@@ -34,9 +34,9 @@ module Skylab::Human
           # (everything about this is hacked for now..)
       end
 
-      def __init_via_sexp_stream st
+      def __init_via_sexp_stream scn
 
-        COMPONENTS.init_via_stream self, st
+        COMPONENTS.init_via_argument_scanner self, scn
       end
 
       def attach_sexp__ sx, association_sym

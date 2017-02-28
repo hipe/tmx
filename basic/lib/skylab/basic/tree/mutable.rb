@@ -175,7 +175,7 @@ module Skylab::Basic
         Tree_::Sessions_::Merge::Constituents.via_ivars self, :@node_payload
       end
 
-      def to_destructee_polymorphic_key_stream  # ditto
+      def to_destructee_key_scanner  # ditto
 
         # because this object *will* be modified mid-scan,
         # we *must* use a duplicate array below.

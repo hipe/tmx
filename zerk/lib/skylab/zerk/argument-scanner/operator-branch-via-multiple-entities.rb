@@ -18,7 +18,7 @@ module Skylab::Zerk
       # the subject exposes special method for parsing, outside of the API
       # of normal operator branches (discussed below). this parsing will
       # dispatch each "at" occurrence to the appropriate value store to
-      # further process that portion of the argument stream head it is
+      # further process that portion of the argument scanner head it is
       # interested in.
       #
       # (typically the value stores are operations, but really they could
@@ -44,7 +44,7 @@ module Skylab::Zerk
       #
       # the main uptake of this is that the subject is distinct among
       # its sibling adaptations in that it can expose a method that parses
-      # that needs only one argument: the argument stream (because the
+      # that needs only one argument: the argument scanner (because the
       # subject already has the value stores as members).
       #
       #

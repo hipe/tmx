@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     class Build_value  # result is a qk
       # -
-        # [#006]:the-universal-component-builder explains everything
+        # [#006.A] "the universal component builder" explains everything
 
         class << self
           def _call ma, asc, acs, & oes_p_p
@@ -104,7 +104,7 @@ module Skylab::Autonomous_Component_System
 
           d = @_receiver.method( m ).arity
           if 1 < d
-            # see construction args [#006]:the-super-signature
+            # see construction args [#003.F] "the super signature"
             xtra = []
             if 2 < d
               xtra.push @association

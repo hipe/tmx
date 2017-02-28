@@ -68,7 +68,7 @@ violoation of which should occur only with good reason.
 
     * a name (imagine it is any string) that is unique in the context of
       all of the "custodian ACS"'s component association names.
-      (the meaning of "custodian" is explained in [#006].)
+      (the meaning of "custodian" is explained in [#006.B].)
 
     * a "component model" (needs only implement one method, #Tenet5.)
 
@@ -380,10 +380,10 @@ the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
 (we are in the midst of developing an experimental new form for the
-above that is only for "compound models" tracked with [#003]#compounds)
+above that is only for "compound models" tracked with [#003.F] "compounds".
 
 we say "interpret" because this method is expected to interpret one
-or more tokens off the argument stream to turn it into a (trueish)
+or more tokens off the argument scanner to turn it into a (trueish)
 object.
 
 this method's semantics are *almost* like the `[]` described above.
@@ -450,7 +450,7 @@ this naming convention with the nested double underscores is
 the "generated form" desribed in (4).
 
 a `via` modifier is an assertion of shape with an expression of intent.
-(but we don't mean "intent" in the [#003] sense, just the non-technical
+(but we don't mean "intent" in the [#003.D] sense, just the non-technical
 sense.)
 
 the `via` modifier allows us to implement a variety of ways that the input

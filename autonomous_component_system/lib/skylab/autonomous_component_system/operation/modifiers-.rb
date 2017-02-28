@@ -10,36 +10,36 @@ module Skylab::Autonomous_Component_System
 
         class << self
 
-          def call_via_argument_stream__ as
-            new.___init_via( as ).execute
+          def call_via_argument_scanner__ scn
+            new.___init_via( scn ).execute
           end
 
           private :new
         end  # >>
 
-        def ___init_via as
-          @argument_stream = as
+        def ___init_via scn
+          @argument_scanner = scn
           self
         end
 
         def execute
 
-          # assume current argument stream head is a modifier keyword..
+          # assume current argument scanner head is a modifier keyword..
 
           @struct = Struct___.new
 
           op_h = OP_H___
-          st = @argument_stream
-          p = op_h.fetch st.gets_one
+          scn = @argument_scanner
+          p = op_h.fetch scn.gets_one
           begin
             instance_exec( & p )
 
             # (because of the imperative phrase grammar,
             # we must have at least one more token:)
 
-            p = op_h[ st.head_as_is ]
+            p = op_h[ scn.head_as_is ]
             if p
-              st.advance_one
+              scn.advance_one
               redo
             end
             break
@@ -71,7 +71,7 @@ module Skylab::Autonomous_Component_System
           modz.assuming = []
         end
         modz.has_conditions = true
-        modz.assuming.push if_or_assuming[ @argument_stream ]
+        modz.assuming.push if_or_assuming[ @argument_scanner ]
         NIL_
       end
 
@@ -82,7 +82,7 @@ module Skylab::Autonomous_Component_System
           self._COVER_ME  # this should be disallowed - bool semantics not clear
         end
         modz.has_conditions = true
-        modz.if = if_or_assuming[ @argument_stream ]
+        modz.if = if_or_assuming[ @argument_scanner ]
         NIL_
       end
 
@@ -96,7 +96,7 @@ module Skylab::Autonomous_Component_System
           a = []
           modz.using = a
         end
-        a.push @argument_stream.gets_one
+        a.push @argument_scanner.gets_one
         NIL_
       end
 
@@ -104,7 +104,7 @@ module Skylab::Autonomous_Component_System
 
       members.push :via
       o[ :via ] = -> do
-        @struct.via = @argument_stream.gets_one
+        @struct.via = @argument_scanner.gets_one
         NIL_
       end
 

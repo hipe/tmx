@@ -115,7 +115,7 @@ module Skylab::Common
         _ok and execute
       end
 
-      include Home_.lib_.fields::Attributes::Lib::PolymorphicProcessingInstanceMethods
+      include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
     private
 
@@ -130,12 +130,12 @@ module Skylab::Common
       end
 
       def fly_p=
-        @fly_p = gets_one_polymorphic_value
+        @fly_p = gets_one
         KEEP_PARSING_
       end
 
       def new_stays_public=
-        @make_new_private = ! gets_one_polymorphic_value
+        @make_new_private = ! gets_one
         KEEP_PARSING_
       end
 

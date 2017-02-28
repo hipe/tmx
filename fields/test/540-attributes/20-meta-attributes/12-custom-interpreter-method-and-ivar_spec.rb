@@ -41,8 +41,8 @@ module Skylab::Fields::TestSupport
           class X_a_ma_CW
 
             def zizzie=
-              st = @_polymorphic_upstream_
-              @zizzie = [ :_yes_, st.gets_one, st.gets_one ]
+              scn = @_argument_scanner_
+              @zizzie = [ :_yes_, scn.gets_one, scn.gets_one ]
               true  # KEEP_PARSING_
             end
 
@@ -86,9 +86,9 @@ module Skylab::Fields::TestSupport
               zing: [ :custom_interpreter_method_of, :zung ],
             )
 
-            def zung st
-              @_a_ = st.gets_one
-              @_b_ = st.gets_one
+            def zung scn
+              @_a_ = scn.gets_one
+              @_b_ = scn.gets_one
               true  # ACHIEVED_
             end
 

@@ -44,6 +44,6 @@ that they are easier to trace. (the user of any API is (eponymously) the
 such an audience.)
 
 code locations tagged with the subject tag may also be towards realizing
-[#006]#the-cold-eventmodel as the universal rule as opposed to just the
+[#006.C.2] "the cold eventmodel" as the universal rule as opposed to just the
 norm..
 _

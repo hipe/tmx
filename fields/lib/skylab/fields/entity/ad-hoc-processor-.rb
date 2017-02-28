@@ -78,8 +78,8 @@ module Skylab::Fields
 
         def consume
 
-          st = @_sess.upstream
-          @_p[ st.gets_one, st.gets_one ]
+          scn = @_sess.upstream
+          @_p[ scn.gets_one, scn.gets_one ]
         end
       end
 

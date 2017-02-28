@@ -4,7 +4,7 @@
 
 ## intro
 
-before reading this, you should understand what [#br-022] formal properties
+before reading this, you should understand what [#002] formal properties
 are.
 
 the concept of meta-properties is all about tagging your formal

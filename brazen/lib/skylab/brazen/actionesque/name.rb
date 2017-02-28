@@ -34,7 +34,7 @@ module Skylab::Brazen
         __accept @_inflection
       end
 
-      include Home_.lib_.fields::Attributes::Lib::PolymorphicProcessingInstanceMethods
+      include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
     private
 

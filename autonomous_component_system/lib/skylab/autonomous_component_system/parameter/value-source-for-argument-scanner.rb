@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class ValueSource_for_ArgumentStream
+    class ValueSource_for_ArgumentScanner
 
       # NOTE  - this means "argument stream" as in the API modality ..
       # notes in [#028].
@@ -18,16 +18,16 @@ module Skylab::Autonomous_Component_System
         end
       end  # >>
 
-      def initialize st
-        @argument_stream = st
+      def initialize scn
+        @argument_scanner = scn
       end
 
       def to_controller_against fo_bx  # [#]:#"Head parse". [ze]
 
         if 1 == fo_bx.length
-          When_Single_Formal___.new fo_bx.at_offset( 0 ), @argument_stream
+          When_Single_Formal___.new fo_bx.at_offset( 0 ), @argument_scanner
         else
-          When_Not_Single_Formal___.new fo_bx, @argument_stream
+          When_Not_Single_Formal___.new fo_bx, @argument_scanner
         end
       end
 
@@ -36,18 +36,18 @@ module Skylab::Autonomous_Component_System
         # the experimental name leaves room for PVS's that
         # don't know when they're empty..
 
-        @argument_stream.no_unparsed_exists
+        @argument_scanner.no_unparsed_exists
       end
 
       class Controller__
 
-        def initialize st
-          @current_argument_stream = st
+        def initialize scn
+          @current_argument_scanner = scn
         end
 
         attr_reader(
           :consuming_formal_parameter_stream,
-          :current_argument_stream,
+          :current_argument_scanner,
         )
       end
 

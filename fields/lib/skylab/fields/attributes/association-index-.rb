@@ -2,13 +2,11 @@ module Skylab::Fields
 
   class Attributes
 
-    module Lib
+    module AssociationIndex_
 
       Normalize_using_defaults_and_requireds = -> sess do
         Here_::Normalization::Normalize_via_Session_with_StaticAttributes[ sess ]
       end
-
-      PolymorphicProcessingInstanceMethods = Actor::InstanceMethods
 
       class Index_of_Definition___
 
@@ -39,7 +37,7 @@ module Skylab::Fields
 
           sidx = static_index_
           o.effectively_defaultants = sidx.effectively_defaultants
-          o.lookup = lookup_attribute_proc_
+          o.lookup = read_association_by_
           o.requireds = sidx.requireds
 
             # -
@@ -89,11 +87,11 @@ module Skylab::Fields
           end
         end
 
-        def lookup_attribute_ k
+        def read_association_ k
           @_h.fetch k
         end
 
-        def lookup_attribute_proc_
+        def read_association_by_
           @_h.method :fetch
         end
 
@@ -108,7 +106,7 @@ module Skylab::Fields
 
       Process_argument_scanner_passively_ = -> st, sess, formals, meths, & x_p do  # 1x
 
-        sess.instance_variable_set ARG_STREAM_IVAR_, st  # as we do
+        sess.instance_variable_set ARGUMENT_SCANNER_IVAR_, st  # as we do
 
         if formals
           _idx = formals.index_
@@ -116,7 +114,7 @@ module Skylab::Fields
 
         o = Parse_and_or_Normalize.new sess, _idx, & x_p
 
-        o.argument_stream = st
+        o.argument_scanner = st
 
         o.__push_formal_reader_by do |k|
 
@@ -130,7 +128,7 @@ module Skylab::Fields
 
         kp = o.execute
 
-        sess.remove_instance_variable ARG_STREAM_IVAR_
+        sess.remove_instance_variable ARGUMENT_SCANNER_IVAR_
 
         kp
       end
@@ -151,7 +149,7 @@ module Skylab::Fields
 
         def initialize sess, index=nil, & oes_p
 
-          @argument_stream = nil
+          @argument_scanner = nil
           @_formal_reader_stack = []
           @index = index  # can be nil
           @_oes_p = oes_p  # can be nil
@@ -163,11 +161,11 @@ module Skylab::Fields
         end
 
         def sexp= sx
-          @argument_stream = Common_::Scanner.via_array sx ; sx
+          @argument_scanner = Common_::Scanner.via_array sx ; sx
         end
 
         attr_writer(
-          :argument_stream,
+          :argument_scanner,
         )
 
         attr_accessor(
@@ -188,7 +186,7 @@ module Skylab::Fields
             normalize_m = :__do_normalize
           end
 
-          if @argument_stream
+          if @argument_scanner
             kp = ___process_argument_stream
           else
             kp = KEEP_PARSING_
@@ -209,7 +207,7 @@ module Skylab::Fields
 
           read = __formal_attribute_reader
 
-          st = @argument_stream
+          st = @argument_scanner
 
           until st.no_unparsed_exists
 
@@ -238,7 +236,7 @@ module Skylab::Fields
         end
 
         def __at_extra_then_raise_an_exception  # mimic #spot-1-1
-          _ev = Home_::Events::Extra.via_strange @argument_stream.head_as_is
+          _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
           raise _ev.to_exception
         end
 
@@ -285,14 +283,14 @@ module Skylab::Fields
 
           p = stack.fetch 0
           -> do
-            p[ @argument_stream.head_as_is ]
+            p[ @argument_scanner.head_as_is ]
           end
         end
 
         def __formal_attribute_reader_when_many stack
 
           top_d = stack.length - 1
-          st = @argument_stream
+          st = @argument_scanner
 
           -> do
 
@@ -315,7 +313,7 @@ module Skylab::Fields
         end
 
         attr_reader(  # (all here)
-          :argument_stream,
+          :argument_scanner,
           :index,
           :session,
         )

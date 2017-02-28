@@ -25,7 +25,7 @@ module Skylab::Fields
 
           _st = Common_::Stream.via_nonsparse_array @_mprp_a
 
-          Home_::Attributes::Normalization_against_Model::Stream.call(
+          Home_::Attributes::Normalization::OCTOBER_08_2014::Stream.call(
             prp,
             _st,
           )
@@ -78,7 +78,7 @@ module Skylab::Fields
           nm = prp.name
           ivar = nm.as_ivar
           rm = nm.as_variegated_symbol
-          wm = prp.conventional_polymorphic_writer_method_name
+          wm = prp.conventional_argument_scanning_writer_method_name
 
           @_cls.class_exec do
 
@@ -101,7 +101,7 @@ module Skylab::Fields
           nm = prp.name
           ivar = nm.as_ivar
           rm = nm.as_variegated_symbol
-          wm = prp.conventional_polymorphic_writer_method_name
+          wm = prp.conventional_argument_scanning_writer_method_name
 
           @_cls.class_exec do
 
@@ -110,7 +110,7 @@ module Skylab::Fields
 
             define_method wm do
 
-              instance_variable_set ivar, gets_one_polymorphic_value
+              instance_variable_set ivar, gets_one
               KEEP_PARSING_
             end
 
@@ -123,13 +123,13 @@ module Skylab::Fields
         def __when_argument_arity_of__custom__ prp
 
           mutate_entity_against_upstream = prp.mutate_entity_proc_
-          wm = prp.conventional_polymorphic_writer_method_name
+          wm = prp.conventional_argument_scanning_writer_method_name
 
           @_cls.class_exec do
 
             define_method wm do
 
-              mutate_entity_against_upstream[ self, @_polymorphic_upstream_ ]
+              mutate_entity_against_upstream[ self, @_argument_scanner_ ]
             end
 
             private wm

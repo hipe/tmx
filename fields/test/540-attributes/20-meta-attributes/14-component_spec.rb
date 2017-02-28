@@ -38,9 +38,9 @@ module Skylab::Fields::TestSupport
                 undef_method :new
               end  # >>
 
-              def initialize st, atr
+              def initialize scn, atr
 
-                @_two = [ st.gets_one, st.gets_one ]
+                @_two = [ scn.gets_one, scn.gets_one ]
                 @_atr = atr
               end
 

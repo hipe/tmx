@@ -72,3 +72,7 @@ OK tan_man/test/14-sexp/24-auto/25-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/12-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
+-18.492: "corral" disparate n11n facilities
+(remove _MANIFEST_.list)
+-18.494: simple symbol renames (methods etc)
+-18.496: many file renames

@@ -2,7 +2,9 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Platform_Arglist__via__Argument_Stream___
+    class Platform_Arglist__via__Argument_Scanner___
+
+      self._HUH?  # #todo
 
       # one of the permutations of [#028]. this one is for the simplest of
       # arrangements: parsing arguments off the argument stream to get them
@@ -29,7 +31,7 @@ module Skylab::Autonomous_Component_System
 
         h = ___build_empty_sparse_hash
 
-        @_n11n.parse_from_argument_stream_into_against_ h, @formals_box
+        @_n11n.parse_from_argument_scanner_into_against_ h, @formals_box
 
         _st = @formals_box.to_value_stream
 

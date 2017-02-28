@@ -302,9 +302,9 @@ module Skylab::Common
           once = -> do
             did = true
             at_end = -> do
-              remove_instance_variable :@_polymorphic_upstream_
+              remove_instance_variable :@_argument_scanner_
             end
-            @_polymorphic_upstream_ = scn
+            @_argument_scanner_ = scn
             NIL_
           end
 
@@ -358,8 +358,8 @@ module Skylab::Common
           NIL_
         end
 
-        def gets_one_polymorphic_value  # :+#cp
-          @_polymorphic_upstream_.gets_one
+        def gets_one  # :+#cp
+          @_argument_scanner_.gets_one
         end
 
       protected

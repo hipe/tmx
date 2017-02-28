@@ -14,27 +14,27 @@ module Skylab::System
       end
 
       def dash_means=
-        @dash_means_ = gets_one_polymorphic_value
+        @dash_means_ = gets_one
         KEEP_PARSING_
       end
 
       def force_arg=
-        @_force_arg = gets_one_polymorphic_value
+        @_force_arg = gets_one
         KEEP_PARSING_
       end
 
       def is_dry_run=
-        @_is_dry_run = gets_one_polymorphic_value
+        @_is_dry_run = gets_one
         KEEP_PARSING_
       end
 
       def stderr=
-        @_stderr = gets_one_polymorphic_value
+        @_stderr = gets_one
         KEEP_PARSING_
       end
 
       def stdout=
-        @_stdout = gets_one_polymorphic_value
+        @_stdout = gets_one
         KEEP_PARSING_
       end
 

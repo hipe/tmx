@@ -184,13 +184,13 @@ module Skylab::Plugin
     class LEGACY_Brazen_Actionesque_ProduceBoundCall
 
       attr_reader(
-        :argument_stream,
+        :argument_scanner,
         :current_bound,
       )
 
       attr_writer(
         :module,  # just for resolving some event handler when necessary
-        :argument_stream,
+        :argument_scanner,
         :current_bound,
         :unbound_stream,
       )
@@ -213,7 +213,7 @@ module Skylab::Plugin
           @on_event_selectively = oes_p
         end
 
-        @argument_stream = Common_::Scanner.via_array x_a
+        @argument_scanner = Common_::Scanner.via_array x_a
         NIL_
       end
 
@@ -237,7 +237,7 @@ module Skylab::Plugin
 
       def __resolve_bound
 
-        if @argument_stream.unparsed_exists
+        if @argument_scanner.unparsed_exists
 
           @unbound_stream = @subject_unbound.build_unordered_selection_stream(
             & @on_event_selectively )
@@ -263,7 +263,7 @@ module Skylab::Plugin
             break
           end
 
-          if @argument_stream.no_unparsed_exists
+          if @argument_scanner.no_unparsed_exists
             __when_name_is_too_short
             ok = false
             break
@@ -279,7 +279,7 @@ module Skylab::Plugin
       def find_via_unbound_stream  # resolves current_bound. results in t/f
 
         st = @unbound_stream
-        sym = @argument_stream.head_as_is
+        sym = @argument_scanner.head_as_is
 
         begin
 
@@ -287,7 +287,7 @@ module Skylab::Plugin
           unb or break
 
           if sym == unb.name_function.as_lowercase_with_underscores_symbol
-            @argument_stream.advance_one
+            @argument_scanner.advance_one
             break
           end
 
@@ -308,7 +308,7 @@ module Skylab::Plugin
       end
 
       def __when_no_bound_at_this_step
-        _end_in_error_with :no_such_action, :action_name, @argument_stream.head_as_is
+        _end_in_error_with :no_such_action, :action_name, @argument_scanner.head_as_is
       end
 
       def __when_name_is_too_short
@@ -320,16 +320,16 @@ module Skylab::Plugin
 
         if @mutable_box
 
-          if @argument_stream.unparsed_exists
+          if @argument_scanner.unparsed_exists
 
             @current_bound.bound_call_against_argument_scanner_and_mutable_box(
-              @argument_stream, @mutable_box )
+              @argument_scanner, @mutable_box )
 
           else
             @current_bound.bound_call_against_box @mutable_box
           end
         else
-          @current_bound.bound_call_against_argument_scanner @argument_stream
+          @current_bound.bound_call_against_argument_scanner @argument_scanner
         end
       end
 

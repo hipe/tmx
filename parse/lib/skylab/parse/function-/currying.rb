@@ -49,12 +49,12 @@ module Skylab::Parse
     private
 
       def input_array=
-        @input_stream = _input_stream_via_array gets_one_polymorphic_value
+        @input_stream = _input_stream_via_array gets_one
         KEEP_PARSING_
       end
 
       def matcher_functions=
-        st = polymorphic_upstream
+        st = argument_scanner
         @function_a = []
         cls = Home_::Functions_::Simple_Matcher
         while st.unparsed_exists
@@ -65,7 +65,7 @@ module Skylab::Parse
 
       def functions=
 
-        _process_functions_via_argument_scanner polymorphic_upstream
+        _process_functions_via_argument_scanner argument_scanner
       end
 
       def _process_functions_via_argument_scanner st
@@ -112,7 +112,7 @@ module Skylab::Parse
       end
 
       def function_objects_array=
-        @function_a = gets_one_polymorphic_value
+        @function_a = gets_one
         KEEP_PARSING_
       end
 

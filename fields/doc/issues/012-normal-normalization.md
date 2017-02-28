@@ -328,7 +328,7 @@ our overall central algorithm will have these characteristics:
 
   - that it comprehends over the entire stream of formals once,
     because it has to to know of any that are required, as well
-    as other reason
+    as other reasons
 
   - it will never assign "into" the local participant data that
     might be invalid (according to the representation of validity
@@ -996,7 +996,10 @@ more specifically: we know we have code that we use to normalize an
 entity against its formal properties (in whatever arbitrary
 business-specific constituency they may assume). can we normalize
 incoming formal properties against the (again business-specific)
-meta-properties with this same code? (see [#034], [#br-022], [#fi-037])
+meta-properties with this same code?
+
+(see also [#034] "entity", [#002] "defined attributes", [#037]
+"meta attributes".)
 
 crazier still, can we normalize meta-properties against The meta-meta-
 properties again with the same code that we use to accomplish the above?

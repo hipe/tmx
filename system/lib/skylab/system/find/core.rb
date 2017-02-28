@@ -147,14 +147,14 @@ module Skylab::System
       private
 
         def filename=
-          @unescaped_filename_a.clear.push gets_one_polymorphic_value
+          @unescaped_filename_a.clear.push gets_one
           KEEP_PARSING_
         end
 
         def filenames=
 
           # an "or" list
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @unescaped_filename_a.replace x
           else
@@ -168,7 +168,7 @@ module Skylab::System
           # for now a hack to effect "-type d" etc. if we find ourselves
           # leveraging this more than once in the same "way", abstract.
 
-          arg = _normalize_unsanititized_freeform_string_array gets_one_polymorphic_value
+          arg = _normalize_unsanititized_freeform_string_array gets_one
           arg and begin
             @sanitized_freeform_query_infix_words = arg.value_x   # nil OK
             KEEP_PARSING_
@@ -177,7 +177,7 @@ module Skylab::System
 
         def freeform_query_postfix_words=
 
-          arg = _normalize_unsanititized_freeform_string_array gets_one_polymorphic_value
+          arg = _normalize_unsanititized_freeform_string_array gets_one
           arg and begin
             @sanitized_freeform_query_postfix_words = arg.value_x  # nil OK
             KEEP_PARSING_
@@ -185,23 +185,23 @@ module Skylab::System
         end
 
         def ignore_dirs=
-          @unescaped_ignore_dir_a.replace gets_one_polymorphic_value
+          @unescaped_ignore_dir_a.replace gets_one
           KEEP_PARSING_
         end
 
         def path=
-          @unescaped_path_a.clear.push gets_one_polymorphic_value
+          @unescaped_path_a.clear.push gets_one
           KEEP_PARSING_
         end
 
         def paths=
-          @unescaped_path_a.clear.replace gets_one_polymorphic_value
+          @unescaped_path_a.clear.replace gets_one
           KEEP_PARSING_
         end
 
         def trusted_strings=  # WARNING the hash is not currently dup-aware
           h = ( @trusted_string_h ||= {} )
-          gets_one_polymorphic_value.each do | s |
+          gets_one.each do | s |
             h[ s ] = true
           end
           KEEP_PARSING_

@@ -110,7 +110,7 @@ module Skylab::Brazen
       end
     end
 
-    attr_writer :polymorphic_upstream_  # hax only (like above)
+    attr_writer :argument_scanner_  # hax only (like above)
 
     def _bound_call_after
 
@@ -344,12 +344,12 @@ module Skylab::Brazen
       Home_::Actionesque::Input_Adapters::Via_qualified_knownness_box[ self, bx ]  # result is result
     end
 
-    def set_polymorphic_upstream__ x
-      @_polymorphic_upstream_ = x
+    def set_argument_scanner__ x
+      @_argument_scanner_ = x
     end
 
-    def remove_polymorphic_upstream__
-      remove_instance_variable :@_polymorphic_upstream_
+    def remove_argument_scanner__
+      remove_instance_variable :@_argument_scanner_
     end
 
     def when_after_process_iambic_fully_stream_has_content st

@@ -31,26 +31,26 @@ module Skylab::Parse
 
         def any_first_constituent_string=
           @expag = nil
-          @x_h[ :any_first_constituent_string ] = gets_one_polymorphic_value
+          @x_h[ :any_first_constituent_string ] = gets_one
           KEEP_PARSING_
         end
 
         def any_subsequent_constituent_string=
           @expag = nil
-          @x_h[ :any_subsequent_constituent_string ] = gets_one_polymorphic_value
+          @x_h[ :any_subsequent_constituent_string ] = gets_one
           KEEP_PARSING_
         end
 
         def constituent_string_via_constituent_badge=
           @cdpsbs = false
           @expag = nil
-          @x_h[ :constituent_string_via_constituent_badge ] = gets_one_polymorphic_value
+          @x_h[ :constituent_string_via_constituent_badge ] = gets_one
           KEEP_PARSING_
         end
 
         def express_all_segments_into_under_of_constituent_reflective_function=
           @expag = nil
-          @x_h[ :express_all_segments_into_under_of_constituent_reflective_function ] = gets_one_polymorphic_value
+          @x_h[ :express_all_segments_into_under_of_constituent_reflective_function ] = gets_one
           KEEP_PARSING_
         end
 

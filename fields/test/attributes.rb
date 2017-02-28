@@ -203,12 +203,12 @@ module Skylab::Fields::TestSupport
       end
 
       def process_argument_scanner_fully_via_ * x_a
-        _st = scanner_via_array_ x_a
-        @session_.send :process_argument_scanner_fully, _st
+        _scn = scanner_via_array_ x_a
+        @session_.send :process_argument_scanner_fully, _scn
       end
 
-      def process_argument_scanner_passively_ st
-        @session_.send :process_argument_scanner_passively, st
+      def process_argument_scanner_passively_ scn
+        @session_.send :process_argument_scanner_passively, scn
       end
 
       def the_empty_argument_scanner_

@@ -173,16 +173,16 @@ module Skylab::System
 
       def filesystem=
         # all path-based n11ns support providing your own filesystem
-        @filesystem = gets_one_polymorphic_value
+        @filesystem = gets_one
         KEEP_PARSING_
       end
 
       def path=
-        _accept_path gets_one_polymorphic_value
+        _accept_path gets_one
       end
 
       def qualified_knownness_of_path=
-        @qualified_knownness_of_path = gets_one_polymorphic_value
+        @qualified_knownness_of_path = gets_one
         @path_arg_was_explicit_ = true
         KEEP_PARSING_
       end
@@ -323,7 +323,7 @@ module Skylab::System
         @qualified_knownness_of_path.value_x
       end
 
-      Common_::Event.selective_builder_sender_receiver self
+      include Common_::Event::ReceiveAndSendMethods
 
       Sibling__ = Normalizations
     end

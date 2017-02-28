@@ -55,10 +55,10 @@ class Kernel  # [#015]
     o.execute
   end
 
-  def bound_call_via_argument_scanner arg_st, & x_p
+  def bound_call_via_argument_scanner scn, & x_p
 
     o = Home_::Actionesque_ProduceBoundCall.new self, & x_p
-    o.argument_stream = arg_st
+    o.argument_scanner = scn
     o.execute
   end
 

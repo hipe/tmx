@@ -70,7 +70,7 @@ module Skylab::System
         end
 
         def line_upstream=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @line_upstream = x
             @resolve_line_upstream_method_name = :OK
@@ -79,7 +79,7 @@ module Skylab::System
         end
 
         def path=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @path = x
             @resolve_line_upstream_method_name = :via_path_resolve_line_upstream

@@ -53,7 +53,7 @@ module Skylab::Autonomous_Component_System
 
           # reminder: we do *not* `ACS_::Interpretation::Build_value` here.
 
-          _x = cont.current_argument_stream.gets_one  # ..
+          _x = cont.current_argument_scanner.gets_one  # ..
 
           @parameter_store.accept_parameter_value _x, par
 

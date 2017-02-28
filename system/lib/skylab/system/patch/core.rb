@@ -62,12 +62,12 @@ module Skylab::System
       private
 
         def is_dry_run=
-          @dry = gets_one_polymorphic_value
+          @dry = gets_one
           KEEP_PARSING_
         end
 
         def patch_file=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @patch_method = :via_patch_file
             @patch_file = x
@@ -78,7 +78,7 @@ module Skylab::System
         end
 
         def patch_lines=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @patch_method = :via_lines
             @patch_lines = x
@@ -89,7 +89,7 @@ module Skylab::System
         end
 
         def patch_string=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @patch_method = :via_patch_string
             @patch_string = x
@@ -100,7 +100,7 @@ module Skylab::System
         end
 
         def target_directory=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @target_method = :against_directory
             @target_directory = x
@@ -111,7 +111,7 @@ module Skylab::System
         end
 
         def target_file=
-          x = gets_one_polymorphic_value
+          x = gets_one
           if x
             @target_method = :against_file
             @target_file = x

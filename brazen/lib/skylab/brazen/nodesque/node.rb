@@ -115,7 +115,7 @@ module Skylab::Brazen
       end
     end
 
-    def knownness_via_association_ prp
+    def _read_knownness_ prp
 
       knownness prp.name_symbol
     end

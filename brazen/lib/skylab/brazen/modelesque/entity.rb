@@ -66,26 +66,26 @@ module Skylab::Brazen
 
   module Modelesque::Entity
     # -
-      def receive_polymorphic_property prp  # (method MUST be public)  :.A
+      def _parse_association_ prp  # (method MUST be public)  :[#here.1]
 
         # (overwrite this #hook-out so we write not to ivars but to our box)
 
         case prp.argument_arity
 
         when :one
-          set_value_of_formal_property_ gets_one_polymorphic_value, prp
+          _write_via_association_ gets_one, prp
 
         when :zero
-          set_value_of_formal_property_ true, prp
+          _write_via_association_ true, prp
 
         when :custom
-          send prp.conventional_polymorphic_writer_method_name  # :+#by:pe
+          send prp.conventional_argument_scanning_writer_method_name  # :+#by:pe
 
         when :one_or_more  # :+#by:st
-          set_value_of_formal_property_ gets_one_polymorphic_value, prp
+          _write_via_association_ gets_one, prp
 
         when :zero_or_more  # :+#by:fm
-          set_value_of_formal_property_ gets_one_polymorphic_value, prp
+          _write_via_association_ gets_one, prp
 
         else
           raise ::NameError, __say_arg_arity( prp )
@@ -102,24 +102,23 @@ module Skylab::Brazen
 
       # ~ normalization (a thin layer on top of entity concerns)
 
-      def normalize  # :.B
+      def normalize  # :[#here.2]
 
         # since we have reached ths method at all it is safe to
         # assume that the entity has some formal properties.
 
-        Home_.lib_.fields::Attributes::Normalization_against_Model::Stream.call(
+        Home_.lib_.fields::Attributes::Normalization::OCTOBER_08_2014::Stream.call(
 
           self,
           formal_properties.to_value_stream,
           & handle_event_selectively )
       end
 
-      def set_value_of_formal_property_ x, prp
+      public def _write_via_association_ x, prp
 
         as_entity_actual_property_box_.set prp.name_symbol, x  # (changed from `add`)
         KEEP_PARSING_
       end
-      public :set_value_of_formal_property_
 
       if const_defined? :Property
         # ok. it means we defined meta-properties above
@@ -141,7 +140,7 @@ module Skylab::Brazen
 
           def ad_hoc_normalizer=
 
-            append_ad_hoc_normalizer_( & gets_one_polymorphic_value )
+            append_ad_hoc_normalizer_( & gets_one )
             KEEP_PARSING_
           end
 
@@ -182,7 +181,7 @@ module Skylab::Brazen
             # when the default is expressed as a simple primitive-ish
             # value, we want to be able to just have it back
 
-            x = gets_one_polymorphic_value
+            x = gets_one
             @default_proc = -> do
               x
             end
@@ -216,7 +215,7 @@ module Skylab::Brazen
 
           def description=
 
-            p = gets_one_polymorphic_value
+            p = gets_one
 
             if p.respond_to? :ascii_only?
               _STRING = x
@@ -255,7 +254,7 @@ module Skylab::Brazen
         private
 
           def integer_greater_than_or_equal_to=
-            add_normalizer_for_greater_than_or_equal_to_integer gets_one_polymorphic_value
+            add_normalizer_for_greater_than_or_equal_to_integer gets_one
           end
 
           def add_normalizer_for_greater_than_or_equal_to_integer d  # :+#public-API
@@ -316,7 +315,7 @@ module Skylab::Brazen
           end
         end
 
-        def receive_missing_required_properties_array miss_prp_a  # :+#public-API #hook-in #universal
+        public def _receive_missing_required_associations_ miss_prp_a  # :+#public-API #hook-in #universal
 
           ev = Home_.lib_.fields::Events::Missing.for_attributes miss_prp_a
 
@@ -327,7 +326,6 @@ module Skylab::Brazen
             raise ev.to_exception
           end
         end
-        public :receive_missing_required_properties_array
 
         def receive_missing_required_properties_softly ev  # popular :+#hook-with
           # (was :+[#054] #tracking error count)
@@ -343,7 +341,7 @@ module Skylab::Brazen
         private
 
           def name_symbol=
-            @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
+            @name = Common_::Name.via_variegated_symbol gets_one
             KEEP_PARSING_
           end
         end

@@ -99,7 +99,7 @@ of the "channel" part of emissions:
     the channel is very frequently `info` or `error`. (but projects are
     free to extend or ignore this convention as useful.)
 
-    the [#ac-006]#Mutated "signal" is an example of a custom front
+    the [#ac-006.J.2] "mutated" "signal" is an example of a custom front
     channel element with special (and important) semantics.
 
     we don't want to think of this as a "formal element" per se (because

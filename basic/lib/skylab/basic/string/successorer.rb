@@ -32,8 +32,8 @@ module Skylab::Basic
     private
 
       def template=
-        _receive_template_string gets_one_polymorphic_value
-        st = polymorphic_upstream
+        _receive_template_string gets_one
+        st = argument_scanner
         h = @tmpl_var_bx.h_
         while st.unparsed_exists
           sym = st.gets_one.intern

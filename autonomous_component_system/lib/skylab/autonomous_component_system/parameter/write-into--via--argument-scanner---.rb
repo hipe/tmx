@@ -2,7 +2,9 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Write_Into__via__Argument_Stream___
+    class Write_Into__via__Argument_Scanner___
+
+      self._HUH?  # #todo
 
       # when your formal operation defines itself as A) a (presumably
       # [#fi-007] session-like) class, and B) it doesn't specify its own
@@ -20,7 +22,7 @@ module Skylab::Autonomous_Component_System
 
         fo_bx = n11n.flush_formals_stream_to_box_
 
-        _h = n11n.parse_from_argument_stream_into_against_( {}, fo_bx )
+        _h = n11n.parse_from_argument_scanner_into_against_( {}, fo_bx )
         _rdr_p = _h.method :fetch
 
         _st = fo_bx.to_value_stream

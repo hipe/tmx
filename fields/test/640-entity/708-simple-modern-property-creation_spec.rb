@@ -17,12 +17,12 @@ module Skylab::Fields::TestSupport
           Entity.lib.call self do
 
             def foo
-              @foo = gets_one_polymorphic_value
+              @foo = gets_one
               true
             end
 
             def bar
-              @bar = gets_one_polymorphic_value
+              @bar = gets_one
               true
             end
           end

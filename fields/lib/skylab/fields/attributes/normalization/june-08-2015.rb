@@ -1,8 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  module Attributes
 
-    class Value_Processing
+    class Normalization::JUNE_2015
 
       # sadly, the two main other implementations of this (in [co] and [br])
       # were not flexible enough to accomodate this kind of thing ..
@@ -28,7 +28,7 @@ module Skylab::Fields
         st = @upstream
 
         while st.unparsed_exists
-          kp = receive_polymorphic_property mz.fetch st.gets_one
+          kp = __parse_via_association mz.fetch st.gets_one
           kp or break
         end
 
@@ -39,28 +39,28 @@ module Skylab::Fields
         kp && normalize
       end
 
-      def receive_polymorphic_property mo  # compare to [#047.A]
+      def __parse_via_association mo  # compare to [#br-047.1] (method)
 
         case mo.argument_arity
 
         when :one
-          set_value_of_formal_property_ @upstream.gets_one, mo
+          _write_via_association_ @upstream.gets_one, mo
 
         when :zero
-          set_value_of_formal_property_ true, mo
+          _write_via_association_ true, mo
 
         when :zero_or_more
 
           # (the onus is on the front client to do this right)
 
-          set_value_of_formal_property_ @upstream.gets_one, mo
+          _write_via_association_ @upstream.gets_one, mo
 
         else
           raise ::NameError, "no: '#{ mo.argument_arity }'"
         end
       end
 
-      def set_value_of_formal_property_ x, mo
+      def _write_via_association_ x, mo
 
         k = mo.name_symbol
 
@@ -69,15 +69,15 @@ module Skylab::Fields
         KEEP_PARSING_
       end
 
-      def normalize  # compare to [#047.B]
+      def normalize  # compare to [#br-047.2] (method)
 
-        Here_::Normalization_against_Model::Stream.call(
+        Here_::Normalization::OCTOBER_08_2014::Stream.call(
           self,
           @value_models.to_value_stream,
         )
       end
 
-      def knownness_via_association_ prp
+      def _read_knownness_ prp
 
         had = true
         x = @value_collection.fetch prp.name_symbol do
@@ -91,7 +91,7 @@ module Skylab::Fields
         end
       end
 
-      def receive_missing_required_properties_array mo_a  # compare to etc
+      def _receive_missing_required_associations_ mo_a  # compare to etc
 
         _ev = Home_.lib_.fields::Events::Missing.for_attributes mo_a
 

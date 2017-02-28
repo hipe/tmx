@@ -39,18 +39,18 @@ module Skylab::Basic
 
       def path=
         @buid = Home_::ByteStream::UpstreamReference.via_path(
-          gets_one_polymorphic_value )
+          gets_one )
         KEEP_PARSING_
       end
 
       def string=
         @buid = Home_::ByteStream::UpstreamReference.via_string(
-          gets_one_polymorphic_value )
+          gets_one )
         KEEP_PARSING_
       end
 
       def couplet_mapper=
-        @couplet_mapper = gets_one_polymorphic_value
+        @couplet_mapper = gets_one
         KEEP_PARSING_
       end
 

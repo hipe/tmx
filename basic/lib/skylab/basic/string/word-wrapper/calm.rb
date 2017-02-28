@@ -55,7 +55,7 @@ module Skylab::Basic
 
       def input_string=
 
-        x = gets_one_polymorphic_value
+        x = gets_one
         if x
           if @_input_shape
             raise ::ArgumentError
@@ -68,7 +68,7 @@ module Skylab::Basic
 
       def input_words=
 
-        x = gets_one_polymorphic_value
+        x = gets_one
         if x
           if @_input_shape
             raise ::ArgumentError

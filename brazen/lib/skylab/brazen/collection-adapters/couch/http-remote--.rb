@@ -62,7 +62,7 @@ module Skylab::Brazen
       private
 
         def add_HTTP_parameter=
-          add_HTTP_param gets_one_polymorphic_value, gets_one_polymorphic_value
+          add_HTTP_param gets_one, gets_one
         end
 
       public

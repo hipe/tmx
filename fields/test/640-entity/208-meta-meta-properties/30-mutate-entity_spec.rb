@@ -19,9 +19,9 @@ module Skylab::Fields::TestSupport
 
         X_e_mmp_me_Entity = Entity.lib.call do
 
-          o :mutate_entity, -> prp, st do
+          o :mutate_entity, -> prp, scn do
 
-              prp.wants_to_know = st.gets_one
+              prp.wants_to_know = scn.gets_one
               KEEP_PARSING_
             end,
 

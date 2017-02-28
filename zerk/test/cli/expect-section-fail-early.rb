@@ -591,13 +591,13 @@ module Skylab::Zerk::TestSupport
       def process_iambic_fully x_a
 
         st = Common_::Scanner.via_array x_a
-        @_polymorphic_upstream_ = st
+        @_argument_scanner_ = st
         begin
           _m = st.gets_one
           _kp = send :"#{ _m }="
           _kp or fail
         end until st.no_unparsed_exists
-        remove_instance_variable :@_polymorphic_upstream_
+        remove_instance_variable :@_argument_scanner_
         NIL_  # ..
       end
 
@@ -607,19 +607,19 @@ module Skylab::Zerk::TestSupport
       end
 
       def state=
-        state = @_polymorphic_upstream_.gets_one
+        state = @_argument_scanner_.gets_one
         @exitstatus = state.exitstatus
         @_build.emission_array = state.lines
         KEEP_PARSING_
       end
 
       def stream=
-        @_build.stream_symbol = @_polymorphic_upstream_.gets_one
+        @_build.stream_symbol = @_argument_scanner_.gets_one
         KEEP_PARSING_
       end
 
       def string=
-        @_build.one_big_string = @_polymorphic_upstream_.gets_one
+        @_build.one_big_string = @_argument_scanner_.gets_one
         KEEP_PARSING_
       end
 

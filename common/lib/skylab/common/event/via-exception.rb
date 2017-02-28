@@ -41,7 +41,7 @@ module Skylab::Common
 
         def event_property=
 
-          st = polymorphic_upstream
+          st = argument_scanner
           _sym = st.gets_one
           _x = st.gets_one
           a = ( @_event_property_pairs ||= [] )
@@ -51,8 +51,8 @@ module Skylab::Common
 
         def search_and_replace_hack=
 
-          rx = gets_one_polymorphic_value
-          p = gets_one_polymorphic_value
+          rx = gets_one
+          p = gets_one
 
           _add_mutator do | o |
 

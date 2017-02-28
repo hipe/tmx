@@ -54,7 +54,7 @@ module Skylab::Fields
         def processor=
 
           @_is_complete = true
-          @_method_name = gets_one_polymorphic_value
+          @_method_name = gets_one
           STOP_PARSING_
         end
 

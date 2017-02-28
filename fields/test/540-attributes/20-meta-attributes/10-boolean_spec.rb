@@ -116,9 +116,9 @@ module Skylab::Fields::TestSupport
           :flag, :property, :jamoney, :wippelzorff,
         )
 
-        st = flush_to_item_stream_expecting_all_items_are_parameters_
+        scn = flush_to_item_stream_expecting_all_items_are_parameters_
 
-        [ st.gets, st.gets ]
+        [ scn.gets, scn.gets ]
       end
     end
 

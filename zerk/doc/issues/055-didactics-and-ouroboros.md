@@ -111,7 +111,7 @@ in the membership, but we do no longer for two reasons:
 
 experimental, this is the remote service telling us that it
 succeeded in resolving a next opera*tor* from the head of the
-argument stream that we handed off to [wherever]. if now or
+argument scanner that we handed off to [wherever]. if now or
 at any point in the future we will want the associated normal
 name symbol (or any derivative thereof), we've got to grab it
 now because the argument scanner is mutable and in motion..

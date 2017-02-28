@@ -62,10 +62,10 @@ module Skylab::Autonomous_Component_System
         ok = true
         normstream_p.call do |x, d|
 
-          _st = Home_.lib_.fields::Argument_stream_via_value[ x ]
+          _scn = Home_.lib_.fields::Argument_scanner_via_value[ x ]
 
           qk = Home_::Interpretation::Build_value.call(
-            _st,
+            _scn,
             @singular_comp_assoc,
             @ACS,
             & x_p )

@@ -38,9 +38,9 @@ module Skylab::Fields::TestSupport
         class X_e_ahp_Child < X_e_ahp_Base
 
           Entity.lib.call self do
-            o :polymorphic_writer_method_name_suffix, :'='
+            o :argument_scanning_writer_method_name_suffix, :'='
             def foo=
-              @foo = gets_one_polymorphic_value
+              @foo = gets_one
             end
             o :gazoink, [ :bar, :baz ]
             def biff=

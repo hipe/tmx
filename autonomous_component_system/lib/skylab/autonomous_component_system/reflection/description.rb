@@ -1,10 +1,11 @@
 module Skylab::Autonomous_Component_System
 
   self._REVEW_dependencies_have_changed_and_this_whole_node_is_not_covered
+  # #todo - really?
 
   module Infer
 
-    Description = -> y, expag, nf, acs do  # [#003]:#infer-desc
+    Description = -> y, expag, nf, acs do  # [#003.L] infer-desc
 
       # hackly made a ridiculous assumption that lets us guess whether
       # the verb takes a singular or plural noun for its object.

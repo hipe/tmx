@@ -16,7 +16,7 @@ module Skylab::Fields::TestSupport
 
           attr_reader :foo, :bar, :baz
 
-          Entity.lib.call self, :polymorphic_writer_method_name_suffix, :"=" do
+          Entity.lib.call self, :argument_scanning_writer_method_name_suffix, :"=" do
 
             o :default, 22,
               :meta_property, :importance,
@@ -24,17 +24,17 @@ module Skylab::Fields::TestSupport
               :importance, 10
 
             def foo=
-              @foo = gets_one_polymorphic_value
+              @foo = gets_one
             end
 
             o :importance, 20
 
             def bar=
-              @bar = gets_one_polymorphic_value
+              @bar = gets_one
             end
 
             def baz=
-              @baz = gets_one_polymorphic_value
+              @baz = gets_one
             end
 
           end

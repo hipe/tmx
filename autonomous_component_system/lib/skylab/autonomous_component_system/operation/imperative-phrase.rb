@@ -15,8 +15,8 @@ module Skylab::Autonomous_Component_System
         private :new
       end  # >>
 
-      def initialize as, rw, & pp
-        @argument_stream = as
+      def initialize scn, rw, & pp
+        @argument_scanner = scn
         @_pp = pp
         @_stack_base = [ rw ]
       end
@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System
         # `gets`'s each next phrase-parsing structure for each next phrase
 
         -> do
-          if @argument_stream.unparsed_exists
+          if @argument_scanner.unparsed_exists
             dup  # nothing to init. all the work is in the next method..
           end
         end
@@ -59,13 +59,13 @@ module Skylab::Autonomous_Component_System
       end
 
       def build_parameter_value_source_
-        Home_::Parameter::ValueSource_for_ArgumentStream.new @argument_stream
+        Home_::Parameter::ValueSource_for_ArgumentScanner.new @argument_scanner
       end
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node
 
-        if MODIFIER_KEYWORDS___[ @argument_stream.head_as_is ]
-          o = Here_::Modifiers_::Parse.call_via_argument_stream__ @argument_stream
+        if MODIFIER_KEYWORDS___[ @argument_scanner.head_as_is ]
+          o = Here_::Modifiers_::Parse.call_via_argument_scanner__ @argument_scanner
         end
 
         @modz_ = o
@@ -82,7 +82,7 @@ module Skylab::Autonomous_Component_System
 
       def __parse_verb  # you can't validate it yet
 
-        @_imperative_verb_symbol = @argument_stream.gets_one
+        @_imperative_verb_symbol = @argument_scanner.gets_one
         NIL_
       end
 
@@ -93,7 +93,7 @@ module Skylab::Autonomous_Component_System
 
         o = Here_::Node_Parse.begin_via_these__(
           @_stack,
-          @argument_stream,
+          @argument_scanner,
         )
 
         sym = @_imperative_verb_symbol
@@ -106,7 +106,7 @@ module Skylab::Autonomous_Component_System
         o.stop_if = -> asc do
           bx = asc.transitive_capabilities_box
           if bx and bx.has_key sym
-            @argument_stream.advance_one
+            @argument_scanner.advance_one
             asc_with_transitive_capability = asc
             transitive_found = true
             true
@@ -159,7 +159,7 @@ module Skylab::Autonomous_Component_System
       def __finish_selection_stack_for_formal
 
         # the top of the selection stack is the lastmost compound node
-        # that could be parsed off of the argument stream. (perhaps none
+        # that could be parsed off of the argument scanner. (perhaps none
         # could, then it is the argument ACS.)
 
         # if this compound node itself defines the formal operation..
@@ -181,15 +181,15 @@ module Skylab::Autonomous_Component_System
       def ___finish_selection_stack_for_formal_with_one_more_descent
 
         # since the verb was not defined by the last-matched compound, we
-        # assume the head of the argument stream represents a non-compound
+        # assume the head of the argument scanner represents a non-compound
         # node (primitivesque or entitesque) we need to build in order to
         # find the recipient for the verb..
 
         _rw = @_stack.last.reader_writer
-        _asc = _rw.read_association @argument_stream.head_as_is
+        _asc = _rw.read_association @argument_scanner.head_as_is
         _asc or self._COVER_ME
 
-        @argument_stream.advance_one
+        @argument_scanner.advance_one
 
         qk = _build_this_under_top_of_selection_stack _asc
         if qk
@@ -228,7 +228,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def ___build_via_via via, asc  # :[#002]:Tenet7.
-        _x = @argument_stream.gets_one
+        _x = @argument_scanner.gets_one
         comp_x = asc.component_model.send :"via__#{ via }__", _x, & @_pp
         if comp_x
           Common_::Qualified_Knownness[ comp_x, asc ]
@@ -242,7 +242,7 @@ module Skylab::Autonomous_Component_System
         _ACS = @_stack.last.ACS
 
         ACS_::Interpretation::Build_value.call(
-          @argument_stream, asc, _ACS, & @_pp )
+          @argument_scanner, asc, _ACS, & @_pp )
       end
 
       def _push_operation_name_on_to_selection_stack

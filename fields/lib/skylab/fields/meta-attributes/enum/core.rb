@@ -6,7 +6,7 @@ module Skylab::Fields
 
     Parse = -> build do
 
-      ary = build.sexp_stream_for_current_attribute.gets_one
+      ary = build.argument_scanner_for_current_association_.gets_one
 
       box = Lazy_.call do
         bx = Common_::Box.new

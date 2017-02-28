@@ -1,6 +1,6 @@
 # ACS construction, composition and eventing :[#006]
 
-## :the-universal-component-builder
+## the universal component builder :[#here.A]
 
 the associated codepoint is the normal, universal way we construct
 a component for any purpose, be it unserialization or some first-time
@@ -25,10 +25,12 @@ rather, what it does do it *bind* the component *to* the "custodian"
 ACS. what we mean by "custodian" and "bind" is the subject of the
 next two sections, respectively.
 
+(:[#here.A.1] is a vapor-point about how not all components have names?)
 
 
 
-## why do we say "custodian" and not "parent"?  :avoid-saying-parent
+
+## why do we say "custodian" and not "parent"?  :avoid-saying-parent :[#here.B]
 
 we are familiar with the parent-child relationship in tree-like
 data structures. ACS structures are frequently just that: trees.
@@ -59,7 +61,7 @@ in a relationship.)
 
 
 
-## :#Event-models
+## event models :[#here.C]
 
 at writing we have (thank goodness) simplified things so we only
 have the "cold" eventmodel, and will perhaps succeed in re-writing
@@ -78,7 +80,7 @@ because they each have a distinct applicability.
 in the "cold" eventmodel, components are themselves not "bound" to a
 custodian. we might call such a component a "cold-entity", meaning
 it models business data and nothing else (no event bindings).
-(:#the-cold-eventmodel)
+:[#here.C.2].
 
 if the cold component exposes itself to operations in some way
 (like an [#002] `edit` (mutation) method), it typically recognizes
@@ -88,7 +90,8 @@ operation.
 
 
 
-### :#Hot-eventmodel:
+
+### the hot event model :[#here.D]
 
 in the "hot" eventmodel, a component holds its "binding" (its
 "listeners" proc) *as* member data. this handler (proc) is an intrinsic,
@@ -115,7 +118,7 @@ the action. the client cannot pass its own handler to such an operation
 
 
 
-### :hot-binding
+### hot binding :[#here.E]
 
 first off, if the component plans to emit no events then it need not
 be concerned with any of this, but what's the fun of a component
@@ -136,7 +139,7 @@ aware this is happening.
 the component emits potential events into the handler, the custodian
 may actually get an "enhanced" emission that also includes the
 component itself, because of how the custodian built the handler
-(typically by creating a "closure", as in [#]:codepoint-1)).
+(typically by creating a "closure", as in [#here.E.2]  (a codepoint).
 
 in order for the ACS to have this ability (i.e in order for this API
 to support the possibility of this, regardless of what the ACS wants),
@@ -150,7 +153,7 @@ the inner-stream mutation session knows this interface..
 
 
 
-#### :hb-again
+#### "HB again" :[#here.F]
 
 assume an ACS *class* has exposed an `interpret_component` or similar
 method, and is using this library method to implement it. in the exact
@@ -181,7 +184,7 @@ component passing itself in as the only argument to that proc.
 
 
 
-### :choice
+### :choice :[#here~G] #DISASSOCIATED
 
 at this codepoint, we send the modality-space handler to the call,
 giving the operation a choice as to whether it wants to use it (cold
@@ -190,15 +193,8 @@ model). it is our way of sidestepping the issue here.
 
 
 
-### :#ick
 
-this tag tracks codepoints that were test that were written before we
-discovered the distinction between hot and cold..
-
-
-
-
-## (special-signals)
+## (special-signals) :[#here~J] #DISASSOCIATED
 
 although we generally want every component to act as if it might
 be the only component in a system, there are some special events
@@ -219,7 +215,7 @@ serialization).
 
 
 
-### `mutated` (:#Mutated)
+### `mutated` :[#here.J.2]
 
 this is for a component to tell its listener(s) that it itself
 mutated. the payload is a linked list of context, terminating in

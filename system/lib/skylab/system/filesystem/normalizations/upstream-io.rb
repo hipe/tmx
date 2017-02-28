@@ -15,7 +15,7 @@ module Skylab::System
       end
 
       def dash_means=
-        @dash_means_ = gets_one_polymorphic_value
+        @dash_means_ = gets_one
         KEEP_PARSING_
       end
 
@@ -32,7 +32,7 @@ module Skylab::System
 
       def must_be_ftype=
 
-        x = gets_one_polymorphic_value
+        x = gets_one
         if x.respond_to? :id2name
           x = Home_::Filesystem.const_get x, false
         end
@@ -43,12 +43,12 @@ module Skylab::System
       end
 
       def stat=  # used #here
-        @stat_ = gets_one_polymorphic_value
+        @stat_ = gets_one
         KEEP_PARSING_
       end
 
       def stdin=
-        @_stdin = gets_one_polymorphic_value
+        @_stdin = gets_one
         KEEP_PARSING_
       end
 

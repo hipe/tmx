@@ -167,7 +167,7 @@ module Skylab::Autonomous_Component_System
       _mi.to_entry_stream
     end
 
-    def __build_method_index  # [#003]:"why we cache the method index"
+    def __build_method_index  # [#003.B] why we cache the method index
       Home_::Method_Index___.new @ACS_.class.instance_methods false
     end
 

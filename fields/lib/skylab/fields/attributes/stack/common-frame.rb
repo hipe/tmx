@@ -81,9 +81,9 @@ module Skylab::Fields
 
           def call_via_arglist x_a
 
-            st = Common_::Scanner.via_array x_a
+            scn = Common_::Scanner.via_array x_a
 
-            cls = st.gets_one
+            cls = scn.gets_one
 
             cls.class_exec do
 
@@ -91,12 +91,11 @@ module Skylab::Fields
 
               define_method :normalize, NORMALIZE_METH___
 
-              define_method :receive_missing_required_properties_array,
-                RMRP_METH___
+              define_method :_receive_missing_required_associations_, RMRA_METH___
             end
 
             Legacy_::Edit_client_class_via_argument_scanner_over_extmod[
-              cls, st, self ]
+              cls, scn, self ]
 
             NIL_
           end
@@ -162,7 +161,7 @@ module Skylab::Fields
           UNABLE_
         end
 
-        def knownness_via_association_ atr  # :[#028]. (has 1x redund)
+        def _read_knownness_ atr  # :[#028]. (has 1x redund)
 
           ivar = atr.ivar
 
@@ -202,7 +201,7 @@ module Skylab::Fields
           def inline_method=
             @reader_classification = :inline_method
             _read_name
-            @literal_proc = gets_one_polymorphic_value
+            @literal_proc = gets_one
             STOP_PARSING_
           end
 
@@ -219,7 +218,7 @@ module Skylab::Fields
           def proc=
             @reader_classification = :proc
             _read_name
-            @literal_proc = gets_one_polymorphic_value
+            @literal_proc = gets_one
             STOP_PARSING_
           end
 
@@ -229,7 +228,7 @@ module Skylab::Fields
           end
 
           def _read_name
-            @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
+            @name = Common_::Name.via_variegated_symbol gets_one
             STOP_PARSING_
           end
 
@@ -293,9 +292,9 @@ module Skylab::Fields
             @external_read_proc = p ; nil
           end
 
-          def __set_polymorphic_writer_method_proc_is_generated x
+          def __set_argument_scanning_writer_method_proc_is_generated x
 
-            @has_custom_polymorphic_writer_method = ! x
+            @has_custom_argument_scanning_writer_method = ! x
             NIL_
           end
 
@@ -466,13 +465,13 @@ module Skylab::Fields
 
           Edit_property_common__[ prp ]
 
-          _WRITER_METHOD_NAME = prp.conventional_polymorphic_writer_method_name
+          _WRITER_METHOD_NAME = prp.conventional_argument_scanning_writer_method_name
 
           prp._during_apply do | prp_ |
 
             define_method prp_.name_symbol do
 
-              kn = self.knownness_via_association_ prp_
+              kn = self._read_knownness_ prp_
 
               if kn.is_known_known
                 kn.value_x
@@ -480,13 +479,13 @@ module Skylab::Fields
             end
 
             define_method _WRITER_METHOD_NAME do
-              _set_value_of_property gets_one_polymorphic_value, prp_
+              _set_value_of_property gets_one, prp_
             end
 
             KEEP_PARSING_
           end
 
-          prp.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
+          prp.set_argument_scanning_writer_method_name _WRITER_METHOD_NAME
 
           Read_via_Method_.write_external_read_proc prp
         end
@@ -497,23 +496,23 @@ module Skylab::Fields
 
           prp.__set_internal_read_proc do | entity, prp_ |
 
-            kn = entity.knownness_via_association_ prp
+            kn = entity._read_knownness_ prp
 
             if kn.is_known_known
               known.value_x
             end
           end
 
-          _WRITER_METHOD_NAME = prp.conventional_polymorphic_writer_method_name
+          _WRITER_METHOD_NAME = prp.conventional_argument_scanning_writer_method_name
 
           prp._during_apply do | prp_ |
 
             define_method _WRITER_METHOD_NAME do
-              _set_value_of_property gets_one_polymorphic_value, prp_
+              _set_value_of_property gets_one, prp_
             end
           end
 
-          prp.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
+          prp.set_argument_scanning_writer_method_name _WRITER_METHOD_NAME
 
           KEEP_PARSING_
         end
@@ -523,7 +522,7 @@ module Skylab::Fields
         Edit_property_common__ = -> prp do
 
           prp.__set_argument_arity :_not_applicable_
-          prp.__set_polymorphic_writer_method_proc_is_generated false
+          prp.__set_argument_scanning_writer_method_proc_is_generated false
 
           NIL_
         end
@@ -556,7 +555,7 @@ module Skylab::Fields
             _is = Home_::Is_required[ prp ]
             _is or next
 
-            kn = entity.knownness_via_association_ prp
+            kn = entity._read_knownness_ prp
 
             __is_unknown = if kn.is_known_known
               kn.value_x.nil?
@@ -570,13 +569,13 @@ module Skylab::Fields
           end
 
           if miss_a
-            entity.receive_missing_required_properties_array miss_a
+            entity._receive_missing_required_associations_ miss_a
           else
             KEEP_PARSING_
           end
         end
 
-        RMRP_METH___ = -> miss_a do  # `receive_missing_required_properties_array` etc
+        RMRA_METH___ = -> miss_a do
 
           _ev = Build_missing_requireds_event___[ miss_a ]
           raise _ev.to_exception

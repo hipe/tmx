@@ -175,7 +175,7 @@ module Skylab::Brazen
         private :new
       end  # >>
 
-      Common_::Event.selective_builder_sender_receiver self
+      include Common_::Event::ReceiveAndSendMethods
 
       def initialize a, & oes_p
         input_method_i, input_x = a

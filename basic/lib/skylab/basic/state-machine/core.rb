@@ -153,7 +153,7 @@ module Skylab::Basic
 
       def can_transition_to=
 
-        x = gets_one_polymorphic_value
+        x = gets_one
         a = x.respond_to?( :id2name ) ? [ x ] : x
 
         if a
@@ -176,13 +176,13 @@ module Skylab::Basic
       end
 
       def entered_by=
-        _accept_barrier_to_entry( & gets_one_polymorphic_value )
+        _accept_barrier_to_entry( & gets_one )
         KEEP_PARSING_
       end
 
       def entered_by_regex=
 
-        rx = gets_one_polymorphic_value
+        rx = gets_one
 
         _accept_barrier_to_entry do |st|
 
@@ -206,7 +206,7 @@ module Skylab::Basic
 
       def on_entry=
         @has_handler = true
-        @_on_entry = gets_one_polymorphic_value
+        @_on_entry = gets_one
         KEEP_PARSING_
       end
 

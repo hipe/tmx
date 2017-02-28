@@ -135,7 +135,7 @@ module Skylab::Zerk
 
     def execute  # *always* result in an exitstatus
 
-      @_arg_st = Common_::Scanner.via_array remove_instance_variable :@argv
+      @_argument_scanner = Common_::Scanner.via_array remove_instance_variable :@argv
 
       bc = ___bound_call
       if bc
@@ -168,7 +168,7 @@ module Skylab::Zerk
 
     def ___bound_call_step
 
-      if @_arg_st.no_unparsed_exists
+      if @_argument_scanner.no_unparsed_exists
 
         when_no_arguments_  # t1
 
@@ -245,14 +245,14 @@ module Skylab::Zerk
 
       @_top = @_top.attach_compound_frame_via_association_ asc  # #push
       @_fo_frame = nil
-      @_arg_st.advance_one
+      @_argument_scanner.advance_one
 
       # note - if we wanted to we could forestall the `push` until after we
       # know whether or not the below syntax error will occur; but we `push`
       # in these cases regardless so that our "selection stack" gives the
       # fullest context of what we were able to build before we had to stop.
 
-      if @_arg_st.no_unparsed_exists
+      if @_argument_scanner.no_unparsed_exists
 
         Here_::When_::Ended_at_Compound[ self ]  # t6
 
@@ -274,7 +274,7 @@ module Skylab::Zerk
     end
 
     def when_head_argument_looks_like_help md
-      @_arg_st.advance_one
+      @_argument_scanner.advance_one
       Here_::When_Help_[ md, self ]
       STOP_PARSING_
     end
@@ -287,7 +287,7 @@ module Skylab::Zerk
       @_operation_syntax = fo_frame.operation_syntax_
       @_top = fo_frame  # #push
 
-      @_arg_st.advance_one
+      @_argument_scanner.advance_one
 
       @__bespoke_values_box = nil  # ivar must be set
 
@@ -302,7 +302,7 @@ module Skylab::Zerk
 
       # if the argument stream is empty, avoid the heavy lift of building o.p
 
-      if @_arg_st.no_unparsed_exists  # then is empty
+      if @_argument_scanner.no_unparsed_exists  # then is empty
         if @_fo_frame.has_custom_option_parser__  # EXPERIMENTAL (for [pe])
           ___parse_opts
         else
@@ -360,8 +360,8 @@ module Skylab::Zerk
         _ok
       else
         _ARGS_AS_STREAM  # convert it back, in case o.p converted it..
-        if @_arg_st.no_unparsed_exists
-          remove_instance_variable :@_arg_st
+        if @_argument_scanner.no_unparsed_exists
+          remove_instance_variable :@_argument_scanner
           ACHIEVED_
         else
           __when_extra_args_native
@@ -381,9 +381,9 @@ module Skylab::Zerk
 
     def __when_extra_args_native  # t9
 
-      s = @_arg_st.gets_one
+      s = @_argument_scanner.gets_one
 
-      _yes = ! @_arg_st.no_unparsed_exists
+      _yes = ! @_argument_scanner.no_unparsed_exists
 
       _when_extra_arg s, _yes
     end
@@ -420,7 +420,7 @@ module Skylab::Zerk
     # --
 
     # both stdlib o.p and our "classic" argument parser require a plain old
-    # array as input as opposed to the (superior) polymorphic stream we use
+    # array as input as opposed to the (superior) argument scanner we use
     # internally. whether or not we engage one, the other, none or both o.p
     # and args parsing depends on both formal syntax and actual arguments.
     # so the "easiest" way to avoid extraneous flip-flops between array and
@@ -428,11 +428,11 @@ module Skylab::Zerk
     # in shoutcase (:#here):
 
     def _ARGS_AS_STREAM
-      @_arg_st ||= Common_::Scanner.via_array( remove_instance_variable :@_argv )
+      @_argument_scanner ||= Common_::Scanner.via_array( remove_instance_variable :@_argv )
     end
 
     def _ARGS_AS_ARGV
-      @_argv ||= remove_instance_variable( :@_arg_st ).flush_remaining_to_array
+      @_argv ||= remove_instance_variable( :@_argument_scanner ).flush_remaining_to_array
     end
 
     def _parse_pp
@@ -490,7 +490,7 @@ module Skylab::Zerk
       if bx
         _pvs = Here_::Argument_Parser_Controller_::Parameter_Value_Source_via_Box.new bx
       else
-        _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
+        _pvs = ACS_::Parameter::ValueSource_for_ArgumentScanner.the_empty_value_source
         # (nothing more to add. everything went from options into the tree.)
       end
 
@@ -551,19 +551,19 @@ module Skylab::Zerk
     end
 
     def _head_token_starts_with_dash  # assume non-empty stream
-      Begins_with_dash_[ @_arg_st.head_as_is ]
+      Begins_with_dash_[ @_argument_scanner.head_as_is ]
     end
 
     def head_as_is
-      @_arg_st.head_as_is
+      @_argument_scanner.head_as_is
     end
 
     def release_argument_stream__
-      remove_instance_variable :@_arg_st
+      remove_instance_variable :@_argument_scanner
     end
 
-    def argument_stream
-      @_arg_st
+    def argument_scanner
+      @_argument_scanner
     end
 
     # -- finishing behavior & loop control constants

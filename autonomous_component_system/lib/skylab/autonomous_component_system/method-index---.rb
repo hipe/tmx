@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
     # 2 ->
         def initialize meth_a
 
-          # see [#003]:"the moment at which we cache the entries"
+          # see [#003.C] "the moment at which we cache the entries"
 
           @_entry_stream = -> do
 

@@ -105,7 +105,7 @@ module Skylab::Autonomous_Component_System
 
             _asc = pair.name_x._defined_association
 
-            _st = Field_::Argument_stream_via_value[ pair.value_x ]  # MODALITY user value
+            _st = Field_::Argument_scanner_via_value[ pair.value_x ]  # MODALITY user value
 
             ok = ACS_::Interpretation::Build_value.call _st, _asc, acs, & pp
             ok || break  # qk

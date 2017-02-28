@@ -58,9 +58,9 @@ module Skylab::Human
         NOTHING_   # (hi.)
       end
 
-      def _init_via_sexp_stream st
+      def _init_via_sexp_stream scn
 
-        COMPONENTS.init_via_stream self, st
+        COMPONENTS.init_via_argument_scanner self, scn
       end
 
       def __early_adverbial_phrase__component_association

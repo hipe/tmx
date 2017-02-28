@@ -43,14 +43,14 @@ module Skylab::Fields
     end
 
     Edit_client_class_via_argument_scanner_over_extmod = -> (
-      cls, st, extmod
+      cls, scn, extmod
     ) do
 
       Session.call_by do |o|
       o.block = NIL_
       o.client = cls
       o.extmod = extmod
-      o.upstream = st
+      o.upstream = scn
       end
     end
 
@@ -305,10 +305,10 @@ module Skylab::Fields
         rep = :receive_entity_property
         # ~ im
         fps = :formal_properties
+        pva = :_parse_association_
         ppsf = :process_argument_scanner_fully
         ppsp = :process_argument_scanner_passively
-        rpp = :receive_polymorphic_property
-        gopv = :gets_one_polymorphic_value
+        gopv = :gets_one
 
         -> do
 
@@ -331,8 +331,8 @@ module Skylab::Fields
               define_method fps, FORMAL_PRPS_METHOD__
             end
 
-            if ! method_defined? rpp
-              define_method rpp, RPP_METHOD___
+            if ! method_defined? pva
+              define_method pva, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_VIA_ASSOCIATION___
             end
 
             if ! private_method_defined? ppsf
@@ -346,7 +346,7 @@ module Skylab::Fields
             end
 
             if ! private_method_defined? gopv
-              define_method gopv, GOPV_METHOD___
+              define_method gopv, DEFINITION_FOR_THE_METHOD_CALLED_GETS_ONE___
             end
 
             NIL_
@@ -397,7 +397,7 @@ module Skylab::Fields
 
         did = nil
         m = nil
-        st = @upstream
+        scn = @upstream
 
         h = {
 
@@ -426,7 +426,7 @@ module Skylab::Fields
 
               if cls.private_method_defined? m
                 did = true
-                st.advance_one
+                scn.advance_one
                 send m
               else
                 KEEP_PARSING_
@@ -442,9 +442,9 @@ module Skylab::Fields
 
               ahp ||= ( @___ahp ||= Here_::AdHocProcessor_::Processors.new self )
 
-              d_ = st.current_index
+              d_ = scn.current_index
               kp_ = ahp.consume_passively
-              did = d_ != st.current_index
+              did = d_ != scn.current_index
               kp_
             end
           end.call,
@@ -453,7 +453,7 @@ module Skylab::Fields
         a = @_optimism
         d = 0
         last = a.length - 1
-        m = :"#{ st.head_as_is }="
+        m = :"#{ scn.head_as_is }="
 
         begin
 
@@ -461,7 +461,7 @@ module Skylab::Fields
           kp = ( h.fetch a.fetch d ).call
           if did
 
-            if st.no_unparsed_exists  # the only way you get out of here OK
+            if scn.no_unparsed_exists  # the only way you get out of here OK
               @upstream = nil
               break
             end
@@ -470,7 +470,7 @@ module Skylab::Fields
               break
             end
 
-            m = :"#{ st.head_as_is }="
+            m = :"#{ scn.head_as_is }="
 
             if d.zero?  # the first nonterminal matched normally
               redo
@@ -494,7 +494,7 @@ module Skylab::Fields
         end while nil
 
         if ! did
-          raise Home_::ArgumentError, "unrecognized property '#{ st.head_as_is }'"
+          raise Home_::ArgumentError, "unrecognized property '#{ scn.head_as_is }'"
         end
         kp
       end
@@ -513,7 +513,7 @@ module Skylab::Fields
         ahpp.consume
       end
 
-      def polymorphic_writer_method_name_suffix=
+      def argument_scanning_writer_method_name_suffix=
 
         if @upstream.unparsed_exists
 
@@ -534,11 +534,11 @@ module Skylab::Fields
       def properties=
 
         kp = nil
-        st = @upstream
+        scn = @upstream
         begin
-          kp = add_property_with_variegated_name st.gets_one
+          kp = add_property_with_variegated_name scn.gets_one
           kp or break
-          if st.unparsed_exists
+          if scn.unparsed_exists
             redo
           end
           break
@@ -610,7 +610,7 @@ module Skylab::Fields
         sess = self
         same = -> do
           @name = Common_::Name.via_variegated_symbol sym
-          @custom_polymorphic_writer_method_name = m
+          @custom_argument_scanning_writer_method_name = m
           sess._shake_it_up self
           normalize_property
         end
@@ -831,11 +831,11 @@ module Skylab::Fields
 
     # ~ instance methods
 
-    RPP_METHOD___ = -> prp do  # "receive polymorphic property"
+    DEFINITION_FOR_THE_METHOD_CALLED_PARSE_VIA_ASSOCIATION___ = -> prp do
 
       case prp.argument_arity
       when :one
-        instance_variable_set prp.ivar, gets_one_polymorphic_value
+        instance_variable_set prp.ivar, gets_one
       when :zero
         instance_variable_set prp.ivar, true
       else
@@ -848,8 +848,8 @@ module Skylab::Fields
       self.class.properties
     end
 
-    GOPV_METHOD___ = -> do  # "gets one polymorphic value"
-      @_polymorphic_upstream_.gets_one
+    DEFINITION_FOR_THE_METHOD_CALLED_GETS_ONE___ = -> do  # `gets_one`
+      @_argument_scanner_.gets_one
     end
 
     # ~ models
@@ -1086,11 +1086,11 @@ module Skylab::Fields
 
       # ~ name & related
 
-      def conventional_polymorphic_writer_method_name
+      def conventional_argument_scanning_writer_method_name
         :"#{ @name.as_variegated_symbol }="
       end
 
-      attr_reader :custom_polymorphic_writer_method_name
+      attr_reader :custom_argument_scanning_writer_method_name
 
       def ivar  # override parent
         @name.as_ivar
@@ -1100,8 +1100,8 @@ module Skylab::Fields
         @name
       end
 
-      def set_polymorphic_writer_method_name x
-        @custom_polymorphic_writer_method_name = x
+      def set_argument_scanning_writer_method_name x
+        @custom_argument_scanning_writer_method_name = x
         NIL_
       end
 
@@ -1109,7 +1109,7 @@ module Skylab::Fields
 
       # ~~ normalization API
 
-      def knownness_via_association_ prp  # #[#fi-029]
+      def _read_knownness_ prp  # #[#fi-029]
 
         ivar = prp.ivar
 
@@ -1160,7 +1160,7 @@ module Skylab::Fields
         @ad_hoc_normalizer_box ||= Common_::Box.new
       end
 
-      def set_value_of_formal_property_ x, prp
+      def _write_via_association_ x, prp
 
         # this is actually for setting a *meta*property value on the property!
 
@@ -1180,7 +1180,7 @@ module Skylab::Fields
         prp.freeze  # not for sure
       end
 
-      def default_value_via_entity_ entity_x
+      def default_value_via_entity__ entity_x
 
         if @default_proc.arity.zero?
           @default_proc[]
@@ -1190,14 +1190,14 @@ module Skylab::Fields
       end
 
       def default=
-        x = gets_one_polymorphic_value
+        x = gets_one
         _set_default_proc do
           x
         end
       end
 
       def default_proc=
-        _set_default_proc( & gets_one_polymorphic_value )
+        _set_default_proc( & gets_one )
       end
 
       def set_default_proc & p
@@ -1223,7 +1223,7 @@ module Skylab::Fields
       def enum=
 
         bx = Common_::Box.new
-        _x_a = gets_one_polymorphic_value
+        _x_a = gets_one
 
         _x_a.each do | x |
           bx.add x, nil
@@ -1245,7 +1245,7 @@ module Skylab::Fields
       def mutate_entity=
 
         @argument_arity = :custom
-        @mutate_entity_proc_ = gets_one_polymorphic_value
+        @mutate_entity_proc_ = gets_one
         KEEP_PARSING_
       end
 
@@ -1257,7 +1257,7 @@ module Skylab::Fields
       end
 
       def parameter_arity=
-        @parameter_arity = gets_one_polymorphic_value
+        @parameter_arity = gets_one
         KEEP_PARSING_
       end
 
@@ -1284,10 +1284,10 @@ module Skylab::Fields
       # ~~ argument arity
 
       def argument_arity=
-        x = gets_one_polymorphic_value
+        x = gets_one
         if :custom == x
-          @has_custom_polymorphic_writer_method = true
-          @polymorphic_writer_method_proc_proc = nil
+          @has_custom_argument_scanning_writer_method = true
+          @argument_scanning_writer_method_proc_proc = nil
         end
         @argument_arity = x
         KEEP_PARSING_
@@ -1298,15 +1298,15 @@ module Skylab::Fields
       end
 
       attr_reader(
-        :has_custom_polymorphic_writer_method,
-        :polymorphic_writer_method_proc_proc,
+        :has_custom_argument_scanning_writer_method,
+        :argument_scanning_writer_method_proc_proc,
       )
 
       # ~~ syntactic finishing of the parse
 
       def property=
 
-        @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
+        @name = Common_::Name.via_variegated_symbol gets_one
         STOP_PARSING_
       end
 
@@ -1314,7 +1314,7 @@ module Skylab::Fields
 
         @_is_meta_property = true
 
-        sym = gets_one_polymorphic_value
+        sym = gets_one
         @name = Common_::Name.via_variegated_symbol sym
 
         STOP_PARSING_

@@ -1683,7 +1683,7 @@ module Skylab::Brazen
       class Event_Sending_Node__
       private
 
-        Common_::Event.selective_builder_sender_receiver self
+        include Common_::Event::ReceiveAndSendMethods
 
         def maybe_send_event * i_a, & ev_p
 

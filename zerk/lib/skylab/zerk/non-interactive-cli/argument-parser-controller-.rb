@@ -235,7 +235,7 @@ module Skylab::Zerk
 
       PVS_via_Box_Controller___ = ::Struct.new(
         :consuming_formal_parameter_stream,
-        :current_argument_stream,
+        :current_argument_scanner,
       )
     end
   end

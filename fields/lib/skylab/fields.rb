@@ -55,7 +55,7 @@ module Skylab::Fields
 
       bx ||= MONADIC_EMPTINESS_
 
-      instance_variable_set :@_polymorphic_upstream_, scn
+      instance_variable_set :@_argument_scanner_, scn
 
       begin
 
@@ -66,12 +66,12 @@ module Skylab::Fields
 
         scn.advance_one
 
-        m = prp.custom_polymorphic_writer_method_name
+        m = prp.custom_argument_scanning_writer_method_name
 
         kp = if m
           send m
         else
-          receive_polymorphic_property prp, & p
+          _parse_association_ prp, & p
         end
 
         kp || break
@@ -79,7 +79,7 @@ module Skylab::Fields
         scn.no_unparsed_exists ? break : redo
       end while above
 
-      remove_instance_variable :@_polymorphic_upstream_
+      remove_instance_variable :@_argument_scanner_
     end
     kp
   end
@@ -133,10 +133,10 @@ module Skylab::Fields
       o.execute_as_init_
     end
 
-    def init_via_stream sess, st, & x_p  # [hu]
+    def init_via_argument_scanner sess, scn, & x_p  # [hu] 4x
 
       o = begin_parse_and_normalize_for sess, & x_p
-      o.argument_stream = st
+      o.argument_scanner = scn
       o.execute_as_init_
     end
 
@@ -176,17 +176,17 @@ module Skylab::Fields
     end
 
     def attribute k
-      _index.lookup_attribute_ k
+      _index.read_association_ k
     end
 
-    def _index
+    def _index  # and #here too
       @___index ||= ___build_index
     end
 
     alias_method :index_, :_index
 
     def ___build_index
-      Here_::Lib::Index_of_Definition___.new( @_h,
+      Here_::AssociationIndex_::Index_of_Definition___.new( @_h,
         ( @meta_attributes || Here_::MetaAttributes ),
         ( @attribute_class || Here_::DefinedAttribute ),
       )
@@ -262,12 +262,12 @@ module Skylab::Fields
           New_via__[ :process_argument_scanner_fully, _st, self, & x_p ]
         end
 
-        def via_argument_scanner st, & x_p
-          New_via__[ :process_argument_scanner_fully, st, self, & x_p ]
+        def via_argument_scanner scn, & x_p
+          New_via__[ :process_argument_scanner_fully, scn, self, & x_p ]
         end
 
-        def via_argument_scanner_passively st, & x_p
-          New_via__[ :process_argument_scanner_passively, st, self, & x_p ]
+        def via_argument_scanner_passively scn, & x_p
+          New_via__[ :process_argument_scanner_passively, scn, self, & x_p ]
         end
 
         def scanner_via_array x_a
@@ -277,11 +277,11 @@ module Skylab::Fields
 
       # ===
 
-      New_via__ = -> m, st, cls, & x_p do  # near #open [#026]
+      New_via__ = -> m, scn, cls, & x_p do  # near #open [#026]: struct vs. actor: cold vs. hot
 
         sess = cls.send :new, & x_p  # actors reasonably expect the handler here [br]
 
-        kp = sess.send m, st, & x_p  # but this here is for all non-actors
+        kp = sess.send m, scn, & x_p  # but this here is for all non-actors
 
         if kp
           sess
@@ -315,44 +315,44 @@ module Skylab::Fields
           Common_::Scanner.via_array x_a
         end
 
-        def process_argument_scanner_fully st, & x_p
-          kp = process_argument_scanner_passively st, & x_p
+        def process_argument_scanner_fully scn, & x_p
+          kp = process_argument_scanner_passively scn, & x_p
           if kp
-            if st.no_unparsed_exists
+            if scn.no_unparsed_exists
               kp
             elsif x_p
               self._K
             else
-              when_after_process_iambic_fully_stream_has_content st
+              when_after_process_iambic_fully_stream_has_content scn
             end
           else
             kp
           end
         end
 
-        def process_argument_scanner_passively st, & x_p
+        def process_argument_scanner_passively scn, & x_p
 
           cls = self.class
           if cls.const_defined? :ATTRIBUTES, false
             _atrs = cls.const_get :ATTRIBUTES
           end
 
-          Here_::Lib::Process_argument_scanner_passively_.call(
-            st, self, _atrs,
-            polymorphic_writer_method_name_passive_lookup_proc,
+          Here_::AssociationIndex_::Process_argument_scanner_passively_.call(
+            scn, self, _atrs,
+            argument_parsing_writer_method_name_passive_lookup_proc,
             & x_p )
         end
 
-        def gets_one_polymorphic_value  # #public-API #hook-in
-          @_polymorphic_upstream_.gets_one
+        def gets_one  # #public-API #hook-in
+          @_argument_scanner_.gets_one
         end
 
-        def polymorphic_upstream  # n.c
-          @_polymorphic_upstream_
+        def argument_scanner  # n.c
+          @_argument_scanner_
         end
 
-        def polymorphic_writer_method_name_passive_lookup_proc  # #public-API #hook-in
-          Here_::Lib::Writer_method_reader___[ self.class ]
+        def argument_parsing_writer_method_name_passive_lookup_proc  # #public-API #hook-in 1x, 
+          Here_::AssociationIndex_::Writer_method_reader___[ self.class ]
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
@@ -403,15 +403,15 @@ module Skylab::Fields
 
         include InstanceMethods
 
-        def process_argument_scanner_passively st
+        def process_argument_scanner_passively scn
 
           bx = self.class::ATTRIBUTES.ivars_box_
 
-          while st.unparsed_exists
-            ivar = bx[ st.head_as_is ]
+          until scn.no_unparsed_exists
+            ivar = bx[ scn.head_as_is ]
             ivar or break
-            st.advance_one
-            instance_variable_set ivar, st.gets_one
+            scn.advance_one
+            instance_variable_set ivar, scn.gets_one
           end
 
           KEEP_PARSING_  # we never fail softly
@@ -471,7 +471,7 @@ module Skylab::Fields
 
     Autoloader_[ self ]
 
-    ARG_STREAM_IVAR_ = :@_polymorphic_upstream_
+    ARGUMENT_SCANNER_IVAR_ = :@_argument_scanner_
     Here_ = self
   end  # attributes
 
@@ -533,7 +533,7 @@ module Skylab::Fields
     )
   end
 
-  class Argument_stream_via_value  # :[#019] (2x similar)
+  class Argument_scanner_via_value  # :[#019] (2x similar)
 
     class << self
 

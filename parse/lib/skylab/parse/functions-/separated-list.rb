@@ -53,11 +53,11 @@ module Skylab::Parse
 
       def _resolve ivar
 
-        _sym = polymorphic_upstream.gets_one
+        _sym = argument_scanner.gets_one
 
         _cls = Home_.function( _sym )
 
-        o = _cls.via_argument_scanner_passively polymorphic_upstream
+        o = _cls.via_argument_scanner_passively argument_scanner
 
         o and begin
           instance_variable_set ivar, o

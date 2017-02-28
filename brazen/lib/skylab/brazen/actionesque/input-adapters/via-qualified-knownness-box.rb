@@ -3,19 +3,19 @@ module Skylab::Brazen
       module Actionesque::Input_Adapters::Via_qualified_knownness_box
 
         # PASSIVELY parse-out values from the box, whose each value is a
-        # qualified_knownness. do this using any custom parsers and parsing logic that
-        # exist to parse normal polymorphic upstream, by spoofing the
+        # qualified_knownness. do this using any custom parsers and parsing
+        # logic that exist to parse argument streams, by spoofing the
         # upstream. unless we add more hacks to this, this can only work
         # for formls whose argument arity is zero or one (separately).
 
         def self.[] act, bx
 
-          # GET RID OF: polymorphic_writer_method_name_passive_lookup_proc
+          # GET RID OF: argument_scanning_writer_method_name_passive_lookup_proc
 
           foz = act.formal_properties
           hsm = Hacky_State_Machine___.new
 
-          act.set_polymorphic_upstream__ hsm
+          act.set_argument_scanner__ hsm
 
           kp = KEEP_PARSING_
           bx.each_pair do | k, qualified_knownness |
@@ -38,7 +38,7 @@ module Skylab::Brazen
 
             hsm.__replace_value x
 
-            kp = act.receive_polymorphic_property prp
+            kp = act._parse_association_ prp
             kp or break
 
           end
@@ -46,7 +46,7 @@ module Skylab::Brazen
           kp
         end
 
-        class Hacky_State_Machine___  # mocky proxy for a polymorphic upstream #[#fi-019]
+        class Hacky_State_Machine___  # mocky proxy for an argument scanner #[#fi-019]
 
           def __replace_value x
             @_state = :containing

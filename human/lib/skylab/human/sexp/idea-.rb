@@ -50,10 +50,10 @@ module Skylab::Human
       def object=
 
         _edit_self(
-          :via, :polymorphic_upstream,
+          :via, :argument_scanner,
           :add,
           :object_argument,
-          polymorphic_upstream )
+          argument_scanner )
       end
 
       def subject
@@ -69,19 +69,19 @@ module Skylab::Human
       def subject=
 
         _edit_self(
-          :via, :polymorphic_upstream,
+          :via, :argument_scanner,
           :add,
           :subject_argument,
-          polymorphic_upstream )
+          argument_scanner )
       end
 
       def verb=
 
         _edit_self(
-          :via, :polymorphic_upstream,
+          :via, :argument_scanner,
           :add,
           :verb,
-          polymorphic_upstream )
+          argument_scanner )
       end
 
       attr_reader :verb_argument

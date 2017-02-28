@@ -354,7 +354,7 @@ module Skylab::Brazen
         build_event_via_iambic_and_message_proc x_a, ev.message_proc
       end
 
-      Common_::Event.selective_builder_sender_receiver self
+      include Common_::Event::ReceiveAndSendMethods
     end
 
     Workspace_ = self

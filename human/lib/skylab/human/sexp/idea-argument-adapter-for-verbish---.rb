@@ -5,7 +5,7 @@ module Skylab::Human
     class Idea_Argument_Adapter_for_Verbish___ < Idea_Argument_Adapter_
       # -
         class << self
-          def via__polymorphic_upstream__ st
+          def via__argument_scanner__ st
 
             new do
 

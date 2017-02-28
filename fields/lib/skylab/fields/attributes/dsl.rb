@@ -129,10 +129,10 @@ module Skylab::Fields
           # *do* go this extra distance and modify the attribute *class*.
 
           ca = @_.current_attribute
-          st = @_.sexp_stream_for_current_attribute
-          if st.unparsed_exists && :reader_method_name == st.head_as_is
-            st.advance_one
-            m = st.gets_one
+          scn = @_.argument_scanner_for_current_association_
+          if scn.unparsed_exists && :reader_method_name == scn.head_as_is
+            scn.advance_one
+            m = scn.gets_one
           end
 
           ca.reader_by_ do

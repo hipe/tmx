@@ -110,10 +110,6 @@ module Skylab::Common
           Event_::Makers_::Prototype
         end
 
-        def selective_builder_sender_receiver x
-          x.include Selective_Builder_Receiver_Sender_Methods ; nil
-        end
-
         def structured_expressive
           Event_::Makers_::Structured_Expressive
         end
@@ -439,7 +435,7 @@ module Skylab::Common
         PN_RX__ = /(?:_|\A)path(?:name)?\z/
       end
 
-      module Selective_Builder_Receiver_Sender_Methods
+      module ReceiveAndSendMethods
 
       private
 

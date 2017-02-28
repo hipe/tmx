@@ -48,7 +48,7 @@ built which in turn involves loading each of their component
 models, which may involve loading extraneous files. all of this
 is resource-consuming work that can be avoided in some cases:
 
-hypothetically for an invocation whose argument stream does not
+hypothetically for an invocation whose argument scanner does not
 appear to have options but only a trail to a formal operation,
 *and* that formal operation does not have a "stated set", we
 *can* avoid this heavy lift.

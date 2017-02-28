@@ -14,10 +14,10 @@ module Skylab::Fields::TestSupport
 
           Entity.lib.call self do
 
-            o :polymorphic_writer_method_name_suffix, :_ZOINK
+            o :argument_scanning_writer_method_name_suffix, :_ZOINK
 
             def foo_bar_ZOINK
-              @foo_bar = gets_one_polymorphic_value
+              @foo_bar = gets_one
             end
 
           end
@@ -35,20 +35,20 @@ module Skylab::Fields::TestSupport
 
           Entity.lib.call self do
 
-            o :polymorphic_writer_method_name_suffix, :_ZEE
+            o :argument_scanning_writer_method_name_suffix, :_ZEE
 
             def foo_ZEE
-              @foo = gets_one_polymorphic_value
+              @foo = gets_one
             end
 
-            o :polymorphic_writer_method_name_suffix, :_ZOO
+            o :argument_scanning_writer_method_name_suffix, :_ZOO
 
             def bar_ZOO
-              @bar = gets_one_polymorphic_value
+              @bar = gets_one
             end
 
             def baz_ZOO
-              @baz = gets_one_polymorphic_value
+              @baz = gets_one
             end
           end
 

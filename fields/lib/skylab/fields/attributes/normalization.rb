@@ -24,7 +24,7 @@ module Skylab::Fields
           sidx = idx.static_index_
           o.effectively_defaultants = sidx.effectively_defaultants
           o.ivar_store = sess
-          o.lookup = idx.lookup_attribute_proc_
+          o.lookup = idx.read_association_by_
           o.requireds = sidx.requireds
             # -
             o.listener = oes_p

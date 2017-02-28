@@ -71,7 +71,7 @@ module Skylab::System
 
       def line_begin_string=
 
-        s = gets_one_polymorphic_value
+        s = gets_one
         if s
           _set_line_begin_proc -> { @downstream_IO.write s }
         end
@@ -80,7 +80,7 @@ module Skylab::System
 
       def line_begin_proc=
 
-        p = gets_one_polymorphic_value
+        p = gets_one
         if p
           _set_line_begin_proc p
         end
@@ -89,7 +89,7 @@ module Skylab::System
 
       def line_end_proc=
 
-        p = gets_one_polymorphic_value
+        p = gets_one
         if p
           _set_line_proc :@_line_end_p, p
         end
@@ -115,7 +115,7 @@ module Skylab::System
         # in the order received in a reduce operation, the result being
         # what is finally passed to puts
 
-        p = gets_one_polymorphic_value
+        p = gets_one
         if p
           ( @_puts_map_p_a ||= [] ).push p
         end

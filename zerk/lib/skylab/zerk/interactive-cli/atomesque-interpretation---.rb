@@ -94,10 +94,10 @@ module Skylab::Zerk
         if @_.is_listy
           a = Here_::List_Interpretation_Adapter___[ s, & @_.UI_event_handler ]
           if a
-            st = Home_.lib_.fields::Argument_stream_via_value[ a ]
+            st = Home_.lib_.fields::Argument_scanner_via_value[ a ]
           end  # else emitted
         else
-          st = Home_.lib_.fields::Argument_stream_via_value[ s ]
+          st = Home_.lib_.fields::Argument_scanner_via_value[ s ]
         end
 
         if st

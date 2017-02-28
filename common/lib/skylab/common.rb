@@ -1267,7 +1267,7 @@ module Skylab::Common
       def execute
         x_a = remove_instance_variable :@arguments
         if x_a
-          __process_argument_stream x_a
+          __process_argument_array x_a
         end
         p = remove_instance_variable :@block
         if p
@@ -1277,23 +1277,23 @@ module Skylab::Common
         NIL
       end
 
-      def __process_argument_stream x_a
+      def __process_argument_array x_a
 
-        @argument_stream = Scanner.via_array x_a
+        @argument_scanner = Scanner.via_array x_a
 
-        if @argument_stream.head_as_is.respond_to? :ascii_only?
+        if @argument_scanner.head_as_is.respond_to? :ascii_only?
           __when_path
         end
 
-        while @argument_stream.unparsed_exists
-          send PROCESS_WHICH___.fetch @argument_stream.gets_one
+        until @argument_scanner.no_unparsed_exists
+          send PROCESS_WHICH___.fetch @argument_scanner.gets_one
         end
         NIL
       end
 
       def __when_path
         @do_extend_methods = true
-        @path = @argument_stream.gets_one
+        @path = @argument_scanner.gets_one
       end
 
       PROCESS_WHICH___ = {
@@ -1304,7 +1304,7 @@ module Skylab::Common
 
       def __when_autoloaderized_parent_module
         @do_extend_methods = true
-        @autoloaderized_parent_module = @argument_stream.gets_one
+        @autoloaderized_parent_module = @argument_scanner.gets_one
         NIL
       end
 

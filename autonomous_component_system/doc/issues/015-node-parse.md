@@ -14,9 +14,9 @@ Start with:
 
 Then:
 
-  • if the argument stream is empty, we are done.
+  • if the argument scanner has reached the end of the stream, we are done.
 
-  • if the head of the stream does not correspond to one of the
+  • if the head of the scanner does not correspond to one of the
     ACS's associations, we are done.
 
   • if the optional `stop_if` proc was provided, the current

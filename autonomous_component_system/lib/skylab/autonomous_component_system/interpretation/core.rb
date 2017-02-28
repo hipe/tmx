@@ -9,7 +9,7 @@ module Skylab::Autonomous_Component_System
       # both the component value and association whenever it emits.
       # #open "go this away" this overcomplicated eventmodel that we don't use
 
-      -> cmp do  # :[#006]:codepoint-1
+      -> cmp do  # :[#006.E.2]
 
         -> * i_a, & x_p do
 

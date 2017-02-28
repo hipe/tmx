@@ -169,7 +169,7 @@ module Skylab::Zerk
         # as it does in the chart, here the (g)/(f) fork must happen
         # *before* the (j)/(h) fork because of "bespoke"s.
 
-        _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.new @_stream
+        _pvs = ACS_::Parameter::ValueSource_for_ArgumentScanner.new @_stream
 
         o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, fo_p[ ss ], & @_pp
 

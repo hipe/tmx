@@ -29,7 +29,7 @@ module Skylab::Fields::TestSupport
 
               :meta_property, :color,
 
-              :polymorphic_writer_method_name_suffix, :"=",
+              :argument_scanning_writer_method_name_suffix, :"=",
 
               :color, :red
 

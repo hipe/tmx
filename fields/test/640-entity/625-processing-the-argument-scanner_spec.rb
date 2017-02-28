@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] entity - processing the polymorphic upstrem" do
+  describe "[fi] entity - processing the argument scanner" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -17,11 +17,11 @@ module Skylab::Fields::TestSupport
           Entity.lib.call self do
 
             def foo
-              @foo_x = gets_one_polymorphic_value
+              @foo_x = gets_one
             end
 
             def bar
-              @bar_x = gets_one_polymorphic_value
+              @bar_x = gets_one
             end
 
           end
@@ -77,12 +77,12 @@ module Skylab::Fields::TestSupport
 
       begin
         class X_e_ptpu_PityVal
-          Entity.lib[ self, :polymorphic_writer_method_name_suffix ]
+          Entity.lib[ self, :argument_scanning_writer_method_name_suffix ]
         end
       rescue Home_::ArgumentError => e
       end
 
-      e.message.should match %r(\bexpecting a value for 'polymorphic_)
+      e.message == "expecting a value for 'argument_scanning_writer_method_name_suffix'" || fail
     end
 
     context "iambic writer postfix option (& introduction to using the DSL)" do
@@ -93,9 +93,9 @@ module Skylab::Fields::TestSupport
 
           attr_reader :x
 
-          Entity.lib.call self, :polymorphic_writer_method_name_suffix, :'=' do
+          Entity.lib.call self, :argument_scanning_writer_method_name_suffix, :'=' do
             def some_writer=
-              @x = gets_one_polymorphic_value
+              @x = gets_one
             end
           end
 
@@ -111,7 +111,7 @@ module Skylab::Fields::TestSupport
         _rx = /\bdid not have expected suffix '_derp': 'ferp'/
         -> do
         class X_e_ptpu_Bad_Suffixer
-          Entity.lib.call self, :polymorphic_writer_method_name_suffix, :_derp do
+          Entity.lib.call self, :argument_scanning_writer_method_name_suffix, :_derp do
             def ferp
             end
           end

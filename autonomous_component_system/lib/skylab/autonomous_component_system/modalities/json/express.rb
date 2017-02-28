@@ -54,7 +54,7 @@ module Skylab::Autonomous_Component_System
 
         THE_EMPTY_TIMES___ = '{}'
 
-        def _recurse cust_x, acs  # see [#003]:on-JSON-expression
+        def _recurse cust_x, acs  # see [#003.G] on JSON expression
 
           result = nil
 
@@ -87,7 +87,7 @@ module Skylab::Autonomous_Component_System
                 store[ x ] ; redo  # false is always stored as-is
               end
 
-              redo  # nil is never stored per #nil-note
+              redo  # nil is never stored per [#003.H] about nil
             end
 
             # if it's a true-ish compound component, always recurse

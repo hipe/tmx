@@ -60,7 +60,7 @@ module Skylab::Common
       end
 
       def _say
-        "polymorphic stream of one item has already been consumed."
+        "argument scanner of one item has already been consumed."
       end
     end
   end

@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
   # ->
     module Modalities::JSON
 
-      class Interpret  # notes in [#003]:on-JSON-interpretation
+      class Interpret  # notes in [#003.E] on JSON interpretation
 
         def initialize & p
 
@@ -299,7 +299,7 @@ module Skylab::Autonomous_Component_System
           # UOW any more: we are in the middle of a depth-first building
           # of a compound component.
 
-          _arg_st = Home_.lib_.fields::Argument_stream_via_value[ qk.value_x ]
+          _arg_scn = Home_.lib_.fields::Argument_scanner_via_value[ qk.value_x ]
 
           # using the "value popper" (a shortlived proxy that looks like
           # a stream but only wraps one value) is our way of leveraging
@@ -311,7 +311,7 @@ module Skylab::Autonomous_Component_System
           _reinit_handlers_for asc
 
           qk = ACS_::Interpretation::Build_value.call(
-            _arg_st, asc, _ACS, & @_CURRENT_component_handler_builder )
+            _arg_scn, asc, _ACS, & @_CURRENT_component_handler_builder )
 
           if qk
             @_write_value[ qk ]
@@ -323,7 +323,7 @@ module Skylab::Autonomous_Component_System
 
         def _reinit_handlers_for asc
 
-          # read [#006]:#Event-models. this is the first codepoint where we
+          # read [#006.C] event models. this is the first codepoint where we
           # must know which event-model is being used, because it determines
           # how the component is built - do we pass the construction method
           # a handler builder that builds a "special" handler or one that

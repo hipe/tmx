@@ -15,7 +15,7 @@ module Skylab::Fields::TestSupport
 
         Home_::Entity.call self do
           def biz
-            @biz_x = gets_one_polymorphic_value
+            @biz_x = gets_one
             true
           end
         end

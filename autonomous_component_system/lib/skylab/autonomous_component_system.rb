@@ -13,7 +13,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         o.execute
       end
 
-      def edit x_a, acs, & oes_p_p  # :Tenet3, [#006]#hot-binding
+      def edit x_a, acs, & oes_p_p  # :Tenet3, [#006.E] hot binding
 
         o = _Mutation_Session.new( & oes_p_p )
         o.accept_argument_array x_a
@@ -22,11 +22,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         o.execute
       end
 
-      def interpret arg_st, acs, & oes_p_p  # #Tenet6, [#003]:hb-again
+      def interpret scn, acs, & oes_p_p  # #Tenet6, [#006.F] "HB again"
 
         o = _Mutation_Session.new( & oes_p_p )
         o.ACS = acs
-        o.argument_stream = arg_st
+        o.argument_scanner = scn
         o.macro_operation_method_name = :interpret
         o.execute
       end
@@ -87,7 +87,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         Home_::Modalities::JSON::Unmarshal[ acs, cust, io, & pp ]
       end
 
-      def handler_builder_for acs  # for #Hot-eventmodel
+      def handler_builder_for acs  # for [#006.D] the hot event model
 
         block_given? and raise ::ArgumentError
 
@@ -218,8 +218,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         otr.instance_variable_set :@component_model, -> st, & pp do
           kn = p[ st, & pp ]
           if kn
-            _st = Field_::Argument_stream_via_value.via_known_known kn
-            _downstream[ _st, & pp ]
+            _scn = Field_::Argument_scanner_via_value.via_known_known kn
+            _downstream[ _scn, & pp ]
           else
             kn
           end
@@ -284,7 +284,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # ~ description
 
-      def accept__generate_description__meta_component  # [#003]#infer-desc
+      def accept__generate_description__meta_component  # [#003.L] infer desc
 
         # (for now this is only covered for primitives w/ operations)
 
@@ -568,7 +568,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!
         case x
-        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]#trueish-note
+        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # #[#003.J] trueish
           true
         else
           false

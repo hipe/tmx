@@ -6,8 +6,8 @@ module Skylab::Brazen
 
         # "iambic literals" are easier to read, but sometimes you just want
         # to pass a plain old box of name-value pairs to your action. this
-        # adapter jumps thru some hacky hoops to spoof a box as a polymorphic
-        # stream, and with that leverages the existing parsing logic.
+        # adapter jumps thru some hacky hoops to spoof a box as an argument
+        # scanner, and with that leverages the existing parsing logic.
 
         def self.[] act, bx
 
@@ -17,7 +17,7 @@ module Skylab::Brazen
           kp = KEEP_PARSING_
 
           pxy = Value_as_Stream___.new
-          act.polymorphic_upstream_ = pxy
+          act.argument_scanner_ = pxy
 
           bx.each_pair do | k, x |
 
@@ -32,7 +32,7 @@ module Skylab::Brazen
             if Field_::Takes_argument[ prp ]
 
               pxy.accept_current_token_ x
-              kp = act.receive_polymorphic_property prp
+              kp = act._parse_association_ prp
 
             elsif x
 
@@ -40,7 +40,7 @@ module Skylab::Brazen
               # the actual value is, in the interest of iambic isomorphism.
 
               pxy.clear
-              kp = act.receive_polymorphic_property prp
+              kp = act._parse_association_ prp
 
             else
 
@@ -54,7 +54,7 @@ module Skylab::Brazen
 
           end
 
-          act.remove_instance_variable :@_polymorphic_upstream_
+          act.remove_instance_variable :@_argument_scanner_
 
           kp
         end

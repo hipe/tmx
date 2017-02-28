@@ -63,7 +63,7 @@ module Skylab::Fields::TestSupport
             o :fun_ness, :really_fun
 
             def foo
-              @foo = gets_one_polymorphic_value
+              @foo = gets_one
             end
           end
 

@@ -5,7 +5,9 @@
 [#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
 
-[#011]       rewrite
+[#011]       model-centric operator branch ..
+
+             :[#here.3]: as described in the document, used to be called "promoted"
              ( #was: legacy table for a help screen is not covered )
 
 [#010]       bundle defined ..

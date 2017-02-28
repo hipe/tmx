@@ -42,7 +42,7 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        if orig_kn.is_effectively_known  # #nil-note, [#]false-note
+        if orig_kn.is_effectively_known  # [#003.H] about nil, [#003.I] about false
 
           -> do
 

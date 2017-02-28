@@ -8,7 +8,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
 
-        def interpret_compound_component p, & _  # #experimental [#003]#compounds
+        def interpret_compound_component p, & _  # #experimental [#003.F.2] compounds
           if p
             _me = new
             p[ _me ]
@@ -33,7 +33,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         :last_name,
       )
 
-      def component_event_model  # experimental near [#006]:#Event-models
+      def component_event_model  # experimental near [#006.C] event models
         :cold
       end
 
@@ -80,7 +80,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         :simple_name,
       )
 
-      def component_event_model  # see [#006]:#Event-models
+      def component_event_model  # see [#006.C] event models
         :cold
       end
 

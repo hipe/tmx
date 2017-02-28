@@ -75,7 +75,7 @@ module Skylab::Fields
 
           -> do
             _c = session.send m  # no yield for now - if you need it, use [ac]
-            _c.interpret_component argument_stream, formal_attribute
+            _c.interpret_component argument_scanner, formal_attribute
           end
         end
       end
@@ -93,7 +93,7 @@ module Skylab::Fields
 
       def custom_interpreter_method_of
 
-        m = @_.sexp_stream_for_current_attribute.gets_one
+        m = @_.argument_scanner_for_current_association_.gets_one
 
         @_.current_attribute.read_and_writer_by__ do |_atr|
 
@@ -104,7 +104,7 @@ module Skylab::Fields
       Newschool_custom_interpreter_as___ = -> m do
 
         -> do
-          x = session.send m, argument_stream
+          x = session.send m, argument_scanner
           if ACHIEVED_ == x
             KEEP_PARSING_
           else
@@ -119,15 +119,15 @@ module Skylab::Fields
 
           sess = session
 
-          if ! sess.instance_variable_defined? ARG_STREAM_IVAR_
-            sess.instance_variable_set ARG_STREAM_IVAR_, argument_stream
+          if ! sess.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
+            sess.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
             did = true
           end
 
           x = sess.send m
 
           if did
-            sess.remove_instance_variable ARG_STREAM_IVAR_
+            sess.remove_instance_variable ARGUMENT_SCANNER_IVAR_
           end
 
           if ACHIEVED_ == x
@@ -144,7 +144,7 @@ module Skylab::Fields
 
       def default
 
-        x = @_.sexp_stream_for_current_attribute.gets_one
+        x = @_.argument_scanner_for_current_association_.gets_one
         if x.nil?
           self._COVER_ME_dont_use_nil_use_optional
         end
@@ -156,7 +156,7 @@ module Skylab::Fields
 
       def default_proc
 
-        _x = @_.sexp_stream_for_current_attribute.gets_one
+        _x = @_.argument_scanner_for_current_association_.gets_one
 
         @_.current_attribute.be_defaultant_by_( & _x )
 
@@ -165,7 +165,7 @@ module Skylab::Fields
 
       def desc
 
-        _desc_p = @_.sexp_stream_for_current_attribute.gets_one
+        _desc_p = @_.argument_scanner_for_current_association_.gets_one
 
         @_.current_attribute.accept_description_proc__ _desc_p ; nil
       end
@@ -187,7 +187,7 @@ module Skylab::Fields
 
       def flag_of
 
-        sym = @_.sexp_stream_for_current_attribute.gets_one
+        sym = @_.argument_scanner_for_current_association_.gets_one
         ca = @_.current_attribute
 
         ca.reader_by_ do
@@ -201,9 +201,9 @@ module Skylab::Fields
             # "flag of" must have the *full* pipeline of the referrant -
             # read *and* write.
 
-            atr = index.lookup_attribute_ sym
-            _mutate_for_redirect x, atr
-            atr.read_and_write_ self  # result is kp
+            asc = index.read_association_ sym
+            mutate_for_redirect_ x, asc
+            asc.read_and_write_ self  # result is kp
           end
         end
       end
@@ -239,14 +239,14 @@ module Skylab::Fields
       end
 
       def ivar
-        @_.current_attribute.as_ivar = @_.sexp_stream_for_current_attribute.gets_one
+        @_.current_attribute.as_ivar = @_.argument_scanner_for_current_association_.gets_one
       end
 
       def known_known
 
         @_.current_attribute.reader_by_ do
           -> do
-            Common_::Known_Known[ argument_stream.gets_one ]
+            Common_::Known_Known[ argument_scanner.gets_one ]
           end
         end
       end
@@ -285,22 +285,22 @@ module Skylab::Fields
 
       def singular_of
 
-        sym = @_.sexp_stream_for_current_attribute.gets_one
+        sym = @_.argument_scanner_for_current_association_.gets_one
 
         ca = @_.current_attribute
 
         ca.reader_by_ do
           -> do
-            [ argument_stream.gets_one ]
+            [ argument_scanner.gets_one ]
           end
         end
 
         ca.writer_by_ do |_atr|
 
           -> x, _oes_p do
-            atr = index.lookup_attribute_ sym
-            _mutate_for_redirect x, atr
-            atr.read_and_write_ self  # result is kp
+            asc = index.read_association_ sym
+            mutate_for_redirect_ x, asc
+            asc.read_and_write_ self  # result is kp
           end
         end
       end

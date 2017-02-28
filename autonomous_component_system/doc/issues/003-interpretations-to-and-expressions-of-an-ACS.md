@@ -8,7 +8,7 @@ here we specify how both [#002] "compound" and "terminal" components of
 an ACS typically handle input & output from and to various "modalities."
 to be cheeky, we refer to input as "interpretation" and output as
 "expression". there is also the closely related idea of "intent"
-explored below at #intent
+explored below at [#here.D].
 
 
 
@@ -81,7 +81,8 @@ to a mutation session which interprets the input.)
 
 ## "method index"
 
-### :"why we cache the method index"
+### why we cache the method index :[#here.B]
+
 
 the default assumption is (reasonably) that the compound is not going to
 create new instance methods on-they-fly on its singleton class in order
@@ -101,7 +102,7 @@ primary design objectives of the [ac], near [#002]#DT3 dynamicism.)
 
 
 
-### :"the moment at which we cache the entries"
+### :"the moment at which we cache the entries" :[#here.C]
 
 when the method index is in its beginning state, use the below hand-written
 map-reduce to produce each next "entry"; all the while memo'ing each entry
@@ -128,7 +129,7 @@ near the the end but never reach the end.
 
 ## the "intent" node
 
-### "intention method", "intent" - :#intent
+### "intention method", "intent" :[#here.D]
 
 the elegant wonder of the ACS near "interpret component" is the idea
 that we could use the same method (validation) whether we are
@@ -160,7 +161,7 @@ express the UI or API. ([mt]'s adapters are an example.)
 
 
 
-#### case-study: :on-JSON-interpretation (as a seqway into something..)
+#### case-study: on JSON interpretation (as a seqway into something..) :[#here.E]
 
 at one time the JSON interpretation node effected a "unit of work"
 pattern whereby in two separate passes it would 1) "line up" JSON
@@ -198,17 +199,17 @@ experimentally we attempt this trick (next section):
 
 
 
-### the "super-signature" of construction methods :the-super-singature
+### the "super-signature" of construction methods :[#here.F]
 
 in an ideal utopia of "true autonomy" the component model needs nothing
-more than the argument stream and a handler to construct itself from
+more than the argument scanner and a handler to construct itself from
 arguments. the simple "node identifiers" of [sn] are exemplary of such
 a use case. (indeed the ACS grew out of this.)
 
 however, component models of non-trivial complexity may need access to
 resources and information beyond just what is available in the argument
-stream in order to parse build a valid, normal component from that
-stream.
+scanner in order to parse build a valid, normal component from that
+scanner.
 
 to accomodate this we specify one "super-signature" for construction
 methods:
@@ -227,7 +228,7 @@ methods:
           typically for use in the interface "intent"
 
       * for compound models, this is under exploration and is
-        being tracked with #compounds.
+        being tracked with :[#here.F.2] "compounds"
 
   • if this construction method takes more than one argument, the *last*
     argument will be the ACS that is building this as a component
@@ -237,7 +238,7 @@ methods:
 
   • if the constructor takes more than 2 arguments, the *second to last*
     argument will be the association structure. (but keep in mind that per
-    [#006]:A "most" components won't need to know their own name.)
+    [#006.A.1] "most" components won't need to know their own name.)
 
   • the constructor cannot take more than 3 arguments.
 
@@ -247,7 +248,7 @@ not define defaults for any parameters.
 
 
 
-### :on-JSON-expression
+### on JSON expression :[#here.G]
 
 (this section is to precede the following "note"-style sections.)
 
@@ -266,7 +267,7 @@ furthermore this makes tests fragile as we add components.
 
 
 
-### :#nil-note
+### about `nil` :[#here.H]
 
 the "common" way we deal with `nil` for both expression and interpretation
 is that we treat it as equivalent to the value not being set. this is so
@@ -288,7 +289,7 @@ being set to `nil` over serialization.
 
 
 
-### :false-note
+### about false :[#here.I]
 
 when it comes to `false`, however, (in contrast to handling `nil`
 above), we always simply treat it as-is.
@@ -317,7 +318,7 @@ lifetime.
 
 
 
-### :#trueish-note
+### :#trueish-note :[#here.J]
 
 we're using this to mark places where the component must be true-ish, for
 example because it is expected to be controller-like ..
@@ -332,7 +333,7 @@ example because it is expected to be controller-like ..
 
 
 
-### :#infer-desc
+### :#infer-desc :[#here.L]
 
 track the multiple places where we do this similar thing
 _

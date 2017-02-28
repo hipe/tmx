@@ -21,7 +21,7 @@ universal abstract operations:
   • "fetch"
   • "add"
   • "remove"
-  • "to polymorphic key stream" [yet to be formally defined]
+  - `to_destructee_key_scanner`  [yet to be formally defined]
 
 i.e the above are "#hook-out's" with particular expected signatures
 and semantics.
@@ -49,7 +49,7 @@ to the intended use case of this operation, so to do otherwise will
 probably lead to behavior that is interesting at best.
 
 so: the destructee will present the keys of the items in its consituency
-via a call to is "to polymorphic key stream" method.
+via a call to its `to_destructee_key_scanner` method.
 
   • with each key in this stream:
 

@@ -27,12 +27,12 @@ module Skylab::System
       end
 
       def is_dry_run=
-        @_is_dry_run = gets_one_polymorphic_value
+        @_is_dry_run = gets_one
         KEEP_PARSING_
       end
 
       def max_mkdirs=
-        @_max_mkdirs = gets_one_polymorphic_value
+        @_max_mkdirs = gets_one
         KEEP_PARSING_
       end
 

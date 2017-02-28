@@ -12,10 +12,10 @@ module Skylab::Autonomous_Component_System
           new( & p )
         end
 
-        def interpret_into_via_passively__ bx, st
+        def interpret_into_via_passively__ bx, scn
 
           par = new do
-            __init_via_argument_stream_passively st
+            __init_via_argument_scanner_passively scn
           end
 
           bx.add par.name_symbol, par
@@ -50,18 +50,18 @@ module Skylab::Autonomous_Component_System
 
       # --
 
-      def __init_via_argument_stream_passively st
+      def __init_via_argument_scanner_passively scn
 
-        @name_symbol = st.gets_one
+        @name_symbol = scn.gets_one
 
-        m = :"__interpret__#{ st.gets_one }__"
+        m = :"__interpret__#{ scn.gets_one }__"
         begin
-          _kp = send m, st
+          _kp = send m, scn
           _kp or fail
-          st.no_unparsed_exists and break
-          m = :"__interpret__#{ st.head_as_is }__"
+          scn.no_unparsed_exists and break
+          m = :"__interpret__#{ scn.head_as_is }__"
           if respond_to? m
-            st.advance_one
+            scn.advance_one
             redo
           end
           break
@@ -70,14 +70,14 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      def mutate_against_argument_scanner_passively st
+      def mutate_against_argument_scanner_passively scn
 
         begin
-          st.no_unparsed_exists and break
-          m = :"__interpret__#{ st.head_as_is }__"
+          scn.no_unparsed_exists and break
+          m = :"__interpret__#{ scn.head_as_is }__"
           if respond_to? m
-            st.advance_one
-            _kp = send m, st
+            scn.advance_one
+            _kp = send m, scn
             _kp ? redo : break
           end
           break
@@ -87,8 +87,8 @@ module Skylab::Autonomous_Component_System
 
       # -- #[#fi-010]
 
-      def __interpret__description__ st
-        @description_proc = st.gets_one
+      def __interpret__description__ scn
+        @description_proc = scn.gets_one
         KEEP_PARSING_
       end
 
@@ -105,8 +105,8 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      def __interpret__name__ st
-        @name = st.gets_one
+      def __interpret__name__ scn
+        @name = scn.gets_one
         KEEP_PARSING_
       end
 
@@ -118,16 +118,16 @@ module Skylab::Autonomous_Component_System
         @name_symbol
       end
 
-      def __interpret__default__ st
+      def __interpret__default__ scn
 
-        x = st.gets_one
+        x = scn.gets_one
         @default_proc = -> { x }
         KEEP_PARSING_
       end
 
-      def __interpret__default_proc__ st
+      def __interpret__default_proc__ scn
 
-        @default_proc = st.gets_one
+        @default_proc = scn.gets_one
         KEEP_PARSING_
       end
 

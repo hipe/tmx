@@ -200,7 +200,7 @@ module Skylab::Zerk
             __init_fixed_primaries_scanner fpnvpa
           end
 
-          # ~ real user scanner (polymorphic scanner)
+          # ~ real user scanner (argument scanner)
 
           if ! rus.no_unparsed_exists
             # this ..

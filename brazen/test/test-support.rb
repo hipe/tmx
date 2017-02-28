@@ -133,7 +133,7 @@ module Skylab::Brazen::TestSupport
 
   # ~ to be an entity (model or action) you have to:
 
-    def knownness_via_association_ prp  # :+#cp
+    def _read_knownness_ prp  # :+#cp
 
       if bx
         had = true

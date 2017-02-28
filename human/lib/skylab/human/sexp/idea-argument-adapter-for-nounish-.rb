@@ -10,7 +10,7 @@ module Skylab::Human
 
           class << self
 
-            def via__polymorphic_upstream__ st
+            def via__argument_scanner__ st
               Self_._new do
                 @role_symbol = :object
                 _receive_etc st
@@ -23,7 +23,7 @@ module Skylab::Human
 
           class << self
 
-            def via__polymorphic_upstream__ st
+            def via__argument_scanner__ st
               Self_._new do
                 @role_symbol = :subject
                 _receive_etc st

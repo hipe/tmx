@@ -16,9 +16,9 @@ module Skylab::Human
 
       attr_reader( * COMPONENTS.symbols )
 
-      def initialize st, asc
+      def initialize scn, asc
 
-        _ok = COMPONENTS.init_via_stream self, st
+        _ok = COMPONENTS.init_via_argument_scanner self, scn
         _ok or fail
         super asc
       end

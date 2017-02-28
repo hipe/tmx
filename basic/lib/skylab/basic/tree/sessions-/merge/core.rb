@@ -43,11 +43,11 @@ module Skylab::Basic
 
       P__ = -> destructee, mutatee do
 
-        st = destructee.to_destructee_polymorphic_key_stream
+        scn = destructee.to_destructee_key_scanner
 
-        while st.unparsed_exists
+        until scn.no_unparsed_exists
 
-          key = st.gets_one
+          key = scn.gets_one
           item_ = destructee.remove key
           if item_.nil?
             next
@@ -90,7 +90,7 @@ module Skylab::Basic
           @o = o ; self
         end
 
-        def to_destructee_polymorphic_key_stream
+        def to_destructee_key_scanner
 
           Common_::Stream.via_nonsparse_array( @ivars ).reduce_by do | k |
 

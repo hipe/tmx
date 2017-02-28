@@ -202,7 +202,7 @@ module Skylab::Zerk
           @__oes_pp[ @_asc ]
         end
 
-        _st = Home_.lib_.fields::Argument_stream_via_value[ @_qkn.value_x ]
+        _st = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value_x ]
 
         qk = ACS_::Interpretation::Build_value.call(
           _st,

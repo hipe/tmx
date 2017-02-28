@@ -15,7 +15,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "this i.m loads" do
-        Attributes.lib::Lib::PolymorphicProcessingInstanceMethods
+        TS_::Attributes::Actor.lib::InstanceMethods
       end
 
       it "i.m only loads" do
@@ -107,9 +107,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_tuple do
 
-          st = _build_this_argument_scanner
-          sess = _hybrid_class.via_argument_scanner_passively st
-          [ st.head_as_is, sess.jiang, sess.bar ]
+          scn = _build_this_argument_scanner
+          sess = _hybrid_class.via_argument_scanner_passively scn
+          [ scn.head_as_is, sess.jiang, sess.bar ]
         end
 
         it "writes" do
@@ -138,9 +138,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_tuple do
           @session_ = _hybrid_class.new
-          st = _build_this_argument_scanner
-          x = process_argument_scanner_passively_ st
-          [ x, st.head_as_is, @session_.jiang, @session_.bar ]
+          scn = _build_this_argument_scanner
+          x = process_argument_scanner_passively_ scn
+          [ x, scn.head_as_is, @session_.jiang, @session_.bar ]
         end
 
         it "writes" do
@@ -168,7 +168,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_a_i_NoSee_Left
 
-          attrs = Attributes::Actor.lib.call( self,
+          attrs = TS_::Attributes::Actor.lib.call( self,
             jiang: nil,
             xiao: nil,
             qing: nil,
@@ -184,16 +184,16 @@ module Skylab::Fields::TestSupport
 
         class X_a_a_i_NoSee_IM_Only
 
-          include Attributes.lib::Lib::PolymorphicProcessingInstanceMethods
+          include Home_::Attributes::Actor::InstanceMethods
 
         private
 
           def foo=
-            @foo = gets_one_polymorphic_value ; true
+            @foo = gets_one ; true
           end
 
           def bar=
-            @bar = gets_one_polymorphic_value ; true
+            @bar = gets_one ; true
           end
 
         public
@@ -213,11 +213,11 @@ module Skylab::Fields::TestSupport
         private
 
           def foo=
-            @foo = gets_one_polymorphic_value ; true
+            @foo = gets_one ; true
           end
 
           def bar=
-            @bar = gets_one_polymorphic_value ; true
+            @bar = gets_one ; true
           end
 
         public
@@ -243,11 +243,11 @@ module Skylab::Fields::TestSupport
         private
 
           def foo=
-            @foo = gets_one_polymorphic_value ; true
+            @foo = gets_one ; true
           end
 
           def bar=
-            @bar = gets_one_polymorphic_value ; true
+            @bar = gets_one ; true
           end
         public
 

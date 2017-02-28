@@ -38,7 +38,7 @@ module Skylab::Parse
       private
 
         def moniker_symbol=  # a "moniker" is a name that has zero imapct on logic - it is for humans only
-          @moniker_symbol = gets_one_polymorphic_value
+          @moniker_symbol = gets_one
           KEEP_PARSING_
         end
 

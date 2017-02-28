@@ -262,10 +262,10 @@ module Skylab::Fields
 
       # --
 
-      def write sess, st  # #EXPERIMENTAL #cover-me #todo
+      def write sess, scn  # #EXPERIMENTAL #cover-me #todo
 
-        pa = Here_::Lib::Parse_and_or_Normalize.new sess
-        pa.argument_stream = st
+        pa = Here_::AssociationIndex_::Parse_and_or_Normalize.new sess
+        pa.argument_scanner = scn
         _interpret pa  # result is k.p
       end
 
@@ -315,7 +315,7 @@ module Skylab::Fields
       end
 
       Read___ = -> do
-        argument_stream.gets_one
+        argument_scanner.gets_one
       end
 
       Write___ = -> x, _ do
@@ -328,14 +328,14 @@ module Skylab::Fields
       class Interpretation_Services___
 
         def initialize attr, parse
-          @_arg_st = nil
+          @_argument_scanner = nil
           @_formal_attribute = attr
           @_parse = parse
           # for now, don't freeze only because #this
         end
 
-        def _mutate_for_redirect x, atr  # :#this is why we didn't freeze
-          @_arg_st = Argument_stream_via_value[ x ]
+        def mutate_for_redirect_ x, atr  # :#this is why we didn't freeze
+          @_argument_scanner = Argument_scanner_via_value[ x ]
           @_formal_attribute = atr ; nil
         end
 
@@ -346,8 +346,8 @@ module Skylab::Fields
           NIL_
         end
 
-        def argument_stream
-          @_arg_st || @_parse.argument_stream
+        def argument_scanner
+          @_argument_scanner || @_parse.argument_scanner
         end
 
         def formal_attribute

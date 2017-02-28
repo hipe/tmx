@@ -30,13 +30,13 @@ module Skylab::Fields
 
           if x
             _ = ::Array.try_convert( x ) || [ x ]
-            st = Common_::Scanner.via_array _
-            @sexp_stream_for_current_attribute = st
+            scn = Common_::Scanner.via_array _
+            @argument_scanner_for_current_association_ = scn
 
             p = @build_N_plus_one_interpreter[ self ]
             begin
-              p[ st.gets_one ]
-            end until st.no_unparsed_exists
+              p[ scn.gets_one ]
+            end until scn.no_unparsed_exists
           end
 
           @finish_attribute[ self ]
@@ -70,7 +70,7 @@ module Skylab::Fields
       attr_reader(
         :current_attribute,
         :meta_attributes_class,
-        :sexp_stream_for_current_attribute,
+        :argument_scanner_for_current_association_,
       )
     end
 

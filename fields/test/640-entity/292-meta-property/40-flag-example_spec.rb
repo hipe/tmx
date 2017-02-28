@@ -50,7 +50,7 @@ module Skylab::Fields::TestSupport
         hey.is_florg.should eql false
       end
 
-      it "..and in this case set a custom 'polymorphic_writer_method_proc'." do
+      it "..and in this case set a custom 'argument_scanning_writer_method_proc'." do
 
         kp = nil
 

@@ -28,12 +28,12 @@ module Skylab::Fields::TestSupport
         X_e_maem_Two = Entity.lib.call do
 
           def foo
-            @foo_x = gets_one_polymorphic_value
+            @foo_x = gets_one
             true
           end
 
           def bar
-            @bar_x = gets_one_polymorphic_value
+            @bar_x = gets_one
             true
           end
 
@@ -58,7 +58,7 @@ module Skylab::Fields::TestSupport
             end
 
             def baz
-              @baz_x = gets_one_polymorphic_value
+              @baz_x = gets_one
               true
             end
           end
@@ -84,12 +84,12 @@ module Skylab::Fields::TestSupport
         X_e_maem_Props = Entity.lib.call do
 
           def uh
-            @uh_x = gets_one_polymorphic_value
+            @uh_x = gets_one
             true
           end
 
           def ah
-            @ah_x = gets_one_polymorphic_value
+            @ah_x = gets_one
             true
           end
 
@@ -121,12 +121,12 @@ module Skylab::Fields::TestSupport
         X_e_maem_Left = Entity.lib.call do
 
           def one
-            @one_x = gets_one_polymorphic_value
+            @one_x = gets_one
             true
           end
 
           def two
-            @one_x = gets_one_polymorphic_value
+            @one_x = gets_one
             true
           end
         end
@@ -134,12 +134,12 @@ module Skylab::Fields::TestSupport
         X_e_maem_Right = Entity.lib.call do
 
           def two
-            @two_x = gets_one_polymorphic_value.to_s.upcase.intern
+            @two_x = gets_one.to_s.upcase.intern
             true
           end
 
           def three
-            @three_x = gets_one_polymorphic_value
+            @three_x = gets_one
             true
           end
         end

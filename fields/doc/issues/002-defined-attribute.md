@@ -1,8 +1,8 @@
 # (will rewrite)
 
-## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes) :[#025]
+## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes) :[#002]
 
-What is the esssence of all data in the universe? It starts from within. with
+What is the essence of all data in the universe? It starts from within. with
 metaprogramming.
 
 Let's take some arbitrary set of name-value pairs, say an

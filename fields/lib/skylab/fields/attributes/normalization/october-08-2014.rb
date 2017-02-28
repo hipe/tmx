@@ -2,7 +2,7 @@ module Skylab::Fields
 
   class Attributes
 
-    module Normalization_against_Model
+    module Normalization::OCTOBER_08_2014
       # <-
     Stream = -> entity_x, formal_prp_st, & oes_p do
 
@@ -11,7 +11,7 @@ module Skylab::Fields
       o = Build_Knownness_Normalizer__.new
 
       o.apply_default = -> model do
-        model.default_value_via_entity_ entity_x
+        model.default_value_via_entity__ entity_x
       end
 
       o.when_missing = -> kn, _, & ev_p do
@@ -31,7 +31,7 @@ module Skylab::Fields
         prp = formal_prp_st.gets
         prp or break
 
-        kn = entity_x.knownness_via_association_ prp
+        kn = entity_x._read_knownness_ prp
 
         if kn.is_known_known
           was_known = true
@@ -59,7 +59,7 @@ module Skylab::Fields
         # (it may be that it was not known and it is not known)
 
         if yes
-          _ = entity_x.set_value_of_formal_property_ kn.value_x, prp
+          _ = entity_x._write_via_association_ kn.value_x, prp
           _ or self._NEVER  # #todo - assume this always succeeds?
         end
 
@@ -67,7 +67,7 @@ module Skylab::Fields
       end while nil
 
       if miss_prp_a
-        entity_x.receive_missing_required_properties_array miss_prp_a
+        entity_x._receive_missing_required_associations_ miss_prp_a
       elsif kn
         ACHIEVED_
       else
@@ -149,7 +149,7 @@ module Skylab::Fields
       self._K
 
       # model.default_value_  # <- more like this
-      # model.default_value_via_entity_ entity_x  # <- less like this
+      # model.default_value_via_entity__ entity_x  # <- less like this
     end
 
     o.when_missing = -> kn, _, & ev_p do

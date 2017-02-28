@@ -25,19 +25,19 @@ module Skylab::Basic
     private
 
       def qualified_knownness=
-        _receive_arg gets_one_polymorphic_value
+        _receive_arg gets_one
       end
 
       def begin=
-        _touch_current_mutable_range.set_begin gets_one_polymorphic_value
+        _touch_current_mutable_range.set_begin gets_one
       end
 
       def end=
-        _touch_current_mutable_range.set_end gets_one_polymorphic_value
+        _touch_current_mutable_range.set_end gets_one
       end
 
       def is=
-        x = gets_one_polymorphic_value
+        x = gets_one
         rng = _touch_current_mutable_range
         rng.set_begin x
         rng.set_end x
@@ -49,7 +49,7 @@ module Skylab::Basic
 
       def x=
 
-        _x = gets_one_polymorphic_value
+        _x = gets_one
         _receive_value _x
       end
 

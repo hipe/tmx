@@ -10,16 +10,16 @@ module Skylab::Fields
 
     Parse = -> build do
 
-      st = build.sexp_stream_for_current_attribute
+      scn = build.argument_scanner_for_current_association_
 
       defs = MethodsDefiner___.new
 
       begin
-        st.no_unparsed_exists and break
-        p = MODIFIERS___[ st.head_as_is ]
+        scn.no_unparsed_exists and break
+        p = MODIFIERS___[ scn.head_as_is ]
         p or break
-        st.advance_one
-        p[ defs, st ]
+        scn.advance_one
+        p[ defs, scn ]
         redo
       end while nil
 
@@ -47,16 +47,16 @@ module Skylab::Fields
 
       MODIFIERS___ = {
 
-        negative_stem: -> defs, st do
+        negative_stem: -> defs, scn do
 
-          sym = st.gets_one
+          sym = scn.gets_one
           defs.neg_read = :"#{ sym }?"
           defs.neg_write = :"#{ sym }!" ; nil
         end,
 
-        positive_stem: -> defs, st do
+        positive_stem: -> defs, scn do
 
-          sym = st.gets_one
+          sym = scn.gets_one
           defs.pos_read = :"#{ sym }?"
           defs.pos_write = :"#{ sym }!" ; nil
         end,

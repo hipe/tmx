@@ -41,16 +41,16 @@ module Skylab::Human
     private
 
       def on_zero_items=
-        @nucleus.on_zero_items_p = gets_one_polymorphic_value
+        @nucleus.on_zero_items_p = gets_one
         KEEP_PARSING_
       end
 
       def template=
 
         @nucleus.template = Home_.lib_.basic::String::Template.via_string(
-          gets_one_polymorphic_value )
+          gets_one )
 
-        via_template_parse_remainder_of_argument_scanner polymorphic_upstream
+        via_template_parse_remainder_of_argument_scanner argument_scanner
       end
 
       def via_template_parse_remainder_of_argument_scanner st
@@ -135,42 +135,42 @@ module Skylab::Human
           nil
         end
 
-        include Home_.lib_.fields::Attributes::Lib::PolymorphicProcessingInstanceMethods
+        include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
       private
 
           def aggregate=
             @does_field_aggregation = true
-            @aggregate_p = gets_one_polymorphic_value
+            @aggregate_p = gets_one
             KEEP_PARSING_
           end
 
           def on_first_mention=
             @does_field_redundancy = true
-            @when_field_value_count_is_one_p = gets_one_polymorphic_value
+            @when_field_value_count_is_one_by = gets_one
             KEEP_PARSING_
           end
 
           def on_subsequent_mentions=
             @does_field_redundancy = true
-            @when_field_value_count_is_two_or_more_p = gets_one_polymorphic_value
+            @when_field_value_count_is_two_or_more_by = gets_one
             KEEP_PARSING_
           end
 
           def on_subsequent_mentions_of=
-            st = polymorphic_upstream
-            i = st.head_as_is
-            case i
+            scn = argument_scanner
+            sym = scn.head_as_is
+            case sym
             when :frame
-              st.advance_one
+              scn.advance_one
               @does_frame_redundancy = true
-              @when_frame_value_count_is_two_or_more_p = st.gets_one
+              @when_frame_value_count_is_two_or_more_by = scn.gets_one
               KEEP_PARSING_
             when :field
-              st.advance_one
+              scn.advance_one
               @does_field_redundancy = true
-              @derivative_of_field_i = st.gets_one
-              @when_field_value_count_is_two_or_more_p = st.gets_one  # BE CAREFUL
+              @derivative_of_field_i = scn.gets_one
+              @when_field_value_count_is_two_or_more_by = scn.gets_one  # BE CAREFUL
               KEEP_PARSING_
             else
 
@@ -188,9 +188,9 @@ module Skylab::Human
           :does_frame_redundancy,
           :does_field_redundancy,
           :does_field_aggregation,
-          :when_frame_value_count_is_two_or_more_p,
-          :when_field_value_count_is_one_p,
-          :when_field_value_count_is_two_or_more_p
+          :when_frame_value_count_is_two_or_more_by,
+          :when_field_value_count_is_one_by,
+          :when_field_value_count_is_two_or_more_by
 
         def name_symbol
           @tparam.name_symbol
@@ -512,7 +512,7 @@ module Skylab::Human
           @subs_h = {}
           scn = @nucleus.field_box.to_value_minimal_stream
           while @fld = scn.gets
-            @p = @fld.when_frame_value_count_is_two_or_more_p
+            @p = @fld.when_frame_value_count_is_two_or_more_by
             if @p
               via_proc_substitute_value
             else
@@ -601,9 +601,9 @@ module Skylab::Human
 
         def via_value_count_resolve_proc
           @p = if 1 == @value_count
-            @fld.when_field_value_count_is_one_p
+            @fld.when_field_value_count_is_one_by
           else
-            @fld.when_field_value_count_is_two_or_more_p
+            @fld.when_field_value_count_is_two_or_more_by
           end ; nil
         end
 

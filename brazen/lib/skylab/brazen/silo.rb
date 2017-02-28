@@ -249,16 +249,16 @@ module Skylab::Brazen
 
         if _ok
 
-          st = o.argument_stream
+          scn = o.argument_scanner
           h = { qualified_knownness_box: nil, preconditions: nil }
-          while st.unparsed_exists
-            if :with == st.head_as_is
-              st.advance_one
+          until scn.no_unparsed_exists
+            if :with == scn.head_as_is
+              scn.advance_one
               break
             end
-            k = st.gets_one
+            k = scn.gets_one
             h.fetch k  # validate
-            h[ k ] = st.gets_one
+            h[ k ] = scn.gets_one
           end
           preconds = h[ :preconditions ]
           qualified_knownness_box = h[ :qualified_knownness_box ]

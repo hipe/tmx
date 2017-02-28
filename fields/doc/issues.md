@@ -1,6 +1,8 @@
 [#039]       [ defined attribute ]
 
 [#038]       meta-meta-attrirubtes justification ..
+       #open [#here.1] the dream of unification (of normalization, then of
+             the unifying theory of models and associations)
 
 [#037]       meta-attributes justification ..
 
@@ -16,7 +18,7 @@
              [#here.2] (in document)
 
        #open [#here.1] whether or not this is deprecated, wait till #open [#br-045] sunset
-             ( #was: track redundant or near-redundant polymorphic stream,
+             ( #was: track redundant or near-redundant argument scanner.
                #moved-to: [#co-xxx] )
 
 [#033]       iambics..
@@ -93,7 +95,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
-             [#here.2], [#here.3], [#here.4] borrow
+             [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.A] #in-situ [ the absorber method maker ]
 
 [#007]       [ SESSION PATTERN ]

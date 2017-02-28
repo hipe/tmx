@@ -89,10 +89,10 @@ module Skylab::Human
 
       attr_reader( * COMPONENTS.symbols( :_read ) )
 
-      def initialize st, asc
+      def initialize scn, asc
 
         @lemma_symbol = nil
-        ok = COMPONENTS.init_via_stream self, st
+        ok = COMPONENTS.init_via_argument_scanner self, scn
         ok or fail
         @suffixed_proper_constituency ||= Natural_defaults___[]
         super asc
@@ -117,7 +117,7 @@ module Skylab::Human
         # but it makes for more readable sexp's
 
         _atr = COMPONENTS.attribute :suffixed_proper_constituency
-        _atr.write self, @_polymorphic_upstream_
+        _atr.write self, @_argument_scanner_
       end
 
       def __suffixed_modifier_phrase__component_association
