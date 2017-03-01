@@ -224,8 +224,11 @@
 
               ( #was: 2011-08-23 @closed filemetrics ignores blank lines, comments )
 
-[#002]        "now.dot" (salvaged from [hl])
+[#002]       [ generate the sidesystem dependency graph ]
+             ( #disassociated: "now.dot" (salvaged from [hl]) )
               ( #was: 2011-08-20 @closed F-ace craps near namespaces )
-[#001]        universe dependency visualizations
+
+[#001]       [ placeholder for any references to/in README ]
               ( #was: 2011-08-17 @closed filemetrics rearchitecting )
+
 [#000] 2011-08-13 @closed filemetrics refactor near linecount feature

@@ -178,7 +178,7 @@ module Skylab::TanMan
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-        include Common_::Event::Selective_Builder_Receiver_Sender_Methods
+        include Common_::Event::ReceiveAndSendMethods
       end
 
       def into_entity_write_digraph_path__ path
@@ -280,7 +280,7 @@ module Skylab::TanMan
         end
       end
 
-      include Common_::Event::Selective_Builder_Receiver_Sender_Methods
+      include Common_::Event::ReceiveAndSendMethods
     end
   end
 end

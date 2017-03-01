@@ -99,7 +99,7 @@ module Skylab::TanMan
           end
           m
         end
-        receive_missing_required_properties_array _miss_prp_a
+        _receive_missing_required_associations_ _miss_prp_a
         UNABLE_
       end
     end

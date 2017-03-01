@@ -405,7 +405,7 @@ module Skylab::Cull
       _SYM = prp.name_symbol
 
       -> do
-        _x = gets_one_polymorphic_value
+        _x = gets_one
         @argument_box.touch_array_and_push _SYM, _x
         KEEP_PARSING_
       end
@@ -417,10 +417,10 @@ module Skylab::Cull
 
       def self.receive_entity_property prp
 
-        if prp.has_custom_polymorphic_writer_method
+        if prp.has_custom_argument_scanning_writer_method
 
-          m = prp.custom_polymorphic_writer_method_name
-          _method_definition = prp.polymorphic_writer_method_proc_proc[ prp ]
+          m = prp.custom_argument_scanning_writer_method_name
+          _method_definition = prp.argument_scanning_writer_method_proc_proc[ prp ]
 
           es = @entity_edit_session
           @entity_edit_session = nil
@@ -445,16 +445,16 @@ module Skylab::Cull
           def list=  # :+#[br-082]
 
             @argument_arity = :_defined_manually_
-            @has_custom_polymorphic_writer_method = true
-            @polymorphic_writer_method_proc_proc = LIST_WRITER_MPP___
+            @has_custom_argument_scanning_writer_method = true
+            @argument_scanning_writer_method_proc_proc = LIST_WRITER_MPP___
             KEEP_PARSING_
           end
 
           def normalize_property
 
-            if has_custom_polymorphic_writer_method
-              set_polymorphic_writer_method_name(
-                conventional_polymorphic_writer_method_name )
+            if has_custom_argument_scanning_writer_method
+              set_argument_scanning_writer_method_name(
+                conventional_argument_scanning_writer_method_name )
             end
             KEEP_PARSING_
           end

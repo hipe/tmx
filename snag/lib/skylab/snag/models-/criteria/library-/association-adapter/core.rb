@@ -21,7 +21,7 @@ module Skylab::Snag
         def named_functions=
 
           bx = Common_::Box.new
-          st = polymorphic_upstream
+          st = argument_scanner
           name_sym = st.gets_one
           func_sym = st.gets_one
           begin
@@ -52,7 +52,7 @@ module Skylab::Snag
         end
 
         def verb_lemma=
-          @verb_lemma_and_phrase_head_s_a = [ gets_one_polymorphic_value ]
+          @verb_lemma_and_phrase_head_s_a = [ gets_one ]
           KEEP_PARSING_
         end
 

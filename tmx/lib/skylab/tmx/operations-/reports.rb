@@ -183,7 +183,7 @@ module Skylab::TMX
 
       def _parse_mutex_operation
 
-        # assume the argument stream head is cached as a primary symbol
+        # assume the argument scanner head is cached as a primary symbol
         # and corresponds to a valid sub-operation. these sub-operations
         # are mutually exclusive - you can only ever indicate one.
         # abstraction candidate maybe.

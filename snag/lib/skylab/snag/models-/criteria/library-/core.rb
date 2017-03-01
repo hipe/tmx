@@ -20,11 +20,11 @@ module Skylab::Snag
 
       class Common_Adapter_
 
-        include Attrs__::Lib::PolymorphicProcessingInstanceMethods
+        include Attrs__::Actor::InstanceMethods
 
         def process_argument_scanner_fully st
           _ok = super
-          _ok && Attrs__::Lib::Normalize_using_defaults_and_requireds[ self ]
+          _ok && Attrs__::Normalization::Normalize_via_Session_with_StaticAttributes[ self ]
         end
       end
 

@@ -84,7 +84,7 @@ module Skylab::Snag
 
         _mutate_upstream_adapter_in @_hy.moz
 
-        o = Home_.lib_.fields::Attributes::Value_Processing.new
+        o = Home_.lib_.fields::Attributes::Normalization::JUNE_08_2015.new
 
         bx = Common_::Box.new
 

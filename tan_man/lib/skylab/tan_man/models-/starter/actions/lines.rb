@@ -44,7 +44,7 @@ module Skylab::TanMan
 
       class Session
 
-        Common_::Event.selective_builder_sender_receiver self
+        include Common_::Event::ReceiveAndSendMethods
 
         def initialize k, oes_p
           @qualified_knownness_box = nil

@@ -131,7 +131,7 @@ module Skylab::TanMan
       # use the filesystem when reading the available collection,
       # use the workspace when writing the currently selected entity.
 
-      include Common_::Event::Selective_Builder_Receiver_Sender_Methods
+      include Common_::Event::ReceiveAndSendMethods
 
       include Common_Collection_Controller_Methods_
 

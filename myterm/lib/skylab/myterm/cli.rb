@@ -108,11 +108,11 @@ module Skylab::MyTerm
 
       def __parse_adapter  # assume starts with dash
 
-        st = @CLI.argument_stream
-        s = st.head_as_is
+        scn = @CLI.argument_scanner
+        s = scn.head_as_is
         md = %r(\A-a([[:alnum:]]+)?\z).match s
         if md
-          st.advance_one
+          scn.advance_one
           yes = true
           val = md[1]
         else
@@ -120,7 +120,7 @@ module Skylab::MyTerm
           if md
             nam = md[1]
             if nam == 'adapter'[ 0, nam.length ]
-              st.advance_one
+              scn.advance_one
               yes = true
               val = md[2]
             end
@@ -128,8 +128,8 @@ module Skylab::MyTerm
         end
         if yes
           if ! val
-            unless st.no_unparsed_exists
-              val = st.gets_one
+            unless scn.no_unparsed_exists
+              val = scn.gets_one
             end
           end
         end

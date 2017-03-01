@@ -143,7 +143,7 @@ module Skylab::SearchAndReplace
 
         class Build_fulfiller___ < Common_::Dyadic
 
-          Common_::Event.selective_builder_sender_receiver self
+          include Common_::Event::ReceiveAndSendMethods
 
           def initialize sym_a, path, & oes_p
             @custom_symbols = sym_a

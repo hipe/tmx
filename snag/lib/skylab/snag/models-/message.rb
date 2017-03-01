@@ -51,7 +51,7 @@ module Skylab::Snag
 
       def character_limit=
 
-        d = gets_one_polymorphic_value
+        d = gets_one
 
         @p_a.push -> arg, & oes_p do
           s = arg.value_x

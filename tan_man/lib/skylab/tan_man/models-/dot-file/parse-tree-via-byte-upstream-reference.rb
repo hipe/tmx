@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    class Sessions__::Produce_Parse_Tree
+    class ParseTree_via_ByteUpstreamReference
 
       Attributes_actor_.call( self,
         byte_upstream_reference: nil,

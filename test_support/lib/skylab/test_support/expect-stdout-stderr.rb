@@ -552,7 +552,7 @@ module Skylab::TestSupport
         private :new
       end  # >>
 
-      include Home_.lib_.fields::Attributes::Lib::PolymorphicProcessingInstanceMethods
+      include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
       def initialize st, & p
 

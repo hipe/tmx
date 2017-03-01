@@ -43,7 +43,7 @@ module Skylab::TestSupport
 
         def do_debug=
           @do_debug_value_was_passed = true
-          @do_debug_x = gets_one_polymorphic_value
+          @do_debug_x = gets_one
           ACHIEVED_
         end
 

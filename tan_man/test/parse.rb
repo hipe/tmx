@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport
       Produce_parse_tree_custom___.new( @bx, & @on_event_selectively ).execute
     end
 
-    class Produce_parse_tree_custom___ < Home_::Models_::DotFile::Sessions__::Produce_Parse_Tree
+    class Produce_parse_tree_custom___ < Home_::Models_::DotFile::ParseTree_via_ByteUpstreamReference
 
       def initialize bx, & oes_p
         @_h = bx.h_

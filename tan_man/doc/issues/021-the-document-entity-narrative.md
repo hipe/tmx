@@ -3,7 +3,7 @@
 
 ## #args-partitioning
 
-from a classified argument stream put each relevant argument into
+from a classified argument scanner put each relevant argument into
 a bucket corresponding to its direction: input arguments in one
 bucket, output arguments in another and so on *for the arbitrary
 list of directions provided by the caller*, expressed as symbols.

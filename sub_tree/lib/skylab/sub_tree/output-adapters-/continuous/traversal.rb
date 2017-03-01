@@ -32,7 +32,7 @@ module Skylab::SubTree
 
       def output_proc=
 
-        p = gets_one_polymorphic_value
+        p = gets_one
 
         case p.arity
         when 3     ; __resolve_downstream_proc_via_arity_of_three p

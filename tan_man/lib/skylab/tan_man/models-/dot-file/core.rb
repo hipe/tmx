@@ -12,7 +12,7 @@ module Skylab::TanMan
 
       def produce_parse_tree_with * x_a, & oes_p
 
-        Here_::Sessions__::Produce_Parse_Tree.call_via_iambic x_a do | * i_a, & ev_p |
+        Here_::ParseTree_via_ByteUpstreamReference.call_via_iambic x_a do | * i_a, & ev_p |
 
           # errors like file not found etc (that stem from path math errors)
           # have causes that are so hard to track down we throw them so that

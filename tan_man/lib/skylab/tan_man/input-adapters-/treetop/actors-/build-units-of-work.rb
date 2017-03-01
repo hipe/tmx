@@ -17,7 +17,7 @@ module Skylab::TanMan
         @on_event_selectively = p
       end
 
-      Common_::Event.selective_builder_sender_receiver self
+      include Common_::Event::ReceiveAndSendMethods
 
       def execute
 

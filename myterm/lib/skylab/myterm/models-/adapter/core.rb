@@ -6,30 +6,30 @@ module Skylab::MyTerm
 
       def interpret_component st, cust, & pp
 
-        Adapter_via_Argument_Stream___[ st, cust.kernel_, & pp ]
+        Adapter_via_ArgumentScanner___[ st, cust.kernel_, & pp ]
       end
     end  # >>
 
-    class Adapter_via_Argument_Stream___ < Common_::Dyadic
+    class Adapter_via_ArgumentScanner___ < Common_::Dyadic
 
       def initialize st, k, & pp
-        @_arg_st = st
+        @_arg_scn = st
         @kernel_ = k
         @_pp = pp
       end
 
       def execute
 
-        _ok = __resolve_loadable_reference_via_argument_stream
+        _ok = __resolve_loadable_reference_via_argument_scanner
         _ok and Instance.__via_selection_loadable_reference @_loadable_reference, @kernel_
       end
 
-      def __resolve_loadable_reference_via_argument_stream
+      def __resolve_loadable_reference_via_argument_scanner
 
         _adapters_silo = @kernel_.silo :Adapters
         _stream_method = _adapters_silo.method :to_asset_reference_stream
 
-        _x = @_arg_st.head_as_is
+        _x = @_arg_scn.head_as_is
 
         @_oes_p = @_pp[ nil ]
 
@@ -47,7 +47,7 @@ module Skylab::MyTerm
 
         lt = o.execute
         if lt
-          remove_instance_variable( :@_arg_st ).advance_one
+          remove_instance_variable( :@_arg_scn ).advance_one
           @_loadable_reference = lt
           ACHIEVED_
         else

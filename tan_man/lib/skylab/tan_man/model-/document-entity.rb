@@ -168,7 +168,7 @@ module Skylab::TanMan
             end
 
             def for_direction=
-              @direction_symbols.push gets_one_polymorphic_value
+              @direction_symbols.push gets_one
               KEEP_PARSING_
             end
           end
@@ -622,7 +622,7 @@ module Skylab::TanMan
 
         # frontier. this *is* a controller because it is coupled to the action.
 
-        include Common_::Event::Selective_Builder_Receiver_Sender_Methods
+        include Common_::Event::ReceiveAndSendMethods
 
         def initialize act, bx, mc, k, & oes_p
 
