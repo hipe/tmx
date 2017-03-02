@@ -9,6 +9,8 @@ module Skylab::Brazen::TestSupport
 
     it "with no name: mersing required attr: argument error" do
 
+      # #lend-coverage to [#sn-008.6]
+
       _rx = /\bmissing required attributes 'workspace-path' and 'name'/
 
       begin

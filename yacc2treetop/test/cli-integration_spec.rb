@@ -176,7 +176,7 @@ describe "[y2] CLI integration" do
       cli.expect_succeed_under self
     end
 
-    # (the below is experimental fringe to feed into [#br-007])
+    # (the below is experimental fringe to feed into [#br-019] CLI expectations)
 
     # -- the general shape of invocation (exitstatus)
 

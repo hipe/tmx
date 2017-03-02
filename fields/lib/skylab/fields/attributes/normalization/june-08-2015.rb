@@ -71,6 +71,7 @@ module Skylab::Fields
 
       def normalize  # compare to [#br-047.2] (method)
 
+        ::Kernel._GONE__wasnt_covered__037_G__
         Here_::Normalization::OCTOBER_08_2014::Stream.call(
           self,
           @value_models.to_value_stream,

@@ -186,7 +186,7 @@ module Skylab::Snag
       _st = __formal_parameter_stream
       _ok = MTk_::Normalize.call_by do |o|
         o.entity = @action
-        o.formal_attribute_stream = _st
+        o.association_stream = _st
       end
       _ok  # hi. #todo
     end

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Git_Config
 
-    module Mutable  # see [#008]
+    module Mutable  # see [#008.A]
 
       class << self
 

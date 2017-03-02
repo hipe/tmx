@@ -1,4 +1,4 @@
-# the mutable git config narrative :[#008]
+# the mutable git config narrative :[#008.A]
 
 
 ## introduction

@@ -48,22 +48,55 @@ module Skylab::Fields
         # a faithful reproduction (to the letter) of that algorithm,
         # driven by three-laws.
 
+        def initialize
+          @argument_scanner = nil
+          @listener = nil
+          yield self
+        end
+
+        def entity= ent
+          @_current_association = nil
+          @_missing_required_associations = nil
+          @_receive_missing_reasons = :__receive_missing_reasons_normally
+          @_write_current_value = :__write_current_value_entily
+          @entity = ent
+        end
+
+        def read_by= p
+          @_read_current_value = :__read_current_value_simply
+          @read_by = p
+        end
+
+        def write_by= p
+          @_write_current_value = :__write_current_value_simply
+          @write_by = p
+        end
+
         attr_writer(
           :argument_scanner,
           :arguments_to_default_proc_by,
-          :read_by,
-          :write_by,
-          :formal_attribute_stream,
+          :association_stream,
           :listener,
         )
 
         def execute
 
-          __index_formals
+          # (this decision was informed by the assimilation of [#037.1.G])
+
+          if @argument_scanner
+            __execute_driven_by_arguments
+          else
+            __execute_driven_by_associations
+          end
+        end
+
+        def __execute_driven_by_arguments
+
+          __index_associations
 
           until __no_more_arguments
 
-            __match_argument_scanner_head_against_formals || break
+            __match_argument_scanner_head_against_associations || break
 
             __resolve_unsanitized_value_for_this_primary || break
 
@@ -76,6 +109,45 @@ module Skylab::Fields
 
           @_ok && __run_the_remains_of_the_diminishing_pool
           @_ok && __check_if_there_were_any_missing_requireds
+        end
+
+        def __execute_driven_by_associations
+
+          ok = true  # watch what happens if there are no associations
+
+          normalize_value = __value_normalizer
+
+          while __gets_association
+
+            existing_kn = __read_current_knownness
+
+            new_kn = normalize_value[ existing_kn ]
+            if ! new_kn
+              ok = new_kn ; break
+            end
+
+            # (it may be that it was not known and still is not known)
+
+            if existing_kn.is_known_known
+              if new_kn.is_known_known
+                if existing_kn.object_id == new_kn.object_id
+                  NOTHING_  # #covered
+                else
+                  send @_write_current_value, new_kn.value_x
+                end
+              else
+                self._COVER_ME__became_unknown__
+              end
+            elsif new_kn.is_known_known
+              send @_write_current_value, new_kn.value_x  # writes never fail
+            end
+          end
+
+          if ok && @_missing_required_associations
+            @entity._receive_missing_required_associations_ @_missing_required_associations
+          else
+            ok
+          end
         end
 
         # -- I
@@ -102,7 +174,7 @@ module Skylab::Fields
         def __build_missing_required_event miss_sym_a
 
           _miss_a = miss_sym_a.map do |k|
-            @_formal_attribute_via_name_symbol.fetch k
+            @_association_via_name_symbol.fetch k
           end
 
           _ev = Home_::Events::Missing.with(
@@ -122,7 +194,7 @@ module Skylab::Fields
 
           __init_diminishing_pool_traversal
 
-          until __no_more_formals_in_diminishing_pool
+          until __no_more_associations_in_diminishing_pool
 
             if __the_property_store_already_has_an_existent_value
               next
@@ -169,7 +241,7 @@ module Skylab::Fields
         end
 
         def __resolve_sanitized_value_via_ad_hoc_normalizer_against_nothing
-          _qkn = Common_::QualifiedKnownness.via_association @_current_formal_attribute
+          _qkn = Common_::QualifiedKnownness.via_association @_current_association
           _resolve_sanitized_value_via_ad_hoc_normalizer _qkn
         end
 
@@ -179,15 +251,15 @@ module Skylab::Fields
           _qualifies_as_existent _x
         end
 
-        def __no_more_formals_in_diminishing_pool
+        def __no_more_associations_in_diminishing_pool
 
           if @_diminishing_pool_key_scanner.no_unparsed_exists
-            @_current_formal_attribute = nil  # #not-taking-any-chances
-            remove_instance_variable :@_current_formal_attribute
+            @_current_association = nil  # #not-taking-any-chances
+            remove_instance_variable :@_current_association
             remove_instance_variable :@_diminishing_pool_key_scanner ; true
           else
             _k = @_diminishing_pool_key_scanner.gets_one
-            @_current_formal_attribute = @_formal_attribute_via_name_symbol[_k]
+            @_current_association = @_association_via_name_symbol[ _k ]
             FALSE
           end
         end
@@ -217,21 +289,46 @@ module Skylab::Fields
 
         def _SEND_THIS_VALUE x
 
-          k = _sanitized_key
           if _is_glob
-            a = @read_by[ k ]
-            if a
-              a.concat x  # also [#008.2]
-            else
-              @write_by[ k, x ]
-            end
+            __send_this_when_glob x
           else
-            @write_by[ k, x ]
+            send @_write_current_value, x
           end
 
           _yes = remove_instance_variable :@_do_advance_EEW
           _yes && @argument_scanner.advance_one
           NIL
+        end
+
+        def __send_this_when_glob x
+
+          a = send @_read_current_value
+          if a
+            a.concat x  # also [#008.2]
+          else
+            send @_write_current_value, x
+          end
+          NIL
+        end
+
+        def __write_current_value_entily x
+          @entity._write_via_association_ x, @_current_association
+          NIL
+        end
+
+        def __write_current_value_simply x
+          @write_by[ _sanitized_key, x ]
+          NIL
+        end
+
+        def __read_current_knownness
+          _kn = @entity._read_knownness_ @_current_association  # #todo [#fi-037.X]
+          _kn || self._NEVER  # #todo sanity
+          _kn
+        end
+
+        def __read_current_value_simply
+          @read_by[ _sanitized_key ]
         end
 
         def _qualifies_as_existent x
@@ -246,7 +343,42 @@ module Skylab::Fields
         end
 
         def _is_required
-          @_current_formal_attribute.is_required
+          @_current_association.is_required
+        end
+
+        # -- F ALTERNATIVE
+
+        def __value_normalizer
+
+          p = ValueNormalizer_via___.call_by do |o|
+
+            o.default_knownness_via_association_by = -> asc do
+
+              _wat = asc.default_value_via_entity__ @entity
+              # (the above interface does not allow for failure, but
+              # it's going away anyway..)
+              Common_::KnownKnown[ _wat ]
+            end
+
+            o.receive_missing_by = -> kn, chan, & ev_p do
+              send @_receive_missing_reasons, ev_p, kn, chan
+            end
+
+            o.listener = @listener
+          end
+
+          -> kn do
+            p[ kn, @_current_association ]
+          end
+        end
+
+        def __receive_missing_reasons_normally ev_p, kn, chan
+
+          # :[#008.6]: #borrow-coverage from [br]
+
+          _asc_a = ev_p[].reasons
+          ( @_missing_required_associations ||= [] ).concat _asc_a
+          kn  # don't stop cold on these - aggregate and procede.
         end
 
         # -- F
@@ -295,7 +427,7 @@ module Skylab::Fields
           # :[#008.3] #borrow-coverage from [sn]
 
           _x = remove_instance_variable :@_current_unsanitized_value
-          _qkn = Common_::QualifiedKnownness[ _x, @_current_formal_attribute ]  # NOTE RIDE
+          _qkn = Common_::QualifiedKnownness[ _x, @_current_association ]  # NOTE RIDE
           _resolve_sanitized_value_via_ad_hoc_normalizer _qkn
         end
 
@@ -306,7 +438,8 @@ module Skylab::Fields
         end
 
         def _resolve_a_default_value
-          kn_by = @_current_formal_attribute.default_by
+          # #here-3.A: the best
+          kn_by = @_current_association.default_by
           if kn_by
             a = @arguments_to_default_proc_by[ _sanitized_key ]
             p = a.pop
@@ -318,12 +451,12 @@ module Skylab::Fields
         end
 
         def _has_ad_hoc_normalizer
-          @_current_formal_attribute.normalize_by
+          @_current_association.normalize_by
         end
 
         def _resolve_sanitized_value_via_ad_hoc_normalizer qkn
 
-          kn = @_current_formal_attribute.normalize_by[ qkn, & @listener ]
+          kn = @_current_association.normalize_by[ qkn, & @listener ]
 
           if kn
             if kn.is_known_known
@@ -394,27 +527,36 @@ module Skylab::Fields
         end
 
         def _is_flag
-          @_current_formal_attribute.is_flag
+          @_current_association.is_flag
         end
 
         def _is_glob
-          @_current_formal_attribute.is_glob
+          @_current_association.is_glob
         end
 
         # -- C
 
-        def __match_argument_scanner_head_against_formals
+        def __match_argument_scanner_head_against_associations
 
           if @argument_scanner.scan_primary_symbol
 
-            fo = @_formal_attribute_via_name_symbol[ _unsanitized_key ]
-            if fo
-              @_current_formal_attribute = fo ; true
+            asc = @_association_via_name_symbol[ _unsanitized_key ]
+            if asc
+              @_current_association = asc ; true
             else
               __when_primary_not_found
             end
           else
             _unable
+          end
+        end
+
+        def __gets_association
+          asc = @association_stream.gets
+          if asc
+            @_current_association = asc ; TRUE
+          else
+            remove_instance_variable :@_current_association ; FALSE
           end
         end
 
@@ -431,7 +573,7 @@ module Skylab::Fields
 
         def __build_primary_not_found_event
 
-          _did_you_mean = @_formal_attribute_via_name_symbol.keys
+          _did_you_mean = @_association_via_name_symbol.keys
 
           _ev = Home_::Events::Extra.build [ _unsanitized_key ], _did_you_mean
 
@@ -439,7 +581,7 @@ module Skylab::Fields
         end
 
         def _sanitized_key
-          @_current_formal_attribute.name_symbol
+          @_current_association.name_symbol
         end
 
         def _unsanitized_key
@@ -458,9 +600,7 @@ module Skylab::Fields
 
         def __no_more_arguments_initially
 
-          if instance_variable_defined? :@argument_scanner and
-              @argument_scanner and
-              ! @argument_scanner.no_unparsed_exists
+          if @argument_scanner and ! @argument_scanner.no_unparsed_exists
 
             @_no_more_arguments = :__no_more_arguments_normally
             send @_no_more_arguments
@@ -477,27 +617,27 @@ module Skylab::Fields
 
         # -- A
 
-        def __index_formals
+        def __index_associations
 
           diminishing_pool = {} ; h = {}
 
-          st = remove_instance_variable :@formal_attribute_stream
+          st = remove_instance_variable :@association_stream
 
           begin
-            fo = st.gets
-            fo || break
+            asc = st.gets
+            asc || break
 
-            if fo.is_required || fo.default_by || fo.normalize_by
-              diminishing_pool[ fo.name_symbol ] = true
+            if asc.is_required || asc.default_by || asc.normalize_by
+              diminishing_pool[ asc.name_symbol ] = true
             end
 
-            h[ fo.name_symbol ] = fo
+            h[ asc.name_symbol ] = asc
 
             redo
           end while above
 
           @_diminishing_pool = diminishing_pool
-          @_formal_attribute_via_name_symbol = h
+          @_association_via_name_symbol = h
           @_ok = true ; @_missing_requireds = nil ; @_seen = {} ; nil
         end
       end
@@ -634,6 +774,80 @@ module Skylab::Fields
 
       # ==
 
+      class ValueNormalizer_via___ < Common_::MagneticBySimpleModel
+
+        attr_writer(
+          :default_knownness_via_association_by,
+          :listener,
+          :receive_missing_by,
+        )
+
+        def execute
+
+          -> kn, asc, & x_p do
+
+            # 1. if value is unknown and defaulting is available, apply it.
+
+            if ! kn.is_effectively_known && Home_::Has_default[ asc ]
+
+              kn_ = @default_knownness_via_association_by[ asc ]
+              if kn_
+                # (replace the effectively unknown with what was produced
+                # by the defaulting IFF the defaulting didn't fail #[#012.E])
+                kn = kn_
+              end
+            end
+
+            # (it may be that you don't know the value and there is no default)
+
+            # 2. if there are ad-hoc normalizations, apply those. (was [#ba-027])
+
+            bx = asc.ad_hoc_normalizer_box
+            if bx
+              kn = __add_hocs kn, bx, asc, & x_p
+            end
+
+            # 3. if this is a required property and it is unknown, act.
+            #    (skip this if the field failed a normalization above.)
+
+            if kn
+
+              if ! kn.is_effectively_known && Home_::Is_required[ asc ]
+
+                kn = @receive_missing_by.call kn, MISSING___ do
+
+                  Home_::Events::Missing.for_attribute asc
+                end
+              end
+            end
+
+            kn
+          end
+        end
+
+        MISSING___ = [ :error, :missing_required_properties ].freeze
+
+        def __add_hocs kn, bx, model, & x_p
+
+          # ad-hocs need to know the property too (née "trios not pairs")
+
+          bx.each_value do | norm_norm_p |
+
+            # at each step, value might have changed. [#053]
+
+            _qkn = kn.to_qualified_known_around model
+
+            kn = norm_norm_p[ _qkn, & ( x_p || @listener ) ]  # (was [#072])
+            kn or break
+            kn.is_qualified and self._SHAPE_ERROR_we_want_QKNs_in_and_KNs_out
+          end
+
+          kn
+        end
+      end
+
+      # ==
+
       Get_parameter_controller_moniker = -> ent do  # legacy
 
         s_a = ent.class.name.split CONST_SEP_
@@ -693,3 +907,4 @@ module Skylab::Fields
     end
   end
 end
+# #history-037.5.G - "normalization against model" (file assimilated)

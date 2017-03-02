@@ -386,5 +386,6 @@ practical reasons to employ both techniques:
   - facility I: formal reader stack
   - facility H: custom for [br]. if it gives trouble, leave it alone
   - facility G: interesting architecture
+                ASSIMILATED
   - facility F: old style but very flexible
   - facility E: use this for all the other guys that do this with platform parameters, maybe

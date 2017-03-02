@@ -25,10 +25,10 @@ module Skylab::Fields
 
           _st = Common_::Stream.via_nonsparse_array @_mprp_a
 
-          Home_::Attributes::Normalization::OCTOBER_08_2014::Stream.call(
-            prp,
-            _st,
-          )
+          Home_::Attributes::Normalization::EK.call_by do |o|
+            o.entity = prp  # WOAH  (i will miss this)
+            o.association_stream = _st
+          end
 
           NIL_  # exceptions must be raised on failure
         end

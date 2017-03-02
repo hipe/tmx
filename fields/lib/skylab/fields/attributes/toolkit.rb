@@ -18,15 +18,15 @@ module Skylab::Fields
 
       attr_writer(
         :argument_scanner,
+        :association_stream,
         :entity,
-        :formal_attribute_stream,
         :listener,
       )
 
       def execute
 
-        @formal_attribute_stream ||= __formal_attribute_stream
         @argument_scanner ||= @entity._argument_scanner_
+        @association_stream ||= __formal_attribute_stream
         @listener ||= @entity._listener_
 
         Attributes::Normalization::EK.call_by do |o|
@@ -36,7 +36,7 @@ module Skylab::Fields
           o.argument_scanner = @argument_scanner
           o.read_by = @entity.method :_read_
           o.write_by = @entity.method :_write_
-          o.formal_attribute_stream = @formal_attribute_stream
+          o.association_stream = @association_stream
           o.listener = @listener
         end
       end

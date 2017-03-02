@@ -107,11 +107,15 @@ module Skylab::Brazen
         # since we have reached ths method at all it is safe to
         # assume that the entity has some formal properties.
 
-        Home_.lib_.fields::Attributes::Normalization::OCTOBER_08_2014::Stream.call(
+        _asc_st = formal_properties.to_value_stream
 
-          self,
-          formal_properties.to_value_stream,
-          & handle_event_selectively )
+        _ok = Home_.lib_.fields::Attributes::Normalization::EK.call_by do |o|
+          o.entity = self
+          o.association_stream = _asc_st
+          o.listener = handle_event_selectively
+        end
+
+        _ok  # hi. #todo
       end
 
       public def _write_via_association_ x, prp

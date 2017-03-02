@@ -222,7 +222,7 @@
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
 
-[#019] #hole
+[#019]       [ CLI expectations ]
              ( #was: [ byte upstream identifiers. ] #moved-to: [#ba-062] )
              ( was: #done turn `is_positive` into `ok` to match HTTP responses )
 [#018]       #parent-node: [#013] "the model property ordering rationale.."
@@ -241,9 +241,14 @@
              ( was: #parent-node: [#001] the event narrative )
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..
-[#008]       #parent-node: [#009] the mutable git config narrative ..
-[#007]       [ CLI expectations ]
+
+[#008]       small assets & liabilities
+             [ oh, actually, none yet ]
+             [#here.A]: the mutable git config narrative .. (#parent-node: [#009])
+
+[#007] #hole (would be etc)
              ( #was: anticpating the issue with losing hooks accross inheritance bounds )
+
 [#006] #open - what to do about this custom CLI property class
              #doc-node the defaults vs required narrative ..
 [#005]       [name]  (compound names derived from model nodes)

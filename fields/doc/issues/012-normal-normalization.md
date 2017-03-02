@@ -114,7 +114,7 @@ for no good reason we generally tag concerns like these as #masking.
 
 
 
-### (requirement for defaulting: a fail-strategy for this meta-attribute)
+### (requirement for defaulting: a fail-strategy for this meta-attribute) :[#here.E]
 
 it's also useful to allow a defaulting function to be able to draw on
 resources of trivial complexity. for example, we have modeled (in at
