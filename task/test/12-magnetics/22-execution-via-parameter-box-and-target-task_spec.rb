@@ -69,6 +69,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
         end
 
         it "fails" do
+          # #lends-coverage to [#fi-008.7]
           fails_
         end
 

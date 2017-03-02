@@ -74,11 +74,13 @@ module Skylab::Fields
           m = :"__#{ atr.name_symbol }__component_association"
 
           -> do
-            _c = session.send m  # no yield for now - if you need it, use [ac]
+            _c = entity.send m  # no yield for now - if you need it, use [ac]
             _c.interpret_component argument_scanner, formal_attribute
           end
         end
       end
+
+      # (above is :#spot-1-4 an example of this DSL)
 
       def custom_interpreter_method
 
@@ -104,7 +106,7 @@ module Skylab::Fields
       Newschool_custom_interpreter_as___ = -> m do
 
         -> do
-          x = session.send m, argument_scanner
+          x = entity.send m, argument_scanner
           if ACHIEVED_ == x
             KEEP_PARSING_
           else
@@ -117,17 +119,17 @@ module Skylab::Fields
 
         -> do
 
-          sess = session
+          ent = entity
 
-          if ! sess.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
-            sess.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
+          if ! ent.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
+            ent.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
             did = true
           end
 
-          x = sess.send m
+          x = ent.send m
 
           if did
-            sess.remove_instance_variable ARGUMENT_SCANNER_IVAR_
+            ent.remove_instance_variable ARGUMENT_SCANNER_IVAR_
           end
 
           if ACHIEVED_ == x
@@ -151,7 +153,7 @@ module Skylab::Fields
 
         @_.current_attribute.be_defaultant_by_value__ x
 
-        @_.add_to_static_index_ :effectively_defaultants ; nil
+        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
       end
 
       def default_proc
@@ -160,7 +162,7 @@ module Skylab::Fields
 
         @_.current_attribute.be_defaultant_by_( & _x )
 
-        @_.add_to_static_index_ :effectively_defaultants ; nil
+        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
       end
 
       def desc
@@ -275,7 +277,7 @@ module Skylab::Fields
       def optional
 
         @_.current_attribute.be_optional__
-        @_.add_to_static_index_ :effectively_defaultants ; nil
+        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
       end
 
       def plural  # #experimental - ..

@@ -24,7 +24,7 @@ module Skylab::Snag
 
         def process_argument_scanner_fully st
           _ok = super
-          _ok && Attrs__::Normalization::Normalize_via_Session_with_StaticAttributes[ self ]
+          _ok && Attrs__::Normalization::Normalize_via_Entity_with_StaticAssociations[ self ]
         end
       end
 

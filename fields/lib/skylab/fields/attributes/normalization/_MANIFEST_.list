@@ -5,4 +5,4 @@ lib.rb                          ->  october-31-2014.rb
 normalization-against-model.rb  ->  october-08-2014.rb
 [ main ]                            [ august-20-2012 ]
 
-via indexed associations        ->  Normalize_via_Session_with_StaticAttributes
+via indexed associations        ->  Normalize_via_Entity_with_StaticAssociations

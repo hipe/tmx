@@ -74,6 +74,7 @@ OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
 (-18.400: completion of phase 3: assimilated all)
 (remove _MANIFEST_.list)
+(rename all remaining `Facility_X` to appropriate names)
 (-18.403 )
 (-18.410 )
 (-18.417 )
@@ -81,4 +82,3 @@ OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
 (-18.430 )
 (-18.437 )
 (-18.443 )
-(-18.450 [fi] A )

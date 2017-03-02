@@ -2,7 +2,7 @@ module Skylab::Fields
 
   class Attributes
 
-    class Normalization < Common_::MagneticBySimpleModel  # see [#012]
+    module Normalization  # main algorithm in [#012], "one ring" in [#037]
 
       # (NOTE at the moment this file/node has both the older (oldest)
       # implemention of normalization used in "attributes actor" (2nd half)
@@ -10,28 +10,161 @@ module Skylab::Fields
       # near each other to encourage re-use, but the full realization of
       # this dream is harder than it sounds..)
 
-      Normalize_via_Session_with_StaticAttributes = -> sess, & oes_p do
+      Normalize_via_Entity_with_StaticAssociations = -> ent, & p do
 
         # (bridge the older-but-still-newish "attribute actor"-style
         # into the file-eponymous node, which starts #here-1)
 
-        attrs = sess.class::ATTRIBUTES
-        if attrs
+        ascs = ent.class::ATTRIBUTES
+        if ascs
 
-          call_by do |o|
-            # -
-          idx = attrs.index_
+          idx = ascs.index_
           sidx = idx.static_index_
-          o.effectively_defaultants = sidx.effectively_defaultants
-          o.ivar_store = sess
-          o.lookup = idx.read_association_by_
-          o.requireds = sidx.requireds
-            # -
-            o.listener = oes_p
+
+          Facility_C.call_by do |o|
+            o.effectively_defaultant_name_symbols = sidx.effectively_defaultant_name_symbols
+            o.ivar_store = ent
+            o.read_association_by = idx.read_association_by_
+            o.required_name_symbols = sidx.required_name_symbols
+            o.listener = p
           end
         else
           ACHIEVED_
         end
+      end
+
+      # ==
+
+      class Facility_C < Common_::MagneticBySimpleModel
+
+        # (this facility is for attributes actors. its lineage traces back
+        # to the origin of this file. it moved locations in the file. as
+        # as appropriate we may dissolve techniques found here *downwards*
+        # into "EK". but for now, it is kept separate because these index-
+        # centric techniques are isolated in their application.)
+
+        def initialize
+          @_execute = :__execute_normally
+          yield self
+        end
+
+        attr_writer(
+          :effectively_defaultant_name_symbols,
+          :listener,
+          :read_association_by,
+          :required_name_symbols,
+        )
+
+        def WILL_USE_EMPTY_STORE  # [ta]
+          @value_store = THE_EMPTY_VALUE_STORE___ ; nil
+        end
+
+        def box_store= bx
+          @value_store = BoxBasedValueStore___.new bx ; bx
+        end
+
+        def ivar_store= entity
+          @value_store = IvarBasedValueStore.new entity ; entity
+        end
+
+        def WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
+          @_execute = :_check_for_missing_requireds ; nil
+        end
+
+        def execute
+          send remove_instance_variable :@_execute
+        end
+
+        def __execute_normally
+          ok = _check_for_missing_requireds
+          ok && __maybe_apply_defaults
+          ok
+        end
+
+        def __maybe_apply_defaults  # near #spot-1-2. sometimes always, but maybe not.
+          if @effectively_defaultant_name_symbols
+            __apply_defaults
+          end
+        end
+
+        def __apply_defaults
+
+          @effectively_defaultant_name_symbols.each do |k|
+
+            asc = @read_association_by[ k ]
+
+            if @value_store.knows asc
+              x = @value_store.dereference asc
+            end
+
+            x.nil? || next
+
+            p = asc.default_proc
+            if p
+              x = p[]
+            end
+            @value_store.write_via_association x, asc
+          end
+          NIL
+        end
+
+        def _check_for_missing_requireds
+          if @required_name_symbols
+            __do_check_for_missing_requireds
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __do_check_for_missing_requireds
+
+          miss_asc_a = nil
+
+          @required_name_symbols.each do |k|
+
+            asc = @read_association_by[ k ]
+
+            if @value_store.knows asc
+              x = @value_store.dereference asc
+            end
+
+            x.nil? || next
+
+            ( miss_asc_a ||= [] ).push asc
+          end
+
+          if miss_asc_a
+            __when_missing_requireds miss_asc_a
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __when_missing_requireds miss_asc_a  # :#here-2
+
+          if @listener
+            @listener.call :error, :missing_required_attributes do
+              _build_event miss_asc_a
+            end
+            UNABLE_
+          else
+            _ev = _build_event miss_asc_a
+            raise _ev.to_exception
+          end
+        end
+
+        def _build_event miss_asc_a
+          Home_::Events::Missing.via miss_asc_a, 'attribute'
+        end
+
+        # (all for hacky experiment, :[#008.7]: #borrow-coverage from [ta])
+
+        attr_reader(
+          :effectively_defaultant_name_symbols,
+          :read_association_by,
+          :required_name_symbols,
+          :value_store,
+        )
       end
 
       # ==
@@ -642,136 +775,6 @@ module Skylab::Fields
         end
       end
 
-      # ==  # :#here-1
-
-      class << self
-        public :define  # for #spot-1-3
-      end  # >>
-
-      def initialize
-        @__execute_once_mutex = nil  # useful only during transition to MagneticBySimpleModel
-        @listener = nil
-        super
-      end
-
-      def ivar_store= ivar_store
-        @store = Ivar_based_Store.new ivar_store
-        ivar_store
-      end
-
-      def box_store= bx
-        @store = Box_based_Store___.new bx
-        bx
-      end
-
-      def use_empty_store
-        @store = The_empty_store___[]
-        NIL_
-      end
-
-      attr_writer(
-        :listener,
-      )
-
-      attr_accessor(
-        :effectively_defaultants,
-        :lookup,
-        :requireds,
-      )
-
-      def execute
-
-        remove_instance_variable :@__execute_once_mutex
-
-        _ok = check_for_missing_requireds
-        _ok && ___apply_defaulting
-      end
-
-      def ___apply_defaulting  # near #spot-1-2. sometimes always, but maybe not.
-        if @effectively_defaultants
-          ___do_apply_defaulting
-        else
-          ACHIEVED_
-        end
-      end
-
-      def ___do_apply_defaulting
-
-        @effectively_defaultants.each do |k|
-
-          atr = @lookup[ k ]
-
-          if @store.knows atr
-            was_defined = true
-            x = @store.retrieve atr
-          end
-
-          if x.nil?
-            p = atr.default_proc
-            if p
-              @store.set p[], atr
-            elsif ! was_defined
-              @store.set nil, atr
-            end
-          end
-        end
-
-        ACHIEVED_
-      end
-
-      def check_for_missing_requireds
-        if @requireds
-          ___do_check_for_missing_requireds
-        else
-          ACHIEVED_
-        end
-      end
-
-      def ___do_check_for_missing_requireds
-
-        miss_a = nil
-
-        @requireds.each do |k|
-
-          atr = @lookup[ k ]
-
-          if @store.knows atr
-            x = @store.retrieve atr
-          end
-
-          if x.nil?
-            ( miss_a ||= [] ).push atr
-          end
-        end
-
-        if miss_a
-          __when_missing_requireds miss_a
-        else
-          ACHIEVED_
-        end
-      end
-
-      def __when_missing_requireds miss_a  # :#here-2
-
-        build_event = -> do
-          Home_::Events::Missing.via miss_a, 'attribute'
-        end
-
-        if @listener
-          @listener.call :error, :missing_required_attributes do
-            build_event[]
-          end
-          UNABLE_
-        else
-          _ev = build_event[]
-          raise _ev.to_exception
-        end
-      end
-
-      attr_reader(
-        :store,
-      )
-
       # ==
 
       class ValueNormalizer_via___ < Common_::MagneticBySimpleModel
@@ -876,7 +879,7 @@ module Skylab::Fields
 
       # ==
 
-      class Box_based_Store___ < ::BasicObject
+      class BoxBasedValueStore___ < ::BasicObject
 
         def initialize bx
           @_box = bx
@@ -886,22 +889,18 @@ module Skylab::Fields
           @_box.has_key atr.name_symbol
         end
 
-        def retrieve atr
-          @_box.fetch atr.name_symbol
+        def dereference asc
+          @_box.fetch asc.name_symbol
         end
       end
 
       # ==
 
-      The_empty_store___ = Lazy_.call do
-
-        class The_Empty_Store____ < ::BasicObject
+      module THE_EMPTY_VALUE_STORE___ ; class << self
           def knows _
             false
           end
-          new
-        end
-      end
+      end ; end
 
       UNDERSCORE_ = '_'
     end

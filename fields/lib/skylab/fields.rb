@@ -149,8 +149,14 @@ module Skylab::Fields
       _index.begin_parse_and_normalize_for__ sess, & x_p
     end
 
+    def AS_ATTRIBUTES_NORMALIZE_BY & p
+      _ = _index
+      _wat = _.AS_INDEX_NORMALIZE_BY( & p )
+      _wat # #todo
+    end
+
     def begin_normalization & x_p
-      _index.begin_normalization_( & x_p )
+      self._GONE__see_me__
     end
 
     # --
@@ -186,7 +192,7 @@ module Skylab::Fields
     alias_method :index_, :_index
 
     def ___build_index
-      Here_::AssociationIndex_::Index_of_Definition___.new( @_h,
+      Here_::AssociationIndex_.new( @_h,
         ( @meta_attributes || Here_::MetaAttributes ),
         ( @attribute_class || Here_::DefinedAttribute ),
       )
@@ -209,14 +215,14 @@ module Skylab::Fields
 
           if a.length.zero?
 
-            cls.extend Module_Methods__
+            cls.extend ModuleMethods__
             cls.include InstanceMethods
             cls.const_set :ATTRIBUTES, nil
             NIL_
 
           elsif 1 == a.length and a.first.respond_to? :each_pair
 
-            cls.extend Module_Methods__
+            cls.extend ModuleMethods__
             cls.include InstanceMethods
             attrs = Here_[ a.first ]
             cls.const_set :ATTRIBUTES, attrs
@@ -235,7 +241,7 @@ module Skylab::Fields
 
       # ===
 
-      module Module_Methods__
+      module ModuleMethods__
 
         # ~ ways to call your actor (pursuant to [#bs-028.5] name conventions)
 
@@ -337,7 +343,7 @@ module Skylab::Fields
             _atrs = cls.const_get :ATTRIBUTES
           end
 
-          Here_::AssociationIndex_::Process_argument_scanner_passively_.call(
+          Here_::AssociationIndex_::Process_argument_scanner_passively.call(
             scn, self, _atrs,
             argument_parsing_writer_method_name_passive_lookup_proc,
             & x_p )
@@ -369,7 +375,7 @@ module Skylab::Fields
 
       module Flat_Actor_MMs___
 
-        include Module_Methods__
+        include ModuleMethods__
 
         def backwards_curry  # eek
           -> * x_a, & oes_p do
@@ -577,23 +583,22 @@ module Skylab::Fields
     end
   end
 
-  class Ivar_based_Store < ::BasicObject  # :[#027].
+  class IvarBasedValueStore < ::BasicObject  # :[#027].
 
     def initialize o
-      @_store = o
+      @_entity = o
     end
 
-    def set x, atr
-      @_store.instance_variable_set atr.as_ivar, x
-      NIL_
+    def write_via_association x, asc
+      @_entity.instance_variable_set asc.as_ivar, x ; nil
     end
 
-    def knows atr
-      @_store.instance_variable_defined? atr.as_ivar
+    def knows asc
+      @_entity.instance_variable_defined? asc.as_ivar
     end
 
-    def retrieve atr
-      @_store.instance_variable_get atr.as_ivar
+    def dereference asc
+      @_entity.instance_variable_get asc.as_ivar
     end
   end
 

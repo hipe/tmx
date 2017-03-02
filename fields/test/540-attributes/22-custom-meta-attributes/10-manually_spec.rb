@@ -40,12 +40,12 @@ module Skylab::Fields::TestSupport
                 atr.__hello or ::Kernel.fail
                 -> x, _oes_p do
                   ivar = atr.as_ivar
-                  sess = session
-                  if sess.instance_variable_defined? ivar
-                    a = sess.instance_variable_get ivar
+                  ent = entity
+                  if ent.instance_variable_defined? ivar
+                    a = ent.instance_variable_get ivar
                   else
                     a = []
-                    sess.instance_variable_set ivar, a
+                    ent.instance_variable_set ivar, a
                   end
                   a.push x
                   true  # KEEP_PARSING_

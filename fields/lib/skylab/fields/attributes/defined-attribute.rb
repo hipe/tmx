@@ -271,7 +271,7 @@ module Skylab::Fields
 
       def _interpret parse, & x_p
 
-        _args = Interpretation_Services___.new self, parse
+        _args = Interpretation_DSL___.new self, parse
         read_and_write_ _args, & x_p
       end
 
@@ -325,7 +325,9 @@ module Skylab::Fields
 
       # ==
 
-      class Interpretation_Services___
+      class Interpretation_DSL___
+
+        # (used, for example, at #spot-1-4)
 
         def initialize attr, parse
           @_argument_scanner = nil
@@ -342,7 +344,7 @@ module Skylab::Fields
         alias_method :calculate, :instance_exec
 
         def accept_attribute_value x
-          @_parse.session.instance_variable_set @_formal_attribute.as_ivar, x
+          @_parse.entity.instance_variable_set @_formal_attribute.as_ivar, x
           NIL_
         end
 
@@ -358,8 +360,8 @@ module Skylab::Fields
           @_parse.index
         end
 
-        def session
-          @_parse.session
+        def entity
+          @_parse.entity
         end
       end
 

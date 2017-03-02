@@ -47,7 +47,7 @@ module Skylab::Fields
 
       # -- look like a parse (..)
 
-      def session
+      def entity
         @current_attribute
       end
 

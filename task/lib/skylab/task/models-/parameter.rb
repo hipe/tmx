@@ -80,19 +80,25 @@ class Skylab::Task
         #
         # SO we check if requireds are satisfied first, and then ..
 
-        o = @_attrs.begin_normalization( & @_oes_p )
+        _HACKY_EXPERIMENT = nil
 
         bx = @_PARAMETERS_.parameter_box  # can be nil
-        if bx
-          o.box_store = bx
-        else
-          o.use_empty_store
+
+        ok = @_attrs.AS_ATTRIBUTES_NORMALIZE_BY do |o|
+
+          _HACKY_EXPERIMENT = o
+
+          if bx
+            o.box_store = bx
+          else
+            o.WILL_USE_EMPTY_STORE
+          end
+
+          o.WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
+          o.listener = @_oes_p
         end
 
-        ok = o.check_for_missing_requireds
-        if ok
-          @_normalization = o
-        end
+        ok and @_normalization = _HACKY_EXPERIMENT
         ok
       end
 
@@ -117,34 +123,38 @@ class Skylab::Task
         # then, for every of the effectively defaultants, write values as
         # appropriate..
 
+        # (BEGIN near #lends-coverage to [#fi-008.7])
+
         o = remove_instance_variable :@_normalization
 
-        lu = o.lookup
-        rs = o.store
-        ws = Home_.lib_.fields::Ivar_based_Store.new dep
+        ws = Home_.lib_.fields::IvarBasedValueStore.new dep  # "write store" (i think)
+        rs = o.value_store  # "read store" (i think)
 
-        req_a = o.requireds
+        df_a = o.effectively_defaultant_name_symbols
+        req_a = o.required_name_symbols
+
+        lu = o.read_association_by  # lookup
+        o = nil  # (END)
+
         if req_a
           req_a.each do |k|
             atr = lu[ k ]
-            _x = rs.retrieve atr  # you know it's known
-            ws.set _x, atr
+            _x = rs.dereference atr  # you know it's known
+            ws.write_via_association _x, atr
           end
         end
-
-        df_a = o.effectively_defaultants
 
         if df_a
           df_a.each do |k|
             atr = lu[ k ]
 
             if rs.knows atr
-              x = rs.retrieve atr
+              x = rs.dereference atr
             end
 
             if x.nil?
 
-              if ws.knows( atr ) && ! ws.retrieve( atr ).nil?
+              if ws.knows( atr ) && ! ws.dereference( atr ).nil?
                 # if the value from the parameter value store is effectively
                 # unknown and the session has an effectively known value,
                 # don't write a default and don't write nil. skip.
@@ -157,7 +167,7 @@ class Skylab::Task
               end
             end
 
-            ws.set x, atr  # is the PVS value or a default value or nil
+            ws.write_via_association x, atr  # is the PVS value or a default value or nil
           end
         end
 

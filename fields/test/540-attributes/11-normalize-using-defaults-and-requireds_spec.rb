@@ -117,7 +117,7 @@ module Skylab::Fields::TestSupport
     # ==
 
     def _subject
-      subject_library_::Normalization::Normalize_via_Session_with_StaticAttributes
+      subject_library_::Normalization::Normalize_via_Entity_with_StaticAssociations
     end
   end
 end

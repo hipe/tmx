@@ -35,12 +35,14 @@ module Skylab::Fields::TestSupport
 
           it "using box instead of the default ivar-based store" do
 
-            o = _common_begin
             bx = Common_::Box.new
             bx.add :_strange_, :_no_see_
             bx.add :soc, false  # not nil, i.e is provided
-            o.box_store = bx
-            _ = o.execute
+
+            _ = _normalize_by do |o|
+              o.box_store = bx
+            end
+
             false == _ or fail
 
             _rx = %r(\Amissing required \w+ 'last-name')i
@@ -52,9 +54,10 @@ module Skylab::Fields::TestSupport
 
           it "using the empty store" do
 
-            o = _common_begin
-            o.use_empty_store
-            _ = o.execute
+            _ = _normalize_by do |o|
+              o.WILL_USE_EMPTY_STORE  # [ta] only
+            end
+
             false == _ or fail
 
             _rx = %r(\Amissing required \w+s 'last-name' and 'soc')i
@@ -64,9 +67,16 @@ module Skylab::Fields::TestSupport
             end
           end
 
-          def _common_begin
+          def _normalize_by
+
             _ = event_log.handle_event_selectively
-            entity_class_::ATTRIBUTES.begin_normalization( & _ )
+
+            _wat = entity_class_::ATTRIBUTES.AS_ATTRIBUTES_NORMALIZE_BY do |o|
+              yield o
+              o.listener = _
+            end
+
+            _wat  # hi. #todo
           end
         end
 

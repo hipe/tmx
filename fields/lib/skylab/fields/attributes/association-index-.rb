@@ -2,13 +2,9 @@ module Skylab::Fields
 
   class Attributes
 
-    module AssociationIndex_
+    class AssociationIndex_
 
-      Normalize_using_defaults_and_requireds = -> sess do
-        Here_::Normalization::Normalize_via_Session_with_StaticAttributes[ sess ]
-      end
-
-      class Index_of_Definition___
+      # -
 
         def initialize unparsed_h, ma_cls, atr_cls
 
@@ -26,24 +22,23 @@ module Skylab::Fields
           @_h = h
         end
 
-        def begin_parse_and_normalize_for__ sess, & x_p
-          Parse_and_or_Normalize.new sess, self, & x_p
+        def begin_parse_and_normalize_for__ entity, & x_p
+          Parse_and_or_Normalize.new entity, self, & x_p
         end
 
-        def begin_normalization_ & x_p
-
-          _ = Here_::Normalization.define do |o|  # :#spot-1-3
-            # -
+        def AS_INDEX_NORMALIZE_BY
 
           sidx = static_index_
-          o.effectively_defaultants = sidx.effectively_defaultants
-          o.lookup = read_association_by_
-          o.requireds = sidx.requireds
 
-            # -
-            o.listener = x_p
+          _wat = Here_::Normalization::Facility_C.call_by do |o|
+            # (was :#spot-1-3)
+            yield o
+            o.effectively_defaultant_name_symbols = sidx.effectively_defaultant_name_symbols
+            o.read_association_by = read_association_by_
+            o.required_name_symbols = sidx.required_name_symbols
           end
-          _  # hi.
+
+          _wat  # hi. #todo
         end
 
         # --
@@ -102,9 +97,9 @@ module Skylab::Fields
           :_h,
           :static_index_,
         )
-      end
+      # -
 
-      Process_argument_scanner_passively_ = -> st, sess, formals, meths, & x_p do  # 1x
+      Process_argument_scanner_passively = -> st, sess, formals, meths, & x_p do  # 1x [fi]
 
         sess.instance_variable_set ARGUMENT_SCANNER_IVAR_, st  # as we do
 
@@ -147,13 +142,13 @@ module Skylab::Fields
 
       class Parse_and_or_Normalize  # this lib only
 
-        def initialize sess, index=nil, & oes_p
+        def initialize entity, index=nil, & oes_p
 
           @argument_scanner = nil
+          @entity = entity
           @_formal_reader_stack = []
           @index = index  # can be nil
-          @_oes_p = oes_p  # can be nil
-          @session = sess
+          @listener = oes_p  # can be nil
         end
 
         def __push_formal_reader_by & p
@@ -175,7 +170,7 @@ module Skylab::Fields
         def execute_as_init_
 
           _ok = execute
-          _ok && @session
+          _ok && @entity
         end
 
         def execute
@@ -203,7 +198,7 @@ module Skylab::Fields
 
           kp = KEEP_PARSING_
 
-          oes_p = @_oes_p   # can be nil
+          oes_p = @listener  # can be nil
 
           read = __formal_attribute_reader
 
@@ -246,7 +241,7 @@ module Skylab::Fields
           if idx
 
             sidx = idx.static_index_
-            if sidx.effectively_defaultants  # [#012.B]
+            if sidx.effectively_defaultant_name_symbols  # [#012.B]
               yes = true
             end
 
@@ -262,10 +257,10 @@ module Skylab::Fields
         end
 
         def __do_normalize
-
-          o = @index.begin_normalization_( & @_oes_p )
-          o.ivar_store = @session
-          o.execute
+          @index.AS_INDEX_NORMALIZE_BY do |o|
+            o.ivar_store = @entity
+            o.listener = @listener
+          end
         end
 
         def __formal_attribute_reader
@@ -315,7 +310,7 @@ module Skylab::Fields
         attr_reader(  # (all here)
           :argument_scanner,
           :index,
-          :session,
+          :entity,
         )
       end
 
@@ -363,9 +358,9 @@ module Skylab::Fields
         end
 
         SI_OP_H__ = {
-          effectively_defaultants: :_push_to_array,
+          effectively_defaultant_name_symbols: :_push_to_array,
           method_definers: :__add_to_box,
-          requireds: :_push_to_array,
+          required_name_symbols: :_push_to_array,
         }
 
         StaticIndex___ = ::Struct.new( * SI_OP_H__.keys ) do
@@ -403,7 +398,7 @@ module Skylab::Fields
       Finish_attribute___ = -> build do
 
         if ! build.current_attribute.parameter_arity
-          build.add_to_static_index_ :requireds
+          build.add_to_static_index_ :required_name_symbols
         end
 
         NIL_
@@ -423,7 +418,7 @@ module Skylab::Fields
         end
 
         def _interpret parse, & x_p
-          parse.session.send @__m, & x_p
+          parse.entity.send @__m, & x_p
         end
       end
     end

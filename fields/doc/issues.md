@@ -95,7 +95,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
-             [#here.6] borrow
+             [#here.6], [#here.7] borrow
              [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.A] #in-situ [ the absorber method maker ]
 
