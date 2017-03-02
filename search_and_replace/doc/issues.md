@@ -54,7 +54,7 @@
 
 [#020] #if-you-like-pain (we first thought of this while implementing
              the last of all the "re-writes" where "hybrid" entities
-             became plain old (and clean!) [#fi-007] sessions): for any
+             became plain old (and clean!) [#fi-007.1] sessions): for any
              one of these guys (but probably the last one, "matches")
              it would be nice if this was isomorphic with making the
              session class as we have done: rather than that, use A)

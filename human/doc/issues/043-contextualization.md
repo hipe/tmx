@@ -39,7 +39,7 @@ depth of code -- these individual implementations of
 this is a session that assists in expressing emissions, mostly in terms
 of inflecting them based on their structural characteristics.
 
-  • it has a [#fi-007] session interface.
+  • it has a [#fi-007.1] session interface.
 
   • it is [#sl-023] dup-mutate compatible.
 

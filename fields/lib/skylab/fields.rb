@@ -597,7 +597,7 @@ module Skylab::Fields
     end
   end
 
-  # -- the external functions experiment ..
+  # -- the external functions experiment (see [#010])
 
   # ~ description & name
 

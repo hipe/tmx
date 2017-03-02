@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System
       self._HUH?  # #todo
 
       # when your formal operation defines itself as A) a (presumably
-      # [#fi-007] session-like) class, and B) it doesn't specify its own
+      # [#fi-007.1] session-like) class, and B) it doesn't specify its own
       # parameters value reader (so it will attempt to parse parameters
       # from the argument stream). one of the permutations of [#028].
 

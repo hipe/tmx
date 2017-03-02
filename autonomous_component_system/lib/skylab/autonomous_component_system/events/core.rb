@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System
     module ExpressionMethods
 
       # although an event object itself is immutable, it is convenient for
-      # the sake of complex expression strategies to use [#fi-007] "session pattern"
+      # the sake of complex expression strategies to use [#fi-007.1] "session pattern"
       # on a object that is of the same structure and content but mutable
 
       def self.[] expag, ev  # oldschool

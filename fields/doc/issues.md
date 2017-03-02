@@ -98,7 +98,11 @@
              [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.A] #in-situ [ the absorber method maker ]
 
-[#007]       [ SESSION PATTERN ]
+[#007]       small internal placeholders/notes (mostly)
+
+             :[#here.B]: we need a proper placeholder for "attribues actor"
+
+             :[#here.1]: [ SESSION PATTERN ] (referenced universally)
 
 [#006]       [ struct ]
              ( #was: old reference code from [ta] for for retrospective )

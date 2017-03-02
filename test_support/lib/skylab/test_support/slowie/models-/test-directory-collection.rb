@@ -76,7 +76,7 @@ module Skylab::TestSupport
         elsif @has_streamer
           ACHIEVED_  # hi.
         else
-          @argument_scanner.when_missing_requireds(
+          @argument_scanner.when_missing_requireds(  # [#fi-037.1.N]
             :operation_path, @__operation_identifier.path,
             :missing, [ :is_plural, "test directories", :use, :test_directory ]
           )

@@ -72,7 +72,15 @@ OK tan_man/test/14-sexp/24-auto/25-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/12-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
--18.492: "corral" disparate n11n facilities
+(-18.400: completion of phase 3: assimilated all)
 (remove _MANIFEST_.list)
--18.494: simple symbol renames (methods etc)
--18.496: many file renames
+(-18.403 )
+(-18.410 )
+(-18.417 )
+(-18.423 )
+(-18.430 )
+(-18.437 )
+(-18.443 )
+(-18.450 [fi] A )
+(-18.457 [fi] G )
+(-18.469: completion of phase 1: survey)

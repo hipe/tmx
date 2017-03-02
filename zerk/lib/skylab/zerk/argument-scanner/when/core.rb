@@ -6,7 +6,7 @@ module Skylab::Zerk
 
     module WhenScratchSpace____
 
-      class When::MissingRequireds
+      class When::MissingRequireds  # [#fi-037.1.N]
 
         def initialize x_a, as
 

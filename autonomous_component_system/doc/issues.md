@@ -41,7 +41,7 @@
 
              (if this breaks out into its own file, see comments this commit)
 
-             :#A is custom execution of the [#fi-007] session, amounting
+             :#A is custom execution of the [#fi-007.1] session, amounting
              to a system-private API. this tracks patterns near that.
 
              coincidentally, [#ze-027] is related.

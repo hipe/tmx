@@ -39,7 +39,7 @@ but in the case of default values, at least, this approach can
 lead to a leaky abstraction (i.e a lossy translation): consider
 the techinque of injecting default values programmatically into
 generated documentation. to accomplish this under the "everything
-is a normalization" rubric would be clunky at best.
+is a normalization" rubric would be clunky at best. :[#here.C]
 
 throughout this document we explore pitfalls like these that can stem
 from this "over-munging" approach. we do so specifically across the
@@ -92,7 +92,6 @@ skip" the effecting of a default for all those defaultant formal
 values for which no actual value was provided. that's really
 the essential characteristic of defaulting. we accomplish that
 at the culmination of [#here.theme-2].
-
 
 
 
@@ -220,7 +219,7 @@ thusly: we accept only one such ad-hoc normalizer function. internally the
 function can employ "normalization function chaining" or any other
 techniques it wants to, but as far as we're concerned we only have this one
 normalization function to deal with. this way we pass the buck without
-closing the door on all the fun.
+closing the door on all the fun. :[#here.D]
 
 
 

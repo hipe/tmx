@@ -65,6 +65,8 @@ module Skylab::Autonomous_Component_System
 
       def __common_normalize
 
+        # :[#fi-037.1.L]
+
         # • implement the [#]:#Algorithm
         # • honor [#]:#API-point-B: evaluate every formal in formal order
         # • generalize to work with [#ze-027]:#Operational-dependencies
