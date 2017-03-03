@@ -42,7 +42,7 @@ module Skylab::Fields::TestSupport
         @session_.foo.should eql :F
       end
 
-      it "right writes" do  # #spot-1-6
+      it "right writes" do
         _given :_right_class
         new_with_ :foo, :F
         @session_.foo.should eql :F
@@ -54,7 +54,7 @@ module Skylab::Fields::TestSupport
         [ @session_.bar, @session_.qing ].should eql [ :B, :Q ]
       end
 
-      it "unrec left" do
+      it "unrec left" do  # :#coverpoint1.5
         _given :_left_class
         _unrec
       end

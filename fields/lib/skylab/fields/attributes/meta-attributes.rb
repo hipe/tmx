@@ -153,7 +153,7 @@ module Skylab::Fields
 
         @_.current_attribute.be_defaultant_by_value__ x
 
-        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
+        @_.add_to_static_index_ :non_required_name_symbols ; nil
       end
 
       def default_proc
@@ -162,7 +162,7 @@ module Skylab::Fields
 
         @_.current_attribute.be_defaultant_by_( & _x )
 
-        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
+        @_.add_to_static_index_ :non_required_name_symbols ; nil
       end
 
       def desc
@@ -277,7 +277,7 @@ module Skylab::Fields
       def optional
 
         @_.current_attribute.be_optional__
-        @_.add_to_static_index_ :effectively_defaultant_name_symbols ; nil
+        @_.add_to_static_index_ :non_required_name_symbols ; nil
       end
 
       def plural  # #experimental - ..

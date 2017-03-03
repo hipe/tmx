@@ -102,7 +102,7 @@ module Skylab::Fields
         end
 
         def id2name
-          name_symbol  # :#coverpoint-1-2
+          name_symbol  # :#coverpoint1.2
         end
 
         attr_reader(
@@ -262,9 +262,9 @@ module Skylab::Fields
 
       # --
 
-      def write ent, scn  # #covered. result in kp
+      def write ent, scn  # result in kp. #coverpoint1.3 (also)
 
-        _kp = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+        _kp = Here_::Normalization::FACILITY_I.call_by do |o|
           o.argument_scanner = scn
           o.entity = ent
           o.EXECUTE_BY = -> n11n, & p do

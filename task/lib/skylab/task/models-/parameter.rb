@@ -130,7 +130,7 @@ class Skylab::Task
         ws = Home_.lib_.fields::IvarBasedValueStore.new dep  # "write store" (i think)
         rs = o.value_store  # "read store" (i think)
 
-        df_a = o.effectively_defaultant_name_symbols
+        df_a = o.non_required_name_symbols
         req_a = o.required_name_symbols
 
         lu = o.read_association_by  # lookup

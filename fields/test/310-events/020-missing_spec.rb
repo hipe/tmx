@@ -15,7 +15,7 @@ module Skylab::Fields::TestSupport
         new_with_reasons_ name_( :foo_bar ), name_( :quux_grault )
       end
 
-      it "(uses \"invariant be\" form)" do
+      it "(uses \"invariant be\" form)" do  # :#coverpoint1.3
 
         _be_this_message = eql(
           "missing required attributes «prp: foo_bar» and «prp: quux_grault»\n" )

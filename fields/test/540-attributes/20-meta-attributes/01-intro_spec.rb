@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
         @awesome or fail
       end
 
-      it "flag of" do
+      it "flag of" do  # :#coverpoint1.6
 
         against_ :ignore_case
         kn = @do_ignore_case

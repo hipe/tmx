@@ -133,23 +133,23 @@ module Skylab::Fields
 
         o.argument_array = a
         o.entity = ent
-        o.will_execute_as_init_
+        o.will_result_in_entity_on_success_
         o.listener = p
       end
     end
 
-    def init_via_argument_scanner ent, scn, & p  # #covered, [hu] 4x)
+    def init_via_argument_scanner ent, scn, & p  # #coverpoint1.3, [hu] 4x
 
       _NORMALIZE_USING_FACILITY_I_BY do |o|
 
         o.argument_scanner = scn
         o.entity = ent
-        o.will_execute_as_init_
+        o.will_result_in_entity_on_success_
         o.listener = p
       end
     end
 
-    def normalize_entity ent, & p  # #covered
+    def normalize_entity ent, & p  # #coverpoint1.4
 
       _NORMALIZE_USING_FACILITY_I_BY do |o|
         o.entity = ent
@@ -160,8 +160,7 @@ module Skylab::Fields
     def _NORMALIZE_USING_FACILITY_I_BY
 
       _ = _index
-
-      _wee = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+      _wee = Here_::Normalization::FACILITY_I.call_by do |o|
         yield o
         o.association_index = _
       end
@@ -369,7 +368,7 @@ module Skylab::Fields
           # an `ATTRIBUTES` const. ([#co-007.1] is one example.)
 
           # entities can say they are an attributes actor but not
-          # define an associations. (#spot-1-6 is one example)
+          # define an associations. (this is covered by running quickie)
 
           meths = argument_parsing_writer_method_name_passive_lookup_proc
           _lookup_association_softly = -> k do
@@ -379,9 +378,11 @@ module Skylab::Fields
 
           instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
 
-          x = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+          # (this call is used all over)
+
+          x = Here_::Normalization::FACILITY_I.call_by do |o|
             o.argument_scanner = scn
-            o.push_looup_association_softly_by__( & _lookup_association_softly )
+            o.push_association_soft_reader_by__( & _lookup_association_softly )
             o.association_index = _ascs_idx
             o.entity = self  # for #spot-1-5, some association interpreters need to write directly
             o.will_parse_passively__
@@ -408,7 +409,7 @@ module Skylab::Fields
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
           _ev = Home_::Events::Extra.via_strange stream.head_as_is
           receive_extra_values_event _ev
-        end  # :#spot-1-1
+        end
 
         def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception

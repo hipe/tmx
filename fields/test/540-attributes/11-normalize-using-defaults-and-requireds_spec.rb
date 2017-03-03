@@ -74,7 +74,7 @@ module Skylab::Fields::TestSupport
       context "missing requireds" do
 
         it "use the very new against the very old. use the word \"parameter\"" do
-          # #coverpoint-1-2: `id2name` is a necessary thing, and "parameter" the word
+          # #coverpoint1.2: `id2name` is a necessary thing, and "parameter" the word
           a = _N_things
           expect_channel_looks_like_missing_required_ a
           _line = black_and_white_line_via_event_ a[1].call

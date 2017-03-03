@@ -89,7 +89,7 @@ module Skylab::Fields::TestSupport
             _against_this_entity _
           end
 
-          it "fails" do
+          it "fails" do  # :#coverpoint1.4
             this_false_or_nil_ == state_.result || fail
           end
 

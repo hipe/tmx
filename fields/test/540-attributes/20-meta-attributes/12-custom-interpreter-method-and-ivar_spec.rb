@@ -113,7 +113,7 @@ module Skylab::Fields::TestSupport
 
       it "use any arbitrary normalization proc" do
 
-        # :#coverpoint-1-1: the first tail leg (disassociated)
+        # :#coverpoint1.1 the first tail leg (disassociated)
 
         _subject = __this_one_subject_not_memoized_but_could_be
         2 == _subject.length || fail

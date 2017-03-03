@@ -27,9 +27,8 @@ module Skylab::Fields
           sidx = static_index_
 
           _wat = Here_::Normalization::Facility_C.call_by do |o|
-            # (was :#spot-1-3)
             yield o
-            o.effectively_defaultant_name_symbols = sidx.effectively_defaultant_name_symbols
+            o.non_required_name_symbols = sidx.non_required_name_symbols
             o.read_association_by = read_association_by_
             o.required_name_symbols = sidx.required_name_symbols
           end
@@ -107,158 +106,33 @@ module Skylab::Fields
         end
       end
 
-      class FACILITY_I < Common_::MagneticBySimpleModel  # [fi] only
+      # ==
 
-        # we wanted to prance in here and assimilate this into "one ring"
-        # but as we explore at [#012.F] it's not so easy. the use of the
-        # subject is widespread and its implementation is particular..
+      class StackBasedAssociationSoftReader  # 1x
 
         def initialize
-
-          @__do_execute_as_init = false
-          @__do_parse_passively = false
-          @_execute = :__execute_normally
-          @_lookup_association_softly_stack = []
-          @_receive_special_instructions = nil
-
-          @argument_scanner = nil
-          yield self
+          @_array = []
         end
 
-        def EXECUTE_BY= p
-          remove_instance_variable :@_receive_special_instructions
-          @_execute = :__execute_customly ; @__execute_by = p
+        def push_association_soft_reader_proc__ p
+          @_array.push p ; nil
         end
 
-        def will_execute_as_init_
-          remove_instance_variable :@_receive_special_instructions
-          @__do_execute_as_init = true
-        end
-
-        def push_looup_association_softly_by__ & p
-          @_lookup_association_softly_stack.push p ; nil
-        end
-
-        def argument_array= a
-          @argument_scanner = Scanner_[ a ] ; a
-        end
-
-        def will_parse_passively__
-          @__do_parse_passively = true
-        end
-
-        attr_writer(
-          :argument_scanner,
-          :association_index,
-          :entity,
-          :listener,
-        )
-
-        def execute
-          send @_execute
-        end
-
-        def __execute_customly
-
-          # this branch is a much more constrainted, beurocratic and
-          # formalized means of doing what we used to do, which was
-          # plain old create a session and pass it around #tombstone-B
-
-          p = remove_instance_variable :@__execute_by
-          freeze  # to send this object out into the wild, would be irresponsible not to
-          _the_result = p[ self ]
-          _the_result  # hi. #todo
-        end
-
-        def __execute_normally
-
-          __init_via_association_index
-
-          if __parse_arguments
-            if __normalize
-              __result
-            end
-          end
-        end
-
-        def __result
-          # since this is a parsing performer, the "proper" result on success
-          # is boolean true. but it's convenient for some to result in the entity.
-          @__do_execute_as_init ? @entity : KEEP_PARSING_
-        end
-
-        def __normalize
-          if @__has_non_requireds
-            _wee = @association_index.AS_INDEX_NORMALIZE_BY do |o|
-              o.ivar_store = @entity
-              o.listener = @listener
-            end
-            _wee  # hi. #todo
-          else
-            KEEP_PARSING_
-          end
-        end
-
-        # -- B
-
-        def __parse_arguments
-          if @argument_scanner
-            __do_parse_arguments
-          else
-            KEEP_PARSING_
-          end
-        end
-
-        def __do_parse_arguments
-
-          kp = KEEP_PARSING_
-          softly = __flush_lookup_association_softly_by
-          scn = @argument_scanner
-
-          until scn.no_unparsed_exists
-            asc = softly[]
-            if ! asc
-              kp = __at_extra
-              break
-            end
-            scn.advance_one
-            kp = asc.as_association_interpret_ self, & @listener  # result is "keep parsing"
-            kp || break
-          end
-
-          kp
-        end
-
-        def __at_extra
-
-          if @__do_parse_passively
-
-            # in a passive parse, when you encounter an unrecognizable
-            # scanner head you merely stop parsing, you do not fail.
-
-            KEEP_PARSING_
-          else
-            _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
-            raise _ev.to_exception
-          end
-        end
-
-        def __flush_lookup_association_softly_by
-          stack = remove_instance_variable :@_lookup_association_softly_stack
+        def flush_to_soft_reader_via_argument_scanner__ scn
+          stack = remove_instance_variable :@_array
           if 1 < stack.length
-            __when_tall_stack stack
+            __when_tall_stack stack, scn
           else
             p = stack.fetch 0
             -> do
-              p[ @argument_scanner.head_as_is ]
+              p[ scn.head_as_is ]
             end
           end
         end
 
-        def __when_tall_stack stack
+        def __when_tall_stack stack ,scn
 
           top_d = stack.length - 1
-          scn = @argument_scanner
 
           -> do
             d = top_d
@@ -273,38 +147,9 @@ module Skylab::Fields
             asc
           end
         end
-
-        # -- A
-
-        def __init_via_association_index
-
-          idx = @association_index
-          if idx
-
-            sidx = idx.static_index_
-            if sidx.effectively_defaultant_name_symbols  # [#012.B]
-              yes = true
-            end
-
-            asc_h = idx.hash_
-            @_lookup_association_softly_stack.push -> k do
-              # (hi.)
-              asc_h[ k ]
-            end
-          end
-
-          @__has_non_requireds = yes
-          NIL
-        end
-
-        # --
-
-        attr_reader(
-          :argument_scanner,
-          :association_index,
-          :entity,
-        )
       end
+
+      # ==
 
       class Build_Index_of_Definition___
 
@@ -350,7 +195,7 @@ module Skylab::Fields
         end
 
         SI_OP_H__ = {
-          effectively_defaultant_name_symbols: :_push_to_array,
+          non_required_name_symbols: :_push_to_array,
           method_definers: :__add_to_box,
           required_name_symbols: :_push_to_array,
         }
@@ -419,5 +264,6 @@ module Skylab::Fields
     end
   end
 end
+# #tombstone: facility "I" assimilated into the main normalization facililty
 # #tombstone-B: used to use plain old mutable session
 # #tombstone: `edit_actor_class`

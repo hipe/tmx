@@ -10,6 +10,19 @@ module Skylab::Fields
       # near each other to encourage re-use, but the full realization of
       # this dream is harder than it sounds..)
 
+      module FACILITY_I
+        # (this used to be its own facility, and lived in "association index"
+        # #todo - this can go away completely, but we want to incubate it
+        class << self
+          def call_by
+            Here_::Normalization::EK.call_by do |o|
+              o.BE_FACILITY_I  # DOES NOTHING
+              yield o
+            end
+          end
+        end  # >>
+      end
+
       Normalize_via_Entity_with_StaticAssociations = -> ent, & p do
 
         # (bridge the older-but-still-newish "attribute actor"-style
@@ -22,7 +35,7 @@ module Skylab::Fields
           sidx = idx.static_index_
 
           Facility_C.call_by do |o|
-            o.effectively_defaultant_name_symbols = sidx.effectively_defaultant_name_symbols
+            o.non_required_name_symbols = sidx.non_required_name_symbols
             o.ivar_store = ent
             o.read_association_by = idx.read_association_by_
             o.required_name_symbols = sidx.required_name_symbols
@@ -49,7 +62,7 @@ module Skylab::Fields
         end
 
         attr_writer(
-          :effectively_defaultant_name_symbols,
+          :non_required_name_symbols,
           :listener,
           :read_association_by,
           :required_name_symbols,
@@ -81,15 +94,15 @@ module Skylab::Fields
           ok
         end
 
-        def __maybe_apply_defaults  # near #spot-1-2. sometimes always, but maybe not.
-          if @effectively_defaultant_name_symbols
+        def __maybe_apply_defaults
+          if @non_required_name_symbols
             __apply_defaults
           end
         end
 
         def __apply_defaults
 
-          @effectively_defaultant_name_symbols.each do |k|
+          @non_required_name_symbols.each do |k|
 
             asc = @read_association_by[ k ]
 
@@ -160,7 +173,7 @@ module Skylab::Fields
         # (all for hacky experiment, :[#008.7]: #borrow-coverage from [ta])
 
         attr_reader(
-          :effectively_defaultant_name_symbols,
+          :non_required_name_symbols,
           :read_association_by,
           :required_name_symbols,
           :value_store,
@@ -182,18 +195,77 @@ module Skylab::Fields
         # driven by three-laws.
 
         def initialize
+
+          @_execute = :__execute_entily
+          @_receive_special_instructions_for_result_once = nil
+          @_result = :__result_normally
+
           @argument_scanner = nil
           @listener = nil
           yield self
         end
 
-        def entity= ent
-          @_current_association = nil
-          @_missing_required_associations = nil
-          @_receive_missing_reasons = :__receive_missing_reasons_normally
-          @_write_current_value = :__write_current_value_entily
-          @entity = ent
+        # ---
+
+        def BE_FACILITY_I
+          @IS_FAC_I = true
         end
+
+        # -- driving the parse
+
+        def will_parse_passively__
+          @__do_parse_passively = true
+        end
+
+        def will_result_in_entity_on_success_
+          remove_instance_variable :@_receive_special_instructions_for_result_once
+          @_result = :__result_in_entity ; nil
+        end
+
+        def EXECUTE_BY= p
+          remove_instance_variable :@_receive_special_instructions_for_result_once
+          @_execute = :__execute_customly ; @__execute_by = p
+        end
+
+        # -- reading associations
+
+        def association_index= asc_idx
+
+          # if this method receives an association index (or even if it
+          # doesn't) it changes the parsing algorithm to [#012.F]
+
+          @__do_parse_passively ||= false
+
+          @_execute = :__execute_DRIVEN_BY_ASSOCIATION_INDEX
+          @_receive_entity = :_receive_entity_simply
+
+          if asc_idx
+
+            sidx = asc_idx.static_index_
+            if sidx.non_required_name_symbols  # [#012.B]
+              yes = true
+            end
+
+            asc_h = asc_idx.hash_
+            _push_association_soft_reader_by do |k|
+              asc_h[ k ]  # (hi.)
+            end
+          end
+
+          @__has_non_requireds = yes
+          @association_index = asc_idx
+        end
+
+        def push_association_soft_reader_by__ & p
+          _push_association_soft_reader_by( & p )
+        end
+
+        def _push_association_soft_reader_by & p
+          ( @_association_soft_reader ||= Here_::AssociationIndex_::StackBasedAssociationSoftReader.new ).
+            push_association_soft_reader_proc__ p
+        end
+
+        # -- reading and writing from the value store ("entity")
 
         def read_by= p
           @_read_current_value = :__read_current_value_simply
@@ -205,14 +277,51 @@ module Skylab::Fields
           @write_by = p
         end
 
+        def argument_array= a
+          @argument_scanner = Scanner_[ a ] ; a
+        end
+
         attr_writer(
           :argument_scanner,
           :arguments_to_default_proc_by,
           :association_stream,
+          :entity,
           :listener,
         )
 
         def execute
+          send @_execute
+        end
+
+        def __execute_DRIVEN_BY_ASSOCIATION_INDEX
+          if __parse_any_arguments_FUN
+            if __normalize_FUN
+              send @_result
+            end
+          end
+        end
+
+        def __parse_any_arguments_FUN
+          if @argument_scanner
+            __do_parse_arguments_FUN
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        def __normalize_FUN
+          if @__has_non_requireds
+            _wee = @association_index.AS_INDEX_NORMALIZE_BY do |o|
+              o.ivar_store = @entity
+              o.listener = @listener
+            end
+            _wee  # hi. #todo
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        def __execute_entily
 
           # (this decision was informed by the assimilation of [#037.1.G])
 
@@ -244,9 +353,33 @@ module Skylab::Fields
           @_ok && __check_if_there_were_any_missing_requireds
         end
 
+        def __do_parse_arguments_FUN
+
+          kp = KEEP_PARSING_
+          softly = __flush_association_soft_reader
+          scn = @argument_scanner
+
+          until scn.no_unparsed_exists
+            asc = softly[]
+            if ! asc
+              kp = __at_extra_FUN
+              break
+            end
+            scn.advance_one
+            kp = asc.as_association_interpret_ self, & @listener  # result is "keep parsing"
+            kp || break
+          end
+
+          kp
+        end
+
         def __execute_driven_by_associations
 
           ok = true  # watch what happens if there are no associations
+
+          @_write_current_value ||= :__write_current_value_entily
+          @_current_association = nil
+          @_missing_required_associations = nil
 
           normalize_value = __value_normalizer
 
@@ -283,6 +416,18 @@ module Skylab::Fields
           end
         end
 
+        def __execute_customly
+
+          # this branch is a much more constrainted, beurocratic and
+          # formalized means of doing what we used to do, which was plain
+          # and pass it around. (#tombstone-B in "association index")
+
+          p = remove_instance_variable :@__execute_by
+          freeze  # to send this object out into the wild, would be irresponsible not to
+          _the_result = p[ self ]
+          _the_result  # hi. #todo
+        end
+
         # -- I
 
         def __check_if_there_were_any_missing_requireds
@@ -314,7 +459,7 @@ module Skylab::Fields
 
             :reasons, _miss_a,
             # :lemma, :attribute | :parameter | :property | :primary | :field
-            :lemma, :parameter,  # #coverpoint-1-2 ("parameters")
+            :lemma, :parameter,  # #coverpoint1.2 ("parameters")
             :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :ick_prim,
           )
           # _ev = Home_::Events::Missing.via _miss_a, 'attribute'
@@ -494,7 +639,8 @@ module Skylab::Fields
             end
 
             o.receive_missing_by = -> kn, chan, & ev_p do
-              send @_receive_missing_reasons, ev_p, kn, chan
+              _m = @_receive_missing_reasons ||= :__receive_missing_reasons_normally
+              send _m, ev_p, kn, chan
             end
 
             o.listener = @listener
@@ -704,6 +850,21 @@ module Skylab::Fields
           _unable
         end
 
+        def  __at_extra_FUN  # #coverpoint1.5
+
+          if @__do_parse_passively
+
+            # in a passive parse, when you encounter an unrecognizable
+            # scanner head you merely stop parsing, you do not fail.
+
+            KEEP_PARSING_
+          else
+            self._COVER_ME__hmmmmm___
+            _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
+            raise _ev.to_exception
+          end
+        end
+
         def __build_primary_not_found_event
 
           _did_you_mean = @_association_via_name_symbol.keys
@@ -771,8 +932,33 @@ module Skylab::Fields
 
           @_diminishing_pool = diminishing_pool
           @_association_via_name_symbol = h
-          @_ok = true ; @_missing_requireds = nil ; @_seen = {} ; nil
+          @_ok = true ; @_missing_requireds = nil ; @_seen = {}
+
+          NIL
         end
+
+        def __flush_association_soft_reader
+          _asr = remove_instance_variable :@_association_soft_reader
+          _asr.flush_to_soft_reader_via_argument_scanner__ @argument_scanner
+        end
+
+        # -- final result
+
+        def __result_in_entity
+          # the "proper" result for a parsing performer is T/F ("keep parsing")
+          # but it's convenient for some clients to have the result be this:
+          remove_instance_variable :@entity
+        end
+
+        def __result_normally
+          KEEP_PARSING_
+        end
+
+        attr_reader(
+          :argument_scanner,  # in "defined attribute"
+          :association_index,  # #coverpoint1.6
+          :entity,
+        )
       end
 
       # ==
@@ -906,4 +1092,5 @@ module Skylab::Fields
     end
   end
 end
+# #history-037.5.I - experimental assimilation of the facility from "association index"
 # #history-037.5.G - "normalization against model" (file assimilated)
