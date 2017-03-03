@@ -238,7 +238,8 @@ module Skylab::Fields::TestSupport
       it "loads" do
       end
 
-      it "when provide all properties" do
+      it "when provide all properties" do  # :#coverpoint1.8
+
         entity = X_a_s_cf_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
         entity.foo.should eql :FO
         entity.baz.should eql :BZ

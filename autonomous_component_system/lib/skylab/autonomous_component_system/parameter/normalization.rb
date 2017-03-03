@@ -4,6 +4,8 @@ module Skylab::Autonomous_Component_System
 
     class Normalization  # [#028] (and see open tag below)
 
+      # :[#fi-037.5.L].
+
       # (we're calling this the fourth implementation of [#ta-005] pathfinding
       # although that's a bit of a stretch.)
 
@@ -65,7 +67,7 @@ module Skylab::Autonomous_Component_System
 
       def __common_normalize
 
-        # :[#fi-037.1.L]
+        # :[#fi-037.5.L]
 
         # • implement the [#]:#Algorithm
         # • honor [#]:#API-point-B: evaluate every formal in formal order

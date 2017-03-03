@@ -1,7 +1,7 @@
 module Skylab::Basic
 
   module Set  # simple param normalization, inner & outer difference always
-      # #[#fi-012] distilled from [gi]. also used by [sg].
+      # #[#fi-012.7] distilled from [gi]. also used by [sg].
 
     def self.[] mod, * x_a
       Bundles__.edit_module_via_mutable_iambic mod, x_a

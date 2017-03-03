@@ -184,6 +184,9 @@ module Skylab::Fields
 
       class EK < Common_::MagneticBySimpleModel
 
+        # this is "one ring": the place where normalization algorithms
+        # go to achieve immortality.
+
         # (this is awfully close to operator branches, but with all the
         #  defaulting and required-ness stuff going on, we go it alone.)
 
@@ -374,6 +377,8 @@ module Skylab::Fields
         end
 
         def __execute_driven_by_associations
+
+          # come back to: fields/lib/skylab/fields/attributes/stack/common-frame.rb:552
 
           ok = true  # watch what happens if there are no associations
 

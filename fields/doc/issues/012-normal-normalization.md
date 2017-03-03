@@ -115,7 +115,8 @@ the "current working directory"; but under your API the idea of a
 so under such a modality you would want there to be (virtually if not
 actually) no defaulting function at all.
 
-for no good reason we generally tag concerns like these as #masking.
+for purely historical reasons, we tag discussion of (and desire for)
+"meta-association injection" (as described above) with :#masking.
 
   - this is one good reason why we now don't associate formal
     attributes "statically" with (for example) a class is because
@@ -886,6 +887,10 @@ or suspend such an effort. some such reasons:
   - some of the novel reductions we propose below may have their own
     experimental merit.
 
+  - having a static model plus our bold "grammar space reduction" allows
+    for the normalization to be more "call-time efficient", because
+    we can skip the reflection of each assocation.
+
 so whether we can or should ultimately assimilate this into the "one ring"
 facility is an open question we explore as we write this.
 
@@ -950,7 +955,7 @@ back to it. for this latest treatment, we propose that:
     `optional` is equivalent to defining that it has a default of `nil`.
 
   - IFF the above provision is in place, we can then simplify things by
-    forbidding the use of `nil` as a default. (for such cases you must
+    forbidding the use of `nil` as a default. (for such a meta-association,
     use the `optional` flag instead.) :[#here.F.2]
 
   - THEN FINALLY, IFF every association falls into one of these 3 *categories*:

@@ -242,6 +242,9 @@ module Skylab::Fields
 
           def __add_required_check
 
+            # (the below is #[#012.I] a good example of an
+            # "ad-hoc normalization box")
+
             _during_apply do
 
               if const_defined? NORM_BOX__
@@ -546,32 +549,15 @@ module Skylab::Fields
 
         NORM_BOX__ = :NORM_BOX___
 
-        Check_for_missing_requireds___ = -> entity do  # near [#fi-012]
+        Check_for_missing_requireds___ = -> entity do
 
-          miss_a = nil
+          # (#tombstone-A: we used to do the below manually)
 
-          entity.class.properties.each_value do | prp |
+          _asc_st = entity.class.properties.to_value_stream
 
-            _is = Home_::Is_required[ prp ]
-            _is or next
-
-            kn = entity._read_knownness_ prp
-
-            __is_unknown = if kn.is_known_known
-              kn.value_x.nil?
-            else
-              true
-            end
-
-            if __is_unknown
-              ( miss_a ||= [] ).push prp
-            end
-          end
-
-          if miss_a
-            entity._receive_missing_required_associations_ miss_a
-          else
-            KEEP_PARSING_
+          Attributes::Normalization::EK.call_by do |o|
+            o.entity = entity
+            o.association_stream = _asc_st
           end
         end
 
@@ -614,3 +600,4 @@ module Skylab::Fields
       # <-
   end
 end
+# #tombstone-A: we used to check for missing requireds "manually"

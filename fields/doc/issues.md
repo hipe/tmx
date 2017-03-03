@@ -6,6 +6,12 @@
 
 [#037]       meta-attributes justification ..
 
+             :[#here.5]: each qualifying facility in the universe will be tracked
+             :[#here.D]: feature categories (placeheld)
+             :[#here.C]: "phase 1" thru "phase 3" (placeheld)
+             :[#here.B]: introduction to "meta-association" (placeheld)
+             :[#here.A]: overview of "association theroy"
+
 [#036]       failure tree expression..
 
 [#035] #itch 1x (in situ in [hu]) it would be nice to get nothing from
@@ -78,6 +84,45 @@
 [#013]       the unification of methodic actors into (here) "attributes"
 
 [#012]       now the "normal normalization" algorithm (and its variants)..
+
+             :[#here.I]: where "ad-hoc normalization box" is still used
+
+             :[#here.8]: track in the universe entity/collection operations
+               related but different
+
+             :[#here.7]: track similar normalization algorithms elsewhere
+             in universe. (this is an older variant of what is now the central
+             project of [#037.five])
+
+             :[#here.F]: marks the beginning of the one-generation-old
+             algorithm.. :[#here.F.1]: is the old (and now defunct) idea that
+             a defaultant association MUST NOT be required. (other sub-tags
+             here track a logical reduction of the grammar space.)
+
+             :[#here.E]: justifies the need for defaulting to be able to fail
+             and recommends an interface for handling and expressing (or not)
+             this failure.
+
+             :[#here.D.2]: tracks where such ordered boxes are used in
+             the universe.
+
+             :[#here.D.1]: jusitifies why we keep "ad-hoc normalizer" as a
+             simple proc and not for example a mutable, ordered set ("box").
+
+             :[#here.C]: offers a counter-argument against "over-munging",
+             that is, the idea that defaulting and required-ness are just
+             specialized forms of "ad-hoc normalization", and so should be
+             represented that way.
+
+             :[#here.B]: in a model definition where every association is
+             required (and ergo (in the old logic) none are defaultant),
+             there is no need for a special call to `normalize` on the
+             entity. (but what about requiredness check?)
+
+             :[#here.A]: in our one-generation-ago algorithm, we posit and
+             explore the significace of "normalization points" as a single,
+             arbitrary but chosen point in time (for defaulting, for
+             requiredness-check).
 
              (from the original [sl] description:)
 

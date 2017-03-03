@@ -43,7 +43,7 @@ these are all different labels for more-or-less the same thing (EDIT where's tha
 
 
 
-## deeper
+## deeper :[#here.B]
 
 a "meta-property" is simply a formal property whose purpose is to modify
 other formal properties.
@@ -90,10 +90,15 @@ this document has been hijacked. it is now for "one ring".
 
 
 
-## overview of approach
+## overview of approach (phase 1 thru 3) :[#here.C]
 
 in three phases, we unify all normalization in our universe into
 this "one ring to rule them all".
+
+(it's worth mentioning several days into this effort that we do not
+actually effect each of these phases discretely in sequence, but rather
+that they sort of happen all together in concert.)
+
 
 
 
@@ -170,7 +175,7 @@ deliver:
 
 
 
-## an enumeration of pertinent algorithm feature-categories
+## an enumeration of pertinent algorithm feature-categories :[#here.D]
 
 we will "index" all of our known existing algorithms (there are maybe
 six-ish) along the following "axes" that we explain below. we will try
@@ -374,8 +379,8 @@ practical reasons to employ both techniques:
   |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
   |O| | | | | | | | | | | | | | | | | | | | | |     deferred - an event - tagged
   |N| | | | | | | | | | | | | | | | | | | | | |     deferred - an event - tagged
-  |M| | | | | | | | | | | | | | | | | | | | | |     red herring. [#br☐057] CLI args parsing
-  |L| |Y|N|Y| |N|Y| |-| |Y| | | | | | | | | | | [ac] param n11n
+  |M| | | | | | | | | | | | | | | | | | | | | |     red herring. [#br-057] CLI args parsing
+  |L| |Y|N|Y| |N|Y| |-| |Y| | | | | | | | | | | [ac] param n11n (BIG ONE)
   |K| | | | | | | | | | | | | | | | | | | | | |     [ze] niCLI production
   |J| |.|.|Y| |Y|Y| |-| |-| | | | | | | | | | | USES "G" (was value processing)
   |I| |.|.|.| |Y|Y| |-| |-| | | | | | | | | | | (used to be "lib.rb")
@@ -383,6 +388,7 @@ practical reasons to employ both techniques:
   |G| |Y|Y|Y| |N|Y| |-| |-| | | | | | | | | | | (against model) (see notes)
   |F| |N|N|Y| |N|Y| |-| |-| | | | | | | | | | | (the set) (see notes)
   |E| | | | | | | | | | | | | | | | | | | | | |     N/A - specialized (see notes)
+  |D2 |N|N|Y| |N|Y| |-| |-| | | | | | | | | | | small, good candidate
   |D| |N|N|Y| |Y|N| |-| |-| | | | | | | | | | | (proxy)
   |C| |Y|N|Y| |N|Y| |Y| |N| | | | | | | | | | | (guy in "A")
   |B| | | | | | | | | | | | | | | | | | | | | | deferred - special - nodeps
@@ -399,6 +405,7 @@ practical reasons to employ both techniques:
     facility G: 2014-10-08 fields/lib/skylab/fields/attributes/normalization/october-08-2014.rb (normalization against model)
     facility F: 2013-11-30 basic/lib/skylab/basic/set.rb
     facility E: 2013-07-12 zerk/lib/skylab/zerk/magnetics/formal-parameters-via-method-parameters.rb:275
+    facility D2:2013-07-08 fields/lib/skylab/fields/attributes/stack/common-frame.rb:549
     facility D: 2013-01-31 basic/lib/skylab/basic/proxy/makers/functional/core.rb
     facility C: 2012-08-20 fields/lib/skylab/fields/attributes/normalization.rb (oldest facility ever, in "A")
     facility B: 2011-08-06 zerk/lib/no-dependencies-zerk.rb

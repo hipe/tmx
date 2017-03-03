@@ -282,7 +282,7 @@ of expressions we want to express when there are "deep unavailabilities".
 
 
 2) (this algorithm is a specialized variant of the [#ac-028]#Algorithm,
-   which in turn is specialized variant of #[#fi-012] normal normalization.
+   which in turn is specialized variant of #[#fi-012.seven] normal normalization.
    participants along this whole trail are all tagged as candidates for
    a possible future unification when all the dust settles (say, when
    #milestone-9). at writing this *seems* to be the most formally documented

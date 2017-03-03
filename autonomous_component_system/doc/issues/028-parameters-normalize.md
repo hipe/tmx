@@ -3,7 +3,7 @@
 
 ## overview
 
-yet another #[#fi-012] normal normalization. needed to be developed
+yet another #[#fi-012.7] normal normalization. needed to be developed
 on its own; is candidate for unification.
 
   • check for missing requireds
