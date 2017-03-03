@@ -352,10 +352,11 @@ module Skylab::Brazen
       remove_instance_variable :@_argument_scanner_
     end
 
-    def when_after_process_iambic_fully_stream_has_content st
+    def when_after_process_iambic_fully_stream_has_content scn
 
-      _ev = Home_.lib_.fields::Events::Extra.via_strange st.head_as_is
-
+      _ev = Home_.lib_.fields::Events::Extra.with(
+        :unrecognized_token, scn.head_as_is,
+      )
       receive_extra_values_event _ev
     end
 

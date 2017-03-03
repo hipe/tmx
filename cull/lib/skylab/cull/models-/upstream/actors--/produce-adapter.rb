@@ -63,7 +63,11 @@ module Skylab::Cull
 
           _s_a = get_available_prefixes
 
-          Home_.lib_.fields::Events::Extra.new [ @prefix ], _s_a, "prefix"
+          Home_.lib_.fields::Events::Extra.with(
+            :unrecognized_token, @prefix,
+            :did_you_mean_tokens, _s_a,
+            :noun_lemma, "prefix",
+          )
         end
 
         UNABLE_
@@ -180,7 +184,11 @@ module Skylab::Cull
             ".#{ nm.as_slug }"
           end
 
-          Home_.lib_.fields::Events::Extra.new [ extname ], _s_a, "extension"
+          Home_.lib_.fields::Events::Extra.with(
+            :unrecognized_token, extname,
+            :did_you_mean_tokens, _s_a,
+            :noun_lemma, "extension",
+          )
         end
 
         UNABLE_

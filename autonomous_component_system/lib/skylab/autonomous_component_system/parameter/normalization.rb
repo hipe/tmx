@@ -157,7 +157,7 @@ module Skylab::Autonomous_Component_System
         ev = Field_::Events::Missing.with(
           :reasons, miss_a,
           :selection_stack, @selection_stack,
-          :lemma, :parameter,
+          :noun_lemma, :parameter,
           :exception_class_by, -> { Home_::MissingRequiredParameters },
         )
 

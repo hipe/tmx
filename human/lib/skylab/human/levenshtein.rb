@@ -42,19 +42,17 @@ module Skylab::Human
 
       target_s = @item_string
 
-      st = __stream
+      scn = __scanner
 
       @_see = :__see_for_the_first_time
       string = @stringify_by
 
-      begin
-        @_item_x = st.gets
-        @_item_x || break
+      until scn.no_unparsed_exists
+        @_item_x = scn.gets_one
         _candidate_s = string[ @_item_x ]
         @_distance = ::Levenshtein.distance _candidate_s, target_s  # integer
         send @_see
-        redo
-      end while above
+      end
 
       # zero-length lists meh, need coverage
 
@@ -167,10 +165,10 @@ module Skylab::Human
       NIL
     end
 
-    def __stream
+    def __scanner
 
       if ::Array.try_convert @items
-        Common_::Stream.via_nonsparse_array @items
+        Common_::Scanner.via_array @items
       else
         remove_instance_variable :@items  # not idempotent
       end

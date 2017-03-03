@@ -65,9 +65,9 @@ module Skylab::TMX
 
         listener.call :error, :expression, :parse_error, :unknown_attribute do |y|
 
-          _st = Stream_.call attrs do |attr|
+          _scn = Stream_.call attrs do |attr|
             attr.name
-          end
+          end.flush_to_scanner
 
           _stringify_by = -> name do
             name.as_lowercase_with_underscores_string
@@ -77,7 +77,7 @@ module Skylab::TMX
 
           _s_a = Home_.lib_.human::Levenshtein.via(
             :item_string, k.id2name,
-            :items, _st,
+            :items, _scn,
             :stringify_by, _stringify_by,
             :map_result_items_by, say_attr,
             :closest_N_items, 3,

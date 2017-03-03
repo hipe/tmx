@@ -28,9 +28,11 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :a, :X, :b, :Y
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       x.should eql false
+
       expect_not_OK_event :extra_properties do |ev|
-        ev.name_x_a.should eql [ :derp, :nerp ]
+        ev.unrecognized_tokens == [ :derp, :nerp ] || fail
       end
+
       expect_no_more_events
     end
 
@@ -60,9 +62,11 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :a, :A1, :b, :B1
       stack.push_frame_with :b, :B2
       x = stack.property_value_via_symbol :c
+
       expect_not_OK_event :extra_properties do |ev|
-        ev.name_x_a.should eql [ :c ]
+        ev.unrecognized_token == :c || fail
       end
+
       expect_no_more_events
       x.should eql false
     end

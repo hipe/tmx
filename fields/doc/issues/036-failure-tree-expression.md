@@ -42,7 +42,7 @@ are the ultimate objective of this document, but we'll stick with this
 example for now:
 
 the members of information in this event that we care about for this
-discussion are three: `reasons`, `selection_stack`, `lemma`.
+discussion are three: `reasons`, `selection_stack`, `noun_lemma`.
 
 unavailability,
 

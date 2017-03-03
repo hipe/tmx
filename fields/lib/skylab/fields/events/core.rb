@@ -13,7 +13,7 @@ module Skylab::Fields
 
       :reasons, nil,  # #[#here.A]
       :selection_stack, nil,
-      :lemma, DEFAULT_PROPERTY_LEMMA_,
+      :noun_lemma, DEFAULT_PROPERTY_LEMMA_,
       :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :par,
       :exception_class_by, -> { Home_::MissingRequiredAttributes },  # ..
       :error_category, :argument_error,
@@ -43,7 +43,7 @@ module Skylab::Fields
         def via miss_a, * x_a   # miss_a [, lemma_x ]
 
           if x_a.length.nonzero?
-            x_a.unshift :lemma
+            x_a.unshift :noun_lemma
           end
 
           with :reasons, miss_a, * x_a
@@ -133,7 +133,7 @@ module Skylab::Fields
 
         _reason = Missing_Required_Attribute_Synopsis_Predicate.new_by_ do |o|
           o.association = nf
-          o.attribute_lemma_symbol = @lemma
+          o.attribute_lemma_symbol = @noun_lemma
           o.THIS_ONE_METHOD = @USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER
         end
 

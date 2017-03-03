@@ -86,6 +86,15 @@ module Skylab::Snag
 
         o = Home_.lib_.fields::Attributes::Normalization::JUNE_08_2015.new
 
+        # so: we're in the middle of unifying all normalization. the above
+        # facility is on deck to be assimilated. however, we don't have
+        # coverage of this point because CLI is on furlough for [sn] while
+        # we go through the big migration off of [br]. when we come back
+        # around to all that we *suspect* that all of this will have changed
+        # because feature injection will hopefully be cleaner by then.
+        # as such, we're just gonna sunset the entire above node. if we
+        # want something from it we can always dig it back up. #tombstone-A
+
         bx = Common_::Box.new
 
         o.value_collection = bx
@@ -470,3 +479,4 @@ module Skylab::Snag
     Brazen_ = Home_.lib_.brazen
   end
 end
+# :#tombstone-A: sunset a normalization over in [fi] that was used only here

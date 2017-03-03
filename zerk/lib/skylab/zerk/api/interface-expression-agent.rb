@@ -25,7 +25,7 @@ module Skylab::Zerk
 
       alias_method :calculate, :instance_exec
 
-      def simple_inflection & p
+      public def simple_inflection & p
         o = dup
         o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
         o.calculate( & p )

@@ -33,7 +33,8 @@ module Skylab::Fields
     if ! kp || scn.no_unparsed_exists
       kp
     else
-      ev = Home_::Events::Extra.via_strange scn.head_as_is
+
+      ev = Home_::Events::Extra.with :unrecognized_token, scn.head_as_is
 
       if respond_to? :receive_extra_values_event
         receive_extra_values_event ev
@@ -407,7 +408,9 @@ module Skylab::Fields
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
-          _ev = Home_::Events::Extra.via_strange stream.head_as_is
+
+          _ev = Home_::Events::Extra.with :unrecognized_token, stream.head_as_is
+
           receive_extra_values_event _ev
         end
 

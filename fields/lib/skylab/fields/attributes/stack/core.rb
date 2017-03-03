@@ -24,7 +24,8 @@ module Skylab::Fields
 
         else
           maybe_send_event :error, :extra_properties do
-            _build_extra_properties_event [ sym ]
+
+            Home_::Events::Extra.with :unrecognized_token, sym
           end
           UNABLE_
         end
@@ -70,14 +71,13 @@ module Skylab::Fields
     private
 
       def when_xtra xtra_a
-        maybe_send_event :error, :extra_properties do
-          _build_extra_properties_event xtra_a
-        end
-        UNABLE_
-      end
 
-      def _build_extra_properties_event xtra_a
-        Home_::Events::Extra.build xtra_a
+        maybe_send_event :error, :extra_properties do
+
+          Home_::Events::Extra.with :unrecognized_tokens, xtra_a
+        end
+
+        UNABLE_
       end
 
       def maybe_send_event * i_a, & ev_p  # #[#ca-066]

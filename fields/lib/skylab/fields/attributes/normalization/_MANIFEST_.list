@@ -1,8 +1,0 @@
-[ EK ]                              [ current ]
-value-processing.rb             ->  june-08-2015.rb
-lib.rb                          ->  october-31-2014.rb
-[ as ]                              [ october-24-2014 ]
-normalization-against-model.rb  ->  october-08-2014.rb
-[ main ]                            [ august-20-2012 ]
-
-via indexed associations        ->  Normalize_via_Entity_with_StaticAssociations

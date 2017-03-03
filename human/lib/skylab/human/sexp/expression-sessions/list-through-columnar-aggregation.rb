@@ -173,10 +173,10 @@ module Skylab::Human
               @when_field_value_count_is_two_or_more_by = scn.gets_one  # BE CAREFUL
               KEEP_PARSING_
             else
-
-              _ev = Home_.lib_.fields::Events::Extra.build(
-                [i], [:frame, :field] )
-
+              _ev = Home_.lib_.fields::Events::Extra.with(
+                :unrecognized_token, sym,
+                :did_you_mean_tokens, [ :frame, :field ],
+              )
               receive_extra_values_event _ev  # #hook-in (local)
             end
           end

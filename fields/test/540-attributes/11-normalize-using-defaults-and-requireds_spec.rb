@@ -49,7 +49,7 @@ module Skylab::Fields::TestSupport
 
       context "unrec" do
 
-        it "messages splays" do
+        it "messages splays" do  # :#coverpoint1.7
 
           a = _N_things
 
@@ -57,8 +57,8 @@ module Skylab::Fields::TestSupport
 
           _lines = black_and_white_lines_via_event_ a[1].call
           expect_these_lines_in_array_ _lines do |y|
-            y << 'unrecognized attribute "aa"'
-            y << 'did you mean "alpha", "beta" or "gamma"?'
+            y << 'unrecognized attribute :aa'
+            y << 'did you mean :alpha, :beta or :gamma?'
           end
         end
 

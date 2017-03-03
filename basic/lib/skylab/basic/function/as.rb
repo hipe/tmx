@@ -213,8 +213,13 @@ module Skylab::Basic
 
         def __build_when_extra_arguments_event extra_sym_a
 
-          _ev = Home_.lib_.fields::Events::Extra.
-            new extra_sym_a, nil, 'argument', 'unexpected'  # #[#co-070.2] `new`
+          # used to need #[#co-070.2] `new`, but no longer #tombstone-A
+
+          _ev = Home_.lib_.fields::Events::Extra.with(
+            :unrecognized_tokens, extra_sym_a,
+            :noun_lemma, "argument",
+            :adjective_lemma, "unexpected",
+          )
 
           _sign_event _ev
         end
@@ -265,3 +270,4 @@ module Skylab::Basic
     # <-
   end
 end
+# :#tombstone-A - we used to use a thing we no longer use

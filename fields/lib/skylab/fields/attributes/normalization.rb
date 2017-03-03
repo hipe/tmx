@@ -458,8 +458,8 @@ module Skylab::Fields
           _ev = Home_::Events::Missing.with(
 
             :reasons, _miss_a,
-            # :lemma, :attribute | :parameter | :property | :primary | :field
-            :lemma, :parameter,  # #coverpoint1.2 ("parameters")
+            # :noun_lemma, :attribute | :parameter | :property | :primary | :field
+            :noun_lemma, :parameter,  # #coverpoint1.2 ("parameters")
             :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :ick_prim,
           )
           # _ev = Home_::Events::Missing.via _miss_a, 'attribute'
@@ -860,7 +860,7 @@ module Skylab::Fields
             KEEP_PARSING_
           else
             self._COVER_ME__hmmmmm___
-            _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
+            _ev = Home_::Events::Extra.with :unrecognized_token, @argument_scanner.head_as_is
             raise _ev.to_exception
           end
         end
@@ -869,8 +869,10 @@ module Skylab::Fields
 
           _did_you_mean = @_association_via_name_symbol.keys
 
-          _ev = Home_::Events::Extra.build [ _unsanitized_key ], _did_you_mean
-
+          _ev = Home_::Events::Extra.with(
+            :unrecognized_token, _unsanitized_key,
+            :did_you_mean_tokens, _did_you_mean,
+          )
           _ev  # hi. #todo
         end
 

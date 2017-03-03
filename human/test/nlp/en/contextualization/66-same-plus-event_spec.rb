@@ -26,9 +26,9 @@ module Skylab::Human::TestSupport
         oes_p.call :error, :extra_properties do
 
           Home_.lib_.fields::Events::Extra.with(
-            :name_x_a, [ 'bezo' ],
-            :did_you_mean_symbol_array, [ 'wezo', 'dezo' ],
-            :lemma, 'kershploink',
+            :unrecognized_token, 'bezo',
+            :did_you_mean_tokens, [ 'wezo', 'dezo' ],
+            :noun_lemma, 'kershploink',
             :suffixed_prepositional_phrase_context_proc, wat,
           )
         end
@@ -48,7 +48,7 @@ module Skylab::Human::TestSupport
       end
 
       it "you still get the (an) event emitted omg!!" do
-        event_.lemma.should eql 'kershploink' or fail
+        event_.noun_lemma == "kershploink" || fail
       end
 
       it "the first item has been contextualized (sensically by chance)" do
