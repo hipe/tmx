@@ -19,11 +19,7 @@ module Skylab::Fields
           @_custom_index = o.__release_thing_ding_one
           @static_index_ = o.__release_thing_ding_two
 
-          @_h = h
-        end
-
-        def begin_parse_and_normalize_for__ entity, & x_p
-          Parse_and_or_Normalize.new entity, self, & x_p
+          @hash_ = h
         end
 
         def AS_INDEX_NORMALIZE_BY
@@ -49,7 +45,7 @@ module Skylab::Fields
           begin
             k = st.gets
             k or break
-            @_h.fetch( k ).deffers_.each do |p|
+            @hash_.fetch( k ).deffers_.each do |p|
               p[ mod ]
             end
             redo
@@ -73,7 +69,7 @@ module Skylab::Fields
 
         def to_defined_attribute_stream__
 
-          ea = @_h.each_value
+          ea = @hash_.each_value
           Common_.stream do
             begin
               ea.next
@@ -83,56 +79,27 @@ module Skylab::Fields
         end
 
         def read_association_ k
-          @_h.fetch k
+          @hash_.fetch k
         end
 
         def read_association_by_
-          @_h.method :fetch
+          @hash_.method :fetch
         end
 
         # --
 
         attr_reader(
           :_custom_index,
-          :_h,
+          :hash_,  # <- in anticipation of one client moving. but all this file for now
           :static_index_,
         )
       # -
 
-      Process_argument_scanner_passively = -> st, sess, formals, meths, & x_p do  # 1x [fi]
-
-        sess.instance_variable_set ARGUMENT_SCANNER_IVAR_, st  # as we do
-
-        if formals
-          _idx = formals.index_
-        end
-
-        o = Parse_and_or_Normalize.new sess, _idx, & x_p
-
-        o.argument_scanner = st
-
-        o.__push_formal_reader_by do |k|
-
-          m = meths[ k ]
-          if m
-            MethodBased_Attribute___.new m
-          end
-        end
-
-        o.at_extra_token = :at_extra_stop_parsing
-
-        kp = o.execute
-
-        sess.remove_instance_variable ARGUMENT_SCANNER_IVAR_
-
-        kp
-      end
-
       Writer_method_reader___ = -> cls do
 
-        -> name_symbol do
+        -> name_sym do
 
-          m = Classic_writer_method_[ name_symbol ]
+          m = Classic_writer_method_[ name_sym ]
 
           if cls.private_method_defined? m
             m
@@ -140,104 +107,178 @@ module Skylab::Fields
         end
       end
 
-      class Parse_and_or_Normalize  # this lib only
+      class FACILITY_I < Common_::MagneticBySimpleModel  # [fi] only
 
-        def initialize entity, index=nil, & oes_p
+        # we wanted to prance in here and assimilate this into "one ring"
+        # but as we explore at [#012.F] it's not so easy. the use of the
+        # subject is widespread and its implementation is particular..
+
+        def initialize
+
+          @__do_execute_as_init = false
+          @__do_parse_passively = false
+          @_execute = :__execute_normally
+          @_lookup_association_softly_stack = []
+          @_receive_special_instructions = nil
 
           @argument_scanner = nil
-          @entity = entity
-          @_formal_reader_stack = []
-          @index = index  # can be nil
-          @listener = oes_p  # can be nil
+          yield self
         end
 
-        def __push_formal_reader_by & p
-          @_formal_reader_stack.push p ; nil
+        def EXECUTE_BY= p
+          remove_instance_variable :@_receive_special_instructions
+          @_execute = :__execute_customly ; @__execute_by = p
         end
 
-        def sexp= sx
-          @argument_scanner = Common_::Scanner.via_array sx ; sx
+        def will_execute_as_init_
+          remove_instance_variable :@_receive_special_instructions
+          @__do_execute_as_init = true
+        end
+
+        def push_looup_association_softly_by__ & p
+          @_lookup_association_softly_stack.push p ; nil
+        end
+
+        def argument_array= a
+          @argument_scanner = Scanner_[ a ] ; a
+        end
+
+        def will_parse_passively__
+          @__do_parse_passively = true
         end
 
         attr_writer(
           :argument_scanner,
+          :association_index,
+          :entity,
+          :listener,
         )
-
-        attr_accessor(
-          :at_extra_token,
-        )
-
-        def execute_as_init_
-
-          _ok = execute
-          _ok && @entity
-        end
 
         def execute
-
-          __given_any_static_indexes_push_to_formal_reader_stack
-
-          if @_do_normalize  # for now..
-            normalize_m = :__do_normalize
-          end
-
-          if @argument_scanner
-            kp = ___process_argument_stream
-          else
-            kp = KEEP_PARSING_
-          end
-
-          if kp && normalize_m
-            kp = send normalize_m
-          end
-
-          kp
+          send @_execute
         end
 
-        def ___process_argument_stream
+        def __execute_customly
+
+          # this branch is a much more constrainted, beurocratic and
+          # formalized means of doing what we used to do, which was
+          # plain old create a session and pass it around #tombstone-B
+
+          p = remove_instance_variable :@__execute_by
+          freeze  # to send this object out into the wild, would be irresponsible not to
+          _the_result = p[ self ]
+          _the_result  # hi. #todo
+        end
+
+        def __execute_normally
+
+          __init_via_association_index
+
+          if __parse_arguments
+            if __normalize
+              __result
+            end
+          end
+        end
+
+        def __result
+          # since this is a parsing performer, the "proper" result on success
+          # is boolean true. but it's convenient for some to result in the entity.
+          @__do_execute_as_init ? @entity : KEEP_PARSING_
+        end
+
+        def __normalize
+          if @__has_non_requireds
+            _wee = @association_index.AS_INDEX_NORMALIZE_BY do |o|
+              o.ivar_store = @entity
+              o.listener = @listener
+            end
+            _wee  # hi. #todo
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        # -- B
+
+        def __parse_arguments
+          if @argument_scanner
+            __do_parse_arguments
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        def __do_parse_arguments
 
           kp = KEEP_PARSING_
+          softly = __flush_lookup_association_softly_by
+          scn = @argument_scanner
 
-          oes_p = @listener  # can be nil
-
-          read = __formal_attribute_reader
-
-          st = @argument_scanner
-
-          until st.no_unparsed_exists
-
-            @_attribute = read[]
-            if @_attribute
-              st.advance_one
-              kp = @_attribute._interpret self, & oes_p  # result is "keep parsing"
-              kp and next
+          until scn.no_unparsed_exists
+            asc = softly[]
+            if ! asc
+              kp = __at_extra
               break
             end
-            kp = ___at_extra
-            break
+            scn.advance_one
+            kp = asc.as_association_interpret_ self, & @listener  # result is "keep parsing"
+            kp || break
           end
+
           kp
         end
 
-        def ___at_extra
-          m = self.at_extra_token
-          m ||= :__at_extra_then_raise_an_exception
-          send m
+        def __at_extra
+
+          if @__do_parse_passively
+
+            # in a passive parse, when you encounter an unrecognizable
+            # scanner head you merely stop parsing, you do not fail.
+
+            KEEP_PARSING_
+          else
+            _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
+            raise _ev.to_exception
+          end
         end
 
-        def at_extra_stop_parsing
-          # NOTE: the "stop parsing" signal is *NOT* issued in these cases
-          KEEP_PARSING_
+        def __flush_lookup_association_softly_by
+          stack = remove_instance_variable :@_lookup_association_softly_stack
+          if 1 < stack.length
+            __when_tall_stack stack
+          else
+            p = stack.fetch 0
+            -> do
+              p[ @argument_scanner.head_as_is ]
+            end
+          end
         end
 
-        def __at_extra_then_raise_an_exception  # mimic #spot-1-1
-          _ev = Home_::Events::Extra.via_strange @argument_scanner.head_as_is
-          raise _ev.to_exception
+        def __when_tall_stack stack
+
+          top_d = stack.length - 1
+          scn = @argument_scanner
+
+          -> do
+            d = top_d
+            k = scn.head_as_is
+            begin
+              asc = stack.fetch( d ).call k
+              asc && break
+              d.zero? && break
+              d -= 1
+              redo
+            end while above
+            asc
+          end
         end
 
-        def __given_any_static_indexes_push_to_formal_reader_stack
+        # -- A
 
-          idx = @index
+        def __init_via_association_index
+
+          idx = @association_index
           if idx
 
             sidx = idx.static_index_
@@ -245,71 +286,22 @@ module Skylab::Fields
               yes = true
             end
 
-            atr_h = idx._h
-            @_formal_reader_stack.push( -> k do
+            asc_h = idx.hash_
+            @_lookup_association_softly_stack.push -> k do
               # (hi.)
-              atr_h[ k ]
-            end )
+              asc_h[ k ]
+            end
           end
 
-          @_do_normalize = yes
-          NIL_
+          @__has_non_requireds = yes
+          NIL
         end
 
-        def __do_normalize
-          @index.AS_INDEX_NORMALIZE_BY do |o|
-            o.ivar_store = @entity
-            o.listener = @listener
-          end
-        end
+        # --
 
-        def __formal_attribute_reader
-
-          stack = remove_instance_variable :@_formal_reader_stack
-          send OP_H___.fetch( 1 <=> stack.length ), stack
-        end
-
-        OP_H___ = {
-          0 => :__formal_attribute_reader_when_one,
-          -1 => :__formal_attribute_reader_when_many,
-        }
-
-        def __formal_attribute_reader_when_one stack
-
-          p = stack.fetch 0
-          -> do
-            p[ @argument_scanner.head_as_is ]
-          end
-        end
-
-        def __formal_attribute_reader_when_many stack
-
-          top_d = stack.length - 1
-          st = @argument_scanner
-
-          -> do
-
-            d = top_d
-            k = st.head_as_is
-
-            begin
-              atr = stack.fetch( d ).call k
-              if atr
-                break
-              end
-              if d.zero?
-                break
-              end
-              d -= 1
-              redo
-            end while nil
-            atr
-          end
-        end
-
-        attr_reader(  # (all here)
+        attr_reader(
           :argument_scanner,
-          :index,
+          :association_index,
           :entity,
         )
       end
@@ -406,7 +398,7 @@ module Skylab::Fields
 
       # ==
 
-      class MethodBased_Attribute___
+      class MethodBasedAssociation  # 1x [fi]
 
         # (we don't subclass simplified name because we are one-off
         #  so we don't bother caching things lazily nor freezing.)
@@ -417,11 +409,15 @@ module Skylab::Fields
           @__m = m
         end
 
-        def _interpret parse, & x_p
-          parse.entity.send @__m, & x_p
+        def as_association_interpret_ n11n, & x_p
+          n11n.entity.send @__m, & x_p  # :#spot-1-5
         end
       end
+
+      # ==
+      # ==
     end
   end
 end
+# #tombstone-B: used to use plain old mutable session
 # #tombstone: `edit_actor_class`

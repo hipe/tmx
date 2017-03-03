@@ -71,7 +71,7 @@ module Skylab::TanMan
 
       def normalize  # near but not really the same as #[#fi-022] ..
 
-        self.class::ATTRIBUTES.normalize_session self  # handler?..
+        self.class::ATTRIBUTES.normalize_entity self  # handler?..
       end
 
       def __resolve_units_of_work

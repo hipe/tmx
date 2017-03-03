@@ -32,8 +32,8 @@ module Skylab::Fields::TestSupport
             where_ :color, :green
           end
 
-          it "fails" do
-            state_.result.should eql false
+          it "fails (with nil)" do
+            this_false_or_nil_ == state_.result || fail
           end
 
           it "emits" do

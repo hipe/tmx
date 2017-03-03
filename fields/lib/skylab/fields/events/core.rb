@@ -132,8 +132,8 @@ module Skylab::Fields
       def __main_add_as_atom nf
 
         _reason = Missing_Required_Attribute_Synopsis_Predicate.new_by_ do |o|
+          o.association = nf
           o.attribute_lemma_symbol = @lemma
-          o.formal_attribute = nf
           o.THIS_ONE_METHOD = @USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER
         end
 
@@ -146,9 +146,9 @@ module Skylab::Fields
 
         @_ff_pfx ||= Common_::Known_Known[ __determine_any_prefix ]
 
-        atr = reason_x.compound_formal_attribute
+        asc = reason_x.compound_formal_attribute
 
-        k = atr.name_symbol
+        k = asc.name_symbol
 
         if @_recurse_memory[ k ]
           adv = :also
@@ -158,7 +158,7 @@ module Skylab::Fields
         end
 
         _styled_surface_verb = @expression_agent_.calculate do
-          nm atr.name
+          nm asc.name
         end
 
         _hard_coded_for_now = [ :statementish,

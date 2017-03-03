@@ -54,7 +54,7 @@ module Skylab::Fields
 
         mattrs_cls.send :define_method, matr.name_symbol do
 
-          matr._interpret @_
+          matr.as_association_interpret_ @_
         end
 
         NIL_

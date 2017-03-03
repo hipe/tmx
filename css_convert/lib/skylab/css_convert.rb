@@ -103,7 +103,7 @@ module Skylab::CSS_Convert
 
       def normalize  # near #[#fi-022]
         # all this does is defaulting so we don't want to bother wiring it
-        self.class::ATTRIBUTES.normalize_session self
+        self.class::ATTRIBUTES.normalize_entity self
       end
 
       self

@@ -35,9 +35,9 @@ module Skylab::Fields
 
         # (note we scrapped TONS of blah blah because it wasn't covered..)
 
-        def initialize sess, attr
+        def initialize sess, asc
 
-          ivar = attr.as_ivar
+          ivar = asc.as_ivar
           @_read = -> do
             if sess.instance_variable_defined? ivar
               sess.instance_variable_get ivar

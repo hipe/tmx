@@ -90,7 +90,7 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails" do
-            fails_
+            this_false_or_nil_ == state_.result || fail
           end
 
           it "emits" do
@@ -218,15 +218,15 @@ module Skylab::Fields::TestSupport
 
             _ = event_log.handle_event_selectively
 
-            x = entity_class_::ATTRIBUTES.normalize_session o, & _
+            x = entity_class_::ATTRIBUTES.normalize_entity o, & _
 
             a = remove_instance_variable( :@event_log ).flush_to_array
 
             [ x, a, o ]
           end
 
-          it "fails" do
-            false == _state_tuple.fetch( 0 ) or fail
+          it "fails (with nil)" do
+            this_false_or_nil_ == _state_tuple.fetch( 0 ) or fail
           end
 
           it "emits" do
@@ -271,7 +271,7 @@ module Skylab::Fields::TestSupport
 
       def _against_this_entity_expect_OK_normalization o
 
-        _x = entity_class_::ATTRIBUTES.normalize_session o
+        _x = entity_class_::ATTRIBUTES.normalize_entity o
         true == _x or fail
       end
 
@@ -279,7 +279,7 @@ module Skylab::Fields::TestSupport
 
         _ = event_log.handle_event_selectively
 
-        _x = entity_class_::ATTRIBUTES.normalize_session o, & _
+        _x = entity_class_::ATTRIBUTES.normalize_entity o, & _
 
         flush_event_log_and_result_to_state _x
       end

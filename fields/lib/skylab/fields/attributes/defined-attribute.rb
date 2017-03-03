@@ -249,10 +249,10 @@ module Skylab::Fields
         w_p = remove_instance_variable :@_writer_p
 
         if rw_p
-          @_interpret_m = :__custom_interpret
+          @_interpret = :__interpret_customly
           @__rw = rw_p[ self ]
         else
-          @_interpret_m = :__common_interpret
+          @_interpret = :__interpret_commonly
           @_read = r_p ? r_p[ self ] : Read___
           @_write = w_p ? w_p[ self ] : Write___
         end
@@ -262,33 +262,39 @@ module Skylab::Fields
 
       # --
 
-      def write sess, scn  # #EXPERIMENTAL #cover-me #todo
+      def write ent, scn  # #covered. result in kp
 
-        pa = Here_::AssociationIndex_::Parse_and_or_Normalize.new sess
-        pa.argument_scanner = scn
-        _interpret pa  # result is k.p
+        _kp = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+          o.argument_scanner = scn
+          o.entity = ent
+          o.EXECUTE_BY = -> n11n, & p do
+            # hi. #todo
+            as_association_interpret_ n11n, & p
+          end
+        end
+        _kp  # hi. #todo
       end
 
-      def _interpret parse, & x_p
+      def as_association_interpret_ n11n, & p
 
-        _args = Interpretation_DSL___.new self, parse
-        read_and_write_ _args, & x_p
+        _dsl = Interpretation_DSL___.new self, n11n
+        read_and_write_ _dsl, & p
       end
 
-      def read_and_write_ args, & x_p  # at least 2x here
+      def read_and_write_ dsl, & p  # at least 2x here
 
-        send @_interpret_m, args, & x_p
+        send @_interpret, dsl, & p
       end
 
-      def __common_interpret args, & x_p
+      def __interpret_customly dsl  # result in kp
 
-        _x = args.calculate( & @_read )
-        args.calculate _x, x_p, & @_write  # result is k.p
+        dsl.calculate( & @__rw )
       end
 
-      def __custom_interpret args
+      def __interpret_commonly dsl, & p  # result in kp
 
-        args.calculate( & @__rw )  # result is k.p
+        _x = dsl.calculate( & @_read )
+        dsl.calculate _x, p, & @_write
       end
 
       attr_accessor(
@@ -329,39 +335,39 @@ module Skylab::Fields
 
         # (used, for example, at #spot-1-4)
 
-        def initialize attr, parse
+        def initialize asc, n11n
           @_argument_scanner = nil
-          @_formal_attribute = attr
-          @_parse = parse
-          # for now, don't freeze only because #this
+          @_association = asc
+          @_normalization = n11n
+          # for now, don't freeze only because #this-1
         end
 
-        def mutate_for_redirect_ x, atr  # :#this is why we didn't freeze
+        def mutate_for_redirect_ x, asc  # :#this-1 is why we didn't freeze
           @_argument_scanner = Argument_scanner_via_value[ x ]
-          @_formal_attribute = atr ; nil
+          @_association = asc ; nil
         end
 
         alias_method :calculate, :instance_exec
 
         def accept_attribute_value x
-          @_parse.entity.instance_variable_set @_formal_attribute.as_ivar, x
+          @_normalization.entity.instance_variable_set @_association.as_ivar, x
           NIL_
         end
 
         def argument_scanner
-          @_argument_scanner || @_parse.argument_scanner
+          @_argument_scanner || @_normalization.argument_scanner
         end
 
-        def formal_attribute
-          @_formal_attribute
+        def current_association
+          @_association
         end
 
-        def index
-          @_parse.index
+        def association_index
+          @_normalization.association_index
         end
 
         def entity
-          @_parse.entity
+          @_normalization.entity
         end
       end
 

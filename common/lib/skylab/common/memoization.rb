@@ -116,6 +116,8 @@ module Skylab::Common
       end
 
       include Home_.lib_.fields::Attributes::Actor::InstanceMethods
+        # here's an example of a performer that uses the above i.m module
+        # but does not define an ATTRIBUTES structure. :[#007.1]
 
     private
 

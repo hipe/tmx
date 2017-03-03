@@ -124,8 +124,14 @@
 [#009]       #tracking-tag advanced semantic reflection -
                `significant_unhandled_event_stream_names`
                #parent: 014
+
 [#008]       #tracking-tag this option scanner
-[#007] #open #tracking-tag this new way to do boxxy event factories
+
+[#007]       ( small and/or internal )
+
+             [#here.1] a spot referenced by [fi]
+             ( #was: #tracking-tag this new way to do boxxy event factories (no references) )
+
 [#006]       #parent-node: [#003] selective event listeners via methods
              ( was: #event-marker: asssuming event shape/utility is a smell )
 [#005]       track all (usually legacy) event class [generator] transplants

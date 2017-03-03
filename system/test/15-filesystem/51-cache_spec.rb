@@ -10,6 +10,7 @@ module Skylab::System::TestSupport
     TS_[ self ]
 
     it "loads" do
+      # #lends-coverage to [#fi-008.8]
       _subject_module
     end
 

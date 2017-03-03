@@ -82,6 +82,10 @@ module Skylab::Fields::TestSupport
       MY_ALL_PURPOSE_EXPRESSION_AGENT___
     end
 
+    def this_false_or_nil_
+      nil  # :[#007.E] a false became nil but it might change back
+    end
+
     def debug!
       @do_debug = true
     end

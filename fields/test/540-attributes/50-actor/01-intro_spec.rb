@@ -42,7 +42,7 @@ module Skylab::Fields::TestSupport
         @session_.foo.should eql :F
       end
 
-      it "right writes" do
+      it "right writes" do  # #spot-1-6
         _given :_right_class
         new_with_ :foo, :F
         @session_.foo.should eql :F

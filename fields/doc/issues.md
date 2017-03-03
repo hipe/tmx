@@ -80,12 +80,14 @@
 [#012]       now the "normal normalization" algorithm (and its variants)..
 
              (from the original [sl] description:)
+
              this tag tracks code instances of the general algorithm
              (and variant algorithms towards the same end) of
              implementing behavior that implements the validation &
              normalization of actual
              { arguments | attributes | parameters | properties };
              #normalization #algorithm
+             more on the above at "unified language" [#012.appendix-A]
 
              ( #was: #done redesign this `with_client` nonsense )
 
@@ -95,11 +97,19 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
-             [#here.6], [#here.7] borrow
+             [#here.6], [#here.7], [#here.8], [#here.9] borrow
              [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.A] #in-situ [ the absorber method maker ]
 
 [#007]       small internal placeholders/notes (mostly)
+
+       #track :[#here.E]: when `false` became `nil`
+
+       #wish :[#here.D]: make configurable the assumption about the
+                         "parameter arity" of associations. currently
+                         `required` is assumed
+
+       #open :[#here.C]: defaults can now fail a requiredness check
 
              :[#here.B]: we need a proper placeholder for "attribues actor"
 

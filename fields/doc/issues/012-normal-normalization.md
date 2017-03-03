@@ -12,7 +12,17 @@ of such an approach (of any of the documents in our universe).
 
 
 
-## introduction: cost-benefit analysis of RISC
+## document-meta
+
+  - #here-4 is the freshest, in battle with #here-3
+  - #here-3 is old but still good
+  - #here-2 is also old
+  - #here-1 is the oldest, being kept for posterity for now
+
+
+
+
+## introduction: cost-benefit analysis of RISC :#here-4
 
 a sufficiently broad implementation of "normalization" can
 accomplish "defaulting" and "requiredness" too, which would
@@ -120,9 +130,9 @@ it's also useful to allow a defaulting function to be able to draw on
 resources of trivial complexity. for example, we have modeled (in at
 least 3 separate applications) a parameter that takes as an argument a
 width of a terminal screen in columns. in these cases it's often valuable
-to use to have this width default to the width in columns of the current
-terminal, but to achieve this requires a call to an `ncurses` function,
-a remote facility that is in no way reliable (for its reasons).
+to us to have this width default to the width in columns of the current
+terminal. however, to accompish this requires a call to an `ncurses`
+function, a remote facility that is in no way reliable (for its reasons).
 
 if this requirement is to be accepted (which so far it is), it has these
 corollaries:
@@ -154,6 +164,14 @@ but it would only be noise to the end user. (but we reserve the right
 to change our minds on this point. scratch that, it should be up to the
 application developer; yet another reason why it would be useful to allow
 the defaulting proc to "reach" the primordial operation.))
+
+  - a further point we would make (somewhat apropos of nothing)
+    is that while ad-hoc normalizations are used for "incoming" data
+    and so can be "modality sensitive" (perhaps indiscernably from
+    unseriazliation/unmarshalling); defaulting should not generally
+    produce "encoded" valued (because it's counter-intuitive, subjectively)
+    and as such values produce by defaulting procs must not be run
+    thorugh normalization :[#here.E.2].
 
 
 
@@ -277,7 +295,7 @@ like an API scanner),..)
 
 more broadly about #masking, it bears mentioning that such a requirement
 may or may not put strain on what we build here; for now we're punting on
-that as being out of scope. but it's possible that the the implementation
+that as being out of scope. but it's possible that the implementation
 of masking would filter formal attributes through some mapper that would
 produce formal attribues appropriate for the remote modality, which would
 allow the subject facility to remain blissfully ignorant of all of this.
@@ -721,7 +739,9 @@ the central requirement for our "entity-killer" phase of development
 
 
 
-## appendix A: aggreeing on terms
+## appendix A: aggreeing on terms :[#here.appendix-A]
+
+(this is bascially a "unified language".)
 
 depending on whom you ask and what you are doing, any and all of these
 terms may be confused:
@@ -841,7 +861,7 @@ rest except to say:
 
 #=== OLDER: (needs EDIT)
 
-## work in progress preface
+## work in progress preface  :#here-3
 
 at the moment we are in the middle of a long cluster of work that will
 try to unify all algorithms under this family strain to here. this
@@ -851,53 +871,100 @@ assimliate [#ac-028]  (and our node assimilate it).
 
 
 
-## temporary scratch space
 
-formal attribute sets can have formal attributes that define default
-values. also they can have formal attributes that somehow express their
-"requiredness" (refered to formally as "parameter arity"). here we
-explain what these classification mean and how they are related.
+## the development of a simpler grammar space  :[#here.F]
+
+the simpler grammar space that we present here is one that we would like
+to assimliate into the broader "one ring" algorithm that occuplies the
+bulk of this document.
+
+however, for reasons we will explore throughout we may have to postpone
+or suspend such an effort. some such reasons:
+
+  - historical - it's a thick algo and it's just easier to keep it separate
+
+  - some of the novel reductions we propose below may have their own
+    experimental merit.
+
+so whether we can or should ultimately assimilate this into the "one ring"
+facility is an open question we explore as we write this.
+
+what we refer to colloquially as "formal attributes" is formally a
+list of [#037.A] associations. (we may use these two terms somewhat
+interchangably, perferring one over the other mostly for idiomatic
+and/or historic reasons, as explored at [#here.appendix-A].)
+
+for our purposes here, these associations express (somehow) their
+"required-ness" (formally "parameter arity") and maybe they express
+default values. here we explain what these classification mean and how
+they are related.
 
 implementing "requiredness" involves chosing some point in time as a
-"normalization point" and at that point determining (by some criteria)
-which of the required formal attributes have no corresponding actual
-value in the "attribute store" (or "entity" if you like).
+"normalization point" and at that point (by some criteria) deriving a
+reduced set of those associations that are required but have no
+corresponding actual value in the "value store" (colloquially "entity").
 
-similarly implementing defaulting involving chosing some point in time
-as a "normalization point" at at that time iterating through the formal
-attributes with defaults and by some criteria deciding whether to set
+similarly, implementing defaulting involving chosing some point in time
+as *its* "normalization point" at at that time iterating through the
+associations with defaults and by some criteria deciding whether to set
 the default value in the attribute store.
 
 (we reference these points in time as :[#here.A].)
 
+(it's worth mentioning now that the "one ring" algorithm has a different
+wa of doing this EDIT)
+
 keep this in mind as we present the below points, because we'll come
 back to it. for this latest treatment, we propose that:
 
-(EDIT: still good but need to accomodate flip/flip)
+  - every association is either required or optional (i.e this
+    meta-association is universal, binary, and mutually exclusive.)
 
-  • every formal attribute is either required or optional.
+  - currently this meta-grammar supports only an `optional` flag
+    and there is no `required` flag; so any association that is not
+    explicitly or (as described below) implicitly defined as `optional` is
+    `required`.  (the desire to make this configurable to be the other
+    way is tracked with #wish :[#007.D].)
 
-  • our syntax supports only an `optional` flag (not a `required`
-    flag).
+  - parenthetically we must explain now that our "one ring" conception of
+    normalization allows for the real possibility that defaulting can fail.
+    (this specific provision and the broader point made here are both
+    explored further at [#here.E].) without this provision, it would seem
+    meaningless to model an association as both being required and having
+    a default (because if it has a default, it's not really required, is
+    it?); but given this provision it then becomes meaningful to express an
+    association that is both required and has a defaulting proc, because a
+    required association that has a defaulting proc that fails should fail
+    the whole invocation whereas an optional association whose defaulting
+    proc fails should not. HOWEVER, it may be the case that [#007.B]
+    attributes actors are so simple that they DO follow the more simple
+    meta-grammar explained here. #open [#007.C] tracks this tension.
 
-  • to define a default for an attribute implies that the attribute is
-    optional. (i.e all attributes with defaults are optional.)
-
-  • it is therefor redundant to define an attribute as `optional` and
+  - so IFF we accept the simpler provision of above, it is then redundant
+    to define an association as `optional` and
     to define a default for it. we will make it a syntax error to do so,
-    to enforce consistency in user definitions. (:#here)
+    to enforce consistency in user definitions. :[#here.F.1]
 
-  • insomuch as we "nilify" optionals, THEN defining an attribute as
+  - to the extent to which we want to and do "nilify" optionals (which,
+    currently we do and do); THEN defining an association as
     `optional` is equivalent to defining that it has a default of `nil`.
 
-  • we may then forbid a default of `nil` for this same reason
-    (insomuch as we "nililfy" optionals.) (:#here-2)
+  - IFF the above provision is in place, we can then simplify things by
+    forbidding the use of `nil` as a default. (for such cases you must
+    use the `optional` flag instead.) :[#here.F.2]
 
-  • IF every formal fits into one of the three categories:
-      * required,
-      * explicitly "defaultant" because the defaulting is defined -or-
-      * implicitly defaultant because it is `optional`;
-    THEN every formal is either required or effectively defaultant (:#here-3).
+  - THEN FINALLY, IFF every association falls into one of these 3 *categories*:
+
+      - required,
+      - explicitly "defaultant" because there's a default value -or-
+      - implicitly defaultant because it's `optional`;
+
+    THEN every formal is either required or effectively defaultant. :[#here.F.3]
+    we may describe "effictively defaultants" as begin "non-requireds"
+    (perhaps because it's more self-documenting) but these are the same.
+
+
+
 
 as suggested but not synthesized above, formal attribute sets that
 involve defaulting and/or requiredness are ones that need this
@@ -925,7 +992,7 @@ if a formal indicates that it is `optional`, these things should happen:
   • the "parameter arity" should be changed from the default of `one`
     (required) to `zero_or_one` (optional).
 
-  • pursuant to the above point #here that explains how these things
+  • pursuant to the above point [#here.F.1] that explains how these things
     should be mutually exclusive, this act should "lock out" (in terms
     of the state of the formal attribute as it is being defined) further
     attempts to give it a default (or repeat the designation of `optional`).
@@ -945,7 +1012,7 @@ forms we should probaly support), these things should happen:
       + its representation should express (on demand) what the default
         value is.
 
-  • just for #here-2, we may signal a syntax error if the default is
+  • just for [#here.F.2], we may signal a syntax error if the default is
     defined by value and that value is `nil`.
 
   • like above, this act should "lock out" subsequent attempts either to
@@ -965,7 +1032,7 @@ determined entirely by how The Normal Normalization will be performed.
 before and during :"The Pass":
 
   • every formal attribute is either required or is effectively
-    "defaultant" per #here-3.
+    "defaultant" per [#here.F].
 
   • once a formal attribute is *done* being defined, you know if it
     is "defaultant". (either the `optional` flag was used or a default
@@ -984,7 +1051,10 @@ the normal normalization will be described inline.
 
 
 
-## (previous) introduction
+## (previous) introduction  # :#here-2
+
+(NOTE: this shares the same shortcoming of its predecessor, that it
+doesn't honor [#here.E.2].)
 
 the big experimental frontier theory at play during the creation of this
 document (as its own node) was in the formulation of this question: how
@@ -1054,7 +1124,12 @@ its own dedicated code.
 
 
 
-## (original in-line comment, here for posterity):
+## original in-line comment, here for posterity :#here-1
+
+(NOTE although the "one ring" algorithm shares obvious DNA with the
+below primordial snippet, the below algorithm is at odds with our
+latest version of it in regards to [#here.E.2] whether default values
+are run through ad-noc normalizers.)
 
 near [#!006] we aggregate three of the above concerns into this one
 normalization hook because a) all but one of the concerns has pre-

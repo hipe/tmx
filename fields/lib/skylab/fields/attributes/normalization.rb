@@ -885,8 +885,8 @@ module Skylab::Fields
           @_box = bx
         end
 
-        def knows atr
-          @_box.has_key atr.name_symbol
+        def knows asc
+          @_box.has_key asc.name_symbol
         end
 
         def dereference asc

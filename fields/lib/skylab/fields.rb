@@ -103,6 +103,7 @@ module Skylab::Fields
       @attribute_class = nil
       @_h = h
       @meta_attributes = nil
+      # (can't freeze because #here-1)
     end
 
     # --
@@ -126,27 +127,45 @@ module Skylab::Fields
 
     # --
 
-    def init sess, x_a, & x_p
+    def init ent, a, & p  # :[#008.8]: #borrow-coverage from [sy]
 
-      o = begin_parse_and_normalize_for sess, & x_p
-      o.sexp = x_a
-      o.execute_as_init_
+      _NORMALIZE_USING_FACILITY_I_BY do |o|
+
+        o.argument_array = a
+        o.entity = ent
+        o.will_execute_as_init_
+        o.listener = p
+      end
     end
 
-    def init_via_argument_scanner sess, scn, & x_p  # [hu] 4x
+    def init_via_argument_scanner ent, scn, & p  # #covered, [hu] 4x)
 
-      o = begin_parse_and_normalize_for sess, & x_p
-      o.argument_scanner = scn
-      o.execute_as_init_
+      _NORMALIZE_USING_FACILITY_I_BY do |o|
+
+        o.argument_scanner = scn
+        o.entity = ent
+        o.will_execute_as_init_
+        o.listener = p
+      end
     end
 
-    def normalize_session sess, & x_p
-      _ = begin_parse_and_normalize_for sess, & x_p
-      _.execute
+    def normalize_entity ent, & p  # #covered
+
+      _NORMALIZE_USING_FACILITY_I_BY do |o|
+        o.entity = ent
+        o.listener = p
+      end
     end
 
-    def begin_parse_and_normalize_for sess, & x_p  # [hu]
-      _index.begin_parse_and_normalize_for__ sess, & x_p
+    def _NORMALIZE_USING_FACILITY_I_BY
+
+      _ = _index
+
+      _wee = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+        yield o
+        o.association_index = _
+      end
+      _wee  # hi. #todo
     end
 
     def AS_ATTRIBUTES_NORMALIZE_BY & p
@@ -185,7 +204,7 @@ module Skylab::Fields
       _index.read_association_ k
     end
 
-    def _index  # and #here too
+    def _index  # #here-1
       @___index ||= ___build_index
     end
 
@@ -336,17 +355,42 @@ module Skylab::Fields
           end
         end
 
-        def process_argument_scanner_passively scn, & x_p
+        def process_argument_scanner_passively scn, & p
 
           cls = self.class
           if cls.const_defined? :ATTRIBUTES, false
-            _atrs = cls.const_get :ATTRIBUTES
+            ascs = cls.const_get :ATTRIBUTES
+            if ascs
+              _ascs_idx = ascs.index_
+            end
           end
 
-          Here_::AssociationIndex_::Process_argument_scanner_passively.call(
-            scn, self, _atrs,
-            argument_parsing_writer_method_name_passive_lookup_proc,
-            & x_p )
+          # not all entities that employ the subject i.m module define
+          # an `ATTRIBUTES` const. ([#co-007.1] is one example.)
+
+          # entities can say they are an attributes actor but not
+          # define an associations. (#spot-1-6 is one example)
+
+          meths = argument_parsing_writer_method_name_passive_lookup_proc
+          _lookup_association_softly = -> k do
+            m = meths[ k ]
+            m and Attributes::AssociationIndex_::MethodBasedAssociation.new m
+          end
+
+          instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
+
+          x = Here_::AssociationIndex_::FACILITY_I.call_by do |o|
+            o.argument_scanner = scn
+            o.push_looup_association_softly_by__( & _lookup_association_softly )
+            o.association_index = _ascs_idx
+            o.entity = self  # for #spot-1-5, some association interpreters need to write directly
+            o.will_parse_passively__
+            o.listener = p
+          end
+
+          remove_instance_variable ARGUMENT_SCANNER_IVAR_
+
+          x  # entity or KEEP_PARSING_ or UNABLE_
         end
 
         def gets_one  # #public-API #hook-in
@@ -707,6 +751,12 @@ module Skylab::Fields
     zero_or_more: true,
     one_or_more: true,
   }
+
+  # --
+
+  Scanner_ = -> a do  # #todo with [sa] etc
+    Common_::Scanner.via_array a
+  end
 
   # --
 

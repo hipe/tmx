@@ -25,12 +25,12 @@ module Skylab::Fields
       end
 
       def _init_by_one x
-        self.formal_attribute = x
+        self.association = x
       end
 
       attr_writer(
+        :association,
         :attribute_lemma_symbol,
-        :formal_attribute,
         :modifier_word_list,
         :THIS_ONE_METHOD,
       )
@@ -39,7 +39,7 @@ module Skylab::Fields
 
         _m = @THIS_ONE_METHOD or self._SANITY
 
-        _guy = [ :for_expag, _m, @formal_attribute ]
+        _guy = [ :for_expag, _m, @association ]
 
         [ :predicateish,  # as demonstrated in test [#hu-053]
           :lemma, :be,
@@ -138,11 +138,6 @@ module Skylab::Fields
     end
 
     # ==
-
-    Scanner_ = -> a do
-      Common_::Scanner.via_array a
-    end
-
     # ==
   end
 end

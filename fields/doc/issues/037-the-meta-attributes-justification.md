@@ -17,6 +17,32 @@ properties.
 
 
 
+## (stub) :[#here.A]
+
+our "association theory" in brief:
+
+  - a "model" is (largely) a list of associations
+
+  - an association:
+
+    - can have any arbitrary business characteristics
+
+    - must have at least a name symbol
+
+    - typically has values for the "meta-associations" we offer here
+
+  - one broad cateogory of "meta-association" is "requiredness"
+    (formally "parameter arity").
+
+  - another broad category of "meta-association" is what we call
+    "argument arity".
+
+these are all different labels for more-or-less the same thing (EDIT where's that list?)
+
+
+
+
+
 ## deeper
 
 a "meta-property" is simply a formal property whose purpose is to modify

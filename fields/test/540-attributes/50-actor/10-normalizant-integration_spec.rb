@@ -47,7 +47,7 @@ module Skylab::Fields::TestSupport
         end
 
         it "fails (`with` results in false)" do
-          false == state_.result or fail  # ..
+          this_false_or_nil_ == state_.result || fail  # ..
         end
 
         it "expresses" do

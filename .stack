@@ -74,6 +74,7 @@ OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
 (-18.400: completion of phase 3: assimilated all)
 (remove _MANIFEST_.list)
+(there are many "hi. ##{}todo"-type lines)
 (rename all remaining `Facility_X` to appropriate names)
 (-18.403 )
 (-18.410 )
@@ -81,4 +82,4 @@ OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
 (-18.423 )
 (-18.430 )
 (-18.437 )
-(-18.443 )
+(-18.443 [fi] see what it's like to ASSIMILATE facility "I" )

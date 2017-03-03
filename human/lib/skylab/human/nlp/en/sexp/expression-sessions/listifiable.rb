@@ -12,9 +12,9 @@ module Skylab::Human
 
       class << self
 
-        def interpret_component st, asc
+        def interpret_component scn, asc
 
-          x = st.gets_one
+          x = scn.gets_one
 
           o = new asc
           if x.respond_to? :ascii_only?

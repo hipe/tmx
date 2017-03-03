@@ -74,8 +74,8 @@ module Skylab::Fields
           m = :"__#{ atr.name_symbol }__component_association"
 
           -> do
-            _c = entity.send m  # no yield for now - if you need it, use [ac]
-            _c.interpret_component argument_scanner, formal_attribute
+            _ca = entity.send m  # no yield for now - if you need it, use [ac]
+            _ca.interpret_component argument_scanner, current_association
           end
         end
       end
@@ -203,7 +203,7 @@ module Skylab::Fields
             # "flag of" must have the *full* pipeline of the referrant -
             # read *and* write.
 
-            asc = index.read_association_ sym
+            asc = association_index.read_association_ sym
             mutate_for_redirect_ x, asc
             asc.read_and_write_ self  # result is kp
           end
@@ -300,7 +300,7 @@ module Skylab::Fields
         ca.writer_by_ do |_atr|
 
           -> x, _oes_p do
-            asc = index.read_association_ sym
+            asc = association_index.read_association_ sym
             mutate_for_redirect_ x, asc
             asc.read_and_write_ self  # result is kp
           end
