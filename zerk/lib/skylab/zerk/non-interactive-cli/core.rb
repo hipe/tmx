@@ -390,6 +390,8 @@ module Skylab::Zerk
 
     def when_via_argument_parser_missing__ ev
 
+      # (the below is tracked by [#fi-037.5.K])
+
       _moniker = Remote_CLI_lib_[]::Syntax_Assembly.
         render_as_argument_uninflected_for_arity ev.property
 

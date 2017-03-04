@@ -554,6 +554,9 @@ module NoDependenciesZerk
     # = modality-agnostic life
 
     Check_requireds = -> o, ivars, & p do
+
+      # (this oft-repeated logic is tagged by :[#fi-037.5.B].)
+
       when_missing = nil
       missing = nil
       main = -> do

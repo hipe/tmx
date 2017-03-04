@@ -2,7 +2,10 @@ module Skylab::Zerk
 
   class Magnetics::FormalParameters_via_MethodParameters < ::Class.new  # see [#022.4]
 
+    # (this normalization facility is tracked with :[#fi-037.5.E].)
+
       # (this is similar to but more specialized than [#br-057])
+
 
       Models_ = ::Module.new
 

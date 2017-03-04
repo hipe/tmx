@@ -1,8 +1,8 @@
 module Skylab::Basic
 
-  # ->
+  class Proxy::Makers::Functional < ::BasicObject
 
-    class Proxy::Makers::Functional < ::BasicObject
+    # ->
 
       # make a 'fuctional' proxy class with a list of member names:
       #
@@ -52,140 +52,161 @@ module Skylab::Basic
         end
 
         def make_ a, & p
-          Make___[ a, p, self ]
+          ProxyClass_via___.new( a, p, self ).execute
         end
       end  # >>
 
-      class Make___
+      # ==
 
-        Attributes_actor_.call( self,
-          :i_a,
-          :p,
-          :base_class,
+      class ProxyClass_via___
+
+        def initialize sym_a, p, cls
+          @base_class = cls
+          @proc = p
+          @member_symbols = sym_a
+        end
+
+        def execute
+
+          cls = ::Class.new @base_class
+
+          bx = __member_box
+
+          cls.const_set MEMBER_BOX_CONST_, bx
+
+          cls.send :define_method, :__functional_proxy_association_box__ do
+            bx
+          end
+
+          cls.class_exec do
+            bx.a_.each do |sym|
+              define_method sym do |*a, &p|
+                @__proxy_implementaton__.__receive_call_ p, a, sym
+              end
+            end
+          end
+
+          if @proc
+            cls.class_exec( & @proc )
+          end
+          cls
+        end
+
+        def __member_box
+
+          bx = Common_::Box.new
+
+          _use_member_symbols = [ * @base_class.const_get( MEMBER_BOX_CONST_ ).a_, * @member_symbols ]
+
+          _use_member_symbols.each do |sym|
+            bx.add sym, sym
+          end
+
+          bx.freeze
+        end
+      end
+
+      # ==
+
+      MEMBER_BOX_CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
+
+      const_set MEMBER_BOX_CONST_, Common_::Box.the_empty_box
+
+      def initialize * x_a
+
+        @__proxy_implementaton__ = ProxyImplementation_via_.call_by do |o|
+          o.argument_array = x_a
+          o.association_box = __functional_proxy_association_box__
+        end
+      end
+
+      # ==
+
+      class ProxyImplementation_via_ < Common_::MagneticBySimpleModel
+
+        def argument_value_array= p_a
+
+          @_pair_stream = Common_::Stream.via_times p_a.length do |d|
+            Common_::Pair.via_value_and_name(
+              p_a.fetch( d ),
+              @association_box.at_offset( d ) )
+          end
+          p_a
+        end
+
+        def argument_array= x_a
+          @_pair_stream = Proxy__PairStream_via_ArgumentArray_[ x_a ]
+          x_a
+        end
+
+        attr_writer(
+          :association_box,
         )
 
         def execute
-          begin_class
-          resolve_box
-          finish_class
-          @p and @class.class_exec( & @p )
-          @class
+          ProxyImplementation___.new __proc_hash
         end
 
-      private
+        def __proc_hash
 
-        def begin_class
-          @class = ::Class.new @base_class
-          NIL_
-        end
+          # (what we do below with using a [#061] "diminishing pool" to
+          # assert that there are no missing requireds, this is a
+          # microscopic sub-slice of the [#fi-012.3] "one ring" algorithm,
+          # namely, using a [#061] "diminishing pool" to assert that there
+          # are no missing requireds. our requirements are a small enough
+          # sub-slice of what happens there that we opt against incurring a
+          # a dependency on [fi]. this logic is tracked with [#fi-037.5.D].)
 
-        def resolve_box
-          resolve_members
-          @box = Common_::Box.new
-          @member_i_a.each do |i|
-            @box.add i, i
+          proc_hash = {}
+
+          bx = @association_box
+          h = bx.h_
+
+          dim_pool = ::Hash[ bx.a_.map { |sym| [ sym, nil ] } ]
+
+          st = remove_instance_variable :@_pair_stream
+          begin
+            pair = st.gets
+            pair || break
+
+            k = pair.name_symbol
+
+            proc_hash[ h.fetch k ] = pair.value_x
+
+            dim_pool.delete k
+            redo
+          end while above
+
+          if dim_pool.length.nonzero?
+            __when_missing dim_pool.keys
           end
-          nil
+
+          proc_hash
         end
 
-        def resolve_members
-          @member_i_a = [ * @base_class.const_get( CONST_ ).a_, * @i_a ]
-          nil
-        end
-
-        def finish_class
-          _BOX = @box
-          @class.const_set CONST_, _BOX
-          @class.send :define_method, :__functional_proxy_property_box__ do
-            _BOX
-          end
-          @box.a_.each do | sym |
-            @class.send :define_method, sym do | * a, & p |
-              @__proxy_kernel__.method_proc( sym )[ * a, & p ]
-            end
-          end
-          NIL_
+        def __when_missing keys
+          _say = "missing required proxy function definition(s): (#{ keys * ', ' })"
+          raise Home_::ArgumentError, _say
         end
       end
 
-      CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
+      # ==
 
-      const_set CONST_, Common_::Box.the_empty_box
+      class ProxyImplementation___
 
-      def initialize * x_a
-        @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
-        @__proxy_kernel__.process_iambic_fully x_a
-      end
-
-      class Kernel_
-
-        def initialize box
-          @box = box
-          @p_h = {}
+        def initialize h
+          @__proc_hash = h
         end
 
-        def process_iambic_fully x_a
-          begin_process
-          __init_pair_stream_via_iambic x_a
-          finish_process
-        end
-
-        def process_arglist_fully p_a
-          begin_process
-          __init_pair_stream_via_arglist p_a
-          finish_process
-        end
-
-        def method_proc i
-          @p_h.fetch i
-        end
-
-      private
-
-        def begin_process
-          @missing_h = ::Hash[ @box.a_.map { |i| [ i, nil ] } ] ; nil
-        end
-
-        def __init_pair_stream_via_iambic x_a
-          @_pair_stream = Try_convert_iambic_to_pair_stream_[ x_a ]
-          NIL_
-        end
-
-        def __init_pair_stream_via_arglist p_a
-
-          @_pair_stream = Common_::Stream.via_times p_a.length do | d |
-
-            Common_::Pair.via_value_and_name(
-              p_a.fetch( d ),
-              @box.at_offset( d ) )
-          end
-          NIL_
-        end
-
-        def finish_process
-
-          @_pair_stream.each do | pair |
-
-            sym = pair.name_symbol
-
-            @p_h[ @box.fetch sym ] = pair.value_x
-
-            @missing_h.delete sym
-          end
-
-          if @missing_h.length.nonzero?
-            when_missing @missing_h.keys
-          end
-        end
-
-        def when_missing i_a
-          ::Kernel.raise Home_::ArgumentError, say_missing( i_a )
-        end
-
-        def say_missing i_a
-          "missing required proxy function definition(s): (#{ i_a * ', ' })"
+        def __receive_call_ p, a, m
+          @__proc_hash.fetch( m )[ * a, & p ]
         end
       end
-    end
-  # <-
+
+      # ==
+      # ==
+
+    # -
+  end
 end
+# #tombstone-A: modernized

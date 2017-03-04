@@ -14,15 +14,15 @@ of such an approach (of any of the documents in our universe).
 
 ## document-meta
 
-  - #here-4 is the freshest, in battle with #here-3
-  - #here-3 is old but still good
+  - [#here.3] is the freshest, in battle with [#here.F]
+  - [#here.F] is old but still good
   - #here-2 is also old
   - #here-1 is the oldest, being kept for posterity for now
 
 
 
 
-## introduction: cost-benefit analysis of RISC :#here-4
+## introduction: cost-benefit analysis of RISC :[#here.3]
 
 a sufficiently broad implementation of "normalization" can
 accomplish "defaulting" and "requiredness" too, which would
@@ -49,7 +49,7 @@ but in the case of default values, at least, this approach can
 lead to a leaky abstraction (i.e a lossy translation): consider
 the techinque of injecting default values programmatically into
 generated documentation. to accomplish this under the "everything
-is a normalization" rubric would be clunky at best. :[#here.C]
+is a normalization" rubric would be clunky at best. :[#here.3.2]
 
 throughout this document we explore pitfalls like these that can stem
 from this "over-munging" approach. we do so specifically across the
@@ -862,7 +862,7 @@ rest except to say:
 
 #=== OLDER: (needs EDIT)
 
-## work in progress preface  :#here-3
+## work in progress preface
 
 at the moment we are in the middle of a long cluster of work that will
 try to unify all algorithms under this family strain to here. this

@@ -109,10 +109,13 @@
              :[#here.D.1]: jusitifies why we keep "ad-hoc normalizer" as a
              simple proc and not for example a mutable, ordered set ("box").
 
-             :[#here.C]: offers a counter-argument against "over-munging",
+             :[#here.3.2]: offers a counter-argument against "over-munging",
              that is, the idea that defaulting and required-ness are just
              specialized forms of "ad-hoc normalization", and so should be
              represented that way.
+
+             :[#here.3]: is the start of the "one ring" algorithm (just
+             discussion around it, really)
 
              :[#here.B]: in a model definition where every association is
              required (and ergo (in the old logic) none are defaultant),

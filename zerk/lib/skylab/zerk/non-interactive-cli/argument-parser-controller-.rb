@@ -6,6 +6,8 @@ module Skylab::Zerk
 
       def initialize oi  # assume nonzero length arguments
 
+        # (the below is why we have an entry in [#fi-037.5.M])
+
         @_n11n = Remote_CLI_lib_[]::Arguments::Normalization.
           via_properties oi.arguments_
 

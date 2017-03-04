@@ -552,6 +552,7 @@ module Skylab::Fields
         Check_for_missing_requireds___ = -> entity do
 
           # (#tombstone-A: we used to do the below manually)
+          # (when we did, this normalization facility was tracked with :[#037.5.D2].)
 
           _asc_st = entity.class.properties.to_value_stream
 

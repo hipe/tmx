@@ -22,9 +22,9 @@ module Skylab::Basic
 
             cls.send :define_singleton_method, :new do | * x_a |
 
-              pair_stream = Try_convert_iambic_to_pair_stream_[ x_a ]
+              pair_stream = Proxy__PairStream_via_ArgumentArray_[ x_a ]
 
-              bx = const_get CONST_
+              bx = const_get MEMBER_BOX_CONST_
 
               arglist = ::Array.new bx.length
 
@@ -52,12 +52,14 @@ module Skylab::Basic
         end  # >>
 
         def initialize * p_a
-          @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
-          @__proxy_kernel__.process_arglist_fully p_a
+          @__proxy_implementation__ = ProxyImplementation_via_.call_by do |o|
+            o.argument_value_array = p_a
+            o.association_box = __functional_proxy_association_box__
+          end
         end
 
         def inspect
-          _a = self.class.const_get( CONST_ ).a_
+          _a = self.class.const_get( MEMBER_BOX_CONST_ ).a_
           "#<#{ self.class.name } #{ _a * ', ' }>"
         end
       end

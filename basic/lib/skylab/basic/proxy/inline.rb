@@ -23,7 +23,7 @@ module Skylab::Basic
 
       def initialize * x_a, & convenience_p
 
-        pair_st = Try_convert_iambic_to_pair_stream_[ x_a ]
+        pair_st = Proxy__PairStream_via_ArgumentArray_[ x_a ]
 
         _I_A = []
 
