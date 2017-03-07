@@ -211,8 +211,9 @@ module Skylab::Fields
         def initialize
 
           @_execute = :__execute_ideally
+          @_mutex_only_one_special_instructions_for_result = nil
+          @__mutex_only_one_valid_value_store = nil
           @_receive_missing_required_MIXED_associations = :__receive_missing_required_MIXED_associations_simply
-          @_receive_special_instructions_for_result_once = nil
           @_result = :__result_normally
 
           @argument_scanner = nil
@@ -270,7 +271,7 @@ module Skylab::Fields
 
         def entity= ent
 
-          # REMINDER: do nothing magical or presumtive here. at #spot-1-6
+          # REMINDER: do nothing magical or presumptive here. at #spot-1-6
           # the toolkit wires an entity up to normalization "manually" so
           # we cannot (and should not) assume to know that the valid value
           # store is an entity thru the use of this method..
@@ -284,34 +285,34 @@ module Skylab::Fields
           @entity = ent
         end
 
-        def ivar_store= ent
-
-          # this needs to merge with the other (and the others) #here-5
-
-          # meh 2x:
-
-          self.read_by = -> k do  # necessary IFF :#here-7
-            ivar = :"@#{ k }"
-            if ent.instance_variable_defined? ivar
-              ent.instance_variable_get ivar
-            end
-          end
-
-          self.write_by = -> k, x do
-            ent.instance_variable_set :"@#{ k }", x ; nil
-          end
-
-          ent
-        end
-
-        def read_by= p
-          @_read_current_value = :__read_current_value_using_proc
-          @read_by = p
+        def ivar_store= object
+          _receive_valid_value_store IvarBasedSimplifiedValidValueStore___.new object
+          object
         end
 
         def write_by= p
-          @_write_value = :__write_value_using_proc
-          @write_by = p
+          _receive_proc_for_proc_based_value_store :__receive_write_by_proc_, p
+          p
+        end
+
+        def read_by= p
+          _receive_proc_for_proc_based_value_store :__receive_read_by_proc_, p
+          p
+        end
+
+        def _receive_proc_for_proc_based_value_store m, p
+          @_PBSVS_in_progress ||= BuildProcBasedSimplifiedValidValueStore__.new
+          vvs = @_PBSVS_in_progress.__receive_ m, p
+          if vvs
+            remove_instance_variable :@_PBSVS_in_progress
+            _receive_valid_value_store vvs
+          end
+          p
+        end
+
+        def _receive_valid_value_store vvs
+          remove_instance_variable :@__mutex_only_one_valid_value_store
+          @_valid_value_store = vvs ; nil
         end
 
         # -- specify the behavior of the parse
@@ -321,13 +322,13 @@ module Skylab::Fields
         end
 
         def will_result_in_entity_on_success_
-          remove_instance_variable :@_receive_special_instructions_for_result_once
+          remove_instance_variable :@_mutex_only_one_special_instructions_for_result
           @_result = :__result_in_entity ; nil
         end
 
         def EXECUTE_BY= p
-          remove_instance_variable :@_receive_special_instructions_for_result_once
-          @_execute = :__execute_customly ; @__execute_by = p
+          remove_instance_variable :@_mutex_only_one_special_instructions_for_result
+          @_execute = :__execute_via_custom_proc ; @__execute_by = p
         end
 
         # -- specify the associations
@@ -426,10 +427,7 @@ module Skylab::Fields
 
           __init_association_stream
 
-          # (the assimilation of [#037.5.G] is what introduced the below
-          # branch, a decision we do not regret.)
-
-          if @argument_scanner
+          if @argument_scanner  # (assimilating [#037.5.G] is when this became a branch)
             __index_associations
             ok = __traverse_arguments
             ok &&= __traverse_associations_remaining_in_pool
@@ -480,7 +478,7 @@ module Skylab::Fields
           kp
         end
 
-        def __execute_customly
+        def __execute_via_custom_proc
 
           # this branch is a much more constrainted, beurocratic and
           # formalized means of doing what we used to do, which was plain
@@ -492,11 +490,7 @@ module Skylab::Fields
           _the_result  # hi. #todo
         end
 
-        # -- I
-
-        # (used to be emission of missings. moved to section E.5)
-
-        # -- H
+        # -- J: traversing the "extroverted" associations
 
         # when there are arguments to parse, the most intuitive, practical
         # (if not only) option is to acquire (somehow) a dictionary (hash)
@@ -638,19 +632,19 @@ module Skylab::Fields
           # the ramifications of this choice to this method.
 
           asc_st = remove_instance_variable :@association_stream
-          asc = asc_st.gets
-          if asc
+          first_asc = asc_st.gets
+          if first_asc
 
-            p = -> { p = asc_st ; asc }
+            p = -> { p = asc_st ; first_asc }
             this_asc_st = Common_.stream { p[] }
 
-            if asc.respond_to? :parameter_arity
               @_traverse_associations_all = :__traverse_associations_all_LEGACY_ENTITY_ALGORITHM
               @__native_association_stream = this_asc_st
+            if first_asc.respond_to? :parameter_arity
             else
               @_traverse_associations_all = :_traverse_associations_all_modernly
-              @_remaining_extroverted_stream = this_asc_st.reduce_by do |asc_|
-                _association_is_extroverted asc_  # hi.
+              @_remaining_extroverted_stream = this_asc_st.reduce_by do |asc|
+                _association_is_extroverted asc  # hi.
               end
             end
           else
@@ -742,7 +736,7 @@ module Skylab::Fields
 
         def __the_valid_value_store_already_has_an_existent_value
 
-          _x = @read_by[ _association_key ]
+          _x = _simplified_read_of_current_valid_value
           _qualifies_as_existent _x
         end
 
@@ -757,7 +751,7 @@ module Skylab::Fields
           end
         end
 
-        # -- G
+        # -- I: sending a sanitized value to the valid value store
 
         def _maybe_check_required_and_maybe_send
 
@@ -791,7 +785,7 @@ module Skylab::Fields
 
         def __send_this_when_glob x
 
-          a = send @_read_current_value
+          a = _simplified_read_of_current_valid_value
           if a
             a.concat x  # also [#008.2]
           else
@@ -801,17 +795,8 @@ module Skylab::Fields
         end
 
         def _write_value x
-          send @_write_value, x
+          @_valid_value_store._simplified_write_ x, _association_key
           NIL
-        end
-
-        def __write_value_using_proc x
-          @write_by[ _association_key, x ]
-          NIL
-        end
-
-        def __read_current_value_using_proc
-          @read_by[ _association_key ]
         end
 
         def _qualifies_as_existent x
@@ -825,7 +810,11 @@ module Skylab::Fields
           end
         end
 
-        # -- F ALTERNATIVE
+        def _simplified_read_of_current_valid_value
+          @_valid_value_store._simplified_read_ _association_key
+        end
+
+        # -- H alternative: for legacy
 
         def __value_normalizer_for_LEGACY_ENTITY_ALGORITHM
 
@@ -852,7 +841,7 @@ module Skylab::Fields
           end
         end
 
-        # -- F
+        # -- H: normalizing (sanitizing) the particular value
 
         def __resolve_sanitized_value_via_unsanitized_value
 
@@ -940,7 +929,7 @@ module Skylab::Fields
           end
         end
 
-        # -- E.5 (moved down here from I)
+        # -- G: missing requireds: memoing and expressssing them
 
         def __add_current_association_as_a_missing_required_asociation
 
@@ -1014,7 +1003,7 @@ module Skylab::Fields
           _ev  # hi. #todo
         end
 
-        # -- E
+        # -- F: checking for problem
 
         def __maybe_check_clobber
 
@@ -1029,7 +1018,7 @@ module Skylab::Fields
           end
         end
 
-        # -- D
+        # -- E: resolving an unsanitized value
 
         def __resolve_unsanitized_value_for_this_primary
           send @_resolve_unsanitized_value
@@ -1089,7 +1078,7 @@ module Skylab::Fields
           _unable
         end
 
-        # -- C
+        # -- D: matching the argument scanner head against an association
 
         def __match_argument_scanner_head_against_associations
 
@@ -1210,7 +1199,7 @@ module Skylab::Fields
           @_ok = false ; UNABLE_
         end
 
-        # -- B
+        # -- C: traversing arguments
 
         def __no_more_arguments
           send ( @_no_more_arguments ||= :__no_more_arguments_initially )
@@ -1233,7 +1222,7 @@ module Skylab::Fields
           end
         end
 
-        # -- A
+        # -- B: index associations
 
         def __index_associations
 
@@ -1310,7 +1299,7 @@ module Skylab::Fields
           TRUE
         end
 
-        # -- final result
+        # -- A: final result
 
         def __result_in_entity
           # the "proper" result for a parsing performer is T/F ("keep parsing")
@@ -1440,6 +1429,55 @@ module Skylab::Fields
         s_a.map do | s |
           p[ s ]
         end * SPACE_
+      end
+
+      # ==
+
+      class IvarBasedSimplifiedValidValueStore___  # ideal #here-5
+
+        def initialize object
+          @_object = object
+        end
+
+        def _simplified_write_ x, k  # necessary IFF :#here-7
+          @_object.instance_variable_set :"@#{ k }", x ; nil
+        end
+
+        def _simplified_read_ k
+          ivar = :"@#{ k }"
+          if @_object.instance_variable_defined? ivar
+            @_object.instance_variable_get ivar
+          end
+        end
+      end
+
+      # ==
+
+      class BuildProcBasedSimplifiedValidValueStore__
+
+        def initialize
+          @_pool = {
+            __receive_read_by_proc_: :"@__read_by",
+            __receive_write_by_proc_: :"@__write_by",
+          }
+        end
+
+        def __receive_ m, p
+          instance_variable_set @_pool.delete( m ), p
+          if @_pool.length.zero?
+            remove_instance_variable :@_pool
+            freeze
+          end
+        end
+
+        def _simplified_write_ x, k
+          @__write_by[ k, x ]
+          NIL
+        end
+
+        def _simplified_read_ k
+          @__read_by[ k ]
+        end
       end
 
       # ==
