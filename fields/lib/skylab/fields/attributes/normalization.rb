@@ -4,11 +4,12 @@ module Skylab::Fields
 
     module Normalization  # main algorithm in [#012], "one ring" in [#037]
 
-      # (NOTE at the moment this file/node has both the older (oldest)
-      # implemention of normalization used in "attributes actor" (2nd half)
-      # and the newest one for model-centric zerk microservices. they are
-      # near each other to encourage re-use, but the full realization of
-      # this dream is harder than it sounds..)
+      # NOTE while we slog through [#037], at the moment this file/node has:
+      #
+      #   - the "one ring" ("EK") preferred normalization facility
+      #   - a clump for injection of the oldschoool [br]-era normalization
+      #   - facility "C" which will be a challenge
+      #   - this dangling faciliity "I" which can go away whenever
 
       module FACILITY_I
         # (this used to be its own facility, and lived in "association index"
@@ -516,98 +517,51 @@ module Skylab::Fields
 
           __init_extroverted_associations_via_flush_diminishing_pool
 
-          _traverse_extroverted_and_with_each_sanitized_value do
+          @_maybe_send = :__this_maybe_send
 
-            # reset this flag to whatever is default (T/F) before each send
+          @_value_normalizer = :_modern_value_normalizer
 
-            @_do_advance_scanner_after_write = @_initial_value_for_do_advance
+          _traverse_extroverted
+        end
 
-            _maybe_check_required_and_maybe_send
-          end
+        def __this_maybe_send
+
+          # reset this flag to whatever is default (T/F) before each send
+
+          @_do_advance_scanner_after_write = @_initial_value_for_do_advance
+
+          _maybe_check_required_and_maybe_send
         end
 
         def __traverse_associations_all
 
-          __init_extroverted_associations_when_you_have_not_already_indexed
-
-          send @_traverse_associations_all
-        end
-
-        def __traverse_associations_all_LEGACY_ENTITY_ALGORITHM
-
-          # we used to think this was the bee's knees because of its use of
-          # knownnesses; but now it's deprecated and on its way out because
-          # of its flagrant disregard for [#012.5.3]: it normalizes values
-          # already in the "valid value store".  (really, it uses the
-          # "valid value store" not as such, but as just an unsanitized
-          # parameter store.) since this change in convention hasn't
-          # percolated out to all the clients, we've got to keep it around
-          # for now..
-
-          kp = true ; new_kn = nil ; native_asc = nil
-
-          write_value = -> do
-            @entity._write_via_association_ new_kn.value_x, native_asc
-          end
-
-          normalize_value = __value_normalizer_for_LEGACY_ENTITY_ALGORITHM
-
-          st = remove_instance_variable :@__native_association_stream
-          begin
-            native_asc = st.gets
-            native_asc || break
-
-            existing_kn = @entity._read_knownness_ native_asc
-            existing_kn || self._NEVER
-
-            new_kn = normalize_value[ existing_kn, native_asc ]
-            if ! new_kn
-              kp = new_kn ; break
-            end
-
-            if existing_kn.is_known_known
-              if new_kn.is_known_known
-                if existing_kn.object_id == new_kn.object_id
-                  NOTHING_  # #covered
-                else
-                  write_value[]
-                end
-              else
-                self._COVER_ME__became_unknown__
-              end
-            elsif new_kn.is_known_known
-              write_value[]
-            end
-            redo
-          end while above
-          kp
-        end
-
-        def _traverse_associations_all_modernly
-
           @_do_advance_scanner_after_write = false  # no scanner at all
 
-          _traverse_extroverted_and_with_each_sanitized_value do
+          __init_extroverted_associations_when_you_have_not_already_indexed
 
-            _maybe_check_required_and_maybe_send
-          end
+          @_maybe_send = :_maybe_check_required_and_maybe_send
+
+          _traverse_extroverted
+        end
+
+        def _traverse_extroverted
+
+          ok = true
+          p = send remove_instance_variable :@_value_normalizer
+          asc_st = remove_instance_variable :@_remaining_extroverted_stream
+          begin
+            mixed_asc = asc_st.gets
+            mixed_asc || break
+            ok = p[ mixed_asc ]
+            ok || break
+            redo
+          end while above
+          ok
         end
 
         def __init_extroverted_associations_via_flush_diminishing_pool
 
-          _keys = remove_instance_variable( :@_diminishing_pool ).keys
-
-          # although we have the option of checking for an empty array above
-          # (and it does occur), because it still "just works" as-is when
-          # the array is empty (and has relatively low overhead), the law of
-          # parsimony suggests that we don't weigh ourselves down with
-          # special code for this case.
-
-          # in an accidental or (don't) real world where a false-ish key is
-          # a valid association key (it's called `name_symbol`, so just don't)
-          # we wouldn't want that false-ish-ness to break our stream early so:
-
-          key_scn = Scanner_[ _keys ]
+          key_scn = Scanner_[ remove_instance_variable( :@_diminishing_pool ).keys ]
 
           @_remaining_extroverted_stream = Common_.stream do
             if ! key_scn.no_unparsed_exists
@@ -638,17 +592,20 @@ module Skylab::Fields
             p = -> { p = asc_st ; first_asc }
             this_asc_st = Common_.stream { p[] }
 
-              @_traverse_associations_all = :__traverse_associations_all_LEGACY_ENTITY_ALGORITHM
-              @__native_association_stream = this_asc_st
             if first_asc.respond_to? :parameter_arity
+
+              @_value_normalizer = :__LEGACY_ENTITY_ALGORITHM_value_normalizer
+              @_remaining_extroverted_stream = this_asc_st
+
             else
-              @_traverse_associations_all = :_traverse_associations_all_modernly
+
+              @_value_normalizer = :_modern_value_normalizer
               @_remaining_extroverted_stream = this_asc_st.reduce_by do |asc|
                 _association_is_extroverted asc  # hi.
               end
             end
           else
-            @_traverse_associations_all = :_traverse_associations_all_modernly
+            @_value_normalizer = :__nothing
             @_remaining_extroverted_stream = Common_::THE_EMPTY_STREAM
           end
           NIL
@@ -656,6 +613,14 @@ module Skylab::Fields
 
         def _association_is_extroverted asc  # :#here-11
           asc.is_required || asc.default_by || asc.normalize_by
+        end
+
+        def __LEGACY_ENTITY_ALGORITHM_value_normalizer
+
+          proto = LEGACY_ENTITY_ALGORITHM_ValueNormalizer___.new self
+          -> asc do
+            proto.invoke asc
+          end
         end
 
         # here we restate the pertinent points of our central algorithm
@@ -671,7 +636,7 @@ module Skylab::Fields
         # fail), then per [#012.E.2] we must assume this value is already
         # "normalized" and as such we must cicumvent any ad-hoc
         # normalization. so if we resolved a default (which could possibly
-        # be `nil`), fall through to the send.
+        # be `nil`), write this value.
 
         # if you got this far,
         #
@@ -692,42 +657,40 @@ module Skylab::Fields
         # sending NIL here but we're gonna wait until we feel that we want
         # it..) #wish [#012.10] "nilify" option
 
-        def _traverse_extroverted_and_with_each_sanitized_value
-
-          @_ok = true
-
-          until __no_more_remaining_extroverted_associations
-
-            if __the_valid_value_store_already_has_an_existent_value
-              next
-            end
-
-            if _resolve_sanitized_value_via_default
-
-              NOTHING_  # fall through to send
-
-            elsif @_current_normal_association.normalize_by
-
-              if ! __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING
-
-                break  # normalization failed. withdraw from everything
-              end
-
-            elsif @_current_normal_association.is_required
-
-              @_current_sanitized_value = nil
-            else
-
-              next  # because nothing to send
-            end
-
-            yield
-          end
-
-          # (if missing requireds were encountered (only), it's still OK)
-
-          remove_instance_variable :@_ok
+        def _modern_value_normalizer
+          method :__normalize_and_send_value_modernly
         end
+
+        def __normalize_and_send_value_modernly asc
+
+          @_current_normal_association = asc
+
+          ok = if __the_valid_value_store_already_has_an_existent_value
+            ACHIEVED_
+          elsif _resolve_sanitized_value_via_default
+            _maybe_send
+          elsif asc.normalize_by
+            if __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING
+              _maybe_send
+            else
+              UNABLE_ # normalization failed. withdraw from everything
+            end
+          elsif asc.is_required
+            @_current_sanitized_value = nil
+            _maybe_send
+          else
+            ACHIEVED_  # nothing to send
+          end
+          remove_instance_variable :@_current_normal_association
+          ok
+        end
+
+        def _maybe_send
+          send @_maybe_send
+          ACHIEVED_
+        end
+
+        # ==
 
         def __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING
           _qkn = Common_::QualifiedKnownness.via_association @_current_normal_association
@@ -738,17 +701,6 @@ module Skylab::Fields
 
           _x = _simplified_read_of_current_valid_value
           _qualifies_as_existent _x
-        end
-
-        def __no_more_remaining_extroverted_associations
-          asc = @_remaining_extroverted_stream.gets
-          if asc
-            @_current_normal_association = asc ; false
-          else
-            @_current_normal_association = nil ;  # stream may have started empty
-            remove_instance_variable :@_current_normal_association
-            remove_instance_variable :@_remaining_extroverted_stream ; true
-          end
         end
 
         # -- I: sending a sanitized value to the valid value store
@@ -812,33 +764,6 @@ module Skylab::Fields
 
         def _simplified_read_of_current_valid_value
           @_valid_value_store._simplified_read_ _association_key
-        end
-
-        # -- H alternative: for legacy
-
-        def __value_normalizer_for_LEGACY_ENTITY_ALGORITHM
-
-          LEGACY_ENTITY_ALGORIHTM_ValueNormalizer_via___.call_by do |o|
-
-            o.default_of_association_by = -> native_asc do
-
-              _wat = native_asc.default_value_via_entity__ @entity
-              # (the above interface does not allow for failure, but
-              # it's going away anyway..)
-              Common_::KnownKnown[ _wat ]
-            end
-
-            o.receive_missing_native_association_by = -> kn, native_asc do
-
-              # #coverpoint1.8
-
-              _add_missing_required_MIXED_association native_asc
-
-              kn  # don't stop cold on these - aggregate and procede
-            end
-
-            o.listener = @listener
-          end
         end
 
         # -- H: normalizing (sanitizing) the particular value
@@ -1295,6 +1220,10 @@ module Skylab::Fields
           remove_instance_variable :@__association_stream
         end
 
+        def __nothing
+          NOTHING_
+        end
+
         def _yes
           TRUE
         end
@@ -1315,43 +1244,89 @@ module Skylab::Fields
           :argument_scanner,  # in "defined attribute"
           :association_index,  # #coverpoint1.6
           :entity,
+          :listener,  # because #here-8
         )
       end
 
       # ==
 
-      class LEGACY_ENTITY_ALGORIHTM_ValueNormalizer_via___ < Common_::MagneticBySimpleModel
+      class LEGACY_ENTITY_ALGORITHM_ValueNormalizer___
 
-        # we used to think this was bee's knees because of the construction
-        # of a single proc that is used to traverse over every association,
-        # but now this is at odds with [#012.5.2] the fact that we must not
-        # run thru ad-hoc normalizers any values derived from defaulting.
-        # also this has the oldschool [be]-era "native" associations with
-        # the RISC methods used to reflect them. this would all change for
-        # the modern age but we've got to see how this percolates out to
-        # the many clients that use this, in its own work.
+        # this legacy algorithm either violates or fails to recognize:
+        #
+        #   - [#012.E.1] defaulting must be able to fail
+        #   - [#012.5.2] don't run default values thru ad-hoc normalizers
+        #   - [#012.5.3] don't normalize values already in the value store
+        #
+        # [br] uses the entity as an UNSANITIZED value store. this is
+        # something baked deeply into the [br] stack. we could try and "fix"
+        # that to achieve maximum "one ring"-ness, but since [br]-era
+        # entities and actions are going away anyway, for now we just
+        # corral it all into here.
 
-        attr_writer(
-          :default_of_association_by,
-          :listener,
-          :receive_missing_native_association_by,
-        )
+        def initialize o
+          @entity = o.entity
+          @_callbacks = o
+        end
+
+        def invoke asc
+          dup.__init( asc ).execute
+        end
+
+        def __init asc
+          @native_association = asc ; self
+        end
 
         def execute
+          _store :@_existing_knownness, @entity._read_knownness_( @native_association ) or self._NEVER
+          if __normalize_value
+            __maybe_send_value
+            ACHIEVED_
+          else
+            UNABLE_
+          end
+        end
 
-          -> kn, asc, & x_p do
+        def __maybe_send_value
+
+          if @_existing_knownness.is_known_known
+            if @_new_knownness.is_known_known
+              if @_existing_knownness.object_id == @_new_knownness.object_id
+                NOTHING_  # hi. #covered
+              else
+                _write
+              end
+            else
+              self._COVER_ME__became_unknown__
+            end
+          elsif @_new_knownness.is_known_known
+            _write
+          end
+          NIL
+        end
+
+        def _write
+          @entity._write_via_association_ @_new_knownness.value_x, @native_association
+          NIL
+        end
+
+        def __normalize_value
+
+          kn = @_existing_knownness ; asc = @native_association
+
+          # -
 
             # 1. if value is unknown and defaulting is available, apply it.
 
             if ! kn.is_effectively_known && Home_::Has_default[ asc ]
 
-              kn_ = @default_of_association_by[ asc ]
-              if kn_
-                # (replace the effectively unknown with what was produced
-                # by the defaulting IFF the defaulting didn't fail #[#012.E])
-                kn = kn_
-                did = true
-              end
+              # in violation of [#012.E.1], the below should but does not
+              # make accomodations for the remote client (API) to express
+              # that it failed to resolve a default value.
+
+              _x = asc.default_value_via_entity__ @entity
+              kn = Common_::KnownKnown[ _x ]
+              did = true
             end
 
             # (it may be that you don't know the value and there is no default)
@@ -1366,7 +1341,7 @@ module Skylab::Fields
                 # in violation of [#012.5.2]
                 NOTHING_  # hi.
               end
-              kn = __add_hocs kn, bx, asc, & x_p
+              kn = __add_hocs kn, bx
             end
 
             # 3. if this is a required property and it is unknown, act.
@@ -1376,31 +1351,44 @@ module Skylab::Fields
 
               if ! kn.is_effectively_known && Home_::Is_required[ asc ]
 
-                kn = @receive_missing_native_association_by[ kn, asc ]
+                kn = __receive_missing_required kn
               end
             end
 
-            kn
-          end
+            # -
+          _store :@_new_knownness, kn
         end
 
-        def __add_hocs kn, bx, model, & x_p
+        def __receive_missing_required kn  # #coverpoint1.8
+
+          @_callbacks._add_missing_required_MIXED_association @native_association
+
+          kn  # don't stop cold on these - aggregate and procede
+        end
+
+        def __add_hocs kn, bx
 
           # ad-hocs need to know the property too (née "trios not pairs")
 
-          bx.each_value do | norm_norm_p |
+          bx.each_value do |norm_norm_p|
 
             # at each step, value might have changed. [#053]
 
-            _qkn = kn.to_qualified_known_around model
+            _qkn = kn.to_qualified_known_around @native_association
 
-            kn = norm_norm_p[ _qkn, & ( x_p || @listener ) ]  # (was [#072])
+            kn = norm_norm_p[ _qkn, & _listener ]  # (was [#072])
             kn or break
             kn.is_qualified and self._SHAPE_ERROR_we_want_QKNs_in_and_KNs_out
           end
 
           kn
         end
+
+        def _listener
+          @_callbacks.listener  # :#here-8
+        end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
 
       # ==

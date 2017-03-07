@@ -85,6 +85,14 @@ module Skylab::Fields
     kp
   end
 
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
+
   # ==
 
   class Attributes < ::Module  # :[#013]

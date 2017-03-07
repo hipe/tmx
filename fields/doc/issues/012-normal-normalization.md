@@ -130,7 +130,7 @@ for purely historical reasons, we tag discussion of (and desire for)
 
 
 
-### (requirement for defaulting: a fail-strategy for this meta-attribute) :[#here.E]
+### (requirement for defaulting: a fail-strategy for this meta-attribute) :[#here.E.1]
 
 it's also useful to allow a defaulting function to be able to draw on
 resources of trivial complexity. for example, we have modeled (in at
@@ -1029,7 +1029,7 @@ back to it. for this latest treatment, we propose that:
   - parenthetically we must explain now that our "one ring" conception of
     normalization allows for the real possibility that defaulting can fail.
     (this specific provision and the broader point made here are both
-    explored further at [#here.E].) without this provision, it would seem
+    explored further at [#here.E.1].) without this provision, it would seem
     meaningless to model an association as both being required and having
     a default (because if it has a default, it's not really required, is
     it?); but given this provision it then becomes meaningful to express an
