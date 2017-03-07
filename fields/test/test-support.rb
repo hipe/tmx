@@ -141,7 +141,6 @@ module Skylab::Fields::TestSupport
     end
   end
 
-
   # --
 
   Home_ = ::Skylab::Fields
@@ -150,6 +149,11 @@ module Skylab::Fields::TestSupport
   Lazy_ = Home_::Lazy_
 
   # --
+
+  Expect_Emission_Fail_Early = -> tcc do
+
+    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  end
 
   Expect_Event = -> tcm do
 
@@ -176,6 +180,7 @@ module Skylab::Fields::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   KEEP_PARSING_ = true
+  MONADIC_TRUTH_ = -> _ { true }
   NIL_ = nil
   TS_ = self
 end

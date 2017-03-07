@@ -113,7 +113,7 @@ module Skylab::Fields
           if _x.respond_to? :id2name
             stringify_by = :id2name.to_proc
           else
-            stringify_by = -> x { x }  # IDENTITY_
+            stringify_by = IDENTITY_
           end
 
           _wat = Home_.lib_.human::Levenshtein.via(

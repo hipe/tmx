@@ -277,6 +277,9 @@ module Skylab::Brazen
             _prp = Home_.lib_.basic::MinimalProperty.via_variegated_symbol(
               :workspace_path )
 
+            self._COVER_ME__easy_just_refactor__
+            # just do Yadda.with :reasons, [_prp]. see #tombstone-A if you must
+
             Home_.lib_.fields::Events::Missing.for_attribute _prp
           end
 
@@ -360,3 +363,4 @@ module Skylab::Brazen
     Workspace_ = self
   end
 end
+# :#tombtone-A temporary

@@ -50,6 +50,9 @@ module Skylab::Fields
 
       class Facility_C < Common_::MagneticBySimpleModel
 
+        # (when you try to unify this with "one ring", have fun because
+        # it's called like 186 times (or places).)
+
         # (this facility is for attributes actors. its lineage traces back
         # to the origin of this file. it moved locations in the file. as
         # as appropriate we may dissolve techniques found here *downwards*
@@ -76,7 +79,7 @@ module Skylab::Fields
           @value_store = BoxBasedValueStore___.new bx ; bx
         end
 
-        def ivar_store= entity
+        def ivar_store= entity  # #here-5
           @value_store = IvarBasedValueStore.new entity ; entity
         end
 
@@ -167,7 +170,10 @@ module Skylab::Fields
         end
 
         def _build_event miss_asc_a
-          Home_::Events::Missing.via miss_asc_a, 'attribute'
+          Home_::Events::Missing.with(
+            :reasons, miss_asc_a,
+            :noun_lemma, "attribute",
+          )
         end
 
         # (all for hacky experiment, :[#008.7]: #borrow-coverage from [ta])
@@ -197,13 +203,20 @@ module Skylab::Fields
         # a faithful reproduction (to the letter) of that algorithm,
         # driven by three-laws.
 
+        # local conventions:
+        #
+        #   - use the `__no_more_foo` pattern to jive semantically
+        #     with the ubiquitous `no_unparsed_exists` of scanners
+
         def initialize
 
-          @_execute = :__execute_entily
+          @_execute = :__execute_ideally
+          @_receive_missing_required_MIXED_associations = :__receive_missing_required_MIXED_associations_simply
           @_receive_special_instructions_for_result_once = nil
           @_result = :__result_normally
 
           @argument_scanner = nil
+          @association_is_required_by = nil
           @listener = nil
           yield self
         end
@@ -214,7 +227,94 @@ module Skylab::Fields
           @IS_FAC_I = true
         end
 
-        # -- driving the parse
+        # -- specify the argument source (if any)
+
+        def argument_scanner= scn
+
+          # ##here-6 for now we are not giving special separate exposure
+          # for "interfacey" argument scanners vs plain old scanners.
+          # but we might one day..
+          #
+          # we wanted them to have a uniform interface but that might
+          # not be easy
+
+          if scn.respond_to? :scan_glob_values
+            __accept_complex_argument_scanner scn
+          else
+            _accept_simple_argument_scanner scn
+          end
+        end
+
+        def argument_array= a
+          _accept_simple_argument_scanner Scanner_[ a ]
+          a
+        end
+
+        def __accept_complex_argument_scanner scn
+          @_initial_value_for_do_advance = false  # complex - be OCD about [#ze-052.2] don't advance until valid
+          @_resolve_unsanitized_value = :__resolve_unsanitized_value_complicatedly
+          @_scan_primary_symbol = :__scan_primary_symbol_complicatedly
+          @_unsanitized_key = :__unsanitized_key_complicatedly
+          @argument_scanner = scn
+        end
+
+        def _accept_simple_argument_scanner scn
+          @_initial_value_for_do_advance = true  # always advance scanner
+          @_resolve_unsanitized_value = :__resolve_unsanitized_value_simply
+          @_scan_primary_symbol = :__scan_primary_symbol_simply
+          @_unsanitized_key = :__unsanitized_key_simply
+          @argument_scanner = scn
+        end
+
+        # -- specify the value store ("entity") (if any)
+
+        def entity= ent
+
+          # REMINDER: do nothing magical or presumtive here. at #spot-1-6
+          # the toolkit wires an entity up to normalization "manually" so
+          # we cannot (and should not) assume to know that the valid value
+          # store is an entity thru the use of this method..
+
+          if ent.respond_to? :_receive_missing_required_associations_
+            # #here-3 this should be temporary, only while [br]-era entities
+            @_receive_missing_required_MIXED_associations =
+              :__receive_missing_required_MIXED_associations_entily
+          end
+
+          @entity = ent
+        end
+
+        def ivar_store= ent
+
+          # this needs to merge with the other (and the others) #here-5
+
+          # meh 2x:
+
+          self.read_by = -> k do  # necessary IFF :#here-7
+            ivar = :"@#{ k }"
+            if ent.instance_variable_defined? ivar
+              ent.instance_variable_get ivar
+            end
+          end
+
+          self.write_by = -> k, x do
+            ent.instance_variable_set :"@#{ k }", x ; nil
+          end
+
+          ent
+        end
+
+        def read_by= p
+          @_read_current_value = :__read_current_value_using_proc
+          @read_by = p
+        end
+
+        def write_by= p
+          @_write_value = :__write_value_using_proc
+          @write_by = p
+        end
+
+        # -- specify the behavior of the parse
 
         def will_parse_passively__
           @__do_parse_passively = true
@@ -230,7 +330,7 @@ module Skylab::Fields
           @_execute = :__execute_customly ; @__execute_by = p
         end
 
-        # -- reading associations
+        # -- specify the associations
 
         def association_index= asc_idx
 
@@ -259,6 +359,18 @@ module Skylab::Fields
           @association_index = asc_idx
         end
 
+        def member_array= sym_a  # #feature-island (intentional, experimental)
+          @_do_sound_like_struct = true  # ..
+          @_association_stream = :__association_stream_via_member_array
+          @__member_array = sym_a
+        end
+
+        def association_stream= st
+          @_do_sound_like_struct = false  # ..
+          @_association_stream = :__association_stream_as_is
+          @__association_stream = st
+        end
+
         def push_association_soft_reader_by__ & p
           _push_association_soft_reader_by( & p )
         end
@@ -268,29 +380,15 @@ module Skylab::Fields
             push_association_soft_reader_proc__ p
         end
 
-        # -- reading and writing from the value store ("entity")
-
-        def read_by= p
-          @_read_current_value = :__read_current_value_simply
-          @read_by = p
-        end
-
-        def write_by= p
-          @_write_current_value = :__write_current_value_simply
-          @write_by = p
-        end
-
-        def argument_array= a
-          @argument_scanner = Scanner_[ a ] ; a
-        end
+        # --
 
         attr_writer(
-          :argument_scanner,
           :arguments_to_default_proc_by,
-          :association_stream,
-          :entity,
+          :association_is_required_by,
           :listener,
         )
+
+        # --
 
         def execute
           send @_execute
@@ -324,20 +422,27 @@ module Skylab::Fields
           end
         end
 
-        def __execute_entily
+        def __execute_ideally
 
-          # (this decision was informed by the assimilation of [#037.1.G])
+          __init_association_stream
+
+          # (the assimilation of [#037.5.G] is what introduced the below
+          # branch, a decision we do not regret.)
 
           if @argument_scanner
-            __execute_driven_by_arguments
+            __index_associations
+            ok = __traverse_arguments
+            ok &&= __traverse_associations_remaining_in_pool
           else
-            __execute_driven_by_associations
+            ok = __traverse_associations_all
           end
+
+          ok && __if_there_were_any_missing_requireds_emit
         end
 
-        def __execute_driven_by_arguments
+        def __traverse_arguments
 
-          __index_associations
+          @_ok = true
 
           until __no_more_arguments
 
@@ -352,8 +457,7 @@ module Skylab::Fields
             _maybe_check_required_and_maybe_send
           end
 
-          @_ok && __run_the_remains_of_the_diminishing_pool
-          @_ok && __check_if_there_were_any_missing_requireds
+          remove_instance_variable :@_ok
         end
 
         def __do_parse_arguments_FUN
@@ -376,51 +480,6 @@ module Skylab::Fields
           kp
         end
 
-        def __execute_driven_by_associations
-
-          # come back to: fields/lib/skylab/fields/attributes/stack/common-frame.rb:552
-
-          ok = true  # watch what happens if there are no associations
-
-          @_write_current_value ||= :__write_current_value_entily
-          @_current_association = nil
-          @_missing_required_associations = nil
-
-          normalize_value = __value_normalizer
-
-          while __gets_association
-
-            existing_kn = __read_current_knownness
-
-            new_kn = normalize_value[ existing_kn ]
-            if ! new_kn
-              ok = new_kn ; break
-            end
-
-            # (it may be that it was not known and still is not known)
-
-            if existing_kn.is_known_known
-              if new_kn.is_known_known
-                if existing_kn.object_id == new_kn.object_id
-                  NOTHING_  # #covered
-                else
-                  send @_write_current_value, new_kn.value_x
-                end
-              else
-                self._COVER_ME__became_unknown__
-              end
-            elsif new_kn.is_known_known
-              send @_write_current_value, new_kn.value_x  # writes never fail
-            end
-          end
-
-          if ok && @_missing_required_associations
-            @entity._receive_missing_required_associations_ @_missing_required_associations
-          else
-            ok
-          end
-        end
-
         def __execute_customly
 
           # this branch is a much more constrainted, beurocratic and
@@ -435,121 +494,267 @@ module Skylab::Fields
 
         # -- I
 
-        def __check_if_there_were_any_missing_requireds
-
-          h = remove_instance_variable :@_missing_requireds
-          if h
-            __when_missing_requireds h.keys
-          else
-            ACHIEVED_
-          end
-        end
-
-        def __when_missing_requireds miss_sym_a  # (look like #here-2)
-
-          me = self
-          @listener.call :error, :missing_required_attributes do
-            me.__build_missing_required_event miss_sym_a
-          end
-          UNABLE_
-        end
-
-        def __build_missing_required_event miss_sym_a
-
-          _miss_a = miss_sym_a.map do |k|
-            @_association_via_name_symbol.fetch k
-          end
-
-          _ev = Home_::Events::Missing.with(
-
-            :reasons, _miss_a,
-            # :noun_lemma, :attribute | :parameter | :property | :primary | :field
-            :noun_lemma, :parameter,  # #coverpoint1.2 ("parameters")
-            :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :ick_prim,
-          )
-          # _ev = Home_::Events::Missing.via _miss_a, 'attribute'
-          _ev  # hi. #todo
-        end
+        # (used to be emission of missings. moved to section E.5)
 
         # -- H
 
-        def __run_the_remains_of_the_diminishing_pool
+        # when there are arguments to parse, the most intuitive, practical
+        # (if not only) option is to acquire (somehow) a dictionary (hash)
+        # of valid association names that can be used to parse-off each
+        # valid "head" of the arguments (as an argument scanner).
 
-          __init_diminishing_pool_traversal
+        # because our lingua-franca representation of associations is as
+        # a stream, when we need such a hash we traverse (and exhaust) the
+        # stream, converting it into such a hash.
 
-          until __no_more_associations_in_diminishing_pool
+        # when doing so, we must also make note of those associations that
+        # are "extroverted", and put them in a [#ba-061] "diminishing pool".
+        # thru this means, any "extroverted" associations that weren't
+        # involved in the argument parsing phase still get the attention
+        # they need to complete the normalization.
 
-            if __the_property_store_already_has_an_existent_value
-              next
-            end
+        # however, in cases where there ws no argument stream to parse, any
+        # (#here-11) "extroverted" associations still need this special
+        # attention. since in such cases we never made an indexing pass, we
+        # achive a similar effect through a stream reduction..
 
-            @_current_sanitized_value = nil  # #not-taking-any-chances
-            remove_instance_variable :@_current_sanitized_value
+        def __traverse_associations_remaining_in_pool
 
-            if _resolve_a_default_value
+          __init_extroverted_associations_via_flush_diminishing_pool
 
-              NOTHING_  # any resolved default circumvents any normalization
+          _traverse_extroverted_and_with_each_sanitized_value do
 
-            elsif _has_ad_hoc_normalizer
+            # reset this flag to whatever is default (T/F) before each send
 
-              if ! __resolve_sanitized_value_via_ad_hoc_normalizer_against_nothing
-                break  # normalization failed, so withdraw
-              end
+            @_do_advance_scanner_after_write = @_initial_value_for_do_advance
 
-            elsif _is_required
+            _maybe_check_required_and_maybe_send
+          end
+        end
 
-              # the value is (effectively) not set in the prop store,
-              # there is (effectively) no default, there is no normalizer,
-              # and it's required. for now we just SPOOF the value as being
-              # nil so that it falls thru "elegantly". we might change this.
+        def __traverse_associations_all
 
-              @_current_sanitized_value = nil
+          __init_extroverted_associations_when_you_have_not_already_indexed
 
-            else
+          send @_traverse_associations_all
+        end
 
-              # when none of the (counting) 4 above conditions are met,
-              # there's nothing to do for this field. (there would PROBABLY
-              # be no harm in sending NIL here but we're gonna wait until
-              # we feel that we want it..)
+        def __traverse_associations_all_LEGACY_ENTITY_ALGORITHM
 
-              next
-            end
+          # we used to think this was the bee's knees because of its use of
+          # knownnesses; but now it's deprecated and on its way out because
+          # of its flagrant disregard for [#012.5.3]: it normalizes values
+          # already in the "valid value store".  (really, it uses the
+          # "valid value store" not as such, but as just an unsanitized
+          # parameter store.) since this change in convention hasn't
+          # percolated out to all the clients, we've got to keep it around
+          # for now..
 
-            # EEW - we never FOO so we never BAR
-            @_do_advance_EEW = false  # not necessary only the 1st time EEW
-            _maybe_check_required_and_maybe_send  # assume value was resolved
+          kp = true ; new_kn = nil ; native_asc = nil
+
+          write_value = -> do
+            @entity._write_via_association_ new_kn.value_x, native_asc
           end
 
+          normalize_value = __value_normalizer_for_LEGACY_ENTITY_ALGORITHM
+
+          st = remove_instance_variable :@__native_association_stream
+          begin
+            native_asc = st.gets
+            native_asc || break
+
+            existing_kn = @entity._read_knownness_ native_asc
+            existing_kn || self._NEVER
+
+            new_kn = normalize_value[ existing_kn, native_asc ]
+            if ! new_kn
+              kp = new_kn ; break
+            end
+
+            if existing_kn.is_known_known
+              if new_kn.is_known_known
+                if existing_kn.object_id == new_kn.object_id
+                  NOTHING_  # #covered
+                else
+                  write_value[]
+                end
+              else
+                self._COVER_ME__became_unknown__
+              end
+            elsif new_kn.is_known_known
+              write_value[]
+            end
+            redo
+          end while above
+          kp
+        end
+
+        def _traverse_associations_all_modernly
+
+          @_do_advance_scanner_after_write = false  # no scanner at all
+
+          _traverse_extroverted_and_with_each_sanitized_value do
+
+            _maybe_check_required_and_maybe_send
+          end
+        end
+
+        def __init_extroverted_associations_via_flush_diminishing_pool
+
+          _keys = remove_instance_variable( :@_diminishing_pool ).keys
+
+          # although we have the option of checking for an empty array above
+          # (and it does occur), because it still "just works" as-is when
+          # the array is empty (and has relatively low overhead), the law of
+          # parsimony suggests that we don't weigh ourselves down with
+          # special code for this case.
+
+          # in an accidental or (don't) real world where a false-ish key is
+          # a valid association key (it's called `name_symbol`, so just don't)
+          # we wouldn't want that false-ish-ness to break our stream early so:
+
+          key_scn = Scanner_[ _keys ]
+
+          @_remaining_extroverted_stream = Common_.stream do
+            if ! key_scn.no_unparsed_exists
+              _k = key_scn.gets_one
+              @_normal_association_via_name_symbol.fetch _k
+            end
+          end
           NIL
         end
 
-        def __resolve_sanitized_value_via_ad_hoc_normalizer_against_nothing
-          _qkn = Common_::QualifiedKnownness.via_association @_current_association
+        def __init_extroverted_associations_when_you_have_not_already_indexed
+
+          # this method could be only four lines long (reduce the stream to
+          # be only those that are extroverted); BUT we are too stubborn to
+          # expose specialized setters for the different kind of associations
+          # (legacy [br]-era vs latest) (#here-3 and another ##here-6)
+          # so instead we've gotta peek at the first association, see what
+          # kind it is, and assume that the way it looks represents the
+          # association implementation of each remaining item them. we are
+          # tempted to change this (make the interface cruchier to the
+          # benefit of cleaner implementation) so we are trying to isolate
+          # the ramifications of this choice to this method.
+
+          asc_st = remove_instance_variable :@association_stream
+          asc = asc_st.gets
+          if asc
+
+            p = -> { p = asc_st ; asc }
+            this_asc_st = Common_.stream { p[] }
+
+            if asc.respond_to? :parameter_arity
+              @_traverse_associations_all = :__traverse_associations_all_LEGACY_ENTITY_ALGORITHM
+              @__native_association_stream = this_asc_st
+            else
+              @_traverse_associations_all = :_traverse_associations_all_modernly
+              @_remaining_extroverted_stream = this_asc_st.reduce_by do |asc_|
+                _association_is_extroverted asc_  # hi.
+              end
+            end
+          else
+            @_traverse_associations_all = :_traverse_associations_all_modernly
+            @_remaining_extroverted_stream = Common_::THE_EMPTY_STREAM
+          end
+          NIL
+        end
+
+        def _association_is_extroverted asc  # :#here-11
+          asc.is_required || asc.default_by || asc.normalize_by
+        end
+
+        # here we restate the pertinent points of our central algorithm
+        # so that they shadow the structure of the below method, literate-
+        # programming-like:
+
+        # if the value is already present in the "valid value store", then
+        # we must assume it is valid and there is nothing more to do for
+        # this association. ([#012.E.3])
+
+        # if you succeeded in resolving a default value (which requires
+        # that a defaulting proc is present and that a call to it didn't
+        # fail), then per [#012.E.2] we must assume this value is already
+        # "normalized" and as such we must cicumvent any ad-hoc
+        # normalization. so if we resolved a default (which could possibly
+        # be `nil`), fall through to the send.
+
+        # if you got this far,
+        #
+        #   - there is effectively no corresponding value in the valid
+        #     value store. (either it's set to `nil` or it's not set
+        #     at all.)
+        #
+        #   - a default value was not resolved for one of two reasons.
+        #
+        # as long as we're treating explicit `nil` indifferently from
+        # "not set" (which we should; yuck if we don't), then we're going to
+        # set it up to look as if the value was explicitly set to `nil`, and
+        # use the same code that we use in those cases (per the law of
+        # parsimony).
+
+        # if no default, no normalizer, and it's not required; then there's
+        # nothing to do for this field. (there would PROBABLY be no harm in
+        # sending NIL here but we're gonna wait until we feel that we want
+        # it..) #wish [#012.10] "nilify" option
+
+        def _traverse_extroverted_and_with_each_sanitized_value
+
+          @_ok = true
+
+          until __no_more_remaining_extroverted_associations
+
+            if __the_valid_value_store_already_has_an_existent_value
+              next
+            end
+
+            if _resolve_sanitized_value_via_default
+
+              NOTHING_  # fall through to send
+
+            elsif @_current_normal_association.normalize_by
+
+              if ! __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING
+
+                break  # normalization failed. withdraw from everything
+              end
+
+            elsif @_current_normal_association.is_required
+
+              @_current_sanitized_value = nil
+            else
+
+              next  # because nothing to send
+            end
+
+            yield
+          end
+
+          # (if missing requireds were encountered (only), it's still OK)
+
+          remove_instance_variable :@_ok
+        end
+
+        def __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING
+          _qkn = Common_::QualifiedKnownness.via_association @_current_normal_association
           _resolve_sanitized_value_via_ad_hoc_normalizer _qkn
         end
 
-        def __the_property_store_already_has_an_existent_value
+        def __the_valid_value_store_already_has_an_existent_value
 
-          _x = @read_by[ _sanitized_key ]
+          _x = @read_by[ _association_key ]
           _qualifies_as_existent _x
         end
 
-        def __no_more_associations_in_diminishing_pool
-
-          if @_diminishing_pool_key_scanner.no_unparsed_exists
-            @_current_association = nil  # #not-taking-any-chances
-            remove_instance_variable :@_current_association
-            remove_instance_variable :@_diminishing_pool_key_scanner ; true
+        def __no_more_remaining_extroverted_associations
+          asc = @_remaining_extroverted_stream.gets
+          if asc
+            @_current_normal_association = asc ; false
           else
-            _k = @_diminishing_pool_key_scanner.gets_one
-            @_current_association = @_association_via_name_symbol[ _k ]
-            FALSE
+            @_current_normal_association = nil ;  # stream may have started empty
+            remove_instance_variable :@_current_normal_association
+            remove_instance_variable :@_remaining_extroverted_stream ; true
           end
-        end
-
-        def __init_diminishing_pool_traversal
-          @_diminishing_pool_key_scanner = Common_::Scanner.via_array(
-            remove_instance_variable( :@_diminishing_pool ).keys ) ; NIL
         end
 
         # -- G
@@ -558,11 +763,11 @@ module Skylab::Fields
 
           x = remove_instance_variable :@_current_sanitized_value
 
-          if _is_required
+          if @_current_normal_association.is_required
             if _qualifies_as_existent x
               _SEND_THIS_VALUE x
             else
-              ( @_missing_requireds ||= {} )[ _sanitized_key ] = true
+              __add_current_association_as_a_missing_required_asociation
             end
           else
             _SEND_THIS_VALUE x
@@ -572,14 +777,15 @@ module Skylab::Fields
 
         def _SEND_THIS_VALUE x
 
-          if _is_glob
+          if @_current_normal_association.is_glob
             __send_this_when_glob x
           else
-            send @_write_current_value, x
+            _write_value x
           end
 
-          _yes = remove_instance_variable :@_do_advance_EEW
-          _yes && @argument_scanner.advance_one
+          if @_do_advance_scanner_after_write
+            @argument_scanner.advance_one
+          end
           NIL
         end
 
@@ -589,29 +795,23 @@ module Skylab::Fields
           if a
             a.concat x  # also [#008.2]
           else
-            send @_write_current_value, x
+            _write_value x
           end
           NIL
         end
 
-        def __write_current_value_entily x
-          @entity._write_via_association_ x, @_current_association
+        def _write_value x
+          send @_write_value, x
           NIL
         end
 
-        def __write_current_value_simply x
-          @write_by[ _sanitized_key, x ]
+        def __write_value_using_proc x
+          @write_by[ _association_key, x ]
           NIL
         end
 
-        def __read_current_knownness
-          _kn = @entity._read_knownness_ @_current_association  # #todo [#fi-037.X]
-          _kn || self._NEVER  # #todo sanity
-          _kn
-        end
-
-        def __read_current_value_simply
-          @read_by[ _sanitized_key ]
+        def __read_current_value_using_proc
+          @read_by[ _association_key ]
         end
 
         def _qualifies_as_existent x
@@ -621,55 +821,42 @@ module Skylab::Fields
             FALSE  # hi.
           else
             self._COVER_ME__meaningful_false__
-            TRUE  # meaninful false. hi.
+            TRUE  # meaningful false. hi.
           end
-        end
-
-        def _is_required
-          @_current_association.is_required
         end
 
         # -- F ALTERNATIVE
 
-        def __value_normalizer
+        def __value_normalizer_for_LEGACY_ENTITY_ALGORITHM
 
-          p = ValueNormalizer_via___.call_by do |o|
+          LEGACY_ENTITY_ALGORIHTM_ValueNormalizer_via___.call_by do |o|
 
-            o.default_knownness_via_association_by = -> asc do
+            o.default_of_association_by = -> native_asc do
 
-              _wat = asc.default_value_via_entity__ @entity
+              _wat = native_asc.default_value_via_entity__ @entity
               # (the above interface does not allow for failure, but
               # it's going away anyway..)
               Common_::KnownKnown[ _wat ]
             end
 
-            o.receive_missing_by = -> kn, chan, & ev_p do
-              _m = @_receive_missing_reasons ||= :__receive_missing_reasons_normally
-              send _m, ev_p, kn, chan
+            o.receive_missing_native_association_by = -> kn, native_asc do
+
+              # #coverpoint1.8
+
+              _add_missing_required_MIXED_association native_asc
+
+              kn  # don't stop cold on these - aggregate and procede
             end
 
             o.listener = @listener
           end
-
-          -> kn do
-            p[ kn, @_current_association ]
-          end
-        end
-
-        def __receive_missing_reasons_normally ev_p, kn, chan
-
-          # :[#008.6]: #borrow-coverage from [br]
-
-          _asc_a = ev_p[].reasons
-          ( @_missing_required_associations ||= [] ).concat _asc_a
-          kn  # don't stop cold on these - aggregate and procede.
         end
 
         # -- F
 
         def __resolve_sanitized_value_via_unsanitized_value
 
-          @_diminishing_pool.delete _sanitized_key
+          @_diminishing_pool.delete _association_key
 
           # (the below "many worlds" tree is not covered to the letter in
           #  the pseudocode, but is nonetheless test-driven)
@@ -678,9 +865,9 @@ module Skylab::Fields
 
             # whenever an existent value was passed, never use defaulting
 
-            _normalizer_or_YIKES
+            _resolve_sanitized_value_via_any_normalizer
 
-          elsif _resolve_a_default_value
+          elsif _resolve_sanitized_value_via_default
 
             # if we got here, NIL was passed and a default value was resolved
 
@@ -689,14 +876,14 @@ module Skylab::Fields
 
             # when NIL is passed and defaulting is unavailable, see.
 
-            _normalizer_or_YIKES
+            _resolve_sanitized_value_via_any_normalizer
           end
         end
 
-        def _normalizer_or_YIKES
+        def _resolve_sanitized_value_via_any_normalizer
 
-          if _has_ad_hoc_normalizer
-            if _is_glob
+          if @_current_normal_association.normalize_by
+            if @_current_normal_association.is_glob
               self._HAVE_FUN__shouldnt_be_that_bad__
             else
               __resolve_sanitized_value_via_ad_hoc_normalizer_against_something
@@ -711,7 +898,7 @@ module Skylab::Fields
           # :[#008.3] #borrow-coverage from [sn]
 
           _x = remove_instance_variable :@_current_unsanitized_value
-          _qkn = Common_::QualifiedKnownness[ _x, @_current_association ]  # NOTE RIDE
+          _qkn = Common_::QualifiedKnownness[ _x, @_current_normal_association ]  # NOTE RIDE
           _resolve_sanitized_value_via_ad_hoc_normalizer _qkn
         end
 
@@ -721,11 +908,13 @@ module Skylab::Fields
           @_current_sanitized_value = _x ; true
         end
 
-        def _resolve_a_default_value
-          # #here-3.A: the best
-          kn_by = @_current_association.default_by
+        def _resolve_sanitized_value_via_default
+
+          # exactly as documented, allow that defaulting can fail
+
+          kn_by = @_current_normal_association.default_by
           if kn_by
-            a = @arguments_to_default_proc_by[ _sanitized_key ]
+            a = @arguments_to_default_proc_by[ _association_key ]
             p = a.pop
             kn = kn_by[ * a, & p ]
             if kn
@@ -734,13 +923,9 @@ module Skylab::Fields
           end
         end
 
-        def _has_ad_hoc_normalizer
-          @_current_association.normalize_by
-        end
-
         def _resolve_sanitized_value_via_ad_hoc_normalizer qkn
 
-          kn = @_current_association.normalize_by[ qkn, & @listener ]
+          kn = @_current_normal_association.normalize_by[ qkn, & @listener ]
 
           if kn
             if kn.is_known_known
@@ -755,78 +940,163 @@ module Skylab::Fields
           end
         end
 
+        # -- E.5 (moved down here from I)
+
+        def __add_current_association_as_a_missing_required_asociation
+
+          k = _association_key
+
+          seen = ( @_MISSING_REQUIRED_ASSOCIATIONS_SEEN_HASH_SANITY_CHECK ||= {} )
+          seen[k] && self._SANITY
+          seen[k] = true
+
+          _add_missing_required_MIXED_association k
+
+          NIL
+        end
+
+        def _add_missing_required_MIXED_association sym_or_object
+          ( @_missing_required_MIXED_associations ||= [] ).push sym_or_object
+        end
+
+        def __if_there_were_any_missing_requireds_emit
+
+          # we want to merge these two missing required techinques but if you
+          # try you will see how on the one hand X but on the other Y
+
+          # (we want to merge this one into the other one but if you try
+          # you will see how we on the one hand need to represent association
+          # structures and on the other hand need to de-dup them *sometimes*..)
+
+          asc_X_a = remove_instance_variable :@_missing_required_MIXED_associations
+          if asc_X_a
+            send @_receive_missing_required_MIXED_associations, asc_X_a
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __receive_missing_required_MIXED_associations_simply miss_sym_a  # (#here-2 will assimilate to here)
+
+          same_build = -> do
+            __build_missing_required_event miss_sym_a
+          end
+
+          if @listener
+            @listener.call :error, :missing_required_attributes do
+              same_build[]
+            end
+            UNABLE_
+          else
+            _ev = same_build[]
+            _e = _ev.to_exception
+            raise _e
+          end
+        end
+
+        def __receive_missing_required_MIXED_associations_entily asc_X_a
+          # #coverpoint1.8 and #here-3 this should be temporary
+          @entity._receive_missing_required_associations_ asc_X_a
+        end
+
+        def __build_missing_required_event miss_sym_a
+
+          these = _maybe_special_noun_lemma
+          these ||= [ :noun_lemma, :parameter ]  # #coverpoint1.2 ("parameters")
+
+          _reasons = Stream_[ miss_sym_a ]
+
+          _ev = Home_::Events::Missing.with(
+            :reasons, _reasons,
+            * these,
+            :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :ick_prim,
+          )
+          _ev  # hi. #todo
+        end
+
         # -- E
 
         def __maybe_check_clobber
 
-          k = _sanitized_key
-          if @_seen[ k ]
-            if _is_glob
+          if @_seen[ _association_key ]
+            if @_current_normal_association.is_glob
               ACHIEVED_  # :[#008.2] #borrow-coverage from [sn]
             else
               self._COVER_ME__this_is_supposed_to_be_not_OK__
             end
           else
-            @_seen[ k ] = true ; true
+            @_seen[ _association_key ] = true ; true
           end
         end
 
         # -- D
 
         def __resolve_unsanitized_value_for_this_primary
+          send @_resolve_unsanitized_value
+        end
 
-          ok = false ; unsanitized_value = nil
+        def __resolve_unsanitized_value_complicatedly
 
-          @_current_unsanitized_value = nil  # #not-taking-any-chances
-          remove_instance_variable :@_current_unsanitized_value
-
-          if _is_glob
-
+          if @_current_normal_association.is_glob
             a = @argument_scanner.scan_glob_values
             if a
-              @_current_unsanitized_value = a ; true  # <-- LOOK
+              @_current_unsanitized_value = a ; true
             else
-              _unable
+              _cannot_resolve_unsanitized
             end
-
           elsif _is_flag
-
             kn = @argument_scanner.scan_flag_value
             if kn
-              @_current_unsanitized_value = kn.value_x
+              @_current_unsanitized_value = kn.value_x ; true
             else
-              _unable
+              _cannot_resolve_unsanitized
             end
           else
-            @argument_scanner.map_value_by do |x|
-              @_do_advance_EEW = true
-              ok = true ; unsanitized_value = x ; nil
+            unsanitized_value = nil
+            ok = @argument_scanner.map_value_by do |x|
+              unsanitized_value = x ; true
             end
             if ok
+              @_do_advance_scanner_after_write = true
               @_current_unsanitized_value = unsanitized_value ; true
             else
-              _unable
+              _cannot_resolve_unsanitized
             end
           end
         end
 
         def _is_flag
-          @_current_association.is_flag
+          @_current_normal_association.is_flag
         end
 
-        def _is_glob
-          @_current_association.is_glob
+        def __resolve_unsanitized_value_simply
+
+          # if the scanner ends "early" then the below just fails hard. there
+          # is no special emission for this if you're using a simple scanner.
+
+          # in "retribution" for #here-4, for the simple scanner we advance
+          # past the "primary name" now.
+
+          @argument_scanner.advance_one
+          @_current_unsanitized_value = @argument_scanner.head_as_is
+          ACHIEVED_
+        end
+
+        def _cannot_resolve_unsanitized
+          # whether we are at the first field or not,
+          @_current_unsanitized_value = nil  # #not-taking-any-chances
+          remove_instance_variable :@_current_unsanitized_value
+          _unable
         end
 
         # -- C
 
         def __match_argument_scanner_head_against_associations
 
-          if @argument_scanner.scan_primary_symbol
-
-            asc = @_association_via_name_symbol[ _unsanitized_key ]
+          if __scan_primary_symbol
+            asc = @_normal_association_via_name_symbol[ _unsanitized_key ]
             if asc
-              @_current_association = asc ; true
+              @_current_normal_association = asc
             else
               __when_primary_not_found
             end
@@ -835,24 +1105,51 @@ module Skylab::Fields
           end
         end
 
-        def __gets_association
+        def __scan_primary_symbol
+          send @_scan_primary_symbol
+        end
+
+        def __scan_primary_symbol_complicatedly
+          @argument_scanner.scan_primary_symbol
+        end
+
+        def __scan_primary_symbol_simply
+          # for now, nothing magical here. #here-4 is where something happens
+          TRUE
+        end
+
+        def __no_more_associations
+          send @_no_more_associations
+        end
+
+        def __no_more_associations_normally
           asc = @association_stream.gets
           if asc
-            @_current_association = asc ; TRUE
+            @_current_normal_association = asc ; false
           else
-            remove_instance_variable :@_current_association ; FALSE
+            remove_instance_variable :@_current_normal_association
+            remove_instance_variable :@association_stream
+            TRUE
           end
         end
 
         def __when_primary_not_found
 
-          _built_it_early = __build_primary_not_found_event  # for now NOTE
+          ev_early_to_be_safe = __build_primary_not_found_event  # for now NOTE
 
-          @listener.call :error, :argument_error, :primary_not_found do
-            _built_it_early
+          # like #here-2, some of these are and some of these aren't like this
+
+          if @listener
+
+            @listener.call :error, :argument_error, :primary_not_found do
+              ev_early_to_be_safe
+            end
+
+            _unable
+          else
+            _e = ev_early_to_be_safe.to_exception
+            raise _e
           end
-
-          _unable
         end
 
         def  __at_extra_FUN  # #coverpoint1.5
@@ -872,21 +1169,41 @@ module Skylab::Fields
 
         def __build_primary_not_found_event
 
-          _did_you_mean = @_association_via_name_symbol.keys
+          _these = _maybe_special_noun_lemma
+
+          _did_you_mean = @_normal_association_via_name_symbol.keys
 
           _ev = Home_::Events::Extra.with(
             :unrecognized_token, _unsanitized_key,
             :did_you_mean_tokens, _did_you_mean,
+            * _these,
           )
           _ev  # hi. #todo
         end
 
-        def _sanitized_key
-          @_current_association.name_symbol
+        def _maybe_special_noun_lemma
+
+          # { :attribute | :member | :parameter | :primary | :property | :field }
+
+          if @_do_sound_like_struct
+            [ :noun_lemma, "member" ]
+          end
+        end
+
+        def _association_key
+          @_current_normal_association.name_symbol
         end
 
         def _unsanitized_key
+          send @_unsanitized_key
+        end
+
+        def __unsanitized_key_complicatedly
           @argument_scanner.current_primary_symbol
+        end
+
+        def __unsanitized_key_simply
+          @argument_scanner.head_as_is
         end
 
         def _unable
@@ -901,45 +1218,41 @@ module Skylab::Fields
 
         def __no_more_arguments_initially
 
-          if @argument_scanner and ! @argument_scanner.no_unparsed_exists
-
-            @_no_more_arguments = :__no_more_arguments_normally
-            send @_no_more_arguments
+          if @argument_scanner
+            send( @_no_more_arguments = :__no_more_arguments_normally )
           else
-            @_no_more_arguments = :_ONCE ; true
+            @_no_more_arguments = :_CLOSED ; true
           end
         end
 
         def __no_more_arguments_normally
-
-          @_do_advance_EEW = false  # be OCD about [#ze-052.2] don't advance until valid
-          @argument_scanner.no_unparsed_exists
+          if @argument_scanner.no_unparsed_exists
+            remove_instance_variable :@argument_scanner ; true
+          else
+            @_do_advance_scanner_after_write = @_initial_value_for_do_advance ; false
+          end
         end
 
         # -- A
 
         def __index_associations
 
-          diminishing_pool = {} ; h = {}
-
+          h = {} ; pool = {}
           st = remove_instance_variable :@association_stream
 
           begin
             asc = st.gets
             asc || break
-
-            if asc.is_required || asc.default_by || asc.normalize_by
-              diminishing_pool[ asc.name_symbol ] = true
+            if _association_is_extroverted asc
+              pool[ asc.name_symbol ] = true
             end
-
             h[ asc.name_symbol ] = asc
-
             redo
           end while above
 
-          @_diminishing_pool = diminishing_pool
-          @_association_via_name_symbol = h
-          @_ok = true ; @_missing_requireds = nil ; @_seen = {}
+          @_normal_association_via_name_symbol = h
+          @_diminishing_pool = pool
+          @_seen = {}
 
           NIL
         end
@@ -947,6 +1260,54 @@ module Skylab::Fields
         def __flush_association_soft_reader
           _asr = remove_instance_variable :@_association_soft_reader
           _asr.flush_to_soft_reader_via_argument_scanner__ @argument_scanner
+        end
+
+        def __init_association_stream
+
+          @_missing_required_MIXED_associations = nil   # snuck in here
+          @association_stream = send @_association_stream
+          NIL
+        end
+
+        def __association_stream_via_member_array
+
+          is_req = remove_instance_variable :@association_is_required_by
+
+          # (when the above is a function that produces true, #here-7)
+
+          is_req ||= MONADIC_EMPTINESS_  # by default, "members" are not required
+
+          Stream_.call remove_instance_variable :@__member_array do |sym|
+
+            NormalAssociation___.new is_req[ sym ], sym
+          end
+        end
+
+        NormalAssociation___ = ::Struct.new :is_required, :name_symbol do
+
+          alias_method :intern, :name_symbol
+
+          def default_by
+            NOTHING_
+          end
+
+          def is_glob
+            FALSE
+          end
+
+          def normalize_by
+            NOTHING_
+          end
+        end
+
+        def __association_stream_as_is
+          _ = remove_instance_variable :@association_is_required_by
+          _ and raise Home_::ArgumentError  # it's only for the members style
+          remove_instance_variable :@__association_stream
+        end
+
+        def _yes
+          TRUE
         end
 
         # -- final result
@@ -970,12 +1331,21 @@ module Skylab::Fields
 
       # ==
 
-      class ValueNormalizer_via___ < Common_::MagneticBySimpleModel
+      class LEGACY_ENTITY_ALGORIHTM_ValueNormalizer_via___ < Common_::MagneticBySimpleModel
+
+        # we used to think this was bee's knees because of the construction
+        # of a single proc that is used to traverse over every association,
+        # but now this is at odds with [#012.5.2] the fact that we must not
+        # run thru ad-hoc normalizers any values derived from defaulting.
+        # also this has the oldschool [be]-era "native" associations with
+        # the RISC methods used to reflect them. this would all change for
+        # the modern age but we've got to see how this percolates out to
+        # the many clients that use this, in its own work.
 
         attr_writer(
-          :default_knownness_via_association_by,
+          :default_of_association_by,
           :listener,
-          :receive_missing_by,
+          :receive_missing_native_association_by,
         )
 
         def execute
@@ -986,11 +1356,12 @@ module Skylab::Fields
 
             if ! kn.is_effectively_known && Home_::Has_default[ asc ]
 
-              kn_ = @default_knownness_via_association_by[ asc ]
+              kn_ = @default_of_association_by[ asc ]
               if kn_
                 # (replace the effectively unknown with what was produced
                 # by the defaulting IFF the defaulting didn't fail #[#012.E])
                 kn = kn_
+                did = true
               end
             end
 
@@ -1000,6 +1371,12 @@ module Skylab::Fields
 
             bx = asc.ad_hoc_normalizer_box
             if bx
+              if did
+                # :[#008.6]: #borrow-coverage from [br], [cu].
+                # cases like these need to GO AWAY #here-3 because they are
+                # in violation of [#012.5.2]
+                NOTHING_  # hi.
+              end
               kn = __add_hocs kn, bx, asc, & x_p
             end
 
@@ -1010,18 +1387,13 @@ module Skylab::Fields
 
               if ! kn.is_effectively_known && Home_::Is_required[ asc ]
 
-                kn = @receive_missing_by.call kn, MISSING___ do
-
-                  Home_::Events::Missing.for_attribute asc
-                end
+                kn = @receive_missing_native_association_by[ kn, asc ]
               end
             end
 
             kn
           end
         end
-
-        MISSING___ = [ :error, :missing_required_properties ].freeze
 
         def __add_hocs kn, bx, model, & x_p
 
@@ -1095,7 +1467,13 @@ module Skylab::Fields
           end
       end ; end
 
+      # ==
+
+      MONADIC_TRUTH_ = -> _ { true }
+
       UNDERSCORE_ = '_'
+
+      # ==
     end
   end
 end

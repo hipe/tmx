@@ -562,9 +562,9 @@ module Skylab::Fields
           end
         end
 
-        RMRA_METH___ = -> miss_a do
+        RMRA_METH___ = -> miss_asc_a do
 
-          _ev = Build_missing_requireds_event___[ miss_a ]
+          _ev = Build_missing_requireds_event___[ miss_asc_a ]
           raise _ev.to_exception
           # maybe_send_event # :error, :missing_required_properties do
         end
@@ -574,13 +574,13 @@ module Skylab::Fields
           Common_::Event.inline_not_OK_with(
 
             :missing_required_properties,
+            :missing_LEGACY_associations, miss_prp_a,
             :exception_class_by, -> { Home_::ArgumentError },
             :error_category, :argument_error,
-            :miss_a, miss_prp_a
 
           ) do | y, o |
 
-            s_a = o.miss_a.map do |prp|
+            s_a = o.missing_LEGACY_associations.map do |prp|
               par prp
             end
 

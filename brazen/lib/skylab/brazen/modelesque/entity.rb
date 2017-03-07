@@ -321,7 +321,7 @@ module Skylab::Brazen
 
         public def _receive_missing_required_associations_ miss_prp_a  # :+#public-API #hook-in #universal
 
-          ev = Home_.lib_.fields::Events::Missing.for_attributes miss_prp_a
+          ev = Home_.lib_.fields::Events::Missing.with :reasons, miss_prp_a
 
           if respond_to? :receive_missing_required_properties_event
 

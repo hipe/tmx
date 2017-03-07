@@ -1,8 +1,10 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalize using defaults & requireds" do
+  describe "[fi] attributes - normalization - extroverted features" do
+
+    # defaulting & re
 
     TS_[ self ]
     use :memoizer_methods
@@ -75,6 +77,7 @@ module Skylab::Fields::TestSupport
 
         it "use the very new against the very old. use the word \"parameter\"" do
           # #coverpoint1.2: `id2name` is a necessary thing, and "parameter" the word
+
           a = _N_things
           expect_channel_looks_like_missing_required_ a
           _line = black_and_white_line_via_event_ a[1].call

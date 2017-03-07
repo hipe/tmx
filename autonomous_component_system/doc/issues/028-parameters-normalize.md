@@ -48,6 +48,7 @@ family thread:
     [br] was that it used the same store (the "entity") to hold unsanitized
     modality values as it did to store these as the valid, ad-hoc
     structures they became.)
+    :[#here.2.1]
 
   • our responsibility is only to traverse over the "expanse set"
     of formal *parameters* (not nodes, i.e not component associations
@@ -55,6 +56,7 @@ family thread:
     parameters that are required. note that thus far we need never produce
     new components during this work, we need only check the values of
     existing components.
+    :[#here.2.2]
 
   • because it's in scope, "definition-based" defaults get effected here
     too. (non-proc-based implementations may have their own form of
@@ -62,6 +64,7 @@ family thread:
     the above bullet and this one is that default values do NOT get
     put through component models to derive a value - the default values
     are accepted as-is.
+    :[#here.2.3]
 
 
 

@@ -762,6 +762,10 @@ module Skylab::Fields
     Common_::Scanner.via_array a
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   # --
 
   ArgumentError = ::Class.new ::ArgumentError
@@ -787,6 +791,7 @@ module Skylab::Fields
   EMPTY_A_ = []
   EMPTY_S_ = ""
   Home_ = self
+  IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   Lazy_ = Common_::Lazy
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }

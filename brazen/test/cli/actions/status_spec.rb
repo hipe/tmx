@@ -96,7 +96,8 @@ module Skylab::Brazen::TestSupport
       end
 
       context "with a path argument that does not exist" do
-        it "says as much" do
+
+        it "says as much" do  # #lends-coverage to #[#fi-008.6]
           invoke 'foozie'
           expect :styled, %r(#{ par 'path' } does not exist - \./foozie\z)
           expect_action_invite_line_

@@ -238,7 +238,7 @@ module Skylab::Fields::TestSupport
       it "loads" do
       end
 
-      it "when provide all properties" do  # :#coverpoint1.8
+      it "when provide all properties" do
 
         entity = X_a_s_cf_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
         entity.foo.should eql :FO
@@ -260,8 +260,7 @@ module Skylab::Fields::TestSupport
         entity.foo.should be_nil
       end
 
-      it "when required field missing" do
-
+      it "when required field missing" do  # :#coverpoint1.8
         _rx = /\Amissing required field - 'baz'\z/
 
         begin

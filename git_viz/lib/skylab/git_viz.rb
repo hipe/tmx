@@ -107,10 +107,6 @@ module Skylab::GitViz
 
     _Hu = nil
 
-    Basic_Set = -> * a do
-      Basic[]::Set[ * a ]
-    end
-
     Date_time = _memoize do
       require 'date'
       ::DateTime

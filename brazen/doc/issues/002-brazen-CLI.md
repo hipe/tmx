@@ -24,6 +24,8 @@ our obsession is with what these disparate "modalities" have in common..
 
 
 
+(EDIT: the rest is ancient [br]-era stuff)
+
 
 # introduction
 

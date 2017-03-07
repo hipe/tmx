@@ -303,10 +303,6 @@ module Skylab::Basic  # introduction at [#020]
       Plugin[]::Bundle::Directory[ mod ]
     end
 
-    Bundle_Multiset = -> mod do
-      Plugin[]::Bundle::Multiset[ mod ]
-    end
-
     Empty_string_scanner = -> do
       StringScanner__[].new ''
     end

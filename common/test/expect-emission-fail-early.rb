@@ -87,6 +87,10 @@ module Skylab::Common::TestSupport
         @EEFE_dispatcher.receive_finish_by p, self
       end
 
+      def DEBUG_ALL_BY_FLUSH_AND_EXIT
+        @EEFE_dispatcher._DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ self
+      end
+
       def execute
         @EEFE_dispatcher.receive_result_as_result self
       end
@@ -130,7 +134,7 @@ module Skylab::Common::TestSupport
       end
 
       def DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER tc
-        @_dispatcher.__DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
+        @_dispatcher._DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
       end
 
       def expect_result_under x, tc
@@ -180,7 +184,7 @@ module Skylab::Common::TestSupport
         _receive_executable_flusher _
       end
 
-      def __DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
+      def _DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
         _ = @_mode_implementation._flusher_for_DEBUG_AND_EXIT_ tc
         _receive_executable_flusher _
       end

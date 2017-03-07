@@ -77,13 +77,16 @@
 
 [#016]       [ actor ]  (will move from [co])
 
-[#015]       track assimiliation targets "missing"
+[#015] #hole
+             ( #was: track assimiliation targets "missing" (used once, in [ba]) )
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 
 [#013]       the unification of methodic actors into (here) "attributes"
 
 [#012]       now the "normal normalization" algorithm (and its variants)..
+
+       #wish :[#here.10]: `nilify` as an option
 
              :[#here.I]: where "ad-hoc normalization box" is still used
 
@@ -99,7 +102,13 @@
              a defaultant association MUST NOT be required. (other sub-tags
              here track a logical reduction of the grammar space.)
 
-             :[#here.E]: justifies the need for defaulting to be able to fail
+             :[#here.E.3]: values already in the value store will be assumed
+             to be already valid.
+
+             :[#here.E.2]: values produced by defaulting procs must not
+             be run through normalization.
+
+             :[#here.E.1]: justifies the need for defaulting to be able to fail
              and recommends an interface for handling and expressing (or not)
              this failure.
 
@@ -123,7 +132,7 @@
              entity. (but what about requiredness check?)
 
              :[#here.A]: in our one-generation-ago algorithm, we posit and
-             explore the significace of "normalization points" as a single,
+             explore the significance of "normalization points" as a single,
              arbitrary but chosen point in time (for defaulting, for
              requiredness-check).
 

@@ -26,30 +26,6 @@ module Skylab::Fields
 
     class Events::Missing
 
-      class << self
-
-        def for_attribute x
-          via [ x ]
-        end
-
-        def for_attributes a
-          via a
-        end
-
-        def via_arglist a
-          via( * a )
-        end
-
-        def via miss_a, * x_a   # miss_a [, lemma_x ]
-
-          if x_a.length.nonzero?
-            x_a.unshift :noun_lemma
-          end
-
-          with :reasons, miss_a, * x_a
-        end
-      end  # >>
-
       # this event expresses as a stream of statement-ishes.. #[#here.B]
 
       def _begin_expression_session_for y, expag
@@ -77,24 +53,28 @@ module Skylab::Fields
         @_atoms = nil
         @_recurses = nil
 
-        st = Common_::Stream.via_nonsparse_array remove_instance_variable :@reasons
-
-        reason_x = st.gets
-
         @_add_as_atom = method :__first_add_as_atom
         @_add_as_recurse = method :__first_add_as_recurse
+
+        x = remove_instance_variable :@reasons
+        st = if x.respond_to? :gets
+          x
+        else
+          Stream_[ x ]
+        end
 
         @_subject_string = Determine_any_subject_string[ self ]
 
         begin
-          if reason_x.respond_to? :name_symbol
+          reason_x = st.gets
+          reason_x || break
+          if reason_x.respond_to? :intern or reason_x.respond_to? :name_symbol
             @_add_as_atom[ reason_x ]
           else
             @_add_as_recurse[ reason_x ]
           end
-          reason_x = st.gets
-        end while reason_x
-
+          redo
+        end while above
 
         if @_atoms
           __express_atoms

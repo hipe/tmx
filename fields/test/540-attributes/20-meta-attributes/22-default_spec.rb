@@ -134,7 +134,7 @@ module Skylab::Fields::TestSupport
           )
           expect_channel_looks_like_missing_required_ a
           _ev = a[1].call
-          _ev.reasons.map( & :name_symbol ) == [ :jamooka ] || fail
+          _ev.reasons.to_a == [ :jamooka ] || fail
         end
 
         def entity_class_

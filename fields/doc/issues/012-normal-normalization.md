@@ -53,7 +53,7 @@ is a normalization" rubric would be clunky at best. :[#here.3.2]
 
 throughout this document we explore pitfalls like these that can stem
 from this "over-munging" approach. we do so specifically across the
-concerns of normalization, requiredness and defaulting; pointing
+concerns of defaulting, ad-hoc normalization and requiredness; pointing
 out where such munging can present costs. we could broaden our focus
 and apply this same lexicon towards an attempted "munging" of `glob`,
 `flag` and "mondaic" attributes (all categories of [#014]
@@ -66,7 +66,7 @@ and apply this same lexicon towards an attempted "munging" of `glob`,
 
 a possible pitfall of all this "munging" is that these meta-attributes
 can be composed and that they are not closed under composition (if
-i have that right): "requiredness", "defaulting" and "normalization"
+i have that right): "defaulting", "ad-hoc normalization" and "requiredness"
 are all meta-attributes that need to be at least somewhat cognizant
 of each other in ways we now explore.
 
@@ -81,6 +81,11 @@ as false-requirements.
 while following along in the three sections (especially their
 pseudocode), give consideration to the importance of their order
 with respect to each other.
+
+following these sections, then, we will explore points of "synthesis"
+about detailed ways these "meta-associations" can and cannot be allowed
+to influence each other.
+
 
 
 
@@ -166,13 +171,6 @@ to change our minds on this point. scratch that, it should be up to the
 application developer; yet another reason why it would be useful to allow
 the defaulting proc to "reach" the primordial operation.))
 
-  - a further point we would make (somewhat apropos of nothing)
-    is that while ad-hoc normalizations are used for "incoming" data
-    and so can be "modality sensitive" (perhaps indiscernably from
-    unseriazliation/unmarshalling); defaulting should not generally
-    produce "encoded" valued (because it's counter-intuitive, subjectively)
-    and as such values produce by defaulting procs must not be run
-    thorugh normalization :[#here.E.2].
 
 
 
@@ -238,7 +236,7 @@ thusly: we accept only one such ad-hoc normalizer function. internally the
 function can employ "normalization function chaining" or any other
 techniques it wants to, but as far as we're concerned we only have this one
 normalization function to deal with. this way we pass the buck without
-closing the door on all the fun. :[#here.D]
+closing the door on all the fun. metaphor! :[#here.D]
 
 
 
@@ -261,6 +259,8 @@ itself.
 anyway, here in contrast to the past we're going to try something a
 little simpler in how we implement this. (we're going to give requiredness
 its own "tick" but not its own "pass", more below at [#here.theme-3].)
+basically, we *do* munge "requiredness" in with every other kind of meta-
+association.
 
 we dodge the question here of [#here.theme-1] what it means for a value
 to be present.
@@ -304,7 +304,7 @@ allow the subject facility to remain blissfully ignorant of all of this.
 
 
 
-## towards implementation: requirements in synthesis
+## an overview of problems in synthesis
 
 we have now arrived at a conception of attributes that are "normalizers"
 in a broad, extroverted sense. not only does the particular formal
@@ -329,9 +329,102 @@ it then follows that you must not run normalization on data that is
 already "inside" (just as you must not unserialize the same data
 twice). an inverted corollary of this is the excellent poka-yoke
 discoverd in [#ac-028] ACS's normalization stack, that if a "frame"
-"has" a "component", then that component is already valid. :[#here.theme-4]
+"has" a "component", then that component is already valid.
 (in a strongly typed language, this would perhaps not need to be a
-specified convention at all.)
+specified convention at all.) this paragraph is a condensation of
+[#here.5.3] a dedicated section on the topic.
+
+
+
+
+## towards synthesis: the interpretation (i.e "meaning") of defaulting vis-a-vis normalization :[#here.5.2]
+
+this is a long-winded but important answer to the question of whether
+default values should be run through normalization. (TL;DR: no.)
+
+for parsimony of our association "grammar" (i.e to keep low the number of
+meta-associations we have to learn about and remember), we allow that ad-
+hoc normalizations (introduced in a previous section) can be used in a
+"modality senstive" manner (through "meta-association injection,
+introduced later). such a utilization of this meta-association makes it
+perhaps indiscernable from an "unserialization" (or "unmarshalling")
+facility.
+
+that is, ad-hoc normalization is what will be used (internally) when you
+need to parse "incoming" data that is some modality-specific format (what
+we'll call "encoded") to the internal format (i.e objects in your runtime,
+or what we'll call "decoded".)
+
+a simple but common real-world example of this is when you need to parse
+some kind of number entered at the command line (or perhaps read from a
+file or in a network payload). this value is all but useless to your
+runtime unless it is converted from the (possibly) arbitrary string it
+"came in" as to a float, integer, etc as appropriate.
+
+the subject facility is designed to make this kind of commonplace
+"normalization" an afterthought.
+
+but when it comes to defaulting, the question arises, "if the association
+specifies both a defaulting proc and some kind of ad-hoc normalization,
+and defaulting is activated, is it appropriate to run the values produced
+by defaulting *through* the ad-hoc normalization?"
+
+although we have encountered (and delivered) arrangements where this
+"feels" useful, our answer today is: no.
+
+while there is room for debate on this point, it is our "feeling" that
+defaulting should generally be "modality agnostic". that is, defaulting
+should produce "decoded" not "encoded" values. it is (again) our feeling
+that this choice is more intuititve than the alternative, because a
+corollary of the alternative is that you could (by default) *not* define
+a modality-agnostic default, and it is our assumption that the model
+author when modeling a defaulting strategy will generally (but not always)
+be thinking of it in modality-agnostic terms.
+
+if the above makes no sense to you (which, it probably doesn't), then
+ask yourself: if you wanted to specify that the default value for some
+association was the integer `2`, does it "feel" more intuitive to represent
+this default as the *integer* `2` or the *string* `"2"`? if you answered
+"string" then you are wrong about your feelings.
+
+but what we are doing by presenting *integer* `2` as our default is
+presenting a "decoded" value (i.e. an internal "object"). remember we are
+now conceiving of the whole ad-hoc normalizer sub-facility as indiscernable
+from unserialization (unmarshalling). since it is always wrong to try and
+unserialize an already unserialized (i.e an already decoded) value, it
+follows that it is always wrong to try to normalize a default. whew!
+
+if for whatever reason you wanted the equivalent of this behavior (an
+imaginable but as-yet unincountered case), you would have to write your
+defaulting proc to do the work "manually" of running whatever value
+through the same (or any other) normalization arrangement. you have this
+as an option because [#here.E.1] defaulting can now fail.)
+
+
+
+
+## one last point of parsimony :[#here.5.3]
+
+a related point that we need represented "officially" somewhere in this
+document is the idea that if a value is already "in" the value store, in
+must already be valid.
+
+it's a "parsimonious reduction" that is intended (counter-intuitively,
+perhaps) to make this less error prone by reducing the possible states we
+have to worry about.
+
+this idea gets more explanation and justification throughout this document
+under its tag. also, this same conclusion is reached through its own
+justification at [#ac-028.2.3].
+
+it's worth noting here that the degree to which this "problem" is actually
+a problem might be determined largely by your platform language's
+relationship to a type system.
+
+a corollary of this is that any ad-hoc normalization for any association
+must never be run against a value already present in the value store.
+in fact, we will broaden the formal name of "value store" to be
+"valid value store" just so we don't forget this point.
 
 
 
@@ -606,7 +699,7 @@ so imagine this:
                                        component is already valid (A) and
                                        (B) it's entirely wrong to run objects
                                        through our normalization routines
-                                       (for now) (per [#here.theme-4]).
+                                       #[#here.5.3].
 
         step 3 (required):             not relevant. if the field is required,
                                        we know it is set. either way there is
@@ -821,6 +914,8 @@ rest except to say:
   - "local participant": this is our future-proofy, extra general placeholder
                          term to mean (probably) "the thing that is doing the
                          the thing we are describing." the "property store" probably.
+
+  - modality: defined (vaguely) at [#br-002]
 
   - monadic: (here) a formal attribute that "takes" a single value (as opposed
              to a flag or glob). formally a category of of "argument arity".
@@ -1059,7 +1154,7 @@ the normal normalization will be described inline.
 ## (previous) introduction  # :#here-2
 
 (NOTE: this shares the same shortcoming of its predecessor, that it
-doesn't honor [#here.E.2].)
+doesn't honor [#here.5.2].)
 
 the big experimental frontier theory at play during the creation of this
 document (as its own node) was in the formulation of this question: how
@@ -1133,7 +1228,7 @@ its own dedicated code.
 
 (NOTE although the "one ring" algorithm shares obvious DNA with the
 below primordial snippet, the below algorithm is at odds with our
-latest version of it in regards to [#here.E.2] whether default values
+latest version of it in regards to [#here.5.2] whether default values
 are run through ad-noc normalizers.)
 
 near [#!006] we aggregate three of the above concerns into this one

@@ -237,6 +237,10 @@ module Skylab::Basic
 
         def __build_missing_arguments_event miss_prp_a
 
+          self._COVER_ME__easy_just_refactor__
+          # the below shoud look like Yadda.with :reasons, miss_prp_a, :noun_lemma, 'argument'
+          # if you really need it, see #tombstone-B
+
           _ev = Home_.lib_.fields::Events::Missing.via miss_prp_a, 'argument'
 
           _sign_event _ev
@@ -272,4 +276,5 @@ module Skylab::Basic
     # <-
   end
 end
+# :#tombstone-B - temporary
 # :#tombstone-A - we used to use a thing we no longer use

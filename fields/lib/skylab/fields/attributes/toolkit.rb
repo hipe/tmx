@@ -29,7 +29,7 @@ module Skylab::Fields
         @association_stream ||= __formal_attribute_stream
         @listener ||= @entity._listener_
 
-        Attributes::Normalization::EK.call_by do |o|
+        Attributes::Normalization::EK.call_by do |o|  # :#spot-1-6
 
           o.arguments_to_default_proc_by = method :__args_to_default_proc_by
 

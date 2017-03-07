@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalization (progressive edit sessions)" do
+  describe "[fi] attributes - normalization - integrate 1st 2 features.." do
 
     TS_[ self ]
     use :memoizer_methods
