@@ -86,7 +86,15 @@
 
 [#012]       now the "normal normalization" algorithm (and its variants)..
 
-       #wish :[#here.10]: `nilify` as an option
+             [#here.L] - low-level gotchas
+             [#here.L.1]: where to advance the scanner after primary expression
+
+       #track #temporary :[#here.K]
+
+       #wish :[#here.J.4]: `nilify` as an option
+             :[#here.J.3]: generally geared towards dynamic associations
+             :[#here.J.2]: as a behavioral feature, aggregate all missing required
+             :[#here.J.1]: (placeheld) we must stop on first unrecognized when ..
 
              :[#here.I]: where "ad-hoc normalization box" is still used
 
@@ -154,6 +162,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
+             [#here.10-13] borrow
              [#here.6], [#here.7], [#here.8], [#here.9] borrow
              [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.A] #in-situ [ the absorber method maker ]

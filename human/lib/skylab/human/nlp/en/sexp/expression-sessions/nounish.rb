@@ -27,11 +27,11 @@ module Skylab::Human
         end
 
         def interpret_component_with_own_stream_ st, asc
-          Phraseish_Redux___.new st, asc
+          PhraseishRedux__.new st, asc
         end
 
         def expression_via_sexp_stream_ st  # #test-only
-          Phraseish_Redux___.new st, nil
+          PhraseishRedux__.new st, nil
         end
 
         alias_method :begin, :new
@@ -71,7 +71,7 @@ module Skylab::Human
       end
     end
 
-    class Phraseish_Redux___ < Redux_Abstract_Base
+    class PhraseishRedux__ < Redux_Abstract_Base
 
       COMPONENTS = Attributes_[
 

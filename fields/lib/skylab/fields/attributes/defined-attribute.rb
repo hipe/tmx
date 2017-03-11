@@ -321,6 +321,7 @@ module Skylab::Fields
       end
 
       Read___ = -> do
+        # [#012.L.1] *DO* advance. (eager parsing)
         argument_scanner.gets_one
       end
 

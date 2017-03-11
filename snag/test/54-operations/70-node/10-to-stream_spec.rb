@@ -63,6 +63,8 @@ module Skylab::Snag::TestSupport
 
     it "`identifier` where number is too low" do
 
+      # #lends-coverage to [#fi-008.12]
+
       call_API :node, :to_stream,
         :identifier, '-12'
 

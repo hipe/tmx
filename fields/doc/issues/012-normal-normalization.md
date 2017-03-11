@@ -468,6 +468,7 @@ so imagine this:
 
       add a reference (the symbolic name) of this formal attribute
       to a hash to be used as a [#ba-061] diminishing pool.
+      (we now call such associations "extroverted".)
 
     now the formals are all represented as (only) this straightforward
     hash and this simple diminishing pool of "normalizant" formals.
@@ -504,9 +505,22 @@ so imagine this:
       that its existence alone indicates that it has been engaged. however,
       because we want the flexibility to be able to change the syntax of
       how (for example) the API scanner works here (maybe even leave it up
-      to the application), we've got to say this: we have to accept a
-      boolean, so that we are free to interpret "flag" as effectively
-      meaning "boolean argument"..
+      to the application), we've got to accept a boolean. more deeply:
+
+      the client may want to effect its syntax so that formal "flags" are
+      in effect common, monadic (argument arity "one") fields whose arguments
+      happen to be interpretated in a boolean manner. instead, the client
+      might want to interpret flags in the way we usually think of them
+      (argument arity "zero"); where the presence of the "primary" name
+      alone is enough to activate a flag, and it does not consume any
+      following argument.
+
+      we want it to be the case that whichever way the (modality) client
+      choses to expose a syntax for flags, it is totally opaque to us;
+      i.e it must be the case that we don't care. to achieve this level of
+      indifference we have to allow for the possibility that the client
+      effects flags in the first way, where's it's essentionally a common,
+      monadic field. whew! so:
 
       because the injected scanner can't know that it's a flag it's
       parsing until we tell it, and we can't know that it's a flag it's
@@ -617,7 +631,7 @@ so imagine this:
       (or "not set") by the working definition, THEN add a symbolic
       reference to this formal attribute to the ordered set (not array) and
       continue processing. (why we do not withdraw from futher processing
-      at this point will be explained at [#here.theme-5].)
+      at this point will be explained at [#here.J.2].)
 
       if everything's still OK (and you have a value that's considered
       present and normal), write the value to the property store using
@@ -701,9 +715,10 @@ so imagine this:
                                        through our normalization routines
                                        #[#here.5.3].
 
-        step 3 (required):             not relevant. if the field is required,
-                                       we know it is set. either way there is
-                                       no work to do here.
+        step 3 (required):             not relevant. because we know it is
+                                       set, if it is required there is nothing
+                                       to do. (there is likewise nothing to
+                                       do if it is nt required.)
 
         as such, when the component is already set we can (and must)
         "pass" on the processing of the formal attribute for this field.
@@ -716,6 +731,7 @@ so imagine this:
             it, it will NOT be run through the any ad-hoc normalization
             of the associated formal attribute. if you want the equivalent
             of this you would have to do it through plain old programming.
+            (again, #[#here.5.3].)
 
       OTHERWISE (and the field was not set),
 
@@ -769,16 +785,16 @@ so imagine this:
           holds the name of the attribute and a boolean indicating that this
           value is a known unknown; and nothing else. if the normalizer
           tries to dereference a would-be value from such a structure an
-          exception is raised so well behaved normalizers always check for
+          exception is raised so well-behaved normalizers always check for
           this "known unknown" case first.
 
           this arrangement allows the remote normalization facility to
           implement a normalization that effectively ammounts to a
           "defaulting". it is also a definitive answer to the question of
           whether and how you normalize a value when that value is not
-          required and it was not provided, but it has a normalization
-          "routine". (the answer is that the normalization facility has to
-          check for this condition explicitly (whether it wants to or not,
+          required and it was not provided, but it has ad-hoc normalization.
+          (the answer is that the normalization facility has to
+          check for this condition explicitly (whether it wants to or not -
           it's the point of qualified knownnesses) and decide for itself
           what to do. typically the remote participant gives all qualified
           known unknowns a "pass" so that if it's not required we keep
@@ -793,7 +809,7 @@ so imagine this:
           reference to this formal attribute to the ordered set of names
           of missing required fields. note we do *not* withdraw from
           processing here in such a case. again this will be explained at
-          [#here.theme-5].
+          [#here.J.2].
 
     if everything's still OK (and so much could have failed by now),
 
@@ -805,18 +821,16 @@ so imagine this:
     emit a single complaint expressing ("splaying") these missing
     required fields.
 
-    :[#here.theme-5] the reason we aggregate all these missing required
-    fields into a collection and express them only at the end:
+    :[#here.J.2] (was :[#here.theme-5]) the reason we aggregate all these
+    missing required fields into a collection and express them only at the end:
 
-      - if we did them piecemeal one-by-one as they happen, for most
-        modality client implementations this "feels" too noisy, and it's
-        such a common occurrence that it's not fair to require the
-        implementation to aggregate summarize these emissions herself.
-
-      - if we withdraw at the first missing required field, then (for some
-        modalities) it makes for a poor using experience, leaving the user
-        to have to be notified one-by-one of each missing required field
-        in a drawn-out, iterative manner.
+    if we withdrew from all further processing of the invocation at
+    every first occurrence of a missing required field, for most
+    modality client implementations this "feels" too clunky -- it
+    either leaves the user with less information than is useful to
+    see the "big picture" of the problem; or it puts too much onus
+    on the client to implement UI explaining the "splay" of required
+    fields.
 
     the final result is a boolean indicating whether everything's OK.
     WHEW!

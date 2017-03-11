@@ -11,6 +11,7 @@ module Skylab::Snag::TestSupport
     it "one fine | multiple matches on one line | multiple patterns " do
 
       # #lends-coverage to [#pl-008.5] (along the way)
+      # #lends-coverage to [#sn-008.13]
 
       call_API(
         :to_do, :to_stream,

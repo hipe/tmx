@@ -12,6 +12,8 @@ module Skylab::Snag::TestSupport
 
       it "the 3 pieces before the structured tag look good" do
 
+        # #lends-coverage to [#fi-008.10]
+
         _init_piece_stream
         expect_piece_ :string, 'hi '
         expect_piece_ :tag, '#normal-tag'

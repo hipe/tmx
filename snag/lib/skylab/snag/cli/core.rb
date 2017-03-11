@@ -401,7 +401,7 @@ module Skylab::Snag
           _on_its_own_line = true
         end
 
-        # (the above block is exemplary of name conv. [#bs-032]#D )
+        # (the above block is exemplary of name conv. [#bs-032.4] )
 
         if _on_its_own_line
           s_a.push s

@@ -11,6 +11,8 @@ module Skylab::Snag::TestSupport
 
       it "one that has has" do
 
+        # #lends-coverage to [#fi-008.11]
+
         call_API :node, :to_stream,
           :identifier, 2,
           :upstream_reference, _path, & EMPTY_P_

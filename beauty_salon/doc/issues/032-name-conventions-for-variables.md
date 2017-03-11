@@ -24,24 +24,41 @@ inflected by scope, shape, and other vectors described here.
 just like with [#029] consts and [#028] methods, there are tiers of
 scope we adhere to when naming our instance variables:
 
-    @public_instance_variable   # :#tier-0 - public API-ish
+    @public_instance_variable   # :[#here.1.0] - public API-ish
 
-    @_public_instance_variable_when_above_convention_is_business_namespace_
+    @_public_instance_variable_when_above_convention_is_business_namespace_  # see [#here.1.1]
 
-    @library_scope_  # #tier-1 - see
+    @library_scope_  # see [#here.1.2]
 
-    @_cozy_scope  # :#tier-2: used only in this file
+    @_cozy_scope  # :[#here.1.3]: used only in this file
 
-    @__ad_hoc_scope  # :#Tier-3 - see
+    @__ad_hoc_scope  # :[#here.1.4] - see
 
-    @___singleton_scope  # :#tier-4 - see
+    @___singleton_scope  # :[#here.1.5] - see
 
 
 the descriptions in the first mentioned source apply here.
 
 
 
-### :#tier-1 - "library scope"
+
+
+### :[#here.1.0.5]
+
+the convention `@_like_this_` (with one leading and one trailing underscore
+in the ivar name) is used:
+
+  - when the instance variable is part of a public API (i.e shared between
+    two disparate code nodes) but [#here.1.0] cannot be used because for
+    example it is reserved for business names.
+
+  - similarly, when a depended-upon node (base class or mixin module) wants
+    to "stay out of the way" of all other var namespaces.
+
+
+
+
+### :[#here.1.2] - "library scope"
 
 for this tier, first see the same tier over in [#028] the method name
 conventions. when used for an ivar, this convention has a related but
@@ -63,11 +80,11 @@ at.
 
 
 
-### :#Tier-3 - "ad hoc scope"
+### :[#here.1.4] - "ad hoc scope"
 
 an ivar with two leading underscores:
 
-  • has the same restrictions as #tier-2
+  • has the same restrictions as [#here.1.3]
 
 additionally, in the normalest of cases this ivar will appear exactly
 twice in the file: once where it is set to a value and once where it is
@@ -76,15 +93,15 @@ accessed.
 more broadly we sometimes extend the semantics to indicate that although
 the ivar occurs more than twice in the file, its "output point" is
 restricted to one place (which is to say the cost of changing it is
-generally lower than for a #tier-2 ivar).
+generally lower than for a [#here.1.3] ivar).
 
 
 
-### :#tier-4 - singleton scope
+### :[#here.1.5] - singleton scope
 
 an ivar with *three* leading underscores:
 
-  • has the same restrictions as #tier-2
+  • has the same restrictions as [#here.1.3]
 
 and furthermore the ivar is refered only ever once. in practice this is
 only ever useful for ivars that memoize some trueish value in

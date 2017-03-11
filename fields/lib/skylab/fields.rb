@@ -811,6 +811,7 @@ module Skylab::Fields
   SPACE_ = ' '
   STOP_PARSING_ = false
   UNABLE_ = false
+  USE_WHATEVER_IS_DEFAULT_ = nil
 
   def self.describe_into_under y, _
     y << "for modeling { arguments | attributes | parameters | properties }"

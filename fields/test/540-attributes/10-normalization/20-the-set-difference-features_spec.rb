@@ -63,7 +63,7 @@ module Skylab::Fields::TestSupport
           _s_a = ev.express_into_under [], expression_agent
           expect_these_lines_in_array_ _s_a do |y|
             y << "unrecognized member :b"
-            y << "did you mean :a or :c?"
+            y << "did you mean :c?"
           end
         end
 
