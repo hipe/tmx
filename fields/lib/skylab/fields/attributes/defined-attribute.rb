@@ -304,15 +304,13 @@ module Skylab::Fields
 
       def write ent, scn  # result in kp. #coverpoint1.3 (also)
 
-        _kp = Here_::Normalization::FACILITY_I.call_by do |o|
+        Here_::Normalization.call_by do |o|
           o.argument_scanner = scn
           o.entity = ent
           o.execute_by__ = -> n11n, & p do
-            # hi. #todo
-            as_association_interpret_ n11n, & p
+            as_association_interpret_ n11n, & p  # hi. #todo
           end
         end
-        _kp  # hi. #todo
       end
 
       def as_association_interpret_ n11n, & p

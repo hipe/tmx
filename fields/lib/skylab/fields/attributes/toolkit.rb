@@ -16,9 +16,17 @@ module Skylab::Fields
         end
       end
 
+      def initialize
+        @_did = false
+        super
+      end
+
+      def association_stream= x
+        @_did = true ; @__as = x
+      end
+
       attr_writer(
         :argument_scanner,
-        :association_stream,
         :entity,
         :listener,
       )
@@ -26,17 +34,21 @@ module Skylab::Fields
       def execute
 
         @argument_scanner ||= @entity._argument_scanner_
-        @association_stream ||= __formal_attribute_stream
         @listener ||= @entity._listener_
 
-        Attributes::Normalization::EK.call_by do |o|  # :#spot-1-6
+        Attributes::Normalization.call_by do |o|  # :#spot-1-6
+
+          if @_did
+            o.association_stream_newschool = remove_instance_variable :@__as  # [sn]
+          else
+            o.association_stream_newschool = __formal_attribute_stream
+          end
 
           o.arguments_to_default_proc_by = method :__args_to_default_proc_by
 
           o.argument_scanner = @argument_scanner
           o.read_by = @entity.method :_read_
           o.write_by = @entity.method :_write_
-          o.association_stream = @association_stream
           o.listener = @listener
         end
       end

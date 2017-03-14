@@ -24,7 +24,19 @@ module Skylab::Snag
 
         def process_argument_scanner_fully scn
           _ok = super
-          _ok && Attrs__::Normalization::Normalize_via_Entity_with_StaticAssociations[ self ]
+          _ok && __normalize_in_place
+        end
+
+        def __normalize_in_place  # the idea is covered by [#fi-008.14]
+          ascs = self.class::ATTRIBUTES
+          if ascs
+            Attrs__::Normalization.call_by do |o|
+              o.association_index = ascs.association_index
+              o.ivar_store = self
+            end
+          else
+            ACHIEVED_
+          end
         end
       end
 

@@ -42,7 +42,7 @@ module Skylab::Fields
 
         def AS_ASSOCIATION_INDEX_NORMALIZE_BY  # 1x [ta], covered here
 
-          _wat = Here_::Normalization::Facility_C.call_by do |o|
+          _wat = Here_::Normalization.call_by do |o|
             yield o
             o.association_index = self
           end

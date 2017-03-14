@@ -163,6 +163,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
+             [#here.14] lend to [sn]
              [#here.10-13] borrow
              [#here.6], [#here.7], [#here.8], [#here.9] borrow
              [#here.2], [#here.3], [#here.4], [#here.5] borrow

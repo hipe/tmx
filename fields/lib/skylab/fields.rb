@@ -138,7 +138,7 @@ module Skylab::Fields
 
     def init ent, a, & p  # :[#008.8]: #borrow-coverage from [sy]
 
-      _NORMALIZE_USING_FACILITY_I_BY do |o|
+      _normalize_by do |o|
 
         o.argument_array = a
         o.entity = ent
@@ -149,7 +149,7 @@ module Skylab::Fields
 
     def init_via_argument_scanner ent, scn, & p  # #coverpoint1.3, [hu] 4x
 
-      _NORMALIZE_USING_FACILITY_I_BY do |o|
+      _normalize_by do |o|
 
         o.argument_scanner = scn
         o.entity = ent
@@ -160,20 +160,17 @@ module Skylab::Fields
 
     def normalize_entity ent, & p  # #coverpoint1.4
 
-      _NORMALIZE_USING_FACILITY_I_BY do |o|
+      _normalize_by do |o|
         o.entity = ent
         o.listener = p
       end
     end
 
-    def _NORMALIZE_USING_FACILITY_I_BY
-
-      _ = _index
-      _wee = Here_::Normalization::FACILITY_I.call_by do |o|
+    def _normalize_by
+      Here_::Normalization.call_by do |o|
         yield o
-        o.association_index = _
+        o.association_index = _index
       end
-      _wee  # hi. #todo
     end
 
     def begin_normalization & x_p
@@ -382,7 +379,7 @@ module Skylab::Fields
 
           # (this call is used all over)
 
-          x = Here_::Normalization::FACILITY_I.call_by do |o|
+          x = Here_::Normalization.call_by do |o|
             o.argument_scanner = scn
             o.push_association_soft_reader_by__( & _lookup_association_softly )
             o.association_index = _ascs_idx

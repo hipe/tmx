@@ -2,91 +2,37 @@ module Skylab::Fields
 
   class Attributes
 
-    module Normalization  # main algorithm in [#012], "one ring" in [#037]
+    class Normalization < Common_::MagneticBySimpleModel
 
-      # NOTE while we slog through [#037], at the moment this file/node has:
+      # this is "one ring": the place where normalization algorithms
+      # go to achieve immortality. main algorithm (etching) in [#012]
+
+      # this feels close to an "operator branch", but for now, not yet
+
+      # we are almost finished with [#037] the effort of "one ring"
+      # unification, but this file file/node still has:
       #
-      #   - the "one ring" ("EK") preferred normalization facility
-      #   - a clump for injection of the oldschoool [br]-era normalization
-      #   - facility "C" which will be a challenge
-      #   - this dangling faciliity "I" which can go away whenever
+      #   - the "one ring" preferred normalization facility
+      #   - a clump for injection of the oldschoool [br]-era normalization #here-1
 
-      module FACILITY_I
-        # (this used to be its own facility, and lived in "association index"
-        # #todo - this can go away completely, but we want to incubate it
-        class << self
-          def call_by
-            Here_::Normalization::EK.call_by do |o|
-              o.BE_FACILITY_I  # DOES NOTHING
-              yield o
-            end
-          end
-        end  # >>
-      end
-
-      Normalize_via_Entity_with_StaticAssociations = -> ent, & p do  # 1x. [fi] only
-
-        # (bridge the older-but-still-newish "attribute actor"-style
-        # into "one-ring")
-
-        ascs = ent.class::ATTRIBUTES
-        if ascs
-          Facility_C.call_by do |o|
-            o.association_index = ascs.association_index
-            o.ivar_store = ent
-            o.listener = p
-          end
-        else
-          ACHIEVED_
-        end
-      end
-
-      # ==
-
-      module Facility_C ; class << self
-        def call_by & p
-          EK.call_by( & p )
-        end
-      end ; end
-
-      # ==
-
-      class EK < Common_::MagneticBySimpleModel
-
-        # this is "one ring": the place where normalization algorithms
-        # go to achieve immortality.
-
-        # (this is awfully close to operator branches, but with all the
-        #  defaulting and required-ness stuff going on, we go it alone.)
-
-        # we just finished writing the massive but ostensibly "complete"
-        # [#012] new normalization algorithm in detailed pseudocode.
-        #
-        # what you see here is an exercise of the greatest OCD ever:
-        # a faithful reproduction (to the letter) of that algorithm,
-        # driven by three-laws.
+      # -
 
         def initialize
 
-          @association_source = nil
           @__do_parse_passively = false
           @_execute = :__execute_algorithmically
+          @__mutex_only_one_argument_scanner = nil
           @__mutex_only_one_association_source = nil
           @__mutex_only_one_special_execute = nil
           @__mutex_only_one_special_result = nil
           @__mutex_only_one_valid_value_store = nil
+          @_my_arg_scanner = nil
           @_react_to_missing_requireds = :__express_missing_requireds
           @_result = :__result_normally
 
-          @argument_scanner = nil
+          @association_source = nil
           @listener = nil
           yield self
-        end
-
-        # ---
-
-        def BE_FACILITY_I
-          @IS_FAC_I = true
         end
 
         # -- specify the argument source (if any)
@@ -101,34 +47,29 @@ module Skylab::Fields
           # not be easy
 
           if scn.respond_to? :scan_glob_values
-            __accept_complex_argument_scanner scn
+            _receive_argument_scanner ComplexArgScanner___.new scn
           else
-            _accept_simple_argument_scanner scn
+            _receive_simple_argument_scanner scn
           end
+          scn
         end
 
         def argument_array= a
-          _accept_simple_argument_scanner Scanner_[ a ]
+          _receive_simple_argument_scanner Scanner_[ a ]
           a
         end
 
-        def __accept_complex_argument_scanner scn
-
-          @_on_primary_completed = :__maybe_advance_scanner_complicatedly
-          @_resolve_unsanitized_value = :__resolve_unsanitized_value_complicatedly
-          @_scan_primary_symbol = :__scan_primary_symbol_complicatedly
-          @_unsanitized_key = :__unsanitized_key_complicatedly
-          @argument_scanner = scn
+        def _receive_simple_argument_scanner scn
+          _receive_argument_scanner SimpleArgScanner___.new scn
         end
 
-        def _accept_simple_argument_scanner scn
+        def _receive_argument_scanner scn_ada
+          remove_instance_variable :@__mutex_only_one_argument_scanner
+          @_my_arg_scanner = scn_ada ; nil
+        end
 
-          @_on_primary_completed = :__maybe_advance_scanner_simply
-          @_initial_value_for_do_advance = true  # always advance scanner
-          @_resolve_unsanitized_value = :__resolve_unsanitized_value_simply
-          @_scan_primary_symbol = :__scan_primary_symbol_simply
-          @_unsanitized_key = :__unsanitized_key_simply
-          @argument_scanner = scn
+        def argument_scanner  # in "defined attribute"
+          @_my_arg_scanner.native_argument_scanner
         end
 
         # -- specify the value store ("entity") (if any)
@@ -253,34 +194,12 @@ module Skylab::Fields
           _touch_mutable_association_source { BuildMemberBasedAssociationSource___ }
         end
 
-        def association_stream= st
+        def association_stream_oldschool= native_asc_st
+          _receive_association_source OLDSCHOOL_WHATAMI_AssociationSource___.new native_asc_st
+        end
 
-          # for now we are too stubborn to expose specialized setters for
-          # the different kinds of association structures (legacy [br]-era
-          # vs latest). (#here-3 and another ##here-6) BUT THIS WILL
-          # PROBABLY CHANGE. so for now we peek at the first one, assuming
-          # that the rest look like it..
-
-          # we are tempted to change this (make the interface crunchier so
-          # that the implementation can be smoother so we're trying to
-          # isolate the ramifications of this choice to this one method.
-
-          mixed_asc = st.gets
-          if mixed_asc
-
-            p = -> { p = st ; mixed_asc }
-            rebuilt_st = Common_.stream { p[] }
-
-            if mixed_asc.respond_to? :parameter_arity
-              as = OLDSCHOOL_WHATAMI_AssociationSource___.new rebuilt_st
-            else
-              as = NormalAssociationStreamBasedAssociationSource__.new rebuilt_st
-            end
-          else
-            as = NormalAssociationStreamBasedAssociationSource__.new Common_::THE_EMPTY_STREAM
-          end
-          _receive_association_source as
-          NIL
+        def association_stream_newschool= normal_asc_st
+          _receive_association_source NormalAssociationStreamBasedAssociationSource___.new normal_asc_st
         end
 
         def _touch_mutable_association_source
@@ -302,7 +221,7 @@ module Skylab::Fields
           :listener,
         )
 
-        # -- K: execution
+        # -- G: execution
 
         def execute
           send @_execute
@@ -319,7 +238,7 @@ module Skylab::Fields
 
           _prepare_to_execute
 
-          if @argument_scanner  # (assimilating [#037.5.G] is when this became a branch)
+          if @_my_arg_scanner  # (assimilating [#037.5.G] is when this became a branch)
 
             ok = __traverse_arguments
             ok &&= __traverse_associations_remaining_in_extroverted_diminishing_pool
@@ -356,7 +275,7 @@ module Skylab::Fields
 
           until __no_more_arguments
 
-            if ! __scan_primary_symbol
+            if ! @_my_arg_scanner._scan_primary_symbol_
               kp = _unable ; break
             end
 
@@ -373,7 +292,7 @@ module Skylab::Fields
 
             kp = parse[ asc ]
             if kp
-              send @_on_primary_completed
+              @_my_arg_scanner._when_primary_completed_
               # (we used to delete from the diminishing pool here but
               # now we do it #here-12 instead because method-based nerks)
             else
@@ -384,23 +303,12 @@ module Skylab::Fields
           kp
         end
 
-        # ~ ( these two called on @_on_primary_completed )
-
-        def __maybe_advance_scanner_complicatedly
-
-          # we hate this, but for now, meh: [#ze-052.2] be OCD about don't
-          # advance until valid, but only for certain argument arities.
-
-          _yes = remove_instance_variable :@_scanner_requireds_advancement_once_succeeded
-          if _yes
-            @argument_scanner.advance_one
+        def __no_more_arguments
+          if @_my_arg_scanner.__no_more_arguments_
+            remove_instance_variable :@_my_arg_scanner ; true
+          else
+            FALSE
           end
-          NIL
-        end
-
-        def __maybe_advance_scanner_simply
-          # :[#012.L.1]: CHANGED
-          NOTHING_
         end
 
         def __execute_via_custom_proc
@@ -423,7 +331,7 @@ module Skylab::Fields
           end
         end
 
-        # -- J: traversing the "extroverted" associations
+        # -- F: traversing the "extroverted" associations
 
         # when there are arguments to parse, the most intuitive, practical
         # (if not only) option is to acquire (somehow) a dictionary (hash)
@@ -541,7 +449,7 @@ module Skylab::Fields
         # sending NIL here but we're gonna wait until we feel that we want
         # it..) #wish [#012.J.4] "nilify" option
 
-        # -- G: missing requireds (both memoing and expressing)
+        # -- E: missing requireds (both memoing and expressing)
 
         def add_missing_required_MIXED_association_ sym_or_object
           ( @_missing_required_MIXED_associations ||= [] ).push sym_or_object
@@ -592,9 +500,7 @@ module Skylab::Fields
           )
           _ev  # hi. #todo
         end
-
-        # -- F: (was) checking for clobber
-      end
+      # -
 
       # ==
 
@@ -676,7 +582,7 @@ module Skylab::Fields
 
       # ~
 
-      class NormalAssociationStreamBasedAssociationSource__
+      class NormalAssociationStreamBasedAssociationSource___
 
         def initialize st
           @__association_stream = st
@@ -1102,69 +1008,15 @@ module Skylab::Fields
 
       # ==
 
-      class EK  # (re-open for those parts that support the "pipelines" above)
+      # -  # (re-open for those parts that support the "pipelines" above)
 
-        # -- E: resolving an unsanitized value
+        # -- D: resolving an unsanitized value (mostly moved to adapters)
 
         def __resolve_unsanitized_value_for_ normal_asc
-          send @_resolve_unsanitized_value, normal_asc
+          @_my_arg_scanner._match_unsanitized_value_ normal_asc
         end
 
-        def __resolve_unsanitized_value_complicatedly normal_asc
-
-          @_scanner_requireds_advancement_once_succeeded = false  # meh
-
-          if normal_asc.is_glob
-            a = @argument_scanner.scan_glob_values
-            if a
-              Common_::KnownKnown[ a ]
-            end
-          elsif normal_asc.is_flag
-            @argument_scanner.scan_flag_value
-          else
-            unsanitized_value = nil
-            _ok = @argument_scanner.map_value_by do |x|
-              unsanitized_value = x ; true
-            end
-            if _ok
-              @_scanner_requireds_advancement_once_succeeded = true
-              Common_::KnownKnown[ unsanitized_value ]
-            end
-          end
-        end
-
-        def __resolve_unsanitized_value_simply normal_asc
-
-          # if the scanner ends "early" then the below just fails hard. there
-          # is no special emission for this if you're using a simple scanner.
-
-          if normal_asc.is_glob
-            ::Kernel._A
-          elsif normal_asc.is_flag
-            ::Kerne._B
-          else
-            @argument_scanner.advance_one  #advance past the primary name,
-            x = @argument_scanner.head_as_is
-            @argument_scanner.advance_one  # and EEK [#012.L.1] do this too
-            Common_::KnownKnown[ x ]
-          end
-        end
-
-        # -- D: matching the argument scanner head against an association
-
-        def __scan_primary_symbol
-          send @_scan_primary_symbol
-        end
-
-        def __scan_primary_symbol_complicatedly
-          @argument_scanner.scan_primary_symbol
-        end
-
-        def __scan_primary_symbol_simply
-          # simple scanners do not have special parsing to detect tokens
-          # that look like primaries. leave the scanner as-is. follow [#012.L.1]
-          TRUE
-        end
+        # -- C: matching the argument scanner head against an association
 
         def __when_primary_not_found
 
@@ -1218,15 +1070,7 @@ module Skylab::Fields
         end
 
         def _unsanitized_key
-          send @_unsanitized_key
-        end
-
-        def __unsanitized_key_complicatedly
-          @argument_scanner.current_primary_symbol
-        end
-
-        def __unsanitized_key_simply
-          @argument_scanner.head_as_is
+          @_my_arg_scanner._unsanitized_key_
         end
 
         def _unable
@@ -1234,32 +1078,7 @@ module Skylab::Fields
           UNABLE_
         end
 
-        # -- C: traversing arguments
-
-        def __no_more_arguments
-          if @argument_scanner.no_unparsed_exists
-            remove_instance_variable :@argument_scanner ; true
-          else
-            FALSE
-          end
-        end
-
-        # -- B: (was) index associations
-
-        def __flush_association_soft_reader
-          _asr = remove_instance_variable :@_association_soft_reader
-          _asr.flush_to_soft_reader_via_argument_scanner__ @argument_scanner
-        end
-
-        def __nothing
-          NOTHING_
-        end
-
-        def _yes
-          TRUE
-        end
-
-        # -- A: final result
+        # -- B: final result
 
         def __result_in_entity
           # the "proper" result for a parsing performer is T/F ("keep parsing")
@@ -1275,7 +1094,7 @@ module Skylab::Fields
           KEEP_PARSING_
         end
 
-        # --
+        # -- A: support
 
         def as_normalization_write_via_association_ x, asc
           valid_value_store.write_via_association x, asc
@@ -1290,13 +1109,12 @@ module Skylab::Fields
         end
 
         attr_reader(
-          :argument_scanner,  # in "defined attribute"
           :arguments_to_default_proc_by,  # here, 1x
           :association_source,  # [ta]
           :entity,
           :listener,  # because #here-8
         )
-      end
+      # -
 
       # ==
 
@@ -1362,7 +1180,7 @@ module Skylab::Fields
           NIL
         end
 
-        def __normalize_value
+        def __normalize_value  # :#here-1
 
           kn = @_existing_knownness ; asc = @native_association
 
@@ -1445,30 +1263,114 @@ module Skylab::Fields
 
       # ==
 
-      Get_parameter_controller_moniker = -> ent do  # legacy
+      MyScanner__ = ::Class.new
 
-        s_a = ent.class.name.split CONST_SEP_
+      class ComplexArgScanner___ < MyScanner__
 
-        case 2 <=> s_a.length
-        when -1  # long
-          s_a = s_a[ -2 .. -1 ]
-          has_two = true
-        when 0
-          has_two = true
+        def initialize scn
+          @_ick = nil ; super
         end
 
-        if has_two
-          if UNDERSCORE_ == s_a.first[ -1 ]  # assume Actors_::Foo
-            s_a.shift
+        def _scan_primary_symbol_
+          @native_argument_scanner.scan_primary_symbol
+        end
+
+        def _unsanitized_key_
+          @native_argument_scanner.current_primary_symbol
+        end
+
+        def _match_unsanitized_value_ normal_asc
+
+          remove_instance_variable :@_ick
+
+          if normal_asc.is_glob
+            @_eew = false
+            a = @native_argument_scanner.scan_glob_values
+            if a
+              Common_::KnownKnown[ a ]
+            end
+
+          elsif normal_asc.is_flag
+            @_eew = false
+            @native_argument_scanner.scan_flag_value
           else
-            s_a.reverse!  # assume Noun::Verb -> 'verb noun'
+
+            @_eew = true
+            unsanitized_value = nil
+            _ok = @native_argument_scanner.map_value_by do |x|
+              unsanitized_value = x ; true
+            end
+            if _ok
+              Common_::KnownKnown[ unsanitized_value ]
+            end
           end
         end
 
-        p = Common_::Name::Conversion_Functions::Pathify
-        s_a.map do | s |
-          p[ s ]
-        end * SPACE_
+        def _when_primary_completed_
+
+          # we hate this, but for now, meh: [#ze-052.2] be OCD about don't
+          # advance until valid, but only for certain argument arities.
+          @_ick = nil
+          if remove_instance_variable :@_eew
+            @native_argument_scanner.advance_one ; nil
+          end
+        end
+      end
+
+      # ~
+
+      class SimpleArgScanner___ < MyScanner__
+
+        def initialize scn
+          @native_argument_scanner = scn
+        end
+
+        def _scan_primary_symbol_
+          # simple scanners do not have special parsing to detect tokens
+          # that look like primaries. leave the scanner as-is. follow [#012.L.1]
+          TRUE
+        end
+
+        def _unsanitized_key_
+          @native_argument_scanner.head_as_is
+        end
+
+        def _match_unsanitized_value_ normal_asc
+
+          # if the scanner ends "early" then the below just fails hard. there
+          # is no special emission for this if you're using a simple scanner.
+
+          if normal_asc.is_glob
+            ::Kernel._CANNOT_PARSE_THIS__with_simple_scanner__
+          elsif normal_asc.is_flag
+            ::Kernel._CANNOT_PARSE_THIS__with_simple_scanner__
+          else
+            scn = @native_argument_scanner
+            scn.advance_one  #advance past the primary name,
+            x = scn.head_as_is
+            scn.advance_one  # and EEK [#012.L.1] do this too
+            Common_::KnownKnown[ x ]
+          end
+        end
+
+        def _when_primary_completed_
+          NOTHING_  # :[#012.L.1]: CHANGED
+        end
+
+        attr_reader :native_argument_scanner
+      end
+
+      class MyScanner__
+
+        def initialize scn
+          @native_argument_scanner = scn
+        end
+
+        def __no_more_arguments_
+          @native_argument_scanner.no_unparsed_exists
+        end
+
+        attr_reader :native_argument_scanner
       end
 
       # ==

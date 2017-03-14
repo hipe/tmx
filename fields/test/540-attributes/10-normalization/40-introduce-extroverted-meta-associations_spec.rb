@@ -16,7 +16,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_guy do
 
-          class X_a_nudar_NoSee_A
+          class X_a_niema_NoSee_A
 
             ATTRIBUTES = Attributes.lib.call(
               alpha: :optional,
@@ -35,7 +35,7 @@ module Skylab::Fields::TestSupport
 
           o = _guy.new
           begin
-            _subject[ o ]
+            X_a_niema_ThisFunction[ o ]
           rescue Home_::ArgumentError => e
           end
 
@@ -99,7 +99,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_entity_class_B do
 
-        class X_a_nudar_NoSee_B
+        class X_a_niema_NoSee_B
 
           include Attributes::EK_ModelMethods
 
@@ -118,10 +118,20 @@ module Skylab::Fields::TestSupport
     # (counterpart E.K test about defaulting is in dedicated defaults)
 
     # ==
-    # ==
 
-    def _subject
-      subject_library_::Normalization::Normalize_via_Entity_with_StaticAssociations
+    X_a_niema_ThisFunction = -> ent do   # :[#008.14] (lend coverage to [sn])
+      ascs = ent.class::ATTRIBUTES
+      if ascs
+        Home_::Attributes::Normalization.call_by do |o|
+          o.association_index = ascs.association_index
+          o.ivar_store = ent
+        end
+      else
+        ACHIEVED_
+      end
     end
+
+    # ==
+    # ==
   end
 end

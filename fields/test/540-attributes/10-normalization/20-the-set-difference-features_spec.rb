@@ -187,7 +187,7 @@ module Skylab::Fields::TestSupport
     end
 
     def subject_module_
-      Home_::Attributes::Normalization::EK
+      Home_::Attributes::Normalization
     end
 
     # ==
