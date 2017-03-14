@@ -133,10 +133,18 @@ module Skylab::Zerk
       # -- while we don't know what we're doing
 
       def ick_oper sym
-        "'#{ sym }'"
+        _ick_via_sym sym
+      end
+
+      def ick_prim x
+        _ick_via_sym x.name_symbol  # ..
       end
 
       def oper sym
+        _ick_via_sym sym
+      end
+
+      def _ick_via_sym sym
         "'#{ sym }'"
       end
 

@@ -21,9 +21,17 @@ language production yet..
 this member has been given the intentionally overly simple name `reasons`
 with this comment added to help future-proof it from endless future
 renames. its name suggests that it should be an array, with each item
-perhaps being some sort of "reason" object. well it *is* an array, but
-the structure of each item is a bit of a subjunctive:
+perhaps being some sort of "reason" object. but:
 
+  - it is not necessaritly an array,
+  - its items are not necessarily "reason" objects.
+
+as for whether or not it is an array, we are now allowing the experiment
+that this can indifferently be an array or a stream, if for some reason it
+was really advantageous to have your missing requireds as a stream that is
+evaluated lazily IFF needd :[#here.A.2].
+
+as for the items of this collecition,
 at present each "reason" item is either a formal-attribute-like
 (representing a missing required field, which is the classic use case)
 *or* the item is a #[#ze-030.1] "reasoning" structure (see).

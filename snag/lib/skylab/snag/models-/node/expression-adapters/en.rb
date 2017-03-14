@@ -21,7 +21,7 @@ module Skylab::Snag
       da.under_target_model_add_association_adapter :ID_Int, (
         da.module::Association_Adapter.with(
 
-          :verb_lemma_and_phrase_head_s_a,
+          :verb_lemma_and_phrase_head_string_array,
             %w( have an identifier with an integer ),
 
           :named_functions,
@@ -56,7 +56,7 @@ module Skylab::Snag
 
         da.module::Association_Adapter.with(
 
-          :verb_lemma_and_phrase_head_s_a, %w( be tagged with ),
+          :verb_lemma_and_phrase_head_string_array, %w( be tagged with ),
 
           :named_functions,
             :positive_tag, :regex, rx ) )
@@ -65,7 +65,7 @@ module Skylab::Snag
 
         da.module::Association_Adapter.with(
 
-          :verb_lemma_and_phrase_head_s_a, %w( be not tagged with ),
+          :verb_lemma_and_phrase_head_string_array, %w( be not tagged with ),
 
           :named_functions,
             :negative_tag, :regex, rx ) )

@@ -873,7 +873,7 @@ but to be technically correct (the best kind of correct):
     and zero or more meta-data "meta-attributes" that describe
     characteristics of the formal attribute. we say "formal" to
     distinguish it from an "actual" attribute (value); a distinction
-    that has a dedicated document at [#025] (in [#002])).
+    that has a [#002.2] dedicated section.
 
   - you may also see "[formal] property" used similarly. nowadays
     we say "[formal] property" to mean a [formal] attribute that is part
@@ -1181,7 +1181,7 @@ business-specific constituency they may assume). can we normalize
 incoming formal properties against the (again business-specific)
 meta-properties with this same code?
 
-(see also [#034] "entity", [#002] "defined attributes", [#037]
+(see also [#034] "entity", [#002.1] "defined attributes", [#037]
 "meta attributes".)
 
 crazier still, can we normalize meta-properties against The meta-meta-

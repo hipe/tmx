@@ -95,7 +95,7 @@ module Skylab::Fields::TestSupport
           }[a-z_]+(?: \| [a-z_]+){3,20} \}\z/
 
         begin
-          attrs.index_
+          attrs.association_index
         rescue Home_::ArgumentError => e
         end
 

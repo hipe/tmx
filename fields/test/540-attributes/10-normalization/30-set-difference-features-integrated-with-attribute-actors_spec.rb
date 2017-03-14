@@ -45,25 +45,26 @@ module Skylab::Fields::TestSupport
 
             false == _ or fail
 
-            _rx = %r(\Amissing required \w+ 'last-name')i
-
+            msg = nil
             expect_event :missing_required_attributes do |ev|
-              black_and_white( ev ).should match _rx
+              msg = black_and_white ev
             end
+
+            expect_missing_required_message_ msg, :last_name
           end
 
-          it "using the empty store" do
+          it "using the empty store" do  # features used by [ta] only
 
             _ = _normalize_by do |o|
-              o.WILL_USE_EMPTY_STORE  # [ta] only
+              o.WILL_USE_EMPTY_STORE
+              o.WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
             end
 
             false == _ or fail
 
-            _rx = %r(\Amissing required \w+s 'last-name' and 'soc')i
-
             expect_event :missing_required_attributes do |ev|
-              black_and_white( ev ).should match _rx
+              _msg = black_and_white ev
+              expect_missing_required_message_ _msg, :last_name, :soc
             end
           end
 
@@ -71,7 +72,7 @@ module Skylab::Fields::TestSupport
 
             _ = event_log.handle_event_selectively
 
-            _wat = entity_class_::ATTRIBUTES.AS_ATTRIBUTES_NORMALIZE_BY do |o|
+            _wat = entity_class_::ATTRIBUTES.association_index.AS_ASSOCIATION_INDEX_NORMALIZE_BY do |o|
               yield o
               o.listener = _
             end
@@ -90,16 +91,15 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails" do  # :#coverpoint1.4
-            this_false_or_nil_ == state_.result || fail
+            expect_this_other_false_or_nil_ state_.result
           end
 
           it "emits" do
 
-            _rx = /\bmissing required attributes 'last-name' and 'soc'/
-
             _be_this = be_emission :error, :missing_required_attributes do |ev|
+
               _msg = black_and_white ev
-              _msg.should match _rx
+              expect_missing_required_message_ _msg, :last_name, :soc
             end
 
             only_emission.should _be_this
@@ -226,17 +226,15 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails (with nil)" do
-            this_false_or_nil_ == _state_tuple.fetch( 0 ) or fail
+            expect_this_other_false_or_nil_ _state_tuple.fetch 0
           end
 
           it "emits" do
 
-            _rx = /\Amissing required attribute 'b'$/
-
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
-              black_and_white( ev ).should match _rx
-
+              _msg = black_and_white ev
+              expect_missing_required_message_ _msg, :b
             end
 
             only_emission.should _be_this
@@ -248,19 +246,19 @@ module Skylab::Fields::TestSupport
 
             _ev = _em.cached_event_value
 
-            a = _ev.reasons
+            a = _ev.reasons.to_a  # might be stream might be array
 
             a.length.should eql 1
 
             a.first.name_symbol.should eql :b
           end
 
-          it "did NOT write defaults!" do
+          it "it DID write defaults" do  # (this changed at #tombstone-A)
 
             o = _state_tuple.fetch 2
 
-            o.instance_variable_defined?( :@c ) and fail
-            o.instance_variable_defined?( :@d ) and fail
+            o.instance_variable_get( :@c ) == :three || fail
+            o.instance_variable_get( :@d ) == :four || fail
           end
 
           def emission_array
@@ -283,6 +281,8 @@ module Skylab::Fields::TestSupport
 
         flush_event_log_and_result_to_state _x
       end
+
     # ==
   end
 end
+# #tombstone-A

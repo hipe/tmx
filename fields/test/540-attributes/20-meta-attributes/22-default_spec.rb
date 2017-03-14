@@ -48,6 +48,8 @@ module Skylab::Fields::TestSupport
 
         it "but if you set the thing to nil, the default is still applied.." do
 
+          # #coverpoint1.9
+
           _against_expect [ :starts_as_true, nil ], true
         end
 

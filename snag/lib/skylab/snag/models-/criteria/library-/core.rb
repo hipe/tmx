@@ -22,7 +22,7 @@ module Skylab::Snag
 
         include Attrs__::Actor::InstanceMethods
 
-        def process_argument_scanner_fully st
+        def process_argument_scanner_fully scn
           _ok = super
           _ok && Attrs__::Normalization::Normalize_via_Entity_with_StaticAssociations[ self ]
         end

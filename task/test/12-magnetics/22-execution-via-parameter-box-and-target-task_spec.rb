@@ -181,7 +181,7 @@ if false
 end  # if false
 
     def _message_expected_for_emit
-      "missing required attributes 'bread' and 'inside'\n"
+      "missing required parameters 'bread' and 'inside'\n"
     end
   end
 end

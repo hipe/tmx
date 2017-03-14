@@ -46,8 +46,6 @@ module Skylab::TanMan
       # the second path is an array because it refers to a node that is
       # more deeply embedded in the structure.
 
-      $xx = 0
-
       class << self
 
         def [] new, sexp, k_a, except_a

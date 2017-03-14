@@ -44,7 +44,7 @@ module Skylab::Fields
     end
   end
 
-  # ==
+  # ~
 
   DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_PARTIALLY = -> scn, & p do
 
@@ -176,12 +176,6 @@ module Skylab::Fields
       _wee  # hi. #todo
     end
 
-    def AS_ATTRIBUTES_NORMALIZE_BY & p
-      _ = _index
-      _wat = _.AS_INDEX_NORMALIZE_BY( & p )
-      _wat # #todo
-    end
-
     def begin_normalization & x_p
       self._GONE__see_me__
     end
@@ -205,7 +199,7 @@ module Skylab::Fields
     end
 
     def to_defined_attribute_stream
-      _index.to_defined_attribute_stream__
+      _index.to_native_association_stream
     end
 
     def attribute k
@@ -215,8 +209,7 @@ module Skylab::Fields
     def _index  # #here-1
       @___index ||= ___build_index
     end
-
-    alias_method :index_, :_index
+    alias_method :association_index, :_index  # here, [ac]
 
     def ___build_index
       Here_::AssociationIndex_.new( @_h,
@@ -369,7 +362,7 @@ module Skylab::Fields
           if cls.const_defined? :ATTRIBUTES, false
             ascs = cls.const_get :ATTRIBUTES
             if ascs
-              _ascs_idx = ascs.index_
+              _ascs_idx = ascs.association_index
             end
           end
 
@@ -412,7 +405,7 @@ module Skylab::Fields
         end
 
         def argument_parsing_writer_method_name_passive_lookup_proc  # #public-API #hook-in 1x, 
-          Here_::AssociationIndex_::Writer_method_reader___[ self.class ]
+          Here_::AssociationIndex_::Writer_method_reader[ self.class ]
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
@@ -537,6 +530,79 @@ module Skylab::Fields
     Here_ = self
   end  # attributes
 
+  # ==
+
+  class CautiousAssociationIndex  # exactly [#002.D] "new lingua franca"
+
+    def initialize p
+
+      @_to_array = :__to_array_initially
+      @_to_stream = :__to_stream_initially
+
+      @_stream_by = p
+    end
+
+    def dereference_association_via_symbol__ sym
+      a = association_array
+      _d = a.index do |asc|
+        sym == asc.name_symbol
+      end
+      a.fetch _d
+    end
+
+    # ~
+
+    def association_array
+      send @_to_array
+    end
+
+    def __to_array_initially
+      @_array = _flush_stream.to_a.freeze
+      @_to_stream = :__to_stream_via_array
+      @_to_array = :__to_array_subsequently
+      freeze
+      @_array
+    end
+
+    def __to_array_subsequently
+      @_array
+    end
+
+    # ~
+
+    def to_native_association_stream
+      send @_to_stream
+    end
+
+    def __to_stream_via_array
+      Stream_[ @_array ]
+    end
+
+    def __to_stream_initially
+      @_to_array = :_CANNOT_WITHOUT_ETC
+      @_to_stream = :_ALREADY_EXECUTED_ONCE
+      _flush_stream
+    end
+
+    def _flush_stream
+      remove_instance_variable( :@_stream_by ).call
+    end
+
+    # ~
+
+    def to_is_required_by
+      -> asc do
+        if asc.parameter_arity_is_known
+          Is_required[ asc ]
+        else
+          TRUE  # contrary to spec. see comment
+        end
+      end
+    end
+  end
+
+  # ~
+
   class SimplifiedName
 
     def initialize k
@@ -639,24 +705,48 @@ module Skylab::Fields
     end
   end
 
-  class IvarBasedValueStore < ::BasicObject  # :[#027].
+  # ==
 
-    def initialize o
-      @_entity = o
+  class IvarBasedSimplifiedValidValueStore  # [ta]
+
+    def initialize object
+      @_object = object
     end
 
     def write_via_association x, asc
-      @_entity.instance_variable_set asc.as_ivar, x ; nil
+      @_object.instance_variable_set asc.as_ivar, x
+      NIL
     end
 
-    def knows asc
-      @_entity.instance_variable_defined? asc.as_ivar
+    def read_softly_via_association asc
+      if knows_value_for_association asc
+        dereference_association asc
+      end
     end
 
-    def dereference asc
-      @_entity.instance_variable_get asc.as_ivar
+    def knows_value_for_association asc
+      @_object.instance_variable_defined? asc.as_ivar
+    end
+
+    def dereference_association asc
+      @_object.instance_variable_get asc.as_ivar
+    end
+
+    def simplified_write_ x, k  # necessary IFF :#here-7
+      @_object.instance_variable_set :"@#{ k }", x ; nil
+    end
+
+    def simplified_read_ k
+      ivar = :"@#{ k }"
+      if @_object.instance_variable_defined? ivar
+        @_object.instance_variable_get ivar
+      end
     end
   end
+
+  # ==
+
+  # (HERE)
 
   # -- the external functions experiment (see [#010])
 
@@ -704,8 +794,10 @@ module Skylab::Fields
   Is_effectively_optional = -> prp do
     if prp.default_proc
       true
-    else
+    elsif prp.parameter_arity_is_known
       ! Is_required[ prp ]
+    else
+      false  # assume the old default [#002.4] of it being required
     end
   end
 
@@ -724,8 +816,14 @@ module Skylab::Fields
     if Takes_argument[ prp ]
       if Can_be_more_than_one[ prp.argument_arity ]
         true
-      elsif Can_be_more_than_one[ prp.parameter_arity ]
-        true  # hi.
+      elsif prp.parameter_arity_is_known
+        if Can_be_more_than_one[ prp.parameter_arity ]
+          # (if you want to remove this expressive redundancy,
+          # start from :[#008.5] (#borrow-coverage from [ze]))
+          true  # hi.
+        end
+      else
+        false  # assume the old parameter arity default of one [#002.4]
       end
     end
   end
@@ -779,6 +877,8 @@ module Skylab::Fields
   ArgumentError = ::Class.new ::ArgumentError
 
   MissingRequiredAttributes = ::Class.new ArgumentError
+
+  StateError_ = ::Class.new ::RuntimeError
 
   # --
 

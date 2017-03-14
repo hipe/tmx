@@ -28,6 +28,23 @@ module Skylab::Fields::TestSupport
       entity_class_.const_get( :ATTRIBUTES, false ).attribute k
     end
 
+    # -
+
+      def expect_missing_required_message_ msg, * sym_a
+
+        _ = sym_a.map do |s|
+          "'#{ s }'"
+        end.join " and "  # ..
+
+        expected_s = "missing required parameter#{ 's' if 1 != sym_a.length } #{ _ }\n"
+
+        if msg != expected_s
+          msg.should eql expected_s
+        end
+      end
+
+    # -
+
     define_method :build_empty_entity_, Build_emp_ent_meth__
 
     define_method :attribute_, Attribute_method__

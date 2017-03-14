@@ -18,13 +18,13 @@ module Skylab::Snag::TestSupport
       rescue ::Skylab::Fields::MissingRequiredAttributes => e
       end
 
-      e.message.should match %r(\Amissing required (?:property|attribute) 'verb-lemma-and-phrase-head-s-a')
+      e.message == "missing required parameter 'verb_lemma_and_phrase_head_string_array'" || fail
     end
 
     it "make a minimal association adapter" do
 
       _o = _min_assoc_adptr
-      _o.instance_variable_get( :@verb_lemma_and_phrase_head_s_a ).should(
+      _o.instance_variable_get( :@verb_lemma_and_phrase_head_string_array ).should(
         eql %w( be ) )
     end
 

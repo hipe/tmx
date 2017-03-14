@@ -178,7 +178,7 @@
 
 [#008]       coverage assets & liabilities (& other misc small)
 
-             [#here.2] borrow. [#here.3] borrow. [#here.4] borrow.
+             [#here.2-5] borrow coverage
        #open [#here.1]: eventually de-dup this with [#sy-029] OGDL
 
 [#007] "threads" (tracking tags for experimentals towards public API)

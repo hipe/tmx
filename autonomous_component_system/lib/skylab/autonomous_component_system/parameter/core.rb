@@ -161,6 +161,16 @@ module Skylab::Autonomous_Component_System
         false
       end
 
+      def parameter_arity_is_known
+        TRUE  # always, here
+      end
+
+      Autoloader_[ self ]
+      stowaway(
+        :AssociationIndex_via_PlatformParameters_and_FormalOperation,
+        'formal-parameter-stream-via-platform-parameters-and-formal-operation'
+      )  # while #pending-rename
+
       Here_ = self
     end
   # -

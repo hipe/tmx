@@ -17,7 +17,7 @@ module Skylab::Fields::TestSupport
 
           Attributes::Actor.lib.call( self,
             starts_as_true: [ :default, true ],
-            other: nil,
+            other: :required,
           )
 
           attr_reader :other, :starts_as_true
@@ -47,16 +47,14 @@ module Skylab::Fields::TestSupport
         end
 
         it "fails (`with` results in false)" do
-          this_false_or_nil_ == state_.result || fail  # ..
+          expect_this_other_false_or_nil_ state_.result
         end
 
         it "expresses" do
 
-          _be_this_msg = match %r(\Amissing required attribute 'other'$)
-
           _be_this = be_emission :error, :missing_required_attributes do |ev|
             _ = black_and_white ev
-            _.should _be_this_msg
+            expect_missing_required_message_ _, :other
           end
 
           only_emission.should _be_this

@@ -69,6 +69,10 @@ module Skylab::Zerk
 
         :reqity_symbol_,  # internally convenient to preserve this
       )
+
+      def parameter_arity_is_known
+        @parameter_arity ? true : self._SANITY__slash__COVER_ME
+      end
     # -
   end
 end

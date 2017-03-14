@@ -578,6 +578,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Autoloader_[ self ]
     end
 
+    Stream_ = -> a, & p do
+      Common_::Stream.via_nonsparse_array a, & p
+    end
+
     MissingRequiredParameters = ::Class.new ::ArgumentError
     NotAvailable = ::Class.new ::ArgumentError
 

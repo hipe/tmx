@@ -7,10 +7,10 @@ module Skylab::Snag
       class Association_Adapter < Common_Adapter_
 
         Attributes_actor_.call( self,
-          verb_lemma_and_phrase_head_s_a: nil,
+          verb_lemma_and_phrase_head_string_array: :required,
         )
 
-        attr_reader :verb_lemma_and_phrase_head_s_a
+        attr_reader :verb_lemma_and_phrase_head_string_array
 
         def initialize
           @model_identifier = nil
@@ -52,7 +52,7 @@ module Skylab::Snag
         end
 
         def verb_lemma=
-          @verb_lemma_and_phrase_head_s_a = [ gets_one ]
+          @verb_lemma_and_phrase_head_string_array = [ gets_one ]
           KEEP_PARSING_
         end
 
@@ -192,7 +192,7 @@ module Skylab::Snag
 
         def _build_verb_head_string_array_for
 
-          s_a = @verb_lemma_and_phrase_head_s_a
+          s_a = @verb_lemma_and_phrase_head_string_array
 
           s = s_a.fetch 0
 

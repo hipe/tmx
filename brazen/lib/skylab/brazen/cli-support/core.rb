@@ -158,6 +158,10 @@ module Skylab::Brazen
         :parameter_arity,
         :argument_arity,
       )
+
+      def parameter_arity_is_known  # necessary because [#fi-002.4]
+        TRUE
+      end
     end
 
     class As_Bound_Call

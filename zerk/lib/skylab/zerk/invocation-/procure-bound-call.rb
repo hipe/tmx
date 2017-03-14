@@ -115,7 +115,7 @@ module Skylab::Zerk
 
         o.PVS_parameter_stream_once = method :__PVS_parameter_stream_once
 
-        o.expanse_stream_once = method :__expanse_stream_once
+        o.association_index_memoized_by = method :__association_index_memoized
 
         o.on_unavailable = __on_unavailable
 
@@ -150,6 +150,15 @@ module Skylab::Zerk
       #
       # note however that if we have any stateds, we have to do the heavy
       # lift to determine how to evaluate them..
+
+      def __association_index_memoized
+        @__ai ||= __association_index
+      end
+
+      def __association_index
+        Require_fields_lib_[]
+        Field_::CautiousAssociationIndex.new method :__expanse_stream_once
+      end
 
       def __expanse_stream_once  # first,
 
@@ -292,6 +301,8 @@ module Skylab::Zerk
         )
       end
 
+      # ==
+
       class Emission___  # a member of our [#030] unified language
 
         def initialize i_a, x_p
@@ -304,6 +315,9 @@ module Skylab::Zerk
           :mixed_event_proc,
         )
       end
+
+      # ==
+      # ==
     end
   end
 end

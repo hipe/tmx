@@ -87,7 +87,7 @@ module Skylab::Fields
         # created to facilitate custom aliases [hu].
         # also bolsters readability for hybrid actors.
 
-        @_.current_attribute.read_and_writer_by__ do |atr|
+        @_.current_attribute.will_interpret_by_ do |atr|
 
           Oldschool_custom_interpreter_as___[ Classic_writer_method_[ atr.name_symbol ] ]
         end
@@ -97,7 +97,7 @@ module Skylab::Fields
 
         m = @_.argument_scanner_for_current_association_.gets_one
 
-        @_.current_attribute.read_and_writer_by__ do |_atr|
+        @_.current_attribute.will_interpret_by_ do |_atr|
 
           Newschool_custom_interpreter_as___[ m ]
         end
@@ -152,8 +152,6 @@ module Skylab::Fields
         end
 
         @_.current_attribute.be_defaultant_by_value__ x
-
-        @_.add_to_static_index_ :non_required_name_symbols ; nil
       end
 
       def default_proc
@@ -161,8 +159,6 @@ module Skylab::Fields
         _x = @_.argument_scanner_for_current_association_.gets_one
 
         @_.current_attribute.be_defaultant_by_( & _x )
-
-        @_.add_to_static_index_ :non_required_name_symbols ; nil
       end
 
       def desc
@@ -205,7 +201,7 @@ module Skylab::Fields
 
             asc = association_index.read_association_ sym
             mutate_for_redirect_ x, asc
-            asc.read_and_write_ self  # result is kp
+            asc.flush_DSL_for_interpretation_ self  # result is kp
           end
         end
       end
@@ -275,9 +271,13 @@ module Skylab::Fields
       end
 
       def optional
-
+        @_.index_statically_ :see_optional
         @_.current_attribute.be_optional__
-        @_.add_to_static_index_ :non_required_name_symbols ; nil
+      end
+
+      def required
+        @_.index_statically_ :see_required
+        @_.current_attribute.be_required__
       end
 
       def plural  # #experimental - ..
@@ -302,7 +302,7 @@ module Skylab::Fields
           -> x, _oes_p do
             asc = association_index.read_association_ sym
             mutate_for_redirect_ x, asc
-            asc.read_and_write_ self  # result is kp
+            asc.flush_DSL_for_interpretation_ self  # result is kp
           end
         end
       end

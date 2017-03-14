@@ -82,8 +82,25 @@ module Skylab::Fields::TestSupport
       MY_ALL_PURPOSE_EXPRESSION_AGENT___
     end
 
-    def this_false_or_nil_
-      nil  # :[#007.E] a false became nil but it might change back
+    # ~ :[#007.E] we might go indifferent to false or nil here but not sure
+
+    def expect_this_one_false_or_nil_NOT_USED_ x
+      _expect_false_or_nil_TS x, nil
+    end
+
+    def expect_this_other_false_or_nil_ x
+      _expect_false_or_nil_TS x, false
+    end
+
+    def _expect_false_or_nil_TS act, exp
+      if act != exp
+        _ = if act
+          "<##{ act.class }>"
+        else
+          act.inspect
+        end
+        fail "expected #{ exp.inspect }, had #{ _ }"
+      end
     end
 
     def debug!

@@ -35,7 +35,7 @@ module Skylab::Autonomous_Component_System
         def __init_args_via_h
           a = []
           h = remove_instance_variable :@__h
-          st = @nr_.to_defined_formal_parameter_stream_cached_
+          st = @nr_.to_defined_association_stream_memoized_
           begin
             par = st.gets
             par or break
@@ -53,13 +53,14 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def to_defined_formal_parameter_stream_to_be_cached_
+      def to_association_index_
 
         ACS_::Parameter::
-          Formal_Parameter_Stream_via_Platform_Parameters_and_Formal_Operation[
+          AssociationIndex_via_PlatformParameters_and_FormalOperation.
+        call(
           @_p.parameters,
           @formal_,
-        ]
+        )
       end
 
       def begin_parameter_store_ & _call_handler

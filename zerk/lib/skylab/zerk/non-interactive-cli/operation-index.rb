@@ -186,9 +186,9 @@ module Skylab::Zerk
 
           _is_argumentish = false  # only for coverage
 
-        elsif Field_::Is_required[ @_parameter ]
+        elsif ! @_parameter.parameter_arity_is_known || Field_::Is_required[ @_parameter ]
 
-          _is_argumentish = true
+          _is_argumentish = true  # (default arity used to be `required` ([#fi-002.4]))
         end
 
         if _is_argumentish

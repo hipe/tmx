@@ -4,7 +4,7 @@
 
 ## intro
 
-before reading this, you should understand what [#002] formal properties
+before reading this, you should understand what [#002.2] formal properties
 are.
 
 the concept of meta-properties is all about tagging your formal
@@ -183,7 +183,7 @@ to distill all these feature-categories down into a discrete set of
 "provisions", where each "formal provision" is universally unique and
 can be answered with a YES/NO against every existing facility.
 
-it may be the case that some formal provision are contingent on others;
+it may be the case that some formal provisions are contingent on others;
 i.e. that you will never have a YES for provision B when there is a NO
 for provision A. we probably will not represent such contingencies
 formally here, but a familiarity with our "feature-space" will allow the

@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalization  # [#028] (and see open tag below)
+    class Normalization  # 1x. [ac] only. [#028] (and see open tag below)
 
       # :[#fi-037.5.L].
 
@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_writer(
-        :expanse_stream_once,  # see [#027]#expanse
+        :association_index_memoized_by,  # (was once "see [#027]#expanes" )
         :parameter_store,  # wrap e.g a session object or argument array
         :parameter_value_source,
         :PVS_parameter_stream_once,  # see [#028]#"Head parse"
@@ -81,22 +81,25 @@ module Skylab::Autonomous_Component_System
           ( miss_a ||= [] ).push x_o
         end
 
-        fo_st = remove_instance_variable( :@expanse_stream_once ).call
+        ai = remove_instance_variable( :@association_index_memoized_by ).call
+        asc_st = ai.to_native_association_stream
+        is_req = ai.to_is_required_by
+        ai = nil
 
         rdr_p = @parameter_store.evaluation_proc
         rdr_p or self._WHERE
 
         begin
-          f = fo_st.gets
-          f or break
+          asc = asc_st.gets
+          asc || break
 
-          sym = f.singplur_category_of_association
+          sym = asc.singplur_category_of_association
           if sym && :singular_of == sym
             # currently we never use the singular side for storage.
             redo
           end
 
-          evl = rdr_p[ f ]  # honor the above mentioned API point.
+          evl = rdr_p[ asc ]  # honor the above mentioned API point.
           if evl.is_effectively_known
             redo
           end
@@ -116,7 +119,7 @@ module Skylab::Autonomous_Component_System
 
           if reasoning_x
 
-            if Field_::Is_required[ f ]
+            if is_req[ asc ]
               add_mixed_failure_object[ reasoning_x ]
               redo
             end
@@ -133,19 +136,19 @@ module Skylab::Autonomous_Component_System
 
           # even if errors have occurred prior, we go through with it
 
-          if Field_::Has_default[ f ]
-            x = f.default_proc.call
-            @parameter_store.accept_parameter_value x, f
+          if Field_::Has_default[ asc ]
+            x = asc.default_proc.call
+            @parameter_store.accept_parameter_value x, asc
           else
             x = nil
           end
 
-          if x.nil? && Field_::Is_required[ f ]
-            add_mixed_failure_object[ f ]
+          if x.nil? && is_req[ asc ]
+            add_mixed_failure_object[ asc ]
           end
 
           redo
-        end while nil
+        end while above
 
         if miss_a
           ___when_failures_and_or_missing_requireds miss_a

@@ -17,7 +17,7 @@ module Skylab::Fields
         :finish_attribute,
       )
 
-      def __build_and_process_attribute k, x  # AS PROTOTYPE
+      def build_and_process_attribute__ k, x  # AS PROTOTYPE
         dup.flush_for_build_and_process_attribute_ k, x
       end
 
@@ -29,8 +29,7 @@ module Skylab::Fields
           @_name_symbol = k
 
           if x
-            _ = ::Array.try_convert( x ) || [ x ]
-            scn = Common_::Scanner.via_array _
+            scn = Common_::Scanner.via_array ::Array.try_convert( x ) || [ x ]
             @argument_scanner_for_current_association_ = scn
 
             p = @build_N_plus_one_interpreter[ self ]
@@ -47,23 +46,24 @@ module Skylab::Fields
 
       # -- look like a parse (..)
 
-      def entity
-        @current_attribute
+      def as_normalization_write_via_association_ x, asc
+        @current_attribute.instance_variable_set asc.as_ivar, x
+        NIL
       end
 
       # -- exposures
 
       def add_methods_definer_by_ & atr_p
 
-        add_to_static_index_ :method_definers
+        index_statically_ :method_definers
         @current_attribute.__add_methods_definer atr_p ; nil
       end
 
-      def __add_to_custom_index meta_k
+      def __index_customly meta_k
         @attribute_services.add_to_the_custom_index_ @_name_symbol, meta_k
       end
 
-      def add_to_static_index_ meta_k
+      def index_statically_ meta_k
         @attribute_services.add_to_the_static_index_ @_name_symbol, meta_k
       end
 
@@ -90,7 +90,7 @@ module Skylab::Fields
           NIL_
 
         elsif _SANITY_RX =~ k
-          build.__add_to_custom_index k
+          build.__index_customly k
           NIL_
 
         else

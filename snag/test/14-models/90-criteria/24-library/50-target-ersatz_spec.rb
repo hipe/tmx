@@ -47,7 +47,7 @@ module Skylab::Snag::TestSupport
 
       sticker = mod::Association_Adapter.with(
 
-        :verb_lemma_and_phrase_head_s_a, %w( be marked with ),
+        :verb_lemma_and_phrase_head_string_array, %w( be marked with ),
 
         :named_functions,
 

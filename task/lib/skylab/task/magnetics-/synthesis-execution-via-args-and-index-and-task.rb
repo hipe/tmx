@@ -106,7 +106,7 @@ class Skylab::Task
         # name. IFF that parameter is known locally, write it to the new
         # parameters box for the remote call. confirm etc.
 
-        rs = Home_.lib_.fields::IvarBasedValueStore.new @_task  # read store
+        rs = Home_.lib_.fields::IvarBasedSimplifiedValidValueStore.new @_task  # read store
 
         _attrs = foz.as_attributes_
         st = _attrs.to_defined_attribute_stream
@@ -120,8 +120,8 @@ class Skylab::Task
           else
             remote_atr
           end
-          if rs.knows local_atr
-            _x = rs.dereference local_atr
+          if rs.knows_value_for_association local_atr
+            _x = rs.dereference_association local_atr
             @_rtask.add_parameter k, _x
           end
           redo

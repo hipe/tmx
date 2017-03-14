@@ -196,7 +196,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def to_defined_formal_parameter_stream
-        @_normal_representation.to_defined_formal_parameter_stream_cached_
+        @_normal_representation.to_defined_association_stream_memoized_
       end
 
       # ~
@@ -235,11 +235,11 @@ module Skylab::Autonomous_Component_System
         o = self.class::Preparation.new self, ss, & oes_p
 
         o.PVS_parameter_stream_once = -> do
-          to_defined_formal_parameter_stream_cached_
+          _association_index.to_native_association_stream
         end
 
-        o.expanse_stream_once = -> do
-          to_defined_formal_parameter_stream_cached_
+        o.association_index_memoized_by = -> do
+          _association_index  # hi.
         end
 
         o.on_unavailable = NOTHING_  # raise exceptions
@@ -259,26 +259,34 @@ module Skylab::Autonomous_Component_System
       end
 
       def __formal_parameter sym
-        a = _DFP_a
-        d = a.index do |par|
-          sym == par.name_symbol
-        end
-        a.fetch d
+
+        _association_index.dereference_association_via_symbol__ sym
       end
 
-      def to_defined_formal_parameter_stream_cached_
+      def to_defined_association_stream_memoized_
 
         # (case in point is [#ze-028]<->[#032] - this is requested 3 times for one invocation?)
 
-        Common_::Stream.via_nonsparse_array _DFP_a
+        Stream_[ _association_index.association_array ]
       end
 
       def __has_defined_formal_parameters
-        _DFP_a.length.nonzero?
+
+        _association_index.association_array.length.nonzero?
       end
 
-      def _DFP_a
-        @___etc ||= to_defined_formal_parameter_stream_to_be_cached_.to_a
+      def _association_index
+        send( @_association_index ||= :__association_index_initially )
+      end
+
+      def __association_index_initially
+        o = to_association_index_  # some memoize this remotely, but not all do
+        @_association_index = :__association_index
+        @__association_index = o ; o
+      end
+
+      def __association_index
+        @__association_index
       end
 
       attr_reader(
@@ -296,7 +304,7 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_writer(
-        :expanse_stream_once,
+        :association_index_memoized_by,
         :on_unavailable,
         :parameter_store,
         :parameter_value_source,
@@ -326,7 +334,7 @@ module Skylab::Autonomous_Component_System
 
         o.PVS_parameter_stream_once = @PVS_parameter_stream_once
 
-        o.expanse_stream_once = @expanse_stream_once
+        o.association_index_memoized_by = @association_index_memoized_by
 
         o.on_reasons = @on_unavailable
 

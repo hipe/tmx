@@ -14,7 +14,7 @@ module Skylab::Snag
           @state, vmp, sym, vmp_, @in_st, @grammatical_context, @ada = a
 
           @named_functions_ = @ada.named_functions_
-          @verb_s_a = @ada.verb_lemma_and_phrase_head_s_a
+          @verb_s_a = @ada.verb_lemma_and_phrase_head_string_array
 
           @did_reach_back = false
 

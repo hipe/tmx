@@ -26,13 +26,13 @@ from application to application and over time.
 ## :#storypoint-30
 
 here we #hook-in to [hl] to change how we process iambics: in an effort to
-bridge the old and the new, we are using the [#fi-002]
+bridge the old and the new, we are using the [#fi-002.1]
 along with more "modern" iambics.
 
 the newfangled iambic way involves working with atr writers that take no
-arguments, but instead consume as many terms as they want from the @x_a ivar.
+arguments, but instead consume as many terms as they want from the `@x_a` ivar.
 
-the older [#fi-002] are based around generated atr writers that
+the older [#same] are based around generated atr writers that
 take one argument.
 
 what we do here bridges between the two.

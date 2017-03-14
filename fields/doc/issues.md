@@ -77,8 +77,9 @@
 
 [#016]       [ actor ]  (will move from [co])
 
-[#015] #hole
-             ( #was: track assimiliation targets "missing" (used once, in [ba]) )
+[#015]       near-term smalls & mediums near "one-ring"
+
+       #open :[#here.1] modernize how `N_Meta_Attribute` is constructed
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 
@@ -89,7 +90,7 @@
              [#here.L] - low-level gotchas
              [#here.L.1]: where to advance the scanner after primary expression
 
-       #track #temporary :[#here.K]
+       #hole :[#here.K]
 
        #wish :[#here.J.4]: `nilify` as an option
              :[#here.J.3]: generally geared towards dynamic associations

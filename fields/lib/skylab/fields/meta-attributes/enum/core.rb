@@ -25,8 +25,7 @@ module Skylab::Fields
           bx = box[]
           if bx.has_key x  # as #here
 
-            accept_attribute_value x
-            KEEP_PARSING_
+            write_association_value_ x
           else
 
             _qkn = Common_::Qualified_Knownness.via_value_and_symbol x, :attribute_value

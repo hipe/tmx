@@ -24,22 +24,16 @@ module Skylab::Fields
         end  # >>
       end
 
-      Normalize_via_Entity_with_StaticAssociations = -> ent, & p do
+      Normalize_via_Entity_with_StaticAssociations = -> ent, & p do  # 1x. [fi] only
 
         # (bridge the older-but-still-newish "attribute actor"-style
-        # into the file-eponymous node, which starts #here-1)
+        # into "one-ring")
 
         ascs = ent.class::ATTRIBUTES
         if ascs
-
-          idx = ascs.index_
-          sidx = idx.static_index_
-
           Facility_C.call_by do |o|
-            o.non_required_name_symbols = sidx.non_required_name_symbols
+            o.association_index = ascs.association_index
             o.ivar_store = ent
-            o.read_association_by = idx.read_association_by_
-            o.required_name_symbols = sidx.required_name_symbols
             o.listener = p
           end
         else
@@ -49,143 +43,11 @@ module Skylab::Fields
 
       # ==
 
-      class Facility_C < Common_::MagneticBySimpleModel
-
-        # (when you try to unify this with "one ring", have fun because
-        # it's called like 186 times (or places).)
-
-        # (this facility is for attributes actors. its lineage traces back
-        # to the origin of this file. it moved locations in the file. as
-        # as appropriate we may dissolve techniques found here *downwards*
-        # into "EK". but for now, it is kept separate because these index-
-        # centric techniques are isolated in their application.)
-
-        def initialize
-          @_execute = :__execute_normally
-          yield self
+      module Facility_C ; class << self
+        def call_by & p
+          EK.call_by( & p )
         end
-
-        attr_writer(
-          :non_required_name_symbols,
-          :listener,
-          :read_association_by,
-          :required_name_symbols,
-        )
-
-        def WILL_USE_EMPTY_STORE  # [ta]
-          @value_store = THE_EMPTY_VALUE_STORE___ ; nil
-        end
-
-        def box_store= bx
-          @value_store = BoxBasedValueStore___.new bx ; bx
-        end
-
-        def ivar_store= entity  # #here-5
-          @value_store = IvarBasedValueStore.new entity ; entity
-        end
-
-        def WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
-          @_execute = :_check_for_missing_requireds ; nil
-        end
-
-        def execute
-          send remove_instance_variable :@_execute
-        end
-
-        def __execute_normally
-          ok = _check_for_missing_requireds
-          ok && __maybe_apply_defaults
-          ok
-        end
-
-        def __maybe_apply_defaults
-          if @non_required_name_symbols
-            __apply_defaults
-          end
-        end
-
-        def __apply_defaults
-
-          @non_required_name_symbols.each do |k|
-
-            asc = @read_association_by[ k ]
-
-            if @value_store.knows asc
-              x = @value_store.dereference asc
-            end
-
-            x.nil? || next
-
-            p = asc.default_proc
-            if p
-              x = p[]
-            end
-            @value_store.write_via_association x, asc
-          end
-          NIL
-        end
-
-        def _check_for_missing_requireds
-          if @required_name_symbols
-            __do_check_for_missing_requireds
-          else
-            ACHIEVED_
-          end
-        end
-
-        def __do_check_for_missing_requireds
-
-          miss_asc_a = nil
-
-          @required_name_symbols.each do |k|
-
-            asc = @read_association_by[ k ]
-
-            if @value_store.knows asc
-              x = @value_store.dereference asc
-            end
-
-            x.nil? || next
-
-            ( miss_asc_a ||= [] ).push asc
-          end
-
-          if miss_asc_a
-            __when_missing_requireds miss_asc_a
-          else
-            ACHIEVED_
-          end
-        end
-
-        def __when_missing_requireds miss_asc_a  # :#here-2
-
-          if @listener
-            @listener.call :error, :missing_required_attributes do
-              _build_event miss_asc_a
-            end
-            UNABLE_
-          else
-            _ev = _build_event miss_asc_a
-            raise _ev.to_exception
-          end
-        end
-
-        def _build_event miss_asc_a
-          Home_::Events::Missing.with(
-            :reasons, miss_asc_a,
-            :noun_lemma, "attribute",
-          )
-        end
-
-        # (all for hacky experiment, :[#008.7]: #borrow-coverage from [ta])
-
-        attr_reader(
-          :non_required_name_symbols,
-          :read_association_by,
-          :required_name_symbols,
-          :value_store,
-        )
-      end
+      end ; end
 
       # ==
 
@@ -204,20 +66,16 @@ module Skylab::Fields
         # a faithful reproduction (to the letter) of that algorithm,
         # driven by three-laws.
 
-        # local conventions:
-        #
-        #   - use the `__no_more_foo` pattern to jive semantically
-        #     with the ubiquitous `no_unparsed_exists` of scanners
-
         def initialize
 
-          @association_source_ = nil
+          @association_source = nil
           @__do_parse_passively = false
-          @_execute = :__execute_ideally
+          @_execute = :__execute_algorithmically
           @__mutex_only_one_association_source = nil
-          @_mutex_only_one_special_instructions_for_result = nil
+          @__mutex_only_one_special_execute = nil
+          @__mutex_only_one_special_result = nil
           @__mutex_only_one_valid_value_store = nil
-          @_receive_missing_required_MIXED_associations = :__receive_missing_required_MIXED_associations_simply
+          @_react_to_missing_requireds = :__express_missing_requireds
           @_result = :__result_normally
 
           @argument_scanner = nil
@@ -275,6 +133,10 @@ module Skylab::Fields
 
         # -- specify the value store ("entity") (if any)
 
+        def WILL_USE_EMPTY_STORE  # [ta]
+          _receive_valid_value_store THE_EMPTY_SIMPLIFIED_VALID_VALUE_STORE___
+        end
+
         def entity= ent
 
           # REMINDER: do nothing magical or presumptive here. at #spot-1-6
@@ -284,15 +146,20 @@ module Skylab::Fields
 
           if ent.respond_to? :_receive_missing_required_associations_
             # #here-3 this should be temporary, only while [br]-era entities
-            @_receive_missing_required_MIXED_associations =
-              :__receive_missing_required_MIXED_associations_entily
+            @_react_to_missing_requireds = :__react_to_missing_requireds_entily
           end
 
           @entity = ent
         end
 
+        def box_store= bx
+          _receive_valid_value_store(
+            Here_::AssociationIndex_::BoxBasedSimplifiedValidValueStore.new bx )
+          bx
+        end
+
         def ivar_store= object
-          _receive_valid_value_store IvarBasedSimplifiedValidValueStore___.new object
+          _receive_valid_value_store IvarBasedSimplifiedValidValueStore.new object
           object
         end
 
@@ -318,47 +185,60 @@ module Skylab::Fields
 
         # -- specify the behavior of the parse
 
+        def WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
+          _execute_this_way :__execute_by_checking_for_missing_requireds_only
+        end
+
         def will_parse_passively__
           @__do_parse_passively = true
         end
 
         def will_result_in_entity_on_success_
-          remove_instance_variable :@_mutex_only_one_special_instructions_for_result
-          @_result = :__result_in_entity ; nil
+          _result_this_way :__result_in_entity
         end
 
-        def EXECUTE_BY= p
-          remove_instance_variable :@_mutex_only_one_special_instructions_for_result
-          @_execute = :__execute_via_custom_proc ; @__execute_by = p
+        def WILL_RESULT_IN_SELF_ON_SUCCESS
+          _result_this_way :__result_in_self
+        end
+
+        def execute_by__= p
+          _result_this_way :_NEVER_CALLED
+          _execute_this_way :__execute_via_custom_proc
+          @__execute_by = p
+        end
+
+        def _execute_this_way m
+          remove_instance_variable :@__mutex_only_one_special_execute
+          @_execute = m ; nil
+        end
+
+        def _result_this_way m
+          remove_instance_variable :@__mutex_only_one_special_result
+          @_result = m ; nil
         end
 
         # -- specify the associations
 
         def association_index= asc_idx
+          _touch_index_based.receive_association_index__ asc_idx ; asc_idx
+        end
 
-          # if this method receives an association index (or even if it
-          # doesn't) it changes the parsing algorithm to [#012.F]
+        def association_index  # #coverpoint1.6
+          @association_source.association_index_
+        end
 
-          @__do_parse_passively ||= false
+        def push_association_soft_reader_by__ & p
+          _touch_index_based.as_source_push_association_soft_reader_by_( & p ) ; nil
+        end
 
-          @_execute = :__execute_DRIVEN_BY_ASSOCIATION_INDEX
-          @_receive_entity = :_receive_entity_simply
+        def is_required_by= p
+          _touch_index_based.is_required_by= p
+        end
 
-          if asc_idx
-
-            sidx = asc_idx.static_index_
-            if sidx.non_required_name_symbols  # [#012.B]
-              yes = true
-            end
-
-            asc_h = asc_idx.hash_
-            _push_association_soft_reader_by do |k|
-              asc_h[ k ]  # (hi.)
-            end
+        def _touch_index_based
+          _touch_mutable_association_source do
+            Here_::AssociationIndex_::BuildIndexBasedAssociationSource
           end
-
-          @__has_non_requireds = yes
-          @association_index = asc_idx
         end
 
         def member_array= sym_a  # #feature-island (intentional, experimental)
@@ -403,25 +283,16 @@ module Skylab::Fields
           NIL
         end
 
-        def push_association_soft_reader_by__ & p
-          _push_association_soft_reader_by( & p )
-        end
-
-        def _push_association_soft_reader_by & p
-          ( @_association_soft_reader ||= Here_::AssociationIndex_::StackBasedAssociationSoftReader.new ).
-            push_association_soft_reader_proc__ p
-        end
-
         def _touch_mutable_association_source
-          if ! @association_source_
+          if ! @association_source
             _receive_association_source yield.new
           end
-          @association_source_
+          @association_source
         end
 
         def _receive_association_source src
           remove_instance_variable :@__mutex_only_one_association_source
-          @association_source_ = src ; nil
+          @association_source = src ; nil
         end
 
         # --
@@ -437,42 +308,16 @@ module Skylab::Fields
           send @_execute
         end
 
-        def __execute_DRIVEN_BY_ASSOCIATION_INDEX
-          if __parse_any_arguments_FUN
-            if __normalize_FUN
-              send @_result
-            end
-          end
+        def __execute_by_checking_for_missing_requireds_only
+          _prepare_to_execute
+          ok = @association_source.traverse_associations_checking_for_missing_requireds_only__ self
+          ok &&= _react_to_any_missing_requireds
+          ok and send @_result
         end
 
-        def __parse_any_arguments_FUN
-          if @argument_scanner
-            __do_parse_arguments_FUN
-          else
-            KEEP_PARSING_
-          end
-        end
+        def __execute_algorithmically
 
-        def __normalize_FUN
-          if @__has_non_requireds
-            _wee = @association_index.AS_INDEX_NORMALIZE_BY do |o|
-              o.ivar_store = @entity
-              o.listener = @listener
-            end
-            _wee  # hi. #todo
-          else
-            KEEP_PARSING_
-          end
-        end
-
-        def __execute_ideally
-
-          # EEW -
-          if instance_variable_defined? :@__mutex_only_one_valid_value_store
-            _receive_valid_value_store WHATEVER_THIS_IS_SimplifiedValidValueStore___.new @entity
-          end
-
-          @_missing_required_MIXED_associations = nil
+          _prepare_to_execute
 
           if @argument_scanner  # (assimilating [#037.5.G] is when this became a branch)
 
@@ -482,14 +327,19 @@ module Skylab::Fields
             ok = __traverse_associations_all
           end
 
-          ok &&= __if_there_were_any_missing_requireds_emit
+          ok &&= _react_to_any_missing_requireds
           ok and send @_result
+        end
+
+        def _prepare_to_execute
+          _init_valid_value_store
+          @_missing_required_MIXED_associations = nil
         end
 
         def _receive_valid_value_store vvs
           remove_instance_variable :@__mutex_only_one_valid_value_store
           @__valid_value_store = :__valid_value_store
-          @__valid_value_store_object = vvs
+          @__valid_value_store_object = vvs ; nil
         end
 
         def __traverse_arguments
@@ -497,7 +347,7 @@ module Skylab::Fields
           kp = KEEP_PARSING_
 
           o = ArgumentTraversalInjection___.new  # a simple struct
-          @association_source_.flush_injection_for_argument_traversal o, self
+          @association_source.flush_injection_for_argument_traversal o, self
 
           parse = o.argument_value_parser
           @__did_you_mean_by = o.did_you_mean_by
@@ -506,16 +356,19 @@ module Skylab::Fields
 
           until __no_more_arguments
 
-            asc = __scan_mixed_association
+            if ! __scan_primary_symbol
+              kp = _unable ; break
+            end
+
+            asc = @_mixed_association_soft_reader[ _unsanitized_key ]
             if ! asc
-              if @__do_parse_passively
-                self._COVER_ME__fine_but_show_me_the_money__
+              if @__do_parse_passively  # :#coverpoint1.5:
                 # in a passive parse, when you encounter an unrecognizable
                 # scanner head you merely stop parsing, you do not fail.
-                # WAS #coverpoint1.5
                 break
+              else
+                kp = __when_primary_not_found ; break
               end
-              kp = asc ; break
             end
 
             kp = parse[ asc ]
@@ -550,36 +403,24 @@ module Skylab::Fields
           NOTHING_
         end
 
-        def __do_parse_arguments_FUN
-
-          kp = KEEP_PARSING_
-          softly = __flush_association_soft_reader
-          scn = @argument_scanner
-
-          until scn.no_unparsed_exists
-            asc = softly[]
-            if ! asc
-              kp = __at_extra_FUN
-              break
-            end
-            scn.advance_one
-            kp = asc.as_association_interpret_ self, & @listener  # result is "keep parsing"
-            kp || break
-          end
-
-          kp
-        end
-
         def __execute_via_custom_proc
 
           # this branch is a much more constrained, beurocratic and
           # formalized means of doing what we used to do, which was plain
           # and pass it around. (#tombstone-B in "association index")
 
+          _init_valid_value_store
           p = remove_instance_variable :@__execute_by
           freeze  # to send this object out into the wild, would be irresponsible not to
           _the_result = p[ self ]
           _the_result  # hi. #todo
+        end
+
+        def _init_valid_value_store  # EEW -
+          if instance_variable_defined? :@__mutex_only_one_valid_value_store
+            # (this happens at whatever's going on at #spot-1-5)
+            _receive_valid_value_store IvarBasedSimplifiedValidValueStore.new @entity
+          end
         end
 
         # -- J: traversing the "extroverted" associations
@@ -590,8 +431,8 @@ module Skylab::Fields
         # valid "head" of the arguments (as an argument scanner).
 
         # because our lingua-franca representation of associations is as
-        # a stream, when we need such a hash we traverse (and exhaust) the
-        # stream, converting it into such a hash.
+        # a stream (but see [#004.E]), when we need such a hash we traverse
+        # (and exhaust) the stream, converting it into such a hash.
 
         # when doing so, we must also make note of those associations that
         # are "extroverted", and put them in a [#ba-061] "diminishing pool".
@@ -618,7 +459,7 @@ module Skylab::Fields
 
           o = RemainingExtrovertedTraversalInjection___.new  # simple struct
 
-          @association_source_.flush_injection_for_remaining_extroverted o, self
+          @association_source.flush_injection_for_remaining_extroverted o, self
             # (the above method is only ever called here. nonetheless, public-API.)
 
           _asc_st = __association_stream_via keys
@@ -642,7 +483,7 @@ module Skylab::Fields
 
           o = FullExtrovertedTraversalInjection___.new  # a simple struct
 
-          @association_source_.flush_injection_for_full_extroverted_traversal o, self
+          @association_source.flush_injection_for_full_extroverted_traversal o, self
 
           _ok = _traverse_extroverted(
             o.extroverted_association_stream,
@@ -667,8 +508,8 @@ module Skylab::Fields
         # (:#here-9:)
 
         # here we restate the pertinent points of our central algorithm
-        # so that they shadow the structure of the below method, literate-
-        # programming-like:
+        # so that they shadow the structure of our code (somewhere),
+        # literate-programming-like:
 
         # if the value is already present in the "valid value store", then
         # we must assume it is valid and there is nothing more to do for
@@ -700,36 +541,23 @@ module Skylab::Fields
         # sending NIL here but we're gonna wait until we feel that we want
         # it..) #wish [#012.J.4] "nilify" option
 
-        # -- G: missing requireds: memoing and expressing them
-
-        def __add_current_association_as_a_missing_required_asociation
-
-          k = _association_key
-
-          seen = ( @_MISSING_REQUIRED_ASSOCIATIONS_SEEN_HASH_SANITY_CHECK ||= {} )
-          seen[k] && self._SANITY
-          seen[k] = true
-
-          add_missing_required_MIXED_association_ k
-
-          NIL
-        end
+        # -- G: missing requireds (both memoing and expressing)
 
         def add_missing_required_MIXED_association_ sym_or_object
           ( @_missing_required_MIXED_associations ||= [] ).push sym_or_object
         end
 
-        def __if_there_were_any_missing_requireds_emit
+        def _react_to_any_missing_requireds
 
           asc_X_a = remove_instance_variable :@_missing_required_MIXED_associations
           if asc_X_a
-            send @_receive_missing_required_MIXED_associations, asc_X_a
+            send @_react_to_missing_requireds, asc_X_a
           else
             KEEP_PARSING_
           end
         end
 
-        def __receive_missing_required_MIXED_associations_simply miss_sym_a  # (#here-2 will assimilate to here)
+        def __express_missing_requireds miss_sym_a  # (#here-2 will assimilate to here)
 
           same_build = -> do
             __build_missing_required_event miss_sym_a
@@ -747,7 +575,7 @@ module Skylab::Fields
           end
         end
 
-        def __receive_missing_required_MIXED_associations_entily asc_X_a
+        def __react_to_missing_requireds_entily asc_X_a
           # #coverpoint1.8 and #here-3 this should be temporary
           @entity._receive_missing_required_associations_ asc_X_a
         end
@@ -757,10 +585,8 @@ module Skylab::Fields
           these = _maybe_special_noun_lemma
           these ||= [ :noun_lemma, :parameter ]  # #coverpoint1.2 ("parameters")
 
-          _reasons = Stream_[ miss_sym_a ]
-
           _ev = Home_::Events::Missing.with(
-            :reasons, _reasons,
+            :reasons, miss_sym_a,
             * these,
             :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :ick_prim,
           )
@@ -1266,11 +1092,11 @@ module Skylab::Fields
         end
 
         def simplified_write x
-          @_valid_value_store_._simplified_write_ x, @normal_association.name_symbol
+          @_valid_value_store_.simplified_write_ x, @normal_association.name_symbol
         end
 
         def simplified_read
-          @_valid_value_store_._simplified_read_ @normal_association.name_symbol
+          @_valid_value_store_.simplified_read_ @normal_association.name_symbol
         end
       end
 
@@ -1326,20 +1152,6 @@ module Skylab::Fields
 
         # -- D: matching the argument scanner head against an association
 
-        def __scan_mixed_association
-
-          if __scan_primary_symbol
-            asc = @_mixed_association_soft_reader[ _unsanitized_key ]
-            if asc
-              asc
-            else
-              __when_primary_not_found
-            end
-          else
-            _unable
-          end
-        end
-
         def __scan_primary_symbol
           send @_scan_primary_symbol
         end
@@ -1352,10 +1164,6 @@ module Skylab::Fields
           # simple scanners do not have special parsing to detect tokens
           # that look like primaries. leave the scanner as-is. follow [#012.L.1]
           TRUE
-        end
-
-        def __no_more_associations
-          send @_no_more_associations
         end
 
         def __when_primary_not_found
@@ -1374,21 +1182,6 @@ module Skylab::Fields
           else
             _e = ev_early_to_be_safe.to_exception
             raise _e
-          end
-        end
-
-        def  __at_extra_FUN  # #coverpoint1.5
-
-          if @__do_parse_passively
-
-            # in a passive parse, when you encounter an unrecognizable
-            # scanner head you merely stop parsing, you do not fail.
-
-            KEEP_PARSING_
-          else
-            self._COVER_ME__hmmmmm___
-            _ev = Home_::Events::Extra.with :unrecognized_token, @argument_scanner.head_as_is
-            raise _ev.to_exception
           end
         end
 
@@ -1414,7 +1207,7 @@ module Skylab::Fields
 
           # { :attribute | :member | :parameter | :primary | :property | :field }
 
-          s = @association_source_.use_this_noun_lemma_to_mean_attribute
+          s = @association_source.use_this_noun_lemma_to_mean_attribute
           if s
             [ :noun_lemma, s ]
           end
@@ -1474,11 +1267,19 @@ module Skylab::Fields
           remove_instance_variable :@entity
         end
 
+        def __result_in_self
+          freeze  # oldschool [ta] techniques
+        end
+
         def __result_normally
           KEEP_PARSING_
         end
 
         # --
+
+        def as_normalization_write_via_association_ x, asc
+          valid_value_store.write_via_association x, asc
+        end
 
         def valid_value_store
           send @__valid_value_store
@@ -1491,8 +1292,7 @@ module Skylab::Fields
         attr_reader(
           :argument_scanner,  # in "defined attribute"
           :arguments_to_default_proc_by,  # here, 1x
-          :association_index,  # #coverpoint1.6
-          :association_source_,
+          :association_source,  # [ta]
           :entity,
           :listener,  # because #here-8
         )
@@ -1690,33 +1490,6 @@ module Skylab::Fields
 
       # ==
 
-      class WHATEVER_THIS_IS_SimplifiedValidValueStore___
-
-        def initialize ent
-          @_entity = ent
-        end
-      end
-
-      # ~
-
-      class IvarBasedSimplifiedValidValueStore___  # ideal #here-5
-
-        def initialize object
-          @_object = object
-        end
-
-        def _simplified_write_ x, k  # necessary IFF :#here-7
-          @_object.instance_variable_set :"@#{ k }", x ; nil
-        end
-
-        def _simplified_read_ k
-          ivar = :"@#{ k }"
-          if @_object.instance_variable_defined? ivar
-            @_object.instance_variable_get ivar
-          end
-        end
-      end
-
       # ~
 
       class BuildProcBasedSimplifiedValidValueStore__
@@ -1736,39 +1509,23 @@ module Skylab::Fields
           end
         end
 
-        def _simplified_write_ x, k
+        def simplified_write_ x, k
           @__write_by[ k, x ]
           NIL
         end
 
-        def _simplified_read_ k
+        def simplified_read_ k
           @__read_by[ k ]
         end
       end
 
       # ==
 
-      class BoxBasedValueStore___ < ::BasicObject
+      module THE_EMPTY_SIMPLIFIED_VALID_VALUE_STORE___ ; class << self
 
-        def initialize bx
-          @_box = bx
+        def read_softly_via_association asc
+          NIL
         end
-
-        def knows asc
-          @_box.has_key asc.name_symbol
-        end
-
-        def dereference asc
-          @_box.fetch asc.name_symbol
-        end
-      end
-
-      # ==
-
-      module THE_EMPTY_VALUE_STORE___ ; class << self
-          def knows _
-            false
-          end
       end ; end
 
       # ==
@@ -1781,5 +1538,6 @@ module Skylab::Fields
     end
   end
 end
+# #history-037.5.C - the "FUN" methods and more "association index"-related, 1st pass
 # #history-037.5.I - experimental assimilation of the facility from "association index"
 # #history-037.5.G - "normalization against model" (file assimilated)

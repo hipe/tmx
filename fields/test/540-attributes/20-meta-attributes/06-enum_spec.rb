@@ -33,7 +33,7 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails (with nil)" do
-            this_false_or_nil_ == state_.result || fail
+            expect_this_other_false_or_nil_ state_.result
           end
 
           it "emits" do

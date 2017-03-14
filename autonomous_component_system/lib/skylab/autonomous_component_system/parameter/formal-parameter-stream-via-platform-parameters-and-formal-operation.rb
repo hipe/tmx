@@ -2,7 +2,9 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    module Formal_Parameter_Stream_via_Platform_Parameters_and_Formal_Operation
+    FormalParameterStreamViaPlatformParametersAndFormalOperation = nil  # #pending-rename (rename file to away this)
+
+    class AssociationIndex_via_PlatformParameters_and_FormalOperation
 
       # 1x here. [#029]
 
@@ -15,22 +17,62 @@ module Skylab::Autonomous_Component_System
       # order of formal parameters. as such, we do.
       #
 
-      class << self ; def [] a, fo
+      class << self
+        alias_method :call, :new
+        alias_method :[], :call
+        undef_method :new
+      end  # >>
 
-        if a.length.nonzero? && :block == a.last.first
+      def initialize mutable_a, fo
+
+        if mutable_a.length.nonzero? && :block == mutable_a.last.first
           # a block (if utilized by the implementer) serves as an event
           # handler builder; and in any case receives no expression here.
-          a.pop
+          mutable_a.pop
         end
 
-        any_bx = fo.parameter_box
+        @__formal_operation = fo
+        @__PLATFORM_parameter_array = mutable_a.freeze
+      end
+
+      def to_native_association_stream
+        Stream_[ association_array ]
+      end
+
+      def to_is_required_by
+        Field_::Is_required
+      end
+
+      def association_array
+        send ( @_association_array ||= :__association_array_initially )
+      end
+
+      def __association_array_initially
+        _st = __to_association_stream
+        a = _st.to_a
+        @__association_array = a.freeze
+        @_association_array = :__association_array
+        freeze ; a
+      end
+
+      def __association_array
+        @__association_array
+      end
+
+      def __to_association_stream
+        # (this was written to stream although it is not used as such.)
+
+        _fo = remove_instance_variable :@__formal_operation
+        _a = remove_instance_variable :@__PLATFORM_parameter_array
+
+        any_bx = _fo.parameter_box
         use_bx = if any_bx
           any_bx
         else
           MONADIC_EMPTINESS_
         end
 
-        Common_::Stream.via_nonsparse_array a do |(cat, sym)|
+        _st = Stream_.call _a do |(cat, sym)|
 
           edit = PARAM_ARITY___.fetch cat
 
@@ -59,7 +101,9 @@ module Skylab::Autonomous_Component_System
             end
           end
         end
-      end ; end
+
+        _st  # hi.
+      end
 
       PARAM_ARITY___ = {
         req: NOTHING_,
@@ -97,6 +141,8 @@ module Skylab::Autonomous_Component_System
       #
       # this was first realized in [#004]:no-defaults
 
+      # ==
+      # ==
     end
   end
 end

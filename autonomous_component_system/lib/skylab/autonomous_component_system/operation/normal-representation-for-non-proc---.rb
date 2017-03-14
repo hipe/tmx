@@ -38,9 +38,9 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def to_defined_formal_parameter_stream_to_be_cached_
+      def to_association_index_
 
-        @__formals.to_defined_attribute_stream
+        @__formals.association_index
       end
 
       def begin_parameter_store_ & call_handler

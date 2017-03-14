@@ -123,7 +123,7 @@ module Skylab::Zerk::TestSupport
     context "the trailing glob syntax (a, *b)" do
 
       it "0 args - whines of missing" do
-
+        # #lends-coverage to [#fi-008.5]
         invoke
         expect :styled, :e, 'expecting: <apple>'
         expect_common_failure_

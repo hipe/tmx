@@ -31,7 +31,12 @@ module Skylab::Autonomous_Component_System
         p
       end
 
-      def to_defined_formal_parameter_stream_to_be_cached_
+      def to_association_index_
+        Require_fields_lib_[]
+        Field_::CautiousAssociationIndex.new method :__this_stream_once
+      end
+
+      def __this_stream_once
 
         @_did || _do
 
@@ -281,6 +286,11 @@ module Skylab::Autonomous_Component_System
           :name_symbol,
           :parameter_arity,
         )
+
+        def parameter_arity_is_known
+          @parameter_arity || self._OOPS
+          TRUE
+        end
       end
 
       # ==

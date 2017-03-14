@@ -80,13 +80,9 @@ class Skylab::Task
         #
         # SO we check if requireds are satisfied first, and then ..
 
-        _HACKY_EXPERIMENT = nil
-
         bx = @_PARAMETERS_.parameter_box  # can be nil
 
-        ok = @_attrs.AS_ATTRIBUTES_NORMALIZE_BY do |o|
-
-          _HACKY_EXPERIMENT = o
+        _n11n = @_attrs.association_index.AS_ASSOCIATION_INDEX_NORMALIZE_BY do |o|
 
           if bx
             o.box_store = bx
@@ -94,12 +90,23 @@ class Skylab::Task
             o.WILL_USE_EMPTY_STORE
           end
 
+          is_req = Home_.lib_.fields::Is_required
+
+          o.is_required_by = -> asc do
+
+            if asc.parameter_arity_is_known
+              is_req[ asc ]
+            else
+              TRUE  # (the default used to be `required` [#fi-002.4])
+            end
+          end
+
           o.WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
+          o.WILL_RESULT_IN_SELF_ON_SUCCESS
           o.listener = @_oes_p
         end
 
-        ok and @_normalization = _HACKY_EXPERIMENT
-        ok
+        _store :@_normalization, _n11n
       end
 
       # ..then..
@@ -125,53 +132,59 @@ class Skylab::Task
 
         # (BEGIN near #lends-coverage to [#fi-008.7])
 
-        o = remove_instance_variable :@_normalization
+        n11n = remove_instance_variable :@_normalization
 
-        ws = Home_.lib_.fields::IvarBasedValueStore.new dep  # "write store" (i think)
-        rs = o.value_store  # "read store" (i think)
+        fi = Home_.lib_.fields
 
-        df_a = o.non_required_name_symbols
-        req_a = o.required_name_symbols
+        dst = fi::IvarBasedSimplifiedValidValueStore.new dep
+        src = n11n.valid_value_store
 
-        lu = o.read_association_by  # lookup
-        o = nil  # (END)
+        ai = n11n.association_source  # association index
+        st = ai.to_native_association_stream
+        is_req = ai.to_is_required_by
+        ai = nil
 
-        if req_a
-          req_a.each do |k|
-            atr = lu[ k ]
-            _x = rs.dereference atr  # you know it's known
-            ws.write_via_association _x, atr
+        st = n11n.association_source.to_native_association_stream
+        begin
+
+          asc = st.gets
+          asc || break
+
+          if is_req[ asc ]
+            # since the source passed the requireds check, the value is not nil
+            _xfer = src.dereference_association asc
+            dst.write_via_association _xfer, asc
+            redo
           end
-        end
 
-        if df_a
-          df_a.each do |k|
-            atr = lu[ k ]
-
-            if rs.knows atr
-              x = rs.dereference atr
+          x = src.read_softly_via_association asc
+          if x.nil?
+            if ! dst.read_softly_via_association( asc ).nil?
+              # if the parameter value store's value is effectively unknown
+              # and the destination's value is effectively known, leave the
+              # existing value as-is. (don't use default, don't write nil.)
+              redo
             end
 
-            if x.nil?
-
-              if ws.knows( atr ) && ! ws.dereference( atr ).nil?
-                # if the value from the parameter value store is effectively
-                # unknown and the session has an effectively known value,
-                # don't write a default and don't write nil. skip.
-                next
-              end
-
-              p = atr.default_proc
-              if p
-                x = p[]
-              end
+            # both source and destination are effectively nil so:
+            p = asc.default_proc
+            if p
+              x = p[]
             end
-
-            ws.write_via_association x, atr  # is the PVS value or a default value or nil
           end
-        end
+          dst.write_via_association x, asc  # write the PVS value or default value or nil
+          redo
+        end while above
 
         NIL_
+      end
+
+      def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+        if x
+          instance_variable_set ivar, x ; true
+        else
+          x
+        end
       end
 
       def name_symbol

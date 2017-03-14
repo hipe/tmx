@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalization - extroverted features" do
+  describe "[fi] attributes - normalization - introduce extroverted meta-associations" do
 
     # defaulting & re
 
@@ -32,7 +32,6 @@ module Skylab::Fields::TestSupport
         end
 
         it "raises argument error" do
-          _msg = "missing required attributes 'beta' and 'delta'"
 
           o = _guy.new
           begin
@@ -40,7 +39,9 @@ module Skylab::Fields::TestSupport
           rescue Home_::ArgumentError => e
           end
 
-          e.message.should eql _msg
+          e.message << "\n"  # NEWLINE_  # meh
+
+          expect_missing_required_message_ e.message, :beta, :delta
         end
       end
 
@@ -81,7 +82,7 @@ module Skylab::Fields::TestSupport
           a = _N_things
           expect_channel_looks_like_missing_required_ a
           _line = black_and_white_line_via_event_ a[1].call
-          _line == "missing required parameters 'beta' and 'delta'\n" || fail
+          expect_missing_required_message_ _line, :beta, :delta
         end
 
         shared_subject :_N_things do

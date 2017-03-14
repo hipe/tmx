@@ -4,6 +4,8 @@ module Skylab::Fields
 
     class DefinedAttribute < SimplifiedName  # :[#039].
 
+      # (see [#002.C] 'pertinent ideas around "attributes actors" and related')
+
       # ==
 
       class EntityKillerParameter < Common_::SimpleModel
@@ -121,7 +123,18 @@ module Skylab::Fields
 
       def initialize k, & edit_p
 
-        @argument_arity = :one
+        @parameter_arity_is_known = false
+        @_parameter_arity = :__raise_that_parameter_arity_is_unknown
+
+        # when a parameter arity ("required-ness") is not defined explicitly
+        # (e.g `optional` signifies a parameter arity of `zero_or_one`),
+        # then the default value we are to interpret for it depends on
+        # whether any attributes in the set defined themselves as optional:
+        # if none did then all are optional; if any did then only those that
+        # did are optional and the rest are required!
+
+        @argument_arity = :one  # by default, attributes take one argument
+
         __init_temporary_ivars
         super k do |me|
           edit_p[ me ]
@@ -141,22 +154,22 @@ module Skylab::Fields
 
       def __init_temporary_ivars
 
-        @_become_optional_m = :_change_parameter_arity_to_be_optional_once
+        @_write_parameter_arity_once = :__write_parameter_arity_once
         @_pending_meths_definers = nil
 
-        @_RW_m = :__receive_first_read_and_write_proc
-        @_read_m = :__receive_first_read_proc
-        @_write_m = :__receive_first_write_proc
+        @_receive_interpreterer = :__receive_interpreterer
+        @_receive_readerer = :__receive_readerer
+        @_receive_writerer = :__receive_writerer
 
-        @_reader_p = nil
-        @_writer_p = nil
-        @_read_writer_p = nil
+        @_read_by_by = nil
+        @_write_by_by = nil
+        @_interpret_by_by = nil
       end
 
       # -- be normalizant
 
       def be_optional__
-        send @_become_optional_m
+        _become_optional_once
         NIL_
       end
 
@@ -168,15 +181,44 @@ module Skylab::Fields
       end
 
       def be_defaultant_by_ & p
-        _change_parameter_arity_to_be_optional_once
+        _become_optional_once
         @default_proc = p
         NIL_
       end
 
-      def _change_parameter_arity_to_be_optional_once
+      # -- required-ness
 
-        @_become_optional_m = :___optionality_is_locked__is_already_optional
-        @parameter_arity = :zero_or_one ; nil
+      def _become_optional_once
+        _write_parameter_arity_once :zero_or_one
+      end
+
+      def be_required__
+        _write_parameter_arity_once :one
+      end
+
+      def _write_parameter_arity_once sym
+        send @_write_parameter_arity_once, sym
+      end
+
+      alias_method :parameter_arity=, :_write_parameter_arity_once
+
+      def __write_parameter_arity_once sym
+        @_write_parameter_arity_once = :__FIX_REDUNDANT_WRITES_TO_PARAM_ARITY
+        @parameter_arity_is_known = true
+        @_parameter_arity = :__parameter_arity
+        @__parameter_arity = sym
+      end
+
+      def parameter_arity
+        send @_parameter_arity
+      end
+
+      def __raise_that_parameter_arity_is_unknown
+        raise StateError_, "unknown. check `parameter_arity_is_known` first"
+      end
+
+      def __parameter_arity
+        @__parameter_arity  # hi.
       end
 
       # --
@@ -194,44 +236,39 @@ module Skylab::Fields
         ( @_pending_meths_definers ||= [] ).push atr_p ; nil
       end
 
-      def read_and_writer_by__ & p
-        send @_RW_m, p
+      def will_interpret_by_ & p
+        send @_receive_interpreterer, p
       end
 
       def reader_by_ & p
-        send @_read_m, p
+        send @_receive_readerer, p
       end
 
       def writer_by_ & p
-        send @_write_m, p
+        send @_receive_writerer, p
       end
 
-      def __receive_first_read_and_write_proc p
-        @_read_m = :_locked
-        @_RW_m = :_locked
-        @_write_m = :_locked
-        @_read_writer_p = p ; nil
+      def __receive_interpreterer p
+        @_receive_interpreterer = :_closed
+        @_receive_readerer = :_closed
+        @_receive_writerer = :_closed
+        @_interpret_by_by = p ; nil
       end
 
-      def __receive_first_read_proc p
-        @_read_m = :_locked
-        @_RW_m = :_locked
-        @_reader_p = p ; nil
+      def __receive_readerer p
+        @_receive_interpreterer = :_closed
+        @_receive_readerer = :_closed
+        @_read_by_by = p ; nil
       end
 
-      def __receive_first_write_proc p
-        @_write_m = :_locked
-        @_RW_m = :_locked
-        @_writer_p = p ; nil
+      def __receive_writerer p
+        @_receive_interpreterer = :_closed
+        @_receive_writerer = :_closed
+        @_write_by_by = p ; nil
       end
 
       alias_method :__orig_freeze, :freeze
       def freeze
-
-        if :_change_parameter_arity_to_be_optional_once ==  # eek
-            remove_instance_variable( :@_become_optional_m )
-          @parameter_arity = :one
-        end
 
         p_a = remove_instance_variable :@_pending_meths_definers
         if p_a
@@ -240,21 +277,24 @@ module Skylab::Fields
           end.freeze
         end
 
-        remove_instance_variable :@_read_m
-        remove_instance_variable :@_RW_m
-        remove_instance_variable :@_write_m
+        remove_instance_variable :@_receive_interpreterer
+        remove_instance_variable :@_receive_readerer
+        remove_instance_variable :@_receive_writerer
+        remove_instance_variable :@_write_parameter_arity_once
 
-        rw_p = remove_instance_variable :@_read_writer_p
-        r_p = remove_instance_variable :@_reader_p
-        w_p = remove_instance_variable :@_writer_p
+        interpret_by_by = remove_instance_variable :@_interpret_by_by
 
-        if rw_p
-          @_interpret = :__interpret_customly
-          @__rw = rw_p[ self ]
+        if interpret_by_by
+          remove_instance_variable :@_read_by_by
+          remove_instance_variable :@_write_by_by
+          @__interpret_by = interpret_by_by[ self ]
+          @_flush_DSL = :__flush_DSL_customly
         else
-          @_interpret = :__interpret_commonly
-          @_read = r_p ? r_p[ self ] : Read___
-          @_write = w_p ? w_p[ self ] : Write___
+          r_p = remove_instance_variable :@_read_by_by
+          w_p = remove_instance_variable :@_write_by_by
+          @_read_by = r_p ? r_p[ self ] : Read___
+          @_write_by = w_p ? w_p[ self ] : Write___
+          @_flush_DSL = :__flush_DSL_commonly
         end
 
         super
@@ -267,7 +307,7 @@ module Skylab::Fields
         _kp = Here_::Normalization::FACILITY_I.call_by do |o|
           o.argument_scanner = scn
           o.entity = ent
-          o.EXECUTE_BY = -> n11n, & p do
+          o.execute_by__ = -> n11n, & p do
             # hi. #todo
             as_association_interpret_ n11n, & p
           end
@@ -276,36 +316,43 @@ module Skylab::Fields
       end
 
       def as_association_interpret_ n11n, & p
-
-        _dsl = Interpretation_DSL___.new self, n11n
-        read_and_write_ _dsl, & p
+        _dsl = Interpretation_DSL__.new p, self, n11n
+        flush_DSL_for_interpretation_ _dsl
       end
 
-      def read_and_write_ dsl, & p  # at least 2x here
+      def flush_DSL_for_interpretation_ dsl  # 3x in [fi]
 
-        send @_interpret, dsl, & p
+        send @_flush_DSL, dsl
       end
 
-      def __interpret_customly dsl  # result in kp
+      def __flush_DSL_customly dsl  # result in kp
 
-        dsl.calculate( & @__rw )
+        dsl.calculate( & @__interpret_by )
       end
 
-      def __interpret_commonly dsl, & p  # result in kp
+      def __flush_DSL_commonly dsl  # result in kp
 
-        _x = dsl.calculate( & @_read )
-        dsl.calculate _x, p, & @_write
+        dsl.__as_DSL_flush_commonly_for_interpretation_
       end
 
-      attr_accessor(
+      def as_association_normalize_in_place_ n11n
+
+        _dsl = Interpretation_DSL__.new self, n11n
+        _dsl.__as_DSL_flush_commonly_for_normalize_in_place_
+      end
+
+      attr_writer(
         :argument_arity,
       )
 
       attr_reader(
+        :argument_arity,
         :deffers_,
         :default_proc,
         :description_proc,
-        :parameter_arity,
+        :_read_by,
+        :parameter_arity_is_known,
+        :_write_by,
       )
 
       def argument_argument_moniker  # see [br]
@@ -326,19 +373,19 @@ module Skylab::Fields
       end
 
       Write___ = -> x, _ do
-        accept_attribute_value x
-        KEEP_PARSING_
+        write_association_value_ x
       end
 
       # ==
 
-      class Interpretation_DSL___
+      class Interpretation_DSL__
 
         # (used, for example, at #spot-1-4)
 
-        def initialize asc, n11n
+        def initialize listener=nil, asc, n11n
           @_argument_scanner = nil
           @_association = asc
+          @__listener = listener
           @_normalization = n11n
           # for now, don't freeze only because #this-1
         end
@@ -348,11 +395,42 @@ module Skylab::Fields
           @_association = asc ; nil
         end
 
+        # -- facility "C" replacement
+
+        def __as_DSL_flush_commonly_for_interpretation_  # result in kp
+
+          x = calculate( & @_association._read_by )
+
+          if x.nil? && _defaulting_exists
+            x = _default_value_that_hopefully_didnt_fail  # :#coverpoint1.9
+          end
+
+          calculate x, @__listener, & @_association._write_by
+        end
+
+        def __as_DSL_flush_commonly_for_normalize_in_place_  # result in kp
+
+          if __any_stored_value_is_effectively_nil
+
+            if _defaulting_exists
+              __change_working_value_to_default_value
+            end
+
+            # (no ad-hoc normalization (why?))
+
+            __maybe_write
+          else
+            KEEP_PARSING_  # if it is set to any non-nil value, leave it alone ([#012.5.3])
+          end
+        end
+
+        # -- exposures
+
         alias_method :calculate, :instance_exec
 
-        def accept_attribute_value x
-          @_normalization.entity.instance_variable_set @_association.as_ivar, x
-          NIL_
+        def write_association_value_ x
+          @_normalization.as_normalization_write_via_association_ x, @_association
+          KEEP_PARSING_  # in-memory writes may not fail. provided as convenience.
         end
 
         def argument_scanner
@@ -370,6 +448,98 @@ module Skylab::Fields
         def entity
           @_normalization.entity
         end
+
+        # -- common language for old facility "C"
+
+        def __maybe_write
+
+          if __is_required
+            if _working_value_is_nil
+              __memo_this_missing_required_association
+            else
+              _write
+            end
+          elsif _working_value_is_nil
+            if ! @__was_defined
+              _write  # [#012.J.4] nilify
+            end
+          else
+            _write
+          end
+
+          KEEP_PARSING_
+        end
+
+        def __any_stored_value_is_effectively_nil
+
+          vvs = @_normalization.valid_value_store  # :#spot-1-2
+
+          if vvs.knows_value_for_association @_association
+            was_defined = true
+            x = vvs.dereference_association @_association
+          end
+
+          if x.nil?
+            @__valid_value_store = vvs
+            @__was_defined = was_defined
+            @_working_value = nil
+            TRUE
+          end
+        end
+
+        # -- defaulting
+
+        def _defaulting_exists
+          @_association.default_proc  # i.e `Has_default`
+        end
+
+        def __change_working_value_to_default_value
+          # (violate [#012.E.1] (defaulting can fail) (legacy, KISS))
+          @_working_value = _default_value_that_hopefully_didnt_fail
+          NIL
+        end
+
+        def _default_value_that_hopefully_didnt_fail
+          @_association.default_proc.call
+        end
+
+        # -- ad-hoc normalization NOTE
+
+        # (there is no treatment of ad-hoc normalization; probably you
+        #  should use method-based associations..)
+
+        # -- requiredness
+
+        def __is_required
+
+          # (implementation of [#002.4] is 1x redundant)
+
+          if @_association.parameter_arity_is_known
+            Is_required[ @_association ]
+          else
+            @_normalization.association_index.required_is_default_
+          end
+        end
+
+        def __memo_this_missing_required_association
+          @_normalization.add_missing_required_MIXED_association_ @_association
+          NIL
+        end
+
+        # -- support
+
+        def _working_value_is_nil
+          @_working_value.nil?
+        end
+
+        def _write
+          _x = remove_instance_variable :@_working_value
+          @__valid_value_store.write_via_association _x, @_association
+        end
+
+        attr_reader(
+          :_normalization,
+        )
       end
 
       # ==

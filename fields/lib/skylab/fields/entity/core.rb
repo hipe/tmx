@@ -1281,6 +1281,10 @@ module Skylab::Fields
         @parameter_arity  # (hi.)
       end
 
+      def parameter_arity_is_known  # for [#fi-002.4]
+        @parameter_arity ? true : self._SANITY__slash__COVER_ME
+      end
+
       # ~~ argument arity
 
       def argument_arity=

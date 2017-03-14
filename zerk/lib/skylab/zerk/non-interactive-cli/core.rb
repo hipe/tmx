@@ -641,12 +641,16 @@ module Skylab::Zerk
 
     def expression_strategy_for_property prp  # for expag
 
-      if :too_basic_for_arity == prp.parameter_arity
-        :render_propperty_without_styling
-      elsif Home_.lib_.fields::Is_required[ prp ]
-        :render_property_as_argument
+      if prp.parameter_arity_is_known
+        if :too_basic_for_arity == prp.parameter_arity
+          :render_propperty_without_styling
+        elsif Home_.lib_.fields::Is_required[ prp ]
+          :render_property_as_argument
+        else
+          self._K
+        end
       else
-        self._K
+        :render_property_as_argument  # (default used to be `required`, near [#fi-002.4])
       end
     end
 
