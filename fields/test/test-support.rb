@@ -40,13 +40,11 @@ module Skylab::Fields::TestSupport
 
   end.call
 
-  Use_method__ = -> k do
-    TS_.require_( k )[ self ]
-  end
-
   module ModuleMethods___
 
-    define_method :use, Use_method__
+    def use k
+      TS_.require_( k )[ self ]
+    end
 
     def subject & p
       memoize_ :subject, & p
@@ -57,6 +55,25 @@ module Skylab::Fields::TestSupport
     end
 
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
+  end
+
+  Expect_missinger_ = -> noun_lemma, yes_newline=nil do
+
+    # produces a function that assists in the definitions for the methods
+    # called `expect_missing_required_message_with_newline_` etc ick/meh
+
+    -> msg, sym_a, tc do
+
+      _ = sym_a.map do |s|
+        "'#{ s }'"
+      end.join " and "  # ..
+
+      expected_s = "missing required #{ noun_lemma }#{ 's' if 1 != sym_a.length } #{ _ }#{ yes_newline }"
+
+      if msg != expected_s
+        msg.should tc.eql expected_s
+      end
+    end
   end
 
   module InstanceMethods___
@@ -164,6 +181,25 @@ module Skylab::Fields::TestSupport
   Autoloader_ = Home_::Autoloader_
   Common_ = Home_::Common_
   Lazy_ = Home_::Lazy_
+
+  # --
+
+  module Common_Frame  # #stowaway
+    class << self
+      def lib
+        Home_::Attributes::Stack::CommonFrame
+      end
+      def definition_for_etc  # `expect_missing_required_message_without_newline_`
+        @___etc ||= __etc
+      end
+      def __etc
+        p = Expect_missinger_[ 'field' ]
+        -> msg, * sym_a do
+          p[ msg, sym_a, self ]
+        end
+      end
+    end  # >>
+  end
 
   # --
 

@@ -11,50 +11,51 @@ module Skylab::Fields
       #  do *not* yet consider this a #feature-island *yet* -- it's a dog-
       #  ear on a feature we might certainly want..)
 
-      def initialize attrs, x_a, & x_p
-        x_p and self._FUN
-
-        @attributes = attrs
+      def initialize ascs, x_a
+        @associations = ascs
         @sexpesque = x_a
       end
 
       def execute
 
-        mattrs_cls = @attributes.meta_attributes__
-        if ! mattrs_cls
-          mattrs_cls = __begin_mutable_meta_attributes_class
+        mascs_cls = @associations.meta_associations__
+        if ! mascs_cls
+          mascs_cls = __begin_mutable_meta_associations_class
         end
 
-        atr_cls = @attributes.attribute_class__
-        if ! atr_cls
-          atr_cls = __begin_mutable_attribute_class
+        asc_cls = @associations.association_class__
+        if ! asc_cls
+          asc_cls = __begin_mutable_association_class
         end
 
-        sexp = remove_instance_variable :@sexpesque
+        _this = Here_::N_Meta_Attribute.define do |o|
 
-        o = Here_::N_Meta_Attribute::Build.new mattrs_cls, Meta_Attribute___
+          o.N_plus_one_interpreter_by = method :__build_interpreter
 
-        o.build_N_plus_one_interpreter = method :__build_interpreter
+          o.meta_associations_class = mascs_cls
 
-        o.finish_attribute = MONADIC_EMPTINESS_  # for now
+          o.association_class = MetaAssociation___
 
-        o.attribute_services = self
+          o.finish_association_by = -> asc do
+            NOTHING_  # hi.
+          end
+
+          o.indexing_callbacks = self
+        end
 
         @_is_method_definer = false
-
-        matr = o.flush_for_build_and_process_attribute_ sexp.pop, sexp
+        sexp = remove_instance_variable :@sexpesque
+        masc = _this.flush_for_build_and_process_association_ sexp.pop, sexp  # :#spot-1-1
 
         if @_is_method_definer
-          matr.deffers_.each do |p|
-            p[ atr_cls ]
-          end
+          masc.effect_definition_into_ asc_cls
         end
 
         # here's the rub:
 
-        mattrs_cls.send :define_method, matr.name_symbol do
+        mascs_cls.send :define_method, masc.name_symbol do
 
-          matr.as_association_interpret_ @_
+          masc.as_association_interpret_ @_
         end
 
         NIL_
@@ -73,62 +74,62 @@ module Skylab::Fields
         NIL_
       end
 
-      def __build_interpreter bld_N
+      def __build_interpreter is  # interpretation services
 
-        mmattrs = Meta_Meta_Attributes___.new bld_N
+        mmascs = MetaMetaAssociations___.new is
 
         -> k do
-          mmattrs.__send__ k
+          mmascs.__send__ k
         end
       end
 
-      def __begin_mutable_meta_attributes_class
+      def __begin_mutable_meta_associations_class
 
         cls = ::Class.new Here_::MetaAttributes
 
-        @attributes.const_set :MetaAttributes, cls
+        @associations.const_set :MetaAttributes, cls
 
-        @attributes.meta_attributes = cls
-
-        cls
-      end
-
-      def __begin_mutable_attribute_class
-
-        cls = ::Class.new Meta_Attribute___
-
-        @attributes.const_set :Attribute, cls
-
-        @attributes.attribute_class = cls
+        @associations.meta_associations = cls
 
         cls
       end
 
-      class Meta_Meta_Attributes___ < ::BasicObject
+      def __begin_mutable_association_class
 
-        def initialize bld
-          @_ = bld
+        cls = ::Class.new MetaAssociation___
+
+        @associations.const_set :Attribute, cls
+
+        @associations.association_class = cls
+
+        cls
+      end
+
+      class MetaMetaAssociations___
+
+        def initialize is  # interpretation services
+          @_ = is
         end
 
         def flag
 
-          # CASE STUDY: this has similar semantics to a a counerpart method
-          # of the same name in the N-1 class, but how they differ is
-          # exemplary of how meta-meta-attributes differ from meta-attributes
-          # (i.e why they are not implemented in the exact same way).
+          # CASE STUDY: this has similar semantics to a counerpart method of
+          # the same name in the N-1 class, but how they differ is exemplary
+          # of how meta-meta-associations differ from meta-associations
+          # (i.e why they are not implemented in the exact same way):
           #
           # the MA in this case merely changes the interpretation reader
           # from the default one to one that doesn't consume a token and
           # always results in `true`. *this* one (the MMA) however, does that
-          # and also modifies the attribute *class*.
+          # and also modifies the association *class*.
           #
-          # the former doesn't also do this because modern meta-attributes
+          # the former doesn't also do this because modern meta-associations
           # are not typically in the business of modifying entity classes
           # because the instance method namespace of the entity class is
           # purely for ad-hoc business. however, we being a high-level DSL
-          # *do* go this extra distance and modify the attribute *class*.
+          # *do* go this extra distance and modify the association *class*.
 
-          ca = @_.current_attribute
+          ca = @_.current_association_
           scn = @_.argument_scanner_for_current_association_
           if scn.unparsed_exists && :reader_method_name == scn.head_as_is
             scn.advance_one
@@ -139,12 +140,12 @@ module Skylab::Fields
             NILADIC_TRUTH_
           end
 
-          @_.add_methods_definer_by_ do |atr|
+          @_.add_methods_definer_by_ do |asc|
 
-            orig_m = atr.name_symbol
+            orig_m = asc.name_symbol
 
             if ! m
-              m = :"is_#{ atr.name_symbol }"
+              m = :"is_#{ asc.name_symbol }"
             end
 
             -> mod do
@@ -167,9 +168,11 @@ module Skylab::Fields
         end
       end
 
-      class Meta_Attribute___ < Here_::DefinedAttribute
-        # (hi.)
-      end
+      MetaAssociation___ = ::Class.new Here_::DefinedAttribute  # hi.
+
+      # ==
+      # ==
+
     end
   end
 end

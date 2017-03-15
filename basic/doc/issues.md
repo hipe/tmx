@@ -88,8 +88,11 @@
              (was: #tracking-tag - places that could benefit maybe from something
                like basic list evented articulation)
 [#014]       #tracking-tag - "get_" vs. "_value" (in basic string template)
-[#013]       #doc-point #parent:003
+
+[#013] #open this belongs in [fi]
+             #doc-point #parent:003
                "an infinite stack of metafields?" ..
+
 [#012]       #doc-point #parent:006 `node` explained. #body-is-inline-in-parent
                #formerly:#it-006
 [#011]       #doc-point #parent:006 #body-is-inline-in-parent

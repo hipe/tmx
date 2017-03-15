@@ -17,7 +17,7 @@ pseudogrammar:
 
   { "including" | "excluding" } { A | B | .. },
 
-this novelty :+[#hu-034] "expression frame"-like session will condense
+this novelty #[#034] "expression frame"-like session will condense
 the produced expressions down to fewer phrases and/or words, so the
 multiple predicates (gerund phrases?) can be aggregated into one so
 that instead of
@@ -57,13 +57,13 @@ etc.
 this is a sandbox of experimentation whose ultimate home is some
 elsewhere.
 
-  • it is very near #[#hu-055] aggregated articulation conceptually.
+  • it is very near #[#055] aggregated articulation conceptually.
 
   • perhaps it belongs in the above mentioned box of expression frames.
 
-  • it is the frontier driver of wishlist :+[#hu-041]
+  • it is the frontier driver of wishlist #[#041]
     conjuctive phrase logic, which perhaps me while overkilled by
-    [#hu-047] the eventing articulator it uses.
+    [#047] the eventing articulator it uses.
     (EDIT: the above "sentence")
 
 

@@ -69,7 +69,7 @@ module Skylab::Fields
         # avoid dependency on [ac] for now. this is a microscopic ersatz of
         # it, to let the work form its own upgrade path..
 
-        @_.current_attribute.reader_by_ do |atr|
+        @_.current_association_.reader_by_ do |atr|
 
           m = :"__#{ atr.name_symbol }__component_association"
 
@@ -87,7 +87,7 @@ module Skylab::Fields
         # created to facilitate custom aliases [hu].
         # also bolsters readability for hybrid actors.
 
-        @_.current_attribute.will_interpret_by_ do |atr|
+        @_.current_association_.will_interpret_by_ do |atr|
 
           Oldschool_custom_interpreter_as___[ Classic_writer_method_[ atr.name_symbol ] ]
         end
@@ -97,7 +97,7 @@ module Skylab::Fields
 
         m = @_.argument_scanner_for_current_association_.gets_one
 
-        @_.current_attribute.will_interpret_by_ do |_atr|
+        @_.current_association_.will_interpret_by_ do |_atr|
 
           Newschool_custom_interpreter_as___[ m ]
         end
@@ -151,21 +151,21 @@ module Skylab::Fields
           self._COVER_ME_dont_use_nil_use_optional
         end
 
-        @_.current_attribute.be_defaultant_by_value__ x
+        @_.current_association_.be_defaultant_by_value__ x
       end
 
       def default_proc
 
         _x = @_.argument_scanner_for_current_association_.gets_one
 
-        @_.current_attribute.be_defaultant_by_( & _x )
+        @_.current_association_.be_defaultant_by_( & _x )
       end
 
       def desc
 
         _desc_p = @_.argument_scanner_for_current_association_.gets_one
 
-        @_.current_attribute.accept_description_proc__ _desc_p ; nil
+        @_.current_association_.accept_description_proc__ _desc_p ; nil
       end
 
       def enum
@@ -174,7 +174,7 @@ module Skylab::Fields
 
       def flag
 
-        ca = @_.current_attribute
+        ca = @_.current_association_
 
         ca.argument_arity = :zero
 
@@ -186,7 +186,7 @@ module Skylab::Fields
       def flag_of
 
         sym = @_.argument_scanner_for_current_association_.gets_one
-        ca = @_.current_attribute
+        ca = @_.current_association_
 
         ca.reader_by_ do
           NILADIC_TRUTH_
@@ -237,12 +237,12 @@ module Skylab::Fields
       end
 
       def ivar
-        @_.current_attribute.as_ivar = @_.argument_scanner_for_current_association_.gets_one
+        @_.current_association_.as_ivar = @_.argument_scanner_for_current_association_.gets_one
       end
 
       def known_known
 
-        @_.current_attribute.reader_by_ do
+        @_.current_association_.reader_by_ do
           -> do
             Common_::Known_Known[ argument_scanner.gets_one ]
           end
@@ -272,24 +272,24 @@ module Skylab::Fields
 
       def optional
         @_.index_statically_ :see_optional
-        @_.current_attribute.be_optional__
+        @_.current_association_.be_optional__
       end
 
       def required
         @_.index_statically_ :see_required
-        @_.current_attribute.be_required__
+        @_.current_association_.be_required__
       end
 
       def plural  # #experimental - ..
 
-        @_.current_attribute.argument_arity = :zero_or_more
+        @_.current_association_.argument_arity = :zero_or_more
       end
 
       def singular_of
 
         sym = @_.argument_scanner_for_current_association_.gets_one
 
-        ca = @_.current_attribute
+        ca = @_.current_association_
 
         ca.reader_by_ do
           -> do

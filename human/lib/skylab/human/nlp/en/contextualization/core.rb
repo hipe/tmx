@@ -503,7 +503,7 @@ module Skylab::Human
     # ==
 
     Workaround_for_bug_hu_60___ = -> stack do
-      # the below is #open [#hu-060]
+      # the below is #open [#060]
       # caveat :#here-3: don't convert this to be an inline lambda because
       # it will break the equivalency detection and caching will never hit
       :Emission_Shape_via_Channel == stack[-1] || fail

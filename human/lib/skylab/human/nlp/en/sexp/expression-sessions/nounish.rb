@@ -116,8 +116,8 @@ module Skylab::Human
         # this is just a plain old alias to the other,
         # but it makes for more readable sexp's
 
-        _atr = COMPONENTS.attribute :suffixed_proper_constituency
-        _atr.write self, @_argument_scanner_
+        _asc = COMPONENTS.attribute :suffixed_proper_constituency
+        _asc.as_association_write_into_against self, @_argument_scanner_
       end
 
       def __suffixed_modifier_phrase__component_association

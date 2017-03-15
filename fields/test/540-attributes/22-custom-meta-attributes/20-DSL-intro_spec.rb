@@ -10,6 +10,17 @@ module Skylab::Fields::TestSupport
 
       context "flag-based meta-attribute" do
 
+        # what we do here is a proof-of-concept (perhaps a #feature-island) of:
+        #
+        #   A) how it's possible to define meta-associations thru a DSL
+        #      (using the meta-meta-association grammar!) and B) it d
+        #
+        #   B) the fact that association definitions are evaluated lazily
+        #      (note the meta-association is defined "after" it is used.)
+        #
+        # it's tracked with #[#002.C.4] in case we ever find a use for it
+        #
+
         shared_subject :entity_class_ do
 
           class X_a_cma_DSL_A
@@ -19,7 +30,7 @@ module Skylab::Fields::TestSupport
               last_name: nil,
             )
 
-            attrs.define_meta_attribute :flag, :highly_sensitive
+            attrs.define_meta_association___ :flag, :highly_sensitive
 
             ATTRIBUTES = attrs
 

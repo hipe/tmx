@@ -2,10 +2,12 @@
 
 ## objective & scope
 
-"zerk" is a goofy fun experiment for command-line apps.
+"zerk" is a goofy fun experiment for command-line apps. more broadly
+it has become the standard-bearer for the broader dream (and theme)
+of our universe, as introduced below at [#here.2].
+
 the name "zerk" is a portmanteau of "zork" and "jerk"; "zork" out of
 deference to the seminal text-adventure, and "jerk" just because.
-
 
 "zerk" is meant to be a
   • modular
@@ -17,6 +19,14 @@ as an unintended side-effect is has become an interesting alternative
 means to make non-interactive API's as well.
 
 also, non-interactive CLI's too.
+
+
+
+
+## introduction to generated modality clients :[#here.2]
+
+"generated modality clients" are the main thing that [ze] does. [ze] is
+a sidesystem that is a vampire and (EDIT)
 
 
 

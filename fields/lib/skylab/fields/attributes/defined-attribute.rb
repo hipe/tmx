@@ -272,7 +272,7 @@ module Skylab::Fields
 
         p_a = remove_instance_variable :@_pending_meths_definers
         if p_a
-          @deffers_ = p_a.map do | p |
+          @__effecters = p_a.map do |p|
             p[ self ]
           end.freeze
         end
@@ -302,7 +302,14 @@ module Skylab::Fields
 
       # --
 
-      def write ent, scn  # result in kp. #coverpoint1.3 (also)
+      def effect_definition_into_ mod
+        @__effecters.each do |p|
+          p[ mod ]
+        end
+        NIL
+      end
+
+      def as_association_write_into_against ent, scn  # result in kp. #coverpoint1.3, [hu]
 
         Here_::Normalization.call_by do |o|
           o.argument_scanner = scn
@@ -345,7 +352,6 @@ module Skylab::Fields
 
       attr_reader(
         :argument_arity,
-        :deffers_,
         :default_proc,
         :description_proc,
         :_read_by,
@@ -492,7 +498,7 @@ module Skylab::Fields
         end
 
         def __change_working_value_to_default_value
-          # (violate [#012.E.1] (defaulting can fail) (legacy, KISS))
+          # (violate [#012.E.2] (defaulting can fail) (legacy, KISS))
           @_working_value = _default_value_that_hopefully_didnt_fail
           NIL
         end

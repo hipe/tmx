@@ -50,7 +50,7 @@ module Skylab::Fields::TestSupport
               msg = black_and_white ev
             end
 
-            expect_missing_required_message_ msg, :last_name
+            expect_missing_required_message_with_newline_ msg, :last_name
           end
 
           it "using the empty store" do  # features used by [ta] only
@@ -64,7 +64,7 @@ module Skylab::Fields::TestSupport
 
             expect_event :missing_required_attributes do |ev|
               _msg = black_and_white ev
-              expect_missing_required_message_ _msg, :last_name, :soc
+              expect_missing_required_message_with_newline_ _msg, :last_name, :soc
             end
           end
 
@@ -99,7 +99,7 @@ module Skylab::Fields::TestSupport
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
               _msg = black_and_white ev
-              expect_missing_required_message_ _msg, :last_name, :soc
+              expect_missing_required_message_with_newline_ _msg, :last_name, :soc
             end
 
             only_emission.should _be_this
@@ -234,7 +234,7 @@ module Skylab::Fields::TestSupport
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
               _msg = black_and_white ev
-              expect_missing_required_message_ _msg, :b
+              expect_missing_required_message_with_newline_ _msg, :b
             end
 
             only_emission.should _be_this

@@ -835,9 +835,9 @@ module Skylab::Fields
 
       case prp.argument_arity
       when :one
-        instance_variable_set prp.ivar, gets_one
+        instance_variable_set prp.as_ivar, gets_one
       when :zero
-        instance_variable_set prp.ivar, true
+        instance_variable_set prp.as_ivar, true
       else
         self._COVER_ME
       end
@@ -1092,7 +1092,7 @@ module Skylab::Fields
 
       attr_reader :custom_argument_scanning_writer_method_name
 
-      def ivar  # override parent
+      def as_ivar  # override parent
         @name.as_ivar
       end
 
@@ -1108,18 +1108,6 @@ module Skylab::Fields
       attr_accessor :_shibboleth
 
       # ~~ normalization API
-
-      def _read_knownness_ prp  # #[#fi-029]
-
-        ivar = prp.ivar
-
-        if instance_variable_defined? ivar
-          Common_::Known_Known[ instance_variable_get ivar ]
-        else
-          Common_::KNOWN_UNKNOWN
-          # raise ::NameError, __say_no_ivar( ivar )
-        end
-      end
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
@@ -1160,13 +1148,10 @@ module Skylab::Fields
         @ad_hoc_normalizer_box ||= Common_::Box.new
       end
 
-      def _write_via_association_ x, prp
-
+      define_method :_write_via_association_, DEFINITION_FOR_THE_METHOD_CALLED_WRITE_VIA_ASSOCIATION_
         # this is actually for setting a *meta*property value on the property!
 
-        instance_variable_set prp.ivar, x
-        KEEP_PARSING_
-      end
+      define_method :_read_knownness_, DEFINITION_FOR_THE_METHOD_CALLED_READ_KNOWNNESS_
 
       ## ~~ default (a meta-meta property & part of the normalization API)
 

@@ -23,6 +23,9 @@ the current working model looks something like this (pseudo code):
 and understand that, and then work your way up. if you don't understand
 the higher two levels above curently, don't worry.)
 
+
+
+
 ## analysis
 
 The general truth about "n-meta-fields" statments like above is:
@@ -32,6 +35,9 @@ may be expressed as the symbol alone, not in an array.
 
 tentatively, with the working model, each element of the tuple must
 be a symbol, except for properties, which we'll get into below...
+
+
+
 
 ## justification
 

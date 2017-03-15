@@ -11,7 +11,7 @@ module Skylab::MyTerm
 
   module API
 
-    # one of the [#015] "generated modality clients" (see)
+    # one of the [#ze-001.2] "generated modality clients" (see)
 
     class << self
 

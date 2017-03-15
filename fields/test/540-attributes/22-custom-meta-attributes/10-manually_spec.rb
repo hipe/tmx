@@ -28,13 +28,13 @@ module Skylab::Fields::TestSupport
 
           class X_a_cma_m_Mattrs  # note we only define what we will use..
 
-            def initialize bld
-              @_build = bld
+            def initialize is  # interpretation services
+              @_ = is
             end
 
             def list
 
-              ca = @_build.current_attribute
+              ca = @_.current_association_
 
               ca.writer_by_ do |atr|
                 atr.__hello or ::Kernel.fail
@@ -70,8 +70,8 @@ module Skylab::Fields::TestSupport
 
             attr_reader( * attrs.symbols )
 
-            attrs.meta_attributes = X_a_cma_m_Mattrs
-            attrs.attribute_class = X_a_cma_m_Attr
+            attrs.meta_associations = X_a_cma_m_Mattrs
+            attrs.association_class = X_a_cma_m_Attr
 
             const_set :ATTRIBUTES, attrs
 

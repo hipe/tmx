@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[br] property - stack - common frame - integrate with entity" do
+  describe "[fi] attributes - stack - common frame - integrate with entity" do
 
     before :all do
 
@@ -33,14 +33,12 @@ module Skylab::Fields::TestSupport
 
     it "required fields still bork" do
 
-      _rx = /\Amissing required field - 'bar'/
-
       begin
         _subject_class.new
       rescue ::ArgumentError => e
       end
 
-      e.message =~ _rx || fail
+      expect_missing_required_message_without_newline_ e.message, :bar
     end
 
     it "works with all" do
@@ -52,6 +50,8 @@ module Skylab::Fields::TestSupport
       foo = _subject_class.new :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
     end
+
+    define_method :expect_missing_required_message_without_newline_, Common_Frame.definition_for_etc
 
     def _subject_class
       X_a_s_cf_Inter_1

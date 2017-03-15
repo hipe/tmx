@@ -7,30 +7,29 @@ module Skylab::Fields
       # (see [#002.C] 'pertinent ideas around "attributes actors" and related')
 
       # -
-        def initialize unparsed_h, ma_cls, atr_cls
+        def initialize unparsed_h, ma_cls, asc_cls
 
           h = {} ; pool_proto = {}
 
-          n_meta_prototype = Here_::N_Meta_Attribute::Build.new ma_cls, atr_cls
-          o = n_meta_prototype  # #open [#015.1]
+          n_meta_prototype = Here_::N_Meta_Attribute.define do |o|
 
-            o.attribute_services = self  # :#here-1
-
-            o.build_N_plus_one_interpreter =
-              Here_::N_Meta_Attribute::Common_build_N_plus_one_interpreter
-
-            o.finish_attribute = -> build do
+            o.finish_association_by = -> _build do
               # (this used to do things under #tombstone-D)  build.current_attribute
               NOTHING_
             end
-          # -
+
+            o.indexing_callbacks = self  # :#here-1
+
+            o.association_class = asc_cls
+            o.meta_associations_class = ma_cls
+          end
 
           @_optional_or_required = nil
           @required_is_default_ = false
           @_custom_index = nil
 
           unparsed_h.each_pair do |k, x|
-            asc = n_meta_prototype.build_and_process_attribute__ k, x
+            asc = n_meta_prototype.build_and_process_association__ k, x
             k = asc.name_symbol
             pool_proto[ k ] = nil
             h[ k ] = asc
@@ -58,9 +57,7 @@ module Skylab::Fields
           begin
             k = st.gets
             k || break
-            @_hash.fetch( k ).deffers_.each do |p|
-              p[ mod ]
-            end
+            @_hash.fetch( k ).effect_definition_into_ mod
             redo
           end while above
           NIL

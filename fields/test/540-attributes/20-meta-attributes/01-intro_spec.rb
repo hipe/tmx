@@ -91,7 +91,7 @@ module Skylab::Fields::TestSupport
 
         attrs = the_attributes_
 
-        _rx = /\Ainvalid meta attribute 'floozie_poozie', expecting \{ #{
+        _rx = /\Ainvalid meta association 'floozie_poozie', expecting \{ #{
           }[a-z_]+(?: \| [a-z_]+){3,20} \}\z/
 
         begin

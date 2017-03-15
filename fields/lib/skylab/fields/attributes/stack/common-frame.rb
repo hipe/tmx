@@ -161,21 +161,9 @@ module Skylab::Fields
           UNABLE_
         end
 
-        def _read_knownness_ atr  # :[#028]. (has 1x redund)
+        define_method :_read_knownness_, DEFINITION_FOR_THE_METHOD_CALLED_READ_KNOWNNESS_
 
-          ivar = atr.ivar
-
-          if instance_variable_defined? ivar
-            Common_::Known_Known[ instance_variable_get ivar ]
-          else
-            Common_::KNOWN_UNKNOWN
-          end
-        end
-
-        def _set_value_of_property x, prp
-          instance_variable_set prp.as_ivar, x
-          ACHIEVED_
-        end
+        define_method :_write_via_association, DEFINITION_FOR_THE_METHOD_CALLED_WRITE_VIA_ASSOCIATION_
 
         def maybe_send_event *, & ev_p  # here for now..
           raise ev_p[].to_exception
@@ -482,7 +470,7 @@ module Skylab::Fields
             end
 
             define_method _WRITER_METHOD_NAME do
-              _set_value_of_property gets_one, prp_
+              _write_via_association gets_one, prp_
             end
 
             KEEP_PARSING_
@@ -511,7 +499,7 @@ module Skylab::Fields
           prp._during_apply do | prp_ |
 
             define_method _WRITER_METHOD_NAME do
-              _set_value_of_property gets_one, prp_
+              _write_via_association gets_one, prp_
             end
           end
 
@@ -564,32 +552,13 @@ module Skylab::Fields
 
         RMRA_METH___ = -> miss_asc_a do
 
-          _ev = Build_missing_requireds_event___[ miss_asc_a ]
+          _ev = Home_::Events::Missing.with(
+            :reasons, miss_asc_a,
+            :noun_lemma, "field",
+          )
+
           raise _ev.to_exception
           # maybe_send_event # :error, :missing_required_properties do
-        end
-
-        Build_missing_requireds_event___ = -> miss_prp_a do   # #open [#030] dedund this
-
-          Common_::Event.inline_not_OK_with(
-
-            :missing_required_properties,
-            :missing_LEGACY_associations, miss_prp_a,
-            :exception_class_by, -> { Home_::ArgumentError },
-            :error_category, :argument_error,
-
-          ) do | y, o |
-
-            s_a = o.missing_LEGACY_associations.map do |prp|
-              par prp
-            end
-
-            1 == s_a.length or ( op, cp = %w[ ( ) ] )
-
-            _x = "#{ op }#{ s_a * ', ' }#{ cp }"
-
-            y << "missing required field#{ s s_a } - #{ _x }"
-          end
         end
 
         REQUIRED_PROP_METHOD__ = -> do

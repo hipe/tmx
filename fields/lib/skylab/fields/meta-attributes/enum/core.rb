@@ -16,7 +16,7 @@ module Skylab::Fields
         bx
       end
 
-      _ca = build.current_attribute
+      _ca = build.current_association_
 
       _ca.writer_by_ do |_atr|
 

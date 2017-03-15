@@ -16,22 +16,20 @@ module Skylab::Snag
 
       # ~ models & like
 
-      Attrs__ = Home_.lib_.fields::Attributes
 
       class Common_Adapter_
 
-        include Attrs__::Actor::InstanceMethods
+        include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
         def process_argument_scanner_fully scn
           _ok = super
           _ok && __normalize_in_place
         end
 
-        def __normalize_in_place  # the idea is covered by [#fi-008.14]
+        def __normalize_in_place
           ascs = self.class::ATTRIBUTES
           if ascs
-            Attrs__::Normalization.call_by do |o|
-              o.association_index = ascs.association_index
+            ascs.normalize_by do |o|  # the idea is covered by [#fi-008.14]
               o.ivar_store = self
             end
           else

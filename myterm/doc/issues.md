@@ -1,6 +1,6 @@
 [#016] #wish language production is amusingly bad
 
-[#015]       introduction to generated modality clients ..
+[#015] #hole (#moved to [#ze-001.2])
 
 [#014] #wish when [#ze-043] niCLI defaults, this will be nice.
              ( #was: this unavailability hullabullooo )

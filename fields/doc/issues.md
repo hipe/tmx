@@ -23,7 +23,9 @@
 
              [#here.2] (in document)
 
-       #open [#here.1] whether or not this is deprecated, wait till #open [#br-045] sunset
+       #open [#here.1] will eventually maybe sunset entity as-is, but
+             that depends on [#br-045] sunset. the concept will live on..
+
              ( #was: track redundant or near-redundant argument scanner.
                #moved-to: [#co-xxx] )
 
@@ -31,19 +33,21 @@
 
 [#032]       any result path (in [#016])
 
-[#031] #open move [#ca-04[56]] to here
+[#031] #hole
+             ( #wont move [#ca-04[56]] to here )
 
-[#030] #open dedund this
+[#030] #hole
+             ( #was: dedund this [missing required exception construction] )
 
-[#029]       in situ track universal redundancy
+[#029] #hole
+             ( #was: local redundancy )
 
-[#028] #open do *not* implement with [br] - break this tie..
-             ( and [stack] )
+[#028]       [stack]
 
 
 [#027]       [store]  (ivar-based, mostly)
 
-[#026] #open struct vs. actor - one is cold one is hot
+[#026] #track struct vs. actor - one is cold one is hot
 
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
 
@@ -59,8 +63,9 @@
              `process_argument_scanner_passively`.
 
              2) more generally it may also be used to track "sessions"
-             that do not have enclosed edit sessions, so they need to
-             have this `normalize` called at user-determined times..
+             that do not have enclosed edit sessions (i.e in a reasonably
+             small block) so they need to have this `normalize` called at
+             user-determined times..
              (more on this at [#012.A].)
 
 [#021] #watch future redundancy - reflect all method-based attributes (in [br])
@@ -79,7 +84,8 @@
 
 [#015]       near-term smalls & mediums near "one-ring"
 
-       #open :[#here.1] modernize how `N_Meta_Attribute` is constructed
+             [#here.2]: perhaps rename the lib to "association"
+             [#here.1]: finish fixes to indentation (formatting) in n-meta-attribute
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 
@@ -106,20 +112,19 @@
              in universe. (this is an older variant of what is now the central
              project of [#037.five])
 
-             :[#here.F]: marks the beginning of the one-generation-old
-             algorithm.. :[#here.F.1]: is the old (and now defunct) idea that
-             a defaultant association MUST NOT be required. (other sub-tags
-             here track a logical reduction of the grammar space.)
+             :[#here.F]: the pseudocode
 
-             :[#here.E.3]: values already in the value store will be assumed
+             :[#here.E.4]: values already in the value store will be assumed
              to be already valid.
 
-             :[#here.E.2]: values produced by defaulting procs must not
+             :[#here.E.3]: values produced by defaulting procs must not
              be run through normalization.
 
-             :[#here.E.1]: justifies the need for defaulting to be able to fail
+             :[#here.E.2]: justifies the need for defaulting to be able to fail
              and recommends an interface for handling and expressing (or not)
              this failure.
+
+             :[#here.E.1]: introduces defaulting as it applies to the algorithm
 
              :[#here.D.2]: tracks where such ordered boxes are used in
              the universe.
@@ -177,9 +182,9 @@
                          "parameter arity" of associations. currently
                          `required` is assumed
 
-       #open :[#here.C]: defaults can now fail a requiredness check
+       #hole :[#here.C]:
 
-             :[#here.B]: we need a proper placeholder for "attribues actor"
+       #hole :[#here.B]:
 
              :[#here.1]: [ SESSION PATTERN ] (referenced universally)
 

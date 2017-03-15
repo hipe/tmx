@@ -1,38 +1,119 @@
-# new normal :[#012]
+# the new normal :[#012]
 
-## synopsis
+## overview
 
-some new freshness is sprinkled on the age-old algorithm of
-normalization as we try to approach the dream of a universal,
-single solution for this.
+one by one we explore the different broad concerns of normalization,
+then we explore how they interplay with one another. then sythhesizing
+all this, we propose a grand unified theory of normalization, expressed
+through a rough-sketch but voluminous body of pseudocode. finally
+we critique this model.
 
-this contains the most detailed algorithm in pseudocode yet
-of such an approach (of any of the documents in our universe).
 
+
+
+## brief history
+
+what is reflected here represents work spanning many years and around
+seven or so separate facilities that were unified into one. notes from
+this can be found in [#037].
 
 
 
 ## document-meta
 
   - [#here.3] is the freshest, in battle with [#here.F]
-  - [#here.F] is old but still good
-  - #here-2 is also old
-  - #here-1 is the oldest, being kept for posterity for now
+  - #here-2 is the old but still open "N-meta proposition"
+  - #here-1 is the oldest pseduocode, being kept for posterity for now
+
+
+
+## current status of unificiation
+
+  - [#ac-028] still exists
+  - [#002] "defined attributes" still exist and do half their own n11n
 
 
 
 
-## introduction: cost-benefit analysis of RISC :[#here.3]
 
-a sufficiently broad implementation of "normalization" can
-accomplish "defaulting" and "requiredness" too, which would
-grant a RISC-like simplification of the set of requirements
-(our API) for formal attributes.
+## cursory intorduction to the algorithm :#here-3
+
+generally the sequence is 1) defaulting, 2) ad-hoc normalization and 3)
+required-ness (hereafter not hyphenated) check, but note it it not merely
+these steps in sequence. we won't discuss here what these steps actually
+mean but you get a pretty good idea of this by the end of the document.
+but with more detail:
+
+    if you're dealing with a value from "the outside",
+
+      if it's `nil` and you have defaulting,
+        if defaulting succeeds, let this new value be your "working value"
+        (otherwise `nil` is still your working value and procede)
+        (note that if defaulting fails it does not fail the invocation)
+
+      if [you don't have defaulting or defaulting failed] and you have an ad-hoc normalizer,
+        if ad-hoc normalization succeeds (against the outside value)
+          let this new value be the "working value"
+        otherwise we must withdraw from further processing of this request.
+
+        (note the normalization is still run even if the working value is `nil`)
+        (note we never run normalization against a defaulted value)
+
+      if everything's still OK,
+      if it's required and your working value is `nil`,
+        note the missing required
+      otherwise
+        write the working value to the "inside".
+
+      (note that an argument of `nil` can overwrite a "good" existing value)
+
+    otherwise (and you're dealing with a "normalize-in-place")
+
+      let the working value be the effective inside value (`nil` when not set),
+        noting whether any existing value (possibly `nil`) was actually set.
+
+      if you have defaulting,
+        if the defaulting succeeds, let this new value be your working value,
+        noting if it succeeded.
+
+      if the association is required and your working value is `nil`
+        note the missing required
+      otherwise if a value was not previously set or defaulting succeeded
+        write the working value to the "inside".
+
+      (we only ever run ad-hoc normalizations against outside values)
+
+    (missing required are aggregated and expressed later)
+
+this is the general idea of the "one ring" algorithm is that there
+are these three areas of concern (defaulting, ad-hoc normalization and
+requiredness) and they each have to be addressed in a way that works
+in concert with the other concerns.
+
+
+
+
+## analysis: cost-benefit analysis of RISC :[#here.3]
+
+if the "ad-hoc normalization" API is worth its salt, then it would
+be usable (superficially at least) to implement "defaulting" and
+"requiredness" as well:
+
+defaulting can be modeled as an ad-hoc normalizer that is pass-thru
+for cases other than "known unknown" and "known nil", and *in* these
+cases maps the value. requiredness can be implemented as an ad-hoc
+normalizer that is pass-thru for all cases other than "known unknown"
+and "known nil", and *in* these cases and aggregates a note for failure.
+("knownness" has a dedicated document at [#co-004].)
+
+in theory such a "munging" of three concerns in to one sub-facility
+could grant us a RISC-like simplification of the set of requirements
+for associations (i.e our API). however:
 
 one category of costs associated with this approach is along the
 axis of expressiveness/clarity/ease-of-use: it's maybe self-
 evident that for most use cases it's more practical to be able
-to model a formal attribute as simply "being" required rather than
+to model a association as simply "being" required rather than
 to ask the author to stop and think how to write a normalization
 function that expresses and asserts requiredness.
 
@@ -42,7 +123,7 @@ normalization, it doesn't mean that it necessarily should be.
 
 maybe this is an issue of abstraction: in the domain of authoring
 it may make sense to hold these as specific, differentiated meta-
-attributes. but internally they can be accomplished through a
+associations. but internally they can be accomplished through a
 smaller, shared set of mechanisms.
 
 but in the case of default values, at least, this approach can
@@ -56,31 +137,33 @@ from this "over-munging" approach. we do so specifically across the
 concerns of defaulting, ad-hoc normalization and requiredness; pointing
 out where such munging can present costs. we could broaden our focus
 and apply this same lexicon towards an attempted "munging" of `glob`,
-`flag` and "mondaic" attributes (all categories of [#014]
-"argument arity"); but we hold off on that for now.
+`flag` and "mondaic" associations (all categories of [#014]
+"argument arity"); but we hold off on such a critique for now (but
+suffice it to say we have over-munged this in the past and we want to
+avoid this today.)
 
 
 
 
 ## case-study through pseudocode of why we can't have nice munging
 
-a possible pitfall of all this "munging" is that these meta-attributes
+a possible pitfall of all this "munging" is that these meta-associations
 can be composed and that they are not closed under composition (if
 i have that right): "defaulting", "ad-hoc normalization" and "requiredness"
-are all meta-attributes that need to be at least somewhat cognizant
+are all meta-associations that need to be at least somewhat cognizant
 of each other in ways we now explore.
 
 what follows is three sections, each correspoding to these three
-meta-attributes. within each section we explore deeply the properties
-of that meta-attribute (the "meta-meta-attributes" if you insist);
-we imagine requirements for that meta-attribute, in some cases we
+meta-associations. within each section we explore deeply the properties
+of that meta-association (the "meta-meta-associations" if you insist);
+we imagine requirements for that meta-association, in some cases we
 suggest mechanisms (i.e implementation, e.g pseudocode) for the
 requirement. in some cases further we identify what we characterize
 as false-requirements.
 
 while following along in the three sections (especially their
 pseudocode), give consideration to the importance of their order
-with respect to each other.
+with respect to each other, in the manner we glanced over cursorily #here-3.
 
 following these sections, then, we will explore points of "synthesis"
 about detailed ways these "meta-associations" can and cannot be allowed
@@ -90,13 +173,13 @@ to influence each other.
 
 
 
-## step 1 of effecting every formal attribute: defaulting
+## step 1 of effecting every association: defaulting :[#here.E.1]
 
 if a "defaulting" function (imagine value) is present, run it
 IFF there is no provided value.
 
 this step, then, of effecting a default is skipped (or is it?)
-for any defaultant formal attribute for which a corresponding
+for any defaultant association for which a corresponding
 actual value was provided. we are sidestepping the definition
 of what exactly we mean by "provided", and whether we mean any
 of this at all. these are important distinctions we pick up at
@@ -111,26 +194,26 @@ at the culmination of [#here.theme-2].
 
 
 
-### (requirement for defaulting: injectable meta-attributes)
+### (requirement for defaulting: injectable meta-associations)
 
-defaulting is a good example of a meta-attribute that you might want
+defaulting is a good example of a meta-association that you might want
 to be "injectable": for a CLI you might want to default a path as being
 the "current working directory"; but under your API the idea of a
-"current directory" might be unapplicable/unusable/problematic, and
-so under such a modality you would want there to be (virtually if not
-actually) no defaulting function at all.
+"current directory" might be unapplicable/unusable/a problematic security
+risk, and so under such a [#br-002] modality you would want there to be
+(virtually if not actually) no defaulting function at all.
 
 for purely historical reasons, we tag discussion of (and desire for)
 "meta-association injection" (as described above) with :#masking.
 
   - this is one good reason why we now don't associate formal
-    attributes "statically" with (for example) a class is because
+    associations "statically" with (for example) a class is because
     now they are so dynamic.
 
 
 
 
-### (requirement for defaulting: a fail-strategy for this meta-attribute) :[#here.E.1]
+### (requirement for defaulting: a fail-strategy for this meta-association) :[#here.E.2]
 
 it's also useful to allow a defaulting function to be able to draw on
 resources of trivial complexity. for example, we have modeled (in at
@@ -145,18 +228,19 @@ corollaries:
 
   - we should model the modeling (sic) of defaulting as something like
     a function that produces the default value to be used, rather than
-    just modeling "defaulting" as a static value that is a baked-in
-    part of the attribute definition.
+    just modeling a "default" as a static value that is a baked-in
+    part of the association definition. (however [#002.WHERE] allows for and
+    gives special treatment to defaults specified as vaules.)
 
   - (tentative) this default function when executed should have available
-    to it the application stack (perhaps even including its associated
+    to it the "application stack" (perhaps even including its associated
     operation in its primordial state) so that it can draw on application
     resources in the same manner that operations do.
 
   - as such, generally we must conceive of defaulting as an auxiliary
-    nicety, and not a mission-critical meta-attribute.
+    nicety, and not a mission-critical meta-association.
 
-given all this we must have a failure strategy to allow the defaulting
+given all this, we must have a failure strategy to allow the defaulting
 function to indicate that it was unable to resolve a value for whatever
 reason. (we probably don't care about what the reason was, just that a
 default value is unavailable.)
@@ -175,14 +259,14 @@ the defaulting proc to "reach" the primordial operation.))
 
 
 
-## step 2 of effecting every formal attribute: ad-hoc normalization
+## step 2 of effecting every association: ad-hoc normalization
 
 allowing arbitrary author functions to operate as "ad-hoc normalizers"
 is a mostly solved problem: the function must take as input a [#co-004]
 "qualified knownness":
 
   - this structure allows the function to know and use the name of the
-    attribute it is normalizing, for use in any custom error reporting.
+    association it is normalizing, for use in any custom error reporting.
 
   - this interface is monadic (ergo simple) while still accommodating
     use for the cases of the actual value being existent ("provided")
@@ -198,7 +282,7 @@ unspecified here (being left to the discrection of the application/
 library stack), but the answer is probably "yes".
 
 the function must result in false-ish or a [#co-004] known known. when
-false-ish the local participant is to assume that the normalization
+false-ish, the local participant is to assume that the normalization
 (serialization or validation, etc) failed (or that a related facility
 is unavailable), and it must take appropriate action (abandoing all futher
 processing of the request, probably).
@@ -212,20 +296,25 @@ found an ideal fit for the (ostensibly useful) concept of "function
 chaining". it would be useful, it seems, to allow the author to model the
 normalization "specification" as a chain of normalizing functions.
 ("first, it has to be an integer. then it has to be in this range..").
+indeed, this is how we once implemented the "over-munged" approach
+described at the beginning of [#here.3].
+
 while this sounds nice, facilitating something like this carries hidden
 cost:
 
-so far, everything we have implemented so far of formal attributes is
-amenable to the [#sl-023] "dup-and-mutate" pattern. the meta-attribute-
+so far, everything we have implemented so far of associations is
+amenable to the [#sl-023] "dup-and-mutate" pattern. the meta-association-
 values necessary to effect all of this are simple, "atomic" values like
 booleans and symbols. but once we allow a relatively complex structure
 like a list of functions, this opens the door to new problems:
 
-  - if we dup a formal attribute that has a subject array, do we deep-dup
-    this array at the time of dup? do we "copy-on-write"? either way it
+  - if we dup an association that has a subject array, do we deep-dup
+    this array at the time of dup? do we "copy-on-write"? should the
+    array always be kept in a frozen state, or should we otherwise
+    manage access to it? regardless of how we answer these questions, it
     requires non-trivial custom code and opens up lots of room for error.
 
-  - near "meta-attribute-injection", do we now need an API to allow the
+  - near #here-4 "meta-association-injection", do we now need an API to allow the
     author to insert new functions at arbitrary locations in the list?
     delete aribtrary functions? so does each function need to have some
     kind of (e.g symbolic name) identifier associated with it?
@@ -241,20 +330,23 @@ closing the door on all the fun. metaphor! :[#here.D]
 
 
 
-## step 3 of effecting every formal attribute: requiredness
+## step 3 of effecting every association: requiredness
 
 it may or may not be useful to regard "requiredness" (formally [#014]
 "parameter arity") as a special kind meta-attribute. on one hand, it is
 perhaps the most centrally important meta-attribute: "no matter what,
-don't procede with the operation unless all of the formal attributes
-on this list have corresponding actual values." but on the other hand
-it is a meta-attribute that can be seen as almost "outside" of the
+don't procede with the operation unless all of the associations
+in this list have corresponding actual values." but on the other hand
+it is a meta-association that can be seen as almost "outside" of the
 intrinsic definition of an attribute, having more to do with the
-participant's relationship with the attribute than the formal attribute
+participant's relationship with the attribute than the attribute
 itself.
 
 [ac] develops this deeply by modeling requiredness as a concern of the
 "component association" but not part of the formal component itself.
+in the subject library we collapse these two ideas into one (the
+association is the attribute), which is why we generally always say
+"association" and not "attribute" here.
 
 anyway, here in contrast to the past we're going to try something a
 little simpler in how we implement this. (we're going to give requiredness
@@ -284,7 +376,7 @@ but near #masking this distinction might not necessarily be rigid.)
 
 as we have suggested at [#ac-003.1], we can then try to use the same
 underlying mechanism whether our remote source of data is human, file
-or other. the referent and its asset has demonstrated this approach as
+or other. the referent and its asset have demonstrated this approach as
 both viable and useful.
 
 (we will sidestep the problem of how you translate something like a
@@ -297,8 +389,8 @@ like an API scanner),..)
 more broadly about #masking, it bears mentioning that such a requirement
 may or may not put strain on what we build here; for now we're punting on
 that as being out of scope. but it's possible that the implementation
-of masking would filter formal attributes through some mapper that would
-produce formal attribues appropriate for the remote modality, which would
+of masking would filter associations through some mapper that would
+produce associations appropriate for the remote modality, which would
 allow the subject facility to remain blissfully ignorant of all of this.
 
 
@@ -306,18 +398,18 @@ allow the subject facility to remain blissfully ignorant of all of this.
 
 ## an overview of problems in synthesis
 
-we have now arrived at a conception of attributes that are "normalizers"
-in a broad, extroverted sense. not only does the particular formal
-attribute need to normalize (e.g unserialize, validate) an incoming,
-provided value; but:
+we have now arrived at a conception of associations that are "normalizers"
+in a broad, extroverted sense. not only does the particular association
+need to normalize (e.g unserialize, validate) an incoming, provided value;
+but:
 
-  - it may need be notified of and engage code for those formal
-    attributes for which no actual value was provided in a facility
-    we call "defaulting" #[#here.theme-2].
+  - it may need to be notified of and engage code for those associations
+    for which no actual value was provided in a sub-concern we call
+    "defaulting" #[#here.theme-2].
 
-  - it may need to be notified of and engage code for those formal
-    attributes who (even after defaulting, maybe) still have
-    "no value" in a facility we call "requiredness".
+  - it may need to be notified of and engage code for those associations
+    that (in effect) have no effective value (even after defaulting,
+    maybe) but "should" have one, in a sub-concern we call "requiredness".
 
 this logical (if not actual) sequence of steps is one-way; i.e., out
 of the box (just as with [un]serialization) we cannot automatically
@@ -345,15 +437,14 @@ default values should be run through normalization. (TL;DR: no.)
 for parsimony of our association "grammar" (i.e to keep low the number of
 meta-associations we have to learn about and remember), we allow that ad-
 hoc normalizations (introduced in a previous section) can be used in a
-"modality senstive" manner (through "meta-association injection,
+"modality senstive" manner (through #here-4 "meta-association injection",
 introduced later). such a utilization of this meta-association makes it
-perhaps indiscernable from an "unserialization" (or "unmarshalling")
-facility.
+perhaps indiscernable from "unserialization" (or "unmarshalling").
 
 that is, ad-hoc normalization is what will be used (internally) when you
 need to parse "incoming" data that is some modality-specific format (what
 we'll call "encoded") to the internal format (i.e objects in your runtime,
-or what we'll call "decoded".)
+or what we'll call "decoded").
 
 a simple but common real-world example of this is when you need to parse
 some kind of number entered at the command line (or perhaps read from a
@@ -385,7 +476,7 @@ if the above makes no sense to you (which, it probably doesn't), then
 ask yourself: if you wanted to specify that the default value for some
 association was the integer `2`, does it "feel" more intuitive to represent
 this default as the *integer* `2` or the *string* `"2"`? if you answered
-"string" then you are wrong about your feelings.
+"string" then your feelings are incorrect.
 
 but what we are doing by presenting *integer* `2` as our default is
 presenting a "decoded" value (i.e. an internal "object"). remember we are
@@ -398,7 +489,7 @@ if for whatever reason you wanted the equivalent of this behavior (an
 imaginable but as-yet unincountered case), you would have to write your
 defaulting proc to do the work "manually" of running whatever value
 through the same (or any other) normalization arrangement. you have this
-as an option because [#here.E.1] defaulting can now fail.)
+as an option because [#here.E.2] defaulting can now fail.)
 
 
 
@@ -429,7 +520,7 @@ in fact, we will broaden the formal name of "value store" to be
 
 
 
-## full synthesis: soft pseudocode
+## full synthesis: soft pseudocode  :[#here.F]
 
 so given all of above facets together (generally, that we traverse
 the formal set not just the provided set (A), and (B) that we must
@@ -437,13 +528,13 @@ never run normalizers on existent data that is already "inside"),
 
 our overall central algorithm will have these characteristics:
 
-  - that it comprehends over the entire stream of formals once,
-    because it has to to know of any that are required, as well
-    as other reasons
+  - that it comprehends over the entire collection (imagine stream)
+    of associations once, because it has to to know of any that are
+    required, as well as other reasons
 
   - it will never assign "into" the local participant data that
     might be invalid (according to the representation of validity
-    modeled by the particular corresponding formal attribute)
+    modeled by the particular corresponding association)
 
   - the degree to which it will validate an already "inside"
     data member of the local participant is particular, and may
@@ -455,20 +546,21 @@ of steps and moving parts, in an approach we call "tick not pass"
 
 so imagine this:
 
-    index the stream of all formal attributes in this way:
-    for each formal atribute,
+    index the stream of all associations in this way:
+    for each association,
 
       add it to a hash keyed to its symbolic name.
 
-      for this formal attribute, if ANY of:
+      for this association, if ANY of:
 
         - it's required
         - it has an ad-hoc normalizer
         - it has a proc for defaulting
 
-      add a reference (the symbolic name) of this formal attribute
+      add a reference (the symbolic name) of this association
       to a hash to be used as a [#ba-061] diminishing pool.
-      (we now call such associations "extroverted".)
+      (we now call such associations "extroverted".) :[#here.F.B]
+      (EDIT: it might be that ad-hoc normalizers are not added to the pool, not sure)
 
     now the formals are all represented as (only) this straightforward
     hash and this simple diminishing pool of "normalizant" formals.
@@ -482,14 +574,14 @@ so imagine this:
 
     for each (if any) provided argument in the (any) argument scanner,
 
-      if you hit an unrecognized formal attribute name (or you
+      if you hit an unrecognized association name (or you
       can't resolve an attirbute name (a.k.a "primary");
 
         we've got to withdraw from further processing this of request.
         (there is no way to continue the parse after this, because in effect
         we don't know how many tokens to skip to get to the next primary.)
 
-      if everything's still OK (and you have a corresponding formal attribute),
+      if everything's still OK (and you have a corresponding association),
 
       as for the concern of argument arity [#here.theme-3], generally it's
       the injected scanner (not us) who determines the mechanics of if and
@@ -497,7 +589,7 @@ so imagine this:
       special argument arities of `flag` and `glob`.
 
       however it is we (not the scanner) who knows the characteristics of
-      the current formal attribute (and it must stay this way) so in effect
+      the current association (and it must stay this way) so in effect
       we have to tell the scanner the arity of the current field we are
       processing.
 
@@ -542,7 +634,7 @@ so imagine this:
       if everything's still OK (and you have a value for this engagement ("the value")),
 
       if per the "seen hash" you have seen a provided value for this
-      attribute already in this request
+      association already in this request
 
         if the formal is of type `glob`
           TODO is this how we will do this? allow this? probably yes
@@ -571,7 +663,7 @@ so imagine this:
       as we do them later (i.e make it a function). we'll describe them
       here instead of later, arbitrarily.
 
-      step 2: if the formal attribute has an ad-hoc normalizer,
+      step 2: if the association has an ad-hoc normalizer,
 
         wrap the value in a "qualified knownness". if flag, the value
         will be `true` or `false`. send it (and the listener) into the
@@ -626,10 +718,10 @@ so imagine this:
           having a required boolean field you may have to write a norm
           function yourself.)
 
-      ANYWAY, if the formal attribute is "required" and the corresponding
+      ANYWAY, if the association is "required" and the corresponding
       actual value (after any normalization) qualifies as "not provided"
       (or "not set") by the working definition, THEN add a symbolic
-      reference to this formal attribute to the ordered set (not array) and
+      reference to this association to the ordered set (not array) and
       continue processing. (why we do not withdraw from futher processing
       at this point will be explained at [#here.J.2].)
 
@@ -640,7 +732,7 @@ so imagine this:
       a particular corollary of the above is worth considering now: what
       happens if the property store ("entity") has something trueish stored
       for this value, and the request had a provided-nil for the value,
-      and there's no defaulting proc in the formal attribute?
+      and there's no defaulting proc in the association?
 
       based on the algorithm as described so far, what happens depends on
       whether the field was required.
@@ -655,11 +747,11 @@ so imagine this:
           the value in the property store!
 
       first of all, keep in mind that if the model author wants a
-      provided-nil to engage the formal attribute's defaulting proc, then
+      provided-nil to engage the association's defaulting proc, then
       that's already what happens. however if the model author wants a
       provided-nil to amount to defaulting to what is already in the
       property store, then (for now) she would have to provide a custom
-      ad-hoc normalizer for that formal attribute that reads the existing
+      ad-hoc normalizer for that association that reads the existing
       value of the entity and sends it back out as the value to default to,
       amounting to the property store ("entity") writing the same value back
       into itself. it's an inelegant but adequate workaround for an odd
@@ -721,7 +813,7 @@ so imagine this:
                                        do if it is nt required.)
 
         as such, when the component is already set we can (and must)
-        "pass" on the processing of the formal attribute for this field.
+        "pass" on the processing of the association for this field.
 
         a corollary of this:
 
@@ -729,7 +821,7 @@ so imagine this:
             favorite) you set the corresponding ivar of this field to
             anything other than `nil` AND there was no provided value for
             it, it will NOT be run through the any ad-hoc normalization
-            of the associated formal attribute. if you want the equivalent
+            of the associated association. if you want the equivalent
             of this you would have to do it through plain old programming.
             (again, #[#here.5.3].)
 
@@ -739,7 +831,7 @@ so imagine this:
         here we will have a bit of a "many worlds" tree..
 
         step 1 (defaulting): :[#here.theme-2]:
-          if the formal attribute has a proc for defaulting, attempt to
+          if the association has a proc for defaulting, attempt to
           resolve a default value from this proc (remembering that it can
           fail and if it fails we are to ignore the failure as if there
           was no default proc).
@@ -751,7 +843,7 @@ so imagine this:
             reminder: we don't care about any ad-hoc normalization
             here, as justified at [#here.theme-6].
 
-            if this attribute is required
+            if this association is required
 
               if the actual value from the defaulting qualifies as
               existent per [#here.theme-1]
@@ -772,7 +864,7 @@ so imagine this:
           to resolve a value from it) then procede to step 2 as if there
           was no defaulting proc.
 
-        step 2 (ad-hoc normalization): if the formal attribute has an
+        step 2 (ad-hoc normalization): if the association has an
           ad-hoc normalizer, process it exactly as described for this step
           way above. as a reminder, it is of course possible for the
           normalization (validation) to fail. such a case should (but
@@ -782,7 +874,7 @@ so imagine this:
           the funny thing here is: the field was not set, so what we
           will be passing into the normalizer is a "qualified knowness"
           of a known unknown. effectively (if not actually), this structure
-          holds the name of the attribute and a boolean indicating that this
+          holds the name of the association and a boolean indicating that this
           value is a known unknown; and nothing else. if the normalizer
           tries to dereference a would-be value from such a structure an
           exception is raised so well-behaved normalizers always check for
@@ -806,7 +898,7 @@ so imagine this:
         step 3 (requiredness check): exactly as described for this same
           step (2 hops) above, if the field is required and our
           "working value" qualifies as being *not* set, add a symbolic
-          reference to this formal attribute to the ordered set of names
+          reference to this association to the ordered set of names
           of missing required fields. note we do *not* withdraw from
           processing here in such a case. again this will be explained at
           [#here.J.2].
@@ -816,8 +908,8 @@ so imagine this:
     FINALLY, now that you have traversed over every zero or more element
       in the diminshing pool, we have only this last effort to do:
 
-    IF there was one or more symbolic reference to required formal
-    attributes added to the (any) ordered set of missing required fields,
+    IF there was one or more symbolic reference to required associations
+    added to the (any) ordered set of missing required fields,
     emit a single complaint expressing ("splaying") these missing
     required fields.
 
@@ -841,7 +933,7 @@ so imagine this:
 ## discussion: is it flexible?
 
 the central requirement for our "entity-killer" phase of development
-(year 7) is that arbitrary new meta-attributes can be accomodated
+(year 7) is that arbitrary new meta-associations can be accomodated
 (somehow).
 
 
@@ -854,7 +946,7 @@ the central requirement for our "entity-killer" phase of development
 depending on whom you ask and what you are doing, any and all of these
 terms may be confused:
 
-    attribute, property, parameter, field
+    association, attribute, property, parameter, field
 
 also:
 
@@ -862,39 +954,41 @@ also:
 
 also:
 
-    property store, entity, "local participant"
+    property store, entity, "local participant", "valid value store"
 
 
 depending on what you're doing, the distinction may be unimportant.
 but to be technically correct (the best kind of correct):
 
-  - the "formal attribute" is both a logical concept and a "physical"
+  - the "association" is both a logical concept and a "physical"
     "structure" that consists (typically) of some kind of "name"
-    and zero or more meta-data "meta-attributes" that describe
-    characteristics of the formal attribute. we say "formal" to
-    distinguish it from an "actual" attribute (value); a distinction
-    that has a [#002.2] dedicated section.
+    and zero or more meta-data "meta-associations" that describe
+    characteristics of the association.
+
+  - the association can have a corresponding "actual value".
+    [#002.2] discusses the related idea of formal attributes vs.
+    actual attributes.
 
   - you may also see "[formal] property" used similarly. nowadays
-    we say "[formal] property" to mean a [formal] attribute that is part
+    we say "[formal] property" to mean a association that is part
     of an "entity" (as in "instance of a business model class") a
     opposed to an "operation" ("action", "actor").
 
   - you may also see "[formal] parameter" used similarly, but to
-    refer to a [formal] attribute that is part of an "operation"
+    refer to a association that is part of an "operation"
     (or "action" or "actor") as opposed to a (business model) entity.
 
   - "field" does not have a strong distinction apart from these,
-    except that there are some idiomatic tendences governing how
+    except that there are some idiomatic tendencies governing how
     we typically use this term:
 
-      - "required field" sounds better than "required attribute", the
-        latter using this generalest of all terms "attribute", and
+      - "required field" sounds better than "required association", the
+        latter using this generalest of all terms "association", and
         so ringing sour from some reasons hinted at below.
 
       - we don't like the sound of "required property", because we
-        associate "property" with "entity", and we think of required-ness
-        as being a charactertic (a meta-atribute) of those attributes
+        associate "property" with "entity", and we think of requiredness
+        as being a charactertic (a meta-association) of those associations
         that are part of operations (which we call "parameters"), and
         not entities.
 
@@ -906,7 +1000,7 @@ but to be technically correct (the best kind of correct):
       - "required parameter" is fine, but "required field" has fewer
         syllables and is a bit of a stronger idiom in the real world.
         in implementation code and the accompanying pseudocd we will say
-        "required attribute" because our normalization algorithm has the
+        "required association" because our normalization algorithm has the
         requirement of normalizing for entities and actions indifferently.
 
 we will simply categorize as "out of scope" any need to differate the
@@ -918,12 +1012,15 @@ rest except to say:
             we might call an "endpoint").
 
   - argument: the "value" part of an actual value associated with a
-              monadic formal attribute, probably. (in CLI, "positional
+              monadic association, probably. (in CLI, "positional
               argument" is a thing, to stand in contrast to "option".)
+
+  - attribute: up until very recently this term was used for what we
+               now call "associations".
 
   - entity: the "object" or "instance" of a (business) model (class).
 
-  - flag: in CLI, a switch that takes no argument. also a meta-attribute here.
+  - flag: in CLI, a switch that takes no argument. also a modifier here.
 
   - "local participant": this is our future-proofy, extra general placeholder
                          term to mean (probably) "the thing that is doing the
@@ -931,7 +1028,7 @@ rest except to say:
 
   - modality: defined (vaguely) at [#br-002]
 
-  - monadic: (here) a formal attribute that "takes" a single value (as opposed
+  - monadic: (here) a association that "takes" a single value (as opposed
              to a flag or glob). formally a category of of "argument arity".
 
   - operation: the newer, [ze]-era term for what we used to call "action".
@@ -947,10 +1044,11 @@ rest except to say:
             "primary" has come to replace this term, although it's subtly
             different.
 
-  - primary: essential to newer [ze], this is the name-part of an actual
-             attribute (expression) as it appears in an argument scanner.
+  - primary: essential to newer [ze], this is the name-part of an argument
+             stream (imagine array)'s surface representation of a particular,
+             actual (supposed) instance of an association.
              this term is borrowed directly from (see) `man find`, and bears
-             no significant difference from its usage there.
+             no significant difference from its conception in that program.
 
   - property store: the "thing" (perhaps imaginary) that is storing the
                     values that are produced by this normalization, also
@@ -959,6 +1057,7 @@ rest except to say:
                     known when the normalization started. in practice,
                     an "action" or an "entity" are likely implementors
                     of this, but it could be anything.
+                    (we prefer "valid value store" now.)
 
   - switch: the CLI expression of a "flag". in CLI, interchangeable with
             "flag", sometimes confused with an "option" (which unlike a
@@ -969,206 +1068,10 @@ rest except to say:
            of a CLI bend to it.
 
 
-#=== OLDER: (needs EDIT)
-
-## work in progress preface
-
-at the moment we are in the middle of a long cluster of work that will
-try to unify all algorithms under this family strain to here. this
-doument moved here from [br]. when the unification is complete, this
-section of text will be removed and this document will somehow
-assimliate [#ac-028]  (and our node assimilate it).
 
 
 
-
-## the development of a simpler grammar space  :[#here.F]
-
-the simpler grammar space that we present here is one that we would like
-to assimliate into the broader "one ring" algorithm that occuplies the
-bulk of this document.
-
-however, for reasons we will explore throughout we may have to postpone
-or suspend such an effort. some such reasons:
-
-  - historical - it's a thick algo and it's just easier to keep it separate
-
-  - some of the novel reductions we propose below may have their own
-    experimental merit.
-
-  - having a static model plus our bold "grammar space reduction" allows
-    for the normalization to be more "call-time efficient", because
-    we can skip the reflection of each assocation.
-
-so whether we can or should ultimately assimilate this into the "one ring"
-facility is an open question we explore as we write this.
-
-what we refer to colloquially as "formal attributes" is formally a
-list of [#037.A] associations. (we may use these two terms somewhat
-interchangably, perferring one over the other mostly for idiomatic
-and/or historic reasons, as explored at [#here.appendix-A].)
-
-for our purposes here, these associations express (somehow) their
-"required-ness" (formally "parameter arity") and maybe they express
-default values. here we explain what these classification mean and how
-they are related.
-
-implementing "requiredness" involves chosing some point in time as a
-"normalization point" and at that point (by some criteria) deriving a
-reduced set of those associations that are required but have no
-corresponding actual value in the "value store" (colloquially "entity").
-
-similarly, implementing defaulting involving chosing some point in time
-as *its* "normalization point" at at that time iterating through the
-associations with defaults and by some criteria deciding whether to set
-the default value in the attribute store.
-
-(we reference these points in time as :[#here.A].)
-
-(it's worth mentioning now that the "one ring" algorithm has a different
-wa of doing this EDIT)
-
-keep this in mind as we present the below points, because we'll come
-back to it. for this latest treatment, we propose that:
-
-  - every association is either required or optional (i.e this
-    meta-association is universal, binary, and mutually exclusive.)
-
-  - currently this meta-grammar supports only an `optional` flag
-    and there is no `required` flag; so any association that is not
-    explicitly or (as described below) implicitly defined as `optional` is
-    `required`.  (the desire to make this configurable to be the other
-    way is tracked with #wish :[#007.D].)
-
-  - parenthetically we must explain now that our "one ring" conception of
-    normalization allows for the real possibility that defaulting can fail.
-    (this specific provision and the broader point made here are both
-    explored further at [#here.E.1].) without this provision, it would seem
-    meaningless to model an association as both being required and having
-    a default (because if it has a default, it's not really required, is
-    it?); but given this provision it then becomes meaningful to express an
-    association that is both required and has a defaulting proc, because a
-    required association that has a defaulting proc that fails should fail
-    the whole invocation whereas an optional association whose defaulting
-    proc fails should not. HOWEVER, it may be the case that [#007.B]
-    attributes actors are so simple that they DO follow the more simple
-    meta-grammar explained here. #open [#007.C] tracks this tension.
-
-  - so IFF we accept the simpler provision of above, it is then redundant
-    to define an association as `optional` and
-    to define a default for it. we will make it a syntax error to do so,
-    to enforce consistency in user definitions. :[#here.F.1]
-
-  - to the extent to which we want to and do "nilify" optionals (which,
-    currently we do and do); THEN defining an association as
-    `optional` is equivalent to defining that it has a default of `nil`.
-
-  - IFF the above provision is in place, we can then simplify things by
-    forbidding the use of `nil` as a default. (for such a meta-association,
-    use the `optional` flag instead.) :[#here.F.2]
-
-  - THEN FINALLY, IFF every association falls into one of these 3 *categories*:
-
-      - required,
-      - explicitly "defaultant" because there's a default value -or-
-      - implicitly defaultant because it's `optional`;
-
-    THEN every formal is either required or effectively defaultant. :[#here.F.3]
-    we may describe "effictively defaultants" as begin "non-requireds"
-    (perhaps because it's more self-documenting) but these are the same.
-
-
-
-
-as suggested but not synthesized above, formal attribute sets that
-involve defaulting and/or requiredness are ones that need this
-"normalization point" to be signalled externally (i.e with a method
-call). the attribute store whose formal attribute set does not involve
-either of these need not concern itself with this extra normalization step.
-
-  • (experimental) if a given "formal attributes" set stipulates neither
-    defaults nor any optionals (which we are treating as the same kind
-    of thing as hinted at above), THEN we are not going to invoke this
-    normalization step "automatically". NOTE that this may be
-    counter-intuititve. since there is an `optional` flag but no
-    `required` flag in this syntax, not to indicate an attribute as
-    optional would seem to imply that it is required. HOWEVER we only
-    invoke the "normalization step" automatically IFF the relevant
-    modifiers are employed by the definition (default related keywords,
-    or the optional keyword). :[#here.B]
-
-
-
-### implementing the above: indexing
-
-if a formal indicates that it is `optional`, these things should happen:
-
-  • the "parameter arity" should be changed from the default of `one`
-    (required) to `zero_or_one` (optional).
-
-  • pursuant to the above point [#here.F.1] that explains how these things
-    should be mutually exclusive, this act should "lock out" (in terms
-    of the state of the formal attribute as it is being defined) further
-    attempts to give it a default (or repeat the designation of `optional`).
-
-  • some parsing parent session should be notified that The Pass
-    should be invoked.
-
-if a formal indicates that it has a default (and there are at least two
-forms we should probaly support), these things should happen:
-
-  • the default should be stored in some normal way (probably as a
-    `default_proc`).
-
-      + its representation should express that a default has been
-        provided.
-
-      + its representation should express (on demand) what the default
-        value is.
-
-  • just for [#here.F.2], we may signal a syntax error if the default is
-    defined by value and that value is `nil`.
-
-  • like above, this act should "lock out" subsequent attempts either to
-    define a default (again) or to signal that this formal attribute is
-    optional.
-
-  • some parsing parent session should be notified that The Pass
-    should be invoked.
-
-
-
-### if "The Pass" should be invoked:
-
-for perceived efficiency, how we index these formal attributes is
-determined entirely by how The Normal Normalization will be performed.
-
-before and during :"The Pass":
-
-  • every formal attribute is either required or is effectively
-    "defaultant" per [#here.F].
-
-  • once a formal attribute is *done* being defined, you know if it
-    is "defaultant". (either the `optional` flag was used or a default
-    was defined somehow.) (actually you can know in advance of it being
-    done that it will need to be indexed - you can know it the moment
-    you interpret the relevant syntax element.)
-
-  • all formal attributes that are not in the category described by
-    the above point are required; but we don't know that we need to
-    index them until we hit any that are in the above category.
-
-"single pass indexation" :.. just do.
-
-the normal normalization will be described inline.
-
-
-
-
-## (previous) introduction  # :#here-2
-
-(NOTE: this shares the same shortcoming of its predecessor, that it
-doesn't honor [#here.5.2].)
+## the N-meta proposition :#here-2
 
 the big experimental frontier theory at play during the creation of this
 document (as its own node) was in the formulation of this question: how
@@ -1181,7 +1084,7 @@ business-specific constituency they may assume). can we normalize
 incoming formal properties against the (again business-specific)
 meta-properties with this same code?
 
-(see also [#034] "entity", [#002.1] "defined attributes", [#037]
+(see also [#034] "entity", [#002.C] "defined attributes", [#037]
 "meta attributes".)
 
 crazier still, can we normalize meta-properties against The meta-meta-
@@ -1190,50 +1093,6 @@ properties again with the same code that we use to accomplish the above?
 to do so would lend credence to the design axiom that "The
 N-meta-property" is a bit of fabricated complexity. that at its essence
 we are only ever normalizing entities against models.
-
-
-
-
-## the algorithm, in brief
-
-1) apply defaults before other normalizations (so that default
-   values themselves get normalized, e.g validated).
-
-2) apply other normaliztions other than the required-ness check.
-
-3) apply the required-ness check.
-
-
-
-
-## analysis of the algorithm
-
-this algorithm was implemented fully under the light of [#ba-027] our
-universal standard API for normalization (which we like because it's
-simple and universal); however when we hold up the above 3 steps to this
-rubric one might wonder why we haven't simplfied our implementation further:
-
-  • for (1), couldn't you implement defaulting with the same logic
-    that you use to implement the ad-hoc normalizers of (2)? (after
-    all, by design ad-hoc normalizers are certainly capable of doing
-    the kind of value mutation that a default is able to do)
-
-  • for (3), the same idea: if you encounter a formal property that is
-    required that has not been provided, couldn't you signal a
-    normalization failure in the same way that ad-hocs do?
-
-well the answer is "yes" and "sort-of", respectively. for (1), we have
-kept the logic for applying defaults "hard-coded" so that (a) the
-explicit, special treatment that this popular meta-meta-property gets in
-the property-related code has a readable counerpart here and (b) sort of
-for the "historical" reasons we want to keep this code readable, and
-that processing defaults is "more important" than processing ad-hoc
-processors (because it's been around longer and is more widely used).
-
-for (3), we *could* try to implement required-ness if we had to through
-the API, but we like to aggregate all required-ness failures into one
-event when normalizing an entity. do to so is easier if we give this one
-its own dedicated code.
 
 
 
@@ -1262,3 +1121,10 @@ is required and the current actual value if any (`nil` if none) is
 act accordingly. note too given that formal properties are dynamic
 we cannot pre-calculate and cache which meet the above categories.
 _
+
+
+
+
+## #document-meta
+
+  - :#tombstone-A: early justification for not over-munging

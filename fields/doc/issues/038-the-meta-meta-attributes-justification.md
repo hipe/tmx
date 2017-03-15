@@ -1,6 +1,7 @@
 # the meta-meta-properties justification [#038]
 
 (EDIT: langauge might be old. this is a re-housing from [br].)
+(TODO: merge this on top of [#ba-013] after moving that one here.)
 
 hopefully without needing to explain it here we know what "formal
 properties" are and that they are useful. but if not, see [#037].

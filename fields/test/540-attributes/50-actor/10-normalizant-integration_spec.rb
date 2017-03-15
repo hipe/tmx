@@ -54,7 +54,7 @@ module Skylab::Fields::TestSupport
 
           _be_this = be_emission :error, :missing_required_attributes do |ev|
             _ = black_and_white ev
-            expect_missing_required_message_ _, :other
+            expect_missing_required_message_with_newline_ _, :other
           end
 
           only_emission.should _be_this

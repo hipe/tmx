@@ -2,52 +2,64 @@ module Skylab::Fields
 
   class Attributes
 
-    N_Meta_Attribute = ::Module.new
+    class N_Meta_Attribute < Common_::SimpleModel
 
-    class N_Meta_Attribute::Build
+      # (the document that probably once described this work is currently at [#ba-013] and should move here.)
 
-      def initialize ma_cls, atr_cls
-        @_attribute_class = atr_cls
-        @meta_attributes_class = ma_cls
-      end
+      # what this seems to be is an "earnest" attempt to distill what
+      # "N-meta" association have (in their construction, at least) in
+      # common, whether it's a business attribute or a fixed meta-
+      # association, or maybe even a meta-meta-association (not sure, there.).
+      #
 
-      attr_writer(
-        :attribute_services,
-        :build_N_plus_one_interpreter,
-        :finish_attribute,
-      )
+      # -
+        def initialize
+          yield self
+          @N_plus_one_interpreter_by ||= N_plus_one_interpreter_by___
+          # can't freeze because #spot-1-1
+        end
 
-      def build_and_process_attribute__ k, x  # AS PROTOTYPE
-        dup.flush_for_build_and_process_attribute_ k, x
-      end
+        def meta_associations_class= x
+          @__meta_associations_class_ = x
+        end
 
-      def flush_for_build_and_process_attribute_ k, x
+        attr_writer(
+          :association_class,
+          :indexing_callbacks,
+          :N_plus_one_interpreter_by,
+          :finish_association_by,
+        )
 
-        remove_instance_variable( :@_attribute_class ).new k do |atr|
+        def build_and_process_association__ k, x  # AS PROTOTYPE
+          dup.flush_for_build_and_process_association_ k, x
+        end
 
-          @current_attribute = atr
+        def flush_for_build_and_process_association_ k, x
+
+          remove_instance_variable( :@association_class ).new k do |asc|
+
+            @current_association_ = asc
           @_name_symbol = k
 
           if x
             scn = Common_::Scanner.via_array ::Array.try_convert( x ) || [ x ]
             @argument_scanner_for_current_association_ = scn
 
-            p = @build_N_plus_one_interpreter[ self ]
+              p = @N_plus_one_interpreter_by[ self ]
             begin
               p[ scn.gets_one ]
             end until scn.no_unparsed_exists
           end
 
-          @finish_attribute[ self ]
-
-          NIL_
+            @finish_association_by[ self ]
+            NIL
+          end
         end
-      end
 
       # -- look like a parse (..)
 
       def as_normalization_write_via_association_ x, asc
-        @current_attribute.instance_variable_set asc.as_ivar, x
+          @current_association_.instance_variable_set asc.as_ivar, x
         NIL
       end
 
@@ -56,31 +68,32 @@ module Skylab::Fields
       def add_methods_definer_by_ & atr_p
 
         index_statically_ :method_definers
-        @current_attribute.__add_methods_definer atr_p ; nil
+        @current_association_.__add_methods_definer atr_p ; nil
       end
 
       def __index_customly meta_k
-        @attribute_services.add_to_the_custom_index_ @_name_symbol, meta_k
+          @indexing_callbacks.add_to_the_custom_index_ @_name_symbol, meta_k
       end
 
       def index_statically_ meta_k
-        @attribute_services.add_to_the_static_index_ @_name_symbol, meta_k
+          @indexing_callbacks.add_to_the_static_index_ @_name_symbol, meta_k
       end
 
-      attr_reader(
-        :current_attribute,
-        :meta_attributes_class,
-        :argument_scanner_for_current_association_,
-      )
-    end
+        attr_reader(
+          :argument_scanner_for_current_association_,
+          :current_association_,
+          :__meta_associations_class_,
+        )
+      # -
 
     _SANITY_RX = /\A_/  # for now - catch typos & API mismatches
 
     when_etc = nil
 
-    N_Meta_Attribute::Common_build_N_plus_one_interpreter = -> build do
+      N_plus_one_interpreter_by___ = -> build do
 
-      ma_cls = build.meta_attributes_class
+        ma_cls = build.__meta_associations_class_
+
       mattrs = ma_cls.new build
 
       -> k do
@@ -103,12 +116,18 @@ module Skylab::Fields
 
       _m_a = ma_cls.instance_methods false
 
-      _nf = Common_::Name.via_variegated_symbol :meta_attribute
+      _nf = Common_::Name.via_variegated_symbol :meta_association
 
       _ev = Home_::MetaAttributes::Enum::Build_extra_value_event.call(
         k, _m_a, _nf )
 
       raise _ev.to_exception
     end
+
+    # ==
+    # ==
+
+    end
   end
 end
+# #pending-rename: `to N_MetaAttributeInterpreter`

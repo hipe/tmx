@@ -4,7 +4,7 @@ module Skylab::MyTerm
 
     # (currently this is the non-interactive CLI. we want to merge the two)
 
-    # to review, [ze] will "generate" for us (#todo  [#015])
+    # to review, [ze] will "generate" for us (#todo  [#ze-001.2])
     # we want to leverage the [ze] generated CLI to
 
     def initialize argv, sin, sout, serr, pn_s_a

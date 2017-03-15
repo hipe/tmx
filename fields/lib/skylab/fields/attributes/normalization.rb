@@ -425,7 +425,7 @@ module Skylab::Fields
 
         # if you succeeded in resolving a default value (which requires
         # that a defaulting proc is present and that a call to it didn't
-        # fail), then per [#012.E.2] we must assume this value is already
+        # fail), then per [#012.E.3] we must assume this value is already
         # "normalized" and as such we must cicumvent any ad-hoc
         # normalization. so if we resolved a default (which could possibly
         # be `nil`), write this value.
@@ -1124,7 +1124,7 @@ module Skylab::Fields
 
         # this legacy algorithm either violates or fails to recognize:
         #
-        #   - [#012.E.1] defaulting must be able to fail
+        #   - [#012.E.2] defaulting must be able to fail
         #   - [#012.5.2] don't run default values thru ad-hoc normalizers
         #   - [#012.5.3] don't normalize values already in the value store
         #
@@ -1190,7 +1190,7 @@ module Skylab::Fields
 
             if ! kn.is_effectively_known && Home_::Has_default[ asc ]
 
-              # in violation of [#012.E.1], the below should but does not
+              # in violation of [#012.E.2], the below should but does not
               # make accomodations for the remote client (API) to express
               # that it failed to resolve a default value.
 

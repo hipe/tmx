@@ -8,6 +8,9 @@ even more relevant to us might be the approach that Plato took, the one off of
 which Aristole's above work was based: in Plato's _Statesman_ he "introduces
 the approach of grouping objects based on their similar properties." [2][3]
 
+
+
+
 ## perfect is the enemy of good
 
 with or without Plato and Aristotle we - in our software and in our minds -
@@ -35,10 +38,13 @@ w  Sophist, Statesman, Philebus", Transl. Benjamin Jowett
 [4] - Tal Ben-Shahar (2009), The Pursuit of Perfect, McGraw Hill Professional,
   ISBN 978-0-07-160882-4
 
+
+
+
 ## introducing `categories` and `exponents` as we see them
 
 as the foundation of this small calculus/ontology we build the concepts
-of a `category` :[#007] and its `exponents`
+of a `category` :[#here.016] and its `exponents`
 defining words in any robust manner using solely other words is always a
 chore. fortunately for us, our conception of `category` and `exponent` in
 their relationship to each other is (for the sake of the discussion at this
@@ -59,9 +65,9 @@ to give it a loose working definition of these key ideas, (and note that
 whenever a semi-formal definition is presented it is indented like so):
 
   an `exponent` is a value of a `category`. i.e an `exponent` belongs to
-  a `category`. [#009]
+  a `category`. :[#here.024]
 
-this is an "ASCII semantic ERD" (entity relationship diagram) [#hu-022].
+this is an "ASCII semantic ERD" (entity relationship diagram) #[#022].
 note in our ERD's that a line with a circle at the end of it means
 something like "is associated with many":
 
@@ -72,10 +78,10 @@ something like "is associated with many":
 conversely, we will define `category` circularly as:
 
   a `category` is defined with many (let's say one or more)
-  `exponents`. :[#007]
+  `exponents`. :[#here.016]
 
 (if there exist two exponents with the same "names" but in different
-categories, they are different exponents, but see [#hu-023])
+categories, they are different exponents, but see [#here.HG])
 
 ## `categorization` vs `category`
 
@@ -87,7 +93,7 @@ categories, they are different exponents, but see [#hu-023])
   `feminine`."
 
   `instance` is not defined formally (yet) but used generally to mean some
-  unspecified entity that a `categorization` is applied to :[#025]
+  unspecified entity that a `categorization` is applied to :[#here.IE]
 
 to review, and delineate explicitly some relationships that were only implied:
 
@@ -105,7 +111,10 @@ to review, and delineate explicitly some relationships that were only implied:
   conversely, one `instance` can belong to many `categories` through its
   many `categorizations`. (but not shown in the graph is that one instance
   is expected never to have more than one `categorization` from the same
-  `category` :[#024].)
+  `category` :[#here.IA].)
+
+
+
 
 ## what is the `categorization exponent arity` of your `category`?
 
@@ -146,20 +155,23 @@ not two or more).
 
 Furthermore,
 
-  we can describe a category that has an categorization exponent arity of 1
-  as `unary`.  that is, "the `categorization` of gender in german is
-  `unary`.". [#017]
+  we can describe a category that has an categorization exponent arity of
+  one as `unary`. for example, "the `categorization` of gender in german
+  is `unary`.". :[#here.056]
+
+elsewhwere in our universe (and indeed in places beyond it), such a
+category might be known as an "enumeration".
 
 Although the grammatical categories of linguistics are "normally mutually
-exclusive within a given category" [5] (that is, you cannot normally use
+exclusive within a given category" [5]  (that is, you cannot normally use
 more than one `exponent` in a categorization), (and of the categorizations of
-machine learning we don't yet know what their arity is [#015]); in this
+machine learning we don't yet know what their arity is [#here.EI]); in this
 pattern language we allow for our `categorizations` to be possibly `N-ary`.
 
   an `N-ary` catgorization is a categorization whose
   `categorization exponent arity` is not 0 or 1. that is, the application of
   the category to a particular instance may use multiple unique exponents
-  from the set of exponents defined by the category. :[#018] (but see note
+  from the set of exponents defined by the category. :[#here.GA]  (but see note
   below).
 
 again, in linguistics and perhaps too in machine learning, categories are
@@ -177,12 +189,12 @@ it is generally safe to assume it is `unary`.
 number of "places", we are for now going with this broad definition of
 categorization, that it may be either `unary` or `N-ary`, with `unary` being
 the default but `N-ary` begin possible. however, there is a chance that if
-a) we find that in The Literature [#015] "category" almost always
+a) we find that in The Literature [#here.EI] "category" almost always
 means `unary`, and / or if we decide to merge our nascent "field theory"
 [#br-045] into this, we may decide that `category` is a subset of `field` --
 that subset of `field` with an `categorization exponent arity` of 1. but for
 now, in our head at least, we are painting it as that `field` is a concrete
-implementation of the `category` theory we are building here. :[#020])
+implementation of the `category` theory we are building here. :[#here.GI])
 
 a naive application of this principle could be found by modeling a video game
 rating sytem in this way: there is a `N-ary` `category` called 'rating' whose
@@ -209,13 +221,16 @@ is it possible for agents to possess multiple moods at the same time?
 it becomes a fun design problem that can give insight into an optimal
 design for the domain based on the desired behavior of the model.
 
+
+
+
 ## who's arity is it, anyway?
 
 to paint a facet of this relationship in more detail between `arity`,
 `category` and `categorization`: we furthermore offer that the
 `categorization exponent arity` in question (that is, the sensical range of
 the count of exponents that may be used in a `categorization`) is a property
-of the `category`, not the `categorization` :[#019].
+of the `category`, not the `categorization` :[#here.GE].
 
 that is, we must define a `category` not only by its `exponents` but by its
 `categorization exponent arity`. the `categorization exponent arity` that the
@@ -253,6 +268,9 @@ between one way and the other trivially) so the point might be moot.
 [5] - `Grammatical_category` (wikipedia)
 [6] - "Exponent_(linguistics)"
 [7] - "Grammatical_gender"
+
+
+
 
 ## must we always be so discrete?
 
@@ -340,7 +358,7 @@ of any given car is *not* `discrete` - it will be respresented as some value
 on a scale. we call this kind of category `continuous`. note we still call
 'new-ness' a `category`, and indeed *still* call 'new-seeming' and
 'used-seeming' `exponents` (although this particular point is *very*
-experimental :[#021] .. we are considering calling them 'waypoints'..)
+experimental :[#here.HC] .. we are considering calling them 'waypoints'..)
 
 our general litmus test for whether or not a category is `discrete` is:
 "can we hold up any instance (of some relevant scope) against each exponent
@@ -358,6 +376,9 @@ different `exponents`)
 
 now, to place `discrete` and `continuous` into our existing framework
 pseudo-formally, we will attempt something interesting and fun:
+
+
+
 
 ## are we self-supporting yet?
 
@@ -394,7 +415,7 @@ because 'continuity' has exactly two exponents, we can describe it as `binary`.
 
     `binary` is shorthand adjective that describes a `category` with
     exactly two `exponents`. a category that matches this criteria and some
-    others exhibits a certain set of behavior we will explore below. :[#011]
+    others exhibits a certain set of behavior we will explore below. :[#here.032]
 
 regrettably, `binary` and `unary` may sound like they describe the same axis,
 but they do not. `unary` describes a commonly occuring and interesting count
@@ -431,7 +452,7 @@ that with a simple line connecting the `exponent` with the `instance`:
 of grammatical categories generally has `exponents` that are unique within
 that space, we can probably say more succinctly but still unambiguously,
 '"Welt" is a feminine german noun' -- that is, we do not need to state the
-name of the category explicitly, even though it is still there [#023].)
+name of the category explicitly, even though it is still there [#here.HG].)
 
 back to putting 'continuity' into our self-supporting ontology: if it's
 useful or fun, we can say that `continuity` is not just a category
@@ -445,7 +466,7 @@ but a `meta-category` (which is, in turn, a category):
 
   let `meta-category` describe a `category` whose target instances are
   themselves other `categories`. that is, a `meta-category` is a category
-  that describes other `categories` :[#008].
+  that describes other `categories` :[#here.T].
 
 remember above that we presented `unary` and `N-ary` as two mutually exclusive
 ways to categorize the `categorization exponent arity` of a `category`? (can
@@ -492,7 +513,7 @@ appear above. so: how many `categorizations` do we get to model? ...
 
 four. two categories * two instances. (we took some logical leaps to arrive
 at that number so definitively - this has to do with the idea of category
-`applicability` and `scope` ([#013], [#026]) which we haven't explored yet.)
+`applicability` and `scope` ([#here.040], [#here.II]) which we haven't explored yet.)
 
 let's start with the easier categorizations - the non-self-referential ones:
 
@@ -579,6 +600,10 @@ their relationships:
 (to reduce noise we have omitted the associations between the two
 `meta-categories` and `category`.)
 
+
+
+
+
 ## all we want is the universe
 
 thus far we have kicked at but not yet jumped on the idea of `applicability`
@@ -589,16 +614,16 @@ referring to things like its `target instances` and so on.
   be sensically applied to. for now we nest it in with `applicability`
   (defined below), of which a category can have multiple, so effectively
   a category have have multiple scopes. for a category to be useful in any
-  pseudo-formal way it should define at least one `scope`. :[#026]
+  pseudo-formal way it should define at least one `scope`. :[#here.II]
 
 we hold off on defining scope more formally than this because we would
 then need some kind of formal defintion for things like entities and classes,
 which is outside of the .. er ..  scope of this inquiry - we are waiting to
-read up on The Literature [#014] for this.
+read up on The Literature [#here.044] for this.
 
   however we should offer the placeholder idea that a scope *may* want
   to reference `semantic structure pattern` or whatever that becomes
-  :[#004]. (it would be like a class, or entity, but ideally defined
+  :[#here.004]. (it would be like a class, or entity, but ideally defined
   in terms of a set of applicable functions).
 
 one thing we *are* doing semi-formally, however, is saying (indirectly) that
@@ -624,7 +649,7 @@ as we will explore below.
 experimentally, we will implement `scope` and `applicability` in our pattern
 language by introducing a new structure-structure as it were: the idea of
 a `category` that takes arguments. (this will almost certainly get dismantled
-after [#014], so watch out. any programmer will detect smells here..)
+after [#here.044], so watch out. any programmer will detect smells here..)
 
 (as an aside, there are two isomorphic ways we could model the following:
 we can either think of scope as a property of applicability, or the reverse.
@@ -653,7 +678,7 @@ associated tuple of arguments per exponent. an example below will demonstrate
 this.)
 
 2) "N-ary, discrete" - we can 'tag' this category with exponents from
-our previously defined meta-categories. because of [#023] we can figure
+our previously defined meta-categories. because of [#here.HG] we can figure
 out what category the exponents come from.
 
 3) "univerally applicable to any category" - this is of course the
@@ -674,7 +699,7 @@ so, to read out the above, what it says is, "there is an N-ary discrete
   category can be applied universally (i.e. to any one of) the constituents
   of the indicated `scope`. `sparse` means that it *might* apply to any of the
   constituents of `scope`, but it is false to say that it *does* apply to any
-  of them. :[#013]
+  of them. :[#here.040]
 
 (also, any category that is `N-ary` need not report that it is `sparse`
 or `universal` -- this exponent should effectively be "ignored" here (?),
@@ -682,9 +707,12 @@ because (for now) a categorization with zero constituents (exponents)
 in it is isomorphic with having no categorization applied to it at all;
 but this is experimental.  e.g a pizza with a list of topings that is zero
 items long is isomorphic with a pizza that has no 'toppings' categorization -
-neither carries any more or less information than the other. :[#030])
+neither carries any more or less information than the other. :[#here.BAE])
 
 all of this is fine and good but it is getting kind of boring.
+
+
+
 
 ## let's do something
 
@@ -692,12 +720,15 @@ the only reason we have assembled such a thus-far small ontology toolkit
 with such painstaking detail is to be able to present the following axioms
 in a semi-formal, albeit unproven manner:
 
+
+
+
 ### 1) the axiom of universal applicability
 
 the `axiom of universal applicability` is as follows:
 
 > any discrete sparse category for a given scope can be made universal
-  for that scope by adding one exponent to its exponent set. :[#027]
+  for that scope by adding one exponent to its exponent set. :[#here.092]
 
 this is a formal way of stating that if we add an exponent equivalent of
 `not applicable` to any sparse (i.e non-universal) category, it becomes
@@ -732,13 +763,15 @@ is that anytime you see or create a category that is not universal for some
 scope, realize that that is a cosmetic design decision, and should be done
 for "semantic aesthestics".
 
+
+
 ### 2) the axiom of binary convertability
 
 the `axiom of binary convertabiliy` is easier to define with another defintion
 to build on:
 
   a `sparse tag` describes a `discrete`, `sparse` category with
-  exactly one `exponent` :[#029].
+  exactly one `exponent` :[#here.BAA].
 
 demo:
 
@@ -763,9 +796,9 @@ where every picture (every picture) had a cat in it. at best, it would be
 meaningless to tag every picture with this tag. at worst, every picture
 would have a cat in it.)
 
-using `the axiom of universal applicability` [#hu-027] above, any
+using `the axiom of universal applicability` [#here.092] above, any
 `sparse tag` category can be converted to what we for now call a
-`universal discrete binary category`. BOOM [#012]:
+`universal discrete binary category`. BOOM :[#here.036]:
 
              +--------------------------------------+    +----------+
              | lolcats, discrete                    |--> | CATegory |
@@ -815,7 +848,7 @@ a corollary exists of the above axiom that states:
   equivalent, may be automatically "upgraaded" to being considered
   universally applicable for the relevant scope(s) (because using the
   equivalent of the `not applicable` exponent on any instance is
-  tautologically equivalent to having been not tagged.) :[#014]
+  tautologically equivalent to having been not tagged.) :[#here.044]
 
 part 2 of the `axiom of binary convertability` has some hiccups in it:
 

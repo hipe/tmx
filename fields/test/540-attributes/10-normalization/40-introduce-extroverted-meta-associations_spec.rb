@@ -39,9 +39,7 @@ module Skylab::Fields::TestSupport
           rescue Home_::ArgumentError => e
           end
 
-          e.message << "\n"  # NEWLINE_  # meh
-
-          expect_missing_required_message_ e.message, :beta, :delta
+          expect_missing_required_message_without_newline_ e.message, :beta, :delta
         end
       end
 
@@ -82,7 +80,7 @@ module Skylab::Fields::TestSupport
           a = _N_things
           expect_channel_looks_like_missing_required_ a
           _line = black_and_white_line_via_event_ a[1].call
-          expect_missing_required_message_ _line, :beta, :delta
+          expect_missing_required_message_with_newline_ _line, :beta, :delta
         end
 
         shared_subject :_N_things do
@@ -122,8 +120,7 @@ module Skylab::Fields::TestSupport
     X_a_niema_ThisFunction = -> ent do   # :[#008.14] (lend coverage to [sn])
       ascs = ent.class::ATTRIBUTES
       if ascs
-        Home_::Attributes::Normalization.call_by do |o|
-          o.association_index = ascs.association_index
+        ascs.normalize_by do |o|
           o.ivar_store = ent
         end
       else

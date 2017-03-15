@@ -40,7 +40,7 @@ about the fact that there were no weapons of mass destruction found in
 iraq. [#sl-158] marks more broadly the realtionship of these terms to
 the outside world.
 
-this is perhaps one step after [#fi-038] the meta-meta-properties
+this is perhaps one step after [#fi-038.1] the meta-meta-properties
 justification.
 
 an important application of this "theory" at [#ba-027] normal

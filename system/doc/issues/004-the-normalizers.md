@@ -66,7 +66,7 @@ of this scope.
 #### interface theory (EDIT: this is like rings of an ooolllddd tree..)
 
 there is what the user passes to your action and then there is what
-your action passes to this actor, which is [#fi-002.?] different:
+your action passes to this actor, which is different:
 
 your action passes to this actor zero or one instream (the IO object,
 typically STDIN); and one [#ca-004] "qualified knownness" modeling both

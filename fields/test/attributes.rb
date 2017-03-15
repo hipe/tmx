@@ -29,20 +29,27 @@ module Skylab::Fields::TestSupport
     end
 
     # -
+      -> do  # why are you like this
 
-      def expect_missing_required_message_ msg, * sym_a
+        p = nil ; with = nil ; without = nil
 
-        _ = sym_a.map do |s|
-          "'#{ s }'"
-        end.join " and "  # ..
-
-        expected_s = "missing required parameter#{ 's' if 1 != sym_a.length } #{ _ }\n"
-
-        if msg != expected_s
-          msg.should eql expected_s
+        define_method :expect_missing_required_message_with_newline_ do |msg, * sym_a|
+          p && p[]
+          with[ msg, sym_a, self ]
         end
-      end
 
+        define_method :expect_missing_required_message_without_newline_ do |msg, * sym_a|
+          p && p[]
+          without[ msg, sym_a, self ]
+        end
+
+        p = -> do
+          p = nil
+          word = 'parameter'
+          with = Expect_missinger_[ word, "\n" ]  # NEWLINE_
+          without = Expect_missinger_[ word ]
+        end
+      end.call
     # -
 
     define_method :build_empty_entity_, Build_emp_ent_meth__

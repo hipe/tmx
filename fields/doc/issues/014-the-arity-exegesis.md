@@ -6,6 +6,8 @@
 likely stale but overall is hopefully still legit.)
 
 
+
+
 ## introduction to `arity` thru the case study of "parameter arity"
 
 prerequisites:
@@ -127,6 +129,7 @@ suggest), but this is done purely as a dalliance:
 
 
 
+
 ## the gory detals
 
 to define `arity`, a word that itself is not in "most"
@@ -148,6 +151,9 @@ whether or not that number makes sense. examples could be cited at this point
 but it is such a simple idea, you can probably come up with fun examples on
 your own (but ok here's an e.g e.g to get you started: the legal drinking age
 for any particular locality may be modeled as an arity).
+
+
+
 
 ## a constructed example: pseudo-HTTP
 
@@ -180,6 +186,9 @@ a corresponding formal parameter to associate with the key (an "unrecognized
 argument", or in other associative spaces an "unexpected argument"; or the
 idea of an "empty" argument (e.g being the empty string, or nil). but it is
 at least worth mentioning their existence now.)
+
+
+
 
 ## many emergent counts to chose from
 
@@ -215,8 +224,12 @@ care about them in a special way):
 
 for one,
 
-## there is for any given formal parameter the count of actual parameters that
-  ## that may sensically be associated with it.
+
+
+
+## there is for any given formal parameter the count of actual parameters that..
+
+..may sensically be associated with it.
 
 huh? well, imagine we have an interface within our constrained information
 superset of CGI-esque in HTTP-esque we painted above, and our interface has
@@ -263,8 +276,12 @@ in the previous version of this essay) we used to munge the two concepts
 together without yet realizing that there may be some utility in separating
 them:
 
-## what is the sensical range of arguments that may be associated with
-  ## a particular actual parameter?
+
+
+
+## what is the sensical range of arguments that may be associated with.. :[#here.G]
+
+..a particular actual parameter?
 
 huh? isn't that a different way of saying the same thing we just finished
 describing? well, subtly no: on the one hand, for any given "interface"
@@ -438,7 +455,7 @@ absolutely no meaningful difference between doing it this way and the
 would-be other way of doing it. (for the zero-or-more, e.g we could say
 `parameter arity` of `one` and `argument arity` of `zero or more`, -OR EVEN-
 `parameter arity` of `zero or one` and `argument arity` of `one or more`.
-(this property is tagged as [#hu-030] and explored further there.))
+(this property is tagged as [#hu-003.BAE] and explored further there.))
 
 yes we *could* do the above if our model supported polyadic argument arities,
 but as it stands it doesn't. and the reason we don't add it in is because

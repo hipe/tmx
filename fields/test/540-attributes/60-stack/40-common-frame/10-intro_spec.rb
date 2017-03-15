@@ -2,10 +2,10 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[br] property - stack - common frame" do
+  describe "[fi] attributes - stack - common frame - intro" do
 
     it "loads." do
-      Home_::Attributes::Stack::CommonFrame
+      TS_::Common_Frame.lib || fail
     end
 
     it "whines on weirdness" do
@@ -14,7 +14,7 @@ module Skylab::Fields::TestSupport
 
       begin
         class X_a_s_cf_Intro_A
-          Home_::Attributes::Stack::CommonFrame.call self, :weirdness
+          TS_::Common_Frame.lib.call self, :weirdness
         end
       rescue Home_::ArgumentError => e
       end
@@ -251,6 +251,7 @@ module Skylab::Fields::TestSupport
           entity.property_value_via_symbol :bar
         rescue ::NameError => e
         end
+
         e.message.should match %r(\Aproperty is not readable - 'bar'\z)
       end
 
@@ -261,14 +262,13 @@ module Skylab::Fields::TestSupport
       end
 
       it "when required field missing" do  # :#coverpoint1.8
-        _rx = /\Amissing required field - 'baz'\z/
 
         begin
           X_a_s_cf_Intro_H.new
         rescue Home_::ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect_missing_required_message_without_newline_ e.message, :baz
       end
     end
 
@@ -278,7 +278,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_I
 
-          Home_::Attributes::Stack::CommonFrame.call self,
+          TS_::Common_Frame.lib.call self,
             :required, :field, :foo,
             :globbing, :processor, :initialize
         end
@@ -291,15 +291,15 @@ module Skylab::Fields::TestSupport
 
       it "when no" do
 
-        _rx = /\Amissing required field - 'foo'\z/
-
         begin
           X_a_s_cf_Intro_I.new
         rescue Home_::ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect_missing_required_message_without_newline_ e.message, :foo
       end
     end
+
+    define_method :expect_missing_required_message_without_newline_, Common_Frame.definition_for_etc
   end
 end

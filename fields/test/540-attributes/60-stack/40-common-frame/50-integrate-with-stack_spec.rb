@@ -2,13 +2,13 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[br] property - stack - common frame - integrate with pstack" do
+  describe "[fi] attributes - stack - common frame - integrate with pstack" do
 
     before :all do
 
       class X_a_s_cf_IntWithStack_1
 
-        Home_::Attributes::Stack::CommonFrame.call self,
+        TS_::Common_Frame.lib.call self,
 
           :proc, :foo, -> do
             :Foo

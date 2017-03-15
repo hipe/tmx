@@ -85,6 +85,22 @@ module Skylab::Fields
     kp
   end
 
+  DEFINITION_FOR_THE_METHOD_CALLED_WRITE_VIA_ASSOCIATION_ = -> x, asc do
+    instance_variable_set asc.as_ivar, x
+    KEEP_PARSING_  # these writes cannot fail gracefully. this is as convenience
+  end
+
+  DEFINITION_FOR_THE_METHOD_CALLED_READ_KNOWNNESS_ = -> asc do  # WAS [#029]
+
+    ivar = asc.as_ivar
+
+    if instance_variable_defined? ivar
+      Common_::Known_Known[ instance_variable_get ivar ]
+    else
+      Common_::KNOWN_UNKNOWN
+    end
+  end
+
   DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
     if x
       instance_variable_set ivar, x ; ACHIEVED_
@@ -109,36 +125,36 @@ module Skylab::Fields
     end  # >>
 
     def initialize h
-      @attribute_class = nil
+      @association_class = nil
       @_h = h
-      @meta_attributes = nil
+      @meta_associations = nil
       # (can't freeze because #here-1)
     end
 
     # --
 
-    def define_meta_attribute * x_a, & x_p
+    def define_meta_association___ * x_a, & x_p  # proof of concept...
       Here_::DSL.new( self, x_a, & x_p ).execute
     end
 
     attr_writer(
-      :attribute_class,
-      :meta_attributes,
+      :association_class,
+      :meta_associations,
     )
 
-    def attribute_class__
-      @attribute_class
+    def association_class__
+      @association_class
     end
 
-    def meta_attributes__
-      @meta_attributes
+    def meta_associations__
+      @meta_associations
     end
 
     # --
 
     def init ent, a, & p  # :[#008.8]: #borrow-coverage from [sy]
 
-      _normalize_by do |o|
+      normalize_by do |o|
 
         o.argument_array = a
         o.entity = ent
@@ -149,7 +165,7 @@ module Skylab::Fields
 
     def init_via_argument_scanner ent, scn, & p  # #coverpoint1.3, [hu] 4x
 
-      _normalize_by do |o|
+      normalize_by do |o|
 
         o.argument_scanner = scn
         o.entity = ent
@@ -160,21 +176,17 @@ module Skylab::Fields
 
     def normalize_entity ent, & p  # #coverpoint1.4
 
-      _normalize_by do |o|
+      normalize_by do |o|
         o.entity = ent
         o.listener = p
       end
     end
 
-    def _normalize_by
+    def normalize_by
       Here_::Normalization.call_by do |o|
         yield o
         o.association_index = _index
       end
-    end
-
-    def begin_normalization & x_p
-      self._GONE__see_me__
     end
 
     # --
@@ -210,8 +222,8 @@ module Skylab::Fields
 
     def ___build_index
       Here_::AssociationIndex_.new( @_h,
-        ( @meta_attributes || Here_::MetaAttributes ),
-        ( @attribute_class || Here_::DefinedAttribute ),
+        ( @meta_associations || Here_::MetaAttributes ),
+        ( @association_class || Here_::DefinedAttribute ),
       )
     end
 
@@ -300,7 +312,7 @@ module Skylab::Fields
 
       # ===
 
-      New_via__ = -> m, scn, cls, & x_p do  # near #open [#026]: struct vs. actor: cold vs. hot
+      New_via__ = -> m, scn, cls, & x_p do  # near [#026]: struct vs. actor: cold vs. hot
 
         sess = cls.send :new, & x_p  # actors reasonably expect the handler here [br]
 
@@ -529,7 +541,7 @@ module Skylab::Fields
 
   # ==
 
-  class CautiousAssociationIndex  # exactly [#002.D] "new lingua franca"
+  class CautiousAssociationIndex  # exactly [#002.E] "new lingua franca"
 
     def initialize p
 

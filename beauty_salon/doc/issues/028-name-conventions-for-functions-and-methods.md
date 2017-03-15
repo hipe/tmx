@@ -57,7 +57,7 @@ B) the number of trailing underscores
   | 0 | 0 | `this_is_a_public_API_method`                     | [#here.0.0]
   | 0 | 1 | `this_method_is_only_called_from_this_library_`   | [#here.0.1]
   | 0 | 2 | `only_from_lib_AND_only_called_in_one_place__`    | [#here.0.2]
-  | 0 | 3 | `typically_a_reader_for_testing_only___`          | [#here.0.3]
+  | 0 | 3 | `typically_a_method_for_testing_only___`          | [#here.0.3]
   | 1 | 0 | `_this_method_is_only_called_from_this_file`      | [#here.1.0]
   | 1 | 1 | `_only_from_this_file_in_hook_out_manner_`        | [#here.1.1]
   | 1 | 1 | `_public_API_method_variant_`  (visually same)    | [#here.1.1.2]
