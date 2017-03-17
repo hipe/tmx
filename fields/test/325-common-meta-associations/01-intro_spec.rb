@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta attributes" do
+  describe "[fi] CMA - intro" do  # :#cov2.1
 
     TS_[ self ]
     use :memoizer_methods

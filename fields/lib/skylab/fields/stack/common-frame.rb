@@ -1,12 +1,12 @@
 module Skylab::Fields
 
-  class Attributes::Stack
+  class Stack
 
       # enhance a class as a `common_frame`
       # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
-      #       Home_::Attributes::Stack::CommmonFrame.call self,
+      #       Home_::Stack::CommmonFrame.call self,
       #         :proc, :foo, -> do
       #            d = 0
       #            -> { d += 1 }
@@ -59,12 +59,12 @@ module Skylab::Fields
         o(
           :ad_hoc_processor, :globbing, -> sess do
             sess.upstream.backtrack_one
-            Attributes::Stack::Define_process_method__[ sess ]
+            Here_::Define_process_method__[ sess ]
           end,
 
           :ad_hoc_processor, :processor, -> sess do
             sess.upstream.backtrack_one
-            Attributes::Stack::Define_process_method__[ sess ]
+            Here_::Define_process_method__[ sess ]
           end
         )
       end
@@ -307,7 +307,7 @@ module Skylab::Fields
     # [ `required` ] `field`s -
     #
     #     class Bar
-    #       Home_::Attributes::Stack::CommonFrame.call self,
+    #       Home_::Stack::CommonFrame.call self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar
@@ -544,7 +544,7 @@ module Skylab::Fields
 
           _asc_st = entity.class.properties.to_value_stream
 
-          Attributes::Normalization.call_by do |o|
+          Home_::Normalization.call_by do |o|
             o.entity = entity
             o.association_stream_oldschool = _asc_st
           end
@@ -567,7 +567,10 @@ module Skylab::Fields
 
         CF_ = self
       end
+
       # <-
+
+    Here_ = self
   end
 end
 # #tombstone-A: we used to check for missing requireds "manually"

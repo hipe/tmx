@@ -12,10 +12,11 @@
 
 
 
-## introduction to the components/pipeline
+## introduction to the components/pipeline  :[#here.2]
 
   - (the idea of "primaries" is lifted from the unix `find` utility,
     and maybe IEEE Std 1003.1-2001 (we have to look).)
+    ([#052.B] says a tiny bit more about syntaxes like this.)
 
   - "argument scanner" adapters can be made for different modalities.
 

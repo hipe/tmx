@@ -181,7 +181,7 @@ module Skylab::Basic
       memo
     end
 
-    M = Home_.lib_.fields::Attributes.struct_class.via_hash o
+    M = Home_.lib_.fields::Struct.via_hash o
 
     define_singleton_method :let, Home_.lib_.test_support::Let::LET_METHOD
 
@@ -278,7 +278,7 @@ module Skylab::Basic
       sing_class.class_exec name, & M.convenience
     end
 
-    M_IM = Home_.lib_.fields::Attributes.struct_class.via_hash o
+    M_IM = Home_.lib_.fields::Struct.via_hash o
 
     def modul! full_name, &module_body
       # get this module by name now, autovivifying any modules necessary to

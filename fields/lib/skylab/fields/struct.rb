@@ -1,7 +1,5 @@
 module Skylab::Fields
 
-  class Attributes
-    # <-
   module Struct  # [#006].
 
     # (this is in effect a #feature-island because its only client is
@@ -218,7 +216,7 @@ module Skylab::Fields
 
     THE_EMPTY_STRUCT__ = new.freeze
 
-  end
-# ->
+    # ==
+    # ==
   end
 end

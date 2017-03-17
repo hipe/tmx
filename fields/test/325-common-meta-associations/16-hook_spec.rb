@@ -1,20 +1,20 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - hook" do
+  describe "[fi] CMA - hook" do  # #cov2.7 (1x)
 
     TS_[ self ]
     use :memoizer_methods
-    use :attributes_meta_attributes
+    use :attributes_meta_associations
 
       context "intro" do
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_Hook_A
+          class X_cma_Hook_A
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               error: :hook,
             )
 

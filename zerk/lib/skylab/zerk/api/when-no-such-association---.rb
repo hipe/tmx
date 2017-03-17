@@ -16,7 +16,7 @@ module Skylab::Zerk
 
         _st__ = _st_.flush_to_scanner
 
-        o = Field_::MetaAttributes::Enum::Build_extra_value_event.new
+        o = Field_::CommonMetaAssociations::Enum::Build_extra_value_event.new
 
         o.invalid_value = arg_st.head_as_is
 

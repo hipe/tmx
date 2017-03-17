@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - stack - common frame - integrate with pstack" do
+  describe "[fi] stack - common frame - integrate with pstack" do
 
     before :all do
 
-      class X_a_s_cf_IntWithStack_1
+      class X_cf_IntWithStack_1
 
         TS_::Common_Frame.lib.call self,
 
@@ -40,8 +40,8 @@ module Skylab::Fields::TestSupport
     end
 
     it "ok" do
-      frame = X_a_s_cf_IntWithStack_1.new {}
-      stack = Home_::Attributes::Stack.new
+      frame = X_cf_IntWithStack_1.new {}
+      stack = Home_::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
       stack.property_value_via_symbol( :foo ).should eql :FOO

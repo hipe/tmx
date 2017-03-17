@@ -1,27 +1,19 @@
 module Skylab::Fields
 
-  class Attributes
-
-    class AssociationIndex_
+  class AssociationIndex_
 
       # (see [#002.C] 'pertinent ideas around "attributes actors" and related')
 
       # -
-        def initialize unparsed_h, ma_cls, asc_cls
+        def initialize unparsed_h, ma_mod, asc_cls
 
           h = {} ; pool_proto = {}
 
-          n_meta_prototype = Here_::N_Meta_Attribute.define do |o|
-
-            o.finish_association_by = -> _build do
-              # (this used to do things under #tombstone-D)  build.current_attribute
-              NOTHING_
-            end
+          ai = Home_::Interpretation_::AssociationInterpreter.define do |o|
 
             o.indexing_callbacks = self  # :#here-1
-
             o.association_class = asc_cls
-            o.meta_associations_class = ma_cls
+            o.meta_associations_module = ma_mod
           end
 
           @_optional_or_required = nil
@@ -29,7 +21,9 @@ module Skylab::Fields
           @_custom_index = nil
 
           unparsed_h.each_pair do |k, x|
-            asc = n_meta_prototype.build_and_process_association__ k, x
+
+            x and _scn = Scanner_[ ::Array.try_convert( x ) || [ x ] ]
+            asc = ai.interpret_association_ k, _scn
             k = asc.name_symbol
             pool_proto[ k ] = nil
             h[ k ] = asc
@@ -41,7 +35,7 @@ module Skylab::Fields
 
         def AS_ASSOCIATION_INDEX_NORMALIZE_BY  # 1x [ta], covered here
 
-          _wat = Here_::Normalization.call_by do |o|
+          _wat = Home_::Normalization.call_by do |o|
             yield o
             o.association_index = self
           end
@@ -51,13 +45,13 @@ module Skylab::Fields
 
         # --
 
-        def define_methods__ mod
+        def enhance_entity_class__ cls
 
-          st = @method_definers.to_key_stream
+          st = @__enhancers_box.to_key_stream
           begin
             k = st.gets
             k || break
-            @_hash.fetch( k ).effect_definition_into_ mod
+            @_hash.fetch( k ).enhance_this_entity_class_ cls
             redo
           end while above
           NIL
@@ -308,7 +302,7 @@ module Skylab::Fields
 
         -> name_sym do
 
-          m = Classic_writer_method_[ name_sym ]
+          m = Attr_writer_method_name_[ name_sym ]
 
           if cls.private_method_defined? m
             m
@@ -372,7 +366,7 @@ module Skylab::Fields
         end
 
         THESE__ = {
-          method_definers: :__add_to_method_definers_box,
+          this_is_an_enhancer: :__add_to_enhancers_box,
           see_optional: :__see_optional,
           see_required: :__see_required,
         }
@@ -398,8 +392,8 @@ module Skylab::Fields
           NIL
         end
 
-        def __add_to_method_definers_box asc_k
-          ( @method_definers ||= Common_::Box.new ).add asc_k, nil
+        def __add_to_enhancers_box asc_k
+          ( @__enhancers_box ||= Common_::Box.new ).add asc_k, nil
           NIL
         end
       # -
@@ -455,7 +449,6 @@ module Skylab::Fields
       EMPTY_H_ = {}.freeze
 
       # ==
-    end
   end
 end
 # #tombstone-D: assimilating facility "C" meant simplifying away a lot

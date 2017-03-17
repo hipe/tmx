@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module MetaAttributes::Enum
+  module CommonMetaAssociations::Enum
 
     class Build_extra_value_event
 

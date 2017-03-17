@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalization - integrate 1st 2 features.." do
+  describe "[fi] normalization - set diff features plus attr actor" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -15,7 +15,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_n_NoSee_A
+          class X_n_sdfiwaa_NoSee_A
 
             attrs = Attributes.lib.call(
               first_name: :optional,
@@ -119,7 +119,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_n_NoSee_B
+          class X_n_sdfiwaa_NoSee_B
 
             attrs = Attributes.lib.call(
               a: [ :default, :one ],
@@ -179,7 +179,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_n_NoSee_C
+          class X_n_sdfiwaa_NoSee_C
 
             attrs = Attributes.lib.call(
 

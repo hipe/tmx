@@ -105,7 +105,7 @@ module Skylab::Zerk  # intro in [#001] README
     end
 
     lazily :Normalize do
-      Home_.lib_.fields::Attributes::Toolkit::Normalize
+      Home_.lib_.fields::Toolkit::Normalize
     end
 
     lazily :ParseArguments_via_FeaturesInjections do

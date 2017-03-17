@@ -2,6 +2,8 @@
 
 ## objective & scope
 
+TL;DR: it is now what we would consider an "association toolkit".
+
 this sidesystem was formed under the mandate to unify universally all
 significant efforts at libraries dealing with modeling
 { arguments | attributes | parameters | properties }, to an extent that
@@ -20,11 +22,12 @@ extensive tabular survey of these previous works.
 
 
 
+
 ## each kind of formal attribute facility introduced.
 
 ### 1. simple "flat list"-based "attributes actor"
 
-this is what you get when you pass the entrypoint proc of [#013] a glob
+this is what you get when you pass the entrypoint proc of a glob
 of symbols.
 
 this formal attribute system merely associates symbol names with ivar
@@ -49,7 +52,7 @@ feature summary:
 this most recent formal attribute system evolved as a semi-easy way to
 facilitate actor-like backends for "operations" of [ac]. it provides a
 concise way of indicating the same information from (1) but allowing the
-ability to indicated "requiredness" too.
+ability to indicate "requiredness" too.
 
 like everything does it evolved so assimilate other commmonly meta-
 attributes (like `flag`, `description` and about 12 others..) and even a
@@ -60,12 +63,19 @@ feature summary:
   • does have meta-attributes
   • does have meta-attributes DSL
 
+see [#002].
+
 
 
 ### 3. the ACS
 
-(see [#ac-001])
-
+the "autonomous component system" tested the experimental assertion that
+applications can usefully be structured as an interlocking tree-like
+structure of interdependent yet autonomous "components". early design
+constraints included avoiding base classes. a major contribution derived
+from it was this concept of the association as being distinct from a
+reusable formal model. this concept of "association" generally has been
+folded back quite extensively into the subject sidesystem. see [#ac-001].
 
 
 
@@ -97,6 +107,8 @@ feature summary:
   • does have dedicated class for formal attributes
   • does have meta-attributes
   • does have meta-attributes DSL
+
+
 
 
 ## historical records

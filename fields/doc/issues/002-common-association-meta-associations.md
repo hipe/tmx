@@ -13,7 +13,12 @@ this same identifier below.
 
 ### (T.o.C)
 
-(identifiers are in order of conception. order is in narrative and physical order)
+(the identifer numbers/letters are allocated in their order of conception
+(not as a rule, but here). however the below items appear in accordance
+with their "physical" order as it occurs in this document, which is also
+the preferred narrative order they are meant to be presented in. i.e, it
+is not the case that you are supposed to read the sections in their numeric
+(or lexographic) order.)
 
   - [one]  (placeholder for this section (the intro))
   - [#here.2] formal vs. actual (the old thing)
@@ -21,6 +26,9 @@ this same identifier below.
   - [#here.F] the "rabbithole" of axioms & corollaries
   - [#here.4] weirdess in how requiredness is implemented
   - [#here.E] the new lingua franca
+  - [#here.7]  [A FORMAL JUSTIFICATION OF META ATTRIBUTES]
+  - [#here.8]  [A FORMAL JUSTIFICATION OF META META ATTRIBUTES]
+  - [#here.9]  [A FORMAL JUSTIFICATION OF N-META ATTRIBUTES]
 
 
 
@@ -90,7 +98,15 @@ Remember this is metahell!
     the association set definition has a surface form that is
     simply a hash whose each element has a value that is either
     `nil`, a simple symbol, or an array of symbols. (these symbols
-    are the meta-associations.)
+    are the meta-associations.)  for example:
+
+        {
+          first_name: nil,
+          last_name: :required,
+          social_security_number: [ regex: /\A\d{3}-\d{2}-\d{4}\z/, :_sensitive ],
+        }
+
+    (the example is didactic. `regex` not a built-in meta association.)
 
 
   - there is a fixed set of recognized "meta-associations"
@@ -102,7 +118,8 @@ Remember this is metahell!
 
     these must start with an underscore. (none of the fixed meta-
     associations do now or ever will start with an underscore).
-    they cannot accept a (meta) value - they are niladic ("flag"-like).
+    meta-associations like these cannot accept a (meta) value. they
+    are niladic ("flag"-like).
 
 
   - you can also employ "proper" arbitrary meta-associations inline :[#here.C.4]
@@ -127,12 +144,12 @@ Remember this is metahell!
 
   - (however) static indexing has been removed:
 
-    when we assimilated to "one ring", we refactored-out two
-    static array passes (#tombstone-C). generally, "indexing" each
-    association around one or another particular category was useful
-    then, and is not now.
+    when we assimilated to "one ring", we refactored-out two static array
+    passes (#tombstone-C). generally, "indexing" each association around
+    one or another particular category was useful then, and is not now.
 
-    (BUT NOTE something like "indexing" is still employed for the next point.)
+    (BUT NOTE something like "indexing" is still employed for the next
+    point :[#here.C.6].)
 
 
   - weirdness around how "requiredness" was/is specified and
@@ -153,13 +170,14 @@ for our purposes here, these associations express (somehow) their
 "requiredness" (formally "parameter arity") and maybe they produce default
 values, among other characteristics. these characteristics themselves have
 a system of classification, which we refer to formally (again) as
-"meta-associations". on that topic there is a dedicated [#037]
-"meta-association justification". (and yes, there is even a [#038]
-"meta-meta-association justification", at which point the rabbit hole ends.)
+"meta-associations".
 
-as well we maintain a [#009] document about our *particular* set of
-hard-baked meta-associations, although the authoritative reference on
-this subject is the corresponding source.
+on that topic there is (or was) a dedicated [#here.7] "meta-association
+justification". and yes, there is (or was) even a [#here.8] "meta-meta-
+association justification". there is (or was (or will be)) an [#here.9]
+"N-meta justification", at which point the rabbit hole will end. (many of
+the above had dedicated files at #tombstone-C which did or will assimilate
+into this one.)
 
 it is recommended, however, that you begin here before consulting those
 sources because A) they are intended to serve as more of a reference for
@@ -199,7 +217,7 @@ let's contextualize deconstruct this statement "completely":
     case, "required" or "optional"). (using our arcane but robust lexicon
     of [#hu-003.056], a finite enumeration would instead be called a
     "unary category". that reference contains more than anyone could
-    possibly want to know about such structures.)
+    possibly want to know about the characteristics of such structures.)
 
   - we call this meta-association "universal" because it applies to
     every association. that is, for any association, there is one knowable
@@ -207,10 +225,16 @@ let's contextualize deconstruct this statement "completely":
     universality is not in any way intrinsically axiomatic; rather, we say
     it's universal because it's useful for our purposes for it to be.)
 
-  - these enumeration values are mutually exclusive in their application
-    to an instance: it is impossible for an association to be both required
-    and optional. this characteristic of mutual exclusivity in application
-    applies to all enumerations.
+  - it is impossible for an association to be both required and optional.
+    to any reader any familiarity with the domain (or even just the words)
+    it may sound obvious, indeed so obvious that to dissect it sounds overly
+    technical or even obtuse; but we offer this in the terms of our critical
+    model because this example exhibits an important characteristic of
+    enumerations generally: enumeration values are mutually exclusive in
+    their application to an instance. since requiredness is an enumeration,
+    it is then impossible for an association to be both required and
+    optional. again, this characteristic of mutual exclusivity in
+    application applies to all enumerations.
 
   - furthermore still, we can call this meta-association "binary" because
     there are exactly two values (elsewhere "exponents") in the enumeration.
@@ -225,7 +249,7 @@ so to restate this, "requiredness is a universal binary meta-association".
 
 "classically" we conceived of "requiredness" as "parameter arity". as an
 [#014] "arity space", it can have a broad range of values (possibly infinite)
-that can be aplied to an instance.
+that can be applied to an instance.
 
 corollaries of a meta-model with this provision *were* interesting. for
 example, is there any useful difference between, on the one hand, a
@@ -238,15 +262,18 @@ whatever reason that system has allowed *parameter* arity to be polyadic
 but it has not allowed for a polyadic *argument* arity.
 
 this is the conclusion we come to on such matters today: for something like
-at least 98% of our pratical, day-to-day modeling needs it seems that
-modeling "requiredness" in such a way was superfluous overkill. parsimony
-holds that since it usually simple enough just to say that an association
-is either "required" or it isn't, that we should keep our meta-model simple,
-and stick with a universal binary here.
+at least 98% of our practical, day-to-day modeling needs it seems that
+modeling "requiredness" in such a way was superfluous overkill. (in other
+words, when we first discovered "arity", we may have become guilty of
+everything looking like a nail.)
 
-(we're not sure but we have a hunch that this simplification will have
+parsimony holds that since it is usually (always, even) simple enough just
+to say that an association is either "required" or it isn't, that we should
+keep our meta-model simple, and stick with a universal binary here.
+
+we're not sure but we have a hunch that this simplification will have
 zero cost against our longterm goals of (wierdly) [#mt-015] generated
-modality clients.)
+modality clients.
 
 
 
@@ -344,9 +371,10 @@ as offered above, we're modeling defaultancy as an optional binary finite
 state enumeration, and requiredness as a universal binary meta-association.
 
 to restate what this means more naturally, every association is either
-required or optional, and every assocation can be defaultant. if it is
+required or optional, and every assocation might be defaultant. if it is
 defaultant it must be specified in one of the two available ways to
-specify defaulting.
+specify defaulting. (the fact that there are two ways to specify defaults
+is somewhat arbitrary, but really so is the whole meta-model.)
 
 now, one of the earliest "clevernesses" of the subject library was the
 axiomatic assertion that it makes no sense to say something is required
@@ -380,7 +408,11 @@ old value, then there's no moving parts so there's no way for it to fail.
 as such, for defaults that are specified by value the axiomatic assumption
 can still hold and we can still effect the same active, assertive
 implications of this (namely that optionality is strictly implied).
-
+elsewhere in code we recognize this distinction and possibly use it to
+dissuade from redundant specifications in models. in more detail, if it is
+true that specifying a default-by-value always implies that the association
+is optional, then it is always redundant to say so explicitly. it would be
+like ordering your food "to go", and also not "for here". [#here.theme-1]
 
 
 
@@ -393,6 +425,9 @@ there is no defaulting, and for which there is no known value in the
 "valid value store", and for which (finally) there is no corresponding
 provided value in the argument stream. the question is, should this value
 get "nilified" (that is, set to nil) in the store?
+
+(ask this question for both a "normalize-in-place" scenario and for when
+normalizing input from an external argument source.)
 
 in a world where the answer is always "yes", then defining an association
 as `optional` (and not providing any default) is equivalent to defining
@@ -411,8 +446,8 @@ synonymous expressions; i.e it would rather enforce one single way than
 allow a variety of different ways of expressing the same thing, by the
 rationale that if models are written consistently and concisely then they
 are easier to understand, and conversely models that are harder to read and
-understand may lead to more bugs, or make bugs harder to fix. (or more to
-the point, "all bugs stem from bad design".)
+understand may lead to more bugs, or make bugs harder to fix. (or more
+enigmatically, "all bugs stem from bad design".)
 
 this provision (to the extent that it is implemented by the meta-model)
 comes down to this: we can simplify things by forbidding the use of
@@ -437,13 +472,22 @@ and requiredness. (these classifications relate to the two meta-associations
 we have presented above as axioms.)
 
 that is, if an association is defaultant it needs extra work to be done
-and the end of a typical normalization (for most definitions of defaultancy),
+at the end of a typical normalization (for most definitions of defaultancy),
 regardless of whether or not a corresponding actual value was passed in the
 argument stream. likewise (and more simply) if an association is required it
 needs this same sort of special attention towards the end of the
-normalization too, certainly without regard to any argument stream at all.
-(indeed "requiredness" is entirely broken if it cannot "look beyond" any
-arguments that may be present in an argument stream.)
+normalization too, and in this case this is without regard to whether there
+is any external argument source at all. (that is, if the implementation of
+"requiredness" cannot "look beyond" that set of argument values that is
+"provided" and/or already existent, then it is surely broken for any
+imaginable definition of "requiredness", because otherwise what is
+the point of requiredness?)
+
+anyway, we refer associations that need this kind of extra work as being
+"extroverted", and the characteristic that unifies them is they have work
+that needs to be done regardless of whether or not they have corresponding
+actual values in the argument source and/or value store. we refer to the
+algorithmic step(s) that do this work as the "extroversion pass".
 
 so having said that, the corollary of this section was this: for an
 association set (i.e "defined attribute set") that has *no* extroverted
@@ -463,39 +507,49 @@ they didn't have any extroverted associations, they could disregard this
 otherwise essential step (method call).
 
 another application of this corollary was that for normalization algorithms
-that did pre-indexing (as the subject library once did), if they saw that
-they had no extroverted associations they could arrange things to skip
-the overhead of this "extroversion pass" entirely.
+that did pre-indexing (as the subject library once did (and still does to
+a lesser extent)), if they saw that they had no extroverted associations
+at all then they could arrange things to skip the overhead of this
+"extroversion pass" entirely.
 
 both of these applications of this corollary, however, have been anulled:
 for one thing, all of the participants that used to concern themselves with
 the obligation of calling this "normalization point" are now served by a
-[#012] unified normalization facility, freeing them from this responsibility.
+[#012] unified normalization facility, freeing them from the responsibility
+of worrying about if/when to issue this "normalization point".
 
 but the other thing (the main thing) is the remainder of this section:
 
 to restate ground covered in "interplay 2" above, if our normalization
 algorithm provides "nilification", then every optional association with no
-default value is (for practical purposes) indistinguishable from an
+default value is (for practical purposes) is indistinguishable from an
 association whose default value is `nil`.
 
 now, to synthesize almost everything we have presented so far (grammatical
 space and critical framework alike):
 
-  - every association is either required or optional
+  - every association is either required or optional.
 
-  - every required association is "extroverted"
+  - every required association is "extroverted".
 
-  - every optional association is able to resolve a default value or it isn't
+  - every optional association is able to resolve a default value or it isn't.
 
-  - every optional association that resolves a default value is "extroverted"
+  - every optional association that resolves a default value is "extroverted".
 
   - every optional assocation that does *not* resolve a default value
     effectively has a default value of `nil`, hence making this association
-    aslo extroverted (IFF "nilification" is a provision)
+    aslo extroverted (IFF "nilification" is a provision).
 
-therefor, if nilifcation is a provision then *every* association is
-extroverted! whew.
+if you accept the delicate cascade of all the above assertions, then
+*every* association is extroverted, making extroversion itself an extraneous
+categeory! what a wild ride!!
+
+in practice, however, we want "nilification" to be a configurable choice
+and not a universal rule. because of this (and apparently only because of
+this), extroversion is still a category. regardless, it's a bit of an
+exercise in semantics. what everything comes down to is that the more we
+develop this meta model, the more we realize we will probably always want
+a dedicated extroversion pass in our normalization.
 
 
 
@@ -584,8 +638,10 @@ false-ish (i.e `false` or `nil`) and then is "turned on" IFF it occurs
 (in its only possible surface form) in the argument stream or equivalent.
 
 in the now established [#here.theme-1] tendency of our meta-model to
-dissuade us from "strange" models in the interest of enforcing bug-
-deterrent design. towards this we *might* say:
+dissuade us from expressing our structural design in a "strange" way
+in the model when there is a less surprising (i.e more conventional)
+way available (all in the interesting of enforcing bug-deterrent design),
+towards all of this we *might* say:
 
   - axiomatically, it doesn't make sense for a flag association to say
     anything about defaults. (although this is technically up to the client
@@ -593,9 +649,9 @@ deterrent design. towards this we *might* say:
   - in a similar simplification, we will offer that it only complicates
     things to allow a flag to be required.
 
-we should mention that in the tangles of the cut gordian knot we are
-leaving on the floor we can find this: we can imagine cases where a
-"required flag" (or something like it) would be meaningful and useful:
+however, in the tangles of the cut gordian knot we are leaving on the
+floor we now see this: we can imagine cases where a "required flag"
+(or something like it) would be meaningful and useful:
 
 imagine a modal dialog box asking you to confirm something, or even
 a simple "Y/N?" prompt at the command line: these atomic channels are
@@ -606,10 +662,10 @@ of the exchange, but this "no answer" case is not the same as saying
 "no".)
 
 if we were to want our meta-model to be capable of making this modeling
-distinction (and we are likely to do), then (probably) either we
-again allow the meta-model to model a required flag, *or* (if "flag"
-has become too overloaded a term) for such a case we would model the
-association as a required "enumeration"..
+distinction (and we likely do), then (probably) either we again allow
+the meta-model to model a flag as being required, *or* (if "flag" has
+become too overloaded a term) for such a case we would model the
+association as a required "binary enumeration"..
 
 
 
@@ -647,7 +703,7 @@ under the auspices of facility "C":
   - if every association in a definition set used neither the `optional`
     modifier nor modifiers that implied optionality (defaulting (and ??)),
     then this has the effect of every association being treated as optional
-    (but note this was perhaps only under facility "C", as disucced below).
+    (but note this was perhaps only under facility "C", as discussed below).
 
   - otherwise (and any one or more association either uses the `optional`
     modifier or modifiers that imply optionality), then the effect is
@@ -683,8 +739,8 @@ classifies as optional (`attributes/defined-attribute.rb:233` and
 
 this alone is cause for concern, but what's worse is that what we were
 afraid of happening happened: some normalization implementations cared
-about only the first part (they checked for missing requireds againt whether
-each association has a `parameter_arity` of `one`); and other
+about only the first part (they checked for missing requireds against
+whether each association has a `parameter_arity` of `one`); and other
 implementations honored the second part (i.e they effectively skipped a
 missing requireds check when all are required); making for implementations
 of normalization near required-ness that were globally inconsistent.

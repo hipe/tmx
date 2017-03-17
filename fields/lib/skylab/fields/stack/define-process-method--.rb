@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  class Attributes::Stack
+  class Stack
 
     class Define_process_method__   # near (marked for removal) [#008]..
       # -

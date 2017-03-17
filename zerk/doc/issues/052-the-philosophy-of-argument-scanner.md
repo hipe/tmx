@@ -7,7 +7,7 @@
 
 
 
-## scope
+## scope  # :[#here.B]
 
 this is a fun experiment being frontiered by [tmx] but being housed here
 in [ze] as an optimism about its potentially more broad utility.

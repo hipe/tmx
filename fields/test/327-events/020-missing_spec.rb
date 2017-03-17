@@ -5,8 +5,10 @@ module Skylab::Fields::TestSupport
   describe "[fi] events - missing" do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :event_failure_graph_expression
+
+    # don't assume etc
+    Memoizer_Methods[ self ]  # use :memoizer_methods
+    TS_::Event::Failure_Graph_Expression[ self ]  # use :event_failure_graph_expression
 
     context "(with no subject)" do
 

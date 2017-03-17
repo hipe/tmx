@@ -79,7 +79,7 @@ module Skylab::Fields::TestSupport
 
     include( Entity_Killer_Methods = ::Module.new )
 
-    module Meta_Attributes
+    module Meta_Associations
 
       include Entity_Killer_Methods
 
@@ -87,10 +87,6 @@ module Skylab::Fields::TestSupport
 
         def [] tcc
           tcc.include self
-        end
-
-        def lib
-          Home_::Attributes
         end
       end  # >>
 
@@ -154,7 +150,7 @@ module Skylab::Fields::TestSupport
         _cls = entity_class_
         entity = _cls.new(){ [ _scn ] }
 
-        yes_no = Home_::Attributes::Toolkit::Normalize[ entity ]
+        yes_no = Home_::Toolkit::Normalize[ entity ]
 
         case yes_no
         when false ; [ chan, ev_p ]
@@ -196,7 +192,7 @@ module Skylab::Fields::TestSupport
       end
 
       def subject_grammar
-        Home_::Attributes::Toolkit.properties_grammar_
+        Home_::Toolkit.properties_grammar_
       end
     end
 

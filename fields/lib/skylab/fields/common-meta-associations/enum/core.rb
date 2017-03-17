@@ -1,12 +1,12 @@
 module Skylab::Fields
 
-  module MetaAttributes::Enum
+  module CommonMetaAssociations::Enum
 
     when_failed = nil
 
-    Parse = -> build do
+    Parse = -> ai do  # association interpreter
 
-      ary = build.argument_scanner_for_current_association_.gets_one
+      ary = ai.meta_argument_scanner_.gets_one
 
       box = Lazy_.call do
         bx = Common_::Box.new
@@ -16,9 +16,9 @@ module Skylab::Fields
         bx
       end
 
-      _ca = build.current_association_
+      _ca = ai.association_
 
-      _ca.writer_by_ do |_atr|
+      _ca.argument_value_consumer_by_ do |_atr|
 
         -> x, oes_p do
 

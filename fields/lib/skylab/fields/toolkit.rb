@@ -1,10 +1,8 @@
 module Skylab::Fields
 
-  module Attributes::Toolkit
+  module Toolkit  # :[#029.A]
 
     # EXPERIMENT towards E.K
-
-#___FROM
 
     class Normalize < Common_::MagneticBySimpleModel
 
@@ -36,7 +34,7 @@ module Skylab::Fields
         @argument_scanner ||= @entity._argument_scanner_
         @listener ||= @entity._listener_
 
-        Attributes::Normalization.call_by do |o|  # :#spot-1-6
+        Home_::Normalization.call_by do |o|  # :#spot-1-6
 
           if @_did
             o.association_stream_newschool = remove_instance_variable :@__as  # [sn]
@@ -78,8 +76,7 @@ module Skylab::Fields
 
     define_singleton_method :properties_grammar_, ( Lazy_.call do
 
-      _inj = Attributes::
-        DefinedAttribute::EntityKillerParameter.grammatical_injection
+      _inj = Home_::CommonAssociation::EntityKillerParameter.grammatical_injection
 
       Home_.lib_.parse::IambicGrammar.define do |o|
 
@@ -91,6 +88,7 @@ module Skylab::Fields
 
     Here__ = self
 
+    # ==
     # ==
   end
 end

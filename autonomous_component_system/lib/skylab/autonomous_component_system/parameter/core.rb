@@ -165,12 +165,6 @@ module Skylab::Autonomous_Component_System
         TRUE  # always, here
       end
 
-      Autoloader_[ self ]
-      stowaway(
-        :AssociationIndex_via_PlatformParameters_and_FormalOperation,
-        'formal-parameter-stream-via-platform-parameters-and-formal-operation'
-      )  # while #pending-rename
-
       Here_ = self
     end
   # -

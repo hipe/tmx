@@ -215,8 +215,7 @@ module Skylab::Snag
 
     # ..
 
-    _param_gi = Fields_::Attributes::
-      DefinedAttribute::EntityKillerParameter.grammatical_injection
+    _param_gi = Fields_::CommonAssociation::EntityKillerParameter.grammatical_injection
 
     _g = Parse_::IambicGrammar.define do |o|
 

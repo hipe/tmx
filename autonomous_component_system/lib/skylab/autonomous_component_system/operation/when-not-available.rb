@@ -43,7 +43,7 @@ module Skylab::Autonomous_Component_System
 
       Build_event = -> fo do
 
-        o = Field_::MetaAttributes::Enum::Build_extra_value_event.new
+        o = Field_::CommonMetaAssociations::Enum::Build_extra_value_event.new
 
         o.adjective = nil  # override 'invalid'
 

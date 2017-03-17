@@ -1,23 +1,23 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - component" do
+  describe "[fi] CMA - component" do  # :#cov2.6 (1x)
 
       # (this is just a stub - see end of file)
 
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
-    use :attributes_meta_attributes
+    use :attributes_meta_associations
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_Component_A
+          class X_cma_Component_A
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               roland_808: :component
             )
 

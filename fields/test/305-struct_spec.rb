@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Fields::TestSupport
 
@@ -10,33 +10,33 @@ module Skylab::Fields::TestSupport
     context "make a basic struct class with a list of member names (like ::Struct)" do
 
       before :all do
-        X_a_s_Foo = Home_::Attributes.const_get( :Struct, false ).new :nerp
+        X_sct_Foo = Home_.const_get( :Struct, false ).new :nerp
       end
 
       it "build an instance with `new`, by default the member is nil (like ::Struct)" do
-        X_a_s_Foo.new.nerp.should eql nil
+        X_sct_Foo.new.nerp.should eql nil
       end
 
       it "arguments passed to `new` will become the member values" do
-        ( X_a_s_Foo.new( :bleep ).nerp ).should eql :bleep
+        ( X_sct_Foo.new( :bleep ).nerp ).should eql :bleep
       end
 
       it "`[]` is effectively an alias for `new`" do
-        ( X_a_s_Foo[ :fazzle ].nerp ).should eql :fazzle
+        ( X_sct_Foo[ :fazzle ].nerp ).should eql :fazzle
       end
 
       it "with an instance you can set (mutate) the value of a member with '='" do
-        foo = X_a_s_Foo.new
+        foo = X_sct_Foo.new
         foo.nerp = :dango
         foo.nerp.should eql :dango
       end
 
       it "`members` as a class method works like in ::Struct" do
-        X_a_s_Foo.members.should eql [ :nerp ]
+        X_sct_Foo.members.should eql [ :nerp ]
       end
 
       it "`members` as an instance method does the same" do
-        X_a_s_Foo.new.members.should eql [ :nerp ]
+        X_sct_Foo.new.members.should eql [ :nerp ]
       end
     end
   end

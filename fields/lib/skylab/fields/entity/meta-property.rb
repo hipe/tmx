@@ -25,7 +25,7 @@ module Skylab::Fields
 
           _st = Common_::Stream.via_nonsparse_array @_mprp_a
 
-          Home_::Attributes::Normalization.call_by do |o|
+          Home_::Normalization.call_by do |o|
             o.entity = prp  # WOAH  (i will miss this)
             o.association_stream_oldschool = _st
           end

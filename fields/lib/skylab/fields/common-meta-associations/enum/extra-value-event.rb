@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module MetaAttributes::Enum
+  module CommonMetaAssociations::Enum
 
     Extra_Value_Event = Common_::Event.prototype_with(
       :invalid_property_value,

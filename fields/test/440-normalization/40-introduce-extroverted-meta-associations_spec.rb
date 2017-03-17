@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalization - introduce extroverted meta-associations" do
+  describe "[fi] normalization - introduce extroverted meta-associations" do
 
     # defaulting & re
 
@@ -16,7 +16,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_guy do
 
-          class X_a_niema_NoSee_A
+          class X_n_iema_NoSee_A
 
             ATTRIBUTES = Attributes.lib.call(
               alpha: :optional,
@@ -35,7 +35,7 @@ module Skylab::Fields::TestSupport
 
           o = _guy.new
           begin
-            X_a_niema_ThisFunction[ o ]
+            X_n_iema_ThisFunction[ o ]
           rescue Home_::ArgumentError => e
           end
 
@@ -97,7 +97,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_entity_class_B do
 
-        class X_a_niema_NoSee_B
+        class X_n_iema_NoSee_B
 
           include Attributes::EK_ModelMethods
 
@@ -117,7 +117,7 @@ module Skylab::Fields::TestSupport
 
     # ==
 
-    X_a_niema_ThisFunction = -> ent do   # :[#008.14] (lend coverage to [sn])
+    X_n_iema_ThisFunction = -> ent do   # :[#008.14] (lend coverage to [sn])
       ascs = ent.class::ATTRIBUTES
       if ascs
         ascs.normalize_by do |o|

@@ -6,6 +6,8 @@
 
   • "scope set" / "stated set" / "bespoke set" / "socialist set" - see [#027]
 
+  - "primary" - see [#053.2]
+
 
 ## (for iCLI)
 

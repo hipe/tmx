@@ -2,8 +2,6 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    FormalParameterStreamViaPlatformParametersAndFormalOperation = nil  # #pending-rename (rename file to away this)
-
     class AssociationIndex_via_PlatformParameters_and_FormalOperation
 
       # 1x here. [#029]

@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - stack" do
+  describe "[fi] stack - intro" do
 
     TS_[ self ]
     use :expect_event
@@ -72,7 +72,7 @@ module Skylab::Fields::TestSupport
     end
 
     def _subject
-      Home_::Attributes::Stack
+      Home_::Stack
     end
   end
 end

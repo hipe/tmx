@@ -187,7 +187,7 @@ module Skylab::Fields::TestSupport
   module Common_Frame  # #stowaway
     class << self
       def lib
-        Home_::Attributes::Stack::CommonFrame
+        Home_::Stack::CommonFrame
       end
       def definition_for_etc  # `expect_missing_required_message_without_newline_`
         @___etc ||= __etc

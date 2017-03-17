@@ -1,8 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  class Normalization < Common_::MagneticBySimpleModel
 
-    class Normalization < Common_::MagneticBySimpleModel
+    # -
 
       # this is "one ring": the place where normalization algorithms
       # go to achieve immortality. main algorithm (etching) in [#012]
@@ -95,7 +95,7 @@ module Skylab::Fields
 
         def box_store= bx
           _receive_valid_value_store(
-            Here_::AssociationIndex_::BoxBasedSimplifiedValidValueStore.new bx )
+            Home_::AssociationIndex_::BoxBasedSimplifiedValidValueStore.new bx )
           bx
         end
 
@@ -178,7 +178,7 @@ module Skylab::Fields
 
         def _touch_index_based
           _touch_mutable_association_source do
-            Here_::AssociationIndex_::BuildIndexBasedAssociationSource
+            Home_::AssociationIndex_::BuildIndexBasedAssociationSource
           end
         end
 
@@ -1437,7 +1437,7 @@ module Skylab::Fields
       USE_WHATEVER_IS_DEFAULT_ = nil
 
       # ==
-    end
+    # -
   end
 end
 # #history-037.5.C - the "FUN" methods and more "association index"-related, 1st pass

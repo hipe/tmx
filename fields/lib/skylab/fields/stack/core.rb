@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  class Attributes::Stack  # :[#028].
+  class Stack  # :[#028].
 
     # LEGACY (used maybe 1x in real life)
 

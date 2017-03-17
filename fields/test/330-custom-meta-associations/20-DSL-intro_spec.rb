@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - DSL experiment (P.o.C)" do
+  describe "[fi] custom meta associations! - DSL experiment (P.o.C)" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -21,18 +21,27 @@ module Skylab::Fields::TestSupport
         # it's tracked with #[#002.C.4] in case we ever find a use for it
         #
 
+        # specifically in the following example, we introduce a meta-
+        # association called "highly sensitive". we define it as a flag.
+        #
+        # ("flag" is a built in meta-meta-association; perhaps the only one.)
+        #
+        # in the corresponding asset node, creating a flag-shaped meta-
+        # association does things to every association that is associated
+        # with the meta-association. whew!
+
         shared_subject :entity_class_ do
 
-          class X_a_cma_DSL_A
+          class X_cma_DSL_A
 
             attrs = Attributes.lib.call(
               social_security_number: :highly_sensitive,
               last_name: nil,
             )
 
-            attrs.define_meta_association___ :flag, :highly_sensitive
+            ATTRIBUTES = attrs  # assign before below just to see what's going on better
 
-            ATTRIBUTES = attrs
+            attrs.define_meta_association___ :highly_sensitive, :flag
 
             self
           end

@@ -1,9 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  class MetaAssociation_via_Iambic___
 
-    class DSL  # ancient history in [#009] (was [#.A])
-
+    # -
       # (this is being thrown back in for fun. it is ANCIENT in spirit)
       #
       # (also, it is a proof of concept. it is not used in production,
@@ -12,168 +11,150 @@ module Skylab::Fields
       #  ear on a feature we might certainly want..)
 
       def initialize ascs, x_a
-        @associations = ascs
-        @sexpesque = x_a
+
+        @__meta_meta_argument_scanner = Scanner_[ x_a ]
+
+        @associations = ascs  # i.e a "defined attributes" set
       end
 
       def execute
 
-        mascs_cls = @associations.meta_associations__
-        if ! mascs_cls
-          mascs_cls = __begin_mutable_meta_associations_class
-        end
+        # (with the lvars, we still talk in terms of "associations"
+        # and "meta associations" but note there is acutally one degree
+        # more of meta than that! yikes)
 
-        asc_cls = @associations.association_class__
-        if ! asc_cls
-          asc_cls = __begin_mutable_association_class
-        end
+        # under the assumption that individual custom meta-associations
+        # aren't created very many times, we're just going to use this
+        # association interpreter for one (N) association, not multiple.
 
-        _this = Here_::N_Meta_Attribute.define do |o|
-
-          o.N_plus_one_interpreter_by = method :__build_interpreter
-
-          o.meta_associations_class = mascs_cls
+        _ai = Home_::Interpretation_::AssociationInterpreter.define do |o|
 
           o.association_class = MetaAssociation___
-
-          o.finish_association_by = -> asc do
-            NOTHING_  # hi.
-          end
-
+          o.meta_associations_module = MetaMetaAssociations___
           o.indexing_callbacks = self
         end
 
-        @_is_method_definer = false
-        sexp = remove_instance_variable :@sexpesque
-        masc = _this.flush_for_build_and_process_association_ sexp.pop, sexp  # :#spot-1-1
+        @_is_enhancer = false
 
-        if @_is_method_definer
-          masc.effect_definition_into_ asc_cls
+        scn = remove_instance_variable :@__meta_meta_argument_scanner
+
+        _meta_association_name_symbol = scn.gets_one
+
+        meta_asc = _ai.interpret_association_ _meta_association_name_symbol, scn
+
+        # SO if the custom meta-association has "enhancement" to do to the
+        # association class (for example DSL friendly readers), touch a
+        # mutuable association subclass and apply the enhancement on that:
+
+        if @_is_enhancer
+
+          _asc_cls = @associations.touch_writable_association_class__
+
+          meta_asc.enhance_this_entity_class_ _asc_cls
         end
 
-        # here's the rub:
+        # AND here's the main thing: creating a new meta association will
+        # mean adding it to a "mutable" grammar "primary" module (presumably
+        # one that itself includes the common primaries, but who knows):
 
-        mascs_cls.send :define_method, masc.name_symbol do
+        _meta_assocs_module = @associations.touch_writable_meta_associations_module___
 
-          masc.as_association_interpret_ @_
+        _meta_assocs_module.module_exec do
+
+          define_method meta_asc.name_symbol do
+
+            meta_asc.as_association_interpret_ @_association_interpreter_
+          end
         end
 
-        NIL_
+        NIL
       end
 
       def add_to_the_static_index_ _k, meta_k
-        send SI_OP_H___.fetch meta_k
+        send THESE___.fetch meta_k
       end
 
-      SI_OP_H___ = {
-        method_definers: :__index_as_method_definer,
+      THESE___ = {
+        this_is_an_enhancer: :__when_this_is_an_enhancer,
       }
 
-      def __index_as_method_definer
-        @_is_method_definer = true
+      def __when_this_is_an_enhancer
+        @_is_enhancer = true ; nil
+      end
+
+    # -
+
+    # ==
+
+    module MetaMetaAssociations___
+
+      def flag
+
+        scn = @_meta_argument_scanner_
+
+        if scn.unparsed_exists && :reader_method_name == scn.head_as_is
+          self._WORKED_ONCE_PROBABLY__but_it_aint_covered_now__
+          scn.advance_one
+          m = scn.gets_one
+        end
+
+        @_association_.argument_value_producer_by_ do
+          NILADIC_TRUTH_
+        end
+
+        @_association_interpreter_.entity_class_enhancer_by_ do |asc|
+
+          custom_meta_association_name_sym = asc.name_symbol
+
+          if ! m
+            m = :"is_#{ custom_meta_association_name_sym }"
+          end
+
+          -> association_class do
+
+            association_class.class_exec do
+              attr_reader custom_meta_association_name_sym
+              alias_method m, custom_meta_association_name_sym
+              remove_method custom_meta_association_name_sym
+            end
+
+            NIL
+          end
+        end
+
         NIL_
       end
-
-      def __build_interpreter is  # interpretation services
-
-        mmascs = MetaMetaAssociations___.new is
-
-        -> k do
-          mmascs.__send__ k
-        end
-      end
-
-      def __begin_mutable_meta_associations_class
-
-        cls = ::Class.new Here_::MetaAttributes
-
-        @associations.const_set :MetaAttributes, cls
-
-        @associations.meta_associations = cls
-
-        cls
-      end
-
-      def __begin_mutable_association_class
-
-        cls = ::Class.new MetaAssociation___
-
-        @associations.const_set :Attribute, cls
-
-        @associations.association_class = cls
-
-        cls
-      end
-
-      class MetaMetaAssociations___
-
-        def initialize is  # interpretation services
-          @_ = is
-        end
-
-        def flag
-
-          # CASE STUDY: this has similar semantics to a counerpart method of
-          # the same name in the N-1 class, but how they differ is exemplary
-          # of how meta-meta-associations differ from meta-associations
-          # (i.e why they are not implemented in the exact same way):
-          #
-          # the MA in this case merely changes the interpretation reader
-          # from the default one to one that doesn't consume a token and
-          # always results in `true`. *this* one (the MMA) however, does that
-          # and also modifies the association *class*.
-          #
-          # the former doesn't also do this because modern meta-associations
-          # are not typically in the business of modifying entity classes
-          # because the instance method namespace of the entity class is
-          # purely for ad-hoc business. however, we being a high-level DSL
-          # *do* go this extra distance and modify the association *class*.
-
-          ca = @_.current_association_
-          scn = @_.argument_scanner_for_current_association_
-          if scn.unparsed_exists && :reader_method_name == scn.head_as_is
-            scn.advance_one
-            m = scn.gets_one
-          end
-
-          ca.reader_by_ do
-            NILADIC_TRUTH_
-          end
-
-          @_.add_methods_definer_by_ do |asc|
-
-            orig_m = asc.name_symbol
-
-            if ! m
-              m = :"is_#{ asc.name_symbol }"
-            end
-
-            -> mod do
-
-              mod.module_exec do
-                attr_reader orig_m
-                alias_method m, orig_m
-                remove_method orig_m
-              end
-
-              NIL_
-            end
-          end
-
-          NIL_
-        end
-
-        Etc___ = -> k do
-          :"is_#{ k }"
-        end
-      end
-
-      MetaAssociation___ = ::Class.new Here_::DefinedAttribute  # hi.
-
-      # ==
-      # ==
-
     end
+
+    # ==
+
+    class MetaAssociation___  # EXPERIMENT - GO IT ALONE
+
+      include Home_::AssociationValueProducerConsumerMethods_
+
+      def initialize k
+
+        init_association_value_producer_consumer_ivars_
+
+        @name_symbol = k
+
+        yield self
+
+        close_association_value_producer_consumer_mutable_session_
+      end
+
+      def as_association_interpret_ ai
+        super  # hi.
+      end
+
+      attr_reader(
+        :name_symbol,  # #here
+      )
+    end
+
+    # ==
+    # ==
   end
 end
+# #tombstone-B: deleted "meta-attributes" document which had ancient notes of ours
 # #history: broke out at #spot-3

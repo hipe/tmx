@@ -1,62 +1,84 @@
 module Skylab::Fields
 
-  class Attributes
+  class CommonValueStores
 
-    class Bounder  # ANCIENT - like an early [#ca-004] qkn that's writable
+    # this file is ANCIENT - because it became anemic but it has so much
+    # history, we re-named it to become the home for the various value
+    # stores in this sidesystem. however we have left them where they are
+    # for now.
 
-      class << self
+    class AssociationValueReader  # 1x. here.
 
-        def _call sess
+      # at one point it was called "bounder". produce something like a
+      # [#co-004] qualified knownness, but one that produces the value
+      # real-time whenever `value_x` is called (as opposed to being
+      # a "cold", immutable structure).
+      #
+      # this is used in one file in [tm] (and also it is covered here.)
 
-          _attrs = sess.class::ATTRIBUTES
-          new sess, _attrs
-        end
-
-        alias_method :[], :_call
-        alias_method :call, :_call
-        remove_method :_call
-
-        private :new
+      def initialize ent, ascs
+        @association_index = ascs.association_index
+        @entity = ent
       end
 
-      def initialize sess, attrs
-        @attributes = attrs
-        @session = sess
+      def association_reader_via_symbol sym
+
+        _asc = @association_index.read_association_ sym
+        ParticularAssociationValueReader___.new @entity, _asc
       end
+    end
 
-      def lookup k
+    # ==
 
-        _attr = @attributes.attribute k
+    class ParticularAssociationValueReader___
 
-        Bound___.new @session, _attr
-      end
+      def initialize ent, asc
 
-      class Bound___
-
-        # (note we scrapped TONS of blah blah because it wasn't covered..)
-
-        def initialize sess, asc
-
-          ivar = asc.as_ivar
-          @_read = -> do
-            if sess.instance_variable_defined? ivar
-              sess.instance_variable_get ivar
-            else
-              raise __say_not_set ivar
-            end
+        ivar = asc.as_ivar
+        @__dereference = -> do
+          if ent.instance_variable_defined? ivar
+            ent.instance_variable_get ivar
+          else
+            raise __say_not_set ivar
           end
         end
-
-        def value_x
-          @_read[]
-        end
-
-        def __say_not_set ivar
-          "cannot read, is known unknown - #{ ivar }"
-        end
+        @association = asc
       end
 
-    end  # bounder
-  end  # attributes
+      def value_x
+        @__dereference[]
+      end
+
+      def __say_not_set ivar
+        "cannot read, is known unknown - #{ ivar }"
+      end
+
+      def name
+        send( @_name ||= :__name_initially )
+      end
+
+      def __name_initially
+        if @association.respond_to? :name
+          @_name = :__name_classically
+        else
+          @__name = Common_::Name.via_lowercase_with_underscores_symbol @association.name_symbol
+          @_name = :__name
+        end
+        send @_name
+      end
+
+      def __name_classically
+        @association.name
+      end
+
+      def __name
+        @__name
+      end
+    end
+
+    # ==
+    # ==
+  end
 end
+# #history-B: another cleanup
 # #tombsone: rewrote from ANCIENT. not-covered behavior was archived.

@@ -1,14 +1,14 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - stack - common frame - integrate with entity" do
+  describe "[fi] stack - common frame - integrate with entity" do
 
     before :all do
 
-      class X_a_s_cf_Inter_1
+      class X_cf_Inter_1
 
-        Home_::Attributes::Stack::CommonFrame.call self,
+        TS_::Common_Frame.lib.call self,
           :globbing, :processor, :initialize,
           :readable, :field, :foo,
           :required, :readable, :field, :bar
@@ -54,7 +54,7 @@ module Skylab::Fields::TestSupport
     define_method :expect_missing_required_message_without_newline_, Common_Frame.definition_for_etc
 
     def _subject_class
-      X_a_s_cf_Inter_1
+      X_cf_Inter_1
     end
   end
 end

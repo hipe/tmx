@@ -1,20 +1,20 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - desc" do
+  describe "[fi] CMA - desc" do  # :#cov2.9
 
     TS_[ self ]
     use :memoizer_methods
-    use :attributes_meta_attributes
+    use :attributes_meta_associations
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_Desc_A
+          class X_cma_Desc_A
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               wazlow: [ :desc, -> y { y << "line 1: #{ self._hi }" ; y << "line 2" } ],
               pazlow: [ :desc, -> { "this way #{ self._hi }" } ],
             )
@@ -49,7 +49,7 @@ module Skylab::Fields::TestSupport
 
       memoize :_would_be_expression_agent do
 
-        cls = class X_a_ma_Desc_Expag
+        cls = class X_cma_Desc_Expag
 
           alias_method :calculate, :instance_exec
 

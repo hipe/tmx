@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - custom meta attributes - manually" do
+  describe "[fi] custom meta associations! - manually" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -18,50 +18,65 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_cls do
 
-          class X_a_cma_m_Attr < Attributes.lib::DefinedAttribute
-            # oh. nothing, i guess
+          class X_cma_m_MyCustomAssociation < Home_::CommonAssociation
 
-            def __hello
-              true
+            # if you want a custom association class, you probably want to
+            # subclass so you can use the producer/consumer/interpreter
+            # customization API that is part of our "common" class..
+
+            # we don't actually do anything interesting here, except
+            # demonstrate that it is this class that is used.
+
+            def HELLO_MY_CUSTOM_ASSOC
+              NIL
             end
           end
 
-          class X_a_cma_m_Mattrs  # note we only define what we will use..
+          # ==
 
-            def initialize is  # interpretation services
-              @_ = is
-            end
+          module X_cma_m_MyCustomMetaAssociations  # (we will only define what we use)
 
             def list
 
-              ca = @_.current_association_
+              @_association_.argument_value_consumer_by_ do |asc|
 
-              ca.writer_by_ do |atr|
-                atr.__hello or ::Kernel.fail
+                asc.HELLO_MY_CUSTOM_ASSOC
+
+                ivar = asc.as_ivar  # be careful doing it here (what if ivar name changed later in the meta assocs?)
+
                 -> x, _oes_p do
-                  ivar = atr.as_ivar
-                  ent = entity
+
+                  ent = @_normalization_.entity
+
                   if ent.instance_variable_defined? ivar
                     a = ent.instance_variable_get ivar
                   else
                     a = []
                     ent.instance_variable_set ivar, a
                   end
+
                   a.push x
-                  true  # KEEP_PARSING_
+                  KEEP_PARSING_
                 end
               end
             end
+
+            # --
+            # --
           end
 
-          class X_a_cma_m_A
+          # ==
 
-            def self.with * x_a
-              o = new
-              _kp = self::ATTRIBUTES.init o, x_a
-              _kp or self._SANITY
-              o
-            end
+          class X_cma_m_MyCustomEntity
+
+            class << self
+              def with * x_a
+                o = new
+                _kp = self::ATTRIBUTES.init o, x_a
+                _kp or self._SANITY
+                o
+              end
+            end  # >>
 
             attrs = Attributes.lib.call(
               foopie: :list,
@@ -70,8 +85,8 @@ module Skylab::Fields::TestSupport
 
             attr_reader( * attrs.symbols )
 
-            attrs.meta_associations = X_a_cma_m_Mattrs
-            attrs.association_class = X_a_cma_m_Attr
+            attrs.meta_associations_module = X_cma_m_MyCustomMetaAssociations
+            attrs.association_class = X_cma_m_MyCustomAssociation
 
             const_set :ATTRIBUTES, attrs
 

@@ -1,10 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  module CommonAssociationMetaAssociations_  # 1x (this lib only). exegesis in [#002]
 
-    class MetaAttributes < ::BasicObject  # 1x (this lib only). [#009]..
-
-      # ==
+    # -
 
       module EntityKillerModifiers
 
@@ -52,90 +50,222 @@ module Skylab::Fields
         end
       end
 
-      # ==
+    # -
 
-      def initialize build
-        @_ = build
+    module ClassicMetaAttributes  # 18 of them at writing. these are what unified us to "attributes"
+
+      # -- UI-level (the highest level here)
+
+      def desc  # #cov2.9
+
+        _desc_p = @_meta_argument_scanner_.gets_one
+
+        @_association_.accept_description_proc__ _desc_p ; nil
       end
 
-      # -- the 17 default meta-attributes in alphabetical order.
+      # -- parameter arity
+      #
+      #    the fundamnetalest part of normalization, "high-level" because
+      #    conceptually it happans after and outside of argument interpretetion
+      #
+      #    (there can be [#002.4] weirdness in how the requiredness check is effected)
 
-      def boolean  # for ancient DSL-controller. see also `flag`
-
-        Home_::MetaAttributes::Boolean::Parse[ @_ ]
+      def required  # #cov2.10 - the newer addition to the pair
+        @_association_interpreter_.index_statically_ :see_required
+        @_association_.be_required__
       end
 
-      def component  # #experimental:
-        # avoid dependency on [ac] for now. this is a microscopic ersatz of
-        # it, to let the work form its own upgrade path..
+      def optional  # #cov2.1
+        @_association_interpreter_.index_statically_ :see_optional
+        @_association_.be_optional__
+      end
 
-        @_.current_association_.reader_by_ do |atr|
+      # -- defaulting is considered a higher-level nicety
 
-          m = :"__#{ atr.name_symbol }__component_association"
+      def default  # #cov2.8
 
+        x = @_meta_argument_scanner_.gets_one
+        if x.nil?
+          self._COVER_ME_dont_use_nil_use_optional
+        end
+
+        @_association_.be_defaultant_by_value__ x
+      end
+
+      def default_proc  # #cov2.8
+
+        _x = @_meta_argument_scanner_.gets_one
+
+        @_association_.be_defaultant_by_( & _x )
+      end
+
+      # -- custom value interpretation
+
+      def known_known  # #cov2.1 like "monadic" but wraps the value in knownness
+
+        @_association_.argument_value_producer_by_ do
           -> do
-            _ca = entity.send m  # no yield for now - if you need it, use [ac]
-            _ca.interpret_component argument_scanner, current_association
+            Common_::Known_Known[ argument_scanner.gets_one ]
           end
         end
       end
 
-      # (above is :#spot-1-4 an example of this DSL)
+      # -- common value interpretation: argument arity (more args down to less args)
 
-      def custom_interpreter_method
+      def singular_of  # #cov2.1 when you have a glob field, exposes a modifier to write ony one item to it
+
+        sym = @_meta_argument_scanner_.gets_one
+
+        ca = @_association_
+
+        ca.argument_value_producer_by_ do
+          -> do
+            [ argument_scanner.gets_one ]
+          end
+        end
+
+        ca.argument_value_consumer_by_ do |_atr|
+
+          -> x, _oes_p do
+            asc = @_normalization_.association_index.read_association_ sym
+            mutate_for_redirect_ x, asc
+            asc.flush_DSL_for_interpretation_ self  # result is kp
+          end
+        end
+      end
+
+      def plural  # #COVER-ME [sa]
+
+        @_association_.argument_arity = :zero_or_more
+      end
+
+      def list  # #cov2.2  make oldschool DSL-like writer
+
+        @_association_interpreter_.entity_class_enhancer_by_ do |asc|
+
+          -> mod do
+            mod.send :define_method, asc.name_symbol do |x|
+              ivar = asc.as_ivar
+              if instance_variable_defined? ivar
+                a = instance_variable_get ivar
+              end
+              if a
+                a.push x
+              else
+                instance_variable_set ivar, [ x ]
+              end
+              NIL_  # because basic object
+            end
+          end
+        end
+      end
+
+      # ~
+
+      def flag  # #cov2.1
+
+        @_association_.argument_value_producer_by_ do
+          NILADIC_TRUTH_
+        end
+
+        @_association_.argument_arity = :zero
+      end
+
+      def flag_of  # #cov2.1 like `flag` but ..
+
+        sym = @_meta_argument_scanner_.gets_one
+
+        @_association_.argument_value_producer_by_ do
+          NILADIC_TRUTH_
+        end
+
+        @_association_.argument_value_consumer_by_ do |_atr|
+
+          -> x, _oes_p do
+
+            # "flag of" must have the *full* pipeline of the referrant -
+            # read *and* write.
+
+            asc = @_normalization_.association_index.read_association_ sym
+            mutate_for_redirect_ x, asc
+            asc.flush_DSL_for_interpretation_ self  # result is kp
+          end
+        end
+      end
+
+      # -- in "association theory" (maybe near [#017]) enumeration is one of the fundamnetalest
+
+      def boolean  # #cov2.4 for ancient DSL-controller. see also `flag`
+        Home_::CommonMetaAssociations::Boolean::Parse[ @_association_interpreter_ ]
+      end
+
+      def enum  # #cov2.3
+        Home_::CommonMetaAssociations::Enum::Parse[ @_association_interpreter_ ]
+      end
+
+      # -- lower-level, governs interaction with value store
+
+      def ivar  # #cov2.5
+        @_association_.as_ivar = @_meta_argument_scanner_.gets_one
+      end
+
+      # -- delegate the work (component, two kinds of interpreter method) & possible support
+
+      def component  # #cov2.6 #experimental:
+
+        # avoid dependency on [ac] for now. this is a microscopic ersatz of
+        # it, to let the work form its own upgrade path..
+
+        @_association_.argument_value_producer_by_ do |asc|
+
+          m = :"__#{ asc.name_symbol }__component_association"
+
+          -> do
+            _ca = @_normalization_.entity.send m  # no yield for now - if you need it, use [ac]
+            _ca.interpret_component argument_scanner, @_association_
+          end
+        end
+      end
+
+      def custom_interpreter_method  # #cov2.5
 
         # created to facilitate custom aliases [hu].
         # also bolsters readability for hybrid actors.
 
-        @_.current_association_.will_interpret_by_ do |atr|
+        @_association_.argument_interpreter_by_ do |asc|
 
-          Oldschool_custom_interpreter_as___[ Classic_writer_method_[ atr.name_symbol ] ]
-        end
-      end
+          m = Attr_writer_method_name_[ asc.name_symbol ]
 
-      def custom_interpreter_method_of
+          -> do
+            ent = @_normalization_.entity
 
-        m = @_.argument_scanner_for_current_association_.gets_one
+            if ! ent.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
+              ent.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
+              yes = true
+            end
 
-        @_.current_association_.will_interpret_by_ do |_atr|
+            x = ent.send m
 
-          Newschool_custom_interpreter_as___[ m ]
-        end
-      end
+            yes and ent.remove_instance_variable ARGUMENT_SCANNER_IVAR_
 
-      Newschool_custom_interpreter_as___ = -> m do
-
-        -> do
-          x = entity.send m, argument_scanner
-          if ACHIEVED_ == x
-            KEEP_PARSING_
-          else
-            raise ::ArgumentError, Say_expected_achieved__[ x ]
+            ACHIEVED_ == x ? KEEP_PARSING_ : raise( ::ArgumentError, Say_expected_achieved__[ x ] )
           end
         end
       end
 
-      Oldschool_custom_interpreter_as___ = -> m do
+      def custom_interpreter_method_of  # #cov2.5
 
-        -> do
+        m = @_meta_argument_scanner_.gets_one
 
-          ent = entity
+        @_association_.argument_interpreter_by_ do |_atr|
 
-          if ! ent.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
-            ent.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
-            did = true
-          end
-
-          x = ent.send m
-
-          if did
-            ent.remove_instance_variable ARGUMENT_SCANNER_IVAR_
-          end
-
-          if ACHIEVED_ == x
-            KEEP_PARSING_
-          else
-            raise ::ArgumentError, Say_expected_achieved__[ x ]
+          -> do
+            x = @_normalization_.entity.send m, argument_scanner
+            if ACHIEVED_ == x
+              KEEP_PARSING_
+            else
+              raise ::ArgumentError, Say_expected_achieved__[ x ]
+            end
           end
         end
       end
@@ -144,73 +274,13 @@ module Skylab::Fields
         "expected #{ ACHIEVED_ } had #{ Home_.lib_.basic::String.via_mixed x }"
       end
 
-      def default
+      # -- like delegators, but just "ride along"
 
-        x = @_.argument_scanner_for_current_association_.gets_one
-        if x.nil?
-          self._COVER_ME_dont_use_nil_use_optional
-        end
+      def hook  # #cov2.7
 
-        @_.current_association_.be_defaultant_by_value__ x
-      end
+        @_association_interpreter_.entity_class_enhancer_by_ do |asc|
 
-      def default_proc
-
-        _x = @_.argument_scanner_for_current_association_.gets_one
-
-        @_.current_association_.be_defaultant_by_( & _x )
-      end
-
-      def desc
-
-        _desc_p = @_.argument_scanner_for_current_association_.gets_one
-
-        @_.current_association_.accept_description_proc__ _desc_p ; nil
-      end
-
-      def enum
-        Home_::MetaAttributes::Enum::Parse[ @_ ]
-      end
-
-      def flag
-
-        ca = @_.current_association_
-
-        ca.argument_arity = :zero
-
-        ca.reader_by_ do
-          NILADIC_TRUTH_
-        end
-      end
-
-      def flag_of
-
-        sym = @_.argument_scanner_for_current_association_.gets_one
-        ca = @_.current_association_
-
-        ca.reader_by_ do
-          NILADIC_TRUTH_
-        end
-
-        ca.writer_by_ do |_atr|
-
-          -> x, _oes_p do
-
-            # "flag of" must have the *full* pipeline of the referrant -
-            # read *and* write.
-
-            asc = association_index.read_association_ sym
-            mutate_for_redirect_ x, asc
-            asc.flush_DSL_for_interpretation_ self  # result is kp
-          end
-        end
-      end
-
-      def hook
-
-        @_.add_methods_definer_by_ do |atr|
-
-          ivar = atr.as_ivar ; k = atr.name_symbol
+          ivar = asc.as_ivar ; k = asc.name_symbol
 
           -> mod do
 
@@ -236,79 +306,12 @@ module Skylab::Fields
         end
       end
 
-      def ivar
-        @_.current_association_.as_ivar = @_.argument_scanner_for_current_association_.gets_one
-      end
+      # --
+      # --
 
-      def known_known
-
-        @_.current_association_.reader_by_ do
-          -> do
-            Common_::Known_Known[ argument_scanner.gets_one ]
-          end
-        end
-      end
-
-      def list
-
-        @_.add_methods_definer_by_ do |atr|
-
-          -> mod do
-            mod.send :define_method, atr.name_symbol do |x|
-              ivar = atr.as_ivar
-              if instance_variable_defined? ivar
-                a = instance_variable_get ivar
-              end
-              if a
-                a.push x
-              else
-                instance_variable_set ivar, [ x ]
-              end
-              NIL_
-            end
-          end
-        end
-      end
-
-      def optional
-        @_.index_statically_ :see_optional
-        @_.current_association_.be_optional__
-      end
-
-      def required
-        @_.index_statically_ :see_required
-        @_.current_association_.be_required__
-      end
-
-      def plural  # #experimental - ..
-
-        @_.current_association_.argument_arity = :zero_or_more
-      end
-
-      def singular_of
-
-        sym = @_.argument_scanner_for_current_association_.gets_one
-
-        ca = @_.current_association_
-
-        ca.reader_by_ do
-          -> do
-            [ argument_scanner.gets_one ]
-          end
-        end
-
-        ca.writer_by_ do |_atr|
-
-          -> x, _oes_p do
-            asc = association_index.read_association_ sym
-            mutate_for_redirect_ x, asc
-            asc.flush_DSL_for_interpretation_ self  # result is kp
-          end
-        end
-      end
-    end  # meta-attributes
-  end  # attributes
-end  # fields
+    end  # classic etc
+  end
+end
 
 # #tombstone: we broke out ANCIENT meta-params DSL at #spot-3
 # #tombstone: DSL atom

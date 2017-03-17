@@ -9,6 +9,7 @@ module Skylab::Permute
       # this custom option paser. any time structured data has to get across
       # the CLI-ACS boundary, some kind of cleverness needs to be employed
       # for the syntax. (think of the syntax for the `find` utility).
+      # ([#ze-053.2] discusses a syntax like this a bit more.)
 
       # were it not this custom o.p, the lone parameter of our core operation
       # would be expressed as a required (positional) glob argument (because

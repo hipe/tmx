@@ -90,7 +90,7 @@ module Skylab::Fields
     KEEP_PARSING_  # these writes cannot fail gracefully. this is as convenience
   end
 
-  DEFINITION_FOR_THE_METHOD_CALLED_READ_KNOWNNESS_ = -> asc do  # WAS [#029]
+  DEFINITION_FOR_THE_METHOD_CALLED_READ_KNOWNNESS_ = -> asc do
 
     ivar = asc.as_ivar
 
@@ -111,44 +111,58 @@ module Skylab::Fields
 
   # ==
 
-  class Attributes < ::Module  # :[#013]
+  class Attributes < ::Module  # :[#013].
 
     class << self
-
       alias_method :[], :new
       alias_method :call, :new
       undef_method :new
-
-      def struct_class
-        const_get :Struct, false  # because there is a toplevel such name, and etc
-      end
     end  # >>
 
     def initialize h
       @association_class = nil
       @_h = h
-      @meta_associations = nil
+      @meta_associations_module = nil
       # (can't freeze because #here-1)
     end
 
     # --
 
-    def define_meta_association___ * x_a, & x_p  # proof of concept...
-      Here_::DSL.new( self, x_a, & x_p ).execute
+    # ~ (feature-island proof of concept..) (moved here at #history-B)
+
+    def define_meta_association___ * x_a, & p
+      Home_::MetaAssociation_via_Iambic___.new( self, x_a, & p ).execute
     end
+
+    def touch_writable_association_class__  # for above
+      if @association_class
+        self._COVER_ME__
+      else
+        const_defined? :Association and self._COVER_ME__
+        cls = ::Class.new Home_::CommonAssociation
+        const_set :Association, cls
+        @association_class = cls
+      end
+    end
+
+    def touch_writable_meta_associations_module___  # same
+      if @meta_associations_module
+        self._COVER_ME__
+      else
+        const_defined? :MetaAssociations and self._COVER_ME__
+        # because proof-of-concept, we don't stack atop the common one but we could
+        mod = ::Module.new
+        const_set :MetaAssociations, mod
+        @meta_associations_module = mod
+      end
+    end
+
+    # ~
 
     attr_writer(
       :association_class,
-      :meta_associations,
+      :meta_associations_module,
     )
-
-    def association_class__
-      @association_class
-    end
-
-    def meta_associations__
-      @meta_associations
-    end
 
     # --
 
@@ -183,7 +197,7 @@ module Skylab::Fields
     end
 
     def normalize_by
-      Here_::Normalization.call_by do |o|
+      Home_::Normalization.call_by do |o|
         yield o
         o.association_index = _index
       end
@@ -191,8 +205,8 @@ module Skylab::Fields
 
     # --
 
-    def define_methods mod
-      _index.define_methods__ mod
+    def define_methods cls
+      _index.enhance_entity_class__ cls
     end
 
     def symbols * sym
@@ -221,10 +235,15 @@ module Skylab::Fields
     alias_method :association_index, :_index  # here, [ac]
 
     def ___build_index
-      Here_::AssociationIndex_.new( @_h,
-        ( @meta_associations || Here_::MetaAttributes ),
-        ( @association_class || Here_::DefinedAttribute ),
+
+      Home_::AssociationIndex_.new( @_h,
+        ( @meta_associations_module || Home_::CommonAssociationMetaAssociations_::ClassicMetaAttributes ),
+        ( @association_class || Home_::CommonAssociation ),
       )
+    end
+
+    def ASSOCIATION_VALUE_READER_FOR ent
+      Home_::CommonValueStores::AssociationValueReader.new ent, self
     end
 
     # ==
@@ -384,14 +403,14 @@ module Skylab::Fields
           meths = argument_parsing_writer_method_name_passive_lookup_proc
           _lookup_association_softly = -> k do
             m = meths[ k ]
-            m and Attributes::AssociationIndex_::MethodBasedAssociation.new m
+            m and Home_::AssociationIndex_::MethodBasedAssociation.new m
           end
 
           instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
 
           # (this call is used all over)
 
-          x = Here_::Normalization.call_by do |o|
+          x = Home_::Normalization.call_by do |o|
             o.argument_scanner = scn
             o.push_association_soft_reader_by__( & _lookup_association_softly )
             o.association_index = _ascs_idx
@@ -414,7 +433,7 @@ module Skylab::Fields
         end
 
         def argument_parsing_writer_method_name_passive_lookup_proc  # #public-API #hook-in 1x, 
-          Here_::AssociationIndex_::Writer_method_reader[ self.class ]
+          Home_::AssociationIndex_::Writer_method_reader[ self.class ]
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
@@ -437,12 +456,12 @@ module Skylab::Fields
 
         def backwards_curry  # eek
           -> * x_a, & oes_p do
-            Actor::Curried.backwards_curry__ self, x_a, & oes_p
+            Home_::CurriedActor_.backwards_curry__ self, x_a, & oes_p
           end
         end
 
         def curry_with * x_a, & oes_p
-          Actor::Curried.curry__ self, x_a, & oes_p
+          Home_::CurriedActor_.curry__ self, x_a, & oes_p
         end
 
         def [] * a, & oes_p
@@ -527,15 +546,7 @@ module Skylab::Fields
 
     # --
 
-    Classic_writer_method_ = -> name_symbol do
-      :"#{ name_symbol }="
-    end
-
-    # --
-
     Autoloader_[ self ]
-
-    ARGUMENT_SCANNER_IVAR_ = :@_argument_scanner_
     Here_ = self
   end  # attributes
 
@@ -610,7 +621,144 @@ module Skylab::Fields
     end
   end
 
-  # ~
+  # ==
+
+  module AssociationValueProducerConsumerMethods_  # 2x
+
+    # (something to share between assocation class and meta-association
+    # classes. a bit of a #stowaway here. here b.c assocs always use this
+    # node and it's otherwise light..)
+
+    def init_association_value_producer_consumer_ivars_
+
+      @_receive_interpreterer_AVPC = :__receive_interpreterer
+      @_receive_producerer_AVPC = :__receive_producerer
+      @_receive_consumerer_AVPC = :__receive_consumerer
+
+      @_producer_by_AVPC = nil
+      @_consumer_by_AVPC = nil
+      @_interpreter_by_AVPC = nil
+
+      @_entity_class_enhancer_procs_AVPC = nil
+    end
+
+    # -- ..
+
+    def add_enhance_entity_class_proc__ p
+      ( @_entity_class_enhancer_procs_AVPC ||= [] ).push p ; nil
+    end
+
+    # -- ..
+
+    def argument_interpreter_by_ & p
+      send @_receive_interpreterer_AVPC, p
+    end
+
+    def argument_value_producer_by_ & p
+      send @_receive_producerer_AVPC, p
+    end
+
+    def argument_value_consumer_by_ & p
+      send @_receive_consumerer_AVPC, p
+    end
+
+    def __receive_interpreterer p
+      @_receive_interpreterer_AVPC = :_closed
+      @_receive_producerer_AVPC = :_closed
+      @_receive_consumerer_AVPC = :_closed
+      @_interpreter_by_AVPC = p ; nil
+    end
+
+    def __receive_producerer p
+      @_receive_interpreterer_AVPC = :_closed
+      @_receive_producerer_AVPC = :_closed
+      @_producer_by_AVPC = p ; nil
+    end
+
+    def __receive_consumerer p
+      @_receive_interpreterer_AVPC = :_closed
+      @_receive_consumerer_AVPC = :_closed
+      @_consumer_by_AVPC = p ; nil
+    end
+
+    def close_association_value_producer_consumer_mutable_session_
+
+      remove_instance_variable :@_receive_interpreterer_AVPC
+      remove_instance_variable :@_receive_producerer_AVPC
+      remove_instance_variable :@_receive_consumerer_AVPC
+
+      interpreter_by = remove_instance_variable :@_interpreter_by_AVPC
+
+      if interpreter_by
+        remove_instance_variable :@_producer_by_AVPC
+        remove_instance_variable :@_consumer_by_AVPC
+        @__interpret_argument_AVPC = interpreter_by[ self ]
+        @_flush_DSL_AVPC = :__flush_DSL_via_custom_interpreter_AVPC
+      else
+        r_p = remove_instance_variable :@_producer_by_AVPC
+        w_p = remove_instance_variable :@_consumer_by_AVPC
+        @produce_argument_value_by__ = r_p ? r_p[ self ] : Produce_value___
+        @consume_argument_value_by__ = w_p ? w_p[ self ] : Consume_value___
+        @_flush_DSL_AVPC = :__flush_DSL_commonly_AVPC
+      end
+
+      p_a = remove_instance_variable :@_entity_class_enhancer_procs_AVPC
+      if p_a
+        @__prepared_entity_class_enhancer_procs_AVPC = p_a.map do |p|
+          p[ self ]  # eesh that timing
+        end.freeze
+      end
+
+      NIL
+    end
+
+    # -- "read" (use)
+
+    def enhance_this_entity_class_ ent_cls  # assume etc
+
+      @__prepared_entity_class_enhancer_procs_AVPC.each do |p|
+        p[ ent_cls ]
+      end
+      NIL
+    end
+
+    def as_association_interpret_ n11n, & p
+
+      _dsl = Home_::Interpretation_::ArgumentValueInterpretation_DSL.new p, self, n11n
+      flush_DSL_for_interpretation_ _dsl
+    end
+
+    def flush_DSL_for_interpretation_ dsl  # 3x in [fi]
+
+      send @_flush_DSL_AVPC, dsl
+    end
+
+    def __flush_DSL_via_custom_interpreter_AVPC dsl  # result in kp
+
+      dsl.calculate( & @__interpret_argument_AVPC )
+    end
+
+    def __flush_DSL_commonly_AVPC dsl  # result in kp
+
+      dsl.as_DSL_flush_commonly_for_interpretation__
+    end
+
+    attr_reader(
+      :produce_argument_value_by__,
+      :consume_argument_value_by__,
+    )
+  end
+
+  Produce_value___ = -> do
+    # [#012.L.1] *DO* advance. (eager parsing)
+    argument_scanner.gets_one
+  end
+
+  Consume_value___ = -> x, _ do
+    write_association_value_ x
+  end
+
+  # ==
 
   class SimplifiedName
 
@@ -755,8 +903,6 @@ module Skylab::Fields
 
   # ==
 
-  # (HERE)
-
   # -- the external functions experiment (see [#010])
 
   # ~ description & name
@@ -873,6 +1019,10 @@ module Skylab::Fields
 
   # --
 
+  Attr_writer_method_name_ = -> name_symbol do
+    :"#{ name_symbol }="
+  end
+
   Scanner_ = -> a do  # #todo with [sa] etc
     Common_::Scanner.via_array a
   end
@@ -903,6 +1053,7 @@ module Skylab::Fields
   end
 
   ACHIEVED_ = true
+  ARGUMENT_SCANNER_IVAR_ = :@_argument_scanner_
   CLI = nil  # for host
   CONST_SEP_ = Common_::CONST_SEPARATOR
   EMPTY_A_ = []
@@ -926,4 +1077,5 @@ module Skylab::Fields
     y << "for modeling { arguments | attributes | parameters | properties }"
   end
 end
+# :#history-B - as referenced
 # #history - backwards_curry moved

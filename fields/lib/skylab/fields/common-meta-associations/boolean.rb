@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module MetaAttributes::Boolean
+  module CommonMetaAssociations::Boolean
 
       # the conceptual logic ("DNA") predates the earliest code in this file
       # by about four years. this is for ancient "DSL-controllers".
@@ -8,9 +8,9 @@ module Skylab::Fields
       # as an exercise, in this latest rewrite we are playing with this
       # would-be "method definer" pattern..
 
-    Parse = -> build do
+    Parse = -> ai do  # argument interpreter
 
-      scn = build.argument_scanner_for_current_association_
+      scn = ai.meta_argument_scanner_
 
       defs = MethodsDefiner___.new
 
@@ -25,9 +25,9 @@ module Skylab::Fields
 
       defs.finish
 
-      build.add_methods_definer_by_ do |atr|
+      ai.entity_class_enhancer_by_ do |asc|
 
-        a = defs.stream_for( atr ).to_a
+        a = defs.stream_for( asc ).to_a
 
         -> mod do
           mod.module_exec do

@@ -215,7 +215,7 @@ module Skylab::System
     define_singleton_method :_memoize, Common_::Memoize
 
     Attributes_stack_frame = -> *a do
-      Fields[]::Attributes::Stack::CommonFrame.call_via_arglist a
+      Fields[]::Stack::CommonFrame.call_via_arglist a
     end
 
     string_scanner_class = _memoize do

@@ -11,8 +11,8 @@ module Skylab::TanMan
       #   • this used to be over-generalized. we have since parsimonized it.
       #   • this once looked like a :+[#sy-004] normalizer. but no longer.
 
-      def initialize batrs, fs, & p
-        @bound_attributes = batrs
+      def initialize avr, fs, & p
+        @association_value_reader = avr
         @filesystem = fs
         @on_event_selectively = p
       end
@@ -23,7 +23,7 @@ module Skylab::TanMan
 
         out_a = []
 
-        @_gx_qkn = @bound_attributes.lookup :add_treetop_grammar  # a "list" b.p
+        @_gx_qkn = @association_value_reader.association_reader_via_symbol :add_treetop_grammar  # a "list" b.p
 
         @_gx_qkn.value_x.each_with_index do | grammar_path, d |
 
@@ -75,8 +75,8 @@ module Skylab::TanMan
 
       def _check_dir sym  # must assert is (existent) directory
 
-        ba = @bound_attributes.lookup sym
-        dir = ba.value_x
+        ar = @association_value_reader.association_reader_via_symbol sym
+        dir = ar.value_x
 
         ok = if dir
 
@@ -84,10 +84,10 @@ module Skylab::TanMan
             instance_variable_set :"@__#{ sym }__", dir
             ACHIEVED_
           else
-            maybe_send_error :__build_not_directory_error, ba
+            maybe_send_error :__build_not_directory_error, ar
           end
         else
-          maybe_send_error :__build_no_anchor_path_event, :xx, ba
+          maybe_send_error :__build_no_anchor_path_event, :xx, ar
         end
 
         if ! ok

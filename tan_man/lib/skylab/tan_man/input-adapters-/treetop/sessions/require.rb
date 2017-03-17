@@ -76,10 +76,10 @@ module Skylab::TanMan
 
       def __resolve_units_of_work
 
-        _bound_attributes = Home_.lib_.fields::Attributes::Bounder[ self ]
+        _avr = self.class::ATTRIBUTES.ASSOCIATION_VALUE_READER_FOR self
 
         _uow_a = Here_::Actors_::Build_units_of_work.call(
-          _bound_attributes,
+          _avr,
           @_filesystem,
           & @on_event_selectively )
 

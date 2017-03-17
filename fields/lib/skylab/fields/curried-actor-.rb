@@ -1,8 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  module CurriedActor_  # ancient experiment. perhaps #feature-island
 
-    module Actor::Curried  # ancient experiment. perhaps #feature-island
+    # -
 
       class << self
 
@@ -144,6 +144,6 @@ module Skylab::Fields
           execute
         end
       end
-    end
+    # -
   end
 end

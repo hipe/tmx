@@ -1,10 +1,10 @@
 [#039]       [ defined attribute ]
 
-[#038]       meta-meta-attrirubtes justification ..
+[#038]
        #open [#here.1] the dream of unification (of normalization, then of
              the unifying theory of models and associations)
 
-[#037]       meta-attributes justification ..
+[#037]       "one ring" assimilation notes ..
 
              :[#here.5]: each qualifying facility in the universe will be tracked
              :[#here.D]: feature categories (placeheld)
@@ -39,7 +39,9 @@
 [#030] #hole
              ( #was: dedund this [missing required exception construction] )
 
-[#029] #hole
+[#029]       temporaly related local trackings
+             :[#here.B]:  [ xx]
+             :[#here.A]:  [ toolkit ]
              ( #was: local redundancy )
 
 [#028]       [stack]
@@ -78,25 +80,26 @@
 [#018]       let me count the ways we parse ..
 
 [#017] #hole
+             ( #was: meta-meta-associations justification )
              ( #was: long note about sandboxed module hack for tests )
 
 [#016]       [ actor ]  (will move from [co])
 
-[#015]       near-term smalls & mediums near "one-ring"
+[#015] #open near-term smalls & mediums near "one-ring"
 
-             [#here.2]: perhaps rename the lib to "association"
-             [#here.1]: finish fixes to indentation (formatting) in n-meta-attribute
+             [#here.1] in-situ WRONG
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 
-[#013]       the unification of methodic actors into (here) "attributes"
+[#013] #hole
+             ( #was: the defined attributes set structure )
 
 [#012]       now the "normal normalization" algorithm (and its variants)..
 
              [#here.L] - low-level gotchas
              [#here.L.1]: where to advance the scanner after primary expression
 
-       #hole :[#here.K]
+             :[#here.K] [hole]
 
        #wish :[#here.J.4]: `nilify` as an option
              :[#here.J.3]: generally geared towards dynamic associations
@@ -164,7 +167,8 @@
 
 [#010]       the external functions experiment ..
 
-[#009]       meta-attributes ..
+[#009] #hole
+             ( #was: meta-attributes .. )
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
@@ -195,7 +199,7 @@
 
 [#004]       [ basic fields ]
 
-[#003]       the declared fields narrative .. (this will assimilate to [#013])
+[#003] #hole
 
-[#002]       the attribute narrative ..
+[#002]       common association meta-associations ..
 [#001]       discussion of all the property libs ..

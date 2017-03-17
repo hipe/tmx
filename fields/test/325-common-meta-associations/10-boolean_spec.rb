@@ -1,20 +1,20 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - boolean" do
+  describe "[fi] CMA - boolean" do  # :#cov2.4 (1x only)
 
     TS_[ self ]
     use :memoizer_methods
-    use :attributes_meta_attributes
+    use :attributes_meta_associations
 
       context "intro" do
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_Boolean_A
+          class X_cma_Boolean_A
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               finished: :boolean,
             )
 
@@ -62,9 +62,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_Boolean_B
+          class X_cma_Boolean_B
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               ready: [ :boolean, :negative_stem, :pending, :positive_stem, :is_ready ],
             )
 

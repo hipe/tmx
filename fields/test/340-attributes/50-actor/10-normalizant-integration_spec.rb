@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - actor - normalizant integration" do
+  describe "[fi] attributes - actor - normalizant integration" do  # :#cov2.10
 
     TS_[ self ]
     use :memoizer_methods

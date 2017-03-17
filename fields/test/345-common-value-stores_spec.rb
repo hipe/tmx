@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - bounder" do
+  describe "[fi] common value stores" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -14,7 +14,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_b_NoSee_A
+          class X_cvs_NoSee_A
 
             attrs = Attributes.lib.call(
               age: :_write,
@@ -32,33 +32,24 @@ module Skylab::Fields::TestSupport
           end
         end
 
-        it "loads" do
-          _subject_module
-        end
-
         it "builds" do
-          _the_bounder or fail
+          _the_reader or fail
         end
 
         it "value of list" do
           _bnd = _of_list_attribute
           _a = _bnd.value_x
-          _a.should eql %w( goldfish llama )
+          _a == %w( goldfish llama ) || fail
         end
 
         def _of_list_attribute
-          _the_bounder.lookup :pet
+          _the_reader.association_reader_via_symbol :pet
         end
 
-        shared_subject :_the_bounder do
+        shared_subject :_the_reader do
 
-          _o = _this_entity
-          _mod = _subject_module
-          _guy = _mod[ _o ]
-        end
-
-        shared_subject :_this_entity do
-          _build_guy
+          ent = _build_guy
+          ent.class::ATTRIBUTES::ASSOCIATION_VALUE_READER_FOR ent
         end
 
         def _build_guy
@@ -69,10 +60,6 @@ module Skylab::Fields::TestSupport
           o.pet 'llama'
           o
         end
-      end
-
-      def _subject_module
-        Home_::Attributes::Bounder
       end
     end
   # ==

@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - misc meta attributes one" do
+  describe "[fi] CMA - misc meta attributes one" do  # :#cov2.5
 
     TS_[ self ]
     use :memoizer_methods
@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_some_class_over_here do
 
-          class X_a_ma_CW
+          class X_cma_CW
 
             def zizzie=
               scn = @_argument_scanner_
@@ -76,13 +76,13 @@ module Skylab::Fields::TestSupport
 
       context "`custom_interpreter_method_of`" do
 
-        Attributes::Meta_Attributes[ self ]
+        Attributes::Meta_Associations[ self ]
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_CIMO_A
+          class X_cma_CIMO_A
 
-            ATTRIBUTES = Attributes::Meta_Attributes.lib.call(
+            ATTRIBUTES = Attributes.lib.call(
               zing: [ :custom_interpreter_method_of, :zung ],
             )
 

@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - normalization (fundamentals)" do
+  describe "[fi] normalization - the set difference features" do
 
     # what we're calling the "set difference features" of normalization are
     # those that can implemented with simple set theory, namely:
@@ -187,7 +187,7 @@ module Skylab::Fields::TestSupport
     end
 
     def subject_module_
-      Home_::Attributes::Normalization
+      Home_::Normalization
     end
 
     # ==

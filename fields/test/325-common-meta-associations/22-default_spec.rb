@@ -1,12 +1,12 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] attributes - meta-attributes - default" do
+  describe "[fi] CMA - default" do  # :#cov2.8
 
     TS_[ self ]
     use :memoizer_methods
-    use :attributes_meta_attributes
+    use :attributes_meta_associations
 
     # ==
 
@@ -14,9 +14,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_d_NoSee_1A
+          class X_cma_d_NoSee_1A
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               starts_as_true: [ :default, true ],
             )
 
@@ -68,11 +68,11 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_a_ma_d_NoSee_1B
+          class X_cma_d_NoSee_1B
 
             d = 0
 
-            attrs = Attributes::Meta_Attributes.lib.call(
+            attrs = Attributes.lib.call(
               wahoo: [ :default_proc, -> { "wahootie: #{ d += 1 }" } ],
               other: nil,
             )
@@ -146,7 +146,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_entity_class_2A do
 
-        class X_a_ma_d_NoSee_2A
+        class X_cma_d_NoSee_2A
 
           include Attributes::EK_ModelMethods
 

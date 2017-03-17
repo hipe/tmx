@@ -74,7 +74,13 @@ OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
 OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
 (-18.400: completion of phase 3: assimilated all)
 (there are many "hi. ##{}todo"-type lines)
-(rename all remaining `Facility_X` to appropriate names)
 (-18.403 )
 (-18.410 )
 (-18.417 )
+look and see if [fi] "toolkit" normalize can be assimilated
+then after that try to use normal normalization to interpret custom meta associations (the feature island)
+then after that try to use normal normalization to interpret associations
+get rid of that one lazy hook in normal normaliztaion - make it so at argument provision time we decide what the value store is
+all green commit with new n-meta work (but not the final work)
+a commit with many renames (to mostly unify to the name "associations")
+a possibly temporary commit erasing documents outside the main two

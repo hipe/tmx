@@ -1111,7 +1111,7 @@ module Skylab::Fields
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_::Attributes::Normalization_Against_Model[ qkn, self, & x_p ]
+        Home_::Normalization_Against_Model[ qkn, self, & x_p ]
       end
 
       def is_normalizable__
@@ -1217,7 +1217,7 @@ module Skylab::Fields
         @enum_box = bx.freeze
 
         _touch_AHN_box.touch :__enum__ do
-          Home_::MetaAttributes::Enum::Normalize_via_qualified_known
+          Home_::CommonMetaAssociations::Enum::Normalize_via_qualified_known
         end
 
         KEEP_PARSING_
