@@ -1,6 +1,8 @@
 module Skylab::TanMan
 
-  if false
+  module Model_
+
+  if false  # to #here1
   DESCRIPTION_METHOD_ = -> s do
 
     self.instance_description_proc = -> y do
@@ -113,9 +115,103 @@ module Skylab::TanMan
       @silo_module::Actions__.const_get @nf.as_const
     end
   end
+  end  # if false :#here1
 
   # ~
 
+    # a lot of this is probably redundant with (#[#ze-002.1])
+    # elsewhere as we wait for dust to settle around possible etc.
+
+    # ==
+
+    Bound_call_via_action_with_definition = -> act do
+
+      # (copy-paste-modify of [sn])
+
+      _asc_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
+        if :_parameter_TM_ == qual_item.injection_identifier
+          qual_item.item
+        end
+      end
+
+      ok = MTk_::Normalization.call_by do |o|
+
+        o.association_stream_newschool = _asc_st
+
+        o.entity_nouveau = act
+      end
+
+      if ok
+        Common_::BoundCall.by( & act.method( :execute ) )
+      else
+        NIL  # downgrade from false (covered)
+      end
+    end
+
+    # ==
+
+    Action_grammar___ = Lazy_.call do
+
+      # for now, we built our entity/action grammar here ourself.
+      # one day maybe this will become a cleaner part of a toolkit
+
+      _param_gi = Fields_lib_[]::
+        CommonAssociation::EntityKillerParameter.grammatical_injection
+
+      _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
+
+        o.add_grammatical_injection :_branch_desc_SN_, BRANCH_DESCRIPTION___
+
+        o.add_grammatical_injection :_parameter_SN_, _param_gi
+      end
+
+      _g  # hi. #todo
+    end
+
+    module BRANCH_DESCRIPTION___ ; class << self
+
+      def is_keyword k
+        :branch_description == k
+      end
+
+      def gets_one_item_via_scanner scn
+        scn.advance_one ; scn.gets_one
+      end
+    end ; end
+
+    # ==
+
+    module CommonActionMethods
+
+      def init_action_ irsx
+        @_invocation_resources_ = irsx
+      end
+
+      def _listener_
+        @_invocation_resources_.listener
+      end
+
+      def _argument_scanner_
+        @_invocation_resources_.argument_scanner
+      end
+
+      def _read_ k
+        ::Kernel._OKAY
+        ivar = :"@#{ k }"
+        # ..
+        instance_variable_get ivar
+      end
+
+      def _write_ k, x
+        ::Kernel._OKAY
+      end
+    end
+
+    # ==
+
+
+    # ==
+  if false  # to #here2
   class Action_ < Brazen_::Action
 
     extend( module MM
@@ -219,6 +315,7 @@ module Skylab::TanMan
   end
 
   Actor_ = -> cls, * a do
+    self._WHERE__see_patch__
 
     Home_.lib_.fields::Attributes::Actor.via cls, a
 
@@ -596,7 +693,9 @@ module Skylab::TanMan
   Models_::Paths = -> path, verb, call, & oes_p do
     Models_::Internal_::Paths[ path, verb, call, & oes_p ]
   end
-  end
+  end  # if false #here2
+
+  end  # `Model_`
 end
 # #tombstone-D: we once had `take` defined as a stream method
 # #tombstone: remote add, list, rm (ancient, deprecated); check, which

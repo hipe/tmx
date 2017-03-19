@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
 
     def initialize oes_p
       @bx = Home_::Common_::Box.new
-      @on_event_selectively = oes_p
+      @listener = oes_p
       yield self
     end
 
@@ -42,14 +42,14 @@ module Skylab::TanMan::TestSupport
     end
 
     def _work
-      Produce_parse_tree_custom___.new( @bx, & @on_event_selectively ).execute
+      Produce_parse_tree_custom___.new( @bx, & @listener ).execute
     end
 
     class Produce_parse_tree_custom___ < Home_::Models_::DotFile::ParseTree_via_ByteUpstreamReference
 
       def initialize bx, & oes_p
         @_h = bx.h_
-        @on_event_selectively = oes_p
+        @listener = oes_p
         @byte_upstream_reference = @_h.fetch :buid
         nil
       end
@@ -59,7 +59,7 @@ module Skylab::TanMan::TestSupport
         # create a load session that produces (hopefully) a parser class
 
         o = Home_::Input_Adapters_::Treetop::Sessions::Require.new(
-          & @on_event_selectively )
+          & @listener )
 
         o.input_path_head_for_relative_paths =
           @_h.fetch :root_for_relative_paths_for_load

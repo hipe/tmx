@@ -171,6 +171,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
+             [#here.15] borrow for "did you mean nothing" from [ta]
              [#here.14] lend to [sn]
              [#here.10-13] borrow
              [#here.6], [#here.7], [#here.8], [#here.9] borrow

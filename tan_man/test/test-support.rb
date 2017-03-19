@@ -6,8 +6,8 @@ module Skylab::TanMan::TestSupport
   class << self
 
     def [] tcc
-      tcc.extend Module_Methods___
-      tcc.include Instance_Methods___
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
     end
 
     def client_proximity_index_
@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
     cache = {}
     define_method :lib_ do | sym |
       cache.fetch sym do
-        x = TestSupport_.fancy_lookup sym, TS_
+        x = TestSupport_.fancy_lookup sym, TS_  # these are #here2
         cache[ sym ] = x
         x
       end
@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
 
   Expect_Event__ = Common_.test_support::Expect_Emission
 
-  module Module_Methods___
+  module ModuleMethods___
 
     def use sym
       TS_.lib_( sym )[ self ]
@@ -138,9 +138,17 @@ module Skylab::TanMan::TestSupport
     end
   end
 
-  module Instance_Methods___
+  module InstanceMethods___
 
-    include Expect_Event__::Test_Context_Instance_Methods
+    include Expect_Event__::Test_Context_Instance_Methods  # #todo
+
+    # -- assertions
+
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    end
+
+    # --
 
     def debug!
       @do_debug = true
@@ -156,7 +164,7 @@ module Skylab::TanMan::TestSupport
 
     alias_method :some_debug_IO, :_same
 
-    def handle_event_selectively_
+    def listener_
       event_log.handle_event_selectively
     end
 
@@ -259,7 +267,7 @@ module Skylab::TanMan::TestSupport
       end
 
       # but if you wanted to test for specific events here:
-      # _oes_p = handle_event_selectively_
+      # _oes_p = listener_
 
       _head = Localize_grammar_path___[ @grammar_class.dir_path ]
       _path = ::File.join _head, ALWAYS_G1__
@@ -381,6 +389,10 @@ module Skylab::TanMan::TestSupport
 
     # ~ hook-outs to ancillary API's
 
+    def prepare_subject_API_invocation invo
+      invo
+    end
+
     def subject_API_value_of_failure
       FALSE
     end
@@ -426,10 +438,19 @@ module Skylab::TanMan::TestSupport
     end
   end.call
 
-  # ==
+  # ==  :#here2
+
+  Expect_CLI_Or_API = -> tcc do
+    Home_::Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
+    tcc.send :alias_method, :call_API, :call  # legacy
+  end
 
   Expect_Line = -> tcc do
     TestSupport_::Expect_line[ tcc ]
+  end
+
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
   The_Method_Called_Let = -> tcc do

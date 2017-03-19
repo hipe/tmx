@@ -77,6 +77,11 @@ module Skylab::Fields
           _receive_valid_value_store THE_EMPTY_SIMPLIFIED_VALID_VALUE_STORE___
         end
 
+        def entity_nouveau= ent  # NOTE unlike many of the others, call-time sensitive!
+          Home_::Toolkit::Receive_entity_nouveau[ self, ent ]
+          ent
+        end
+
         def entity_as_ivar_store= ent
           # (until deeper integration, this is the one way)
           self.ivar_store = ent
@@ -653,7 +658,7 @@ module Skylab::Fields
           ok  # hi. #todo
         end
 
-        o.did_you_mean_by = -> do
+        o.did_you_mean_by = -> do  # :#here10
           a = h.keys - mutable_argument_value_pipeline.__to_seen_keys_
           if a.length.zero?
             h.keys
@@ -1029,11 +1034,9 @@ module Skylab::Fields
 
           p = @__did_you_mean_by
           if p
-            _did_you_mean = p[]
+            _did_you_mean = p[]  # perhaps #here10
           end
           _these = _maybe_special_noun_lemma
-
-          # _did_you_mean = @_normal_association_via_name_symbol.keys
 
           _ev = Home_::Events::Extra.with(
             :unrecognized_token, _unsanitized_key,

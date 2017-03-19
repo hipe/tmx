@@ -202,5 +202,6 @@
 
 [#002]       API (the bundled modality)
              ( #was: [the event loop] )
+             :[#here.1]: as "microservice", maybe will DRY this boilerplate
 
 [#001] #open the readme (needs freshening up)

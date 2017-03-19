@@ -2,75 +2,46 @@ module Skylab::Fields
 
   module Toolkit  # :[#029.A]
 
-    # EXPERIMENT towards E.K
-
-    class Normalize < Common_::MagneticBySimpleModel
-
-      # (bridge the gap between bleeding new and the more general one)
-
-      def self.[] ent
-        call_by do |o|
-          o.entity = ent
-        end
-      end
-
-      def initialize
-        @_did = false
-        super
-      end
-
-      def association_stream= x
-        @_did = true ; @__as = x
-      end
-
-      attr_writer(
-        :argument_scanner,
-        :entity,
-        :listener,
-      )
-
-      def execute
-
-        @argument_scanner ||= @entity._argument_scanner_
-        @listener ||= @entity._listener_
-
-        Home_::Normalization.call_by do |o|
-
-          if @_did
-            o.association_stream_newschool = remove_instance_variable :@__as  # [sn]
-          else
-            o.association_stream_newschool = __formal_attribute_stream
-          end
-
-          o.arguments_to_default_proc_by = method :__args_to_default_proc_by
-
-          o.argument_scanner = @argument_scanner
-          o.read_by = @entity.method :_read_
-          o.write_by = @entity.method :_write_
-          o.listener = @listener
-        end
-      end
-
-      def __args_to_default_proc_by _k
-        [ @entity, @listener ]  # (last element is the proc to use)
-      end
-
-      def __formal_attribute_stream
-
-        _array = @entity._definition_
-        _scn = Common_::Scanner.via_array _array
-
-        _pg = Here__.properties_grammar_
-        _qual_item_st = _pg.stream_via_scanner _scn
-
-        _qual_item_st.map_by do |qual_item|
-          :_parameter_FI_ == qual_item.injection_identifier || fail
-          qual_item.item
-        end
-      end
-    end
+    # (this node (file) was created/repurposed to act as a transitional
+    # bridge, insulating outside clients from whatever mess is going on in
+    # (for example) our normalization node. but since we have cleaned that
+    # one up..
 
     # ==
+
+      Receive_entity_nouveau = -> o, ent do  # 1x this lib only. o=normalization
+
+        # implement `entity_nouveau=` in a different file than n11n to lighten it
+        # (it happens here for purely historical reasons)
+
+        # NOTE unlike many of the others, this one is call-time sensitive!
+        # (what is and isn't already set in the o will inform what happens here.)
+
+        if o.association_source
+          NOTHING_  # [sn], [ta]
+        else
+          self._WHERE  # #see #tombstone-B
+        end
+
+        o.argument_scanner = ent._argument_scanner_  # ..
+
+        if o.listener
+          self._COVER_ME
+        else
+          o.listener = ent._listener_
+        end
+
+        o.arguments_to_default_proc_by = -> _ do
+          [ ent, o.listener ]  # (last element is the block to pass)
+        end
+
+        o.read_by = ent.method :_read_
+        o.write_by = ent.method :_write_
+      end
+
+    # ==
+
+    # (at #tombstone-B) "association stream via entity" moved to one of our test files)
 
     # ==
 
@@ -92,4 +63,5 @@ module Skylab::Fields
     # ==
   end
 end
+# #tombstone-B - moved "default" association streamer out (for now)
 # #history-A - repurposed file from "stack" to "toolkit"

@@ -42,7 +42,7 @@ module Skylab::Fields
 
         def __express_first_line
 
-      # e.g: "couldn't wizzle - unrecognized property 'foo' in blah blah"
+          # e.g: "couldn't wizzle - unrecognized property 'foo' in blah blah"
 
           _express_any_this :@prefixed_conjunctive_phrase_context_proc
 
@@ -58,11 +58,11 @@ module Skylab::Fields
 
         def __express_splay a, o
 
+          #      "unrecognized property 'mlem'" | "unrecogized properties 'mlem' and 'baz'"
+
           @_expression_agent.simple_inflection do
 
             # -
-
-        # "unrecognized property 'mlem'" | "unrecogized properties 'mlem' and 'baz'"
 
         _scn = Scanner_[ o.unrecognized_tokens ]
 
@@ -87,14 +87,16 @@ module Skylab::Fields
 
         def __do_express_second_line
 
-          if __has_only_one_unrecognized_item &&
+          if __has_no_did_you_menas
+            __express_no_did_you_means
+
+          elsif __has_only_one_unrecognized_item &&
             __has_one_or_more_did_you_means &&
             __the_number_of_did_you_means_exceeds_a_levenstein_limit &&
             __the_unrecognized_thing_is_a_token_type &&
             true
           then
-            _x_a = __reduce_using_levenshtein
-            _express_did_you_mean _x_a
+            _express_did_you_mean __reduce_using_levenshtein
           else
             _express_did_you_mean @did_you_mean_tokens
           end
@@ -144,12 +146,29 @@ module Skylab::Fields
           end
         end
 
+        def __has_no_did_you_menas
+          @did_you_mean_tokens.length.zero?
+        end
+
         def __has_one_or_more_did_you_means
           @did_you_mean_tokens.length.nonzero?
         end
 
         def __has_only_one_unrecognized_item
           1 == @unrecognized_tokens.length
+        end
+
+        def __express_no_did_you_means
+
+          # :[#008.15] #borrow-coverage from [ta] for the case of zero items
+
+          lem = @noun_lemma || DEFAULT_PROPERTY_LEMMA_
+
+          _ = @_expression_agent.simple_inflection do
+            "expecting no #{ n 0, lem }"
+          end
+
+          @_line_downstream << _
         end
 
         def _express_did_you_mean sym_a  # actually sym_a or s_a

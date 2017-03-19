@@ -45,6 +45,10 @@ module Skylab::Plugin
         yield self
       end
 
+      def add_model_modules_glob glob, tail
+        @_a.push ModelModulesGlob___.new glob, tail ; nil
+      end
+
       def add_actions_modules_glob glob
         @_a.push ActionsModulesGlob___.new glob ; nil
       end
@@ -83,6 +87,30 @@ module Skylab::Plugin
       end
     end
 
+    class ModelModulesGlob___
+
+      # #experimental - for [tm]: using only a glob of models (not actions),
+      # spoof it as if every model has an "actions" node, so that UMM..
+
+      def initialize s, s_
+        @glob = s ; @tail = s_
+      end
+
+      def write_into_using y, o
+        glob = ::File.join o.path_head, @glob
+        a = o.filesystem.glob glob
+        a.length.zero? and raise This_one_exception__[ glob ]
+        a.each do |path|
+          d = ::File.extname( path ).length
+          if d.nonzero?
+            path[ -d .. -1 ] = EMPTY_S_  # (information is lost here)
+          end
+          y << ::File.join( path, @tail )
+        end
+        NIL
+      end
+    end
+
     class ActionsModulesGlob___
 
       # implement this kind of path glob specification.
@@ -94,12 +122,8 @@ module Skylab::Plugin
       def write_into_using y, o
         glob = ::File.join o.path_head, @glob
         a = o.filesystem.glob glob
-        if a.length.zero?
-          self._SANITY__this_is_probably_not_what_you_want__
-          # (the above could maybe be an exception, but should never be an emission)
-        else
-          y.concat a ; nil
-        end
+        a.length.zero? and raise This_one_exception__[ glob ]
+        y.concat a ; nil
       end
     end
 
@@ -114,6 +138,12 @@ module Skylab::Plugin
       def write_into_using y, o
         y << ::File.join( o.path_head, @path_tail )
       end
+    end
+
+    This_one_exception__ = -> glob do
+      # this is intended as a sanity check for developers.
+      # this should not be made into an emission.
+      ::RuntimeError.new "this is probably not what you want. zero paths - #{ glob }"
     end
 
     # == section 2 of 3 - operator branch via [3 means]

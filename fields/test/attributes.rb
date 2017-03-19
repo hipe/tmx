@@ -148,16 +148,21 @@ module Skylab::Fields::TestSupport
         end
 
         _cls = entity_class_
-        entity = _cls.new(){ [ _scn ] }
+        ent = _cls.new(){ [ _scn ] }
 
-        yes_no = Home_::Toolkit::Normalize[ entity ]
+        yes_no = Home_::Normalization.call_by do |o|
+
+          o.association_stream_newschool = Association_stream_via_entity___[ ent ]
+
+          o.entity_nouveau = ent
+        end
 
         case yes_no
         when false ; [ chan, ev_p ]
 
         when true
           chan && fail
-          entity
+          ent
 
         else ; never
         end
@@ -193,6 +198,22 @@ module Skylab::Fields::TestSupport
 
       def subject_grammar
         Home_::Toolkit.properties_grammar_
+      end
+    end
+
+    # ==
+
+    Association_stream_via_entity___ = -> ent do  # moved this here at #history-A from "toolkit". could move back.
+
+      _array = ent._definition_
+      _scn = Home_::Scanner_[ _array ]
+
+      _pg = Home_::Toolkit.properties_grammar_
+      _qual_item_st = _pg.stream_via_scanner _scn
+
+      _qual_item_st.map_by do |qual_item|
+        :_parameter_FI_ == qual_item.injection_identifier || fail
+        qual_item.item
       end
     end
 
@@ -284,3 +305,4 @@ module Skylab::Fields::TestSupport
     # ==
   end
 end
+# #history-A (as referenced) (can be temporary)

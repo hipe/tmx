@@ -5,7 +5,7 @@ module Skylab::TanMan
     class Sessions::Require  # see [#008]
 
       Attributes_ = -> h do
-        Home_.lib_.fields::Attributes[ h ]
+        Fields_lib_[]::Attributes[ h ]
       end
 
       attrs = Attributes_.call(

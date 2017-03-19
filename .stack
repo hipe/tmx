@@ -21,11 +21,12 @@ use [sa] to convert etc to Stream_
 API's: [st],[co]
 API: [gi] (during this, modernize "directory as collection" (or not))
 API's: [f2],[bs],[tr],[sl]
-imagine inverting required/optional
 finish what you started with expag (somewhere)
+(there are many "hi. ##{}todo"-type lines in [fi])
 explain MTk and associate the explanation with its nodes
 API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
+(many `if false` in [tm])
 (silo: hear)
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
@@ -60,21 +61,3 @@ TD tan_man/test/54-operations/23-workspace/42-create_spec.rb
 TD tan_man/test/54-operations/23-workspace/24-status_spec.rb
 (model: paths)
 TD tan_man/test/54-operations/14-paths_spec.rb
-TD tan_man/test/54-operations/05-intro_spec.rb
-TD tan_man/test/14-sexp/34-prototype_spec.rb
-(concern: sexp)
-TD tan_man/test/14-sexp/24-auto/74-hacks/18-recursive-rule-integration_spec.rb
-OK tan_man/test/14-sexp/24-auto/74-hacks/14-recursive-rule-mutation_spec.rb
-OK tan_man/test/14-sexp/24-auto/70-all-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/60-content-pattern-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/50-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/25-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/12-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/06-grammar_spec.rb
-OK tan_man/test/14-sexp/24-auto/03-grammar_spec.rb
-(-18.400: completion of phase 3: assimilated all)
-(there are many "hi. ##{}todo"-type lines)
-(-18.403 )
-(-18.410 )
-(-18.417 )
-look and see if [fi] "toolkit" normalize can be assimilated

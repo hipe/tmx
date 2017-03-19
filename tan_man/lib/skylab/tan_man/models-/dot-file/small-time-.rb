@@ -19,7 +19,7 @@ module Skylab::TanMan
         @byte_downstream_reference = id
         @graph_sexp = gsp
         @is_dry = false
-        @on_event_selectively = oes_p
+        @listener = oes_p
 
         if x_a.length.nonzero?
           _kp = process_iambic_fully x_a
@@ -41,7 +41,7 @@ module Skylab::TanMan
           y.close
         end
 
-        @on_event_selectively.call :info, :wrote_resource do
+        @listener.call :info, :wrote_resource do
           __build_event bytes
         end
 
@@ -78,13 +78,13 @@ module Skylab::TanMan
 
       def initialize kr=nil, & oes_p
         @kernel = kr
-        @on_event_selectively = oes_p
+        @listener = oes_p
       end
 
       def receive_document_action action
 
         @kernel = action.kernel
-        @on_event_selectively = action.handle_event_selectively
+        @listener = action.handle_event_selectively
 
         receive_byte_upstream_reference action.document_entity_byte_upstream_reference
         produce_document_controller
@@ -94,7 +94,7 @@ module Skylab::TanMan
 
         o = Home_::Model_::DocumentEntity::
           Byte_Stream_Identifier_Resolver.new(
-            @kernel, & @on_event_selectively )
+            @kernel, & @listener )
 
         o.against_qualified_knownness_box bx
 
@@ -116,12 +116,12 @@ module Skylab::TanMan
 
       def __via_BUID_resolve_graph_sexp
 
-        _gs = Here_.produce_parse_tree_with(
+        _gs = Here_::ParseTree_via_ByteUpstreamReference.via(
 
           :byte_upstream_reference, @_BUID,
           :generated_grammar_dir_path, __GGD_path,
 
-          & @on_event_selectively )
+          & @listener )
 
         _store :@graph_sexp, _gs
       end
@@ -132,7 +132,7 @@ module Skylab::TanMan
 
       def __via_graph_sexp_produce_doc_controller
 
-        Here_::Controller__.new @graph_sexp, @_BUID, @kernel, & @on_event_selectively
+        Here_::Controller__.new @graph_sexp, @_BUID, @kernel, & @listener
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

@@ -12,6 +12,8 @@ module Skylab::Snag
 
     class << self
 
+      # (track what is now boilerplate here with #[#ze-002.1] (might dry))
+
       def call * a, & p
         _microservice_invocation( p, a ).execute
       end
@@ -159,7 +161,7 @@ module Skylab::Snag
       o.models_branch_module = Models_
 
       o.bound_call_via_action_with_definition_by = -> act do
-        BoundCall_via_Action_with_Definition___[ act ]
+        Bound_call_via_action_with_definition___[ act ]
       end
 
       o.filesystem = ::Dir
@@ -168,35 +170,24 @@ module Skylab::Snag
 
   # ==
 
-  class BoundCall_via_Action_with_Definition___ < Common_::Monadic
+  Bound_call_via_action_with_definition___ = -> act do
 
-    # (will likely move up to a toolkit)
+    # (leaving this sort of thing here instead of pushing it up lets us
+    # see the significance of the various symbols and method names.)
 
-    def initialize act
-      @action = act
-    end
-
-    def execute
-      if __normal
-        Common_::BoundCall.by( & @action.method( :execute ) )
+    _fo_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
+      if :_parameter_SN_ == qual_item.injection_identifier
+        qual_item.item
       end
     end
 
-    def __normal
-      _st = __formal_parameter_stream
-      _ok = MTk_::Normalize.call_by do |o|
-        o.entity = @action
-        o.association_stream = _st
-      end
-      _ok  # hi. #todo
+    ok = MTk_::Normalization.call_by do |o|
+      o.association_stream_newschool = _fo_st
+      o.entity_nouveau = act
     end
 
-    def __formal_parameter_stream
-      Action_grammar___[].stream_via_array( @action.definition ).map_reduce_by do |qual_item|
-        if :_parameter_SN_ == qual_item.injection_identifier
-          qual_item.item
-        end
-      end
+    if ok  # downgrade false to nil
+      Common_::BoundCall.by( & act.method( :execute ) )
     end
   end
 
@@ -207,17 +198,9 @@ module Skylab::Snag
     # for now, we built our entity/action grammar here ourself.
     # one day maybe this will become a cleaner part of a toolkit
 
-    # ..
+    _param_gi = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
 
-    lib = Home_.lib_
-    Fields_ = lib.fields
-    Parse_ = lib.parse_lib
-
-    # ..
-
-    _param_gi = Fields_::CommonAssociation::EntityKillerParameter.grammatical_injection
-
-    _g = Parse_::IambicGrammar.define do |o|
+    _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
 
       o.add_grammatical_injection :_branch_desc_SN_, BRANCH_DESCRIPTION___
 

@@ -104,8 +104,8 @@ module Skylab::Zerk  # intro in [#001] README
       Home_.lib_.plugin::ModelCentricOperatorBranch
     end
 
-    lazily :Normalize do
-      Home_.lib_.fields::Toolkit::Normalize
+    lazily :Normalization do
+      Home_.lib_.fields::Normalization
     end
 
     lazily :ParseArguments_via_FeaturesInjections do

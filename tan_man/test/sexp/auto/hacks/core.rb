@@ -173,7 +173,8 @@ module Skylab::TanMan::TestSupport
 
     def _resolve_graph_sexp
 
-      @graph_sexp = Home_::Models_::DotFile.produce_parse_tree_with(
+      @graph_sexp = Home_::Models_::DotFile::
+          ParseTree_via_ByteUpstreamReference.via(
 
         :byte_upstream_reference,
           Byte_upstream_reference_[].via_string(
@@ -181,7 +182,7 @@ module Skylab::TanMan::TestSupport
 
         :generated_grammar_dir_path, existent_testing_GGD_path,
 
-        & handle_event_selectively_ )
+        & listener_ )
 
       nil
     end

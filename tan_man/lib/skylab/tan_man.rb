@@ -1,5 +1,4 @@
 require 'skylab/common'
-# require 'skylab/brazen'
 
 module Skylab::TanMan
 
@@ -8,15 +7,10 @@ module Skylab::TanMan
   end
 
   Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
 
   class << self
-
-    if false
-    define_method :application_kernel_, ( Lazy_.call do
-      Brazen_::Kernel.new Home_
-    end )
-    end
 
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
@@ -31,12 +25,6 @@ module Skylab::TanMan
       @___ssp ||= ::File.expand_path '../../..', __FILE__
     end
   end  # >>
-
-  Autoloader_ = Common_::Autoloader
-
-  # ==
-
-  # (reminder: `Models_` has an epoynymous file)
 
   # ==
 
@@ -59,7 +47,7 @@ module Skylab::TanMan
   end
 
   Attributes_actor_ = -> cls, * a do
-    Home_.lib_.fields::Attributes::Actor.via cls, a
+    Fields_lib_[]::Attributes::Actor.via cls, a
   end
 
   Path_lib_ = Lazy_.call do
@@ -74,6 +62,10 @@ module Skylab::TanMan
 
   Zerk_lib_ = Lazy_.call do
     Autoloader_.require_sidesystem :Zerk
+  end
+
+  Fields_lib_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Fields
   end
 
   # ==
@@ -130,8 +122,7 @@ module Skylab::TanMan
     # --
 
     Basic = sidesys[ :Basic ]
-    # = sidesys[ :Brazen ]  # for [sl]
-    Fields = sidesys[ :Fields ]
+    # = sidesys[ :Fields ]  # for [#sl-002]
     File_utils = stdlib[ :FileUtils ]
     Human = sidesys[ :Human ]
     Parse_lib = sidesys[ :Parse ]
@@ -139,7 +130,7 @@ module Skylab::TanMan
     String_IO = stdlib[ :StringIO ]
     System_lib___ = sidesys[ :System ]
     TT = stdlib[ :Treetop ]
-    # = sidesys[ :Zerk ]  # for [sl]
+    # = sidesys[ :Zerk ]  # for [#sl-002]
   end
 
   # ==

@@ -9,10 +9,25 @@ module Skylab::TanMan
         generated_grammar_dir_path: nil,
       )
 
-      def initialize & oes_p
-        if oes_p
-          @on_event_selectively = oes_p
+      def initialize & p
+        if p
+          __init_listener p
         end
+      end
+
+      def __init_listener use_p
+
+        # errors like file not found etc (that stem from path math errors)
+        # have causes that are so hard to track down we throw them so that
+        # the call stack is presented immediately rather than having to hunt
+
+        @listener = -> * i_a, & ev_p do
+          if :error == i_a.first && :stat_error == i_a[ 1 ]
+            raise ev_p[].exception
+          else
+            use_p[ * i_a, & ev_p ]
+          end
+        end ; nil
       end
 
       Here_::SyntaxNodes.class
@@ -21,7 +36,7 @@ module Skylab::TanMan
       def execute
 
         o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new(
-          & @on_event_selectively )
+          & @listener )
 
         o.receive_byte_upstream_reference @byte_upstream_reference
 
@@ -54,7 +69,7 @@ module Skylab::TanMan
           if :error == i_a.first
             raise ev_p[].to_exception
           else
-            @on_event_selectively.call( * i_a, & ev_p )
+            @listener.call( * i_a, & ev_p )
           end
         end
 

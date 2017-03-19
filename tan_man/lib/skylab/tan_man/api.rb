@@ -2,13 +2,19 @@ module Skylab::TanMan
 
   module API
 
-    # ~ stowaway API-related things here for now
+    # (track what is now boilerplate here with #[#ze-002.1] (might dry))
 
     class << self
 
-      def call * x_a, & oes_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+      def call * a, & p
+        bc = invocation_via_argument_array( a, & p ).to_bound_call_of_operator
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
+
+      def invocation_via_argument_array a, & p  # #testpoint
+        Require_microservice_toolkit___[]
+        _as = MTk_::API_ArgumentScanner.new a, & p
+        MicroserviceInvocation___.new InvocationResources___.new _as
       end
 
       def expression_agent_instance  # :+[#051]
@@ -16,7 +22,89 @@ module Skylab::TanMan
       end
     end  # >>
 
-    # ~
+    # ==
+
+    class MicroserviceInvocation___
+
+      def initialize invo_rsx
+        @_invocation_resources = invo_rsx
+      end
+
+      def execute
+        bc = to_bound_call_of_operator
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
+
+      def to_bound_call_of_operator
+
+        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+
+          o.argument_scanner = @_invocation_resources.argument_scanner
+
+          o.add_operators_injection_by do |inj|
+
+            inj.operators = @_invocation_resources.__microservice_operator_branch
+            inj.injector = :_no_injector_for_now_from_BR_
+          end
+        end
+
+        fo = _omni.parse_operator
+        if fo
+          _ref = fo.mixed_business_value
+          _ref.bound_call_of_operator_via_invocation_resouces( @_invocation_resources )
+        end
+      end
+    end
+
+    # ==
+
+    class InvocationResources___
+
+      def initialize as
+        @argument_scanner = as
+      end
+
+      def __microservice_operator_branch
+        Operator_branch___[]
+      end
+
+      def application_moniker
+        "tannimous mannimous"
+      end
+
+      def listener
+        @argument_scanner.listener
+      end
+
+      attr_reader :argument_scanner
+    end
+
+    # ==
+
+    Operator_branch___ = Lazy_.call do
+
+      MTk_::ModelCentricOperatorBranch.define do |o|
+
+        # (every imaginable detail of the below is explained at [#pl-011.1])
+
+        # every nerkiss under the derkiss has an actions module.
+        # use the filesystem to find the nerkisses
+
+        same = 'actions'
+
+        o.add_actions_module_path_tail ::File.join 'ping', same
+
+        o.add_model_modules_glob GLOB_STAR_, same
+
+        o.models_branch_module = Home_::Models_
+
+        o.bound_call_via_action_with_definition_by = -> act do
+          Home_::Model_::Bound_call_via_action_with_definition[ act ]
+        end
+
+        o.filesystem = ::Dir
+      end
+    end
 
     class InterfaceExpressionAgent___
       # follows [#ze-040]:#the-semantic-markup-guidelines
@@ -136,6 +224,19 @@ module Skylab::TanMan
       end
     end
 
+    # ==
+
+    Require_microservice_toolkit___ = Lazy_.call do
+      # (move this as appropriate)
+      Home_::MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
+    end
+
+    # ==
+    # ==
+
     DOT_ = '.'
+    GLOB_STAR_ = '*'
+
+    # ==
   end
 end

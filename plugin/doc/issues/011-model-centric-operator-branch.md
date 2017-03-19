@@ -56,7 +56,11 @@ in practice this requirement hasn't felt like a heavy cost so
 far. and one plus side of this trade-off is that we don't have to
 litter our non-participating participating business modules
 (business modules were formerly called "silos") with `Actions`
-consts with a value of nothing.
+consts with a value of nothing, for those model nodes that do
+not have corresponding actions.
+
+(side note, we still employ this technique for the equivalent
+of what we used to call "promoted" actions :[#here.1].)
 
 
 so:

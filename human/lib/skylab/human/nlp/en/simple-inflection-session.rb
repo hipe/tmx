@@ -12,7 +12,7 @@ module Skylab::Human
         end
       end  # >>
 
-      # this is its hacky power:
+      # this WAS its hacky power:
       #
       #   "#{ s a, :no }known person#{ s a } #{ s a, :is } #{ and_ a }".strip
       #
