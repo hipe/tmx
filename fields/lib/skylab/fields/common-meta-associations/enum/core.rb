@@ -6,7 +6,9 @@ module Skylab::Fields
 
     Parse = -> ai do  # association interpreter
 
-      ary = ai.meta_argument_scanner_.gets_one
+      n11n = ai.current_normalization_
+
+      ary = n11n.argument_scanner.gets_one
 
       box = Lazy_.call do
         bx = Common_::Box.new
@@ -16,7 +18,7 @@ module Skylab::Fields
         bx
       end
 
-      _ca = ai.association_
+      _ca = n11n.entity  # current association
 
       _ca.argument_value_consumer_by_ do |_atr|
 
@@ -61,7 +63,7 @@ module Skylab::Fields
     when_failed = -> qkn, bx, & oes_p do
 
       build_the_event = -> do
-        Here_::Build_extra_value_event.call(
+        Here_::Build_extra_value_event.call(  # 1x
           qkn.value_x,
           bx.get_keys,
           qkn.association.name,

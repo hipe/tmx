@@ -113,6 +113,8 @@ module Skylab::Fields
 
   class Attributes < ::Module  # :[#013].
 
+    # (subclass module because #here2)
+
     class << self
       alias_method :[], :new
       alias_method :call, :new
@@ -123,12 +125,12 @@ module Skylab::Fields
       @association_class = nil
       @_h = h
       @meta_associations_module = nil
-      # (can't freeze because #here-1)
+      # (can't freeze because #here1)
     end
 
     # --
 
-    # ~ (feature-island proof of concept..) (moved here at #history-B)
+    # ~ (feature-island proof of concept..) (moved here at #history-B) (:#here2)
 
     def define_meta_association___ * x_a, & p
       Home_::MetaAssociation_via_Iambic___.new( self, x_a, & p ).execute
@@ -160,6 +162,7 @@ module Skylab::Fields
     # ~
 
     attr_writer(
+      # ~ #cov2.12
       :association_class,
       :meta_associations_module,
     )
@@ -171,7 +174,7 @@ module Skylab::Fields
       normalize_by do |o|
 
         o.argument_array = a
-        o.entity = ent
+        o.entity_as_ivar_store = ent
         o.will_result_in_entity_on_success_
         o.listener = p
       end
@@ -182,7 +185,7 @@ module Skylab::Fields
       normalize_by do |o|
 
         o.argument_scanner = scn
-        o.entity = ent
+        o.entity_as_ivar_store = ent
         o.will_result_in_entity_on_success_
         o.listener = p
       end
@@ -191,7 +194,7 @@ module Skylab::Fields
     def normalize_entity ent, & p  # #coverpoint1.4
 
       normalize_by do |o|
-        o.entity = ent
+        o.entity_as_ivar_store = ent
         o.listener = p
       end
     end
@@ -229,7 +232,7 @@ module Skylab::Fields
       _index.read_association_ k
     end
 
-    def _index  # #here-1
+    def _index  # :#here1
       @___index ||= ___build_index
     end
     alias_method :association_index, :_index  # here, [ac]
@@ -398,23 +401,27 @@ module Skylab::Fields
           # an `ATTRIBUTES` const. ([#co-007.1] is one example.)
 
           # entities can say they are an attributes actor but not
-          # define an associations. (this is covered by running quickie)
+          # define associations. (this is covered by running quickie)
 
-          meths = argument_parsing_writer_method_name_passive_lookup_proc
-          _lookup_association_softly = -> k do
-            m = meths[ k ]
-            m and Home_::AssociationIndex_::MethodBasedAssociation.new m
-          end
+          meths = Home_::AssociationIndex_::Writer_method_reader[ self.class ]
 
           instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
 
           # (this call is used all over)
 
           x = Home_::Normalization.call_by do |o|
+
+            o.push_association_soft_reader_by__ do |k|  # exactly [#013]
+              m = meths[ k ]
+              m and Home_::AssociationIndex_::MethodBasedAssociation.new m
+            end
+
             o.argument_scanner = scn
-            o.push_association_soft_reader_by__( & _lookup_association_softly )
             o.association_index = _ascs_idx
-            o.entity = self  # for #spot-1-5, some association interpreters need to write directly
+
+            # for #spot-1-5, some association interpreters need to write directly
+            o.entity_as_ivar_store = self
+
             o.will_parse_passively__
             o.listener = p
           end
@@ -430,10 +437,6 @@ module Skylab::Fields
 
         def argument_scanner  # n.c
           @_argument_scanner_
-        end
-
-        def argument_parsing_writer_method_name_passive_lookup_proc  # #public-API #hook-in 1x, 
-          Home_::AssociationIndex_::Writer_method_reader[ self.class ]
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
@@ -552,7 +555,7 @@ module Skylab::Fields
 
   # ==
 
-  class CautiousAssociationIndex  # exactly [#002.E] "new lingua franca"
+  class CautiousAssociationIndex  # exactly [#002.E.2] "new lingua franca"
 
     def initialize p
 
@@ -751,7 +754,7 @@ module Skylab::Fields
 
   Produce_value___ = -> do
     # [#012.L.1] *DO* advance. (eager parsing)
-    argument_scanner.gets_one
+    argument_scanner_.gets_one
   end
 
   Consume_value___ = -> x, _ do
@@ -761,6 +764,9 @@ module Skylab::Fields
   # ==
 
   class SimplifiedName
+
+    # like [#co-060] but only symbol & ivar (& upgrades to name function)
+    # born as a base class for association but we use composition now instead
 
     def initialize k
       @cache_ = {}
@@ -1019,6 +1025,14 @@ module Skylab::Fields
 
   # --
 
+  module NO_LENGTH_ ; class << self
+    def length
+      0
+    end
+  end ; end
+
+  # --
+
   Attr_writer_method_name_ = -> name_symbol do
     :"#{ name_symbol }="
   end
@@ -1064,9 +1078,7 @@ module Skylab::Fields
   Lazy_ = Common_::Lazy
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
-  NILADIC_TRUTH_ = -> do
-    true
-  end
+  NILADIC_TRUTH_ = -> { TRUE }
   NOTHING_ = nil
   SPACE_ = ' '
   STOP_PARSING_ = false

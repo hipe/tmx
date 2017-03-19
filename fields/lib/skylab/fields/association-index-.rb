@@ -202,7 +202,7 @@ module Skylab::Fields
             diminishing_pool = asc_idx._diminishing_pool_prototype.dup
             delete = diminishing_pool.method :delete
           else
-            diminishing_pool = EMPTY_H_
+            diminishing_pool = NO_LENGTH_
             delete = MONADIC_EMPTINESS_
           end
 
@@ -298,7 +298,7 @@ module Skylab::Fields
 
       # ==
 
-      Writer_method_reader = -> cls do  # 1x. [fi] only
+      Writer_method_reader = -> cls do  # 1x. [fi] only. exactly [#013]
 
         -> name_sym do
 
@@ -354,7 +354,12 @@ module Skylab::Fields
       # -
         # -- exposures for #here-1
 
-        def add_to_the_custom_index_ k, meta_k
+        def add_to_the_custom_index__ n11n
+
+          meta_k = n11n.argument_scanner.gets_one
+          k = n11n.entity.name_symbol
+
+          # --
 
           _idx = ( @_custom_index ||= {} )
           _bx = _idx[ meta_k ] ||= Common_::Box.new
@@ -445,9 +450,6 @@ module Skylab::Fields
       end
 
       # ==
-
-      EMPTY_H_ = {}.freeze
-
       # ==
   end
 end

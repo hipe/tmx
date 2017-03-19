@@ -45,7 +45,7 @@ module Skylab::Fields::TestSupport
               end
 
               def yep
-                [ @_atr.name.as_variegated_symbol, * @_two ]
+                [ @_atr.name_symbol, * @_two ]
               end
             end
 

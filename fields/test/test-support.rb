@@ -234,6 +234,7 @@ module Skylab::Fields::TestSupport
 
   KEEP_PARSING_ = true
   MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = "\n"
   NIL_ = nil
   TS_ = self
 end

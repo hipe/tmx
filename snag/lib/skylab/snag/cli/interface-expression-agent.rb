@@ -56,16 +56,16 @@ module Skylab::Snag
         _strongly_emphasized _unstyled
       end
 
-      def render_property_as__argument__ prp
-        "<#{ prp.name.as_slug }>"
+      def render_property_as__argument__ asc
+        "<#{ _name_of( asc ).as_slug }>"
       end
 
-      def render_property_as__option__ prp
-        "--#{ prp.name.as_slug }"
+      def render_property_as__option__ asc
+        "--#{ _name_of( asc ).as_slug }"
       end
 
-      def render_property_as_unknown prp
-        "«#{ prp.name.as_slug }»"  # :+#guillemets
+      def render_property_as_unknown asc
+        "«#{ _name_of( asc ).as_slug }»"  # :+#guillemets
       end
 
       # ~~ )
@@ -132,7 +132,15 @@ module Skylab::Snag
         @___NLP_agent ||= Zerk_lib_[]::Expresser::NLP_EN_ExpressionAgent.new
       end
 
-      # ~
+      # ~ suport
+
+      def _name_of asc
+        if asc.respond_to? :name
+          asc.name
+        else
+          Common_::Name.via_lowercase_with_underscores_symbol asc.name_symbol
+        end
+      end
 
       def identifier_integer_width
         @_up.identifier_integer_width

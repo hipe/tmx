@@ -27,7 +27,6 @@ module Skylab::Fields
           @__mutex_only_one_special_result = nil
           @__mutex_only_one_valid_value_store = nil
           @_my_arg_scanner = nil
-          @_react_to_missing_requireds = :__express_missing_requireds
           @_result = :__result_normally
 
           @association_source = nil
@@ -78,18 +77,9 @@ module Skylab::Fields
           _receive_valid_value_store THE_EMPTY_SIMPLIFIED_VALID_VALUE_STORE___
         end
 
-        def entity= ent
-
-          # REMINDER: do nothing magical or presumptive here. at #spot-1-6
-          # the toolkit wires an entity up to normalization "manually" so
-          # we cannot (and should not) assume to know that the valid value
-          # store is an entity thru the use of this method..
-
-          if ent.respond_to? :_receive_missing_required_associations_
-            # #here-3 this should be temporary, only while [br]-era entities
-            @_react_to_missing_requireds = :__react_to_missing_requireds_entily
-          end
-
+        def entity_as_ivar_store= ent
+          # (until deeper integration, this is the one way)
+          self.ivar_store = ent
           @entity = ent
         end
 
@@ -195,21 +185,21 @@ module Skylab::Fields
         end
 
         def association_stream_oldschool= native_asc_st
-          _receive_association_source OLDSCHOOL_WHATAMI_AssociationSource___.new native_asc_st
+          receive_association_source_ OLDSCHOOL_WHATAMI_AssociationSource___.new native_asc_st
         end
 
         def association_stream_newschool= normal_asc_st
-          _receive_association_source NormalAssociationStreamBasedAssociationSource___.new normal_asc_st
+          receive_association_source_ NormalAssociationStreamBasedAssociationSource___.new normal_asc_st
         end
 
         def _touch_mutable_association_source
           if ! @association_source
-            _receive_association_source yield.new
+            receive_association_source_ yield.new
           end
           @association_source
         end
 
-        def _receive_association_source src
+        def receive_association_source_ src
           remove_instance_variable :@__mutex_only_one_association_source
           @association_source = src ; nil
         end
@@ -251,7 +241,6 @@ module Skylab::Fields
         end
 
         def _prepare_to_execute
-          _init_valid_value_store
           @_missing_required_MIXED_associations = nil
         end
 
@@ -317,18 +306,10 @@ module Skylab::Fields
           # formalized means of doing what we used to do, which was plain
           # and pass it around. (#tombstone-B in "association index")
 
-          _init_valid_value_store
           p = remove_instance_variable :@__execute_by
           freeze  # to send this object out into the wild, would be irresponsible not to
           _the_result = p[ self ]
           _the_result  # hi. #todo
-        end
-
-        def _init_valid_value_store  # EEW -
-          if instance_variable_defined? :@__mutex_only_one_valid_value_store
-            # (this happens at whatever's going on at #spot-1-5)
-            _receive_valid_value_store IvarBasedSimplifiedValidValueStore.new @entity
-          end
         end
 
         # -- F: traversing the "extroverted" associations
@@ -459,9 +440,21 @@ module Skylab::Fields
 
           asc_X_a = remove_instance_variable :@_missing_required_MIXED_associations
           if asc_X_a
-            send @_react_to_missing_requireds, asc_X_a
+            __when_missing_requireds asc_X_a
           else
             KEEP_PARSING_
+          end
+        end
+
+        def __when_missing_requireds asc_X_a
+
+          if instance_variable_defined? :@entity and
+              @entity.respond_to? :_receive_missing_required_associations_
+
+            # #coverpoint1.8 and #here-3 this should be temporary, or not
+            @entity._receive_missing_required_associations_ asc_X_a
+          else
+            __express_missing_requireds asc_X_a
           end
         end
 
@@ -481,11 +474,6 @@ module Skylab::Fields
             _e = _ev.to_exception
             raise _e
           end
-        end
-
-        def __react_to_missing_requireds_entily asc_X_a
-          # #coverpoint1.8 and #here-3 this should be temporary
-          @entity._receive_missing_required_associations_ asc_X_a
         end
 
         def __build_missing_required_event miss_sym_a
@@ -1095,10 +1083,6 @@ module Skylab::Fields
         end
 
         # -- A: support
-
-        def as_normalization_write_via_association_ x, asc
-          valid_value_store.write_via_association x, asc
-        end
 
         def valid_value_store
           send @__valid_value_store

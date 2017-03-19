@@ -8,7 +8,7 @@ module Skylab::Fields::TestSupport
     use :memoizer_methods
     use :attributes
 
-      context "for example if you wanted a \"list\"-style (`argument_arity` many)" do
+      context "for example if you wanted a \"list\"-style (`argument_arity` many)" do  # #cov2.12
 
         it "ok." do
           o = _cls.with :foopie, :x, :foopie, :y, :harbinger, :j, :foopie, :z

@@ -10,7 +10,7 @@ module Skylab::Fields
 
     Parse = -> ai do  # argument interpreter
 
-      scn = ai.meta_argument_scanner_
+      scn = ai.current_normalization_.argument_scanner
 
       defs = MethodsDefiner___.new
 

@@ -9,15 +9,15 @@ module Skylab::Fields
         module PrefixedModifiers
 
           def required
-            @parse_tree.become_required
+            @parse_tree.be_required
           end
 
           def flag
-            @parse_tree.become_flag
+            @parse_tree.be_flag
           end
 
           def glob
-            @parse_tree.become_glob
+            @parse_tree.be_glob
           end
 
           def property
@@ -52,7 +52,9 @@ module Skylab::Fields
 
     # -
 
-    module ClassicMetaAttributes  # 18 of them at writing. these are what unified us to "attributes"
+    module ClassicMetaAttributes  # :[#002.H.3]
+
+      # 18 of them at writing. these are what unified us to "attributes"
 
       # -- UI-level (the highest level here)
 
@@ -105,7 +107,7 @@ module Skylab::Fields
 
         @_association_.argument_value_producer_by_ do
           -> do
-            Common_::Known_Known[ argument_scanner.gets_one ]
+            Common_::Known_Known[ argument_scanner_.gets_one ]
           end
         end
       end
@@ -120,7 +122,7 @@ module Skylab::Fields
 
         ca.argument_value_producer_by_ do
           -> do
-            [ argument_scanner.gets_one ]
+            [ argument_scanner_.gets_one ]
           end
         end
 
@@ -162,7 +164,7 @@ module Skylab::Fields
 
       # ~
 
-      def flag  # #cov2.1
+      def flag  # #cov2.1. an interpretation whose value is always `true`
 
         @_association_.argument_value_producer_by_ do
           NILADIC_TRUTH_
@@ -171,7 +173,7 @@ module Skylab::Fields
         @_association_.argument_arity = :zero
       end
 
-      def flag_of  # #cov2.1 like `flag` but ..
+      def flag_of  # #cov2.1 says "use this other association, but give it `true`"
 
         sym = @_meta_argument_scanner_.gets_one
 
@@ -205,7 +207,7 @@ module Skylab::Fields
 
       # -- lower-level, governs interaction with value store
 
-      def ivar  # #cov2.5
+      def ivar  # #cov2.5 for indicating a non-normal ivar to use for storage
         @_association_.as_ivar = @_meta_argument_scanner_.gets_one
       end
 
@@ -222,12 +224,15 @@ module Skylab::Fields
 
           -> do
             _ca = @_normalization_.entity.send m  # no yield for now - if you need it, use [ac]
-            _ca.interpret_component argument_scanner, @_association_
+            _ca.interpret_component argument_scanner_, @_association_
           end
         end
       end
 
       def custom_interpreter_method  # #cov2.5
+
+        # a full replacement for the entire interpretation process of
+        # interpreting the attribute value.
 
         # created to facilitate custom aliases [hu].
         # also bolsters readability for hybrid actors.
@@ -240,7 +245,7 @@ module Skylab::Fields
             ent = @_normalization_.entity
 
             if ! ent.instance_variable_defined? ARGUMENT_SCANNER_IVAR_
-              ent.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner
+              ent.instance_variable_set ARGUMENT_SCANNER_IVAR_, argument_scanner_
               yes = true
             end
 
@@ -260,7 +265,7 @@ module Skylab::Fields
         @_association_.argument_interpreter_by_ do |_atr|
 
           -> do
-            x = @_normalization_.entity.send m, argument_scanner
+            x = @_normalization_.entity.send m, argument_scanner_
             if ACHIEVED_ == x
               KEEP_PARSING_
             else

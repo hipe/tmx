@@ -65,7 +65,7 @@ module Skylab::Autonomous_Component_System
 
         def evaluation_of par
 
-          ivar = par.name.as_ivar
+          ivar = par.as_ivar
 
           if @_sess.instance_variable_defined? ivar
 

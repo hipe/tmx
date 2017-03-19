@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  class CommonAssociation < SimplifiedName  # :[#039].
+  class CommonAssociation  # :[#039].
 
     # this file holds both the "entity killer" association class and also
     # the older (but widespread) "common association".
@@ -74,15 +74,15 @@ module Skylab::Fields
 
         # --
 
-        def become_required
+        def be_required
           @is_required = true ; ACHIEVED_
         end
 
-        def become_flag
+        def be_flag
           _argument_arity_mutex :@is_flag
         end
 
-        def become_glob
+        def be_glob
           _argument_arity_mutex :@is_glob
         end
 
@@ -135,7 +135,10 @@ module Skylab::Fields
 
         init_association_value_producer_consumer_ivars_
 
-        super  # yields self
+        @as_ivar = nil
+        @name_symbol = k  # setting this below before adds parsimony #spot-1-1
+        yield self
+        freeze
       end
 
       def dup_by & edit_p
@@ -149,12 +152,12 @@ module Skylab::Fields
         otr.__orig_freeze
       end
 
-      # -- be normalizant
+      attr_writer(
+        :argument_arity,
+        :as_ivar,
+      )
 
-      def be_optional__
-        _become_optional_once
-        NIL_
-      end
+      # -- be normalizant (1 of 3)
 
       def be_defaultant_by_value__ x
         # ..
@@ -164,16 +167,18 @@ module Skylab::Fields
       end
 
       def be_defaultant_by_ & p
-        _become_optional_once
+
+        _be_optional  # this is now in violation of [#002] interplay 1, but waiting for coverage
         @default_proc = p
         NIL_
       end
 
-      # -- required-ness
+      # -- required-ness (2 of 3)
 
-      def _become_optional_once
+      def _be_optional
         _write_parameter_arity_once :zero_or_one
       end
+      alias_method :be_optional__, :_be_optional
 
       def be_required__
         _write_parameter_arity_once :one
@@ -204,7 +209,7 @@ module Skylab::Fields
         @__parameter_arity  # hi.
       end
 
-      # --
+      # -- very high-level & low-level
 
       def accept_description_proc__ p
 
@@ -215,6 +220,12 @@ module Skylab::Fields
         @description_proc = p ; nil
       end
 
+      def as_ivar
+        @as_ivar || :"@#{ @name_symbol }"  # meh (used to cache, #tombstone-B)
+      end
+
+      # --
+
       alias_method :__orig_freeze, :freeze
       def freeze
         remove_instance_variable :@_write_parameter_arity_once
@@ -222,13 +233,13 @@ module Skylab::Fields
         NIL
       end
 
-      # --
+      # == "read" (use)
 
       def as_association_write_into_against ent, scn  # result in kp. #coverpoint1.3, [hu]
 
         Home_::Normalization.call_by do |o|
           o.argument_scanner = scn
-          o.entity = ent
+          o.entity_as_ivar_store = ent
           o.execute_by__ = -> n11n, & p do
             as_association_interpret_ n11n, & p  # hi. #todo
           end
@@ -241,14 +252,11 @@ module Skylab::Fields
         _dsl.__as_DSL_flush_commonly_for_normalize_in_place_
       end
 
-      attr_writer(
-        :argument_arity,
-      )
-
       attr_reader(
         :argument_arity,
         :default_proc,
         :description_proc,
+        :name_symbol,
         :parameter_arity_is_known,
       )
 
@@ -269,4 +277,5 @@ module Skylab::Fields
     # ==
   end
 end
+# #tombstone-B (could be temporary): used to subclass simple name
 # #tombstone-A: moved what's now "argument value producer consumer" up & out

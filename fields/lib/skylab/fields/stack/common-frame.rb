@@ -545,7 +545,8 @@ module Skylab::Fields
           _asc_st = entity.class.properties.to_value_stream
 
           Home_::Normalization.call_by do |o|
-            o.entity = entity
+
+            o.entity_as_ivar_store = entity
             o.association_stream_oldschool = _asc_st
           end
         end

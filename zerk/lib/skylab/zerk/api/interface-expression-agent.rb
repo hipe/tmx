@@ -93,8 +93,10 @@ module Skylab::Zerk
       def parameter_in_black_and_white x
         if x.respond_to? :ascii_only?
           "'#{ x }'"
-        else
+        elsif x.respond_to? :name
           nm x.name
+        else
+          nm Common_::Name.via_lowercase_with_underscores_symbol x.name_symbol
         end
       end
 

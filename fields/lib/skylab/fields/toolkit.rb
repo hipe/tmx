@@ -34,7 +34,7 @@ module Skylab::Fields
         @argument_scanner ||= @entity._argument_scanner_
         @listener ||= @entity._listener_
 
-        Home_::Normalization.call_by do |o|  # :#spot-1-6
+        Home_::Normalization.call_by do |o|
 
           if @_did
             o.association_stream_newschool = remove_instance_variable :@__as  # [sn]

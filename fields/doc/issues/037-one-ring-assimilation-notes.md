@@ -50,7 +50,7 @@ other formal properties.
 
 our pedagogical example of a meta-property is often "requiredness". but
 actually, that is becoming a poor example of a meta-property with the
-ideas we will formulate in [#038] the meta-meta-attribute justification.
+ideas we will formulate in [#002.9] the meta-meta-attribute justification.
 
 the defining characteristic of meta-properties is that they are
 business-specific. (and yes, what constitues "business logic" apart from

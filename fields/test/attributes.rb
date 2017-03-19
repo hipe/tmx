@@ -46,7 +46,7 @@ module Skylab::Fields::TestSupport
         p = -> do
           p = nil
           word = 'parameter'
-          with = Expect_missinger_[ word, "\n" ]  # NEWLINE_
+          with = Expect_missinger_[ word, NEWLINE_ ]
           without = Expect_missinger_[ word ]
         end
       end.call

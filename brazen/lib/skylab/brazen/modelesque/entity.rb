@@ -110,7 +110,7 @@ module Skylab::Brazen
         _asc_st = formal_properties.to_value_stream
 
         _ok = Home_.lib_.fields::Normalization.call_by do |o|
-          o.entity = self
+          o.entity_as_ivar_store = self
           o.association_stream_oldschool = _asc_st
           o.listener = handle_event_selectively
         end

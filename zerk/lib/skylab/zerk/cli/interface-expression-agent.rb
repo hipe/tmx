@@ -109,19 +109,19 @@ module Skylab::Zerk
         _NLP_agent.or_ x
       end
 
-      def par prp  # referenced by :[#115].
-        if prp
-          highlight parameter_in_black_and_white prp
+      def par asc  # referenced by :[#115].
+        if asc
+          highlight parameter_in_black_and_white asc
         else
-          prp
+          asc
         end
       end
 
-      def parameter_in_black_and_white prp
+      def parameter_in_black_and_white asc
 
-        m, * a = @_injection.expression_strategy_for_property prp
+        m, * a = @_injection.expression_strategy_for_property asc
 
-        send m, prp, * a
+        send m, asc, * a
       end
 
       rx = nil
@@ -157,26 +157,26 @@ module Skylab::Zerk
         end
       end
 
-      def render_property_in_black_and_white_customly prp
-        @_injection._etc_customly[ prp, self ]
+      def render_property_in_black_and_white_customly asc
+        @_injection._etc_customly[ asc, self ]
       end
 
-      def render_property_as__option__ prop
-        "--#{ prop.name.as_slug }"
+      def render_property_as__option__ asc
+        "--#{ _name_of( asc ).as_slug }"
       end
 
-      def render_property_as__argument__ prop
-        "<#{ prop.name.as_slug }>"
+      def render_property_as__argument__ asc
+        "<#{ _name_of( asc ).as_slug }>"
       end
 
       alias_method :render_property_as_argument, :render_property_as__argument__
 
-      def render_property_as__environment_variable__ prp
-        @_injection.environment_variable_name_string_via_property_ prp
+      def render_property_as__environment_variable__ asc
+        @_injection.environment_variable_name_string_via_property_ asc
       end
 
-      def render_propperty_without_styling prp
-        prp.name.as_slug
+      def render_propperty_without_styling asc
+        _name_of( asc ).as_slug
       end
 
       def s * x_a
@@ -214,6 +214,14 @@ module Skylab::Zerk
 
       def _NLP_agent
         @___NLP_agent ||= Home_::Expresser::NLP_EN_ExpressionAgent.new
+      end
+
+      def _name_of asc
+        if asc.respond_to? :name
+          asc.name
+        else
+          Common_::Name.via_lowercase_with_underscores_symbol asc.name_symbol
+        end
       end
 
       # -- #experiment
@@ -259,8 +267,8 @@ module Skylab::Zerk
           @_etc_customly
         end
 
-        def expression_strategy_for_property prp
-          @_expression_strategy_for_property[ prp ]
+        def expression_strategy_for_property asc
+          @_expression_strategy_for_property[ asc ]
         end
       end
 

@@ -87,7 +87,7 @@ module Skylab::Fields::TestSupport
         the_attributes_
       end
 
-      it "does fail (raises exception) at definition parsing time" do
+      it "does fail (raises exception) at definition parsing time" do  # :#cov2.11 (1x)
 
         attrs = the_attributes_
 
@@ -99,7 +99,9 @@ module Skylab::Fields::TestSupport
         rescue Home_::ArgumentError => e
         end
 
-        e.message.should match _rx
+        s_a = e.message.split NEWLINE_
+        s_a.first == "unrecognized meta-association 'floozie_poozie'." || fail
+        s_a.last =~ /\Adid you mean '/ || fail
       end
     end
 

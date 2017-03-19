@@ -85,13 +85,11 @@
 
 [#016]       [ actor ]  (will move from [co])
 
-[#015] #open near-term smalls & mediums near "one-ring"
-
-             [#here.1] in-situ WRONG
+[#015] #hole
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 
-[#013] #hole
+[#013]       "simple, association-based method interpreters .."
              ( #was: the defined attributes set structure )
 
 [#012]       now the "normal normalization" algorithm (and its variants)..
@@ -167,7 +165,8 @@
 
 [#010]       the external functions experiment ..
 
-[#009] #hole
+[#009]       shared tombstones
+             [#here.1]: as described in-situ throughout
              ( #was: meta-attributes .. )
              ( #was: transplant "parameters" from [hl] )
 

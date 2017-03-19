@@ -2,7 +2,7 @@ module Skylab::Fields
 
   module CommonMetaAssociations::Enum
 
-    class Build_extra_value_event
+    class Build_extra_value_event  # 1x
 
       # (a session interface to build an event so..)
 
