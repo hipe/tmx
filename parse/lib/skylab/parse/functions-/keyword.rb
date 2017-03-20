@@ -19,20 +19,18 @@ module Skylab::Parse
         @minimum_number_of_characters = nil
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022], [#ca-057]
+      def as_attributes_actor_parse_and_normalize scn   # [#co-057]
 
-        @formal_string = st.gets_one
+        @formal_string = scn.gets_one
 
-        _kp = if st.no_unparsed_exists
-          KEEP_PARSING_
+        if scn.no_unparsed_exists
+          as_attributes_actor_normalize  # but why
         else
           super
         end
-
-        _kp && normalize
       end
 
-      def normalize
+      def as_attributes_actor_normalize
         @moniker_symbol ||= @formal_string.intern
         @formal_length = @formal_string.length
         @does_need_hotstring = true

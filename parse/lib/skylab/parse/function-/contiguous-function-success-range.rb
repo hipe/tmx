@@ -45,14 +45,16 @@ module Skylab::Parse
 
         # ~ for construction:
 
-        def process_argument_scanner_passively st  # #hook-in to [cb] actor construction
+        def as_attributes_actor_parse_and_normalize scn
 
           # we need at least and at most one parse function.
 
-          f = Home_.function( st.gets_one ).via_argument_scanner_passively st
-          f and begin
+          f = Home_.function( scn.gets_one ).via_argument_scanner_passively scn
+          if f
             @f = f
             KEEP_PARSING_
+          else
+            f
           end
         end
 

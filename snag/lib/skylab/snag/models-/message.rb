@@ -37,11 +37,7 @@ module Skylab::Snag
         @p_a = []
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
         @p_a.freeze
         freeze
         KEEP_PARSING_

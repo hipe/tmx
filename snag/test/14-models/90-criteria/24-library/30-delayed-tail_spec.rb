@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport
     TS_[ self ]
     use :criteria_magnetics
 
-    it "build this simplest of grammars" do
+    it "build this simplest of grammars" do  # #lends-coverage to [#pa-010.1]
 
       _simplest_width
     end

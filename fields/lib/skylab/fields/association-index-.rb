@@ -29,8 +29,8 @@ module Skylab::Fields
             h[ k ] = asc
           end
 
-          @_diminishing_pool_prototype = pool_proto.freeze
-          @_hash = h.freeze
+          @diminishing_pool_prototype_ = pool_proto.freeze
+          @association_hash_ = h.freeze
         end
 
         def AS_ASSOCIATION_INDEX_NORMALIZE_BY  # 1x [ta], covered here
@@ -51,7 +51,7 @@ module Skylab::Fields
           begin
             k = st.gets
             k || break
-            @_hash.fetch( k ).enhance_this_entity_class_ cls
+            @association_hash_.fetch( k ).enhance_this_entity_class_ cls
             redo
           end while above
           NIL
@@ -72,11 +72,11 @@ module Skylab::Fields
         end
 
         def association_array  # [ac]
-          @___association_array ||= @_hash.values.freeze
+          @___association_array ||= @association_hash_.values.freeze
         end
 
         def to_native_association_stream  # [ac] and 1x here.
-          ea = @_hash.each_value
+          ea = @association_hash_.each_value
           Common_.stream do
             begin
               ea.next
@@ -100,15 +100,48 @@ module Skylab::Fields
         end
 
         def read_association_ k
-          @_hash.fetch k
+          @association_hash_.fetch k
         end
 
         # --
 
+      # ~ (
+
+      Argument_value_parser_via_normalization__ = -> n11n do
+
+        # if there is no argument index then this is called as a proc.
+        # if there is a typical arg index then this is called as a method.
+        # at #spot1-6 we inject a different approach.
+
+        scn = n11n.argument_scanner
+        listener = n11n.listener
+
+        -> native_asc do
+          scn.advance_one  # #[#012.L.1] advance past the primary name
+          native_asc.as_association_interpret_ n11n, & listener
+        end
+      end
+
+      Extroverted_association_normalizer_via_normalization__ = -> n11n do
+
+        -> native_asc do
+
+          native_asc.as_association_normalize_in_place_ n11n
+        end
+      end
+
+      # ~ )
+
+        define_method :argument_value_parser_via_normalization_,
+          Argument_value_parser_via_normalization__
+
+        define_method :extroverted_association_normalizer_via_normalization_,
+          Extroverted_association_normalizer_via_normalization__
+
         attr_reader(
+          :association_hash_,
           :_custom_index,
-          :_diminishing_pool_prototype,
-          :_hash,
+          :diminishing_pool_prototype_,
           :required_is_default_,
         )
       # -
@@ -129,7 +162,7 @@ module Skylab::Fields
 
           if asc_idx
 
-            asc_h = asc_idx._hash
+            asc_h = asc_idx.association_hash_
             as_source_push_association_soft_reader_by_ do |k|
               asc_h[ k ]  # (hi.)
             end
@@ -189,21 +222,27 @@ module Skylab::Fields
 
         def flush_injection_for_argument_traversal o, n11n
 
-          scn = n11n.argument_scanner
-          listener = n11n.listener
-
-          o.argument_value_parser = -> native_asc do
-            scn.advance_one  # #[#012.L.1] advance past the primary name
-            native_asc.as_association_interpret_ n11n, & listener
-          end
-
           asc_idx = @association_index_
+
           if asc_idx
-            diminishing_pool = asc_idx._diminishing_pool_prototype.dup
-            delete = diminishing_pool.method :delete
+
+            dim_pool = asc_idx.diminishing_pool_prototype_.dup
+
+            o.extroverted_diminishing_pool = dim_pool
+
+            delete = dim_pool.method :delete
+
+            o.argument_value_parser =
+              asc_idx.argument_value_parser_via_normalization_ n11n
+
           else
-            diminishing_pool = NO_LENGTH_
+
+            o.extroverted_diminishing_pool = NO_LENGTH_
+
             delete = MONADIC_EMPTINESS_
+
+            o.argument_value_parser =
+              Argument_value_parser_via_normalization__[ n11n ]
           end
 
           read = _association_soft_reader
@@ -216,18 +255,19 @@ module Skylab::Fields
             end
           end
 
-          o.extroverted_diminishing_pool = diminishing_pool
-
           NIL
         end
 
         def flush_injection_for_remaining_extroverted o, n11n
 
-          o.extroverted_association_normalizer = -> native_asc do
+          o.extroverted_association_normalizer = if @association_index_
 
-            native_asc.as_association_normalize_in_place_ n11n
+            @association_index_.
+              extroverted_association_normalizer_via_normalization_ n11n
+          else
+
+            Extroverted_association_normalizer_via_normalization__[ n11n ]
           end
-
           NIL
         end
 
@@ -241,11 +281,14 @@ module Skylab::Fields
           # other meta-associations in associations in our extroverted index,
           # it will be effected below!
 
-          o.extroverted_association_normalizer = -> native_asc do
+          o.extroverted_association_normalizer = if @association_index_
 
-            native_asc.as_association_normalize_in_place_ n11n
+            @association_index_.
+              extroverted_association_normalizer_via_normalization_ n11n
+          else
+
+            Extroverted_association_normalizer_via_normalization__[ n11n ]
           end
-
           NIL
         end
 
@@ -256,7 +299,7 @@ module Skylab::Fields
             self._COVER_ME_AND_DESIGN_ME__how_to_stream_when_no_index
           end
 
-          scn = Scanner_.call asc_idx._diminishing_pool_prototype.keys
+          scn = Scanner_.call asc_idx.diminishing_pool_prototype_.keys
 
           read = _association_soft_reader
 
@@ -403,7 +446,7 @@ module Skylab::Fields
         end
       # -
 
-      class BoxBasedSimplifiedValidValueStore  # (this sees use at #spot-1-2)
+      class BoxBasedSimplifiedValidValueStore  # (this sees use at #spot1-2)
 
         def initialize bx
           @_box = bx
@@ -445,7 +488,7 @@ module Skylab::Fields
         end
 
         def as_association_interpret_ n11n, & x_p
-          n11n.entity.send @__m, & x_p  # :#spot-1-5
+          n11n.entity.send @__m, & x_p  # :#spot1-5
         end
       end
 

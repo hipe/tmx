@@ -72,7 +72,8 @@ module Skylab::Basic
 
       def to_stream_of moda_sym, * x_a
 
-        _expad( x_a, moda_sym )::Actors::Build_stream.call_via_iambic x_a
+        _ = _expad( x_a, moda_sym )::Actors::Build_stream
+        _.call_via_iambic x_a
       end
 
       def _expad x_a, modality_symbol  # mutates arg

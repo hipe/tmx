@@ -23,11 +23,7 @@ module Skylab::Human
         @__slots = Common_::Box.new
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
         h = remove_instance_variable( :@__slots ).h_
         h.each_pair do | sym, x |
           instance_variable_set :"@#{ sym }", x

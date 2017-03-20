@@ -17,7 +17,7 @@ module Skylab::Parse::TestSupport
       include InstaceMethods__  # could get you in trouble depending
 
       def initialize x_a, tc
-        @SCANNER = Common_::Scanner.via_array x_a
+        @SCANNER = Home_::Scanner_[ x_a ]
         @_test_context = tc
       end
 
@@ -53,7 +53,7 @@ module Skylab::Parse::TestSupport
       end
 
       def against * x_a
-        @SCANNER = Common_::Scanner.via_array x_a
+        @SCANNER = Home_::Scanner_[ x_a ]
       end
 
       def iambic_grammar_library_module

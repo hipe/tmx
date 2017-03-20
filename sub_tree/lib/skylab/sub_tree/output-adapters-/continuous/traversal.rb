@@ -12,17 +12,12 @@ module Skylab::SubTree
       )
 
       def initialize
-
         @curr_a = []
         @do_verbose_lines = false
         @matrix_a = []
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
         @glyph_set ||= Home_.lib_.basic::Tree.unicode::GlyphSets::WIDE
         @sep ||= SEP_
         KEEP_PARSING_

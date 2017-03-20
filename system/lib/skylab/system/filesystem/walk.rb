@@ -52,11 +52,7 @@ module Skylab::System
           @property_symbol = nil
         end
 
-        def process_argument_scanner_passively st  # #[#fi-022]
-          super && normalize
-        end
-
-        def normalize
+        def as_attributes_actor_normalize
           @filesystem ||= Home_.services.filesystem
           KEEP_PARSING_
         end

@@ -58,11 +58,7 @@ module Skylab::System
         @_was_newline = true
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
         @niladic_pass_filter_proc ||= NILADIC_TRUTH_
         KEEP_PARSING_
       end

@@ -42,13 +42,9 @@ module Skylab::Basic
           @minimum = nil
         end
 
-        def process_iambic_passively st  # #[#fi-022]
-          super && normalize
-        end
-
-        def normalize
+        def as_attributes_actor_normalize
           _normalize_self
-          if ! @qualified_knownness
+          if ! ( @qualified_knownness || @knownness )
             freeze
           end
           KEEP_PARSING_

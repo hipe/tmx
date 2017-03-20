@@ -101,7 +101,11 @@ module Skylab::CSS_Convert
         @on_event_selectively = oes_p
       end
 
-      def normalize  # near #[#fi-022]
+      def as_attributes_actor_normalize
+        self._NO__the_subject_class_is_only_ever_called_wierdly
+      end
+
+      def __normalize_
         # all this does is defaulting so we don't want to bother wiring it
         self.class::ATTRIBUTES.normalize_entity self
       end
@@ -148,8 +152,7 @@ module Skylab::CSS_Convert
     def convert directives_file
 
       @_directives_path = directives_file
-
-      ok = _attribute_values.normalize
+      ok = _attribute_values.__normalize_
       ok &&= __resolve_directives
       ok &&= __via_directives
       ok || @_result

@@ -46,8 +46,8 @@ module Skylab::Snag
           :subject_number,
         )
 
-        def process_argument_scanner_passively st  # variant of #[#fi-022]
-          super && freeze
+        def as_attributes_actor_normalize
+          freeze
         end
 
         attr_reader :subject_number

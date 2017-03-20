@@ -57,7 +57,7 @@ module Skylab::Parse::TestSupport
       before :all do
         X_f_sp_Digits = begin
 
-          _NNI = Home_.function( :non_negative_integer )
+          _NNI = Home_.function :non_negative_integer
 
           Home_.function( :spending_pool ).with(
           :functions,

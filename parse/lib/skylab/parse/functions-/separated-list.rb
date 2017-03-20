@@ -15,11 +15,7 @@ module Skylab::Parse
         # (hi.)
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
 
         @p = if @single_separator_mode
           __build_proc_for_one_separator

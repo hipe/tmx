@@ -91,13 +91,13 @@ module Skylab::Parse
           # args are matchers (constituency of the grammar). if unparsed
           # exists raise argument error. otherwise result is output tuple.
 
-          arg_st = Common_::Scanner.via_array a
-          input_array = arg_st.gets_one
+          scn = Scanner_[ a ]
+          input_array = scn.gets_one
 
           with(
             :function_objects_array, Common_.stream do
-              if arg_st.unparsed_exists
-                Functions_::Simple_Matcher.via_proc arg_st.gets_one
+              if scn.unparsed_exists
+                Functions_::Simple_Matcher.via_proc scn.gets_one
               end
             end.to_a ).to_parse_array_fully_proc[ input_array ]
         end

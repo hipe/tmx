@@ -67,7 +67,7 @@ module Skylab::Parse
     #
     #     Digits = begin
     #
-    #       _NNI = Home_.function( :non_negative_integer )
+    #       _NNI = Home_.function :non_negative_integer
     #
     #       Home_.function( :spending_pool ).with(
     #       :functions,
@@ -217,9 +217,7 @@ module Skylab::Parse
         end
 
         if did_parse_any
-
           Home_::OutputNode.with res_a, :did_spend_function, did_spend_all
-
         end
       end
     end

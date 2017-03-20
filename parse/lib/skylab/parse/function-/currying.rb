@@ -23,24 +23,30 @@ module Skylab::Parse
       )
 
       def initialize
-
         @input_stream = nil
         super
       end
 
-      def process_argument_scanner_passively st
+      def as_attributes_actor_parse_and_normalize scn
 
         # :+#experimental custom syntax - enclosing a flat list of
         # constituents in an array: nicer than a `end_functions` token?
 
-        a = ::Array.try_convert st.head_as_is
+        a = ::Array.try_convert scn.head_as_is
         if a
 
-          st.advance_one
+          scn.advance_one
 
-          _st = Common_::Scanner.via_array a
+          if ! scn.no_unparsed_exists
+            # this is OK. in fact this is the point. if we are handed a whole
+            # array to parse then the beginning ending boundaries of our
+            # surface expression are already defined for us. anything after
+            # it is not our concern. :[#010.1] #borrow-coverage from [sn]
+          end
 
-          _process_functions_via_argument_scanner _st
+          _scn_ = Scanner_[ a ]
+
+          _process_functions_via_argument_scanner _scn_
         else
           super
         end
@@ -54,11 +60,11 @@ module Skylab::Parse
       end
 
       def matcher_functions=
-        st = argument_scanner
+        scn = argument_scanner
         @function_a = []
         cls = Home_::Functions_::Simple_Matcher
-        while st.unparsed_exists
-          @function_a.push cls.via_proc st.gets_one
+        while scn.unparsed_exists
+          @function_a.push cls.via_proc scn.gets_one
         end
         KEEP_PARSING_
       end
@@ -68,11 +74,11 @@ module Skylab::Parse
         _process_functions_via_argument_scanner argument_scanner
       end
 
-      def _process_functions_via_argument_scanner st
+      def _process_functions_via_argument_scanner scn
 
         @function_a = []
 
-        st_ = __produce_parse_function_stream_via_argument_scanner st
+        st_ = __produce_parse_function_stream_via_argument_scanner scn
 
         begin
           f = st_.gets
@@ -84,15 +90,15 @@ module Skylab::Parse
         UNABLE_ != f
       end
 
-      def __produce_parse_function_stream_via_argument_scanner st
+      def __produce_parse_function_stream_via_argument_scanner scn
 
         Common_.stream do
-          if st.unparsed_exists
-            sym = st.gets_one
+          if scn.unparsed_exists
+            sym = scn.gets_one
             if :end_functions == sym
               nil  # not false
             else
-              Home_.function( sym ).via_argument_scanner_passively st
+              Home_.function( sym ).via_argument_scanner_passively scn
             end
           end
         end

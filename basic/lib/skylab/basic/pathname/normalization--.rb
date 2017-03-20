@@ -42,8 +42,8 @@ module Skylab::Basic
           @absolute_is_OK = @relative_is_OK = true
         end
 
-        def process_argument_scanner_passively st  # #[#fi-022]
-          super && freeze
+        def as_attributes_actor_normalize
+          freeze
         end
 
         def initialize_copy _otr_

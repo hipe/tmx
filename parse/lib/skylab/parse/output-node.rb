@@ -11,9 +11,9 @@ module Skylab::Parse
       )
 
       # == begin retrofitting for nasty old syntax:
-      #    when built with atom, init as atom as we do (A)
-      #    when building a new one, do [#ca-057] an "ideal mixed syntax" (B)
-      #    when duping & modifying, use plain-old iambic syntax (C)
+      #    when built with atom, init as atom as we do #here1
+      #    when building a new one, do [#ca-057] an "ideal mixed syntax" #here2
+      #    when duping & modifying, use plain-old iambic syntax #here3
 
       class << self
 
@@ -26,10 +26,10 @@ module Skylab::Parse
       end  # >>
 
       def initialize
-        # (hi.)
+        @_do_be_fancy = true
       end
 
-      def __init_for_atom x  # :(A)
+      def __init_for_atom x  # #here1
         @function_is_spent = true
         @value_x = x
         self
@@ -37,18 +37,26 @@ module Skylab::Parse
 
       @the_empty_node = self.for( nil ).freeze
 
-      def with * x_a  # :(C)
+      def with * x_a  # #here3
+
         o = dup
-        _st = scanner_via_array x_a
-        _kp = o.send :___eek_orig_etc, _st
+
+        o.__do_NOT_be_fancy
+
+        _kp = o.send :process_argument_scanner_fully, scanner_via_array( x_a )
+
         _kp && o
       end
 
-      alias_method :___eek_orig_etc, :process_argument_scanner_passively
+      def __do_NOT_be_fancy
+        @_do_be_fancy = false
+      end
 
-      def process_argument_scanner_passively st  # :(B)
-        # implement a [#ca-057] "ideal mixed syntax"
-        @value_x = st.gets_one
+      def as_attributes_actor_parse_and_normalize scn  # #here2
+
+        if remove_instance_variable :@_do_be_fancy
+          @value_x = scn.gets_one
+        end
         super
       end
 

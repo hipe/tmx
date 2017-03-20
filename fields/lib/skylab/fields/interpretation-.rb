@@ -138,7 +138,7 @@ module Skylab::Fields
 
           as = n11n.argument_scanner
 
-          _meta_association_name_symbol = as.gets_one  ##spot-1-1 ("parsimony")
+          _meta_association_name_symbol = as.gets_one  ##spot1-1 ("parsimony")
 
           # the below two are used so frequently, we set them as ivars here
           # to make association interpretation code less magic looking but..
@@ -294,7 +294,7 @@ module Skylab::Fields
 
       def __any_stored_value_is_effectively_nil
 
-        vvs = @_normalization_.valid_value_store  # :#spot-1-2
+        vvs = @_normalization_.valid_value_store  # :#spot1-2
 
         if vvs.knows_value_for_association @_association_
           was_defined = true

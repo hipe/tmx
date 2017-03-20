@@ -129,10 +129,8 @@ module Skylab::Parse
             # (hi.)
           end
 
-          def process_argument_scanner_passively st
-            kp = super
-            kp && freeze
-            kp
+          def as_attributes_actor_normalize
+            freeze
           end
 
           def via_iambic x_a

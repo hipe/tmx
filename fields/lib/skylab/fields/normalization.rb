@@ -13,7 +13,7 @@ module Skylab::Fields
       # unification, but this file file/node still has:
       #
       #   - the "one ring" preferred normalization facility
-      #   - a clump for injection of the oldschoool [br]-era normalization #here-1
+      #   - a clump for injection of the oldschoool [br]-era normalization #here1
 
       # -
 
@@ -38,7 +38,7 @@ module Skylab::Fields
 
         def argument_scanner= scn
 
-          # ##here-6 for now we are not giving special separate exposure
+          # ##here6 for now we are not giving special separate exposure
           # for "interfacey" argument scanners vs plain old scanners.
           # but we might one day..
           #
@@ -83,9 +83,8 @@ module Skylab::Fields
         end
 
         def entity_as_ivar_store= ent
-          # (until deeper integration, this is the one way)
           self.ivar_store = ent
-          @entity = ent
+          @entity = ent  # (until needed elsewhere, this is the one way. allows #here4
         end
 
         def box_store= bx
@@ -288,7 +287,7 @@ module Skylab::Fields
             if kp
               @_my_arg_scanner._when_primary_completed_
               # (we used to delete from the diminishing pool here but
-              # now we do it #here-12 instead because method-based nerks)
+              # now we do it #here12 instead because method-based nerks)
             else
               break  # :[#008.12] #borrow-coverage from [sn]
             end
@@ -335,7 +334,7 @@ module Skylab::Fields
         # they need to complete the normalization.
 
         # however, in cases where there ws no argument stream to parse, any
-        # (#here-11) "extroverted" associations still need this special
+        # (#here11) "extroverted" associations still need this special
         # attention. since in such cases we never made an indexing pass, we
         # achive a similar effect through a stream reduction..
 
@@ -399,7 +398,7 @@ module Skylab::Fields
           ok
         end
 
-        # (:#here-9:)
+        # (:#here9:)
 
         # here we restate the pertinent points of our central algorithm
         # so that they shadow the structure of our code (somewhere),
@@ -456,14 +455,14 @@ module Skylab::Fields
           if instance_variable_defined? :@entity and
               @entity.respond_to? :_receive_missing_required_associations_
 
-            # #coverpoint1.8 and #here-3 this should be temporary, or not
+            # #coverpoint1.8 and #here3 this should be temporary, or not
             @entity._receive_missing_required_associations_ asc_X_a
           else
             __express_missing_requireds asc_X_a
           end
         end
 
-        def __express_missing_requireds miss_sym_a  # (#here-2 will assimilate to here)
+        def __express_missing_requireds miss_sym_a  # (#here2 will assimilate to here)
 
           same_build = -> do
             __build_missing_required_event miss_sym_a
@@ -556,7 +555,7 @@ module Skylab::Fields
 
           is_req = remove_instance_variable :@association_is_required_by
 
-          # (when the above is a function that produces true, #here-7)
+          # (when the above is a function that produces true, #spot1-3)
 
           is_req ||= MONADIC_EMPTINESS_  # by default, "members" are not required
 
@@ -653,7 +652,7 @@ module Skylab::Fields
           mutable_argument_value_pipeline.reinitialize normal_asc
           ok = mutable_argument_value_pipeline.execute
           if ok
-            pool.delete normal_asc.name_symbol  # #here-12
+            pool.delete normal_asc.name_symbol  # #here12
           end
           ok  # hi. #todo
         end
@@ -731,7 +730,7 @@ module Skylab::Fields
 
       # ==
 
-      Association_is_extroverted__ = -> asc do  # :#here-11
+      Association_is_extroverted__ = -> asc do  # :#here11
         asc.is_required || asc.default_by || asc.normalize_by
       end
 
@@ -838,7 +837,7 @@ module Skylab::Fields
 
         # (during refactoring this code-interest moved here, but to preserve
         # VCS history (for now) the comment-block describing its sub-
-        # algorithm in detail is still at #here-9 above.)
+        # algorithm in detail is still at #here9 above.)
 
         include CommonPipelineLanguage__
 
@@ -1011,11 +1010,35 @@ module Skylab::Fields
 
         # -- C: matching the argument scanner head against an association
 
-        def __when_primary_not_found
+        def __when_primary_not_found  # :#here4 lazily detect callbacks
+
+          # in order to assimilate parts of our very old "attributes actor"
+          # API, allow that the client might define this idiomatic method
+
+          if instance_variable_defined? :@entity
+            if @entity.respond_to? :when_after_process_iambic_fully_stream_has_content
+              _yes = true
+            end
+          end
+          if _yes
+            ::Kernel._NO_PROBLEM__but_cover_me__
+            user_x = @entity.when_after_process_iambic_fully_stream_has_content argument_scanner
+            if user_x
+              self._EEK
+              _unable
+            else
+              user_x  # false or nil
+            end
+          else
+            __when_primary_not_found_express_event_somehow
+          end
+        end
+
+        def __when_primary_not_found_express_event_somehow
 
           ev_early_to_be_safe = __build_primary_not_found_event  # for now NOTE
 
-          # like #here-2, some of these are and some of these aren't like this
+          # like #here2, some of these are and some of these aren't like this
 
           if @listener
 
@@ -1099,7 +1122,7 @@ module Skylab::Fields
           :arguments_to_default_proc_by,  # here, 1x
           :association_source,  # [ta]
           :entity,
-          :listener,  # because #here-8
+          :listener,  # because #here8
         )
       # -
 
@@ -1167,7 +1190,7 @@ module Skylab::Fields
           NIL
         end
 
-        def __normalize_value  # :#here-1
+        def __normalize_value  # :#here1
 
           kn = @_existing_knownness ; asc = @native_association
 
@@ -1194,7 +1217,7 @@ module Skylab::Fields
             if bx
               if did
                 # :[#008.6]: #borrow-coverage from [br], [cu].
-                # cases like these need to GO AWAY #here-3 because they are
+                # cases like these need to GO AWAY #here3 because they are
                 # in violation of [#012.5.2]
                 NOTHING_  # hi.
               end
@@ -1242,7 +1265,7 @@ module Skylab::Fields
         end
 
         def _listener
-          @_callbacks.listener  # :#here-8
+          @_callbacks.listener  # :#here8
         end
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

@@ -29,11 +29,7 @@ module Skylab::Basic
         @margin = nil
       end
 
-      def process_argument_scanner_passively st  # #[#fi-022]
-        super && normalize
-      end
-
-      def normalize
+      def as_attributes_actor_normalize
 
         if @aspect_ratio
           extend Here_::Fit_to_Aspect_Ratio_::Layout_Engine_Methods

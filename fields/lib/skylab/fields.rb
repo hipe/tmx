@@ -235,7 +235,7 @@ module Skylab::Fields
     def _index  # :#here1
       @___index ||= ___build_index
     end
-    alias_method :association_index, :_index  # here, [ac]
+    alias_method :association_index, :_index  # #here3, [ac]
 
     def ___build_index
 
@@ -281,7 +281,7 @@ module Skylab::Fields
 
           else
 
-            cls.const_set :ATTRIBUTES, Flat_Attributes___.new( a )
+            cls.const_set :ATTRIBUTES, FlatAttributes___.new( a )
 
             cls.extend Flat_Actor_MMs___
             cls.include Flat_Actor_IMs___
@@ -314,9 +314,7 @@ module Skylab::Fields
         end
 
         def via_iambic x_a, & x_p
-
-          _st = Common_::Scanner.via_array x_a
-          New_via__[ :process_argument_scanner_fully, _st, self, & x_p ]
+          via_argument_scanner Scanner_[ x_a ], & x_p
         end
 
         def via_argument_scanner scn, & x_p
@@ -340,11 +338,7 @@ module Skylab::Fields
 
         kp = sess.send m, scn, & x_p  # but this here is for all non-actors
 
-        if kp
-          sess
-        else
-          kp
-        end
+        kp && sess
       end
 
       # ===
@@ -372,63 +366,96 @@ module Skylab::Fields
           Common_::Scanner.via_array x_a
         end
 
-        def process_argument_scanner_fully scn, & x_p
-          kp = process_argument_scanner_passively scn, & x_p
-          if kp
-            if scn.no_unparsed_exists
-              kp
-            elsif x_p
-              self._K
-            else
-              when_after_process_iambic_fully_stream_has_content scn
-            end
-          else
-            kp
+        def process_argument_scanner_fully scn, & p
+          as_attributes_actor_parse_and_normalize scn do |o|
+            o.listener = p
           end
         end
 
         def process_argument_scanner_passively scn, & p
+          as_attributes_actor_parse_and_normalize scn do |o|
+            o.will_parse_passively__
+            o.listener = p
+          end
+        end
+
+        def as_attributes_actor_parse_and_normalize scn
+
+          instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
+
+          ok = Home_::Normalization.call_by do |o|
+
+            yield o
+
+            __push_methods_reader_first_FI o
+
+            _write_defined_associations_into_normalization_FI_ o
+
+            o.entity_as_ivar_store = self  # entity not just ivar store because:
+
+              # :#spot1-5 some association interpreters need to write directly
+              # :#spot1-4 in error cases we inspect the entity lazily for handlers
+
+            o.argument_scanner = scn
+          end
+
+          remove_instance_variable ARGUMENT_SCANNER_IVAR_  # (often the next method freezes)
+
+          ok &&= as_attributes_actor_normalize
+
+          ok
+        end
+
+        def as_attributes_actor_normalize
+          KEEP_PARSING_  # #public-API: do nothing else here in this default form
+        end
+
+        def _write_defined_associations_into_normalization_FI_ n11n
+
+          # it is a point of our #public-API that the client is free of any
+          # obligation to define an `ATTRIBUTES` const (e.g [#co-007.1]).
+          #
+          # (if it wants to be explicit, the client can set such a const
+          # to false-ish and it will have the same effect.)
+          #
+          # a client that (at writing) has no defined attributes can be seen
+          # by simply running the [ts] quickie recursive runner.
 
           cls = self.class
           if cls.const_defined? :ATTRIBUTES, false
             ascs = cls.const_get :ATTRIBUTES
             if ascs
-              _ascs_idx = ascs.association_index
+              _ascs_idx = ascs.association_index  # :#here3
             end
           end
 
-          # not all entities that employ the subject i.m module define
-          # an `ATTRIBUTES` const. ([#co-007.1] is one example.)
+          n11n.association_index = _ascs_idx  # whether or not an index is
+            # present, setting this is necessary to help let the store
+            # know when it is done being defined
 
-          # entities can say they are an attributes actor but not
-          # define associations. (this is covered by running quickie)
+          NIL
+        end
+
+        def __push_methods_reader_first_FI n11n
+
+          # any client entity can define an association that is discovered
+          # only lazily using the technique described at [#013]. (unlike in
+          # [ac] we do not attempt to index such associations up front.)
+          #
+          # as such we must be prepared to accomodate every client in such
+          # a manner, whether or not they employ this techique.
+          #
+          # push this soft reader first as an optimization because it's
+          # used less frequently than traditionally defined attributes.
 
           meths = Home_::AssociationIndex_::Writer_method_reader[ self.class ]
 
-          instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
-
-          # (this call is used all over)
-
-          x = Home_::Normalization.call_by do |o|
-
-            o.push_association_soft_reader_by__ do |k|  # exactly [#013]
-              m = meths[ k ]
-              m and Home_::AssociationIndex_::MethodBasedAssociation.new m
-            end
-
-            o.argument_scanner = scn
-            o.association_index = _ascs_idx
-
-            # for #spot-1-5, some association interpreters need to write directly
-            o.entity_as_ivar_store = self
-
-            o.will_parse_passively__
-            o.listener = p
+          n11n.push_association_soft_reader_by__ do |k|  # exactly [#013]
+            m = meths[ k ]
+            m and Home_::AssociationIndex_::MethodBasedAssociation.new m
           end
 
-          remove_instance_variable ARGUMENT_SCANNER_IVAR_
-
-          x  # entity or KEEP_PARSING_ or UNABLE_
+          NIL
         end
 
         def gets_one  # #public-API #hook-in
@@ -439,9 +466,9 @@ module Skylab::Fields
           @_argument_scanner_
         end
 
-        def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
+        def when_after_process_iambic_fully_stream_has_content scn  # :+#public-API
 
-          _ev = Home_::Events::Extra.with :unrecognized_token, stream.head_as_is
+          _ev = Home_::Events::Extra.with :unrecognized_token, scn.head_as_is
 
           receive_extra_values_event _ev
         end
@@ -485,25 +512,15 @@ module Skylab::Fields
 
       # ===
 
-      module Flat_Actor_IMs___
+      module Flat_Actor_IMs___  # NOW GO THIS AWAY
 
         include InstanceMethods
 
-        def process_argument_scanner_passively scn
-
-          bx = self.class::ATTRIBUTES.ivars_box_
-
-          until scn.no_unparsed_exists
-            ivar = bx[ scn.head_as_is ]
-            ivar or break
-            scn.advance_one
-            instance_variable_set ivar, scn.gets_one
-          end
-
-          KEEP_PARSING_  # we never fail softly
-        end
-
         def process_arglist_fully a
+
+          # (for now we're keeping it very simple, but if for some reason
+          # we wanted to use normal normalization etc, we would probably
+          # make a functional scanner that qualifies each element..)
 
           bx = self.class::ATTRIBUTES.ivars_box_
 
@@ -513,32 +530,76 @@ module Skylab::Fields
 
           KEEP_PARSING_
         end
+
+        def process_argument_scanner_passively scn
+          ::Kernel._OKAY__this_is_in_notes__
+        end
+
+        def process_argument_scanner_fully scn
+          super
+        end
+
+        def _write_defined_associations_into_normalization_FI_ n11n
+
+          _this_thing = self.class.const_get :ATTRIBUTES, false  # #here4
+          n11n.association_index = _this_thing
+          NIL
+        end
       end
 
       # ===
 
-      class Flat_Attributes___
+      class FlatAttributes___
 
         def initialize sym_a
-          @_do = true
-          @_sym_a = sym_a
+          @__sym_a = sym_a
         end
+
+        # ~ ( #here4 act as an argument index
+
+        def association_hash_
+          ivars_box_.h_
+        end
+
+        def diminishing_pool_prototype_
+          ivars_box_.h_
+        end
+
+        def argument_value_parser_via_normalization_ n11n
+
+          scn = n11n.argument_scanner
+          ent = n11n.entity  # ##spot1-5
+
+          -> ivar_as_asc do
+
+            scn.advance_one  # #[#012.L.1] advance over the primary name
+
+            _value = scn.gets_one  # there are no flags
+            ent.instance_variable_set ivar_as_asc, _value
+            KEEP_PARSING_
+          end
+        end
+
+        def extroverted_association_normalizer_via_normalization_ n11n
+
+          -> ivar_as_asc do
+            $stderr.puts "COULD HAVE nilified or whined about missing required: #{ ivar_as_asc }"
+            KEEP_PARSING_
+          end
+        end
+
+        # ~ )
 
         def ivars_box_
-          if @_do
-            _parse
-          end
-          @__ivars_box
+          @___ivars_box ||= __ivars_box
         end
 
-        def _parse
-          @_do = false
+        def __ivars_box
           bx = Common_::Box.new
-          remove_instance_variable( :@_sym_a ).each do |sym|
+          remove_instance_variable( :@__sym_a ).each do |sym|
             bx.add sym, :"@#{ sym }"
           end
-          @__ivars_box = bx
-          NIL_
+          bx
         end
       end
 
@@ -895,7 +956,7 @@ module Skylab::Fields
       @_object.instance_variable_get asc.as_ivar
     end
 
-    def simplified_write_ x, k  # necessary IFF :#here-7
+    def simplified_write_ x, k  # necessary IFF :#spot1-3
       @_object.instance_variable_set :"@#{ k }", x ; nil
     end
 

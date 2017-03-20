@@ -103,11 +103,7 @@ module Skylab::System
 
         protected :__init_new
 
-        def process_argument_scanner_passively st  # #[#fi-022]
-          super && normalize
-        end
-
-        def normalize  # assume..
+        def as_attributes_actor_normalize
 
           # assume this instance (whether prototype or session) is "done"
           # being mutated by arguments. whether or not we have zero argument

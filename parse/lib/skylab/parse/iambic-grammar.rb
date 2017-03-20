@@ -23,7 +23,7 @@ module Skylab::Parse
       end
 
       def stream_via_array ary
-        stream_via_scanner Common_::Scanner.via_array ary
+        stream_via_scanner Scanner_[ ary ]
       end
 
       def stream_via_scanner scn
@@ -146,11 +146,11 @@ module Skylab::Parse
 
       def parse_one_item_via_iambic_fully x_a
 
-        st = Common_::Scanner.via_array x_a
-        st_ = simple_stream_of_items_via_polymorpic_stream st
-        x = st_.gets
+        scn = Common_::Scanner.via_array x_a
+        scn_ = simple_stream_of_items_via_polymorpic_stream scn
+        x = scn_.gets
         if x
-          if st.unparsed_exists
+          if scn.unparsed_exists
             raise ::ArgumentError
           end
           x
@@ -161,14 +161,14 @@ module Skylab::Parse
 
       def simple_stream_of_items_via_polymorpic_array x_a
 
-        _st = Common_::Scanner.via_array x_a
+        _scn = Scanner_[ x_a ]
 
-        simple_stream_of_items_via_polymorpic_stream _st
+        simple_stream_of_items_via_polymorpic_stream _scn
       end
 
-      def simple_stream_of_items_via_polymorpic_stream _st
+      def simple_stream_of_items_via_polymorpic_stream _scn
 
-        new _st
+        new _scn
       end
     end  # >>
 

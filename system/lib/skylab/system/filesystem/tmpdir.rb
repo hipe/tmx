@@ -69,6 +69,10 @@ module Skylab::System
         freeze
       end
 
+      def as_attributes_actor_normalize
+        raise ::NoMethodError  # see note above about [#fi-022]
+      end
+
       # -- Simple readers
 
       attr_reader :be_verbose

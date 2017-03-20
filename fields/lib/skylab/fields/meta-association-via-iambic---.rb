@@ -151,7 +151,7 @@ module Skylab::Fields
 
         init_association_value_producer_consumer_ivars_
 
-        @name_symbol = k  # setting this before below adds parsimony (again) #spot-1-1
+        @name_symbol = k  # setting this before below adds parsimony (again) #spot1-1
 
         yield self
 

@@ -10,10 +10,10 @@ module Skylab::Parse
 
         __prepare
 
-        f_st = Common_::Scanner.via_array @function_a
+        f_scn = Scanner_[ @function_a ]
 
-        if f_st.unparsed_exists
-          f = f_st.head_as_is
+        if f_scn.unparsed_exists
+          f = f_scn.head_as_is
         end
 
         q = []
@@ -30,17 +30,17 @@ module Skylab::Parse
           if on
             tn = on.try_next
             if tn
-              q.push [ f_st.current_index, tn ]
+              q.push [ f_scn.current_index, tn ]
             end
-            @result_x_a[ f_st.current_index ] = on.value_x
-            f_st.advance_one
-            f = if f_st.unparsed_exists
-              f_st.head_as_is
+            @result_x_a[ f_scn.current_index ] = on.value_x
+            f_scn.advance_one
+            f = if f_scn.unparsed_exists
+              f_scn.head_as_is
             end
             redo
 
           elsif q.length.nonzero?
-            f = __step_backwards_for_try_again f_st, q
+            f = __step_backwards_for_try_again f_scn, q
             redo
 
           else
@@ -59,12 +59,12 @@ module Skylab::Parse
         nil
       end
 
-      def __step_backwards_for_try_again f_st, q
+      def __step_backwards_for_try_again f_scn, q
 
         function_index, try_again = q.shift
         q.length.nonzero? and self._RIDE_ME
 
-        f_st.current_index = function_index
+        f_scn.current_index = function_index
         @input_stream.current_index = try_again.input_index_for_try_again
 
         try_again

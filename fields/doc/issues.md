@@ -1,8 +1,7 @@
 [#039]       [ defined attribute ]
 
-[#038]
-       #open [#here.1] the dream of unification (of normalization, then of
-             the unifying theory of models and associations)
+[#038] #hole
+             ( #was: referencepoint for [tm] to complain about no "one ring" )
 
 [#037]       "one ring" assimilation notes ..
 

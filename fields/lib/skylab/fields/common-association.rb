@@ -136,7 +136,7 @@ module Skylab::Fields
         init_association_value_producer_consumer_ivars_
 
         @as_ivar = nil
-        @name_symbol = k  # setting this below before adds parsimony #spot-1-1
+        @name_symbol = k  # setting this below before adds parsimony #spot1-1
         yield self
         freeze
       end
