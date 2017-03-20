@@ -1,6 +1,9 @@
 module Skylab::TanMan
 
-  class CLI < Brazen_::CLI
+  module CLI
+  # class CLI < Brazen_::CLI
+
+    if false
 
     # ~ experimental front client customizations:
 
@@ -61,16 +64,60 @@ module Skylab::TanMan
     end
 
     SLASH_BYTE___ = ::File::SEPARATOR.getbyte 0
+    end
 
     # ~ could go away:
 
-    class CustomExpressionAgent
+    class InterfaceExpressionAgent___  # #testpoint
 
+      class << self
+        def instance
+          @__instance ||= new
+        end
+        private :new
+      end  # >>
+
+      if false
       def initialize action_reflection
         @kernel = action_reflection.application_kernel
       end
+      end
 
       alias_method :calculate, :instance_exec
+
+      def simple_inflection & p
+        o = dup
+        o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
+      end
+
+      # ~ new stuff to compat with whatever
+
+      def ick_mixed x
+        x.inspect
+      end
+
+      def ick_prim sym
+        prim( sym ).inpsect
+      end
+
+      def ick_oper sym
+        oper( sym ).inspect
+      end
+
+      def prim sym
+        "-#{ _slug sym }"
+      end
+
+      def oper sym
+        _slug sym
+      end
+
+      def _slug sym
+        sym.id2name.gsub UNDERSCORE_, DASH_
+      end
+
+      if false  # bring back as needed
 
       def app_name
         @kernel.app_name
@@ -163,6 +210,7 @@ module Skylab::TanMan
       def _NLP_agent
         @___NLP_agent ||= Zerk_lib_[]::Expresser::NLP_EN_ExpressionAgent.new
       end
+      end  # if false
     end
   end
 end

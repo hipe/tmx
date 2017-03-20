@@ -804,7 +804,7 @@ module Skylab::Fields
 
         def __unsanitized_value_qualifies_as_existent
 
-          Value_qualifies_as_existent__[ @_unsanitized_value_ ]
+          Value_qualifies_as_existent[ @_unsanitized_value_ ]
         end
 
         def __check_clobber
@@ -882,7 +882,7 @@ module Skylab::Fields
         def __the_valid_value_store_already_has_an_existent_value
 
           _x = simplified_read
-          Value_qualifies_as_existent__[ _x ]
+          Value_qualifies_as_existent[ _x ]
         end
 
         def __field_is_required
@@ -978,7 +978,7 @@ module Skylab::Fields
             end
             ACHIEVED_
 
-          elsif @normal_association.is_required && ! Value_qualifies_as_existent__[ x ]
+          elsif @normal_association.is_required && ! Value_qualifies_as_existent[ x ]
 
             @_callbacks_.add_missing_required_MIXED_association_ @normal_association.name_symbol
 
@@ -1006,6 +1006,10 @@ module Skylab::Fields
 
         def __resolve_unsanitized_value_for_ normal_asc
           @_my_arg_scanner._match_unsanitized_value_ normal_asc
+        end
+
+        def match_unsanitized_monadic_value__
+          @_my_arg_scanner._match_unsanitized_monadic_value_
         end
 
         # -- C: matching the argument scanner head against an association
@@ -1304,6 +1308,11 @@ module Skylab::Fields
             @_eew = false
             @native_argument_scanner.scan_flag_value
           else
+            _match_unsanitized_monadic_value_
+          end
+        end
+
+        def _match_unsanitized_monadic_value_
 
             @_eew = true
             unsanitized_value = nil
@@ -1313,7 +1322,6 @@ module Skylab::Fields
             if _ok
               Common_::KnownKnown[ unsanitized_value ]
             end
-          end
         end
 
         def _when_primary_completed_
@@ -1355,12 +1363,16 @@ module Skylab::Fields
           elsif normal_asc.is_flag
             ::Kernel._CANNOT_PARSE_THIS__with_simple_scanner__
           else
+            _match_unsanitized_monadic_value_
+          end
+        end
+
+        def _match_unsanitized_monadic_value_
             scn = @native_argument_scanner
             scn.advance_one  #advance past the primary name,
             x = scn.head_as_is
             scn.advance_one  # and EEK [#012.L.1] do this too
             Common_::KnownKnown[ x ]
-          end
         end
 
         def _when_primary_completed_
@@ -1385,7 +1397,7 @@ module Skylab::Fields
 
       # ==
 
-      Value_qualifies_as_existent__ = -> x do
+      Value_qualifies_as_existent = -> x do  # [fi] only
 
         # (keep in mind - every occurrence where this is called, we might
         #  swap it out with a call to the normalization invocation (as "callbacks"))

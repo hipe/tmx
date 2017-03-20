@@ -262,10 +262,11 @@ module Skylab::Fields
         alias_method :call, :_call
         remove_method :_call
 
-        def via cls, a  # (transitional implementation..)
+        def via cls, p=nil, a  # (transitional implementation..)
 
           if a.length.zero?
 
+            p && no
             cls.extend ModuleMethods__
             cls.include InstanceMethods
             cls.const_set :ATTRIBUTES, nil
@@ -273,6 +274,7 @@ module Skylab::Fields
 
           elsif 1 == a.length and a.first.respond_to? :each_pair
 
+            p && no
             cls.extend ModuleMethods__
             cls.include InstanceMethods
             attrs = Here_[ a.first ]
@@ -281,7 +283,7 @@ module Skylab::Fields
 
           else
 
-            cls.const_set :ATTRIBUTES, FlatAttributes___.new( a )
+            cls.const_set :ATTRIBUTES, FlatAttributes___.new( p, a )
 
             cls.extend Flat_Actor_MMs___
             cls.include Flat_Actor_IMs___
@@ -531,18 +533,10 @@ module Skylab::Fields
           KEEP_PARSING_
         end
 
-        def process_argument_scanner_passively scn
-          ::Kernel._OKAY__this_is_in_notes__
-        end
-
-        def process_argument_scanner_fully scn
-          super
-        end
-
         def _write_defined_associations_into_normalization_FI_ n11n
 
-          _this_thing = self.class.const_get :ATTRIBUTES, false  # #here4
-          n11n.association_index = _this_thing
+          _flat_attrs = self.class.const_get :ATTRIBUTES, false
+          n11n.association_index = _flat_attrs._flat_attributes_index
           NIL
         end
       end
@@ -551,55 +545,23 @@ module Skylab::Fields
 
       class FlatAttributes___
 
-        def initialize sym_a
-          @__sym_a = sym_a
+        def initialize p, sym_a
+          @__symbols_array = sym_a ; @__proc = p
         end
-
-        # ~ ( #here4 act as an argument index
-
-        def association_hash_
-          ivars_box_.h_
-        end
-
-        def diminishing_pool_prototype_
-          ivars_box_.h_
-        end
-
-        def argument_value_parser_via_normalization_ n11n
-
-          scn = n11n.argument_scanner
-          ent = n11n.entity  # ##spot1-5
-
-          -> ivar_as_asc do
-
-            scn.advance_one  # #[#012.L.1] advance over the primary name
-
-            _value = scn.gets_one  # there are no flags
-            ent.instance_variable_set ivar_as_asc, _value
-            KEEP_PARSING_
-          end
-        end
-
-        def extroverted_association_normalizer_via_normalization_ n11n
-
-          -> ivar_as_asc do
-            $stderr.puts "COULD HAVE nilified or whined about missing required: #{ ivar_as_asc }"
-            KEEP_PARSING_
-          end
-        end
-
-        # ~ )
 
         def ivars_box_
-          @___ivars_box ||= __ivars_box
+          _flat_attributes_index.ivars_box
         end
 
-        def __ivars_box
-          bx = Common_::Box.new
-          remove_instance_variable( :@__sym_a ).each do |sym|
-            bx.add sym, :"@#{ sym }"
-          end
-          bx
+        def _flat_attributes_index
+          @___ ||= ___flat_attributes_index
+        end
+
+        def ___flat_attributes_index
+          AssociationIndex_::FlatAttributesIndex.new(
+            remove_instance_variable( :@__proc ),
+            remove_instance_variable( :@__symbols_array ),
+          )
         end
       end
 
@@ -961,7 +923,10 @@ module Skylab::Fields
     end
 
     def simplified_read_ k
-      ivar = :"@#{ k }"
+      _simplified_read_via_ivar :"@#{ k }"
+    end
+
+    def _simplified_read_via_ivar ivar
       if @_object.instance_variable_defined? ivar
         @_object.instance_variable_get ivar
       end
@@ -1086,7 +1051,12 @@ module Skylab::Fields
 
   # --
 
-  module NO_LENGTH_ ; class << self
+  module LENGTH_ZERO_ ; class << self
+
+    def delete _
+      NOTHING_
+    end
+
     def length
       0
     end

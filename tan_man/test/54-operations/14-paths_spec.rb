@@ -2,51 +2,84 @@ require_relative '.././test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] internal models", wip: true do
+  describe "[tm] paths" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
 
-    context "the `paths` node (and more importantly, procs as nodes)" do
+    # (largely the tests here are for covering integration of the MSTk
+    #  with the use of a simple attributes actor which remarkably seems
+    #  to work out well and required only a few lines..)
 
-      it "missing" do
+    context "missing" do
+
+      it "fails" do
+        _tuple || fail
+      end
+
+      it "explains" do
+
+        expect_these_lines_in_array_ _tuple do |y|
+          y << "missing required parameters :path and :verb\n"
+        end
+      end
+
+      shared_subject :_tuple do
 
         call_API :paths
 
-        _em = expect_not_OK_event :error
-
-        ev = _em.cached_event_value.to_event
-
-        COMMON_MISS_ == ev.terminal_channel_symbol or fail
-
-        black_and_white( ev ).should match(
-          %r(\bmissing required arguments 'path' and 'verb') )
+        lines = nil
+        expect :error, COMMON_MISS_ do |ev|
+          lines = black_and_white_lines ev
+        end
 
         expect_fail
+
+        lines
+      end
+    end
+
+    context "extra" do
+
+      it "fails" do
+        _tuple || fail
       end
 
-      it "extra" do
+      it "explains (only the first unrecognized token)" do
+
+        expect_these_lines_in_array_ _tuple do |y|
+          y << 'unrecognized attribute :wiz'
+        end
+      end
+
+      shared_subject :_tuple do
 
         call_API :paths, :wiz, :waz, :wazoozle
 
-        _em = expect_not_OK_event :error
-
-        ev = _em.cached_event_value.to_event
-
-        :extra_properties == ev.terminal_channel_symbol or fail
-
-        black_and_white( ev ).should match(
-          %r(\bunexpected arguments :wiz and :wazoozle) )
+        lines = nil
+        expect :error, :argument_error, :primary_not_found do |ev|
+          lines = black_and_white_lines ev
+        end
 
         expect_fail
+
+        lines
       end
+    end
+
+    context "(swap in other expag)" do
 
       it "strange verb" do
 
         call_API :paths, :path, :generated_grammar_dir, :verb, :wiznippl
 
-        _em = expect_not_OK_event :unrecognized_verb
-
-        _em.cached_event_value.verb.should eql :wiznippl
+        expect :error, :unrecognized_verb do |ev|
+          _a = black_and_white_lines ev
+          expect_these_lines_in_array_ _a do |y|
+            y << 'unrecognized verb "wiznippl". did you mean "retrieve"?'
+          end
+        end
 
         expect_fail
       end
@@ -55,18 +88,34 @@ module Skylab::TanMan::TestSupport
 
         call_API :paths, :path, :waznoozle, :verb, :retrieve
 
-        _em = expect_not_OK_event :unknown_path
-
-        _em.cached_event_value.did_you_mean.should be_include :generated_grammar_dir
+        expect :error, :unknown_path do |ev|
+          _a = black_and_white_lines ev
+          expect_these_lines_in_array_ _a do |y|
+            y << 'unknown path "waznoozle". did you mean "generated-grammar-dir"?'
+          end
+        end
 
         expect_fail
       end
 
       it "retrieves (and possibly generates) the GGD path" do
+
         # it may or may not emit events based on whether the dir already existed
         call_API :paths, :path, :generated_grammar_dir, :verb, :retrieve
-        %r([^/]+\z).match( @result )[ 0 ].should eql Home_.lib_.tmpdir_stem
+
+        _result = execute
+
+        _tail = ::File.basename _result
+
+        _tail == Home_.lib_.tmpdir_stem || fail
+      end
+
+      def black_and_white_expression_agent_for_expect_emission
+        expression_agent_for_CLI_TM
       end
     end
+
+    # ==
+    # ==
   end
 end

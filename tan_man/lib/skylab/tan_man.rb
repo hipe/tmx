@@ -46,8 +46,8 @@ module Skylab::TanMan
     Home_.lib_.basic::ByteStream::UpstreamReference
   end
 
-  Attributes_actor_ = -> cls, * a do
-    Fields_lib_[]::Attributes::Actor.via cls, a
+  Attributes_actor_ = -> cls, * a, & p do
+    Fields_lib_[]::Attributes::Actor.via cls, p, a
   end
 
   Path_lib_ = Lazy_.call do
@@ -56,6 +56,10 @@ module Skylab::TanMan
 
   Path_looks_relative_ = -> path do
     Home_.lib_.system.path_looks_relative path
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
   end
 
   # ==

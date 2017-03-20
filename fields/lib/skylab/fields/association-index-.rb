@@ -237,7 +237,7 @@ module Skylab::Fields
 
           else
 
-            o.extroverted_diminishing_pool = NO_LENGTH_
+            o.extroverted_diminishing_pool = LENGTH_ZERO_
 
             delete = MONADIC_EMPTINESS_
 
@@ -337,6 +337,90 @@ module Skylab::Fields
         def use_this_noun_lemma_to_mean_attribute
           USE_WHATEVER_IS_DEFAULT_
         end
+      end
+
+      # ==
+
+      class FlatAttributesIndex  # 1x [fi] only
+
+        def initialize p, sym_a
+
+          bx = Common_::Box.new
+          sym_a.each do |sym|
+            bx.add sym, :"@#{ sym }"
+          end
+          @ivars_box = bx
+
+          @is_required_by = nil
+          if p
+            p[ self ]
+          end
+          freeze
+        end
+
+        attr_accessor(
+          :is_required_by,
+        )
+
+        # ~ ( act as an argument index
+
+        def diminishing_pool_prototype_
+          if @is_required_by
+            @ivars_box.h_
+          else
+            LENGTH_ZERO_
+          end
+        end
+
+        def association_hash_
+          @ivars_box.h_
+        end
+
+        def argument_value_parser_via_normalization_ n11n
+
+          _scn = n11n.argument_scanner
+          ent = n11n.entity  # ##spot1-5
+
+          -> ivar_as_asc do
+
+            # scn.advance_one  # #[#012.L.1] advance over the primary name
+
+            _x = n11n.match_unsanitized_monadic_value__.value_x
+
+            ent.instance_variable_set ivar_as_asc, _x
+            KEEP_PARSING_
+          end
+        end
+
+        def extroverted_association_normalizer_via_normalization_ n11n
+
+          if @is_required_by
+
+            is_req = @is_required_by
+            vvs = n11n.valid_value_store
+            is_provided = Home_::Normalization::Value_qualifies_as_existent
+
+            -> ivar_as_asc do
+              if is_req[ ivar_as_asc ]
+                _x = vvs._simplified_read_via_ivar ivar_as_asc
+                if ! is_provided[ _x ]
+                  n11n.add_missing_required_MIXED_association_ ivar_as_asc[ 1 .. -1 ].intern  # meh
+                end
+              end
+              KEEP_PARSING_
+            end
+          else
+            -> _ do
+              ::Home_._NEVER
+            end
+          end
+        end
+
+        # ~ )
+
+        attr_reader(
+          :ivars_box,
+        )
       end
 
       # ==

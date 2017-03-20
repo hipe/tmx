@@ -172,6 +172,11 @@ module Skylab::TanMan::TestSupport
       Home_::API::expression_agent_instance
     end
 
+    def expression_agent_for_CLI_TM
+      Home_::CLI::InterfaceExpressionAgent___.instance
+    end
+
+
     # -- ..
 
     def expect_committed_changes_

@@ -164,6 +164,10 @@ module Skylab::Zerk::TestSupport
       @API.expect_result_under x, self
     end
 
+    def execute
+      @API.execute_under self
+    end
+
     def finish_by & p
       @API.receive_finish_by p, self
     end

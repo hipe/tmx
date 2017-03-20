@@ -124,13 +124,33 @@ module Skylab::TanMan
         o.calculate( & p )
       end
 
-      def and_ a
-        _NLP_agent.and_ a
+      # ~ new stuff to compat with whatever
+
+      def ick_mixed x
+        x.inspect
       end
+
+      def ick_oper sym
+        ick_prim sym
+      end
+
+      def ick_prim sym
+        _slug_via_symbol( sym ).inspect
+      end
+
+      def _slug_via_symbol sym
+        sym  # oops i'm in API
+      end
+
+      # ~ custom stuff
 
       def app_name
         Home_.name_function.as_human
       end
+
+      # ~ old stuff to deprecate, here for reference
+
+      if false
 
       def code s
         "'#{ s }'"
@@ -144,24 +164,12 @@ module Skylab::TanMan
         "** #{ string } **"
       end
 
-      def ick_mixed x
-        val x
-      end
-
-      def indefinite_noun lemma_s
-        _NLP_agent.indefinite_noun lemma_s
-      end
-
       def kbd s
         s
       end
 
       def lbl x
         par x
-      end
-
-      def or_ a
-        _NLP_agent.or_ a
       end
 
       def par x
@@ -171,16 +179,29 @@ module Skylab::TanMan
         "'#{ x }'"
       end
 
-      def plural_noun * a
-        _NLP_agent.plural_noun( * a )
-      end
-
       def pth s
         if DOT_ == ::File.dirname(s)
           s
         else
           ::File.basename s
         end
+      end
+
+      def val x
+        x.inspect
+      end
+      end
+
+      # ~ old EN stuff, here for reference until we restore everything
+
+      if false
+
+      def sp_ * x_a
+        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
+      end
+
+      def indefinite_noun lemma_s
+        _NLP_agent.indefinite_noun lemma_s
       end
 
       def s count_x, lexeme_i=:s
@@ -192,14 +213,16 @@ module Skylab::TanMan
         end
       end
 
-      def sp_ * x_a
-
-        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
+      def and_ a
+        _NLP_agent.and_ a
       end
 
-      def val x
-        x.inspect
+      def or_ a
+        _NLP_agent.or_ a
       end
+      end
+
+      # ~
 
       def _NLP_agent
         NLP_agent_instance___[]

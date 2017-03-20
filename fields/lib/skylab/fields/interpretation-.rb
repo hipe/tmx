@@ -64,7 +64,7 @@ module Skylab::Fields
 
         sct.argument_value_parser = method :__parse_this_meta_association  # otherwise this
 
-        sct.extroverted_diminishing_pool = NO_LENGTH_  # [#002.H.1.1]
+        sct.extroverted_diminishing_pool = LENGTH_ZERO_  # [#002.H.1.1]
         NIL
       end
 

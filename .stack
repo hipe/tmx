@@ -59,5 +59,3 @@ TD tan_man/test/54-operations/32-dot-file/46-parsing/examples-001-thru-489_spec.
 (model: workspace)
 TD tan_man/test/54-operations/23-workspace/42-create_spec.rb
 TD tan_man/test/54-operations/23-workspace/24-status_spec.rb
-(model: paths)
-TD tan_man/test/54-operations/14-paths_spec.rb

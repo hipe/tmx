@@ -690,9 +690,6 @@ module Skylab::TanMan
     end
   end
 
-  Models_::Paths = -> path, verb, call, & oes_p do
-    Models_::Internal_::Paths[ path, verb, call, & oes_p ]
-  end
   end  # if false #here2
 
   end  # `Model_`
