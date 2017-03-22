@@ -104,7 +104,7 @@ module Skylab::Fields::TestSupport
 
     context "(E.K)" do
 
-      context "(against this one entity class)" do
+      context "(default by proc)" do
 
         it "defaulting happens in this semi-normal case" do
 
@@ -175,6 +175,56 @@ module Skylab::Fields::TestSupport
 
           attr_reader(
             :jamooka, :faflooka, :secret_horrible_dont_do_this,
+          )
+
+          self
+        end
+      end
+
+      context "(default by value)" do
+
+        it "no defaulting" do
+
+          ent = call_thru_normalize_(
+            :size, :large,
+            :for_here_or_to_go, :to_go,
+          )
+          ent.size == :large || fail
+          ent.for_here_or_to_go == :to_go || fail
+        end
+
+        it "defaulting" do
+
+          ent = call_thru_normalize_(
+            :size, :small,
+          )
+          ent.size == :small || fail
+          ent.for_here_or_to_go == :for_here || fail
+        end
+
+        def entity_class_
+          _entity_class_2B
+        end
+      end
+
+      shared_subject :_entity_class_2B do
+
+        class X_cma_d_NoSee_2B
+
+          include Attributes::EK_ModelMethods
+
+          # (the below nastiness is so we have a defaulting proc
+          # that "flickers" - under some conditions it appears to fail)
+
+          def _definition_ ; [
+
+            :property, :for_here_or_to_go, :default, :for_here,
+
+            :required, :property, :size
+          ] end
+
+          attr_reader(
+            :for_here_or_to_go, :size,
           )
 
           self

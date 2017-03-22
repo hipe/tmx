@@ -9,25 +9,14 @@ module Skylab::System
 
     # ~ actor exposures
 
-    def flock_first_available_path * x_a, & x_p
+    def flock_first_available_path *a, &p
 
-      Home_::Filesystem::Flock_first_available_path.for_mutable_args_ x_a, & x_p
+      Home_::Filesystem::Flock_first_available_path.against_mutable_ a, &p
     end
 
-    def hack_guess_module_tree * x_a, & x_p
+    def hack_guess_module_tree *a, &p
 
-      Home_::Filesystem::Hack_guess_module_tree.for_mutable_args_ x_a, & x_p
-    end
-
-    # ~ normalization exposures
-
-    def for_mutable_args_ x_a
-
-      if x_a.length.zero?
-        self
-      else
-        normalization( * x_a )
-      end
+      Home_::Filesystem::Hack_guess_module_tree.against_mutable_ a, &p
     end
 
     # ~ bridge exposures
@@ -56,31 +45,10 @@ module Skylab::System
     ## ~~ tmpdir
 
     def tmpdir_path
-      @__tmpdir_path ||= Home_.lib_.tmpdir
-    end
-
-    def tmpdir * x_a, & x_p
-
-      Home_::Filesystem::Tmpdir.for_mutable_args_ x_a, & x_p
-    end
-
-    def normalization sym  # [#]:note-C
-
-      _cls = Home_::Filesystem::Normalizations.const_get sym, false
-      _cls.begin_ self
-    end
-
-    # ~ session exposures
-
-    def walk * x_a, & oes_p
-      Home_::Filesystem::Walk.for_mutable_args_ x_a, & oes_p
+      @__tmpdir_path ||= Home_.lib_.tmpdir_path
     end
 
     # ~ hook-outs / internal / low-level
-
-    def constants
-      Home_::Filesystem
-    end
 
     def modality_const
       :Filesystem

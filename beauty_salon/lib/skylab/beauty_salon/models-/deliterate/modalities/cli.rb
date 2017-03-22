@@ -58,7 +58,7 @@ module Skylab::BeautySalon
 
           _qkn = remove_backstream_argument :file
 
-          kn = Home_.lib_.system.filesystem( :Upstream_IO ).call_via(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
 
             :qualified_knownness_of_path, _qkn,
             :filesystem, @resources.bridge_for( :filesystem ),

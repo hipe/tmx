@@ -363,7 +363,7 @@ module Skylab::SearchAndReplace
 
     System_lib = sidesys[ :System ]
 
-    Tmpdir = Lazy_.call do
+    Tmpdir_path = Lazy_.call do
       require 'tmpdir'
       ::Dir.tmpdir
     end

@@ -116,7 +116,7 @@ module Skylab::TanMan
     end
 
     System = -> do
-      System_lib___[].services
+      System_lib[].services
     end
 
     Tmpdir_stem = Common_.memoize do
@@ -126,13 +126,14 @@ module Skylab::TanMan
     # --
 
     Basic = sidesys[ :Basic ]
+    Brazen_NOUVEAU = sidesys[ :Brazen ]  # weird name for now for a while
     # = sidesys[ :Fields ]  # for [#sl-002]
     File_utils = stdlib[ :FileUtils ]
     Human = sidesys[ :Human ]
     Parse_lib = sidesys[ :Parse ]
     Pretty_print = stdlib[ :PP ]
     String_IO = stdlib[ :StringIO ]
-    System_lib___ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     TT = stdlib[ :Treetop ]
     # = sidesys[ :Zerk ]  # for [#sl-002]
   end

@@ -56,14 +56,14 @@ module Skylab::SubTree
     _System_lib = nil
 
     System = -> do
-      _System_lib[].services
+      System_lib[].services
     end
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
-    _System_lib = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]
   end
 

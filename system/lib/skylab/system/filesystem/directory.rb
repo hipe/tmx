@@ -260,8 +260,9 @@ module Skylab::System
 
     def __whine_about_missing_directory path
 
-      _x = Home_.services.filesystem( :Existent_Directory ).against_path(
-        path,
+      _x = Home_::Filesystem::Normalizations::ExistentDirectory.via(
+        :path, path,
+        :filesystem, Home_.services.filesystem,
         & @on_event_selectively
       )
 

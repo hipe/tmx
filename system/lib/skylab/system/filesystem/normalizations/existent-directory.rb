@@ -2,11 +2,10 @@ module Skylab::System
 
   module Filesystem
 
-    class Normalizations::Existent_Directory < Normalizations::Path_Based
+    class Normalizations::ExistentDirectory < Normalizations::PathBased
     private
 
-      def initialize _fs
-
+      def initialize
         @_do_create = nil
         @_IFF_not_exist_do_create = nil
         @_is_dry_run = false
@@ -38,6 +37,8 @@ module Skylab::System
 
       public def execute
 
+        @do_lock_file_ and self._COVER_ME__you_cannot_lock_a_directory__
+
         init_exception_and_stat_ path_
 
         if @stat_
@@ -59,13 +60,13 @@ module Skylab::System
             _ok = __can_create
             _ok && __create
           else
-            maybe_send_event :error, :enoent do
+            @listener.call :error, :enoent do
               Common_::Event.wrap.exception @exception_, :path_hack
             end
             UNABLE_
           end
         else
-          maybe_send_event :error, :strange_stat_error do
+          @listener.call :error, :strange_stat_error do
             __via_strange_stat_error_build_event
           end
           UNABLE_
@@ -138,7 +139,7 @@ module Skylab::System
 
       def __cannot_create_because_path_too_deep
 
-        maybe_send_event :error, :path_too_deep do
+        @listener.call :error, :path_too_deep do
           __build_path_too_deep_event
         end
 
@@ -170,7 +171,7 @@ module Skylab::System
         if DIRECTORY_FTYPE == @stat_.ftype
           ACHIEVED_
         else
-          maybe_send_event :error, :wrong_ftype do
+          @listener.call :error, :wrong_ftype do
             __via_stat_and_pn_build_wrong_ftype_event DIRECTORY_FTYPE
           end
           UNABLE_
@@ -200,7 +201,7 @@ module Skylab::System
 
       def __create
 
-        maybe_send_event :info, :creating_directory do
+        @listener.call :info, :creating_directory do
           build_neutral_event_with(
             :creating_directory,
             :path, path_,
@@ -237,7 +238,7 @@ module Skylab::System
 
           if @_do_create
 
-            maybe_send_event :error, :directory_exists do
+            @listener.call :error, :directory_exists do
 
               build_not_OK_event_with(
                 :directory_exists,
@@ -249,7 +250,7 @@ module Skylab::System
             _build_normal_result
           end
         else
-          maybe_send_event :error, :wrong_ftype do
+          @listener.call :error, :wrong_ftype do
 
             build_wrong_ftype_event_ path_, @stat_, DIRECTORY_FTYPE
           end

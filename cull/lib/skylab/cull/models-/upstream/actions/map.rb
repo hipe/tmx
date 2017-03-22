@@ -8,7 +8,7 @@ module Skylab::Cull
 
           :ad_hoc_normalizer, -> qkn, & oes_p do
             if qkn.is_known_known
-              Home_.lib_.basic::Number.normalization.via(
+              Home_.lib_.basic::Number::Normalization.via(
                 :qualified_knownness, qkn,
                 :number_set, :integer,
                 :minimum, 1,

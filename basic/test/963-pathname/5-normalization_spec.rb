@@ -188,7 +188,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject_module
-      Home_::Pathname.normalization
+      Home_::Pathname::Normalization
     end
   end
 end

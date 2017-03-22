@@ -50,10 +50,6 @@ module Skylab::TestSupport  # :[#021].
     def spec_rb
       Home_::Init.spec_rb
     end
-
-    def tmpdir
-      lib_.system.filesystem.tmpdir
-    end
   end  # >>
 
   class Lazy_Constants

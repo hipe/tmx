@@ -75,15 +75,14 @@ y << "target distance must be at a minimum N-1."
         :property, :to,
 
         :required,
-        :ad_hoc_normalizer, -> qkn, & x_p do
-
-          _normer = Brazen_.lib_.basic.normalizers.number(
-            :number_set, :integer,
-            :recognize_positive_sign,
-          )
+        :ad_hoc_normalizer, -> qkn, & p do
 
           if qkn.is_known_known
-            _normer.normalize_qualified_knownness qkn, & x_p
+            Home_.lib_.basic::Number::Normalization.via(
+              :qualified_knownness, qkn,
+              :number_set, :integer,
+              :recognize_positive_sign,
+              & p )
           else
             qkn
           end

@@ -50,11 +50,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     def build_my_tmpdir_controller_  # NOT prepared (emptied)
 
-      sys = Home_.lib_.system
+      _path = ::File.join Home_.lib_.system.defaults.dev_tmpdir_path, '[sa]'
 
-      _path = ::File.join sys.defaults.dev_tmpdir_path, '[sa]'
-
-      sys.filesystem.tmpdir.with(
+      Home_.lib_.system_lib::Filesystem::Tmpdir.with(
         :path, _path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,

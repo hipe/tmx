@@ -9,6 +9,9 @@ module Skylab::Treemap::TestSupport
 
     it "OK (small representative sample)" do
 
+      # #lends-coverage to [#sy-008.03] (test side)
+      # #lends-coverage to [#fi-008.16]
+
       _path = Fixture_file_[ 'eg-050-small-representative-sample' ]
 
       io = TS_.string_IO.new

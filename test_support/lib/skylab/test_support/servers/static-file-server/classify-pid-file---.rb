@@ -32,10 +32,11 @@ module Skylab::TestSupport
         end
 
         if stat
+          o = Home_.lib_.system_lib::Filesystem
           case stat.ftype
-          when fs.constants::DIRECTORY_FTYPE
+          when o::DIRECTORY_FTYPE
             __when_PID_path_is_directory
-          when fs.constants::FILE_FTYPE
+          when o::FILE_FTYPE
             __when_PID_path_is_file
           else
             __when_strange_inode stat.ftype
@@ -68,9 +69,12 @@ module Skylab::TestSupport
 
         _dirname = ::File.dirname @_PID_path
 
-        _dir_exists = @filesystem.normalization( :Upstream_IO ).call(
+        _real_FS = Home_.lib_.system.filesystem
+
+        _dir_exists = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
           :path, _dirname,
           :must_be_ftype, :DIRECTORY_FTYPE,
+          :filesystem, _real_FS,
           & @_oes_p )
 
         if _dir_exists

@@ -77,10 +77,11 @@ module Skylab::TestSupport
 
         @on_event_selectively.call :error, :resource_not_found do
 
-          Home_.lib_.system.filesystem.walk.build_resource_not_found_event(
+          Home_.lib_.system_lib::Filesystem::Walk.build_resource_not_found_event(
             @start_path,
             @filenames,
-            num_dirs_looked )
+            num_dirs_looked,
+          )
         end
 
         UNABLE_

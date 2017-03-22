@@ -60,7 +60,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       it "infile not exist" do
 
         call_API :translate,
-          :flex_file, tmpdir.join( 'not-there.flex' ).to_path,
+          :flex_file, tmpdir_instance.join( 'not-there.flex' ).to_path,
           :resources, Mock_resources_[],
           * _outpath_arg( '_no_see_' )
 
@@ -291,7 +291,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _init_outpath  # we will assert that it is not created
 
-        _path = tmpdir.touch_r( 'a-dir/' ).to_path
+        _path = tmpdir_instance.touch_r( 'a-dir/' ).to_path
 
         _API_invoke_with_parser_dir _path
 
@@ -345,9 +345,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def _init_outpath
 
-        tmpdir = self.tmpdir
-        tmpdir.prepare  # nuke any old files from before
-        @outpath = tmpdir.join( 'o.rb' ).to_path
+        td = self.tmpdir_instance
+        td.prepare  # nuke any old files from before
+        @outpath = td.join( 'o.rb' ).to_path
         NIL_
       end
 

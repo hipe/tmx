@@ -9,22 +9,6 @@ module Skylab::System
 
         class << self
 
-          def for_mutable_args_ x_a, & x_p
-
-            case 1 <=> x_a.length
-            when -1
-
-              _st = scanner_via_array x_a
-              _o = via_argument_scanner _st, & x_p
-              _o.execute
-
-            when 1
-              self
-            else
-              raise ::ArgumentError
-            end
-          end
-
           def build_resource_not_found_event start_path, file_pattern_x, num_dirs_looked
 
             Build_resource_not_found_event__[ start_path, file_pattern_x, num_dirs_looked ]
@@ -38,6 +22,7 @@ module Skylab::System
           max_num_dirs_to_look: nil,
           prop: nil,
           property_symbol: nil,
+          do_lock: nil,
           filesystem: nil,
         )
 
@@ -46,6 +31,7 @@ module Skylab::System
         def initialize & oes_p
 
           @argument_path_might_be_target_path = nil
+          @do_lock = false
           @ftype = nil
           @on_event_selectively = oes_p
           @prop = nil
@@ -201,19 +187,25 @@ module Skylab::System
 
         def __found found_path, surrounding_path
 
-          yes = Home_.services.filesystem.normalization( :Upstream_IO ).call(
-
+          kn = Home_::Filesystem::Normalizations::Upstream_IO.via(
             :path, found_path,
             :must_be_ftype, ( @ftype || :FILE_FTYPE ),
+            :do_lock_file, @do_lock,
             :filesystem, @filesystem,
             & @on_event_selectively )
 
-          if yes
-            surrounding_path
+          if kn
+            if @do_lock
+              ThisTuple___[ kn.value_x, surrounding_path ]
+            else
+              surrounding_path
+            end
           else
             yes
           end
         end
+
+        ThisTuple___ = ::Struct.new :locked_IO, :surrounding_path  # experimental
 
         def __when_resource_not_found count
 

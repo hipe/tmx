@@ -51,6 +51,8 @@
 
 [#008]       coverage assets & liabilities & similar
 
+             [#here.3]
+
              [#here.2], .. : borrow coverage
 
              [#here.1]: we're relying on the content of these two files

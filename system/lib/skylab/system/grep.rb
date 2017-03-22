@@ -15,10 +15,10 @@ module Skylab::System
 
       class << self
 
-        def for_mutable_args_ x_a, & oes_p
-          if x_a.length.nonzero? || block_given?
-            o = new( & oes_p )
-            o.__init_via_iambic x_a
+        def against_mutable_ a, & p
+          if a.length.nonzero? || block_given?
+            o = new( & p )
+            o.__init_via_iambic a
             o.execute
           else
             self

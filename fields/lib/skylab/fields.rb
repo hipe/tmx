@@ -347,14 +347,20 @@ module Skylab::Fields
 
       module InstanceMethods
 
-        def new_with * x_a, & x_p
-          x_p and self._DESIGN_ME
-          otr = dup
-          kp = otr.send :process_iambic_fully, x_a
+        def new_with * a, & p
+          as_attributes_actor_dup_and_mutate p, Scanner_[ a ]
+        end
+
+        def as_attributes_actor_dup_and_mutate p, scn  # #[#sl-023]
+          if p
+            ::Kernel._COVER_ME__ride_the_passing_of_this_down_below__
+          end
+          o = dup
+          kp = o.send :process_argument_scanner_fully, scn
           if kp
-            otr
+            o
           else
-            self._COVER_ME
+            ::Kernel._COVER_ME__failed_to_process_iambic
           end
         end
 
@@ -370,7 +376,11 @@ module Skylab::Fields
 
         def process_argument_scanner_fully scn, & p
           as_attributes_actor_parse_and_normalize scn do |o|
-            o.listener = p
+            if p
+              o.listener = p
+            else
+              NOTHING_  # :[#008.16] #borrow-coverage from [tr]
+            end
           end
         end
 

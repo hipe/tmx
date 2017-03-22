@@ -170,6 +170,7 @@
              ( #was: transplant "parameters" from [hl] )
 
 [#008]       borrow/lend coverage
+             16 [tr] don't overwrite the already present listener
              [#here.15] borrow for "did you mean nothing" from [ta]
              [#here.14] lend to [sn]
              [#here.10-13] borrow

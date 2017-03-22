@@ -68,17 +68,18 @@ module Skylab::Cull::TestSupport
 
     def prepare_tmpdir
 
-      td = Home_.lib_.filesystem.tmpdir(
+      _td = Home_.lib_.system_lib::Filesystem::Tmpdir.with(
         :path, tmpdir_path,
         :be_verbose, do_debug,
-        :debug_IO, debug_IO )
+        :debug_IO, debug_IO,
+      )
 
-      td.clear
+      _td.clear
     end
 
     def tmpdir_path
 
-      ::File.join Home_.lib_.filesystem.tmpdir_path, 'culio'
+      ::File.join Home_.lib_.system.filesystem.tmpdir_path, 'culio'
     end
 
     # ~ assertion support

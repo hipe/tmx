@@ -2,16 +2,21 @@ module Skylab::System
 
   module Filesystem
 
-    class Normalizations::Upstream_IO < Normalizations::Path_Based  # [#004.B].
+    class Normalizations::Upstream_IO < Normalizations::PathBased  # [#004.B].
     private
 
-      def initialize _fs
+      def initialize
 
         @_neither_is_OK = false
         @_only_apply_ftype_expectation = false
         @_stdin = nil
         @_value_is_pathname = false
         super
+      end
+
+      def do_lock_file=
+        @do_lock_file_ = gets_one
+        TRUE
       end
 
       def dash_means=
@@ -21,7 +26,7 @@ module Skylab::System
 
       def neither_is_OK=
 
-        # first, see [#.E]. normally in the absence of the 2 things the
+        # first, see [#here.E]. normally in the absence of the 2 things the
         # result is a failure to normalize. however IFF subject flag is
         # engaged we result with the unknown knownness singleton so that
         # presumably the client will take some other course of action.
@@ -56,7 +61,7 @@ module Skylab::System
 
       def execute
 
-        # implement [#.A] the common algorithm (see)
+        # implement [#here.A] the common algorithm (see)
 
         pa = @qualified_knownness_of_path
 
@@ -97,7 +102,7 @@ module Skylab::System
 
         io = @_stdin
         if io.tty?  # for now ..
-          @on_event_selectively.call :error, :expression, :interactive_stdin do | y |
+          @listener.call :error, :expression, :interactive_stdin do | y |
             y << "STDIN is interactive. must be non-interactive"
           end
           UNABLE_
@@ -108,7 +113,7 @@ module Skylab::System
 
       def __when_both
 
-        maybe_send_event :error, :ambiguous_upstream_arguments do
+        @listener.call :error, :ambiguous_upstream_arguments do
           __build_ambiguous_upstream_arguments_event
         end
         UNABLE_
@@ -150,16 +155,30 @@ module Skylab::System
 
       def via_path_arg_that_represents_file_
 
-        init_exception_and_stat_ path_
-
-        if @stat_
-          via_stat_execute
+        if @do_lock_file_
+          init_exception_and_locked_file_ path_
+          if @locked_IO_
+            Common_::Known_Known[ remove_instance_variable :@locked_IO_ ]
+          else
+            _when_exception
+          end
         else
-          maybe_send_event :error, :stat_error do
+          init_exception_and_stat_ path_
+          if @stat_
+            via_stat_execute
+          else
+            _when_exception
+          end
+        end
+      end
+
+      def _when_exception
+
+          @listener.call :error, :stat_error do
             wrap_exception_ @exception_
           end
+
           UNABLE_  # result of above is unreliable
-        end
       end
 
       public def via_stat_execute  # :+#public-API, :#here
@@ -172,7 +191,7 @@ module Skylab::System
           __via_file
 
         else
-          maybe_send_event :error, :wrong_ftype do
+          @listener.call :error, :wrong_ftype do
             build_wrong_ftype_event_ path_, @stat_, FILE_FTYPE
           end
           UNABLE_  # result of above is unreliable
@@ -185,7 +204,7 @@ module Skylab::System
 
           Common_::Known_Known[ ACHIEVED_ ]
         else
-          maybe_send_event :error, :wrong_ftype do
+          @listener.call :error, :wrong_ftype do
             build_wrong_ftype_event_ path_, @stat_, @_expected_ftype
           end
           UNABLE_
@@ -199,7 +218,7 @@ module Skylab::System
         if @open_IO_
           produce_result_via_open_IO_ remove_instance_variable :@open_IO_
         else
-          maybe_send_event :error, :exception do
+          @listener.call :error, :exception do
             wrap_exception_ @exception_
           end
           UNABLE_

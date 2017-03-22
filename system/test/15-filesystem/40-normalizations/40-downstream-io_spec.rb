@@ -20,20 +20,20 @@ module Skylab::System::TestSupport
 
       _setup_same
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :path, @_path,
         :force_arg, __build_force_yes_arg,
-        & handle_event_selectively_ )
+      )
 
       _expect_overwrote
     end
 
     it "exists, formal force, actual force is known and false" do
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :path, TestSupport_::Fixtures.file( :three_lines ),
         :force_arg, __build_force_no_arg,
-        & handle_event_selectively_ )
+      )
 
       _em = expect_not_OK_event :missing_required_properties
 
@@ -85,10 +85,10 @@ module Skylab::System::TestSupport
 
       _path = _not_here
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :path, _path,
         :is_dry_run, true,
-        & handle_event_selectively_ )
+      )
 
       expect_neutral_event :before_probably_creating_new_file
       expect_no_more_events
@@ -129,7 +129,7 @@ module Skylab::System::TestSupport
     end
 
     def subject_
-      Home_.services.filesystem :Downstream_IO
+      Home_::Filesystem::Normalizations::Downstream_IO
     end
   end
 end

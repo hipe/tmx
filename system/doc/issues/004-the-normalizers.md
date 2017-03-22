@@ -1,37 +1,37 @@
 # the normalizers :[#004]
 
-## T.O.C and our general ordering rational :[#.A]
+## T.O.C and our general ordering rational :[#here.A]
 
-the test files are numbered in general because [#ts-001.C].
+the test files are numbered in general because [#ts-001.3].
 
 there are holes in the sequence because [#sl-137.H].
 
 we make the lettered sections here correspond to the numbers there
 because hey why not (note we use the holes for our own nodes):
 
-  • [#.A]: (here)
-  • [#.B]: upstream IO
-  • [#.C]: unlink file
-  • [#.D]: downstream IO
-  • [#.E]: (this common algorithm)
-  • [#.F]: existent directory
-  • [#.G]: path-based normalizations
-  • [#.H]: (below)
-  • [#.I]: (started inside of [#.D])
+  • [#here.A]: (here)
+  • [#here.B]: upstream IO
+  • [#here.C]: unlink file
+  • [#here.D]: downstream IO
+  • [#here.E]: (this common algorithm)
+  • [#here.F]: existent directory
+  • [#here.G]: path-based normalizations
+  • [#here.H]: (below)
+  • [#here.I]: track the volatility/mutex issue of all filesystems
 
-[#.G] has a general introduction to why these are "normalizers" and what
+[#here.G] has a general introduction to why these are "normalizers" and what
 that means.
 
 
 
 
-## the upstream IO normalization  :[#.B]
+## the upstream IO normalization  :[#here.B]
 
 at essence this node can be summarized as "open an existing file for
 reading". its primary reason for existence, however, is:
 
 
-### the commmon upstream resolution algorithm :[#.E]
+### the commmon upstream resolution algorithm :[#here.E]
 
 
 #### synopsis
@@ -122,7 +122,7 @@ currently it feels like a hack because of how automatic it tries to be:
 it assumes that if you have one argument in argv and stdin is interactive,
 then that one argument should be taken to repreesnt a filename.
 
-#experimental: Figure out which of several possible datasources should
+ #experimental: Figure out which of several possible datasources should
 be the stream for reading from based on whether the instream (stdin)
 is a tty (interactive terminal) or not, and whether arguments exist
 in argv, and if so, whether the number of those argv arguments is one,
@@ -163,7 +163,7 @@ model.
 so this would serve as a good prototyping ground for that.
 
 
-#### the converse of the above but for the downstream will be [#.H]
+#### the converse of the above but for the downstream will be [#here.H]
 
 (that is, either write you output to a file (named as an argument) or to
 stdout.
@@ -171,17 +171,18 @@ stdout.
 
 
 
-## the downstream IO normalization :[#.D]
+## the downstream IO normalization :[#here.D]
 
 
-### the non-atomicity of all things :[#.I]
+### the non-atomicity of all things :[#here.I]
 
-it is certainly possible that between the time when we take the "stat"
-"snapshot" of the file and when we try to open the file that the file
-may change or have been removed (or permissions may have changed so it
-is not writable, and so-on: between then and now, assume that in this
-interim literally anything that can happen on a filesystem may have
-happened).
+when not locking (as will be explained below), it is certainly possible
+that between the time when we (let's say) take the "stat" "snapshot" of
+the file and when we (let's say) try to open the file that the file may
+change or have been removed (or permissions may have changed so it is
+not writable, and so-on). generally, between any "then" and any "now",
+assume that in this interim literally about the state of the filesystem
+may have changed.
 
 there may be multiple places with similar such issues here and in the
 sibling nodes.
@@ -191,12 +192,18 @@ have it corralled into one place where it "should" be, and we have it
 bookmarked for the future here, and it is hopefully abstracted away enough
 not to affect the sorroundiing system too much.
 
-(EDIT: we use locks more often now..)
+for code contemporary to this writing and newer, we generally try to
+use locks to allay this issue. there is a "split second" (or perhaps
+longer, on an overloaded system) between when you (let's assume
+successfully) open a file and when you (let's assume successfully) aquire
+a mutex lock on it. but in fact it's a distraction to assume this compounds
+the problem. the simple fact is, either you acquire the lock or you don't,
+and whether or not you had to open that file first is just a detail.
 
 
 
 
-## the path-based normalizations :[#.G]
+## the path-based normalizations :[#here.G]
 
 the most commonly used features of this sidesystem (to read and write
 files) is implemented by what is also the most fun and weird "game mechanic"
@@ -210,7 +217,8 @@ that it is a valid email address, we will also try to produce an open
 filehandle from a string representing its path.
 
 near the curriability of normalizations, this becomes a useful mechanic
-to have. but in general, too, it is a design decision that just works.
+to have. but in general, too, it is a design decision that (at its best)
+"just works", sometimes even paying unexpected dividends.
 
 
 

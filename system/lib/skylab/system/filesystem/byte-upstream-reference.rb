@@ -28,11 +28,16 @@ module Skylab::System
         to_rewindable_line_stream( & x_p )
       end
 
-      def to_rewindable_line_stream & x_p
+      def to_rewindable_line_stream & p
 
         if block_given?  # experimental convenience exposure
 
-          Home_.services.filesystem( :Upstream_IO ).against_path @path, & x_p
+          kn = Home_::Filesystem::Normalizations::Upstream_IO.via(
+            :path, @path,
+            :filesystem, Home_.services.filesystem,
+            & p
+          )
+          kn && kn.value_x
         else
           ::File.open @path, ::File::RDONLY
         end

@@ -288,7 +288,7 @@ module Skylab::Snag::TestSupport
             o.with :be_verbose, false
           end
         else
-          o = TestSupport_.tmpdir.with(
+          o = Home_.lib_.system_lib::Filesystem::Tmpdir.with(
             :path, ::File.join(
                Home_.lib_.system.defaults.dev_tmpdir_path,
                'snaggle' ),

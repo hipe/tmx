@@ -50,7 +50,7 @@ then. as such, these techniques are now infallible.
 
 
 
-## test suites are trees, test support is not :[#.A]
+## test suites are trees, test support is not :[#here.A]
 
 our most recent "architecture innovation" is more of a refinement:
 
@@ -64,7 +64,7 @@ leading up to this, some general axioms:
   • furthermore we construct the test suite tree to follow the structure
     of the "application" (or library) code tree, so that to ascertain
     whether or where a code node is covered generally is straightforward
-    and unambiguous :[#.B].
+    and unambiguous :[#here.B].
 
     indeed we now derive significant utility from this convention thru
     [#st-002] the "file coverage" utility (b. feb 2012), which relies
@@ -96,12 +96,29 @@ negligible impact on the clients of the test support nodes.
 
 ### but sometimes you want sandbox modules..  :[#048]
 
-(this is only being tracked for now. later we may explain it..)
+the general idea (now deprecated) of "sandbox modules" was of having a
+plain-old module that is open within the "lexical scope" of your test
+that you can write to for that test only. in practice this effort was
+more trouble than it was worth.
+
+the most recent word on this is that we always avoid "sandbox modules"
+in favor of awkwardly named constants like, for example, `X_lt_cf_Frobulator`
+for a "frobulator" class needed for a test that's testing the
+"common functions" sub-library in the "lovely times" library of whatever
+sidesystem it's in. that is, these constants always start with `X` and use
+clusters of lowercase letters signifying the sub-sub-libraries and so on,
+prefixing an otherwise normal-looking const name appropriate for the test case.
+
+this convention (while awkard-looking) grants the test a reasonably strong
+assurance that the const names it uses in that *file* (not test) won't
+collide with other names outside of the file (this being contingent on
+whether you follow other conventions that are so easily inferred we won't
+enumerate them here).
 
 
 
 
-## numbering test files [#.C], and regressability in general
+## numbering test files :[#here.3], and regressability in general
 
 we stand by the essential tenet of unit testing design that each test in
 a test suite must be an atomic individual unit that does not run
@@ -117,12 +134,13 @@ the trees we work with have two dimensions: with the root at the top,
 these trees have "depth", but also the nodes of each branch node are
 ordered, say from left to right.
 
-we leverage this other dimension to make our tests more "regressable",
+we leverage this other dimension to make our tests more "regression-friendly",
 which warrants a discussion into what we mean by this neo-logistic
 adjective:
 
 
-### regressability? :[#.D]
+
+### regressability? :[#here.D]
 
 fixing a broken test can take anywhere from a few seconds to a few
 hours. (whether we have ever spent a few days on a broken test is
@@ -139,7 +157,7 @@ a good meta-strategy is one where the search space for a solution is
 made relatively small relatively quickly. with such a meta-strategy we
 can spend less time searching for what the exact problem is and more
 time fixing it (or if you prefer, "improving our design", with a nod to
-our favorite tautology: "all bugs stem from bad design").
+our favorite tautology: :[#here.4.2] "all bugs stem from bad design").
 
 in a perfect world this meta-strategy of ours becomes second nature,
 and we solve our problems one after another at a pretty steady clip.
@@ -161,7 +179,7 @@ no tests at all; because these broken tests don't linearize your focus:
 
 
 
-## the reason we access system resources in this manner :[#.E]
+## the reason we access system resources in this manner :[#here.E]
 
 it is convenient for tests to be able to write directly to stderr for e.g to
 output debugging information. however, littering our code with hard-coded

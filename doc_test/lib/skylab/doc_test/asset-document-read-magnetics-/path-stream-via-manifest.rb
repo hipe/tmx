@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  self._K_will_rewrite
+  self._K_will_rewrite  # #open #[#041]
 
             start_path = if ::File.file? @path  # walks start from dirs always
               ::File.dirname @path
@@ -8,7 +8,7 @@ module Skylab::DocTest
               @path
             end
 
-            @surrounding_path = @filesystem.walk(
+            @surrounding_path = Home_.lib_.system_lib::Filesystem::Walk.via(
               :start_path, start_path,
               :filename, @doc_test_files_file,
               :ftype, @filesystem.constants::FILE_FTYPE,
@@ -22,15 +22,19 @@ module Skylab::DocTest
             else
               UNABLE_
             end
-          end
 
           def __via_manifest_path_resolve_open_file
 
-            @open_file_IO = @filesystem[ :Upstream_IO ].via_path(
-              @manifest_path,
+            kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
+              :path, @matnifest_path,
+              :filesystem, etc,
               & @on_event_selectively )
 
-            @open_file_IO && ACHIEVED_
+            if kn
+              @open_file_IO = kn.value_x ; ACHIEVED_
+            else
+              kn
+            end
           end
 end
 # #tombstone: rewrite to simplify away manifest file syntax

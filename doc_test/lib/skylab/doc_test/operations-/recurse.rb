@@ -128,8 +128,11 @@ module Skylab::DocTest
         if @filesystem.exist? @path  # file or directory OK
           ACHIEVED_
         else
-          _nn = @filesystem.normalization :Upstream_IO
-          _no = _nn.against_path @path, & @_on_event_selectively
+          _no = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
+            :path, @path,
+            :filesystem, @filesystem,
+            & @_on_event_selectively
+          )
           false == _no || self._SANITY
           UNABLE_
         end
@@ -226,7 +229,7 @@ module Skylab::DocTest
 
     Path_must_be_absolute___ = Lazy_.call do
 
-      Home_.lib_.basic::Pathname.normalization.with(
+      Home_.lib_.basic::Pathname::Normalization.with(
         :absolute,
         :downward_only,
         :no_single_dots,

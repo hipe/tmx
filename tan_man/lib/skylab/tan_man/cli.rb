@@ -117,6 +117,23 @@ module Skylab::TanMan
         sym.id2name.gsub UNDERSCORE_, DASH_
       end
 
+      # ~ other stuff
+
+      def pth s
+        if s.respond_to? :to_path
+          s = s.to_path
+        end
+        if DIR_SEP___ == s.getbyte( 0 )
+          # Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.pretty_path s
+          ::File.basename s
+        else
+          s
+        end
+      end
+      DIR_SEP___ = ::File::SEPARATOR.getbyte 0
+
+      # ~
+
       if false  # bring back as needed
 
       def app_name
@@ -182,18 +199,6 @@ module Skylab::TanMan
       def plural_noun * a
         _NLP_agent.plural_noun( * a )
       end
-
-      def pth s
-        if s.respond_to? :to_path
-          s = s.to_path
-        end
-        if DIR_SEP___ == s.getbyte( 0 )
-          Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.pretty_path s
-        else
-          s
-        end
-      end
-      DIR_SEP___ = ::File::SEPARATOR.getbyte 0
 
       def s * x_a
         _NLP_agent.s( * x_a )

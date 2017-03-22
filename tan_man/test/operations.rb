@@ -6,6 +6,8 @@ module Skylab::TanMan::TestSupport
       tcc.include self
     end
 
+    if false
+
     # ~ adjunct facet : hearing ( & abstract graphs )
 
     def add_association_to_abstract_graph lbl_src_s, lbl_dst_s
@@ -178,6 +180,7 @@ module Skylab::TanMan::TestSupport
       end
       td
     end
+    end
 
     def dir sym
       ::File.join( dirs,
@@ -188,6 +191,7 @@ module Skylab::TanMan::TestSupport
       TS_::FixtureDirectories.dir_path
     end
 
+    if false
     def cfn
       CONFIG_FILENAME___
     end
@@ -199,5 +203,6 @@ module Skylab::TanMan::TestSupport
     CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
 
     THE_DOTFILE__ = 'the.dot'
+    end
   end
 end

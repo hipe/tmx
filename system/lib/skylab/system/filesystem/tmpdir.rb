@@ -16,14 +16,6 @@ module Skylab::System
           Memoizer___.new tc, slug
         end
 
-        def for_mutable_args_ x_a, & x_p
-          if x_a.length.zero?
-            self
-          else
-            via_iambic x_a, & x_p
-          end
-        end
-
         def with * x_a  # we would use la la but for #here
           via_iambic x_a
         end

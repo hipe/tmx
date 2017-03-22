@@ -61,7 +61,7 @@ module Skylab::Git::TestSupport
         if o
           o.for self
         else
-          o = TestSupport_.tmpdir.memoizer_for self, 'git-xyzizzy'
+          o = Home_.lib_.system_lib::Filesystem::Tmpdir.memoizer_for self, 'git-xyzizzy'
           o.instance
         end
       end

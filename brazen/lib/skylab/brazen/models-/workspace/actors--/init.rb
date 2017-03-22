@@ -122,11 +122,12 @@ module Skylab::Brazen
 
         @make_these_directories.each do | dir |
 
-          kn = LIB_.system.filesystem( :Existent_Directory ).call_via(
+          kn = LIB_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
 
             :path, dir,
             :create,
             :is_dry_run, @is_dry,
+            :filesystem, Home_.lib_.system.filesystem,
             & @on_event_selectively )
 
           if ! kn

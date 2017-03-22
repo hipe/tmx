@@ -70,13 +70,30 @@ module Skylab::Brazen
     end
   end  # >>
 
-  # -- singletons
+  # == functions that produce procs to be used as method definitions
 
-  module THE_EMPTY_EXPRESSION_AGENT_ ; class << self  # c.p from [ts]. 1x here
-    alias_method :calculate, :instance_exec
-  end ; end
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x
+    else
+      x
+    end
+  end
 
-  # --
+  # == this thing
+
+  module Toolkit
+
+    Autoloader_[ self ]
+
+    lazily :ConfigFileInquiry do
+
+      _ = Home_::Models_::Workspace::ConfigFileInquiry
+      _  # hi. #todo
+    end
+  end
+
+  # == public "magnetics" (functions)
 
   Ordered_stream_via_participating_stream = -> do  # 1x here, 1x [tm]
 
@@ -94,7 +111,7 @@ module Skylab::Brazen
     end
   end.call
 
-  # --
+  # == public models or similar (when small stowaways)
 
   module Collection_Adapters
 
@@ -122,17 +139,7 @@ module Skylab::Brazen
     _wee::LEGACY_Brazen_Actionesque_ProduceBoundCall
   end
 
-  # ==
-
-  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
-    if x
-      instance_variable_set ivar, x
-    else
-      x
-    end
-  end
-
-  # ==
+  # == small functions used locally
 
   Entity_lib_ = -> do
     Require_fields_lib_[]
@@ -164,7 +171,11 @@ module Skylab::Brazen
     Home_.lib_.zerk
   end
 
-  # ==
+  # == singletons, small subclasses
+
+  module THE_EMPTY_EXPRESSION_AGENT_ ; class << self  # c.p from [ts]. 1x here
+    alias_method :calculate, :instance_exec
+  end ; end
 
   ArgumentError = ::Class.new ::ArgumentError
 

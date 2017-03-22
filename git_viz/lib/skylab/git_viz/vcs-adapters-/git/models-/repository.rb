@@ -106,14 +106,14 @@ module Skylab::GitViz
 
         def __money
 
-          fs = Home_.lib_.system.filesystem
+          _FS = Home_.lib_.system_lib::Filesystem
 
-          fs.walk(
+          _FS::Walk.via(
             :start_path, @_start_path,
             :filesystem, @fs,
             :filename, VENDOR_DIR_,
             :max_num_dirs_to_look, -1,
-            :ftype, fs.constants.const_get( :DIRECTORY_FTYPE, false ),
+            :ftype, _FS::DIRECTORY_FTYPE,
             & @on_event_selectively )
         end
       end

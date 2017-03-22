@@ -106,8 +106,7 @@ module Skylab::Snag
 
     Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, fs, * x_a, & x_p do
 
-      Home_.lib_.system.filesystem.walk.with(
-
+      Home_.lib_.system_lib::Filesystem::Walk.with(
         :filename, fn,
         :max_num_dirs_to_look, 10,  # whatever
         :property_symbol, :dir,

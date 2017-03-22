@@ -125,9 +125,10 @@ module Skylab::TestSupport
 
     def ___doc_root_must_exist
 
-      @filesystem.normalization( :Upstream_IO ).call(
+      Home_.lib_.system_lib::Normalizations::Upstream_IO.via(
         :path, @doc_root,
         :must_be_ftype, :DIRECTORY_FTYPE,
+        :filesystem, @filesystem,
         & @_oes_p )
     end
 

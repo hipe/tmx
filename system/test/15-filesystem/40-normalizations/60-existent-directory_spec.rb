@@ -21,10 +21,10 @@ module Skylab::System::TestSupport
       td = memoized_tmpdir_.clear
       _path = ::File.join td.path, 'mambazo'
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :path, _path,
         :create_if_not_exist,
-        & handle_event_selectively_ )
+      )
 
       expect_neutral_event :creating_directory
       expect_no_more_events
@@ -41,11 +41,14 @@ module Skylab::System::TestSupport
       _expect_same
     end
 
-    it "curry" do
+    it "curry" do  # :#cov1.1
 
-      o = subject_.new_with(
+      _ = subject_
+
+      o = _.with(
         :create_if_not_exist,
-        & handle_event_selectively_ )
+        :filesystem, the_real_filesystem_,
+        & listener_ )
 
       o.frozen? or fail
 
@@ -64,7 +67,7 @@ module Skylab::System::TestSupport
     end
 
     def subject_
-      Home_.services.filesystem :Existent_Directory
+      Home_::Filesystem::Normalizations::ExistentDirectory
     end
   end
 end

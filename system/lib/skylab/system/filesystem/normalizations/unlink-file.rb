@@ -2,10 +2,10 @@ module Skylab::System
 
   module Filesystem
 
-    class Normalizations::Unlink_File < Normalizations::Path_Based
+    class Normalizations::UnlinkFile < Normalizations::PathBased  # 1x in universe, #feature-island
     private
 
-      def initialize _fs
+      def initialize
         @_probably_exists = false
         super
       end
@@ -36,7 +36,7 @@ module Skylab::System
 
         if e
           ev = wrap_exception_ e
-          @on_event_selectively.call :error, ev.terminal_channel_i do
+          @listener.call :error, ev.terminal_channel_i do
             ev
           end
           UNABLE_

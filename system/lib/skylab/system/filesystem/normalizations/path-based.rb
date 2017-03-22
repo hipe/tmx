@@ -2,171 +2,108 @@ module Skylab::System
 
   module Filesystem
 
-    class Normalizations::Path_Based  # read [#004.G] near states
-    private
+    class Normalizations::PathBased  # read [#004.G] near states
 
       Attributes_actor_[ self ]
 
       class << self
 
-        def begin_ filesystem
-          # hi.
-          new filesystem
+        # ~ make a prototype (then typically it is called with #here1)
+
+        def with( * )
+          super.freeze
         end
 
-        private :new  # all n11ns must begin by being begun (formally)
+        # ~
+
+        private :new  # all n11ns must now use "attributes actor" constuctors/callers
       end  # >>
 
-      def initialize filesystem
-
+      def initialize & l
+        if l
+          @listener = l
+        end
+        @do_lock_file_ = false
         @do_recognize_common_string_patterns_ = false
-        @filesystem = filesystem
         @path_arg_was_explicit_ = false
       end
 
-    public
+      # -- this crazy thing: an experiment:
+      #    you have a prototype that is un-differentiated. then you
+      #    [#sl-023] dup-and-mutate WHILE (in effect) changing the class.
+      #    :[#008.3]: #borrow-coverage from [tr]
 
-      def against_path path, & oes_p
+      def via * a, & p
 
-        if frozen?
-          _otr = dup
-          _otr.against_path path, & oes_p
-        else
-          if oes_p
-            @on_event_selectively = oes_p
-          end
-          _accept_path path
-          kn = execute
-          if kn
-            kn.value_x
-          else
-            kn
-          end
+        frozen? || self._SANITY__this_should_always_be_called_by_a_prototype__
+
+        scn = Scanner_[ a ]
+
+        if :up_or_down != scn.head_as_is
+          self._COVER_ME__fine_but_where__
         end
-      end
 
-      def new_with * x_a, & oes_p  # assume "edit" state
-
-        kp = process_iambic_fully_ x_a, & oes_p
-        if kp
-          freeze  # or more
-        else
-          kp
-        end
-      end
-
-      def edit_with * x_a, & oes_p  # assume "edit" state
-
-        kp = process_iambic_fully_ x_a, & oes_p
-        if kp
-          self
-        else
-          kp
-        end
-      end
-
-      def call * x_a, & oes_p
-
-        kn = call_via_iambic x_a, & oes_p
-        kn && kn.value_x
-      end
-
-      alias_method :[], :call
-
-      def call_via * x_a, & oes_p
-        call_via_iambic x_a, & oes_p
-      end
-
-      def call_via_iambic x_a, & oes_p
-
-        if frozen?
-
-          receive_call_when_curry_ x_a, & oes_p
-        else
-          __receive_call_when_editing x_a, & oes_p
-        end
-      end
-
-      def byte_whichstream_identifier_for open_IO, up_or_down  # courtesy
-
-        _cls = case up_or_down
+        scn.advance_one
+        _cls = case scn.head_as_is
         when :down
-          Home_::IO::ByteDownstreamReference
+          Sibling__::Downstream_IO
         when :up
-          Home_::IO::ByteUpstreamReference
+          Sibling__::Upstream_IO
         else
-          raise ::ArgumentError, up_or_down
+          raise ::NameError, scn.head_as_is
+        end
+        scn.advance_one
+
+        mutable = _cls.allocate
+
+        instance_variables.each do |ivar|
+          mutable.instance_variable_set ivar, instance_variable_get( ivar )
         end
 
-        _cls.via_open_IO open_IO
+        _ok = mutable.send :process_argument_scanner_fully, scn, & p
+
+        _ok && mutable.execute
       end
 
-      # ~ (( BEGIN :+#experiment a callable undifferentiated base actr [tr]
+      def byte_whichstream_identifier_for x, up_or_down  # 1x [tr] only (part of above
 
-      def receive_call_when_curry_ x_a, & x_p
-
-        # :+#experiment: call on an undifferentiated base actor. by [tr]
-
-        st = Common_::Scanner.via_array x_a
-        if :up_or_down != st.head_as_is
-          raise ::ArgumentError, "required first term: `up_or_down`"
-        end
-        st.advance_one
-        send :"__call_for__#{ st.gets_one }__", st, & x_p
-      end
-
-      def __call_for__up__ st, & x_p
-
-        _call_this_guy Sibling__::Upstream_IO, st, & x_p
-      end
-
-      def __call_for__down__ st, & x_p
-
-        _call_this_guy Sibling__::Downstream_IO, st, & x_p
-      end
-
-      def _call_this_guy cls, st, & oes_p
-
-        ivars = instance_variables
-        me = self
-        ok = false
-
-        o = cls.begin_ nil  # :+#would-change-class
-        o.instance_exec do
-
-          ivars.each do | ivar |
-            instance_variable_set ivar, me.instance_variable_get( ivar )
-          end
-
-          if oes_p
-            @on_event_selectively = oes_p
-          end
-
-          ok = process_argument_scanner_fully st
-        end
-
-        ok && o.execute
-      end
-
-      # ~ END ))
-
-      def __receive_call_when_editing x_a, & oes_p
-
-        kp = process_iambic_fully_ x_a, & oes_p
-        if kp
-          execute
+        case up_or_down
+        when :down
+          Home_::IO::ByteDownstreamReference.via_open_IO x
+        when :up
+          Home_::IO::ByteUpstreamReference.via_open_IO x
         else
-          kp
+          raise ::NameError, up_or_down
         end
       end
 
-      def process_iambic_fully_ x_a, & oes_p  # ssume we are in "edit" state
+      # --
 
-        if oes_p
-          @on_event_selectively = oes_p
+      def against_path path, & p  # :#here1
+        frozen? || self._WHERE
+        dup.__against_path p, path
+      end
+
+      def __against_path p, path
+        # assume [#sl-023] "dup and mutate" pattern
+        _accept_path path
+        if p
+          @listener = p
+        else
+          # (#cov1.1 but might be #feature-island to use a listener in a prototype)
         end
+        kn = execute
+        kn and kn.value_x  # part of the deal is the convenience of this
+      end
 
-        process_iambic_fully x_a
+      def _accept_path path
+
+        if path
+          @qualified_knownness_of_path = Common_::Qualified_Knownness.via_value_and_symbol path, :path
+          KEEP_PARSING_
+        else
+          self._COVER_ME_path_argument_was_falseish
+        end
       end
 
     private
@@ -192,15 +129,11 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      def _accept_path path
 
-        if path
-          @qualified_knownness_of_path = Common_::Qualified_Knownness.via_value_and_symbol path, :path
-          KEEP_PARSING_
-        else
-          self._COVER_ME_path_argument_was_falseish
-        end
-      end
+
+
+
+  private
 
       # ~ support for the commonest `execute`s
 
@@ -217,9 +150,27 @@ module Skylab::System
         NIL_
       end
 
-      def init_exception_and_stat_ path
+      # ~ #[#021] (both branches) a common maneuver..
 
-        # :+[#021] (common maneuver). see [#.I]: there is no locking here.
+      def init_exception_and_locked_file_ path
+
+        io = @filesystem.open path, ::File::RDONLY
+
+        # this spot between the above line and the below line is the
+        # subject of [#004.I] (the atomicity of all things)
+
+        d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
+        if d.zero?
+          @exception_ = nil
+          @locked_IO_ = io ; ACHIEVED_
+        else
+          self._COVER_ME__failed_to_acquire_lock__  # alas it is but a sketch
+        end
+      rescue ::Errno::ENOENT, Errno::ENOTDIR => @exception_
+        @stat_ = UNABLE_ ; UNABLE_
+      end
+
+      def init_exception_and_stat_ path
 
         @stat_ = @filesystem.stat path
         @exception_ = nil
@@ -259,7 +210,7 @@ module Skylab::System
 
         same = :invalid_system_resource_identifier
 
-        maybe_send_event :error, same do
+        @listener.call :error, same do
 
           build_not_OK_event_with( same,
 
@@ -301,7 +252,7 @@ module Skylab::System
 
       def maybe_emit_missing_required_properties_event_
 
-        maybe_send_event :error, :missing_required_properties do
+        @listener.call :error, :missing_required_properties do
 
           build_missing_required_properties_event_
         end

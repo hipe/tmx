@@ -42,7 +42,8 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject_call * x_a, & oes_p
-      _subject_module.normalization.call_via_iambic x_a, & oes_p
+
+      _normalization_class.call_via_iambic x_a, & oes_p
     end
 
     def _expect_common_failure x
@@ -69,10 +70,14 @@ module Skylab::Basic::TestSupport
 
     def __build_subject_curry
 
-     _subject_module.normalization.with(
+     _normalization_class.with(
         :begin, 'barbie',
         :end, 'foobie',
       )
+    end
+
+    def _normalization_class
+      _subject_module.const_get :Normalization, false
     end
 
     def _subject_module

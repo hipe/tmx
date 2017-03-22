@@ -271,7 +271,7 @@ module Skylab::Brazen
 
           def _add_number_normalization * x_a
 
-            _n11n = Home_.lib_.basic.normalizers.number.via_iambic x_a
+            _n11n = Home_.lib_.basic::Number::Normalization.via_iambic x_a
 
             __add_ad_hoc_normalization _n11n
           end
@@ -292,14 +292,15 @@ module Skylab::Brazen
 
           def non_negative_integer=
 
-            _NORMER = Home_.lib_.basic.normalizers.number(
+            n11n = Home_.lib_.basic::Number::Normalization.with(
               :number_set, :integer,
-              :minimum, 0 )
+              :minimum, 0,
+            )
 
             append_ad_hoc_normalizer_ do | qkn, & oes_p |
 
               if qkn.is_effectively_known
-                _NORMER.normalize_qualified_knownness qkn, & oes_p
+                n11n.normalize_qualified_knownness qkn, & oes_p
               else
                 qkn.to_knownness
               end

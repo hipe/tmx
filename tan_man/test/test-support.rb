@@ -310,25 +310,27 @@ module Skylab::TanMan::TestSupport
 
     -> do
 
-      _PATH = nil
+      path = nil
 
-      Memoized_GGD_path__ = -> { _PATH }
+      Memoized_GGD_path__ = -> { path }
 
       Memoize_GGD_path__ = -> do_debug, debug_IO do
 
-        _PATH = ::File.join TS_.tmpdir_path_, 'grammerz'
+        path = ::File.join TS_.tmpdir_path_, 'grammerz'
 
-        if ! ::File.exist? _PATH
+        if ! ::File.exist? path
 
-          _tmpdir = Home_.lib_.system.filesystem.tmpdir :path, _PATH,
+          _tmpdir = Home_.lib_.system_lib::Filesystem::Tmpdir.with(
+            :path, path,
             :be_verbose, do_debug,
             :debug_IO, debug_IO,
-            :max_mkdirs, 3  # you can make __tmx__, you can make [tm], and this
+            :max_mkdirs, 3,  # you can make __tmx__, you can make [tm], and this
+          )
 
           _tmpdir.prepare_when_not_exist
         end
 
-        _PATH
+        path
       end
     end.call
 
@@ -477,9 +479,11 @@ module Skylab::TanMan::TestSupport
     define_singleton_method :_memoize, Common_::Memoize
 
     base_tmpdir = _memoize do
-      Home_.lib_.system.filesystem.tmpdir(
+
+      Home_.lib_.system_lib::Filesystem::Tmpdir.with(
         :path, TS_.tmpdir_path_,
-        :max_mkdirs, 1 )
+        :max_mkdirs, 1,
+      )
     end
 
     Empty_dir_pn = _memoize do

@@ -502,7 +502,7 @@ allow a variety of different ways of expressing the same thing, by the
 rationale that if models are written consistently and concisely then they
 are easier to understand, and conversely models that are harder to read and
 understand may lead to more bugs, or make bugs harder to fix. (or more
-enigmatically, "all bugs stem from bad design".)
+enigmatically, [#ts-001.4.2] "all bugs stem from bad design".)
 
 this provision (to the extent that it is implemented by the meta-model)
 comes down to this: we can simplify things by forbidding the use of
@@ -1064,6 +1064,13 @@ up at night asking how many sub-branches can a branch have. the answer
 is "infinitely many" and we don't give it a second thought.
 
 (to be continued..)
+
+
+
+
+## further reading
+
+[#ba-027] & [#ba-045] will eventually merge into this narrative as siblings #open
 
 
 

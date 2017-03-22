@@ -33,16 +33,16 @@ module Skylab::System
 
         class << self
 
-          def for_mutable_args_ a, & oes_p
+          def against_mutable_ a, & p
 
             case 1 <=> a.length
 
             when -1
-              via_iambic( a, & oes_p ).execute
+              via_iambic( a, & p ).execute
 
             when 0
               a.unshift :path
-              via_iambic( a, & oes_p ).execute
+              via_iambic( a, & p ).execute
 
             when 1
               self._COVER_ME_easy

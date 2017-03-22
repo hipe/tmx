@@ -1,5 +1,11 @@
 # the method-naming idiomspace of validation :[#045]
 
+(EDIT: this document is less fresh than [#fi-012] and has yet to be
+reconciled with the larger narrative that document is part of. it seems
+there is room for this document to complement that one, as their respective
+ideas are largely non-overlapping; however this document should probably be
+moved to there.)
+
 ## introduction in context
 
 this is a historical document kept because it informs ideas that went on
@@ -30,6 +36,7 @@ until we feel that we reached an adequate general convention. having said
 this, we feel at this point comfortable prescribing some general conventions,
 especially in regards to the semantic distinction to be drawn between
 "normalization" and "validation":
+
 
 
 
@@ -148,3 +155,10 @@ conventionally correct ways to accomplish such a thing might include:
   then we are not in an error state; that the field is valid.  conversely if
   it results in true-ish when we know that we are in an error state and
   furthermore we have our exit status, all with no side-effects.
+
+
+
+
+## document meta
+
+  - #pending-rename should be moved next to [#fi-012] for narrative consistency

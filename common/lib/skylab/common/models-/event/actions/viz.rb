@@ -74,9 +74,10 @@ module Skylab::Common
 
           fa = qualified_knownness_of :force
 
-          kn = Home_.lib_.system.filesystem( :Downstream_IO ).with(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Downstream_IO.via(
             :qualified_knownness_of_path, pa,
             :force_arg, fa,
+            :filesystem, Home_.lib_.system.filesystem,
             & handle_event_selectively )
 
           if kn

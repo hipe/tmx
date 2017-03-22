@@ -6,11 +6,11 @@ module Skylab::System
 
       class << self
 
-        def for_mutable_args_ x_a, & oes_p
+        def against_mutable_ a
 
-          oes_p and raise ::ArgumentErrror
+          block_given? and raise ::ArgumentErrror
 
-          case 1 <=> x_a.length
+          case 1 <=> a.length
           when -1
             self._COVER_ME
           when 0

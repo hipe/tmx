@@ -6,16 +6,17 @@ module Skylab::Basic
 
     class << self
 
-      def normalization
-        Range_::Normalization__
-      end
-
       def normalize_qualified_knownness qkn, * x_a, & oes_p
         x_a.push :qualified_knownness, qkn
-        Range_::Normalization__.call_via_iambic x_a, & oes_p
+        Here_::Normalization.call_via_iambic x_a, & oes_p
       end
+    end  # >>
+
+    Autoloader_[ self ]
+    lazily :Normalization do
+      Here_::Normalization__
     end
 
-    Range_ = self
+    Here_ = self
   end
 end

@@ -323,10 +323,6 @@ module Skylab::DocTest::TestSupport
         dup.extend( OpenSupport___ ).__execute_against path, mode
       end
 
-      def normalization const
-        The_real_filesystem_[].normalization const
-      end
-
       attr_reader(
         :_read_only_filesystem,
       )

@@ -6,12 +6,12 @@ module Skylab::Cull
 
       def any_nearest_path_via_looking_upwards_from_path arg, & oes_p
 
-        fs = Home_.lib_.filesystem
+        _FS = Home_.lib_.system_lib::Filesystem
 
-        surrounding_path = fs.walk(
+        surrounding_path = _FS::Walk.via(
           :start_path, arg.value_x,
           :filename, FILENAME_,
-          :ftype, fs.constants::DIRECTORY_FTYPE,
+          :ftype, _FS::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
           :prop, arg.association,
           & oes_p )

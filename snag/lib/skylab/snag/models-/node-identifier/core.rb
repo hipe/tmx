@@ -243,7 +243,7 @@ module Skylab::Snag
       # expirimental near :+[#ba-050]
       # ->
 
-        _n11n = Home_.lib_.basic::Number.normalization.with(
+        _n11n = Home_.lib_.basic::Number::Normalization.with(
           :minimum, 1,
           :number_set, :integer,
         )

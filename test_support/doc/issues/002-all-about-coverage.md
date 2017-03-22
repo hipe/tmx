@@ -18,7 +18,7 @@ no dependencies at all except ruby.
 
 despite this, for aesthetics, comprehensiveness, and perhaps
 future-proofing we still make the coverage mechaincs "look like" a true
-plugin as much as we can, in terms of where its files lives. the cost of
+plugin as much as we can, in terms of where its files live. the cost of
 this is a couple lines of explicit file requiring.
 
 

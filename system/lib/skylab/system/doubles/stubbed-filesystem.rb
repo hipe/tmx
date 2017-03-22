@@ -164,7 +164,7 @@ module Skylab::System
       end
 
       def _const sym
-        Home_.services.filesystem.constants.const_get sym, false
+        Home_::Filesystem.const_get sym, false
       end
     end
 

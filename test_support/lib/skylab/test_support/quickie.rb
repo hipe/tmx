@@ -1044,7 +1044,7 @@ module Skylab::TestSupport
       def begin_branch_node d, ctx
         send @_EEK_flush
         if ctx.is_pending
-          ::Kernel._K
+          ::Kernel._COVER_ME__pending_not_covered_for_quickie__
         else
           __cache_branch d, ctx  # either this
           # _express_branch d, ctx  # or this

@@ -12,7 +12,7 @@ module Skylab::System::TestSupport
     end
 
     def subject_
-      Home_.services.filesystem :Path_Based
+      Home_::Filesystem::Normalizations::PathBased
     end
   end
 end

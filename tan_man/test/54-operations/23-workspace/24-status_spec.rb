@@ -2,51 +2,94 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - workspace - `status`", wip: true do
+  describe "[tm] operations - workspace - `status`" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
-    it "dir w/o config file - is not failure, result is \"promise\"" do
+    context "dir w/o config file - is not failure, result is \"promise\"" do
 
-      call_API :status, :path, dirs
+      it "succeeds" do
+        _tuple || fail
+      end
 
-      em = @result
-      em.category.should eql [ :info, :resource_not_found ]
+      it "result is a debugging sexp" do
+        a = _tuple.first
+        a.first == :did_not_exist || fail
+        ::File.basename( a.last ) == "config.ini" || fail
+      end
 
-      _ev = em.emission_value_proc[]
-      _ev and fail
+      it "emits this one event" do
 
-      _em = expect_OK_event :resource_not_found
-      _ev = _em.cached_event_value
+        _ev = _tuple.last
 
-      _line = black_and_white _ev
+        _lines = black_and_white_lines _ev
 
-      _exp = '"tanman-workspace/config" not found in fixture-directories'
+        expect_these_lines_in_array_ _lines do |y|
+          y << '"tan-man-workspace/config.ini" not found in fixture-directories'
+        end
+      end
 
-      _line == _exp || fail
+      shared_subject :_tuple do
 
-      expect_no_more_events
+        call_API :workspace, :status, :path, dirs
+
+        ev = nil
+        expect :info, :resource_not_found do |ev_|
+          ev = ev_
+        end
+
+        _result = execute
+
+        [ _result, ev ]
+      end
     end
 
-    it "partay" do
+    context "partay" do
 
-      call_API :status, :path, dir( :with_freshly_initted_conf ),
-        :config_filename, 'tan-man.conf'
+      it "wee" do
+        _tuple || fail
+      end
 
-      expect_no_events
-      em = @result
+      it "result is special tuple" do
+        a = _tuple.first
+        a.first == :existed || fail
+        a.last.include? ::File::SEPARATOR or fail
+      end
 
-      em.category.should eql [ :info, :resource_exists ]
+      it "emits" do
+        expect_these_lines_in_array_ _tuple.last do |y|
+          y << "resource exists - tan-man.conf"
+        end
+      end
 
-      ev = em.emission_value_proc[]
+      shared_subject :_tuple do
 
-      ev.terminal_channel_symbol.should eql :resource_exists
+        call_API(
+          :workspace, :status,
+          :path, dir( :with_freshly_initted_conf ),
+          :config_filename, 'tan-man.conf',
+        )
 
-      _ = black_and_white( ev )
+        lines = nil
+        expect :info, :expression, :resource_exists do |y|
+          lines = y
+        end
 
-      _.should eql "resource exists - tan-man.conf"
+        _hi = execute
+        [ _hi, lines ]
+      end
+
+      def expression_agent
+        expression_agent_for_CLI_TM
+      end
     end
+
+    # ==
+    # ==
   end
 end
+# #tombstone-B: rewrite during migration away from [br]
 # this line is for :+#posterity - "@todo waiting for permute [#056]"

@@ -1,3 +1,15 @@
+(EDIT: this document is less fresh than [#fi-012] and has yet to be
+reconciled with the larger narrative that document is part of. (at writing
+[#045] holds this same classification.) however (again as with [#same] with
+respect to [#same~2]) there might be enough non-overlap of ideas for these
+documents to co-exist peacefully; however we should at least add references
+in the remote larger narrative back to this one.
+
+one more related note, probably only one of these documents should
+exploit the cheeky "the new normal" as a section heading, and it should
+probably not be this one.)
+
+
 (we cram two different doc-nodes in here for now with the intention of
 one day assimilating the older one into the newer one.)
 
@@ -16,9 +28,8 @@ signature and semantics:
 
 ## introduction
 
-
 we have finally arrived at a normalization API we are happy with. here
-we sing about it. you may be looking for the old [fa] normalization
+we sing about it. you may be looking for the old [#045] normalization
 document. that is the second half of this document.
 
 
@@ -26,7 +37,7 @@ document. that is the second half of this document.
 
 ## historical context
 
-ideas put forth in the historical [#045] hold a snapshot of what was
+ideas put forth in the historical [#same] hold a snapshot of what was
 going on when we synthesized these ideas.
 
 
@@ -289,6 +300,9 @@ particular field, and insulates us from both how the data is stored and how
 we are wired for eventing issues surrounding it, which in turn enables us
 to make flexible, reusable normalizers. but there are lots of details:
 
+
+
+
 ## using the `normalizer` metafield
 
 there exists in the F-ace API API recognition of a metafield called
@@ -310,6 +324,9 @@ otherwise if the `normalize` metafield is assicated with a value other than
 `true`, the system will assume that the value itself is the
 `normalization callable` (e.g a proc, perhaps defined inline or perhaps
 held in e.g a constant, or perhaps even as the result of some other proc).
+
+
+
 
 ## how is the `normalizer callable` is used, and when is it called?
 
@@ -333,11 +350,16 @@ we will call these facets "channels of concern". each channel of concern
 manifests itself in some way in the interface that the `normalizer callable`
 must follow. for now, there are three "channels of concern":
 
+
+
+
 ## what are the three channels of concern?
 
 in brief, they are "is it invalid?", "is it provided?" and "what change
 (if any) should we make to the value (or how should we mutate the object)?"
 but underneath each of these there are details:
+
+
 
 ### channel of concern one: were there validation errors (and if so,
     what were they)?
@@ -373,6 +395,8 @@ logic as software!
 
 which brings us nicely to a separate channel of concern:
 
+
+
 ### channel of concern two: should the field be considered as having
     been provided?
 
@@ -388,6 +412,7 @@ of its associated field. how it communicates this state back to the system
 is covered below. what happens when required fields are missing is
 (fortunately for your callable) outside of the scope of field-level
 normalization.
+
 
 
 ### channel of concern three: is the value we should store different than the
@@ -441,6 +466,9 @@ modalities.
 
 how the callable signals such a change back to the system is covered below.
 
+
+
+
 ## how can the callable signal signals back to the system along each of
    the three channels of concern?
 
@@ -453,6 +481,8 @@ covering each of these control points effectively documents the entirety of
 the F-ace API API field-level normalization API. we present them here in a
 fuzzily-narrative chronological order corresponding roughly to the sequence
 in which they become significant:
+
+
 
 ### control point 1 - the incoming value from the upstream
 
@@ -470,6 +500,7 @@ hypothetically `x` could be some kind of complex mutable object (i.e not
 just a string, etc) that the callable is expected to mutate in some way as
 part of its normalizing behavior, but at the time of this writing we haven't
 employed this behavior in any of our normalizers.
+
 
 
 ### control point 2 - the notification yielder
@@ -523,6 +554,7 @@ this notification yielder gets passed to the callable as its first argument.
 the reason for this position is explained below.
 
 
+
 ### control point 3 - the `value change` callback.
 
 a `normalizer callable` changing the received value is not a foregone
@@ -543,6 +575,7 @@ reasons below, when we explain why the `value change` callback is the third
 and final argument to the `normalizer callable` below.
 
 
+
 ### (final) control point 4 - the result of the normalizer callable.
 
 the result of the call to the `normalizer callable` will be treated as a
@@ -559,6 +592,8 @@ qualifies as having been provided. a default assumption in the absense of
 any `normalizer callable` will likely be that a value of `nil` is interpreted
 to mean that the field was not provided, and all other values (including
 `false`) will be interpreted as meaning that the field was provided.
+
+
 
 ## synthesis: why are the arguments in this strange order?
 
@@ -607,5 +642,12 @@ by anything else, for the above described reasons.
 all of this will likely have changed by the time you finish reading it, but
 thank you anyway for doing so ^_^
 _
+
+
+
+
+## document meta
+
+  - #pending-rename - should be moved next to [#fi-012] and edited appropriately
 
 :+#tombstone the documentation of the five sunsetted normalization methods

@@ -2,15 +2,15 @@ module Skylab::System
 
   module Filesystem
 
-    class Normalizations::Downstream_IO < Normalizations::Path_Based  # :[#004.D]
+    class Normalizations::Downstream_IO < Normalizations::PathBased  # :[#004.D]
     private
 
-      def initialize _fs
+      def initialize
         @_force_arg = nil
         @_is_dry_run = false
         @_stderr = nil
         @_stdout = nil
-        super _fs
+        super
       end
 
       def dash_means=
@@ -40,7 +40,7 @@ module Skylab::System
 
       public def execute
 
-        # note this is only superficially similar to [#.A] the common
+        # note this is only superficially similar to [#here.A] the common
         # algorithm and should probably not be abstracted
 
         io = @_stdout
@@ -137,7 +137,7 @@ module Skylab::System
 
         _dir = ::File.dirname path_
 
-        maybe_send_event :resource_not_found, :parent_directory_must_exist  do
+        @listener.call :resource_not_found, :parent_directory_must_exist  do
 
           build_not_OK_event_with(
             :parent_directory_must_exist,
@@ -174,7 +174,7 @@ module Skylab::System
           if fa.is_known_known && fa.value_x
             _overwrite
           else
-            maybe_send_event :error, :missing_required_properties do
+            @listener.call :error, :missing_required_properties do
               __build_missing_required_force_event
             end
             UNABLE_
@@ -205,7 +205,7 @@ module Skylab::System
         # assume that either the file didn't exist, or existed but
         # was of zero size.
 
-        maybe_send_event :info, :before_probably_creating_new_file do
+        @listener.call :info, :before_probably_creating_new_file do
           __build_before_probably_creating_new_file_event
         end
 
@@ -222,7 +222,7 @@ module Skylab::System
 
       def _overwrite  # assume file existed and had nonzero content
 
-        maybe_send_event :info, :before_editing_existing_file do
+        @listener.call :info, :before_editing_existing_file do
           __build_before_editing_existing_file_event
         end
 
@@ -271,7 +271,7 @@ module Skylab::System
 
       def via_exception_produce_result_
 
-        maybe_send_event :error, :exception do
+        @listener.call :error, :exception do
           wrap_exception_ @exception_
         end
         UNABLE_

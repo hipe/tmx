@@ -109,7 +109,7 @@ module Skylab::Basic
       end
 
       def description_under expag
-        Pathname_.description_under_of_path expag, @path
+        Here_.description_under_of_path expag, @path
       end
 
       def to_simple_line_stream
@@ -168,8 +168,15 @@ module Skylab::Basic
 
     # ==
 
+    Autoloader_[ self ]
+    lazily :Normalization do
+      Here_::Normalization__
+    end
+
+    # ==
+
     DOT_DOT_ = '..'
     FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
-    Pathname_ = self
+    Here_ = self
   end
 end

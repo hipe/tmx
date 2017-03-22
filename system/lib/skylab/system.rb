@@ -56,19 +56,18 @@ module Skylab::System
         _service :Environment
       end
 
-      def filesystem * x_a, & x_p
-
-        _service( :Filesystem ).for_mutable_args_ x_a, & x_p
+      def filesystem
+        _service :Filesystem
       end
 
-      def find * x_a, & x_p
+      def find * a, & p
 
-        _lib( :Find ).for_mutable_args_ x_a, & x_p
+        _lib( :Find ).against_mutable_ a, &p
       end
 
-      def grep * x_a, & x_p
+      def grep * a, & p
 
-        _lib( :Grep ).for_mutable_args_ x_a, & x_p
+        _lib( :Grep ).against_mutable_ a, &p
       end
 
       def IO
@@ -200,6 +199,10 @@ module Skylab::System
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Scanner_ = -> a do  # #todo etc
+    Common_::Scanner.via_array a
+  end
+
   Basic_ = Lazy_.call do
     Home_.lib_.basic
   end
@@ -227,7 +230,7 @@ module Skylab::System
       string_scanner_class[].new s
     end
 
-    Tmpdir = _memoize do
+    Tmpdir_path = _memoize do
       require 'tmpdir'
       ::Dir.tmpdir
     end

@@ -160,9 +160,9 @@ module Skylab::TanMan
 
       _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
 
-        o.add_grammatical_injection :_branch_desc_SN_, BRANCH_DESCRIPTION___
+        o.add_grammatical_injection :_branch_desc_TM_, BRANCH_DESCRIPTION___
 
-        o.add_grammatical_injection :_parameter_SN_, _param_gi
+        o.add_grammatical_injection :_parameter_TM_, _param_gi
       end
 
       _g  # hi. #todo
@@ -196,14 +196,15 @@ module Skylab::TanMan
       end
 
       def _read_ k
-        ::Kernel._OKAY
         ivar = :"@#{ k }"
-        # ..
-        instance_variable_get ivar
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        end
       end
 
       def _write_ k, x
-        ::Kernel._OKAY
+        instance_variable_set :"@#{ k }", x
+        NIL
       end
     end
 
@@ -452,6 +453,7 @@ module Skylab::TanMan
     stowaway :Internal, 'internal/paths'
   end
 
+  if false  # #todo: cut this soon
   class Models_::Workspace < Brazen_::Models_::Workspace
 
     set_workspace_config_filename 'tanman-workspace/config'
@@ -531,6 +533,7 @@ module Skylab::TanMan
       @__asset_dir
     end
   end
+  end  # if false
 
   class Models_::Graph < Model_
 
@@ -694,6 +697,7 @@ module Skylab::TanMan
 
   end  # `Model_`
 end
+# #tombstone-E.1: compartmentalize workspace node
 # #tombstone-D: we once had `take` defined as a stream method
 # #tombstone: remote add, list, rm (ancient, deprecated); check, which
 # :+#tombstone: this used to be bottom properties frame

@@ -28,14 +28,12 @@ module Skylab::Cull
         # that is, that the directory itself does not exist but that its
         # dirname exists and is a directory.
 
-        kn = Home_.lib_.system.filesystem( :Existent_Directory ).call_via(
+        kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
 
           :path, @survey.workspace_path_,
-
           :is_dry_run, true,  # always true, we are checking only
-
           :create,
-
+          :filesystem, Home_.lib_.system.filesystem,
           & @_emit )
 
         if kn

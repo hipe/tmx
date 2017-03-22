@@ -42,10 +42,11 @@ module Skylab::Fields
 
         def _add_number_normalization * x_a  # (as seen in [br])
 
-          normer = Home_.lib_.basic.normalizers.number.via_iambic x_a
+          n11n = Home_.lib_.basic::Number::Normalization.via_iambic x_a
+
           will_normalize_by do |qkn, &p|
             if qkn.is_effectively_known
-              normer.normalize_qualified_knownness qkn, & p
+              n11n.normalize_qualified_knownness qkn, & p
             else
               qkn.to_knownness
             end

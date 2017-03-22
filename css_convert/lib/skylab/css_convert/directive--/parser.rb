@@ -41,11 +41,11 @@ module Skylab::CSS_Convert
       o.execute
     end
 
-    _ = Home_.lib_.system.filesystem :Existent_Directory
-
-    DIR_N11N__ = _.new_with(
+    DIR_N11N__ =
+    Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.with(
       :create_if_not_exist,
       :max_mkdirs, 1,
+      :filesystem, Home_.lib_.system.filesystem,
     )
 
     def entity_noun_stem

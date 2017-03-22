@@ -228,10 +228,11 @@ module Skylab::Basic
         end
 
         def _new_invalid_event
-          Number_::Uninterpretable.new  # example of #expermiental #[#co-070.1] plain old `new` constructs malleable event
+          Here_::Uninterpretable.new  # example of #expermiental #[#co-070.1] plain old `new` constructs malleable event
         end
       end
 
       # <-
   end
 end
+# #pending-rename: publicize

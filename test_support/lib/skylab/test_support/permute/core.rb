@@ -86,10 +86,14 @@ module Skylab::TestSupport
           _kn = Common_::Qualified_Knownness.via_value_and_symbol _x, :test_file
           _oes_p = pp[ nil ]
 
-          _fs = @_filesystem_proc.call
-          _fs.normalization( :Upstream_IO ).call_via(
+          _real_FS = @_filesystem_proc.call
+
+          _kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
             :qualified_knownness_of_path, _kn,
+            :filesystem, _real_FS,
             & _oes_p )
+
+          _kn
         end
       end
 

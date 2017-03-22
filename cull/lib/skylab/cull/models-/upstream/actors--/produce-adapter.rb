@@ -116,9 +116,12 @@ module Skylab::Cull
 
       def process_as_file_absolute_path path
 
-        yes = Home_.lib_.system.filesystem.normalization( :Upstream_IO ).call(
+        _real_FS = Home_.lib_.system.filesystem
+
+        yes = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
           :path, path,
           :must_be_ftype, :FILE_FTYPE,
+          :filesystem, _real_FS,
           & @_emit )
 
         if yes

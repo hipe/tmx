@@ -52,8 +52,10 @@ module Skylab::System::TestSupport
         if io
           x_a.push :be_verbose, true, :infostream, io
         end
-        td = TestSupport_.tmpdir.via_iambic x_a
-        td.exist? or td.prepare
+        td = Home_::Filesystem::Tmpdir.via_iambic x_a
+        if ! td.exist?
+          td.prepare
+        end
         p = -> _ { td }
         td
       end

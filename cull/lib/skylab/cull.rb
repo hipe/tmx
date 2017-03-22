@@ -166,10 +166,6 @@ module Skylab::Cull
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Filesystem = -> do
-      System[].filesystem
-    end
-
     Load_JSON_lib = -> do
       require 'json'
       nil
@@ -180,15 +176,14 @@ module Skylab::Cull
       ::StringScanner.new x
     end
 
-    system_lib = nil
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
 
     Basic = sidesys[ :Basic ]
     # = sidesys[ :Brazen ]  # for [sl]
     Fields = sidesys[ :Fields ]
-    system_lib = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
   end
 
   # ==

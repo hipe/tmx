@@ -29,10 +29,6 @@ module Skylab::Basic  # introduction at [#020]
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
-
-    def normalizers
-      Normalizers_instance__[]
-    end
   end  # >>
 
   Common_ = ::Skylab::Common
@@ -211,31 +207,6 @@ module Skylab::Basic  # introduction at [#020]
     def parameter_arity
       :too_basic_for_arity
     end
-  end
-
-  Normalizers_instance__ = Common_.memoize do
-
-    class Normalizers__
-
-      _MEMBERS = [ :number, :pathname, :range ].freeze
-
-      define_method :members do
-        _MEMBERS.dup
-      end
-
-      _MEMBERS.each do |i|
-        _CONST = Common_::Name.via_variegated_symbol( i ).as_const
-        define_method i do | * a |
-          if a.length.zero?
-            Home_.const_get( _CONST, false ).normalization
-          else
-            Home_.const_get( _CONST, false ).normalization.via_arglist a
-          end
-        end
-      end
-
-      self
-    end.new
   end
 
   module Simple_Selective_Sender_Methods_

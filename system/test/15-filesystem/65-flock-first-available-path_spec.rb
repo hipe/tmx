@@ -24,14 +24,13 @@ module Skylab::System::TestSupport
 
     def _init_tmppdir
 
-      fs = services_.filesystem
+      _path = ::File.join services_.filesystem.tmpdir_path, 'hl-flock-etc'
 
-      _path = ::File.join fs.tmpdir_path, 'hl-flock-etc'
-
-      @td = fs.tmpdir(
+      @td = Home_::Filesystem::Tmpdir.with(
         :path, _path,
         :be_verbose, do_debug,
-        :debug_IO, debug_IO )
+        :debug_IO, debug_IO,
+      )
 
       @td.clear
 

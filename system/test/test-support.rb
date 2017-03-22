@@ -68,7 +68,7 @@ module Skylab::System::TestSupport
         if o
           o.for self
         else
-          o = TestSupport_.tmpdir.memoizer_for self, 'sy-xyzizzy'
+          o = Home_::Filesystem::Tmpdir.memoizer_for self, 'sy-xyzizzy'
           o.instance
         end
       end
@@ -94,7 +94,7 @@ module Skylab::System::TestSupport
       FALSE
     end
 
-    def handle_event_selectively_
+    def listener_
       event_log.handle_event_selectively
     end
 
@@ -133,11 +133,11 @@ module Skylab::System::TestSupport
 
     # (use memoized_tmpdir_ if you can, this if you can't (#here))
 
-    svcs = Home_.services
-    _tmpdir = svcs.defaults.dev_tmpdir_path
+    _tmpdir = Home_.services.defaults.dev_tmpdir_path
+
     _path = ::File.join _tmpdir, 'sy-xyzizzy-g'
 
-    svcs.filesystem.tmpdir(
+    Home_::Filesystem::Tmpdir.with(
       :path, _path,
       :max_mkdirs, 2,  # one universe wide, one for the sidesystem
     )

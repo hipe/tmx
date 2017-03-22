@@ -36,6 +36,13 @@ module Skylab::Fields
             @parse_tree.must_be_integer_greater_than_or_equal_to_this @scanner.gets_one
           end
 
+          def default
+            x = @scanner.gets_one
+            @parse_tree.will_default_by do |_ent|
+              Common_::KnownKnown[ x ]
+            end
+          end
+
           def default_by
             @parse_tree.will_default_by( & @scanner.gets_one )
           end

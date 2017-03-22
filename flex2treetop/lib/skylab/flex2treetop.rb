@@ -293,9 +293,10 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
-          kn = LIB_.system.filesystem( :Upstream_IO ).call_via(
+          kn = LIB_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
             :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdin, @resources.sin,
+            :filesystem, LIB_.system.filesystem,
             & handle_event_selectively )
 
           if kn
@@ -328,11 +329,12 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
-          kn = LIB_.system.filesystem( :Downstream_IO ).call_via(
+          kn = LIB_.system_lib::Filesystem::Normalizations::Downstream_IO.via(
 
             :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdout, @resources.sout,
-            :force_arg, qualified_knownness( :force )
+            :force_arg, qualified_knownness( :force ),
+            :filesystem, LIB_.system.filesystem,
 
           ) do | * i_a, & ev_p |
 
@@ -414,14 +416,14 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     end
 
     System = -> do
-      System_lib___[].services
+      System_lib[].services
     end
 
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
     Option_parser = -> { require 'optparse' ; ::OptionParser }
     String_scanner = -> { require 'strscan' ; ::StringScanner }
-    System_lib___ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     Treetop = vendor[ :Treetop ]
   end
 
@@ -526,7 +528,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __use_FS_parser
 
-      @FS_parser_dir ||= LIB_.stdlib_tmpdir.tmpdir
+      @FS_parser_dir ||= LIB_.stdlib_tmpdir_path
 
       x = __resolve_parser_dir_stat
       x ||= __via_parser_dir_stat
@@ -571,7 +573,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       :parser_dir_is_not_dir
     end
 
-    DIR_FTYPE___ = LIB_.system.filesystem.constants::DIRECTORY_FTYPE
+    DIR_FTYPE___ = LIB_.system_lib::Filesystem::DIRECTORY_FTYPE
 
     def __resolve_and_use_generated_files
 

@@ -39,7 +39,7 @@ module Skylab::Cull
 
       def to_entity_stream_stream
 
-        @line_stream = Home_.lib_.filesystem.line_stream_via_path @path
+        @line_stream = Home_.lib_.system.filesystem.line_stream_via_path @path
 
         Me___::Table_scanner_via_line_stream__[ @line_stream, & @_emit ]
       end

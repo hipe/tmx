@@ -108,11 +108,11 @@ module Skylab::Brazen::TestSupport
 
     Tmpdir_controller_instance = Lazy_.call do
 
-      sys = Home_::LIB_.system
+      _path = ::File.join Home_.lib_.system.defaults.dev_tmpdir_path, 'brzn'
 
-      _path = ::File.join sys.defaults.dev_tmpdir_path, 'brzn'
-
-      sys.filesystem.tmpdir :path, _path
+      Home_.lib_.system_lib::Filesystem::Tmpdir.with(
+        :path, _path,
+      )
     end
 
     System_tmpdir_path = Lazy_.call do

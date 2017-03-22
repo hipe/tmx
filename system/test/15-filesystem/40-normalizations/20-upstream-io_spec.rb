@@ -11,7 +11,9 @@ module Skylab::System::TestSupport
 
     it "not exist" do
 
-      against_ _not_here
+      _ = _not_here
+
+      against_ _
 
       _em = expect_not_OK_event :stat_error
 
@@ -25,9 +27,9 @@ module Skylab::System::TestSupport
       _pa = Common_::Qualified_Knownness.via_value_and_symbol(
         _not_here, :wazoozie )
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :qualified_knownness_of_path, _pa,
-        & handle_event_selectively_ )
+      )
 
       _em = expect_not_OK_event :stat_error
 
@@ -37,7 +39,7 @@ module Skylab::System::TestSupport
     end
 
     def _not_here
-      TestSupport_::Fixtures.file( :not_here )
+      TestSupport_::Fixtures.file :not_here
     end
 
     it "wrong ftype" do
@@ -49,7 +51,7 @@ module Skylab::System::TestSupport
 
     it "exist" do
 
-      against_ TestSupport_::Fixtures.file( :three_lines )
+      against_ TestSupport_::Fixtures.file :three_lines
       expect_no_events
       kn = @result
       kn.is_known_known or fail
@@ -60,10 +62,10 @@ module Skylab::System::TestSupport
 
     it "sin and file" do
 
-      @result = subject_.call_via(
+      @result = subject_via_plus_listener_(
         :stdin, _non_interactive_stdin,
         :path, 'no-see',
-        & handle_event_selectively_ )
+      )
 
       expect_not_OK_event :ambiguous_upstream_arguments
       expect_fail
@@ -74,7 +76,7 @@ module Skylab::System::TestSupport
     end
 
     def subject_
-      Home_.services.filesystem :Upstream_IO
+      Home_::Filesystem::Normalizations::Upstream_IO
     end
   end
 end

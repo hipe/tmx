@@ -75,7 +75,7 @@ module Skylab::BeautySalon
     end
 
     System = -> do
-      System_lib___[].services
+      System_lib[].services
     end
 
     Token_buffer = -> x, y do
@@ -89,7 +89,7 @@ module Skylab::BeautySalon
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     ST__ = sidesys[ :SubTree ]
-    System_lib___ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]
   end
 

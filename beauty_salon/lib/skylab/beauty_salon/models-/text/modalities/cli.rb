@@ -42,17 +42,21 @@ module Skylab::BeautySalon
 
             prp.dup.append_ad_hoc_normalizer do | arg, & oes_p |
 
-              Home_.lib_.system.filesystem( :Upstream_IO ).call_via(
+              Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
 
                 :qualified_knownness_of_path, arg,
                 :stdin, @resources.sin,
                 :recognize_common_string_patterns,
                 :dash_means, :stdin,
+                :filesystem, Home_.lib_.system.filesystem,
                 & oes_p )
             end
           end
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

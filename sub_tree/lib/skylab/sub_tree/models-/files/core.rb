@@ -222,8 +222,9 @@ module Skylab::SubTree
             _when_pattern
           else
 
-            kn = Home_.lib_.system.filesystem( :Upstream_IO ).call_via(
+            kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
               :qualified_knownness_of_path, @upstream_arg,
+              :filesystem, Home_.lib_.system.filesystem,
               & handle_event_selectively )
 
             if kn

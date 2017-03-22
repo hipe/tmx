@@ -23,13 +23,13 @@ module Skylab::System
 
       class << self
 
-        def for_mutable_args_ x_a, & x_p
+        def against_mutable_ a, & p
 
-          if x_a.length.zero?
+          if a.length.zero?
             self
           else
-            o = new( & x_p )
-            kp = o.send :process_iambic_fully, x_a
+            o = new( & p )
+            kp = o.send :process_iambic_fully, a
             if kp
               o.__mixed_result
             else

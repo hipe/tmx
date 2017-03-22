@@ -61,7 +61,7 @@ module Skylab::TanMan
 
         def __path_is_absolute
 
-          _n11n = Path_lib_[].normalization.with :absolute
+          _n11n = Path_lib_[]::Normalization.with :absolute
 
           _ok_arg = _n11n.normalize_qualified_knownness(
             @_qkn, & @on_event_selectively )
@@ -104,10 +104,11 @@ module Skylab::TanMan
 
         def __path_is_file
 
-          _o = _sys.filesystem.normalization( :Upstream_IO ).edit_with(
+          _o = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.with(
             :stat, @stat,
             :qualified_knownness_of_path, @_qkn,
             :must_be_ftype, :FILE_FTYPE,
+            :filesystem, _real_filesystem,
             & @on_event_selectively )
 
           _o.via_stat_execute
@@ -160,8 +161,9 @@ module Skylab::TanMan
 
         def __resolve_downstream_file
 
-          kn = _sys.filesystem( :Downstream_IO ).call_via(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Downstream_IO.via(
             :qualified_knownness_of_path, @_qkn,
+            :filesystem, _real_filesystem,
             & @on_event_selectively )
 
           if kn
@@ -172,8 +174,8 @@ module Skylab::TanMan
           end
         end
 
-        def _sys
-          @__sys ||= Home_.lib_.system
+        def _real_filesystem
+          Home_.lib_.system.filesystem
         end
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

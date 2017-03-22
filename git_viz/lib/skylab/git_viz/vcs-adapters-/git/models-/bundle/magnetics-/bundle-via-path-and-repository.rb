@@ -37,7 +37,7 @@ module Skylab::GitViz
 
         def __normalize_path_appearance
 
-          _n11n = Home_.lib_.basic::Pathname.normalization
+          _n11n = Home_.lib_.basic::Pathname::Normalization
 
           _ = _n11n.with :relative, :downward_only  #, :no_single_dots
 
@@ -58,7 +58,7 @@ module Skylab::GitViz
            ::File.join @repo.path, @path
           end
 
-          kn = Home_.lib_.system.filesystem( :Existent_Directory ).call_via(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
             :path, _path,
             :filesystem, @filesystem,
             & @on_event_selectively )

@@ -48,10 +48,10 @@ module Skylab::TanMan
           end
         end
 
-        fo = _omni.parse_operator
-        if fo
-          _ref = fo.mixed_business_value
-          _ref.bound_call_of_operator_via_invocation_resouces( @_invocation_resources )
+        act = _omni.parse_operator
+        if act
+          _ref = act.mixed_business_value
+          _ref.bound_call_of_operator_via_invocation_resouces @_invocation_resources
         end
       end
     end
@@ -76,7 +76,14 @@ module Skylab::TanMan
         @argument_scanner.listener
       end
 
-      attr_reader :argument_scanner
+      attr_reader(
+        :argument_scanner,
+      )
+
+      def filesystem
+        _ = Home_.lib_.system.filesystem
+        _  # hi. #todo
+      end
     end
 
     # ==
@@ -144,6 +151,14 @@ module Skylab::TanMan
 
       # ~ custom stuff
 
+      def pth s
+        if DOT_ == ::File.dirname(s)
+          s
+        else
+          ::File.basename s
+        end
+      end
+
       def app_name
         Home_.name_function.as_human
       end
@@ -177,14 +192,6 @@ module Skylab::TanMan
           x = x.name.as_lowercase_with_underscores_symbol
         end
         "'#{ x }'"
-      end
-
-      def pth s
-        if DOT_ == ::File.dirname(s)
-          s
-        else
-          ::File.basename s
-        end
       end
 
       def val x

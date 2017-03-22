@@ -86,14 +86,13 @@ module Skylab::System::TestSupport
 
     def prepared_tmpdir
 
-      fs = services_.filesystem
+      _path = ::File.join services_.filesystem.tmpdir_path, 'hl-xyzizzy-patch'
 
-      _path = ::File.join fs.tmpdir_path, 'hl-xyzizzy-patch'
-
-      fs.tmpdir(
+      Home_::Filesystem::Tmpdir.with(
         :path, _path,
         :be_verbose, do_debug,
-        :debug_IO, debug_IO ).clear
+        :debug_IO, debug_IO,
+      ).clear
     end
 
     # ~ patches
@@ -110,7 +109,7 @@ module Skylab::System::TestSupport
 
     def _against * x_a
 
-      @result = services_.patch( * x_a, & handle_event_selectively_ )
+      @result = services_.patch( * x_a, & listener_ )
       nil
     end
 

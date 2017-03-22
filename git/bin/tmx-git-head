@@ -160,7 +160,7 @@ module Skylab::Git_head
 
     def bld_tmp_patch_pn
       _tail = "#{ self.class.name.gsub( '::', '-' ).downcase }-mutex"  # hah
-      Library_::Pathname[].new( Library_::Tmpdir[].tmpdir ).join _tail
+      Library_::Pathname[].new( Library_::Tmpdir_path[] ).join _tail
     end
   public
 

@@ -145,10 +145,10 @@ module Skylab::TaskExamples::TestSupport
 
     Memoize_tmpdirer_and_etc_for___ = -> tc do
 
-      _ = Home_.lib_.system.filesystem.tmpdir
-      __ = ::File.basename TS_::BUILD_DIR
+      _basename = ::File.basename TS_::BUILD_DIR
 
-      tdr = _.memoizer_for tc, __
+      tdr = Home_.lib_.system_lib::Filesystem::Tmpdir.memoizer_for tc, _basename
+
       tdr.instance
     end
 

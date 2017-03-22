@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace
       end
 
       Tmpfile_path___ = Lazy_.call do
-        ::File.join Home_.lib_.tmpdir, 'tmpfile.txt'
+        ::File.join Home_.lib_.tmpdir_path, 'tmpfile.txt'
       end
 
       LOCK___ = ::File::LOCK_EX | ::File::LOCK_NB

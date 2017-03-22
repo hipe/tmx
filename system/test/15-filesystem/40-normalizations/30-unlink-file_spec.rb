@@ -21,11 +21,9 @@ module Skylab::System::TestSupport
 
       _path = TestSupport_::Fixtures.file :not_here
 
-      @result = subject_.call_via(
-
+      @result = subject_via_plus_real_filesystem_plus_listener_(
         :path, _path,
         :probably_exists,
-        & handle_event_selectively_
       )
 
       expect_not_OK_event :errno_enoent
@@ -44,7 +42,7 @@ module Skylab::System::TestSupport
     end
 
     def subject_
-      Home_.services.filesystem :Unlink_File
+      Home_::Filesystem::Normalizations::UnlinkFile
     end
   end
 end

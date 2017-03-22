@@ -9,10 +9,6 @@ module Skylab::Basic
         Component_Models.const_get sym, false
       end
 
-      def normalization
-        Number_::Normalization__
-      end
-
       def of_digits_before_and_after_decimal_in_positive_float orig_f, sanity=16
 
         if sanity
@@ -92,7 +88,7 @@ module Skylab::Basic
 
       module Component_Models
 
-        _positive_integer = Number_.normalization.with(
+        _positive_integer = Here_::Normalization.with(
 
           :minimum, 1,
           :number_set, :integer,
@@ -104,6 +100,17 @@ module Skylab::Basic
       NIL_
     end
 
-    Number_ = self
+    # ==
+
+    Autoloader_[ self ]
+    lazily :Normalization do
+      Here_::Normalization__
+    end
+
+    # ==
+
+    Here_ = self
+
+    # ==
   end
 end

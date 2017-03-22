@@ -13,7 +13,7 @@ with [#032].
 a stubbed filesystem is defined by an absolute (real filesystem) path to a
 manifest file. the manifest file is simply a list of paths (absolute or
 relative) that constitute the imaginary files and directories of the stubbed
-fileystem. (directories are the paths that end in "/".)
+filesystem. (directories are the paths that end in "/".)
 
 the function of the stubbed filesystem is to act like a real filesystem
 that has these nodes and these nodes only (unless otherwise noted); but

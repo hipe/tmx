@@ -15,16 +15,14 @@ module Skylab::TaskExamples
 
     def execute
 
-      did_send_event = nil
-
-      kn = Home_.lib_.system.filesystem( :Existent_Directory ).call_via(
+      kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
         :path, @mkdir_p,
         :is_dry_run, @dry_run,
         :max_mkdirs, @max_depth,
         :create_if_not_exist,
+        :filesystem, Home_.lib_.system.filesystem,
 
       ) do | * i_a, & ev_p |
-        did_send_event = true
         send :"__on__#{ i_a.last }__", ev_p[]
       end
 

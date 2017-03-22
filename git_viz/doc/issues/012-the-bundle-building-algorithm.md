@@ -73,7 +73,7 @@ appear with the form "[#012]:#hashtag-name" (without the quotes).)
 when a term uses another term in its definition, that other term will
 appear with a hashtag IFF it hasn't been defined yet.
 
-• a #path is a fileystem path relative to the root directory of the
+• a #path is a filesystem path relative to the root directory of the
   repository. this the internal, univerally normal way we represent
   filesystem locations, which themselves are transient data,
   as opposed to existing one-to-one with a #trail.

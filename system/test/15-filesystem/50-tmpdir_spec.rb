@@ -9,7 +9,7 @@ module Skylab::System::TestSupport
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
 
-      _tmpdir = services_.filesystem.tmpdir.with
+      _tmpdir = Home_::Filesystem::Tmpdir.with
       _tmpdir.to_path.should eql ::Dir.tmpdir
     end
 
@@ -180,7 +180,7 @@ module Skylab::System::TestSupport
     end
 
     def _new_with * x_a
-      services_.filesystem.tmpdir( * x_a )
+      Home_::Filesystem::Tmpdir.via_iambic x_a
     end
 
     dangerous_memoize_ :sandbox_dir_ do

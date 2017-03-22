@@ -15,7 +15,7 @@ module Skylab::Zerk
 
           mutable_a.push :qualified_knownness, _qkn
 
-          _n11n = Basic_[]::Number.normalization.via_iambic(
+          _n11n = Basic_[]::Number::Normalization.via_iambic(
             mutable_a, & @listener )
 
           _kn = _n11n.execute

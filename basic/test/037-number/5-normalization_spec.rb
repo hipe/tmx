@@ -95,7 +95,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject_module
-      Home_::Number.normalization
+      Home_::Number::Normalization
     end
   end
 end

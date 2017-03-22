@@ -74,10 +74,11 @@ module Skylab::Git
 
           _path_arg = remove_backstream_argument :file
 
-          kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
             :instream, @resources.sin,
             :qualified_knownness_of_path, _path_arg,
             :neither_is_OK,
+            :filesystem, Home_.lib_.system.filesystem,
             & handle_event_selectively
           )
 

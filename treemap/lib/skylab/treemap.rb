@@ -74,10 +74,10 @@ module Skylab::Treemap
     Brazen = sidesys[ :Brazen ]
 
     System = -> do
-      System_lib___[].services
+      System_lib[].services
     end
 
-    System_lib___ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
   end
 
   ACHIEVED_ = true
