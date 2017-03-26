@@ -43,7 +43,7 @@ the outside world.
 this is perhaps one step after [#fi-002.9] the meta-meta-properties
 justification.
 
-an important application of this "theory" at [#ba-027] normal
+an important application of this "theory" at [#fi-004.5] normal
 normalization.
 
 

@@ -107,23 +107,25 @@ module Skylab::Brazen
     def persist_entity bx, entity, & oes_p
 
       _ok = entity.intrinsic_persist_before_persist_in_collection bx, & oes_p
-      _ok && Couch_::Actors__::Persist[ bx[ :dry_run ], entity, self, & oes_p ]
+
+      _ok && Couch_::Magnetics::PersistEntity_via_Entity_and_Collection.call(
+        bx[ :dry_run ], entity, self, & oes_p )
     end
 
     def intrinsic_persist_before_persist_in_collection _, & oes_p
 
       oes_p ||= handle_event_selectively
-      Couch_::Actors__::Touch_collection[ self, & oes_p ]
+      Couch_::Magnetics::TouchCollection_via_Collection[ self, & oes_p ]
       ACHIEVED_  # #note-085
     end
 
     def entity_via_intrinsic_key id, & oes_p
-      Couch_::Actors__::Retrieve_collection_entity[ id, self, @kernel, & oes_p ]
+      Couch_::Magnetics::Retrieve_collection_entity[ id, self, @kernel, & oes_p ]
     end
 
     def to_entity_stream_via_model cls, & oes_p
 
-      Couch_::Actors__::Build_stream.via(
+      Couch_::Magnetics::EntityStream_via_Collection.via(
         :model_class, cls,
         :collection, self,
         :kernel, @kernel,
@@ -132,12 +134,12 @@ module Skylab::Brazen
 
     def delete_entity action, ent, & oes_p
       _ok = ent.intrinsic_delete_before_delete_in_collection action, & oes_p
-      _ok && Couch_::Actors__::Delete[ action, ent, self, & oes_p ]
+      _ok && Couch_::Magnetics::DeleteEntity_via_Entity_and_Collection[ action, ent, self, & oes_p ]
     end
 
     def intrinsic_delete_before_delete_in_collection action, & oes_p
 
-      Couch_::Actors__::Delete_collection.call(
+      Couch_::Magnetics::DeleteCollection_via_Collection.call(
         action.knownness( :dry_run ),
         action.knownness( :force ),
         self,

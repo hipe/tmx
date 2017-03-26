@@ -14,7 +14,7 @@ module Skylab::Human  # :[#001].
 
   Lazy_ = Common_::Lazy
 
-  # -- proc-like support methods
+  # == proc-like support methods
 
   atrs = attrs = nil
 
@@ -38,17 +38,21 @@ module Skylab::Human  # :[#001].
     NIL_
   end
 
-  # -- would-be orphanic stowaways
+  Ucfirst_ = -> s do
+    "#{ s[ 0, 1 ].upcase }#{ s[ 1 .. -1 ] }"
+  end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
+  # == stowaways
 
   Autoloader_ = Common_::Autoloader
 
-  module NLP
-    Autoloader_[ self ]
-    NLP_ = self
-  end
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
-  # --
+  # ==
 
   module Lib_
 
@@ -70,19 +74,20 @@ module Skylab::Human  # :[#001].
     Levenshtein = gemlib[ :Levenshtein ]
     Parse = sidesys[ :Parse ]
     Plugin = sidesys[ :Plugin ]
+    System_lib = sidesys[ :System ]
     Task = sidesys[ :Task ]
   end
 
   # --
 
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
-
   ACHIEVED_ = true
   CLI = nil  # for host
+  DASH_ = '-'
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }
+  MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NOTHING_ = nil
   NIL_ = nil

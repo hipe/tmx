@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - small time actors - `unparenthesize` (& core) " do
+  describe "[ba] string - magnetics - `unparenthesize` (& core) " do
 
     TS_[ self ]
     use :string

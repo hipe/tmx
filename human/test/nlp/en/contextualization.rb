@@ -284,7 +284,7 @@ module Skylab::Human::TestSupport
     end
 
     def subject_class_
-      Home_::NLP::EN::Contextualization
+      NLP_EN_.lib::Contextualization
     end
   end
 end

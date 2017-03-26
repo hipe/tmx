@@ -112,7 +112,7 @@ module Skylab::Human
 
           _lx = __irregular_index_.irregular_collection.entry_for NIL_  # #special
 
-          _lx.inflect_words_into_against_exponent_state y, _and_a
+          _lx.inflect_words_into_against_exponent_state_ y, _and_a
         end
 
         def __to_grammatical_category_state_around_ phrase  # :+#ac

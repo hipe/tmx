@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Input_Adapters__::Indented_Line_Stream  # :[#043].
+    class Magnetics::Tree_via_IndentedLineStream  # :[#043].
 
       Attributes_actor_.call( self,
         :upstream_x,
@@ -29,7 +29,7 @@ module Skylab::Basic
         agent = self
         @stack = [ @frame ]
         ok = nil
-        node = Immutable_Node_.new do
+        node = Here_::ImmutableNode.new do
           cx_a = []
           ok = agent.add_current_and_each_sibling_or_child self do |x|
             cx_a.push x
@@ -68,7 +68,7 @@ module Skylab::Basic
           ok, value_x = value_pair_via_content_string_and_parent(
             current_frame.content_s, parent )
           ok or break
-          node = Immutable_Node_.new do
+          node = Here_::ImmutableNode.new do
             @parent = parent
             @value_x = value_x
             if next_node_is_child

@@ -1109,7 +1109,7 @@ module Skylab::Fields
 
       # ~~ normalization API
 
-      def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
+      def normalize_qualified_knownness qkn, & x_p  # #[#fi-004.5] assume some normalizer (for now)
 
         Home_::Normalization_Against_Model[ qkn, self, & x_p ]
       end

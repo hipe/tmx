@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] sexp - expression sessions - list thru c.agg. - intro" do
+  describe "[hu] magnetics - list via c.agg. - intro" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :sexp_expression_sessions_list_through_columnar_aggregation
+    use :magnetics_list_via_columnar_aggregation
 
     context "handling field-level repetition by redundancy acknowledgement" do
 
@@ -28,7 +28,7 @@ module Skylab::Human::TestSupport
         su
       end
 
-      it "builds" do
+      it "builds" do  # #cov1.6
         subject
       end
 

@@ -1,11 +1,11 @@
-require_relative '../../../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - O&S object count" do
+  describe "[hu] NLP EN mags - O&S object count" do
 
     TS_[ self ]
-    use :NLP_EN_sexp_magnetics
+    use :NLP_EN_magnetics
 
     # [td] permute --x "more is expected" -x "(no expectation)"
     # --polarity negative -ppositive --count 0 -c1 -c2 -c3
@@ -194,7 +194,7 @@ module Skylab::Human::TestSupport
     end
 
     def magnetic_module_
-      magnetic_module_for_ :When_Object_and_Subject
+      magnetic_module_for_ const_for_magnet_for_object_and_subject_
     end
   end
 end

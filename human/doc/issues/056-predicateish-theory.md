@@ -9,7 +9,7 @@ grammatical categories of the subject (specifically, `count` and
 to inflection, but we try to use the remote jargon when it is known.)
 
 there are other sorts of "inflection" exhibited by the EN verb that
-are arguably more important: wheras "conjugation" is effectively
+are arguably more important: whereas "conjugation" is effectively
 superflous (never adding new information to the utterance beyond
 perhaps socio-political information), inflecting for verb *tense*
 (for example) *does* add information we deem valuable.

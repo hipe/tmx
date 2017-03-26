@@ -1,10 +1,8 @@
 module Skylab::Common
 
-  class Event
+  module Magnetics_
 
-    Actors_::Produce_new_message_proc_via_map_reducer_and_old_message_proc =
-
-    ( -> map_reduce_p, old_message_proc do
+    MessageProc_via_MapReducer_and_MessageProc = -> map_reduce_p, old_message_proc do
 
           -> y, o do
 
@@ -22,6 +20,9 @@ module Skylab::Common
             NIL_
           end
 
-    end )
+    end
+
+    # ==
+    # ==
   end
 end

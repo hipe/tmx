@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    class Actors__::Build_stream < Couch_Actor_
+    class Magnetics::EntityStream_via_Collection < CouchMagnetic_
 
       Attributes_actor_.call( self,
         :model_class,

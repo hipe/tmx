@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Input_Adapters__::Hash < Common_::Monadic
+    class Magnetics::Tree_via_Hash < Common_::Monadic
 
       def initialize x
         @upstream_x = x
@@ -10,7 +10,7 @@ module Skylab::Basic
 
       def execute
 
-        @node_class = Tree_::Mutable
+        @node_class = Here_::Mutable
         _work @node_class.new, @upstream_x
       end
 
@@ -30,5 +30,8 @@ module Skylab::Basic
         node_
       end
     end
+
+    # ==
+    # ==
   end
 end

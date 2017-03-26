@@ -1,10 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP EN Sexp - proof of concept" do  # (:#spot-2)
+  describe "[hu] NLP EN sexp - proof of concept" do  # :#spot1.2
 
     TS_[ self ]
+    use :memoizer_methods
 
     it "node loads" do
       _lib_node
@@ -27,7 +28,7 @@ module Skylab::Human::TestSupport
       end
 
       it "but normally empty lists express as writing nothing" do
-        _ = _lib_node.express_into EMPTY_A_, [ :list, a ]
+        _ = _sexp_node.express_sexp_into___ EMPTY_A_, [ :list, a ]
         _.should eql EMPTY_A_
       end
     end
@@ -81,7 +82,7 @@ module Skylab::Human::TestSupport
 
       it _word_mode do
 
-        _o = _lib_node.expression_session_for :list, a, :alternation
+        _o = _sexp_node.expression_session_for :list, a, :alternation
 
         _ = _o.express_words_into []
 
@@ -96,7 +97,7 @@ module Skylab::Human::TestSupport
 
     it "`express_words_into_under`" do
 
-      o = _lib_node.expression_session_for :list, %w( foo bar )
+      o = _sexp_node.expression_session_for :list, %w( foo bar )
 
       o.expression_agent_method_for_saying_item :par
 
@@ -106,48 +107,62 @@ module Skylab::Human::TestSupport
     end
 
     it "say, separator attributes" do
-      o = _lib_node.expression_session_for :list, %w( foo bar baz )
+      o = _sexp_node.expression_session_for :list, %w( foo bar baz )
       o.final_separator_sexp = [ :as_is, '--' ]
       o.separator_sexp = [ :as_is, '-' ]
       o.say.should eql 'foo-bar--baz'
     end
 
-    it "curriable, stream for list, infer sexp from string.." do  # #todo
+    context "curriable, stream for list, infer sexp from string.." do
 
-      o = _lib_node.expression_session_for :list
+      it "against empty list" do
 
-      o.final_separator = ' und '
+        _s = _expression.with_list( Common_::THE_EMPTY_STREAM ).say
+        _s == '[none]' || fail
+      end
 
-      o.express_none_by { '[none]' }
+      it "against some items - uses special guys and breaks into word string stream" do
 
-      _ = o.with_list( Common_::THE_EMPTY_STREAM ).say
+        _expr = _expression.with_list %w( a b )
+        _st = _expr.flush_to_word_string_stream___
+        _a = _st.to_a
+        _a == [ "a", "und b" ] || fail
+      end
 
-      _.should eql '[none]'
+      shared_subject :_expression do
 
-      _ = o.with_list( %w(a b) ).flush_to_word_string_stream___
-      _ = _.to_a
-      _.should eql [ "a", "und b" ]
+        _lib_node::Magnetics::List_via_Items.define do |o|
+
+          o.final_separator = ' und '
+
+          o.express_none_by { '[none]' }
+        end
+      end
     end
 
     # --
 
     def _flat a, s
 
-      _ = _lib_node.express_into "", [ :list, a ]
+      _ = _sexp_node.express_sexp_into___ "", [ :list, a ]
       _.should eql s
     end
 
     def _words a, exp_a
 
-      _o = _lib_node.expression_session_for :list, a
+      _o = _sexp_node.expression_session_for :list, a
 
       _act_a = _o.express_words_into []
 
       _act_a.should eql exp_a
     end
 
+    def _sexp_node
+      NLP_EN_.sexp_lib
+    end
+
     def _lib_node
-      NLP_EN_Sexp_[]
+      NLP_EN_.lib
     end
   end
 end

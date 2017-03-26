@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module Tree
 
-    class Sessions_::Merge
+    class Magnetics::MergedTree_via_Trees
 
-      module Actors__
+      module Magnetics__  # 1x
 
         class Merge  # an experiment about merging two arbitrary objects
           # based on their "shape" - two ints get added together, two lists

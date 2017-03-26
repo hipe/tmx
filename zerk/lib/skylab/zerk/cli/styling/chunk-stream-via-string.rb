@@ -93,7 +93,7 @@ module Skylab::Zerk
       # further discussion: if you *were* to try to express an ASCII-
       # escaped string as HTML, it's certainly possible but it may not
       # be as easy as you think because of the aforementioned dis-
-      # isomorphicism. in effect the performer undertaking this becomes
+      # isomorphism. in effect the performer undertaking this becomes
       # its own "rendering agent" that needs a priori knowlege of not just
       # what each escape sequence code (integer) "means" but also meta-
       # information about these meanings: i.e `red` and `green` are

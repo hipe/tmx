@@ -30,17 +30,17 @@ module Skylab::Basic
       end
 
       def count_occurrences_in_string_of_string haystack, needle
-        Here_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
-          needle, haystack ]
+        Here_::Magnetics__::OccurrenceCount_via_Needle_in_Haystack.call(
+          needle, haystack )
       end
 
       def count_occurrences_in_string_of_regex haystack, needle_rx
-        Here_::Small_Time_Actors__::Count_occurrences_OF_regex_IN_string[
-          needle_rx, haystack ]
+        Here_::Magnetics__::OccurrenceCount_via_Regex_in_String.call(
+          needle_rx, haystack )
       end
 
       def ellipsify * a  # [#032].
-        Here_::Small_Time_Actors__::Ellipsify.call_via_arglist a
+        Here_::Magnetics__::Ellipsify_via_String.call_via_arglist a
       end
 
       def looks_like_sentence * a
@@ -124,9 +124,9 @@ module Skylab::Basic
 
       def unparenthesize_message_string * a
         if a.length.zero?
-          Here_::Small_Time_Actors__::Unparenthesize_message_string
+          Here_::Magnetics__::UnparenthesizedPieces_via_MessageString
         else
-          Here_::Small_Time_Actors__::Unparenthesize_message_string[ * a ]
+          Here_::Magnetics__::UnparenthesizedPieces_via_MessageString[ * a ]
         end
       end
 

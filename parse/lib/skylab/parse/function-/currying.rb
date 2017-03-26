@@ -1,8 +1,8 @@
 module Skylab::Parse
 
-  # ->
+  class Function_::Currying
 
-    class Function_::Currying
+    # -
 
       class << self
 
@@ -61,10 +61,10 @@ module Skylab::Parse
 
       def matcher_functions=
         scn = argument_scanner
-        @function_a = []
+        @functions = []
         cls = Home_::Functions_::Simple_Matcher
         while scn.unparsed_exists
-          @function_a.push cls.via_proc scn.gets_one
+          @functions.push cls.via_proc scn.gets_one
         end
         KEEP_PARSING_
       end
@@ -76,7 +76,7 @@ module Skylab::Parse
 
       def _process_functions_via_argument_scanner scn
 
-        @function_a = []
+        @functions = []
 
         st_ = __produce_parse_function_stream_via_argument_scanner scn
 
@@ -105,27 +105,27 @@ module Skylab::Parse
       end
 
       def accept_function_ f
-        @function_a.push f
+        @functions.push f
         nil
       end
 
       def maybe_send_sibling_sandbox_to_function_ f  # #courtesy
         if f.respond_to? :receive_sibling_sandbox
-          @__ss ||= Function_::Nonterminal::Sibling_Sandbox.new @function_a
+          @__ss ||= SiblingSandbox___.new @functions
           f.receive_sibling_sandbox @__ss
           nil
         end
       end
 
       def function_objects_array=
-        @function_a = gets_one
+        @functions = gets_one
         KEEP_PARSING_
       end
 
     public
 
       def execute
-        @function_a.freeze
+        @functions.freeze
         if @input_stream  # then this function is an inline one-off
           parse_
         else
@@ -135,7 +135,7 @@ module Skylab::Parse
 
       def express_all_segments_into_under y, * x_a
 
-        Home_::Function_::Nonterminal::Sessions::Express.session do | o |
+        Home_::Function_::Expression_via_ReflectiveFunctionStream.call_by do |o|
 
           case 1 <=> x_a.length
           when  0
@@ -145,20 +145,21 @@ module Skylab::Parse
           end
 
           if o.constituent_delimiter_pair_should_be_specified
-            o.set_constituent_delimiter_pair( *
-              constituent_delimiter_pair_for_expression_agent(
-                o.expression_agent ) )
+
+            _pair = constituent_delimiter_pair_for_expression_agent(
+              o.expression_agent )
+
+            o.set_constituent_delimiter_pair( * _pair )
           end
 
-          o.set_reflective_function_stream(
-            Common_::Stream.via_nonsparse_array @function_a )
+          o.set_reflective_function_stream Stream_[ @functions ]
 
           o.set_downstream y
         end
       end
 
       def to_reflective_function_stream_  # for above
-        Common_::Stream.via_nonsparse_array @function_a
+        Common_::Stream.via_nonsparse_array @functions
       end
 
       def to_parse_array_fully_proc

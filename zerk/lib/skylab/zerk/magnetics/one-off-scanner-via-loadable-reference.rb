@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Magnetics_::OneOffScanner_via_LoadableReference < Home_::MagneticBySimpleModel  # 1x
+  class Magnetics::OneOffScanner_via_LoadableReference < Home_::MagneticBySimpleModel  # 1x
 
     # how to "splay" "mountable" "one-offs"
 

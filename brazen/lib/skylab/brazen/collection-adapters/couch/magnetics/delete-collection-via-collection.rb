@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    class Actors__::Delete_collection < Couch_Actor_
+    class Magnetics::DeleteCollection_via_Collection < CouchMagnetic_  # 1x  #feature-island
 
       Attributes_actor_.call( self,
         :dry_run_arg,

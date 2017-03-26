@@ -44,7 +44,7 @@ module Skylab::Human::TestSupport
     end
 
     def __gateway_module
-      Home_::NLP::EN::POS::Noun
+      NLP_EN_.POS_lib::Noun
     end
   end
 end

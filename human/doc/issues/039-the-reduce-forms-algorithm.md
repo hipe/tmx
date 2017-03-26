@@ -1,4 +1,4 @@
-# the "reduce forms" algorithm (:#miranda-july)
+# the "reduce forms" algorithm (:#miranda-july) :[#039]
 
 any given form is a match for the argument constituency IFF for
 every category-exponent pair in the constituency:
@@ -15,6 +15,8 @@ that category.
 no greater weight (or "score") can be given to forms that
 "match more things" than others; the form either matches the
 criteria or it doesn't.
+
+
 
 ### case in point
 

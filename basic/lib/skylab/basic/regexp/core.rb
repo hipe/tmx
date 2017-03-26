@@ -17,11 +17,6 @@ module Skylab::Basic
         Options__.new rx.options
       end
 
-      def string_via_grep_string s, & oes_p
-
-        Regexp_::Actors__::Platform_string_via_grep_string[ s, & oes_p ]
-      end
-
       def stream_of_matches s, rx
 
         # 'strscn' is great for what it does, but it doesn't do this
@@ -228,6 +223,6 @@ module Skylab::Basic
       NIL_
     end
 
-    Regexp_ = self
+    Here_ = self
   end
 end

@@ -1,20 +1,18 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
     class Idea_
 
-      Attributes_actor_.call( self,
+      ATTRIBUTES = Attributes_.call(
         syntactic_category: nil,
       )
 
       class << self
 
-        alias_method :via_sexp_stream__, :via_argument_scanner
-
-        alias_method :via_sexp__, :via_iambic
-
-        # #itch [#fi-035] - it would be nice to get nothing from methodic..
+        def interpret_ scn
+          ATTRIBUTES.init_via_argument_scanner_plus new, scn
+        end
 
         private :new
       end  # >>
@@ -49,7 +47,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :object_argument,
-          argument_scanner )
+          @_argument_scanner_ )
       end
 
       def subject
@@ -68,7 +66,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :subject_argument,
-          argument_scanner )
+          @_argument_scanner_ )
       end
 
       def verb=
@@ -77,7 +75,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :verb,
-          argument_scanner )
+          @_argument_scanner_ )
       end
 
       attr_reader :verb_argument
@@ -125,21 +123,21 @@ module Skylab::Human
 
         yield :can, :add
 
-        Here_::Idea_Argument_Adapter_for_Nounish_::Object
+        ExpressionPipeline_::IdeaArgumentAdapter_via_Nounish_::Object
       end
 
       def __subject_argument__component_association
 
         yield :can, :add
 
-        Here_::Idea_Argument_Adapter_for_Nounish_::Subject
+        ExpressionPipeline_::IdeaArgumentAdapter_via_Nounish_::Subject
       end
 
       def __verb__component_association
 
         yield :can, :add
 
-        Here_::Idea_Argument_Adapter_for_Verbish___
+        ExpressionPipeline_::IdeaArgumentAdapter_via_Verbish___
       end
 
       def __add__component qk, & _

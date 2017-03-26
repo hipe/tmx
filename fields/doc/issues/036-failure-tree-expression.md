@@ -72,7 +72,7 @@ a "statementish" is something like a sentence-phrase (e.g "it is
 missing FOO") or a meaningful sentence fragment (e.g "missing FOO").
 
 this event will express its constituency as a stream of such
-statement-ishes, where in effect a one-to-one isomorphicism is formed
+statement-ishes, where in effect a one-to-one isomorphism is formed
 between a statement-ish and output "line": each item always has a
 trailing newline; and before that there is a terminating period if
 the statement-ish had a subject (i.e was sentence-phrase-ish).

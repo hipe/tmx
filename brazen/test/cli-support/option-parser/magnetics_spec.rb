@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport
     context "a hack to see if a basic switch looks to be present in an array" do
 
       shared_subject :p do
-        Home_::CLI_Support::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
+        Home_::CLI_Support::Option_Parser::Magnetics::Build_basic_switch_proc[ '--foom' ]
       end
 
       it "if the argv doesn't include it, result is nil" do

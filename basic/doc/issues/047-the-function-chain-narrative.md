@@ -2,7 +2,7 @@
 
 (three years later see also [#ta-008] task "synthesis dependency".)
 
-in the same manner that we explore the isomorphicism between switch statements
+in the same manner that we explore the isomorphism between switch statements
 and e.g hashes, we here are amusing ourselves with something ..
 
 imagine a list of functions (a "tower"): the first (topmost) function in the

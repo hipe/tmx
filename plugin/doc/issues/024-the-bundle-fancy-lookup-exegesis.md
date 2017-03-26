@@ -93,7 +93,7 @@ corresponding patterns for those).
 
 to try to interpret the same tree node unambiguosly from an identifier
 with this less expressive grammar involves more indirection, more
-inference, and less strong isomorphicism between the identifier and its
+inference, and less strong isomorphism between the identifier and its
 referrant:
 
 whereas `Foo_Bar::Baz` unambiguously implies `foo-bar/baz`, a

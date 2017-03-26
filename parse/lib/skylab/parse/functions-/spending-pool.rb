@@ -151,7 +151,7 @@ module Skylab::Parse
 
       def parse_
 
-        func_a = @function_a
+        func_a = @functions
         d = func_a.length
         res_a = ::Array.new d
         pool_idx_a = d.times.to_a

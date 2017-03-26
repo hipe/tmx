@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - input adapters - hash" do
+  describe "[ba] tree - magnetics - tree via paths" do
 
     TS_[ self ]
     use :tree

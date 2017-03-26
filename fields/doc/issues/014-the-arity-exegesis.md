@@ -12,7 +12,7 @@ likely stale but overall is hopefully still legit.)
 
 prerequisites:
 
-  • the concept of parameter arity employs the notions of [#fi-025]
+  • the concept of parameter arity employs the notions of [#fi-002.2]
     formal-vs-actual parameters. in summary; the former refers to what is
     specified/declared/programmed for, and the latter refers to what is
     passed in actual requests/calls.
@@ -141,7 +141,7 @@ who wants you to trust them with the words they made up.)
 associated with a particular formal number describing the sensical range for
 the actual numbers that will be associated with that formal number." we mean
 formal/actual in the sense of formal-vs-actual parameters to a function,
-(presented at [#fi-025]), although typically the number we are referring to
+(presented at [#fi-002.2]), although typically the number we are referring to
 is not itself a parameter but a `count` derived (in some way) from other
 parameters (either formal or actual), and the relationships therebetween!
 
@@ -205,7 +205,7 @@ be "the number of characters that is a vowel", in this case 2. yet another
 one would be "the number of unique vowels," in this case 1; and so on.
 
 the point is that these counts aren't expressed directly in the data but may
-be derived (deterministicly) from it.
+be derived (deterministically) from it.
 
 -sidebar!)
 
@@ -430,7 +430,7 @@ the exponents of the `parameter arity` axis.
 
 also, the "polyadic" class of arities (`zero or more`, `one or more`) we have
 put into the `parameter` axis and not the `argument` axis, although with
-effort we may be able to prove that there is some isomorphicism there
+effort we may be able to prove that there is some isomorphism there
 (that is, that they are equivalent)..
 
 ## what about many arguments (zero or more, one or more)?
@@ -497,7 +497,7 @@ and for the former to allow for `zero or more` and the latter to allow
 for `zero`. there is simply no other solution that adequately described
 the phenomenon without feeling itself hacky.
 
-## some more thoughts on isomorphicisms and equivalencies
+## some more thoughts on isomorphisms and equivalencies
 
 as stated above, we model the `arity dichotomy` especially so we can represent
 the edgy polyadic/niladic options like the incrementing -v (verbose) flag, an

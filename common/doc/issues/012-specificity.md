@@ -16,5 +16,5 @@ for each event that is emitted, and then of this for each listener
 of the event, find only the most specific (whatever that means)
 stream that is subscribed to, and emit the event only on that stream..
 
-the open question, thne, is can we deterministicly (and then efficiently)
+the open question, thne, is can we deterministically (and then efficiently)
 determine what that stream is for each emission for each listener etc?

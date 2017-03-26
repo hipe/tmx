@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - actors - `longest_common_base_path`" do
+  describe "[ba] tree - magnetics - `longest_common_base_path`" do
 
     TS_[ self ]
     use :tree

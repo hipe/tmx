@@ -125,7 +125,7 @@ goal is to generate modality-specific interfaces as a byproduct of the
 model and its behavior.
 
 to put it another way, if we can't find a meaningful and direct
-isomorphicism from model state to interface state, then we don't really
+isomorphism from model state to interface state, then we don't really
 care about it.
 
 the reason we use `instance_variable_defined?` instead of setting the

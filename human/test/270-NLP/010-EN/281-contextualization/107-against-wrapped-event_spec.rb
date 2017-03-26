@@ -71,8 +71,9 @@ module Skylab::Human::TestSupport
       # `inflected_noun`, but if we don't it steps into something much uglier
 
       o = XXX_Stub_Etc.new
-      o.verb_lexeme = Home_::NLP::EN::POS::Verb[ 'frob' ]
-      o.noun_lexeme = Home_::NLP::EN::POS::Noun[ 'widjit' ]
+      _POS = NLP_EN_.POS_lib
+      o.verb_lexeme = _POS::Verb[ 'frob' ]
+      o.noun_lexeme = _POS::Noun[ 'widjit' ]
       o.inflected_noun = "widgetszzz"
 
       # the above noun_lexeme exists to show that it is not used - it shows

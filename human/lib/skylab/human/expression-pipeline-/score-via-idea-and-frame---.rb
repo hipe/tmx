@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
-    module Build_score_against_idea_of_frame___
+    module Score_via_Idea_and_Frame___
 
       my_proc = -> idea, frame_mod do
 

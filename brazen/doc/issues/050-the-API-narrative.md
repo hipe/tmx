@@ -24,7 +24,7 @@ the birthday of the latter code-node is a week or two after that of the
 subject code-node, so they share DNA:
 
 in the latter code node itself, the discerning eye will see lots of
-isomorphicism and early conceptual ancestors of most of the main components
+isomorphism and early conceptual ancestors of most of the main components
 we use today: there is one long running lightweight "daemon"-ish and then
 for each request a dedicated "invocation" instance has a short-ish lifespan.
 [#fi-033] "iambics" were quite formalized by then too, and used then as

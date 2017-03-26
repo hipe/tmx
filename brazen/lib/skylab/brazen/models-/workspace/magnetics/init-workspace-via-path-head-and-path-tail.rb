@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actors__::Init
+    class Magnetics::InitWorkspace_via_PathHead_and_PathTail
 
       # :+#non-atomic with regards to filesystem interaction.
 

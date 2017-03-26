@@ -49,11 +49,10 @@ module Skylab::Brazen
         :surrounding_path, bx.fetch( :surrounding_path ),
         :config_filename, bx.fetch( :config_filename ) )
 
-      ok = Workspace_::Actors__::Init.call_via_iambic x_a, & oes_p
-      if ok
-        @_surrounding_path_exists = true
-      end
-      ok
+      _ok = Workspace_::Magnetics::InitWorkspace_via_PathHead_and_PathTail.
+        call_via_iambic x_a, & oes_p
+
+      _store :@_surrounding_path_exists, _ok
     end
 
     # ~~ find nearest
@@ -160,6 +159,8 @@ module Skylab::Brazen
       end
       @document_
     end
+
+    define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
     # ~ for actions
 

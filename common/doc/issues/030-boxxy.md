@@ -66,11 +66,11 @@ pertain to constants (namely `constants` and `const_defined?`) by making
 *inferences*. as mentioned above, our implementation is concerned in part
 with "paying back" these inferences.
 
-these inferences are *not* based on an assumption of a two-way isomorphicism
+these inferences are *not* based on an assumption of a two-way isomorphism
 between "constantspace" and filesystem: we allow that there can be arbitrary
 constants defined in the subject module that have no counterpart node in the
 filesystem. however, for the converse we *do* model as a strong
-isomorphicism: any "nodes" that we discover through the mechanism of
+isomorphism: any "nodes" that we discover through the mechanism of
 [#024] #note-1, we model an inference of the existence of an "approximated"
 const when a corresponding "concrete" const is not known.
 

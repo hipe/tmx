@@ -41,10 +41,6 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
-  # == model support
-
-  MonadicMagneticAndModel_ = Common_::MonadicMagneticAndModel
-
   # == functions
 
   Begin_fuzzy_retrieve_ = -> & any_oes_p do

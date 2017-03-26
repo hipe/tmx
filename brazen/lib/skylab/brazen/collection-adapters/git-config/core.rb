@@ -24,7 +24,7 @@ module Skylab::Brazen
       end
 
       def write * a
-        Git_Config_::Actors__::Write.call_via_arglist a
+        Git_Config_::Magnetics::PersistEntity_via_Entity_and_Collection.call_via_arglist a
       end
     end  # >>
 
@@ -69,7 +69,7 @@ module Skylab::Brazen
 
       ok &&= ent.intrinsic_persist_before_persist_in_collection( * x, & oes_p )
 
-      ok &&= Git_Config_::Mutable::Actors::Mutate.call(
+      ok &&= Git_Config_::Mutable::Magnetics::MutateDocument_via_Entity_and_Collection.call(
         ent, @mutable_document, & oes_p )
 
       ok and _via_mutated_mutable_document_write_file_via_persist x, & oes_p
@@ -78,17 +78,23 @@ module Skylab::Brazen
     # ~ retrieve (one)
 
     def entity_via_intrinsic_key id, & oes_p
-      Git_Config_::Actors__::Retrieve[ id, _document, @kernel, & oes_p ]
+
+      Git_Config_::Magnetics::RetrieveEntity_via_EntityIdentifier_and_Document.call(
+        id, _document, @kernel, & oes_p )
     end
 
     # ~ retrieve (many)
 
     def to_entity_stream_via_model cls, & oes_p
-      Git_Config_::Actors__::Build_stream[ cls, _document, @kernel, & oes_p ]
+
+      Git_Config_::Magnetics::EntityStream_via_Collection.call(
+        cls, _document, @kernel, & oes_p )
     end
 
     def to_section_stream & oes_p
-      Git_Config_::Actors__::Build_stream[ nil, _document, @kernel, & oes_p ]
+
+      Git_Config_::Magnetics::EntityStream_via_Collection.call(
+        nil, _document, @kernel, & oes_p )
     end
 
     # ~ delete
@@ -96,7 +102,7 @@ module Skylab::Brazen
     def delete_entity action, entity, & oes_p
       ok = resolve_mutable_document
       ok &&= entity.intrinsic_delete_before_delete_in_collection( action, & oes_p )
-      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
+      ok &&= Git_Config_::Mutable::Magnetics::DeleteEntity_via_Entity_and_Collection[ entity, @mutable_document, & oes_p ]
       ok and _via_mutated_mutable_document_write_file_via_persist( action.argument_box, & oes_p )
     end
 
@@ -158,7 +164,7 @@ module Skylab::Brazen
 
     def _via_mutated_mutable_document_write_file_via_persist bx, & oes_p  # #covered-by [tm]
 
-      Git_Config_::Mutable::Actors::Persist.via(
+      Git_Config_::Mutable::Magnetics::WriteDocument_via_Collection.via(
         :is_dry, bx[ :dry_run ],
         :path, @mutable_document.input_id.to_path,
         :document, @mutable_document,

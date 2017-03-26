@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Tree::Business < Tree.mutable_node::Frugal
+  class Tree::Business < Tree::Mutable::Frugal
 
     class << self
 

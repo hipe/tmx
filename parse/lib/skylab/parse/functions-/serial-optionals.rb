@@ -113,7 +113,7 @@ module Skylab::Parse
         formal_d = 0
         is_exhausted = false
 
-        f_p_a = @function_a
+        f_p_a = @functions
         formal_length = f_p_a.length
         output_a = ::Array.new formal_length
 

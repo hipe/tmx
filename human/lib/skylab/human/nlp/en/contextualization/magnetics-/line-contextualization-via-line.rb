@@ -68,7 +68,7 @@ module Skylab::Human
       end
 
       def define_prefixed_string_via_inflected_parts
-        ip = Here_::Models_::InflectedParts.begin
+        ip = This_::Models_::InflectedParts.begin
         yield ip
         @mutable_line_parts.prefixed_string = ip.to_string  # no trailing space added yet (#here)
         NIL_

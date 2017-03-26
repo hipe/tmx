@@ -2,13 +2,11 @@ module Skylab::Basic
 
   module Tree
 
-    # ->
+    Magnetics::Tree_via_NodeIdentifiers = -> upstream_x do
 
-      Input_Adapters__::Node_Identifiers = -> upstream_x do
+        root = Here_::Mutable.new
 
-        root = Tree_::Mutable.new
-
-        upstream_x.each do | identifier |
+        upstream_x.each do |identifier|
 
           root.touch_node identifier.to_tree_path,
             :leaf_node_payload_proc, -> do
@@ -17,8 +15,10 @@ module Skylab::Basic
         end
 
         root
-      end
 
-      # <-
+    end
+
+    # ==
+    # ==
   end
 end

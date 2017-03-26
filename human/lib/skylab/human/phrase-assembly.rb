@@ -255,16 +255,16 @@ module Skylab::Human
     followed_by_space = nil
     preceded_by_space = nil
 
-    word_chunk_stream_via_sexp_stream = nil
+    word_chunk_stream_via_sexp_scanner = nil
     string_via_nonempty_chunk = nil
 
-    Word_string_stream_via_sexp_stream = -> st do
+    Word_string_stream_via_sexp_scanner = -> st do
 
-      _st = word_chunk_stream_via_sexp_stream[ st ]
+      _st = word_chunk_stream_via_sexp_scanner[ st ]
       _st.map_by( & string_via_nonempty_chunk )
     end
 
-    word_chunk_stream_via_sexp_stream = -> st do
+    word_chunk_stream_via_sexp_scanner = -> st do
 
       main_gets = -> do
         st.gets

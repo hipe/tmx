@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    class Actors__::Persist < Couch_Actor_
+    class Magnetics::PersistEntity_via_Entity_and_Collection < CouchMagnetic_  # 1x
 
       Attributes_actor_.call( self,
         :is_dry,

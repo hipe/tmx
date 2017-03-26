@@ -1,15 +1,15 @@
 module Skylab::Human::TestSupport
 
-  module Sexp::Expression_Sessions::List_Through_Columnar_Aggregation
+  module Magnetics::List_Via_Columnar_Aggregation  # this name ich muss sein
 
     def self.[] tcc
       tcc.include self
     end
 
-    a = [ :list, :through, :columnar_aggregation ]
+    a = [ :list, :via, :columnar_aggregation ]
     define_method :subject_call_ do |*sx|
       sx[ 0, 0 ] = a
-      Home_::Sexp.expression_session_via_sexp sx
+      Home_::Sexp.__expression_session_via_sexp sx
     end
 
     def push_mixed * x_a

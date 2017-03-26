@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Git_Config
 
-    class Actors__::Write
+    class Magnetics::PersistEntity_via_Entity_and_Collection  # 1x
 
       Attributes_actor_.call( self,
         :downstream_IO,
@@ -18,14 +18,17 @@ module Skylab::Brazen
       end
 
       def resolve_section
+
         _prs = Mock_Parse__.new -> i, * _, & ev_p do
           if :info != i
             raise ev_p[].to_exception
           end
         end
-        @section = Git_Config_::Mutable::Section_or_Subsection__.
+
+        _ = Git_Config_::Mutable::Section_or_Subsection__.
           via_literals @subsection_name, @section_name, _prs
-        @section ? ACHIEVED_ : UNABLE_
+
+        _store :@section, _
       end
 
       def resolve_assignment_lines
@@ -47,7 +50,12 @@ module Skylab::Brazen
         ok
       end
 
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
       Mock_Parse__ = ::Struct.new :handle_event_selectively
+
+      # ==
+      # ==
     end
   end
 end

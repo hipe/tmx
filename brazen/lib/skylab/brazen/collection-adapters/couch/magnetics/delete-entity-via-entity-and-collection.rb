@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    class Actors__::Delete < Couch_Actor_
+    class Magnetics::DeleteEntity_via_Entity_and_Collection < CouchMagnetic_
 
       Attributes_actor_.call( self,
         :action,

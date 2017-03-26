@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] sexp - expression sessions - list thru eventing" do
+  describe "[hu] magnetics - list via eventing" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -67,10 +67,10 @@ module Skylab::Human::TestSupport
       end
     end
 
-    a = [ :list, :through, :eventing ]
+    a = [ :list, :via, :eventing ]
     define_method :_something_about_eventing do |*x_a|
       x_a[ 0, 0 ] = a
-      Home_::Sexp.expression_session_via_sexp x_a
+      Home_::Sexp.__expression_session_via_sexp x_a
     end
   end
 end

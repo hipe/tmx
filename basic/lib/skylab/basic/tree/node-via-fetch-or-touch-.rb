@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Actors__::Fetch_or_touch
+    class Node_via_Fetch_or_Touch_
 
       # (client writes ivars directly - "highly coupled" performer interface)
 
@@ -34,8 +34,8 @@ module Skylab::Basic
         if a.length.zero?
           @node
         else
-          @_slug_stream = Common_::Scanner.via_array a
-          __main_loop_because_nonempty_slug_stream
+          @_slug_scanner = Common_::Scanner.via_array a
+          __main_loop_because_nonempty_slug_scanner
         end
       end
 
@@ -49,26 +49,26 @@ module Skylab::Basic
         end
       end
 
-      def __main_loop_because_nonempty_slug_stream
+      def __main_loop_because_nonempty_slug_scanner
 
         do_create = :touch == @fetch_or_touch
         node = @node
-        st = @_slug_stream
+        scn = @_slug_scanner
 
         begin
 
-          node_ = node[ st.head_as_is ]
+          node_ = node[ scn.head_as_is ]
 
           if node_
-            st.advance_one
+            scn.advance_one
           elsif do_create
             node_ = ___add_child_because_touch node
           else
-            x = __when_not_found st, node
+            x = __when_not_found scn, node
             break
           end
 
-          if st.unparsed_exists
+          if scn.unparsed_exists
             node = node_
             redo
           end
@@ -86,14 +86,14 @@ module Skylab::Basic
 
       def ___add_child_because_touch node
 
-        slug = @_slug_stream.gets_one
+        slug = @_slug_scanner.gets_one
 
         node_ = node.class.new slug
 
         # set the newly created node's payload using the most applicable
         # proc based on whether we are at the end and which were provided
 
-        if @_slug_stream.no_unparsed_exists  # are we at the end?
+        if @_slug_scanner.no_unparsed_exists  # are we at the end?
           p = @leaf_node_payload_proc
         end
 
@@ -119,7 +119,7 @@ module Skylab::Basic
       end
 
       def ___say_no_such_node
-        "no such node: '#{ @_slug_stream.head_as_is }'"
+        "no such node: '#{ @_slug_scanner.head_as_is }'"
       end
 
       def __when_not_found_via_proc st, node
@@ -138,7 +138,7 @@ module Skylab::Basic
       def __when_found node
         p = @result_tuple_proc
         if p
-          p[ node, @_slug_stream ]
+          p[ node, @_slug_scanner ]
         else
           node
         end

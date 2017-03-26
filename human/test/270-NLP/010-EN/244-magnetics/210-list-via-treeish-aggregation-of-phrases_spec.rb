@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - list through treeish aggregation" do
+  describe "[hu] NLP EN mags - list via treeish aggregation of phrases" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -63,7 +63,7 @@ module Skylab::Human::TestSupport
         o.verb_lemma.should eql :miss
         oo = o.object_noun_phrase
         oo.lemma_symbol.should eql :property
-        oo.modifier_word_list.send( :_s_a ).should eql [ 'required' ]
+        oo.modifier_word_list.send( :_strings ).should eql [ 'required' ]
       end
 
       it "but note the constituency" do
@@ -74,9 +74,9 @@ module Skylab::Human::TestSupport
         _L = a.fetch 0
         _R = a.fetch 1
 
-        :par == _L.send( :_m ) or fail
-        :par_1 == _L.send( :_x ).as_variegated_symbol or fail
-        :par_2 == _R.send( :_x ).as_variegated_symbol or fail
+        :par == _L.send( :_method_name ) or fail
+        :par_1 == _L.send( :_mixed ).as_variegated_symbol or fail
+        :par_2 == _R.send( :_mixed ).as_variegated_symbol or fail
       end
 
       it "wahoo expression two" do
@@ -126,7 +126,7 @@ module Skylab::Human::TestSupport
         oo = o.object_noun_phrase
 
         _wordlist = oo.suffixed_modifier_phrase
-        _wordlist.send( :_s_a ).should eql %w( which failed to load )
+        _wordlist.send( :_strings ).should eql %w( which failed to load )
       end
 
       it "but note the constituency" do
@@ -135,8 +135,8 @@ module Skylab::Human::TestSupport
 
         _a = _onp.suffixed_proper_constituency._read_only_array
 
-        _a.fetch( 0 ).send( :_x ).as_variegated_symbol.should eql :par_1
-        _a.fetch( 1 ).send( :_x ).as_variegated_symbol.should eql :par_2
+        _a.fetch( 0 ).send( :_mixed ).as_variegated_symbol.should eql :par_1
+        _a.fetch( 1 ).send( :_mixed ).as_variegated_symbol.should eql :par_2
       end
 
       it "express four!" do
@@ -290,8 +290,8 @@ module Skylab::Human::TestSupport
       if o
         o.dup
       else
-        o = NLP_EN_Sexp_[].expression_session_for(
-          :list, :through, :treeish_aggregation,
+        o = NLP_EN_.sexp_lib.expression_session_for(
+          :list, :via, :treeish_aggregation_of_phrases,
         )
         o
       end

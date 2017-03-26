@@ -169,7 +169,7 @@ module Skylab::TestSupport
           file_key_for = @name_conventions.method file_m
 
           depth = 0
-          output_node = Tree_lib_[].mutable_node.new
+          output_node = Tree_lib_[]::Mutable.new
           parents = []
           st = tree.to_classified_stream
           tree_ = output_node

@@ -75,7 +75,7 @@ module Skylab::Human
           end
         end
 
-        def the_only  # #coverpoint-1-1
+        def the_only  # #cov1.1
           @_is_negative_HU = true
           d = count_for_inflection
           case 1 <=> d
@@ -86,7 +86,7 @@ module Skylab::Human
           end
         end
 
-        def no_double_negative s  # #coverpoint-1-1
+        def no_double_negative s  # #cov1.1
           @_is_negative_HU = true
           d = count_for_inflection
           case 1 <=> d
@@ -461,10 +461,10 @@ module Skylab::Human
           end
         end
 
-        _NP = [ :when, :syntactic_category, :noun_phrase ]
+        _NP = [ :magnetic_idea, :syntactic_category, :noun_phrase ]
         o[ :noun_phrase ] = -> * x_a do
           x_a[ 0, 0 ] = _NP
-          _fr = EN_::Sexp.expression_session_via_sexp x_a
+          _fr = EN_::Sexp.interpret_ Scanner_[ x_a ]
           _fr.express_into ""
         end
 
@@ -506,12 +506,12 @@ module Skylab::Human
           end
         end
 
-        _SP = [ :when, :syntactic_category, :sentence_phrase ]
+        _SP = [ :magnetic_idea, :syntactic_category, :sentence_phrase ]
 
         o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
 
           x_a[ 0, 0 ] = _SP
-          _fr = EN_::Sexp.expression_session_via_sexp x_a
+          _fr = EN_::Sexp.interpret_ Scanner_[ x_a ]
           _fr.express_into ""
         end
 

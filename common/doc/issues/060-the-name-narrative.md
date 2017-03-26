@@ -25,7 +25,7 @@
 
 
 
-# intro
+## intro
 
 imagine we have an instance of a class `FooBar` (or maybe it's
 `Foo_Bar`). if we need to store that object in an instance variable,
@@ -194,7 +194,7 @@ system but these are more specific and less general-purpose.
 
 
 
-## constant names can hold information that some others,
+## constant names can hold information that some others, :[#here.7]
 
 not all name conventions are cleanly isomorphic with each other.
 converting from const to norm can be lossy, for example:

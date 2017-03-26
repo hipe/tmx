@@ -305,7 +305,7 @@ what are the operational categories that we can use to categories operations?
 
   `destructiveness` (first mentioned above) is one such category.
   there are two `exponents` for this category -- this category has a strong
-  isomorphicism with the same concept from the Computer Sciences, so we have
+  isomorphism with the same concept from the Computer Sciences, so we have
   a choice of terms we could borrow to represent its two `exponents` -- we
   chose `read-only`, `destructive`.
 
@@ -326,7 +326,7 @@ what are the operational categories that we can use to categories operations?
 
 ### a leak-proof abstraction
 
-above we said `destructiveness` has a strong isomorphicism with the
+above we said `destructiveness` has a strong isomorphism with the
 same concept from computer science. in fact it may be too strong. What we're
 after in developing our pattern language for abstract structures is less about
 talking about desctructive operations those abstract structures may exhibit,

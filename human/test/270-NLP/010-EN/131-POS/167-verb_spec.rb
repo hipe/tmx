@@ -104,8 +104,7 @@ module Skylab::Human::TestSupport
     end
 
     def _POS
-
-      Home_::NLP::EN::POS
+      NLP_EN_.POS_lib
     end
   end
 end

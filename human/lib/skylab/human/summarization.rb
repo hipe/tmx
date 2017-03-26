@@ -2,7 +2,7 @@ module Skylab ; end # etc
 
 module Skylab::Human
 
-  module Summarizer
+  module Summarization
 
     def ellipsis
       '..'

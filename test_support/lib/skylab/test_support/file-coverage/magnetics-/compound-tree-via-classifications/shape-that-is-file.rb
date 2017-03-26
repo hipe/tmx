@@ -74,7 +74,7 @@ module Skylab::TestSupport
         def init
           super
           @test_local_range = tailer_range_via_path_ @test_dir
-          @tree = Tree_lib_[].mutable_node.new
+          @tree = Tree_lib_[]::Mutable.new
           NIL_
         end
 

@@ -3,7 +3,7 @@
 ## prerequisites
 
 to understand how "actual value" is distinct from "formal value",
-see [#fi-025].
+see [#fi-002.2].
 
 
 

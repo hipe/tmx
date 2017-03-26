@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] sexp - expression sessions - list thru c.agg. - features" do
+  describe "[hu] magnetics - list thru c.agg. - features" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :sexp_expression_sessions_list_through_columnar_aggregation
+    use :magnetics_list_via_columnar_aggregation
 
     context "expander (when no input)" do
 

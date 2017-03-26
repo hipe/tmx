@@ -1,17 +1,20 @@
 module Skylab::Human
 
-  module Sexp
+  class Magnetics::List_via_ColumnarAggregation_of_Phrases < ::Module
 
-    class Expression_Sessions::List_through_ColumnarAggregation < ::Module  # see [#055]
+    # see [#055]. #cov1.6
 
+    # (NOTE there is a same-named const in this lib elsewhere!)
+
+    # -
       Attributes_actor_[ self ]
 
       # Entity_.event.selective_builder_sender_receiver self
 
       class << self
 
-        def expression_via_sexp_stream_ st
-          new.__init_and_produce_via_etc st
+        def interpret_ scn
+          new.__interpret scn
         end
 
         private :new
@@ -32,9 +35,8 @@ module Skylab::Human
         :do_field_aggregation,
         :on_zero_items_p )
 
-      def __init_and_produce_via_etc st
-
-        _ok = process_argument_scanner_fully st
+      def __interpret scn
+        _ok = process_argument_scanner_fully scn
         _ok && self
       end
 
@@ -656,6 +658,6 @@ module Skylab::Human
           @subs_h[ @fld.name_symbol ] = nil   # substitute the mustache variable name
         end
       end
-    end
+    # -
   end
 end

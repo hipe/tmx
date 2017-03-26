@@ -377,7 +377,7 @@ module Skylab::Brazen
 
         def write * x_a, & oes_p  # experimental
 
-          Mutable::Actors::Persist.build_mutable_with(
+          Mutable::Magnetics::WriteDocument_via_Collection.build_mutable_with(
             :write_to_tempfile_first,
             :path, @input_id.to_path,
             :is_dry, false,
@@ -388,7 +388,7 @@ module Skylab::Brazen
 
         def write_to_path path, * x_a, & oes_p
 
-          Mutable::Actors::Persist.build_mutable_with(
+          Mutable::Magnetics::WriteDocument_via_Collection.build_mutable_with(
             :path, path,
             :is_dry, false,
             :document, self,

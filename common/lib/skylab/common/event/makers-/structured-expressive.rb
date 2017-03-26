@@ -9,7 +9,7 @@ module Skylab::Common
       # should probably be merged into the older cousin of the same name
       # that is now nearby
 
-      _ = Event_::Actors_::Build_struct_like_constructor_method.call(
+      _p = Home_.lib_.basic::Struct::Definition_for_the_Method_Called_New.via(
 
         :on_args_to_method_called_new, -> x_a, & p do
 
@@ -45,7 +45,7 @@ module Skylab::Common
         alias_method :orig_new, :new
       end
 
-      define_singleton_method :new, _
+      define_singleton_method :new, _p
 
       class << self
         alias_method :[], :new

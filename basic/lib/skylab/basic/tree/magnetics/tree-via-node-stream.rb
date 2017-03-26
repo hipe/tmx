@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module Tree
 
-    Input_Adapters__::Node_Stream = -> in_st do
+    Magnetics::Tree_via_NodeStream = -> in_st do
 
-      root = Tree_::Mutable.new
+      root = Here_::Mutable.new
 
       begin
         id = in_st.gets
@@ -20,5 +20,8 @@ module Skylab::Basic
 
       root
     end
+
+    # ==
+    # ==
   end
 end

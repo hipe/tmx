@@ -1,22 +1,22 @@
 # event makers :[#005]
 
-• :[#.A] tracks the transplant from [hl]. legacy.
+- :[#here.A] tracks the transplant from [hl]. legacy.
   "the magical, multipurpose Event base class and variants"
   was broken up into [#B], [#C] and [#D]. [#B] wins the history.
 
 
-• :[#.B] is the maker, which makes [#C] and [#D].
+- :[#here.B] is a reference to [#ba-063], which makes [#here.C] and [#here.D].
 
 
-• :[#.C] is what used to be the "magical, multipurpose" event class.
+- :[#here.C] is what used to be the "magical, multipurpose" event class.
 
 
-• :[#.D] is the "hooks"
+- :[#here.4] is the "hooks" (remotely referenced by [ba] only, probably)
 
 
-• :[#.E] is the "data event" (transplated from some old app ([sg]?))
-         which is sorta like half of [#.C].
+- :[#here.E] is the "data event" (transplated from some old app ([sg]?))
+         which is sorta like half of [#here.C].
 
-• :[#.F] is the "message" event (also transplated from same) which
-         is sorta lke the other half of [#.C].
-_
+
+- :[#here.F] is the "message" event (also transplated from same) which
+         is sorta lke the other half of [#here.C].

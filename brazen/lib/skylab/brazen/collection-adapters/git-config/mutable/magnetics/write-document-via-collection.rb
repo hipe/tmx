@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Mutable
 
-      class Actors::Persist
+      class Magnetics::WriteDocument_via_Collection
 
         # ~ #[#081] experimental extensions to methodic actor
 

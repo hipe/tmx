@@ -1,10 +1,10 @@
 require_relative '../../test-support'
 
-describe "[hu] NLP EN minitesimal" do  # :#spot-2
+describe "[hu] NLP EN - core" do  # :#spot1.2
 
   context "s" do
 
-    # ( has a counterpart test in sibling `methods_spec.rb` )
+    # ( has a counterpart test in #spot1.4 )
 
     o = -> a, n, so, *t do
       it "#{ so }", *t do
@@ -33,6 +33,6 @@ describe "[hu] NLP EN minitesimal" do  # :#spot-2
   end
 
   def _lib
-    ::Skylab::Human::NLP::EN
+    ::Skylab::Human::TestSupport::NLP_EN_.lib
   end
 end

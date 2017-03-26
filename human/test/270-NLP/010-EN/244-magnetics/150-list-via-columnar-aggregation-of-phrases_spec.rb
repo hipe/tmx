@@ -1,15 +1,15 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - list through columnar aggregation of statementishes" do
+  describe "[hu] NLP EN mags - list via columnar aggregation of phrases" do
 
     TS_[ self ]
 
-    it "(cute)" do
+    it "(cute)" do  # #cov1.4
 
-      o = NLP_EN_Sexp_[].expression_session_for(
-        :list, :through, :columnar_aggregation_of_statementishes,
+      o = NLP_EN_.sexp_lib.expression_session_for(
+        :list, :via, :columnar_aggregation_of_phrases,
       )
 
       o.add :drink, :tea

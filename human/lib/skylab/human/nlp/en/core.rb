@@ -57,27 +57,30 @@ module Skylab::Human
       end
 
       oxford_comma_proto = Lazy_.call do
-        o = Home_::NLP::EN::Sexp.expression_session_for :list
-        o.express_none_by do
-          NIL_
+
+        EN_::Magnetics::List_via_Items.define do |o|
+          o.express_none_by do
+            NOTHING_
+          end
+          o.separator = ', '
         end
-        o.separator = ', '
-        o.freeze
       end
 
       Oxford_AND_prototype = Lazy_.call do
-        o = oxford_comma_proto[].dup
-        o.final_separator = ' and '
-        o.freeze
+
+        oxford_comma_proto[].redefine do |o|
+          o.final_separator = ' and '
+        end
       end
 
       Oxford_OR_prototype = Lazy_.call do
-        o = oxford_comma_proto[].dup
-        o.final_separator = ' or '
-        o.freeze
+
+        oxford_comma_proto[].redefine do |o|
+          o.final_separator = ' or '
+        end
       end
 
-      S__ = -> do  # tested at #spot-1
+      S__ = -> do  # tested at #spot1.1
 
         it_them = [ 'them', 'it' ]
 
@@ -173,11 +176,16 @@ module Skylab::Human
 
       end.call
 
+      Association_via_symbol_ = -> sym do  # kind of hiding here
+        Require_fields_lib_[]
+        Field_::SimplifiedName.new sym do end
+      end
+
       AND___ = ' and '.freeze
 
       COMMA___ = ', '.freeze
 
-      EN_ = self
+      EN_ = self  # do not use `Here_` anywhere in [hu]. this is shorter.
     end  # EN
   end
 end

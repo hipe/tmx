@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     # ==
 
-    class Via_AlreadyLoaded < MonadicMagneticAndModel_
+    class Via_AlreadyLoaded < Common_::MonadicMagneticAndModel
 
       def initialize ss_mod
 

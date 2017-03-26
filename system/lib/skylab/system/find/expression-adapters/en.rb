@@ -43,7 +43,7 @@ module Skylab::System
           end
 
           def _EN
-            Home_.lib_.human::NLP::EN
+            @___EN ||= Home_.lib_.human::NLP::EN
           end
         end  # >>
       end

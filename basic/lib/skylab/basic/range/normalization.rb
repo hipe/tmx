@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Range
 
-    class Normalization__  # :+[#027]
+    class Normalization  # ##[#fi-004]
 
       Attributes_actor_[ self ]
 
@@ -10,7 +10,7 @@ module Skylab::Basic
         def with * x_a, & x_p
           o = super
           if o
-            o.freeze  # :+[#036]
+            o.freeze  # ##[#fi-004.6]
           end
           o
         end
@@ -238,7 +238,9 @@ module Skylab::Basic
           end
         end
       end
+
+      # ==
+      # ==
     end
   end
 end
-# #pending-rename: publicize

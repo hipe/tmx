@@ -1,24 +1,26 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
-    class Magnetic_Expression_Session
+    class Expression  # [here] only. (2x)
 
-      # theory of "expression frames" at [#034]
+      # (introduction to parent node at #spot1.6)
+
       # <-
 
     class << self
 
       def list_argument_via_array a
-        Here_::Idea_Argument_Adapter_for_Nounish_.via_array a
+        ::Kernel._OKAY
+        ExpressionPipeline_::IdeaArgumentAdapter_via_Nounish_.via_array a
       end
 
       def match_for_idea__ idea
-        Here_::Build_score_against_idea_of_frame___[ idea, self ]
+        ExpressionPipeline_::Score_via_Idea_and_Frame___[ idea, self ]
       end
 
       def new_session_via_sexp__ x_a  # assume receiver is an e.f subclass
-        via_idea_ Here_::Idea_.via_sexp__ x_a
+        via_idea_ ExpressionPipeline_::Idea_.interpret_ Scanner_[ x_a ]
       end
 
       def via_idea_ x

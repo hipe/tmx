@@ -1,12 +1,14 @@
 module Skylab::Human::TestSupport
 
-  module NLP::EN::Sexp::Magnetics
+  module NLP::EN::Magnetics
 
     class << self
       def [] tcm
         tcm.include self ; nil
       end
     end  # >>
+
+    # -
 
       def e_ expected_string  # "e_" = "expect_"
 
@@ -25,8 +27,12 @@ module Skylab::Human::TestSupport
         _.new_session_via_sexp__ @the_iambic_for_the_request_
       end
 
+      def const_for_magnet_for_object_and_subject_
+        :Expression_via_Idea_with_Object_and_Subject
+      end
+
       def magnetic_module_for_ const
-        NLP_EN_Sexp_[]::Expression_Sessions.const_get const, false
+        NLP_EN_.lib::Magnetics.const_get const, false
       end
     # -
   end

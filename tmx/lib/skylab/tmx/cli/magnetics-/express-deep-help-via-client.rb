@@ -110,7 +110,7 @@ module Skylab::TMX
 
         def __init_glyphs
 
-          gss = Basic_[]::Tree.unicode::GlyphSets
+          gss = Basic_[]::Tree::Magnetics::TextGlyph_via_NodeCategory::GlyphSets
           gs = gss::WIDE    # or
           gs = gss::NARROW  # or
 

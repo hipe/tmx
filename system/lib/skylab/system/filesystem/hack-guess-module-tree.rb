@@ -283,7 +283,7 @@ module Skylab::System
         end
         public :build_each_immutable_child
 
-        Immu_Node__ = Basic_[]::Tree.immutable_node
+        Immu_Node__ = Basic_[]::Tree::ImmutableNode
 
         def OK
           ACHIEVED_

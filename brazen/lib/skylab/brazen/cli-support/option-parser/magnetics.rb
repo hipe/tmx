@@ -2,12 +2,12 @@ module Skylab::Brazen
 
   module CLI_Support::Option_Parser
 
-    Actors = ::Module.new
+    Magnetics = ::Module.new
 
     # a hack to see if a basic switch looks to be present in an array
     # build it with the full switch as its only argument:
     #
-    #     p = Home_::CLI_Support::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
+    #     p = Home_::CLI_Support::Option_Parser::Magnetics::Build_basic_switch_proc[ '--foom' ]
     #
     # if the argv doesn't include it, result is nil:
     #
@@ -21,7 +21,7 @@ module Skylab::Brazen
     #
     #     p[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
 
-    Actors::Build_basic_switch_proc = -> do
+    Magnetics::Build_basic_switch_proc = -> do
 
       full_basic_switch_match = -> do
         rx = /\A--([a-z]).+\z/i

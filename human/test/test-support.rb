@@ -62,11 +62,17 @@ module Skylab::Human::TestSupport
 
   # --
 
-  NLP_EN_Sexp_ = -> do
-    Home_::NLP::EN::Sexp
-  end
-
-  # --
+  module NLP_EN_ ; class << self
+    def POS_lib
+      Home_::NLP::EN::POS
+    end
+    def sexp_lib
+      Home_::NLP::EN::Sexp
+    end
+    def lib
+      Home_::NLP::EN
+    end
+  end ; end
 
   Expect_Event = -> tcc do
     Common_.test_support::Expect_Emission[ tcc ]

@@ -1,11 +1,11 @@
-require_relative '../../../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - O&S cross-product" do
+  describe "[hu] NLP EN mags - O&S cross-product" do
 
     TS_[ self ]
-    use :NLP_EN_sexp_magnetics
+    use :NLP_EN_magnetics
 
     if false  # the mentor-case, here for refernce:
 
@@ -23,7 +23,7 @@ module Skylab::Human::TestSupport
 
     context "(main context)" do
 
-      it "negative, none" do
+      it "negative, none" do  # :#cov1.7
         _a false, 0
         e_ "nothing matches a subsystem"
       end
@@ -89,7 +89,7 @@ module Skylab::Human::TestSupport
     end
 
     def magnetic_module_
-      magnetic_module_for_ :When_Object_and_Subject
+      magnetic_module_for_ const_for_magnet_for_object_and_subject_
     end
   end
 end

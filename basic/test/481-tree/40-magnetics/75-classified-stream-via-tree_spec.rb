@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - actors - build traversal stream" do
+  describe "[ba] tree - magnetics - classified stream via tree" do
 
     TS_[ self ]
     use :tree

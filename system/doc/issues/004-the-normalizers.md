@@ -209,8 +209,8 @@ the most commonly used features of this sidesystem (to read and write
 files) is implemented by what is also the most fun and weird "game mechanic"
 it exhibits:
 
-these commonest filesystem operations are implemented as [#ba-027] normal
-normalizers.
+these commonest filesystem operations are implemented as [#fi-004.5] "normal
+normalizers."
 
 this means that in the same way we might normalize a string to make sure
 that it is a valid email address, we will also try to produce an open

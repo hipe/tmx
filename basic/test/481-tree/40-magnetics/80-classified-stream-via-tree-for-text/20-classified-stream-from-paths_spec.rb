@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - expad - text - classified stream from paths" do
+  describe "[ba] tree - magnetics - classified stream via tree for text - paths" do
 
     TS_[ self ]
     use :tree

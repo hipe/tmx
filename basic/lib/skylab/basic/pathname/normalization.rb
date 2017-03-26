@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Pathname
 
-      class Normalization__
+    class Normalization
 
         # do not let this seep into the scope of [#sy-004]. do not use FS here
 
@@ -255,7 +255,9 @@ module Skylab::Basic
 
         include Simple_Selective_Sender_Methods_  # instead of "entity"'s
           # event-building stuff, just for consistency within the library
-      end
+
+      # ==
+      # ==
+    end
   end
 end
-# #pending-rename: publicize

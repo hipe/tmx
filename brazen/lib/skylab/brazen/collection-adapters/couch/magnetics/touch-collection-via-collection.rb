@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    class Actors__::Touch_collection < Couch_Actor_
+    class Magnetics::TouchCollection_via_Collection < CouchMagnetic_  # 1x
 
       Attributes_actor_.call( self,
         :entity,

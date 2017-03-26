@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - simple inflection session" do
+  describe "[hu] NLP - EN - simple inflection session" do  # :#spot1.4
 
     TS_[ self ]
 
@@ -56,7 +56,7 @@ module Skylab::Human::TestSupport
 
     context "(redux of hacky stuff)" do
 
-      # #coverpoint-1-1
+      # :#cov1.1
 
       context "(the primitive cases)" do
 
@@ -187,7 +187,7 @@ module Skylab::Human::TestSupport
 
     define_method :_expect, -> do
 
-      # ( has a counterpart test in #spot-2 )
+      # ( has a counterpart test in #spot1.2 )
       # ( note the example is somewhat un-realistic because we are using the
       # same count-variable referrant for two different noun phrases. )
 
@@ -219,18 +219,20 @@ module Skylab::Human::TestSupport
 
         cls = ::Class.new
         TS_.const_set "#{ prefix }#{ d += 1 }", cls
-        Home_::NLP::EN::SimpleInflectionSession.edit_module_via_iambic cls, [ :public, i_a ]
+        X_nlp_en_sis_lib[].edit_module_via_iambic cls, [ :public, i_a ]
         cls.new
       end
     end.call
 
+    X_nlp_en_sis_lib = -> do
+      NLP_EN_.lib::SimpleInflectionSession
+    end
+
     class X_nlp_en_sis_SessionClass
-      include Home_::NLP::EN::SimpleInflectionSession::Methods
+      include X_nlp_en_sis_lib[]::Methods
       alias_method :calculate, :instance_exec
     end
 
-    def _subject_module
-      Home_::NLP::EN::SimpleInflectionSession
-    end
+    define_method :_subject_module, X_nlp_en_sis_lib
   end
 end

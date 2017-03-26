@@ -2,14 +2,14 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - expad - paths" do
+  describe "[ba] tree - magnetics - pre-order normal path stream via tree" do
 
     TS_[ self ]
     use :tree
 
     it "x." do
 
-      tree = subject_module_.mutable_node.new
+      tree = subject_module_::Mutable.new
       tree.touch_node 'one/two'
       tree.touch_node 'three/four/five'
       tree.touch_node 'one/six'

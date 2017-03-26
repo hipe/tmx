@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - count and noun" do
+  describe "[hu] NLP EN mags - count and noun" do
 
     TS_[ self ]
-    use :NLP_EN_sexp_magnetics
+    use :NLP_EN_magnetics
 
     if false  #  the mentor case, here for reference:
 
@@ -20,8 +20,8 @@ module Skylab::Human::TestSupport
 
     it "x." do
 
-      _ef = NLP_EN_Sexp_[].expression_session_for(
-        :when,
+      _ef = NLP_EN_.sexp_lib.expression_session_for(
+        :magnetic_idea,
         :syntactic_category, :noun_phrase,
         :subject, 3, :subject, 'amigo' )
 
@@ -45,7 +45,7 @@ module Skylab::Human::TestSupport
     end
 
     def magnetic_module_
-      magnetic_module_for_ :When_Count_and_Noun
+      magnetic_module_for_ :Expression_via_Idea_with_Count_and_Noun
     end
   end
 end

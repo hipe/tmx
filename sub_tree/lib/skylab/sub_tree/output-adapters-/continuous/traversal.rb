@@ -18,7 +18,7 @@ module Skylab::SubTree
       end
 
       def as_attributes_actor_normalize
-        @glyph_set ||= Home_.lib_.basic::Tree.unicode::GlyphSets::WIDE
+        @glyph_set ||= Home_.lib_.basic::Tree::Magnetics::TextGlyph_via_NodeCategory::GlyphSets::WIDE
         @sep ||= SEP_
         KEEP_PARSING_
       end
@@ -223,7 +223,7 @@ module Skylab::SubTree
 
   private
 
-    Home_.lib_.basic::Tree.unicode::Glyphs.each_value do | g |
+    Home_.lib_.basic::Tree::Magnetics::TextGlyph_via_NodeCategory::Glyphs.each_value do |g|
 
       m = g.normalized_glyph_name
 

@@ -324,7 +324,7 @@ module Skylab::Fields
         # valid "head" of the arguments (as an argument scanner).
 
         # because our lingua-franca representation of associations is as
-        # a stream (but see [#004.E]), when we need such a hash we traverse
+        # a stream (but see [#002.E.2]), when we need such a hash we traverse
         # (and exhaust) the stream, converting it into such a hash.
 
         # when doing so, we must also make note of those associations that
@@ -1215,7 +1215,7 @@ module Skylab::Fields
 
             # (it may be that you don't know the value and there is no default)
 
-            # 2. if there are ad-hoc normalizations, apply those. (was [#ba-027])
+            # 2. if there are ad-hoc normalizations, apply those (as [#004.5])
 
             bx = asc.ad_hoc_normalizer_box
             if bx

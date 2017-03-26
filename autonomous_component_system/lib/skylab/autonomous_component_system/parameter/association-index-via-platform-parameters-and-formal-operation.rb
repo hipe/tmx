@@ -112,7 +112,7 @@ module Skylab::Autonomous_Component_System
       }
 
       # as referenced above, in various ways we have tried to support the
-      # isomorphicism that an optional (platform) parameter would express
+      # isomorphism that an optional (platform) parameter would express
       # "as expected" in interfaces BUT there are two problems with this:
       #
       #   • there is no "optional" platform parameter per se, only

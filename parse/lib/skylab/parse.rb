@@ -83,6 +83,8 @@ module Skylab::Parse  # see [#001]
       Home_.lib_.fields::Attributes::Actor.via cls, a
     end
 
+    Stream_ = Common_::Stream.method :via_nonsparse_array
+
     Scanner_ = Common_::Scanner.method :via_array
 
     module Lib___

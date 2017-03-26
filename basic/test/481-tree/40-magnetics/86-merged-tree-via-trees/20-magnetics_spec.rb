@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - sessions - merge - actors" do
+  describe "[ba] tree - magnetics - merged tree via trees - sub-magnetics" do
 
     TS_[ self ]
     use :tree
@@ -64,7 +64,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject
-      subject_module_::Sessions_::Merge
+      subject_module_::Magnetics::MergedTree_via_Trees
     end
   end
 end

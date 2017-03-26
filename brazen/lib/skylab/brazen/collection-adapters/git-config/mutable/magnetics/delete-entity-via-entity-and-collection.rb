@@ -2,13 +2,9 @@ module Skylab::Brazen
 
   class Collection_Adapters::Git_Config
 
-    Git_Config_::Actors__.class
-
     module Mutable
 
-      Actors = ::Module.new
-
-      class Actors::Delete < Git_Config_Actor_
+      class Magnetics::DeleteEntity_via_Entity_and_Collection < GitConfigMagnetic_  # 1x
 
         Attributes_actor_.call( self,
           :entity,
@@ -62,6 +58,9 @@ module Skylab::Brazen
           end
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

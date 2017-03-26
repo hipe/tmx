@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module String
 
-    module Small_Time_Actors__
+    module Magnetics__
 
-      Count_occurrences_OF_string_IN_string = -> needle, haystack do
+      OccurrenceCount_via_Needle_in_Haystack = -> needle, haystack do
 
         # you could `scan`, but why? #not-covered:visually-once
 
@@ -22,7 +22,9 @@ module Skylab::Basic
         count
       end
 
-      Count_occurrences_OF_regex_IN_string = -> rx, str do
+      # ==
+
+      OccurrenceCount_via_Regex_in_String = -> rx, str do
 
         # you could use `scan`, but why?
 
@@ -35,7 +37,9 @@ module Skylab::Basic
         d
       end
 
-      class Ellipsify  # :[#032].
+      # ==
+
+      class Ellipsify_via_String  # :[#032].
 
         Attributes_actor_.call( self,
           :input_string,
@@ -97,7 +101,9 @@ module Skylab::Basic
         end
       end
 
-      module Unparenthesize_message_string
+      # ==
+
+      module UnparenthesizedPieces_via_MessageString
 
         p = -> s do
           md = UNPARENTHESIZE_RX___.match s
@@ -134,6 +140,9 @@ module Skylab::Basic
         # this same set. note this parses "foo\n" and "\n".
 
       end
+
+      # ==
+      # ==
     end
   end
 end

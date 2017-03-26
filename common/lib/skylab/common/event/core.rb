@@ -174,11 +174,10 @@ module Skylab::Common
 
       def with_message_string_mapper p
 
-        _p = Event_::Actors_::
-          Produce_new_message_proc_via_map_reducer_and_old_message_proc.call(
-            p, message_proc )
+        _p_ = Event_::Magnetics_::MessageProc_via_MapReducer_and_MessageProc.call(
+          p, message_proc )
 
-        new_with( & _p )
+        new_with( & _p_ )
       end
 
       def new_with * x_a, & msg_p  # #note-25

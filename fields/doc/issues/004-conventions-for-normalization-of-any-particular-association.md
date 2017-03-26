@@ -43,9 +43,9 @@ going on when we synthesized these ideas.
 
 
 
-## a broad view
+## a broad view :[#here.b]
 
-broadly we conceive of normalization as both the process and modeling
+broadly we conceive of normalization as both the processing and modeling
 therebehind of taking a given input data, determining whether or not it
 is a member of the formal set of data defined by the particular
 "formal value" for this "field", and then if valid potentially transforming
@@ -53,7 +53,7 @@ the argument data and somehow making this result value available.
 
 as it would turn out, this conception of normalization is so broad that
 it arguably encompases all of computing in our universe. this is an
-isomorphicism we play with here and there to put this normalization
+isomorphism we play with here and there to put this normalization
 API to perhaps surprising use in some places, for example the possible
 transformation and resolution of resources on the filesystem or even on
 the network.
@@ -80,7 +80,7 @@ it into something far more embarassing than that..
 
 
 
-## normalizing vs. validation
+## normalizing vs. validation :[#here.c]
 
 in our universe, normalization is a superset of validation. validation
 sounds like "is it valid?" and suggests that it results in a boolean
@@ -119,11 +119,11 @@ abstract operations.
 
 the method takes on arugment and optionally one block.
 
-  • the argument is a [#ca-004] "knownness"
-  • the optional block is a [#ca-017] selective listener.
+  • the argument is a [#co-004] "knownness"
+  • the optional block is a [#co-017] selective listener.
 
 
-understanding [#ca-004] "the states of knownness" is *essential* here,
+understanding [#co-004] "the states of knownness" is *essential* here,
 and it is highly recommened that you read its doc-node before proceding.
 we use a "knowness" structure to represent the argument and all of the
 relevant metadata around it that we will work with..
@@ -160,7 +160,7 @@ a native integer `1`). if it is already valid and normal as it is
 you may leave it as it is.
 
 in such cases where you want to change the value to make it "normal"
-be useful to use the `new_with_value` method of [#ca-004] to create
+be useful to use the `new_with_value` method of [#co-004] to create
 a modified frozen dup of the incoming argument structure, but with
 the new desired value.
 
@@ -170,7 +170,7 @@ the new desired value.
 ### the semantics of your result
 
 if based on your definition of normal this normalization was
-successful, your result *must* be another or the same [#ca-004]-shaped
+successful, your result *must* be another or the same [#co-004]-shaped
 argument structure containing the new (or same) value for the argument
 value. that is:
 
@@ -207,7 +207,7 @@ execute.
 
 
 
-## :#normal-normalizers
+## normal normalizers :[#here.5]
 
 in the normal case a normalizer will be implemented something like a
 specialized actor. the full lifecycle of normalization can be broken up
@@ -216,7 +216,7 @@ conceptually into two parts (at least):
     1) defining the formal property
     2) normalizing the actual property against the formal
 
-this pairing of ideas relates exactly to the discussion of [#fi-025] formal
+this pairing of ideas relates exactly to the discussion of [#002.2] formal
 vs. actual values.
 
 conceptually you can think of the formal property as a formal set of all
@@ -231,18 +231,15 @@ tranformation functions that you write, etc.
 
 should go here (EDIT)
 
-
-
-
-## a plastic distinction between normalizer class and object thru currying
+### a plastic distinction between normalizer class and object thru currying
 
 the paradigm behind a "prototype-based" object-oriented language like
 Javascript is of course different than the idea behind class-based OOP:
 with prototypes there is a fuzzier distinction between what is a class
-and what is an object. (more accurately there are no classes)
+and what is an object. (more accurately there are no classes.)
 
 the counterpart to a class in prototype-based langauge seems essentially
-to bean object that gets duped
+to be an object that gets duped
 to make other objects. this different perspective has interesting
 ramifications that we find useful to leverage specifically in this domain
 of normalization.

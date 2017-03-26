@@ -12,7 +12,7 @@ module Skylab::Zerk
 
     # `_const_path_array_guess_` is #testpoint for [tmx] too :(
 
-    class LoadableReference_via_AlreadyLoaded < MonadicMagneticAndModel_
+    class LoadableReference_via_AlreadyLoaded < Common_::MonadicMagneticAndModel
 
       include LoadableReferenceMethods__
 
@@ -110,7 +110,7 @@ module Skylab::Zerk
       end
 
       def to_one_off_scanner_by
-        Home_::Magnetics_::OneOffScanner_via_LoadableReference.call_by do |o|
+        Home_::Magnetics::OneOffScanner_via_LoadableReference.call_by do |o|
           o.glob_entry = ONE_OFF_GLOB_ENTRY___
           o.filesystem = ::Dir
           yield o
@@ -290,5 +290,6 @@ module Skylab::Zerk
     # ==
   end
 end
+# #history-C: moved class to place
 # #history: moved from [tmx] to [ze]
 # #history: broke out from "installation" model

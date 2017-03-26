@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - small time actors - math ellipsify" do
+  describe "[ba] string - magnetics - math ellipsify" do
 
     TS_[ self ]
     use :string

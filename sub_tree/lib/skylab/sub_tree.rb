@@ -36,6 +36,10 @@ module Skylab::SubTree
     end
   end  # >>
 
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x then instance_variable_set ivar, x ; else x end
+  end
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end

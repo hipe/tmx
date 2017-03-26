@@ -5,7 +5,7 @@ away all that is no longer relevant, but we have not made the remainder
 into a pretty, coherent narrative yet..)
 
 the central thesis statement of this experiment
-is: [#104] "can a clean isomorphicism be drawn between the public methods of
+is: [#104] "can a clean isomorphism be drawn between the public methods of
 a particular class and its collection of supported "commands"?". this remains
 the space of active inquiry and we embark on our eights or so rewrite of an
 implementation of this idea.

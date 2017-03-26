@@ -82,7 +82,7 @@ module Skylab::Parse
       end
 
       def parse_
-        pool_a = @function_a
+        pool_a = @functions
         len = pool_a.length
         pool_idx_a = len.times.to_a
         res_a = ::Array.new len

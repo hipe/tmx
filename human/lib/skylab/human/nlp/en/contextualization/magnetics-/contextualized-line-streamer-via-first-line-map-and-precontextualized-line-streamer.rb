@@ -9,7 +9,7 @@ module Skylab::Human
         _flm = ps.first_line_map
         st_p = ps.precontextualized_line_streamer
 
-        o = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
+        o = Home_::Magnetics::List_via_Eventing::Simple.begin
 
         o.on_first = -> line do
 

@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - statementish" do
+  describe "[hu] NLP EN mags - statementish" do
 
     # (OK to move some of these to future lower-level (lower-numbered) tests)
 
@@ -99,11 +99,11 @@ module Skylab::Human::TestSupport
     end
 
     def _begin_statement
-      NLP_EN_Sexp_[]::Expression_Sessions::Statementish.begin_
+      NLP_EN_.lib::Magnetics::Statementish_via_Subject_and_VerbPhrase.begin_
     end
 
     def _build * sx
-      NLP_EN_Sexp_[].expression_session_via_sexp sx
+      NLP_EN_.sexp_lib.interpret_ Home_::Scanner_[ sx ]
     end
 
     def _s_of o

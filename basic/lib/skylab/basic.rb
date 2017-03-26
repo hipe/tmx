@@ -260,6 +260,10 @@ module Skylab::Basic  # introduction at [#020]
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   # --
 
   Autoloader_ = Common_::Autoloader

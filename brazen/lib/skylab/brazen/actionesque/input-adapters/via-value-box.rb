@@ -46,7 +46,7 @@ module Skylab::Brazen
 
               # the formal is a flag and the actual is known but false-ish..
               # it's tempting to add the [ nil or false ] to the argument box,
-              # but this is in violation of the iambic isomorphicism
+              # but this is in violation of the iambic isomorphism
 
             end
 

@@ -2,11 +2,11 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    Couch_Actor_ = ::Class.new Home_::Collection::Actor
+    CouchMagnetic_ = ::Class.new Home_::Collection::Actor
 
-    module Actors__
+    module Magnetics
 
-      class Retrieve_collection_entity < Couch_Actor_
+      class Retrieve_collection_entity < CouchMagnetic_
 
         Attributes_actor_.call( self,
           :entity_identifier,
@@ -70,7 +70,7 @@ module Skylab::Brazen
       end
     end
 
-    class Couch_Actor_
+    class CouchMagnetic_
     private
 
       def init_response_receiver_for_self_on_channel i

@@ -5,7 +5,7 @@ module Skylab::System
       # -
         # synopsis:
         #
-        #   • this is a :+[#ba-027]:#normal-normalizer: once built this entity
+        #   • this is a #[#fi-004.5] "normal normalizer": once built this entity
         #     is :+[#bs-018] immutable, effecting :+[#sl-023] dup-and-mutate
         #
         #   • when successful the entity holds a tokenized array of strings

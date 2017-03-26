@@ -1,15 +1,18 @@
 # the method-naming idiomspace of validation :[#045]
 
-(EDIT: this document is less fresh than [#fi-012] and has yet to be
+(EDIT: this document is less fresh than [#012] and has yet to be
 reconciled with the larger narrative that document is part of. it seems
 there is room for this document to complement that one, as their respective
 ideas are largely non-overlapping; however this document should probably be
 moved to there.)
 
+
+
+
 ## introduction in context
 
 this is a historical document kept because it informs ideas that went on
-to become [#027]; so that document should be seen as a "solution" to the
+to become [#004]; so that document should be seen as a "solution" to the
 problems introduced here. NOTE that everything after this sentence is
 historical and may no longer be accurate.
 
@@ -48,9 +51,9 @@ potentially mutate either the particular business field or the whole object
 as appropriate. it is very likely that we will stipulate that the result of
 such a call be a boolean-ish indicating whether the field or object is valid
 or not, that is, whether or not the data could be normalized (similar to
-[#ba-027]).
+[#004]).
 
-(there exists [#ba-027] one particular normalization API documented
+(there exists [#same] one particular normalization API documented
 voluminously in all of ~3000 words. when the topic document reaches draft we
 should cycle-back there and confirm that the language accords with this
 convention.)

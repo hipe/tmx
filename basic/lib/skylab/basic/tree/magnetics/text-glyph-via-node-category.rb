@@ -2,7 +2,7 @@
 
 module Skylab::Basic
 
-  module Tree::Expression_Adapters__::Text::Glyph   # [#049].
+  module Tree::Magnetics::TextGlyph_via_NodeCategory  # [#049].
 
     GlyphSets = ::Module.new
 
@@ -44,5 +44,8 @@ module Skylab::Basic
 
       end.call Glyph___
     end
+
+    # ==
+    # ==
   end
 end

@@ -1,8 +1,10 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
-    class Quad_Count  # (1x in lib)
+    class QuadCount  # 1x. [here] only
+
+      # (introduction to parent node at #spot1.6)
 
       # we find that a useful generalization of "count" is into these four
       # categories, the integer sets variously of 0, 1, 2 and

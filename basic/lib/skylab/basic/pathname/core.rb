@@ -168,13 +168,6 @@ module Skylab::Basic
 
     # ==
 
-    Autoloader_[ self ]
-    lazily :Normalization do
-      Here_::Normalization__
-    end
-
-    # ==
-
     DOT_DOT_ = '..'
     FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
     Here_ = self

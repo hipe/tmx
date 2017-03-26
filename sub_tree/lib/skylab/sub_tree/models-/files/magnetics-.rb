@@ -4,9 +4,9 @@ module Skylab::SubTree
 
     module Home_::Models_::Files
 
-      Small_Time_Sessions_ = ::Module.new
+      Magnetics_ = ::Module.new
 
-      class Small_Time_Sessions_::Perform_aggregate_find
+      class Magnetics_::Find_via_Paths_and_Pattern
 
         Attributes_actor_.call( self,
           :paths,
@@ -14,12 +14,12 @@ module Skylab::SubTree
         )
 
         def initialize & p
-          @on_event_selectively = p
+          @listener = p
         end
 
-        def produce_upstream
+        def execute
           _ok = __resolve_command
-          _ok && __via_command_produce_upstream
+          _ok && __upstream_via_command
         end
 
         def __resolve_command
@@ -28,18 +28,19 @@ module Skylab::SubTree
             _pattern_part = [ :filename, @pattern ]
           end
 
-          @cmd_o = Home_.lib_.system.find(
+          _ = Home_.lib_.system.find(
             :paths, @paths,
             * _pattern_part,
             :freeform_query_infix_words, %w'-type file',
-            :when_command, IDENTITY_, & @on_event_selectively )
+            :when_command, IDENTITY_,
+            & @listener )
 
-          @cmd_o && ACHIEVED_
+          _store :@__command, _
         end
 
-        def __via_command_produce_upstream
+        def __upstream_via_command
 
-          i, o, e, @thread = Home_::Library_::Open3.popen3( * @cmd_o.args )
+          i, o, e, @thread = Home_::Library_::Open3.popen3( * @__command.args )
           i.close
           s = e.read
           if s && s.length.nonzero?
@@ -57,7 +58,7 @@ module Skylab::SubTree
 
           s.chomp!
 
-          @on_event_selectively.call :error, :find_error do
+          @listener.call :error, :find_error do
 
             Common_::Event.inline_not_OK_with :find_error,
 
@@ -70,7 +71,12 @@ module Skylab::SubTree
 
           UNABLE_
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
+
+      # ==
+      # ==
     end
   end
 end

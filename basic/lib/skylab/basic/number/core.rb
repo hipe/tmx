@@ -102,13 +102,6 @@ module Skylab::Basic
 
     # ==
 
-    Autoloader_[ self ]
-    lazily :Normalization do
-      Here_::Normalization__
-    end
-
-    # ==
-
     Here_ = self
 
     # ==

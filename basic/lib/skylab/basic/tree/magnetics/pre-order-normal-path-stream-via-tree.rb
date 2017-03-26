@@ -2,9 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    module Magnetics_
-    end
-    Magnetics_::PreOrderNormalPathStream_via_Tree = -> root do
+    Magnetics::PreOrderNormalPathStream_via_Tree = -> root do
 
       recurse = -> tree, tree_path do
 
@@ -63,11 +61,13 @@ module Skylab::Basic
       st
     end
 
-    module Expression_Adapters__::Paths
+    # ==
+    # ==
 
-      module Actors
+    class Magnetics::PathStream_via_Tree
 
-        class Build_stream
+      # -
+        # -
 
           Attributes_actor_.call( self,
             :do_branches,
@@ -82,8 +82,6 @@ module Skylab::Basic
 
             To_path_stream___[ @node, @do_branches ]
           end
-        end
-      end
 
       To_path_stream___ = -> root_node, do_branches do
 
@@ -209,5 +207,8 @@ module Skylab::Basic
         end
       end
     end
+
+    # ==
+    # ==
   end
 end

@@ -1,10 +1,8 @@
 module Skylab::Human
 
-  module Sexp
+  class Magnetics::List_via_Eventing  # :[#047].
 
-    class Expression_Sessions::List_through_Eventing  # :[#047].
-
-      # ==
+    # -
 
       class Simple
 
@@ -57,15 +55,15 @@ module Skylab::Human
       )
 
       class << self
-        def expression_via_sexp_stream_ st
-          new.___init_and_produce_via_etc st
+        def interpret_ scn
+          new.__interpret scn
         end
         private :new
       end  # >>
 
-      def ___init_and_produce_via_etc st  # (used to be #[#ca-063])
+      def __interpret scn  # (used to be #[#ca-063])
         init_ivars
-        process_argument_scanner_fully st
+        process_argument_scanner_fully scn
         sanity_checks
         defaults
         self
@@ -241,6 +239,6 @@ module Skylab::Human
           x = @buffer_x ; @buffer_x = nil ; x
         end
       end
-    end
+    # -
   end
 end

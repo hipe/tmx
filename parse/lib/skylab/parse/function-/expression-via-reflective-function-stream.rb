@@ -1,31 +1,26 @@
 module Skylab::Parse
 
-  # ->
+  class Function_::Expression_via_ReflectiveFunctionStream < Common_::MagneticBySimpleModel
 
-    module Function_::Nonterminal
+    # expresses the array of functions as a string somehow.
 
-      class Sessions::Express
+    #   - 1x. [here] only.
 
-        class << self
+    # -
+      # -
 
-          def session
-            o = new
-            yield o
-            o.__execute
-          end
-        end  # >>
+        Attributes_actor_[ self ]
 
         def initialize
           @cdpsbs = true
           @x_h = {}
+          yield self
         end
 
         def accept_iambic x_a
           process_argument_scanner_fully scanner_via_array x_a
           nil
         end
-
-        Attributes_actor_[ self ]
 
       private
 
@@ -109,7 +104,7 @@ module Skylab::Parse
 
         # ~ implementation
 
-        def __execute
+        def execute
           expression_agent
           __via_expag
         end
@@ -182,7 +177,7 @@ module Skylab::Parse
 
           @expag.constituent_string_via_constituent_badge[ y ]
         end
-      end
-    end
-    # <-
+      # -
+    # -
+  end
 end

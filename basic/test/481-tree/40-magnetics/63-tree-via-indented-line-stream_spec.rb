@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - via indented line stream" do
+  describe "[ba] tree - magnetics - via indented line stream" do
 
     TS_[ self ]
     use :expect_event

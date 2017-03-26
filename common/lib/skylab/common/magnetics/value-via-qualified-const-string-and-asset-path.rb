@@ -1,18 +1,17 @@
 module Skylab::Common
 
-  class Sessions_::Resolve_Module  # :[#068]. (improvement in [cm] maybe)
+  class Magnetics::Value_via_QualifiedConstString_and_AssetPath < Home_::MagneticBySimpleModel
+
+    #   - 1x. [here] only. :[#068].
+    #   - [cm] may have better version (was written once, before #history-A)
 
     attr_writer(
+      :listener,
       :path,
       :qualified_const_string,
     )
 
-    def initialize & p
-      @on_event_selectively = p
-    end
-
     def execute
-
       _ok = __require_path
       _ok && __produce_module
     end
@@ -42,5 +41,9 @@ module Skylab::Common
 
       end
     end
+
+    # ==
+    # ==
   end
 end
+# #history-A: magnetic not session

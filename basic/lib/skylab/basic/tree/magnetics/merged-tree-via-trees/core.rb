@@ -2,20 +2,20 @@ module Skylab::Basic
 
   module Tree
 
-    class Sessions_::Merge  # towards [#040]
+    class Magnetics::MergedTree_via_Trees  # towards [#040]
 
       class << self
 
         def merge_atomic x, x_
-          Merge_::Actors__::Merge[ x, x_, :merge_atomic ]
+          Merge_::Magnetics__::Merge[ x, x_, :merge_atomic ]
         end
 
         def merge_one_dimensional x, x_
-          Merge_::Actors__::Merge[ x, x_, :merge_one_dimensional ]
+          Merge_::Magnetics__::Merge[ x, x_, :merge_one_dimensional ]
         end
 
         def merge_union x, x_
-          Merge_::Actors__::Merge[ x, x_, :merge_union ]
+          Merge_::Magnetics__::Merge[ x, x_, :merge_union ]
         end
 
         def via_ivars destructee, mutatee, * ivars

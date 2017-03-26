@@ -33,7 +33,7 @@ module Skylab::Parse
 
         in_st = @input_stream
 
-        @function_a.each_with_index.reduce nil do | _, ( f, d ) |
+        @functions.each_with_index.reduce nil do | _, ( f, d ) |
 
           on = f.output_node_via_input_stream in_st
 

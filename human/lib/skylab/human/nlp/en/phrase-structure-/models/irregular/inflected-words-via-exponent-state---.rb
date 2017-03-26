@@ -4,9 +4,7 @@ module Skylab::Human
 
     module Models::Irregular
 
-      Actors_ = ::Module.new
-
-      class Actors_::Inflect  # [#039]
+      class InflectedWords_via_ExponentState___  # :[#039] (exact algorithm) ..
 
         Attributes_actor_.call( self,
           :y,
@@ -59,6 +57,9 @@ module Skylab::Human
             yes
           end
         end
+
+        # ==
+        # ==
       end
     end
   end

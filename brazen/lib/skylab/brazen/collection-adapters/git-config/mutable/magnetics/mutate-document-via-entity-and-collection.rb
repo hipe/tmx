@@ -4,9 +4,7 @@ module Skylab::Brazen
 
     module Mutable
 
-    module Actors
-
-      class Mutate < Git_Config_Actor_
+      class Magnetics::MutateDocument_via_Entity_and_Collection < GitConfigMagnetic_  # 1x
 
         Attributes_actor_.call( self,
           :entity,
@@ -206,8 +204,10 @@ module Skylab::Brazen
 
           @entity.receive_possible_event_via_channel i_a, & ev_p
         end
+
+        # ==
+        # ==
       end
-    end
     end
   end
 end

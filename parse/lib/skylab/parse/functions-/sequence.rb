@@ -10,7 +10,7 @@ module Skylab::Parse
 
         __prepare
 
-        f_scn = Scanner_[ @function_a ]
+        f_scn = Scanner_[ @functions ]
 
         if f_scn.unparsed_exists
           f = f_scn.head_as_is
@@ -54,7 +54,7 @@ module Skylab::Parse
 
       def __prepare
         @initial_input_stream_index = @input_stream.current_index
-        @result_x_a = ::Array.new @function_a.length
+        @result_x_a = ::Array.new @functions.length
         @try_next_queue = nil
         nil
       end

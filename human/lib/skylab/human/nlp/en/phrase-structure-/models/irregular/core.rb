@@ -133,7 +133,7 @@ module Skylab::Human
 
           _and_a = __to_grammatical_category_state_around_ sp
 
-          inflect_words_into_against_exponent_state y, _and_a
+          inflect_words_into_against_exponent_state_ y, _and_a
         end
 
         def __to_grammatical_category_state_around_ phrase
@@ -149,11 +149,11 @@ module Skylab::Human
           end
         end
 
-        def inflect_words_into_against_exponent_state y, and_a
+        def inflect_words_into_against_exponent_state_ y, and_a
 
           _st = Common_::Stream.via_nonsparse_array @form_array
 
-          Irregular_::Actors_::Inflect[ y, and_a, _st ]
+          Irregular_::InflectedWords_via_ExponentState___[ y, and_a, _st ]
         end
 
         def as_lemma_symbol_if_possible_

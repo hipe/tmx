@@ -79,7 +79,7 @@ neutral?) and those about the "channel" (the channel being represented
 as an array of symbols).
 
 structural checks are those about the particular members (both formal
-and actual [#fi-025]) of the particular event.
+and actual [#fi-002.2]) of the particular event.
 
 in practice, whenever any of the checks (where assertions exist for that
 category) fail from the former category, any checks from assertions from

@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] tree - sessions - merge" do
+  describe "[ba] tree - magnetics - merged tree via trees - core" do
 
     TS_[ self ]
     use :tree

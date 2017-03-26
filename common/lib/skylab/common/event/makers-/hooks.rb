@@ -6,7 +6,7 @@ module Skylab::Common
 
       # [#005.D]. (this splintered from [#005.B] (more history there))
 
-      _p = Event_::Actors_::Build_struct_like_constructor_method.call(
+      _p = Home_.lib_.basic::Struct::Definition_for_the_Method_Called_New.via(
 
         :edit_class, -> edit_p=nil do
 

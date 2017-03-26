@@ -2,11 +2,13 @@ module Skylab::Brazen
 
   class Collection_Adapters::Git_Config
 
-    Git_Config_Actor_ = ::Class.new Home_::Collection::Actor  # in [#028]
+    GitConfigMagnetic_ = ::Class.new Home_::Collection::Actor  # in [#028]
 
-    Actors__ = ::Module.new
+    Magnetics = ::Module.new
 
-    class Actors__::Retrieve < Git_Config_Actor_
+    # ==
+
+    class Magnetics::RetrieveEntity_via_EntityIdentifier_and_Document < GitConfigMagnetic_  # 1x
 
       Attributes_actor_.call( self,
         :entity_identifier,
@@ -21,7 +23,9 @@ module Skylab::Brazen
       end
     end
 
-    class Actors__::Build_stream < Git_Config_Actor_
+    # ==
+
+    class Magnetics::EntityStream_via_Collection < GitConfigMagnetic_
 
       Attributes_actor_.call( self,
         :model_class,
@@ -108,7 +112,9 @@ module Skylab::Brazen
       end
     end
 
-    class Git_Config_Actor_
+    # ==
+
+    class GitConfigMagnetic_
     private
 
       def via_entity_identifier_resolve_subsection_id
@@ -255,6 +261,8 @@ module Skylab::Brazen
       end
     end
 
+    # ==
+
     class Subsection_Identifier_
 
       def initialize s, ss
@@ -282,6 +290,11 @@ module Skylab::Brazen
       end
     end
 
+    # ==
+    # ==
+
     LINE_SEP_ = "\n".freeze
+
+    # ==
   end
 end
