@@ -1,14 +1,14 @@
-module Skylab::Common
+module Skylab::Basic
 
-  class Event
+  module Struct
 
-    module Actors_::Build_struct_like_constructor_method
+    # (nothing.)
 
-      # :[#005.B] NOTE client must do its own alias of `orig_new` !
+    module Definition_for_the_Method_Called_New  # :[#063]
+
+      # 2x [co] 0x [here]. covered only by [#co-005.4].
       #
-      # currently this gets its coverage by [#005.D].
-
-      _Params = ::Struct.new :edit_class, :on_args_to_method_called_new
+      # NOTE client must do its own alias of `orig_new`!
 
       _HM = -> sym do
         members.include? sym
@@ -27,10 +27,10 @@ module Skylab::Common
         self::MEMBER_I_A__
       end
 
-      define_singleton_method :_call do | * x_a |
+      define_singleton_method :via do |* x_a|
 
-        o = _Params.new
-        x_a.each_slice 2 do | k, x |
+        o = Parameters___.new
+        x_a.each_slice 2 do |k, x|
           o[ k ] = x
         end
         edit_class_p, args_notify_p = o.to_a
@@ -71,11 +71,11 @@ module Skylab::Common
         end
       end
 
-      class << self
-
-        alias_method :[], :_call
-        alias_method :call, :_call
-      end
+      Parameters___ = ::Struct.new :edit_class, :on_args_to_method_called_new
     end
+
+    # ==
+    # ==
   end
 end
+# #history-A: moved here from [co]

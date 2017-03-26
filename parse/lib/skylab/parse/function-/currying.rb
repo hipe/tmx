@@ -226,6 +226,23 @@ module Skylab::Parse
         Home_::Input_Streams_::Array.new a
       end
 
+    # -
+
+    # ==
+
+    class SiblingSandbox___
+
+      def initialize a
+        @_function_a = a
+      end
+
+      def to_reflective_function_stream
+        Common_::Stream.via_nonsparse_array @_function_a
+      end
     end
-    # <-
+
+    # ==
+    # ==
+  end
 end
+# #history-A: "sibling sandbox" moved to here from own file

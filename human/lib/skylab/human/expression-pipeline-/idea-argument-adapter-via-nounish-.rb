@@ -1,63 +1,57 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
-    class Idea_Argument_Adapter_for_Nounish_ < Idea_Argument_Adapter_
-      # -
-        attr_reader :role_symbol
+    class IdeaArgumentAdapter_via_Nounish_ < Common_::SimpleModel
 
-        module Object
+      # ==
 
-          class << self
-
-            def via__argument_scanner__ st
-              Self_._new do
-                @role_symbol = :object
-                _receive_etc st
-              end
-            end
-          end # >>
-        end
-
-        module Subject
-
-          class << self
-
-            def via__argument_scanner__ st
-              Self_._new do
-                @role_symbol = :subject
-                _receive_etc st
-              end
-            end
-          end  # >>
-        end
-
-        class << self
-          def via_array a
-            Self_._new do
-              @role_symbol = :_neither_
-              _init_via_array a
-            end
+      module Subject ; class << self
+        def via__argument_scanner__ scn
+          Self_.define do |o|
+            o.role_symbol = :subject
+            o._interpret scn
           end
-          alias_method :_new, :new
-          private :new
-        end  # >
-
-        def slot_symbol
-          :"#{ @role_symbol }_#{ @received_shape }"
         end
+      end ; end
 
-        attr_reader :is_adjectivial
+      # ==
 
-        def _receive_etc st
+      module Object ; class << self
+        def via__argument_scanner__ scn
+          Self_.define do |o|
+            o.role_symbol = :object
+            o._interpret scn
+          end
+        end
+      end ; end
 
-          x = st.gets_one
+      # ==
+
+      class << self
+        def via_array
+          Self_.define do |o|
+            o.role_symbol = :_neither_
+            o._init_via_array a
+          end
+        end
+      end  # >>
+
+      # -
+
+        attr_writer(
+          :role_symbol,
+        )
+
+        def _interpret scn
+
+          x = scn.gets_one
 
           if x.respond_to? :id2name
             :adjectivial == x or raise ::ArgumentError
             @is_adjectivial = true
 
-            x = st.gets_one
+            x = scn.gets_one
           end
 
           if x.respond_to? :each_with_index
@@ -99,6 +93,19 @@ module Skylab::Human
           NIL_
         end
 
+        # -- read
+
+        def slot_symbol
+          :"#{ @role_symbol }_#{ @received_shape }"
+        end
+
+        attr_reader(
+          :is_adjectivial,
+          :role_symbol,
+        )
+
+      # ==
+
         module Array_Methods___
 
           def quad_count_category
@@ -112,6 +119,8 @@ module Skylab::Human
           attr_reader :to_array
         end
 
+      # ==
+
         module Integer_Methods___
 
           def quad_count_category
@@ -120,6 +129,8 @@ module Skylab::Human
 
           attr_reader :to_integer
         end
+
+      # ==
 
         Quad_category_via_integer_ = -> d do
 

@@ -4,6 +4,8 @@ module Skylab::Human
 
     class SimpleInflectionSession  # [#032]
 
+      # this is a old/new hybrid node. #todo the counterpart document is only for the older
+
       class << self
 
         def edit_module mod, * x_a

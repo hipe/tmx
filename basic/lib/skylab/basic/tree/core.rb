@@ -4,44 +4,22 @@ module Skylab::Basic
 
     class << self
 
-      def frugal_node
-        Tree_::Mutable::Frugal
-      end
-
-      def immutable_node
-        Immutable_Node_
-      end
-
-      def lazy_via_enumeresque * internal_properties, & children_yielder_p
-        Lazy_via_Enumeresque__.new internal_properties, children_yielder_p
-      end
-
-      def merge_destructively
-        Tree_::Sessions_::Merge
-      end
-
-      def mutable_node
-        Tree_::Mutable
-      end
-
-      def unicode
-        Tree_::Expression_Adapters__::Text::Glyph
-      end
-
       def via sym, x, * x_a, & x_p
 
-        _const = Common_::Name.via_variegated_symbol( sym ).as_const
+        _ = :"Tree_via_#{ Common_::Name.via_variegated_symbol( sym ).as_camelcase_const_string }"
 
-        p_x = Tree_::Input_Adapters__.const_get _const, false
+        mag = Here_::Magnetics.const_get _, false
 
         if x_a.length.nonzero? || block_given?
           x_a.push :upstream_x, x
-          p_x.call_via_iambic x_a, & x_p
+          mag.call_via_iambic x_a, & x_p
         else
-          p_x[ x ]
+          mag[ x ]
         end
       end
     end  # >>
+
+    # ==
 
     class Binary
 
@@ -105,71 +83,8 @@ module Skylab::Basic
       Leaf__ = IDENTITY_  # etc
     end
 
-  class Lazy_via_Enumeresque__
-
-    -> do  # `initialize`
-      h = {
-        0 => -> do
-          @has_local_data = false
-        end,
-        1 => -> x do
-          @has_local_data = true
-          @local_x = x
-        end
-      }
-      define_method :initialize do |a, f|
-        instance_exec( *a, & h.fetch( a.length ) )
-        @f = f
-      end
-    end.call
-
-    # `flatten` - you get no branch local data, only the data from
-    # each leaf node recursive.
-
-    def flatten
-      ::Enumerator.new( & method( :flatten_ ) )
-    end
-
-    def flatten_ y
-      children.each do |tree|
-        if tree.is_leaf
-          y << tree.leaf_data
-        else
-          tree.flatten_ y
-        end
-        # it is important that you propagate the result of child's `each` here.
-      end
-    end
-    protected :flatten_  # #protected-not-private
-
-    # `children` - each yielded item is always a node it is never
-    # the local data or leaf data.
-
-    def children
-      ::Enumerator.new do |y|
-        yld = ::Enumerator::Yielder.new do |x|
-          if x.respond_to? :is_leaf
-            y << x
-          else
-            Pooled_Leaf__.instance_session do |tl|
-              tl.init_from_pool x
-              y << tl
-            end
-          end
-          nil
-        end
-        @f[ yld ]
-      end
-    end
-
-    def is_leaf
-      false
-    end
-
-    def data
-      @local_x
-    end
-  end
+    # ==
+    # ==
 
   class Immutable_Leaf  # :+#experimental
 
@@ -188,28 +103,7 @@ module Skylab::Basic
     attr_reader :slug
   end
 
-  class Pooled_Leaf__
-
-    Common_::Memoization::Pool[ self ].
-      instances_can_only_be_accessed_through_instance_sessions
-
-    def init_from_pool x
-      @leaf_data = x
-      nil
-    end
-
-    def clear_for_pool
-      @leaf_data = nil
-    end
-
-    def is_leaf
-      true
-    end
-
-    def leaf_data
-      @leaf_data  # etc
-    end
-  end
+    # ==
 
     class Algortihm_Node__
 
@@ -254,7 +148,9 @@ module Skylab::Basic
       end
     end
 
-    class Immutable_Node_ < Algortihm_Node__
+    # ==
+
+    class ImmutableNode < Algortihm_Node__
 
       def initialize & p
         instance_exec( & p )
@@ -296,6 +192,8 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
     class Mutable_Node_ < Algortihm_Node__
 
       def initialize & p
@@ -317,8 +215,23 @@ module Skylab::Basic
       end
     end
 
-    Autoloader_[ Expression_Adapters__ = ::Module.new ]
+    # ==
 
-    Tree_ = self
+    module Magnetics
+
+      # (experimental stowaways here and then there)
+
+      Autoloader_[ self ]
+
+      lazily :PathStream_via_Tree do
+        self::PreOrderNormalPathStream_via_Tree
+      end
+    end
+
+    # ==
+    # ==
+
+    Here_ = self
   end
 end
+# #history-A: moved feature island "lazy via enumeresque" to own file

@@ -33,11 +33,12 @@ module Skylab::Common
 
         h = @argument_box.h_
 
-        o = Home_::Sessions_::Resolve_Module.new( & handle_event_selectively )
-        o.path = h.fetch :file
-        o.qualified_const_string = h.fetch :const
+        mod = Home_::Magnetics::Value_via_QualifiedConstString_and_AssetPath.call_by do |o|
+          o.path = h.fetch :file
+          o.qualified_const_string = h.fetch :const
+          o.listener = handle_event_selectively
+        end
 
-        mod = o.execute
         if mod
           @module_ = mod
           ACHIEVED_

@@ -106,7 +106,11 @@
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       option parser hack for '-1', '-2' etc ..
              ( #was: #parent-node: [#011] the codifying expression agents)
-[#073] #hole
+
+[#073] #open unused file - could try to cover it, but the "right" way to do
+             that would be to check out every commit that effected it until
+             you find one that uses it and see what changed that way..
+
              ( #was: lipstick. #moved-to: [#ba-057] )
              ( #was: #done awareness of system environment does not belong in the model - )
              front clients should do this mapping somehow..

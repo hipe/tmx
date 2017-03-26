@@ -1,3 +1,32 @@
+## introduction to a headless dream :[#065]
+
+## synopsis
+
+
+## introduction to this document in context
+
+this document is probably somewhere in the 98th percentile of old documents
+by age in our entire universe. we have "hijacked" is from its original
+incarnation as a collection of spurious notes and "lessons learned",
+and charged it with the formidable duty of carrying this most important
+mission statement.
+
+the degree to which the very old remains is a function of how much we
+feel like editing it at this moment.
+
+
+
+
+## (sketch)
+
+  - the idea of a headless server is one without a keyboard or screen
+  - the "client" "mounts" the "server"
+  - we can apply this idea to application design with varying results
+
+
+
+
+
 ## (EDIT: this document is historical and largely no longer relevant)
 
 
@@ -47,4 +76,4 @@ all of this is experimental and exploratory.
 
 ## document-meta
 
-  - #pending-rename: move this to [ze] as a startingpoint for objective/the dream of modality unification
+  - #history-A: re-housed document from [tm] from [ze]

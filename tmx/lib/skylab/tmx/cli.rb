@@ -176,8 +176,21 @@ module Skylab::TMX
 
         _inst = _installation
 
-        ob = Zerk_lib_[]::Magnetics::OperatorBranch_via_Directory.call_by do |o|
-          o.sidesystem_module = Home_
+        ob = Home_.lib_.system_lib::Filesystem::OperatorBranch_via_Directory.define do |o|
+
+          o.item_scanner_by = -> _ do
+
+            _loadable_reference = Zerk_::Models::Sidesystem::
+              LoadableReference_via_AlreadyLoaded[ o.startingpoint_module ]
+
+            Zerk_::Magnetics::OneOffScanner_via_LoadableReference.call_by do |x|
+              x.loadable_reference = _loadable_reference
+              x.filesystem = o.filesystem_for_globbing
+              x.glob_entry = o.glob_entry
+            end
+          end
+
+          o.startingpoint_module = Home_
           o.glob_entry = "#{ _inst.participating_exe_prefix }*"
           o.filesystem_for_globbing = __filesystem_for_globbing
         end

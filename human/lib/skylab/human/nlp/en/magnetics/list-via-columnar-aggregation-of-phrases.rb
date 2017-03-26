@@ -1,16 +1,21 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::List_through_ColumnarAggregation_of_Statementishes  # docs in [#052]
+    class Magnetics::List_via_ColumnarAggregation_of_Phrases
+
+      # implement [#052]. #cov1.4. use by [cm].
+      # (referenced only by token `columnar_aggregation_of_phrases`)
+
+      # (NOTE there is a same-named const above)
 
       # we are not sure how useful this will be outside of [cme] - here
       # it almost stands more as a proof of concept for its dependencies
 
       class << self
 
-        def expression_via_sexp_stream_ st
-          st.assert_empty
+        def interpret_ scn
+          scn.assert_empty
           new
         end
         private :new
@@ -40,9 +45,9 @@ module Skylab::Human
 
         word_y = []
 
-        pair_y = Home_::Sexp.express(
+        pair_y = Home_::Sexp.expression_session_for(
 
-          :list, :through, :eventing,
+          :list, :via, :eventing,
 
           :y, word_y,
 
@@ -71,9 +76,9 @@ module Skylab::Human
 
       def _express_predicate word_y, pair
 
-        sym_y = Home_::Sexp.express(
+        sym_y = Home_::Sexp.expression_session_for(
 
-          :list, :through, :eventing,
+          :list, :via, :eventing,
 
           :y, word_y,
 

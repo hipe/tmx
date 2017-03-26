@@ -1,4 +1,12 @@
-# the aggregating articulator :[#055]
+# expression of phrase streams via columnar aggregation of phrases :[#055]
+
+(EDIT: this needs reconciliation with [#052], as mentioned there.)
+
+## foreward
+
+(there is a sister algorithm at [#002]. we don't know which one is
+"better" off hand.)
+
 
 ## introduction
 
@@ -72,7 +80,7 @@ definitely the more difficult of the two to implement.
 
 
 
-## :#note-310
+## :[#here.4(ph)]
 
 in any given repetition among some particular subset of the fields,
 aggregators are not used on the repeating fields. they are used

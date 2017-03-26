@@ -1,3 +1,8 @@
+[#064] #open file never used
+
+[#063] #open decide "definitively" (somehow) if we can replace our concept
+             of "iambics" with "s-expressions". (a bit more inline)
+
 [#062] #open 'XXX' holes in c15n
 
 [#061] #open it would be fun to prove this
@@ -15,7 +20,8 @@
 
 [#056]       predicateish theory ..
 
-[#055]       #wish #past-participle (internal to this lib)
+[#055]       expression of phrase streams via columnar aggregation of phrases ..
+             ( #AND: #wish #past-participle (internal to this lib) )
 
 [#054]       :#antecedent-distance  (theory in our minds yet to be written)
 

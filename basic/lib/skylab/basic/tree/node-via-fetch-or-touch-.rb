@@ -15,16 +15,20 @@ module Skylab::Basic
       end
 
       def process_iambic_fully x_a
-        st = Common_::Scanner.via_array x_a
-        while st.unparsed_exists
-          ivar = :"@#{ st.head_as_is }"
-          if instance_variable_defined? ivar
-            st.advance_one
-            instance_variable_set ivar, st.gets_one
-            next
+
+        # (this implementation is part of a [#fi-012.2.1] case study)
+
+        scn = Scanner_[ x_a ]
+
+        until scn.no_unparsed_exists
+          ivar = :"@#{ scn.head_as_is }"
+          if ! instance_variable_defined? ivar
+            raise ::ArgumentError
           end
-          raise ::ArgumentError
+          scn.advance_one
+          instance_variable_set ivar, scn.gets_one
         end
+
         KEEP_PARSING_
       end
 

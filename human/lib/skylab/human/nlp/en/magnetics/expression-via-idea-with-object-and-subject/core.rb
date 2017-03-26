@@ -1,8 +1,12 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::When_Object_and_Subject < Home_::Sexp::Magnetic_Expression_Session
+    class Magnetics::Expression_via_Idea_with_Object_and_Subject <
+        Home_::ExpressionPipeline_::Expression
+
+      # referenced by magic only (near `_via_Idea_with_`).
+
       # ->
         REQUIRED_TERMS = [ :subject, :object ]
 
@@ -12,7 +16,7 @@ module Skylab::Human
 
         def initialize idea
 
-          si = Siblings_::Nounish.begin
+          si = Magnetics::NounPhraseish_via_Components.begin
 
           si.receive_count_and_list_and_atom( *
             idea.to_subject_count_and_list_and_atom )
@@ -44,7 +48,7 @@ module Skylab::Human
 
         def __will_express_something si, idea
 
-          oi = Siblings_::Nounish.begin
+          oi = Magnetics::NounPhraseish_via_Components.begin
 
           oi.receive_count_and_list_and_atom( *
             idea.to_object_count_and_list_and_atom )

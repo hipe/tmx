@@ -170,30 +170,27 @@ module Skylab::SubTree
 
         def __normalize__path__upstream
 
-          sess = Files_::Small_Time_Sessions_::Perform_aggregate_find.with(
-
-              :paths, @upstream_arg.value_x,
-              :pattern, @pattern ) do | * i_a, & ev_p |
+          _listener = -> * i_a, & ev_p do
 
             if :find_command_args == i_a.last
               if @argument_box[ :show_find_command ]
-
-                maybe_send_event( * i_a, & ev_p )
-
-                NIL_
+                yes = true
               end
             else
-
+              yes = true
+            end
+            if yes
               maybe_send_event( * i_a, & ev_p )
+              NIL
             end
           end
 
-          io = sess.produce_upstream
+          _ = Files_::Magnetics_::Find_via_Paths_and_Pattern.via(
+            :paths, @upstream_arg.value_x,
+            :pattern, @pattern,
+            & _listener )
 
-          io and begin
-            @upstream_IO = io
-            ACHIEVED_
-          end
+          _store :@upstream_IO, _
         end
 
         def __emit_find_command & x_p
@@ -291,6 +288,8 @@ module Skylab::SubTree
           _ok = exts.receive_the_collection_of_mutable_items node_a  # we ignore any failure
           _ok && Result_Table___.new( node_a )
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
         Line_Item___ = ::Struct.new :glyphs, :slug, :any_leaf
 

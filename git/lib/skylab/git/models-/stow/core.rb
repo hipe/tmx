@@ -94,13 +94,14 @@ module Skylab::Git
 
         h = @argument_box.h_
 
-        o = Stow_::Sessions_::Save.new( & @on_event_selectively )
-        o.versioned_directory = @_versioned_directory
-        o.stow_name = h.fetch :stow_name
-        o.stows_collection = @_stows_collection
-        o.system_conduit = h.fetch :system_conduit
-        o.filesystem = h.fetch :filesystem
-        o.execute
+        Stow_::Magnetics_::WriteStow_via_StowName_and_StowsCollection_and_VersionedDirectory.call_by do |o|
+          o.versioned_directory = @_versioned_directory
+          o.stow_name = h.fetch :stow_name
+          o.stows_collection = @_stows_collection
+          o.system_conduit = h.fetch :system_conduit
+          o.filesystem = h.fetch :filesystem
+          o.listener = @on_event_selectively
+        end
       end
     end
 
@@ -131,11 +132,12 @@ module Skylab::Git
 
       def __money
 
-        o = Stow_::Sessions_::Pop.new( & @on_event_selectively )
-        o.expressive_stow = @_expressive_stow
-        o.filesystem = @argument_box.h_.fetch :filesystem
-        o.project_path = @_versioned_directory.project_path
-        o.execute
+        Stow_::Magnetics_::PopStow_via_Stow_and_ProjectPath.call_by do |o|
+          o.expressive_stow = @_expressive_stow
+          o.project_path = @_versioned_directory.project_path
+          o.filesystem = @argument_box.h_.fetch :filesystem
+          o.listener = @on_event_selectively
+        end
       end
     end
 
@@ -300,9 +302,6 @@ module Skylab::Git
         Stow_::Models_::Collection.new path, fs, @kernel, & oes_p
       end
     end
-
-    Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
-    Autoloader_[ ( Sessions_ = ::Module.new ), :boxxy ]
 
     Stow_ = self
 

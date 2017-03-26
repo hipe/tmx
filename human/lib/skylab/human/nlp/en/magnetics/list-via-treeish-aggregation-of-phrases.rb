@@ -1,15 +1,18 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::List_through_TreeishAggregation
+    class Magnetics::List_via_TreeishAggregation_of_Phrases
+
+      # referenced by `treeish_aggregation_of_phrases` only [here] only 1x.
+      # referended directly Nx [here] and Nx in [fi]
 
       # (see comments below re: algorithm)
 
       class << self
 
-        def expression_via_sexp_stream_ st
-          st.assert_empty
+        def interpret_ scn
+          scn.assert_empty
           new
         end
 
@@ -30,7 +33,7 @@ module Skylab::Human
 
       def add_sexp sx
 
-        _ = EN_::Sexp.expression_session_via_sexp sx
+        _ = EN_::Sexp.interpret_ Scanner_[ sx ]
         ___add_expression _
       end
 
@@ -171,7 +174,7 @@ module Skylab::Human
                 exp.send k
               end
 
-              x_ = exp_.send k  # :#spot-3
+              x_ = exp_.send k  # :#spot1.3
 
               if is_atomic[ k ]
 

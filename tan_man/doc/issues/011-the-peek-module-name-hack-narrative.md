@@ -1,5 +1,13 @@
 # the peek module name hack :[#011]
 
+## foreward
+
+something similar is going on over at [#dt-006]. it looks more
+sophisticated there maybe.
+
+
+
+
 ## introduction
 
 this is an intense hack. it is an intense hack. scan the first few lines

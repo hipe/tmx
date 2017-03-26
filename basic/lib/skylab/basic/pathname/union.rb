@@ -128,7 +128,7 @@ module Skylab::Basic
 
         agg = Home_.lib_.human::Sexp.expression_session_for(
 
-          :list, :through, :columnar_aggregation,
+          :list, :via, :columnar_aggregation,
 
           :template, "{{ longer }} covered by {{ shorter }}",
 

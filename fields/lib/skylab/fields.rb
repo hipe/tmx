@@ -180,6 +180,11 @@ module Skylab::Fields
       end
     end
 
+    def init_via_argument_scanner_plus ent, scn  # 1x [hu]
+      _ok = NormalizeLikeAttributesActor__.new( ent, scn ).execute
+      _ok && ent
+    end
+
     def init_via_argument_scanner ent, scn, & p  # #coverpoint1.3, [hu] 4x
 
       normalize_by do |o|
@@ -391,31 +396,8 @@ module Skylab::Fields
           end
         end
 
-        def as_attributes_actor_parse_and_normalize scn
-
-          instance_variable_set ARGUMENT_SCANNER_IVAR_, scn  # as we do
-
-          ok = Home_::Normalization.call_by do |o|
-
-            yield o
-
-            __push_methods_reader_first_FI o
-
-            _write_defined_associations_into_normalization_FI_ o
-
-            o.entity_as_ivar_store = self  # entity not just ivar store because:
-
-              # :#spot1-5 some association interpreters need to write directly
-              # :#spot1-4 in error cases we inspect the entity lazily for handlers
-
-            o.argument_scanner = scn
-          end
-
-          remove_instance_variable ARGUMENT_SCANNER_IVAR_  # (often the next method freezes)
-
-          ok &&= as_attributes_actor_normalize
-
-          ok
+        def as_attributes_actor_parse_and_normalize scn, & p
+          NormalizeLikeAttributesActor__.new( self, scn, & p ).execute
         end
 
         def as_attributes_actor_normalize
@@ -447,28 +429,7 @@ module Skylab::Fields
 
           NIL
         end
-
-        def __push_methods_reader_first_FI n11n
-
-          # any client entity can define an association that is discovered
-          # only lazily using the technique described at [#013]. (unlike in
-          # [ac] we do not attempt to index such associations up front.)
-          #
-          # as such we must be prepared to accomodate every client in such
-          # a manner, whether or not they employ this techique.
-          #
-          # push this soft reader first as an optimization because it's
-          # used less frequently than traditionally defined attributes.
-
-          meths = Home_::AssociationIndex_::Writer_method_reader[ self.class ]
-
-          n11n.push_association_soft_reader_by__ do |k|  # exactly [#013]
-            m = meths[ k ]
-            m and Home_::AssociationIndex_::MethodBasedAssociation.new m
-          end
-
-          NIL
-        end
+        public :_write_defined_associations_into_normalization_FI_  # for #here4
 
         def gets_one  # #public-API #hook-in
           @_argument_scanner_.gets_one
@@ -533,6 +494,7 @@ module Skylab::Fields
           # (for now we're keeping it very simple, but if for some reason
           # we wanted to use normal normalization etc, we would probably
           # make a functional scanner that qualifies each element..)
+          # (now it's also part of a [#012.2.2] case study.)
 
           bx = self.class::ATTRIBUTES.ivars_box_
 
@@ -568,7 +530,7 @@ module Skylab::Fields
         end
 
         def ___flat_attributes_index
-          AssociationIndex_::FlatAttributesIndex.new(
+          Home_::AssociationIndex_::FlatAttributesIndex.new(
             remove_instance_variable( :@__proc ),
             remove_instance_variable( :@__symbols_array ),
           )
@@ -579,6 +541,93 @@ module Skylab::Fields
 
       Autoloader_[ self ]
     end  # actor
+
+    # --
+
+    class NormalizeLikeAttributesActor__
+
+      # (new in this version, you don't have to be an actor to be like one)
+
+      def initialize ent, scn, & p
+        @_entity = ent
+        @__p = p
+        @_scanner = scn
+      end
+
+      def execute
+
+        @_entity.instance_variable_set ARGUMENT_SCANNER_IVAR_, @_scanner  # as we do
+
+        ok = __normalize
+
+        @_entity.remove_instance_variable ARGUMENT_SCANNER_IVAR_  # before next line
+
+        ok and @_entity.send :as_attributes_actor_normalize  # often freezes, so do above line first
+      end
+
+      def __normalize
+
+        _ok = Home_::Normalization.call_by do |o|
+
+          @_n11n = o
+          __yield_to_any_customization
+          __push_methods_reader_first_FI
+          __write_defined_associations
+          remove_instance_variable :@_n11n
+
+          o.entity_as_ivar_store = @_entity  # entity not just ivar store because:
+
+            # :#spot1-5 some association interpreters need to write directly
+            # :#spot1-4 in error cases we inspect the entity lazily for handlers
+
+          o.argument_scanner = @_scanner
+        end
+        _ok  # hi. #todo
+      end
+
+      def __write_defined_associations
+
+        # attributes actors that pull in the whole shebang have a method
+        # but at #history-C we allow them to be fully rogue. :#here4
+
+        if @_entity.respond_to? :_write_defined_associations_into_normalization_FI_
+          @_entity._write_defined_associations_into_normalization_FI_ @_n11n
+        else
+          @_n11n.association_index = @_entity.class::ATTRIBUTES.association_index
+        end
+        NIL
+      end
+
+      def __push_methods_reader_first_FI
+
+        # any client entity can define an association that is discovered
+        # only lazily using the technique described at [#013]. (unlike in
+        # [ac] we do not attempt to index such associations up front.)
+        #
+        # as such we must be prepared to accomodate every client in such
+        # a manner, whether or not they employ this techique.
+        #
+        # push this soft reader first as an optimization because it's
+        # used less frequently than traditionally defined attributes.
+
+        meths = Home_::AssociationIndex_::Writer_method_reader[ @_entity.class ]
+
+        @_n11n.push_association_soft_reader_by__ do |k|  # exactly [#013]
+          m = meths[ k ]
+          m and Home_::AssociationIndex_::MethodBasedAssociation.new m
+        end
+
+        NIL
+      end
+
+      def __yield_to_any_customization
+        p = remove_instance_variable :@__p
+        if p
+          p[ @_n11n ]
+        end
+        NIL
+      end
+    end
 
     # --
 
@@ -1130,5 +1179,6 @@ module Skylab::Fields
     y << "for modeling { arguments | attributes | parameters | properties }"
   end
 end
+# :#history-C - as referenced
 # :#history-B - as referenced
 # #history - backwards_curry moved

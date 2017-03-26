@@ -2,72 +2,106 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
+    #   - everything said in #spot1.5 (eponymous uncle) qualifies here
+    #   - exactly [#049] the justification of "sexp"
+
     class << self
 
       def say * sexp
         express_into "", sexp
       end
 
-      def express_into y, sexp
-        expression_session_via_sexp( sexp ).express_into y
-      end
-
-      def expression_session_for * sexp
-        expression_session_via_sexp sexp
-      end
-
-      def expression_session_via_sexp sx
-        __expression_session_via_sexp_stream _ps sx
-      end
-
-      def association_via_symbol_ sym
-        Require_fields_lib_[]
-        Field_::SimplifiedName.new sym do end
+      def express_sexp_into___ y, sx  # #testpoint only
+        _exp = interpret_ Scanner_[ sx ]
+        _exp.express_into y
       end
 
       def expression_via_these_ sx, asc
-        st = _ps sx
-        _cls = _lookup_class st
-        _cls.interpret_component_with_own_stream_ st, asc
+        scn = Scanner_[ sx ]
+        _cls = _parse_class scn
+        _cls.interpret_component_fully_ scn, asc
       end
 
-      def _ps x
-        Common_::Scanner.via_array x
+      def expression_session_for * sx
+        interpret_ Scanner_[ sx ]
       end
 
-      def __expression_session_via_sexp_stream st
+      def interpret_ scn
 
-        if :when == st.head_as_is
-          st.advance_one
-          ___magnetic_collection.expression_session_via_sexp_stream__ st
+        if :magnetic_idea == scn.head_as_is
+          scn.advance_one
+          This_index___[].interpret_ scn
         else
-          _cls = _lookup_class st
-          _cls.expression_via_sexp_stream_ st
+          _cls = _parse_class scn
+          _cls.interpret_ scn
         end
       end
 
-      def ___magnetic_collection
-        @___mc ||= Home_::Sexp::Expression_Collection.
-          via_multipurpose_module__( EN_::Sexp::Expression_Sessions )
+      def _parse_class scn
+
+        # exactly as #spot1.5, we're taking the magic away
+
+        k = scn.gets_one
+        const = CONST_VIA_SHORT_NAMES___[ k ]
+        if const
+          _magnetics_module.const_get const, false
+        elsif :list == k
+          __parse_class_when_list scn
+        else
+          ::Kernel._OKAY__do_me__  # #todo
+        end
       end
 
-      def _lookup_class st
-        _const = Home_::Sexp::Const_via_tokens_special_[ st ]
-        Expression_Sessions.const_get _const, false
+      def __parse_class_when_list scn
+
+        # (this got uglier when we transitioned to magnetic filenames,
+        # #tombstone-A, but it's worth it)
+
+        _const = if scn.no_unparsed_exists or ! scn.head_as_is.respond_to? :id2name
+          :List_via_Items
+
+        else
+          # scanner is not empty and head token is a symbol. #cov1.3
+          # currently this means it must mean it was `:list, :via, :foo_bar_baz`
+          # so we derive the const name from the term.
+          # (#could-cache but only called 2x in sidesystem test suite)
+
+          Keywords_must_be[ :via, scn ]
+          _terms = scn.gets_one.id2name.split UNDERSCORE_
+          _scn_ = Scanner_[ _terms ]
+          _ = Home_::ExpressionPipeline_::ConstString_via_TermScanner[ _scn_ ]
+          "List_via_#{ _ }".intern
+        end
+
+        _magnetics_module.const_get _const, false
+      end
+
+      def _magnetics_module
+        EN_::Magnetics
       end
     end  # >>
 
-    module AnyExpression ; class << self
+    CONST_VIA_SHORT_NAMES___ = {
+      # under #tombstone-A we used to generate const names, but no longer
+      for_expag: :Expression_via_ExpressionAgent,
+      gerund_phraseish: :GerundPhraseish_via_ObjectNounPhrase_and_VerbLemma,
+      nounish: :NounPhraseish_via_Components,
+      predicateish: :VerbPhraseish_via_Components,
+      statementish: :Statementish_via_Subject_and_VerbPhrase,
+      word_list: :Phraseish_via_AlreadyInflectedAtoms_in_Scanner,
+    }
 
-      def interpret_component st, asc
-        _sx = st.gets_one
-        st_ = Common_::Scanner.via_array _sx
-        _cls = Here_._lookup_class st_
-        _cls.interpret_component_with_own_stream_ st_, asc
+    module AnyExpression ; class << self  # 1x. [hu] only
+
+      def interpret_component scn, asc
+        _sx = scn.gets_one
+        scn_ = Scanner_[ _sx ]
+        _cls = This___._parse_class scn_
+        _cls.interpret_component_fully_ scn_, asc
       end
     end ; end
 
-    class String_as_Expression_
+    class String_as_Expression  # 1x. [hu] only
 
       class << self
         alias_method :[], :new
@@ -95,187 +129,23 @@ module Skylab::Human
       end
     end
 
-    Siblings_ =
-    module Expression_Sessions
+    # ==
 
-      class ForExpag  # #stowaway
-
-        class << self
-
-          alias_method :interpret_component_with_own_stream_, :new
-          undef_method :new
-        end  # >>
-
-        def initialize st, asc
-
-          @_m = st.gets_one
-          @_x = st.gets_one
-          st.assert_empty
-        end
-
-        def express_into_under y, expag
-          y << expag.send( @_m, @_x )
-        end
-
-        def _difference_against_counterpart_ otr
-          if otr._m == @_m
-            if otr._x == @_x
-              NOTHING_
-            else
-              :_x_
-            end
-          else
-            :_m_
-          end
-        end
-
-        attr_reader :_m, :_x
-        protected :_m, :_x
-
-        def category_symbol_
-          :_for_expag_
-        end
-      end
-
-      class WordList  # #stowaway
-
-        class << self
-
-          def interpret_component st, asc
-            new( asc ).__init_comp st
-          end
-
-          def interpret_component_with_own_stream_ st, asc
-            new( asc ).__init_own st
-          end
-
-          private :new
-        end
-
-        def initialize asc
-          @_asc = asc
-        end
-
-        def __init_comp st
-          @_s_a = st.gets_one
-          self
-        end
-
-        def __init_own st
-          @_s_a = st.gets_one
-          st.assert_empty
-          self
-        end
-
-        # --
-
-        def express_into_under y, _expag
-          st = Common_::Scanner.via_array @_s_a
-          y << st.gets_one
-          until st.no_unparsed_exists
-            y << SPACE_
-            y << st.gets_one
-          end
-          y
-        end
-
-        # -- see [#050]:"note about aggregating word-lists"
-
-        def _can_aggregate_
-          true
-        end
-
-        def _difference_against_counterpart_ otr
-          otr._s_a != @_s_a  # #equivalence
-        end
-
-        attr_reader :_s_a
-        protected :_s_a
-
-        # --
-      end
-
-      class Freeform_Phrase
-
-        class << self
-
-          def interpret_component st, _asc
-            x = st.gets_one
-            if x
-              via_ x
-            else
-              x  # life is easier to allow the client to pass nils
-            end
-          end
-
-          def via_ x
-            if x.respond_to? :ascii_only?
-              String_as_Freeform_Phrase___.new x
-            elsif x.respond_to? :id2name
-              Symbol_as_Freeform_Phrase.new x
-            else
-              self._K
-            end
-          end
-        end
-      end
-
-      class String_as_Freeform_Phrase___ < Freeform_Phrase
-
-        def initialize s
-          @_s = s
-        end
-
-        def _as_string
-          @_s
-        end
-
-        def _inner_x
-          @_s
-        end
-      end
-
-      class Symbol_as_Freeform_Phrase < Freeform_Phrase
-
-        def initialize sym
-          @_sym = sym
-        end
-
-        def _as_string
-          @_sym.id2name
-        end
-
-        def _inner_x
-          @_sym
-        end
-      end
-
-      class Freeform_Phrase  # (re-open)
-
-        def express_into_phrase_builder__ pb
-          pb.add_string _as_string
-          NIL_
-        end
-
-        def express_into_under y, _
-          y << _as_string
-        end
-
-        def _can_aggregate_
-          true
-        end
-
-        def _difference_against_counterpart_ x
-          _inner_x != x._inner_x
-        end
-      end
-
-      Autoloader_[ self ]
-      self
+    This_index___ = Lazy_.call do
+      Home_::ExpressionPipeline_::BestMatchingExpression_via_Magnetics.
+        index_via_magnetics_module__ EN_::Magnetics
     end
 
+    # ==
+
+    Keywords_must_be = Home_::Sexp::Keywords_must_be
+
+    # ==
+
     EN_ = NLP::EN
-    MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
-    Here_ = self
+    This___ = self
+
+    # ==
   end
 end
+# :#tombstone-A: magnetics not expression frames, break out: many stowaways, "expression collection"

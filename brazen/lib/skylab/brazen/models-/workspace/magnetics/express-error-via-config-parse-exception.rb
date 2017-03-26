@@ -1,8 +1,10 @@
+self._NOT_USED  # #open [#073]
+
 module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actors__::Render_parse_error
+    class Magnetics::ExpressError_via_ConfigParseException
 
       Attributes_actor_.call( self,
         :properties,
@@ -29,6 +31,9 @@ module Skylab::Brazen
 
         end ; nil
       end
+
+      # ==
+      # ==
     end
   end
 end

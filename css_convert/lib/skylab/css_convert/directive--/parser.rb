@@ -28,17 +28,17 @@ module Skylab::CSS_Convert
 
       _relpath_root = Directive__::Parser.dir_path
 
-      o = start_treetop_require_
+      require_treetop_grammar_by_ do |o|
 
-      o.add_parser_enhancer_module Home_::Parser_::Parser_Instance_Methods
+        o.add_parser_enhancer_module Home_::Parser_::Parser_Instance_Methods
 
-      # o.force_overwrite!
+        # o.force_overwrite!
 
-      o.add_treetop_grammar 'common.treetop'
-      o.add_treetop_grammar 'directive.treetop'
-      o.input_path_head_for_relative_paths = _relpath_root
-      o.output_path_head_for_relative_paths = ggd.to_path
-      o.execute
+        o.add_treetop_grammar 'common.treetop'
+        o.add_treetop_grammar 'directive.treetop'
+        o.input_path_head_for_relative_paths = _relpath_root
+        o.output_path_head_for_relative_paths = ggd.to_path
+      end
     end
 
     DIR_N11N__ =

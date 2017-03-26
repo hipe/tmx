@@ -1,27 +1,26 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_
 
-    class Idea_Argument_Adapter_for_Verbish___ < Idea_Argument_Adapter_
+    class IdeaArgumentAdapter_via_Verbish___  # #cov1.7
+
       # -
         class << self
-          def via__argument_scanner__ st
 
-            new do
-
-              x = st.gets_one
-              if x.respond_to? :ascii_only?
-                __init_via_string x
-              else
-                self._FUN
-              end
+          def via__argument_scanner__ scn
+            x = scn.gets_one
+            if x.respond_to? :ascii_only?
+              new x
+            else
+              self._COVER_ME__when_lemma_is_not_string_symbol_would_be_fine__
             end
           end
+          private :new
         end  # >>
 
         attr_reader :lemma_string
 
-        def __init_via_string s
+        def initialize s
           @lemma_string = s
         end
 

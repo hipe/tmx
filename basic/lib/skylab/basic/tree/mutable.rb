@@ -46,7 +46,7 @@ module Skylab::Basic
           [ st, node ]
         end
 
-        x = Tree_::Actors__::Fetch_or_touch.new self do
+        x = Here_::Node_via_Fetch_or_Touch_.new self do
 
           @fetch_or_touch = :fetch
           @path_x = path_s
@@ -61,36 +61,36 @@ module Skylab::Basic
         x
       end
 
-      def to_classified_stream_for i, * x_a
-        _expad( x_a, i )::Actors::Build_classified_stream.call_via_iambic x_a
-      end
-
-      def to_pre_order_normal_path_stream
-        Tree::Expression_Adapters__.const_get :Paths, false  # below is hard stowaway in here
-        Tree::Magnetics_::PreOrderNormalPathStream_via_Tree[ self ]
-      end
+      # ~ we used to do string math but it's counter-productive (#tombstone-A)
 
       def to_stream_of moda_sym, * x_a
 
-        _ = _expad( x_a, moda_sym )::Actors::Build_stream
-        _.call_via_iambic x_a
-      end
-
-      def _expad x_a, modality_symbol  # mutates arg
+        :paths == moda_sym || self._WHERE
 
         x_a.push :node, self
 
-        s = modality_symbol.id2name  # :+#actor-case
+        Here_::Magnetics::PathStream_via_Tree.call_via_iambic x_a
+      end
 
-        Tree_::Expression_Adapters__.const_get(
+      def to_pre_order_normal_path_stream
 
-          :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }", false
-        )
+        Here_::Magnetics::PreOrderNormalPathStream_via_Tree[ self ]
+      end
+
+      def to_classified_stream_for moda_sym, * x_a
+
+        :text == moda_sym || self._WHERE
+
+        x_a.push :node, self
+
+        Here_::Magnetics::ClassifiedStream_via_Tree_for_Text.call_via_iambic x_a
       end
 
       def to_classified_stream
-        Tree_::Magnetics::ClassifiedStream_via_Tree[ self ]
+        Here_::Magnetics::ClassifiedStream_via_Tree[ self ]
       end
+
+      # ~
 
       def longest_common_base_path
 
@@ -114,7 +114,7 @@ module Skylab::Basic
 
       def fetch_node path_x, & else_p  # #todo covered only by [gv]
 
-        Tree_::Actors__::Fetch_or_touch.new self do
+        Here_::Node_via_Fetch_or_Touch_.new self do
           @fetch_or_touch = :fetch
           @path_x = path_x
           @when_not_found = else_p
@@ -168,12 +168,16 @@ module Skylab::Basic
 
       def merge_destructively otr
 
-        Tree_::Sessions_::Merge.new( otr, self ).execute
+        _merge_lib.new( otr, self ).execute
       end
 
       def to_constituents  # #hook-out for above
 
-        Tree_::Sessions_::Merge::Constituents.via_ivars self, :@node_payload
+        _merge_lib::Constituents.via_ivars self, :@node_payload
+      end
+
+      def _merge_lib
+        Here_::Magnetics::MergedTree_via_Trees
       end
 
       def to_destructee_key_scanner  # ditto
@@ -186,7 +190,7 @@ module Skylab::Basic
 
       def touch_node path_x, * x_a, & node_payload_p
 
-        o = Tree_::Actors__::Fetch_or_touch.new self do
+        o = Here_::Node_via_Fetch_or_Touch_.new self do
           @path_x = path_x
           @node_payload_proc = node_payload_p
           @fetch_or_touch = :touch
@@ -254,3 +258,4 @@ module Skylab::Basic
     end
   end
 end
+# :#tombstone-A: string math

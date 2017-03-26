@@ -1,21 +1,21 @@
-(EDIT: this document is less fresh than [#fi-012] and has yet to be
-reconciled with the larger narrative that document is part of. (at writing
-[#045] holds this same classification.) however (again as with [#same] with
-respect to [#same~2]) there might be enough non-overlap of ideas for these
-documents to co-exist peacefully; however we should at least add references
-in the remote larger narrative back to this one.
+# conventions for normalization of a particular association :[#004]
 
-one more related note, probably only one of these documents should
-exploit the cheeky "the new normal" as a section heading, and it should
-probably not be this one.)
+## this document in context
+
+the ideas as they are written here are older than the ideas put forth
+in [#012] and [#002]  (the documents on "normal nomalization" and
+"common association meta-associations"). however, a lot of the language
+here is still salient. so:
+
+  - whenever there is a conceptual conflict, those documents should
+    take precedent over this one.
+
+  - at [#here.f], stop reading this document (except for anthropological purposes)
 
 
-(we cram two different doc-nodes in here for now with the intention of
-one day assimilating the older one into the newer one.)
 
-# the new normal :[#027]
 
-## synopsis
+## synopsis  :[#here.1.2]
 
 for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
@@ -23,19 +23,36 @@ signature and semantics:
 
     normalize_qualified_knownness <qualified-knownness>, & <oes_p>
 
+the result of such a method (or proc as appropriate) must be assumed to
+be either false-ish for all cases of failure, or otherwise (and true-ish)
+a [#co-004] "known known" (but *not* a qualified knownness).
+
+(elswhere in our literature we may use this subject identifier to
+signify this general method (or proc) signature (in terms of its
+argument types and result types), but not necessaritly (when a method)
+its method name.)
 
 
 
-## introduction
+
+### T.o.C
+
+
+  - [#here.1] introductions & related
+  - [#here.b] introductory definition of normalization
+  - [#here.c] normalization vs. validation
+  - [#here.d] the structure & behavior of such a method (historical)
+  - [#here.5] normal normalizers
+  - [#here.f] stop reading here
+
+
+
+
+## introduction & historical context
 
 we have finally arrived at a normalization API we are happy with. here
-we sing about it. you may be looking for the old [#045] normalization
+we sing about it. you may be looking for the old [#003] normalization
 document. that is the second half of this document.
-
-
-
-
-## historical context
 
 ideas put forth in the historical [#same] hold a snapshot of what was
 going on when we synthesized these ideas.
@@ -101,7 +118,7 @@ invalid or perhaps even when the input value is valid but gets normalized.
 
 
 
-## the normal value normalization method
+## the normal value normalization method :[#here.d]
 
 a historical aside to give us some context to the scope of this:
 
@@ -227,9 +244,7 @@ tranformation functions that you write, etc.
 
 
 
-## something about currying..
-
-should go here (EDIT)
+## the idea of a curried normalizer :[#here.6]
 
 ### a plastic distinction between normalizer class and object thru currying
 
@@ -247,6 +262,8 @@ of normalization.
 
 
 
+
+(:[#here.f]: everything after this line in this document is ANCIENT and deprecated.)
 (EDIT: the below is close to sunsetting..)
 
 
@@ -645,6 +662,6 @@ _
 
 ## document meta
 
-  - #pending-rename - should be moved next to [#fi-012] and edited appropriately
+  - #history: re-housed in [fi] from [ba] to be close to related documents
 
 :+#tombstone the documentation of the five sunsetted normalization methods

@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::List
+    class Magnetics::List_via_Items < Common_::SimpleModel  # [here] only
 
       # this is what has become of the "oxford comma" algorithm.
       #
@@ -14,7 +14,7 @@ module Skylab::Human
       #
       # internally it requires *two* items of lookahead.
       #
-      # (coverd by the "proof of concept" test at #spot-1)
+      # (coverd by the "proof of concept" test at #spot1.1)
       #
       # this underlying algorithm can be accomplished in about two lines
       # (attested by the only remaining (ancient) cousin of this is one
@@ -26,19 +26,16 @@ module Skylab::Human
       class << self
 
         def via_ * x_a
-          _st = Common_::Scanner.via_array x_a
-          expression_via_sexp_stream_ _st
+          interpret_ Scanner_[ x_a ]
         end
 
-        def expression_via_sexp_stream_ st
-          new.__init_via_sexp_stream st
+        def interpret_ scn
+          define.__init_via_sexp_scanner scn
         end
 
-        def interpret_component st, asc
-          new.__init_as_componet st, asc
+        def interpret_component scn, asc
+          define.__init_as_component scn, asc
         end
-
-        private :new
       end  # >>
 
       def initialize
@@ -46,31 +43,43 @@ module Skylab::Human
         @_fsep_sexp = nil
         @_none_sexp_proc = nil
         @_sep_sexp = nil
+        if block_given?  # tricky
+          yield self
+          freeze
+        else
+          self
+        end
       end
 
-      def __init_as_componet st, asc
+      def redefine
+        otr = dup
+        yield otr
+        otr.freeze
+      end
 
-        _init_constituency_via_mixed st.gets_one
+      def __init_as_component scn, asc
+
+        _init_constituency_via_mixed scn.gets_one
         @_association_symbol = asc.name_symbol
         self
       end
 
-      def __init_via_sexp_stream st
+      def __init_via_sexp_scanner scn
 
-        if st.unparsed_exists
-          _init_constituency_via_mixed st.gets_one
-          if st.unparsed_exists
-            ___parse_inline_specification st
+        if scn.unparsed_exists
+          _init_constituency_via_mixed scn.gets_one
+          if scn.unparsed_exists
+            ___parse_inline_specification scn
           end
         end
 
         self
       end
 
-      def ___parse_inline_specification st
+      def ___parse_inline_specification scn
         begin
-          send st.gets_one, st  # ..
-        end until st.no_unparsed_exists
+          send scn.gets_one, scn  # ..
+        end until scn.no_unparsed_exists
       end
 
       def with_list x
@@ -86,8 +95,8 @@ module Skylab::Human
         be_alternation
       end
 
-      def association_symbol st
-        @_association_symbol = st.gets_one ; nil
+      def association_symbol scn
+        @_association_symbol = scn.gets_one ; nil
       end
 
       def none _
@@ -168,9 +177,9 @@ module Skylab::Human
       end
 
       def express_into y
-        _st = _assembly_sexp_stream_via_finish
-        _st_ = Progressive_string_stream_via_assembly_sexp_stream___[ _st ]
-        Flush_string_stream_into__[ y, _st_ ]
+        _scn = _assembly_sexp_scanner_via_finish
+        _st = Progressive_string_stream_via_assembly_sexp_scanner___[ _scn ]
+        Flush_string_stream_into__[ y, _st ]
       end
 
       def express_words_into_under y, expag
@@ -197,29 +206,29 @@ module Skylab::Human
       end
 
       def flush_to_word_string_stream___
-        _st = _assembly_sexp_stream_via_finish
-        Home_::PhraseAssembly::Word_string_stream_via_sexp_stream[ _st ]
+        _scn = _assembly_sexp_scanner_via_finish
+        Home_::PhraseAssembly::Word_string_stream_via_sexp_scanner[ _scn ]
       end
 
       # --
 
-      def _assembly_sexp_stream_via_finish  # #todo functional spaghetti - cleanup after lockdown
+      def _assembly_sexp_scanner_via_finish  # #todo functional spaghetti - cleanup after lockdown
 
-        st = __item_stream_via_finish
+        scn = __item_stream_via_finish
 
         p = -> do
 
-          if st.no_unparsed_exists
+          if scn.no_unparsed_exists
             p = EMPTY_P_
             ___any_sexp_when_none
           else
 
-            first = st.gets_one
-            if st.no_unparsed_exists  # == when one
+            first = scn.gets_one
+            if scn.no_unparsed_exists  # == when one
               p = EMPTY_P_
               [ :wordish, first ]
             else
-              final = st.gets_one
+              final = scn.gets_one
 
               begin_phrase_assembly = -> do
                 Home_::PhraseAssembly.begin_phrase_builder
@@ -233,7 +242,7 @@ module Skylab::Human
                 pa.sexp_via_finish
               end
 
-              if st.no_unparsed_exists  # == when two
+              if scn.no_unparsed_exists  # == when two
                 p = final_p
                 [ :wordish, first ]
 
@@ -259,9 +268,9 @@ module Skylab::Human
                 p = -> do
 
                   item_s = memo
-                  memo = st.gets_one
+                  memo = scn.gets_one
 
-                  if st.no_unparsed_exists
+                  if scn.no_unparsed_exists
                     final = memo
                     p = final_p
 
@@ -309,8 +318,8 @@ module Skylab::Human
 
         _p = expag.method m
         _pst = send @_build_stream_method
-        _st = _pst.flush_to_stream
-        _st_ = _st.map_by( & _p )
+        _scn = _pst.flush_to_stream
+        _st_ = _scn.map_by( & _p )
         _st_.flush_to_scanner
       end
 
@@ -446,7 +455,7 @@ module Skylab::Human
         true
       end
 
-      Progressive_string_stream_via_assembly_sexp_stream___ = -> st do
+      Progressive_string_stream_via_assembly_sexp_scanner___ = -> scn do
 
         # "normally" (i.e not in "word mode") the onus is on us to add
         # spaces to the beginnings of subsequent "phrases" ..
@@ -457,7 +466,7 @@ module Skylab::Human
 
         main = -> do
           begin
-            sx = st.gets
+            sx = scn.gets
             sx or break
             if :the_empty_sexp == sx.first
               redo
@@ -475,7 +484,7 @@ module Skylab::Human
 
         p = -> do
           begin
-            sx = st.gets
+            sx = scn.gets
             sx or break
             if :the_empty_sexp == sx.first
               redo
@@ -511,6 +520,8 @@ module Skylab::Human
       THE_EMPTY_SEXP___ = [ :the_empty_sexp ]
 
       NONE___ = [ :wordish, '[none]' ]
+
+      # ==
     end
   end
 end

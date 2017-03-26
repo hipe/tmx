@@ -1,89 +1,77 @@
-module Skylab::Zerk
+module Skylab::System
 
-  class Magnetics::OperatorBranch_via_Directory < Common_::SimpleModelAsMagnetic  # :[#051.G]
+  class Filesystem::OperatorBranch_via_Directory < Common_::SimpleModel  # :[#ze-051.G]
 
-    # about the asymmetry of where this stored vs the other [#051]'s:
+    # about the asymmetry of where this stored vs the other [#ze-051]'s:
     #
-    # unlike the other #[#051] operator branches, we are putting this
-    # one here because despite its name, really it's more of an adapter
-    # for mounted one-offs (for now (but it would be nice if it could be
-    # generalized in-place to work for any directories we wanted it to)).
-    #
-    # so the placement here is an exercise of the design axiom that nodes
+    # generally the design axiom is that nodes
     # that adapt between a more general and a more specific facility should
     # be closer to the more specific facility. the bulk of the other operator
     # branch adapters are all siblings with each other because they all
-    # relate to more general ideas (hashes, modules). since this (in
-    # practice if not in name) relates to the more specific idea of a
-    # "one-off", it's housed in location more suited to that concern..
-
-    # ==
-
-    class OA  # ..
-
-      def initialize one_off, cli
-        @CLI = cli
-        @one_off = one_off
-      end
-
-      def to_bound_call_for_help
-
-        _by_this = -> o do
-          o.program_name_head_string_array = @CLI.program_name_string_array
-          o.downstream = @CLI.stderr
-        end
-
-        Common_::BoundCall[ nil, @one_off, :express_help_by, & _by_this ]
-      end
-
-      def to_bound_call_for_invocation
-
-        _proc = @one_off.require_proc_like
-
-        _pnsa = [ * @CLI.program_name_string_array,
-                  * @one_off.program_name_tail_string_array ]
-
-        _scn = @CLI.release_argument_scanner_for_mounted_operator
-
-        d, argv = _scn.close_and_release
-        argv[ 0, d ] = EMPTY_A_
-
-        _args = [ argv, @CLI.stdin, @CLI.stdout, @CLI.stderr, _pnsa ]
-
-        _maybe_one_day = -> do
-          ::Kernel._K__readme__  # mmmaaayyybeee some one-offs want resources? but don't
-        end
-
-        Common_::BoundCall[ _args, _proc, :call, & _maybe_one_day ]
-      end
-    end
-
-    # ==
+    # relate more general ideas (hashes, modules) to the more specific idea
+    # of an operator branch (an idea that [ze] officially owns).
+    #
+    # following that axiom, because a filesystem is more general than [ze],
+    # this node should be over there. however, (and whether or not as part
+    # of a broader trend) the idea of (something like) an operator branch
+    # for directories using filesystem globbing has proven to be useful for
+    # sidesystems that inhabit a lower level than [ze], so this one is here.
 
     # -
 
       def initialize
+        @_item_scanner_mutex = nil
+        @_startingpoint_mutex = nil
         yield self
+        @filesystem_for_globbing ||= Home_.services.filesystem
         @glob_entry ||= GLOB_STAR_
-        mod = @sidesystem_module
-        # ..
-          loadable_reference = Home_::Models::Sidesystem::LoadableReference_via_AlreadyLoaded[ mod ]
-        # ..
-
-        @_scn = Home_::Magnetics_::OneOffScanner_via_LoadableReference.call_by do |o|
-          o.loadable_reference = loadable_reference
-          o.filesystem = remove_instance_variable :@filesystem_for_globbing
-          o.glob_entry = remove_instance_variable :@glob_entry
-        end
-
+        @_scn = send @_item_scanner
         @CACHE = {}
         @_open = true
+      end
+
+      # ~ you can produce each item (file) using a map or a whole external thing
+
+      def loadable_reference_via_path_by= p
+        remove_instance_variable :@_item_scanner_mutex
+        @_item_scanner = :__flush_item_scanner_via_mapper
+        @__item_map = p
+      end
+
+      def __flush_item_scanner_via_mapper
+        remove_instance_variable :@_item_scanner
+        _p = remove_instance_variable :@__item_map
+        Item_scanner_via_mapper___[ _p, self ]
+      end
+
+      def item_scanner_by= p
+        remove_instance_variable :@_item_scanner_mutex
+        @_item_scanner = :__flush_item_scanner_via_proc
+        @__item_scanner_by = p
+      end
+
+      def __flush_item_scanner_via_proc
+        remove_instance_variable :@_item_scanner
+        remove_instance_variable( :@__item_scanner_by )[ self ]
+      end
+
+      # ~
+
+      def startingpoint_module= x
+        remove_instance_variable :@_startingpoint_mutex
+        @_startingpoint_path = :__startingpoint_path_derived
+        @startingpoint_module = x
+      end
+
+      def startingpoint_path= x
+        remove_instance_variable :@_startingpoint_mutex
+        @_startingpoint_path = :__startingpoint_path_as_is
+        @startingpoint_path = x
       end
 
       attr_writer(
         :glob_entry,
         :filesystem_for_globbing,
-        :sidesystem_module,
       )
 
       # -- read
@@ -167,7 +155,38 @@ module Skylab::Zerk
       def _to_item_stream_using_only_cache
         Stream_[ @CACHE.values ]
       end
+
+      def startingpoint_path
+        send @_startingpoint_path
+      end
+
+      def __startingpoint_path_derived
+        @startingpoint_module.dir_path
+      end
+
+      def __startingpoint_path_as_is
+        @startingpoint_path
+      end
+
+      attr_reader(
+        :glob_entry,
+        :filesystem_for_globbing,
+        :startingpoint_module,
+      )
     # -
+    # ==
+
+    Item_scanner_via_mapper___ = -> map, o do
+
+      _path = o.startingpoint_path
+
+      _glob = ::File.join _path, o.glob_entry
+
+      _paths = o.filesystem_for_globbing.glob _glob
+
+      require 'no-dependencies-zerk'  # ick/meh
+      NoDependenciesZerk::Scanner_via_Array.call _paths, & map
+    end
 
     # ==
 
@@ -176,4 +195,5 @@ module Skylab::Zerk
     # ==
   end
 end
+# #history-B, #tombstone-B: moved here from [ze]; a class moved out of here.
 # #history: broke out of (now) "one-off" model

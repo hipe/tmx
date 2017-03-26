@@ -11,19 +11,45 @@ we critique this model.
 
 
 
+## T.o.C
+
+  - [#here.a] intro & similar
+  - [#here.2] background: analyzing simple, non-general approaches as case studies
+  - [#here.d] cursory intro the algorithm (compare [#here.F])
+  - [#here.3] cost-benefit analysis of RISC
+  - [#here.F] full algorithm in pseudocode
+  - [#here.e] is it flexible?
+  - [#here.appendix-A] definitions of terms
+  - [#here.h] the old but still open "N-meta proposition"
+  - [#here.i] is the oldest pseduocode, being kept for posterity for now
+
+
+
+
 ## brief history
 
 what is reflected here represents work spanning many years and around
-seven or so separate facilities that were unified into one. notes from
-this can be found in [#037].
+seven or so separate facilities that were unified into one. [#037] our
+notes from this massive refactoring effort are being kept both for
+posterity and to provid a detailed (if noisy) background to the ideas
+we present in the subject document.
 
 
 
-## document-meta
 
-  - [#here.3] is the freshest, in battle with [#here.F]
-  - #here-2 is the old but still open "N-meta proposition"
-  - #here-1 is the oldest pseduocode, being kept for posterity for now
+## this document in context
+
+[#003] and [#004] are spiritually much older than this document, and
+generally this one supercedes those. however A) they may still provide
+interesting background and B) there is still significant non-overlap,
+for which we should cross reference as appropriate.
+
+although this document is higer-level than [#002] generally, we feel
+that it may be useful to "come in" to the problem-space from the higher
+level of this document (normal normalization) so that we can have an
+understanding of why we want modeling of associations at all.
+
+
 
 
 
@@ -35,11 +61,76 @@ this can be found in [#037].
 
 
 
+## background: analyzing simplified, non-general approaches as case studies :[#here.2]
 
-## cursory intorduction to the algorithm :#here-3
+despite having achieved what we consider a "complete" delivery and
+integration of our "one ring" algorithm to the many places that use it
+in "our universe"; there still exist small pockets of implement-in-place
+code that achieve a subset of the same king of thing. for one reason or
+another we have left these pockets alone to exist independently of the
+subject facility.
+
+these "pockets" are left as-is because (A) they work for the purpose they
+are intended with perfect clarity and with negligible cost in terms of
+code size; and (B) they give interesting background and (to a developer)
+a non-jarring introduction to the kinds of concerns we address with the
+general algorithm, and by contrast demonstrate why the "one ring"
+normalization is the way it is.
+
+
+
+
+### case study 1: this one simple loop :[#here.2.1]
+
+the code we discuss here appears in [ba], tagged with the subject identifier.
+
+this "pocket"
+
+  - interprets an input stream. it does *not* provide "normalize in place".
+
+  - can *not* provide any [#here.F.B] "extroverted" features (like
+    checking for missing requireds), however it..
+
+  - provides what we consider the primary feature of normalizations,
+    which is set membership of arguments. (i.e it raises a (could be)
+    dedicated exception in the case of unrecognized arguments).
+
+  - cannot parse "softly" (i.e leave the argument scanner as-is when
+    encountering an unrecognized scanner head).
+
+  - has the ability to do rudimentary de-facto defaulting (by setting
+    default values in your `initialize` method, before the subject method
+    is called).
+
+
+
+### case study 2: this other simple loop :[#here.2.2]
+
+this "pocket" has all the properties of the immediately previous section,
+however it derives the significance of each argument value from its
+position rather than requiring qualifying "primaries" to signify the
+significance of each value.
+
+
+
+### conclusion of the case studies
+
+although these use cases work perfectly well for their intended purposes,
+as a more general solution their most glaring shortcoming is that they
+don't provide any modeling or delivery of any kind of "required-ness"
+(hereafter not hyphenated) check. a secondary shortcoming is is that while
+a rudimentary form of defaulting is possible through what might be called
+a hack, defaulting that requires any amount of work is not approrpriate by
+this means. (defaulting "by-hand" after parsing the arguments may, however,
+be suitable in such cases.) nontheless:
+
+
+
+
+## cursory intorduction to the algorithm :[#here.d]
 
 generally the sequence is 1) defaulting, 2) ad-hoc normalization and 3)
-required-ness (hereafter not hyphenated) check, but note it it not merely
+requiredness check, but note it it not merely
 these steps in sequence. we won't discuss here what these steps actually
 mean but you get a pretty good idea of this by the end of the document.
 but with more detail:
@@ -97,7 +188,8 @@ in concert with the other concerns.
 
 if the "ad-hoc normalization" API is worth its salt, then it would
 be usable (superficially at least) to implement "defaulting" and
-"requiredness" as well:
+"requiredness" as well. (historic [#004.1.2] gives a sense for what
+such a normalization API might look like.) so:
 
 defaulting can be modeled as an ad-hoc normalizer that is pass-thru
 for cases other than "known unknown" and "known nil", and *in* these
@@ -163,7 +255,7 @@ as false-requirements.
 
 while following along in the three sections (especially their
 pseudocode), give consideration to the importance of their order
-with respect to each other, in the manner we glanced over cursorily #here-3.
+with respect to each other, in the manner we glanced over cursorily [#here.d]
 
 following these sections, then, we will explore points of "synthesis"
 about detailed ways these "meta-associations" can and cannot be allowed
@@ -262,8 +354,10 @@ the defaulting proc to "reach" the primordial operation.))
 ## step 2 of effecting every association: ad-hoc normalization
 
 allowing arbitrary author functions to operate as "ad-hoc normalizers"
-is a mostly solved problem: the function must take as input a [#co-004]
-"qualified knownness":
+is a mostly solved problem (presented fully in historic [#004.1.2]).
+
+but to summarize [#same] and highlight its pertinent characteristics: the
+function must take as input a [#co-004] "qualified knownness":
 
   - this structure allows the function to know and use the name of the
     association it is normalizing, for use in any custom error reporting.
@@ -930,7 +1024,7 @@ so imagine this:
 
 
 
-## discussion: is it flexible?
+## discussion: is it flexible? :[#here.e]
 
 the central requirement for our "entity-killer" phase of development
 (year 7) is that arbitrary new meta-associations can be accomodated
@@ -1071,7 +1165,7 @@ rest except to say:
 
 
 
-## the N-meta proposition :#here-2
+## the N-meta proposition :[#here.h]
 
 the big experimental frontier theory at play during the creation of this
 document (as its own node) was in the formulation of this question: how
@@ -1097,7 +1191,7 @@ we are only ever normalizing entities against models.
 
 
 
-## original in-line comment, here for posterity :#here-1
+## original in-line comment, here for posterity :[#here.i]
 
 (NOTE although the "one ring" algorithm shares obvious DNA with the
 below primordial snippet, the below algorithm is at odds with our

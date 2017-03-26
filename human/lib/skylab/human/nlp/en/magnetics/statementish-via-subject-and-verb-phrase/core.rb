@@ -1,8 +1,10 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::Statementish
+    class Magnetics::Statementish_via_Subject_and_VerbPhrase  # [here] only..
+
+      # #feature-island maybe?
 
       COMPONENTS = Attributes_[
 
@@ -20,8 +22,8 @@ module Skylab::Human
 
       class << self
 
-        def expression_via_sexp_stream_ st
-          begin_.__init_via_sexp_stream st
+        def interpret_ scn
+          begin_.__init_via_sexp_scanner scn
         end
 
         alias_method :begin_, :new
@@ -34,15 +36,15 @@ module Skylab::Human
           # (everything about this is hacked for now..)
       end
 
-      def __init_via_sexp_stream scn
+      def __init_via_sexp_scanner scn
 
         COMPONENTS.init_via_argument_scanner self, scn
       end
 
       def attach_sexp__ sx, association_sym
 
-        asc = Here_.association_via_symbol_ association_sym
-        _expr = Here_.expression_via_these_ sx, asc
+        asc = Association_via_symbol_[ association_sym ]
+        _expr = EN_::Sexp.expression_via_these_ sx, asc
         attach_ _expr, asc
       end
 
@@ -52,13 +54,13 @@ module Skylab::Human
       end
 
       def __verb_phrase__component_association
-        Siblings_::Predicateish
+        Magnetics::VerbPhraseish_via_Components
       end
 
       def xyzzy_red st
         x = st.gets_one
         if x
-          @freeform_prefix = Siblings_::Freeform_Phrase.via_ x
+          @freeform_prefix = Magnetics::Phraseish_via_AlreadyInflectedAtom.via_ x
         else
           @freeform_prefix = x
         end
@@ -66,7 +68,8 @@ module Skylab::Human
       end
 
       def prefixed_prepositional_phrase_lemma= sym
-        @freeform_prefix = Siblings_::Symbol_as_Freeform_Phrase.new sym
+        @freeform_prefix = Magnetics::
+          Phraseish_via_AlreadyInflectedAtom::Phraseish_via_Symbol.new sym
         sym
       end
 
@@ -92,7 +95,7 @@ module Skylab::Human
         else
           # (hi.)
           if @verb_phrase.object_noun_phrase
-            This_::Passive_voice___[ y, expag, self ]
+            This___::Passive_voice___[ y, expag, self ]
           else
             __express_into_under_as_is_for_no_subject y, expag
           end
@@ -188,7 +191,10 @@ module Skylab::Human
         end
       end
 
-      This_ = self
+      # ==
+      # ==
+
+      This___ = self
     end
   end
 end

@@ -1,3 +1,5 @@
+[#063]       [ struct ]
+
 [#062]       [ byte stream identifer. ]
 
 [#061]       :"diminishing pool": (this entry is for tracking and describing
@@ -41,7 +43,10 @@
 [#048]       [ module & class creator ]
 [#047]       f.chain ..
 [#046]       the minimal yielder ..
-[#045]       the normalization & validation method naming idiomspace ..
+
+[#045] #hole
+             ( #moved-to: [#fi-003] #was: the normalization & validation method naming idiomspace .. )
+
 [#044]       [ state machine ]
              [#here.2]: track other state machines in the universe (~3)
              [#here.1]: ways to "pause" a parse for stream-oriented parsing
@@ -55,7 +60,10 @@
 [#038]       [ the visual testing CLI client ]
              ( #was: [ trio ] )
 [#037] #open make digraph a box
-[#036]       #parent-node: [#027] #tracking-tag the idea of a curried normalizer
+
+[#036] #hole
+             ( #moved-to: [#fi-004.6] the idea of a curried normalizer )
+
 [#035]       #doc-node the range narrative ..
 [#034]       #doc-node the module narrative .. #tracking-tag module math
 [#033]       [ word wrap ]
@@ -66,8 +74,12 @@
              [#.A]  (ancient) "memberhood" means an instance of a member
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..
-[#027]       the normalization narrative ..
+
+[#027] #hole
+             ( #moved-to: [#fi-004] )
+             ( #was: the normalization narrative .. )
              ( was: aggregated articulation refactor )
+
 [#026]       #doc-node the hash narrative ..
 [#025]       #doc-node #digraph the digraph narrative ..
 [#024]       #parent-node: [#022] "the string stream narrative.."

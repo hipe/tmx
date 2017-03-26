@@ -16,7 +16,12 @@ this is what a call to an iambic method looks like:
 
 most commonly iambic grammars use symbols as "keywords", often in pairs
 with their values following. parts of them often (but not necessarily)
-ilook like associative arrays.
+look like associative arrays.
+
+indeed they are much like the "keyword arguments" now supported by the
+platform language. but iambics are more powerful and more hand-written
+then keyword arguments, because iambics can support grammatical constructs
+that keyword arguments don't.
 
 if it means anything to you, one way of looking at iambics is that they
 are a family of approaches to making a mini-DSL, typically for a method.

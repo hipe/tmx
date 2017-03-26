@@ -81,12 +81,17 @@ is not a good general solution for several reasons:
   topic does not self-document what the event substrate is, if one even
   exists.
 
-the [#ba-027] generalized normalization solution has resolutions for all of
-these issues.
+the [#004] field-level generalized normalization solution has resolutions
+for all of these issues.
+
 
 
 
 ## validation in conjunction with normalization
+
+(EDIT we'll restate the caveat at the beginning of the document because
+it's especially pertinent here: most of these ideas are old and perhaps
+no longer followed, but they are nonetheless interesting.)
 
 • we draw a sharp semantic distinction between "validate" and "normalize": to
   "normalize" means that you are potentially mutating the data. to "validate"
@@ -126,7 +131,7 @@ these issues.
   of the business data (that is for "normalize"), then it necessarily follows
   that two calls to the "validate" method must effect the same behavior: that
   is, that if the field or object is invalid, that these two calls in a row
-  must e.g call_digraph_listeners the exact same events. bullets below will discuss this.
+  must e.g emit the exact same events. bullets below will discuss this.
 
 • if you want something like a "validate" method that has no behavioral
   (or otherwise) side-effects, then you must not name your method with
@@ -138,7 +143,7 @@ these issues.
 • if you want something like a "validate" method that only emits events once
   and does not repeat itself, then you need something like a state machine,
   or better yet a dedicated builder class whose only job is to build a
-  a valid object or call_digraph_listeners events as appropriate.
+  a valid object or emit events as appropriate.
 
 
 
@@ -150,7 +155,7 @@ conventionally correct ways to accomplish such a thing might include:
   • (perhaps less attractively) set the exit status to an ivar as a side-
   effect of your validate or normalize method.
   • rename your method to something like
-  "determine_any_error_exit_status_for_foo", which confers a lot of meaning,
+  `determine_any_error_exit_status_for_foo`, which confers a lot of meaning,
   if it is given that all exit statii are integers: the "any" tells us that
   it may result in false-ish. hence this method must either results in an
   integer or false-ish. because "exit status" is qualified here as being only
@@ -164,4 +169,5 @@ conventionally correct ways to accomplish such a thing might include:
 
 ## document meta
 
-  - #pending-rename should be moved next to [#fi-012] for narrative consistency
+  - #history-A: re-housed in [fi] from [ba] to be near other,
+    more authoritative n11n documents.

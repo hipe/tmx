@@ -1,5 +1,4 @@
-# actors, agent and models
-
+# magents, agents and models
 
 ## quick rundown of every detail of "actions" and "events" et. al
 
@@ -123,11 +122,14 @@ bulk of ancillary logic required by a typical action frequently lives
 elsewhere. why is *that*? [edit: figure out why]
 
 
-## actors in this context
+## magnetics in this context
 
 
 
 
 
-## models, actors, and actions with side-effects
+## models, magnetics, and actions with side-effects
 
+## document-meta
+
+  - #pending-rename: one day make this be a unified language for [ze]

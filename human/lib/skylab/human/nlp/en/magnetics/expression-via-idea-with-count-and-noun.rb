@@ -1,8 +1,13 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::When_Count_and_Noun < Home_::Sexp::Magnetic_Expression_Session
+    class Magnetics::Expression_via_Idea_with_Count_and_Noun <
+        Home_::ExpressionPipeline_::Expression
+
+      # referenced by magic near `_via_Idea_with_`.
+      # [here] only. also 1x explicit reference in test.
+
       # ->
         REQUIRED_TERMS = [ :subject_atom, :subject_count ]
 

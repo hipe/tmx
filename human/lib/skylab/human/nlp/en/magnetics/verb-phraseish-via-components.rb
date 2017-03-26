@@ -1,8 +1,12 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::Predicateish  # important theory at :[#056].
+    class Magnetics::VerbPhraseish_via_Components  # [here] only
+
+      # reached (only) in expression sexp's using the alias `predicateish`
+
+      # important theory at :[#056].
 
       COMPONENTS = Attributes_[
 
@@ -30,16 +34,16 @@ module Skylab::Human
 
       class << self
 
-        def interpret_component st, asc
-          Here_.expression_via_these_ st.gets_one, asc
+        def interpret_component scn, asc
+          EN_::Sexp.expression_via_these_ scn.gets_one, asc
         end
 
-        def interpret_component_with_own_stream_ st, _asc
-          expression_via_sexp_stream_ st
+        def interpret_component_fully_ scn, _asc
+          interpret_ scn
         end
 
-        def expression_via_sexp_stream_ st
-          new._init_via_sexp_stream st
+        def interpret_ scn
+          new._init_via_sexp_scanner scn
         end
 
         alias_method :begin_, :new
@@ -58,17 +62,17 @@ module Skylab::Human
         NOTHING_   # (hi.)
       end
 
-      def _init_via_sexp_stream scn
+      def _init_via_sexp_scanner scn
 
         COMPONENTS.init_via_argument_scanner self, scn
       end
 
       def __early_adverbial_phrase__component_association
-        Siblings_::Freeform_Phrase
+        Magnetics::Phraseish_via_AlreadyInflectedAtom
       end
 
       def __object_noun_phrase__component_association
-        Siblings_::Nounish
+        Magnetics::NounPhraseish_via_Components
       end
 
       def nilify_object__
@@ -95,7 +99,7 @@ module Skylab::Human
 
       def _difference_against_counterpart_ x
 
-        Siblings_::List_through_TreeishAggregation::Phrase_diff[ self, x ]
+        Magnetics::List_via_TreeishAggregation_of_Phrases::Phrase_diff[ self, x ]
       end
 
       def _aggregate_ diff_x, otr
@@ -128,17 +132,17 @@ module Skylab::Human
         # to express themselves..
 
         Common_::Stream.once do
-          o = Siblings_::Statementish.begin_
+          o = Magnetics::Statementish_via_Subject_and_VerbPhrase.begin_
           o.attach_sexp__ sexp, :subject
           o.verb_phrase = self
           o
         end
       end
 
-      def to_statementish_stream_for_no_subject  # #spot-1
+      def to_statementish_stream_for_no_subject  # #spot1.3
 
         Common_::Stream.once do
-          o = Siblings_::Statementish.begin_
+          o = Magnetics::Statementish_via_Subject_and_VerbPhrase.begin_
           o.verb_phrase = self
           o
         end
@@ -204,7 +208,7 @@ module Skylab::Human
 
       def _express_verb_agreeing_with_natural_default_subject y
 
-        _ = Siblings_::Nounish::Natural_defaults[]
+        _ = Magnetics::NounPhraseish_via_Components::Natural_defaults[]
         _express_verb_agreeing_with y, _
       end
 
@@ -239,7 +243,7 @@ module Skylab::Human
         end
       end
 
-      def lemma  # only for use by #spot-3 (machine reading)
+      def lemma  # only for use by #spot1.3 (machine reading)
         @lemma_symbol
       end
 
@@ -275,17 +279,17 @@ module Skylab::Human
 
           # this is wild - this is wild.
 
-          asc = Here_.association_via_symbol_ :subject
-          expr = Here_.expression_via_these_ sx, asc
+          asc = Association_via_symbol_[ :subject ]
+          expr = EN_::Sexp.expression_via_these_ sx, asc
 
           make_statement = -> vp do
-            o = Siblings_::Statementish.begin_
+            o = Magnetics::Statementish_via_Subject_and_VerbPhrase.begin_
             o.attach_ expr, asc
             o.verb_phrase = vp
             o
           end
 
-          stmr = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
+          stmr = Home_::Magnetics::List_via_Eventing::Simple.begin
 
           stmr.on_first = -> verb_phrase do
             make_statement[ verb_phrase ]  # (hi.)

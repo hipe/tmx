@@ -2,27 +2,26 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Actors_::Move_Tree
+    class Magnetics_::MoveTree_via_TreeMove < Common_::MagneticBySimpleModel  # 1x
 
-      def initialize tree_move, sym, fs, & oes_p
-
+      def initialize
         @_do_prune_source_directories = true
-        @filesystem = fs
-        @on_event_selectively = oes_p
-        @tree_move = tree_move
-        if sym
-          send :"#{ sym }="
-        end
+        super
       end
 
-      def do_not_prune=
-        @_do_prune_source_directories = false
-        # KEEP_PARSING_
+      def do_not_prune
+        @_do_prune_source_directories = false ; nil
       end
+
+      attr_writer(
+        :filesystem,
+        :listener,
+        :tree_move,
+      )
 
       def execute
-
-        ok = __check_that_target_paths_are_unoccupied
+        ok = true
+        ok &&= __check_that_target_paths_are_unoccupied
         ok && __init_dir_related
         ok &&= __touch_target_directories
         ok &&= __move_files
@@ -48,7 +47,7 @@ module Skylab::Git
 
       def __when_files_existed a
 
-        @on_event_selectively.call :error, :expression, :collision do | y |
+        @listener.call :error, :expression, :collision do | y |
 
           y << "destination file(s) exist:"
 
@@ -62,7 +61,7 @@ module Skylab::Git
 
       def __init_dir_related
 
-        tree = Home_.lib_.basic::Tree.mutable_node.new
+        tree = Home_.lib_.basic::Tree::Mutable.new
 
         @tree_move.a.each do | relpath |
 
@@ -88,7 +87,7 @@ module Skylab::Git
           _yes = @filesystem.directory? dir
           _yes and redo
 
-          @on_event_selectively.call :info, :expression, :mkdir do | y |
+          @listener.call :info, :expression, :mkdir do | y |
             y << "mkdir #{ dir }"
           end
 
@@ -128,7 +127,7 @@ module Skylab::Git
 
         @tree_move.each_path_pair do | src, dst |
 
-          @filesystem.mv src, dst, & @on_event_selectively
+          @filesystem.mv src, dst, & @listener
         end
         ACHIEVED_
       end
@@ -175,6 +174,9 @@ module Skylab::Git
           p[]
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

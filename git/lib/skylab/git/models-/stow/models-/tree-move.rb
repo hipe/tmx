@@ -84,7 +84,7 @@ module Skylab::Git
 
       def _to_path_stream_around path
 
-        Common_::Stream.via_nonsparse_array( @a ).map_by do | relpath |
+        Common_::Stream.via_nonsparse_array( @a ).map_by do |relpath|
 
           ::File.join path, relpath
         end
@@ -149,9 +149,16 @@ module Skylab::Git
         end
       end.call
 
-      def execute sym=nil, fs, & x_p
+      def execute sym=nil, fs, & p
 
-        Stow_::Actors_::Move_Tree.new( self, sym, fs, & x_p ).execute
+        Stow_::Magnetics_::MoveTree_via_TreeMove.call_by do |o|
+          if sym
+            o.send sym
+          end
+          o.tree_move = self
+          o.filesystem = fs
+          o.listener = p
+        end
       end
 
       attr_reader(

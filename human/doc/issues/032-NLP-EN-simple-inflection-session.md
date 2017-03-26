@@ -1,5 +1,10 @@
 # NLP EN simple inflection session :[#002]
 
+(EDIT: the counterpart asset file is an old/new hybrid -
+most of this document explains how the older facility works.
+we'll keep this content around as long as the older one is
+not yet sunsetted.)
+
 ## introduction
 
 things about NLP here: 1) we put our NLP-ish subclient instance methods
@@ -11,7 +16,6 @@ different from our downstream (dependees) is we memoize the last used
 numeric expressers (for the 'number' grammatical category) so that they
 don't need to be re-submitted as arguments for subsequent utterance
 producers, for shorter, more readable utterance templates.
-
 
 
 

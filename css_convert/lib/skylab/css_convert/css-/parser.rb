@@ -156,11 +156,10 @@ module Skylab::CSS_Convert
       # need to provide "head" paths because the provided treetop path is
       # absolute - the generated ruby file will be put alongside it.
 
-      o = start_treetop_require_
-      o.add_treetop_grammar w.treetop_path
-      o.add_parser_enhancer_module Home_::Parser_::Parser_Instance_Methods
-
-      o.execute
+      require_treetop_grammar_by_ do |o|
+        o.add_treetop_grammar w.treetop_path
+        o.add_parser_enhancer_module Home_::Parser_::Parser_Instance_Methods
+      end
     end
 
     Work___ = ::Struct.new :treetop_path

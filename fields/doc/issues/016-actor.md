@@ -147,12 +147,14 @@ see [#001] the comprehensive list of libraries like this.
 
 here is how it compares:
 
- + unlike [#034] the entity library, actors do not currently (and
+ - unlike [#034] the entity library, actors do not currently (and
    probably never will) support meta-properties (like `required` and so
    on). actors embody an intentional simplification of entities.
 
- + [#fi-004] basic fields will nil out fields for you; this does not.
-   however this will probably replace that. ( did: with [#fi-002] "interplay 2" )
+ - (EDIT) at one time "basic fields" would "nil-out" fields for you where
+   as this facility would not. since unification we are not sure how to
+   articulte this issue. [#012.J.4] is focused on nilification, as
+   well as [#002] "interplay 2".
 
 
 

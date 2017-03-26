@@ -1,11 +1,16 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::GerundPhraseish < Expression_Sessions::Nounish::Redux_Abstract_Base  # ..
+    class Magnetics::GerundPhraseish_via_ObjectNounPhrase_and_VerbLemma <
+        Magnetics::NounPhraseish_via_Components::AbstractBase_REDUX
+
+      # referenced by `gerund_phraseish` 1x [fi], Nx [here]
+
+      # referenced by name 1x, [here] only.
 
       class << self
-        alias_method :interpret_component_with_own_stream_, :new
+        alias_method :interpret_component_fully_, :new
         private :new
       end  # >>
 
@@ -24,7 +29,7 @@ module Skylab::Human
       end
 
       def __object_noun_phrase__component_association
-        Siblings_::Nounish
+        Magnetics::NounPhraseish_via_Components
       end
 
       def express_into_under y, expag
@@ -35,7 +40,7 @@ module Skylab::Human
       end
 
       def assimilate_with_same_type_ exp
-        Siblings_::List_through_TreeishAggregation::Assimilate[ self, exp ]
+        Magnetics::List_via_TreeishAggregation_of_Phrases::Assimilate[ self, exp ]
       end
 
       def _can_aggregate_

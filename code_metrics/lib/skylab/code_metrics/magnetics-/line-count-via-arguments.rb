@@ -44,7 +44,7 @@ module Skylab::CodeMetrics
         filter_a = []
 
         o = Home_.lib_.human::NLP::EN::Sexp.expression_session_for(
-          :list, :through, :columnar_aggregation_of_statementishes,
+          :list, :via, :columnar_aggregation_of_phrases,
         )
 
         if @count_blank_lines

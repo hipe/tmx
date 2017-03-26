@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::Statementish::Passive_voice___
+    class Magnetics::Statementish_via_Subject_and_VerbPhrase::Passive_voice___
 
       # omg swtich to #passive-voice - this won't always be pretty:
       #
@@ -85,7 +85,7 @@ module Skylab::Human
         _tense = remove_instance_variable( :@_tense ) || :present
         _preterite_verb_as_object = remove_instance_variable :@_will_be_object
 
-        o = Siblings_::Predicateish.begin_
+        o = Magnetics::VerbPhraseish_via_Components.begin_
 
         o.lemma_symbol = :be
 

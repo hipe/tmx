@@ -2,27 +2,41 @@ require_relative '../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] sexp - expression collection" do
+  describe "[hu] expression pipeline - const string via term scanner" do
 
     TS_[ self ]
     use :memoizer_methods
 
-    it "camel case for business parts" do
-      _ 'gerund-phraseish', :GerundPhraseish
+    it "for those parts of your name that \"look like\" business, camel case" do
+
+      _against %w( gerundish phraseicle )
+      _expect :GerundishPhraseicle
     end
 
-    it "`through` and `of` are special" do
-      _ 'list-through-columnar-aggregation-of-statementishes',
-        :List_through_ColumnarAggregation_of_Statementishes
+    it "a fixed set of special keywords is recognized and etc" do
+
+      _against %w( lerst via columnicar accretion of phraseicles )
+      _expect :Lerst_via_ColumnicarAccretion_of_Phraseicles
     end
 
-    it "`when` at beginning is special" do
-      _ 'when-object-and-subject', :When_Object_and_Subject
+    # it "you can't start with a keyword"  # meh
+
+    # it "you can't end on a keyword"  # meh
+
+    def _against s_a
+      @WORDS = s_a
     end
 
-    def _ head, const
-      _const = Home_::Sexp::Const_via_Tokens_.via_head head
-      _const == const || fail
+    def _expect expect_const
+      _words = remove_instance_variable :@WORDS
+      _scn = Home_::Scanner_[ _words ]
+      actual = Home_::ExpressionPipeline_::ConstString_via_TermScanner[ _scn ].intern
+      if actual != expect_const
+        fail "expected `#{ expect_const }`, had `#{ actual }`"
+      end
     end
+
+    # ==
+    # ==
   end
 end

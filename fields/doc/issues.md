@@ -13,9 +13,10 @@
 
 [#036]       failure tree expression..
 
-[#035] #itch 1x (in situ in [hu]) it would be nice to get nothing from
+[#035] #hole
+             ( #was: 1x (in situ in [hu]) it would be nice to get nothing from
              the actor at all to pollute the namespace of builder
-             methods. (edit: probably throu using attrs alone, no actor)
+             methods. (edit: probably throu using attrs alone, no actor) )
 
 
 [#034]       "entity" ..
@@ -50,7 +51,9 @@
 
 [#026] #track struct vs. actor - one is cold one is hot
 
-[#025]       #parent-node: [#002] "formal vs. actual attributes.."
+[#025] #hole
+             ( this identifier became a sub-identifier under [#002] )
+             ( #was: #parent-node: [#002] "formal vs. actual attributes.." )
 
 [#023]       #wish - when the time comes - track inheritence merging
 
@@ -197,9 +200,10 @@
 
 [#005]       [ from ]
 
-[#004]       [ basic fields ]
+[#004]       conventions for normalization of any particular association ..
+             ( #was: [ basic fields ] (but got unified) )
 
-[#003] #hole
+[#003]       musings on a deep lexicon for validation and normalization ..
 
 [#002]       common association meta-associations ..
 [#001]       discussion of all the property libs ..

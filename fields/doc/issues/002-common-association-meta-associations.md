@@ -63,8 +63,6 @@ occur in this document.)
 
 
 
-
-
 ## formal attributes vs. actual attributes :[#here.2]
 
 (EDIT: very old. really needs rewrite.)
@@ -124,7 +122,7 @@ Remember this is metahell!
 ## feature overview of "defined attributes", actors :[#here.C]
 
 before explaining what every term means, we'll give you a broad overview
-of the "defined attributes" system using the langauge that we'll develop
+of the "defined attributes" facility using the langauge that we'll develop
 throughout this document, as a broad (if jarring) introduction to both the
 library and the language.
 
@@ -313,8 +311,8 @@ but it has not allowed for a polyadic *argument* arity.
 this is the conclusion we come to on such matters today: for something like
 at least 98% of our practical, day-to-day modeling needs it seems that
 modeling "requiredness" in such a way was superfluous overkill. (in other
-words, when we first discovered "arity", we may have become guilty of
-everything looking like a nail.)
+words, when we first discovered the hammer of "arity", we may have become
+guilty of everything looking like a nail.)
 
 parsimony holds that since it is usually (always, even) simple enough just
 to say that an association is either "required" or it isn't, that we should
@@ -1070,7 +1068,7 @@ is "infinitely many" and we don't give it a second thought.
 
 ## further reading
 
-[#ba-027] & [#ba-045] will eventually merge into this narrative as siblings #open
+[#003] & [#004] will eventually merge into this narrative as siblings #open
 
 
 

@@ -1,8 +1,10 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::Nounish  # actually noun phraseish
+    class Magnetics::NounPhraseish_via_Components  # [here] only
+
+      # used ~7x here. can be reached by the alias `nounish` in sexp's.
 
       # (NOTE: we have *begun* to retrofit this into [#049] for now the two
       # are grafted together into one file without being integrated at all..)
@@ -22,16 +24,16 @@ module Skylab::Human
           if x.respond_to? :ascii_only?
             Word_as_Nounish_Expression___.new x, asc
           else
-            Here_.expression_via_these_ x, asc
+            EN_::Sexp.expression_via_these_ x, asc
           end
         end
 
-        def interpret_component_with_own_stream_ st, asc
-          PhraseishRedux__.new st, asc
+        def interpret_component_fully_ scn, asc
+          PhraseishRedux__.new scn, asc
         end
 
-        def expression_via_sexp_stream_ st  # #test-only
-          PhraseishRedux__.new st, nil
+        def interpret_ scn  # #test-only
+          PhraseishRedux__.new scn, nil
         end
 
         alias_method :begin, :new
@@ -40,9 +42,9 @@ module Skylab::Human
 
     # == begin redux
 
-    Redux_Abstract_Base = ::Class.new  # abstract
+    AbstractBase_REDUX = ::Class.new  # abstract
 
-    class Word_as_Nounish_Expression___ < Redux_Abstract_Base
+    class Word_as_Nounish_Expression___ < AbstractBase_REDUX
 
       def initialize s, asc
         @__word = s
@@ -55,7 +57,7 @@ module Skylab::Human
           # make sure to give the outside expression a chance to reject the
           # aggregation if for example the aggregation category is wrong
         else
-          Siblings_::List.via_(
+          Magnetics::List_via_Items.via_(
             [ self, exp ],
             :association_symbol, @association_symbol_,
           )
@@ -71,7 +73,7 @@ module Skylab::Human
       end
     end
 
-    class PhraseishRedux__ < Redux_Abstract_Base
+    class PhraseishRedux__ < AbstractBase_REDUX
 
       COMPONENTS = Attributes_[
 
@@ -98,8 +100,8 @@ module Skylab::Human
         super asc
       end
 
-      def __interpret_lemma st  # whether lemmata are symbols or strings is in transition
-        x = st.gets_one
+      def __interpret_lemma scn  # whether lemmata are symbols or strings is in transition
+        x = scn.gets_one
         if x.respond_to? :ascii_only?
           x = x.intern
         end
@@ -108,7 +110,7 @@ module Skylab::Human
       end
 
       def __modifier_word_list__component_association
-        Siblings_::WordList
+        EN_::Magnetics::Phraseish_via_AlreadyInflectedAtoms_in_Scanner
       end
 
       def proper_noun=
@@ -125,7 +127,7 @@ module Skylab::Human
       end
 
       def __suffixed_proper_constituency__component_association
-        Siblings_::Listifiable
+        Magnetics::Listifiable_via_Scanner_and_Association  # 1x
       end
 
       # --
@@ -185,7 +187,7 @@ module Skylab::Human
       # --
 
       def assimilate_with_same_type_ exp
-        Siblings_::List_through_TreeishAggregation::Assimilate[ self, exp ]
+        Magnetics::List_via_TreeishAggregation_of_Phrases::Assimilate[ self, exp ]
       end
 
       def number
@@ -196,7 +198,7 @@ module Skylab::Human
         @suffixed_proper_constituency.person_exponent_symbol_
       end
 
-      def lemma  # only for use by #spot-3 (machine reading)
+      def lemma  # only for use by #spot1.3 (machine reading)
         @lemma_symbol
       end
 
@@ -213,7 +215,7 @@ module Skylab::Human
       end
     end
 
-    class Redux_Abstract_Base  # this lib only
+    class AbstractBase_REDUX  # this lib only
 
       def initialize asc
         if asc
@@ -349,7 +351,7 @@ module Skylab::Human
         :must_express_negativity
 
       def quad_count
-        Home_::Sexp::Quad_Count.fetch @_quad_count_category
+        Home_::ExpressionPipeline_::QuadCount.fetch @_quad_count_category
       end
 
       def __when__none__list_only  # see previous method comment
@@ -434,8 +436,8 @@ module Skylab::Human
       def _init_noun_phrase_plus_adjective_list
 
         _init_noun_phrase
-        _st = @_list_arg.to_stream
-        _es = Siblings_::List.via_ _st
+        _scn = @_list_arg.to_stream
+        _es = Magnetics::List_via_Items.via_ _scn
         @noun_phrase.prepend_adjective_phrase _es
         NIL_
       end

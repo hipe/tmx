@@ -1,8 +1,11 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::When_Object_and_Subject
+    class Magnetics::Expression_via_Idea_with_Object_and_Subject <
+        Home_::ExpressionPipeline_::Expression
+
+      # referenced by magic only (near `_via_Idea_`)
 
       Some_of_many_sp_split___ = -> sp, si do  # assume two or more
 

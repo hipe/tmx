@@ -1,86 +1,32 @@
 module Skylab::Human
 
-  module Sexp
+  module ExpressionPipeline_::BestMatchingExpression_via_Magnetics
 
-    class Expression_Collection
+    # exactly [#034] "expression frames" (name will probably change).
+    # (looks like [#039] but while similar, is different.)
+    # :#spot1.6
 
-      class << self
+    CONST_FRAGMENT__ = '_via_Idea_with_'
 
-        def via_multipurpose_module__ mod
-          new.__init_etc mod
-        end
+    GLOB_ENTRY___ = "*#{ CONST_FRAGMENT__.downcase.gsub UNDERSCORE_, DASH_ }*"
 
-        private :new
-      end  # >>
+    class << self
 
-      def __init_etc mod
-
-        # assume that `mod` has a mix of nodes under it, some that are
-        # "magnetic" and others that are not. assume the node is magetic
-        # IFF it's name matches the pattern we untilize below. map-reduce
-        # the stream down to only those that are magnetic.
-        #
-        # assume that the stream produced by this streamer is guaranteed to
-        # be exhausted (i.e always reach the end). cache the reduction it
-        # does so we do not repeat this work every time we have a lookup.
-
-        ft = mod.entry_tree
-        ft || fail
-        @__file_tree = ft
-        @__module = mod
-        @_stream = :__stream_first_time
-        self
+      def index_via_magnetics_module__ mod
+        Index___.new mod
       end
+    end  # >>
 
-      def __stream_first_time
+    # ==
 
-        cache = []
-        mod = @__module
-        st = @__file_tree.to_asset_reference_stream
-
-        Common_.stream do  # hand-written map-reduce for clarity
-
-          begin
-            sm = st.gets
-
-            if ! sm  # once we reach the end, don't repeat this work.
-              remove_instance_variable :@__file_tree
-              remove_instance_variable :@__module
-              @__module_cache = cache
-              @_stream = :__stream_subsequent_time
-              break
-            end
-
-            head = sm.entry_group_head
-            if WHITE_RX___ !~ head  # the "reduce"
-              redo
-            end
-
-            _const = Home_::Sexp::Const_via_Tokens_.via_head head
-            x = mod.const_get _const, false
-            cache.push x
-            break
-          end while above
-          x
-        end
-      end
-
-      WHITE_RX___ = /\Awhen-/
-
-      def __stream_subsequent_time
-        Common_::Stream.via_nonsparse_array @__module_cache
-      end
-
-      def expression_session_via_sexp_stream__ st
+    BestMatchingExpression_via_LoadableReferenceStream___ = -> idea, st do
 
         best_match = nil
-        idea = Here_::Idea_.via_sexp_stream__ st
 
-        st = send @_stream
         begin
-          x = st.gets
-          x or break
-          match = x.match_for_idea__ idea
+          lr = st.gets
+          lr || break
+          match = lr.dereference.match_for_idea__ idea
           if match
             if best_match
               if best_match <= match
@@ -91,14 +37,83 @@ module Skylab::Human
             end
           end
           redo
-        end while nil
+        end while above
 
         if best_match
           best_match.to_expression_session__
         else
           self._LOGIC_HOLE
         end
+    end
+
+    # ==
+
+    class Index___
+
+      # only those magnetics that end in a particular thing in their filename
+
+      # we assume that the subject instance will be cached by the
+      # client so we do no additional caching of anything here :#here1
+
+      def initialize mod
+
+        @__index = Home_.lib_.system_lib::Filesystem::OperatorBranch_via_Directory.define do |o|
+
+          o.startingpoint_path = mod.dir_path
+
+          o.loadable_reference_via_path_by = -> path do
+
+            LoadableReference___.new path, mod
+          end
+
+          o.glob_entry = GLOB_ENTRY___
+        end
+      end
+
+      def interpret_ scn
+
+        _idea = ExpressionPipeline_::Idea_.interpret_ scn
+        _st = @__index.to_loadable_reference_stream
+        exp = BestMatchingExpression_via_LoadableReferenceStream___[ _idea, _st ]
+        exp || self._COVER_ME__not_sure_if_possible__
+        exp
       end
     end
+
+    # ==
+
+    class LoadableReference___
+
+      # (ideally this would all push up to [sy] to be next to that o.b)
+
+      def initialize path, mod
+
+        const = Const_via_path___[ path ]
+
+        @dereference = mod.const_get const, false  # trigger autoloading
+
+        @normal_symbol = const  # prob never used
+      end
+
+      attr_reader(
+        :dereference,
+        :normal_symbol,
+      )
+    end
+
+    # ==
+
+    Const_via_path___ = -> path do
+
+      basename = ::File.basename path
+      d = ::File.extname( basename ).length
+      _slug = d.zero? ? basename : basename[ 0 ... -d ]
+      _terms = _slug.split DASH_
+      ExpressionPipeline_::ConstString_via_TermScanner[ Scanner_[ _terms ] ].intern
+    end
+
+    # ==
+    # ==
   end
 end
+# #history: that whole name thing moved to its own file

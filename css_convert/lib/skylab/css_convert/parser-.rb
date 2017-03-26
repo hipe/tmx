@@ -45,46 +45,38 @@ module Skylab::CSS_Convert
 
     def parse_path path
 
-      o = _start_parse_via_path path
-      if o
-        o.flush_to_parse_tree
-      else
-        o
+      _parse_by do |o|
+        o.accept_upstream_path path
+        o.execute_using :flush_to_parse_tree
       end
     end
 
     def syntax_node_via_path path
-      o = _start_parse_via_path path
-      if o
-        o.flush_to_syntax_node
-      else
-        o
-      end
-    end
 
-    def _start_parse_via_path path
-      o = _start_parse
-      if o
+      _parse_by do |o|
         o.accept_upstream_path path
+        o.execute_using :flush_to_syntax_node
       end
-      o
     end
 
-    def _start_parse
+    def _parse_by
 
       cls = produce_parser_class
       if cls
-        o = Home_.lib_.treetop_tools::Sessions::Parse.new( & @on_event_selectively )
-        o.accept_parser_class cls
-        o
+        _Treetop = Home_.lib_.treetop_tools
+        _Treetop::Parse_via_ByteUpstreamReference_and_ParserClass.call_by do |o|
+          yield o
+          o.accept_parser_class cls
+          o.listener = @on_event_selectively
+        end
       else
         cls
       end
     end
 
-    def start_treetop_require_
+    def require_treetop_grammar_by_
 
-      Home_.lib_.treetop_tools::Sessions::Require.new do | * i_a, & ev_p |
+      _listener = -> * i_a, & ev_p do
 
         if :error == i_a.first
           raise ev_p[].to_exception
@@ -92,6 +84,15 @@ module Skylab::CSS_Convert
           @on_event_selectively.call( * i_a, & ev_p )
         end
       end
+
+      _Treetop = Home_.lib_.treetop_tools
+
+      _hi = _Treetop::RequireGrammars_via_Paths.call_by do |o|
+        yield o
+        o.listener = _listener
+      end
+
+      _hi  # hi. #todo
     end
   end
 

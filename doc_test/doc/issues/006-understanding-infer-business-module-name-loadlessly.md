@@ -1,5 +1,14 @@
 # understanding `infer_business_module_name_loadlessly` :[#006]
 
+## foreward
+
+something similar is going on over at [#tm-011]. it looks like what
+we do here is more sophisticated than there, but they are all hacks
+nonetheless.
+
+
+
+
 ## introduction
 
 over the *years* the solution to this problem has taken interesting twists

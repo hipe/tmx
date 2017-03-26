@@ -1,4 +1,4 @@
-[#065]       [ project "W" ]
+[#065]       introduction to a headless dream [ and project "W" ]
 
 [#064]       non-interactive CLI "fail early" notes ..
 

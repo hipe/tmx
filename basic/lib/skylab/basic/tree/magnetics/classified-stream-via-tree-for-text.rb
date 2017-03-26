@@ -2,9 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    module Expression_Adapters__::Text
-
-      class Actors::Build_classified_stream
+    class Magnetics::ClassifiedStream_via_Tree_for_Text
 
         Attributes_actor_.call( self,
           :node,
@@ -38,12 +36,12 @@ module Skylab::Basic
 
         def __resolve_glyphset_via_ID id_x
 
-          @glyphset = Autoloader_.const_reduce(
+          _ = Autoloader_.const_reduce(
             [ id_x ],
-            Home_::Tree.unicode::GlyphSets,
+            Here_::Magnetics::TextGlyph_via_NodeCategory::GlyphSets,
           )
 
-          @glyphset && ACHIEVED_
+          _store :@glyphset, _
         end
 
         def __via_glyphset_init
@@ -86,9 +84,16 @@ module Skylab::Basic
           end
         end
 
+        def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+          if x
+            instance_variable_set ivar, x
+          else
+            x
+          end
+        end
+
         Classifications___ = ::Struct.new :node, :prefix_string
-      end
+
     end
   end
 end
-# #pending rename (for [tm])

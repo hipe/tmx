@@ -86,19 +86,8 @@ module Skylab::TanMan
       end
     end
 
-    Models_ = ::Module.new
-    class Models_::Grammar_to_Load
-
-      attr_accessor(
-        :input_path,
-        :make_this_directory_minus_p,
-        :module_name_i_a,
-        :output_path,
-        :output_path_did_exist,
-      )
-    end
-
-    Here_ = self
+    # ==
+    # ==
   end
 end
 # :#tombstone: this used to be must more overwrought and hookable

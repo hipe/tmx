@@ -1,4 +1,6 @@
-# the conjuncter narrative :[#010]
+# the conjuncter narrative :[#052]
+
+(EDIT: this needs reconciliation with [#055], as mentioned there.)
 
 ## preface
 

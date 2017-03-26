@@ -1,4 +1,11 @@
-# aggregation notes :[#002]
+# expression of phrases via treeish aggregation of phrases :[#002]
+
+## foreward
+
+(there is a sister algorithm at [#055]. we don't know which one is
+"better" off hand.)
+
+
 
 
 ## :"how we tiebreak"

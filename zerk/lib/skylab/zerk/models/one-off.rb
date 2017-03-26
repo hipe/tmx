@@ -31,7 +31,7 @@ module Skylab::Zerk
 
     # ==
 
-    class LEGACY_Whatever_via_OneOff___ < MonadicMagneticAndModel_
+    class LEGACY_Whatever_via_OneOff___ < Common_::MonadicMagneticAndModel
 
       def initialize oo
         _ = oo.loadable_reference.gem_name_elements.entry_string
@@ -136,7 +136,7 @@ module Skylab::Zerk
       # --
 
       def TO_OPERATOR_ADAPTER_FOR cli
-        Home_::Magnetics::OperatorBranch_via_Directory::OA.new self, cli
+        OperatorAdapter___.new self, cli
       end
 
       def express_help_by
@@ -300,6 +300,48 @@ module Skylab::Zerk
       end
 
       # ===
+
+    # ==
+
+    class OperatorAdapter___  # (moved to this file at #history-B)
+
+      def initialize one_off, cli
+        @CLI = cli
+        @one_off = one_off
+      end
+
+      def to_bound_call_for_help
+
+        _by_this = -> o do
+          o.program_name_head_string_array = @CLI.program_name_string_array
+          o.downstream = @CLI.stderr
+        end
+
+        Common_::BoundCall[ nil, @one_off, :express_help_by, & _by_this ]
+      end
+
+      def to_bound_call_for_invocation
+
+        _proc = @one_off.require_proc_like
+
+        _pnsa = [ * @CLI.program_name_string_array,
+                  * @one_off.program_name_tail_string_array ]
+
+        _scn = @CLI.release_argument_scanner_for_mounted_operator
+
+        d, argv = _scn.close_and_release
+        argv[ 0, d ] = EMPTY_A_
+
+        _args = [ argv, @CLI.stdin, @CLI.stdout, @CLI.stderr, _pnsa ]
+
+        _maybe_one_day = -> do
+          ::Kernel._K__readme__  # mmmaaayyybeee some one-offs want resources? but don't
+        end
+
+        Common_::BoundCall[ _args, _proc, :call, & _maybe_one_day ]
+      end
+    end
+
     # ==
 
     module DUMMY_STDIN___ ; class << self
@@ -319,4 +361,5 @@ module Skylab::Zerk
     # ==
   end
 end
+# #history-B: moved operator adapter (then "OA") to here from "operator branch via directory"
 # #history: moved from [br] to [ze], took content from (now) "magnetics-/one off scanner via.."

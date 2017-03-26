@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  module NLP::EN::Sexp
+  module NLP::EN
 
-    class Expression_Sessions::Listifiable
+    class Magnetics::Listifiable_via_Scanner_and_Association  # 1x, [here] only
 
       # experiment - this is *NOT* for building plural lists outright -
       # rather it is for those parts of an expression that can *become*
@@ -32,13 +32,13 @@ module Skylab::Human
       end
 
       def __init_via_string x  # assume is string
-        @_inner_expression = String_as_Expression_[ x, @_ASC ]
+        @_inner_expression = EN_::Sexp::String_as_Expression[ x, @_ASC ]
         self
       end
 
       def __init_via_not_string x
 
-        _exp = Here_.expression_via_these_ x, @_ASC
+        _exp = EN_::Sexp.expression_via_these_ x, @_ASC
         @_inner_expression = _exp
         self
       end
@@ -78,7 +78,7 @@ module Skylab::Human
 
       def _aggregate_ o
         _a = [ @_inner_expression, o._inner_expression ]
-        Siblings_::List.via_ _a, :association_symbol, @_ASC.name_symbol
+        Magnetics::List_via_Items.via_ _a, :association_symbol, @_ASC.name_symbol
       end
 
       def to_read_only_array__

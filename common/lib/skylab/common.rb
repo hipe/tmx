@@ -2052,10 +2052,14 @@ module Skylab::Common
   # --
 
   build_oxford = -> const do
-    o = Home_.lib_.human::NLP::EN.const_get( const, false ).call.dup
-    o.express_none_by { '[none]' }
+
+    _proto = Home_.lib_.human::NLP::EN.const_get( const, false ).call
+    exp = _proto.redefine do |o|
+      o.express_none_by { '[none]' }
+    end
+
     -> a do
-      o.with_list( a ).say
+      exp.with_list( a ).say
     end
   end
 

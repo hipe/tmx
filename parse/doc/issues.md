@@ -6,7 +6,7 @@
 [#009]       #api-point constant trouble's fields are immutable (ergo dupable)
 [#008]       tracking "parse static sequence" as abstraction candidate
 [#007]       legacy parsing terms defined
-[#006]       [ iambic grammar ]
+[#006]       [ iambic grammar ]  ("iambics" in general are a [#fi-033])
 [#005]       the item grammar ..
 [#004]       the parse serial optionals narrative ..
 [#003]       a freeeform "serial optionals" basically like minimal packrat parser

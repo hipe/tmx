@@ -26,7 +26,7 @@
 [#059]       [ bound call ]
              ( #was: #done #parent-node: [#016] "signal processing scans.." ) )
 
-[#058]       autoloading implementation
+[#058]       autoloading implementation (see also [#024] a.l introduction)
 
 [#057]       "the ideal mixed syntax.." (in [#fi-016] )
 
