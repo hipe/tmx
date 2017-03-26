@@ -321,7 +321,7 @@ module Skylab::Brazen
         y.concat @resources.invocation_string_array  # result
       end
 
-      def app_name
+      def app_name_string
         Common_::Name.via_module( @mod ).as_slug  # etc.
       end
 
@@ -370,7 +370,7 @@ module Skylab::Brazen
       end
 
       public(
-        :app_name,  # by our expag (covered by [f2])
+        :app_name_string,  # by our expag (covered by [f2])
         :application_kernel,
         :build_expression_agent_for_this_invocation,
         :branch_adapter_class_,
@@ -1069,8 +1069,8 @@ module Skylab::Brazen
 
       ## ~~ resources/services near kernel & application
 
-      def app_name
-        @parent.app_name
+      def app_name_string
+        @parent.app_name_string
       end
 
       def application_kernel  # [tm]
@@ -1085,7 +1085,7 @@ module Skylab::Brazen
 
       public(
         # UI
-        :app_name,  # ibid
+        :app_name_string,  # ibid
         :after_name_value_for_order,
         :is_visible,
         :name_value_for_order,
@@ -2197,7 +2197,7 @@ module Skylab::Brazen
       end
 
       def ___APPNAME
-        @___APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
+        @___APPNAME ||= application_kernel.app_name_string.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
       end
     end
 

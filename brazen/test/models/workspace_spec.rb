@@ -11,7 +11,7 @@ module Skylab::Brazen::TestSupport
 
       call_API :workspace, :ping
 
-      expect_event :ping, 'hello from (app_name)'
+      expect_event :ping, 'hello from (app_name_string)'
       expect_no_more_events
 
       @result.should eql :_hello_from_brazen_

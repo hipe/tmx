@@ -38,7 +38,7 @@ module Skylab::Cull
       Common_::Event.wrap.signature(
         bound.unbound.name_function,
         ( Common_::Event.inline_neutral_with :ping do | y, o |
-          y << "hello from #{ bound.kernel.app_name }."
+          y << "hello from #{ bound.kernel.app_name_string }."
         end ) )
     end
 

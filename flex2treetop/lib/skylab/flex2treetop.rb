@@ -92,7 +92,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             if arg_1
               y << "helo:(#{ arg_1 })"
             else
-              y << "hello from #{ app_name }."
+              y << "hello from #{ app_name_string }."
             end
             :_xyzzy_
           end
@@ -112,7 +112,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         edit_entity_class(
 
           :branch_description, -> y do
-            y << "output the #{ app_name } version"
+            y << "output the #{ app_name_string } version"
           end,
 
           :flag, :property, :bare,
@@ -123,7 +123,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
           if @argument_box[ :bare ]
             "#{ VERSION }"
           else
-            "#{ @kernel.app_name }: #{ VERSION }"
+            "#{ @kernel.app_name_string }: #{ VERSION }"
           end
         end
       end

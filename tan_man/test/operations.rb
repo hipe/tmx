@@ -149,37 +149,27 @@ module Skylab::TanMan::TestSupport
     def empty_dir_pn
       TestLib_::Empty_dir_pn[]
     end
+    end  # if false
 
-    def empty_work_dir
-      @empty_work_dir ||= begin
-        prepare_ws_tmpdir
-        @ws_pn.to_path
+    def build_empty_tmpdir  # was `empty_work_dir`
+
+      td = TestLib_::Volatile_tmpdir[]  # was `Volatile_tmpdir`
+
+      # ~ was `verbosify_tmpdir`
+
+      if do_debug && ! ts.be_verbose
+        td = td.new_with :be_verbose, true, :debug_IO, debug_IO
+        # (we do not un-verbosify a verbose tmpdir)
       end
-    end
 
-    def prepare_ws_tmpdir s=nil
-      td = verbosify_tmpdir volatile_tmpdir
-      td.prepare
-      if s
-        td.patch s
-      end
-      @ws_pn = td ; nil
-    end
+      # ~
 
-    def volatile_tmpdir
-      TestLib_::Volatile_tmpdir[]
-    end
+      td.prepare  # was `prepare_ws_tmpdir`
 
-    def verbosify_tmpdir td
-      if do_debug
-        if ! td.be_verbose
-          td = td.new_with :be_verbose, true, :debug_IO, debug_IO
-        end
-      elsif td.be_verbose
-        self._IT_WILL_BE_EASY
-      end
+      # td.patch s
+
+      # ~
       td
-    end
     end
 
     def dir sym
@@ -203,6 +193,6 @@ module Skylab::TanMan::TestSupport
     CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
 
     THE_DOTFILE__ = 'the.dot'
-    end
+    end  # if false
   end
 end

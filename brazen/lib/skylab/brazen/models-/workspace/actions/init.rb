@@ -50,7 +50,7 @@ module Skylab::Brazen
 
       _ok = @ws.init_workspace(
         :is_dry, @argument_box[ :dry_run ],
-        :app_name, @kernel.app_name,
+        :app_name_string, @kernel.app_name_string,
         :prop, _prp,
         & _oes )
 

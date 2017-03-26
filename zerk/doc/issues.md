@@ -1,3 +1,11 @@
+[#066]       [ model re-use ]
+             it's ghastly. although you could sub-class model actions,
+             don't. doing so becomes a liability for the host application.
+             only reuse those magnetics exposed as part of the
+             microservice model's public API (and as such keep real logic
+             out of the actions so it is exposed as potentially exposable
+             but not interface-facing magnetics).
+
 [#065]       introduction to a headless dream [ and project "W" ]
 
 [#064]       non-interactive CLI "fail early" notes ..

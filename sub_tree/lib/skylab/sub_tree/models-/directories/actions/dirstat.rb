@@ -15,7 +15,7 @@ module Skylab::SubTree
         kr = @kernel
 
         maybe_send_event :info, :expression, :ping do | y |
-          y << "hello from #{ em kr.app_name }."
+          y << "hello from #{ em kr.app_name_string }."
         end
 
         :hello_from_sub_tree

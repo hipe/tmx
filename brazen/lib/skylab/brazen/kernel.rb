@@ -68,7 +68,7 @@ class Kernel  # [#015]
     NIL_  # etc
   end
 
-  def app_name
+  def app_name_string
 
     if @_name_function
       @_name_function

@@ -32,7 +32,7 @@ module Skylab::TanMan
         end,
 
         :property, :config_filename,
-        :default, CONFIG_FILENAME___,
+        :default, CONFIG_FILENAME__,
 
         :required, :property, :path,
       ] end
@@ -87,27 +87,64 @@ module Skylab::TanMan
       end
     end
 
-    if false
-    class Actions__::Init < Brazen_::Models_::Workspace::Actions::Init
+    class Actions::Init
 
-      extend Action_::MM
+      # #was-promoted
 
-      @is_promoted = true
+      def definition ; [
 
-      @description_proc = -> y do
-        _ = @kernel.silo( :workspace ).silo_module.default_config_filename
-        y << "create the #{ val _ } directory"
+        :branch_description, -> y do
+          y << "create the #{ val CONFIG_FILENAME__ } file"
+        end,
+
+        # #was-verbose
+        # #was-dry-run
+
+        :required, :property, :config_filename,
+        :default, CONFIG_FILENAME__,
+
+        :required, :property, :path,
+        :description, -> y do
+          y << "the directory to init"
+        end,
+
+      ] ; end
+
+      def initialize
+        extend Home_::Model_::CommonActionMethods
+        init_action_ yield
       end
-    end
+
+      def execute
+
+        _app_name_string = Home_.name_function.as_human
+
+        _ = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics
+
+        _ignored = _::InitWorkspace_via_PathHead_and_PathTail.via(
+          :is_dry, false,
+          :surrounding_path, @path,
+          :config_filename, @config_filename,
+          :prop, :path,
+          :app_name_string, _app_name_string,
+          & _listener_
+        )
+
+        # success is covered, failure is not. either way,
+        # result does not indicate success or failure here (for now).
+
+        NIL
+      end
     end
 
     # ==
 
-    CONFIG_FILENAME___ = ::File.join 'tan-man-workspace', 'config.ini'
+    CONFIG_FILENAME__ = ::File.join 'tan-man-workspace', 'config.ini'
 
     # ==
     # ==
   end
 end
+# #history-C: (can be temporary) rewrite "init" for new arch
 # #tombstone-B: rewrote "status" with whole new arch
 # #tombstone-A: "ping" used to live here

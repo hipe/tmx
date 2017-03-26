@@ -11,7 +11,7 @@ module Skylab::Brazen
         :surrounding_path,
         :config_filename,
         :prop,
-        :app_name,
+        :app_name_string,
       )
 
       def initialize & _
@@ -48,7 +48,7 @@ module Skylab::Brazen
       end
 
       def into_document_add_comment
-        @document.add_comment "created by #{ @app_name } #{
+        @document.add_comment "created by #{ @app_name_string } #{
           }#{ ::Time.now.strftime '%Y-%m-%d %H:%M:%S' }"
       end
 

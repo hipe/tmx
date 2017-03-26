@@ -240,8 +240,8 @@ module Skylab::Zerk
         end
       end
 
-      def app_name
-        @expag.app_name
+      def app_name_string
+        @expag.app_name_string
       end
 
     private

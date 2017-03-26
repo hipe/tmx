@@ -113,6 +113,21 @@ module Skylab::Brazen
 
   # == public models or similar (when small stowaways)
 
+  module Models
+
+    # (new in this edition: we only expose a subset of our model for
+    # "re-use". see [#ze-066] about model re-use.)
+
+    module Workspace
+
+      Autoloader_[ self ]
+
+      lazily :Magnetics do
+        Home_::Models_::Workspace::Magnetics
+      end
+    end
+  end
+
   module Collection_Adapters
 
     class << self

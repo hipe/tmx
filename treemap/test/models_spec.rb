@@ -11,7 +11,7 @@ module Skylab::Treemap::TestSupport
 
       call_API :ping
 
-      expect_neutral_event :ping, 'hello from (app_name).'
+      expect_neutral_event :ping, 'hello from (app_name_string).'
 
       @result.should eql :hello_from_treemap
 

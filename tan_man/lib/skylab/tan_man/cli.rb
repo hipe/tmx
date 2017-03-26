@@ -136,8 +136,8 @@ module Skylab::TanMan
 
       if false  # bring back as needed
 
-      def app_name
-        @kernel.app_name
+      def app_name_string
+        @kernel.app_name_string
       end
 
       def invoke_notify

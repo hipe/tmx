@@ -19,7 +19,7 @@ module Skylab::Zerk
 
       def initialize injection
         @app_name_p = -> do
-          injection.app_name
+          injection.app_name_string
         end
       end
 
@@ -37,7 +37,7 @@ module Skylab::Zerk
         _NLP_agent.and_ x
       end
 
-      def app_name
+      def app_name_string
         @app_name_p[]
       end
 

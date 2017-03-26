@@ -17,7 +17,7 @@ module Skylab::GitViz
 
         oes_p.call _chn, :expression, :ping do | y |
 
-          y << "hello from #{ bnd.kernel.app_name }."
+          y << "hello from #{ bnd.kernel.app_name_string }."
         end
 
         :hello_from_git_viz

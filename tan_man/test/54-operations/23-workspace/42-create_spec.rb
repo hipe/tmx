@@ -2,40 +2,77 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - workspace create", wip: true do
+  describe "[tm] operations - workspace create (the action is called 'init')" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
-    it "holy god" do
+    context "(successfully)" do
 
-      config_filename = 'xyz'
+      it "succeeds" do
+        _tuple || fail
+      end
 
-      call_API :init,
-        :path, empty_work_dir,
-        :config_filename, config_filename
+      it "the file is there and its content looks OK" do
 
-      _expected_config_path = @ws_pn.join( config_filename ).to_path
+        a = _tuple
 
-      expect_committed_changes_
+        _path = ::File.join a[-2], a.last
 
-      o = TestSupport_::Expect_Line::Scanner.via_line_stream(
-        io = ::File.open( _expected_config_path ) )
+        _io = ::File.open _path
 
-      o.next_line.should match(
-        /\A# created by tan man \d{4}-\d\d-\d\d \d\d:\d\d:\d\d/ )
+        o = TestSupport_::Expect_Line::Scanner.via_line_stream _io
 
-      o.next_line.should be_nil
+        o.next_line =~ /\A# created by tan man \d{4}-\d\d-\d\d \d\d:\d\d:\d\d/ or fail
 
-      io.close
+        o.next_line.nil? || fail
+      end
 
-      @result.existent_surrounding_path  # should respond
+      it "emits about creating the intermediate directory" do
 
+        _ev = _tuple.first
+        _content = black_and_white _ev
+        _content =~ /\bcreating directory\b.+\bpp-qq\b/ or fail
+      end
+
+      it "emits about creating the file" do
+        _ev = _tuple[1]
+        _content = black_and_white _ev
+        _content =~ /\Acreated xyz\.ohai \(\d+ bytes\)\z/ or fail
+      end
+
+      shared_subject :_tuple do
+
+        _td = build_empty_tmpdir
+        empty_work_dir = _td.path
+
+        config_filename = 'pp-qq/xyz.ohai'
+
+        call_API(
+          :workspace, :init,
+          :path, empty_work_dir,
+          :config_filename, config_filename,
+        )
+
+        a = []
+        expect :info, :creating_directory do |ev|
+          a.push ev
+        end
+
+        expect :info, :success do |ev|
+          a.push ev
+        end
+
+        expect_result NIL
+
+        a.push empty_work_dir, config_filename
+        a
+      end
     end
 
-    def expected_config_path
-      @ws_pn.join( Home_::Models_::Workspace.config_filename ).to_path
-    end
-
+    # ==
+    # ==
   end
 end

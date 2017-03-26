@@ -159,7 +159,7 @@ module Skylab::TanMan
         end
       end
 
-      def app_name
+      def app_name_string
         Home_.name_function.as_human
       end
 

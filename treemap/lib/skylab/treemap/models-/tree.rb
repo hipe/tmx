@@ -13,7 +13,7 @@ module Skylab::Treemap
           maybe_send_event :info, :ping do
 
             Common_::Event.inline_neutral_with :ping do | y, o |
-              y << "hello from #{ app_name }."
+              y << "hello from #{ app_name_string }."
             end
           end
 

@@ -9,9 +9,9 @@ module Skylab::Cull
       def produce_result
 
         @on_event_selectively.call :info, :ping do
-          app_name = @kernel.app_name
+          app_name_string = @kernel.app_name_string
           build_OK_event_with :ping do | y, o |
-            y << "#{ app_name } says #{ highlight 'hello' }"
+            y << "#{ app_name_string } says #{ highlight 'hello' }"
           end
         end
 

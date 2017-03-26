@@ -56,6 +56,3 @@ TD tan_man/test/54-operations/42-graph/44-use_spec.rb
 TD tan_man/test/54-operations/32-dot-file/56-update-label_spec.rb
 TD tan_man/test/54-operations/32-dot-file/46-parsing/examples-490-thru-699_spec.rb
 TD tan_man/test/54-operations/32-dot-file/46-parsing/examples-001-thru-489_spec.rb
-(model: workspace)
-(reminder: delete the old workspace class in models file)
-TD tan_man/test/54-operations/23-workspace/42-create_spec.rb

@@ -60,8 +60,8 @@ module Skylab::Zerk
         _NLP_agent.and_ a
       end
 
-      def app_name
-        @_injection.app_name
+      def app_name_string
+        @_injection.app_name_string
       end
 
       def both x

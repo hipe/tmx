@@ -200,7 +200,7 @@ module Skylab::Brazen
         def produce_result
           maybe_send_event :payload, :ping do
             build_OK_event_with :ping do |y, o|
-              y << "hello from #{ app_name }"
+              y << "hello from #{ app_name_string }"
             end
           end
           :_hello_from_brazen_
