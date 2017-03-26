@@ -583,12 +583,6 @@ module Skylab::TanMan
       y << "view and edit nodes"
     end
 
-    class << self
-      def touch
-        self::Actors__::Mutate::Touch
-      end
-    end  # >>
-
     def to_controller  # experiment
       Models_::Node::Controller__.new self, @preconditions.fetch( :dot_file )
     end

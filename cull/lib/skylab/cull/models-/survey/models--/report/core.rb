@@ -140,7 +140,7 @@ module Skylab::Cull
 
       def __persist_calls
 
-        Me__::Actors__::Persist_calls.call(
+        Me__::RecomposeSection_via_FunctionCalls_and_Section___.call(
           @call_a, @section, & @_emit )
       end
 
@@ -150,7 +150,7 @@ module Skylab::Cull
 
         if @call_a && @call_a.length.nonzero?
 
-          Me__::Actors__::To_stream[ st, @call_a, & @_emit ]
+          Me__::EntityStream_via_EntityStream_and_FunctionCalls___[ st, @call_a, & @_emit ]
         else
           st
         end

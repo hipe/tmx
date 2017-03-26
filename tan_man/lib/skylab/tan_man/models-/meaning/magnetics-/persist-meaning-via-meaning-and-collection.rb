@@ -2,8 +2,8 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-      class Actors__::Persist
-
+    class Magnetics_::PersistMeaning_via_Meaning_and_Collection
+      # -
         Actor_.call( self,
           :session,
           :change_is_OK,
@@ -180,7 +180,7 @@ module Skylab::TanMan
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/
         TRAILING_WHITESPACE_RX__ = /[ \t]+\z/
-      end
-
+      # -
+    end
   end
 end

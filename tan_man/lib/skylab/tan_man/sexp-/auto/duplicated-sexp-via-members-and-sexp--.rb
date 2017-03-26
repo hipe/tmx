@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Sexp_::Auto
 
-    class Actors__::Duplicate
+    class DuplicatedSexp_via_Members_and_Sexp__
 
       # synopsis:
       #
@@ -48,9 +48,9 @@ module Skylab::TanMan
 
       class << self
 
-        def [] new, sexp, k_a, except_a
+        def [] new, except_a, k_a, sexp
 
-          # in cases where there is no exemption list, we don't bother
+          # in cases where there is no exception list, we don't bother
           # creating an actor, we just do it here
 
           if except_a && except_a.length.nonzero?
@@ -123,6 +123,9 @@ module Skylab::TanMan
           x
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

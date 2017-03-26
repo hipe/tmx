@@ -8,10 +8,10 @@ module Skylab::Snag
 
         # this adapter decides that a node has "extended content" if there
         # is a filesystem entry whose name corresponds to the node's
-        # identifier based on a simple isomorphicism: if within a particular
+        # identifier based on a simple isomorphism: if within a particular
         # directory there is an entry who has integers in the head of its
         # name, that entry will be seen as corresponding to any node whose
-        # identifier has that integer. this isomorphicism should be
+        # identifier has that integer. this isomorphism should be
         # insensitive to any leading zeros in the integer-strings on either
         # side of the comparison.
 

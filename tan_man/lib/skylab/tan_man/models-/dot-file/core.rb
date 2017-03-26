@@ -47,21 +47,21 @@ module Skylab::TanMan
 
       def precondition_for action, id, box, & oes_p
 
-        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new
+        o = Here_::Magnetics_::DocumentController_via_Kernel.new
         o.receive_document_action action
         o.produce_document_controller
       end
 
       def document_controller_via_byte_upstream_reference id, & oes_p
 
-        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
+        o = Here_::Magnetics_::DocumentController_via_Kernel.new @kernel, & oes_p
         o.receive_byte_upstream_reference id
         o.produce_document_controller
       end
 
       def document_controller_via_qualified_knownness_box bx, & oes_p
 
-        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
+        o = Here_::Magnetics_::DocumentController_via_Kernel.new @kernel, & oes_p
         o.receive_qualified_knownness_box bx
         o.produce_document_controller
       end

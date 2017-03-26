@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick
 
-    class Session___
+    class ClientForMagnetics___
 
       # (a stand-in for [#ta-005] the dream of magnetics..)
 
@@ -24,7 +24,7 @@ module Skylab::MyTerm
       # -- resolving the image
 
       def resolve_image_
-        _init_if_necessary :@image_, Here_::Magnetics_::Image_via_Appearance
+        _touch :@image_, Here_::Magnetics_::Image_via_Appearance
       end
 
       attr_reader :image_
@@ -32,12 +32,12 @@ module Skylab::MyTerm
       # -- resolving the IM command
 
       def resolve_IM_command_
-        _init_if_necessary :@IM_command_, Here_::Magnetics_::Command_via_Appearance
+        _touch :@IM_command_, Here_::Magnetics_::Command_via_Appearance
       end
 
       # --
 
-      def _init_if_necessary ivar, p_ish
+      def _touch ivar, p_ish
 
         if instance_variable_defined? ivar
           instance_variable_get( ivar ) ? ACHIEVED_ : UNABLE_
@@ -59,4 +59,3 @@ module Skylab::MyTerm
     end
   end
 end
-# #pending rename: rename this "magnetics session.."

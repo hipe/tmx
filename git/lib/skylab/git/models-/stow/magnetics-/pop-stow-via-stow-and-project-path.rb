@@ -2,17 +2,14 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Sessions_::Pop
+    class Magnetics_::PopStow_via_Stow_and_ProjectPath < Common_::MagneticBySimpleModel  # 1x
 
       attr_accessor(
         :expressive_stow,
         :filesystem,
+        :listener,
         :project_path,
       )
-
-      def initialize & x_p
-        @on_event_selectively = x_p
-      end
 
       def execute
 
@@ -30,10 +27,11 @@ module Skylab::Git
           redo
         end while nil
 
-        uow.execute(
-          @filesystem,
-          & @on_event_selectively )
+        uow.execute @filesystem, & @listener
       end
+
+      # ==
+      # ==
     end
   end
 end

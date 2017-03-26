@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Graph
 
-    class Actors__::Touch  # ~:+[#049] algo family
+    class WriteGraph_to_Bytestore_via_Graph_and_Workspace___  # ~#[#049] algo family
 
       Actor_.call( self,
         :is_dry_run,

@@ -80,7 +80,7 @@ module Skylab::CodeMetrics
         @__path_tailer = Home_::Models_::Path::Path_tailerer[ head_path ]
 
         @_PathScanner = Home_::Mondrian_[]::PathScanner
-        @_Tree = Home_.lib_.basic::Tree.mutable_node::Frugal
+        @_Tree = Home_.lib_.basic::Tree::Mutable::Frugal
 
         @__listener = p
 

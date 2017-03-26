@@ -2,11 +2,11 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    module Actors__
+    module Magnetics_
 
-      Edit = ::Module.new
+      NormalizedKnownness_via_QualifiedKnownness = ::Module.new
 
-      class Edit::Normalize_name
+      class NormalizedKnownness_via_QualifiedKnownness::Name
 
         Actor_.call( self,
           :qualified_knownness,
@@ -35,7 +35,9 @@ module Skylab::TanMan
         VALID_NAME_RX__ = /\A[a-z][-a-z0-9]*\z/
       end
 
-      class Edit::Normalize_value
+      # ==
+
+      class NormalizedKnownness_via_QualifiedKnownness::Value
 
         Actor_.call( self,
           :qualified_knownness,
@@ -79,6 +81,9 @@ module Skylab::TanMan
           end
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

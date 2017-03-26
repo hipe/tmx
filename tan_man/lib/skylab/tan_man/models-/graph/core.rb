@@ -50,7 +50,7 @@ module Skylab::TanMan
 
     def intrinsic_persist_before_persist_in_collection bx, & oes_p
 
-      Here_::Actors__::Touch.call(
+      Here_::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call(
         bx[ :dry_run ],
         self,
         bx.fetch( :template_values_provider_ ),

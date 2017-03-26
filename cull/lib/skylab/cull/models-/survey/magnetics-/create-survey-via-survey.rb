@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actors__::Create
+    class Magnetics_::CreateSurvey_via_Survey
 
       ATTRIBUTES = Attributes_.call(
         survey: nil,  # order - this one first :(

@@ -2,13 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    Autoloader_[ Sessions = ::Module.new ]
-
-    class Sessions::Parse
-
-      def initialize & oes_p
-        @on_event_selectively = oes_p
-      end
+    class Parse_via_ByteUpstreamReference_and_ParserClass < Common_::MagneticBySimpleModel
 
       def accept_upstream_path path
 
@@ -24,6 +18,18 @@ module Skylab::TanMan
       def accept_parser_class cls
         cls or self._SANITY
         @_parser_class = cls ; nil
+      end
+
+      attr_writer(
+        :listener,
+      )
+
+      def execute_using m
+        @__execute_using = m
+      end
+
+      def execute
+        send remove_instance_variable :@__execute_using
       end
 
       def flush_to_parse_tree
@@ -72,7 +78,7 @@ module Skylab::TanMan
 
           ev = Common_::Event.wrap.exception e, :path_hack
 
-          @on_event_selectively.call :error, ev.terminal_channel_symbol do
+          @listener.call :error, ev.terminal_channel_symbol do
             ev
           end
           UNABLE_

@@ -9,10 +9,10 @@ implement two different functions (that correspond to its two public
 instance methods).
 
 we almost created a new category for this sort of thing called
-"perforomer" and then "device" - we wanted something distinct from
+"performer" and then "device" - we wanted something distinct from
 "actor" because this violates that categorization in that to use this
 node, apriori knowledge of its interface required of it (something we
-like to avoid generally)
+like to avoid generally).
 
 "model" is not a good fit either, perhaps because an "unmarshal" is not
 long-running, or perhaps because it has no data of its own, but rather
@@ -69,6 +69,7 @@ values (which, after all, are not entites so that brings you into an
 area of your own experimentation).
 
 
+
 ### mutator
 
 a mutator is sorta like a map function but instead of resulting in a new
@@ -79,6 +80,7 @@ programming purists will prefer thinking in terms of `map` instead of
 map function by putting the the mutate function behind a correctly
 implemented `dup` method for the entity so we aren't too hung up about
 this yet.
+
 
 
 ### aggregator
@@ -103,6 +105,7 @@ from the upstream; that is it will keep pulling until the end of the
 stream. once that point is reached (and hopefully it is); it will do
 some sort of summary calculations. then it will deliver its results (in
 some structure) as if it is an entity stream.
+
 
 
 ## discussion
@@ -152,4 +155,4 @@ it might be nothing but map-ishes, you don't know.
 since the "normal algorithm" described above is one we are comfortable
 with, to implement the "N-number of arbitrary functions" algorthm, we
 group this chain of functions into structures we call "jogs", each of
-which is implemnted with the normal algortihm. let's see how that goes..
+which is implemented with the normal algortihm. let's see how that goes..

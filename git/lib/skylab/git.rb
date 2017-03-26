@@ -63,6 +63,10 @@ module Skylab::Git
     end
   end  # >>
 
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x then instance_variable_set ivar, x ; true else x end
+  end
+
   module Models_
 
     module Branches

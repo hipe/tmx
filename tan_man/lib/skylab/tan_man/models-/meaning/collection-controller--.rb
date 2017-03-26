@@ -23,7 +23,7 @@ module Skylab::TanMan
           bx[ :force ]
         end
 
-        _ok = Here_::Actors__::Persist.call(
+        _ok = Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call(
           _build_session,
           _has_force,
           ent,
@@ -46,7 +46,7 @@ module Skylab::TanMan
       # ~ custom business-specific
 
       def apply_meaning_to_node meaning, node
-        Models_::Meaning::Actors_::Apply.call(
+        Models_::Meaning::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call(
           meaning,
           node,
           _build_session.to_stream_of_meanings_with_mutable_string_metadata,

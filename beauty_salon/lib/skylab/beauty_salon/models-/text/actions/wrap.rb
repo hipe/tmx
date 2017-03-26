@@ -69,7 +69,7 @@ module Skylab::BeautySalon
         :default, 80,
         :ad_hoc_normalizer, -> qkn, & oes_p do
 
-          # ( was :+[#ba-027], used to have what is now [#br.024.C] shape )
+          # ( was #[#fi-004.5], used to have what is now [#br.024.C] shape )
 
           if qkn.is_known_known
             Home_.lib_.basic::Number::Normalization.via(
@@ -128,7 +128,7 @@ module Skylab::BeautySalon
           "     + "
         end
 
-        @line_buffer = Text_::Sessions_::Wrapping_Buffer.new(
+        @line_buffer = Text_::WrappedLines_via_Lines_and_Width___.new(
           h.fetch( :num_chars_wide ),
           -> line do
             @downstream << "#{ __HEADER }#{ line }"

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class << self
 
-      def normalize_qualified_knownness qkn, & oes_p  # :+[#ba-027]
+      def normalize_qualified_knownness qkn, & oes_p  # #[#fi-004.5]
 
         if qkn.is_known_known
 

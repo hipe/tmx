@@ -2,12 +2,14 @@ module Skylab::TanMan
 
   class Models_::Node  # in [#084]
 
-      class Actors__::Mutate
+    module Magnetics
 
+      class CommonThing__
         include Common_::Event::ReceiveAndSendMethods
+      end
 
-        class Touch < self
-
+      class Create_or_Retrieve_or_Touch_via_NodeName_and_Collection < CommonThing__  # 1x
+        # -
           Attributes_actor_.call( self,
             :name,
             :verb,  # 'create' | 'retrieve' | 'touch'
@@ -31,10 +33,11 @@ module Skylab::TanMan
           def resolve_new_node_id_
             resolve_new_node_id_programmatically
           end
-        end
+        # -
+      end
 
-        class Via_entity < self
-
+      class Create_or_Touch_or_Delete_via_Node_and_Collection < CommonThing__  # 2x
+        # -
           Attributes_actor_.call( self,
             :verb,
             :entity,
@@ -72,7 +75,12 @@ module Skylab::TanMan
               resolve_new_node_id_programmatically
             end
           end
-        end
+        # -
+      end
+
+      # ==
+
+      class CommonThing__  # (re-open)
 
         def execute
           init_ivars
@@ -523,5 +531,8 @@ module Skylab::TanMan
         POSITIVE_NOTHINGNESS_ = true
       end
 
+      # ==
+      # ==
+    end
   end
 end

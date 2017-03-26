@@ -244,7 +244,7 @@ module Skylab::TanMan
                    :to_node_ID, h.fetch( :to_node_ID )
         end
 
-        _ok = Here_::Actors__::Mutate.call_via_iambic x_a, & _oes_p_
+        _ok = Here_::TouchOrDeleteAssociation_via_FromNode_and_ToNode__.call_via_iambic x_a, & _oes_p_
         _ok and Info___[ did_mutate ]
       end
 
@@ -254,7 +254,7 @@ module Skylab::TanMan
 
         bx = action.argument_box
 
-        _ok = Here_::Actors__::Mutate.via(
+        _ok = Here_::TouchOrDeleteAssociation_via_FromNode_and_ToNode__.via(
           :verb, :delete,
           :from_node_label, bx.fetch( :from_node_label ),
           :to_node_label, bx.fetch( :to_node_label ),

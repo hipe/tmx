@@ -31,7 +31,7 @@ send a message requesting the value of the property, just as one
 does not simply walk in and out of mordor.
 
 Never ever do we result in an invalid value, but as such never ever can
-we deterministicly expect that a method call will always result in
+we deterministically expect that a method call will always result in
 a valid value. Each accessor method ("") must be able to follow one of
 two paths, one when valid and one when not.
 

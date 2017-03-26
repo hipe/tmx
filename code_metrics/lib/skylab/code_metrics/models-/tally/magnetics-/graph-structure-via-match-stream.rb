@@ -63,7 +63,7 @@ module Skylab::CodeMetrics
         leaf_bucket_box = Common_::Box.new
         leaf_bucket_keys = leaf_bucket_box.a_
 
-        t = Home_.lib_.basic::Tree.mutable_node.new
+        t = Home_.lib_.basic::Tree::Mutable.new
 
         touch_leaf_bucket_for_path = -> path do
 

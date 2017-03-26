@@ -63,11 +63,8 @@ module Skylab::Cull
 
     def _process_edit sh
 
-      x = Here_::Actors__::Produce_adapter[ sh.bx, & @on_event_selectively ]
-      x and begin
-        @_adapter = x
-        self
-      end
+      _ = Here_::Adapter_via_ActionArguments___[ sh.bx, & @on_event_selectively ]
+      _store :@_adapter, _ and self
     end
 
   public
@@ -94,6 +91,10 @@ module Skylab::Cull
 
     def event_for_fell_short_of_count needed_number, had_number
       @_adapter.event_for_fell_short_of_count needed_number, had_number
+    end
+
+    def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      if x then instance_variable_set ivar, x ; else x end
     end
 
     # ==

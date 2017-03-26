@@ -122,7 +122,7 @@ avoid having our implementation methods bump into our business action methods.
 
 ## the rearchitecting of [#037], illustrated
 
-We like exploiting the isomorphicism of public methods as business actions
+We like exploiting the isomorphism of public methods as business actions
 (it is not only an elegant and cute-sy hack, but it mirrors the deeper spirit
 of the whole project); yet in practice the design can feel kludgy and does
 not scale: a class with a restricted public method namespace makes objects

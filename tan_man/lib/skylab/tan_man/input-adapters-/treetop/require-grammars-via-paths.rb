@@ -2,7 +2,9 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Sessions::Require  # see [#008]
+    class RequireGrammars_via_Paths < Common_::MagneticBySimpleModel
+
+      #   - sparse notes in [#008]
 
       Attributes_ = -> h do
         Fields_lib_[]::Attributes[ h ]
@@ -25,11 +27,11 @@ module Skylab::TanMan
 
       attr_writer( * attrs.symbols( :_write ) )
 
-      ATTRIBUTES = attrs
+      attr_writer(
+        :listener,
+      )
 
-      def initialize & oes_p
-        @on_event_selectively = oes_p
-      end
+      ATTRIBUTES = attrs
 
       LOADED__ = Common_::Box.new
 
@@ -78,10 +80,10 @@ module Skylab::TanMan
 
         _avr = self.class::ATTRIBUTES.ASSOCIATION_VALUE_READER_FOR self
 
-        _uow_a = Here_::Actors_::Build_units_of_work.call(
+        _uow_a = Input_Adapters_::Treetop::Magnetics_::GrammarArray_via_Entity.call(
           _avr,
           @_filesystem,
-          & @on_event_selectively )
+          & @listener )
 
         _store :@_units_of_work, _uow_a
       end
@@ -109,13 +111,13 @@ module Skylab::TanMan
         if a
 
           if will_create
-            @on_event_selectively.call :info, :creating do
+            @listener.call :info, :creating do
               __build_creating_event a.reject( & :output_path_did_exist )
             end
           end
 
           if will_overwrite
-            @on_event_selectively.call :info, :overwriting do
+            @listener.call :info, :overwriting do
               __build_overwriting_event a.select( & :output_path_did_exist )
             end
           end
@@ -170,7 +172,7 @@ module Skylab::TanMan
         mkdir_p = uow.make_this_directory_minus_p
         if mkdir_p
           ::Home._COVER_ME
-          @_filesystem.mkdir_p mkdir_p, & @on_event_selectively
+          @_filesystem.mkdir_p mkdir_p, & @listener
         else
           ACHIEVED_
         end
@@ -247,5 +249,6 @@ module Skylab::TanMan
     end
   end
 end
+# #history-B: became magnetic
 # :#tombstone: crazy formal parameter class with directory / f.s "smarts" and..
 #              silly detailed error messages from requiring treetop parsers

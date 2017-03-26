@@ -2,19 +2,16 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Sessions_::Save
+    class Magnetics_::WriteStow_via_StowName_and_StowsCollection_and_VersionedDirectory < Common_::MagneticBySimpleModel  # 1x
 
       attr_accessor(
         :filesystem,
+        :listener,
         :stow_name,
         :stows_collection,
         :system_conduit,
         :versioned_directory,
       )
-
-      def initialize & oes_p
-        @on_event_selectively = oes_p
-      end
 
       def execute
 
@@ -24,16 +21,11 @@ module Skylab::Git
 
       def __resolve_valid_name
 
-        id = @stows_collection.produce_available_identifier(
+        _ = @stows_collection.produce_available_identifier(
           @stow_name,
-          & @on_event_selectively )
+          & @listener )
 
-        if id
-          @_stow_ID = id
-          ACHIEVED_
-        else
-          id
-        end
+        _store :@_stow_ID, _
       end
 
       def __money
@@ -54,8 +46,13 @@ module Skylab::Git
         uow.execute(
           :do_not_prune,
           @filesystem,
-          & @on_event_selectively )
+          & @listener )
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # ==
+      # ==
     end
   end
 end

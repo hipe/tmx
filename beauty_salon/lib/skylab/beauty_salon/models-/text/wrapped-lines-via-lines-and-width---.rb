@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  Models_::Text::Sessions_::Wrapping_Buffer =
+  Models_::Text::WrappedLines_via_Lines_and_Width___ =
 
       Common_::Session::Ivars_with_Procs_as_Methods.new :flush do
 

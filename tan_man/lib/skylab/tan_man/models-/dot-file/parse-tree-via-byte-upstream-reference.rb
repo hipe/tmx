@@ -35,14 +35,17 @@ module Skylab::TanMan
 
       def execute
 
-        o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new(
-          & @listener )
+        x = Home_::Input_Adapters_::Treetop::Parse_via_ByteUpstreamReference_and_ParserClass.call_by do |o|
 
-        o.receive_byte_upstream_reference @byte_upstream_reference
+          o.receive_byte_upstream_reference @byte_upstream_reference
 
-        o.accept_parser_class produce_parser_class_
+          o.accept_parser_class produce_parser_class_
 
-        x = o.flush_to_parse_tree
+          o.execute_using :flush_to_parse_tree
+
+          o.listener = @listener
+        end
+
         if x
           x
         else
@@ -62,9 +65,7 @@ module Skylab::TanMan
 
       def __require_parser_class
 
-        o = Home_::Input_Adapters_::Treetop::Sessions::Require.new(
-
-        ) do | * i_a, & ev_p |
+        _listener = -> * i_a, & ev_p do
 
           if :error == i_a.first
             raise ev_p[].to_exception
@@ -73,19 +74,21 @@ module Skylab::TanMan
           end
         end
 
-        # o.force_overwrite!  # re-writes generated parser files - use only when syntax changes
+        Home_::Input_Adapters_::Treetop::RequireGrammars_via_Paths.call_by do |o|
 
-        _path = Models_::DotFile.dir_path
+          _path = Models_::DotFile.dir_path
 
-        o.input_path_head_for_relative_paths = _path
+          o.input_path_head_for_relative_paths = _path
 
-        o.output_path_head_for_relative_paths = @generated_grammar_dir_path
+          o.output_path_head_for_relative_paths = @generated_grammar_dir_path
 
-        o.add_treetop_grammar 'dot-language-hand-made.treetop'
+          o.add_treetop_grammar 'dot-language-hand-made.treetop'
 
-        o.add_treetop_grammar 'dot-language.generated.treetop'
+          o.add_treetop_grammar 'dot-language.generated.treetop'
 
-        o.execute
+          # o.force_overwrite!  # re-writes generated parser files - use only when syntax changes
+          o.listener = _listener
+        end
       end
 
       def build_parse_failure_event  # #hook-out for [ttt]

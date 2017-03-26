@@ -23,7 +23,7 @@ module Skylab::Snag
 
         @pattern_s_a.each_with_index do | s, d |
 
-          rx_s = Rx_Lib__.string_via_grep_string s, & @on_event_selectively
+          rx_s = Rx_Lib__::PlatformRegexpString_via_GrepRegexpString[ s, & @on_event_selectively ]
           if rx_s
             rx_s_a[ d ] = rx_s
           else

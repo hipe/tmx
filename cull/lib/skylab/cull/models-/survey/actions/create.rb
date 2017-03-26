@@ -60,13 +60,12 @@ module Skylab::Cull
 
       def ___via_survey
 
-        ok = Here_::Actors__::Create[ @_survey, @bx, & @on_event_selectively ]
+        ok = Here_::Magnetics_::CreateSurvey_via_Survey[ @_survey, @bx, & @on_event_selectively ]
         if ok
 
           Common_::Emission.of :info, :created_survey do
             @_survey.to_event
           end
-
         else
           ok
         end

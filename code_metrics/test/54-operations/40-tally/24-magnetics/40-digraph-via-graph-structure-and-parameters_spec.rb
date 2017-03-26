@@ -104,7 +104,7 @@ module Skylab::CodeMetrics::TestSupport
 
       _LB = _other_module::Leaf_Bucket___
 
-      t = Home_.lib_.basic::Tree.mutable_node.new
+      t = Home_.lib_.basic::Tree::Mutable.new
 
       o = -> path, x do
 

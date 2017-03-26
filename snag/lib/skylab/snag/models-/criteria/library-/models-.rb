@@ -139,7 +139,7 @@ module Skylab::Snag
 
           def to_tree_
 
-            me = LIB_.basic::Tree.mutable_node.new symbol
+            me = LIB_.basic::Tree::Mutable.new symbol
 
             h = {}
             counter = -> k do

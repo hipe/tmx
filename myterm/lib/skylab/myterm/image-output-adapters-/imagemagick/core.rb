@@ -74,7 +74,7 @@ module Skylab::MyTerm
     end
 
     def _begin_IM_session & oes_p
-      Here_::Session___.begin_hot_session__ self, & oes_p
+      Here_::ClientForMagnetics___.begin_hot_session__ self, & oes_p
     end
 
     # -- Components

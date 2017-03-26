@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actors__::Edit_associated_entities
+    class Magnetics_::EditEntities_via_Request_and_Survey
 
       Attributes_actor_ = -> cls, * a do
         Home_.lib_.fields::Attributes::Actor.via cls, a

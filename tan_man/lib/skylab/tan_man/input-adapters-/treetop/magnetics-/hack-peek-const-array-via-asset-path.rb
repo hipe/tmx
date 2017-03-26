@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
     # <-
-  class Actors_::Hack_peek_module_name < Common_::Dyadic  # READ [#011]
+  class Magnetics_::HackPeekConstArray_via_AssetPath < Common_::Dyadic  # READ [#011]
 
     def initialize path, fs
       @filesystem = fs

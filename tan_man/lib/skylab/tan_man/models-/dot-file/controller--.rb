@@ -26,7 +26,7 @@ module Skylab::TanMan
 
       def persist_into_byte_downstream_reference id, * x_a, & oes_p  # [ :is_try, true ]
 
-        Here_::Small_Time_::Actors::Persist.new(
+        Here_::Magnetics_::PersistDotFile_via_ByteDownstreamReference_and_GraphSexp.new(
           id, @graph_sexp, x_a, & oes_p ).execute
       end
 

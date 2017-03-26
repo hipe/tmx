@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::Persist_calls < Common_::Dyadic  # 1x
+      class RecomposeSection_via_FunctionCalls_and_Section___ < Common_::Dyadic  # 1x
 
         # [#005] algorithm decribed in full
 
@@ -193,6 +193,9 @@ module Skylab::Cull
         end
 
         NAME__ = Common_::Name.via_variegated_symbol :function
+
+        # ==
+        # ==
       end
     end
   end

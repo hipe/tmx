@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Upstream
 
-    class Actors__::Produce_adapter
+    class Adapter_via_ActionArguments___
 
       ATTRIBUTES = Attributes_.call(
         derelativizer: nil,
@@ -12,9 +12,8 @@ module Skylab::Cull
       )
 
       class << self
-        define_method :_call, VALUE_BOX_EXPLODER_CALL_METHOD_
-        alias_method :[], :_call
-        alias_method :call, :_call
+        define_method :call, VALUE_BOX_EXPLODER_CALL_METHOD_
+        alias_method :[], :call
         alias_method :begin_session__, :new
         undef_method :new
       end  # >>

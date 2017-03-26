@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Actors_::Apply
+    class Magnetics_::ApplyMeaning_via_Node_and_Meaning
 
       Attributes_actor_.call( self,
         :meaning,

@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::To_stream < Common_::Dyadic
+      class EntityStream_via_EntityStream_and_FunctionCalls___ < Common_::Dyadic
 
         # narrative in [#006]:#note-007
 
@@ -145,6 +145,9 @@ module Skylab::Cull
         def estream_via_agg_and_estream agg, estream
           agg[ estream, & @_emit ]
         end
+
+        # ==
+        # ==
       end
     end
   end

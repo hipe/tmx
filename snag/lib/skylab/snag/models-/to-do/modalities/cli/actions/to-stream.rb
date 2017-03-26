@@ -160,7 +160,7 @@ module Skylab::Snag
 
       def execute
 
-        @tree = Home_.lib_.basic::Tree.mutable_node.new
+        @tree = Home_.lib_.basic::Tree::Mutable.new
         populate_tree
         prune_tree
         resolve_line_stream

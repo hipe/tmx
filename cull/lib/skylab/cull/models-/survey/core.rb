@@ -131,7 +131,7 @@ module Skylab::Cull
         self
       else
 
-        _ok = Here_::Actors__::Edit_associated_entities.call(
+        _ok = Here_::Magnetics_::EditEntities_via_Request_and_Survey.call(
           arg_a, bx, self, & @on_event_selectively )
 
         _ok and self

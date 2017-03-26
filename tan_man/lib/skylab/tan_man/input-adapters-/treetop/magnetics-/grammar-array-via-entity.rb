@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Actors_::Build_units_of_work < Common_::Dyadic
+    class Magnetics_::GrammarArray_via_Entity < Common_::Dyadic  # 1x
 
       # build the array of units of work, necessarily in one batch so we
       # memoize the existential state of the various dirs involved, only
@@ -25,7 +25,7 @@ module Skylab::TanMan
 
         @_gx_qkn = @association_value_reader.association_reader_via_symbol :add_treetop_grammar  # a "list" b.p
 
-        @_gx_qkn.value_x.each_with_index do | grammar_path, d |
+        @_gx_qkn.value_x.each_with_index do |grammar_path, d|
 
           @_grammar_path = grammar_path
           @_item_index = d
@@ -43,7 +43,7 @@ module Skylab::TanMan
 
       def __build_grammar
 
-        @_uow = Models_::Grammar_to_Load.new
+        @_uow = Grammar_to_Load___.new
 
         if FILE_SEPARATOR_ == @_grammar_path[ 0 ]  # ..
           __when_grammar_path_is_absolute
@@ -151,7 +151,7 @@ module Skylab::TanMan
 
         uow = @_uow
 
-        i_a = Actors_::Hack_peek_module_name.call(
+        i_a = Magnetics_::HackPeekConstArray_via_AssetPath.call(
           uow.input_path,
           @filesystem,
           & @on_event_selectively )

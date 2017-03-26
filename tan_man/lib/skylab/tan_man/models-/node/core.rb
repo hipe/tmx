@@ -13,7 +13,7 @@ module Skylab::TanMan
 
       :required,
       :ad_hoc_normalizer, -> arg, & oes_p do
-        Here_::Controller__::Normalize_name[ self, arg, & oes_p ]
+        Here_::Controller__::NormalKnownness_via_QualifiedKnownness_of_Name[ arg, self, & oes_p ]
       end,
       :property, :name )
 
@@ -218,7 +218,7 @@ module Skylab::TanMan
         byte_downstream_ID = action.document_entity_byte_downstream_reference
         bx = action.argument_box
 
-        _ok = Here_::Actors__::Mutate::Via_entity.call(
+        _ok = Here_::Magnetics__::Create_or_Touch_or_Delete_via_Node_and_Collection.call(
           :delete,
           ent,
           document_,
@@ -229,7 +229,7 @@ module Skylab::TanMan
 
       def _mutate_via_verb_and_entity verb_i, entity, & oes_p
 
-        Here_::Actors__::Mutate::Via_entity.call(
+        Here_::Magnetics__::Create_or_Touch_or_Delete_via_Node_and_Collection.call(
           verb_i,
           entity,
           document_,

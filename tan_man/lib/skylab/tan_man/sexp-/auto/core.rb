@@ -228,8 +228,8 @@ module Skylab::TanMan
 
     def duplicate_except_ * except
 
-      Auto_::Actors__::Duplicate[ self.class.new, self, members, except ]
-
+      Auto_::DuplicatedSexp_via_Members_and_Sexp__.call(
+        self.class.new, except, members, self )
     end
   end
 
@@ -240,8 +240,11 @@ module Skylab::TanMan
     def duplicate_except_
 
       d = length
-      Auto_::Actors__::Duplicate[ self.class.new( d ), self, d.times.to_a ]
 
+      self._NEVER_CALLED__lost_contact_this_refactor__  # before #history-A
+
+      Auto_::DuplicatedSexp_via_Members_and_Sexp__.call(
+        self.class.new(d), :xxxx, d.times.to_a, self )
     end
 
     def is_list_
@@ -748,3 +751,4 @@ module Skylab::TanMan
   end
   end
 end
+# #history-A (can be temporary) as referenced

@@ -66,7 +66,7 @@ module Skylab::Treemap::TestSupport
       def __build_line_stream_via_node_for_debugging node
 
         _Tree = Home_.lib_.basic::Tree
-        _ = _Tree::Expression_Adapters__::Text::Actors::Build_classified_stream
+        _ = _Tree::Magnetics::ClassifiedStream_via_Tree_for_Text
 
         _st = _[ node ]
 

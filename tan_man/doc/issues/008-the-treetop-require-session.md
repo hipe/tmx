@@ -22,14 +22,15 @@ otherwise we attempt to load the grammar, with all the fireworks that
 entails.
 
 
+
 ### even more detail
 
 in "production" we expect that this whole issue is not as much of an
-issue as in testing. in testing we call "Require" once for each test, in
+issue as in testing. in testing we call subject once for each test, in
 order to produce a parser for the relevant grammar (there are several).
 
 in production we cache the parser class itself away somewhere reasonable
-(EDIT - confirm this) so when we call "Require" it is when a load is
+(EDIT - confirm this) so when we call subject  it is when a load is
 actuall necessary (i.e only the first time).
 
 

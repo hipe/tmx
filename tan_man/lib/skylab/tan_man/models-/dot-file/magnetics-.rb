@@ -2,13 +2,9 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    Small_Time_ = ::Module.new
+    Magnetics_ = ::Module.new
 
-    Small_Time_::Actors = ::Module.new
-
-    Small_Time_::Sessions = ::Module.new
-
-    class Small_Time_::Actors::Persist
+    class Magnetics_::PersistDotFile_via_ByteDownstreamReference_and_GraphSexp
 
       Attributes_actor_.call( self,
         is_dry: nil,
@@ -74,7 +70,9 @@ module Skylab::TanMan
       end
     end
 
-    class Small_Time_::Sessions::Build_Document_Controller
+    # ==
+
+    class Magnetics_::DocumentController_via_Kernel
 
       def initialize kr=nil, & oes_p
         @kernel = kr
@@ -137,5 +135,8 @@ module Skylab::TanMan
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
+
+    # ==
+    # ==
   end
 end

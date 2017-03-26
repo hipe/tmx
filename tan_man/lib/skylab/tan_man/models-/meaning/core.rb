@@ -11,15 +11,16 @@ module Skylab::TanMan
 
       :required,
       :ad_hoc_normalizer, -> qkn, & oes_p do
-        Here_::Actors__::Edit::Normalize_name[ qkn, & oes_p ]
+        Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness::Name[ qkn, & oes_p ]
       end,
       :property, :name,
 
       :required,
       :ad_hoc_normalizer, -> qkn, & oes_p do
-        Here_::Actors__::Edit::Normalize_value[ qkn, & oes_p ]
+        Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness::Value[ qkn, & oes_p ]
       end,
-      :property, :value )
+      :property, :value,
+    )
 
     Actions__ = make_action_making_actions_module
 

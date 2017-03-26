@@ -21,7 +21,7 @@ rules. (we will differentiate explicitly between treetop rules and flex
 rules.)
 
 the brazen theory this utility puts to the test is this: to what extent
-can we construct an isomorphicism between treetop rules and (variously)
+can we construct an isomorphism between treetop rules and (variously)
 the definitions and rules of flex? the extent to which we can do this is
 the extent to which we can translate a flex specification into a treetop
 specification.

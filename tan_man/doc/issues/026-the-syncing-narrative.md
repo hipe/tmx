@@ -4,7 +4,7 @@ as an exercise we want to know what it "feels like" to process an
 incoming graph as a stream and not tree: certainly there are "large"
 graphs in the world that we might want to process; we've seen them,
 and for such "huge" datasets, needing to read the whole dataset in
-as one big tree will certainly be a deal breaker for the significanly
+as one big tree will certainly be a deal breaker for the significantly
 large dataset, whereas stream-based processing could hypothetically
 scale "infinitely".
 

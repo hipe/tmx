@@ -41,8 +41,8 @@ module Skylab::Snag
 
           _Tree = Home_.lib_.basic::Tree
 
-          _Big_Tree = _Tree.mutable_node
-          _Frugal_Tree = _Tree.frugal_node
+          _Big_Tree = _Tree::Mutable
+          _Frugal_Tree = _Tree::Mutable::Frugal
 
           # in hindsight using "frugal tree" here may have no gain: these
           # nodes are always branches, never leaves; nonetheless we leave
