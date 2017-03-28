@@ -214,7 +214,7 @@ module Skylab::System
           # NASTY - until we work this out - #open [#022]
 
           @filesystem.unlink path_
-          produce_result_via_open_IO_ Home_::IO.dry_stub_instance
+          produce_result_via_open_IO_ Home_::IO::DRY_STUB
         else
           produce_result_via_open_IO_ @open_IO_
         end
@@ -229,7 +229,7 @@ module Skylab::System
         if @_is_dry_run
 
           @open_IO_.close
-          produce_result_via_open_IO_ Home_::IO.dry_stub_instance
+          produce_result_via_open_IO_ Home_::IO::DRY_STUB
 
         else
 

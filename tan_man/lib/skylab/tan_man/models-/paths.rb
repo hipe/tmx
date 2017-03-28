@@ -28,7 +28,7 @@ module Skylab::TanMan
     # takes to expose an attributes actor as a microservice action.
     #
     # now, this node stands as an experimental sandbox that does whatever
-    # it takes to pass the existing tess (for this UI node) implementing
+    # it takes to pass the existing tests (for this UI node) implementing
     # this action as an attributes actor..
 
     # -
@@ -102,7 +102,7 @@ module Skylab::TanMan
         NIL
       end
 
-      def _build_common_event sym, * i_a, rx
+      def _build_common_event sym, * sym_a, rx
 
         _i_a_ = self.class.public_instance_methods( false ).reduce [] do | m, i |
           md = rx.match i
@@ -114,8 +114,8 @@ module Skylab::TanMan
 
         Common_::Event.inline_not_OK_with(
           sym,
-          * i_a,
-          :term, i_a.first,  # eew
+          * sym_a,
+          :term, sym_a.first,  # eew
           :did_you_mean, _i_a_,
         ) do |y, o|
 
@@ -157,19 +157,19 @@ module Skylab::TanMan
           :max_mkdirs, 2,   # you can make __tmx__ and you can make this path
           :filesystem, Home_.lib_.system.filesystem,
 
-        ) do | * i_a, & ev_p |
+        ) do | * sym_a, & ev_p |
 
           p = _listener
           if p
 
-            p.call( * i_a ) do
+            p.call( * sym_a ) do
               _ev = ev_p[]
               _ev.with_message_string_mapper MSG_MAP__
             end
 
             UNABLE_  # info events won't ride all the way out only errors
 
-          elsif :info == i_a.first
+          elsif :info == sym_a.first
             # nothing, for now
            else
             raise ev_p[].to_exception

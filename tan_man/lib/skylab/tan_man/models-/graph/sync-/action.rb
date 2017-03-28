@@ -32,7 +32,9 @@ module Skylab::TanMan
 
           # our rules are pretty weird, so we do it manually
 
-          o = DocEnt_::Byte_Stream_Identifier_Resolver.new( @kernel, & handle_event_selectively )
+          ::Kernel._THIS_CHANGED__but_it_can_be_easy__
+          o = Home_::DocumentMagnetics_::ByteStreamReference_via_Request
+          o = DocEnt_::ByteStreamIdentifier_via.new( @kernel, & handle_event_selectively )
 
           o.formals formal_properties
 

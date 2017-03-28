@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Input_Adapters_::Treetop
+  module InputAdapters_::Treetop
     # <-
   class Magnetics_::HackPeekConstArray_via_AssetPath < Common_::Dyadic  # READ [#011]
 

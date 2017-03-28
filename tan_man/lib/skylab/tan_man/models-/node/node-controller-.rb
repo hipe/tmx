@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Node
 
-    class Controller__
+    class NodeController_
 
       # this is an experimental overflow spot for auxiliary
       # operations we don't want in the main model node.

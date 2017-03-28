@@ -2,7 +2,7 @@ module Skylab::System
 
   module IO
 
-  Select__ = Common_::Session::Ivars_with_Procs_as_Methods.new :select do
+  Select = Common_::Session::Ivars_with_Procs_as_Methods.new :select do
 
     # Select - a chunking, multstream `select` wrapper
     #

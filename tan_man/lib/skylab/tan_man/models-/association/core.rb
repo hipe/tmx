@@ -194,7 +194,7 @@ module Skylab::TanMan
 
         x = bx[ :attrs ]
         if x
-          any_attrs_x = x  # :+[#007] should be a hash from internal call..
+          any_attrs_x = x  # #[#007.B] should be a hash from internal call..
             # (the front client would have to write a custom normalizer)
         end
 
@@ -217,12 +217,12 @@ module Skylab::TanMan
 
         did_mutate = nil
 
-        _oes_p_ = -> * i_a, & ev_p do
+        _oes_p_ = -> * sym_a, & ev_p do
           ev = ev_p[]
           if ev.ok
             did_mutate = ev.did_mutate_document
           end
-          oes_p.call( * i_a ) do
+          oes_p.call( * sym_a ) do
             ev
           end
         end

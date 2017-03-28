@@ -96,9 +96,9 @@ module Skylab::TanMan::TestSupport
           touch_node_via_label str
         end
 
-        def expect * i_a
+        def expect * sym_a
           _i_a = node_sexp_stream.map_by( & :node_id ).to_a
-          _i_a == i_a || fail
+          _i_a == sym_a || fail
         end
       end
 

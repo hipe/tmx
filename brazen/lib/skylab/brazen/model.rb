@@ -18,7 +18,7 @@ module Skylab::Brazen
       end
 
       def make_common_properties & edit_p
-        Home_::Nodesque::Common_Properties.new entity_enhancement_module, & edit_p
+        Home_::CommonAssociations::LEGACY.new entity_enhancement_module, & edit_p
       end
 
       def edit_entity kernel, oes_p, & edit_p

@@ -13,7 +13,7 @@ module Skylab::TanMan
 
       :required,
       :ad_hoc_normalizer, -> arg, & oes_p do
-        Here_::Controller__::NormalKnownness_via_QualifiedKnownness_of_Name[ arg, self, & oes_p ]
+        Here_::NodeController_::NormalKnownness_via_QualifiedKnownness_of_Name[ arg, self, & oes_p ]
       end,
       :property, :name )
 

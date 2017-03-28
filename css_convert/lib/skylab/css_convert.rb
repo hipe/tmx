@@ -48,7 +48,7 @@ module Skylab::CSS_Convert
     end
 
     Treetop_tools = -> do
-      TM__[]::Input_Adapters_::Treetop
+      TM__[]::InputAdapters_::Treetop
     end
 
     # Basic = sidesys[ :Basic ]

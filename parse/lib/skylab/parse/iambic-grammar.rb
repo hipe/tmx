@@ -100,9 +100,6 @@ module Skylab::Parse
 
     # ==
     # ==
-    # ==
-    # ==
-    # ==
   end
 
   class IambicGrammar::ItemGrammar_LEGACY  # see [#005]
@@ -333,14 +330,27 @@ module Skylab::Parse
 
       # (meant to realize "entity killer", and be a broader replacement for legacy item grammar)
 
+      def redefine
+        otr = dup
+        yield otr
+        otr.freeze
+      end
+
       attr_writer(
         :item_class,
         :postfixed_modifiers,
         :prefixed_modifiers
       )
 
-      def is_keyword k
-        @prefixed_modifiers.method_defined? k
+      # -- "read"
+
+      def gets_one_item_via_scanner_fully scn
+        item = gets_one_item_via_scanner scn
+        if scn.no_unparsed_exists
+          item
+        else
+          self._COVER_ME__scanner_had_unparsed_content_after_parsing_item
+        end
       end
 
       def gets_one_item_via_scanner scn
@@ -348,6 +358,15 @@ module Skylab::Parse
           scn, @prefixed_modifiers, @postfixed_modifiers, @item_class
         ).execute
       end
+
+      def is_keyword k
+        @prefixed_modifiers.method_defined? k
+      end
+
+      attr_reader(
+        :postfixed_modifiers,
+        :prefixed_modifiers,
+      )
     end
 
     # ==

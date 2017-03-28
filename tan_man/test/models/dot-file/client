@@ -6,9 +6,9 @@ module Skylab::TanMan::TestSupport
 
   class Models::Dot_File::Client
 
-    def initialize
+    def initialize invo
 
-      @on_event_selectively = -> * i_a, & ev_p do
+      @on_event_selectively = -> * sym_a, & ev_p do
 
         ev = ev_p[]
 
@@ -16,6 +16,8 @@ module Skylab::TanMan::TestSupport
           raise ev.to_exception
         end
       end
+
+      @__invocation = invo
     end
 
     def parse_file input_file_path
@@ -28,15 +30,19 @@ module Skylab::TanMan::TestSupport
 
     def _doc_controller_via_name_value_pair sym, x
 
-      Home_::Models_.class
+      bx = Common_::Box.new
 
-      bx = Home_::Common_::Box.new
+      _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
 
-      bx.add sym, Common_::Qualified_Knownness.via_value_and_association( x,
-        Home_::Model_::DocumentEntity::IO_PROPERTIES__.fetch( sym ) )
+      _qkn = Common_::Qualified_Knownness[ x, _asc ]
 
-      Home_.application_kernel_.silo( :dot_file ).
-        document_controller_via_qualified_knownness_box bx, & @on_event_selectively
+      bx.add sym, _qkn
+
+      Home_::Models_::DotFile::DocumentController_via_Request.call_by do |o|
+        o.qualified_knownness_box = bx
+        o.invocation = @__invocation
+        o.listener = @on_event_selectively
+      end
     end
   end
 end

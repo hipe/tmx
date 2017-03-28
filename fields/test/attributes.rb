@@ -206,7 +206,7 @@ module Skylab::Fields::TestSupport
     Association_stream_via_entity___ = -> ent do  # moved this here at #history-A from "toolkit". could move back.
 
       _array = ent._definition_
-      _scn = Home_::Scanner_[ _array ]
+      _scn = Scanner_[ _array ]
 
       _pg = Home_::Toolkit.properties_grammar_
       _qual_item_st = _pg.stream_via_scanner _scn

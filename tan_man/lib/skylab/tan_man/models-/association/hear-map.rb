@@ -59,12 +59,12 @@ module Skylab::TanMan
         def initialize * a, & oes_p
           @src_lbl_s, @dst_lbl_s, @qualified_knownness_box, @kernel = a
           @did_mutate = false
-          @did_mutate_filter = -> * i_a, & ev_p do
+          @did_mutate_filter = -> * sym_a, & ev_p do
             ev = ev_p[]
             if ev.ok && ev.did_mutate_document
               @did_mutate = true
             end
-            oes_p.call( * i_a ) do
+            oes_p.call( * sym_a ) do
               ev
             end
           end
@@ -86,8 +86,11 @@ module Skylab::TanMan
 
         def __resolve_document_controller
 
-          _dc = @kernel.silo( :dot_file ).document_controller_via_qualified_knownness_box(
-            @qualified_knownness_box, & @on_event_selectively )
+          _dc = Models_::DotFile::DocumentController_via_Request.call_by do |o|
+            ::Kernel._THIS_CHANGED__but_it_can_be_easy__
+            o.qualified_knownness_box = @qualified_knownness_box
+            o.listener = @on_event_selectively
+          end
 
           _store :@dc, _dc
         end
@@ -147,9 +150,10 @@ module Skylab::TanMan
 
         def __do_persist
 
-          o = Home_::Model_::DocumentEntity::
-            Byte_Stream_Identifier_Resolver.new(
-              @kernel, & @on_event_selectively )
+          ::Kernel._THIS_CHANGED__but_it_can_be_easy__
+          o = Home_::DocumentMagnetics_::ByteStreamReference_via_Request
+          o = Home_::Model_::DocumentEntity::ByteStreamIdentifier_via.new(
+            @kernel, & @on_event_selectively )
 
           o.for_model Here_
 

@@ -1044,7 +1044,7 @@ module Skylab::Common
     end
 
     def name_symbol
-      name.name_symbol
+      @association.name_symbol
     end
 
     def name

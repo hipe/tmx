@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Input_Adapters_::Treetop
+  module InputAdapters_::Treetop
 
     class Parse_via_ByteUpstreamReference_and_ParserClass < Common_::MagneticBySimpleModel
 

@@ -36,7 +36,7 @@ module Skylab::CodeMetrics
 
       def execute
 
-        sess = LIB_.select
+        sess = LIB_.system_lib::IO::Select.new
         sess.timeout_seconds = @_timeout_seconds
 
         # ~ an experimental UI nicety

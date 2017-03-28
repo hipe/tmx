@@ -146,13 +146,13 @@ module Skylab::TanMan
         end ; nil
       end
 
-      @listener = -> * i_a, ev_p do
+      @listener = -> * sym_a, ev_p do
         once && once[]
-        if :expression == i_a.fetch(1)
+        if :expression == sym_a.fetch(1)
           nil.instance_exec( y, & ev_p )
           y
         else
-          y << i_a.inspect
+          y << sym_a.inspect
         end
       end ; nil
     end

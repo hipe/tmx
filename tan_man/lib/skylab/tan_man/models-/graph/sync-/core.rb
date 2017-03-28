@@ -179,35 +179,35 @@ module Skylab::TanMan
             ACHIEVED_
           end
         else
-          i_a = []
+          sym_a = []
           if @seen_labels
             if @seen_edges
-              i_a.push :edge_line
+              sym_a.push :edge_line
             else
-              i_a.push :label_line
+              sym_a.push :label_line
             end
           elsif @seen_edges
-            i_a.push :edge_line
+            sym_a.push :edge_line
           else
-            i_a.push :label_line
-            i_a.push :edge_line
+            sym_a.push :label_line
+            sym_a.push :edge_line
           end
-          i_a.push :closing_digraph_line
-          _when_expected( * i_a )
+          sym_a.push :closing_digraph_line
+          _when_expected( * sym_a )
         end
       end
 
       LAST_LINE_RX___ = /\A[[:space:]]*\}[[:space:]]*(?:#.*)?\n?\z/
 
-      def _when_expected * i_a
+      def _when_expected * sym_a
 
         @on_event_selectively.call :error, :input_parse_error do
-          __build_parse_eror_event i_a
+          __build_parse_eror_event sym_a
         end
         UNABLE_
       end
 
-      def __build_parse_eror_event i_a
+      def __build_parse_eror_event sym_a
 
         h = {
           opening_digraph_line: "digraph{",
@@ -220,7 +220,7 @@ module Skylab::TanMan
 
             :lineno, @line_count,
             :line, @line,
-            :tuples, i_a.map { |i| [ i, h.fetch( i ) ] } do | y, o |
+            :tuples, sym_a.map { |i| [ i, h.fetch( i ) ] } do | y, o |
 
           _s_a = o.tuples.map do | sym, eg_s |
             "#{ sym.id2name.gsub( UNDERSCORE_, SPACE_ ) }#{

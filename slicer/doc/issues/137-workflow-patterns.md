@@ -364,7 +364,7 @@ next two sections after this one, and may or may not serve as a partial
 or full replacement for one or more of them, or is perhaps oblique to them,
 we are not sure which.
 
-joggling is a bit like the [#127] three laws of test-driven development,
+joggling is a bit like the [#129.3] three laws of test-driven development,
 but instead of addressing the interplay between asset code and test
 code, joggling addresses the interplay between a "library" asset node
 and an "application" asset node.

@@ -2,7 +2,16 @@ module Skylab::System
 
   module IO
 
-    DRY_STUB__ = class Dry_Stub__  # getting a good dry run
+    module DRY_STUB ; class << self
+
+      # this is meant to look like an IO (imagine a file) open for writing,
+      # similar to writing to `/dev/null`. it may be useful to the client
+      # drying to implement a dry run, so that it can invoke all of the same
+      # moving parts as a real life file write.
+
+      # since our instance can be (and should be) truly stateless (that
+      # is, no member variables at all), it's #[#sl-126.2] a singleton
+      # implemented with a module.
 
       # a bespoke #[#039.1] one of many such proxies
 
@@ -35,6 +44,7 @@ module Skylab::System
       end
 
       def puts *a
+        NIL
       end
 
       def << _
@@ -52,34 +62,9 @@ module Skylab::System
       def close
         # there is risk of this silently succeeding when it should have
         # failed per state, but meh we would have to remove the singleton  #open [#170]
+        NIL
       end
 
-      class << self
-
-        def the_dry_byte_downstream_reference
-          THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
-        end
-      end
-
-      module THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
-
-        class << self
-          def to_minimal_yielder  # :+[#ba-046]
-            LT_LT___
-          end
-        end  # >>
-
-        class Less_Than_Less_Than___
-          def << _
-            self
-          end
-        end
-
-        LT_LT___ = Less_Than_Less_Than___.new
-
-      end
-
-      self
-    end.new.freeze  # :+#[#sl-126] class for singleton
+    end ; end
   end
 end

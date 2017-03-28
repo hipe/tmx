@@ -1,6 +1,121 @@
 module Skylab::Brazen
-  # ->
-    class Nodesque::Common_Properties < ::Module
+
+  class CommonAssociations < Common_::SimpleModel
+
+    # this file is a #no-downtime-hybrid: we are splicing a brand new
+    # munculus into it while keeping the legacy one fully functional and
+    # intact..
+    #
+    # the new one is
+    # more or less [#sl-129.3] three laws compliant.
+
+    # -
+
+      def initialize
+        @_receive_injection = :__receive_injection
+        @_box = Common_::Box.new
+        yield self
+        # no freeze because injection is loaded lazily
+      end
+
+      def add_association_by_definition_array sym, & p
+        _add ByDefinitionArray__.new( p, sym )
+        NIL
+      end
+
+      def _add ada
+        @_box.add ada.name_symbol, MutableState__.new( ada, self )
+        NIL
+      end
+
+      def property_grammatical_injection_by & p
+        send @_receive_injection, p
+      end
+
+      def __receive_injection p
+        remove_instance_variable :@_receive_injection
+        @__injection_proc = p
+        @_read_injection = :__read_injection_initially ; nil
+      end
+
+      # -- "read"
+
+      def dereference sym
+        @_box.fetch( sym ).__dereference_
+      end
+
+      def __association_injection_
+        send @_read_injection
+      end
+
+      def __read_injection_initially
+        @_read_injection = :__read_injection_subsequently
+        inj = remove_instance_variable( :@__injection_proc ).call
+        @__injection = inj
+        inj
+      end
+
+      def __read_injection_subsequently
+        @__injection
+      end
+    # -
+
+    # ==
+
+    class MutableState__
+
+      def initialize ada, rsx
+        @_dereference = :__dereference_initially
+        @__adapter = ada
+        @__resources = rsx
+      end
+
+      def __dereference_
+        send @_dereference
+      end
+
+      def __dereference_initially
+        _rsx = remove_instance_variable :@__resources
+        x = remove_instance_variable( :@__adapter )._property_via_flush_ _rsx
+        @__value = x
+        @_dereference = :__dereference_subsequently
+        freeze
+        x
+      end
+
+      def __dereference_subsequently
+        @__value
+      end
+    end
+
+    # ==
+
+    class ByDefinitionArray__
+
+      def initialize p, sym
+        @proc = p
+        @name_symbol = sym
+      end
+
+      def _property_via_flush_ rsx
+
+        _array = remove_instance_variable( :@proc ).call
+
+        _inj = rsx.__association_injection_
+
+        _asc = _inj.gets_one_item_via_scanner_fully Scanner_[ _array ]
+
+        _asc  # hi. #todo
+      end
+
+      attr_reader(
+        :name_symbol,
+      )
+    end
+
+    # ==
+
+    class LEGACY < ::Module
 
       def initialize entity_mod, & sess_p
 
@@ -82,7 +197,6 @@ module Skylab::Brazen
         sess_p[ _sess ]
         NIL_
       end
-    end
 
     class Cmn_Prps_Session___
 
@@ -107,5 +221,15 @@ module Skylab::Brazen
         @_p[ a, & edit_p ]
       end
     end
-    # <-
+    end  # LEGACY
+
+    # ==
+
+    Scanner_ = -> a do
+      Common_::Scanner.via_array a
+    end
+
+    # ==
+    # ==
+  end
 end

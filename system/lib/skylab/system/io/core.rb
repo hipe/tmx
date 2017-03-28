@@ -2,21 +2,6 @@ module Skylab::System
 
   module IO
 
-    class << self
-
-      def dry_stub
-        Here_::Dry_Stub__
-      end
-
-      def dry_stub_instance
-        Here_::DRY_STUB__
-      end
-
-      def select
-        Here_::Select__
-      end
-    end  # >>
-
     # ==
 
     class DownstreamProxy < SimpleModel_

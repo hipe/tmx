@@ -119,8 +119,12 @@ module Skylab::TanMan
 
   # ~
 
-    # a lot of this is probably redundant with (#[#ze-002.1])
-    # elsewhere as we wait for dust to settle around possible etc.
+    # parts of the below may or may not redund with the #[#ze-002.1] as we
+    # drive the dust towards settling along that strain.
+    #
+    # however, [tm] has been historically and continues to be the
+    # application that frontiers modeling to the limit of its design, and
+    # as such it would follow that things are ornate here.
 
     # ==
 
@@ -128,7 +132,7 @@ module Skylab::TanMan
 
       # (copy-paste-modify of [sn])
 
-      _asc_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
+      _asc_st = Here_.__action_grammar_.stream_via_array( act.definition ).map_reduce_by do |qual_item|
         if :_parameter_TM_ == qual_item.injection_identifier
           qual_item.item
         end
@@ -150,23 +154,23 @@ module Skylab::TanMan
 
     # ==
 
-    Action_grammar___ = Lazy_.call do
+    define_singleton_method :__action_grammar_, ( Lazy_.call do
 
-      # for now, we built our entity/action grammar here ourself.
-      # one day maybe this will become a cleaner part of a toolkit
+      # all actions will leverage our custom association subclass, even
+      # those that don't need to.
+      #
+      # however, in order to isolate the implemetation of our custom
+      # associations to their own subdomain, that happens at #spot1.1
 
-      _param_gi = Fields_lib_[]::
-        CommonAssociation::EntityKillerParameter.grammatical_injection
+      _param_gi = my_custom_grammatical_injection_without_custom_meta_associations_
 
-      _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
+      Home_.lib_.parse_lib::IambicGrammar.define do |o|
 
         o.add_grammatical_injection :_branch_desc_TM_, BRANCH_DESCRIPTION___
 
         o.add_grammatical_injection :_parameter_TM_, _param_gi
       end
-
-      _g  # hi. #todo
-    end
+    end )
 
     module BRANCH_DESCRIPTION___ ; class << self
 
@@ -178,6 +182,39 @@ module Skylab::TanMan
         scn.advance_one ; scn.gets_one
       end
     end ; end
+
+    def self.my_custom_grammatical_injection_without_custom_meta_associations_
+
+      _orig = __common_association_grammatical_injection
+      _orig.redefine do |o|
+        o.item_class = __my_custom_association_class
+        # the two models (prefix, postfix) are left as-is here.
+      end
+    end
+
+    define_singleton_method :__my_custom_association_class, ( Lazy_.call do
+
+      class ApplicationSpecificCustomizedAssociation____ < _common_association_class
+
+        attr_accessor(
+          :_throughput_characteristics_,
+        )
+
+        def expresses_direction
+          TRUE  # for now..
+        end
+
+        self
+      end
+    end )
+
+    def self.__common_association_grammatical_injection
+      _common_association_class.grammatical_injection
+    end
+
+    def self._common_association_class
+      Fields_lib_[]::CommonAssociation::EntityKillerParameter
+    end
 
     # ==
 
@@ -584,7 +621,7 @@ module Skylab::TanMan
     end
 
     def to_controller  # experiment
-      Models_::Node::Controller__.new self, @preconditions.fetch( :dot_file )
+      Models_::Node::NodeController_.new self, @preconditions.fetch( :dot_file )
     end
 
     attr_reader :node_stmt
@@ -689,6 +726,7 @@ module Skylab::TanMan
 
   end  # if false #here2
 
+    Here_ = self
   end  # `Model_`
 end
 # #tombstone-E.1: compartmentalize workspace node

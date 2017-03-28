@@ -80,7 +80,14 @@
                Test Code, Gerard Meszaros, 2007
 [#131]       #tracking-tag all extlib - we are trying to avoiding these.
 [#130]       #doc-point  all the letters of the alphabet ..
+
 [#129]       #bibliographic-reference: _Clean Code_, Robert C. Martin, 2009
+
+             :[#here.3]: "three laws": 1) don't write any asset code without
+             first having a breaking test written. 2) don't write more of
+             test code than is necessary to be broken. 3) write just enough
+             asset code to pass the broken test. when it is passing, repeat.
+
 [#128] #open this is strictly a development, pre-alpha version
                (especially) as long as you are using skylab/tmp!
 [#127] #open unify inflection module methods interface

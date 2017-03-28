@@ -183,6 +183,8 @@
 
 [#007]       small internal placeholders/notes (mostly)
 
+             :[#here.6]: a test referenced externally (by [tm])
+
        #track :[#here.E]: when `false` became `nil`
 
        #wish :[#here.D]: make configurable the assumption about the

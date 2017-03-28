@@ -21,11 +21,11 @@ module Skylab::TanMan
         # have causes that are so hard to track down we throw them so that
         # the call stack is presented immediately rather than having to hunt
 
-        @listener = -> * i_a, & ev_p do
-          if :error == i_a.first && :stat_error == i_a[ 1 ]
+        @listener = -> * sym_a, & ev_p do
+          if :error == sym_a.first && :stat_error == sym_a[ 1 ]
             raise ev_p[].exception
           else
-            use_p[ * i_a, & ev_p ]
+            use_p[ * sym_a, & ev_p ]
           end
         end ; nil
       end
@@ -35,7 +35,7 @@ module Skylab::TanMan
 
       def execute
 
-        x = Home_::Input_Adapters_::Treetop::Parse_via_ByteUpstreamReference_and_ParserClass.call_by do |o|
+        x = Home_::InputAdapters_::Treetop::Parse_via_ByteUpstreamReference_and_ParserClass.call_by do |o|
 
           o.receive_byte_upstream_reference @byte_upstream_reference
 
@@ -65,16 +65,16 @@ module Skylab::TanMan
 
       def __require_parser_class
 
-        _listener = -> * i_a, & ev_p do
+        _listener = -> * sym_a, & ev_p do
 
-          if :error == i_a.first
+          if :error == sym_a.first
             raise ev_p[].to_exception
           else
-            @listener.call( * i_a, & ev_p )
+            @listener.call( * sym_a, & ev_p )
           end
         end
 
-        Home_::Input_Adapters_::Treetop::RequireGrammars_via_Paths.call_by do |o|
+        Home_::InputAdapters_::Treetop::RequireGrammars_via_Paths.call_by do |o|
 
           _path = Models_::DotFile.dir_path
 

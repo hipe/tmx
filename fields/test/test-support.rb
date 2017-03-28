@@ -236,6 +236,7 @@ module Skylab::Fields::TestSupport
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n"
   NIL_ = nil
+  Scanner_ = Home_::Scanner_
   TS_ = self
 end
 

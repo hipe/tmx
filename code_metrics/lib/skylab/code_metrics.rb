@@ -158,10 +158,6 @@ module Skylab::CodeMetrics
       Basic[]::String::LineStream_via_String::Reverse[ s ]
     end
 
-    Select = -> do
-      System_lib__[]::IO.select.new
-    end
-
     sketchy_rx = /[ $']/
     Shellescape_path = -> x do
       if sketchy_rx =~ x
@@ -177,7 +173,7 @@ module Skylab::CodeMetrics
     end
 
     System = -> do
-      System_lib__[].services
+      System_lib[].services
     end
 
     Brazen = sidesys[ :Brazen ]
@@ -187,7 +183,7 @@ module Skylab::CodeMetrics
     Open_3 = stdlib[ :Open3 ]
     Parse = sidesys[ :Parse ]
     Shellwords = stdlib[ :Shellwords ]
-    System_lib__ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     Task = sidesys[ :Task ]
     Test_support = sidesys[ :TestSupport ]
     Treemap = sidesys[ :Treemap ]

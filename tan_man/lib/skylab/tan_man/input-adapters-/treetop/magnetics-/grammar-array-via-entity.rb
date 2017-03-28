@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Input_Adapters_::Treetop
+  module InputAdapters_::Treetop
 
     class Magnetics_::GrammarArray_via_Entity < Common_::Dyadic  # 1x
 
@@ -151,20 +151,20 @@ module Skylab::TanMan
 
         uow = @_uow
 
-        i_a = Magnetics_::HackPeekConstArray_via_AssetPath.call(
+        sym_a = Magnetics_::HackPeekConstArray_via_AssetPath.call(
           uow.input_path,
           @filesystem,
           & @on_event_selectively )
 
-        if i_a
+        if sym_a
 
-          uow.module_name_i_a = i_a
+          uow.module_name_i_a = sym_a
 
           uow.output_path_did_exist = @filesystem.file? uow.output_path
 
           uow.freeze
         else
-          i_a
+          sym_a
         end
       end
 

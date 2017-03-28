@@ -52,7 +52,3 @@ TD tan_man/test/54-operations/50-starter/14-list_spec.rb
 (model: graph)
 TD tan_man/test/54-operations/42-graph/64-sync_spec.rb
 TD tan_man/test/54-operations/42-graph/44-use_spec.rb
-(model: dot-file)
-TD tan_man/test/54-operations/32-dot-file/56-update-label_spec.rb
-TD tan_man/test/54-operations/32-dot-file/46-parsing/examples-490-thru-699_spec.rb
-TD tan_man/test/54-operations/32-dot-file/46-parsing/examples-001-thru-489_spec.rb

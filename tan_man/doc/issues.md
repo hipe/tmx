@@ -130,14 +130,26 @@
 [#010]       [ the treetop input adapter ]
              ( #was: #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist )
-[#009] #open #feature square word wrap (target an aspect ratio)
-             #doc-node: the node controller narrative ..
+
+[#009]       document controller notes ..
+
+       #open? :[#here.3]: #feature square word wrap (target an aspect ratio)
+
              ( #was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes) )
+
 [#008]       the treetop load DSL narrative ..
              ( #was: #done 2012-10-10 #rename rename "nt" to "expression" / "rule" )
-[#007]     #watch tracking all non-primitive values still used in our trans-modality API
+
+[#007]       small internal tracking
+
+             :[#here.C]: what we're calling "sub-invocations"
+
+             :[#here.B]: #watch track all non-primitive values still used in
+             our trans-modality API (old)
+
              ( #was: #done #small #critical models/ dir generated during specs 2012-09-29 )
+
 [#006]       meta property reference (.rb!)
              ( #was: #one-day look into reflection via metagrammer instead 2012-09-27 )
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02

@@ -48,7 +48,7 @@ module Skylab::TanMan
 
       class << self
 
-        def [] new, except_a, k_a, sexp
+        def call new, except_a, k_a, sexp
 
           # in cases where there is no exception list, we don't bother
           # creating an actor, we just do it here

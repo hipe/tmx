@@ -30,7 +30,7 @@ module Skylab::CodeMetrics
 
       EXTMOD__ = Brazen_::Modelesque::Entity
 
-      COMMON_PROPERTIES = Brazen_::Nodesque::Common_Properties.new(
+      COMMON_PROPERTIES = Brazen_::CommonAssociations::LEGACY.new(
         EXTMOD__
       ) do | sess |
 

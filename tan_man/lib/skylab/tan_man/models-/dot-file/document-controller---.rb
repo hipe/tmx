@@ -2,27 +2,22 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    class Controller__  # see [#009] (historical)
+    class DocumentController___ < Common_::SimpleModel
 
-      def initialize gsp, bu_id, k, & oes_p
+      # ([#009] is where notes for this would go. currently only one short, ancient note there.)
 
         # we encapsulate the byte upstream ID into the controller because
         # every document has exactly one BUID. however the same relationship
         # does not hold with byte downstream ID's so they are passed as args.
 
-        @byte_upstream_reference = bu_id
-        @graph_sexp = gsp
-        @on_event_selectively = oes_p
-        @kernel = k
-      end
+      attr_writer(
+        :byte_upstream_reference,
+        :graph_sexp,
+        :invocation,
+        :listener,
+      )
 
-      def members
-        [ :graph_sexp, :persist_into_byte_downstream_reference, :unparse_into ]
-      end
-
-      attr_reader :graph_sexp
-
-      # ~ readers
+      # -- "read"
 
       def persist_into_byte_downstream_reference id, * x_a, & oes_p  # [ :is_try, true ]
 
@@ -48,7 +43,7 @@ module Skylab::TanMan
         insert_stmt new, least_greater_neighbor
       end
 
-      def insert_stmt new, new_before_this=nil  # #note-20
+      def insert_stmt new, new_before_this=nil  # :[#here.B]
 
         g = @graph_sexp
 
@@ -103,9 +98,16 @@ module Skylab::TanMan
         end
       end
 
+      attr_reader(
+        :graph_sexp,
+      )
+
       def provide_action_precondition _id, _g
         self
       end
+
+      # ==
+      # ==
     end
   end
 end

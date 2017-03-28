@@ -58,7 +58,7 @@ module Skylab::TanMan::TestSupport
 
         # create a load session that produces (hopefully) a parser class
 
-        Home_::Input_Adapters_::Treetop::RequireGrammars_via_Paths.call_by do |o|
+        Home_::InputAdapters_::Treetop::RequireGrammars_via_Paths.call_by do |o|
 
           o.input_path_head_for_relative_paths =
             @_h.fetch :root_for_relative_paths_for_load

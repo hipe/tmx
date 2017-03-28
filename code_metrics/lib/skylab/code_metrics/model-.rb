@@ -79,7 +79,7 @@ module Skylab::CodeMetrics
       end
     end
 
-    _ = Brazen_::Nodesque::Common_Properties
+    _ = Brazen_::CommonAssociations::LEGACY
 
     COMMON_PROPERTIES = _.new My_Entity__ do | sess |
 

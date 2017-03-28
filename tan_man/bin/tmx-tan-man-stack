@@ -18,7 +18,7 @@ class Skylab::Stack
       @argv, @stdin, @stdout, @stderr, @pn_s_a, @_filesystem = six
 
       y = nil
-      @_oes_p = -> * i_a, & ev_p do
+      @_oes_p = -> * _sym_a, & ev_p do
 
         y ||= ::Enumerator::Yielder.new do | s |
           @stderr.puts s

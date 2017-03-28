@@ -1,11 +1,13 @@
-# the node controller narrative :[#009]
+# document controller notes :[#009]
 
-## introudction
+## introduction
 
 these notes are historical
 
 
-## :#note-20
+
+
+## :[#here.B]
 
 leveraging the new 'meh' precept [#071] we do a fantastic hack in the
 case that we don't have either a `stmt_list`, and/or a prototype for the

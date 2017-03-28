@@ -152,6 +152,7 @@ module Skylab::TanMan
   # stowaway :Entity_, 'models-'
   FILE_SEPARATOR_ = ::File::SEPARATOR
   # stowaway :Kernel_, 'models-'
+  KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
   NIL_ = nil
   NOTHING_ = nil

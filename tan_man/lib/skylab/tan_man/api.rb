@@ -11,9 +11,13 @@ module Skylab::TanMan
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
-      def invocation_via_argument_array a, & p  # #testpoint
+      def invocation_via_argument_array a=nil, & p  # #testpoint
         Require_microservice_toolkit___[]
-        _as = MTk_::API_ArgumentScanner.new a, & p
+        _as = if a
+          MTk_::API_ArgumentScanner.new a, & p
+        elsif p
+          ListenerOnly___.new p
+        end
         MicroserviceInvocation___.new InvocationResources___.new _as
       end
 
@@ -54,6 +58,45 @@ module Skylab::TanMan
           _ref.bound_call_of_operator_via_invocation_resouces @_invocation_resources
         end
       end
+
+      # -- experimental "kernel killer"
+
+      # ~ this one is called many times. dicussion under #[#007.C].
+
+      def generated_grammar_dir__
+        send( @_generated_grammar_dir ||= :__generated_grammar_dir_initially )
+      end
+
+      def __generated_grammar_dir_initially
+
+        _ = __call_sub_invocation(
+          :paths,
+          :path, :generated_grammar_dir,
+          :verb, :retrieve,
+          & @_invocation_resources.listener )  # ??
+
+        @_generated_grammar_dir = :__generated_grammar_dir
+        @__generated_grammar_dir = _
+        _
+      end
+
+      def __generated_grammar_dir
+        @__generated_grammar_dir
+      end
+
+      # --
+
+      def __call_sub_invocation * sym_a, & p
+
+        # (currently nothing fancy here, but this gives us room for stuff
+        # that the "kernel" (monolith) used to be responsible for.
+        # see #[#007.C] throughout lib.)
+
+        _as = MTk_::API_ArgumentScanner.new sym_a, & @_invocation_resources.listener
+        _rsx = @_invocation_resources.__dup_invocation_resources_ _as
+        _invo = self.class.new _rsx
+        _invo.execute
+      end
     end
 
     # ==
@@ -62,6 +105,11 @@ module Skylab::TanMan
 
       def initialize as
         @argument_scanner = as
+        freeze
+      end
+
+      def __dup_invocation_resources_ as
+        self.class.new as  # CAREFUL
       end
 
       def __microservice_operator_branch
@@ -69,6 +117,7 @@ module Skylab::TanMan
       end
 
       def application_moniker
+        # (#todo this is the thing that's redundant with `app_name_string`)
         "tannimous mannimous"
       end
 
@@ -262,6 +311,9 @@ module Skylab::TanMan
     end
 
     # ==
+
+    ListenerOnly___ = ::Struct.new :listener
+
     # ==
 
     DOT_ = '.'

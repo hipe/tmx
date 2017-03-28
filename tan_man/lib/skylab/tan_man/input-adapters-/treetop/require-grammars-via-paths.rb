@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Input_Adapters_::Treetop
+  module InputAdapters_::Treetop
 
     class RequireGrammars_via_Paths < Common_::MagneticBySimpleModel
 
@@ -80,7 +80,7 @@ module Skylab::TanMan
 
         _avr = self.class::ATTRIBUTES.ASSOCIATION_VALUE_READER_FOR self
 
-        _uow_a = Input_Adapters_::Treetop::Magnetics_::GrammarArray_via_Entity.call(
+        _uow_a = InputAdapters_::Treetop::Magnetics_::GrammarArray_via_Entity.call(
           _avr,
           @_filesystem,
           & @listener )

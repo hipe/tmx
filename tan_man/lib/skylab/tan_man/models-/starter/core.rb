@@ -52,8 +52,8 @@ module Skylab::TanMan
         include Brazen_::Actionesque::Factory::Retrieve_Methods
 
         def produce_result
-          produce_one_entity do | * i_a, & ev_p |
-            @on_event_selectively.call( * i_a ) do
+          produce_one_entity do | * sym_a, & ev_p |
+            @on_event_selectively.call( * sym_a ) do
               ev_p[].new_inline_with :invite_to_action, [ :starter, :set ]
             end
           end

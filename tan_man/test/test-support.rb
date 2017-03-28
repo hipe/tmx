@@ -176,7 +176,6 @@ module Skylab::TanMan::TestSupport
       Home_::CLI::InterfaceExpressionAgent___.instance
     end
 
-
     # -- ..
 
     def expect_committed_changes_
@@ -261,9 +260,9 @@ module Skylab::TanMan::TestSupport
 
       # life is easier if we don't have to ignore 'manually' the below event
 
-      _oes_p = -> * i_a, & ev_p do
+      _oes_p = -> * sym_a, & ev_p do
 
-        case i_a.last
+        case sym_a.last
         when :using_parser_files, :creating, :mkdir_p
           NIL_
         else

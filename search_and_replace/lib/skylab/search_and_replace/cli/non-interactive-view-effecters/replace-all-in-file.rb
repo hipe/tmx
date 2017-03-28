@@ -94,7 +94,7 @@ module Skylab::SearchAndReplace
         is_dry = @edit_session.is_dry_run
 
         if is_dry
-          fh = Home_.lib_.system_lib::IO.dry_stub_instance
+          fh = Home_.lib_.system_lib::IO::DRY_STUB
         else
           fh = ::File.open path, ::File::WRONLY
         end

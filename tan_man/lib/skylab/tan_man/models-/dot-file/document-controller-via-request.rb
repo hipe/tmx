@@ -2,7 +2,9 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    Magnetics_ = ::Module.new
+    if false
+
+      # (NOTE - when rekindled, this guy should break out into own file #todo)
 
     class Magnetics_::PersistDotFile_via_ByteDownstreamReference_and_GraphSexp
 
@@ -69,74 +71,91 @@ module Skylab::TanMan
         end
       end
     end
+    end  # if false
 
-    # ==
+    class DocumentController_via_Request < Common_::MagneticBySimpleModel
 
-    class Magnetics_::DocumentController_via_Kernel
-
-      def initialize kr=nil, & oes_p
-        @kernel = kr
-        @listener = oes_p
+      def initialize
+        @__mutex_for_solve_BUR = nil
+        super
       end
 
-      def receive_document_action action
-
-        @kernel = action.kernel
-        @listener = action.handle_event_selectively
-
-        receive_byte_upstream_reference action.document_entity_byte_upstream_reference
-        produce_document_controller
+      def qualified_knownness_box= bx
+        _solve_BUR_via :__solve_BUR_via_box
+        @__box = bx
       end
 
-      def receive_qualified_knownness_box bx
-
-        o = Home_::Model_::DocumentEntity::
-          Byte_Stream_Identifier_Resolver.new(
-            @kernel, & @listener )
-
-        o.against_qualified_knownness_box bx
-
-        @_BUID = o.solve_for :input
-
-        nil
+      def _solve_BUR_via m
+        remove_instance_variable :@__mutex_for_solve_BUR
+        @__solve_BUR = m
       end
 
-      def receive_byte_upstream_reference id
-        @_BUID = id ; nil
+      attr_writer(
+        :invocation,
+        :listener,
+      )
+
+      # --
+
+      def execute
+
+        ok = true
+        ok &&= __resolve_BUR
+        ok &&= __resolve_generated_grammar_dir_path
+        ok &&= __via_BUR_resolve_graph_sexp
+        ok && __via_graph_sexp_produce_doc_controller
       end
 
-      def produce_document_controller
-        @_BUID and begin
-          ok = __via_BUID_resolve_graph_sexp
-          ok && __via_graph_sexp_produce_doc_controller
+      def __via_graph_sexp_produce_doc_controller
+
+        Here_::DocumentController___.define do |o|
+          o.byte_upstream_reference = @_BUR
+          o.graph_sexp = @graph_sexp
+          o.invocation = @invocation
+          o.listener = @listener
         end
       end
 
-      def __via_BUID_resolve_graph_sexp
+      def __via_BUR_resolve_graph_sexp
+
+        _path = remove_instance_variable :@__generated_grammar_dir_path
 
         _gs = Here_::ParseTree_via_ByteUpstreamReference.via(
 
-          :byte_upstream_reference, @_BUID,
-          :generated_grammar_dir_path, __GGD_path,
+          :byte_upstream_reference, @_BUR,
+          :generated_grammar_dir_path, _path,
 
           & @listener )
 
         _store :@graph_sexp, _gs
       end
 
-      def __GGD_path
-        @kernel.call :paths, :path, :generated_grammar_dir, :verb, :retrieve
+      def __resolve_generated_grammar_dir_path
+
+        _ = @invocation.generated_grammar_dir__
+        _store :@__generated_grammar_dir_path, _
       end
 
-      def __via_graph_sexp_produce_doc_controller
+      def __resolve_BUR
+        _ = send remove_instance_variable :@__solve_BUR
+        _store :@_BUR, _
+      end
 
-        Here_::Controller__.new @graph_sexp, @_BUID, @kernel, & @listener
+      def __solve_BUR_via_box
+
+        bx = remove_instance_variable :@__box
+
+        Home_::DocumentMagnetics_::ByteStreamReference_via_Request.call_by do |o|
+
+          o.qualified_knownness_box = bx
+          o.will_solve_for :input
+          o.listener = @listener
+        end
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-    end
 
-    # ==
-    # ==
+    end
   end
 end
+# #history-A: rewritten from "smalls"-style magnetics file to house only 1 magnetic

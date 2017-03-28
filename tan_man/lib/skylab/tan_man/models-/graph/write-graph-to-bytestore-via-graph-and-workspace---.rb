@@ -248,15 +248,15 @@ module Skylab::TanMan
           # first, use any starter indicated in the workspace
 
           @kernel.silo( :starter ).lines_via__(
-              @value_fetcher, @workspace ) do | * i_a, & ev_p |
+              @value_fetcher, @workspace ) do | * sym_a, & ev_p |
 
-            if :component_not_found == i_a.last
+            if :component_not_found == sym_a.last
               @on_event_selectively.call :info, :component_not_found do
                 wrap = ev_p[]
                 wrap.new_with_event wrap.to_event.new_inline_with( :ok, nil )
               end
             else
-              @on_event_selectively[ * i_a, & ev_p ]
+              @on_event_selectively[ * sym_a, & ev_p ]
             end
           end
         end
