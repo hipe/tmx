@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch
+  class CollectionAdapters::Couch
 
-    CouchMagnetic_ = ::Class.new Home_::Collection::Actor
+    CouchMagnetic_ = ::Class.new Home_::Action
 
     module Magnetics
 

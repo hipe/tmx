@@ -1,29 +1,29 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
     module Mutable  # see [#008.A]
 
       class << self
 
         def new & oes_p
-          Document__.new Parse__.with( & oes_p )
+          Document__.new MutableDocument_via__.with( & oes_p )
         end
 
         def parse_string str, & oes_p
-          Parse__[ :via_string, str, & oes_p ]
+          MutableDocument_via__[ :via_string, str, & oes_p ]
         end
 
         def parse_path path_s, & oes_p
-          Parse__[ :via_path, path, & oes_p ]
+          MutableDocument_via__[ :via_path, path, & oes_p ]
         end
 
-        def parse_input_id input_id, & oes_p
-          Parse__[ :via_input_adapter, input_id, & oes_p ]
+        def parse_byte_upstream_reference byte_upstream_reference, & oes_p
+          MutableDocument_via__[ :via_input_adapter, byte_upstream_reference, & oes_p ]
         end
-      end
+      end  # >>
 
-      class Parse__ < Parse_
+      class MutableDocument_via__ < Document_via_  # #testpoint
 
         class << self
           def with * x_a, & oes_p
@@ -46,43 +46,49 @@ module Skylab::Brazen
 
           dsl = DSL__.new self
 
-          a.each_slice 2 do |i, x|
-            dsl.send i, x
+          a.each_slice 2 do |sym, x|
+            dsl.send sym, x
           end
 
           NIL_
         end
 
         class DSL__
+
           def initialize x
             @receiver = x
           end
+
           def via_path x
             @receiver.accept_input_ID Byte_upstream_reference_[].via_path x
           end
+
           def via_string x
             @receiver.accept_input_ID Byte_upstream_reference_[].via_string x
           end
+
           def via_input_adapter x
             @receiver.accept_input_ID x
           end
+
           def via_string_for_immediate_parse s
             @receiver.accept_string_for_immediate_scan s
           end
+
           def on_event_selectively oes_p
             @receiver.accept_handle_event_selectively_proc oes_p
           end
         end
 
-        def prepare_for_parse
+        def init_for_parse_
           @scn = nil
           super
         end
 
-        def resolve_document
-          @document = Document__.new @input_id, self
-          @current_nonterminal_node = @document
-          ACHIEVED_
+        def init_appropriate_document_instance_
+
+          @document = Document__.new @byte_upstream_reference, self
+          @current_nonterminal_node = @document ; nil
         end
 
         def execute_parse
@@ -97,7 +103,7 @@ module Skylab::Brazen
               else
                 @scn = LIB_.string_scanner.new @line
               end
-              ok = send @state_i
+              ok = send @state_symbol
               ok or break
             end
           end
@@ -133,7 +139,7 @@ module Skylab::Brazen
       public
 
         def accept_input_ID x
-          @input_id = x ; nil
+          @byte_upstream_reference = x ; nil
         end
 
         def accept_string_for_immediate_scan s
@@ -155,7 +161,7 @@ module Skylab::Brazen
         def accept_sect sect
           @document.accept_sect sect
           @current_nonterminal_node = sect
-          @state_i = :when_section_or_assignment
+          @state_symbol = :when_section_or_assignment
           nil
         end
 
@@ -208,20 +214,20 @@ module Skylab::Brazen
           Common_::Stream.via_nonsparse_array @a
         end
 
-        def count_number_of_nodes i
+        def count_number_of_nodes sym
           @a.count do |x|
-            i == x.category_symbol
+            sym == x.category_symbol
           end
         end
 
-        def first_node i
+        def first_node sym
           @a.detect do |x|
-            i == x.category_symbol
+            sym == x.category_symbol
           end
         end
 
-        def map_nodes i, p
-          get_node_enum( i ).map( & p )
+        def map_nodes sym, p
+          get_node_enum( sym ).map( & p )
         end
 
         def aref_node_with_norm_name_i sym, norm_i
@@ -245,21 +251,20 @@ module Skylab::Brazen
           end
         end
 
-        def _to_node_stream_via_symbol sym
-          _to_node_streamish Common_::Stream, sym
-
+        def __to_node_stream_via_symbol sym  # [cu]
+          _to_stream Common_::Stream, sym
         end
 
-        def _to_node_scn_via_symbol sym
-          _to_node_streamish Common_::MinimalStream, sym
+        def _to_node_minimal_stream_via_symbol sym
+          _to_stream Common_::MinimalStream, sym  # silly OCD holdover from antiquity
         end
 
-        def _to_node_streamish cls, i
+        def _to_stream cls, sym
           d = -1 ; last = @a.length - 1
           cls.by do
             while d < last
               d += 1
-              if i == @a[ d ].category_symbol
+              if sym == @a[ d ].category_symbol
                 x = @a[ d ]
                 break
               end
@@ -313,11 +318,11 @@ module Skylab::Brazen
 
         include Mutable_Branch_Methods__, Readable_Branch_Methods__
 
-        def initialize input_id=nil, parse
+        def initialize byte_upstream_reference=nil, parse
           @a = []
-          input_id and @input_id = input_id
+          byte_upstream_reference and @byte_upstream_reference = byte_upstream_reference
           @parse = parse
-          @sections_shell = Sections_Facade__.new self, parse
+          @sections_shell = SectionsFacade__.new self, parse
         end
 
         def members
@@ -326,11 +331,11 @@ module Skylab::Brazen
         end
 
         def description_under expag
-          @input_id.description_under expag
+          @byte_upstream_reference.description_under expag
         end
 
-        def input_id
-          @input_id
+        def byte_upstream_reference
+          @byte_upstream_reference
         end
 
         def dup_via_parse_context parse  # #when-and-how-we-duplicate
@@ -340,7 +345,7 @@ module Skylab::Brazen
         end
 
         def initialize_copy _otr_
-          @a = @input_id = @parse = @sections_shell = nil
+          @a = @byte_upstream_reference = @parse = @sections_shell = nil
         end
 
       protected
@@ -350,7 +355,7 @@ module Skylab::Brazen
             x.dup_via_parse_context parse
           end
           @parse = parse
-          @sections_shell = Sections_Facade__.new self, parse
+          @sections_shell = SectionsFacade__.new self, parse
           nil
         end
 
@@ -371,7 +376,7 @@ module Skylab::Brazen
         end
 
         def add_comment str
-          @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }#{ NEWLINE_ }"
+          @a.push BlankLine_or_CommentLine__.new "# #{ str }#{ NEWLINE_ }"
           ACHIEVED_
         end
 
@@ -379,7 +384,7 @@ module Skylab::Brazen
 
           Mutable::Magnetics::WriteDocument_via_Collection.build_mutable_with(
             :write_to_tempfile_first,
-            :path, @input_id.to_path,
+            :path, @byte_upstream_reference.to_path,
             :is_dry, false,
             :document, self,
             & ( oes_p || _handle_event_selectively )
@@ -403,7 +408,7 @@ module Skylab::Brazen
         end
 
         def accept_blank_line_or_comment_line line_s
-          @a.push Blank_Line_Or_Comment_Line__.new line_s ; nil
+          @a.push BlankLine_or_CommentLine__.new line_s ; nil
         end
 
       private
@@ -413,7 +418,7 @@ module Skylab::Brazen
         end
       end
 
-      class Mutable_Collection_Shell__  # #understanding-the-mutable-collection-shell
+      class MutableCollectionFacade__  # #understanding-the-mutable-collection-shell
 
         def initialize kernel, parse
           @collection_kernel = kernel
@@ -428,24 +433,24 @@ module Skylab::Brazen
         end
 
         def length
-          @collection_kernel.count_number_of_nodes self.class::SYMBOL_I
+          @collection_kernel.count_number_of_nodes self.class::CATEGORY_SYMBOL
         end
 
         def first
-          @collection_kernel.first_node self.class::SYMBOL_I
+          @collection_kernel.first_node self.class::CATEGORY_SYMBOL
         end
 
         def map & p
-          @collection_kernel.map_nodes self.class::SYMBOL_I, p
+          @collection_kernel.map_nodes self.class::CATEGORY_SYMBOL, p
         end
 
-        def to_value_stream
-          @collection_kernel._to_node_stream_via_symbol self.class::SYMBOL_I
+        def to_value_stream  # [cu]
+          @collection_kernel.__to_node_stream_via_symbol self.class::CATEGORY_SYMBOL
         end
 
-        def [] norm_name_i
-          @collection_kernel.aref_node_with_norm_name_i(
-            self.class::SYMBOL_I, norm_name_i )
+        def [] norm_name_sym
+          @collection_kernel.aref_node_with_norm_name_sym(
+            self.class::CATEGORY_SYMBOL, norm_name_sym )
         end
 
         # ~ the mutators
@@ -564,30 +569,30 @@ module Skylab::Brazen
 
         def __build_compare section
           normalized_name_s = section.internal_normal_name_string
-          subsection_name_s = section.subsect_name_s
+          subsection_name_s = section.subsection_name_string
           if subsection_name_s
-            bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
+            __build_compare_name_and_ss_name normalized_name_s, subsection_name_s
           else
-            bld_compare_name normalized_name_s
+            __build_compare_name normalized_name_s
           end
         end
 
-        def bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
+        def __build_compare_name_and_ss_name normalized_name_s, subsection_name_s
           -> x do
             d = x.internal_normal_name_string <=> normalized_name_s
             if d.zero?
-              if x.subsect_name_s
-                x.subsect_name_s <=> subsection_name_s
+              if x.subsection_name_string
+                x.subsection_name_string <=> subsection_name_s
               else -1 end
             else d end
           end
         end
 
-        def bld_compare_name normalized_name_s
+        def __build_compare_name normalized_name_s
           -> x do
             d = x.internal_normal_name_string <=> normalized_name_s
             if d.zero?
-              x.subsect_name_s ? 1 : 0
+              x.subsection_name_string ? 1 : 0
             else d end
           end
         end
@@ -689,7 +694,9 @@ module Skylab::Brazen
         def initialize_copy _otr_
           @kernel = nil
         end
+
       protected
+
         def init_copy_via_parse_and_other parse, otr
           @kernel = otr.kernel.dup_via_parse_context parse ; nil
         end
@@ -726,8 +733,8 @@ module Skylab::Brazen
           @kernel.internal_normal_name_string
         end
 
-        def subsect_name_s
-          @kernel.subsect_name_s
+        def subsection_name_string
+          @kernel.subsection_name_string
         end
 
         def value_when_is_result_of_aref_lookup
@@ -753,9 +760,9 @@ module Skylab::Brazen
           @kernel.set_subsect_name_ s
         end
 
-        def []= i, x
+        def []= sym, x
           @is_editable or _make_editable
-          @kernel.aref_set i, x ; x
+          @kernel.aref_set sym, x ; x
         end
 
         def replace_children_with_this_array x
@@ -794,9 +801,9 @@ module Skylab::Brazen
 
       OPEN_BRACE_RX_ = /[ ]*\[[ ]*/
 
-      Event_Sending_Node__ = ::Class.new
+      HotNode__ = ::Class.new
 
-      Section_or_Subsection_Kernel__ = ::Class.new Event_Sending_Node__
+      Section_or_Subsection_Kernel__ = ::Class.new HotNode__
 
       class Section_or_Subsection_Parse__ < Section_or_Subsection_Kernel__
 
@@ -804,7 +811,7 @@ module Skylab::Brazen
 
         def initialize parse
           @a = []
-          @assignments_shell = Assignments_Facade__.new self, parse
+          @assignments_shell = AssignmentsFacade__.new self, parse
           @parse = parse
           @scn = parse.string_stream_for_freezable_current_line
         end
@@ -825,7 +832,7 @@ module Skylab::Brazen
           @a = otr.a.map do |x|
             x.dup_via_parse_context parse
           end
-          @assignments_shell = Assignments_Facade__.new self, parse
+          @assignments_shell = AssignmentsFacade__.new self, parse
           @parse = parse ; nil
         end
 
@@ -847,7 +854,7 @@ module Skylab::Brazen
           if d
             parse_name d
           else
-            recv_error_symbol :expected_open_square_bracket
+            _receive_error_symbol :expected_open_square_bracket
           end
         end
 
@@ -868,7 +875,7 @@ module Skylab::Brazen
           if d
             parse_rest d
           else
-            recv_error_symbol :expected_section_name
+            _receive_error_symbol :expected_section_name
           end
         end
 
@@ -883,7 +890,7 @@ module Skylab::Brazen
             if d
               parse_subsection_rest d
             else
-              recv_error_symbol :expected_subsection_name
+              _receive_error_symbol :expected_subsection_name
             end
           else
             @subsection_leader_width = nil
@@ -905,7 +912,7 @@ module Skylab::Brazen
           if d
             finish_parse
           else
-            recv_error_symbol :expected_close_square_bracket
+            _receive_error_symbol :expected_close_square_bracket
           end
         end
         CLOSE_SQUARE_BRACKET_RX__ = /[ ]*\][ ]*(?:[;#]|\r?\n?\z)/
@@ -954,7 +961,7 @@ module Skylab::Brazen
             # the absence of existing trailing spacing is for now assumed
           end
 
-          @subsect_s = s_.freeze
+          @subsection_string = s_.freeze
           @subsection_name_width = s__.length
 
           @line = line
@@ -967,7 +974,7 @@ module Skylab::Brazen
         end
 
         def accept_blank_line_or_comment_line line_s
-          @a.push Blank_Line_Or_Comment_Line__.new line_s ; nil
+          @a.push BlankLine_or_CommentLine__.new line_s ; nil
         end
 
         def unparse_into_yielder y
@@ -981,11 +988,11 @@ module Skylab::Brazen
           p = -> do
             x = @line
             p = -> do
-              scn = to_body_line_stream
+              st = to_body_line_stream
               p = -> do
-                scn.gets
+                st.gets
               end
-              scn.gets
+              st.gets
             end
             x
           end
@@ -1003,8 +1010,8 @@ module Skylab::Brazen
           d = @a.length ; @a.clear ; d
         end
 
-        def aref_set i, x
-          ast = Assignment__.via_literal i, x, @parse
+        def aref_set sym, x
+          ast = Assignment__.via_literal sym, x, @parse
           ast and aref_set_via_assignment ast
         end
 
@@ -1063,8 +1070,8 @@ module Skylab::Brazen
 
         def initialize subsect_s, sect_s, parse
           @parse = parse
-          @unsanitized_sect_s = sect_s
-          @unsanitized_subsect_s = subsect_s
+          @unsanitized_section_string = sect_s
+          @unsanitized_subsect_string = subsect_s
         end
 
         def is_empty
@@ -1077,11 +1084,11 @@ module Skylab::Brazen
 
         def for_edit
 
-          unparse_into_yielder y=[]
+          _string = unparse_into_yielder ""
 
-          _parse = Parse__.with(
+          _parse = MutableDocument_via__.with(
             :via_string_for_immediate_parse,
-            y * EMPTY_S_,
+            _string,
             & @parse.handle_event_selectively )
 
           otr = Section_or_Subsection_Parse__.new _parse
@@ -1097,31 +1104,32 @@ module Skylab::Brazen
         end
 
         def to_line_stream
+
           p = -> do
-            line = rndr_line
+            line = __render_line
             p = EMPTY_P_
             line
           end
+
           Common_.stream do
             p[]
           end
         end
-      private
-        def rndr_line
-          if @subsect_s
-            s = @subsect_s.dup
+
+        def __render_line
+          if @subsection_string
+            s = @subsection_string.dup
             Section_.mutate_subsection_name_for_marshal s
-            "[#{ @sect_s } \"#{ s }\"]#{ NEWLINE_ }"
+            "[#{ @section_string } \"#{ s }\"]#{ NEWLINE_ }"
           else
-            "[#{ @sect_s }]#{ NEWLINE_ }"
+            "[#{ @section_string }]#{ NEWLINE_ }"
           end
         end
-      public
 
         def resolve
-          if ANCHORED_SECTION_NAME_RX_ =~ @unsanitized_sect_s
-            @sect_s = @unsanitized_sect_s ; @unsanitized_sect_s = nil
-            rslv_subsect_s
+          if ANCHORED_SECTION_NAME_RX_ =~ @unsanitized_section_string
+            @section_string = @unsanitized_section_string ; @unsanitized_section_string = nil
+            __resolve_subsection_string
           else
             maybe_send_invalid_section_name_error
             UNABLE_
@@ -1162,7 +1170,7 @@ module Skylab::Brazen
 
         def maybe_send_invalid_subsection_name_error
           maybe_send_event :error, :invalid_subsection_name do
-            bld_invalid_subsection_name_event
+            __build_invalid_subsection_name_event
           end
         end
 
@@ -1194,20 +1202,20 @@ module Skylab::Brazen
       class Section_or_Subsection_Kernel__
 
         def external_normal_name_symbol
-          @normalized_sect_i
+          @normalized_section_symbol
         end
 
         def internal_normal_name_string
-          @normalized_sect_s
+          @normal_section_string
         end
 
-        def subsect_name_s
-          @subsect_s
+        def subsection_name_string
+          @subsection_string
         end
 
       private
 
-        def recv_error_symbol sym
+        def _receive_error_symbol sym
           @parse.receive_error_symbol_and_column_number_ sym, @column_number
           UNABLE_
         end
@@ -1231,14 +1239,14 @@ module Skylab::Brazen
 
         class << self
           def via_parse parse
-            ast = Assignment_Parse__.new parse
+            ast = AssignmentParse___.new parse
             ast.parse and begin
               new ast
             end
           end
 
-          def via_literal i, x, parse
-            ast = Assignment_Literal__.new i, x, parse
+          def via_literal sym, x, parse
+            ast = AssignmentLiteral___.new sym, x, parse
             ast.resolve and begin
               new ast
             end
@@ -1312,9 +1320,9 @@ module Skylab::Brazen
 
       AST_NAME_RX_ = /[A-Za-z][-0-9A-Za-z]*/
 
-      Assignment_Kernel__ = ::Class.new Event_Sending_Node__
+      AssignmentKernel__ = ::Class.new HotNode__
 
-      class Assignment_Parse__ < Assignment_Kernel__
+      class AssignmentParse___ < AssignmentKernel__
 
         def initialize parse
           @parse = parse
@@ -1330,11 +1338,14 @@ module Skylab::Brazen
         def initialize_copy _otr_
           @parse = @scn = nil
         end
+
       protected
+
         def init_copy_via_parse_and_other parse, _otr_
           # at this writing there are 13 ivars we keep as-is as copy-by-reference
           @parse = parse ; nil
         end
+
       public
 
         def parse
@@ -1345,7 +1356,7 @@ module Skylab::Brazen
           if d
             parse_any_value d
           else
-            recv_error_symbol :expected_variable_name
+            _receive_error_symbol :expected_variable_name
           end
         end
 
@@ -1359,7 +1370,7 @@ module Skylab::Brazen
             parse_value d
           else
             d = @scn.skip THE_REST_RX_
-            d or recv_error_symbol :expected_equals_sign_or_end_of_line
+            d or _receive_error_symbol :expected_equals_sign_or_end_of_line
           end
         end
         EQUALS_RX__ = /[ ]*=/
@@ -1388,19 +1399,19 @@ module Skylab::Brazen
         BOOLEAN_FALSE_RHS_RX__ = /(?i:no|false|off)#{ _REST_ }/
 
         def parse_integer d
-          @value_conversion_method_i = :convert_integer
+          @_convert_value = :__convert_integer
           @value_width = d
           finish_line
         end
 
         def parse_boolean_true d
-          @value_conversion_method_i = :convert_true
+          @_convert_value = :__convert_true
           @value_width = d
           finish_line
         end
 
         def parse_boolean_false d
-          @value_conversion_method_i = :convert_false
+          @_convert_value = :__convert_false
           @value_width = d
           finish_line
         end
@@ -1430,7 +1441,7 @@ module Skylab::Brazen
               ok
             end
           else
-            recv_error_symbol(
+            _receive_error_symbol(
               :expected_integer_or_boolean_or_quoted_or_non_quoted_string )
           end
         end
@@ -1461,7 +1472,7 @@ module Skylab::Brazen
                 UNABLE_
               end
             else
-              recv_error_symbol :end_quote_not_found_anywhere_before_end_of_line
+              _receive_error_symbol :end_quote_not_found_anywhere_before_end_of_line
             end
           end
         end
@@ -1482,19 +1493,19 @@ module Skylab::Brazen
           if d
             @line = @scn.string.freeze
             @parse = @scn = @column_number = nil
-            rslv_names
+            _init_names_
             if block_given?
               yield d
             else
               ACHIEVED_
             end
           else
-            recv_error_symbol :expected_end_of_line
+            _receive_error_symbol :expected_end_of_line
           end
         end
         THE_REST_RX_ = /[ ]*(?:[#;]|\r?\n?\z)/
 
-        def rslv_names
+        def _init_names_
           _received_name_s = @line[ @name_start_index, @name_width ]
           @internal_normal_name_string = _received_name_s.downcase
           @external_normal_name_symbol = @internal_normal_name_string.intern ; nil
@@ -1519,26 +1530,26 @@ module Skylab::Brazen
         end
 
         def value_x
-          @value_is_converted or cnvrt_value
+          @value_is_converted || __convert_value
           @value_x
         end
 
       private
 
-        def cnvrt_value
+        def __convert_value
           @value_is_converted = true
-          send @value_conversion_method_i
+          send @_convert_value
         end
 
-        def convert_integer
+        def __convert_integer
           @value_x = @line[ @value_start_index, @value_width ].to_i ; nil
         end
 
-        def convert_true
+        def __convert_true
           @value_x = true
         end
 
-        def convert_false
+        def __convert_false
           @value_x = false
         end
 
@@ -1557,23 +1568,23 @@ module Skylab::Brazen
           @line.freeze ; nil
         end
 
-        def recv_error_symbol sym
+        def _receive_error_symbol sym
           @parse.receive_error_symbol_and_column_number_ sym, @column_number
           UNABLE_
         end
       end
 
-      class Assignment_Literal__ < Assignment_Kernel__
+      class AssignmentLiteral___ < AssignmentKernel__
 
-        def initialize variegated_i, x, parse
+        def initialize variegated_sym, x, parse
           parse or raise ::ArgumentError
           @parse = parse
           @unsanitized_x = x
-          @variegated_i = variegated_i
+          @variegated_sym = variegated_sym
         end
 
         def external_normal_name_symbol
-          @enns ||= @variegated_i.id2name.
+          @enns ||= @variegated_sym.id2name.
             gsub( DASH_, UNDERSCORE_ ).downcase.intern
         end
 
@@ -1582,7 +1593,7 @@ module Skylab::Brazen
         end
 
         def resolve
-          s = @variegated_i.id2name
+          s = @variegated_sym.id2name
           if AST_NAME_RX__ =~ s
             @inns = s
             rslv_value
@@ -1604,7 +1615,7 @@ module Skylab::Brazen
         def maybe_send_variable_name_error
           maybe_send_event :error, :invalid_variable_name do
             build_not_OK_event_with :invalid_variable_name,
-              :invalid_variable_name, @variegated_i.id2name
+              :invalid_variable_name, @variegated_sym.id2name
           end ; nil
         end
 
@@ -1633,7 +1644,7 @@ module Skylab::Brazen
         end
       end
 
-      class Assignment_Kernel__
+      class AssignmentKernel__
 
         def to_line_stream
           Line_stream_via_single_line__[ rndr_line ]
@@ -1680,7 +1691,7 @@ module Skylab::Brazen
         end
       end
 
-      class Event_Sending_Node__
+      class HotNode__
       private
 
         include Common_::Event::ReceiveAndSendMethods
@@ -1691,7 +1702,7 @@ module Skylab::Brazen
         end
       end
 
-      class Blank_Line_Or_Comment_Line__
+      class BlankLine_or_CommentLine__
 
         def initialize line
           @line = line.freeze

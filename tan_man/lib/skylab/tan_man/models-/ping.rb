@@ -28,7 +28,7 @@ module Skylab::TanMan
 
       def bld_ping_event
 
-        _am = @_invocation_resources_.application_moniker
+        _am = _invocation_resources_.application_moniker
 
         Common_::Event.inline_neutral_with(
           :ping

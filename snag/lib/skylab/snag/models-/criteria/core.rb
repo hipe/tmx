@@ -476,7 +476,7 @@ module Skylab::Snag
 
         _path = remove_instance_variable :@directory_path
 
-        _class = Home_.lib_.system_lib::Filesystem::Directory::As::Collection
+        _class = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
         @_imp = _class.define do |o|
 
           o.directory_path = _path

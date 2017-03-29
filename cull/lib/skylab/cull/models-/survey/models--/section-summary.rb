@@ -23,7 +23,7 @@ module Skylab::Cull
       def express_into_under y, expag
 
         lhs_s = @sect.internal_normal_name_string
-        rhs_x = @sect.subsect_name_s
+        rhs_x = @sect.subsection_name_string
 
         if ! rhs_x
           if @sect.assignments && 1 == @sect.assignments.length

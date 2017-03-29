@@ -91,6 +91,7 @@ module Skylab::Cull
               end
               @nodes.concat span.node_a  # reuse the existing nodes
             else
+
               new_node = @section.build_assignment_via_mixed_value_and_name_function(
                 func.marshal,
                 NAME__ )

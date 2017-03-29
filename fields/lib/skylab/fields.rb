@@ -977,11 +977,11 @@ module Skylab::Fields
       @_object.instance_variable_get asc.as_ivar
     end
 
-    def simplified_write_ x, k  # necessary IFF :#spot1-3
+    def _simplified_write_ x, k  # necessary IFF :#spot1-3
       @_object.instance_variable_set :"@#{ k }", x ; nil
     end
 
-    def simplified_read_ k
+    def _simplified_read_ k
       _simplified_read_via_ivar :"@#{ k }"
     end
 

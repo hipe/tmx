@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch < Home_::Collection::Model_  # see [#038]
+  class CollectionAdapters::Couch < Home_::Model  # see [#038]
 
     Home_::Modelesque.entity self do
 
@@ -202,6 +202,5 @@ module Skylab::Brazen
     end  # >>
 
     Couch_ = self
-    Collection = Home_::Collection
   end
 end

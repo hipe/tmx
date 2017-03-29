@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def subject
-      Home_::Collection_Adapters::Git_Config::Mutable  # repeat
+      Home_::CollectionAdapters::GitConfig::Mutable  # repeat
     end
   end
 
@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport
 
       _oes_p = event_log.handle_event_selectively
 
-      subject::Parse__.with( & _oes_p )
+      subject::MutableDocument_via__.with( & _oes_p )
     end
 
     def touch_section subsect_s=nil, sect_s, & x_p
@@ -100,11 +100,9 @@ module Skylab::Brazen::TestSupport
     end
 
     def super_subject
-      Home_::Collection_Adapters::Git_Config
+      Home_::CollectionAdapters::GitConfig
     end
   end
   # ->
   end
 end
-
-# Home_::Collection_Adapters::Git_Config::Mutable

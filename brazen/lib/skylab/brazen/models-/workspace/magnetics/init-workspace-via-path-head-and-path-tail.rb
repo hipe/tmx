@@ -21,7 +21,7 @@ module Skylab::Brazen
       def execute
 
         init_max_number_of_directories_to_make
-        ok = resolve_document
+        ok = __resolve_document
         ok && partition
         ok &&= __validate_depth_of_directories_to_create
         ok &&= create_any_directories
@@ -41,8 +41,8 @@ module Skylab::Brazen
         # treat repeating '/' as one separator. don't count any
         # separator anchored to the head of the string or the tail.
 
-      def resolve_document
-        @document = Home_::Collection_Adapters::Git_Config::Mutable.new(
+      def __resolve_document
+        @document = Home_::CollectionAdapters::GitConfig::Mutable.new(
           & @on_event_selectively )
         into_document_add_comment
       end

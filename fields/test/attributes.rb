@@ -281,11 +281,11 @@ module Skylab::Fields::TestSupport
         @_argument_scanner_ = o.first
       end
 
-      def _write_ k, x
+      def _simplified_write_ k, x
         instance_variable_set :"@#{ k }", x
       end
 
-      def _read_ k
+      def _simplified_read_ k
         ivar = :"@#{ k }"
         if instance_variable_defined? ivar
           instance_variable_get ivar

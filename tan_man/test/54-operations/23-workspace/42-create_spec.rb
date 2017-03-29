@@ -45,8 +45,9 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        _td = build_empty_tmpdir
-        empty_work_dir = _td.path
+        td = volatile_tmpdir
+        td.prepare
+        empty_work_dir = td.path
 
         config_filename = 'pp-qq/xyz.ohai'
 

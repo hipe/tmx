@@ -45,7 +45,7 @@ module Skylab::TanMan
       end
 
       def initialize
-        @_invocation_resources_ = yield
+        @__invocation_resources = yield.invocation_resources
       end
 
       # ~ ( this is what would abstract out if we found this pattern useful,
@@ -54,7 +54,7 @@ module Skylab::TanMan
 
       def to_bound_call_of_operator
 
-        rsx = @_invocation_resources_
+        rsx = _invocation_resources_
 
         ok = as_attributes_actor_parse_and_normalize rsx.argument_scanner do |o|
           o.listener = rsx.listener
@@ -184,7 +184,11 @@ module Skylab::TanMan
       end
 
       def _listener
-        @_invocation_resources_.listener
+        _invocation_resources_.listener
+      end
+
+      def _invocation_resources_
+        @__invocation_resources  # hi.
       end
 
       # ==

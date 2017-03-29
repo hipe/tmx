@@ -44,7 +44,7 @@ module Skylab::Zerk  # intro in [#001] README
   # == functions
 
   Begin_fuzzy_retrieve_ = -> & any_oes_p do
-    Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new( & any_oes_p )
+    Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.new( & any_oes_p )
   end
 
   Is_listy_ = -> sym do  # assume Field_

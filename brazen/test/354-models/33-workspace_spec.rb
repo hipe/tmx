@@ -60,7 +60,7 @@ module Skylab::Brazen::TestSupport
 
       em = @result
 
-      em.category.should eql [ :info, :resource_exists ]
+      em.category.should eql [ :info, :resource_existed ]
 
       ev = em.emission_value_proc.call
 

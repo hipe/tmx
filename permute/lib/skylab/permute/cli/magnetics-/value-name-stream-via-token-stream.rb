@@ -56,7 +56,7 @@ module Skylab::Permute
         _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           short_category_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
           _qkn,
           @_col.method( :to_entity_stream ),
           & @on_event_selectively )
@@ -74,7 +74,7 @@ module Skylab::Permute
         _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
           _qkn,
           @_col.method( :to_entity_stream ),
         ) do end

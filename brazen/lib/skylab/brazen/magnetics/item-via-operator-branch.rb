@@ -1,5 +1,8 @@
 module Skylab::Brazen
 
+  class Magnetics::Item_via_OperatorBranch < Common_::MagneticBySimpleModel
+
+  if false
   module Collection
 
     Model_ = Home_::Model
@@ -19,8 +22,10 @@ module Skylab::Brazen
         ACHIEVED_
       end
     end
+  end
+  end
 
-    class Common_fuzzy_retrieve
+    class FYZZY
 
       # (this node is an interesting case study)
 

@@ -74,7 +74,7 @@ module Skylab::TanMan::TestSupport
         )
 
         lines = nil
-        expect :info, :expression, :resource_exists do |y|
+        expect :info, :expression, :resource_existed do |y|
           lines = y
         end
 

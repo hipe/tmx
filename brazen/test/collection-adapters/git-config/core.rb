@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport
       expect_config do |conf|
         sect = conf.sections.first
         sect.internal_normal_name_string.should eql '-.secto-2014.08'
-        sect.subsect_name_s.should eql 'foo " \\ '
+        sect.subsection_name_string == 'foo " \\ ' || fail
       end
     end
 
@@ -84,7 +84,7 @@ module Skylab::Brazen::TestSupport
       _x == false || fail
 
       chan_i_a.should eql [ :error, :config_parse_error ]
-      ev.parse_error_category_i.should eql :section_expected
+      ev.parse_error_category_symbol.should eql :section_expected
       ev.lineno.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
@@ -139,7 +139,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def subject
-      Home_::Collection_Adapters::Git_Config
+      Home_::CollectionAdapters::GitConfig
     end
 
     MARGIN_RX__ = /^[ ]{8}/

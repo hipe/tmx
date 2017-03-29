@@ -19,7 +19,7 @@ module Skylab::Cull
 
         @___ubox___ = Common_::Box.new
 
-        if s = sect.subsect_name_s
+        if s = sect.subsection_name_string
           __unmarshal_id s
         end
 

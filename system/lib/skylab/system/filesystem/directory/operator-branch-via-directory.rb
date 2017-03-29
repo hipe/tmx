@@ -2,10 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    module Directory
-
-      As = ::Module.new
-      class As::Collection < Common_::SimpleModel  # #open [#040] modernize/unify (or not)
+    class Directory::OperatorBranch_via_Directory < Common_::SimpleModel
 
         # <-x2
 
@@ -347,7 +344,6 @@ module Skylab::System
 
     MONADIC_TRUTH_ = -> _ { true }
   # -> x2
-      end
     end
   end
 end

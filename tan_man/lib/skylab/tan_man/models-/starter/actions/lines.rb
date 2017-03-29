@@ -16,7 +16,7 @@ module Skylab::TanMan
 
           # reading from the workspace is an option, but the workspace is not a precondition
 
-          :property_object, o[ :max_num_dirs ],
+          :property_object, o[ :max_num_dirs_to_look ],
           :property_object, o[ :config_filename ],
           :property_object, o[ :workspace_path ].dup.set_is_not_required.freeze )
 

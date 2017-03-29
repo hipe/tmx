@@ -9,9 +9,9 @@ module Skylab::System
 
         class << self
 
-          def build_resource_not_found_event start_path, file_pattern_x, num_dirs_looked
+          def build_resource_not_found_event start_path, file_pat_s_or_s_a, num_dirs_looked
 
-            Build_resource_not_found_event__[ start_path, file_pattern_x, num_dirs_looked ]
+            Build_resource_not_found_event__[ start_path, file_pat_s_or_s_a, num_dirs_looked ]
           end
         end  # >>
 
@@ -231,12 +231,12 @@ module Skylab::System
           Home_.lib_.fields::SimplifiedName.new sym do end
         end
 
-        Build_resource_not_found_event__ = -> start_path, file_pattern_x, num_dirs_looked do
+        Build_resource_not_found_event__ = -> start_path, file_pat_s_or_s_a, num_dirs_looked do
 
           Common_::Event.inline_not_OK_with(
             :resource_not_found,
             :start_path, start_path,
-            :file_pattern_x, file_pattern_x,
+            :file_pattern_string_or_array, file_pat_s_or_s_a,
             :num_dirs_looked, num_dirs_looked,
 
           ) do | y, o |
@@ -248,7 +248,7 @@ module Skylab::System
                 d = o.num_dirs_looked - 1
                 _xtra = " or #{ d } dir#{ s d } up"
               end
-              y << "#{ ick_mixed o.file_pattern_x } #{
+              y << "#{ ick_mixed o.file_pattern_string_or_array } #{
                 }not found in #{ pth o.start_path }#{ _xtra }"
             end
           end

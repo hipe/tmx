@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch
+  class CollectionAdapters::Couch
 
     class Magnetics::DeleteCollection_via_Collection < CouchMagnetic_  # 1x  #feature-island
 

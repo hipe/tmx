@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport
         ev_ = ev.to_event
         ev_.start_path ==_the_asset_file_path || fail
         ev_.num_dirs_looked.zero? || fail
-        ::Array.try_convert( ev_.file_pattern_x ) || fail
+        ::Array.try_convert( ev_.file_pattern_string_or_array ) || fail
         ev_.ok == false || fail
       end
 

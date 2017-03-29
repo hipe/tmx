@@ -147,7 +147,7 @@ module Skylab::Brazen
 
       def __when_found
 
-        Common_::Emission.of :info, :resource_exists do
+        Common_::Emission.of :info, :resource_existed do
           ___build_event
         end
       end
@@ -155,7 +155,7 @@ module Skylab::Brazen
       def ___build_event
 
         _ev = build_OK_event_with(
-          :resource_exists,
+          :resource_existed,
           :config_path, @_workspace.existent_config_path,
           :is_completion, true,
 

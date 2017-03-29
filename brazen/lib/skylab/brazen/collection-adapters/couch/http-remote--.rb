@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch
+  class CollectionAdapters::Couch
 
     class HTTP_Remote__
 

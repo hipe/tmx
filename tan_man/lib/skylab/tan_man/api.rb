@@ -31,7 +31,7 @@ module Skylab::TanMan
     class MicroserviceInvocation___
 
       def initialize invo_rsx
-        @_invocation_resources = invo_rsx
+        @invocation_resources = invo_rsx
       end
 
       def execute
@@ -43,11 +43,11 @@ module Skylab::TanMan
 
         _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
 
-          o.argument_scanner = @_invocation_resources.argument_scanner
+          o.argument_scanner = @invocation_resources.argument_scanner
 
           o.add_operators_injection_by do |inj|
 
-            inj.operators = @_invocation_resources.__microservice_operator_branch
+            inj.operators = @invocation_resources.__microservice_operator_branch
             inj.injector = :_no_injector_for_now_from_BR_
           end
         end
@@ -55,7 +55,7 @@ module Skylab::TanMan
         act = _omni.parse_operator
         if act
           _ref = act.mixed_business_value
-          _ref.bound_call_of_operator_via_invocation_resouces @_invocation_resources
+          _ref.bound_call_of_operator_via_invocation self
         end
       end
 
@@ -73,7 +73,7 @@ module Skylab::TanMan
           :paths,
           :path, :generated_grammar_dir,
           :verb, :retrieve,
-          & @_invocation_resources.listener )  # ??
+          & @invocation_resources.listener )  # ??
 
         @_generated_grammar_dir = :__generated_grammar_dir
         @__generated_grammar_dir = _
@@ -92,10 +92,18 @@ module Skylab::TanMan
         # that the "kernel" (monolith) used to be responsible for.
         # see #[#007.C] throughout lib.)
 
-        _as = MTk_::API_ArgumentScanner.new sym_a, & @_invocation_resources.listener
-        _rsx = @_invocation_resources.__dup_invocation_resources_ _as
+        _as = MTk_::API_ArgumentScanner.new sym_a, & @invocation_resources.listener
+        _rsx = @invocation_resources.__dup_invocation_resources_ _as
         _invo = self.class.new _rsx
         _invo.execute
+      end
+
+      attr_reader(
+        :invocation_resources,  # [pl]
+      )
+
+      def HELLO_INVOCATION  # #todo
+        NIL
       end
     end
 

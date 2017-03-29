@@ -19,7 +19,7 @@ module Skylab::Brazen
         # (contrast w/ parent):
 
         Home_::Branchesque::Indexation.new(
-          Home_::Collection_Adapters,  # <- look! as if it is an Actions
+          Home_::CollectionAdapters,  # <- look! as if it is an Actions
           self,
         )
       end

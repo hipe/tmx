@@ -105,7 +105,7 @@ module Skylab::Cull
 
       _config_path = ::File.join ws_path, CONFIG_FILENAME_
 
-      cfg = Brazen_.collections::Git_Config.parse_path(
+      cfg = Brazen_::CollectionAdapters::GitConfig.parse_path(
         _config_path,
         & @on_event_selectively )
 
@@ -144,8 +144,8 @@ module Skylab::Cull
 
     def re_persist is_dry  # assume a config for read
 
-      @cfg_for_write = Brazen_.collections::Git_Config::Mutable.parse_input_id(
-        @cfg_for_read.input_id, & @on_event_selectively )
+      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.parse_byte_upstream_reference(
+        @cfg_for_read.byte_upstream_reference, & @on_event_selectively )
 
       @cfg_for_read = nil
 
@@ -190,7 +190,7 @@ module Skylab::Cull
 
     def __create_editable_document
       @cfg_for_read = nil
-      @cfg_for_write = Brazen_.collections::Git_Config::Mutable.new(
+      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.new(
         & @on_event_selectively )
       ACHIEVED_
     end
@@ -261,8 +261,8 @@ module Skylab::Cull
         if box.length.zero?
           ACHIEVED_
         else
-          box.each_pair do | sym, x |
-            asts.add_to_bag_mixed_value_and_name_function x, Common_::Name.via_variegated_symbol( sym )
+          box.each_pair do |sym, x|
+            asts.add_to_bag_mixed_value_and_name_symbol x, sym
           end
           ACHIEVED_
         end

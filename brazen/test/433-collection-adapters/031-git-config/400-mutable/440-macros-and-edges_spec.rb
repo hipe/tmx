@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] collection adapters - git config - write" do
+  describe "[br] collection adapters - git config - mutable - macros and edges" do
 
     TS_[ self ]
     use :collection_adapters_git_config
@@ -16,7 +16,9 @@ module Skylab::Brazen::TestSupport
       a.push Common_::Pair.via_value_and_name( true, :zappo )
       _scan = Common_::Stream.via_nonsparse_array a
       x = subject.write io, _scan, 'sub sec.to', 'se-cto'
-      x.should eql true
+
+      x.bit_length
+
       io.rewind
       s = io.read
       io.close
@@ -32,7 +34,9 @@ module Skylab::Brazen::TestSupport
       _scan = Common_::Stream.via_nonsparse_array _a
       io = Home_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'
-      x.should eql true
+
+      x.bit_length
+
       s = io.string
       lines = s.split Home_::NEWLINE_
       lines.last.should eql 'two-characters = \\\\b'  # the value that was

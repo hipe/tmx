@@ -961,7 +961,7 @@ module Skylab::Common
         _CA = Home_.lib_.basic::MinimalProperty.via_variegated_symbol :argument
       end
 
-      define_method :via_value_and_symbol do | x, sym |
+      define_method :via_value_and_symbol do |x, sym|
 
         _asc = if :argument == sym
           _CA || p[]

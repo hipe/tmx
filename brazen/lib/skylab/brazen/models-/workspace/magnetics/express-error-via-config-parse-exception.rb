@@ -19,7 +19,7 @@ module Skylab::Brazen
 
         @expag.calculate do
 
-          y << "#{ o.reason } in #{ pth o.input_identifier.to_path }:#{
+          y << "#{ o.reason } in #{ pth o.byte_upstream_reference.to_path }:#{
             }#{ o.lineno }:#{ o.column_number }"
 
           hdr = "  #{ o.lineno }: "

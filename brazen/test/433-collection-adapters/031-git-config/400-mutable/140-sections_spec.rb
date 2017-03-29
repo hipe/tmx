@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] collection adaptes - git config mutable sections" do
+  describe "[br] collection adaptes - git config - mutable - sections" do
 
     TS_[ self ]
     use :expect_event
@@ -57,7 +57,7 @@ module Skylab::Brazen::TestSupport
         expect_document_content "[foo]\n"
 
         secto_ = touch_section 'foo'
-        secto.should be_respond_to :subsect_name_s
+        secto.should be_respond_to :subsection_name_string
         secto_.object_id.should eql secto.object_id
       end
 

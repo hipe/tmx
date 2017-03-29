@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -193,7 +193,7 @@ module Skylab::Brazen
           @body_pair_a.each do |pair|
             s = pair.name_symbol.to_s
             if s.include? UNDERSCORE_
-              pair = pair.with_name_i s.gsub( UNDERSCORE_, DASH_ ).intern
+              pair = pair.with_name_symbol s.gsub( UNDERSCORE_, DASH_ ).intern
             end
             @section[ pair.name_symbol ] = pair.value_x
           end

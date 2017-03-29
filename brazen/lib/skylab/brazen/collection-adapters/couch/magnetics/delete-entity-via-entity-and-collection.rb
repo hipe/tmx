@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch
+  class CollectionAdapters::Couch
 
     class Magnetics::DeleteEntity_via_Entity_and_Collection < CouchMagnetic_
 

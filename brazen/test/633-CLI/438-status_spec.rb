@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI actions status" do
+  describe "[br] CLI (actions) status" do
 
     TS_[ self ]
     use :memoizer_methods

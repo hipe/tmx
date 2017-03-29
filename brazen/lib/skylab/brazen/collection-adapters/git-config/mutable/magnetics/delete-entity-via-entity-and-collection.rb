@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -46,7 +46,7 @@ module Skylab::Brazen
             if :section_or_subsection == item.category_symbol
               d = sect_s <=> item.internal_normal_name_string
               if d.nonzero? then d else
-                subs_s <=> item.subsect_name_s
+                subs_s <=> item.subsection_name_string
               end
             else
               -1

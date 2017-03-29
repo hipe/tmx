@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI actions - canon level-2" do
+  describe "[br] CLI - canon level-2" do
 
     TS_[ self ]
     use :memoizer_methods
