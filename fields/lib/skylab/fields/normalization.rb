@@ -152,6 +152,10 @@ module Skylab::Fields
           @_result = m ; nil
         end
 
+        def will_nilify
+          @_do_nilify_ = true
+        end
+
         # -- specify the associations
 
         def association_index= asc_idx
@@ -398,42 +402,6 @@ module Skylab::Fields
           ok
         end
 
-        # (:#here9:)
-
-        # here we restate the pertinent points of our central algorithm
-        # so that they shadow the structure of our code (somewhere),
-        # literate-programming-like:
-
-        # if the value is already present in the "valid value store", then
-        # we must assume it is valid and there is nothing more to do for
-        # this association. ([#012.5.3])
-
-        # if you succeeded in resolving a default value (which requires
-        # that a defaulting proc is present and that a call to it didn't
-        # fail), then per [#012.E.3] we must assume this value is already
-        # "normalized" and as such we must cicumvent any ad-hoc
-        # normalization. so if we resolved a default (which could possibly
-        # be `nil`), write this value.
-
-        # if you got this far,
-        #
-        #   - there is effectively no corresponding value in the valid
-        #     value store. (either it's set to `nil` or it's not set
-        #     at all.)
-        #
-        #   - a default value was not resolved for one of two reasons.
-        #
-        # as long as we're treating explicit `nil` indifferently from
-        # "not set" (which we should; yuck if we don't), then we're going to
-        # set it up to look as if the value was explicitly set to `nil`, and
-        # use the same code that we use in those cases (per the law of
-        # parsimony).
-
-        # if no default, no normalizer, and it's not required; then there's
-        # nothing to do for this field. (there would PROBABLY be no harm in
-        # sending NIL here but we're gonna wait until we feel that we want
-        # it..) #wish [#012.J.4] "nilify" option
-
         # -- E: missing requireds (both memoing and expressing)
 
         def add_missing_required_MIXED_association_ sym_or_object
@@ -636,10 +604,16 @@ module Skylab::Fields
 
         h = {} ; pool = {}
 
+        is_extroverted = if n11n._do_nilify_
+          MONADIC_TRUTH_  # [#002."interplay 4"] "proves" that nilification = all are extroverted
+        else
+          Association_is_extroverted__
+        end
+
         begin
           asc = asc_st.gets
           asc || break
-          if Association_is_extroverted__[ asc ]
+          if is_extroverted[ asc ]
             pool[ asc.name_symbol ] = true
           end
           h[ asc.name_symbol ] = asc
@@ -746,7 +720,6 @@ module Skylab::Fields
         include CommonPipelineLanguage__
 
         def initialize n11n
-
           @_seen = {}
           super
         end
@@ -835,11 +808,14 @@ module Skylab::Fields
         # remaining extroverted associations in the diminishing pool after
         # processing (any) arguments.
 
-        # (during refactoring this code-interest moved here, but to preserve
-        # VCS history (for now) the comment-block describing its sub-
-        # algorithm in detail is still at #here9 above.)
+        # exactly [#012.K.2] pseudocode.
 
         include CommonPipelineLanguage__
+
+        def initialize n11n
+          @__do_nilify = n11n._do_nilify_
+          super
+        end
 
         def reinitialize normal_asc
           @normal_association = normal_asc
@@ -873,6 +849,13 @@ module Skylab::Fields
 
             @_sanitized_value_ = nil
             send_sanitized_value   # anticipate the failure on required check
+
+          elsif @__do_nilify
+
+            # explained at [#012.K.3]
+
+            @_sanitized_value_ = nil
+            send_sanitized_value
 
           else
             ACHIEVED_  # nothing to send
@@ -990,11 +973,11 @@ module Skylab::Fields
         end
 
         def simplified_write x
-          @_valid_value_store_.simplified_write_ x, @normal_association.name_symbol
+          @_valid_value_store_._simplified_write_ x, @normal_association.name_symbol
         end
 
         def simplified_read
-          @_valid_value_store_.simplified_read_ @normal_association.name_symbol
+          @_valid_value_store_._simplified_read_ @normal_association.name_symbol
         end
       end
 
@@ -1125,6 +1108,7 @@ module Skylab::Fields
         attr_reader(
           :arguments_to_default_proc_by,  # here, 1x
           :association_source,  # [ta]
+          :_do_nilify_,
           :entity,
           :listener,  # because #here8
         )
@@ -1433,12 +1417,12 @@ module Skylab::Fields
           end
         end
 
-        def simplified_write_ x, k
+        def _simplified_write_ x, k
           @__write_by[ k, x ]
           NIL
         end
 
-        def simplified_read_ k
+        def _simplified_read_ k
           @__read_by[ k ]
         end
       end

@@ -8,6 +8,20 @@ module Skylab::Basic
 
         Attributes_actor_[ self ]
 
+        def initialize & p
+
+          if p
+            @on_event_selectively = p
+          end
+
+          @_do_freeze = true
+          @absolute_is_OK = true
+          @content_validation_is_required = false
+          @content_validation_is_activated = false
+          @disallow_h = nil
+          @relative_is_OK = true
+        end
+
       private
 
         def absolute=
@@ -35,15 +49,17 @@ module Skylab::Basic
           KEEP_PARSING_
         end
 
-        def initialize
-          @content_validation_is_required = false
-          @content_validation_is_activated = false
-          @disallow_h = nil
-          @absolute_is_OK = @relative_is_OK = true
+        def qualified_knownness=
+          @_do_freeze = false
+          @qualified_knownness = @_argument_scanner_.gets_one
+          KEEP_PARSING_
         end
 
         def as_attributes_actor_normalize
-          freeze
+          if @_do_freeze
+            freeze
+          end
+          KEEP_PARSING_
         end
 
         def initialize_copy _otr_

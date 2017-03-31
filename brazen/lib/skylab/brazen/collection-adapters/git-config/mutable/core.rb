@@ -173,10 +173,6 @@ module Skylab::Brazen
 
       module Readable_Branch_Methods__  # for documents and [sub] sections, not assignment or comments
 
-        def members
-          EMPTY_A_  # meh
-        end
-
         def is_empty
           @a.length.zero?
         end
@@ -230,24 +226,36 @@ module Skylab::Brazen
           get_node_enum( sym ).map( & p )
         end
 
-        def aref_node_with_norm_name_i sym, norm_i
-          scn = _to_node_scn_via_symbol sym
-          while node = scn.gets
-            if norm_i == node.external_normal_name_symbol
-              found = node ; break
-            end
-          end
+        def aref_node_with_norm_name_sym sym, norm_sym
+
+          st = _to_node_minimal_stream_via_symbol sym
+
+          begin
+            node = st.gets
+            node || break
+            norm_sym == node.external_normal_name_symbol || redo
+            found = node
+            break
+          end while above
+
           if found
             found.value_when_is_result_of_aref_lookup
           end
         end
 
-        def get_node_enum i
+        def get_node_enum sym
+
           if block_given?
-            x = nil ; scn = _to_node_scn_via_symbol i
-            yield x while x = scn.gets ; nil
+            st = _to_node_minimal_stream_via_symbol sym
+            begin
+              x = st.gets
+              x || break
+              yield x
+              redo
+            end while above
+            NIL
           else
-            to_enum :get_node_enum, i
+            to_enum :get_node_enum, sym
           end
         end
 
@@ -325,9 +333,15 @@ module Skylab::Brazen
           @sections_shell = SectionsFacade__.new self, parse
         end
 
-        def members
-          [ :add_comment, :input_id, :sections, :to_line_stream,
-            :write, :write_to_path, * super ]
+        def set_value_in_section value_value, value_name_symbol, section_name_string, & p
+
+          _sect = sections.touch_section section_name_string
+
+          _x_ = _sect[ value_name_symbol ] = value_value
+
+          value_value == _x_ || self._SANITY
+
+          ACHIEVED_
         end
 
         def description_under expag
@@ -428,10 +442,6 @@ module Skylab::Brazen
         def initialize_copy _otr_
         end
 
-        def members
-          [ :length, :first, :to_value_stream ]
-        end
-
         def length
           @collection_kernel.count_number_of_nodes self.class::CATEGORY_SYMBOL
         end
@@ -520,27 +530,26 @@ module Skylab::Brazen
 
           x = [ yes=[], no=[] ]
 
-          scn = @collection_kernel.to_node_stream
+          st = @collection_kernel.to_node_stream
 
-          while item = scn.gets
+          begin
+            item = st.gets
+            item || break
             if compare_p[ item ].zero?
               yes.push item
             else
               no.push item
             end
-          end
+            redo
+          end while above
 
           x
         end
       end
 
-      class Sections_Facade__ < Mutable_Collection_Shell__
+      class SectionsFacade__ < MutableCollectionFacade__
 
-        SYMBOL_I = :section_or_subsection
-
-        def members
-          [ :touch_section, :delete_these_ones, * super ]
-        end
+        CATEGORY_SYMBOL = :section_or_subsection
 
         def touch_section subsect_s=nil, sect_s, & x_p
           section = _build_section subsect_s, sect_s
@@ -673,16 +682,6 @@ module Skylab::Brazen
         def initialize kernel
           @kernel = kernel
           @is_editable = false
-        end
-
-        def members
-          [ :assignments,
-            :build_assignment_via_mixed_value_and_name_function,
-            :external_normal_name_symbol,
-            :internal_normal_name_string,
-            :subsect_name_s,
-            :to_line_stream,
-            :to_node_stream ]
         end
 
         def dup_via_parse_context parse
@@ -921,23 +920,35 @@ module Skylab::Brazen
           @line = @scn.string.freeze
           @column_number = @scn = nil
           # keep @parse around for any subsequent events we may emit!
-          rslv_names
+          _init_names_
           ACHIEVED_
         end
 
-        def rslv_names
-          @sect_s = @line[ @name_start_index, @name_width ]
-          @normalized_sect_s = @sect_s.downcase
-          @normalized_sect_i = @normalized_sect_s.intern
-          @subsect_s = @subsection_leader_width && prdc_ss_s
-          nil
+        def _init_names_
+
+          if @subsection_leader_width
+            ss_s = __subsection_string
+          end
+
+          section_s = @line[ @name_start_index, @name_width ]
+
+          slug_town = section_s.downcase
+
+          @normalized_section_symbol = slug_town.intern
+
+          @normal_section_string = slug_town
+          @section_string = section_s
+          @subsection_string = ss_s
         end
 
-        def prdc_ss_s
-          s = @line[
-            @name_start_index + @name_width + @subsection_leader_width,
-            @subsection_name_width ]
+        def __subsection_string
+
+          _d = @name_start_index + @name_width + @subsection_leader_width
+
+          s = @line[ _d, @subsection_name_width ]
+
           Section_.mutate_subsection_name_for_unmarshal s
+
           s
         end
 
@@ -1097,10 +1108,17 @@ module Skylab::Brazen
         end
 
         def unparse_into_yielder y  # :+#arbitrary-styling
-          scn = to_line_stream
-          while line = scn.gets
+
+          st = to_line_stream
+
+          begin
+            line = st.gets
+            line || break
             y << line
-          end ; nil
+            redo
+          end while above
+
+          y
         end
 
         def to_line_stream
@@ -1140,32 +1158,35 @@ module Skylab::Brazen
 
         def maybe_send_invalid_section_name_error
           maybe_send_event :error, :invalid_section_name do
-            bld_invalid_section_name_event
+            __build_invalid_section_name_event
           end
         end
 
-        def bld_invalid_section_name_event
-          build_not_OK_event_with :invalid_section_name, :invalid_section_name,
-            @unsanitized_sect_s
+        def __build_invalid_section_name_event
+          build_not_OK_event_with(
+            :invalid_section_name,
+            :invalid_section_name, @unsanitized_section_string,
+          )
         end
 
-        def rslv_subsect_s
-          ok = if @unsanitized_subsect_s
-            if @unsanitized_subsect_s.include? NEWLINE_
+        def __resolve_subsection_string
+
+          ok = if @unsanitized_subsect_string
+            if @unsanitized_subsect_string.include? NEWLINE_
               maybe_send_invalid_subsection_name_error
               UNABLE_
             else
-              @subsect_s = @unsanitized_subsect_s ; @unsanitized_subsect_s = nil
+              @subsection_string = @unsanitized_subsect_string
+              @unsanitized_subsect_string = nil
               ACHIEVED_
             end
           else
-            @subsect_s = @unsanitized_subsect_s ; @unsanitized_subsect_s = nil
+            @subsection_string = @unsanitized_subsect_string
+            @unsanitized_subsect_string = nil
             ACHIEVED_
           end
-          ok and begin
-            rslv_names
-            ok
-          end
+          ok && _init_names_
+          ok
         end
 
         def maybe_send_invalid_subsection_name_error
@@ -1174,25 +1195,31 @@ module Skylab::Brazen
           end
         end
 
-        def bld_invalid_subsection_name_event
-          build_not_OK_event_with :invalid_subsection_name, :invalid_subsection_name,
-            @unsanitized_subsect_s do |y, o|
+        def __build_invalid_subsection_name_event
+
+          build_not_OK_event_with(
+            :invalid_subsection_name,
+            :invalid_subsection_name, @unsanitized_subsect_string,
+          ) do |y, o|
+
               s = o.invalid_subsection_name
               d = s.index NEWLINE_
               d_ = d - 4
+
               _excerpt = case 0 <=> d_
               when -1 ; "[..]#{ s[ d_ .. d ] }"
               when  0 ; s[ d_ .. d ]
               when  1 ; s[ 0 .. d ]
               end
+
               y << "subsection names #{
                 }can contain any characters except newline (#{ ick _excerpt })"
           end
         end
 
-        def rslv_names
-          @normalized_sect_s = @sect_s.downcase
-          @external_normal_name_symbol = @normalized_sect_s.intern ; nil
+        def _init_names_
+          @normal_section_string = @section_string.downcase
+          @external_normal_name_symbol = @normal_section_string.intern ; nil
         end
       end
 
@@ -1221,16 +1248,18 @@ module Skylab::Brazen
         end
       end
 
-      class Assignments_Facade__ < Mutable_Collection_Shell__
-        SYMBOL_I = :assignment
+      class AssignmentsFacade__ < MutableCollectionFacade__
 
-        def members
-          [ :add_to_bag_mixed_value_and_name_function, * super ]
-        end
+        CATEGORY_SYMBOL = :assignment
 
-        def add_to_bag_mixed_value_and_name_function x, nm
-          @collection_kernel.accept_asmt(
-            Assignment__.via_literal( nm.as_slug.intern, x, @parse ) )
+        def add_to_bag_mixed_value_and_name_symbol x, sym  # [cu]
+
+          _sym = Common_::Name.via_variegated_symbol( sym ).as_slug.intern
+
+          _asst = Assignment__.via_literal _sym, x, @parse
+
+          @collection_kernel.accept_asmt _asst
+
           ACHIEVED_
         end
       end
@@ -1255,11 +1284,6 @@ module Skylab::Brazen
 
         def initialize kernel
           @kernel = kernel
-        end
-
-        def members
-          [ :category_symbol, :external_normal_name_symbol,
-            :internal_normal_name_string, :value_x ]
         end
 
         def dup_via_parse_context parse
@@ -1712,10 +1736,6 @@ module Skylab::Brazen
           self._DO_ME  # todo
         end
 
-        def members
-          [ :category_symbol, :to_line, :to_line_stream, :unparse_into_yielder ]
-        end
-
         def category_symbol
           :blank_line_or_comment_line
         end
@@ -1733,11 +1753,53 @@ module Skylab::Brazen
         end
       end
 
+      # ==
+
+      module Magnetics
+        Autoloader_[ self ]
+      end
+
+      class Magnetics::WroteFileEvent_via_Values < Common_::MagneticBySimpleModel  # #stowaway
+
+        attr_writer(
+          :bytes,
+          :is_dry,
+          :path,
+          :verb_symbol,
+        )
+
+        def execute
+
+          Common_::Event.inline_OK_with(
+
+            :collection_resource_committed_changes,
+            :bytes, remove_instance_variable( :@bytes ),
+            :is_completion, true,
+            :is_dry, remove_instance_variable( :@is_dry ),
+            :path, remove_instance_variable( :@path ),
+            :verb_symbol, remove_instance_variable( :@verb_symbol ),
+
+          ) do | y, o |
+
+            _dry = ( "dry " if o.is_dry )
+
+            y << "#{ o.verb_symbol }d #{ pth o.path } (#{ o.bytes } #{ _dry }bytes)"
+          end
+        end
+      end
+
+      # ==
+
       Line_stream_via_single_line__ = -> line do
         Common_::Stream.via_item line
       end
 
+      # ==
+
       SPACE_RX_ = /[ ]*/
+
+      # ==
+      # ==
     end
   end
 end

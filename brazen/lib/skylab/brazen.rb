@@ -21,14 +21,6 @@ module Skylab::Brazen
       Home_::Nodesque::Methods::Branchesque_Defaults
     end
 
-    def cfg
-      Home_::Collection_Adapters::Git_Config
-    end
-
-    def collections
-      Home_::Collection_Adapters
-    end
-
     def describe_into_under y, expag
 
       y << "the prototype [br] app (sidelined for now as a real app)"
@@ -80,19 +72,6 @@ module Skylab::Brazen
     end
   end
 
-  # == this thing
-
-  module Toolkit
-
-    Autoloader_[ self ]
-
-    lazily :ConfigFileInquiry do
-
-      _ = Home_::Models_::Workspace::ConfigFileInquiry
-      _  # hi. #todo
-    end
-  end
-
   # == public "magnetics" (functions)
 
   Ordered_stream_via_participating_stream = -> do  # 1x here, 1x [tm]
@@ -128,7 +107,7 @@ module Skylab::Brazen
     end
   end
 
-  module Collection_Adapters
+  module CollectionAdapters
 
     class << self
       def name_function

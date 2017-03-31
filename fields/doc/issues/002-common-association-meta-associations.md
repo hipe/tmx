@@ -29,7 +29,7 @@ to manifest, as a means of explaining both the libraries and of the
 the jump from the oldest section in this document (which is the next major
 section) to the second-oldest (and the rest of them) is a span of more than
 3 years. we haven't gotten around to modernizing this oldest section yet
-purely for sentimental reasons.
+for purely sentimental reasons.
 
 the first contemporary section starts at [#here.C]. that same
 identifier is also used as a tracking identifier for what we'll call the
@@ -39,17 +39,11 @@ related libraries built around a theoretical framework introduced under
 
 
 
-### (T.o.C)
+### table of contents
 
-(the identifer numbers/letters are allocated in their order of conception
-(not as a rule, but here). however the below items appear in accordance
-with their "physical" order as it occurs in this document, which is also
-the preferred narrative order they are meant to be presented in. i.e, it
-is not the case that you are supposed to read the sections in their numeric
-(or lexographic) order; you should read them in the order in which they
-occur in this document.)
+(the numbering and ordering rationale of this is per [#bs-016.2] conventions.)
 
-  - [one]        (a placeholder for anything reference-able in the intro(s))
+  - [#here.A]    introductory sections(s), table of contents & related.
   - [#here.2]    formal vs. actual (the old thing)
   - [#here.C]    feature overview of defined attributes, actors
   - [#here.F]    the "rabbithole" of axioms & corollaries
@@ -511,7 +505,7 @@ use the `optional` modifier instead.
 
 
 
-## a deprecated interplay 4, here for posterity and to exercise thought:
+## a semi-deprecated interplay 4, here for posterity and to exercise thought:
 
 in [#012.F.B] we introduced the general idea of "extroverted" associations
 as those associations that need special, inductive activation rather than
@@ -562,7 +556,7 @@ otherwise essential step (method call).
 another application of this corollary was that for normalization algorithms
 that did pre-indexing (as the subject library once did (and still does to
 a lesser extent)), if they saw that they had no extroverted associations
-at all then they could arrange things to skip the overhead of this
+at all then they could arrange things to skip the "overhead" of this
 "extroversion pass" entirely.
 
 both of these applications of this corollary, however, have been anulled:
@@ -574,7 +568,7 @@ of worrying about if/when to issue this "normalization point".
 but the other thing (the main thing) is the remainder of this section:
 
 to restate ground covered in "interplay 2" above, if our normalization
-algorithm provides "nilification", then every optional association with no
+algorithm provides [#012.J.4] "nilification", then every optional association with no
 default value is (for practical purposes) is indistinguishable from an
 association whose default value is `nil`.
 
@@ -591,7 +585,7 @@ space and critical framework alike):
 
   - every optional association that does *not* resolve a default value
     effectively has a default value of `nil`, hence making this association
-    aslo extroverted (IFF "nilification" is a provision).
+    also extroverted (IFF "nilification" is a provision).
 
 if you accept the delicate cascade of all the above assertions, then
 *every* association is extroverted, making extroversion itself an extraneous

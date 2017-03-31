@@ -58,6 +58,10 @@ module Skylab::TanMan
     Home_.lib_.system.path_looks_relative path
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   Scanner_ = -> a do
     Common_::Scanner.via_array a
   end
@@ -155,6 +159,7 @@ module Skylab::TanMan
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NIL_AS_FAILURE_ = nil
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   Home_ = self

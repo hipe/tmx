@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
-    GitConfigMagnetic_ = ::Class.new Home_::Collection::Actor  # in [#028]
+    GitConfigMagnetic_ = ::Class.new Home_::Action  # in [#028]
 
     Magnetics = ::Module.new
 
@@ -55,13 +55,17 @@ module Skylab::Brazen
       end
 
       def via_model_class_rslv_subsection_name_query
-        i = via_model_class_prdc_section_name_i
+
+        sym = via_model_class_prdc_section_name_symbol
+
         @subsection_name_query = -> sect do
-          i == sect.external_normal_name_symbol
-        end ; nil
+          sym == sect.external_normal_name_symbol
+        end
+
+        NIL
       end
 
-      def via_model_class_prdc_section_name_i
+      def via_model_class_prdc_section_name_symbol
         @model_class.node_identifier.
           silo_name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
       end
@@ -97,15 +101,20 @@ module Skylab::Brazen
       end
 
       def via_section_scan_and_model_class_produce_entity_scan
+
         fly = @model_class.new_flyweight @kernel, & @on_event_selectively
         box = fly.properties
         name_name_s = NAME_SYMBOL.to_s
+
         @section_scan.map_by do |sect|
-          h = { name_name_s => sect.subsect_name_s }
-          sect.assignments.each_normalized_pair do |i, x|
+
+          h = { name_name_s => sect.subsection_name_string }
+
+          sect.assignments.each_normalized_pair do |sym, x|
             x or next
-            h[ i.id2name ] = "#{ x }"
+            h[ sym.id2name ] = "#{ x }"
           end
+
           box.replace_hash h
           fly
         end
@@ -172,18 +181,18 @@ module Skylab::Brazen
         ss = @subsection_id
         st = @document.sections.to_value_stream
 
-        s_i = ss.section_s.intern
+        sect_sym = ss.section_s.intern
         ss_s = ss.subsection_s
 
         while sect = st.gets
 
-          if s_i != sect.external_normal_name_symbol
+          if sect_sym != sect.external_normal_name_symbol
             next
           end
 
           count += 1
 
-          if ss_s != sect.subsect_name_s
+          if ss_s != sect.subsection_name_string
             next
           end
 
@@ -208,10 +217,10 @@ module Skylab::Brazen
         build_not_OK_event_with :component_not_found,
           :count, @count,
           :subsection_id, @subsection_id,
-          :input_id, @document.input_id do |y, o|
+          :byte_upstream_reference, @document.byte_upstream_reference do |y, o|
 
-          if o.input_id
-            s = o.input_id.description_under self
+          if o.byte_upstream_reference
+            s = o.byte_upstream_reference.description_under self
             s and loc_s = " in #{ s }"
           end
 
@@ -228,7 +237,7 @@ module Skylab::Brazen
 
       def __via_subsection_id_resolve_model_class
 
-        _sym = @subsection_id.to_silo_name_i
+        _sym = @subsection_id.to_silo_name_symbol
 
         _id = Home_::Nodesque::Identifier.via_symbol _sym
 
@@ -243,7 +252,7 @@ module Skylab::Brazen
       def __via_section_and_model_class_resolve_unmarshal_result
 
         @result = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
-          o.edit_pair @section.subsect_name_s, NAME_SYMBOL
+          o.edit_pair @section.subsection_name_string, NAME_SYMBOL
           o.edit_pairs @section.assignments do | x |
             if ! x.nil?
               x.to_s  # life is easier if string is the great equalizer:
@@ -271,23 +280,24 @@ module Skylab::Brazen
           @escaped_subsection_s = ss.dup )
       end
 
-      def members
-        [ :section_s, :subsection_s, :escaped_subsection_s ]
-      end
-
-      attr_reader :section_s, :subsection_s, :escaped_subsection_s
 
       def to_a
         [ @subsection_s, @section_s ]
       end
 
-      def to_silo_name_i
+      def to_silo_name_symbol
         @section_s.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
       def description
         "#{ @section_s } \"#{ @escaped_subsection_s }\""
       end
+
+      attr_reader(
+        :section_s,
+        :subsection_s,
+        :escaped_subsection_s,
+      )
     end
 
     # ==

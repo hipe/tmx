@@ -9,12 +9,15 @@ module Skylab::System::TestSupport
 
     it "works" do
 
-      _subject = services_.filesystem.directory_as_collection do | o |
+      _fs = services_.filesystem
+
+      _subject = Home_::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
 
         o.directory_is_assumed_to_exist = true
         o.directory_path = TestSupport_::Fixtures.files_path
         o.flyweight_class = _Whatever_Flyweight_Class
         o.flyweight_arguments = [ :_nothing_from_SY_ ]
+        o.filesystem = _fs
       end
 
       st = _subject.to_entity_stream

@@ -56,7 +56,7 @@ module Skylab::System
       end
 
       def write s
-        "#{ s }".length
+        s.length
       end
 
       def close

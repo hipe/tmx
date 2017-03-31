@@ -32,16 +32,6 @@ module Skylab::System
 
     # ~ model exposures
 
-    ## ~~ dir as collection
-
-    def directory_as_collection & build
-
-      Home_::Filesystem::Directory::As::Collection.define do |o|
-        o.filesystem = self  # as a default
-        build[ o ]
-      end
-    end
-
     ## ~~ tmpdir
 
     def tmpdir_path

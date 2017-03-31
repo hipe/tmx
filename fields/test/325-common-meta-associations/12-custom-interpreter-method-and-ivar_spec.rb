@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_some_class_over_here do
 
-          class X_cma_CW
+          class X_cimai_CW
 
             def zizzie=
               scn = @_argument_scanner_
@@ -80,7 +80,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_cma_CIMO_A
+          class X_cimai_CIMO_A
 
             ATTRIBUTES = Attributes.lib.call(
               zing: [ :custom_interpreter_method_of, :zung ],
@@ -140,40 +140,27 @@ module Skylab::Fields::TestSupport
 
       context "use this one \"macro\"" do
 
-        it "yes" do
-
-          _attr = _attribute
-          _qkn = Common_::QualifiedKnownness.via_value_and_symbol( -2, :_no_see_FI_ )
-          _kn = _attr.normalize_by[ _qkn ]
-          _kn.value_x == -2 || fail
+        it "OK number is OK" do
+          _expect_this_value_is_OK( -2 )
         end
 
-        it "no" do
+        context "not OK number is not OK" do
 
-          _attr = _attribute
-
-          _qkn = Common_::QualifiedKnownness.via_value_and_symbol( -3, :_no_see_FI_ )
-
-          chan = nil ; ev_p = nil
-
-          _kn = _attr.normalize_by.call _qkn do |*a, &p|
-            chan = a ; ev_p = p ; :_no_see_FI_
+          it "this channel" do
+            _this_channel :error, :invalid_property_value
           end
 
-          _kn == false || fail
+          it "this message" do
+            _this_message "«prp: arg_1» must be greater than or equal to «val: -2», had «ick: -3»"
+          end
 
-          chan == [ :error, :invalid_property_value ] || fail
+          shared_subject :_details do
 
-          _ev = ev_p[]
-
-          _expag = my_all_purpose_expression_agent_
-
-          _act = _ev.express_into_under "", _expag
-
-          _act == "«prp: _no_see_FI_» must be greater than or equal to «val: -2», had «ick: -3»" or fail
+            _details_via_argument( -3, :arg_1 )
+          end
         end
 
-        shared_subject :_attribute do
+        shared_subject :_association do
 
           given_definition_(
             :property, :foo, :must_be_integer_greater_than_or_equal_to, -2,
@@ -181,7 +168,122 @@ module Skylab::Fields::TestSupport
           flush_to_item_
         end
       end
+
+      context "use this other \"macro\"" do
+
+        it "OK number is OK" do
+          _expect_this_value_is_OK( 0 )
+        end
+
+        context "not OK number is not OK" do
+
+          it "this channel" do
+            _this_channel :error, :invalid_property_value
+          end
+
+          it "this message" do
+            _this_message "«prp: arg_2» must be non-negative, had «ick: -1»"
+          end
+
+          shared_subject :_details do
+
+            _details_via_argument( -1, :arg_2 )
+          end
+        end
+
+        shared_subject :_association do
+
+          given_definition_(
+            :non_negative_integer, :property, :foo,
+          )
+          flush_to_item_
+        end
+      end
+
+      context "use this third \"macro\"" do
+
+        it "OK number is OK" do
+          _expect_this_value_is_OK 1
+        end
+
+        context "not OK number is not OK" do
+
+          it "this channel" do
+            _this_channel :error, :invalid_property_value
+          end
+
+          it "this message" do
+            _this_message "«prp: arg_3» must be greater than or equal to «val: 1», had «ick: 0»"
+          end
+
+          shared_subject :_details do
+
+            _details_via_argument 0, :arg_3
+          end
+        end
+
+        shared_subject :_association do
+
+          given_definition_(
+            :positive_nonzero_integer, :property, :foo,
+          )
+          flush_to_item_
+        end
+      end
+
+      # ===
+
+      def _this_channel * sym_a
+
+        _details.channel == sym_a || fail
+      end
+
+      def _this_message msg
+
+        _event = _details.event
+
+        _expag = my_all_purpose_expression_agent_
+
+        _act = _event.express_into_under "", _expag
+
+        _act.should eql msg
+      end
+
+      def _details_via_argument d, name_sym
+
+        _asc = _association
+
+        _qkn = Common_::QualifiedKnownness.via_value_and_symbol d, name_sym
+
+        sct = X_cimai_CIMaI_AdHocNormalizationFailureDetails.new
+
+        ev_p = nil
+
+        _kn = _asc.normalize_by.call _qkn do |*a, &p|
+          sct.channel = a
+          ev_p = p
+          :_no_see_FI_
+        end
+
+        _kn == false || fail
+
+        sct.event = ev_p[]  # we're doing this out here and not in there just as exercise
+        sct.freeze
+      end
+
+      def _expect_this_value_is_OK d
+
+        _attr = _association
+        _qkn = Common_::QualifiedKnownness.via_value_and_symbol d, :_no_see_FI_
+        _kn = _attr.normalize_by[ _qkn ]
+        _kn.value_x == d || fail
+      end
     end
+
+    # ==
+
+    X_cimai_CIMaI_AdHocNormalizationFailureDetails = ::Struct.new(
+      :event, :channel )
 
     # ==
     # ==

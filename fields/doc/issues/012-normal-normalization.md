@@ -3,7 +3,7 @@
 ## overview
 
 one by one we explore the different broad concerns of normalization,
-then we explore how they interplay with one another. then sythhesizing
+then we explore how they interplay with one another. then sythesizing
 all this, we propose a grand unified theory of normalization, expressed
 through a rough-sketch but voluminous body of pseudocode. finally
 we critique this model.
@@ -11,7 +11,9 @@ we critique this model.
 
 
 
-## T.o.C
+## table of contents
+
+(the numbering and ordering rationale here is per [#bs-016.2] conventions.)
 
   - [#here.a] intro & similar
   - [#here.2] background: analyzing simple, non-general approaches as case studies
@@ -21,6 +23,7 @@ we critique this model.
   - [#here.e] is it flexible?
   - [#here.appendix-A] definitions of terms
   - [#here.h] the old but still open "N-meta proposition"
+  - [#here.K] code notes
   - [#here.i] is the oldest pseduocode, being kept for posterity for now
 
 
@@ -44,11 +47,14 @@ generally this one supercedes those. however A) they may still provide
 interesting background and B) there is still significant non-overlap,
 for which we should cross reference as appropriate.
 
-although this document is higer-level than [#002] generally, we feel
+although this document is higher-level than [#002] generally, we feel
 that it may be useful to "come in" to the problem-space from the higher
 level of this document (normal normalization) so that we can have an
 understanding of why we want modeling of associations at all.
 
+anytime you find something confusing here, or something "seems missing",
+always look in [#002] because these two complement each other throughout
+most of their content.
 
 
 
@@ -205,7 +211,7 @@ for associations (i.e our API). however:
 one category of costs associated with this approach is along the
 axis of expressiveness/clarity/ease-of-use: it's maybe self-
 evident that for most use cases it's more practical to be able
-to model a association as simply "being" required rather than
+to model an association as simply "being" required rather than
 to ask the author to stop and think how to write a normalization
 function that expresses and asserts requiredness.
 
@@ -870,7 +876,7 @@ so imagine this:
       must munge the case of a value being not set and the value being
       explicitly set to `nil`. (were this not the case this would add
       to the requirements of our reader and writer procs, adding complexity
-      to them that we today see as having little value.)
+      to them that we today see as having little value :[#here.F.c].)
 
       so now we have this *any* value of the any existing component
       in the property store ("entity").
@@ -1030,6 +1036,8 @@ the central requirement for our "entity-killer" phase of development
 (year 7) is that arbitrary new meta-associations can be accomodated
 (somehow).
 
+[tm] is the frontier of this sort of thing, and it appears that yes. (EDIT)
+
 
 
 
@@ -1187,6 +1195,61 @@ properties again with the same code that we use to accomplish the above?
 to do so would lend credence to the design axiom that "The
 N-meta-property" is a bit of fabricated complexity. that at its essence
 we are only ever normalizing entities against models.
+
+
+
+
+## code notes :[#here.K]
+
+### :[#here.K.2]
+
+here we restate the pertinent points of our central algorithm so that
+they shadow the structure of our code (mostly), literate-programming-like:
+
+if the value is already present in the "valid value store", then
+we must assume it is valid and there is nothing more to do for
+this association. ([#here.5.3])
+
+if you succeeded in resolving a default value (which requires
+that a defaulting proc is present and that a call to it didn't
+fail), then per [#here.E.3] we must assume this value is already
+"normalized" and as such we must cicumvent any ad-hoc
+normalization. so if we resolved a default (which could possibly
+be `nil`), write this value.
+
+if you got this far,
+
+  - there is effectively no corresponding value in the valid
+    value store. (either it's set to `nil` or it's not set
+    at all.)
+
+  - a default value was not resolved for one of two reasons.
+
+as long as we're treating explicit `nil` indifferently from
+"not set" (which we should; yuck if we don't), then we're going to
+set it up to look as if the value was explicitly set to `nil`, and
+use the same code that we use in those cases (per the law of
+parsimony).
+
+if no default, no normalizer, and it's not required; then there's
+nothing to do for this field. (there would PROBABLY be no harm in
+sending NIL here but we're gonna wait until we feel that we want
+it..) #wish [#here.J.4] "nilify" option
+
+
+
+### :[#here.K.3]
+
+([#here.J.4] tracks nilification generally, while this section is
+related this particular codepoint as an implementation of nilification.)
+
+we know that the effective value is nil. what we don't know
+is whether or not it is actually set. (in a struct-based store,
+it is a meaningless distinction. but ivar-, hash- and box-based
+can make this distinction.) rather than complicate the requirements
+for value stores which we [#here.F.c] don't want to do, we just
+write `nil` always in these cases, with the chance that it's
+sometimes happening unnecessarily.
 
 
 

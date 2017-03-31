@@ -433,7 +433,19 @@ module Skylab::Plugin
         :sub_branch_const,
       )
 
+      def bound_call_of_operator_via_invocation invo
+        _bound_call_of_operator_by do |o|
+          o.remote_invocation = invo
+        end
+      end
+
       def bound_call_of_operator_via_invocation_resouces rirsx
+        _bound_call_of_operator_by do |o|
+          o.remote_invocation_resources = rirsx
+        end
+      end
+
+      def _bound_call_of_operator_by
 
         # (must be reentrant - is evident if you run all tests in the file)
 
@@ -453,14 +465,18 @@ module Skylab::Plugin
 
         if _is_conventional_model
           BoundCall_via_Branch___.call_by do |o|
-            o.remote_invocation_resources = rirsx
+            yield o  # write resources or invocation
             o.business_module = mod
             o.glob_resources = @glob_resources
             o.local_invocation_resources = @local_invocation_resources
             o.sub_branch_const = const
           end
         else
-          BoundCall_via_Action__[ mod, rirsx, @local_invocation_resources ]
+          BoundCall_via_Action__.call_by do |o|
+            yield o  # ..
+            o.action_class = mod
+            o.local_invocation_resources = @local_invocation_resources
+          end
         end
       end
 
@@ -495,11 +511,22 @@ module Skylab::Plugin
       # of the file: resolve an operator branch and use it to parse the next
       # step.
 
+      def remote_invocation= invo
+        @_remote_invocation_resources = :__RIR_via_invo
+        @_bound_call_via_found_operator = :__bound_call_via_found_op_and_invo
+        @_remote_invocation = invo
+      end
+
+      def remote_invocation_resources= rsx
+        @_remote_invocation_resources = :__RIR_via_selfsame_instance
+        @_bound_call_via_found_operator = :__bound_call_via_found_op_and_invo_rsx
+        @_remote_invo_resources_instance = rsx
+      end
+
       attr_writer(
         :business_module,
         :glob_resources,
         :local_invocation_resources,
-        :remote_invocation_resources,
         :sub_branch_const,
       )
 
@@ -512,19 +539,33 @@ module Skylab::Plugin
 
       def __bound_call_via_found_operator
 
-        _lt = remove_instance_variable( :@__found_operator ).mixed_business_value
-        _lt.bound_call_of_operator_via_invocation_resouces @remote_invocation_resources
+        _op_ref = remove_instance_variable( :@__found_operator ).mixed_business_value
+        send @_bound_call_via_found_operator, _op_ref
+      end
+
+      def __bound_call_via_found_op_and_invo op_ref
+
+        _invo = remove_instance_variable :@_remote_invocation
+        op_ref.bound_call_of_operator_via_invocation _invo
+      end
+
+      def __bound_call_via_found_op_and_invo_rsx op_ref
+
+        _rir = remove_instance_variable :@_remote_invo_resources_instance
+        op_ref.bound_call_of_operator_via_invocation_resouces _rir
       end
 
       # --
 
       def __find_operator
 
+        _rir = send @_remote_invocation_resources
+
         _ob = remove_instance_variable :@__operator_branch
 
         _ = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
 
-          o.argument_scanner = @remote_invocation_resources.argument_scanner
+          o.argument_scanner = _rir.argument_scanner
 
           o.add_operators_injection_by do |inj|
             inj.operators = _ob
@@ -533,6 +574,14 @@ module Skylab::Plugin
         end.parse_operator
 
         _store :@__found_operator, _
+      end
+
+      def __RIR_via_invo
+        @_remote_invocation.invocation_resources
+      end
+
+      def __RIR_via_selfsame_instance
+        @_remote_invo_resources_instance
       end
 
       # --
@@ -640,11 +689,22 @@ module Skylab::Plugin
         :stem,
       )
 
+      def bound_call_of_operator_via_invocation invo
+
+        BoundCall_via_Action__.call_by do |o|
+          o.action_class = send @_action_module
+          o.remote_invocation = invo
+          o.local_invocation_resources = @local_invocation_resources
+        end
+      end
+
       def bound_call_of_operator_via_invocation_resouces rirsx
 
-        _action_mod = send @_action_module
-
-        BoundCall_via_Action__[ _action_mod, rirsx, @local_invocation_resources ]
+        BoundCall_via_Action__.call_by do |o|
+          o.action_class = send @_action_module
+          o.remote_invocation_resources = rirsx
+          o.local_invocation_resources = @local_invocation_resources
+        end
       end
 
       def __action_module_initially
@@ -696,13 +756,24 @@ module Skylab::Plugin
         @__splay = splay
       end
 
+      def bound_call_of_operator_via_invocation invo
+        _by do |o|
+          o.remote_invocation = invo
+        end
+      end
+
       def bound_call_of_operator_via_invocation_resouces irsx
+        _by do |o|
+          o.remote_invocation_resources = irsx
+        end
+      end
 
-        @__splay.const_defined? @__const, false or fail self._SANITY
-
-        _action_mod = @__splay.const_get @__const, false
-
-        BoundCall_via_Action__[ _action_mod, irsx, @__local_invocation_resources ]
+      def _by
+        BoundCall_via_Action__.call_by do |o|
+          yield o
+          o.action_class = @__splay.const_get @__const, false
+          o.local_invocation_resources = @__local_invocation_resources
+        end
       end
 
       attr_reader(
@@ -821,18 +892,36 @@ module Skylab::Plugin
 
     # ==
 
-    BoundCall_via_Action__ = -> action_mod, irsx, invo_rsx do
+    class BoundCall_via_Action__ < Common_::MagneticBySimpleModel
 
-      op = action_mod.new(){ irsx }
+      def remote_invocation= x
+        @_MIXED = x
+      end
 
-      if op.respond_to? :to_bound_call_of_operator
-        op.to_bound_call_of_operator
+      def remote_invocation_resources= x
+        @_MIXED = x
+      end
 
-      elsif op.respond_to? :definition
+      attr_writer(
+        :action_class,
+        :local_invocation_resources,
+      )
 
-        invo_rsx.bound_call_via_action_with_definition_by[ op ]
-      else
-        Common_::BoundCall.by( & op.method( :execute ) )
+      def execute
+
+        op = @action_class.new(){ @_MIXED }
+
+        if op.respond_to? :to_bound_call_of_operator
+
+          op.to_bound_call_of_operator
+
+        elsif op.respond_to? :definition
+
+          @local_invocation_resources.bound_call_via_action_with_definition_by[ op ]
+
+        else
+          Common_::BoundCall.by( & op.method( :execute ) )
+        end
       end
     end
 

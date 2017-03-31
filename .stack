@@ -51,4 +51,6 @@ TD tan_man/test/54-operations/50-starter/24-get_spec.rb
 TD tan_man/test/54-operations/50-starter/14-list_spec.rb
 (model: graph)
 TD tan_man/test/54-operations/42-graph/64-sync_spec.rb
+sunset old code in graph model file
 TD tan_man/test/54-operations/42-graph/44-use_spec.rb
+the whole starter silo

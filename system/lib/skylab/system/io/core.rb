@@ -91,6 +91,10 @@ module Skylab::System
         end
       end
 
+      def path  # WHERE AVAILABLE
+        @io.path
+      end
+
       def shape_symbol
         :IO
       end

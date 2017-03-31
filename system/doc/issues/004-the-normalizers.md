@@ -17,7 +17,7 @@ because hey why not (note we use the holes for our own nodes):
   • [#here.F]: existent directory
   • [#here.G]: path-based normalizations
   • [#here.H]: (below)
-  • [#here.I]: track the volatility/mutex issue of all filesystems
+  • [#here.9]: track the volatility/mutex issue of all filesystems
 
 [#here.G] has a general introduction to why these are "normalizers" and what
 that means.
@@ -174,7 +174,7 @@ stdout.
 ## the downstream IO normalization :[#here.D]
 
 
-### the non-atomicity of all things :[#here.I]
+### the non-atomicity of all things :[#here.9]
 
 when not locking (as will be explained below), it is certainly possible
 that between the time when we (let's say) take the "stat" "snapshot" of

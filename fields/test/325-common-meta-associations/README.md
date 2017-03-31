@@ -13,8 +13,10 @@
   and would be a dependant of flag conceptually.
 
 • `custom_interpreter_method` before `component` b.c dependency
+  (EDIT: ad-hoc normalizations are shoehorned into here.)
 
 • `hook`, `default`, and `desc` are legacy, so last.
+  (EDIT: `default` is not legacy but meh.)
 
 • `desc` is a high-level meta-attribute being that it pertains only
   to generated interfaces and not in interpretation logic.

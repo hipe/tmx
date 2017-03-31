@@ -1,6 +1,57 @@
 module Skylab::TanMan
 
-  class Models_::Graph
+  module Models_::Graph
+
+    # ==
+
+    Actions = ::Module.new
+    class Actions::Use
+
+      def definition
+
+        _these = Home_::DocumentMagnetics_::CommonAssociations.to_workspace_related_stream__
+
+        [
+          :property, :starter,
+          :property, :created_on,
+
+          :properties, _these,
+
+          :required, :property, :digraph_path,
+        ]
+      end
+
+      def initialize
+        extend Home_::Model_::CommonActionMethods
+        init_action_ yield
+      end
+
+      def execute
+        resolve_workspace_ && __thing_ding
+      end
+
+      def __thing_ding
+
+        ok = Here___::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call_by do |o|
+          o.digraph_path = @digraph_path
+          o.is_dry_run = false  # ..
+          o.workspace = @_workspace_
+          o.template_values_provider = self
+          o.sub_invoker = @_microservice_invocation_
+          o.filesystem = _invocation_resources_.filesystem
+          o.listener = _listener_
+        end
+
+        if ok
+          ok  # #cov1.5
+        else
+          NIL_AS_FAILURE_  # #cov1.2
+        end
+      end
+    end
+
+    # ==
+
     if false
 
     edit_entity_class(
@@ -160,8 +211,14 @@ module Skylab::TanMan
         end
       end
     end
+    end  # if false
 
-    Here_ = self
-    end
+    # ==
+    # ==
+
+    Here___ = self
+
+    # ==
   end
 end
+# #history-A: ween off of [br]

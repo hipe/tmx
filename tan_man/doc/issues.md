@@ -58,7 +58,9 @@
 [#052]       #postponed normalizing double quoted strings
 [#051]       #postponed support for 'port' in dot-lang grammar
 [#050]       #done just for fun, eliminate all return statements
-[#049]       #watch #pattern - four permutations for file creation (dirname etc)
+
+[#049]       #watch #pattern - four permutations for file creation (dirname etc) (1x)
+
 [#048]       ( #was: #done failing on tan init should do porcelain too )
              ( #was: #watch what is the deal with the non-orthogonal-ass
               event interface for remote list )

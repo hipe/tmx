@@ -2,90 +2,148 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - graph - use", wip: true do
+  describe "[tm] operations - graph - use" do
 
     TS_[ self ]
-    use :expect_line
+    # use :expect_line
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
-    context "when no workspace" do
+    # (1/N)
+    context "no workspace arguments complains about missing required arguments" do
 
-      it "no args - missing the one required arg" do
+      it "invokes" do
+        _tuple || fail
+      end
+
+      it "missing requireds are.. (structured retrieval)" do
+        _ev = _tuple.first
+        _ev.reasons == %i( workspace_path digraph_path ) || fail
+      end
+
+      shared_subject :_tuple do
 
         call_API :graph, :use
 
-        expect_not_OK_event COMMON_MISS_ do | ev |
-
-          [ :digraph_path, :workspace_path ].should be_include(
-            ev.to_event.reasons.first.name_symbol
-          )
+        a = []
+        expect :error, :missing_required_attributes do |ev|
+          a.push ev
         end
 
         expect_fail
-      end
-
-      it "just digraph path, no ws resolution" do
-
-        call_API :graph, :use,
-          :digraph_path, 'some-path'
-
-        _em = expect_not_OK_event :missing_required_properties
-
-        black_and_white( _em.cached_event_value ).should eql(
-          "missing required attribute 'workspace_path'\n" )
-
-        expect_fail
-      end
-
-      it "yes args but ws path is noent - workspace not found" do
-
-        use_empty_ws
-
-        call_API :graph, :use,
-          :digraph_path, 'some-path',
-          :workspace_path, @ws_pn.to_path,
-          :config_filename, cfn
-
-        expect_not_OK_event :resource_not_found do |ev|
-          ev = ev.to_event
-          ev.num_dirs_looked.should eql 1
-          ev.file_pattern_x.should eql cfn
-          ev.start_path.should eql @ws_pn.to_path
-        end
-
-        expect_fail
+        a
       end
     end
 
-    context "when workspace" do
+    # (2/N)
+    context "just digraph path no workspace arguments complains of missing reqs" do
 
-      it "and digraph path is not absolute - no" do
-
-        prepare_whatever_workspace
-
-        call_API :graph, :use, :digraph_path, 'some-relative/path',
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn
-
-        _em = expect_not_OK_event :invalid_property_value
-
-        ev = _em.cached_event_value.to_event
-
-        :path_cannot_be_relative == ev.terminal_channel_symbol or fail
-
-        ev.to_event.path.should eql 'some-relative/path'
-
-        expect_fail
+      it "invokes" do
+        _tuple || fail
       end
 
-      it "and digraph is abspath whose dirname is noent - no" do
+      it "missing requireds are.. (message generation)" do  # :#cov1.3
 
-        prepare_whatever_workspace
+        _ev = _tuple.first
+        _line = black_and_white _ev
+        _line == "missing required parameter :workspace_path\n" || fail
+      end
 
-        full_path = @ws_pn.dirname.join( 'some-deep/path' ).to_path
+      shared_subject :_tuple do
 
-        call_API :graph, :use,
-          :digraph_path, full_path,
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn
+        call_API(
+          :graph, :use,
+          :digraph_path, 'some-path',
+        )
+
+        a = []
+        expect :error, :missing_required_attributes do |ev|
+          a.push ev
+        end
+
+        expect_fail
+        a
+      end
+    end
+
+    # (3/N)
+    context "workspace path referent must exist" do
+
+      it "invokes" do
+        _tuple || fail
+      end
+
+      it "event has much detail" do
+        ev, workspace_path = _tuple
+        ev.num_dirs_looked == 1 || fail
+        ev.file_pattern_string_or_array == cfn || fail
+        ev.start_path == workspace_path || fail
+      end
+
+      shared_subject :_tuple do
+
+        workspace_path = the_empty_esque_directory__
+
+        _call_API_with_digraph_path_and_workspace_path(
+          'some-path',
+          workspace_path,
+        )
+
+        a = []
+        expect :error, :resource_not_found do |ev|
+          a.push ev
+        end
+
+        expect_fail
+        a.push workspace_path
+        a
+      end
+    end
+
+    # (4/N)
+    context "digraph path cannot be relative (at backend level)" do
+
+      it "invokes" do
+        _tuple || fail
+      end
+
+      it "event has structured info" do
+
+        ev = _tuple.fetch 0
+        :path_cannot_be_relative == ev.terminal_channel_symbol || fail
+        ev.to_event.path == 'some-relative/path' || fail
+      end
+
+      shared_subject :_tuple do
+
+        _workspace_path = path_for_workspace_005_with_just_a_config_
+
+        _call_API_with_digraph_path_and_workspace_path(
+          'some-relative/path',
+          _workspace_path,
+        )
+
+        a = []
+        expect :error, :invalid_property_value do |ev|
+          a.push ev
+        end
+
+        expect_fail
+
+        a
+      end
+    end
+
+    # (5/N)
+    context "dirname of digraph path cannot be noent" do
+
+      it "invokes" do  # :#cov1.1
+        _tuple || fail
+      end
+
+      it ".."  # (at writing 2 of the 4 emissions emit..)
+      def _xx
 
         ev = _expect_events_order_insensitive(
 
@@ -99,82 +157,155 @@ module Skylab::TanMan::TestSupport
         ev.to_event.path.should eql full_path_
 
         black_and_white( ev ).should eql "parent directory must exist - some-deep"
+      end while false
 
-        expect_fail
+      shared_subject :_tuple do
+
+        workspace_path = path_for_workspace_005_with_just_a_config_
+
+        _digraph_path = ::File.join workspace_path, 'some-deep/path'
+
+        _call_API_with_digraph_path_and_workspace_path _digraph_path, workspace_path
+
+        a = []
+        expect :info, :adding_extension do |ev|
+          a.push ev
+        end
+
+        expect :resource_not_found, :parent_directory_must_exist do |ev|
+          a.push ev
+        end
+
+        a
+      end
+    end
+
+    # (6/N)
+    context "digraph path cannot be a directory" do
+
+      it "invokes" do  # :#cov1.2
+        _tuple || fail
       end
 
-      context "and digraph is abspath whose dirname exists" do
-
-        it "and digraph path is directory - no" do
-
-          prepare_ws_tmpdir <<-O.unindent
-            --- /dev/null
-            +++ b/#{ cfn }
-            @@ -0,0 +1 @@
-            +[ whatever ]
-            --- /dev/null
-            +++ b/#{ cdn }/not-a-dotfile.dot/empty-file.txt
-            @@ -0,0 +1 @@
-            +
-          O
-
-          dgpn = @ws_pn.join "#{ cdn }/not-a-dotfile.dot"
-
-          call_API :graph, :use,
-            :digraph_path, dgpn.to_path,
-            :workspace_path, @ws_pn.to_path, :config_filename, cfn
-
+      it ".."
+      if false
           expect_not_OK_event :wrong_ftype,
             /\A\(pth "[^"]+"\) exists but is not \(indefinite_noun #{
              }"file"\), it is \(indefinite_noun "directory"\)\z/
+      end
 
-          expect_fail
+      shared_subject :_tuple do
+
+        path = path_for_workspace_010_with_directory_that_looks_like_file__
+
+        _call_API_with_digraph_path_and_workspace_path(
+          ::File.join( path, cdn, 'not-a-dotfile.dot' ),
+          path,
+        )
+
+        # (this path refers to a directory in the fixture)
+        # (under #tombstone-A we used to make this through a patch)
+
+        a = []
+        expect :error, :wrong_ftype do |ev|
+          a.push ev
         end
 
-        it "and digraph path is file but config parse error" do
+        expect_fail
+        a
+      end
+    end
 
-          shared_setup_via_config_line '["whtvr"]'
-          expect_not_OK_event :config_parse_error
-          expect_fail
+    # (7/N)
+    context "digraph is file but config parse error" do
+
+      it "invokes" do  # #cov1.4
+        _tuple || fail
+      end
+
+      it "config parse error says.."
+
+      shared_subject :_tuple do
+
+        path = path_for_workspace_015_with_config_parse_error__
+
+        digraph_path = ::File.join path, cdn, 'i-exist', 'like-a-boss.dog'
+
+        _call_API_with_digraph_path_and_workspace_path digraph_path, path
+
+        a = []
+        expect :error, :config_parse_error do |ev|
+          a.push ev
         end
 
-        it "and digraph path is file - OK" do
+        expect_fail
+        a
+      end
+    end
 
-          shared_setup_via_config_line '[wiw]'
+    # (8/N)
+    context "WORKS when digraph path referent exists - writes config file" do
 
-          _em = expect_OK_event :success
+      it "invokes; result is number of bytes" do  # :#cov1.5
+        _a = _tuple
+        d = _a.last
+        ::Integer === d or fail
+        d.zero? && fail
+      end
 
-          _sym = _em.cached_event_value.to_event.terminal_channel_symbol
+      it "this first event talks about .." do
+        _ev = _tuple[ -3 ]
+        _content = black_and_white _ev
+        _content =~ /\Aadded value - \(name: path value: "/ or fail
+      end
 
-          :collection_resource_committed_changes == _sym or fail
+      it "this second event talks about .." do
+        _ev = _tuple[ -2 ]
+        _content = black_and_white _ev
+        _content =~ /\Acreated tm-conferg\.file \(\d+ bytes\)\z/ or fail
+      end
 
-          _read_config_file
+      it "content of config file looks good" do
 
-          excerpt( -2 .. -1 ).should eql "[graph \"i-exist/like-a-boss.dog\" ]\n[wiw]\n"
+        _path = ::File.join _tuple[1], cfn
+        io = ::File.open _path, ::File::RDONLY
+        line = io.gets
+        line == "[digraph]\n" || fail
+        line = io.gets
+        line =~ /\Apath = [[:graph:]]/ or fail
+        line = io.gets
+        line && fail
+      end
 
-          expect_succeed
+      shared_subject :_tuple do
+
+        a = _create_the_two_files_where_the_config_file_has_this_line '[wiw]'
+
+        _call_API_with_digraph_path_and_workspace_path( * a )
+
+        expect :info, :related_to_assignment_change do |ev|
+          a.push ev
         end
 
-        it "and diraph path is File object (A HACK)" do
+        expect :info, :success, :collection_resource_committed_changes do |ev|
+          a.push ev
+        end
 
-          prepare_ws_tmpdir <<-O.unindent
-            --- /dev/null
-            +++ b/#{ cfn }
-            @@ -0,0 +1 @@
-            +[ graph "dingo-dango" ]
-            --- /dev/null
-            +++ b/#{ cdn }/open-this-yourself
-            @@ -0,0 +1 @@
-            + this will get overwritten
-          O
+        _d = execute
+        a.push _d
+      end
+    end
 
-          _file = @ws_pn.join( 'open-this-yourself' ).open( ::File::CREAT | ::File::EXCL | ::File::WRONLY )
+    # (9/N)
+    context "you can pass an open IO as the digraph path (a convenience hack)" do
 
-          call_API( :graph, :use,
-            :digraph_path, _file,
-            :workspace_path, @ws_pn.to_path,
-            :config_filename, cfn,
-          )
+      it "invokes", wip: true do
+        # (this needs starter silo)
+        _tuple || fail
+      end
+
+      it ".."
+      def _xx
 
           scn = @event_log.flush_to_scanner
 
@@ -193,45 +324,35 @@ module Skylab::TanMan::TestSupport
           _read_config_file
 
           excerpt( 0 .. 0 ).should eql "[ graph \"../open-this-yourself\" ]\n"
-        end
+      end
 
-        def shared_setup_via_config_line config_line
+      shared_subject :_tuple do
 
-          __like_a_boss config_line
+        workspace_path = prepare_a_tmpdir_like_so_ <<-O.unindent
+          --- /dev/null
+          +++ b/#{ cfn }
+          @@ -0,0 +1 @@
+          +[ graph "dingo-dango" ]
+          --- /dev/null
+          +++ b/#{ cdn }/open-this-yourself
+          @@ -0,0 +1 @@
+          + this will get overwritten
+        O
 
-          call_API(
-            :graph, :use,
-            :digraph_path, @digraph_path,
-            :workspace_path, @ws_pn.to_path,
-            :config_filename, cfn,
-          )
-        end
+        _path = ::File.join workspace_path, 'open-this-yourself'
 
-        def __like_a_boss config_line
+        _IO = ::File.open _path, ::File::CREAT | ::File::EXCL | ::File::WRONLY
 
-          prepare_ws_tmpdir <<-O.unindent
-            --- /dev/null
-            +++ b/#{ cfn }
-            @@ -0,0 +1 @@
-            +#{ config_line }
-            --- /dev/null
-            +++ b/#{ cdn }/i-exist/like-a-boss.dog
-            @@ -0,0 +1 @@
-            + but this is not a dotfile
-          O
+        _call_API_with_digraph_path_and_workspace_path _IO, workspace_path
 
-          @digraph_path = @ws_pn.join( "#{ cdn }/i-exist/like-a-boss.dog" ).to_path
+        self.DEBUG_ALL_BY_FLUSH_AND_EXIT
+      end
+    end
 
-          nil
-        end
+    $stderr.puts "\n\n\nDON'T YOU ... FORGET ABOUT ME\n\n\n"
+    if false
 
-        def _read_config_file
-          @output_s = @ws_pn.join( cfn ).read
-          nil
-        end
-
-        context "and digraph does *not* exist" do
-
+    # (10/N)
           it "and digraph path is without extension - adds ext, creates digraph" do  # #too-big
 
             prepare_whatever_workspace
@@ -273,6 +394,7 @@ module Skylab::TanMan::TestSupport
             expect_succeed
           end
 
+    # (11/N)
           it "and the digraph path is with extension - creates digraph" do
 
             prepare_whatever_workspace
@@ -297,9 +419,6 @@ module Skylab::TanMan::TestSupport
 
             expect_succeeded_result
           end
-        end
-      end
-    end
 
     def prepare_whatever_workspace
       prepare_ws_tmpdir <<-O.unindent
@@ -360,5 +479,39 @@ module Skylab::TanMan::TestSupport
 
       last_user_result
     end
+    end  # if false
+
+    def _call_API_with_digraph_path_and_workspace_path digraph_path, path
+
+      call_API(
+        :graph, :use,
+        :digraph_path, digraph_path,
+        :workspace_path, path,
+        :config_filename, cfn,
+      )
+    end
+
+    def _create_the_two_files_where_the_config_file_has_this_line config_line
+
+      _patch_string = <<-O.unindent
+        --- /dev/null
+        +++ b/#{ cfn }
+        @@ -0,0 +1 @@
+        +#{ config_line }
+        --- /dev/null
+        +++ b/#{ cdn }/i-exist/like-a-boss.dog
+        @@ -0,0 +1 @@
+        + but this is not a dotfile
+      O
+
+      workspace_path = prepare_a_tmpdir_like_so_ _patch_string
+
+      _digraph_path = ::File.join workspace_path, cdn, 'i-exist', 'like-a-boss.dog'
+
+      [ _digraph_path, workspace_path ]
+    end
+    # ==
+    # ==
   end
 end
+# #history-A.1 the beginning of the ween-off-[br] rewrite

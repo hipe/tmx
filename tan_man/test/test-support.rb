@@ -466,35 +466,7 @@ module Skylab::TanMan::TestSupport
   # ==
 
   Autoloader_ = Common_::Autoloader
-
-  # (moved to _FLUX_)
-
-  module TestLib_
-
-    stdlib, = Autoloader_.at(
-      :build_require_stdlib_proc,
-    )
-
-    define_singleton_method :_memoize, Common_::Memoize
-
-    base_tmpdir = _memoize do
-
-      Home_.lib_.system_lib::Filesystem::Tmpdir.with(
-        :path, TS_.tmpdir_path_,
-        :max_mkdirs, 1,
-      )
-    end
-
-    Empty_dir_pn = _memoize do
-      base_tmpdir[].tmpdir_via_join 'empty-tmpdir', :max_mkdirs, 2
-    end
-
-    PP = stdlib[ :PP ]
-
-    Volatile_tmpdir = _memoize do
-      base_tmpdir[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
-    end
-  end
+  Lazy_ = Common_::Lazy
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
@@ -508,7 +480,6 @@ module Skylab::TanMan::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   FIXTURES_ENTRY_ = 'fixtures'
   IDENTITY_= -> x { x }
-  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_

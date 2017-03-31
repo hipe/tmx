@@ -40,7 +40,7 @@ module Skylab::Brazen
           missing_required_properties: ( d += 1 ),
           actual_property_is_outside_of_formal_property_set: ( d += 1 ),
           resource_not_found: ( d += 1 ),
-          resource_exists: ( d += 1 ),
+          resource_existed: ( d += 1 ),
         }.freeze
 
         define_method :[], & h.method( :[] )

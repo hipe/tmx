@@ -177,6 +177,25 @@ module Skylab::TanMan
 
     # ==
 
+    def self.to_workspace_related_stream__
+      __to_stream WORKSPACE_RELATED___
+    end
+
+    WORKSPACE_RELATED___ = [
+      :workspace_path,
+      :max_num_dirs_to_look,
+      :config_filename,
+    ]
+
+    def self.__to_stream sym_a
+
+      col = common_IO_parameters
+
+      Stream_.call sym_a do |sym|
+        col.dereference sym
+      end
+    end
+
     define_singleton_method :common_IO_parameters, ( Lazy_.call do
 
       Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
@@ -229,10 +248,10 @@ module Skylab::TanMan
           :throughput_direction, :output,
         ] end
 
-        o.add_association_by_definition_array :max_num_dirs do [
+        o.add_association_by_definition_array :max_num_dirs_to_look do [
 
           :non_negative_integer,
-          :property, :max_num_dirs,
+          :property, :max_num_dirs_to_look,
           :default, 1,
 
           :description, -> y do
@@ -246,6 +265,7 @@ module Skylab::TanMan
 
         o.add_association_by_definition_array :workspace_path do [
 
+          :required,  # #cov1.3 but..
           :direction_essential,
           :property, :workspace_path,
 

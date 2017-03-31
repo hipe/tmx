@@ -36,10 +36,17 @@ module Skylab::Zerk
 
         OPTIONS___ = {
           must_be: [ :__at_must_be ],
+
           must_be_integer: [ :must_be_trueish, :__must_be_int ],
+
           must_be_integer_that_is_non_negative: [ :must_be_integer, :__non_neg ],
+            # (near `non_negative_integer`)
+
           must_be_integer_that_is_positive_nonzero: [ :must_be_integer, :__posi_non ],
+            # (near `positive_nonzero_integer`)
+
           must_be_trueish: [ :__must_be_trueish ],
+
           use_method: [ :__takes_one_argument ],
         }
 

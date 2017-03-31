@@ -1,5 +1,7 @@
 # the shell and kernel metaphor :[#078]
 
+(EDIT: this feels "gone" (as a convention) but what has replaced it?)
+
 # history and context
 
 we used to say "conduit" and "flusher" instead of "shell" and "kernel",

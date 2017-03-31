@@ -1,204 +1,250 @@
 module Skylab::TanMan
 
-  class Models_::Graph
+  module Models_::Graph
 
-    class WriteGraph_to_Bytestore_via_Graph_and_Workspace___  # ~#[#049] algo family
+    class WriteGraph_to_Bytestore_via_Graph_and_Workspace___ < Common_::MagneticBySimpleModel
 
-      Actor_.call( self,
+      # ~#[#049] algo family (1x)
+
+      # this get thick (and boring) because we are adding an extension to
+      # the file (conditionally) and adding content to the file
+      # (conditionally) and when we add content we use the starters silo..
+
+      attr_writer(
+        :digraph_path,
+        :filesystem,
         :is_dry_run,
-        :entity,
+        :listener,
+        :sub_invoker,
         :template_values_provider,
         :workspace,
-        :kernel,
       )
 
-      def initialize & p
-        @on_event_selectively = p
-      end
-
-      def execute
-        __init_downstream_reference
-        send :"__execute_for__#{ @down_ID.shape_symbol }__"
-      end
-
-      def __init_downstream_reference
-
-        @_qkn = @entity.qualified_knownness :digraph_path
-        x = @_qkn.value_x
-
-        if x.respond_to? :write
-          @down_ID = Byte_downstream_reference_[].via_stream x
-        else
-          @down_ID = Byte_downstream_reference_[].via_path x
+      # -
+        def execute
+          @_downstream_reference = __downstream_reference
+          _const = THESE___.fetch @_downstream_reference.shape_symbol
+          extend This___.const_get( _const, false )
+          execute  # eek
         end
-        nil
-      end
 
-      def __execute_for__path__
-        Touch_path___.new( @_qkn, self, & @on_event_selectively ).execute
-      end
+        THESE___ = {
+          IO: :IO_Methods___,
+          path: :PathMethods___,
+        }
 
-      def __execute_for__IO__
-        _ok = resolve_upstream_lines_
-        _ok and flush_upstream_lines_to_file_ @_qkn.value_x
-      end
+      # -
 
-      class Touch_path___
-
-        def initialize arg, parent, & oes_p
-          @_qkn = arg
-          @parent = parent
-          @on_event_selectively = oes_p
-        end
+      module IO_Methods___
 
         def execute
-          if __path_is_absolute
-            __via_absolute_path_touch_path
-          else
-            UNABLE_
+          if _resolve_digraph_line_upstream_
+            _flush_digraph_line_upstream_to_fileish_ @digraph_path
           end
         end
+      end
 
-        def __path_is_absolute
+      module PathMethods___
 
-          _n11n = Path_lib_[]::Normalization.with :absolute
-
-          _ok_arg = _n11n.normalize_qualified_knownness(
-            @_qkn, & @on_event_selectively )
-
-          _store :@_qkn, _ok_arg
-        end
-
-        def __via_absolute_path_touch_path
-
-          begin
-
-            if __path_exists
-              ok = __path_is_file
-              ok &&= _write_path_to_entity
-              break
-            end
-
-            if __path_has_extension
-              ok = __write_upstream_content
-              ok &&= _write_path_to_entity
-              break
-            end
-
-            __add_extension_to_path
-            redo
-          end while nil
+        def execute
+          ok = true
+          ok &&= __check_that_path_is_absolute
+          ok &&= __touch_file
+          ok &&= __write_path_to_workspace
           ok
         end
 
-        def __path_exists
-          e, @stat = __noent_exception_and_stat_via_path @_qkn.value_x
-          e ? false : true
+        # --
+
+        def __write_path_to_workspace
+
+          path = _current_unsanitized_absolute_path
+
+          @workspace.mutate_and_persist_by do |o|
+
+            o.mutate_document_by do |doc|
+              doc.set_value_in_section path, :path, "digraph"
+            end
+
+            o.is_dry_run = @is_dry_run
+            o.filesystem = @filesystem
+            o.listener = @listener
+          end
         end
 
-        def __noent_exception_and_stat_via_path path
-          [ nil, ::File.stat( path ) ]
-        rescue ::Errno::ENOENT => e
-          [ e, false ]
+        # -- d.
+
+        def __touch_file
+
+          if __path_has_extension
+
+            _touch_file_via_path_with_extension
+
+          elsif __path_existed
+            _check_that_it_was_file
+          else
+            __add_extension_to_path
+            _touch_file_via_path_with_extension
+          end
         end
 
-        def __path_is_file
+        def _touch_file_via_path_with_extension
 
-          _o = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.with(
-            :stat, @stat,
-            :qualified_knownness_of_path, @_qkn,
+          if __open_new_file_for_writing
+
+            __write_upstream_content
+
+          elsif remove_instance_variable :@_referent_existed
+
+            # #cov1.2
+            _init_stat  # (there is one of these #[#sy-004.9] dangerous gaps here
+            _check_that_it_was_file
+          else
+
+            # maybe the dirname of the argument path didn't exist
+
+            UNABLE_  # hi.
+          end
+        end
+
+        def __open_new_file_for_writing
+
+          existed = false
+          _custom_listener = -> * chan, & ev_p do
+            if :error == chan[0] && :resource_existed == chan[1]
+              existed = true
+            else
+              @listener[ * chan, & ev_p ]
+            end
+          end
+
+          o = ::File::Constants
+
+          kn = _these::Downstream_IO.via(
+            :qualified_knownness_of_path, @_current_unsanitized_absolute_path_qkn,
+            :flags_for_open, o::CREAT | o::EXCL | o::WRONLY,
+            :filesystem, @filesystem,
+            & _custom_listener )
+
+          if kn
+            ::Kernel._OKAY
+
+          elsif existed
+
+            # this means that *some* referent (maybe a directory) is already
+            # in the path. silently pass thru to #cov1.2..
+
+            @_referent_existed = true ; UNABLE_
+          else
+            @_referent_existed = false ; UNABLE_  # #cov1.1
+          end
+        end
+
+        # -- c. if the path had an existing referent, success or fail hinges
+        #       on whether that referrent was a file. we won't be adding any
+        #       content to this file here (even if it is empty) so we do not
+        #       lock it.
+
+        def _check_that_it_was_file
+
+          _o = _these::Upstream_IO.with(
+            :stat, remove_instance_variable( :@__stat ),
+            :qualified_knownness_of_path, @_current_unsanitized_absolute_path_qkn,
             :must_be_ftype, :FILE_FTYPE,
-            :filesystem, _real_filesystem,
-            & @on_event_selectively )
+            :filesystem, @filesystem,
+            & @listener )
 
-          _o.via_stat_execute
+          _ok = _o.via_stat_execute
+          _ok  # hi. #todo
         end
 
-        def __path_has_extension
-          ::File.extname( @_qkn.value_x ).length.nonzero?
-        end
-
-        def __add_extension_to_path
-
-          @ext = Home_::Models_::DotFile::DEFAULT_EXTENSION
-
-          path = @_qkn.value_x
-
-          maybe_send_event :info, :adding_extension do
-            __build_adding_extension_event path
-          end
-
-          d = ::File.extname( path ).length
-          _head = d.zero? ? path : path[ 0 ... - d ]
-          @_qkn = @_qkn.new_with_value "#{ _head }#{ @ext }"
-          NIL
-        end
-
-        def __build_adding_extension_event path_before
-
-          Common_::Event.inline_neutral_with(
-
-            :adding_extension,
-            :extension, @ext,
-            :path, path_before,
-
-          ) do | y, o |
-
-            y << "adding #{ o.extension } extension to #{ pth o.path }"
-          end
-        end
-
-        def _write_path_to_entity
-          @parent.into_entity_write_digraph_path__ @_qkn.value_x
+        def _these
+          Home_.lib_.system_lib::Filesystem::Normalizations
         end
 
         def __write_upstream_content
 
+          self._USE_OR_LOSE  # #todo
           ok = @parent.resolve_upstream_lines_
           ok &&= __resolve_downstream_file
           ok and @parent.flush_upstream_lines_to_file_ @f
         end
 
-        def __resolve_downstream_file
+        def __path_existed  # all you know is path has no extension
+          _init_stat
+          ACHIEVED_
+        rescue ::Errno::ENOENT => _e
+          NOTHING_
+        end
 
-          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Downstream_IO.via(
-            :qualified_knownness_of_path, @_qkn,
-            :filesystem, _real_filesystem,
-            & @on_event_selectively )
+        def _init_stat
+          @__stat = @filesystem.stat _current_unsanitized_absolute_path
+          NIL
+        end
 
-          if kn
-            @f = kn.value_x
-            ACHIEVED_
-          else
-            kn
+        # -- b. digraph paths must either already exist or have an extension.
+        #       if a path is provided that both has no extension and has no
+        #       referent, we will add a default extension to it before proceding.
+
+        def __add_extension_to_path  # assume path has no extension
+
+          ext = Home_::Models_::DotFile::DEFAULT_EXTENSION
+          path_before = _current_unsanitized_absolute_path
+
+          _build_event = -> do
+
+            _ev = Common_::Event.inline_neutral_with(
+
+              :adding_extension,
+              :extension, ext,
+              :path, path_before,
+
+            ) do |y, o|
+
+              y << "adding #{ o.extension } extension to #{ pth o.path }"
+            end
+            _ev  # hi. #todo
+          end
+
+          qkn = remove_instance_variable :@_current_unsanitized_absolute_path_qkn
+          qkn = qkn.new_with_value "#{ qkn.value_x }#{ ext }"  # `::Pathname#sub_ext`
+          @_current_unsanitized_absolute_path_qkn = qkn
+
+          @listener.call :info, :adding_extension do
+            _build_event[]
+          end
+          NIL
+        end
+
+        def __path_has_extension
+          ::File.extname( _current_unsanitized_absolute_path ).length.nonzero?
+        end
+
+        # -- a. at the level of magnetics we never expand relative paths.
+        #       this must have already happened before we get to this point.
+
+        def __check_that_path_is_absolute
+
+          _qkn = Common_::QualifiedKnownness.via_value_and_symbol(
+            @_downstream_reference.path, :digraph_path )
+
+          _kn = Path_lib_[]::Normalization.via(
+            :qualified_knownness, _qkn,
+            :absolute,
+            & @listener )
+
+          if _kn
+            @_current_unsanitized_absolute_path_qkn = _qkn ; true
           end
         end
 
-        def _real_filesystem
-          Home_.lib_.system.filesystem
+        def _current_unsanitized_absolute_path
+          @_current_unsanitized_absolute_path_qkn.value_x
         end
-
-        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-
-        include Common_::Event::ReceiveAndSendMethods
-      end
-
-      def into_entity_write_digraph_path__ path
-
-        # the path is not relativized here. the path might not have changed.
-
-        @entity.properties.replace :digraph_path, path
-
-        ACHIEVED_
-      end
-
-      def resolve_upstream_lines_
-        otr = dup
-        otr.extend Produce_upstream_lines___  # :+[#sl-106]
-        _store :@up_lines, otr.execute
       end
 
       def flush_upstream_lines_to_file_ f  # assume @up_lines
+        self._USE_OR_LOSE  # #todo
 
         # flush upstream lines into file
 
@@ -219,7 +265,21 @@ module Skylab::TanMan
         bytes
       end
 
+      # -
+
+        # -- A
+
+        def _resolve_digraph_line_upstream_
+
+          _ = DigraphLineUpstream_via_These___.call_by do |o|
+            o.template_values_provider = @template_values_provider
+            o.sub_invoker = @sub_invoker
+          end
+          _store :@__line_upstream, _
+        end
+
       def __build_wrote_file_event bytes, f
+        self._USE_OR_LOSE  # #todo
 
         build_OK_event_with :wrote_file,
             :is_dry, @is_dry_run,
@@ -230,20 +290,50 @@ module Skylab::TanMan
         end
       end
 
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+        def __downstream_reference
 
-      module Produce_upstream_lines___
+          x = remove_instance_variable :@digraph_path
+
+          _m = if x.respond_to? :write  # allow the passing of an open IO
+            :via_stream
+          else
+            :via_path
+          end
+
+          _hi = Byte_downstream_reference_[].send _m, x
+          _hi  # hi. #todo
+        end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      # -
+
+      # ==
+
+      class DigraphLineUpstream_via_These___ < Common_::MagneticBySimpleModel
+
+        attr_writer(
+          :sub_invoker,
+          :template_values_provider,
+        )
 
         def execute
 
-          @value_fetcher = Template_Value_Provider_as_Fetcher___.
-            new( @template_values_provider )
-
+          __init_value_fetcher_via_value_provider
           _x = __via_workspace_expect_lines
           _x || __any_lines
         end
 
+        def __any_lines
+
+          # if no starter is indicated in the workspace, use default
+
+          Models_::Starter::Actions::Lines.session @kernel, @listener do | o |
+            o.value_fetcher = @value_fetcher
+          end.via_default
+        end
+
         def __via_workspace_expect_lines
+          self._USE_OR_LOSE
 
           # first, use any starter indicated in the workspace
 
@@ -261,28 +351,33 @@ module Skylab::TanMan
           end
         end
 
-        def __any_lines
-
-          # if no starter is indicated in the workspace, use default
-
-          Models_::Starter::Actions::Lines.session @kernel, @on_event_selectively do | o |
-            o.value_fetcher = @value_fetcher
-          end.via_default
+        def __init_value_fetcher_via_value_provider
+          _ = remove_instance_variable :@template_values_provider
+          @_value_fetcher = Fetcher_via_TemplateValueProvider___.new _
+          NIL
         end
       end
 
-      class Template_Value_Provider_as_Fetcher___ < ::BasicObject
+      # ==
+
+      class Fetcher_via_TemplateValueProvider___ < ::BasicObject
 
         def initialize o
-          @provider = o
+          @__provider = o
         end
 
         def fetch sym
-          @provider.template_value sym
+          @__provider.template_value sym
         end
       end
 
-      include Common_::Event::ReceiveAndSendMethods
+      # ==
+      # ==
+
+      This___ = self
+
+      # ==
     end
   end
 end
+# #history-A.1: begin rewriting most of it for ween off [br]

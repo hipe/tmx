@@ -49,7 +49,7 @@ module Skylab::Brazen
         :surrounding_path, bx.fetch( :surrounding_path ),
         :config_filename, bx.fetch( :config_filename ) )
 
-      _ok = Workspace_::Magnetics::InitWorkspace_via_PathHead_and_PathTail.
+      _ok = Here_::Magnetics::InitWorkspace_via_PathHead_and_PathTail.
         call_via_iambic x_a, & oes_p
 
       _store :@_surrounding_path_exists, _ok
@@ -152,7 +152,7 @@ module Skylab::Brazen
     def _document & oes_p
       @___did_attempt_to_resolve_document ||= begin
 
-        @document_ = Home_::Collection_Adapters::Git_Config.via_path_and_kernel(
+        @document_ = Home_::CollectionAdapters::GitConfig.via_path_and_kernel(
           existent_config_path, @kernel, & oes_p )
 
         true
@@ -248,112 +248,87 @@ module Skylab::Brazen
 
     # ==
 
-    class ConfigFileInquiry < Common_::SimpleModel
+    module Magnetics
+      Autoloader_[ self ]
+    end
 
-      # a fresh take on this, not yet integrated in [br] but being developed
-      # for [tm] and meant to fold back in to here:
-      #
-      #   - be generally frozen
-      #
-      #   - (except for a reference to a file lock)
-      #
-      #   - so determine state at construction time
-      #
-      #   - so produce and cache pertinent events for later doo-hitily
-
-      def initialize
-        @_can_expand_path = false
-        yield self
-        rsx = remove_instance_variable :@invocation_resources
-        @filesystem = rsx.filesystem
-        @system = Home_.lib_.system  # for now
-        @listener = rsx.listener
-        __inquire
-        freeze
-      end
-
-      def yes_can_expand_path
-        @_can_expand_path = true
-      end
+    class Magnetics::Workspace_via_Request < Common_::MagneticBySimpleModel  # #stowaway
+      # pure glue.
 
       attr_writer(
-        :invocation_resources,
-        :path_head,
-        :path_tail,
+        :config_filename,
+        :filesystem,
+        :listener,
+        :max_num_dirs_to_look,
+        :workspace_class_by,
+        :workspace_path,
       )
 
-      def __inquire
-        if __path_is_absolute
-          _do_inquire
-        elsif @_can_expand_path
-          __expand_path
-          _do_inquire
-        else
-          __whine_about_non_absolute_path
-        end
-      end
+      def execute
 
-      def __path_is_absolute
-
-        if @system.path_looks_absolute @path_head
-          @_absolute_path_head = @path_head ; true
-        else
-          @_UNSANITIZED_PATH_PATH = path ; false
-        end
-      end
-
-      def _do_inquire
-
-        chan = nil ; ev = nil
-
-        sct = Home_.lib_.system_lib::Filesystem::Walk.via(
-
-          :max_num_dirs_to_look, 1,  # currently we have simplified this to this
-          :start_path, @_absolute_path_head,
-          :filename, @path_tail,
-          :filesystem, @filesystem,
-          :do_lock, true,  # effects result shape
-
-        ) do |*chan_, &ev_p|
-          ev = ev_p[]  # ..
-          chan = chan_ ; :_no_see_BR_
+        _inq = Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
+          o.path_head = @workspace_path
+          o.max_num_dirs_to_look = @max_num_dirs_to_look
+          o.path_tail = @config_filename
+          o.filesystem = @filesystem
+          o.listener = @listener
         end
 
-        if sct
-          @locked_IO = sct.locked_IO
-          @surrounding_path = sct.surrounding_path
-          @file_exists = true
-        else
-          @unsanitized_path = ::File.join @_absolute_path_head, @path_tail
-          @_event = :__event ; @__event = ev
-          @channel = chan
-          @file_exists = false
+        Magnetics::Workspace_via_ConfigFileInquiry.call_by do |o|
+          o.config_file_inquiry = _inq
+          o.workspace_class_by = @workspace_class_by
+          o.listener = @listener
         end
-        NIL
       end
+    end
 
-      # -- read
+    # ==
 
-      def event
-        send @_event
-      end
+    class Magnetics::Workspace_via_ConfigFileInquiry < Common_::MagneticBySimpleModel  # #stowaway
 
-      def __event
-        @__event
-      end
+      # using the same underlying mechanics as a "status" inquiry,
+      # produce a workspace object IFF the config file is found (lock it);
+      # otherwise emit the same *kind* of event (under a different channel).
 
-      attr_reader(
-        :channel,
-        :file_exists,
-        :locked_IO, # as applicable
-        :unsanitized_path,  # as applicable
-        :surrounding_path,  # as applicable
+      attr_writer(
+        :config_file_inquiry,
+        :listener,
+        :workspace_class_by,
       )
+
+      def execute
+        if @config_file_inquiry.file_exists
+          __yay
+        else
+          __sad
+        end
+      end
+
+      def __yay
+        inq = remove_instance_variable :@config_file_inquiry
+        _cls = @workspace_class_by.call
+        _cls.define do |o|
+          o.locked_IO = inq.locked_IO
+          o.surrounding_path = inq.surrounding_path
+          o.config_filename = inq.path_tail
+        end
+      end
+
+      def __sad
+        @listener.call( * @config_file_inquiry.channel ) do
+          @config_file_inquiry.event
+        end
+        UNABLE_
+      end
     end
 
     # ==
 
     class WS_via_qualified_knownness_box___
+
+      # NOTE: DEPRECATED: use the excellent new magnetics (above this line
+      # and as nephews to this file node) instad of this for all new work
+      # (since #tombstone-B) - this will be phased out when [br] weens off [br] (sic).
 
       def initialize bx, sm, k, & oes_p
 
@@ -468,7 +443,13 @@ module Skylab::Brazen
       include Common_::Event::ReceiveAndSendMethods
     end
 
-    Workspace_ = self
+    # ==
+    # ==
+
+    Here_ = self
+
+    # ==
   end
 end
+# #tombstone-B: moved "config file inquiry.." to own file
 # :#tombtone-A temporary

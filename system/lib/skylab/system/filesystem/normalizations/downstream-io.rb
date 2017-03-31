@@ -6,6 +6,7 @@ module Skylab::System
     private
 
       def initialize
+        @__flags_for_open = nil
         @_force_arg = nil
         @_is_dry_run = false
         @_stderr = nil
@@ -15,6 +16,11 @@ module Skylab::System
 
       def dash_means=
         @dash_means_ = gets_one
+        KEEP_PARSING_
+      end
+
+      def flags_for_open=
+        @__flags_for_open = gets_one
         KEEP_PARSING_
       end
 
@@ -102,7 +108,7 @@ module Skylab::System
 
       def via_path_arg_that_represents_file_
 
-        init_exception_and_open_IO_ ::File::RDWR | ::File::CREAT
+        init_exception_and_open_IO_ __flags_for_open
 
         if @exception_  # e.g perms, e.g no directory
 
@@ -112,6 +118,10 @@ module Skylab::System
           @open_IO_.flock ::File::LOCK_EX | ::File::LOCK_NB
           __via_open_IO_create_or_overwrite
         end
+      end
+
+      def __flags_for_open
+        @__flags_for_open || ::File::RDWR | ::File::CREAT
       end
 
       def __when_exception
@@ -124,9 +134,20 @@ module Skylab::System
           # hi. we could clarify this but we don't for now.
           via_exception_produce_result_
 
+        when ::Errno::EEXIST
+          __when_existed
+
         else
           via_exception_produce_result_
         end
+      end
+
+      def __when_existed
+
+        @listener.call :error, :resource_existed do  # give caller a change to customize
+          wrap_exception_ @exception_
+        end
+        UNABLE_
       end
 
       def __when_no_dirname
@@ -138,6 +159,8 @@ module Skylab::System
         _dir = ::File.dirname path_
 
         @listener.call :resource_not_found, :parent_directory_must_exist  do
+
+          # #todo the above is not a friendly signature. prepend it with `error` as a default channel
 
           build_not_OK_event_with(
             :parent_directory_must_exist,

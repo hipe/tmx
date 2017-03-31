@@ -129,10 +129,6 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-
-
-
-
   private
 
       # ~ support for the commonest `execute`s
@@ -141,13 +137,11 @@ module Skylab::System
 
         @open_IO_ = @filesystem.open path_, mode_d
           # :#open-filehandle-1 - don't loose track
-        @exception_ = nil
-        NIL_
+        @exception_ = nil ; nil
 
-      rescue ::SystemCallError => @exception_  # Errno::EISDIR, Errno::ENOENT etc
+      rescue ::SystemCallError => @exception_  # Errno::{ EEXIST, EISDIR, ENOENT }..
 
-        @open_IO_ = false
-        NIL_
+        @open_IO_ = false ; nil
       end
 
       # ~ #[#021] (both branches) a common maneuver..
@@ -157,7 +151,7 @@ module Skylab::System
         io = @filesystem.open path, ::File::RDONLY
 
         # this spot between the above line and the below line is the
-        # subject of [#004.I] (the atomicity of all things)
+        # subject of [#004.9] (the atomicity of all things)
 
         d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
         if d.zero?

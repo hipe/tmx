@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -64,28 +64,18 @@ module Skylab::Brazen
           end
 
           @on_event_selectively.call :info, :success do
-            build_wrote_file_event d
+
+            Magnetics::WroteFileEvent_via_Values.call_by do |o|
+              o.bytes = d
+              o.is_dry = @is_dry
+              o.path = @path
+              o.verb_symbol = @verb_symbol
+            end
           end
 
           # let's no longer let `info` events dictate our result
 
           ACHIEVED_
-        end
-
-        def build_wrote_file_event d
-
-          build_OK_event_with( :collection_resource_committed_changes,
-              :bytes, d,
-              :is_completion, true,
-              :is_dry, @is_dry,
-              :path, @path,
-              :verb_symbol, @verb_symbol ) do | y, o |
-
-            _dry = ( "dry " if o.is_dry )
-
-            y << "#{ o.verb_symbol }d #{ pth o.path } (#{ o.bytes } #{ _dry }bytes)"
-
-          end
         end
 
         module Simple_Event_Builder_Methods_

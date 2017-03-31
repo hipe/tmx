@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Git_Config
+  class CollectionAdapters::GitConfig
 
     class Magnetics::PersistEntity_via_Entity_and_Collection  # 1x
 
@@ -19,13 +19,13 @@ module Skylab::Brazen
 
       def resolve_section
 
-        _prs = Mock_Parse__.new -> i, * _, & ev_p do
-          if :info != i
+        _prs = MockParse__.new -> sym, * _, & ev_p do
+          if :info != sym
             raise ev_p[].to_exception
           end
         end
 
-        _ = Git_Config_::Mutable::Section_or_Subsection__.
+        _ = Here_::Mutable::Section_or_Subsection__.
           via_literals @subsection_name, @section_name, _prs
 
         _store :@section, _
@@ -39,20 +39,23 @@ module Skylab::Brazen
       end
 
       def flush
-        scn = @section.to_line_stream
-        if line = scn.gets
-          ok = ACHIEVED_
-          @downstream_IO.write line
+        st = @section.to_line_stream
+        line = st.gets
+        if line
+          d = @downstream_IO.write line
+          begin
+            line = st.gets
+            line || break
+            d += @downstream_IO.write( line )
+            redo
+          end while above
+          d
         end
-        while line = scn.gets
-          @downstream_IO.write line
-        end
-        ok
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-      Mock_Parse__ = ::Struct.new :handle_event_selectively
+      MockParse__ = ::Struct.new :handle_event_selectively
 
       # ==
       # ==

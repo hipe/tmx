@@ -1,14 +1,6 @@
 # the model experiments narrative :[#024]
 
+## document-meta
 
-## stubbing
-
-stubbing hacks are tracked with (see code node).
-
-life is easier if we are able to see what the leaf actions are for all
-of the model nodes at this level without loading every action file.
-
-we don't love this (because it requires manual duplication, one line per
-action), we just hate it less than the alternative.
-
-this breaks every time we refactor [br] and it's getting annnoying.
+  - #tombstone-A: stubbing hacks
+    which was #[#br-065] a stubbing hack

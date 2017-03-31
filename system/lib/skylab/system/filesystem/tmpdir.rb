@@ -65,30 +65,6 @@ module Skylab::System
         raise ::NoMethodError  # see note above about [#fi-022]
       end
 
-      # -- Simple readers
-
-      attr_reader :be_verbose
-
-      def basename
-        @to_pathname.basename
-      end
-
-      def children with_directory=false
-        @to_pathname.children with_directory
-      end
-
-      def dirname
-        @to_pathname.dirname
-      end
-
-      def path
-        @_path_s
-      end
-
-      attr_reader :to_pathname
-
-    public
-
       def to_memoizer
 
         hot = nil ; cold = nil
@@ -166,7 +142,6 @@ module Skylab::System
       # ~ preparation & related
 
       def clear
-
         prepare
         self
       end
@@ -433,7 +408,7 @@ module Skylab::System
 
       def _patch * x_a
 
-        Home_.services.patch(
+        _ok = Home_.services.patch(
           :target_directory, to_path,
           :is_dry_run, @is_noop,
           * x_a
@@ -449,6 +424,8 @@ module Skylab::System
             raise ev_p[].to_exception
           end
         end
+
+        _ok  # hi. #todo
       end
 
       # ~~ touch & related
@@ -559,6 +536,32 @@ module Skylab::System
         NIL_
       end
 
+      # --
+
+      def children with_directory=false
+        @to_pathname.children with_directory
+      end
+
+      def dirname
+        @to_pathname.dirname
+      end
+
+      def basename
+        @to_pathname.basename
+      end
+
+      def path
+        @_path_s
+      end
+
+      attr_reader(
+        :be_verbose,
+        :max_mkdirs,
+        :to_pathname,
+      )
+
+      # ==
+
       class Memoizer___
 
         attr_reader :instance
@@ -595,7 +598,12 @@ module Skylab::System
         end
       end
 
+      # ==
+      # ==
+
       This___ = self
+
+      # ==
     end
   end
 end

@@ -8,6 +8,14 @@ module Skylab::Fields
 
         module PrefixedModifiers
 
+          def positive_nonzero_integer
+            @parse_tree.must_be_integer_greater_than_or_equal_to_this 1
+          end
+
+          def non_negative_integer
+            @parse_tree.must_be_integer_greater_than_or_equal_to_this 0
+          end
+
           def required
             @parse_tree.be_required
           end

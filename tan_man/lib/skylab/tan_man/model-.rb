@@ -2,122 +2,7 @@ module Skylab::TanMan
 
   module Model_
 
-  if false  # to #here1
-  DESCRIPTION_METHOD_ = -> s do
-
-    self.instance_description_proc = -> y do
-      y << s
-    end
-    NIL_
-  end
-
-  class Model_ < Brazen_::Model
-
-    class << self
-      define_method :description_, DESCRIPTION_METHOD_
-      private :description_
-    end  # >>
-
-    class << self
-
-      def action_base_class
-        Action_
-      end
-
-      def entity_enhancement_module
-        Entity_
-      end
-
-      def stubber
-        Stub_Making_Action_Box_Module__.new self
-      end
-
-      def const_get _, __=true  # local loading hack :(
-        if :Silo_Daemon == _ && ! const_defined?( :Silo_Daemon, false )
-          if const_defined? :Stub_, false
-            const_get :Actions__, false
-          end
-        end
-        super
-      end
-    end  # >>
-
-    Autoloader_[ self ]
-  end
-
-  # ~ this is :+[#br-065] a stubbing hack. a few notes in [#024].
-
-  class Stub_Making_Action_Box_Module__ < ::Module
-
-    def initialize model_class
-      model_class.const_set :Stub_, :__legacy_requirement__
-      @_mc = model_class
-    end
-
-    def stub
-      Common_Action_Stub___.new @_mc
-    end
-  end
-
-  class Action_Stub_ < ::Module
-
-    include Brazen_.actionesque_defaults::Unbound_Methods
-
-    def initialize & real_action_class_p
-      @is_promoted = false
-      @real_action_class_p = real_action_class_p
-    end
-
-    def build_unordered_selection_stream & _
-      self._WHY
-    end
-
-    def build_unordered_index_stream
-      # terminal nodes never expand beyond themselves
-      Common_::Stream.via_item self
-    end
-
-    def name_function
-      @nf ||= begin
-        Common_::Name.via_module self
-      end
-    end
-
-    def is_promoted= x
-      # in at least one place .. eew
-      @is_promoted = x
-    end
-
-    attr_reader :is_promoted
-
-    def new boundish, & oes_p
-      produce_real_action_class_.new boundish, & oes_p
-    end
-
-    def produce_real_action_class_
-      @real_action_class_p.call
-    end
-  end
-
-  class Common_Action_Stub___ < Action_Stub_
-
-    def initialize sm
-
-      @is_promoted = false
-      @silo_module = sm
-    end
-
-    attr_reader(
-      :silo_module,
-    )
-
-    def produce_real_action_class_
-      @silo_module::Actions__.const_get @nf.as_const
-    end
-  end
-  end  # if false :#here1
-
-  # ~
+    # ==
 
     # parts of the below may or may not redund with the #[#ze-002.1] as we
     # drive the dust towards settling along that strain.
@@ -130,19 +15,59 @@ module Skylab::TanMan
 
     Bound_call_via_action_with_definition = -> act do
 
-      # (copy-paste-modify of [sn])
+      # (started as copy-pase of [sn]. diverged significantly for `properties`)
 
-      _asc_st = Here_.__action_grammar_.stream_via_array( act.definition ).map_reduce_by do |qual_item|
-        if :_parameter_TM_ == qual_item.injection_identifier
-          qual_item.item
+      # ~ hand-written map reduce:
+
+      all_qual_item_st = Here_.__action_grammar_.stream_via_array act.definition
+
+      p = nil
+      expand_using_this = nil
+      main = -> do
+        begin
+          qual_item = all_qual_item_st.gets
+          qual_item || break
+          case qual_item.injection_identifier
+          when :_parameter_TM_
+            x = qual_item.item ; break
+          when :_branch_desc_TM_
+            redo
+          when :_several_props_TM_
+            expand_using_this[ qual_item.item ]
+            x = p[] ; break
+          else
+            no
+          end
+        end while above
+        x
+      end
+      expand_using_this = -> st do
+        p = -> do
+          x = st.gets
+          if x
+            x
+          else
+            p = main
+            p[]
+          end
         end
       end
+
+      p = main
+
+      _asc_st = Common_.stream do
+        p[]
+      end
+
+      # ~
 
       ok = MTk_::Normalization.call_by do |o|
 
         o.association_stream_newschool = _asc_st
 
         o.entity_nouveau = act
+
+        o.will_nilify  # because of #spot1.2
       end
 
       if ok
@@ -169,6 +94,8 @@ module Skylab::TanMan
         o.add_grammatical_injection :_branch_desc_TM_, BRANCH_DESCRIPTION___
 
         o.add_grammatical_injection :_parameter_TM_, _param_gi
+
+        o.add_grammatical_injection :_several_props_TM_, SEVERAL_PROPS___
       end
     end )
 
@@ -176,6 +103,17 @@ module Skylab::TanMan
 
       def is_keyword k
         :branch_description == k
+      end
+
+      def gets_one_item_via_scanner scn
+        scn.advance_one ; scn.gets_one
+      end
+    end ; end
+
+    module SEVERAL_PROPS___ ; class << self
+
+      def is_keyword k
+        :properties == k
       end
 
       def gets_one_item_via_scanner scn
@@ -220,146 +158,63 @@ module Skylab::TanMan
 
     module CommonActionMethods
 
-      def init_action_ irsx
-        @_invocation_resources_ = irsx
+      def init_action_ invo
+        invo.HELLO_INVOCATION  # #todo
+        @_microservice_invocation_ = invo
       end
 
-      def _listener_
-        @_invocation_resources_.listener
+      def resolve_workspace_
+
+        # assume these variables are ours for consumption:
+
+        _mnd = remove_instance_variable :@max_num_dirs_to_look
+        _wsp = remove_instance_variable :@workspace_path
+        _cfn = remove_instance_variable :@config_filename
+
+        _mag = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics::Workspace_via_Request
+
+        _ = _mag.call_by do |o|
+          o.config_filename = _cfn
+          o.max_num_dirs_to_look = _mnd
+          o.workspace_path = _wsp
+          o.workspace_class_by = -> { Home_::Models_::Workspace }
+          o.filesystem = _invocation_resources_.filesystem
+          o.listener = _listener_
+        end
+
+        _store_ :@_workspace_, ( _ || NIL_AS_FAILURE_ )
       end
 
-      def _argument_scanner_
-        @_invocation_resources_.argument_scanner
+      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      def _simplified_write_ k, x
+        instance_variable_set :"@#{ k }", x
+        NIL
       end
 
-      def _read_ k
+      def _simplified_read_ k
         ivar = :"@#{ k }"
         if instance_variable_defined? ivar
           instance_variable_get ivar
         end
       end
 
-      def _write_ k, x
-        instance_variable_set :"@#{ k }", x
-        NIL
+      def _listener_
+        _invocation_resources_.listener
+      end
+
+      def _argument_scanner_
+        _invocation_resources_.argument_scanner
+      end
+
+      def _invocation_resources_
+        @_microservice_invocation_.invocation_resources
       end
     end
 
     # ==
 
-
-    # ==
-  if false  # to #here2
-  class Action_ < Brazen_::Action
-
-    extend( module MM
-
-      define_method :description_, DESCRIPTION_METHOD_
-      private :description_
-
-      def entity_enhancement_module
-        Entity_
-      end
-
-      self
-    end )
-
-    include module IM
-
-      def bound_call_for_ping_
-
-        Common_::BoundCall.by do
-
-          sym = name.as_lowercase_with_underscores_symbol
-
-          ___maybe_send_ping_event sym
-
-          :"ping_from__#{ sym }__"
-        end
-      end
-
-      def ___maybe_send_ping_event sym
-
-        maybe_send_event :payload, :ping_from_action do
-
-          _ = build_OK_event_with(
-            :ping_from_action,
-            :name_symbol, sym,
-          )
-          _
-        end
-      end
-
-      def receive_extra_values_event ev  # #hook-in [cb]
-        maybe_send_event :error do
-          ev
-        end
-        UNABLE_  # important - the above is unreliable
-      end
-
-      def krnl
-        @kernel
-      end
-
-      def receive_stdin_ x
-        @stdin_ = x
-        nil
-      end
-
-      def receive_stdout_ x
-        @stdout_ = x
-        nil
-      end
-
-      attr_reader :stdin_, :stdout_
-
-      def to_qualified_knownness_box__
-
-        bx = Common_::Box.new
-        fo = formal_properties
-
-        ( @argument_box.each_pair do | k, x |
-
-          bx.add k, Common_::Qualified_Knownness.via_value_and_association( x, fo.fetch( k ) )
-
-        end )
-        bx
-      end
-
-      self
-    end
-  end
-
-  Entity_ = Brazen_::Modelesque.entity do
-
-    # create an entity extension module whose foundation is another entity
-    # extension module. effectively we inherit its metaproperties & ad-hoc
-    # processors, etc. we may add to them but not (easily) take them away.
-
-  end
-
-  module Entity_
-
-  public
-
-    def property_value_via_symbol sym  # abstraction candidate
-      property_value_via_property self.class.properties.fetch sym
-    end
-
-    def receive_missing_required_properties_event ev  # #hook-in [br]
-      receive_missing_required_properties_softly ev  # #experimental
-      UNABLE_
-    end
-  end
-
-  Actor_ = -> cls, * a do
-    self._WHERE__see_patch__
-
-    Home_.lib_.fields::Attributes::Actor.via cls, a
-
-    Common_::Event.selective_builder_sender_receiver cls ; nil
-  end
-
+  if false  # for CCC
   module Common_Collection_Controller_Methods_
 
     # ~ :++#CC-abstraction-candidate(s)
@@ -471,132 +326,9 @@ module Skylab::TanMan
       @model_class or self._SET_THIS_IVAR
     end
   end
+  end  # if false for CCC
 
-  Silo_daemon_base_class_ = -> do
-    Brazen_::Silo::Daemon
-  end
-
-  # ~
-
-  module Models_
-
-    Autoloader_[ self, :boxxy ]
-
-    # old autoloader used to fall back to loading the lexically lowest file.
-    # that weirdness has been simplified away so now we must state the below
-    # explicitly. ugly until the next rearchitecting at #open [#096]
-
-    stowaway :Comment, 'comment/line-stream'
-    stowaway :Internal, 'internal/paths'
-  end
-
-  if false  # #todo: cut this soon
-  class Models_::Workspace < Brazen_::Models_::Workspace
-
-    set_workspace_config_filename 'tanman-workspace/config'
-
-    class << self
-
-      def common_properties
-        COMMON_PROPERTIES___
-      end
-
-      def entity_enhancement_module
-        Entity_  # for below
-      end
-    end  # >>
-
-    COMMON_PROPERTIES___ = make_common_properties do | sess |
-
-      otr = Brazen_::Models_::Workspace.common_properties
-
-      sess.edit_common_properties_module(
-        :property_object, otr.fetch( :config_filename ),
-        :property_object, otr.fetch( :max_num_dirs ),
-        :property_object, otr.fetch( :workspace_path ) )
-
-    end
-
-    Silo_Daemon = self::Silo_Daemon
-
-    Actions = Stub_Making_Action_Box_Module__.new self
-
-    module Actions
-
-      Status = stub
-      Status.is_promoted = true
-      Init = stub
-      Init.is_promoted = true
-      Ping = stub
-      Ping.is_promoted = true
-    end
-
-    # ~ all abstraction candidates:
-
-    def business_property_value sym, & oes_p
-
-      ok = resolve_document_( & oes_p )
-      ok and begin
-        @document_.property_value_via_symbol sym, & oes_p
-      end
-    end
-
-    def from_asset_directory_absolutize_path__ path
-
-      ad = asset_directory_
-
-      ad && path.length.nonzero? && ::File::SEPARATOR != path[ 0 ] and begin  # etc
-        ::File.expand_path path, ad
-      end
-    end
-
-    def from_asset_directory_relativize_path__ path
-
-      ad = asset_directory_
-
-      if ad && path && path.length.nonzero?
-
-        Path_lib_[]::Relative_path_from[ path, ad ]
-      end
-    end
-
-    def asset_directory_
-      @___did_calculate_asset_dir ||= begin
-        if @_surrounding_path_exists
-          @__asset_dir = ::File.dirname existent_config_path
-          true
-        end
-      end
-      @__asset_dir
-    end
-  end
-  end  # if false
-
-  class Models_::Graph < Model_
-
-    @after_name_symbol = :init
-
-    description_ "with the current graph.."
-
-    Actions = stubber
-
-    module Actions
-      Use = stub
-      Sync = stub
-    end
-
-    # desc "there's a lot you can tell about a man from his choice of words"
-
-    def persist_via_action act, & oes_p
-
-      # (the graph document is created thru a template that ultimately needs
-      #  an implementer to provide the values for its variables. it "feels
-      #  right" to appoint the particulr action class itself to this role.)
-
-      act.argument_box.add :template_values_provider_, act
-      super
-    end
-  end
+  if false  # for this/these model class(es)
 
   class Graph_Document_Entity__ < Model_
 
@@ -723,12 +455,12 @@ module Skylab::TanMan
       NIL_
     end
   end
-
-  end  # if false #here2
+  end  # if false for this/these model class(es)
 
     Here_ = self
   end  # `Model_`
 end
+# #tombstone-E.2: "stubbing", "model" base class, "action" base class
 # #tombstone-E.1: compartmentalize workspace node
 # #tombstone-D: we once had `take` defined as a stream method
 # #tombstone: remote add, list, rm (ancient, deprecated); check, which
