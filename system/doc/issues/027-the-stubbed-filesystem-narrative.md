@@ -1,9 +1,31 @@
 # the stubbed filesystem narrative :[#027]
 
-## (quick preface)
+## quick preface: other implementations..
 
-alternative (simplified) implementations exist in the universe, tracked
-with [#032].
+the subject was founded on the premise that a filesystem can be "mocked"
+(or if you prefer "stubbed") with a text file whose every line is an
+absolute path to a file or (probably empty) directory that we're supposed
+to pretend exists on this imaginary filesystem.
+
+although this solution is sound enough for implementations that want to
+mock several files across many severals of cases; for many purposes this
+implementation is more trouble than it's worth.
+
+since its first inception in early 2014, we have come up with simplified,
+much clearer implementations of this same sort of thing.
+
+for a very focused test and a very straightforward facility-under-test,
+mocking a filesystem can be as simple as five or ten lines of code with
+no dependencies.
+
+of these simplified implementations,
+
+  - we track those that exist outside of this sidesystem with [#here.2]
+  - we track those that occurr inside this sidesystem with [#here.C]
+
+if you are going to attempt to use the subject facility for new work,
+consult whatever implementation(s) are tracked by the above and see if
+they meet your needs before diving in to this one.
 
 
 
@@ -223,7 +245,7 @@ empty strings. but we don't feel like hacking [po] right now: we are currently
 instead, what we do (because it is how we specified this stubbed FS hack to work)
 is simply detect multiple trailing slashes in the pathname. but note there
 are almost certainly edge cases where we can make this fail, depending on
-how our cacheing works..
+how our caching works..
 
 note that the alternative is equally ugly: according to [po] the "branchiness"
 of a node is purely a function of whether or not it has nonzero children

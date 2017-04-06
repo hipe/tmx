@@ -1,4 +1,6 @@
-[#040] #open modernize "directory as collection"
+[#040]       operator branch via directory ..
+       #open [#here.F]: clean this up after an incubation period
+
 [#039]
              [#here.1] track all similar proxy classes for acting like a writable IO
 [#038]       [ the "readable writable" legacy system recorder ]
@@ -7,12 +9,20 @@
 [#035]       a sixth system double
 [#034]       [ hack guess module tree ]
 [#033] #open feature islands
-[#032]       alternative (simplified) implementations of [#027] stubbed FS
+
+[#032] #hole
+             ( #was: alternative (simplified) implementations of stubbed FS )
+             ( #moved-to: [#027.2] )
+
 [#031]       [ processes ]
 [#030]       chunker & related
 [#029]       [ OGDL ]
 [#028]       [ stubbed system ]
+
 [#027]       the stubbed filesystem narrative ..
+             [#here.C]: tracks simplified implementations in this sidesystem
+             [#here.2]: alternative implementations in universe (none here)
+
 [#026]       [ mkdir p ]
 [#025] #open "open2" (ancient) reconcile with IO-select (hl?)
 [#024]       [ mocks ]
@@ -51,9 +61,7 @@
 
 [#008]       coverage assets & liabilities & similar
 
-             [#here.3]
-
-             [#here.2], .. : borrow coverage
+             [#here.{2-4}]: borrow coverage
 
              [#here.1]: we're relying on the content of these two files
                         to be self-similar (cross referenced to [ts])

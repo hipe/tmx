@@ -102,7 +102,7 @@ appear with a hashtag IFF it hasn't been defined yet.
 
 • #the-commit-cache is a simple hash of commits, keyed by SHA. we used
   to call it "the commit dictionary" but we want to emphasize that
-  because the repo itself is volatile, cacheing commits should be the
+  because the repo itself is volatile, caching commits should be the
   exception and not the rule.
 
 • the #git-show-command..

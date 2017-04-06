@@ -866,7 +866,7 @@ while writing this manifesto something occured to us: keeping in mind
 that our end goal in this was to find the perfect name convention for a
 query-effecting method, we realized that we already have a strong
 candidate word for such a thing: "reduce". `reduce_by` (in the pantheon of
-[#co-016] stream methods) has a strong, unambiguos meaning and syntax. the
+[#co-016.2] stream methods) has a strong, unambiguos meaning and syntax. the
 kind of method we are describing here has the exact same semantics but a
 diffenent syntax: it takes an iambic literal instead of a block. hence
 we must follow suit with the existing word, so please see `reduce_with`.

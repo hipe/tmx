@@ -1,6 +1,10 @@
 # Unobtrusive Lexical-esque Insertion :[#011]
 
+(implementations modern with this sentence exist in the host sidesystem,
+tagged with the subject identifier.)
+
 (this ancient but still relevant "algorithm" moved here from [#tm-067].)
+
 
 
 The idea is this:
@@ -15,6 +19,7 @@ that was lexically greater ("should come after") the new item.
 
 
 
+
 ## examples with pseudocode:
 
 consider a list '1', '2', '3' and you want to insert a '2' into it.
@@ -25,7 +30,8 @@ when we get to item '3' (and we are still holding on to item '2'),
 we can say "yes, it is greater". in such cases you insert the new item
 between the two items you are holding.
 
-imagine the list '3' and you are inserting '4' into it: we get to the
+imagine the list '3' (that is, a list with only one item which is
+the item '3') and you are inserting '4' into it: we get to the
 end of the list before we ever found one that was greater. in such
 cases insert the new item after the final item in the list (or if there
 are no items in the list, insert the new item as the first item.)
@@ -36,6 +42,6 @@ inserting the new item at the beginning of the list.
 
 BUT imaine the list '4', '2', '1' and you are inserting a '3' in it.
 in such cases the '3' would get inserted into the beginnng of the list,
-becuse '4' is greater. i.e the algorithm always short-circuits at the
+because '4' is greater. i.e the algorithm always short-circuits at the
 first found item that is greater, regardless of whatever other ordering
 is going on in the list.

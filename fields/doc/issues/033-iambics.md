@@ -3,6 +3,8 @@
 
 ## introduction
 
+(EDIT: offer that "magnetic by simple model" has advantages per #history-A)
+
 (EDIT: say something about keyword arguments..)
 
 in keeping with the tradition of wacky experiments in this universe,
@@ -228,3 +230,22 @@ universe at least.
 ## references
 
    [DSL-vs-natural-language]: http://pragdave.me/blog/2008/03/10/the-language-in-domainspecific-language-doesnt-mean-english-or-french-or-japanese-or-/
+
+
+
+
+## document-meta
+
+  - #history-A: up until the commit of this writing, a `write_to_path`
+    method as presented in this document was exposed by a popular facility.
+
+    however, that facility is phasing out such use of iambics and phasing-in
+    the use of "magnetic by simple model" in their place; as part of a
+    broader design consequence:
+
+    the newer pattern has advantages over "iambics" and few disadvantages.
+    this case is made in this same commit, where we replace the awkward
+    `build_mutable_with` / `edit_via_iambic` with a simple `yield`.
+
+    anyway the new method is called `write_to_path_by`.
+

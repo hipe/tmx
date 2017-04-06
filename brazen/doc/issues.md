@@ -80,17 +80,25 @@
 
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085] #hole (#was: (#moved-to: [#ba-052]))
+
+[#085]       [ this collection magnet, whatever it will be called ]
+             (#was: (#moved-to: [#ba-052]))
+
 [#084]       +#wishlist a `flag` meta-meta property
 
 [#083] #almost-hole ..
+       #open  something to do with mounting one offs (2x in [gi]).
+             probably just needs to be conventionalized
              ( #moved-to: [#ze-063.1] mounting one-offs )
              ( #was: track this spot that does [tmx] mounting for one-off scripts )
              ( #was: #moved-to: [#hu-043] contextualization )
 
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
-[#081]       #track experimental extensions to Actor (1x)
+
+[#081] #hole
+             ( #was: #track experimental extensions to Actor (1x) )
+
 [#080]       #parent-node:[#013] actors, agents and models ..
 [#079]       #parent-node:[#050] the API API components narrative
              ( #was: #done rather than the model action ever having to know about the
@@ -241,16 +249,18 @@
              ( #was: `has_custom_moniker` is a smell to exist in entity. )
 [#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc
+
 [#011]       the unobtrusive lexical-esque ordering narrative ..
              ( was: #parent-node: [#001] the event narrative )
+
 [#010]       #doc-node: data stores
+
 [#009]       #parent-node: [#010] the git config narrative ..
 
-[#008]       small assets & liabilities
-             [ oh, actually, none yet ]
-             [#here.A]: the mutable git config narrative .. (#parent-node: [#009])
+[#008]       the mutable git config narrative .. (#parent-node: [#009])
 
-[#007] #hole (would be etc)
+[#007]       small assets & liabilities
+             [#here.1]: borrow from [cu]
              ( #was: anticpating the issue with losing hooks accross inheritance bounds )
 
 [#006] #open - what to do about this custom CLI property class

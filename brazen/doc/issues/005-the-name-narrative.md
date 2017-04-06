@@ -31,7 +31,7 @@ only), 36 pair structures would be created with only 10 of them unique,
 the rest redundant. likewise without caching many redundant const
 lookups are made.
 
-the only forseeable cons to this sort of cacheing are deemed moot:
+the only forseeable cons to this sort of caching are deemed moot:
 
   • the rate at which nodes are added to a reactive tree is slow
     enough that there will never be enough nodes in the cache to
@@ -74,7 +74,7 @@ it. the way we accomplish this is:
      to build this we must know who the parent node is. to determine
      the parent node we will do string arithmetic on the leaf's fully
      qualified constant name (or ersatz same in the case of a proc
-     proxy.) with this alongside the aforementioned cacheing and
+     proxy.) with this alongside the aforementioned caching and
      "hopping", we can derive the parent from the constant namespace.
 
   3. that parent must itself respond to `name_function` by the time we

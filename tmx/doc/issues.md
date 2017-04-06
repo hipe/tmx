@@ -70,7 +70,9 @@
              efficiently but is still randomized.
 
 
-[#008] #wish smarter descriptions for added primaries - can we reach the s.s?
+[#008]
+             :[#here.2] lend coverage to [br]
+       #wish smarter descriptions for added primaries - can we reach the s.s?
 
 [#007]       internal issues that are not public
 

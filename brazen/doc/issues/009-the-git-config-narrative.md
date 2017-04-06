@@ -8,12 +8,20 @@ existing config files; config files that happen to try and immitate the
 syntax of git config files.
 
 we implement our rendition of the *git* config file syntax speficially
-because it is complex enough for our needs without being too complex, it
-is well documented and it should have a relatively widespread
-distribution of understanding in the world.
+because
+
+  - it's complex enough for our needs without being too complex
+
+  - it is well documented
+
+  - it is part of a software ecosystem that has a huge enough distribution
+    around the world that its popularity alone is a good justification for
+    its use, notwithstanding any major CON's, of which there are none
+    against our requirements.
 
 however, using the git format specifically is a bit of an afterthought.
 we can build out other document editors for other formats as necessary.
+
 
 
 

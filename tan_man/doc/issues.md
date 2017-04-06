@@ -1,3 +1,5 @@
+[#097] #open abstract tons of this work for the new workspace
+
 [#096] #open no more [br]
 [#095] #open tests marked #too-big
 [#094] #open become insensitive to newlines when referencing nodes

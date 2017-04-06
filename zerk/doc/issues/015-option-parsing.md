@@ -37,7 +37,7 @@ know the #scope-set which involves determining the formal node category
 for every association in the compound stack which in turn involves
 loading every model referred to in it.
 
-cacheing is only helpful here if we take into account that a) this is
+caching is only helpful here if we take into account that a) this is
 niCLI so it is not long-running :[#034] and b) as we always metion it,
 [#ac-002]#DT3 the ACS tree is dynamic so we have to assume that all
 indexing is just a "snapshot" of this moment.
