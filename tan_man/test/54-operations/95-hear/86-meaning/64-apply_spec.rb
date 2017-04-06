@@ -7,8 +7,10 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :expect_line
 
+# (1/N)
     it "add meaning"
 
+# (2/N)
     it "associate meaning" do
 
       s = <<-HERE.unindent

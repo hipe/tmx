@@ -57,4 +57,3 @@ TD tan_man/test/54-operations/42-graph/44-use_spec.rb
 brazen/doc/issues/028-entity-collection-via-git-config.md - needs EDIT but wait till better integrated
 the whole starter silo
 give "lines" action its own test file (there's enough work there)
-re-arch for lock

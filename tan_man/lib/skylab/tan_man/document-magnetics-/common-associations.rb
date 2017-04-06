@@ -177,7 +177,7 @@ module Skylab::TanMan
 
     # ==
 
-    def self.to_workspace_related_stream__
+    def self.to_workspace_related_stream_
       __to_stream WORKSPACE_RELATED___
     end
 
@@ -240,8 +240,9 @@ module Skylab::TanMan
 
           :property, :config_filename,
 
-          :default, -> _xx do
-            ::Kernel._OKAY__do_like_in_workspace_common_properties_in_br__
+          :default_by, -> _action do
+            # #cov2.1 (random silo)
+            Config_filename_knownness_[]
           end,
 
           :throughput_direction, :input,

@@ -234,13 +234,6 @@ module Skylab::TanMan
     end.call
 
     # ==
-
-    No_deps_ = Lazy_.call do
-      require 'no-dependencies-zerk'
-      ::NoDependenciesZerk
-    end
-
-    # ==
     # ==
   end
 end

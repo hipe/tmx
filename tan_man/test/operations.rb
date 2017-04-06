@@ -204,22 +204,20 @@ module Skylab::TanMan::TestSupport
 
     # --
 
-    def path_for_workspace_015_with_config_parse_error__
-      _head = dirs
-      ::File.join _head, '015-config-parse-error'
-    end
-
-    def path_for_workspace_010_with_directory_that_looks_like_file__
-      _head = dirs
-      ::File.join _head, '010-has-a-directory-that-looks-like-a-file'
-    end
-
     def path_for_workspace_005_with_just_a_config_
-      _head = dirs
-      ::File.join _head, '005-just-a-config'
+      path_for_fixture_workspace_ '005-just-a-config'
     end
 
-    def the_empty_esque_directory__
+    def path_for_fixture_workspace_ tail
+      _head = dirs
+      ::File.join _head, tail
+    end
+
+    def the_no_ent_directory_
+      TestSupport_::Fixtures.directory :not_here
+    end
+
+    def the_empty_esque_directory_
       TestSupport_::Fixtures.directory :empty_esque_directory
     end
 

@@ -13,11 +13,10 @@ module Skylab::TanMan
       attr_writer(
         :digraph_path,
         :filesystem,
-        :is_dry_run,
         :listener,
+        :mutable_workspace,
         :sub_invoker,
         :template_values_provider,
-        :workspace,
       )
 
       # -
@@ -58,23 +57,21 @@ module Skylab::TanMan
 
         def __write_path_to_workspace
 
-          path = _current_unsanitized_absolute_path
+          # #history-A.2: changed this to assume we are inside of a session
 
-          @workspace.mutate_and_persist_by do |o|
+          _path = _current_unsanitized_absolute_path
 
-            o.mutate_document_by do |doc|
+          _doc = @mutable_workspace.mutable_document
 
-              _sect = doc.sections.touch_section "digraph"
+          _sect = _doc.sections.touch_section "digraph"
+
+          _ok = _sect.assign _path, :path, & @listener
+
+          # #open [#tm-008.XXX] - make the above localized to be an asset path
 
               # (this form gets you no emission:) _sect[ :path ] = path
-              #
-              _sect.assign path, :path, & @listener
-            end
 
-            o.is_dry_run = @is_dry_run
-            o.filesystem = @filesystem
-            o.listener = @listener
-          end
+          _ok  # hi. #todo
         end
 
         # -- d.
@@ -385,4 +382,5 @@ module Skylab::TanMan
     end
   end
 end
+# #history-A.2: (can be temporary)..
 # #history-A.1: begin rewriting most of it for ween off [br]

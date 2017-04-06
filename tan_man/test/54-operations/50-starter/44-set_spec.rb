@@ -8,6 +8,7 @@ module Skylab::TanMan::TestSupport
     use :expect_line
     use :operations
 
+# (1/N)
     it "when bad name - shows good names" do
 
       prepare_ws_tmpdir <<-HERE.unindent
@@ -35,12 +36,14 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "good name, no workspace path" do
       call_API :starter, :set, :name, 'digr'
       expect_not_OK_event COMMON_MISS_
       expect_fail
     end
 
+# (3/N)
     it "good name, workspace path, but config parse error" do
 
       prepare_ws_tmpdir <<-HERE.unindent
@@ -64,6 +67,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (4/N)
     it "good name, workspace path, good config" do
 
       prepare_ws_tmpdir <<-HERE.unindent

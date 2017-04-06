@@ -18,6 +18,15 @@ store and retrieve an entity that consisted of a single, "primitive" value.
 
 
 
+## table of contents
+
+  - [#here.B]: about our "external" vs. "internal" names
+  - [#here.3]: meditations on file locking
+
+
+
+
+
 ## a universal normal name convention :[#here.B]
 
 the git config syntax specifies that variable names cannot contain
@@ -63,3 +72,59 @@ where they are *not* there are other characters available to substitute;
 characters not included in the standard (whew), THEN it might be that
 the collection can do the name conversions, rather than the business
 layer having to worry about it, which would be optimal.
+
+
+
+
+## a meditation on file-locking (introduction to the problem) :[#here.3]
+
+the idea of programming for concurrency is a bit outside of the auspices
+of our current platform, but that is not to say it is a problem we want
+to (or should) sidestep completely.
+
+more specifically, if it were the case that we had an architecture where
+many instances of a "microservice" of ours were running concurrently while
+sharing one filesystem (a setup that is not unimaginable), we would want
+to be able to say that we tried, at least, to address the underlying problem
+there.
+
+more interestingly, this is a tiny glimmer of a shadow of the broader
+problem that challenges larger datastore solutions, relational and
+"no-SQL" alike: that of concurrency, replication, eventual consistency, etc.
+
+rather than come from the outside in (taking in the heavy galaxy of work
+that has been done there and then trying to apply it to our toy stack
+here); we will come from the inside out; and start with our few easy pieces
+and come up with a solution for them in a vacuum, and then later compare
+notes with what the grownups do in said galaxy.
+
+
+
+
+## explanation by way of example of the problem.
+
+the classic example is something like this:
+
+  1. instance A reads the whole "config file" from the filesystem, and turns
+     it into a "document"; i.e a data structure floating in memory.
+
+  1. instance A makes a change to the document (but has not yet written
+     this change back to the filesystem).
+
+  1. instance B reads the same file from the filesystem, again parsing it
+     and producing the exact same (but different instance of) the structure
+     that instance A had in step 1.
+
+  1. instance A writes its changed document back to the filesystem.
+
+  1. instance B writes *its* changed document back to the filesystem,
+     clobbering the work that instance A did.
+
+
+
+
+## simple, "shotgun" approach to a solution for the problem
+
+always lock the file (whether reading or read/writing). this solution
+presents scaling problems but it ensures consistency. if you really wanted
+to scale you would probably want to explore the more robust options.

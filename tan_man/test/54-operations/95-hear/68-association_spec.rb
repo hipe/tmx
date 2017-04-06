@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_association
 
+# (1/N)
     it "when all 3 exist already" do
       add_association_to_abstract_graph 'buy almond milk', 'get to the store'
       hear_words %w( buy almond milk depends on get to the store )
@@ -16,6 +17,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (2/N)
     it "create one association (the 2 nodes exist already)" do
       add_nodes_to_abstract_graph 'zip win', 'zip work'
       hear_words %w( zip win depends on zip work )
@@ -30,6 +32,7 @@ module Skylab::TanMan::TestSupport
       scn.next_line.should be_nil
     end
 
+# (3/N)
     it "create 2 nodes and one association (empty document)" do
       begin_empty_abstract_graph
       hear_words %w( zip win solidly depends on zip work hard )
@@ -47,6 +50,7 @@ module Skylab::TanMan::TestSupport
       scn.next_line.should be_nil
     end
 
+# (4/N)
     it "create 2 nodes and one association (single rando node document)" do
       add_nodes_to_abstract_graph 'zip doodle'
       hear_words %w( zip win solidly depends on zip work hard )

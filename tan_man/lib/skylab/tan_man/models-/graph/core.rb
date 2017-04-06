@@ -9,7 +9,7 @@ module Skylab::TanMan
 
       def definition
 
-        _these = Home_::DocumentMagnetics_::CommonAssociations.to_workspace_related_stream__
+        _these = Home_::DocumentMagnetics_::CommonAssociations.to_workspace_related_stream_
 
         [
           :property, :starter,
@@ -27,23 +27,25 @@ module Skylab::TanMan
       end
 
       def execute
-        resolve_workspace_ && __thing_ding
+        @dry_run = false  # ..
+        with_mutable_workspace_ do
+          __via_mutable_workspace
+        end
       end
 
-      def __thing_ding
+      def __via_mutable_workspace
 
-        ok = Here___::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call_by do |o|
+        sta = Here___::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call_by do |o|
           o.digraph_path = @digraph_path
-          o.is_dry_run = false  # ..
-          o.workspace = @_workspace_
+          o.mutable_workspace = @_mutable_workspace_
           o.template_values_provider = self
           o.sub_invoker = @_microservice_invocation_
           o.filesystem = _invocation_resources_.filesystem
           o.listener = _listener_
         end
 
-        if ok
-          ok  # #cov1.5
+        if sta  # #cov1.5
+          [ :_result_from_use_TM_, sta.did_add_to_end, sta.offset  ]
         else
           NIL_AS_FAILURE_  # #cov1.2
         end
@@ -199,7 +201,7 @@ module Skylab::TanMan
 
       def __via_graph_path
 
-        path = @workspace.from_asset_directory_absolutize_path__ @graph_path
+        path = @workspace.absolute_path_via_unsanitized_asset_path_ @graph_path
 
         p = Home_::DocumentMagnetics_::ByteStreamReference_via_Request::BytestreamClassConst_via_Direction
 

@@ -83,7 +83,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        workspace_path = the_empty_esque_directory__
+        workspace_path = the_empty_esque_directory_
 
         _call_API_with_digraph_path_and_workspace_path(
           'some-path',
@@ -196,7 +196,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        path = path_for_workspace_010_with_directory_that_looks_like_file__
+        path = path_for_fixture_workspace_ '010-has-a-directory-that-looks-like-a-file'
 
         _call_API_with_digraph_path_and_workspace_path(
           ::File.join( path, cdn, 'not-a-dotfile.dot' ),
@@ -227,7 +227,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        path = path_for_workspace_015_with_config_parse_error__
+        path = path_for_fixture_workspace_ '015-config-parse-error'
 
         digraph_path = ::File.join path, cdn, 'i-exist', 'like-a-boss.dog'
 
@@ -246,11 +246,9 @@ module Skylab::TanMan::TestSupport
     # (8/N)
     context "WORKS when digraph path referent exists - writes config file" do
 
-      it "invokes; result is number of bytes" do  # :#cov1.5
-        _a = _tuple
-        d = _a.last
-        ::Integer === d or fail
-        d.zero? && fail
+      it "invokes; result is nothing interesting" do  # :#cov1.5
+        a = _tuple.last
+        a.first == :_result_from_use_TM_ || fail
       end
 
       it "this first event talks about .." do

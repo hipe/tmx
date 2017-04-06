@@ -12,7 +12,7 @@ module Skylab::TanMan
       end
 
       def invocation_via_argument_array a=nil, & p  # #testpoint
-        Require_microservice_toolkit___[]
+        Require_microservice_toolkit_[]
         _as = if a
           MTk_::API_ArgumentScanner.new a, & p
         elsif p
@@ -309,13 +309,6 @@ module Skylab::TanMan
 
         cls
       end
-    end
-
-    # ==
-
-    Require_microservice_toolkit___ = Lazy_.call do
-      # (move this as appropriate)
-      Home_::MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
     end
 
     # ==

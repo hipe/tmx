@@ -38,6 +38,19 @@ module Skylab::TanMan
 
   # ==
 
+  Config_filename_knownness_ = Lazy_.call do
+    Common_::KnownKnown[ Config_filename_[] ]
+  end
+
+  Config_filename_ = Lazy_.call do
+
+    # (hardcoded final default. most relevant actions take this as a parameter)
+
+    ::File.join( 'tan-man-workspace', 'config.ini' ).freeze
+  end
+
+  # ==
+
   Byte_downstream_reference_ = Lazy_.call do
     Home_.lib_.basic::ByteStream::DownstreamReference
   end
@@ -64,6 +77,15 @@ module Skylab::TanMan
 
   Scanner_ = -> a do
     Common_::Scanner.via_array a
+  end
+
+  No_deps_ = Lazy_.call do
+    # Require_microservice_toolkit_[] when needed
+    MTk_::NoDependenciesZerk
+  end
+
+  Require_microservice_toolkit_ = Lazy_.call do
+    MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
   end
 
   # ==

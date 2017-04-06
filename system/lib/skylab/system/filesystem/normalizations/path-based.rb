@@ -25,6 +25,7 @@ module Skylab::System
         end
         @do_lock_file_ = false
         @do_recognize_common_string_patterns_ = false
+        @need_mutable_not_immutable_ = nil
         @path_arg_was_explicit_ = false
       end
 
@@ -148,7 +149,13 @@ module Skylab::System
 
       def init_exception_and_locked_file_ path
 
-        io = @filesystem.open path, ::File::RDONLY
+        _mode = if @need_mutable_not_immutable_
+          ::File::RDWR
+        else
+          ::File::RDONLY
+        end
+
+        io = @filesystem.open path, _mode
 
         # this spot between the above line and the below line is the
         # subject of [#004.9] (the atomicity of all things)

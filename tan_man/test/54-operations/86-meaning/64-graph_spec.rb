@@ -14,6 +14,7 @@ module Skylab::TanMan::TestSupport
         graph_from
       end
 
+# (1/N)
       it "any meaning - KeyError" do
         -> do
           graph.meaning_values_via_meaning_name 'foo'
@@ -27,12 +28,14 @@ module Skylab::TanMan::TestSupport
         graph_from( [ 'red', 'color=#fa0schwartz' ] )
       end
 
+# (2/N)
       it "the one meaning - you got it" do
         arr = graph.meaning_values_via_meaning_name 'red'
         arr.length.should eql( 1 )
         arr[0].should eql( 'color=#fa0schwartz' )
       end
 
+# (3/N)
       it "an unknown meaning - KeyError" do
         -> do
           graph.meaning_values_via_meaning_name 'foo'
@@ -46,6 +49,7 @@ module Skylab::TanMan::TestSupport
         graph_from( [ 'angry-color', 'red' ] )
       end
 
+# (4/N)
       it "the one meaning - nerp" do
 
         ev = nil
@@ -69,12 +73,14 @@ module Skylab::TanMan::TestSupport
                      ['happy', 'happy-color'] )
       end
 
+# (5/N)
       it "the NT meaning - T" do
         arr = graph.meaning_values_via_meaning_name 'happy'
         arr.length.should eql( 1 )
         arr[0].should eql( 'foo=bar' )
       end
 
+# (6/N)
       it "the T meaning - T" do
         arr = graph.meaning_values_via_meaning_name 'happy-color'
         arr.length.should eql( 1 )
@@ -94,6 +100,7 @@ module Skylab::TanMan::TestSupport
           [ 'important', 'icon=star' ] )
       end
 
+# (7/N)
       it "resolves to the four terminal meanings along six arcs" do
         graph.meaning_values_via_meaning_name( 'zero-day' ).should eql(
           [ "border=heavy", "icon=star", "color=red", "border=heavy" ]
@@ -112,6 +119,7 @@ module Skylab::TanMan::TestSupport
           [ 'clock-radio', 'radio' ] )
       end
 
+# (8/N)
       it " - resolves to just the one nerk" do
         term_a = graph.meaning_values_via_meaning_name 'clock-radio'
         term_a.length.should eql( 1 )
@@ -127,6 +135,7 @@ module Skylab::TanMan::TestSupport
           [ 'finished', 'done-color' ] )
       end
 
+# (9/N)
       it "which is cool for rich error reporting" do
 
         ev = nil
@@ -167,6 +176,7 @@ module Skylab::TanMan::TestSupport
 
         exp = 'yin -> yang -> yin'
 
+# (10/N)
         it "- circular dependency: #{ exp }" do
 
           ev = nil
@@ -198,6 +208,7 @@ module Skylab::TanMan::TestSupport
 
         exp = "fear -> anger -> hate -> suffering -> fear"
 
+# (11/N)
         it "- circ dep: #{ exp }" do
 
           ev = nil

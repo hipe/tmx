@@ -16,26 +16,31 @@ module Skylab::TanMan::TestSupport
 
     context "ordinary strings" do
 
+# (1/N)
       it "the empty string is NO lines" do
         with EMPTY_S_
         expect
       end
 
+# (2/N)
       it "a single newline is ONE line" do
         with NEWLINE_
         expect EMPTY_S_
       end
 
+# (3/N)
       it "one line" do
         with "ohai\n"
         expect 'ohai'
       end
 
+# (4/N)
       it "two lines" do
         with "foo\nbar"
         expect 'foo', 'bar'
       end
 
+# (5/N)
       it "interceding blank lines are still there" do
         with "a\n\nc"
         expect 'a', EMPTY_S_, 'c'
@@ -47,11 +52,13 @@ module Skylab::TanMan::TestSupport
 
     context "shell style" do
 
+# (6/N)
       it "one line" do
         with "  # zanger \n"
         expect ' zanger '
       end
 
+# (7/N)
       it "two lines" do
         with " # feeple\n#deeple"
         expect ' feeple', 'deeple'
@@ -62,11 +69,13 @@ module Skylab::TanMan::TestSupport
 
     context "c-style" do
 
+# (8/N)
       it "one line" do
         with '/*ha*/'
         expect 'ha'
       end
 
+# (9/N)
       it "two lines" do
         with "   /*  one\ntwo */  "
         expect '  one', 'two '

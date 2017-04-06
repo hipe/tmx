@@ -73,7 +73,7 @@ module Skylab::TanMan
       if ok
         Common_::BoundCall.by( & act.method( :execute ) )
       else
-        NIL  # downgrade from false (covered)
+        NIL  # #downgrade-from-false (covered)
       end
     end
 
@@ -163,29 +163,38 @@ module Skylab::TanMan
         @_microservice_invocation_ = invo
       end
 
-      def resolve_workspace_
+      def with_mutable_workspace_
 
         # assume these variables are ours for consumption:
 
         _mnd = remove_instance_variable :@max_num_dirs_to_look
         _wsp = remove_instance_variable :@workspace_path
         _cfn = remove_instance_variable :@config_filename
+        _dry = remove_instance_variable :@dry_run
 
         _mag = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics::Workspace_via_Request
 
         _ = _mag.call_by do |o|
+
+          o.do_this_with_mutable_workspace do |ws|
+            @_mutable_workspace_ = ws
+            x = yield
+            remove_instance_variable :@_mutable_workspace_
+            x
+          end
+
           o.config_filename = _cfn
           o.max_num_dirs_to_look = _mnd
           o.workspace_path = _wsp
-          o.workspace_class_by = -> { Home_::Models_::Workspace }
+          o.is_dry_run = _dry
           o.filesystem = _invocation_resources_.filesystem
           o.listener = _listener_
         end
 
-        _store_ :@_workspace_, ( _ || NIL_AS_FAILURE_ )
+        _ || NIL  # #downgrade-from-false
       end
 
-      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      # define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       def _simplified_write_ k, x
         instance_variable_set :"@#{ k }", x

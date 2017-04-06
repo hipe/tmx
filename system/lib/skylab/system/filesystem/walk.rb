@@ -20,6 +20,7 @@ module Skylab::System
           filename: nil,
           ftype: nil,
           max_num_dirs_to_look: nil,
+          need_mutable_not_immutable: nil,
           prop: nil,
           property_symbol: nil,
           do_lock: nil,
@@ -67,7 +68,7 @@ module Skylab::System
           if Path_looks_relative_[ @start_path ]
             @start_path = @filesystem.expand_path @start_path
           end
-          nil
+          NIL
         end
 
         def __work
@@ -189,8 +190,9 @@ module Skylab::System
 
           kn = Home_::Filesystem::Normalizations::Upstream_IO.via(
             :path, found_path,
-            :must_be_ftype, ( @ftype || :FILE_FTYPE ),
+            :need_mutable_not_immutable, @need_mutable_not_immutable,
             :do_lock_file, @do_lock,
+            :must_be_ftype, ( @ftype || :FILE_FTYPE ),
             :filesystem, @filesystem,
             & @on_event_selectively )
 
@@ -201,7 +203,7 @@ module Skylab::System
               surrounding_path
             end
           else
-            yes
+            kn
           end
         end
 

@@ -215,13 +215,13 @@
 [#031]       #parent-node: [#026] the `retrieve` narrative ..
 [#030]       #parent-node: [#026] the `create` narrative ..
 
-[#029]       entity collection for git config
-
-       #track :[#here.W.A]: datamapper-like instance isomorphicism
-
+[#029] #hole
              ( #moved-to: [#028.B] )
 
-[#028]       #parent-node: [#010] entity collection via git config ..
+[#028]       entity collection via git config ..
+             #parent-node: [#010] collection adapters
+
+       #track :[#here.W.A]: datamapper-like instance isomorphicism
 
 [#027] #open #tracking the zero-configuration dream - one day, [br]-powered
                API's should need not define a 'Kernel' / 'Kernel_' nor have

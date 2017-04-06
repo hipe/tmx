@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :operations
 
+# (1/N)
     it "C-style" do
 
       call_API :meaning, :ls, :input_string, "digraph{/* foo : fee \n fiffle: faffle */}"
@@ -25,6 +26,7 @@ module Skylab::TanMan::TestSupport
       st.gets.should be_nil
     end
 
+# (2/N)
     it "shell-style" do
 
       _input_string = <<-O.unindent
@@ -48,6 +50,7 @@ module Skylab::TanMan::TestSupport
       st.gets.should be_nil
     end
 
+# (3/N)
     it "when input does not parse as a graph-viz dotfile (it borks)"
 
     ignore_these_events :using_parser_files

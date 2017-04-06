@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :operations
 
+# (1/N)
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do
 
       using_dotfile <<-O.unindent
@@ -33,6 +34,7 @@ module Skylab::TanMan::TestSupport
       ::File.read( dotfile_path ).should eql _exp
     end
 
+# (2/N)
     it "assign a known meaning to a new value" do
 
       using_dotfile <<-O.unindent

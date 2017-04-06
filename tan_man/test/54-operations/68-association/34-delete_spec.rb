@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_association
 
+# (1/N)
     it "remove when first node not found (no stmt_list)" do
       call_API_against "digraph {\n}\n"
       expect_not_OK_event :no_stmt_list
@@ -14,6 +15,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "remove when first node not found" do
       call_API_against "digraph {\nbaz}\n"
       expect_not_OK_event :node_not_found, 'node not found - (ick "foo")'
@@ -21,6 +23,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (3/N)
     it "remove when 2nd node not found" do
       call_API_against "digraph {\n foo [ label = \"foo\"]\n }\n"
       expect_not_OK_event :node_not_found, 'node not found - (ick "bar")'
@@ -28,6 +31,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (4/N)
     it "remove when not associated" do
       call_API_against "digraph {\n foo\nbar\nbar -> foo\n }\n"
       expect_not_OK_event :component_not_found,
@@ -36,6 +40,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (5/N)
     it "remove when associated" do
       call_API_against "digraph {\n foo\nbar\nfoo -> bar\n }\n"
       expect_OK_event :deleted_association do |ev|

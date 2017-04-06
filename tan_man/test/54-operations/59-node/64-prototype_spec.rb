@@ -9,6 +9,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'simple-prototype-and-graph-with/zero.dot' do
 
+# (1/N)
       it 'can add a node to zero nodes' do
         number_of_nodes.should be_zero
         o = touch_node_via_label 'cyan'
@@ -23,6 +24,7 @@ module Skylab::TanMan::TestSupport
 
       context 'having quotes in labels' do
 
+# (2/N)
         it 'that are unescaped unparses AND stringifies correctly' do
           str = %<it's a quote: ">
           o = touch_node_via_label str
@@ -34,6 +36,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'simple-prototype-and-graph-with/one-that-comes-before.dot' do
 
+# (3/N)
       it 'can add a node to one node' do
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
@@ -52,6 +55,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'simple-prototype-and-graph-with/one-that-comes-after.dot' do
 
+# (4/N)
       it 'can add a node to one node' do
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
@@ -77,16 +81,19 @@ module Skylab::TanMan::TestSupport
 
       context 'it adds nodes "alphabetically" but does not rearrange existing' do
 
+# (5/N)
         it 'when first one comes after new one, new one goes first' do
           add 'beta'
           expect :beta, :gamma, :alpha, :yeti
         end
 
+# (6/N)
         it '(inside)' do
           add 'ham'
           expect :gamma, :alpha, :ham, :yeti
         end
 
+# (7/N)
         it '(last)' do
           touch_node_via_label 'zap'
           expect :gamma, :alpha, :yeti, :zap
@@ -102,6 +109,7 @@ module Skylab::TanMan::TestSupport
         end
       end
 
+# (8/N)
       it 'will not redundantly add a new node if one with same label exists' do
         number_of_nodes.should eql 3
         item = retrieve_any_node_with_id :yeti

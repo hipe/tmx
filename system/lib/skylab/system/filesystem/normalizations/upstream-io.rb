@@ -14,9 +14,14 @@ module Skylab::System
         super
       end
 
+      def need_mutable_not_immutable=
+        @need_mutable_not_immutable_ = gets_one
+        KEEP_PARSING_
+      end
+
       def do_lock_file=
         @do_lock_file_ = gets_one
-        TRUE
+        KEEP_PARSING_
       end
 
       def dash_means=
@@ -213,7 +218,14 @@ module Skylab::System
 
       def __via_file
 
-        init_exception_and_open_IO_ ::File::RDONLY
+        _mode = if @need_mutable_not_immutable_
+          self._COVER_ME__probably_fine__
+          ::File::RDWR
+        else
+          ::File::RDONLY
+        end
+
+        init_exception_and_open_IO_ _mode
 
         if @open_IO_
           produce_result_via_open_IO_ remove_instance_variable :@open_IO_

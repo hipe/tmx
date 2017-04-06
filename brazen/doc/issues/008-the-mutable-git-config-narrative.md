@@ -25,10 +25,9 @@ warrants its own foundation here, as a complement to the more general
 
 
 
-
 ## our simple grammar and its ramifications
 
-  - our grammr is simple enough to implement with this hand-written
+  - our grammar is simple enough to implement with this hand-written
     parser. (if it were more complex we would consider other options.)
 
   - the grammar is line-oriented. the non-terminal symbols of our
@@ -166,6 +165,16 @@ easily start with a known document "prototype" (or fixture) and duplicate
 it deeply and then modify this copy and test against that, rather than
 having to parse the document from a string or build it up "by hand" over
 and over again for each test.
+
+
+
+
+
+## further reading
+
+[#028.3] will talk about file-locking, which while being peripherally related
+to mutable documents, is also a wholly separate concern.
+
 
 
 

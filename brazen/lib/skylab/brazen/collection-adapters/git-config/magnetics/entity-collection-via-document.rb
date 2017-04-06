@@ -2,12 +2,14 @@ module Skylab::Brazen
 
   module CollectionAdapters::GitConfig
 
-    class Magnetics::EntityCollection_via_Document  # :[#029].
+    class Magnetics::EntityCollection_via_Document  # :[#028].
 
       # the document around which this is constructed is either immutable
       # or mutable. in the former case, operations that require a mutable
       # document can fail because it must first be converted (once) from
       # immutable to mutable..
+
+      # file locking is explored beginning at [#028.3].
 
       # coverage currently starts at #cov2.1
 
@@ -257,7 +259,7 @@ module Skylab::Brazen
 
         def _entity_via_section sect
 
-          # (if ever we wanted to roll out a [#029.W.A] datamapper-like etc..)
+          # (if ever we wanted to roll out a [#028.W.A] datamapper-like etc..)
 
           st = sect.assignments.to_stream_of_assignments
 

@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_node
 
+# (1/N)
     it "a workspace without a graph value complains & invite" do
 
       _dir = dir :with_freshly_initted_conf
@@ -24,6 +25,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "`list` results in a stream of entities. see node label with 'name' prop" do
 
       call_API :node, :ls,
@@ -41,6 +43,7 @@ module Skylab::TanMan::TestSupport
       st.gets.should be_nil
     end
 
+# (3/N)
     it "remove nope" do
 
       call_API :node, :rm,
@@ -55,6 +58,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (4/N)
     it "remove money" do
 
       using_dotfile <<-O.unindent

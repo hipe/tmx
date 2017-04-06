@@ -6,6 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
 
+# (1/N)
     it "unrecognized input" do
 
       call_API :hear, :word, [ 'zing', 'zang' ]

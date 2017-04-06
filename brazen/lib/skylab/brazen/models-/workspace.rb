@@ -155,11 +155,11 @@ module Skylab::Brazen
 
     def __config_initially & p
 
-      _GitConfig = Home_::CollectionAdapters::GitConfig
+      _GitConfig = Git_config__[]
 
       _path = existent_config_path
 
-      doc = _GitConfig.parse_document_by do |o|
+      doc = _GitConfig::parse_document_by do |o|
         o.upstream_path = _path
         o.listener = p
       end
@@ -274,73 +274,186 @@ module Skylab::Brazen
     end
 
     class Magnetics::Workspace_via_Request < Common_::MagneticBySimpleModel  # #stowaway
-      # pure glue.
+
+      # this started out as "pure glue", but then became *the* implementation
+      # of [#028.3] (file-lock-based read or read-write sessions of configs)
+      #
+      # (this absorbed `Workspace_via_ConfigFileInquiry` #history-B.2)
+
+      def do_this_with_mutable_workspace & p
+
+        @_maybe_write_new_document = :__probably_write_new_document
+        @_resolve_document = :__resolve_document_mutable
+        @need_mutable_not_immutable = true
+        @_do_this_with_workspace = p ; nil
+      end
 
       attr_writer(
         :config_filename,
         :filesystem,
+        :is_dry_run,
         :listener,
         :max_num_dirs_to_look,
-        :workspace_class_by,
         :workspace_path,
       )
 
       def execute
+        if __locate_and_open_config_file
+          ok = __resolve_document
+          ok &&= __yield_workspace
+          ok &&= __maybe_write_new_document
+          __release_locked_resource
+          ok && __release_final_user_result
+        else
+          __whine_about_how_you_couldnt_locate_and_open_config_file
+        end
+      end
 
-        _inq = Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
+      # -- E. finish
+
+      def __release_final_user_result
+        remove_instance_variable :@__mixed_user_result
+      end
+
+      def __release_locked_resource
+        remove_instance_variable( :@writable_locked_IO ).close
+          # :#here2, #release-locked-file
+        NIL
+      end
+
+      # -- D. write document
+
+      def __maybe_write_new_document
+        send @_maybe_write_new_document
+      end
+
+      def __probably_write_new_document
+
+        is_dry = remove_instance_variable :@is_dry_run
+        _path = @mutable_document.document_byte_upstream_reference.path
+        st = @mutable_document.to_line_stream
+
+        if is_dry
+          io = Home_.lib_.system_lib::IO::DRY_STUB
+        else
+          io = @writable_locked_IO
+          io.rewind
+          io.truncate 0  # yikes ..
+        end
+
+        bytes = 0
+        begin
+          line = st.gets
+          line || break
+          bytes += io.write line
+          redo
+        end while above
+
+        # (don't close the IO yet, that happens #here2)
+
+        _ev = __build_event_about_how_you_wrote_the_new_document do |o|
+          o.bytes = bytes
+          o.is_dry = is_dry
+          o.path = _path
+        end
+
+        @listener.call :info, :success, :collection_resource_committed_changes do
+          _ev  # for now, built eagerly
+        end
+
+        ACHIEVED_
+      end
+
+      def __build_event_about_how_you_wrote_the_new_document
+
+        _Mag = Git_config__[]::Mutable::Magnetics::
+          WriteDocument_via_Collection::WroteFileEvent_via_Values
+
+        _ev = _Mag.call_by do |o|
+          yield o
+          o.verb_lemma_symbol = :create  # ..
+        end
+        _ev  # #hi. #todo
+      end
+
+      # -- C. yield workspace
+
+      def __yield_workspace
+
+        user_x = remove_instance_variable( :@_do_this_with_workspace )[ self ]
+        if user_x
+          @__mixed_user_result = user_x ; ACHIEVED_
+        else
+          user_x
+        end
+      end
+
+      # -- B. resolve document
+
+      def __resolve_document
+        send @_resolve_document
+      end
+
+      def __resolve_document_mutable
+
+        _GitConfig = Home_::CollectionAdapters::GitConfig
+
+        _doc = _GitConfig::Mutable.parse_document_by do |o|
+          o.upstream_IO = @writable_locked_IO
+          o.listener = @listener
+        end
+
+        # doc yes: #cov1.5. doc no: #cov1.4.
+
+        _store :@mutable_document, _doc
+      end
+
+      # -- A. locate and open config file
+
+      # using the same underlying mechanics as a "status" inquiry,
+      # produce a workspace object IFF the config file is found (lock it);
+      # otherwise emit the same *kind* of event (under a different channel).
+
+      def __locate_and_open_config_file
+
+        inq = Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
           o.path_head = @workspace_path
+          o.need_mutable_not_immutable = @need_mutable_not_immutable
           o.max_num_dirs_to_look = @max_num_dirs_to_look
           o.path_tail = @config_filename
           o.filesystem = @filesystem
           o.listener = @listener
         end
 
-        Magnetics::Workspace_via_ConfigFileInquiry.call_by do |o|
-          o.config_file_inquiry = _inq
-          o.workspace_class_by = @workspace_class_by
-          o.listener = @listener
-        end
-      end
-    end
+        if inq.file_existed
 
-    # ==
-
-    class Magnetics::Workspace_via_ConfigFileInquiry < Common_::MagneticBySimpleModel  # #stowaway
-
-      # using the same underlying mechanics as a "status" inquiry,
-      # produce a workspace object IFF the config file is found (lock it);
-      # otherwise emit the same *kind* of event (under a different channel).
-
-      attr_writer(
-        :config_file_inquiry,
-        :listener,
-        :workspace_class_by,
-      )
-
-      def execute
-        if @config_file_inquiry.file_exists
-          __yay
+          _be_muta = remove_instance_variable :@need_mutable_not_immutable
+          if _be_muta
+            @writable_locked_IO = inq.locked_IO
+          else
+            @read_only_locked_IO = inq.locked_IO
+          end
+          @config_filename = inq.path_tail ; ACHIEVED_
         else
-          __sad
+          @config_file_inquiry = inq
+          UNABLE_
         end
       end
 
-      def __yay
-        inq = remove_instance_variable :@config_file_inquiry
-        _cls = @workspace_class_by.call
-        _cls.define do |o|
-          o.locked_IO = inq.locked_IO
-          o.surrounding_path = inq.surrounding_path
-          o.config_filename = inq.path_tail
-        end
-      end
-
-      def __sad
+      def __whine_about_how_you_couldnt_locate_and_open_config_file
         @listener.call( * @config_file_inquiry.channel ) do
           @config_file_inquiry.event
         end
         UNABLE_
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # --
+
+      attr_reader(
+        :mutable_document,
+      )
     end
 
     # ==
@@ -436,7 +549,7 @@ module Skylab::Brazen
           __when_just_looking i_a, & ev_p
         else
           maybe_send_event_via_channel i_a do
-            bld_workspace_not_found_event ev_p[]
+            __build_workspace_not_found_event ev_p[]
           end
         end
       end
@@ -454,7 +567,7 @@ module Skylab::Brazen
         nil
       end
 
-      def bld_workspace_not_found_event ev
+      def __build_workspace_not_found_event ev
         x_a = ev.to_iambic
         x_a[ 0 ] = :workspace_not_found  # was 'resource_not_found'
         x_a.push :invite_to_action, [ :init ]
@@ -465,6 +578,11 @@ module Skylab::Brazen
     end
 
     # ==
+
+    Git_config__ = Lazy_.call do
+      Home_::CollectionAdapters::GitConfig
+    end
+
     # ==
 
     Here_ = self
@@ -472,5 +590,6 @@ module Skylab::Brazen
     # ==
   end
 end
+# #history-B.2: absorb a magnetic into another magnetic
 # #tombstone-B: moved "config file inquiry.." to own file
 # :#tombtone-A temporary

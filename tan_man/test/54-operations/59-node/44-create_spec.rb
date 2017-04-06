@@ -7,12 +7,14 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_node
 
+# (1/N)
     it "ping the 'node add' action" do
       call_API :node, :add, :ping
       expect_OK_event :ping_from_action, "ping from action - (ick :add)"
       @result.should eql :ping_from__add__
     end
 
+# (2/N)
     it "add a minimal node to the minimal string" do
       s = 'digraph{}'
       add_name_to_string 'bae', s
@@ -21,6 +23,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (3/N)
     it "add one before" do
       s = "digraph{ foo [label=foo]\n}"
       add_name_to_string 'bar', s
@@ -29,6 +32,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (4/N)
     it "add one after" do
       s = "digraph{\n bar}"
       add_name_to_string 'foo', s
@@ -37,6 +41,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (5/N)
     it "add one same - fails with event about node with same name" do
       s = " digraph { zoz } "
       add_name_to_string 'zoz', s
@@ -44,6 +49,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (6/N)
     it "add one in between" do
       s = " digraph { apple ; zoz ; } "
       add_name_to_string 'menengitis', s
@@ -91,6 +97,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'simple-prototype-and-graph-with/zero.dot' do
 
+# (9/N)
       it 'adds a node to zero nodes' do
         get_node_array.should eql EMPTY_A_
         touch_node_via_label 'feep'
@@ -99,6 +106,7 @@ module Skylab::TanMan::TestSupport
         stmt_list.unparse.should eql "feep [label=feep]\n"
       end
 
+# (10/N)
       it "creates unique but natural node_ids" do
 
         touch_node_via_label 'milk the cow'
@@ -123,6 +131,7 @@ module Skylab::TanMan::TestSupport
           }the following characters are not yet supported: #{
            }#{ %s<"\t" (009), "\n" (010) and "\u007F" (127)> }"
 
+# (11/N)
         it "when you try to use weird chars for labels - #{
           }\"#{ exp[ 0..96 ] }[..]\"" do
 
@@ -140,6 +149,7 @@ module Skylab::TanMan::TestSupport
         input = 'joe\'s "mother" & i <wat>'
         output = 'joe&apos;s &quot;mother&quot; &amp; i &lt;wat&gt;'
 
+# (12/N)
         it "it will escape some chars - #{
           }this:(#{ input }) becomes : #{ output }" do
 

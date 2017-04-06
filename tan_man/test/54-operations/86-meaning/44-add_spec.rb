@@ -7,6 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :operations
 
+# (1/N)
     it "add - shell-style, after, in between - spacing mimics greatest lesser neighbor" do
       s = "digraph{}\n # cutie : patootey\n  # fazinkle: doo-dinkle\n"
       insert_foo_bar_into s
@@ -19,6 +20,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (2/N)
     it "add - C-style, before, before" do
       s = " /* winterly : wanterly \n bliff blaff */ digraph{}"
       insert_foo_bar_into s
@@ -26,6 +28,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (3/N)
     it "add - C-style, inside, after" do
       s = "digraph{ /* dolan : is \n a : duck \n */ }"
       insert_foo_bar_into s
@@ -33,6 +36,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (4/N)
     it "add - shell-style, inside, after" do
 
       s = <<-O.unindent
@@ -54,6 +58,7 @@ module Skylab::TanMan::TestSupport
       scn.next_line.should eql "  #  foo : bar\n"
     end
 
+# (5/N)
     it "add to string with one space" do
       s = 'digraph{ }'
       insert_foo_bar_into s
@@ -61,6 +66,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (6/N)
     it "add will not clobber" do
       s = "digraph{ # foo : x\n}"
       insert_foo_bar_into s
@@ -73,6 +79,7 @@ module Skylab::TanMan::TestSupport
       call_API :meaning, :add, :input_string, s, :output_string, s, :name, 'foo', :value, 'bar'
     end
 
+# (7/N)
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
                                   # client.parser.root = :node_stmt
       graph = _parse_string <<-O.unindent
@@ -91,6 +98,7 @@ module Skylab::TanMan::TestSupport
       alist.unparse.should eql('fontname=Futura, label=barl')
     end
 
+# (8/N)
     it "UPDATE ONE AND ADD ONE -- WHAT WILL HAPPEN!!?? - note order logic" do
 
       graph = _parse_string <<-O.unindent
@@ -114,6 +122,7 @@ module Skylab::TanMan::TestSupport
       _bruh.client_class__.new.parse_string s
     end
 
+# (9/N)
     it "OMG associate" do
 
       _input_string = <<-O.unindent

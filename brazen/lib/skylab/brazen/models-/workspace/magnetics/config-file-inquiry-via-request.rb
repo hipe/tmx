@@ -30,9 +30,10 @@ module Skylab::Brazen
         end
 
         attr_writer(
-          :max_num_dirs_to_look,
           :filesystem,
           :listener,
+          :max_num_dirs_to_look,
+          :need_mutable_not_immutable,
           :path_head,
           :path_tail,
         )
@@ -69,6 +70,7 @@ module Skylab::Brazen
 
           sct = Home_.lib_.system_lib::Filesystem::Walk.via(
 
+            :need_mutable_not_immutable, @need_mutable_not_immutable,
             :max_num_dirs_to_look, @max_num_dirs_to_look,
             :start_path, @_absolute_path_head,
             :filename, @path_tail,
@@ -83,12 +85,12 @@ module Skylab::Brazen
           if sct
             @locked_IO = sct.locked_IO
             @surrounding_path = sct.surrounding_path
-            @file_exists = true
+            @file_existed = true
           else
             @unsanitized_path = ::File.join @_absolute_path_head, @path_tail
             @_event = :__event ; @__event = ev
             @channel = chan
-            @file_exists = false
+            @file_existed = false
           end
           NIL
         end
@@ -105,7 +107,7 @@ module Skylab::Brazen
 
         attr_reader(
           :channel,
-          :file_exists,
+          :file_existed,
           :locked_IO, # as applicable
           :path_tail,  # for creating workspace, echo it back
           :surrounding_path,  # as applicable

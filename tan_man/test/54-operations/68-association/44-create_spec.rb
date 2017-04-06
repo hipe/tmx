@@ -8,6 +8,7 @@ module Skylab::TanMan::TestSupport
     use :expect_line
     use :models_association
 
+# (1/N)
     it 'ping' do
 
       call_API :association, :add, :ping
@@ -17,6 +18,7 @@ module Skylab::TanMan::TestSupport
 
     context "when input cannot be resolved" do
 
+# (2/N)
       it ".. because nothing provided" do
         call_API :association, :add, :from_node_label, 'A', :to_node_label, 'B'
         expect_not_OK_event :non_one_IO,
@@ -28,6 +30,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '../fixture-dot-files-for-node/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
 
+# (3/N)
       it 'associates nodes when neither exists, creating them' do
 
         associate 'one', 'two'
@@ -61,6 +64,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '2-nodes-0-edges.dot' do
 
+# (4/N)
       it "associates when first exists, second does not" do
         associate 'alpha', 'peanut gallery'
         expect_OK_event :found_existing_node, 'found existing node (lbl "alpha")'
@@ -77,6 +81,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '2-nodes-1-edge.dot' do
 
+# (5/N)
       it 'does not associate again redundantly' do
 
         associate 'alpha', 'gamma'
@@ -103,6 +108,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '0-nodes-3-edges.dot' do
 
+# (6/N)
       it "adds edge statements in unobtrusive lexical-esque order, #{
            } with taxonomy and proximity" do
 
@@ -121,6 +127,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'point-5-1-prototype.dot' do
 
+# (7/N)
       it 'uses any edge prototype called "edge_stmt"' do
         associate 'foo', "bar's mother"
         excerpt( -2 .. -2 ).should eql(
@@ -131,6 +138,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'point-5-2-named-prototypes.dot' do
 
+# (8/N)
       it "association prototype not found" do
         associate 'a', 'b', :prototype, :clancy
         expect_OK_event :created_node
@@ -140,6 +148,7 @@ module Skylab::TanMan::TestSupport
         expect_fail
       end
 
+# (9/N)
       it "lets you choose which of several edge prototypes" do
         associate 'c', 'd', :prototype, :fancy
         associate_again 'b', 'a', :prototype, :boring
@@ -156,6 +165,7 @@ module Skylab::TanMan::TestSupport
 
     using_input 'point-5-1-prototype.dot' do
 
+# (10/N)
       it "lets you set attributes in the edge prototype (alphabeticesque)" do
         associate 'a', 'b', :attrs, { label: %<joe's mom: "jane"> }
         excerpt( -2 .. -2 ).should eql <<-O.unindent
@@ -164,6 +174,7 @@ module Skylab::TanMan::TestSupport
         expect_succeeded_result
       end
 
+# (11/N)
       it "lets you set attributes not yet in the edge prototype" do
         associate 'a', 'b', :attrs, { politics: :radical }
         excerpt( -2 .. -2 ).should eql <<-O.unindent
@@ -173,6 +184,7 @@ module Skylab::TanMan::TestSupport
       end
     end
 
+# (12/N)
     it "against a digraph with two nodes, will first match existing nodes fuzzily before creating" do
 
       s = <<-HERE.unindent
