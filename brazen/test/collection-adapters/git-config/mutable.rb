@@ -3,13 +3,15 @@ module Skylab::Brazen::TestSupport
   module Collection_Adapters::Git_Config::Mutable
 
     class << self
+
       def [] tcc
 
-        TS_.lib_( :collection_adapters_git_config )[ tcc ]
+        Collection_Adapters::Git_Config[ tcc ]
+        # (should be same as: TS_.lib_( :collection_adapters_git_config )[ tcc ] )
 
         tcc.extend Module_Methods___
         tcc.include Instance_Methods___
-        NIL_
+        NIL
       end
     end  # >>
 
@@ -39,37 +41,37 @@ module Skylab::Brazen::TestSupport
 
     def with_content s
 
-      document_p = -> do
-        doc = subject.parse_string s do self._NEVER end
-        document_p = -> { doc } ; doc
+      yes = true ; doc_proto = nil
+      once = -> do
+
+        yes = false ; once = nil
+
+        doc_proto = Subject__[].parse_document_by do |o|
+          o.upstream_string = s
+        end
+
+        NIL
       end
 
-      define_method :__build_document__ do
+      define_method :__build_document_ do
 
-        @__parse_context ||= __build_parse_context
+        # HACKISLY don't re-parse the same content over and over again..
 
-        document_p[].dup_via_parse_context @__parse_context
+        yes && once[]
+
+        _doc_ = doc_proto.DEEPLY_DUPLICATE___
+
+        _doc_  # hi. #todo
       end
 
       NIL_
-    end
-
-    def subject
-      Home_::CollectionAdapters::GitConfig::Mutable  # repeat
     end
   end
 
   module Instance_Methods___
 
     def document
-      @document ||= __build_document__
-    end
-
-    def __build_parse_context
-
-      _oes_p = event_log.handle_event_selectively
-
-      subject::MutableDocument_via__.with( & _oes_p )
+      @document ||= __build_document_
     end
 
     def touch_section subsect_s=nil, sect_s, & x_p
@@ -79,8 +81,24 @@ module Skylab::Brazen::TestSupport
     # ~ expectations
 
     def expect_document_content expected_string
-      _actual_string = @document.unparse
+      _actual_string = __document_content
       _actual_string.should eql expected_string
+    end
+
+    def expect_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
+
+      TestSupport_::Expect_Line::
+        Expect_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
+
+      NIL
+    end
+
+    def __document_content
+      @document.unparse
+    end
+
+    def document_to_lines_
+      @document.unparse_into []
     end
 
     def expect_one_event_ sym
@@ -93,16 +111,33 @@ module Skylab::Brazen::TestSupport
       em
     end
 
-    # ~ support
+    # ~ setup
 
-    def subject
-      super_subject::Mutable
+    def will_call_by_
+      p = expect_emission_fail_early_listener
+      call_by do
+        yield p
+      end
+      NIL
     end
 
-    def super_subject
-      Home_::CollectionAdapters::GitConfig
+    def subject_module_
+      Subject__[]
     end
   end
   # ->
+
+    # ==
+
+    Subject__ = -> do
+      Home_::CollectionAdapters::GitConfig::Mutable
+    end
+
+    Super_subject__ = -> do
+      Home_::CollectionAdapters::GitConfig
+    end
+
+    # ==
+    # ==
   end
 end

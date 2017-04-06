@@ -54,7 +54,7 @@ module Skylab::Brazen
 
         _ick_h = bld_view_document_hash
 
-        _body = _JSON.pretty_generate _ick_h
+        _body = JSON_[].pretty_generate _ick_h
 
         _rr = @response_receiver.with :channel, :my_face
 

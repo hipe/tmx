@@ -224,12 +224,6 @@ module Skylab::Brazen
     end  # LEGACY
 
     # ==
-
-    Scanner_ = -> a do
-      Common_::Scanner.via_array a
-    end
-
-    # ==
     # ==
   end
 end

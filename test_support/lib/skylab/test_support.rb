@@ -152,16 +152,27 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
-  Attributes_actor_ = -> cls, * a do
-    Home_.lib_.fields::Attributes::Actor.via cls, a
-  end
-
   CLI_ = Lazy_.call do
     Zerk_lib_[]::CLI
   end
 
   CLI_support_ = -> do
     Home_.lib_.brazen::CLI_Support
+  end
+
+  Zerk_lib_ = Lazy_.call do
+    x = Home_.lib_.zerk
+    Zerk_ = x  # for those who know
+    x
+  end
+
+  No_deps_zerk_ = Lazy_.call do  # #testpoint
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
+  end
+
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
   Path_looks_absolute_ = -> path do
@@ -174,12 +185,6 @@ module Skylab::TestSupport  # :[#021].
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
-  end
-
-  Zerk_lib_ = Lazy_.call do
-    x = Home_.lib_.zerk
-    Zerk_ = x  # for those who know
-    x
   end
 
   # --

@@ -156,7 +156,7 @@ module Skylab::DocTest
         c14n = _.execute
         if c14n
           @_characterization = c14n
-          send NODE_OF_INTEREST_VERB__.fetch c14n.verb_symbol
+          send NODE_OF_INTEREST_VERB__.fetch c14n.verb_lemma_symbol
         else
           c14n  # false-ish
         end

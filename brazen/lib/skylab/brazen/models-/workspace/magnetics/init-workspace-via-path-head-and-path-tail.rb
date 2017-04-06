@@ -29,7 +29,7 @@ module Skylab::Brazen
       end
 
       def init_max_number_of_directories_to_make
-        @maximum_number_of_directories_to_make = LIB_.basic::String.
+        @maximum_number_of_directories_to_make = Home_.lib_.basic::String.
           count_occurrences_in_string_of_regex(
             @config_filename,
             RX___ )
@@ -42,12 +42,9 @@ module Skylab::Brazen
         # separator anchored to the head of the string or the tail.
 
       def __resolve_document
-        @document = Home_::CollectionAdapters::GitConfig::Mutable.new(
-          & @on_event_selectively )
-        into_document_add_comment
-      end
 
-      def into_document_add_comment
+        @document = Home_::CollectionAdapters::GitConfig::Mutable.new_empty_document
+
         @document.add_comment "created by #{ @app_name_string } #{
           }#{ ::Time.now.strftime '%Y-%m-%d %H:%M:%S' }"
       end
@@ -122,7 +119,7 @@ module Skylab::Brazen
 
         @make_these_directories.each do | dir |
 
-          kn = LIB_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
+          kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
 
             :path, dir,
             :create,
@@ -139,11 +136,18 @@ module Skylab::Brazen
       end
 
       def maybe_write_document
+
         @path = ::File.join @surrounding_path, @config_filename
+
         if ::File.exist? @path
+
           when_exist
         else
-          @document.write_to_path @path, :is_dry, @is_dry
+          @document.write_to_path_by do |o|
+            o.path = @path
+            o.is_dry = @is_dry
+            o.listener = @on_event_selectively
+          end
         end
       end
 

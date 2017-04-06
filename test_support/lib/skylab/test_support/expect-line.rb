@@ -354,9 +354,39 @@ module Skylab::TestSupport
       Streams_have_same_content[ p[ actual_s ], p[ expected_s ], context ]
     end
 
-    Expect_these_lines_in_array = -> act_s_a, p, _context do
+    Expect_these_lines_in_array_with_trailing_newlines = -> mixed_upstream, p, context do
 
-      act_line_scn = Common_::Scanner.via_array act_s_a
+      _p = -> y do
+
+        _y_ = ::Enumerator::Yielder.new do |exp_x|
+
+          if ! exp_x.respond_to? :named_captures
+            exp_x << NEWLINE_
+          end
+
+          y << exp_x
+        end
+
+        p[ _y_ ]
+      end
+
+      Expect_these_lines_in_array[ mixed_upstream, _p, context ]
+    end
+
+    Expect_these_lines_in_array = -> up_x, p, _context do
+
+      act_line_scn = if up_x.respond_to? :gets
+
+        if up_x.respond_to? :flush_to_scanner
+          up_x.flush_to_scanner
+        else
+          No_deps_zerk_[]::Scanner_by.new do
+            up_x.gets
+          end
+        end
+      else  # assume array
+        Scanner_[ up_x ]
+      end
 
       _y = ::Enumerator::Yielder.new do |exp_line|
 
@@ -794,6 +824,10 @@ module Skylab::TestSupport
 
     Line_stream_via_string__ = -> s do
       Home_.lib_.basic::String::LineStream_via_String[ s ]
+    end
+
+    Scanner_ = -> a do  # this is certain to move up
+      Common_::Scanner.via_array a
     end
 
     # ==

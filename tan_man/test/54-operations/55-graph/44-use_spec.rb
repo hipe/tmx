@@ -256,7 +256,7 @@ module Skylab::TanMan::TestSupport
       it "this first event talks about .." do
         _ev = _tuple[ -3 ]
         _content = black_and_white _ev
-        _content =~ /\Aadded value - \(name: path value: "/ or fail
+        _content =~ /\Aadded value - \( path : "/ or fail
       end
 
       it "this second event talks about .." do
@@ -268,13 +268,13 @@ module Skylab::TanMan::TestSupport
       it "content of config file looks good" do
 
         _path = ::File.join _tuple[1], cfn
-        io = ::File.open _path, ::File::RDONLY
-        line = io.gets
-        line == "[digraph]\n" || fail
-        line = io.gets
-        line =~ /\Apath = [[:graph:]]/ or fail
-        line = io.gets
-        line && fail
+        _actual = ::File.open _path, ::File::RDONLY
+
+        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          y << "[digraph]"
+          y << /\Apath = [[:graph:]]/
+          y << "[wiw]"
+        end
       end
 
       shared_subject :_tuple do

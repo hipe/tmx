@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Branchesque::Indexation  # tracked by [#013]
 
-    # this is a "cacheing indexation". it is for a non-dynamic branch only.
+    # this is a "caching indexation". it is for a non-dynamic branch only.
     # it caches traversals of the branch's children lazily. we call it an
     # "indexation" as opposed to an "index" because it has state (as opposed
     # to being immutable) and effects behavior as it used.

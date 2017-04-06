@@ -52,13 +52,10 @@ module Skylab::Snag
 
         def __via_etc_resolve_SLS
 
-          us = @byte_upstream_ID.to_simple_line_stream(
+          _ = @byte_upstream_ID.to_simple_line_stream(
             & @on_event_selectively )
 
-          us and begin
-            @simple_line_upstream = us
-            ACHIEVED_
-          end
+          _store :@simple_line_upstream, _
         end
 
         def __gets_first_node_after_EOF_or_rewind
@@ -288,6 +285,10 @@ module Skylab::Snag
           NIL_
         end
 
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+        # ==
+
         class As_Rewinder_Releaser___
 
           def initialize actor
@@ -313,7 +314,12 @@ module Skylab::Snag
           end
         end
 
+        # ==
+
         WHITE__ = /[ \t]+/
+
+        # ==
+        # ==
       end
     end
   end

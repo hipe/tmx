@@ -78,7 +78,7 @@ module Skylab::Brazen
       x_a.push :start_path, bx.fetch( :surrounding_path ),
         :filename, bx.fetch( :config_filename )
 
-      surrounding_path = LIB_.system_lib::Filesystem::Walk.call_via_iambic x_a, & oes_p
+      surrounding_path = Home_.lib_.system_lib::Filesystem::Walk.call_via_iambic x_a, & oes_p
 
       if surrounding_path
         @property_box.replace :surrounding_path, surrounding_path
@@ -149,14 +149,21 @@ module Skylab::Brazen
 
     # ~ support
 
-    def _document & oes_p
-      @___did_attempt_to_resolve_document ||= begin
+    def _document & p
+      send ( @_document ||= :__document_initially ), & p
+    end
 
-        @document_ = Home_::CollectionAdapters::GitConfig.via_path_and_kernel(
-          existent_config_path, @kernel, & oes_p )
+    def __document_initially & p
 
-        true
-      end
+      x = Home_::CollectionAdapters::GitConfig.via_path_and_kernel(
+        existent_config_path, @kernel, & p )
+
+      @document_ = x
+      @_document = :__document_subsequently
+      send @_document
+    end
+
+    def __document_subsequently
       @document_
     end
 

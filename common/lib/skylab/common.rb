@@ -693,7 +693,7 @@ module Skylab::Common
     end
   end ; end
 
-  class MinimalStream  # see [#016.1]
+  class MinimalStream  # exactly [#016.1]
     class << self
       alias_method :by, :new
       undef_method :new

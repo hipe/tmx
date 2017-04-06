@@ -17,9 +17,8 @@ module Skylab::Brazen
       )
 
       def execute
-        ok = via_entity_identifier_resolve_subsection_id
-        ok && via_subsection_id_resolve_some_result
-        ok && @result
+        _ok = via_entity_identifier_resolve_subsection_id
+        _ok && result_via_subsection_id__
       end
     end
 
@@ -34,81 +33,79 @@ module Skylab::Brazen
       )
 
       def initialize & p
-        @on_event_selectively = p
+        @listener = p
       end
 
       def execute
-        rslv_subsection_name_query
-        via_any_subsection_name_query_rslv_section_scan
-        via_section_scan_produce_scan
+        __init_subsection_name_query
+        __init_section_stream_via_subsection_name_query
+        __stream_via_section_stream
       end
 
-    private
-
-      def rslv_subsection_name_query
+      def __init_subsection_name_query
         if @model_class
-          via_model_class_rslv_subsection_name_query
+          __init_subsection_name_query_via_model_class
         else
-          @subsection_name_query = nil
+          @_subsection_name_query = nil
           ACHIEVED_
         end
       end
 
-      def via_model_class_rslv_subsection_name_query
+      def __init_subsection_name_query_via_model_class
 
-        sym = via_model_class_prdc_section_name_symbol
+        sym = __subsection_name_symbol_via_model_class
 
-        @subsection_name_query = -> sect do
+        @_subsection_name_query = -> sect do
           sym == sect.external_normal_name_symbol
         end
 
         NIL
       end
 
-      def via_model_class_prdc_section_name_symbol
+      def __subsection_name_symbol_via_model_class
         @model_class.node_identifier.
           silo_name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
       end
 
-      def via_any_subsection_name_query_rslv_section_scan
-        if @subsection_name_query.nil?
-          when_all_rslv_section_scan
+      def __init_section_stream_via_subsection_name_query
+        if @_subsection_name_query.nil?
+          __init_section_stream_as_stream_of_all_sections
         else
-          via_subsection_name_query_rslv_section_scan
+          __init_section_stream_via_subsection_name_query
         end
       end
 
-      def when_all_rslv_section_scan
+      def __init_section_stream_as_stream_of_all_sections
 
-        @section_scan = @document.sections.to_value_stream
-        NIL_
+        @_section_stream = @document.sections.to_stream_of_sections
+        NIL
       end
 
-      def via_subsection_name_query_rslv_section_scan
+      def __init_section_stream_via_subsection_name_query
 
-        @section_scan = @document.sections.to_value_stream.reduce_by do | x |
-          @subsection_name_query.call x
+        @_section_stream = @document.sections.to_stream_of_sections.reduce_by do |el|
+          @_subsection_name_query.call el
         end
-        NIL_
+        NIL
       end
 
-      def via_section_scan_produce_scan
+      def __stream_via_section_stream
         if @model_class
-          via_section_scan_and_model_class_produce_entity_scan
+          __entity_stream_via_section_stream_and_model_class
         else
-          @section_scan
+          @_section_stream
         end
       end
 
-      def via_section_scan_and_model_class_produce_entity_scan
+      def __entity_stream_via_section_stream_and_model_class
 
-        fly = @model_class.new_flyweight @kernel, & @on_event_selectively
+        fly = @model_class.new_flyweight @kernel, & @listener
         box = fly.properties
         name_name_s = NAME_SYMBOL.to_s
 
-        @section_scan.map_by do |sect|
+        @_section_stream.map_by do |sect|
 
-          h = { name_name_s => sect.subsection_name_string }
+          h = { name_name_s => sect.subsection_string }
 
           sect.assignments.each_normalized_pair do |sym, x|
             x or next
@@ -166,11 +163,10 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
-      def via_subsection_id_resolve_some_result
+      def result_via_subsection_id__
         ok = via_subsection_id_resolve_section_
         ok &&= __via_subsection_id_resolve_model_class
-        ok && __via_section_and_model_class_resolve_unmarshal_result
-        ok || @result = false
+        ok && __via_section_and_model_class_unmarshal
       end
 
       def via_subsection_id_resolve_section_
@@ -179,7 +175,7 @@ module Skylab::Brazen
         found = false
 
         ss = @subsection_id
-        st = @document.sections.to_value_stream
+        st = @document.sections.to_stream_of_sections
 
         sect_sym = ss.section_s.intern
         ss_s = ss.subsection_s
@@ -192,7 +188,7 @@ module Skylab::Brazen
 
           count += 1
 
-          if ss_s != sect.subsection_name_string
+          if ss_s != sect.subsection_string
             next
           end
 
@@ -241,7 +237,7 @@ module Skylab::Brazen
 
         _id = Home_::Nodesque::Identifier.via_symbol _sym
 
-        silo = @kernel.silo_via_identifier _id, & @on_event_selectively
+        silo = @kernel.silo_via_identifier _id, & @listener
 
         if silo
           @model_class = silo.silo_module
@@ -249,10 +245,10 @@ module Skylab::Brazen
         end
       end
 
-      def __via_section_and_model_class_resolve_unmarshal_result
+      def __via_section_and_model_class_unmarshal
 
-        @result = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
-          o.edit_pair @section.subsection_name_string, NAME_SYMBOL
+        _x = @model_class.unmarshalled @kernel, @listener do |o|
+          o.edit_pair @section.subsection_string, NAME_SYMBOL
           o.edit_pairs @section.assignments do | x |
             if ! x.nil?
               x.to_s  # life is easier if string is the great equalizer:
@@ -262,11 +258,7 @@ module Skylab::Brazen
           end
         end
 
-        @result and ACHIEVED_
-      end
-
-      def resolve_result_via_write_file dry_run
-        @result = @document.write_to_path @to_path, :is_dry, @dry_run
+        _x  # hi. #todo
       end
     end
 
@@ -276,8 +268,9 @@ module Skylab::Brazen
 
       def initialize s, ss
         @section_s = s ; @subsection_s = ss
-        Section_.mutate_subsection_name_for_marshal(
-          @escaped_subsection_s = ss.dup )
+        s = ss.dup
+        Section_::Mutate_subsection_name_for_marshal[ s ]
+        @escaped_subsection_s = s
       end
 
 

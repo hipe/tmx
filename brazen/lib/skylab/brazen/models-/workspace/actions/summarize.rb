@@ -44,16 +44,19 @@ module Skylab::Brazen
       ONLY_LOOK_IN_THE_FIRST_DIRECTORY___ = 1  # for now, searching upwards is not an option
 
       def work
+
         bx = Box_.new
         one = -> { 1 }
         increment = -> d { d + 1 }
-        st = @_workspace.document_.to_section_stream( & handle_event_selectively )
-        sect = st.gets
 
-        while sect
-          bx.add_or_replace sect.external_normal_name_symbol, one, increment
+        st = @_workspace.document_.to_section_stream( & handle_event_selectively )
+
+        begin
           sect = st.gets
-        end
+          sect || break
+          bx.add_or_replace sect.external_normal_name_symbol, one, increment
+          redo
+        end while above
 
         @box = bx
 
@@ -76,7 +79,7 @@ module Skylab::Brazen
             count += 1
             d, i = pair.to_a
             s = i.id2name
-            s.gsub! DASH_, SPACE_
+            s.gsub! UNDERSCORE_, SPACE_
             y << "  • #{ d } #{ plural_noun d, s }"
             redo
           end while nil

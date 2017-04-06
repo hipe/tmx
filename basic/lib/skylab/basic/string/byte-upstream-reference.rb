@@ -12,11 +12,15 @@ module Skylab::Basic
         @s
       end
 
-      def to_simple_line_stream
-        to_rewindable_line_stream
+      def TO_REWOUND_SHAREABLE_LINE_UPSTREAM_EXPERIMENT
+        _same
       end
 
-      def to_rewindable_line_stream
+      def to_simple_line_stream
+        _same
+      end
+
+      def _same
         Here_::LineStream_via_String[ @s ]
       end
 

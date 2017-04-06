@@ -130,18 +130,22 @@ module Skylab::System
         ::Dir.rmdir path
       end
 
-      def mv src, dst, h=nil, & x_p
+      def mv src, dst, h=nil, & p
 
-        if x_p
-          file_utils_controller do | msg |
+        if p
+          _fuc = file_utils_controller do |msg|
 
-            x_p.call :info, :file_utils_message do
-
-              _ev = Common_::Event.wrap.file_utils_message msg
-              _ev or Common_::Event.inline_neutral_with( :fu_msg, :msg, msg )
+            p.call :info, :file_utils_message do
+              ev = Common_::Event.wrap.file_utils_message msg
+              if ev
+                ev
+              else
+                Common_::Event.inline_neutral_with :fu_msg, :msg, msg
+              end
             end
-            NIL_
-          end.mv src, dst, * h
+            NIL
+          end
+          _fuc.mv src, dst, * h
         else
 
           Home_.lib_.file_utils.mv src, dst, * h

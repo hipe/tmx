@@ -2846,11 +2846,6 @@ module Skylab::TestSupport
 
     # ==
 
-    No_deps_zerk_ = Lazy_.call do  # #testpoint
-      require 'no-dependencies-zerk'
-      ::NoDependenciesZerk
-    end
-
     Infinity_glyph___ = Lazy_.call() { '∞' }
 
     Here_ = self

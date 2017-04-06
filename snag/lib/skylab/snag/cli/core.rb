@@ -8,7 +8,7 @@ module Skylab::Snag
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
 
-    # awful alias method chain only #while #exist [br] and while #open [#co-016.1]
+    # awful alias method chain only #while #exist [br] and while #open [#co-016.3]
 
     expose_executables_with_prefix 'tmx-snag-'
 

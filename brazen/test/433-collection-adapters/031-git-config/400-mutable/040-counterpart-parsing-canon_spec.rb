@@ -49,7 +49,7 @@ module Skylab::Brazen::TestSupport
       chan_i_a = nil
       ev = nil
 
-      _x = subject.parse_string @input_string do | * i_a, & ev_p |
+      _x = subject_module_document_via_string_ @input_string do |*i_a, &ev_p|
         chan_i_a = i_a
         ev = ev_p[]
         :_BR_NO_SEE_

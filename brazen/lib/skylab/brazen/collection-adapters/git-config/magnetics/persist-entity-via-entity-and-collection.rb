@@ -19,11 +19,7 @@ module Skylab::Brazen
 
       def resolve_section
 
-        _prs = MockParse__.new -> sym, * _, & ev_p do
-          if :info != sym
-            raise ev_p[].to_exception
-          end
-        end
+        _prs = MockParse__.new LISTENER_THAT_RAISES_ALL_NON_INFO_EMISSIONS_
 
         _ = Here_::Mutable::Section_or_Subsection__.
           via_literals @subsection_name, @section_name, _prs

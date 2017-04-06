@@ -13,18 +13,23 @@ module Skylab::Brazen::TestSupport
       with_empty_document
 
       it "add a section" do
-        x = touch_section 'foo'
+        el = touch_section 'foo'
         expect_document_content "[foo]\n"
-        expect_no_events
-        x.category_symbol.should eql :section_or_subsection
+        el._category_symbol_ == :_section_or_subjection_ || fail
       end
 
       it "add a section with an invalid name" do
+
         _secs = document.sections
-        ok = _secs.touch_section 'foo_bar'
-        ok.should eql Home_::UNABLE_
+
+        _p = event_log.handle_event_selectively
+
+        ok = _secs.touch_section 'foo_bar', & _p
+
+        ok == Home_::UNABLE_ || fail
+
         expect_one_event :invalid_section_name do |ev|
-          ev.invalid_section_name.should eql 'foo_bar'
+          ev.invalid_section_name == 'foo_bar' || fail
         end
       end
 
@@ -34,16 +39,25 @@ module Skylab::Brazen::TestSupport
       end
 
       it "add a section with a subsection with an invalid name" do
+
         _secs = document.sections
-        ok = _secs.touch_section "bar\nbaz", 'foo'
+
+        _p = event_log.handle_event_selectively
+
+        ok = _secs.touch_section "bar\nbaz", 'foo', & _p
+
         expect_event :invalid_subsection_name,
+
           /\Asubsection names can contain any characters except newline #{
            }\(\(ick "bar\\n"\)\)\z/
+
         ok.should eql Home_::UNABLE_
       end
     end
 
     context "to a document with one section" do
+
+      # :#cov1.1
 
       with_a_document_with_a_section_called_foo
 
@@ -57,7 +71,7 @@ module Skylab::Brazen::TestSupport
         expect_document_content "[foo]\n"
 
         secto_ = touch_section 'foo'
-        secto.should be_respond_to :subsection_name_string
+        secto.should be_respond_to :subsection_string
         secto_.object_id.should eql secto.object_id
       end
 

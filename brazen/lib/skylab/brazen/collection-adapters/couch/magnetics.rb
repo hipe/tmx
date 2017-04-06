@@ -121,13 +121,7 @@ module Skylab::Brazen
     public
 
       def my_face_when_200_ok o
-        _JSON.parse o.response.body
-      end
-
-    private
-
-      def _JSON
-        LIB_.JSON
+        JSON_[].parse o.response.body
       end
     end
   end

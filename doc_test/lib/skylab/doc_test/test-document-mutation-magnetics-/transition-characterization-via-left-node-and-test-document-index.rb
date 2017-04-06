@@ -63,7 +63,7 @@ module Skylab::DocTest
           o.existing_node_index = @_existing_node_index
           o.identifying_string = @_left_identifying_string
           o.right_is_of_branch = right_is_of_branch
-          o.verb_symbol = right_is_of_branch ? :downgrade : :upgrade
+          o.verb_lemma_symbol = right_is_of_branch ? :downgrade : :upgrade
         end
       end
     end
@@ -107,7 +107,7 @@ module Skylab::DocTest
       attr_accessor(
         :existing_node_index,
         :right_is_of_branch,
-        :verb_symbol,
+        :verb_lemma_symbol,
       )
     end
 
@@ -118,7 +118,7 @@ module Skylab::DocTest
         :is_of_branch,
       )
 
-      def verb_symbol
+      def verb_lemma_symbol
         :same_shape
       end
     end
@@ -129,7 +129,7 @@ module Skylab::DocTest
         :is_of_branch,
       )
 
-      def verb_symbol
+      def verb_lemma_symbol
         :create
       end
     end

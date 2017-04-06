@@ -2,6 +2,8 @@ module Skylab::System
 
   class Doubles::Stubbed_Filesystem  # see [#027]
 
+    # (reminder: [#here] discusses simplified implementations of this.)
+
     class << self
 
       def enhance_client_class client

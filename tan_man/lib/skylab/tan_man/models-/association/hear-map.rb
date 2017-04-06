@@ -165,7 +165,7 @@ module Skylab::TanMan
 
             if :path == id.shape_symbol && DASH_ == id.path
 
-              id = Brazen_::Collection::ByteDownstreamReference.via_stream(
+              id = Brazen_::Collection::ByteDownstreamReference.via_open_IO(
                 @qualified_knownness_box.fetch( :stdout ).value_x )
             end
 

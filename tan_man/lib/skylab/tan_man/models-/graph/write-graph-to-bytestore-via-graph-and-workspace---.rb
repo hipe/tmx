@@ -63,7 +63,12 @@ module Skylab::TanMan
           @workspace.mutate_and_persist_by do |o|
 
             o.mutate_document_by do |doc|
-              doc.set_value_in_section path, :path, "digraph"
+
+              _sect = doc.sections.touch_section "digraph"
+
+              # (this form gets you no emission:) _sect[ :path ] = path
+              #
+              _sect.assign path, :path, & @listener
             end
 
             o.is_dry_run = @is_dry_run
@@ -295,7 +300,7 @@ module Skylab::TanMan
           x = remove_instance_variable :@digraph_path
 
           _m = if x.respond_to? :write  # allow the passing of an open IO
-            :via_stream
+            :via_open_IO
           else
             :via_path
           end

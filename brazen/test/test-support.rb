@@ -34,6 +34,12 @@ module Skylab::Brazen::TestSupport
 
   module Instance_Methods___
 
+    def expect_these_lines_in_array_ act_s_a, & p
+
+      TestSupport_::Expect_Line::Expect_these_lines_in_array.call(
+        act_s_a, p, self )
+    end
+
     def debug!
       @do_debug = true
     end
@@ -88,6 +94,10 @@ module Skylab::Brazen::TestSupport
   end
 
   module TestLib_
+
+    Expect_emission_fail_early = -> tcc do
+      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+    end
 
     Expect_event = -> test_context_cls do
       Common_.test_support::Expect_Emission[ test_context_cls ]
@@ -179,6 +189,7 @@ module Skylab::Brazen::TestSupport
 
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = ''.freeze
+  NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '.freeze

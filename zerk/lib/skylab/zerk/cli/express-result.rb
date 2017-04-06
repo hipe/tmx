@@ -110,7 +110,7 @@ module Skylab::Zerk
           elsif x.respond_to? :ascii_only?
             shape = :stringish
 
-          elsif x.respond_to? :nan?
+          elsif x.respond_to? :infinite?
             shape = :floatish
 
           elsif x.respond_to? :bit_length

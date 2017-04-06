@@ -75,6 +75,8 @@ module Skylab::Cull::TestSupport
 
     it "add valid upstream on a workspace with multiple upstreams" do
 
+      # #lends-coverage to [#br-007.1]
+
       td = prepare_tmpdir_with_patch_ :many_upstreams
 
       s = content_of_the_file td

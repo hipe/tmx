@@ -32,7 +32,7 @@ module Skylab::Brazen
         else
           __infer_noun_stem
         end
-        s and LIB_.human::NLP::EN::POS::Noun[ s ]
+        s and NLP_[]::EN::POS::Noun[ s ]
       end
 
       def __infer_noun_stem  # #to-determine-a-noun
@@ -208,7 +208,7 @@ module Skylab::Brazen
 
         s ||= @_name_function.as_human
 
-        LIB_.human::NLP::EN::POS::Verb[ s ]
+        NLP_[]::EN::POS::Verb[ s ]
       end
 
       def __rslv_VAN_lexeme
@@ -217,7 +217,7 @@ module Skylab::Brazen
 
         if ci
           if ci.has_verb_as_noun_lemma
-            x = LIB_.human::NLP::EN::POS::Noun[ ci.verb_as_noun_lemma ]
+            x = NLP_[]::EN::POS::Noun[ ci.verb_as_noun_lemma ]
           end
         end
 
@@ -268,5 +268,14 @@ module Skylab::Brazen
         # "add a couch db collection"
       end
     end
+
+    # ==
+
+    NLP_ = Lazy_.call do
+      Home_.lib_.human::NLP
+    end
+
+    # ==
+    # ==
   end
 end

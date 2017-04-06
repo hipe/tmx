@@ -56,7 +56,7 @@ module Skylab::Cull
 
         cfg = @survey.config_for_write_
 
-        if cfg.is_empty
+        if cfg.DOCUMENT_IS_EMPTY
           cfg.add_comment "ohai"
         end
 

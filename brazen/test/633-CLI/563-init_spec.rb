@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport
         line_oriented_state_from_invoke
       end
 
-      it "succeeds" do
+      it "succeeds" do  # :#cov1.3
         results_in_success_exitstatus_
       end
 

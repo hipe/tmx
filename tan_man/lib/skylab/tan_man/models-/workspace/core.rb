@@ -181,7 +181,10 @@ module Skylab::TanMan
 
         _GitConfig = Home_.lib_.brazen_NOUVEAU::CollectionAdapters::GitConfig
 
-        doc = _GitConfig.read @locked_IO, & listener
+        doc = _GitConfig.parse_document_by do |o|
+          o.upstream_IO = @locked_IO
+          o.listener = listener
+        end
 
         if doc
           # #cov1.5
@@ -238,7 +241,8 @@ module Skylab::TanMan
       def __emit
 
         _Mag = Home_.lib_.brazen_NOUVEAU::CollectionAdapters::
-          GitConfig::Mutable::Magnetics::WroteFileEvent_via_Values
+          GitConfig::Mutable::Magnetics::
+          WriteDocument_via_Collection::WroteFileEvent_via_Values
 
         @listener.call :info, :success, :collection_resource_committed_changes do
 
@@ -246,7 +250,7 @@ module Skylab::TanMan
             o.bytes = @_bytes
             o.is_dry = @_is_dry
             o.path = @_path
-            o.verb_symbol = :create  # ..
+            o.verb_lemma_symbol = :create  # ..
           end
         end
         NIL
@@ -256,7 +260,7 @@ module Skylab::TanMan
 
         doc = remove_instance_variable :@_document
 
-        @_path = doc.byte_upstream_reference.path
+        @_path = doc.DOCUMENT_BYTE_UPSTREAM_REFERENCE.path
         st = doc.to_line_stream
 
         io = if @_is_dry

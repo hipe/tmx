@@ -13,7 +13,10 @@ module Skylab::Cull
 
         cfg = survey.config_for_read_
         if cfg
-          sect = cfg.sections[ :report ] and __unmarshal sect
+          sect = cfg.sections.lookup_softly :report
+          if sect
+            __unmarshal sect
+          end
         end
       end
 
@@ -21,7 +24,7 @@ module Skylab::Cull
 
         @call_a = []
 
-        st = sect.assignments.to_value_stream
+        st = sect.assignments.to_stream_of_assignments
 
         while ast = st.gets
 

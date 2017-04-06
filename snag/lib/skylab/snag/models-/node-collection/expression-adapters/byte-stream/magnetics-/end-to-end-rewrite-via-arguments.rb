@@ -97,7 +97,7 @@ module Skylab::Snag
 
           @_BUs_ID = @collection.upstream_reference
 
-          _ = @_BUs_ID.to_rewindable_line_stream( & @listener )
+          _ = @_BUs_ID.TO_REWOUND_SHAREABLE_LINE_UPSTREAM_EXPERIMENT( & @listener )
 
           _store :@_simple_line_upstream, _
         end

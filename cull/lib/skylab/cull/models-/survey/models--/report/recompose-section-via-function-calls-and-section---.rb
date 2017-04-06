@@ -25,11 +25,11 @@ module Skylab::Cull
           @added_nodes = []
           @removed_nodes = []
           @span_a_h = {}  # #note-25
-          st = @section.to_node_stream
+          st = @section.to_stream_of_all_elements
           current_span = []
           main_node = nil
           while node = st.gets
-            if is_node_of_interest node
+            if Is_node_of_interest__[ node ]
               if main_node
                 add_span main_node, current_span
                 current_span = [ node ]
@@ -92,9 +92,8 @@ module Skylab::Cull
               @nodes.concat span.node_a  # reuse the existing nodes
             else
 
-              new_node = @section.build_assignment_via_mixed_value_and_name_function(
-                func.marshal,
-                NAME__ )
+              _s = func.marshal
+              new_node = @section.ASSIGNEMNT _s, NAME_SYMBOL_FOR_ASSIGNMENT___
 
               @added_nodes.push new_node
               @nodes.push new_node
@@ -107,23 +106,36 @@ module Skylab::Cull
 
           __maybe_emit_events
 
-          @section.replace_children_with_this_array @nodes  # result is number of nodes gained
+          @section.REPLACE_ALL_ELEMENTS @nodes  # result is number of nodes gained
         end
 
         def __salvage
-          @span_a_h.each_value do | span_a |
-            span_a.each do | span |
-              span.node_a.each do | node |
-                if is_node_of_interest node
-                  __memo_removed_node node
+
+          crazy_comment_hack = -> el do
+
+            s, s_ = el.TO_LINE_AS_BLANK_LINE_OR_COMMENT_LINE.split '#', 2
+
+            el = el.class.new "#{ s }# (from removed function)#{ s_ }"
+
+            @nodes.push el
+          end
+
+          @span_a_h.each_value do |span_a|
+
+            span_a.each do |span|
+
+              span.node_a.each do |el|
+
+                if Is_node_of_interest__[ el ]
+
+                  __memo_removed_node el
+
+                elsif el.is_blank_line_or_comment_line
+
+                  crazy_comment_hack[ el ]
+
                 else
-                  if :blank_line_or_comment_line == node.category_symbol
-                    s, s_ = node.to_line.split '#', 2
-                    node = node.class.new( "#{ s }# (from removed function)#{ s_ }" )
-                  else
-                    self._DO_ME_this_node_is_not_a_comment
-                  end
-                  @nodes.push node
+                  self.__COVER_ME__unexpected_element_category__
                 end
               end
             end
@@ -134,11 +146,6 @@ module Skylab::Cull
         def __memo_removed_node node
           @removed_nodes.push node
           nil
-        end
-
-        def is_node_of_interest node
-          :assignment == node.category_symbol &&
-            :function == node.external_normal_name_symbol
         end
 
         def __maybe_emit_events
@@ -193,7 +200,17 @@ module Skylab::Cull
           ACHIEVED_
         end
 
-        NAME__ = Common_::Name.via_variegated_symbol :function
+        # ==
+
+        Is_node_of_interest__ = -> node do
+          if node.is_assignment
+            :function == node.external_normal_name_symbol
+          end
+        end
+
+        # ==
+
+        NAME_SYMBOL_FOR_ASSIGNMENT___ = :function
 
         # ==
         # ==

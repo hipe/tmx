@@ -6,7 +6,7 @@ module Skylab::Fields
     # [ba] class/module creator and that thing is to be sunsetted..)
 
     # (if you are looking for guys that generate structs from lists of
-    # names, [#sy-028] has the latest..)
+    # names, [#ba-063] is exactly this.)
 
     # make a basic struct class with a list of member names (like ::Struct)
     #
@@ -214,7 +214,7 @@ module Skylab::Fields
       end
     end
 
-    THE_EMPTY_STRUCT__ = new.freeze
+    THE_EMPTY_STRUCT__ = new.freeze  # :[#here.2]
 
     # ==
     # ==

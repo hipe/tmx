@@ -2,6 +2,8 @@ module Skylab::Common
 
   class Stream::Magnetics::RandomAccessImmutable_via_Stream < SimpleModel
 
+    # :[#016.4] (refereneced 1x only, by [sy])
+
     # -
 
       def initialize

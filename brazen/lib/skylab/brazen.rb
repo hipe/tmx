@@ -35,7 +35,7 @@ module Skylab::Brazen
     end
 
     def lib_
-      LIB_
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
 
     def members
@@ -135,6 +135,10 @@ module Skylab::Brazen
 
   # == small functions used locally
 
+  Zerk_lib_ = Lazy_.call do
+    Home_.lib_.zerk
+  end
+
   Entity_lib_ = -> do
     Require_fields_lib_[]
     Field_::Entity
@@ -153,16 +157,16 @@ module Skylab::Brazen
     NIL_
   end
 
-  Stream_ = -> a, & p do
-    Common_::Stream.via_nonsparse_array a, & p
-  end
-
   Byte_upstream_reference_ = -> do
     Home_.lib_.basic::ByteStream::UpstreamReference
   end
 
-  Zerk_lib_ = Lazy_.call do
-    Home_.lib_.zerk
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
   end
 
   # == singletons, small subclasses
@@ -239,7 +243,6 @@ module Skylab::Brazen
   Home_ = self
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
-  LIB_ = Common_.produce_library_shell_via_library_and_app_modules Lib_, self
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NAME_SYMBOL = :name

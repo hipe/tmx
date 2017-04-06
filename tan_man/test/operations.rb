@@ -129,6 +129,16 @@ module Skylab::TanMan::TestSupport
     end
     end  # if false
 
+    # -- expectations (assertions)
+
+    def expect_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
+
+      TestSupport_::Expect_Line::
+        Expect_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
+
+      NIL
+    end
+
     # -- TMPDIR TOWN
 
     def prepare_a_tmpdir_like_so_ patch_string

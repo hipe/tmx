@@ -14,8 +14,7 @@ module Skylab::Brazen
         def execute
           ok = __look_at_entity
           ok &&= via_entity_resolve_subsection_id_via_entity_name @name_x
-          ok && __produce_and_edit_section
-          @result
+          ok && __go_short_or_long
         end
 
         def __look_at_entity
@@ -68,10 +67,12 @@ module Skylab::Brazen
         end
 
         def cannot_persist_entity_with_no_properties
+
           maybe_send_event :error, :cannot_persist_entity_with_no_properties do
             bld_cannot_persist_entity_with_no_properties_event
           end
-          @result = UNABLE_
+
+          UNABLE_
         end
 
         def bld_cannot_persist_entity_with_no_properties_event
@@ -81,7 +82,7 @@ module Skylab::Brazen
           end
         end
 
-        def __produce_and_edit_section
+        def __go_short_or_long
           if @use_short_identity && @body_pair_a.length.zero?
             __go_short
           else
@@ -96,7 +97,7 @@ module Skylab::Brazen
             inserting_item: :__go_short_when_created }
 
           method = nil
-          @section = @mutable_document.sections.touch_section_magnetic(
+          @section = @mutable_document.sections.touch_section_matching_any_existing_section_with_name__(
               @subsection_id.section_s ) do | * i_a |
 
             method = h.fetch i_a.fetch 1
@@ -118,9 +119,11 @@ module Skylab::Brazen
         end
 
         def __go_short_common_finish
-          @section.set_subsection_name @actual_s
-          @result = ACHIEVED_
-          nil
+
+          self._COVER_ME__it_can_be_OK__
+          @section.SET_SUBSECTION_NAME @actual_s
+
+          ACHIEVED_
         end
 
         def __go_long
@@ -177,10 +180,12 @@ module Skylab::Brazen
         end
 
         def when_no_change_in_section
+
           maybe_send_event :error, :no_change_in_entity do
             bld_no_change_in_section_event
           end
-          @result = UNABLE_
+
+          UNABLE_
         end
 
         def bld_no_change_in_section_event
@@ -190,6 +195,7 @@ module Skylab::Brazen
         end
 
         def _into_section_write
+
           @body_pair_a.each do |pair|
             s = pair.name_symbol.to_s
             if s.include? UNDERSCORE_
@@ -197,7 +203,8 @@ module Skylab::Brazen
             end
             @section[ pair.name_symbol ] = pair.value_x
           end
-          @result = ACHIEVED_
+
+          ACHIEVED_
         end
 
         def maybe_send_event * i_a, & ev_p

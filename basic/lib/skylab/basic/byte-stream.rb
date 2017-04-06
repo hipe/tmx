@@ -51,7 +51,7 @@ module Skylab::Basic
 
       elsif x.respond_to? :puts
 
-        DownstreamReference.via_stream x
+        DownstreamReference.via_open_IO x
 
       elsif x.respond_to? :ascii_only?
 
@@ -73,7 +73,7 @@ module Skylab::Basic
           Home_.lib_.system_lib::Filesystem::ByteDownstreamReference.new s
         end
 
-        def via_stream io
+        def via_open_IO io
           Home_.lib_.IO_lib::ByteDownstreamReference.via_open_IO io
         end
 
@@ -106,7 +106,7 @@ module Skylab::Basic
           Home_.lib_.system_lib::Filesystem::ByteUpstreamReference.new s
         end
 
-        def via_stream io
+        def via_open_IO io
           Home_.lib_.system_lib::IO::ByteUpstreamReference.via_open_IO io
         end
 

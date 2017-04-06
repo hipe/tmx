@@ -10,7 +10,7 @@ module Skylab::Cull
 
         cfg = survey.config_for_read_
         if cfg
-          sect = cfg.sections[ :upstream ]
+          sect = cfg.sections.lookup_softly :upstream
           sect and __unmarshal sect
         end
       end
@@ -19,11 +19,11 @@ module Skylab::Cull
 
         @___ubox___ = Common_::Box.new
 
-        if s = sect.subsection_name_string
+        if s = sect.subsection_string
           __unmarshal_id s
         end
 
-        st = sect.assignments.to_value_stream
+        st = sect.assignments.to_stream_of_assignments
 
         while ast = st.gets
           m = :"___unmarshal_#{ ast.external_normal_name_symbol }_property"

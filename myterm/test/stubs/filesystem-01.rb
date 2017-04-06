@@ -2,7 +2,7 @@ module Skylab::MyTerm::TestSupport
 
   module Stubs::Filesystem_01 ; class << self
 
-    # this is #[#sy-032] an alternative implementation of [#sy-027]
+    # this is #[#sy-027.2.1] an alternative implementation of a mocked filesystem
     # (rough sketch)
 
     def produce_new_instance

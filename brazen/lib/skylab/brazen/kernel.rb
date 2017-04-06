@@ -88,7 +88,7 @@ class Kernel  # [#015]
   end
 
   def debug_IO
-    LIB_.system.IO.some_stderr_IO  # etc
+    Home_.lib_.system.IO.some_stderr_IO  # etc
   end
 
   # ~ silo production

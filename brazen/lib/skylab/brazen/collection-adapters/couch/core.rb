@@ -201,6 +201,10 @@ module Skylab::Brazen
       end
     end  # >>
 
+    JSON_ = Lazy_.call do
+      Home_.lib_.JSON
+    end
+
     Couch_ = self
   end
 end

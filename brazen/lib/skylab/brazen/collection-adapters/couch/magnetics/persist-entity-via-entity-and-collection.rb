@@ -47,7 +47,7 @@ module Skylab::Brazen
 
       def rslv_result_when_create
         _h = bld_entity_as_document_h
-        _s = _JSON.pretty_generate _h
+        _s = JSON_[].pretty_generate _h
 
         @collection.put _s,
           :native_entity_identifier_s, @native_entity_identifier_s,

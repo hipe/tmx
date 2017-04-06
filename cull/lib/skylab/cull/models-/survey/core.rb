@@ -105,9 +105,10 @@ module Skylab::Cull
 
       _config_path = ::File.join ws_path, CONFIG_FILENAME_
 
-      cfg = Brazen_::CollectionAdapters::GitConfig.parse_path(
-        _config_path,
-        & @on_event_selectively )
+      cfg = Brazen_::CollectionAdapters::GitConfig.parse_document_by do |o|
+        o.upstream_path = _config_path
+        o.listener = @on_event_selectively
+      end
 
       cfg and begin
         @_path = ::File.dirname ws_path
@@ -144,12 +145,23 @@ module Skylab::Cull
 
     def re_persist is_dry  # assume a config for read
 
-      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.parse_byte_upstream_reference(
-        @cfg_for_read.byte_upstream_reference, & @on_event_selectively )
+      # convert a read-only document to a mutable document "by hand"
 
-      @cfg_for_read = nil
+      _r_cfg = remove_instance_variable :@cfg_for_read
 
-      flush_persistence_script_ and _write( is_dry )
+      bur = _r_cfg.byte_upstream_reference
+
+      cfg = Brazen_::CollectionAdapters::GitConfig::Mutable.parse_document_by do |o|
+        o.byte_upstream_reference = bur
+        o.listener = @on_event_selectively
+      end
+
+      cfg || self._SANITY__why_did_it_not_parse__it_was_OK_before__
+
+      @cfg_for_write = cfg
+
+      _ok = flush_persistence_script_
+      _ok and _write is_dry
     end
 
     def write_ is_dry
@@ -161,11 +173,14 @@ module Skylab::Cull
 
     def _write is_dry
 
-      @cfg_for_write.write_to_path(  # results in true on success
+      _path = ::File.join workspace_path_, CONFIG_FILENAME_
 
-        ::File.join( workspace_path_, CONFIG_FILENAME_ ),
-        :is_dry, is_dry,
-        & @on_event_selectively )
+      @cfg_for_write.write_to_path_by do |o|
+        o.path = _path
+        o.is_dry = is_dry
+        o.listener = @on_event_selectively
+      end
+      # t/f succeeded/failed
     end
 
     # ~~ interface for the persistence script
@@ -189,9 +204,11 @@ module Skylab::Cull
     # ~~ steps avaiable for the persistence script
 
     def __create_editable_document
+
       @cfg_for_read = nil
-      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.new(
-        & @on_event_selectively )
+
+      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.new_empty_document
+
       ACHIEVED_
     end
 
@@ -236,43 +253,48 @@ module Skylab::Cull
       @__ws_path
     end
 
-    def persist_box_and_value_for_name_symbol_ box, value_string, section_symbol
+    def persist_box_and_value_for_name_symbol_ bx, value_string, section_sym
 
       cfg = @cfg_for_write
 
-      delete_these, change_the_name_of_this_one = ___all_become_one section_symbol
+      delete_these, change_the_name_of_this_one = ___all_become_one section_sym
 
       if delete_these
-        cfg.sections.delete_these_ones delete_these
+        cfg.sections.DELETE_SECTIONS_VIA_SECTIONS delete_these
       end
 
       if change_the_name_of_this_one
-        change_the_name_of_this_one.set_subsection_name value_string
-        guy = change_the_name_of_this_one
+        change_the_name_of_this_one.SET_SUBSECTION_NAME value_string
+        section = change_the_name_of_this_one
       else
-        guy = cfg.sections.touch_section value_string, section_symbol
+        section = cfg.sections.touch_section value_string, section_sym
       end
 
-      guy and begin
-        asts = guy.assignments
-        if asts.length.nonzero?
-          self._DO_ME
-        end
-        if box.length.zero?
-          ACHIEVED_
-        else
-          box.each_pair do |sym, x|
-            asts.add_to_bag_mixed_value_and_name_symbol x, sym
-          end
-          ACHIEVED_
-        end
-      end
+      section and __via_section_and_box section, bx
     end
 
-    def ___all_become_one section_symbol
+    def __via_section_and_box section, bx
 
-      st = @cfg_for_write.sections.to_value_stream.reduce_by do | x |
-        section_symbol == x.external_normal_name_symbol
+      _has = section.assignments.first
+
+      if _has
+        self._COVER_ME__watch_carefully_what_happens__
+      end
+
+      bx.each_pair do |sym, x|
+        if x.respond_to? :id2name
+          x = x.id2name  # you can't store symbols directly in the config
+        end
+        section.assign x, sym
+      end
+
+      ACHIEVED_
+    end
+
+    def ___all_become_one section_sym
+
+      st = @cfg_for_write.sections.to_stream_of_sections.reduce_by do |el|
+        section_sym == el.external_normal_name_symbol
       end
 
       sec = st.gets
@@ -296,8 +318,8 @@ module Skylab::Cull
 
       cfg = @cfg_for_write
 
-      st = cfg.sections.to_value_stream.reduce_by do | x |
-        section_sym == x.external_normal_name_symbol
+      st = cfg.sections.to_stream_of_sections.reduce_by do |el|
+        section_sym == el.external_normal_name_symbol
       end
 
       delete_these = st.to_a
@@ -309,7 +331,7 @@ module Skylab::Cull
         end
         UNABLE_
       else
-        a = cfg.sections.delete_these_ones delete_these
+        a = cfg.sections.DELETE_SECTIONS_VIA_SECTIONS delete_these
         @on_event_selectively.call :info, :"deleted_#{ section_sym }" do
           bld_deleted_slotular a, section_sym
         end

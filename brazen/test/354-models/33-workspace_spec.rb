@@ -106,14 +106,19 @@ module Skylab::Brazen::TestSupport
       em.category.should eql [ :info, :summary ]
       ev = em.emission_value_proc.call
 
-      ev.express_into_under y=[], black_and_white_expression_agent_for_expect_emission
-      scn = Home_::Common_::Stream.via_nonsparse_array y
-      scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
-      scn.gets.should match %r(\A[^[:alnum:]]*2 poet or authors\z)
-      scn.gets.should match %r(\A[^[:alnum:]]*2 vocabularies\z)
-      scn.gets.should match %r(\A[^[:alnum:]]*1 a single thing\z)
-      scn.gets.should eql "3 sections total"
-      scn.gets.should be_nil
+      _expag = black_and_white_expression_agent_for_expect_emission
+      _actual = ev.express_into_under [], _expag
+
+      _ = '[^[:alnum:]]*'
+
+      expect_these_lines_in_array_ _actual do |y|
+
+        y << %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
+        y << %r(\A#{ _ }2 poet or authors\z)
+        y << %r(\A#{ _ }2 vocabularies\z)
+        y << %r(\A#{ _ }1 a single thing\z)
+        y << "3 sections total"
+      end
     end
 
     def _prepare_ws_tmpdir s=nil
