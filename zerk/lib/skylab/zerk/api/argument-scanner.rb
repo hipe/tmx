@@ -41,12 +41,9 @@ module Skylab::Zerk
         Matcher___.new self, a
       end
 
-      def available_branch_item_name_stream_via_operator_branch ob, _
+      def available_branch_internable_stream_via_operator_branch ob, _
 
-        ob.to_loadable_reference_stream.map_by do |key_x|
-
-          Common_::Name.via_variegated_symbol key_x.intern
-        end
+        ob.to_loadable_reference_stream
       end
 
       def added_primary_normal_name_symbols

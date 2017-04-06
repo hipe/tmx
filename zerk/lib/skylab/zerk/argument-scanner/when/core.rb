@@ -50,8 +50,7 @@ module Skylab::Zerk
 
             say = -> is_plural, subject_s, primary_s do
 
-              _name = Common_::Name.via_variegated_symbol op_path.last   # meh
-              _op = say_formal_component_ _name
+              _op = ick_prim op_path.last
 
               say = subsequent_say
               y << "can't #{ _op } without #{ subject_s }. (maybe use #{ primary_s }.)"
@@ -70,9 +69,7 @@ module Skylab::Zerk
 
               :use == use_keyword || fail
 
-              _name = Common_::Name.via_variegated_symbol use_what
-
-              _moniker = say_primary_ _name
+              _moniker = prim use_what
 
               _is_plural = IS_PLURAL___.fetch singplur  # not used for now but check anyway
 
@@ -126,7 +123,7 @@ module Skylab::Zerk
           business_item: :missing_required_argument,
         }.fetch req.shape_symbol
 
-        When::Unknown_branch_item_via_two__[ _tcs, sea ].execute
+        When::Unknown_branch_item_via_two__[ _tcs, sea ]
       end
 
       # ==
@@ -139,7 +136,7 @@ module Skylab::Zerk
           _user_x    # #todo
         else
           _tcs = rsn.reason_symbol  # terminal channel symbol
-          When::Unknown_branch_item_via_two__[ _tcs, sea ].execute
+          When::Unknown_branch_item_via_two__[ _tcs, sea ]
         end
       end
 
@@ -157,7 +154,7 @@ module Skylab::Zerk
 
         def execute
 
-          When::UnknownBranchItem.define do |o|
+          When::UnknownBranchItem.call_by do |o|
             @out = o
             __populate_idea
           end
@@ -194,11 +191,11 @@ module Skylab::Zerk
         def __populate_splayer
 
           _p = @_argument_scanner.method(
-            :available_branch_item_name_stream_via_operator_branch )
+            :available_branch_internable_stream_via_operator_branch )
 
           ob = @_operator_branch ; sym = @_shape_symbol
 
-          @out.available_item_name_stream_by = -> do
+          @out.available_item_internable_stream_by = -> do
             _p[ ob, sym ]
           end
           NIL

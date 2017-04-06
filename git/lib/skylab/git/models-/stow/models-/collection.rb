@@ -53,20 +53,31 @@ module Skylab::Git
 
       def to_entity_stream
 
-        _dac = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
+        flyweight = nil
 
-          o.directory_path = @path
-          o.directory_is_assumed_to_exist = true  # so it whines
-
-          o.filesystem = @filesystem
-          o.flyweight_class = Stow_
-
-          o.flyweight_arguments = [ @kernel ]
-
-          o.on_event_selectively = @on_event_selectively
+        main = -> path do
+          flyweight.reinitialize_as_flyweight_ path
+        end
+        p = -> path do
+          flyweight = Stow_.new_flyweight @kernel, & @on_event_selectively
+          p = main
+          p[ path ]
         end
 
-        _dac.to_entity_stream_via_model( Stow_, & @on_event_selectively )
+        _OB = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
+        _dac = _OB.define do |o|
+
+          o.loadable_reference_via_path_by = -> path do
+            p[ path ]
+          end
+
+          o.startingpoint_path = @path
+          o.directory_is_assumed_to_exist = false  # so it whines
+          o.filesystem_for_globbing = @filesystem
+          o.listener = @on_event_selectively
+        end
+
+        _dac.to_loadable_reference_stream
       end
 
       def produce_available_identifier name, & oes_p

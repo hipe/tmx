@@ -25,7 +25,7 @@ this useful pattern to cases where the "representational structure"
 was "normal", but something other than a hash.
 
 (specifically, we mean filesystem directories and/or autoloaderized
-modules. at writing these use-cases are undergoing full overhaul to
+modules. at writing these use-cases are undergoing (EDIT: have undergone) full overhaul to
 be corraled into this new moving-target API. implementors are tracked
 with [#subject]. even more volatile information than this should be
 the manifest entry ("issues.md" file) for this document.)
@@ -65,3 +65,29 @@ many adaptations of `lookup_softly` without needing to wrap its positive
 result.)
 
 the above properties of this result type are more or less restated in [#060.B].
+
+it's worth considering how this contrasts to the familiar methods of
+platform `::Hash`: `fetch` and `[]` (the latter sometimes called `aref`
+from within code that cannot name methods like this).
+
+  - `lookup_softly` is comparable to `[]`, but we prefer the former
+    because it states explicitly (to the extent that it does) what will
+    happen when the key is not found.
+
+  - whereas with `fetch` you can achieve the effect of either our
+    one method or our other method, we prefer our system because A)
+    it makes it more clear in the code the exact semantics of it
+    and B) our method name is a custom, dedicated name to a concept
+    that we "own".
+
+in fact, as a case study (and also for very pragmatic reasons) see
+ #history-A.
+
+
+
+
+## document meta
+
+  - #history-A: in this selfsame commit we refactor a problematic method
+    name (and indeed whole interface) to make use of the standard interface
+    of [#here.1].

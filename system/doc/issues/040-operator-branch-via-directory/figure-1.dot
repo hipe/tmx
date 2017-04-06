@@ -1,0 +1,36 @@
+digraph g {
+
+  label="
+figure 1. state machine for caching
+over a stream with random access"
+
+  node1 [label="initial\nstate" shape=rect]
+
+  node1->node2 [label="a point of\ndefinition"]
+  node2->node2 [label="a point of\ndefinition"]
+
+  node2 [label="mutable\nstate" shape=rect]
+
+  node2->node3 [label="first read\nof any kind"]
+  node3 [label="immutable state:\ncharacteritics\nand scanner" shape=rect]
+
+  node3->q1 [label="(immediately)"]
+  q1 [label="is\nscanner\nempty?" shape="diamond"]
+  q1->node5 [label="yes"]
+  q1->node3B [label="no"]
+
+  node3B [label="pre-first\nread state" shape=rect]
+
+  node3B->node4 [label="read of\nnon-last\nitem"]
+
+  node4 [label="hybrid\nstate" shape=rect]
+
+  node4->node4 [label="read of\nnon-last\nitem"]
+
+  node3B->node5 [label="read of\nlast\nitem"]
+
+  node4->node5 [label="read of\nlast\nitem"]
+
+  node5 [label="fully\ncached" shape=rect]
+
+}

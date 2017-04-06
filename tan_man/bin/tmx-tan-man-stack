@@ -131,8 +131,9 @@ class Skylab::Stack
         if true == x
           0
         elsif x.respond_to? :gets
+          sout = @stdout
           while line = x.gets
-            @stderr.puts line
+            sout.puts line
           end
           0
         else

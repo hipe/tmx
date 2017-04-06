@@ -10,6 +10,8 @@ module Skylab::Snag::TestSupport
 
     it "backend - yes" do
 
+      # #lends-coverage to [#sy-008.4]
+
       td = my_tmpdir_.clear
       td.touch 'zap-tango'
 

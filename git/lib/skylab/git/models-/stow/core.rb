@@ -314,14 +314,12 @@ module Skylab::Git
       class << self
 
         def new_flyweight k, & oes_p
-          o = new k, & oes_p
-          o.__init_as_flyweight
-          o
+          new( k, & oes_p ).__init_as_flyweight
         end
 
         def via_path path
           o = new :_no_kernel_
-          o.reinitialize_via_path_for_directory_as_collection path
+          o.reinitialize_as_flyweight_ path
           o
         end
       end
@@ -334,12 +332,11 @@ module Skylab::Git
       end
 
       def __init_as_flyweight
-        NIL_
+        self
       end
 
-      def reinitialize_via_path_for_directory_as_collection path
-        @path = path
-        NIL_
+      def reinitialize_as_flyweight_ path
+        @path = path ; self
       end
 
       def express_of_via_into_under y, expag
@@ -357,17 +354,22 @@ module Skylab::Git
         end
       end
 
-      def _item_name
-
-        ::File.basename @path
+      def normal_symbol
+        _item_name.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
       def get_stow_name
+        _item_name
+      end
+
+      def _item_name
         ::File.basename @path
       end
     end
+
+    # ==
+    # ==
   end
 end
-
 # [#bs-001] 'reaction-to-assembly-language-phase' phase :+#tombstone:
 # :+#tombstone: #storypoint-3

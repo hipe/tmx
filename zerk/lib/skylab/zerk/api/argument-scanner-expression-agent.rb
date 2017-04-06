@@ -14,50 +14,48 @@ module Skylab::Zerk
       alias_method :calculate, :instance_exec
 
       def say_primary_alternation_ st
-        _say_name_alternation :say_primary_, st
-      end
 
-      def say_business_item_alternation_ st
-        _say_name_alternation :_same, st
-      end
-
-      def _say_name_alternation m, st
-
-        p = method m
-
-        st.join_into_with_by "", " or " do |name|
-          p[ name ]  # hi.
+        st.join_into_with_by "", " or " do |sym|
+          prim sym
         end
       end
 
-      def say_formal_component_ name
-        _same name
+      def simple_inflection & p
+        o = dup
+        o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
       end
 
-      def say_strange_branch_item x
-        x.inspect
+      def ick_prim sym
+        _say_sym sym
       end
 
       def prim sym
-        say_primary_ Common_::Name.via_variegated_symbol sym
+        _say_sym sym
       end
 
-      def say_primary_ name
-        _same name
+      def ick_oper x
+        if x.respond_to? :id2name
+          _say_sym x
+        elsif x.respond_to? :ascii_only?
+          x.inspect  # as covered
+        else
+          self._COVER_ME__strange_shape__
+        end
       end
 
-      def say_arguments_head_ name
-        _same name
+      def oper sym
+        _say_sym sym
       end
 
-      def _ick name
-        self._WAHT
+      def _say_sym sym
+        ":#{ sym.id2name }"  # type check :/
       end
 
-      def _same name
-        name.as_lowercase_with_underscores_symbol.inspect
-      end
+      # ==
+      # ==
     end
   end
 end
+# :#history-B (probably temporary)
 # #history: abstracted from [tmx]

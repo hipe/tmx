@@ -7,8 +7,8 @@ module Skylab::System::TestSupport
 
     def [] tcc  # "test context class"
 
-      tcc.extend Module_Methods__
-      tcc.include Instance_Methods__ ; nil
+      tcc.extend ModuleMethods_
+      tcc.include InstanceMethods___ ; nil
     end
 
     def tmpdir_path_
@@ -35,7 +35,19 @@ module Skylab::System::TestSupport
   TestSupport_::Quickie.
     enhance_test_support_module_with_the_method_called_describe self
 
-  module Module_Methods__
+  # -- functions that are also used in method definitions
+
+  Home_ = ::Skylab::System
+  Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
+
+  Fixture_file_ = -> tail do
+    ::File.join TS_.dir_path, 'fixture-files', tail
+  end
+
+  # --
+
+  module ModuleMethods_
 
     def use sym
       TS_.lib_( sym )[ self ]
@@ -46,11 +58,7 @@ module Skylab::System::TestSupport
     define_method :dangerous_memoize, & TestSupport_::DANGEROUS_MEMOIZE
   end
 
-  Fixture_file_ = -> tail do
-    ::File.join TS_.dir_path, 'fixture-files', tail
-  end
-
-  module Instance_Methods__
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -60,6 +68,16 @@ module Skylab::System::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
+    end
+
+    def expect_these_lines_in_array_ act_s_a, & p
+
+      TestSupport_::Expect_Line::Expect_these_lines_in_array.call(
+        act_s_a, p, self )
+    end
+
+    def expression_agent_of_API_classic_
+      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     define_method :memoized_tmpdir_, ( -> do  # (see also #here)
@@ -73,6 +91,10 @@ module Skylab::System::TestSupport
         end
       end
     end ).call
+
+    define_method :the_no_ent_directory_, ( Lazy_.call do
+      ::File.join TS_.dir_path, 'no-ent'
+    end )
 
     def fu_
       Home_.lib_.file_utils
@@ -121,10 +143,6 @@ module Skylab::System::TestSupport
 
   # -- functions
 
-  Home_ = ::Skylab::System
-  Common_ = Home_::Common_
-  Lazy_ = Common_::Lazy
-
   Tmpdir_ = Lazy_.call do
     Tmpdir_controller_[].path
   end
@@ -151,6 +169,7 @@ module Skylab::System::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = Home_::NIL_
+  NOTHING_ = Home_::NOTHING_
   TS_ = self
 end
 # (point of history - what used to be this node became [#br-xxx])

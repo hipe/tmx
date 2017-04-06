@@ -327,31 +327,29 @@ module Skylab::Zerk
 
         # --
 
-        def available_branch_item_name_stream_via_operator_branch ob, shape_sym
+        def available_branch_internable_stream_via_operator_branch ob, shape_sym
           send THESE_3__.fetch( shape_sym ), ob
         end
 
         THESE_3__ = {
-          business_item: :__available_business_name_stream_via_operation_branch,
-          primary: :__available_primary_name_stream_via_operator_branch,
+          business_item: :__available_business_internable_stream_via_operation_branch,
+          primary: :__available_primary_internable_stream_via_operator_branch,
         }
 
-        def __available_primary_name_stream_via_operator_branch ob
+        def __available_primary_internable_stream_via_operator_branch ob
 
           _st = ob.to_loadable_reference_stream.map_by do |key_x|
             [ :primary, key_x ]
           end
 
           altered_normal_tuple_stream_via( _st ).map_by do |tuple|
-            Common_::Name.via_variegated_symbol tuple.fetch 1
+            tuple.fetch 1
           end
         end
 
-        def __available_business_name_stream_via_operation_branch ob
+        def __available_business_internable_stream_via_operation_branch ob
 
-          ob.to_loadable_reference_stream.map_by do |key_x|
-            Common_::Name.via_variegated_symbol key_x.intern
-          end
+          ob.to_loadable_reference_stream
         end
 
         # --

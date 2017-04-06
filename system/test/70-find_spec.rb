@@ -47,7 +47,7 @@ module Skylab::System::TestSupport
 
       _np_like = _x.express_under :EN
 
-      _expag = Home_.lib_.brazen::API.expression_agent_instance
+      _expag = expression_agent_of_API_classic_
 
       _s_a = _np_like.express_words_into_under [], _expag
 

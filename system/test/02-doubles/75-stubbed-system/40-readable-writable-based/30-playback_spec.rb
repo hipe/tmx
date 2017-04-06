@@ -9,12 +9,12 @@ module Skylab::System::TestSupport
 
     it "a mock system conduit is built with a pathname (any string)" do
 
-      conduit_for_RW_.new _no_ent_path
+      conduit_for_RW_.new the_no_ent_directory_
     end
 
     it "doesn't read the FS until it is used" do
 
-      _cond = conduit_for_RW_.new( _no_ent_path )
+      _cond = conduit_for_RW_.new the_no_ent_directory_
       begin
         _cond.popen3 'no'
       rescue ::Errno::ENOENT => e
@@ -41,8 +41,7 @@ module Skylab::System::TestSupport
       w.value.exitstatus.should be_zero
     end
 
-    memoize :_no_ent_path do
-      ::File.join TS_.dir_path, 'no-ent'
-    end
+    # ==
+    # ==
   end
 end

@@ -4,6 +4,8 @@ module Skylab::Basic
 
     # (nothing.)
 
+    # (you might be looking for something like [#fi-006] "struct".)
+
     module Definition_for_the_Method_Called_New  # :[#063]
 
       # 2x [co] 0x [here]. covered only by [#co-005.4].

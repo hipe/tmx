@@ -112,6 +112,10 @@ module Skylab::Zerk  # intro in [#001] README
     lazily :API_ArgumentScanner do
       No_deps_zerk_[]::API_ArgumentScanner
     end
+
+    lazily :NoDependenciesZerk do  # [pl]
+      No_deps_zerk_[]
+    end
   end
 
   module Invocation_
@@ -137,7 +141,7 @@ module Skylab::Zerk  # intro in [#001] README
     require 'no-dependencies-zerk'
     ::NoDependenciesZerk
   end
-  No_deps = No_deps_zerk_  # [pl]
+  No_deps = No_deps_zerk_  # [fi], [pl]
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS

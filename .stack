@@ -53,6 +53,7 @@ TD tan_man/test/54-operations/50-starter/14-list_spec.rb
 TD tan_man/test/54-operations/42-graph/64-sync_spec.rb
 sunset old code in graph model file
 TD tan_man/test/54-operations/42-graph/44-use_spec.rb
+[tm] "DON'T YOU .. FORGET ABOUT ME" (the "use" action parts that need starter silo)
 the whole starter silo
 give "lines" action its own test file (there's enough work there)
 assimilate directory operator branch

@@ -5,8 +5,8 @@ module Skylab::System::TestSupport
     class << self
       def [] tcm
         tcm.send :define_singleton_method, :with, Definition_for_method_called_with___
-        tcm.extend Module_Methods__
-        tcm.include Instance__Methods__
+        tcm.extend ModuleMethods_
+        tcm.include InstanceMethods_for_LineScanner___
       end
     end  # >>
 
@@ -18,7 +18,7 @@ module Skylab::System::TestSupport
 
     # <-
 
-  module Instance__Methods__
+  module InstanceMethods_for_LineScanner___
 
     def subject_via_pathname pn, d=nil
       Home_.services.filesystem.line_stream_via_path pn.to_path, d

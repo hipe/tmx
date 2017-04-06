@@ -6,7 +6,7 @@ module Skylab::Snag
 
       class << self
 
-        def [] * a, & x_p
+        def call * a, & x_p
           new( a, & x_p ).execute
         end
       end  # >>
@@ -19,7 +19,7 @@ module Skylab::Snag
           @_oes_p_p = oes_p_p
         end
 
-        @dir_path = @col_x.directory_path
+        @dir_path = @col_x.startingpoint_path
       end
 
       def execute

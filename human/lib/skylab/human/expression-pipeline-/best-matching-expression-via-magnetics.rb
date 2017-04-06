@@ -57,7 +57,7 @@ module Skylab::Human
 
       def initialize mod
 
-        @__index = Home_.lib_.system_lib::Filesystem::OperatorBranch_via_Directory.define do |o|
+        @__index = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
 
           o.startingpoint_path = mod.dir_path
 

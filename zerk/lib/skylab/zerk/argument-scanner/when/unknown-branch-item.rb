@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     module WhenScratchSpace____
 
-      class When::UnknownBranchItem < Home_::SimpleModel_  # 1x
+      class When::UnknownBranchItem < Home_::MagneticBySimpleModel  # 1x
 
         # :[#fi-037.5.O]
 
@@ -24,7 +24,8 @@ module Skylab::Zerk
         # -
 
           def initialize
-            @available_item_name_stream_by = nil
+            @available_item_internable_stream_by = nil
+            @primary_channel_symbol = nil
             @strange_value_by = nil
             @talker = nil
             yield self
@@ -32,8 +33,9 @@ module Skylab::Zerk
           end
 
           attr_accessor(
-            :available_item_name_stream_by,
+            :available_item_internable_stream_by,
             :listener,
+            :primary_channel_symbol,
             :shape_symbol,
             :strange_value_by,
             :talker,
@@ -63,7 +65,8 @@ module Skylab::Zerk
 
           def get_channel
 
-            head = [ :error, :expression, :parse_error ]
+            _primary = @primary_channel_symbol || :error
+            head = [ _primary, :expression, :parse_error ]
             head.push @terminal_channel_symbol  # ..
             head
           end
@@ -78,7 +81,7 @@ module Skylab::Zerk
           end
 
           def is_about_expecting
-            @available_item_name_stream_by
+            @available_item_internable_stream_by
           end
 
           def category_symbol
@@ -180,7 +183,7 @@ module Skylab::Zerk
           end
 
           def can_say_splay
-            @available_item_name_stream_by
+            @available_item_internable_stream_by
           end
 
           def say_unknown_item
@@ -211,7 +214,7 @@ module Skylab::Zerk
 
             x = @strange_value_by[]
             s = @_expression_agent_.calculate do
-              say_strange_branch_item x
+              ick_oper x  # formerly `say_strange_branch_item` #history-B
             end
 
             case colon
@@ -244,17 +247,57 @@ module Skylab::Zerk
           end
 
           def say_splay
+            case @shape_symbol
+            when :primary
+              __say_splay_when_primary
+            when :business_item
+              __say_splay_when_business
+            else ; no
+            end
+          end
 
-            available_name_st = @available_item_name_stream_by[]
+          def __say_splay_when_primary
 
-            sym = @shape_symbol
+            # we can't use our ordinary rendering technique because splays
+            # such at these sometimes are not simply oxford joins. not all
+            # expession agents have this (at writing).
+            #
+
+            available_internable_st = @available_item_internable_stream_by[]
 
             @_expression_agent_.calculate do
-              case sym
-              when :primary
-                say_primary_alternation_ available_name_st
-              when :business_item
-                say_business_item_alternation_ available_name_st
+
+              say_primary_alternation_ available_internable_st
+            end
+          end
+
+          def __say_splay_when_business
+
+            # (there might be a desire to "chuck down on the bat" here and
+            # expose an API that lets you have more control of how items
+            # are expressed. but for now we map them to symbols and use a
+            # hard-coded method..)
+
+            # (also there will probably eventually be a desire to levenshtein here)
+
+            available_internable_st = @available_item_internable_stream_by[]
+
+            No_deps_zerk_[]
+            _sym_scn = ::NoDependenciesZerk::Scanner_by.new do
+              item = available_internable_st.gets
+              if item
+                item.intern
+              end
+            end
+
+            good_m = :oper  # as long as it works ..
+
+            @_expression_agent_.calculate do
+
+              simple_inflection do
+                oxford_join_do_not_store_count "", _sym_scn, " or " do |sym|
+                  send good_m, sym
+                end
               end
             end
           end
@@ -310,4 +353,5 @@ module Skylab::Zerk
     end
   end
 end
+# :#history-B (probably temporary)
 # #history: broke out from main "when" node

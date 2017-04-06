@@ -35,7 +35,7 @@ module Skylab::Snag::TestSupport
         :save, '-not-valid-',
         & handle_event_selectively_ )
 
-      expect_not_OK_event :invalid_name, "invalid name (ick \"-not-valid-\")"
+      expect_not_OK_event :invalid_name, "invalid name (ick_mixed \"-not-valid-\")"
       expect_fail
     end
 

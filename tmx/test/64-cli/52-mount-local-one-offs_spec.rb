@@ -28,7 +28,6 @@ module Skylab::TMX::TestSupport
     end
 
     it "ambiguous between two categories of operator:" do
-      # #a.s-coverpoint-3
       invoke 'p'
       on_stream :serr
       md = nil

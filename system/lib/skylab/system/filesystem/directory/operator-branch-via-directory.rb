@@ -4,128 +4,116 @@ module Skylab::System
 
     class Directory::OperatorBranch_via_Directory < Common_::SimpleModel
 
-        # <-x2
+      # "implementation objectives", pseudocode, and historical context in :[#040].
 
-    # model a filesystem directory as *cold* entity that exposes an ACS
-    # edit session. (hot/cold in [#ac-006]. sections are per [#ac-005].)
-    #
+      # as an operator branch, this is referenced with :[#ze-051.G].
+
     # this operates strictly thru a filesystem controller so it is
     # compatible with a stubbed filesystem.
 
-    # -- Initializers
+      def initialize
 
-    def initialize
-      @directory_is_assumed_to_exist = true
-      @filename_pattern = nil
-      @name_maybe_under_by = nil
-      yield self
-    end
+        @_do_construct_item_scanner_producer = true  # (not method reference so we can yield #here3)
+        @_mutex_for_startingpoint = nil
 
-    attr_writer(
-      :directory_is_assumed_to_exist,
-      :directory_path,
-      :filesystem,
-      :filename_pattern,  # respond to `=~`
-      :flyweight_class,
-      :flyweight_arguments,
-      :name_maybe_under_by,
-      :on_event_selectively,
-    )
-
-    # -- Modality hook-outs
-
-    def to_entity_stream_via_model _cls_, & x_p  # #UAO
-      to_entity_stream( & x_p )
-    end
-
-    def first_equivalent_item item  # :+[#ba-051] universal collection operation
-
-      s = item.natural_key_string
-
-      to_entity_stream.flush_until_detect do | item_ |
-
-        s == item_.natural_key_string
-      end
-    end
-
-    # -- ACS hook-ins (none here)
-
-    # -- Human exposures (no Operations yet)
-
-    def edit * x_a, & oes_p
-
-      _oes_p_p = -> _ do
-        oes_p
+        yield self
+        @filesystem_for_globbing ||= Home_.services.filesystem
       end
 
-      ACS_[].edit x_a, self, & _oes_p_p
-    end
+      # ~ you can produce each item (file) using a map or a whole external thing
 
-    # -- support for edit session:  c.r.u.d as c-d-r
+      def loadable_reference_via_path_by= p
+
+        _touch_common_item_scanner_producer.__receive_mapper_ p
+      end
+
+      def directory_is_assumed_to_exist= yn  # :#here2, exegesis at [#here.D]
+
+        _touch_common_item_scanner_producer.__receive_directory_is_assumed_to_exist_ yn
+      end
+
+      def filename_pattern= pat
+        _touch_common_item_scanner_producer.__receive_filename_pattern_ pat
+      end
+
+      def glob_entry= ge
+        _touch_common_item_scanner_producer.__receive_glob_entry_ ge
+      end
+
+      def _touch_common_item_scanner_producer
+        _touch_item_scanner_producer { CommonItemScannerProducer___ }
+      end
+
+      def item_scanner_by= p
+        _touch_item_scanner_producer { CustomItemScannerProducer___ }.__receive_proc_ p
+      end
+
+      def listener= p  # only used for #here2
+        _touch_common_item_scanner_producer.__receive_listener_ p
+      end
+
+      def _touch_item_scanner_producer
+
+        if @_do_construct_item_scanner_producer
+
+          @_do_construct_item_scanner_producer = false
+          @_mutable_item_scanner_producer = yield.new  # :#here3
+
+          @_read_for_stream = :__read_for_stream_initially
+          @_read_for_random_access = :__read_for_random_access_initially
+        end
+
+        @_mutable_item_scanner_producer
+      end
+
+      # ~
+
+      def startingpoint_module= x
+        remove_instance_variable :@_mutex_for_startingpoint
+        @_startingpoint_path = :__startingpoint_path_derived
+        @startingpoint_module = x
+      end
+
+      def startingpoint_path= x
+        remove_instance_variable :@_mutex_for_startingpoint
+        @_startingpoint_path = :__startingpoint_path_as_is
+        @startingpoint_path = x
+      end
+
+      attr_writer(
+        :descriptive_name_symbol,
+        :filesystem_for_globbing,
+      )
+
+      # -- read
+
+      # ~ ACS (legacy)
 
     # ~~ create (by way of ACS)
 
     def __add__component qk, & pp
 
-      o = qk.value_x
-      ok = __resolve_entry_name o, & pp
-      ok &&= __resolve_destination_directory( & pp )
-      ok && __finish_add( o, & pp )
-    end
+        item = qk.value_x
+        _path = ::File.join startingpoint_path, item.natural_key_string
+        listener = pp[ NOTHING_ ]
 
-    def __resolve_entry_name o, & oes_p_p
-
-      if @filename_pattern
-        ok = @filename_pattern =~ o.natural_key_string
-        if ok
-          ok
-        else
-
-          _oes_p = oes_p_p[ self ]
-          _oes_p.call :error, :expression, :invalid_name do | y |
-            y << "invalid name #{ ick o.natural_key_string }"
-          end
-          UNABLE_
+        _confirm_by = -> do
+          # (crazy:)
+          item.express_into_under self, @filesystem_for_globbing, & ( -> _ { listener } )
         end
-      else
-        ACHIEVED_
-      end
-    end
 
-    def __resolve_destination_directory & x_p
+        pdp = @__particular_definition_points
 
-      if @filesystem.directory? @directory_path
-        ACHIEVED_
-      elsif @directory_is_assumed_to_exist
-        x_p.call :error, :expression, :noent do | y |
-          y < "no. (hl-xyzizzy)"
+        Directory::AddItem_via_Path.call_by do |o|
+
+          o.path = _path
+          o.filename_pattern = pdp.filename_pattern
+          o.directory_is_assumed_to_exist = pdp.directory_is_assumed_to_exist
+          o.confirm_by = _confirm_by
+          o.filesystem = @filesystem_for_globbing
+          o.listener = listener
         end
-        UNABLE_
-      else
-
-        # we can make 2. meh
-
-        path = ::File.dirname @directory_path
-        ok = if @filesystem.directory? path
-          ACHIEVED_
-        else
-          @filesystem.mkdir path  # -p meh
-        end
-        if ok
-          if path == @directory_path
-            ok
-          else
-            @filesystem.mkdir @directory_path
-          end
-        else
-          ok
-        end
-      end
-    end
-
-    def __finish_add o, & x_p
-
-      o.express_into_under self, @filesystem, & x_p
+        # (result of above is achieved/unable)
     end
 
     # ~~ delete (by way of ACS)
@@ -135,49 +123,31 @@ module Skylab::System
       # per ACS, assume that last we checked, item is present in collection
       # this is only exploraory - we emit an event on success
 
-      o = qk.value_x
-      succ = Basic_[]::String::Successorer.via(
+        listener = oes_p_p[ NOTHING_ ]
 
-        :beginning_width, 2,
-        :first_item_does_not_use_number,
-
-        :template, '{{ sep if ID }}{{ ID }}{{ tail }}',
-
-        :sep, DOT_,
-        :tail, '.previous',
-      )
-
-      entry_s  = o.natural_key_string
-
-      src = ::File.join @directory_path, entry_s
-
-      begin
-
-        candidate_s = ::File.join @directory_path, "#{ entry_s }#{ succ[] }"
-
-        if @filesystem.file? candidate_s
-          redo
+        _confirm_by = -> do
+          ACS_[].send_component_removed qk, self, & listener
+          ACHIEVED_
         end
 
-        _oes_p = oes_p_p[ self ]
+        item = qk.value_x
 
-        ok = @filesystem.mv src, candidate_s, & _oes_p
-        break
-      end while nil
+        _path = ::File.join startingpoint_path, item.natural_key_string
 
-      if ok
+        _ok = Directory::SoftDeleteItemUsingRename_via_Path.call_by do |o|
+          o.path = _path
+          o.association = qk.association
+          o.filesystem = @filesystem_for_globbing  # cheat a bit
+          o.confirm_by = _confirm_by
+          o.listener = listener
+        end
 
-        _oes_p = oes_p_p[ nil ]
-
-        ACS_[].send_component_removed qk, self, & _oes_p
-        o
-      else
-        ok
-      end
+        _ok && item
     end
 
     # ~~~ ACS hook-outs *for* edit session (remove if exists, create if not exist)
 
+      # 6
     def expect_component_not__exists__ qk, & oes_p
 
       _found = first_equivalent_item qk.value_x
@@ -188,6 +158,7 @@ module Skylab::System
       end
     end
 
+      # 7
     def expect_component__exists__ qk, & oes_p
 
       _found = first_equivalent_item qk.value_x
@@ -198,152 +169,445 @@ module Skylab::System
       end
     end
 
-    # ~~ retrieve
+      def first_equivalent_item item
 
-    def to_entity_stream & x_p
+        # (this used to be a #[#ba-051] universal collection operation,
+        # but now it is just here so that the above two methods can use
+        # their exact legacy implementations as written.
+        # #open [#here.F] refactor this after incubation (or just privatize it))
 
-      p = -> do
+        lookup_softly item.normal_symbol
+      end
 
-        path_a = __produce_path_a
-        if path_a
-          p = __proc_via_path_a path_a, & x_p
+      # ~
+
+      def procure_by
+        Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_OperatorBranch.call_by do |o|
+          yield o
+          o.operator_branch = self
+        end
+      end
+
+      def dereference key_x  # #[#ze-051.1] "trueish item value"
+        trueish_x = lookup_softly key_x
+        if trueish_x
+          trueish_x
+        else
+          raise KeyError, __say( key_x )
+        end
+      end
+
+      def __say k
+        _path = startingpoint_path
+        "no file corresponding to '#{ k }' in directory - #{ _path }"
+      end
+
+      # -- THE MAIN STUFF (near [#here.C] pseudocode)
+
+      def lookup_softly ref  # #[#ze-051.1] "trueish item value"
+        send @_read_for_random_access, ref.intern
+      end
+
+      def to_loadable_reference_stream
+        send @_read_for_stream
+      end
+
+      def __read_for_stream_initially
+        _transition_to_hybrid_state_or_the_other_one
+        send @_read_for_stream
+      end
+
+      def __read_for_random_access_initially k
+        _transition_to_hybrid_state_or_the_other_one
+        send @_read_for_random_access, k
+      end
+
+      def _transition_to_hybrid_state_or_the_other_one  # assume..
+
+        # assume a read will happen immedately after this call.
+
+        _ada = remove_instance_variable :@_mutable_item_scanner_producer
+
+        scn, @__particular_definition_points =
+          _ada._flush_to_non_caching_item_scanner_and_readable_definition_points_ self
+
+        if scn.no_unparsed_exists
+          @_read_for_random_access = :__read_for_random_access_for_empty_life
+          @_read_for_stream = :__read_for_stream_for_empty_life
+        else
+
+          @_box_for_hybrid_state = Common_::Box.new
+          @_scanner_for_hybrid_state = scn
+          @_still_in_hybrid_state = true
+
+          @_read_for_random_access = :__read_for_random_access_in_hybrid_state
+          @_read_for_stream = :__read_for_stream_in_hybrid_state
+        end
+        NIL
+      end
+
+      def __read_for_random_access_for_empty_life k
+        NOTHING_
+      end
+
+      def __read_for_stream_for_empty_life
+        The_empty_stream_for_real___[]  # #here5
+      end
+
+      def __read_for_random_access_in_hybrid_state k
+
+        # assume mutable cache is started and scanner is non-empty
+
+        item = @_box_for_hybrid_state[ k ]
+        if item
+          item
+        else
+          __read_for_random_access_in_hybrid_state_when_not_in_cache k
+        end
+      end
+
+      def __read_for_random_access_in_hybrid_state_when_not_in_cache k
+
+        st = _to_PRIVATE_stream_OF_AS_YET_UNCACHED_ITEMS_in_hybrid_state
+
+        begin
+          item = st.gets
+          item || break
+          item.normal_symbol == k ? break : redo
+        end while above
+
+        item
+      end
+
+      def __read_for_stream_in_hybrid_state
+
+        # exegesis at [#here.D]
+
+        offset_of_item_to_see = -1
+        the_one_scanner = @_scanner_for_hybrid_state
+
+        main = nil ; go_to_crazy_town = nil
+
+        p = -> do
+          if @_still_in_hybrid_state
+            main[]
+          else
+            go_to_crazy_town[]
+          end
+        end
+
+        main = -> do
+
+          offset_of_item_to_see += 1
+
+          case offset_of_item_to_see <=> @_box_for_hybrid_state.length
+
+          when -1  # when this scanner is behind the cache
+
+            @_box_for_hybrid_state.at_offset offset_of_item_to_see
+
+          when 0  # when this scanner is neck-and-neck with the cache
+
+            item = the_one_scanner.gets_one
+            _cache item
+            if the_one_scanner.no_unparsed_exists
+              _CLOSE
+              p = EMPTY_P_
+            end
+
+            item
+          else
+
+            # how could this scanner ever be ahead of the cache? something is wrong
+
+            self._NEVER__we_cant_imagine_when_this_would_happen
+          end
+        end
+
+        go_to_crazy_town = -> do
+          bx = @_box_for_fully_cached_state
+          len = bx.length
+          p = -> do
+            offset_of_item_to_see += 1
+            if len == offset_of_item_to_see
+              p = EMPTY_P_ ; NOTHING_
+            else
+              bx.at_offset offset_of_item_to_see
+            end
+          end
           p[]
-        else
-          path_a
+        end
+
+        Common_::MinimalStream.by do  # change to stream whenever (and see #here5)
+          p[]
         end
       end
 
-      Common_.stream do
-        p[]
-      end
-    end
+      def _to_PRIVATE_stream_OF_AS_YET_UNCACHED_ITEMS_in_hybrid_state
 
-    def __produce_path_a
+        the_one_scanner = @_scanner_for_hybrid_state
 
-      path = @directory_path
-      if path  # otherwise nasty
-        __produce_path_a_via_trueish_path path
-      else
-        UNABLE_
-      end
-    end
+        p = -> do
+          item = the_one_scanner.gets_one
+          _cache item
 
-    def __produce_path_a_via_trueish_path path
+          if the_one_scanner.no_unparsed_exists
+            _CLOSE
+            p = EMPTY_P_
+          end
 
-      glob = -> do
-        @filesystem.glob ::File.join( path, '*' )
-      end
-
-      if @directory_is_assumed_to_exist
-
-        a = glob[]
-
-        if a.length.zero? && ! @filesystem.directory?( path )
-          __whine_about_missing_directory path
+          item
         end
 
-        a
-      else
-
-        # (hi.)
-
-        if @filesystem.directory? path
-          glob[]
-        else
-          EMPTY_A_
-        end
-      end
-    end
-
-    def __whine_about_missing_directory path
-
-      _x = Home_::Filesystem::Normalizations::ExistentDirectory.via(
-        :path, path,
-        :filesystem, Home_.services.filesystem,
-        & @on_event_selectively
-      )
-
-      UNABLE_ == _x or self._SANITY
-      NIL_
-    end
-
-    def __proc_via_path_a path_a, & x_p
-
-      fly = @flyweight_class.new_flyweight( * @flyweight_arguments, & x_p )
-
-      pass = __produce_pass_proc
-
-      st = Common_::Stream.via_nonsparse_array(
-        path_a
-      ).map_reduce_by do |path|
-
-        _yes = pass[ path ]
-        if _yes
-
-          fly.reinitialize_via_path_for_directory_as_collection path
-          fly
+        Common_::MinimalStream.by do
+          p[]
         end
       end
 
-      -> do
-        st.gets
+      def _cache item
+        @_box_for_hybrid_state.add item.normal_symbol, item
+        NIL
       end
-    end
 
-    def __produce_pass_proc
+      def _CLOSE
+        _bx = remove_instance_variable :@_box_for_hybrid_state
+        @_box_for_fully_cached_state = _bx.freeze
+        remove_instance_variable :@_scanner_for_hybrid_state
+        @_still_in_hybrid_state = false
 
-      if @filename_pattern
-        rx_ish = @filename_pattern
-        -> path do
-          rx_ish =~ ::File.basename( path )
-        end
-      else
-        MONADIC_TRUTH_
+        @_read_for_random_access = :__read_for_random_access_in_fully_closed_state
+        @_read_for_stream = :__read_for_stream_in_fully_closed_state
+        freeze
+        NIL
       end
-    end
+
+      def __read_for_random_access_in_fully_closed_state sym
+        @_box_for_fully_cached_state[ sym ]
+      end
+
+      def __read_for_stream_in_fully_closed_state
+        @_box_for_fully_cached_state.to_value_stream
+      end
+
+      # -- easy reads
+
+      def startingpoint_path
+        send @_startingpoint_path
+      end
+
+      def __startingpoint_path_derived
+        @startingpoint_module.dir_path
+      end
+
+      def __startingpoint_path_as_is
+        @startingpoint_path
+      end
+
+      # ~ ACS (again)
 
     def to_model_name  # :[#008.2]: #borrow-coverage from [sn] (it's for same)
-      p = @name_maybe_under_by
-      if p
-        p[]
-      else
-        _to_same_name
-      end
+        Common_::Name.via_lowercase_with_underscores_symbol @descriptive_name_symbol
     end
 
     def description_under expag  # for [#ac-007.8]
-      p = @name_maybe_under_by
-      if p
-        p[ expag ].as_human
-      else
-        _to_same_name.as_human
-      end
-    end
-
-    def _same_name
-      Common_::Name.via_module self.class
+        @descriptive_name_symbol.id2name.gsub UNDERSCORE_, SPACE_  # meh
     end
 
     def name  # also for [#ac-007.8]
       NOTHING_
     end
 
-    # -- Components (none formal: here, the components are filesystem entries!)
+      attr_reader(
+        :filesystem_for_globbing,  # #here1
+        :glob_entry,  # #here1
+        :startingpoint_module,
 
-    # -- ACS signal handling (none)
+      )
+    # -
 
-    # -- Custom readers
+      # ==
 
-    attr_reader :directory_path
+      class CommonItemScannerProducer___
 
-    # -- Support (just constants)
+        # this guy must NOT worry about caching
 
-    ACS_ = -> do  # (the only one in [sy] currently)
+        def initialize
+          @__mutex_for_filename_pattern = nil
+          @__mutex_for_glob_entry = nil
+          @__mutex_for_mapper = nil
+          @_knows_whether_or_not_directory_is_assumed_to_exist = false
+
+          @filename_pattern = nil
+          @glob_entry = nil
+        end
+
+        def __receive_mapper_ p
+          remove_instance_variable :@__mutex_for_mapper
+          @mapper = p
+        end
+
+        def __receive_directory_is_assumed_to_exist_ yn
+          @_knows_whether_or_not_directory_is_assumed_to_exist = true
+          @_DiAtE_knownness = Common_::KnownKnown.yes_or_no yn ; yn
+        end
+
+        def __receive_filename_pattern_ p
+          remove_instance_variable :@__mutex_for_filename_pattern
+          @filename_pattern = p
+        end
+
+        def __receive_glob_entry_ ge
+          remove_instance_variable :@__mutex_for_glob_entry
+          @glob_entry = ge
+        end
+
+        def __receive_listener_ p
+          @__listener = p
+        end
+
+        # -- read (once)
+
+        def _flush_to_non_caching_item_scanner_and_readable_definition_points_ o
+
+          a = ::Array.new 2
+
+          a[0] = __flush_non_caching_item_scanner o
+
+          if remove_instance_variable :@_knows_whether_or_not_directory_is_assumed_to_exist
+            _kn = remove_instance_variable :@_DiAtE_knownness
+          end
+
+          a[1] = TheseParticularDefinitionPoints___.new(
+            _kn,
+            remove_instance_variable( :@filename_pattern ),
+          )
+          remove_instance_variable :@_FS
+          remove_instance_variable :@startingpoint_path
+          freeze
+          a
+        end
+
+        def __flush_non_caching_item_scanner o  # :#here1
+          @_FS = o.filesystem_for_globbing
+          @startingpoint_path = o.startingpoint_path
+          if @_knows_whether_or_not_directory_is_assumed_to_exist && ! @_DiAtE_knownness.value_x
+            if @_FS.directory? @startingpoint_path
+              _do_flush_to_non_caching_scanner
+            else
+              __when_directory_does_not_exist
+            end
+          else
+            _do_flush_to_non_caching_scanner
+          end
+        end
+
+        def _do_flush_to_non_caching_scanner
+
+          map = remove_instance_variable :@mapper  # user must provide one
+
+          _glob = ::File.join @startingpoint_path, ( @glob_entry || GLOB_STAR_ )
+          paths = @_FS.glob _glob
+
+          rx = @filename_pattern
+          if rx
+
+            Stream_[ paths ].map_reduce_by do |path|
+              if rx =~ ::File.basename( path )
+                map[ path ]
+              end
+            end.flush_to_scanner
+
+          else
+            # (we are using "no deps" scanner because the [co] one doesn't map)
+            No_deps_zerk_[]::Scanner_via_Array.call paths, & map
+          end
+        end
+
+        def __when_directory_does_not_exist
+
+          _x = Home_::Filesystem::Normalizations::ExistentDirectory.via(
+            :path, @startingpoint_path,
+            :filesystem, @_FS,
+            & @__listener
+          )
+          UNABLE_ == _x or self._SANITY
+          Common_::THE_EMPTY_SCANNER
+        end
+      end
+
+      # ==
+
+      class TheseParticularDefinitionPoints___
+
+        # (straightforward, read-only select subset of "definition datapoints")
+
+        def initialize kn, pat
+          if kn
+            yes = true
+            @_DiAtE_knownness = kn
+          end
+          @knows_whether_or_not_directory_is_assumed_to_exist = yes
+          @filename_pattern = pat
+          freeze
+        end
+
+        def directory_is_assumed_to_exist
+          @_DiAtE_knownness.value_x
+        end
+
+        attr_reader(
+          :filename_pattern,
+          :knows_whether_or_not_directory_is_assumed_to_exist,
+        )
+      end
+
+      # ==
+
+      class CustomItemScannerProducer___
+
+        def __receive_proc_ p
+          @proc = p
+        end
+
+        def _flush_to_non_caching_item_scanner_and_readable_definition_points_ o
+
+          _scn = remove_instance_variable( :@proc )[ o ]
+
+          [ _scn, MY_THE_EMPTY_STRUCT___ ]
+        end
+      end
+
+      # ==
+
+      module MY_THE_EMPTY_STRUCT___ ; class << self
+        # (also seen at [#fi-006.2])
+        # ..
+      end ; end
+
+      The_empty_stream_for_real___ = Lazy_.call do
+
+        # at writing THE_EMPTY_MINIMAL_STREAM does not subclass
+        # ::Proc and would need to to pass [tmx] tests
+
+        Common_.stream do
+          NOTHING_
+        end
+      end
+
+      # ==
+
+      ACS_ = Lazy_.call do
       Home_.lib_.autonomous_component_system
-    end
+      end
 
-    MONADIC_TRUTH_ = -> _ { true }
-  # -> x2
+      # ==
+
+      GLOB_STAR_ = '*'
+      KeyError = ::Class.new ::KeyError
+
+      # ==
+
     end
   end
 end
+# #history-A: full rewrite to assimilate newer into older

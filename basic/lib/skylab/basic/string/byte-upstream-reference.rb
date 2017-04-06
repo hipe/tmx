@@ -6,48 +6,71 @@ module Skylab::Basic
 
       # comport to a universal interface for accessing the bytes in a string.
 
-      # ~ data delivery
+      # -
 
-      def whole_string
-        @s
+        # -- data delivery
+
+        def whole_string
+          @_string_
+        end
+
+        def TO_REWOUND_SHAREABLE_LINE_UPSTREAM_EXPERIMENT
+          _same
+        end
+
+        def to_simple_line_stream
+          _same
+        end
+
+        def _same
+          Here_::LineStream_via_String[ @_string_ ]
+        end
+
+      # -
+
+      # ==
+
+      CommonBase__ = superclass
+
+      class ByteDownstreamReference < CommonBase__
+
+        #  conform to #[#ba-062.2] a semi-unified interface for writing bytes to a string
+
+        def to_minimal_yielder  # :[#046]
+          @_string_.clear  # this is what you want..
+        end
+
+        def EN_preposition_lexeme
+          NOTHING_
+        end
       end
 
-      def TO_REWOUND_SHAREABLE_LINE_UPSTREAM_EXPERIMENT
-        _same
-      end
+      # ==
 
-      def to_simple_line_stream
-        _same
-      end
-
-      def _same
-        Here_::LineStream_via_String[ @s ]
-      end
-
-      Superclass = superclass
-
-      class Superclass
+      class CommonBase__
 
         def initialize s
-          @s = s
+          @_string_ = s
         end
 
-        # ~ reflection
-
-        def is_same_waypoint_as x
-          :string == x.shape_symbol && @s.object_id == x.__string.object_id
-        end
-
-        protected def __string
-          @s
+        def is_same_waypoint_as otr
+          if :string == otr.shape_symbol
+            @_string_.object_id == otr._string_.object_id
+          end
         end
 
         def description_under expag
-          s = Here_.ellipsify( @s ).inspect
+          s = Here_.ellipsify( @_string_ ).inspect
           expag.calculate do
             val s
           end
         end
+
+        attr_reader(
+          :_string_,
+        )
+        protected :_string_
+
 
         def shape_symbol
           :string
@@ -57,6 +80,9 @@ module Skylab::Basic
           :ByteStream
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

@@ -479,6 +479,13 @@ module Skylab::Basic
 
     # ==
 
+    Autoloader_[ self ]
+    lazily :ByteDownstreamReference do
+      self::ByteUpstreamReference::ByteDownstreamReference
+    end
+
+    # ==
+
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
     Here_ = self

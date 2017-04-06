@@ -73,19 +73,19 @@ module Skylab::TMX
             name.as_lowercase_with_underscores_string
           end
 
-          say_attr = method :say_formal_component_
+          _ickify_by = -> name do
+            ick_prim name.as_lowercase_with_underscores_symbol
+          end
 
           _s_a = Home_.lib_.human::Levenshtein.via(
             :item_string, k.id2name,
             :items, _scn,
             :stringify_by, _stringify_by,
-            :map_result_items_by, say_attr,
+            :map_result_items_by, _ickify_by,
             :closest_N_items, 3,
           )
 
-          _eew = Common_::Name.via_variegated_symbol k
-
-          _first_sentence = "unrecognized attribute \"#{ say_attr[ _eew ] }\"."
+          _first_sentence = "unrecognized attribute \"#{ ick_prim k }\"."
           _second_sentence = "did you mean #{ Common_::Oxford_or[ _s_a ] }?"
 
           y << "#{ _first_sentence } #{ _second_sentence }"
@@ -100,9 +100,8 @@ module Skylab::TMX
 
         listener.call :error, :expression, :parse_error, :no_implementation_for, primary_sym do |y|
 
-          _eew = Common_::Name.via_variegated_symbol primary_sym
-          _subj = say_formal_component_ me.name
-          _topic = say_primary_ _eew
+          _subj = ick_prim me.name.as_lowercase_with_underscores_symbol
+          _topic = prim primary_sym
           y << "#{ _subj } has no implementation for #{ _topic }."
           y << "(maybe defined `#{ m }` for #{ me.implementation.class }?)"
         end

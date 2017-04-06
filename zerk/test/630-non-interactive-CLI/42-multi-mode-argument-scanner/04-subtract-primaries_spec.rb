@@ -147,7 +147,7 @@ module Skylab::Zerk::TestSupport
 
       alias_method :calculate, :instance_exec
 
-      def say_strange_branch_item x
+      def ick_oper x  # assimilated `say_strange_branch_item` at #history-A
         x.respond_to? :ascii_only? or self._WHERE
         x.inspect
       end
@@ -160,3 +160,4 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
+# :#history-A (probably temporary)

@@ -98,7 +98,7 @@ module Skylab::TMX
 
       def __say_primary name
         @expag.calculate do
-          say_primary_ name
+          prim name.as_lowercase_with_underscores_symbol
         end
       end
     end

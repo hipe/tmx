@@ -2,9 +2,10 @@ module Skylab::Common
 
   class Stream::Magnetics::RandomAccessImmutable_via_Stream < SimpleModel
 
-    # :[#016.4] (refereneced 1x only, by [sy])
-
-    # -
+    # this is :[#016.4], which is refereneced (only ever) by [sy] which
+    # has what is likely an improvment on this implementation, but
+    # specific for directory listings at [#sy-040]. either abstract that
+    # work up into here, or at least duplicate its test "galley" here.
 
       def initialize
         yield self

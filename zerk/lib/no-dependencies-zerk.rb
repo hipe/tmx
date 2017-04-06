@@ -1123,8 +1123,8 @@ module NoDependenciesZerk
         @_substrate_adapter_.loadable_reference_via_symbol sym
       end
 
-      def dereference k
-        @_substrate_adapter_.dereference k
+      def dereference ref
+        @_substrate_adapter_.dereference ref
       end
     end
 

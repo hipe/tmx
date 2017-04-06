@@ -38,8 +38,7 @@ module Skylab::System::TestSupport
 
       a.last.should eql [ :error, :regexp_option_not_supported ]
 
-      a.first.express_into_under y=[],
-        Home_.lib_.brazen::API.expression_agent_instance
+      a.first.express_into_under y=[], expression_agent_of_API_classic_
 
       y.should eql [ "non convertible regexp options - 'MULTILINE', 'EXTENDED'" ]
     end

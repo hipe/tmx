@@ -174,9 +174,9 @@ module Skylab::TMX
 
       def __add_one_off_mounter_lazily inj
 
-        _inst = _installation
+        _glob_entry = "#{ _installation.participating_exe_prefix }*"
 
-        ob = Home_.lib_.system_lib::Filesystem::OperatorBranch_via_Directory.define do |o|
+        ob = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
 
           o.item_scanner_by = -> _ do
 
@@ -186,12 +186,11 @@ module Skylab::TMX
             Zerk_::Magnetics::OneOffScanner_via_LoadableReference.call_by do |x|
               x.loadable_reference = _loadable_reference
               x.filesystem = o.filesystem_for_globbing
-              x.glob_entry = o.glob_entry
+              x.glob_entry = _glob_entry
             end
           end
 
           o.startingpoint_module = Home_
-          o.glob_entry = "#{ _inst.participating_exe_prefix }*"
           o.filesystem_for_globbing = __filesystem_for_globbing
         end
 

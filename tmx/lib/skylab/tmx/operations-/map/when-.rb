@@ -11,11 +11,7 @@ module Skylab::TMX
 
         listener.call :error, :expression, :parse_error, :contextually_missing do |y|
 
-          _prim_name = Common_::Name.via_variegated_symbol primary_sym
-
-          _dep_name = Common_::Name.via_variegated_symbol dep_sym
-
-          y << "cannot use #{ say_primary_ _prim_name } without #{ say_primary_ _dep_name }"
+          y << "cannot use #{ prim primary_sym } without #{ prim dep_sym }"
         end
 
         UNABLE_

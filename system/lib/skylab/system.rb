@@ -207,6 +207,11 @@ module Skylab::System
     Home_.lib_.basic
   end
 
+  No_deps_zerk_ = Lazy_.call do
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
+  end
+
   # --
 
   module Lib_
@@ -240,6 +245,7 @@ module Skylab::System
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]  # used in tests too
+    Brazen_NOUVEAU = Brazen  # (to track what is new and what is old)
     Fields = sidesys[ :Fields ]
     File_utils = stdlib[ :FileUtils ]
     Human = sidesys[ :Human ]

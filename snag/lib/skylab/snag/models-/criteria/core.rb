@@ -275,18 +275,16 @@ module Skylab::Snag
 
       def express_into__Filesystem__under col_x, fs, & x_p
 
-        Here_::ExpressionAdapters::Filesystem[
-          col_x, @_word_array, self, @_tmpfile_sessioner, fs, & x_p ]
+        Here_::ExpressionAdapters::Filesystem.call(
+          col_x, @_word_array, self, @_tmpfile_sessioner, fs, & x_p )
       end
 
       # ~ for listing, deleting persisted critiera
 
       def __init_as_flyweight
 
-        @_slug_by = -> do
-          ::File.basename @_path
-        end
-        NIL_
+        @_receive_path = :__receive_path_normally
+        @_slug = :__slug_normally ; nil
       end
 
       def __init_as_reference slug
@@ -294,9 +292,12 @@ module Skylab::Snag
         _set_name_slug slug
       end
 
-      def reinitialize_via_path_for_directory_as_collection path
-        @_path = path
-        NIL_
+      def __reinitialize_as_flyweight path
+        send @_receive_path, path
+      end
+
+      def __receive_path_normally path
+        @_path = path ; self
       end
 
       def description_under expag
@@ -311,21 +312,32 @@ module Skylab::Snag
       end
 
       def natural_key_string
-        @_slug_by[]
+        send @_slug
       end
 
       def __name__property_value
-        @_slug_by[]
+        send @_slug
       end
 
-      # ~ support of above 3
+      # -- slug and derivatives
 
       def _set_name_slug slug
+        @_receive_path = :_NO__not_a_flyweight__
+        @_slug = :__slug_via_value
+        @__slug = slug ; nil
+      end
 
-        @_slug_by = -> do
-          slug
-        end
-        NIL
+      def __slug_via_value
+        @__slug
+      end
+
+      def __slug_normally
+        ::File.basename @_path
+      end
+
+      def normal_symbol  # (because flyweight, don't memoize)
+        _slug = send @_slug
+        _slug.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
       # ~
@@ -472,31 +484,42 @@ module Skylab::Snag
       def __flush_self_to_init_implementor
 
         invo_rsx = remove_instance_variable :@invocation_resources
+
+        # ~ experimentally we're keeping flyweighting around even though it's out of fashion
+
+        flyweight = nil
+        main = -> path do
+          flyweight.__reinitialize_as_flyweight path
+        end
+        p = -> path do
+          flyweight = Here_.new_flyweight invo_rsx
+          p = main
+          p[ path ]
+        end
+
+        # ~
+
         _fs = invo_rsx.node_collection_filesystem_adapter.filesystem  # or whatever
 
         _path = remove_instance_variable :@directory_path
 
-        _class = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
-        @_imp = _class.define do |o|
+        _OB = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
 
-          o.directory_path = _path
+        @_imp = _OB.define do |o|
 
-          o.flyweight_arguments = [ invo_rsx ]
+          o.loadable_reference_via_path_by = -> path do
+            p[ path ]
+          end
 
-          o.flyweight_class = Here_
+          o.startingpoint_path = _path
 
-          o.filesystem = _fs
+          o.filename_pattern = /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\z/i
 
           o.directory_is_assumed_to_exist = false
 
-          o.name_maybe_under_by = -> expag=nil do
-            # near [#ac-007] expressive events (when expag),
-            # [#sy-008.2] (when no expag) (which is for us)
-            _nf = Common_::Name.via_human "persisted criteria collection"
-            _nf
-          end
+          o.descriptive_name_symbol = :persisted_criteria_collection
 
-          o.filename_pattern = /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\z/i
+          o.filesystem_for_globbing = _fs
         end
 
         NIL
@@ -525,7 +548,7 @@ module Skylab::Snag
       end
 
       def to_entity_stream
-        @_imp.to_entity_stream
+        @_imp.to_loadable_reference_stream
       end
 
       # -- Components
@@ -545,8 +568,12 @@ module Skylab::Snag
       Autoloader_[ self ]
     end
 
+    DASH_ = '-'
     Here_ = self
+
+    # ==
   end
 end
+# :#tombstone-A.2 (temporary): xx
 # #tombstone-A (temporary): criteria used to be glob but it's inconvenient
 #   until [#ze-023] ("glob") is perfect

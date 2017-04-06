@@ -154,14 +154,20 @@ module Skylab::System
         # subject of [#004.9] (the atomicity of all things)
 
         d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
-        if d.zero?
+        if d && d.zero?
           @exception_ = nil
           @locked_IO_ = io ; ACHIEVED_
         else
-          self._COVER_ME__failed_to_acquire_lock__  # alas it is but a sketch
+          io.close
+          raise __say_locked_out path
+          # (hard/annoying to cover, but this happens in development)
         end
       rescue ::Errno::ENOENT, Errno::ENOTDIR => @exception_
         @stat_ = UNABLE_ ; UNABLE_
+      end
+
+      def __say_locked_out path
+        "can't aquire exclusive nonblocking lock (file already locked?) - #{ path }"
       end
 
       def init_exception_and_stat_ path
