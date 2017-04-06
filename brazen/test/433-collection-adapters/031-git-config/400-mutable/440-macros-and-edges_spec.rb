@@ -5,54 +5,94 @@ module Skylab::Brazen::TestSupport
   describe "[br] collection adapters - git config - mutable - macros and edges" do
 
     TS_[ self ]
-    use :collection_adapters_git_config
+    use :memoizer_methods
+    use :collection_adapters_git_config_mutable
 
-    it "an easy way to write a single-section config" do
-      td = prepared_tmpdir
-      pn = td.join 'some-file.cfg'
-      io = ::File.open pn.to_path, 'w+'
-      a = []
-      a.push Common_::Pair.via_value_and_name( 'x x', :Foo )
-      a.push Common_::Pair.via_value_and_name( true, :zappo )
-      _scan = Common_::Stream.via_nonsparse_array a
-      x = subject.write io, _scan, 'sub sec.to', 'se-cto'
+    it "marshal correctly with backslashes" do
 
-      x.bit_length
+      doc = _build_new_empty_document
 
-      io.rewind
-      s = io.read
-      io.close
-      s.should eql <<-O.gsub %r(^[ ]+), Home_::EMPTY_S_
-        [se-cto "sub sec.to"]
-        Foo = x x
-        zappo = true
-      O
-    end
+      _sect = doc.sections.touch_section 'sub.sect', 'se-ct'
 
-    it "don't fall over on backslashes" do
-      _a = [ Common_::Pair.via_value_and_name( '\b', :'two-characters' ) ]
-      _scan = Common_::Stream.via_nonsparse_array _a
-      io = Home_::LIB_.string_IO.new
-      x = subject.write io, _scan, 'sub.sect', 'se-ct'
+      _sect[ :'two-characters' ] = '\b'
 
-      x.bit_length
+      _actual = doc.unparse_into []
 
-      s = io.string
-      lines = s.split Home_::NEWLINE_
-      lines.last.should eql 'two-characters = \\\\b'  # the value that was
+      expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        y << '[se-ct "sub.sect"]'
+        y << 'two-characters = \\\\b'
+      end
+
+      # the value that was
       # input as two characters (the backslash character then the 'b' character)
       # became three: a backslash, a backslash, 'b'
     end
 
-    it "gets back up with backslashes" do
+    it "unmarshal correctly with backslashes" do  # :#cov1.4
 
-      _head = Home_::TestSupport::Fixtures.dir_path
+      _head = TS_::Fixtures.dir_path
       _cfg_path = ::File.join _head, '00-escape.cfg'
 
-      doc = subject.parse_path _cfg_path
-      sect = doc.sections.first
-      ast = sect.assignments.first
-      ast.value_x.should eql '\\b'
+      doc = subject_module_.parse_document_by do |o|
+        o.upstream_path = _cfg_path
+        o.listener = Home_::CollectionAdapters::GitConfig::LISTENER_THAT_RAISES_ALL_NON_INFO_EMISSIONS_
+      end
+
+      _sect = doc.sections.first
+
+      a = _sect.assignments.to_stream_of_assignments.to_a
+
+      scn = Home_::Scanner_[ a ]
+
+      o = -> sym, & p do
+        asmt = scn.gets_one
+        asmt.external_normal_name_symbol == sym || fail
+        p[ asmt.value_x ]
+      end
+
+      o.call :three_characters do |s|
+        s.length == 3 || fail
+        s == ( '\\' '\\' 'b' ) || fail
+      end
+
+      o.call :two_characters do |s|
+        s.length == 2 || fail
+        s == ( '\\' 'b' ) || fail
+      end
+
+      o.call :combine_these do |s|
+        s == 'foobiff bazbar' || fail
+      end
+    end
+
+    context "add comments, get stream of lines" do
+
+      # (as used in [br])
+
+      it "you can add a comment with this one method" do
+        _doc || fail
+      end
+
+      it "use this one method to get a stream of lines" do
+
+        _actual = _doc.to_line_stream
+
+        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          y << "# hello mother"
+        end
+      end
+
+      shared_subject :_doc do
+
+        doc = _build_new_empty_document
+        doc.add_comment 'hello mother'
+        doc
+      end
+    end
+
+    def _build_new_empty_document
+      subject_module_.new_empty_document
     end
   end
 end
+# #tombstone-A: the `write` macro is gone

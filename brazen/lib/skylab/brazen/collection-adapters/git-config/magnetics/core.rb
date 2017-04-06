@@ -71,7 +71,7 @@ module Skylab::Brazen
         if @_subsection_name_query.nil?
           __init_section_stream_as_stream_of_all_sections
         else
-          __init_section_stream_via_subsection_name_query
+          __do_init_section_stream_via_subsection_name_query
         end
       end
 
@@ -81,7 +81,7 @@ module Skylab::Brazen
         NIL
       end
 
-      def __init_section_stream_via_subsection_name_query
+      def __do_init_section_stream_via_subsection_name_query
 
         @_section_stream = @document.sections.to_stream_of_sections.reduce_by do |el|
           @_subsection_name_query.call el
