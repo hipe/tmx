@@ -168,7 +168,7 @@ module Skylab::Common::TestSupport
       end
 
       def receive_call_via_proc p
-        @_mode_implementation._receive_call_via_proc_ p
+        @_mode_implementation._receive_call_via_proc_ p, listener
       end
 
       def receive_ignore_etc sym
@@ -228,9 +228,9 @@ module Skylab::Common::TestSupport
         @_expression_of_execution = ArrayBasedExpressionOfExecution___.new listener, x_a
       end
 
-      def _receive_call_via_proc_ p
+      def _receive_call_via_proc_ p, listener
         remove_instance_variable :@_one_call_mutex
-        @_expression_of_execution = ProcBasedExpressionOfExecution___.new p
+        @_expression_of_execution = ProcBasedExpressionOfExecution___.new p, listener
       end
 
       def _receive_ignore_etc_ sym
@@ -380,13 +380,23 @@ module Skylab::Common::TestSupport
 
     class ProcBasedExpressionOfExecution___
 
-      def initialize p
+      def initialize p, l
+        @listener = l
         @proc = p
       end
 
-      def execute_for_real _tc
-        _user_x = @proc.call
-        _user_x  # #hi.
+      def execute_for_real tc
+
+        # experiment - if the proc takes one argument, assume it is for the
+        # listener. this also assumes we are not in "spy" mode but in fully
+        # integrated mode (where the library has been pulled in to test context)
+
+        if 1 == @proc.arity
+          _user_x = @proc.call @listener
+        else
+          _user_x = @proc.call
+        end
+        _user_x  # hi.
       end
     end
 
@@ -624,7 +634,7 @@ module Skylab::Common::TestSupport
         _no
       end
 
-      def _receive_call_via_proc_ p
+      def _receive_call_via_proc_ p, _
         _no
       end
 

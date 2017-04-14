@@ -1,29 +1,26 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig < Home_::Model  # introduction at :[#009]
+  module CollectionAdapters::GitConfig
+
+    # objective & scope of the "git config" entity store at [#009]
 
     class << self
-
-      def via_path_and_kernel path, kernel, & p
-
-        doc = parse_document_by do |o|
-          o.upstream_path = path
-          o.listener = p
-        end
-
-        doc and Here_.new doc, kernel, & p
-      end
 
       def parse_document_by
         ImmutableDocument_via___.call_by do |o|
           yield o
         end
       end
-    end  # >>
+    end # >>
 
     CommonDocumentParse_ = ::Class.new Common_::MagneticBySimpleModel
 
     class ImmutableDocument_via___ < CommonDocumentParse_
+
+      def initialize
+        @listener = nil  # not required
+        super
+      end
 
       def init_appropriate_document_instance_
         @document = Document___.new @byte_upstream_reference
@@ -109,7 +106,7 @@ module Skylab::Brazen
 
     BLANK_LINE_OR_COMMENT_RX_ = /\A[ ]*(?:\r?\n?\z|[#;])/
 
-    class CommonDocumentParse_   # re-open. #testpoint
+    class CommonDocumentParse_   # #testpoint
 
       def upstream_path= path
         @byte_upstream_reference = _BUR.via_path path
@@ -153,7 +150,16 @@ module Skylab::Brazen
 
       def receive_error_symbol_and_column_number_ sym, col_number
 
-        @listener.call :error, :config_parse_error do
+        listener = @listener
+        if ! listener
+
+          # (when we're getting a parse error we don't expect, pass
+          # no listener and read the message of the exception)
+
+          listener = LISTENER_THAT_RAISES_ALL_NON_INFO_EMISSIONS_
+        end
+
+        listener.call :error, :config_parse_error do
           __build_config_parse_error sym, col_number
         end
 
@@ -172,6 +178,7 @@ module Skylab::Brazen
           :parse_error_category_symbol, sym,
           :reason, sym.id2name.gsub( UNDERSCORE_, SPACE_ ),
           :byte_upstream_reference, @byte_upstream_reference,
+          :error_category, :argument_error,
 
         ) do |y, o|
 
@@ -193,208 +200,17 @@ module Skylab::Brazen
       end
     end
 
-    Actions = ::Module.new
-
-    def initialize doc=nil, kernel
-
-      if doc
-        if doc.is_mutable
-          _receive_mutable_document doc
-        else
-          __receive_immutable_document doc
-        end
-        @_has_document = true
-      else
-        @_has_document = false
-      end
-
-      super kernel
-    end
-
-    def description_under expag
-      if @_has_document
-        with_document nil do |doc|
-          doc.description_under expag
-        end
-      else
-        "«git config»"  # :+#guillemets
-      end
-    end
-
-    # ~ persist
-
-    def persist_entity x=nil, ent, & p
-
-      with_mutable_document p do |doc|
-
-        ok = ent.intrinsic_persist_before_persist_in_collection( * x, & p )
-        ok &&= Here_::Mutable::Magnetics::MutateDocument_via_Entity_and_Collection[ ent, doc, & p ]
-        ok and _via_mutated_mutable_document_write_file_via_persist p, x, doc
-      end
-    end
-
-    # ~ retrieve (one)
-
-    def entity_via_intrinsic_key id, & p
-
-      with_document p do |doc|
-        Here_::Magnetics::RetrieveEntity_via_EntityIdentifier_and_Document[ id, doc, @kernel, p ]
-      end
-    end
-
-    # ~ retrieve (many)
-
-    def to_entity_stream_via_model cls, & p
-
-      with_document p do |doc|
-        Here_::Magnetics::EntityStream_via_Collection[ cls, doc, @kernel, & p ]
-      end
-    end
-
-    def to_section_stream & p
-
-      with_document p do |doc|
-        Here_::Magnetics::EntityStream_via_Collection[ nil, doc, @kernel, & p ]
-      end
-    end
-
-    # ~ delete
-
-    def delete_entity action, entity, & p
-
-      with_mutable_document p do |doc|
-
-        ok = entity.intrinsic_delete_before_delete_in_collection( action, & p )
-        ok &&= Here_::Mutable::Magnetics::DeleteEntity_via_Entity_and_Collection[ entity, p, & p ]
-        ok and _via_mutated_mutable_document_write_file_via_persist p, action.argument_box, doc
-      end
-    end
-
-    # ~ atomic property values
-
-    def property_value_via_symbol sym, & p
-
-      with_document p do |doc|
-
-        x = doc.sections[ sym ]
-
-        if x
-          x.subsection_string
-        elsif p
-          __when_property_not_found p, sym, doc
-        else
-          NOTHING_
-        end
-      end
-    end
-
-    def __when_property_not_found p, sym, doc
-
-      p.call :info, :property_not_found do
-
-        Common_::Event.inline_neutral_with(
-          :property_not_found,
-          :property_symbol, sym,
-          :byte_upstream_reference, doc.byte_upstream_reference,
-
-        ) do |y, o|
-
-          _name = Common_::Name.via_variegated_symbol o.property_symbol
-          _here = o.byte_upstream_reference.description_under self
-
-          y << "no #{ nm _name } property in #{ _here }"
-        end
-      end
-
-      NOTHING_
-    end
-
-    # --
-
-    def _via_mutated_mutable_document_write_file_via_persist p, bx, doc  # #covered-by [tm]
-
-      Here_::Mutable::Magnetics::WriteDocument_via_Collection.call_by do |o|
-
-        o.is_dry = bx[ :dry_run ]
-        o.line_upstream = doc.to_line_stream
-        o.path = doc.byte_upstream_reference.to_path
-        o.listener = p
-      end
-      # always succeeds. failure is impossible
-    end
-
-    # --
-
-    def with_mutable_document listener, & do_this  # [tm]
-
-      send @_with_mutable_doc, listener, & do_this
-    end
-
-    def with_document listener, & do_this
-
-      send @_with_immutable_doc, listener, & do_this
-    end
-
-    def _with_mutable_doc_as_is _listener
-      yield @_mutable_doc_instance
-    end
-
-    def __with_immutable_doc_as_is _listener
-      yield @_immutable_doc_instance
-    end
-
-    def __with_mutable_doc_via_immutable_doc_initially listener, & do_this
-
-      _idoc = remove_instance_variable :@_immutable_doc_instance
-      listener ||= @listener
-
-      _bur = _idoc.byte_upstream_reference
-
-      mdoc = Here_::Mutable.parse_document_by do |o|
-        o.byte_upstream_reference = _bur
-        o.listener = listener
-      end
-
-      if mdoc
-        _receive_mutable_document mdoc
-        send @_with_mutable_doc, listener, & do_this
-      else
-        # ..
-        remove_instance_variable :@_with_mutable_doc
-        remove_instance_variable :@_with_immutable_doc
-        @_has_document = false
-        freeze
-        mdoc
-      end
-    end
-
-    # ~
-
-    def _receive_mutable_document doc
-
-      @_with_mutable_doc = :_with_mutable_doc_as_is
-      @_with_immutable_doc = :_with_mutable_doc_as_is
-      @_mutable_doc_instance = doc ; nil
-    end
-
-    def __receive_immutable_document doc
-
-      @_with_mutable_doc = :__with_mutable_doc_via_immutable_doc_initially
-      @_with_immutable_doc = :__with_immutable_doc_as_is
-      @_immutable_doc_instance = doc ; nil
-    end
-
     # ==
 
     class Document___
 
       def initialize byte_upstream_reference
-        @byte_upstream_reference = byte_upstream_reference
+        @document_byte_upstream_reference = byte_upstream_reference
         @sections = Sections___.new
       end
 
       def description_under expag
-        @byte_upstream_reference.description_under expag
+        @document_byte_upstream_reference.description_under expag
       end
 
       def to_section_stream
@@ -402,17 +218,36 @@ module Skylab::Brazen
       end
 
       attr_reader(
-        :byte_upstream_reference,
+        :document_byte_upstream_reference,
         :sections,
       )
 
       def is_mutable
-        false
+        FALSE
       end
-
     end
 
-    class Box__
+    # ==
+
+    class ElementBox__
+
+      # abstract base class to aide in the implementation of our two kinds
+      # of "collection" node: one that holds a collection of sections (the
+      # constituency of the "document" element), and the other for holding
+      # a collection of assignments (the constituency of a section).
+      #
+      # expose random access to the collection of elements, through use of
+      # some kind of normal identifier. superficially like a [#co-061] box
+      # but:
+      #
+      #   - the client (subclass) must manage its own collision checking
+      #     of keys to its incoming writes (or it doesn't: in at least one
+      #     implementation, the last added element to use a name "wins",
+      #     and the other elements that had the same identifier become
+      #     reachable only by streaming).
+      #
+      #   - the exposures here are now more like a [#ze-051] operator
+      #     branch than a box but whatever..
 
       def initialize
         @_elements_ = []
@@ -456,7 +291,7 @@ module Skylab::Brazen
       end
     end
 
-    class Sections___ < Box__
+    class Sections___ < ElementBox__
 
       def accept_section_as_sections__ sect
         @_offset_via_symbol_[ sect.external_normal_name_symbol ] = @_elements_.length
@@ -479,7 +314,7 @@ module Skylab::Brazen
 
       attr_reader(
         :assignments,
-        :external_normal_name_symbol,  # (and the next) explained at [#008.H]
+        :external_normal_name_symbol,  # (and the next) explained at [#028.B]
         :internal_normal_name_string,
         :subsection_string,
       )
@@ -495,7 +330,7 @@ module Skylab::Brazen
       end
     end
 
-    class Assignments__ < Box__
+    class Assignments__ < ElementBox__
 
       def __accept_assignment_ asmt
 
@@ -570,15 +405,19 @@ module Skylab::Brazen
         @listener = p
       end
 
+      # ~ "external" vs. "internal" should be explained at [#028.B]
+
       def external_normal_name_symbol
         # uppercase is OK but convert dashes to underscores
-        @enn_symbol ||= @internal_normal_name_string.gsub( DASH_, UNDERSCORE_ ).intern
+        @___ENNS ||= @internal_normal_name_string.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
       def internal_normal_name_symbol
         # per spec but might change
-        @inn_symbol ||= @internal_normal_name_string.downcase.intern
+        @___INNS ||= @internal_normal_name_string.downcase.intern
       end
+
+      # ~
 
       def value_x
         @did_unmarshal or unmarshal
@@ -720,6 +559,10 @@ module Skylab::Brazen
 
     # ==
 
+    Actions = nil  # while #open [#045]
+
+    # ==
+
     BACKSLASH_ = '\\'.freeze
     BACKSLASH_BACKSLASH_ = '\\\\'.freeze
     BACKSLASH_QUOTE_ = '\\"'.freeze
@@ -730,4 +573,5 @@ module Skylab::Brazen
     QUOTE_ = '"'.freeze
   end
 end
+# #history-A.2: moved man man to sham sham
 # :#history-A: (can be temporary) as referenced

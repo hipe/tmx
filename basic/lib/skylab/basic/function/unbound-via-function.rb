@@ -1,12 +1,12 @@
 module Skylab::Basic
 
-  module Function::As  # see [#052]
+  module Function  # see [#052]
 
     # -> ; (covered here, also :+#by:ta, cu, sg)
 
       Brazen_ = ::Skylab::Brazen  # assumed
 
-      class Unbound
+      class Unbound_via_Function
 
         include Brazen_.actionesque_defaults::Unbound_Methods
 

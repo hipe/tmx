@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -18,7 +18,7 @@ module Skylab::Brazen
 
           # -- write
 
-          def DELETE_SECTIONS_VIA_SECTIONS a  # [cu]
+          def delete_sections_via_sections a  # [cu], also #cov2.2
 
             This_::Magnetics::DeleteEntity_via_Entity_and_Collection.call_by do |o|
               o.will_delete_these_actual_instances a
@@ -29,7 +29,12 @@ module Skylab::Brazen
 
           def touch_section subsect_s=nil, sect_s, & p
 
-            sect = __build_section p, subsect_s, sect_s
+            sect = build_section_by_ do |o|
+              o.unsanitized_subsection_name_string = subsect_s  # nil OK
+              o.unsanitized_section_name_string = sect_s
+              o.listener = p
+            end
+
             if sect
               __do_touch_section p, sect
             else
@@ -59,11 +64,9 @@ module Skylab::Brazen
             end
           end
 
-          def __build_section p, subsect_s, sect_s
+          def build_section_by_
             Magnetics_::Section_or_Subsection_via_DirectDefinition.call_by do |o|
-              o.unsanitized_subsection_name_string = subsect_s
-              o.unsanitized_section_name_string = sect_s
-              o.listener = p
+              yield o  # hi.
             end
           end
 
@@ -96,7 +99,7 @@ module Skylab::Brazen
 
           def _to_stream
             Stream_[ @_all_elements_ ].reduce_by do |el|
-              :_section_or_subjection_ == el._category_symbol_
+              :_section_or_subsection_ == el._category_symbol_
             end
           end
           alias_method :to_stream_of_sections, :_to_stream
@@ -113,6 +116,8 @@ module Skylab::Brazen
             # can't freeze because assignments facade is made lazily
             # also, now you can mutate the subsection name any time.
           end
+
+          undef_method :dup  # avoid accidentally calling this. see #here1
 
           # -- write these
 
@@ -158,19 +163,26 @@ module Skylab::Brazen
           end
 
           def assign x, sym, & p
-
-            This_::Magnetics_::ApplyAssignment_via_Arguments.call_by do |o|
-              o.variegated_name_symbol = sym
+            assign_by_ do |o|
+              o.external_normal_name_symbol = sym
               o.mixed_value = x
-              o.elements = @_child_elements_
               o.listener = p
             end
           end
 
-          def ASSIGNEMNT x, sym  # [cu]
+          def assign_by_
+            This_::Magnetics_::ApplyAssignment_via_Arguments.call_by do |o|
+              yield o
+              o.elements = @_child_elements_
+            end
+          end
+
+          def build_assignment x, sym, & p  # [cu]
+
             This_::Magnetics_::Assignment_via_DirectDefinition.call_by do |o|
-              o.variegated_name_symbol = sym
+              o.external_normal_name_symbol = sym
               o.mixed_value = x
+              o.listener = p  # if any
             end
           end
 
@@ -267,8 +279,8 @@ module Skylab::Brazen
 
             slug = sect_s.downcase
 
-            @internal_normal_name_string = slug
-            @normal_section_symbol_ = slug.intern
+            @external_normal_name_symbol = slug.gsub( DASH_, UNDERSCORE_ ).intern
+            @internal_normal_name_string = slug.freeze
             @__section_string = sect_s
             @subsection_string = frozen_subsect_s  # if any
 
@@ -278,7 +290,8 @@ module Skylab::Brazen
           # -- write during parse
 
           def accept_assignment_ asmt
-            @_child_elements_.push asmt ; nil
+            @_child_elements_.push asmt
+            ACHIEVED_  # for convenience
           end
 
           def accept_blank_line_or_comment_line_ frozen_line
@@ -339,17 +352,13 @@ module Skylab::Brazen
             @_frozen_line
           end
 
-          def external_normal_name_symbol
-            @normal_section_symbol_
-          end
-
           def to_stream_of_all_elements
             Stream_[ @_child_elements_ ]
           end
 
           attr_reader(
+            :external_normal_name_symbol,
             :internal_normal_name_string,
-            :normal_section_symbol_,
             :subsection_string,
           )
 
@@ -358,7 +367,7 @@ module Skylab::Brazen
           end
 
           def _category_symbol_
-            :_section_or_subjection_
+            :_section_or_subsection_
           end
 
           # ~ ( [cu]
@@ -379,10 +388,35 @@ module Skylab::Brazen
             FALSE
           end
 
-          def _DEEPLY_DUPLICATE_  # #testpoint only
-            otr = dup
-            otr.instance_variable_set :@_child_elements_, Deeply_duplicate_elements_[ @_child_elements_ ]
+          def _DUPLICATE_DEEPLY_  # #testpoint only. :#here1
+
+            otr = self.class.allocate
+
+            otr.instance_variable_set :@_child_elements_,
+              @_child_elements_.map( & :_DUPLICATE_DEEPLY_ )
+
+            # (or just dup..)
+            %i(
+              @external_normal_name_symbol
+              @_frozen_line
+              @internal_normal_name_string
+              @__offset_of_name_start
+              @__section_string
+              @subsection_string
+              @_to_head_line
+              @__width_of_section_name
+              @__width_of_subsection_leader
+              @__width_of_subsection_name
+            ).each do |ivar|
+              otr.instance_variable_set ivar, instance_variable_get( ivar )
+            end
+
             otr
+          end
+
+          def _FREEZE_AS_DOCUMENT_ELEMENT_  # #testpoint only
+            @_child_elements_.each( & :_FREEZE_AS_DOCUMENT_ELEMENT_ )
+            freeze
           end
         # -
         # ==

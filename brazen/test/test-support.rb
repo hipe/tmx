@@ -7,7 +7,7 @@ module Skylab::Brazen::TestSupport
 
     def [] tcc
       tcc.send :define_singleton_method, :use, Use_method___
-      tcc.include Instance_Methods___
+      tcc.include InstanceMethods___
     end
 
     def lib sym
@@ -32,7 +32,7 @@ module Skylab::Brazen::TestSupport
     TS_.lib_( sym )[ self ]
   end
 
-  module Instance_Methods___
+  module InstanceMethods___
 
     def expect_these_lines_in_array_ act_s_a, & p
 
@@ -54,6 +54,27 @@ module Skylab::Brazen::TestSupport
       event_log.handle_event_selectively
     end
 
+    def black_and_white ev
+      _expag = expression_agent  # yes different
+      ev.express_into_under "", _expag
+    end
+
+    def black_and_white_lines ev
+      _expag = expression_agent  # yes different
+      ev.express_into_under [], _expag
+    end
+
+    def black_and_white_expression_agent_for_expect_emission
+      This_one_expression_agent___[]
+    end
+
+    def begin_emission_spy_
+
+      # (when your OCD prevents you from pulling in the test support module whole hog)
+
+      Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+    end
+
     def prepared_tmpdir
       td = TestLib_::Tmpdir_controller_instance[]
       if do_debug
@@ -67,8 +88,8 @@ module Skylab::Brazen::TestSupport
       td
     end
 
-    def black_and_white_expression_agent_for_expect_emission
-      This_one_expression_agent___[]
+    def fixture_path_ tail
+      ::File.join Fixture_path_directory_[], tail
     end
 
     def cfg_filename
@@ -85,13 +106,24 @@ module Skylab::Brazen::TestSupport
   end
 
   Common_ = ::Skylab::Common
-
   Lazy_ = Common_::Lazy
+
+  # --
 
   This_one_expression_agent___ = Lazy_.call do
     Zerk_lib_[]::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.
       via_expression_agent_injection :_no_injection_for_tests_BR_
   end
+
+  This_other_expression_agent_ = Lazy_.call do
+    Home_::No_deps_zerk_[]::API_InterfaceExpressionAgent.instance
+  end
+
+  Fixture_path_directory_ = Lazy_.call do
+    ::File.join TS_.dir_path, 'fixtures'
+  end
+
+  # --
 
   module TestLib_
 
@@ -133,54 +165,6 @@ module Skylab::Brazen::TestSupport
     Zerk_test_support = -> do
       Zerk_lib_[].test_support
     end
-  end
-
-  module Test_Instance_Methods_
-
-    def initialize & edit_p
-      instance_exec( & edit_p )
-    end
-
-  # ~ to be an entity (model or action) you have to:
-
-    def _read_knownness_ prp  # :+#cp
-
-      if bx
-        had = true
-        x = bx.fetch prp.name_symbol do
-          had = false
-        end
-      end
-
-      if had
-        Common_::Known_Known[ x ]
-      else
-        Common_::KNOWN_UNKNOWN
-      end
-    end
-
-    def as_entity_actual_property_box_
-      @bx ||= Home_::Box_.new
-    end
-
-    def handle_event_selectively
-      NIL_
-    end
-
-  # ~ for these tests
-
-    attr_reader :bx
-
-    private def process_and_normalize_for_test_ * x_a
-
-      _st = Common_::Scanner.via_array x_a
-      _ok = process_argument_scanner_fully _st
-      _ok && normalize
-    end
-  end
-
-  module Fixtures
-    Common_::Autoloader[ self ]  # don't load fixture file when autoloading lib
   end
 
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]

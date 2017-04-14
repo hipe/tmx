@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -70,14 +70,14 @@ module Skylab::Brazen
 
           @elements[ offset, 0 ] = [ @element ]
 
-          StatusAdded__.new offset
+          StatusAdded_.new offset
         end
 
         def __insert_after_above_neighbor offset
 
           @elements[ offset + 1, 0 ] = [ @element ]
 
-          StatusAdded__.new offset
+          StatusAdded_.new offset
         end
 
         def __append_element
@@ -85,7 +85,7 @@ module Skylab::Brazen
           offset = @elements.length
           @elements.push @element
 
-          StatusAdded__.new true, offset
+          StatusAdded_.new true, offset
         end
 
         def __when_exact_match el, offset
@@ -100,28 +100,8 @@ module Skylab::Brazen
 
         # ==
 
-        class StatusAdded__
-
-          def initialize did_add_to_end=nil, offset
-            @did_add_to_end = did_add_to_end
-            @offset = offset
-          end
-
-          attr_reader(
-            :did_add_to_end,
-            :offset,
-          )
-
-          def did_add
-            TRUE
-          end
-
-          def found_existing
-            FALSE
-          end
-        end
-
         class StatusFoundExisting___
+          # (keep API close close to `StatusAdded_`)
 
           def initialize el, offset
             @existing_element = el

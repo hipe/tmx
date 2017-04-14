@@ -49,7 +49,7 @@ module Skylab::Brazen
         one = -> { 1 }
         increment = -> d { d + 1 }
 
-        st = @_workspace.document_.to_section_stream( & handle_event_selectively )
+        st = @_workspace.config_.to_section_stream
 
         begin
           sect = st.gets

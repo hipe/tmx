@@ -15,7 +15,7 @@ module Skylab::Brazen::TestSupport
       it "add a section" do
         el = touch_section 'foo'
         expect_document_content "[foo]\n"
-        el._category_symbol_ == :_section_or_subjection_ || fail
+        el._category_symbol_ == :_section_or_subsection_ || fail
       end
 
       it "add a section with an invalid name" do

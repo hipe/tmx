@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -11,10 +11,13 @@ module Skylab::Brazen
         # document if we're not careful to validate "direct" definitions.
         # (more at [#008.C])
 
+        def external_normal_name_symbol= s
+          @__unsanitized_external_normal_name_symbol = s
+        end
+
         attr_writer(
           :listener,
           :mixed_value,
-          :variegated_name_symbol,
         )
 
         def execute
@@ -34,7 +37,7 @@ module Skylab::Brazen
           buff = ""
           # ..
           n_d = buff.length
-          s = remove_instance_variable :@__sanitized_surface_name_string
+          s = remove_instance_variable :@__sanitized_internal_name_string
           n_w = s.length
           buff << s
           buff << " = "
@@ -119,15 +122,37 @@ module Skylab::Brazen
         # -- B
 
         def __validate_assignment_name
-          s = @variegated_name_symbol.id2name
-          if RX_ASSIGNMENT_NAME_ANCHORED___ =~ s
-            @__sanitized_surface_name_string = s
-            ACHIEVED_
+
+          # per [#028] use underscores (not dashes) in external normal
+          # names, and dashes (not underscores) in internal. these two
+          # conventions are (variously) strict: internally we want the
+          # internal names to be prepared ("encoded") for being written
+          # to the config and/or for comparison during searches; and
+          # externally we want the client code to be consistent in its use
+          # of its own business names. this is why we check explicitly for
+          # (and error on) any occurrence of dashes before converting all
+          # dashes to underscores.
+
+          as_is = remove_instance_variable :@__unsanitized_external_normal_name_symbol
+          provided_as_s = as_is.id2name.freeze
+
+          if provided_as_s.include? DASH_
+            bad = true
           else
+            internal_s = provided_as_s.gsub UNDERSCORE_, DASH_
+            if RX_ASSIGNMENT_NAME_ANCHORED___ =~ internal_s
+              @__sanitized_internal_name_string = internal_s
+            else
+              bad = true
+            end
+          end
+          if bad
             @listener.call :error, :invalid_variable_name do
-              __build_event_B s
+              __build_event_B as_is
             end
             UNABLE_
+          else
+            ACHIEVED_
           end
         end
 

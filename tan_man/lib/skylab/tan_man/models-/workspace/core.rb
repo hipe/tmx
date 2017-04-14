@@ -189,13 +189,15 @@ module Skylab::TanMan
         if doc
           # #cov1.5
 
+          col = _GitConfig::Magnetics::EntityCollection_via_Document.new doc
+
           # (that guy is supposed to close the file once it reads it)
 
           remove_instance_variable :@locked_IO
 
           @_with_config = :_COVER_ME__easy_but_cover_this__
 
-          yield _GitConfig.new doc, TEMPORARY_STAND_IN_FOR_KERNEL___, & listener
+          yield col
         else
           # #cov1.4
           @_with_config = :_COVER_ME__easy_but_cover_this__
@@ -260,7 +262,7 @@ module Skylab::TanMan
 
         doc = remove_instance_variable :@_document
 
-        @_path = doc.DOCUMENT_BYTE_UPSTREAM_REFERENCE.path
+        @_path = doc.document_byte_upstream_reference.path
         st = doc.to_line_stream
 
         io = if @_is_dry

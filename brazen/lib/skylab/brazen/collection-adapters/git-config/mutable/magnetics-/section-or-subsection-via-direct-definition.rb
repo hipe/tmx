@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -8,16 +8,32 @@ module Skylab::Brazen
 
         # even though we are not parsing lines from an input file, we still
         # have to ensure that names are valid or we'll corrupt the document
-        # (more at [#008.XXX.222])
+        # (more at [#008.C])
+
+        def initialize
+          @_mutex_for_etc = nil
+          super
+        end
+
+        def unsanitized_section_name_string= s
+          remove_instance_variable :@_mutex_for_etc
+          @_validate_section_name = :_validate_section_name_via_string
+          @unsanitized_section_name_string = s
+        end
+
+        def unsanitized_section_name_symbol= s
+          remove_instance_variable :@_mutex_for_etc
+          @_validate_section_name = :__validate_section_name_via_symbol
+          @unsanitized_section_name_symbol = s
+        end
 
         attr_writer(
           :listener,
-          :unsanitized_section_name_string,
           :unsanitized_subsection_name_string,
         )
 
         def execute
-          ok = __validate_section_name
+          ok = send remove_instance_variable :@_validate_section_name
           ok &&= __validate_subsection_name
           ok && __flush
         end
@@ -30,7 +46,7 @@ module Skylab::Brazen
 
             o.accept_sanitized_name_strings_directly__(
               remove_instance_variable( :@_sanitized_subsection_name_string ),
-              remove_instance_variable( :@__sanitized_section_name_string ),
+              remove_instance_variable( :@_sanitized_section_name_string ),
             )
           end
         end
@@ -86,25 +102,45 @@ module Skylab::Brazen
 
         # -- B
 
-        def __validate_section_name
+        def __validate_section_name_via_symbol
 
-          if RX_SECTION_NAME_ANCHORED___ =~ @unsanitized_section_name_string
-            @__sanitized_section_name_string =
-              remove_instance_variable :@unsanitized_section_name_string
-            ACHIEVED_
+          # (do the work of converting from symbols with their native
+          # conventions to the convetions described in [#028.B])
+
+          sym = @unsanitized_section_name_symbol
+          s = sym.id2name
+          if s.include? DASH_
+            _when_invalid_section_name sym
           else
-            _listener.call :error, :invalid_section_name do
-              __build_invalid_section_name_event
-            end
-            UNABLE_
+            s.gsub! UNDERSCORE_, DASH_
+            @unsanitized_section_name_string = s
+            _validate_section_name_via_string
           end
         end
 
-        def __build_invalid_section_name_event
+        def _validate_section_name_via_string
+
+          if RX_SECTION_NAME_ANCHORED___ =~ @unsanitized_section_name_string
+            @_sanitized_section_name_string =
+              remove_instance_variable :@unsanitized_section_name_string
+            ACHIEVED_
+          else
+            _when_invalid_section_name @unsanitized_section_name_string
+          end
+        end
+
+        def _when_invalid_section_name name_x
+          _listener.call :error, :invalid_section_name do
+            __build_invalid_section_name_event name_x
+          end
+          UNABLE_
+        end
+
+        def __build_invalid_section_name_event name_x
 
           Common_::Event.inline_not_OK_with(
             :invalid_section_name,
-            :invalid_section_name, @unsanitized_section_name_string,
+            :invalid_section_name, name_x,
             :error_category, :argument_error,
           )
         end

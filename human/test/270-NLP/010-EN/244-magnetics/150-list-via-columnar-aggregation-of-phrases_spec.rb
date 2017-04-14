@@ -6,7 +6,7 @@ module Skylab::Human::TestSupport
 
     TS_[ self ]
 
-    it "(cute)" do  # #cov1.4
+    it "(cute)" do  # :#cov1.4
 
       o = NLP_EN_.sexp_lib.expression_session_for(
         :list, :via, :columnar_aggregation_of_phrases,

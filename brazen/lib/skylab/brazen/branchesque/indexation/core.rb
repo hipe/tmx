@@ -172,7 +172,7 @@ module Skylab::Brazen
 
     def __unbound_via_proc x, const
 
-      Home_.lib_.basic::Function::As::Unbound.new(
+      Home_.lib_.basic::Function::Unbound_via_Function.new(
         x,
         const,
         @_source,
@@ -186,7 +186,7 @@ module Skylab::Brazen
 
       if source
 
-        Home_.lib_.basic::Module::As::Unbound.new(
+        Home_.lib_.basic::Module::Unbound_via_Module.new(
           source,
           mod,
         )

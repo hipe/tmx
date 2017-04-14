@@ -6,8 +6,7 @@ module Skylab::Brazen::TestSupport
 
       def [] tcc
 
-        Collection_Adapters::Git_Config[ tcc ]
-        # (should be same as: TS_.lib_( :collection_adapters_git_config )[ tcc ] )
+        Collection_Adapters::Git_Config::Immutable[ tcc ]
 
         tcc.extend Module_Methods___
         tcc.include Instance_Methods___
@@ -59,7 +58,7 @@ module Skylab::Brazen::TestSupport
 
         yes && once[]
 
-        _doc_ = doc_proto.DEEPLY_DUPLICATE___
+        _doc_ = doc_proto.DUPLICATE_DEEPLY_AS_MUTABLE_DOCUMENT_
 
         _doc_  # hi. #todo
       end

@@ -69,7 +69,7 @@ module Skylab::Treemap
 
         def __resolve_output_adapter
 
-          _col = Home_.lib_.basic::Module::As::Collection[ Output_Adapters_ ]
+          _col = Home_.lib_.basic::Module::OperatorBranch_via_Module[ Output_Adapters_ ]
 
           oa = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
             qualified_knownness( :output_adapter ),

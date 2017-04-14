@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport
 
       _sect = doc.sections.touch_section 'sub.sect', 'se-ct'
 
-      _sect[ :'two-characters' ] = '\b'
+      _sect[ :two_characters ] = '\b'
 
       _actual = doc.unparse_into []
 
@@ -30,8 +30,7 @@ module Skylab::Brazen::TestSupport
 
     it "unmarshal correctly with backslashes" do  # :#cov1.4
 
-      _head = TS_::Fixtures.dir_path
-      _cfg_path = ::File.join _head, '00-escape.cfg'
+      _cfg_path = fixture_path_ '00-escape.cfg'
 
       doc = subject_module_.parse_document_by do |o|
         o.upstream_path = _cfg_path

@@ -93,7 +93,7 @@ module Skylab::Cull
             else
 
               _s = func.marshal
-              new_node = @section.ASSIGNEMNT _s, NAME_SYMBOL_FOR_ASSIGNMENT___
+              new_node = @section.build_assignment _s, NAME_SYMBOL_FOR_ASSIGNMENT___
 
               @added_nodes.push new_node
               @nodes.push new_node

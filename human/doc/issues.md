@@ -143,11 +143,16 @@
 [#009]       #doc-point #parent:003 #body-is-inline-in-parent
                `exponent` posed.
 
-[#008]       #doc-point #parent:003 #body-is-inline-in-parent
-               `N-meta-category` concept introduced.
+[#008]       coverage assets & liabilities
 
-[#007]       #doc-point #parent:003 #body-is-inline-in-parent
-               `category` as a foundational thing presented.
+             :[#here.1]: borrow from [br]
+
+             ( #was: #doc-point #parent:003 #body-is-inline-in-parent
+               `N-meta-category` concept introduced. )
+
+[#007] #hole
+             ( #was: #doc-point #parent:003 #body-is-inline-in-parent
+               `category` as a foundational thing presented. )
 
 [#006]       [ambiguity disputes can be settled with specificity]
              (was: moved to [#ba-012])

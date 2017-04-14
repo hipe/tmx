@@ -85,20 +85,14 @@ module Skylab::Brazen::TestSupport
 
     it "summarize (a development proxy of 'plural_noun')" do
 
-      _prepare_ws_tmpdir <<-O.unindent
-        --- /dev/null
-        +++ b/#{ cfg_filename }
-        @@ -0,0 +1,6 @@
-        +[ poet-or-author "elizabeth bishop" ]
-        +foo = fa
-        +[ vocabulary "foo" ]
-        +[ poet-or-author "anais nin" ]
-        +[ vocabulary "bar" ]
-        +[ a-single-thing ]
-      O
+      # :#cov2.1 (enter config as entity collection)
 
-      call_API :workspace, :summarize,
-        :path, __ws_tmpdir.to_path
+      _workspace_path = fixture_path_ 'directory-001-shambalamba'
+
+      call_API(
+        :workspace, :summarize,
+        :path, _workspace_path,
+      )
 
       expect_no_events
 

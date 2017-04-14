@@ -2,7 +2,23 @@ require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - simple inflection session" do  # :#spot1.4
+  describe "[hu] NLP - EN - simple inflection session" do  # :#cov2.0
+
+    # usage notes:
+    #
+    #   - verbs, nouns and pronouns that "modify" "irregularly" (i.e
+    #     "irregulars") are an uninteresing problem but we cannot for any
+    #     practical purposes avoid them: because of some linguistic
+    #     phenomenon, their occurrence is more frequent among frequently
+    #     used verbs and pronouns (and for whatever reason, many nouns for
+    #     animals, which we do not cover here).
+    #
+    #     our hacky solution to irregular verbs is that you pass a symbol
+    #     not a string as the "lemma" for the verb. the lemma being a
+    #     symbol tells us it is irregular, and we should expect some
+    #     hard-coded solution for it rather than derivinng its inflection
+    #     "algorithmically"..
+    #
 
     TS_[ self ]
 
@@ -56,7 +72,55 @@ module Skylab::Human::TestSupport
 
     context "(redux of hacky stuff)" do
 
-      # :#cov1.1
+      context "(..)" do
+
+        it "is" do
+          _given true, :is
+          _expect "is"
+        end
+
+        it "are" do
+          _given 2, :is
+          _expect "are"
+        end
+
+        # a note about using the contracted form ("wasn't") vs the non-
+        # contracted from ("was not"): a cop-out answer is that we express
+        # in the contracted form only for legacy reasons. the deepter truth
+        # is that:
+        #
+        #   - the contracted form sounds more natural when the copula
+        #     is an auxilary:
+        #       more natural: "the document didn't have such a section"
+        #       too formal:   "the document did not have such a section"
+        #
+        #   - but the contracted form may sound too casual when it is not
+        #     acting as an auxiliary. (not sure..)
+        #
+        # so there is almost a desire to make this a new semantic category
+        # of expression, but we'll hold off on that for now..  :#cov2.2
+
+        it "was not" do
+          _given false, :was
+          _expect "wasn't"
+        end
+
+        def _given * x_a
+          @TWO = x_a
+        end
+
+        def _expect s
+
+          sess = X_nlp_en_sis_SessionClass.new
+
+          two = remove_instance_variable :@TWO
+          if ! two.first.respond_to? :bit_length
+            sess.write_count_for_inflection 1  # meh
+          end
+          _actual = sess.v( * two )
+          _actual == s || fail
+        end
+      end
 
       context "(the primitive cases)" do
 
@@ -83,6 +147,32 @@ module Skylab::Human::TestSupport
         end
       end
 
+      # :#cov2.1:
+      #
+      # when using those noun modifer functions with the same classification
+      # as that of `the_only` (for example, itself);
+      #
+      # since the "polarity" of the sentence "frame" is expressed by the
+      # count of the subject noun phrase, it sounds non-idiomatic at best
+      # and incorrect at worst to express again this polarity through verb
+      # inflection. so observe how the verb phrase is or isn't inflected by
+      # negative polarity:
+      #
+      #   yes: "none of the 10 squirrels saw me walk by"
+      #   not: "none of the 10 squirrels didn't see me walk by"
+      #
+      #   yes: "the only squirrel didn't see me walk by"
+      #   not: "the only squirrel saw me walk by"
+      #
+      #   yes: "there are no squirrels, so none saw me walk by"
+      #   not: "there are no squirrels didn't see me walk by"
+      #   not: "no squirrels saw me walk by"  # (because the reason is ambiguous)
+      #
+      # so:
+      #   if more than one: positive
+      #   else if one: negative
+      #   otherwise (and none): positive (and assume hack by the other function)
+
       context "(this target thing)" do
 
         it "many" do
@@ -103,6 +193,30 @@ module Skylab::Human::TestSupport
         def _express_by sess
           sess.calculate do
             "#{ the_only } #{ n "state transition" } #{ no_double_negative "bring" } etc"
+          end
+        end
+      end
+
+      context "(the above plus preterite plus irregular OH MY)" do
+
+        it "many" do
+          _given_count 10
+          _expect "none of the 10 sections was about etc"
+        end
+
+        it "one" do
+          _given_count 1
+          _expect "the only section wasn't about etc"
+        end
+
+        it "none" do
+          _given_count 0
+          _expect "there are no sections so nothing was about etc"
+        end
+
+        def _express_by sess
+          sess.calculate do
+            "#{ the_only } #{ n "section" } #{ no_double_negative :was } about etc"
           end
         end
       end

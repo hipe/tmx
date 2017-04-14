@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -14,6 +14,17 @@ module Skylab::Brazen
 
           def initialize a
             @_all_elements_ = a
+          end
+
+          # -- write
+
+          def delete_assignments_via_assignments__ a
+            # (corresponds to `delete_sections_via_sections`)
+            This_::Magnetics::DeleteEntity_via_Entity_and_Collection.call_by do |o|
+              o.will_delete_these_actual_instances a
+              o.all_elements = @_all_elements_
+            end
+            # result is a (different) array of the deleted items
           end
 
           # -- read
@@ -170,7 +181,7 @@ module Skylab::Brazen
 
           # --
 
-          # ([#008.H explains these names)
+          # ([#028.B explains these names)
 
           attr_reader(
             :external_normal_name_symbol,
@@ -196,8 +207,12 @@ module Skylab::Brazen
           end
           # ~ )
 
-          def _DEEPLY_DUPLICATE_  # this wil #bite you
+          def _DUPLICATE_DEEPLY_  # this wil #bite you
             self
+          end
+
+          def _FREEZE_AS_DOCUMENT_ELEMENT_  # #freeze
+            freeze
           end
         # -
       end

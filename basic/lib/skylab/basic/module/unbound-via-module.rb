@@ -1,8 +1,8 @@
 module Skylab::Basic
 
-  module Module::As  # :[#053].
+  module Module  # :[#053].
 
-    class Unbound  # [#br-013] is instructive.
+    class Unbound_via_Module  # [#br-013] is instructive.
 
       Brazen_ = ::Skylab::Brazen  # assumed
 
@@ -48,6 +48,8 @@ module Skylab::Basic
 
       attr_reader :silo_module
 
+      # ==
+
       class Bound___
 
         include Brazen_.branchesque_defaults::Bound_Methods
@@ -76,6 +78,9 @@ module Skylab::Basic
           @unbound.name_function
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

@@ -1,6 +1,24 @@
-# the collection actor narrative :[#028]
+# entity collection via git config :[#028]
 
-## a universal normal name convention :[#029]
+## in context
+
+(EDIT when better integrated)
+
+the subject library is a bit of a solution in search of a problem; but
+it's one we feel strongly about maintaining.
+
+something something #feature-island.
+
+it's worth explaining how it arrived at its current form:
+
+at one point we used the facilities behind the subject library to
+store and retrieve an entity that consisted of a single, "primitive" value.
+
+
+
+
+
+## a universal normal name convention :[#here.B]
 
 the git config syntax specifies that variable names cannot contain
 underscores (but dashes are OK). however everyplace else we usually
@@ -11,7 +29,7 @@ the things with dashes we call "slugs"). (but yes, we like the look of
 hence we are left with conversion work to do: going into and coming out
 of the collection we need to convert dashes to underscores in field
 names. furthermore we haven't yet said anything about all the other kinds
-of characters, like numbers, mixed case names and beyond.
+of characters, like numbers, mixed case names and others.
 
 as it stands this is work left for the client to do; the collection
 merely borks with a message when invalid names are passed. and this is

@@ -94,8 +94,8 @@ module Skylab::Brazen
 
     def description_under expag
 
-      if document_
-        @document_.description_under expag
+      if config_
+        @config_.description_under expag
       else
         path = @property_box[ :surrounding_path ]
         if path
@@ -112,59 +112,73 @@ module Skylab::Brazen
 
     def persist_entity( x=nil, ent, & oes_p )
 
-      doc = _document( & oes_p )
-      doc and begin
-        doc.persist_entity( * x, ent, & oes_p )
+      cfg = _config( & oes_p )
+      cfg and begin
+        cfg.persist_entity( * x, ent, & oes_p )
       end
     end
 
     def entity_via_intrinsic_key id, & oes_p
-      doc = _document( & oes_p )
-      doc and begin
-        doc.entity_via_intrinsic_key id, & oes_p
+      cfg = _config( & oes_p )
+      cfg and begin
+        cfg.entity_via_intrinsic_key id, & oes_p
       end
     end
 
     def to_entity_stream_via_model cls, & oes_p
-      doc = _document( & oes_p )
-      doc and begin
-        doc.to_entity_stream_via_model cls, & oes_p
+      cfg = _config( & oes_p )
+      cfg and begin
+        cfg.to_entity_stream_via_model cls, & oes_p
       end
     end
 
     def delete_entity act, ent, & oes_p
-      doc = _document( & oes_p )
-      doc and begin
-        doc.delete_entity act, ent, & oes_p
+      cfg = _config( & oes_p )
+      cfg and begin
+        cfg.delete_entity act, ent, & oes_p
       end
     end
 
     # ~ for actions
 
     def resolve_document_ & oes_p
-      _document( & oes_p ) ? ACHIEVED_ : UNABLE_
+      _config( & oes_p ) ? ACHIEVED_ : UNABLE_
     end
 
-    attr_reader :document_
+    attr_reader :config_
 
     # ~ support
 
-    def _document & p
-      send ( @_document ||= :__document_initially ), & p
+    def _config & p
+      send ( @_config ||= :__config_initially ), & p
     end
 
-    def __document_initially & p
+    def __config_initially & p
 
-      x = Home_::CollectionAdapters::GitConfig.via_path_and_kernel(
-        existent_config_path, @kernel, & p )
+      _GitConfig = Home_::CollectionAdapters::GitConfig
 
-      @document_ = x
-      @_document = :__document_subsequently
-      send @_document
+      _path = existent_config_path
+
+      doc = _GitConfig.parse_document_by do |o|
+        o.upstream_path = _path
+        o.listener = p
+      end
+
+      if doc
+
+        _entity_collection =
+        _GitConfig::Magnetics::EntityCollection_via_Document.new doc
+
+        @config_ = _entity_collection
+        @_config = :__config_subsequently
+        send @_config
+      else
+        cfg
+      end
     end
 
-    def __document_subsequently
-      @document_
+    def __config_subsequently
+      @config_
     end
 
     define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

@@ -31,7 +31,7 @@ module Skylab::Brazen::TestSupport
 
         class E__Small_Agent_With_Defaults
 
-          include Test_Instance_Methods_
+          include TheseMethods__
 
           Subject_.call self do
             o :default, :yay, :property, :foo
@@ -70,7 +70,7 @@ module Skylab::Brazen::TestSupport
             super
           end
 
-          include Test_Instance_Methods_
+          include TheseMethods__
 
           Subject_.call self do
             o :integer_greater_than_or_equal_to, -2, :property, :zoip
@@ -119,7 +119,7 @@ module Skylab::Brazen::TestSupport
 
         class E__Small_Agent_With_Required_Properties
 
-          include Test_Instance_Methods_
+          include TheseMethods__
 
           Subject_.call self,
             :required, :property, :foo,
@@ -156,6 +156,54 @@ module Skylab::Brazen::TestSupport
       end
     end
 
+    # ==
+
+    module TheseMethods__
+
+      def initialize & edit_p
+        instance_exec( & edit_p )
+      end
+
+      # -- to be an entity (model or action) you have to:
+
+      def _read_knownness_ prp  # :+#cp
+
+        if bx
+          had = true
+          x = bx.fetch prp.name_symbol do
+            had = false
+          end
+        end
+
+        if had
+          Common_::Known_Known[ x ]
+        else
+          Common_::KNOWN_UNKNOWN
+        end
+      end
+
+      def as_entity_actual_property_box_
+        @bx ||= Home_::Box_.new
+      end
+
+      def handle_event_selectively
+        NIL_
+      end
+
+      # -- for these tests
+
+      attr_reader :bx
+
+      private def process_and_normalize_for_test_ * x_a
+
+        _st = Common_::Scanner.via_array x_a
+        _ok = process_argument_scanner_fully _st
+        _ok && normalize
+      end
+    end
+
+    # ==
+
     Subject_ = -> * a, & p do
 
       if a.length.nonzero? || p
@@ -164,7 +212,11 @@ module Skylab::Brazen::TestSupport
         Home_::Modelesque::Entity
       end
     end
+
+    # ==
+    # ==
   end
 # ->
   end
 end
+# #history-A: a big support module of instance methods moved here from top test-support

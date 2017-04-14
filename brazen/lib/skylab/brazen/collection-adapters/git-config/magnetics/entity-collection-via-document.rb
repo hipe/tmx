@@ -1,303 +1,441 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
-    GitConfigMagnetic_ = ::Class.new Home_::Action  # in [#028]
+    class Magnetics::EntityCollection_via_Document  # :[#029].
 
-    Magnetics = ::Module.new
+      # the document around which this is constructed is either immutable
+      # or mutable. in the former case, operations that require a mutable
+      # document can fail because it must first be converted (once) from
+      # immutable to mutable..
 
-    # ==
+      # coverage currently starts at #cov2.1
 
-    class Magnetics::RetrieveEntity_via_EntityIdentifier_and_Document < GitConfigMagnetic_  # 1x
+      def initialize doc
 
-      Attributes_actor_.call( self,
-        :entity_identifier,
-        :document,
-        :kernel,
-      )
-
-      def execute
-        _ok = via_entity_identifier_resolve_subsection_id
-        _ok && result_via_subsection_id__
-      end
-    end
-
-    # ==
-
-    class Magnetics::EntityStream_via_Collection < GitConfigMagnetic_
-
-      Attributes_actor_.call( self,
-        :model_class,
-        :document,
-        :kernel,
-      )
-
-      def initialize & p
-        @listener = p
-      end
-
-      def execute
-        __init_subsection_name_query
-        __init_section_stream_via_subsection_name_query
-        __stream_via_section_stream
-      end
-
-      def __init_subsection_name_query
-        if @model_class
-          __init_subsection_name_query_via_model_class
+        if doc.is_mutable
+          _init_or_reinit_via_mutable_document doc
         else
-          @_subsection_name_query = nil
-          ACHIEVED_
+          __init_via_immutable_document doc
         end
       end
 
-      def __init_subsection_name_query_via_model_class
+      # -- read
 
-        sym = __subsection_name_symbol_via_model_class
+      def build_facade cls, external_normal_name_symbol  # of section
+        Facade___.new cls, external_normal_name_symbol, self
+      end
 
-        @_subsection_name_query = -> sect do
-          sym == sect.external_normal_name_symbol
+      def to_section_stream
+        document_.to_section_stream
+      end
+
+      def with_mutable_document listener, & do_this  # [tm]
+
+        send @_with_mutable_doc, listener, & do_this
+      end
+
+      def description_under expag
+        document_.description_under expag
+      end
+
+      def document_
+        send @_document
+      end
+
+      # -- support: state changes from immutable to mutable
+
+      def __with_mutable_doc_via_immutable_doc_initially listener, & do_this
+
+        _idoc = remove_instance_variable :@_immutable_doc_instance
+
+        _bur = _idoc.document_byte_upstream_reference
+
+        mdoc = Here_::Mutable.parse_document_by do |o|
+          o.byte_upstream_reference = _bur
+          o.listener = listener
         end
 
-        NIL
-      end
-
-      def __subsection_name_symbol_via_model_class
-        @model_class.node_identifier.
-          silo_name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
-      end
-
-      def __init_section_stream_via_subsection_name_query
-        if @_subsection_name_query.nil?
-          __init_section_stream_as_stream_of_all_sections
+        if mdoc
+          _init_or_reinit_via_mutable_document mdoc
+          send @_with_mutable_doc, listener, & do_this
         else
-          __do_init_section_stream_via_subsection_name_query
+          # ..
+          remove_instance_variable :@_with_mutable_doc
+          remove_instance_variable :@_document
+          freeze
+          mdoc
         end
       end
 
-      def __init_section_stream_as_stream_of_all_sections
+      def _init_or_reinit_via_mutable_document doc
 
-        @_section_stream = @document.sections.to_stream_of_sections
-        NIL
+        @_with_mutable_doc = :_with_mutable_doc_as_is
+        @_document = :_mutable_doc_instance
+        @_mutable_doc_instance = doc ; nil
       end
 
-      def __do_init_section_stream_via_subsection_name_query
+      def __init_via_immutable_document doc
 
-        @_section_stream = @document.sections.to_stream_of_sections.reduce_by do |el|
-          @_subsection_name_query.call el
-        end
-        NIL
+        @_document = :_immutable_doc_instance
+        @_with_mutable_doc = :__with_mutable_doc_via_immutable_doc_initially
+        @_immutable_doc_instance = doc ; nil
       end
 
-      def __stream_via_section_stream
-        if @model_class
-          __entity_stream_via_section_stream_and_model_class
-        else
-          @_section_stream
-        end
+      def _with_mutable_doc_as_is _listener
+        yield @_mutable_doc_instance
       end
 
-      def __entity_stream_via_section_stream_and_model_class
-
-        fly = @model_class.new_flyweight @kernel, & @listener
-        box = fly.properties
-        name_name_s = NAME_SYMBOL.to_s
-
-        @_section_stream.map_by do |sect|
-
-          h = { name_name_s => sect.subsection_string }
-
-          sect.assignments.each_normalized_pair do |sym, x|
-            x or next
-            h[ sym.id2name ] = "#{ x }"
-          end
-
-          box.replace_hash h
-          fly
-        end
-      end
-    end
-
-    # ==
-
-    class GitConfigMagnetic_
-    private
-
-      def via_entity_identifier_resolve_subsection_id
-        __via_entity_identifier_resolve_both_strings
-        via_both_strings_resolve_subsection_id_
+      def _mutable_doc_instance
+        @_mutable_doc_instance  # hi.
       end
 
-      def __via_entity_identifier_resolve_both_strings
-        id = @entity_identifier
-        @section_s = id.silo_name_symbol.id2name.gsub UNDERSCORE_, DASH_
-        @subsection_s = id.entity_name_string ; nil
+      def _immutable_doc_instance
+        @_immutable_doc_instance  # hi.
       end
 
-      def via_entity_resolve_subsection_id__
-        via_entity_resolve_model_class
-        via_model_class_resolve_section_string
-        via_entity_resolve_subsection_string
-        via_both_strings_resolve_subsection_id_
+      def __duplicate_deeply_as_entity_collection_  # #testpoint only
+
+        otr = self.class.allocate
+
+        otr.instance_variable_set :@_mutable_doc_instance,
+          @_mutable_doc_instance.DUPLICATE_DEEPLY_AS_MUTABLE_DOCUMENT_
+
+        otr.instance_variable_set :@_document, @_document
+        otr.instance_variable_set :@_with_mutable_doc, @_with_mutable_doc
+        otr
       end
 
-      def via_entity_resolve_subsection_id_via_entity_name s
-        via_entity_resolve_model_class
-        via_model_class_resolve_section_string
-        @subsection_s = s
-        via_both_strings_resolve_subsection_id_
-      end
+      # ==
 
-      def via_model_class_resolve_section_string
-        @section_s = @model_class.
-          node_identifier.silo_name_symbol.id2name.gsub UNDERSCORE_, DASH_ ; nil
-      end
+      class Facade___
 
-      def via_entity_resolve_subsection_string
-        @subsection_s = @entity.natural_key_string ; nil
-      end
-
-      def via_both_strings_resolve_subsection_id_
-        @subsection_id = Subsection_Identifier_.
-          new @section_s, @subsection_s
-        ACHIEVED_
-      end
-
-      def result_via_subsection_id__
-        ok = via_subsection_id_resolve_section_
-        ok &&= __via_subsection_id_resolve_model_class
-        ok && __via_section_and_model_class_unmarshal
-      end
-
-      def via_subsection_id_resolve_section_
-
-        count = 0
-        found = false
-
-        ss = @subsection_id
-        st = @document.sections.to_stream_of_sections
-
-        sect_sym = ss.section_s.intern
-        ss_s = ss.subsection_s
-
-        while sect = st.gets
-
-          if sect_sym != sect.external_normal_name_symbol
-            next
-          end
-
-          count += 1
-
-          if ss_s != sect.subsection_string
-            next
-          end
-
-          found = true
-          @section = sect
-          break
+        def initialize cls, sym, ec
+          @external_normal_name_symbol = sym  # of section
+          @class = cls
+          @entity_collection = ec
         end
 
-        if found
-          ACHIEVED_
-        else
-          @count = count
-          maybe_send_event :error, :component_not_found do
-            build_entity_not_found_event
-          end
-          UNABLE_
-        end
-      end
-
-      def build_entity_not_found_event
-
-        build_not_OK_event_with :component_not_found,
-          :count, @count,
-          :subsection_id, @subsection_id,
-          :byte_upstream_reference, @document.byte_upstream_reference do |y, o|
-
-          if o.byte_upstream_reference
-            s = o.byte_upstream_reference.description_under self
-            s and loc_s = " in #{ s }"
-          end
-
-          ss = o.subsection_id
-
-          if o.count.zero?
-            y << "found no #{ ick ss.section_s } section#{ loc_s }"
-          else
-            y << "no #{ ick ss.subsection_s } section found in #{
-             }#{ o.count } #{ ss.section_s } section(s)#{ loc_s }"
+        def update ent, & p
+          _update_or_create p, ent do |o|
+            o.be_update_not_create
           end
         end
-      end
 
-      def __via_subsection_id_resolve_model_class
-
-        _sym = @subsection_id.to_silo_name_symbol
-
-        _id = Home_::Nodesque::Identifier.via_symbol _sym
-
-        silo = @kernel.silo_via_identifier _id, & @listener
-
-        if silo
-          @model_class = silo.silo_module
-          ACHIEVED_
+        def create ent, & p
+          _update_or_create p, ent do |o|
+            o.be_create_not_update
+          end
         end
-      end
 
-      def __via_section_and_model_class_unmarshal
+        def _update_or_create p, ent
 
-        _x = @model_class.unmarshalled @kernel, @listener do |o|
-          o.edit_pair @section.subsection_string, NAME_SYMBOL
-          o.edit_pairs @section.assignments do | x |
-            if ! x.nil?
-              x.to_s  # life is easier if string is the great equalizer:
-              # just because the collection thinks it's e.g. an int or a
-              # boolean doesn't mean it "is"
+          Here_::Mutable::Magnetics::PersistEntity_via_Entity_and_Collection.call_by do |o|
+            yield o
+            o.entity = ent
+            o.persist_these = ent.class::PERSIST_THESE  # for now, just a sketch
+            o.facade = self
+            o.listener = p
+          end
+        end
+
+        def build_section_as_EC_facade_by__  # assume document is mutable
+          @entity_collection.document_.sections.build_section_by_ do |o|
+            yield o
+            o.unsanitized_section_name_symbol = @external_normal_name_symbol
+          end
+        end
+
+        def delete nat_key, & p
+
+          # you've got to convert the document to a mutable document first
+          # before you gather the the object ID's of sections to delete
+
+          @entity_collection.with_mutable_document p do |doc|
+
+            lu = lookup_section_ nat_key
+            if lu.did_find
+              _ary = doc.sections.delete_sections_via_sections [ lu.section ]
+              _entity_via_section _ary.fetch 0  # meh
+            else
+              p.call :error, :expression, :component_not_found do |y|
+                y << "cannot delete #{ lu.description_under self }"
+                y << lu.to_one_line_of_further_information_under( self )
+              end
+              UNABLE_
             end
           end
         end
 
-        _x  # hi. #todo
+        def dereference nat_key
+          ent = lookup_softly nat_key
+          if ent
+            ent
+          else
+            self._COVER_ME__entity_not_found_for_dereference__
+            lookup_section_( nat_key ).xxx
+          end
+        end
+
+        def lookup_softly nat_key
+          sect = lookup_section_softly_ nat_key
+          if sect
+            _entity_via_section sect
+          end
+        end
+
+        def lookup_section_softly_ nat_key  # #testpoint
+
+          sym = @external_normal_name_symbol
+
+          _to_every_section_stream.flush_until_detect do |sect|
+
+            if sym == sect.external_normal_name_symbol
+              nat_key == sect.subsection_string  # hi.
+            end
+          end
+        end
+
+        def to_stream_of_all_such_entities
+
+          sym = @external_normal_name_symbol
+
+          _to_every_section_stream.map_reduce_by do |sect|
+
+            if sym == sect.external_normal_name_symbol
+              _entity_via_section sect
+            end
+          end
+        end
+
+        def procure nat_key, & p
+
+          lu = lookup_section_ nat_key
+          if lu.did_find
+            _entity_via_section lu.section
+          else
+            p.call :error, :expression, :component_not_found do |y|
+              y << "#{ lu.description_under self } not found"
+              y << lu.to_one_line_of_further_information_under( self )
+            end
+            UNABLE_
+          end
+        end
+
+        def lookup_section_ nat_key
+
+          # like much of the lookup logic above, but gather metadata
+          # while traversing the document for use in event emission.
+
+          sym = @external_normal_name_symbol
+
+          count_of_all_sections = 0
+          count_of_relevant_sections = 0
+
+          found = _to_every_section_stream.flush_until_detect do |sect|
+
+            if sym == sect.external_normal_name_symbol
+              if nat_key == sect.subsection_string  # hi.
+                true
+              else
+                count_of_relevant_sections += 1
+                count_of_all_sections += 1 ; false
+              end
+            else
+              count_of_all_sections += 1 ; false
+            end
+          end
+
+          if found
+            FoundSection___.new found, nat_key, @external_normal_name_symbol
+          else
+            _buref = @entity_collection.document_.document_byte_upstream_reference
+            DidNotFindSection___.new count_of_relevant_sections, nat_key,
+              @external_normal_name_symbol, count_of_all_sections, _buref
+          end
+        end
+
+        def _entity_via_section sect
+
+          # (if ever we wanted to roll out a [#029.W.A] datamapper-like etc..)
+
+          st = sect.assignments.to_stream_of_assignments
+
+          @class.define do |o|
+            o._natural_key_string_ = sect.subsection_string
+            begin
+              asmt = st.gets
+              asmt || break
+              o.send :"#{ asmt.external_normal_name_symbol }=", asmt.value_x
+              redo
+            end while above
+          end
+        end
+
+        def _to_every_section_stream
+          @entity_collection.document_.to_section_stream
+        end
+
+        attr_reader(
+          :entity_collection,
+          :external_normal_name_symbol,
+        )
+
+        def DUPLICATE_DEEPLY_AS_FACADE__AS__IMMUTABLE_MUTABLE__
+
+          # *this* one is for when the receiver *is* such a subject as
+          # described below, and we want to make a truly mutable deep
+          # copy of it for use in a test case (i.e a mutating operation that
+          # is testing success..)
+
+          otr = _common_dup
+          otr.instance_variable_set :@entity_collection,
+            @entity_collection.__duplicate_deeply_as_entity_collection_
+          otr
+        end
+
+        def DUPLICATE_DEEPLY_AS_FACADE__FOR__IMMUTABLE_MUTABLE__  # #testpoint only
+
+          # ridiculous - an "immutable mutable" is a subject that is
+          # prepared to undergo the beginning of a mutating operation, but
+          # one that also "knows" this operation will fail, and hence the
+          # subject can be actually immutable and re-used across tests..
+
+          otr =  _common_dup
+          ec = @entity_collection
+
+          # confirm that the current EC is in "immutable" mode:
+          ec.instance_variable_defined? :@_immutable_doc_instance or self._CHANGED?
+
+          # make a plain old dup (you want every ivar), make it immutable:
+          otr_ec = ec.dup
+          otr_ec.with_mutable_document :_no_listener_BR_ do |doc|
+            doc.sections  # eew, will need it. won't duplicate over to copies
+            doc.freeze_as_mutable_document___
+          end
+
+          otr.instance_variable_set :@entity_collection, otr_ec
+          otr.freeze
+        end
+
+        def _common_dup
+          otr = self.class.allocate
+          otr.instance_variable_set :@class, @class
+          otr.instance_variable_set :@external_normal_name_symbol, @external_normal_name_symbol
+          otr
+        end
       end
+
+      # ==
+
+      DidOrDidNotFindSection__ = ::Class.new
+
+      class DidNotFindSection___ < DidOrDidNotFindSection__
+
+        def initialize dd, s, sym, d, buref
+          @byte_upstream_reference = buref
+          @count_of_relevant_sections = dd
+          @count_of_all_sections = d
+          super s, sym
+        end
+
+        def to_one_line_of_further_information_under expag
+
+          dd = @count_of_relevant_sections ; d = @count_of_all_sections
+          buref = @byte_upstream_reference  # if not trueish assume nil
+          me = self
+
+          expag.calculate do
+
+            dsc = -> { buref and buref.description_under self }
+            dash = -> { s = dsc[] and " - #{ s }" }
+            in_ = -> { s = dsc[] and " in #{ s }" }
+
+            if dd.zero?
+              if d.zero?
+                "document is empty#{ dash[] }"  # perhaps not technically true but effectively true
+              else
+
+                # (lends supplemental coverage to [#hu-008.1])
+
+                simple_inflection do
+
+                  # "none of the 10 sections was about shoes"
+                  # "the only section was not about a shoe"
+                  # "there are no sections so nothing was about shoes" (won't hit)
+
+                  write_count_for_inflection d
+
+                  _topic = indef me._describe_model_under_ self
+
+                  _verb = no_double_negative :was
+
+                  "#{ the_only } #{ n 'section' } #{ _verb } #{
+                    }about #{ _topic }#{ in_[] }"
+                end
+              end
+            else
+
+              simple_inflection do
+
+                write_count_for_inflection dd
+
+                _eek = me._describe_model_under_ self
+
+                "#{ the_only } #{ n _eek } #{ no_double_negative 'has' } #{
+                  }this identifier#{ in_[] }"
+              end
+            end
+          end
+        end
+
+        def did_find
+          FALSE
+        end
+      end
+
+      class FoundSection___ < DidOrDidNotFindSection__
+
+        def initialize sect, s, sym
+          @section = sect
+          super s, sym
+        end
+
+        attr_reader :section
+
+        def did_find
+          TRUE
+        end
+      end
+
+      class DidOrDidNotFindSection__
+
+        def initialize s, sym
+          @natural_key_string = s
+          @external_normal_name_symbol = sym
+          freeze
+        end
+
+        def description_under expag
+
+          _nat = _describe_natural_key_string_under_ expag
+          _hum = _describe_model_under_ expag
+
+          "#{ _hum } #{ _nat }"
+        end
+
+        def _describe_model_under_ _expag
+          @external_normal_name_symbol.id2name.gsub UNDERSCORE_, SPACE_  # meh
+        end
+
+        def _describe_natural_key_string_under_ _expag
+          @natural_key_string.inspect  # meh
+        end
+      end
+
+      # ==
+      # ==
     end
-
-    # ==
-
-    class Subsection_Identifier_
-
-      def initialize s, ss
-        @section_s = s ; @subsection_s = ss
-        s = ss.dup
-        Section_::Mutate_subsection_name_for_marshal[ s ]
-        @escaped_subsection_s = s
-      end
-
-
-      def to_a
-        [ @subsection_s, @section_s ]
-      end
-
-      def to_silo_name_symbol
-        @section_s.gsub( DASH_, UNDERSCORE_ ).intern
-      end
-
-      def description
-        "#{ @section_s } \"#{ @escaped_subsection_s }\""
-      end
-
-      attr_reader(
-        :section_s,
-        :subsection_s,
-        :escaped_subsection_s,
-      )
-    end
-
-    # ==
-    # ==
-
-    LINE_SEP_ = "\n".freeze
-
-    # ==
   end
 end
+# #history: rewrite during proper birth of entity collection

@@ -144,6 +144,11 @@ module Skylab::Brazen
     Field_::Entity
   end
 
+  No_deps_zerk_ = Lazy_.call do
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
+  end
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end

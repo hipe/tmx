@@ -1,6 +1,6 @@
 module Skylab::Brazen::TestSupport
 
-  module Collection_Adapters::Git_Config
+  module Collection_Adapters::Git_Config::Immutable
 
     class << self
       def [] tcc

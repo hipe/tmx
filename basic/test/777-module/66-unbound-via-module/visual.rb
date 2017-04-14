@@ -1,6 +1,6 @@
 module Skylab::Basic::TestSupport_Visual
 
-  class Module::As::Unbound
+  class Module::Unbound_via_Module
 
     def initialize i, o, e, argv
       @ioe_argv = [ i, o, e, argv ]

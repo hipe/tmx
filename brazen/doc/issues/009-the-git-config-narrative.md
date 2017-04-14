@@ -1,13 +1,31 @@
 # the git config narrative :[#009]
 
-## introduction
+## objective & scope
 
-this is not intended to read/edit git config files per se. it is intended
-to be a library used for creating new, modifying existing and reading from
-existing config files; config files that happen to try and immitate the
-syntax of git config files.
+despite its name, this library's founding purpose is not for reading (or
+writing) git config files per se. (whether it can do that is in fact outside
+of its scope, but the answer is "probably, most of the time".)
 
-we implement our rendition of the *git* config file syntax speficially
+rather, this library's objective is to implement a simple "entity"
+datastore through the use of text files that follow a simple format;
+text files that can be read *and edited* by human *and machine* alike.
+
+if this sounds preposterous or useless, it is in fact neither: `git` already
+employs this excellent game mechanic in its config system: you can use git
+commands to change config settings programatically, but also you can edit
+the config file(s) directly, by hand. the config files are then something
+that readable *and editable* by human *and machine* alike; which is a dynamic
+that we think is pretty neat.
+
+this is one reason (but not the only one) why we have used pieces of git's
+config system as inpiration for this effort.
+
+
+
+
+## but then why `git` (config) specifically?
+
+we implement our rendition of the *git* config file syntax specifically
 because
 
   - it's complex enough for our needs without being too complex
@@ -21,6 +39,10 @@ because
 
 however, using the git format specifically is a bit of an afterthought.
 we can build out other document editors for other formats as necessary.
+
+because of how tightly we try to use git's config syntax as acceptance
+criteria for our efforts; we will continue to use the name unless outside
+forces dictate that we do not.
 
 
 

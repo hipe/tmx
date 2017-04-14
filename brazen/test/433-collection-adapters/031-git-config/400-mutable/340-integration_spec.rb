@@ -26,7 +26,7 @@ module Skylab::Brazen::TestSupport
 
       it "event" do
         ev = _tuple.first
-        ev.invalid_variable_name == 'fum_fum' || fail
+        ev.invalid_variable_name == :'fum-fum' || fail
       end
 
       shared_subject :_tuple do
@@ -34,7 +34,7 @@ module Skylab::Brazen::TestSupport
         _sect = touch_section 'wizzie'
 
         will_call_by_ do |p|
-          _sect.assign 'he he', :fum_fum, & p
+          _sect.assign 'he he', :'fum-fum', & p
         end
 
         a = []
@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport
     it "add a variable with a valid name ; also use `[]=` ; also to line stream" do
 
       _sect = touch_section 'wizzie'
-      _x = _sect[ :'fum-fum' ] = 'he he'
+      _x = _sect[ :fum_fum ] = 'he he'
       _x == 'he he' || fail
 
       _actual = @document.to_line_stream

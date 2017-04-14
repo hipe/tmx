@@ -1,16 +1,25 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
       class Magnetics_::ApplyAssignment_via_Arguments < Common_::MagneticBySimpleModel
 
+        def initialize
+          @_via_new_assignment = :__via_new_assignment_touch
+          super
+        end
+
+        def will_append
+          @_via_new_assignment = :__via_new_assignment_append
+        end
+
         attr_writer(
           :elements,
+          :external_normal_name_symbol,
           :listener,
           :mixed_value,
-          :variegated_name_symbol,
         )
 
         def execute
@@ -26,12 +35,16 @@ module Skylab::Brazen
           @listener ||= LISTENER_THAT_RAISES_ALL_NON_INFO_EMISSIONS_
 
           if __resolve_new_assignment
-            @_status = __touch
-            if @_status.did_add
-              __when_added
-            else
-              __when_found_existing
-            end
+            send @_via_new_assignment
+          end
+        end
+
+        def __via_new_assignment_touch
+          @_status = __touch
+          if @_status.did_add
+            _when_added
+          else
+            __when_found_existing
           end
         end
 
@@ -56,10 +69,16 @@ module Skylab::Brazen
           _  # hi. #todo
         end
 
+        def __via_new_assignment_append
+          @_status = StatusAdded_.new true, @elements.length
+          @elements.push @_new_assignment
+          _when_added
+        end
+
         def __resolve_new_assignment
 
           _ = This_::Magnetics_::Assignment_via_DirectDefinition.call_by do |o|
-            o.variegated_name_symbol = @variegated_name_symbol
+            o.external_normal_name_symbol = @external_normal_name_symbol
             o.mixed_value = @mixed_value
             o.listener = @listener
           end
@@ -128,7 +147,7 @@ module Skylab::Brazen
           @_status
         end
 
-        def __when_added
+        def _when_added
           @listener.call :info, :related_to_assignment_change do
             __build_added_event
           end

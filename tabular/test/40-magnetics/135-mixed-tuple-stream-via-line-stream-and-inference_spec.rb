@@ -122,12 +122,12 @@ module Skylab::Tabular::TestSupport
 
       spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
 
-      spy.call_by do |x|
+      spy.call_by do |p|
 
         _line_upstream = Stream_[ lines ]
 
         _st = _subject_module.call(
-          _line_upstream, :_inference_not_yet_needed_, & spy.listener )
+          _line_upstream, :_inference_not_yet_needed_, & p )
 
         _should_be_unable = _st.gets
 

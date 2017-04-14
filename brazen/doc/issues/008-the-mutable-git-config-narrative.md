@@ -19,7 +19,6 @@ warrants its own foundation here, as a complement to the more general
   - [#here.E] - peeking (inline)
   - [#here.F] - ramification two of our grammar: façades
   - [#here.G] - immutability of atomic elements
-  - [#here.H] - these simlar method names explained
 
   - [#here.xx] - historical synopsis
 
@@ -159,7 +158,7 @@ need to be duplicated recursively (mainly in regards to their array).
 however the "atomics" are to be treated as immutable. as such
 when duplicating a document we can share the same atomic nodes
 across several documents; allowing the implementation of deep
-duping to be straightforward. :#spot1.2
+duping to be straightforward.
 
 the dirty secret about all this is that we are preoccupied with it mainly
 because it makes testing much less clunky and more performant when we can
@@ -167,28 +166,6 @@ easily start with a known document "prototype" (or fixture) and duplicate
 it deeply and then modify this copy and test against that, rather than
 having to parse the document from a string or build it up "by hand" over
 and over again for each test.
-
-
-
-
-## these methods with similar names :[#here.H]
-
-why?
-
-    attr_reader(
-      :external_normal_name_symbol,
-      :internal_normal_name_string,
-    )
-
-the external one is for general use, often outside of this library
-(hence "external"). it gravitates towards the convention of using
-`lowercase_with_underscores_symbols` for things that resemble hash
-keys.
-
-however, when we have a new incoming node and we have to decide how
-to place it among the other nodes, we want to use strings so we can
-compare them lexographically. also there are other differences.
-
 
 
 

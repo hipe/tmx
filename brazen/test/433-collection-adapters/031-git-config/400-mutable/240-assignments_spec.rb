@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport
           _sect = _dereference_section :foo
 
           will_call_by_ do |p|
-            _sect.assign true, :'is-on', & p
+            _sect.assign true, :is_on, & p
           end
 
           _flush_common_triadic_tuple

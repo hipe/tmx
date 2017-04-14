@@ -41,10 +41,15 @@ module Skylab::Human
       #     hacky mans anew rather than reach up
       #
       #   - very soon we are going to do something massive to shrink this up
+      #
+
+      # the spec file (#cov2.0) has usage documentation
 
       module Methods
 
-        # exactly [#ze-040.3]
+        # exactly #open [#ze-040.3] unify expression agent-ry between niCLI and iCLI
+
+        # -- oxford join & family
 
         def oxford_join buff, scn=nil, final=AND__, sep=COMMA_SPACE__, & p
 
@@ -77,7 +82,9 @@ module Skylab::Human
           end
         end
 
-        def the_only  # #cov1.1
+        # -- these (the main functions)
+
+        def the_only  # #cov2.1
           @_is_negative_HU = true
           d = count_for_inflection
           case 1 <=> d
@@ -88,24 +95,49 @@ module Skylab::Human
           end
         end
 
-        def no_double_negative s  # #cov1.1
+        def no_double_negative lemma_x  # #cov2.1
+
+          # (strongly recommended that you read the explanation at the spec)
+          # (also has [#008.1] supplemental coverage by [br])
+
+          v = _verb_HU lemma_x
+          is_preterite = v.is_preterite  # (snuck in through irregular, for now)
+          _d = count_for_inflection
           @_is_negative_HU = true
-          d = count_for_inflection
-          case 1 <=> d
-          when -1 ; _verb_HU d, false, s
-          when  0 ; "fails to #{ _verb_HU d, false, s }"
-          when  1 ; "so nothing #{ _verb_HU d, false, s }"
-          else never
+
+          case 1 <=> _d
+          when -1
+            if is_preterite
+              v.to_string  # "[none of the 10 foobrics] were about"
+            else
+              v.be_singular.to_string  # "[none of the 10 foobrics] brings"
+            end
+          when 0
+            if is_preterite
+              v.to_negative.to_string  # "[the only foobric] was not about"
+            else
+              "fails to #{ v.to_string }"  # "[the only foobric] fails to bring"
+            end
+          when 1
+            if is_preterite
+              "so nothing #{ v.to_string }"  # "[there were no foobrics] so there was nothing about"
+            else
+              "so nothing #{ v.be_singular.to_string }"  # "so nothing brings"
+            end
+          else ; never
           end
         end
 
         def none_of_them s
+
+          v = _verb_HU s
+
           @_is_negative_HU = true
           case count_for_inflection
-          when 2 ; "neither or them #{ _verb_HU 0, true, s }"
-          when 1 ; "it does not #{ v s }"
-          when 0 ; "there is nothing to #{ _verb_HU 0, true, s }"
-          else   ; "none of them #{ v s }"
+          when 2 ; "neither of them #{ v.be_singular.to_string }"
+          when 1 ; "it does not #{ v.to_string }"
+          when 0 ; "there is nothing to #{ v.to_string }"
+          else   ; "none of them #{ v.to_string }"
           end
         end
 
@@ -130,70 +162,262 @@ module Skylab::Human
           end
         end
 
-        def v numberish=nil, mixed_string
+        def v numberish_or_polarity=nil, mixed_string
 
-          # awfuly, numberish if TRUE or FALSE is the polarity of the verb..
-
-          if numberish
-            if true == numberish
-              @_is_negative_HU = false ; yes = true ; d = count_for_inflection
+          if numberish_or_polarity
+            if true == numberish_or_polarity
+              yes = true
             else
-              d = write_count_for_inflection numberish ; yes = ! _is_negative_HU
+              numberish = numberish_or_polarity
             end
-          elsif numberish.nil?
-            d = count_for_inflection ; yes = ! _is_negative_HU
-          else
-            @_is_negative_HU = true ; yes = false ; d = count_for_inflection
+          elsif false == numberish_or_polarity
+            yes = false
           end
 
-          _verb_HU d, yes, mixed_string
+          if yes.nil?
+            yes = ! _is_negative_HU
+          else
+            @_is_negative_HU = ! yes
+          end
+
+          count = if numberish
+            write_count_for_inflection numberish
+          else
+            count_for_inflection
+          end
+
+          _verb_HU( mixed_string ).have_count( count ).have_polarity( yes ).to_string
+        end
+
+        def indef lemma_s
+
+          d = count_for_inflection
+
+          tail = _noun_HU( lemma_s ).have_count( d ).to_string
+
+          if 1 == d
+            "#{ An_[ lemma_s, d ] }#{ tail }"
+          else
+            tail
+          end
         end
 
         def n numberish=nil, mixed_string
 
           _d = numberish ? write_count_for_inflection( numberish ) : count_for_inflection
-          _noun_HU _d, mixed_string
+
+          _noun_HU( mixed_string ).have_count( _d ).to_string
         end
 
-        def _verb_HU count, yes=true, mixed_string
-          if mixed_string.respond_to? :id2name
-            __inflect_irregular_verb_HU count, yes, mixed_string
+        # -- these two
+
+        def _noun_HU mixed_s
+          MutableInflectedNoun_REDUX__.new mixed_s
+        end
+
+        def _verb_HU mixed
+          if mixed.respond_to? :id2name
+            Irregular_verbs__[].dereference( mixed ).duplicate
           else
-            __inflect_verb_hackily_HU count, yes, mixed_string
+            MutableInflectedVerb_REDUX___.new mixed
+          end
+        end
+      end
+
+      # ==
+
+      Irregular_verbs__ = Lazy_.call do
+
+        # just whatever:
+        #
+        #   - the only irregular verb we care about for now is "the copula"
+        #     (to be: "am", "is", "are", "was", "were")
+        #
+        #   - in practive we never need to produce procecurally weird
+        #     grammatical cases like subjunctive ("if it were") or
+        #     infinitive ("to be")
+        #
+        #   - in practice we never need first person or second person, only 3rd
+        #     (if we produce "I", "we" or "you", its count is not variable.)
+        #
+        #   - in practice the tense is never procedurally variable. (whether
+        #     the expression is in present tense or past tense (preterite)
+        #     is fixed in the code.)
+        #
+        #   - so which of the two tenses to start the mutable inflected verb
+        #     off as is determined by which of two surface forms is used to
+        #     reference the verb: `is` or `was`
+        #
+        #   - typically the only variable, then, is the count of the subject
+        #     but our `to_string` implementation is broader than that (but
+        #     only slightly).
+        #
+        #   - this amounts to a massive simplification of what the `POS`
+        #     library attempts which, in turn, is a massive simplification
+        #     of a robust EN natural language production system.
+
+        class TheCopula___ < Common_::SimpleModel
+
+          def to_string
+            if @is_positive
+              _to_string_before_polarity
+            else
+              "#{ _to_string_before_polarity }n't"  # see #cov2.2
+            end
+          end
+
+          def _to_string_before_polarity
+            if @is_preterite
+              if @is_plural
+                "were"
+              else
+                "was"
+              end
+            elsif @is_plural
+              "are"
+            else
+              "is"
+            end
           end
         end
 
-        def __inflect_irregular_verb_HU count, yes, sym
-          case sym
-          when :is ; ( 1 == count ? "is" : "are" ).tap { |s| yes or s << "n't" }
-          else ; never
+        class TheCopula___  # re-open
+
+          def initialize
+            @is_positive = true
+            @is_plural = false
+            @is_preterite = false
+            super
           end
+
+          def to_negative
+            redefine do |o|
+              o.have_polarity false
+            end
+          end
+
+          def redefine
+            otr = dup
+            yield otr
+            otr.freeze
+          end
+
+          def duplicate
+            dup
+          end
+
+          def have_polarity yes
+            @is_positive = yes ; self
+          end
+
+          def have_count d
+            @is_plural = 1 != d ; self
+          end
+
+          def be_preterite
+            @is_preterite = true ; self
+          end
+
+          attr_reader(
+            :is_preterite,
+          )
         end
 
-        def __inflect_verb_hackily_HU count, yes, mixed_string
+        the_copula = TheCopula___.define { }
+
+        oo = {}
+
+        oo[ :is ] = the_copula
+
+        oo[ :was ] = the_copula.redefine do |o|
+          o.be_preterite
+        end
+
+        irregs =  module IRREGULAR_VERBS___ ; self end
+        irregs.send :define_singleton_method, :dereference do |sym|
+          oo.fetch sym
+        end
+        irregs
+      end
+
+      # ==
+
+      # ==
+
+      class MutableInflectedVerb_REDUX___
+
+        def initialize lemma_s
+          @_to_string = :_to_string_when_infinitive_stem
+          @_frozen_lemma_string = lemma_s.freeze  # meh
+          @polarity = true
+        end
+
+        def have_count d
+          if 1 == d
+            be_singular
+          else
+            @_to_string = :_to_string_when_infinitive_stem
+          end
+          self
+        end
+
+        def be_singular
+          @_to_string = :__to_string_when_singular
+          self
+        end
+
+        def have_polarity yes
+          @polarity = yes ; self
+        end
+
+        def to_string
+          send @_to_string
+        end
+
+        def __to_string_when_singular
+
+          # "singular" = "inflect the verb for a singular subject noun phrase".
 
           # SUPER hacky: conjugate verbs for count with the exact same
           # underlying logic as we use for the noun hack:
           # 0: "nothing floofs"  1: "it floofs"  2: "they floof"
 
-          if yes
-            case 1 <=> count
-            when -1 ; _noun_HU 1, mixed_string  # ~2: they make
-            when  0 ; _noun_HU 2, mixed_string  #  1: it makes
-            when  1 ; _noun_HU 1, mixed_string  #  0: zero Xs make
-            else never
-            end
+          if @polarity
+            MutableInflectedNoun_REDUX__.
+              new( @_frozen_lemma_string ).
+              have_count( 3 ).
+              to_string
           else
-            case 1 <=> count
-            when -1 ; _noun_HU 2, mixed_string  # ~2: none of them makes
-            when  0 ; _noun_HU 1, mixed_string  #  1: it failed to make
-            when  1 ; _noun_HU 2, mixed_string  #  0: [ so nothing ] makes  # EEK
-            else never
-            end
+            self._COVER_ME__xx__
           end
         end
 
-        def _noun_HU count, mixed_string
+        def _to_string_when_infinitive_stem
+          if @polarity
+            @_frozen_lemma_string  # ..
+          else
+            self._COVER_ME__xx__
+          end
+        end
+
+        def is_preterite
+          FALSE
+        end
+      end
+
+      # ==
+
+      class MutableInflectedNoun_REDUX__
+
+        def initialize s
+          @mixed_string = s
+        end
+
+        def have_count d
+          @count = d ; self
+        end
+
+        def to_string
 
           # assume the argument noun is inflected for singular or plural,
           # and might be in all caps, and might have any number of modifier
@@ -204,13 +428,17 @@ module Skylab::Human
           # rudimentary morphological rules of EN, both to interpret the
           # argument string and to produce the result. YEEHAH hacktown
 
+          count = self.count || 3  # "i love elephants" not "i love elephant"
+          is_negative = self.is_negative
+          mixed_string = @mixed_string
+
           md = SING_PLUR_REGEX_HACK___.match mixed_string
 
           looks_plural = md.offset( :looks_plural ).first
           the_Y_category = md.offset( :the_Y_category ).first
           all_caps = md.offset( :all_caps ).first
 
-          if _is_negative_HU
+          if is_negative
             # (all hi.)
             case count <=> 1
             when -1 ; use_count = count  # none of the N foobrics frobulate
@@ -240,6 +468,18 @@ module Skylab::Human
             "#{ md.pre_match }#{ all_caps ? "S" : "s" }"
           end
         end
+
+        attr_reader(
+          :count,
+          :is_negative,
+        )
+      end
+
+      # ==
+
+      module Methods  # re-open
+
+        # -- write and read the exponents of grammatical categories
 
         attr_reader :_is_negative_HU
 
@@ -555,6 +795,12 @@ module Skylab::Human
       _SLL = -> x do  # set last length
         @__NLP_last_length__ = x ; nil
       end
+
+#==BEGIN NEW (again)
+
+
+
+#==END NEW (again)
     end
   end
 end

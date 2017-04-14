@@ -178,7 +178,7 @@
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
 
-[#045] #open TRANSITION NOTES for sunset brazen ..
+[#045] #open ween off brazen as framework
              ( #was: #moved-to: [#ze-054.1] )
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 
@@ -214,8 +214,15 @@
 [#032]       #parent-node: [#026] the entity scan narrative ..
 [#031]       #parent-node: [#026] the `retrieve` narrative ..
 [#030]       #parent-node: [#026] the `create` narrative ..
-[#029]       #parent-node: [#028] "a universal normal name convention.."
-[#028]       #parent-node: [#010] the collection actor narrative ...
+
+[#029]       entity collection for git config
+
+       #track :[#here.W.A]: datamapper-like instance isomorphicism
+
+             ( #moved-to: [#028.B] )
+
+[#028]       #parent-node: [#010] entity collection via git config ..
+
 [#027] #open #tracking the zero-configuration dream - one day, [br]-powered
                API's should need not define a 'Kernel' / 'Kernel_' nor have
                a dedicated 'API' file - just limit it to a singleton

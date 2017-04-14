@@ -24,7 +24,8 @@ module Skylab::Task::TestSupport
       end
     end
 
-    same = "transition from the state you are in, which is the A state."
+    same_inf = "transition from the state you are in, which is the A state."
+    same_sing = "transitions from the state you are in, which is the A state."
 
     context "(empty)" do
 
@@ -55,7 +56,7 @@ module Skylab::Task::TestSupport
 
         s_a = black_and_white_lines_of_ _em
         "'_the_empty_agent' requires nothing." == s_a.first || fail
-        "it does not #{ same }" == s_a.last || fail
+        "it does not #{ same_inf }" == s_a.last || fail
       end
 
       it "same as above but 2x subjects" do
@@ -67,7 +68,7 @@ module Skylab::Task::TestSupport
 
         s_a = black_and_white_lines_of_ _em
         s_a.first == "'_empty_agent_1' and '_empty_agent_2' require nothing." || fail
-        s_a.last == "neither or them #{ same }" || fail
+        s_a.last == "neither of them #{ same_sing }" || fail
       end
 
       def agent_

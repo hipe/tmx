@@ -149,7 +149,7 @@ module Skylab::Cull
 
       _r_cfg = remove_instance_variable :@cfg_for_read
 
-      bur = _r_cfg.byte_upstream_reference
+      bur = _r_cfg.document_byte_upstream_reference
 
       cfg = Brazen_::CollectionAdapters::GitConfig::Mutable.parse_document_by do |o|
         o.byte_upstream_reference = bur
@@ -260,14 +260,15 @@ module Skylab::Cull
       delete_these, change_the_name_of_this_one = ___all_become_one section_sym
 
       if delete_these
-        cfg.sections.DELETE_SECTIONS_VIA_SECTIONS delete_these
+        cfg.sections.delete_sections_via_sections delete_these
       end
 
       if change_the_name_of_this_one
         change_the_name_of_this_one.SET_SUBSECTION_NAME value_string
         section = change_the_name_of_this_one
       else
-        section = cfg.sections.touch_section value_string, section_sym
+        _section_name_s = section_sym.id2name  # ..
+        section = cfg.sections.touch_section value_string, _section_name_s
       end
 
       section and __via_section_and_box section, bx
@@ -331,7 +332,7 @@ module Skylab::Cull
         end
         UNABLE_
       else
-        a = cfg.sections.DELETE_SECTIONS_VIA_SECTIONS delete_these
+        a = cfg.sections.delete_sections_via_sections delete_these
         @on_event_selectively.call :info, :"deleted_#{ section_sym }" do
           bld_deleted_slotular a, section_sym
         end

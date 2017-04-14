@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable  # intro to this sizeable sub-project at [#008]
 
@@ -20,7 +20,7 @@ module Skylab::Brazen
         end
       end  # >>
 
-      # ==
+      # == models (short, common)
 
       class BlankLine_or_CommentLine_
 
@@ -28,6 +28,8 @@ module Skylab::Brazen
           @_frozen_line = frozen_line
           freeze
         end
+
+        private :freeze
 
         def unparse_into y
           y << @_frozen_line
@@ -62,9 +64,17 @@ module Skylab::Brazen
         def _is_atom_
           TRUE
         end
+
+        def _DUPLICATE_DEEPLY_
+          self
+        end
+
+        def _FREEZE_AS_DOCUMENT_ELEMENT_  # #testpoint only
+          self
+        end
       end
 
-      # ==
+      # == enhancement modules
 
       module TheSkipAndWhineMethods_
 
@@ -113,7 +123,7 @@ module Skylab::Brazen
         end
       end ; end
 
-      # ==
+      # == functions (short, common)
 
       DereferenceElement_via_NormalName_and_Collection_ = -> norm_sym, perf do
         el = perf._lookup_softly_no_unwrap_ norm_sym
@@ -124,6 +134,8 @@ module Skylab::Brazen
         end
       end
 
+      # ~
+
       LookupElementSoftlyNoUnwrap_via_NormalName_and_RelevantStream_ = -> norm_sym, st do
         begin
           el = st.gets
@@ -132,14 +144,29 @@ module Skylab::Brazen
         el
       end
 
-      # ==
+      # == magnet support
 
-      Deeply_duplicate_elements_ = -> orig_a do  # only used in testing
-        new_a = ::Array.new orig_a.length
-        orig_a.each_with_index do |x, d|
-          new_a[d] = orig_a.fetch( d )._DEEPLY_DUPLICATE_
+      class StatusAdded_
+
+        # (keep API close to `StatusFoundExisting___`)
+
+        def initialize did_add_to_end=nil, offset
+          @did_add_to_end = did_add_to_end
+          @offset = offset
         end
-        new_a
+
+        attr_reader(
+          :did_add_to_end,
+          :offset,
+        )
+
+        def did_add
+          TRUE
+        end
+
+        def found_existing
+          FALSE
+        end
       end
 
       # ==

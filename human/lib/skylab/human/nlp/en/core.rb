@@ -11,7 +11,7 @@ module Skylab::Human
         end
 
         def an lemma_x, d=nil
-          An__[ lemma_x, d ]
+          An_[ lemma_x, d ]
         end
 
         def both a
@@ -27,7 +27,7 @@ module Skylab::Human
         end
       end  # >>
 
-      An__ = -> do
+      An_ = -> do
 
         initial_vowel_rx = /\A[aeiou]/i
 
@@ -162,7 +162,7 @@ module Skylab::Human
         end.call
 
         o[ :an ] = -> s, d=nil do
-          s_ = An__[ s, d ]
+          s_ = An_[ s, d ]
           if s_
             "#{ s_ }#{ s }"
           else

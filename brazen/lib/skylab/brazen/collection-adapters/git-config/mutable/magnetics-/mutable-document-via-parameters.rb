@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CollectionAdapters::GitConfig
+  module CollectionAdapters::GitConfig
 
     module Mutable
 
@@ -57,7 +57,7 @@ module Skylab::Brazen
         def when_section_or_assignment_
 
           # as described in [#same] above, we don't know yet whether this is
-          # an section line or an assignment line. probably because an open
+          # a section line or an assignment line. probably because an open
           # square bracket is so distinctive, we first "peek" if the current
           # line looks like it is a section line, and if it looks like it is
           # we continue trying to parse it as one; otherwise we assume it is
@@ -131,14 +131,20 @@ module Skylab::Brazen
       class MutableDocument___
 
         def initialize bur
-          @DOCUMENT_BYTE_UPSTREAM_REFERENCE = bur
+          @document_byte_upstream_reference = bur
           @_elements_ = []
         end
+
+        # ~ ( avoid accidentally calling these - use the custom ones below #here1
+        undef_method :dup
+        private :freeze
+        # ~ )
 
         # -- write
 
         def accept_section_ sect
-          @_elements_.push sect ; nil
+          @_elements_.push sect
+          ACHIEVED_  # #covenience
         end
 
         def add_comment str
@@ -153,6 +159,10 @@ module Skylab::Brazen
         end
 
         # -- read
+
+        def to_section_stream  # seems to be a thing, #cov2.2
+          sections.to_stream_of_sections
+        end
 
         def sections
           @___sections_facade ||= This_::Models_::MutableSectionOrSubsection::SectionsFacade.new @_elements_
@@ -214,7 +224,7 @@ module Skylab::Brazen
 
         def description_under expag
           self._COVER_ME__this_used_to_be_this__
-          @DOCUMENT_BYTE_UPSTREAM_REFERENCE.description_under expag
+          @document_byte_upstream_reference.description_under expag
         end
 
         def DOCUMENT_IS_EMPTY  # [cu] only. meh
@@ -222,13 +232,19 @@ module Skylab::Brazen
         end
 
         attr_reader(
-          :DOCUMENT_BYTE_UPSTREAM_REFERENCE,
+          :document_byte_upstream_reference,
         )
 
-        def DEEPLY_DUPLICATE___  # #testpoint only
-          new = self.class.allocate
-          new.instance_variable_set :@_elements_, Deeply_duplicate_elements_[ @_elements_ ]
-          new
+        def freeze_as_mutable_document___  # #testpoint only. :#here1
+          @_elements_.each( & :_FREEZE_AS_DOCUMENT_ELEMENT_ )
+          @document_byte_upstream_reference.freeze
+          freeze
+        end
+
+        def DUPLICATE_DEEPLY_AS_MUTABLE_DOCUMENT_  # #testpoint only
+          otr = self.class.allocate
+          otr.instance_variable_set :@_elements_, @_elements_.map( & :_DUPLICATE_DEEPLY_ )
+          otr
         end
       end
 

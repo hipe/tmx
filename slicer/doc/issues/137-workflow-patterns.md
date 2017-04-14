@@ -53,6 +53,7 @@ first, let's consider an intuitive order before we present our argument
 for the counter-intuitive order:
 
 
+
 ### the intuitive order (that's actually sub-optimal)
 
 a "narrative" order for "CRUD" is suggested by the letters of the
@@ -69,7 +70,8 @@ this narrative justification is both cute and may have some practical
 value. indeed we have written as much *maybe* in the commit messages
 long ago.
 
-HOWEVER we now have a stronger rational for a different suggested order:
+HOWEVER we now have a stronger rationale for a different suggested order:
+
 
 
 ### the counter-intuitive order (that's actually pro-optimal) is:

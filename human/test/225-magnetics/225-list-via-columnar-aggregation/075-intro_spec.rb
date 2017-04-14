@@ -28,7 +28,7 @@ module Skylab::Human::TestSupport
         su
       end
 
-      it "builds" do  # #cov1.6
+      it "builds" do  # :#cov1.6
         subject
       end
 

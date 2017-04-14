@@ -69,7 +69,9 @@
 [#140]       #parent-node:[#137] off-lining and on-lining ..
 [#139]       #parent-node:[#140] "un-refactor.."
 [#138]       #parent-node:[#137] "the golden plow.."
+
 [#137]       #doc-node: workflow patterns ..
+
 [#136]       #parent-node: [#137] "the golden two-step.."
 [#135]       #facility-tracker: #exit-statuses
 [#134]       #classification-tracker: nodes that are known "islands" - known

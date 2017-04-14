@@ -21,7 +21,9 @@
                this would replace whatever all that other stuff is.
                (one in [hu] too)
 [#062]       the box struct proxy narrative ..
+
 [#061]       the box narrative ..
+
 [#060]       the name narrative ..
 [#059]       [ bound call ]
              ( #was: #done #parent-node: [#016] "signal processing scans.." ) )

@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Module::As::Collection
+  class Module::OperatorBranch_via_Module
 
     # :+#by: [f2]
 

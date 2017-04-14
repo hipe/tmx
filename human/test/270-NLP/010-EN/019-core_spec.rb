@@ -4,7 +4,7 @@ describe "[hu] NLP EN - core" do  # :#spot1.2
 
   context "s" do
 
-    # ( has a counterpart test in #spot1.4 )
+    # ( has a counterpart test in #cov2.0 )
 
     o = -> a, n, so, *t do
       it "#{ so }", *t do
