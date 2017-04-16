@@ -2,89 +2,197 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - starter get", wip: true do
+  describe "[tm] operations - starter get" do
+
+    # (the counterpart code node (file) explains the many (~9) predictable
+    # kinds of failures that can occur even for such a simple operation.)
+    # (:#cov2.2 is all the tests in this file.)
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
+    # (1/N)
     it "'workspace_path' is required (currently)" do
-      call_API :starter, :get
-      expect_event COMMON_MISS_ do |ev|
-        ev.to_event.reasons.first.name_symbol.should eql :workspace_path
+
+      call_API(
+        * _subject_action,
+      )
+
+      expect :error, COMMON_MISS_ do |ev|
+        ev.to_event.reasons.first == :workspace_path
       end
-      expect_fail
-    end
-
-    it "when workspace path is illegitimate" do
-
-      use_empty_ws
-
-      call_API :starter, :get,
-        :workspace_path, @ws_pn.join( 'xxx' ).to_path
-
-      expect_event :start_directory_is_not_directory
 
       expect_fail
     end
 
-    it "when workspace path does not have config filename" do
+    # (2/N)
+    it "when workspace path is noent" do
 
-      use_empty_ws
+      workspace_path = the_no_ent_directory_
 
-      call_API :starter, :get,
-        :workspace_path, @ws_pn.to_path
+      call_API(
+        * _subject_action_plus,
+        :workspace_path, workspace_path,
+      )
 
-      expect_event :resource_not_found
+      expect :error, :start_directory_is_not_directory
 
       expect_fail
     end
 
+    # (3/N)
+    context "when workspace path does not have config filename (check real default)" do
+
+      # :#cov2.1 (this one default)
+
+      it "invokes" do
+        _tuple || fail
+      end
+
+      it "config filename was same as REAL default" do
+        _event.file_pattern_string_or_array == Home_::Config_filename_[] || fail
+      end
+
+      it "config filename was SAME STRING INSTANCE as real default (OCD)" do
+        _event.file_pattern_string_or_array.object_id == Home_::Config_filename_[].object_id || fail
+      end
+
+      def _event
+        _tuple.first
+      end
+
+      shared_subject :_tuple do
+
+        workspace_path = the_empty_esque_directory_
+
+        call_API(
+          * _subject_action,
+          :workspace_path, workspace_path,
+        )
+
+        a = []
+        expect :error, :resource_not_found do |ev|
+          a.push ev
+        end
+
+        expect_fail
+        a
+      end
+    end
+
+    # (4/N)
     it "when workspace does not have entity" do
 
-      prepare_ws_tmpdir <<-O.unindent
-        --- /dev/null
-        +++ b/#{ cfn }
-        @@ -0,0 +1 @@
-        +[ whatever ]
-      O
+      workspace_path = path_for_workspace_005_with_just_a_config_
 
-      call_API :starter, :get,
-        :workspace_path, @ws_pn.to_path, :config_filename, cfn
+      call_API(
+        * _subject_action_plus,
+        :workspace_path, workspace_path,
+      )
 
-      _em = expect_not_OK_event :component_not_found
-
-      black_and_white( _em.cached_event_value ).should eql(
-        'in workspace config there are no starters' )
+      expect :error, :expression, :component_not_found do |y|
+        y == [ "no starter is set in config" ] || fail
+      end
 
       expect_fail
     end
 
-    it "when workspace has multiple entities, none of which exist" do
+    # ( note: (5/N) tested a case where multiple starters were indicated
+    #         in the config. we have since changed the means of storage
+    #         from being as a section to as an assignment (but we could be
+    #         compelled to change it back). anyway for now, we don't care
+    #         about this case (although there could be multiple assigments,
+    #         and in such cases we don't know which it would take.
+    #         the original test case description:
+    #             "when workspace has multiple entities, none of which exist"
+    #         #history-A.
 
-      prepare_ws_tmpdir <<-HERE.unindent
-        --- /dev/null
-        +++ b/#{ cfn }
-        @@ -0,0 +1,2 @@
-        +[ starter "holodeck" ]
-        +[ starter "holy-derp.dot" ]
-      HERE
+    # (6/N)
+    context "when workspace has entity, but is noent" do
 
-      call_API :starter, :get,
-        :workspace_path, @ws_pn.to_path, :config_filename, cfn
+      # #lends-coverage to [#sy-008.4]
 
-      _em = expect_neutral_event :single_entity_resolved_with_ambiguity
+      it "invokes, doesn't fail" do
+        _tuple || fail
+      end
 
-      black_and_white( _em.cached_event_value ).should eql(
-        'in config there is more than one starter. using the last one.' )
+      it "results in the INVALID starter item structure" do
+        _sct = _tuple.first
+        _sct.normal_symbol == :this_starter_does_not_exist || fail
+      end
 
-      ent = @result
-      ent.class.name_function.as_human.should eql 'starter'
-      ent.natural_key_string.should eql 'holy-derp.dot'
+      it "emits an informational message about this invalidity (note it's all on one line because aesthetics)" do
 
+        # (#fragile-test: relies on ordering of filesystem)
+
+        _lines = _tuple.last
+
+        expect_these_lines_in_array_ _lines do |y|
+          y << 'unknown item: "this-starter-does-not-exist". expecting digraph, holy-smack or minimal'
+        end
+      end
+
+      shared_subject :_tuple do
+
+        workspace_path = path_for_fixture_workspace_ '020-starter-is-no-ent'
+
+        call_API(
+          * _subject_action_plus,
+          :workspace_path, workspace_path,
+        )
+
+        lines = nil
+        expect :info, :expression, :parse_error, :business_item_not_found do |y|
+          lines = y
+        end
+
+        _result = execute
+        [ _result, lines ]
+      end
+
+      def expression_agent
+
+        # (just to see how the CLI expag expresses an expression like this.)
+
+        Home_::No_deps_[]::CLI_InterfaceExpressionAgent.instance
+      end
     end
 
+    # (7/N) lookin' good my scrollies - NOTE there was no corresponding
+    # test for this case in the original flowriginal
+
+    context "when everything is OK" do
+
+      it "invokes, doesn't fail" do
+        _tuple || fail
+      end
+
+      it "results in the VALID starter item structure (indistinguishable from invalid)" do
+        _sct = _tuple.first
+        _sct.normal_symbol == :holy_smack || fail
+      end
+
+      shared_subject :_tuple do
+
+        workspace_path = path_for_fixture_workspace_ '025-starter-is-OK'
+
+        call_API(
+          * _subject_action_plus,
+          :workspace_path, workspace_path,
+        )
+        _result = execute
+        [ _result ]
+      end
+    end
+
+    # ==
+
+    if false  # (this is on the stack)
     context "apply -" do
 
+      # (6/N)
       it "go to it - when file does not exist" do
 
         prepare_ws_tmpdir <<-O.unindent
@@ -108,6 +216,7 @@ module Skylab::TanMan::TestSupport
         expect_no_more_events
       end
 
+      # (7/N)
       it "go to it - when file does exists" do
 
         prepare_ws_tmpdir <<-O.unindent
@@ -137,18 +246,24 @@ module Skylab::TanMan::TestSupport
 
       end
     end
+    end  # if false
 
-    def _IO_spy
-      @IO_spy ||= bld_IO_spy
+    # ==
+
+    def _subject_action_plus
+      [ * _subject_action, :config_filename, cfn ]
     end
 
-    def bld_IO_spy
-      TestSupport_::IO.spy(
-        :do_debug_proc, -> { do_debug },
-        :debug_IO, debug_IO,
-        :puts_map_proc, -> s do
-          "« dbg: #{ s } »"  # #guillemets
-        end )
+    def _subject_action
+      X_oper_starter_get_THIS_ACTION
     end
+
+    # ==
+
+    X_oper_starter_get_THIS_ACTION = [ :starter, :get ]
+
+    # ==
+    # ==
   end
 end
+# :#history-A.1: [br] ween, tombstone some tests, move others.

@@ -1,8 +1,24 @@
 module Skylab::TanMan
 
-  class Models_::Starter  # re-opening
+  module Models_::Starter
 
-    if false
+    # the "silos" "starter" and "graph" have this in common:
+    #
+    #   - both are represented in the config, and both are represented
+    #     similarly. a single {graph|starter} is "selected", which means
+    #     that some representation of a filesystem path is stored to the
+    #     config, as a [#br-009] "assignment line".
+    #
+    #   - as such, both can be "unresolvable references", i.e. the config
+    #     can have a path that does not have a referent on the filesystem.
+    #
+    # and then:
+    #
+    #   - starters (unlike graphs) can "splay", meaning we can list the
+    #     available doo-hahs. (we could try to do this for graphs too
+    #     with some kind of clever globbing etc but meh.)
+
+  if false  # #open [#007.D.1] (on stack)
 
     edit_entity_class(
       :persist_to, :starter,
@@ -33,30 +49,6 @@ module Skylab::TanMan
 
         def entity_collection
           # sanity
-        end
-      end
-
-      Ls = make_action_class :List do
-
-        edit_entity_class :preconditions, EMPTY_A_
-
-        def entity_collection
-          @___col ||= Build_collection__[ @kernel, & @on_event_selectively ]
-        end
-      end
-
-      class Get < Action_
-
-        edit_entity_class :preconditions, [ :workspace, :starter ]
-
-        include Brazen_::Actionesque::Factory::Retrieve_Methods
-
-        def produce_result
-          produce_one_entity do | * sym_a, & ev_p |
-            @on_event_selectively.call( * sym_a ) do
-              ev_p[].new_inline_with :invite_to_action, [ :starter, :set ]
-            end
-          end
         end
       end
     end
@@ -263,6 +255,8 @@ module Skylab::TanMan
     end
 
     Here_ = self
-    end
+  end  # if false
+
   end
 end
+# #history-A: broke out `list` and `get`

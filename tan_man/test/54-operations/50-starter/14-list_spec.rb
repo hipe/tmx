@@ -2,27 +2,63 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - starter list", wip: true do
+  describe "[tm] operations - starter list" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
-    it "lists the two items, from the filesystem" do
+    context "(ok)" do
 
-      call_API :starter, :ls
+      it "produces a result" do
+        _result || fail
+      end
 
-      expect_no_events
+      it "the result (a stream) has every item in the pool of expected items" do
+        _missing_and_extra.first.length.zero? || fail
+      end
 
-      st  = @result
+      it "the result (a stream) doesn't have any items outside of the expected items" do
+        _missing_and_extra.last && fail
+      end
 
-      st.gets.natural_key_string.should eql 'digraph.dot'
+      # ===
 
-      st.gets.natural_key_string.should eql 'holy-smack.dot'
+      shared_subject :_missing_and_extra do
 
-      st.gets.natural_key_string.should eql 'minimal.dot'
+        extra = nil
 
-      st.gets.should be_nil
+        pool = {
+          "digraph.dot" => true,
+          "holy-smack.dot" => true,
+          "minimal.dot" => true,
+        }
 
+        st = _result
+        begin
+          item = st.gets
+          item || break
+          _had = pool.delete item.natural_key_string
+          _had && redo
+          ( extra ||= [] ).push item
+          redo
+        end while above
+
+        [ pool, extra ]
+      end
+
+      # ===
+
+      shared_subject :_result do
+
+        call_API(
+          :starter, :ls,
+        )
+
+        execute
+      end
     end
   end
 end
+# #history-A: full rewrite during [br] ween

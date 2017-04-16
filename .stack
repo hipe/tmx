@@ -26,6 +26,7 @@ finish what you started with expag (somewhere)
 explain MTk and associate the explanation with its nodes
 API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
+`make_action_class` and related: liquidate this. (push back as necessary)
 (many `if false` in [tm])
 (silo: hear)
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
@@ -56,4 +57,7 @@ TD tan_man/test/54-operations/42-graph/44-use_spec.rb
 [tm] "DON'T YOU .. FORGET ABOUT ME" (the "use" action parts that need starter silo)
 brazen/doc/issues/028-entity-collection-via-git-config.md - needs EDIT but wait till better integrated
 the whole starter silo
+(get rid of this chunk related to starters: [#007.D.1] )
+(get rid of this chunk related to starters: [#007.D.2] )
+#open [#tm-097] abstract when an expected primitive is not found in config
 give "lines" action its own test file (there's enough work there)

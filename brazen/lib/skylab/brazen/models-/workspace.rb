@@ -280,11 +280,26 @@ module Skylab::Brazen
       #
       # (this absorbed `Workspace_via_ConfigFileInquiry` #history-B.2)
 
+      def initialize
+        @_mutex_for_etc = nil
+        super
+      end
+
       def do_this_with_mutable_workspace & p
 
+        remove_instance_variable :@_mutex_for_etc
         @_maybe_write_new_document = :__probably_write_new_document
         @_resolve_document = :__resolve_document_mutable
-        @need_mutable_not_immutable = true
+        @_mutable_not_immutable = true
+        @_do_this_with_workspace = p ; nil
+      end
+
+      def do_this_with_immutable_workspace & p
+
+        remove_instance_variable :@_mutex_for_etc
+        @_maybe_write_new_document = :__no_new_document_to_write
+        @_resolve_document = :__resolve_document_immutable
+        @_mutable_not_immutable = false
         @_do_this_with_workspace = p ; nil
       end
 
@@ -315,16 +330,24 @@ module Skylab::Brazen
         remove_instance_variable :@__mixed_user_result
       end
 
-      def __release_locked_resource
-        remove_instance_variable( :@writable_locked_IO ).close
-          # :#here2, #release-locked-file
+      def __release_locked_resource  # :#here2, #release-locked-file
+
+        if @_mutable_not_immutable
+          remove_instance_variable( :@writable_locked_IO ).close
+        else
+          remove_instance_variable( :@read_only_locked_IO ).close
+        end
         NIL
       end
 
       # -- D. write document
 
       def __maybe_write_new_document
-        send @_maybe_write_new_document
+        if @_mutable_not_immutable
+          __probably_write_new_document
+        else
+          ACHIEVED_
+        end
       end
 
       def __probably_write_new_document
@@ -396,16 +419,32 @@ module Skylab::Brazen
 
       def __resolve_document_mutable
 
-        _GitConfig = Home_::CollectionAdapters::GitConfig
-
-        _doc = _GitConfig::Mutable.parse_document_by do |o|
+        doc = Git_config__[]::Mutable.parse_document_by do |o|
           o.upstream_IO = @writable_locked_IO
           o.listener = @listener
         end
 
-        # doc yes: #cov1.5. doc no: #cov1.4.
+        if doc  # #cov1.5
+          @_read_muta = :__mutable_document_instance
+          @mutable_document = doc ; true
+        else  # #cov1.4
+          doc
+        end
+      end
 
-        _store :@mutable_document, _doc
+      def __resolve_document_immutable
+
+        doc = Git_config__[].parse_document_by do |o|
+          o.upstream_IO = @read_only_locked_IO
+          o.listener = @listener
+        end
+
+        if doc
+          @_read_immuta = :__immutable_document_instance
+          @immutable_document = doc ; true
+        else
+          doc
+        end
       end
 
       # -- A. locate and open config file
@@ -418,7 +457,7 @@ module Skylab::Brazen
 
         inq = Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
           o.path_head = @workspace_path
-          o.need_mutable_not_immutable = @need_mutable_not_immutable
+          o.need_mutable_not_immutable = @_mutable_not_immutable
           o.max_num_dirs_to_look = @max_num_dirs_to_look
           o.path_tail = @config_filename
           o.filesystem = @filesystem
@@ -427,8 +466,7 @@ module Skylab::Brazen
 
         if inq.file_existed
 
-          _be_muta = remove_instance_variable :@need_mutable_not_immutable
-          if _be_muta
+          if @_mutable_not_immutable
             @writable_locked_IO = inq.locked_IO
           else
             @read_only_locked_IO = inq.locked_IO
@@ -447,13 +485,23 @@ module Skylab::Brazen
         UNABLE_
       end
 
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      # -- read (by client)
 
-      # --
+      def mutable_document
+        send @_read_muta
+      end
 
-      attr_reader(
-        :mutable_document,
-      )
+      def __mutable_document_instance
+        @mutable_document
+      end
+
+      def immutable_document
+        send @_read_immuta
+      end
+
+      def __immutable_document_instance
+        @immutable_document
+      end
     end
 
     # ==
@@ -579,7 +627,7 @@ module Skylab::Brazen
 
     # ==
 
-    Git_config__ = Lazy_.call do
+    Git_config__ = Lazy_.call do  # 4x
       Home_::CollectionAdapters::GitConfig
     end
 

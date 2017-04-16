@@ -165,16 +165,11 @@ module Skylab::TanMan
 
       def with_mutable_workspace_
 
-        # assume these variables are ours for consumption:
+        # assume these variables are ours for consumption (:#spot1.2):
 
-        _mnd = remove_instance_variable :@max_num_dirs_to_look
-        _wsp = remove_instance_variable :@workspace_path
-        _cfn = remove_instance_variable :@config_filename
         _dry = remove_instance_variable :@dry_run
 
-        _mag = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics::Workspace_via_Request
-
-        _ = _mag.call_by do |o|
+        _ = _with_mutable_or_immutable_workspace_MO do |o|
 
           o.do_this_with_mutable_workspace do |ws|
             @_mutable_workspace_ = ws
@@ -183,18 +178,45 @@ module Skylab::TanMan
             x
           end
 
+          o.is_dry_run = _dry
+        end
+
+        _ || NIL  # #downgrade-from-false
+      end
+
+      def with_immutable_workspace_
+
+        _with_mutable_or_immutable_workspace_MO do |o|
+
+          o.do_this_with_immutable_workspace do |ws|
+            @_immutable_workspace_ = ws
+            x = yield
+            remove_instance_variable :@_immutable_workspace_
+            x
+          end
+        end
+      end
+
+      def _with_mutable_or_immutable_workspace_MO
+
+        _mnd = remove_instance_variable :@max_num_dirs_to_look
+        _wsp = remove_instance_variable :@workspace_path
+        _cfn = remove_instance_variable :@config_filename
+
+        _mag = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics::Workspace_via_Request
+        _ = _mag.call_by do |o|
+
+          yield o
+
           o.config_filename = _cfn
           o.max_num_dirs_to_look = _mnd
           o.workspace_path = _wsp
-          o.is_dry_run = _dry
           o.filesystem = _invocation_resources_.filesystem
           o.listener = _listener_
         end
 
         _ || NIL  # #downgrade-from-false
       end
-
-      # define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       def _simplified_write_ k, x
         instance_variable_set :"@#{ k }", x
@@ -438,6 +460,8 @@ module Skylab::TanMan
   end
 
   class Models_::Starter < Model_
+
+    self._SUNSET_THIS_CLASS  # #open [#007.D.2] (on stack)
 
     @after_name_symbol = :meaning
 

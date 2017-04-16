@@ -147,6 +147,8 @@
 
 [#007]       small internal tracking
 
+             :[#here.D]: tiny stack items
+
              :[#here.C]: what we're calling "sub-invocations"
 
              :[#here.B]: #watch track all non-primitive values still used in

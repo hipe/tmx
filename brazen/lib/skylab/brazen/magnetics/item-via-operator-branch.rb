@@ -1,29 +1,62 @@
 module Skylab::Brazen
 
-  class Magnetics::Item_via_OperatorBranch < Common_::MagneticBySimpleModel
+  class Magnetics::Item_via_OperatorBranch < Common_::MagneticBySimpleModel  # :[#085]
 
-  if false
-  module Collection
+    #   - for the familiar (and now universal) interface of an operator
+    #     branch, we want to offer this as default implementation of
+    #     `procure`, which is like a `lookup_softly` that takes a listener
+    #     and emits an emission suitable for UI on failure.
+    #
+    #   - really this doesn't do much other than wrap a call to
+    #     `lookup_softly` that leverages another magnetic on failure.
 
-    Model_ = Home_::Model
-
-    Action = Home_::Action
-
-    class Actor
-    private
-
-      def via_entity_resolve_model_class
-        @model_class = @entity.class ; nil
+    # -
+      def initialize
+        @primary_channel_symbol = nil
+        super
       end
 
-      def via_entity_resolve_entity_identifier
-        @entity_identifier = @entity.class.node_identifier.
-          with_local_entity_identifier_string @entity.natural_key_string  # #todo - is this covered
-        ACHIEVED_
+      attr_writer(
+        :listener,
+        :needle_item,
+        :operator_branch,
+        :primary_channel_symbol,
+      )
+
+      def execute
+
+        lr = @operator_branch.lookup_softly @needle_item.normal_symbol
+          # (might change the above to pass the whole item)
+          # ("lr" stands for "loadable reference")
+
+        if ! lr
+          __when
+        end
+        lr
       end
-    end
-  end
-  end
+
+      def __when
+
+        Home_.lib_.zerk::ArgumentScanner::When::UnknownBranchItem.call_by do |o|
+
+          o.strange_value_by = -> do
+            @needle_item.normal_symbol
+          end
+
+          o.available_item_internable_stream_by = -> do
+            @operator_branch.to_loadable_reference_stream  # ..
+          end
+
+          o.shape_symbol = :business_item
+          o.terminal_channel_symbol = :business_item_not_found
+          o.primary_channel_symbol = @primary_channel_symbol  # nil OK
+          o.listener = @listener
+        end
+        NIL
+      end
+    # -
+
+    # ==
 
     class FYZZY
 
@@ -202,6 +235,10 @@ module Skylab::Brazen
         UNABLE_
       end
     end
+
+    # ==
+    # ==
   end
 end
+# #tombstone-B (can be temporary) "collection actor"
 # #history: "byte stream identifiers" extracted from here to [ba]
