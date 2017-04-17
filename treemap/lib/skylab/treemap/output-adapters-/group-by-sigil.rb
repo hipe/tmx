@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class Output_Adapters_::Group_by_Sigil
+  class Output_Adapters_::GroupBySigil
 
     # (this is a one-off for debugging a strange case,
     # as well as being a frontier-pusher for the new [tr].)

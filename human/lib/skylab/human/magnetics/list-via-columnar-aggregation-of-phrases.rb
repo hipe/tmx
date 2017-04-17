@@ -93,9 +93,9 @@ module Skylab::Human
 
       def when_extra_field_template_variables
 
-        _ev = build_not_OK_event_with :extra_properties,
-            :name_i_a, [ current_iambic_token ],
-            :expecting_i_a, @nucleus.name_i_a,
+        _ev = build_not_OK_event_with :item_not_found,
+            :name_symbols, [ current_iambic_token ],
+            :expecting_symbols, @nucleus.name_symbols,
             :error_category, :argument_error do |y, o|
 
           s_a = o.name_i_a.map do |i|

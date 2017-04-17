@@ -6,52 +6,55 @@ module Skylab::Zerk
 
     oes_p = ada.UI_event_handler
 
-    o = Begin_fuzzy_retrieve_[]
+    _qkn = Common_::QualifiedKnownness.via_value_and_symbol s, :argument  # ..
 
-    # -- setup
+    _ = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
 
-    o.qualified_knownness = Common_::Qualified_Knownness.
-      via_value_and_symbol( s, :argument )  # ..
-        # against this string
+      # -- setup
 
-    o.stream_builder = -> do
-      # of this stream of objects..
+      o.qualified_knownness = _qkn  # needle
 
-      ada.to_stream_for_resolving_buttonesque_selection
-    end
+      o.item_stream_by do  # haystack
 
-    o.name_map = -> bsque do
-      # use this string to compare it to the input ..
+        ada.to_stream_for_resolving_buttonesque_selection
+      end
 
-      bsque.hotstring_to_resolve_selection
-    end
+      o.string_via_item_by do |buttonesque|
 
-    o.be_case_sensitive = true  # we care about the difference
+        # to compare a button to the input, derive a string from the button in this way
 
-    # -- resultage
+        buttonesque.hotstring_to_resolve_selection
+      end
 
-    o.success_map = -> bsque do
-      bsque.loadable_reference
-    end
+      o.levenshtein_number = LEVENSHTEIN_NUMBER_  # see
 
-    o.on_event_selectively = -> * i_a, & ev_p do
+      o.will_be_case_sensitive  # we care about the difference
 
-      # because the outstream is oldchool, we've got to be *sure* that
-      # the result from the callback here is false on error (nowadays
-      # we treat it as `UNRELIABLE_`)
+      # -- result & related
 
-      x = oes_p[ * i_a, & ev_p ]
+      o.result_via_found_by do |buttonesque|
 
-      if :error == i_a.first  # then result is
-        :_unreliable_ == x or self._SANITY
-        UNABLE_
-      else
-        self._INFO_from_button?
+        buttonesque.loadable_reference
+      end
+
+      o.listener = -> * i_a, & ev_p do
+
+        # because the outstream is oldchool, we've got to be *sure* that
+        # the result from the callback here is false on error (nowadays
+        # we treat it as `UNRELIABLE_`)
+
+        x = oes_p[ * i_a, & ev_p ]
+
+        if :error == i_a.first  # then result is
+          :_unreliable_ == x or self._SANITY
+          UNABLE_
+        else
+          self._INFO_from_button?
+        end
       end
     end
 
-    _ = o.execute
-    _
+    _  # hi.
   end
 
   end

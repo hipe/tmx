@@ -645,24 +645,28 @@ module Skylab::Zerk
           # "did you mean (..)"-style emission. result is the found nerp
           # or false.
 
-          o = Begin_fuzzy_retrieve_[ & @_oes_p ]
+          nt = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
 
-          _m = APPROPRIATE_STREAMER___.fetch @set_sym
+            _m = APPROPRIATE_STREAMER___.fetch @set_sym
 
-          o.stream_builder = @services.send _m
+            o.item_stream_proc = @services.send _m
 
-          o.name_map = -> qk do
-            qk.name.as_slug
+            o.string_via_item_by do |node_ref|
+              node_ref.name.as_slug
+            end
+
+            o.set_qualified_knownness_value_and_name @token, Node_Name___[]
+
+            svcs = @services
+            o.suffixed_contextualization_message_proc = -> y, _o do
+              svcs._suffixed_context_into_under y, self
+            end
+
+            o.levenshtein_number = LEVENSHTEIN_NUMBER_  # see
+
+            o.listener = @_oes_p
           end
 
-          o.set_qualified_knownness_value_and_name @token, Node_Name___[]
-
-          svcs = @services
-          o.suffixed_contextualization_message_proc = -> y, _o do
-            svcs._suffixed_context_into_under y, self
-          end
-
-          nt = o.execute
           if nt
             send INIT_FORMAL_NODE___.fetch( nt.node_reference_category ), nt
           else

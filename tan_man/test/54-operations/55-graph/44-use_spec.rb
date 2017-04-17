@@ -249,6 +249,7 @@ module Skylab::TanMan::TestSupport
       it "invokes; result is nothing interesting" do  # :#cov1.5
         a = _tuple.last
         a.first == :_result_from_use_TM_ || fail
+        a.last == "i-exist/like-a-boss.dog" || fail
       end
 
       it "this first event talks about .." do
@@ -260,7 +261,7 @@ module Skylab::TanMan::TestSupport
       it "this second event talks about .." do
         _ev = _tuple[ -2 ]
         _content = black_and_white _ev
-        _content =~ /\Acreated tm-conferg\.file \(\d+ bytes\)\z/ or fail
+        _content =~ /\Aupdated tm-conferg\.file \(\d+ bytes\)\z/ or fail
       end
 
       it "content of config file looks good" do

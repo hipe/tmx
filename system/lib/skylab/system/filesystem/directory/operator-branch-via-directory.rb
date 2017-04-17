@@ -16,7 +16,10 @@ module Skylab::System
         @_do_construct_item_scanner_producer = true  # (not method reference so we can yield #here3)
         @_mutex_for_startingpoint = nil
 
+        @item_lemma_symbol = nil
+
         yield self
+
         @filesystem_for_globbing ||= Home_.services.filesystem
       end
 
@@ -83,6 +86,7 @@ module Skylab::System
       attr_writer(
         :descriptive_name_symbol,
         :filesystem_for_globbing,
+        :item_lemma_symbol,
       )
 
       # -- read
@@ -182,8 +186,13 @@ module Skylab::System
       # ~
 
       def procure_by
+
         Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_OperatorBranch.call_by do |o|
+
+          o.item_lemma_symbol = @item_lemma_symbol  # can be nil ; do this before below to allow per-call customization
+
           yield o
+
           o.operator_branch = self
         end
       end

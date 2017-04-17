@@ -17,7 +17,7 @@ module Skylab::Cull::TestSupport
 
       freshly_initted_against "zoidberg:no see"
 
-      _em = expect_not_OK_event_ :extra_properties
+      _em = expect_not_OK_event_ :unrecognized_argument
 
       black_and_white_lines( _em.cached_event_value ).should eql(
         [ 'unrecognized prefix "zoidberg"', 'did you mean "file"?' ] )

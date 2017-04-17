@@ -14,22 +14,28 @@ module Skylab::Treemap::TestSupport
 
       _path = Fixture_file_[ 'eg-050-small-representative-sample' ]
 
-      io = TS_.string_IO.new
+      stdin = Home_.lib_.system.test_support::STUBS.interactive_STDIN_instance
+      stdout = TS_.string_IO.new
+      stderr = :_stderr_not_called_TR_
 
-      call_API :session,
+      call_API(
+        :session,
         :upstream_reference, _path,
-        :stdin, Home_.lib_.system.test_support::STUBS.interactive_STDIN_instance,
-        :stdout, io,
-        :stderr, :_no_stderr_,
-        :output_adapter, 'group-by-sigi'
+        :stdin, stdin,
+        :stdout, stdout,
+        :stderr, stderr,
+        :output_adapter, 'group-by-sigi',
+      )
 
       expect_succeed
-      scn = TestSupport_::Expect_Line::Scanner.via_string io.string
 
-      scn.next_line.should eql "[ab]...(3)\n"
-      scn.next_line.should eql "[cd].(1)\n"
-      scn.next_line.should eql "(4 tests over 2 sigil changes)\n"
-      scn.next_line.should be_nil
+      stdout.rewind
+
+      expect_these_lines_in_array_with_trailing_newlines_ stdout do |y|
+        y << '[ab]...(3)'
+        y << '[cd].(1)'
+        y << '(4 tests over 2 sigil changes)'
+      end
     end
   end
 end

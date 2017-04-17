@@ -57,19 +57,12 @@ module Skylab::TanMan
 
         def __write_path_to_workspace
 
+          # #history-A.3: abstracted most of this away into new workspace class
           # #history-A.2: changed this to assume we are inside of a session
 
           _path = _current_unsanitized_absolute_path
 
-          _doc = @mutable_workspace.mutable_document
-
-          _sect = _doc.sections.touch_section "digraph"
-
-          _ok = _sect.assign _path, :path, & @listener
-
-          # #open [#tm-008.XXX] - make the above localized to be an asset path
-
-              # (this form gets you no emission:) _sect[ :path ] = path
+          _ok = @mutable_workspace.write_digraph_asset_path_ _path, :path, & @listener
 
           _ok  # hi. #todo
         end
@@ -184,7 +177,7 @@ module Skylab::TanMan
           NIL
         end
 
-        # -- b. digraph paths must either already exist or have an extension.
+        # -- B. digraph paths must either already exist or have an extension.
         #       if a path is provided that both has no extension and has no
         #       referent, we will add a default extension to it before proceding.
 
@@ -222,8 +215,11 @@ module Skylab::TanMan
           ::File.extname( _current_unsanitized_absolute_path ).length.nonzero?
         end
 
-        # -- a. at the level of magnetics we never expand relative paths.
+        # -- A. at the level of magnetics we never expand relative paths.
         #       this must have already happened before we get to this point.
+        #
+        #       (also, any relative paths in the config are relative to
+        #        the asset directory)
 
         def __check_that_path_is_absolute
 
@@ -382,5 +378,6 @@ module Skylab::TanMan
     end
   end
 end
+# #history-A.3: (can be temporary)..
 # #history-A.2: (can be temporary)..
 # #history-A.1: begin rewriting most of it for ween off [br]

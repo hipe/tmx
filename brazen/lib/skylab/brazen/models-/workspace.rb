@@ -303,6 +303,14 @@ module Skylab::Brazen
         @_do_this_with_workspace = p ; nil
       end
 
+      def workspace_class_by & p
+        @workspace_class_proc = p
+      end
+
+      def init_workspace_by & p
+        @init_workspace_proc = p
+      end
+
       attr_writer(
         :config_filename,
         :filesystem,
@@ -336,6 +344,10 @@ module Skylab::Brazen
           remove_instance_variable( :@writable_locked_IO ).close
         else
           remove_instance_variable( :@read_only_locked_IO ).close
+        end
+
+        if @_did_build_workspace
+          remove_instance_variable( :@__workspace ).close_workspace_session_PERMANENTLY
         end
         NIL
       end
@@ -394,7 +406,9 @@ module Skylab::Brazen
 
         _ev = _Mag.call_by do |o|
           yield o
-          o.verb_lemma_symbol = :create  # ..
+          o.verb_lemma_symbol = :update
+          # the above is always `update` and never :create because we never
+          # both create a workspace and write to it in one invocation.
         end
         _ev  # #hi. #todo
       end
@@ -403,7 +417,33 @@ module Skylab::Brazen
 
       def __yield_workspace
 
-        user_x = remove_instance_variable( :@_do_this_with_workspace )[ self ]
+        cls = @workspace_class_proc.call
+
+        same = -> o do
+          remove_instance_variable( :@init_workspace_proc )[ o ]
+
+          o.accept_workspace_path_and_config_filename(
+            @workspace_path, @config_filename )
+        end
+
+        workspace = if @_mutable_not_immutable
+
+          cls.begin_mutable_workspace_session_by do |o|
+            o.accept_mutable_document @mutable_document
+            same[ o ]
+          end
+        else
+          cls.begin_immutable_workspace_session_by do |o|
+            o.accept_immutable_document @immutable_document
+            same[ o ]
+          end
+        end
+
+        user_x = remove_instance_variable( :@_do_this_with_workspace )[ workspace ]
+
+        @_did_build_workspace = true
+        @__workspace = workspace
+
         if user_x
           @__mixed_user_result = user_x ; ACHIEVED_
         else
@@ -425,7 +465,6 @@ module Skylab::Brazen
         end
 
         if doc  # #cov1.5
-          @_read_muta = :__mutable_document_instance
           @mutable_document = doc ; true
         else  # #cov1.4
           doc
@@ -440,7 +479,6 @@ module Skylab::Brazen
         end
 
         if doc
-          @_read_immuta = :__immutable_document_instance
           @immutable_document = doc ; true
         else
           doc
@@ -454,6 +492,8 @@ module Skylab::Brazen
       # otherwise emit the same *kind* of event (under a different channel).
 
       def __locate_and_open_config_file
+
+        @_did_build_workspace = false  # (sneak this in here)
 
         inq = Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
           o.path_head = @workspace_path
@@ -471,7 +511,12 @@ module Skylab::Brazen
           else
             @read_only_locked_IO = inq.locked_IO
           end
-          @config_filename = inq.path_tail ; ACHIEVED_
+
+          # if the search had to go upwards to find the directory, for now
+          # we just clobber the argument path here with the "corrected" path
+
+          @workspace_path = inq.surrounding_path
+          ACHIEVED_
         else
           @config_file_inquiry = inq
           UNABLE_
@@ -483,24 +528,6 @@ module Skylab::Brazen
           @config_file_inquiry.event
         end
         UNABLE_
-      end
-
-      # -- read (by client)
-
-      def mutable_document
-        send @_read_muta
-      end
-
-      def __mutable_document_instance
-        @mutable_document
-      end
-
-      def immutable_document
-        send @_read_immuta
-      end
-
-      def __immutable_document_instance
-        @immutable_document
       end
     end
 

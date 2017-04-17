@@ -85,6 +85,8 @@
 
 [#129]       #bibliographic-reference: _Clean Code_, Robert C. Martin, 2009
 
+             :[#here.4]: the "single responsibility principle" (SRP)
+
              :[#here.3]: "three laws": 1) don't write any asset code without
              first having a breaking test written. 2) don't write more of
              test code than is necessary to be broken. 3) write just enough

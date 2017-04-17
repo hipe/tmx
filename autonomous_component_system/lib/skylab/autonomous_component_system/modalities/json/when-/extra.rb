@@ -6,7 +6,7 @@ module Skylab::Autonomous_Component_System
 
         def self.[] sym_a, sess
 
-          sess.caller_emission_handler_.call :error, :extra_properties do
+          sess.caller_emission_handler_.call :error, :unrecognized_argument do
 
             _LL = sess.context_linked_list
 

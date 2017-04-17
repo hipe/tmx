@@ -12,7 +12,7 @@ module Skylab::Human
   #
   #     _a_  # => [ :ernana, :onono, :banana ]
 
-  class Levenshtein
+  class Levenshtein  # :[065]
 
     Attributes_actor_.call( self,
       :item_string,
@@ -32,13 +32,72 @@ module Skylab::Human
 
     def execute
       if @item_string && @items && @closest_N_items
-        __via_OK_ivars_execute
+        __do_execute
       else
         false
       end
     end
 
-    def __via_OK_ivars_execute
+    def __do_execute
+
+      __init_initial_list_of_winners
+      __maybe_shorten_final_list_of_winners
+      __flush_final_list_of_winners
+    end
+
+    def __maybe_shorten_final_list_of_winners
+
+      #   - this method is an auxiliary (not ancillary) "aesthetic adjustment".
+      #     it's a fine-tuning detail. it's OK to erase this whole method.
+      #
+      #   - secondly, the code is (of course) the authoritative reference
+      #     on what happens here. the pseudocode below is a sketch and has
+      #     known differences from what the code actually does.
+      #
+      #   - thirdly, coverage is very poor for this. it was developed
+      #     visually, and even in client sidesystems its effect is not
+      #     covered directly.
+
+      # this is an aesthetic adjustment because it "doesn't sound right"
+      # to have "far" matches next to "near" matches, for example:
+      #
+      #     unrecognized fruit "bernerner". did you mean "bununu", "banana", "benene", "apple" or "strawberry"?
+      #
+      # the first three are "so close", it sounds weird to include the last two.
+
+      # e.g., if the list at this point meets ALL these criteria:
+      #
+      #   - the list is "long" (longer than the target number of items)
+      #
+      #   - there is a "stark" increase in the distance at some point
+      #     (have fun figuring out how we define "stark")
+      #
+      #   - if after you would truncate the list by cutting off all items
+      #     after the stark increase, there is still more than one item (or not)
+      #
+      # then truncate the list in this manner.
+      # :[#008.2] borrow coverage from [my]
+      # :[#065.2] refers to all of the above and below.
+
+      if @closest_N_items < @_winners.length
+
+        last_dist = @_winners.last.distance
+
+        if ( @_winners.first.distance * 2 ) < last_dist
+
+          index = @_winners.length.times.detect do |d|
+            last_dist == @_winners[ d ].distance
+          end
+
+          if 1 < index
+            @_winners[ index .. -1 ] = EMPTY_A_
+          end
+        end
+      end
+      NIL
+    end
+
+    def __init_initial_list_of_winners
 
       target_s = @item_string
 
@@ -53,13 +112,19 @@ module Skylab::Human
         @_distance = ::Levenshtein.distance _candidate_s, target_s  # integer
         send @_see
       end
+      NIL
+    end
+
+    def __flush_final_list_of_winners
 
       # zero-length lists meh, need coverage
 
       p = @map_result_items_by || IDENTITY_
+
       a = @_winners.map do |sct|
         p[ sct.item ]
       end
+
       if @aggregate_by
         @aggregate_by[ a ]
       else
@@ -167,10 +232,16 @@ module Skylab::Human
 
     def __scanner
 
-      if ::Array.try_convert @items
-        Common_::Scanner.via_array @items
+      mixed = remove_instance_variable :@items  # not idempotent
+
+      if ::Array.try_convert mixed
+        Scanner_[ mixed ]
+
+      elsif mixed.respond_to? :gets
+        mixed.flush_to_scanner
+
       else
-        remove_instance_variable :@items  # not idempotent
+        mixed  # assume scanner
       end
     end
 

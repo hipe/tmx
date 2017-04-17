@@ -3,16 +3,27 @@ module Skylab::System
   module Filesystem
 
     class Normalizations::Upstream_IO < Normalizations::PathBased  # [#004.B].
-    private
+
+      class << self
+        def new_for_crazy_class_change_experiment_
+          allocate._init_these
+        end
+      end  # >>
 
       def initialize
+        _init_these
+        super
+      end
 
+      def _init_these
         @_neither_is_OK = false
         @_only_apply_ftype_expectation = false
         @_stdin = nil
         @_value_is_pathname = false
-        super
+        self
       end
+
+    private
 
       def need_mutable_not_immutable=
         @need_mutable_not_immutable_ = gets_one
@@ -52,7 +63,7 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      def stat=  # used #here
+      def stat=  # used #here1
         @stat_ = gets_one
         KEEP_PARSING_
       end
@@ -186,7 +197,7 @@ module Skylab::System
           UNABLE_  # result of above is unreliable
       end
 
-      public def via_stat_execute  # :+#public-API, :#here
+      def via_stat_execute  # :+#public-API, :#here1
 
         if @_only_apply_ftype_expectation
 

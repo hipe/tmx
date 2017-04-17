@@ -27,7 +27,7 @@ module Skylab::MyTerm::TestSupport
     context "try to set a font that is not found (LIVE, FRAGILE)" do
 
       call_by do
-        call :adapter, COMMON_ADAPTER_CONST_, :background_font, :path, 'NOTAFONT'
+        call :adapter, COMMON_ADAPTER_CONST_, :background_font, :path, 'menlaco'
       end
 
       it "fails" do
@@ -58,14 +58,21 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "says that your font wasn't recognized (NOTE contextualiztion removed)" do
-        _msg_a.fetch( 0 ).should eql 'unrecognized font path "NOTAFONT"'
+        _msg_a.fetch( 0 ).should eql 'unrecognized font path "menlaco"'
       end
 
       it "offers around 3 levenshtein-based suggestions" do
+
+        # #lends-coverage-to [#hu-008.2]
+
+        # NOTE this test anchors this whole test suite to the development
+        # machine. when you make fixtures make them so that the [#ba-065.2]
+        # algorithm is demonstrated; i.e. have the below two fonts and
+        # a few others that are "far away" from them, to demonstrate that
+        # the others are cut out of the final "winners" list.
+
         _msg = _msg_a.fetch( -1 )
-        _ = '"[^"]+"'
-        _rx = %r(\Adid you mean #{ _ }, #{ _ }, #{ _ } or #{ _ }\?\z)
-        _msg.should match _rx
+        _msg == 'did you mean "menlo" or "monaco"?' || fail
       end
     end
 

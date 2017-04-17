@@ -3,16 +3,28 @@ module Skylab::System
   module Filesystem
 
     class Normalizations::Downstream_IO < Normalizations::PathBased  # :[#004.D]
-    private
+
+      class << self
+        def new_for_crazy_class_change_experiment_
+          allocate._init_these
+        end
+      end  # >>
 
       def initialize
+        _init_these
+        super
+      end
+
+      def _init_these
         @__flags_for_open = nil
         @_force_arg = nil
         @_is_dry_run = false
         @_stderr = nil
         @_stdout = nil
-        super
+        self
       end
+
+    private
 
       def dash_means=
         @dash_means_ = gets_one

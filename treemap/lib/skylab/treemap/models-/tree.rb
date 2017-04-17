@@ -69,26 +69,43 @@ module Skylab::Treemap
 
         def __resolve_output_adapter
 
-          _col = Home_.lib_.basic::Module::OperatorBranch_via_Module[ Output_Adapters_ ]
+          ob = Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
+            o.module = Output_Adapters_
+          end
 
-          oa = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
-            qualified_knownness( :output_adapter ),
-            _col.method( :to_entity_stream ),
-            & handle_event_selectively )
+          _qkn = qualified_knownness :output_adapter
 
-          if oa
-            @_unbound_output_adapter = oa
-            ACHIEVED_
+          ref = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+
+            o.qualified_knownness = _qkn
+
+            o.string_via_item_by do |sym|
+              # (because arguments are presented in "slug" form)
+
+              sym.id2name.gsub UNDERSCORE_, DASH_
+            end
+
+            o.item_stream_proc = ob.method :to_loadable_reference_stream
+
+            o.levenshtein_number = -1  # show all
+
+            o.listener = handle_event_selectively
+          end
+
+          if ref
+            _ref_ = ob.dereference ref
+            @__output_adapter_class = _ref_.const_value ; ACHIEVED_
           else
-            oa
+            ref
           end
         end
 
         def __resolve_waypoints
 
+          _fs = Home_.lib_.system.filesystem
           @_n11n = Home_.lib_.system_lib::Filesystem::Normalizations::PathBased.with(
             :recognize_common_string_patterns,
-            :filesystem, Home_.lib_.system.filesystem,
+            :filesystem, _fs,
             & handle_event_selectively )
 
           ok = __resolve_up
@@ -163,8 +180,7 @@ module Skylab::Treemap
 
         def __via_waypoints_and_output_adapter
 
-          oa = @_unbound_output_adapter.module.new(
-            self, & handle_event_selectively )
+          oa = @__output_adapter_class.new self, & handle_event_selectively
 
           sym = oa.required_stream
           st = _build_upstream sym
@@ -227,7 +243,17 @@ module Skylab::Treemap
 
           st
         end
+
+        # define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
     end
+
+    # ==
+
+    DASH_ = '-'
+    UNDERSCORE_ = '_'
+
+    # ==
+    # ==
   end
 end

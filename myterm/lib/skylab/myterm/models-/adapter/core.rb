@@ -33,25 +33,29 @@ module Skylab::MyTerm
 
         @_oes_p = @_pp[ nil ]
 
-        o = Common_fuzzy_retrieve_[].new( & @_oes_p )
+        lr = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
 
-        o.name_map = -> lt do
-          lt.stem
+          o.string_via_item_by do |lr_|
+            lr_.stem
+          end
+
+          o.item_stream_by do
+            _adapters_silo.to_asset_reference_stream
+          end
+
+          o.set_qualified_knownness_value_and_symbol _x, :adapter_name
+
+          o.levenshtein_number = 3  # to exercise the machinery
+
+          o.listener = @_oes_p
         end
 
-        o.stream_builder = -> do
-          _adapters_silo.to_asset_reference_stream
-        end
-
-        o.set_qualified_knownness_value_and_symbol _x, :adapter_name
-
-        lt = o.execute
-        if lt
+        if lr
           remove_instance_variable( :@_arg_scn ).advance_one
-          @_loadable_reference = lt
+          @_loadable_reference = lr
           ACHIEVED_
         else
-          lt
+          lr
         end
       end
     end

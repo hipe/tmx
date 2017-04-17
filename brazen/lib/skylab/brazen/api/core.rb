@@ -36,12 +36,14 @@ module Skylab::Brazen
           generic_error: ( d = 5 ),
           error_as_specificed: ( d += 1 ),
           invalid_property_value: ( d += 1 ),
-          extra_properties: ( d += 1 ),
+          unrecognized_argument: ( d += 1 ),
           missing_required_properties: ( d += 1 ),
           actual_property_is_outside_of_formal_property_set: ( d += 1 ),
           resource_not_found: ( d += 1 ),
           resource_existed: ( d += 1 ),
         }.freeze
+
+        # h[ :item_not_found ] = h[ :unrecognized_argument ]
 
         define_method :[], & h.method( :[] )
         define_method :fetch, & h.method( :fetch )

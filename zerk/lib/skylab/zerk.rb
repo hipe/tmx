@@ -43,10 +43,6 @@ module Skylab::Zerk  # intro in [#001] README
 
   # == functions
 
-  Begin_fuzzy_retrieve_ = -> & any_oes_p do
-    Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.new( & any_oes_p )
-  end
-
   Is_listy_ = -> sym do  # assume Field_
     if sym
       Field_::Can_be_more_than_zero[ sym ]
@@ -200,6 +196,7 @@ module Skylab::Zerk  # intro in [#001] README
   Home_ = self
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
+  LEVENSHTEIN_NUMBER_ = 3  # how many items to display in "did you mean.."
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NIL_ = nil

@@ -66,7 +66,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "emits" do
-        only_emission.should be_emission( :error, :extra_properties )
+        only_emission.should be_emission( :error, :unrecognized_argument )
       end
     end
 

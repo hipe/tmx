@@ -93,13 +93,13 @@ module Skylab::Cull
         #   - you need only provide a unique head of the function name
         #     (i.e only the start of the slug not the full slug)
 
-        o = Fuzzy_lookup_fuction_name_prototype___[].dup
+        _proto = Fuzzy_lookup_fuction_name_prototype___[]
+        a = _proto.call_by do |o|
 
-        o.stream = @box_mod.to_special_boxxy_item_name_stream__
+          o.stream = @box_mod.to_special_boxxy_item_name_stream__
 
-        o.string = @_function_slug_head
-
-        a = o.execute
+          o.string = @_function_slug_head
+        end
 
         case 1 <=> a.length
         when  0 ; __when_one a.fetch 0
@@ -112,11 +112,11 @@ module Skylab::Cull
 
         Home_.lib_.basic::Fuzzy.prototype_by do |o|
 
-          o.candidate_map = -> name do
+          o.string_via_item_by do |name|
             name.as_slug
           end
 
-          o.result_map = -> name do
+          o.result_via_matching_by do |name|
             # this const should not be Wide_Camel_Cased but Function_cased
             # (preserve the casing that the name function was constructed with)
             name.as_const

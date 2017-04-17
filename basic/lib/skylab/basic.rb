@@ -38,46 +38,48 @@ module Skylab::Basic  # introduction at [#020]
     MinimalProperty.via_variegated_symbol :argument
   end
 
-  class Fuzzy  # :[#015].
+  class Fuzzy < Common_::MagneticBySimpleModel  # :[#015].
 
     class << self
 
       def reduce_array_against_string a, s, * p_a, & p
         p and p_a.push p
-        o = self.begin
+        call_by do |o|
         o.sparse_array = a
         o.string = s
         o.procs = p_a
-        o.execute
+        end
       end
 
       def reduce_to_array_stream_against_string st, s, * p_a, & p
         p and p_a.push p
-        o = self.begin
+        call_by do |o|
         o.stream = st
         o.string = s
         o.procs = p_a
-        o.execute
+        end
       end
 
-      def prototype_by
-        o = self.begin
-        yield o
-        o.freeze
+      def prototype_by & p  # then call #here1 on the prototype
+        define( & p ).freeze
       end
-
-      alias_method :begin, :new
-      undef_method :new
     end  # >>
 
     def initialize
       @be_case_sensitive = false
-      @candidate_map = nil
-      @result_map = nil
+      @result_via_matching = nil
+      @string_via_item = nil
+      super
+    end
+
+    def call_by  # used in conjunction with #here1
+      otr = dup
+      yield otr
+      otr.execute
     end
 
     def procs= p_a
-      @candidate_map, @result_map = p_a
+      @string_via_item, @result_via_matching = p_a
     end
 
     def sparse_array= a
@@ -86,19 +88,27 @@ module Skylab::Basic  # introduction at [#020]
       a
     end
 
+    def result_via_matching_by & p
+      @result_via_matching = p ; nil
+    end
+
+    def string_via_item_by & p
+      @string_via_item = p ; nil
+    end
+
     attr_writer(
       :be_case_sensitive,
-      :candidate_map,
-      :result_map,
+      :result_via_matching,
       :stream,
       :string,
+      :string_via_item,
     )
 
     def execute
 
       a = []
-      candidate_map = @candidate_map || IDENTITY_
-      result_map = @result_map || IDENTITY_
+      string_via_item = @string_via_item || IDENTITY_
+      result_via_matching = @result_via_matching || IDENTITY_
       s = @string
       st = @stream
 
@@ -112,13 +122,13 @@ module Skylab::Basic  # introduction at [#020]
         begin
           x = st.gets
           x or break
-          s_ = candidate_map[ x ]
+          s_ = string_via_item[ x ]
           if rx =~ s_
             if s == s_
-              a.clear.push result_map[ x ]
+              a.clear.push result_via_matching[ x ]
               break
             end
-            a.push result_map[ x ]
+            a.push result_via_matching[ x ]
           end
           redo
         end while nil

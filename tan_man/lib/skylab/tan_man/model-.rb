@@ -208,6 +208,14 @@ module Skylab::TanMan
 
           yield o
 
+          o.workspace_class_by do
+            Home_::Models_::Workspace
+          end
+
+          o.init_workspace_by do |ws|
+            ws.HELLO_MY_OWN_WORKSPACE
+          end
+
           o.config_filename = _cfn
           o.max_num_dirs_to_look = _mnd
           o.workspace_path = _wsp

@@ -120,10 +120,6 @@ module Skylab::MyTerm
 
   Lazy_ = Common_::Lazy
 
-  Common_fuzzy_retrieve_ = -> do
-    Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY
-  end
-
   Require_zerk_ = Lazy_.call do
     Zerk_ = Home_.lib_.zerk ; nil
   end

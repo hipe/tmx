@@ -23,7 +23,7 @@ module Skylab::Fields
           pptr.property_value_via_symbol sym
 
         else
-          maybe_send_event :error, :extra_properties do
+          maybe_send_event :error, :unrecognized_argument do
 
             Home_::Events::Extra.with :unrecognized_token, sym
           end
@@ -72,7 +72,7 @@ module Skylab::Fields
 
       def when_xtra xtra_a
 
-        maybe_send_event :error, :extra_properties do
+        maybe_send_event :error, :unrecognized_argument do
 
           Home_::Events::Extra.with :unrecognized_tokens, xtra_a
         end

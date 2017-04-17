@@ -19,7 +19,7 @@ module Skylab::GitViz::TestSupport
 
       _sym = _em.cached_event_value.to_event.terminal_channel_symbol
 
-      :extra_properties == _sym or fail
+      :unrecognized_argument == _sym || fail
 
       expect_fail
     end

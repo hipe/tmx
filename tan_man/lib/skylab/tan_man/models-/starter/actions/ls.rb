@@ -35,14 +35,14 @@ module Skylab::TanMan
 
         def execute
 
-          _ob = dangerously_memoized_operator_branch_FOR_SILO_ONLY_
+          _ob = _dangerously_memoized_operator_branch
           _st = _ob.to_loadable_reference_stream
           _st  # hi.
         end
 
         -> do
           yes = true ; x = nil
-          define_method :dangerously_memoized_operator_branch_FOR_SILO_ONLY_ do
+          define_method :_dangerously_memoized_operator_branch do
             if yes
               yes = false
               x = __build_operator_branch
@@ -61,13 +61,15 @@ module Skylab::TanMan
           Home_.lib_.system_lib::Filesystem::
           Directory::OperatorBranch_via_Directory.define do |o|
 
+            o.loadable_reference_via_path_by = -> path do
+              CacheableDereferencableItem__.new path  # hi.
+            end
+
             o.startingpoint_path = _path
 
-            o.filesystem_for_globbing = _fs
+            o.item_lemma_symbol = :starter
 
-            o.loadable_reference_via_path_by = -> path do
-              CacheableDereferencableItem_FOR_SILO_ONLY.new path  # hi.
-            end
+            o.filesystem_for_globbing = _fs
           end
         end
 
@@ -79,9 +81,68 @@ module Skylab::TanMan
         end
       # -
 
+      class << self
+        def lookup_starter_by_ & p
+          LookupStarter___.call_by( & p )
+        end
+      end  # >>
+
+      class LookupStarter___ < Common_::MagneticBySimpleModel
+
+        def initialize
+          @primary_channel_symbol = nil
+          super
+        end
+
+        attr_writer(
+          :listener,
+          :microservice_invocation,
+          :primary_channel_symbol,
+          :starter_tail,
+        )
+
+        def execute
+
+          needle_item = CacheableDereferencableItem__.new @starter_tail
+
+          _op = Here_.new do @microservice_invocation end
+
+          _ob = _op._dangerously_memoized_operator_branch
+
+          item = _ob.procure_by do |o|
+
+            o.needle_item = needle_item
+
+            o.will_be_fuzzy
+
+            o.primary_channel_symbol = @primary_channel_symbol
+
+            o.listener = @listener
+          end
+
+          if item
+            DidFind___.new item
+          else
+            DidNotFind___.new needle_item
+          end
+        end
+      end
+
+      DidNotFind___ = ::Struct.new :needle_item do
+        def did_find
+          FALSE
+        end
+      end
+
+      DidFind___ = ::Struct.new :found_item do
+        def did_find
+          TRUE
+        end
+      end
+
       # ==
 
-      class CacheableDereferencableItem_FOR_SILO_ONLY
+      class CacheableDereferencableItem__
 
         # (to compat with the operator branch
 
@@ -108,6 +169,9 @@ module Skylab::TanMan
           :path,
         )
       end
+
+
+      Here_ = self
 
       # ==
       # ==

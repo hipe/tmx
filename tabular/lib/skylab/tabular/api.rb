@@ -76,7 +76,7 @@ module Skylab::Tabular
 
   Operations_module_operator_branch___ = Lazy_.call do  # c.p/m from [tmx]
 
-    Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |defn|
+    Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |defn|
 
       defn.module = Home_::Operations_
       defn.express_unknown_by do |o|

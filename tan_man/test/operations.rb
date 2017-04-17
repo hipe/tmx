@@ -141,6 +141,25 @@ module Skylab::TanMan::TestSupport
 
     # -- TMPDIR TOWN
 
+    def make_a_copy_of_this_workspace_ tail
+
+      # use `cp -r` (similar) to copy the contents of a fixture tree into a
+      # tmpdir, for use in a mutating operation on that "workspace".
+
+      _path = path_for_fixture_workspace_ tail
+      _use_path = ::File.join _path, '.'  # DOT_
+
+      td = volatile_tmpdir
+      td.prepare
+      dst = td.path
+
+      ::FileUtils.cp_r _use_path, dst
+        # (we cheat and know that f.u is loaded by tmpdir above.)
+        # (result is nil.)
+
+      dst
+    end
+
     def prepare_a_tmpdir_like_so_ patch_string
 
       td = volatile_tmpdir

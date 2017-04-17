@@ -4,7 +4,7 @@ module Skylab::Fields
 
     Home_::Events::Extra = Common_::Event.prototype_with(
 
-      :extra_properties,
+      :unrecognized_argument,
 
       # (see #here-1 about 2 others)
       :did_you_mean_tokens, nil,

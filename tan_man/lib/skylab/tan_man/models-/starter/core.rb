@@ -37,22 +37,6 @@ module Skylab::TanMan
 
     Actions__ = make_action_making_actions_module
 
-    module Actions__
-
-      Set = make_action_class :Create do
-
-        edit_entity_class :preconditions, [ :workspace, :starter ]
-
-        def produce_result
-          super
-        end
-
-        def entity_collection
-          # sanity
-        end
-      end
-    end
-
     def line_stream_against_value_fetcher vfetch
       Here_::Actions__::Lines.via__(
         vfetch, self, @kernel, & handle_event_selectively )

@@ -31,23 +31,31 @@ module Skylab::MyTerm
 
       def lookup_font_path__ _action_sym, path
 
-        o = Common_fuzzy_retrieve_[].new( & @_oes_p )
+        _ = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
 
-        o.set_qualified_knownness_value_and_symbol path, :font_path
+          o.set_qualified_knownness_value_and_symbol path, :font_path
 
-        o.stream_builder = -> do
-          to_expressing_path_stream_
+          o.item_stream_by do
+            to_expressing_path_stream_
+          end
+
+          p = -> path_ do
+            # (it makes the "did you mean.." more interesting if we strip
+            #  the extension from these.. might bite later)
+            bn = ::File.basename path_
+            d = ::File.extname( bn ).length
+            d.zero? ? bn : bn[ 0 ... -d ].downcase
+          end
+
+          o.string_via_item = p
+
+          o.string_via_target = p
+
+          o.levenshtein_number = 3
+
+          o.listener = @_oes_p
         end
-
-        p = -> path_ do
-          ::File.basename( path_ ).downcase
-        end
-
-        o.levenshtein_number = 3
-        o.name_map = p
-        o.target_map = p
-
-        o.execute
+        _  # hi.
       end
 
       def to_expressing_path_stream_

@@ -35,7 +35,7 @@ module Skylab::TanMan
 
       def __via_mutable_workspace
 
-        sta = Here___::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call_by do |o|
+        path = Here___::WriteGraph_to_Bytestore_via_Graph_and_Workspace___.call_by do |o|
           o.digraph_path = @digraph_path
           o.mutable_workspace = @_mutable_workspace_
           o.template_values_provider = self
@@ -44,8 +44,8 @@ module Skylab::TanMan
           o.listener = _listener_
         end
 
-        if sta  # #cov1.5
-          [ :_result_from_use_TM_, sta.did_add_to_end, sta.offset  ]
+        if path # #cov1.5
+          [ :_result_from_use_TM_, path ]
         else
           NIL_AS_FAILURE_  # #cov1.2
         end

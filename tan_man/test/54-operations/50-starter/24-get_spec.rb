@@ -123,14 +123,16 @@ module Skylab::TanMan::TestSupport
         _sct.normal_symbol == :this_starter_does_not_exist || fail
       end
 
-      it "emits an informational message about this invalidity (note it's all on one line because aesthetics)" do
+      it "emits an informational message about this invalidity" do
 
         # (#fragile-test: relies on ordering of filesystem)
 
-        _lines = _tuple.last
+        _event = _tuple.last
+        _actual = black_and_white_lines _event
 
-        expect_these_lines_in_array_ _lines do |y|
-          y << 'unknown item: "this-starter-does-not-exist". expecting digraph, holy-smack or minimal'
+        expect_these_lines_in_array_ _actual do |y|
+          y << 'unrecognized starter "this-starter-does-not-exist.dot"'
+          y << 'did you mean "digraph.dot", "holy-smack.dot" or "minimal.dot"?'
         end
       end
 
@@ -143,13 +145,13 @@ module Skylab::TanMan::TestSupport
           :workspace_path, workspace_path,
         )
 
-        lines = nil
-        expect :info, :expression, :parse_error, :business_item_not_found do |y|
-          lines = y
+        event = nil
+        expect :error, :item_not_found do |ev|
+          event = ev
         end
 
         _result = execute
-        [ _result, lines ]
+        [ _result, event ]
       end
 
       def expression_agent

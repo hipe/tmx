@@ -56,10 +56,20 @@ module Skylab::Permute
         _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           short_category_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
-          _qkn,
-          @_col.method( :to_entity_stream ),
-          & @on_event_selectively )
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+
+          o.qualified_knownness = _qkn
+
+          o.item_stream_proc = @_col.method :to_entity_stream
+
+          o.string_via_item_by do |item|
+            item.name.as_slug
+          end
+
+          o.levenshtein_number = -1
+
+          o.listener = @on_event_selectively
+        end
 
         if cat_o
           cat_o.string_array.push value_s
@@ -74,10 +84,22 @@ module Skylab::Permute
         _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call(
-          _qkn,
-          @_col.method( :to_entity_stream ),
-        ) do end
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+
+          o.qualified_knownness = _qkn
+
+          o.item_stream_proc = @_col.method :to_entity_stream
+
+          o.string_via_item_by do |item|
+            item.name.as_slug
+          end
+
+          o.levenshtein_number = -1
+
+          o.listener = -> * do
+            NOTHING_  # hi.
+          end
+        end
 
         if cat_o
           cat_o.string_array.push value_s

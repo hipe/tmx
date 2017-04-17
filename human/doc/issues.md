@@ -1,3 +1,6 @@
+[#065]       [ levenshtein ]
+             [#here.2]: this "cutoff at stark change" algorithm
+
 [#064] #open file never used
 
 [#063] #open decide "definitively" (somehow) if we can replace our concept
@@ -145,6 +148,7 @@
 
 [#008]       coverage assets & liabilities
 
+             :[#here.2]: borrow from [my]
              :[#here.1]: borrow from [br]
 
              ( #was: #doc-point #parent:003 #body-is-inline-in-parent

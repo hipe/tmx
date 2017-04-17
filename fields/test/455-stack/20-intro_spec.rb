@@ -24,12 +24,13 @@ module Skylab::Fields::TestSupport
     end
 
     it "the first frame determines what names the subsequent frames may have" do
+
       stack = _subject.new( & handle_event_selectively_ )
       stack.push_frame_with :a, :X, :b, :Y
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       x.should eql false
 
-      expect_not_OK_event :extra_properties do |ev|
+      expect_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_tokens == [ :derp, :nerp ] || fail
       end
 
@@ -63,7 +64,7 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :b, :B2
       x = stack.property_value_via_symbol :c
 
-      expect_not_OK_event :extra_properties do |ev|
+      expect_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_token == :c || fail
       end
 

@@ -70,7 +70,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         it "emits extra properties event" do
 
-          _ = be_emission :error, :extra_properties do |ev|
+          _ = be_emission :error, :unrecognized_argument do |ev|
 
             _s = black_and_white ev
             _s.should eql 'unrecognized element \'middle_initial\' in "someplace"'

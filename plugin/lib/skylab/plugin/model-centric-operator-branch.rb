@@ -735,7 +735,7 @@ module Skylab::Plugin
       # much less moving parts because the constants (nodes) are already loaded
 
       # -
-        Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |o|
+        Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
           o.module = splay
           o.loadable_reference_by = -> const do
             AlreadyLoadedLoadableReference___.new const, splay, lirsx

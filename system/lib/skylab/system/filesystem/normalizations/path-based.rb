@@ -55,7 +55,7 @@ module Skylab::System
         end
         scn.advance_one
 
-        mutable = _cls.allocate
+        mutable = _cls.new_for_crazy_class_change_experiment_
 
         instance_variables.each do |ivar|
           mutable.instance_variable_set ivar, instance_variable_get( ivar )

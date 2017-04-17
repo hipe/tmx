@@ -25,6 +25,7 @@ module Skylab::Zerk
 
           def initialize
             @available_item_internable_stream_by = nil
+            @item_lemma_symbol = nil
             @primary_channel_symbol = nil
             @strange_value_by = nil
             @talker = nil
@@ -32,8 +33,9 @@ module Skylab::Zerk
             freeze
           end
 
-          attr_accessor(
+          attr_writer(
             :available_item_internable_stream_by,
+            :item_lemma_symbol,
             :listener,
             :primary_channel_symbol,
             :shape_symbol,
@@ -87,6 +89,10 @@ module Skylab::Zerk
           def category_symbol
             :unknown_branch_item
           end
+
+          attr_reader(
+            :listener,  # [tab]
+          )
 
         # -
 
@@ -188,15 +194,23 @@ module Skylab::Zerk
 
           def say_unknown_item
 
-            case @shape_symbol
-            when :primary
+            # (weird kinky style guidelines of when to use a colon #here1)
+
+            sym = @item_lemma_symbol
+            if sym
+              buffer = "unknown #{ sym.id2name.gsub UNDERSCORE_, SPACE_ }"
+              colon = :yes
+
+            elsif :primary == @shape_symbol
               buffer = "unknown primary"
               colon = :no
-            when :business_item
+
+            elsif :business_item == @shape_symbol
               buffer = "unknown item"
               colon = :yes
+
             else
-              fail
+              never
             end
 
             _say_unknown_item_smart_prefixed buffer, colon
@@ -311,7 +325,7 @@ module Skylab::Zerk
 
       # ==
 
-      # kinky new guidelines for when to use a colon:
+      # kinky new guidelines for when to use a colon (:#here1):
       #
       # generally we use a colon to separate a descriptive noun phrase
       # from the referrant being described:

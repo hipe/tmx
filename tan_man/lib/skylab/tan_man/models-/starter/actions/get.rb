@@ -59,29 +59,17 @@ module Skylab::TanMan
 
         def __via_starter_tail
 
-          _Ls = Actions::Ls
-
-          _tail = remove_instance_variable :@__unsanitized_starter_tail
-
-          needle_item = _Ls::CacheableDereferencableItem_FOR_SILO_ONLY.new _tail
-
-          _for_fun = _Ls.new do @_microservice_invocation_ end
-
-          _ob = _for_fun.dangerously_memoized_operator_branch_FOR_SILO_ONLY_
-
-          item = _ob.procure_by do |o|
-
-            o.needle_item = needle_item
-
+          sct = Actions::Ls.lookup_starter_by_ do |o|
+            o.starter_tail = remove_instance_variable :@__unsanitized_starter_tail
             o.primary_channel_symbol = :info  # per :#here1
-
+            o.microservice_invocation = @_microservice_invocation_
             o.listener = _listener_
           end
 
-          if item
-            item  # as covered
+          if sct.did_find
+            sct.found_item  # as covered
           else
-            needle_item  # as covered
+            sct.needle_item  # as covered
           end
         end
 

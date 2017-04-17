@@ -23,7 +23,7 @@ module Skylab::Human::TestSupport
           s_a.join Home_::SPACE_
         end
 
-        oes_p.call :error, :extra_properties do
+        oes_p.call :error, :itemzie_not_foundie do
 
           Home_.lib_.fields::Events::Extra.with(
             :unrecognized_token, 'bezo',
@@ -40,7 +40,7 @@ module Skylab::Human::TestSupport
       end
 
       it "the re-emitted channel is the same" do
-        channel_.should eql [ :error, :extra_properties ] or fail
+        channel_.should eql [ :error, :itemzie_not_foundie ] or fail
       end
 
       it "the last line is the same" do

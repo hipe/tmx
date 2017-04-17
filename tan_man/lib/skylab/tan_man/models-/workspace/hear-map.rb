@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Models_::Workspace
+  class Models_::Workspace
 
     module Hear_Map
 

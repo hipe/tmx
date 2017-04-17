@@ -221,14 +221,14 @@ module Skylab::Permute
 
         EEK___ = {
           error: {
-            ambiguous_property: :__ambiguous_property,
+            item_reference_was_ambiguous: :__ambiguous_property,
             case: {
               no_available_state_transition: :__no_available_state_transition,
             },
             expression: {
               parse_error: :__parse_error_expression,
             },
-            extra_properties: :__extra_properties,
+            item_not_found: :__extra_properties,
           },
           extra_functional: {
             help: :__helporino,

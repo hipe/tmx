@@ -19,7 +19,7 @@ module Skylab::MyTerm::TestSupport
 
       it "emits (levenschtein)" do
 
-        _be_this = be_emission :error, :extra_properties do |ev|
+        _be_this = be_emission :error, :item_not_found do |ev|
 
           s_a = black_and_white_lines ev
           s_a.first.should eql 'unrecognized adapter name "whonani"'
