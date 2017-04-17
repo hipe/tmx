@@ -1,181 +1,178 @@
 module Skylab::TanMan
 
-  class Models_::Starter
+  module Models_::Starter
 
-    module Actions__
+    class Actions::Lines
 
-      class Lines < Action_
+      # -
 
-        o = Models_::Workspace.common_properties
+        def definition
 
-        edit_entity_class(
-
-          :preconditions, EMPTY_A_,
-
-          :flag, :property, :use_default,
+          ca = Home_::DocumentMagnetics_::CommonAssociations
 
           # reading from the workspace is an option, but the workspace is not a precondition
 
-          :property_object, o[ :max_num_dirs_to_look ],
-          :property_object, o[ :config_filename ],
-          :property_object, o[ :workspace_path ].dup.set_is_not_required.freeze )
+          h = ca.to_workspace_related_mutable_hash__
 
-        def produce_result
-          Session.new @kernel, handle_event_selectively do | o |
-            o.qualified_knownness_box = to_qualified_knownness_box_proxy
-          end.via_qualified_knownness_box
-        end
-
-        class << self
-
-          def session k, oes_p, & edit_p
-            Here_::Actions__::Lines::Session.new k, oes_p, & edit_p
+          h[ :workspace_path ] = h.fetch( :workspace_path ).redefine do |o|
+            o.be_optional
           end
 
-          def via__ value_fetcher, starter, k, & oes_p
-            Session.new k, oes_p do | o |
-              o.starter = starter
-              o.value_fetcher = value_fetcher
-            end.via_starter
-          end
-        end  # >>
+          [
+            :branch_description, -> y do  # #todo change this name to ..
+              y << "get a preview of what the lines would look like in a new graph"
+              y << "template variables will be filled with placeholders"
+            end,
 
-        # we cleaved an API action into an internal API
+            :flag, :property, :use_default,
+            :description, -> y do
+              y << "you can see the lines of the default starter without a workspace"
+            end,
 
-      class Session
+            :property, :value_provider,
 
-        include Common_::Event::ReceiveAndSendMethods
-
-        def initialize k, oes_p
-          @qualified_knownness_box = nil
-          @kernel = k
-          @on_event_selectively = oes_p
-          @value_fetcher = nil
-          yield self
+            :properties, h.values,
+          ]
         end
 
-        attr_writer :starter, :qualified_knownness_box, :value_fetcher
+        def initialize
+          extend Home_::Model_::CommonActionMethods
+          init_action_ yield
+        end
 
-        def via_qualified_knownness_box
-
-          q = @qualified_knownness_box[ :use_default ]
-
-          if q && q.is_known_known && q.is_known_known && q.value_x
-
-            via_default
+        def execute
+          if __it_was_requested_that_we_use_the_default_starter
+            __will_resolve_the_default_starter
           else
-            via_workspace_related_arguments
+            __will_resolve_starter_in_workspace
+          end
+          __with_resolved_starter do
+            __lines_via_starter
           end
         end
 
-        def via_default
-          @st = @kernel.call :starter, :ls, & @on_event_selectively
-          @st and via_starter_stream
+        # -- D
+
+        def __lines_via_starter
+
+          _vp = __value_provider
+          _tmpl = __template
+
+          # (at #history-A we used to catch an ENOENT from template, but
+          # now we are more confident that the file's existence has been
+          # validated already.)
+
+          _big_string = _tmpl.call _vp
+          _fake_IO = Home_.lib_.string_IO.new _big_string
+          _fake_IO  # hi. #todo
         end
 
-        def via_starter_stream
-          x = @st.gets
-          count = 0
-          while x
-            count += 1
-            last = x
-            x = @st.gets
-          end
+        def __template
+          _o = remove_instance_variable :@_starter
+          _path = _o.path
+          Home_.lib_.basic::String::Template.via_path _path
+        end
 
-          if last
-            maybe_send_using_default last, count
-            @starter = last
-            via_starter
+        def __value_provider
+          vp = @value_provider
+          if vp
+            vp
           else
-            self._NEVER
+            MOCKING_VALUE_PROVIDER___
           end
         end
 
-        def maybe_send_using_default strtr, d
-          @on_event_selectively.call :info, :using_default do
-            bld_using_default_event strtr, d
-          end
+        # -- C
+
+        def __with_resolved_starter & p
+          send remove_instance_variable( :@_with_resolved_starter ), & p
         end
 
-        def bld_using_default_event strtr, d
-
-          Common_::Event.inline_neutral_with(
-
-            :using_default,
-            :name_s, strtr.natural_key_string,
-            :num, d
-
-          ) do | y, o |
-
-            y << "using default starter #{ val o.name_s } #{
-             }(the last of #{ o.num } starter#{ s o.num })"
-          end
-        end
-
-        def via_workspace_related_arguments
-
-          @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(
-            @qualified_knownness_box, & handle_event_selectively )
-
-          @ws and via_workspace
-        end
-
-        def via_workspace
-          @starter = @kernel.silo( :starter ).starter_in_workspace( @ws, & @on_event_selectively )
-          @starter and via_starter
-        end
-
-        def via_starter
-          @template = Home_.lib_.basic::String::Template.via_path @starter.to_path
-
-          if ! @value_fetcher
-            @value_fetcher = Mocking_Fetcher___.new
-          end
-
-          @output_s, @enoent = call_template
-          if @output_s
-            via_output_s
+        def __with_starter_in_workspace
+          if @workspace_path
+            ok = __resolve_starter_via_workspace
+            ok && __emit_thing_about_using_workspace_starter
+            ok && yield
           else
-            when_enoent
+            _listener_.call :error, :expression, :missing_required_parameters do |y|
+              y << "need `workspace_path` or `use_default`"
+            end
+            NIL
           end
         end
 
-        def call_template
-          @template.call @value_fetcher
-        rescue ::Errno::ENOENT => e
-          [ false, e ]
-        end
+        def __resolve_starter_via_workspace
 
-        def when_enoent
-          @on_event_selectively.call :error, :resource_not_found do
-            via_enoent_bld_event
+          _ = Actions::Get.YIKES__experiment__ @_microservice_invocation_ do |o|
+
+            o._simplified_write_ :workspace_path, @workspace_path
+            o._simplified_write_ :config_filename, @config_filename
+            o._simplified_write_ :max_num_dirs_to_look, @max_num_dirs_to_look
           end
-          UNABLE_
+
+          _store_ :@_starter, _
         end
 
-        def via_enoent_bld_event
+        def __with_default_starter
 
-          Common_::Event.wrap.exception.via(
-            :path_hack,
-            :terminal_channel_i, :resource_not_found,
-            :exception, @enoent )
-        end
-
-        def via_output_s
-          Home_.lib_.string_IO.new @output_s
-        end
-
-        class Mocking_Fetcher___
-
-          def fetch sym
-
-            "{{ #{ Common_::Name.via_variegated_symbol( sym ).
-              as_lowercase_with_underscores_symbol.id2name.upcase } }}"
-
+          o = Actions::Get.default_starter__ @_microservice_invocation_
+          if o
+            __emit_thing_about_using_default_starter o
+            @_starter = o
+            yield
+          else
+            # assume emitted
+            o
           end
         end
-      end
-      end
+
+        def __emit_thing_about_using_workspace_starter
+          o = @_starter
+          _listener_.call :info, :expression, :using_starter do |y|
+            y << "using starter: #{ o.natural_key_string }"
+          end
+        end
+
+        def __emit_thing_about_using_default_starter o
+
+          _listener_.call :info, :expression, :using_default_starter do |y|
+            # (used to be a structured event before #history-A)
+            y << "using default starter: #{ o.natural_key_string }"  # same as ::File.basename( o.path )
+          end
+          NIL
+        end
+
+        # -- B
+
+        def __it_was_requested_that_we_use_the_default_starter
+          @use_default
+        end
+
+        def __will_resolve_the_default_starter
+          @_with_resolved_starter = :__with_default_starter ; nil
+        end
+
+        def __will_resolve_starter_in_workspace
+          @_with_resolved_starter = :__with_starter_in_workspace ; nil
+        end
+      # -
+
+      # ==
+
+      module MOCKING_VALUE_PROVIDER___ ; class << self
+
+        def fetch sym
+
+          _name = Common_::Name.via_variegated_symbol sym
+          _ = _name.as_lowercase_with_underscores_string.upcase
+
+          "{{ #{ _ } }}"
+        end
+      end ; end
+
+      # ==
+      # ==
     end
   end
 end
+# #history-A: full rewrite during ween off [br]. tombstone: used to use last starter as default

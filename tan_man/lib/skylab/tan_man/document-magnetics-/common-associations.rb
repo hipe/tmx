@@ -177,24 +177,40 @@ module Skylab::TanMan
 
     # ==
 
-    def self.to_workspace_related_stream_
-      __to_stream WORKSPACE_RELATED___
-    end
+    class << self
 
-    WORKSPACE_RELATED___ = [
+      def to_workspace_related_stream_
+        __to_stream WORKSPACE_RELATED__
+      end
+
+      def to_workspace_related_mutable_hash__
+        __to_hash WORKSPACE_RELATED__
+      end
+
+      def __to_hash sym_a
+        h = {}
+        col = common_IO_parameters
+        sym_a.each do |sym|
+          h[ sym ] = col.dereference sym
+        end
+        h
+      end
+
+      def __to_stream sym_a
+
+        col = common_IO_parameters
+
+        Stream_.call sym_a do |sym|
+          col.dereference sym
+        end
+      end
+    end  # >>
+
+    WORKSPACE_RELATED__ = [
       :workspace_path,
       :max_num_dirs_to_look,
       :config_filename,
     ]
-
-    def self.__to_stream sym_a
-
-      col = common_IO_parameters
-
-      Stream_.call sym_a do |sym|
-        col.dereference sym
-      end
-    end
 
     define_singleton_method :common_IO_parameters, ( Lazy_.call do
 

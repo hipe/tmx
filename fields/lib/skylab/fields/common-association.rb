@@ -11,6 +11,8 @@ module Skylab::Fields
 
       class EntityKillerParameter < Common_::SimpleModel
 
+        # reminder: there is a definition for `redefine` in [tm]
+
         define_singleton_method :grammatical_injection, ( Lazy_.call do
 
           mod = Home_::CommonAssociationMetaAssociations_::EntityKillerModifiers
@@ -74,6 +76,8 @@ module Skylab::Fields
         end
 
         # --
+
+        # (reminder: a `be_optional` was implemented in [tm] at #history-C)
 
         def be_required
           @is_required = true ; ACHIEVED_
@@ -278,5 +282,6 @@ module Skylab::Fields
     # ==
   end
 end
+# :#history-C (can be temporary)
 # #tombstone-B (could be temporary): used to subclass simple name
 # #tombstone-A: moved what's now "argument value producer consumer" up & out

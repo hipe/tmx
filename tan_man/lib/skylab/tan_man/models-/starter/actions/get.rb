@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     class Actions::Get
 
-      # the design challege is posed of what exactly it should mean to "get"
+      # the design challenge is posed of what exactly it should mean to "get"
       # a starter. there are many predictable failpoints, only some of which
       # have unsurprising design consequences:
       #
@@ -25,6 +25,22 @@ module Skylab::TanMan
       #
       # if the failcase *at* #here1 does occur, then we emit an informational
       # event explaining this. but note we continue to result the value.
+
+      class << self
+
+        def default_starter__ ms_invo
+          me = new do ms_invo end
+          me.__accept_starter_tail_ DEFAULT_STARTER_
+          _hi = me._via_starter_tail
+          _hi  # hi. #todo  CAN FAIL
+        end
+
+        def YIKES__experiment__ ms_invo
+          me = new do ms_invo end
+          yield me
+          me.execute
+        end
+      end  # >>
 
       # -
 
@@ -51,16 +67,20 @@ module Skylab::TanMan
 
         def __work
           if __resolve_starter_tail
-            __via_starter_tail
+            _via_starter_tail
           end
         end
 
         # -- B.
 
-        def __via_starter_tail
+        def __accept_starter_tail_ s
+          @_unsanitized_starter_tail = s ; nil
+        end
+
+        def _via_starter_tail
 
           sct = Actions::Ls.lookup_starter_by_ do |o|
-            o.starter_tail = remove_instance_variable :@__unsanitized_starter_tail
+            o.starter_tail = remove_instance_variable :@_unsanitized_starter_tail
             o.primary_channel_symbol = :info  # per :#here1
             o.microservice_invocation = @_microservice_invocation_
             o.listener = _listener_
@@ -69,7 +89,9 @@ module Skylab::TanMan
           if sct.did_find
             sct.found_item  # as covered
           else
-            sct.needle_item  # as covered
+            # sct.needle_item  # as covered
+            $stderr.puts "CHANGING THIS TO MAKE MORE SENSE"
+            NOTHING_
           end
         end
 
@@ -82,7 +104,7 @@ module Skylab::TanMan
           if sect
             tail = sect.assignments.lookup_softly :starter
             if tail
-              @__unsanitized_starter_tail = tail ; true
+              @_unsanitized_starter_tail = tail ; true
             else
               _when_section_not_found
             end
@@ -105,6 +127,9 @@ module Skylab::TanMan
           UNABLE_
         end
       # -
+
+      # ==
+      # ==
     end
   end
 end

@@ -18,6 +18,8 @@ module Skylab::TanMan
     #     available doo-hahs. (we could try to do this for graphs too
     #     with some kind of clever globbing etc but meh.)
 
+    DEFAULT_STARTER_ = 'minimal.dot'
+
   if false  # #open [#007.D.1] (on stack)
 
     edit_entity_class(

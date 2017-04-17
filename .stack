@@ -60,4 +60,3 @@ the whole starter silo
 (get rid of this chunk related to starters: [#007.D.1] )
 (get rid of this chunk related to starters: [#007.D.2] )
 #open [#tm-097] abstract when an expected primitive is not found in config
-give "lines" action its own test file (there's enough work there)

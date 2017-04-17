@@ -118,9 +118,10 @@ module Skylab::TanMan::TestSupport
         _tuple || fail
       end
 
-      it "results in the INVALID starter item structure" do
+      it "results in NOTHING (nil)" do
+        # #history-A.2: we used to result in an invalid starter structure here
         _sct = _tuple.first
-        _sct.normal_symbol == :this_starter_does_not_exist || fail
+        _sct.nil? || fail
       end
 
       it "emits an informational message about this invalidity" do
@@ -268,4 +269,5 @@ module Skylab::TanMan::TestSupport
     # ==
   end
 end
+# :#history-A.2: (can be temporary): used to result in something on noent
 # :#history-A.1: [br] ween, tombstone some tests, move others.

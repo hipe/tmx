@@ -23,6 +23,7 @@ module Skylab::TanMan
 
       p = nil
       expand_using_this = nil
+
       main = -> do
         begin
           qual_item = all_qual_item_st.gets
@@ -41,7 +42,15 @@ module Skylab::TanMan
         end while above
         x
       end
-      expand_using_this = -> st do
+
+      expand_using_this = -> x do
+
+        st = if x.respond_to? :gets
+          x
+        else
+          st = Stream_[ x ]
+        end
+
         p = -> do
           x = st.gets
           if x
@@ -134,6 +143,16 @@ module Skylab::TanMan
 
       class ApplicationSpecificCustomizedAssociation____ < _common_association_class
 
+        def redefine  # experiment
+          otr = dup
+          yield otr
+          otr.freeze
+        end
+
+        def be_optional
+          @is_required = false ; nil
+        end
+
         attr_accessor(
           :_throughput_characteristics_,
         )
@@ -225,6 +244,8 @@ module Skylab::TanMan
 
         _ || NIL  # #downgrade-from-false
       end
+
+      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       def _simplified_write_ k, x
         instance_variable_set :"@#{ k }", x
