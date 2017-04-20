@@ -592,16 +592,16 @@ module Skylab::Brazen
 
       def __via_workspace_produce_existent_workspace_via_qualified_knownness_box bx
 
-        _did_find = @ws.resolve_nearest_existent_surrounding_path(
+        did_find = @ws.resolve_nearest_existent_surrounding_path(
           bx.fetch( :max_num_dirs ).value_x,
           :prop, bx.fetch( :workspace_path ).association,
           & @oes_p )
 
-        _did_find and begin
+        if did_find
 
-          q = bx[ :verbose ]
+          qk = bx[ :verbose ]
 
-          if q && q.is_known_known && q.value_x  # #tracking :+[#069] verbose manually
+          if qk && qk.is_effectively_trueish  # #tracking :+[#069] verbose manually
 
             maybe_send_event :info, :verbose, :using_workspace do
 
@@ -613,6 +613,8 @@ module Skylab::Brazen
           end
 
           @ws
+        else
+          did_find  # false or nil
         end
       end
 

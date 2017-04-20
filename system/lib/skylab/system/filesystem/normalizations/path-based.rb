@@ -134,56 +134,65 @@ module Skylab::System
 
       # ~ support for the commonest `execute`s
 
-      def init_exception_and_open_IO_ mode_d
-
-        @open_IO_ = @filesystem.open path_, mode_d
-          # :#open-filehandle-1 - don't loose track
-        @exception_ = nil ; nil
-
-      rescue ::SystemCallError => @exception_  # Errno::{ EEXIST, EISDIR, ENOENT }..
-
-        @open_IO_ = false ; nil
-      end
-
       # ~ #[#021] (both branches) a common maneuver..
 
-      def init_exception_and_locked_file_ path
+      def resolve_locked_open_IO_ mode
 
-        _mode = if @need_mutable_not_immutable_
-          ::File::RDWR
-        else
-          ::File::RDONLY
+        if resolve_non_locked_open_IO_ mode
+
+          # these moments between when the filehandle is opened in the above
+          # call and when we lock it below is the subject of [#004.9] (the
+          # atomicity of all things)
+
+          __lock_that_IO_PB
         end
+      end
 
-        io = @filesystem.open path, _mode
+      def __lock_that_IO_PB
 
-        # this spot between the above line and the below line is the
-        # subject of [#004.9] (the atomicity of all things)
-
+        io = remove_instance_variable :@non_locked_open_IO_
         d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
         if d && d.zero?
-          @exception_ = nil
-          @locked_IO_ = io ; ACHIEVED_
+          @locked_open_IO_ = io ; ACHIEVED_
         else
           io.close
-          raise __say_locked_out path
+          raise __say_locked_out
           # (hard/annoying to cover, but this happens in development)
         end
-      rescue ::Errno::ENOENT, Errno::ENOTDIR => @exception_
-        @stat_ = UNABLE_ ; UNABLE_
       end
 
-      def __say_locked_out path
-        "can't aquire exclusive nonblocking lock (file already locked?) - #{ path }"
+      def __say_locked_out
+        "can't aquire exclusive nonblocking lock (file already locked?) - #{ path_ }"
       end
 
-      def init_exception_and_stat_ path
+      def resolve_non_locked_open_IO_ mode
 
+        _path = path_  # hi.
+
+        @non_locked_open_IO_ = @filesystem.open _path, mode
+          # :#open-filehandle-1 - don't loose track
+        ACHIEVED_
+      rescue ::Errno::EEXIST => @exception_
+        UNABLE_  # hi.
+      rescue ::Errno::EISDIR => @exception_
+        UNABLE_  # hi.
+      rescue ::Errno::ENOENT => @exception_
+        UNABLE_  # hi.
+      rescue ::Errno::ENOTDIR => @exception_
+        UNABLE_  # hi.
+      end
+
+      # ~
+
+      def resolve_stat_
+        _path = path_  # hi.
+        resolve_stat_via_path_ _path
+      end
+
+      def resolve_stat_via_path_ path
         @stat_ = @filesystem.stat path
-        @exception_ = nil
         ACHIEVED_
       rescue ::Errno::ENOENT, Errno::ENOTDIR => @exception_  # #todo assimilate the others
-        @stat_ = UNABLE_
         UNABLE_
       end
 
@@ -247,11 +256,18 @@ module Skylab::System
           :expected_ftype, expected_ftype_s,
           :path, path,
 
-        ) do | y, o |
+        ) do |y, o|
 
-          y << "#{ pth o.path } exists but is not #{
-           }#{ indefinite_noun o.expected_ftype }, #{
-            }it is #{ indefinite_noun o.actual_ftype }"
+          buffer = "#{ pth o.path } exists but is not "
+
+          simple_inflection do
+            write_count_for_inflection 1
+            buffer << indef( o.expected_ftype )
+            buffer << ", it is "
+            buffer << indef( o.actual_ftype )
+          end
+
+          y << buffer
         end
       end
 

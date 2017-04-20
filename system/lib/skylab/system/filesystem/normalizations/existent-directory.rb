@@ -39,11 +39,8 @@ module Skylab::System
 
         @do_lock_file_ and self._COVER_ME__you_cannot_lock_a_directory__
 
-        init_exception_and_stat_ path_
-
-        if @stat_
+        if resolve_stat_
           via_stat_execute   # (public API)
-
         else
           __when_no_stat
         end
@@ -100,10 +97,12 @@ module Skylab::System
         @_num_dirs_needed_to_create = 1  # you need to create at least the tgt
         @_curr_pn = ::Pathname.new ::File.expand_path path_
 
-        while true  # assume current path does not exist
+        begin
+          # assume current path does not exist
 
           if stop_p[]
-            break next_i = :__cannot_create_because_path_too_deep
+            m = :__cannot_create_because_path_too_deep
+            break
           end
 
           parent_pn = @_curr_pn.dirname
@@ -113,17 +112,18 @@ module Skylab::System
           # need to except for a logic error sanity check.
           # # #todo - get rid of all hardcoded checks for '/' in univ.
 
-          init_exception_and_stat_ parent_pn.to_path
-
-          if @stat_
+          if resolve_stat_via_path_ parent_pn.to_path
             @_pn = parent_pn
-            break next_i = :__can_create_via_stat_and_existent_pn
+            m = :__can_create_via_stat_and_existent_pn
+            break
           end
 
           @_num_dirs_needed_to_create += 1
           @_curr_pn = parent_pn
-        end
-        send next_i
+          redo
+        end while above
+
+        send m
       end
 
       def __build_proc_for_stop_because_reached_max_mkdirs

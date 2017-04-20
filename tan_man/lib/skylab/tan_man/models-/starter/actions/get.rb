@@ -30,15 +30,15 @@ module Skylab::TanMan
 
         def default_starter__ ms_invo
           me = new do ms_invo end
-          me.__accept_starter_tail_ DEFAULT_STARTER_
+          me._will_use_default_starter_tail
           _hi = me._via_starter_tail
           _hi  # hi. #todo  CAN FAIL
         end
 
-        def YIKES__experiment__ ms_invo
-          me = new do ms_invo end
-          yield me
-          me.execute
+        def call_directly_ ms_invo
+          op = new { ms_invo }
+          yield op  # (exposed parameters are #here2)
+          op.execute
         end
       end  # >>
 
@@ -54,27 +54,63 @@ module Skylab::TanMan
         end
 
         def initialize
+          @_execute = :__execute_normally
           extend Home_::Model_::CommonActionMethods
           init_action_ yield
         end
 
+        # -- :#here2
+
+        def mutable_workspace= mw
+          @_execute = :__execute_specially
+          @_mutable_workspace_ = mw
+        end
+
+        attr_writer(
+          :config_filename,
+          :max_num_dirs_to_look,
+          :workspace_path,
+        )
+
+        # --
+
         def execute
+          send @_execute
+        end
+
+        def __execute_specially
+
+          # (this "special" form of execute (cobbled together to get us over
+          # the finish line) is just a synthesis of everything we've already
+          # done, but in one method: A) use the mutable document we already
+          # have instead of an immutable document we derive and B) use the
+          # default starter nothing is in the workspace.)
+
+          @_document = @_mutable_workspace_.mutable_document
+          _ok = _resolve_starter_tail
+          if ! _ok
+            _will_use_default_starter_tail
+          end
+          _via_starter_tail
+        end
+
+        def __execute_normally
           with_immutable_workspace_ do
-            @__document = @_immutable_workspace_.immutable_document
+            @_document = @_immutable_workspace_.immutable_document
             __work
           end
         end
 
         def __work
-          if __resolve_starter_tail
+          if _resolve_starter_tail
             _via_starter_tail
           end
         end
 
         # -- B.
 
-        def __accept_starter_tail_ s
-          @_unsanitized_starter_tail = s ; nil
+        def _will_use_default_starter_tail
+          @_unsanitized_starter_tail = DEFAULT_STARTER_ ; nil
         end
 
         def _via_starter_tail
@@ -97,9 +133,9 @@ module Skylab::TanMan
 
         # -- A.
 
-        def __resolve_starter_tail
+        def _resolve_starter_tail
           @_section_symbol = :digraph
-          _sects = @__document.sections
+          _sects = @_document.sections
           sect = _sects.lookup_softly @_section_symbol
           if sect
             tail = sect.assignments.lookup_softly :starter

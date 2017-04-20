@@ -172,19 +172,23 @@ module Skylab::System
       def via_path_arg_that_represents_file_
 
         if @do_lock_file_
-          init_exception_and_locked_file_ path_
-          if @locked_IO_
-            Common_::Known_Known[ remove_instance_variable :@locked_IO_ ]
+          if resolve_locked_open_IO_ __mode
+            Common_::Known_Known[ remove_instance_variable :@locked_open_IO_ ]
           else
             _when_exception
           end
+        elsif resolve_stat_
+          via_stat_execute
         else
-          init_exception_and_stat_ path_
-          if @stat_
-            via_stat_execute
-          else
-            _when_exception
-          end
+          _when_exception
+        end
+      end
+
+      def __mode
+        if @need_mutable_not_immutable_
+          ::File::RDWR
+        else
+          ::File::RDONLY
         end
       end
 
@@ -236,10 +240,8 @@ module Skylab::System
           ::File::RDONLY
         end
 
-        init_exception_and_open_IO_ _mode
-
-        if @open_IO_
-          produce_result_via_open_IO_ remove_instance_variable :@open_IO_
+        if resolve_non_locked_open_IO_ _mode
+          produce_result_via_open_IO_ remove_instance_variable :@non_locked_open_IO_
         else
           @listener.call :error, :exception do
             wrap_exception_ @exception_

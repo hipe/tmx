@@ -76,7 +76,7 @@ module Skylab::TanMan
 
         o.entity_nouveau = act
 
-        o.will_nilify  # because of #spot1.2
+        o.will_nilify  # because of #here1
       end
 
       if ok
@@ -94,7 +94,7 @@ module Skylab::TanMan
       # those that don't need to.
       #
       # however, in order to isolate the implemetation of our custom
-      # associations to their own subdomain, that happens at #spot1.1
+      # associations to their own subdomain, that happens at #here1
 
       _param_gi = my_custom_grammatical_injection_without_custom_meta_associations_
 
@@ -184,9 +184,13 @@ module Skylab::TanMan
 
       def with_mutable_workspace_
 
-        # assume these variables are ours for consumption (:#spot1.2):
+        # assume these variables are ours for consumption (:#here1):
 
-        _dry = remove_instance_variable :@dry_run
+        # here's a nasty trick: we don't want to procede unless
+        # this is set, but leave it set for others to read:
+
+        dry = remove_instance_variable :@dry_run
+        @dry_run = dry
 
         _ = _with_mutable_or_immutable_workspace_MO do |o|
 
@@ -197,7 +201,7 @@ module Skylab::TanMan
             x
           end
 
-          o.is_dry_run = _dry
+          o.is_dry_run = dry
         end
 
         _ || NIL  # #downgrade-from-false
@@ -488,35 +492,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models_::Starter < Model_
 
-    self._SUNSET_THIS_CLASS  # #open [#007.D.2] (on stack)
-
-    @after_name_symbol = :meaning
-
-    @description_proc = -> y do
-      y << "get or set the starter file used to create digraphs"
-    end
-
-    Actions = stubber
-
-    module Actions
-      Set = stub
-      Ls = stub
-      Get = stub
-      Lines = stub
-
-      def Lines.session * a, & p
-        Models_::Starter::Actions__::Lines.session( * a, & p )
-      end
-    end
-
-    def reinitialize_via_path_for_directory_as_collection path
-
-      @property_box.replace_name_in_hash ::File.basename path
-      NIL_
-    end
-  end
   end  # if false for this/these model class(es)
 
     Here_ = self

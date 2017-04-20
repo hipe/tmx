@@ -2,18 +2,38 @@
 
 ## in context
 
-(EDIT when better integrated)
-
 the subject library is a bit of a solution in search of a problem; but
 it's one we feel strongly about maintaining.
 
-something something #feature-island.
-
 it's worth explaining how it arrived at its current form:
 
-at one point we used the facilities behind the subject library to
-store and retrieve an entity that consisted of a single, "primitive" value.
+at one point we used the facilities behind the subject library to store
+and retrieve an entity that consisted of a single, "primitive" value. we
+have since decided that's it's overkill to use an entity model when our
+requirements are limited to the storage and retrieval of primitive values
+(strings, specifically filesystem paths).
 
+however, the vacuum left behind was a conspicuous one: as we would come
+to see it, the "problem" of using a config-file based store *as* as
+entity store is one that is both interesting and easily solveable.
+
+despite the fact that we apparently no longer had an immediate need for
+such a "sophisticated" layer on top of of our plain old config file
+API (recently overhauled to be perfect), if we nevertheless persisted
+it would have this value:
+
+  - working with parsing config files is easy and fun
+
+  - a full CRUD-like facility on top of the store layer bolsters
+    the general robustity of the adapter
+
+  - having an exemplary CRUD solution can act as a guide
+    (an "acceptance gamut") for other CRUD adaptations
+
+  - having the above be based on a store that we control and that
+    is easy to add features to and modify increases its value.
+
+as such, this amounts to an intentional #feature-island.
 
 
 

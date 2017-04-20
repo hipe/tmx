@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        call_API :graph, :use
+        call_API( * _subject_action )
 
         a = []
         expect :error, :missing_required_attributes do |ev|
@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
       shared_subject :_tuple do
 
         call_API(
-          :graph, :use,
+          * _subject_action,
           :digraph_path, 'some-path',
         )
 
@@ -138,44 +138,44 @@ module Skylab::TanMan::TestSupport
     # (5/N)
     context "dirname of digraph path cannot be noent" do
 
-      it "invokes" do  # :#cov1.1
-        _tuple || fail
+      it "result is NIL" do  # :#cov1.1
+        _tuple.last.nil? || fail
       end
 
-      it ".."  # (at writing 2 of the 4 emissions emit..)
-      def _xx
+      it "structured event, whines with focused detail" do
 
-        ev = _expect_events_order_insensitive(
+        arg_path, ev = _tuple[ 0, 2 ]
 
-          adding_extension: nil,
-          component_not_found: nil,
-          using_default: nil,
-          parent_directory_must_exist: IDENTITY_ )
+        ev.path == ::File.dirname( arg_path ) || fail
 
-        full_path_ = ::File.dirname full_path
-
-        ev.to_event.path.should eql full_path_
-
-        black_and_white( ev ).should eql "parent directory must exist - some-deep"
-      end while false
+        _actual = black_and_white ev
+        _actual == "parent directory must exist - some-deep"
+      end
 
       shared_subject :_tuple do
 
+        a = []
+
         workspace_path = path_for_workspace_005_with_just_a_config_
 
-        _digraph_path = ::File.join workspace_path, 'some-deep/path'
+        digraph_path = ::File.join workspace_path, 'some-deep/path.dot'
 
-        _call_API_with_digraph_path_and_workspace_path _digraph_path, workspace_path
+        a.push digraph_path
 
-        a = []
-        expect :info, :adding_extension do |ev|
-          a.push ev
-        end
+        # (we include the extension in the name above so that we don't
+        #  get an emission about it being added.)
+
+        # (we place the would-be digraph file in the workspace directory
+        #  so that the path is relativized in the config, making it easier
+        #  to assert in a portable way here.)
+
+        _call_API_with_digraph_path_and_workspace_path digraph_path, workspace_path
 
         expect :resource_not_found, :parent_directory_must_exist do |ev|
           a.push ev
         end
 
+        a.push execute
         a
       end
     end
@@ -184,14 +184,16 @@ module Skylab::TanMan::TestSupport
     context "digraph path cannot be a directory" do
 
       it "invokes" do  # :#cov1.2
-        _tuple || fail
+        _tuple.last.nil? || fail
       end
 
-      it ".."
-      if false
-          expect_not_OK_event :wrong_ftype,
-            /\A\(pth "[^"]+"\) exists but is not \(indefinite_noun #{
-             }"file"\), it is \(indefinite_noun "directory"\)\z/
+      it "explains what was expected and what was actual" do
+
+        _ev = _tuple.first
+
+        _actual = black_and_white _ev
+
+        _actual == "not-a-dotfile.dot exists but is not a file, it is a directory" || fail
       end
 
       shared_subject :_tuple do
@@ -211,19 +213,27 @@ module Skylab::TanMan::TestSupport
           a.push ev
         end
 
-        expect_fail
-        a
+        a.push execute
       end
     end
 
     # (7/N)
     context "digraph is file but config parse error" do
 
-      it "invokes" do  # #cov1.4
-        _tuple || fail
+      it "results in NIL" do  # #cov1.4
+        _tuple.last.nil? || fail
       end
 
-      it "config parse error says.."
+      it "config parse error says.." do
+
+        _ev = _tuple.first
+        _actual = black_and_white_lines _ev
+        expect_these_lines_in_array_ _actual do |y|
+          y << "expected section name in tm-conferg.file:1:2"
+          y << "  1: [\"whtvr\"]\n"
+          y << "      ^"
+        end
+      end
 
       shared_subject :_tuple do
 
@@ -238,15 +248,14 @@ module Skylab::TanMan::TestSupport
           a.push ev
         end
 
-        expect_fail
-        a
+        a.push execute
       end
     end
 
     # (8/N)
-    context "WORKS when digraph path referent exists - writes config file" do
+    context "(work) when digraph path referent exists - writes config file" do
 
-      it "invokes; result is nothing interesting" do  # :#cov1.5
+      it "invokes; result is a would-be custom struct" do  # :#cov1.5, #here2
         a = _tuple.last
         a.first == :_result_from_use_TM_ || fail
         a.last == "i-exist/like-a-boss.dog" || fail
@@ -296,194 +305,187 @@ module Skylab::TanMan::TestSupport
     end
 
     # (9/N)
-    context "you can pass an open IO as the digraph path (a convenience hack)" do
 
-      it "invokes", wip: true do
-        # (this needs starter silo)
-        _tuple || fail
+    # NOTE - a lot happened with the next 2 tests at #history-A.2 :#here2:
+    #
+    #   - we flipped test 9 and 10. it used to be that the one that passed
+    #     an open IO for an argument value went first, then a more "ordinary"
+    #     one went second. but since we now aren't sure if we want the former
+    #     form, we are putting the more ordinary case first, and the weirder
+    #     variant second or not at all.
+    #
+    #     (they are each totally rewritten anyway, so no history is lost
+    #     by swapping positions.)
+    #
+    #   - at the moment, we don't want what used to be test 9 at all. if in
+    #     the future we find that in fact we do, we'll go back and re-do
+    #     this commit.
+    #
+    #   - it used to be that we had a special method for asserting
+    #     expectation of a set of events without regard to what order they
+    #     occurred in (`_expect_events_order_insensitive`). at first
+    #     appearance the (now preferred) "fail early" technique is at odds
+    #     with this pool-based technique because the former requires that
+    #     you forward-declare all expected emissions in the order they are
+    #     expected;
+    #
+    #     however A) because now our API for how and when we mutate and
+    #     write mutated config files is more established, the order of
+    #     emissions should hopefully be more rigid and B) the underlying
+    #     spirit of the original arrangement (testing details of emissions
+    #     in a manner divorced from their relative placement) is still
+    #     achieved under our present technique.
+
+    context "(work) normal case" do
+
+      it "result is a would-be struct, the path to the newly created file" do  # #here2
+
+        a = _tuple[2]  # result
+        a.first == :_result_from_use_TM_ || fail
+        a.last == "make-me.dot" || fail
       end
 
-      it ".."
-      def _xx
+      it "wrote the new digraph file, whose content looks good" do
 
-          scn = @event_log.flush_to_scanner
+        _digraph_path = _tuple[1]  # digraph_path
+        _but_actually = "#{ _digraph_path }.dot"
+        io = ::File.open _but_actually
+        line = io.gets
+        io.close
+        line.include? "this file is exists only to be a short file" || fail
+      end
 
-          while :wrote_file != scn.head_as_is.channel_symbol_array.last
-            scn.advance_one
-          end
+      it "write a line in the config talkin bout this new digraph file" do
 
-          @event_log = scn.flush_to_stream
+        _workspace_path = _tuple[0]  # workspace_path
+        _config_path = ::File.join _workspace_path, cfn
+        actual = ::File.open _config_path
+        expect_these_lines_in_array_with_trailing_newlines_ actual do |y|
+          y << "[ digraph ]"
+          y << "path = make-me.dot"
+          y << "starter = shorty-short.dot"
+        end
+        actual.close
+      end
 
-          expect_OK_event :wrote_file
+      it "because no extension was supplied in the argument path, one was added (explained)" do
 
-          expect_committed_changes_
+        _ev = _dereference_event :adding_extension
+        _actual = black_and_white _ev
+        _actual == "adding .dot extension to make-me" || fail
+      end
 
-          expect_succeed
+      it "for fancy CLI, the file create gets two events: one before and one after" do
 
-          _read_config_file
+        ev, ev_ = _dereference_events :before_probably_creating_new_file, :wrote_file
 
-          excerpt( 0 .. 0 ).should eql "[ graph \"../open-this-yourself\" ]\n"
+        _actual = black_and_white ev
+        _actual_ = black_and_white ev_
+
+        _actual == "creating make-me.dot" || fail
+        _actual_ == "wrote make-me.dot (182 bytes)" || fail
+      end
+
+      it "(the usual suspects occurred because of the config write)" do
+
+        ev, ev_ = _dereference_events(
+          :related_to_assignment_change,
+          :collection_resource_committed_changes,
+        )
+
+        _actual = black_and_white ev
+        _actual_ = black_and_white ev_
+
+        _actual == 'added value - ( path : "make-me.dot" )' || fail
+        _actual_ == 'updated tm-conferg.file (58 bytes)' || fail
+      end
+
+      def _dereference_event sym
+        _event_hash.fetch sym
+      end
+
+      def _dereference_events * syms
+        h = _event_hash
+        syms.map do |sym|
+          h.fetch sym
+        end
+      end
+
+      def _event_hash
+        _tuple.fetch 3
       end
 
       shared_subject :_tuple do
 
-        workspace_path = prepare_a_tmpdir_like_so_ <<-O.unindent
-          --- /dev/null
-          +++ b/#{ cfn }
-          @@ -0,0 +1 @@
-          +[ graph "dingo-dango" ]
-          --- /dev/null
-          +++ b/#{ cdn }/open-this-yourself
-          @@ -0,0 +1 @@
-          + this will get overwritten
-        O
+        a = []
 
-        _path = ::File.join workspace_path, 'open-this-yourself'
+        workspace_path = make_a_copy_of_this_workspace_ '027-short-city'
+        digraph_path = ::File.join workspace_path, cdn, 'make-me'  # note no extension
 
-        _IO = ::File.open _path, ::File::CREAT | ::File::EXCL | ::File::WRONLY
+        a.push workspace_path
+        a.push digraph_path
 
-        _call_API_with_digraph_path_and_workspace_path _IO, workspace_path
+        call_API(
+          * _subject_action,
+          :created_on, "XYZ",
+          :digraph_path, digraph_path,
+          :workspace_path, workspace_path,
+          :config_filename, cfn,
+        )
 
-        self.DEBUG_ALL_BY_FLUSH_AND_EXIT
+        o = __begin_gather_events_by_terminal_channel_symbol
+
+        o.expect :info, :adding_extension
+        o.expect :info, :before_probably_creating_new_file
+        o.expect :info, :wrote_file
+        o.expect :info, :related_to_assignment_change
+        o.expect :info, :success, :collection_resource_committed_changes
+
+        a.push execute
+        a.push o.__release_hash
       end
     end
-
-    $stderr.puts "\n\n\nDON'T YOU ... FORGET ABOUT ME\n\n\n"
-    if false
 
     # (10/N)
-          it "and digraph path is without extension - adds ext, creates digraph" do  # #too-big
+    # (#here2 explains how test 9 and 10 switched positions and we got rid
+    # of what used to be test 9; hence there is nothing in the 10 "slot")
 
-            prepare_whatever_workspace
-
-            @ws_pn = volatile_tmpdir
-
-            dg_pn = @ws_pn.join "#{ cdn }/make-me"
-
-            call_API :graph, :use,
-              :created_on, "XYZ",
-              :digraph_path, dg_pn.to_path,
-              :workspace_path, @ws_pn.to_path, :config_filename, cfn
-
-            _expect_events_order_insensitive(
-
-              adding_extension: [ nil,
-                "adding .dot extension to make-me" ],
-
-              component_not_found: [ nil,
-                "in workspace config there are no starters" ],
-
-              using_default: [ nil,
-                /\Ausing default starter "minimal\.dot" \(the last of [23] starters\)/ ],
-
-              before_probably_creating_new_file: nil,
-
-              wrote_file: [ true,
-                /\Awrote make-me\.dot \([456]\d bytes\)/ ],
-
-              collection_resource_committed_changes: [ true,
-                %r(\Aupdated config \(\d{2} bytes\)) ] )
-
-            io = dg_pn.sub_ext( '.dot' ).open( ::File::RDONLY )
-            o = TestSupport_::Expect_Line::Scanner.via_line_stream io
-
-            o.next_line.should eql "# created by tan-man on XYZ\n"
-            io.close
-
-            expect_succeed
-          end
-
-    # (11/N)
-          it "and the digraph path is with extension - creates digraph" do
-
-            prepare_whatever_workspace
-
-            ws_pn = volatile_tmpdir
-
-            dg_pn = ws_pn.join "#{ cdn }/make-this.wtvr"
-
-            call_API :graph, :use,
-              :digraph_path, dg_pn.to_path,
-              :workspace_path, @ws_pn.to_path,
-              :config_filename, cfn
-
-            ev = _expect_events_order_insensitive(
-              component_not_found: nil,
-              using_default: nil,
-              before_probably_creating_new_file: nil,
-              wrote_file: IDENTITY_,
-              collection_resource_committed_changes: nil )
-
-            ::File.basename( ev.to_event.path ).should eql 'make-this.wtvr'
-
-            expect_succeeded_result
-          end
-
-    def prepare_whatever_workspace
-      prepare_ws_tmpdir <<-O.unindent
-        --- /dev/null
-        +++ b/#{ cfn }
-        @@ -0,0 +1 @@
-        +[ whatever ]
-      O
+    def __begin_gather_events_by_terminal_channel_symbol
+      X_oper_graph_use_ThisThing.new method :expect
     end
 
-    def _expect_events_order_insensitive mutable_h
+    class X_oper_graph_use_ThisThing
 
-      # :+#abstraction-candidate
+      # because of the sheer number of events of interest emitted here,
+      # it's more practical to reference them by symbolic-key-of-terminal-
+      # channel-symbol than by offset. but keep in mind because of the
+      # "fail early" architecture (a good thing) we must assert the order
+      # of the events nonetheless. (see #here1 for what we used to do.)
+      #
+      # this is hacked inline here because it's never been needed anywhere
+      # else, and we want it to really fight to be abstracted out of this
+      # one case.
 
-      h = mutable_h
-      last_user_result = nil
+      def initialize p
+        @_event_via_terminal_channel_symbol = {}
+        @expect = p
+      end
 
-      el = event_log
-      st = Common_.stream do
-        em = el.gets
-        if em
-          em.cached_event_value
+      def expect * sym_a
+        @expect.call( * sym_a ) do |ev|
+          @_event_via_terminal_channel_symbol[ sym_a.last ] = ev
         end
       end
 
-      begin
-        ev = st.gets
-        ev or break
-        k = ev.terminal_channel_i
-        x = h.fetch k
-        h.delete k
-        x or redo
-
-        if x.respond_to? :call
-          last_user_result = x[ ev ]
-          redo
-        end
-
-        ok, msg_x = x
-
-        ok_ = ev.to_event.ok
-        ok == ok_ or fail "`#{ k }.ok` was #{ ok_.inspect }, expected #{ ok.inspect }"
-
-        msg_x or redo
-        msg = black_and_white ev
-        if msg_x.respond_to? :named_captures
-          msg.should match msg_x
-        else
-          msg.should eql msg_x
-        end
-
-        redo
-      end while nil
-
-      if h.length.nonzero?
-        fail "these expected events were not emitted: (#{ h.keys * ', ' })"
+      def __release_hash
+        remove_instance_variable :@_event_via_terminal_channel_symbol
       end
-
-      last_user_result
     end
-    end  # if false
 
     def _call_API_with_digraph_path_and_workspace_path digraph_path, path
 
       call_API(
-        :graph, :use,
+        * _subject_action,
         :digraph_path, digraph_path,
         :workspace_path, path,
         :config_filename, cfn,
@@ -509,8 +511,14 @@ module Skylab::TanMan::TestSupport
 
       [ _digraph_path, workspace_path ]
     end
+
+    def _subject_action
+      [ :graph, :use ]
+    end
+
     # ==
     # ==
   end
 end
+# :#history-A.2 (can be temporary) ..
 # #history-A.1 the beginning of the ween-off-[br] rewrite

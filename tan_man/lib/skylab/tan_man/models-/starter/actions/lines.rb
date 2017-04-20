@@ -4,6 +4,14 @@ module Skylab::TanMan
 
     class Actions::Lines
 
+      class << self
+        def call_directly__ ms_invo
+          op = new { ms_invo }
+          yield op  # (parameters exposed for this are #here1)
+          op.execute
+        end
+      end  # >>
+
       # -
 
         def definition
@@ -36,16 +44,30 @@ module Skylab::TanMan
         end
 
         def initialize
+          @_with_resolved_starter = nil
           extend Home_::Model_::CommonActionMethods
           init_action_ yield
         end
 
+        def mutable_workspace= mw
+          @_with_resolved_starter = :__with_starter_in_workspace_plus
+          @_mutable_workspace_ = mw
+        end
+
+        attr_writer(
+          :value_provider,
+        )
+
         def execute
-          if __it_was_requested_that_we_use_the_default_starter
-            __will_resolve_the_default_starter
-          else
-            __will_resolve_starter_in_workspace
+
+          unless __we_already_know_how_we_will_resolve_the_starter
+            if __it_was_requested_that_we_use_the_default_starter
+              __will_resolve_the_default_starter
+            else
+              __will_resolve_starter_in_workspace
+            end
           end
+
           __with_resolved_starter do
             __lines_via_starter
           end
@@ -88,6 +110,19 @@ module Skylab::TanMan
           send remove_instance_variable( :@_with_resolved_starter ), & p
         end
 
+        def __with_starter_in_workspace_plus
+          _ok = __resolve_starter_via_workspace_plus
+          _ok && yield
+        end
+
+        def __resolve_starter_via_workspace_plus
+
+          _ = Actions::Get.call_directly_ @_microservice_invocation_ do |o|
+            o.mutable_workspace = @_mutable_workspace_
+          end
+          _store_ :@_starter, _
+        end
+
         def __with_starter_in_workspace
           if @workspace_path
             ok = __resolve_starter_via_workspace
@@ -103,11 +138,11 @@ module Skylab::TanMan
 
         def __resolve_starter_via_workspace
 
-          _ = Actions::Get.YIKES__experiment__ @_microservice_invocation_ do |o|
+          _ = Actions::Get.call_directly_ @_microservice_invocation_ do |o|
 
-            o._simplified_write_ :workspace_path, @workspace_path
-            o._simplified_write_ :config_filename, @config_filename
-            o._simplified_write_ :max_num_dirs_to_look, @max_num_dirs_to_look
+            o.workspace_path = @workspace_path
+            o.config_filename = @config_filename
+            o.max_num_dirs_to_look = @max_num_dirs_to_look
           end
 
           _store_ :@_starter, _
@@ -143,6 +178,10 @@ module Skylab::TanMan
         end
 
         # -- B
+
+        def __we_already_know_how_we_will_resolve_the_starter
+          @_with_resolved_starter
+        end
 
         def __it_was_requested_that_we_use_the_default_starter
           @use_default

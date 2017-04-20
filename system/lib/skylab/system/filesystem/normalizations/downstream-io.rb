@@ -56,15 +56,17 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      public def execute
+    public
+
+      def execute
 
         # note this is only superficially similar to [#here.A] the common
         # algorithm and should probably not be abstracted
 
         io = @_stdout
-        pa = @qualified_knownness_of_path
+        qk = @qualified_knownness_of_path
 
-        if pa && pa.is_known_known && pa.value_x
+        if qk && qk.is_effectively_trueish
 
           if @do_recognize_common_string_patterns_
             md_x = via_path_arg_match_common_pattern_
@@ -120,15 +122,14 @@ module Skylab::System
 
       def via_path_arg_that_represents_file_
 
-        init_exception_and_open_IO_ __flags_for_open
+        _mode = __flags_for_open
 
-        if @exception_  # e.g perms, e.g no directory
+        if resolve_locked_open_IO_ _mode
 
-          __when_exception
-        else
-
-          @open_IO_.flock ::File::LOCK_EX | ::File::LOCK_NB
           __via_open_IO_create_or_overwrite
+        else
+          # e.g perms, e.g no directory
+          __when_exception
         end
       end
 
@@ -184,7 +185,7 @@ module Skylab::System
 
       def __via_open_IO_create_or_overwrite
 
-        @stat_ = @open_IO_.stat
+        @stat_ = @locked_open_IO_.stat
         d = @stat_.size
         if d.zero?
 
@@ -193,11 +194,11 @@ module Skylab::System
 
           __create
         else
-          __maybe_overwrite
+          __maybe_overwrite_via_stat_and_locked_open_IO
         end
       end
 
-      def __maybe_overwrite  # assume file existed and had nonzero bytes
+      def __maybe_overwrite_via_stat_and_locked_open_IO
 
         # you've opened a file for RW that has some content in it -
         # appending to it is outside our scope (for now). either you
@@ -205,17 +206,24 @@ module Skylab::System
         # cannot overwrite its content. which it is depends on:
 
         fa = @_force_arg
+
         if fa
-          if fa.is_known_known && fa.value_x
-            _overwrite
+          if fa.is_effectively_trueish
+            _do_overwrite = true  # hi.
           else
-            @listener.call :error, :missing_required_properties do
-              __build_missing_required_force_event
-            end
-            UNABLE_
+            NOTHING_  # hi.
           end
         else
-          _overwrite
+          _do_overwrite = true  # hi.
+        end
+
+        if _do_overwrite
+          __overwrite_via_stat_and_locked_open_IO
+        else
+          @listener.call :error, :missing_required_properties do
+            __build_missing_required_force_event
+          end
+          UNABLE_
         end
       end
 
@@ -251,26 +259,27 @@ module Skylab::System
           @filesystem.unlink path_
           produce_result_via_open_IO_ Home_::IO::DRY_STUB
         else
-          produce_result_via_open_IO_ @open_IO_
+          _io = remove_instance_variable :@locked_open_IO_
+          produce_result_via_open_IO_ _io
         end
       end
 
-      def _overwrite  # assume file existed and had nonzero content
+      def __overwrite_via_stat_and_locked_open_IO  # assume file existed and had nonzero content
 
         @listener.call :info, :before_editing_existing_file do
           __build_before_editing_existing_file_event
         end
 
+        io = remove_instance_variable :@locked_open_IO_
+
         if @_is_dry_run
 
-          @open_IO_.close
+          io.close
           produce_result_via_open_IO_ Home_::IO::DRY_STUB
-
         else
-
-          @open_IO_.rewind
-          @open_IO_.truncate 0
-          produce_result_via_open_IO_ @open_IO_
+          io.rewind
+          io.truncate 0
+          produce_result_via_open_IO_ io
         end
       end
 

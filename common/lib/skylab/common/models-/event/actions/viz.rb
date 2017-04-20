@@ -70,7 +70,7 @@ module Skylab::Common
 
         pa = qualified_knownness_of :output_file
 
-        if pa.is_known_known && pa.value_x
+        if pa.is_effectively_trueish
 
           fa = qualified_knownness_of :force
 

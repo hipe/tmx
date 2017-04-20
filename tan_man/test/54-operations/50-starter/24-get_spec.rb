@@ -126,15 +126,20 @@ module Skylab::TanMan::TestSupport
 
       it "emits an informational message about this invalidity" do
 
-        # (#fragile-test: relies on ordering of filesystem)
+        # (near #spot1.1: places that depend on the constituency of starters)
 
         _event = _tuple.last
         _actual = black_and_white_lines _event
 
+        item = '"[a-z]+(?:-[a-z]+)*\\.dot"'
+
         expect_these_lines_in_array_ _actual do |y|
           y << 'unrecognized starter "this-starter-does-not-exist.dot"'
-          y << 'did you mean "digraph.dot", "holy-smack.dot" or "minimal.dot"?'
+          y << %r(\Adid you mean (#{ item }(?:, #{ item })* or #{ item })\?\z)
         end
+
+        # (the above asserts a count of at least two items. elsewhere
+        # (under #spot.same) the constituency and order is asserted.)
       end
 
       shared_subject :_tuple do

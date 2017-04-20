@@ -17,6 +17,7 @@ use [sa] to convert etc to Stream_
 -5 [br] is renovated when it is only datastore adapteres and the example app
 -6 [cs] have fun figuring out what to do with isomorpic methods client
 -7 also: decide if entity library is deprecated (#open [#fi-034.1])
+when [tm] CLI: #open [#tm-059] invites
 [#ze-008.2] glob values
 API's: [st],[co]
 API: [gi] (during this, modernize "directory as collection" (or not))
@@ -46,17 +47,6 @@ TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 TD tan_man/test/54-operations/59-node/64-prototype_spec.rb
 TD tan_man/test/54-operations/59-node/44-create_spec.rb
 TD tan_man/test/54-operations/59-node/34-list-and-remove_spec.rb
-(model: starter)
-TD tan_man/test/54-operations/50-starter/44-set_spec.rb
-TD tan_man/test/54-operations/50-starter/24-get_spec.rb
-TD tan_man/test/54-operations/50-starter/14-list_spec.rb
 (model: graph)
 TD tan_man/test/54-operations/42-graph/64-sync_spec.rb
-sunset old code in graph model file
-TD tan_man/test/54-operations/42-graph/44-use_spec.rb
-[tm] "DON'T YOU .. FORGET ABOUT ME" (the "use" action parts that need starter silo)
-brazen/doc/issues/028-entity-collection-via-git-config.md - needs EDIT but wait till better integrated
-the whole starter silo
-(get rid of this chunk related to starters: [#007.D.1] )
-(get rid of this chunk related to starters: [#007.D.2] )
 #open [#tm-097] abstract when an expected primitive is not found in config

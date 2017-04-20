@@ -881,6 +881,10 @@ module Skylab::Common
       :reasoning,  # #[#ze-030.1]
     )
 
+    def is_effectively_trueish
+      false
+    end
+
     def is_effectively_known
       false
     end
@@ -930,6 +934,10 @@ module Skylab::Common
 
     def new_with_value x
       self.class[ x ]
+    end
+
+    def is_effectively_trueish
+      @value_x
     end
 
     def is_effectively_known
@@ -1013,6 +1021,12 @@ module Skylab::Common
 
     def to_unknown
       self.class.via_association @association
+    end
+
+    def is_effectively_trueish
+      if @is_known_known
+        @value_x
+      end
     end
 
     def is_effectively_known

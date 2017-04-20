@@ -27,12 +27,15 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_missing_and_extra do
 
+        # (:#spot1.1: tests at or near having a dependency on the below constituency)
+
         extra = nil
 
         pool = {
           "digraph.dot" => true,
           "holy-smack.dot" => true,
           "minimal.dot" => true,
+          "shorty-short.dot" => true,
         }
 
         st = _result

@@ -13,9 +13,10 @@ module Skylab::TanMan
       attr_writer(
         :digraph_path,
         :filesystem,
+        :is_dry_run,
         :listener,
+        :microservice_invocation,
         :mutable_workspace,
-        :sub_invoker,
         :template_values_provider,
       )
 
@@ -122,7 +123,7 @@ module Skylab::TanMan
             & _custom_listener )
 
           if kn
-            ::Kernel._OKAY
+            @_locked_writable_open_IO = kn.value_x ; ACHIEVED_
 
           elsif existed
 
@@ -135,7 +136,7 @@ module Skylab::TanMan
           end
         end
 
-        # -- c. if the path had an existing referent, success or fail hinges
+        # -- C. if the path had an existing referent, success or fail hinges
         #       on whether that referrent was a file. we won't be adding any
         #       content to this file here (even if it is empty) so we do not
         #       lock it.
@@ -159,10 +160,24 @@ module Skylab::TanMan
 
         def __write_upstream_content
 
-          self._USE_OR_LOSE  # #todo
-          ok = @parent.resolve_upstream_lines_
-          ok &&= __resolve_downstream_file
-          ok and @parent.flush_upstream_lines_to_file_ @f
+          if _resolve_digraph_line_upstream_
+            __write_upstream_lines_to_downstream
+          else
+            __woops_clean_up_opened_file
+          end
+        end
+
+        def __woops_clean_up_opened_file
+
+          # (probably not covered, but used during development)
+
+          io = remove_instance_variable :@_locked_writable_open_IO
+          d = io.stat.size
+          io.close
+          if d.zero?  # likely
+            @filesystem.unlink io.path
+          end
+          UNABLE_
         end
 
         def __path_existed  # all you know is path has no extension
@@ -241,23 +256,25 @@ module Skylab::TanMan
         end
       end
 
-      def flush_upstream_lines_to_file_ f  # assume @up_lines
-        self._USE_OR_LOSE  # #todo
+      def __write_upstream_lines_to_downstream
+
+        up_io = remove_instance_variable :@__line_upstream
+        down_io = remove_instance_variable :@_locked_writable_open_IO
 
         # flush upstream lines into file
 
         bytes = 0
         begin
-          line = @up_lines.gets
+          line = up_io.gets
           line or break
-          bytes += f.write line
+          bytes += down_io.write line
           redo
         end while nil
 
-        f.close
+        down_io.close  # was locked, too
 
-        maybe_send_event :info, :wrote_file do
-          __build_wrote_file_event bytes, f
+        @listener.call :info, :wrote_file do
+          __build_wrote_file_event bytes, down_io
         end
 
         bytes
@@ -267,26 +284,20 @@ module Skylab::TanMan
 
         # -- A
 
+
         def _resolve_digraph_line_upstream_
 
-          _ = DigraphLineUpstream_via_These___.call_by do |o|
-            o.template_values_provider = @template_values_provider
-            o.sub_invoker = @sub_invoker
+          _tvp = remove_instance_variable :@template_values_provider
+
+          _vp = Fetcher_via_TemplateValueProvider___.new _tvp
+
+          _ = Models_::Starter::Actions::Lines.call_directly__ @microservice_invocation do |o|
+            o.value_provider = _vp
+            o.mutable_workspace = @mutable_workspace
           end
+
           _store :@__line_upstream, _
         end
-
-      def __build_wrote_file_event bytes, f
-        self._USE_OR_LOSE  # #todo
-
-        build_OK_event_with :wrote_file,
-            :is_dry, @is_dry_run,
-            :path, f.path, :bytes, bytes do | y, o |
-
-          o.is_dry and _dry = " dry"
-          y << "wrote #{ pth o.path } (#{ o.bytes }#{ _dry } bytes)"
-        end
-      end
 
         def __downstream_reference
 
@@ -303,69 +314,39 @@ module Skylab::TanMan
         end
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+        def __build_wrote_file_event bytes, io
+
+          _ev = Common_::Event.inline_OK_with(
+            :wrote_file,
+            :bytes, bytes,
+            :is_dry, @is_dry_run,
+            :path, io.path,
+          ) do |y, o|
+
+            o.is_dry and _dry = " dry"
+            y << "wrote #{ pth o.path } (#{ o.bytes }#{ _dry } bytes)"
+          end
+          _ev  # hi. #todo
+        end
+
       # -
 
       # ==
 
-      class DigraphLineUpstream_via_These___ < Common_::MagneticBySimpleModel
-
-        attr_writer(
-          :sub_invoker,
-          :template_values_provider,
-        )
-
-        def execute
-
-          __init_value_fetcher_via_value_provider
-          _x = __via_workspace_expect_lines
-          _x || __any_lines
-        end
-
-        def __any_lines
-
-          # if no starter is indicated in the workspace, use default
-
-          Models_::Starter::Actions::Lines.session @kernel, @listener do | o |
-            o.value_fetcher = @value_fetcher
-          end.via_default
-        end
-
-        def __via_workspace_expect_lines
-          self._USE_OR_LOSE
-
-          # first, use any starter indicated in the workspace
-
-          @kernel.silo( :starter ).lines_via__(
-              @value_fetcher, @workspace ) do | * sym_a, & ev_p |
-
-            if :component_not_found == sym_a.last
-              @on_event_selectively.call :info, :component_not_found do
-                wrap = ev_p[]
-                wrap.new_with_event wrap.to_event.new_inline_with( :ok, nil )
-              end
-            else
-              @on_event_selectively[ * sym_a, & ev_p ]
-            end
-          end
-        end
-
-        def __init_value_fetcher_via_value_provider
-          _ = remove_instance_variable :@template_values_provider
-          @_value_fetcher = Fetcher_via_TemplateValueProvider___.new _
-          NIL
-        end
-      end
-
       # ==
 
       class Fetcher_via_TemplateValueProvider___ < ::BasicObject
+
+        # in the template's eyes, we've got to look like a hash. but
+        # we would rather our internal API use more clear names
 
         def initialize o
           @__provider = o
         end
 
         def fetch sym
-          @__provider.template_value sym
+          @__provider.dereference_template_variable__ sym
         end
       end
 

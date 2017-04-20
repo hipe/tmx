@@ -18,6 +18,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :operations
 
+# (1/N)
     it "case 8 - error: no input, no output" do  #  indirectly case 3, case 6, case 7 too
       call_API :graph, :sync
       expect_not_OK_event :non_one_IO, /\Aneed exactly 1 input-related /i
@@ -25,6 +26,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "case 4 with input syntax failure" do
 
       out_a = EMPTY_A_
@@ -41,6 +43,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (3/N)
     it "case 5 (a regressive case) - copy hereput to output" do
 
       out_a = [ 'gets removed' ]
@@ -56,6 +59,7 @@ module Skylab::TanMan::TestSupport
       out_a.join( EMPTY_S_ ).should eql same_bytes
     end
 
+# (4/N)
     it "case 5 - you can't copy a graph to the same waypoint" do
 
       same_path = Home_::TestSupport::FixtureGraphs[ :the_empty_graph ]
@@ -69,6 +73,7 @@ module Skylab::TanMan::TestSupport
       expect_fail
     end
 
+# (5/N)
     it "case 4 (a regressive case) - write input to output thru transient graph " do
 
       out_a = []
@@ -83,6 +88,7 @@ module Skylab::TanMan::TestSupport
       expect_succeed
     end
 
+# (6/N)
     it "case 4 - corner case 1 - this. (covers immaculate conception)" do
 
       out_a = []
@@ -96,6 +102,7 @@ module Skylab::TanMan::TestSupport
       out_a.join( EMPTY_S_ ).should eql "digraph{\nhi -> mother\n}\n"  # note spacing
     end
 
+# (7/N)
     it "case 2 (\"import\") - simple venn case with edges only, no labels" do
 
       i_am_this =
@@ -123,6 +130,7 @@ module Skylab::TanMan::TestSupport
       # (dig that smart indenting)
     end
 
+# (8/N)
     it "case 1 - input will not overwrite labels, but will write them" do
 
       _input_s = "digraph{ \n su [ label=\"Super-Par\" ]\n ab [  label=\"Xy\"] \n}"

@@ -1,0 +1,5 @@
+# created by tan-man on {{ created_on }} (this file is exists only to be a short file that is not the default file, for testing. making fixtures for this is too annoying.)
+
+digraph {
+  a -> b;
+}
