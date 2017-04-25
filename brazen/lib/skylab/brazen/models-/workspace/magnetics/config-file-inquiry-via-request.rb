@@ -19,6 +19,7 @@ module Skylab::Brazen
 
         def initialize
           @_can_expand_path = false
+          @need_mutable_not_immutable = nil
           yield self
           @max_num_dirs_to_look ||= 1  # for now not all clients are required to pass this
           @system = Home_.lib_.system  # for now. just for abs path stuff.

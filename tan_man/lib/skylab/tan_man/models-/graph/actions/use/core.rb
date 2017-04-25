@@ -2,9 +2,6 @@ module Skylab::TanMan
 
   module Models_::Graph
 
-    # ==
-
-    Actions = ::Module.new
     class Actions::Use
 
       def definition
@@ -61,6 +58,13 @@ module Skylab::TanMan
 
         @created_on || ::Time.now.utc.to_s
       end
+
+      # ==
+
+      Here___ = self
+
+      # ==
+      # ==
     end
 
     # ==
@@ -81,13 +85,7 @@ module Skylab::TanMan
               # otherwise clients will not look for this invitation
 
     end  # if false
-
-    # ==
-    # ==
-
-    Here___ = self
-
-    # ==
   end
 end
+# #history-A.2: this used to be the core "graph" file, became the "use" action node.
 # #history-A: ween off of [br]

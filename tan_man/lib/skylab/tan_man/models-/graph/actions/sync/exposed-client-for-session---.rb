@@ -1,11 +1,18 @@
 module Skylab::TanMan
 
-  class Models_::Graph
+  module Models_::Graph
 
-    class Sync_
+    class Actions::Sync
 
-      class Session___
+      class ExposedClient_for_Session___
 
+        $stderr.puts "REMINDER: we haven't begun to refactor this node at all"
+
+        def initialize( * )
+          NOTHING_  # hi.
+        end
+
+        if false
         def initialize dc, kr, & oes_p
 
           nc = kr.silo( :node ).
@@ -56,6 +63,7 @@ module Skylab::TanMan
           # it's not within our scope to persist the graph.
 
           ACHIEVED_
+        end
         end
       end
     end

@@ -54,20 +54,23 @@ module Skylab::TanMan
           if x
             x
           else
-            self._COVER_ME_FUN_emit_this_instead
-            @parser_failure_reason = @_parse.failure_reason
-            UNABLE_
+            __when_input_parse_error
           end
         else
           s
         end
       end
 
-      def parser_failure_reason
-        self._JUST_CHECKING
-      end
+      def __when_input_parse_error  # #cov11.1
 
-      # attr_reader :parser_failure_reason
+        message_s = @_parse.failure_reason  # (not our name)
+
+        @listener.call :error, :expression, :input_parse_error do |y|
+          y << message_s
+        end
+
+        UNABLE_
+      end
 
       def _produce_whole_string
 

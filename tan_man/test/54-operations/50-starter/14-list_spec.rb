@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_missing_and_extra do
 
-        # (:#spot1.1: tests at or near having a dependency on the below constituency)
+        # (:#spot1.2: tests at or near having a dependency on the below constituency)
 
         extra = nil
 

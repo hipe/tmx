@@ -17,7 +17,11 @@ module Skylab::TanMan
       p = self.class.grammar.parser_for_rule :id  # danger is here? [#054]
       node = p.parse str
       node ||= p.parse "\"#{str.gsub('"', '\"')}\""
-      fail "sanity - what such string is invalid? #{p.failure_reason}" if ! node
+
+      if ! node
+        fail "sanity - what such string is invalid? #{ p.failure_reason }"  # (method is not our name)
+      end
+
       self.class.element2tree node, member # note member might be nil
     end
 

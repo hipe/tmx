@@ -730,7 +730,7 @@ module Skylab::Yacc2Treetop
 
       cls_ = ::Class.new cls
       cls_.include Treetop_Parser_Methods___
-      cls_.send :alias_method, :failure_reason, :my_failure_reason
+      cls_.send :alias_method, :failure_reason, :my_failure_reason  # (`failure_reason` is not our name)
       cls_
     end
 
@@ -758,7 +758,7 @@ module Skylab::Yacc2Treetop
 
     def __when_parse_failure
 
-      msg = @_parser.failure_reason || __say_no_reason
+      msg = @_parser.failure_reason || __say_no_reason  # (not our name)
       @on_event_selectively.call :error, :expression, :line do | y |
         y << msg
       end

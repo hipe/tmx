@@ -1,88 +1,75 @@
 module Skylab::TanMan
 
-  class Models_::Graph
+  class Models_::Graph::Actions::Sync
 
-    class Sync_  # see [#026] narrative
+    class Sync_via_Parameters___ < Common_::MagneticBySimpleModel
 
-      def initialize inp, herep, outp, bx, kr, & oes_p
-        @box_proxy = bx
-        @do_build_transient_graph = false
-        @dot_file_silo = kr.silo :dot_file
-        @here_ID = herep
-        @in_ID = inp
-        @kernel = kr
-        @on_event_selectively = oes_p
-        @only_write_hereput_to_output = false
-        @out_ID = outp
+      # see [#026] IO resolution through parameter modeling, near syncing.
+
+      def initialize
+        super
       end
 
-      attr_accessor :do_build_transient_graph, :only_write_hereput_to_output
+      attr_writer(
+        :here_reference,
+        :in_reference,
+        :listener,
+        :microservice_invocation,
+        :out_reference,
+      )
 
-      def flush
-        if @only_write_hereput_to_output
-          __only_write_hereput_to_output
-        else
-          _ok = __resolve_input_lines
-          _ok && __normal
-        end
-      end
+      # (it "feels" more parsimonious if we again make a logic mesh here,
+      #  but with the making of different decisions than we did there.
+      #  with some fragility we omit the cases that we failed out before.)
 
-      def __only_write_hereput_to_output
-
-        if @here_ID.is_same_waypoint_as @out_ID
-          @on_event_selectively.call :error, :hereput_and_output_waypoints_are_the_same
-          UNABLE_
-        else
-          _store :@dc, _via_here_ID_build_document_controller
-        end
-      end
-
-      def __resolve_input_lines
-        @line_count = 0
-        st = @in_ID.to_simple_line_stream
-        st and begin
-          @in_ID = nil
-          @upstream_lines = Common_::MinimalStream.by do
-            line = st.gets
-            if line
-              @line_count += 1
+      def execute
+        if @in_reference
+          if @here_reference
+            if @out_reference
+              __when_input_and_hereput_and_output  # case 1
+            else
+              __when_input_and_hereput  # case 2
             end
-            line
+          else
+            __when_input_and_output  # case 3
           end
-          ACHIEVED_
-        end
-      end
-
-      def __normal
-
-        if @do_build_transient_graph
-          __resolve_session_with_transient_graph
         else
-          _via_hereput_resolve_session
-        end
-        @sync_session and __mutate_session_and_write_to_output
-      end
-
-      def __resolve_session_with_transient_graph
-        @here_ID = Byte_upstream_reference_[].via_string "digraph{\n}\n"
-        _via_hereput_resolve_session
-      end
-
-      def _via_hereput_resolve_session
-        @sync_session = begin
-          @dc = _via_here_ID_build_document_controller
-          @dc and begin
-            Sync_::Session___.new @dc, @kernel, & @on_event_selectively
-          end
+          __when_hereput_and_output  # case 5
         end
       end
 
-      def _via_here_ID_build_document_controller
-        @dot_file_silo.document_controller_via_byte_upstream_reference(
-          @here_ID, & @on_event_selectively )
+      # -- H:
+
+      def __when_input_and_hereput
+
+        ok = _not_same :_input_, :_hereput_
+        ok && self._SKETCH__in_pseudocode__
       end
 
-      def __mutate_session_and_write_to_output
+      def __when_input_and_hereput_and_output
+
+        ok = _not_same :_input_, :_hereput_
+        ok &&= _not_same :_hereput_, :_output_
+        ok && self._SKETCH__in_pseudocode__
+      end
+
+      def __when_input_and_output
+
+        ok = _not_same :_input_, :_output_
+        ok &&= _resolve_upstream_line_stream_via :_input_
+        ok &&= _begin_empty_document
+        ok && _will_write_final_output_lines_to( :_output_ )
+        ok && _money
+      end
+
+      def __when_hereput_and_output
+
+        ok = _not_same :_hereput_, :_output_
+        ok &&= self._HMMM
+      end
+
+      def _money
+
         ok = __process_first_line
         ok &&= __process_zero_or_more_label_nodes
         ok &&= __process_zero_or_more_edges
@@ -90,7 +77,7 @@ module Skylab::TanMan
         ok && __finish
       end
 
-      # ~ matching only
+      # -- G: matching
 
       def __process_first_line
         @line = @upstream_lines.gets
@@ -201,7 +188,7 @@ module Skylab::TanMan
 
       def _when_expected * sym_a
 
-        @on_event_selectively.call :error, :input_parse_error do
+        @listener.call :error, :input_parse_error do
           __build_parse_eror_event sym_a
         end
         UNABLE_
@@ -216,11 +203,18 @@ module Skylab::TanMan
           closing_digraph_line: "}"
         }
 
-        Common_::Event.inline_not_OK_with :input_parse_error,
+        _tuples = sym_a.map do |sym|
+          [ sym, h.fetch( sym ) ]
+        end
 
-            :lineno, @line_count,
+        _lineno = send @_lineno
+
+        Common_::Event.inline_not_OK_with(
+          :input_parse_error,
+          :lineno, _lineno,
             :line, @line,
-            :tuples, sym_a.map { |i| [ i, h.fetch( i ) ] } do | y, o |
+          :tuples, _tuples,
+        ) do |y, o|
 
           _s_a = o.tuples.map do | sym, eg_s |
             "#{ sym.id2name.gsub( UNDERSCORE_, SPACE_ ) }#{
@@ -236,7 +230,7 @@ module Skylab::TanMan
         end
       end
 
-      # ~ processing
+      # -- F: processing
 
       def _via_label_match
 
@@ -258,11 +252,114 @@ module Skylab::TanMan
         @sync_session.receive_finish
       end
 
-      def the_document_controller
-        @dc
+      # -- E:
+
+      def _will_write_final_output_lines_to sym
+
+        $stderr.puts "(IGNORING A THING)"
+
+        @sync_session = This_::ExposedClient_for_Session___.new(
+          remove_instance_variable( :@__document_controller ),
+          @microservice_invocation,
+          & @listener )
+        NIL
+      end
+
+      # -- D:
+
+      def _begin_empty_document
+
+        _ref = Byte_upstream_reference_[].via_string "digraph{\n}\n"
+
+        __resolve_document_controller_via_byte_upstream_reference _ref
+      end
+
+      def __resolve_document_controller_via_byte_upstream_reference ref
+
+        _ = Models_::DotFile::DocumentController_via_Request.call_by do |o|
+
+          o.byte_upstream_reference = ref
+          o.invocation = @microservice_invocation
+          o.listener = @listener
+        end
+
+        _store :@__document_controller, _
+      end
+
+      # -- C:
+
+      def _resolve_upstream_line_stream_via whatput
+
+        _ref = instance_variable_get _ivar whatput
+
+        st = _ref.to_simple_line_stream  # ..
+
+        if st
+          if st.respond_to? :lineno
+            @_lineno = :__line_number_easily
+            @upstream_lines = st
+          else
+            @_lineno = :__line_number_complicatedly
+            @upstream_lines = __wrap_so_we_have_line_numbers st
+          end
+          ACHIEVED_
+        end
+      end
+
+      def __wrap_so_we_have_line_numbers st
+        @_current_line_number = 0
+        Common_::MinimalStream.by do
+          line = st.gets
+          if line
+            @_current_line_number += 1
+            line
+          end
+        end
+      end
+
+      def __line_number_complicatedly
+        @_current_line_number
+      end
+
+      def __line_number_easily
+        @upstream_lines.lineno
+      end
+
+      # -- B:
+
+      def _not_same whatput, whatput_
+
+        ref = instance_variable_get _ivar whatput
+        ref_ = instance_variable_get _ivar whatput_
+
+        if ref.is_same_waypoint_as ref_
+
+          _channel_tail = case [ whatput, whatput_ ]
+          when [ :_hereput_, :_output_ ]
+            :hereput_and_output_waypoints_are_the_same
+          else
+            self._COVER_ME__easy__
+          end
+
+          @listener.call :error, _channel_tail
+          UNABLE_
+        else
+          ACHIEVED_
+        end
+      end
+
+      # -- A: general support
+
+      def _ivar whatput
+        case whatput
+        when :_input_ ; :@in_reference
+        when :_hereput_ ; :@here_reference
+        when :_output_ ; :@out_reference
+        end
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
   end
 end
+# #history-A.1: first half of rewrite (perhaps last half too)

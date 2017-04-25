@@ -126,7 +126,7 @@ module Skylab::TanMan::TestSupport
 
       it "emits an informational message about this invalidity" do
 
-        # (near #spot1.1: places that depend on the constituency of starters)
+        # (near #spot1.2: places that depend on the constituency of starters)
 
         _event = _tuple.last
         _actual = black_and_white_lines _event

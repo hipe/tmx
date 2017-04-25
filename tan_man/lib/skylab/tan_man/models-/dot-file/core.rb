@@ -53,14 +53,6 @@ module Skylab::TanMan
         o.receive_document_action action
         o.produce_document_controller
       end
-
-      def document_controller_via_byte_upstream_reference id, & oes_p
-
-        ::Kernel._THIS_CHANGED__but_it_can_be_easy__
-        o = Here_::Magnetics_::DocumentController_via_Kernel.new @kernel, & oes_p
-        o.receive_byte_upstream_reference id
-        o.produce_document_controller
-      end
     end
 
     end  # if false

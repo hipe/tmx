@@ -2,24 +2,28 @@ module Skylab::TanMan
 
   class DocumentMagnetics_::ByteStreamReference_via_Request < Common_::MagneticBySimpleModel
 
-    # (#spot1.1 is probably required reading to understand this.)
+    # ([#026.B] is probably required reading to understand this.)
 
     # given one or both "throughput directions" (input and/or output), solve
     # a single qualified actual parameter for each direction. if exactly one
     # cannot be resolved for each direction unambiguously, fail expressively
 
+    # oh, also, this thing with "hereput"
+
     # -
 
-      def initialize
-        @__mutex_for_will_solve_for = nil
-        super
+      def will_solve_for * input_hereput_output
+        @_number_of_directions = input_hereput_output.length
+        @_solve_for_these_symbols = input_hereput_output
+        NIL
       end
 
-      def will_solve_for sym
-        remove_instance_variable :@__mutex_for_will_solve_for
-        @_number_of_directions = 1
-        @_solve_for_these_symbols = [ sym ]
-        NIL
+      def will_enforce_minimum
+        @_do_enforce_minimum  = :__TRUE
+      end
+
+      def will_NOT_enforce_minimum
+        @_do_enforce_minimum = :__FALSE
       end
 
       attr_writer(
@@ -34,7 +38,7 @@ module Skylab::TanMan
         __classify_each_association_under_the_directions_it_solves_for
 
         __for_each_direction do
-          __resolve_exactly_one_bytestream_reference_for_this_direction
+          __resolve_at_most_one_bytestream_reference_for_this_direction
         end
 
         __flush_final_result
@@ -44,19 +48,23 @@ module Skylab::TanMan
 
       def __flush_final_result
 
-        a = remove_instance_variable :@_final_byte_stream_references
-        if 1 == @_number_of_directions
-          a.fetch 0
+        _a = remove_instance_variable :@_final_byte_stream_references
+        _q_a = remove_instance_variable :@qualifieds_via_direction_offset
+        if @_ok
+          MyResult___.new _a, _q_a
         else
-          ::Kernel._OKAY
+          self._COVER_ME__xx__
         end
       end
 
+      MyResult___ = ::Struct.new :solution_tuple, :qualifieds_via_direction_offset
+
       # -- C
 
-      def __resolve_exactly_one_bytestream_reference_for_this_direction
+      def __resolve_at_most_one_bytestream_reference_for_this_direction
 
         if __resolve_exactly_one_qualified_value_for_this_direction
+
           __resolve_bytestream_reference_via_current_qualified_value
         end
         NIL
@@ -64,7 +72,7 @@ module Skylab::TanMan
 
       def __resolve_bytestream_reference_via_current_qualified_value
 
-        _qkn = remove_instance_variable :@__current_qualified_value
+        _qkn = remove_instance_variable :@_current_qualified_value
 
         _class = ByteStreamClass_via_Direction[ @_current_direction_symbol ]
 
@@ -81,18 +89,34 @@ module Skylab::TanMan
       # -- B
 
       def __resolve_exactly_one_qualified_value_for_this_direction
-        a = @__name_symbols_via_direction_offset.fetch @_current_direction_offset
-        if a
-          if 1 == @_number_of_directions
-            @__current_qualified_value =
-              @qualified_knownness_box.fetch a.fetch 0
-          else
-            self._SEE_NOTES__have_fun__
+
+        do_enforce_minimum = send @_do_enforce_minimum  # #hi.
+
+        qkn_a = @qualifieds_via_direction_offset.fetch @_current_direction_offset
+        if qkn_a
+          use_qkn_a = nil
+          qkn_a.each do |qkn|
+            qkn.is_effectively_trueish || next
+            ( use_qkn_a ||= [] ).push qkn
           end
-        else
-          __when_zero_for_this_direction
         end
-        @_ok
+
+        if use_qkn_a
+          case 1 <=> use_qkn_a.length
+          when 0  # length of 1
+            @_current_qualified_value = use_qkn_a.fetch 0
+            YES_
+
+          when -1  # length of many
+            __tiebreak use_qkn_a
+
+          else ; no
+          end
+        elsif do_enforce_minimum
+          __when_zero_for_this_direction
+        else
+          NO_  # hi.
+        end
       end
 
       def __for_each_direction
@@ -104,55 +128,68 @@ module Skylab::TanMan
           @_current_direction_symbol = sym
           @_current_direction_offset = d
           yield
-          @_ok || break  # (we don't have to short circuit here but we choose to.)
+          # @_ok || break  # (we don't have to short circuit here but we choose to.)
         end
         NIL
       end
 
       def __when_zero_for_this_direction
-        Emit_via_NonOneScenario__.call_by do |o|
-          o.array_of_qualifieds_that_provide_such_a_value = EMPTY_A_
+        Emit_via_NonOneScenario.call_by do |o|
+          o.parameter_symbols_via_direction = nil
           o.direction_symbol = @_current_direction_symbol
           o.listener = @listener
         end
-        @_ok = false ; nil
+        @_ok = false ; NO_
       end
 
       # -- A
 
       def __classify_each_association_under_the_directions_it_solves_for
 
+        # for each qualified knownness in the box (whether it has a
+        # provided value or not), index it under each direction it can solve
+        # for..
+
         a = ::Array.new @_number_of_directions
 
-        __each_qualified_knownness do |qkn|
+        @qualified_knownness_box.each_value do |qkn|
 
           asc = qkn.association
           tc = asc._throughput_characteristics_
           tc || next
+
           @_solve_for_these_symbols.each_with_index do |direction_sym, d|
             tc[ direction_sym ] || next
-            ( a[ d ] ||= [] ).push asc.name_symbol
+            ( a[ d ] ||= [] ).push qkn
           end
         end
-        @__name_symbols_via_direction_offset = a.freeze
+        @qualifieds_via_direction_offset = a.freeze
         NIL
       end
 
-      def __each_qualified_knownness
-        @qualified_knownness_box.each_value do |qkn|
-          yield qkn
-        end
+      def __TRUE
+        TRUE
       end
+
+      def __FALSE
+        FALSE
+      end
+
     # -
 
     # ==
 
-    class Emit_via_NonOneScenario__ < Common_::MagneticBySimpleModel
+    class Emit_via_NonOneScenario < Common_::MagneticBySimpleModel
+
+      def direction_symbol= sym
+        # (this is kept as-is to hide the fact that internally we represent them the same)
+        self.direction_symbols = [ sym ] ; sym
+      end
 
       attr_writer(
-        :array_of_qualifieds_that_provide_such_a_value,
-        :direction_symbol,
+        :direction_symbols,
         :listener,
+        :parameter_symbols_via_direction,
       )
 
       def execute
@@ -165,9 +202,8 @@ module Skylab::TanMan
         me = self
         Common_::Event.inline_not_OK_with(
           :non_one_IO,
-          :direction_symbol, @direction_symbol,
-          :array_of_qualifieds_that_provide_such_a_value,
-            @array_of_qualifieds_that_provide_such_a_value
+          :direction_symbols, @direction_symbols,
+          :parameter_symbols_via_direction, @parameter_symbols_via_direction,
 
         ) do |y, _o|
           me.__express_into_under y, self
@@ -181,20 +217,70 @@ module Skylab::TanMan
       end
 
       def __express
-        @_current_line_yielder << "needed exactly 1 #{ @direction_symbol }#{
-          }-related argument, had #{ _array.length }#{ __say_extra }"
-      end
-
-      def __say_extra
-        if _array.length.zero?
-          __say_extra_when_none
+        if 1 == @direction_symbols.length
+          @direction_symbol = @direction_symbols[ 0 ]
+          __express_for_one_direction
         else
-          __say_extra_when_several
+          __express_for_multiple_directions
         end
       end
 
-      def __say_extra_when_none
-        self._SEE_NOTES__there_is_a_special_dootily_hah
+      # ~
+
+      def __express_for_multiple_directions
+
+        __express_what_is_missing_for_multiple_directions_as_a_line
+        __express_what_can_be_used_to_supply_the_missing_directions_as_a_line
+      end
+
+      def __express_what_can_be_used_to_supply_the_missing_directions_as_a_line
+
+        h = {}
+        @direction_symbols.each do |sym|
+          @parameter_symbols_via_direction.fetch( sym ).each do |sym_|
+            h[ sym_ ] = true
+          end
+        end
+        buffer = "use "
+        @_current_expression_agent.calculate do
+          simple_inflection do
+            oxford_join buffer, Scanner_[ h.keys ], ' and/or ' do |sym|
+              prim sym
+            end
+          end
+        end
+        @_current_line_yielder << buffer
+      end
+
+      def __express_what_is_missing_for_multiple_directions_as_a_line
+
+        buffer = "missing required "
+        _these = Scanner_[ @direction_symbols ]
+        @_current_expression_agent.calculate do
+          simple_inflection do
+            oxford_join buffer, _these do |sym|
+              sym.id2name  # this works just because they're each one word
+            end
+          end
+        end
+        buffer << "-related arguments"
+        @_current_line_yielder << buffer
+      end
+
+      # ~
+
+      def __express_for_one_direction
+
+        self._CHANGED__near_use_of_this_method_called_array__
+
+        @_current_line_yielder << "needed exactly 1 #{ @direction_symbol }#{
+          }-related argument, had #{ _array.length }#{ __say_extra_for_one_direction }"
+      end
+
+      def __say_extra_for_one_direction
+        if _array.length.nonzero?
+          __say_extra_when_several
+        end
       end
 
       def __say_extra_when_several
@@ -203,7 +289,7 @@ module Skylab::TanMan
 
         @_current_expression_agent.simple_inflection do
 
-          _scn = No_deps_[]::Scanner_via_Array me._array do |qkn|
+          _scn = No_deps_[]::Scanner_via_Array.new me._array do |qkn|
             prim qkn.association.name_symbol
           end
 
@@ -217,13 +303,13 @@ module Skylab::TanMan
       end
     end
 
-
     # ==
 
     ByteStreamClass_via_Direction = -> do
 
       these = {
         input: :UpstreamReference,
+        hereput: :UpstreamReference,  # meh this is :#microtheme1
         output: :DownstreamReference,
       }
 
@@ -232,6 +318,9 @@ module Skylab::TanMan
         Home_.lib_.basic::ByteStream.const_get _const, false
       end
     end.call
+
+    NO_ = false
+    YES_ = true
 
     # ==
     # ==

@@ -162,7 +162,7 @@ module Skylab::TanMan
         reason = nil
         begin # set reason
           if ! res
-            reason = parser.failure_reason
+            reason = parser.failure_reason  # (not our name)
             break
           end
           if parser.input.length > parser.index

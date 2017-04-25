@@ -19,6 +19,7 @@ the salient charactersistics of this model are:
 
   • as such, rather than speaking of emitting *events*, we conceive
     of the role of the producer as emitting *potential* events.
+    (EDIT: more frequently we simply say "emissions" nowadays.)
 
   • the role of the consumer in this model is to *decide* on each
     potential event it receives (we say "emission"), whether or not

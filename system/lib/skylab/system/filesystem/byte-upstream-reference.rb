@@ -67,10 +67,6 @@ module Skylab::System
         Home_::Filesystem::ByteDownstreamReference.new @path, & @on_event_selectively
       end
 
-      def is_same_waypoint_as x
-        :path == x.shape_symbol && @path == x.path  # can fail because etc.
-      end
-
       def description_under expr
         Basic_[]::Pathname.description_under_of_path expr, @path
       end
@@ -87,6 +83,57 @@ module Skylab::System
         @path
       end
 
+      def modality_const
+        :ByteStream
+      end
+
+      # ..
+
+      def is_same_waypoint_as otr
+
+        # ultimately it's the filesystem's responsibility (not ours) to
+        # decide how an inode (file) is resolved from a string, and most (if
+        # not all) filesystems allow for more than just one string to resolve
+        # to the same inode:
+        #
+        #     "/some/FILE", "some/file"  # same file on HFS (iOS)
+        #
+        #     "/some/./file", "/some/file"  # same file (probaly most FS's)
+        #
+        #     "file", "/some/file"  # same file if you are "in" the "/some" directory
+        #
+        # to implement the subject method "robustly" would then probably
+        # involve .. we're not even sure how we'd do it.
+        #
+        # while we don't want to go crazy implementing this to a degree of
+        # robustness that would involve coupling too tightly to the system,
+        # we would hate to get bit by cases like the second example above,
+        # that are easy enough to detect without going into the system.
+        # so here is our middle-ground compromise for good-enough robustity:
+
+        if :path == otr.shape_symbol
+
+          otr_path = otr.path
+
+          # (for many cases we would save work by just short-circuiting on
+          # string equality here, but we want to exercise the machinery)
+
+          if Path_looks_absolute_[ @path ]
+            if Path_looks_absolute_[ otr_path ]
+
+              _use_path = ::File.expand_path @path
+              _use_path_ = ::File.expand_path otr_path
+              _use_path == _use_path_
+
+            else
+              self._COVER_ME__not_recommended_to_use_this_with_any_relative_paths
+            end
+          else
+            self._COVER_ME__not_recommended_to_use_this_with_any_relative_paths
+          end
+        end
+      end
+
       attr_reader(
         :path,
       )
@@ -95,9 +142,6 @@ module Skylab::System
         :path
       end
 
-      def modality_const
-        :ByteStream
-      end
     end
   end
 end

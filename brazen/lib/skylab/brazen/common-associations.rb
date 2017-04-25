@@ -58,6 +58,10 @@ module Skylab::Brazen
       def __read_injection_subsequently
         @__injection
       end
+
+      def to_loadable_reference_stream
+        @_box.to_key_stream
+      end
     # -
 
     # ==

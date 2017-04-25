@@ -1,130 +1,182 @@
 module Skylab::TanMan
 
-  class Models_::Graph
+  module Models_::Graph
 
-    class Sync_
+    class Actions::Sync
 
-      class Action < DocEnt_::Action
+      # if memory serves, this was intented to help the subject application
+      # "import" (and maybe "export") graphs to other applications, like [sn]
+      # but in its state it's really just the beginning of a proof of concept
+      #
+      # see [#026] IO resolution through parameter modeling, near syncing.
 
-        # this is an ordinary [br] model action with lots of custom
-        # normalization oweing to our experiment with possibly three
-        # "waypoints": input, "hereput" and output. see [#026] for
-        # more about the architecture of syncing.
+      def definition
 
-        Property = DocEnt_.entity_property_class
-
-        edit_entity_class(
-
-          :preconditions, EMPTY_A_,
-
+        false and [
           :inflect, :verb, 'sync', :noun, 'graph',
+        ]
 
+        _hi = Home_::DocumentMagnetics_::CommonAssociations.
+          to_item_stream_nothing_required__
+
+        [
           :flag, :property, :dry_run,
 
-          :reuse, Home_::Model_::DocumentEntity.IO_properties,
+          :properties, _hi,
 
-          :for_direction, :hereput, :property, :hereput_string,
-          :for_direction, :hereput, :property, :hereput_path
+          :use_this_one_custom_attribute_grammar,
 
-        )
+          :property, :hereput_string,
+          :throughput_direction, :hereput,
 
-        def document_entity_normalize_
+          :property, :hereput_path,
+          :throughput_direction, :hereput,
+        ]
+      end
 
-          # our rules are pretty weird, so we do it manually
+      def initialize
+        extend Home_::Model_::CommonActionMethods
+        init_action_ yield
+        @_associations_ = {}
+      end
 
-          ::Kernel._THIS_CHANGED__but_it_can_be_easy__
-          o = Home_::DocumentMagnetics_::ByteStreamReference_via_Request
-          o = DocEnt_::ByteStreamIdentifier_via.new( @kernel, & handle_event_selectively )
+      def _accept_association_ asc
+        @_associations_[ asc.name_symbol ] = asc
+      end
 
-          o.formals formal_properties
+      def execute
+        ok = true
+        ok &&= __resolve_at_most_one_parameter_per_direction
+        ok &&= __do_the_rule_table_thing
+        ok &&= __sync_appropriately
+        ok || NIL_AS_FAILURE_
+      end
 
-          o.for_model silo_module
+      # -- D
 
-          o.against_argument_box @argument_box
+      def __sync_appropriately
+        send remove_instance_variable :@__will_write_like_this
+      end
 
-          o.set_custom_direction_mapping :hereput, :input
-
-          # some front clients will always throw in a workspace path
-          # (guess) to default in for a missing input or output path, and
-          # then when the workspace is not found an error happens. in our
-          # case, if a "hereput" is provided, we *never* want to employ the
-          # above mechanics, because it gets in the way of what we do below.
-
-          h = @argument_box.h_
-          if h[ :hereput_path ] || h[ :hereput_string ] and h[ :workspace_path ]
-            @argument_box.remove :workspace_path
-          end
-
-          ok, inp, herep, outp = o.solve_at :input, :hereput, :output
-
-          ok &&= receive_byte__input__identifier_ inp
-
-          ok and @byte_herestream_ID = maybe_convert_to_stdin_stream_( herep )
-
-          ok &&= receive_byte__output__identifier_ outp
-
-          ok and begin
-
-            @resolver = o
-
-            __effect_rule_table_validation
-          end
+      def __write_input_graph_as_is_to_output
+        _sync_by do |o|
+          # o.will_only_write_input_to_output__
         end
+      end
 
-        def __effect_rule_table_validation
+      def __write_hereput_graph_as_it_to_output  # (same as previous)
+        _sync_by do |o|
+          # o.will_only_write_hereput_to_output__
+        end
+      end
 
-          # see the spec which expresses the below as a rule table
+      def _sync_by
+        This_::Sync_via_Parameters___.call_by do |o|
+          yield o
+          o.in_reference = @_input
+          o.here_reference = @_hereput
+          o.out_reference = @_output
+          o.microservice_invocation = @_microservice_invocation_
+          o.listener = _listener_
+        end
+      end
 
-          in_ID = document_entity_byte_upstream_reference
-          here_ID = @byte_herestream_ID
-          out_ID = document_entity_byte_downstream_reference
+      # -- C
 
-          if in_ID
-            if here_ID
-              if ! out_ID  # case 2
-                out_ID = here_ID.to_byte_downstream_reference
-                @_DEBDID = out_ID
-              end
-            elsif out_ID
-              do_build_transient_graph = true  # case 4
+      def __do_the_rule_table_thing
+
+        # the rule table at #spot1.2 can probably be implemented more
+        # tightly than what we do here (a full, mechanistic unwinding of the
+        # three booleans: TTT, TTF, TFT, TFF, ..). for example maybe the
+        # absolute distillation of the policy is simply "at least two";
+        # however we leave it unwound fully like this so we can inject
+        # special behavior per-case without having to disrupt the overall
+        # structure ("mesh") of the logic.
+        #
+        # the performer asserted that for each direction, it resolved no
+        # more than one trueish qualified argument for that direction.
+        #
+        # but if zero values were resolved for the direction, that appears
+        # as a "hole" in the below array. the remainder of this work, then,
+        # is (partly) about deciding whether any such holes are OK.
+
+        @_input, @_hereput, @_output = remove_instance_variable :@__solution_tuple
+        if @_input
+          if @_hereput
+            if @_output
+              self._CASE_1__good__
+            else
+              self._CASE_2__good__output_graph_replaces_hereput_graph__
             end
-          elsif here_ID && out_ID
-            only_write_hereput_to_output = true  # case 5
-          end
-
-          if ! only_write_hereput_to_output
-            miss_a = nil
-            in_ID or ( miss_a ||= [] ).push :input
-            out_ID or ( miss_a ||= [] ).push :output
-          end
-
-          if miss_a
-            __missing miss_a
+          elsif @_output
+            _will_write_like_this :__write_input_graph_as_is_to_output  # case 3
           else
-            o = Here_::Sync_.new in_ID, here_ID, out_ID, to_qualified_knownness_box_proxy,
-              @kernel, & handle_event_selectively
+            _fail_because_missing :input  # case 4
+          end
+        elsif @_hereput
+          if @_output
+            _will_write_like_this :__write_hereput_graph_as_it_to_output  # case 5
+          else
+            _fail_because_missing :input, :output  # case 6 (same as 8)
+          end
+        elsif @_output
+          _fail_because_missing :input  # case 7
+        else
+          _fail_because_missing :input, :output  # case 8 (same 6)
+        end
+      end
 
-            o.do_build_transient_graph = do_build_transient_graph
-            o.only_write_hereput_to_output = only_write_hereput_to_output
+      def _fail_because_missing * sym_a
 
-            @gsync = o
-            ACHIEVED_
+        h = {}
+        qkn_a_a = remove_instance_variable :@qualifieds_via_direction_offset
+        eew = [ :input, :hereput, :output ]
+        sym_a.each do |sym|
+          qkn_a = qkn_a_a.fetch eew.index sym
+          qkn_a || next
+          qkn_a.each do |qkn|
+            ( h[ sym ] ||= [] ).push qkn.name_symbol
           end
         end
 
-        def __missing miss_dir_sym_a
-          last_x = nil
-          miss_dir_sym_a.each do | sym |
-            last_x = @resolver.when_count_is_not_one sym
-          end
-          last_x
+        _this_performer::Emit_via_NonOneScenario.call_by do |o|
+          o.parameter_symbols_via_direction = h
+          o.direction_symbols = sym_a
+          o.listener = _listener_
+        end
+        UNABLE_
+      end
+
+      def _will_write_like_this m
+        @__will_write_like_this = m
+        ACHIEVED_
+      end
+
+      # -- B
+
+      def __resolve_at_most_one_parameter_per_direction
+
+        _bx = to_box__
+
+        sct = _this_performer.call_by do |o|
+          o.will_solve_for :input, :hereput, :output
+          o.will_NOT_enforce_minimum
+          o.qualified_knownness_box = _bx
+          o.listener = _listener_
         end
 
-        def produce_result
-          _ok = @gsync.flush
-          _ok and __persist
+        if sct
+          @__solution_tuple = sct.solution_tuple
+          @qualifieds_via_direction_offset = sct.qualifieds_via_direction_offset
+          ACHIEVED_
         end
+      end
 
+      def _this_performer
+        Home_::DocumentMagnetics_::ByteStreamReference_via_Request
+      end
+
+      if false
         def __persist
 
           @gsync.the_document_controller.persist_into_byte_downstream_reference(
@@ -133,6 +185,14 @@ module Skylab::TanMan
             & handle_event_selectively )
         end
       end
+
+
+      # ==
+
+      # ==
+      # ==
+
+      This_ = self
     end
   end
 end

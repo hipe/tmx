@@ -2,49 +2,101 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  # the three booleans (input, hereput, output) together have 8 permutations:
+  # three booleans together have 8 permutations. our three booleans are
+  # "input", "hereput" and "output". as it works out, the permutation is
+  # valid IFF it has two or more of the three elements. (and otherwise (with
+  # zero or one of the three elements), it is an invalid combination.)
   #
-  # case 1  Y Y Y  normal
-  # case 2  Y Y    here as out, normal
-  # case 3  Y      error - no output
-  # case 4  Y   Y  transient, normal
-  # case 5    Y Y  write hereput to output
-  # case 6    Y    error - no input, no output
-  # case 7      Y  error - no output
-  # case 8         error - no input, no output
+  # case 1:   input, hereput, output   good: write the new graph to the output
+  # case 2:   input, hereput           good: output graph replaces the hereput graph
+  # case 3:   input,          output   ok: write input graph as-is to the output
+  # case 4:   input                    error: no output
+  # case 5:          hereput, output   ok: write hereput graph as-is to the output
+  # case 6:          hereput           error: no input, no output
+  # case 7:                   output   error: no input
+  # case 8:                            error: no input, no output
+  #
+  # :#spot1.2
 
-  describe "[tm] operations - graph - sync", wip: true do
+  describe "[tm] operations - graph - sync" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :operations
 
 # (1/N)
-    it "case 8 - error: no input, no output" do  #  indirectly case 3, case 6, case 7 too
-      call_API :graph, :sync
-      expect_not_OK_event :non_one_IO, /\Aneed exactly 1 input-related /i
-      expect_not_OK_event :non_one_IO, /\Aneed exactly 1 output-related /i
-      expect_fail
+    context "case 8 - error: no input, no output" do  # almost case 4, 6 & 7 too
+
+      it "fails with nil" do
+
+        _hi = _tuple.first
+        _hi.nil? || fail
+      end
+
+      it "complains about missing BOTH input and output (first line)" do
+
+        _tuple[1] == "missing required input and output-related arguments" || fail
+      end
+
+      it 'suggests parameters you can use to provide those directions (note the use of "and/or")' do
+
+        _tuple[2] == "use 'input-string', 'input-path', 'workspace-path', 'output-string' and/or 'output-path'" || fail
+      end
+
+      shared_subject :_tuple do
+
+        call_API( * _subject_action )
+
+        a = []
+        event = nil
+        expect :error, :non_one_IO do |ev|
+          event = ev
+        end
+        a.push execute
+
+        _actual = black_and_white_lines event
+        a.concat _actual
+        a
+      end
     end
 
 # (2/N)
-    it "case 4 with input syntax failure" do
+    context "case 3 with input syntax failure" do  # :#cov11.1
 
-      out_a = EMPTY_A_
-      call_API :graph, :sync,
+      it "fails with nil" do
+        _fails_commonly
+      end
+
+      it "whined specifically" do
+
+        _actual = black_and_white_lines _tuple.first
+
+        expect_these_lines_in_array_ _actual do |y|
+          y << "expecting opening digraph line (e.g \"digraph{\") #{
+            }near line 1: \"wazoozle\\n\""
+        end
+      end
+
+      shared_subject :_tuple do
+
+        call_API(
+          * _subject_action,
         :input_string, "wazoozle\n",
-        :output_path, out_a
+        :output_path, EMPTY_A_,  # sneaky
+        )
 
-      _em = expect_not_OK_event :input_parse_error
+        a = []
+        expect :error, :input_parse_error do |ev|
+          a.push ev
+        end
 
-      black_and_white( _em.cached_event_value ).should eql(
-        "expecting opening digraph line (e.g \"digraph{\") #{
-          }near line 1: \"wazoozle\\n\"" )
-
-      expect_fail
+        a.push execute
+      end
     end
 
 # (3/N)
-    it "case 5 (a regressive case) - copy hereput to output" do
+    it "case 5 (a regressive case) - copy hereput to output", wip: true do
 
       out_a = [ 'gets removed' ]
 
@@ -60,21 +112,34 @@ module Skylab::TanMan::TestSupport
     end
 
 # (4/N)
-    it "case 5 - you can't copy a graph to the same waypoint" do
+    context "case 5 - you can't copy a graph to the same waypoint" do
 
-      same_path = Home_::TestSupport::FixtureGraphs[ :the_empty_graph ]
-      same_path_ = same_path.dup
+      it "fails commonly, emits custom emission (for now with only channel, no content)" do
+        _fails_commonly
+      end
 
-      call_API :graph, :sync,
-        :hereput_path, same_path,
-        :output_path, same_path_
+      shared_subject :_tuple do
 
-      expect_not_OK_event :hereput_and_output_waypoints_are_the_same
-      expect_fail
+        same_path = Home_::TestSupport::FixtureGraphs[ :the_empty_graph ]
+        _same_path_ = same_path.dup
+
+        call_API(
+          * _subject_action,
+          :hereput_path, same_path,
+          :output_path, _same_path_,
+        )
+
+        a = []
+        expect(
+          :error, :hereput_and_output_waypoints_are_the_same,
+        )
+
+        a.push execute
+      end
     end
 
 # (5/N)
-    it "case 4 (a regressive case) - write input to output thru transient graph " do
+    it "case 3 (a regressive case) - write input to output thru transient graph ", wip: true do
 
       out_a = []
       call_API :graph, :sync,
@@ -89,7 +154,7 @@ module Skylab::TanMan::TestSupport
     end
 
 # (6/N)
-    it "case 4 - corner case 1 - this. (covers immaculate conception)" do
+    it "case 3 - corner case 1 - this. (covers immaculate conception)", wip: true do
 
       out_a = []
       call_API :graph, :sync,
@@ -103,7 +168,7 @@ module Skylab::TanMan::TestSupport
     end
 
 # (7/N)
-    it "case 2 (\"import\") - simple venn case with edges only, no labels" do
+    it "case 2 (\"import\") - simple venn case with edges only, no labels", wip: true do
 
       i_am_this =
         [ "digraph {\n", "  beebo -> ceebo\n", "  deebo -> feebo\n", "}\n" ]
@@ -131,7 +196,7 @@ module Skylab::TanMan::TestSupport
     end
 
 # (8/N)
-    it "case 1 - input will not overwrite labels, but will write them" do
+    it "case 1 - input will not overwrite labels, but will write them", wip: true do
 
       _input_s = "digraph{ \n su [ label=\"Super-Par\" ]\n ab [  label=\"Xy\"] \n}"
 
@@ -171,6 +236,15 @@ module Skylab::TanMan::TestSupport
     end
 
     ignore_these_events :using_parser_files
+
+    def _fails_commonly
+      _x = _tuple.last
+      _x.nil? || fail
+    end
+
+    def _subject_action
+      [ :graph, :sync ]
+    end
 
     def expression_agent_for_expect_emission
       black_and_white_expression_agent_for_expect_emission  # BE CAREFUL

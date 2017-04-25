@@ -93,8 +93,10 @@
              ( #was: #done no more api knob (api.invoke -> `api_invoke`))
 [#028]       #bad-reference any and all changes to CLI core client
 [#027]       overhaul to cli actions base class
-[#026]       #doc-node: the syncing narrative ..
+
+[#026]       resolving IO through parameter modeling ..
              ( #was: #done API::InvocationMethods away! )
+
 [#025] #open get rid of convoluted parser enhance
              ( #DONE ancient legacy [ttt] mess-lette )
              ( #was: API::RuntimeExtensions away! #done )

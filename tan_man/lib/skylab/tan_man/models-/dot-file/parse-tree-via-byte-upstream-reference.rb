@@ -49,7 +49,7 @@ module Skylab::TanMan
         if x
           x
         else
-          self._COVER_ME_parse_failed
+          x  # hi. #cov11.1
         end
       end
 

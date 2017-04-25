@@ -20,11 +20,7 @@ module Skylab::TanMan
 
           # reading from the workspace is an option, but the workspace is not a precondition
 
-          h = ca.to_workspace_related_mutable_hash__
-
-          h[ :workspace_path ] = h.fetch( :workspace_path ).redefine do |o|
-            o.be_optional
-          end
+          _x = ca.to_workspace_related_stream_nothing_required_
 
           [
             :branch_description, -> y do  # #todo change this name to ..
@@ -39,7 +35,7 @@ module Skylab::TanMan
 
             :property, :value_provider,
 
-            :properties, h.values,
+            :properties, _x,
           ]
         end
 

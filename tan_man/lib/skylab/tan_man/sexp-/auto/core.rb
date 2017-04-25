@@ -201,7 +201,7 @@ module Skylab::TanMan
     end
 
     def __say_parse_failed parser
-      "#{ name } parse failed - #{ parser.failure_reason || '(no reason?)' }"
+      "#{ name } parse failed - #{ parser.failure_reason || '(no reason?)' }"  # (method is not our name)
     end
 
     attr_accessor :rule

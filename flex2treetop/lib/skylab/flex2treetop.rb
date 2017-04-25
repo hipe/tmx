@@ -816,7 +816,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __when_NO_parser_result
 
-      s = parser.failure_reason
+      s = parser.failure_reason  # (not our name)
 
       @on_event_selectively.call :error, :expression, :no_parser_result do | y |
         y << ( s || "Got nil from parse without reason" )
@@ -1637,7 +1637,9 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
   Enhance_parser_class__ = -> do  # (if you edit this heavily, move it up)
     # CompiledParser#failure_reason overridden for less context
-    def failure_reason
+
+    def failure_reason  # (not our name)
+
       return nil unless (tf = terminal_failures) && tf.size > 0
       "Expected " +
         ( tf.size == 1 ?

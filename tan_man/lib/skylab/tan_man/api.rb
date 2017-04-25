@@ -202,6 +202,10 @@ module Skylab::TanMan
         _slug_via_symbol( sym ).inspect
       end
 
+      def prim sym
+        "'#{ sym.id2name.gsub UNDERSCORE_, DASH_ }'"
+      end
+
       def _slug_via_symbol sym
         sym  # oops i'm in API
       end

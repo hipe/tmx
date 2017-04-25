@@ -123,88 +123,25 @@ module Skylab::TanMan
       end
       end  # if false
 
-    # :#spot1.1:
-    #
-    # please buckle up because we're going to be justifying two separate but
-    # related "essential" features of advanced modeling at once:
-    #
-    # as it works out, many (most?) of the actions in this application are
-    # involved with reading from or manipulating The Document in some way.
-    #
-    # in order to read from the document, every such action must resolve a
-    # means of input (a "byte upstream reference") (add, ls, rm).
-    #
-    # those actions that mutate the document must also resolve a means of
-    # output (a "byte downstream reference") (add, rm).
-    #
-    # as a bit of an aside, there are actions that may (for certain modality
-    # adaptations) want to customize such parameters to effect a defaulting
-    # of, say, the `pwd` (current working directory); but such a retrieval
-    # of this system "service" must *not* happen from the microservice layer
-    # itself, because it is not appropriate for a true microservice to be
-    # dependent on such a volatile property such as the `pwd`. the relevant
-    # uptake here is that like all other formal associations, these ones
-    # might be customized per modality (near #masking).
-    #
-    # more broadly the thing to note about all this is two key points:
-    #
-    #   1. that the associations like these (there are several) all have
-    #      characteristics that are part of a common "semantic sub-system"
-    #      (sub-domain) that while pertinent to these actions, is not
-    #      pertinent to what we consider "common associations".
-    #
-    #   1. that it would feel folly to re-model these same associations
-    #      (parameters/properties) over and over again for the perhaps dozens
-    #      of actions that all use some subset of these common associations.
-    #
-    # for an example of the first point, from the discussion above we might
-    # say there's this idea of a "throughput direction" for an association
-    # to have: some associations might be related to resolving an input (an
-    # "upstream reference"). others might be related to resolving an output
-    # (a "downstream reference"). some associations (as we will see) will
-    # be concerned with both. however it is not the case that all
-    # associations in all applications should necessarily even have to "know"
-    # what a "throughput direction" is, much less represent values for this
-    # "custom meta association".
-    #
-    # for better or worse, all of the above has been heralded as the
-    # quintessential use-case for application-specific meta-associations:
-    #
-    # here, then, is the frontier use-case for the "nouveau" rewrites of
-    # both shared common associations (here "parameters") and custom meta-
-    # associations.
-    #
-
     # ==
 
     class << self
 
+      def to_workspace_related_stream_nothing_required_
+        __as_optionals_at WORKSPACE_RELATED__
+      end
+
       def to_workspace_related_stream_
-        __to_stream WORKSPACE_RELATED__
-      end
 
-      def to_workspace_related_mutable_hash__
-        __to_hash WORKSPACE_RELATED__
-      end
-
-      def __to_hash sym_a
-        h = {}
-        col = common_IO_parameters
-        sym_a.each do |sym|
-          h[ sym ] = col.dereference sym
-        end
-        h
-      end
-
-      def __to_stream sym_a
-
+        sym_a = WORKSPACE_RELATED__
+        # ..
         col = common_IO_parameters
 
         Stream_.call sym_a do |sym|
           col.dereference sym
         end
       end
-    end  # >>
+    end
 
     WORKSPACE_RELATED__ = [
       :workspace_path,
@@ -212,28 +149,53 @@ module Skylab::TanMan
       :config_filename,
     ]
 
+    -> do
+
+      cache = -> k1 do
+        col = common_IO_parameters
+        normal = -> k do
+          col.dereference k
+        end
+        deref = -> k do
+          asc = normal[ k ]
+          if :workspace_path == k
+            asc = asc.redefine do |o|
+              o.be_optional
+            end
+            deref = normal
+            asc
+          else
+            asc
+          end
+        end
+        cache = ::Hash.new do |h, k|
+          x = deref[ k ]
+          h[ k ] = x
+          x
+        end
+        cache[ k1 ]
+      end
+
+      define_singleton_method :__as_optionals_at do |sym_a|
+        sym_a.map do |sym|
+          cache[ sym ]
+        end
+      end
+
+      define_singleton_method :to_item_stream_nothing_required__ do
+        common_IO_parameters.to_loadable_reference_stream.map_by do |sym|
+          cache[ sym ]
+        end
+      end
+    end.call
+
     define_singleton_method :common_IO_parameters, ( Lazy_.call do
 
       Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
 
         o.property_grammatical_injection_by do
 
-          inj = Home_::Model_.my_custom_grammatical_injection_without_custom_meta_associations_
-
-          inj.redefine do |oo|
-
-            # (keep the same, application-specific association base class)
-
-            # (eek allow ourselves to define these mods out in the open)
-
-            mod = MyCustomPrefixedModifiers___
-            mod.include oo.prefixed_modifiers
-            oo.prefixed_modifiers = mod
-
-            mod = MyCustomPostfixedModifiers___
-            mod.include oo.postfixed_modifiers
-            oo.postfixed_modifiers = mod
-          end
+          This_one_custom_attribute_grammatical_injection__[]
         end
 
         o.add_association_by_definition_array :input_string do
@@ -261,8 +223,8 @@ module Skylab::TanMan
             Config_filename_knownness_[]
           end,
 
-          :throughput_direction, :input,
-          :throughput_direction, :output,
+          # :throughput_direction, :input,
+          # :throughput_direction, :output,
         ] end
 
         o.add_association_by_definition_array :max_num_dirs_to_look do [
@@ -275,8 +237,8 @@ module Skylab::TanMan
             y << "whatever max num dirs, like `common_properties` in [br]"
           end,
 
-          :throughput_direction, :input,
-          :throughput_direction, :output,
+          # :throughput_direction, :input,
+          # :throughput_direction, :output,
 
         ] end
 
@@ -293,6 +255,46 @@ module Skylab::TanMan
         ] end
       end
     end )
+
+    # ==
+
+    This_one_grammar = Lazy_.call do  # 1x
+
+      # the way this is implementated is just a rough sketch. this is the
+      # grammar to parse ONLY document-centric properties (defined with the
+      # `propery` keyword), and nothing else. (but it could be modified to
+      # be more like our main grammar.)
+
+      _param_gi =
+        This_one_custom_attribute_grammatical_injection__[]
+
+      Home_.lib_.parse_lib::IambicGrammar.define do |o|
+
+        o.add_grammatical_injection :_DOC_parameter_TM_, _param_gi
+      end
+    end
+
+    # ==
+
+    This_one_custom_attribute_grammatical_injection__ = Lazy_.call do
+
+      _inj = Home_::Model_.my_custom_grammatical_injection_without_custom_meta_associations_
+
+      _inj.redefine do |oo|
+
+        # (keep the same, application-specific association base class)
+
+        # (eek allow ourselves to define these mods out in the open)
+
+        mod = MyCustomPrefixedModifiers___
+        mod.include oo.prefixed_modifiers
+        oo.prefixed_modifiers = mod
+
+        mod = MyCustomPostfixedModifiers___
+        mod.include oo.postfixed_modifiers
+        oo.postfixed_modifiers = mod
+      end
+    end
 
     # ==
 
@@ -326,7 +328,13 @@ module Skylab::TanMan
       parse_tree._throughput_characteristics_ ||= ThroughputCharacteristics___.new 0
     end
 
-    ThroughputCharacteristics___ = ::Struct.new :count, :is_essential, :input, :output
+    ThroughputCharacteristics___ = ::Struct.new(
+      :count,  # keeps track of how many different "throughput directions" this
+      :is_essential,  # #todo document this or away it
+      :input,    # whether this attribute is associated with input
+      :hereput,  # whether this attribute is associated with [#026.C] "hereput"
+      :output,   # whether this attribute is associated with output
+    )
 
       if false
       class Collection_Controller
@@ -403,6 +411,8 @@ module Skylab::TanMan
         end
       end
       end
+
+    Here__ = self
 
     # ==
     # ==

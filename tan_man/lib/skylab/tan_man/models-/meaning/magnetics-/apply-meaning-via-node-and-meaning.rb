@@ -63,11 +63,12 @@ module Skylab::TanMan
 
         @on_event_selectively.call :error, :failed_to_parse_meaning_string do
 
-          Common_::Event.inline_not_OK_with :failed_to_parse_meaning_string,
-              :input_string, s,
-              :failure_reason, @parser.failure_reason do | y, o |
-
-            y << "failed to parse #{ val o.input_string } - #{ o.failure_reason }"
+          Common_::Event.inline_not_OK_with(
+            :failed_to_parse_meaning_string,
+            :input_string, s,
+            :failure_reason_string, @parser.failure_reason,  # (not our name)
+          ) do |y,o|
+            y << "failed to parse #{ val o.input_string } - #{ o.failure_reason_string }"
           end
         end
 

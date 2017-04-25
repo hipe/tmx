@@ -19,23 +19,49 @@ module Skylab::TanMan
 
       # ~ hand-written map reduce:
 
-      all_qual_item_st = Here_.__action_grammar_.stream_via_array act.definition
+      _first_grammar = Here_.__action_grammar_
+
+      token_scn = Scanner_[ act.definition ]
+
+      current_all_qual_item_st = _first_grammar.stream_via_scanner token_scn
 
       p = nil
       expand_using_this = nil
+      see_association = nil
 
       main = -> do
+
         begin
-          qual_item = all_qual_item_st.gets
+
+          qual_item = current_all_qual_item_st.gets
           qual_item || break
+
           case qual_item.injection_identifier
+
           when :_parameter_TM_
-            x = qual_item.item ; break
+            x = qual_item.item
+            see_association[ x ]
+            break
+
+          when :_DOC_parameter_TM_  # hi. (keep this identical to above)
+            x = qual_item.item
+            see_association[ x ]
+            break
+
           when :_branch_desc_TM_
             redo
+
           when :_several_props_TM_
             expand_using_this[ qual_item.item ]
             x = p[] ; break
+
+          when :_document_specific_parameter_grammar_TM_
+
+            _g = Home_::DocumentMagnetics_::CommonAssociations::This_one_grammar[]
+            current_all_qual_item_st = _g.stream_via_scanner token_scn
+            token_scn.advance_one
+            redo
+
           else
             no
           end
@@ -52,14 +78,31 @@ module Skylab::TanMan
         end
 
         p = -> do
-          x = st.gets
-          if x
-            x
+          asc = st.gets
+          if asc
+            see_association[ asc ]
+            asc
           else
             p = main
             p[]
           end
         end
+      end
+
+      see_association = -> asc1 do
+
+        # (the first time you receive an association, see if the action
+        # is subscribed to receiving the associations; etc.)
+
+        see_association = if act.respond_to? :_accept_association_  # #experiment
+          -> asc do
+            act._accept_association_ asc
+            NIL
+          end
+        else
+          MONADIC_EMPTINESS_
+        end
+        see_association[ asc1 ]
       end
 
       p = main
@@ -94,7 +137,7 @@ module Skylab::TanMan
       # those that don't need to.
       #
       # however, in order to isolate the implemetation of our custom
-      # associations to their own subdomain, that happens at #here1
+      # associations to their own subdomain, that happens near #spot1.1
 
       _param_gi = my_custom_grammatical_injection_without_custom_meta_associations_
 
@@ -105,8 +148,21 @@ module Skylab::TanMan
         o.add_grammatical_injection :_parameter_TM_, _param_gi
 
         o.add_grammatical_injection :_several_props_TM_, SEVERAL_PROPS___
+
+        o.add_grammatical_injection :_document_specific_parameter_grammar_TM_, THIS_ONE_KEYWORD___
       end
     end )
+
+    module THIS_ONE_KEYWORD___ ; class << self
+
+      def is_keyword k
+        :use_this_one_custom_attribute_grammar == k
+      end
+
+      def gets_one_item_via_scanner _
+        :__anything_trueish__
+      end
+    end ; end
 
     module BRANCH_DESCRIPTION___ ; class << self
 
@@ -254,6 +310,20 @@ module Skylab::TanMan
       def _simplified_write_ k, x
         instance_variable_set :"@#{ k }", x
         NIL
+      end
+
+      def to_box__  # #experiment. replaces something in [br]
+        bx = Common_::Box.new
+        @_associations_.each_value do |asc|
+          k = asc.name_symbol
+          ivar = :"@#{ k }"
+          # -
+            x = instance_variable_get ivar
+          # -
+          _qkn = Common_::QualifiedKnownness.via_value_and_association x, asc
+          bx.add k, _qkn
+        end
+        bx
       end
 
       def _simplified_read_ k
@@ -496,6 +566,7 @@ module Skylab::TanMan
   end  # if false for this/these model class(es)
 
     Here_ = self
+    MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   end  # `Model_`
 end
 # #tombstone-E.2: "stubbing", "model" base class, "action" base class

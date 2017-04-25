@@ -85,6 +85,11 @@ module Skylab::TanMan
         @__box = bx
       end
 
+      def byte_upstream_reference= bur
+        _solve_BUR_via :__use_BUR_as_is
+        @__byte_upstream_reference = bur
+      end
+
       def _solve_BUR_via m
         remove_instance_variable :@__mutex_for_solve_BUR
         @__solve_BUR = m
@@ -145,12 +150,21 @@ module Skylab::TanMan
 
         bx = remove_instance_variable :@__box
 
-        Home_::DocumentMagnetics_::ByteStreamReference_via_Request.call_by do |o|
+        sct = Home_::DocumentMagnetics_::ByteStreamReference_via_Request.call_by do |o|
 
           o.qualified_knownness_box = bx
           o.will_solve_for :input
+          o.will_enforce_minimum
           o.listener = @listener
         end
+
+        if sct
+          sct.solution_tuple.fetch 0
+        end
+      end
+
+      def __use_BUR_as_is
+        remove_instance_variable :@__byte_upstream_reference
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

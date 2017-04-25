@@ -29,6 +29,10 @@ API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
 `make_action_class` and related: liquidate this. (push back as necessary)
 (many `if false` in [tm])
+#open [#tm-097] abstract when an expected primitive is not found in config
+(model: graph)
+(related: driftwood in [#tm-026])
+TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
 (silo: hear)
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
@@ -47,6 +51,3 @@ TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 TD tan_man/test/54-operations/59-node/64-prototype_spec.rb
 TD tan_man/test/54-operations/59-node/44-create_spec.rb
 TD tan_man/test/54-operations/59-node/34-list-and-remove_spec.rb
-(model: graph)
-TD tan_man/test/54-operations/42-graph/64-sync_spec.rb
-#open [#tm-097] abstract when an expected primitive is not found in config

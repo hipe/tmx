@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models_::Graph
 
-    class WriteGraph_to_Bytestore_via_Graph_and_Workspace___ < Common_::MagneticBySimpleModel
+    class Actions::Use::WriteGraph_to_Bytestore_via_Graph_and_Workspace___ < Common_::MagneticBySimpleModel
 
       # ~#[#049] algo family (1x)
 
