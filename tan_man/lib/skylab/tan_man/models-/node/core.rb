@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Models_::Node  # re-opening
+  class Models_::Node
 
     if false
     edit_entity_class(
@@ -16,11 +16,9 @@ module Skylab::TanMan
         Here_::NodeController_::NormalKnownness_via_QualifiedKnownness_of_Name[ arg, self, & oes_p ]
       end,
       :property, :name )
+    end  # if false
 
-    Actions__ = make_action_making_actions_module
-
-    module Actions__
-
+    if false
       Add = make_action_class :Create do
 
         edit_entity_class(
@@ -37,22 +35,11 @@ module Skylab::TanMan
           end
         end
       end
-
-      Ls = make_action_class :List do
-
-        edit_entity_class(
-          :reuse, Model_::DocumentEntity.input_properties )
-      end
-
-      Rm = make_action_class :Delete do
-
-        edit_entity_class(
-          :reuse, Model_::DocumentEntity.IO_properties )
-      end
-    end
+    end  # if false
 
     class << self
 
+      if false
       def build_sexp_fuzzy_matcher_via_natural_key_fragment s
 
         rx = /\A#{ ::Regexp.escape s }/i  # :+[#069] case insensitive?. :~+[#ba-015]
@@ -61,8 +48,13 @@ module Skylab::TanMan
           rx =~ stmt.label_or_node_id_normalized_string
         end
       end
+      end  # if false
+
+      alias_method :new_flyweight__, :new
+      undef_method :new
     end  # >>
 
+    if false
     class Silo_Daemon < Silo_daemon_base_class_[]
 
       def node_collection_controller_via_document_controller dc, & oes_p
@@ -213,20 +205,6 @@ module Skylab::TanMan
         _mutate_via_verb_and_entity :touch, entity
       end
 
-      def delete_entity action, ent, & oes_p
-
-        byte_downstream_ID = action.document_entity_byte_downstream_reference
-        bx = action.argument_box
-
-        _ok = Here_::Magnetics__::Create_or_Touch_or_Delete_via_Node_and_Collection.call(
-          :delete,
-          ent,
-          document_,
-          @kernel, & ( oes_p || @on_event_selectively ) )
-
-        _ok and _commit_changes bx, byte_downstream_ID, & oes_p
-      end
-
       def _mutate_via_verb_and_entity verb_i, entity, & oes_p
 
         Here_::Magnetics__::Create_or_Touch_or_Delete_via_Node_and_Collection.call(
@@ -262,8 +240,24 @@ module Skylab::TanMan
 
       self
     end
+    end  # if false
 
-    STOP_ = false
-    end
+    # -
+
+      def reinit_as_flyweight__ node_stmt
+        @_node_stmt = node_stmt
+        self
+      end
+
+      def node_name_symbol_
+        @_node_stmt.node_id
+      end
+    # -
+
+    Here_ = self
+
+    # ==
+    # ==
   end
 end
+# #history-A.1: begin modernization for end of [br]-era

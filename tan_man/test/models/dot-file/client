@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
 
     def initialize invo
 
-      @on_event_selectively = -> * sym_a, & ev_p do
+      @listener = -> * sym_a, & ev_p do
 
         ev = ev_p[]
 
@@ -21,28 +21,35 @@ module Skylab::TanMan::TestSupport
     end
 
     def parse_file input_file_path
-      _doc_controller_via_name_value_pair( :input_path, input_file_path ).graph_sexp
+      _graph_sexp_via :input_path, input_file_path
     end
 
     def parse_string input_string
-      _doc_controller_via_name_value_pair( :input_string, input_string ).graph_sexp
+      _graph_sexp_via :input_string, input_string
     end
 
-    def _doc_controller_via_name_value_pair sym, x
-
-      bx = Common_::Box.new
+    def _graph_sexp_via sym, x
 
       _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
-
       _qkn = Common_::Qualified_Knownness[ x, _asc ]
+      _class = Home_::DocumentMagnetics_::ByteStreamReference_via_Request::ByteStreamClass_via_Direction[ :input ]
+      _ref = _class.via_qualified_knownnesses [ _qkn ], & @listener  #  ??
 
-      bx.add sym, _qkn
+      yikes = nil
+      Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
 
-      Home_::Models_::DotFile::DocumentController_via_Request.call_by do |o|
-        o.qualified_knownness_box = bx
-        o.invocation = @__invocation
-        o.listener = @on_event_selectively
+        o.session_by do |dc|
+          yikes = dc
+          true
+        end
+
+        o.be_read_only_not_read_write_
+        o.byte_stream_reference = _ref
+        o.microservice_invocation = @__invocation
+        o.listener = @listener
       end
+
+      yikes.graph_sexp
     end
   end
 end

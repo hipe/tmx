@@ -97,7 +97,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def document_to_lines_
-      @document.unparse_into []
+      @document.write_bytes_into []
     end
 
     def expect_one_event_ sym

@@ -2,16 +2,15 @@ module Skylab::System
 
   module Filesystem
 
-    class ByteUpstreamReference  # [#003].
+    ByteWhichstreamReference__ = ::Class.new
+
+    class ByteUpstreamReference < ByteWhichstreamReference__  # [#003].
 
       # a #[#ba-062] unified interface for accessing the bytes in a file.
 
-      def initialize path, & oes_p
-
+      def initialize path
         @_to_rewound_shareable = :__to_rewound_shareable_intially
-
-        @path = path
-        @on_event_selectively = oes_p
+        super
       end
 
       # -- data delivery
@@ -41,7 +40,7 @@ module Skylab::System
 
       # ~
 
-      def to_simple_line_stream & p
+      def to_minimal_line_stream & p
         _to_rewindable_line_stream p
       end
 
@@ -64,11 +63,7 @@ module Skylab::System
       # -- conversion, standard readers, reflection, etc
 
       def to_byte_downstream_reference
-        Home_::Filesystem::ByteDownstreamReference.new @path, & @on_event_selectively
-      end
-
-      def description_under expr
-        Basic_[]::Pathname.description_under_of_path expr, @path
+        Home_::Filesystem::ByteDownstreamReference.new @path
       end
 
       def name
@@ -87,7 +82,29 @@ module Skylab::System
         :ByteStream
       end
 
-      # ..
+      def BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE  # [tm] experiment
+        FALSE
+      end
+    end
+
+    # ==
+
+    class ByteUpstreamReference::ByteDownstreamReference_STOWED_AWAY < ByteWhichstreamReference__
+
+      # #[#ba-062.2]
+
+      def to_minimal_yielder_for_receiving_lines  # :+#open-filehandle  :+[#ba-046]
+        ::File.open @path, ::File::CREAT | ::File::WRONLY # | ::File::EXCL
+      end
+    end
+
+    # ==
+
+    class ByteWhichstreamReference__
+
+      def initialize path
+        @path = path
+      end
 
       def is_same_waypoint_as otr
 
@@ -134,6 +151,10 @@ module Skylab::System
         end
       end
 
+      def description_under expag
+        Basic_[]::Pathname.description_under_of_path expag, @path
+      end
+
       attr_reader(
         :path,
       )
@@ -141,7 +162,10 @@ module Skylab::System
       def shape_symbol
         :path
       end
-
     end
+
+    # ==
+    # ==
   end
 end
+# #history-A: subsumed byte donwstream reference

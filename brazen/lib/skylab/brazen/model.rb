@@ -328,7 +328,7 @@ module Skylab::Brazen
       _read_knownness_( prp ).value_x
     end
 
-    def property_value_via_symbol i  # ( was #note-120 )
+    def dereference i  # ( was #note-120 )
       @property_box.fetch i
     end
 

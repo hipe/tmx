@@ -30,17 +30,13 @@ module Skylab::Basic
         "«output stream»"  # :+#guillemets
       end
 
-      def EN_preposition_lexeme
-        'to'
-      end
-
       def shape_symbol
         :line_list
       end
 
       # ~ data acceptance exposures
 
-      def to_minimal_yielder  # :+[#046]
+      def to_minimal_yielder_for_receiving_lines  # :+[#046]
         @s_a.clear
         @s_a
       end

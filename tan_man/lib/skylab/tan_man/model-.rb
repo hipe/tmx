@@ -125,7 +125,7 @@ module Skylab::TanMan
       if ok
         Common_::BoundCall.by( & act.method( :execute ) )
       else
-        NIL  # #downgrade-from-false (covered)
+        NIL_AS_FAILURE_
       end
     end
 
@@ -238,6 +238,60 @@ module Skylab::TanMan
         @_microservice_invocation_ = invo
       end
 
+      # --
+
+      def with_mutable_digraph_
+
+        _is_dry = remove_instance_variable :@dry_run
+        @dry_run = _is_dry  # meh
+
+        _digraph_session_MO do |o|
+
+          o.be_read_write_not_read_only__
+
+          o.session_by do |dc|
+            @_mutable_digraph_ = dc
+            x = yield
+            remove_instance_variable :@_mutable_digraph_
+            x
+          end
+
+          o.is_dry_run = _is_dry
+
+          o.microservice_invocation = @_microservice_invocation_
+        end
+      end
+
+      def with_immutable_digraph_
+
+        _digraph_session_MO do |o|
+
+          o.be_read_only_not_read_write_
+
+          o.session_by do |dc|
+            @_immutable_digraph_ = dc
+            x = yield
+            remove_instance_variable :@_immutable_digraph_
+            x
+          end
+        end
+      end
+
+      def _digraph_session_MO
+
+        with_immutable_workspace_ do
+
+          Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
+            yield o
+            o.immutable_workspace = @_immutable_workspace_
+            o.microservice_invocation = @_microservice_invocation_
+            o.listener = _listener_
+          end
+        end
+      end
+
+      # --
+
       def with_mutable_workspace_
 
         # assume these variables are ours for consumption (:#here1):
@@ -260,7 +314,7 @@ module Skylab::TanMan
           o.is_dry_run = dry
         end
 
-        _ || NIL  # #downgrade-from-false
+        _ || NIL_AS_FAILURE_
       end
 
       def with_immutable_workspace_
@@ -302,7 +356,7 @@ module Skylab::TanMan
           o.listener = _listener_
         end
 
-        _ || NIL  # #downgrade-from-false
+        _ || NIL_AS_FAILURE_
       end
 
       define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -496,8 +550,6 @@ module Skylab::TanMan
 
     module Actions
       Add = stub
-      Ls = stub
-      Rm = stub
     end
 
     def persist_via_action action, & oes_p  # #hook-in to [br]

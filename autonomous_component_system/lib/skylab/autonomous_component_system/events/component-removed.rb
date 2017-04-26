@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events::Component_Removed = Common_::Event.prototype_with(  # :[#007.2]
+    Events::ComponentRemoved = Common_::Event.prototype_with(  # :[#007.2]
 
       :component_removed,
       :component, nil,

@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     expression = nil
 
-    Events::Component_Added = Common_::Event.prototype_with(  # :[#007.4]
+    Events::ComponentAdded = Common_::Event.prototype_with(  # :[#007.4]
 
       :component_added,
 

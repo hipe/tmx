@@ -14,13 +14,13 @@ module Skylab::Fields
         end
       end
 
-      def property_value_via_symbol sym
+      def dereference sym
 
         pptr = any_proprietor_of sym
 
         if pptr
 
-          pptr.property_value_via_symbol sym
+          pptr.dereference sym
 
         else
           maybe_send_event :error, :unrecognized_argument do
@@ -134,7 +134,7 @@ module Skylab::Fields
           end
         end
 
-        def property_value_via_symbol i
+        def dereference i
           @bx.fetch i
         end
       end
@@ -163,7 +163,7 @@ module Skylab::Fields
           end
         end
 
-        def property_value_via_symbol i
+        def dereference i
           @h.fetch i
         end
       end
@@ -186,7 +186,7 @@ module Skylab::Fields
           nil
         end
 
-        def property_value_via_symbol i
+        def dereference i
           raise ::KeyError
         end
       end

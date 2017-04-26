@@ -1797,17 +1797,26 @@ module Skylab::TestSupport
       # arguments for other options; contrast to [#br-074].
       # the platform o.p is not sympathetic to causes like this at all.
 
-      rx = /\A-(?<lineno>\d+)\z/
+      rx = /\A-(?<lineno>\d+)(?:-(?<to_lineno>\d+))?\z/
 
       -> argv do
         d = 0
         begin
+
           md = rx.match argv.fetch d
           md || break
-          argv[ d, 1 ] = [ '--line', md[ :lineno ] ]
-          d += 2
-          d == argv.length ? break : redo
-        end while above
+
+          line_s = md[ :lineno ]
+          to_s = md[ :to_lineno ]
+
+          insert_a = if to_s
+            [ '--from', line_s, '--to', to_s ]
+          else
+            [ '--line', line_s ]
+          end
+          argv[ d, 1 ] = insert_a
+          d += insert_a.length
+        end until argv.length == d
         NIL
       end
     end.call

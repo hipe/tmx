@@ -97,8 +97,8 @@ module Skylab::System
 
       # ~
 
-      def to_identifier
-        Basic_[]::Pathname.identifier @pathname
+      def to_byte_stream_reference  # 1x [cu]
+        Basic_[]::Pathname::ByteStreamReference.new @pathname
       end
     end
   end

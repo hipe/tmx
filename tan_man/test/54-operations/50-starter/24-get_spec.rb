@@ -83,20 +83,41 @@ module Skylab::TanMan::TestSupport
     end
 
     # (4/N)
-    it "when workspace does not have entity" do
+    context "when workspace does not have entity" do
 
-      workspace_path = path_for_workspace_005_with_just_a_config_
+      it "fails normally" do
 
-      call_API(
-        * _subject_action_plus,
-        :workspace_path, workspace_path,
-      )
-
-      expect :error, :expression, :component_not_found do |y|
-        y == [ "no starter is set in config" ] || fail
+        _fails_normally
       end
 
-      expect_fail
+      it "structured event has invite" do
+
+        ev = _tuple.first
+
+        ev.invite_to_action == [ :starter, :set ] || fail
+
+        _actual = black_and_white ev
+
+        _actual == 'section "digraph" not found in tm-conferg.file' || fail
+      end
+
+      shared_subject :_tuple do
+
+        a = []
+        _workspace_path = path_for_workspace_005_with_just_a_config_
+
+        call_API(
+          * _subject_action_plus,
+          :workspace_path, _workspace_path,
+        )
+
+        expect :error, :config_component_not_found do |ev|
+          a.push ev
+        end
+
+        a.push execute
+        a
+      end
     end
 
     # ( note: (5/N) tested a case where multiple starters were indicated
@@ -255,6 +276,10 @@ module Skylab::TanMan::TestSupport
       end
     end
     end  # if false
+
+    def _fails_normally
+      _tuple.last.nil? || fail
+    end
 
     # ==
 

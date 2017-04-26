@@ -6,38 +6,16 @@ module Skylab::TanMan
 
       # ([#009] is where notes for this would go. currently only one short, ancient note there.)
 
-        # we encapsulate the byte upstream ID into the controller because
-        # every document has exactly one BUID. however the same relationship
-        # does not hold with byte downstream ID's so they are passed as args.
+      def microservice_invocation= _
+      end
 
       attr_writer(
-        :byte_upstream_reference,
+        :byte_stream_reference,  # just for description
         :graph_sexp,
-        :invocation,
         :listener,
       )
 
-      # -- "read"
-
-      def persist_into_byte_downstream_reference id, * x_a, & oes_p  # [ :is_try, true ]
-
-        Here_::Magnetics_::PersistDotFile_via_ByteDownstreamReference_and_GraphSexp.new(
-          id, @graph_sexp, x_a, & oes_p ).execute
-      end
-
-      def description_under expag
-        @byte_upstream_reference.description_under expag
-      end
-
-      def at_graph_sexp i
-        @graph_sexp.send i
-      end
-
-      def unparse_into y
-        @graph_sexp.unparse_into y
-      end
-
-      # ~ mutators
+      # -- write
 
       def insert_stmt_before_stmt new, least_greater_neighbor
         insert_stmt new, least_greater_neighbor
@@ -98,12 +76,27 @@ module Skylab::TanMan
         end
       end
 
+      # -- read
+
+      def write_bytes_into y
+        @graph_sexp.write_bytes_into y
+      end
+
+      def description_under expag
+        @byte_stream_reference.description_under expag
+      end
+
       attr_reader(
         :graph_sexp,
       )
 
-      def provide_action_precondition _id, _g
-        self
+      # -- finish
+
+      def close_document_controller_permanantly__
+        remove_instance_variable :@byte_stream_reference
+        remove_instance_variable :@graph_sexp
+        remove_instance_variable :@listener
+        freeze
       end
 
       # ==
@@ -111,4 +104,5 @@ module Skylab::TanMan
     end
   end
 end
+# #tombstone-B: file writing x
 # #tombstone-A: `length_exceeds` on stream

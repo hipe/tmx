@@ -20,7 +20,7 @@ module Skylab::Brazen
     private
 
       def init_ivars
-        @collection_s = @entity.property_value_via_symbol :name
+        @collection_s = @entity.dereference :name
         init_response_receiver_for_self_on_channel :delete_collection
         nil
       end

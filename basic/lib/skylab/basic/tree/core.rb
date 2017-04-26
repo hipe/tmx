@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Tree
+  module Tree  # :[#001].
 
     class << self
 

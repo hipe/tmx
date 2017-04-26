@@ -38,7 +38,7 @@ module Skylab::Git
 
         _stow = Stow_.via_path ::File.join( @path, name_s )
 
-        _ev = Home_.lib_.brazen.event( :Component_Not_Found ).with(
+        _ev = Home_.lib_.ACS::Events::ComponentNotFound.with(
           :component, _stow,
           :component_association, Stow_.name_function,
           :ACS, self,

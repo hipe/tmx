@@ -5,6 +5,7 @@ module Skylab::System
     Events = ::Module.new
 
     Events::Wrote = Common_::Event.prototype_with(
+      # (#[#032.2] tracks other event classes like this)
 
       :wrote,
 

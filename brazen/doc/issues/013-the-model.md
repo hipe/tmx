@@ -172,7 +172,7 @@ if we are to continue to want to appreciate the convenience of having
 actual properties stored in ivars, then we would have to go to the other
 extreme: somehow avoid using ivars entirely for anything mechanical.
 
-the workaround for this for now is to use `property_value_via_symbol` (and the
+the workaround for this for now is to use `dereference` (and the
 separate but related `action_property_value`) for reading actual
 properties.
 

@@ -50,10 +50,10 @@ module Skylab::Fields::TestSupport
 
       end
 
-      it "and then with an object of this class, call the method by `property_value_via_symbol`" do
+      it "and then with an object of this class, call the method by `dereference`" do
 
         frame = X_cf_Intro_B.new { }
-        frame.property_value_via_symbol( :foo_diddle ).should eql "foo diddle: 1"
+        frame.dereference( :foo_diddle ) == "foo diddle: 1" || fail
       end
     end
 
@@ -79,8 +79,8 @@ module Skylab::Fields::TestSupport
 
       it "reads (fresh call each time), makes reader methods too", f:true do
         entity = X_cf_Intro_C.new { }
-        entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 1"
-        entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 2"
+        entity.dereference( :wiz_waz ) == "wiz waz: 1" || fail
+        entity.dereference( :wiz_waz ) == "wiz waz: 2" || fail
         entity.wiz_waz.should eql 'wiz waz: 3'
         entity.wiz_waz.should eql 'wiz waz: 4'
       end
@@ -109,8 +109,8 @@ module Skylab::Fields::TestSupport
 
       it "reaads (fresh call first time, subsequently memoized)" do
         entity = X_cf_Intro_D.new { }
-        entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
-        entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
+        entity.dereference( :wiz_wuz ) == "wiz wuz: 1" || fail
+        entity.dereference( :wiz_wuz ) == "wiz wuz: 1" || fail
       end
     end
 
@@ -155,7 +155,7 @@ module Skylab::Fields::TestSupport
       it "works (both ways)" do
         ent = X_cf_Intro_E.new { }
         ent.dozer.should eql 'zack braff'
-        ent.property_value_via_symbol( :dozer ).should eql 'zack braff'
+        ent.dereference( :dozer ) == 'zack braff' || fail
       end
     end
 
@@ -186,8 +186,8 @@ module Skylab::Fields::TestSupport
         ent = X_cf_Intro_F.new { }
         ent.wowzaa.should eql "1 1"
         ent.wowzaa.should eql "1 1"
-        ent.property_value_via_symbol( :wowzaa ).should eql "1 1"
-        ent.property_value_via_symbol( :wowzaa ).should eql "1 1"
+        ent.dereference( :wowzaa ) == "1 1" || fail
+        ent.dereference( :wowzaa ) == "1 1" || fail
       end
     end
 
@@ -214,7 +214,7 @@ module Skylab::Fields::TestSupport
         x = entity.dingle_woofer
         x.should eql :toofer
 
-        x = entity.property_value_via_symbol :dingle_woofer
+        x = entity.dereference :dingle_woofer
         x.should eql :toofer
 
       end
@@ -243,12 +243,12 @@ module Skylab::Fields::TestSupport
         entity = X_cf_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
         entity.foo.should eql :FO
         entity.baz.should eql :BZ
-        entity.property_value_via_symbol( :baz ).should eql :BZ
+        entity.dereference( :baz ) == :BZ || fail
 
         entity.respond_to?( :bar ).should eql false
 
         begin
-          entity.property_value_via_symbol :bar
+          entity.dereference :bar
         rescue ::NameError => e
         end
 

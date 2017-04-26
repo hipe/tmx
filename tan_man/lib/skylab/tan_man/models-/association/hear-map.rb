@@ -86,7 +86,7 @@ module Skylab::TanMan
 
         def __resolve_document_controller
 
-          _dc = Models_::DotFile::DocumentController_via_Request.call_by do |o|
+          _dc = Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
             ::Kernel._THIS_CHANGED__but_it_can_be_easy__
             o.qualified_knownness_box = @qualified_knownness_box
             o.listener = @on_event_selectively

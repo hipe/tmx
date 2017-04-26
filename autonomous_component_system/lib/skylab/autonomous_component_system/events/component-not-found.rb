@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] #Scope stack trick
 
-    Events::Component_Not_Found = Common_::Event.prototype_with(
+    Events::ComponentNotFound = Common_::Event.prototype_with(
 
       :component_not_found,
 
@@ -15,10 +15,10 @@ module Skylab::Autonomous_Component_System
 
     ) do | y, o |
 
-      Events::Component_Not_Found::Express_into_under_of___[ y, self, o ]
+      Events::ComponentNotFound::Express_into_under_of___[ y, self, o ]
     end
 
-    module Events::Component_Not_Found::Express_into_under_of___
+    module Events::ComponentNotFound::Express_into_under_of___
 
       include ExpressionMethods  # (see comments here)
 

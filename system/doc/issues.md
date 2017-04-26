@@ -10,7 +10,8 @@
 [#034]       [ hack guess module tree ]
 [#033] #open feature islands
 
-[#032] #hole
+[#032]       track events that might DRY (one here)
+             :[#here.2]: an event related to writing files
              ( #was: alternative (simplified) implementations of stubbed FS )
              ( #moved-to: [#027.2] )
 

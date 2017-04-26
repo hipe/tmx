@@ -63,6 +63,7 @@ module Skylab::TanMan
 
         def mutable_workspace= mw
           @_execute = :__execute_specially
+          @_immutable_workspace = :__mutable_as_immutable
           @_mutable_workspace_ = mw
         end
 
@@ -95,6 +96,7 @@ module Skylab::TanMan
         end
 
         def __execute_normally
+          @_immutable_workspace = :__immu_via_immu
           with_immutable_workspace_ do
             @_document = @_immutable_workspace_.immutable_document
             __work
@@ -126,7 +128,7 @@ module Skylab::TanMan
             sct.found_item  # as covered
           else
             # sct.needle_item  # as covered
-            $stderr.puts "CHANGING THIS TO MAKE MORE SENSE"
+            $stderr.puts "CHANGING THIS TO MAKE MORE SENSE"  # #todo
             NOTHING_
           end
         end
@@ -134,34 +136,29 @@ module Skylab::TanMan
         # -- A.
 
         def _resolve_starter_tail
-          @_section_symbol = :digraph
-          _sects = @_document.sections
-          sect = _sects.lookup_softly @_section_symbol
-          if sect
-            tail = sect.assignments.lookup_softly :starter
-            if tail
-              @_unsanitized_starter_tail = tail ; true
-            else
-              _when_section_not_found
-            end
-          else
-            _when_section_not_found
-          end
-        end
 
-        def _when_section_not_found
-
-          # #open [#097] this won't stay here
-
-          _listener_.call :error, :expression, :component_not_found do |y|
-
-            y << "no starter is set in config"
+          _ = __effectively_immutable_workspace.procure_component_by_ do |o|
+            o.assigment :starter, :digraph
+            # o.will_be_asset_path  -  no. leave as tail
+            o.would_invite_by { [ :starter, :set ] }
+            o.listener = _listener_
           end
 
-          # #would-invite
-
-          UNABLE_
+          _store_ :@_unsanitized_starter_tail, _
         end
+
+        def __effectively_immutable_workspace
+          send @_immutable_workspace
+        end
+
+        def __mutable_as_immutable
+          @_mutable_workspace_
+        end
+
+        def __immu_via_immu
+          @_immutable_workspace_
+        end
+
       # -
 
       # ==

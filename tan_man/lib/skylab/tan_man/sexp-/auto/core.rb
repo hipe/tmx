@@ -310,7 +310,7 @@ module Skylab::TanMan
       @content_text_value
     end
 
-    def unparse_into y
+    def write_bytes_into y
       s = @content_text_value.to_s
       y << s
       s.length
@@ -685,20 +685,21 @@ module Skylab::TanMan
 
     def unparse
       y = []
-      unparse_into y
+      write_bytes_into y
       y.join EMPTY_S_
     end
 
-    def unparse_into y
+    def write_bytes_into y
       d = 0
-      each do | child |
-        child or next
-        if child.respond_to? :unparse_into
-          d += child.unparse_into y
+      each do |el|
+        el || next
+        if el.respond_to? :ascii_only?
+          y << el
+          d += el.length
+        elsif el.respond_to? :write_bytes_into
+          d += el.write_bytes_into y
         else
-          s = child.to_s
-          y << s
-          d += s.length
+          self._STRANGE_SHAPE__for_element__not_string__not_component__  # #todo
         end
       end
       d

@@ -52,7 +52,7 @@ module Skylab::Snag
 
         def __via_etc_resolve_SLS
 
-          _ = @byte_upstream_ID.to_simple_line_stream(
+          _ = @byte_upstream_ID.to_minimal_line_stream(
             & @on_event_selectively )
 
           _store :@simple_line_upstream, _

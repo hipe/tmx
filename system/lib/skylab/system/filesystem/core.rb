@@ -173,6 +173,11 @@ module Skylab::System
     # - end core services
   end
 
+    Autoloader_[ self ]
+    lazily :ByteDownstreamReference do
+      Filesystem::ByteUpstreamReference::ByteDownstreamReference_STOWED_AWAY
+    end
+
     # ==
 
     CONST_SEP_ = '::'

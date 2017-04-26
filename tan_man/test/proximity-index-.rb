@@ -1,6 +1,6 @@
 module Skylab::TanMan::TestSupport
 
-  class Proximity_Index_  # :[#013] (mainly for an issue)
+  class ProximityIndex_  # :[#013] (mainly for an issue). 1x
 
     # given both
     #
@@ -10,21 +10,43 @@ module Skylab::TanMan::TestSupport
     #
     #   • an arbitrary argument path on the same filesystem,
     #
-    # find the "closest" asset for the argument path using the [ba] tree
-    # "winnow" algorithm. imagine that the "arg" file below is the argument
-    # path and we want to find the "closest" asset file:
+    # find the "closest" asset file given an argument path. we call this
+    # the :[#ba-001.2] tree "winnow" algorithm, but we think that this here
+    # is the only implementation of it.
+    #
+    # this is best understood through example. imagine that our "argument"
+    # file is the one file called "arg" below. and imagine that our "target"
+    # file criteria is any file called "asset":
     #
     #     /body/head/neck/arg
     #     /body/head/asset
     #     /body/torso/asset
     #     /body/asset
     #
-    # there is no asset file in the "neck" directory, but if there
-    # were that would be the closest. since one is found in the parent
-    # directory ("head" in the example), that is closest. the asset in
-    # "body" is therefor never reached. because the "torso" directory
-    # is not one of the parent directories of the argument directory,
-    # that asset is never reached either.
+    # in the above example,
+    #
+    #   - there is no target file in the parent directory of the argument
+    #     path (the "neck" directory), but if there were that would be the
+    #     closest such file and that would be the result.
+    #
+    #   - since there isn't a target file in the current directory, we
+    #     look to its parent directory (the "head" directory). there *is*
+    #     a target file ("asset") there.
+    #
+    #   - since we found a target file in "head", the target file in
+    #     "body" is not used. (but if there hadn't been it would have been.)
+    #
+    #   - because the "torso" directory is not one of the parent directories
+    #     of the argument directory, its target file is also not used, and
+    #     would never be considered given such an argument path *and* such
+    #     a target filename (see next point) because it's not along the path
+    #     of the search.
+    #
+    # also, the "target" filename can have more than one component (but
+    # should always be a relative path); so for example if we had said the
+    # target filename was "torso/asset" then the "closest" (and in this case
+    # only) file matching that criteria would have resulted.
+    #
     #
     #
     #

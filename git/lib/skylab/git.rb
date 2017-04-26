@@ -120,6 +120,7 @@ module Skylab::Git
       System_lib[].services
     end
 
+    ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]

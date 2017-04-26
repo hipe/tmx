@@ -305,12 +305,12 @@ module Skylab::Brazen
             @__assignments_facade ||= This_::Models_::MutableAssignment::AssignmentsFacade.new @_child_elements_
           end
 
-          def unparse_into y
+          def write_bytes_into y
 
             y << send( @_to_head_line )
 
             @_child_elements_.each do |el|
-              el.unparse_into y
+              el.write_bytes_into y
             end
             y
           end

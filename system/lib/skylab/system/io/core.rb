@@ -9,90 +9,138 @@ module Skylab::System
       # the final, favorite of many #[#039.1] similar proxies
 
       attr_writer(
+        :byte_stream_reference,
         :listener,
-        :stream_identifier,
       )
 
       def puts s=nil
-        @listener[ s, :puts, @stream_identifier ]
+        @listener[ s, :puts, @byte_stream_reference ]
         NIL
       end
+
       def << s
-        @listener[ s, :<<, @stream_identifier ]
+        @listener[ s, :<<, @byte_stream_reference ]
         self
       end
+
       def write s
-        @listener[ s, :write, @stream_identifier ]
+        @listener[ s, :write, @byte_stream_reference ]
         s.length
       end
     end
 
     # ==
 
-    Byte_Identifer_ = ::Class.new
+    # our exposures of #[#ba-062.1] & #[#ba-062.2] have perhaps distinct
+    # characteristics when compared to other adaptations in this strain
+    # owing both to our practical requirements and to characteristics of
+    # IO handles themselves:
+    #
+    # ideally the subjects in this strain are immutable; but we are wrappng
+    # an IO handle and the handle itself has state: it can be either open or
+    # closed, and (when open) it has an internal read/write "cursor".
+    # typically clients will be aware of this statefulness and break the
+    # abstraction layer as necessary.
+    #
+    # also (and perhaps more significantly) we must model for the idea that
+    # the IO handle we are wrapping is any of the THREE permutations of
+    # readable and writable (with at least one of them being true) so
+    # read-only, write-only, and read-write.
+    #
+    # as such we cannot simply have one class for "upstreams" and another
+    # for "downstreams". (in fact it may be that the work here reflects
+    # the beginning of a broader the dismantling of these deep idioms;
+    # which may present a false dichotomy.)
 
-    class ByteDownstreamReference < Byte_Identifer_   # #[#ba-062.2]
-
-      # ~ reflection
-
-      def fallback_description_
-        "«output stream»"  # :+#guillemets
-      end
-
-      def EN_preposition_lexeme
-        'to'
-      end
-
-      # ~ data acceptance exposures
-
-      def to_minimal_yielder  # :+[#ba-046]
-        @io
-      end
-    end
-
-    class Byte_Identifer_
-
-      class << self
-        alias_method :via_open_IO, :new
-        private :new
-      end  # >>
-
-      # (see subclasses)
-
-      def initialize io
-        @io = io
-      end
-
-      # ~ reflection
-
-      def is_same_waypoint_as x
-        if :IO == x.shape_symbol
-          io = __the_IO
-          if @io.fileno == io.fileno
-            true
-          elsif @io.respond_to?( :path ) && io.respond_to?( :path )
-            @io.path == io.path  # not as normal as it could be
-          end
+    module ByteUpstreamReference ; class << self
+      def via_open_IO io
+        ByteStreamReference.define do |o|
+          o.write_is_readable
+          o.IO = io
         end
       end
+    end ; end
 
-      protected def __the_IO
-        @io
+    module ByteDownstreamReference ; class << self
+      def via_open_IO io
+        ByteStreamReference.define do |o|
+          o.write_is_writable
+          o.IO = io
+        end
+      end
+    end ; end
+
+    class ByteStreamReference < Common_::SimpleModel
+
+      def initialize
+        @_is_readable = false
+        @_is_writable = false
+        super
+      end
+
+      def write_is_writable
+        extend ByteStreamReferenceMethodsApplicableToWritable_ONLY___
+        @_is_writable = true
+      end
+
+      def write_is_readable
+        extend ByteStreamReferenceMethodsApplicableToReadable_ONLY___
+        @_is_readable = true
+      end
+
+      attr_writer(
+        :IO,
+      )
+
+      def CLOSE_BYTE_STREAM_IO  # [tm] experiment
+        @IO.close
       end
 
       def description_under expag
-        if @io.respond_to? :path
-          path = @io.path
+        if @IO.respond_to? :path
+          path = @IO.path
           expag.calculate do
             pth path
           end
+        elsif @_is_readable
+          # #guillemets
+          if @_is_writable
+            "«input/output stream»"
+          else
+            "«input stream»"
+          end
+        elsif @_is_writable
+          "«output stream»"
         else
-          fallback_description_
+          self._NEVER
         end
       end
 
+      def is_same_waypoint_as otr
+        if :IO == otr.shape_symbol
+          io = otr.__IO
+          if @IO.fileno == io.fileno
+            true
+          elsif @IO.respond_to?( :path ) && io.respond_to?( :path )
+
+            self._REVIEW__easy__
+
+            @IO.path == io.path  # see 
+          end
+        end
+      end
+
+      def __IO
+        @IO
+      end
+      protected :__IO
+
       def path  # WHERE AVAILABLE
-        @io.path
+        @IO.path
+      end
+
+      def BYTE_STREAM_IO_FOR_LOCKING  # [sn]
+        @IO
       end
 
       def shape_symbol
@@ -101,6 +149,35 @@ module Skylab::System
 
       def modality_const
         :ByteStream
+      end
+
+      def BYTE_STREAM_IO_IS_TTY  # [tm]
+        @IO.tty?
+      end
+    end
+
+    module ByteStreamReferenceMethodsApplicableToWritable_ONLY___
+
+      def to_minimal_yielder_for_receiving_lines  # #[#ba-046]
+        @IO.rewind
+        @IO.truncate 0
+        @IO
+      end
+    end
+
+    module ByteStreamReferenceMethodsApplicableToReadable_ONLY___
+
+      def whole_string  # (`Treetop` needs whole strings)
+        @IO.read  # or whatever
+      end
+
+      def to_minimal_line_stream
+        @IO
+      end
+
+      def TO_REWOUND_SHAREABLE_LINE_UPSTREAM_EXPERIMENT
+        @IO.rewind
+        @IO
       end
     end
 
@@ -126,5 +203,7 @@ module Skylab::System
     MAXLEN_ = 4096  # (2 ** 12), or the number of bytes in about 50 lines
 
     # ==
+    # ==
   end
 end
+# #history-A: merged byte stream identifers (down & up) into one node

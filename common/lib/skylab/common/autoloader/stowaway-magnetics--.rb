@@ -20,7 +20,7 @@ module Skylab::Common
         mod = cm.module
         const = cm.const_symbol
 
-        x = stow_x.call
+        x = stow_x.call const
 
         if mod.const_defined? const, false
 

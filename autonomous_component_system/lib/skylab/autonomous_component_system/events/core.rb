@@ -400,9 +400,12 @@ module Skylab::Autonomous_Component_System
         s
       else
         expag.calculate do
-          ick s
+          ick_mixed s
         end
       end
     end
+
+    # ==
+    # ==
   end
 end

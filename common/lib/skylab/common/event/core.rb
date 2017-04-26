@@ -482,16 +482,6 @@ module Skylab::Common
 
       private
 
-        def normal_top_channel_via_OK_value x
-          if x
-            :success
-          elsif x.nil?
-            :info
-          else
-            :error
-          end
-        end
-
         def _OK_value_via_top_channel i
           case i
           when :error

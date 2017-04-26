@@ -84,7 +84,7 @@ module Skylab::Git
 
           if kn
             if kn.is_known_known
-              kn.value_x.to_simple_line_stream
+              kn.value_x.to_minimal_line_stream
             else
 
               # the argument value is a known unknown, that is, the user

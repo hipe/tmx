@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport
 
       _sect[ :two_characters ] = '\b'
 
-      _actual = doc.unparse_into []
+      _actual = doc.write_bytes_into []
 
       expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
         y << '[se-ct "sub.sect"]'

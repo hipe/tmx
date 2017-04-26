@@ -66,14 +66,16 @@ module Skylab::TanMan::TestSupport
 
     # it "to a empty 'digraph' -- makes up its own prototype" :+#ancient
     if false
-      using_dotfile 'digraph{}'
+      o = given_dotfile_ 'digraph{}'
+      ::Kernel._SAME
+      @workspace_path = o.workspace_path
       invoke_from_dotfile_dir 'graph', 'node', 'add', 'foo'
       dotfile_pathname.read.should eql( 'digraph{foo [label=foo]}' )
     end
 
     # it "to a digraph with a prototype - it adds that puppy"  :+#ancient
     if false
-      using_dotfile <<-O.unindent
+      o = given_dotfile_ <<-O.unindent
         digraph {
         /*
           example stmt_list:
@@ -85,6 +87,8 @@ module Skylab::TanMan::TestSupport
         */
         }
       O
+      ::Kernel._SKETCH
+      @workspace_path = o.workspace_path
       invoke_from_dotfile_dir 'graph', 'node', 'add', 'bar'
       output.lines.last.string.should match( /created node: bar/ )
       content = dotfile_pathname.read

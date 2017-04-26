@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System
 
-  module Events::Component_Not_Available
+  module Events::ComponentNotAvailable
 
     Require_fields_lib_[]
 

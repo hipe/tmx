@@ -178,12 +178,12 @@ module Skylab::Brazen
         end
 
         def unparse
-          unparse_into ""
+          write_bytes_into ""
         end
 
-        def unparse_into y
+        def write_bytes_into y
           @_elements_.each do |el|
-            el.unparse_into y
+            el.write_bytes_into y
           end
           y
         end

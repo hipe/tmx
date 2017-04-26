@@ -57,7 +57,7 @@ module Skylab::TanMan
 
         ok = _not_same :_input_, :_output_
         ok &&= _resolve_upstream_line_stream_via :_input_
-        ok &&= _begin_empty_document
+        ok && _will_begin_with_empty_document
         ok && _will_write_final_output_lines_to( :_output_ )
         ok && _money
       end
@@ -71,6 +71,7 @@ module Skylab::TanMan
       def _money
 
         ok = __process_first_line
+        ok && self._README  # you're gonna wanna go ahead and use DigraphSession_via_THESE
         ok &&= __process_zero_or_more_label_nodes
         ok &&= __process_zero_or_more_edges
         ok &&= __process_last_line
@@ -257,6 +258,7 @@ module Skylab::TanMan
       def _will_write_final_output_lines_to sym
 
         $stderr.puts "(IGNORING A THING)"
+        @__document_controller = nil  # NOTE - ..
 
         @sync_session = This_::ExposedClient_for_Session___.new(
           remove_instance_variable( :@__document_controller ),
@@ -267,23 +269,11 @@ module Skylab::TanMan
 
       # -- D:
 
-      def _begin_empty_document
+      def _will_begin_with_empty_document
 
         _ref = Byte_upstream_reference_[].via_string "digraph{\n}\n"
-
-        __resolve_document_controller_via_byte_upstream_reference _ref
-      end
-
-      def __resolve_document_controller_via_byte_upstream_reference ref
-
-        _ = Models_::DotFile::DocumentController_via_Request.call_by do |o|
-
-          o.byte_upstream_reference = ref
-          o.invocation = @microservice_invocation
-          o.listener = @listener
-        end
-
-        _store :@__document_controller, _
+        @USE_BYTE_UPSTREAM_REFERENCE = _ref
+        NIL
       end
 
       # -- C:
@@ -292,7 +282,7 @@ module Skylab::TanMan
 
         _ref = instance_variable_get _ivar whatput
 
-        st = _ref.to_simple_line_stream  # ..
+        st = _ref.to_minimal_line_stream  # ..
 
         if st
           if st.respond_to? :lineno

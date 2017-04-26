@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events::Component_Already_Added = Common_::Event.prototype_with(  # :[#007.C]
+    Events::ComponentAlreadyAdded = Common_::Event.prototype_with(  # :[#007.C]
 
       :component_already_added,
 
@@ -16,11 +16,11 @@ module Skylab::Autonomous_Component_System
     ) do | y, ev |
 
       o = ev.dup
-      o.extend Events::Component_Already_Added::Expresser___
+      o.extend Events::ComponentAlreadyAdded::Expresser___
       o.__express_into_under y, self
     end
 
-    module Events::Component_Already_Added::Expresser___
+    module Events::ComponentAlreadyAdded::Expresser___
 
       include ExpressionMethods
 

@@ -10,16 +10,18 @@ module Skylab::TanMan::TestSupport
 # (1/N)
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do
 
-      using_dotfile <<-O.unindent
+      o = given_dotfile_ <<-O.unindent
         digraph {
           # biff : baz
         }
       O
 
-      call_API :hear,
+      call_API(
+        :hear,
         :word, [ 'foo', 'means', 'bar' ],
-        :workspace_path, @workspace_path,
-        :config_filename, cfn_shallow
+        :workspace_path, o.workspace_path,
+        :config_filename, o.config_filename,
+      )
 
       expect_OK_event :wrote_resource
       expect_succeed
@@ -37,16 +39,18 @@ module Skylab::TanMan::TestSupport
 # (2/N)
     it "assign a known meaning to a new value" do
 
-      using_dotfile <<-O.unindent
+      o = given_dotfile_ <<-O.unindent
         digraph {
           # success : red
         }
       O
 
-      call_API :hear,
+      call_API(
+        :hear,
         :word, [ 'success', 'means', 'blue' ],
-        :workspace_path, @workspace_path,
-        :config_filename, cfn_shallow
+        :workspace_path, o.workspace_path,
+        :config_filename, o.config_filename,
+      )
 
       expect_OK_event :wrote_resource
       expect_succeed

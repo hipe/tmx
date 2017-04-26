@@ -69,7 +69,7 @@ module Skylab::Snag
             when :path
             _attempt_to_lock @_simple_line_upstream
             when :IO
-            _attempt_to_lock @_simple_line_upstream.lockable_resource
+            _attempt_to_lock @_simple_line_upstream.BYTE_STREAM_IO_FOR_LOCKING
             when :string
             ACHIEVED_
           else
@@ -398,13 +398,8 @@ module Skylab::Snag
 
           def __resolve_yielder
 
-            y = @_downstream_ID.to_minimal_yielder
-            if y
-              @_minimal_yielder = y
-              ACHIEVED_
-            else
-              y
-            end
+            _ = @_downstream_ID.to_minimal_yielder_for_receiving_lines
+            _store :@_minimal_yielder, _
           end
 
           def downstream_lines_during_possibly_locked_session
@@ -413,6 +408,8 @@ module Skylab::Snag
 
             # result is result. nothing to do.
           end
+
+          define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
         end
 
         # ==

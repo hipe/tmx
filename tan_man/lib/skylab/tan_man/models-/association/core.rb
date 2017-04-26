@@ -170,19 +170,19 @@ module Skylab::TanMan
 
         cc = @precons_box_.fetch :node
 
-        f_o = cc.entity_via_natural_key_fuzzily asc.property_value_via_symbol :from_node_label
+        f_o = cc.entity_via_natural_key_fuzzily asc.dereference :from_node_label
 
-        t_o = cc.entity_via_natural_key_fuzzily asc.property_value_via_symbol :to_node_label
+        t_o = cc.entity_via_natural_key_fuzzily asc.dereference :to_node_label
 
         a = nil
         if f_o
           a = []
-          a.push :from_node_label, f_o.property_value_via_symbol( :name )
+          a.push :from_node_label, f_o.dereference( :name )
         end
 
         if t_o
           a ||= []
-          a.push :to_node_label, t_o.property_value_via_symbol( :name )
+          a.push :to_node_label, t_o.dereference( :name )
         end
 
         if a

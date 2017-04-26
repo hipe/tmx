@@ -19,8 +19,8 @@ module Skylab::Fields::TestSupport
     it "the stack with one frame produces the values it has" do
       stack = _subject.new
       stack.push_frame_with :foo, :Foo, :bar, :Bar
-      stack.property_value_via_symbol( :foo ).should eql :Foo
-      stack.property_value_via_symbol( :bar ).should eql :Bar
+      stack.dereference( :foo ) == :Foo || fail
+      stack.dereference( :bar ) == :Bar || fail
     end
 
     it "the first frame determines what names the subsequent frames may have" do
@@ -53,16 +53,16 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :b, :B2, :c, :c2
       stack.push_frame_with :c, :C3
 
-      stack.property_value_via_symbol( :a ).should eql :A1
-      stack.property_value_via_symbol( :b ).should eql :B2
-      stack.property_value_via_symbol( :c ).should eql :C3
+      stack.dereference( :a ) == :A1 || fail
+      stack.dereference( :b ) == :B2 || fail
+      stack.dereference( :c ) == :C3 || fail
     end
 
     it "strange value when event receiver produces the same event as earlier" do
       stack = _subject.new( & handle_event_selectively_ )
       stack.push_frame_with :a, :A1, :b, :B1
       stack.push_frame_with :b, :B2
-      x = stack.property_value_via_symbol :c
+      x = stack.dereference :c
 
       expect_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_token == :c || fail

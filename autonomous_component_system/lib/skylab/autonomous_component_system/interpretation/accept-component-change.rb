@@ -50,7 +50,7 @@ module Skylab::Autonomous_Component_System
             _as_prev_comp = as_component_via_component[ orig_kn.value_x ]
             _LL = build_linked_list_of_context[]
 
-            ACS_.event( :Component_Changed ).with(
+            Home_::Events::ComponentChanged.with(
               :current_component, _as_new_comp,
               :previous_component, _as_prev_comp,
               :context_as_linked_list_of_names, _LL,
@@ -64,7 +64,7 @@ module Skylab::Autonomous_Component_System
             _as_new_comp = as_component_via_component[ new_x ]
             _LL = build_linked_list_of_context[]
 
-            ACS_.event( :Component_Added ).with(
+            Home_::Events::ComponentAdded.with(
               :component, _as_new_comp,
               :context_as_linked_list_of_names, _LL,
               :suggested_event_channel, [ :info, :component_added ],

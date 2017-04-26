@@ -50,7 +50,7 @@ module Skylab::TanMan
 
         rsx = _invocation_resources_
 
-        @_inquiry = Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics::ConfigFileInquiry_via_Request.call_by do |o|
+        @_inquiry = These_mags__[]::ConfigFileInquiry_via_Request.call_by do |o|
           o.path_head = @path
           o.path_tail = @config_filename
           o.yes_can_expand_path  # #masking
@@ -169,14 +169,22 @@ module Skylab::TanMan
         remove_instance_variable :@_mutex
         @_close = :__close_mutable
         @__mutable_document = :_mutable_document
+        @_immutable_document = :_mutable_document
         @mutable_document = doc ; nil
       end
 
       def accept_immutable_document doc
         remove_instance_variable :@_mutex
         @_close = :__close_immutable
-        @__immutable_document = :_immutable_document
+        @_immutable_document = :_immutable_document
         @immutable_document = doc ; nil
+      end
+
+      def procure_component_by_
+        These_mags__[]::ProcureComponent_via_ComponentPath.call_by do |o|
+          yield o
+          o.workspace = self
+        end
       end
 
       def mutable_document
@@ -188,7 +196,7 @@ module Skylab::TanMan
       end
 
       def immutable_document
-        send @__immutable_document
+        send @_immutable_document
       end
 
       def _immutable_document
@@ -257,7 +265,7 @@ module Skylab::TanMan
 
       def __normalize_asset_path_initially p, abs_path
 
-        asset_dir = _asset_dir p
+        asset_dir = asset_directory p
         if asset_dir
 
           @__relative_via_absolute = Home_.lib_.basic::Pathname::Localizer[ asset_dir ]
@@ -280,7 +288,7 @@ module Skylab::TanMan
         end
       end
 
-      def _asset_dir listener
+      def asset_directory listener  # [br]
         send ( @_asset_dir ||= :__asset_dir_initially ), listener
       end
 
@@ -291,9 +299,12 @@ module Skylab::TanMan
         d = Home_.lib_.basic::String.count_occurrences_in_string_of_string(
           cfn, ::File::SEPARATOR )
 
-        if 1 == d
+        case d <=> 1
+        when 0
           @__asset_dir = ::File.join @workspace_path, ::File.dirname( cfn )
-          send ( @_asset_dir = :__asset_dir_subsequently ), listener
+          send ( @_asset_dir = :__asset_dir_subsequently ), nil
+        when -1
+          send ( @_asset_dir = :__asset_dir_as_workspace_path ), nil
         else
           self._COVER_ME__this_algorithm_assumes_a_config_filename_of_this_particular_depth__
         end
@@ -301,6 +312,10 @@ module Skylab::TanMan
 
       def __asset_dir_subsequently _
         @__asset_dir
+      end
+
+      def __asset_dir_as_workspace_path _
+        @workspace_path
       end
 
       # --
@@ -326,10 +341,14 @@ module Skylab::TanMan
 
       def __close_immutable
         remove_instance_variable :@immutable_document
-        remove_instance_variable :@__immutable_document ; nil
+        remove_instance_variable :@_immutable_document ; nil
       end
 
     # -
+
+    These_mags__ = -> do
+      Home_.lib_.brazen_NOUVEAU::Models::Workspace::Magnetics
+    end
 
     # ==
     # ==

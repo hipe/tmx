@@ -35,7 +35,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         oes_p.call :error, :component_already_added do
 
-          event( :Component_Already_Added ).with(
+          Home_::Events::ComponentAlreadyAdded.with(
             :component, qk.value_x,
             :component_association, qk.association,
             :ACS, acs,
@@ -49,7 +49,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         oes_p.call :error, :component_not_found do
 
-          Home_.event( :Component_Not_Found ).with(
+          Home_::Events::ComponentNotFound.with(
             :component, qkn.value_x,
             :component_association, qkn.association,
             :ACS, acs,
@@ -62,17 +62,13 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         oes_p.call :info, :component_removed do
 
-          event( :Component_Removed ).with(
+          Home_::Events::ComponentRemoved.with(
             :component, qk.value_x,
             :component_association, qk.association,
             :ACS, acs,
           )
         end
         ACHIEVED_
-      end
-
-      def event sym
-        Home_.lib_.brazen.event sym
       end
 
       def _Mutation_Session

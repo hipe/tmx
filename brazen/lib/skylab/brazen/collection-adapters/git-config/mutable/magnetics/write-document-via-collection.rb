@@ -114,7 +114,9 @@ module Skylab::Brazen
 
         # ==
 
-        class WroteFileEvent_via_Values < Common_::MagneticBySimpleModel  # [tm] too
+        class WroteFileEvent_via_Values < Common_::MagneticBySimpleModel  # [br] too
+
+          # (#[#sy-032.2] tracks event classes like this (if others exist))
 
           attr_writer(
             :bytes,

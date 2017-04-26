@@ -74,7 +74,7 @@ module Skylab::Zerk
           unava_p = p[ asc ]
         end
         if unava_p
-          ACS_::Events::Component_Not_Available::Act[ unava_p, asc, @_stack ]  # raises
+          ACS_::Events::ComponentNotAvailable::Act[ unava_p, asc, @_stack ]  # raises
         else
           ___parse_this_component_association asc
         end

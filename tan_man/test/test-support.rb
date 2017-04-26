@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
 
       _ = Home_.sidesystem_path_
 
-      TS_::Proximity_Index_.new _, 'client', 'test', TS_
+      TS_::ProximityIndex_.new _, 'client', 'test', TS_
     end
 
     cache = {}
@@ -143,6 +143,11 @@ module Skylab::TanMan::TestSupport
     include Expect_Event__::Test_Context_Instance_Methods  # #todo
 
     # -- assertions
+
+    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines.call(
+        a, p, self )
+    end
 
     def expect_these_lines_in_array_ a, & p
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]

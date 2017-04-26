@@ -64,7 +64,8 @@ B) the number of trailing underscores
   | 2 | 0 | `__only_called_from_this_file_AND_only_1_place`   | [#here.2.0]
   | 2 | 1 | `__only_this_file_AND_hook_out_AND_one_place_`    | [#here.2.1]
   | 3 | 0 | `___this_file_AND_1x_AND_defined_immedately_above`| #deprecated
-  | - | - | `this_method_has_a__generated_portion__`          | see [#here.5]
+  | - | - | `this_method_has_a__generated_portion__`          | [#here.10]
+  | - | - | `THIS_METHOD_IS_SHOUTCASE`                        | [#here.11]
 
 
 
@@ -249,6 +250,37 @@ as exactly a portmanteau of `library_scope_` and `_file_scope`,
     that "hooks out" to an implementing agent by calling this method.
     as such it can be the case that there are multiple definitions but
     only a single location of call for such a method.
+
+
+
+
+### `foo_bar__this_convention__` :[#here.10]
+
+this convention is used in some *legacy* code where that part nested
+by the double underscores was derived from a variable. this was done
+for "security" reasons whereby we could employ this technique without
+worrying about accidentally calling a non-participating method (provided
+that all methods know about this convention).
+
+typically nowadays when we want to do something similar, we use a hash
+or a case expression; which seems to produce code that is easier to follow.
+
+
+
+
+### `A_SHOUTCASE_METHOD` :[#here.11]
+
+this indicates an experimental method that does not yet have adequate
+coverage and/or should not be considered at all stable.
+
+for example we might do this when we need a feature in one sidesystem that
+requires us to add a method to a node in another sidesystem, and we add no
+dedicated coverage in the other sidesystem.
+
+at writing we are employing this convention for methods that violate an
+abstraction layer. there is not yet widespread need for the method we are
+adding so we don't know if or how we want the method to become part of the
+public API of the subject.
 
 
 
@@ -587,6 +619,8 @@ here but there are some that are not.
 
 
 ### :#signing
+
+(EDIT: away this)
 
 when we use the verb "sign" in the context of events we mean the process
 of in some way adding more context to an event to make it clearer for

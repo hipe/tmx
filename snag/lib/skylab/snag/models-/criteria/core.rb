@@ -307,7 +307,7 @@ module Skylab::Snag
         end
       end
 
-      def property_value_via_symbol sym
+      def dereference sym
         send :"__#{ sym }__property_value"
       end
 

@@ -20,7 +20,7 @@ for some deep context, consider that we are now conceptualizing a
 "formal property" as a sort of [#ac-002] "association" structure. (the
 relationship between these two is tracked by [#122]).
 
-`property_value_via_symbol` is one method you can use to get the actual
+`dereference` is one method you can use to get the actual
 value from the formal value's name symbol.
 
 some of the action's arguments may parse into property values for the

@@ -60,22 +60,6 @@ module Skylab::Basic
 
     public
 
-      def identifier * a
-        if a.length.zero?
-          Identifier__
-        else
-          Identifier__.new( * a )
-        end
-      end
-
-      def members
-        singleton_class.public_instance_methods( false ) - [ :members ]
-      end
-
-      def normalization
-        Pathname::Normalization__
-      end
-
       def try_convert x
         x and begin
           if x.respond_to? :relative_path_from
@@ -89,7 +73,7 @@ module Skylab::Basic
       end
     end  # >>
 
-    class Identifier__  # you might prefer [#sy-003] the FS byte upstream ID
+    class ByteStreamReference  # you might prefer [#sy-003] the FS byte upstream ID
 
       def initialize io=nil, path_x
 
@@ -112,11 +96,11 @@ module Skylab::Basic
         Here_.description_under_of_path expag, @path
       end
 
-      def to_simple_line_stream
+      def to_minimal_line_stream
         @_IO
       end
 
-      def to_minimal_yielder
+      def to_minimal_yielder_for_receiving_lines
         @_IO
       end
     end

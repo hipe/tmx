@@ -99,7 +99,7 @@ module Skylab::TanMan
       end
 
       attr_reader(
-        :invocation_resources,  # [pl]
+        :invocation_resources,  # [pl], here
       )
 
       def HELLO_INVOCATION  # #todo

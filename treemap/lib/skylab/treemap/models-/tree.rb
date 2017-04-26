@@ -228,17 +228,18 @@ module Skylab::Treemap
 
         def __produce_raw_line_upstream
 
-          if @upstream_ID.lockable_resource.tty?
+          if @upstream_ID.BYTE_STREAM_IO_IS_TTY
             @argument_box[ :stderr ].puts "(entering interactive mode)"
           end
 
-          st = @upstream_ID.to_simple_line_stream
+          st = @upstream_ID.to_minimal_line_stream
 
           if @throughstream_ID
 
-            st = Input_Adapters_::Build_throughstream_mapper[
-              @throughstream_ID.to_minimal_yielder,
-              st ]
+            st = Input_Adapters_::Build_throughstream_mapper.call(
+              @throughstream_ID.to_minimal_yielder_for_receiving_lines,
+              st,
+            )
           end
 
           st

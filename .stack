@@ -34,6 +34,7 @@ HO tan_man/test/62-cli_spec.rb
 (related: driftwood in [#tm-026])
 TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
 (silo: hear)
+consider trying to quash `make_action_making_actions_module`
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
 TD tan_man/test/54-operations/95-hear/68-association_spec.rb
@@ -50,4 +51,3 @@ TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 (model: node)
 TD tan_man/test/54-operations/59-node/64-prototype_spec.rb
 TD tan_man/test/54-operations/59-node/44-create_spec.rb
-TD tan_man/test/54-operations/59-node/34-list-and-remove_spec.rb

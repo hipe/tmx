@@ -31,7 +31,7 @@ module Skylab::Brazen
 
         private :freeze
 
-        def unparse_into y
+        def write_bytes_into y
           y << @_frozen_line
         end
 

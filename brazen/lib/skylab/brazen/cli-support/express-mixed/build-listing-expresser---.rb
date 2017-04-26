@@ -75,7 +75,7 @@ module Skylab::Brazen
             @_prps = cls.properties.to_value_stream.to_a
 
             @_value_p = -> sym do
-              @_ent.property_value_via_symbol sym
+              @_ent.dereference sym
             end
 
           else

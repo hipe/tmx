@@ -50,10 +50,11 @@ module Skylab::Cull
 
         def event_for_fell_short_of_count wanted_number, had_number
 
-          _pathname_ID = Home_.lib_.basic::Pathname.identifier.new @path
+          _BSR = Home_.lib_.basic::Pathname::ByteStreamReference.new @path
+
           Build_not_OK_event_.call(
             :early_end_of_stream,
-            :stream_identifier, _pathname_ID,
+            :byte_stream_reference, _BSR,
             :wanted_number, wanted_number,
             :had_number, had_number,
           ) do |y, o|
@@ -64,7 +65,7 @@ module Skylab::Cull
             y << "JSON files are always exactly one entity collection #{
              }(\"table\") - table #{ ick want } was requested, #{
               }but had#{ ' only' if had.nonzero? } #{ had } table#{ s had } in #{
-               }#{ o.stream_identifier.description_under self }."
+               }#{ o.byte_stream_reference.description_under self }."
           end
         end
 

@@ -15,21 +15,21 @@ module Skylab::TanMan
         end
 
         def execute
-          init_ivars
+          __init_ivars
           ok = resolve_insertion_ivars
           ok and rewrite_string
         end
 
       private
 
-        def init_ivars
-          @name = @entity.property_value_via_symbol :name
+        def __init_ivars
+          @name = @entity.dereference :name
           @new_line = nil
-          @value = @entity.property_value_via_symbol :value
+          @value = @entity.dereference :value
         end
 
         def resolve_insertion_ivars
-          greatest_lesser_name, exact_fly, least_greater_name = find_neighbors
+          greatest_lesser_name, exact_fly, least_greater_name = __find_neighbors
           if exact_fly
             @exact_match_fly = exact_fly
             when_exact_match_fly_resolve_insertion_ivars
@@ -44,12 +44,12 @@ module Skylab::TanMan
           end
         end
 
-        def find_neighbors
+        def __find_neighbors
           my_name = @name
           @stream = @session.to_stream_of_meanings_with_mutable_string_metadata
           least_greater_name = nil
           while fly = @stream.gets
-            name = fly.property_value_via_symbol :name
+            name = fly.dereference :name
             case name <=> my_name
             when -1 ; greatest_lesser_name = name
             when  0 ; exact = fly ; break
@@ -93,7 +93,7 @@ module Skylab::TanMan
         def find_first_flyweight_with_name s
           @stream = @session.to_stream_of_meanings_with_mutable_string_metadata
           @stream.flush_until_detect do |ent|
-            s == ent.property_value_via_symbol( :name )
+            s == ent.dereference( :name )
           end
         end
 
@@ -137,7 +137,7 @@ module Skylab::TanMan
         end
 
         def when_name_collision
-          value = @exact_match_fly.property_value_via_symbol :value
+          value = @exact_match_fly.dereference :value
           if value == @value
             when_no_change
           else
@@ -169,7 +169,7 @@ module Skylab::TanMan
         def bld_name_collision_event
           build_not_OK_event_with :name_collision,
               :name, @name,
-              :existing_value, @exact_match_fly.property_value_via_symbol( :value ),
+              :existing_value, @exact_match_fly.dereference( :value ),
               :replacement_value, @value do |y, o|
 
             y << "cannot set #{ lbl o.name } to #{ val o.replacement_value },#{

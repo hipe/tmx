@@ -1,4 +1,6 @@
-self._NOT_USED
+self._NEVER_LOADED__readme__
 
-# this is here for continuity with the future if ever the node becomes normal-
-# sized again but for now its anemic content has been moved to parent node.
+# exactly #[#ta-005.2], and also there may be a change in tide for
+# byte stream references (near "false dichotomy"), we're not sure yet..
+
+# #history-B: moved anemic file up to parent

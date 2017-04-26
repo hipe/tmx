@@ -27,14 +27,14 @@ module Skylab::TanMan
     end
 
     def natural_key_string
-      property_value_via_symbol :name
+      dereference :name
     end
 
     def value_string
-      property_value_via_symbol :value
+      dereference :value
     end
 
-    def property_value_via_symbol i
+    def dereference i
       @indexed or index!
       send PROP_VAL_H__.fetch i
     end

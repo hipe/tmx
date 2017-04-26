@@ -78,12 +78,6 @@ module Skylab::TanMan
       end
     end
 
-      # (below is #open [#059] was once invite)
-
-          ev_p[].new_inline_with :invite_to_action, [ :graph, :use ],
-            :ok, false  # change the not found from neutral to not OK
-              # otherwise clients will not look for this invitation
-
     end  # if false
   end
 end

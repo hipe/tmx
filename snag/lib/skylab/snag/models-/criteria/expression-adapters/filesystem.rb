@@ -93,7 +93,7 @@ module Skylab::Snag
 
           _linked_list = Home_.lib_.basic::List::Linked[ nil, _nf ]
 
-          ACS_[].event( :Component_Added ).with(
+          ACS_[]::Events::ComponentAdded.with(
             :component, @ent,
             :context_as_linked_list_of_names, _linked_list,
           )

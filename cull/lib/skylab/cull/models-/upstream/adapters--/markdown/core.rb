@@ -48,7 +48,7 @@ module Skylab::Cull
 
         Build_not_OK_event_.call(
           :early_end_of_stream,
-          :stream_identifier, @line_stream.to_identifier,
+          :byte_stream_reference, @line_stream.to_byte_stream_reference,
           :wanted_number, wanted_number,
           :had_number, had_number,
         ) do |y, o|
@@ -70,7 +70,7 @@ module Skylab::Cull
           end
 
           y << "early end of stream - #{ _msg } of #{
-           }#{ o.stream_identifier.description_under self }."
+           }#{ o.byte_stream_reference.description_under self }."
         end
       end
 

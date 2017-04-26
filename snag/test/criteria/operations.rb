@@ -25,7 +25,7 @@ module Skylab::Snag::TestSupport
       begin
         o = st.gets
         o or break
-        _s = o.property_value_via_symbol :name
+        _s = o.dereference :name
         if target_s == _s
           found = o
           break

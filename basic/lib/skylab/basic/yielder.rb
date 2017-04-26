@@ -121,7 +121,7 @@ module Skylab::Basic
         @_yielder = yld
       end
 
-      def to_minimal_yielder
+      def to_minimal_yielder_for_receiving_lines
 
         @_yielder
       end

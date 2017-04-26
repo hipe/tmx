@@ -123,7 +123,7 @@ module Skylab::Brazen
             "( #{ @__name_string_as_received } : #{ value_x.inspect } )"
           end
 
-          def unparse_into y
+          def write_bytes_into y
             # ..
             y << @_frozen_line
           end

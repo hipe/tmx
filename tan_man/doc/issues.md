@@ -1,8 +1,15 @@
-[#097] #open abstract tons of this work for the new workspace
+[#099] #open double-writing with a tmpfile
+
+[#098] #open abstract file-locking work out to the byte stream references
+
+[#097] #open abstract tons of this work for the new workspace (may be "finished")
 
 [#096] #open no more [br]
+
 [#095] #open tests marked #too-big
+
 [#094] #open become insensitive to newlines when referencing nodes
+
 [#093]       #done cleanup `__dupe` interface and implementation
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091]       #done #list-API improve the implementation of \`unparse\`
@@ -10,10 +17,12 @@
 [#089]       #done [br] collection / file-based [ file etc ] <= [ttt]
 [#088]       #done same issue as below with graph use
 [#087]       #done setting a starter doesn't remove the last one
+
 [#086] #open on first test run with an empty "[tmx root]/tmp/", the
              event of creating the tmpdir breaks the comprehensive test run
              (tricky because the test that is the first to build the
              grammar files varies based on "how" we're running the tests..)
+
 [#085]       #done #list-API make methods conform to [#bs-029.5]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
@@ -33,11 +42,13 @@
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
+
 [#067] #open CLI is borked for a typical use-case. needs better coverage
              and fixing. (try: `init`, `hear "a depends on b"`) this
              occurred in part because of gaping holes in coverage near
              the higher-level concerns, like creating directories for 'init'.
              ( #was: #tracking-tag lexical ordering stuff, #moved-to [#br-011] )
+
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
 [#065]       #done fuzzy manage dependency
@@ -47,7 +58,7 @@
 [#061]       #done shallow shortcut to `tell` ?
 [#060]       #done #refactor: *all* NLP actions should go thru API duh
 
-[#059] #open restore invites
+[#059] #hole ( #was: restore invites )
              ( #was: #done places where you could prettify custom action invites )
 
 [#058]       #done get abs paths out of conf file, make them rel to the file
@@ -56,7 +67,9 @@
              3. applying them
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?
                #waiting-on:(#014, #015)
+
 [#055] #open #feature meaning delete
+
 [#054]       #watching it seems like it will probably be dangerous to
              reuse the same parser for multiple parses?, also #tracking-tag
 [#053]       #postponed normalizing string here
@@ -75,7 +88,9 @@
 [#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
+
 [#041] #open #feature workspace status is furloughed
+
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes [m-h] generic
 [#038]       #done `text_styler` away!
@@ -109,13 +124,16 @@
              ( #was: refactor-in headless, and sub-client )
 [#021]       the document entity narrative ..
              ( #was: #done merge singletons into service )
+
 [#020] #open #feature-collection upstream
              ( #was: #done #low-priority nounify cli commands
                x. check -> graph check
                x. push -> graph push
                x. use -> graph use
                x. tell -> graph tell )
+
 [#019] #open where is my optional term going?
+
              ( was: #done "magic" for DRYING up tests (Regret) #done )
 [#018]       #deferred #depends-on:#sl-100 refactor out porcelain ["bleeding"]
                we are gonna hinge this on to treemap for no real reason
@@ -124,16 +142,22 @@
 [#016]       [ nascent - see commit ]
              ( #was: #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity )
+
 [#015] #open #feature remove association between nodes (see)
              ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
-[#014]       #done UI for associate (labeled "depends on")
+
+[#014]       unified language ..
+             ( #was: #done UI for associate (labeled "depends on") )
+
 [#013]       #track why symlinks (once here, once outside)
              ( #was: unused files )
              ( #was: #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading )
+
 [#012] #open #feature common collection controller - ambiguity method not implemented
              ( #was: #done 2012-11-01 refactor UI / NLP to use sexp auto
+
 [#011]       #parent-node: [#010] the peek module name hack narrative ..
              ( #was: make sure complex prototypes can be used with nonzero length lists )
 [#010]       [ the treetop input adapter ]
@@ -166,9 +190,11 @@
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
+
 [#002] #open implement ambiguity expressor for 'st[atus]' and 'st[arter]'
              ( #was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller )
                examples-controller -> example-collection)
+
 [#001] #open refactor out the repetition among document entity actions:
              resolve one layer where all collection persists happen (i.e
              should collection controllers write files or should actions?)

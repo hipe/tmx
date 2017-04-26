@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def via_upstream_reference x, invo_rsx, & p
 
-        if x.respond_to? :to_simple_line_stream
+        if x.respond_to? :to_minimal_line_stream
 
           _via_upstream_reference x, invo_rsx, & p
         else

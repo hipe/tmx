@@ -100,33 +100,6 @@ module Skylab::TanMan::TestSupport
       @__seen_id_h[ s_a_ ] = true
       s_a_ * UNDERSCORE_
     end
-
-    # ~ fixture and prepared dir and file paths
-
-    def using_dotfile content_s
-
-      prepare_ws_tmpdir
-
-      @workspace_path = @ws_pn.to_path  # push up as needed
-
-      _graph_path = dotfile_path
-
-      ::File.open _graph_path, ::File::WRONLY | ::File::CREAT do | fh |
-        fh.write content_s
-      end
-
-      _conf_path = ::File.join @workspace_path, cfn_shallow
-
-      ::File.open _conf_path, ::File::WRONLY | ::File::CREAT do | fh |
-        fh.write "[ graph \"#{ THE_DOTFILE__ }\" ]\n"
-      end
-
-      NIL_
-    end
-
-    def dotfile_path
-      ::File.join @workspace_path, THE_DOTFILE__
-    end
     end  # if false
 
     # -- expectations (assertions)
@@ -140,6 +113,42 @@ module Skylab::TanMan::TestSupport
     end
 
     # -- TMPDIR TOWN
+
+    def given_dotfile_ content_s
+
+      td = volatile_tmpdir
+
+      td.prepare
+
+      workspace_path = td.path
+
+      dotfile_path = ::File.join workspace_path, THE_DOTFILE__
+
+      mode = ::File::WRONLY | ::File::CREAT
+
+      ::File.open dotfile_path, mode do |fh|
+        fh.write content_s
+      end
+
+      cfn_filename = cfn_shallow
+
+      _conf_path = ::File.join workspace_path, cfn_filename
+
+      ::File.open _conf_path, mode do |fh|
+        fh.puts "[ digraph ]"
+        fh.puts "path = \"#{ THE_DOTFILE__ }\""
+      end
+
+      ThesePaths___.new dotfile_path, workspace_path, cfn_filename
+    end
+
+    def given_dotfile_FAKE_ workspace_path
+      ThesePaths___.new ::File.join( workspace_path, THE_DOTFILE__ ), workspace_path, cfn_shallow
+    end
+
+    ThesePaths___ = ::Struct.new :dotfile_path, :workspace_path, :config_filename
+
+    THE_DOTFILE__ = 'the.dot'
 
     def make_a_copy_of_this_workspace_ tail
 
@@ -255,13 +264,8 @@ module Skylab::TanMan::TestSupport
     end
     CONFIG_FILENAME___ = 'local-conf.d/tm-conferg.file'.freeze
 
-    if false
     def cfn_shallow
-      CONFIG_FILENAME_SHALLOW___
+      'tern-mern.conf'
     end
-    CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
-
-    THE_DOTFILE__ = 'the.dot'
-    end  # if false
   end
 end

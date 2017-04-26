@@ -141,4 +141,6 @@
 [#002]       #branch-node, list sub-node
              :[#]:LL tracks what would be clients of a common linked list lib
              see also [#003]
+
 [#001]       #branch-node, tree sub-node
+             :[#here.2]: the "winnow" algorithm (currently in [tm] only, apparently)

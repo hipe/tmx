@@ -42,6 +42,8 @@ module Skylab::Basic
 
       def winnow path_s  # find closest match. result is that node plus scan
 
+        # (we don't *think* this is related to [#001.2] "winnow" algorithm)
+
         wahoo_p = -> node, st do
           [ st, node ]
         end

@@ -50,7 +50,7 @@ module Skylab::TanMan
 
         s = _produce_whole_string
         if s
-          x = @_parse.parse @_upstream_ID.whole_string
+          x = @_parse.parse s
           if x
             x
           else

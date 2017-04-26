@@ -42,7 +42,7 @@ module Skylab::Basic
         @s_a * EMPTY_S_
       end
 
-      def to_simple_line_stream
+      def to_minimal_line_stream
         Common_::Stream.via_nonsparse_array @s_a
       end
 

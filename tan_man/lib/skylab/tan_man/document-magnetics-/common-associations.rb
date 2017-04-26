@@ -2,127 +2,6 @@ module Skylab::TanMan
 
   module DocumentMagnetics_::CommonAssociations
 
-      if false
-      class << self
-
-        def downstream_reference_via_qualified_knownnesss qkn_a, & oes_p
-          Byte_downstream_reference_[].via_qualified_knownnesses qkn_a, & oes_p
-        end
-
-        def entity_property_class
-          IO_PROPERTIES__.entity_property_class
-        end
-
-        def IO_properties
-          IO_PROPERTIES__.array
-        end
-
-        def input_properties  # an array
-          INPUT_PROPERTIES___.array
-        end
-
-        def output_stream_property
-          IO_PROPERTIES__.output_stream
-        end
-
-        def upstream_reference_via_qualified_knownnesss qkn_a, & oes_p
-          Byte_upstream_reference_[].via_qualified_knownnesses qkn_a, & oes_p
-        end
-      end  # >>
-
-      class Action < Action_
-
-        # we've got to get in front of `normalize` so ..
-
-        include Brazen_::Modelesque::Entity
-
-        def document_entity_byte_upstream_reference
-          @_DEBUID
-        end
-
-        def document_entity_byte_downstream_reference
-          @_DEBDID
-        end
-
-      private
-
-        def normalize
-
-          # first call ordinary normalize to let any user-provided defaulting
-          # logic play out. then with the result arguments, resolve from them
-          # one input and (when applicable) one output means.
-
-          _ok = super
-          _ok && document_entity_normalize_
-        end
-
-        def document_entity_normalize_
-
-          o = Byte_Stream_Identifier_Resolver.new( @kernel, & handle_event_selectively )
-
-          o.formals formal_properties
-
-          o.for_model silo_module
-
-          o.against_argument_box @argument_box
-
-          st = o.to_resolution_pair_stream
-
-          st and begin
-            ok = true
-            begin
-              pair = st.gets
-              pair or break
-              ok = send :"receive_byte__#{ pair.name_symbol }__identifier_", pair.value_x
-              ok or break
-              redo
-            end while nil
-            ok
-          end
-        end
-
-        def receive_byte__input__identifier_ id
-          if id
-            @_DEBUID = maybe_convert_to_stdin_stream_ id
-            @_DEBUID && ACHIEVED_
-          else
-            @_DEBUID = id
-            ACHIEVED_
-          end
-        end
-
-        def maybe_convert_to_stdin_stream_ id
-
-          if id && :path == id.shape_symbol && DASH_ == id.path
-            sin = stdin_
-            if sin.tty?
-              maybe_send_event :error, :stdin_should_probably_not_be_interactive
-              UNABLE_
-            else
-              Byte_upstream_reference_[].via_open_IO sin
-            end
-          else
-            id
-          end
-        end
-
-        def receive_byte__output__identifier_ id
-
-          @_DEBDID = __maybe_convert_to_stdout_stream id
-          ACHIEVED_
-        end
-
-        def __maybe_convert_to_stdout_stream id
-
-          if id && :path == id.shape_symbol && DASH_ == id.path
-            Brazen_::Collection::ByteDownstreamReference.via_open_IO stdout_
-          else
-            id
-          end
-        end
-      end
-      end  # if false
-
     # ==
 
     class << self
@@ -336,40 +215,7 @@ module Skylab::TanMan
       :output,   # whether this attribute is associated with output
     )
 
-      if false
-      class Collection_Controller
-
-        # frontier. this *is* a controller because it is coupled to the action.
-
-        include Common_::Event::ReceiveAndSendMethods
-
-        def initialize act, bx, mc, k, & oes_p
-
-          oes_p or self._EVENT_HANDLER_MANDATORY
-
-          @action = act
-          @df = bx.fetch :dot_file
-          @kernel = k
-          @model_class = mc
-          @precons_box_ = bx
-          @on_event_selectively = oes_p
-
-        end
-
-        # c r u d
-
-        def unparse_into y
-          @df.unparse_into y
-        end
-
-        def flush_maybe_changed_document_to_output_adapter__ did_mutate
-          if did_mutate
-            flush_changed_document_to_ouptut_adapter
-          else
-            __when_document_did_not_change
-          end
-        end
-
+    if false
         def __when_document_did_not_change
 
           maybe_send_event :info, :document_did_not_change do
@@ -384,33 +230,7 @@ module Skylab::TanMan
             end
           end ; nil
         end
-
-        def flush_changed_document_to_ouptut_adapter
-          flush_changed_document_to_output_adapter_per_action @action
-        end
-
-        def flush_changed_document_to_output_adapter_per_action action
-
-          @df.persist_into_byte_downstream_reference(
-
-            action.document_entity_byte_downstream_reference,
-
-            :is_dry, action.argument_box[ :dry_run ],
-
-            & action.handle_event_selectively )
-
-        end
-
-        def document_
-
-          # we wanted this to be referred to as "digraph" and not "dot file"
-          # but the clients need to manipulate the document at the sexp level
-          # so it is pointless to try to abstract our implementation away..
-
-          @df
-        end
-      end
-      end
+    end  # if false
 
     Here__ = self
 

@@ -275,7 +275,7 @@ module Skylab::Brazen
 
           oes_p.call :error, :component_not_found do
 
-            Home_.event( :Component_Not_Found ).with(
+            Home_.lib_.ACS::Events::ComponentNotFound.with(
               :component_association, _model_class,
               :ACS, entity_collection,
             )

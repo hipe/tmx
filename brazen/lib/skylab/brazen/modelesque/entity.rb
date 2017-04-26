@@ -374,7 +374,7 @@ module Skylab::Brazen
 
         if pptr
           had_value = true
-          x_ = pptr.property_value_via_symbol sym
+          x_ = pptr.dereference sym
         else
           had_value = false
           x_ = nil
@@ -402,9 +402,11 @@ module Skylab::Brazen
     end
 
     def __say_wont_clobber_ivar x_, x, ivar
-      p = Home_::Lib_::Strange
+
+      _ = Home_.lib_.strange x
+
       "sanity - won't clobber existing #{ ivar } #{
-        }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
+        }(#{ _ }) with new value (#{ p[ x_ ] })"
     end
   end
 end

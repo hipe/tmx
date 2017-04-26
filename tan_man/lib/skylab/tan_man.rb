@@ -26,7 +26,7 @@ module Skylab::TanMan
     end
   end  # >>
 
-  # ==
+  # == method bodies as functions
 
   DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
     if x
@@ -36,9 +36,28 @@ module Skylab::TanMan
     end
   end
 
-  # ==
+  # == this
+
+  module DocumentMagnetics_
+
+    Autoloader_[ self ]
+
+    same = -> const do
+      # Home_.const_get :DocumentToolkit___, false
+      Home_::Models_::DotFile.const_get :DocumentController_via_Request, false
+      DocumentMagnetics_.const_defined?( const, false ) || self._OOPS
+      NOTHING_
+    end
+
+    lazily :ByteStreamReference_via_Locked_IO, & same
+    lazily :IO_via_ExistingFilePath, & same
+    lazily :Locked_IO_via_IO, & same
+  end
+
+  # == memoized objects
 
   Config_filename_knownness_ = Lazy_.call do
+
     Common_::KnownKnown[ Config_filename_[] ]
   end
 
@@ -49,7 +68,7 @@ module Skylab::TanMan
     ::File.join( 'tan-man-workspace', 'config.ini' ).freeze
   end
 
-  # ==
+  # == shortcuts
 
   Byte_downstream_reference_ = Lazy_.call do
     Home_.lib_.basic::ByteStream::DownstreamReference
@@ -88,10 +107,14 @@ module Skylab::TanMan
     MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
   end
 
-  # ==
+  # == require sidesystems
 
   Zerk_lib_ = Lazy_.call do
     Autoloader_.require_sidesystem :Zerk
+  end
+
+  ACS_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Autonomous_Component_System
   end
 
   Fields_lib_ = Lazy_.call do
@@ -151,6 +174,7 @@ module Skylab::TanMan
 
     # --
 
+    # = sidesys[ :Autonomous_Component_System ]  # for [#sl-002]
     Basic = sidesys[ :Basic ]
     Brazen_NOUVEAU = sidesys[ :Brazen ]  # weird name for now for a while
     # = sidesys[ :Fields ]  # for [#sl-002]

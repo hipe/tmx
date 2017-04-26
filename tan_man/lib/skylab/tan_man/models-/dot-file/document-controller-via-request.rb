@@ -1,175 +1,64 @@
 module Skylab::TanMan
 
-  module Models_::DotFile
+  module DocumentMagnetics_
 
-    if false
+    # ==
 
-      # (NOTE - when rekindled, this guy should break out into own file #todo)
+    ByteStreamReference_via_Locked_IO = -> io, is_read_write_not_read_only do
 
-    class Magnetics_::PersistDotFile_via_ByteDownstreamReference_and_GraphSexp
-
-      Attributes_actor_.call( self,
-        is_dry: nil,
-      )
-
-      def initialize id, gsp, x_a, & oes_p
-
-        @byte_downstream_reference = id
-        @graph_sexp = gsp
-        @is_dry = false
-        @listener = oes_p
-
-        if x_a.length.nonzero?
-          _kp = process_iambic_fully x_a
-          _kp or self._FAILED
+      IO_[]::ByteStreamReference.define do |o|
+        o.write_is_readable
+        if is_read_write_not_read_only
+          o.write_is_writable
         end
+        o.IO = io
       end
+    end
 
-      def execute
+    # ==
 
-        y = if @is_dry
-          Brazen_::Collection::ByteDownstreamReference.the_dry_identifier.to_minimal_yielder
+    Locked_IO_via_IO = -> io do  # ..
+
+      # (annoying to cover. a bit of a stub for now)
+
+      d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
+      if d
+        if d.zero?
+          io
         else
-          @byte_downstream_reference.to_minimal_yielder
+          self._COVER_ME__nonzero_status_when_tried_to_lock__
         end
-
-        bytes = @graph_sexp.unparse_into y
-
-        if y.respond_to? :close
-          y.close
-        end
-
-        @listener.call :info, :wrote_resource do
-          __build_event bytes
-        end
-
-        ACHIEVED_  # not bytes, it's confusing to the API
-      end
-
-      def __build_event bytes
-
-        Common_::Event.inline_OK_with :wrote_resource,
-
-            :byte_downstream_reference, @byte_downstream_reference,
-            :bytes, bytes,
-            :is_dry, @is_dry,
-            :is_completion, true do  | y, o |
-
-          id = o.byte_downstream_reference
-
-          _s = id.description_under self
-
-          s = id.EN_preposition_lexeme
-          if s
-            _to = " #{ s }"
-          end
-
-          y << "wrote#{ _to  } #{ _s } #{
-
-            }(#{ o.bytes }#{ ' dry' if o.is_dry } bytes)"
-
-        end
+      else
+        self._COVER_ME__falseish_result_when_tried_to_lock__
       end
     end
-    end  # if false
 
-    class DocumentController_via_Request < Common_::MagneticBySimpleModel
+    # ==
 
-      def initialize
-        @__mutex_for_solve_BUR = nil
-        super
+    IO_via_ExistingFilePath = -> path, is_read_write_not_read_only, filesystem do  # ..
+
+      # (we can cover no ent when necessary)
+
+      _mode = if is_read_write_not_read_only
+        ::File::RDWR
+      else
+        ::File::RDONLY
       end
 
-      def qualified_knownness_box= bx
-        _solve_BUR_via :__solve_BUR_via_box
-        @__box = bx
-      end
-
-      def byte_upstream_reference= bur
-        _solve_BUR_via :__use_BUR_as_is
-        @__byte_upstream_reference = bur
-      end
-
-      def _solve_BUR_via m
-        remove_instance_variable :@__mutex_for_solve_BUR
-        @__solve_BUR = m
-      end
-
-      attr_writer(
-        :invocation,
-        :listener,
-      )
-
-      # --
-
-      def execute
-
-        ok = true
-        ok &&= __resolve_BUR
-        ok &&= __resolve_generated_grammar_dir_path
-        ok &&= __via_BUR_resolve_graph_sexp
-        ok && __via_graph_sexp_produce_doc_controller
-      end
-
-      def __via_graph_sexp_produce_doc_controller
-
-        Here_::DocumentController___.define do |o|
-          o.byte_upstream_reference = @_BUR
-          o.graph_sexp = @graph_sexp
-          o.invocation = @invocation
-          o.listener = @listener
-        end
-      end
-
-      def __via_BUR_resolve_graph_sexp
-
-        _path = remove_instance_variable :@__generated_grammar_dir_path
-
-        _gs = Here_::ParseTree_via_ByteUpstreamReference.via(
-
-          :byte_upstream_reference, @_BUR,
-          :generated_grammar_dir_path, _path,
-
-          & @listener )
-
-        _store :@graph_sexp, _gs
-      end
-
-      def __resolve_generated_grammar_dir_path
-
-        _ = @invocation.generated_grammar_dir__
-        _store :@__generated_grammar_dir_path, _
-      end
-
-      def __resolve_BUR
-        _ = send remove_instance_variable :@__solve_BUR
-        _store :@_BUR, _
-      end
-
-      def __solve_BUR_via_box
-
-        bx = remove_instance_variable :@__box
-
-        sct = Home_::DocumentMagnetics_::ByteStreamReference_via_Request.call_by do |o|
-
-          o.qualified_knownness_box = bx
-          o.will_solve_for :input
-          o.will_enforce_minimum
-          o.listener = @listener
-        end
-
-        if sct
-          sct.solution_tuple.fetch 0
-        end
-      end
-
-      def __use_BUR_as_is
-        remove_instance_variable :@__byte_upstream_reference
-      end
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-
+      filesystem.open path, _mode
     end
+
+    # ==
+
+    IO_ = Lazy_.call do
+      Home_.lib_.system_lib::IO
+    end
+
+    # ==
+    # ==
   end
 end
-# #history-A: rewritten from "smalls"-style magnetics file to house only 1 magnetic
+
+# #pending-rename: to "document toolkit" maybe (up out of models) (see `DocumentToolkit___`)
+Skylab::TanMan::Models_::DotFile::DocumentController_via_Request = NIL
+# #history-A: full rewrite, back to smalls

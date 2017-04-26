@@ -393,7 +393,7 @@ module Skylab::TanMan
 
           _as_component = Conceptual_Association___.new @from_node, @to_node
 
-          Brazen_.event( :Component_Not_Found ).with(
+          ACS_[]::Events::ComponentNotFound.with(
             :component, _as_component,
             :component_association, Models_::Association,
           )

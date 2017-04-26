@@ -44,12 +44,12 @@ module Skylab::Fields::TestSupport
       stack = Home_::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
-      stack.property_value_via_symbol( :foo ).should eql :FOO
-      stack.property_value_via_symbol( :bar ).should eql 1
-      stack.property_value_via_symbol( :bar ).should eql 1
+      stack.dereference( :foo ) == :FOO || fail
+      stack.dereference( :bar ) == 1 || fail
+      stack.dereference( :bar ) == 1 || fail
 
-      stack.property_value_via_symbol( :baz ).should eql 'baz.'
-      stack.property_value_via_symbol( :boffo ).should eql "Foo: 1"
+      stack.dereference( :baz ) == 'baz.' || fail
+      stack.dereference( :boffo ) == "Foo: 1" || fail
     end
   end
 end

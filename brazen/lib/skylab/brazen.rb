@@ -26,16 +26,12 @@ module Skylab::Brazen
       y << "the prototype [br] app (sidelined for now as a real app)"
     end
 
-    def event const
-      Home_.lib_.the_ACS_lib::Events.const_get const, false
-    end
-
     def event_class const
       Home_::Actionesque::Factory::Events.const_get const, false
     end
 
     def lib_
-      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib___, self
     end
 
     def members
@@ -184,7 +180,7 @@ module Skylab::Brazen
 
   # ==
 
-  module Lib_
+  module Lib___
 
     sidesys, stdlib = Autoloader_.at(
       :build_require_sidesystem_proc,

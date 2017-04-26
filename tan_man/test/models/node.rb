@@ -4,18 +4,18 @@ module Skylab::TanMan::TestSupport
 
     def self.[] tcc
       TS_::Operations[ tcc ]
-      tcc.include Instance_Methods___
+      tcc.include InstanceMethods___
     end
     # <-
 
-  module Instance_Methods___
+  module InstanceMethods___
 
     define_method :fixtures_path_, ( Lazy_.call do
       ::File.join TS_.dir_path, 'fixture-dot-files-for-node'
     end )
 
     def stmt_list
-      _node_collection_controller.at_graph_sexp :stmt_list
+      _node_collection_controller.graph_sexp.stmt_list
     end
 
     def number_of_nodes
@@ -44,7 +44,7 @@ module Skylab::TanMan::TestSupport
 
     def unparsed
       s = ''
-      _node_collection_controller.unparse_into s
+      _node_collection_controller.write_bytes_into s
       s
     end
 
@@ -80,7 +80,7 @@ module Skylab::TanMan::TestSupport
 
       oes_p = listener_
 
-      action = Mock_Action___.new(
+      action = MockAction___.new(
         send( :"__via__#{ input_mechanism_i }__build_byte_upstream_reference" ),
         kr, & oes_p )
 
@@ -97,7 +97,7 @@ module Skylab::TanMan::TestSupport
     end
   end
 
-  class Mock_Action___
+  class MockAction___
 
     def initialize up_id, k, & oes_p
       @document_entity_byte_upstream_reference = up_id

@@ -300,7 +300,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             & handle_event_selectively )
 
           if kn
-            @upstream_ID = Home_.lib_.basic::Pathname.identifier kn.value_x, path
+            @upstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value_x, path
             ACHIEVED_
           else
             kn
@@ -347,7 +347,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
           if kn
             @verb_s ||= 'output'
-            @downstream_ID = Home_.lib_.basic::Pathname.identifier kn.value_x, path
+            @downstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value_x, path
             ACHIEVED_
           else
             kn
@@ -512,11 +512,11 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       _byte_downstream = if @do_show_sexp_only
         :__BYTE_DOWNSTREAM_NOT_USED__
       else
-        @downstream_ID.to_minimal_yielder
+        @downstream_ID.to_minimal_yielder_for_receiving_lines
       end
 
       Translate_stream___.call(
-        :byte_upstream, @upstream_ID.to_simple_line_stream,
+        :byte_upstream, @upstream_ID.to_minimal_line_stream,
         :byte_downstream, _byte_downstream,
         :do_show_sexp_only, @do_show_sexp_only,
         :resources, @resources,

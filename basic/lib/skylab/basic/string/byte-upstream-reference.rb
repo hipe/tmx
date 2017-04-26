@@ -18,12 +18,16 @@ module Skylab::Basic
           _same
         end
 
-        def to_simple_line_stream
+        def to_minimal_line_stream
           _same
         end
 
         def _same
           Here_::LineStream_via_String[ @_string_ ]
+        end
+
+        def BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE  # [tm] experiment
+          TRUE
         end
 
       # -
@@ -36,12 +40,8 @@ module Skylab::Basic
 
         #  conform to #[#ba-062.2] a semi-unified interface for writing bytes to a string
 
-        def to_minimal_yielder  # :[#046]
+        def to_minimal_yielder_for_receiving_lines  # :[#046]
           @_string_.clear  # this is what you want..
-        end
-
-        def EN_preposition_lexeme
-          NOTHING_
         end
       end
 

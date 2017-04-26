@@ -137,7 +137,7 @@ module Skylab::Fields
           end
         end
 
-        def property_value_via_symbol name_i
+        def dereference name_i
 
           prp = self.class.properties.fetch name_i
 

@@ -147,7 +147,7 @@ module Skylab::Zerk
           _Proxy = Home_::lib_.system_lib::IO::DownstreamProxy
           _Proxy.define do |o|
             o.listener = method :__receive_string_from_helpscreen
-            o.stream_identifier = NOTHING_
+            o.byte_stream_reference = NOTHING_
           end
         end
 

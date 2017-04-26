@@ -4,10 +4,11 @@ module Skylab::TanMan
 
     module Events__
 
-      _ = Brazen_.event :Component_Already_Added
+      _ = ACS_[]::Events::ComponentAlreadyAdded
 
-      Found_Existing_Node = _.prototype_with( :found_existing_node,
+      Found_Existing_Node = _.prototype_with(
 
+        :found_existing_node,
         :component_association, Here_,
         :did_mutate_document, false,
         :ok, nil
