@@ -1,4 +1,5 @@
-self._NEVER_LOADED
+
+self._NEVER_LOADED  # exactly #[#ta-005.2]
 
 # this file is kept here for continuity with the past and future.
 # the actual asset node is stowed away in another castle

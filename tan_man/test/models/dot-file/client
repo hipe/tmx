@@ -32,8 +32,9 @@ module Skylab::TanMan::TestSupport
 
       _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
       _qkn = Common_::Qualified_Knownness[ x, _asc ]
-      _class = Home_::DocumentMagnetics_::ByteStreamReference_via_Request::ByteStreamClass_via_Direction[ :input ]
-      _ref = _class.via_qualified_knownnesses [ _qkn ], & @listener  #  ??
+      _ref = Home_::DocumentMagnetics_::
+        ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection.call(
+          _qkn, :input )
 
       yikes = nil
       Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|

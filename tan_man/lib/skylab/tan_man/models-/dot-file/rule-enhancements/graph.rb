@@ -1,10 +1,10 @@
 module Skylab::TanMan
 
-  module Models_::DotFile::Sexp::InstanceMethods::Graph
+  module Models_::DotFile::RuleEnhancements::Graph
 
-    include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
+    include Models_::DotFile::CommonRuleEnhancementsMethods_
 
-    comment_rx = Models_::DotFile::Sexp::InstanceMethods::Comment.match_rx
+    comment_rx = Models_::DotFile::RuleEnhancements::Comment.match_rx
 
     define_method :comment_nodes do
       ::Enumerator.new do |y|

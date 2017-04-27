@@ -44,7 +44,7 @@ module Skylab::TanMan
 
         _hi = GenericEntityForReference_.new @node_name
 
-        _ok = Here_::Magnetics::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
+        _ok = Here_::Magnetics_::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
 
           o.entity = _hi
           o.document = @_mutable_digraph_

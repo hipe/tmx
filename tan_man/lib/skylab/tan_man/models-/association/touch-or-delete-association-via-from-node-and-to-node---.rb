@@ -85,7 +85,7 @@ module Skylab::TanMan
 
       def find_nodes
 
-        @touch_node = Models_::Node::Magnetics::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection.curry_with(
+        @touch_node = Models_::Node::Magnetics_::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection.curry_with(
           :verb,  send( :"node_verb_when_#{ @verb }" ),
           :document, @document,
           :kernel, @kernel,

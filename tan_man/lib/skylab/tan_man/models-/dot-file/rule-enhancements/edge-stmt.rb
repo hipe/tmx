@@ -1,8 +1,8 @@
 module Skylab::TanMan
 
-  module Models_::DotFile::Sexp::InstanceMethods::EdgeStmt
+  module Models_::DotFile::RuleEnhancements::EdgeStmt
 
-    include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
+    include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def source_node_id
       self[:agent][:id].normalized_string.intern

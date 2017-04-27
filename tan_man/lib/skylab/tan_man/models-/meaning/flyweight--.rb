@@ -14,10 +14,6 @@ module Skylab::TanMan
       @indexed = @scn = nil
     end
 
-    def members
-      [ :natural_key_string, :start_pos, :end_pos, :whole_string, :value_string ]
-    end
-
     attr_reader :start_pos, :end_pos
     attr_reader :next_line_start_pos
 
@@ -96,10 +92,6 @@ module Skylab::TanMan
     def value_range
       index! unless @indexed
       @value_range
-    end
-
-    def whole_string # for extreme hacking only
-      @scn.string
     end
 
   private

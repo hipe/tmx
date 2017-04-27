@@ -182,7 +182,7 @@ module Skylab::TanMan::TestSupport
 
         :generated_grammar_dir_path, existent_testing_GGD_path,
 
-        & listener_ )
+        & event_log.listener )
 
       nil
     end

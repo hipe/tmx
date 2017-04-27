@@ -99,7 +99,10 @@
 [#081] #hole
              ( #was: #track experimental extensions to Actor (1x) )
 
-[#080]       #parent-node:[#013] actors, agents and models ..
+[#080] #hole
+             ( #moved-to: [#ze-030.2] "unified language for performers" )
+             ( #was: #parent-node:[#013] actors, agents and models .. )
+
 [#079]       #parent-node:[#050] the API API components narrative
              ( #was: #done rather than the model action ever having to know about the
              modality adapter, the modality action should make a custom

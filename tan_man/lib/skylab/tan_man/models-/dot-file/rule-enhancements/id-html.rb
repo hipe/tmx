@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Models_::DotFile::Sexp::InstanceMethods::IdHtml
+  module Models_::DotFile::RuleEnhancements::IdHtml
 
     # (0..128).each { |i| puts("#{ '%03d' % [i] }: #{ ('%c' % [i] ).inspect }") }
 

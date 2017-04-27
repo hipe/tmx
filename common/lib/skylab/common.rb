@@ -1524,7 +1524,7 @@ module Skylab::Common
       end
 
       def empty_name_for__ x
-        Name::Conversion_Functions::Empty_name_for[ x ]
+        Name::ConversionFunctions::Empty_name_for[ x ]
       end
     end  # >>
 

@@ -15,7 +15,7 @@ module Skylab::TanMan
       #     citizens that release resources when we are done using them;
       #
       #     also so that any current or future [possible] problems stemming
-      #     from concurrent-access problems) fail loudly instead of silently
+      #     from concurrent-access fail loudly instead of silently
       #
       #     (when we want to allow concurrent reads, we can phase that in.);
       #
@@ -50,10 +50,11 @@ module Skylab::TanMan
       #     successes and failures), it's awkward for a client to have to
       #     to intercept emissions to determine basic result status.
       #
-      #   - on the one hand we want our result shape to be consistent
-      #     whether or not we are in read-write mode; but on the other hand
-      #     it "feels" more strightforward if the user result is our
-      #     result for when in read-only mode. :#here1
+      #   - on one hand we want our result shape to be consistent whether
+      #     or not we are in read-write mode; but on the other hand: when
+      #     in read-only mode it "feels" more straightforward if our result
+      #     is just the user result with no additional wrapping. we follow
+      #     the latter currently. :#here1 (and extrapolated below)
 
       # our responsibilities:
       #
@@ -62,7 +63,9 @@ module Skylab::TanMan
       #     explicitly what may seem obvious, we never write to the document
       #     when in read-only mode.
       #
-      #   - if we ever do double-writing with a tmpfile, that will happen here.
+      #   - if we ever do double-writing with a tmpfile, the subject node
+      #     will be the sole agent (but not performer) of such work.
+      #     (#wish [#007.D])
       #
       #   - in all cases involving files (including non-exception errors),
       #     we must close the file (so the lock is released). (but note we
@@ -78,11 +81,20 @@ module Skylab::TanMan
 
       # finally, a tiny gotcha:
       #
-      #   - client MUST result in `nil` (not `false`) IFF something failed.
-      #     `false` will be interpreted as being a meaningful boolean..
+      #   - to keep things simple but still adequately powerful, client
+      #     MUST result in `nil` (not `false`) IFF something failed.
+      #     `false` will always be interpreted as being a meaningful boolean.
+      #     `nil` can never be used as a valid result from the client.
+      #     its only possible interpretation is failure, and failure's
+      #     only absolute expression is through a result of `nil`. (but all
+      #     this applies only to clients of the subject.)
       #
 
       # supporting non-file BSR's (byte stream references):
+      #
+      # (normally we avoid creating or using local acronyms, but [#ba-062.3]
+      # byte stream references are so common here, we make an exception. see
+      # manifesto.)
       #
       # the subject was conceived of as a central, unified way to manage
       # file opening, file locking, file writing and file closing as it
@@ -111,36 +123,39 @@ module Skylab::TanMan
       # abstract lock-related logic up & out into the byte stream reference API
 
       def initialize
+        @_mutex_for_RDWR_vs_RDONLY = nil
         @__mutex_for_BSR = nil
         super
       end
 
       def be_read_write_not_read_only__
-        @_is_read_write_not_read_only = :__TRUE ; nil
+        remove_instance_variable :@_mutex_for_RDWR_vs_RDONLY
+        @_is_read_write_not_read_only = :_TRUE ; nil
       end
 
       def be_read_only_not_read_write_
-        @_is_read_write_not_read_only = :__FALSE ; nil
+        remove_instance_variable :@_mutex_for_RDWR_vs_RDONLY
+        @_is_read_write_not_read_only = :_FALSE ; nil
       end
 
       def immutable_workspace= ws
-        _will_solve_BSR_via :__resolve_sanitized_BSR_etc_via_immutable_workspace
+        _will_solve_BSR_via :__resolve_open_streams_via_immutable_workspace
         @immutable_workspace = ws
       end
 
       def qualified_knownness_box= bx
-        _will_solve_BSR_via :__resolve_sanitized_BSR_etc_via_qualified_knownness_box
+        _will_solve_BSR_via :__resolve_open_streams_via_qualified_knownness_box
         @qualified_knownness_box = bx
       end
 
       def byte_stream_reference= bsr
-        _will_solve_BSR_via :__resolve_sanitized_BSR_etc_via_BSR
+        _will_solve_BSR_via :__resolve_open_streams_via_unsanitized_BSR
         @byte_stream_reference = bsr
       end
 
       def _will_solve_BSR_via m
         remove_instance_variable :@__mutex_for_BSR
-        @__solve_BSR = m ; nil
+        @__resolve_open_streams = m ; nil
       end
 
       def session_by & p
@@ -154,7 +169,7 @@ module Skylab::TanMan
       )
 
       def execute
-        if __resolve_sanitized_byte_stream_reference_and_maybe_locked_IO  # (B)
+        if __resolve_open_streams  # (B)
           ok = __resolve_generated_grammar_dir_path  # (C)
           ok &&= __resolve_graph_sexp_via_everything  # (D)
           ok && __init_document_controller_via_graph_sexp  # (E)
@@ -163,18 +178,21 @@ module Skylab::TanMan
           else
             x = ok
           end
-          __close_if_necessary  # (G)
+          __close_as_necessary  # (G)
           x
         end
       end
 
       # -- G:
 
-      def __close_if_necessary
-        if @_filesystem_is_involved
-          @_sanitized_BSR.CLOSE_BYTE_STREAM_IO  # :#here2
-          remove_instance_variable :@_sanitized_BSR
+      def __close_as_necessary
+
+        @_open_streams.each do |obs|
+          obs.is_lockable_and_locked || next
+          obs.sanitized_byte_stream_reference.CLOSE_BYTE_STREAM_IO  # :#here2
         end
+
+        remove_instance_variable :@_open_streams
         NIL
       end
 
@@ -208,11 +226,15 @@ module Skylab::TanMan
 
       def __persist  # was `persist_into_byte_downstream_reference`
 
+        # (whether we have one two-way stream or two streams.. same as #here3)
+
+        _bdr = @_open_streams.last.sanitized_byte_stream_reference
+
         _is_dry = remove_instance_variable :@is_dry_run
 
         _bytes = PeristDotfile___.call_by do |o|
           o.is_dry_run = _is_dry
-          o.byte_stream_reference = @_sanitized_BSR
+          o.byte_stream_reference = _bdr
           o.graph_sexp = @_DC.graph_sexp
           o.listener = @listener
         end
@@ -224,8 +246,15 @@ module Skylab::TanMan
 
       def __init_document_controller_via_graph_sexp
 
+        # (it's a bit of a coin-toss whether to associate the upstream or
+        # the downstream reference with the document, and
+        # #open [#007.E] probably a smell - why do we need to assoc a
+        # BSR with a document controller at all?)
+
+        _use_bsr = @_open_streams.first.sanitized_byte_stream_reference
+
         @_DC = Here_::DocumentController___.define do |o|
-          o.byte_stream_reference = @_sanitized_BSR
+          o.byte_stream_reference = _use_bsr
           o.graph_sexp = remove_instance_variable :@__graph_sexp
           o.microservice_invocation = @microservice_invocation
           o.listener = @listener
@@ -238,11 +267,17 @@ module Skylab::TanMan
 
       def __resolve_graph_sexp_via_everything
 
+        # (whether we have one ONE-way stream, one TWO-way stream or two
+        #  streams, all we need to know is that the first (leftmost) one
+        #  is the upstream. :#here3)
+
+        _bur = @_open_streams.first.sanitized_byte_stream_reference
+
         _path = remove_instance_variable :@__generated_grammar_dir_path
 
         _gs = Here_::ParseTree_via_ByteUpstreamReference.via(
 
-          :byte_upstream_reference, @_sanitized_BSR,
+          :byte_upstream_reference, _bur,
           :generated_grammar_dir_path, _path,
 
           & @listener )
@@ -260,16 +295,29 @@ module Skylab::TanMan
 
       # -- B:
 
-      def __resolve_sanitized_byte_stream_reference_and_maybe_locked_IO
-        send remove_instance_variable :@__solve_BSR
+      def __resolve_open_streams
+        send remove_instance_variable :@__resolve_open_streams
       end
 
-      # ~ B4:
+      # ~
 
-      def __resolve_sanitized_BSR_etc_via_immutable_workspace
+      def __resolve_open_streams_via_immutable_workspace
 
         if __resolve_digraph_path_via_workspace
-          _resolve_sanitized_BSR_etc_and_locked_IO_via_digraph_path
+
+          __resolve_open_streams_via_digraph_path
+        end
+      end
+
+      def __resolve_open_streams_via_digraph_path
+
+        _path = remove_instance_variable :@__digraph_path
+
+        _qkn = Common_::QualifiedKnownness.via_value_and_symbol(
+          _path, :input_path )  # name is important, must accord with [#ba-062]
+
+        _resolve_open_streams_by do |o|
+          o.for_qualified_knownness_and_direction__ _qkn, :input
         end
       end
 
@@ -284,125 +332,70 @@ module Skylab::TanMan
           o.listener = @listener
         end
 
-        _store :@_digraph_path, _
+        _store :@__digraph_path, _
       end
 
-      # ~ B3:
+      # ~
 
-      def __resolve_sanitized_BSR_etc_via_qualified_knownness_box
+      def __resolve_open_streams_via_qualified_knownness_box
+
+        if __resolve_tuple_via_QK_box
+
+          _a = remove_instance_variable( :@__tuple ).byte_stream_reference_qualified_knownness_array
+
+          _resolve_open_streams_by do |o|
+            o.for_one_or_two _a
+          end
+        end
+      end
+
+      def __resolve_tuple_via_QK_box
+
+        if _is_read_write_not_read_only  # :#spot2.1 (important)
+          these = [ :input, :output ]
+        else
+          self._COVER_ME__imagine_if_extra__
+          these = [ :input ]
+        end
 
         _bx = remove_instance_variable :@qualified_knownness_box
 
-        sct = Home_::DocumentMagnetics_::ByteStreamReference_via_Request.call_by do |o|
+        _ = Mags_[]::ByteStreamReferences_via_Request.call_by do |o|
 
           o.qualified_knownness_box = _bx
-          o.will_solve_for :input
+          o.will_solve_for( * these )
           o.will_enforce_minimum
           o.listener = @listener
         end
 
-        if sct
-          _wat = sct.solution_tuple.fetch 0
-          ::Kernel._OKAY
+        _store :@__tuple, _
+      end
+
+      # ~
+
+      def __resolve_open_streams_via_unsanitized_BSR
+
+        # this is for when we were passed a single BSR
+
+        _bsr = remove_instance_variable :@byte_stream_reference
+        _resolve_open_streams_by do |o|
+          o.only_this_byte_stream_reference _bsr
         end
-      end
-
-      # ~ B2:
-
-      def __resolve_sanitized_BSR_etc_via_BSR
-
-        @_unsanitized_BSR = remove_instance_variable :@byte_stream_reference
-
-        if __unsanitized_BSR_shape_is_primitive
-
-          __use_unsanitized_BSR_as_is_and_there_will_be_no_locking
-
-        elsif __unsanitized_BSR_is_of_path
-
-          _resolve_sanitized_BSR_etc_and_locked_IO_via_digraph_path
-
-        else
-          __use_unsanitized_BSR_as_is_IF_you_succeed_in_locking_it
-        end
-      end
-
-      def __use_unsanitized_BSR_as_is_IF_you_succeed_in_locking_it
-
-        self._SKETCH
-        bsr = remove_instance_variable :@_unsanitized_BSR
-        if _locked_IO_via_non_locked_IO bsr.IO
-          @_sanitized_BSR = bsr
-          @_do_locking = true
-          @_filesystem_is_involved = true
-          ACHIEVED_
-        end
-      end
-
-      def __use_unsanitized_BSR_as_is_and_there_will_be_no_locking
-
-        @_sanitized_BSR = remove_instance_variable :@_unsanitized_BSR
-        @_do_locking = false
-        @_filesystem_is_involved = false
-        ACHIEVED_
-      end
-
-      def __unsanitized_BSR_is_of_path
-
-        if :path == @_unsanitized_BSR.shape_symbol
-          _bsr = remove_instance_variable :@_unsanitized_BSR
-          @_digraph_path = _bsr.path
-          ACHIEVED_
-        end
-      end
-
-      def __unsanitized_BSR_shape_is_primitive
-        @_unsanitized_BSR.BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE
-      end
-
-      # ~ B1: support
-
-      def _resolve_sanitized_BSR_etc_and_locked_IO_via_digraph_path
-
-        ok = __resolve_non_locked_IO_via_digraph_path
-        ok &&= __resolve_locked_IO_via_non_locked_IO
-        ok && __resolve_sanitized_BSR_etc_via_locked_IO
-      end
-
-      def __resolve_sanitized_BSR_etc_via_locked_IO
-
-        _ = Home_::DocumentMagnetics_::ByteStreamReference_via_Locked_IO.call(
-          remove_instance_variable( :@__locked_IO ),
-          _is_read_write_not_read_only,
-        )
-        @_sanitized_BSR = _
-        @_filesystem_is_involved = true
-        @_do_locking = true
-
-        ACHIEVED_
-      end
-
-      def __resolve_locked_IO_via_non_locked_IO
-
-        _ = _locked_IO_via_non_locked_IO remove_instance_variable :@__non_locked_IO
-        _store :@__locked_IO, _
-      end
-
-      def __resolve_non_locked_IO_via_digraph_path
-
-        _ = Home_::DocumentMagnetics_::IO_via_ExistingFilePath.call(
-          remove_instance_variable( :@_digraph_path ),
-          _is_read_write_not_read_only,
-          __filesystem,
-        )
-        _store :@__non_locked_IO, _
-      end
-
-      def _locked_IO_via_non_locked_IO io
-
-        Home_::DocumentMagnetics_::Locked_IO_via_IO[ io ]
       end
 
       # -- A: support
+
+      def _resolve_open_streams_by
+
+        _ = Mags_[]::OpenByteStreams_via_Request.call_by do |o|  # 1x
+          yield o
+          o.is_read_write_not_read_only = _is_read_write_not_read_only
+          o.filesystem = __filesystem
+          o.listener = @listener
+        end
+
+        _store :@_open_streams, _
+      end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
@@ -410,7 +403,13 @@ module Skylab::TanMan
         send @_is_read_write_not_read_only
       end
 
-      def __FALSE ; false end ; def __TRUE ; true end
+      def _FALSE
+        FALSE
+      end
+
+      def _TRUE
+        TRUE
+      end
 
       def __filesystem
         @microservice_invocation.invocation_resources.filesystem

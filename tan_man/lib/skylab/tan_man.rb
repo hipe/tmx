@@ -43,13 +43,13 @@ module Skylab::TanMan
     Autoloader_[ self ]
 
     same = -> const do
-      # Home_.const_get :DocumentToolkit___, false
-      Home_::Models_::DotFile.const_get :DocumentController_via_Request, false
+      Home_.const_get :DocumentToolkit_, false
       DocumentMagnetics_.const_defined?( const, false ) || self._OOPS
       NOTHING_
     end
 
     lazily :ByteStreamReference_via_Locked_IO, & same
+    lazily :ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection, & same
     lazily :IO_via_ExistingFilePath, & same
     lazily :Locked_IO_via_IO, & same
   end
@@ -69,6 +69,10 @@ module Skylab::TanMan
   end
 
   # == shortcuts
+
+  Mags_ = -> do
+    Home_::DocumentMagnetics_
+  end
 
   Byte_downstream_reference_ = Lazy_.call do
     Home_.lib_.basic::ByteStream::DownstreamReference

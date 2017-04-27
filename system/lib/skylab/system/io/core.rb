@@ -1,6 +1,6 @@
 module Skylab::System
 
-  module IO
+  module IO  # :[#010].
 
     # ==
 
@@ -31,7 +31,8 @@ module Skylab::System
 
     # ==
 
-    # our exposures of #[#ba-062.1] & #[#ba-062.2] have perhaps distinct
+    # our exposures of #[#ba-062.1] & #[#ba-062.2] (see manifesto) have
+    # perhaps distinct
     # characteristics when compared to other adaptations in this strain
     # owing both to our practical requirements and to characteristics of
     # IO handles themselves:
@@ -50,12 +51,12 @@ module Skylab::System
     # as such we cannot simply have one class for "upstreams" and another
     # for "downstreams". (in fact it may be that the work here reflects
     # the beginning of a broader the dismantling of these deep idioms;
-    # which may present a false dichotomy.)
+    # which may present a false dichotomy..)
 
     module ByteUpstreamReference ; class << self
       def via_open_IO io
         ByteStreamReference.define do |o|
-          o.write_is_readable
+          o.will_be_readable
           o.IO = io
         end
       end
@@ -64,7 +65,7 @@ module Skylab::System
     module ByteDownstreamReference ; class << self
       def via_open_IO io
         ByteStreamReference.define do |o|
-          o.write_is_writable
+          o.will_be_writable
           o.IO = io
         end
       end
@@ -78,12 +79,12 @@ module Skylab::System
         super
       end
 
-      def write_is_writable
+      def will_be_writable
         extend ByteStreamReferenceMethodsApplicableToWritable_ONLY___
         @_is_writable = true
       end
 
-      def write_is_readable
+      def will_be_readable
         extend ByteStreamReferenceMethodsApplicableToReadable_ONLY___
         @_is_readable = true
       end
@@ -139,7 +140,7 @@ module Skylab::System
         @IO.path
       end
 
-      def BYTE_STREAM_IO_FOR_LOCKING  # [sn]
+      def BYTE_STREAM_IO_FOR_LOCKING  # [sn], [tm]
         @IO
       end
 
@@ -167,9 +168,11 @@ module Skylab::System
 
     module ByteStreamReferenceMethodsApplicableToReadable_ONLY___
 
-      def whole_string  # (`Treetop` needs whole strings)
+      def to_mutable_whole_string  # (`Treetop` needs whole strings)
         @IO.read  # or whatever
       end
+
+      alias_method :to_read_only_whole_string, :to_mutable_whole_string
 
       def to_minimal_line_stream
         @IO

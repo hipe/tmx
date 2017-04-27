@@ -70,7 +70,7 @@ module Skylab::DocTest
       # Common_::Name.via_human( @_mutable_string ).as_lowercase_with_underscores_string
 
       @_mutable_string =
-        Common_::Name::Conversion_Functions::Snake_case_string_via_human[
+        Common_::Name::ConversionFunctions::Snake_case_string_via_human[
           @_mutable_string ]
       NIL_
     end

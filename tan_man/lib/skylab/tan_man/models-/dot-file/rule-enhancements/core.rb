@@ -2,9 +2,7 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    module Sexp::InstanceMethod
-
-      module InstanceMethods
+    module CommonRuleEnhancementsMethods_  # #stowaway
 
     def _label2id_stem label_str
       md = /\A(?<stem>\w+)/.match label_str
@@ -25,10 +23,9 @@ module Skylab::TanMan
       self.class.element2tree node, member # note member might be nil
     end
 
-      end
     end
 
-  module Sexp::InstanceMethods
+    module RuleEnhancements  # this is a #magic-name to the sexp::auto lib
 
     # #was-boxxy
 
@@ -73,12 +70,13 @@ module Skylab::TanMan
 
   module EqualsStmt
 
-    include Sexp::InstanceMethod::InstanceMethods
+        include CommonRuleEnhancementsMethods_
 
     def rhs= mixed
       self[:rhs] = _parse_id(mixed, :rhs)
     end
   end
-  end
+
+    end
   end
 end

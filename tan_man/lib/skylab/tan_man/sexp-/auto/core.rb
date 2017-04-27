@@ -41,24 +41,21 @@ module Skylab::TanMan
         tree_cls.include mod
       end
 
-      _a = [
-        :Sexp,
-        :InstanceMethods,
-        Common_::Name::Conversion_Functions::Constantize[ tree_cls.rule ] ]
+      _rule_as_const = Common_::Name::ConversionFunctions::Constantize[ tree_cls.rule ]
+      _const_path = [ :RuleEnhancements, _rule_as_const ]  # :#magic-name
+      _mod = tree_cls.grammar.anchor_module
 
-      im = _a.reduce(
-        tree_cls.grammar.anchor_module
-      ) do | mod_, i |
+      im = _const_path.reduce _mod do |mod_, const|
 
-        mod_.const_defined? i, false  or break  # one end of [#078]
-        mod_.const_get i, false
+        mod_.const_defined? const, false or break  # one end of [#078]
+        mod_.const_get const, false
       end
 
       if im
         tree_cls.include im
       end
 
-      nil
+      NIL
     end
 
     def build_element_names i # extent: * defs, 1 call

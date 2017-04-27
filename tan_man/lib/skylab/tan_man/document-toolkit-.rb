@@ -1,15 +1,37 @@
 module Skylab::TanMan
 
+  DocumentToolkit_ = nil
+  # (for now this node exists only to hold anemics for:)
+
   module DocumentMagnetics_
 
     # ==
 
-    ByteStreamReference_via_Locked_IO = -> io, is_read_write_not_read_only do
+    ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection = -> do
+
+      these = {
+        input: :UpstreamReference,
+        hereput: :UpstreamReference,  # meh this is :#microtheme1
+        output: :DownstreamReference,
+      }
+
+      -> qkn, direction_sym do
+        _const = these.fetch direction_sym
+        _class = Home_.lib_.basic::ByteStream.const_get _const, false
+        _class.via_qualified_knownness qkn
+      end
+    end.call
+
+    # ==
+
+    ByteStreamReference_via_Locked_IO = -> io, yes_w, yes_r do
 
       IO_[]::ByteStreamReference.define do |o|
-        o.write_is_readable
-        if is_read_write_not_read_only
-          o.write_is_writable
+        if yes_r
+          o.will_be_readable
+        end
+        if yes_w
+          o.will_be_writable
         end
         o.IO = io
       end
@@ -35,17 +57,23 @@ module Skylab::TanMan
 
     # ==
 
-    IO_via_ExistingFilePath = -> path, is_read_write_not_read_only, filesystem do  # ..
+    IO_via_ExistingFilePath = -> path, yes_w, yes_r, filesystem do  # ..
 
       # (we can cover no ent when necessary)
 
-      _mode = if is_read_write_not_read_only
-        ::File::RDWR
-      else
+      mode = if yes_w
+        if yes_r
+          ::File::RDWR
+        else
+          ::File::WRONLY
+        end
+      elsif yes_r
         ::File::RDONLY
       end
 
-      filesystem.open path, _mode
+      if mode
+        filesystem.open path, mode
+      end
     end
 
     # ==
@@ -58,7 +86,4 @@ module Skylab::TanMan
     # ==
   end
 end
-
-# #pending-rename: to "document toolkit" maybe (up out of models) (see `DocumentToolkit___`)
-Skylab::TanMan::Models_::DotFile::DocumentController_via_Request = NIL
 # #history-A: full rewrite, back to smalls

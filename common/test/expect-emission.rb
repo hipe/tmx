@@ -963,6 +963,7 @@ module Skylab::Common::TestSupport
       def handle_event_selectively
         send @_record_time_read, :listener
       end
+      alias_method :listener, :handle_event_selectively  # todo rename ~62X
 
       def shave num  # hacky fun - pop off the last N items with assertion
 

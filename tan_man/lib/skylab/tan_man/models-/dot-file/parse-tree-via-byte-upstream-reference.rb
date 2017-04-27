@@ -30,8 +30,8 @@ module Skylab::TanMan
         end ; nil
       end
 
-      Here_::SyntaxNodes.class
-      Here_::Sexp::InstanceMethods.class
+      Here_.const_get :SyntaxNodes, false
+      Here_.const_get :RuleEnhancements, false
 
       def execute
 

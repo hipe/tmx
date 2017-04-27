@@ -176,7 +176,7 @@
 
 [#007]       small internal tracking
 
-             :[#here.D]: tiny stack items
+       #wish :[#here.D]: double-writing to tmpfile for dotfiles (like [sg] does)
 
              :[#here.C]: what we're calling "sub-invocations"
 

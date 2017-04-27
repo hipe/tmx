@@ -16,8 +16,7 @@ module Skylab::TanMan
           :inflect, :verb, 'sync', :noun, 'graph',
         ]
 
-        _hi = Home_::DocumentMagnetics_::CommonAssociations.
-          to_item_stream_nothing_required__
+        _hi = Home_::DocumentMagnetics_::CommonAssociations.all_
 
         [
           :flag, :property, :dry_run,
@@ -71,11 +70,19 @@ module Skylab::TanMan
       end
 
       def _sync_by
+
         This_::Sync_via_Parameters___.call_by do |o|
+
           yield o
-          o.in_reference = @_input
-          o.here_reference = @_hereput
-          o.out_reference = @_output
+
+          # (we can strip the below values of their "association" structures
+          #  because when syncing, the associations (input, hereput, output)
+          #  that correspond to the BSR's are both known and uninterestng.)
+
+          o.in_reference = ( @_input && @_input.value_x )
+          o.here_reference = ( @_hereput && @_hereput.value_x )
+          o.out_reference = ( @_output && @_output.value_x )
+
           o.microservice_invocation = @_microservice_invocation_
           o.listener = _listener_
         end
@@ -100,7 +107,7 @@ module Skylab::TanMan
         # as a "hole" in the below array. the remainder of this work, then,
         # is (partly) about deciding whether any such holes are OK.
 
-        @_input, @_hereput, @_output = remove_instance_variable :@__solution_tuple
+        @_input, @_hereput, @_output = remove_instance_variable :@__QKs
         if @_input
           if @_hereput
             if @_output
@@ -156,7 +163,7 @@ module Skylab::TanMan
 
       def __resolve_at_most_one_parameter_per_direction
 
-        _bx = to_box__
+        _bx = to_box_
 
         sct = _this_performer.call_by do |o|
           o.will_solve_for :input, :hereput, :output
@@ -166,14 +173,14 @@ module Skylab::TanMan
         end
 
         if sct
-          @__solution_tuple = sct.solution_tuple
+          @__QKs = sct.byte_stream_reference_qualified_knownness_array
           @qualifieds_via_direction_offset = sct.qualifieds_via_direction_offset
           ACHIEVED_
         end
       end
 
       def _this_performer
-        Home_::DocumentMagnetics_::ByteStreamReference_via_Request
+        Home_::DocumentMagnetics_::ByteStreamReferences_via_Request
       end
 
       if false

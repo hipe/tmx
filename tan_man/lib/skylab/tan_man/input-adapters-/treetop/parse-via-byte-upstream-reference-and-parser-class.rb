@@ -75,7 +75,7 @@ module Skylab::TanMan
       def _produce_whole_string
 
         begin
-          @_upstream_ID.whole_string
+          @_upstream_ID.to_read_only_whole_string
 
         rescue ::Errno::ENOENT => e
 

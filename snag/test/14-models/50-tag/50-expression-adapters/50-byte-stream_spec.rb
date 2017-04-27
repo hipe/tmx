@@ -74,7 +74,7 @@ module Skylab::Snag::TestSupport
 
       memoize :_the_byte_upstream do
 
-        Home_.lib_.basic::String::ByteUpstreamReference.new(
+        Home_.lib_.basic::String::ByteUpstreamReference.via_big_string(
 
           "[#07] hi #normal-tag ( #wiz: hey #other-tag hi ) and #normal-again.\n"
         )

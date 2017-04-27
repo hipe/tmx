@@ -9,7 +9,7 @@ introducing a domain-specific neologism.
 
 
 
-## introducing "byte upstream" and "byte downstream" :[#here.A]
+## introducing "byte upstream" and "byte downstream" :[#here.1]
 
 as it works out, many (most?) of the actions in this application are
 involved with reading from or manipulating The Document in some way.
@@ -35,6 +35,9 @@ but "references" that can produce (and sometimes re-produce) the streams
 when needed. so you'll hear us say "byte upstream reference" and
 "byte downstream reference" which you can probably safely think of as an
 input stream and ouput stream (even STDIN and STDOUT, if you are familiar).
+
+(the final few paragraphs are redundant with (and supercede) their
+corresponding ideas in [#ba-062.3] "the byte stream manifesto".)
 
 
 

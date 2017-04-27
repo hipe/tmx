@@ -70,7 +70,7 @@ module Skylab::TanMan
         def via_exact_match_resolve_insertion_ivars
           o = @reference_meaning = @exact_match_fly
           @insertion_range = o.line_start .. o.end_pos
-          @mutable_s = o.whole_string
+          @mutable_s = o.to_mutable_whole_string
           ACHIEVED_
         end
 
@@ -78,7 +78,7 @@ module Skylab::TanMan
           @reference_meaning = find_first_flyweight_with_name @greatest_lesser_name
           d = @reference_meaning.next_line_start_pos
           @insertion_range = d ... d
-          @mutable_s = @reference_meaning.whole_string
+          @mutable_s = @reference_meaning.to_mutable_whole_string
           ACHIEVED_
         end
 
@@ -86,7 +86,7 @@ module Skylab::TanMan
           @reference_meaning = find_first_flyweight_with_name @least_greater_name
           d = @reference_meaning.next_line_start_pos
           @insertion_range = d ... d
-          @mutable_s = @reference_meaning.whole_string
+          @mutable_s = @reference_meaning.to_mutable_whole_string
           ACHIEVED_
         end
 
@@ -116,7 +116,7 @@ module Skylab::TanMan
           o_x = o.line_start
           its_width_to_colon = o.colon_pos - o_x
           its_e2_width = o.colon_pos - o.name_range.end - 1
-          its_e0 = o.whole_string[ o_x .. o.name_range.begin - 1 ]
+          its_e0 = o.to_read_only_whole_string[ o_x .. o.name_range.begin - 1 ]
           its_e0 = sanitize_e0 its_e0
           e0 = "#{ its_e0 }#{
             SPACE_ * [ 0,

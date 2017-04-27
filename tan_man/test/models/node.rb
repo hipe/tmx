@@ -78,7 +78,7 @@ module Skylab::TanMan::TestSupport
 
       id = silo.silo_module.node_identifier
 
-      oes_p = listener_
+      oes_p = event_log.listener
 
       action = MockAction___.new(
         send( :"__via__#{ input_mechanism_i }__build_byte_upstream_reference" ),

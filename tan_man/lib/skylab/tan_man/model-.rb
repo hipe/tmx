@@ -245,7 +245,7 @@ module Skylab::TanMan
         _is_dry = remove_instance_variable :@dry_run
         @dry_run = _is_dry  # meh
 
-        _digraph_session_MO do |o|
+        _mutable_or_immutable_digraph_session_MO do |o|
 
           o.be_read_write_not_read_only__
 
@@ -257,14 +257,12 @@ module Skylab::TanMan
           end
 
           o.is_dry_run = _is_dry
-
-          o.microservice_invocation = @_microservice_invocation_
         end
       end
 
       def with_immutable_digraph_
 
-        _digraph_session_MO do |o|
+        _mutable_or_immutable_digraph_session_MO do |o|
 
           o.be_read_only_not_read_write_
 
@@ -277,16 +275,36 @@ module Skylab::TanMan
         end
       end
 
+      def _mutable_or_immutable_digraph_session_MO
+
+        # really hacky: at writing some actions are "fully configurable" in
+        # how they can take arguments to represent/indicate a digraph; and
+        # others use solely the workspace for this. because FOR NOW we
+        # already have the workspace session thing here, we want to use that
+        # if we've got it (will likely all change), otherwise ..
+
+        if instance_variable_defined? :@_associations_
+          _bx = to_box_
+          _digraph_session_MO do |o|
+            yield o
+            o.qualified_knownness_box = _bx
+          end
+        else
+          with_immutable_workspace_ do
+            _digraph_session_MO do |o|
+              yield o
+              o.immutable_workspace = @_immutable_workspace_
+            end
+          end
+        end
+      end
+
       def _digraph_session_MO
 
-        with_immutable_workspace_ do
-
-          Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
-            yield o
-            o.immutable_workspace = @_immutable_workspace_
-            o.microservice_invocation = @_microservice_invocation_
-            o.listener = _listener_
-          end
+        Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
+          yield o
+          o.microservice_invocation = @_microservice_invocation_
+          o.listener = _listener_
         end
       end
 
@@ -366,7 +384,7 @@ module Skylab::TanMan
         NIL
       end
 
-      def to_box__  # #experiment. replaces something in [br]
+      def to_box_  # #experiment. replaces something in [br]
         bx = Common_::Box.new
         @_associations_.each_value do |asc|
           k = asc.name_symbol
@@ -530,37 +548,6 @@ module Skylab::TanMan
         :graph
       end
     end  # >>
-  end
-
-  class Models_::Node < Graph_Document_Entity__
-
-    @after_name_symbol = :hear
-
-    @description_proc = -> y do
-      y << "view and edit nodes"
-    end
-
-    def to_controller  # experiment
-      Models_::Node::NodeController_.new self, @preconditions.fetch( :dot_file )
-    end
-
-    attr_reader :node_stmt
-
-    Actions = stubber
-
-    module Actions
-      Add = stub
-    end
-
-    def persist_via_action action, & oes_p  # #hook-in to [br]
-
-      entity_collection.persist_entity(
-        action.argument_box,
-        action.document_entity_byte_downstream_reference,
-        self, & oes_p )
-    end
-
-    Here_ = self
   end
 
   class Models_::Association < Graph_Document_Entity__

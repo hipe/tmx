@@ -276,7 +276,7 @@ module Skylab::System
             if @abbrev
               @filename = @abbrev
             else
-              @filename = Common_::Name::Conversion_Functions::Pathify[
+              @filename = Common_::Name::ConversionFunctions::Pathify[
                 @const_a.last ]
             end
             via_filename_validate

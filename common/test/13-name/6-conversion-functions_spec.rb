@@ -8,7 +8,7 @@ module Skylab::Common::TestSupport
 
     memoizer_for = -> sym do
       p = -> x do
-        p = Home_::Name::Conversion_Functions.const_get sym, false
+        p = Home_::Name::ConversionFunctions.const_get sym, false
         p[ x ]
       end
       -> x do

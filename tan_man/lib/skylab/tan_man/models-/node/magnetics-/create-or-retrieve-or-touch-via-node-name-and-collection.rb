@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Node  # in [#084]
 
-    module Magnetics
+    module Magnetics_
 
       CommonMagnetic__ = ::Class.new Common_::MagneticBySimpleModel
 
@@ -403,10 +403,8 @@ module Skylab::TanMan
 
           @listener.call _this_top_sym, :found_existing_node do
 
-            lib = Here_::Events__
-
-            lib::Found_Existing_Node.with(
-              :component, lib::Node_Statement_as_Component.new( one ),
+            Found_existing_node___[].with(
+              :component, Component_via_NodeStatement___.new( one ),
               :ok, is_ok,
             )
           end
@@ -532,7 +530,41 @@ module Skylab::TanMan
       end
 
       # ==
+
+      class Component_via_NodeStatement___
+
+        # (we might do etc but this is a probe for now..)
+
+        def initialize ns
+          @__node_statement = ns
+        end
+
+        def description_under expag
+
+          s = @__node_statement.label_or_node_id_normalized_string
+
+          expag.calculate do
+            lbl s
+          end
+        end
+      end
+
+      # ==
+
+      Found_existing_node___ = Lazy_.call do
+
+        FoundExistingNode = _ACS_[]::Events::ComponentAlreadyAdded.prototype_with(
+
+          :found_existing_node,
+          :component_association, Here_,
+          :did_mutate_document, false,
+          :ok, nil
+        )
+      end
+
+      # ==
       # ==
     end
   end
 end
+# #meta-tombstone-A: event prototypes for destroyed, not found

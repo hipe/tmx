@@ -60,7 +60,7 @@ module Skylab::Snag::TestSupport
 
       _invo_rsx = invocation_resources_
 
-      _BU_ID = Home_.lib_.basic::String::ByteUpstreamReference.new s
+      _BU_ID = Home_.lib_.basic::String::ByteUpstreamReference.via_big_string s
 
       @col = Home_::Models_::NodeCollection.via_upstream_reference _BU_ID, _invo_rsx
       NIL_

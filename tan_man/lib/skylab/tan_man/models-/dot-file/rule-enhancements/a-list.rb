@@ -1,8 +1,8 @@
 module Skylab::TanMan
 
-  module Models_::DotFile::Sexp::InstanceMethods::A_List
+  module Models_::DotFile::RuleEnhancements::A_List
 
-    include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
+    include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def _update_attributes attr_h, add_p=nil, change_p=nil
       h = {}

@@ -21,7 +21,7 @@ module Skylab::Snag
       def via_path path, invo_rsx, & p
 
         _id = Home_.lib_.
-          system_lib::Filesystem::ByteUpstreamReference.new path
+          system_lib::Filesystem::ByteUpstreamReference.via_path path
 
         _via_upstream_reference _id, invo_rsx, & p
       end

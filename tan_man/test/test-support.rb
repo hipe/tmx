@@ -142,46 +142,7 @@ module Skylab::TanMan::TestSupport
 
     include Expect_Event__::Test_Context_Instance_Methods  # #todo
 
-    # -- assertions
-
-    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines.call(
-        a, p, self )
-    end
-
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
-    end
-
-    # --
-
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
-    def _same
-      TestSupport_.debug_IO
-    end
-
-    alias_method :debug_IO, :_same
-
-    alias_method :some_debug_IO, :_same
-
-    def listener_
-      event_log.handle_event_selectively
-    end
-
-    def black_and_white_expression_agent_for_expect_emission
-      Home_::API::expression_agent_instance
-    end
-
-    def expression_agent_for_CLI_TM
-      Home_::CLI::InterfaceExpressionAgent___.instance
-    end
-
-    # -- ..
+    # -- expectations
 
     def expect_committed_changes_
 
@@ -196,7 +157,46 @@ module Skylab::TanMan::TestSupport
       ev
     end
 
-    # ~ grammar testing support
+    def see_unexpected_emission em  # ..
+
+      if em.emission_looks_like_expression  # ..
+        if ! do_debug
+          _cha_cha_TS em, :express_into_under_debuggingly
+        end
+      else
+        _cha_cha_TS em.emission_proc[], :express_into_under
+      end
+      NIL
+    end
+
+    def _cha_cha_TS o, m  # ..
+      io = debug_IO
+      io.puts "(MESSAGE FROM EMISSION:"
+      _y = ::Enumerator::Yielder.new { |s| io.puts "  #{ s }" }
+      _expag = black_and_white_expression_agent_for_expect_emission
+      o.send m, _y, _expag
+      io.puts "<-THAT)"
+      NIL
+    end
+
+    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines.call(
+        a, p, self )
+    end
+
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    end
+
+    def expression_agent_for_CLI_TM
+      Home_::CLI::InterfaceExpressionAgent___.instance
+    end
+
+    def black_and_white_expression_agent_for_expect_emission
+      Home_::API::expression_agent_instance
+    end
+
+    # -- grammar testing support
 
     def unparse_losslessly
       result.unparse.should eql some_input_string
@@ -224,6 +224,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def __resolve_grammar_class
+
       granule_s = grammar_pathpart_
       mod = grammars_module_
       const = __build_grammar_const granule_s
@@ -253,7 +254,7 @@ module Skylab::TanMan::TestSupport
 
       rest_s = md[ :rest ]
       if rest_s
-        rest_s = "_#{ Common_::Name::Conversion_Functions::Constantize[ rest_s ] }"
+        rest_s = "_#{ Common_::Name::ConversionFunctions::Constantize[ rest_s ] }"
       end
 
       :"Grammar#{ _number_part }#{ rest_s }"
@@ -338,7 +339,7 @@ module Skylab::TanMan::TestSupport
       end
     end.call
 
-    # ~ near input mechanism reification
+    # -- near input mechanism reification
 
     def produce_result_via_perform_parse
       send produce_result_via_parse_method_i
@@ -398,7 +399,7 @@ module Skylab::TanMan::TestSupport
       x_a.push :output_string, @output_s ; nil
     end
 
-    # ~ hook-outs to ancillary API's
+    # -- hook-outs to ancillary API's
 
     def prepare_subject_API_invocation invo
       invo
@@ -412,7 +413,7 @@ module Skylab::TanMan::TestSupport
       Home_::API
     end
 
-    # ~ misc business
+    # -- misc business
 
     def cfn
       CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__
@@ -426,7 +427,19 @@ module Skylab::TanMan::TestSupport
     CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = "#{
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ }/conf.conf".freeze
 
-    # ~ fs
+    # --
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
+    # -- fs
 
     def read_file_ path
       ::File.open( path, ::File::RDONLY ).read

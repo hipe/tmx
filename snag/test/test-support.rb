@@ -129,7 +129,7 @@ module Skylab::Snag::TestSupport
 
     def upstream_reference_via_string_ s
 
-      Home_.lib_.basic::String::ByteUpstreamReference.new s
+      Home_.lib_.basic::String::ByteUpstreamReference.via_big_string s
     end
 
     # ~ near downstream
@@ -149,12 +149,12 @@ module Skylab::Snag::TestSupport
 
     def downstream_ID_via_string_ s
 
-      Home_.lib_.basic::String::ByteDownstreamReference.new s
+      Home_.lib_.basic::String::ByteDownstreamReference.via_big_string s
     end
 
     def downstream_ID_via_array_ a
 
-      Home_.lib_.basic::List::ByteDownstreamReference.new a
+      Home_.lib_.basic::List::ByteDownstreamReference.via_line_array a
     end
 
     # ~ near verification

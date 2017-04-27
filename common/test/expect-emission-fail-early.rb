@@ -488,7 +488,7 @@ module Skylab::Common::TestSupport
         end
 
         def __maybe_express_first_line_of_expression_into_under_ y, expag
-          if _looks_like_expression
+          if emission_looks_like_expression
             _first_N_lines_HACKISHLY_under 1, expag do |line|
               y << "  (first line: #{ line.inspect })"
             end
@@ -498,7 +498,7 @@ module Skylab::Common::TestSupport
 
         def express_into_under_debuggingly y, expag
           y << "#{ @channel_symbol_array.inspect }#{ NEWLINE_ }"
-          if _looks_like_expression
+          if emission_looks_like_expression
             _first_N_lines_HACKISHLY_under( -1, expag ) do |line|
               y << "  #{ line.inspect }#{ NEWLINE_ }"
             end
@@ -527,7 +527,7 @@ module Skylab::Common::TestSupport
           NIL
         end
 
-        def _looks_like_expression
+        def emission_looks_like_expression  # [tm]
           Looks_like_expression__[ @channel_symbol_array ]
         end
 
@@ -582,8 +582,14 @@ module Skylab::Common::TestSupport
       end
 
       def __when_channel_unequal
+
         @actual_emission.channel_symbol_array.should(
           @test_context.eql @channel_symbol_array )
+
+        if @test_context.respond_to? :see_unexpected_emission
+          @test_context.see_unexpected_emission @actual_emission
+        end
+
         fail AssertionFailed
       end
 

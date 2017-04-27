@@ -5,7 +5,7 @@ module Skylab::TanMan
     class Actions::Ls
 
       def definition
-        _these = Home_::DocumentMagnetics_::CommonAssociations.to_workspace_related_stream_
+        _these = Home_::DocumentMagnetics_::CommonAssociations.to_workspace_related_stream_  # ..
         [
           :properties, _these,
         ]

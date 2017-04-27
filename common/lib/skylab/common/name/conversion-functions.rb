@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  module Name::Conversion_Functions
+  module Name::ConversionFunctions
 
     sanitize_file = nil
     Constantize = -> do

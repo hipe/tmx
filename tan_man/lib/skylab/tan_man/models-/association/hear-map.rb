@@ -151,7 +151,7 @@ module Skylab::TanMan
         def __do_persist
 
           ::Kernel._THIS_CHANGED__but_it_can_be_easy__
-          o = Home_::DocumentMagnetics_::ByteStreamReference_via_Request
+          o = Home_::DocumentMagnetics_::ByteStreamReferences_via_Request
           o = Home_::Model_::DocumentEntity::ByteStreamIdentifier_via.new(
             @kernel, & @on_event_selectively )
 

@@ -45,7 +45,7 @@
 
              similarly, we may want to advertise "loudly" the presence of
              the magnetic so that it is not overlooked during future work,
-             when we are surveying what magnetics are availale when
+             when we are surveying what magnetics are available when
              considering how to pathfind a problem.
 
              finally, in the cases where there is interesting history in

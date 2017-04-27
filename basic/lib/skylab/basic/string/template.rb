@@ -37,14 +37,16 @@ module Skylab::Basic
 
     private
 
+      # ("BSR" = "byte stream reference")
+
       def path=
-        @buid = Home_::ByteStream::UpstreamReference.via_path(
+        @_BSR = Home_::ByteStream::UpstreamReference.via_path(
           gets_one )
         KEEP_PARSING_
       end
 
       def string=
-        @buid = Home_::ByteStream::UpstreamReference.via_string(
+        @_BSR = Home_::ByteStream::UpstreamReference.via_string(
           gets_one )
         KEEP_PARSING_
       end
@@ -112,15 +114,15 @@ module Skylab::Basic
       def _parse_tree
         if @is_not_parsed
           @is_not_parsed = false
-          @parse_tree = Parse___.new( @buid, @couplet_mapper ).parse
+          @parse_tree = Parse___.new( @_BSR, @couplet_mapper ).parse
         end
         @parse_tree
       end
 
       class Parse___
 
-        def initialize buid, fvm
-          @buid = buid
+        def initialize bur, fvm
+          @_BSR = bur
           @couplet_mapper = fvm
         end
 
@@ -186,7 +188,7 @@ module Skylab::Basic
 
           plain_rx = /(?: (?! #{ var_rx.source } ) . )+/mx
 
-          scn = Home_.lib_.string_scanner @buid.whole_string
+          scn = Home_.lib_.string_scanner @_BSR.to_read_only_whole_string
           @__volatile_string_scanner = scn
 
           p = -> do

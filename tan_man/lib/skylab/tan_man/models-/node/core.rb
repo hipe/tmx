@@ -253,6 +253,15 @@ module Skylab::TanMan
         @_node_stmt.node_id
       end
     # -
+    # ==
+
+    module Magnetics_
+      Autoloader_[ self ]
+      lazily :Create_or_Touch_or_Delete_via_Node_and_Collection do |const|
+        const_get :Create_or_Retrieve_or_Touch_via_NodeName_and_Collection, false
+        const_defined? const, false or self.__OOPS
+      end
+    end
 
     Here_ = self
 

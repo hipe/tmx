@@ -1,8 +1,8 @@
 module Skylab::TanMan
 
-  module Models_::DotFile::Sexp::InstanceMethods::NodeStmt
+  module Models_::DotFile::RuleEnhancements::NodeStmt
 
-    include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
+    include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def label_or_node_id_normalized_string
       label || node_id_normalized_string

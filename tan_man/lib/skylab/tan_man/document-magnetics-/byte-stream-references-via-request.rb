@@ -1,8 +1,8 @@
 module Skylab::TanMan
 
-  class DocumentMagnetics_::ByteStreamReference_via_Request < Common_::MagneticBySimpleModel
+  class DocumentMagnetics_::ByteStreamReferences_via_Request < Common_::MagneticBySimpleModel
 
-    # ([#026.B] is probably required reading to understand this.)
+    # [#026.B] explains how IO is manifested in our association modeling system.
 
     # given one or both "throughput directions" (input and/or output), solve
     # a single qualified actual parameter for each direction. if exactly one
@@ -48,7 +48,7 @@ module Skylab::TanMan
 
       def __flush_final_result
 
-        _a = remove_instance_variable :@_final_byte_stream_references
+        _a = remove_instance_variable :@__final_QKs
         _q_a = remove_instance_variable :@qualifieds_via_direction_offset
         if @_ok
           MyResult___.new _a, _q_a
@@ -57,7 +57,10 @@ module Skylab::TanMan
         end
       end
 
-      MyResult___ = ::Struct.new :solution_tuple, :qualifieds_via_direction_offset
+      MyResult___ = ::Struct.new(
+        :byte_stream_reference_qualified_knownness_array,
+        :qualifieds_via_direction_offset,
+      )
 
       # -- C
 
@@ -72,14 +75,14 @@ module Skylab::TanMan
 
       def __resolve_bytestream_reference_via_current_qualified_value
 
-        _qkn = remove_instance_variable :@_current_qualified_value
+        qkn = remove_instance_variable :@_current_qualified_value
 
-        _class = ByteStreamClass_via_Direction[ @_current_direction_symbol ]
+        ref = Mags_[]::
+          ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection.call(
+            qkn, @_current_direction_symbol )
 
-        id = _class.via_qualified_knownnesses [ _qkn ], & @listener  #  ??
-
-        if id
-          @_final_byte_stream_references[ @_current_direction_offset ] = id
+        if ref
+          @__final_QKs[ @_current_direction_offset ] = qkn.new_with_value ref
         else
           @_ok = false  # assume emitted
         end
@@ -122,7 +125,7 @@ module Skylab::TanMan
       def __for_each_direction
 
         @_ok = true  # (sneak this in here)
-        @_final_byte_stream_references = ::Array.new @_number_of_directions
+        @__final_QKs = ::Array.new @_number_of_directions  # (acutally 3x)
 
         @_solve_for_these_symbols.each_with_index do |sym, d|
           @_current_direction_symbol = sym

@@ -128,6 +128,7 @@
 
 [#030]       unified language ..
          #track [#]:#A is about whether a "reasoning" is always exactly one event
+             :[#here.2]: unified language for performers ..
 
 [#029]       introducing isomorphic interfaces ..
 [#028]       in-situ
@@ -155,7 +156,7 @@
              :[#here.4]: isomorphic method arguments ..
              :[#here.3]: isomorphic methods microservice and CLI ..
              :[#here.2]: isomorphic methods microservice ..
-       #open :[#here.A]: #track whast was lost when we stopped doing summary info
+       #open :[#here.A]: #track what was lost when we stopped doing summary info
              ( #was: duplicate of [#021] )
 
 [#021] #open #high-value

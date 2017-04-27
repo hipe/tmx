@@ -5,6 +5,7 @@ module Skylab::Basic
     class LineStream_via_Array < Common_::MonadicMagneticAndModel
 
       # read [#023] (in [#022]) the array scanner narrative
+      # be sure you don't want [#co-016.1] or [#co-016.2] a common stream instead.
 
       def initialize a
         @a = a ; @idx = @ridx = 0 ; nil

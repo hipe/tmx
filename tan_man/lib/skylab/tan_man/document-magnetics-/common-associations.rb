@@ -61,7 +61,7 @@ module Skylab::TanMan
         end
       end
 
-      define_singleton_method :to_item_stream_nothing_required__ do
+      define_singleton_method :all_ do
         common_IO_parameters.to_loadable_reference_stream.map_by do |sym|
           cache[ sym ]
         end

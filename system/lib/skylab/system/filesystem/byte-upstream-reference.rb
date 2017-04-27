@@ -6,7 +6,10 @@ module Skylab::System
 
     class ByteUpstreamReference < ByteWhichstreamReference__  # [#003].
 
-      # a #[#ba-062] unified interface for accessing the bytes in a file.
+      # comport to a #[#ba-062] unified interface whereby a file (as
+      # represented as a path string) is used as a "byte stream store",
+      # in this case for reading the bytes of a file as a stream of lines.
+      # see manifesto.
 
       def initialize path
         @_to_rewound_shareable = :__to_rewound_shareable_intially
@@ -15,9 +18,11 @@ module Skylab::System
 
       # -- data delivery
 
-      def whole_string
+      def to_mutable_whole_string
         ::File.read @path
       end
+
+      alias_method :to_read_only_whole_string, :to_mutable_whole_string
 
       # ~
 
@@ -63,7 +68,7 @@ module Skylab::System
       # -- conversion, standard readers, reflection, etc
 
       def to_byte_downstream_reference
-        Home_::Filesystem::ByteDownstreamReference.new @path
+        Home_::Filesystem::ByteDownstreamReference.via_path @path
       end
 
       def name
@@ -101,6 +106,11 @@ module Skylab::System
     # ==
 
     class ByteWhichstreamReference__
+
+      class << self
+        alias_method :via_path, :new
+        undef_method :new
+      end  # >>
 
       def initialize path
         @path = path
