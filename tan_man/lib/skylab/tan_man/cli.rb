@@ -132,6 +132,11 @@ module Skylab::TanMan
       end
       DIR_SEP___ = ::File::SEPARATOR.getbyte 0
 
+      def component_label s  # (replaces `lbl` #todo)
+        s.ascii_only?  # hi.
+        s.inspect
+      end
+
       # ~
 
       if false  # bring back as needed

@@ -2,41 +2,6 @@ module Skylab::TanMan
 
   class Models_::Node
 
-    if false
-    edit_entity_class(
-
-      :persist_to, :node,
-
-      :preconditions, [ :dot_file ],
-
-      :property, :id,
-
-      :required,
-      :ad_hoc_normalizer, -> arg, & oes_p do
-        Here_::NodeController_::NormalKnownness_via_QualifiedKnownness_of_Name[ arg, self, & oes_p ]
-      end,
-      :property, :name )
-    end  # if false
-
-    if false
-      Add = make_action_class :Create do
-
-        edit_entity_class(
-          :flag, :property, :ping,
-          :reuse, Model_::DocumentEntity.IO_properties )
-
-      private
-
-        def via_arguments_produce_bound_call
-          if @argument_box[ :ping ]
-            bound_call_for_ping_
-          else
-            super
-          end
-        end
-      end
-    end  # if false
-
     class << self
 
       if false
@@ -50,45 +15,13 @@ module Skylab::TanMan
       end
       end  # if false
 
-      alias_method :new_flyweight__, :new
+      alias_method :new_flyweight_, :new
       undef_method :new
     end  # >>
 
-    if false
-    class Silo_Daemon < Silo_daemon_base_class_[]
+    # ==
 
-      def node_collection_controller_via_document_controller dc, & oes_p
-
-        # :+#actionless-collection-controller-experiment
-
-        bx = Common_::Box.new
-        bx.add :dot_file, dc
-
-        precondition_for_self :_no_action_,
-          @silo_module.node_identifier,
-          bx,
-          & oes_p
-      end
-
-      def precondition_for_self act, id, box, & oes_p
-        Collection_Controller__.new act, box, @silo_module, @kernel, & oes_p
-      end
-    end
-
-    class Collection_Controller__ < Model_::DocumentEntity::Collection_Controller
-
-      include Common_Collection_Controller_Methods_
-
-      def to_preconditions_plus_self__
-        bx = @precons_box_.dup
-        bx.add(
-          @model_class.name_function.as_lowercase_with_underscores_symbol,
-          self )
-        bx
-      end
-
-      # ~ c r u d
-
+      if false
       def entity_via_natural_key_fuzzily s
 
         p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment s
@@ -157,100 +90,88 @@ module Skylab::TanMan
           sym == node.node_id
         end
       end
+      end  # if false
 
-      def to_node_sexp_stream
-        document_.at_graph_sexp :to_node_stream
+    class NodesOperatorBranchFacade_
+
+      def initialize dc
+        @_digraph_controller = dc  # ivar name is #testpoint
       end
 
-      def to_node_statement_stream
-        document_.at_graph_sexp :to_node_statement_stream
-      end
+      def touch_node_via_label___ label, & any_listener  # #testpoint only (for now)
 
-      def at_graph_sexp i
-        document_.at_graph_sexp i
-      end
+        _un = UnsanitizedNode_.new label
 
-      def add_node_via_id_and_label id_s, label_s
+        Here_::Magnetics_::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
 
-        node = _begin_node :name, label_s, :id, id_s
+          o.entity = _un
 
-        node and begin
-          produce_relevant_sexp_via_touch_entity node
+          o.entity_via_created_element_by = -> node_stmt do
+            Here_.new_flyweight_.reinit_as_flyweight_ node_stmt
+          end
+
+          o.verb_lemma_symbol = :touch
+          o.document = @_digraph_controller
+          o.listener = any_listener
         end
       end
 
-      def touch_node_via_label s
+      def to_dereferenced_item_stream__   # (experimental, currently used only for list action)
 
-        node = _begin_node :name, s
+        fly = Here_.new_flyweight_
 
-        node and begin
-          produce_relevant_sexp_via_touch_entity node
+        _st = __to_node_sexp_stream
+
+        _st.map_by do |node_stmt|
+          fly.reinit_as_flyweight_ node_stmt
         end
       end
 
-      def _begin_node * x_a, & oes_p
-        Here_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
-          o.edit_via_iambic x_a
-        end
+      def __to_node_sexp_stream  # #tespoint
+
+        # it's necessarilty confusing: each item of this stream is a NodeStmt
+
+        @_digraph_controller.graph_sexp.to_node_stream
       end
 
-      def persist_entity bx, byte_downstream_ID, entity, & oes_p
+      def to_node_statement_stream___
 
-        _ok = _mutate_via_verb_and_entity :create, entity, & oes_p
-        _ok and _commit_changes bx, byte_downstream_ID, & oes_p
-      end
+        # it's necessarilty confusing: each item of this stream is a StmtList
 
-      def produce_relevant_sexp_via_touch_entity entity
-
-        _mutate_via_verb_and_entity :touch, entity
-      end
-
-      def _mutate_via_verb_and_entity verb_i, entity, & oes_p
-
-        Here_::Magnetics__::Create_or_Touch_or_Delete_via_Node_and_Collection.call(
-          verb_i,
-          entity,
-          document_,
-          @kernel, & ( oes_p || @on_event_selectively ) )
-      end
-
-      def _entity_via_node node
-
-        @model_class.new( @kernel, & @on_event_selectively ).
-          __init_via_node_stmt_and_immutable_preconditions node, @precons_box_
-      end
-
-      def _commit_changes bx, byte_downstream_ID, & oes_p
-
-        document_.persist_into_byte_downstream_reference(
-          byte_downstream_ID,
-          :is_dry, bx[ :dry_run ],
-          & oes_p )
+        @_digraph_controller.graph_sexp.to_node_statement_stream
       end
     end
 
-    def __init_via_node_stmt_and_immutable_preconditions node_stmt, precon_bx
+    # ==
 
-      bx = Common_::Box.new
-      bx.add :name, node_stmt.label
+    class UnsanitizedNode_
 
-      @preconditions = precon_bx
-      @property_box = bx
-      @node_stmt = node_stmt
+      def initialize unsanitized_label_s
+        @_ = unsanitized_label_s
+      end
 
-      self
+      def unsanitized_label_string___
+        @_
+      end
+
+      def lookup_value_softly_ _
+        NOTHING_
+      end
     end
-    end  # if false
 
     # -
 
-      def reinit_as_flyweight__ node_stmt
+      def reinit_as_flyweight_ node_stmt
         @_node_stmt = node_stmt
         self
       end
 
-      def node_name_symbol_
-        @_node_stmt.node_id
+      def node_label_
+        @_node_stmt.label
+      end
+
+      def node_identifier_symbol_
+        @_node_stmt.node_ID_symbol_
       end
     # -
     # ==

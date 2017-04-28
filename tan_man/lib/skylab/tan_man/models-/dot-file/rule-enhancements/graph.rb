@@ -15,7 +15,7 @@ module Skylab::TanMan
         end
         [e0, e4, e6].each(& space)
         if stmt_list
-          stmt_list.nodes_.each do |node|
+          stmt_list.elements_.each do |node|
             space[ node.e2 ]
             space[ node.tail.stmt_separator ] if node.tail
           end
@@ -31,14 +31,18 @@ module Skylab::TanMan
     end
 
     def _first_label_stmt
-      stmt_list.stmts.detect do |s|
-        :equals_stmt == s.class.rule && 'label' == s.lhs.normalized_string
+      stmt_list.stmts.detect do |el|
+        if :equals_stmt == el.class.rule
+          LABEL_LABEL_ == el.lhs.normal_content_string_
+        end
       end
     end
 
     def get_label
       equals_stmt = _first_label_stmt
-      equals_stmt.rhs.normalized_string if equals_stmt
+      if equals_stmt
+        equals_stmt.rhs.normal_content_string_
+      end
     end
 
     def set_label str
@@ -62,9 +66,9 @@ module Skylab::TanMan
       end
     end
 
-    def node_with_id id
+    def node_with_id id_sym
       nodes.detect do |stmt|
-        id == stmt.node_id
+        id_sym == stmt.node_ID_symbol_
       end
     end
 
@@ -83,7 +87,7 @@ module Skylab::TanMan
     def get_stmt_scan
       sl = stmt_list
       if sl
-        sl.to_node_stream_
+        sl.to_element_stream_
       else
         Common_::THE_EMPTY_STREAM
       end

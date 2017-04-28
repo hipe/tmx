@@ -293,9 +293,11 @@ module Skylab::TanMan
       end
     end
 
-    attr_reader :content_text_value
 
-    def normalized_string
+    def normal_content_string_
+
+      # (no need to unescape here - it's already unescaped)
+
       @content_text_value
     end
 
@@ -312,6 +314,10 @@ module Skylab::TanMan
       y << s
       s.length
     end
+
+    attr_reader(
+      :content_text_value,
+    )
   end
 
   # --*--
@@ -677,13 +683,17 @@ module Skylab::TanMan
     include Auto_::InstanceMethods
 
     def description
+      self._WHERE  # #todo
       unparse
     end
 
     def unparse
-      y = []
+      unparse_into ""
+    end
+
+    def unparse_into y
       write_bytes_into y
-      y.join EMPTY_S_
+      y
     end
 
     def write_bytes_into y

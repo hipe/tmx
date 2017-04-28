@@ -324,16 +324,6 @@ module Skylab::TestSupport
 
     # ==
 
-    say_not_same = -> act_s, exp_s do
-      "(expected, had): (#{ exp_s.inspect }, #{ act_s.inspect })"
-    end
-    say_extra = -> s do
-      "unexpected extra line - #{ s.inspect }"
-    end
-    say_missing = -> s do
-      "missing expected line - #{ s.inspect }"
-    end
-
     Expect_same_lines = -> do
       convert = -> x do
         if x.respond_to? :gets
@@ -356,56 +346,123 @@ module Skylab::TestSupport
 
     Expect_these_lines_in_array_with_trailing_newlines = -> mixed_upstream, p, context do
 
-      _p = -> y do
-
-        _y_ = ::Enumerator::Yielder.new do |exp_x|
-
+      ExpectThese__.call_by do |o|
+        o.map_expectations_by do |exp_x|
           if ! exp_x.respond_to? :named_captures
             exp_x << NEWLINE_
           end
-
-          y << exp_x
+          exp_x
         end
-
-        p[ _y_ ]
+        o.mixed_upstream = mixed_upstream
+        o.receive_yielder = p
+        o.test_context = context
       end
-
-      Expect_these_lines_in_array[ mixed_upstream, _p, context ]
     end
 
-    Expect_these_lines_in_array = -> up_x, p, _context do
+    Expect_these_lines_in_array = -> mixed_upstream, p, context do
 
-      act_line_scn = if up_x.respond_to? :gets
+      ExpectThese__.call_by do |o|
 
-        if up_x.respond_to? :flush_to_scanner
-          up_x.flush_to_scanner
-        else
-          No_deps_zerk_[]::Scanner_by.new do
-            up_x.gets
-          end
-        end
-      else  # assume array
-        Scanner_[ up_x ]
+        o.mixed_upstream = mixed_upstream
+        o.receive_yielder = p
+        o.test_context = context
+      end
+    end
+
+    class ExpectThese__ < Common_::MagneticBySimpleModel
+
+      def initialize
+        @map_expectations_by = nil
+        super
       end
 
-      _y = ::Enumerator::Yielder.new do |exp_line|
+      def map_expectations_by & p
+        @map_expectations_by = p
+      end
 
-        if act_line_scn.no_unparsed_exists
-          fail say_missing[ exp_line ]
+      attr_writer(
+        :mixed_upstream,
+        :receive_yielder,
+        :test_context,
+      )
+
+      def execute
+
+        @_actual_item_scanner = __actual_item_scanner
+
+        _y = __expectation_receiver
+
+        @receive_yielder[ _y ]
+
+        if ! @_actual_item_scanner.no_unparsed_exists
+          fail __say_extra
+        end
+      end
+
+      def __expectation_receiver
+        if @map_expectations_by
+          y = _expectation_receiver_raw
+          map = remove_instance_variable :@map_expectations_by
+          ::Enumerator::Yielder.new do |exp_x|
+            _use = map[ exp_x ]
+            y << _use
+          end
         else
-          act_line = act_line_scn.gets_one
-          if exp_line.respond_to? :ascii_only?
-            act_line == exp_line or fail say_not_same[ act_line, exp_line ]
+          _expectation_receiver_raw
+        end
+      end
+
+      def _expectation_receiver_raw
+
+        act_scn = @_actual_item_scanner
+
+        ::Enumerator::Yielder.new do |exp_x|
+
+          if act_scn.no_unparsed_exists
+            fail __say_missing exp_x
           else
-            act_line =~ exp_line or fail say_not_same[ act_line, exp_line ]
+            act_x = act_scn.head_as_is
+            if exp_x.respond_to? :named_captures
+              if exp_x !~ act_x
+                fail _say_not_same exp_x
+              end
+            elsif exp_x != act_x
+              fail _say_not_same exp_x
+            end
+            act_scn.advance_one
           end
         end
       end
 
-      p[ _y ]
+      def __actual_item_scanner
+        up_x = remove_instance_variable :@mixed_upstream
+        if up_x.respond_to? :gets
+          if up_x.respond_to? :flush_to_scanner
+            up_x.flush_to_scanner
+          else
+            No_deps_zerk_[]::Scanner_by.new do
+              up_x.gets
+            end
+          end
+        else  # assume array
+          Scanner_[ up_x ]
+        end
+      end
 
-      if ! act_line_scn.no_unparsed_exists
-        fail say_extra[ act_line_scn.head_as_is ]
+      def _say_not_same exp_x
+        Say_not_same__[ _head_as_is, exp_x ]
+      end
+
+      def __say_extra
+        Say_extra__[ _head_as_is  ]
+      end
+
+      def __say_missing exp_x
+        Say_missing__[ exp_x ]
+      end
+
+      def _head_as_is
+        @_actual_item_scanner.head_as_is
       end
     end
 
@@ -422,19 +479,31 @@ module Skylab::TestSupport
             if exp_s == act_s
               redo
             else
-              fail say_not_same[ act_s, exp_s ]
+              fail Say_not_same__[ act_s, exp_s ]
             end
           else
-            fail say_extra[ act_s ]
+            fail Say_extra__[ act_s ]
           end
         elsif exp_s
-          fail say_missing[ exp_s ]
+          fail Say_missing__[ exp_s ]
         else
           # (when they both end at the same moment, success)
           break
         end
       end while nil
       NIL_
+    end
+
+    Say_not_same__ = -> act_s, exp_s do
+      "(expected, had): (#{ exp_s.inspect }, #{ act_s.inspect })"
+    end
+
+    Say_extra__ = -> s do
+      "unexpected extra line - #{ s.inspect }"
+    end
+
+    Say_missing__ = -> s do
+      "missing expected line - #{ s.inspect }"
     end
 
     # ==

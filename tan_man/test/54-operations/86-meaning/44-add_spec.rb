@@ -118,8 +118,8 @@ module Skylab::TanMan::TestSupport
 
     def _parse_string s
 
-      _bruh = TS_.lib_ :models_dot_file
-      _bruh.client_class__.new.parse_string s
+      _client = TS_::Models::Dot_File.PARSER_INSTANCE
+      _client.parse_string s
     end
 
 # (9/N)

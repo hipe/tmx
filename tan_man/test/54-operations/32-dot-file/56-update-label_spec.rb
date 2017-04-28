@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
         unparse_losslessly
 
         stmt = _retrieve_label_statement
-        stmt.rhs.normalized_string.should match( /\ATangent with/ )
+        stmt.rhs.normal_content_string_ =~ /\ATangent with/ || fail
 
         stmt.rhs = "zeep"
         stmt.unparse.should eql( 'label=zeep' )
@@ -56,7 +56,7 @@ module Skylab::TanMan::TestSupport
 
       define_method :_retrieve_label_statement do
         result.stmt_list.stmts.detect do |sx|
-          :equals_stmt == sx.class.rule && _LABEL == sx.lhs.normalized_string
+          :equals_stmt == sx.class.rule && _LABEL == sx.lhs.normal_content_string_
         end
       end
     end

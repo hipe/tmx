@@ -232,6 +232,11 @@ module Skylab::TanMan::TestSupport
 
     # --
 
+    def fixture_file_ tail
+      _head = fixtures_path_  # varies from node to node..
+      ::File.join _head, tail
+    end
+
     def path_for_workspace_005_with_just_a_config_
       path_for_fixture_workspace_ '005-just-a-config'
     end

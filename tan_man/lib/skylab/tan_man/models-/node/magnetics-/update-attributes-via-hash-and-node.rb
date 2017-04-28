@@ -82,12 +82,8 @@ module Skylab::TanMan
         y << "on node #{ lbl o.node_stmt.label } #{ pred_a * ' and ' }"
       end
 
-      NormalKnownness_via_QualifiedKnownness_of_Name = -> qkn, ent, & oes_p do  # 1x
-
-        # (placeholder for the idea)
-
-        qkn.to_knownness
-      end
+      # ==
+      # ==
     end
   end
 end

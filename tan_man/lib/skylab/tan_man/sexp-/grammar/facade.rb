@@ -29,10 +29,5 @@ module Skylab::TanMan
     def parser_class
       anchor_module.const_get "#{ grammar_const }Parser", false
     end
-
-  private
-
-    # none
-
   end
 end

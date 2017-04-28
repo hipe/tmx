@@ -65,10 +65,10 @@ module Skylab::TanMan::TestSupport
         st = execute
 
         x = st.gets
-        x.node_name_symbol_ == :foo || fail
+        x.node_identifier_symbol_ == :foo || fail
 
         x = st.gets
-        x.node_name_symbol_ == :bar || fail
+        x.node_identifier_symbol_ == :bar || fail
 
         st.gets.should be_nil
     end
@@ -169,7 +169,7 @@ module Skylab::TanMan::TestSupport
           :config_filename, o.config_filename,
         )
 
-        expect :succeeded, :wrote_resource do |ev|
+        expect :success, :wrote_resource do |ev|
           a.push ev
         end
 

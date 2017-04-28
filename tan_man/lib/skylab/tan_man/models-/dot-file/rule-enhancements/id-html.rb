@@ -10,7 +10,7 @@ module Skylab::TanMan
       '"' => 'quot', "'" => 'apos', '&' => 'amp', '<' => 'lt', '>' => 'gt',
     }
 
-    define_method :_escape_string do | string, & oes_p |
+    define_method :escape_ID_string__ do |string, & oes_p|
 
       # currently we go with a narrow whitelist. in the future we could
       # expand this trivially but currently extenstive support for HTML
@@ -45,7 +45,8 @@ module Skylab::TanMan
       Models_::DotFile::Events_::Invalid_Characters.with :chars, xtra_a
     end
 
-    def normalized_string
+    def normal_content_string_
+      # (no need to unescape anything in ID's)
       self[:content_text_value]
     end
 

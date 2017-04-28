@@ -23,6 +23,9 @@ module Skylab::TanMan
       self.class.element2tree node, member # note member might be nil
     end
 
+      LABEL_LABEL_ = 'label'.freeze  # yikes -
+      # we don't normally rely on modules to inject constants but meh
+
     end
 
     module RuleEnhancements  # this is a #magic-name to the sexp::auto lib
@@ -59,8 +62,8 @@ module Skylab::TanMan
 
   module DoubleQuotedString
 
-    def normalized_string
-      content_text_value.gsub('\"', '"')
+    def normal_content_string_
+      content_text_value.gsub BACKSLASH_DOUBLE_QUOTE_, DOUBLE_QUOTE_
     end
 
     def set_normalized_string string

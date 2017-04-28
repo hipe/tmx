@@ -5,18 +5,30 @@ module Skylab::TanMan
     include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def _update_attributes attr_h, add_p=nil, change_p=nil
+
       h = {}
       as.each do |a|  # per recursive-rule, an a_list has many a's
-        h[ a.id.normalized_string.intern ] = a
+        h[ a.id.normal_content_string_.intern ] = a
       end
+
       _pairs = attr_h.map { |k, v| [ k.intern, v ] }
-      _pairs.each do |i, x|
-        if h.key? i
-          change_p and change_p[ i, h[ i ][ :equals ][ :id ].normalized_string, x ]
-          h[ i ][ :equals ][ :id ] = _parse_id x
+
+      _pairs.each do |sym, sxp|
+
+        el = h[ sym ]
+        if el
+          equals = el[ :equals ]
+          if change_p
+            _s = equals[ :id ].normal_content_string_
+            change_p[ sym, _s, sxp ]
+          end
+          _id = _parse_id sxp
+          equals[ :id ] = _id
         else
-          add_p and add_p[ i, x ]
-          _insert_assignment i, x
+          if add_p
+            add_p[ sym, sxp ]
+          end
+          _insert_assignment sym, sxp
         end
       end
       ACHIEVED_
@@ -35,7 +47,7 @@ module Skylab::TanMan
       new_before_this_asst = nil  # before which asst will we insert ourselves?
 
       items.each do |asst|        # :+[#br-011] always iterate over the whole list
-        cmp = key_s <=> asst[:id].normalized_string
+        cmp = key_s <=> asst[:id].normal_content_string_
         case cmp
         when -1                   # new should come before current one..
           new_before_this_asst ||= asst # this is special, only keep 1st

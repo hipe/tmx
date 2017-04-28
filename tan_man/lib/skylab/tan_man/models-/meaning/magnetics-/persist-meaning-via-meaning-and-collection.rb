@@ -147,12 +147,12 @@ module Skylab::TanMan
 
         def when_no_change
           maybe_send_event :error, :no_change do
-            bld_no_change_event
+            __build_no_change_event
           end
           UNABLE_
         end
 
-        def bld_no_change_event
+        def __build_no_change_event
           build_not_OK_event_with :no_change,
               :name, @name, :value, @value do |y, o|
             y << "#{ lbl o.name } is already set to #{ val o.value }."
@@ -161,12 +161,12 @@ module Skylab::TanMan
 
         def when_will_not_clobber
           maybe_send_event :error, :name_collision do
-            bld_name_collision_event
+            __build_name_collision_event
           end
           UNABLE_
         end
 
-        def bld_name_collision_event
+        def __build_name_collision_event
           build_not_OK_event_with :name_collision,
               :name, @name,
               :existing_value, @exact_match_fly.dereference( :value ),
@@ -176,7 +176,6 @@ module Skylab::TanMan
              } it is already set to #{ val o.existing_value }"
           end
         end
-
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/
         TRAILING_WHITESPACE_RX__ = /[ \t]+\z/

@@ -30,7 +30,7 @@ module Skylab::TanMan
         end
 
         if ! g.stmt_list.prototype_
-          st = g.stmt_list.to_node_stream_  # used to be `length_exceeds( 1 )`
+          st = g.stmt_list.to_element_stream_  # used to be `length_exceeds( 1 )`
           _one = st.gets
           if _one
             _length_exceeds_one = st.gets

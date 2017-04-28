@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     DEFAULT_EXTENSION = '.dot'.freeze
 
-    class DigraphSession_via_THESE < Common_::MagneticBySimpleModel  # 1x
+    class DigraphSession_via_THESE < Common_::MagneticBySimpleModel  # 1x + #testpoint
 
       # design objectives:
       #
@@ -443,7 +443,7 @@ module Skylab::TanMan
 
         # don't close here.. close at #here2
 
-        @listener.call :succeeded, :wrote_resource do
+        @listener.call :success, :wrote_resource do
           __build_event bytes
         end
 

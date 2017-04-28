@@ -107,7 +107,6 @@ module Skylab::TanMan
                                                # in the doc or created here)
                                                # that winds up holding the
                                                # prototypes!
-
   private
 
     name_rx = /[_a-z][_a-z0-9]*/i
@@ -270,8 +269,6 @@ module Skylab::TanMan
     end
   end
 
-
-
   class Sexp_::Prototype::ShellStyle < Sexp_::Prototype::Hack
 
     # no public methods defined here.
@@ -341,7 +338,6 @@ module Skylab::TanMan
       res
     end
   end
-
 
   class Sexp_::Prototype::C_Style < Sexp_::Prototype::Hack
 

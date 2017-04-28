@@ -2,118 +2,59 @@ module Skylab::TanMan::TestSupport
 
   module Models::Node
 
-    def self.[] tcc
-      TS_::Operations[ tcc ]
-      tcc.include InstanceMethods___
-    end
-    # <-
+    class << self
 
-  module InstanceMethods___
+      def [] tcc
+        TS_::Operations[ tcc ]
+        tcc.include self
+      end
+
+      def __lib
+        Home_::Models_::Node
+      end
+    end  # >>
+
+    def with_operator_branch_for_nodes_
+
+      _client = TS_::Models::Dot_File.PARSER_INSTANCE
+
+      _path = digraph_file_path_
+
+      _client.parse_file _path do |dc|
+
+        @OB_FOR_NODES = Here__.__lib::NodesOperatorBranchFacade_.new dc
+        x = yield
+        remove_instance_variable :@OB_FOR_NODES
+        x
+      end
+    end
+
+    def touch_node_via_label label  # name preserved for legacy code for now
+      @OB_FOR_NODES.touch_node_via_label___ label
+    end
+
+    def to_node_sexp_stream_
+      @OB_FOR_NODES.__to_node_sexp_stream
+    end
+
+    def all_nodes_right_now_count_
+      @OB_FOR_NODES.to_node_statement_stream___.flush_to_count
+    end
+
+    def stmt_list  # name preserved for legacy code for now
+      @OB_FOR_NODES.instance_variable_get( :@_digraph_controller ).graph_sexp.stmt_list
+    end
 
     define_method :fixtures_path_, ( Lazy_.call do
       ::File.join TS_.dir_path, 'fixture-dot-files-for-node'
     end )
 
-    def stmt_list
-      _node_collection_controller.graph_sexp.stmt_list
-    end
+    # ==
 
-    def number_of_nodes
-      to_node_statement_stream.flush_to_count
-    end
+    Here__ = self
 
-    def retrieve_any_node_with_id i
-      _node_collection_controller.retrieve_any_node_with_id i
-    end
-
-    def to_node_statement_stream
-      _node_collection_controller.to_node_statement_stream
-    end
-
-    def get_node_array
-      node_sexp_stream.to_a
-    end
-
-    def node_sexp_stream
-      _node_collection_controller.to_node_sexp_stream
-    end
-
-    def touch_node_via_label s
-      _node_collection_controller.touch_node_via_label s
-    end
-
-    def unparsed
-      s = ''
-      _node_collection_controller.write_bytes_into s
-      s
-    end
-
-    def subject_model_name_i
-      :node
-    end
-
-    def _node_collection_controller
-      @___ncc ||= __build_node_collection_controller
-    end
-
-    def __build_node_collection_controller
-
-      # TL;DR: a messy dance to give a document controller to the topic c.c.
-
-      # problematically (and years ago) we thought we wanted to test what is
-      # now this silo's hand-made collection controller as a "unit" divorced
-      # from the functional layer. but this c.c uses preconditions that come
-      # from formal preconds and formal preconds come from the action. so we
-      # need to know the action anyway to build the c.c. (the fact that this
-      # component has "controller" in the name is a hint that it should only
-      # be tested functionally. food for the thoughts of the future.)
-
-      # because we don't want any of the above knowledge to be built deeply
-      # into out tests, we just hack-build an actual preconditions box here
-      # manually until the four or so tests that need this can be improved.
-
-      kr = Home_.application_kernel_
-
-      silo = kr.silo :node
-
-      id = silo.silo_module.node_identifier
-
-      oes_p = event_log.listener
-
-      action = MockAction___.new(
-        send( :"__via__#{ input_mechanism_i }__build_byte_upstream_reference" ),
-        kr, & oes_p )
-
-      bx = Home_::Common_::Box.new
-      bx.add :dot_file,
-        kr.silo( :dot_file ).precondition_for( action, id, :_no_box_, & oes_p )
-
-      silo.precondition_for_self action, id, bx, & oes_p
-    end
-
-    def __via__input_file_granule__build_byte_upstream_reference
-
-      Byte_upstream_reference_[].via_path input_file_path
-    end
-  end
-
-  class MockAction___
-
-    def initialize up_id, k, & oes_p
-      @document_entity_byte_upstream_reference = up_id
-      @kernel = k
-      @oes_p = oes_p
-    end
-
-    attr_reader(
-      :document_entity_byte_upstream_reference,
-      :kernel,
-    )
-
-    def handle_event_selectively
-      @oes_p
-    end
-  end
-# ->
+    # ==
+    # ==
   end
 end
+# #history-A: full rewrite

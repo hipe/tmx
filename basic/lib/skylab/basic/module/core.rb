@@ -30,52 +30,59 @@ module Skylab::Basic
       end
 
       def touch_value_via_relative_path mod, path, create_p
-        o = Touch__.new mod
-        o.create_p = create_p
-        o.relative_path = path
-        o.execute
+        Touch__.call_by do |o|
+          o.relative_path = path
+          o.starting_module = mod
+          o.create_proc = create_p
+        end
       end
 
-      def value_via_parts i_a, & p
+      def value_via_parts sym_a, & p
         if p
-          o = Touch__.new ::Object
-          o.else_p = p
-          o.relative_path_parts = i_a
-          o.execute
+          Touch__.call_by do |o|
+            o.relative_path_parts = sym_a
+            o.starting_module = ::Object
+            o.else_proc = p
+          end
         else
-          Common_::Const_value_via_parts[ i_a ]
+          Common_::Const_value_via_parts[ sym_a ]
         end
       end
 
       def value_via_module_and_relative_parts mod, const_x_a
-        o = Touch__.new mod
-        o.relative_path_parts = const_x_a
-        o.execute
+        Touch__.call_by do |o|
+          o.relative_path_parts = const_x_a
+          o.starting_module = mod
+        end
       end
 
       def value_via_parts_and_relative_path prts, path_s
-        o = Touch__.new
-        o.starting_module_parts = prts
-        o.relative_path = path_s
-        o.execute
+        Touch__.call_by do |o|
+          o.relative_path = path_s
+          o.starting_module_parts = prts
+        end
       end
 
       def value_via_relative_path mod, path
-        o = Touch__.new mod
-        o.relative_path = path
-        o.execute
+        Touch__.call_by do |o|
+          o.relative_path = path
+          o.starting_module = mod
+        end
       end
     end  # >>
 
     Chain_via_parts__ = -> s_a do
-      _Pair = Common_::Pair
 
       pair_a = ::Array.new s_a.length
+
       mod = ::Object
+      _Pair = Common_::Pair
+
       s_a.each_with_index do |s, d|
         mod = mod.const_get s, false
         pair_a[ d ] = _Pair.via_value_and_name( mod, s.intern )
       end
+
       pair_a
     end
 
@@ -87,40 +94,48 @@ module Skylab::Basic
       end
     end
 
-    class Touch__
+    class Touch__ < Common_::MagneticBySimpleModel
 
-      def initialize starting_mod=nil
-        @create_p = @else_p = nil
-        @starting_module = starting_mod
+      def initialize
+        @create_proc = nil
+        @else_proc = nil
+        @starting_module = nil
         @starting_module_parts = nil
+        super
       end
-
-      attr_writer :create_p, :else_p,
-        :relative_path_parts, :starting_module_parts
 
       def relative_path= s
-        @relative_path_parts = s.split( PATH_SEP_RX__ ) ; nil
+        @relative_path_parts = s.split PATH_SEP_RX__ ; nil
       end
+
+      attr_writer(
+        :create_proc,
+        :else_proc,
+        :relative_path_parts,
+        :starting_module,
+        :starting_module_parts,
+      )
 
       def execute
-        @normal_path_parts = build_normal_path_parts
-        via_normal_path_parts_execute
+        @normal_path_parts = __build_normal_path_parts
+        __via_normal_path_parts_execute
       end
 
-    private
+      def __build_normal_path_parts
 
-      def build_normal_path_parts
-        real_parts = if @starting_module_parts
+        _real_parts = if @starting_module_parts
           @starting_module_parts.dup
         elsif ::Object == @starting_module   # not necessary, just algorithmic aesthetic
           []
         else
           @starting_module.name.split CONST_SEP_
         end
-        Home_::Pathname.expand_real_parts_by_relative_parts real_parts, @relative_path_parts, CONST_SEP_
+
+        Home_::Pathname.expand_real_parts_by_relative_parts(
+          _real_parts, @relative_path_parts, CONST_SEP_ )
       end
 
-      def via_normal_path_parts_execute
+      def __via_normal_path_parts_execute
         m = ::Object ; path_a = @normal_path_parts
         d = -1 ; last = path_a.length - 1
         while d != last
@@ -129,11 +144,11 @@ module Skylab::Basic
           if m.const_defined? s, false
             x = m.const_get s, false
             m = x
-          elsif @create_p and last == d
-            x = m.const_set s, @create_p.call  # #experimental: signature may change
+          elsif @create_proc and last == d
+            x = m.const_set s, @create_proc.call  # #experimental: signature may change
             break
-          elsif @else_p
-            x = @else_p[ s, m ]
+          elsif @else_proc
+            x = @else_proc[ s, m ]
             m = x  # KEEP GOING covered.
           else
             x = m.const_get s, false  # trigger the error or trip a.l
@@ -190,8 +205,12 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
+    Here_ = self  # 1x
     PATH_SEP_RX__ = %r(::|/)
 
-    Module_ = self
+    # ==
+    # ==
   end
 end

@@ -23,7 +23,7 @@ module Skylab::TanMan
 
         @parser = @document.graph_sexp.class
 
-        ok = rslv_stmt_list_and_stream
+        ok = __resolve_stmt_list_and_stream
 
         if ok && @from_node_label
           ok = find_nodes
@@ -37,10 +37,10 @@ module Skylab::TanMan
 
     private
 
-      def rslv_stmt_list_and_stream
+      def __resolve_stmt_list_and_stream
         @stmt_list = @document.graph_sexp.stmt_list
         if @stmt_list
-          @st = @stmt_list.to_node_stream_
+          @st = @stmt_list.to_element_stream_
           ACHIEVED_
         elsif :delete == @verb
           when_no_stmt_list
@@ -70,7 +70,7 @@ module Skylab::TanMan
 
         @document.graph_sexp.stmt_list = sx
         @stmt_list = sx
-        @st = sx.to_node_stream_
+        @st = sx.to_element_stream_
 
         ACHIEVED_
       end
@@ -91,8 +91,8 @@ module Skylab::TanMan
           :kernel, @kernel,
           & @on_event_selectively )
 
-        ok = rslv_from_node
-        ok &&= rslv_to_node
+        ok = __resolve_from_node
+        ok &&= __resolve_to_node
 
         if ok
           ACHIEVED_
@@ -101,12 +101,12 @@ module Skylab::TanMan
         end
       end
 
-      def rslv_from_node
+      def __resolve_from_node
         _from_node = @touch_node.call_via :name, @from_node_label
         _store :@from_node, _from_node
       end
 
-      def rslv_to_node
+      def __resolve_to_node
         _to_node = @touch_node.call_via :name, @to_node_label
         _store :@to_node, _to_node
       end
@@ -161,8 +161,8 @@ module Skylab::TanMan
       def __init_node_ID_symbols_and_strings
 
         if @from_node_label
-          @source_node_ID_sym = @from_node.node_id
-          @target_node_ID_sym = @to_node.node_id
+          @source_node_ID_sym = @from_node.node_ID_symbol_
+          @target_node_ID_sym = @to_node.node_ID_symbol_
         else
           @source_node_ID_sym = @from_node_ID
           @target_node_ID_sym = @to_node_ID  # (yeah, just an ivar name change)
@@ -191,12 +191,12 @@ module Skylab::TanMan
 
       def send_found_existing_event stmt
         maybe_send_event :info, :found_existing_association do
-          bld_found_existing_association stmt
+          __build_found_existing_association stmt
         end
         nil
       end
 
-      def bld_found_existing_association stmt
+      def __build_found_existing_association stmt
 
         build_OK_event_with :found_existing_association,
 
@@ -238,13 +238,13 @@ module Skylab::TanMan
 
       def when_no_protos
         maybe_send_event :error, :association_prototypes_not_found do
-          bld_association_prototypes_not_found_at_all
+          __build_association_prototypes_not_found_at_all
         end
         @result = UNABLE_
         UNABLE_
       end
 
-      def bld_association_prototypes_not_found_at_all
+      def __build_association_prototypes_not_found_at_all
         build_not_OK_event_with :association_prototypes_not_found do |y, o|
           y << "the stmt_list does not have any prototypes"
         end
@@ -261,13 +261,13 @@ module Skylab::TanMan
 
       def when_no_proto
         maybe_send_event :error, :association_prototypes_not_found do
-          bld_association_prototypes_not_found_with_that_name
+          __build_association_prototypes_not_found_with_that_name
         end
         @result = UNABLE_
         UNABLE_
       end
 
-      def bld_association_prototypes_not_found_with_that_name
+      def __build_association_prototypes_not_found_with_that_name
         build_not_OK_event_with :association_prototype_not_found,
             :prototype_i, @prototype_i do |y, o|
           y << "the stmt_list has no prototype named #{ ick o.prototype_i }"
@@ -363,7 +363,7 @@ module Skylab::TanMan
         @result = ACHIEVED_  # is result
       end
 
-      def bld_created_association_event
+      def __build_created_association_event
         build_OK_event_with :created_association,
             :edge_stmt, @edge_stmt,
             :did_mutate_document, true do | y, o |
@@ -417,7 +417,7 @@ module Skylab::TanMan
 
         def description_under expag
 
-          s = "#{ @from_node.node_id } -> #{ @to_node.node_id }"
+          s = "#{ @from_node.node_ID_symbol_ } -> #{ @to_node.node_ID_symbol_ }"
           expag.calculate do
             code s
           end
@@ -473,7 +473,7 @@ module Skylab::TanMan
     def each_edge_stmt_list       # repeats some of `prod` but w/o all the
       ::Enumerator.new do |y|     # lexcial trappings
         sl = graph_sexp.stmt_list or break
-        sl.nodes_.each do |stmt_list|
+        sl.elements_.each do |stmt_list|
           stmt = stmt_list.stmt or next
           :edge_stmt == stmt.class.rule or next
           y << stmt_list

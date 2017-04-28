@@ -212,12 +212,21 @@ module Skylab::TanMan
 
       # ~ custom stuff
 
+      def sentence_phrase__ * x_a
+        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
+      end
+
       def pth s
         if DOT_ == ::File.dirname(s)
           s
         else
           ::File.basename s
         end
+      end
+
+      def component_label s  # (to replace `lbl` #todo)
+        s.ascii_only?  # hi.
+        s.inspect
       end
 
       def app_name_string
@@ -264,10 +273,6 @@ module Skylab::TanMan
 
       if false
 
-      def sp_ * x_a
-        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
-      end
-
       def indefinite_noun lemma_s
         _NLP_agent.indefinite_noun lemma_s
       end
@@ -288,7 +293,7 @@ module Skylab::TanMan
       def or_ a
         _NLP_agent.or_ a
       end
-      end
+      end  # if false
 
       # ~
 

@@ -24,13 +24,7 @@ module Skylab::TanMan
 
       def __via_immutable_digraph
 
-        fly = Here_.new_flyweight__
-
-        _st = @_immutable_digraph_.graph_sexp.to_node_stream
-
-        _st.map_by do |node|
-          fly.reinit_as_flyweight__ node
-        end
+        NodesOperatorBranchFacade_.new( @_immutable_digraph_ ).to_dereferenced_item_stream__
       end
 
       if false

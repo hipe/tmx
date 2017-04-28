@@ -12,7 +12,7 @@ module Skylab::TanMan::TestSupport
 
         ev = ev_p[]
 
-        if :using_parser_files != ev.terminal_channel_i
+        if :using_parser_files != ev.terminal_channel_symbol
           raise ev.to_exception
         end
       end
@@ -20,27 +20,37 @@ module Skylab::TanMan::TestSupport
       @__invocation = invo
     end
 
-    def parse_file input_file_path
-      _graph_sexp_via :input_path, input_file_path
+    def parse_file input_file_path, & sess
+      _graph_sexp_via :input_path, input_file_path, & sess
     end
 
-    def parse_string input_string
-      _graph_sexp_via :input_string, input_string
+    def parse_string input_string, & sess
+      _graph_sexp_via :input_string, input_string, & sess
     end
 
     def _graph_sexp_via sym, x
 
-      _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
-      _qkn = Common_::Qualified_Knownness[ x, _asc ]
+      # _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
+      # _qkn = Common_::Qualified_Knownness[ x, _asc ]
+      # (above worked but was overkill :#history-A.1)
+
+      _qkn = Common_::Qualified_Knownness.via_value_and_symbol x, sym
+
       _ref = Home_::DocumentMagnetics_::
         ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection.call(
           _qkn, :input )
 
-      yikes = nil
+      x = nil
+      sane_mode = block_given?
+
       Home_::Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
 
         o.session_by do |dc|
-          yikes = dc
+          if sane_mode
+            x = yield dc
+          else
+            x = dc  # yikes
+          end
           true
         end
 
@@ -50,11 +60,21 @@ module Skylab::TanMan::TestSupport
         o.listener = @listener
       end
 
-      yikes.graph_sexp
+      if sane_mode
+        x
+      else
+        x.graph_sexp  # yikes - outside of the session but meh
+      end
     end
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
+
+  self._CHANGED__readme__  # this changed long before this writing. currently
+  # the subject is not useful for running from the command line, however it
+  # is eminently useful for parsing dotfiles from tests.
+
   ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new( ARGV ).execute
 end
+# :#history-A.1 (probably tmp)

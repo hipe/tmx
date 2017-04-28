@@ -8,64 +8,62 @@ module Skylab::TanMan
 
       class Create_or_Retrieve_or_Touch_via_NodeName_and_Collection < CommonMagnetic__
         # -
-          attr_writer(
-            :name_string,
-            :verb_lemma_symbol,  # 'create' | 'retrieve' | 'touch'
-          )
+
+          def initialize
+            @_node_ID_is_provided = false
+            super
+          end
+
+          def name_string= s
+            @_unsanitized_label_string = s
+          end
 
           def execute
-            super
-          end
-
-          def _init_name_string_
-            NOTHING_
-          end
-
-          def _init_ivars_
-            @node_ID_is_provided = false
-            super
+            super  # hi.
           end
 
           def _resolve_new_node_id_
-            _resolve_new_node_id_programmatically
+            _find_next_available_node_id_programmatically
           end
         # -
       end
 
       class Create_or_Touch_or_Delete_via_Node_and_Collection < CommonMagnetic__ # 2x
         # -
+
+          def initialize
+            super
+            __init_ivars_related_to_provided_node_ID
+            @_unsanitized_label_string = @entity.unsanitized_label_string___
+          end
+
           attr_writer(
             :entity,
           )
 
           def execute
-            super
+            super  # hi.
           end
 
-          def _init_name_string_
-            @name_string = @entity.node_name_string__ ; nil
-          end
-
-          def _init_ivars_
+          def __init_ivars_related_to_provided_node_ID
 
             provided_ID = @entity.lookup_value_softly_ :id
             if provided_ID
               @provided_ID = provided_ID
               @provided_ID_sym = provided_ID.intern
-              @node_ID_is_provided = true
+              @_node_ID_is_provided = true
             else
-              @node_ID_is_provided = false
+              @_node_ID_is_provided = false
             end
-            super
           end
 
           def _resolve_new_node_id_
 
-            if @node_ID_is_provided
+            if @_node_ID_is_provided
               @new_node_ID_sym = @provided_ID.intern
               ACHIEVED_
             else
-              _resolve_new_node_id_programmatically
+              _find_next_available_node_id_programmatically
             end
           end
         # -
@@ -75,23 +73,34 @@ module Skylab::TanMan
 
       class CommonMagnetic__  # (re-open)
 
+        def initialize
+          @top_channel_for_created_symbol = nil
+          super
+          __init_ivars_as_CM
+        end
+
         attr_writer(
           :document,
+          :entity_via_created_element_by,
           :listener,
-          :verb_lemma_symbol,
+          :top_channel_for_created_symbol,
+          :verb_lemma_symbol,  # 'create' | 'retrieve' | 'touch'
         )
 
         def execute
-          _init_ivars_
           __find_neighbors
           __via_verb_produce_relevant_sexp
         end
 
-        def _init_ivars_
-          @graph_sexp = @document.graph_sexp
-          _init_name_string_
-          @stmt_list = @graph_sexp.stmt_list
+        def __init_ivars_as_CM
+
           send :"init_ivars_for__#{ @verb_lemma_symbol }__"
+
+          gsp = @document.graph_sexp
+          @stmt_list = gsp.stmt_list
+          @graph_sexp = gsp
+
+          NIL
         end
 
         def init_ivars_for__create__
@@ -151,7 +160,7 @@ module Skylab::TanMan
           @fuzzy_matches_found = nil
           @has_neighbors = true
           @num_nodes_seen = 0
-          @node_stream = @stmt_list.to_node_stream_
+          @node_stream = @stmt_list.to_element_stream_
           @still_looking = @node_stream && true
           @still_looking_for_lexically_greater = @can_create  # || @can_create.nil?
           __init_matchers
@@ -159,7 +168,7 @@ module Skylab::TanMan
 
         def __init_matchers
 
-          if @node_ID_is_provided
+          if @_node_ID_is_provided
             __init_matcher_using_node_IDs
           else
             __init_matcher_using_labels
@@ -169,17 +178,20 @@ module Skylab::TanMan
         def __init_matcher_using_node_IDs
           sym = @provided_ID_sym
           @match_p = -> stmt do
-            sym == stmt.node_id
+            sym == stmt.node_ID_symbol_
           end ; nil
         end
 
         def __init_matcher_using_labels
-          s = @name_string
+
+          s = @_unsanitized_label_string
+
           @exact_match_p = -> stmt do
             s == stmt.label_or_node_id_normalized_string
           end
+
           if @do_fuzzy
-            @fuzzy_match_p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment_ @name_string
+            @fuzzy_match_p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment_ @_unsanitized_label_string
             @match_p = @fuzzy_match_p
           else
             @match_p = @exact_match_p
@@ -233,7 +245,7 @@ module Skylab::TanMan
         end
 
         def __when_still_looking stmt
-          case @name_string <=> stmt.label_or_node_id_normalized_string
+          case @_unsanitized_label_string <=> stmt.label_or_node_id_normalized_string
           when 1  # new should go somewhere after current
             if ! @first_non_node_stmt
               @catch_the_first_non_node_stmt ||= true
@@ -244,7 +256,8 @@ module Skylab::TanMan
             @first_lexically_greater_node_stmt = stmt
           else
             self._SANITY  # we must have tried exact match already
-          end ; nil
+          end
+          NIL
         end
 
         def __via_verb_produce_relevant_sexp
@@ -252,8 +265,8 @@ module Skylab::TanMan
         end
 
         def produce_relevant_sexp_when__touch__
-          ok = __resolve_relevant_sexp_when_touch
-          ok && @created_existing_or_destroyed_node
+          _ok = __resolve_relevant_sexp_when_touch
+          _ok && @THIS_GUY  # (was @created_existing_or_destroyed_node)
         end
 
         def produce_relevant_sexp_when__retrieve__
@@ -286,7 +299,7 @@ module Skylab::TanMan
 
           @listener.call :error, :node_not_found do
 
-            _as_componet = Common_::Name.via_slug @name_string
+            _as_componet = Common_::Name.via_slug @_unsanitized_label_string
             # this might give us "human" inflection. we could do better,
             # but it would invole heavy hacking of the node class
 
@@ -302,16 +315,16 @@ module Skylab::TanMan
 
           _proto = produce_prototype_node
 
-          _new = _proto._create_node_with_label @name_string, & handle_event_selectively
+          _ = _proto.create_node_with_label__ @_unsanitized_label_string, & @listener
 
-          _store :@created_existing_or_destroyed_node, _new
+          _store :@created_existing_or_destroyed_node, _
         end
 
         def produce_prototype_node
           if @stmt_list
             __produce_prototype_node_when_stmt_list
           else
-            _produce_hard_coded_default_prototype_node
+            _dangerously_memoized_hard_coded_default_node
           end
         end
 
@@ -321,47 +334,57 @@ module Skylab::TanMan
             node = np[ :node_stmt ]  # might be nil
           end
           if ! node
-            node = _produce_hard_coded_default_prototype_node
+            node = _dangerously_memoized_hard_coded_default_node
           end
           node
         end
 
-        define_method :_produce_hard_coded_default_prototype_node, -> do
-          _NODE_ = nil ; p = -> doc do
-            doc.class.parse :node_stmt, 'foo [label="foo"]'  # :+[#071] "meh"
+        define_method :_dangerously_memoized_hard_coded_default_node, -> do
+
+          yes = true ; x = nil
+
+          once = -> doc do
+            yes = false ; once = nil
+            x = doc.class.parse(  # #[#071] "meh"
+              :node_stmt,
+              'your_node_ID_here [label="«your label here»"]',
+            )
+            NIL
           end
+
           -> do
-            _NODE_ ||= p[ @graph_sexp ]
+            yes && once[ @graph_sexp ]
+            x
           end
         end.call
 
         def __to_new_node_apply_id
-          ok = _resolve_new_node_id_
-          if ok
-            @created_existing_or_destroyed_node.set_node_id @new_node_ID_sym
+          if _resolve_new_node_id_
+            _ = remove_instance_variable :@new_node_ID_sym
+            @created_existing_or_destroyed_node.set_node_id _
           end
         end
 
-        def _resolve_new_node_id_programmatically
-
-          stem_s = @graph_sexp._label2id_stem @name_string
-          stem_i = stem_s.intern
+        def _find_next_available_node_id_programmatically
 
           _st = @graph_sexp.to_node_stream
 
-          h = _st.reduce_into( {} ) do |hash|
+          taken = _st.reduce_into( {} ) do |h|
             -> node do
-              hash[ node.node_id ] = true
+              h[ node.node_ID_symbol_ ] = true
             end
           end
 
+          head = @graph_sexp._label2id_stem @_unsanitized_label_string
+          stem_sym = head.intern
+
           d = 1  # so that the first *numbered* node_id will be foo_2
 
-          while h.key? stem_i
-            stem_i = :"#{ stem_s }_#{ d += 1 }"
+          while taken[ stem_sym ]
+            stem_sym = :"#{ head }_#{ d += 1 }"
           end
 
-          @new_node_ID_sym = stem_i ; ACHIEVED_
+          @new_node_ID_sym = stem_sym ; ACHIEVED_
         end
 
         def __via_neighbors_and_new_node_insert_if_necessary
@@ -438,7 +461,7 @@ module Skylab::TanMan
         end
 
         def __build_ambiguous_event
-          build_not_OK_event_with :ambiguous, :name_s, @name_string,
+          build_not_OK_event_with :ambiguous, :name_s, @_unsanitized_label_string,
               :nodes, @fuzzy_matches_found do |y, o|
 
             _s_a = o.to_node_stream.map_by do |n|
@@ -464,17 +487,18 @@ module Skylab::TanMan
 
           nd.object_id == node_stmt.object_id or self._SANITY
 
-          _send_created_event_for_node node_stmt
+          _see_created_node node_stmt
 
           ACHIEVED_
         end
 
         def __insert_new_node_into_empty_list
+
           nd = @created_existing_or_destroyed_node
           stmt_list = @document.insert_stmt nd
-          node = stmt_list[ :stmt ]
-          nd.object_id == node.object_id or self._SANITY
-          _send_created_event_for_node node
+          node_stmt = stmt_list[ :stmt ]
+          nd.object_id == node_stmt.object_id or self._SANITY
+          _see_created_node node_stmt
           ACHIEVED_
         end
 
@@ -482,22 +506,42 @@ module Skylab::TanMan
           @document.destroy_stmt @exact_match_found
         end
 
-        def _send_created_event_for_node node_stmt
+        def _see_created_node node_stmt
 
-          @listener.call :info, :created_node do
-            __build_created_node_event node_stmt
+          @THIS_GUY = @entity_via_created_element_by[ node_stmt ]
+
+          if @listener
+            __emit_created_node
           end
+          NIL
         end
 
-        def __build_created_node_event node_stmt
+        def __emit_created_node
 
-          build_OK_event_with :created_node,  # #[#ac-007.4]
+          _use_sym = @top_channel_for_created_symbol || :info
 
-              :node_stmt, node_stmt,
-              :did_mutate_document, true do | y, o |
+          _ev = __build_created_node_event  # eager for now  # #todo
 
-            y << "created node #{ lbl o.node_stmt.label }"
+          @listener.call _use_sym, :created_node do
+            _ev
           end
+          NIL
+        end
+
+        def __build_created_node_event
+
+          _ev = Common_::Event.inline_OK_with(
+
+            :created_node,  # #[#ac-007.4]
+            :node, @THIS_GUY,
+            :did_mutate_document, true,
+
+          ) do |y, o|
+
+            y << "created node #{ component_label o.node.node_label_ }"
+          end
+
+          _ev  # hi. #todo
         end
 
         def __when_match_not_found
@@ -509,7 +553,7 @@ module Skylab::TanMan
         end
 
         def __build_match_not_found_event
-          build_not_OK_event_with :match_not_found, :name_s, @name_string,
+          build_not_OK_event_with :match_not_found, :name_s, @_unsanitized_label_string,
               :seen_count, @num_nodes_seen do |y, o|
             y << "couldn't find a node whose label starts with #{
              }#{ ick o.name_s } #{
@@ -544,7 +588,7 @@ module Skylab::TanMan
           s = @__node_statement.label_or_node_id_normalized_string
 
           expag.calculate do
-            lbl s
+            component_label s
           end
         end
       end
@@ -553,7 +597,7 @@ module Skylab::TanMan
 
       Found_existing_node___ = Lazy_.call do
 
-        FoundExistingNode = _ACS_[]::Events::ComponentAlreadyAdded.prototype_with(
+        FoundExistingNode = ACS_[]::Events::ComponentAlreadyAdded.prototype_with(
 
           :found_existing_node,
           :component_association, Here_,

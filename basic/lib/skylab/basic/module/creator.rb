@@ -51,7 +51,7 @@ module Skylab::Basic
 
     o[ :create_meta ] = -> name_sym do
 
-      Module_::Models_::Plan.new name_sym
+      Here_::Models_::Plan.new name_sym
     end
 
     o[:define_methods] = -> me, name, build_module do

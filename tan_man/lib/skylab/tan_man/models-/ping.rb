@@ -17,7 +17,7 @@ module Skylab::TanMan
 
       def execute
 
-        _event = bld_ping_event  # (conventially built lazily, but we want to fail early)
+        _event = __build_ping_event  # (conventially built lazily, but we want to fail early)
 
         _listener_.call :info, :ping do
           _event
@@ -26,7 +26,7 @@ module Skylab::TanMan
         :hello_from_tan_man
       end
 
-      def bld_ping_event
+      def __build_ping_event
 
         _am = _invocation_resources_.application_moniker
 

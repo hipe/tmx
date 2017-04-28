@@ -99,12 +99,10 @@ module Skylab::TanMan
 
     Sanitize__ = -> line do
       line.gsub! BACKSLASH_, EMPTY_S_   # meh
-      line.gsub! DOUBLE_QUOTE_, ESCAPED_QUOTE_
+      line.gsub! DOUBLE_QUOTE_, BACKSLASH_DOUBLE_QUOTE_
       line
     end
 
     BACKSLASH_ = '\\'
-    ESCAPED_QUOTE_ = '\\"'
-    DOUBLE_QUOTE_ = '"'
   end
 end

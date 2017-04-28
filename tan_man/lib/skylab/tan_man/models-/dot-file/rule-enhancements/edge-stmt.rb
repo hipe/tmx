@@ -5,7 +5,7 @@ module Skylab::TanMan
     include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def source_node_id
-      self[:agent][:id].normalized_string.intern
+      self[:agent][:id].normal_content_string_.intern
     end
 
     def set_source_node_id source_node_id
@@ -14,7 +14,7 @@ module Skylab::TanMan
     end
 
     def target_node_id
-      self[:edge_rhs][:recipient][:id].normalized_string.intern
+      self[:edge_rhs][:recipient][:id].normal_content_string_.intern
     end
 
     def set_target_node_id target_node_id

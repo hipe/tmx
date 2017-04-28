@@ -197,9 +197,11 @@ module Skylab::TanMan
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
+  BACKSLASH_DOUBLE_QUOTE_ = '\\"'
   # Brazen_ = ::Skylab::Brazen
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'.freeze
+  DOUBLE_QUOTE_ = '"'
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

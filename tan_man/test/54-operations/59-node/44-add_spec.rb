@@ -2,66 +2,149 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - node create", wip: true do
+  describe "[tm] operations - node create" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :models_node
 
 # (1/N)
-    it "ping the 'node add' action" do
-      call_API :node, :add, :ping
-      expect_OK_event :ping_from_action, "ping from action - (ick :add)"
-      @result.should eql :ping_from__add__
-    end
+    # (pinging this action is gone.)
 
 # (2/N)
-    it "add a minimal node to the minimal string" do
-      s = 'digraph{}'
-      add_name_to_string 'bae', s
-      expect_OK_event :created_node, 'created node (lbl "bae")'
-      s.should eql 'digraph{bae [label=bae]}'
-      expect_succeed
+    context "add a minimal node to the minimal string" do
+
+      it "result is the entity that was created (currently flyweight is used)" do
+        _expect_result_that_is_node_for :bae
+      end
+
+      it "content bytes are correct" do
+        _expect_content "digraph{bae [label=bae]}"
+      end
+
+      it "main event explains, reflects" do
+        _expect_event_for_created_node "bae"
+      end
+
+      shared_subject :_tuple do
+
+        s = "digraph{}"
+        a = [ s ]
+
+        _mutate_string_by_adding_node s, 'bae'
+
+        _expect_common_events_and_execute a
+      end
     end
 
 # (3/N)
-    it "add one before" do
-      s = "digraph{ foo [label=foo]\n}"
-      add_name_to_string 'bar', s
-      expect_OK_event :created_node, 'created node (lbl "bar")'
-      s.should eql "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
-      expect_succeed
+    context "add one before" do
+
+      it "result.." do
+        _expect_result_that_is_node_for :bar
+      end
+
+      it "content.." do
+        _expect_content "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
+      end
+
+      it "main event.." do
+        _expect_event_for_created_node "bar"
+      end
+
+      shared_subject :_tuple do
+
+        s = "digraph{ foo [label=foo]\n}"
+        a = [ s ]
+
+        _mutate_string_by_adding_node s, "bar"
+
+        _expect_common_events_and_execute a
+      end
     end
 
 # (4/N)
-    it "add one after" do
-      s = "digraph{\n bar}"
-      add_name_to_string 'foo', s
-      expect_OK_event :created_node, 'created node (lbl "foo")'
-      s.should eql "digraph{\n bar\nfoo [label=foo]}"
-      expect_succeed
+    context "add one after" do
+
+      it "result.." do
+        _expect_result_that_is_node_for :foo
+      end
+
+      it "content.." do
+        _expect_content "digraph{\n bar\nfoo [label=foo]}"
+      end
+
+      it "main event.." do
+        _expect_event_for_created_node "foo"
+      end
+
+      shared_subject :_tuple do
+
+        s = "digraph{\n bar}"
+        a = [ s ]
+
+        _mutate_string_by_adding_node s, "foo"
+
+        _expect_common_events_and_execute a
+      end
     end
 
 # (5/N)
-    it "add one same - fails with event about node with same name" do
-      s = " digraph { zoz } "
-      add_name_to_string 'zoz', s
-      expect_not_OK_event :found_existing_node, 'node already existed: (lbl "zoz")'
-      expect_fail
+    context "add one same - fails with event about node with same name" do
+
+      it "fails.." do
+        _fails_commonly
+      end
+
+      it "main event.." do
+
+        ev = _main_event
+        _actual = black_and_white ev
+        ev.ok && fail
+        ev.did_mutate_document && fail
+        ev.component_association == Home_::Models_::Node || fail  # not important
+      end
+
+      shared_subject :_tuple do
+
+        s = " digraph { zoz } "
+        a = [ s ]
+
+        _mutate_string_by_adding_node s, "zoz"
+
+        expect :error, :found_existing_node do |ev|
+          a.push ev
+        end
+
+        a.push execute
+      end
     end
 
 # (6/N)
-    it "add one in between" do
-      s = " digraph { apple ; zoz ; } "
-      add_name_to_string 'menengitis', s
-      expect_OK_event :created_node do |ev|
-        ev_ = ev.to_event
-        a = ev_.members
-        a.should be_include :ok
-        a.should be_include :node_stmt
-        ev_.node_stmt.label.should eql 'menengitis'
+    context "add one in between" do
+
+      it "result.." do
+        _expect_result_that_is_node_for :menengitis
       end
-      s.should eql " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
-      expect_succeed
+
+      it "content.." do
+        _expect_content " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
+      end
+
+      it "main event.." do
+        _expect_event_for_created_node "menengitis"
+      end
+
+      shared_subject :_tuple do
+
+        s = " digraph { apple ; zoz ; } "
+        a = [ s ]
+
+        _mutate_string_by_adding_node s, "menengitis"
+
+        _expect_common_events_and_execute a
+      end
     end
 
     # it "to a empty 'digraph' -- makes up its own prototype" :+#ancient
@@ -95,76 +178,239 @@ module Skylab::TanMan::TestSupport
       content.should be_include( 'bar [label=bar]' )
     end
 
-    def add_name_to_string name_s, s
-      call_API :node, :add, :name, name_s, :input_string, s, :output_string, s
-    end
-
-    using_input 'simple-prototype-and-graph-with/zero.dot' do
-
 # (9/N)
-      it 'adds a node to zero nodes' do
-        get_node_array.should eql EMPTY_A_
-        touch_node_via_label 'feep'
-        a = get_node_array
-        a.length.should eql 1
-        stmt_list.unparse.should eql "feep [label=feep]\n"
+
+    context "add a node to zero nodes" do
+
+      it "number of nodes before is 0 and after is 1" do
+        a = _tuple
+        a.first.zero? || fail
+        a[1] == 1 || fail
       end
 
+      it "content" do
+        _stmt_list = _tuple.last
+        _actual = _stmt_list.unparse_into ""
+        _actual == "feep [label=feep]\n" || fail
+      end
+
+      shared_subject :_tuple do
+
+        with_operator_branch_for_nodes_ do
+          a = []
+          a.push all_nodes_right_now_count_
+        touch_node_via_label 'feep'
+          a.push all_nodes_right_now_count_  # kill get_node_array,
+          a.push stmt_list
+        end
+      end
+
+      def digraph_file_path_
+        _use_file_zero
+      end
+    end
+
 # (10/N)
-      it "creates unique but natural node_ids" do
+
+    context "creates unique but natural node_ids" do
+
+      it "labels" do
+        _actual = _tuple.first
+        expect_these_lines_in_array_ _actual do |y|
+          y << "MiLk the catfish"
+          y << "milk the cat"
+          y << "milk the cow"
+        end
+      end
+
+      it "symbols (generated ID's)" do
+        _actual = _tuple.last
+        expect_these_lines_in_array_ _actual do |y|
+          y << :milk_3
+          y << :milk_2
+          y << :milk
+        end
+      end
+
+      shared_subject :_tuple do
+
+        with_operator_branch_for_nodes_ do
 
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'
 
-        _sym_a = node_sexp_stream.map_by( & :node_id ).to_a
-        _sym_a == %i( milk_3 milk_2 milk ) || fail
+          s_a = [] ; sym_a = []
 
-        a = node_sexp_stream.map_by( & :label ).to_a
-        a.shift.should eql 'MiLk the catfish'
-        a.shift.should eql 'milk the cat'
-        a.shift.should eql 'milk the cow'
+          to_node_sexp_stream_.each do |node_stmt|
+            sym_a.push node_stmt.node_ID_symbol_
+            s_a.push node_stmt.label
+          end
+
+          a = []
+          a.push s_a
+          a.push sym_a
+        end
+      end
+
+      def digraph_file_path_
+        _use_file_zero
       end
     end
 
-    using_input(
-      "big-ass-prototype-with-html-in-it-watchya-gonna-do-now-omg.dot" ) do
+    -> do  # #here2
 
-      -> do
         exp = "html-escaping support is currently very limited - #{
           }the following characters are not yet supported: #{
            }#{ %s<"\t" (009), "\n" (010) and "\u007F" (127)> }"
 
 # (11/N)
-        it "when you try to use weird chars for labels - #{
+
+    context "incoming label strings are validated - #{
           }\"#{ exp[ 0..96 ] }[..]\"" do
 
-          touch_node_via_label "\t\t\n\x7F"
+      it "fails" do
+        _tuple[1].nil? || fail
+      end
 
-          _em = expect_not_OK_event :invalid_characters
+      it "event (every byte of the message) (uses `sentence_phrase__`)" do
 
-          black_and_white( _em.cached_event_value ).should eql exp
+        yikes = _tuple.first
+        ev_p = yikes.pop
+        yikes == [ :error, :invalid_characters ] || fail
+        _ev = ev_p[]
+        _actual = black_and_white _ev
+        _actual == exp || fail
+      end
 
-          expect_no_more_events
+      shared_subject :_tuple do
+
+        with_operator_branch_for_nodes_ do
+
+          a = []
+
+          _x = @OB_FOR_NODES.touch_node_via_label___ "\t\t\n\x7F" do |*i_a, &ev_p|
+            i_a.push ev_p ; a.push i_a  # yikes
+          end
+
+          a.push _x
         end
-      end.call
+      end
 
-      -> do
+      def digraph_file_path_
+        _use_file_watchya
+      end
+    end
+
+    end.call  # :#here2
+
+    -> do  # #here3
+
         input = 'joe\'s "mother" & i <wat>'
         output = 'joe&apos;s &quot;mother&quot; &amp; i &lt;wat&gt;'
 
 # (12/N)
-        it "it will escape some chars - #{
-          }this:(#{ input }) becomes : #{ output }" do
+
+    context "it *will* escape *some* chars - this:(#{ input }) becomes : #{ output }" do
+
+      it "um.." do
+
+        _entity = _tuple.first
+        _big_html_table = _entity.node_label_
+        _big_html_table.include? output or fail
+      end
+
+      shared_subject :_tuple do
+
+        with_operator_branch_for_nodes_ do
 
           o = touch_node_via_label input
-          big_html_string = o.unparse
 
-          big_html_string.should be_include output
+          [ o ]
         end
-      end.call
+      end
+
+      def digraph_file_path_
+        _use_file_watchya
+      end
     end
 
-    ignore_these_events :using_parser_files, :wrote_resource
+    end.call  # :here3
+
+    def _expect_event_for_created_node label_s
+
+      ev = _main_event
+      _actual = black_and_white ev
+      _expected = "created node \"#{ label_s }\""
+      _actual == _expected || fail
+      ev.node.node_label_ == label_s || fail
+      ev.did_mutate_document || fail
+      ev.ok || fail
+    end
+
+    def _expect_common_events_and_execute a
+
+      expect :success, :created_node do |ev|
+        a.push ev
+      end
+
+      expect :success, :wrote_resource do |ev|
+        a.push ev
+      end
+
+      a.push execute
+    end
+
+    def _expect_content exp_s
+      _actual = _tuple.fetch 0
+      _actual == exp_s || fail
+    end
+
+    def _expect_result_that_is_node_for sym
+      _node = _result
+      _node.node_identifier_symbol_ == sym || fail
+    end
+
+    def _fails_commonly
+      _result.nil? || fail
+    end
+
+    def _main_event
+      _tuple.fetch 1
+    end
+
+    def _result
+      _tuple.last  # either 4th or 3rd element :/
+    end
+
+    # --
+
+    def _mutate_string_by_adding_node s, name_s
+
+      call_API(
+        * _subject_action,
+        :node_name, name_s,
+        :input_string, s,
+        :output_string, s,
+      )
+    end
+
+    def _subject_action
+      [ :node, :add ]
+    end
+
+    # --
+
+    def _use_file_watchya
+      fixture_file_ "big-ass-prototype-with-html-in-it-watchya-gonna-do-now-omg.dot"
+    end
+
+    def _use_file_zero
+      fixture_file_ "simple-prototype-and-graph-with/zero.dot"
+    end
+
+    # ==
+    # ==
   end
 end
+# #history-A: full rewrite

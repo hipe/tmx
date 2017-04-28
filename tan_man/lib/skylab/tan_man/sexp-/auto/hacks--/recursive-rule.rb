@@ -122,7 +122,7 @@ module Skylab::TanMan
 
           @cls.class_exec do
 
-            define_method :to_node_stream_, me.build_to_node_stream_method
+            define_method :to_element_stream_, me._build_definition_for_the_method_called_to_element_stream_
 
             define_method me.pluralized_method_name, ITEMS_SOFT_ALIAS_METHOD___
 
@@ -199,19 +199,19 @@ module Skylab::TanMan
 
       def to_item_array_
         k = session_prototype_.item_k
-        to_node_stream_.map_by do | x |
-          x[ k ]
+        to_element_stream_.map_by do |el|
+          el[ k ]
         end.to_a
       end
 
-      def nodes_
-        to_node_stream_.to_enum
+      def elements_
+        to_element_stream_.to_enum
       end
 
       # ~ support
 
       def _start_session
-        session_prototype_.dup.__init_session to_node_stream_, self
+        session_prototype_.dup.__init_session to_element_stream_, self
       end
     end
 
@@ -227,7 +227,7 @@ module Skylab::TanMan
         nil
       end
 
-      def build_to_node_stream_method
+      def _build_definition_for_the_method_called_to_element_stream_
 
         tail_k = @session.tail_k
         item_k = @session.item_k
@@ -276,7 +276,7 @@ module Skylab::TanMan
         nil
       end
 
-      def build_to_node_stream_method
+      def _build_definition_for_the_method_called_to_element_stream_
 
         item_k = @session.item_k
         list_k = @session.list_k
@@ -672,7 +672,7 @@ module Skylab::TanMan
         # the new final node. 3) style the old final node appropriately now
         # that it is non-final.
 
-        _last = pl.to_node_stream_.flush_to_last  # (1)
+        _last = pl.to_element_stream_.flush_to_last  # (1)
         new_item_node = _last.dup
         new_item_node[ @item_k ] = @new_item_x
 
@@ -771,7 +771,7 @@ module Skylab::TanMan
 
         front_node = @front_node
 
-        final_proto_node = _prototype_list.to_node_stream_.flush_to_last
+        final_proto_node = _prototype_list.to_element_stream_.flush_to_last
 
         final_proto_node.members.each do | k |
           front_node[ k ] = final_proto_node[ k ]
@@ -786,7 +786,7 @@ module Skylab::TanMan
         # create the new node before you mutate the existing node because
         # the prototype may actually be the parent node of the final node
 
-        proto_Y, proto_Z = any_last_two_via_stream pl.to_node_stream_
+        proto_Y, proto_Z = any_last_two_via_stream pl.to_element_stream_
 
         node_ = __produce_new_final_node_from_prototype_list proto_Z
 

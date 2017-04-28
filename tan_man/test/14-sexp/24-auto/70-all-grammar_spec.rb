@@ -5,6 +5,8 @@ describe "[tm] sexp auto list pattern (grammars 70*)", g: true do
   Skylab::TanMan::TestSupport[ self ]
   use :sexp_auto
 
+  # #cov2.3
+
   using_grammar '70-50-bughunt' do
     using_input 'foop-foop' do
       it 'does not do infinite recursion' do

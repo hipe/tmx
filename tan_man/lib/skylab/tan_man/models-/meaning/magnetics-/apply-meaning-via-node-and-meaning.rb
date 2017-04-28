@@ -91,7 +91,7 @@ module Skylab::TanMan
           existing_a.push asmt_d
         else
           otr = @asmt_a.fetch existing_a.last
-          if otr.a_list1.equals.id.normalized_string != o.a_list1.equals.id.normalized_string
+          if otr.a_list1.equals.id.normal_content_string_ != o.a_list1.equals.id.normal_content_string_
 
             # then a conflict in meaning - aggregate them all & report later
 
@@ -132,7 +132,7 @@ module Skylab::TanMan
                 ast = o.asmt_a.fetch d
 
                 "in #{ lbl ast.meaning.name } as #{
-                  }#{ ick ast.a_list1.equals.id.normalized_string }"
+                  }#{ ick ast.a_list1.equals.id.normal_content_string_ }"
               end
 
               "#{ ick atr_s } was defined #{ _pred_a * ' and ' } #{
@@ -165,7 +165,7 @@ module Skylab::TanMan
         end
 
         _sorted_pairs.map do | atr, d |
-          [ atr, @asmt_a.fetch( d ).a_list1.equals.id.normalized_string ]
+          [ atr, @asmt_a.fetch( d ).a_list1.equals.id.normal_content_string_ ]
         end
       end
 
