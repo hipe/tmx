@@ -57,6 +57,10 @@ module Skylab::TMX::TestSupport
 
   module InstanceMethods___
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     attr_reader :do_debug
 
     def debug!

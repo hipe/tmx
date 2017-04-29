@@ -2118,11 +2118,6 @@ module Skylab::Common
       strange[][ x ]
     end
 
-    String_IO = Lazy_.call do
-      require 'stringio'
-      ::StringIO
-    end
-
     StringScanner = Lazy_.call do
       require 'strscan'
       ::StringScanner

@@ -9,7 +9,7 @@ module Skylab::Common::TestSupport
 
     it "with the ideal case - works" do
 
-      io =  TestSupport_::Library_::StringIO.new
+      io = String_IO_[].new
       _path = Home_.dir_path
 
       call_API(

@@ -47,6 +47,10 @@ module Skylab::Tabular::TestSupport
 
   module InstanceMethods___
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     def debug!
       @do_debug = true
     end

@@ -853,7 +853,7 @@ module Skylab::Brazen
 
         ev = @arg_parse.execute
         if ev
-          send :"__bound_call_when__#{ ev.terminal_channel_i }__arguments", ev
+          send :"__bound_call_when__#{ ev.terminal_channel_symbol }__arguments", ev
         else
           @mutable_backbound_iambic.concat @arg_parse.release_result_iambic
           remove_instance_variable :@arg_parse
@@ -1782,7 +1782,7 @@ module Skylab::Brazen
       end
 
       def _any_exit_status_for_event ev
-        any_exit_status_for_channel_symbol ev.terminal_channel_i
+        any_exit_status_for_channel_symbol ev.terminal_channel_symbol
       end
 
       def any_exit_status_for_channel_symbol sym

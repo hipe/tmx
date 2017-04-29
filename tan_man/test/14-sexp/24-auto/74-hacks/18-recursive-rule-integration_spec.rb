@@ -5,6 +5,7 @@ module Skylab::TanMan::TestSupport
   describe "[tm] sexp - auto - hacks - recursive rule integration", g: true do
 
     TS_[ self ]
+    use :expect_emission_classic
     use :sexp_auto_hacks
 
     context "against a `stmt_list`" do

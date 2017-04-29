@@ -30,14 +30,12 @@ module Skylab::Basic
 
         @minimum = nil
         @_do_report_as_general_failure = false
-        @terminal_channel_i = :uninterpretable_under_number_set
+        @terminal_channel_symbol = :uninterpretable_under_number_set
 
         if block_given?
           instance_exec( & edit_p )
         end
       end
-
-      attr_reader :minimum, :terminal_channel_i
 
       def did_not_match x, prp, min_d=nil, sym
 
@@ -68,7 +66,7 @@ module Skylab::Basic
       def general_failure=
 
         @_do_report_as_general_failure = true
-        @terminal_channel_i = :uninterpretable_under_number_set
+        @terminal_channel_symbol = :uninterpretable_under_number_set
         KEEP_PARSING_
       end
 
@@ -77,7 +75,7 @@ module Skylab::Basic
         x = gets_one
         if x
           @minimum = x
-          @terminal_channel_i = :number_too_small
+          @terminal_channel_symbol = :number_too_small
         end
         KEEP_PARSING_
       end
@@ -175,6 +173,14 @@ module Skylab::Basic
           " #{ sym }"
         end
       end
+
+      attr_reader(
+        :minimum,
+        :terminal_channel_symbol,
+      )
+
+      # ==
+      # ==
     end
   end
 end

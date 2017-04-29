@@ -58,7 +58,7 @@ module Skylab::Brazen::TestSupport
       _x == false || fail
 
       chan_i_a.should eql [ :error, :config_parse_error ]
-      ev.terminal_channel_i.should eql :config_parse_error
+      ev.terminal_channel_symbol == :config_parse_error || fail
       ev.parse_error_category_symbol.should eql :expected_open_square_bracket
       ev.lineno.should eql 1
       ev.column_number.should eql 1

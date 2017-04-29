@@ -99,6 +99,10 @@ module Skylab::Fields::TestSupport
       MY_ALL_PURPOSE_EXPRESSION_AGENT___
     end
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     # ~ :[#007.E] we might go indifferent to false or nil here but not sure
 
     def expect_this_one_false_or_nil_NOT_USED_ x
@@ -236,6 +240,7 @@ module Skylab::Fields::TestSupport
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n"
   NIL_ = nil
+  NOTHING_ = nil
   Scanner_ = Home_::Scanner_
   TS_ = self
 end

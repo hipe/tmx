@@ -86,6 +86,11 @@ module Skylab::Zerk::TestSupport
 
     # ~ of API
 
+    def ignore_emissions_whose_terminal_channel_symbol_is sym
+      @API.add_ignore_terminal_channel_symbol sym
+      NIL
+    end
+
     def expect_these_lines_on_stderr
       # experiment - not ideal because it confuses who's driving
       on_stream :serr
@@ -212,6 +217,18 @@ module Skylab::Zerk::TestSupport
 
       TestSupport_::Expect_these_lines_in_array[ actual_messages, p, self ]
     end
+
+    # ~ shameless copy-paste from [#co-065] - will go away if it interferes
+
+    def black_and_white ev
+      _expag = black_and_white_expression_agent_for_expect_emission
+      ev.express_into_under "", _expag
+    end
+
+    def black_and_white_lines ev
+      _expag = black_and_white_expression_agent_for_expect_emission
+      ev.express_into_under [], _expag
+    end
   end
 
 #==END
@@ -233,6 +250,22 @@ module Skylab::Zerk::TestSupport
 
   # -
 
+    # --
+
+    def build_root_ACS  # cp from [ac]
+      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
+    end
+
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
+    def event_log_
+      Common_.test_support::Expect_Emission::Log
+    end
+
+    # --
+
     def debug!
       @do_debug = true
     end
@@ -241,16 +274,6 @@ module Skylab::Zerk::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
-    end
-
-    # --
-
-    def build_root_ACS  # cp from [ac]
-      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
-    end
-
-    def event_log_
-      Common_.test_support::Expect_Emission::Log
     end
   # -
 

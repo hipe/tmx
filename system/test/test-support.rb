@@ -60,16 +60,6 @@ module Skylab::System::TestSupport
 
   module InstanceMethods___
 
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
-    def debug_IO
-      TestSupport_.debug_IO
-    end
-
     def expect_these_lines_in_array_ act_s_a, & p
 
       TestSupport_::Expect_Line::Expect_these_lines_in_array.call(
@@ -78,6 +68,10 @@ module Skylab::System::TestSupport
 
     def expression_agent_of_API_classic_
       Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
     end
 
     define_method :memoized_tmpdir_, ( -> do  # (see also #here)
@@ -121,6 +115,16 @@ module Skylab::System::TestSupport
     end
 
     define_method :fixture_file_, Fixture_file_
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
   end
 
   # -- test library nodes

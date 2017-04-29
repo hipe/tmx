@@ -235,7 +235,7 @@ module Skylab::Common
 
         # ~ instance methods of event class
 
-        def terminal_channel_i
+        def terminal_channel_symbol
           self.class::TERMINAL_CHANNEL_SYMBOL___
         end
 
@@ -287,7 +287,7 @@ module Skylab::Common
           st = Home_::Scanner.via_array x_a
           _CUSTOM_TERM_CHAN_SYM = st.gets_one
           _write_members st
-          define_singleton_method :terminal_channel_i do
+          define_singleton_method :terminal_channel_symbol do
             _CUSTOM_TERM_CHAN_SYM
           end
         end

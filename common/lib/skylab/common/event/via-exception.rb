@@ -6,7 +6,7 @@ module Skylab::Common
 
         Attributes_actor_.call( self,
           exception: nil,
-          terminal_channel_i: nil,
+          terminal_channel_symbol: nil,
         )
 
         def initialize
@@ -83,7 +83,7 @@ module Skylab::Common
 
         def execute
 
-          @terminal_channel_i ||= __infer_terminal_channel_symbol
+          @terminal_channel_symbol ||= __infer_terminal_channel_symbol
 
           __begin_edit
 
@@ -130,7 +130,7 @@ module Skylab::Common
 
         def __begin_edit
 
-          o = Session___.new @terminal_channel_i, @exception
+          o = Session___.new @terminal_channel_symbol, @exception
           o.push :exception, @exception, :ok, false
           o.message_proc = UNMAPPED_MESSAGE_PROC___
           @_sess = o
@@ -154,7 +154,7 @@ module Skylab::Common
 
           -> y, o do
 
-            _s = o.terminal_channel_i.id2name.gsub UNDERSCORE_, SPACE_
+            _s = o.terminal_channel_symbol.id2name.gsub UNDERSCORE_, SPACE_
 
             y << "« #{ _s  } »"  # :+#guillemets
           end

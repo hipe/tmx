@@ -258,7 +258,7 @@ module Skylab::Basic
 
            ) do | y, o |
 
-              s_a = o.terminal_channel_i.to_s.split UNDERSCORE_
+              s_a = o.terminal_channel_symbol.id2name.split UNDERSCORE_
               s_a.shift
 
               y << "#{ par o.prop } #{ s_a * SPACE_ } - #{ ick o.path }"

@@ -130,13 +130,13 @@ module Skylab::Common
 
       def __init_via_iambic x_a, & msg_p
         st = Home_::Scanner.via_array x_a
-        @terminal_channel_i = st.gets_one
+        @terminal_channel_symbol = st.gets_one
         _process_pairs st.flush_to_each_pairer, & msg_p
         NIL_
       end
 
       def __init_via_box_and_terminal_channel_symbol bx, sym, & msg_p
-        @terminal_channel_i = sym
+        @terminal_channel_symbol = sym
         _process_pairs bx, & msg_p
       end
 
@@ -159,13 +159,8 @@ module Skylab::Common
 
     public
 
-      def terminal_channel_symbol
-        terminal_channel_i
-      end
-
-      attr_reader :message_proc, :terminal_channel_i
-
       def verb_lexeme
+        NOTHING_
       end
 
       def to_event
@@ -194,7 +189,7 @@ module Skylab::Common
 
         self.class.inline_via_mutable_box_and_terminal_channel_symbol(
           bx,
-          terminal_channel_i,
+          terminal_channel_symbol,
           & ( msg_p || message_proc ) )
       end
 
@@ -206,7 +201,7 @@ module Skylab::Common
         box = ivar_box
         a = box.a_ ; h = box.h_
         y = ::Array.new 1 + a.length * 2
-        y[ 0 ] = terminal_channel_i
+        y[ 0 ] = terminal_channel_symbol
         d = -1 ; last = a.length - 1
         while d < last
           d += 1
@@ -260,6 +255,7 @@ module Skylab::Common
       end
 
     private
+
       def ivar_box
         @__ivar_box__
       end
@@ -267,6 +263,7 @@ module Skylab::Common
       def formal_properties
         @__ivar_box__
       end
+
     public
 
       def description
@@ -318,6 +315,13 @@ module Skylab::Common
         Home_::Stream.via_nonsparse_array s_a
       end
 
+      attr_reader(
+        :message_proc,
+        :terminal_channel_symbol,
+      )
+
+      # ==
+
       class Inferred_Message  # #experimental - you hate me now
 
         Attributes_actor_.call( self,
@@ -337,7 +341,7 @@ module Skylab::Common
 
         def execute
 
-          @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
+          @sp_as_s_a = @o.terminal_channel_symbol.id2name.split UNDERSCORE_
 
           maybe_replace_noun_phrase_with_prop
           rslv_item_x_from_first_tag
@@ -433,6 +437,8 @@ module Skylab::Common
 
         PN_RX__ = /(?:_|\A)path(?:name)?\z/
       end
+
+      # ==
 
       module ReceiveAndSendMethods
 
@@ -545,6 +551,8 @@ module Skylab::Common
         end
       end
 
+      # ==
+
       class PRODUCE_HANDLE_EVENT_SELECTIVELY_THROUGH_METHODS__  # :[#006]. (see also [#013])
 
         class << self
@@ -592,6 +600,8 @@ module Skylab::Common
         end
       end
 
+      # ==
+
       module WRAP__
 
         class << self
@@ -619,6 +629,9 @@ module Skylab::Common
           end
         end
       end
+
+      # ==
+      # ==
 
       Event_ = self
     end

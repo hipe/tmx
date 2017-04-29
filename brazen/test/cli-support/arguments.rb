@@ -47,7 +47,7 @@ module Skylab::Brazen::TestSupport
 
         x = @__result
         if x
-          x.terminal_channel_i.should eql event_channel_sym
+          x.terminal_channel_symbol == event_channel_sym || fail
           if :missing == event_channel_sym
             x.property.name_symbol.should eql x_i
           else

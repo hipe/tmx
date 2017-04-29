@@ -113,7 +113,7 @@ module Skylab::Basic
 
         ev = Common_::Event.wrap.exception @e
 
-        @on_event_selectively.call :error, ev.terminal_channel_i do
+        @on_event_selectively.call :error, ev.terminal_channel_symbol do
           ev
         end
 

@@ -103,6 +103,8 @@ module Skylab::TanMan::TestSupport
         # it may or may not emit events based on whether the dir already existed
         call_API :paths, :path, :generated_grammar_dir, :verb, :retrieve
 
+        ignore_emissions_whose_terminal_channel_symbol_is :creating_directory  # #open [#086]
+
         _result = execute
 
         _tail = ::File.basename _result

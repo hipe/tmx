@@ -98,7 +98,7 @@ module Skylab::Common::TestSupport
       end
 
       def debug_IO
-        @debug_IO ||= Home_.lib_.string_IO.new
+        @debug_IO ||= String_IO_[].new
       end
 
       context "the ignore option" do

@@ -36,17 +36,9 @@ module Skylab::SearchAndReplace::TestSupport
 
   # -
 
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
-    def debug_IO
-      TestSupport_.debug_IO
-    end
-
     # -- setup
+
+    # ~ FS
 
     def build_my_tmpdir_controller_  # NOT prepared (emptied)
 
@@ -107,6 +99,8 @@ module Skylab::SearchAndReplace::TestSupport
       ::File.basename path
     end
 
+    # ~
+
     def magnetics_
       Home_::Magnetics_
     end
@@ -162,10 +156,26 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- hook-ins/outs
 
-    # ~ [co] "expect event"
+    # ~ [co] "expect emission [fail early]"
+
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
 
     def subject_API
       Home_::API
+    end
+
+    # --
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
     end
   # -
 

@@ -21,6 +21,7 @@ module Skylab::Common::TestSupport
 
   Home_ = ::Skylab::Common
   Autoloader_ = Home_::Autoloader
+  Lazy_ = Home_::Lazy
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
   TestSupport_::Quickie.
@@ -62,12 +63,9 @@ module Skylab::Common::TestSupport
 
   # --
 
-  LIB_ = ::Object.new
-  class << LIB_
-
-    def basic
-      Home_.lib_.basic
-    end
+  String_IO_ = Lazy_.call do
+    require 'stringio'
+    ::StringIO
   end
 
   # --
@@ -77,7 +75,6 @@ module Skylab::Common::TestSupport
   ACHIEVED_ = Home_::ACHIEVED_
   EMPTY_A_ = Home_::EMPTY_A_
   KEEP_PARSING_ = true
-  Lazy_ = Home_::Lazy
   NEWLINE_ = "\n".freeze
   NOTHING_ = nil
   NIL_ = nil

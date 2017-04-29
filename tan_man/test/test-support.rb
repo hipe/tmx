@@ -51,8 +51,6 @@ module Skylab::TanMan::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  Expect_Event__ = Common_.test_support::Expect_Emission
-
   module ModuleMethods___
 
     def use sym
@@ -111,7 +109,14 @@ module Skylab::TanMan::TestSupport
       nil
     end
 
-    define_method :ignore_these_events, Expect_Event__::IGNORE_THESE_EVENTS_METHOD
+    def ignore_these_events * _
+      $stderr.puts "Ignoring ignoring: #{ _.inspect }"
+      # #here3::IGNORE_THESE_EVENTS_METHOD
+    end
+
+    def IGNORE_METHOD__
+      NOTHING_
+    end
 
     def shared_subject sym, & p
       x = nil ; yes = true
@@ -140,7 +145,7 @@ module Skylab::TanMan::TestSupport
 
   module InstanceMethods___
 
-    include Expect_Event__::Test_Context_Instance_Methods  # #todo
+    # include Expect_Event__::Test_Context_Instance_Methods  # #todo
 
     # -- expectations
 
@@ -401,6 +406,10 @@ module Skylab::TanMan::TestSupport
 
     # -- hook-outs to ancillary API's
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_  # related to #here3
+    end
+
     def prepare_subject_API_invocation invo
       invo
     end
@@ -462,7 +471,7 @@ module Skylab::TanMan::TestSupport
     end
   end.call
 
-  # ==  :#here2
+  # == :#here2
 
   Expect_CLI_Or_API = -> tcc do
     Home_::Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
@@ -471,6 +480,10 @@ module Skylab::TanMan::TestSupport
 
   Expect_Line = -> tcc do
     TestSupport_::Expect_line[ tcc ]
+  end
+
+  Expect_Emission_Classic = -> tcc do
+    Common_.test_support::Expect_Emission[ tcc ] # #here3
   end
 
   Memoizer_Methods = -> tcc do
@@ -500,6 +513,7 @@ module Skylab::TanMan::TestSupport
   IDENTITY_= -> x { x }
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNDERSCORE_ = Home_::UNDERSCORE_

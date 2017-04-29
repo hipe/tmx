@@ -121,6 +121,10 @@ module Skylab::Common::TestSupport
         @_dispatcher.receive_call x_a
       end
 
+      def add_ignore_terminal_channel_symbol sym
+        @_dispatcher.receive_ignore_etc sym
+      end
+
       def call_by & p
         @_dispatcher.receive_call_via_proc p
       end
@@ -171,7 +175,7 @@ module Skylab::Common::TestSupport
         @_mode_implementation._receive_call_via_proc_ p, listener
       end
 
-      def receive_ignore_etc sym
+      def receive_ignore_etc sym  # [ze]
         @_mode_implementation._receive_ignore_etc_ sym
       end
 
@@ -406,10 +410,22 @@ module Skylab::Common::TestSupport
 
       def initialize expression_of_execution, any_ignore_h, exp_em_a, tc
 
+        defined_ignore_h = tc.ignore_emissions_whose_terminal_channel_is_in_this_hash
+
+        _use_ignore_h = if any_ignore_h
+          if defined_ignore_h
+            self._NOT_YET_DESIGNED__which_to_ignore_when_you_have_both__
+          else
+            any_ignore_h
+          end
+        else
+          defined_ignore_h || MONADIC_EMPTINESS_
+        end
+
         exp_em_a.frozen? || self._NO
         @expected_emission_scanner = Home_::Scanner.via_array exp_em_a
 
-        @do_ignore_terminal_channel = ( any_ignore_h || MONADIC_EMPTINESS_ )
+        @do_ignore_terminal_channel = _use_ignore_h
         @expression_of_execution = expression_of_execution
         @test_context = tc
       end

@@ -48,8 +48,8 @@ module Skylab::Common
           @ev.to_event
         end
 
-        def terminal_channel_i
-          @ev.terminal_channel_i
+        def terminal_channel_symbol
+          @ev.terminal_channel_symbol
         end
 
         def express_into_under y, expag

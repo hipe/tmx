@@ -58,3 +58,4 @@ the name `i`
 indentation of comments
 create or retrieve or touch via node name
 refactor the add to use the doohah
+get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

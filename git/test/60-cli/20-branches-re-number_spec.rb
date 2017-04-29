@@ -46,12 +46,19 @@ module Skylab::Git::TestSupport
 
       _em = expect_not_OK_event :too_much_squeeze
 
-      black_and_white( _em.cached_event_value ).should eql(
-       "between 3 and 9 there are 4 items.\n#{
-        }desired contraction of -4 would bring distance down to 2, #{
-         }but distance cannot go below 3 for 4 items." )
+      _actual = black_and_white_lines _em.cached_event_value
+
+      expect_these_lines_in_array_ _actual do |y|
+        y << "between 3 and 9 there are 4 items."
+        y << "desired contraction of -4 would bring distance down to 2, #{
+         }but distance cannot go below 3 for 4 items."
+      end
 
       expect_fail
+    end
+
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_Line::Expect_these_lines_in_array[ a, p, self ]
     end
 
     def _against d_a, trip

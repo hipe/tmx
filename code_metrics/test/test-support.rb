@@ -90,6 +90,10 @@ module Skylab::CodeMetrics::TestSupport
       [ s ]  # some places need this as mutable (to build sub-program name)
     end
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     def subject_API
       Home_.application_kernel_
     end

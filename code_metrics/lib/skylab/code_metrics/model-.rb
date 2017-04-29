@@ -56,7 +56,8 @@ module Skylab::CodeMetrics
           Common_::Event.wrap.exception.via(
             :exception, e,
             :path_hack,
-            :terminal_channel_i, :enoent )
+            :terminal_channel_symbol, :enoent,
+          )
         end
         NIL_
       end

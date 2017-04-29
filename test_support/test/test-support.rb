@@ -142,17 +142,9 @@ module Skylab::TestSupport::TestSupport
 
   module InstanceMethods
 
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
     end
-
-    def debug_IO
-      @debug_IO ||= Home_.lib_.stderr
-    end
-
-    # --
 
     def fixture_file__ filename
       ::File.join Home_::Fixtures.files_path, filename
@@ -174,6 +166,18 @@ module Skylab::TestSupport::TestSupport
 
     def subject_API_value_of_failure
       FALSE
+    end
+
+    # --
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      @debug_IO ||= Home_.lib_.stderr
     end
   end
 

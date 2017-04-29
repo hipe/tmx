@@ -163,7 +163,9 @@ module Skylab::Common::TestSupport
         # ~ expectations along the different qualities of events
 
         def black_and_white ev
-          black_and_white_lines( ev ).join NEWLINE_
+
+          _expag = _expev_upper_level_expression_agent
+          ev.express_into_under "", _expag
         end
 
         def black_and_white_lines ev

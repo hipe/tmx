@@ -114,7 +114,7 @@ module Skylab::Zerk
           o = remove_instance_variable( :@__n11n ).via_argv remove_instance_variable :@__argv
           ev = o.execute
           if ev
-            @_result = @client.send H___.fetch( ev.terminal_channel_i ), ev
+            @_result = @client.send H___.fetch( ev.terminal_channel_symbol ), ev
             UNABLE_
           else
             @_box = o.release_random_access_box

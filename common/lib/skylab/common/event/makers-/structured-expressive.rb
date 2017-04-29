@@ -84,7 +84,7 @@ module Skylab::Common
         self
       end
 
-      def terminal_channel_i
+      def terminal_channel_symbol
 
         @___tci ||= Home_::Name.via_module_name( self.class.name ).
           as_lowercase_with_underscores_symbol

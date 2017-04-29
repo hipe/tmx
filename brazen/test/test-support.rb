@@ -40,16 +40,6 @@ module Skylab::Brazen::TestSupport
         act_s_a, p, self )
     end
 
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
-    def debug_IO
-      TestSupport_.debug_IO
-    end
-
     def handle_event_selectively_
       event_log.handle_event_selectively
     end
@@ -73,6 +63,10 @@ module Skylab::Brazen::TestSupport
       # (when your OCD prevents you from pulling in the test support module whole hog)
 
       Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+    end
+
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
     end
 
     def prepared_tmpdir
@@ -102,6 +96,16 @@ module Skylab::Brazen::TestSupport
 
     def subject_API
       Home_::API
+    end
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
     end
   end
 

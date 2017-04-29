@@ -25,7 +25,6 @@
 [#108]       testing conventions near CLI ..
 [#107]       `name` should not be the name used here
              #after:[#sa-119]
-             (piggyback: `terminal_channel_i` too)
 
 [#106] #hole ( #moved-to: [#ze-064] )
              ( #was fun with help screen parsing .. )

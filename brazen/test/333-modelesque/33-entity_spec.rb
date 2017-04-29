@@ -109,7 +109,7 @@ module Skylab::Brazen::TestSupport
         end
         ok.should eql false
         _i_a.should eql [ :error, :invalid_property_value ]
-        ev.terminal_channel_i.should eql :number_too_small
+        ev.terminal_channel_symbol == :number_too_small || fail
       end
     end
 

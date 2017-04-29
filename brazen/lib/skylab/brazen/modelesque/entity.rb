@@ -334,7 +334,7 @@ module Skylab::Brazen
 
         def receive_missing_required_properties_softly ev  # popular :+#hook-with
           # (was :+[#054] #tracking error count)
-          maybe_send_event :error, ev.terminal_channel_i do
+          maybe_send_event :error, ev.terminal_channel_symbol do
             ev
           end
           UNABLE_

@@ -62,6 +62,10 @@ module Skylab::Snag::TestSupport
 
     # -- setup
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     def subject_API_value_of_failure
       NIL  # not false - i.e use [#ze-007.5] semantics
     end

@@ -95,17 +95,19 @@ module Skylab::TMX
         en_denom_rx = /\A(?:
           (half)             |   ( 3rd | third )     |  ( 4#{x} | quarter )  |
           ( 6#{x} | sixth )  |   ( 8#{x} | eighth )  |   ( 10#{x} | tenth )  |
+          ( 12#{ x } | twelfth ) |
           ( 16#{x} | sixteenth )         |       ( 32#{x} | thirty-second )
         )\z/x
 
         md = en_denom_rx.match s
 
         if md
-          _d = ( 1..8 ).detect { |d| md[ d ] }
+          _d = ( 1..9 ).detect { |d| md[ d ] }
           _denom = case _d
           when 1 ; 2 ; when 2 ; 3 ; when 3 ; 4
           when 4 ; 6 ; when 5 ; 8 ; when 6 ; 10
-          when 7 ; 16         ; when 8 ; 32
+          when 7 ; 12
+          when 8 ; 16         ; when 9 ; 32
           end
           __receive_denominator _denom
         else

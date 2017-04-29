@@ -267,7 +267,7 @@ module Skylab::Brazen
               @property = property
             end
             attr_reader :property
-            def terminal_channel_i
+            def terminal_channel_symbol
               :missing
             end
           end
@@ -277,7 +277,7 @@ module Skylab::Brazen
               @x = x
             end
             attr_reader :x
-            def terminal_channel_i
+            def terminal_channel_symbol
               :extra
             end
           end

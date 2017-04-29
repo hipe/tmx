@@ -40,19 +40,11 @@ module Skylab::Git::TestSupport
 
   module InstanceMethods___
 
-    # ~ test-time support
+    # -- expectation support
 
-    # ~ ~ time-time configuration of the test-time environment
+    # -- set-up
 
-    attr_accessor :do_debug
-
-    def debug!
-      self.do_debug = true  # here we don't trigger anything but elsewhere ..
-    end
-
-    def debug_IO
-      TestSupport_.debug_IO
-    end
+    # ~ test-time configuration of the test-time environment
 
     define_method :memoized_tmpdir_, -> do
 
@@ -98,6 +90,16 @@ module Skylab::Git::TestSupport
       em = expect_neutral_event
       sym.should eql em.cached_event_value.to_event.terminal_channel_symbol
       em
+    end
+
+    attr_accessor :do_debug
+
+    def debug!
+      self.do_debug = true  # here we don't trigger anything but elsewhere ..
+    end
+
+    def debug_IO
+      TestSupport_.debug_IO
     end
   end
 

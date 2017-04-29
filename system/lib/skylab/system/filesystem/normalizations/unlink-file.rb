@@ -36,7 +36,7 @@ module Skylab::System
 
         if e
           ev = wrap_exception_ e
-          @listener.call :error, ev.terminal_channel_i do
+          @listener.call :error, ev.terminal_channel_symbol do
             ev
           end
           UNABLE_
