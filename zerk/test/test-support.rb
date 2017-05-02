@@ -43,9 +43,21 @@ module Skylab::Zerk::TestSupport
     end
 
     def call * x_a
+      _init_for_call_to_API_ZE
+      @API.receive_call x_a
+      NIL
+    end
+
+    def call_by & p
+      _init_for_call_to_API_ZE
+      @API.call_by( & p )
+      NIL
+    end
+
+    def _init_for_call_to_API_ZE
       @API_OR_CLI = :API
       @API = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
-      @API.receive_call x_a
+      NIL
     end
 
     # -- line-oriented expectations of emission..

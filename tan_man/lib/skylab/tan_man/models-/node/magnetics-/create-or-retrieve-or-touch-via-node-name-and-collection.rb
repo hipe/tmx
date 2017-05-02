@@ -423,7 +423,9 @@ module Skylab::TanMan
 
         def when__touch__when_one_exists_already one
 
-          @created_existing_or_destroyed_node = one  # OVERWRITE
+          # @created_existing_or_destroyed_node = one  # OVERWRITE
+          remove_instance_variable :@created_existing_or_destroyed_node
+          ent = @entity_via_created_element_by[ one ]  # yikes or not
 
           is_ok = send :"when__#{ @verb_lemma_symbol }__and_you_found_one_it_is_OK"
 
@@ -432,7 +434,7 @@ module Skylab::TanMan
           @listener.call _this_top_sym, :found_existing_node do
 
             Found_existing_node___[].with(
-              :component, Component_via_NodeStatement___.new( one ),
+              :component, ent,  # this requires one particular method :#spot2.2
               :ok, is_ok,
             )
           end
@@ -440,7 +442,8 @@ module Skylab::TanMan
           if :create == @verb_lemma_symbol
             UNABLE_
           else
-            POSITIVE_NOTHINGNESS_
+            @THIS_GUY = ent
+            ACHIEVED_
           end
         end
 
@@ -574,28 +577,6 @@ module Skylab::TanMan
         end
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-
-        POSITIVE_NOTHINGNESS_ = true
-      end
-
-      # ==
-
-      class Component_via_NodeStatement___
-
-        # (we might do etc but this is a probe for now..)
-
-        def initialize ns
-          @__node_statement = ns
-        end
-
-        def description_under expag
-
-          s = @__node_statement.label_or_node_id_normalized_string
-
-          expag.calculate do
-            component_label s
-          end
-        end
       end
 
       # ==
@@ -616,4 +597,5 @@ module Skylab::TanMan
     end
   end
 end
+# #tombstone-A.1: when we took away the wrapper for passing a node in the event
 # #meta-tombstone-A: event prototypes for destroyed, not found

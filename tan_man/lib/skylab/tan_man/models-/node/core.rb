@@ -116,6 +116,14 @@ module Skylab::TanMan
         end
       end
 
+      def lookup_softly_via_node_ID___ node_ID_sym
+
+        to_dereferenced_item_stream__.flush_until_detect do |fly|
+          _actual = fly.node_identifier_symbol_
+          node_ID_sym == _actual
+        end
+      end
+
       def to_dereferenced_item_stream__   # (experimental, currently used only for list action)
 
         fly = Here_.new_flyweight_
@@ -129,14 +137,14 @@ module Skylab::TanMan
 
       def __to_node_sexp_stream  # #tespoint
 
-        # it's necessarilty confusing: each item of this stream is a NodeStmt
+        # it's necessarily confusing: each item of this stream is a NodeStmt
 
         @_digraph_controller.graph_sexp.to_node_stream
       end
 
       def to_node_statement_stream___
 
-        # it's necessarilty confusing: each item of this stream is a StmtList
+        # it's necessarily confusing: each item of this stream is a StmtList
 
         @_digraph_controller.graph_sexp.to_node_statement_stream
       end
@@ -162,17 +170,31 @@ module Skylab::TanMan
     # -
 
       def reinit_as_flyweight_ node_stmt
-        @_node_stmt = node_stmt
+        @node_stmt = node_stmt
         self
       end
 
+      def description_under expag
+
+        # (the only reason we need this method is because of #spot2.2 (good reason))
+
+        s = @node_stmt.label_or_node_id_normalized_string  # can't be label, #cov2.4
+        expag.calculate do
+          component_label s
+        end
+      end
+
       def node_label_
-        @_node_stmt.label
+        @node_stmt.label
       end
 
       def node_identifier_symbol_
-        @_node_stmt.node_ID_symbol_
+        @node_stmt.node_ID_symbol_
       end
+
+      attr_reader(
+        :node_stmt,  # #testpoint
+      )
     # -
     # ==
 

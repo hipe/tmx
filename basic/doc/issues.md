@@ -75,7 +75,7 @@
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..
 
-[#027] #hole
+[#027]       [ roting buffer ]  (1x: [tm])
              ( #moved-to: [#fi-004] )
              ( #was: the normalization narrative .. )
              ( was: aggregated articulation refactor )

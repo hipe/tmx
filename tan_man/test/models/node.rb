@@ -14,6 +14,27 @@ module Skylab::TanMan::TestSupport
       end
     end  # >>
 
+    def to_one_array__symbols_
+      sym_a = []
+
+      to_node_sexp_stream_.each do |node_stmt|
+        sym_a.push node_stmt.node_ID_symbol_  # (yes, you could map instead)
+      end
+
+      sym_a
+    end
+
+    def to_two_arrays__labels_and_symbols_
+      s_a = [] ; sym_a = []
+
+      to_node_sexp_stream_.each do |node_stmt|
+        sym_a.push node_stmt.node_ID_symbol_
+        s_a.push node_stmt.label
+      end
+
+      [ s_a, sym_a ]
+    end
+
     def with_operator_branch_for_nodes_
 
       _client = TS_::Models::Dot_File.PARSER_INSTANCE
@@ -29,8 +50,8 @@ module Skylab::TanMan::TestSupport
       end
     end
 
-    def touch_node_via_label label  # name preserved for legacy code for now
-      @OB_FOR_NODES.touch_node_via_label___ label
+    def touch_node_via_label label, & p  # name preserved for legacy code for now
+      @OB_FOR_NODES.touch_node_via_label___ label, & p
     end
 
     def to_node_sexp_stream_
@@ -42,7 +63,11 @@ module Skylab::TanMan::TestSupport
     end
 
     def stmt_list  # name preserved for legacy code for now
-      @OB_FOR_NODES.instance_variable_get( :@_digraph_controller ).graph_sexp.stmt_list
+      graph_sexp_.stmt_list
+    end
+
+    def graph_sexp_
+      @OB_FOR_NODES.instance_variable_get( :@_digraph_controller ).graph_sexp
     end
 
     define_method :fixtures_path_, ( Lazy_.call do

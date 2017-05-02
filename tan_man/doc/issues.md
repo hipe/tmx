@@ -29,6 +29,9 @@
 
              there's a script in [sy] tagged with this ID to help with this.
 
+             (on a separate but related note, `created` is a bad terminal
+              channel name. please append a noun to this channel name.)
+
 [#085]       #done #list-API make methods conform to [#bs-029.5]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel

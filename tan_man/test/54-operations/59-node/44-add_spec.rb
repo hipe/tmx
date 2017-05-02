@@ -97,7 +97,7 @@ module Skylab::TanMan::TestSupport
         _fails_commonly
       end
 
-      it "main event.." do
+      it "main event.." do  # :#cov2.4
 
         ev = _main_event
         _actual = black_and_white ev
@@ -240,16 +240,7 @@ module Skylab::TanMan::TestSupport
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'
 
-          s_a = [] ; sym_a = []
-
-          to_node_sexp_stream_.each do |node_stmt|
-            sym_a.push node_stmt.node_ID_symbol_
-            s_a.push node_stmt.label
-          end
-
-          a = []
-          a.push s_a
-          a.push sym_a
+          to_two_arrays__labels_and_symbols_
         end
       end
 

@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Rotating_Buffer
+  class Rotating_Buffer  # :[#027].
 
     def self.[] d
       1 == d ? A_Buffer_Of_One__.new : new( d )

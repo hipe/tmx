@@ -10,10 +10,14 @@ module Skylab::TanMan::TestSupport
 
       @listener = -> * sym_a, & ev_p do
 
-        ev = ev_p[]
-
-        if :using_parser_files != ev.terminal_channel_symbol
-          raise ev.to_exception
+        if :using_parser_files == sym_a.last
+          NOTHING_
+        elsif :creating == sym_a.last
+          NOTHING_  # near [#086]
+        else
+          _ev = ev_p[]
+          _ex = _ev.to_exception
+          raise _ex
         end
       end
 

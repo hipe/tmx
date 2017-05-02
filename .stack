@@ -51,7 +51,5 @@ TD tan_man/test/54-operations/77-comment/14-stream_spec.rb
 TD tan_man/test/54-operations/68-association/44-create_spec.rb
 TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 (model: node)
-TD tan_man/test/54-operations/59-node/64-prototype_spec.rb
-create or retrieve or touch via node name
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]
