@@ -26,8 +26,10 @@ describe "[cssc] when parsing directives" do
 
     tree = parse_directives_in_file_ fixture_path_ '002-minitessimal.txt'
 
-    tree[:in_the_folder].should eql(false)
-    tree[:styles_under].should eql(false)
+    tree[ :in_the_folder ].nil? || fail
+
+    tree[ :styles_under ].nil? || fail
+
     ["red.css", "blue.css"].should eql(
       tree[:styles_in_files].children(:left, :right))
     md = tree[:merge_list]

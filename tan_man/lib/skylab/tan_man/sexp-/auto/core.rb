@@ -28,7 +28,7 @@ module Skylab::TanMan
     # and (for components of the latter two facilities) its facility
     # affilition.
 
-    CUSTOM_PARSE_TREE_METHOD_NAME__ = :tree
+    CUSTOM_PARSE_TREE_METHOD_NAME__ = :_to_final_parse_tree_
 
   module BuildMethods_
 
@@ -37,14 +37,14 @@ module Skylab::TanMan
     #
     # This module will typically be used as follows: descendant modules of
     # this module will typically be extended by for e.g. toplevel modules in
-    # this library, and possibly generated Sexp_ classes for use in
+    # this library, and possibly generated sexp classes for use in
     # recursive calls to builder methods.
 
     def [] syntax_node  # inheritable API entrypoint
-      node2tree syntax_node, nil, nil  # no class, no member_name
+      _tree_via_syntax_node syntax_node, nil, nil  # no class, no member_name
     end
 
-    def add_instance_methods tree_cls
+    def __add_instance_methods tree_cls
 
       mod = _instance_methods_module_
 
@@ -52,7 +52,7 @@ module Skylab::TanMan
         tree_cls.include mod
       end
 
-      _rule_as_const = Common_::Name::ConversionFunctions::Constantize[ tree_cls.rule ]
+      _rule_as_const = Common_::Name::ConversionFunctions::Constantize[ tree_cls.rule_symbol ]
       _const_path = [ :RuleEnhancements, _rule_as_const ]  # :#magic-name
       _mod = tree_cls.grammar.anchor_module
 
@@ -69,7 +69,7 @@ module Skylab::TanMan
       NIL
     end
 
-    def build_element_names o  # extent: * defs, 1 call
+    def _build_element_names_ o
 
       # For this basic auto sexp implementation for deciding what the
       # member names should be, we 1) take the methods
@@ -78,10 +78,10 @@ module Skylab::TanMan
       # if it were important you would put a label on it.
       # Return a frozen doohah.  Do not rely on generated properties of inf.
 
-      o.methods_of_interest.reject( & With_numbers__ ).freeze
+      o.to_methods_of_interest.reject( & With_numbers__ ).freeze
     end
 
-    def build_members_of_interest o
+    def _build_members_of_interest_ o
 
       # For this basic auto sexp implementation we assume that the
       # members of interest are one and the same with all the named members.
@@ -91,29 +91,32 @@ module Skylab::TanMan
       NOTHING_
     end
 
-    def build_tree_class o  # o = "inference with elements" 1x
+    def __build_tree_class o  # o = "inference with elements"
 
-      members = build_element_names( o ).freeze
+      members = _build_element_names_( o ).freeze
 
       $stderr.write "for #{ members.inspect }"
 
-      _sct_class = Give_it_a_name___[ ::Struct.new( * members ) ]
-      # :#cov2.3
-      cls = ::Class.new _sct_class
-
-      cls.extend _module_methods_module_
-      cls._members = members
-      cls.expression = o.expression
-      cls.grammar = o.grammar_facade
-      cls.rule = o.rule
-
-      moi = build_members_of_interest o
+      moi = _build_members_of_interest_ o
       if ! moi
         moi = members  # hi.
       end
-      cls.members_of_interest = moi
 
-      add_instance_methods cls
+      _sct_class = Give_it_a_name___[ ::Struct.new( * members ) ]  # :#cov2.3
+
+      cls = ::Class.new _sct_class
+
+      cls.extend _module_methods_module_
+
+      cls.__init_sexp_class(
+        moi,
+        members,
+        o.__build_grammar_facade,
+        o.__to_expression_symbol,
+        o.to_rule_symbol_,
+      )
+
+      __add_instance_methods cls
 
       # There might be issues with hacks with more broad patterns intercepting
       # all potential matches with hacks with more narrow patterns so
@@ -122,42 +125,63 @@ module Skylab::TanMan
       o.tree_class && self._SANITY  # eew
       o.tree_class = cls
 
-      hack =   Auto_::Hacks__::HeadTail.match o  # run hacks
-      hack ||= Auto_::Hacks__::RecursiveRule.match o
+      hack =   Auto_::Hacks__::HeadTail.match_inference o  # run hacks
+      hack ||= Auto_::Hacks__::RecursiveRule.match_inference o
       if hack
-        hack.commit!
+        hack.call
       end
 
       cls
     end
 
-    def inference2tree o  # extent: solo def, 2 calls
-      if o.member and Auto_::Hacks__::MemberName.hack_matches_member_name o.member
-        Auto_::Hacks__::MemberName.tree o
+    def _tree_via_inference o
+
+      yes = Auto_::Hacks__::MemberName.tree_proc_via_inference__ o
+      if yes
+        yes[]
+
       elsif o.element_names_are_inferrable
-        tree_class = if o.sexps_module.const_defined?( o.sexp_const, false )
-          o.sexps_module.const_get o.sexp_const, false
+
+        mod = o._sexps_module ; c = o._sexp_const
+
+        if mod.const_defined? c, false
+          cls = mod.const_get c, false
         else
-          o.sexps_module.const_set o.sexp_const, build_tree_class(o)
+          cls = __build_tree_class o
+          mod.const_set c, cls
         end
-        tree_class.tree o
+
+        cls.final_parse_tree_via_inference_ o
       else
 
-        # "peek ahead" assuming this might be a semantic kleene group.
+        # "peek ahead" assuming this might be a semantic kleene group :#here2.
         # if any of the children has an extension module, make a generic list.
         # Note that we have *no* parent tree class per above, and no elem name.
 
-        a = if o._node.elements
-          o._node.elements.map do |n|
-            Auto_::Inference.get(n, nil, nil)
+        sns = o.syntax_node.elements
+        if sns
+          a = sns.map do |sn|
+            Inference_for_[ sn ]
           end
         end
-        if a and a.any? { |x| x.the_expression_name_is_inferrable or x.element_names_are_inferrable }
+
+        _yes = if a
+          a.any? do |inf|
+            inf.the_expression_name_is_inferrable || inf.element_names_are_inferrable
+          end
+        end
+
+        if _yes
+
           list = _list_class_.new a.length
-          a.each_with_index { |_inf, idx| list[idx] = inference2tree(_inf) }
+
+          a.each_with_index do |inf, d|
+            list[ d ] = _tree_via_inference inf
+          end
+
           list
         else
-          s = o._node.text_value
+          s = o.syntax_node.text_value
           if s.length.nonzero?  # easier for boolean logic to map these out
             s
           end
@@ -177,13 +201,12 @@ module Skylab::TanMan
       ModuleMethods_
     end
 
-    def node2tree node, parent_class, member_sym  # extent: solo def, 2 calls
-      # don't call node.tree because that can call this
-      inference2tree Auto_::Inference.get(node, parent_class, member_sym)
-    end
+    def _tree_via_syntax_node sn, parent_class, member_sym
 
-    def sexp_builder_anchor_module  # experimental
-      Auto_
+      # don't call node._to_final_parse_tree_ because that can call this
+
+      _inf = Inference_for_[ sn, parent_class, member_sym ]
+      _tree_via_inference _inf
     end
   end
 
@@ -203,34 +226,35 @@ module Skylab::TanMan
   module ModuleMethods_
 
     # This module or descendant modules will be included by generated
-    # Sexp_ ("tree") classes.
+    # sexp ("tree") classes.
 
-    include BuildMethods_  # node2tree et. al
+    include BuildMethods_
 
-    # extent: solo def, 2 calls
+    def __init_sexp_class members_of_interest, frozen_members, grammar_facade, expression_sym, rule_sym
 
-    def element2tree el, member_sym
-      if el
-        if el.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME__
-          el.send CUSTOM_PARSE_TREE_METHOD_NAME__  # careful!
+      @members_of_interest = members_of_interest
+      @_use_members = frozen_members
+      @grammar = grammar_facade
+      @expression_symbol = expression_sym
+      @rule_symbol = rule_sym
+      NIL
+    end
+
+    def tree_via_syntax_node_ sn, member_sym
+      if sn
+        if sn.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME__
+          sn.send CUSTOM_PARSE_TREE_METHOD_NAME__  # careful!
         else
-          node2tree el, self, member_sym
+          _tree_via_syntax_node sn, self, member_sym
         end
       end  # else typically is trailing optional node
     end
 
-    attr_accessor :expression
-    attr_accessor :grammar  # a Grammar::Facade
-    def _hacks ; @_hacks ||= [] end  #debugging-feature-only
-    attr_writer :_members  # experimental frozen persistent object
-    def _members ; @_members ||= members.freeze end
-    attr_accessor :members_of_interest
-
-    def parse rule_i, string, err_p=nil  # for hacks
-      parser = grammar.build_parser_for_rule rule_i
+    def parse rule_sym, string, err_p=nil  # for hacks
+      parser = grammar.build_parser_for_rule rule_sym
       syn_node = parser.parse string
       if syn_node
-        element2tree syn_node, :"xyzzy_#{ rule_i }"
+        tree_via_syntax_node_ syn_node, :"xyzzy_#{ rule_sym }"
       elsif err_p
         err_p[ parser ]
       else
@@ -243,14 +267,28 @@ module Skylab::TanMan
       "#{ name } parse failed - #{ parser.failure_reason || '(no reason?)' }"  # (method is not our name)
     end
 
-    attr_accessor :rule
+    def final_parse_tree_via_inference_ inference
 
-    def tree inference
       child_a = members_of_interest.map do |member_sym|
-        element2tree inference._node.send(member_sym), member_sym
+
+        _x = inference.syntax_node.send member_sym
+
+        tree_via_syntax_node_ _x, member_sym
       end
+
       new( * child_a )
     end
+
+    def _use_members
+      @_use_members ||= members.freeze
+    end
+
+    attr_reader(
+      :expression_symbol,
+      :grammar,  # a grammar facade
+      :members_of_interest,
+      :rule_symbol,
+    )
   end
 
   ParseFailure___ = ::Class.new ::RuntimeError
@@ -277,13 +315,7 @@ module Skylab::TanMan
     include InstanceMethods_  # it appears that we overwrite every method, but this is necessary .. why? #todo
 
     def duplicate_except_
-
-      d = length
-
-      self._NEVER_CALLED__lost_contact_this_refactor__  # before #history-A
-
-      Auto_::DuplicatedSexp_via_Members_and_Sexp__.call(
-        self.class.new(d), :xxxx, d.times.to_a, self )
+      self._WAS_NOT_COVERED__but_read_me__  # in #tombstone-A.2 is beginning of a rabbit hole
     end
 
     def is_list_
@@ -297,7 +329,7 @@ module Skylab::TanMan
 
     # Exeperimental: Use this as a sexp builder in your grammars (with []) where
     # you want to flatten a rule into its text value, but rather than use
-    # just a string as the Sexp_ node, you want this one extra level in it as
+    # just a string as the sexp node, you want this one extra level in it as
     # a wrapper.
     #
     # This is a tree building strategy that: gives you a struct
@@ -311,7 +343,6 @@ module Skylab::TanMan
       def [] syntax_node
         new syntax_node.text_value
       end
-      # alias_method :_members, :members
     end
 
     def initialize x
@@ -369,160 +400,159 @@ module Skylab::TanMan
 
   # --*--
 
-  class Inference  # TODO
+  Inference_for_ = -> do
 
-    def initialize * a
-      @extension_module_metas, @member, @_node, @_parent_class, @tree_lass = a
-    end
+    cache = {}  # for some algorithms we look-ahead to infer names #here2
 
-    def members
-      [ :extension_module_metas, :member, :tree_class, :_node, :_parent_class ]
-    end
-
-    attr_reader :extension_module_metas, :member, :_node, :_parent_class
-
-    attr_accessor :tree_class
-
-    # The Inference of a synax node is for "inferring" what Sexp_ class to use
-    # for a given node from its extension modules.  We crawl up backwards from
-    # the first extension module to infer things like the sexp wrapper module.
-
-    cache = {}  # for some algorithms we might try look-ahead to infer names
-
-    factory = nil
-
-    define_singleton_method :get do |node, parent_class, member_sym|
-
-      if cache.key? node.object_id
-
-        o = cache[ node.object_id ]
-        o._parent_class.object_id == parent_class.object_id || self._SANITY
-        member_sym == o.member || self._SANITY
+    -> sn, parent_class=nil, member_sym=nil do
+      o = cache[ sn.object_id ]
+      if o
+        o.parent_class.object_id == parent_class.object_id || self._SANITY
+        member_sym == o.member_symbol || self._SANITY
         o
-
       else
-        cache[ node.object_id ] = factory[ node, parent_class, member_sym ]
+        o = Build_inference___[ sn, parent_class, member_sym ]
+        cache[ sn.object_id ] = o
+        o
       end
     end
+  end.call
 
-    custom_parse_tree_method_name = CUSTOM_PARSE_TREE_METHOD_NAME__
+  Build_inference___ = -> sn, parent_class, member_sym do
 
-    factory = -> node, parent_class, member_sym do
+    a = sn.extension_modules
 
-      a = node.extension_modules
+    if a.length.zero?  # possibly a kleene group
 
-      if a.length.zero?  # possibly a kleene group
+      Inference_.new nil, member_sym, sn, parent_class
+    else
+      # from this one extension module we can infer a const name. but can we
+      # infer the names of its elements? we can if we have "methods of
+      # interest" that would come from an extension module. hackishly avoid
+      # oru own extension module for checking for the existence of our magic
+      # name..
 
-        new nil, member_sym, node, parent_class
+      d = a.length  # left vs. right -- ick!!
+      last = [ 0, d - 2 ].max  # any second to last one
 
+      while ( d -= 1 ) >= last
+
+        methods = a[ d ].instance_methods
+        if methods.length.zero?
+          next
+        end
+        if methods.include? CUSTOM_PARSE_TREE_METHOD_NAME__
+          next
+        end
+        found_d = d
+        break
+      end
+
+      metas = a.map { |mod| ExtensionModuleReflection___[ mod ] }
+
+      if found_d
+        InferenceWithElements___.new(
+          found_d, metas, member_sym, sn, parent_class )
       else
-
-        # We have at least one extension module so we can definitely infer
-        # a const name. But can we infer the names of the elements?
-        # We can if we have 'methods of interest' that would come from an
-        # extension module  Note, unfortunately, that we have to sidestep
-        # the extension module that gets created by us with a method called
-        # [custom_parse_tree_method_name]. It's a dodgy move, but this whole
-        # house is dodgy o_O
-
-        d = a.length  # left vs. right -- ick!!
-        last = [ 0, d - 2 ].max  # any second to last one
-
-        while ( d -= 1 ) >= last
-
-          methods = a[ d ].instance_methods
-          if methods.length.zero?
-            next
-          end
-          if methods.include? custom_parse_tree_method_name
-            next
-          end
-          found_d = d
-          break
-        end
-
-        metas = a.map { |mod| ExtensionModuleReflection___[ mod ] }
-
-        if found_d
-          InferenceWithElements___.new(
-            metas, member_sym, node, parent_class, found_d )
-        else
-          InferenceWithConst__.new(
-            metas, member_sym, node, parent_class )
-        end
+        InferenceWithConst__.new(
+          metas, member_sym, sn, parent_class )
       end
     end
+  end
+
+  class Inference_
+
+    # this is perhaps the workhorse node of the whole library: the
+    # "inference" of a synax node is for "inferring" what sexp class to use
+    # for a given node from its extension modules.  We crawl up backwards
+    # from the first extension module to infer things like the sexp wrapper
+    # module.
+
+    def initialize metas, member_sym, syntax_node, parent_class
+
+      @extension_module_metas = metas
+      @member_symbol = member_sym
+      @parent_class = parent_class
+      @syntax_node = syntax_node
+    end
+
+    attr_writer(
+      :tree_class,
+    )
 
     def element_names_are_inferrable
       methods_of_interest_can_be_determined
     end
 
-    def the_expression_name_is_inferrable  # is the expression name inferrable?
-      false
-    end
-
     def members_of_interest
-      tree_class.members_of_interest
+      @tree_class.members_of_interest
     end
 
     def has_members_of_interest
-      ! tree_class.nil?
+      @tree_class
+    end
+
+    attr_reader(
+      :extension_module_metas,
+      :member_symbol,
+      :parent_class,
+      :syntax_node,
+      :tree_class,
+    )
+
+    def the_expression_name_is_inferrable  # is the expression name inferrable?
+      false
     end
 
     def methods_of_interest_can_be_determined  # are we able to determine methods of interest?
       false
     end
 
-    def rule? # is the rule name inferrable?
+    def is_rule  # is the rule name inferrable?
       false
     end
   end
 
-  class InferenceWithConst__ < Inference
+  class InferenceWithConst__ < Inference_
 
     # What can we do with a node with one extension module?
 
-    def members
-      [ * super, :expression, :rule, :sexp_const, :sexps_module ]
-    end
-
-    def expression
-      Symbol_via_const__[ sexp_const ]
+    def __to_expression_symbol
+      Symbol_via_const__[ _sexp_const ]
     end
 
     def the_expression_name_is_inferrable
       true
     end
 
-    def grammar_facade
+    def __build_grammar_facade
 
-      _head = expression_extension_module_meta.grammar_const
-      c = :"#{ _head }GrammarFacade"
+      head_const = _expression_extension_module_meta.grammar_const
+      c = :"#{ head_const }GrammarFacade"
 
       mod = anchor_module
       if mod.const_defined? c
         mod.const_get c, false
       else
-        _const = expression_extension_module_meta.grammar_const
-        faça = Sexp_::Grammar::Facade.new mod, _const
+        faça = Sexp_::Grammar::Facade.new mod, head_const
         mod.const_set c, faça
         faça
       end
     end
 
-    def rule
-      Symbol_via_const__[ expression_extension_module_meta.tail_stem ]
+    def to_rule_symbol_
+      Symbol_via_const__[ _expression_extension_module_meta.tail_stem ]
     end
 
-    def rule?
+    def is_rule
       true
     end
 
     # Given that the extension modules Foo0, Foo1, Foo2 exist, we infer that
     # there is a non-terminal "foo" for which we will use a sexp class
-    # whose constant will  be "Foo" (in some module); and the nonterminal
+    # whose constant will be "Foo" (in some module); and the nonterminal
     # symbol has two constituent child symbols Foo0 and Foo1, for which we will
-    # also make Sexp_ classes with those same names. (So note then that there
+    # also make sexp classes with those same names. (so note then that there
     # will *not* be a sexp class called Foo2, rather we just call that one Foo.)
     #
     # (In such a series, the "outermost" node gets the highest number.)
@@ -535,36 +565,87 @@ module Skylab::TanMan
     #
     #   Foo0 => Foo0, Foo1 => Foo1, BUT : Foo2 => Foo
 
-    def sexp_const
-      ( SEXP__.fetch grammar_module do |grammar_module|
-        SEXP__[ grammar_module ] = (
-         ::Hash.new do |hsh, const|
-            stem = Chomp_digits__[ const ]
-            arr = (
-              STEM__.fetch grammar_module do |gram_mod|
-                STEM__[gram_mod] = (
-                  ::Hash.new do |h, stm|
-                    i = 0 ; a = [ ] ; gm = gram_mod
-                    loop do
-                      a.push :"#{ stm }#{ i }"
-                      gm.const_defined? "#{ stm }#{  i += 1  }" or break
-                    end
-                    h[ stm ] = a
-                  end
-                )
-              end
-             )[ stem ]
-            hsh[const] = arr.last == const ? stem.intern : const
-          end
-        )
-      end )[ expression_extension_module_meta.tail_const ]
-    end
+    -> do
 
-    STEM__ = {}  # grammar_mod => :Foo => [:Foo0, :Foo1, :Foo2]
+      # (as an amusing and possibly didactic point of history (perhaps for
+      # some kind of case-study), the pre-refactor of what used to be in this
+      # scope (#tombstone-A.2) was undecipherable #eyeblood, but also it was
+      # more than 3x shorter.  it's still a bit painful..)
 
-    SEXP__ = {}  # grammar_mod => { :Foo3 => :Foo, :Foo2 => :Foo2, ... }
+      stem_const_via_native_const_via_grammar_mod = {}
+        # grammar_mod => { :Foo3 => :Foo, :Foo2 => :Foo2, ... }
 
-    def sexps_module
+      define_method :_sexp_const do
+        grammar_mod = grammar_module
+        _h = stem_const_via_native_const_via_grammar_mod.fetch grammar_mod do
+          x = Hash_of__use_const_via_given_const__[ grammar_mod ]
+          stem_const_via_native_const_via_grammar_mod[ grammar_mod ] = x
+          x
+        end
+        _const = _expression_extension_module_meta.tail_const
+        _h[ _const ]
+      end
+
+      Hash_of__use_const_via_given_const__ = -> grammar_mod do
+        ::Hash.new do |h, const|
+          x = Find__use_const__via_given_const___[ const, grammar_mod ]
+          h[ const ] = x
+          x
+        end
+      end
+
+      Find__use_const__via_given_const___ = -> const, grammar_mod do
+        const_head = Chomp_digits__[ const ]
+        _a = Consts_via_const_head___[ const_head, grammar_mod ]
+        if const == _a.last  # when it would be `FooBar0`, result in `FooBar` instead
+          const_head
+        else
+          const
+        end
+      end
+
+      native_const_array_via_stem_const_via_grammar_mod = {}
+        # grammar_mod => :Foo => [:Foo0, :Foo1, :Foo2]
+
+      Consts_via_const_head___ = -> const_head, grammar_mod do
+
+        # what are the `Foo0`, `Foo1`, `Foo2`, etc for any given `Foo`?
+        # since this list is fixed per grammar module, we memoize it there.
+
+        _ary_via_head = native_const_array_via_stem_const_via_grammar_mod.fetch grammar_mod do
+          x = Hash_of__consts_via_const__via_grammar_mod___[ grammar_mod ]
+          native_const_array_via_stem_const_via_grammar_mod[ grammar_mod ] = x
+          x
+        end
+        _ary_via_head[ const_head ]
+      end
+
+      Hash_of__consts_via_const__via_grammar_mod___ = -> grammar_mod do
+        ::Hash.new do |h, const_head|
+          a = Array_of_defined_consts_via___[ grammar_mod, const_head ]
+          h[ const_head ] = a
+          a
+        end
+      end
+
+      Array_of_defined_consts_via___ = -> mod, const_head do
+
+        # determine what the `Foo0`, `Foo1`, `Foo2`, etc are for any given
+        # `Foo` in the given module. (i.e solve for N in 0..N). result is
+        # the actual array of consts of `Foo0`, `Foo1`, `Foo2` etc.
+
+        a = [] ; d = 0
+        const = :"#{ const_head }#{ d }"
+        begin
+          a.push const
+          d += 1
+          const = :"#{ const_head }#{ d }"
+        end while mod.const_defined? const
+        a
+      end
+    end.call
+
+    def _sexps_module
 
       # auto-vivify a module for holding generated sexps
 
@@ -583,27 +664,27 @@ module Skylab::TanMan
   private
 
     def anchor_module
-      expression_extension_module_meta.anchor_module
+      _expression_extension_module_meta.anchor_module
     end
 
-    def expression_extension_module_meta
+    def _expression_extension_module_meta
       extension_module_metas.last
       # to see why this is last and not first, see test grammr 60
     end
 
     def grammar_module
-      expression_extension_module_meta.grammar_module
+      _expression_extension_module_meta.grammar_module
     end
   end
 
   class InferenceWithElements___ < InferenceWithConst__
 
-    def initialize *a, methods_idx
+    def initialize methods_idx, *a
       @methods_idx = methods_idx
-      super(* a )
+      super( * a )
     end
 
-    def methods_of_interest
+    def to_methods_of_interest
       extension_module_metas[ @methods_idx ].module.instance_methods
     end
 
@@ -674,7 +755,7 @@ module Skylab::TanMan
 
     include BuildMethods_
 
-    def build_element_names o  # extent: * defs, 1 call
+    def _build_element_names_ o
 
       # This is ridiculously sinful but useful (experimental, too):
       #
@@ -699,24 +780,24 @@ module Skylab::TanMan
       # first, only for the methods of interest make a note of the
       # object ID of the element
 
-      el = o._node
+      sn = o.syntax_node
 
-      o.methods_of_interest.each do |m|
-        _el_ = el.send m
-        _el_ || self._SANITY__member_must_exist__
-        method_via_object_id[ _el_.object_id ] = m
+      o.to_methods_of_interest.each do |m|
+        _sn_ = sn.send m
+        _sn_ || self._SANITY__member_must_exist__
+        method_via_object_id[ _sn_.object_id ] = m
       end
 
       # then map each element such that we end up with an array of
       # the member names, variously meaningful or derived
 
-      el.elements.each_with_index.map do |syn_node, idx|
+      sn.elements.each_with_index.map do |syn_node, idx|
         method_via_object_id[ syn_node.object_id ] || :"e#{ idx }"
       end
     end
 
-    def build_members_of_interest o
-      o.methods_of_interest.reject( & With_numbers__ ).freeze  # again, sic
+    def _build_members_of_interest_ o
+      o.to_methods_of_interest.reject( & With_numbers__ ).freeze  # again, sic
     end
 
     def _module_methods_module_
@@ -783,10 +864,6 @@ module Skylab::TanMan
 
     include LosslessBuildMethods_
 
-    def sexp_builder_anchor_module
-      Recursive
-    end
-
     def _module_methods_module_
       LosslessRecursiveModuleMethods___
     end
@@ -806,10 +883,10 @@ module Skylab::TanMan
 
     include LosslessRecursiveBuildMethods_  # for #recursive call
 
-    def tree inference  # the #recursive call
+    def final_parse_tree_via_inference_ inference  # the #recursive call
 
-      elements = inference._node.elements
-      mems = _members
+      elements = inference.syntax_node.elements
+      mems = _use_members
 
       mems.length == elements.length || self._SANITY__wrong_number_of_elements__
 
@@ -818,9 +895,9 @@ module Skylab::TanMan
 
       prev = nil
 
-      _children = elements.zip( mems ).map do |element, member_sym|
+      _children = elements.zip( mems ).map do |syntax_node, member_sym|
 
-        tree = element2tree element, member_sym
+        tree = tree_via_syntax_node_ syntax_node, member_sym
 
         if Is_string_that_includes_the_special_string___[ prev ]
           hack = Sexp_::Prototype.match prev, tree, self, member_sym
@@ -880,5 +957,6 @@ module Skylab::TanMan
     # ==
   end
 end
+# :#tombstone-A.2 (can be temporary) (as referenced 2x)
 # :#history-A.1 (can be temporary) (as referenced)
 # #history-A (can be temporary) as referenced

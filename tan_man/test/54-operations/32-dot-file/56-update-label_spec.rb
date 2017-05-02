@@ -56,7 +56,7 @@ module Skylab::TanMan::TestSupport
 
       define_method :_retrieve_label_statement do
         result.stmt_list.stmts.detect do |sx|
-          :equals_stmt == sx.class.rule && _LABEL == sx.lhs.normal_content_string_
+          :equals_stmt == sx.class.rule_symbol && _LABEL == sx.lhs.normal_content_string_
         end
       end
     end

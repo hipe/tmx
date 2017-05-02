@@ -3,7 +3,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_38
     rule document
       s:s? node_list:node_list?
       {
-        def tree
+        def _to_final_parse_tree_
           ::Skylab::TanMan::Sexp_::Auto::LosslessRecursive[ self ]
         end
       }
@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_38
     end
     rule s
       (white / comment) s?
-      { def tree ; text_value end }
+      { def _to_final_parse_tree_ ; text_value end }
     end
     rule white
       [ \t\r\n]+

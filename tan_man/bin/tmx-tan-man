@@ -2,14 +2,16 @@
 
 require 'skylab/tan_man'
 
+serr = $stderr
+
 x = Skylab::TanMan::CLI.new(
-  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ARGV, $stdin, $stdout, serr, [ $PROGRAM_NAME ]
 ).execute
 
 if x.respond_to? :id2name
-  $stderr.puts "(result: #{ x })"
+  serr.puts "(result: #{ x })"
   x = 0
 elsif x.nonzero?
-  $stderr.puts "(exitstatus: #{ x })"
+  serr.puts "(exitstatus: #{ x })"
 end
 exit x

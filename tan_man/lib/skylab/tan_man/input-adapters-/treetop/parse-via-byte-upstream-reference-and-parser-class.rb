@@ -36,7 +36,7 @@ module Skylab::TanMan
 
         sn = flush_to_syntax_node
         if sn
-          sn.tree
+          sn._to_final_parse_tree_
         else
           sn
         end

@@ -82,7 +82,7 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
 
       it 'parses double quoted node ID\'s correctly' do
         node_stmt = result.stmt_list.stmts.first
-        node_stmt.class.rule.should eql :node_stmt
+        node_stmt.class.rule_symbol == :node_stmt || fail
         node_stmt[ :node_id ].id.content_text_value.should eql 'node0'
       end
     end

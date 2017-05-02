@@ -21,7 +21,7 @@ describe "[cssc] with 'just-a-comment.css'" do
     if false  # in 2012 or before, maybe was:
 
     node.class.should eql Home_::CssParsing::CssFile::CssFile
-    tree = node.tree
+    tree = node._to_final_parse_tree_
     tree.should match_the_structure_pattern(
       [:css_file, [:space, :white, :c_style_comment, :white]]
     )

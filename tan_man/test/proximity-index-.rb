@@ -136,20 +136,13 @@ module Skylab::TanMan::TestSupport
 
       _tree = Home_.lib_.basic::Tree.via :paths, _list
 
-      @assets_dir = assets_dir
-      @entry = entry
-      @from_module = mod
-      @symlink_path = orig_path
-      @symlink_used = symlink_used
-      @tree = _tree
+      @__assets_dir = assets_dir
+      @_entry = entry
+      @__from_module = mod
+      @__symlink_path = orig_path
+      @__symlink_used = symlink_used
+      @__tree = _tree
     end
-
-    attr_reader(
-      :assets_dir,
-      :symlink_path,
-      :symlink_used,
-      :tree,
-    )
 
     def nearest_such_class_to_path arg_abspath
 
@@ -167,10 +160,10 @@ module Skylab::TanMan::TestSupport
         abs_path = ::File.readlink abs_path
       end
 
-      st, node = @tree.winnow abs_path
+      st, node = @__tree.winnow abs_path
 
       _ok = if st.unparsed_exists
-        if node[ @entry ]
+        if node[ @_entry ]
           true
         end
       else
@@ -179,7 +172,7 @@ module Skylab::TanMan::TestSupport
 
       if _ok
         s_a = st.array_for_read[ 0 ... st.current_index ]
-        s_a.push @entry
+        s_a.push @_entry
         s_a.join ::File::SEPARATOR
       else
         self._NONE
@@ -188,8 +181,8 @@ module Skylab::TanMan::TestSupport
 
     def ___see_first_argument_path abs_path
       @_first = false
-      if @symlink_used
-        s = @symlink_path
+      if @__symlink_used
+        s = @__symlink_path
         if s == abs_path[ 0, s.length ]
           self._COVER_ME_we_need_to_dereference_all_symlinks_PROBABLY_OK
           args_are_symlinks = true
@@ -217,13 +210,13 @@ module Skylab::TanMan::TestSupport
       # logic that once lived in "const reduce" but has been simplified out
       # of it for now.
 
-      _localizer = Home_::Path_lib_[]::Localizer[ @assets_dir ]
+      _localizer = Home_::Path_lib_[]::Localizer[ @__assets_dir ]
       _local_path = _localizer[ client_path ]
       _entries = _local_path.split ::File::SEPARATOR
 
       scn = Common_::Scanner.via_array _entries
 
-      mod = @from_module
+      mod = @__from_module
       begin
         slug = scn.gets_one
         is_last = scn.no_unparsed_exists

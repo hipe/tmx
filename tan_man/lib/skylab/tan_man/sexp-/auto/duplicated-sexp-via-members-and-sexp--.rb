@@ -101,9 +101,9 @@ module Skylab::TanMan
       def execute
 
         @k_a.each do | k |
-          meth_i, args = @op_h[ k ]
-          if meth_i
-            @new[ k ] = send meth_i, k, * args
+          meth_sym, args = @op_h[ k ]
+          if meth_sym
+            @new[ k ] = send meth_sym, k, * args
           else
             @new[ k ] = self.class._duplicate_member @sexp[ k ]
           end

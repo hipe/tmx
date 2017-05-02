@@ -3,14 +3,14 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_50
     rule gestalt
       stmt*
       {
-        def tree
+        def _to_final_parse_tree_
           ::Skylab::TanMan::Sexp_::Auto::LosslessRecursive[ self ]
         end
       }
     end
     rule stmt_sep
       s? ';' s?
-      { def tree ; text_value end }
+      { def _to_final_parse_tree_ ; text_value end }
     end
     rule s
       [ \t\r\n]+

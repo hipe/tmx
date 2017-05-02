@@ -3,7 +3,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace6
     rule nerks
       nerk (',' nerk)* "\n"
       {
-        def tree
+        def _to_final_parse_tree_
           ::Skylab::TanMan::Sexp_::Auto::LosslessRecursive[ self ]
         end
       }

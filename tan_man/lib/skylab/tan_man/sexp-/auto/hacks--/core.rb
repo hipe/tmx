@@ -2,64 +2,11 @@ module Skylab::TanMan
 
   module Sexp_::Auto
 
-  class Hack_  # stowaway
+    Hacks__ = ::Module.new
 
-    # this in an implementation of :#matchdata-pattern: we want to be able to
-    # separate the act of matching a hack from the act of applying that hack.
-    # so it is a commitable hack object that encapsulates a proc that appiles
-    # the hack and as well is a simple 2-state state machine tracking whether
-    # or not it has been applied (hacks are single-use only).
+    module HackSupport_  # because the Hacks__ module is (uselessly) a cordoned-off collection module
 
-    class << self
-      def list_rx
-        LIST_RX__
-      end
-    end  # >>
-
-    LIST_RX__ = /\A(?<stem>.+)_list\z/
-
-    def initialize & p
-      @p = p
-      @state = :uncommitted
-    end
-
-    attr_reader :state
-
-    def commit!
-      if :uncommitted == @state
-        x = @p.call
-        @state = :committed
-        x
-      else
-        fail "won't commit the same hack twice"
-      end
-    end
-
-    module ModuleMethods
-
-      def define_items_method cls, stem  # duplicated over there
-
-        meth_i = :"#{ stem }s".intern  # #pluralize
-
-        if cls.method_defined? meth_i
-          fail __say_name_collision meth_i
-        else
-          cls.send :define_method, meth_i do
-            # future-proof the method's inheritability. also, too #opaque?
-            self.to_item_array_
-          end
-        end
-        nil
-      end
-    end
-  end  # end stowaway
-
-
-  # --*--
-
-  Hacks__ = ::Module.new
-
-  module Hacks__::HeadTail
+      module Auto_::Hacks__::HeadTail
 
     # This HeadTail hack is similar but different from the RecursiveRule hack
     # thus: they both represent alternate ways to define lists in grammars.
@@ -90,58 +37,53 @@ module Skylab::TanMan
     #     in length.)
     #   - else we will fail
     #
+        def self.match_inference o
 
-    extend Hack_::ModuleMethods
+          # enhance the tree class with this hack IFF members of interest
+          # include `head` and `tail`
 
+          _d = ( THESE___ - o.members_of_interest ).length
 
-    members = [:head, :tail]
-
-    define_singleton_method :match do |i|
-      if ( members - i.members_of_interest ).empty? # members incl. head & tail
-        Hack_.new { enhance i }
-      end
-    end
-
-
-    list_rx = Hack_.list_rx
-
-    define_singleton_method :enhance do |i| # `i` for "inference"
-      tree_class = i.tree_class
-      tree_class._hacks.push :HeadTail #debugging-feature-only
-      tree_class.send :include, Instance_Methods___
-
-      head = i._node.head or fail 'for this hack to work, head: must exist'
-
-      md = list_rx.match i.rule.to_s
-      use_stem = nil
-      if md
-        use_stem = md[:stem].intern
-      else
-        head_inference = Auto_::Inference.get head, tree_class, :head
-        if head_inference.the_expression_name_is_inferrable
-          use_stem = head_inference.rule
-        else
-          fail "for this hack to work your rule name must end in _list #{
-            }(your rule name: #{ i.expression })"
+          if _d.zero?  # (the number of items that weren't in the list)
+            -> { Enhance___[ o ] }
+          end
         end
-      end
 
-      define_items_method tree_class, use_stem
-      true
-    end
+        THESE___ = [ :head, :tail ]
 
-  module Instance_Methods___
+        Enhance___ = -> o do  # inference
 
-    def to_item_array_
-      a = []
-      yield_items_into_ a
-      a
-    end
+          cls = o.tree_class
+          cls.include HeadTailInstanceMethods___
+
+          head = o.syntax_node.head
+          head || self._SANITY__for_this_hack_to_work__head_must_exist__
+
+          md = LIST_RX.match o.to_rule_symbol_
+          if md
+            stem = md[ :stem ].intern
+          else
+            head_inference = Inference_for_[ head, cls, :head ]
+            head_inference || self._SANITY__readme__
+              # for this hack to work, your rule name must end int `_list`
+            stem = head_inference.to_rule_symbol_
+          end
+
+          Define_items_method___[ cls, stem ]
+          NIL
+        end
+
+        module HeadTailInstanceMethods___
+
+          def to_item_array_
+            _write_items_into []
+          end
 
     # we are experimenting with different patterns for this (as seen in
     # the various grammars in the unit tests), so this is all subject to change.
 
-    def yield_items_into_ y
+          def _write_items_into y
+
       head = self.head ; tail = self.tail
       head and y << head
       if ! tail
@@ -150,48 +92,63 @@ module Skylab::TanMan
         tail.each do |tree|
           y << tree.content
         end
-      elsif tail.class.expression == self.class.expression
+      elsif tail.class.expression_symbol == self.class.expression_symbol
         # foo_list ::= (s? head:foo s? ';'? '?' tail:foo_list?)?
-        tail.yield_items_into_ y
+        tail._write_items_into y
       else
         # foo_list ::= (head:foo tail:(sep content:foo_list)? sep?)?
-        if tail.class.rule != self.class.rule
+        if tail.class.rule_symbol != self.class.rule_symbol
           # this used to be an issue, is it not any more!?
           # fail('sanity - this does not look recursive')
         end
         if tail.content
-          tail.content.class.expression == self.class.expression or fail('sanity')
-          tail.content.yield_items_into_ y
+          tail.content.class.expression_symbol == self.class.expression_symbol || self._SANITY
+          tail.content._write_items_into y
         end
       end
-      nil
-    end
-  end
-  end
+            y
+          end  # the def
+        end  # head tail instance methods
+      end  # end hack
 
   # -- * --
 
-  module Hacks__::MemberName
+      module Auto_::Hacks__::MemberName
 
-    # This hack simply states: If the rule component has a name that
-    # ends in '_text_value', then the treeification strategy for it is simply
-    # to call 'text_value' (to get the result string) of the syntax node.
+        # this hack is simply: if the rule component has a name that ends in
+        # `*_text_value`, then the treeification strategy for syntax nodes
+        # like these is simply to call `text_value` (to get the result string
+        # of the syntax node).
 
+        def self.tree_proc_via_inference__ inf
+          mem = inf.member_symbol
+          if mem && /\A.+_text_value\z/ =~ mem
+            -> do
+              inf.syntax_node.text_value
+            end
+          end
+        end
+      end  # end hack
 
-    extend ( module Methods
+      # (now you're in hack support)
 
-      def hack_matches_member_name name_symbol
-        RX___ =~ name_symbol
+      Define_items_method___ = -> cls, stem do
+
+        meth_sym = :"#{ stem }s"  # #pluralize
+
+        if cls.method_defined? meth_sym
+          fail __say_name_collision meth_sym  # ..
+        else
+          cls.send :define_method, meth_sym do
+            # future-proof the method's inheritability. also, too #opaque?
+            self.to_item_array_
+          end
+        end
+        NIL
       end
 
-      def tree inference
-        inference._node.text_value
-      end
-
-      self
-    end )
-
-    RX___ = /\A(?<stem>.+)_text_value\z/
-  end
+      LIST_RX = /\A(?<stem>.+)_list\z/
+    end
   end
 end
+# :#history-A.1

@@ -18,8 +18,8 @@ module Skylab::TanMan::TestSupport
       x = result
       part = Parent_module_name__[ x.class ]
       if SEXPS__ == part
-        if :graph != x.class.expression
-          fail "expected 'graph', had '#{ x.class.expression }'"
+        if :graph != x.class.expression_symbol
+          fail "expected 'graph', had '#{ x.class.expression_symbol }'"
         end
       else
         fail "expected containing moudle to be '#{ SEXPS__ }', had #{ part }"

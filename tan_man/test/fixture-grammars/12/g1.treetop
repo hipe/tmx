@@ -3,7 +3,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace12
     rule document
       content:(head:stmt tail:(';' content:stmt)* )? "\n"
       {
-        def tree
+        def _to_final_parse_tree_
           ::Skylab::TanMan::Sexp_::Auto::LosslessRecursive[ self ]
         end
       }
@@ -14,7 +14,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace12
     rule expr
       ('a'+ / 'b'+) [0-9]*
       {
-        def tree ; text_value end
+        def _to_final_parse_tree_ ; text_value end
       }
     end
   end

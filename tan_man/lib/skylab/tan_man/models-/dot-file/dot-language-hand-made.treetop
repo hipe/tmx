@@ -33,7 +33,7 @@ module Skylab::TanMan::Models_::DotFile
 
     rule s
       (white / comment) s?
-      { def tree ; text_value end } # we want tests to pass w or w/o this line
+      { def _to_final_parse_tree_ ; text_value end } # we want tests to pass w or w/o this line
     end
     rule white
       [ \t\n\r]+
@@ -57,7 +57,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule id_name
       id_name_start_char id_name_char*
-      { def tree ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[self] end }
+      { def _to_final_parse_tree_ ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[ self ] end }
     end
     rule id_name_start_char
       [_a-zA-Z]
@@ -68,7 +68,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule id_numeric
       '-'? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
-      { def tree ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[self] end }
+      { def _to_final_parse_tree_ ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[ self ] end }
     end
     rule double_quoted_string
       '"' content_text_value:('\"' / !'"' .)* '"'
@@ -79,7 +79,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule edgeop # see comments at '"edgeop"' above
       '->' / '--'
-      { def tree ; text_value end }
+      { def _to_final_parse_tree_ ; text_value end }
     end
   end
 end

@@ -41,7 +41,7 @@ module Skylab::TanMan
         @s_a.each do | s |
           ok = parse_meaning_string s
           ok or break
-          _a_list = @dot_file.graph_sexp.class.element2tree ok, :custom_a_list
+          _a_list = @dot_file.graph_sexp.class.tree_via_syntax_node_ ok, :custom_a_list
           _a_list.to_item_array_.each do | a_list1 |
             ok = process_list_item a_list1, s
             ok or break

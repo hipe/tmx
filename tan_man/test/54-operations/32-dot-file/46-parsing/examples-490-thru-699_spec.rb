@@ -16,13 +16,21 @@ describe "[tm] operations - dot-file parsing - examples 490 to 699" do
       unparse_losslessly
       x = @result
 
-      x.stmt_list.stmts.map { |x_| x_.class.expression }.should eql(
+      _wat = x.stmt_list.stmts.map do |sx|
+        sx.class.expression_symbol
+      end
+
+      _wat == (
         [:attr_stmt, :node_stmt, :node_stmt, :node_stmt, :edge_stmt, :edge_stmt]
-      )
-      stmt = x.stmt_list.stmts.detect { |x_| :edge_stmt == x_.class.expression }
-      stmt.agent.id.content_text_value.should eql('node0')
-      stmt.edge_rhs.edgeop.should eql('->')
-      stmt.edge_rhs.recipient.id.content_text_value.should eql('node1')
+      ) || fail
+
+      stmt = x.stmt_list.stmts.detect do |sx|
+        :edge_stmt == sx.class.expression_symbol
+      end
+
+      stmt.agent.id.content_text_value == "node0" || fail
+      stmt.edge_rhs.edgeop == "->" || fail
+      stmt.edge_rhs.recipient.id.content_text_value == "node1" || fail
     end
   end
 
@@ -50,7 +58,7 @@ describe "[tm] operations - dot-file parsing - examples 490 to 699" do
       end
       a_alt = stmt.attr_list.content.a_list.a_list.a_list.a_list.a_list.content
       a.object_id.should eql(a_alt.object_id)
-      a.equals.id.class.expression.should eql(:id_html)
+      a.equals.id.class.expression_symbol == :id_html || fail
       a.equals.id.content_text_value.should(
         match(%r{\A<table .+</table>\z}))
     end

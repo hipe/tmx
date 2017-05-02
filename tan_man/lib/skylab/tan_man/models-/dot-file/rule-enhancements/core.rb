@@ -20,7 +20,7 @@ module Skylab::TanMan
         fail "sanity - what such string is invalid? #{ p.failure_reason }"  # (method is not our name)
       end
 
-      self.class.element2tree node, member # note member might be nil
+      self.class.tree_via_syntax_node_ node, member # note member might be nil
     end
 
       LABEL_LABEL_ = 'label'.freeze  # yikes -

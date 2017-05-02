@@ -27,6 +27,8 @@
              as our `ignore_emissions_whose_terminal_channel_is_in_this_hash`
              that is used for *every* emission tested that ..
 
+             there's a script in [sy] tagged with this ID to help with this.
+
 [#085]       #done #list-API make methods conform to [#bs-029.5]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel

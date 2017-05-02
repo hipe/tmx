@@ -6,7 +6,7 @@ module Skylab::TanMan
 
     class SyntaxNodes::Graph < Home_.lib_.TT::Runtime::SyntaxNode
 
-      def tree
+      def _to_final_parse_tree_
         Home_::Sexp_::Auto::LosslessRecursive[ self ]  # #strain
       end
     end

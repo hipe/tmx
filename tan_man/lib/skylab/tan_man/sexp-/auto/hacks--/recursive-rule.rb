@@ -2,7 +2,9 @@ module Skylab::TanMan
 
   module Sexp_::Auto
 
-  module Hacks__::RecursiveRule
+    module HackSupport_  # assume already defined
+
+      module Auto_::Hacks__::RecursiveRule
 
     # Synopsis: this hack exists primarily to deliver the list mutation API,
     # a sub-library that is both essential to the host application and (in its
@@ -69,82 +71,131 @@ module Skylab::TanMan
     # there is one base class and then one sub-class for each classification
     # of grammar, amounting to around 6 classes.
 
-    extend Hack_::ModuleMethods
+        def self.match_inference o
 
-    class << self
+          if o.has_members_of_interest
 
-      def match o
+            rule_sym = o.to_rule_symbol_
 
-        builder_cls = if o.has_members_of_interest
-
-          md = LIST_RX__.match o.rule.to_s
-          if md
-            stem_i = md[ :stem ].intern
-          end
-
-          moi = o.members_of_interest
-          rule_i = o.rule
-
-          if moi.include? rule_i  # a "foo" rule with a "foo" element
-            Simple_Recursion_Methods_Builder___
-
-          elsif stem_i and moi.include? stem_i
-            Compound_Recursion_Methods_Builder___
-          end
-        end
-
-        if builder_cls
-          builder_cls.new( stem_i, moi, o.tree_class, rule_i ).__produce_hack
-        end
-      end
-    end  # >>
-
-    LIST_RX__ = Hack_.list_rx  # any name that ends in "_list"
-
-    class Methods_Builder__
-
-      def initialize stem_i, moi, cls, rule_i
-        @cls = cls
-        @rule_i = rule_i
-        @stem_i = stem_i
-        @some_stem_i = stem_i || rule_i
-        init_session_prototype_
-      end
-
-      def __produce_hack
-
-        Hack_.new do
-
-          @cls.include Common_Static_Methods___
-          session = @session
-          me = self
-
-
-          @cls.class_exec do
-
-            define_method :to_element_stream_, me._build_definition_for_the_method_called_to_element_stream_
-
-            define_method me.pluralized_method_name, ITEMS_SOFT_ALIAS_METHOD___
-
-            define_method :session_prototype_ do
-              session
+            md = LIST_RX.match rule_sym
+            if md
+              stem_sym = md[ :stem ].intern
             end
 
-            nil
+            moi = o.members_of_interest
+
+            cls = if moi.include? rule_sym  # a "foo" rule with a "foo" element
+              ForSimpleRecursionDefineTreeClassMethods___
+            elsif stem_sym and moi.include? stem_sym
+              ForCompoundRecursionDefineTreeClassMethods___
+            end
+          end
+
+          if cls
+            cls.new( stem_sym, moi, o.tree_class, rule_sym ).__to_hack_as_callable
           end
         end
-      end
 
-      def pluralized_method_name
-        :"#{ @some_stem_i }s"
-      end
-    end
+        # ==
 
-    ITEMS_SOFT_ALIAS_METHOD___ = -> do
-      to_item_array_
-    end
+        DefineTreeClassMethods__ = ::Class.new  # will re-open
 
-    module Common_Static_Methods___
+        # ==
+
+        class ForCompoundRecursionDefineTreeClassMethods___ < DefineTreeClassMethods__
+
+          def _build_session_prototype_
+
+            CompoundRecursionOperationSession___.new(
+              @stem_symbol,  # stem
+              @stem_symbol,  # same thing as above for item
+              :tail,  # tail
+              @rule_symbol,  # list
+            )
+          end
+
+          def _build_definition_for_the_method_called_to_element_stream_
+
+            o = @operation_session_prototype
+            For_compound_recursion_build_definition_for_the_method_called_to_element_stream__.call(
+              o.item_k, o.list_k, o.tail_k )
+          end
+        end
+
+        # ==
+
+        class ForSimpleRecursionDefineTreeClassMethods___ < DefineTreeClassMethods__
+
+          def _build_session_prototype_
+
+            SimpleRecursionOperationSession___.new(
+              _some_stem_symbol,  # stem
+              :content,  # item
+              @rule_symbol,  # tail
+            )
+          end
+
+          def _build_definition_for_the_method_called_to_element_stream_
+
+            o = @operation_session_prototype
+            For_simple_recursion_build_definition_for_the_method_called_to_element_stream___.call(
+              o.item_k, o.tail_k )
+          end
+        end
+
+        # ==
+
+        class DefineTreeClassMethods__
+
+          def initialize stem_sym, moi, cls, rule_sym=nil
+
+            @rule_symbol = rule_sym
+            @stem_symbol = stem_sym
+
+            @operation_session_prototype = _build_session_prototype_
+
+            @__tree_class = cls
+          end
+
+          def __to_hack_as_callable
+            method :__flush
+          end
+
+          def __flush
+
+            proto = @operation_session_prototype
+
+            _pluralized_method_name = :"#{ _some_stem_symbol }s"
+
+            _defn_for_etc = _build_definition_for_the_method_called_to_element_stream_
+
+            cls = remove_instance_variable :@__tree_class
+            cls.class_exec do
+
+              define_method _pluralized_method_name do
+                # (this is a soft alias to this:)
+                to_item_array_
+              end
+
+              define_method :session_prototype_ do
+                proto
+              end
+
+              define_method :to_element_stream_, _defn_for_etc
+
+              include InstanceMethodsForTreeClass___
+            end
+            NIL
+          end
+
+          def _some_stem_symbol
+            @stem_symbol || @rule_symbol
+          end
+        end
+
+        # (from this point on downward to #here1, we let legacy indentation run rampant..)
+
+    module InstanceMethodsForTreeClass___
 
       attr_accessor :prototype_  # so that we can add to lists with zero or one items
 
@@ -153,6 +204,7 @@ module Skylab::TanMan
       end
 
       def named_prototypes_  # collude in a hack implemented elsewhere meh
+        NOTHING_
       end
 
       # ~ mutators
@@ -215,23 +267,7 @@ module Skylab::TanMan
       end
     end
 
-    class Simple_Recursion_Methods_Builder___ < Methods_Builder__
-
-      def init_session_prototype_
-
-        @session = Simple_Recursion_Operation_Session___.new(
-
-          @some_stem_i,  # stem
-          :content,  # item
-          @rule_i ) # tail
-        nil
-      end
-
-      def _build_definition_for_the_method_called_to_element_stream_
-
-        tail_k = @session.tail_k
-        item_k = @session.item_k
-
+      For_simple_recursion_build_definition_for_the_method_called_to_element_stream___ = -> item_k, tail_k do
         -> do
           p = nil
           main_p = -> do
@@ -260,27 +296,8 @@ module Skylab::TanMan
           end
         end
       end
-    end
 
-    class Compound_Recursion_Methods_Builder___ < Methods_Builder__
-
-      def init_session_prototype_
-
-        @session = Compound_Recursion_Operation_Session__.new(
-
-          @stem_i,  # stem
-          @stem_i,  # item
-          :tail,  # tail
-          @rule_i )  # list
-
-        nil
-      end
-
-      def _build_definition_for_the_method_called_to_element_stream_
-
-        item_k = @session.item_k
-        list_k = @session.list_k
-        tail_k = @session.tail_k
+      For_compound_recursion_build_definition_for_the_method_called_to_element_stream__ = -> item_k, list_k, tail_k do
 
         -> do
           p = nil
@@ -315,9 +332,8 @@ module Skylab::TanMan
           end
         end
       end
-    end
 
-    class Operation_Session__
+    class OperationSession__
 
       # for those operations that mutate the list (append, insert, remove)
       # we implement each operation in its particular call with one session
@@ -487,7 +503,7 @@ module Skylab::TanMan
             _resolve_styling_for_front_insertion created_node, pl
           end
         else
-          raise Prototype_Required.new( 1, :insert_into )
+          raise PrototypeRequired.new( 1, :insert_into )
         end
       end
 
@@ -654,7 +670,7 @@ module Skylab::TanMan
       end
     end
 
-    class Simple_Recursion_Operation_Session___ < Operation_Session__
+    class SimpleRecursionOperationSession___ < OperationSession__
 
       # ~ appendation (the two #hook-out's)
 
@@ -756,11 +772,11 @@ module Skylab::TanMan
       end
     end
 
-    class Compound_Recursion_Operation_Session__ < Operation_Session__
+    class CompoundRecursionOperationSession___ < OperationSession__
 
-      def initialize _, __, ___, list=nil
-        super _, __, ___
+      def initialize stem_sym, item_sym, tail_sym, list=nil
         @list_k = list
+        super stem_sym, item_sym, tail_sym
       end
 
       attr_reader :list_k
@@ -878,7 +894,7 @@ module Skylab::TanMan
       end
     end
 
-    class Prototype_Required < ::RuntimeError
+    class PrototypeRequired < ::RuntimeError  # #testpoint
 
       def initialize d, verb_phrase_symbol
         @items_count = d
@@ -890,6 +906,12 @@ module Skylab::TanMan
 
       attr_reader :items_count
     end
-  end
+
+
+        # :#here1
+        # ==
+        # ==
+      end
+    end
   end
 end

@@ -11,7 +11,7 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
       it 'does not blink (works 2 times in a row)' do
         a = produce_result
         b = produce_result
-        a.class.rule.should eql(:nerks)
+        a.class.rule_symbol == :nerks || fail
         a.class.should eql(b.class)
         ( a.object_id == b.object_id ).should eql( false )
       end
@@ -26,16 +26,19 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
     let(:rest) { result.e1 }
 
     using_input '200-nerp' do
+
       it_unparses_losslessly
+
       it 'the second element is array-like' do
         o = rest
-        o.should be_respond_to( :each )
+        o.respond_to? :each or fail
         o.length.should eql(1)
       end
+
       it 'the first element of the above array looks like this' do
-        x = rest.first
-        x.class.expression.should eql(:nerks0)
-        x.nerk.should eql('bbb2')
+        sx = rest.first
+        sx.class.expression_symbol == :nerks0 || fail
+        sx.nerk == 'bbb2' || fail
       end
     end
 

@@ -88,7 +88,9 @@ module Skylab::CSS_Convert::TestSupport
 
       _rsx = Selective_Listener_as_Resources___.new( & p )
 
-      cls.new Home_.lib_.my_sufficiently_existent_tmpdir, _rsx, & p
+      _tmpdir = Home_.lib_.my_sufficiently_existent_tmpdir
+
+      cls.new _tmpdir, _rsx, & p
     end
   end
 

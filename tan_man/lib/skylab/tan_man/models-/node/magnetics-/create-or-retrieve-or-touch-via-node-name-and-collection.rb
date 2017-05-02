@@ -198,17 +198,22 @@ module Skylab::TanMan
           end ; nil
         end
 
-        def __process_node_for_neighbors node
-          stmt = node[ :stmt ]
-          rule_i = stmt.class.rule
-          if :node_stmt == rule_i
+        def __process_node_for_neighbors syntax_node
+
+          stmt = syntax_node[ :stmt ]
+          rule_sym = stmt.class.rule_symbol
+
+          if :node_stmt == rule_sym
             __process_significant_node_for_potential_neighbor stmt
+
           elsif @catch_the_first_non_node_stmt
             @first_non_node_stmt = stmt
             @catch_the_first_non_node_stmt = false  # 1 of 3
-          elsif :edge_stmt == rule_i && ! @first_edge_stmt
+
+          elsif :edge_stmt == rule_sym && ! @first_edge_stmt
             @first_edge_stmt = stmt
-          end ; nil
+          end
+          NIL
         end
 
         def __process_significant_node_for_potential_neighbor stmt

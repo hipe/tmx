@@ -104,12 +104,12 @@ module Skylab::CSS_Convert
 
     class << self
 
-      def build name, *childs
+      def via name, *childs
         childs.unshift name
         new childs
       end
 
-      alias_method :[], :build
+      alias_method :[], :via
 
       private :new
     end  # >>

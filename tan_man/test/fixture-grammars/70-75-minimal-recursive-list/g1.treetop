@@ -3,7 +3,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_75
     rule node
       s? content:( 'f' [aeiour]+ 'p' ) separator:( s? ';' s? ) node:node?
       {
-        def tree
+        def _to_final_parse_tree_
           ::Skylab::TanMan::Sexp_::Auto::LosslessRecursive[ self ]
         end
       }

@@ -33,7 +33,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule stmt_separator
       s? ';' s? / s
-      { def tree ; text_value end }
+      { def _to_final_parse_tree_ ; text_value end }
     end
     rule stmt
       # The order as generated (below) won't work for us because

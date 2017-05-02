@@ -13,9 +13,15 @@ grammar CssFile
 
 
   rule css_file
+
     things:( space ( style_block / at_rule ) )* space <CssFile> {
-      def tree
-        CustomTree::Aggregate[:css_file, * (things.elements.map(&:tree) + [space.tree])]
+
+      def _to_final_parse_tree_
+
+        a = things.elements.map( & :_to_final_parse_tree_ )
+        a.push space._to_final_parse_tree_
+
+        CustomTree::Aggregate[ :css_file, *a ]
       end
     }
   end
@@ -23,7 +29,7 @@ grammar CssFile
   # http://www.w3.org/TR/CSS21/syndata.html#at-rules
   rule at_rule
     '@' css_identifier ( ';' / css_block ) <AtRule> {
-      def tree
+      def _to_final_parse_tree_
         :at_rule
       end
     }
@@ -42,7 +48,7 @@ grammar CssFile
 
   rule style_block
     space selector space '{' space assignment* '}' <StyleBlock> {
-      def tree
+      def _to_final_parse_tree_
         :style_block
       end
     }
@@ -54,7 +60,7 @@ grammar CssFile
   #
   rule selector
     simple_selector_sequence ( combinator simple_selector_sequence )* pseudo_element? <Selectors> {
-      def tree
+      def _to_final_parse_tree_
         :selector
       end
     }
@@ -67,7 +73,7 @@ grammar CssFile
   #
   rule pseudo_element
     "::" ( "first-line" / "first-letter" / "before" / "after" ) <PseudoElement> {
-      def tree
+      def _to_final_parse_tree_
         :pseudo_element
       end
     }
@@ -82,7 +88,7 @@ grammar CssFile
   #
   rule simple_selector_sequence
     (type_selector / universal_selector) (attribute_selector / class_selector / id_selector / pseudo_class ) <SimpleSelectorSequence> {
-      def tree
+      def _to_final_parse_tree_
         :simple_selector_sequence
       end
     }
@@ -101,7 +107,7 @@ grammar CssFile
   #
   rule combinator
     ( white* combinator_operator:[>+~] ) / white+ <Combinator> {
-      def tree
+      def _to_final_parse_tree_
         :combinator # rember the whitespace combinator is the Descendant combinator
       end
     }
@@ -112,7 +118,7 @@ grammar CssFile
 
   rule assignment
     assignment_name space ':' space assignment_value space ';' space <Assignment> {
-      def tree
+      def _to_final_parse_tree_
         :assignment
       end
     }
@@ -120,7 +126,7 @@ grammar CssFile
 
   rule assignment_value
     [^;]+ <AssignmentValue> {
-      def tree
+      def _to_final_parse_tree_
         :assgnmt_val
       end
     }
@@ -128,7 +134,7 @@ grammar CssFile
 
   rule element_name
     [a-z] [a-z0-9]* <ElementName> { # h1 etc
-      def tree
+      def _to_final_parse_tree_
         :el_name_val
       end
     }
@@ -136,7 +142,7 @@ grammar CssFile
 
   rule class_selector
     '.' [-_a-zA-z] [-_a-zA-Z0-9]* <ClassSelector> {
-      def tree
+      def _to_final_parse_tree_
         :cls_sel_val
       end
     }
@@ -144,7 +150,7 @@ grammar CssFile
 
   rule pseudoclass_selector
     ':' [a-z]+ <PseudoclassSelector> {
-      def tree
+      def _to_final_parse_tree_
         :pseudo_val
       end
     }
@@ -152,7 +158,7 @@ grammar CssFile
 
   rule assignment_name
     [-a-z]+ <AssignmentName> {
-      def tree
+      def _to_final_parse_tree_
         :assignment_name
       end
     }
@@ -160,7 +166,7 @@ grammar CssFile
 
   rule c_style_comment
     '/*' ( [^*] / '*' !'/' )* '*/' <CStyleComment> {
-      def tree
+      def _to_final_parse_tree_
         CustomTree::Whitesque[:c_style_comment, text_value]
       end
     }
@@ -168,7 +174,7 @@ grammar CssFile
 
   rule space
     ( c_style_comment / white )* <Space> {
-      def tree
+      def _to_final_parse_tree_
         CustomTree::Aggregate[:space, * elements.map(&:tree) ]
       end
     }
@@ -181,7 +187,7 @@ grammar CssFile
   #
   rule white
     [ \t\n\r\f]+ <White> {
-      def tree
+      def _to_final_parse_tree_
         CustomTree::Whitesque[:white, elements.first.text_value]
       end
     }

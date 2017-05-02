@@ -28,6 +28,7 @@ explain MTk and associate the explanation with its nodes
 API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
 `make_action_class` and related: liquidate this. (push back as necessary)
+(many $stderr in [tm])
 (many `if false` in [tm])
 #open [#tm-097] abstract when an expected primitive is not found in config
 (model: graph)
@@ -51,11 +52,6 @@ TD tan_man/test/54-operations/68-association/44-create_spec.rb
 TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 (model: node)
 TD tan_man/test/54-operations/59-node/64-prototype_spec.rb
-(clean up sexp auto)
-anchor_module
-name promote: _parse_id
-the name `i`
-indentation of comments
 create or retrieve or touch via node name
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

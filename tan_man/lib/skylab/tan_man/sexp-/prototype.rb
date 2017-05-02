@@ -212,7 +212,7 @@ module Skylab::TanMan
     end
 
     def process_parse_result syntax_node
-      sexp = tree_class.element2tree syntax_node, :whatever
+      sexp = tree_class.tree_via_syntax_node_ syntax_node, :whatever
       res = nil
 
       use_name = -> do                         # for now, we use either the

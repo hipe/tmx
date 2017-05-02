@@ -8,48 +8,63 @@ module Skylab
         end
         rule merge_statement
           itf:in_the_folder? sif:styles_in_files su:styles_under? merge_list '.' space* {
-            def tree
-              S[:merge_statement, {
-                :in_the_folder => itf.respond_to?(:tree) && itf.tree,
-                :styles_in_files => sif.tree,
-                :styles_under => su.respond_to?(:tree) && su.tree,
-                :merge_list => merge_list.tree
-              }]
+            def _to_final_parse_tree_
+
+              x = itf
+              if x.respond_to? :_to_final_parse_tree_
+                _itf_tree = itf._to_final_parse_tree_
+              end
+
+              x = su
+              if x.respond_to? :_to_final_parse_tree_
+                _su_tree = x._to_final_parse_tree_
+              end
+
+              S.via(
+                :merge_statement, {
+                  in_the_folder: _itf_tree,
+                  styles_in_files: sif._to_final_parse_tree_,
+                  styles_under: _su_tree,
+                  merge_list: merge_list._to_final_parse_tree_,
+                }
+              )
             end
           }
         end
         rule in_the_folder
           [Ii] "n" (space "the")? space "folder" space folder:literal phrase_end {
-            def tree
+            def _to_final_parse_tree_
               S[:in_the_folder, {:path => folder.value} ]
             end
           }
         end
         rule styles_in_files
           [Ff] "or styles in " left:literal " on the left" ","? " and styles in " right:literal " on the right" phrase_end {
-            def tree
+            def _to_final_parse_tree_
               S[:for_styles_in_files, { :left => left.value, :right => right.value} ]
             end
           }
         end
         rule styles_under
           "for styles under " left:literal " on the left" ','? " and styles under " right:literal " on the right" phrase_end {
-            def tree
+            def _to_final_parse_tree_
               S[:styles_under, { :left => left.value, :right => right.value} ]
             end
           }
         end
         rule merge_list
           "merge the styles in the left over the styles on the right where" space applies_list {
-            def tree
-              applies_list.tree
+            def _to_final_parse_tree_
+              applies_list._to_final_parse_tree_
             end
           }
         end
         rule applies_list
           list:( pairing aesthetic_sep )* oneof:( catchall_pairing / pairing ) {
-            def tree
-              list.elements.map{ |x| x.pairing.tree } + [ oneof.tree ]
+            def _to_final_parse_tree_
+              a = list.elements.map { |el| el.pairing._to_final_parse_tree_ }
+              a.push oneof._to_final_parse_tree_
+              a
             end
           }
         end
@@ -58,14 +73,14 @@ module Skylab
         end
         rule pairing
           space* left:literal space+ "applies to" space+ right:quoted_string {
-            def tree
+            def _to_final_parse_tree_
               S[:pairing, {:left => left.value, :right => right.value} ]
             end
           }
         end
         rule catchall_pairing
           space* left:literal space+ "applies to" space+ "everything else" {
-            def tree
+            def _to_final_parse_tree_
               S[:catchall_pairing, {:left => left.value} ]
             end
           }

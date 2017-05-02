@@ -12,19 +12,24 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
       context 'add to' do
 
         it 'position 1 - fails because no prototype' do
-          -> do
+          begin
             result.insert_item_before_item_string_ 'fap', 'fip'
-          end.should raise_same_error
+          rescue _same_ex_class => e
+          end
+          e || fail
         end
+
 
         it 'position 2 (append) - fails because no prototype' do
-          -> do
+          begin
             result.insert_item_before_item_string_ 'fap', 'fip'
-          end.should raise_same_error
+          rescue _same_ex_class => e
+          end
+          e || fail
         end
 
-        def raise_same_error
-          raise_error subject::Prototype_Required
+        def _same_ex_class
+          subject::PrototypeRequired
         end
       end
 

@@ -26,14 +26,14 @@ module Skylab::TanMan
 
     def _edge_stmts
       _get_stmt_scan.reduce_by do |stmt|
-        :edge_stmt == stmt.class.rule
+        :edge_stmt == stmt.class.rule_symbol
       end
     end
 
     def _first_label_stmt
-      stmt_list.stmts.detect do |el|
-        if :equals_stmt == el.class.rule
-          LABEL_LABEL_ == el.lhs.normal_content_string_
+      stmt_list.stmts.detect do |sn|
+        if :equals_stmt == sn.class.rule_symbol
+          LABEL_LABEL_ == sn.lhs.normal_content_string_
         end
       end
     end
@@ -79,12 +79,12 @@ module Skylab::TanMan
     end
 
     def to_node_statement_stream
-      get_stmt_scan.reduce_by do |stmt_list|
-        :node_stmt == stmt_list.stmt.class.rule
+     __to_stmt_stream.reduce_by do |stmt_list|
+        :node_stmt == stmt_list.stmt.class.rule_symbol
       end
     end
 
-    def get_stmt_scan
+    def __to_stmt_stream
       sl = stmt_list
       if sl
         sl.to_element_stream_

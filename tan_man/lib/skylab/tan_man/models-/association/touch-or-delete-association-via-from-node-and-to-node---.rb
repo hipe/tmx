@@ -475,7 +475,7 @@ module Skylab::TanMan
         sl = graph_sexp.stmt_list or break
         sl.elements_.each do |stmt_list|
           stmt = stmt_list.stmt or next
-          :edge_stmt == stmt.class.rule or next
+          :edge_stmt == stmt.class.rule_symbol || next
           y << stmt_list
         end
         nil
