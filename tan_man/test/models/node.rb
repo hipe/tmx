@@ -43,7 +43,7 @@ module Skylab::TanMan::TestSupport
 
       _client.parse_file _path do |dc|
 
-        @OB_FOR_NODES = Here__.__lib::NodesOperatorBranchFacade_.new dc
+        @OB_FOR_NODES = Here__.__lib::NodesOperatorBranchFacade_TM.new dc
         x = yield
         remove_instance_variable :@OB_FOR_NODES
         x

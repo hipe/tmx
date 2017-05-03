@@ -192,6 +192,11 @@ module Skylab::Zerk
       end
       public :stylize
 
+      def mixed_primitive s
+        # (this method is to replace `val` eventually)
+        s.inspect
+      end
+
       def val x  # assume "primitive"
         x.inspect
       end

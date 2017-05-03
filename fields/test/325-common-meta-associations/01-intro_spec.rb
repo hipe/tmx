@@ -101,7 +101,7 @@ module Skylab::Fields::TestSupport
 
         s_a = e.message.split NEWLINE_
         s_a.first == "unrecognized meta-association 'floozie_poozie'." || fail
-        s_a.last =~ /\Adid you mean '/ || fail
+        s_a.last =~ /\Adid you mean :/ || fail
       end
     end
 

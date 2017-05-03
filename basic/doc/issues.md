@@ -129,6 +129,9 @@
 [#007]       #doc-point #parent:006 #body-is-inline-in-parent
                `operation` posited.
 
+             also: (just to have it somewhere in this file)
+             [#tm-011] "unobtrusive lexicalesque-ordering" algorithm will move to [ba] (somewhere)
+
 [#006]       #doc-node developing a pattern language for abstract structures ..
 
 [#005]       #track-node all String Templating-like nerks

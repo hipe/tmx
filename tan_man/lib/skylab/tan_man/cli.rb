@@ -117,7 +117,11 @@ module Skylab::TanMan
         sym.id2name.gsub UNDERSCORE_, DASH_
       end
 
-      # ~ other stuff
+      def mixed_primitive x
+        x.inpsect
+      end
+
+      # ~ custom stuff
 
       def pth s
         if s.respond_to? :to_path
@@ -134,6 +138,14 @@ module Skylab::TanMan
 
       def component_label s  # (replaces `lbl` #todo)
         s.ascii_only?  # hi.
+        s.inspect
+      end
+
+      def code s
+        kbd "'#{ s }'"
+      end
+
+      def mixed_primitive s
         s.inspect
       end
 
@@ -157,10 +169,6 @@ module Skylab::TanMan
 
       def and_ a
         _NLP_agent.and_ a
-      end
-
-      def code s
-        kbd "'#{ s }'"
       end
 
     public def hdr x
@@ -207,10 +215,6 @@ module Skylab::TanMan
 
       def s * x_a
         _NLP_agent.s( * x_a )
-      end
-
-      def val x
-        x
       end
 
       def stylize style_d_a, string

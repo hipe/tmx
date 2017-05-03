@@ -24,7 +24,7 @@ module Skylab::TanMan
 
       def __via_immutable_digraph
 
-        NodesOperatorBranchFacade_.new( @_immutable_digraph_ ).to_dereferenced_item_stream__
+        NodesOperatorBranchFacade_TM.new( @_immutable_digraph_ ).to_dereferenced_item_stream__
       end
 
       if false

@@ -210,6 +210,10 @@ module Skylab::TanMan
         sym  # oops i'm in API
       end
 
+      def mixed_primitive s
+        s.inspect
+      end
+
       # ~ custom stuff
 
       def sentence_phrase__ * x_a
@@ -229,6 +233,11 @@ module Skylab::TanMan
         s.inspect
       end
 
+      def code s
+        # (used e.g for showing a snipped of dot language for a digraph)
+        "'#{ s }'"
+      end
+
       def app_name_string
         Home_.name_function.as_human
       end
@@ -236,10 +245,6 @@ module Skylab::TanMan
       # ~ old stuff to deprecate, here for reference
 
       if false
-
-      def code s
-        "'#{ s }'"
-      end
 
       def hdr s
         s
@@ -262,10 +267,6 @@ module Skylab::TanMan
           x = x.name.as_lowercase_with_underscores_symbol
         end
         "'#{ x }'"
-      end
-
-      def val x
-        x.inspect
       end
       end
 

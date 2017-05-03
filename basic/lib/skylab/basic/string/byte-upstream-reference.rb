@@ -68,10 +68,6 @@ module Skylab::Basic
         def _same
           Here_::LineStream_via_String[ @_string_ ]
         end
-
-        def BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE  # [tm] experiment
-          TRUE
-        end
     end
 
     module MethodsForDownstream___
@@ -81,12 +77,12 @@ module Skylab::Basic
         end
     end
 
-    class ByteStreamReference__  # (re-open
+    class ByteStreamReference__  # (re-open)
 
       def description_under expag
         s = Here_.ellipsify( @_string_ ).inspect
         expag.calculate do
-          val s
+          mixed_primitive s  # used to be `val`
         end
       end
 
@@ -127,6 +123,10 @@ module Skylab::Basic
         def modality_const
           :ByteStream
         end
+
+      def BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE  # [tm] experiment
+        TRUE
+      end
     end
 
     # ==

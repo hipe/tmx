@@ -2,49 +2,67 @@ module Skylab::TanMan
 
   class Models_::Association
 
-    class TouchOrDeleteAssociation_via_FromNode_and_ToNode__
+    class TouchOrDeleteAssociation_via_FromNode_and_ToNode___ < Common_::MagneticBySimpleModel
 
-      Actor_.call( self,
-       :verb,  # 'touch' | 'delete'
-       :attrs,
-       :prototype_i,
-       :from_node_label, :to_node_label,
-       :from_node_ID, :to_node_ID,
-       :document,
-       :kernel,
+      def initialize
+        @_is_label_based = false  # for now, always?
+        super
+      end
+
+      def from_node_label= x
+        _be_label_based
+        @from_node_label = x
+      end
+
+      def to_node_label= x
+        _be_label_based
+        @to_node_label = x
+      end
+
+      def _be_label_based
+        @_is_label_based = true ; nil
+      end
+
+      attr_writer(
+        :digraph_controller,
+        :entity_via_element_by,
+        :listener,
+        :verb_lemma_symbol,  # `touch` | `delete`
       )
 
-      def initialize & p
-        @from_node_label = nil  # used as a canary
-        @on_event_selectively = p
+      if false
+      xx(
+       :attrs,
+       :prototype_i,
+      )
       end
 
       def execute
 
-        @parser = @document.graph_sexp.class
+        @parser = @digraph_controller.graph_sexp.class
 
         ok = __resolve_stmt_list_and_stream
 
-        if ok && @from_node_label
+        if ok && @_is_label_based
           ok = find_nodes
         end
 
         ok &&= find_neighbor_associations
         ok && work
 
-        @result
+        remove_instance_variable :@result
       end
 
     private
 
       def __resolve_stmt_list_and_stream
-        @stmt_list = @document.graph_sexp.stmt_list
+        @stmt_list = @digraph_controller.graph_sexp.stmt_list
         if @stmt_list
-          @st = @stmt_list.to_element_stream_
+          @__stmt_list_stream = @stmt_list.to_element_stream_
           ACHIEVED_
-        elsif :delete == @verb
+        elsif :delete == @verb_lemma_symbol
           when_no_stmt_list
-        elsif :touch == @verb
+        elsif :touch == @verb_lemma_symbol
           __resolve_stmt_list_and_stream_by_hacking_an_empty_thing_into_existence
         else
           self._HOLE
@@ -57,7 +75,7 @@ module Skylab::TanMan
         # life is easier if we hack an empty statement list into existence.
         # these do not occur in nature. we need one because touch.
 
-        _prs = @document.graph_sexp.class
+        _prs = @digraph_controller.graph_sexp.class
         proto = _prs.parse :stmt_list, "a->b\nc->d\n"  # that last one..
           # the NT classes are not guaranteed to be generated yet
 
@@ -68,7 +86,7 @@ module Skylab::TanMan
 
         sx.prototype_ = proto
 
-        @document.graph_sexp.stmt_list = sx
+        @digraph_controller.graph_sexp.stmt_list = sx
         @stmt_list = sx
         @st = sx.to_element_stream_
 
@@ -77,7 +95,7 @@ module Skylab::TanMan
 
       def when_no_stmt_list
         maybe_send_event :error, :no_stmt_list do
-          build_not_OK_event_with :no_stmt_list, :document, @document
+          build_not_OK_event_with :no_stmt_list, :document, @digraph_controller
         end
         @result = UNABLE_
         UNABLE_
@@ -85,29 +103,28 @@ module Skylab::TanMan
 
       def find_nodes
 
-        @touch_node = Models_::Node::Magnetics_::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection.curry_with(
-          :verb,  send( :"node_verb_when_#{ @verb }" ),
-          :document, @document,
-          :kernel, @kernel,
-          & @on_event_selectively )
+        # :#tombstone-A.1: we used to use the nodes related-magnet directly
+        # (even doing a trick with currying the performer). now we honor
+        # one further level of abstraction and stay behind the "o.b" facade:
+
+        @_nodes = Models_::Node::NodesOperatorBranchFacade_TM.new @digraph_controller
 
         ok = __resolve_from_node
         ok &&= __resolve_to_node
-
-        if ok
-          ACHIEVED_
-        else
-          @result = ok
-        end
+        _procede_if ok
       end
 
       def __resolve_from_node
-        _from_node = @touch_node.call_via :name, @from_node_label
+
+        _from_node = @_nodes.procure_node_via_label_ @from_node_label, & @listener
+
         _store :@from_node, _from_node
       end
 
       def __resolve_to_node
-        _to_node = @touch_node.call_via :name, @to_node_label
+
+        _to_node = @_nodes.procure_node_via_label_ @to_node_label, & @listener
+
         _store :@to_node, _to_node
       end
 
@@ -120,6 +137,7 @@ module Skylab::TanMan
       end
 
       def find_neighbor_associations
+        # :[#br-011] unobtrusive lexical-esque insertion
         @least_greater_edge_stmt = nil
         @greatest_lesser_edge_stmt = nil
         @matched_stmt = nil
@@ -130,11 +148,17 @@ module Skylab::TanMan
         snid_s = @source_node_ID_s
         tnid_s = @target_node_ID_s
 
-
-        stmt_list = @st.gets
-        while stmt_list
+        st = remove_instance_variable :@__stmt_list_stream
+        begin
+          stmt_list = st.gets
+          stmt_list || break
           stmt = stmt_list.stmt
-          if :edge_stmt == stmt.class.rule
+          if :edge_stmt != stmt.class.rule_symbol
+            redo
+          end
+
+          # ~ (legacy (cleanup whenever)
+
             snid_s_ = stmt.source_node_id.id2name
             tnid_s_ = stmt.target_node_id.id2name
             _d = snid_s <=> snid_s_
@@ -151,16 +175,17 @@ module Skylab::TanMan
             when  1  # subject should go after current
               @greatest_lesser_edge_stmt = stmt
             end
-          end
-          stmt_list = @st.gets
-        end
+          # ~ )
+
+          redo
+        end while above
 
         ok
       end
 
       def __init_node_ID_symbols_and_strings
 
-        if @from_node_label
+        if @_is_label_based
           @source_node_ID_sym = @from_node.node_ID_symbol_
           @target_node_ID_sym = @to_node.node_ID_symbol_
         else
@@ -175,7 +200,7 @@ module Skylab::TanMan
       end
 
       def when_same stmt
-        send :"when_same_when_#{ @verb }", stmt
+        send :"when_same_when_#{ @verb_lemma_symbol }", stmt
       end
 
       def when_same_when_touch stmt
@@ -209,7 +234,7 @@ module Skylab::TanMan
       end
 
       def work
-        send :"work_when_#{ @verb }"
+        send :"work_when_#{ @verb_lemma_symbol }"
       end
 
       # ~ touch
@@ -391,7 +416,7 @@ module Skylab::TanMan
 
         maybe_send_event :error, :component_not_found do
 
-          _as_component = Conceptual_Association___.new @from_node, @to_node
+          _as_component = UnsanitizedAssociation___.new @from_node, @to_node
 
           ACS_[]::Events::ComponentNotFound.with(
             :component, _as_component,
@@ -402,40 +427,25 @@ module Skylab::TanMan
         UNABLE_
       end
 
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      def via_matched_stmt_work_when_delete
 
-      class Conceptual_Association___
+        removed_el = @stmt_list.remove_item_ @matched_stmt
 
-        # experimental :+[#029] entity not yet associated with document
-        # we shoehorned this in after everything to work with the new
-        # [#ac-007] exprssive events. could use better integration..
-
-        def initialize from_node, to_node
-          @from_node = from_node
-          @to_node = to_node
-        end
-
-        def description_under expag
-
-          s = "#{ @from_node.node_ID_symbol_ } -> #{ @to_node.node_ID_symbol_ }"
-          expag.calculate do
-            code s
-          end
-        end
+        removed_el and __did_remove removed_el
       end
 
-      def via_matched_stmt_work_when_delete
-        removed_item = @stmt_list.remove_item_ @matched_stmt
+      def __did_remove removed_el
+
         # result is structurally like argument, but different object. we discard
-        if removed_item
-          maybe_send_event :info, :deleted_association do
-            build_OK_event_with :deleted_association, :association, removed_item
-          end
-          @result = ACHIEVED_
-          nil
-        else
-          removed_item
+
+        ent = @entity_via_element_by[ removed_el ]
+
+        maybe_send_event :info, :deleted_association do
+          build_OK_event_with :deleted_association, :association, ent
         end
+
+        @result = ent
+        NIL
       end
 
     if false  # #open [#015] remove association
@@ -482,6 +492,61 @@ module Skylab::TanMan
       end
     end
     end
+
+      # -- (retrofit the older code that uses these, it's fine)
+
+      def maybe_send_event * chan, & ev_p
+        @listener.call( * chan ) do
+          ev_p[]  # hi.
+        end
+        NIL
+      end
+
+      def build_not_OK_event_with * a, & p
+        Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc a, p
+      end
+
+      def build_OK_event_with * a, & p
+        Common_::Event.inline_OK_via_mutable_iambic_and_message_proc a, p
+      end
+
+      # --
+
+      def _procede_if x  # experiment
+        if x
+          ACHIEVED_
+        else
+          @result = x ; x
+        end
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # ==
+
+      class UnsanitizedAssociation___
+
+        # represent a would-be association (#[#029] not yet associated with
+        # document) so that it is compatible with [#ac-007] expressive events
+        # (even though perhaps it could not be inserted into the document)
+
+        def initialize from_node, to_node
+          @from_node = from_node
+          @to_node = to_node
+        end
+
+        def description_under expag
+
+          s = "#{ @from_node.node_ID_symbol_ } -> #{ @to_node.node_ID_symbol_ }"
+          expag.calculate do
+            code s
+          end
+        end
+      end
+
+      # ==
+      # ==
     end
   end
 end
+# :#tombstone-A.1 (can be temporary) (as referenced)

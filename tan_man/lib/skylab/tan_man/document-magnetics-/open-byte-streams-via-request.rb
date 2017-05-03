@@ -81,18 +81,36 @@ module Skylab::TanMan
 
         if in_ref.is_same_waypoint_as out_ref
 
-          _use_ref = in_ref.to_TWO_WAY_byte_stream_reference
-
-          obs = _open_stream_by do |o|
-            o.be_for_read_write
-            o.byte_stream_reference = _use_ref
-          end
-
-          obs and _finish obs
+          __finish_by_making_one_two_way_stream in_ref
         else
-          ::Kernel._COVER_ME__two_streams_is_fine__
+          __finish_by_making_two_one_way_streams in_ref, out_ref
         end
       end
+
+      def __finish_by_making_one_two_way_stream in_ref
+
+        _use_ref = in_ref.to_TWO_WAY_byte_stream_reference
+
+        obs = _open_stream_by do |o|
+          o.be_for_read_write
+          o.byte_stream_reference = _use_ref
+        end
+
+        obs and _finish obs
+      end
+
+      def __finish_by_making_two_one_way_streams in_ref, out_ref  # #cov2.5
+
+        ibs = _open_stream in_ref
+        if ibs
+          obs = _open_stream out_ref
+          if obs
+            _finish ibs, obs
+          end
+        end
+      end
+
+      # --
 
       def __execute_for_lone_BSR
 
@@ -112,6 +130,12 @@ module Skylab::TanMan
         obs and _finish obs
       end
 
+      def _open_stream bsr
+        _open_stream_by do |o|
+          o.byte_stream_reference = bsr
+        end
+      end
+
       def _open_stream_by
 
         Mags_[]::OpenByteStream_via_ByteStreamReference.call_by do |o|  # 1x
@@ -122,9 +146,7 @@ module Skylab::TanMan
       end
 
       def _finish * sbsrs
-        if 1 != sbsrs.length
-          self._COVER_ME__follow_me_two_SBSRs__
-        end
+        (1..2).include? sbsrs.length || self._SANITY
         sbsrs.freeze
       end
     # -

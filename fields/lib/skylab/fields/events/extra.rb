@@ -175,10 +175,12 @@ module Skylab::Fields
 
           y = @_line_downstream
           @_expression_agent.calculate do
-            # -
 
-        _m = respond_to?( :code ) ? :code : :ick_mixed
-        code = method _m
+            # ..
+              code = method :mixed_primitive  # used to be `code`, `ick_mixed`
+            # ..
+
+            # -
 
         simple_inflection do
           buff = "did you mean "

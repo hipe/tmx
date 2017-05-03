@@ -550,22 +550,6 @@ module Skylab::TanMan
     end  # >>
   end
 
-  class Models_::Association < Graph_Document_Entity__
-
-    @after_name_symbol = :node
-
-    @description_proc = -> y do
-      y << "view and edit associations"
-    end
-
-    Actions = stubber
-
-    module Actions
-      Add = stub
-      Rm = stub
-    end
-  end
-
   class Models_::Meaning < Graph_Document_Entity__
 
     @after_name_symbol = :association

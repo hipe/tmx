@@ -92,13 +92,23 @@ module Skylab::TanMan
       end
       end  # if false
 
-    class NodesOperatorBranchFacade_
+    class NodesOperatorBranchFacade_TM
 
       def initialize dc
         @_digraph_controller = dc  # ivar name is #testpoint
       end
 
-      def touch_node_via_label___ label, & any_listener  # #testpoint only (for now)
+      def touch_node_via_label___ label, & p  # #testpoint only (for now)
+
+        _operation :touch, p, label
+      end
+
+      def procure_node_via_label_ label, & p
+
+        _operation :retrieve, p, label
+      end
+
+      def _operation sym, any_listener, label
 
         _un = UnsanitizedNode_.new label
 
@@ -110,7 +120,7 @@ module Skylab::TanMan
             Here_.new_flyweight_.reinit_as_flyweight_ node_stmt
           end
 
-          o.verb_lemma_symbol = :touch
+          o.verb_lemma_symbol = sym
           o.document = @_digraph_controller
           o.listener = any_listener
         end

@@ -2,64 +2,110 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - association delete", wip: true do
+  describe "[tm] operations - association delete" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :models_association
 
 # (1/N)
-    it "remove when first node not found (no stmt_list)" do
-      call_API_against "digraph {\n}\n"
-      expect_not_OK_event :no_stmt_list
-      expect_empty_output
-      expect_fail
+    context "remove when first node not found (no stmt_list)" do  # :#cov2.5
+
+      it "fails" do
+        fails_
+      end
+
+      it "dedicated emission" do
+        _actual = black_and_white tuple_.event_of_significance
+        _actual =~ /\Ano stmt list - / || fail  # (the whole string is repeated)
+      end
+
+      shared_subject :tuple_ do
+        will_remove_association_foo_bar_from_ "digraph {\n}\n"
+        tuple_for_dedicated_emission_and_failure_ :no_stmt_list
+      end
     end
 
 # (2/N)
-    it "remove when first node not found" do
-      call_API_against "digraph {\nbaz}\n"
-      expect_not_OK_event :node_not_found, 'node not found - (ick "foo")'
-      expect_empty_output
-      expect_fail
+    context "remove when first node not found" do
+
+      it "fails" do
+        fails_
+      end
+
+      it "dedicated emission" do
+        expect_message_ 'node not found - "foo"'
+      end
+
+      shared_subject :tuple_ do
+        will_remove_association_foo_bar_from_ "digraph {\nbaz}\n"
+        tuple_for_dedicated_emission_and_failure_ :node_not_found
+      end
     end
 
 # (3/N)
-    it "remove when 2nd node not found" do
-      call_API_against "digraph {\n foo [ label = \"foo\"]\n }\n"
-      expect_not_OK_event :node_not_found, 'node not found - (ick "bar")'
-      expect_empty_output
-      expect_fail
+    context "remove when 2nd node not found" do
+
+      it "fails" do
+        fails_
+      end
+
+      it "dedicated emission" do
+        expect_message_ 'node not found - "bar"' || fail
+      end
+
+      shared_subject :tuple_ do
+        will_remove_association_foo_bar_from_ "digraph {\n foo [ label = \"foo\"]\n }\n"
+        tuple_for_dedicated_emission_and_failure_ :node_not_found
+      end
     end
 
 # (4/N)
-    it "remove when not associated" do
-      call_API_against "digraph {\n foo\nbar\nbar -> foo\n }\n"
-      expect_not_OK_event :component_not_found,
-        'association not found - (code "foo -> bar")'
-      expect_empty_output
-      expect_fail
+    context "remove when not associated" do
+
+      it "fails" do
+        fails_
+      end
+
+      it "dedicated emission" do
+        expect_message_ "association not found - 'foo -> bar'"
+      end
+
+      shared_subject :tuple_ do
+        will_remove_association_foo_bar_from_ "digraph {\n foo\nbar\nbar -> foo\n }\n"
+        tuple_for_dedicated_emission_and_failure_ :component_not_found
+      end
     end
 
 # (5/N)
-    it "remove when associated" do
-      call_API_against "digraph {\n foo\nbar\nfoo -> bar\n }\n"
-      expect_OK_event :deleted_association do |ev|
-        ev.to_event.association.unparse.should eql "foo -> bar"
+    context "remove when associated" do
+
+      it "event has association deleted" do
+        event_.association.edge_stmt.unparse == "foo -> bar" || fail
       end
-      @output_s.should eql "digraph {\n foo\nbar\n}\n"
-      expect_event :wrote_resource
-      expect_succeed
+
+      it "final output" do
+        final_output_ == "digraph {\n foo\nbar\n}\n" || fail
+      end
+
+      shared_subject :tuple_ do
+
+        will_remove_association_foo_bar_from_ "digraph {\n foo\nbar\nfoo -> bar\n }\n"
+
+        tuple_for_money_town_ do |tup|  # ick/meh
+
+          expect :info, :deleted_association do |ev|
+            tup.event_of_significance = ev
+          end
+
+          expect :success, :wrote_resource
+        end
+      end
     end
 
-    def expect_empty_output
-      @output_s.should eql EMPTY_S_
-    end
-
-    def call_API_against inp_s
-      @output_s = ::String.new
-      call_API :association, :rm,
-        :input_string, inp_s, :output_string, @output_s,
-        :from_node_label, 'foo', :to_node_label, 'bar'
-    end
+    # ==
+    # ==
   end
 end
+# #history-A: full rewrite during ween off [br]-era

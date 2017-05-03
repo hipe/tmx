@@ -1,26 +1,12 @@
 module Skylab::TanMan
 
-  class Models_::Association  # re-opening
+  class Models_::Association
+
+    # "view and edit associations"
+
+    # (begins as entity class #here1)
 
     if false
-    edit_entity_class(
-
-      :persist_to, :association,
-
-      :preconditions, [ :dot_file, :node ],
-
-      :property,
-      :from_node_label,
-
-      :property,
-      :from_node_ID,
-
-      :property,
-      :to_node_label,
-
-      :property,
-      :to_node_ID )
-
     Actions__ = make_action_making_actions_module
 
     module Actions__
@@ -50,27 +36,6 @@ module Skylab::TanMan
             @edited_entity = asc
           end
           super
-        end
-      end
-
-      Rm = make_action_class :Delete
-
-      class Rm
-
-        edit_entity_class(
-
-          :reuse, Model_::DocumentEntity.IO_properties,
-
-          :required, :property, :from_node_label,
-          :required, :property, :to_node_label )
-
-
-        properties.remove Brazen_::NAME_SYMBOL  # it's ok to mutate this, yeah?
-
-
-        def produce_result
-          entity_collection.delete_entity(
-            self, nil, & handle_event_selectively )
         end
       end
     end
@@ -106,25 +71,34 @@ module Skylab::TanMan
 
     attr_reader :has_both_labels_, :has_both_IDs_
 
-    class Silo_Daemon < Silo_daemon_base_class_[]
+    end  # if false (for the add action)
 
-      def association_collection_controller_via_preconditions bx, & oes_p
+    class AssocOperatorBranchFacade_
+      # was: Collection_Controller___ < Model_::DocumentEntity::Collection_Controller
 
-        # :+#actionless-collection-controller-experiment
-
-        precondition_for_self :_no_action_2_,
-          @silo_module.node_identifier,
-          bx,
-          & oes_p
+      def initialize dc
+        @_digraph_controller = dc
       end
 
-      def precondition_for_self action, id, bx, & oes_p
-        Collection_Controller___.new action, bx, @silo_module, @kernel, & oes_p
+      def procure_remove_association__ compound_key, & p
+
+        _from_node_label, _to_node_label = compound_key
+
+        Here_::TouchOrDeleteAssociation_via_FromNode_and_ToNode___.call_by do |o|
+
+          o.from_node_label = _from_node_label
+          o.to_node_label = _to_node_label
+
+          o.entity_via_element_by = method :__entity_via_edge_stmt
+
+          o.verb_lemma_symbol = :delete
+
+          o.digraph_controller = @_digraph_controller
+          o.listener = p
+        end
       end
-    end
 
-    class Collection_Controller___ < Model_::DocumentEntity::Collection_Controller
-
+      if false
       def touch_association_via_node_labels src_lbl_s, dst_lbl_s, & oes_p
 
         oes_p ||= @on_event_selectively
@@ -212,6 +186,7 @@ module Skylab::TanMan
       end
 
       def _info_via_into_collection_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p
+        self._CHANGE_FO_SHO
 
         oes_p ||= @on_event_selectively
 
@@ -249,24 +224,42 @@ module Skylab::TanMan
       end
 
       Info___ = ::Struct.new :did_mutate
+      end  # if false (for the old methods of the old collection controller)
 
-      def delete_entity action, _, & oes_p
-
-        bx = action.argument_box
-
-        _ok = Here_::TouchOrDeleteAssociation_via_FromNode_and_ToNode__.via(
-          :verb, :delete,
-          :from_node_label, bx.fetch( :from_node_label ),
-          :to_node_label, bx.fetch( :to_node_label ),
-          :document, document_,
-          :kernel, @kernel,
-          & oes_p )
-
-        _ok and flush_changed_document_to_ouptut_adapter
+      def __entity_via_edge_stmt edge_stmt
+        Here_.new_flyweight_.reinit_as_flyweight_ edge_stmt
       end
     end
 
+    # ==
+
+    # ==
+
+    class << self
+      alias_method :new_flyweight_, :new
+      undef_method :new
+    end  # >>
+
+    # - :#here1
+
+      def initialize
+        NOTHING_
+      end
+
+      def reinit_as_flyweight_ edge_stmt
+        @edge_stmt = edge_stmt ; self
+      end
+
+      attr_reader(
+        :edge_stmt,  # #testpoint - an easy copout for testing
+      )
+
+      def HELLO_ASSOCIATION  # just during development
+        NOTHING_
+      end
+
+    # -
+
     Here_ = self
-    end
   end
 end

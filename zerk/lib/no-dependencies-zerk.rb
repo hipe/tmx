@@ -417,6 +417,10 @@ module NoDependenciesZerk
         "-#{ oper sym }"
       end
 
+      def mixed_primitive s  # (we used to abuse `ick_mixed` for this)
+        s.inspect
+      end
+
       def em s  # (typically used in tests)
         # near #open [#ts-005] redundant these, maybe move to here
         "\e[1;32m#{ s }\e[0m"
@@ -538,6 +542,10 @@ module NoDependenciesZerk
 
       def _same sym
         "'#{ sym.id2name }'"
+      end
+
+      def mixed_primitive s  # (we used to abuse `ick_mixed` for this)
+        s.inspect
       end
 
       def em s

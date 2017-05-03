@@ -128,6 +128,11 @@ module Skylab::Zerk
         _NLP_agent.sentence_phrase_via_mutable_iambic x_a
       end
 
+      def mixed_primitive s
+        # (this method is to replace `val` eventually)
+        s.inspect
+      end
+
       def val s
         s.inspect
       end

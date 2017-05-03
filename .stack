@@ -49,7 +49,6 @@ TD tan_man/test/54-operations/86-meaning/14-list_spec.rb
 TD tan_man/test/54-operations/77-comment/14-stream_spec.rb
 (model: association)
 TD tan_man/test/54-operations/68-association/44-create_spec.rb
-TD tan_man/test/54-operations/68-association/34-delete_spec.rb
 (model: node)
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

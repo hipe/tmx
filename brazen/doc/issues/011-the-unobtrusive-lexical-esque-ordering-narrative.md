@@ -45,3 +45,10 @@ in such cases the '3' would get inserted into the beginnng of the list,
 because '4' is greater. i.e the algorithm always short-circuits at the
 first found item that is greater, regardless of whatever other ordering
 is going on in the list.
+
+
+
+
+## document-meta
+
+  - #pending-rename - move this to [ba] because it's a common algorithm
