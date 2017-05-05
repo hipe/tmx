@@ -133,13 +133,16 @@ module Skylab::TanMan
 
       def lookup_softly_via_node_ID___ node_ID_sym
 
-        to_dereferenced_item_stream__.flush_until_detect do |fly|
+        to_node_entity_stream_.flush_until_detect do |fly|
           _actual = fly.node_identifier_symbol_
           node_ID_sym == _actual
         end
       end
 
-      def to_dereferenced_item_stream__   # (experimental, currently used only for list action)
+      def to_node_entity_stream_
+
+        # experimental, would-be API method `to_dereferenced_item_stream`
+        # (currently used only for the `ls` action and one other #testpoint-only)
 
         fly = Here_.new_flyweight_
 

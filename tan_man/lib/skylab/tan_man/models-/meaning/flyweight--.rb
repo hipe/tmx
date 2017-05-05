@@ -1,14 +1,8 @@
 module Skylab::TanMan
 
-  class Models_::Meaning
+  module Models_::Meaning
 
   class Flyweight__
-
-    class << self
-      def properties  # :+#hook-out for [#br-021] magic result shapes
-        Models_::Meaning.properties
-      end
-    end  # >>
 
     def initialize
       @indexed = @scn = nil
@@ -120,3 +114,4 @@ module Skylab::TanMan
   end
   end
 end
+# #tombstone-A.1 (should be temporary): used to have a hook-out for [#br-021] magic result shapes

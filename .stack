@@ -34,21 +34,18 @@ HO tan_man/test/62-cli_spec.rb
 #open [#tm-097] abstract when an expected primitive is not found in config
 (model: graph)
 (related: driftwood in [#tm-026])
+(related: Common_Collection_Controller_Methods_ is driftwood)
 TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
 (silo: hear)
 `ignore_these_events` can go away
 consider trying to quash `make_action_making_actions_module`
+maybe close [#001] - because now, the layer where entities are persisted is fixed
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
 TD tan_man/test/54-operations/95-hear/68-association_spec.rb
 TD tan_man/test/54-operations/95-hear/10-intro_spec.rb
 (model: meaning
-resolve_insertion_ivars when_exact_match_fly_resolve_insertion_ivars via_exact_match_resolve_insertion_ivars before_least_greater_name_resolve_insertion_ivars when_no_neighbors_resolve_insertion_ivars rewrite_string  resolve_new_line sanitize_e0  when_name_collision  when_no_change  when_will_not_clobber index! when_no_stmt_list find_nodes node_verb_when_touch  node_verb_when_delete find_neighbor_associations  when_same  when_same_when_touch  send_found_existing_event  work work_when_touch  resolve_prototype  via_prototype_i_resolve_prototype when_no_protos via_named_protos_resolve_prototype  when_no_proto  resolve_default_prototype  resolve_hardcoded_prototype  via_prototype_make_association  resolve_edge_statement  add_attrs_to_edge_stmt  in_edge_stmt_produce_attr_list to_edge_stmt_add_attr_list  via_edge_stmt_make_association work_when_delete  when_not_found 
 TD tan_man/test/54-operations/86-meaning/64-graph_spec.rb
-TD tan_man/test/54-operations/86-meaning/44-add_spec.rb
-TD tan_man/test/54-operations/86-meaning/14-list_spec.rb
-(model: comment)
-TD tan_man/test/54-operations/77-comment/14-stream_spec.rb
 (model: node)
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

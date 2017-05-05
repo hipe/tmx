@@ -375,8 +375,7 @@ module Skylab::TanMan
         if _is_read_write_not_read_only  # :#spot2.1 (important)
           these = [ :input, :output ]
         else
-          self._COVER_ME__imagine_if_extra__
-          these = [ :input ]
+          these = [ :input ]  # #cov3.1
         end
 
         _bx = remove_instance_variable :@qualified_knownness_box

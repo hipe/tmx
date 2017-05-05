@@ -55,7 +55,7 @@ module Skylab::TanMan
         if 2 == a.length
           __execute_for_two( * a )
         else
-          self._OK__this_can_be_done__
+          __execute_for_one( * a )  #cov3.1
         end
       end
 
@@ -85,6 +85,10 @@ module Skylab::TanMan
         else
           __finish_by_making_two_one_way_streams in_ref, out_ref
         end
+      end
+
+      def __execute_for_one only_qk
+        __finish_by_making_one_one_way_stream only_qk.value_x
       end
 
       def __finish_by_making_one_two_way_stream in_ref
@@ -117,6 +121,16 @@ module Skylab::TanMan
             _finish ibs, obs
           end
         end
+      end
+
+      def __finish_by_making_one_one_way_stream only_ref
+
+        obs = _open_stream_by do |o|
+          o.be_for_read_only
+          o.byte_stream_reference = only_ref
+        end
+
+        obs and _finish obs
       end
 
       # --

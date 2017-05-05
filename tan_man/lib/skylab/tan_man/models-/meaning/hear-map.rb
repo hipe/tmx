@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Models_::Meaning
+  module Models_::Meaning
 
     module Hear_Map
 

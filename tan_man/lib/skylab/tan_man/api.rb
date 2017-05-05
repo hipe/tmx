@@ -210,7 +210,7 @@ module Skylab::TanMan
         sym  # oops i'm in API
       end
 
-      def mixed_primitive s
+      def mixed_primitive s  # (probably replaces `val`)
         s.inspect
       end
 

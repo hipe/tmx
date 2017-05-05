@@ -1,6 +1,10 @@
 module Skylab::TanMan
 
-  class Models_::Meaning  # re-opening
+  module Models_::Meaning
+
+    # description_ "manage meaning"
+
+    ActionBoilerplate_ = ::Class.new
 
     if false
     edit_entity_class(
@@ -21,11 +25,11 @@ module Skylab::TanMan
       end,
       :property, :value,
     )
+    end  # if false
 
-    Actions__ = make_action_making_actions_module
+    module Actions
 
-    module Actions__
-
+      if false
       Add = make_action_class :Create do
 
         edit_entity_class(
@@ -33,12 +37,24 @@ module Skylab::TanMan
           :reuse, Model_::DocumentEntity.IO_properties )
 
       end
-
-      Ls = make_action_class :List do
-
-        edit_entity_class :reuse, Model_::DocumentEntity.input_properties
-
       end
+
+      class Ls < ActionBoilerplate_
+
+        def definition
+          [
+            :properties, _these_,
+          ]
+        end
+
+        def execute
+          __with_read_only_operator_branch_facade__ do
+            @_operator_branch_.to_meaning_entity_stream_
+          end
+        end
+      end
+
+      if false
 
       Rm = make_action_class :Delete
 
@@ -90,20 +106,53 @@ module Skylab::TanMan
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
+      end  # if false
     end
 
-    class Silo_Daemon < Silo_daemon_base_class_[]
+    class ActionBoilerplate_
 
-      def precondition_for_self action, id, box, & oes_p
-        Here_::Collection_Controller__.new action, box, @silo_module, @kernel, & oes_p
+      def initialize
+        extend Home_::Model_::CommonActionMethods
+        init_action_ yield
+        @_associations_ = {}
+      end
+
+      def _these_
+        Home_::DocumentMagnetics_::CommonAssociations.all_
+      end
+
+      def _accept_association_ asc
+        @_associations_[ asc.name_symbol ] = asc
+      end
+
+      def __with_read_only_operator_branch_facade__
+
+        with_immutable_digraph_ do
+          @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_immutable_digraph_
+          x = yield
+          remove_instance_variable :@_operator_branch_
+          x
+        end
       end
     end
 
+    Autoloader_[ self ]
+    lazily :MeaningsOperatorBranchFacade_ do |c|
+      const_get :Collection_Controller__
+      const_defined? c, false or fail
+    end
+
+    # ==
+
     Here_ = self
+    if false
     NAME_ = 'name'.freeze
     NEWLINE_ = "\n".freeze
     VALUE_ = 'value'.freeze
     end
 
+    # ==
+    # ==
   end
 end
+# #history-A: full rewrite to ween off [br]-era

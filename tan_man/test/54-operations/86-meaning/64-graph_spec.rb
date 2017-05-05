@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :the_method_called_let
-    use :models_meaning_graph
+    use :models_meaning
 
     context "with an empty graph" do
 

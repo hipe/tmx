@@ -2,32 +2,48 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - meaning - list", wip: true do
+  describe "[tm] operations - meaning - list" do
 
     TS_[ self ]
-    use :operations
+    use :memoizer_methods
+    use :expect_CLI_or_API
+    use :models_meaning
 
 # (1/N)
-    it "C-style" do
+    context "C-style" do
 
-      call_API :meaning, :ls, :input_string, "digraph{/* foo : fee \n fiffle: faffle */}"
+      it "each item of this stream is (at the surface) the same object (flyweight)" do
 
-      expect_no_events
-      st = @result
+        a = _matrix
+        a.length > 1 || fail
+        a.first || fail  # be sure that any one item is not nil/false
+        _these = a.map( & :object_id_of_item ).uniq
+        _these.length == 1 || fail
+      end
 
-      ent = st.gets
-        ent.natural_key_string.should eql 'foo'
-        ent.value_string.should eql 'fee '
+      it "NOTE the trailing space in the item value is preserved" do
 
-      ent = st.gets
-        ent.natural_key_string.should eql 'fiffle'
-        ent.value_string.should eql 'faffle */'  # <- LOOK
+        item = _matrix.fetch 0
+        item.natural_key_string == "foo" || fail
+        item.value_string == "fee " || fail
+      end
 
-      st.gets.should be_nil
+      it "NOTE even the close comment sequence is include (BUG)" do
+
+        a = _matrix
+        a.length == 2 || fail  # we should test this somewhere
+        item = a.fetch 1
+        item.natural_key_string == "fiffle" || fail
+        item.value_string == "faffle */" || fail  # <-- LOOK
+      end
+
+      shared_subject :_matrix do
+        _matrix_via_input_string "digraph{/* foo : fee \n fiffle: faffle */}"
+      end
     end
 
 # (2/N)
-    it "shell-style" do
+    context "shell-style" do
 
       _input_string = <<-O.unindent
         digraph {
@@ -36,23 +52,41 @@ module Skylab::TanMan::TestSupport
         }
       O
 
-      call_API :meaning, :ls, :input_string, _input_string
+      it "ok great (note how this style doesn't have the same issues as C-style)" do
+        a = _matrix
+        item = a.fetch 0
+        item.natural_key_string == "money" || fail
+        item.value_string == "honey" || fail
+        item = a.fetch 1
+        item.natural_key_string == "funny" || fail
+        item.value_string == "bunny" || fail
+        a.length == 2 || fail
+      end
 
-      st = @result
-      ent = st.gets
-        ent.natural_key_string.should eql 'money'
-        ent.value_string.should eql 'honey'
-
-      ent = st.gets
-        ent.natural_key_string.should eql 'funny'
-        ent.value_string.should eql 'bunny'
-
-      st.gets.should be_nil
+      shared_subject :_matrix do
+        _matrix_via_input_string _input_string
+      end
     end
 
 # (3/N)
     it "when input does not parse as a graph-viz dotfile (it borks)"
 
-    ignore_these_events :using_parser_files
+    # -- setup
+
+    def _matrix_via_input_string input_s
+
+      call_API(
+        :meaning, :ls,  # _subject_action
+        :input_string, input_s,
+      )
+
+      # (note no expectation of any emissions - so if something emits, fails)
+
+      _st = execute
+      matrix_of_item_snapshots_via_meaning_stream_ _st
+    end
+
+    # ==
+    # ==
   end
 end

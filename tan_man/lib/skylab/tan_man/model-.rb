@@ -15,7 +15,7 @@ module Skylab::TanMan
 
     Bound_call_via_action_with_definition = -> act do
 
-      # (started as copy-pase of [sn]. diverged significantly for `properties`)
+      # (started as copy-paste of [sn]. diverged significantly for `properties`)
 
       # ~ hand-written map reduce:
 

@@ -2,9 +2,7 @@ module Skylab::TanMan
 
   class Models_::Comment
 
-    Actions = ::Module.new
-
-    module Line_Stream
+    module LineStream
 
       class << self
 
@@ -25,7 +23,7 @@ module Skylab::TanMan
         def of_string str
           Of_string__[ str ]
         end
-      end
+      end  # >>
 
       module Of_string__
 
@@ -56,7 +54,7 @@ module Skylab::TanMan
             :Shell_Style__
           end
           if type
-            Line_Stream.const_get( type, false ).new scn
+            LineStream.const_get( type, false ).new scn
           end
         end
         SPACE_RX__ = /[[:space:]]+/
@@ -131,10 +129,6 @@ module Skylab::TanMan
           super( & p )
         end
 
-        def members
-          [ :last_end_position, :last_start_position, :source_string ]
-        end
-
         attr_writer :parent_stream, :last_start_position, :last_end_position
 
         def source_string
@@ -155,5 +149,8 @@ module Skylab::TanMan
 
       NEWLINE_RX_ = /\r?\n/
     end
+
+    # ==
+    # ==
   end
 end

@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport
 
   TS_[ self ]
 
-  describe "[tm] comment stream", wip: true do
+  describe "[tm] comment stream" do
 
     class << self
       def use m
@@ -89,7 +89,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def expect * s_a
-      _subject = Home_::Models_::Comment::Line_Stream
+      _subject = Home_::Models_::Comment::LineStream
       scn = _subject.send use_method, @s
       a = []
       while s = scn.gets
@@ -97,5 +97,8 @@ module Skylab::TanMan::TestSupport
       end
       a.should eql s_a ; nil
     end
+
+    # ==
+    # ==
   end
 end

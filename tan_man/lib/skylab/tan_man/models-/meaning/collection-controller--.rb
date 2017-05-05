@@ -1,45 +1,28 @@
 module Skylab::TanMan
 
-  class Models_::Meaning
+  module Models_::Meaning
 
-    class Collection_Controller__ <  Model_::DocumentEntity::Collection_Controller
+    class MeaningsOperatorBranchFacade_
 
-      class << self
+      def initialize dc
 
-        def via_iambic x_a
-          new do
-            init_via_iambic x_a
-          end
-        end
-      end  # >>
-
-      include Common_Collection_Controller_Methods_
-
-      # ~ create
-
-      def persist_entity bx=nil, ent, & oes_p
-
-        _has_force = if bx
-          bx[ :force ]
-        end
-
-        _ok = Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call(
-          _build_session,
-          _has_force,
-          ent,
-          & oes_p )
-
-        _ok and begin
-          flush_changed_document_to_ouptut_adapter  # no guarantee it did change but meh. :+[#001] where does saving happen?
-        end
+        __init_string_array_via_digraph_controller dc
       end
 
-      # ~ retrieve (many)
+      def add_meaning__ value_s, name_s, & p
 
-      def to_entity_stream_via_model cls, & oes_p
+        # :#tombstone-A.2 we used to ask where the saving happens [#001] - now we know
 
-        if @model_class == cls  # just to punish those who dare defy us
-          _build_session.to_stream_of_meanings_with_mutable_string_metadata
+        # entity on success. false-ish on failure
+
+        Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call_by do |o|
+
+          o.fallback_mutable_string = @fallback_mutable_string
+          o.entity_stream_by = method :to_meaning_entity_stream_
+
+          o.name = name_s
+          o.value = value_s
+          o.listener = p
         end
       end
 
@@ -49,21 +32,14 @@ module Skylab::TanMan
         Models_::Meaning::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call(
           meaning,
           node,
-          _build_session.to_stream_of_meanings_with_mutable_string_metadata,
+          to_meaning_entity_stream_,
           document_,
           & @on_event_selectively )
       end
 
-      # ~ support
+      def __init_string_array_via_digraph_controller dc  # (legacy placement)
 
-      def _build_session
-        Session__.new document_.graph_sexp
-      end
-
-      class Session__
-
-        def initialize sx
-          @s_a = []
+        sx = dc.graph_sexp
 
           if ! sx.e6
             sx.e6 = ""  # MEH - make life easier by guaranteeing at least one editable
@@ -71,15 +47,20 @@ module Skylab::TanMan
 
           @fallback_mutable_string = sx.e6
 
+          s_a = []
           [ :e0, :e6, :e10 ].each do | sym |
             x = sx[ sym ]
-            x and @s_a.push x
+            x || next
+            s_a.push x
           end
-        end
 
-        attr_reader :fallback_mutable_string
+        @_string_array = s_a ; nil
+      end
 
-        def to_stream_of_meanings_with_mutable_string_metadata
+      def to_meaning_entity_stream_
+
+        # (was: `to_stream_of_meanings_with_mutable_string_metadata`)
+        # (would-be API method `to_dereferenced_item_stream`)
 
           # we have a chain of three streams: 1) the stream of editable strings
           # (probably 1 to 3 for each graph document) 2) within each one, the
@@ -94,9 +75,9 @@ module Skylab::TanMan
 
           special_line_st = nil
 
-          Common_::Stream.via_nonsparse_array( @s_a ).expand_by do | mutable_s |
+          Stream_[ @_string_array ].expand_by do |mutable_s|
 
-            special_line_st = Models_::Comment::Line_Stream.of_mystery_string mutable_s
+            special_line_st = Models_::Comment::LineStream.of_mystery_string mutable_s
 
           end.map_reduce_by do | line |
 
@@ -108,11 +89,15 @@ module Skylab::TanMan
               fly
             end
           end
-        end
+      end
 
         ASSOCIATION_RX___ = /\A[ \t]*[-a-z]+[ \t]*:/
 
-      end
+      # ==
     end
   end
 end
+Skylab::TanMan::Models_::Meaning::Collection_Controller__ = nil  # don't forget the `lazily` clause too
+# :#tombstone-A.2 (temporary) (as referenced)
+# #pending-rename: meanings operator branch facade
+# #history-A: half full rewrite during ween off [br]-era
