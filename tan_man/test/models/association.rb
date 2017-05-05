@@ -2,10 +2,17 @@ module Skylab::TanMan::TestSupport
 
   module Models::Association
 
-    def self.[] tcc
-      TS_::Operations[ tcc ]
-      tcc.include self
-    end
+    class << self
+
+      def [] tcc
+        TS_::Operations[ tcc ]
+        tcc.include self
+      end
+
+      def __lib
+        Home_::Models_::Association
+      end
+    end  # >>
 
     # -
 
@@ -87,6 +94,20 @@ module Skylab::TanMan::TestSupport
         NIL
       end
 
+      def with_operator_branch_for_associations_  # (has counterpart in node)
+
+        _client = TS_::Models::Dot_File.PARSER_INSTANCE
+
+        _path = digraph_file_path_
+
+        _client.parse_file _path do |dc|
+
+          ob = Here___.__lib::AssocOperatorBranchFacade_.new dc
+          x = yield ob
+          x
+        end
+      end
+
     # -
 
     define_method :fixtures_path_, ( Lazy_.call do
@@ -106,6 +127,7 @@ module Skylab::TanMan::TestSupport
     # ==
 
     ErrorTuple___ = ::Struct.new :result, :event_of_significance
+    Here___ = self
     SuccessTuple___ = ::Struct.new :result, :event_of_significance, :output_string
 
     # ==

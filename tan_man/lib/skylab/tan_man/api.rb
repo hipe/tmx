@@ -203,7 +203,7 @@ module Skylab::TanMan
       end
 
       def prim sym
-        "'#{ sym.id2name.gsub UNDERSCORE_, DASH_ }'"
+        symbol_as_identifier_ sym
       end
 
       def _slug_via_symbol sym
@@ -240,6 +240,10 @@ module Skylab::TanMan
 
       def app_name_string
         Home_.name_function.as_human
+      end
+
+      def symbol_as_identifier_ sym
+        "'#{ sym.id2name.gsub UNDERSCORE_, DASH_ }'"
       end
 
       # ~ old stuff to deprecate, here for reference

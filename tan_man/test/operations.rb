@@ -104,6 +104,29 @@ module Skylab::TanMan::TestSupport
 
     # -- expectations (assertions)
 
+    def string_of_excerpted_lines_of_output_ r
+
+      # #history-A.1: in its original form this existed as a method called
+      # `excerpt` that was sunsetted near the time we *started* re-covering
+      # the operations.
+
+      _lines = __excerpted_lines_of_output_OPER r
+      _lines.join EMPTY_S_  # the lines are newline *terminated*
+    end
+
+    def __excerpted_lines_of_output_OPER r
+
+      if respond_to? :_tuple
+        _tuple_a = _tuple
+        _output_s = _tuple_a.first
+      else
+        _output_s = tuple_.output_string
+      end
+
+      _lines = _output_s.split %r(^)  # LINE_SPLITTING_RX_
+      _lines[ r ]
+    end
+
     def expect_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
 
       TestSupport_::Expect_Line::
@@ -274,3 +297,4 @@ module Skylab::TanMan::TestSupport
     end
   end
 end
+# :#history-A.1 (as referenced)

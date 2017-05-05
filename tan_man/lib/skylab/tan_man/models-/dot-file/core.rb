@@ -210,9 +210,20 @@ module Skylab::TanMan
 
         if _user_call_succeeded
           if _is_read_write_not_read_only
-            bytes = __persist
-            if bytes
-              DidWrite__[ x, bytes ]
+
+            _yes = if x.respond_to? :_DO_WRITE_COLLECTION_
+              x._DO_WRITE_COLLECTION_
+            else
+              ACHIEVED_  # node silo, at writing
+            end
+
+            if _yes
+              bytes = __persist
+              if bytes
+                DidWrite___[ x, bytes ]
+              end
+            else
+              DidNotWrite___[ x ]
             end
           else
             x
@@ -222,7 +233,17 @@ module Skylab::TanMan
         end
       end
 
-      DidWrite__ = ::Struct.new :user_value, :bytes
+      DidWrite___ = ::Struct.new :user_value, :bytes do
+        def did_write
+          TRUE
+        end
+      end
+
+      DidNotWrite___ = ::Struct.new :user_value do
+        def did_write
+          FALSE
+        end
+      end
 
       def __persist  # was `persist_into_byte_downstream_reference`
 

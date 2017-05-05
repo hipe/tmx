@@ -110,11 +110,18 @@ module Skylab::TanMan::TestSupport
 
       expected_bytes = 14
 
-      it "result is a structure with a small amount of info" do
+      it "result is a structure with meta info particular to writes" do
 
         sct = _tuple.last
         sct.bytes == expected_bytes || fail
-        sct.user_value == true || fail
+        sct.user_value.HELLO_NODE
+      end
+
+      it "result structure has a representation of the removed entity" do
+
+        _ent = _tuple.last.user_value
+        _hi = _ent.get_node_label_
+        _hi == "berks" || fail
       end
 
       it "file looks OK (not perfect but OK)" do

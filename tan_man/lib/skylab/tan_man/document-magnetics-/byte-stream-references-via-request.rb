@@ -50,10 +50,11 @@ module Skylab::TanMan
 
         _a = remove_instance_variable :@__final_QKs
         _q_a = remove_instance_variable :@qualifieds_via_direction_offset
-        if @_ok
+        ok = remove_instance_variable :@_ok
+        if ok
           MyResult___.new _a, _q_a
         else
-          self._COVER_ME__xx__
+          ok  # #cov2.6
         end
       end
 
@@ -137,9 +138,11 @@ module Skylab::TanMan
       end
 
       def __when_zero_for_this_direction
+
         Emit_via_NonOneScenario.call_by do |o|
-          o.parameter_symbols_via_direction = nil
-          o.direction_symbol = @_current_direction_symbol
+          o.qualifieds_via_direction_offset = @qualifieds_via_direction_offset
+          o.current_direction_offset = @_current_direction_offset
+          o.direction_symbols = @_solve_for_these_symbols
           o.listener = @listener
         end
         @_ok = false ; NO_
@@ -184,15 +187,16 @@ module Skylab::TanMan
 
     class Emit_via_NonOneScenario < Common_::MagneticBySimpleModel
 
-      def direction_symbol= sym
-        # (this is kept as-is to hide the fact that internally we represent them the same)
-        self.direction_symbols = [ sym ] ; sym
+      def initialize
+        @current_direction_offset = nil
+        super
       end
 
       attr_writer(
+        :current_direction_offset,
         :direction_symbols,
         :listener,
-        :parameter_symbols_via_direction,
+        :qualifieds_via_direction_offset,
       )
 
       def execute
@@ -206,8 +210,6 @@ module Skylab::TanMan
         Common_::Event.inline_not_OK_with(
           :non_one_IO,
           :direction_symbols, @direction_symbols,
-          :parameter_symbols_via_direction, @parameter_symbols_via_direction,
-
         ) do |y, _o|
           me.__express_into_under y, self
         end
@@ -220,8 +222,7 @@ module Skylab::TanMan
       end
 
       def __express
-        if 1 == @direction_symbols.length
-          @direction_symbol = @direction_symbols[ 0 ]
+        if @current_direction_offset
           __express_for_one_direction
         else
           __express_for_multiple_directions
@@ -232,77 +233,93 @@ module Skylab::TanMan
 
       def __express_for_multiple_directions
 
-        __express_what_is_missing_for_multiple_directions_as_a_line
-        __express_what_can_be_used_to_supply_the_missing_directions_as_a_line
-      end
+        # the crazy thing here is that instead of enumerating each
+        # suggested parameter under its own direction heading (a loop
+        # inside a loop), we glup all the suggested parameters together
+        # and spit them out at the end.
 
-      def __express_what_can_be_used_to_supply_the_missing_directions_as_a_line
+        # (again, as with #here1, the below indexing has probably been
+        # done already somewhere else in this invocation but meh.)
 
-        h = {}
-        @direction_symbols.each do |sym|
-          @parameter_symbols_via_direction.fetch( sym ).each do |sym_|
-            h[ sym_ ] = true
+        seen = {}
+        unforgiveable = [ :input, :hereput, :output ]
+        @direction_symbols.each_with_index do |sym, d|
+          _these = @qualifieds_via_direction_offset.fetch unforgiveable.index sym
+          haves, have_nots =  _these.partition( & :is_effectively_trueish )
+          haves.length.zero? || self._SANITY
+          have_nots.each do |qkn|
+            seen[ qkn.name_symbol ] = true
           end
         end
-        buffer = "use "
-        @_current_expression_agent.calculate do
-          simple_inflection do
-            oxford_join buffer, Scanner_[ h.keys ], ' and/or ' do |sym|
-              prim sym
-            end
-          end
-        end
-        @_current_line_yielder << buffer
-      end
-
-      def __express_what_is_missing_for_multiple_directions_as_a_line
 
         buffer = "missing required "
-        _these = Scanner_[ @direction_symbols ]
-        @_current_expression_agent.calculate do
-          simple_inflection do
-            oxford_join buffer, _these do |sym|
-              sym.id2name  # this works just because they're each one word
-            end
-          end
+        _eew buffer, @direction_symbols, ' and ' do |sym|
+          "#{ sym.id2name }#{ DASH_ }"
+          # this works just because they're each one word
+          # the dash serves as a hyphen (as in "input-related" and "output-related")
         end
-        buffer << "-related arguments"
+        buffer << "related arguments"
+        @_current_line_yielder << buffer
+
+        buffer = "use "
+        _eew buffer, seen.keys, ' and/or ' do |sym|
+          prim sym
+        end
         @_current_line_yielder << buffer
       end
 
-      # ~
+      # --
 
-      def __express_for_one_direction
+      def __express_for_one_direction  # #cov2.6
 
-        self._CHANGED__near_use_of_this_method_called_array__
+        # (we had the below information before somewhere, but meh. #here1)
 
-        @_current_line_yielder << "needed exactly 1 #{ @direction_symbol }#{
-          }-related argument, had #{ _array.length }#{ __say_extra_for_one_direction }"
-      end
+        # (hackishly, we make it be on one line if there's too many
+        # parameters provided; but on two lines if no params provided.)
 
-      def __say_extra_for_one_direction
-        if _array.length.nonzero?
-          __say_extra_when_several
+        d = @current_direction_offset
+
+        _quals = @qualifieds_via_direction_offset.fetch d
+
+        kns, unkns = _quals.partition( & :is_effectively_trueish )
+
+        had_length = kns.length
+
+        if had_length.nonzero?
+          buffer = " ("
+          _eew buffer, kns, ' and ' do |qkn|
+            prim qkn.name_symbol
+          end
+          buffer << " )"
         end
+
+        _sym = @direction_symbols.fetch d
+
+        @_current_line_yielder << "needed exactly 1 #{ _sym }#{
+          }-related argument, had #{ had_length }#{ buffer }"
+
+        if had_length.zero?
+          buffer = "(provide "
+          _eew buffer, unkns, ' or ' do |qkn|
+            prim qkn.name_symbol
+          end
+          buffer << ")"
+          @_current_line_yielder << buffer
+        end
+
+        @_current_line_yielder
       end
 
-      def __say_extra_when_several
-
-        buffer = " (" ; me = self
+      def _eew buffer, sym_a, sep, & p
 
         @_current_expression_agent.simple_inflection do
 
-          _scn = No_deps_[]::Scanner_via_Array.new me._array do |qkn|
-            prim qkn.association.name_symbol
+          _scn = No_deps_[]::Scanner_via_Array.call sym_a do |sym|
+            instance_exec sym, & p
           end
 
-          oxford_join buffer, _scn, ', '
+          oxford_join buffer, _scn, sep
         end
-        buffer << ")"
-      end
-
-      def _array
-        @array_of_qualifieds_that_provide_such_a_value
       end
     end
 

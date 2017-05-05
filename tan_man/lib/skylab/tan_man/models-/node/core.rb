@@ -34,7 +34,7 @@ module Skylab::TanMan
           x or break
           _does_match = p[ x ]
           if _does_match
-            if s == x.label  # case sensitive
+            if s == x.get_label_  # case sensitive
               found_a.clear.push x
               break
             else
@@ -57,7 +57,7 @@ module Skylab::TanMan
         label_s = node_identifier.entity_name_string
 
         node = to_node_sexp_stream.flush_until_detect do | node_ |
-          label_s == node_.label
+          label_s == node_.get_label_
         end
 
         if node
@@ -98,19 +98,24 @@ module Skylab::TanMan
         @_digraph_controller = dc  # ivar name is #testpoint
       end
 
-      def touch_node_via_label___ label, & p  # #testpoint only (for now)
+      def touch_node_via_label_ label, & p  # #testpoint
 
-        _operation :touch, p, label
+        _via_label :touch, p, label
       end
 
-      def procure_node_via_label_ label, & p
+      def procure_node_via_label__ label, & p
 
-        _operation :retrieve, p, label
+        _via_label :retrieve, p, label
       end
 
-      def _operation sym, any_listener, label
+      def procure_node_removal_via_label__ label, & p
 
-        _un = UnsanitizedNode_.new label
+        _via_label :delete, p, label
+      end
+
+      def _via_label sym, any_listener, label
+
+        _un = UnsanitizedNode___.new label
 
         Here_::Magnetics_::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
 
@@ -162,7 +167,7 @@ module Skylab::TanMan
 
     # ==
 
-    class UnsanitizedNode_
+    class UnsanitizedNode___  # might go away..
 
       def initialize unsanitized_label_s
         @_ = unsanitized_label_s
@@ -194,8 +199,8 @@ module Skylab::TanMan
         end
       end
 
-      def node_label_
-        @node_stmt.label
+      def get_node_label_
+        @node_stmt.get_label_
       end
 
       def node_identifier_symbol_
@@ -205,6 +210,10 @@ module Skylab::TanMan
       attr_reader(
         :node_stmt,  # #testpoint
       )
+
+      def HELLO_NODE  # during dev
+        NOTHING_
+      end
     # -
     # ==
 

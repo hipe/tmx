@@ -77,9 +77,9 @@ module Skylab::TanMan::TestSupport
 
     def _can_set_and_create_the_label
       o = result
-      o.get_label.nil?.should eql( true )
+      o.get_label_.nil?.should eql( true )
       o.set_label 'Zeepadeep doobop'
-      o.get_label.should eql('Zeepadeep doobop')
+      o.get_label_.should eql('Zeepadeep doobop')
       full = o.unparse
       full.include?( 'label="Zeepadeep doobop"' ).should eql(true)
       o.set_label 'bipbap'

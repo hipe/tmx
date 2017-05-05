@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
 
       it "the label looks good" do  # -14/N
         _one = _tuple.first
-        _label = _one.node_label_
+        _label = _one.get_node_label_
         _label == str || fail
       end
 
@@ -272,7 +272,7 @@ module Skylab::TanMan::TestSupport
             touch_node_via_label "yeti", & p
           end
 
-          expect :success, :found_existing_node do |ev|
+          expect :info, :found_existing_node do |ev|
             a.push ev
           end
 
@@ -303,7 +303,7 @@ module Skylab::TanMan::TestSupport
       # it *very* likely that that would be significantly lest performant
       # than what we do below (#open [#bm-016] (in [sl])))
 
-      lines = _big_s.split %r(^)
+      lines = _big_s.split %r(^)  # LINE_SPLITTING_RX_
 
       3 > lines.length && fail
 

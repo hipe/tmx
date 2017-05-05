@@ -70,7 +70,7 @@ module Skylab::TanMan
       def destroy_stmt stmt
         if @graph_sexp.stmt_list
           _x = @graph_sexp.stmt_list.remove_item_ stmt
-          _x ? ACHIEVED_ : UNABLE_  # we mean to destroy
+          _x  # you're on your own if you use this..
         else
           UNABLE_
         end

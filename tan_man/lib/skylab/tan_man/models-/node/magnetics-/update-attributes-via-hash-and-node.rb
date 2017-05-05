@@ -24,7 +24,7 @@ module Skylab::TanMan
         add_a = []
         change_a = []
 
-        a_list._update_attributes attrs,
+        a_list.update_attributes_ attrs,
 
           -> s, x { add_a.push [ s, x ] },
           -> s, x, x_ { change_a.push [ s, x, x_ ] }
@@ -79,7 +79,7 @@ module Skylab::TanMan
           pred_a.push "changed #{ _s_a }"
         end
 
-        y << "on node #{ lbl o.node_stmt.label } #{ pred_a * ' and ' }"
+        y << "on node #{ lbl o.node_stmt.get_label_ } #{ pred_a * ' and ' }"
       end
 
       # ==

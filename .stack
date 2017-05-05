@@ -28,6 +28,7 @@ explain MTk and associate the explanation with its nodes
 API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
 `make_action_class` and related: liquidate this. (push back as necessary)
+`make_action_making_actions_module` too
 (many $stderr in [tm])
 (many `if false` in [tm])
 #open [#tm-097] abstract when an expected primitive is not found in config
@@ -35,6 +36,7 @@ HO tan_man/test/62-cli_spec.rb
 (related: driftwood in [#tm-026])
 TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
 (silo: hear)
+`ignore_these_events` can go away
 consider trying to quash `make_action_making_actions_module`
 TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
@@ -47,8 +49,6 @@ TD tan_man/test/54-operations/86-meaning/44-add_spec.rb
 TD tan_man/test/54-operations/86-meaning/14-list_spec.rb
 (model: comment)
 TD tan_man/test/54-operations/77-comment/14-stream_spec.rb
-(model: association)
-TD tan_man/test/54-operations/68-association/44-create_spec.rb
 (model: node)
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

@@ -92,3 +92,12 @@ there is a parent node, use that (assuming the common convention).
 
 otherwise, if there is custom inflection with a verb (and since we have
 no parent), assume that the class name is a noun. use that.  :#note-170
+
+
+
+
+## further reading
+
+this is vaguely but not directly related to the discussion at [#hu-066]
+about how expressions are inflected based on the contrast between what
+is expected and what is reality, over time.

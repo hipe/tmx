@@ -10,6 +10,8 @@ module Skylab::Autonomous_Component_System
       :component_association, nil,
       :ACS, nil,
 
+      :expectation_matrix, nil,
+
       :error_category, :key_error,
       :ok, false,
 
@@ -29,17 +31,22 @@ module Skylab::Autonomous_Component_System
         initialize_as_expresser expag
         index_for_expression_oldschool
 
-        # the way the `@ok` member sees expression is interesting, and has
-        # to do with how we express what is expected alongside an expression
-        # of current state.
+        # the name of the subject "component already added" is a bit
+        # misleading: the "surface phenomenon" (in this case adverb)
+        # "already" is utilized in the subject's expression conditionally
+        # based on the parameters.
         #
-        # if we expected something not to be there already in the "slot"
-        # (as is the case with a canonical "add" operation), then we
-        # emphasize this by alluding to the past: "already" indicates that
-        # the thing is true now and was also true in the past, and
-        # furthermore that we expected it not to be so in the past.
+        # to say "added the thing *already*" implies that the expectation
+        # was "no component, then component" but the reality was "component,
+        # then (still) component."
         #
-        # conversely when 'OK' is trueish, the use of "already" makes it
+        # in fact we also use the subject for uninflected, informational
+        # statements in the positive, also; which would be [expected:
+        # "no then yes", actual: "no then yes"].
+        #
+        # if it is the case that we are using the subject for a confirmation,
+        # (which is to say that reality matches expectation) then to include
+        # "already" makes it sound
         # sound uncecessarily accusatory. however, if we say simply
         # "<collection> has <component>", it is ambiguous what it is saying
         # about state change: do we have it now and we didn't before?
@@ -47,19 +54,75 @@ module Skylab::Autonomous_Component_System
         # to say "found existing <component>" it makes it unabiguous that
         # this is not a state change. and it sounds neutral as opposed to
         # unexpected.
+        #
+        # the above ideas expanded into [#hu-066] at #history-A, which has
+        # a much more in-depth analysis of what could possibly be done with
+        # a four-element boolean tuple like we use here..
 
-        if instance_variable_defined? :@ok
-          ok = @ok
+        a = @expectation_matrix
+        a || self._COVER_ME__meh__
+
+        expectation_then_yes, expectation_now_yes,
+          reality_then_yes, reality_now_yes = a
+
+        # we supply a code skeleton for all 16 permutations as an exercise
+        # and also as perhaps a template for elsewhere; but most of these
+        # permutations should never arrive here.
+
+        if expectation_then_yes
+          if expectation_now_yes
+            if reality_then_yes
+              if reality_now_yes
+                __express_declarative_statement_of_positive_static_story_as_expected  # (1)
+              else
+                _no a  # (2)
+              end
+            elsif reality_now_yes
+              _no a  # (3)
+            else
+              _no a  # (4)
+            end
+          elsif reality_then_yes
+            if reality_now_yes
+              _no a  # (5)
+            else
+              _no a  # (6)
+            end
+          elsif reality_now_yes
+            _no  # (7)
+          else
+            _no  # (8)
+          end
+        elsif expectation_now_yes
+          if reality_then_yes
+            if reality_now_yes
+              __expected_add_has_static_positive  # (9)
+            else
+              _no a  # (10)
+            end
+          elsif reality_now_yes
+            _no a  # (11)
+          else
+            _no a  # (12)
+          end
+        elsif reality_then_yes
+          if reality_now_yes
+            _no a  # (13)
+          else
+            _no a  # (14)
+          end
+        elsif reality_now_yes
+          _no a  # (15)
         else
-          # ??? - we assume false-ish only by virtue of the event class name
+          _no a  # (16)
         end
 
-        if ok
+        flush_into y
+      end
 
-          accept_sentence_part 'found existing'
-          _express_component_somehow
+      def __expected_add_has_static_positive
 
-        elsif @can_express_collection_related_
+        if @can_express_collection_related_
 
           express_collection_via_members
           accept_sentence_part 'already has'  # #wish #[#007.G]
@@ -85,7 +148,17 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        flush_into y
+        NIL
+      end
+
+      def _no a
+        fail "DO ME: #{ a.inspect }"
+      end
+
+      def __express_declarative_statement_of_positive_static_story_as_expected  # [tm], [sn]
+        accept_sentence_part 'found existing'
+        _express_component_somehow
+        NIL
       end
 
       def _express_component_somehow
@@ -94,3 +167,4 @@ module Skylab::Autonomous_Component_System
     end
   end
 end
+# :#history-A: the comment that led to an article about expression theory

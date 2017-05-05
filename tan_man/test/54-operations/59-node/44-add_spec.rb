@@ -280,7 +280,7 @@ module Skylab::TanMan::TestSupport
 
           a = []
 
-          _x = @OB_FOR_NODES.touch_node_via_label___ "\t\t\n\x7F" do |*i_a, &ev_p|
+          _x = @OB_FOR_NODES.touch_node_via_label_ "\t\t\n\x7F" do |*i_a, &ev_p|
             i_a.push ev_p ; a.push i_a  # yikes
           end
 
@@ -307,7 +307,7 @@ module Skylab::TanMan::TestSupport
       it "um.." do
 
         _entity = _tuple.first
-        _big_html_table = _entity.node_label_
+        _big_html_table = _entity.get_node_label_
         _big_html_table.include? output or fail
       end
 
@@ -334,7 +334,7 @@ module Skylab::TanMan::TestSupport
       _actual = black_and_white ev
       _expected = "created node \"#{ label_s }\""
       _actual == _expected || fail
-      ev.node.node_label_ == label_s || fail
+      ev.node.get_node_label_ == label_s || fail
       ev.did_mutate_document || fail
       ev.ok || fail
     end

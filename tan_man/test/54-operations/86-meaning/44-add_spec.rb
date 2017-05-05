@@ -111,7 +111,7 @@ module Skylab::TanMan::TestSupport
       alist = stmt.attr_list.content
       alist.unparse.should eql( 'label=barl, fillcolor="too"' )
       attrs = [['fontname', 'Futura'], ['fillcolor', '#11c11']]
-      alist._update_attributes attrs
+      alist.update_attributes_ attrs
       alist.unparse.should eql(
         'fontname=Futura, label=barl, fillcolor="#11c11"'  )
     end

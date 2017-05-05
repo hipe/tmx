@@ -135,19 +135,10 @@ module Skylab::TanMan
 
       def _fail_because_missing * sym_a
 
-        h = {}
-        qkn_a_a = remove_instance_variable :@qualifieds_via_direction_offset
-        eew = [ :input, :hereput, :output ]
-        sym_a.each do |sym|
-          qkn_a = qkn_a_a.fetch eew.index sym
-          qkn_a || next
-          qkn_a.each do |qkn|
-            ( h[ sym ] ||= [] ).push qkn.name_symbol
-          end
-        end
+        _q_a = remove_instance_variable :@qualifieds_via_direction_offset
 
         _this_performer::Emit_via_NonOneScenario.call_by do |o|
-          o.parameter_symbols_via_direction = h
+          o.qualifieds_via_direction_offset = _q_a
           o.direction_symbols = sym_a
           o.listener = _listener_
         end

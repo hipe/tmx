@@ -38,6 +38,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           Home_::Events::ComponentAlreadyAdded.with(
             :component, qk.value_x,
             :component_association, qk.association,
+            :expectation_matrix, [ false, true, true, true ],  # "already has" not "found existing"
             :ACS, acs,
             :ok, nil,  # overwrite so error becomes info
           )

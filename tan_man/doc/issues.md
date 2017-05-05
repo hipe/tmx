@@ -67,7 +67,8 @@
 [#061]       #done shallow shortcut to `tell` ?
 [#060]       #done #refactor: *all* NLP actions should go thru API duh
 
-[#059] #hole ( #was: restore invites )
+[#059]       the algorithm for resolving a prototype document element
+             ( #was: restore invites )
              ( #was: #done places where you could prettify custom action invites )
 
 [#058]       #done get abs paths out of conf file, make them rel to the file

@@ -36,7 +36,7 @@ module Skylab::TanMan::TestSupport
 
       it "complains about missing BOTH input and output (first line)" do
 
-        _tuple[1] == "missing required input and output-related arguments" || fail
+        _tuple[1] == "missing required input- and output-related arguments" || fail
       end
 
       it 'suggests parameters you can use to provide those directions (note the use of "and/or")' do

@@ -5,10 +5,10 @@ module Skylab::TanMan
     include Models_::DotFile::CommonRuleEnhancementsMethods_
 
     def label_or_node_id_normalized_string
-      label || node_id_normalized_string
+      get_label_ || node_id_normalized_string
     end
 
-    def label
+    def get_label_
       lbl_el = _label_sexp
       if lbl_el
         _id = lbl_el[ :content ][ :equals ][ :id ]

@@ -101,9 +101,18 @@ module Skylab::TanMan
 
       def __finish_by_making_two_one_way_streams in_ref, out_ref  # #cov2.5
 
-        ibs = _open_stream in_ref
+        ibs = _open_stream_by do |o|
+          o.byte_stream_reference = in_ref
+          o.be_for_read_only
+        end
+
         if ibs
-          obs = _open_stream out_ref
+
+          obs = _open_stream_by do |o|
+            o.byte_stream_reference = out_ref
+            o.be_for_write_only
+          end
+
           if obs
             _finish ibs, obs
           end
@@ -130,12 +139,6 @@ module Skylab::TanMan
         obs and _finish obs
       end
 
-      def _open_stream bsr
-        _open_stream_by do |o|
-          o.byte_stream_reference = bsr
-        end
-      end
-
       def _open_stream_by
 
         Mags_[]::OpenByteStream_via_ByteStreamReference.call_by do |o|  # 1x
@@ -145,9 +148,9 @@ module Skylab::TanMan
         end
       end
 
-      def _finish * sbsrs
-        (1..2).include? sbsrs.length || self._SANITY
-        sbsrs.freeze
+      def _finish * open_streams
+        (1..2).include? open_streams.length || self._SANITY
+        open_streams.freeze
       end
     # -
 

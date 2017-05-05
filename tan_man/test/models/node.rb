@@ -29,13 +29,13 @@ module Skylab::TanMan::TestSupport
 
       to_node_sexp_stream_.each do |node_stmt|
         sym_a.push node_stmt.node_ID_symbol_
-        s_a.push node_stmt.label
+        s_a.push node_stmt.get_label_
       end
 
       [ s_a, sym_a ]
     end
 
-    def with_operator_branch_for_nodes_
+    def with_operator_branch_for_nodes_  # (has counterpart in assoc)
 
       _client = TS_::Models::Dot_File.PARSER_INSTANCE
 
@@ -51,7 +51,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def touch_node_via_label label, & p  # name preserved for legacy code for now
-      @OB_FOR_NODES.touch_node_via_label___ label, & p
+      @OB_FOR_NODES.touch_node_via_label_ label, & p
     end
 
     def to_node_sexp_stream_

@@ -124,7 +124,7 @@ module Skylab::Snag
 
         def __build_enity_not_found_event id_o
 
-          Home_.lib_.autonomous_component_system::Events::ComponentNotFound.with(
+          ACS_[]::Events::ComponentNotFound.with(
 
             :component, id_o,
             :component_association, Models_::Node,

@@ -481,7 +481,9 @@ module Skylab::Basic
 
     Autoloader_[ self ]
     lazily :ByteDownstreamReference do
-      self::ByteUpstreamReference::ByteDownstreamReference
+      const_get :ByteUpstreamReference, false
+      const_defined? :ByteDownstreamReference, false or fail
+      NIL
     end
 
     # ==

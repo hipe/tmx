@@ -113,10 +113,6 @@ module Skylab::TanMan
         _slug sym
       end
 
-      def _slug sym
-        sym.id2name.gsub UNDERSCORE_, DASH_
-      end
-
       def mixed_primitive x
         x.inpsect
       end
@@ -141,12 +137,20 @@ module Skylab::TanMan
         s.inspect
       end
 
+      def symbol_as_identifier_ sym
+        "'#{ _slug sym }'"
+      end
+
       def code s
         kbd "'#{ s }'"
       end
 
       def mixed_primitive s
         s.inspect
+      end
+
+      def _slug sym
+        sym.id2name.gsub UNDERSCORE_, DASH_
       end
 
       # ~

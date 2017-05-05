@@ -38,7 +38,7 @@ module Skylab::TanMan
       end
     end
 
-    def get_label
+    def get_label_
       equals_stmt = _first_label_stmt
       if equals_stmt
         equals_stmt.rhs.normal_content_string_

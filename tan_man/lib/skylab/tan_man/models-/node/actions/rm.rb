@@ -27,17 +27,11 @@ module Skylab::TanMan
 
       def __via_mutable_digraph
 
-        _hi = UnsanitizedNode_.new @node_name
+        _ob = NodesOperatorBranchFacade_TM.new @_mutable_digraph_
 
-        _ok = Here_::Magnetics_::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
+        _ent = _ob.procure_node_removal_via_label__ @node_name, & _listener_
 
-          o.entity = _hi
-          o.document = @_mutable_digraph_
-          o.verb_lemma_symbol = :delete
-          o.listener = _listener_
-        end
-
-        _ok || NIL_AS_FAILURE_
+        _ent || NIL_AS_FAILURE_
       end
 
       # ==

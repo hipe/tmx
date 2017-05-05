@@ -89,7 +89,11 @@ module Skylab::TanMan
 
         def execute
           __find_neighbors
-          __via_verb_produce_relevant_sexp
+          case @internal_verb
+          when :retrieve ; __retrieve_via_neighbors
+          when :touch ; __touch_via_neighbors
+          when :delete ; __delete_via_neighbors
+          end
         end
 
         def __init_ivars_as_CM
@@ -265,30 +269,27 @@ module Skylab::TanMan
           NIL
         end
 
-        def __via_verb_produce_relevant_sexp
-          send :"produce_relevant_sexp_when__#{ @internal_verb }__"
-        end
-
-        def produce_relevant_sexp_when__touch__
+        def __touch_via_neighbors
           _ok = __resolve_relevant_sexp_when_touch
           _ok && @THIS_GUY  # (was @created_existing_or_destroyed_node)
         end
 
-        def produce_relevant_sexp_when__retrieve__
+        def __retrieve_via_neighbors
           if @do_fuzzy
             self._HOLE
           elsif @exact_match_found
-            @exact_match_found
+            @entity_via_created_element_by[ @exact_match_found ]
           else
             _when_not_found
           end
         end
 
-        def produce_relevant_sexp_when__delete__
+        def __delete_via_neighbors
           if @do_fuzzy
             self._HOLE
           elsif @exact_match_found
-            __del
+            _node_stmt = @document.destroy_stmt @exact_match_found
+            @entity_via_created_element_by[ _node_stmt ]
           else
             _when_not_found
           end
@@ -452,7 +453,7 @@ module Skylab::TanMan
         end
 
         def when__touch__and_you_found_one_it_is_OK
-          true
+          NIL  # hm..
         end
 
         def when__delete__when_one_exists_already one
@@ -510,10 +511,6 @@ module Skylab::TanMan
           ACHIEVED_
         end
 
-        def __del
-          @document.destroy_stmt @exact_match_found
-        end
-
         def _see_created_node node_stmt
 
           @THIS_GUY = @entity_via_created_element_by[ node_stmt ]
@@ -546,7 +543,7 @@ module Skylab::TanMan
 
           ) do |y, o|
 
-            y << "created node #{ component_label o.node.node_label_ }"
+            y << "created node #{ component_label o.node.get_node_label_ }"
           end
 
           _ev  # hi. #todo
@@ -588,6 +585,7 @@ module Skylab::TanMan
           :found_existing_node,
           :component_association, Here_,
           :did_mutate_document, false,
+          :expectation_matrix, [ true, true, true, true ],  # experiment, per [#hu-066]
           :ok, nil
         )
       end

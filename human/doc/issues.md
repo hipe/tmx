@@ -1,3 +1,5 @@
+[#066]       musings on "already", "still" and "yet"
+
 [#065]       [ levenshtein ]
              [#here.2]: this "cutoff at stark change" algorithm
 

@@ -4,31 +4,39 @@ module Skylab::TanMan
 
     include Models_::DotFile::CommonRuleEnhancementsMethods_
 
-    def _update_attributes attr_h, add_p=nil, change_p=nil
+    def update_attributes_ attr_h, add_p=nil, change_p=nil
 
       h = {}
       as.each do |a|  # per recursive-rule, an a_list has many a's
         h[ a.id.normal_content_string_.intern ] = a
       end
 
-      _pairs = attr_h.map { |k, v| [ k.intern, v ] }
+      attr_h.each_pair do |sym, mixed_value|
 
-      _pairs.each do |sym, sxp|
+        value_s = if mixed_value.respond_to? :id2name
+          mixed_value.id2name
+        elsif mixed_value.respond_to? :ascii_only?
+          mixed_value
+        else
+          self._COVER_ME__value_must_be_string_or_symbol__
+        end
+
+        sym.respond_to? :id2name or self._COVER_ME__key_must_be_symbol__
 
         el = h[ sym ]
         if el
           equals = el[ :equals ]
           if change_p
             _s = equals[ :id ].normal_content_string_
-            change_p[ sym, _s, sxp ]
+            change_p[ sym, _s, value_s ]
           end
-          _id = _parse_id sxp
+          _id = _parse_id value_s
           equals[ :id ] = _id
         else
           if add_p
-            add_p[ sym, sxp ]
+            add_p[ sym, value_s ]
           end
-          _insert_assignment sym, sxp
+          _insert_assignment sym, value_s
         end
       end
       ACHIEVED_

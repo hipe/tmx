@@ -2,118 +2,207 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - association create", wip: true do
+  describe "[tm] operations - association create" do
 
     TS_[ self ]
-    use :expect_line
+    use :memoizer_methods
+    use :expect_CLI_or_API
     use :models_association
 
 # (1/N)
-    it 'ping' do
 
-      call_API :association, :add, :ping
-      expect_OK_event :ping_from_action, 'ping from action - (ick :add)'
-      @result.should eql :ping_from__add__
-    end
-
-    context "when input cannot be resolved" do
+    # (a test of "ping" was removed #history-A.1)
 
 # (2/N)
-      it ".. because nothing provided" do
-        call_API :association, :add, :from_node_label, 'A', :to_node_label, 'B'
-        expect_not_OK_event :non_one_IO,
-          "need exactly 1 input-related argument, had 0 #{
-           }(provide (or_ [\"(par input_string)\", \"(par input_path)\", \"(par workspace_path)\"]))"
-        expect_fail
+
+    context "when input cannot be resolved because none provided" do
+
+      # :#cov2.6
+
+      it "fails" do
+        _fails
+      end
+
+      it "explains (offers suggestions)" do
+
+        ev, ev_ = _tuple[0, 2]
+        a = black_and_white_lines ev
+        a.concat black_and_white_lines ev_
+
+        expect_these_lines_in_array_ a do |y|
+          y << "needed exactly 1 input-related argument, had 0"
+          y << "(provide 'input-string', 'input-path' or 'workspace-path')"
+          y << "needed exactly 1 output-related argument, had 0"
+          y << "(provide 'output-string', 'output-path' or 'workspace-path')"
+        end
+      end
+
+      shared_subject :_tuple do
+
+        call_API(
+          * _subject_action,
+          :from_node_label, "A",
+          :to_node_label, "B",
+        )
+        a = []
+        2.times do
+          expect :error, :non_one_IO do |ev|
+            a.push ev
+          end
+        end
+        a.push execute
       end
     end
 
-    using_input '../fixture-dot-files-for-node/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
-
 # (3/N)
-      it 'associates nodes when neither exists, creating them' do
+    context "associates nodes when neither exists, creating them" do
 
-        associate 'one', 'two'
+      # (before #history-A.1 this had an ugly fix for [#086])
 
-        scn = @event_log.flush_to_scanner
+      it "succeeds" do
+        _succeeds
+      end
 
-        _ = scn.head_as_is.channel_symbol_array.last
+      it "event for wrote resource (digraph)" do
+        ev = _tuple[-2]
+        ev.byte_downstream_reference || fail
+        ev.bytes.zero? && fail
+      end
 
-        if :creating == _
-          scn.advance_one  # ugly fix for [#086]
-        end
+      it "events for created node (2)" do
+        ev, ev_ = _tuple[ 1, 2 ]
+        black_and_white( ev ) == 'created node "one"' || fail
+        black_and_white( ev_ ) == 'created node "two"' || fail
+      end
 
-        @event_log = scn.flush_to_stream
+      it "events for created association" do
+        _actual = black_and_white _tuple[3]
+        _actual == "created association: one -> two" || fail
+      end
 
-        expect_OK_event :created_node, 'created node (lbl "one")'
-
-        expect_OK_event :created_node, 'created node (lbl "two")'
-
-        expect_OK_event :created_association, 'created association: one -> two'
-
-        excerpt( -4 .. -1 ).should eql <<-O.unindent
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_( -4..-1 )
+        _expected = <<-O.unindent
           one [label=one]
           two [label=two]
           one -> two
           }
         O
+        _actual == _expected || fail
+      end
 
-        expect_succeed
+      shared_subject :_tuple do
+
+        call_API_for_associate_ "one", "two"
+
+        a = [ release_output_string_ ]
+
+        2.times do
+          expect :info, :created_node do |ev|
+            a.push ev
+          end
+        end
+
+        expect :info, :created_association do |ev|
+          a.push ev
+        end
+
+        expect :success, :wrote_resource do |ev|  # check this 1x only in file
+          a.push ev
+        end
+
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_A
       end
     end
 
-    using_input '2-nodes-0-edges.dot' do
-
 # (4/N)
-      it "associates when first exists, second does not" do
-        associate 'alpha', 'peanut gallery'
-        expect_OK_event :found_existing_node, 'found existing node (lbl "alpha")'
-        expect_OK_event :created_node
-        expect_OK_event :created_association
-        excerpt( -4 .. -2 ).should eql <<-O.unindent
+    context "associates when first exists, second does not" do
+
+      it "succeeds" do
+        _succeeds
+      end
+
+      it "this emission about found existing node" do
+        _actual = black_and_white _tuple[1]
+        _actual == 'found existing node "alpha"' || fail
+      end
+
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_( -4..-2 )
+        _expected = <<-O.unindent
           alpha [label=alpha]
           peanut [label="peanut gallery"]
           alpha -> peanut
         O
-        expect_succeed
+        _actual == _expected || fail
+      end
+
+      shared_subject :_tuple do
+
+        call_API_for_associate_ "alpha", "peanut gallery"
+        a = [ release_output_string_ ]
+        expect( :info, :found_existing_node ) { |ev| a.push ev }
+        expect :info, :created_node
+        expect :info, :created_association
+        _expect_emission_for_wrote_resource
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_B
       end
     end
-
-    using_input '2-nodes-1-edge.dot' do
 
 # (5/N)
-      it 'does not associate again redundantly' do
+    context "does not associate again redundantly" do
 
-        associate 'alpha', 'gamma'
+      # :#cov2.7
 
-        scn = @event_log.flush_to_scanner
+      it "the result is a new kind of structure" do
+        sct = _tuple.last
+        sct.did_write && fail
+        sct.user_value.HELLO_ASSOCIATION
+      end
 
-        # #hack-ignore :found_existing_node (x2), :found_existing_association
+      it "the last emission says so" do
+        _actual = black_and_white _tuple.first
+        _actual == "found existing association: alpha -> gamma" || fail
+      end
 
-        begin
-          if :document_did_not_change == scn.head_as_is.channel_symbol_array.last
-            break
-          end
-          scn.advance_one
-          redo
-        end while nil
+      shared_subject :_tuple do
 
-        @event_log = scn.flush_to_stream
+        a = []
+        call_API_for_associate_ "alpha", "gamma"
 
-        expect_neutral_event :document_did_not_change
+        _expect_emissions_for_found_existing_nodes
 
-        expect_neutralled
+        expect :info, :found_existing_association do |ev|
+          a.push ev  # offest 0
+        end
+
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_C
       end
     end
 
-    using_input '0-nodes-3-edges.dot' do
-
 # (6/N)
-      it "adds edge statements in unobtrusive lexical-esque order, #{
+    context "adds edge statements in unobtrusive lexical-esque order, #{
            } with taxonomy and proximity" do
 
-        associate 'feasly', 'teasly'
-        excerpt( -8 .. -2 ).should eql <<-O.unindent
+      it "succeeds" do
+        _succeeds
+      end
+
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_( -8..-2 )
+        _expected = <<-O.unindent
           */
           feasly [label=feasly]
           teasly [label=teasly]
@@ -122,37 +211,78 @@ module Skylab::TanMan::TestSupport
           gargoyle -> flargoyle
           ainsly -> fainsly
         O
+        _actual == _expected || fail
+      end
+
+      shared_subject :_tuple do
+
+        call_API_for_associate_ "feasly", "teasly"
+        a = [ release_output_string_ ]
+        _expect_emissions_for_created_all
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_D
       end
     end
-
-    using_input 'point-5-1-prototype.dot' do
 
 # (7/N)
-      it 'uses any edge prototype called "edge_stmt"' do
-        associate 'foo', "bar's mother"
-        excerpt( -2 .. -2 ).should eql(
+    context 'uses any edge prototype called "edge_stmt"' do
+
+      it "succeeds" do
+        _succeeds
+      end
+
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_( -2..-2 )
+        _actual.should eql(
          "foo -> bar [ penwidth = 5 fontsize = 28 fontcolor = \"black\" label = \"e\" ]\n" )
-        expect_succeeded_result
+      end
+
+      shared_subject :_tuple do
+        call_API_for_associate_ "foo", "bar's mother"
+        a = [ release_output_string_ ]
+        _expect_emissions_for_created_all
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_E
       end
     end
 
-    using_input 'point-5-2-named-prototypes.dot' do
-
 # (8/N)
-      it "association prototype not found" do
-        associate 'a', 'b', :prototype, :clancy
-        expect_OK_event :created_node
-        expect_OK_event :created_node
-        expect_not_OK_event :association_prototypes_not_found,
-          "the stmt_list has no prototype named (ick :clancy)"
-        expect_fail
+    context "association prototype not found" do
+
+      it "fails" do
+        _fails
       end
 
+      it "explains" do
+        _actual = black_and_white _tuple[0]
+        _actual == "the stmt_list has no prototype named 'clancy'" || fail
+      end
+
+      shared_subject :_tuple do
+        a = []
+        call_API_for_associate_ "a", "b", :prototype, :clancy
+        _expect_emissions_for_created_nodes
+        expect( :error, :association_prototype_not_found ) { |ev| a.push ev }
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_F
+      end
+    end
+
 # (9/N)
-      it "lets you choose which of several edge prototypes" do
-        associate 'c', 'd', :prototype, :fancy
-        associate_again 'b', 'a', :prototype, :boring
-        excerpt( -7 .. -2 ).should eql <<-O.unindent
+    context "lets you choose which of several edge prototypes" do
+
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_( -7..-2 )
+        _expected = <<-O.unindent
           a [label=a]
           b [label=b]
           c [label=c]
@@ -160,32 +290,122 @@ module Skylab::TanMan::TestSupport
           b -> a [this=is not=fancy]
           c -> d [this=style is=fancy]
         O
+        _actual == _expected || fail
+      end
+
+      shared_subject :_tuple do
+
+        # (this is a rough sketch proof of concept..)
+
+        a = [ nil ]
+
+        call_by do |p|
+
+          with_operator_branch_for_associations_ do |ob|
+
+            ob.touch_by__ do |o|
+              o.from_and_to_labels "c", "d"
+              o.prototype_name_symbol = :fancy
+              o.listener = p
+            end
+
+            ob.touch_by__ do |o|
+              o.from_and_to_labels "b", "a"
+              o.prototype_name_symbol = :boring
+              o.listener = p
+            end
+
+            ob._digraph_controller.graph_sexp.unparse
+          end
+        end
+
+        2.times { _expect_emission_for_created_all_no_write }
+
+        a[ 0 ] = execute
+        a
+      end
+
+      def digraph_file_path_
+        _FILE_F
       end
     end
 
-    using_input 'point-5-1-prototype.dot' do
-
 # (10/N)
-      it "lets you set attributes in the edge prototype (alphabeticesque)" do
-        associate 'a', 'b', :attrs, { label: %<joe's mom: "jane"> }
-        excerpt( -2 .. -2 ).should eql <<-O.unindent
-          a -> b [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "joe's mom: \\"jane\\"" ]
-        O
-        expect_succeeded_result
+    context "lets you set attributes in the edge prototype (alphabeticesque)" do
+
+      it "succeeds" do
+        _succeeds
       end
 
+      it "content" do
+
+        _expected = <<-O.unindent
+          a -> b [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "joe's mom: \\"jane\\"" ]
+        O
+        _actual = string_of_excerpted_lines_of_output_( -2..-2 )
+        _actual == _expected || fail
+      end
+
+      shared_subject :_tuple do
+
+        call_API_for_associate_ "a", "b", :attrs, { label: %<joe's mom: "jane"> }
+
+        a = [ release_output_string_ ]
+
+        _expect_emissions_for_created_all
+
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_G
+      end
+    end
+
 # (11/N)
-      it "lets you set attributes not yet in the edge prototype" do
-        associate 'a', 'b', :attrs, { politics: :radical }
-        excerpt( -2 .. -2 ).should eql <<-O.unindent
+    context "lets you set attributes not yet in the edge prototype" do
+
+      it "succeeds" do
+        _succeeds
+      end
+
+      it "content" do
+        _these = string_of_excerpted_lines_of_output_( -2..-2 )
+        _expected = <<-O.unindent
           a -> b [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "e" politics = radical ]
         O
-        expect_succeeded_result
+        _these == _expected || fail
+      end
+
+      shared_subject :_tuple do
+
+        call_API_for_associate_ "a", "b", :attrs, { politics: :radical }
+
+        a = [ release_output_string_ ]
+
+        _expect_emissions_for_created_all
+
+        a.push execute
+      end
+
+      def digraph_file_path_
+        _FILE_G
       end
     end
 
 # (12/N)
-    it "against a digraph with two nodes, will first match existing nodes fuzzily before creating" do
+    context "against a digraph with two nodes, will first match existing nodes fuzzily before creating (FUZZY IS TURNED OFF FOR NOW)" do
+
+      it "succeeds" do
+        _succeeds
+      end
+
+      it "content" do
+        _actual = string_of_excerpted_lines_of_output_ 3..3
+        _actual == "  foo -> bar}\n" || fail
+      end
+
+      shared_subject :_tuple do
 
       s = <<-HERE.unindent
         digraph {
@@ -193,38 +413,128 @@ module Skylab::TanMan::TestSupport
           foo [label=foo]}
       HERE
 
-      call_API :association, :add,
+        false and [  # (the below was was used before #history-A.1)
         :from_node_label, 'fo',
         :to_node_label, 'ba',
+        ]
+        call_API(
+          * _subject_action,
+          # YIKES
+          :from_node_label, 'foo',
+          :to_node_label, 'bar',
         :input_string, s,
         :output_string, s
+        )
+        a = [ s ]
 
-      expect_OK_event :found_existing_node
-      expect_OK_event :found_existing_node
-      expect_OK_event :created_association
-      @output_s = s
-      excerpt( 3 .. 3 ).should eql "  foo -> bar}\n"
+        _expect_emissions_for_found_existing_nodes
+        _expect_emission_for_created_association
+        _expect_emission_for_wrote_resource
+
+        a.push execute
+      end
     end
 
-    def associate src_s, tgt_s, * x_a_
-      x_a = [ :association, :add ]
-      add_input_arguments_to_iambic x_a
-      add_output_arguments_to_iambic x_a
-      x_a.push :from_node_label, src_s, :to_node_label, tgt_s
-      x_a_.length.nonzero? and x_a.concat x_a_
-      call_API_via_iambic x_a ; nil
+    # -- assertions
+
+    def _fails
+      _tuple.last.nil? || fail
     end
 
-    def associate_again src_s, tgt_s, * x_a_
-      x_a = [ :association, :add ]
-      s = @output_s ; @output_s = ::String.new
-      x_a.push :input_string, s
-      x_a.push :output_string, @output_s
-      x_a.push :from_node_label, src_s, :to_node_label, tgt_s
-      x_a_.length.nonzero? and x_a.concat x_a_
-      call_API_via_iambic x_a ; nil
+    def _succeeds
+      wrote = _tuple.last
+      wrote.user_value.HELLO_ASSOCIATION
+      wrote.bytes.zero? and fail
+      NIL
     end
 
-    ignore_these_events :using_parser_files, :wrote_resource
+    # -- setup
+
+    def _expect_emissions_for_created_all  # 1x
+      _expect_emission_for_created_all_no_write
+      expect :success, :wrote_resource
+      NIL
+    end
+
+    def _expect_emission_for_created_all_no_write
+      _expect_emissions_for_created_nodes
+      _expect_emission_for_created_association
+    end
+
+    def _expect_emission_for_created_association
+      expect :info, :created_association
+    end
+
+    def _expect_emissions_for_created_nodes
+
+      2.times { expect :info, :created_node }
+    end
+
+    def _expect_emissions_for_found_existing_nodes  # 1x
+      2.times do
+        expect :info, :found_existing_node
+      end
+      NIL
+    end
+
+    def _expect_emission_for_wrote_resource
+      expect :success, :wrote_resource
+    end
+
+    def call_API_for_associate_ from_s, to_s, * xtra
+
+      s = ""
+      @YIKES_OUTPUT_STRING = s
+
+      _input_path = digraph_file_path_
+
+      call_API(
+        * _subject_action,
+        :from_node_label, from_s,
+        :to_node_label, to_s,
+        :input_path, _input_path,
+        :output_string, @YIKES_OUTPUT_STRING,
+        * xtra,
+      )
+
+      NIL
+    end
+
+    def release_output_string_
+      remove_instance_variable :@YIKES_OUTPUT_STRING
+    end
+
+    def _FILE_G
+      fixture_file_ "point-5-1-prototype.dot"
+    end
+
+    def _FILE_F
+      fixture_file_ "point-5-2-named-prototypes.dot"
+    end
+
+    def _FILE_E
+      fixture_file_ "point-5-1-prototype.dot"
+    end
+
+    def _FILE_D
+      fixture_file_ "0-nodes-3-edges.dot"
+    end
+
+    def _FILE_C
+      fixture_file_ "2-nodes-1-edge.dot"
+    end
+
+    def _FILE_B
+      fixture_file_ "2-nodes-0-edges.dot"
+    end
+
+    def _FILE_A
+      fixture_file_ "../fixture-dot-files-for-node/simple-prototype-and-graph-with/zero-but-with-leading-space.dot"
+    end
+
+    def _subject_action
+      [ :association, :add ]
+    end
   end
 end
+# :#history-A.1 fully modernize style duing ween off [br]-era

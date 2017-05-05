@@ -1,0 +1,44 @@
+digraph {
+
+label="
+
+fig 1. when creating a new document element (e.g node or association),
+it is built from an existing \"prototype\" element. this flowchart suggests
+one possible algorithm for determining the prototype to use.
+
+(not shown in this algorithm is the use of \"proximity\" elements
+to serve as prototypes.)
+
+(\"t\" can stand for both \"transition\" and \"test\".)"
+
+a_q_1 [label="is a specific\nname of a prototype\nprovided?" shape=diamond style=filled]
+
+a_q_1->a_q_2_2 [label="no (t1)"]
+a_q_1->a_q_2 [label="yes (t2)"]
+
+a_q_2   [label="does the\ndocument itelf have named\nprototypes? (1/2)" shape=diamond style=filled]
+a_q_2_2 [label="does the\ndocument itelf have named\nprototypes? (2/2)" shape=diamond style=filled]
+
+a_q_2->a_f_1 [label="no (t3)"]
+a_q_2->a_q_3_2 [label="yes (t4)"]
+
+a_q_2_2->a_s_1 [label="no (t5)"]
+a_q_2_2->a_q_3 [label="yes (t6)"]
+
+a_q_3 [label="can you resolve\nthe appropriate (harcoded)\nname from the document's\nprototypes?" shape=diamond style=filled]
+a_q_3_2 [label="can you resolve\nthe provided name\nfrom the prototypes?" shape=diamond style=filled]
+
+a_q_3->a_s_1 [label="no (t7)"]
+a_q_3->a_s_2 [label="yes (t8)"]
+
+a_q_3_2->a_f_2 [label="no (t9)"]
+a_q_3_2->a_s_2 [label="yes (t10)"]
+
+a_f_1 [label="fail talkin' bout\ndocument has no prototypes" shape=rect style=filled]
+a_f_2 [label="fail talkin' bout\ndocument doesn't have\nthat prototype" shape=rect style=filled]
+
+a_s_1 [label="use the appropriate\nhardcoded, memoized\nprototype" shape=rect style=filled]
+a_s_2 [label="use that\nprototype" shape=rect style=filled]
+
+
+}
