@@ -5,22 +5,32 @@ module Skylab::TanMan
   class Flyweight__
 
       class << self
+
         def via_this_data__ * a
           new.__init_via_this_data( * a )
         end
+
+        undef_method :clone
+        private :dup
       end  # >>
 
     def initialize
       @indexed = @scn = nil
     end
 
+      def duplicate_as_flyweight_
+        dup  # hi.
+      end
+
+      def initialize_dup _
+        @indexed || index!  # (legacy names)
+        @scn = StaticScanner__.new @scn.string
+        freeze
+        NIL
+      end
+
     attr_reader :start_pos, :end_pos
     attr_reader :next_line_start_pos
-
-    def initialize_copy _otr_
-      @scn = @scn.dup
-      @scn.string = @scn.string.dup
-    end
 
     def natural_key_string
       dereference :name
@@ -135,7 +145,7 @@ module Skylab::TanMan
 
         @value_range = v_r
         @name_range = n_r
-        @scn = StaticScanner___.new line
+        @scn = StaticScanner__.new line
         @indexed = true
         freeze
       end
@@ -146,7 +156,7 @@ module Skylab::TanMan
 
       # ==
 
-      StaticScanner___  = ::Struct.new :string  # per #spot2.3 (above)
+      StaticScanner__  = ::Struct.new :string  # per #spot2.3 (above)
 
       # ==
       # ==

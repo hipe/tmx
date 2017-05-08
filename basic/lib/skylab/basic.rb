@@ -41,25 +41,6 @@ module Skylab::Basic  # introduction at [#020]
   class Fuzzy < Common_::MagneticBySimpleModel  # :[#015].
 
     class << self
-
-      def reduce_array_against_string a, s, * p_a, & p
-        p and p_a.push p
-        call_by do |o|
-        o.sparse_array = a
-        o.string = s
-        o.procs = p_a
-        end
-      end
-
-      def reduce_to_array_stream_against_string st, s, * p_a, & p
-        p and p_a.push p
-        call_by do |o|
-        o.stream = st
-        o.string = s
-        o.procs = p_a
-        end
-      end
-
       def prototype_by & p  # then call #here1 on the prototype
         define( & p ).freeze
       end
@@ -76,10 +57,6 @@ module Skylab::Basic  # introduction at [#020]
       otr = dup
       yield otr
       otr.execute
-    end
-
-    def procs= p_a
-      @string_via_item, @result_via_matching = p_a
     end
 
     def sparse_array= a

@@ -9,6 +9,18 @@ module Skylab::TanMan
         __init_string_array_via_digraph_controller dc
       end
 
+      def into_node_apply_meaning__ node_label, is_dry, meaning_name, & listener
+
+        Here_::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call_by do |o|
+          o.node_label = node_label
+          o.meaning_name_string = meaning_name
+          o.is_dry = is_dry
+          o.meanings_operator_branch = self
+          o.mutable_digraph = @__mutable_digraph
+          o.listener = listener
+        end
+      end
+
       def add_meaning__ value_s, name_s, & p
 
         # :#tombstone-A.2 we used to ask where the saving happens [#001] - now we know
@@ -24,17 +36,6 @@ module Skylab::TanMan
           o.value = value_s
           o.listener = p
         end
-      end
-
-      # ~ custom business-specific
-
-      def apply_meaning_to_node meaning, node
-        Models_::Meaning::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call(
-          meaning,
-          node,
-          to_meaning_entity_stream_,
-          document_,
-          & @on_event_selectively )
       end
 
       def __init_string_array_via_digraph_controller dc  # (legacy placement)
@@ -54,7 +55,19 @@ module Skylab::TanMan
             s_a.push x
           end
 
-        @_string_array = s_a ; nil
+        @_string_array = s_a
+
+        @__mutable_digraph = dc
+        NIL
+      end
+
+      def one_entity_against_natural_key_fuzzily_ name_s, & p
+        Home_::ModelMagnetics_::OneEntity_via_NaturalKey_Fuzzily.call_by do |o|
+          o.natural_key_head = name_s
+          o.entity_stream_by = method :to_meaning_entity_stream_
+          o.model_module = Here_
+          o.listener = p
+        end
       end
 
       def to_meaning_entity_stream_

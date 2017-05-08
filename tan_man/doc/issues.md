@@ -47,7 +47,12 @@
 [#072]       #done when returning false, use the terminal action node
 [#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
-[#069]       #tracking-tag fuzzy-finding regexen - case insensitive?
+
+[#069] #hole
+             ( #was: whether or not to be case insensitive when resolving
+              nodes, etc. now this is an option in the supporting actor, and
+              changing it would be trivial..)
+
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj

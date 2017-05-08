@@ -2,11 +2,23 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - meaning graph (resolving (i.e expand NT into N T's))", wip: true do
+  describe "[tm] operations - meaning graph (resolving (i.e expand NT into N T's))" do
 
     TS_[ self ]
-    use :the_method_called_let
     use :models_meaning
+
+    # ~( (for now, let legacy code remain as is but blow up when etc)
+    def self.let sym, & p
+      :graph == sym || TS_.no
+      yes = nil
+      define_method :graph do
+        yes && TS_.no
+        yes = true
+        _graph = instance_exec( & p )
+        _graph  # #todo
+      end
+    end
+    # ~)
 
     context "with an empty graph" do
 
@@ -16,15 +28,17 @@ module Skylab::TanMan::TestSupport
 
 # (1/N)
       it "any meaning - KeyError" do
-        -> do
+        begin
           graph.meaning_values_via_meaning_name 'foo'
-        end.should raise_error( ::KeyError, /key not found: :foo/ )
+        rescue ::KeyError => e
+        end
+        e.message =~ /\Akey not found: :foo\z/ or fail
       end
     end
 
     context "with a graph with one terminal node of meaning" do
 
-      let :graph do
+      shared_subject :graph do
         graph_from( [ 'red', 'color=#fa0schwartz' ] )
       end
 
@@ -37,9 +51,11 @@ module Skylab::TanMan::TestSupport
 
 # (3/N)
       it "an unknown meaning - KeyError" do
-        -> do
+        begin
           graph.meaning_values_via_meaning_name 'foo'
-        end.should raise_error( ::KeyError, /key not found: :foo/ )
+        rescue ::KeyError => e
+        end
+        e.message =~ /\Akey not found: :foo\b/ or fail
       end
     end
 
@@ -68,7 +84,7 @@ module Skylab::TanMan::TestSupport
 
     context "with a graph with one NT and one T (related)" do
 
-      let :graph do
+      shared_subject :graph do
         graph_from( ['happy-color', 'foo=bar'],
                      ['happy', 'happy-color'] )
       end

@@ -4,93 +4,13 @@ module Skylab::TanMan
 
     class << self
 
-      if false
-      def build_sexp_fuzzy_matcher_via_natural_key_fragment s
-
-        rx = /\A#{ ::Regexp.escape s }/i  # :+[#069] case insensitive?. :~+[#ba-015]
-
-        -> stmt do
-          rx =~ stmt.label_or_node_id_normalized_string
-        end
-      end
-      end  # if false
-
       alias_method :new_flyweight_, :new
       undef_method :new
     end  # >>
 
+    # (as entity (flyweight) starts #here1)
+
     # ==
-
-      if false
-      def entity_via_natural_key_fuzzily s
-
-        p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment s
-
-        st = to_node_sexp_stream
-
-        found_a = []
-        begin
-          x = st.gets
-          x or break
-          _does_match = p[ x ]
-          if _does_match
-            if s == x.get_label_  # case sensitive
-              found_a.clear.push x
-              break
-            else
-              found_a.push x
-            end
-          end
-          redo
-        end while nil
-
-        case 1 <=> found_a.length
-        when  0
-          _entity_via_node found_a.fetch 0
-        when -1
-          self._BEHAVIOR_IS_NOT_YET_DESIGNED  # #open similar to [#012]
-        end
-      end
-
-      def entity_via_intrinsic_key node_identifier, & oes_p
-
-        label_s = node_identifier.entity_name_string
-
-        node = to_node_sexp_stream.flush_until_detect do | node_ |
-          label_s == node_.get_label_
-        end
-
-        if node
-
-          _entity_via_node node
-
-        else
-
-          if oes_p
-          oes_p.call :info, :component_not_found do
-            Common_::Event.inline_neutral_with :component_not_found,
-              :entity_name_string, node_identifier.entity_name_string
-          end
-          end
-
-          UNABLE_
-        end
-      end
-
-      def to_entity_stream_via_model model
-        if @model_class == model
-          to_node_sexp_stream.map_by do | node |
-            _entity_via_node node
-          end
-        end
-      end
-
-      def retrieve_any_node_with_id sym
-        to_node_sexp_stream.flush_until_detect do | node |
-          sym == node.node_id
-        end
-      end
-      end  # if false
 
     class NodesOperatorBranchFacade_TM
 
@@ -101,6 +21,18 @@ module Skylab::TanMan
       def touch_node_via_label_ label, & p  # #testpoint
 
         _via_label :touch, p, label
+      end
+
+      def one_entity_against_natural_key_fuzzily_ name_s, & p
+
+        # (bascially `entity_via_natural_key_fuzzily`, which was erased now #todo)
+
+        Home_::ModelMagnetics_::OneEntity_via_NaturalKey_Fuzzily.call_by do |o|
+          o.natural_key_head = name_s
+          o.entity_stream_by = method :to_node_entity_stream_
+          o.model_module = Here_
+          o.listener = p
+        end
       end
 
       def procure_node_via_label__ label, & p
@@ -185,11 +117,15 @@ module Skylab::TanMan
       end
     end
 
-    # -
+    # -  # :#here1
 
       def reinit_as_flyweight_ node_stmt
         @node_stmt = node_stmt
         self
+      end
+
+      def duplicate_as_flyweight_
+        self.class.new_flyweight_.reinit_as_flyweight_ @node_stmt
       end
 
       def description_under expag
@@ -200,6 +136,10 @@ module Skylab::TanMan
         expag.calculate do
           component_label s
         end
+      end
+
+      def natural_key_string  # hook-out for #fuzzy-lookup
+        get_node_label_  # hi.
       end
 
       def get_node_label_

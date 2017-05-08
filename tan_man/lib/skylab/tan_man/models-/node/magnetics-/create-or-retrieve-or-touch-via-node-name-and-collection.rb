@@ -1,6 +1,8 @@
 module Skylab::TanMan
 
-  class Models_::Node  # in [#084]
+  class Models_::Node
+
+    # (both magnets have one shared document section (stub) in [#084])
 
     module Magnetics_
 

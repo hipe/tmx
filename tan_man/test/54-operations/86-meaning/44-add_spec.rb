@@ -190,40 +190,6 @@ module Skylab::TanMan::TestSupport
       _client.parse_string s
     end
 
-# (9/N)
-    if false
-    it "OMG associate" do
-
-      _input_string = <<-O.unindent
-        digraph{
-        # done : style=filled fillcolor="#79f234"
-        fizzle [label=fizzle]
-        sickle [label=sickle]
-        fizzle -> sickle
-        }
-      O
-
-      output_string = ""
-
-      call_API :meaning, :associate,
-        :meaning_name, 'done',
-        :node_label, 'fizzle',
-        :input_string, _input_string,
-        :output_string, output_string
-
-      _em = expect_OK_event :updated_attributes
-
-      expect_succeed
-
-      black_and_white( _em.cached_event_value ).should eql(
-        "on node 'fizzle' added attributes: [ style=filled, fillcolor=#79f234 ]" )
-
-      scn = TestSupport_::Expect_Line::Scanner.via_string output_string
-      scn.advance_N_lines 2
-      scn.next_line.should eql "fizzle [fillcolor=\"#79f234\", label=fizzle, style=filled]\n"
-    end
-    end
-
     def _fails
       _x = _tuple.last
       _x.nil? || false
@@ -234,5 +200,6 @@ module Skylab::TanMan::TestSupport
 
   end
 end
+# #tombstone-A.2: the point at which one test moved to a new file
 # #pending-rename: this tests both add AND apply (or called "associate")
 # :#history-A.1 (can be temporary) (as referenced)

@@ -26,7 +26,7 @@ module Skylab::TanMan
 
         def execute
           @dry_run = nil
-          __with_read_write_operator_branch_facade_ do
+          with_read_write_operator_branch_facade_ do
             __via_operator_branch
           end
         end
@@ -62,55 +62,44 @@ module Skylab::TanMan
 
       Rm = make_action_class :Delete
 
-      class Associate < Home_::Model_::DocumentEntity::Action
-
-        Entity_.call self,
-
-          :branch_description, -> y do
-            y << "apply a meaningful tag to a node"
-          end,
-
-          :preconditions, [ :dot_file, :meaning, :node ],
-
-          :reuse, Home_::Model_::DocumentEntity.IO_properties,
-          :flag, :property, :dry_run,
-          :required, :property, :meaning_name,
-          :required, :property, :node_label
-
-        def produce_result
-          @meanings_controller = @preconditions.fetch :meaning
-          @nodes_controller = @preconditions.fetch :node
-          ok = __resolve_meaning
-          ok &&= __resolve_node
-          ok &&= __apply_meaning_to_node
-          ok && __persist
-        end
-
-        def __resolve_meaning
-
-          _meaning = @meanings_controller.one_entity_against_natural_key_fuzzily_ @argument_box[ :meaning_name ]
-          _store :@meaning, _meaning
-        end
-
-        def __resolve_node
-
-          _node = @nodes_controller.one_entity_against_natural_key_fuzzily_ @argument_box[ :node_label ]
-          _store :@node, _node
-        end
-
-        def __apply_meaning_to_node
-          @meanings_controller.apply_meaning_to_node @meaning, @node
-        end
-
-        def __persist
-
-          @preconditions.fetch( :meaning ).
-            flush_changed_document_to_output_adapter_per_action self
-        end
-
-        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-      end
       end  # if false
+
+      class Apply < ActionBoilerplate_
+
+        def definition
+          false and [
+            :description, -> y do
+              y << "apply a meaningful tag to a node"
+            end,
+          ]
+          [
+
+            :required,
+            :property, :meaning_name,
+
+            :required,
+            :property, :node_label,
+
+            :properties, _these_,
+
+            :flag, :property, :dry_run,
+          ]
+        end
+
+        def execute
+          with_read_write_operator_branch_facade_ do
+            __via_operator_branch
+          end
+        end
+
+        def __via_operator_branch
+          @_operator_branch_.into_node_apply_meaning__(
+            @node_label,
+            remove_instance_variable( :@dry_run ),
+            @meaning_name,
+            & _listener_ )
+        end
+      end
     end
 
     class ActionBoilerplate_
@@ -129,7 +118,7 @@ module Skylab::TanMan
         @_associations_[ asc.name_symbol ] = asc
       end
 
-      def __with_read_write_operator_branch_facade_
+      def with_read_write_operator_branch_facade_
 
         with_mutable_digraph_ do
           @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_mutable_digraph_

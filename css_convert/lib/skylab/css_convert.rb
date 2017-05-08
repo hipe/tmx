@@ -275,6 +275,11 @@ module Skylab::CSS_Convert
         letter,
       )
 
+      s_a = Basic_[]::Fuzzy.call_by do |o|
+        o.string = letter
+        o.sparse_array = @_DUMPABLES
+      end
+
       case 1 <=> s_a.length
       when 1
         __when_not_dumpable letter
@@ -564,6 +569,14 @@ module Skylab::CSS_Convert
           name
         ) do | o |
           o.name_s
+        end
+
+        list = Basic_[]::Fuzzy.call_by do |o|
+          o.string = name
+          o.sparse_array = Visual_tests__[]
+          o.string_via_item = -> item do
+            item.name_
+          end
         end
       end
 

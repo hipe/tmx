@@ -91,7 +91,7 @@ module Skylab::TanMan
         end
         oes_p.call :error, :interminal_meaning, * ( :circular if is_circular ) do
           if is_circular
-            Circular__.with :trail_a, trail_a
+            Circular___[].with :trail_a, trail_a
           else
             Interminable__.with :trail_a, trail_a
           end
@@ -126,7 +126,8 @@ module Skylab::TanMan
       y << stack_a.reverse.join( EMPTY_S_ )
     end
 
-    Circular__ = Common_::Event.prototype_with(  # #[#ta-007]
+    Circular___ = Lazy_.call do
+      x = Common_::Event.prototype_with(  # #[#ta-007]
       :circular,
       :trail_a, nil,
       :reason, :circular,
@@ -142,5 +143,12 @@ module Skylab::TanMan
 
       "circular dependency in meaning: #{ _s }"
     end
+
+      Circular____ = x
+      x
+    end
+
+    # ==
+    # ==
   end
 end

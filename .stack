@@ -44,8 +44,6 @@ TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
 TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
 TD tan_man/test/54-operations/95-hear/68-association_spec.rb
 TD tan_man/test/54-operations/95-hear/10-intro_spec.rb
-(model: meaning
-TD tan_man/test/54-operations/86-meaning/64-graph_spec.rb
 (model: node)
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]

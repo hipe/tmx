@@ -543,12 +543,16 @@ module Skylab::Brazen
 
       def __array_of_matching_unbounds_against_token_slow tok
 
-        Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-          to_unordered_selection_stream,
-          tok,
-          -> unbound do
+        Home_.lib_.basic::Fuzzy.call_by do |o|
+
+          o.string = tok
+
+          o.stream = to_unordered_selection_stream
+
+          o.string_via_item = -> unbound do  # (legacy name)
             unbound.name_function.as_slug
-          end )
+          end
+        end
       end
 
       def to_unordered_selection_stream  # :+#public-API

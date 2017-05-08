@@ -81,7 +81,7 @@ module Skylab::Basic
           cls.class_exec do
             bx.a_.each do |sym|
               define_method sym do |*a, &p|
-                @__proxy_implementaton__.__receive_call_ p, a, sym
+                @__proxy_implementation__.__receive_call_ p, a, sym
               end
             end
           end
@@ -114,7 +114,7 @@ module Skylab::Basic
 
       def initialize * x_a
 
-        @__proxy_implementaton__ = ProxyImplementation_via_.call_by do |o|
+        @__proxy_implementation__ = ProxyImplementation_via_.call_by do |o|
           o.argument_array = x_a
           o.association_box = __functional_proxy_association_box__
         end

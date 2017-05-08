@@ -34,10 +34,12 @@ module Skylab::TanMan::TestSupport
 
       # -- setup
 
-      def graph_from * s_pair_
+      def graph_from * s_pair_a
+
+        fly = MockMeaning___.new
 
         _st = Home_::Common_::Stream.via_nonsparse_array s_pair_a do | s, s_ |
-          Home_::Models_::Meaning.new s, s_
+          fly.__reinit_ s_, s
         end
 
         Home_::Models_::Meaning::Graph__.new _st
@@ -91,6 +93,22 @@ module Skylab::TanMan::TestSupport
       :natural_key_string,
       :object_id_of_item,
     )
+
+    class MockMeaning___ < ::BasicObject
+
+      def initialize
+        NOTHING_  # hi.
+      end
+
+      def __reinit_ v_s, n_s
+        @value_string = v_s ; @natural_key_string = n_s ; self
+      end
+
+      attr_reader(
+        :natural_key_string,
+        :value_string,
+      )
+    end
 
     # ==
     # ==

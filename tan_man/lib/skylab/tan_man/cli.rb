@@ -113,10 +113,6 @@ module Skylab::TanMan
         _slug sym
       end
 
-      def mixed_primitive x
-        x.inpsect
-      end
-
       # ~ custom stuff
 
       def pth s
