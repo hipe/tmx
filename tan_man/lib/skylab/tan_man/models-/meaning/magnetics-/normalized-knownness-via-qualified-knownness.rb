@@ -1,16 +1,16 @@
 module Skylab::TanMan
 
-  class Models_::Meaning
+  module Models_::Meaning
 
     module Magnetics_
 
       NormalizedKnownness_via_QualifiedKnownness = ::Module.new
 
-      class NormalizedKnownness_via_QualifiedKnownness::Name
+      class NormalizedKnownness_via_QualifiedKnownness::Name < Common_::Monadic
 
-        Actor_.call( self,
-          :qualified_knownness,
-        )
+        def initialize qkn, & p
+          @qualified_knownness = qkn ; @listener = p
+        end
 
         def execute
 
@@ -22,7 +22,7 @@ module Skylab::TanMan
         end
 
         def when_invalid
-          @on_event_selectively.call :error, :invalid_property_value do
+          @listener.call :error, :invalid_property_value do
             Common_::Event.inline_not_OK_with :invalid_meaning_name,
                 :meaning_name, @qualified_knownness.value_x do | y, o |
               y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
@@ -37,11 +37,11 @@ module Skylab::TanMan
 
       # ==
 
-      class NormalizedKnownness_via_QualifiedKnownness::Value
+      class NormalizedKnownness_via_QualifiedKnownness::Value < Common_::Monadic
 
-        Actor_.call( self,
-          :qualified_knownness,
-        )
+        def initialize qkn, & p
+          @qualified_knownness = qkn ; @listener = p
+        end
 
         def execute
           @x = @qualified_knownness.value_x
@@ -54,7 +54,7 @@ module Skylab::TanMan
         NL_RX__ = /[\r\n]/
 
         def when_invalid
-          @on_event_selectively.call :error, :invalid_property_value do
+          @listener.call :error, :invalid_property_value do
             Common_::Event.inline_not_OK_with :invalid_meaning_name,
                 :meaning_value, @x do | y, o |
               y << "value cannot contain newlines."
@@ -74,7 +74,7 @@ module Skylab::TanMan
         end
 
         def report_strip d
-          @on_event_selectively.call :info, :value_changed_during_normalization do
+          @listener.call :info, :value_changed_during_normalization do
             Common_::Event.inline_neutral_with :value_changed_during_normalization do | y, o |
               y << "trimming #{ d } char#{ s d } of whitespace from value"
             end

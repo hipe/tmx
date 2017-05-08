@@ -2,43 +2,76 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - meaning", wip: true do
+  describe "[tm] operations - meaning - add" do
 
     TS_[ self ]
-    use :operations
+    use :memoizer_methods
+    use :expect_CLI_or_API
+    use :models_meaning
+
+    # (formatting in this file is currently jagged in the interest of preserving legacy for now)
 
 # (1/N)
+    context do
+
     it "add - shell-style, after, in between - spacing mimics greatest lesser neighbor" do
+        _succeeds
+      end
+
+      shared_subject :tuple_ do
       s = "digraph{}\n # cutie : patootey\n  # fazinkle: doo-dinkle\n"
       insert_foo_bar_into s
-      s.should eql( <<-O.unindent )
+      end
+
+      it "(content)" do
+        _content <<-O.unindent
       digraph{}
        # cutie : patootey
         # fazinkle: doo-dinkle
         #      foo: bar
       O
-      expect_succeed
+      end
     end
 
 # (2/N)
+    context do
     it "add - C-style, before, before" do
+        _succeeds
+      end
+
+      it "(content)" do
+        _content " /* winterly : wanterly \n         foo : bar\n bliff blaff */ digraph{}"
+      end
+
+      shared_subject :tuple_ do
       s = " /* winterly : wanterly \n bliff blaff */ digraph{}"
       insert_foo_bar_into s
-      s.should eql " /* winterly : wanterly \n         foo : bar\n bliff blaff */ digraph{}"
-      expect_succeed
+      end
     end
 
 # (3/N)
+    context do
     it "add - C-style, inside, after" do
+        _succeeds
+      end
+
+      it "(content)" do
+        _content "digraph{ /* dolan : is \n a : duck \nfoo : bar\n */ }"
+      end
+
+      shared_subject :tuple_ do
       s = "digraph{ /* dolan : is \n a : duck \n */ }"
       insert_foo_bar_into s
-      s.should eql "digraph{ /* dolan : is \n a : duck \nfoo : bar\n */ }"
-      expect_succeed
+      end
     end
 
 # (4/N)
+    context do
     it "add - shell-style, inside, after" do
+        _succeeds
+      end
 
+      shared_subject :tuple_ do
       s = <<-O.unindent
         # bifd : x
 
@@ -51,33 +84,65 @@ module Skylab::TanMan::TestSupport
       O
 
       insert_foo_bar_into s
+      end
+
+      it "(content (partial))" do
 
       scn = TestSupport_::Expect_Line::Scanner.via_string s
       scn.advance_N_lines 4
-      scn.next_line.should eql "  # biff : baz\n"
-      scn.next_line.should eql "  #  foo : bar\n"
+        expect_these_lines_in_array_with_trailing_newlines_ scn do |y|
+          y << "  # biff : baz"
+          y << "  #  foo : bar"
+          y << nil  # experiment: quit early
+        end
+      end
     end
 
 # (5/N)
+    context do
     it "add to string with one space" do
+        _succeeds
+      end
+
+      it "(content)" do
+        _content "digraph{ # foo : bar\n}"
+      end
+
+      shared_subject :tuple_ do
       s = 'digraph{ }'
       insert_foo_bar_into s
-      s.should eql "digraph{ # foo : bar\n}"
-      expect_succeed
+      end
     end
 
 # (6/N)
-    it "add will not clobber" do
+    context "add will not clobber" do
+
+      it "fails" do
+        _fails
+      end
+
+      it "emission.." do
+        _actual = black_and_white _tuple.first
+        _actual == 'cannot set "foo" to "bar". it is already set to "x"' || fail
+      end
+
+      shared_subject :_tuple do
+
       s = "digraph{ # foo : x\n}"
-      insert_foo_bar_into s
-      expect_not_OK_event :name_collision,
-        'cannot set (lbl "foo") to (val "bar"), it is already set to (val "x")'
-      expect_fail
+
+        s.freeze  # (tacitly asserts that selfsame string is not mutated)
+        call_API_for_add_meaning_ s
+
+        a = []
+        expect :error, :name_collision do |ev|
+          a.push ev
+        end
+        a.push execute
+      end
     end
 
-    def insert_foo_bar_into s
-      call_API :meaning, :add, :input_string, s, :output_string, s, :name, 'foo', :value, 'bar'
-    end
+    alias_method :_succeeds, :expect_result_from_add_is_entity__
+    alias_method :_content, :expect_content_from_add_is__
 
 # (7/N)
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
@@ -110,7 +175,10 @@ module Skylab::TanMan::TestSupport
       stmt = graph.to_node_statement_stream.gets.stmt
       alist = stmt.attr_list.content
       alist.unparse.should eql( 'label=barl, fillcolor="too"' )
-      attrs = [['fontname', 'Futura'], ['fillcolor', '#11c11']]
+      attrs = {
+        fontname: "Futura",
+        fillcolor: "#11c11",
+      }  # before #history-A.1 the above was a 2-D array (2 element tuples)
       alist.update_attributes_ attrs
       alist.unparse.should eql(
         'fontname=Futura, label=barl, fillcolor="#11c11"'  )
@@ -123,6 +191,7 @@ module Skylab::TanMan::TestSupport
     end
 
 # (9/N)
+    if false
     it "OMG associate" do
 
       _input_string = <<-O.unindent
@@ -153,8 +222,17 @@ module Skylab::TanMan::TestSupport
       scn.advance_N_lines 2
       scn.next_line.should eql "fizzle [fillcolor=\"#79f234\", label=fizzle, style=filled]\n"
     end
+    end
 
-    ignore_these_events :wrote_resource
+    def _fails
+      _x = _tuple.last
+      _x.nil? || false
+    end
+
+    # ==
+    # ==
 
   end
 end
+# #pending-rename: this tests both add AND apply (or called "associate")
+# :#history-A.1 (can be temporary) (as referenced)

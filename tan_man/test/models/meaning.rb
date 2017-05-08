@@ -13,6 +13,25 @@ module Skylab::TanMan::TestSupport
 
       # -- assertion
 
+      def expect_result_from_add_is_entity__
+        _t = tuple_
+        _rslt = _t.result_of_API_call
+        ent = _rslt.user_value
+        ent.HELLO_MEANING
+        ent.dereference( :name ) == "foo" || fail
+        ent.dereference( :value ) == "bar" || fail
+      end
+
+      def expect_content_from_add_is__ expected_s
+        _actual = s
+        _actual == expected_s || fail
+      end
+
+      def s  # 1x here, 1x in test (for legacy code, adapted)
+        _t = tuple_
+        _t.big_string
+      end
+
       # -- setup
 
       def graph_from * s_pair_
@@ -22,6 +41,28 @@ module Skylab::TanMan::TestSupport
         end
 
         Home_::Models_::Meaning::Graph__.new _st
+      end
+
+      def insert_foo_bar_into s  # (legacy name)
+
+        call_API_for_add_meaning_ s
+
+        expect :success, :wrote_resource
+
+        _x = execute
+        ThisOneTuple___.new _x, s
+      end
+
+      def call_API_for_add_meaning_ s
+
+        call_API(
+          :meaning, :add,
+          :input_string, s,
+          :output_string, s,
+          :name, "foo",
+          :value, "bar",
+        )
+        NIL
       end
 
       def matrix_of_item_snapshots_via_meaning_stream_ st
@@ -39,6 +80,11 @@ module Skylab::TanMan::TestSupport
     # -
 
     # ==
+
+    ThisOneTuple___ = ::Struct.new(
+      :result_of_API_call,
+      :big_string,
+    )
 
     ItemSnapshot___  = ::Struct.new(
       :value_string,

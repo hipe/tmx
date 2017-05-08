@@ -6,37 +6,41 @@ module Skylab::TanMan
 
     ActionBoilerplate_ = ::Class.new
 
-    if false
-    edit_entity_class(
-
-      :persist_to, :meaning,
-
-      :preconditions, [ :dot_file ],
-
-      :required,
-      :ad_hoc_normalizer, -> qkn, & oes_p do
-        Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness::Name[ qkn, & oes_p ]
-      end,
-      :property, :name,
-
-      :required,
-      :ad_hoc_normalizer, -> qkn, & oes_p do
-        Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness::Value[ qkn, & oes_p ]
-      end,
-      :property, :value,
-    )
-    end  # if false
-
     module Actions
 
-      if false
-      Add = make_action_class :Create do
+      class Add < ActionBoilerplate_
 
-        edit_entity_class(
-          :flag, :property, :force,
-          :reuse, Model_::DocumentEntity.IO_properties )
+        def definition
+          [
+            :required,
+            :property, :name,
 
-      end
+            :required,
+            :property, :value,
+
+            :properties, _these_,
+
+            # :flag, :property, :force,
+          ]
+        end
+
+        def execute
+          @dry_run = nil
+          __with_read_write_operator_branch_facade_ do
+            __via_operator_branch
+          end
+        end
+
+        def __via_operator_branch
+
+          _ent = @_operator_branch_.add_meaning__(
+            # remove_instance_variable( :@force ),
+            remove_instance_variable( :@value ),
+            remove_instance_variable( :@name ),
+            & _listener_ )
+
+          _ent || NIL_AS_FAILURE_
+        end
       end
 
       class Ls < ActionBoilerplate_
@@ -48,7 +52,7 @@ module Skylab::TanMan
         end
 
         def execute
-          __with_read_only_operator_branch_facade__ do
+          __with_read_only_operator_branch_facade_ do
             @_operator_branch_.to_meaning_entity_stream_
           end
         end
@@ -125,7 +129,17 @@ module Skylab::TanMan
         @_associations_[ asc.name_symbol ] = asc
       end
 
-      def __with_read_only_operator_branch_facade__
+      def __with_read_write_operator_branch_facade_
+
+        with_mutable_digraph_ do
+          @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_mutable_digraph_
+          x = yield
+          remove_instance_variable :@_operator_branch_
+          x
+        end
+      end
+
+      def __with_read_only_operator_branch_facade_
 
         with_immutable_digraph_ do
           @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_immutable_digraph_

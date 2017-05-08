@@ -348,7 +348,7 @@ module Skylab::TestSupport
 
       ExpectThese__.call_by do |o|
         o.map_expectations_by do |exp_x|
-          if ! exp_x.respond_to? :named_captures
+          if exp_x and ! exp_x.respond_to? :named_captures
             exp_x << NEWLINE_
           end
           exp_x
@@ -395,7 +395,11 @@ module Skylab::TestSupport
         @receive_yielder[ _y ]
 
         if ! @_actual_item_scanner.no_unparsed_exists
-          fail __say_extra
+          if @_expectations_terminated_early
+            NOTHING_  # hi.
+          else
+            fail __say_extra
+          end
         end
       end
 
@@ -415,12 +419,14 @@ module Skylab::TestSupport
       def _expectation_receiver_raw
 
         act_scn = @_actual_item_scanner
+        @_expectations_terminated_early = false
 
         ::Enumerator::Yielder.new do |exp_x|
 
           if act_scn.no_unparsed_exists
             fail __say_missing exp_x
-          else
+
+          elsif exp_x
             act_x = act_scn.head_as_is
             if exp_x.respond_to? :named_captures
               if exp_x !~ act_x
@@ -430,6 +436,8 @@ module Skylab::TestSupport
               fail _say_not_same exp_x
             end
             act_scn.advance_one
+          else
+            @_expectations_terminated_early = true ;  # experiment for [tm]
           end
         end
       end
@@ -870,6 +878,10 @@ module Skylab::TestSupport
         def fake_open
           Common_::Stream.via_nonsparse_array @a
         end
+      end
+
+      def gets  # so it can act like a minimal stream
+        @up.gets
       end
     end
 

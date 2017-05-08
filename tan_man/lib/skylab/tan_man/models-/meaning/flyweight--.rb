@@ -4,6 +4,12 @@ module Skylab::TanMan
 
   class Flyweight__
 
+      class << self
+        def via_this_data__ * a
+          new.__init_via_this_data( * a )
+        end
+      end  # >>
+
     def initialize
       @indexed = @scn = nil
     end
@@ -88,6 +94,10 @@ module Skylab::TanMan
       @value_range
     end
 
+    def mutable_whole_string
+      @scn.string
+    end
+
   private
 
     white_rx = /[ \t]+/
@@ -111,6 +121,35 @@ module Skylab::TanMan
       @next_line_start_pos = @scn.pos
       @indexed = true
     end
+
+      public
+
+      def __init_via_this_data v_r, n_r, line
+
+        # a hackish afterthought to bridge legacy code with our new thing
+        # of resulting in an entity after an add: while changing as little
+        # other code as possible here, let the client prouduce a meaning
+        # "entity" given the arguments. the implementation is hacked to
+        # allow the rest of the subject to think it's in the middle of a
+        # scan of a large string #spot2.3
+
+        @value_range = v_r
+        @name_range = n_r
+        @scn = StaticScanner___.new line
+        @indexed = true
+        freeze
+      end
+
+      def HELLO_MEANING  # #todo during development
+        NOTHING_
+      end
+
+      # ==
+
+      StaticScanner___  = ::Struct.new :string  # per #spot2.3 (above)
+
+      # ==
+      # ==
   end
   end
 end
