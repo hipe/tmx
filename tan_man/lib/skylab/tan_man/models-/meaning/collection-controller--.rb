@@ -9,32 +9,25 @@ module Skylab::TanMan
         __init_string_array_via_digraph_controller dc
       end
 
-      def into_node_apply_meaning__ node_label, is_dry, meaning_name, & listener
+      def into_node_apply_meaning_by_
 
         Here_::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call_by do |o|
-          o.node_label = node_label
-          o.meaning_name_string = meaning_name
-          o.is_dry = is_dry
-          o.meanings_operator_branch = self
+          yield o
           o.mutable_digraph = @__mutable_digraph
-          o.listener = listener
+          o.meanings_operator_branch = self
         end
       end
 
-      def add_meaning__ value_s, name_s, & p
+      def add_meaning_by_
 
         # :#tombstone-A.2 we used to ask where the saving happens [#001] - now we know
 
         # entity on success. false-ish on failure
 
         Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call_by do |o|
-
+          yield o
           o.fallback_mutable_string = @fallback_mutable_string
           o.entity_stream_by = method :to_meaning_entity_stream_
-
-          o.name = name_s
-          o.value = value_s
-          o.listener = p
         end
       end
 

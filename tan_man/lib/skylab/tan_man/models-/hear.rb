@@ -1,171 +1,254 @@
 module Skylab::TanMan
 
-  class Models_::Hear_Front < Model_
+  module Models_::Hear
+
+    # :[#030] "hear" is the very beginnings of a rough prototype for an idea..
+    # it's much like the beginnings of a [#br-002] frontier "modality".
 
     Actions = ::Module.new
 
-    class Actions::Hear < Action_
+    class Actions::Hear
 
-      @is_promoted = true
-
-      @after_name_symbol = :status
-
-      Entity_.call self,
-
+      def definition
+        false and [
         :branch_description, -> y do
           y << 'experimental natural language-ISH interface'
         end,
 
         :inflect, :noun, nil, :verb, 'understand',
-
-        :reuse, Model_::DocumentEntity.IO_properties,
+        ]
+        _these = Home_::DocumentMagnetics_::CommonAssociations.all_
+        [
+        :properties, _these,
 
         :flag, :property, :dry_run,
 
-        :required, :argument_arity, :one_or_more, :property, :word
-
-      def produce_result
-
-        bx = to_qualified_knownness_box__
-
-        bx.add :stdout, Common_::Qualified_Knownness.
-          via_value_and_symbol( stdout_, :stdout )
-
-        bc = @kernel.silo( :hear_front ).__bound_call_via_qualified_knownness_box(
-          bx,
-          & handle_event_selectively )
-
-        if bc
-          bc.receiver.send bc.method_name, * bc.args
-        else
-          bc
-        end
+        :required, :property, :words,  # ..
+        ]
       end
-    end
-
-    class Silo_Daemon < ::Object
 
       # every top-level model node has zero or more parse functions. these are
       # instantiated lazily, only as many as are needed to find one that
       # parses the input. but each that is created is cached, so that we only
       # ever create one parse function for the lifetime of the process.
 
-      def initialize k, _model_class
-
-        @k = k
-
-        _st_ = __to_definition_stream
-
-        _st = Brazen_::Ordered_stream_via_participating_stream[ _st_ ]
-
-        _st_ = Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
-          o.upstream = _st
-          o.key_method_name = :name_value_for_order
-        end
-
-        @definition_collection = _st_
+      def initialize
+        extend Home_::Model_::CommonActionMethods
+        init_action_ yield
+        @_associations_ = {}
       end
 
-      def __bound_call_via_qualified_knownness_box bx, & oes_p
+      def _accept_association_ asc
+        @_associations_[ asc.name_symbol ] = asc
+      end
 
-        word_s_a = bx.fetch( :word ).value_x
+      def execute
 
-        upstream = Home_.lib_.parse_lib.input_stream.via_array word_s_a
-
-        st = @definition_collection.to_value_stream
-        dfn = st.gets
-        while dfn
-          on = dfn.parse_function.output_node_via_input_stream upstream
-          on and break
-          upstream.current_index = 0
-          dfn = st.gets
-        end
+        up_st = Parse_lib_[].input_stream.via_array @words
+        st = _to_exposure_stream
+        begin
+          exp = st.gets
+          exp || break
+          on = exp._parse_function.output_node_via_input_stream up_st
+          on && break
+          up_st.current_index = 0
+          redo
+        end while above
 
         if on
-          dfn.external_definition.bound_call_via_heard(
-            Heard__[ on.value_x, bx, @k ], & oes_p )
+          _me_as_box = to_box_
+          _hrd = Heard___.new on.value_x, _me_as_box, @_microservice_invocation_
+          exp._native_definition.execute_via_heard _hrd, & _listener_  # result is association entity (on success)
         else
-          __when_no_matching_definition word_s_a, & oes_p
-        end
-      end
-
-      def __to_definition_stream
-
-        __to_name_of_module_that_has_hear_map_stream.expand_by do | nm |
-
-          bx = Home_::Models_.const_get( nm.as_const, false ).const_get( :Hear_Map, false )::Definitions
-
-          Common_::Stream.via_nonsparse_array bx.constants do | const |
-
-            Definition__.new(
-              bx.const_get( const, false ),
-              const,
-              nm )
-
+          _listener_.call :error, :unrecognized_utterance do
+            __build_event
           end
+          NIL_AS_FAILURE_
         end
       end
 
-      Heard__ = ::Struct.new :parse_tree, :qualified_knownness_box, :kernel
+      def __build_event
 
-      def __to_name_of_module_that_has_hear_map_stream
+        _f_a = _to_exposure_stream.map_by do |exp|
+          exp._parse_function
+        end.to_a
 
-        # just reading from the filesystem is easier and cheaper
+        Common_::Event.inline_not_OK_with(
+          :unrecognized_utterance,
+          :words, @words,
+          :parse_functions, _f_a,
+        ) do |y, o|
 
-        _glob = ::File.join Models_.dir_path, '*', "hear-map#{ Autoloader_::EXTNAME }"
-        _entries = ::Dir[ _glob ]
-        Common_::Stream.via_nonsparse_array _entries do |path|
+          y << "unrecognized input #{ ick_mixed o.words }. known definitions:"
 
-          Common_::Name.via_slug( ::File.basename ::File.dirname path )
-        end
-      end
-
-      def __when_no_matching_definition words, & oes_p
-
-        oes_p.call :error, :unrecognized_utterance do
-
-          _f_a = @definition_collection.to_value_stream.map_by do | x |
-            x.parse_function
-          end.to_a
-
-          Common_::Event.inline_not_OK_with :unrecognized_utterance,
-              :words, words,
-              :parse_functions, _f_a do | y, o |
-
-            y << "unrecognized input #{ ick_mixed o.words }. known definitions: "
-
-            o.parse_functions.each do | f |
-              y << f.express_all_segments_into_under( "" )
-            end
-
-            nil
+          o.parse_functions.each do |f|
+            y << f.express_all_segments_into_under( "" )
           end
+          y
         end
+      end
 
-        UNABLE_
+      def _to_exposure_stream
+        Memoized_exposure_operator_branch___[].to_dereferenced_item_stream
       end
     end
 
-    class Definition__
+    Heard___ = ::Struct.new(
+      :parse_tree,
+      :qualified_knownness_box,
+      :microservice_invocation,
+    )
 
-      def initialize cls, const, nm
+    # ==
 
-        @external_definition = cls.new
+    Memoized_exposure_operator_branch___ = Lazy_.call do  # :#here1
 
-        @name_value_for_order = [ nm.as_lowercase_with_underscores_symbol,
-          Common_::Name.via_const_symbol( const ).as_lowercase_with_underscores_symbol ]
+      _unordered_st = To_stream_of_unordered_exposures___[]
 
-        @parse_function = Home_.lib_.parse_lib.function_via_definition_array(
-          @external_definition.definition )
+      _ordered_exposure_st = Home_.lib_.brazen_NOUVEAU::
+        Ordered_stream_via_participating_stream[ _unordered_st ]
 
+      Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
+        o.upstream = _ordered_exposure_st
+        o.key_method_name = :name_value_for_order
       end
+    end
 
-      attr_reader :external_definition, :name_value_for_order, :parse_function
+    # ==
+
+    To_stream_of_unordered_exposures___ = -> do
+
+      To_stream_of_participating_silos___[].expand_by do |silo|
+
+        ExposureStream_via_ParticipatingSilo___[ silo ]
+      end
+    end
+
+    # ==
+
+    ExposureStream_via_ParticipatingSilo___ = -> o do
+
+      normal_sym = o.normal_symbol
+
+      mod = o.silo_module.const_get( :HearMap, false )::Definitions
+
+      _consts = mod.constants
+
+      Stream_.call _consts do |const|
+
+        _cls = mod.const_get const, false
+
+        Exposure___.new _cls, const, normal_sym
+      end
+    end
+
+    # ==
+
+    class Exposure___
+
+      def initialize cls, const, normal_sym
+
+        defn = cls.new
+
+        @_parse_function = Parse_lib_[].function_via_definition_array(
+          defn.definition )
+
+        _sym = Common_::Name.via_const_symbol( const ).as_lowercase_with_underscores_symbol
+
+        @name_value_for_order = [ normal_sym, _sym ].freeze
+
+        @_native_definition = defn
+
+        freeze
+      end
 
       def after_name_value_for_order
-        @external_definition.after
+        @_native_definition.after
+      end
+
+      attr_reader(
+        :name_value_for_order,  # participate with [co] ordering
+        :_native_definition,
+        :_parse_function,
+      )
+    end
+
+    # ==
+
+    To_stream_of_participating_silos___ = -> do
+
+      # (weirdly, for once we don't memoize this operator branch because
+      #  we're already memoizing its leaf nodes of interest #here1)
+
+      Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
+
+        mod = Models_
+
+        o.startingpoint_module = mod
+
+        o.glob_entry = ::File.join '*', "hear-map#{ Autoloader_::EXTNAME }"
+
+        o.directory_is_assumed_to_exist = true
+
+        o.loadable_reference_via_path_by = Participating_silo_builder_via___[ mod ]
+
+      end.to_loadable_reference_stream
+    end
+
+    # ==
+
+    Participating_silo_builder_via___ = -> mod do
+
+      -> path do
+
+        _slug = ::File.basename ::File.dirname path
+        name = Common_::Name.via_slug _slug
+
+        const = name.as_camelcase_const_string.intern
+        _mod = mod.const_get const, false
+
+        _sym = name.as_lowercase_with_underscores_symbol
+
+        ParticipatingSilo___.new _mod, _sym
       end
     end
+
+    ParticipatingSilo___ = ::Struct.new(
+      :silo_module,
+      :normal_symbol,  # for o.b caching (not used but meh)
+    )
+
+    # ==
+
+    DEFINITION_FOR_THE_METHOD_CALLED_WITH_MUTABLE_DIGRAPH = -> & p do
+
+      Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
+
+        o.session_by do |sess|
+          @_mutable_digraph_ = sess
+          x = p[]
+          remove_instance_variable :@_mutable_digraph_
+          x
+        end
+
+        o.be_read_write_not_read_only_
+        o.qualified_knownness_box = @_qualified_knownness_box_
+
+        o.is_dry_run = false  # let's just say this isn't available under "hear"
+        o.microservice_invocation = @_microservice_invocation_
+        o.listener = _listener_
+      end
+    end
+
+    # ==
+
+    Parse_lib_ = Lazy_.call do
+      Home_.lib_.parse_lib
+    end
+
+    # ==
+    # ==
   end
 end
+# #history-A.1: full rewrite during ween off [br]. tombstone of resulting in "bound call"
 # (historical note of #posterity: this used to be *THE* PEG grammar file.)

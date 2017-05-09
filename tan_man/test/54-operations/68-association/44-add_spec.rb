@@ -303,13 +303,13 @@ module Skylab::TanMan::TestSupport
 
           with_operator_branch_for_associations_ do |ob|
 
-            ob.touch_by__ do |o|
+            ob.touch_association_by_ do |o|
               o.from_and_to_labels "c", "d"
               o.prototype_name_symbol = :fancy
               o.listener = p
             end
 
-            ob.touch_by__ do |o|
+            ob.touch_association_by_ do |o|
               o.from_and_to_labels "b", "a"
               o.prototype_name_symbol = :boring
               o.listener = p

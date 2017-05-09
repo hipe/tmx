@@ -1,5 +1,69 @@
 # the operator branch structure pattern :[#051]
 
+## introduction
+
+because of the ubiquity of hashes and their near-univeral familiarity
+across different platforms (programming languages), it's useful to
+introduce "operator branches" in terms of how they can be seen as
+something of a "view" on a hash.
+
+but it's equally essential to understand that hashes actually don't
+have anything to do with operator branches, except that a) one particular
+operator branch implementation happens to exist that wraps a hash and
+b) hashes are useful as a didactic tool here because of their partial
+isomorphism with the subject.
+
+there is nowadays a tendency to conceive of everything that seems like
+a "collection" (as in the broad category of data structures as described
+in wikipedia) as an "operator branch" (this name to be justified below).
+the relevant point here is that at its essense an operator branch is a
+collection of some sort of "items".
+
+whereas in a hash an item is *added* (or call it "inserted", or call it
+"set" (these three ideas are similar but not the same)) using a key (or
+say it's "associated" with a key); in an operator branch the terminology
+we use is "reference" (as opposed to "key").
+
+  - the item *reference* is (usually) not the *item*
+
+
+
+
+## synopsis of possible exposures
+
+one key "thing" about operator branches is that it's not a strict
+"interface" per se, but more of a set of method names with well-defined
+semantics, acting as a sort of "guideline" for how collections should
+be interfaced; for lack of any compelling reason not to. participating
+clients are free to cherry-pick whichever methods from this set it makes
+sense to; and so
+
+  - it *cannot* be assumed that anything calling itself an operator branch
+    responds to any *particular* one of these methods.
+
+  - it *can* be assumed that anything calling itself an operator branch
+    implements at least one (and probably a few) of these methods.
+
+here's some of these:
+
+  - `to_loadable_reference_stream`
+
+  - `to_dereferenced_item_stream`
+
+  - `dereference`
+
+  - `lookup_softly`
+
+
+
+
+## why is it called "operator branch"?
+
+(EDIT)
+
+
+
+
 ## beginnings
 
 for driving an argument scan, a popular choice of ours lately is
@@ -87,6 +151,8 @@ in fact, as a case study (and also for very pragmatic reasons) see
 
 
 ## document meta
+
+  - #pending-rename: we sorta want to rename this "operator branch theory" (maybe)
 
   - #history-A: in this selfsame commit we refactor a problematic method
     name (and indeed whole interface) to make use of the standard interface

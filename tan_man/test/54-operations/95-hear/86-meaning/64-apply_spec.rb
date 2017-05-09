@@ -2,16 +2,24 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - hear - meaning - apply", wip: true do
+  describe "[tm] operations - hear - meaning - apply" do
 
     TS_[ self ]
-    use :expect_line
+    use :memoizer_methods
+    use :operations  # for #here1
+    use :expect_CLI_or_API
 
 # (1/N)
-    it "add meaning"
+
+    # #tombstone (very likely temporary): test was pending. now in other file.
 
 # (2/N)
+    context do
     it "associate meaning" do
+        __succeeds
+      end
+
+      shared_subject :_tuple do
 
       s = <<-HERE.unindent
         digraph{
@@ -21,14 +29,31 @@ module Skylab::TanMan::TestSupport
       HERE
 
       call_API(
-        :hear,
-        :word, %w( foo is done ),
+          * the_subject_action_for_hear_,
+          :words, %w( foo is done ),
         :input_string, s,
         :output_string, s )
 
-      expect_OK_event :updated_attributes
-      @output_s = s
-      excerpt( 2 .. 2 ).should eql "  foo [label=\"foo\", style=filled]\n"
+        expect :info, :updated_attributes
+        a = [ s ]
+        a.push execute
+      end
+
+      it "(content)" do
+        _actual = string_of_excerpted_lines_of_output_ 2..2  # :#here1
+        _actual == "  foo [label=\"foo\", style=filled]\n"
+      end
     end
+
+    def __succeeds  # similar to but different from sibling: different type of entity
+      sct = _tuple.last
+      sct.did_write || fail
+      sct.user_value.HELLO_NODE
+    end
+
+    ignore_these_events :wrote_resource
+
+    # ==
+    # ==
   end
 end

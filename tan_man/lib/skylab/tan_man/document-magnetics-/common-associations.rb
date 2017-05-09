@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   module DocumentMagnetics_::CommonAssociations
 
+    # (the IO-related parameters here are explained at [#026])
+
     # ==
 
     class << self

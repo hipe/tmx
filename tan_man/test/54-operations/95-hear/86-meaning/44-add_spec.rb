@@ -2,58 +2,78 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - hear - meaning - create", wip: true do
+  describe "[tm] operations - hear - meaning - create" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :operations
+    use :expect_CLI_or_API
 
 # (1/N)
+    context do
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do
+        _succeeds
+      end
 
-      o = given_dotfile_ <<-O.unindent
+      shared_subject :_tuple do
+
+        _up_s = <<-O.unindent
         digraph {
           # biff : baz
         }
       O
 
+      s = ""
       call_API(
-        :hear,
-        :word, [ 'foo', 'means', 'bar' ],
-        :workspace_path, o.workspace_path,
-        :config_filename, o.config_filename,
+        * the_subject_action_for_hear_,
+          :words, %w( foo means bar ),
+          :input_string, _up_s,
+          :output_string, s,
       )
+        a = [ s ]
+        a.push execute
+        a
+      end  # _tuple
 
-      expect_OK_event :wrote_resource
-      expect_succeed
-
+      it "(content)" do
+        _actual = _tuple.first
       _exp = <<-O.unindent
         digraph {
           # biff : baz
           #  foo : bar
         }
       O
-
-      ::File.read( dotfile_path ).should eql _exp
-    end
+        _actual == _exp || fail
+      end
+    end  # context
 
 # (2/N)
+    context do  # :#cov3.3
     it "assign a known meaning to a new value" do
+        _succeeds
+      end
 
-      o = given_dotfile_ <<-O.unindent
+      shared_subject :_tuple do
+
+        _s = <<-O.unindent
         digraph {
           # success : red
         }
       O
 
+        s = ""
       call_API(
-        :hear,
-        :word, [ 'success', 'means', 'blue' ],
-        :workspace_path, o.workspace_path,
-        :config_filename, o.config_filename,
+          * the_subject_action_for_hear_,
+          :words, %w( success means blue ),
+          :input_string, _s,
+          :output_string, s,
       )
+        a = [ s ]
+        a.push execute
+        a
+      end
 
-      expect_OK_event :wrote_resource
-      expect_succeed
+      it "(content)" do
 
       _exp = <<-O.unindent
         digraph {
@@ -61,9 +81,19 @@ module Skylab::TanMan::TestSupport
         }
       O
 
-      ::File.read( dotfile_path ).should eql _exp
+        _tuple.first == _exp || fail
+      end
     end
 
-    ignore_these_events :using_parser_files
+    def _succeeds
+      sct = _tuple.last
+      sct.did_write || fail
+      sct.user_value.HELLO_MEANING
+    end
+
+    ignore_these_events :wrote_resource
+
+    # ==
+    # ==
   end
 end

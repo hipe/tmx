@@ -25,25 +25,24 @@ API's: [f2],[bs],[tr],[sl]
 finish what you started with expag (somewhere)
 (there are many "hi. ##{}todo"-type lines in [fi])
 explain MTk and associate the explanation with its nodes
-API's: [tm],[gv],[cu],[cm]
 HO tan_man/test/62-cli_spec.rb
+([gv]: 2 actions, API only)
+([cm]: 4 actions, API only)
+([cu]: 7 actions, API only)
+(the two more [tm]-related items stacked far below this one)
 `make_action_class` and related: liquidate this. (push back as necessary)
 `make_action_making_actions_module` too
 (many $stderr in [tm])
 (many `if false` in [tm])
 #open [#tm-097] abstract when an expected primitive is not found in config
+in the node add spec, archive those two tests
 (model: graph)
 (related: driftwood in [#tm-026])
 (related: Common_Collection_Controller_Methods_ is driftwood)
 TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
-(silo: hear)
-`ignore_these_events` can go away
 consider trying to quash `make_action_making_actions_module`
 maybe close [#001] - because now, the layer where entities are persisted is fixed
-TD tan_man/test/54-operations/95-hear/86-meaning/64-apply_spec.rb
-TD tan_man/test/54-operations/95-hear/86-meaning/44-create_spec.rb
-TD tan_man/test/54-operations/95-hear/68-association_spec.rb
-TD tan_man/test/54-operations/95-hear/10-intro_spec.rb
 (model: node)
 refactor the add to use the doohah
 get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]
+one_entity_against_natural_key_fuzzily_

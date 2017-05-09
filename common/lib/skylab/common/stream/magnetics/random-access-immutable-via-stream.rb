@@ -3,7 +3,7 @@ module Skylab::Common
   class Stream::Magnetics::RandomAccessImmutable_via_Stream < SimpleModel
 
     # this is :[#016.4], which is refereneced (only ever) by [sy] which
-    # has what is likely an improvment on this implementation, but
+    # has what is likely an improvement on this implementation, but
     # specific for directory listings at [#sy-040]. either abstract that
     # work up into here, or at least duplicate its test "galley" here.
 
@@ -21,14 +21,12 @@ module Skylab::Common
 
       # -- read
 
-      include Box::InstanceMethods
-
-      def offset_of k
+      def offset_via_reference k  # [ac]
         if @_cache.key? k
           @_order.index k
         else
           had = true
-          _fetch_when_not_in_cache k do
+          _lookup_when_not_in_cache k do
             had = false
           end
           if had
@@ -39,7 +37,22 @@ module Skylab::Common
         end
       end
 
-      def fetch k, & p
+      def to_dereferenced_item_stream
+        scn = __to_key_scanner
+        Stream.by do
+          unless scn.no_unparsed_exists
+            _lookup scn.gets_one
+          end
+        end
+      end
+
+      def lookup_softly k
+        _lookup k do
+          NOTHING_
+        end
+      end
+
+      def _lookup k, & p
         had = true
         x = @_cache.fetch k do
           had = false
@@ -47,13 +60,13 @@ module Skylab::Common
         if had
           x
         else
-          _fetch_when_not_in_cache k, & p
+          _lookup_when_not_in_cache k, & p
         end
       end
 
-      def _fetch_when_not_in_cache k, & p
+      def _lookup_when_not_in_cache k, & p
         if @_open
-          __lookup p, k
+          __lookup_when_open p, k
         elsif p
           p[]
         else
@@ -61,7 +74,7 @@ module Skylab::Common
         end
       end
 
-      def __lookup p, k
+      def __lookup_when_open p, k
         scn = _to_caching_unseen_key_scanner
         begin
           if scn.no_unparsed_exists
@@ -82,7 +95,7 @@ module Skylab::Common
         x
       end
 
-      def to_key_scanner
+      def __to_key_scanner
         if @_open
           if @_cache.length.zero?
             _to_caching_unseen_key_scanner
@@ -139,4 +152,5 @@ module Skylab::Common
     # ==
   end
 end
+# #pending-rename: operator branch something
 # #tombstone-A: used to use iambic attributes, removed TONS of unused method

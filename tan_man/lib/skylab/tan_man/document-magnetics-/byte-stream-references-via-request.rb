@@ -7,6 +7,8 @@ module Skylab::TanMan
     # given one or both "throughput directions" (input and/or output), solve
     # a single qualified actual parameter for each direction. if exactly one
     # cannot be resolved for each direction unambiguously, fail expressively
+    #
+    # (also, legacy [#021.B] attempts to describe an earlier version of this)
 
     # oh, also, this thing with "hereput"
 

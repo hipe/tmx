@@ -20,7 +20,10 @@ module Skylab::TanMan
 
             :properties, _these_,
 
-            # :flag, :property, :force,
+            :flag, :property, :force,
+            :description, -> y do
+              y << "necessary to allow you to change the value of an existing meaning"
+            end,
           ]
         end
 
@@ -33,11 +36,13 @@ module Skylab::TanMan
 
         def __via_operator_branch
 
-          _ent = @_operator_branch_.add_meaning__(
-            # remove_instance_variable( :@force ),
-            remove_instance_variable( :@value ),
-            remove_instance_variable( :@name ),
-            & _listener_ )
+          _ent = @_operator_branch_.add_meaning_by_ do |o|
+
+            o.value_string = remove_instance_variable :@value
+            o.name_string = remove_instance_variable :@name
+            o.force_is_present = remove_instance_variable :@force
+            o.listener = _listener_
+          end
 
           _ent || NIL_AS_FAILURE_
         end
@@ -93,11 +98,13 @@ module Skylab::TanMan
         end
 
         def __via_operator_branch
-          @_operator_branch_.into_node_apply_meaning__(
-            @node_label,
-            remove_instance_variable( :@dry_run ),
-            @meaning_name,
-            & _listener_ )
+
+          @_operator_branch_.into_node_apply_meaning_by_ do |o|
+            o.node_label = @node_label
+            o.meaning_name_string = @meaning_name
+            o.is_dry = remove_instance_variable :@dry_run
+            o.listener = _listener_
+          end
         end
       end
     end

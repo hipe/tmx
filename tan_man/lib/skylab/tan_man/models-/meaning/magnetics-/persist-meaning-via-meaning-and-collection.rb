@@ -16,18 +16,35 @@ module Skylab::TanMan
 
         def initialize
           @new_line = nil  # bc #here1
-          @change_is_OK = nil
           super
         end
 
+        # ~( keeping these two legacy names for the ivars for now
+
+        def value_string= s
+          @value = s
+        end
+
+        def name_string= s
+          @name = s
+        end
+
+        # ~)
+
+        def force_is_present= yes
+          if yes
+            @_has_force = :__TRUE
+          else
+            @_has_force = :__FALSE
+          end
+          yes
+        end
+
         attr_writer(
-          :change_is_OK,
           :entity_stream_by,
           :listener,
-          :name,  # legacy name
           :fallback_mutable_string,
           :session,
-          :value,  # legacy name
         )
 
         def execute
@@ -68,9 +85,11 @@ module Skylab::TanMan
         end
 
         def __when_exact_match_fly_resolve_insertion_ivars
-          if @change_is_OK
-            self._COVER_ME__was_this_ever_called__we_arent_sure_
-            __via_exact_match_init_insertion_ivars
+
+          _has_force = send @_has_force  # (a bit of extra poka-yoke)
+
+          if _has_force
+            __via_exact_match_init_insertion_ivars  # #cov3.3
           else
             __when_name_collision
           end
@@ -254,6 +273,14 @@ module Skylab::TanMan
 
         def build_not_OK_event_with * a, & p
           Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc a, p
+        end
+
+        def __FALSE
+          FALSE
+        end
+
+        def __TRUE
+          TRUE
         end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/

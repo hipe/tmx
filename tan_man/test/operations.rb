@@ -3,43 +3,126 @@ module Skylab::TanMan::TestSupport
   module Operations
 
     def self.[] tcc
+
+      tcc.send :define_singleton_method, :ignore_these_events,
+        DEFINITION_FOR_THE_METHOD_CALLED_IGNORE_THESE_EVENTS___
+
       tcc.include self
     end
 
-    if false
+    # -
+      DEFINITION_FOR_THE_METHOD_CALLED_IGNORE_THESE_EVENTS___ = -> * syms do
+        h = {}
+        syms.each do |sym|
+          h[ sym ] = true
+        end
+        h.freeze
+        define_method :ignore_emissions_whose_terminal_channel_is_in_this_hash do
+          h
+        end
+        NIL
+      end
+    # -
 
-    # ~ adjunct facet : hearing ( & abstract graphs )
+    module Legacy_Methods_For_Hear
+
+      # NOTE this module is something of a mishmash that exists *wholly*
+      # because we want to see (experimentally) what hoops we have to jump
+      # through to keep as much as possible the legacy code intact of a
+      # particular few test(s). because the methods in this category run the
+      # gamut from behavior we might want to re-use across silos to behavior
+      # specific to one silo ("hear"), they are for now all in this file.
+
+      def self.[] tcc
+
+        tcc.send :define_singleton_method,
+          :ignore_these_events, DEFINITION_FOR_THE_METHOD_CALLED_IGNORE_THESE_EVENTS___
+
+        tcc.include Operations
+        tcc.include self
+      end
+
+      # -- assertion & conceptually related
+
+      def build_scanner_via_output_string_
+
+        tup = tuple_
+        sct = tup.writey_struct
+        sct.did_write || fail
+        # sct.user_value.HELLO_ENTITY  assumes did below
+        _big_s = tup.__output_string_
+        TestSupport_::Expect_Line::Scanner.via_string _big_s
+      end
+
+      def expect_did_not_write__
+        tuple_.writey_struct.did_write && fail
+      end
+
+      def expect_did_write_
+        tuple_.writey_struct.did_write || fail
+      end
+
+      # -- setup
+
+      def expect_succeed
+        sct = execute
+        sct.did_write  # assert responds to
+        sct.user_value.HELLO_ENTITY
+        _s = remove_instance_variable :@OUTPUT_STRING
+        MyTuple___[ _s, sct ]
+      end
+
+      # ~ setup expectations of emission
+
+      def expect_OK_event term_chan_sym
+        expect :info, term_chan_sym
+        # (these emissions should generally be structured events whose members
+        # and expression we have already tested in previous test files)
+        NIL
+      end
+
+      # ~ setup input digraph
 
     def add_association_to_abstract_graph lbl_src_s, lbl_dst_s
-      @__abstract_graph ||= []
-      @__abstract_graph.push [ :__asc__, lbl_src_s, lbl_dst_s ]
-      nil
+        _abstract_graph_OPER.push [ :__asc__, lbl_src_s, lbl_dst_s ]
+        NIL
     end
 
     def add_nodes_to_abstract_graph * s_a
-      @__abstract_graph ||= []
-      s_a.each do | lbl_s |
-        @__abstract_graph.push [ :__nds__, s_a ]
-      end
-      nil
+        a = _abstract_graph_OPER
+        s_a.each do |lbl_s|
+          a.push [ :__nds__, s_a ]
+        end
+        NIL
     end
 
     def begin_empty_abstract_graph
-      @__abstract_graph = [] ; nil
+        _abstract_graph_OPER
+        NIL
     end
+
+      def _abstract_graph_OPER
+        @ABSTRACT_GRAPH ||= []
+      end
+
+      # ~ setup the API call
 
     def hear_words s_a
 
-      @input_s = __input_string_via_abstract_graph
-      @output_s = ""
+        s = ""
+        _big_s = __input_string_via_abstract_graph
 
-      call_API :hear,
-        :word, s_a,
-        :input_string, @input_s,
-        :output_string, @output_s
+        call_API(
+          * the_subject_action_for_hear_,
+          :words, s_a,
+          :input_string, _big_s,
+          :output_string, s,
+        )
 
-      nil
+        @OUTPUT_STRING = s ; nil
     end
+
+      # ~ mixed support
 
     def __input_string_via_abstract_graph
 
@@ -48,7 +131,8 @@ module Skylab::TanMan::TestSupport
       @__seen_id_h = {}
       lbl_to_id_h = {}
 
-      @__abstract_graph.each do | record |
+        _ag = remove_instance_variable :@ABSTRACT_GRAPH
+        _ag.each do |record|
 
         if :__asc__ == record.first
           is_assoc = true
@@ -82,7 +166,7 @@ module Skylab::TanMan::TestSupport
         if is_assoc
           line_a.push "  #{ qkn_a.first[ 1 ] } -> #{ qkn_a.last[ 1 ] }"
         end
-      end
+        end
 
       line_a.push "}\n"
       line_a.join "\n"
@@ -100,7 +184,9 @@ module Skylab::TanMan::TestSupport
       @__seen_id_h[ s_a_ ] = true
       s_a_ * UNDERSCORE_
     end
-    end  # if false
+    end  # legacy methods
+
+    MyTuple___ = ::Struct.new :__output_string_, :writey_struct
 
     # -- expectations (assertions)
 
@@ -137,7 +223,7 @@ module Skylab::TanMan::TestSupport
 
     # -- TMPDIR TOWN
 
-    def given_dotfile_ content_s
+    def given_dotfile__ content_s  # (was: `given_dotfile_`)
 
       td = volatile_tmpdir
 
@@ -295,6 +381,9 @@ module Skylab::TanMan::TestSupport
     def cfn_shallow
       'tern-mern.conf'
     end
+
+    # ==
+    # ==
   end
 end
 # :#history-A.1 (as referenced)

@@ -117,8 +117,12 @@
 [#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc
 [#033]       #done `full_action_name_parts` becomes `local_normal_name` (`action_name` ..?)
 [#032]       #done rename stdout, s-tderr
-[#031]       #done regretify all tests
-[#030]       #done reconceive api as a service
+
+[#031] #hole
+             ( #was: #done regretify all tests )
+
+[#030]       [ hear ]
+             ( #was: #done reconceive api as a service )
 
 [#029]       track classes for entities not yet associated with documents? ..
              ( #was: #done no more api knob (api.invoke -> `api_invoke`))
@@ -136,10 +140,17 @@
              ( #was: #done use -h -- we had to etc use bleeding )
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
-[#022]       #done end client defaulting patterns (workspace etc)
+
+[#022] #open-ish - this just here to mark this tombstone related to dash
+             for input
+             #tombstone - something to do with dashes for stdin for input
+             weirdly in the "hear" silo
+             ( #was: #done end client defaulting patterns (workspace etc) )
              ( #was: workspace directories )
              ( #was: refactor-in headless, and sub-client )
-[#021]       the document entity narrative ..
+
+[#021]       the digraph session architecture ..
+             the document entity narrative ..
              ( #was: #done merge singletons into service )
 
 [#020] #open #feature-collection upstream

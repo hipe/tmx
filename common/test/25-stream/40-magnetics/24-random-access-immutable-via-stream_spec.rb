@@ -14,68 +14,116 @@ module Skylab::Common::TestSupport
     context "A B C" do
 
       it "builds" do
-        _subject || fail
+
+        _with_memoized
+        @SUBJECT || fail
       end
 
       it "access first then last" do
-        bx = _subject
-        bx[ :A ] == "A" || fail
-        bx[ :C ] == "C" || fail
+
+        _with_memoized
+        _expect_lookup_softly "A", :A
+        _expect_lookup_softly "C", :C
       end
 
       it "access last then first (exercises cache) " do
-        bx = _rebuild
-        bx[ :C ] == "C" || fail
-        bx[ :A ] == "A" || fail
+
+        _with_rebuilt
+        _expect_lookup_softly "C", :C
+        _expect_lookup_softly "A", :A
       end
 
       it "ask for offset of already indexed" do
-        bx = _rebuild
-        bx[ :A ]
-        bx.offset_of( :A ) == 0 || fail
+
+        _with_rebuilt
+        _lookup_softly :A
+        _expect_offset 0, :A
       end
 
       it "ask for offset of not yet indexed" do
-        _bx = _rebuild
-        _bx.offset_of( :C ) == 2 || fail
+
+        _with_rebuilt
+        _expect_offset 2, :C
       end
 
       it "ask for offset of doesn't exist when not yet cached" do
-        _bx = _rebuild
-        _bx.offset_of( :D ).nil? || fail
+
+        _with_rebuilt
+        _expect_offset nil, :D
       end
 
       it "ask for offset of doesn't exist when cached" do
-        bx = _rebuild
-        bx[ :C ]
-        bx.offset_of( :D ).nil? || fail
+
+        _with_rebuilt
+        _lookup_softly :C
+        _expect_offset nil, :D
       end
 
       it "to value stream before cached" do
-        _bx = _rebuild
-        _st = _bx.to_value_stream
+
+        _with_rebuilt
+        _st = _to_value_stream
         _st.to_a == %w( A B C ) || fail
       end
 
       it "to value stream when cached midway" do
-        bx = _rebuild
-        bx[ :A ]
-        _st = bx.to_value_stream
+
+        _with_rebuilt
+        _lookup_softly :A
+        _st = _to_value_stream
         _st.to_a == %w( A B C ) || fail
       end
 
       it "to value stream after cached" do
-        bx = _rebuild
-        bx[ :C ]
-        _st = bx.to_value_stream
+
+        _with_rebuilt
+        _lookup_softly :C
+        _st = _to_value_stream
         _st.to_a == %w( A B C ) || fail
       end
 
-      shared_subject :_subject do
-        _rebuild
+      # --
+      #
+      # (NOTE - as an afterthought we have altered the above to insulate
+      # it from the particular business names, when the subject was
+      # retrofitted to accord to with operator branched. adhering to a
+      # "rule of 2's" for future tests (if you use a business name more
+      # than 2x, hide it behind a local method) might be good..)
+
+      def _expect_offset x, sym
+
+        _actual = @SUBJECT.offset_via_reference sym
+        _actual == x || fail
       end
 
-      def _rebuild
+      def _to_value_stream
+        @SUBJECT.to_dereferenced_item_stream
+      end
+
+      def _expect_lookup_softly x, sym
+        _actual = _lookup_softly sym
+        _actual == x || fail
+      end
+
+      def _lookup_softly sym
+        @SUBJECT.lookup_softly sym
+      end
+
+      def _with_memoized
+        @SUBJECT = _memoized_subject
+        NIL
+      end
+
+      def _with_rebuilt
+        @SUBJECT = _build
+        NIL
+      end
+
+      shared_subject :_memoized_subject do
+        _build
+      end
+
+      def _build
 
         stack = %w( C B A )
         _st = Home_::MinimalStream.by do
@@ -92,6 +140,10 @@ module Skylab::Common::TestSupport
     def _subject_module
       Home_::Stream::Magnetics::RandomAccessImmutable_via_Stream
     end
+
+    # ==
+    # ==
   end
 end
+# #pending-rename: with its asset
 # #born years after its asset

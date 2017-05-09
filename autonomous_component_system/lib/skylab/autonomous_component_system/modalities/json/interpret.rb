@@ -102,7 +102,7 @@ module Skylab::Autonomous_Component_System
           deeps = nil
           shallows = nil
 
-          bxish = ___build_boxish
+          ob = ___build_operator_branch
           st = remove_instance_variable :@_pair_stream
 
           begin
@@ -112,10 +112,8 @@ module Skylab::Autonomous_Component_System
             sym = pair.name_symbol
             x = pair.value_x
 
-            had = true
-            qk = bxish.fetch sym do
-              had = false
-            end
+            qk = ob.lookup_softly sym
+            had = qk ? true : false
 
             if ! had
               has_extra = true
@@ -138,14 +136,14 @@ module Skylab::Autonomous_Component_System
           if has_extra
             __when_extra sym, st
           else
-            @_boxish = bxish
+            @_operator_branch = ob
             @_unorderd_deeps = deeps
             @_unorderd_shallows = shallows
             ACHIEVED_
           end
         end
 
-        def ___build_boxish
+        def ___build_operator_branch
 
           _st = ACS_::For_Serialization::Stream.via_customization_and_rw_(
             @customization_structure_x, @_rw )
@@ -417,11 +415,11 @@ module Skylab::Autonomous_Component_System
           # making unserialization errors consistent with respect to content,
           # not surface representation.
 
-          bx = @_boxish
+          ob = @_operator_branch
 
           qkn_a.sort_by do |qk|
 
-            bx.offset_of qk.name_symbol
+            ob.offset_via_reference qk.name_symbol
           end
           NIL_
         end

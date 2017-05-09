@@ -137,8 +137,6 @@ module Skylab::TanMan::TestSupport
       result.node_list.nodes.map( & :unparse )
     end
 
-    ignore_these_events :using_parser_files
-
     def subject
       Home_::Sexp_::Prototype
     end

@@ -14,12 +14,12 @@ the older file assimilates the newer, but we use as a foundation
 the newer code, only splicing in "grafts" of older pieces where
 necessary. (this is why at #history-A we see what looks like a near
 full rewrite of the asset node (file) and a deletion of another
-asset node. what we delete is file that once held the newer code,
-and the file stays sees a replacement of most older code with the
+asset node. what was deleted was the file that once held the newer code,
+and the file that stayed saw a replacement of most older code with the
 newer code.)
 
 as a now historic experiment, the older collection exposed some
-operations in compliance with [ac] intefaces for some of the
+operations in compliance with [ac] interfaces for some of the
 fundamental collection operations (add, remove) and that legacy
 remains.
 
@@ -130,7 +130,7 @@ this interplay between random access and the internal scanner. also
 
 ## about this one method :[#here.D]
 
-in any filesystem that supporting "globbing" (probably), if you
+in any filesystem that supports "globbing" (probably), if you
 send a glob into the filesystem and get nothing back, you have no
 indication of whether this is because the "startingpoint path" is
 a directory that has no entires matched by your glob OR because

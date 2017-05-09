@@ -6,6 +6,8 @@ please buckle up because we're going to be justifying two separate but
 related "essential" features of advanced modeling at once, as well as
 introducing a domain-specific neologism.
 
+(also, it would appear this is a newer version of content in [#021.B])
+
 
 
 

@@ -102,7 +102,7 @@ module Skylab::TanMan::TestSupport
 
         _client.parse_file _path do |dc|
 
-          ob = Here___.__lib::AssocOperatorBranchFacade_.new dc
+          ob = Here___.__lib::AssocOperatorBranchFacade_TM.new dc
           x = yield ob
           x
         end

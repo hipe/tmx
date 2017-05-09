@@ -347,7 +347,8 @@ module Skylab::System
           p[]
         end
 
-        Common_::MinimalStream.by do  # change to stream whenever (and see #here5)
+        Common_.stream do  # (stay close to #here5)
+          # (upgraded from minimal stream for [tm])
           p[]
         end
       end

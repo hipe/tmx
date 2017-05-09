@@ -108,7 +108,7 @@ module Skylab::Common
 
     def __when_unresolved
 
-        _line_a = @waiting_h.each_pair.map do | i, a |
+      _line_a = @_waiting_h.each_pair.map do | i, a |
           _i_a = a.map do | item |
 
           @identifying_key_by[ item ]
@@ -117,7 +117,7 @@ module Skylab::Common
           "#{ i } <- ( #{ _i_a * ', ' } )"
         end
 
-        _seen_s = "( #{ @went_h.keys * ', ' } )"
+      _seen_s = "( #{ @_went_h.keys * ', ' } )"
 
         _msg = "unresolved `after` dependences: seen #{ _seen_s }, #{
           } still waiting: #{ _line_a * ', ' }"

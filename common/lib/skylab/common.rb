@@ -116,8 +116,6 @@ module Skylab::Common
 
   class Box  # :[#061]
 
-    InstanceMethods = ::Module.new
-
     class << self
 
       def the_empty_box
@@ -415,22 +413,7 @@ module Skylab::Common
     def box
       self
     end
-  end
-
-  module Box::InstanceMethods  # #experiment
-
-    def [] k
-      fetch( k ) { NOTHING_ }
-    end
-
-    def to_value_stream
-      scn = to_key_scanner
-      Stream.by do
-        unless scn.no_unparsed_exists
-          fetch scn.gets_one
-        end
-      end
-    end
+    # #tombstone: Box::InstanceMethods (barely a thing)
   end
 
   # ==

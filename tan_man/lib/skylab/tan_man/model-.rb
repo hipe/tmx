@@ -247,7 +247,7 @@ module Skylab::TanMan
 
         _mutable_or_immutable_digraph_session_MO do |o|
 
-          o.be_read_write_not_read_only__
+          o.be_read_write_not_read_only_
 
           o.session_by do |dc|
             @_mutable_digraph_ = dc

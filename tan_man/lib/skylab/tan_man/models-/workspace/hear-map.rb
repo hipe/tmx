@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Workspace
 
-    module Hear_Map
+    module HearMap
 
       module Definitions
 
@@ -20,7 +20,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def bound_call_via_heard hrd, & oes_p
+          def execute_via_heard hrd, & oes_p
 
             bx = hrd.qualified_knownness_box
             x = bx.remove :word

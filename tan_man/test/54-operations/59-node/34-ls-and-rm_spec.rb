@@ -160,7 +160,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        o = given_dotfile_ <<-O.unindent
+        o = given_dotfile__ <<-O.unindent
           digraph {
             ermagherd [ label = "berks" ]
           }

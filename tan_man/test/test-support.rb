@@ -109,11 +109,6 @@ module Skylab::TanMan::TestSupport
       nil
     end
 
-    def ignore_these_events * _
-      $stderr.puts "Ignoring ignoring: #{ _.inspect }"
-      # #here3::IGNORE_THESE_EVENTS_METHOD
-    end
-
     def IGNORE_METHOD__
       NOTHING_
     end
@@ -199,6 +194,12 @@ module Skylab::TanMan::TestSupport
 
     def black_and_white_expression_agent_for_expect_emission
       Home_::API::expression_agent_instance
+    end
+
+    # -- (microscopic stowaway)
+
+    def the_subject_action_for_hear_
+      [ :hear, :hear ]
     end
 
     # -- grammar testing support
@@ -510,7 +511,6 @@ module Skylab::TanMan::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   FIXTURES_ENTRY_ = 'fixtures'
-  IDENTITY_= -> x { x }
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   NOTHING_ = nil

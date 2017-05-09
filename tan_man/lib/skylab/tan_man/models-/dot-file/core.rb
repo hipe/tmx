@@ -9,115 +9,7 @@ module Skylab::TanMan
 
     class DigraphSession_via_THESE < Common_::MagneticBySimpleModel  # 1x + #testpoint
 
-      # design objectives:
-      #
-      #   - so that our design encourages (enforces even) us to be good
-      #     citizens that release resources when we are done using them;
-      #
-      #     also so that any current or future [possible] problems stemming
-      #     from concurrent-access fail loudly instead of silently
-      #
-      #     (when we want to allow concurrent reads, we can phase that in.);
-      #
-      #     whenever a digraph corresponds to a file on the filesystem, all
-      #     interactions with it (read-only and read-write alike) must now
-      #     happen within an exclusive, locked-file session.
-      #
-      #   - provision this same centralized point-of-access for all digraph
-      #     "sessions", regardless of whether or not the filesystem is
-      #     involved. realize file opening, file locking, and file closing
-      #     as an implementation detail: all performers outside of the
-      #     subject must be insulated from any knowledge of it to the
-      #     furthest extent reasonable.
-      #
-      #   - give the client some kind of straightforward confirmation of
-      #     whether something failed, and whether the document was written
-      #     as applicable.
-
-      # broad corollaries of our objectives:
-      #
-      #   - we must know explicitly for all interactions whether the option
-      #     may be needed of writing the graph (read-write) or whether this
-      #     access is read-only. (we don't encounter write-only only because
-      #     of how digraphs are always created (on the filesystem) in a
-      #     dedicated invocation ("graph use") which is out of this scope;
-      #     that is, the file (when applicable) will always have already
-      #     existed when you get here.)
-
-      # considerations:
-      #
-      #   - although emissions are emitted in an unsurprising way (for both
-      #     successes and failures), it's awkward for a client to have to
-      #     to intercept emissions to determine basic result status.
-      #
-      #   - on one hand we want our result shape to be consistent whether
-      #     or not we are in read-write mode; but on the other hand: when
-      #     in read-only mode it "feels" more straightforward if our result
-      #     is just the user result with no additional wrapping. we follow
-      #     the latter currently. :#here1 (and extrapolated below)
-
-      # our responsibilities:
-      #
-      #   - whether we are in read-write mode or read-only mode determines
-      #     whether we will attempt to write the document. to state
-      #     explicitly what may seem obvious, we never write to the document
-      #     when in read-only mode.
-      #
-      #   - if we ever do double-writing with a tmpfile, the subject node
-      #     will be the sole agent (but not performer) of such work.
-      #     (#wish [#007.D])
-      #
-      #   - in all cases involving files (including non-exception errors),
-      #     we must close the file (so the lock is released). (but note we
-      #     abstain from writing to the file when we detect a user error.)
-      #
-      #   - in cases where the document was written (filesystem or no),
-      #     result is metadata about the write (e.g how many bytes) but also
-      #     the result includes whatever the user resulted in; all in a
-      #     struct. (see #here1)
-      #
-      #   - in success cases where the document was not written, result
-      #     is just user result. (justified at #here1)
-
-      # finally, a tiny gotcha:
-      #
-      #   - to keep things simple but still adequately powerful, client
-      #     MUST result in `nil` (not `false`) IFF something failed.
-      #     `false` will always be interpreted as being a meaningful boolean.
-      #     `nil` can never be used as a valid result from the client.
-      #     its only possible interpretation is failure, and failure's
-      #     only absolute expression is through a result of `nil`. (but all
-      #     this applies only to clients of the subject.)
-      #
-
-      # supporting non-file BSR's (byte stream references):
-      #
-      # (normally we avoid creating or using local acronyms, but [#ba-062.3]
-      # byte stream references are so common here, we make an exception. see
-      # manifesto.)
-      #
-      # the subject was conceived of as a central, unified way to manage
-      # file opening, file locking, file writing and file closing as it
-      # pertains to digraphs. while this remains its central "mission", we
-      # also want this to be the central means of accessing digraphs
-      # generally, not just digraphs that live on the filesystem.
-      #
-      # when the argument BSR is something "primitive" like a content string
-      # or an array of lines; it is then passed as-is to the other performer.
-      # BUT if it is a path or an IO (and we think that covers all the kinds
-      # of BSR's we care about), then we lock it here and pass the BSR
-      # wrapping the locked IO to the performer. (away this at #open [#098])
-      #
-      #     - if content string, we do no locking, we do no closing
-      #     - if array of lines, (same as above)
-      #     - if open IO, we DO locking, we DO closing
-      #     - if path, we open it, (then same as above)
-      #
-      # the point is that for writing and reading alike, it is not the other
-      # performer's responsibility to know about file modes and file locking;
-      # it is ours and when locking applies it is also our responsibility to
-      # release the lock by closing the file (or closing the file in any case
-      # as appropriate).
+      # read :[#021] "the digraph session architecture" which is exactly this.
 
       # #open [#098] once we understand our requirements, we may further
       # abstract lock-related logic up & out into the byte stream reference API
@@ -128,7 +20,7 @@ module Skylab::TanMan
         super
       end
 
-      def be_read_write_not_read_only__
+      def be_read_write_not_read_only_
         remove_instance_variable :@_mutex_for_RDWR_vs_RDONLY
         @_is_read_write_not_read_only = :_TRUE ; nil
       end

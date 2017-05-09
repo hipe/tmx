@@ -36,7 +36,7 @@ module Skylab::TanMan
 
       def __via_mutable_digraph
 
-        _guy = AssocOperatorBranchFacade_.new @_mutable_digraph_
+        _guy = AssocOperatorBranchFacade_TM.new @_mutable_digraph_
 
         ent = _guy.procure_remove_association__(
           [ remove_instance_variable( :@from_node_label ),

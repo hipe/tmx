@@ -6,7 +6,7 @@ module Skylab::TanMan
 
     # (begins as entity class #here1)
 
-    class AssocOperatorBranchFacade_  # #testpoint
+    class AssocOperatorBranchFacade_TM
       # was: Collection_Controller___ < Model_::DocumentEntity::Collection_Controller
 
       def initialize dc
@@ -23,7 +23,7 @@ module Skylab::TanMan
         end
       end
 
-      def touch_by__  # #testpoint
+      def touch_association_by_  # #testpoint
         touch_or_delete_by_ do |o|
           yield o
           o.verb_lemma_symbol = :touch
@@ -39,26 +39,7 @@ module Skylab::TanMan
         end
       end
 
-      if false  # until "hear"
-      def touch_association_via_node_labels src_lbl_s, dst_lbl_s, & oes_p
-
-        oes_p ||= @on_event_selectively
-
-        asc = _begin_association :from_node_label, src_lbl_s,
-          :to_node_label, dst_lbl_s, & oes_p
-
-        asc and begin
-
-          asc_ = _fuzzy_match_nodes_of_association asc
-          if asc_
-            asc = asc_
-          end
-
-          info = _info_via_into_collection_marshal_entity(
-            nil, nil, asc, & oes_p )
-          info and asc
-        end
-      end
+      if false  # until "sync"
 
       # (for "sync")
       def touch_association_via_IDs src_id_sym, dst_id_sym, & oes_p
@@ -74,32 +55,6 @@ module Skylab::TanMan
           info and asc
         end
       end
-
-      def _fuzzy_match_nodes_of_association asc
-
-        cc = @precons_box_.fetch :node
-
-        f_o = cc.entity_via_natural_key_fuzzily asc.dereference :from_node_label
-
-        t_o = cc.entity_via_natural_key_fuzzily asc.dereference :to_node_label
-
-        a = nil
-        if f_o
-          a = []
-          a.push :from_node_label, f_o.dereference( :name )
-        end
-
-        if t_o
-          a ||= []
-          a.push :to_node_label, t_o.dereference( :name )
-        end
-
-        if a
-          asc.via_iambic a
-        end
-      end
-
-      Info___ = ::Struct.new :did_mutate
       end  # if false (for the old methods of the old collection controller)
 
       def __entity_via_edge_stmt edge_stmt
@@ -153,6 +108,10 @@ module Skylab::TanMan
       )
 
       def HELLO_ASSOCIATION  # just during development
+        NOTHING_
+      end
+
+      def HELLO_ENTITY  # same
         NOTHING_
       end
 

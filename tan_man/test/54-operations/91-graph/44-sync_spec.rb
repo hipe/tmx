@@ -235,8 +235,6 @@ module Skylab::TanMan::TestSupport
       st.next_line.should be_nil
     end
 
-    ignore_these_events :using_parser_files
-
     def _fails_commonly
       _x = _tuple.last
       _x.nil? || fail

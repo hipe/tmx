@@ -18,9 +18,9 @@ module Skylab::Parse  # see [#001]
 
       alias_method :function, :function
 
-      def function_via_definition_array x_a
-        _scn = Scanner_[ x_a ]
-        function( scn.gets_one ).via_argument_scanner _scn
+      def function_via_definition_array x_a  # [tm]
+        scn = Scanner_[ x_a ]
+        function( scn.gets_one ).via_argument_scanner scn
       end
 
       def fuzzy_matcher * a
