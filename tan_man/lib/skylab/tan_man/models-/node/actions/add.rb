@@ -40,19 +40,17 @@ module Skylab::TanMan
 
       def __money
 
-        _ = Here_::Magnetics_::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection.call_by do |o|
-          o.name_string = @node_name
-          o.entity_via_created_element_by = method :__entity_via_node_statement
+        _ob = Here_::NodesOperatorBranchFacade_TM.new @_mutable_digraph_
+
+        _ = _ob.node_by_ do |o|
+
+          o.unsanitized_label_string = @node_name
           o.top_channel_for_created_symbol = :success  # not `info`
           o.verb_lemma_symbol = :create
-          o.document = @_mutable_digraph_
           o.listener = _listener_
         end
-        _ || NIL_AS_FAILURE_
-      end
 
-      def __entity_via_node_statement node_stmt
-        Here_.new_flyweight_.reinit_as_flyweight_ node_stmt  # meh..
+        _ || NIL_AS_FAILURE_
       end
 
       # ==

@@ -9,8 +9,9 @@ module Skylab::TanMan
     end
 
     def set_source_node_id source_node_id
-      self[ :agent ][ :id ] = _parse_id source_node_id.to_s ; nil
+      self[ :agent ][ :id ] = _parse_id source_node_id.to_s
       # #open [#051] support for 'port'
+      NIL
     end
 
     def target_node_id

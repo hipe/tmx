@@ -12,9 +12,8 @@ module Skylab::TanMan
         super
       end
 
-      def for_one_or_two a
-        @__these = a
-        _will_execute_by :__execute_for_one_or_two
+      def for_one_or_two_QKs__ a
+        _for_one_to_two_BSRs a.map { |qk| qk.value_x }
       end
 
       def for_qualified_knownness_and_direction__ qkn, dir_sym
@@ -24,7 +23,11 @@ module Skylab::TanMan
             qkn, dir_sym )
       end
 
-      def only_this_byte_stream_reference bsr
+      def these_two_byte_stream_references__ bsr, bsr_
+        _for_one_to_two_BSRs [ bsr, bsr_ ]
+      end
+
+      def only_this_byte_stream_reference__ bsr
 
         _will_execute_for_this_lone_bsr bsr  # hi.
       end
@@ -33,6 +36,12 @@ module Skylab::TanMan
 
         @__lone_BSR = bsr
         _will_execute_by :__execute_for_lone_BSR
+      end
+
+      def _for_one_to_two_BSRs a
+
+        @__these = a
+        _will_execute_by :__execute_for_one_or_two
       end
 
       attr_writer(
@@ -55,11 +64,11 @@ module Skylab::TanMan
         if 2 == a.length
           __execute_for_two( * a )
         else
-          __execute_for_one( * a )  #cov3.1
+          __finish_by_making_one_one_way_stream( * a )  # #cov3.1
         end
       end
 
-      def __execute_for_two in_qk, out_qk
+      def __execute_for_two in_ref, out_ref
 
         # part of what the subject does is "downgrade" path-based references
         # to open IO references. we do NOT want to open two separate IOs to
@@ -76,19 +85,12 @@ module Skylab::TanMan
         @is_read_write_not_read_only || self._SANITY__readme__
         # what determined that we want 2 refs is #spot2.1 (isomorphic)
 
-        in_ref = in_qk.value_x
-        out_ref = out_qk.value_x
-
         if in_ref.is_same_waypoint_as out_ref
 
           __finish_by_making_one_two_way_stream in_ref
         else
           __finish_by_making_two_one_way_streams in_ref, out_ref
         end
-      end
-
-      def __execute_for_one only_qk
-        __finish_by_making_one_one_way_stream only_qk.value_x
       end
 
       def __finish_by_making_one_two_way_stream in_ref

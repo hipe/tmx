@@ -35,12 +35,12 @@ module Skylab::Basic
       end
 
       def will_be_writable
-        @IS_WRITABLE = true  # only for easy inpsection
+        @is_writable = true
         extend MethodsForDownstream___ ; nil
       end
 
       def will_be_readable
-        @IS_READABLE =  # only for easy inspection
+        @is_readable = true
         extend MethodsForUpstream___ ; nil
       end
 
@@ -62,6 +62,14 @@ module Skylab::Basic
     end
 
     module MethodsForUpstream___
+
+      def to_read_writable
+        ByteStreamReference__.define do |o|
+          o.will_be_readable
+          o.will_be_writable
+          o.line_array = @line_array
+        end
+      end
 
       def description_under expag
         "«input stream»"  # #guillemets
@@ -101,7 +109,12 @@ module Skylab::Basic
         end
       end
 
-      attr_reader :line_array
+      attr_reader(
+        :is_readable,
+        :is_writable,
+        :line_array,  # for now
+      )
+
       protected :line_array  # for now
 
       def shape_symbol
@@ -110,6 +123,10 @@ module Skylab::Basic
 
       def modality_const
         :ByteStream
+      end
+
+      def BYTE_STREAM_REFERENCE_SHAPE_IS_PRIMITIVE  # [tm]
+        TRUE
       end
     end
 

@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class DocumentMagnetics_::OpenByteStream_via_ByteStreamReference < Common_::MagneticBySimpleModel  # 1x
+  class DocumentMagnetics_::OpenByteStream_via_ByteStreamReference < Common_::MagneticBySimpleModel
 
     # an "open byte stream" under this facility is a composite structure
     # wrapping an open native IO handle (or the like) along with a few
@@ -27,8 +27,8 @@ module Skylab::TanMan
     # the successful result is structure-like that wraps the final, normal
     # BSR (exposed as `sanitized_byte_stream_reference`) and simple boolean
     # metadata about whether this resource is a locked IO and more broadly
-    # whether this resource is associated with filesystem. (these two
-    # booleans may be entirely concomitant.)
+    # whether this resource is associated with filesystem. (it may be the
+    # case that these two booleans are entirely concomitant.)
     #
     # there are at least two possible points of failure: one is a failure
     # to open the file (when path-based BSR), the other is failure to
@@ -178,6 +178,10 @@ module Skylab::TanMan
       end
 
       # --
+
+      def close_stream_and_release_lock_  # assume @is_lockable_and_locked
+        @sanitized_byte_stream_reference.CLOSE_BYTE_STREAM_IO  # (nil)
+      end
 
       attr_reader(
         :filesystem_is_involved,

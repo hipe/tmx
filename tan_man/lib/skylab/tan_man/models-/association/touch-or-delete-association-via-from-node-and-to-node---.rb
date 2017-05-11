@@ -5,7 +5,6 @@ module Skylab::TanMan
     class TouchOrDeleteAssociation_via_FromNode_and_ToNode___ < Common_::MagneticBySimpleModel
 
       def initialize
-        @_is_label_based = false  # for now, always?
 
         @attrs = nil
         @prototype_name_symbol = nil
@@ -16,6 +15,13 @@ module Skylab::TanMan
         @_is_label_based = true
         @from_node_label = from_s
         @to_node_label = to_s
+        NIL
+      end
+
+      def from_and_to_IDs from_sym, to_sym
+        @_is_label_based = false
+        @from_node_ID = from_sym
+        @to_node_ID = to_sym
         NIL
       end
 

@@ -40,6 +40,13 @@ module Skylab::TanMan
         @qualified_knownness_box = bx
       end
 
+      def two_byte_stream_references__ bsr, bsr_
+        _will_solve_BSR_via :__resolve_open_streams_via_unsanitized_BSR_AND_ETC
+        @__OUTPUT_STREAM_REFERENCE = bsr_
+        @byte_stream_reference = bsr
+        NIL
+      end
+
       def byte_stream_reference= bsr
         _will_solve_BSR_via :__resolve_open_streams_via_unsanitized_BSR
         @byte_stream_reference = bsr
@@ -81,7 +88,7 @@ module Skylab::TanMan
 
         @_open_streams.each do |obs|
           obs.is_lockable_and_locked || next
-          obs.sanitized_byte_stream_reference.CLOSE_BYTE_STREAM_IO  # :#here2
+          obs.close_stream_and_release_lock_  # :#spot3.1
         end
 
         remove_instance_variable :@_open_streams
@@ -145,10 +152,9 @@ module Skylab::TanMan
 
         _is_dry = remove_instance_variable :@is_dry_run
 
-        _bytes = PeristDotfile___.call_by do |o|
-          o.is_dry_run = _is_dry
+        _bytes = @_DC.write_and_emit_by_ do |o|
           o.byte_stream_reference = _bdr
-          o.graph_sexp = @_DC.graph_sexp
+          o.is_dry_run = _is_dry
           o.listener = @listener
         end
 
@@ -169,8 +175,6 @@ module Skylab::TanMan
         @_DC = Here_::DocumentController___.define do |o|
           o.byte_stream_reference = _use_bsr
           o.graph_sexp = remove_instance_variable :@__graph_sexp
-          o.microservice_invocation = @microservice_invocation
-          o.listener = @listener
         end
 
         NIL
@@ -257,7 +261,7 @@ module Skylab::TanMan
           _a = remove_instance_variable( :@__tuple ).byte_stream_reference_qualified_knownness_array
 
           _resolve_open_streams_by do |o|
-            o.for_one_or_two _a
+            o.for_one_or_two_QKs__ _a
           end
         end
       end
@@ -285,13 +289,23 @@ module Skylab::TanMan
 
       # ~
 
+      def __resolve_open_streams_via_unsanitized_BSR_AND_ETC
+
+        _bsr = remove_instance_variable :@byte_stream_reference
+        _bsr_ = remove_instance_variable :@__OUTPUT_STREAM_REFERENCE
+
+        _resolve_open_streams_by do |o|
+          o.these_two_byte_stream_references__ _bsr, _bsr_
+        end
+      end
+
       def __resolve_open_streams_via_unsanitized_BSR
 
         # this is for when we were passed a single BSR
 
         _bsr = remove_instance_variable :@byte_stream_reference
         _resolve_open_streams_by do |o|
-          o.only_this_byte_stream_reference _bsr
+          o.only_this_byte_stream_reference__ _bsr
         end
       end
 
@@ -330,62 +344,11 @@ module Skylab::TanMan
 
     # ==
 
-    class PeristDotfile___ < Common_::MagneticBySimpleModel
-
-      # (ideally we like these nodes out of the main flow but this is anemic.)
-      # (#[#sy-032.2] tracks events like these (3 total known at writing))
-      # (was `PersistDotFile_via_ByteDownstreamReference_and_GraphSexp`)
-
-      attr_writer(
-        :byte_stream_reference,
-        :graph_sexp,
-        :is_dry_run,
-        :listener,
-      )
-
-      def execute
-
-        y = if @is_dry_run
-          Home_.lib_.system_lib::IO::DRY_STUB
-        else
-          @byte_stream_reference.to_minimal_yielder_for_receiving_lines
-        end
-
-        bytes = @graph_sexp.write_bytes_into y
-
-        # don't close here.. close at #here2
-
-        @listener.call :success, :wrote_resource do
-          __build_event bytes
-        end
-
-        bytes
-      end
-
-      def __build_event bytes
-
-        Common_::Event.inline_OK_with(
-          :wrote_resource,
-          :byte_downstream_reference, @byte_stream_reference,
-          :bytes, bytes,
-          :was_dry_run, @is_dry_run,
-          :is_completion, true,
-        ) do  |y, o|
-
-          _document = o.byte_downstream_reference.description_under self
-
-          y << "updated #{ _document } #{
-            }(#{ o.bytes }#{ ' dry' if o.was_dry_run } bytes)"
-        end
-      end
-    end
-
-    # ==
-
     Here_ = self
 
     # ==
     # ==
   end
 end
+# #history-A.2: moved "persist dotfile" out of file to other file
 # #history-A: spike of main magnetic (locked file session) back into here

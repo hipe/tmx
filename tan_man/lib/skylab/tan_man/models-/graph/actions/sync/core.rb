@@ -57,31 +57,19 @@ module Skylab::TanMan
         send remove_instance_variable :@__will_write_like_this
       end
 
-      def __write_input_graph_as_is_to_output
-        _sync_by do |o|
-          # o.will_only_write_input_to_output__
-        end
-      end
-
-      def __write_hereput_graph_as_it_to_output  # (same as previous)
-        _sync_by do |o|
-          # o.will_only_write_hereput_to_output__
-        end
-      end
-
-      def _sync_by
+      def _sync
 
         This_::Sync_via_Parameters___.call_by do |o|
 
-          yield o
-
           # (we can strip the below values of their "association" structures
           #  because when syncing, the associations (input, hereput, output)
-          #  that correspond to the BSR's are both known and uninterestng.)
+          #  that correspond to the BSR's are both known and uninteresting.)
 
           o.in_reference = ( @_input && @_input.value_x )
           o.here_reference = ( @_hereput && @_hereput.value_x )
           o.out_reference = ( @_output && @_output.value_x )
+
+          o.is_dry_run = remove_instance_variable :@dry_run
 
           o.microservice_invocation = @_microservice_invocation_
           o.listener = _listener_
@@ -111,18 +99,18 @@ module Skylab::TanMan
         if @_input
           if @_hereput
             if @_output
-              self._CASE_1__good__
+              _will :_sync  # case 1
             else
-              self._CASE_2__good__output_graph_replaces_hereput_graph__
+              _will :_sync  # case 2
             end
           elsif @_output
-            _will_write_like_this :__write_input_graph_as_is_to_output  # case 3
+            _will :_sync  # case 3
           else
             _fail_because_missing :input  # case 4
           end
         elsif @_hereput
           if @_output
-            _will_write_like_this :__write_hereput_graph_as_it_to_output  # case 5
+            _will :_sync  # case 5
           else
             _fail_because_missing :input, :output  # case 6 (same as 8)
           end
@@ -145,7 +133,7 @@ module Skylab::TanMan
         UNABLE_
       end
 
-      def _will_write_like_this m
+      def _will m
         @__will_write_like_this = m
         ACHIEVED_
       end
@@ -174,18 +162,19 @@ module Skylab::TanMan
         Home_::DocumentMagnetics_::ByteStreamReferences_via_Request
       end
 
-      if false
-        def __persist
-
-          @gsync.the_document_controller.persist_into_byte_downstream_reference(
-            document_entity_byte_downstream_reference,
-            :is_dry, @argument_box[ :dry_run ],
-            & handle_event_selectively )
-        end
-      end
-
-
       # ==
+
+      module DID_NO_WORK_ ; class << self
+        def _DO_WRITE_COLLECTION_
+          FALSE
+        end
+      end ; end
+
+      module DID_WORK_ ; class << self
+        def _DO_WRITE_COLLECTION_
+          TRUE
+        end
+      end ; end
 
       # ==
       # ==

@@ -39,7 +39,6 @@ in the node add spec, archive those two tests
 (model: graph)
 (related: driftwood in [#tm-026])
 (related: Common_Collection_Controller_Methods_ is driftwood)
-TD tan_man/test/54-operations/91-graph/44-sync_spec.rb
 consider trying to quash `make_action_making_actions_module`
 maybe close [#001] - because now, the layer where entities are persisted is fixed
 (model: node)

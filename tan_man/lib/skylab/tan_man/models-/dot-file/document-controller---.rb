@@ -6,13 +6,9 @@ module Skylab::TanMan
 
       # ([#009] is where notes for this would go. currently only one short, ancient note there.)
 
-      def microservice_invocation= _
-      end
-
       attr_writer(
         :byte_stream_reference,  # just for description
         :graph_sexp,
-        :listener,
       )
 
       # -- write
@@ -76,7 +72,17 @@ module Skylab::TanMan
         end
       end
 
-      # -- read
+      # -- read (sic)
+
+      def write_and_emit_by_
+
+        _bytes = PersistDotfile___.call_by do |o|
+          yield o
+          o.graph_sexp = @graph_sexp
+        end
+
+        _bytes  # hi.
+      end
 
       def write_bytes_into y
         @graph_sexp.write_bytes_into y
@@ -100,9 +106,62 @@ module Skylab::TanMan
       end
 
       # ==
+
+      class PersistDotfile___ < Common_::MagneticBySimpleModel
+
+        # (ideally we like these nodes out of the main flow but this is anemic.)
+        # (#[#sy-032.2] tracks events like these (3 total known at writing))
+        # (was `PersistDotFile_via_ByteDownstreamReference_and_GraphSexp`)
+
+        attr_writer(
+          :byte_stream_reference,
+          :graph_sexp,
+          :is_dry_run,
+          :listener,
+        )
+
+        def execute
+
+          y = if @is_dry_run
+            Home_.lib_.system_lib::IO::DRY_STUB
+          else
+            @byte_stream_reference.to_minimal_yielder_for_receiving_lines
+          end
+
+          bytes = @graph_sexp.write_bytes_into y
+
+          # don't close here.. close at #spot3.1
+
+          @listener.call :success, :wrote_resource do
+            __build_event bytes
+          end
+
+          bytes
+        end
+
+        def __build_event bytes
+
+          Common_::Event.inline_OK_with(
+            :wrote_resource,
+            :byte_downstream_reference, @byte_stream_reference,
+            :bytes, bytes,
+            :was_dry_run, @is_dry_run,
+            :is_completion, true,
+          ) do  |y, o|
+
+            _document = o.byte_downstream_reference.description_under self
+
+            y << "updated #{ _document } #{
+              }(#{ o.bytes }#{ ' dry' if o.was_dry_run } bytes)"
+          end
+        end
+      end
+
+      # ==
       # ==
     end
   end
 end
+# #history-A.2: re-gained file writing
 # #tombstone-B: file writing x
 # #tombstone-A: `length_exceeds` on stream

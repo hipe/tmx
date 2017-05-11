@@ -35,6 +35,8 @@ module Skylab::TanMan::TestSupport
 
       def self.[] tcc
 
+        Legacy_Methods_For_Emission[ tcc ]
+
         tcc.send :define_singleton_method,
           :ignore_these_events, DEFINITION_FOR_THE_METHOD_CALLED_IGNORE_THESE_EVENTS___
 
@@ -71,17 +73,6 @@ module Skylab::TanMan::TestSupport
         _s = remove_instance_variable :@OUTPUT_STRING
         MyTuple___[ _s, sct ]
       end
-
-      # ~ setup expectations of emission
-
-      def expect_OK_event term_chan_sym
-        expect :info, term_chan_sym
-        # (these emissions should generally be structured events whose members
-        # and expression we have already tested in previous test files)
-        NIL
-      end
-
-      # ~ setup input digraph
 
     def add_association_to_abstract_graph lbl_src_s, lbl_dst_s
         _abstract_graph_OPER.push [ :__asc__, lbl_src_s, lbl_dst_s ]
@@ -187,6 +178,25 @@ module Skylab::TanMan::TestSupport
     end  # legacy methods
 
     MyTuple___ = ::Struct.new :__output_string_, :writey_struct
+
+    # ==
+
+    Legacy_Methods_For_Emission = -> tcc do
+      tcc.send :define_method, :expect_OK_event,
+        DEFINITION_FOR_THE_METHOD_CALLED_EXPECT_OK_EVENT___
+      NIL
+    end
+
+    # -
+      DEFINITION_FOR_THE_METHOD_CALLED_EXPECT_OK_EVENT___ = -> term_chan_sym do
+        expect :info, term_chan_sym
+        # (these emissions should generally be structured events whose members
+        # and expression we have already tested in previous test files)
+        NIL
+      end
+    # -
+
+    # ==
 
     # -- expectations (assertions)
 

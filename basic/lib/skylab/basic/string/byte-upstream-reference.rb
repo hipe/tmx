@@ -33,12 +33,12 @@ module Skylab::Basic
       end
 
       def will_be_writable
-        @IS_WRITABLE = true  # for easy inspection only
+        @is_writable = true
         extend MethodsForDownstream___ ; nil
       end
 
       def will_be_readable
-        @IS_READABLE = true  # for easy inspection only
+        @is_readable = true
         extend MethodsForUpstream___ ; nil
       end
 
@@ -48,6 +48,14 @@ module Skylab::Basic
     end  # (will re-open)
 
     module MethodsForUpstream___
+
+      def to_read_writable
+        ByteStreamReference__.define do |o|
+          o.will_be_readable
+          o.will_be_writable
+          o.big_string = @_string_
+        end
+      end
 
       def to_mutable_whole_string
         @_string_.dup
@@ -111,10 +119,12 @@ module Skylab::Basic
           end
         end
 
-        attr_reader(
-          :_string_,
-        )
-        protected :_string_
+      attr_reader(
+        :is_readable,
+        :is_writable,
+        :_string_,
+      )
+      protected :_string_
 
         def shape_symbol
           :string

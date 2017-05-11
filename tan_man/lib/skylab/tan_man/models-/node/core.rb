@@ -18,10 +18,27 @@ module Skylab::TanMan
         @_digraph_controller = dc  # ivar name is #testpoint
       end
 
+      # ~ mutating
+
       def touch_node_via_label_ label, & p  # #testpoint
 
-        _via_label :touch, p, label
+        node_by_ do |o|
+          o.unsanitized_label_string = label
+          o.verb_lemma_symbol = :touch
+          o.listener = p
+        end
       end
+
+      def procure_node_removal_via_label__ label, & p
+
+        node_by_ do |o|
+          o.unsanitized_label_string = label
+          o.verb_lemma_symbol = :delete
+          o.listener = p
+        end
+      end
+
+      # ~ read-only
 
       def one_entity_against_natural_key_fuzzily_ name_s, & p
 
@@ -37,39 +54,44 @@ module Skylab::TanMan
 
       def procure_node_via_label__ label, & p
 
-        _via_label :retrieve, p, label
-      end
-
-      def procure_node_removal_via_label__ label, & p
-
-        _via_label :delete, p, label
-      end
-
-      def _via_label sym, any_listener, label
-
-        _un = UnsanitizedNode___.new label
-
-        Here_::Magnetics_::Create_or_Touch_or_Delete_via_Node_and_Collection.call_by do |o|
-
-          o.entity = _un
-
-          o.entity_via_created_element_by = -> node_stmt do
-            Here_.new_flyweight_.reinit_as_flyweight_ node_stmt
-          end
-
-          o.verb_lemma_symbol = sym
-          o.document = @_digraph_controller
-          o.listener = any_listener
+        node_by_ do |o|
+          o.unsanitized_label_string = label
+          o.verb_lemma_symbol = :procure
+          o.listener = p
         end
       end
 
-      def lookup_softly_via_node_ID___ node_ID_sym
+      def lookup_softly_via_node_ID__IMPLEMENTATION_TWO__ node_ID_sym
+
+        node_by_ do |o|
+          o.unsanitized_ID_symbol = node_ID_sym
+          o.verb_lemma_symbol = :lookup_softly
+        end
+      end
+
+      def lookup_softly_via_node_ID__ node_ID_sym  # #testpoint
 
         to_node_entity_stream_.flush_until_detect do |fly|
           _actual = fly.node_identifier_symbol_
           node_ID_sym == _actual
         end
       end
+
+      def node_by_
+
+        Here_::Magnetics_::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection.call_by do |o|
+
+          yield o
+
+          o.entity_via_created_element_by = -> node_stmt do
+            Here_.new_flyweight_.reinit_as_flyweight_ node_stmt
+          end
+
+          o.document = @_digraph_controller
+        end
+      end
+
+      # -- streames
 
       def to_node_entity_stream_
 
@@ -97,23 +119,6 @@ module Skylab::TanMan
         # it's necessarily confusing: each item of this stream is a StmtList
 
         @_digraph_controller.graph_sexp.to_node_statement_stream
-      end
-    end
-
-    # ==
-
-    class UnsanitizedNode___  # might go away..
-
-      def initialize unsanitized_label_s
-        @_ = unsanitized_label_s
-      end
-
-      def unsanitized_label_string___
-        @_
-      end
-
-      def lookup_value_softly_ _
-        NOTHING_
       end
     end
 
@@ -159,14 +164,6 @@ module Skylab::TanMan
       end
     # -
     # ==
-
-    module Magnetics_
-      Autoloader_[ self ]
-      lazily :Create_or_Touch_or_Delete_via_Node_and_Collection do |const|
-        const_get :Create_or_Retrieve_or_Touch_via_NodeName_and_Collection, false
-        const_defined? const, false or self.__OOPS
-      end
-    end
 
     Here_ = self
 

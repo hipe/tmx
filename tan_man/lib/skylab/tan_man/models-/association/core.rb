@@ -39,24 +39,6 @@ module Skylab::TanMan
         end
       end
 
-      if false  # until "sync"
-
-      # (for "sync")
-      def touch_association_via_IDs src_id_sym, dst_id_sym, & oes_p
-
-        asc = _begin_association :from_node_ID, src_id_sym,
-          :to_node_ID, dst_id_sym
-
-        asc and begin
-
-          info = _info_via_into_collection_marshal_entity(
-            nil, nil, asc, & oes_p )
-
-          info and asc
-        end
-      end
-      end  # if false (for the old methods of the old collection controller)
-
       def __entity_via_edge_stmt edge_stmt
         Here_.new_flyweight_ do |o|
           yield o

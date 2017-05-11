@@ -24,6 +24,7 @@ module Skylab::TanMan::TestSupport
     use :memoizer_methods
     use :expect_CLI_or_API
     use :operations
+    use :operations_legacy_methods_for_emission
 
 # (1/N)
     context "case 8 - error: no input, no output" do  # almost case 4, 6 & 7 too
@@ -96,19 +97,40 @@ module Skylab::TanMan::TestSupport
     end
 
 # (3/N)
-    it "case 5 (a regressive case) - copy hereput to output", wip: true do
+    context "case 5 (a regressive case) - copy hereput to output" do
+
+      it "for now, result is bytes written" do
+        _succeeds
+      end
+
+      it "(content oh my)" do
+
+        # (having sent as the `output_path` an array covers one small part of [ba])
+
+        _expected_s, _actual_a = _tuple
+        _actual_s = _actual_a.join EMPTY_S_
+        _actual_s == _expected_s || fail
+      end
+
+      shared_subject :_tuple do
 
       out_a = [ 'gets removed' ]
 
       same_bytes = "digraph{\n  # a coment\n  foo -> bar\n}\n"
 
-      call_API :graph, :sync,
+        call_API(
+          * _subject_action,
         :hereput_string, same_bytes,
         :output_path, out_a
+        )
 
-      expect_OK_event :wrote_resource
+        _expect_wrote
 
-      out_a.join( EMPTY_S_ ).should eql same_bytes
+        a = [ same_bytes ]
+        a.push out_a
+        a.push execute
+        a
+      end
     end
 
 # (4/N)
@@ -139,64 +161,168 @@ module Skylab::TanMan::TestSupport
     end
 
 # (5/N)
-    it "case 3 (a regressive case) - write input to output thru transient graph ", wip: true do
+    context "case 3 (a regressive case) - write input to output thru transient graph " do
 
-      out_a = []
-      call_API :graph, :sync,
+      it "(events)" do
+        _succeeds 37
+      end
+
+      it "(content (2 things))" do
+
+        _actual_s = _tuple.first
+        _actual = _actual_s.split %r(^)
+        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          y << "digraph{"
+          y << "x [label=EX]"  # note quotes were removed
+          y << "p -> q"  # note order was alphabetized
+          y << "y -> z}"
+        end
+      end
+
+      shared_subject :_tuple do
+
+        s = ""
+        call_API(
+          * _subject_action,
         :input_string, "digraph {\n  x [ label=\"EX\" ]\n y -> z\np->q\n}\n",
-        :output_path, out_a
+          :output_string, s,
+        )
 
       expect_OK_event :created_node
       expect_OK_event :created_association
       expect_OK_event :created_association
-      expect_OK_event :wrote_resource
-      expect_succeed
+        _expect_wrote
+
+        a = [s]
+        a.push execute
+      end
     end
 
 # (6/N)
-    it "case 3 - corner case 1 - this. (covers immaculate conception)", wip: true do
+    context "case 3 - corner case 1 - this. (covers immaculate conception)" do
 
-      out_a = []
-      call_API :graph, :sync,
+      it "(events)" do
+        _succeeds
+      end
+
+      it "(content)" do
+
+        _actual = _tuple.first
+        _actual == "digraph{\nhi -> mother\n}\n" || fail  # note spacing
+      end
+
+      shared_subject :_tuple do
+
+        s = ""
+        call_API(
+          * _subject_action,
         :input_string, "digraph{\n hi->mother\n }",
-        :output_path, out_a
+          :output_string, s,
+        )
 
       expect_OK_event :created_association
-      expect_OK_event :wrote_resource
+        _expect_wrote
 
-      out_a.join( EMPTY_S_ ).should eql "digraph{\nhi -> mother\n}\n"  # note spacing
+        a = [s]
+        a.push execute
+      end
     end
 
 # (7/N)
-    it "case 2 (\"import\") - simple venn case with edges only, no labels", wip: true do
+    context "case 2 (\"import\") - simple venn case with edges only, no labels" do
+
+      it "(emits)" do
+        _succeeds
+      end
+
+      shared_subject :_tuple do
 
       i_am_this =
         [ "digraph {\n", "  beebo -> ceebo\n", "  deebo -> feebo\n", "}\n" ]
 
-      call_API :graph, :sync,
+        call_API(
+          * _subject_action,
         :input_path,
           [ "digraph {\n", "abo -> beebo\n", "beebo -> ceebo\n", "}" ],
         :hereput_path,
-          i_am_this
+          i_am_this,
+        )
 
       expect_OK_event :created_association
       expect_OK_event :found_existing_association
-      expect_OK_event :wrote_resource
-      expect_succeed
+        _expect_wrote
 
-      ( i_am_this * EMPTY_S_ ).should eql <<-HERE.unindent
+        a = [ i_am_this ]
+        a.push execute
+      end
+
+      it "(content)" do
+
+        _actual_a = _tuple.first
+        _actual_s = _actual_a.join EMPTY_S_
+
+        _expected = <<-HERE.unindent
         digraph {
           abo -> beebo
           beebo -> ceebo
           deebo -> feebo
         }
       HERE
-
       # (dig that smart indenting)
+
+        _actual_s == _expected || fail
+      end
     end
 
 # (8/N)
-    it "case 1 - input will not overwrite labels, but will write them", wip: true do
+    context "case 1 - input will not overwrite labels, but will write them (README)" do
+
+      # in a fully parsimonious implementation, the elements of the input
+      # document would (one could reasonably argue) overrule any competing
+      # atomic element in the hereput document in cases of collision (for
+      # definitions of) during the recursive merge.
+      #
+      # for example if you have two nodes with the same ID, the label from
+      # the incoming node should clobber that of the existing node.
+      #
+      # HOWEVER for the case of labels, it seems that the legacy work avoided
+      # clobbering these, but instead *ignored* the label in the input
+      # document. perhaps the rationale was (and in any case is now)
+      # that you might want to hand-edit your document to have a friendlier,
+      # more interesting or more informational label.
+      #
+      # it might be better to make this some kind of option or at least emit
+      # a notice that we are disregarding the labels in the input in such
+      # cases, but for now we are just re-greening.. :#cov3.4
+
+      it "(events)" do
+        _succeeds
+      end
+
+      it "(content)" do
+
+        _actual = _tuple.first
+
+        _scn = Home_.lib_.basic::String::LineStream_via_String[ _actual ]
+
+        expect_these_lines_in_array_with_trailing_newlines_ _scn do |y|
+
+          y << "digraph{"
+          y << " # hehe"
+          y << "  be [ label=\"Bee\" ]"
+
+          y << "  su [ label=\"Super Par\" thing=ding ]"
+            # note that the label stayed the same
+
+          y << "ab [label=Xy]"
+            # note that internally it decided to remove the quotes. also,
+            # indentation is borked
+
+          y << "}"
+        end
+      end
+
+      shared_subject :_tuple do
 
       _input_s = "digraph{ \n su [ label=\"Super-Par\" ]\n ab [  label=\"Xy\"] \n}"
 
@@ -210,34 +336,45 @@ module Skylab::TanMan::TestSupport
 
       output_s = ""
 
-      call_API :graph, :sync,
+        call_API(
+          * _subject_action,
         :input_string, _input_s,
         :hereput_string, _hereput_s,
         :output_string, output_s
+        )
 
       expect_OK_event :found_existing_node
       expect_OK_event :created_node
-      expect_OK_event :wrote_resource
+        _expect_wrote
 
-      st = TestSupport_::Expect_Line::Scanner.via_string output_s
-      st.next_line.should eql "digraph{\n"
-      st.next_line.should eql " # hehe\n"
-      st.next_line.should eql "  be [ label=\"Bee\" ]\n"
+        a = [ output_s ]
+        a.push execute
+      end
+    end
 
-      st.next_line.should eql "  su [ label=\"Super Par\" thing=ding ]\n"
-        # note that the label stayed the same
+    # == assertions
 
-      st.next_line.should eql "ab [label=Xy]\n"
-        # note that internally it decided to remove the quotes. also,
-        # indentation is borked
-
-      st.next_line.should eql "}\n"
-      st.next_line.should be_nil
+    def _succeeds d=nil
+      sct = _tuple.last
+      if d
+        sct.bytes == d || fail
+      else
+        sct.bytes.zero? && fail
+      end
+      sct.user_value._DO_WRITE_COLLECTION_ || fail  # or don't test this
     end
 
     def _fails_commonly
       _x = _tuple.last
       _x.nil? || fail
+    end
+
+    # == setup
+
+    # ignore_these_events :wrote_resource  # <- keep this out - assert it explicitly
+
+    def _expect_wrote
+      expect :success, :wrote_resource
     end
 
     def _subject_action
@@ -249,3 +386,4 @@ module Skylab::TanMan::TestSupport
     end
   end
 end
+# #history-A.1: half rewrite during ween off [br]

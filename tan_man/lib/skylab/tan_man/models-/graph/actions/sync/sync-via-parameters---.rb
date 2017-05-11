@@ -4,15 +4,17 @@ module Skylab::TanMan
 
     class Sync_via_Parameters___ < Common_::MagneticBySimpleModel
 
-      # see [#026] IO resolution through parameter modeling, near syncing.
+      # [#026.B] describes syncing
 
       def initialize
         super
+          @_is_dry_run = remove_instance_variable :@is_dry_run
       end
 
       attr_writer(
         :here_reference,
         :in_reference,
+          :is_dry_run,
         :listener,
         :microservice_invocation,
         :out_reference,
@@ -40,43 +42,152 @@ module Skylab::TanMan
 
       # -- H:
 
-      def __when_input_and_hereput
+        def __when_input_and_hereput_and_output  # a proper syncing, non-destructive
 
-        ok = _not_same :_input_, :_hereput_
-        ok && self._SKETCH__in_pseudocode__
-      end
+          if _not_same :_input_, :_hereput_ and _not_same :_hereput_, :_output_
+            _with_locked_line_counting_upstream_via :_input_ do
+              _with_digraph_that_we_wont_mutate :@here_reference, :@out_reference do
+                _money
+              end
+            end
+          end
+        end
 
-      def __when_input_and_hereput_and_output
+        def __when_input_and_hereput  # a proper syncing that is destructive
 
-        ok = _not_same :_input_, :_hereput_
-        ok &&= _not_same :_hereput_, :_output_
-        ok && self._SKETCH__in_pseudocode__
-      end
+          if _not_same :_input_, :_hereput_
+            _with_locked_line_counting_upstream_via :_input_ do
+              __with_digraph_that_we_will_mutate :@here_reference do
+                _money
+              end
+            end
+          end
+        end
 
       def __when_input_and_output
 
-        ok = _not_same :_input_, :_output_
-        ok &&= _resolve_upstream_line_stream_via :_input_
-        ok && _will_begin_with_empty_document
-        ok && _will_write_final_output_lines_to( :_output_ )
-        ok && _money
+          # a bit of a motion test: starting with an empty document,
+          # exercise our hand-written parsing hack to "sync" all the input
+          # lines into the empty digraph, and express it to the output.
+
+          if _not_same :_input_, :_output_
+            _with_locked_line_counting_upstream_via :_input_ do
+
+              @__empty_ref = Byte_upstream_reference_[].via_string "digraph{\n}\n"
+
+              _with_digraph_that_we_wont_mutate :@__empty_ref, :@out_reference do
+                _money
+              end
+            end
+          end
       end
 
       def __when_hereput_and_output
 
-        ok = _not_same :_hereput_, :_output_
-        ok &&= self._HMMM
+          # again this is a bit of a simple exercise of machinery:
+          # see if you can resolve a digraph document from the input.
+          # if it works, merely echo out each line to the output.
+
+          if _not_same :_hereput_, :_output_
+            _with_digraph_that_we_wont_mutate :@here_reference, :@out_reference do
+              DID_WORK_  # really this just simplifies testing. could be any trueish
+            end
+          end
       end
 
-      def _money
+        # --
 
-        ok = __process_first_line
-        ok && self._README  # you're gonna wanna go ahead and use DigraphSession_via_THESE
+        def _with_digraph_that_we_wont_mutate ivar, ivar_, & work
+
+          bsr = remove_instance_variable ivar
+          bsr_ = remove_instance_variable ivar_
+
+          _digraph_session_by work do |o|
+            o.two_byte_stream_references__ bsr, bsr_
+            o.be_read_write_not_read_only_
+          end
+        end
+
+        def __with_digraph_that_we_will_mutate ivar, & work
+
+          bsr = remove_instance_variable ivar
+
+          if ! bsr.is_writable
+            bsr = bsr.to_read_writable
+          end
+
+          _digraph_session_by work do |o|
+            o.byte_stream_reference = bsr
+            o.be_read_write_not_read_only_
+          end
+        end
+
+        def _digraph_session_by work
+
+          Models_::DotFile::DigraphSession_via_THESE.call_by do |o|
+
+            yield o
+
+            o.session_by do |dc|
+              @_digraph_controller = dc
+              x = work[]
+              remove_instance_variable :@_digraph_controller
+              x || NIL_AS_FAILURE_
+            end
+            o.is_dry_run = @_is_dry_run  # only relevant if we write
+            o.microservice_invocation = @microservice_invocation
+            o.listener = @listener
+          end
+        end
+
+        def _with_open_output_stream ivar
+
+          _bsr = remove_instance_variable ivar
+
+          obs = _open_by_stream_by do |o|
+            o.byte_stream_reference = _bsr
+            o.be_for_write_only
+          end
+
+          if obs
+            bsr = obs.sanitized_byte_stream_reference
+            @_open_downstream = bsr
+            x = yield
+            remove_instance_variable :@_open_downstream
+            if obs.is_lockable_and_locked
+              obs.close_stream_and_release_lock_  # stay close to #spot3.1
+            end
+            x
+          end
+        end
+
+        def _open_by_stream_by
+
+          Mags_[]::OpenByteStream_via_ByteStreamReference.call_by do |o|
+            yield o
+            o.filesystem = @microservice_invocation.invocation_resources.filesystem
+            o.listener = @listener
+          end
+        end
+
+      # --
+
+      def _money
+          __init_sync_session
+          ok = __process_first_line
         ok &&= __process_zero_or_more_label_nodes
         ok &&= __process_zero_or_more_edges
         ok &&= __process_last_line
         ok && __finish
       end
+
+        def __init_sync_session
+          @sync_session = This_::ExposedClient_for_Session___.define do |o|
+            o.digraph_controller = @_digraph_controller
+            o.listener = @listener
+          end
+          NIL
+        end
 
       # -- G: matching
 
@@ -258,43 +369,56 @@ module Skylab::TanMan
       def _will_write_final_output_lines_to sym
 
         $stderr.puts "(IGNORING A THING)"
-        @__document_controller = nil  # NOTE - ..
-
-        @sync_session = This_::ExposedClient_for_Session___.new(
-          remove_instance_variable( :@__document_controller ),
-          @microservice_invocation,
-          & @listener )
         NIL
       end
 
       # -- D:
-
-      def _will_begin_with_empty_document
-
-        _ref = Byte_upstream_reference_[].via_string "digraph{\n}\n"
-        @USE_BYTE_UPSTREAM_REFERENCE = _ref
-        NIL
-      end
+        # (used to be something)
 
       # -- C:
 
-      def _resolve_upstream_line_stream_via whatput
+        def _with_locked_line_counting_upstream_via whatput
 
-        _ref = instance_variable_get _ivar whatput
+          _byte_upstream_ref = instance_variable_get _ivar whatput
 
-        st = _ref.to_minimal_line_stream  # ..
+          obs = _open_by_stream_by do |o|
+            o.byte_stream_reference = _byte_upstream_ref
+            o.be_for_read_only
+          end
 
-        if st
+          if obs
+            min_st = obs.sanitized_byte_stream_reference.to_minimal_line_stream  # ..
+            if min_st
+              min_st = __produce_use_minimal_stream_and_init_line_number_reader_via min_st
+              __init_comment_free_line_stream_via_line_counting_line_stream min_st
+              x = yield
+            end
+            if obs.is_lockable_and_locked
+              obs.close_stream_and_release_lock_  # stay close to #spot3.1
+            end
+            x
+          end
+        end
+
+        def __init_comment_free_line_stream_via_line_counting_line_stream min_st
+
+          if false  # (see notes there)
+          min_st = Minimal_line_stream_without_comments_via_minimal_line_stream___[ min_st ]
+          end
+          @upstream_lines = min_st  # (legacy name)
+          NIL
+        end
+
+        def __produce_use_minimal_stream_and_init_line_number_reader_via st
           if st.respond_to? :lineno
             @_lineno = :__line_number_easily
-            @upstream_lines = st
+            @__line_counting_line_stream = st
+            st
           else
             @_lineno = :__line_number_complicatedly
-            @upstream_lines = __wrap_so_we_have_line_numbers st
+            __wrap_so_we_have_line_numbers st
           end
-          ACHIEVED_
         end
-      end
 
       def __wrap_so_we_have_line_numbers st
         @_current_line_number = 0
@@ -312,7 +436,7 @@ module Skylab::TanMan
       end
 
       def __line_number_easily
-        @upstream_lines.lineno
+          @__line_counting_line_stream.lineno
       end
 
       # -- B:
@@ -349,6 +473,28 @@ module Skylab::TanMan
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # ==
+
+      Minimal_line_stream_without_comments_via_minimal_line_stream___ = -> st do
+
+        # at first we thought we needed this to pass legacy tests, but no..
+        # nonetheless we have kept the sketch here
+
+        Common_::MinimalStream.by do
+          begin
+            line = st.gets
+            line || break
+            # ..
+            self._ETC__this_would_take_some_rearranging__
+            break
+          end while above
+          line
+        end
+      end
+
+      # ==
+      # ==
     end
   end
 end

@@ -2,83 +2,57 @@ module Skylab::TanMan
 
   class Models_::Node
 
-    # (both magnets have one shared document section (stub) in [#084])
+    class Magnetics_::Create_or_Retrieve_or_Touch_via_NodeName_and_Collection <  # 2x
+        Common_::MagneticBySimpleModel
 
-    module Magnetics_
+      # (stub in [#084])
 
-      CommonMagnetic__ = ::Class.new Common_::MagneticBySimpleModel
-
-      class Create_or_Retrieve_or_Touch_via_NodeName_and_Collection < CommonMagnetic__
-        # -
-
-          def initialize
-            @_node_ID_is_provided = false
-            super
-          end
-
-          def name_string= s
-            @_unsanitized_label_string = s
-          end
-
-          def execute
-            super  # hi.
-          end
-
-          def _resolve_new_node_id_
-            _find_next_available_node_id_programmatically
-          end
-        # -
-      end
-
-      class Create_or_Touch_or_Delete_via_Node_and_Collection < CommonMagnetic__ # 2x
-        # -
-
-          def initialize
-            super
-            __init_ivars_related_to_provided_node_ID
-            @_unsanitized_label_string = @entity.unsanitized_label_string___
-          end
-
-          attr_writer(
-            :entity,
-          )
-
-          def execute
-            super  # hi.
-          end
-
-          def __init_ivars_related_to_provided_node_ID
-
-            provided_ID = @entity.lookup_value_softly_ :id
-            if provided_ID
-              @provided_ID = provided_ID
-              @provided_ID_sym = provided_ID.intern
-              @_node_ID_is_provided = true
-            else
-              @_node_ID_is_provided = false
-            end
-          end
-
-          def _resolve_new_node_id_
-
-            if @_node_ID_is_provided
-              @new_node_ID_sym = @provided_ID.intern
-              ACHIEVED_
-            else
-              _find_next_available_node_id_programmatically
-            end
-          end
-        # -
-      end
-
-      # ==
-
-      class CommonMagnetic__  # (re-open)
+      # -
 
         def initialize
+
+          @_mutex_for_means_of_identification = nil
+          @can_create = false
+
+          @do_fuzzy = false
           @top_channel_for_created_symbol = nil
-          super
-          __init_ivars_as_CM
+
+          yield self
+
+          _ = case @verb_lemma_symbol
+          when :procure ; :__init_ivars_for_procure
+          when :lookup_softly ; :__init_ivars_for_lookup_softly
+          when :touch ; :__init_ivars_for_touch
+          when :create ; :__init_ivars_for_create
+          when :delete ; :__init_ivars_for_delete
+          end
+
+          send _
+
+          gsp = @document.graph_sexp
+          @stmt_list = gsp.stmt_list
+          @graph_sexp = gsp
+        end
+
+        def unsanitized_both id_sym, label_s
+          remove_instance_variable :@_mutex_for_means_of_identification
+          @_node_ID_was_provided = true
+          @unsanitized_ID_symbol = id_sym
+          @_unsanitized_label_string = label_s
+          NIL
+        end
+
+        def unsanitized_label_string= s
+          remove_instance_variable :@_mutex_for_means_of_identification
+          @_node_ID_was_provided = false
+          @_unsanitized_label_string = s
+        end
+
+        def unsanitized_ID_symbol= sym
+          remove_instance_variable :@_mutex_for_means_of_identification
+          @_node_ID_was_provided = true
+          @_unsanitized_label_string = nil
+          @unsanitized_ID_symbol = sym
         end
 
         attr_writer(
@@ -86,52 +60,19 @@ module Skylab::TanMan
           :entity_via_created_element_by,
           :listener,
           :top_channel_for_created_symbol,
-          :verb_lemma_symbol,  # 'create' | 'retrieve' | 'touch'
+          :verb_lemma_symbol,  # :touch | :create | :delete | :procure | :lookup_softly
         )
 
         def execute
           __find_neighbors
-          case @internal_verb
-          when :retrieve ; __retrieve_via_neighbors
-          when :touch ; __touch_via_neighbors
-          when :delete ; __delete_via_neighbors
+          case @_category_symbol
+          when :_lookup_ ; __lookup_via_neighbors
+          when :_touch_ ; __touch_via_neighbors
+          when :_delete_ ; __delete_via_neighbors
           end
         end
 
-        def __init_ivars_as_CM
-
-          send :"init_ivars_for__#{ @verb_lemma_symbol }__"
-
-          gsp = @document.graph_sexp
-          @stmt_list = gsp.stmt_list
-          @graph_sexp = gsp
-
-          NIL
-        end
-
-        def init_ivars_for__create__
-          @can_create = true
-          @do_fuzzy = false
-          @internal_verb = :touch
-        end
-
-        def init_ivars_for__touch__
-          @can_create = true
-          @do_fuzzy = false
-          @internal_verb = :touch
-        end
-
-        def init_ivars_for__retrieve__
-          @can_create = false
-          @do_fuzzy = false
-          @internal_verb = @verb_lemma_symbol
-        end
-
-        def init_ivars_for__delete__
-          @can_create = false
-          @do_fuzzy = false
-          @internal_verb = @verb_lemma_symbol
-        end
+        # -- C
 
         def __find_neighbors
           if @stmt_list
@@ -142,6 +83,7 @@ module Skylab::TanMan
         end
 
         def __find_neighbors_when_empty_list
+          @exact_match_found = nil
           @has_neighbors = false ; nil
         end
 
@@ -174,7 +116,7 @@ module Skylab::TanMan
 
         def __init_matchers
 
-          if @_node_ID_is_provided
+          if @_node_ID_was_provided
             __init_matcher_using_node_IDs
           else
             __init_matcher_using_labels
@@ -182,7 +124,7 @@ module Skylab::TanMan
         end
 
         def __init_matcher_using_node_IDs
-          sym = @provided_ID_sym
+          sym = @unsanitized_ID_symbol
           @match_p = -> stmt do
             sym == stmt.node_ID_symbol_
           end ; nil
@@ -271,27 +213,39 @@ module Skylab::TanMan
           NIL
         end
 
+        # -- D
+
         def __touch_via_neighbors
+
           _ok = __resolve_relevant_sexp_when_touch
           _ok && @THIS_GUY  # (was @created_existing_or_destroyed_node)
         end
 
-        def __retrieve_via_neighbors
+        def __lookup_via_neighbors
+
           if @do_fuzzy
             self._HOLE
+
           elsif @exact_match_found
             @entity_via_created_element_by[ @exact_match_found ]
-          else
+
+          elsif @_whine_when_not_found
             _when_not_found
+
+          else
+            NOTHING_
           end
         end
 
         def __delete_via_neighbors
+
           if @do_fuzzy
             self._HOLE
+
           elsif @exact_match_found
             _node_stmt = @document.destroy_stmt @exact_match_found
             @entity_via_created_element_by[ _node_stmt ]
+
           else
             _when_not_found
           end
@@ -367,13 +321,23 @@ module Skylab::TanMan
         end.call
 
         def __to_new_node_apply_id
-          if _resolve_new_node_id_
+          if __resolve_new_node_ID
             _ = remove_instance_variable :@new_node_ID_sym
             @created_existing_or_destroyed_node.set_node_id _
           end
         end
 
-        def _find_next_available_node_id_programmatically
+        def __resolve_new_node_ID
+
+          if @_node_ID_was_provided
+            @new_node_ID_sym = @unsanitized_ID_symbol
+            ACHIEVED_
+          else
+            __find_next_available_node_id_programmatically
+          end
+        end
+
+        def __find_next_available_node_id_programmatically
 
           _st = @graph_sexp.to_node_stream
 
@@ -414,11 +378,15 @@ module Skylab::TanMan
         end
 
         def __when_matches_exist
+
           one = @exact_match_found || @fuzzy_matches_found.first  # CAREFUL
+
           if @can_create
-            send :"when__#{ @internal_verb }__when_one_exists_already", one
+            send :"when_#{ @_category_symbol }_when_one_exists_already", one
+
           elsif @exact_match_found || 1 == @fuzzy_matches_found.length
-            send :"when__#{ @internal_verb }__when_one_exists_already", one
+            send :"when_#{ @_category_symbol }_when_one_exists_already", one
+
           else
             __when_ambiguous
           end
@@ -527,11 +495,10 @@ module Skylab::TanMan
 
           _use_sym = @top_channel_for_created_symbol || :info
 
-          _ev = __build_created_node_event  # eager for now  # #todo
-
           @listener.call _use_sym, :created_node do
-            _ev
+            __build_created_node_event
           end
+
           NIL
         end
 
@@ -568,6 +535,41 @@ module Skylab::TanMan
           end
         end
 
+        # -- B
+
+        def __init_ivars_for_touch
+
+          @can_create = true
+          @_whine_when_an_existing_one_is_found = false
+          @_category_symbol = :_touch_
+        end
+
+        def __init_ivars_for_create
+
+          @can_create = true
+          @_whine_when_an_existing_one_is_found = true
+          @_category_symbol = :_touch_
+        end
+
+        def __init_ivars_for_delete
+
+          @_category_symbol = :_delete_
+        end
+
+        def __init_ivars_for_procure
+
+          @_whine_when_not_found = true
+          @_category_symbol = :_lookup_
+        end
+
+        def __init_ivars_for_lookup_softly
+
+          @_whine_when_not_found = false
+          @_category_symbol = :_lookup_
+        end
+
+        # -- A
+
         def handle_error
           -> ev do
             send_event ev
@@ -576,7 +578,7 @@ module Skylab::TanMan
         end
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-      end
+      # -
 
       # ==
 

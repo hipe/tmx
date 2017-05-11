@@ -265,7 +265,7 @@ module Skylab::TanMan::TestSupport
 
           a = []
 
-          _existing_ent = @OB_FOR_NODES.lookup_softly_via_node_ID___ :yeti
+          _existing_ent = @OB_FOR_NODES.lookup_softly_via_node_ID__ :yeti
           a.push _existing_ent
 
           call_by do |p|
