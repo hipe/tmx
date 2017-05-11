@@ -2,7 +2,8 @@
 
 [#098] #open abstract file-locking work out to the byte stream references
 
-[#097] #open abstract tons of this work for the new workspace (may be "finished")
+[#097] #hole
+             ( #was: abstract tons of this work for the new workspace (may be "finished") )
 
 [#096] #open no more [br]
 
@@ -116,9 +117,17 @@
 [#035]       #wont `delegates_to` go away as a smell (meh)
 [#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc
 [#033]       #done `full_action_name_parts` becomes `local_normal_name` (`action_name` ..?)
-[#032]       #done rename stdout, s-tderr
 
-[#031] #hole
+[#032] #hole
+             #done rename stdout, s-tderr
+
+[#031]       when this is *set* (literally set, as in to anything), this
+             indicates that the action will want to access its defined
+             parameters after it begins execution. (many actions don't
+             need to reflect on their formal parameters once they have
+             begun execution; but in this application many do, because
+             reasons.
+
              ( #was: #done regretify all tests )
 
 [#030]       [ hear ]
@@ -223,7 +232,8 @@
              ( #was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller )
                examples-controller -> example-collection)
 
-[#001] #open refactor out the repetition among document entity actions:
+[#001]       [ readme ]
+             ( #was: refactor out the repetition among document entity actions:
              resolve one layer where all collection persists happen (i.e
-             should collection controllers write files or should actions?)
+             should collection controllers write files or should actions?) )
              ( #was: #done tan -w ok, #depends-on:(#sl-unwip) )

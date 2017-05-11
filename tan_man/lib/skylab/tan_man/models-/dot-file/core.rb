@@ -122,6 +122,7 @@ module Skylab::TanMan
                 DidWrite___[ x, bytes ]
               end
             else
+              # see #archive-A.3 for when we emitted here
               DidNotWrite___[ x ]
             end
           else
@@ -350,5 +351,6 @@ module Skylab::TanMan
     # ==
   end
 end
+# #archive-A.3: got rid of the event that was emitted on no write
 # #history-A.2: moved "persist dotfile" out of file to other file
 # #history-A: spike of main magnetic (locked file session) back into here

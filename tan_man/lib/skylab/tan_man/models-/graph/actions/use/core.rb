@@ -68,17 +68,6 @@ module Skylab::TanMan
     end
 
     # ==
-
-    $stderr.puts "\n\n\n(REMEMBER: 2 things remaining in graph silo)\n\n\n"
-
-    if false
-    module Actions__
-      Sync = Action_Stub_.new do
-        Here_::Sync_::Action
-      end
-    end
-
-    end  # if false
   end
 end
 # #history-A.2: this used to be the core "graph" file, became the "use" action node.

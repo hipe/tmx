@@ -63,8 +63,9 @@ module Skylab::TanMan
 
         def receive_finish
 
-          # per [#001] there is nothing more to do.
-          # it's not within our scope to persist the graph.
+          # by resulting in the below we particicpate in telling the
+          # caller this information so that we can skip needlessly
+          # writing documentst that haven't changed.
 
           if @_tick.zero?
             DID_NO_WORK_

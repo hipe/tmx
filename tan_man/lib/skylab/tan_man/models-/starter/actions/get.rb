@@ -127,9 +127,8 @@ module Skylab::TanMan
           if sct.did_find
             sct.found_item  # as covered
           else
-            # sct.needle_item  # as covered
-            $stderr.puts "CHANGING THIS TO MAKE MORE SENSE"  # #todo
-            NOTHING_
+            # sct.needle_item (was)
+            NOTHING_  # #cov2.8
           end
         end
 

@@ -366,11 +366,7 @@ module Skylab::TanMan
 
       # -- E:
 
-      def _will_write_final_output_lines_to sym
-
-        $stderr.puts "(IGNORING A THING)"
-        NIL
-      end
+        # (used to be something)
 
       # -- D:
         # (used to be something)

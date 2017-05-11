@@ -147,37 +147,6 @@ module Skylab::TanMan::TestSupport
       end
     end
 
-    # it "to a empty 'digraph' -- makes up its own prototype" :+#ancient
-    if false
-      o = given_dotfile_ 'digraph{}'
-      ::Kernel._SAME
-      @workspace_path = o.workspace_path
-      invoke_from_dotfile_dir 'graph', 'node', 'add', 'foo'
-      dotfile_pathname.read.should eql( 'digraph{foo [label=foo]}' )
-    end
-
-    # it "to a digraph with a prototype - it adds that puppy"  :+#ancient
-    if false
-      o = given_dotfile_ <<-O.unindent
-        digraph {
-        /*
-          example stmt_list:
-            foo -> bar
-            biff -> baz
-
-          example node_stmt:
-            foo [label=foo]
-        */
-        }
-      O
-      ::Kernel._SKETCH
-      @workspace_path = o.workspace_path
-      invoke_from_dotfile_dir 'graph', 'node', 'add', 'bar'
-      output.lines.last.string.should match( /created node: bar/ )
-      content = dotfile_pathname.read
-      content.should be_include( 'bar [label=bar]' )
-    end
-
 # (9/N)
 
     context "add a node to zero nodes" do
@@ -404,4 +373,5 @@ module Skylab::TanMan::TestSupport
     # ==
   end
 end
+# #archive-A.2: archive ancient commented out tests: add to empty document [ with prototype ]
 # #history-A: full rewrite

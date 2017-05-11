@@ -521,53 +521,6 @@ module Skylab::TanMan
         NIL
       end
 
-      # -- X
-
-    if false  # #open [#015] remove association
-    def destroy_all_associations node_id, _, success # i cannot fail
-      res_a = each_associated_list_node( node_id ).to_a.reverse.map do |list|
-        x = list._remove! list.stmt             # (reverse b/c deletes up
-        x.stmt                                  # at root do a lot of juggling
-      end                                       # we want to avoid. might be ok)
-      res = nil
-      if res_a.length.nonzero?
-        res_a.reverse! # cosmetics - restore it back to the maybe lexical order
-        if success
-          ev = Models::Association::Events::Disassociation_Successes.new self,
-            res_a
-          res = success[ ev ]
-        else
-          res = res_a
-        end
-      end
-      res
-    end
-
-    def each_associated_list_node node_id
-      ::Enumerator.new do |y|     # used to be a nice pretty reduce but w/e
-        each_edge_stmt_list.each do |edge_stmt_list|
-          o = edge_stmt_list.stmt
-          if o.source_node_id == node_id or o.target_node_id == node_id
-            y << edge_stmt_list
-          end
-        end
-        nil
-      end
-    end
-
-    def each_edge_stmt_list       # repeats some of `prod` but w/o all the
-      ::Enumerator.new do |y|     # lexcial trappings
-        sl = graph_sexp.stmt_list or break
-        sl.elements_.each do |stmt_list|
-          stmt = stmt_list.stmt or next
-          :edge_stmt == stmt.class.rule_symbol || next
-          y << stmt_list
-        end
-        nil
-      end
-    end
-    end
-
       # -- A
 
       # -- (retrofit the older code that uses these, it's fine)
@@ -625,6 +578,7 @@ module Skylab::TanMan
     end
   end
 end
+# #archive-A.3 (should be temporary) related to #open [#015] remove association
 # #pending-rename: it probably wouldn't hurt to go ahead and put this in magnets, per #here1
 # :#history-A.2: full rewrite mostly
 # :#tombstone-A.1 (can be temporary) (as referenced)

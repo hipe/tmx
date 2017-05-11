@@ -217,23 +217,6 @@ module Skylab::TanMan
       :output,   # whether this attribute is associated with output
     )
 
-    if false
-        def __when_document_did_not_change
-
-          maybe_send_event :info, :document_did_not_change do
-
-            Common_::Event.inline_neutral_with(
-
-              :document_did_not_change
-
-            ) do | y, o |
-
-              y << "document did not change."
-            end
-          end ; nil
-        end
-    end  # if false
-
     Here__ = self
 
     # ==

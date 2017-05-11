@@ -27,20 +27,6 @@ module Skylab::TanMan
         NodesOperatorBranchFacade_TM.new( @_immutable_digraph_ ).to_node_entity_stream_
       end
 
-      if false
-      def with_immutable_digraph_
-        if instance_variable_defined? :@_immutable_digraph_
-          yield
-        else
-          super
-        end
-      end
-
-      attr_writer(
-        :_immutable_digraph_,
-      )
-      end
-
       # ==
       # ==
     end

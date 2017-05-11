@@ -94,13 +94,15 @@ module Skylab::TanMan
         # (the first time you receive an association, see if the action
         # is subscribed to receiving the associations; etc.)
 
-        see_association = if act.respond_to? :_accept_association_  # #experiment
-          -> asc do
-            act._accept_association_ asc
-            NIL
+        if act.instance_variable_defined? :@_associations_
+          # (as described at [#031])
+          # (make this a hook-in method when desired and move this #here2)
+          h = act.instance_variable_get :@_associations_
+          see_association = -> asc do
+            h[ asc.name_symbol ] = asc ; nil
           end
         else
-          MONADIC_EMPTINESS_
+          see_association = MONADIC_EMPTINESS_
         end
         see_association[ asc1 ]
       end
@@ -237,6 +239,8 @@ module Skylab::TanMan
         invo.HELLO_INVOCATION  # #todo
         @_microservice_invocation_ = invo
       end
+
+      # (:#here2)
 
       # --
 

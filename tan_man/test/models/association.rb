@@ -114,16 +114,6 @@ module Skylab::TanMan::TestSupport
       ::File.join TS_.dir_path, 'fixture-dot-files-for-association'
     end )
 
-    if false  # #todo
-    def collection_class
-      Home_::Models::Association::Collection
-    end
-
-    def lines
-      result.unparse.split NEWLINE_
-    end
-    end
-
     # ==
 
     ErrorTuple___ = ::Struct.new :result, :event_of_significance

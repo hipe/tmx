@@ -551,12 +551,13 @@ end
 
 if __FILE__ == $PROGRAM_NAME
 
+  serr = $stderr
   d = Skylab::Stack.new(
-    ::ARGV, nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File
+    ::ARGV, nil, $stdout, serr, [ $PROGRAM_NAME ], ::File
   ).execute
 
   if d.nonzero?
-    $stderr.puts "(exitstatus: #{ d })"
+    serr.puts "(exitstatus: #{ d })"
   end
 
   exit d

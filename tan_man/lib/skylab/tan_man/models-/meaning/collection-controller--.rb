@@ -20,8 +20,6 @@ module Skylab::TanMan
 
       def add_meaning_by_
 
-        # :#tombstone-A.2 we used to ask where the saving happens [#001] - now we know
-
         # entity on success. false-ish on failure
 
         Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call_by do |o|
@@ -104,6 +102,5 @@ module Skylab::TanMan
   end
 end
 Skylab::TanMan::Models_::Meaning::Collection_Controller__ = nil  # don't forget the `lazily` clause too
-# :#tombstone-A.2 (temporary) (as referenced)
 # #pending-rename: meanings operator branch facade
 # #history-A: half full rewrite during ween off [br]-era

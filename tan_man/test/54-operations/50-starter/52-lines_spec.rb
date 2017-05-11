@@ -54,6 +54,12 @@ module Skylab::TanMan::TestSupport
       end
     end
 
+    # (#archive (can be temporary) in sibling file - we used to test
+    # the "lines" action with a path in the workspace with no referent
+    # ("no-ent"). in the new refactor we would use '020-starter-is-no-ent'
+    # to test this, but since we are setting this setup for other actions
+    # already we don't bother here, for now.)
+
     context "workspacey" do
 
       it "works" do

@@ -28,7 +28,7 @@ module Skylab::TanMan
             s_a = x.value_x
 
             if 'a' == s_a.fetch( 1 )
-              $stderr.puts "(FIX [#019])"
+              self._HELLO__readme__  # (this used to be a fix for [#019] #tombstone)
               s_a[ 1, 1 ] = EMPTY_A_
             end
 

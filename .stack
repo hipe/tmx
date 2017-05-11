@@ -3,8 +3,6 @@ insane experment with [sa] - convert every `should eql` to etc and see diff (C)
 unify table under [ze] and then re-apply this to [tmx] counts (covered, add totals row and fix layout)
 fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`, memoize vs lazy) (B)
 try to simplify [ac]/[ze] procure bound call
-[tm] change actors and sessions to magnetics
-[tm] no more Selective_Builder_Receiver_Sender_Methods
 use [sa] to convert etc to Stream_
 -1 script to calculate costs [#tmx-011] then [#tmx-010]
 -2 the cost-driven divvy algorithm [#tmx-012]
@@ -15,6 +13,8 @@ use [sa] to convert etc to Stream_
 [ze] Expresser needs slight cleanup, should be simple model
 (-4 cleanup the items between this one and -3)
 -5 [br] is renovated when it is only datastore adapteres and the example app
+consider trying to quash `make_action_making_actions_module`
+consider trying to quash `make_action_class`
 -6 [cs] have fun figuring out what to do with isomorpic methods client
 -7 also: decide if entity library is deprecated (#open [#fi-034.1])
 when [tm] CLI: #open [#tm-059] invites
@@ -29,19 +29,3 @@ HO tan_man/test/62-cli_spec.rb
 ([gv]: 2 actions, API only)
 ([cm]: 4 actions, API only)
 ([cu]: 7 actions, API only)
-(the two more [tm]-related items stacked far below this one)
-`make_action_class` and related: liquidate this. (push back as necessary)
-`make_action_making_actions_module` too
-(many $stderr in [tm])
-(many `if false` in [tm])
-#open [#tm-097] abstract when an expected primitive is not found in config
-in the node add spec, archive those two tests
-(model: graph)
-(related: driftwood in [#tm-026])
-(related: Common_Collection_Controller_Methods_ is driftwood)
-consider trying to quash `make_action_making_actions_module`
-maybe close [#001] - because now, the layer where entities are persisted is fixed
-(model: node)
-refactor the add to use the doohah
-get rid of _accept_association_ per se - make it only set due to the existence of :@_associations_ - write about it in [#xxx]
-one_entity_against_natural_key_fuzzily_

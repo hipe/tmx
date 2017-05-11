@@ -36,11 +36,7 @@ module Skylab::TanMan
       def initialize
         extend Home_::Model_::CommonActionMethods
         init_action_ yield
-        @_associations_ = {}
-      end
-
-      def _accept_association_ asc
-        @_associations_[ asc.name_symbol ] = asc
+        @_associations_ = {}  # #[#031]
       end
 
       def execute

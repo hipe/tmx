@@ -63,12 +63,6 @@ module Skylab::TanMan
         end
       end
 
-      if false
-
-      Rm = make_action_class :Delete
-
-      end  # if false
-
       class Apply < ActionBoilerplate_
 
         def definition
@@ -114,15 +108,11 @@ module Skylab::TanMan
       def initialize
         extend Home_::Model_::CommonActionMethods
         init_action_ yield
-        @_associations_ = {}
+        @_associations_ = {}  # #[#031]
       end
 
       def _these_
         Home_::DocumentMagnetics_::CommonAssociations.all_
-      end
-
-      def _accept_association_ asc
-        @_associations_[ asc.name_symbol ] = asc
       end
 
       def with_read_write_operator_branch_facade_
@@ -155,11 +145,6 @@ module Skylab::TanMan
     # ==
 
     Here_ = self
-    if false
-    NAME_ = 'name'.freeze
-    NEWLINE_ = "\n".freeze
-    VALUE_ = 'value'.freeze
-    end
 
     # ==
     # ==

@@ -135,7 +135,7 @@ module Skylab::TanMan::TestSupport
 
       # #lends-coverage to [#sy-008.4]
 
-      it "invokes, doesn't fail" do
+      it "invokes, doesn't fail" do  # :#cov2.8
         _tuple || fail
       end
 
@@ -217,65 +217,6 @@ module Skylab::TanMan::TestSupport
     end
 
     # ==
-
-    if false  # (this is on the stack)
-    context "apply -" do
-
-      # (6/N)
-      it "go to it - when file does not exist" do
-
-        prepare_ws_tmpdir <<-O.unindent
-          --- /dev/null
-          +++ a/#{ cfn }
-          @@ -0,0 +1 @@
-          +[ starter "digraphie" ]
-        O
-
-        call_API :starter, :lines,
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn
-
-        scn = @result
-        scn.should eql false
-
-        _em = expect_not_OK_event :resource_not_found
-
-        black_and_white( _em.cached_event_value ).should eql(
-          "No such file or directory - digraphie" )
-
-        expect_no_more_events
-      end
-
-      # (7/N)
-      it "go to it - when file does exists" do
-
-        prepare_ws_tmpdir <<-O.unindent
-          --- /dev/null
-          +++ a/#{ cfn }
-          @@ -0,0 +1 @@
-          +[ starter "minimal.dot" ]
-        O
-
-        call_API :starter, :lines,
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn
-        st = @result
-
-        first_line = st.gets
-        d = first_line.length
-        line = st.gets
-        while line
-          d += line.length
-          line = st.gets
-        end
-
-        ( 50 .. 60 ).should be_include d  # the number of bytes written
-
-        first_line.should eql "# created by tan-man on {{ CREATED_ON }}\n"
-
-        expect_no_events
-
-      end
-    end
-    end  # if false
 
     def _fails_normally
       _tuple.last.nil? || fail

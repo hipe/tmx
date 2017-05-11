@@ -95,8 +95,6 @@ module Skylab::TanMan
 
       members = _build_element_names_( o ).freeze
 
-      $stderr.write "for #{ members.inspect }"
-
       moi = _build_members_of_interest_ o
       if ! moi
         moi = members  # hi.
@@ -215,7 +213,6 @@ module Skylab::TanMan
   Give_it_a_name___ = -> do
     d = 0
     -> x do
-      $stderr.puts " making #{ d }"
       Generated___.const_set :"Rule_#{ d += 1 }", x
       x
     end
@@ -957,6 +954,7 @@ module Skylab::TanMan
     # ==
   end
 end
+# :#tombstone-A.3 debugging output to stderr
 # :#tombstone-A.2 (can be temporary) (as referenced 2x)
 # :#history-A.1 (can be temporary) (as referenced)
 # #history-A (can be temporary) as referenced

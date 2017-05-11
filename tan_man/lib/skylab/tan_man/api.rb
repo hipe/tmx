@@ -246,60 +246,6 @@ module Skylab::TanMan
         "'#{ sym.id2name.gsub UNDERSCORE_, DASH_ }'"
       end
 
-      # ~ old stuff to deprecate, here for reference
-
-      if false
-
-      def hdr s
-        s
-      end
-
-      def highlight string
-        "** #{ string } **"
-      end
-
-      def kbd s
-        s
-      end
-
-      def lbl x
-        par x
-      end
-
-      def par x
-        if ! ( x.respond_to? :ascii_only? or x.respond_to? :id2name )
-          x = x.name.as_lowercase_with_underscores_symbol
-        end
-        "'#{ x }'"
-      end
-      end
-
-      # ~ old EN stuff, here for reference until we restore everything
-
-      if false
-
-      def indefinite_noun lemma_s
-        _NLP_agent.indefinite_noun lemma_s
-      end
-
-      def s count_x, lexeme_i=:s
-        count_x.respond_to?( :abs ) or count_x = count_x.length
-        if :s == lexeme_i
-          's' if 1 != count_x
-        else
-          lexeme_i
-        end
-      end
-
-      def and_ a
-        _NLP_agent.and_ a
-      end
-
-      def or_ a
-        _NLP_agent.or_ a
-      end
-      end  # if false
-
       # ~
 
       def _NLP_agent
@@ -337,3 +283,4 @@ module Skylab::TanMan
     # ==
   end
 end
+# #tombstone-A.1: got rid of remaining unused methods from [br] era
