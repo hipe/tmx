@@ -10,13 +10,12 @@ module Skylab::Git::TestSupport
     it "status - dir not found" do
 
       _path = no_ent_path_
-      _sc = real_system_conduit_
 
       begin
         call_API( :stow, :status,
           :current_relpath, 'xyz1',
           :project_path, _path,
-          :system_conduit, _sc,
+          # :system_conduit, _sc,
         )
       rescue ::Errno::ENOENT => e
       end
@@ -27,13 +26,11 @@ module Skylab::Git::TestSupport
     it "status - dir not dir" do
 
       _path = TestSupport_::Fixtures.file( :one_line )
-      _sc = real_system_conduit_
 
       begin
         call_API( :stow, :status,
           :current_relpath, 'xyz2',
           :project_path, _path,
-          :system_conduit, _sc,
         )
       rescue ::Errno::ENOTDIR => e
       end
@@ -43,10 +40,18 @@ module Skylab::Git::TestSupport
 
     it "status - OK - OK" do
 
+      syscond = __this_mock_system_conduit
+      define_singleton_method :prepare_subject_API_invocation do |invo|
+        # (meh)
+        invo.invocation_resources.define_singleton_method :system_conduit do
+          syscond
+        end
+        invo
+      end
+
       call_API( :stow, :status,
         :current_relpath, 'diffy',
         :project_path, '/wiffy',
-        :system_conduit, __this_mock_system_conduit,
       )
 
       expect_neutral_event :command, /\Acommand: git ls-files /
@@ -117,7 +122,7 @@ module Skylab::Git::TestSupport
         +
       HERE
 
-      s = Home_.lib_.zerk::CLI::Styling::Unstyle_styled[ _act ]
+      s = Zerk_lib_[]::CLI::Styling::Unstyle_styled[ _act ]
       s or fail
       s.should eql _exp
     end
@@ -125,10 +130,6 @@ module Skylab::Git::TestSupport
     def _same_API_call
 
       call_API :stow, :show,
-        :filesystem, real_filesystem_,  # glob
-        :system_conduit, Home_.lib_.open_3,  # using the real one is OK here:
-          # we do a `find` command inside a fixture tree, and ..
-
         :stows_path, Fixture_tree_[ :stows_2 ],
         :stow_name, 'derp'
       NIL_

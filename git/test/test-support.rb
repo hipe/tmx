@@ -87,9 +87,24 @@ module Skylab::Git::TestSupport
 
     def expect_neutral_event_ sym
 
-      em = expect_neutral_event
-      sym.should eql em.cached_event_value.to_event.terminal_channel_symbol
-      em
+      # legacy [br] (somehow, somewhere) "upgrades" an expression to an
+      # event, and in so doing **changes the signature** from what was
+      # emitted. whatever its justification was for doing that then
+      # (probably trying to ease the burden for its main modality adaptation
+      # of expressing emissions), we now see this as an unacceptable amount
+      # of indirection: especially when testing API, the emission signatures
+      # we code for in our expectations must correspond exactly to those
+      # that are emitted, otherwise there's really no point in testing our
+      # API at all.
+      #
+      # (and it is the job of the modality adaptation layer (and no where
+      # else) to adapt the emissions as-received from the API.)
+      #
+      # anyway, because of this legacy design, when weening off [br] the
+      # the signatures of our emissions change even when our application
+      # code remains the same change, an so tests break. :#history-A.1
+
+      expect_neutral_event_or_expression sym
     end
 
     attr_accessor :do_debug
@@ -145,3 +160,4 @@ module Skylab::Git::TestSupport
   UNDERSCORE_ = '_'
   Zerk_lib_ = Home_::Zerk_lib_
 end
+# #history-A.1: [br] used to do someting whacky changing expressions to events. no longer

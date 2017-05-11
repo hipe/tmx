@@ -30,19 +30,16 @@ module Skylab::Git
 
   class << API
 
-    def call * x_a, & oes_p
-
-      bc = application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-      if bc
-        bc.receiver.send bc.method_name, * bc.args
-      else
-        bc
-      end
+    def call * a, & p  # #cp 1 of N
+      bc = invocation_via_argument_array( a, & p ).to_bound_call_of_operator
+      bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
     end
 
-    define_method :application_kernel_, ( Common_.memoize do
-      Home_.lib_.brazen::Kernel.new Home_
-    end )
+    def invocation_via_argument_array a, & p
+      Require_microservice_toolkit_[]
+      _as = MTk_::API_ArgumentScanner.new a, & p
+      MicroserviceInvocation___.new InvocationResources___.new _as
+    end
   end  # >>
 
   Home_ = self
@@ -67,27 +64,80 @@ module Skylab::Git
     if x then instance_variable_set ivar, x ; true else x end
   end
 
-  module Models_
+  # ==
 
-    module Branches
+  class MicroserviceInvocation___
 
-      module Actions
-
-        Autoloader_[ self, :boxxy ]
-      end
-
-      Autoloader_[ self ]
+    def initialize invo_rsx
+      @invocation_resources = invo_rsx
     end
 
-    Autoloader_[ self, :boxxy ]
+    def to_bound_call_of_operator
+      MTk_::BoundCall_of_Operation_via[ self, Operator_branch___[] ]
+    end
+
+    attr_reader(
+      :invocation_resources,
+    )
+
+    def HELLO_INVOCATION  # type-check - temporary during development :/
+      NIL
+    end
   end
 
-  # --
+  # ==
 
   Lazy_ = Common_::Lazy
 
-  Require_brazen_ = Lazy_.call do
+  Operator_branch___ = Lazy_.call do
 
+    MTk_::ModelCentricOperatorBranch.define do |o|  # (find the implementation in [pl])
+
+      # (every imaginable detail of the below is explained at [#pl-011.1])
+
+      # (every action has a file whether or not it needs it per [#pl-011.2])
+
+      o.add_actions_module_path_tail "stow/actions"  # .. 
+
+      o.models_branch_module = Home_::Models_
+
+      o.bound_call_via_action_with_definition_by = -> act do
+        MTk_::BoundCall_of_Operation_with_Definition[ act ]
+      end
+
+      o.filesystem = ::Dir
+    end
+  end
+
+  # ==
+
+  class InvocationResources___
+
+    def initialize as
+      @argument_scanner = as
+    end
+
+    def filesystem
+      Home_.lib_.system.filesystem
+    end
+
+    def system_conduit
+      Home_.lib_.open_3
+    end
+
+    def listener
+      @argument_scanner.listener
+    end
+
+    attr_reader(
+      :argument_scanner,
+    )
+  end
+
+  # ==
+
+  Require_brazen_ = Lazy_.call do
+    self._ITS_GONE__pete_tong__
     Brazen_ = ::Skylab::Brazen
   end
 
@@ -95,11 +145,15 @@ module Skylab::Git
     Home_.lib_.basic::Process.via_five( * five )
   end
 
-  Zerk_lib_ = Lazy_.call do
-    Home_.lib_.zerk
+  Require_microservice_toolkit_ = Lazy_.call do
+    MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
   end
 
-  # --
+  Zerk_lib_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Zerk
+  end
+
+  # ==
 
   module Lib_
 
@@ -122,17 +176,17 @@ module Skylab::Git
 
     ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
-    Brazen = sidesys[ :Brazen ]
+    Brazen_NOUVEAU = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
     Git_viz = sidesys[ :GitViz ]
     Open_3 = stdlib[ :Open3 ]
     Plugin = sidesys[ :Plugin ]
     System_lib = sidesys[ :System ]
     Time = Lazy_.call { require 'time' ; ::Time }  # for tests only
-    Zerk = sidesys[ :Zerk ]
+    # Zerk = sidesys[ :Zerk ]  use Zerk_lib_[]
   end
 
-  # --
+  # ==
 
   module Library_
 
@@ -149,7 +203,7 @@ module Skylab::Git
     end
   end
 
-  # --
+  # ==
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze

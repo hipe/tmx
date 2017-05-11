@@ -40,23 +40,7 @@ module Skylab::TanMan
       end
 
       def to_bound_call_of_operator
-
-        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
-
-          o.argument_scanner = @invocation_resources.argument_scanner
-
-          o.add_operators_injection_by do |inj|
-
-            inj.operators = @invocation_resources.__microservice_operator_branch
-            inj.injector = :_no_injector_for_now_from_BR_
-          end
-        end
-
-        act = _omni.parse_operator
-        if act
-          _ref = act.mixed_business_value
-          _ref.bound_call_of_operator_via_invocation self
-        end
+        MTk_::BoundCall_of_Operation_via[ self, Operator_branch___[] ]
       end
 
       # -- experimental "kernel killer"
@@ -120,10 +104,6 @@ module Skylab::TanMan
         self.class.new as  # CAREFUL
       end
 
-      def __microservice_operator_branch
-        Operator_branch___[]
-      end
-
       def application_moniker
         # (#todo this is the thing that's redundant with `app_name_string`)
         "tannimous mannimous"
@@ -151,8 +131,7 @@ module Skylab::TanMan
 
         # (every imaginable detail of the below is explained at [#pl-011.1])
 
-        # every nerkiss under the derkiss has an actions module.
-        # use the filesystem to find the nerkisses
+        # (every action has a file whether or not it needs it per [#pl-011.2])
 
         same = 'actions'
 

@@ -133,23 +133,34 @@ module Skylab::System
       def mv src, dst, h=nil, & p
 
         if p
-          _fuc = file_utils_controller do |msg|
-
-            p.call :info, :file_utils_message do
-              ev = Common_::Event.wrap.file_utils_message msg
-              if ev
-                ev
-              else
-                Common_::Event.inline_neutral_with :fu_msg, :msg, msg
-              end
-            end
-            NIL
-          end
-          _fuc.mv src, dst, * h
+          __mv_using_file_utils_controller p, src, dst, h
         else
-
-          Home_.lib_.file_utils.mv src, dst, * h
+          Home_.lib_.file_utils.mv src, dst, * h  # result is 0 on success
         end
+      end
+
+      def __mv_using_file_utils_controller p, src, dst, h
+
+        _fuc = file_utils_controller do |msg|
+
+          # this is tricky - in the interest of having the terminal channel
+          # be more meaningful, we try to build the event whether or not
+          # the listener wants it
+
+          ev = Common_::Event::Via_file_utils_message[ msg ]
+          if ev
+            p.call :info, :file_utils_message, ev.terminal_channel_symbol do
+              ev
+            end
+          else
+            p.call :info, :expression, :file_utils_message do |y|
+              y << msg
+            end
+          end
+          NIL
+        end
+
+        _fuc.mv src, dst, * h  # result is 0 on success
       end
 
       def copy src_s, dst_s

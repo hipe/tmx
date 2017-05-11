@@ -92,22 +92,35 @@ module Skylab::Zerk  # intro in [#001] README
 
     Autoloader_[ self ]
 
-    lazily :ModelCentricOperatorBranch do
-      Home_.lib_.plugin::ModelCentricOperatorBranch
+    br_lib = Lazy_.call do
+      Home_.lib_.brazen::Action  # (to be renamed `ActionToolkit`)
     end
 
-    lazily :Normalization do
-      Home_.lib_.fields::Normalization
+    br = -> c do
+      br_lib[].const_get c, false
     end
 
-    lazily :ParseArguments_via_FeaturesInjections do
-      # a convenience alias so the remote doesn't have to know where it is
-      No_deps_zerk_[]::ParseArguments_via_FeaturesInjections
+    ndz = -> c do
+      No_deps_zerk_[].const_get c, false
     end
 
-    lazily :API_ArgumentScanner do
-      No_deps_zerk_[]::API_ArgumentScanner
+    lazily :BoundCall_of_Operation_via, & br
+
+    lazily :ParseOperator_via, & br
+
+    lazily :BoundCall_of_Operation_with_Definition, & br
+
+    lazily :ModelCentricOperatorBranch do |c|
+      Home_.lib_.plugin.const_get c, false
     end
+
+    lazily :Normalization do |c|
+      Home_.lib_.fields.const_get c, false
+    end
+
+    lazily :ParseArguments_via_FeaturesInjections, & ndz
+
+    lazily :API_ArgumentScanner, & ndz
 
     lazily :NoDependenciesZerk do  # [pl]
       No_deps_zerk_[]

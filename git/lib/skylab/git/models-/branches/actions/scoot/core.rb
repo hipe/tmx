@@ -4,6 +4,7 @@ module Skylab::Git
 
     Require_brazen_[]
 
+    ::Kernel._I_AM_ONE
     class Actions::Scoot < Brazen_::Action
 
       @instance_description_proc = -> y do

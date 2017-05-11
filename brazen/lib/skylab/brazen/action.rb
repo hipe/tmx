@@ -1,5 +1,99 @@
 module Skylab::Brazen
 
+# ===( SNIP
+  Action = ::Class.new Home_::Nodesque::Node
+  class Action  # (will be renamed ActionToolkit)
+
+    mtk = -> { ::Skylab::Zerk::MicroserviceToolkit }  # it is assumed
+
+    BoundCall_of_Operation_via = -> microservice_invo, oper_branch do
+
+      act = ParseOperator_via[ microservice_invo, oper_branch ]
+      if act
+        _ref = act.mixed_business_value
+        _ref.bound_call_of_operator_via_invocation microservice_invo
+      end
+    end
+
+    # ~
+
+    ParseOperator_via = -> microservice_invo, oper_branch do
+
+      mtk[]::ParseArguments_via_FeaturesInjections.define do |o|
+
+        o.argument_scanner = microservice_invo.invocation_resources.argument_scanner
+
+        o.add_operators_injection_by do |inj|
+
+          inj.operators = oper_branch
+          inj.injector = :_no_injector_from_BR_
+        end
+      end.parse_operator
+    end
+
+    # ~
+
+    BoundCall_of_Operation_with_Definition = -> act do
+
+      # (for now, if you want your own action grammar you'll have to
+      # copy-paste-modify such a function, as [tm] does)
+
+      # ("action" and "operation" are the same thing in different dialects.)
+
+      _fo_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
+        if :_parameter_BR_ == qual_item.injection_identifier
+          qual_item.item
+        end
+      end
+
+      _ok = mtk[]::Normalization.call_by do |o|
+        o.association_stream_newschool = _fo_st
+        o.entity_nouveau = act
+      end
+
+      if _ok  # downgrade false to nil
+        Common_::BoundCall.by( & act.method( :execute ) )
+      end
+    end
+
+    # ~
+
+    Action_grammar___ = Lazy_.call do
+
+      # this is a minimal, default grammar for the metadata of actions
+      # which (in this minimal grammar) provisions for a description
+      # proc for the action and the modeling of its zero or more parameters..
+      # apps that want to do fancy things like [tm] can inject custom
+      # grammars instead.
+
+      _param_gi = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
+
+      _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
+
+        o.add_grammatical_injection :_branch_desc_BR_, BRANCH_DESCRIPTION___
+
+        o.add_grammatical_injection :_parameter_BR_, _param_gi
+      end
+
+      _g  # hi. #todo
+    end
+
+    # ~
+
+    module BRANCH_DESCRIPTION___ ; class << self
+
+      def is_keyword k
+        :branch_description == k
+      end
+
+      def gets_one_item_via_scanner scn
+        scn.advance_one ; scn.gets_one
+      end
+    end ; end
+  end
+
+# ===)
+
   class Action < Home_::Nodesque::Node  # see [#024]
 
     # -- Actionability - identity in & navigation of the ractive model
@@ -569,4 +663,5 @@ module Skylab::Brazen
     end
   end
 end
+# #history-A.1: first injection of post-[br] distillation
 # :+#tombstone: to_trio_stream (`to_qualified_knownness_stream`)

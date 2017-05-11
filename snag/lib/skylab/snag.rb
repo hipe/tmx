@@ -48,7 +48,7 @@ module Skylab::Snag
     # (a pioneer. will probably move up)
 
     def initialize invo_rsx
-      @_invocation_resources = invo_rsx
+      @invocation_resources = invo_rsx
     end
 
     def execute
@@ -58,29 +58,23 @@ module Skylab::Snag
 
     def __flush_to_bound_call_of_operator  # (near `to_bound_call_of_operator`)
 
-      @omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+      # (we would normally use `BoundCall_of_Operation_via` but we have
+      # the uncharacteristically simple requirement that actions are built
+      # with only the resources and not the "whole stack" invocation.)
 
-        o.argument_scanner = @_invocation_resources.argument_scanner
+      _ob = @invocation_resources.microservice_operator_branch_
 
-        o.add_operators_injection_by do |inj|
+      oper = MTk_::ParseOperator_via[ self, _ob ]
 
-          inj.operators = @_invocation_resources.microservice_operator_branch_
-          inj.injector = :_no_injector_for_now_from_SN_
-        end
-      end
-
-      if _store :@__found_operator, @omni.parse_operator
-        __bound_call_of_operator_via_operator_found
+      if oper
+        _lt = oper.mixed_business_value
+        _lt.bound_call_of_operator_via_invocation_resouces @invocation_resources
       end
     end
 
-    def __bound_call_of_operator_via_operator_found
-
-      _lt = remove_instance_variable( :@__found_operator ).mixed_business_value
-      _lt.bound_call_of_operator_via_invocation_resouces @_invocation_resources
-    end
-
-    define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    attr_reader(
+      :invocation_resources,
+    )
   end
 
   # ==
@@ -161,65 +155,12 @@ module Skylab::Snag
       o.models_branch_module = Models_
 
       o.bound_call_via_action_with_definition_by = -> act do
-        Bound_call_via_action_with_definition___[ act ]
+        MTk_::BoundCall_of_Operation_with_Definition[ act ]
       end
 
       o.filesystem = ::Dir
     end
   end
-
-  # ==
-
-  Bound_call_via_action_with_definition___ = -> act do
-
-    # (leaving this sort of thing here instead of pushing it up lets us
-    # see the significance of the various symbols and method names.)
-
-    _fo_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
-      if :_parameter_SN_ == qual_item.injection_identifier
-        qual_item.item
-      end
-    end
-
-    ok = MTk_::Normalization.call_by do |o|
-      o.association_stream_newschool = _fo_st
-      o.entity_nouveau = act
-    end
-
-    if ok  # downgrade false to nil
-      Common_::BoundCall.by( & act.method( :execute ) )
-    end
-  end
-
-  # ==
-
-  Action_grammar___ = Lazy_.call do
-
-    # for now, we built our entity/action grammar here ourself.
-    # one day maybe this will become a cleaner part of a toolkit
-
-    _param_gi = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
-
-    _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
-
-      o.add_grammatical_injection :_branch_desc_SN_, BRANCH_DESCRIPTION___
-
-      o.add_grammatical_injection :_parameter_SN_, _param_gi
-    end
-
-    _g  # hi. #todo
-  end
-
-  module BRANCH_DESCRIPTION___ ; class << self
-
-    def is_keyword k
-      :branch_description == k
-    end
-
-    def gets_one_item_via_scanner scn
-      scn.advance_one ; scn.gets_one
-    end
-  end ; end
 
   # ==
 

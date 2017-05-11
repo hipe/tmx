@@ -2,10 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] CLI - intro" do
+  describe "[gi] CLI - intro", wip: true do
 
     TS_[ self ]
     use :CLI
+    # NOTE when you return to this file, we commented out something in the above file 
 
     it "CLI client loads" do  # can be moved up when appropriate
       Home_::CLI

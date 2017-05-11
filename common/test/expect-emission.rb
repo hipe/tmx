@@ -61,12 +61,24 @@ module Skylab::Common::TestSupport
           call_API_via_iambic x_a, & x_p
         end
 
-        def call_API_via_iambic x_a, & oes_p
+        def call_API_via_iambic a, & p
+
           if ! block_given?
-            oes_p = event_log.handle_event_selectively
+            p = event_log.handle_event_selectively
           end
-          @result = subject_API.call( * x_a, & oes_p )
-          NIL_
+
+          _x = if respond_to? :prepare_subject_API_invocation
+
+            invo = subject_API.invocation_via_argument_array a, & p
+            invo = prepare_subject_API_invocation invo
+            bc = invo.to_bound_call_of_operator
+            bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+          else
+            subject_API.call( * a, & p )
+          end
+
+          @result = _x
+          NIL
         end
 
         def expect_one_event_and_neutral_result * x_a, & p
@@ -93,6 +105,23 @@ module Skylab::Common::TestSupport
         def expect_not_OK_event * x_a, & p
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_3( false, * x_a, & p )
+          end
+        end
+
+        def expect_neutral_event_or_expression sym
+
+          # (bandaid to acommodate weening off [br] as described in [gi])
+
+          _next_actual_expev_emission do |em|
+
+            _be_this = _expev_matcher_by do
+
+              trilean nil  # neutral
+
+              terminal_channel_symbol_of sym
+            end
+
+            em.should _be_this
           end
         end
 

@@ -2,7 +2,7 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Models_::Tree_Stat
+    class Models_::TreeStat  # 1x
 
       # of a filesystem "tree" (directory), conceptualize it as something
       # like a commit in a project, one that can be displayed in a manner
@@ -86,7 +86,7 @@ module Skylab::Git
       Stylify__ = -> do
 
         p = -> sym_a, s do
-          p = Home_.lib_.zerk::CLI::Styling::Stylify
+          p = Zerk_lib_[]::CLI::Styling::Stylify
           p[ sym_a, s ]
         end
         -> sym_a, s do

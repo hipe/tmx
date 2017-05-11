@@ -13,19 +13,24 @@ use [sa] to convert etc to Stream_
 [ze] Expresser needs slight cleanup, should be simple model
 (-4 cleanup the items between this one and -3)
 -5 [br] is renovated when it is only datastore adapteres and the example app
+HO git/test/[ many CLI ]
+HO tan_man/test/62-cli_spec.rb
+when [tm] CLI: #open [#tm-059] invites
 consider trying to quash `make_action_making_actions_module`
 consider trying to quash `make_action_class`
 -6 [cs] have fun figuring out what to do with isomorpic methods client
 -7 also: decide if entity library is deprecated (#open [#fi-034.1])
-when [tm] CLI: #open [#tm-059] invites
 [#ze-008.2] glob values
-API's: [st],[co]
-API: [gi] (during this, modernize "directory as collection" (or not))
-API's: [f2],[bs],[tr],[sl]
 finish what you started with expag (somewhere)
 (there are many "hi. ##{}todo"-type lines in [fi])
 explain MTk and associate the explanation with its nodes
-HO tan_man/test/62-cli_spec.rb
+([br]: N actions..)
+([co]: 2 actions, API only)
+([tr]: 2 actions but maybe no coverage, API only)
+([bs]: 3 actions, API only)
 ([gv]: 2 actions, API only)
+([st]: 3 actions, API only)
+([f2]: 3 actions, API only)
+([sl]: 4 actions, API only)
 ([cm]: 4 actions, API only)
 ([cu]: 7 actions, API only)

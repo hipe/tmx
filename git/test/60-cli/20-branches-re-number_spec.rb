@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] CLI - branches - re-number" do
+  describe "[gi] CLI - branches - re-number", wip: true do
 
     TS_[ self ]
     use :expect_event

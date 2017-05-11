@@ -3,7 +3,9 @@ module Skylab::Git::TestSupport
   module CLI
 
     def self.[] tcc
+      if false
       Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
+      end
       tcc.include Instance_Methods___
       NIL_
     end

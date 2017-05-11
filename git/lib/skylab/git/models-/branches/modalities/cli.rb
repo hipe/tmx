@@ -6,6 +6,7 @@ module Skylab::Git
 
       Actions = ::Module.new
 
+      ::Kernel._I_AM_ONE
       class Actions::ReNumber < Brazen_::CLI::Action_Adapter
 
         MUTATE_THESE_PROPERTIES =  [ :branch_name_stream ]

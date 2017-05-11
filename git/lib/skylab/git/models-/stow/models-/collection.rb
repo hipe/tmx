@@ -40,7 +40,7 @@ module Skylab::Git
 
         _ev = Home_.lib_.ACS::Events::ComponentNotFound.with(
           :component, _stow,
-          :component_association, Stow_.name_function,
+          :component_association, Common_::Name.via_lowercase_with_underscores_symbol( :stow ),
           :ACS, self,
         )
 
@@ -135,3 +135,4 @@ module Skylab::Git
     end
   end
 end
+# #pending-rename: stows operator branch facade

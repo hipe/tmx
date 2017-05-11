@@ -110,15 +110,13 @@ module Skylab::Git::TestSupport
         ::File.join proj_path, curr_relpath
       end
 
-      _sy = _my_mock_system_conduit _chdir
+      @SYSTEM_CONDUIT = _my_mock_system_conduit _chdir
 
       call_API( :stow, :save,
         :stow_name, stow_name,
         :current_relpath, curr_relpath,
         :project_path, proj_path,
         :stows_path, _stows_path,
-        :system_conduit, _sy,
-        :filesystem, real_filesystem_  # we need mkdir
       )
 
       path
@@ -138,6 +136,14 @@ module Skylab::Git::TestSupport
         calc/some-versioned-file.txt
       )
       td
+    end
+
+    def prepare_subject_API_invocation invo
+      sy = remove_instance_variable :@SYSTEM_CONDUIT
+      invo.invocation_resources.send :define_singleton_method, :system_conduit do
+        sy
+      end
+      invo
     end
   end
 end

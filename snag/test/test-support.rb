@@ -286,18 +286,19 @@ module Skylab::Snag::TestSupport
         if o
           if do_debug
             if ! o.be_verbose
-              o = o.with :debug_IO, debug_IO, :be_verbose, true
+              o = o.new_with :debug_IO, debug_IO, :be_verbose, true
             end
           elsif o.be_verbose
-            o.with :be_verbose, false
+            o.new_with :be_verbose, false
           end
         else
+          _head = Home_.lib_.system.defaults.dev_tmpdir_path
+          _path = ::File.join _head, 'snaggle'
           o = Home_.lib_.system_lib::Filesystem::Tmpdir.with(
-            :path, ::File.join(
-               Home_.lib_.system.defaults.dev_tmpdir_path,
-               'snaggle' ),
+            :path, _path,
             :be_verbose, do_debug,
-            :debug_IO, debug_IO )
+            :debug_IO, debug_IO,
+          )
         end
         o
       end

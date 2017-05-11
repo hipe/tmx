@@ -2,58 +2,51 @@ module Skylab::Git
 
   class Models_::Stow  # see [#010]
 
-    Require_brazen_[]
-
-    class Action_ < Brazen_::Action
-
-      Brazen_::Modelesque.entity self
-
-      # will re-open!
-    end
-
     Actions = ::Module.new
 
-    class Actions::Ping < Action_
+    class Actions::Ping
 
-      @is_promoted = true
+      def initialize
+        @channel = nil
+        extend CommonActionMethods__
+        init_action_ yield
+      end
 
-      edit_entity_class(
+      def definition ; [
         :property, :channel,
         :property, :zerp,
-      )
+      ]
+      end
 
-      def produce_result
+      def execute
 
-        h = @argument_box.h_
-
-        ch = h[ :channel ]
-        oes_p = @on_event_selectively
-
+        ch = @channel
+        oes_p = _listener_
+        x = @zerp
+        # --
         if ch
           case ch
           when 'ero'
 
             oes_p.call :error, :expression, :fake_error do | y |
 
-              y << "(pretending this was wrong: #{ ick h[ :zerp ] })"
+              y << "(pretending this was wrong: #{ ick x })"
             end
             UNABLE_
 
           when 'inf'
 
             oes_p.call :info, :expression, :for_ping do | y |
-              y << "(inf: #{ h[ :zerp ] })"
+              y << "(inf: #{ x })"
             end
             ACHIEVED_
           end
         else
 
-          s = h[ :zerp ]
-
-          if s
+          if x
             oes_p.call :payload, :expression, :ping do | y |
 
-              y << "(out: #{ h[ :zerp ] })"
+              y << "(out: #{ x })"
             end
             :pingback_from_API
           else
@@ -66,24 +59,27 @@ module Skylab::Git
       end
     end
 
-    class Actions::Save < Action_
+    class Actions::Save
 
-      edit_entity_class(
+      def initialize
+        extend CommonActionMethods__
+        init_action_ yield
+      end
+
+      def definition ; [
 
         :branch_description, -> y do
           "move all untracked files in the current path to #{
             }a \"stow\" directory"
         end,
 
-        :required, :property, :filesystem,
-        :required, :property, :system_conduit,
         :required, :property, :stows_path,
         :required, :property, :project_path,
         :required, :property, :current_relpath,
         :required, :property, :stow_name,
-      )
+      ] ; end
 
-      def produce_result
+      def execute
 
         _init_stows_collection
         _ok = _resolve_versioned_directory
@@ -92,38 +88,42 @@ module Skylab::Git
 
       def __money
 
-        h = @argument_box.h_
+        _sn = remove_instance_variable :@stow_name
 
         Stow_::Magnetics_::WriteStow_via_StowName_and_StowsCollection_and_VersionedDirectory.call_by do |o|
           o.versioned_directory = @_versioned_directory
-          o.stow_name = h.fetch :stow_name
+          o.stow_name = _sn
           o.stows_collection = @_stows_collection
-          o.system_conduit = h.fetch :system_conduit
-          o.filesystem = h.fetch :filesystem
-          o.listener = @on_event_selectively
+          o.system_conduit = _system_conduit_
+          o.filesystem = _filesystem_
+          o.listener = _listener_
         end
       end
     end
 
-    class Actions::Pop < Action_
+    class Actions::Pop
 
-      edit_entity_class(
+      def initialize
+        @channel = nil
+        extend CommonActionMethods__
+        init_action_ yield
+      end
+
+      def definition ; [
 
         :branch_description, -> y do
           y << "attempts to put the files back if there are no collisions."
         end,
 
-        :inflect, :noun, :lemma_string,  # say "couldn't pop stow", not "couldn't pop a stow"
+        # :inflect, :noun, :lemma_string,  # say "couldn't pop stow", not "couldn't pop a stow"
 
-        :required, :property, :filesystem,
-        :required, :property, :system_conduit,
         :required, :property, :stows_path,
         :required, :property, :project_path,
         :required, :property, :current_relpath,
         :required, :property, :stow_name,
-      )
+      ] end
 
-      def produce_result
+      def execute
 
         ok = __resolve_expressive_stow :no_color
         ok &&= _resolve_versioned_directory
@@ -135,71 +135,86 @@ module Skylab::Git
         Stow_::Magnetics_::PopStow_via_Stow_and_ProjectPath.call_by do |o|
           o.expressive_stow = @_expressive_stow
           o.project_path = @_versioned_directory.project_path
-          o.filesystem = @argument_box.h_.fetch :filesystem
-          o.listener = @on_event_selectively
+          o.filesystem = _filesystem_
+          o.listener = _listener_
         end
       end
     end
 
-    class Actions::Show < Action_
+    class Actions::Show
 
-      edit_entity_class(
+      def initialize
+        extend CommonActionMethods__
+        init_action_ yield
+      end
+
+      def definition ; [
 
         :branch_description, -> y do
           y << "in the spirit of `git stash show`, show contents of stash"
         end,
 
-        :required, :property, :filesystem,
-        :required, :property, :system_conduit,
         :required, :property, :stows_path,
         :required, :property, :stow_name,
-      )
+      ] ; end
 
-      def produce_result
+      def execute
 
         _build_expressive_stow :yes_colo
       end
     end
 
-    class Actions::Status < Action_
+    class Actions::Status
 
-      edit_entity_class(
+      def initialize
+        extend CommonActionMethods__
+        init_action_ yield
+      end
+
+      def definition ; [
 
         :branch_description, -> y do
           y << "shows the files that would be stashed."
         end,
 
-        :required, :property, :system_conduit,
         :required, :property, :project_path,
         :required, :property, :current_relpath,
-      )
+      ] ; end
 
-      def produce_result
-
+      def execute
         ok = _resolve_versioned_directory
         ok && @_versioned_directory.to_entity_stream
       end
     end
 
-    class Actions::List < Action_
+    class Actions::List
 
-      edit_entity_class(
+      def initialize
+        extend CommonActionMethods__
+        init_action_ yield
+      end
+
+      def definition ; [
 
         :branch_description, -> y do
           y << "list the stows"
         end,
 
-        :required, :property, :filesystem,
         :required, :property, :stows_path,
-      )
+      ] end
 
-      def produce_result
+      def execute
 
         _new_stows_collection.to_entity_stream
       end
     end
 
-    class Action_  # re-open
+    module CommonActionMethods__
+
+      def init_action_ invo
+        invo.HELLO_INVOCATION  # #todo
+        @_microservice_invocation_ = invo ; nil
+      end
 
       def __resolve_expressive_stow style_x
 
@@ -220,18 +235,13 @@ module Skylab::Git
 
       def __via_etc_build_ES yes_or_no_color
 
-        h = @argument_box.h_
+        _rsc = _invocation_resources_
 
-        _rsc = Resources___.new(
-          h.fetch( :system_conduit ),
-          h.fetch( :filesystem ),
-        )
-
-        Stow_::Models_::Expressive_Stow.new(
+        Here_::Models_::ExpressiveStow.new(
           :yes_or_no_color,
           @_stow,
           _rsc,
-          & @on_event_selectively )
+          & _listener_ )
       end
 
       Resources___ = ::Struct.new :system_conduit, :filesystem
@@ -251,8 +261,10 @@ module Skylab::Git
 
         @_stows_collection ||= _new_stows_collection
 
+        _sn = remove_instance_variable :@stow_name
+
         @_stows_collection.entity_via_intrinsic_key(
-          @argument_box.h_.fetch :stow_name )
+          _sn )
       end
 
       def _init_stows_collection & oes_p
@@ -261,50 +273,63 @@ module Skylab::Git
         NIL_
       end
 
-      def _new_stows_collection & oes_p
+      def _new_stows_collection
 
-        oes_p ||= @on_event_selectively
-
-        h = @argument_box.h_
-        @kernel.silo( :stow ).stows_collection_via(
-          h.fetch( :stows_path ),
-          h.fetch( :filesystem ),
-          & oes_p )
+        Here_::Models_::Collection.new(
+          @stows_path,
+          _filesystem_,
+          @_microservice_invocation_,
+          & _listener_ )
       end
 
       def _resolve_versioned_directory
 
-        h = @argument_box.h_
+        _crp = remove_instance_variable :@current_relpath
+        _pp = remove_instance_variable :@project_path
 
-        @_versioned_directory = Stow_::Models_::Versioned_Directory.new(
-
-          h.fetch( :current_relpath ),
-          h.fetch( :project_path ),
-          h.fetch( :system_conduit ),
-          & @on_event_selectively
+        @_versioned_directory = Here_::Models_::VersionedDirectory.new(
+          _crp,
+          _pp,
+          _system_conduit_,
+          & _listener_
         )
 
         ACHIEVED_
       end
-    end
 
-    class Silo_Daemon
-
-      def initialize k, _model_class
-        @kernel = k
+      def _simplified_write_ k, x
+        instance_variable_set :"@#{ k }", x ; nil
       end
 
-      def stows_collection_via path, fs, & oes_p  # like `entity_via_intrinsic_key`
+      def _simplified_read_ k
+        ivar = :"@#{ k }"
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        end
+      end
 
-        # (we could cache each collection per path, but instead we bind the
-        # collection to the event handler, making it a "collection controller")
+      def _listener_
+        _argument_scanner_.listener
+      end
 
-        Stow_::Models_::Collection.new path, fs, @kernel, & oes_p
+      def _argument_scanner_
+        _invocation_resources_.argument_scanner
+      end
+
+      def _filesystem_
+        _invocation_resources_.filesystem
+      end
+
+      def _system_conduit_
+        _invocation_resources_.system_conduit
+      end
+
+      def _invocation_resources_
+        @_microservice_invocation_.invocation_resources
       end
     end
 
     Stow_ = self
-
     class Stow_
 
       attr_reader(
@@ -322,7 +347,7 @@ module Skylab::Git
           o.reinitialize_as_flyweight_ path
           o
         end
-      end
+      end  # >>
 
       def initialize k, & oes_p
 
@@ -366,6 +391,8 @@ module Skylab::Git
         ::File.basename @path
       end
     end
+
+    Here_ = self
 
     # ==
     # ==

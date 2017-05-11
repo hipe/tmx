@@ -616,10 +616,6 @@ module Skylab::Common
             end
           end
 
-          def file_utils_message s
-            Event_::Via_file_utils_message[ s ]
-          end
-
           def members
             [ :exception, :signature ]
           end

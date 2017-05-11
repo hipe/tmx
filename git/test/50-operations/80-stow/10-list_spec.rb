@@ -9,11 +9,17 @@ module Skylab::Git::TestSupport
 
     it "ping" do
 
-      call_API :ping, :zerp, 'hi'
+      call_API(
+        :stow, :ping,
+        :zerp, 'hi',
+      )
 
-      _em = expect_OK_event :ping
+      actual_lines = nil
+      expect_emission :payload, :expression, :ping do |y|
+        actual_lines = y
+      end
 
-      black_and_white( _em.cached_event_value ).should eql "(out: hi)"
+      actual_lines == [ "(out: hi)" ] || fail
 
       expect_no_more_events
 
@@ -72,7 +78,6 @@ module Skylab::Git::TestSupport
 
       call_API( :stow, :list,
         :stows_path, path,
-        :filesystem, real_filesystem_,  # glob, directory?
       )
       NIL_
     end

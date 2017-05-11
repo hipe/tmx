@@ -26,7 +26,8 @@ module Skylab::Git
 
         @file_relpath, @stow_path, rsc = _3
 
-        @system_conduit, @filesystem = rsc.to_a
+        @filesystem = rsc.filesystem
+        @system_conduit = rsc.system_conduit
 
         @on_event_selectively = p
       end
@@ -143,7 +144,7 @@ module Skylab::Git
       Stylify__ = -> do
         p = nil
         -> s_a, s do
-          p ||= Home_.lib_.zerk::CLI::Styling::Stylify
+          p ||= Zerk_lib_[]::CLI::Styling::Stylify
           p[ s_a, s ]
         end
       end.call

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] CLI - integration", TMX_CLI_integration: true do
+  describe "[gi] CLI - integration", TMX_CLI_integration: true, wip: true do
 
     TS_[ self ]
 

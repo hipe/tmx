@@ -2,7 +2,7 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Models_::Versioned_Directory
+    class Models_::VersionedDirectory
 
       # model any one directory within a versioned project
 

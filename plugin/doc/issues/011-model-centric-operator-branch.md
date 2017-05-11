@@ -25,7 +25,6 @@ begin clarity and readability.
 
 
 
-
 ## case-study/tutorial :[#here.1]
 
 (this coincides with real production code (contemporary with this
@@ -137,6 +136,24 @@ different ordering based on what nodes were already loaded.)
 
 
 
+
+# :[#here.2]
+
+this identifier tracks a common pattern whereby we want every action
+(leaf node) in the tree to have repesentation on the filesystem in the
+form of an isomorphically named file, whether or not that actual file
+has any real content that it loaded. that is:
+
+under this pattern, for files that would otherwise be "anemic" we might
+stow the node away in a parent node; but we nonetheless want the file on
+the filesystem because hitting the filesystem with one single glob query
+is both efficient and has self-documenting properties.)
+
+
+
+
+
+(EDIT everything below here)
 #=== LEGACY:
 
 # an introduction to a reactive model :[#!br-100]

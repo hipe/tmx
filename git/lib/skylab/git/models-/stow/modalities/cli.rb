@@ -1,5 +1,6 @@
 module Skylab::Git
 
+  self._CLI_IS_OFF__for_now__
   class Models_::Stow
 
     module Modalities::CLI

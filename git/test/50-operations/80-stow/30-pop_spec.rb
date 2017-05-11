@@ -29,7 +29,6 @@ module Skylab::Git::TestSupport
       it "move the stashed files back, prunes empty dir in stow tree" do
 
         _path = _pop_into_working_dir_Y_stow_X '.', 'project', 'dingle'
-
         __expect_these_paths _path
         __expect_these_events
       end
@@ -133,8 +132,6 @@ module Skylab::Git::TestSupport
         :current_relpath, curr_relpath,
         :project_path, proj_path,
         :stows_path, stows_dir,
-        :system_conduit, real_system_conduit_,
-        :filesystem, real_filesystem_,  # needs full monty
       )
       NIL_
     end

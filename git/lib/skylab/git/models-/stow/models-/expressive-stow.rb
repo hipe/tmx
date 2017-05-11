@@ -2,7 +2,7 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Models_::Expressive_Stow
+    class Models_::ExpressiveStow  # 1x
 
       # a high level wrapper around almost every sibling node. we create
       # this in lieu of rolling it into the parent model so that the parent
@@ -41,7 +41,7 @@ module Skylab::Git
 
       def to_tree_stat
 
-        Models_::Tree_Stat.new(
+        Models_::TreeStat.new(
           @stow.path,
           @resources,
           & @on_event_selectively

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] mode integrations - CLI - models - stow - pop" do
+  describe "[gi] mode integrations - CLI - models - stow - pop", wip: true do
 
     TS_[ self ]
     use :CLI

@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
 
       o = _common
 
-      expect_neutral_event :file_utils_message,
+      expect_neutral_event :file_utils_mv_event,
         /\Amv \(pth "[^"]+"\) \(pth "[^"]+"\)\z/
 
       _em = expect_OK_event :component_removed

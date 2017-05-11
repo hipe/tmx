@@ -221,7 +221,7 @@ module Skylab::Brazen
     Human = sidesys[ :Human ]
     JSON = stdlib[ :JSON ]
     Open_3 = stdlib[ :Open3 ]
-    Parse = sidesys[ :Parse ]
+    Parse_lib = sidesys[ :Parse ]
     Pathname = stdlib[ :Pathname ]
     Plugin = sidesys[ :Plugin ]
     String_IO = stdlib[ :StringIO ]
