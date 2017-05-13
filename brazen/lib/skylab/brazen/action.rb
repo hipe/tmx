@@ -587,7 +587,7 @@ module Skylab::Brazen
           Common_::Event.inline_via_normal_extended_mutable_channel i_a
         end
 
-        Common_::Event.wrap.signature name, _ev
+        Common_::Event::Via_signature[ name, _ev ]
       end
     end
 

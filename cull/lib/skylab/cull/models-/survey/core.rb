@@ -1,6 +1,40 @@
 module Skylab::Cull
 
-  class Models_::Survey < Model_
+  module Models_::Survey
+
+    # (#used-to-descend-model)
+
+    module Actions
+      Autoloader_[ self ]
+    end
+
+    class Actions::Ping
+
+      # (if you like, compare to the simpler proc-based one at #spot1-1)
+
+      def initialize
+        extend CommonActionMethods_
+        init_action_ yield
+      end
+
+      def execute
+
+        _listener_.call :info, :ping do
+
+          app_name_string = _microservice_invocation_.app_name_string
+
+          Common_::Event.inline_OK_with(
+            :ping,
+          ) do |y, o|
+            y << "#{ app_name_string } says #{ highlight "hello" }"
+          end
+        end
+
+        :_hi_again_
+      end
+    end
+
+    # ==
 
     class << self
 
@@ -105,7 +139,7 @@ module Skylab::Cull
 
       _config_path = ::File.join ws_path, CONFIG_FILENAME_
 
-      cfg = Brazen_::CollectionAdapters::GitConfig.parse_document_by do |o|
+      cfg = Git_config_[].parse_document_by do |o|
         o.upstream_path = _config_path
         o.listener = @on_event_selectively
       end
@@ -151,7 +185,7 @@ module Skylab::Cull
 
       bur = _r_cfg.document_byte_upstream_reference
 
-      cfg = Brazen_::CollectionAdapters::GitConfig::Mutable.parse_document_by do |o|
+      cfg = Git_config_[]::Mutable.parse_document_by do |o|
         o.byte_upstream_reference = bur
         o.listener = @on_event_selectively
       end
@@ -207,7 +241,7 @@ module Skylab::Cull
 
       @cfg_for_read = nil
 
-      @cfg_for_write = Brazen_::CollectionAdapters::GitConfig::Mutable.new_empty_document
+      @cfg_for_write = Git_config_[]::Mutable.new_empty_document
 
       ACHIEVED_
     end
@@ -403,12 +437,6 @@ module Skylab::Cull
 
     # ==
 
-    module Actions
-      Autoloader_[ self, :boxxy ]
-    end
-
-    # ==
-
     module Models__
 
       define_singleton_method :tricky_index__, ( Lazy_.call do
@@ -455,6 +483,7 @@ module Skylab::Cull
         KEEP_PARSING_
       end
 
+      if false
       Common_entity_.call self do
 
         const_set :Property, ::Class.new( const_get( :Property  ) )
@@ -495,6 +524,7 @@ module Skylab::Cull
           :list, :property, :add_aggregator,
           :list, :property, :remove_aggregator
       end
+      end  # if false
 
     private
 
@@ -550,10 +580,14 @@ module Skylab::Cull
 
     # ==
 
+    false and  # #todo
     COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_value_stream.to_a
     CONFIG_FILENAME_ = 'config'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Here_ = self
     UNRELIABLE_ = :_cu_unreliable_
+
+    # ==
+    # ==
   end
 end

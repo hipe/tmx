@@ -98,6 +98,11 @@ module Skylab::Fields
           object
         end
 
+        def hash_store= h
+          _receive_valid_value_store HashBasedSimplifiedValidValueStore___.new h
+          h
+        end
+
         def write_by= p
           _receive_proc_for_proc_based_value_store :__receive_write_by_proc_, p
           p
@@ -659,6 +664,23 @@ module Skylab::Fields
         end
 
         NIL
+      end
+
+      # ==
+
+      class HashBasedSimplifiedValidValueStore___
+
+        def initialize h
+          @hash = h
+        end
+
+        def _simplified_write_ x, k
+          @hash[ k ] = x
+        end
+
+        def _simplified_read_ k
+          @hash[ k ]
+        end
       end
 
       # ==

@@ -58,7 +58,10 @@ module Skylab::System
             _ok && __create
           else
             @listener.call :error, :enoent do
-              Common_::Event.wrap.exception @exception_, :path_hack
+              Common_::Event::Via_exception.via(
+                :exception, @exception_,
+                :path_hack,
+              )
             end
             UNABLE_
           end
@@ -72,7 +75,10 @@ module Skylab::System
 
       def __via_strange_stat_error_build_event
 
-        _ev = Common_::Event.wrap.exception @exception_, :path_hack
+        _ev = Common_::Event::Via_exception.via(
+          :exception, @exception_,
+          :path_hack,
+        )
 
         i_a = _ev.to_iambic
 

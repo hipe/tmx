@@ -53,7 +53,7 @@ module Skylab::CodeMetrics
 
         @on_event_selectively.call :info, :enoent do
 
-          Common_::Event.wrap.exception.via(
+          Common_::Event::Via_exception.via(
             :exception, e,
             :path_hack,
             :terminal_channel_symbol, :enoent,

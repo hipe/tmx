@@ -54,7 +54,7 @@ module Skylab::Fields
       end
     end
 
-    Apply_entity = -> extmod, arglist, & edit_p do
+    Apply_entity_BR = -> extmod, arglist, & edit_p do
 
       Session.call_by do |o|
       o.arglist = arglist

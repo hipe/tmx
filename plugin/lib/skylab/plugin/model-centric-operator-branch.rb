@@ -34,8 +34,6 @@ module Skylab::Plugin
       end
     end  # >>
 
-    # (N is "5")
-
     # == section 1 of 3 - define-time
 
     class Define___ < Common_::MagneticBySimpleModel
@@ -153,7 +151,7 @@ module Skylab::Plugin
     class OperatorBranch_via_ActionsPaths___
 
       # very close to [#pl-012] "operator branch via directories one deeper".
-      # also stay close to our counterpart #here-1.
+      # also stay close to our counterpart #here1.
 
       def initialize scn, gr, lirx
         @glob_resources = gr
@@ -184,21 +182,25 @@ module Skylab::Plugin
 
         _tail = @__localize[ path ]
 
-        s_a = _tail.split ::File::SEPARATOR
-
-        2 == s_a.length || fail  # th
-
         # _tail  # =>  "ping/actions", "tag/actions.rb"
 
-        entry = s_a.pop
-        d = ::File.extname( entry ).length
-        if d.zero?
-          _stem = entry  # "actions"
-        else
-          _stem = entry[ 0 ... -d ]  # "actions.rb" => "actions"  [#here.2]
-        end
+        s_a = _tail.split ::File::SEPARATOR
 
-        _const = @local_invocation_resources.const_cache[ _stem ]
+        case s_a.length
+        when 2
+          entry = s_a.pop
+          d = ::File.extname( entry ).length
+          _stem = if d.zero?
+            entry  # "actions"
+          else
+            entry[ 0 ... -d ]  # "actions.rb" => "actions"  [#here.2]
+          end
+          _const = @local_invocation_resources.const_cache[ _stem ]
+        when 1
+          _const = NOTHING_  # hi. :#here2
+        else
+          self._ARGUMENT_ERROR__need_one_or_two_pieces__
+        end
 
         LazyLoadableReference_for_ModelProbably___.define do |o|
           o.glob_resources = @glob_resources
@@ -450,31 +452,44 @@ module Skylab::Plugin
         # (must be reentrant - is evident if you run all tests in the file)
 
         mod = dereference_loadable_reference
-        const = @sub_branch_const  # `Actions`, probably
-        if const
-          if mod.const_get const, false
-            _is_conventional_model = true
+        c = @sub_branch_const  # `Actions`, probably
+
+        if mod.respond_to? :const_get
+          if mod.const_get c, false
+            do_this = :__conventional
           else
-            NOTHING_  # as described [#here.3], this is how we hack having
-            # an action "sitting" in a spot where a model is supposed to go.
-            # :[#008.4] #borrow-coverage from [sn]
+            do_this = :__action  # as described [#here.3], this is how we
+            # hack having an action "sitting" in a spot where a model is
+            # supposed to go.  :[#008.4] #borrow-coverage from [sn]
           end
         else
-          self._WE_FORGOT__when_does_this_happen_if_ever?
+          c && self._SANITY__if_you_want_to_use_a_proc_in___
+          do_this = :__proc
         end
 
-        if _is_conventional_model
+        case do_this
+        when :__conventional
+
           BoundCall_via_Branch___.call_by do |o|
             yield o  # write resources or invocation
             o.business_module = mod
             o.glob_resources = @glob_resources
             o.local_invocation_resources = @local_invocation_resources
-            o.sub_branch_const = const
+            o.sub_branch_const = c
           end
-        else
+        when :__action
+
           BoundCall_via_Action__.call_by do |o|
             yield o  # ..
             o.action_class = mod
+            o.local_invocation_resources = @local_invocation_resources
+          end
+        when :__proc
+
+          BoundCall_via_Proc___.call_by do |o|
+            yield o
+            o.invocation_stack_top_name_symbol = @name_symbol
+            o.proc = mod
             o.local_invocation_resources = @local_invocation_resources
           end
         end
@@ -615,7 +630,7 @@ module Skylab::Plugin
       # (typically called `Actions`). we scream-case our name to emphasize
       # the distinction.
       #
-      # the counterpart class for "actionS" is #here-1. some copy-pasta,
+      # the counterpart class for "actionS" is #here1. some copy-pasta,
       # but we are different because we don't hop 2-deep, we hop 1-deep.
 
       def initialize gr, lirsx
@@ -728,7 +743,7 @@ module Skylab::Plugin
       alias_method :intern, :name_symbol  # :[#008.2] #borrow-coverage from [sn]
     end
 
-    # ~ 3. via action CONSTANS
+    # ~ 3. via action CONSTANTS
 
     OperatorBranch_via_Action_CONSTANTS___ = -> splay, lirsx do
 
@@ -892,24 +907,17 @@ module Skylab::Plugin
 
     # ==
 
-    class BoundCall_via_Action__ < Common_::MagneticBySimpleModel
+    TheseGuys__ = ::Class.new Common_::MagneticBySimpleModel
 
-      def remote_invocation= x
-        @_MIXED = x
-      end
-
-      def remote_invocation_resources= x
-        @_MIXED = x
-      end
+    class BoundCall_via_Action__ < TheseGuys__
 
       attr_writer(
         :action_class,
-        :local_invocation_resources,
       )
 
       def execute
 
-        op = @action_class.new(){ @_MIXED }
+        op = @action_class.new(){ @_MIXED_ }
 
         if op.respond_to? :to_bound_call_of_operator
 
@@ -923,6 +931,49 @@ module Skylab::Plugin
           Common_::BoundCall.by( & op.method( :execute ) )
         end
       end
+    end
+
+    # ~
+
+    class BoundCall_via_Proc___ < TheseGuys__
+
+      # (this seems anemic because it seems to do almost nothing, but
+      # you gotta, because we gotta receive the invocation resources
+      # in the normal way.)
+
+      attr_writer(
+        :invocation_stack_top_name_symbol,
+        :proc,
+      )
+
+      def execute
+
+        ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_that_is_Proc.call_by do |o|
+
+          o.invocation_stack_top_name_symbol =
+            @invocation_stack_top_name_symbol
+
+          o.proc = @proc
+          o.microservice_invocation = @_MIXED_  # eew
+        end
+      end
+    end
+
+    # ~
+
+    class TheseGuys__
+
+      def remote_invocation= x
+        @_MIXED_ = x
+      end
+
+      def remote_invocation_resources= x
+        @_MIXED_ = x
+      end
+
+      attr_writer(
+        :local_invocation_resources,
+      )
     end
 
     # ==

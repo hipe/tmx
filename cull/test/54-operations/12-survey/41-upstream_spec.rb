@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] operations - survey - upstream set" do
+  describe "[cu] operations - survey - upstream set", wip: true do
 
     TS_[ self ]
     use :expect_event

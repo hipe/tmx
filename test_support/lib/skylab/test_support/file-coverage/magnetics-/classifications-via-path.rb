@@ -29,7 +29,8 @@ module Skylab::TestSupport
 
         @on_event_selectively.call :error, :resource_not_found do
 
-          Common_::Event.wrap.exception( e,
+          Common_::Event::Via_exception.via(
+            :exception, e,
             :path_hack,
             :terminal_channel_symbol, :resource_not_found,
           )

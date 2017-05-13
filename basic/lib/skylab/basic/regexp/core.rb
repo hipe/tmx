@@ -111,7 +111,7 @@ module Skylab::Basic
 
       def ___when_rx_e
 
-        ev = Common_::Event.wrap.exception @e
+        ev = Common_::Event::Via_exception.via :exception, @e
 
         @on_event_selectively.call :error, ev.terminal_channel_symbol do
           ev

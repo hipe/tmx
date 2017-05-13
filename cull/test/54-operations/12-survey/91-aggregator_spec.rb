@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] operations - survey - aggregators" do
+  describe "[cu] operations - survey - aggregators", wip: true do
 
     TS_[ self ]
     use :expect_event

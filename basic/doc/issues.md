@@ -61,7 +61,7 @@
              ( #was: [ trio ] )
 [#037] #open make digraph a box
 
-[#036] #hole
+[#036] #open #in-situ
              ( #moved-to: [#fi-004.6] the idea of a curried normalizer )
 
 [#035]       #doc-node the range narrative ..

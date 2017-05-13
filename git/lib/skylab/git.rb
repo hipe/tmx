@@ -36,7 +36,7 @@ module Skylab::Git
     end
 
     def invocation_via_argument_array a, & p
-      Require_microservice_toolkit_[]
+      Require_microservice_toolkit___[]
       _as = MTk_::API_ArgumentScanner.new a, & p
       MicroserviceInvocation___.new InvocationResources___.new _as
     end
@@ -95,9 +95,7 @@ module Skylab::Git
 
       # (every imaginable detail of the below is explained at [#pl-011.1])
 
-      # (every action has a file whether or not it needs it per [#pl-011.2])
-
-      o.add_actions_module_path_tail "stow/actions"  # .. 
+      o.add_actions_module_path_tail "stow/actions"  # all actions in corefile
 
       o.models_branch_module = Home_::Models_
 
@@ -145,7 +143,7 @@ module Skylab::Git
     Home_.lib_.basic::Process.via_five( * five )
   end
 
-  Require_microservice_toolkit_ = Lazy_.call do
+  Require_microservice_toolkit___ = Lazy_.call do
     MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
   end
 

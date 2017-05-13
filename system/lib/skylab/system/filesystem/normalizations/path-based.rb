@@ -284,8 +284,11 @@ module Skylab::System
 
       def wrap_exception_ e, * xtra
 
-        Common_::Event.wrap.exception e, :path_hack,
-          :event_property, :qualified_knownness_of_path, @qualified_knownness_of_path, * xtra
+        Common_::Event::Via_exception.via(
+          :exception, e,
+          :path_hack,
+          :event_property, :qualified_knownness_of_path, @qualified_knownness_of_path,
+          * xtra )
       end
 
       def produce_result_via_open_IO_ io

@@ -13,9 +13,11 @@ use [sa] to convert etc to Stream_
 [ze] Expresser needs slight cleanup, should be simple model
 (-4 cleanup the items between this one and -3)
 -5 [br] is renovated when it is only datastore adapteres and the example app
+HO cull/test/64-cli/10-intro_spec.rb
 HO git/test/[ many CLI ]
 HO tan_man/test/62-cli_spec.rb
 when [tm] CLI: #open [#tm-059] invites
+when all use of [br] API is weened off, cover new proc-based action adapter #open [#br-036]
 consider trying to quash `make_action_making_actions_module`
 consider trying to quash `make_action_class`
 -6 [cs] have fun figuring out what to do with isomorpic methods client
@@ -33,4 +35,13 @@ explain MTk and associate the explanation with its nodes
 ([f2]: 3 actions, API only)
 ([sl]: 4 actions, API only)
 ([cm]: 4 actions, API only)
-([cu]: 7 actions, API only)
+cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
+cull/test/54-operations/62-mutator/25-actions_spec.rb
+cull/test/54-operations/37-upstream/50-map/50-markdown-vertical_spec.rb
+cull/test/54-operations/37-upstream/50-map/25-markdown-horizontal_spec.rb
+cull/test/54-operations/12-survey/91-aggregator_spec.rb
+cull/test/54-operations/12-survey/74-reduce_spec.rb
+cull/test/54-operations/12-survey/58-mutator_spec.rb
+cull/test/54-operations/12-survey/41-upstream_spec.rb
+cull/test/54-operations/12-survey/25-status_spec.rb
+cull/test/54-operations/12-survey/08-create_spec.rb

@@ -2,25 +2,6 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    # ~ begin stowaways
-
-    class Actions::Ping < Action_
-
-      def produce_result
-
-        @on_event_selectively.call :info, :ping do
-          app_name_string = @kernel.app_name_string
-          build_OK_event_with :ping do | y, o |
-            y << "#{ app_name_string } says #{ highlight 'hello' }"
-          end
-        end
-
-        :_hi_again_
-      end
-    end
-
-    # ~ end stowaways
-
     class Actions::Create < Action_
 
       @is_promoted = true

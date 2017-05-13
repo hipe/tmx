@@ -1,12 +1,175 @@
 module Skylab::Basic
 
-  module Function  # see [#052]
+  class Function::Unbound_via_Function  # see [#052]
 
-    # -> ; (covered here, also :+#by:ta, cu, sg)
+    # ==
+
+    class BoundCall_of_Operation_that_is_Proc < Common_::MagneticBySimpleModel
+
+      #   - this is the (at writing) newest such thing. it's a fresh take
+      #     to comport with the [ze] style of microservice diaspora.
+      #
+      #   - for reference, subject is based off of [ze]'s (or [br]'s)
+      #     `BoundCall_of_Operation_with_Definition` (but is now
+      #     unrecognizable when held up against that).
+      #
+      #   - if your proc takes as least one parameter, the endmost parameter
+      #     will be used to pass a structure that wraps the "microservice
+      #     invocation" (through which can be reached the "invocation
+      #     resources" like maybe the filesystem, etc).
+      #
+      #   - the (any) N-1 other formal parameters in your list will be
+      #     interpreted as being required parameters. if you want optionals
+      #     you've gotta use a class.
+      #
+      #   - the (any) N-1 other formal parameters in your list must not
+      #     specify defaults (in the way you do for function/method
+      #     parameters in the platform language). if you want defaults
+      #     you've gotta use a class.
+      #
+      #   - currently the only coverage of this is by [cu]. one day
+      #     all occurrences of the equivalent thing in legacy [br] will
+      #     be replaced by this and we will point our native tests at this #open :[#036]
+
+      def initialize
+        super  # hi.
+      end
+
+      attr_writer(
+        :invocation_stack_top_name_symbol,  # will probably build out eventually
+        :microservice_invocation,
+        :proc,
+      )
+
+      def execute
+        __init_parameter_name_symbols_and_whether_it_takes_a_block
+        __init_whether_it_takes_the_stackish
+        if __procure_arguments_hash_by_normalizing
+          __flush_bound_call
+        end
+      end
+
+      def __flush_bound_call
+
+        args = []
+        h = remove_instance_variable :@__parameter_values_hash
+        remove_instance_variable( :@_parameter_name_symbols ).each do |sym|
+          args.push h.fetch sym
+        end
+
+        if remove_instance_variable :@__it_does_take_a_block
+          p = @microservice_invocation.invocation_resources.listener
+        end
+
+        the_proc = remove_instance_variable :@proc
+
+        if remove_instance_variable :@__it_does_take_a_stack
+          args.push __build_stackish
+        end
+
+        Common_::BoundCall[ args, the_proc, :call, & p ]
+      end
+
+      def __build_stackish
+        freeze  # #here1
+      end
+
+      def __procure_arguments_hash_by_normalizing
+
+        _fo_st = Stream_.call @_parameter_name_symbols do |name_sym|
+          HiJimothy___[ name_sym ]
+        end
+
+        invo_rsx = @microservice_invocation.invocation_resources
+
+        _arg_scn = invo_rsx.argument_scanner
+        _listener = invo_rsx.listener  # probably comes from above
+
+        h = {}
+
+        _ok = MTk_[]::Normalization.call_by do |o|
+
+          o.hash_store = h
+          o.argument_scanner = _arg_scn
+          o.association_stream_newschool = _fo_st
+          o.listener = _listener
+        end
+
+        if _ok
+          @__parameter_values_hash = h ; ACHIEVED_
+        end
+      end
+
+      def __init_whether_it_takes_the_stackish
+
+        name_sym_a = @_parameter_name_symbols
+        if name_sym_a.length.nonzero?
+          _ = name_sym_a.pop
+          _ == :stackish || self._OK__this_was_temporary__
+          _yes = true
+        end
+        @__it_does_take_a_stack = _yes ; nil
+      end
+
+      def __init_parameter_name_symbols_and_whether_it_takes_a_block
+
+        name_sym_a = [] ; takes_block = nil
+
+        @proc.parameters.each do |(opt_req_block, name_sym)|
+          case opt_req_block
+          when :req
+            name_sym_a.push name_sym
+          when :block
+            takes_block = true
+          else
+            self._COVER_ME__every_parameter_of_the_proc_must_required__
+          end
+        end
+
+        @__it_does_take_a_block = takes_block
+        @_parameter_name_symbols = name_sym_a ; nil
+      end
+
+      attr_reader(  # :#here1
+        :microservice_invocation,
+        :invocation_stack_top_name_symbol,
+      )
+    end
+
+    # ==
+
+    HiJimothy___ = ::Struct.new :name_symbol do
+
+      def is_required
+        TRUE
+      end
+
+      def default_by
+        NOTHING_
+      end
+
+      def normalize_by
+        NOTHING_
+      end
+
+      def is_glob
+        NOTHING_
+      end
+
+      def is_flag
+        NOTHING_
+      end
+    end
+
+    # ==
+
+      # (reminder: [ta], [cu], [sn])
 
       Brazen_ = ::Skylab::Brazen  # assumed
 
+      Unbound_via_Function = self
       class Unbound_via_Function
+
 
         include Brazen_.actionesque_defaults::Unbound_Methods
 
@@ -49,6 +212,8 @@ module Skylab::Basic
         )
       end
 
+    # ==
+
       class Signature_Classifications___
 
         def initialize p
@@ -86,6 +251,8 @@ module Skylab::Basic
           NIL_
         end
       end
+
+    # ==
 
       class As_Bound_Action___
 
@@ -270,11 +437,20 @@ module Skylab::Basic
 
         def _sign_event ev
           _nf = @unbound.name_function
-          Common_::Event.wrap.signature _nf, ev
+          Common_::Event::Via_signature[ _nf, ev ]
         end
       end
-    # <-
+
+    # ==
+
+    MTk_ = -> do
+      ::Skylab::Zerk::MicroserviceToolkit
+    end
+
+    # ==
+    # ==
   end
 end
+# #pending-rename: etc
 # :#tombstone-B - temporary
 # :#tombstone-A - we used to use a thing we no longer use

@@ -59,7 +59,7 @@ module Skylab::Human::TestSupport
     def __wrap_event ev
 
       _nf = __build_legacy_name_structure
-      _ = Common_::Event.wrap.signature _nf, ev
+      _ = Common_::Event::Via_signature[ _nf, ev ]
       _
     end
 

@@ -13,7 +13,7 @@ module Skylab::Cull::TestSupport
     cache = {}
     define_method :___lib do | sym |
       cache.fetch sym do
-        x = TestSupport_.fancy_lookup sym, TS_
+        x = TestSupport_.fancy_lookup sym, These___
         cache[ sym ] = x
         x
       end
@@ -34,14 +34,10 @@ module Skylab::Cull::TestSupport
 
   module Instance_Methods___
 
-    def debug!
-      @do_debug = true
-    end
+    # -- assertion support (newer)
 
-    attr_reader :do_debug
-
-    def debug_IO
-      TestSupport_.debug_IO
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
 
     # ~ paths for READ ONLY:
@@ -124,6 +120,33 @@ module Skylab::Cull::TestSupport
     def subject_API
       Home_::API
     end
+
+    # -- standard
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+  end
+
+  # ==
+
+  module These___
+
+    # tcc = test context class
+
+    Expect_Event = -> tcc do
+      Common___.test_support::Expect_Emission[ tcc ]
+    end
+
+    Memoizer_Methods = -> tcc do
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
   end
 
   # ==
@@ -135,10 +158,6 @@ module Skylab::Cull::TestSupport
   Config_filename___ = Lazy_.call do
     o = Home_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
-  end
-
-  Expect_Event = -> test_context_class do
-    Common___.test_support::Expect_Emission[ test_context_class ]
   end
 
   Autoloader_ = Home_::Autoloader_

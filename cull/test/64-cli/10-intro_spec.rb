@@ -2,10 +2,10 @@ require_relative '../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] clients - CLI" do
+  describe "[cu] clients - CLI", wip: true do
 
     TS_[ self ]
-    use :CLI
+    TS_::CLI[ self ]  # (should be `use :CLI` but for ..)
 
     it "0   no args" do
       invoke

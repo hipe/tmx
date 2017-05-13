@@ -1,29 +1,34 @@
 module Skylab::Common
 
   class Event
-    # -
-      class Via_signature  # :[#051]. #covered-only-by:[bs],[gi]
 
-        class << self
-          def begin_via_arglist__ a
-            new a
-          end
-          private :new
-        end  # >>
+    class Via_signature < Home_::Dyadic
 
-        def initialize a
-          @nf, @ev = a
+      # :[#051]. #covered-only-by:[bs],[gi]
+
+      # event "signing" is deprecated because it adds complexity without
+      # adding commensurate value. but for the point of explaining it,
+      # the idea was this: if every event comes from one or another
+      # particular action, the idea is that the action "signs" the event
+      # (wraps it) with what we now consider the invocation "stack" (just
+      # an array of names) so that the modality client can render the
+      # action's name as part of expressing the event. we now encourage
+      # other means of accessing this "stack" other than wrappin the event,
+      # so that there is a more direct relationship between what is emitted
+      # and what is received.
+
+      # -
+
+        def initialize name_function, event
+          @nf = name_function
+          @ev = event
+        end
+
+        def execute
+          freeze
         end
 
         attr_reader :ev
-
-        def new_with_event ev
-          dup.__init_otr( ev )
-        end
-
-        protected def __init_otr ev
-          @ev = ev ; self
-        end
 
         def inflected_verb
           if @nf.respond_to? :inflected_verb
@@ -63,7 +68,7 @@ module Skylab::Common
         def noun_lexeme
           @nf.noun_lexeme
         end
-      end
-    # -
+      # -
+    end
   end
 end

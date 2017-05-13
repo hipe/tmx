@@ -117,7 +117,7 @@ module Skylab::Brazen
   module Modelesque
 
     def self.entity * a, & edit_p
-      Entity_lib_[]::Apply_entity[ self::Entity, a, & edit_p ]
+      Entity_lib_[]::Apply_entity_BR[ self::Entity, a, & edit_p ]
     end
 
     Autoloader_[ self ]

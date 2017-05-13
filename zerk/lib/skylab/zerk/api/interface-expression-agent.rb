@@ -144,7 +144,12 @@ module Skylab::Zerk
       end
 
       def ick_prim x
-        _ick_via_sym x.name_symbol  # ..
+        _sym = if x.respond_to? :id2name
+          x
+        else
+          x.name_symbol
+        end
+        _ick_via_sym _sym
       end
 
       def oper sym

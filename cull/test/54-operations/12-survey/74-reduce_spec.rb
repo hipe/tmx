@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] operations - survey - reduce (integrate with markdown)" do
+  describe "[cu] operations - survey - reduce (integrate with markdown)", wip: true do
 
     TS_[ self ]
     use :expect_event

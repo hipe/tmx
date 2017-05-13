@@ -5,17 +5,47 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - survey - create" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_event
 
     it "loads" do
       Home_::API
     end
 
-    it "ping the top" do
-      x = Home_::API.call :ping, :on_event_selectively, event_log.handle_event_selectively
-      expect_neutral_event :ping, "hello from cull."
-      expect_no_more_events
-      x.should eql :hello_from_cull
+    context "ping the top" do
+
+      # (we're not supposed to do this but we're structuring this one
+      # test in the newer style but still using the older library) :#history-A.1
+
+      it "modality-specific styled message comes through" do
+
+        expect_these_lines_in_array_ _tuple.first do |y|
+
+          y << "the 'ping' action of cull says ** hello **!"
+        end
+      end
+
+      it "result is result" do
+        _tuple.last == :hello_from_cull || fail
+      end
+
+      shared_subject :_tuple do
+
+        _p = event_log.handle_event_selectively
+
+        x = Home_::API.call(
+          :ping,
+          :some_word, "bazoozle",
+          & _p )
+
+        a = []
+        expect_emission :info, :expression, :ping do |y|
+          a.push y
+        end
+        expect_no_more_events
+
+        a.push x
+      end
     end
 
     it "ping the model node" do
@@ -25,13 +55,13 @@ module Skylab::Cull::TestSupport
       @result.should eql :_hi_again_
     end
 
-    it "create on a directory with the thing already" do
+    it "create on a directory with the thing already", wip: true do
       call_API :create, :path, freshly_initted_path_
       expect_not_OK_event :directory_exists
       expect_fail
     end
 
-    it "go money" do
+    it "go money", wip: true do
 
       call_API :create, :path, prepare_tmpdir.to_path
 
@@ -48,3 +78,4 @@ module Skylab::Cull::TestSupport
     end
   end
 end
+# #history-A.1 rewrite 1 test (no reason to keep except posterity and 1x place)
