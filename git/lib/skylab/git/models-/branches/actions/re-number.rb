@@ -9,7 +9,7 @@ module Skylab::Git
 
       Brazen_::Modelesque.entity( self,
 
-        :branch_description, -> y do
+        :description, -> y do
 
      # until we re-integrate w/ n.curses and/or word-wrap (if ever):
      #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)

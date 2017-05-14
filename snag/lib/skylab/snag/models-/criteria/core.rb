@@ -147,7 +147,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "(actually \"archives\")"
         end,
 

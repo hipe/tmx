@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << 'list the tags for a given node.'
         end,
 
@@ -47,7 +47,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
            y << "add a tag to a node."
         end,
 
@@ -92,7 +92,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << 'remove a tag from a node.'
         end,
 

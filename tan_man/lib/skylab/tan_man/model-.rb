@@ -17,6 +17,9 @@ module Skylab::TanMan
 
       # (started as copy-paste of [sn]. diverged significantly for `properties`)
 
+      # (now this has become a specialized variant of [#br-024], and is
+      # used as an example of a customized action grammar.)
+
       # ~ hand-written map reduce:
 
       _first_grammar = Here_.__action_grammar_

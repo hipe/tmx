@@ -55,15 +55,24 @@ module Skylab::Cull::TestSupport
       @result.should eql :_hi_again_
     end
 
-    it "create on a directory with the thing already", wip: true do
-      call_API :create, :path, freshly_initted_path_
+    it "create on a directory with the thing already" do
+        _path = freshly_initted_path_
+        call_API(
+          * _subject_action,
+          :path, _path,
+        )
       expect_not_OK_event :directory_exists
       expect_fail
     end
 
-    it "go money", wip: true do
+    it "go money" do
 
-      call_API :create, :path, prepare_tmpdir.to_path
+        _path = prepare_tmpdir.to_path
+
+        call_API(
+          * _subject_action,
+          :path, _path,
+        )
 
       em = @result
       expect_neutral_event :creating_directory
@@ -76,6 +85,15 @@ module Skylab::Cull::TestSupport
       ev.path or fail
       ev.is_completion or fail
     end
+
+    # ==
+
+    def _subject_action
+      [ :survey, :create ]
+    end
+
+    # ==
+    # ==
   end
 end
 # #history-A.1 rewrite 1 test (no reason to keep except posterity and 1x place)

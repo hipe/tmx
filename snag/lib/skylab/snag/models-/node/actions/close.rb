@@ -6,7 +6,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           'close a node (remove tag #open and add tag #done)'
         end,
 

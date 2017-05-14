@@ -18,6 +18,22 @@ module Skylab::Brazen
         # no freeze because injection is loaded lazily
       end
 
+      def ADD_ALL_THESE_MUGS * sym_a  # [cu]
+
+        bx = @_box
+        scn = Scanner_[ sym_a ]
+
+        inj = _association_injection
+
+        begin
+
+          asc = inj.gets_one_item_via_scanner scn
+          bx.add asc.name_symbol, AlreadyDereferenced___[ asc ]
+
+        end until scn.no_unparsed_exists
+        NIL
+      end
+
       def add_association_by_definition_array sym, & p
         _add ByDefinitionArray__.new( p, sym )
         NIL
@@ -40,11 +56,18 @@ module Skylab::Brazen
 
       # -- "read"
 
-      def dereference sym
-        @_box.fetch( sym ).__dereference_
+      def to_dereferenced_item_array
+        h = @_box.h_
+        @_box.a_.map do |k|
+          h.fetch( k )._dereference_
+        end
       end
 
-      def __association_injection_
+      def dereference sym
+        @_box.fetch( sym )._dereference_
+      end
+
+      def _association_injection
         send @_read_injection
       end
 
@@ -74,7 +97,7 @@ module Skylab::Brazen
         @__resources = rsx
       end
 
-      def __dereference_
+      def _dereference_
         send @_dereference
       end
 
@@ -92,6 +115,8 @@ module Skylab::Brazen
       end
     end
 
+    AlreadyDereferenced___ = ::Struct.new :_dereference_
+
     # ==
 
     class ByDefinitionArray__
@@ -105,7 +130,7 @@ module Skylab::Brazen
 
         _array = remove_instance_variable( :@proc ).call
 
-        _inj = rsx.__association_injection_
+        _inj = rsx._association_injection
 
         _asc = _inj.gets_one_item_via_scanner_fully Scanner_[ _array ]
 

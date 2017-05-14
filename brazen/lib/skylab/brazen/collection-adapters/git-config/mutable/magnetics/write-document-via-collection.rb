@@ -44,7 +44,7 @@ module Skylab::Brazen
 
           __emit_an_emission_structure bytes
 
-          ACHIEVED_  # all failures are exceptional
+          bytes  # all failures are exceptional
         end
 
         # -- C

@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "write to the output stream a digrpah of doc nodes"
         end,
 

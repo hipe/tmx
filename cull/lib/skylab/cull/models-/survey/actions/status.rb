@@ -19,7 +19,7 @@ module Skylab::Cull
 
       def produce_result
 
-        _ok = via_path_argument_resolve_existent_survey
+        _ok = via_path_argument_resolve_existent_survey__
         _ok and via_survey
 
       end

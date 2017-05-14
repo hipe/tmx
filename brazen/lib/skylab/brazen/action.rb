@@ -1,7 +1,7 @@
 module Skylab::Brazen
 
 # ===( SNIP
-  Action = ::Class.new Home_::Nodesque::Node
+  Action = ::Class.new Home_::Nodesque::Node  # :[#024] (and see)
   class Action  # (will be renamed ActionToolkit)
 
     mtk = -> { ::Skylab::Zerk::MicroserviceToolkit }  # it is assumed
@@ -40,15 +40,67 @@ module Skylab::Brazen
 
       # ("action" and "operation" are the same thing in different dialects.)
 
-      _fo_st = Action_grammar___[].stream_via_array( act.definition ).map_reduce_by do |qual_item|
-        if :_parameter_BR_ == qual_item.injection_identifier
-          qual_item.item
+      # the action's `definition` method produces an array of primitives.
+      # parse this with the appropriate grammar to produce a stream of
+      # "items" whose each item is a name-value pair, the name being a
+      # symbol from the grammar and the item being the corresponding
+      # business value (e.g structure) that was parsed.
+      #
+      # (note that all the grammatical symbol names end in `*_BR_` to make
+      # it clear that they "live" in this sidesystem (and indeed this file).)
+      #
+      # some of these structures are associations (i.e formal parameters).
+      # we want to produce a stream that is is only of the associations (so
+      # a map-reduce). but also: one special kind of item is itself a stream
+      # of more associations (so a map-expand) (and this does not recurse).
+      #
+      # this is hand-written "for clarity" (and we're not even sure if etc.)
+
+      _defn_a = act.definition
+
+      st = Action_grammar___[].stream_via_array _defn_a
+
+      qual_item = nil
+      proc_for_list = nil
+      p = main = -> do
+        begin
+          qual_item = st.gets
+          qual_item || break
+          case qual_item.injection_identifier
+          when :_parameter_BR_
+            x = qual_item.item
+            break
+          when :_parameTERS_BR_
+            p = proc_for_list[]
+            x = p[]
+            break
+          when :_description_BR_
+            redo
+          else ; no
+          end
+          never
+        end while above
+        x
+      end
+
+      proc_for_list = -> do
+        a = qual_item.item
+        Common_::Stream.via_times a.length do |d|
+          if d.zero?
+            p = main
+          end
+          a.fetch d
         end
+      end
+
+      _fo_st = Common_.stream do
+        p[]
       end
 
       _ok = mtk[]::Normalization.call_by do |o|
         o.association_stream_newschool = _fo_st
         o.entity_nouveau = act
+        o.will_nilify  # (things don't usually explode without this)
       end
 
       if _ok  # downgrade false to nil
@@ -70,9 +122,11 @@ module Skylab::Brazen
 
       _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
 
-        o.add_grammatical_injection :_branch_desc_BR_, BRANCH_DESCRIPTION___
+        o.add_grammatical_injection :_description_BR_, DESCRIPTION___
 
         o.add_grammatical_injection :_parameter_BR_, _param_gi
+
+        o.add_grammatical_injection :_parameTERS_BR_, PARAMETERS___
       end
 
       _g  # hi. #todo
@@ -80,16 +134,38 @@ module Skylab::Brazen
 
     # ~
 
-    module BRANCH_DESCRIPTION___ ; class << self
+    module DESCRIPTION___ ; class << self
+
+      # (the grammatical element for modeling the description of an action)
 
       def is_keyword k
-        :branch_description == k
+        :description == k
       end
 
       def gets_one_item_via_scanner scn
         scn.advance_one ; scn.gets_one
       end
     end ; end
+
+    # ~
+
+    module PARAMETERS___ ; class << self
+
+      # (the grammatical element for specifying the injection of an array
+      # (or maybe stream) of several parameters (already parsed) into the
+      # action definition.)
+
+      def is_keyword k
+        :properties == k  # (legacy name)
+      end
+
+      def gets_one_item_via_scanner scn
+        scn.advance_one ; scn.gets_one
+      end
+    end ; end
+
+    # ~
+    # ~
   end
 
 # ===)

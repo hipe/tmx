@@ -6,7 +6,7 @@ module Skylab::Snag
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "a report of the ##{}todo's (or TODO's etc) in a tree"
         end,
 

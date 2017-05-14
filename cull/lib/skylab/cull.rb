@@ -70,29 +70,6 @@ module Skylab::Cull
 
   # == METHODS
 
-  HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do  # 1x
-
-    st = const_get( :ATTRIBUTES, false ).to_defined_attribute_stream
-
-    o = begin_session__( & oes_p )
-
-    values.length.times do |d|
-      _atr = st.gets
-      o.instance_variable_set _atr.as_ivar, values.fetch( d )
-    end
-
-    begin
-      atr = st.gets
-      atr or break
-      _ivar = :"#{ atr.as_ivar }_arg"
-      _x = arg_box.fetch atr.name_symbol
-      o.instance_variable_set _ivar, _x
-      redo
-    end while nil
-
-    o.execute
-  end
-
   VALUE_BOX_EXPLODER_CALL_METHOD_ = -> value_box, & oes_p do  # 1x
 
     # for every defined attribute (only the names matter), read the value
@@ -118,6 +95,14 @@ module Skylab::Cull
     s.intern
   end
 
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
+
   # ==
 
   module CommonActionMethods_
@@ -126,8 +111,24 @@ module Skylab::Cull
       @_microservice_invocation_ = ms_invo ; nil
     end
 
+    def _simplified_write_ k, x
+      instance_variable_set :"@#{ k }", x ; nil
+    end
+
+    def _simplified_read_ k
+      ivar = :"@#{ k }"
+      if instance_variable_defined? ivar
+        instance_variable_get ivar
+      end
+    end
+    alias_method :[], :_simplified_read_  # makes internal code easier to read :/
+
     def _listener_
       @_microservice_invocation_.invocation_resources.listener
+    end
+
+    def _argument_scanner_
+      @_microservice_invocation_.invocation_resources.argument_scanner
     end
 
     attr_reader(
@@ -191,11 +192,11 @@ module Skylab::Cull
       @argument_scanner = as
     end
 
-    if false
     def filesystem
       Home_.lib_.system.filesystem
     end
 
+    if false
     def system_conduit
       Home_.lib_.open_3
     end
@@ -290,8 +291,9 @@ module Skylab::Cull
     end
 
     Basic = sidesys[ :Basic ]
-    # = sidesys[ :Brazen ]  # for [sl]
+    Brazen_NOUVEAU = sidesys[ :Brazen ]  # for [sl]
     Fields = sidesys[ :Fields ]
+    Parse_lib = sidesys[ :Parse ]
     System_lib = sidesys[ :System ]
     # = sidesys[ :Zerk ]  # for [sl]
   end

@@ -1,5 +1,12 @@
 # the action narrative :[#024]
 
+## (preface)
+
+(EDIT: this node is getting rocked..)
+
+
+
+
 ## the list of shared concerns (between model & action)
 
   • actionability - identity in & navigation of the reactive model

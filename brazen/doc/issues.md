@@ -93,7 +93,8 @@
              ( #was: #moved-to: [#hu-043] contextualization )
 
              ( #was: #done workspace `init` action should not default to '.' in API )
-[#082]       #track meta-meta-property candidates (list, enum etc)
+
+[#082] #hole ( #was: #track meta-meta-property candidates (list, enum etc) )
 
 [#081] #hole
              ( #was: #track experimental extensions to Actor (1x) )
@@ -233,7 +234,9 @@
              ( #was: #done do not throw exceptions for parse errors )
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
+
 [#024]       #parent-node: [#025] the action narrative ..
+
 [#023]       track the magic of `expression` ( described in [#024] )
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ EDIT: document formal properties  ]

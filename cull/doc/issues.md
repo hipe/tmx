@@ -1,3 +1,6 @@
+[#008] #open try a bad action name in API. it lists the non-participating
+             nodes when it shouldn't
+
 [#007]       README for development ..
 [#006]       the function narrative ..
 [#005]       the persist calls narrative ..

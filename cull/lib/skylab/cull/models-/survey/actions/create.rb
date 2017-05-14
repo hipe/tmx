@@ -2,55 +2,62 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actions::Create < Action_
+    class Actions::Create
 
-      @is_promoted = true
+      def initialize
+        extend SurveyActionMethods_
+        init_action_ yield
+      end
 
-      @after_name_symbol = :ping
+      # #was-promoted, #was-after: ping
 
-      Common_entity_.call( self,
+      def definition ; [
 
         :flag, :property, :dry_run,
 
-        :reuse, COMMON_PROPERTIES_,
+        :properties, these_common_properties_,
 
         :description, -> y do
           y << "create a cull survey workspace directory in the path"
         end,
         :required, :property, :path,
-      )
 
-      def produce_result
+      ] end
 
-        @bx = to_full_qualified_knownness_box
+      def execute
 
-        x = Models_::Survey.edit_entity @kernel, @on_event_selectively do | edit |
-
-          edit.create_via_mutable_qualified_knownness_box_and_look_path(
-            @bx,
-            @argument_box.fetch( :path ) )
-        end
-
-        if x
-          @_survey = x
-          ___via_survey
-        else
-          x
-        end
+        ok = true
+        __init_empty_survey
+        ok &&= __persist_survey_via_survey
+        ok && __emit_survey_as_result
       end
 
-      def ___via_survey
-
-        ok = Here_::Magnetics_::CreateSurvey_via_Survey[ @_survey, @bx, & @on_event_selectively ]
-        if ok
-
-          Common_::Emission.of :info, :created_survey do
-            @_survey.to_event
-          end
-        else
-          ok
+      def __emit_survey_as_result
+        _ev = @_survey_.to_event
+        _em = Common_::Emission.of :info, :created_survey do
+          _ev
         end
+        _em  # #todo hi.
       end
+
+      def __persist_survey_via_survey
+        _ = Here_::Magnetics_::CreateSurvey_via_Survey.call(
+          @_survey_, self, & _listener_ )
+        _
+      end
+
+      def __init_empty_survey
+
+        @_survey_ = Here_.define_sanitized_ do |o|
+
+          o.init_for_create__
+          o.path = @path
+        end
+        NIL
+      end
+
+      # ==
+      # ==
     end
   end
 end

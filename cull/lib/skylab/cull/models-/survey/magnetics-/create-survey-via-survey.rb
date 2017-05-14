@@ -2,23 +2,13 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Magnetics_::CreateSurvey_via_Survey
+    class Magnetics_::CreateSurvey_via_Survey < Common_::Dyadic
 
-      ATTRIBUTES = Attributes_.call(
-        survey: nil,  # order - this one first :(
-        dry_run: nil,
-      )
-
-      class << self
-        define_method :_call, HARD_CALL_METHOD_
-        alias_method :[], :_call
-        alias_method :call, :_call
-        alias_method :begin_session__, :new
-        undef_method :new
-      end  # >>
-
-      def initialize & oes_p
-        @_emit = oes_p
+      def initialize survey, eek, & p
+        @filesystem = eek._microservice_invocation_.invocation_resources.filesystem
+        @is_dry_run = eek._simplified_read_ :dry_run  # where available
+        @listener = p
+        @survey = survey
       end
 
       def execute
@@ -28,23 +18,27 @@ module Skylab::Cull
         # that is, that the directory itself does not exist but that its
         # dirname exists and is a directory.
 
+        if __check_the_thing_ding_with_the_thing
+          __money
+        end
+      end
+
+      def __check_the_thing_ding_with_the_thing
+
         kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
 
-          :path, @survey.workspace_path_,
+          :path, @survey.survey_path_,
           :is_dry_run, true,  # always true, we are checking only
           :create,
-          :filesystem, Home_.lib_.system.filesystem,
-          & @_emit )
+          :filesystem, @filesystem,
+          & @listener )
 
         if kn
 
           # the value of the known is a mock directory. for sanity:
 
           kn.value_x.to_path or fail
-
-          __money
-        else
-          kn
+          ACHIEVED_
         end
       end
 
@@ -60,11 +54,38 @@ module Skylab::Cull
           cfg.add_comment "ohai"
         end
 
-        kn = @dry_run_arg
+        _bytes = @survey.write_ @listener, @is_dry_run
 
-        @survey.write_( ( kn.value_x if kn.is_known_known ) )
-
+        _bytes  # hi. #todo
       end
     end
+
+    # ~
+
+    Magnetics_::Survey_via_SurveyPath = -> su_path, & p do
+      # -
+
+        _config_path = ::File.join su_path, CONFIG_FILENAME_
+
+        cfg = Git_config_[].parse_document_by do |o|
+          o.upstream_path = _config_path
+          o.listener = p
+        end
+
+        if cfg
+
+          Here_.define_sanitized_ do |o|
+
+            o.cfg_for_write = nil
+            o.cfg_for_read = cfg
+            o.path = ::File.dirname su_path
+          end
+        end
+      # -
+    end
+
+    # ~
+    # ~
   end
 end
+# #pending-rename: "persist" not "create"

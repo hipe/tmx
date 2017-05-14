@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Emission
+  class Emission  # :[#003.2]
 
     class Interpreter
 

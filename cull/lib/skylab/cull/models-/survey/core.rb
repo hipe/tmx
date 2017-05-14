@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  module Models_::Survey
+  class Models_::Survey
 
     # (#used-to-descend-model)
 
@@ -34,11 +34,24 @@ module Skylab::Cull
       end
     end
 
-    # ==
-
     class << self
 
-      def any_nearest_path_via_looking_upwards_from_path arg, & oes_p
+      def define_sanitized_
+        me = new
+        yield me
+        me.__become_self
+      end
+      private :new
+    end  # >>
+
+    # NOTE 
+    # we are in the middle of a "progressive full
+
+    module Magnetics_  # (legacy placement)
+
+      SurveyPath_via_Path = -> path, & oes_p do
+
+        arg = Common_::Qualified_Knownness.via_value_and_symbol path, :path
 
         _FS = Home_.lib_.system_lib::Filesystem
 
@@ -52,67 +65,26 @@ module Skylab::Cull
 
         if surrounding_path
           ::File.join surrounding_path, FILENAME_
-        else
-          surrounding_path
         end
       end
-    end  # >>
+    end
 
-    def initialize k
+    def initialize
       @cfg_for_read = nil
       @entities = nil
       @persist_step_a = nil
-      super k
     end
 
     # ~ all #hook-in to [br] edit session API
 
-    def first_edit_shell
-      subsequent_edit_shell
-    end
+    attr_writer(
+      :cfg_for_read,
+      :cfg_for_write,
+      :path,
+    )
 
-    def subsequent_edit_shell
-      Edit_Shell__.new
-    end
-
-    def process_first_edit sh
-      process_subsequent_edit sh
-    end
-
-    def process_subsequent_edit sh
-      send sh.m, * sh.a
-    end
-
-    # ==
-
-    class Edit_Shell__
-
-      def initialize
-      end
-
-      attr_reader :m, :a
-
-      def create_via_mutable_qualified_knownness_box_and_look_path bx, path
-        _call :__create_via_mutable_qualified_knownness_box_and_look_path, bx, path
-      end
-
-      def edit_via_mutable_qualified_knownness_box_and_look_path bx, path
-        _call :__edit_via_mutable_qualified_knownness_box_and_look_path, bx, path
-      end
-
-      def edit_via_mutable_qualified_knownness_box__ bx
-        _call :_edit_via_mutable_qualified_knownness_box, bx
-      end
-
-      def retrieve_via_workspace_path path
-        _call :_retrieve_via_workspace_path, path
-      end
-
-    private
-
-      def _call i, * a
-        @m = i ; @a = a ; nil
-      end
+    def __become_self
+      self  # hi.
     end
 
     # ==
@@ -123,37 +95,6 @@ module Skylab::Cull
       @persist_step_a.push [ :__create_editable_document ]
 
       _edit_via_mutable_qualified_knownness_box bx
-    end
-
-    def __edit_via_mutable_qualified_knownness_box_and_look_path bx, path
-
-      ok = _retrieve_via_workspace_path ::File.join( path, FILENAME_ )
-      if ok
-        _edit_via_mutable_qualified_knownness_box bx
-      else
-        ok
-      end
-    end
-
-    def _retrieve_via_workspace_path ws_path
-
-      _config_path = ::File.join ws_path, CONFIG_FILENAME_
-
-      cfg = Git_config_[].parse_document_by do |o|
-        o.upstream_path = _config_path
-        o.listener = @on_event_selectively
-      end
-
-      cfg and begin
-        @_path = ::File.dirname ws_path
-        @cfg_for_write = nil
-        @cfg_for_read = cfg
-        self
-      end
-    end
-
-    def path
-      @_path
     end
 
     def _edit_via_mutable_qualified_knownness_box bx
@@ -198,23 +139,22 @@ module Skylab::Cull
       _ok and _write is_dry
     end
 
-    def write_ is_dry
+    def write_ p, is_dry
 
-      ::Dir.mkdir workspace_path_  # dry? atomic? meh
+      ::Dir.mkdir survey_path_  # dry? atomic? meh
 
-      _write is_dry
+      _write p, is_dry
     end
 
-    def _write is_dry
+    def _write p, is_dry
 
-      _path = ::File.join workspace_path_, CONFIG_FILENAME_
+      _path = ::File.join survey_path_, CONFIG_FILENAME_
 
       @cfg_for_write.write_to_path_by do |o|
         o.path = _path
         o.is_dry = is_dry
-        o.listener = @on_event_selectively
-      end
-      # t/f succeeded/failed
+        o.listener = p
+      end  # number of bytes
     end
 
     # ~~ interface for the persistence script
@@ -237,13 +177,15 @@ module Skylab::Cull
 
     # ~~ steps avaiable for the persistence script
 
-    def __create_editable_document
+    def init_for_create__
 
       @cfg_for_read = nil
 
       @cfg_for_write = Git_config_[]::Mutable.new_empty_document
 
-      ACHIEVED_
+      @persist_step_a = EMPTY_A_  # assertion
+
+      NIL
     end
 
     def call_on_associated_entity_ ent_sym, m, * args
@@ -278,6 +220,7 @@ module Skylab::Cull
     end
 
     def _workspace_path
+      self._HEY__readme__  # see #here1
       @___did_calc_WS_path ||= begin
         if @_path
           @__ws_path = ::File.join @_path, FILENAME_
@@ -389,16 +332,6 @@ module Skylab::Cull
       end
     end
 
-    def to_event
-      Common_::Event.inline_OK_with :survey,
-        :path, ::File.join( @_path, FILENAME_ ),
-        :is_completion, true
-    end
-
-    def workspace_path_
-      @___ws_path ||= ::File.join @_path, FILENAME_
-    end
-
     # ~ public API for #:+actors near "associated entities" API (experiment)
 
     def existent_associated_entity_ ent_sym  # placeholder for etc.
@@ -435,11 +368,42 @@ module Skylab::Cull
       end
     end
 
+      # -- B: this support
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # -- A: popular readers
+
+      def to_event
+        _path = survey_path_
+        Common_::Event.inline_OK_with(
+          :survey,
+          :path, _path,
+          :is_completion, true,
+        )
+      end
+
+      def survey_path_
+        send ( @_survey_path ||= :__survey_path_initially )
+      end
+
+      def __survey_path_initially
+        @path || self._RECONSIDER_ME__see_that_other_thing__  # #here1
+        @__survey_path = ::File.join( @path, FILENAME_ ).freeze
+        send( @_survey_path = :__survey_path )
+      end
+
+      def __survey_path
+        @__survey_path
+      end
+
+    # -
     # ==
 
     module Models__
 
       define_singleton_method :tricky_index__, ( Lazy_.call do
+        Home_._LETS_FIX_THIS
         Build_tricky_index___[ self ]
       end )
 
@@ -451,68 +415,27 @@ module Skylab::Cull
       stowaway :Aggregator, same
     end
 
-    LIST_WRITER_MPP___ = -> prp do  # must be defined before below
-
-      _SYM = prp.name_symbol
-
-      -> do
-        _x = gets_one
-        @argument_box.touch_array_and_push _SYM, _x
-        KEEP_PARSING_
-      end
-    end
-
     # ==
 
-    module Survey_Action_Methods_
+    module SurveyActionMethods_
 
-      def self.receive_entity_property prp
+      include CommonActionMethods_
 
-        if prp.has_custom_argument_scanning_writer_method
-
-          m = prp.custom_argument_scanning_writer_method_name
-          _method_definition = prp.argument_scanning_writer_method_proc_proc[ prp ]
-
-          es = @entity_edit_session
-          @entity_edit_session = nil
-          define_method m, & _method_definition
-          @entity_edit_session = es
-
-          private m
-        end
-        KEEP_PARSING_
+      def these_common_properties_
+        These___[]
       end
+    end  # (will re-open)
 
-      if false
-      Common_entity_.call self do
+    These___ = Lazy_.call do
 
-        const_set :Property, ::Class.new( const_get( :Property  ) )
+      _ca = Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
 
-        class self::Property
-
-          attr_reader :_wmeth
-
-        private
-
-          def list=  # :+#[br-082]
-
-            @argument_arity = :_defined_manually_
-            @has_custom_argument_scanning_writer_method = true
-            @argument_scanning_writer_method_proc_proc = LIST_WRITER_MPP___
-            KEEP_PARSING_
-          end
-
-          def normalize_property
-
-            if has_custom_argument_scanning_writer_method
-              set_argument_scanning_writer_method_name(
-                conventional_argument_scanning_writer_method_name )
-            end
-            KEEP_PARSING_
-          end
+        o.property_grammatical_injection_by do
+          Build_custom_grammatical_injection_ONCE___[]
         end
 
-        o :property, :upstream,
+        o.ADD_ALL_THESE_MUGS(
+          :property, :upstream,
           :property, :upstream_adapter,
 
           :list, :property, :add_map,
@@ -522,33 +445,33 @@ module Skylab::Cull
           :list, :property, :remove_mutator,
 
           :list, :property, :add_aggregator,
-          :list, :property, :remove_aggregator
-      end
-      end  # if false
-
-    private
-
-      def via_path_argument_resolve_existent_survey
-
-        _qualified_knownness = qualified_knownness :path
-
-        path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
-          _qualified_knownness,
-          & @on_event_selectively )
-
-        path and ___resolve_existent_survey_via_existent_path path
+          :list, :property, :remove_aggregator,
+        )
       end
 
-      def ___resolve_existent_survey_via_existent_path path
+      _ca.to_dereferenced_item_array
+    end
 
-        sv = Models_::Survey.edit_entity @kernel, @on_event_selectively do | edit |
-          edit.retrieve_via_workspace_path path
-        end
+    Build_custom_grammatical_injection_ONCE___ = -> do
 
-        sv and begin
-          @survey = sv
-          ACHIEVED_
+      _inj = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
+
+      _inj.redefine do |o|
+
+        mod = MyCustomPrefixedModifiers___
+        mod.include o.prefixed_modifiers  # yikes
+        o.prefixed_modifiers = mod
+      end
+    end
+
+    module MyCustomPrefixedModifiers___
+
+      def list
+
+        @parse_tree.will_normalize_by do |xx, & pp|
+          ::Kernel._OKAY
         end
+        KEEP_PARSING_
       end
     end
 
@@ -580,9 +503,31 @@ module Skylab::Cull
 
     # ==
 
-    false and  # #todo
-    COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_value_stream.to_a
+    module SurveyActionMethods_
+      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_  # (probably move up)
+    end
+
+    module Magnetics_  # re-open
+
+      Autoloader_[ self ]
+
+      lazily :Survey_via_SurveyPath do |c|
+        const_get :CreateSurvey_via_Survey, false
+        const_defined? c, false or fail
+        const_get c
+      end
+    end
+
+    # ==
+
+    Git_config_ = Lazy_.call do
+      Home_.lib_.brazen_NOUVEAU::CollectionAdapters::GitConfig
+    end
+
+    # ==
+
     CONFIG_FILENAME_ = 'config'.freeze
+    EMPTY_A_ = [].freeze
     FILENAME_ = 'cull-survey'.freeze
     Here_ = self
     UNRELIABLE_ = :_cu_unreliable_

@@ -68,7 +68,7 @@ module Skylab::Git
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           "move all untracked files in the current path to #{
             }a \"stow\" directory"
         end,
@@ -111,7 +111,7 @@ module Skylab::Git
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "attempts to put the files back if there are no collisions."
         end,
 
@@ -150,7 +150,7 @@ module Skylab::Git
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "in the spirit of `git stash show`, show contents of stash"
         end,
 
@@ -173,7 +173,7 @@ module Skylab::Git
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "shows the files that would be stashed."
         end,
 
@@ -196,7 +196,7 @@ module Skylab::Git
 
       def definition ; [
 
-        :branch_description, -> y do
+        :description, -> y do
           y << "list the stows"
         end,
 

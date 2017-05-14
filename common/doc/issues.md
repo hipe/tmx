@@ -153,6 +153,9 @@
 [#003]       the event narrative ..
              :[#here.1]: "structured expressive" (both old (main) node and new)
              (was: #done event class should not be a struct)
+
+       #open :[#here.2] [ emission (the class) ]
+
 [#002]       #tracking-tag #pattern: public emitters
 [#001]       the selective listener pattern
              (was: #pattern: #parent-node: [#019] "events and their payloads"

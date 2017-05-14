@@ -498,6 +498,8 @@ module Skylab::Common::TestSupport
 
       class ActualEmission___
 
+        # (#open it would probably be prudent to use [#003.2] for this instead..)
+
         def initialize em_p, x_a
           @channel_symbol_array = x_a
           @emission_proc = em_p
