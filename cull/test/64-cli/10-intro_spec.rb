@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     TS_::CLI[ self ]  # (should be `use :CLI` but for ..)
 
+# (1/N)
     it "0   no args" do
       invoke
       expect :styled, /\Aexpecting <action>\z/i
@@ -16,6 +17,7 @@ module Skylab::Cull::TestSupport
       expect_exitstatus_for_general_failure
     end
 
+# (2/N)
     it "1.2 strange arg" do
       invoke 'cow'
       expect_unrecognized_action :cow
@@ -27,6 +29,7 @@ module Skylab::Cull::TestSupport
       expect :e, "unrecognized action #{ sym.id2name.inspect }"
     end
 
+# (3/N)
     it "1.3 easy money" do
       invoke 'ping'
       expect "hello from cull."
@@ -34,6 +37,7 @@ module Skylab::Cull::TestSupport
       @exitstatus.should eql :hello_from_cull
     end
 
+# (4/N)
     it "[tmx] integration", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX

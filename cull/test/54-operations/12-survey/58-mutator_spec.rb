@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "add strange name" do
 
       call_API :survey, :edit,
@@ -18,6 +19,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "add good name" do
 
       td = prepare_tmpdir_with_patch_ :freshly_initted
@@ -42,6 +44,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (3/N)
     it "add a mutator to a temporary survey with `reduce`" do
 
       call_API :survey,
@@ -63,6 +66,7 @@ module Skylab::Cull::TestSupport
       ent_.to_even_iambic.should eql [ :"prog lang name", "haskell", :monads, "yes" ]
     end
 
+# (4/N)
     it "take an existing survey, add a function, run it (does not persist)" do
 
       _path = dir :two_tables
@@ -87,6 +91,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (5/N)
     it "remove a function from an existing survey (strange name)" do
 
       call_API :survey, :edit,
@@ -98,6 +103,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (6/N)
     it "remove a function (good name but not found)" do
 
       call_API :survey, :edit,
@@ -109,6 +115,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (7/N)
     it "remove last of three - comments and formatting preserved in the others" do
 
       td = prepare_tmpdir_with_patch_ :with_fuzz_biff
@@ -127,6 +134,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (8/N)
     it "remove first of three - also we do this hacktastic thing with comments" do
 
       td = prepare_tmpdir_with_patch_ :with_fuzz_biff

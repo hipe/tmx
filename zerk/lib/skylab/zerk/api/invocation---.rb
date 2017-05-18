@@ -12,7 +12,7 @@ module Skylab::Zerk
           @_stack.push Here_::CompoundFrame___.new qk ; nil
         end
 
-        _qk = Common_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]
+        _qk = Common_::QualifiedKnownKnown[ acs, ROOT_ASSOCIATION___ ]
 
         @_memory = []
         @_stack = []

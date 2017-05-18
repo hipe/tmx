@@ -24,6 +24,8 @@ module Skylab::Common::TestSupport
 
     it "(stowaway - tmx integration)", TMX_CLI_integration: true do
 
+      # #cov1.9
+
       Autoloader_.require_sidesystem :TMX
 
       cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client

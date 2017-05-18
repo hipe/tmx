@@ -922,7 +922,7 @@ module Skylab::Brazen
           x_a[ d, 2 ] = EMPTY_A_  # eew
         end
 
-        Common_::Qualified_Knownness.via_value_and_had_and_association(
+        Common_::QualifiedKnownness.via_value_and_had_and_association(
           x,
           had,
           @front_properties.fetch( sym ),
@@ -1931,7 +1931,7 @@ module Skylab::Brazen
             end
           end
 
-          Common_::Qualified_Knownness.via_value_and_association x, prp
+          Common_::QualifiedKnownKnown.via_value_and_association x, prp
         end
       end
     end

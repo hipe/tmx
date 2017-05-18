@@ -929,7 +929,7 @@ module Skylab::Fields
 
         def __resolve_sanitized_value_via_ad_hoc_normalizer_against_NOTHING  # 1x but here for proximity to next
 
-          _qkn = Common_::QualifiedKnownness.via_association @normal_association
+          _qkn = Common_::QualifiedKnownUnknown.via_association @normal_association
           _resolve_sanitized_value_through_ad_hoc_normalizer_CL _qkn
         end
 
@@ -940,7 +940,7 @@ module Skylab::Fields
           # (here we squash the knowlege of whether the ivar was actually set)
 
           _x = remove_instance_variable :@_unsanitized_value_
-          _qkn = Common_::QualifiedKnownness[ _x, @normal_association ]
+          _qkn = Common_::QualifiedKnownKnown[ _x, @normal_association ]
           _resolve_sanitized_value_through_ad_hoc_normalizer_CL _qkn
         end
 

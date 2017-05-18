@@ -98,7 +98,7 @@ module Skylab::Zerk
         asc = nt.association
         p = asc.default_proc
         p or redo
-        reader_writer.write_if_not_set Common_::Qualified_Knownness[ p[], asc ]
+        reader_writer.write_if_not_set Common_::QualifiedKnownKnown[ p[], asc ]
         redo
       end while nil
 

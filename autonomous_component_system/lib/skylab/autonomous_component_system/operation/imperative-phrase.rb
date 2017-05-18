@@ -231,7 +231,7 @@ module Skylab::Autonomous_Component_System
         _x = @argument_scanner.gets_one
         comp_x = asc.component_model.send :"via__#{ via }__", _x, & @_pp
         if comp_x
-          Common_::Qualified_Knownness[ comp_x, asc ]
+          Common_::QualifiedKnownKnown[ comp_x, asc ]
         else
           comp_x
         end

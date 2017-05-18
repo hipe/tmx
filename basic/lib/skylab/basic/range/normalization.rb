@@ -85,7 +85,7 @@ module Skylab::Basic
 
       def _receive_value x
 
-        _kn = Common_::Qualified_Knownness.via_value_and_association(
+        _kn = Common_::QualifiedKnownKnown.via_value_and_association(
           x, Home_.default_property )
 
         _receive_arg _kn

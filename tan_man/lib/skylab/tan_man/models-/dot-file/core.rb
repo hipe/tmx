@@ -231,7 +231,7 @@ module Skylab::TanMan
 
         _path = remove_instance_variable :@__digraph_path
 
-        _qkn = Common_::QualifiedKnownness.via_value_and_symbol(
+        _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
           _path, :input_path )  # name is important, must accord with [#ba-062]
 
         _resolve_open_streams_by do |o|

@@ -7,12 +7,14 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "files must be absolute here" do
       call_API :upstream, :map, :upstream, 'non-absolute-path'
       expect_not_OK_event :path_must_be_absolute
       expect_fail
     end
 
+# (2/N)
     it "empty file" do
 
       markdown_map_against_file :zero_bytes
@@ -25,6 +27,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (3/N)
     it "file with one empty line" do
       markdown_map_against_file :one_newline_only
       expect_not_OK_event :early_end_of_stream
@@ -37,6 +40,7 @@ module Skylab::Cull::TestSupport
           :upstream_adapter, :markdown
     end
 
+# (4/N)
     it "and existent" do
 
       map_against_file :GFM_misc
@@ -60,6 +64,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (5/N)
     it "table number is too low" do
 
       map_against_file :GFM_misc, :table_number, '0'
@@ -72,6 +77,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (6/N)
     it "table number too high" do
 
       map_against_file :GFM_misc, :table_number, '6'
@@ -84,6 +90,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (7/N)
     it "table number works" do
 
       map_against_file :GFM_misc, :table_number, '5'

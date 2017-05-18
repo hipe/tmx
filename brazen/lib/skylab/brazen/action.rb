@@ -456,7 +456,7 @@ module Skylab::Brazen
           nil
         end
 
-        bx.add sym, Common_::Qualified_Knownness.
+        bx.add sym, Common_::QualifiedKnownness.
           via_value_and_had_and_association( x, had, prp )
 
         prp = st.gets
@@ -481,7 +481,7 @@ module Skylab::Brazen
 
       a_.each do | k |
 
-        h_[ k ] = Common_::Qualified_Knownness.via_value_and_association(
+        h_[ k ] = Common_::QualifiedKnownKnown.via_value_and_association(
           h.fetch( k ), fo.fetch( k ) )
       end
 
@@ -495,7 +495,7 @@ module Skylab::Brazen
         had = false
       end
 
-      Common_::Qualified_Knownness.via_value_and_had_and_association(
+      Common_::QualifiedKnownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 

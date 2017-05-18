@@ -8,6 +8,7 @@ module Skylab::Cull::TestSupport
     use :memoizer_methods
     use :expect_event
 
+# (1/N)
     it "loads" do
       Home_::API
     end
@@ -48,6 +49,7 @@ module Skylab::Cull::TestSupport
       end
     end
 
+# (2/N)
     it "ping the model node" do
       call_API :survey, :ping
       expect_OK_event :ping, 'cull says (highlight "hello")'
@@ -55,6 +57,7 @@ module Skylab::Cull::TestSupport
       @result.should eql :_hi_again_
     end
 
+# (3/N)
     it "create on a directory with the thing already" do
         _path = freshly_initted_path_
         call_API(
@@ -65,6 +68,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (4/N)
     it "go money" do
 
         _path = prepare_tmpdir.to_path

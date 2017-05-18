@@ -46,12 +46,12 @@ module Skylab::System::TestSupport
 
     def __build_force_yes_arg
 
-      Common_::Qualified_Knownness.via_value_and_symbol true, :force
+      Common_::QualifiedKnownKnown.via_value_and_symbol true, :force
     end
 
     def __build_force_no_arg
 
-      Common_::Qualified_Knownness.via_value_and_symbol false, :force
+      Common_::QualifiedKnownKnown.via_value_and_symbol false, :force
     end
 
     it "no exist, dirname does not exist" do

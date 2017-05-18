@@ -54,6 +54,15 @@ here's some of these:
 
   - `lookup_softly`
 
+here's some more specialized possibilites:
+
+  - `has_reference`
+
+  - `TO_NAME_STREAM`
+
+experimental suggested names for mutation
+
+[none yet]
 
 
 
@@ -146,6 +155,24 @@ from within code that cannot name methods like this).
 
 in fact, as a case study (and also for very pragmatic reasons) see
  #history-A.
+
+
+
+
+## `has_reference`
+
+comparable to platform `Hash#key?`.
+
+the idea is it results in yes/no based solely on whether this reference
+(a symbol, probably) is stored in the operator branch (associated with
+some loadable trueish business value).
+
+the only reason to expose such a method and not just use `lookup_softly`
+is so that the subject instance can save on any necessary work that would
+be involved in dereferencing the reference.
+
+the full set of values that results in `true` for this method should be
+be equivalent to the set of values produced by `to_loadable_reference_stream`.
 
 
 

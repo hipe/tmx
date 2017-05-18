@@ -15,7 +15,7 @@ module Skylab::Cull
 
         :flag, :property, :dry_run,
 
-        :properties, these_common_properties_,
+        :properties, these_common_associations_,
 
         :description, -> y do
           y << "create a cull survey workspace directory in the path"

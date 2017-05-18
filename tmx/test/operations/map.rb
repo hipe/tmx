@@ -254,8 +254,12 @@ module Skylab::TMX::TestSupport
 
       alias_method :calculate, :instance_exec
 
-      def par sym
-        sym.inspect
+      def par x
+        if x.respond_to? :name_symbol
+          x.name_symbol.inspect
+        else
+          ":#{ x.id2name }"  # hi.
+        end
       end
 
       def ick x

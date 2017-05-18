@@ -83,7 +83,7 @@ module Skylab::TestSupport
         -> st, & pp do
 
           _x = st.gets_one
-          _kn = Common_::Qualified_Knownness.via_value_and_symbol _x, :test_file
+          _kn = Common_::QualifiedKnownKnown.via_value_and_symbol _x, :test_file
           _oes_p = pp[ nil ]
 
           _real_FS = @_filesystem_proc.call

@@ -6,7 +6,7 @@ module Skylab::Zerk
 
     oes_p = ada.UI_event_handler
 
-    _qkn = Common_::QualifiedKnownness.via_value_and_symbol s, :argument  # ..
+    _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol s, :argument  # ..
 
     _ = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
 

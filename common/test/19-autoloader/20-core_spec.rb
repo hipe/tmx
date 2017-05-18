@@ -152,7 +152,7 @@ module Skylab::Common::TestSupport
         _mod.entry_tree && fail
       end
 
-      it "does not have (same) when you did" do  # #coverpoint-1-1
+      it "does not have (same) when you did" do  # #cov1.1
         mod = _module
         mod.dir_path  # kick
         mod.entry_tree && fail

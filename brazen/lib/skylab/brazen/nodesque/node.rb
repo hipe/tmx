@@ -127,7 +127,7 @@ module Skylab::Brazen
         had = false
       end
 
-      Common_::Qualified_Knownness.via_value_and_had_and_association(
+      Common_::QualifiedKnownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 

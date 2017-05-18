@@ -253,7 +253,7 @@ module Skylab::TanMan
         def _normalize ivar, const
           _x = remove_instance_variable ivar
           _sym = ivar[ 1..-1 ].intern  # meh
-          _qkn = Common_::QualifiedKnownness.via_value_and_symbol _x, _sym
+          _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol _x, _sym
           _f = Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness.const_get const, false
           kn = _f[ _qkn, & @listener ]
           if kn

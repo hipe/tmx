@@ -43,12 +43,12 @@ module Skylab::Basic
       # but read [#026] the hash narrative # #storypoint-105
 
       Unpack_equal__ = -> h, * k_a do
-        Validate_superset__[ h, k_a ]
+        Validate_superset[ h, k_a ]
         Unpack_subset__[ h, *k_a ]
       end
 
       Unpack_superset__ = -> h, * k_a do
-        Validate_superset__[ h, k_a ]
+        Validate_superset[ h, k_a ]
         Unpack_intersect__[ h, *k_a ]
       end
 
@@ -57,7 +57,7 @@ module Skylab::Basic
       end
 
       say_extra = nil
-      Validate_superset__ = -> h, k_a do
+      Validate_superset = -> h, k_a do
 
         xtra_a = h.keys - k_a
         if xtra_a.length.nonzero?

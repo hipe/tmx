@@ -263,6 +263,23 @@ now, of those that are `nil`, someone has to decide what `nil` means.
 but we see that as a business concern outside of the scope of this
 "knownness" structure.
 
+
+
+
+
+## API :[#here.3]
+
+  - [#here.3.1] `name`
+  - [#here.3.2] `name_symbol`
+
+if an interested class comports with these two methods then it can be
+used as an association (as in the member we expose in the subject)
+"for free" and remain iteself. however, in your class, it is encouraged
+that you use more meaningful method names for your business code, and
+alias them to these as appropriate (experimental)
 _
+
+
+
 :+#tombstone: remove longwinded intro with some history
 :+#tombstone: when we used to have one more field, to model unknown unknown

@@ -65,13 +65,18 @@ module Skylab::Common
 
             name_value_pair_via_asset_reference_
           else
-            _msg = Here_::Say_::No_filesystem_node[ name_, @module ]
-            raise Here_::NameError, _msg
+            raise_name_error_no_filesystem_node_
           end
         else
           # the parent module has no associated file tree
           NOTHING_  # covered, follow
         end
+      end
+
+      def raise_name_error_no_filesystem_node_
+        _nm = _name
+        _msg = Here_::Say_::No_filesystem_node[ _nm, @module ]
+        raise Here_::NameError, _msg
       end
 
       def __the_parent_module_has_an_associated_file_tree
@@ -87,10 +92,10 @@ module Skylab::Common
       def __the_file_tree_has_an_associated_filesystem_entry_group
 
         # open [#067] why do we do approximation why not etc
-        _slug = name_.as_slug
-        at = @file_tree.asset_reference_via_entry_group_head _slug
-        if at
-          self.asset_reference = at
+        _slug = _name.as_slug
+        ref = @file_tree.asset_reference_via_entry_group_head _slug
+        if ref
+          self.asset_reference = ref
           ACHIEVED_
         end
       end
@@ -142,8 +147,8 @@ module Skylab::Common
         DEBUG_IO_.puts "#{ margin }#{ @module }::#{ @const_string }"
       end
 
-      def asset_reference= at
-        @_asset_reference = at
+      def asset_reference= ref
+        @_asset_reference = ref
       end
 
       def __should_autoloaderize_the_value  # #spot-4 does similar
@@ -194,9 +199,9 @@ module Skylab::Common
 
         @_child_file_tree = @file_tree.child_file_tree @_asset_reference
 
-        at = @_child_file_tree.corefile_asset_reference_
-        if at
-          @_core_file_asset_reference = at ; ACHIEVED_
+        ref = @_child_file_tree.corefile_asset_reference_
+        if ref
+          @_core_file_asset_reference = ref ; ACHIEVED_
         end
       end
 
@@ -237,6 +242,7 @@ module Skylab::Common
 
         load_the_file_
         become_loaded_assuming_assets_are_loaded_
+        ACHIEVED_
       end
 
       def load_the_file_  # #sm
@@ -246,7 +252,7 @@ module Skylab::Common
 
       def to_known_  # #sm
         # (we could result in a pair, but why)
-        Known_Known[ @the_asset_value_ ]
+        CorrectConst_[ @the_asset_value_ ]
       end
 
       def become_loaded_assuming_assets_are_loaded_  # #sm
@@ -269,7 +275,8 @@ module Skylab::Common
           raise Here_::NameError, _message
 
         end while above
-        ACHIEVED_
+
+        NIL
       end
 
       def __constant_is_defined
@@ -281,11 +288,12 @@ module Skylab::Common
         end
       end
 
-      def name_
-        @___name ||= Name.via_valid_const_string_ @const_string
+      def _name
+        @__name ||= Name.via_valid_const_string_ @const_string
       end
 
       def const_symbol= sym
+        @__name = nil
         @const_string = sym.id2name
         @const_symbol = sym
       end

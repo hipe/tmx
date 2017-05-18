@@ -328,7 +328,7 @@ module Skylab::Zerk
         end
 
         def _to_qkn
-          Common_::Qualified_Knownness[ @__any_value_string, @__association_or_parameter ]
+          Common_::QualifiedKnownKnown[ @__any_value_string, @__association_or_parameter ]
         end
 
         def is_special

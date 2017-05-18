@@ -89,7 +89,7 @@ module Skylab::Brazen
 
       def __qualified_knownness
         _sym = @item_lemma_symbol || :item
-        Common_::Qualified_Knownness.via_value_and_symbol @needle_item, _sym
+        Common_::QualifiedKnownKnown.via_value_and_symbol @needle_item, _sym
       end
 
       def __when_not_found
@@ -197,13 +197,13 @@ module Skylab::Brazen
 
       def set_qualified_knownness_value_and_symbol x, sym
         @qualified_knownness =
-          Common_::Qualified_Knownness.via_value_and_symbol x, sym
+          Common_::QualifiedKnownKnown.via_value_and_symbol x, sym
         NIL_
       end
 
       def set_qualified_knownness_value_and_name x, nf
         @qualified_knownness =
-          Common_::Qualified_Knownness.via_value_and_association x, nf
+          Common_::QualifiedKnownKnown.via_value_and_association x, nf
       end
 
       def execute

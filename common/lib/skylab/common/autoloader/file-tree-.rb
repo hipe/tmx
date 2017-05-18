@@ -68,9 +68,9 @@ module Skylab::Common
 
           _ft = @_parent_file_tree
 
-          at = _ft.asset_reference_via_entry_group_head _slug
-          if at
-            eg = at.entry_group
+          ref = _ft.asset_reference_via_entry_group_head _slug
+          if ref
+            eg = ref.entry_group
             if eg.includes_what_is_probably_a_directory
               _make_my_own_tree
             else
@@ -185,7 +185,7 @@ module Skylab::Common
         end
 
         def __when_enoent
-          NOTHING_  # as covered. be sure this gets cached. #coverpoint-1-1
+          NOTHING_  # as covered. be sure this gets cached. #cov1.1
         end
 
         def __init_index_via_hit_the_filesystem
@@ -287,19 +287,19 @@ module Skylab::Common
 
         def get_load_file_path_for__ head
 
-          at = asset_reference_via_entry_group_head head
-          if at
-            get_load_file_path_for_asset_reference at
+          ref = asset_reference_via_entry_group_head head
+          if ref
+            get_load_file_path_for_asset_reference ref
           end
         end
 
-        def get_load_file_path_for_asset_reference at  # [pl]
+        def get_load_file_path_for_asset_reference ref  # [pl]
 
-          if at.entry_group.includes_what_is_probably_a_file
-            at.get_filesystem_path
+          if ref.entry_group.includes_what_is_probably_a_file
+            ref.get_filesystem_path
           else
             # (hi.)
-            _ft = child_file_tree at
+            _ft = child_file_tree ref
             at_ = _ft.corefile_asset_reference_
             if at_
               at_.get_filesystem_path
@@ -307,9 +307,9 @@ module Skylab::Common
           end
         end
 
-        def child_file_tree at  # state machine
+        def child_file_tree ref  # state machine
 
-          _child_node_path = ::File.join @node_path, at.entry_group.head
+          _child_node_path = ::File.join @node_path, ref.entry_group.head
 
           @treer[ _child_node_path ]
         end
@@ -367,9 +367,9 @@ module Skylab::Common
 
         def _add_and_produce_asset_reference entry_group, head
 
-          at = AssetReferenceStateMachine___.new entry_group, @node_path
-          @_value_asset_reference_cache[ head ] = at
-          at
+          ref = AssetReferenceStateMachine___.new entry_group, @node_path
+          @_value_asset_reference_cache[ head ] = ref
+          ref
         end
 
         attr_reader(
@@ -388,19 +388,19 @@ module Skylab::Common
         end
 
         def write_and_produce_pair_ x, const_sym
-          pa = Pair.via_value_and_name x, const_sym
+          nv = CorrectConst_[ x, const_sym ]
           @value_is_known = true
-          @_value_and_name = pa
+          @_value_and_name = nv
           freeze
-          pa
+          nv
         end
 
         def value_x
-          @_value_and_name.value_x
+          @_value_and_name.const_value
         end
 
         def const_symbol
-          @_value_and_name.name_symbol
+          @_value_and_name.correct_const_symbol
         end
 
         def get_node_path

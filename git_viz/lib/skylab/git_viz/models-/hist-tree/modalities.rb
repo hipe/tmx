@@ -81,7 +81,7 @@ module Skylab::GitViz
 
             sym = x_a.fetch 0
 
-            _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
+            _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
               x_a.fetch( 1 ), sym
             )
 

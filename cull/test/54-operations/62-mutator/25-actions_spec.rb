@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "lists" do
 
       call_API :mutator, :list

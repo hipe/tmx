@@ -253,7 +253,7 @@ module Skylab::Fields::TestSupport
 
         _asc = _association
 
-        _qkn = Common_::QualifiedKnownness.via_value_and_symbol d, name_sym
+        _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol d, name_sym
 
         sct = X_cimai_CIMaI_AdHocNormalizationFailureDetails.new
 
@@ -274,7 +274,7 @@ module Skylab::Fields::TestSupport
       def _expect_this_value_is_OK d
 
         _attr = _association
-        _qkn = Common_::QualifiedKnownness.via_value_and_symbol d, :_no_see_FI_
+        _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol d, :_no_see_FI_
         _kn = _attr.normalize_by[ _qkn ]
         _kn.value_x == d || fail
       end

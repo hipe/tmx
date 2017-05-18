@@ -6,7 +6,7 @@ module Skylab::Snag
 
       def normalize_value__ x, & x_p  # valid values are true-ish
 
-        _qkn_ = Common_::Qualified_Knownness.via_value_and_symbol( x, :arg )
+        _qkn_ = Common_::QualifiedKnownKnown.via_value_and_symbol x, :arg
         qkn_ = N11n_instance___[].normalize_qualified_knownness _qkn_, & x_p
         qkn_ and qkn_.value_x
       end

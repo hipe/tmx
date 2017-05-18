@@ -114,7 +114,7 @@ module Skylab::Autonomous_Component_System
 
           cmp = @_receiver.send m, @mixed_argument, * xtra, & @_oes_p_p
           if cmp
-            Common_::Qualified_Knownness[ cmp, @association ]
+            Common_::QualifiedKnownKnown[ cmp, @association ]
           else
             cmp
           end

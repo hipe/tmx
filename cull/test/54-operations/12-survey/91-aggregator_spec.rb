@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "add a strange name" do
 
       call_API :survey, :edit,
@@ -17,6 +18,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "add a good name" do
 
       td = prepare_tmpdir_with_patch_ :with_fuzz_biff
@@ -41,6 +43,7 @@ module Skylab::Cull::TestSupport
         ] ) )
     end
 
+# (3/N)
     it "remove (in a temporary omg) (also we sneak a test for map in here)" do
 
       call_API :survey, :reduce,
@@ -61,6 +64,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (4/N)
     it "ersatz catalyst case (integration for sure)" do
 
       call_API :survey, :reduce,

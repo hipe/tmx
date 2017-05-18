@@ -238,7 +238,7 @@ module Skylab::TanMan
 
         def __check_that_path_is_absolute
 
-          _qkn = Common_::QualifiedKnownness.via_value_and_symbol(
+          _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
             @_downstream_reference.path, :digraph_path )
 
           _kn = Path_lib_[]::Normalization.via(

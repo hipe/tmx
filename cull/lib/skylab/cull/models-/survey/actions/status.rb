@@ -2,35 +2,75 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actions::Status < Action_
+    class Actions::Status
 
-      @after_name_symbol = :edit
+      def initialize
+        extend SurveyActionMethods_
+        init_action_ yield
+      end
 
-      Common_entity_.call self,
+      # #was-after: edit
 
-        :branch_description, -> y do
+      def definition ; [
+
+        :description, -> y do
           y << "display status of the survey"
         end,
 
+        :required, :property, :path,
         :description, -> y do
           y << "path from which the survey is searched for"
         end,
-        :required, :property, :path
 
-      def produce_result
+      ] end
 
-        _ok = via_path_argument_resolve_existent_survey__
-        _ok and via_survey
+      def execute
 
+        if __resolve_existent_survey
+          __via_survey
+        end
       end
 
-      include Survey_Action_Methods_
+      def __via_survey
 
-      def via_survey
-        @survey.to_datapoint_stream_for_synopsis
+        # (was `to_datapoint_stream_for_synopsis`)
+
+        _st = @_survey_.config_for_read_.to_section_stream
+        _st.map_by do |sect|
+          Here_::Models__::SectionSummary.new sect
+        end
       end
 
-      UNDERSCORE_ = '_'.freeze
+      # ~( abstraction candidate
+
+      def __resolve_existent_survey
+
+        if __resolve_survey_path_via_path
+          __resolve_survey_via_survey_path
+        end
+      end
+
+      def __resolve_survey_via_survey_path
+
+        # (parse the config file)
+
+        _su_path = remove_instance_variable :@__survey_path
+        _ = Here_::Magnetics_::Survey_via_SurveyPath[ _su_path, & _listener_ ]
+        _store_ :@_survey_, _
+      end
+
+      def __resolve_survey_path_via_path
+
+        # (walk up from the argument path looking for the special filename)
+
+        _ = Here_::Magnetics_::SurveyPath_via_Path[ @path, & _listener_ ]
+        _store_ :@__survey_path, _
+      end
+
+      # ~)
+
+      # ==
+      # ==
     end
   end
 end

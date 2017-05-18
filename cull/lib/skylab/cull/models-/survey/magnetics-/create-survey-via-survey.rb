@@ -78,7 +78,7 @@ module Skylab::Cull
 
             o.cfg_for_write = nil
             o.cfg_for_read = cfg
-            o.path = ::File.dirname su_path
+            o.survey_path = su_path
           end
         end
       # -

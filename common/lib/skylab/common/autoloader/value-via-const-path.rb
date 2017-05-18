@@ -303,9 +303,9 @@ module Skylab::Common
           _node_path = @module.send NODE_PATH_METHOD_
           @_file_tree = @__file_tree_cache[ _node_path ]
           _sym = @_name.as_approximation
-          at = @_file_tree.asset_reference_via_approximation_softly__ _sym
-          if at
-            @__asset_reference = at
+          ref = @_file_tree.asset_reference_via_approximation_softly__ _sym
+          if ref
+            @__asset_reference = ref
             ACHIEVED_
           else
             UNABLE_  # #covered-by [dt]
@@ -371,7 +371,7 @@ module Skylab::Common
 
           sym = @_const_symbol
           _x = @module.const_get sym, false
-          Pair.via_value_and_name _x, sym
+          CorrectConst_[ _x, sym ]
         end
 
         # -- not
@@ -464,7 +464,7 @@ module Skylab::Common
         end
 
         def the_value
-          @name_value_pair.value_x
+          @name_value_pair.const_value
         end
 
         attr_accessor(

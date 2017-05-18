@@ -140,7 +140,7 @@ module Skylab::Zerk
           ___knownness_via_bound_call
         else
           _ = @_procure_bound_call.release_reasoning_
-          Common_::Known_Unknown.via_reasoning _
+          Common_::KnownUnknown.via_reasoning _
         end
       end
 
@@ -193,7 +193,7 @@ module Skylab::Zerk
           # (when the above fails, design something. hopefully all failure
           #  of dependee operations will have client-provided emission.)
 
-          Common_::Known_Unknown.via_reasoning _
+          Common_::KnownUnknown.via_reasoning _
         end
       end
 

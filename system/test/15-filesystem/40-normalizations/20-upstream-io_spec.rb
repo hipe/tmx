@@ -24,7 +24,7 @@ module Skylab::System::TestSupport
 
     it "not exist (path arg passed, name is used)" do
 
-      _pa = Common_::Qualified_Knownness.via_value_and_symbol(
+      _pa = Common_::QualifiedKnownKnown.via_value_and_symbol(
         _not_here, :wazoozie )
 
       @result = subject_via_plus_real_filesystem_plus_listener_(

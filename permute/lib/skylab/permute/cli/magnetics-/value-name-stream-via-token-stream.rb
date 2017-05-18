@@ -53,7 +53,7 @@ module Skylab::Permute
 
       def __on_short_switch value_s, short_category_s
 
-        _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
+        _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
           short_category_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
@@ -81,7 +81,7 @@ module Skylab::Permute
 
       def __on_long_switch value_s, long_partial_catgory_s
 
-        _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
+        _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|

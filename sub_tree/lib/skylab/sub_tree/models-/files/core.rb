@@ -145,7 +145,7 @@ module Skylab::SubTree
             x or next
             prp = @formal_properties[ k ]
             prp.is_extension or next
-            ok = __load_extension Common_::Qualified_Knownness.via_value_and_association( x, prp )
+            ok = __load_extension Common_::QualifiedKnownKnown.via_value_and_association( x, prp )
             ok or break
           end
 

@@ -30,7 +30,7 @@ module Skylab::Fields
             write_association_value_ x
           else
 
-            _qkn = Common_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
+            _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol x, :attribute_value
 
             when_failed[ _qkn, bx, & oes_p ]
           end

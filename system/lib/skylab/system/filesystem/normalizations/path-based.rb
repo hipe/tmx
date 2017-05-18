@@ -100,7 +100,7 @@ module Skylab::System
       def _accept_path path
 
         if path
-          @qualified_knownness_of_path = Common_::Qualified_Knownness.via_value_and_symbol path, :path
+          @qualified_knownness_of_path = Common_::QualifiedKnownKnown.via_value_and_symbol path, :path
           KEEP_PARSING_
         else
           self._COVER_ME_path_argument_was_falseish

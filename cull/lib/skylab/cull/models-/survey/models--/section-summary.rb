@@ -10,7 +10,7 @@ module Skylab::Cull
         def name_function
           @nf ||= Common_::Name.via_variegated_symbol :section
         end
-      end
+      end  # >>
 
       def name_function
         self.class.name_function
@@ -45,6 +45,9 @@ module Skylab::Cull
 
         ACHIEVED_
       end
+
+      # ==
+      # ==
     end
   end
 end

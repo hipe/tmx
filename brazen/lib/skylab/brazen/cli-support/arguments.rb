@@ -222,7 +222,7 @@ module Skylab::Brazen
           def __accept_for_random_access x, prp, _sym
 
             _bx = ( @_random_access_box ||= Common_::Box.new )
-            _qkn = Common_::Qualified_Knownness.via_value_and_association( x, prp )
+            _qkn = Common_::QualifiedKnownKnown.via_value_and_association x, prp
             _bx.add prp.name_symbol, _qkn ; nil
           end
 

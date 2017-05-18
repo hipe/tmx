@@ -18,26 +18,26 @@ module Skylab::Common
       # -
 
         mod = cm.module
-        const = cm.const_symbol
+        c = cm.const_symbol
 
-        x = stow_x.call const
+        x = stow_x.call c
 
-        if mod.const_defined? const, false
+        if mod.const_defined? c, false
 
           # if you define the value in the block yourself, then we use that
 
-          x = mod.const_get const, false
+          x = mod.const_get c, false
         else
 
           # otherwise we use the result value, and do this:
 
-          mod.const_set const, x
+          mod.const_set c, x
         end
 
         # we do *not* autoloaderize - do it yourself if you want it
         # we do *not* associate the value w/ a filesystem node
 
-        Known_Known[ x ]
+        CorrectConst_[ x, c ]
       # -
     end
 
@@ -286,11 +286,11 @@ module Skylab::Common
 
       def next_frame piece
 
-        at = asset_reference
+        ref = asset_reference
 
-        if at.entry_group.includes_what_is_probably_a_directory
+        if ref.entry_group.includes_what_is_probably_a_directory
 
-          _file_tree_ = @file_tree.child_file_tree at
+          _file_tree_ = @file_tree.child_file_tree ref
 
           NameAndValue_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
         else
@@ -312,11 +312,11 @@ module Skylab::Common
       end
 
       def __asset_reference
-        at = @file_tree.asset_reference_via_entry_group_head @piece_string
-        if ! at
+        ref = @file_tree.asset_reference_via_entry_group_head @piece_string
+        if ! ref
           self._COVER_ME_bad_path_tail_piece__no_such_filesystem_node
         end
-        at
+        ref
       end
 
       attr_reader(

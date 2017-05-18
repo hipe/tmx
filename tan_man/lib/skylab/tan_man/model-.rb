@@ -399,7 +399,7 @@ module Skylab::TanMan
           # -
             x = instance_variable_get ivar
           # -
-          _qkn = Common_::QualifiedKnownness.via_value_and_association x, asc
+          _qkn = Common_::QualifiedKnownKnown.via_value_and_association x, asc
           bx.add k, _qkn
         end
         bx

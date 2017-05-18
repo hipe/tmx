@@ -128,8 +128,8 @@ module Skylab::Common::TestSupport
           o.result_in_name_and_value
         end
 
-        pair.name_x == :NCSA_Spy or fail
-        pair.value_x == :x or fail
+        pair.correct_const_symbol == :NCSA_Spy or fail
+        pair.const_value == :x or fail
       end
     end
 
@@ -160,8 +160,8 @@ module Skylab::Common::TestSupport
           o.result_in_name_and_value
         end
 
-        pair.name_x == :InfermationTerktix or fail
-        pair.value_x.name =~ %r(FixtureTree::One_Skorlab::InfermationTerktix\z) or fail
+        pair.correct_const_symbol == :InfermationTerktix or fail
+        pair.const_value.name =~ %r(FixtureTree::One_Skorlab::InfermationTerktix\z) or fail
       end
 
       it "the same as above but value only (name correction)" do

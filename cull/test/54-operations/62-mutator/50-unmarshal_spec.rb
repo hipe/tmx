@@ -6,6 +6,7 @@ module Skylab::Cull::TestSupport
 
     TS_[ self ]
 
+# (1/N)
     it "minimal no prefix" do
 
       func = subject.unmarshal_via_string_and_module(
@@ -16,6 +17,7 @@ module Skylab::Cull::TestSupport
         :Remove_empty_actual_properties )
     end
 
+# (2/N)
     it "minimal prefix" do
 
       func = subject.unmarshal 'mutator:split-and-pr'
@@ -28,6 +30,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (3/N)
     it "minimal one arg" do
 
       subject.unmarshal_via_string_and_module(
@@ -36,6 +39,7 @@ module Skylab::Cull::TestSupport
           [ -12.3 ] )
     end
 
+# (4/N)
     it "catalyst case" do
 
       subject.unmarshal_via_string_and_module(

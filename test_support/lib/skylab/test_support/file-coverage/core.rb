@@ -121,7 +121,7 @@ module Skylab::TestSupport
 
         -> st, & pp do
           _x = st.gets_one
-          _qkn = Common_::Qualified_Knownness.via_value_and_symbol _x, :path
+          _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol _x, :path
           _n11n = Home_.lib_.basic::Pathname::Normalization.with :absolute
           _n11n.normalize_qualified_knownness _qkn do |*i_a, &ev_p|
             _oes_p = pp[ :_fc_hi_ ]

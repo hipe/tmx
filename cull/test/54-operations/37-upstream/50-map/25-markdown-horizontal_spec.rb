@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "money" do  # #lends-coverage to #[#fi-008.6]
 
       map_against_file :horizontal_01_first_my_md

@@ -11,7 +11,7 @@ module Skylab::Zerk
         x = parse_primary_value :must_be_trueish
         if x
 
-          _qkn = Common_::Qualified_Knownness.via_value_and_association x, sym
+          _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol x, sym
 
           mutable_a.push :qualified_knownness, _qkn
 
@@ -57,11 +57,11 @@ module Skylab::Zerk
 
     Known_unknown = -> sym do
       _rsn = SimpleStructuredReason.new sym
-      Common_::Known_Unknown.via_reasoning _rsn
+      Common_::KnownUnknown.via_reasoning _rsn
     end
 
     Known_unknown_because = -> & p do
-      Common_::Known_Unknown.via_reasoning BehaviorBasedReason___.new p
+      Common_::KnownUnknown.via_reasoning BehaviorBasedReason___.new p
     end
 
     # ==

@@ -7,6 +7,7 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "if persistend table count is high" do
 
       call_API :survey, :reduce,
@@ -16,6 +17,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (2/N)
     it "integrate with markdown - will recognize the peristed table count" do
 
       call_API :survey, :reduce,
@@ -35,6 +37,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (3/N)
     it "integrate with markdown - override with your own table count" do
       call_API :survey, :reduce,
         :path, dir( :two_tables ),
@@ -46,6 +49,7 @@ module Skylab::Cull::TestSupport
       st.gets.should be_nil
     end
 
+# (4/N)
     it "a reduce with no functions looks like an upstream map" do
 
       call_API :survey, :reduce,
@@ -65,6 +69,7 @@ module Skylab::Cull::TestSupport
       st.gets.should be_nil
     end
 
+# (5/N)
     it "table number against an adapter that doesn't have tables" do
 
       call_API :survey, :reduce,

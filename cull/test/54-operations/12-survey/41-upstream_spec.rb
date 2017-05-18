@@ -7,12 +7,14 @@ module Skylab::Cull::TestSupport
     TS_[ self ]
     use :expect_event
 
+# (1/N)
     it "a random string with no prefix - treated as path" do
       freshly_initted_against 'zoidberg'
       expect_not_OK_event :path_must_be_absolute
       expect_fail
     end
 
+# (2/N)
     it "use a strange prefix" do
 
       freshly_initted_against "zoidberg:no see"
@@ -25,6 +27,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (3/N)
     it "use the 'file' prefix but noent" do
       freshly_initted_against 'file:wazoo.json'
       expect_not_OK_event_ :errno_enoent
@@ -39,6 +42,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (4/N)
     it "to an existing survey try to set an upstream with a strange extension" do
 
       call_API :survey, :edit,
@@ -55,6 +59,7 @@ module Skylab::Cull::TestSupport
       expect_no_more_events
     end
 
+# (5/N)
     it "add existent file with good extension on fresh workspace" do
 
       _prepare_tmpdir_with_patch_and_do_common :freshly_initted
@@ -62,6 +67,7 @@ module Skylab::Cull::TestSupport
       _expect_common_OK
     end
 
+# (6/N)
     it "add valid upstream file on workspace with existing, erroneous upstream" do
 
       td = _prepare_tmpdir_with_patch_and_do_common :some_config_file
@@ -73,6 +79,7 @@ module Skylab::Cull::TestSupport
       __expect_detail td
     end
 
+# (7/N)
     it "add valid upstream on a workspace with multiple upstreams" do
 
       # #lends-coverage to [#br-007.1]
@@ -111,6 +118,7 @@ module Skylab::Cull::TestSupport
 
     end
 
+# (8/N)
     it "unset - no" do
       call_API :survey, :edit,
         :upstream, Home_::EMPTY_S_,
@@ -120,6 +128,7 @@ module Skylab::Cull::TestSupport
       expect_fail
     end
 
+# (9/N)
     it "unset - yes" do
 
       td = prepare_tmpdir_with_patch_ :many_upstreams

@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    # (#used-to-descend-model)
+    # == (stowaway actions)
 
     module Actions
       Autoloader_[ self ]
@@ -34,6 +34,21 @@ module Skylab::Cull
       end
     end
 
+    # ==
+
+    module SurveyActionMethods_
+
+      include CommonActionMethods_
+
+      def these_common_associations_
+        Common_associations___[]
+      end
+
+      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_  # (probably move up)
+    end
+
+    # ==
+
     class << self
 
       def define_sanitized_
@@ -44,14 +59,13 @@ module Skylab::Cull
       private :new
     end  # >>
 
-    # NOTE 
-    # we are in the middle of a "progressive full
+    # == (stowaway magnetics (one))
 
     module Magnetics_  # (legacy placement)
 
       SurveyPath_via_Path = -> path, & oes_p do
 
-        arg = Common_::Qualified_Knownness.via_value_and_symbol path, :path
+        arg = Common_::QualifiedKnownKnown.via_value_and_symbol path, :path
 
         _FS = Home_.lib_.system_lib::Filesystem
 
@@ -77,15 +91,21 @@ module Skylab::Cull
 
     # ~ all #hook-in to [br] edit session API
 
+      def survey_path= su_path
+        @path = ::File.dirname su_path
+        @_survey_path = :_survey_path_via_ivar
+        @_survey_path_value = su_path
+      end
+
     attr_writer(
       :cfg_for_read,
       :cfg_for_write,
       :path,
     )
 
-    def __become_self
-      self  # hi.
-    end
+      def __become_self
+        self  # hi.
+      end
 
     # ==
 
@@ -360,14 +380,6 @@ module Skylab::Cull
       ent
     end
 
-    # ~ misc public API for actors and actions
-
-    def to_datapoint_stream_for_synopsis
-      @cfg_for_read.to_section_stream( & @on_event_selectively ).map_by do | x |
-        Here_::Models__::SectionSummary.new x
-      end
-    end
-
       # -- B: this support
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -389,12 +401,12 @@ module Skylab::Cull
 
       def __survey_path_initially
         @path || self._RECONSIDER_ME__see_that_other_thing__  # #here1
-        @__survey_path = ::File.join( @path, FILENAME_ ).freeze
-        send( @_survey_path = :__survey_path )
+        @_survey_path_value = ::File.join( @path, FILENAME_ ).freeze
+        send( @_survey_path = :_survey_path_via_ivar )
       end
 
-      def __survey_path
-        @__survey_path
+      def _survey_path_via_ivar
+        @_survey_path_value
       end
 
     # -
@@ -417,16 +429,7 @@ module Skylab::Cull
 
     # ==
 
-    module SurveyActionMethods_
-
-      include CommonActionMethods_
-
-      def these_common_properties_
-        These___[]
-      end
-    end  # (will re-open)
-
-    These___ = Lazy_.call do
+    Common_associations___ = Lazy_.call do
 
       _ca = Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
 
@@ -502,10 +505,6 @@ module Skylab::Cull
     end
 
     # ==
-
-    module SurveyActionMethods_
-      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_  # (probably move up)
-    end
 
     module Magnetics_  # re-open
 

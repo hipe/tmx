@@ -881,6 +881,237 @@ module Skylab::Common
     attr_reader :args, :block, :method_name, :receiver
   end
 
+  # == knownnesses (see [#004])
+
+  class QualifiedKnownness
+
+    class << self
+
+      def via_value_and_had_and_association x, yes, asc
+        if yes
+          QualifiedKnownKnown.via_value_and_association x, asc
+        else
+          QualifiedKnownUnknown.via_association asc
+        end
+      end
+
+      private :new
+    end  # >>
+  end
+
+  KnownUnknownMethods__ = ::Module.new
+  KnownKnownMethods__ = ::Module.new
+
+  class QualifiedKnownKnown < QualifiedKnownness
+    include KnownKnownMethods__
+
+    class << self
+
+      def via_value_and_symbol x, sym
+        new( x )._init_via_symbol sym
+      end
+
+      def via_value_and_association x, asc
+        new( x )._init_via_association asc
+      end
+
+      alias_method :[], :via_value_and_association  # use IFF it's clear
+      private :new
+    end  # >>
+
+    def initialize x
+      @value = x
+    end
+
+    def new_with_value x  # stay close to #here1
+      self.class.via_value_and_association x, @_association  # ..
+    end
+
+    def to_unknown
+      QualifiedKnownUnknown.via_association @_association  # ..
+    end
+
+    def to_knownness
+      KnownKnown[ @value ]
+    end
+  end
+
+  class QualifiedKnownUnknown < QualifiedKnownness
+    include KnownUnknownMethods__
+
+    class << self
+      def via_symbol sym
+        new._init_via_symbol sym
+      end
+
+      def via_association asc
+        new._init_via_association asc
+      end
+    end  # >>
+
+    def new_with_value x  # stay close to #here1
+      QualifiedKnownKnown.via_value_and_association x, @_association  # ..
+    end
+
+    def to_knownness
+      KNOWN_UNKNOWN
+    end
+  end
+
+  class QualifiedKnownness
+
+    def _init_via_symbol sym
+      @association = :__association_via_name_symbol_ONCE
+      @name_symbol = :_name_symbol
+      @_name_symbol = sym ; self
+    end
+
+    def _init_via_association asc
+      @name_symbol = :_name_symbol_via_association
+      @association = :_association
+      @_association = asc
+      freeze
+    end
+
+    def name
+      # :[#004.3.1]: for a thing to be an "association" it must expose a [#060] name with:
+      association.name
+    end
+
+    def association
+      send @association
+    end
+
+    def name_symbol
+      send @name_symbol
+    end
+
+    def __association_via_name_symbol_ONCE
+      @association = :_association
+      @_association = Home_.lib_.basic::MinimalProperty.via_variegated_symbol(
+        remove_instance_variable :@_name_symbol )
+      @name_symbol = :_name_symbol_via_association
+      freeze
+      send @association
+    end
+
+    def _association
+      @_association
+    end
+
+    def _name_symbol_via_association
+      # :[#004.3.2]: for a thing to be an "association" it must:
+      @_association.name_symbol
+    end
+
+    def _name_symbol
+      @_name_symbol
+    end
+
+    def is_qualified
+      true
+    end
+  end
+
+  UnqualifiedKnownness__ = ::Class.new
+
+  class KnownKnown < UnqualifiedKnownness__
+    include KnownKnownMethods__
+
+    class << self
+
+      def yes_or_no x
+        x ? trueish_instance : falseish_instance
+      end
+
+      def falseish_instance
+        @___falseish_instance ||= new false
+      end
+
+      def trueish_instance
+        @___trueish_instance ||= new true
+      end
+
+      alias_method :[], :new
+      private :new
+    end  # >>
+
+    def initialize x
+      @value = x
+    end
+
+    def to_qualified_known_around asc
+      QualifiedKnownKnown.via_value_and_association @value, asc
+    end
+
+    def new_with_value x
+      self.class[ x ]
+    end
+  end
+
+  Known_Known = KnownKnown  # soon..
+  class KnownUnknown < UnqualifiedKnownness__
+    include KnownUnknownMethods__
+    class << self
+      alias_method :via_reasoning, :new
+      private :new
+    end
+    def initialize x
+      @reasoning = x
+    end
+    def to_qualified_known_around asc
+      QualifiedKnownUnknown.via_association asc
+    end
+    attr_reader(
+      :reasoning,
+    )
+  end
+
+  KNOWN_UNKNOWN = KnownUnknown.via_reasoning nil
+
+  class UnqualifiedKnownness__
+    def is_qualified
+      false
+    end
+  end
+
+  module KnownUnknownMethods__
+
+    def is_effectively_trueish
+      false
+    end
+
+    def is_effectively_known
+      false
+    end
+
+    def is_known_known
+      false
+    end
+  end
+
+  module KnownKnownMethods__
+
+    def is_effectively_trueish
+      @value
+    end
+
+    def is_effectively_known
+      ! @value.nil?
+    end
+
+    def value_x  # (historic name)
+      @value
+    end
+
+    attr_reader :value
+    def is_known_known
+      true
+    end
+  end
+
+  # ==
+
   Without_extension = -> path do
     path[ 0 ... path.rindex( DOT_ ) ]
   end
@@ -1117,8 +1348,7 @@ module Skylab::Common
           end
 
           if do_boxxy
-
-            @boxxy_original_methods__ ||= BoxxyOriginalMethods___.__for self  # [#030] #note-1
+            @boxxy_original_constants_method_ = method :constants  # [#030] #note=1
 
             if ! respond_to? NODE_PATH_METHOD_
               extend Methods__
@@ -1137,35 +1367,35 @@ module Skylab::Common
     module BoxxyMethods____
 
       def constants
-        _boxxy_controller.constants__
+        boxxy_module_as_operator_branch.boxxy_enhanced_constants_
       end
 
       def const_missing sym
-        kn = _boxxy_controller.known_for_const_missing__ sym
-        if kn
-          kn.value_x
+        $i += 1
+        $stderr.puts "(BL:#{ THING_DING_FORMAT_ % $i } #{ self }::#{ sym })"
+
+        nv = boxxy_module_as_operator_branch.name_and_value_for_const_missing_ sym
+        if nv
+          nv.const_value
         else
           super
         end
       end
 
-      def boxxy_const_guess_via_name nf
-        nf.as_const  # or maybe as_camelcase_const_string ..
+      def boxxy_const_guess_via_slug slug
+
+        # we suggest the equivalent to either `as_const` or `as_camelcase_const_string`
+
+        NOTHING_  # take default
       end
 
-      def _boxxy_controller
-        @___boxxy_controller ||= Here_::Boxxy_::Controller.new self
+      def boxxy_module_as_operator_branch
+        @___boxxy_OB ||= Here_::Boxxy_::OperatorBranch_via_Module[ self ]
       end
 
       attr_reader(
-        :boxxy_original_methods__
+        :boxxy_original_constants_method_
       )
-    end
-
-    BoxxyOriginalMethods___ = ::Struct.new :constants do
-      def self.__for mod
-        new mod.method( :constants )
-      end
     end
 
     module Methods__
@@ -1190,19 +1420,26 @@ module Skylab::Common
       # -- autoload "reading"
 
       def const_missing x  # accept symbol or string
-        kn = Here_::ConstMissing_.new( x, self ).execute
-        if kn
-          kn.value_x
+        $i += 1
+        $stderr.puts "(AL:#{ THING_DING_FORMAT_ % $i } #{ self }::#{ x })"
+        nv = Here_::ConstMissing_.new( x, self ).execute
+        if nv
+          nv.const_value
         else
           super
         end
       end
 
       def entry_tree
-        kn = ( @____file_tree_knownness ||= begin
-          Knownish__[ Here_::FileTree_::Via_module.new( self, File_tree_cache__ ).execute ]
-        end )
-        kn.value_x if kn.is_known_known
+        kn = ( @___entry_tree_knownness ||= __entry_tree_knownness )
+        if kn.is_known_known
+          kn.value_x
+        end
+      end
+
+      def __entry_tree_knownness
+        x = Here_::FileTree_::Via_module.new( self, File_tree_cache__ ).execute
+        x ? KnownKnown[ x ] : KNOWN_UNKNOWN
       end
 
       def parent_module
@@ -1232,6 +1469,8 @@ module Skylab::Common
     autoload :ConstMissing_, ::File.join( dir, 'const-missing-' )
     autoload :FileTree_, ::File.join( dir, 'file-tree-' )
     autoload :Say_, ::File.join( dir, 'say-' )
+
+    CorrectConst_ = ::Struct.new :const_value, :correct_const_symbol
 
     EXTNAME = '.rb'.freeze
 
@@ -1359,6 +1598,11 @@ module Skylab::Common
         _const.as_camelcase_const_string
       end
 
+      def AS_CONST_STRING
+        o = _const
+        o && o.AS_CONST_STRING
+      end
+
       def as_const
         o = _const
         o && o.as_const
@@ -1451,7 +1695,12 @@ module Skylab::Common
       @surface_value_as_symbol_ ||= @surface_value_.intern
     end
 
+    def AS_CONST_STRING
+      @surface_value_
+    end
+
     def as_approximation
+
       @___approximation ||= Distill[ @surface_value_ ]
     end
 
@@ -1889,6 +2138,10 @@ module Skylab::Common
   end
 
   # --
+
+      $stderr.puts "\n\nDONT FORGET [co]\n\n"
+      THING_DING_FORMAT_ = "%3i"
+      $i = 0
 
   ACHIEVED_ = true
   CONST_SEPARATOR = '::'.freeze

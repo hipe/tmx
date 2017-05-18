@@ -13,7 +13,7 @@ module Skylab::Autonomous_Component_System
 
         -> * i_a, & x_p do
 
-          qkn = Common_::Qualified_Knownness[ cmp, asc ]
+          qkn = Common_::QualifiedKnownKnown[ cmp, asc ]
 
           st = Common_::Scanner.via_array i_a
 

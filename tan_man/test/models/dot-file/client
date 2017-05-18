@@ -35,10 +35,10 @@ module Skylab::TanMan::TestSupport
     def _graph_sexp_via sym, x
 
       # _asc = Home_::DocumentMagnetics_::CommonAssociations.common_IO_parameters.dereference sym
-      # _qkn = Common_::Qualified_Knownness[ x, _asc ]
+      # _qkn = Common_::QualifiedKnownKnown[ x, _asc ]
       # (above worked but was overkill :#history-A.1)
 
-      _qkn = Common_::Qualified_Knownness.via_value_and_symbol x, sym
+      _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol x, sym
 
       _ref = Home_::DocumentMagnetics_::
         ByteStreamReference_via_QualifiedKnownness_and_ThroughputDirection.call(

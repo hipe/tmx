@@ -87,7 +87,7 @@ module Skylab::Basic
         def normalize_value x, & oes_p
 
           normalize_qualified_knownness(
-            Common_::Qualified_Knownness.via_value_and_symbol( x, :path ),
+            Common_::QualifiedKnownKnown.via_value_and_symbol( x, :path ),
             & oes_p )
         end
 

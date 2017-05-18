@@ -17,6 +17,7 @@ module Skylab::Common::TestSupport
       end
 
       it "names are inferred then corrected." do
+        # #cov1.2
 
         mod = _subject_module
 
@@ -45,6 +46,7 @@ module Skylab::Common::TestSupport
       end
 
       it "boxxy won't break just because there is no dir" do
+        # :#cov1.3
         mod = _subject_module
         a = mod.constants
         b = mod.constants
@@ -54,6 +56,7 @@ module Skylab::Common::TestSupport
       end
 
       it "but still gives helpful error message on no ent" do
+        # :#cov1.4
 
         _rx = %r(\buninit.+const.+Wizzlo and no directory\b)
 
@@ -76,6 +79,7 @@ module Skylab::Common::TestSupport
       end
 
       it "it will say it is defined, and then BOOM - X" do
+        # :#cov1.5
 
         mod = _subject_module
 
@@ -112,6 +116,8 @@ module Skylab::Common::TestSupport
       end
 
       it "it only happens the once" do
+
+        # :#cov1.6
 
         mod = TS_::FixtureTreesVolatile::Three
 
@@ -163,7 +169,7 @@ module Skylab::Common::TestSupport
           o.file_tree_cache_by = Autoloader_::File_tree_cache__
         end
 
-        _pair.name_x == :InfermationTerktix || fail
+        _pair.correct_const_symbol == :InfermationTerktix || fail
       end
     end
 
@@ -177,9 +183,43 @@ module Skylab::Common::TestSupport
         [ mod, _constants ]
       end
 
-      it "constants has right constituency, order" do  # #coverpoint-2-1
-        _actual = _the_module.constants
-        _actual == [ :Shammy_Jammy, :Shimmy_Jimmy ] || fail
+      # #cov1.7
+
+      it "the constants have the right essential constituency" do
+
+        const_a = _these_two
+
+        2 == const_a.length || fail
+
+        _actual_h = ::Hash[ const_a.map { |c| [ Home_::Distill[ c ], nil ] } ]
+
+        _expect_h = {
+          Home_::Distill[ "shimmy_jimmy" ] => nil,
+          Home_::Distill[ "shammy_jammy" ] => nil,
+        }
+
+        _hashes_have_same_keys _actual_h, _expect_h
+      end
+
+      it "the one constant uses the stowaway name, trumping the filesystem node" do
+
+        _actual_h = ::Hash[ _these_two.map { |c| [ c, nil ] } ]
+
+        _expect_h = {
+          ShimmyJIMMY: nil,
+          Shammy_Jammy: nil,
+        }
+
+        _hashes_have_same_keys _actual_h, _expect_h
+      end
+
+      it "the constant names are ordered with the stowaway const(s) first " do
+
+        _these_two == %i( ShimmyJIMMY Shammy_Jammy ) || fail
+      end
+
+      shared_subject :_these_two do
+        _the_module.constants
       end
 
       it "the ordinary asset loads (use inaccurately inferred name)" do
@@ -188,9 +228,10 @@ module Skylab::Common::TestSupport
         _xx == :_yes_ || fail
       end
 
-      it "the foopilie asset loads (use inaccurately inferred name)" do
+      it "the stowed-away asset loads (use name in stowaway entry)" do
+        # :#cov1.8
         _mod = _the_module
-        _mod_ = _mod::Shimmy_Jimmy
+        _mod_ = _mod::ShimmyJIMMY
         _mod_.hello_shimmy_jimmy
       end
 
@@ -198,6 +239,18 @@ module Skylab::Common::TestSupport
         TS_::FixtureDirectories::SxtnBoxstow
       end
     end
+
+    # ==
+
+    def _hashes_have_same_keys actual_h, expect_h
+
+      p = Home_.lib_.basic::Hash::Validate_superset
+      p[ expect_h, actual_h.keys ]
+      p[ actual_h, expect_h.keys ]
+    end
+
+    # ==
+    # ==
   end
 end
 # #tombstone: `const_defined?` is no longer overridden with fuzziness
