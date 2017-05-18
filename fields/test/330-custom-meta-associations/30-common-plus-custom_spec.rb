@@ -34,7 +34,7 @@ module Skylab::Fields::TestSupport
         asc = _gets_one_item :property, :ohai, :default, :yep
         asc.name_symbol == :ohai || fail
         _kn = asc.default_by[]
-        _kn.value_x == :yep || fail
+        _kn.value == :yep || fail
       end
 
       shared_subject :_this_class do

@@ -385,7 +385,7 @@ module Skylab::Fields
 
             # scn.advance_one  # #[#012.L.1] advance over the primary name
 
-            _x = n11n.match_unsanitized_monadic_value__.value_x
+            _x = n11n.match_unsanitized_monadic_value__.value
 
             ent.instance_variable_set ivar_as_asc, _x
             KEEP_PARSING_

@@ -90,7 +90,7 @@ module Skylab::Snag
 
         if sym
 
-          Library_::Models_::Name_Value_Output_Node.new obj.value_x, sym, id_x
+          Library_::Models_::Name_Value_Output_Node.new obj.value, sym, id_x
         end
       end
 
@@ -248,7 +248,7 @@ module Skylab::Snag
               when :keyword
                 if x_a.fetch( d + 2 ) == s
                   did_match = true
-                  x = Common_::Pair.via_value_and_name true, x_a.fetch( d )
+                  x = Common_::QualifiedKnownKnown.via_value_and_symbol true, x_a.fetch( d )
                   break
                 end
 
@@ -256,7 +256,7 @@ module Skylab::Snag
                 md = x_a.fetch( d + 2 ).match s
                 if md
                   did_match = true
-                  x = Common_::Pair.via_value_and_name md, x_a.fetch( d )
+                  x = Common_::QualifiedKnownKnown.via_value_and_symbol md, x_a.fetch( d )
                   break
                 end
               end

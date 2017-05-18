@@ -313,7 +313,7 @@ module Skylab::Autonomous_Component_System
 
         def initialize qk
           @association = qk.association
-          @ACS = qk.value_x
+          @ACS = qk.value
         end
 
         def reader_writer
@@ -326,7 +326,7 @@ module Skylab::Autonomous_Component_System
 
         # -- (rather than implement `to_qualified_knownness` but ..)
 
-        def value_x
+        def value
           @ACS
         end
 

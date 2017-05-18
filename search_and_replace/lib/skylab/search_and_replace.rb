@@ -116,7 +116,7 @@ module Skylab::SearchAndReplace
       if @ruby_regexp  # #item-value-description (#survey)
         yield :description, -> qkn do
           # ([ze] uses [#ba-019] ("ick") which doesn't express regexps)
-          qkn.value_x.inspect
+          qkn.value.inspect
         end
       end
 
@@ -125,13 +125,13 @@ module Skylab::SearchAndReplace
           x = st.gets_one
           if x
             if x.respond_to? :casefold?
-              Common_::Known_Known[ x ]
+              Common_::KnownKnown[ x ]
             else
               ___interpret_ruby_regexp x, & pp
             end
           else
             # setting it to false-ish has been requested explicitly
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
           end
         end
       end
@@ -165,7 +165,7 @@ module Skylab::SearchAndReplace
       rx = _lib.marshal_load s, & _oes_p
 
       if rx
-        Common_::Known_Known[ rx ]
+        Common_::KnownKnown[ rx ]
       else
         rx
       end
@@ -179,7 +179,7 @@ module Skylab::SearchAndReplace
         if st.unparsed_exists
           x = st.gets_one
           if x
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
           end
         end
       end
@@ -197,7 +197,7 @@ module Skylab::SearchAndReplace
       -> st do
         x = st.gets_one
         if x
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         end
       end
     end
@@ -214,7 +214,7 @@ module Skylab::SearchAndReplace
       -> st do
         x = st.gets_one
         if x
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         end
       end
     end

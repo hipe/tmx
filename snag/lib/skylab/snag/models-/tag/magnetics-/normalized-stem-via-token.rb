@@ -31,7 +31,7 @@ module Skylab::Snag
             if _rest
               _when_invalid
             else
-              Common_::Known_Known[ @symbol.get_stem_string.intern ]
+              Common_::KnownKnown[ @symbol.get_stem_string.intern ]
             end
           else
             _when_invalid

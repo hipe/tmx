@@ -27,7 +27,7 @@ module Skylab::Cull
 
           ent.remove_property prp
 
-          prp.value_x.split( @split_rx ).each do | s |
+          prp.value.split( @split_rx ).each do | s |
             ent.add_actual_property_value_and_name @x, s.intern
           end
         end

@@ -208,7 +208,7 @@ module Skylab::Zerk
 
               asc = fo
               _anything = fo.default_proc.call
-              _EEK_KN = Common_::Known_Known[ _anything ]
+              _EEK_KN = Common_::KnownKnown[ _anything ]
               break
 
             end while above
@@ -216,7 +216,7 @@ module Skylab::Zerk
           end
 
           _parameter_value_stream = Gets_one_proxy___.new do
-            _EEK_KN.value_x
+            _EEK_KN.value
           end
 
           PVS_via_Box_Controller___[ _formal_parameter_stream, _parameter_value_stream ]
@@ -224,7 +224,7 @@ module Skylab::Zerk
       end
 
       Known_nothing___ = Lazy_.call do
-        Common_::Known_Known[ NOTHING_ ]
+        Common_::KnownKnown[ NOTHING_ ]
       end
 
       # ==

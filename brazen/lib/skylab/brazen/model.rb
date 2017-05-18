@@ -310,7 +310,7 @@ module Skylab::Brazen
         kn = st.gets
         kn or break
         _x = if kn.is_known_known
-          kn.value_x
+          kn.value
         end
         y.push kn.name_symbol, _x
         redo
@@ -325,7 +325,7 @@ module Skylab::Brazen
 
     def property_value_via_property prp  # :+#public-API (limited but varied use)
 
-      _read_knownness_( prp ).value_x
+      _read_knownness_( prp ).value
     end
 
     def dereference i  # ( was #note-120 )

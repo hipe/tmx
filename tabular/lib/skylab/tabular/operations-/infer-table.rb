@@ -54,10 +54,10 @@ module Skylab::Tabular
 
         widest = 0 ; monikers = [] ; desc_procs = []
         @_operation.__to_primary_description_stream_.each do |pa|
-          moniker = "-#{ pa.name_x.id2name.gsub _UNDERSCORE, _DASH }"
+          moniker = "-#{ pa.name_symbol.id2name.gsub _UNDERSCORE, _DASH }"
           len = moniker.length
           widest < len and widest = len
-          monikers.push moniker ; desc_procs.push pa.value_x
+          monikers.push moniker ; desc_procs.push pa.value
         end
 
         moniker_only = "#{ SPACE_ * 2 }%#{ widest }s"
@@ -267,7 +267,7 @@ module Skylab::Tabular
       def __to_primary_description_stream_
         h = OPTION_DESCRIPTIONS___
         Stream_.call h.keys do |k|
-          Common_::Pair.via_value_and_name h.fetch(k), k
+          Common_::QualifiedKnownKnown.via_value_and_symbol h.fetch(k), k
         end
       end
 

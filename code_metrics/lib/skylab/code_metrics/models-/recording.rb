@@ -108,7 +108,7 @@ module Skylab::CodeMetrics
         if kn
           ivar = which.ivar
           if ivar
-            instance_variable_set which.ivar, kn.value_x
+            instance_variable_set which.ivar, kn.value
           end
           ACHIEVED_
         else
@@ -171,7 +171,7 @@ module Skylab::CodeMetrics
     end  # will re-open
 
     Normalize_normally___ = -> s do
-      Common_::Known_Known[ s ]
+      Common_::KnownKnown[ s ]
     end
 
     # --
@@ -181,12 +181,12 @@ module Skylab::CodeMetrics
     ONE_OR_MORE_SPACE___ = RegexpBased__.new ONE_OR_MORE_SPACE_RX__
 
     LINENO___ = RegexpBased__.new %r(\d+), :@lineno do |s|
-      Common_::Known_Known[ s.to_i ]
+      Common_::KnownKnown[ s.to_i ]
     end
 
     which_event = {
-      class: Common_::Known_Known[ :class ],
-      end: Common_::Known_Known[ :end ],
+      class: Common_::KnownKnown[ :class ],
+      end: Common_::KnownKnown[ :end ],
     }
 
     EVENT___ = RegexpBased__.new %r(class|end), :@event_symbol do |s|
@@ -212,13 +212,13 @@ module Skylab::CodeMetrics
     end
 
     CLASS_CACHE___ = ::Hash.new do |h, k|
-      x = Common_::Known_Known[ Class___.new k ]
+      x = Common_::KnownKnown[ Class___.new k ]
       h[ k ] = x
       x
     end
 
     SPECIAL_CACHE___ = ::Hash.new do |h, k|
-      x = Common_::Known_Known[ Special___.new k ]
+      x = Common_::KnownKnown[ Special___.new k ]
       h[ k ] = x
       x
     end
@@ -271,7 +271,7 @@ module Skylab::CodeMetrics
 
     PATH___ = RegexpBased__.new %r(/[^[:space:]]+), :@path do |s, scan|
       scan.path_cache.fetch s do
-        x =  Common_::Known_Known[ s.freeze ]
+        x =  Common_::KnownKnown[ s.freeze ]
         scan.path_cache[ s ] = x
         x
       end

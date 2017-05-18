@@ -8,7 +8,7 @@ module Skylab::Snag
 
         _qkn_ = Common_::QualifiedKnownKnown.via_value_and_symbol x, :arg
         qkn_ = N11n_instance___[].normalize_qualified_knownness _qkn_, & x_p
-        qkn_ and qkn_.value_x
+        qkn_ and qkn_.value
       end
     end  # >>
 
@@ -50,7 +50,7 @@ module Skylab::Snag
         d = gets_one
 
         @p_a.push -> arg, & oes_p do
-          s = arg.value_x
+          s = arg.value
           if d < s.length
             _express arg, :character_limit_exceeded, oes_p do
               "messages cannot be longer than #{ d } characters #{
@@ -66,7 +66,7 @@ module Skylab::Snag
       def must_be_trueish=
 
         @p_a.push -> arg, & oes_p do
-          x = arg.value_x
+          x = arg.value
           if x
             arg
           else
@@ -124,10 +124,10 @@ module Skylab::Snag
 
         @p_a.push -> arg, & oes_p do
 
-          if rx =~ arg.value_x
+          if rx =~ arg.value
             _express arg, :string_has_extraordinary_features, oes_p do
 
-              "#{ instance_exec( & str_p ) }: #{ ick arg.value_x }"
+              "#{ instance_exec( & str_p ) }: #{ ick arg.value }"
             end
           else
             arg
@@ -143,7 +143,7 @@ module Skylab::Snag
           Common_::Event.inline_not_OK_with(
 
             term_chan_sym,
-            :x, arg.value_x,
+            :x, arg.value,
             :string_proc, str_p,
             :error_category, :argument_error
 

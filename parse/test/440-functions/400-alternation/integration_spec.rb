@@ -32,13 +32,13 @@ module Skylab::Parse::TestSupport
 
     it "one recognized token then one strange - parses and consumes" do
       argv = [ '-h', 'strange' ]
-      _against( argv ).value_x.should eql :do_help
+      _against( argv ).value.should eql :do_help
       argv.should eql [ 'strange' ]
     end
 
     it "two recognizables - only parses first b.c is a branch" do
       argv = [ 'server', '-h' ]
-      _against( argv ).value_x.should eql :server
+      _against( argv ).value.should eql :server
       argv.should eql [ '-h' ]
     end
 

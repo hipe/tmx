@@ -17,7 +17,7 @@ module Skylab::Permute
       \z/x
 
       pair = -> v_x=nil, n_x=nil do
-        Common_::Pair.via_value_and_name v_x, n_x
+        Common_::QualifiedKnownKnown.via_value_and_symbol v_x, n_x
       end
 
       o = Home_.lib_.basic::StateMachine::begin_definition

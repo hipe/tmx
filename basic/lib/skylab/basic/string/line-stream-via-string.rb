@@ -120,7 +120,7 @@ module Skylab::Basic
         def advance_one
           s = send @_gets
           if s
-            @_kn_kn.value_x = s
+            @_kn_kn.value = s
           else
             remove_instance_variable :@_kn_kn
             @unparsed_exists = false
@@ -129,7 +129,7 @@ module Skylab::Basic
         end
 
         def head_as_is
-          @_kn_kn.value_x
+          @_kn_kn.value
         end
 
         attr_reader(
@@ -230,7 +230,7 @@ module Skylab::Basic
 
       # ==
 
-      Writable_Known_Known___ = ::Struct.new :value_x
+      Writable_Known_Known___ = ::Struct.new :value
 
       # ==
   end

@@ -28,7 +28,7 @@ module Skylab::Cull
         while ast = st.gets
           m = :"___unmarshal_#{ ast.external_normal_name_symbol }_property"
           if respond_to? m
-            send m, ast.value_x
+            send m, ast.value
           end
         end
 
@@ -70,7 +70,7 @@ module Skylab::Cull
       end
 
       def set arg, bx
-        if arg.value_x.length.zero?
+        if arg.value.length.zero?
           _unset
         else
           _set arg, bx

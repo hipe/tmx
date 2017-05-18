@@ -70,7 +70,7 @@ module Skylab::Cull
         _FS = Home_.lib_.system_lib::Filesystem
 
         surrounding_path = _FS::Walk.via(
-          :start_path, arg.value_x,
+          :start_path, arg.value,
           :filename, FILENAME_,
           :ftype, _FS::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,

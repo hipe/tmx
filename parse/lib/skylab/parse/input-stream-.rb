@@ -14,15 +14,11 @@ module Skylab::Parse
       class Token
 
         def initialize x
-          @value_x = x
+          @value = x
           freeze
         end
 
-        def members
-          [ :value_x ]
-        end
-
-        attr_reader :value_x
+        attr_reader :value
       end
     end
     # <-

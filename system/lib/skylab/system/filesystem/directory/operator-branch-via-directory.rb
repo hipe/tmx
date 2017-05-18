@@ -97,7 +97,7 @@ module Skylab::System
 
     def __add__component qk, & pp
 
-        item = qk.value_x
+        item = qk.value
         _path = ::File.join startingpoint_path, item.natural_key_string
         listener = pp[ NOTHING_ ]
 
@@ -134,7 +134,7 @@ module Skylab::System
           ACHIEVED_
         end
 
-        item = qk.value_x
+        item = qk.value
 
         _path = ::File.join startingpoint_path, item.natural_key_string
 
@@ -154,7 +154,7 @@ module Skylab::System
       # 6
     def expect_component_not__exists__ qk, & oes_p
 
-      _found = first_equivalent_item qk.value_x
+      _found = first_equivalent_item qk.value
       if _found
         ACS_[].send_component_already_added qk, self, & oes_p
       else
@@ -165,7 +165,7 @@ module Skylab::System
       # 7
     def expect_component__exists__ qk, & oes_p
 
-      _found = first_equivalent_item qk.value_x
+      _found = first_equivalent_item qk.value
       if _found
         true
       else
@@ -500,7 +500,7 @@ module Skylab::System
         def __flush_non_caching_item_scanner o  # :#here1
           @_FS = o.filesystem_for_globbing
           @startingpoint_path = o.startingpoint_path
-          if @_knows_whether_or_not_directory_is_assumed_to_exist && ! @_DiAtE_knownness.value_x
+          if @_knows_whether_or_not_directory_is_assumed_to_exist && ! @_DiAtE_knownness.value
             if @_FS.directory? @startingpoint_path
               _do_flush_to_non_caching_scanner
             else
@@ -562,7 +562,7 @@ module Skylab::System
         end
 
         def directory_is_assumed_to_exist
-          @_DiAtE_knownness.value_x
+          @_DiAtE_knownness.value
         end
 
         attr_reader(

@@ -182,7 +182,7 @@ module Skylab::Zerk
         p = -> line do
           had_none = false
           if @_tight_IFF_one_line
-            tight_one = Common_::Known_Known[ line ]
+            tight_one = Common_::KnownKnown[ line ]
             p = -> line_ do
               tight_one = nil
               _express_lone_header_line
@@ -224,7 +224,7 @@ module Skylab::Zerk
         if had_none
           self._DECIDE_ME
         elsif tight_one
-          _express_tight_first_line tight_one.value_x
+          _express_tight_first_line tight_one.value
           ACHIEVED_
         elsif plain_one
           if @_singularize

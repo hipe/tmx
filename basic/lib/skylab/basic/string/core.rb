@@ -256,7 +256,7 @@ module Skylab::Basic
 
             if nb_t_rx =~ x
 
-              Common_::Known_Known[ arg_st.gets_one.to_sym ]
+              Common_::KnownKnown[ arg_st.gets_one.to_sym ]
 
             else
 

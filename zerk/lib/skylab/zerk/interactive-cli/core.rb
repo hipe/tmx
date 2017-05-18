@@ -21,7 +21,7 @@ module Skylab::Zerk
     end
 
     def filesystem_conduit= x
-      @filesystem_conduit_known_known = Common_::Known_Known[ x ] ; nil
+      @filesystem_conduit_known_known = Common_::KnownKnown[ x ] ; nil
     end
 
     def root_ACS_by & p
@@ -29,7 +29,7 @@ module Skylab::Zerk
     end
 
     def system_conduit= x
-      @system_conduit_known_known = Common_::Known_Known[ x ] ; nil
+      @system_conduit_known_known = Common_::KnownKnown[ x ] ; nil
     end
 
     attr_writer(

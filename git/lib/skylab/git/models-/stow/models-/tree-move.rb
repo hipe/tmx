@@ -32,9 +32,9 @@ module Skylab::Git
 
         @a = []
 
-        @source_path = _verify_as_absolute( src_path ).value_x
+        @source_path = _verify_as_absolute( src_path ).value
 
-        @destination_path = _verify_as_absolute( dst_path ).value_x
+        @destination_path = _verify_as_absolute( dst_path ).value
 
       end
 
@@ -92,7 +92,7 @@ module Skylab::Git
 
       def add path
 
-        @a.push _normalize_relative( path ).value_x
+        @a.push _normalize_relative( path ).value
         NIL_
       end
 
@@ -137,7 +137,7 @@ module Skylab::Git
         -> path do
           o = p[ path ]
           if o
-            md = rx.match o.value_x
+            md = rx.match o.value
             if md
               o.new_with_value md[ 0 ]
             else

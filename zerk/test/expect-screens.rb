@@ -197,7 +197,7 @@ module Skylab::Zerk::TestSupport
       # -- exitstatii
 
       def exitstatus_
-        iCLI_state.end_result_wrapped_value.value_x
+        iCLI_state.end_result_wrapped_value.value
       end
 
       def be_successful_exitstatus_
@@ -914,7 +914,7 @@ module Skylab::Zerk::TestSupport
         if remove_instance_variable( :@_did_get_to_end )
 
           _x = remove_instance_variable :@_end_result
-          end_result_wv = Common_::Known_Known[ _x ]
+          end_result_wv = Common_::KnownKnown[ _x ]
 
         else
 

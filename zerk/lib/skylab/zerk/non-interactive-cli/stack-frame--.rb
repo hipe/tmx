@@ -76,7 +76,7 @@ module Skylab::Zerk
           @_association = qk.association
           @next_frame_ = former_top
           @_reader_builder_for_this_frame = nil  # not yet available
-          super qk.value_x, node_map
+          super qk.value, node_map
         end
 
         def description_proc_

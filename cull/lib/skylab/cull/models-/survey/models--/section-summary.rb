@@ -30,7 +30,7 @@ module Skylab::Cull
             ast = @sect.assignments.first
             _lhs_s_ = ast.internal_normal_name_string
             lhs_s = "#{ lhs_s } #{ _lhs_s_ }"  # le meh
-            rhs_x = ast.value_x
+            rhs_x = ast.value
           end
         end
 

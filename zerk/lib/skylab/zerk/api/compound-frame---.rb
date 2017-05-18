@@ -87,7 +87,7 @@ module Skylab::Zerk
       end
 
       def ACS
-        @qualified_knownness.value_x
+        @qualified_knownness.value
       end
 
       def build_formal_operation_via_node_reference_ nt

@@ -71,14 +71,14 @@ module Skylab::Plugin
       begin
 
         if frame.has_the_answer_right_now
-          x = frame.value_x
+          x = frame.value
           break
         end
 
         frame = frame.next_frame
 
         if frame.is_the_answer
-          x = frame.value_x
+          x = frame.value
           break
         end
         redo
@@ -105,15 +105,15 @@ module Skylab::Plugin
         const = @const_string_array[ @stream_offset .. -1 ].join( UNDERSCORE_ ).intern
 
         if @module.const_defined? const, false
-          @_value_x = @module.const_get const, false
+          @__value = @module.const_get const, false
           ACHIEVED_
         else
           UNABLE_
         end
       end
 
-      def value_x
-        remove_instance_variable :@_value_x
+      def value
+        remove_instance_variable :@__value
       end
 
       def next_frame
@@ -241,7 +241,7 @@ module Skylab::Plugin
 
         _result = _pf.output_node_via_input_stream @stream
 
-        @_asset_reference = _result.value_x
+        @_asset_reference = _result.value
         NIL
       end
 
@@ -254,10 +254,10 @@ module Skylab::Plugin
 
     class TheAnswer___
       def initialize x
-        @value_x = x
+        @value = x
       end
       attr_reader(
-        :value_x,
+        :value,
       )
       def is_the_answer
         true
@@ -287,7 +287,7 @@ module Skylab::Plugin
             end while above
 
             if sm
-              Common_::Pair.via_value_and_name(
+              Common_::QualifiedKnownKnown.via_value_and_association(
                 sm,
                 sm.entry_group_head.split( DASH_ ) )
             end

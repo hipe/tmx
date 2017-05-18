@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
 
       it "results in a qualified knownness of the root ACS" do
         qk = root_ACS_result
-        qk.value_x.hello.should eql :_emtpy_guy_
+        qk.value.hello.should eql :_emtpy_guy_
       end
 
       it "(emits nothing)" do

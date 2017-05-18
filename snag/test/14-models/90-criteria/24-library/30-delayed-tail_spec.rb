@@ -20,7 +20,7 @@ module Skylab::Snag::TestSupport
 
       on.symbol.should eql :point
 
-      a = on.value_x
+      a = on.value
       a.first.should eql 3
       a.fetch( 1 ).should eql :foot_unit
     end
@@ -31,9 +31,9 @@ module Skylab::Snag::TestSupport
 
       on = against_ input_stream_via_array %w( is 6 or 7 feet wide )
 
-      a = on.value_x
+      a = on.value
       a.fetch( 1 ).should eql :foot_unit
-      a.first.map( & :value_x ).should eql [ 6, 7 ]
+      a.first.map( & :value ).should eql [ 6, 7 ]
     end
 
     it "you've gotta finish it - the 'wide' part is not optional" do

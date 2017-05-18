@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport
 
       _kn = @result
       _kn.is_known_known or fail
-      -1 == _kn.value_x or fail
+      -1 == _kn.value or fail
     end
 
     def _against x

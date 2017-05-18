@@ -16,7 +16,7 @@ module Skylab::Parse
       # this function :+#cannot-operate-on-the-empty-stream
 
       def output_node_via_input_stream in_st
-        if @p[ in_st.current_token_object.value_x ]
+        if @p[ in_st.current_token_object.value ]
           tok = in_st.current_token_object  # change when necessary.
           in_st.advance_one
           tok

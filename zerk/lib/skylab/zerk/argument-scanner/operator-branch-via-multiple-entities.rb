@@ -127,7 +127,8 @@ module Skylab::Zerk
 
             ob.to_loadable_reference_stream.map_by do |k|
 
-              Common_::Pair.via_value_and_name( _special_value( vs, p[k] ), k )
+              _x = _special_value vs, p[ k ]
+              Common_::QualifiedKnownKnown.via_value_and_symbol _x , k
             end
 
           end.expand_by do |st|

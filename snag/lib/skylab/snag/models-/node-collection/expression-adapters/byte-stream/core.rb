@@ -40,7 +40,7 @@ module Skylab::Snag
 
         def __add__component cx, qk, & oes_p_p
 
-          node = qk.value_x
+          node = qk.value
 
           _oes_p = oes_p_p[ node ]  # transition from hot to cold
 

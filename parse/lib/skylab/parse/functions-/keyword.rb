@@ -52,7 +52,7 @@ module Skylab::Parse
             Home_::Input_Streams_::Single_Token.new input_token_s )
 
           if on
-            on.value_x  # sanity
+            on.value  # sanity
             true
           end
         end
@@ -97,7 +97,7 @@ module Skylab::Parse
         #
         # this function is :+#empty-stream-safe
 
-        tok_s = in_st.current_token_object.value_x
+        tok_s = in_st.current_token_object.value
         tok_d = tok_s.length
 
         if @hotstring

@@ -132,7 +132,7 @@ module Skylab::TanMan
           _node_label_s = pt.first.join SPACE_
           _meaning_name_s = pt.last.join SPACE_
 
-          _is_dry = @_qualified_knownness_box_[ :dry_run ].value_x
+          _is_dry = @_qualified_knownness_box_[ :dry_run ].value
 
           @_mutable_operator_branch_.into_node_apply_meaning_by_ do |o|
             o.node_label = _node_label_s

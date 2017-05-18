@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport
       \z/x
 
       pair = -> v_x=nil, n_x=nil do
-        Common_::Pair.via_value_and_name v_x, n_x
+        Common_::QualifiedKnownKnown.via_value_and_symbol v_x, n_x
       end
 
       o = Home_::StateMachine.begin_definition
@@ -145,12 +145,21 @@ module Skylab::Basic::TestSupport
       st = _upstream '--foo=bar', '-bbaz', '-b', 'baz', 'stops here'
       _against st
 
-      a = @result
-      a.map( & :name_x ).should eql(
-        [ :long_switch, :value, :short_switch, :value, :short_switch, :value ] )
+      _a = @result
 
-      a.map( & :value_x ).should eql(
-        %w( foo bar b baz b baz ) )
+      names = [] ; values = []
+      _a.each do |o|
+        names.push o.name_symbol
+        values.push o.value
+      end
+
+      names == (
+        %i( long_switch value short_switch value short_switch value )
+      ) || fail
+
+      values == (
+        %w( foo bar b baz b baz )
+      ) || fail
 
       st.current_index.should eql 4
     end
@@ -185,11 +194,11 @@ module Skylab::Basic::TestSupport
 
       a.length.should eql 2
 
-      a.first.name_x.should eql :long_switch
-      a.first.value_x.should eql 'foo'
+      a.first.name_symbol.should eql :long_switch
+      a.first.value.should eql 'foo'
 
-      a.last.name_x.should eql :value
-      a.last.value_x.should eql 'bar'
+      a.last.name_symbol.should eql :value
+      a.last.value.should eql 'bar'
     end
   end
 end

@@ -94,7 +94,7 @@ module Skylab::System
           # (#cov1.1 but might be #feature-island to use a listener in a prototype)
         end
         kn = execute
-        kn and kn.value_x  # part of the deal is the convenience of this
+        kn and kn.value  # part of the deal is the convenience of this
       end
 
       def _accept_path path
@@ -293,11 +293,11 @@ module Skylab::System
 
       def produce_result_via_open_IO_ io
 
-        Common_::Known_Known[ io ]
+        Common_::KnownKnown[ io ]
       end
 
       def path_
-        @qualified_knownness_of_path.value_x
+        @qualified_knownness_of_path.value
       end
 
       include Common_::Event::ReceiveAndSendMethods

@@ -9,10 +9,10 @@ module Skylab::Parse
       _RX = /\A\d+\z/
 
       same_method = -> in_st do
-        if _RX =~ in_st.current_token_object.value_x
+        if _RX =~ in_st.current_token_object.value
           tok_o = in_st.current_token_object
           in_st.advance_one
-          Home_::OutputNode.for tok_o.value_x.to_i
+          Home_::OutputNode.for tok_o.value.to_i
         end
       end
 

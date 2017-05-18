@@ -319,7 +319,7 @@ module Skylab::TestSupport
         -> node_ do
           Define_dangerous_memoizer.call tcc, node.name_symbol do
             # hi.
-            instance_exec( & node_.value_x )
+            instance_exec( & node_.value )
           end
         end.call node
 
@@ -335,7 +335,7 @@ module Skylab::TestSupport
               # previous (in code space) memoized item.
 
               _x = send prev_sym
-              instance_exec _x, & node_.value_x
+              instance_exec _x, & node_.value
             end
           end )[ prev_node_symbol, node ]
           redo

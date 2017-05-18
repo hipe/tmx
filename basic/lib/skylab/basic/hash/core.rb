@@ -12,7 +12,7 @@ module Skylab::Basic
         a = h.keys
         Common_::Stream.via_times( a.length ).map_by do |d|
           k = a.fetch d
-          Common_::Pair.via_value_and_name h.fetch( k ), k
+          Common_::QualifiedKnownKnown.via_value_and_symbol h.fetch( k ), k
         end
       end
     end

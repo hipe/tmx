@@ -136,7 +136,7 @@ module Skylab::Brazen::TestSupport
 
       it "here's an assignment that was addded" do
 
-        _hash_of_assignments_after[ :weight_in_ounces ].value_x == 12.5 || fail
+        _hash_of_assignments_after[ :weight_in_ounces ].value == 12.5 || fail
       end
 
       it "here's an assignment that was removed" do
@@ -146,7 +146,7 @@ module Skylab::Brazen::TestSupport
 
       it "here's an assignment that was changed" do
 
-        _hash_of_assignments_after[ :main_color ].value_x == "sky blue" || fail
+        _hash_of_assignments_after[ :main_color ].value == "sky blue" || fail
       end
 
       it "event about value changed" do

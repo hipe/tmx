@@ -17,12 +17,12 @@ module Skylab::Parse::TestSupport
       end
 
       it "against nothing - succeeds" do
-        against_.value_x.should eql EMPTY_A_
+        against_.value.should eql EMPTY_A_
       end
 
       it "against something - parses nothing and succeeds" do
         st = input_stream_containing :foo
-        against_input_stream( st ).value_x.should eql EMPTY_A_
+        against_input_stream( st ).value.should eql EMPTY_A_
         st.current_index.should be_zero
       end
     end
@@ -53,7 +53,7 @@ module Skylab::Parse::TestSupport
 
       it "against two right tokens and a wrong token" do
         st = input_stream_containing 'foo', 'bar', 'bozzo'
-        against_input_stream( st ).value_x.should eql [ :foo, :bar ]
+        against_input_stream( st ).value.should eql [ :foo, :bar ]
         st.current_index.should eql 2
       end
     end
@@ -78,19 +78,19 @@ module Skylab::Parse::TestSupport
 
       it "against minimal good" do
         st = input_stream_containing 'bar'
-        against_input_stream( st ).value_x.should eql [ nil, :bar ]
+        against_input_stream( st ).value.should eql [ nil, :bar ]
         st.current_index.should eql 1
       end
 
       it "against minimal good plus one" do
         st = input_stream_containing 'bar', 'bar'
-        against_input_stream( st ).value_x.should eql [ nil, :bar ]
+        against_input_stream( st ).value.should eql [ nil, :bar ]
         st.current_index.should eql 1
       end
 
       it "against maximal normal" do
         st = input_stream_containing 'foo', 'bar'
-        against_input_stream( st ).value_x.should eql [ :foo, :bar ]
+        against_input_stream( st ).value.should eql [ :foo, :bar ]
         st.current_index.should eql 2
       end
 
@@ -121,19 +121,19 @@ module Skylab::Parse::TestSupport
 
       it "against minimal good" do
         st = input_stream_containing 'bar'
-        against_input_stream( st ).value_x.should eql [ EMPTY_A_, :bar ]
+        against_input_stream( st ).value.should eql [ EMPTY_A_, :bar ]
         st.current_index.should eql 1
       end
 
       it "against good with one of the optionals" do
         st = input_stream_containing 'foo', 'bar'
-        against_input_stream( st ).value_x.should eql [ [ :foo ], :bar ]
+        against_input_stream( st ).value.should eql [ [ :foo ], :bar ]
         st.current_index.should eql 2
       end
 
       it "against good with two of the optionals" do
         st = input_stream_containing 'foo', 'foo', 'bar'
-        against_input_stream( st ).value_x.should eql [ [ :foo, :foo ], :bar ]
+        against_input_stream( st ).value.should eql [ [ :foo, :foo ], :bar ]
         st.current_index.should eql 3
       end
 
@@ -154,13 +154,13 @@ module Skylab::Parse::TestSupport
 
       it "against minimal good" do
         st = input_stream_containing 'zep'
-        against_input_stream( st ).value_x.should eql [ nil, :zep ]
+        against_input_stream( st ).value.should eql [ nil, :zep ]
         st.current_index.should eql 1
       end
 
       it "against maximal good" do
         st = input_stream_containing 'zep', 'zep'
-        against_input_stream( st ).value_x.should eql [ :zep, :zep ]
+        against_input_stream( st ).value.should eql [ :zep, :zep ]
         st.current_index.should eql 2
       end
     end
@@ -175,19 +175,19 @@ module Skylab::Parse::TestSupport
 
       it "against minimal good" do
         st = input_stream_containing 'zo'
-        against_input_stream( st ).value_x.should eql [ EMPTY_A_, :zo ]
+        against_input_stream( st ).value.should eql [ EMPTY_A_, :zo ]
         st.current_index.should eql 1
       end
 
       it "with one optional" do
         st = input_stream_containing 'zo', 'zo'
-        against_input_stream( st ).value_x.should eql [ [ :zo ], :zo ]
+        against_input_stream( st ).value.should eql [ [ :zo ], :zo ]
         st.current_index.should eql 2
       end
 
       it "with two optionals" do
         st = input_stream_containing 'zo', 'zo', 'zo'
-        against_input_stream( st ).value_x.should eql [ [ :zo, :zo ], :zo ]
+        against_input_stream( st ).value.should eql [ [ :zo, :zo ], :zo ]
         st.current_index.should eql 3
       end
     end
@@ -219,13 +219,13 @@ module Skylab::Parse::TestSupport
 
       it "two keywords" do
         st = input_stream_containing 'zoink', 'zoi'
-        against_input_stream( st ).value_x.should eql [ [ 'zoink' ], :zoink ]
+        against_input_stream( st ).value.should eql [ [ 'zoink' ], :zoink ]
         st.current_index.should eql 2
       end
 
       it "three keywords" do
         st = input_stream_containing 'z', 'z', 'z'
-        against_input_stream( st ).value_x.should eql [ [ 'z', 'z' ], :zoink ]
+        against_input_stream( st ).value.should eql [ [ 'z', 'z' ], :zoink ]
         st.current_index.should eql 3
       end
     end
@@ -246,7 +246,7 @@ module Skylab::Parse::TestSupport
 
       it "the keyword and one term - win" do
         st = input_stream_containing 'zank', 'zank'
-        against_input_stream( st ).value_x.should eql [ :zank, [ 'zank' ] ]
+        against_input_stream( st ).value.should eql [ :zank, [ 'zank' ] ]
         st.current_index.should eql 2
       end
     end
@@ -280,19 +280,19 @@ module Skylab::Parse::TestSupport
 
       it "succeeds with three normal" do
         st = input_stream_containing 'X', 'has', 'Y'
-        against_input_stream( st ).value_x.should eql [ ['X'], :has, ['Y'] ]
+        against_input_stream( st ).value.should eql [ ['X'], :has, ['Y'] ]
         st.current_index.should eql 3
       end
 
       it "succeeds with three keywords" do
         st = input_stream_containing 'ha', 'ha', 'ha'
-        against_input_stream( st ).value_x.should eql [ ['ha'], :has, ['ha'] ]
+        against_input_stream( st ).value.should eql [ ['ha'], :has, ['ha'] ]
         st.current_index.should eql 3
       end
 
       it "one further (four) shows greediness" do
         st = input_stream_containing 'h', 'h', 'h', 'h'
-        against_input_stream( st ).value_x.should eql [ %w( h h ), :has, [ "h" ] ]
+        against_input_stream( st ).value.should eql [ %w( h h ), :has, [ "h" ] ]
         st.current_index.should eql 4
       end
     end
@@ -315,7 +315,7 @@ module Skylab::Parse::TestSupport
 
       it "omg minimal passing" do
         st = input_stream_containing 'i', 'would', 'like', 'soup'
-        against_input_stream( st ).value_x.should eql [ %w( i ), [ :would, :like ], %w( soup ) ]
+        against_input_stream( st ).value.should eql [ %w( i ), [ :would, :like ], %w( soup ) ]
         st.current_index.should eql 4
       end
 
@@ -323,7 +323,7 @@ module Skylab::Parse::TestSupport
 
         st = input_stream_containing 'would', 'like', 'would', 'like', 'would', 'like'
 
-        against_input_stream( st ).value_x.should eql(
+        against_input_stream( st ).value.should eql(
 
           [ %w( would like ), [ :would, :like ], %w( would like ) ] )
 

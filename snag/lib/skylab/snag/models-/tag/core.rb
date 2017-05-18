@@ -20,7 +20,7 @@ module Skylab::Snag
 
         arg = Here_::Magnetics_::NormalizedStem_via_Token[ scn.gets_one, & _oes_p ]
         arg and begin
-          new arg.value_x
+          new arg.value
         end
       end
 

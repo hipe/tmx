@@ -198,7 +198,7 @@ module Skylab::System
 
           if kn
             if @do_lock
-              ThisTuple___[ kn.value_x, surrounding_path ]
+              ThisTuple___[ kn.value, surrounding_path ]
             else
               surrounding_path
             end

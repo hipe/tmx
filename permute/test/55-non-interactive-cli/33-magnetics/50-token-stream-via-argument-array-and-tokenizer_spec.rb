@@ -103,12 +103,14 @@ module Skylab::Permute::TestSupport
 
       it "result has tags of lexical category type" do
 
-        _result_as_array.map( & :name_x ) == %i( long_switch value short_switch value ) || fail
+        _actual = _result_as_array.map( & :name_symbol )
+        _expected =  %i( long_switch value short_switch value )
+        _actual == _expected || fail
       end
 
       it "result has the argv strings as-is" do
 
-        _result_as_array.map( & :value_x ) == %w( --longer l1 -s short )
+        _result_as_array.map( & :value ) == %w( --longer l1 -s short )
       end
 
       def _result_as_array

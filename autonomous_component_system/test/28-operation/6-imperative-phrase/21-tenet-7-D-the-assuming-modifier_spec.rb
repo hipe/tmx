@@ -77,7 +77,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :rattle
 
           -> st do
-            Common_::Known_Known[ nil ]
+            Common_::KnownKnown[ nil ]
           end
         end
 

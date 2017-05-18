@@ -113,20 +113,20 @@ module Skylab::Snag
 
             if string
               value_category_symbol = :string
-              value_x = string
+              x = string
 
             else
               integer_s = scn.scan integer_value
 
               if integer_s
                 value_category_symbol = :integer
-                value_x = integer_s.to_i
+                x = integer_s.to_i
 
               else
                 string = scn.scan multi_suffix_as_string
                 if string
                   value_category_symbol = :string
-                  value_x = string
+                  x = string
                 else
 
                   break
@@ -139,7 +139,7 @@ module Skylab::Snag
             a.push Component___.new(
               separator_string,
               value_category_symbol,
-              value_x ).freeze
+              x ).freeze
 
             scn.eos? and break
             redo

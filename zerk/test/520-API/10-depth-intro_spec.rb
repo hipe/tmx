@@ -60,7 +60,7 @@ module Skylab::Zerk::TestSupport
         qk = root_ACS_result
         qk.is_known_known or fail
         qk.name_symbol.should eql :verb_phrase
-        qk.value_x.should eql :_xXx_
+        qk.value.should eql :_xXx_
       end
 
       def event_log
@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
 
       it "result is the last componet that was set - a primitivesque" do
         qk = root_ACS_result
-        qk.value_x.should eql 'like'
+        qk.value.should eql 'like'
         qk.association.name_symbol.should eql :verb
       end
 

@@ -28,7 +28,7 @@ module Skylab::Parse::TestSupport
         Home_::Input_Streams_::Single_Token.new s )
 
       if on
-        on.value_x
+        on.value
       end
     end
 

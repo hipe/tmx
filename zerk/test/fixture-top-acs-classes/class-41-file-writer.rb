@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
         end
 
         -> st do
-          Common_::Known_Known[ "(nn:#{ st.gets_one })" ]
+          Common_::KnownKnown[ "(nn:#{ st.gets_one })" ]
         end
       end
 
@@ -59,7 +59,7 @@ module Skylab::Zerk::TestSupport
 
         -> st do
           _hi = st.gets_one
-          Common_::Known_Known[ _hi ]
+          Common_::KnownKnown[ _hi ]
         end
       end
 

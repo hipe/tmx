@@ -256,11 +256,11 @@ module Skylab::Zerk
 
           st = __discrete_width_pair_stream
           begin
-            pair = st.gets
-            pair || break
+            sct = st.gets
+            sct || break
 
-            w = pair.value_x
-            field_offset = pair.name_x
+            w = sct.width
+            field_offset = sct.field_offset
 
             fs = @_field_survey_writer.dereference field_offset
             fs.width_of_widest_string < w || fail
@@ -328,7 +328,8 @@ module Skylab::Zerk
             width_d = width_integer_st.gets
             if width_d
               dd += 1
-              Common_::Pair.via_value_and_name width_d, @my_order_array.fetch( dd )
+              _field_d = @my_order_array.fetch dd
+              WidthAndFieldOffset___[ width_d, _field_d ]
             end
           end
         end
@@ -511,6 +512,11 @@ module Skylab::Zerk
         end
       end
 
+      # ==
+
+      WidthAndFieldOffset___ = ::Struct.new :width, :field_offset
+
+      # ==
       # ==
     end
   end

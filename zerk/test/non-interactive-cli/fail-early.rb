@@ -318,7 +318,7 @@ module Skylab::Zerk::TestSupport
 
         kn = setup.program_name_string_array_knownness
         _pn_s_a = if kn
-          kn.value_x
+          kn.value
         else
           __program_name_string_array
         end
@@ -605,7 +605,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def program_name_string_array= x
-        @program_name_string_array_knownness = Common_::Known_Known[ x ]
+        @program_name_string_array_knownness = Common_::KnownKnown[ x ]
         x
       end
 

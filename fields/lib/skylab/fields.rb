@@ -95,7 +95,7 @@ module Skylab::Fields
     ivar = asc.as_ivar
 
     if instance_variable_defined? ivar
-      Common_::Known_Known[ instance_variable_get ivar ]
+      Common_::KnownKnown[ instance_variable_get ivar ]
     else
       Common_::KNOWN_UNKNOWN
     end
@@ -911,7 +911,7 @@ module Skylab::Fields
     class << self
 
       def [] x
-        new Common_::Known_Known[ x ]
+        new Common_::KnownKnown[ x ]
       end
 
       def via_known_known kn  # [ac]
@@ -933,7 +933,7 @@ module Skylab::Fields
     end
 
     def head_as_is
-      @_kn.value_x
+      @_kn.value
     end
 
     def advance_one

@@ -108,7 +108,7 @@ module Skylab::Basic
       def __normal_normalize
 
         ok = false
-        x = @qualified_knownness.value_x
+        x = @qualified_knownness.value
 
         @or_a.each do |range|
           d = range.compare x
@@ -154,7 +154,7 @@ module Skylab::Basic
         qkn = o.send QKN__
 
         y << "#{ par qkn.association } must be #{ or_ adj_p_s_a }. #{
-          }had #{ ick qkn.value_x }"
+          }had #{ ick qkn.value }"
       end
 
       class Mutable_Range___

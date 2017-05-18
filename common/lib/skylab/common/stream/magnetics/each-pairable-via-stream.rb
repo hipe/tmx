@@ -22,7 +22,7 @@ module Skylab::Common
           st = @__p.call
 
           while pair = st.gets
-            yield pair.name_symbol, pair.value_x
+            yield pair.name_symbol, pair.value
           end
 
           NIL_

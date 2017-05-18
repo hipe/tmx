@@ -395,7 +395,7 @@ module Skylab::Common
           nv
         end
 
-        def value_x
+        def value
           @_value_and_name.const_value
         end
 

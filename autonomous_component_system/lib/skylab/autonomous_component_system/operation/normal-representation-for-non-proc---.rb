@@ -69,7 +69,7 @@ module Skylab::Autonomous_Component_System
 
           if @_sess.instance_variable_defined? ivar
 
-            Common_::Known_Known[ @_sess.instance_variable_get ivar ]
+            Common_::KnownKnown[ @_sess.instance_variable_get ivar ]
           else
             Common_::KNOWN_UNKNOWN
           end

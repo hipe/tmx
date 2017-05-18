@@ -123,7 +123,7 @@ module Skylab::TanMan
             & _custom_listener )
 
           if kn
-            @_locked_writable_open_IO = kn.value_x ; ACHIEVED_
+            @_locked_writable_open_IO = kn.value ; ACHIEVED_
 
           elsif existed
 
@@ -217,7 +217,7 @@ module Skylab::TanMan
           end
 
           qkn = remove_instance_variable :@_current_unsanitized_absolute_path_qkn
-          qkn = qkn.new_with_value "#{ qkn.value_x }#{ ext }"  # `::Pathname#sub_ext`
+          qkn = qkn.new_with_value "#{ qkn.value }#{ ext }"  # `::Pathname#sub_ext`
           @_current_unsanitized_absolute_path_qkn = qkn
 
           @listener.call :info, :adding_extension do
@@ -252,7 +252,7 @@ module Skylab::TanMan
         end
 
         def _current_unsanitized_absolute_path
-          @_current_unsanitized_absolute_path_qkn.value_x
+          @_current_unsanitized_absolute_path_qkn.value
         end
       end
 

@@ -26,7 +26,7 @@ module Skylab::Zerk
       begin
         kn = st.call
         if kn
-          @_result.push kn.value_x
+          @_result.push kn.value
           redo
         end
         break
@@ -77,7 +77,7 @@ module Skylab::Zerk
 
       s = _write_unquoted_content_to_buffer ""
       if s
-        Common_::Known_Known[ s ]
+        Common_::KnownKnown[ s ]
       else
         __error_unexpected_character_in_unquoted_string
       end
@@ -87,7 +87,7 @@ module Skylab::Zerk
       s = _write_quoted_content_to_buffer ""
       if s
         if ___close_quote
-          Common_::Known_Known[ s ]
+          Common_::KnownKnown[ s ]
         else
           _error_no_closing_quote
         end

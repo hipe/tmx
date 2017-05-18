@@ -55,7 +55,7 @@ module Skylab::System::TestSupport
       expect_no_events
       kn = @result
       kn.is_known_known or fail
-      io = kn.value_x
+      io = kn.value
       io.gets or fail
       io.close
     end

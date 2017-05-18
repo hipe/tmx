@@ -36,7 +36,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         oes_p.call :error, :component_already_added do
 
           Home_::Events::ComponentAlreadyAdded.with(
-            :component, qk.value_x,
+            :component, qk.value,
             :component_association, qk.association,
             :expectation_matrix, [ false, true, true, true ],  # "already has" not "found existing"
             :ACS, acs,
@@ -51,7 +51,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         oes_p.call :error, :component_not_found do
 
           Home_::Events::ComponentNotFound.with(
-            :component, qkn.value_x,
+            :component, qkn.value,
             :component_association, qkn.association,
             :ACS, acs,
           )
@@ -64,7 +64,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         oes_p.call :info, :component_removed do
 
           Home_::Events::ComponentRemoved.with(
-            :component, qk.value_x,
+            :component, qk.value,
             :component_association, qk.association,
             :ACS, acs,
           )
@@ -178,7 +178,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     Flag___ = -> st, & _pp do  # is Any_value
       # experimental, in cahoots with [#ze-044]
-      Common_::Known_Known[ st.gets_one ]
+      Common_::KnownKnown[ st.gets_one ]
     end
   end
   # ->
@@ -521,15 +521,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       singplur = {
         :plural_of => -> qk, acs do
-          x = qk.value_x
+          x = qk.value
           ::Array.try_convert( x ) or self._SANITY
           write[ x, qk.association, acs ]
         end,
         :singular_of => -> qk, acs do
-          write[ [ qk.value_x ], qk.association, acs ]  # the other side of [#026]
+          write[ [ qk.value ], qk.association, acs ]  # the other side of [#026]
         end,
         nil => -> qk, acs do
-          write[ qk.value_x, qk.association, acs ]
+          write[ qk.value, qk.association, acs ]
         end
       }
 
@@ -545,7 +545,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         -> asc do
           ivar = asc.name.as_ivar
           if acs.instance_variable_defined? ivar
-            Common_::Known_Known[ acs.instance_variable_get ivar ]
+            Common_::KnownKnown[ acs.instance_variable_get ivar ]
           else
             Common_::KNOWN_UNKNOWN
           end

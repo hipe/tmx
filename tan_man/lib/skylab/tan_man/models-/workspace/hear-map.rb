@@ -25,7 +25,7 @@ module Skylab::TanMan
             bx = hrd.qualified_knownness_box
             x = bx.remove :word
 
-            s_a = x.value_x
+            s_a = x.value
 
             if 'a' == s_a.fetch( 1 )
               self._HELLO__readme__  # (this used to be a fix for [#019] #tombstone)
@@ -54,7 +54,7 @@ module Skylab::TanMan
 
             def touch_workspace & path_p
 
-              _pair = Common_::Pair.via_value_and_name true, :just_looking
+              _pair = Common_::QualifiedKnownKnown.via_value_and_symbol true, :just_looking
               @bx.add :just_looking, _pair
 
               @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(

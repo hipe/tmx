@@ -211,7 +211,7 @@ module Skylab::Brazen
         @_use_string_via_item = @string_via_item || IDENTITY_
         @_use_string_via_target = @string_via_target || IDENTITY_
 
-        _s = @_use_string_via_target[ @qualified_knownness.value_x ]
+        _s = @_use_string_via_target[ @qualified_knownness.value ]
 
         a = Home_.lib_.basic::Fuzzy.call_by do |o|
           o.string = _s
@@ -243,7 +243,7 @@ module Skylab::Brazen
         @listener.call :error, :ambiguous_property do
           Home_.lib_.fields::Events::Ambiguous.new(  # CUSTOM #[#co-070.2]
             a,
-            @qualified_knownness.value_x,
+            @qualified_knownness.value,
             @qualified_knownness.name,
             & @string_via_item
           )
@@ -275,7 +275,7 @@ module Skylab::Brazen
               _Lev = Home_.lib_.human::Levenshtein
 
               a = _Lev.via(
-                :item_string, qkn.value_x,
+                :item_string, qkn.value,
                 :items, st,
                 :closest_N_items, d,
               )
@@ -288,7 +288,7 @@ module Skylab::Brazen
             did_you_mean_s_a = a
           end
 
-          _needle_as_string = @_use_string_via_target[ qkn.value_x ]
+          _needle_as_string = @_use_string_via_target[ qkn.value ]
 
           Home_.lib_.fields::Events::Extra.with(
             :unrecognized_token, _needle_as_string,

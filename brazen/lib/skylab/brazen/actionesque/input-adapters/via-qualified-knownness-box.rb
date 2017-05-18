@@ -29,7 +29,7 @@ module Skylab::Brazen
             end
 
             prp = qualified_knownness.association
-            x = qualified_knownness.value_x
+            x = qualified_knownness.value
 
             if :zero == prp.argument_arity && ! x
               next  # for now we handle flag-like fields whose actual values

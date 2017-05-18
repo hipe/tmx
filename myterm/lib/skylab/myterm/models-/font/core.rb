@@ -98,7 +98,7 @@ module Skylab::MyTerm
 
         if x
           st.advance_one
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         else
           x
         end
@@ -106,7 +106,7 @@ module Skylab::MyTerm
     end
 
     def accept_path__ kn
-      @path = kn.value_x ; nil
+      @path = kn.value ; nil
     end
 
     def __list__component_operation

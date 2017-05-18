@@ -20,7 +20,7 @@ module Skylab::Parse::TestSupport
       end
 
       it "the output node has the winning value" do
-        on.value_x.should eql :B
+        on.value.should eql :B
       end
 
       it "the output node reports the index of the winning node" do
@@ -41,11 +41,11 @@ module Skylab::Parse::TestSupport
       end
 
       it "and call it in another" do
-        ( p[ :a ].value_x ).should eql :A
+        ( p[ :a ].value ).should eql :A
       end
 
       it "and another" do
-        ( p[ :b ].value_x ).should eql :B
+        ( p[ :b ].value ).should eql :B
         ( p[ :c ] ).should eql nil
       end
     end
@@ -75,7 +75,7 @@ module Skylab::Parse::TestSupport
       end
 
       it "parses one" do
-        ( p[ :one ].value_x ).should eql :is_one
+        ( p[ :one ].value ).should eql :is_one
       end
 
       it "parses two" do

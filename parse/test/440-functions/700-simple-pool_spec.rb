@@ -10,12 +10,12 @@ module Skylab::Parse::TestSupport
         X_f_sp_SP = Home_.function( :simple_pool ).with(
           :functions,
             :trueish_mapper, -> in_st do
-              if /bill/i =~ in_st.current_token_object.value_x
-                in_st.gets_one.value_x
+              if /bill/i =~ in_st.current_token_object.value
+                in_st.gets_one.value
               end
             end,
             :trueish_mapper, -> in_st do
-              if :hi == in_st.current_token_object.value_x
+              if :hi == in_st.current_token_object.value
                 in_st.advance_one
                 :hello
               end

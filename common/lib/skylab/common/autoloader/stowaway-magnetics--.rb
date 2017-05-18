@@ -189,7 +189,7 @@ module Skylab::Common
         @_asset_reference = @frame.asset_reference
         if @_asset_reference.value_is_known
           yield
-          @_the_value = @_asset_reference.value_x
+          @_the_value = @_asset_reference.value
         else
           __init_and_cache_and_autoloaderize
         end

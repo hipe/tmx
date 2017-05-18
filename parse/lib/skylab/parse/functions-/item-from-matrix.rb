@@ -90,7 +90,7 @@ module Skylab::Parse
             # assume every row has the current cel, otherwise by now it would
             # have been eliminated. we furthermore assume no zero-width rows
 
-            row = pair.name_x
+            row = pair.association
 
             _yes = s == row.fetch( @_current_column )
 
@@ -251,9 +251,9 @@ module Skylab::Parse
           st = o.item_stream_proc.call
 
           begin
-            x = st.gets
-            x or break
-            s = x.name_x.fetch d
+            kn = st.gets
+            kn || break
+            s = kn.association.fetch d
             h.fetch s do
               h[ s ] = true
               a.push val s
@@ -266,7 +266,7 @@ module Skylab::Parse
             redo
           end while nil
 
-          if x and st.gets
+          if kn and st.gets
             ellipsis = true
             a.push '[..]'
           end

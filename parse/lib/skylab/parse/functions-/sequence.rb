@@ -32,7 +32,7 @@ module Skylab::Parse
             if tn
               q.push [ f_scn.current_index, tn ]
             end
-            @result_x_a[ f_scn.current_index ] = on.value_x
+            @result_x_a[ f_scn.current_index ] = on.value
             f_scn.advance_one
             f = if f_scn.unparsed_exists
               f_scn.head_as_is

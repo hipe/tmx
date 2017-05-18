@@ -261,7 +261,7 @@ module Skylab::Tabular
         _mutex
         @_input_offset_incrementor.increment
         _offset = @_input_offset_incrementor.read
-        @__input_offset_knownness = Common_::Known_Known[ _offset ]
+        @__input_offset_knownness = Common_::KnownKnown[ _offset ]
         @method_name = :__add_field_corresponding_to_input
         NIL
       end
@@ -274,7 +274,7 @@ module Skylab::Tabular
       # -- read
 
       def input_offset
-        @__input_offset_knownness.value_x
+        @__input_offset_knownness.value
       end
 
       attr_reader(

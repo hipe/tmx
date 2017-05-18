@@ -29,11 +29,11 @@ module Skylab::Human
     #   it's trilean `nil` and not the not-set `nil`. #c15n-spot-2 is nearby.
 
     def trilean= x
-      @trilean = Common_::Known_Known[ x ] ; x
+      @trilean = Common_::KnownKnown[ x ] ; x
     end
 
     def trilean
-      @trilean.value_x
+      @trilean.value
     end
 
     # ~ functions are written assuming these terms are user-writable (and

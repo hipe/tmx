@@ -184,7 +184,7 @@ module Skylab::Basic
             x = arg_st.gets_one
 
             if @matcher =~ x
-              Common_::Known_Known[ x ]
+              Common_::KnownKnown[ x ]
             else
               _failed( & x_p )
             end
@@ -201,7 +201,7 @@ module Skylab::Basic
 
             if md
               _x = @mapper[ * md.captures ]
-              Common_::Known_Known[ _x ]
+              Common_::KnownKnown[ _x ]
             else
               _failed( & x_p )
             end

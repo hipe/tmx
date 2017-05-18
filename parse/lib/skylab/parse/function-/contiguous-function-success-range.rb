@@ -87,7 +87,7 @@ module Skylab::Parse
           end
 
           def _accept_output_node on
-            @output_value_x = on.value_x
+            @output_value_x = on.value
             nil
           end
 
@@ -140,7 +140,7 @@ module Skylab::Parse
           end
 
           def _accept_output_node on
-            @mutable_outout_value_x_a.push on.value_x
+            @mutable_outout_value_x_a.push on.value
             nil
           end
 

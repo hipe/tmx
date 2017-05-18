@@ -368,7 +368,7 @@ reasons this technique may be useful include but are not limited to:
 so that this technique supports components that are validly false-ish
 (that is, that the component can validly have a value of `false` and/
 or `nil`), the result of this call must be an object that responds to
-`value_x` which must produce the component.
+`value` which must produce the component.
 
 
 

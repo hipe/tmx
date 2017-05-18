@@ -276,7 +276,7 @@ module Skylab::Fields::TestSupport
         _attr = _association
         _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol d, :_no_see_FI_
         _kn = _attr.normalize_by[ _qkn ]
-        _kn.value_x == d || fail
+        _kn.value == d || fail
       end
     end
 

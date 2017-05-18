@@ -98,7 +98,7 @@ module Skylab::Autonomous_Component_System
             had = false
           end
           if had
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
           else
             Common_::KNOWN_UNKNOWN
           end

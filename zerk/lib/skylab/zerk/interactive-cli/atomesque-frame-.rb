@@ -119,11 +119,11 @@ module Skylab::Zerk
     end
 
     def is_listy
-      ( @___listy_kn ||= ___determine_listy_kn ).value_x
+      ( @___listy_kn ||= ___determine_listy_kn ).value
     end
 
     def ___determine_listy_kn
-      Common_::Known_Known[ Is_listy_[ @loadable_reference.association.argument_arity ] ]
+      Common_::KnownKnown[ Is_listy_[ @loadable_reference.association.argument_arity ] ]
     end
 
     # -- events

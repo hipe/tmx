@@ -19,7 +19,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     if x.length.zero?
       self._K
     elsif fn_rx =~ x
-      Common_::Known_Known[ x ]
+      Common_::KnownKnown[ x ]
     else
       _oes_p = oes_p_p[ nil ]
       _oes_p.call :error, :expression, :invalid_value do | y |

@@ -108,9 +108,9 @@ module Skylab::Autonomous_Component_System
             pair = st.gets
             pair || break
 
-            _asc = pair.name_x._defined_association
+            _asc = pair.association._defined_association
 
-            _st = Field_::Argument_scanner_via_value[ pair.value_x ]  # MODALITY user value
+            _st = Field_::Argument_scanner_via_value[ pair.value ]  # MODALITY user value
 
             ok = ACS_::Interpretation::Build_value.call _st, _asc, acs, & pp
             ok || break  # qk
@@ -134,7 +134,9 @@ module Skylab::Autonomous_Component_System
         end
 
         def accept_parameter_value x, par
-          @_bx.add par.name_symbol, Common_::Pair.via_value_and_name( x, par )
+
+          _qk = Common_::QualifiedKnownKnown.via_value_and_association x, par
+          @_bx.add par.name_symbol, _qk
           NIL_
         end
 
@@ -145,7 +147,7 @@ module Skylab::Autonomous_Component_System
         def evaluation_of par
           pair = @_bx[ par.name_symbol ]
           if pair
-            Common_::Known_Known[ pair.value_x ]
+            Common_::KnownKnown[ pair.value ]
           else
             Common_::KNOWN_UNKNOWN
           end

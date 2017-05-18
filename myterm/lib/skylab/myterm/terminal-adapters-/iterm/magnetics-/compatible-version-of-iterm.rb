@@ -14,7 +14,7 @@ module Skylab::MyTerm
         ok = true
         ok &&= __resolve_version_string
         ok &&= __resolve_version_parts
-        ok && Common_::Known_Known[ __check_iTerm2_version ]
+        ok && Common_::KnownKnown[ __check_iTerm2_version ]
       end
 
       def __check_iTerm2_version

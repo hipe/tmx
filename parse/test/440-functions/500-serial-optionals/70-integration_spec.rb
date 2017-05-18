@@ -106,7 +106,7 @@ module Skylab::Parse::TestSupport
       st = input_stream_via_array s_a
       d = st.current_index
       on = G.output_node_via_input_stream st
-      @int, @kw = on.value_x
+      @int, @kw = on.value
       if d == st.current_index
         @did_parse = false
       else

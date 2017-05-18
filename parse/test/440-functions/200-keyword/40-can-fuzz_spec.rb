@@ -60,7 +60,7 @@ module Skylab::Parse::TestSupport
     end
 
     def _against * s_a
-      against_input_array( s_a ).value_x
+      against_input_array( s_a ).value
     end
   end
 end

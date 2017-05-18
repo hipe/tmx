@@ -213,7 +213,7 @@ module Skylab::DocTest
     Path__ = -> st do
       x = st.gets_one
       if x
-        Common_::Known_Known[ x ]
+        Common_::KnownKnown[ x ]
       else
         x
       end
@@ -265,7 +265,7 @@ module Skylab::DocTest
           path = fs.expand_path path
         end
 
-        Common_::Known_Known[ path ]
+        Common_::KnownKnown[ path ]
       end
       # (the above is #[#ze-048] a common n11n that might get abstracted
     end

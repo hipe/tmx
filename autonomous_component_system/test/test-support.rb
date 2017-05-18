@@ -152,7 +152,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     Class_91_Trueish = -> st do
       x = st.gets_one
       if x
-        Common_::Known_Known[ x ]
+        Common_::KnownKnown[ x ]
       else
         self._NOT_NEEDED_YET
       end
@@ -164,7 +164,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       s = st.head_as_is
       if rx_92 =~ s
         st.advance_one
-        Common_::Known_Known[ s ]
+        Common_::KnownKnown[ s ]
       else
         _oes_p = pp[ nil ]
         _oes_p.call :error, :expression, :nope do |y|

@@ -15,8 +15,8 @@ class Skylab::Task
 
   # the "arc streamer" is no joke: it is a proc that builds a stream.
   # each item in the stream is a "pair" structure that represents a node
-  # and all its depedencies. the `name_x` component of the pair is the
-  # name function of the node. the `value_x` component is .. yet another
+  # and all its depedencies. the `association` component of the pair is the
+  # name function of the node. the `value` component is .. yet another
   # streamer. this streamer builds a stream, each item of which is the name
   # function of each depended upon node for that node. whew!
 
@@ -48,7 +48,7 @@ class Skylab::Task
               end
             end
 
-            Common_::Pair.via_value_and_name _st_p, _nf
+            Common_::QualifiedKnownKnown.via_value_and_association _st_p, _nf
           end
         end
 
@@ -72,10 +72,10 @@ class Skylab::Task
 
         explain = -> prefix=nil do
 
-          name = pair.name_x
+          name = pair.association
           k = name.as_variegated_symbol
 
-          dpe_st = pair.value_x.call
+          dpe_st = pair.value.call
           name_ = dpe_st.gets
           if name_
 

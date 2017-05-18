@@ -94,7 +94,7 @@ module Skylab::Parse
     #     on = Digits[ argv ]
     #     argv.length  # => 0
     #     on.function_is_spent  # => false
-    #     kw, k2, digits = on.value_x
+    #     kw, k2, digits = on.value
     #     ( kw || k2 )  # => nil
     #     digits  # => [ 1 ]
     #
@@ -104,7 +104,7 @@ module Skylab::Parse
     #     argv = %w( 2 3 )
     #     on = Digits[ argv ]
     #     on.function_is_spent  # => false
-    #     on.value_x  # => [ nil, nil, [ 2, 3 ] ]
+    #     on.value  # => [ nil, nil, [ 2, 3 ] ]
     #
     #
     # parses one keyword:
@@ -112,7 +112,7 @@ module Skylab::Parse
     #     argv = [ 'bar' ]
     #     on = Digits[ argv ]
     #     on.function_is_spent  # => false
-    #     on.value_x  # => [ nil, [:bar], nil ]
+    #     on.value  # => [ nil, [:bar], nil ]
     #
     #
     # parses two keywords (in reverse grammar order):
@@ -121,7 +121,7 @@ module Skylab::Parse
     #     on = Digits[ argv ]
     #     argv.length  # => 0
     #     on.function_is_spent  # => false
-    #     on.value_x  # => [ [:foo], [:bar], nil ]
+    #     on.value  # => [ [:foo], [:bar], nil ]
     #
     #
     # will not parse multiple of same keyword:
@@ -130,7 +130,7 @@ module Skylab::Parse
     #     on = Digits[ argv ]
     #     argv  # => %w( foo )
     #     on.function_is_spent  # => false
-    #     on.value_x  # => [ [ :foo ], nil, nil ]
+    #     on.value  # => [ [ :foo ], nil, nil ]
     #
     #
     # will stop at first non-parsable:
@@ -139,7 +139,7 @@ module Skylab::Parse
     #     on = Digits[ argv ]
     #     on.function_is_spent  # => false
     #     argv  # => [ 'biz', 'bar' ]
-    #     on.value_x  # => [ [ :foo ], nil, [ 1, 2 ] ]
+    #     on.value  # => [ [ :foo ], nil, [ 1, 2 ] ]
 
 
     class Functions_::Spending_Pool < Home_::Function_::Currying
@@ -186,7 +186,7 @@ module Skylab::Parse
 
             if on
 
-              ( res_a[ func_idx ] ||= [] ).push on.value_x
+              ( res_a[ func_idx ] ||= [] ).push on.value
 
               parsed_this_pass = true
               is_spent = on.function_is_spent

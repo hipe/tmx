@@ -177,7 +177,7 @@ module Skylab::TanMan
         end
 
         if kn
-          kn.value_x
+          kn.value
         else
           kn
         end

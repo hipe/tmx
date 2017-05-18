@@ -66,7 +66,7 @@ module Skylab::BeautySalon
           )
 
           if kn
-            x_a.push :line_upstream, kn.value_x
+            x_a.push :line_upstream, kn.value
             ACHIEVED_
           else
             kn

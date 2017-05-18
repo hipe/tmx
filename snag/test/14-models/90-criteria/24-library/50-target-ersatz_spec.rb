@@ -17,15 +17,15 @@ module Skylab::Snag::TestSupport
         %w( the thing is marked with "sale" or "clearance" and
             has no particular shortcomings ) )
 
-      o.name_symbol.should eql %i( Thing )
+      o.association == %i( Thing ) || fail
 
-      t = o.value_x
-      t.a.first.a.first.value_x[ :body ].should eql 'sale'
-      t.a.first.a.last.value_x[ :body ].should eql 'clearance'
+      t = o.value
+      t.a.first.a.first.value[ :body ].should eql 'sale'
+      t.a.first.a.last.value[ :body ].should eql 'clearance'
 
       o = t.a.last
       o.associated_model_identifier.should eql [:Shortcomings]
-      o.value_x.first.should eql :no
+      o.value.first.should eql :no
 
       _s = t.to_ascii_visualization_string_
       _s.should eql __this_tree

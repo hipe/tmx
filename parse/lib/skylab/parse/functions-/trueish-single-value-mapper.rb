@@ -15,7 +15,7 @@ module Skylab::Parse
       # this function :+#cannot-operate-on-the-empty-stream.
 
       def output_node_via_input_stream in_st
-        x = @p[ in_st.current_token_object.value_x ]
+        x = @p[ in_st.current_token_object.value ]
         if x
           in_st.advance_one
           Home_::OutputNode.for x

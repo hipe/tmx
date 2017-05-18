@@ -1252,13 +1252,13 @@ module Skylab::Common::TestSupport
       end
 
       def cached_event_value
-        ( @___event_knownness ||= ___build_event_knownness ).value_x
+        ( @___event_knownness ||= ___build_event_knownness ).value
       end
 
       def ___build_event_knownness
         _p = remove_instance_variable :@__event_proc
         _ev = _p.call
-        Common_::Known_Known[ _ev ]
+        Common_::KnownKnown[ _ev ]
       end
 
       attr_reader(
@@ -1286,7 +1286,7 @@ module Skylab::Common::TestSupport
       alias_method :_express_into_under_, :express_into_under
 
       def _event_or_lines_
-        ( @___1 ||= _kn( [], _black_and_white_expag )).value_x
+        ( @___1 ||= _kn( [], _black_and_white_expag )).value
       end
 
       def to_black_and_white_lines
@@ -1295,7 +1295,7 @@ module Skylab::Common::TestSupport
       end
 
       def to_black_and_white_line
-        ( @___2 ||= _kn( "", _black_and_white_expag )).value_x
+        ( @___2 ||= _kn( "", _black_and_white_expag )).value
       end
 
       def _black_and_white_expag
@@ -1304,7 +1304,7 @@ module Skylab::Common::TestSupport
 
       def _kn y, expag
         _y_ = expag.calculate y, & @expression_proc
-        Common_::Known_Known[ _y_ ]
+        Common_::KnownKnown[ _y_ ]
       end
 
       def _trilean_

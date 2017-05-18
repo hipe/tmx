@@ -19,7 +19,7 @@ module Skylab::Permute
 
         cat_bx = Common_::Box.new
 
-        cat = Category__.new st.gets.value_x, st.gets.value_x
+        cat = Category__.new st.gets.value, st.gets.value
 
         cat_bx.add cat.name_string, cat
 
@@ -35,9 +35,9 @@ module Skylab::Permute
 
           pair_for_value = st.gets
 
-          _m = THESE___.fetch pair_for_name.name_x
+          _m = THESE___.fetch pair_for_name.name_symbol
 
-          ok = send _m, pair_for_value.value_x, pair_for_name.value_x
+          ok = send _m, pair_for_value.value, pair_for_name.value
 
           ok or break
           redo

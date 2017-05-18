@@ -268,7 +268,7 @@ module Skylab::Snag
 
             @pred_tail_trees = nil
 
-            @tree_of_predicates = Common_::Pair.via_value_and_name(
+            @tree_of_predicates = Common_::QualifiedKnownKnown.via_value_and_association(
               _top_x,
               @model_reflection.identifier )
 

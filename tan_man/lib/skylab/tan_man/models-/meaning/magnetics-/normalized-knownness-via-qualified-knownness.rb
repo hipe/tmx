@@ -14,7 +14,7 @@ module Skylab::TanMan
 
         def execute
 
-          if VALID_NAME_RX__ =~ @qualified_knownness.value_x
+          if VALID_NAME_RX__ =~ @qualified_knownness.value
             @qualified_knownness.to_knownness
           else
             when_invalid
@@ -24,7 +24,7 @@ module Skylab::TanMan
         def when_invalid
           @listener.call :error, :invalid_property_value do
             Common_::Event.inline_not_OK_with :invalid_meaning_name,
-                :meaning_name, @qualified_knownness.value_x do | y, o |
+                :meaning_name, @qualified_knownness.value do | y, o |
               y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
                }must start with a-z followd by [-a-z0-9]"
             end
@@ -44,7 +44,7 @@ module Skylab::TanMan
         end
 
         def execute
-          @x = @qualified_knownness.value_x
+          @x = @qualified_knownness.value
           if NL_RX__ =~ @x
             when_invalid
           else

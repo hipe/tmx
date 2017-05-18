@@ -160,12 +160,12 @@ module Skylab::Tabular
           item_on_deck = mixed_tuple_st[]
           if item_on_deck
             if zero[]
-              @_exhausted_naturally_known = Common_::Known_Known.falseish_instance
-              @__item_on_deck_known = Common_::Known_Known[ item_on_deck ]
+              @_exhausted_naturally_known = Common_::KnownKnown.falseish_instance
+              @__item_on_deck_known = Common_::KnownKnown[ item_on_deck ]
               at_end[]
             end
           else
-            @_exhausted_naturally_known = Common_::Known_Known.trueish_instance
+            @_exhausted_naturally_known = Common_::KnownKnown.trueish_instance
             at_end[]
           end
           x
@@ -195,11 +195,11 @@ module Skylab::Tabular
       end
 
       def __exhausted_naturally_
-        @_exhausted_naturally_known.value_x
+        @_exhausted_naturally_known.value
       end
 
       def __item_on_deck_
-        @__item_on_deck_known.value_x
+        @__item_on_deck_known.value
       end
     end
 

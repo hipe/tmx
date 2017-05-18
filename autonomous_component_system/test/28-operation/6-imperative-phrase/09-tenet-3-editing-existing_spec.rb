@@ -97,7 +97,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
             s = in_st.gets_one
             if /\A[a-z]+\z/ =~ s
-              Common_::Known_Known[ s ]
+              Common_::KnownKnown[ s ]
             else
 
               if oes_p_p
@@ -117,12 +117,12 @@ module Skylab::Autonomous_Component_System::TestSupport
           -> in_st do
             x = in_st.gets_one
             x.respond_to?( :bit_length ) or self._SANITY
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
           end
         end
 
         def __set__component qk, & _x_p
-          instance_variable_set qk.name.as_ivar, qk.value_x
+          instance_variable_set qk.name.as_ivar, qk.value
           true
         end
 

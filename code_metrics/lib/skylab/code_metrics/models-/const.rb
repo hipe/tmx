@@ -69,7 +69,7 @@ module Skylab::CodeMetrics
           mod = _mod_
           advance_one
         end until @no_unparsed_exists
-        Common_::Known_Known[ mod ]
+        Common_::KnownKnown[ mod ]
       end
 
       def gets_one
@@ -79,7 +79,7 @@ module Skylab::CodeMetrics
       end
 
       def head_as_is
-        @_current_token_knownness.value_x
+        @_current_token_knownness.value
       end
 
       def advance_one
@@ -112,7 +112,7 @@ module Skylab::CodeMetrics
         s = @_scn.scan CONST___
         if s
           s.freeze
-          @_current_token_knownness = Common_::Known_Known[ s ]
+          @_current_token_knownness = Common_::KnownKnown[ s ]
           ACHIEVED_
         else
           UNABLE_

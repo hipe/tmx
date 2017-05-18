@@ -21,7 +21,7 @@ module Skylab::Zerk::TestSupport
       end
       if ok
         st.advance_one
-        Common_::Known_Known[ x ]
+        Common_::KnownKnown[ x ]
       else
         pp[ nil ].call :error, :expression, :invalid_number do |y|
           y << "didn't look like a simple number (had: #{ ick x })"

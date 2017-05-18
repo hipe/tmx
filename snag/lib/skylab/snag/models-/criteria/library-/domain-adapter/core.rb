@@ -127,7 +127,7 @@ module Skylab::Snag
           end
 
           pair = _f.output_node_via_input_stream in_st, & oes_p
-          pair and pair.value_x
+          pair and pair.value
         end
 
         def _to_model_reflection_stream & map_p
@@ -178,7 +178,7 @@ module Skylab::Snag
             s_a = _human_s_a
             s_a_ = s_a.dup
             s_a_[ -1 ] = Home_.lib_.NLP::EN::POS::Noun[ s_a.fetch( -1 ) ].plural
-            Common_::Pair.via_value_and_name self, s_a_
+            Common_::QualifiedKnownKnown.via_value_and_association self, s_a_
           end
 
           def to_item_for_singular_name
@@ -188,7 +188,7 @@ module Skylab::Snag
 
           def __build_singular_item
 
-            Common_::Pair.via_value_and_name self, _human_s_a
+            Common_::QualifiedKnownKnown.via_value_and_association self, _human_s_a
           end
 
           def _human_s_a

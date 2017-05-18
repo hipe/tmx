@@ -35,7 +35,7 @@ module Skylab::Fields
             begin
               defn = st.gets
               defn or break
-              define_method defn.name_x, & defn.value_x
+              define_method defn.name_symbol, & defn.value
               redo
             end while nil
           end
@@ -90,7 +90,7 @@ module Skylab::Fields
         end
 
         def _set ivar, x
-          instance_variable_set ivar, Common_::Known_Known[ x ] ; x
+          instance_variable_set ivar, Common_::KnownKnown[ x ] ; x
         end
 
         def finish
@@ -105,7 +105,7 @@ module Skylab::Fields
         def _maybe ivar, then_m
           kn = remove_instance_variable ivar
           if kn
-            m = kn.value_x
+            m = kn.value
             if m
               send then_m, m
             end
@@ -171,7 +171,7 @@ module Skylab::Fields
         end
 
         def _define m, & p
-          Common_::Pair.via_value_and_name p, m
+          Common_::QualifiedKnownKnown.via_value_and_symbol p, m
         end
 
         def _writer_for atr

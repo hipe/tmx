@@ -85,7 +85,7 @@ module Skylab::TMX
           sym = as.current_primary_symbol
           kn = as.parse_primary_value_as_one_such_number_via_mutable_array a
           if kn
-            instance_variable_set :"@#{ sym }", kn.value_x
+            instance_variable_set :"@#{ sym }", kn.value
             ACHIEVED_
           end
         end

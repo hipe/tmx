@@ -34,7 +34,7 @@ module Skylab::Parse
       end
 
       def head_as_is
-        current_token_object.value_x
+        current_token_object.value
       end
 
       def current_token_object

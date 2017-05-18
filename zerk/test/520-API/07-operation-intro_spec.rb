@@ -17,7 +17,7 @@ module Skylab::Zerk::TestSupport
 
         qk = root_ACS_result
         qk.association.name_symbol.should eql :left_number
-        qk.value_x.should eql 10
+        qk.value.should eql 10
       end
 
       it "emits" do

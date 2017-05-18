@@ -13,7 +13,7 @@ module Skylab::TanMan
       end
 
       def for_one_or_two_QKs__ a
-        _for_one_to_two_BSRs a.map { |qk| qk.value_x }
+        _for_one_to_two_BSRs a.map { |qk| qk.value }
       end
 
       def for_qualified_knownness_and_direction__ qkn, dir_sym

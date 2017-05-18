@@ -62,7 +62,7 @@ module Skylab::Zerk::TestSupport
 
         via_integer = -> d do
           # (more validation here .. etc)
-          Common_::Known_Known[ d ]
+          Common_::KnownKnown[ d ]
         end
 
         if x.respond_to? :bit_length

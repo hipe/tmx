@@ -268,7 +268,7 @@ module Skylab::Brazen
             begin
               asmt = st.gets
               asmt || break
-              o.send :"#{ asmt.external_normal_name_symbol }=", asmt.value_x
+              o.send :"#{ asmt.external_normal_name_symbol }=", asmt.value
               redo
             end while above
           end

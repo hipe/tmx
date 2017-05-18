@@ -39,7 +39,7 @@ module Skylab::Zerk
         @parameter_value_source = ACS_::Parameter::ValueSource_for_ArgumentScanner.the_empty_value_source
         @_trouble_stack = ts
 
-        @on_unavailable_kn_ = Common_::Known_Known[ -> * i_a, & ev_p do
+        @on_unavailable_kn_ = Common_::KnownKnown[ -> * i_a, & ev_p do
 
           @did_emit_ = true
 
@@ -86,7 +86,7 @@ module Skylab::Zerk
       end
 
       def on_unavailable_= x
-        @on_unavailable_kn_ = Common_::Known_Known[ x ] ; x
+        @on_unavailable_kn_ = Common_::KnownKnown[ x ] ; x
       end
 
       # --
@@ -195,7 +195,7 @@ module Skylab::Zerk
         -> par do
           kn = p[ par ]
           if kn.is_known_known && @_operation_index.is_appropriated_( par.name_symbol )
-            @real_store_.accept_parameter_value kn.value_x, par
+            @real_store_.accept_parameter_value kn.value, par
           end
           kn
         end
@@ -241,7 +241,7 @@ module Skylab::Zerk
       def __on_unavailable
         kn = @on_unavailable_kn_  # used 1x more later..
         if kn
-          kn.value_x  # can be nil
+          kn.value  # can be nil
         else
           @_oes_p
         end

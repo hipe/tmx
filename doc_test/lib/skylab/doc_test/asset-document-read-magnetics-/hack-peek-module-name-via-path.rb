@@ -82,7 +82,7 @@ module Skylab::DocTest
         @tree.children_depth_first do |node|
           if node.children_count.zero?
             leaf_a.push node
-            dist_i_a.push Distill__[ node.value_x.last ]
+            dist_i_a.push Distill__[ node.value.last ]
           end
         end
 
@@ -116,7 +116,7 @@ module Skylab::DocTest
         @tree.children_depth_first do |node|
           if node.children_count.nonzero?
             branch_a.push node
-            dist_i_a.push Distill__[ node.value_x.last ]
+            dist_i_a.push Distill__[ node.value.last ]
           end
         end
 
@@ -132,7 +132,7 @@ module Skylab::DocTest
         dist_i_a.each_with_index do | distilled_i, idx |
           against_i == distilled_i or next
           _node = node_a.fetch idx
-          _const_i = _node.value_x.last
+          _const_i = _node.value.last
           seen_h.fetch _const_i do
             seen_h[ _const_i ] = true
             d_a.push idx
@@ -150,7 +150,7 @@ module Skylab::DocTest
       def bld_ambiguous_event node_a
 
         i_a = node_a.map do |node|
-          node.value_x.last
+          node.value.last
         end
 
         _event.build_not_OK_with(
@@ -177,11 +177,11 @@ module Skylab::DocTest
       def bld_not_found_event
 
         _leaf_i_a = @leaf_a.map do |leaf|
-          leaf.value_x.last
+          leaf.value.last
         end
 
         _branch_i_a = @branch_a.map do |branch|
-          branch.value_x.last
+          branch.value.last
         end
 
         _event.build_not_OK_with(
@@ -210,13 +210,13 @@ module Skylab::DocTest
 
       def when_money node
 
-        i_a = node.value_x.reverse
+        i_a = node.value.reverse
         node = node.parent
-        x = node.value_x
+        x = node.value
         while x
           i_a.concat x.reverse
           node = node.parent
-          x = node.value_x
+          x = node.value
         end
 
         i_a.reverse!

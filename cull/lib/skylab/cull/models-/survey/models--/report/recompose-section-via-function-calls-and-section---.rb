@@ -51,7 +51,7 @@ module Skylab::Cull
 
           if main_node
             func = Home_::Models_::Function_.unmarshal(
-              main_node.value_x, & @_emit )
+              main_node.value, & @_emit )
             if func
               __add_span func, node_a
             else
@@ -172,7 +172,7 @@ module Skylab::Cull
           @_emit.call :info, :removed_function_call do
             Build_event_.call(
               :remove_function_call,
-              :function_call, @removed_nodes.first.value_x,
+              :function_call, @removed_nodes.first.value,
               :ok, nil,
             )
           end
@@ -193,7 +193,7 @@ module Skylab::Cull
           @_emit.call :info, :added_function_call do
             Build_event_.call(
               :added_function_call,
-              :function_call, @added_nodes.first.value_x,
+              :function_call, @added_nodes.first.value,
               :ok, nil,
             )
           end

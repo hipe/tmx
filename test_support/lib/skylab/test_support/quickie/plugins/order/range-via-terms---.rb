@@ -26,7 +26,7 @@ module Skylab::TestSupport
           first_term, second_term = a
 
           if second_term
-            if second_term.value_x < first_term.value_x
+            if second_term.value < first_term.value
               do_reverse = true
               a.reverse!
             end
@@ -35,7 +35,7 @@ module Skylab::TestSupport
           end
 
           begin_, end_ = a.map do |term|
-            term.value_x - 1  # go from ordinal to offset
+            term.value - 1  # go from ordinal to offset
           end
 
           @range = begin_ .. end_

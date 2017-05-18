@@ -142,7 +142,7 @@ module Skylab::Brazen
             cm = kn.association.component_model
 
             if kn.is_known_known
-              x = kn.value_x
+              x = kn.value
               if x
                 if x.respond_to? :to_component_knownness_stream
                   y << "#{ margin_s }#{ kn.name.as_human }:"

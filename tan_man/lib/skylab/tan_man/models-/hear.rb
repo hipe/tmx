@@ -53,7 +53,7 @@ module Skylab::TanMan
 
         if on
           _me_as_box = to_box_
-          _hrd = Heard___.new on.value_x, _me_as_box, @_microservice_invocation_
+          _hrd = Heard___.new on.value, _me_as_box, @_microservice_invocation_
           exp._native_definition.execute_via_heard _hrd, & _listener_  # result is association entity (on success)
         else
           _listener_.call :error, :unrecognized_utterance do

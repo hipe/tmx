@@ -31,7 +31,7 @@ module Skylab::Cull
           :function == ast.external_normal_name_symbol or next  # for now
 
           func = Home_::Models_::Function_.unmarshal(
-            ast.value_x, & @_emit )
+            ast.value, & @_emit )
 
           if func
             @call_a.push func

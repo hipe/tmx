@@ -40,7 +40,7 @@ module Skylab::MyTerm::TestSupport
 
         qk = root_ACS_result
         qk.association.name_symbol.should eql :adapter
-        ada = qk.value_x
+        ada = qk.value
         ada.adapter_name_const.should eql COMMON_ADAPTER_CONST_
       end
 

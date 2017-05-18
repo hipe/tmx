@@ -61,9 +61,9 @@ module Skylab::TanMan
           #  because when syncing, the associations (input, hereput, output)
           #  that correspond to the BSR's are both known and uninteresting.)
 
-          o.in_reference = ( @_input && @_input.value_x )
-          o.here_reference = ( @_hereput && @_hereput.value_x )
-          o.out_reference = ( @_output && @_output.value_x )
+          o.in_reference = ( @_input && @_input.value )
+          o.here_reference = ( @_hereput && @_hereput.value )
+          o.out_reference = ( @_output && @_output.value )
 
           o.is_dry_run = remove_instance_variable :@dry_run
 

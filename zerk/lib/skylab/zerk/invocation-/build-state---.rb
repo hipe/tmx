@@ -87,7 +87,7 @@ module Skylab::Zerk
         if kn.is_effectively_known  # if it is set and not nil
           Require_fields_lib_[]
           if Field_::Takes_many_arguments[ @_asc ]
-            if kn.value_x.length.zero?
+            if kn.value.length.zero?
               kn = Common_::KNOWN_UNKNOWN
             end
           end
@@ -171,12 +171,12 @@ module Skylab::Zerk
 
         # (maybe this succeeded, maybe it failed. for now we are indifferent?)
 
-        Common_::Known_Known[ _business_result_x ]
+        Common_::KnownKnown[ _business_result_x ]
       end
 
       def __knownness_via_non_customized_operation_dependency
 
-        _oes_p = @_procure_bound_call.on_unavailable_kn_.value_x
+        _oes_p = @_procure_bound_call.on_unavailable_kn_.value
 
         ok_x = @_bc.receiver.send @_bc.method_name, * @_bc.args, & _oes_p
         if ok_x
@@ -185,7 +185,7 @@ module Skylab::Zerk
             self._WEEE  # maybe emit the events back into the bc block # #todo
           end
 
-          Common_::Known_Known[ ok_x ]
+          Common_::KnownKnown[ ok_x ]
         else
 
           _ = @_procure_bound_call.release_reasoning_

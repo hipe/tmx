@@ -90,7 +90,7 @@ module Skylab::Zerk::TestSupport
     context "if the value is nil and you pass no arguments.." do
 
       it "result is a knownness" do
-        _kn_and_as.first.value_x.nil? || fail
+        _kn_and_as.first.value.nil? || fail
       end
 
       it "arg scanner is empty" do
@@ -118,7 +118,7 @@ module Skylab::Zerk::TestSupport
       as.advance_one
 
       _kn = as.parse_primary_value
-      _xx = _kn.value_x
+      _xx = _kn.value
       _xx == :_money_two_ || fail
     end
 

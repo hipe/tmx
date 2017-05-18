@@ -33,7 +33,7 @@ module Skylab::Permute
       recurse = -> st, d do
 
         st_ = st.expand_by do |sct|
-          x_a = categories.fetch( d ).value_x  # as #here
+          x_a = categories.fetch( d ).value  # as #here
           Common_::Stream.via_times x_a.length do |d_|
             o = sct.dup
             o[ d ] = x_a.fetch d_
@@ -48,7 +48,7 @@ module Skylab::Permute
         end
       end
 
-      x_a = categories.fetch( 0 ).value_x  # as #here
+      x_a = categories.fetch( 0 ).value  # as #here
       st = Common_::Stream.via_times x_a.length do |d|
         struct_class.new x_a.fetch d
       end
@@ -63,7 +63,7 @@ module Skylab::Permute
 
     def __struct_class_via_categories cat_a
 
-      sym_a = cat_a.map( & :name_x )
+      sym_a = cat_a.map( & :name_symbol )
 
       const = GENERATED_STRUCT_CONSTS__.fetch sym_a do
 

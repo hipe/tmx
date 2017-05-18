@@ -19,7 +19,7 @@ module Skylab::SearchAndReplace::TestSupport
         _tree.children_depth_first_via_args_hook nil do |node, x, p|
           a = []
           x and a.push x
-          a.concat node.value_x
+          a.concat node.value
           mine = a * _SEP
           s_a.push mine
           p[ -> do

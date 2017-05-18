@@ -719,7 +719,7 @@ module Skylab::TestSupport
             if x.respond_to? :id2name
               x = x.id2name
             end
-            @__known_known = Common_::Known_Known[ x ]
+            @__known_known = Common_::KnownKnown[ x ]
           end
           _ok = p[ self ]
           _ok  # #todo
@@ -750,13 +750,13 @@ module Skylab::TestSupport
         # ~
 
         def mixed_value
-          @__known_known.value_x
+          @__known_known.value
         end
 
         def __process_plural
           kn = _normal_knownness
           if kn
-            _read.push kn.value_x
+            _read.push kn.value
             ACHIEVED_
           else
             kn
@@ -767,7 +767,7 @@ module Skylab::TestSupport
           x = _read
           if x.nil?
             kn = _normal_knownness
-            kn and _write kn.value_x
+            kn and _write kn.value
           else
             self._COVER_ME__policy_for_clobber__
           end
@@ -777,7 +777,7 @@ module Skylab::TestSupport
           # (leaving room for numerizers etc)
           x = @scanner.gets_one  # this could be fancier, but not today
           # ..
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
         end
 
         def _write x

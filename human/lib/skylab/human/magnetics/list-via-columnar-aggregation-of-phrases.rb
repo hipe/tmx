@@ -335,19 +335,20 @@ module Skylab::Human
         end
 
         def any_same_i_a frame_
-          same_i_a = nil
+
+          syms = nil
           frame = @queue.first
           scn = @nucleus.field_box.to_pair_stream
+
           while pair = scn.gets
-            _fld_NOT_USED, i = pair.to_a
-            x = frame[ i ]
-            x_ = frame_[ i ]
-            if x == x_
-              same_i_a ||= []
-              same_i_a.push i
-            end
+            sym = pair.name_symbol
+            _x = frame[ sym ]
+            _x_ = frame_[ sym ]
+            _x == _x_ || next
+            ( syms ||= [] ).push sym
           end
-          same_i_a
+
+          syms
         end
 
         def when_some_same_on_second_frame  # :#310

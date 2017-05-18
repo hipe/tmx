@@ -29,7 +29,7 @@ module Skylab::Parse
 
         if in_st.unparsed_exists
 
-          _x = in_st.current_token_object.value_x
+          _x = in_st.current_token_object.value
 
           s = ::String.try_convert _x
           if s

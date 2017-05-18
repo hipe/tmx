@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Magnetics_::GroupTree_via_ParsedNodeStream_and_Reductions < Common_::Dyadic
+  class Magnetics_::GroupTree_via_ParsedNodeStream_and_Reductions < Common_::Dyadic  # 1x
 
     def initialize st, a
       @parsed_node_stream = st
@@ -18,7 +18,7 @@ module Skylab::TMX
     # sort by last name, then (when last names are the same) first name,
     # then (when first names are ALSO the same) middle name. (and note that
     # even when all three are the same, there might be multiple entities
-    # (people) with these same three names.)
+    # (people) with these same three name components.)
     #
     #    +-------+        +-------+
     #    | group |-------O| group |
@@ -44,7 +44,7 @@ module Skylab::TMX
     # particular cost, like `123`, an the items in the list would all have
     # this cost in common.
     #
-    # in this model a "list" is actutually an abstract type: it can either
+    # in this model a "list" is actually an abstract type: it can either
     # be an "item list" or a "group tree". in this manner we can a recursive,
     # arbitrarily deep tree of groups.
 
@@ -98,7 +98,7 @@ module Skylab::TMX
           _groups = _pair_a.map do |pair|
             # map from a generic type to our local custom type
 
-            Group__.new ItemList__.new( pair.value_x ), pair.name_x
+            Group__.new ItemList__.new( pair.these_nodes ), pair.this_one_offset
           end
 
           _group_tree = GroupTree__.new _groups
@@ -167,7 +167,7 @@ module Skylab::TMX
       end
     end
 
-    Group__ = ::Struct.new :list, :value_x
+    Group__ = ::Struct.new :list, :value
 
     ItemList__ = ::Struct.new :items do
 

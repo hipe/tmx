@@ -61,7 +61,7 @@ module Skylab::Brazen
               properties: ( h_ = {} ) }
 
         while actual = @property_scan.gets
-          h_[ actual.name_symbol ] = actual.value_x
+          h_[ actual.name_symbol ] = actual.value
         end
 
         h

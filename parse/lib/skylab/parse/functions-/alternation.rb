@@ -39,7 +39,7 @@ module Skylab::Parse
 
           if on
 
-            break Home_::OutputNode.with on.value_x,
+            break Home_::OutputNode.with on.value,
               :constituent_index, d
 
           end
@@ -60,7 +60,7 @@ begin  # :/
   #
   # the output node has the winning value:
   #
-  #     on.value_x  # => :B
+  #     on.value  # => :B
   #
   # the output node reports the index of the winning node:
   #
@@ -77,11 +77,11 @@ begin  # :/
   #
   # and call it in another
   #
-  #     p[ :a ].value_x  # => :A
+  #     p[ :a ].value  # => :A
   #
   # and another:
   #
-  #     p[ :b ].value_x  # => :B
+  #     p[ :b ].value  # => :B
   #     p[ :c ]  # => nil
 
   # in the minimal case, the empty parser always results in nil
@@ -106,7 +106,7 @@ begin  # :/
   #
   # it parses one:
   #
-  #     p[ :one ].value_x  # => :is_one
+  #     p[ :one ].value  # => :is_one
   #
   # it parses two:
   #

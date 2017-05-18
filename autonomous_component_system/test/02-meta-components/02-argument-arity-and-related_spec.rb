@@ -83,14 +83,14 @@ module Skylab::Autonomous_Component_System::TestSupport
               oes_p_p[ nil ].call :error, :expression, :cant_have_it
               UNABLE_
             else
-              Common_::Known_Known[ s ]
+              Common_::KnownKnown[ s ]
             end
           end
         end
 
         def __set__component qk, & _x_p
 
-          instance_variable_set qk.name.as_ivar, qk.value_x
+          instance_variable_set qk.name.as_ivar, qk.value
           :_yerf_
         end
 

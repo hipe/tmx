@@ -81,9 +81,9 @@ module Skylab::Common
             & handle_event_selectively )
 
           if kn
-            @_path_to_open = pa.value_x
+            @_path_to_open = pa.value
             @_do_close = true
-            kn.value_x
+            kn.value
           else
             kn
           end

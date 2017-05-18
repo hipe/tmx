@@ -50,8 +50,8 @@ module Skylab::TanMan
               super
               mutable_back_properties.replace_by :digraph_path do | prp |
                 prp.dup.append_ad_hoc_normalizer do | arg |
-                  if arg.value_x and SLASH_BYTE___ != arg.value_x.getbyte( 0 )
-                    arg = arg.new_with_value ::File.expand_path arg.value_x
+                  if arg.value and SLASH_BYTE___ != arg.value.getbyte( 0 )
+                    arg = arg.new_with_value ::File.expand_path arg.value
                   end
                   arg
                 end.freeze

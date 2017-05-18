@@ -34,7 +34,7 @@ module Skylab::Cull
           prp = st.gets
           while prp
             if name_field_sym == prp.name_symbol
-              name_string = prp.value_x
+              name_string = prp.value
             else
               cache.push prp
             end
@@ -77,7 +77,7 @@ module Skylab::Cull
                   :"feature name" )
 
                 ent.add_actual_property_value_and_name(
-                  occurrence.prop.value_x,
+                  occurrence.prop.value,
                   :"feature value" )
               end ) )
           end

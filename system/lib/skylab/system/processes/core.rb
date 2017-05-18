@@ -31,7 +31,7 @@ module Skylab::System
         d += md[ :M ].to_i * 60  # minutes
         d += md[ :S ].to_i  # seconds
 
-        Common_::Known_Known[ epoch + d ]
+        Common_::KnownKnown[ epoch + d ]
       end
     end
 
@@ -40,7 +40,7 @@ module Skylab::System
       fld.interpret = -> s, & oes_p do
 
         if s
-          Common_::Known_Known[ s.to_i ]
+          Common_::KnownKnown[ s.to_i ]
         end
       end
     end
@@ -49,7 +49,7 @@ module Skylab::System
 
       fld.interpret = -> s, & oes_p do
         if s
-          Common_::Known_Known[ s ]
+          Common_::KnownKnown[ s ]
         end
       end
     end
@@ -208,7 +208,7 @@ module Skylab::System
 
           x = Record___[ @_first, @_header, @_struct_class, @_sorted_fields ]
           x or self._REDESIGN
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
 
         else
           self.__ROLL
@@ -346,7 +346,7 @@ module Skylab::System
           _k = field.name.as_lowercase_with_underscores_symbol
           wv = field.interpret s
           if wv
-            struct[ _k ] = wv.value_x
+            struct[ _k ] = wv.value
           else
             self._COVER_ME
           end

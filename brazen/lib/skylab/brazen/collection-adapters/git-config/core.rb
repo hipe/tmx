@@ -282,7 +282,7 @@ module Skylab::Brazen
       def each_pair
         @_elements_.each do |ast|
           :assignment == ast.nonterminal_symbol or next
-          yield ast.external_normal_name_symbol, ast.value_x
+          yield ast.external_normal_name_symbol, ast.value
         end
       end
 
@@ -349,7 +349,7 @@ module Skylab::Brazen
 
         d = @_offset_via_symbol_[ sym ]
         if d
-          @_elements_.fetch( d ).value_x
+          @_elements_.fetch( d ).value
         else
           raise ::NameError, "no such assignment '#{ sym }'"
         end
@@ -359,7 +359,7 @@ module Skylab::Brazen
 
         d = @_offset_via_symbol_[ sym ]
         if d
-          @_elements_.fetch( d ).value_x
+          @_elements_.fetch( d ).value
         end
       end
 
@@ -368,7 +368,7 @@ module Skylab::Brazen
           st = to_pair_stream
           pair = st.gets
           while pair
-            yield pair.name_symbol, pair.value_x
+            yield pair.name_symbol, pair.value
             pair = st.gets
           end
         else
@@ -386,8 +386,8 @@ module Skylab::Brazen
           if d < last
             d += 1
             ast = @_elements_.fetch d
-            Common_::Pair.via_value_and_name(
-              ast.value_x,
+            Common_::QualifiedKnownKnown.via_value_and_symbol(
+              ast.value,
               ast.external_normal_name_symbol )
           end
         end
@@ -419,9 +419,9 @@ module Skylab::Brazen
 
       # ~
 
-      def value_x
+      def value
         @did_unmarshal or unmarshal
-        @value_x
+        @value
       end
 
       def unmarshal
@@ -430,17 +430,17 @@ module Skylab::Brazen
         if Q__ == marshaled_s.getbyte( 0 )
           unmarshal_quoted_string
         elsif (( @md = INTEGER_RX__.match marshaled_s ))
-          @value_x = @md[ 0 ].to_i
+          @value = @md[ 0 ].to_i
         elsif TRUE_RX__ =~ marshaled_s
-          @value_x = true
+          @value = true
         elsif FALSE_RX__ =~ marshaled_s
-          @value_x = false
+          @value = false
         else
           @md = ALL_OTHERS_RX__.match marshaled_s
           @md or fail "sanity: #{ marshaled_s.inspect }"
           s = @md[ 0 ]
           if Mutate_value_string_for_UNmarshal[ s, & @listener ]
-            @value_x = s
+            @value = s
           end
         end
         NIL
@@ -457,7 +457,7 @@ module Skylab::Brazen
         @md or raise ParseError, "huh? #{ @_marshaled_string.inspect }"
         s = @md[ 0 ]
         if Mutate_value_string_for_UNmarshal[ s, & @listener ]
-          @value_x = s
+          @value = s
         end
         nil
       end

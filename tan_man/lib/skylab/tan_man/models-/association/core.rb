@@ -80,7 +80,7 @@ module Skylab::TanMan
       end
 
       def _DO_WRITE_COLLECTION_
-        @_DO_WRITE_COLLECTION_.value_x
+        @_DO_WRITE_COLLECTION_.value
       end
 
       # ~ )

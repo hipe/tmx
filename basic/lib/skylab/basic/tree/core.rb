@@ -107,7 +107,7 @@ module Skylab::Basic
 
     class Algortihm_Node__
 
-      attr_reader :children, :parent, :value_x
+      attr_reader :children, :parent, :value
 
       def children_depth_first & p
         if has_children
@@ -167,7 +167,7 @@ module Skylab::Basic
         me = self
         ( Mutable_Node_.new do
           @parent = parent
-          @value_x = me.value_x
+          @value = me.value
           if me.has_children
             cx_a = []
             o = me.to_child_stream
@@ -200,7 +200,7 @@ module Skylab::Basic
         instance_exec( & p )
       end
 
-      attr_writer :value_x
+      attr_writer :value
 
       def has_children
         ! @children.nil?

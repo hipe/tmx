@@ -148,7 +148,7 @@ module Skylab::Snag::TestSupport
       if st.unparsed_exists
 
         fail "did not parse token #{ st.current_index }: #{
-          }#{ st.current_token_object.value_x.inspect }"
+          }#{ st.current_token_object.value.inspect }"
       end
     end
 

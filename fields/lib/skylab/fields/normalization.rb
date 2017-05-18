@@ -793,7 +793,7 @@ module Skylab::Fields
         def __resolve_unsanitized_value
           kn = @_callbacks_.__resolve_unsanitized_value_for_ @normal_association
           if kn
-            @_unsanitized_value_ = kn.value_x ; ACHIEVED_
+            @_unsanitized_value_ = kn.value ; ACHIEVED_
           end
         end
 
@@ -915,7 +915,7 @@ module Skylab::Fields
           p = a.pop
           kn = _kn_by[ * a, & p ]
           if kn
-            @_sanitized_value_ = kn.value_x ; true
+            @_sanitized_value_ = kn.value ; true
           end
         end
 
@@ -948,7 +948,7 @@ module Skylab::Fields
           kn = @normal_association.normalize_by[ _qkn, & @_callbacks_.listener ]
           if kn
             if kn.is_known_known
-              @_sanitized_value_ = kn.value_x
+              @_sanitized_value_ = kn.value
             else
               @_sanitized_value_ = nil  # our indifference. [sn]
             end
@@ -1196,7 +1196,7 @@ module Skylab::Fields
         end
 
         def _write
-          @entity._write_via_association_ @_new_knownness.value_x, @native_association
+          @entity._write_via_association_ @_new_knownness.value, @native_association
           NIL
         end
 

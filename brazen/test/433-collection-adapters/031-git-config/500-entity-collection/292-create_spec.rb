@@ -63,8 +63,8 @@ module Skylab::Brazen::TestSupport
         asmt1 || fail
         asmt2 = h[ :weight_in_ounces ]
         asmt2 || fail
-        asmt1.value_x == 123456 || fail
-        asmt2.value_x == "heavy" || fail
+        asmt1.value == 123456 || fail
+        asmt2.value == "heavy" || fail
       end
 
       it "the assignment that was nil did *not* write to the document" do

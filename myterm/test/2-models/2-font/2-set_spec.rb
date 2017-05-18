@@ -86,7 +86,7 @@ module Skylab::MyTerm::TestSupport
       it "because succeeds, results in qk about the path" do
 
         _qk = root_ACS_result
-        _qk.value_x.should match %r(\bMonaco\.dfont\z)
+        _qk.value.should match %r(\bMonaco\.dfont\z)
       end
 
       it "event sounds natural (but is not yet contextualized)" do

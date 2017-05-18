@@ -43,7 +43,7 @@ module Skylab::Cull
         s_a = [ "(" ]
         if prp
           p = -> prp_ do
-            "#{ prp.name.as_slug }: #{ val prp_.value_x }"
+            "#{ prp.name.as_slug }: #{ val prp_.value }"
           end
           s_a.push p[ prp ]
           prp = st.gets
@@ -71,7 +71,7 @@ module Skylab::Cull
         @actual_properties.each do | prp |
           sym = prp.name_symbol
           h.delete sym or next
-          h_[ sym ] = prp.value_x
+          h_[ sym ] = prp.value
           h.length.zero? and break
         end
         i_a.map { |i| h_[ i ] }
@@ -80,7 +80,7 @@ module Skylab::Cull
 
     def [] sym
       prp = actual_property_via_name_symbol sym
-      prp and prp.value_x
+      prp and prp.value
     end
 
     def get_property_name_symbols
@@ -102,7 +102,7 @@ module Skylab::Cull
     def to_even_iambic
       a = []
       @actual_properties.each do | prp |
-        a.push prp.name_symbol, prp.value_x
+        a.push prp.name_symbol, prp.value
       end
       a
     end
@@ -148,19 +148,15 @@ module Skylab::Cull
     class Actual_Property__
 
       def initialize x, sym
-        @value_x = x
+        @value = x
         @name_symbol = sym
-      end
-
-      def members
-        [ :value_x, :name, :name_symbol ]
       end
 
       def name
         @nm ||= Common_::Name.via_variegated_symbol @name_symbol
       end
 
-      attr_reader :value_x, :name_symbol
+      attr_reader :value, :name_symbol
     end
   end
 end

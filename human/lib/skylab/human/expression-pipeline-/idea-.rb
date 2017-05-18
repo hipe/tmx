@@ -142,7 +142,7 @@ module Skylab::Human
 
       def __add__component qk, & _
 
-        o = qk.value_x
+        o = qk.value
         @__slots.add o.slot_symbol, o
         o
       end

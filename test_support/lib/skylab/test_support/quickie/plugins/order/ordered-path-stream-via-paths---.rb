@@ -33,11 +33,11 @@ module Skylab::TestSupport
           pairs = node.to_pair_stream.to_a
 
           pairs.sort_by! do |pair|
-            # back when it mattered: pair.value_x.has_children
+            # back when it mattered: pair.value.has_children
             Comparer_for___[ pair ]
           end
 
-          _new_order_ = pairs.map( & :name_x )
+          _new_order_ = pairs.map( & :name_symbol )  # (strings actually)
 
           node.a_.replace _new_order_
 
@@ -51,11 +51,13 @@ module Skylab::TestSupport
         \z/x
 
         Comparer_for___ = -> pair do
-          md = rx.match pair.name_x
+
+          # (kind of awful, we collaborate knowing that the keys are strings not symbols)
+          md = rx.match pair.name_symbol
           if md
             Numbered_Comparer___.new md
           else
-            Non_Numbered_Comparer___.new pair.name_x
+            Non_Numbered_Comparer___.new pair.name_symbol
           end
         end
 

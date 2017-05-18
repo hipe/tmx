@@ -58,7 +58,7 @@ module Skylab::System
             :filesystem, Home_.services.filesystem,
             & p
           )
-          kn && kn.value_x
+          kn && kn.value
 
         else
           ::File.open @path, ::File::RDONLY

@@ -45,7 +45,7 @@ module Skylab::GitViz
 
           arg and begin
 
-            @path = arg.value_x  # probably same object
+            @path = arg.value  # probably same object
             ACHIEVED_
           end
         end
@@ -64,7 +64,7 @@ module Skylab::GitViz
             & @on_event_selectively )
 
           if kn
-            kn.value_x.to_path  # sanity check that result is a dir object
+            kn.value.to_path  # sanity check that result is a dir object
             ACHIEVED_
           else
             kn

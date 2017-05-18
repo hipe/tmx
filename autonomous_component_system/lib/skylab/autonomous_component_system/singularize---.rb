@@ -71,7 +71,7 @@ module Skylab::Autonomous_Component_System
             & x_p )
 
           if qk
-            ok_value_a.push qk.value_x
+            ok_value_a.push qk.value
           else
             ok = false
             break
@@ -79,7 +79,7 @@ module Skylab::Autonomous_Component_System
         end
 
         if ok
-          Common_::Known_Known[ ok_value_a ]
+          Common_::KnownKnown[ ok_value_a ]
         else
           # assume the callback was called
           ok

@@ -265,7 +265,7 @@ module Skylab::System
           ( item_a.each do |item|
             _node = Immu_Node__.new do
               @parent = parent
-              @value_x = item.name_i_a
+              @value = item.name_i_a
               if item.has_children
                 cx_a = []
                 me.build_each_immutable_child item.children, self do |x|

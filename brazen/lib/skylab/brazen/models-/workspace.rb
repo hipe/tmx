@@ -557,7 +557,7 @@ module Skylab::Brazen
 
         qkn = @bx.fetch :workspace_path
         if qkn.is_known_known
-          ws_path = qkn.value_x
+          ws_path = qkn.value
         end
 
         if ws_path
@@ -583,8 +583,8 @@ module Skylab::Brazen
 
         @ws = @silo_module.edit_entity @kernel, @oes_p do |o|
           o.edit_with(
-            :config_filename, @bx.fetch( :config_filename ).value_x,
-            :surrounding_path, @bx.fetch( :workspace_path ).value_x )
+            :config_filename, @bx.fetch( :config_filename ).value,
+            :surrounding_path, @bx.fetch( :workspace_path ).value )
         end
 
         @ws and __via_workspace_produce_existent_workspace_via_qualified_knownness_box @bx
@@ -593,7 +593,7 @@ module Skylab::Brazen
       def __via_workspace_produce_existent_workspace_via_qualified_knownness_box bx
 
         did_find = @ws.resolve_nearest_existent_surrounding_path(
-          bx.fetch( :max_num_dirs ).value_x,
+          bx.fetch( :max_num_dirs ).value,
           :prop, bx.fetch( :workspace_path ).association,
           & @oes_p )
 
@@ -622,7 +622,7 @@ module Skylab::Brazen
 
         pair = @bx[ :just_looking ]
 
-        if pair && pair.value_x
+        if pair && pair.value
           __when_just_looking i_a, & ev_p
         else
           maybe_send_event_via_channel i_a do

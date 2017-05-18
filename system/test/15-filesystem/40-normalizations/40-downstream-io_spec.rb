@@ -93,7 +93,7 @@ module Skylab::System::TestSupport
       expect_neutral_event :before_probably_creating_new_file
       expect_no_more_events
 
-      x = @result.value_x
+      x = @result.value
       d = x.write 'abc'
       3 == d or fail
       x.close
@@ -117,7 +117,7 @@ module Skylab::System::TestSupport
       expect_neutral_event :before_editing_existing_file
       expect_no_more_events
 
-      io = @result.value_x
+      io = @result.value
       io.write 'hey'
       io.close
 

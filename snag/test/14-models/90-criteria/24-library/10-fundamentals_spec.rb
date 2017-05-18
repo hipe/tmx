@@ -44,14 +44,14 @@ module Skylab::Snag::TestSupport
 
       on = parse_against_ 'is', 'on'
       on.symbol.should eql :the_ON_form
-      on.value_x.should eql :on
+      on.value.should eql :on
     end
 
     it "parse the second case" do
 
       on = parse_against_ 'is', 'off'
       on.symbol.should eql :the_OFF_form
-      on.value_x.should eql :off
+      on.value.should eql :off
     end
 
     it "parse neither" do
@@ -135,7 +135,7 @@ module Skylab::Snag::TestSupport
       _x = against_ st
       _x.length.should eql 3
       st.current_index.should eql 6
-      st.current_token_object.value_x.should eql 'or'
+      st.current_token_object.value.should eql 'or'
     end
 
     it "trippel (long case)" do

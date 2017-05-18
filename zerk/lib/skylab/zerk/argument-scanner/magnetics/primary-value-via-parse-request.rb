@@ -34,7 +34,7 @@ module Skylab::Zerk
             # if an argument is provided and there is no norm chain, any.
             x = _head_as_is_or_should_be
             @argument_scanner.advance_one
-            Common_::Known_Known[ x ]
+            Common_::KnownKnown[ x ]
           end
         end
 

@@ -11,7 +11,7 @@ module Skylab::Fields
 
       # at one point it was called "bounder". produce something like a
       # [#co-004] qualified knownness, but one that produces the value
-      # real-time whenever `value_x` is called (as opposed to being
+      # real-time whenever `value` is called (as opposed to being
       # a "cold", immutable structure).
       #
       # this is used in one file in [tm] (and also it is covered here.)
@@ -45,7 +45,7 @@ module Skylab::Fields
         @association = asc
       end
 
-      def value_x
+      def value
         @__dereference[]
       end
 

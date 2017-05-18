@@ -47,10 +47,10 @@ module Skylab::Brazen
           while pair = st.gets
             if NAME_SYMBOL == pair.name_symbol
               did_see_name = true
-              @name_x = pair.value_x
+              @name_x = pair.value
               next
             end
-            pair.value_x.nil? and next
+            pair.value.nil? and next
             body_pair_a.push pair
           end
 
@@ -201,7 +201,7 @@ module Skylab::Brazen
             if s.include? UNDERSCORE_
               pair = pair.with_name_symbol s.gsub( UNDERSCORE_, DASH_ ).intern
             end
-            @section[ pair.name_symbol ] = pair.value_x
+            @section[ pair.name_symbol ] = pair.value
           end
 
           ACHIEVED_

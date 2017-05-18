@@ -344,7 +344,7 @@ module Skylab::Snag
 
       def __receive_criteria_expression x
 
-        _ct = if x.respond_to? :value_x
+        _ct = if x.respond_to? :value
           x
         else
           @_word_array = x
@@ -363,7 +363,7 @@ module Skylab::Snag
 
       def __receive_trueish__criteria_tree__ ct
 
-        sym_a = ct.name_x
+        sym_a = ct.association
 
         1 == sym_a.length || self._HAVE_FUN__deep_names_you_dont_want_this__
 
@@ -398,7 +398,7 @@ module Skylab::Snag
 
         _lookup_p = expad.method :lookup_associated_model_
 
-        @_criteria_proc = @criteria_tree.value_x.to_criteria_proc_under_ _lookup_p
+        @_criteria_proc = @criteria_tree.value.to_criteria_proc_under_ _lookup_p
 
         ACHIEVED_
       end

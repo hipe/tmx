@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
 
         it "value of list" do
           _bnd = _of_list_attribute
-          _a = _bnd.value_x
+          _a = _bnd.value
           _a == %w( goldfish llama ) || fail
         end
 

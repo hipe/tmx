@@ -40,7 +40,7 @@ module Skylab::Zerk
 
         # now, an entity-item table *is* a two-dimensional thing, but nah..
 
-        _x_a = @_qk.value_x
+        _x_a = @_qk.value
 
         long_s = ""
         y = Basic_[]::Yielder::Mapper.joiner( long_s, ', ' ).y
@@ -67,7 +67,7 @@ module Skylab::Zerk
 
         _prepare_etc
 
-        _ = @_string_via_mixed[ @_qk.value_x ]
+        _ = @_string_via_mixed[ @_qk.value ]
 
         [ _ ]
       end

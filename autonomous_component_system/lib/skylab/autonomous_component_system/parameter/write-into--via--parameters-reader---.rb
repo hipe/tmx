@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System
           kn = hrdr.read_value_via_symbol__ k
 
           if kn.is_known_known
-            kn.value_x
+            kn.value
           else
             else_p[]
           end

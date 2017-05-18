@@ -199,7 +199,7 @@ module Skylab::Basic
       end
 
       def execute
-        @mixed_value = @qualified_knownness.value_x
+        @mixed_value = @qualified_knownness.value
         send DIRECTION_SHAPE_RX___.match( @qualified_knownness.name_symbol )[ :shape ]
       end
 

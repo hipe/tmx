@@ -8,12 +8,12 @@ module Skylab::Snag
 
         if qkn.is_known_known
 
-          if RX___ =~ qkn.value_x
+          if RX___ =~ qkn.value
 
-            qkn.new_with_value new qkn.value_x
+            qkn.new_with_value new qkn.value
           else
             oes_p.call :error, :invalid_date do
-              __build_invalid_date_event qkn.value_x
+              __build_invalid_date_event qkn.value
             end
             UNABLE_
           end

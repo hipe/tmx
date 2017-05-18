@@ -84,13 +84,13 @@ module Skylab::SubTree
           qkn_bx = to_qualified_knownness_box_proxy
 
           x = qkn_bx.any_trueish :file_of_input_paths
-          x and x.value_x.length.nonzero? and a.push x
+          x and x.value.length.nonzero? and a.push x
 
           x = qkn_bx.any_trueish :path
           x and a.push x
 
           x = qkn_bx.any_trueish :input_stream
-          x and ! x.value_x.tty? and a.push x
+          x and ! x.value.tty? and a.push x
 
           case 1 <=> a.length
           when  0
@@ -186,7 +186,7 @@ module Skylab::SubTree
           end
 
           _ = Files_::Magnetics_::Find_via_Paths_and_Pattern.via(
-            :paths, @upstream_arg.value_x,
+            :paths, @upstream_arg.value,
             :pattern, @pattern,
             & _listener )
 
@@ -226,7 +226,7 @@ module Skylab::SubTree
 
             if kn
 
-              @upstream_IO = kn.value_x
+              @upstream_IO = kn.value
               ACHIEVED_
             else
               kn
@@ -239,7 +239,7 @@ module Skylab::SubTree
           if @pattern
             _when_pattern
           else
-            @upstream_IO = @upstream_arg.value_x
+            @upstream_IO = @upstream_arg.value
             ACHIEVED_
           end
         end

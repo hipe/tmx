@@ -26,7 +26,7 @@ module Skylab::Brazen
       end
 
       def check_force
-        if @force_arg.value_x
+        if @force_arg.value
           ACHIEVED_
         else
           when_force_not_present
@@ -47,7 +47,7 @@ module Skylab::Brazen
       end
 
       def work
-        if @dry_run_arg.value_x
+        if @dry_run_arg.value
           delete_collection_when_dry_run
           ACHIEVED_
         else

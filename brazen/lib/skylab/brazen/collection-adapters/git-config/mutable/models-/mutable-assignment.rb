@@ -120,7 +120,7 @@ module Skylab::Brazen
             # for emissions in events. only while our type system has the
             # constraints it has, the below magically "just works" for now:
 
-            "( #{ @__name_string_as_received } : #{ value_x.inspect } )"
+            "( #{ @__name_string_as_received } : #{ value.inspect } )"
           end
 
           def write_bytes_into y
@@ -137,10 +137,10 @@ module Skylab::Brazen
           end
 
           def value_as_result_of_dereference_or_lookup_softy_
-            value_x
+            value
           end
 
-          def value_x
+          def value
             send @_value
           end
 

@@ -25,7 +25,7 @@ module Skylab::Zerk::TestSupport
         qk = root_ACS_result
         qk.is_known_known or fail
         qk.association.model_classifications.looks_compound or fail
-        qk.value_x.hello.should eql :_hi_
+        qk.value.hello.should eql :_hi_
       end
     end
 
@@ -68,7 +68,7 @@ module Skylab::Zerk::TestSupport
       it "result is a qk about the component" do
         qk = root_ACS_result
         qk.is_known_known or fail
-        qk.value_x.should eql :_xXx_
+        qk.value.should eql :_xXx_
         qk.association.name.as_variegated_symbol.should eql :file_name
       end
     end

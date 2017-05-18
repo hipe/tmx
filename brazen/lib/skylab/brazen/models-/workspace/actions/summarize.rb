@@ -77,8 +77,8 @@ module Skylab::Brazen
             pair = st.gets
             pair or break
             count += 1
-            d, i = pair.to_a
-            s = i.id2name
+            d = pair.value
+            s = pair.name_symbol.id2name
             s.gsub! UNDERSCORE_, SPACE_
             y << "  • #{ d } #{ plural_noun d, s }"
             redo

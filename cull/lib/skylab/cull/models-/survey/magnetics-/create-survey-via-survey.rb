@@ -37,7 +37,7 @@ module Skylab::Cull
 
           # the value of the known is a mock directory. for sanity:
 
-          kn.value_x.to_path or fail
+          kn.value.to_path or fail
           ACHIEVED_
         end
       end

@@ -251,14 +251,14 @@ module Skylab::SearchAndReplace
           def via_tree_guess_and_loaded_path_resolve_function
 
             tree = @tree.dup_mutable
-            tree.value_x = ::Object
+            tree.value = ::Object
             @func = nil
 
             tree.children_depth_first do |node|
 
-              const_i_a = node.value_x
+              const_i_a = node.value
 
-              x = const_i_a.reduce node.parent.value_x do |m, i|
+              x = const_i_a.reduce node.parent.value do |m, i|
                 m.const_get i, false
               end
 
@@ -270,7 +270,7 @@ module Skylab::SearchAndReplace
 
               @func and break
 
-              node.value_x = x
+              node.value = x
             end
             if ! @func  # search at toplevel
               @func = Autoloader_.const_reduce [ @custom_symbol ], ::Object do end

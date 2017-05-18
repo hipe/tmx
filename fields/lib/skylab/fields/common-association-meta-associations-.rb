@@ -122,7 +122,7 @@ module Skylab::Fields
 
         @_association_.argument_value_producer_by_ do
           -> do
-            Common_::Known_Known[ argument_scanner_.gets_one ]
+            Common_::KnownKnown[ argument_scanner_.gets_one ]
           end
         end
       end

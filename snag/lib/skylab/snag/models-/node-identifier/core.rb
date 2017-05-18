@@ -254,7 +254,7 @@ module Skylab::Snag
 
     def __set__component qk, & _x_p
 
-      instance_variable_set qk.name.as_ivar, qk.value_x
+      instance_variable_set qk.name.as_ivar, qk.value
       ACHIEVED_
     end
 

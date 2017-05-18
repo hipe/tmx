@@ -84,7 +84,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             s = st.head_as_is
             if /\A[A-Z ]+\z/ =~ s
               st.advance_one
-              Common_::Known_Known[ s ]
+              Common_::KnownKnown[ s ]
             else
 
               _oes_p = oes_p_p[ nil ]
@@ -109,7 +109,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __set__component qk, & _x_p
 
-          instance_variable_set qk.name.as_ivar, qk.value_x
+          instance_variable_set qk.name.as_ivar, qk.value
           true
         end
 

@@ -100,7 +100,7 @@ module Skylab::Brazen
           stru = x_a[ -3 ]
           x = mod
           mod = if stru
-            stru.value_x
+            stru.value
           end
           x
         end

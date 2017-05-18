@@ -124,7 +124,7 @@ module Skylab::Fields
 
       def __main_add_as_recurse reason_x
 
-        @_ff_pfx ||= Common_::Known_Known[ __determine_any_prefix ]
+        @_ff_pfx ||= Common_::KnownKnown[ __determine_any_prefix ]
 
         asc = reason_x.compound_formal_attribute
 
@@ -142,7 +142,7 @@ module Skylab::Fields
         end
 
         _hard_coded_for_now = [ :statementish,
-          :freeform_prefix, @_ff_pfx.value_x,
+          :freeform_prefix, @_ff_pfx.value,
           :verb_phrase, [
             :predicateish,
             :auxiliary, :must,

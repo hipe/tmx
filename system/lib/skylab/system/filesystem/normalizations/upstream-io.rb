@@ -173,7 +173,7 @@ module Skylab::System
 
         if @do_lock_file_
           if resolve_locked_open_IO_ __mode
-            Common_::Known_Known[ remove_instance_variable :@locked_open_IO_ ]
+            Common_::KnownKnown[ remove_instance_variable :@locked_open_IO_ ]
           else
             _when_exception
           end
@@ -222,7 +222,7 @@ module Skylab::System
 
         if @_expected_ftype == @stat_.ftype
 
-          Common_::Known_Known[ ACHIEVED_ ]
+          Common_::KnownKnown[ ACHIEVED_ ]
         else
           @listener.call :error, :wrong_ftype do
             build_wrong_ftype_event_ path_, @stat_, @_expected_ftype

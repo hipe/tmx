@@ -18,7 +18,7 @@ module Skylab::MyTerm::TestSupport
         qk = root_ACS_result
         qk.is_known_known or fail
         qk.name.as_variegated_symbol.should eql :adapter
-        qk.value_x.should be_nil
+        qk.value.should be_nil
       end
 
       def event_log

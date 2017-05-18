@@ -127,9 +127,10 @@ module Skylab::Basic
         def argument_value_array= p_a
 
           @_pair_stream = Common_::Stream.via_times p_a.length do |d|
-            Common_::Pair.via_value_and_name(
+            Common_::QualifiedKnownKnown.via_value_and_symbol(
               p_a.fetch( d ),
-              @association_box.at_offset( d ) )
+              @association_box.at_offset( d ),  # (is symbol)
+            )
           end
           p_a
         end
@@ -171,7 +172,7 @@ module Skylab::Basic
 
             k = pair.name_symbol
 
-            proc_hash[ h.fetch k ] = pair.value_x
+            proc_hash[ h.fetch k ] = pair.value
 
             dim_pool.delete k
             redo

@@ -88,7 +88,7 @@ module Skylab::TestSupport
         -> st do
           x = st.gets_one
           ::Array.try_convert x or Zerk_._SANTIY
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         end
       end
 
@@ -109,7 +109,7 @@ module Skylab::TestSupport
         -> st do
           x = st.gets_one
           ::Array.try_convert( x ) && Home_._SANITY
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         end
       end
 

@@ -27,7 +27,7 @@ module Skylab::TaskExamples
       end
 
       if kn
-        @created_directory = kn.value_x
+        @created_directory = kn.value
         ACHIEVED_
       else
         remove_instance_variable :@_result

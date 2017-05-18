@@ -29,7 +29,7 @@ module Skylab::Basic
               arglist = ::Array.new bx.length
 
               while pair = pair_stream.gets
-                arglist[ bx.offset_of pair.name_symbol ] = pair.value_x
+                arglist[ bx.offset_of pair.name_symbol ] = pair.value
               end
 
               o = orig_new_( * arglist )  # ick

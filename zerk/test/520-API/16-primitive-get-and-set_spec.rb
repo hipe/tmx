@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
         end
 
         it "ok" do
-          root_ACS_result.value_x.should eql 123
+          root_ACS_result.value.should eql 123
         end
       end
 
@@ -75,7 +75,7 @@ module Skylab::Zerk::TestSupport
 
         it "appears to work" do
           _qk = root_ACS_result
-          _qk.value_x.should eql 98
+          _qk.value.should eql 98
         end
 
         it "worked" do

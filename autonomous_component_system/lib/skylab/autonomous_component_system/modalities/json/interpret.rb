@@ -110,7 +110,7 @@ module Skylab::Autonomous_Component_System
             pair = st.gets
             pair or break
             sym = pair.name_symbol
-            x = pair.value_x
+            x = pair.value
 
             qk = ob.lookup_softly sym
             had = qk ? true : false
@@ -251,7 +251,7 @@ module Skylab::Autonomous_Component_System
 
           _ctx_ = ::Skylab::Basic::List::Linked[ @context_linked_list, _desc_p ]
 
-          _json_as_h = qk.value_x
+          _json_as_h = qk.value
 
           _rw = Home_::ReaderWriter.for_componentesque cmp
 
@@ -297,7 +297,7 @@ module Skylab::Autonomous_Component_System
           # UOW any more: we are in the middle of a depth-first building
           # of a compound component.
 
-          _arg_scn = Home_.lib_.fields::Argument_scanner_via_value[ qk.value_x ]
+          _arg_scn = Home_.lib_.fields::Argument_scanner_via_value[ qk.value ]
 
           # using the "value popper" (a shortlived proxy that looks like
           # a stream but only wraps one value) is our way of leveraging

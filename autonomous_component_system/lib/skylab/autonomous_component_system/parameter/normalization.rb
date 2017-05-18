@@ -111,7 +111,7 @@ module Skylab::Autonomous_Component_System
           # these two cases with one behavior.
 
           if evl.is_known_known
-            evl.value_x.nil? or self._SANITY
+            evl.value.nil? or self._SANITY
             reasoning_x = nil
           else
             reasoning_x = evl.reasoning

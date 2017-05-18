@@ -103,11 +103,11 @@ module Skylab::CodeMetrics
         :argument_arity, :zero_or_more,
 
         :ad_hoc_normalizer, -> qkn, & oes_p do
-          a = qkn.value_x
+          a = qkn.value
           if '[]' == a.last
             a.clear  # EGADS!
           end
-          Common_::Known_Known[ a ]
+          Common_::KnownKnown[ a ]
         end,
 
         :default, [ '.*' ],

@@ -35,7 +35,7 @@ module Skylab::Zerk
         end
 
         def pair_via_normal_symbol k
-          Common_::Pair.via_value_and_name @hash.fetch(k), k
+          Common_::QualifiedKnownKnown.via_value_and_symbol @hash.fetch(k), k
         end
 
         def to_loadable_reference_stream

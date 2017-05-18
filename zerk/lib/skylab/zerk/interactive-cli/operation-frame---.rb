@@ -105,7 +105,7 @@ module Skylab::Zerk
         _p[ _ss ]
       end
 
-      Reference__ = ::Struct.new :value_x
+      Reference__ = ::Struct.new :value
 
       def __build_handler_builder
 

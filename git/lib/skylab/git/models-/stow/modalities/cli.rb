@@ -156,7 +156,7 @@ module Skylab::Git
 
         def knownness_for sym
 
-          Common_::Known_Known[ instance_variable_get :"@__#{ sym }__" ]
+          Common_::KnownKnown[ instance_variable_get :"@__#{ sym }__" ]
         end
       end
     end

@@ -25,7 +25,7 @@ module Skylab::TanMan
 
         @_gx_qkn = @association_value_reader.association_reader_via_symbol :add_treetop_grammar  # a "list" b.p
 
-        @_gx_qkn.value_x.each_with_index do |grammar_path, d|
+        @_gx_qkn.value.each_with_index do |grammar_path, d|
 
           @_grammar_path = grammar_path
           @_item_index = d
@@ -76,7 +76,7 @@ module Skylab::TanMan
       def _check_dir sym  # must assert is (existent) directory
 
         ar = @association_value_reader.association_reader_via_symbol sym
-        dir = ar.value_x
+        dir = ar.value
 
         ok = if dir
 
@@ -174,7 +174,7 @@ module Skylab::TanMan
 
           y << "#{ nm qkn_.name } must be an absolute #{
             }path in order to expand paths like #{ nm qkn.name } #{
-              }(path: #{ pth qkn.value_x })"
+              }(path: #{ pth qkn.value })"
         end
       end
 
@@ -191,7 +191,7 @@ module Skylab::TanMan
 
         build_not_OK_event_with :not_a_directory do |y, _|
 
-          y << "#{ nm qkn.name } is not a directory: #{ pth qkn.value_x }"
+          y << "#{ nm qkn.name } is not a directory: #{ pth qkn.value }"
         end
       end
 
@@ -199,7 +199,7 @@ module Skylab::TanMan
 
         build_not_OK_event_with :not_found do |y, _|
 
-          y << "#{ nm qkn.name } not found: #{ pth qkn.value_x }"
+          y << "#{ nm qkn.name } not found: #{ pth qkn.value }"
         end
       end
 

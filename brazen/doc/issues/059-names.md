@@ -54,19 +54,8 @@ alongside "pairs" and "unqualified knownnesses".
 
 ## a pair :[#ca-055]
 
-when we group a name and a value in a general way we call this a "pair."
-always the means of accessing this pair's constituents must be with the
-methods `value_x` and `name_x` (or use the alias for `name` IFF it
-holds a name function).
+(this used to be a simple, dedicates struct; but is now under the [#co-004] stack)
 
-the members are suffixed with `x` to remind the user that their shape is
-freeform -- the "name" is not necesssarily a name function, for example.
-
-although this is currently a platform struct, avoid `to_a` because our conventional
-ordering of this pair is "value, name" (volatility order) not
-"name, value" (the more familiar, idiomatic order of these terms).
-since our convention is at oods with the idiom and the idiom is at odds
-with our convention, we opt to formaize this order as undefined.
 
 
 
@@ -89,3 +78,10 @@ see [#ca-004] for a full treatment on this.
 `property` - what entities handle. also an object modeling the formal value.
 
 `qualified_knownness` - see [#ca-004]
+
+
+
+
+## document meta
+
+  - #history-A: when the "pair" structure went away

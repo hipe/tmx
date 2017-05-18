@@ -71,7 +71,7 @@ module Skylab::System
         else
 
           if ! @do_ignore_case
-            @do_ignore_case = Common_::Known_Known[ opts.is_ignorecase ]
+            @do_ignore_case = Common_::KnownKnown[ opts.is_ignorecase ]
           end
 
           @_use_as_grep_extended_regexp = @ruby_regexp.source
@@ -98,7 +98,7 @@ module Skylab::System
       def __resolve_regexp_via_egrep_string
 
         if ! @do_ignore_case
-          @do_ignore_case = Common_::Known_Known[ false ]  # ..
+          @do_ignore_case = Common_::KnownKnown[ false ]  # ..
         end
 
         s = @grep_extended_regexp_string
@@ -146,7 +146,7 @@ module Skylab::System
 
         cmd.push GREP___, E_OPTION___
 
-        if @do_ignore_case.value_x
+        if @do_ignore_case.value
           cmd.push IGNORE_CASE_OPTION__
         end
 

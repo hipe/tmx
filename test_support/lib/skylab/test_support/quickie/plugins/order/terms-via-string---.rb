@@ -98,7 +98,7 @@ module Skylab::TestSupport
           if rest.length.zero?
             a.push sym
           else
-            a.push Common_::Pair.via_value_and_name( * rest, sym )
+            a.push Common_::QualifiedKnownKnown.via_value_and_symbol( * rest, sym )
           end
           NIL_
         end

@@ -23,8 +23,8 @@ module Skylab::TestSupport
           len = @_ordered_paths.length
 
           a.each_with_index do | x, d |
-            if :N == x.to_sym
-              a[ d ] = Common_::Pair.via_value_and_name( len, :digit )
+            if :N == x
+              a[ d ] = Common_::QualifiedKnownKnown.via_value_and_symbol len, :digit
             end
           end
 
@@ -32,9 +32,9 @@ module Skylab::TestSupport
           second_term = a[ 1 ]
 
           ok = true
-          val_a = [ [ :first, first_term.value_x ] ]
+          val_a = [ [ :first, first_term.value ] ]
           if second_term
-            val_a.push [ :second, second_term.value_x ]
+            val_a.push [ :second, second_term.value ]
           end
 
           val_a.each do |sym, d|

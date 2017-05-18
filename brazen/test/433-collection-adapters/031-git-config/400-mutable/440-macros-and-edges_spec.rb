@@ -46,7 +46,7 @@ module Skylab::Brazen::TestSupport
       o = -> sym, & p do
         asmt = scn.gets_one
         asmt.external_normal_name_symbol == sym || fail
-        p[ asmt.value_x ]
+        p[ asmt.value ]
       end
 
       o.call :three_characters do |s|

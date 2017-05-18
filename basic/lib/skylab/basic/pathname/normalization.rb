@@ -104,14 +104,14 @@ module Skylab::Basic
         end
 
         def execute
-          @value_x = @qualified_knownness.value_x
-          @value_x and via_value_x
+          @value = @qualified_knownness.value
+          @value and via_value_x
         end
 
       private
 
         def via_value_x
-          @md = RX__.match @value_x
+          @md = RX__.match @value
           if @md
             via_md
           else
@@ -253,7 +253,7 @@ module Skylab::Basic
             build_argument_error_event_with_(
 
               terminal_channel_symbol,
-              :path, @value_x,
+              :path, @value,
               :prop, @qualified_knownness.association
 
            ) do | y, o |

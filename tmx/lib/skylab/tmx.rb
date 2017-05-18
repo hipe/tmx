@@ -129,7 +129,7 @@ module Skylab::TMX
 
     if x
       if req.successful_result_will_be_wrapped
-        x = x.value_x
+        x = x.value
       end
       instance_variable_set ivar, x
       ACHIEVED_
@@ -155,6 +155,10 @@ module Skylab::TMX
       Zerk_lib_[]::Models::Sidesystem::LoadableReference
     end
   end
+
+  # ==
+
+  ThisOneItem_ = ::Struct.new :these_nodes, :this_one_offset
 
   # ==
 

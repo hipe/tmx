@@ -379,7 +379,7 @@ module Skylab::Common
       NIL_
     end
 
-    def to_pair_stream
+    def to_pair_stream  # assumes your keys are symbols..
 
       d = -1
       last = @a.length - 1
@@ -387,7 +387,7 @@ module Skylab::Common
       Stream.by do
         if d < last
           k = @a.fetch d += 1
-          Pair.via_value_and_name @h.fetch( k ), k
+          QualifiedKnownKnown.via_value_and_symbol @h.fetch( k ), k
         end
       end
     end
@@ -940,6 +940,7 @@ module Skylab::Common
     include KnownUnknownMethods__
 
     class << self
+
       def via_symbol sym
         new._init_via_symbol sym
       end
@@ -1049,27 +1050,30 @@ module Skylab::Common
     end
   end
 
-  Known_Known = KnownKnown  # soon..
   class KnownUnknown < UnqualifiedKnownness__
     include KnownUnknownMethods__
+
     class << self
       alias_method :via_reasoning, :new
       private :new
     end
+
     def initialize x
       @reasoning = x
     end
+
     def to_qualified_known_around asc
       QualifiedKnownUnknown.via_association asc
     end
+
     attr_reader(
       :reasoning,
     )
   end
-
   KNOWN_UNKNOWN = KnownUnknown.via_reasoning nil
 
   class UnqualifiedKnownness__
+
     def is_qualified
       false
     end
@@ -1100,11 +1104,8 @@ module Skylab::Common
       ! @value.nil?
     end
 
-    def value_x  # (historic name)
-      @value
-    end
-
     attr_reader :value
+
     def is_known_known
       true
     end
@@ -1433,7 +1434,7 @@ module Skylab::Common
       def entry_tree
         kn = ( @___entry_tree_knownness ||= __entry_tree_knownness )
         if kn.is_known_known
-          kn.value_x
+          kn.value
         end
       end
 

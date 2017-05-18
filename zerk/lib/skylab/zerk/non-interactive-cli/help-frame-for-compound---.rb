@@ -182,7 +182,7 @@ module Skylab::Zerk
             fr = @modality_frame_
             -> y do
               _qk = fr.qualified_knownness_of_touched_via_association_ asc
-              _qk.value_x.describe_into_under y, self
+              _qk.value.describe_into_under y, self
             end
           end
 

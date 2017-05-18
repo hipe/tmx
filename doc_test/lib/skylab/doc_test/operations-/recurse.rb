@@ -239,7 +239,7 @@ module Skylab::DocTest
     # ==
 
     Any_value__ = -> st do
-      Common_::Known_Known[ st.gets_one ]
+      Common_::KnownKnown[ st.gets_one ]
     end
   end
 end

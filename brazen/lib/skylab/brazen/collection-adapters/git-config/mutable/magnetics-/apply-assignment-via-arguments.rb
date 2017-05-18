@@ -90,8 +90,8 @@ module Skylab::Brazen
         def __when_found_existing
 
           @_existing_assignment = @_status.existing_element
-          existing_x = @_existing_assignment.value_x
-          _new_x = @_new_assignment.value_x
+          existing_x = @_existing_assignment.value
+          _new_x = @_new_assignment.value
           if existing_x == _new_x
             __when_no_change
           else
@@ -103,7 +103,7 @@ module Skylab::Brazen
 
           # we used to do just this:
           #
-          #     @_existing_assignment.value_x = new_x
+          #     @_existing_assignment.value = new_x
           #
           # what we do instead below is the subject of [#008.G]
 

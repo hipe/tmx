@@ -17,7 +17,7 @@ module Skylab::Brazen::TestSupport
 
         it "dereferences the association" do
           asc = _instance.dereference :zib_zub
-          asc.default_by[].value_x == :digimon || fail
+          asc.default_by[].value == :digimon || fail
         end
       end
 

@@ -9,7 +9,7 @@ module Skylab::Parse
       def output_node_via_input_stream in_st
 
         if in_st.unparsed_exists
-          Home_::OutputNode.for in_st.gets_one.value_x
+          Home_::OutputNode.for in_st.gets_one.value
         end
       end
 

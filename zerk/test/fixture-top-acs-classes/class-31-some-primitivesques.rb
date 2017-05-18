@@ -68,7 +68,7 @@ module Skylab::Zerk::TestSupport
         UNABLE_
       else
         st.advance_one
-        Common_::Known_Known[ s ]
+        Common_::KnownKnown[ s ]
       end
     end
   end

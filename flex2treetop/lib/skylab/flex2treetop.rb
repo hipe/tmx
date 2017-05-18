@@ -287,7 +287,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         def __resolve_upstream
 
           qualified_knownness_of_path = qualified_knownness :flex_file
-          path = qualified_knownness_of_path.value_x
+          path = qualified_knownness_of_path.value
 
           if DASH_ == path
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
@@ -300,7 +300,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             & handle_event_selectively )
 
           if kn
-            @upstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value_x, path
+            @upstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value, path
             ACHIEVED_
           else
             kn
@@ -323,7 +323,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         def __resolve_normal_downstream
 
           qualified_knownness_of_path = qualified_knownness :output_path
-          path = qualified_knownness_of_path.value_x
+          path = qualified_knownness_of_path.value
 
           if DASH_ == path
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
@@ -347,7 +347,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
           if kn
             @verb_s ||= 'output'
-            @downstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value_x, path
+            @downstream_ID = Home_.lib_.basic::Pathname::ByteStreamReference.new kn.value, path
             ACHIEVED_
           else
             kn

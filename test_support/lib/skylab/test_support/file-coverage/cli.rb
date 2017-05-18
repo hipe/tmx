@@ -29,7 +29,7 @@ module Skylab::TestSupport
             if Path_looks_relative_[ path ]
               path = cli_frame.root_frame.CLI.filesystem.expand_path path
             end
-            Common_::Known_Known[ path ]
+            Common_::KnownKnown[ path ]
           end
         end
         # (we do the above often enough that it is now tracked by #[#ze-048])

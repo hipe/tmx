@@ -140,10 +140,11 @@ class Skylab::Task
         _bx = ( @_function_forward_references ||= Common_::Box.new )
 
         _o = _bx.touch fit.function_offset do
-          Common_::Pair.via_value_and_name fit, "#{ FUN___ }#{ fit.function_offset }"
+
+          CustomThingDing___[ fit, "#{ FUN___ }#{ fit.function_offset }" ]
         end
 
-        _o.name_x
+        _o.this_one_string
       end
 
       def _touch_forward_reference_to_term sym
@@ -251,7 +252,7 @@ class Skylab::Task
       def __render_next_function_referent_as_node
         pair = @_function_referent_stream.gets
         if pair
-          _render_node "(all of these)", pair.name_x  # #here
+          _render_node "(all of these)", pair.this_one_string  # #here
         else
           @_m = :_render_term_referents
           send @_m
@@ -264,9 +265,9 @@ class Skylab::Task
         #  shortname that we are supposed to use for the dootily)
 
         @_after_all_of_these = m
-        @_AoT = pair.name_x
+        @_AoT = pair.this_one_string
 
-        @_precon_st = pair.value_x.to_prerequisite_term_symbol_stream_
+        @_precon_st = pair.jerby_derby.to_prerequisite_term_symbol_stream_
         @_m = :_all_of_these_main
         send @_m
       end
@@ -318,8 +319,8 @@ class Skylab::Task
 
           # first, make it look like a normal, word-wrappable string
 
-          _label_sym = pair.name_x
-          _internal_ref_sym = pair.value_x
+          _label_sym = pair.name_symbol
+          _internal_ref_sym = pair.value
 
           s = _label_sym.id2name
           s.gsub! UNDERSCORE_, SPACE_
@@ -410,9 +411,18 @@ class Skylab::Task
         end
       end
 
+      # ==
+
+      CustomThingDing___ = ::Struct.new :jerby_derby, :this_one_string
+
+      # ==
+
       EMPTY_P_ = -> do
         NOTHING_
       end
+
+      # ==
+      # ==
     end
   end
 end

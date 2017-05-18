@@ -226,7 +226,7 @@ module Skylab::Zerk
 
           sum = _left_width + 1 + _right_width  # 1 for '.'
 
-          @__WoICC_kn = Common_::Known_Known[ sum ]
+          @__WoICC_kn = Common_::KnownKnown[ sum ]
 
           maybe_widen_width_of_widest_string sum
 
@@ -249,7 +249,7 @@ module Skylab::Zerk
         end
 
         def width_of_imaginary_content_column_
-          @__WoICC_kn.value_x
+          @__WoICC_kn.value
         end
 
         attr_reader(

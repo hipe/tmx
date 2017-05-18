@@ -36,12 +36,12 @@ module Skylab::Parse
     #     SP = Home_.function( :simple_pool ).with(
     #       :functions,
     #         :trueish_mapper, -> in_st do
-    #           if /bill/i =~ in_st.current_token_object.value_x
-    #             in_st.gets_one.value_x
+    #           if /bill/i =~ in_st.current_token_object.value
+    #             in_st.gets_one.value
     #           end
     #         end,
     #         :trueish_mapper, -> in_st do
-    #           if :hi == in_st.current_token_object.value_x
+    #           if :hi == in_st.current_token_object.value
     #             in_st.advance_one
     #             :hello
     #           end
@@ -96,7 +96,7 @@ module Skylab::Parse
 
             if on
               pool_idx_a[ idx_idx, 1 ] = EMPTY_A_
-              break [ idx, on.value_x ]
+              break [ idx, on.value ]
             end
           end
 

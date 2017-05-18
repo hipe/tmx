@@ -80,7 +80,7 @@ module Skylab::Autonomous_Component_System
               redo  # if it's a known unknown, don't write anything
             end
 
-            x = o.value_x
+            x = o.value
             if ! x  # if it's false-ish, *even if it's a compound component*,
 
               if false == x

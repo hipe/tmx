@@ -575,15 +575,15 @@ module Skylab::DocTest
         end
 
         def document_unique_identifying_string
-          _identifyings.document_unique_identifying_string_knownness.value_x
+          _identifyings.document_unique_identifying_string_knownness.value
         end
 
         def branch_unique_identifying_string
-          _identifyings.branch_unique_identifying_string_knownness.value_x
+          _identifyings.branch_unique_identifying_string_knownness.value
         end
 
         def node_internal_identifying_symbol
-          _identifyings.node_internal_identifying_symbol_knownness.value_x
+          _identifyings.node_internal_identifying_symbol_knownness.value
         end
 
         def _identifyings
@@ -593,7 +593,7 @@ module Skylab::DocTest
         def _any_mixed_identifying m
           kn = _identifyings[ m ]
           if kn.is_known_known
-            kn.value_x
+            kn.value
           end
         end
       end
@@ -631,7 +631,7 @@ module Skylab::DocTest
       )
 
       Knownness___ = -> x do
-        x ? Common_::Known_Known[ x ] : Common_::KNOWN_UNKNOWN
+        x ? Common_::KnownKnown[ x ] : Common_::KNOWN_UNKNOWN
       end
 
       # ==

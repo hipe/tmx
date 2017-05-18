@@ -465,7 +465,7 @@ module Skylab::Fields
               kn = self._read_knownness_ prp_
 
               if kn.is_known_known
-                kn.value_x
+                kn.value
               end
             end
 
@@ -490,7 +490,7 @@ module Skylab::Fields
             kn = entity._read_knownness_ prp
 
             if kn.is_known_known
-              known.value_x
+              known.value
             end
           end
 

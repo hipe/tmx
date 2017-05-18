@@ -65,12 +65,14 @@ module Skylab::Basic
               ok or break
             end
           end
-          ok, value_x = value_pair_via_content_string_and_parent(
+
+          ok, val_x = value_pair_via_content_string_and_parent(
             current_frame.content_s, parent )
           ok or break
+
           node = Here_::ImmutableNode.new do
             @parent = parent
-            @value_x = value_x
+            @value = val_x
             if next_node_is_child
               cx_a = []
               agent.push_stack_frame next_frame

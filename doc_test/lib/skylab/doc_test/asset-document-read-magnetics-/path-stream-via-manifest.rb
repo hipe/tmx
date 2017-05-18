@@ -31,7 +31,7 @@ module Skylab::DocTest
               & @on_event_selectively )
 
             if kn
-              @open_file_IO = kn.value_x ; ACHIEVED_
+              @open_file_IO = kn.value ; ACHIEVED_
             else
               kn
             end

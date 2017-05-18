@@ -125,7 +125,7 @@ module Skylab::Common
       def each_pair
         st = remove_instance_variable :@stream
         while pair = st.gets
-          yield pair.name_symbol, pair.value_x
+          yield pair.name_symbol, pair.value
         end
         NIL
       end

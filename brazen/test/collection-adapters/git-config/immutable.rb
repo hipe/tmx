@@ -104,7 +104,7 @@ module Skylab::Brazen::TestSupport
         _sect = conf.sections.dereference :sect
         ast = _sect.assignments.first
         ast.internal_normal_name_string.should eql 'foo'
-        ast.value_x.should eql 'bar'
+        ast.value.should eql 'bar'
       end
     end
 

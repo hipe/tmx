@@ -257,7 +257,7 @@ module Skylab::TanMan
           _f = Here_::Magnetics_::NormalizedKnownness_via_QualifiedKnownness.const_get const, false
           kn = _f[ _qkn, & @listener ]
           if kn
-            instance_variable_set ivar, kn.value_x
+            instance_variable_set ivar, kn.value
             ACHIEVED_
           else
             self._COVER_ME__just_a_reminder__failures_like_these_are_not_covered__

@@ -134,7 +134,7 @@ module Skylab::Zerk
       _asc = lt.node_reference.association
       _rw = @top_frame.reader_writer
 
-      ACS_::Interpretation::Touch[ _asc, _rw ].value_x  # result is ACS itself
+      ACS_::Interpretation::Touch[ _asc, _rw ].value  # result is ACS itself
     end
 
     def _build_compound_adapter below_frame=nil, acs, lt

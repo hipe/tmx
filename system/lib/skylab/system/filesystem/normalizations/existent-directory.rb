@@ -268,7 +268,7 @@ module Skylab::System
 
       def _build_normal_result
 
-        Common_::Known_Known[
+        Common_::KnownKnown[
           if @_is_dry_run
             Mock_Dir__.new path_
           else

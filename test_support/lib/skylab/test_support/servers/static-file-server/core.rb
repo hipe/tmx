@@ -77,7 +77,7 @@ module Skylab::TestSupport
 
       if kn
         if kn.is_known_known
-          _rec = kn.value_x
+          _rec = kn.value
           ___express_that_process_is_still_running _rec
         else
           _ok = __cleanup_PID_file

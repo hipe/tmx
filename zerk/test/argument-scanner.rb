@@ -83,7 +83,7 @@ module Skylab::Zerk::TestSupport
       def __parse_one_argument
         _ivar = _parse_ivar
         _kn = @argument_scanner.parse_primary_value
-        instance_variable_set _ivar, _kn.value_x
+        instance_variable_set _ivar, _kn.value
         ACHIEVED_
       end
 

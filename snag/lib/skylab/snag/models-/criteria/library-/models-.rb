@@ -24,13 +24,13 @@ module Skylab::Snag
 
             @associated_model_identifier = id_x
             @symbol = sym
-            @value_x = x
+            @value = x
           end
 
-          attr_reader :associated_model_identifier, :symbol, :value_x
+          attr_reader :associated_model_identifier, :symbol, :value
 
           def to_arguments_
-            [ @value_x, @symbol ]
+            [ @value, @symbol ]
           end
 
           def to_criteria_proc_under_ model_lookup_p

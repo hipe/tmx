@@ -34,7 +34,7 @@ module Skylab::Cull
       def _batch arg, box, m
         ok = true
 
-        arg.value_x.each do |s|
+        arg.value.each do |s|
           ok = __parse s
           ok or break
           ok = send m, ok

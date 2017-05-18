@@ -49,7 +49,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __set__component qk, & _x_p
 
-          instance_variable_set qk.name.as_ivar, qk.value_x
+          instance_variable_set qk.name.as_ivar, qk.value
           true
         end
 

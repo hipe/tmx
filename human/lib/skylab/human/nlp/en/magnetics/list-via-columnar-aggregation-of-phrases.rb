@@ -86,7 +86,7 @@ module Skylab::Human
 
           :any_first_item, -> y, sym do
 
-            __express_gerund y, sym, pair.name_x
+            __express_gerund y, sym, pair.name_symbol
           end,
 
           :any_subsequent_items, -> y, sym do
@@ -96,7 +96,7 @@ module Skylab::Human
           end,
         )
 
-        pair.value_x.each do | sym |
+        pair.value.each do | sym |
           sym_y << sym
         end
         NIL_

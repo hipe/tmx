@@ -27,7 +27,7 @@ module Skylab::Basic
       if ok_arg
         @output_value_was_written = true
         @output_arg = ok_arg
-        @output_x = ok_arg.value_x
+        @output_x = ok_arg.value
       else
         @output_value_was_written = false
         @result_x = ok_arg
@@ -52,7 +52,7 @@ module Skylab::Basic
       qkn.is_qualified or fail ___say_not( qkn )
       kn.is_qualified and fail __say( kn )
 
-      qkn.value_x.should eql kn.value_x
+      qkn.value.should eql kn.value
 
       nil
     end
@@ -95,7 +95,7 @@ module Skylab::Basic
           end
         end
 
-        def via_3 value_x, actuals_has_name, any_name_i
+        def via_3 x, actuals_has_name, any_name_i
 
           _prop = if any_name_i
             Mock_Property__.new Common_::Name.via_variegated_symbol name_i
@@ -104,7 +104,7 @@ module Skylab::Basic
           end
 
           Common_::QualifiedKnownness.via_value_and_had_and_association(
-            value_x, actuals_has_name, _prop )
+            x, actuals_has_name, _prop )
         end
       end
 

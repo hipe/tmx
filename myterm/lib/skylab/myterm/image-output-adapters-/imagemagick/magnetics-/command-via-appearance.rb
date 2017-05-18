@@ -88,18 +88,18 @@ module Skylab::MyTerm
 
       def __add__compound__ qk
 
-        _recurse_into qk.value_x
+        _recurse_into qk.value
       end
 
       def __add__entitesque__ qk  # assume effectively known
 
-        _x = qk.value_x.to_primitive_for_component_serialization
+        _x = qk.value.to_primitive_for_component_serialization
         _add_prepared_value _x, qk
       end
 
       def __add__primitivesque__ qk  # assume effectively known
 
-        x = qk.value_x
+        x = qk.value
         if ACS_::Reflection::Looks_primitive[ x ]
           _add_prepared_value x, qk
         else
@@ -120,7 +120,7 @@ module Skylab::MyTerm
       def __add_label
 
         _qk = remove_instance_variable :@_label_qk
-        s = _qk.value_x
+        s = _qk.value
         s or self._SANITY  # because normalization, assumed
         @_a.push "label:#{ s }"  # works without escaping because how we call it
         ACHIEVED_

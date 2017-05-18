@@ -168,7 +168,7 @@ module Skylab::Treemap
 
           if kn
 
-            _ID = @_n11n.byte_whichstream_identifier_for kn.value_x, up_down
+            _ID = @_n11n.byte_whichstream_identifier_for kn.value, up_down
 
             instance_variable_set destination_ivar, _ID
 

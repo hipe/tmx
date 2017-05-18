@@ -43,11 +43,11 @@ module Skylab::MyTerm
       )
 
       def filesystem
-        ( @filesystem_knownness ||= KK__[ Home_.lib_.system.filesystem ] ).value_x
+        ( @filesystem_knownness ||= KK__[ Home_.lib_.system.filesystem ] ).value
       end
 
       def system_conduit
-        ( @system_conduit_knownness ||= KK__[ Home_.lib_.open3 ] ).value_x
+        ( @system_conduit_knownness ||= KK__[ Home_.lib_.open3 ] ).value
       end
 
       # --
@@ -68,7 +68,7 @@ module Skylab::MyTerm
 
       # --
 
-      KK__ = Common_::Known_Known
+      KK__ = Common_::KnownKnown
     end
   end
 end

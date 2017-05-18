@@ -74,13 +74,13 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :add
 
           -> st do
-            Common_::Known_Known[ st.gets_one ]
+            Common_::KnownKnown[ st.gets_one ]
           end
         end
 
         def component_is__color_starts_with_g__ qk, & _
 
-          if 'g' == qk.value_x[ 0 ]
+          if 'g' == qk.value[ 0 ]
             true
           else
             false
@@ -88,7 +88,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
 
         def __add__component qk, & _x_p
-          x = qk.value_x
+          x = qk.value
           @_a.push x
           x
         end

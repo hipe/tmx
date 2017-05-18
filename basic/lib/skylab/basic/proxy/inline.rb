@@ -43,7 +43,7 @@ module Skylab::Basic
         while pair = pair_st.gets
 
           sym = pair.name_symbol
-          add[ sym, pair.value_x ]
+          add[ sym, pair.value ]
           if :inspect == sym
             did_inspect = true
             break
@@ -52,7 +52,7 @@ module Skylab::Basic
 
         if did_inspect
           while pair = pair_st.gets
-            add[ pair.name_symbol, pair.value_x ]
+            add[ pair.name_symbol, pair.value ]
           end
         else
           add[ :inspect, -> do

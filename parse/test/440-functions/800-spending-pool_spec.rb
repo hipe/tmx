@@ -82,7 +82,7 @@ module Skylab::Parse::TestSupport
         on = X_f_sp_Digits[ argv ]
         argv.length.should eql 0
         on.function_is_spent.should eql false
-        kw, k2, digits = on.value_x
+        kw, k2, digits = on.value
         ( kw || k2 ).should eql nil
         digits.should eql [ 1 ]
       end
@@ -91,14 +91,14 @@ module Skylab::Parse::TestSupport
         argv = %w( 2 3 )
         on = X_f_sp_Digits[ argv ]
         on.function_is_spent.should eql false
-        on.value_x.should eql [ nil, nil, [ 2, 3 ] ]
+        on.value.should eql [ nil, nil, [ 2, 3 ] ]
       end
 
       it "parses one keyword" do
         argv = [ 'bar' ]
         on = X_f_sp_Digits[ argv ]
         on.function_is_spent.should eql false
-        on.value_x.should eql [ nil, [:bar], nil ]
+        on.value.should eql [ nil, [:bar], nil ]
       end
 
       it "parses two keywords (in reverse grammar order)" do
@@ -106,7 +106,7 @@ module Skylab::Parse::TestSupport
         on = X_f_sp_Digits[ argv ]
         argv.length.should eql 0
         on.function_is_spent.should eql false
-        on.value_x.should eql [ [:foo], [:bar], nil ]
+        on.value.should eql [ [:foo], [:bar], nil ]
       end
 
       it "will not parse multiple of same keyword" do
@@ -114,7 +114,7 @@ module Skylab::Parse::TestSupport
         on = X_f_sp_Digits[ argv ]
         argv.should eql %w( foo )
         on.function_is_spent.should eql false
-        on.value_x.should eql [ [ :foo ], nil, nil ]
+        on.value.should eql [ [ :foo ], nil, nil ]
       end
 
       it "will stop at first non-parsable" do
@@ -122,7 +122,7 @@ module Skylab::Parse::TestSupport
         on = X_f_sp_Digits[ argv ]
         on.function_is_spent.should eql false
         argv.should eql [ 'biz', 'bar' ]
-        on.value_x.should eql [ [ :foo ], nil, [ 1, 2 ] ]
+        on.value.should eql [ [ :foo ], nil, [ 1, 2 ] ]
       end
     end
   end

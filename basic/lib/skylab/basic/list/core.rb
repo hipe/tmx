@@ -183,7 +183,8 @@ module Skylab::Basic
 
       Common_::Stream.via_times( a.length / 2 ).map_by do | d |
         d <<= 1
-        Common_::Pair.via_value_and_name(
+
+        Common_::QualifiedKnownKnown.via_value_and_symbol(
           a.fetch( d + 1 ),
           a.fetch( d ),
         )

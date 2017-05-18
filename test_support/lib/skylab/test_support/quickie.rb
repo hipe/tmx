@@ -2705,7 +2705,7 @@ module Skylab::TestSupport
       def __to_custom_writer p
         -> x do
           if ! @primary.is_flag
-            @__known_known = Common_::Known_Known[ x ]
+            @__known_known = Common_::KnownKnown[ x ]
           end
           p[ self ]  # (result is false on failure)
           NIL
@@ -2718,7 +2718,7 @@ module Skylab::TestSupport
       end
 
       def mixed_value
-        @__known_known.value_x
+        @__known_known.value
       end
 
       def __writer_for_plural_flag
@@ -2762,7 +2762,7 @@ module Skylab::TestSupport
         p = -> s do
           kn = _normalize s
           if kn
-            ( @writable_client[ k ] ||= [] ).push kn.value_x
+            ( @writable_client[ k ] ||= [] ).push kn.value
           else
             @writable_client[ k ] = false
             p = MONADIC_EMPTINESS_
@@ -2782,7 +2782,7 @@ module Skylab::TestSupport
         p = -> s do
           kn = _normalize s
           if kn
-            @writable_client[ k ] = kn.value_x
+            @writable_client[ k ] = kn.value
           else
             @writable_client[ k ] = nil  # propagate the error
           end

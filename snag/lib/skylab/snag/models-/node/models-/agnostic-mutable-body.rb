@@ -9,13 +9,13 @@ module Skylab::Snag
       end
 
       def prepend_component_ qk, & _oes_p
-        o = qk.value_x
+        o = qk.value
         @_o_a.unshift o
         o
       end
 
       def append_component_ qk, & _oes_p
-        o = qk.value_x
+        o = qk.value
         @_o_a.push o
         o
       end

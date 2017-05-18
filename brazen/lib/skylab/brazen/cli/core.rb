@@ -626,7 +626,7 @@ module Skylab::Brazen
           qkn or break
 
           sym = qkn.name_symbol
-          _x = qkn.value_x
+          _x = qkn.value
 
           _cls = ___view_controller_class_via_option_property_name_symbol sym
           o = _cls.new
@@ -1175,11 +1175,11 @@ module Skylab::Brazen
       def __derelativize_path qkn, & oes_p
 
         if qkn.is_known_known
-          path = qkn.value_x
+          path = qkn.value
           if path
             if Home_.lib_.system.path_looks_relative path
               _path_ = _filesystem.expand_path path, present_working_directory
-              kn = Common_::Known_Known[ _path_ ]
+              kn = Common_::KnownKnown[ _path_ ]
             end
           end
         end
@@ -1828,7 +1828,7 @@ module Skylab::Brazen
             kn ||= ___const_get_support_node sym
             _cache kn, sym
           end
-          kn.value_x
+          kn.value
         end
 
         def ___const_get_support_node const
@@ -1864,7 +1864,7 @@ module Skylab::Brazen
 
         def _definitely_there mod, const
 
-          Common_::Known_Known[ mod.const_get( const, false ) ]
+          Common_::KnownKnown[ mod.const_get( const, false ) ]
         end
 
         def _cached sym
@@ -2064,7 +2064,7 @@ module Skylab::Brazen
 
       def knownness_for sym  # [gi]
 
-        Common_::Known_Known[ bridge_for( sym ) ]
+        Common_::KnownKnown[ bridge_for( sym ) ]
       end
 
       def bridge_for sym

@@ -166,7 +166,7 @@ module Skylab::System
 
           arg = _normalize_unsanititized_freeform_string_array gets_one
           arg and begin
-            @sanitized_freeform_query_infix_words = arg.value_x   # nil OK
+            @sanitized_freeform_query_infix_words = arg.value   # nil OK
             KEEP_PARSING_
           end
         end
@@ -175,7 +175,7 @@ module Skylab::System
 
           arg = _normalize_unsanititized_freeform_string_array gets_one
           arg and begin
-            @sanitized_freeform_query_postfix_words = arg.value_x  # nil OK
+            @sanitized_freeform_query_postfix_words = arg.value  # nil OK
             KEEP_PARSING_
           end
         end
@@ -208,7 +208,7 @@ module Skylab::System
           if s_a
             __normalze_trueish_unsanitized_freeform_string_array s_a
           else
-            Common_::Known_Known[ s_a ]  # a false-ish value is valid
+            Common_::KnownKnown[ s_a ]  # a false-ish value is valid
           end
         end
 
@@ -226,7 +226,7 @@ module Skylab::System
           if extra_a
             raise ::ArgumentError, "looks strange: #{ s_a.map( & :inspect ) } * ', ' }"
           else
-            Common_::Known_Known[ s_a ]
+            Common_::KnownKnown[ s_a ]
           end
         end
 

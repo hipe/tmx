@@ -20,7 +20,7 @@ module Skylab::Brazen
 
           qkn.to_knownness  # fallthru. let missing required's catch it
 
-        elsif /\A[-a-z0-9]+\z/ =~ qkn.value_x
+        elsif /\A[-a-z0-9]+\z/ =~ qkn.value
 
           qkn.to_knownness  # valid!
 
@@ -28,7 +28,7 @@ module Skylab::Brazen
           oes_p.call :error, :invalid_property_value do
             Common_::Event.inline_not_OK_with(
               :name_must_be_lowercase_alphanumeric_with_dashes,
-                :name_s, qkn.value_x )
+                :name_s, qkn.value )
           end
         end
       end,
@@ -57,7 +57,7 @@ module Skylab::Brazen
       :default, '5984',
       :ad_hoc_normalizer, -> qkn, & oes_p do
         if qkn.is_known_known
-          x = qkn.value_x
+          x = qkn.value
         end
         if x
           if /\A[0-9]{1,4}\z/ =~ x

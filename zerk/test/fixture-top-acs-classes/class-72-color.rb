@@ -8,7 +8,7 @@ module Skylab::Zerk::TestSupport
     sym = st.head_as_is
     if h[ sym ]
       st.advance_one
-      Common_::Known_Known[ sym ]
+      Common_::KnownKnown[ sym ]
     else
       pp[ nil ].call :error, :bad_color
       UNABLE_

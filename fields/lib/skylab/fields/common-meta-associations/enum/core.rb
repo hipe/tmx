@@ -46,7 +46,7 @@ module Skylab::Fields
 
         bx = qkn.association.enum_box
 
-        if bx.has_key qkn.value_x  # as #here
+        if bx.has_key qkn.value  # as #here
           qkn.to_knownness
         else
           when_failed[ qkn, bx, & oes_p ]
@@ -64,7 +64,7 @@ module Skylab::Fields
 
       build_the_event = -> do
         Here_::Build_extra_value_event.call(  # 1x
-          qkn.value_x,
+          qkn.value,
           bx.get_keys,
           qkn.association.name,
         )

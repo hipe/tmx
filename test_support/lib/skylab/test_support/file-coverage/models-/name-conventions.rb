@@ -112,7 +112,7 @@ module Skylab::TestSupport
       end
 
       def big_tree_filename_patterns__
-        ( @___btfp  ||= ___build_etc ).value_x
+        ( @___btfp  ||= ___build_etc ).value
       end
 
       def ___build_etc
@@ -120,7 +120,7 @@ module Skylab::TestSupport
         if s_a
           x = s_a.map { |s| "#{ ASTERISK_ }#{ s }" }
         end
-        Common_::Known_Known[ x ]
+        Common_::KnownKnown[ x ]
       end
 
       def to_big_tree_filename_patterns__

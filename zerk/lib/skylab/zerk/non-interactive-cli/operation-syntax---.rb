@@ -202,7 +202,7 @@ module Skylab::Zerk
           @__oes_pp[ @_asc ]
         end
 
-        _st = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value_x ]
+        _st = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value ]
 
         qk = ACS_::Interpretation::Build_value.call(
           _st,
@@ -256,7 +256,7 @@ module Skylab::Zerk
 
         # --
 
-        _value_x = sing_qkn.value_x
+        _value_x = sing_qkn.value
         _plur_k = sing_asc.singplur_referent_symbol
         _plur_asc = @_si.node_reference_via_node_name_symbol_( _plur_k ).association
 
@@ -300,7 +300,7 @@ module Skylab::Zerk
         kn = @_frame.reader_writer_.read_value plur_asc
 
         if kn.is_known_known
-          existing_a = kn.value_x
+          existing_a = kn.value
         end
 
         if existing_a

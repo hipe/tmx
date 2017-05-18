@@ -35,13 +35,13 @@ module Skylab::System::TestSupport
       o = root
       o.children_count.should eql 1
       o = o.children.first
-      o.value_x.should eql [ :Jazzmatazz ]
+      o.value.should eql [ :Jazzmatazz ]
       o.children.length.should eql 3
-      o.children.first.value_x.should eql [ :Bizzo ]
+      o.children.first.value.should eql [ :Bizzo ]
       x = o.children[ 1 ]
-        x.value_x.should eql [ :Bizzo, :Boffo ]
-        x.children.first.value_x.should eql [ :Stfu_OMG ]
-      o.children.last.value_x.should eql [ :Other_Module ]
+        x.value.should eql [ :Bizzo, :Boffo ]
+        x.children.first.value.should eql [ :Stfu_OMG ]
+      o.children.last.value.should eql [ :Other_Module ]
 
       count = 0
       root.children_depth_first do |_|

@@ -18,7 +18,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( bilbo baggins daggins waggins )
 
-        _go( in_st ).value_x.should eql :__bilbo_baggins__
+        _go( in_st ).value.should eql :__bilbo_baggins__
 
         in_st.current_index.should eql 2
       end
@@ -37,7 +37,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( bilbo dazoink )
 
-        _go( in_st, & handle_event_selectively_ ).value_x.should eql :__bilbo__
+        _go( in_st, & handle_event_selectively_ ).value.should eql :__bilbo__
 
         in_st.current_index.should eql 1
       end
@@ -56,7 +56,7 @@ module Skylab::Parse::TestSupport
         ev.token.should eql 'nodo'
         a = ev.item_stream_proc.call.to_a
         a.length.should eql 1
-        a.first.value_x.should eql :__frodo_baggins__
+        a.first.value.should eql :__frodo_baggins__
 
         in_st.current_index.should eql 0
       end
@@ -105,7 +105,7 @@ module Skylab::Parse::TestSupport
 
         in_st.advance_one
 
-        _go( in_st ).value_x.should eql :__elizabeth_keen_tom_keen__
+        _go( in_st ).value.should eql :__elizabeth_keen_tom_keen__
 
         in_st.current_index.should eql 5
       end
@@ -125,7 +125,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( xx yy )
 
-        _go( in_st, & handle_event_selectively_ ).value_x.should(
+        _go( in_st, & handle_event_selectively_ ).value.should(
           eql :__xx_yy__ )
 
         in_st.current_index.should eql 2
@@ -146,7 +146,7 @@ module Skylab::Parse::TestSupport
 
       _st = _o.instance_variable_get( :@item_stream_proc ).call
 
-      _st.gets.value_x.should eql :__a_b__
+      _st.gets.value.should eql :__a_b__
     end
 
     def _go in_st, & x_p
@@ -180,10 +180,10 @@ module Skylab::Parse::TestSupport
 
         Common_::Stream.via_nonsparse_array a_a do | row |
 
-          Common_::Pair.via_value_and_name(
+          Common_::QualifiedKnownKnown.via_value_and_association(
             :"__#{ row * UNDERSCORE_ }__",
-            row )
-
+            row,
+          )
         end
       end
 

@@ -15,11 +15,11 @@ module Skylab::MyTerm
     end
 
     def filesystem_conduit= x
-      @_FS_qk = Common_::Known_Known[ x ] ; x
+      @_FS_qk = Common_::KnownKnown[ x ] ; x
     end
 
     def system_conduit= x
-      @_SC_qk = Common_::Known_Known[ x ] ; x
+      @_SC_qk = Common_::KnownKnown[ x ] ; x
     end
 
     def execute

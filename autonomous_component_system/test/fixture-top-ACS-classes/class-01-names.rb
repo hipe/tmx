@@ -45,7 +45,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           s = st.gets_one
           if rx =~ s
-            Common_::Known_Known[ s ]
+            Common_::KnownKnown[ s ]
           else
 
             _oes_p = oes_p_p[ nil ]
@@ -63,7 +63,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         -> st, & p do
 
           _s = st.gets_one
-          Common_::Known_Known[ _s ]
+          Common_::KnownKnown[ _s ]
         end
       end
     end
@@ -88,7 +88,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         -> st, & _ do
 
-          Common_::Known_Known[ st.gets_one ]
+          Common_::KnownKnown[ st.gets_one ]
         end
       end
 

@@ -68,7 +68,7 @@ module Skylab::Basic
 
               _x = in_st.head_as_is
 
-              _kn = Common_::Known_Known[ in_st.head_as_is ]
+              _kn = Common_::KnownKnown[ in_st.head_as_is ]
 
               vw = normalize_knownness _kn do | * i_a, & ev_p |
 
@@ -76,7 +76,7 @@ module Skylab::Basic
               end
               if vw
                 in_st.advance_one
-                Home_.lib_.parse_lib::OutputNode.for vw.value_x
+                Home_.lib_.parse_lib::OutputNode.for vw.value
               else
                 vw
               end
@@ -111,10 +111,10 @@ module Skylab::Basic
 
           if @qualified_knownness
             @_is_qualified = true
-            @x = @qualified_knownness.value_x
+            @x = @qualified_knownness.value
           else
             @_is_qualified = false
-            @x = @knownness.value_x
+            @x = @knownness.value
           end
 
           ok = send :"__when_set_is__#{ @number_set }__"
@@ -124,7 +124,7 @@ module Skylab::Basic
           end
 
           if ok
-            Common_::Known_Known[ @number ]
+            Common_::KnownKnown[ @number ]
           else
             @result
           end

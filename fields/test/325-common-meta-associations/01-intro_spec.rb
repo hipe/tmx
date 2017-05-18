@@ -30,7 +30,7 @@ module Skylab::Fields::TestSupport
         against_ :do_ignore_case, :momma
         kn = @do_ignore_case
         kn.is_known_known or fail
-        kn.value_x.should eql :momma
+        kn.value.should eql :momma
       end
 
       it "flag" do
@@ -43,7 +43,7 @@ module Skylab::Fields::TestSupport
         against_ :ignore_case
         kn = @do_ignore_case
         kn.is_known_known or fail
-        kn.value_x or fail
+        kn.value or fail
       end
 
       it "singular of" do

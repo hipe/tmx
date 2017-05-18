@@ -97,7 +97,7 @@ module Skylab::GitViz
             x_a[ 0, 2 ] = EMPTY_A_
 
             qkn and begin
-              @width = qkn.value_x
+              @width = qkn.value
               ACHIEVED_
             end
           end

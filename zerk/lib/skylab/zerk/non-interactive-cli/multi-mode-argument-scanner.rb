@@ -144,7 +144,7 @@ module Skylab::Zerk
 
         def __receive_subtract_primary_with_default_ x, sym
 
-          _ = Common_::Pair.via_value_and_name x, sym
+          _ = Common_::QualifiedKnownKnown.via_value_and_symbol x, sym
 
           ( @_fixed_primary_name_value_pairs_array ||= [] ).push _
 
@@ -797,7 +797,7 @@ module Skylab::Zerk
           # although we have a name-value pair, we are only resulting in
           # a derivative of the name (nothing of the value) here.
 
-          k = @_real_scn.head_as_is.name_x
+          k = @_real_scn.head_as_is.name_symbol
           k == wfr.well_formed_symbol || self._SANITY
 
           _x = wfr.request.operator_branch.dereference k
@@ -810,7 +810,7 @@ module Skylab::Zerk
         def _well_formed_primary_categorization_
           if @_is_pointing_at_name
             # :#here1.
-            _sym = @_real_scn.head_as_is.name_x
+            _sym = @_real_scn.head_as_is.name_symbol
             AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _sym ]
           else
             self._IF_EVER_THEN_WHY
@@ -819,9 +819,9 @@ module Skylab::Zerk
 
         def _head_as_normal_symbol_
           if @_is_pointing_at_name
-            @_real_scn.head_as_is.name_x
+            @_real_scn.head_as_is.name_symbol
           else
-            x = @_real_scn.head_as_is.value_x
+            x = @_real_scn.head_as_is.value
             if ! x.respond_to? :id2name
               self._IF_EVER_THEN_WHY_2
             end
@@ -831,9 +831,9 @@ module Skylab::Zerk
 
         def _head_as_is_
           if @_is_pointing_at_name
-            @_real_scn.head_as_is.name_x
+            @_real_scn.head_as_is.name_symbol
           else
-            @_real_scn.head_as_is.value_x
+            @_real_scn.head_as_is.value
           end
         end
 
@@ -1050,7 +1050,7 @@ module Skylab::Zerk
 
           if sym
             @has_default_primary = true
-            @__default_primary_knownness = Common_::Known_Known[ sym ]
+            @__default_primary_knownness = Common_::KnownKnown[ sym ]
           end
         end
 
@@ -1156,7 +1156,7 @@ module Skylab::Zerk
         end
 
         def default_primary_symbol  # assume has default primary
-          @__default_primary_knownness.value_x
+          @__default_primary_knownness.value
         end
 
         attr_reader(
@@ -1205,7 +1205,7 @@ module Skylab::Zerk
             @rx =~ k || redo
             ( @a ||= [] ).push(
               cls.via_user_value_and_normal_symbol(
-                pair.value_x, pair.name_symbol ) )
+                pair.value, pair.name_symbol ) )
             redo
           end while above
           NIL

@@ -304,7 +304,7 @@ module Skylab::BeautySalon
         end
 
         def execute
-          @x = @_qualified_knownness.value_x
+          @x = @_qualified_knownness.value
           if @x
             __when_value
           else
@@ -335,7 +335,7 @@ module Skylab::BeautySalon
           end while nil
 
           if @ok
-            Common_::Known_Known[ @union.prune ]
+            Common_::KnownKnown[ @union.prune ]
           else
             UNABLE_
           end

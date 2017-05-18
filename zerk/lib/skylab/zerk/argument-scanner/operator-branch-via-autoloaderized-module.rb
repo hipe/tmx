@@ -65,14 +65,14 @@ module Skylab::Zerk
 
         def dereference_user_value my_custom_loadable_reference  # #here
 
-          at = my_custom_loadable_reference.asset_reference
+          ref = my_custom_loadable_reference.asset_reference
 
-          _cls = if at.value_is_known
-            at.value_x  # :[#008.2] #borrow-coverage from [ts]
+          _cls = if ref.value_is_known
+            ref.value  # :[#008.2] #borrow-coverage from [ts]
           else
             Autoloader_.const_reduce_by do |o|
               o.from_module = @module
-              o.const_path = [ at.entry_group_head ]
+              o.const_path = [ ref.entry_group_head ]
               o.autoloaderize
             end
           end
@@ -83,10 +83,10 @@ module Skylab::Zerk
 
         def lookup_softly k  # #[#ze-051.1] "trueish item value"
 
-          at = @module.entry_tree.
+          ref = @module.entry_tree.
             asset_reference_via_entry_group_head Slug_via_symbol__[k]
-          if at
-            _trueish_item_value_via_asset_reference at
+          if ref
+            _trueish_item_value_via_asset_reference ref
           end
         end
 
@@ -99,11 +99,12 @@ module Skylab::Zerk
 
         def to_pair_stream
 
-          @module.entry_tree.to_asset_reference_stream.map_by do |at|
+          @module.entry_tree.to_asset_reference_stream.map_by do |ref|
 
-            Common_::Pair.via_value_and_name(
-              _trueish_item_value_via_asset_reference( at ),
-              Symbol_via_slug__[ at.entry_group_head ] )
+            _sym = Symbol_via_slug__[ ref.entry_group_head ]
+            _x = _trueish_item_value_via_asset_reference ref
+
+            Common_::QualifiedKnownKnown.via_value_and_symbol _x, _sym
           end
         end
 
@@ -121,9 +122,9 @@ module Skylab::Zerk
           end
         end
 
-        def _trueish_item_value_via_asset_reference at
+        def _trueish_item_value_via_asset_reference ref
 
-          @loadable_reference_class.new at, @module
+          @loadable_reference_class.new ref, @module
         end
 
         attr_reader(
@@ -144,8 +145,8 @@ module Skylab::Zerk
 
       class LoadableReferenceIsh___  # :#here
 
-        def initialize at, mod
-          @asset_reference = at
+        def initialize ref, mod
+          @asset_reference = ref
           @module = mod
         end
 

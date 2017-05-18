@@ -109,7 +109,7 @@ module Skylab::Human
     public
 
       def be_alternation
-        @_fsep_sexp = Common_::Known_Known[ FINAL_SEPARATOR_FOR_ALTERNATION___ ]
+        @_fsep_sexp = Common_::KnownKnown[ FINAL_SEPARATOR_FOR_ALTERNATION___ ]
         NIL_
       end
 
@@ -134,7 +134,7 @@ module Skylab::Human
       end
 
       def final_separator_sexp= x
-        @_fsep_sexp = Common_::Known_Known[ x ] ; nil
+        @_fsep_sexp = Common_::KnownKnown[ x ] ; nil
       end
 
       def separator= x
@@ -142,7 +142,7 @@ module Skylab::Human
       end
 
       def separator_sexp= x
-        @_sep_sexp = Common_::Known_Known[ x ] ; nil
+        @_sep_sexp = Common_::KnownKnown[ x ] ; nil
       end
 
       # --
@@ -325,12 +325,12 @@ module Skylab::Human
 
       def __final_separator_sexp
 
-        @_fsep_sexp ? @_fsep_sexp.value_x : FINAL_SEPARATOR___
+        @_fsep_sexp ? @_fsep_sexp.value : FINAL_SEPARATOR___
       end
 
       def __separator_sexp
 
-        @_sep_sexp ? @_sep_sexp.value_x : SEPARATOR___
+        @_sep_sexp ? @_sep_sexp.value : SEPARATOR___
       end
 
       # --

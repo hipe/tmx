@@ -31,7 +31,7 @@ module Skylab::Parse
 
       def __init_for_atom x  # #here1
         @function_is_spent = true
-        @value_x = x
+        @value = x
         self
       end
 
@@ -55,7 +55,7 @@ module Skylab::Parse
       def as_attributes_actor_parse_and_normalize scn  # #here2
 
         if remove_instance_variable :@_do_be_fancy
-          @value_x = scn.gets_one
+          @value = scn.gets_one
         end
         super
       end
@@ -79,7 +79,7 @@ module Skylab::Parse
         :constituent_index,
         :function_is_spent,
         :try_next,
-        :value_x,
+        :value,
       )
     end
     # <-

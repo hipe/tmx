@@ -59,7 +59,7 @@ module Skylab::Basic
         end
 
         def __add__component qk, & _x_p
-          x = qk.value_x
+          x = qk.value
           if x
             @_bx.add x.name_symbol, x
             x

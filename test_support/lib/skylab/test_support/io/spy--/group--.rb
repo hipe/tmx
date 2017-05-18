@@ -115,15 +115,15 @@ module Skylab::TestSupport
       add_strm_with_name_and_value name_x, _stream
     end
 
-    def add_strm_with_name_and_value name_x, value_x
+    def add_strm_with_name_and_value name_x, x
       did = false
       @stream_h.fetch name_x do
         did = true
         @k_a << name_x
-        @stream_h[ name_x ] = value_x
+        @stream_h[ name_x ] = x
       end
       did or raise "constituent is write-once: '#{ name_x }'"
-      value_x
+      x
     end
 
   private

@@ -18,11 +18,11 @@ module Skylab::Basic::TestSupport
       _against_lines _dedent <<-HERE
         + beeble
       HERE
-      @tree.value_x.should be_nil
+      @tree.value.should be_nil
       @tree.parent.should be_nil
       @tree.children_count.should eql 1
       tree = @tree.children.first
-      tree.value_x.should eql "beeble\n"
+      tree.value.should eql "beeble\n"
       tree.parent.object_id.should eql @tree.object_id
       tree.children_count.should be_zero
       tree.children.should be_nil
@@ -50,8 +50,8 @@ module Skylab::Basic::TestSupport
       @tree.children_count.should eql 2
       @tree.children.length.should eql 2
       o, x = @tree.children
-      o.value_x.should eql "foo\n"
-      x.value_x.should eql "bar\n"
+      o.value.should eql "foo\n"
+      x.value.should eql "bar\n"
       o.parent.object_id.should eql x.parent.object_id
       o.parent.object_id.should eql @tree.object_id
       o.children_count.should be_zero
@@ -80,7 +80,7 @@ module Skylab::Basic::TestSupport
       o.children_count.should eql 1
       x = o.children.first
       x.children_count.should be_zero
-      x.value_x.should eql "bar\n"
+      x.value.should eql "bar\n"
     end
 
     it "step back two" do
@@ -122,7 +122,7 @@ module Skylab::Basic::TestSupport
     it "`build_using` allows you to map the received string values to whatever" do
       @handle_build = -> line, parent do
         if parent.parent
-          :"#{ parent.value_x }_#{ line.chop! }"
+          :"#{ parent.value }_#{ line.chop! }"
         else
           :"top_#{ line.chop! }"
         end
@@ -132,9 +132,9 @@ module Skylab::Basic::TestSupport
           + bar
         + baz
       O
-      @tree.children.first.value_x.should eql :top_foo
-      @tree.children.first.children.first.value_x.should eql :top_foo_bar
-      @tree.children.last.value_x.should eql :top_baz
+      @tree.children.first.value.should eql :top_foo
+      @tree.children.first.children.first.value.should eql :top_foo_bar
+      @tree.children.last.value.should eql :top_baz
     end
 
     def _against_lines heredoc_string
@@ -169,7 +169,7 @@ module Skylab::Basic::TestSupport
 
       io = Home_.lib_.string_IO
       @tree.children_depth_first_via_args_hook io, nil do |node, io_, indent, p|
-        io_.write "#{ indent }+ #{ node.value_x }"
+        io_.write "#{ indent }+ #{ node.value }"
         p[ -> do
           [ io_, "#{ indent }  " ]
         end ]

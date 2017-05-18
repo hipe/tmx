@@ -27,7 +27,7 @@ module Skylab::Zerk::TestSupport
 
       it "result is last qk of thing - etc" do
         qk = root_ACS_result
-        qk.value_x.should eql 'you'
+        qk.value.should eql 'you'
         qk.association.name_symbol.should eql :subject
       end
     end

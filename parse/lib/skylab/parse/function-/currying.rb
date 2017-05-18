@@ -7,7 +7,7 @@ module Skylab::Parse
       class << self
 
         def build_extra_input_tokens_event st
-          Extra_Input___[ st.current_token_object.value_x ]
+          Extra_Input___[ st.current_token_object.value ]
         end
       end  # >>
 
@@ -173,13 +173,13 @@ module Skylab::Parse
           if in_st.unparsed_exists
             raise self.class.build_extra_input_tokens_event( in_st ).to_exception
           else
-            on.value_x
+            on.value
           end
         end
       end
 
       def parse_and_mutate_array a
-        _output_node_and_mutate_array( a ).value_x  # until this doesn't work
+        _output_node_and_mutate_array( a ).value  # until this doesn't work
       end
 
       def to_output_node_and_mutate_array_proc

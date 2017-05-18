@@ -39,11 +39,11 @@ module Skylab::Zerk
           use_x = " for more about #{ sym }s"  # meh
         end
 
-        @_for_what_kn = Common_::Known_Known[ use_x ] ; nil
+        @_for_what_kn = Common_::KnownKnown[ use_x ] ; nil
       end
 
       def for_more
-        @_for_what_kn = Common_::Known_Known[ " for more." ] ; nil
+        @_for_what_kn = Common_::KnownKnown[ " for more." ] ; nil
       end
 
     public
@@ -81,7 +81,7 @@ module Skylab::Zerk
 
         kn = remove_instance_variable :@_for_what_kn
         if kn
-          for_what = kn.value_x
+          for_what = kn.value
         else
           for_what = " for help"
         end

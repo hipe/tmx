@@ -23,7 +23,7 @@ describe "[pa] fuctions - serial optionals - foundation" do
     end
 
     it "built thing is a stream parser (_parse a full normal input)" do
-      against_( 'rando', '2' ).value_x.should eql [ :randomize, 2 ]
+      against_( 'rando', '2' ).value.should eql [ :randomize, 2 ]
     end
   end
 

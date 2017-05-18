@@ -229,7 +229,7 @@ module Skylab::Zerk
           kn = rw.read_value @association
 
           if kn.is_known_known
-            x = kn.value_x
+            x = kn.value
           end
 
           _qkn = Common_::QualifiedKnownKnown[ ( ! x ), @association ]

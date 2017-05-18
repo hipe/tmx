@@ -79,17 +79,17 @@ module Skylab::Parse::TestSupport
         p = Home_.function( :serial_optionals ).with(
           :functions,
           :proc, -> st do
-            if feet_rx =~ st.current_token_object.value_x
+            if feet_rx =~ st.current_token_object.value
               tok = st.current_token_object
               st.advance_one
-              Home_::OutputNode.for tok.value_x.to_i
+              Home_::OutputNode.for tok.value.to_i
             end
           end,
           :proc, -> st do
-            if inch_rx =~ st.current_token_object.value_x
+            if inch_rx =~ st.current_token_object.value
               tok = st.current_token_object
               st.advance_one
-              Home_::OutputNode.for tok.value_x.to_f
+              Home_::OutputNode.for tok.value.to_f
             end
           end ).to_parse_array_fully_proc
 

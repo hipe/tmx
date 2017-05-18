@@ -77,7 +77,7 @@ module Skylab::Permute
 
       -> st do
         x = st.gets_one
-        Common_::Known_Known[ x ]
+        Common_::KnownKnown[ x ]
       end
     end
 

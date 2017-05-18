@@ -36,7 +36,7 @@ module Skylab::TMX
         factory = @is_forwards ? Forwardsly___ : Reversely___
 
         a.sort_by do |group|
-          factory[ group.name_x ]
+          factory[ group.this_one_offset ]
         end
       end
 
@@ -55,13 +55,13 @@ module Skylab::TMX
           d = offset_via_value.fetch x do
 
             d_ = groups.length
-            groups.push Common_::Pair.via_value_and_name [], x  # note weird semantics
+            groups.push ThisOneItem_[ [], x ]
             offset_via_value[ x ] = d_
             d_
           end
 
           _group = groups.fetch d
-          _group.value_x.push node
+          _group.these_nodes.push node
         end
 
         @__unsorted_list_of_groups = groups
@@ -122,11 +122,11 @@ module Skylab::TMX
     class Known__
 
       def initialize x
-        @value_x = x
+        @value = x
       end
 
       attr_reader(
-        :value_x,
+        :value,
       )
 
       def is_known
@@ -137,7 +137,7 @@ module Skylab::TMX
     class ReverseCommonly___ < Known__
       def <=> otr
         if otr.is_known
-          otr.value_x <=> @value_x
+          otr.value <=> @value
         else
           -1
         end
@@ -147,13 +147,14 @@ module Skylab::TMX
     class ForwardsCommonly___ < Known__
       def <=> otr
         if otr.is_known
-          @value_x <=> otr.value_x
+          @value <=> otr.value
         else
           1
         end
       end
     end
 
+    # ==
     # ==
   end
 end

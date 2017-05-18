@@ -33,7 +33,7 @@ module Skylab::Zerk
       # (if we allowed for this, which we don't now. but we could.
 
       proto = if kn
-        kn.value_x
+        kn.value
       else
         Here_.const_get( const, false ).default_instance
       end

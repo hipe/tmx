@@ -239,7 +239,7 @@ module Skylab::System
           y << "#{ par o.qualified_knownness_of_path.association } #{
            }exists, won't overwrite without #{
             }#{ par o.force_arg.association }: #{
-             }#{ pth o.qualified_knownness_of_path.value_x }"
+             }#{ pth o.qualified_knownness_of_path.value }"
         end
       end
 
@@ -291,7 +291,7 @@ module Skylab::System
 
         ) do | y, o |
 
-          y << "creating #{ pth o.qualified_knownness_of_path.value_x }"
+          y << "creating #{ pth o.qualified_knownness_of_path.value }"
         end
       end
 
@@ -307,7 +307,7 @@ module Skylab::System
           if o.stat.size.zero?
             _zero_note = " empty file"
           end
-          _path = o.qualified_knownness_of_path.value_x
+          _path = o.qualified_knownness_of_path.value
 
           y << "updating#{ _zero_note } #{ pth _path }"
         end

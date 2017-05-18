@@ -176,7 +176,7 @@ module Skylab::Brazen::TestSupport
         end
 
         if had
-          Common_::Known_Known[ x ]
+          Common_::KnownKnown[ x ]
         else
           Common_::KNOWN_UNKNOWN
         end

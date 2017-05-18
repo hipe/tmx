@@ -8,7 +8,7 @@ module Skylab::Autonomous_Component_System
         # result is proc that produces an event describing the change.
 
         asc = new_qkn.association
-        new_x = new_qkn.value_x
+        new_x = new_qkn.value
 
         # make a note of any exisiting value before we replace it
         orig_kn = reader_writer.read_value asc
@@ -47,7 +47,7 @@ module Skylab::Autonomous_Component_System
           -> do
 
             _as_new_comp = as_component_via_component[ new_x ]
-            _as_prev_comp = as_component_via_component[ orig_kn.value_x ]
+            _as_prev_comp = as_component_via_component[ orig_kn.value ]
             _LL = build_linked_list_of_context[]
 
             Home_::Events::ComponentChanged.with(

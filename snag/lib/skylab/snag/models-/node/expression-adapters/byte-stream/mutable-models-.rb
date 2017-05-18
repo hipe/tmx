@@ -22,7 +22,7 @@ module Skylab::Snag
 
         def prepend_component_ qk, & _
 
-          obj = qk.value_x
+          obj = qk.value
           a = _mutable_row_at_index( @r.begin ).o_a_
           if a.length.nonzero?
             o = a.first
@@ -40,7 +40,7 @@ module Skylab::Snag
 
         def append_component_ qk, & _
 
-          obj = qk.value_x
+          obj = qk.value
           a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if a.length.nonzero?
             o = a.last
@@ -63,7 +63,7 @@ module Skylab::Snag
 
         def remove_component_ qk
 
-          obj = qk.value_x
+          obj = qk.value
           did = false
           x = nil
 

@@ -183,7 +183,7 @@ module Skylab::CodeMetrics
 
       def __resolve_head_module
         _scn = remove_instance_variable :@__const_scanner
-        @_head_module = _scn.flush_to_value.value_x
+        @_head_module = _scn.flush_to_value.value
         ACHIEVED_
       end
 

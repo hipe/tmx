@@ -329,7 +329,7 @@ module Skylab::Zerk::TestSupport
   Primitivesque_model_for_trueish_value_ = -> arg_st do
     x = arg_st.gets_one
     x or self._SANITY
-    Common_::Known_Known[ x ]
+    Common_::KnownKnown[ x ]
   end
 
   # -- mode-specific

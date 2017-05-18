@@ -38,13 +38,13 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :effect
 
           -> st do
-            Common_::Known_Known[ st.gets_one ]
+            Common_::KnownKnown[ st.gets_one ]
           end
         end
 
         def __effect__component * many, qk, & _x_p
 
-          many.push qk.value_x
+          many.push qk.value
           instance_variable_set qk.name.as_ivar, many
           :yep
         end

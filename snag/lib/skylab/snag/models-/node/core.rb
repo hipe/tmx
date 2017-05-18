@@ -189,7 +189,7 @@ module Skylab::Snag
 
     def __expect__tag__is__present__ qk, & oes_p
 
-      tag = qk.value_x
+      tag = qk.value
       existing = first_equivalent_item tag
       if existing
         ACHIEVED_
@@ -200,7 +200,7 @@ module Skylab::Snag
 
     def __expect__tag__is__absent__ qk, & oes_p
 
-      tag = qk.value_x
+      tag = qk.value
       existing = first_equivalent_item tag
       if existing
         ACS_[].send_component_already_added qk, self, & oes_p
@@ -221,7 +221,7 @@ module Skylab::Snag
 
     def __set__component qk, & _x_p
 
-      x = qk.value_x
+      x = qk.value
       instance_variable_set qk.name.as_ivar, x
       x || self._COVER_ME  # as soon as you have valid false-ishes, things change
     end
@@ -516,13 +516,13 @@ module Skylab::Snag
 
     Normalize_ID_ = -> qkn, & oes_p do  # 1x. eventing is per [br] API
 
-      x = ( qkn.value_x if qkn.is_known_known )
+      x = ( qkn.value if qkn.is_known_known )
       if x
 
         o = HomeModels__::NodeIdentifier.via_user_value_ x, & oes_p  # yes
 
         if o
-          Common_::Known_Known[ o ]
+          Common_::KnownKnown[ o ]
         else
           o
         end

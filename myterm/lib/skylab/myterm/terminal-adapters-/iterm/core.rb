@@ -52,7 +52,7 @@ module Skylab::MyTerm
 
     def check_version_of_iterm_
       @___CV_of_iT_qk ||= Magnetics_::Compatible_Version_of_Iterm[ self, & @_oes_p ]
-      @___CV_of_iT_qk.value_x
+      @___CV_of_iT_qk.value
     end
 
     def _init_via_vendor_node ivar, node_m, resolve_m

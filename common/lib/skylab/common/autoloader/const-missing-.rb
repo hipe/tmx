@@ -22,12 +22,12 @@ module Skylab::Common
       end
 
       def do_autoloaderize= x  # #cr
-        @_whether_to_autoloaderize_module = Known_Known.yes_or_no x
+        @_whether_to_autoloaderize_module = KnownKnown.yes_or_no x
         x
       end
 
       def autoloaderization_node_path= x  # #sm
-        @__autoloaderization_node_path_knownness = Known_Known[ x ]
+        @__autoloaderization_node_path_knownness = KnownKnown[ x ]
         x
       end
 
@@ -155,7 +155,7 @@ module Skylab::Common
 
         kn = @_whether_to_autoloaderize_module
         if kn
-          kn.value_x  # was decided externally. user's choice
+          kn.value  # was decided externally. user's choice
 
         elsif @_asset_reference.entry_group.includes_what_is_probably_a_directory
 
@@ -173,7 +173,7 @@ module Skylab::Common
         kn = @__autoloaderization_node_path_knownness
 
         _child_node_path = if kn
-          kn.value_x
+          kn.value
         else
           @_asset_reference.get_node_path
         end
@@ -216,7 +216,7 @@ module Skylab::Common
         x = ::Module.new
         @module.const_set @const_symbol, x
         @the_asset_value_ = x
-        @_whether_to_autoloaderize_module ||= Known_Known.trueish_instance
+        @_whether_to_autoloaderize_module ||= KnownKnown.trueish_instance
         ACHIEVED_
       end
 
