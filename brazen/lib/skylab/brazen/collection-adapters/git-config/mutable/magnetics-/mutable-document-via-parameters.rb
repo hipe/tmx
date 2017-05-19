@@ -128,7 +128,7 @@ module Skylab::Brazen
 
       # ==
 
-      class MutableDocument___
+      class MutableDocument___  # #stowaway
 
         def initialize bur
           @document_byte_upstream_reference = bur
@@ -245,6 +245,10 @@ module Skylab::Brazen
           otr = self.class.allocate
           otr.instance_variable_set :@_elements_, @_elements_.map( & :_DUPLICATE_DEEPLY_ )
           otr
+        end
+
+        def is_mutable  # [cu]
+          true
         end
       end
 

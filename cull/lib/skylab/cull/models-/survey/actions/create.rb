@@ -41,16 +41,21 @@ module Skylab::Cull
       end
 
       def __persist_survey_via_survey
-        _ = Here_::Magnetics_::CreateSurvey_via_Survey.call(
-          @_survey_, self, & _listener_ )
+        _ = @_survey_.persist_by_ do |o|
+          o.is_dry_run = @dry_run
+          o.filesystem = _filesystem_
+          o.listener = _listener_
+        end
         _
       end
 
       def __init_empty_survey
 
+        _config = Git_config_[]::Mutable.new_empty_document
+
         @_survey_ = Here_.define_sanitized_ do |o|
 
-          o.init_for_create__
+          o.accept_initial_config_ _config
           o.path = @path
         end
         NIL

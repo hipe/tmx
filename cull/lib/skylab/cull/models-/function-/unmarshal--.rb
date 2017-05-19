@@ -126,9 +126,7 @@ module Skylab::Cull
 
       def __when_zero
 
-        _name = Common_::Name.via_slug @_function_slug_head
-
-        _partial_const = FUNCTION_NAME_CONVENTION_[ _name ]
+        _partial_const = FUNCTION_NAME_CONVENTION_[ @_function_slug_head ]
 
         @_emit.call :error, :uninitialized_constant do
 

@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Upstream
+  module Models_::Upstream
 
     class Adapters__::Markdown < Here_::FileBasedAdapter_
 
@@ -18,7 +18,7 @@ module Skylab::Cull
         super path, & oes_p
       end
 
-      def to_descriptive_event
+      def to_descriptive_event  # (or `to_event`)
 
         Build_event_.call(
           :markdown_upstream,

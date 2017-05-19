@@ -10,7 +10,7 @@ module Skylab::Cull
 
     class Actions::Ping
 
-      # (if you like, compare to the simpler proc-based one at #spot1-1)
+      # (if you like, compare to the simpler proc-based one at #spot1.1)
 
       def initialize
         extend CommonActionMethods_
@@ -41,7 +41,31 @@ module Skylab::Cull
       include CommonActionMethods_
 
       def these_common_associations_
-        Common_associations___[]
+        Common_associations_[]
+      end
+
+      def resolve_existent_survey_via_path_
+
+        if __resolve_survey_path_via_path_SRVY
+          __resolve_survey_via_survey_path_SRVY
+        end
+      end
+
+      def __resolve_survey_via_survey_path_SRVY
+
+        # (parse the config file)
+
+        _su_path = remove_instance_variable :@__survey_path
+        _ = Here_::Magnetics_::Survey_via_SurveyPath[ _su_path, & _listener_ ]
+        _store_ :@_survey_, _
+      end
+
+      def __resolve_survey_path_via_path_SRVY
+
+        # (walk up from the argument path looking for the special filename)
+
+        _ = Here_::Magnetics_::SurveyPath_via_Path[ @path, & _listener_ ]
+        _store_ :@__survey_path, _
       end
 
       define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_  # (probably move up)
@@ -84,9 +108,9 @@ module Skylab::Cull
     end
 
     def initialize
-      @cfg_for_read = nil
+        @_mutex_for_config = nil
+        @persist_step_a = EMPTY_A_  # this is going away or full overhaul. setting it to this asserts that it is not used
       @entities = nil
-      @persist_step_a = nil
     end
 
     # ~ all #hook-in to [br] edit session API
@@ -98,8 +122,6 @@ module Skylab::Cull
       end
 
     attr_writer(
-      :cfg_for_read,
-      :cfg_for_write,
       :path,
     )
 
@@ -108,74 +130,6 @@ module Skylab::Cull
       end
 
     # ==
-
-    def __create_via_mutable_qualified_knownness_box_and_look_path bx, path
-      @_path = path
-      @persist_step_a ||= []
-      @persist_step_a.push [ :__create_editable_document ]
-
-      _edit_via_mutable_qualified_knownness_box bx
-    end
-
-    def _edit_via_mutable_qualified_knownness_box bx
-
-      arg_a = bx.to_value_stream.reduce_by do | arg |
-        arg.is_known_known && :path != arg.name_symbol
-      end.to_a
-
-      if arg_a.length.zero?
-        self
-      else
-
-        _ok = Here_::Magnetics_::EditEntities_via_Request_and_Survey.call(
-          arg_a, bx, self, & @on_event_selectively )
-
-        _ok and self
-      end
-    end
-
-    # ~ public API for :+#actors near persistence
-
-    # ~~ flushers
-
-    def re_persist is_dry  # assume a config for read
-
-      # convert a read-only document to a mutable document "by hand"
-
-      _r_cfg = remove_instance_variable :@cfg_for_read
-
-      bur = _r_cfg.document_byte_upstream_reference
-
-      cfg = Git_config_[]::Mutable.parse_document_by do |o|
-        o.byte_upstream_reference = bur
-        o.listener = @on_event_selectively
-      end
-
-      cfg || self._SANITY__why_did_it_not_parse__it_was_OK_before__
-
-      @cfg_for_write = cfg
-
-      _ok = flush_persistence_script_
-      _ok and _write is_dry
-    end
-
-    def write_ p, is_dry
-
-      ::Dir.mkdir survey_path_  # dry? atomic? meh
-
-      _write p, is_dry
-    end
-
-    def _write p, is_dry
-
-      _path = ::File.join survey_path_, CONFIG_FILENAME_
-
-      @cfg_for_write.write_to_path_by do |o|
-        o.path = _path
-        o.is_dry = is_dry
-        o.listener = p
-      end  # number of bytes
-    end
 
     # ~~ interface for the persistence script
 
@@ -188,6 +142,9 @@ module Skylab::Cull
     def flush_persistence_script_
       a = @persist_step_a ; @persist_step_a = nil
       ok = true
+      if a.length.nonzero?
+        self._STOP_THE_INSANITY
+      end
       a.each do | m, * args |
         ok = send m, * args
         ok or break
@@ -197,61 +154,15 @@ module Skylab::Cull
 
     # ~~ steps avaiable for the persistence script
 
-    def init_for_create__
-
-      @cfg_for_read = nil
-
-      @cfg_for_write = Git_config_[]::Mutable.new_empty_document
-
-      @persist_step_a = EMPTY_A_  # assertion
-
-      NIL
-    end
-
     def call_on_associated_entity_ ent_sym, m, * args
       touch_associated_entity_( ent_sym ).send m, * args
     end
 
     # ~~ misc functions for actors & top entities
 
-    def config_for_read_
-      @cfg_for_read
-    end
-
-    def config_for_write_
-      @cfg_for_write
-    end
-
-    def derelativize path
-      pth = _workspace_path and ::File.join( pth, path )
-    end
-
-    def maybe_relativize_path path
-
-      _from = _workspace_path
-
-      relpath = Home_.lib_.basic::Pathname::Relative_path_from[ path, _from ]
-
-      if relpath.length < path.length
-        relpath
-      else
-        path
-      end
-    end
-
-    def _workspace_path
-      self._HEY__readme__  # see #here1
-      @___did_calc_WS_path ||= begin
-        if @_path
-          @__ws_path = ::File.join @_path, FILENAME_
-        end
-        true
-      end
-      @__ws_path
-    end
-
     def persist_box_and_value_for_name_symbol_ bx, value_string, section_sym
 
+      self._CHANGED__at_this_commit__  # the below ivar is gone
       cfg = @cfg_for_write
 
       delete_these, change_the_name_of_this_one = ___all_become_one section_sym
@@ -291,6 +202,7 @@ module Skylab::Cull
 
     def ___all_become_one section_sym
 
+      self._CHANGED__at_this_commit__  # the below ivar is gone
       st = @cfg_for_write.sections.to_stream_of_sections.reduce_by do |el|
         section_sym == el.external_normal_name_symbol
       end
@@ -314,6 +226,7 @@ module Skylab::Cull
 
     def destroy_all_persistent_nodes_for_name_symbol_ section_sym
 
+      self._CHANGED__at_this_commit__  # the below ivar is gone
       cfg = @cfg_for_write
 
       st = cfg.sections.to_stream_of_sections.reduce_by do |el|
@@ -355,10 +268,12 @@ module Skylab::Cull
     # ~ public API for #:+actors near "associated entities" API (experiment)
 
     def existent_associated_entity_ ent_sym  # placeholder for etc.
+      self._AWAY__this_method__
       @entities.fetch ent_sym
     end
 
     def touch_associated_entity_ ent_sym
+      self._AWAY__this_method__
 
       if @entities
         ent = @entities[ ent_sym ]
@@ -380,11 +295,60 @@ module Skylab::Cull
       ent
     end
 
-      # -- B: this support
+      # -- C ..
+
+      def define_and_assign_component__ sym, & p
+
+        _hi = MTk_::AssociationToolkit::DefineAndAssignComponent_via_Block_and_Symbol.call_by do |o|
+          o.entity_definition_block = p
+          o.association_symbol = sym
+          o.mutable_entity = self
+        end
+        _hi  # hi. #todo
+      end
+
+      # -- B ..
+
+      def accept_initial_config_ cfg
+        remove_instance_variable :@_mutex_for_config
+        if cfg.is_mutable
+          @config_for_write_ = :_mutable_config
+          @config_for_read_ = :_mutable_config
+          @_mutable_config = cfg
+        else
+          @config_for_read_ = :__read_only_config
+          @__read_only_config = cfg
+        end
+        NIL
+      end
+
+      def config_for_write_
+        send @config_for_write_
+      end
+
+      def config_for_read_
+        send @config_for_read_
+      end
+
+      def _mutable_config
+        @_mutable_config
+      end
+
+      def __read_only_config
+        @__read_only_config
+      end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # -- A: popular readers
+
+      def persist_by_
+        # was `re_persist`
+        Here_::Magnetics_::CreateSurvey_via_Survey.call_by do |o|
+          yield o
+          o.survey = self
+        end
+      end
 
       def to_event
         _path = survey_path_
@@ -393,6 +357,17 @@ module Skylab::Cull
           :path, _path,
           :is_completion, true,
         )
+      end
+
+      def _derelativize_by_
+        method :__derelativize_path
+      end
+
+      def __derelativize_path path
+        head = survey_path_
+        if head
+          ::File.join head, path
+        end
       end
 
       def survey_path_
@@ -409,17 +384,35 @@ module Skylab::Cull
         @_survey_path_value
       end
 
+      def to_stream_of_qualified_components__
+        MTk_::AssociationToolkit::QualifiedComponentStream_via_Entity[ self ]
+      end
+
+      def _read_softly_via_association_ asc
+        ivar = asc.name.as_ivar
+        if instance_variable_defined? ivar
+          x = instance_variable_get ivar
+          x.nil? and self._NEVER__no_big_deal_readme__  # #todo
+            # (let's only ever have ivar "defined" coincide with being "set")
+          x
+        end
+      end
+
+      def _associations_operator_branch_
+        Here_::Models__.boxxy_module_as_operator_branch
+      end
+
+      def _models_module_
+        Models_
+      end
+
     # -
     # ==
 
     module Models__
 
-      define_singleton_method :tricky_index__, ( Lazy_.call do
-        Home_._LETS_FIX_THIS
-        Build_tricky_index___[ self ]
-      end )
-
       Autoloader_[ self, :boxxy ]
+      # (this is the frontier use-case [#co-030.5] boxxy as operator branch)
 
       same = 'function--'
       stowaway :Map, same
@@ -429,7 +422,7 @@ module Skylab::Cull
 
     # ==
 
-    Common_associations___ = Lazy_.call do
+    Common_associations_ = Lazy_.call do
 
       _ca = Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
 
@@ -471,38 +464,15 @@ module Skylab::Cull
 
       def list
 
-        @parse_tree.will_normalize_by do |xx, & pp|
-          ::Kernel._OKAY
-        end
+        # (until recently, we use to do this all custom..) now it's a
+        # palceholder for the idea of doing something crazy..)
+
+        @parse_tree.be_glob
         KEEP_PARSING_
       end
     end
 
     # ==
-
-    Build_tricky_index___ = -> mod do
-
-      # workaround for new autoloader - reflect on all nodes in filesystem
-      # plus all registered stowaways.
-      # (boxxy doesn't reflect on stowaways but maybe it should [#co-041])
-
-      h = {}
-
-      st = mod.entry_tree.to_asset_reference_stream
-      begin
-        sm = st.gets
-        sm || break
-        h[ sm.entry_group_head ] = true
-        redo
-      end while nil
-
-      mod.stowaway_hash_.keys.each do |k|
-        _slug = Common_::Name.via_const_symbol( k ).as_slug
-        h[ _slug ] = true
-      end
-
-      h
-    end
 
     # ==
 

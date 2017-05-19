@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Upstream
+    module Models__::Upstream
 
       def initialize survey, & oes_p
         @survey = survey

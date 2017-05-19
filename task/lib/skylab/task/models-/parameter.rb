@@ -157,9 +157,9 @@ class Skylab::Task
             redo
           end
 
-          x = src.read_softly_via_association asc
+          x = src._read_softly_via_association_ asc
           if x.nil?
-            if ! dst.read_softly_via_association( asc ).nil?
+            if ! dst._read_softly_via_association_( asc ).nil?
               # if the parameter value store's value is effectively unknown
               # and the destination's value is effectively known, leave the
               # existing value as-is. (don't use default, don't write nil.)

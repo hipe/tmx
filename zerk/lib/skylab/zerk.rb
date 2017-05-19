@@ -126,6 +126,10 @@ module Skylab::Zerk  # intro in [#001] README
 
     lazily :API_ArgumentScanner, & ndz
 
+    lazily :AssociationToolkit do |c|
+      Home_.lib_.ACS::AssociationToolkit
+    end
+
     lazily :NoDependenciesZerk do  # [pl]
       No_deps_zerk_[]
     end

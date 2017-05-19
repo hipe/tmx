@@ -1,66 +1,62 @@
 module Skylab::Cull
 
-  class Models_::Upstream
+  module Models_::Upstream
 
-    class Adapter_via_ActionArguments___
+    class Adapter_via_ActionArguments___ < Common_::MagneticBySimpleModel
 
-      ATTRIBUTES = Attributes_.call(
-        derelativizer: nil,
-        table_number: nil,
-        upstream: nil,
-        upstream_adapter: nil,
-      )
-
-      class << self
-        define_method :call, VALUE_BOX_EXPLODER_CALL_METHOD_
-        alias_method :[], :call
-        alias_method :begin_session__, :new
-        undef_method :new
-      end  # >>
-
-      def initialize & oes_p
-        @_emit = oes_p
+      def initialize
+        super  # hi.
       end
+
+      attr_writer(
+        :derelativize_by,
+        :filesystem,
+        :listener,
+        :table_number,
+        :upstream_string,
+        :upstream_adapter_symbol,
+      )
 
       def execute
 
-        @md = /\A(?<prefix>[a-z0-9-]+):(?<arg>.+)/.match @upstream
+        @md = /\A(?<prefix>[a-z0-9-]+):(?<arg>.+)/.match @upstream_string
 
         if @md
           @prefix = @md[ :prefix ]
           @arg = @md[ :arg ]
-          via_prefix
+          _via_prefix
         else
-          via_path
+          __via_path
         end
       end
 
-      def via_path
-        if ::File::SEPARATOR == @upstream[ 0 ]
+      def __via_path
+        s = @upstream_string
+        if Path_looks_absolute_[ s ]
           @prefix = :file
-          @arg = @upstream
-          via_prefix
+          @arg = x
+          _via_prefix
         else
-          when_relpath @upstream
+          _when_relpath s
         end
       end
 
-      def via_prefix
+      def _via_prefix
 
-        m = :"process_as_#{ @prefix }_identifier_string"
+        m = :"__process_as__#{ @prefix }__identifier_string"  # also #here1
 
         if respond_to? m
           send m, @arg
         else
-          when_prefix
+          __when_prefix
         end
       end
 
-      def when_prefix
+      def __when_prefix
 
-        @_emit.call :error, :invalid_prefix do
+        @listener.call :error, :invalid_prefix do
 
-          _s_a = get_available_prefixes
+          _s_a = __get_available_prefixes
 
           Home_.lib_.fields::Events::Extra.with(
             :unrecognized_token, @prefix,
@@ -72,8 +68,8 @@ module Skylab::Cull
         UNABLE_
       end
 
-      def get_available_prefixes
-        rx = /\Aprocess_as_([a-z_0-9]+)_identifier_string\z/
+      def __get_available_prefixes
+        rx = /\A__process_as__([a-z_0-9]+)__identifier_string\z/  # also #here1
         self.class.instance_methods( false ).reduce [] do | m, x |
           md = rx.match x
           if md
@@ -83,104 +79,116 @@ module Skylab::Cull
         end
       end
 
-      def process_as_file_identifier_string str
-        path = __via_derelativizer_absolutize_path str
-        path and process_as_file_absolute_path path
+      def __process_as__file__identifier_string str
+        @_unsanitized_path = str
+        ok = __via_derelativizer_absolutize_path
+        ok &&= __check_that_absolute_path_is_file
+        ok && __via_absolute_path_that_exists
       end
 
-      def __via_derelativizer_absolutize_path str
-        if str
-          if str.length.zero?
-            UNABLE_
-          elsif ::File::SEPARATOR == str[ 0 ]
-            str
-          else
-            if @derelativizer
-              x = @derelativizer.derelativize str
-            end
-            x or when_relpath str
-          end
+      def __via_derelativizer_absolutize_path
+        s = @_unsanitized_path
+        if ! s
+          UNABLE_  # hi.
+        elsif s.length.zero?
+          UNABLE_  # hi.
+        elsif Path_looks_absolute_[ s ]
+          @_absolute_path = remove_instance_variable :@_unsanitized_path ; true
         else
-          str
+          p = @derelativize_by
+          s = remove_instance_variable :@_unsanitized_path
+          if p
+            x = p[ s ]
+          end
+          if _store :@_absolute_path, x
+            ACHIEVED_
+          else
+            _when_relpath s
+          end
         end
       end
 
-      def when_relpath path
+      def _when_relpath path
 
-        @_emit.call :error, :path_must_be_absolute do
+        @listener.call :error, :path_must_be_absolute do
           Build_not_OK_event_[ :path_must_be_absolute, :path, path ]
         end
         UNABLE_
       end
 
-      def process_as_file_absolute_path path
+      def __check_that_absolute_path_is_file
 
-        _real_FS = Home_.lib_.system.filesystem
-
-        yes = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
-          :path, path,
+        _yes = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
+          :path, @_absolute_path,
           :must_be_ftype, :FILE_FTYPE,
-          :filesystem, _real_FS,
-          & @_emit )
+          :filesystem, @filesystem,
+          & @listener )
 
-        if yes
-          when_path_resolved_as_valid_one_time path
-        else
-          yes
+        _yes  # hi. #todo
+      end
+
+      def __via_absolute_path_that_exists
+
+        if __resolve_adapter_class
+          __adapter_via_adapter_class
         end
       end
 
-      def when_path_resolved_as_valid_one_time path
-
-        if @upstream_adapter
-          via_upstream_adapter_via_path path
+      def __resolve_adapter_class
+        if @upstream_adapter_symbol
+          __resolve_adapter_class_via_upstream_adapter
         else
-          via_path_extension path
+          __resolve_adapter_class_via_path_extension
         end
       end
 
-      # ~ pairs
+      # -- (begin pairs)
 
-      def via_path_extension path
-        extname = ::File.extname path
-        cls = __class_via_extension extname
-        if cls
-          adapter_via_path_and_class path, cls
+      # ~ via absolute path and X (2x)
+
+      def __resolve_adapter_class_via_path_extension
+        @_extname = ::File.extname @_absolute_path
+        if __resolve_adapter_class_via_extension
+          ACHIEVED_
         else
-          when_bad_extension extname
+          __when_bad_extension
         end
       end
 
-      def __class_via_extension ext
+      def __resolve_adapter_class_via_extension
 
-        Here_::Adapters__.constants.reduce nil do | m, const |
+        _ = Here_::Adapters__.constants.reduce nil do |m, const|
 
           cls = Here_::Adapters__.const_get const, false
 
-          cls::EXTENSIONS.include?( ext ) and break cls
-
+          if cls::EXTENSIONS.include? @_extname
+            break cls
+          end
         end
+
+        _store :@_adapter_class, _
       end
 
-      def via_upstream_adapter_via_path path
+      def __resolve_adapter_class_via_upstream_adapter
 
-        cls = __class_via_const_guess Common_::Name.
-          via_variegated_symbol( @upstream_adapter ).as_const
+        _c = Common_::Name.via_variegated_symbol( @upstream_adapter_symbol ).as_const
 
-        if cls
-          adapter_via_path_and_class path, cls
+        cls = Autoloader_.const_reduce( _c, Here_::Adapters__ ) { NOTHING_ }
+
+        if _store :@_adapter_class, cls
+          ACHIEVED_
         else
-          when_bad_adapter @upstream_adapter
+          __when_bad_upstream_adapter
         end
       end
 
-      def __class_via_const_guess x
-        Autoloader_.const_reduce( x, Here_::Adapters__ ) { NOTHING_ }
-      end
+      # ~ when bad X (2x)
 
-      def when_bad_extension extname
+      def __when_bad_extension
 
-        @_emit.call :error, :invalid_extension do
+        extname = remove_instance_variable :@_extname
+
+        @listener.call :error, :invalid_extension do
 
           _s_a = _sorted_upstream_adapters_names.map do | nm |
             ".#{ nm.as_slug }"
@@ -196,9 +204,13 @@ module Skylab::Cull
         UNABLE_
       end
 
-      def when_bad_adapter sym
+      def __when_bad_upstream_adapter
 
-        @_emit.call :error, :invalid_adapter do
+        ::Kernel._REVIEW
+
+        sym = @upstream_adapter_symbol
+
+        @listener.call :error, :invalid_adapter do
 
           _s_a = _sorted_upstream_adapters_names.map do | nm |
             nm.as_lowercase_with_underscores_symbol
@@ -228,15 +240,30 @@ module Skylab::Cull
         name_a.freeze
       end
 
-      # ~ end pairs
+      # -- (end pairs)
 
-      def adapter_via_path_and_class path, cls
-        if @table_number
-          cls.via_table_number_and_path @table_number, path, & @_emit
+      def __adapter_via_adapter_class
+        d = @table_number
+        path = remove_instance_variable :@_absolute_path
+        if d
+          d.bit_length || self._SANITY__this_should_have_been_normalized_by_not
+          @_adapter_class.via_table_number_and_path x, path, & @listener
         else
-          cls.via_path path, & @_emit
+          @_adapter_class.via_path path, & @listener
         end
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # ==
+
+      Path_looks_absolute_ = -> path do
+        _yes = Home_.lib_.system.filesystem.path_looks_absolute path
+        _yes  # hi. #todo
+      end
+
+      # ==
+      # ==
     end
   end
 end

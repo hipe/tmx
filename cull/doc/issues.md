@@ -1,3 +1,6 @@
+
+[#009]       (reserved for [#001] to become)
+
 [#008] #open try a bad action name in API. it lists the non-participating
              nodes when it shouldn't
 

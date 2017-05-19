@@ -1,5 +1,30 @@
 # thoughts on the abstract component system ("ACS") experiment :[#002]
 
+## new preface
+
+the "autonomous component system" has come to represent an idea as much
+as a library. this document in its current state straddles both the very
+old (where "ACS" was primarily a library) and the contemporaneous with
+this writing, where "ACS" is an approach that informs design both within
+this library and outside of it. hopefully from context it will be clear
+under which category each of the below sections falls.
+
+
+
+## table of contents
+
+(this is mainly as a reference for placeholder for would-be identifiers,
+if we ever modernize the conventions there.)
+
+  - introductions, table of contents - would be a/A/1
+  - design tenets - would be b/B/2. #open [#002] modernize convention
+  - principles & patterns - would be c/C/3
+  - comparison to other related doo-hahs - would be d/D/4
+  - new experiments with associations - would be e/E/5
+  - the N tenets in depth f/F/6
+
+
+
 ## design tenets
 
 these tenets are a distilled expression of the "principles & patterns"
@@ -145,6 +170,42 @@ violoation of which should occur only with good reason.
   "transitive operation" syntax are in a hard-coded set of about 4 keywords.
   there is as yet no plan to make this soft-coded. however this doesn't
   really have an equivalent in [br] so it's not relelvant anyway.
+
+
+
+
+## new experiments with associations :[#here.5]
+
+[cu]  (which is relatively old) is undergoing an overhaul that will employ
+the "best of" ideas from [ac] but all new implementation code employing the
+"best of" ideas of the legacy implementation code there.
+
+  - the main point of distinction of the legacy [cu] is one of implemention
+    of how associtions are represented, which (for this one model) was
+    through using the filesystem instead of the instance method space.
+
+    - as was with the legacy application, in the new work we'll at first
+      attempt using [#co-030] "boxxy"-like modules to represent the
+      associations (although it would be nice if this particular solution
+      were not a requirement).
+
+    - as an implementation detail (but one that informs the overall design),
+      all the *formal* associations for a given entity (model) will be
+      derived from a single filesystem hit (one hit per model).
+
+  - associated components are stored in the entity using the entity's
+    ivar space generally. (so an instance of `PersonName` might have
+    members `@first_name`, `@middle_name`, '@last_name`.)
+
+    - this choice to use ivars and not some other arrangement of storage
+      should have little impact aside from work at the sub-entity level.
+
+    - ivar names are derived directly from "associations" (above) and so
+      the ivar namespace of "normal names" should be left wide open for
+      associations. (so avoid `@normal_names` for any other purpose.)
+
+      - so ivar names that are part of the API (we avoid these) are named
+        `@_like_this_`.
 
 
 

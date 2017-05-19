@@ -963,7 +963,7 @@ module Skylab::Fields
       NIL
     end
 
-    def read_softly_via_association asc
+    def _read_softly_via_association_ asc
       if knows_value_for_association asc
         dereference_association asc
       end

@@ -104,6 +104,232 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
             Lib_, self )
       end
     end  # >>
+
+  Common_ = ::Skylab::Common
+
+  module AssociationToolkit
+
+    class DefineAndAssignComponent_via_Block_and_Symbol < Common_::MagneticBySimpleModel
+
+      attr_writer(
+        :association_symbol,
+        :entity_definition_block,
+        :mutable_entity,
+      )
+
+      def execute
+
+        qc = QualifiedComponent_via___[ @association_symbol, @mutable_entity ]
+
+        # ~( #todo
+        qc.association.module || fail
+        # ~)
+
+        if qc.is_known_known
+          self._COVER_ME__what_to_do_about_clobber_here
+        end
+
+        _model_mod = qc.association.model_module
+
+        el = _model_mod.define do |o|
+          @entity_definition_block[ o ]
+        end
+
+        if el
+          self._COVER_ME__where_is_this_first
+          ACHIEVED_
+        else
+          NOTHING_  # hi. #cov1.1
+        end
+      end
+    end
+
+    qualified_component_reader_for = nil
+    association_stream_via_entity = nil
+
+    QualifiedComponentStream_via_Entity = -> ent do
+
+      # via the entity produce a stream whose each item is a [#co-004]
+      # qualified knownness. the items in the stream will correspond 1-to-1
+      # (in the same order) as the *formal* associations of the entity.
+      # each such formal association either does or doesn't have an actual
+      # component associated with it, and each item will accordingly be a
+      # known known or known unknown.
+      #
+      # "plural" associations are not given special treatement in this
+      # arrangement: the association will have one item in this stream
+      # regardless of whether the association has an assignment or not.
+      # when populated, the value of the item will be the array or
+      # comparable collection adapter.
+
+      # -
+        read = qualified_component_reader_for[ ent ]
+        _st = association_stream_via_entity[ ent ]
+
+        _st.map_by do |asc|
+          read[ asc ]  # hi.
+        end
+      # -
+    end
+
+    association_reader_via_entity = nil
+    qualified_component_reader_for = nil
+
+    QualifiedComponent_via___ = -> sym, ent do
+      # -
+
+        ob = ent._associations_operator_branch_
+
+        _item = ob.dereference sym
+
+        _asc = association_reader_via_entity[ ent ][ _item ]
+
+        qualified_component_reader_for[ ent ][ _asc ]
+      # -
+    end
+
+    qualified_component_reader_for = -> ent do
+      -> asc do
+        # -
+          x = ent._read_softly_via_association_ asc
+          if x || ! x.nil?  # imagine ::BasicObject
+            Common_::QualifiedKnownKnown.via_value_and_association x, asc
+          else
+            Common_::QualifiedKnownUnknown.via_association asc
+          end
+        # -
+      end
+    end
+
+    association_stream_via_entity = -> ent do
+
+      # (you don't have to use the filesystem to represent your assocs but it is default)
+      # -
+        _ob = ent._associations_operator_branch_
+
+        _st = _ob.to_loadable_reference_stream
+
+        asc_via_item = association_reader_via_entity[ ent ]
+
+        _st.map_by do |item|
+          asc_via_item[ item ]  # hi.
+        end
+      # -
+    end
+
+    association_reader_via_entity = -> ent do
+
+      prototype = Association___.new ent
+
+      -> item do
+        prototype.new item  # hi.
+      end
+    end
+
+    class Association___
+
+      # (think of this as the first of perhaps a couple kinds of adapters -
+      # this one being for our weird new filesystem-based association API)
+
+      def initialize ent
+
+        _ob = ent._associations_operator_branch_
+
+        @__association_module = -> item do
+          _c = item.name.as_const
+          _mod = _ob.module.const_get _c, false
+          _mod  # hi. #todo
+        end
+
+        @__associated_module = -> item do
+
+          _c = item.name.as_const
+
+          # when #plurals ..
+
+          _mod = ent._models_module_.const_get _c, false
+          _mod  # hi. #todo
+        end
+
+        @model_module = :__associated_model_module_initially
+        @module = :__association_module_initially
+        @name = :__name_initially
+        @_counter = 0
+
+        freeze
+      end
+
+      def new item
+        dup.__init item
+      end
+
+      def __init item
+        @_remote_item = item
+        self
+      end
+
+      # --
+
+      def module
+        send @module
+      end
+
+      def model_module
+        send @model_module
+      end
+
+      def __association_module_initially
+        @module = :__module
+        _ = remove_instance_variable( :@__association_module )[ @_remote_item ]
+        @__module = _
+        _maybe_freeze
+        send @module
+      end
+
+      def __associated_model_module_initially
+        @model_module = :__model_module
+        _ = remove_instance_variable( :@__associated_module )[ @_remote_item ]
+        @__model_module = _
+        _maybe_freeze
+        send @model_module
+      end
+
+      def __module
+        @__module
+      end
+
+      def __model_module
+        @__model_module
+      end
+
+      def _maybe_freeze  # sneaky as hell
+        if 2 == ( @_counter += 1 )
+          @name = :__name_when_frozen
+          @__name = remove_instance_variable( :@_remote_item ).name
+          remove_instance_variable :@_counter
+          freeze ; nil
+        end
+      end
+
+      def name_symbol
+        name.as_lowercase_with_underscores_symbol
+      end
+
+      def name
+        # (we don't memoize the below name because it might correct itself..)
+        send @name
+      end
+
+      def __name_initially
+        @_remote_item.name
+      end
+
+      def __name_when_froze
+        @__name
+      end
+    end
+  end
+
     # <-
   class Component_Association
 
@@ -553,7 +779,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
-    Common_ = ::Skylab::Common
     Autoloader_ = Common_::Autoloader
 
     module Operation
@@ -626,5 +851,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     y << "building blocks. the underpinnings of early \"zerk\"."
   end
 end
+# #history-3.1: begin spike of brand new work for [cu] revamp
 # #tombstone: `caching_method_based_reader_for`
 # #tombstone (maybe) - how parts of this file is/were structured is/was [#bs-039]

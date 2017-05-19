@@ -211,7 +211,7 @@ module Skylab::Fields
             mixed_asc = mixed_asc_st.gets
             mixed_asc || break
             is_req[ mixed_asc ] || redo
-            _x = vvs.read_softly_via_association mixed_asc
+            _x = vvs._read_softly_via_association_ mixed_asc
             _x.nil? || redo
             n11n.add_missing_required_MIXED_association_ mixed_asc
             redo
@@ -545,7 +545,7 @@ module Skylab::Fields
           NIL
         end
 
-        def read_softly_via_association asc  # [ta]
+        def _read_softly_via_association_ asc  # [ta]
           @_box[ asc.name_symbol ]
         end
 

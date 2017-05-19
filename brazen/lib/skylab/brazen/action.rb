@@ -85,8 +85,10 @@ module Skylab::Brazen
 
       proc_for_list = -> do
         a = qual_item.item
-        Common_::Stream.via_times a.length do |d|
-          if d.zero?
+        len = a.length
+        last = len - 1
+        Common_::Stream.via_times len do |d|
+          if last == d
             p = main
           end
           a.fetch d

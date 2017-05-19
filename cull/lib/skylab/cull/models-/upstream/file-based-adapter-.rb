@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Upstream
+  module Models_::Upstream
 
       class FileBasedAdapter_
 
@@ -16,10 +16,12 @@ module Skylab::Cull
           @_emit = oes_p
         end
 
-        def to_mutable_marshal_box_for_survey_ survey
+        def to_mutable_marshal_box_for_survey survey
+
+          _upstream = "file:#{ survey.maybe_relativize_path__ @path }"
 
           bx = Common_::Box.new
-          bx.add :upstream, "file:#{ survey.maybe_relativize_path( @path ) }"
+          bx.add :upstream, _upstream
           bx.add :adapter, adapter_symbol
           bx
         end

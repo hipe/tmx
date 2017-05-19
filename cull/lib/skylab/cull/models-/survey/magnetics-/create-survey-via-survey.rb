@@ -2,14 +2,20 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Magnetics_::CreateSurvey_via_Survey < Common_::Dyadic
+    class Magnetics_::CreateSurvey_via_Survey < Common_::MagneticBySimpleModel
 
-      def initialize survey, eek, & p
-        @filesystem = eek._microservice_invocation_.invocation_resources.filesystem
-        @is_dry_run = eek._simplified_read_ :dry_run  # where available
-        @listener = p
-        @survey = survey
+      def initialize
+        @is_re_persist = nil
+        super  # hi.
       end
+
+      attr_writer(
+        :is_dry_run,
+        :is_re_persist,
+        :listener,
+        :filesystem,
+        :survey,
+      )
 
       def execute
 
@@ -18,12 +24,78 @@ module Skylab::Cull
         # that is, that the directory itself does not exist but that its
         # dirname exists and is a directory.
 
-        if __check_the_thing_ding_with_the_thing
-          __money
+        ok = __maybe_check_that_directory_exists
+        ok &&= __write_things_other_than_the_config_file
+        ok && __write_the_config_file
+      end
+
+      # -- D
+
+      def __write_things_other_than_the_config_file
+
+        st = @survey.to_stream_of_qualified_components__
+        ok = true
+        begin
+          qk = st.gets
+          qk || break
+          @_current_qualified_component = qk
+          ok = __write_current_qualified_component
+        end while ok
+        ok
+      end
+
+      def __write_current_qualified_component
+        qk = @_current_qualified_component
+        if qk.is_known_known
+          self._NEET
+        else
+          # (cleanup assets..)
+          $stderr.puts "IGNORING CLEAN UP ASSETS FOR NOW in [cu] (for #{ qk.name.as_const })"
+          ACHIEVED_
         end
       end
 
-      def __check_the_thing_ding_with_the_thing
+      # -- C
+
+      def __write_the_config_file
+
+        cfg = @survey.config_for_write_  # ..
+
+        if cfg.DOCUMENT_IS_EMPTY
+          cfg.add_comment "ohai"
+        end
+
+        dir = @survey.survey_path_
+
+        _path = ::File.join dir, CONFIG_FILENAME_
+
+        if ! @is_re_persist
+          ::Dir.mkdir dir  # dry? atomic? failure? meh
+        end
+
+        @survey.flush_persistence_script_  # goes away momentarily
+
+        _bytes = cfg.write_to_path_by do |o|
+          o.path = _path
+          o.is_dry = @is_dry_run
+          o.listener = @listener
+        end  # number of bytes
+
+        _bytes  # hi. #todo
+      end
+
+      # -- B
+
+      def __maybe_check_that_directory_exists
+        if @is_re_persist
+          # (we assume that the directory hasn't been removed since ..)
+          ACHIEVED_
+        else
+          __check_that_directory_exists
+        end
+      end
+
+      def __check_that_directory_exists
 
         kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
 
@@ -54,7 +126,16 @@ module Skylab::Cull
           cfg.add_comment "ohai"
         end
 
-        _bytes = @survey.write_ @listener, @is_dry_run
+        survey_path = @survey.survey_path_
+        ::Dir.mkdir survey_path  # dry? atomic? errors? meh.
+
+        _path = ::File.join survey_path, CONFIG_FILENAME_
+
+        _bytes = cfg.write_to_path_by do |o|
+          o.path = _path
+          o.is_dry = @is_dry_run
+          o.listener = @listener
+        end  # number of bytes
 
         _bytes  # hi. #todo
       end
@@ -76,8 +157,7 @@ module Skylab::Cull
 
           Here_.define_sanitized_ do |o|
 
-            o.cfg_for_write = nil
-            o.cfg_for_read = cfg
+            o.accept_initial_config_ cfg
             o.survey_path = su_path
           end
         end

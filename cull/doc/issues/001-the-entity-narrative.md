@@ -1,5 +1,10 @@
 # the entity narrative :[#001]
 
+(EDIT - there's something here, but names should be moderninzed)
+
+
+
+
 ## prerequisite
 
 see [#007] README for development.
@@ -24,7 +29,7 @@ the shortest reasonable synopsis of this whole document is:
 
 in more detail, in [cu] an "entity" is:
 
-  • an *unorderd* collection of "actual properties". to use another
+  • an *unordered* collection of "actual properties". to use another
     term, this collection is a "multiset" or "bag".
 
 (for review "multiset/bag" means an unordered collection where there
@@ -106,3 +111,14 @@ criteria on some "fields", the actual value is
 ignored/meaningless/undefined.
 
 ...
+
+
+
+## implementation
+
+
+
+
+## document-meta
+
+  - #pending-rename: open up the [#001] identifier for the README - probably [#009]

@@ -2,37 +2,26 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Magnetics_::EditEntities_via_Request_and_Survey
+    class Magnetics_::EditEntities_via_Request_and_Survey < Common_::MagneticBySimpleModel
 
-      Attributes_actor_ = -> cls, * a do
-        Home_.lib_.fields::Attributes::Actor.via cls, a
-      end
-
-      Attributes_actor_.call( self,
-        :passed_arg_a,
-        :arg_box,
+      attr_writer(
+        :listener,
+        :parameter_value_store,
         :survey,
       )
 
       def execute
-
-        ok = ACHIEVED_
-        st = Common_::Stream.via_nonsparse_array @passed_arg_a
-
-        begin
-          @_arg = st.gets
-          @_arg || break
-
+        ok = true
+        while __next_relevant_provided_argument
           ok = if __looks_verby
             __when_verby
           elsif __has_model
             __when_model
           else
-            KEEP_PARSING_
+            self._COVER_ME__wat__
           end
-
-          ok ? redo : break
-        end while above
+          ok || break
+        end
         ok
       end
 
@@ -50,30 +39,71 @@ module Skylab::Cull
         md = remove_instance_variable :@__matchdata
 
         _add_or_remove = md[ :add ] ? :add : :remove
-        _ok = _via_associated_entity _add_or_remove, md[ :stem ].intern
-        _ok  # #todo
+
+        _el = @survey.touch em[ :stem ].intern
+        _ok = _el.send _add_or_remove, @_arg, @parameter_value_store, & @listener
+        _ok  # hi. #todo
       end
 
       def __has_model
 
-        _h = Models__.tricky_index__
-        _slug = @_arg.name.as_slug
-        _h[ _slug ]
+        Models__.boxxy_module_as_operator_branch.has_reference @_arg.name_symbol
       end
 
       def __when_model
 
-        _sym = @_arg.name.as_lowercase_with_underscores_symbol
-        _via_associated_entity :set, _sym
+        @survey.define_and_assign_component__ @_arg.name_symbol do |o|
+
+          o.component_as_primitive_value = @_arg.value
+
+          o.primitive_resources = @survey
+
+          o.invocation_resources = @parameter_value_store._invocation_resources_  # meh
+
+          o.listener = @listener
+        end
       end
 
       RX___ = /\A(?:(?<add>add_)|(?<remove>remove_))(?<stem>.+)/
 
-      def _via_associated_entity verb_sym, ent_sym
+      # -- B.
 
-        _ = @survey.touch_associated_entity_ ent_sym
-        _.send verb_sym, @_arg, @arg_box
+      def __next_relevant_provided_argument
+        send( @_next ||= :__next_etc_initially )
       end
+
+      def __next_etc_initially
+
+        pvs = @parameter_value_store
+        st = Stream_[ Common_associations_[] ].map_reduce_by do |asc|
+          x = pvs[ asc.name_symbol ]
+          if x
+            Common_::QualifiedKnownKnown.via_value_and_association x, asc
+          end
+        end
+
+        @__proc_for_next = -> do
+          qk = st.gets
+          if qk
+            @_arg = qk ; ACHIEVED_
+          end
+        end
+
+        send( @_next = :__next_etc_normally )
+      end
+
+      def __next_etc_normally
+        @__proc_for_next.call
+      end
+
+      # ==
+
+      Stream_ = -> a, & p do
+        Common_::Stream.via_nonsparse_array a, & p
+      end
+
+      # ==
+      # ==
     end
   end
 end

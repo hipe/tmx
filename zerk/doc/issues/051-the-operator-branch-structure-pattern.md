@@ -29,7 +29,7 @@ we use is "reference" (as opposed to "key").
 
 
 
-## synopsis of possible exposures
+## synopsis of possible exposures  :[#here.2]
 
 one key "thing" about operator branches is that it's not a strict
 "interface" per se, but more of a set of method names with well-defined
@@ -57,8 +57,6 @@ here's some of these:
 here's some more specialized possibilites:
 
   - `has_reference`
-
-  - `TO_NAME_STREAM`
 
 experimental suggested names for mutation
 

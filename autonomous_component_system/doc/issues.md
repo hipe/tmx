@@ -98,5 +98,8 @@
 [#005]       the master list of sections ..
 [#004]       thoughts on ACS isomorphisms ..
 [#003]       interpretations to and expressions of an ACS ..
+
 [#002]       tenets and the edit session ..
+       #open (you could modernize DT1 etc to be [#002.2.1] etc)
+
 [#001]       [the readme]

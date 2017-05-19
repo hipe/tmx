@@ -1453,7 +1453,7 @@ module Skylab::Fields
 
       module THE_EMPTY_SIMPLIFIED_VALID_VALUE_STORE___ ; class << self
 
-        def read_softly_via_association asc
+        def _read_softly_via_association_ asc
           NIL
         end
       end ; end

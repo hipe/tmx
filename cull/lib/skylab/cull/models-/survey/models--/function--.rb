@@ -4,12 +4,17 @@ module Skylab::Cull
 
     class Models__::Function__
 
+      class << self
+        private :new
+      end  # >>
+
       def initialize survey, & oes_p
         @survey = survey
         @_emit = oes_p
       end
 
       def add arg, box
+        Home._REFACTOR__to_take_listener_as_arg__
         _batch arg, box, :__add
       end
 
@@ -18,6 +23,7 @@ module Skylab::Cull
       end
 
       def remove arg, box
+        Home._REFACTOR__to_take_listener_as_arg__
         @_remove_a = []
         _batch arg, box, :__remove and begin
           a = @_remove_a
@@ -81,3 +87,4 @@ module Skylab::Cull
     end
   end
 end
+# #pending-rename: this is not like the others. not an association. promote probably.

@@ -46,7 +46,7 @@ module Skylab::Cull
 
   Models_::Ping = -> some_word, stackish, & oes_p do
 
-    # (for a class-based ping, see #spot1-1)
+    # (for a class-based ping, see #spot1.1)
 
     oes_p.call :info, :expression, :ping do |y|
       buffer = "the '"
@@ -70,27 +70,8 @@ module Skylab::Cull
 
   # == METHODS
 
-  VALUE_BOX_EXPLODER_CALL_METHOD_ = -> value_box, & oes_p do  # 1x
-
-    # for every defined attribute (only the names matter), read the value
-    # from the value box and write it to the session as an ivar. then execute.
-
-    o = begin_session__( & oes_p )
-
-    st = const_get( :ATTRIBUTES, false ).to_defined_attribute_stream
-
-    begin
-      atr = st.gets
-      atr or break
-      o.instance_variable_set atr.as_ivar, value_box[ atr.name_symbol ]
-      redo
-    end while nil
-
-    o.execute
-  end
-
-  FUNCTION_NAME_CONVENTION_ = -> name do
-    s = name.as_lowercase_with_underscores_string
+  FUNCTION_NAME_CONVENTION_ = -> slug do
+    s = slug.gsub DASH_, UNDERSCORE_
     s[ 0 ] = s[ 0 ].upcase
     s.intern
   end
@@ -121,14 +102,25 @@ module Skylab::Cull
         instance_variable_get ivar
       end
     end
-    alias_method :[], :_simplified_read_  # makes internal code easier to read :/
+
+    def [] k  # ..
+      instance_variable_get :"@#{ k }"
+    end
+
+    def _filesystem_
+      _invocation_resources_.filesystem
+    end
 
     def _listener_
-      @_microservice_invocation_.invocation_resources.listener
+      _invocation_resources_.listener
     end
 
     def _argument_scanner_
-      @_microservice_invocation_.invocation_resources.argument_scanner
+      _invocation_resources_.argument_scanner
+    end
+
+    def _invocation_resources_
+      @_microservice_invocation_.invocation_resources
     end
 
     attr_reader(
@@ -242,14 +234,10 @@ module Skylab::Cull
       _hey.freeze
     end
 
-    define_method :boxxy_const_guess_via_name, FUNCTION_NAME_CONVENTION_
+    define_method :boxxy_const_guess_via_slug, FUNCTION_NAME_CONVENTION_
   end
 
   # == FUNCTIONS
-
-  Attributes_ = -> h do
-    Home_.lib_.fields::Attributes[ h ]
-  end
 
   Build_not_OK_event_ = -> * i_a, & msg_p do
     i_a.push :ok, false
@@ -306,5 +294,7 @@ module Skylab::Cull
   EMPTY_S_ = ''.freeze
   KEEP_PARSING_ = true
   NIL_ = nil
+  NIL_AS_FAILURE_ = nil
+  NOTHING_ = nil
   UNABLE_ = false
 end

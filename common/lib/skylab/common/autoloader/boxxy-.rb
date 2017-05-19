@@ -43,6 +43,64 @@ module Skylab::Common
           @_augment = :__augment_while_active
         end
 
+        # ~( exposition of a selection of [#ze-051.2] operator branch methods
+        #
+        #    - experimental, #open [#041] only covered by [cu]
+        #
+        #    - index "items" are *the* items, *not* const values.
+        #      if it is useful to develop this, see [#cu-010]
+
+        def has_reference name_sym
+
+          # (to keep things simple, this will only detect those that have
+          # already been indexed (so stowaways and filesystem nodes) which
+          # is fine #theme-here)
+
+          @index.item_offsets_via_name_symbol[ name_sym ] && true
+        end
+
+        def dereference name_sym
+
+          # a bit shaky but it's ok -
+          # it's forseeable that the client would find it useful to have
+          # the name (function) as part of the result structure (if not
+          # as the result itself), (and keep in mind this would be free
+          # for us because we produce a name function when indexing);
+          # however not to result in the loaded const value ("asset") would
+          # A) seem to violate the semantics of the method and B) put onus
+          # on the client to know how to *actually* dereference it.
+          # our solution is to result in our internal indexing item
+          # structure, but to enusre that the asset is loaded here..
+
+          d_a = @index.item_offsets_via_name_symbol[ name_sym ]
+          1 == d_a.length || self._COVER_ME__bah__
+          item = @index.items.fetch d_a.fetch 0
+
+          if ! item.filesystem_asset_reference.value_is_known
+
+            # (we can imagine cases where this would fail but .. etc)
+
+            name_and_value_for_const_missing_ item.name.as_const
+            item.filesystem_asset_reference.value_is_known || self._SANITY
+          end
+
+          item
+        end
+
+        def to_loadable_reference_stream
+
+          # (if there is a need to, map `constants` instead (but still result
+          # in a stream of items). for now we'll keep it simple and assume
+          # that the items you want to map are either filesystem- or
+          # stowaway- based #theme-here)
+
+          # (we assume that (in our index) there is one item per const)
+
+          Stream.via_nonsparse_array @index.items
+        end
+
+        # ~)
+
         def name_and_value_for_const_missing_ wrong_const
           MyConstMissing___.call_by do |o|
             o.wrong_const = wrong_const
@@ -204,6 +262,7 @@ module Skylab::Common
 
         attr_reader(
           :index,  # here only
+          :module,  # [cu]
         )
       end
 
@@ -441,6 +500,7 @@ module Skylab::Common
 
           @item_offset_via_const = {}
           @item_offsets_via_distilled_key = {}
+          @item_offsets_via_name_symbol = {}
 
           @items = []
 
@@ -564,12 +624,18 @@ module Skylab::Common
 
           _distilled_key = nm.as_approximation
           ( @item_offsets_via_distilled_key[ _distilled_key ] ||= [] ).push d
+
+          _k = nm.as_lowercase_with_underscores_symbol
+          ( @item_offsets_via_name_symbol[ _k ] ||= [] ).push d
           NIL
         end
+
+        # ==
 
         attr_reader(
           :item_offset_via_const,
           :item_offsets_via_distilled_key,
+          :item_offsets_via_name_symbol,
           :items,
         )
       end
@@ -612,5 +678,6 @@ module Skylab::Common
     end  # :#bo
   end
 end
+# #history-3.2: spike of initial code of boxxy reflection API that includes stowaways
 # #tombstone-3.1: full overhaul during "operator branch" era
 #   (tombstones 1 & 2 are in our main spec file - they occurred before this file existed)

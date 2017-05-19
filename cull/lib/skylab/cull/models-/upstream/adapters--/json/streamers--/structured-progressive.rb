@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Upstream
+  module Models_::Upstream
 
     class Adapters__::JSON
 

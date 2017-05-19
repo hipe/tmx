@@ -2,13 +2,14 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] operations - survey - upstream set", wip: true do
+  describe "[cu] operations - survey - upstream set" do
 
     TS_[ self ]
     use :expect_event
 
 # (1/N)
     it "a random string with no prefix - treated as path" do
+      # :#cov1.1
       freshly_initted_against 'zoidberg'
       expect_not_OK_event :path_must_be_absolute
       expect_fail
@@ -36,18 +37,22 @@ module Skylab::Cull::TestSupport
 
     def freshly_initted_against s
 
-      call_API :survey, :edit,
+      call_API(
+        * _subject_action,
         :upstream, s,
         :path, freshly_initted_path_
-
+      )
+      NIL
     end
 
 # (4/N)
     it "to an existing survey try to set an upstream with a strange extension" do
 
-      call_API :survey, :edit,
+      call_API(
+        * _subject_action,
         :path, various_extensions_path,
         :upstream, 'file:strange-ext.beefer'
+      )
 
       _em = expect_not_OK_event :invalid_extension
 
@@ -60,7 +65,7 @@ module Skylab::Cull::TestSupport
     end
 
 # (5/N)
-    it "add existent file with good extension on fresh workspace" do
+    it "add existent file with good extension on fresh workspace", wip: true do
 
       _prepare_tmpdir_with_patch_and_do_common :freshly_initted
 
@@ -68,7 +73,7 @@ module Skylab::Cull::TestSupport
     end
 
 # (6/N)
-    it "add valid upstream file on workspace with existing, erroneous upstream" do
+    it "add valid upstream file on workspace with existing, erroneous upstream", wip: true do
 
       td = _prepare_tmpdir_with_patch_and_do_common :some_config_file
 
@@ -80,7 +85,8 @@ module Skylab::Cull::TestSupport
     end
 
 # (7/N)
-    it "add valid upstream on a workspace with multiple upstreams" do
+    it "add valid upstream on a workspace with multiple upstreams", wip: true do
+      TS_._THIS_TEST_IS_TOO_BIG
 
       # #lends-coverage to [#br-007.1]
 
@@ -119,23 +125,28 @@ module Skylab::Cull::TestSupport
     end
 
 # (8/N)
-    it "unset - no" do
-      call_API :survey, :edit,
+    it "unset - no", wip: true do
+      call_API(
+        * _subject_action,
         :upstream, Home_::EMPTY_S_,
         :path, freshly_initted_path_
+      )
 
       expect_not_OK_event :no_upstream_set
       expect_fail
     end
 
 # (9/N)
-    it "unset - yes" do
+    it "unset - yes", wip: true do
+      TS_._THIS_TEST_IS_TOO_BIG
 
       td = prepare_tmpdir_with_patch_ :many_upstreams
 
-      call_API :survey, :edit,
+      call_API(
+        * _subject_action,
         :upstream, Home_::EMPTY_S_,
         :path, td.to_path
+      )
 
       expect_not_OK_event :path_must_be_absolute
 
@@ -167,9 +178,13 @@ module Skylab::Cull::TestSupport
 
     def call_API_with_td_and_file td, file
 
-      call_API :survey, :edit,
+      _path = td.to_path
+
+      call_API(
+        * _subject_action,
         :upstream, "file:#{ file }",
-        :path, td.to_path
+        :path, _path,
+      )
 
       nil
     end
@@ -204,5 +219,12 @@ module Skylab::Cull::TestSupport
       TestSupport_.lib_.basic::String.
         count_occurrences_in_string_of_string( s, NEWLINE_ )
     end
+
+    def _subject_action
+      [ :survey, :edit ]
+    end
+
+    # ==
+    # ==
   end
 end

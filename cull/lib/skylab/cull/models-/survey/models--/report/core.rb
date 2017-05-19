@@ -4,7 +4,12 @@ module Skylab::Cull
 
     class Models__::Report
 
+      class << self
+        private :new
+      end  # >>
+
       def initialize survey, & oes_p
+        Home._REFACTOR__to_take_listener_as_arg__
 
         @call_a = nil
 
@@ -160,7 +165,6 @@ module Skylab::Cull
       end
 
       Me__ = self
-      NOTHING_ = nil
     end
   end
 end

@@ -82,8 +82,9 @@
 [#042] #open easy refactor (see)
              ( #was: #moved-to [#fi-016] )
 
-[#041] #wish if boxxy ever reflects on stowaways
+[#041] #open o.b like adaptation of boxxy is experimental, covered only by [cu]
              ( #was: #parent-node: [#024] what are hybrid boxxy nodes? )
+
 [#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions
 [#038]       #parent-node: [#037] #in-situ use readable method names for cb's
