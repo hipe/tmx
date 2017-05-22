@@ -4,6 +4,7 @@ module Skylab::Cull
 
     module Models__::Upstream
 
+      if false
       def initialize survey, & oes_p
         @survey = survey
         @_emit = oes_p
@@ -85,44 +86,6 @@ module Skylab::Cull
         ACHIEVED_
       end
 
-      def _set arg, bx
-
-        @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @_emit do | edit |
-          edit.derelativizer @survey
-          edit.mutable_qualified_knownness_box bx
-        end
-
-        @_top_entity and via_edited_upstream
-      end
-
-      def via_edited_upstream
-
-        @survey.add_to_persistence_script_(
-          :call_on_associated_entity_,
-          :upstream,
-          :persist )
-
-        ACHIEVED_
-      end
-
-      def persist
-        bx = @_top_entity.to_mutable_marshal_box_for_survey @survey
-        bx and __persist_via_box bx
-      end
-
-      def __persist_via_box bx
-        x = bx.remove :upstream
-        _ok = @survey.persist_box_and_value_for_name_symbol_ bx, x, :upstream
-        _ok && __maybe_send_set_event
-      end
-
-      def __maybe_send_set_event
-        @_emit.call :info, :set_upstream do
-          @_top_entity.to_event
-        end
-        ACHIEVED_
-      end
-
       def delete
         @survey.destroy_all_persistent_nodes_for_name_symbol_ :upstream
       end
@@ -138,6 +101,56 @@ module Skylab::Cull
       def to_entity_stream_stream
         @_top_entity.to_entity_stream_stream
       end
+      end
+
+      class WriteComponent_via_Component_and_Survey < Common_::Dyadic
+
+        def initialize qc, survey, & p
+          @upstream = qc.value
+          @association = qc.association
+          @survey = survey
+          @listener = p
+        end
+
+        def execute
+          if __write_to_survey
+            __emit_event
+            ACHIEVED_
+          end
+        end
+
+        def __emit_event
+
+          _ev = @upstream.to_descriptive_event  # #todo
+
+          @listener.call :info, :set_upstream do
+            _ev
+          end
+
+          NIL
+        end
+
+        def __write_to_survey
+
+          _st = @upstream.to_persistable_primitive_name_value_pair_stream_recursive_ @survey
+
+          _ok = @survey.write_component_via_primitives_by__ do |o|
+            o.primitive_name_value_stream_recursive = _st
+            o.association_name_symbol = @association.name_symbol
+            o.listener = @listener
+          end
+
+          _ok  # hi. #todo
+        end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      end
+
+      # ==
+
+      # ==
+      # ==
     end
   end
 end
+# #history-A.1: start to inject ween-off-[br] stuff

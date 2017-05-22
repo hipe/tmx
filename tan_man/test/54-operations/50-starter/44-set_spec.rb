@@ -149,7 +149,7 @@ module Skylab::TanMan::TestSupport
           :config_filename, cfn,
         )
 
-        expect :info, :related_to_assignment_change do |ev|
+        expect :info, :related_to_assignment_change, :changed do |ev|
           a.push ev
         end
 

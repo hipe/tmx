@@ -61,7 +61,7 @@ module Skylab::Brazen
             o.verb_lemma_symbol = _verb_lemma
           end
 
-          @listener.call :info, :success do
+          @listener.call :info, :collection_resource_committed_changes do
             _
           end
           NIL

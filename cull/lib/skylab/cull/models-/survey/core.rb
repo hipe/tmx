@@ -140,6 +140,7 @@ module Skylab::Cull
     end
 
     def flush_persistence_script_
+      # (`re_persist` was 1) convert to mutable config, 2) this method, then write config)
       a = @persist_step_a ; @persist_step_a = nil
       ok = true
       if a.length.nonzero?
@@ -159,70 +160,6 @@ module Skylab::Cull
     end
 
     # ~~ misc functions for actors & top entities
-
-    def persist_box_and_value_for_name_symbol_ bx, value_string, section_sym
-
-      self._CHANGED__at_this_commit__  # the below ivar is gone
-      cfg = @cfg_for_write
-
-      delete_these, change_the_name_of_this_one = ___all_become_one section_sym
-
-      if delete_these
-        cfg.sections.delete_sections_via_sections delete_these
-      end
-
-      if change_the_name_of_this_one
-        change_the_name_of_this_one.SET_SUBSECTION_NAME value_string
-        section = change_the_name_of_this_one
-      else
-        _section_name_s = section_sym.id2name  # ..
-        section = cfg.sections.touch_section value_string, _section_name_s
-      end
-
-      section and __via_section_and_box section, bx
-    end
-
-    def __via_section_and_box section, bx
-
-      _has = section.assignments.first
-
-      if _has
-        self._COVER_ME__watch_carefully_what_happens__
-      end
-
-      bx.each_pair do |sym, x|
-        if x.respond_to? :id2name
-          x = x.id2name  # you can't store symbols directly in the config
-        end
-        section.assign x, sym
-      end
-
-      ACHIEVED_
-    end
-
-    def ___all_become_one section_sym
-
-      self._CHANGED__at_this_commit__  # the below ivar is gone
-      st = @cfg_for_write.sections.to_stream_of_sections.reduce_by do |el|
-        section_sym == el.external_normal_name_symbol
-      end
-
-      sec = st.gets
-      if sec
-        change_the_name_of_this_one = sec
-        sec = st.gets
-        if sec
-          delete_these = [ sec ]
-          sec = st.gets
-          while sec
-            delete_these.push sec
-            sec = st.gets
-          end
-        end
-      end
-
-      [ delete_these, change_the_name_of_this_one ]
-    end
 
     def destroy_all_persistent_nodes_for_name_symbol_ section_sym
 
@@ -307,17 +244,26 @@ module Skylab::Cull
         _hi  # hi. #todo
       end
 
+      def write_component_via_primitives_by__
+
+        _ok = Here_::Magnetics_::WriteComponent_via_Primitives_and_Survey.call_by do |o|
+          yield o
+          o.survey = self
+        end
+
+        _ok  # hi. #todo
+      end
+
       # -- B ..
 
       def accept_initial_config_ cfg
         remove_instance_variable :@_mutex_for_config
         if cfg.is_mutable
-          @config_for_write_ = :_mutable_config
-          @config_for_read_ = :_mutable_config
-          @_mutable_config = cfg
+          _accept_mutable_config cfg
         else
           @config_for_read_ = :__read_only_config
-          @__read_only_config = cfg
+          @config_for_write_ = :__convert_config_once
+          @_read_only_config = cfg
         end
         NIL
       end
@@ -330,12 +276,32 @@ module Skylab::Cull
         send @config_for_read_
       end
 
+      def __convert_config_once
+
+        _cfg = remove_instance_variable :@_read_only_config
+        _bur = _cfg.document_byte_upstream_reference
+
+        _cfg = Git_config_[]::Mutable.parse_document_by do |o|
+          o.byte_upstream_reference = _bur
+          # (can't listen)
+        end
+
+        _accept_mutable_config _cfg
+        send @config_for_write_
+      end
+
+      def _accept_mutable_config cfg
+        @config_for_write_ = :_mutable_config
+        @config_for_read_ = :_mutable_config
+        @_mutable_config = cfg ; nil
+      end
+
       def _mutable_config
         @_mutable_config
       end
 
       def __read_only_config
-        @__read_only_config
+        @_read_only_config
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -357,6 +323,15 @@ module Skylab::Cull
           :path, _path,
           :is_completion, true,
         )
+      end
+
+      def maybe_relativize_path__ path
+
+        _head = survey_path_
+
+        relpath = Home_.lib_.basic::Pathname::Relative_path_from[ path, _head ]
+
+        relpath.length < path.length ? relpath : path
       end
 
       def _derelativize_by_
@@ -386,6 +361,12 @@ module Skylab::Cull
 
       def to_stream_of_qualified_components__
         MTk_::AssociationToolkit::QualifiedComponentStream_via_Entity[ self ]
+      end
+
+      def _write_via_value_and_association_ x, asc  # near `_simplified_write_`
+        _ivar = asc.name.as_ivar
+        instance_variable_set _ivar, x
+        NIL
       end
 
       def _read_softly_via_association_ asc
@@ -499,9 +480,11 @@ module Skylab::Cull
     EMPTY_A_ = [].freeze
     FILENAME_ = 'cull-survey'.freeze
     Here_ = self
+    UNDERSCORE_ = '_'
     UNRELIABLE_ = :_cu_unreliable_
 
     # ==
     # ==
   end
 end
+# #history-A.1: when two methods left this file to become something #spot1.2

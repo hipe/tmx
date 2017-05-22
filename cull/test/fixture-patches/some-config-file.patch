@@ -1,6 +1,9 @@
 new file mode 100644
 --- /dev/null
 +++ b/cull-survey/config
-@@ -0,0 +1,2 @@
+@@ -0,0 +1,5 @@
 +#ohai
-+[upstream "this will trigger an innocuous error"]
++[upstream "this is invalid but will get overwritten"]
++  jiminy=crickets
++  # heyburt, highburt
++  adapter=fladapter

@@ -30,7 +30,7 @@ module Skylab::Cull::TestSupport
 
 # (4/N)
     it "with a workspace with no datappoints" do
-      against dir :freshly_initted
+      against fixture_directory_ :freshly_initted
       scn = @result
       x = scn.gets
       x.should be_nil
@@ -40,7 +40,7 @@ module Skylab::Cull::TestSupport
     it "with an upstream 'foo'" do
       count = 0
       y = []
-      against dir :upstream_foo
+      against fixture_directory_ :upstream_foo
       scn = @result
       expag = expression_agent_for_expect_emission_normally
       begin

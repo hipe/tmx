@@ -104,7 +104,7 @@ module Skylab::Brazen
       NIL_
     end
 
-    def on_init_success_via_channel i_a, & ev_p
+    def on_init_collection_resource_committed_changes_via_channel i_a, & ev_p
       maybe_send_event_via_channel i_a, & ev_p
       UNABLE_
     end

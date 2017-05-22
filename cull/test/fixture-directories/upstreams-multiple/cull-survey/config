@@ -1,0 +1,13 @@
+#ohai
+
+[upstream "zoop"]
+
+[upstream "\"zeep\""]
+
+[zafarelli "gazoonk"]
+keep-this=value
+
+[upstream "nerp"]
+go-this=away
+
+[you-can-stay "ok"]

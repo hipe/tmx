@@ -5,6 +5,7 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - survey - upstream set" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_event
 
 # (1/N)
@@ -50,7 +51,7 @@ module Skylab::Cull::TestSupport
 
       call_API(
         * _subject_action,
-        :path, various_extensions_path,
+        :path, _various_extensions_path,
         :upstream, 'file:strange-ext.beefer'
       )
 
@@ -65,63 +66,146 @@ module Skylab::Cull::TestSupport
     end
 
 # (5/N)
-    it "add existent file with good extension on fresh workspace", wip: true do
+    context "add noent path with good extension on fresh workspace" do
 
-      _prepare_tmpdir_with_patch_and_do_common :freshly_initted
+      # #cov1.2, #lends-coverage-to [#br-007.1]
 
-      _expect_common_OK
+      it "(result is number of bytes written FOR NOW)" do
+        129 == _tuple.last || fail
+      end
+
+      it "emits event talkin bout added" do
+        _actual = black_and_white _tuple.first
+        _actual == 'added value - ( adapter : "json" )' || fail
+      end
+
+      it "emits talkin bout set upstream" do
+        _actual = black_and_white _tuple[1]
+        _actual =~ /\AJSON file: «[^»]+»\z/ || fail
+      end
+
+      it "emits talkin bout updated (not created)" do
+        _actual = black_and_white _tuple[2]
+        _actual =~ /\Aupdated «[^»]+» \(\d+ bytes\)\z/ || fail
+      end
+
+      it "content" do
+        io = ::File.open ::File.join _tuple[-2], config_tail_
+        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+          y << "# ohai"
+          y << %r(\A\[upstream "file:[^ ]+not\.json"\]\n\z)
+          y << "adapter = json"
+        end
+        io.close
+      end
+
+      shared_subject :_tuple do
+
+        path = prepare_tmpdir_with_patch_( :freshly_initted ).path
+        x = _call_API_with_path_and_file path, _existent_but_not_JSON_file
+
+        a = []
+        __expect_added a
+        _expect_common_success_finish a
+        a.push path
+        a.push x
+      end
     end
 
 # (6/N)
-    it "add valid upstream file on workspace with existing, erroneous upstream", wip: true do
+    context "add upstream file on workspace with extraneous assignments and .." do
 
-      td = _prepare_tmpdir_with_patch_and_do_common :some_config_file
+      # #lends-coverage-to [#br-007.1] (again)
 
-      expect_not_OK_event :path_must_be_absolute
+      it "(results in number of bytes)" do
+        _tuple.last.zero? && fail
+      end
 
-      _expect_common_OK
+      it "says how it changed one" do
+        _actual = black_and_white _tuple.first
+        _actual == 'value changed - ( adapter : "fladapter" )' || fail
+      end
 
-      __expect_detail td
+      it "says how it removed one" do
+        _actual = black_and_white _tuple[1]
+        _actual == 'removed - ( jiminy : "crickets" )' || fail
+      end
+
+      it "content good (an interceding comment is preserved)" do
+
+        _path = _tuple[-2]
+        io = ::File.open ::File.join( _path, config_tail_ )
+
+        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+
+           y << "#ohai"  # was there in the beginning
+           y << %r(\A\[upstream "file:[^ ]+not\.json"\]\n\z)
+           y << "  # heyburt, highburt"  # ditto
+           y << "  adapter=json"  # this is something that was changed
+        end
+        io.close
+      end
+
+      shared_subject :_tuple do
+
+        path = prepare_tmpdir_with_patch_( :some_config_file ).path
+        x = _call_API_with_path_and_file path, _existent_but_not_JSON_file
+
+        a = []
+        __expect_changed a
+        __expect_removed a
+        _expect_common_success_finish
+        a.push path
+        a.push x
+      end
     end
 
 # (7/N)
-    it "add valid upstream on a workspace with multiple upstreams", wip: true do
-      TS_._THIS_TEST_IS_TOO_BIG
+    context "add existent upstream on a workspace with multiple upstreams" do
 
-      # #lends-coverage to [#br-007.1]
+      # when the association models a singleton (formerly "slotular")
+      # component (as "upstream" and most others are), it used to be that
+      # we would allow multiple sections to match and then we would combine
+      # them together.
+      #
+      # now we see this as an overly active stunt - a file that has multiple
+      # sections for a singleton association is invalid; and it should not
+      # be up to us to decide how to fix it. to merge all the assignments
+      # into one section as we used to do is weird; akin to combining pages
+      # from different books into one book.
+      #
+      # local custom holds that when a workspace will be mutated during
+      # the course of a test, we create it by patching it; and when not
+      # we simply use a fixture directory in place (risky). as such, since
+      # the fixture directory of this test went from being mutated to not
+      # mutated, what used to be created by a patch has become a fixture
+      # directory and we have put the old patch file under #tombstone-A.1.
 
-      td = prepare_tmpdir_with_patch_ :many_upstreams
+      it "fails" do
+        _tuple.last.nil? || fail
+      end
 
-      s = content_of_the_file td
+      it "explains" do
+        _actual = _tuple.first
+        expect_these_lines_in_array_ _actual do |y|
+          y << 'the document has 3 existing "upstream" sections.'
+          y << "must have at most one."
+        end
+      end
 
-      d = count_lines s
+      shared_subject :_tuple do
 
-      call_API_with_td_and_file td, big_JSON_file
+        _path = fixture_directory_ :upstreams_multiple
 
-      expect_not_OK_event :path_must_be_absolute
+        x = _call_API_with_path_and_file _path, _existent_but_not_JSON_file
 
-      _expect_common_OK
+        a = []
+        expect :error, :expression, :multiple_sections_for_singleton do |y|
+          a.push y
+        end
 
-      s_ = content_of_the_file td
-
-      d_ = count_lines s_
-
-      d.should eql 13
-      d_.should eql 9
-
-      o = TestSupport_::Expect_line.shell s_
-
-      o.advance_to_next_nonblank_line
-
-      o.next_nonblank_line.should match %r(\bupstream ".+not\.json\")
-
-      o.next_nonblank_line.should eql "adapter = json\n"
-
-      o.next_nonblank_line.should match %r(\bzafarelli )
-      o.next_line.should match %r(\Akeep-this=)
-
-      o.next_nonblank_line.should match %r(\byou-can-stay )
-
+        a.push x
+      end
     end
 
 # (8/N)
@@ -160,65 +244,76 @@ module Skylab::Cull::TestSupport
       expect_succeed
     end
 
-    def _prepare_tmpdir_with_patch_and_do_common sym
-      td = prepare_tmpdir_with_patch_ sym
-      call_API_with_td_and_file td, big_JSON_file
-      td
+    # -- assert
+
+    def _expect_common_success_finish a=nil
+
+      if a
+        p = -> ev do
+          a.push ev
+        end
+      end
+
+      expect :info, :set_upstream, & p
+
+      expect :info, :collection_resource_committed_changes, & p
+
+      NIL
     end
 
-    # ~ prepare & execute
-
-    def big_JSON_file
-      ::File.join various_extensions_path, 'cull-survey/not.json'
+    def __expect_added a
+      expect :info, :related_to_assignment_change, :added do |ev|
+        a.push ev
+      end
     end
 
-    def various_extensions_path
-      dir :upstreams_with_various_extensions
+    def __expect_changed a
+      expect :info, :related_to_assignment_change, :changed do |ev|
+        a.push ev
+      end
     end
 
-    def call_API_with_td_and_file td, file
+    def __expect_removed a
+      expect :info, :related_to_assignment_change, :removed do |ev|
+        a.push ev
+      end
+    end
 
-      _path = td.to_path
+    def expression_agent_for_expect_emission
+      Home_::Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
+    end
+
+    # -- setup
+
+    def _call_API_with_path_and_file path, file
 
       call_API(
         * _subject_action,
         :upstream, "file:#{ file }",
-        :path, _path,
+        :path, path,
       )
-
-      nil
+      remove_instance_variable :@result
     end
 
-    # ~ expect
+    # ~ paths
 
-    def _expect_common_OK
-
-      expect_OK_event_ :json_upstream
-
-      _em = expect_OK_event_ :collection_resource_committed_changes
-
-      _em.cached_event_value.to_event.is_completion.should eql true
-
-      expect_succeed
+    def _existent_but_not_JSON_file
+      ::File.join _various_extensions_path, survey_file_, 'not.json'
     end
 
-    def __expect_detail td
-
-      scn = TestSupport_::Expect_Line::Scanner.via_string(
-        content_of_the_file td )
-
-      scn.next_line.should eql "#ohai\n"
-      scn.next_line.should match %r(\A\[upstream "file:)
-      scn.next_line.should eql "adapter = json\n"
-      scn.next_line.should be_nil
-
+    def _various_extensions_path
+      fixture_directory_ :upstreams_with_various_extensions
     end
 
-    def count_lines s
-
-      TestSupport_.lib_.basic::String.
-        count_occurrences_in_string_of_string( s, NEWLINE_ )
+    def config_tail_
+      ::File.join survey_file_, 'config'
     end
+
+    def survey_file_
+      'cull-survey'
+    end
+
+    # ~
 
     def _subject_action
       [ :survey, :edit ]
@@ -228,3 +323,4 @@ module Skylab::Cull::TestSupport
     # ==
   end
 end
+# :#tombstone-A.1: there was a patch. there was a method called `count_lines`

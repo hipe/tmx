@@ -2,7 +2,9 @@ module Skylab::Cull
 
   module Models_::Upstream
 
-      class FileBasedAdapter_
+    class FileBasedAdapter_
+
+      # -
 
         class << self
 
@@ -16,14 +18,21 @@ module Skylab::Cull
           @_emit = oes_p
         end
 
-        def to_mutable_marshal_box_for_survey survey
+        def to_persistable_primitive_name_value_pair_stream_recursive_ survey
+
+          _a = to_mutable_name_value_pair_array_AS_UPSTREAM_ survey
+          Stream_[ _a ]
+        end
+
+        def to_mutable_name_value_pair_array_AS_UPSTREAM_ survey
 
           _upstream = "file:#{ survey.maybe_relativize_path__ @path }"
 
-          bx = Common_::Box.new
-          bx.add :upstream, _upstream
-          bx.add :adapter, adapter_symbol
-          bx
+          a = []
+          a.push NameValuePair_[ :upstream, _upstream ]
+          a.push NameValuePair_[ :adapter, self.adapter_symbol.id2name ]
+            # (no persistence for #symbols yet)
+          a
         end
 
         def entity_stream_at_some_table_number d
@@ -44,7 +53,10 @@ module Skylab::Cull
             UNABLE_
           end
         end
-      end
+      # -
 
+      # ==
+      # ==
+    end
   end
 end

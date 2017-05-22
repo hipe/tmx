@@ -36,6 +36,10 @@ module Skylab::Cull::TestSupport
 
     # -- assertion support (newer)
 
+    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    end
+
     def expect_these_lines_in_array_ a, & p
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
@@ -43,10 +47,10 @@ module Skylab::Cull::TestSupport
     # ~ paths for READ ONLY:
 
     def freshly_initted_path_
-      dir :freshly_initted
+      fixture_directory_ :freshly_initted
     end
 
-    def dir sym
+    def fixture_directory_ sym
       TS_::Fixtures::Directories[ sym ]
     end
 
@@ -80,8 +84,9 @@ module Skylab::Cull::TestSupport
 
     # ~ assertion support
 
-    def content_of_the_file td
-      ::File.read( td.to_pathname.join( config_filename ).to_path )
+    def content_via_path_ path
+      _path_ = ::Fie.join path, config_filename
+      ::File.read _path_
     end
 
     def config_filename
@@ -165,8 +170,8 @@ module Skylab::Cull::TestSupport
   Autoloader_[ self,  ::File.dirname( __FILE__ ) ]
 
   Common___ = ::Skylab::Common
-  DASH_ = '-'
+  DASH_ = Home_::DASH_
   NEWLINE_ = "\n"
-  UNDERSCORE_ = '_'
+  UNDERSCORE_ = Home_::UNDERSCORE_
   TS_ = self
 end

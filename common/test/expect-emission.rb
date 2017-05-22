@@ -143,6 +143,23 @@ module Skylab::Common::TestSupport
           end
         end
 
+        def expect * sym_a, & p  # EXPERIMENT
+
+          _next_actual_expev_emission do |em|
+
+            _be_this = _expev_matcher_by do
+
+              full_channel_of sym_a
+
+              if p
+                alternate_user_proc_of p
+              end
+
+            end
+            em.should _be_this
+          end
+        end
+
         def expect_no_events
           _expect_no_next_actual_expev_emission
         end

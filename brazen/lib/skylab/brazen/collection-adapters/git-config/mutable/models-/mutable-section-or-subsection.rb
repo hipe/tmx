@@ -51,7 +51,7 @@ module Skylab::Brazen
             sct = This_::Magnetics::TouchComparableElement_via_Element_and_Comparator_and_Elements.call_by do |o|
               o.element = sect
               o.comparator = _p_
-              o.elements = @_all_elements_
+              o.all_elements = @_all_elements_
             end
 
             # saying hello (you might want to emit something):
@@ -173,7 +173,7 @@ module Skylab::Brazen
           def assign_by_
             This_::Magnetics_::ApplyAssignment_via_Arguments.call_by do |o|
               yield o
-              o.elements = @_child_elements_
+              o.all_elements = @_child_elements_
             end
           end
 

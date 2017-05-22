@@ -7,16 +7,26 @@ module Skylab::Brazen
       class Magnetics_::ApplyAssignment_via_Arguments < Common_::MagneticBySimpleModel
 
         def initialize
-          @_via_new_assignment = :__via_new_assignment_touch
+          @_mutex_for_position = nil
+          @_via_new_assignment = nil
+          @external_normal_name_symbol = nil
           super
         end
 
+        def offset_of_assignment_to_change= d
+          remove_instance_variable :@_mutex_for_position
+          @_status = ACHIEVED_  # (because we aren't touching)
+          @_via_new_assignment = :_maybe_change_existing
+          @offset_of_assignment_to_change = d
+        end
+
         def will_append
+          remove_instance_variable :@_mutex_for_position
           @_via_new_assignment = :__via_new_assignment_append
         end
 
         attr_writer(
-          :elements,
+          :all_elements,
           :external_normal_name_symbol,
           :listener,
           :mixed_value,
@@ -35,7 +45,7 @@ module Skylab::Brazen
           @listener ||= LISTENER_THAT_RAISES_ALL_NON_INFO_EMISSIONS_
 
           if __resolve_new_assignment
-            send @_via_new_assignment
+            send( @_via_new_assignment || :__via_new_assignment_touch )
           end
         end
 
@@ -64,24 +74,32 @@ module Skylab::Brazen
           TouchComparableElement_via_Element_and_Comparator_and_Elements.call_by do |o|
             o.element = @_new_assignment
             o.comparator = _comparator
-            o.elements = @elements
+            o.all_elements = @all_elements
           end
           _  # hi. #todo
         end
 
         def __via_new_assignment_append
-          @_status = StatusAdded_.new true, @elements.length
-          @elements.push @_new_assignment
+          @_status = StatusAdded_.new true, @all_elements.length
+          @all_elements.push @_new_assignment
           _when_added
         end
 
         def __resolve_new_assignment
 
+          use_sym = @external_normal_name_symbol
+          if ! use_sym
+            # (snuck in here)
+            @_existing_assignment = @all_elements.fetch @offset_of_assignment_to_change
+            use_sym = @_existing_assignment.external_normal_name_symbol
+          end
+
           _ = This_::Magnetics_::Assignment_via_DirectDefinition.call_by do |o|
-            o.external_normal_name_symbol = @external_normal_name_symbol
+            o.external_normal_name_symbol = use_sym
             o.mixed_value = @mixed_value
             o.listener = @listener
           end
+
           _store :@_new_assignment, _
         end
 
@@ -90,6 +108,11 @@ module Skylab::Brazen
         def __when_found_existing
 
           @_existing_assignment = @_status.existing_element
+          @offset_of_assignment_to_change = @_status.offset
+          _maybe_change_existing
+        end
+
+        def _maybe_change_existing
           existing_x = @_existing_assignment.value
           _new_x = @_new_assignment.value
           if existing_x == _new_x
@@ -125,7 +148,7 @@ module Skylab::Brazen
 
           @_new_assignment.accept_five_ n_d, n_w, vd2, vw2, new_line.freeze
 
-          @elements[ @_status.offset ] = @_new_assignment
+          @all_elements[ @offset_of_assignment_to_change ] = @_new_assignment
 
           __when_changed prev_x
         end
@@ -134,21 +157,21 @@ module Skylab::Brazen
         # -- events
 
         def __when_no_change
-          @listener.call :info, :related_to_assignment_change do
+          @listener.call :info, :related_to_assignment_change, :no_change do
             __build_no_change_event
           end
           @_status
         end
 
         def __when_changed prev_x
-          @listener.call :info, :related_to_assignment_change do
+          @listener.call :info, :related_to_assignment_change, :changed do
             __build_change_event prev_x
           end
           @_status
         end
 
         def _when_added
-          @listener.call :info, :related_to_assignment_change do
+          @listener.call :info, :related_to_assignment_change, :added do
             __build_added_event
           end
           @_status
@@ -181,6 +204,8 @@ module Skylab::Brazen
           )
           _ev  # hi. #todo
         end
+
+        # (a "build deleted event" is here: #spot1.2)
 
         define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 

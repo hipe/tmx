@@ -291,7 +291,7 @@ module Skylab::TanMan::TestSupport
 
         _call_API_with_digraph_path_and_workspace_path( * a )
 
-        expect :info, :related_to_assignment_change do |ev|
+        expect :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 
@@ -389,7 +389,7 @@ module Skylab::TanMan::TestSupport
       it "(the usual suspects occurred because of the config write)" do
 
         ev, ev_ = _dereference_events(
-          :related_to_assignment_change,
+          :added,  # near :related_to_assignment_change,
           :collection_resource_committed_changes,
         )
 
@@ -438,7 +438,7 @@ module Skylab::TanMan::TestSupport
         o.expect :info, :adding_extension
         o.expect :info, :before_probably_creating_new_file
         o.expect :info, :wrote_file
-        o.expect :info, :related_to_assignment_change
+        o.expect :info, :related_to_assignment_change, :added
         o.expect :info, :success, :collection_resource_committed_changes
 
         a.push execute

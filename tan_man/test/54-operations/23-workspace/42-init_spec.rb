@@ -62,7 +62,7 @@ module Skylab::TanMan::TestSupport
           a.push ev
         end
 
-        expect :info, :success do |ev|
+        expect :info, :collection_resource_committed_changes do |ev|
           a.push ev
         end
 

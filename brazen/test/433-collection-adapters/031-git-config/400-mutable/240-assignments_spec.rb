@@ -176,7 +176,7 @@ module Skylab::Brazen::TestSupport
 
     def _flush_common_triadic_tuple
       a = []
-      expect :info, :related_to_assignment_change do |ev|
+      expect :info, :related_to_assignment_change, :added do |ev|
         a.push ev
       end
       _x = execute

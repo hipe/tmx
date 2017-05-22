@@ -39,20 +39,29 @@ module Skylab::Cull
           qk = st.gets
           qk || break
           @_current_qualified_component = qk
-          ok = __write_current_qualified_component
+          ok = if qk.is_known_known
+            __write_component
+          else
+            __maybe_delete_component
+          end
         end while ok
         ok
       end
 
-      def __write_current_qualified_component
+      def __maybe_delete_component
         qk = @_current_qualified_component
-        if qk.is_known_known
-          self._NEET
-        else
           # (cleanup assets..)
           $stderr.puts "IGNORING CLEAN UP ASSETS FOR NOW in [cu] (for #{ qk.name.as_const })"
           ACHIEVED_
-        end
+      end
+
+      def __write_component
+        qc = @_current_qualified_component
+        _asc = qc.association
+        _asc_mod = _asc.module
+        _ok = _asc_mod::WriteComponent_via_Component_and_Survey.call(
+          qc, @survey, & @listener )
+        _ok  # hi. #todo
       end
 
       # -- C

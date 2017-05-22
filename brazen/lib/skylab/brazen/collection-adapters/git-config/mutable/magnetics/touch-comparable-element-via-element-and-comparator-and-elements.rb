@@ -15,14 +15,14 @@ module Skylab::Brazen
         attr_writer(
           :comparator,
           :element,
-          :elements,
+          :all_elements,
         )
 
         def execute
 
           compare = remove_instance_variable :@comparator
 
-          st = Stream_[ @elements ]
+          st = Stream_[ @all_elements ]
           offset = -1
           interesting_offset = nil
           begin
@@ -68,22 +68,22 @@ module Skylab::Brazen
 
         def __insert_before_below_neighbor offset
 
-          @elements[ offset, 0 ] = [ @element ]
+          @all_elements[ offset, 0 ] = [ @element ]
 
           StatusAdded_.new offset
         end
 
         def __insert_after_above_neighbor offset
 
-          @elements[ offset + 1, 0 ] = [ @element ]
+          @all_elements[ offset + 1, 0 ] = [ @element ]
 
           StatusAdded_.new offset
         end
 
         def __append_element
 
-          offset = @elements.length
-          @elements.push @element
+          offset = @all_elements.length
+          @all_elements.push @element
 
           StatusAdded_.new true, offset
         end

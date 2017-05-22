@@ -121,23 +121,25 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         qc = QualifiedComponent_via___[ @association_symbol, @mutable_entity ]
 
+        asc = qc.association
+
         # ~( #todo
-        qc.association.module || fail
+        asc.module || fail
         # ~)
 
         if qc.is_known_known
           self._COVER_ME__what_to_do_about_clobber_here
         end
 
-        _model_mod = qc.association.model_module
+        _model_mod = asc.model_module
 
         el = _model_mod.define do |o|
           @entity_definition_block[ o ]
         end
 
         if el
-          self._COVER_ME__where_is_this_first
-          ACHIEVED_
+          @mutable_entity._write_via_value_and_association_ el, asc
+          ACHIEVED_  # hi. #cov1.2
         else
           NOTHING_  # hi. #cov1.1
         end
@@ -324,7 +326,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_remote_item.name
       end
 
-      def __name_when_froze
+      def __name_when_frozen
         @__name
       end
     end

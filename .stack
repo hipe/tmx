@@ -48,3 +48,4 @@ one association fully covered by new association API
 cull/test/54-operations/12-survey/41-upstream_spec.rb
 unify emission class with the others..
 HISTORY in [#co-030]
+this improved way to remove a singleton association ("unset_foo")- two remaining tests in that one file

@@ -258,6 +258,14 @@ module Skylab::Cull
     Autoloader_.require_sidesystem :Zerk
   end
 
+  NameValuePair_ = -> sym, x do
+    Common_::QualifiedKnownKnown.via_value_and_symbol x, sym
+  end
+
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   # ==
 
   module Lib_
@@ -289,6 +297,7 @@ module Skylab::Cull
   # ==
 
   ACHIEVED_ = true
+  DASH_ = '-'
   Home_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
@@ -297,4 +306,5 @@ module Skylab::Cull
   NIL_AS_FAILURE_ = nil
   NOTHING_ = nil
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 end

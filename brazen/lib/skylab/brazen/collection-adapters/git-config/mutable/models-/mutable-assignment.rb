@@ -18,6 +18,20 @@ module Skylab::Brazen
 
           # -- write
 
+          def REPLACE_ASSIGNMENTS st, & p  # experiment for [cu]
+
+            This_::Magnetics.const_get :DeleteEntity_via_Entity_and_Collection, false
+              # (so we don't have to register the below as a stowaway)
+
+            _ok = This_::Magnetics::ReplaceEntity_via_Entity_and_Collection.call_by do |o|
+              o.will_replace_with_these_name_value_pairs st
+              o.all_elements = @_all_elements_
+              o.listener = p
+            end
+
+            _ok  # hi. #todo
+          end
+
           def delete_assignments_via_assignments__ a
             # (corresponds to `delete_sections_via_sections`)
             This_::Magnetics::DeleteEntity_via_Entity_and_Collection.call_by do |o|

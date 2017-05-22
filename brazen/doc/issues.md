@@ -272,7 +272,7 @@
 [#008]       the mutable git config narrative .. (#parent-node: [#009])
 
 [#007]       small assets & liabilities
-             [#here.1]: borrow from [cu]
+             [#here.1]: as covered in [cu]
              ( #was: anticpating the issue with losing hooks accross inheritance bounds )
 
 [#006] #open - what to do about this custom CLI property class

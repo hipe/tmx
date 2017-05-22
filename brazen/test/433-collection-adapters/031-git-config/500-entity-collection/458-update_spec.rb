@@ -194,11 +194,11 @@ module Skylab::Brazen::TestSupport
           fac.update _ent, & p
         end
 
-        expect :info, :related_to_assignment_change do |ev|
+        expect :info, :related_to_assignment_change, :changed do |ev|
           a.push ev
         end
 
-        expect :info, :related_to_assignment_change do |ev|
+        expect :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 
