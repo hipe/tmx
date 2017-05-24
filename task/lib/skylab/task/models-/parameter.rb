@@ -153,7 +153,7 @@ class Skylab::Task
           if is_req[ asc ]
             # since the source passed the requireds check, the value is not nil
             _xfer = src.dereference_association asc
-            dst.write_via_association _xfer, asc
+            dst._write_via_association_ _xfer, asc
             redo
           end
 
@@ -172,7 +172,7 @@ class Skylab::Task
               x = p[]
             end
           end
-          dst.write_via_association x, asc  # write the PVS value or default value or nil
+          dst._write_via_association_ x, asc  # write the PVS value or default value or nil
           redo
         end while above
 

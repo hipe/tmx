@@ -33,13 +33,13 @@ module Skylab::Cull
 
       def __edit_survey
 
-        _hi = Here_::Magnetics_::EditEntities_via_Request_and_Survey.call_by do |o|
+        _ok = Here_::Magnetics_::EditEntities_via_Request_and_Survey.call_by do |o|
           o.parameter_value_store = self
           o.survey = @_survey_
           o.listener = _listener_
         end
 
-        _hi  # hi. #to
+        _ok  # hi. #todo
       end
 
       def __persist_survey

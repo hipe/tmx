@@ -51,12 +51,14 @@ module Skylab::Cull
 
       def __init_empty_survey
 
+        _survey_path = ::File.join @path, FILENAME_
+
         _config = Git_config_[]::Mutable.new_empty_document
 
-        @_survey_ = Here_.define_sanitized_ do |o|
+        @_survey_ = Here_.define_survey_ do |o|
 
           o.accept_initial_config_ _config
-          o.path = @path
+          o.survey_path = _survey_path
         end
         NIL
       end

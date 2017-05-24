@@ -1,9 +1,12 @@
 new file mode 100644
 --- /dev/null
 +++ b/cull-survey/config
-@@ -0,0 +1,5 @@
-+#ohai
-+[upstream "this is invalid but will get overwritten"]
-+  jiminy=crickets
-+  # heyburt, highburt
-+  adapter=fladapter
+@@ -0,0 +1,3 @@
++# ohai i am some config file
++[ upstream "file:shamonay.file" ]
++adapter = json
+new file mode 100644
+--- /dev/null
++++ b/cull-survey/shamonay.file
+@@ -0,0 +1,1 @@
++never opened, ick but necessary see [#007.D.3]

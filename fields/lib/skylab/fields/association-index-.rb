@@ -536,7 +536,7 @@ module Skylab::Fields
           @_box = bx
         end
 
-        def write_via_association x, asc
+        def _write_via_association_ x, asc
           @_box.add_or_replace(
             asc.name_symbol,
             -> { x },
@@ -549,7 +549,7 @@ module Skylab::Fields
           @_box[ asc.name_symbol ]
         end
 
-        def knows_value_for_association asc
+        def _knows_value_for_association_ asc
           @_box.has_key asc.name_symbol
         end
 

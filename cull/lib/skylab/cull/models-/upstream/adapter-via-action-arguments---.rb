@@ -5,7 +5,85 @@ module Skylab::Cull
     class Adapter_via_ActionArguments___ < Common_::MagneticBySimpleModel
 
       def initialize
-        super  # hi.
+        @_execute = :_execute_normally
+        @table_number = nil
+        @upstream_adapter_symbol = nil
+        super
+      end
+
+      def these_name_value_pairs= nv_st
+        @_execute = :__execute_experimentally
+        @__primitive_name_value_pair_stream = nv_st
+      end
+
+      def execute
+        send @_execute
+      end
+
+      def __execute_experimentally
+        # just a rough sketch experiment. belongs somewhere else.
+
+        ok = true
+        nv_st = remove_instance_variable :@__primitive_name_value_pair_stream
+        h = THESE___
+        extra_ks = nil
+        begin
+          nv = nv_st.gets
+          nv || break
+          m = h[ nv.name_symbol ]
+          if ! m
+            ok = false
+            ( extra_ks ||= [] ).push nv.name_symbol
+            redo
+          end
+          ok_ = send m, nv
+          if ! ok_
+            ok = false
+          end
+          redo
+        end while above
+        if ok
+          # #cov1.3
+          _execute_normally
+        elsif extra_ks
+          @listener.call :error, :expression, :unrecognized_associations do |y|
+            simple_inflection do
+              buff = oxford_join Scanner_[ extra_ks ] do |sym|
+                humanize( sym ).inspect
+              end
+              y << "\"upstream\" doesn't have #{
+                }#{ this_or_these } #{ n "association" }: #{ buff }"
+            end
+          end
+          UNABLE_
+        end
+      end
+
+      THESE___ = {
+        table_number: :__table_number,
+        adapter: :__adapter,
+        upstream: :__upstream,
+      }
+
+      def __table_number nv
+        x = nv.value
+        if x.respond_to? :bit_length
+          @table_number = x ; true
+        else
+          @listener.call( :error, :expression, :primitive_type_error ) { |y| y << "table number is not integer" }
+          UNABLE_
+        end
+      end
+
+      def __adapter nv
+        x = nv.value
+        @upstream_adapter_symbol = x.to_s.intern  # yikes/meh
+        ACHIEVED_
+      end
+
+      def __upstream nv
+        @upstream_string = nv.value  # (we happen to know that this must be a string)
+        ACHIEVED_
       end
 
       attr_writer(
@@ -17,7 +95,7 @@ module Skylab::Cull
         :upstream_adapter_symbol,
       )
 
-      def execute
+      def _execute_normally
 
         @md = /\A(?<prefix>[a-z0-9-]+):(?<arg>.+)/.match @upstream_string
 
@@ -260,6 +338,12 @@ module Skylab::Cull
       Path_looks_absolute_ = -> path do
         _yes = Home_.lib_.system.filesystem.path_looks_absolute path
         _yes  # hi. #todo
+      end
+
+      # ==
+
+      Scanner_ = -> a do
+        Common_::Scanner.via_array a
       end
 
       # ==

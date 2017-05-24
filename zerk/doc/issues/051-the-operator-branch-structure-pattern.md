@@ -60,7 +60,9 @@ here's some more specialized possibilites:
 
 experimental suggested names for mutation
 
-[none yet]
+  - `dereference_and_unset`
+
+
 
 
 

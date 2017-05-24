@@ -1,2 +1,3 @@
 # ohai
-[ upstream "zippy dippy" ]
+[ upstream "file:../../upstreams-with-various-extensions/cull-survey/not.json" ]
+  # (the above won't be opened but must exist)

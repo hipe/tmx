@@ -218,7 +218,9 @@
 [#031]       #parent-node: [#026] the `retrieve` narrative ..
 [#030]       #parent-node: [#026] the `create` narrative ..
 
-[#029] #hole
+[#029] #open in git-config, in read-only, try making an assignment with an
+             underscore `foo_bar = xx` then reading the assigment as a parsed
+             structure
              ( #moved-to: [#028.B] )
 
 [#028]       entity collection via git config ..

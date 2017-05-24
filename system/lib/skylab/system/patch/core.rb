@@ -1,6 +1,6 @@
 module Skylab::System
 
-  module Patch
+  module Patch  # :[#023.2]
 
     class Service
 

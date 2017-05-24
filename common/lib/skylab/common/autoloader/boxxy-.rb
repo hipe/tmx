@@ -50,6 +50,13 @@ module Skylab::Common
         #    - index "items" are *the* items, *not* const values.
         #      if it is useful to develop this, see [#cu-010]
 
+        def lookup_softly name_sym
+          d_a = @index.item_offsets_via_name_symbol[ name_sym ]
+          if d_a
+            _via_item_offsets d_a
+          end
+        end
+
         def has_reference name_sym
 
           # (to keep things simple, this will only detect those that have
@@ -72,7 +79,10 @@ module Skylab::Common
           # our solution is to result in our internal indexing item
           # structure, but to enusre that the asset is loaded here..
 
-          d_a = @index.item_offsets_via_name_symbol[ name_sym ]
+          _via_item_offsets @index.item_offsets_via_name_symbol[ name_sym ]
+        end
+
+        def _via_item_offsets d_a
           1 == d_a.length || self._COVER_ME__bah__
           item = @index.items.fetch d_a.fetch 0
 

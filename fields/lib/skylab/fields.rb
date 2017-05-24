@@ -958,18 +958,18 @@ module Skylab::Fields
       @_object = object
     end
 
-    def write_via_association x, asc
+    def _write_via_association_ x, asc
       @_object.instance_variable_set asc.as_ivar, x
       NIL
     end
 
     def _read_softly_via_association_ asc
-      if knows_value_for_association asc
+      if _knows_value_for_association_ asc
         dereference_association asc
       end
     end
 
-    def knows_value_for_association asc
+    def _knows_value_for_association_ asc
       @_object.instance_variable_defined? asc.as_ivar
     end
 

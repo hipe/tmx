@@ -141,6 +141,14 @@ module Skylab::Human
           end
         end
 
+        def this_or_these
+          _d = count_for_inflection
+          case _d
+          when 1    ; "this"
+          else      ; "these"
+          end
+        end
+
         def both_or_all numberish=nil
           _d = numberish ? write_count_for_inflection( numberish ) : count_for_inflection
           case _d

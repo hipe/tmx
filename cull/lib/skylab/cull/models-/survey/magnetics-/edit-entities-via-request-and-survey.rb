@@ -4,6 +4,8 @@ module Skylab::Cull
 
     class Magnetics_::EditEntities_via_Request_and_Survey < Common_::MagneticBySimpleModel
 
+      # (this has potential to be generalized and moved up as a general entity mutator)
+
       attr_writer(
         :listener,
         :parameter_value_store,
@@ -29,21 +31,93 @@ module Skylab::Cull
 
         md = RX___.match @_arg.name_symbol
         if md
-          @__matchdata = md
+
+          @__verb_symbol = %i( add remove unset ).detect do |sym|
+            md.offset( sym ).first  # ocd
+          end
+
+          @_association_symbol = md[ :stem ].intern
+
           ACHIEVED_
         end
       end
 
+      RX___ = %r(\A
+        (?:
+          (?<add> add ) |
+          (?<remove> remove ) |
+          (?<unset> unset )
+        )
+        _
+        (?<stem>.+)
+      \z)x
+
       def __when_verby
+        case remove_instance_variable :@__verb_symbol
+        when :add ; __when_add
+        when :remove ; __when_remove
+        when :unset ; __when_unset
+        else no end
+      end
 
-        md = remove_instance_variable :@__matchdata
-
-        _add_or_remove = md[ :add ] ? :add : :remove
+      def __WAS  # `__when_add`, `__when_remove`
 
         _el = @survey.touch em[ :stem ].intern
         _ok = _el.send _add_or_remove, @_arg, @parameter_value_store, & @listener
         _ok  # hi. #todo
       end
+
+      def __when_unset
+
+        asc = Common_::Name.via_lowercase_with_underscores_symbol @_association_symbol
+        if @survey._knows_value_for_association_ asc
+          __do_unset asc
+        else
+          __when_already_not_set
+        end
+      end
+
+      def __when_already_not_set  # #cov1.4 (has legacy behavior)
+
+        term_sym = :"no_#{ @_association_symbol }_set"  # `no_upstream_set`..
+        @listener.call :error, term_sym do
+          __build_event_for_cannot_unset_because_no_component term_sym
+        end
+        UNABLE_
+      end
+
+      def __build_event_for_cannot_unset_because_no_component term_sym
+
+        asc_sym = @_association_symbol
+        Build_not_OK_event_.call term_sym do |y, o|
+          y << "cannot unset #{ humanize asc_sym } - #{ humanize term_sym }"
+        end
+      end
+
+      def __do_unset asc  # #cov1.5
+
+        _cfg = @survey.config_for_write_
+
+        _sects = _cfg.sections
+
+        _sects.dereference_and_unset @_association_symbol
+        # (result is section - discarded)
+        # (we remove the section now but this is (in theory) redundant with
+        # #spot1.3, which removes extra sections in a general way. we do it
+        # now to be explicit and to make more contact and to future-proof it.)
+
+        ent = @survey._unset_via_association_ asc  # (result is value - discarded)
+
+        @listener.call :info, :expression, :removed_entity do |y|
+
+          _desc = ent.describe_entity_under_ self
+          y << "removed #{ asc.name.as_human } (#{ _desc })"
+        end
+
+        ACHIEVED_
+      end
+
+      # --
 
       def __has_model
 
@@ -52,19 +126,48 @@ module Skylab::Cull
 
       def __when_model
 
-        @survey.define_and_assign_component__ @_arg.name_symbol do |o|
+        ent = @survey
 
-          o.component_as_primitive_value = @_arg.value
+        # ~( whoopie: if the following operation is going to to result in
+        # a clobber (replacement) of an existing component, for now we have
+        # to sign off on it here. to determine if it's going to be a clobber,
+        # we have to know if the component is set already. to know if it's
+        # already set, we need a name (function). "EK parameters" (which
+        # is what actions deal in) don't speak "name", they just use simple
+        # symbols (which is fine). we don't want to create a shortlived name
+        # function here when one already exists in the association, so we
+        # sort of peek into the associations just to get the name:
 
-          o.primitive_resources = @survey
+        asc_sym = @_arg.association.name_symbol
 
-          o.invocation_resources = @parameter_value_store._invocation_resources_  # meh
+        _item = @survey._associations_operator_branch_.dereference asc_sym
 
-          o.listener = @listener
+        _yes = ent._knows_value_for_association_ _item
+
+        # ~)
+
+        ent.define_and_assign_component_by__ do |o|
+
+          if _yes
+            o.will_be_clobber
+          else
+            o.will_not_be_clobber
+          end
+
+          o.association_symbol = asc_sym
+
+          o.define_entity_by do |oo|
+
+            oo.component_as_primitive_value = @_arg.value
+
+            oo.primitive_resources = ent
+
+            oo.invocation_resources = @parameter_value_store._invocation_resources_  # meh
+
+            oo.listener = @listener
+          end
         end
       end
-
-      RX___ = /\A(?:(?<add>add_)|(?<remove>remove_))(?<stem>.+)/
 
       # -- B.
 

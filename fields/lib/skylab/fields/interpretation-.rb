@@ -263,7 +263,7 @@ module Skylab::Fields
 
       def write_association_value_ x
 
-        @_normalization_.valid_value_store.write_via_association x, @_association_
+        @_normalization_.valid_value_store._write_via_association_ x, @_association_
         KEEP_PARSING_  # in-memory writes may not fail. provided as convenience.
       end
 
@@ -296,7 +296,7 @@ module Skylab::Fields
 
         vvs = @_normalization_.valid_value_store  # :#spot1-2
 
-        if vvs.knows_value_for_association @_association_
+        if vvs._knows_value_for_association_ @_association_
           was_defined = true
           x = vvs.dereference_association @_association_
         end
@@ -356,7 +356,7 @@ module Skylab::Fields
 
       def _write
         _x = remove_instance_variable :@_working_value
-        @__valid_value_store.write_via_association _x, @_association_
+        @__valid_value_store._write_via_association_ _x, @_association_
       end
 
       attr_reader(

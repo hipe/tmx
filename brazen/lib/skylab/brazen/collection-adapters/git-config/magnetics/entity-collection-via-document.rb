@@ -157,7 +157,7 @@ module Skylab::Brazen
 
             lu = lookup_section_ nat_key
             if lu.did_find
-              _ary = doc.sections.delete_sections_via_sections [ lu.section ]
+              _ary = doc.sections.delete_sections_via_sections_ [ lu.section ]
               _entity_via_section _ary.fetch 0  # meh
             else
               p.call :error, :expression, :component_not_found do |y|

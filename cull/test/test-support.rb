@@ -44,6 +44,11 @@ module Skylab::Cull::TestSupport
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
 
+    def contemporary_expression_agent_
+      # (legacy tests still use the default. we want newer tests to look natural)
+      Home_::Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
+    end
+
     # ~ paths for READ ONLY:
 
     def freshly_initted_path_

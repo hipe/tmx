@@ -1,8 +1,8 @@
 #ohai
 
-[upstream "zoop"]
+[upstream "file:../../upstreams-with-various-extensions/cull-survey/not.json"]
 
-[upstream "\"zeep\""]
+[upstream "file:../../upstreams-with-various-extensions/cull-survey/another-not.json"]
 
 [zafarelli "gazoonk"]
 keep-this=value

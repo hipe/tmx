@@ -33,7 +33,7 @@ module Skylab::Brazen
           end
 
           def delete_assignments_via_assignments__ a
-            # (corresponds to `delete_sections_via_sections`)
+            # (counterpart to `delete_sections_via_sections_`)
             This_::Magnetics::DeleteEntity_via_Entity_and_Collection.call_by do |o|
               o.will_delete_these_actual_instances a
               o.all_elements = @_all_elements_

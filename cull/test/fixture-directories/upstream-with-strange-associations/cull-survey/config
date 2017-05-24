@@ -1,0 +1,7 @@
+#ohai
+
+[upstream "flonkie:jabroovniak"]
+
+  chiwetel-ejiofor = "baron brando"
+  adapter = knuckle
+  table-number = "you betcha"

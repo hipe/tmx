@@ -18,7 +18,14 @@ module Skylab::Brazen
 
           # -- write
 
-          def delete_sections_via_sections a  # [cu], also #cov2.2
+          def dereference_and_unset sym
+            _sect = dereference sym
+            _a = delete_sections_via_sections_ [ _sect ]
+            _a.fetch 0
+          end
+
+          def delete_sections_via_sections_ a  # #cov2.2
+            # (counterpart to delete_assignments_via_assignments__)
 
             This_::Magnetics::DeleteEntity_via_Entity_and_Collection.call_by do |o|
               o.will_delete_these_actual_instances a

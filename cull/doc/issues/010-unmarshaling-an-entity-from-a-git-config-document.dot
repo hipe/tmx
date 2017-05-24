@@ -1,0 +1,46 @@
+digraph g {
+
+  label="\n\nfig. 1 - just because we are in the mood, we will make
+a flowchart of this relatively commonplace algorithm.\n
+we use the terminology for our \"git config\" based serialization
+but this algorithm could be generalized for other stores.
+"
+
+
+n1_1 [label="another section\nin the document?" shape=diamond]
+n1_1->n1_2 [label=yes]
+n1_1->n1_3 [label=no]
+
+n1_3 [label="finished" shape=rect style=filled]
+
+n1_2 [label="find this section name\nas-is in the associations?" shape=diamond]
+
+n1_2->n1_4 [label=yes]
+n1_2->n1_5 [label=no]
+
+n1_5 [label="error: complain\nabout unrecognized\nsection name" shape=rect style=filled]
+
+n1_4 [label="parse the entity\nvia its model class\nand the section?" shape=diamond]
+n1_4->n1_6 [label=yes]
+n1_4->n1_7 [label=no]
+
+n1_7 [label="error: per\nmodel" shape=rect style=filled]
+
+n1_6 [label="is the association\na singleton association?" shape=diamond]
+
+n1_6->n1_8 [label=yes]
+n1_6->n1_9 [label=no]
+
+n1_9 [label="autovivify an array\n(if necessary)\nand push the entity to it" shape=rect style=filled]
+n1_9->n1_1
+
+n1_8 [label="is the ivar\nalready set?" shape=diamond]
+n1_8->n1_10 [label=yes]
+n1_8->n1_11 [label=no]
+
+n1_10 [label="error: whine about\nmultiple entities for a\nsingleton association" shape=rect style=filled]
+
+n1_11 [label="store the entity\nunder the ivar" shape=rect style=filled]
+n1_11->n1_1
+
+}

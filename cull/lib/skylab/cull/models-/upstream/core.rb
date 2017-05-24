@@ -3,16 +3,57 @@ module Skylab::Cull
   module Models_::Upstream
 
     class << self
+
+      def via_persistable_primitive_name_value_pair_stream_
+        _by do |o|
+          yield FacadeForUnmarshal___.new o
+        end
+      end
+
       def define
+        _by do |o|
+          yield FacadeForEdit___.new o
+        end
+      end
+
+      def _by
         Here_::Adapter_via_ActionArguments___.call_by do |o|
-          yield Facade___.new o
+          yield o  # hi.
         end
       end
     end  # >>
 
     # ==
 
-    class Facade___
+    class FacadeForUnmarshal___
+
+      def initialize o
+        @_magnet = o
+      end
+
+      def name_value_pair_stream= st
+        @_magnet.these_name_value_pairs = st
+      end
+
+      def survey_path= su_path
+        @_magnet.derelativize_by = -> rel_path do
+          ::File.expand_path rel_path, su_path
+        end
+        su_path
+      end
+
+      def filesystem= fs
+        @_magnet.filesystem = fs
+      end
+
+      def listener= p
+        @_magnet.listener = p
+      end
+    end
+
+    # ==
+
+    class FacadeForEdit___
 
       # interchange generic parameters for specific parameters:
       #
@@ -21,11 +62,6 @@ module Skylab::Cull
       #   - manifold service instances into their requisite parts.. etc
 
       def initialize o
-
-        # ~(nilify these ourselves for now, to keep things explicit
-        o.table_number = nil
-        o.upstream_adapter_symbol = nil
-        # ~)
         @_magnet = o
       end
 

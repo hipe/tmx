@@ -111,9 +111,27 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     class DefineAndAssignComponent_via_Block_and_Symbol < Common_::MagneticBySimpleModel
 
+      def initialize
+        @_mutex_for_this = nil
+        super
+      end
+
+      def will_not_be_clobber
+        remove_instance_variable :@_mutex_for_this
+        @_will_be_clobber = false ; nil
+      end
+
+      def will_be_clobber
+        remove_instance_variable :@_mutex_for_this
+        @_will_be_clobber = true ; nil
+      end
+
+      def define_entity_by & p
+        @entity_definition_block = p
+      end
+
       attr_writer(
         :association_symbol,
-        :entity_definition_block,
         :mutable_entity,
       )
 
@@ -127,8 +145,17 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         asc.module || fail
         # ~)
 
+        yes = remove_instance_variable :@_will_be_clobber
         if qc.is_known_known
-          self._COVER_ME__what_to_do_about_clobber_here
+          if yes
+            NOTHING_  # hi. ok.
+          else
+            self._SANITY__clobber_is_not_OK__
+          end
+        elsif yes
+          self._SANITY__clobber_was_expected_but_did_not_occur__
+        else
+          NOTHING_  # hi. ok.
         end
 
         _model_mod = asc.model_module
@@ -138,7 +165,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
 
         if el
-          @mutable_entity._write_via_value_and_association_ el, asc
+          @mutable_entity._write_via_association_ el, asc  # maybe clobber, maybe not. OK both.
           ACHIEVED_  # hi. #cov1.2
         else
           NOTHING_  # hi. #cov1.1

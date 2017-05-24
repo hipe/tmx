@@ -734,7 +734,7 @@ module Skylab::TestSupport
           __init_option_parser
           begin
             @_option_parser.parse! @_ARGV
-            ACHIEVED_
+            @_ok
           rescue ::OptionParser::ParseError => e
             __when_optparse_parse_error e
           end

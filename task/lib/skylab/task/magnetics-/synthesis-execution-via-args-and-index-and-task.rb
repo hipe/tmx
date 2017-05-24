@@ -120,7 +120,7 @@ class Skylab::Task
           else
             remote_atr
           end
-          if rs.knows_value_for_association local_atr
+          if rs._knows_value_for_association_ local_atr
             _x = rs.dereference_association local_atr
             @_rtask.add_parameter k, _x
           end

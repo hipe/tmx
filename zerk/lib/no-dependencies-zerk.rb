@@ -1360,6 +1360,10 @@ module NoDependenciesZerk
         o.extend Zerk_lib_[].lib_.human::NLP::EN::SimpleInflectionSession::Methods
         o.calculate( & p )
       end
+
+      def humanize sym  # (bringing back this ancient thing)
+        sym.id2name.gsub UNDERSCORE_, SPACE_
+      end
     end
 
     class PrimaryFound__ < SimpleModel  # structure backstory at [#here.A]

@@ -12,12 +12,20 @@ module Skylab::Cull
 
         def to_descriptive_event  # (or `to_event`)
 
+          me = self
           Build_event_.call(
             :json_upstream,
             :path, @path,
             :ok, true
-          ) do |y, o|
-            y << "JSON file: #{ pth o.path }"
+          ) do |y, _o|
+            y << me.describe_entity_under_( self )
+          end
+        end
+
+        def describe_entity_under_ expag
+          path = @path
+          expag.calculate do
+            "JSON file: #{ pth path }"
           end
         end
 

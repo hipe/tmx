@@ -20,12 +20,20 @@ module Skylab::Cull
 
       def to_descriptive_event  # (or `to_event`)
 
+        me = self
         Build_event_.call(
           :markdown_upstream,
           :path, @path,
           :ok, true,
-        ) do |y, o|
-          y << "markdown file: #{ pth o.path }"
+        ) do |y, _o|
+          y << me.describe_entity_under_( self )
+        end
+      end
+
+      def describe_entity_under_ expag
+        path = @path
+        expag.calculate do
+          "markdown file: #{ pth path }"
         end
       end
 

@@ -8,6 +8,8 @@ module Skylab::System
 
     class Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
+      #   - :[#020] (see)
+
       # (if we were to write this again today we would *not* subclass pathname)
 
       class << self

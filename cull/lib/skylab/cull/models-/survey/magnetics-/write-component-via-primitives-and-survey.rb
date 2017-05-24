@@ -63,13 +63,13 @@ module Skylab::Cull
 
       def __when_multiple_relevant_sections a
 
-        s = _to_section_name_string
+        self._COVER_ME__probably_never_hits__readme__
 
-        @listener.call :error, :expression, :multiple_sections_for_singleton do |y|
+        # this once provided #cov1.6 but that has changed now that (in
+        # effect) we validate the document on unmarshal rather than on
+        # marshal (seems to make more sense) so the language production
+        # that was once here moved to the new referent codepoint. #history-A.2
 
-          y << "the document has #{ a.length } existing #{ s.inspect } sections."
-          y << "must have at most one."
-        end
         UNABLE_
       end
 
@@ -173,4 +173,5 @@ module Skylab::Cull
     end
   end
 end
+# :#history-A.2 (can be temporary) (as referenced)
 # #history-A.1: abstracted from two methods in main survey file #spot1.2

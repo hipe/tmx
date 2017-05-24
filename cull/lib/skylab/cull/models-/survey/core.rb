@@ -56,7 +56,13 @@ module Skylab::Cull
         # (parse the config file)
 
         _su_path = remove_instance_variable :@__survey_path
-        _ = Here_::Magnetics_::Survey_via_SurveyPath[ _su_path, & _listener_ ]
+
+        _ = Here_::Magnetics_::Survey_via_SurveyPath.call_by do |o|
+          o.survey_path = _su_path
+          o.filesystem = _filesystem_
+          o.listener = _listener_
+        end
+
         _store_ :@_survey_, _
       end
 
@@ -75,11 +81,12 @@ module Skylab::Cull
 
     class << self
 
-      def define_sanitized_
+      def define_survey_
         me = new
         yield me
-        me.__become_self
+        me  # (note that at this point you might be known to be invalid, near #spot1.4)
       end
+
       private :new
     end  # >>
 
@@ -121,14 +128,6 @@ module Skylab::Cull
         @_survey_path_value = su_path
       end
 
-    attr_writer(
-      :path,
-    )
-
-      def __become_self
-        self  # hi.
-      end
-
     # ==
 
     # ~~ interface for the persistence script
@@ -160,47 +159,6 @@ module Skylab::Cull
     end
 
     # ~~ misc functions for actors & top entities
-
-    def destroy_all_persistent_nodes_for_name_symbol_ section_sym
-
-      self._CHANGED__at_this_commit__  # the below ivar is gone
-      cfg = @cfg_for_write
-
-      st = cfg.sections.to_stream_of_sections.reduce_by do |el|
-        section_sym == el.external_normal_name_symbol
-      end
-
-      delete_these = st.to_a
-
-      if delete_these.length.zero?
-        name_sym = :"no_#{ section_sym }_set"
-        @on_event_selectively.call :error, name_sym do
-          Build_not_OK_event_[ name_sym ]
-        end
-        UNABLE_
-      else
-        a = cfg.sections.delete_sections_via_sections delete_these
-        @on_event_selectively.call :info, :"deleted_#{ section_sym }" do
-          bld_deleted_slotular a, section_sym
-        end
-        ACHIEVED_
-      end
-    end
-
-    def bld_deleted_slotular a, sym
-
-      Build_event_.call( :"deleted_#{ sym }#{ 's' if 1 != a.length }",
-        :symbol, sym,
-        :count, a.length,
-        :ok, true,
-      ) do |y, o|
-        if 1 == o.count
-          y << "deleted #{ par o.symbol.id2name }"
-        else
-          y << "deleted #{ o.count } #{ par plural_noun o.symbol.id2name }"
-        end
-      end
-    end
 
     # ~ public API for #:+actors near "associated entities" API (experiment)
 
@@ -234,11 +192,9 @@ module Skylab::Cull
 
       # -- C ..
 
-      def define_and_assign_component__ sym, & p
-
+      def define_and_assign_component_by__
         _hi = MTk_::AssociationToolkit::DefineAndAssignComponent_via_Block_and_Symbol.call_by do |o|
-          o.entity_definition_block = p
-          o.association_symbol = sym
+          yield o
           o.mutable_entity = self
         end
         _hi  # hi. #todo
@@ -363,10 +319,24 @@ module Skylab::Cull
         MTk_::AssociationToolkit::QualifiedComponentStream_via_Entity[ self ]
       end
 
-      def _write_via_value_and_association_ x, asc  # near `_simplified_write_`
+      def _write_via_association_ x, asc  # near `_simplified_write_`
         _ivar = asc.name.as_ivar
         instance_variable_set _ivar, x
         NIL
+      end
+
+      def _unset_via_association_ asc
+        _ivar = asc.name.as_ivar
+        remove_instance_variable _ivar
+      end
+
+      def _knows_value_for_association_ asc
+        ivar = asc.name.as_ivar
+        if instance_variable_defined? ivar
+          x = instance_variable_get ivar
+          x.nil? and self._NEVER__no_big_deal_readme__  # #todo
+          true
+        end
       end
 
       def _read_softly_via_association_ asc
@@ -414,6 +384,8 @@ module Skylab::Cull
         o.ADD_ALL_THESE_MUGS(
           :property, :upstream,
           :property, :upstream_adapter,
+
+          :flag, :property, :unset_upstream,
 
           :list, :property, :add_map,
           :list, :property, :remove_map,

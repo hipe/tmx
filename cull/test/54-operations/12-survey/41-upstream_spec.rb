@@ -66,7 +66,7 @@ module Skylab::Cull::TestSupport
     end
 
 # (5/N)
-    context "add noent path with good extension on fresh workspace" do
+    context "add path with good extension and existent referent on fresh workspace" do
 
       # #cov1.2, #lends-coverage-to [#br-007.1]
 
@@ -81,12 +81,12 @@ module Skylab::Cull::TestSupport
 
       it "emits talkin bout set upstream" do
         _actual = black_and_white _tuple[1]
-        _actual =~ /\AJSON file: «[^»]+»\z/ || fail
+        _actual =~ /\AJSON file: .+\bnot\.json\z/ || fail
       end
 
       it "emits talkin bout updated (not created)" do
         _actual = black_and_white _tuple[2]
-        _actual =~ /\Aupdated «[^»]+» \(\d+ bytes\)\z/ || fail
+        _actual =~ /\Aupdated [^ ]+ \(\d+ bytes\)\z/ || fail
       end
 
       it "content" do
@@ -105,7 +105,11 @@ module Skylab::Cull::TestSupport
         x = _call_API_with_path_and_file path, _existent_but_not_JSON_file
 
         a = []
-        __expect_added a
+
+        expect :info, :related_to_assignment_change, :added do |ev|
+          a.push ev
+        end
+
         _expect_common_success_finish a
         a.push path
         a.push x
@@ -113,7 +117,7 @@ module Skylab::Cull::TestSupport
     end
 
 # (6/N)
-    context "add upstream file on workspace with extraneous assignments and .." do
+    context "add (same path) over survey with existing upstream" do
 
       # #lends-coverage-to [#br-007.1] (again)
 
@@ -122,26 +126,20 @@ module Skylab::Cull::TestSupport
       end
 
       it "says how it changed one" do
-        _actual = black_and_white _tuple.first
-        _actual == 'value changed - ( adapter : "fladapter" )' || fail
-      end
-
-      it "says how it removed one" do
         _actual = black_and_white _tuple[1]
-        _actual == 'removed - ( jiminy : "crickets" )' || fail
+        _actual == 'no change in value - ( adapter : "json" )' || fail
       end
 
       it "content good (an interceding comment is preserved)" do
 
-        _path = _tuple[-2]
+        _path = _tuple[0]
         io = ::File.open ::File.join( _path, config_tail_ )
 
         expect_these_lines_in_array_with_trailing_newlines_ io do |y|
 
-           y << "#ohai"  # was there in the beginning
-           y << %r(\A\[upstream "file:[^ ]+not\.json"\]\n\z)
-           y << "  # heyburt, highburt"  # ditto
-           y << "  adapter=json"  # this is something that was changed
+           y << "# ohai i am some config file"  # (as it was in the beginning)
+           y << %r(\A\[ upstream "file:[^ ]+not\.json" \]\n\z)
+           y << "adapter = json"  # this is something that was changed
         end
         io.close
       end
@@ -151,44 +149,31 @@ module Skylab::Cull::TestSupport
         path = prepare_tmpdir_with_patch_( :some_config_file ).path
         x = _call_API_with_path_and_file path, _existent_but_not_JSON_file
 
-        a = []
-        __expect_changed a
-        __expect_removed a
+        a = [ path ]  # _tuple[0]
+
+        expect :info, :related_to_assignment_change, :no_change do |ev|
+          a.push ev  # _tuple[1]
+        end
+
         _expect_common_success_finish
-        a.push path
-        a.push x
+        a.push x  # _tuple.last
       end
     end
 
 # (7/N)
     context "add existent upstream on a workspace with multiple upstreams" do
 
-      # when the association models a singleton (formerly "slotular")
-      # component (as "upstream" and most others are), it used to be that
-      # we would allow multiple sections to match and then we would combine
-      # them together.
-      #
-      # now we see this as an overly active stunt - a file that has multiple
-      # sections for a singleton association is invalid; and it should not
-      # be up to us to decide how to fix it. to merge all the assignments
-      # into one section as we used to do is weird; akin to combining pages
-      # from different books into one book.
-      #
-      # local custom holds that when a workspace will be mutated during
-      # the course of a test, we create it by patching it; and when not
-      # we simply use a fixture directory in place (risky). as such, since
-      # the fixture directory of this test went from being mutated to not
-      # mutated, what used to be created by a patch has become a fixture
-      # directory and we have put the old patch file under #tombstone-A.1.
+      # :#cov1.6, :#spot1.3.
+      # [#007.D.2] describes how #tombstone-A.1 pertains to this test case.
 
       it "fails" do
-        _tuple.last.nil? || fail
+        _fails
       end
 
       it "explains" do
         _actual = _tuple.first
         expect_these_lines_in_array_ _actual do |y|
-          y << 'the document has 3 existing "upstream" sections.'
+          y << 'the document has more than one existing "upstream" section.'
           y << "must have at most one."
         end
       end
@@ -209,39 +194,93 @@ module Skylab::Cull::TestSupport
     end
 
 # (8/N)
-    it "unset - no", wip: true do
-      call_API(
-        * _subject_action,
-        :upstream, Home_::EMPTY_S_,
-        :path, freshly_initted_path_
-      )
+    context "unset when it is already not set" do
 
-      expect_not_OK_event :no_upstream_set
-      expect_fail
+      it "fails" do
+        _fails
+      end
+
+      it "explains" do
+        _actual = black_and_white _tuple.first
+        _actual == "cannot unset upstream - no upstream set" || fail
+      end
+
+      shared_subject :_tuple do
+
+        x = call_API(
+          * _subject_action,
+
+          :unset_upstream,
+          :path, freshly_initted_path_
+        )
+
+        a = []
+        expect :error, :no_upstream_set do |ev|
+          a.push ev
+        end
+        a.push x
+      end
     end
 
 # (9/N)
-    it "unset - yes", wip: true do
-      TS_._THIS_TEST_IS_TOO_BIG
+    context "unset OK" do
 
-      td = prepare_tmpdir_with_patch_ :many_upstreams
+      it "succeeds (result is number of bytes written for now)" do
+        _x = _tuple.last
+        _x.zero? && fail
+      end
 
-      call_API(
-        * _subject_action,
-        :upstream, Home_::EMPTY_S_,
-        :path, td.to_path
-      )
+      it "emits something talkin bout removed (in a non-document-centric-way)" do
 
-      expect_not_OK_event :path_must_be_absolute
+        _actual = _tuple[1]
+        expect_these_lines_in_array_ _actual do |y|
+          y << %r(\Aremoved upstream \(JSON file: [^ ]+\bshamonay\.file\)\z)
+        end
+      end
 
-      _em = expect_OK_event :deleted_upstream
+      it "emits talkin bout wrote resource" do
 
-      expect_event_ :collection_resource_committed_changes
+        _ev = _tuple[2]
+        _ev.bytes.zero? && fail
+      end
 
-      black_and_white( _em.cached_event_value ).should eql(
-        "deleted 3 'upstreams'" )
+      it "after having done this, the file has no data lines" do
 
-      expect_succeed
+        _head = _tuple[0]
+        _path = ::File.join _head, config_filename
+        io = ::File.open _path
+
+        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+          y << "# ohai i am some config file"
+        end
+
+        io.close
+      end
+
+      shared_subject :_tuple do
+
+        a = []
+
+        path = prepare_tmpdir_with_patch_( :some_config_file ).path
+
+        a.push path  # _tuple[0]
+
+        call_API(
+          * _subject_action,
+          :unset_upstream,
+          :path, path,
+        )
+
+        expect :info, :expression, :removed_entity do |y|
+          a.push y  # _tuple[1]
+        end
+
+        expect :info, :collection_resource_committed_changes do |ev|
+          a.push ev  # _tuple[2]
+        end
+
+        a.push @result  # _tuple.last
+      end
     end
 
     # -- assert
@@ -261,27 +300,19 @@ module Skylab::Cull::TestSupport
       NIL
     end
 
-    def __expect_added a
-      expect :info, :related_to_assignment_change, :added do |ev|
-        a.push ev
-      end
+    def _fails
+      _tuple.last.nil? || fail
     end
 
-    def __expect_changed a
-      expect :info, :related_to_assignment_change, :changed do |ev|
-        a.push ev
-      end
-    end
-
-    def __expect_removed a
-      expect :info, :related_to_assignment_change, :removed do |ev|
-        a.push ev
-      end
+    # ~( ..
+    def black_and_white_expression_agent_for_expect_emission
+      expression_agent_for_expect_emission
     end
 
     def expression_agent_for_expect_emission
-      Home_::Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
+      contemporary_expression_agent_
     end
+    # ~)
 
     # -- setup
 
@@ -323,4 +354,5 @@ module Skylab::Cull::TestSupport
     # ==
   end
 end
+# #tombstone-A.2: deleting the upstream no longer happens with the empty string hack
 # :#tombstone-A.1: there was a patch. there was a method called `count_lines`

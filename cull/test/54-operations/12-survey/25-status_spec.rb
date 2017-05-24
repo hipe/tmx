@@ -5,6 +5,7 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - survey - status" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_event
 
 # (1/N)
@@ -36,8 +37,77 @@ module Skylab::Cull::TestSupport
       x.should be_nil
     end
 
+#==(ADDENDUM
+
+    context "when config file exists with strange section name" do
+
+      it "fails" do
+        _fails
+      end
+
+      it "explains" do
+        _actual = _tuple.first
+        _actual == [ 'the section "chiwetel ejiofor" does not correspond to any known association.' ] || fail
+      end
+
+      shared_subject :_tuple do
+        x = call_API(
+          * _subject_action,
+          :path, fixture_directory_( :strange_section ),
+        )
+        a = []
+        expect :error, :expression, :unrecognized_section_name do |y|
+          a.push y
+        end
+        a.push x
+      end
+    end
+
+    # (for no particular reason except history, the error case of having
+    # multiple sections associated with a singleton association is covered
+    # over at #cov1.6)
+
+    context "when config file exists, entity section has issues within the section" do
+
+      it "fails" do
+        _fails
+      end
+
+      it "whines about table number" do
+        _actual = _tuple.first
+        _actual == [ "table number is not integer" ] || fail
+      end
+
+      it "whines about unrec assoc" do
+        _actual = _tuple[1]
+        _actual == [ '"upstream" doesn\'t have this association: "chiwetel ejiofor"' ] || fail
+      end
+
+      shared_subject :_tuple do
+
+        x = call_API(
+          * _subject_action,
+          :path, fixture_directory_( :upstream_with_strange_associations ),
+        )
+
+        a = []
+        expect :error, :expression, :primitive_type_error do |y|
+          a.push y
+        end
+
+        expect :error, :expression, :unrecognized_associations do |y|
+          a.push y
+        end
+
+        a.push x
+      end
+    end
+
+#===)
+
 # (5/N)
     it "with an upstream 'foo'" do
+      # #cov1.3
       count = 0
       y = []
       against fixture_directory_ :upstream_foo
@@ -51,11 +121,34 @@ module Skylab::Cull::TestSupport
         redo
       end while above
       count.should eql 1
-      y.first.should eql 'upstream (val "zippy dippy")'
+      y.first =~ /\Aupstream \(val "file:\.\./ || fail
     end
+
+    # -- assert
+
+    def black_and_white_expression_agent_for_expect_emission
+      expression_agent_for_expect_emission
+    end
+
+    def expression_agent_for_expect_emission
+      contemporary_expression_agent_
+    end
+
+    def _fails
+      _tuple.last.nil? || fail
+    end
+
+    # -- setup
 
     def against path
       call_API :survey, :status, :path, path
     end
+
+    def _subject_action
+      [ :survey, :status ]
+    end
+
+    # ==
+    # ==
   end
 end

@@ -229,7 +229,7 @@ module Skylab::Brazen
 
     # ==
 
-    class ElementBox__
+    class Facade__
 
       # abstract base class to aide in the implementation of our two kinds
       # of "collection" node: one that holds a collection of sections (the
@@ -291,7 +291,7 @@ module Skylab::Brazen
       end
     end
 
-    class Sections___ < ElementBox__
+    class Sections___ < Facade__
 
       def accept_section_as_sections__ sect
         @_offset_via_symbol_[ sect.external_normal_name_symbol ] = @_elements_.length
@@ -330,7 +330,7 @@ module Skylab::Brazen
       end
     end
 
-    class Assignments__ < ElementBox__
+    class Assignments__ < Facade__
 
       def __accept_assignment_ asmt
 
@@ -394,6 +394,10 @@ module Skylab::Brazen
       end
 
       alias_method :to_stream_of_assignments, :_to_stream_of_elements_
+
+      def ARRAY_READ_ONLY  # [cu]
+        @_elements_
+      end
     end
 
     class Assignment_
