@@ -113,6 +113,10 @@ module Skylab::Fields
           name_symbol  # :#coverpoint1.2
         end
 
+        def do_guard_against_clobber
+          ! is_glob
+        end
+
         attr_reader(
           :default_by,
           :describe_by,
@@ -121,6 +125,10 @@ module Skylab::Fields
           :is_required,
           :name_symbol,
         )
+
+        def store_by  # (for now it's write your own)
+          NOTHING_
+        end
       end
 
       # ==

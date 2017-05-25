@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Report
+    class Associations_::Report
 
       class RecomposeSection_via_FunctionCalls_and_Section___ < Common_::Dyadic  # 1x
 

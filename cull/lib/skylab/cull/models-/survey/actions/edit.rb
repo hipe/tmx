@@ -33,9 +33,9 @@ module Skylab::Cull
 
       def __edit_survey
 
-        _ok = Here_::Magnetics_::EditEntities_via_Request_and_Survey.call_by do |o|
+        _ok = PersistenceToolkit_[]::EditComponents_via_Request_and_MutableEntity.call_by do |o|
           o.parameter_value_store = self
-          o.survey = @_survey_
+          o.mutable_entity = @_survey_
           o.listener = _listener_
         end
 
@@ -49,6 +49,12 @@ module Skylab::Cull
           o.filesystem = _filesystem_
           o.listener = _listener_
         end
+      end
+
+      # ==
+
+      PersistenceToolkit_ = Lazy_.call do
+        Home_.lib_.ACS::GitConfigMagnetics
       end
 
       # ==

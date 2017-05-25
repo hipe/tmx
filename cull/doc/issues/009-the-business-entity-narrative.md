@@ -1,4 +1,4 @@
-# the entity narrative :[#001]
+# the business entity narrative :[#009]
 
 (EDIT - there's something here, but names should be moderninzed)
 
@@ -7,7 +7,7 @@
 
 ## prerequisite
 
-see [#007] README for development.
+see [#011] "internal architecture" for development notes.
 
 
 
@@ -121,4 +121,4 @@ ignored/meaningless/undefined.
 
 ## document-meta
 
-  - #pending-rename: open up the [#001] identifier for the README - probably [#009]
+  [ none ]

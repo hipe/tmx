@@ -421,10 +421,11 @@ module Skylab::Common
           x = @item_x
           a = ::Array.try_convert x
           s = @expression_agent.calculate do
+            m = :ick_mixed  # (used to be `ick`)
             if a
-              a.map( & method( :ick ) ).join( ', ' )
+              a.map( & method( m ) ).join( ', ' )
             else
-              ick x
+              send m, x
             end
           end
           @item_x = s ; nil

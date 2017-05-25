@@ -344,7 +344,7 @@ module Skylab::TanMan
 
       def __find_equivalent_association_or_neighbor_associations
 
-        # :[#br-011] unobtrusive lexical-esque insertion
+        # #[#ba-045] unobtrusive lexical-esque insertion
 
         __init_node_ID_symbols_and_strings
 
@@ -579,6 +579,5 @@ module Skylab::TanMan
   end
 end
 # #archive-A.3 (should be temporary) related to #open [#015] remove association
-# #pending-rename: it probably wouldn't hurt to go ahead and put this in magnets, per #here1
 # :#history-A.2: full rewrite mostly
 # :#tombstone-A.1 (can be temporary) (as referenced)

@@ -201,5 +201,4 @@ module Skylab::TanMan::TestSupport
   end
 end
 # #tombstone-A.2: the point at which one test moved to a new file
-# #pending-rename: this tests both add AND apply (or called "associate")
 # :#history-A.1 (can be temporary) (as referenced)

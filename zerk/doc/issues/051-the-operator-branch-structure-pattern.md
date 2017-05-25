@@ -179,8 +179,6 @@ be equivalent to the set of values produced by `to_loadable_reference_stream`.
 
 ## document meta
 
-  - #pending-rename: we sorta want to rename this "operator branch theory" (maybe)
-
   - #history-A: in this selfsame commit we refactor a problematic method
     name (and indeed whole interface) to make use of the standard interface
     of [#here.1].

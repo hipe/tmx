@@ -40,8 +40,7 @@ module Skylab::Cull
 
   module Models_
 
-    # Autoloader_[ self, :boxxy ]
-    Autoloader_[ self ]
+    Autoloader_[ self, :boxxy ]  # because #spot2.1
   end
 
   Models_::Ping = -> some_word, stackish, & oes_p do
@@ -53,7 +52,7 @@ module Skylab::Cull
       buffer << stackish.invocation_stack_top_name_symbol.id2name
       buffer << "' action of "
       buffer << stackish.microservice_invocation.app_name_string
-      buffer << " says #{ highlight "hello" }!"
+      buffer << " says #{ em "hello" }!"
       y << buffer
     end
 
@@ -92,7 +91,22 @@ module Skylab::Cull
       @_microservice_invocation_ = ms_invo ; nil
     end
 
-    def _simplified_write_ k, x
+    def _insert_via_index_and_association_symbol_ x, d, k
+
+      # (stay close to `_insert_via_index_and_association_`)
+
+      -1 == d || self._COVER_ME__no_ad_hoc_inserts_yet__
+      ivar = :"@#{ k }"
+      if instance_variable_defined? ivar
+        a = instance_variable_get ivar
+      else
+        a = []
+        instance_variable_set ivar, a
+      end
+      a.push x ; nil
+    end
+
+    def _simplified_write_ x, k
       instance_variable_set :"@#{ k }", x ; nil
     end
 
@@ -206,35 +220,12 @@ module Skylab::Cull
   # ==
 
   module Special_boxxy_
-
-    # memoize special index information about its constituency *into* the
-    # module for use in unmarshaling
-
     class << self
       def call mod
-         Autoloader_[ mod, :boxxy ]
-         mod.extend self ; nil
+        self._GONE__as_referenced_at_history__  # :#history-A.1
       end
       alias_method :[], :call
     end  # >>
-
-    def to_special_boxxy_item_name_stream__
-      _a = ( @___special_index ||= __build_item_index_array )
-      Common_::Stream.via_nonsparse_array _a
-    end
-
-    def __build_item_index_array
-
-      _hi = constants  # assume these are boxxy (some or all are inferred)
-
-      _hey = _hi.map do |const|
-        Common_::Name.via_const_symbol const
-      end
-
-      _hey.freeze
-    end
-
-    define_method :boxxy_const_guess_via_slug, FUNCTION_NAME_CONVENTION_
   end
 
   # == FUNCTIONS
@@ -286,6 +277,7 @@ module Skylab::Cull
       System_lib[].services
     end
 
+    ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Brazen_NOUVEAU = sidesys[ :Brazen ]  # for [sl]
     Fields = sidesys[ :Fields ]
@@ -301,10 +293,10 @@ module Skylab::Cull
   Home_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
-  KEEP_PARSING_ = true
   NIL_ = nil
   NIL_AS_FAILURE_ = nil
   NOTHING_ = nil
   UNABLE_ = false
   UNDERSCORE_ = '_'
 end
+# #history-A.1 (MUST be temporary) as referenced

@@ -28,7 +28,8 @@ module Skylab::Common
 
           @module = mod
 
-          @index = Index_via_Module___.new( @module ).execute
+          _p = method :__value_of
+          @index = Index_via_Module___.new( _p, @module ).execute
 
           _these = @index.item_offset_via_const.keys
           @_pool = ::Hash[ _these.map { |k| [ k, true ] } ]
@@ -59,6 +60,9 @@ module Skylab::Common
 
         def has_reference name_sym
 
+          # (this had an exlucsive client in [cu], but #tombstone-3.3 no longer)
+          self._NOT_USED__but_worked_once__
+
           # (to keep things simple, this will only detect those that have
           # already been indexed (so stowaways and filesystem nodes) which
           # is fine #theme-here)
@@ -84,17 +88,7 @@ module Skylab::Common
 
         def _via_item_offsets d_a
           1 == d_a.length || self._COVER_ME__bah__
-          item = @index.items.fetch d_a.fetch 0
-
-          if ! item.filesystem_asset_reference.value_is_known
-
-            # (we can imagine cases where this would fail but .. etc)
-
-            name_and_value_for_const_missing_ item.name.as_const
-            item.filesystem_asset_reference.value_is_known || self._SANITY
-          end
-
-          item
+          @index.items.fetch d_a.fetch 0
         end
 
         def to_loadable_reference_stream
@@ -111,9 +105,31 @@ module Skylab::Common
 
         # ~)
 
+        def __value_of ref, item
+          # assume that ref either does not exist or has unknown value
+          if ref
+            name_and_value_for_const_missing_ item.name.as_const
+            ref.value_is_known || self._SANITY
+            ref.value
+          else
+            # (probably a stowaway that is not yet loaded)
+            _nv = _same_by do |o|
+              o.wrong_name = item.name
+            end
+            _nv.const_value
+          end
+        end
+
         def name_and_value_for_const_missing_ wrong_const
-          MyConstMissing___.call_by do |o|
+          _same_by do |o|
             o.wrong_const = wrong_const
+          end
+        end
+
+        def _same_by
+
+          MyConstMissing___.call_by do |o|
+            yield o
             o.operator_branch = self
             o.module = @module
           end
@@ -213,8 +229,7 @@ module Skylab::Common
               next
             end
 
-            _ref = item.filesystem_asset_reference
-            if ! _ref
+            if ! @index.FS_asset_reference_via_item_offset.key? d
               # if this item was not a stowaway then it's either a
               # filesystem-derived one, or it's one we added here (below)
               # (right?). if it's one we added here then presumably there
@@ -280,8 +295,21 @@ module Skylab::Common
 
       class MyConstMissing___ < MagneticBySimpleModel
 
+        def wrong_name= nm
+          c = nm.as_const
+          @wrong_const_symbol = c
+          @wrong_const = c
+          @wrong_name = nm
+        end
+
         def wrong_const= x
-          @wrong_const_symbol = x.intern
+          if x.respond_to? :ascii_only?
+            @wrong_name = Name.via_const_string x
+            @wrong_const_symbol = x.intern
+          else
+            @wrong_name = Name.via_const_symbol x
+            @wrong_const_symbol = x
+          end
           @wrong_const = x
         end
 
@@ -319,7 +347,7 @@ module Skylab::Common
           _d_a = remove_instance_variable :@__offsets
           _d_a.each do |d|
             item = @index.items.fetch d
-            item.filesystem_asset_reference || next
+            @index.FS_asset_reference_via_item_offset.key? d or next
             found_item = item ; found_item_offset = d
             break
           end
@@ -340,7 +368,7 @@ module Skylab::Common
 
           # as is our habit (see)
 
-          _distilled_key = @_wrong_name.as_approximation
+          _distilled_key = @wrong_name.as_approximation
 
           _d_a = @index.item_offsets_via_distilled_key[ _distilled_key ]
           _store :@__offsets, _d_a
@@ -451,14 +479,14 @@ module Skylab::Common
             UNABLE_  # #cov1.5 fall thru
           end
 
-          _correct_const_sym = fl.execute_for @module, @_wrong_name  # :#here1
+          _correct_const_sym = fl.execute_for @module, @wrong_name  # :#here1
 
           _store :@__correct_const_symbol, _correct_const_sym
         end
 
         def __init_for_loady_time
 
-          ref = @_item.filesystem_asset_reference
+          ref = @index.FS_asset_reference_via_item_offset.fetch @_item.item_offset
           ref.value_is_known && self._COVER_ME__read_me__  # incorrect name used. but why?
 
           o = @_cm
@@ -482,13 +510,6 @@ module Skylab::Common
         end
 
         def __init
-
-          @_wrong_name = if @wrong_const.respond_to? :ascii_only?
-            Name.via_const_string @wrong_const
-          else
-            Name.via_const_symbol @wrong_const
-          end
-
           @_cm = Here_::ConstMissing_.new @wrong_const, @module
           NIL
         end
@@ -498,6 +519,8 @@ module Skylab::Common
             instance_variable_set ivar, x ; true
           end
         end
+
+        attr_writer :_wrong_name  # shh..
       end
 
       # ==
@@ -506,14 +529,16 @@ module Skylab::Common
 
         # (this is the evolution of [#here.5] "why we cache names and ..)
 
-        def initialize mod
+        def initialize p, mod
 
           @item_offset_via_const = {}
           @item_offsets_via_distilled_key = {}
           @item_offsets_via_name_symbol = {}
 
-          @items = []
+          @FS_asset_reference_via_item_offset = {}
 
+          @__value_of = p
+          @items = []
           @module = mod
         end
 
@@ -574,17 +599,16 @@ module Skylab::Common
 
             if d_a
               d_a.each do |d|  # #cov1.7
-                _item = @items.fetch d
-                _item.filesystem_asset_reference = ref
+                @FS_asset_reference_via_item_offset[ d ] = ref
                 # (it's OK if multiple stowaways exist associate with one FS node)
                 # (in theory such items will nonetheless use the stowaway strategy
                 #  alone to resolve the const value, at #here2)
               end
             else
-              add_item_by do |o|
-                o.filesystem_asset_reference = ref
+              _d = add_item_by do |o|
                 o.name = nm
               end
+              @FS_asset_reference_via_item_offset[ _d ] = ref
             end
             redo
           end while above
@@ -613,11 +637,19 @@ module Skylab::Common
 
         # -- A
 
-        def add_item_by & p
+        def add_item_by
 
-          item = Item___.define( & p )
-          nm = item.name
           d = @items.length
+
+          item = Item___.define do |o|
+            yield o
+            o.value_by = -> do
+              __my_value_of item
+            end
+            o.item_offset = d
+          end
+
+          nm = item.name
 
           _had = @item_offset_via_const.fetch nm.as_const do |c|
             @item_offset_via_const[ c ] = d ; nil
@@ -637,12 +669,27 @@ module Skylab::Common
 
           _k = nm.as_lowercase_with_underscores_symbol
           ( @item_offsets_via_name_symbol[ _k ] ||= [] ).push d
-          NIL
+
+          d
+        end
+
+        def __my_value_of item
+          ref = @FS_asset_reference_via_item_offset[ item.item_offset ]
+          if ref
+            if ref.value_is_known
+              ref.value
+            else
+              @__value_of[ ref, item ]
+            end
+          else
+            @__value_of[ ref, item ]
+          end
         end
 
         # ==
 
         attr_reader(
+          :FS_asset_reference_via_item_offset,
           :item_offset_via_const,
           :item_offsets_via_distilled_key,
           :item_offsets_via_name_symbol,
@@ -659,6 +706,11 @@ module Skylab::Common
           # not freeze because mutates later
         end
 
+        def value_by= p
+          @value = :__value_initially
+          @__p = p
+        end
+
         def be_stowaway
           @is_stowaway = true
         end
@@ -668,9 +720,23 @@ module Skylab::Common
         end
 
         attr_accessor(
-          :filesystem_asset_reference,
           :name,
+          :item_offset,  # write once!
         )
+
+        def value
+          send @value
+        end
+
+        def __value_initially
+          @value = :__value
+          @__value = remove_instance_variable( :@__p )[]
+          send @value
+        end
+
+        def __value
+          @__value
+        end
 
         attr_reader(
           :has_correct_const_symbol,
@@ -688,6 +754,7 @@ module Skylab::Common
     end  # :#bo
   end
 end
+# :#tombstone-3.3 (as referenced) (can be temporary)
 # #history-3.2: spike of initial code of boxxy reflection API that includes stowaways
 # #tombstone-3.1: full overhaul during "operator branch" era
 #   (tombstones 1 & 2 are in our main spec file - they occurred before this file existed)

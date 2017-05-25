@@ -37,7 +37,7 @@ module Skylab::Cull
 
         _st = @_survey_.config_for_read_.to_section_stream
         _st.map_by do |sect|
-          Here_::Models__::SectionSummary.new sect
+          Here_::Models_::SectionSummary.new sect
         end
       end
 

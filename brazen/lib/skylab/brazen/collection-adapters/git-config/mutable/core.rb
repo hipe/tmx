@@ -130,7 +130,7 @@ module Skylab::Brazen
         if el
           el.value_as_result_of_dereference_or_lookup_softy_
         else
-          self._COVER_ME__etc_easy__
+          self._COVER_ME__dereference_failed__
         end
       end
 

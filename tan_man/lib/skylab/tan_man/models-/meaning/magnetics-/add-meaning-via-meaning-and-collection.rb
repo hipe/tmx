@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models_::Meaning
 
-    class Magnetics_::PersistMeaning_via_Meaning_and_Collection < Common_::MagneticBySimpleModel
+    class Magnetics_::AddMeaning_via_Meaning_and_Collection < Common_::MagneticBySimpleModel
 
       # yet another implementation (in this app) of #[#tm-011] unobtrusive
       # lexicalesque ordering
@@ -290,5 +290,4 @@ module Skylab::TanMan
     end
   end
 end
-# #pending-rename: perhaps to anything else
 # #history-A.1: minor modernification of style - leading underscores of method names

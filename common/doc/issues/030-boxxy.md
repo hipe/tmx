@@ -70,12 +70,30 @@ may not be loaded yet. two important questions arise immediately from this:
 
 ### 1. why on earth would you want to do this?
 
-probably the only reason you want to do this, really, is if you want to
-"reflect" on all the items in a filesystem collection (very often these
-are something like plugins in a plugin directory; but they could be
-anything) without having to load the main file (i.e corefile or eponymous
-file) for each item. so, it's an optimization to save on the overhead of
-the filesystem hit and loading of asset file(s) for each item.
+over the years we have arrived at this same design solution as an answer
+to to a variety of design "objectives" (read: pain points).
+
+  - this does not carry the eyesore and coding liability of using
+    `autoloader` (the platform method) to create entries for each
+    asset.
+
+  - if you imagine that the items are something like plugins in a plugin
+    directory; we may want to be able to "reflect" on the constituency of
+    the plugin collection (that is, all the items by name) without having
+    to load the main file (i.e corefile or eponymous file) for each item.
+    so, one way to look at it is it's an "optimization" to save you the
+    overhead of the filesystem hit(s) of loading every asset file for each
+    item. it may seem like early optimization, but in a CLI with only a
+    handful of items, the overhead of loading each asset can cause
+    palpable lag, even for a handful of items.
+
+  - another advantage to being able to reflect on your assets without
+    loading them is regressability: you may want to be able to detect
+    the existence of particular assets without incurring any possible
+    "load-time" errors that might occur by loading them (i.e a dependent
+    gem that is not installed for a feature you are not using). by
+    deferring the loading of the asset until later, you can isolate
+    such issues to the tests that cover them.
 
 
 
@@ -234,26 +252,31 @@ overriding of platform methods (2 in particular). (not monkeypatching,
 mind you, but just overriding 2 methods on participating modules.)
 
 in practice, one of these provisions has served us well; and the other one
-was problematic (HISTORY)
+proved to be problematic: the one that served us well (enough) has been the
+"enhancement" to the `constants` method of the participating module.
 
-in practice this approach worked well for enhancing the `constants` method
-of the participating module, but overriding `const_defined?` created far
-more problems than it solved. our solution to *that*, in turn, was to
-elminate this overriding of the `const_defined?` method. to accomodate this,
-affected clients had to refactor workaround.
+the provision that was problematic was that of overriding the
+`const_defined?` method with fuzziness. this created more problems than
+it solved, because of how essential this method is to have working
+"correctly", and how ugly it is to muck with alias method chains.
 
-, so boxxy before this version saw that method
-removed and all affected clients refactored workarounds.
+the solution to *that*, in turn, was to unwind the overriding of the
+`const_defined?` method. (there is a history entry in boxxy's test file
+commemorating this event.) a consequence of this rollback was that
+affected clients had to refactor a workaround, to the extent that they
+relied on the inferential behavior.
 
-we have returned anew to the desire to have a method like this,
-but ou
+but we have returned again to a desire for the "spirit" of a
+"inferential" `const_defined?` (because our one particular client
+that wanted it created a sore thumb of a bump to compensate for its
+absence).
 
-our answer to this now
+our answer to this, then, is that rather than the hidden magic of opt-in
+mokeypatching, we opt for a "composition" approach where we have smaller,
+dedicated classes that encompass this behavior as something like a
+"collection controller" (now "operator branch").
 
-so what seems more apt is to utilize "composition" (smaller, dedicated
-classes) rather than overriding essential platform methods to have
-"magic" behavior, an anti-pattern that for better or worse boxxy was
-founded on. per [#030.D.3], do not assume a static constantspace.
+reminder: per [#030.D.3], we do not assume a static constantspace.
 
 
 

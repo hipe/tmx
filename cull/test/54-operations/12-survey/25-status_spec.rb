@@ -126,14 +126,6 @@ module Skylab::Cull::TestSupport
 
     # -- assert
 
-    def black_and_white_expression_agent_for_expect_emission
-      expression_agent_for_expect_emission
-    end
-
-    def expression_agent_for_expect_emission
-      contemporary_expression_agent_
-    end
-
     def _fails
       _tuple.last.nil? || fail
     end

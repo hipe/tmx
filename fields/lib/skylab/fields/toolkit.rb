@@ -35,8 +35,10 @@ module Skylab::Fields
           [ ent, o.listener ]  # (last element is the block to pass)
         end
 
-        o.read_by = ent.method :_simplified_read_
-        o.write_by = ent.method :_simplified_write_
+        ent.respond_to? :_simplified_read_ or no  # #todo
+        ent.respond_to? :_simplified_write_ or no  # #todo
+
+        o.valid_value_store = ent
       end
 
     # ==

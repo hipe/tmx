@@ -51,7 +51,7 @@ module Skylab::Snag
 
         # ~ create / update
 
-        def persist_entity cx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
+        def persist_entity cx, node, & x_p  # see where [#ba-045] is refrenced in [#038] the pseudocode document
 
           if cx
             _ds_x = cx._snag_downstream_reference_

@@ -172,7 +172,7 @@ module Skylab::Snag
 
     define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-    def _simplified_write_ k, x
+    def _simplified_write_ x, k
       instance_variable_set :"@#{ k }", x
     end
 

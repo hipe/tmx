@@ -199,7 +199,13 @@ module Skylab::Common::TestSupport
 
           if em.channel_symbol_array == sym_a
             if p
-              p[ em._event_or_lines_ ]
+              if em.is_expression
+                _expag = _expev_upper_level_expression_agent
+                _lines = em._express_into_under_ [], _expag
+                p[ _lines ]
+              else
+                p[ em.cached_event_value ]
+              end
             end
           else
             em.channel_symbol_array.should eql sym_a
@@ -1264,10 +1270,6 @@ module Skylab::Common::TestSupport
         cached_event_value.to_event.ok
       end
 
-      def _event_or_lines_
-        cached_event_value
-      end
-
       def cached_event_value
         ( @___event_knownness ||= ___build_event_knownness ).value
       end
@@ -1301,10 +1303,6 @@ module Skylab::Common::TestSupport
       end
 
       alias_method :_express_into_under_, :express_into_under
-
-      def _event_or_lines_
-        ( @___1 ||= _kn( [], _black_and_white_expag )).value
-      end
 
       def to_black_and_white_lines
         _expag = _black_and_white_expag

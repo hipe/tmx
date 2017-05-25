@@ -264,7 +264,8 @@
 [#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc
 
-[#011]       the unobtrusive lexical-esque ordering narrative ..
+[#011] #hole
+             ( #was: the unobtrusive lexical-esque etc. #moved-to: [#ba-045] )
              ( was: #parent-node: [#001] the event narrative )
 
 [#010]       #doc-node: data stores

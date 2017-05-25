@@ -1254,6 +1254,20 @@ sometimes happening unnecessarily.
 
 
 
+### :[#here.K.D]
+
+this used to be a distinction that was one-to-one with being a
+"glob" association: if the association is a singleton (the default)
+then we would complain of unrecoverable ambiguity if you try to
+provide any value multiple different times in one request for
+association (parameter). however for glob parameters it must be
+allowed to specify their value multiple times (it's the point of
+globs). now, with our custom parameter model we likewise want to
+hold this classification without actually being a glob.
+
+
+
+
 ## original in-line comment, here for posterity :[#here.i]
 
 (NOTE although the "one ring" algorithm shares obvious DNA with the

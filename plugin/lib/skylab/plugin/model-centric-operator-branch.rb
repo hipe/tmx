@@ -948,7 +948,7 @@ module Skylab::Plugin
 
       def execute
 
-        ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_that_is_Proc.call_by do |o|
+        ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_via_Proc.call_by do |o|
 
           o.invocation_stack_top_name_symbol =
             @invocation_stack_top_name_symbol

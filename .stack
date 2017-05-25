@@ -35,16 +35,24 @@ explain MTk and associate the explanation with its nodes
 ([f2]: 3 actions, API only)
 ([sl]: 4 actions, API only)
 ([cm]: 4 actions, API only)
+[#ze-051] is same as valid value store - do anything about this now?
+not used: common/test/expect-emission-meta.rb
+unify emission class with the others..
+fold-in expect emission (oldschool)
+fold-in "fail early"
+make names modern ("emission.rb")
 cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
 cull/test/54-operations/62-mutator/25-actions_spec.rb
 cull/test/54-operations/37-upstream/50-map/50-markdown-vertical_spec.rb
 cull/test/54-operations/37-upstream/50-map/25-markdown-horizontal_spec.rb
 cull/test/54-operations/12-survey/91-aggregator_spec.rb
 cull/test/54-operations/12-survey/74-reduce_spec.rb
+smalls in [#cu-007]
 cull/test/54-operations/12-survey/58-mutator_spec.rb
-[#ze-051] is same as valid value store - do anything about this now?
-rm all mention of @entities in that file
-if you haven't already, flush pending renames and the small things above this
-unify emission class with the others..
-HISTORY in [#co-030]
-stop using the whacky expags, universally
+get to this to_special_boxxy_item_name_stream__  (function-via-string.rb:99)
+you need this: added_function_call
+so you need this: RecomposeSection_via_FunctionCalls_and_Section___
+read all of [#005] about this
+the key is getting to the persist call in the survey object..
+you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functions
+[ac] pluralton persistence dedicated tests!

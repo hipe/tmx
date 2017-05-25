@@ -280,7 +280,6 @@ module Skylab::TanMan::TestSupport
         end
       end
 
-
       def digraph_file_path_
         _FILE_D
       end
@@ -333,5 +332,4 @@ module Skylab::TanMan::TestSupport
 
   end
 end
-# #pending-rename: this is more like "add (details of ordering, collection theory)" and has nothing really to do with prototypes
 # #history-A.1: full rewrite for post [br]

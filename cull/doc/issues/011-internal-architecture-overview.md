@@ -1,4 +1,4 @@
-# README for development :[#007]
+# internal architecture :[#011]
 
 ## objective & scope
 
@@ -26,7 +26,26 @@ in our "architecture" and a roadmap overview of same.
 
 
 
-## smalls (in semi-narrative order)  :[#here.D]
+## smalls (in semi-narrative order) :[#here.D]
+
+### :[#here.D.4]
+
+[#006] outlines our general business model as it pertains to functions.
+at the moment we have implemented this by modeling the N categories of
+functions as nodes under "models", and then each such node has a sub-node
+currently called `Subclasses_`.
+
+(at the moment there are perhaps 5 such terminal nodes under 3 categories.)
+
+as the name of that node communicates [#bs-029] unequivocally, this node
+is totally private to it parent node. but the purpose of the subject API
+document node node is to say: not quite. the provision of this API point
+is that this node must A) be a module and B) have a fixed depth within its
+model module (namely, a distance of "one", so it must be nested directly
+in the model module).
+
+
+
 
 ### about mutating filetrees in tests :[#here.D.1]
 

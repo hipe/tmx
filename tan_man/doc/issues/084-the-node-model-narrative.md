@@ -2,7 +2,7 @@
 
 ## :#lexical-esque-node-insertion
 
-this algorithm is a specialized form of :+[#br-011] the lexical-esque
+this algorithm is a specialized form of #[#ba-045] the lexical-esque
 insertion strategy:
 
 When creating new nodes this is how we determine where they go:

@@ -18,8 +18,8 @@ module Skylab::Cull
 
       def initialize
         super
-        @associations_module = Here_::Models__  # ..
-        @models_module = Models_  # ..
+        @associations_module = Here_::Associations_  # ..
+        @models_module = Home_::Models_  # ..
       end
 
       attr_writer(
@@ -177,7 +177,7 @@ module Skylab::Cull
         item = _ob.lookup_softly @_current_association_symbol
         if item
           # (shed the intricacies of the remote library now by exploding the item)
-          @_current_association_module = item.filesystem_asset_reference.value
+          @_current_association_module = item.value
           @_current_association_name = item.name
           ACHIEVED_
         end
@@ -244,7 +244,7 @@ module Skylab::Cull
 
     # ~
 
-    class Magnetics_::CreateSurvey_via_Survey < Common_::MagneticBySimpleModel
+    class Magnetics_::PersistSurvey_via_Survey < Common_::MagneticBySimpleModel
 
       def initialize
         @is_re_persist = nil
@@ -302,7 +302,7 @@ module Skylab::Cull
         qc = @_current_qualified_component
         _asc = qc.association
         _asc_mod = _asc.module
-        _ok = _asc_mod::WriteComponent_via_Component_and_Survey.call(
+        _ok = _asc_mod::WriteComponent_via_Component_and_Entity.call(
           qc, @survey, & @listener )
         _ok  # hi. #todo
       end
@@ -398,4 +398,3 @@ module Skylab::Cull
   end
 end
 # :#history-A.1: big spike of unmarshaling performer
-# #pending-rename: "persist" not "create"

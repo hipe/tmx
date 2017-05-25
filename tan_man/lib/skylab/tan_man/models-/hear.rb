@@ -104,7 +104,7 @@ module Skylab::TanMan
       _ordered_exposure_st = Home_.lib_.brazen_NOUVEAU::
         Ordered_stream_via_participating_stream[ _unordered_st ]
 
-      Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
+      Common_::Stream::Magnetics::OperatorBranch_via_Stream.define do |o|
         o.upstream = _ordered_exposure_st
         o.key_method_name = :name_value_for_order
       end

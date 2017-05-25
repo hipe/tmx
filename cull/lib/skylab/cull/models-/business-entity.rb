@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Entity_
+  class Models_::BusinessEntity
 
     # :+[#br-013]:API.A trailing underscore = not part of reactive model tree)
 
@@ -160,4 +160,3 @@ module Skylab::Cull
     end
   end
 end
-# #pending-rename: to something (as referenced #here1)

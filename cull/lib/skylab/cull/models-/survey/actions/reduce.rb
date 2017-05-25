@@ -6,7 +6,7 @@ module Skylab::Cull
 
       @after_name_symbol = :edit
 
-      _prp = Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.
+      _prp = Home_::Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.
         new_without_default
 
       Common_entity_.call self,

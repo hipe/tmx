@@ -106,8 +106,77 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     end  # >>
 
   Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   module AssociationToolkit
+
+    ekp = -> do
+      Home_.lib_.fields::CommonAssociation::EntityKillerParameter
+    end
+
+    Pluralton_powered_parameter_grammatical_injection = Lazy_.call do
+
+      _inj = ekp[].grammatical_injection
+
+      _inj.redefine do |o|
+
+        mod = MyCustomPostfixedModifiers___
+        mod.include o.postfixed_modifiers  # yikes
+        o.postfixed_modifiers = mod
+
+        o.item_class = My_custom_parameter_class___[]
+      end
+    end
+
+    module MyCustomPostfixedModifiers___
+
+      # ~( might go up
+
+      def pluralton_association
+
+        @parse_tree.__receive_pluralton_group_symbol_ @scanner.gets_one
+
+        KEEP_PARSING_
+      end
+      # ~)
+    end
+
+    My_custom_parameter_class___ = Lazy_.call do
+
+      class MyCustomParameterClass____ < ekp[]
+
+        def initialize
+          @pluralton_group_symbol = nil
+          super
+        end
+
+        def __receive_pluralton_group_symbol_ group_sym
+
+          @store_by = -> pvs, x, asc do
+
+            _qk = Common_::QualifiedKnownKnown[ x, asc ]
+
+            pvs._insert_via_index_and_association_symbol_ _qk, -1, group_sym
+
+            ACHIEVED_
+          end
+
+          @pluralton_group_symbol = group_sym
+          NIL
+        end
+
+        def do_guard_against_clobber
+          ! @pluralton_group_symbol
+        end
+
+        attr_reader(
+          :pluralton_group_symbol,
+          :store_by,
+        )
+
+        self
+      end
+    end
 
     class DefineAndAssignComponent_via_Block_and_Symbol < Common_::MagneticBySimpleModel
 
@@ -116,13 +185,20 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         super
       end
 
+      def will_be_add
+        remove_instance_variable :@_mutex_for_this
+        @_will_be_add = true ; nil
+      end
+
       def will_not_be_clobber
         remove_instance_variable :@_mutex_for_this
+        @_will_be_add = false
         @_will_be_clobber = false ; nil
       end
 
       def will_be_clobber
         remove_instance_variable :@_mutex_for_this
+        @_will_be_add = false
         @_will_be_clobber = true ; nil
       end
 
@@ -132,44 +208,107 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       attr_writer(
         :association_symbol,
+        :listener,
+        :MODEL_MODULE,
         :mutable_entity,
       )
 
       def execute
-
-        qc = QualifiedComponent_via___[ @association_symbol, @mutable_entity ]
-
-        asc = qc.association
-
-        # ~( #todo
-        asc.module || fail
-        # ~)
-
-        yes = remove_instance_variable :@_will_be_clobber
-        if qc.is_known_known
-          if yes
-            NOTHING_  # hi. ok.
+        __init
+        if __is_singleton_association
+          if __will_clobber
+            if _is_already_set
+              _resolve_singleton_entity_and_store
+            else
+              no
+            end
+          elsif _is_already_set
+            no
           else
-            self._SANITY__clobber_is_not_OK__
+            _resolve_singleton_entity_and_store
           end
-        elsif yes
-          self._SANITY__clobber_was_expected_but_did_not_occur__
+        elsif __will_add
+          __resolve_pluralton_entity_and_add
         else
-          NOTHING_  # hi. ok.
+          no
         end
+      end
 
-        _model_mod = asc.model_module
+      def __resolve_pluralton_entity_and_add
+        if __resolve_pluralton_entity
+          __add_pluralton_entity
+        end
+      end
 
-        el = _model_mod.define do |o|
+      def _resolve_singleton_entity_and_store
+        if __resolve_singleton_entity
+          __set_singleton_entity
+        end
+      end
+
+      def __resolve_pluralton_entity
+
+        _ = @MODEL_MODULE.define do |o|
           @entity_definition_block[ o ]
         end
+        _store :@_entity, _
+      end
 
-        if el
-          @mutable_entity._write_via_association_ el, asc  # maybe clobber, maybe not. OK both.
-          ACHIEVED_  # hi. #cov1.2
-        else
-          NOTHING_  # hi. #cov1.1
+      def __resolve_singleton_entity
+
+        _ = @_association.model_module.define do |o|
+          @entity_definition_block[ o ]
         end
+        _store :@_entity, _  # #cov1.1 when not
+      end
+
+      def __add_pluralton_entity
+
+        __emit_about_pluralton_add
+        @mutable_entity._insert_via_index_and_association_ @_entity, -1, @_association
+        @_entity
+      end
+
+      def __set_singleton_entity
+
+        # ([#cu-007.B] (yikes) would get closed by following suit here)
+        # maybe clobber, maybe not. OK both. #cov1.2
+        @mutable_entity._write_via_association_ @_entity, @_association
+        @_entity
+      end
+
+      def __emit_about_pluralton_add
+        @_association.module::On_added[ @listener, @_entity, @mutable_entity ]
+        NIL
+      end
+
+      # --
+
+      def _is_already_set
+        @_qualified_component.is_known_known
+      end
+
+      def __will_clobber
+        remove_instance_variable :@_will_be_clobber
+      end
+
+      def __will_add
+        remove_instance_variable :@_will_be_add
+      end
+
+      def __is_singleton_association
+        @_association.is_singleton_association
+      end
+
+      def __init
+        @_qualified_component =
+          QualifiedComponent_via___[ @association_symbol, @mutable_entity ]
+        @_association = @_qualified_component.association
+        NIL
+      end
+
+      def _store ivar, x   # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+        if x ; instance_variable_set ivar, x else x end
       end
     end
 
@@ -262,30 +401,27 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def initialize ent
 
-        _ob = ent._associations_operator_branch_
-
         @__association_module = -> item do
-          _c = item.name.as_const
-          _mod = _ob.module.const_get _c, false
+          _mod = item.value
           _mod  # hi. #todo
         end
 
-        @__associated_module = -> item do
+        @__associated_module = -> item, me do
 
-          _c = item.name.as_const
-
-          # when #plurals ..
-
-          _mod = ent._models_module_.const_get _c, false
-          _mod  # hi. #todo
+          if me.is_singleton_association
+            _c = item.name.as_const
+            _mod = ent._models_module_.const_get _c, false
+            _mod  # hi. #todo
+          else
+            ::Kernel._OKAY
+          end
         end
 
         @model_module = :__associated_model_module_initially
-        @module = :__association_module_initially
+        @module = :__module_initially
         @name = :__name_initially
         @_counter = 0
-
-        freeze
+        freeze  # as prototype. as instance freeze (also) #here1
       end
 
       def new item
@@ -299,6 +435,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # --
 
+      def is_singleton_association
+        _mod = self.module
+        _mod::IS_SINGLETON_ASSOCIATION
+      end
+
       def module
         send @module
       end
@@ -307,18 +448,18 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         send @model_module
       end
 
-      def __association_module_initially
+      def __module_initially
         @module = :__module
-        _ = remove_instance_variable( :@__association_module )[ @_remote_item ]
-        @__module = _
+        @__module =
+          remove_instance_variable( :@__association_module )[ @_remote_item ]
         _maybe_freeze
         send @module
       end
 
       def __associated_model_module_initially
         @model_module = :__model_module
-        _ = remove_instance_variable( :@__associated_module )[ @_remote_item ]
-        @__model_module = _
+        @__model_module =
+          remove_instance_variable( :@__associated_module )[ @_remote_item, self ]
         _maybe_freeze
         send @model_module
       end
@@ -336,7 +477,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           @name = :__name_when_frozen
           @__name = remove_instance_variable( :@_remote_item ).name
           remove_instance_variable :@_counter
-          freeze ; nil
+          freeze ; nil  # :#here1
         end
       end
 
@@ -833,10 +974,12 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Common_::Stream.via_nonsparse_array a, & p
     end
 
+    Scanner_ = -> a do
+      Common_::Scanner.via_array a
+    end
+
     MissingRequiredParameters = ::Class.new ::ArgumentError
     NotAvailable = ::Class.new ::ArgumentError
-
-    Lazy_ = Common_::Lazy
 
     Require_fields_lib_ = Lazy_.call do
       Field_ = Home_.lib_.fields  # idiomatic name

@@ -1,4 +1,6 @@
-# Unobtrusive Lexical-esque Insertion :[#011]
+# Unobtrusive Lexical-esque Insertion :[#045]
+
+(the following sentence is now false.)
 
 (implementations modern with this sentence exist in the host sidesystem,
 tagged with the subject identifier.)
@@ -51,4 +53,4 @@ is going on in the list.
 
 ## document-meta
 
-  - #pending-rename - move this to [ba] because it's a common algorithm
+  - #history-A.1: re-housed from [br]

@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Report
+    class Associations_::Report
 
       class EntityStream_via_EntityStream_and_FunctionCalls___ < Common_::Dyadic
 

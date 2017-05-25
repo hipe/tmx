@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Function__
+    class FunctionBasedAssociation_  # #stowaway
 
       class << self
         private :new
@@ -62,7 +62,9 @@ module Skylab::Cull
       end
     end
 
-    class Models__::Map < Models__::Function__
+    module FunctionBasedAssociations_
+
+    class Map < FunctionBasedAssociation_
     private
 
       def my_box_module
@@ -70,7 +72,7 @@ module Skylab::Cull
       end
     end
 
-    class Models__::Mutator < Models__::Function__
+    class Mutator < FunctionBasedAssociation_
     private
 
       def my_box_module
@@ -78,13 +80,14 @@ module Skylab::Cull
       end
     end
 
-    class Models__::Aggregator < Models__::Function__
+    class Aggregator < FunctionBasedAssociation_
     private
 
       def my_box_module
         Home_::Models_::Aggregator::Items__
       end
     end
+
+    end
   end
 end
-# #pending-rename: this is not like the others. not an association. promote probably.

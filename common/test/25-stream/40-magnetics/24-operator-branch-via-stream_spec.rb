@@ -138,12 +138,11 @@ module Skylab::Common::TestSupport
     end
 
     def _subject_module
-      Home_::Stream::Magnetics::RandomAccessImmutable_via_Stream
+      Home_::Stream::Magnetics::OperatorBranch_via_Stream
     end
 
     # ==
     # ==
   end
 end
-# #pending-rename: with its asset
 # #born years after its asset

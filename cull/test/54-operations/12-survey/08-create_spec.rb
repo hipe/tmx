@@ -22,7 +22,7 @@ module Skylab::Cull::TestSupport
 
         expect_these_lines_in_array_ _tuple.first do |y|
 
-          y << "the 'ping' action of cull says ** hello **!"
+          y << "the 'ping' action of cull says *hello*!"
         end
       end
 
@@ -52,7 +52,7 @@ module Skylab::Cull::TestSupport
 # (2/N)
     it "ping the model node" do
       call_API :survey, :ping
-      expect_OK_event :ping, 'cull says (highlight "hello")'
+      expect_OK_event :ping, 'cull says *hello*'
       expect_no_more_events
       @result.should eql :_hi_again_
     end

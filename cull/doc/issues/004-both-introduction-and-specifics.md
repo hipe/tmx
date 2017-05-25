@@ -2,7 +2,7 @@
 
 ## prerequisite
 
-see [#007] README for development.
+see [#011] "internal architecture" for developement.
 
 
 

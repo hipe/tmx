@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Stream::Magnetics::RandomAccessImmutable_via_Stream < SimpleModel
+  class Stream::Magnetics::OperatorBranch_via_Stream < SimpleModel
 
     # this is :[#016.4], which is refereneced (only ever) by [sy] which
     # has what is likely an improvement on this implementation, but
@@ -152,5 +152,5 @@ module Skylab::Common
     # ==
   end
 end
-# #pending-rename: operator branch something
+# #tombstone-A.2: ENTIRE "random access mutable" file
 # #tombstone-A: used to use iambic attributes, removed TONS of unused method

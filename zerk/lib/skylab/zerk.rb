@@ -110,8 +110,8 @@ module Skylab::Zerk  # intro in [#001] README
 
     lazily :BoundCall_of_Operation_with_Definition, & br
 
-    lazily :BoundCall_of_Operation_that_is_Proc do |c|
-      Home_.lib_.basic::Function::Unbound_via_Function.const_get c, false  # :#pending-rename
+    lazily :BoundCall_of_Operation_via_Proc do |c|
+      Home_.lib_.basic::Function.const_get c, false
     end
 
     lazily :ModelCentricOperatorBranch do |c|
@@ -127,7 +127,7 @@ module Skylab::Zerk  # intro in [#001] README
     lazily :API_ArgumentScanner, & ndz
 
     lazily :AssociationToolkit do |c|
-      Home_.lib_.ACS::AssociationToolkit
+      Home_.lib_.ACS.const_get c, false
     end
 
     lazily :NoDependenciesZerk do  # [pl]

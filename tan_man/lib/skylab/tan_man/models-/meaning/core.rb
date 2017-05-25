@@ -136,12 +136,6 @@ module Skylab::TanMan
       end
     end
 
-    Autoloader_[ self ]
-    lazily :MeaningsOperatorBranchFacade_ do |c|
-      const_get :Collection_Controller__
-      const_defined? c, false or fail
-    end
-
     # ==
 
     Here_ = self

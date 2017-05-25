@@ -281,7 +281,7 @@ module Skylab::Fields::TestSupport
         @_argument_scanner_ = o.first
       end
 
-      def _simplified_write_ k, x
+      def _simplified_write_ x, k
         instance_variable_set :"@#{ k }", x
       end
 

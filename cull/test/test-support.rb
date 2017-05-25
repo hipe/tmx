@@ -44,7 +44,17 @@ module Skylab::Cull::TestSupport
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
 
-    def contemporary_expression_agent_
+    # ~( during legacy use
+    def black_and_white_expression_agent_for_expect_emission
+      _this_expag_TS
+    end
+
+    def expression_agent_for_expect_emission
+      _this_expag_TS
+    end
+    # ~)
+
+    def _this_expag_TS
       # (legacy tests still use the default. we want newer tests to look natural)
       Home_::Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
     end

@@ -4,14 +4,18 @@
 
 the horizontal rule divides the old from the new.
 
+
+
 ## objective
 
-we fill a bit overwhelmed with a bit more than halfway to go in our
+we feel a bit overwhelmed with a bit more than halfway to go in our
 grand rewrite, not being very sure of the right steps to take, or where
 all of the components *should* fit together. SO:
 
 we will attempt "the 5-phase action spike technique". below is phase 1.
 but first:
+
+
 
 
 ## pre-planning
@@ -33,6 +37,8 @@ going to do the writing first before the reading because
 
 also, withing "writing" there are two important categories: "adding" vs.
 "editing", to be expanded upon below.
+
+
 
 
 ## rough sketch of assuptions and introduction to components
@@ -78,7 +84,7 @@ this edit session won't actually hold this line stream directly. rather:
   • a :"node stream" is the higher-level abstraction of a line stream.
     this too is not random-access: the nodes come at you in some
     arbitrary order that you can't control, but during which we may
-    use the :+[#br-011] lexical-esque insertion strategy when relevant.
+    use the #[#ba-045] lexical-esque insertion strategy when relevant.
 
 
 so, the edit session *adapter* knows that it's going to rewrite every
@@ -201,7 +207,7 @@ so, for 1) (add a node by re-appropriating if possible)
 
     here is how we add a node to the collection
 
-      # (this is exactly :+[#br-011], perhaps flipped)
+      # (this is exactly #[#ba-045], perhaps flipped)
 
       start a tempfile
 
@@ -221,6 +227,7 @@ so, for 1) (add a node by re-appropriating if possible)
         write it to the tempfile
 
       we did it
+
 
 
 ## on locking (:#note-35) and related concerns

@@ -1,6 +1,8 @@
 # the function narrative :[#006]
 
-## :#note-006
+## about the "unmarshal" performer :[#here.A]
+
+(EDIT: "magnetic" would probably apply nowadays.)
 
 this "unmarshal" device was originally categorized as a model because
 (by design) it does not follow the simple single-entry model of actor:
@@ -20,6 +22,7 @@ is a means to the end of other data (which again touches on the invisible
 definition of actor).
 
 "ancillary" works. "effecter" is a fun neologism.
+
 
 
 
@@ -85,13 +88,15 @@ this yet.
 
 ### aggregator
 
+(EDIT: this sounds like "reduce")
+
 this last one is significantly more complex to implement than the other
 two, but arguably more valuable as well. an aggregator can perform the
 "reduce" of map-reduce. rather than taking as input an individual entity
 like the other two do, an aggregator takes as input an entire stream.
 still, though, its interface must be a pull-driven stream that results
 in individual entities. hence to implement an aggregator typically
-required maintaining some sort of state.
+requires maintaining some sort of state.
 
 if we were to make a "search" aggregator, when it receives a pull
 request it would pull from the upstream until an entity (if any) matches
@@ -105,6 +110,7 @@ from the upstream; that is it will keep pulling until the end of the
 stream. once that point is reached (and hopefully it is); it will do
 some sort of summary calculations. then it will deliver its results (in
 some structure) as if it is an entity stream.
+
 
 
 
@@ -144,7 +150,7 @@ the zero or one aggregator have to worry about this, we just feed it (if
 any) an enity stream that wraps the above.
 
 when there are no map-ishes, the aggregator gets the upstream "raw".
-when there is no aggregator our result is the resultant estream of the
+when there is no aggregator our result is the resultant stream of the
 map-ishes. when there are neither map-ishes nor aggregator our result is
 simply the upstream.
 

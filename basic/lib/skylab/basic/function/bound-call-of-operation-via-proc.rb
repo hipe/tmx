@@ -1,10 +1,10 @@
 module Skylab::Basic
 
-  class Function::Unbound_via_Function  # see [#052]
+  class Function::BoundCall_of_Operation_via_Proc < Common_::MagneticBySimpleModel
 
-    # ==
+    # -
 
-    class BoundCall_of_Operation_that_is_Proc < Common_::MagneticBySimpleModel
+      # (legacy nodes in [#052], but also use this identifer for tracking.)
 
       #   - this is the (at writing) newest such thing. it's a fresh take
       #     to comport with the [ze] style of microservice diaspora.
@@ -134,7 +134,7 @@ module Skylab::Basic
         :microservice_invocation,
         :invocation_stack_top_name_symbol,
       )
-    end
+    # -
 
     # ==
 
@@ -152,6 +152,14 @@ module Skylab::Basic
         NOTHING_
       end
 
+      def store_by
+        NOTHING_
+      end
+
+      def do_guard_against_clobber
+        TRUE
+      end
+
       def is_glob
         NOTHING_
       end
@@ -167,9 +175,7 @@ module Skylab::Basic
 
       Brazen_ = ::Skylab::Brazen  # assumed
 
-      Unbound_via_Function = self
-      class Unbound_via_Function
-
+      class Unbound_via_Function  # (legacy notes in [#052])
 
         include Brazen_.actionesque_defaults::Unbound_Methods
 
@@ -451,6 +457,5 @@ module Skylab::Basic
     # ==
   end
 end
-# #pending-rename: etc
 # :#tombstone-B - temporary
 # :#tombstone-A - we used to use a thing we no longer use

@@ -123,6 +123,10 @@ module Skylab::Fields
           p
         end
 
+        def valid_value_store= vvs  # new for [fi]
+          _receive_valid_value_store vvs  # hi.
+        end
+
         # -- specify the behavior of the parse
 
         def WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
@@ -715,8 +719,16 @@ module Skylab::Fields
           NOTHING_
         end
 
+        def store_by
+          NOTHING_
+        end
+
         def is_flag
           FALSE
+        end
+
+        def do_guard_against_clobber
+          TRUE
         end
 
         def is_glob
@@ -805,10 +817,10 @@ module Skylab::Fields
         def __check_clobber
           k = @normal_association.name_symbol
           if @_seen[ k ]
-            if @normal_association.is_glob
-              ACHIEVED_  # :[#008.2] #borrow-coverage from [sn]
-            else
+            if @normal_association.do_guard_against_clobber  # :[#here.K.D]
               self._COVER_ME__this_is_supposed_to_be_not_OK__
+            else
+              ACHIEVED_  # :[#008.2] #borrow-coverage from [sn]
             end
           else
             @_seen[ k ] = true ; true
@@ -876,8 +888,16 @@ module Skylab::Fields
 
             # explained at [#012.K.3]
 
-            @_sanitized_value_ = nil
-            send_sanitized_value
+            if @normal_association.store_by
+              # experimentally, assocs that manage their own storage often
+              # don't want this feature, often because they multiplex into
+              # a single other ivar, and so to nilify all such ivars creates
+              # storage noise
+              ACHIEVED_
+            else
+              @_sanitized_value_ = nil
+              send_sanitized_value
+            end
 
           else
             ACHIEVED_  # nothing to send
@@ -968,7 +988,14 @@ module Skylab::Fields
 
         def _check_and_write_value_appropriately_CL x
 
-          if @normal_association.is_glob
+          if @normal_association.store_by
+
+            _ok = @normal_association.store_by[
+              @_valid_value_store_, x, @normal_association ]  # listener whenever
+
+            _ok  # hi. #todo
+
+          elsif @normal_association.is_glob
 
             if @normal_association.is_required
 

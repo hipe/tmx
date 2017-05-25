@@ -33,7 +33,9 @@
 [#055]       [ hotstrings ]
 [#054]       [ the "classify list" algorithm ]
 [#053]       this one tree traversal algorithm
-[#052]       adapting a proc into a [br] action ..
+
+[#052]       procs as actions ..
+
 [#051]       track universal collection operations
 [#050] #open tracks universal locations possibly to back-integrate once
              the future non-vapor feature of cached component models
@@ -44,7 +46,7 @@
 [#047]       f.chain ..
 [#046]       the minimal yielder ..
 
-[#045] #hole
+[#045]       the unobtrusive lexicalesque ordering algorithm ..
              ( #moved-to: [#fi-003] #was: the normalization & validation method naming idiomspace .. )
 
 [#044]       [ state machine ]

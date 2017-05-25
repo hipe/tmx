@@ -2,7 +2,7 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Models_::Collection
+    class Models_::StowsOperatorBranchFacade
 
       # model a collection of "stows". in implementation, this means that
       # this models a directory that contains nothing but other directories.
@@ -135,4 +135,3 @@ module Skylab::Git
     end
   end
 end
-# #pending-rename: stows operator branch facade

@@ -22,7 +22,7 @@ module Skylab::TanMan
 
         # entity on success. false-ish on failure
 
-        Here_::Magnetics_::PersistMeaning_via_Meaning_and_Collection.call_by do |o|
+        Here_::Magnetics_::AddMeaning_via_Meaning_and_Collection.call_by do |o|
           yield o
           o.fallback_mutable_string = @fallback_mutable_string
           o.entity_stream_by = method :to_meaning_entity_stream_
@@ -101,6 +101,4 @@ module Skylab::TanMan
     end
   end
 end
-Skylab::TanMan::Models_::Meaning::Collection_Controller__ = nil  # don't forget the `lazily` clause too
-# #pending-rename: meanings operator branch facade
 # #history-A: half full rewrite during ween off [br]-era

@@ -148,7 +148,7 @@ module Skylab::Autonomous_Component_System
           _st = ACS_::For_Serialization::Stream.via_customization_and_rw_(
             @customization_structure_x, @_rw )
 
-          Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
+          Common_::Stream::Magnetics::OperatorBranch_via_Stream.define do |o|
             o.upstream = _st
             o.key_method_name = :name_symbol
           end

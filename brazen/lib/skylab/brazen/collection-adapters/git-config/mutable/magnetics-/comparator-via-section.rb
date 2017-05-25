@@ -6,7 +6,8 @@ module Skylab::Brazen
 
       class Magnetics_::Comparator_via_Section < Common_::MagneticBySimpleModel
 
-        # (reminder: this is used by our nearby [#011] which takes as an
+        # (reminder: this is used by our nearby implementation of [#ba-045]
+        # (the unobtrusive lexical-esque ordering algorithm) which takes as an
         # argument all collection elements as an array, so check the symbol
         # categorgy of every incoming element when you are comparing.)
 

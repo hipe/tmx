@@ -275,7 +275,7 @@ module Skylab::Git
 
       def _new_stows_collection
 
-        Here_::Models_::Collection.new(
+        Here_::Models_::StowsOperatorBranchFacade.new(
           @stows_path,
           _filesystem_,
           @_microservice_invocation_,
@@ -297,7 +297,7 @@ module Skylab::Git
         ACHIEVED_
       end
 
-      def _simplified_write_ k, x
+      def _simplified_write_ x, k
         instance_variable_set :"@#{ k }", x ; nil
       end
 

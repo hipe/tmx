@@ -324,8 +324,6 @@ and a downstream identifer, yet (EDIT)
 
 ## document-meta:
 
-  - #pending-rename: to "the digraph session architecture" or similar (maybe)
-
   - #history-A.1: spike this with a splice of 100% as much (more) content,
     that came in from inline comments; while at the same time realizing
     that the existing content that was here was largey redundant with

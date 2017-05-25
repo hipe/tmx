@@ -2,13 +2,13 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    module Models__::Upstream
+    module Associations_::Upstream
 
       MODEL_CONST = :Upstream
 
       IS_SINGLETON_ASSOCIATION = true
 
-      class WriteComponent_via_Component_and_Survey < Common_::Dyadic
+      class WriteComponent_via_Component_and_Entity < Common_::Dyadic
 
         def initialize qc, survey, & p
           @upstream = qc.value
@@ -25,6 +25,8 @@ module Skylab::Cull
         end
 
         def __emit_event
+
+          # #open [#007.B] see reference to this identifier *in* [ac]
 
           _ev = @upstream.to_descriptive_event  # #todo
 

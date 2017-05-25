@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       class Magnetics::TouchComparableElement_via_Element_and_Comparator_and_Elements < Common_::MagneticBySimpleModel
 
-        # #[#011] an implementation of "unobtrusive lexical-esque ordering"
+        # #:[#ba-045] an implementation of "unobtrusive lexical-esque ordering"
 
         def initialize
           yield self

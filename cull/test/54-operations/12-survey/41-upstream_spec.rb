@@ -164,7 +164,7 @@ module Skylab::Cull::TestSupport
     context "add existent upstream on a workspace with multiple upstreams" do
 
       # :#cov1.6, :#spot1.3.
-      # [#007.D.2] describes how #tombstone-A.1 pertains to this test case.
+      # [#011.D.2] describes how #tombstone-A.1 pertains to this test case.
 
       it "fails" do
         _fails
@@ -201,8 +201,8 @@ module Skylab::Cull::TestSupport
       end
 
       it "explains" do
-        _actual = black_and_white _tuple.first
-        _actual == "cannot unset upstream - no upstream set" || fail
+        _actual = _tuple.first
+        _actual == [ "cannot unset upstream - no upstream set" ] || fail
       end
 
       shared_subject :_tuple do
@@ -215,8 +215,8 @@ module Skylab::Cull::TestSupport
         )
 
         a = []
-        expect :error, :no_upstream_set do |ev|
-          a.push ev
+        expect :error, :expression, :no_upstream_set do |y|
+          a.push y
         end
         a.push x
       end
@@ -303,16 +303,6 @@ module Skylab::Cull::TestSupport
     def _fails
       _tuple.last.nil? || fail
     end
-
-    # ~( ..
-    def black_and_white_expression_agent_for_expect_emission
-      expression_agent_for_expect_emission
-    end
-
-    def expression_agent_for_expect_emission
-      contemporary_expression_agent_
-    end
-    # ~)
 
     # -- setup
 

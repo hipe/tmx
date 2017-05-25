@@ -62,7 +62,7 @@
              and fixing. (try: `init`, `hear "a depends on b"`) this
              occurred in part because of gaping holes in coverage near
              the higher-level concerns, like creating directories for 'init'.
-             ( #was: #tracking-tag lexical ordering stuff, #moved-to [#br-011] )
+             ( #was: #tracking-tag lexical ordering stuff, #moved-to [#ba-045] )
 
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
@@ -159,7 +159,6 @@
              ( #was: refactor-in headless, and sub-client )
 
 [#021]       the digraph session architecture ..
-             the document entity narrative ..
              ( #was: #done merge singletons into service )
 
 [#020] #open #feature-collection upstream

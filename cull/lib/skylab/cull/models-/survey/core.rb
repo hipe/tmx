@@ -26,7 +26,7 @@ module Skylab::Cull
           Common_::Event.inline_OK_with(
             :ping,
           ) do |y, o|
-            y << "#{ app_name_string } says #{ highlight "hello" }"
+            y << "#{ app_name_string } says #{ em "hello" }"
           end
         end
 
@@ -117,7 +117,6 @@ module Skylab::Cull
     def initialize
         @_mutex_for_config = nil
         @persist_step_a = EMPTY_A_  # this is going away or full overhaul. setting it to this asserts that it is not used
-      @entities = nil
     end
 
     # ~ all #hook-in to [br] edit session API
@@ -160,44 +159,16 @@ module Skylab::Cull
 
     # ~~ misc functions for actors & top entities
 
-    # ~ public API for #:+actors near "associated entities" API (experiment)
-
-    def existent_associated_entity_ ent_sym  # placeholder for etc.
-      self._AWAY__this_method__
-      @entities.fetch ent_sym
-    end
-
-    def touch_associated_entity_ ent_sym
-      self._AWAY__this_method__
-
-      if @entities
-        ent = @entities[ ent_sym ]
-      else
-        @entities = {}
-      end
-
-      if ! ent
-
-        _const_s = Common_::Name.via_variegated_symbol( ent_sym ).as_camelcase_const_string
-
-        _cls = Models__.const_get _const_s, false
-
-        ent = _cls.new self, & @on_event_selectively
-
-        @entities[ ent_sym ] = ent
-      end
-
-      ent
-    end
-
       # -- C ..
 
-      def define_and_assign_component_by__
-        _hi = MTk_::AssociationToolkit::DefineAndAssignComponent_via_Block_and_Symbol.call_by do |o|
+      def define_and_assign_component_by  # (will be for [ac])
+
+        _ent = MTk_::AssociationToolkit::DefineAndAssignComponent_via_Block_and_Symbol.call_by do |o|
           yield o
           o.mutable_entity = self
         end
-        _hi  # hi. #todo
+
+        _ent # hi. #todo on success, the entity that was added
       end
 
       def write_component_via_primitives_by__
@@ -266,7 +237,7 @@ module Skylab::Cull
 
       def persist_by_
         # was `re_persist`
-        Here_::Magnetics_::CreateSurvey_via_Survey.call_by do |o|
+        Here_::Magnetics_::PersistSurvey_via_Survey.call_by do |o|
           yield o
           o.survey = self
         end
@@ -319,6 +290,23 @@ module Skylab::Cull
         MTk_::AssociationToolkit::QualifiedComponentStream_via_Entity[ self ]
       end
 
+      # ~(
+
+      def _insert_via_index_and_association_ x, d, asc
+
+        # (stay close to `_insert_via_index_and_association_symbol_`)
+
+        -1 == d || self._COVER_ME__ad_hoc_inserts_not_yet_implemented_
+        ivar = asc.name.as_ivar
+        if instance_variable_defined? ivar
+          a = instance_variable_get ivar
+        else
+          a = []
+          instance_variable_set ivar, a
+        end
+        a.push x ; nil
+      end
+
       def _write_via_association_ x, asc  # near `_simplified_write_`
         _ivar = asc.name.as_ivar
         instance_variable_set _ivar, x
@@ -350,25 +338,38 @@ module Skylab::Cull
       end
 
       def _associations_operator_branch_
-        Here_::Models__.boxxy_module_as_operator_branch
+        Here_::Associations_.boxxy_module_as_operator_branch
+      end
+
+      def _models_operator_branch_  # :#spot2.1
+        _models_module_.boxxy_module_as_operator_branch
+      end
+
+      def _THESE_ASSOCIATIONS_
+        Common_associations_[]
       end
 
       def _models_module_
-        Models_
+        Home_::Models_
       end
+
+      # ~)
 
     # -
     # ==
 
-    module Models__
+    module Associations_
 
       Autoloader_[ self, :boxxy ]
       # (this is the frontier use-case [#co-030.5] boxxy as operator branch)
 
-      same = 'function--'
-      stowaway :Map, same
-      stowaway :Mutator, same
-      stowaway :Aggregator, same
+      same = -> c do
+        Here_.const_get :FunctionBasedAssociations_, false
+        const_defined? c, false or fail
+        const_get c, false
+      end
+
+      lazily :CurriedFunctions, & same
     end
 
     # ==
@@ -378,8 +379,10 @@ module Skylab::Cull
       _ca = Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
 
         o.property_grammatical_injection_by do
-          Build_custom_grammatical_injection_ONCE___[]
+          MTk_::AssociationToolkit::Pluralton_powered_parameter_grammatical_injection[]
         end
+
+        these = :curried_functions
 
         o.ADD_ALL_THESE_MUGS(
           :property, :upstream,
@@ -387,42 +390,20 @@ module Skylab::Cull
 
           :flag, :property, :unset_upstream,
 
-          :list, :property, :add_map,
-          :list, :property, :remove_map,
+          # ("pluralton" defined at [#ac-024.XXX])
 
-          :list, :property, :add_mutator,
-          :list, :property, :remove_mutator,
+          :property, :add_map, :pluralton_association, these,
+          :property, :remove_map, :pluralton_association, these,
 
-          :list, :property, :add_aggregator,
-          :list, :property, :remove_aggregator,
+          :property, :add_mutator, :pluralton_association, these,
+          :property, :remove_mutator, :pluralton_association, these,
+
+          :property, :add_aggregator, :pluralton_association, these,
+          :property, :remove_aggregator, :pluralton_association, these,
         )
       end
 
       _ca.to_dereferenced_item_array
-    end
-
-    Build_custom_grammatical_injection_ONCE___ = -> do
-
-      _inj = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
-
-      _inj.redefine do |o|
-
-        mod = MyCustomPrefixedModifiers___
-        mod.include o.prefixed_modifiers  # yikes
-        o.prefixed_modifiers = mod
-      end
-    end
-
-    module MyCustomPrefixedModifiers___
-
-      def list
-
-        # (until recently, we use to do this all custom..) now it's a
-        # palceholder for the idea of doing something crazy..)
-
-        @parse_tree.be_glob
-        KEEP_PARSING_
-      end
     end
 
     # ==
@@ -434,7 +415,7 @@ module Skylab::Cull
       Autoloader_[ self ]
 
       lazily :Survey_via_SurveyPath do |c|
-        const_get :CreateSurvey_via_Survey, false
+        const_get :PersistSurvey_via_Survey, false
         const_defined? c, false or fail
         const_get c
       end
