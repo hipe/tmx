@@ -1,8 +1,10 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class Parameter
+  class Magnetics_::Normalize_via_ParameterStream_and_ReadableOperatorBranch_and_WritableOperatorBranch
 
-    class Normalization  # 1x. [ac] only. [#028] (and see open tag below)
+      # 1x. [ac] only. [#028] (and see open tag below)
+
+      # #open [#008.D] modernize interface (or don't)
 
       # :[#fi-037.5.L].
 
@@ -53,7 +55,7 @@ module Skylab::Autonomous_Component_System
           par = st.gets
           par or break
 
-          # reminder: we do *not* `ACS_::Interpretation::Build_value` here.
+          # reminder: we do *not* `Home_::Magnetics::QualifiedComponent_via_Value_and_Association` here.
 
           _x = cont.current_argument_scanner.gets_one  # ..
 
@@ -183,6 +185,5 @@ module Skylab::Autonomous_Component_System
       def _box_via_stream st
         st.flush_to_box_keyed_to_method :name_symbol
       end
-    end
   end
 end

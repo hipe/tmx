@@ -75,7 +75,7 @@ module Skylab::MyTerm
 
       def ___qkn_stream_via acs
 
-        _rw = ACS_::ReaderWriter.for_componentesque acs  # meh
+        _rw = Arc_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs  # meh
 
         _o = _rw.to_non_operation_node_reference_streamer
 
@@ -100,7 +100,7 @@ module Skylab::MyTerm
       def __add__primitivesque__ qk  # assume effectively known
 
         x = qk.value
-        if ACS_::Reflection::Looks_primitive[ x ]
+        if Arc_::Reflection_looks_primitive[ x ]
           _add_prepared_value x, qk
         else
           self._COVER_ME_primitive_not_primitive

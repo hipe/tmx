@@ -1,8 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class Parameter
-
-    class ValueSource_for_ArgumentScanner
+  class Magnetics::ParameterValueSource_via_ArgumentScanner
 
       # NOTE  - this means "argument stream" as in the API modality ..
       # notes in [#028].
@@ -114,6 +112,5 @@ module Skylab::Autonomous_Component_System
 
         end ; self end
       end
-    end
   end
 end

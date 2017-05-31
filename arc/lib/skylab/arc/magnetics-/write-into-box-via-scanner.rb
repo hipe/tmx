@@ -1,6 +1,8 @@
-module Skylab::Autonomous_Component_System
-  # ->
-    class Parameter  # :[#020] (compare to and stay close to [#fi-039] defined attribute)
+module Skylab::Arc
+
+  class Magnetics_::WriteIntoBox_via_Scanner
+
+    # :[#020] (compare to and stay close to [#fi-039] defined attribute)
 
       class << self
 
@@ -23,7 +25,7 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
-        alias_method :new_by_, :new
+        alias_method :new_by__, :new
         private :new
       end  # >>
 
@@ -166,6 +168,6 @@ module Skylab::Autonomous_Component_System
       end
 
       Here_ = self
-    end
-  # -
+
+  end
 end

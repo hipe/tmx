@@ -215,7 +215,7 @@ module Skylab::Brazen
       System_lib[].services
     end
 
-    The_ACS_lib = sidesys[ :Autonomous_Component_System ]
+    The_ACS_lib = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]

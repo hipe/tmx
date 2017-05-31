@@ -84,7 +84,7 @@ module Skylab::Basic
 
     Require_component_support___ = Common_.memoize do
 
-      Assume_ACS_[]
+      Require_arc_const_[]
 
       module Component_Models
 
@@ -94,7 +94,7 @@ module Skylab::Basic
           :number_set, :integer,
         )
 
-        POSITIVE_INTEGER = ACS_::Model::Via_normalization[ _positive_integer ]
+        POSITIVE_INTEGER = ARC_::Magnetics::Model_via_Normalization[ _positive_integer ]
       end
 
       NIL_

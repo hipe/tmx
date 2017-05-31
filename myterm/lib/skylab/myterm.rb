@@ -125,7 +125,8 @@ module Skylab::MyTerm
   end
 
   Require_ACS_ = Lazy_.call do
-    ACS_ = Home_.lib_.autonomous_component_system
+    ACS_ = Home_.lib_.arc
+    Arc_ = ACS_  # (the new name)
     NIL_
   end
 
@@ -145,7 +146,7 @@ module Skylab::MyTerm
       System_lib[].services
     end
 
-    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Arc = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Open3 = stdlib[ :Open3 ]

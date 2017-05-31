@@ -249,7 +249,7 @@ module Skylab::Snag
         )
         # <-
 
-      ACS_[]::Model::Via_normalization[ _n11n ]
+      ACS_[]::Magnetics::Model_via_Normalization[ _n11n ]
     end
 
     def __set__component qk, & _x_p

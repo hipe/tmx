@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -52,7 +52,7 @@ module Skylab::Autonomous_Component_System
             break
           end
 
-          o = Home_::Interpretation::Touch.new
+          o = Home_::Magnetics::TouchComponent_via_Association_and_OperatorBranch.new
           o.component_association = asc
           o.reader_writer = rw
           qk = o.execute

@@ -188,7 +188,7 @@ module Skylab::DocTest
       System_lib[].services
     end
 
-    ACS = sidesys[ :Autonomous_Component_System ]
+    ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
     Git = sidesys[ :Git ]

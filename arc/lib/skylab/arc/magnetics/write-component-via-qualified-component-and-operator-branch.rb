@@ -1,8 +1,11 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Interpretation
-    # -
-      Accept_component_change = -> new_qkn, reader_writer, & _LL_p do
+  Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch =
+    # this name is wishful thinking..
+
+      # ==
+
+      -> new_qkn, reader_writer, & _LL_p do
 
         # storage of new component is "guaranteed".
         # result is proc that produces an event describing the change.
@@ -75,7 +78,9 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      class Primitivesque_As_Component___
+      # ==
+
+      class Primitivesque_As_Component___  # #stowaway
 
         def initialize x
           @_x = x
@@ -88,6 +93,6 @@ module Skylab::Autonomous_Component_System
           end
         end
       end
-    # -
-  end
+
+      # ==
 end

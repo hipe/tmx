@@ -242,7 +242,7 @@ module Skylab::System
 
     # --
 
-    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Arc = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]  # used in tests too
     Brazen_NOUVEAU = Brazen  # (to track what is new and what is old)

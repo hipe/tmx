@@ -1,6 +1,9 @@
-module Skylab::Autonomous_Component_System
-  # ->
-    class Mutation_Session___  # notes in [#002]
+module Skylab::Arc
+
+  class Magnetics_::Mutate_via_ArgumentScanner_and_Verb_and_ACS
+
+    # notes in [#002]
+    # -
 
       def initialize & oes_p_p
         if oes_p_p
@@ -130,7 +133,7 @@ module Skylab::Autonomous_Component_System
 
       def _prepare_unit_of_work_queue
 
-        _rw = Home_::ReaderWriter.for_componentesque @ACS
+        _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @ACS
         # (#[#023] - a read/writer is one-to-one with an ACS, so etc..)
 
         a = []
@@ -224,6 +227,6 @@ module Skylab::Autonomous_Component_System
       Change_Log___ = ::Struct.new :last_delivery_result
 
       Here_ = self
-    end
-  # -
+    # -
+  end
 end

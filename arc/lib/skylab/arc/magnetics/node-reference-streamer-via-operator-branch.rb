@@ -1,8 +1,8 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Reflection
+  class Magnetics::NodeReferenceStreamer_via_OperatorBranch
 
-    class NodeReferenceStreamer  # :[#036]
+    # :[#036]
 
       # a "streamer" generally is a performer that produces a stream
       # (re-entrantly): it's like a proc that you can call multiple times,
@@ -36,7 +36,7 @@ module Skylab::Autonomous_Component_System
           # for clients (ACS or otherwise) who don't know or care about
           # holding a reader-writer themselves..
 
-          _rw = Home_::ReaderWriter.for_componentesque acs
+          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs
           ___via_reader _rw
         end
 
@@ -44,7 +44,7 @@ module Skylab::Autonomous_Component_System
           rdr.to_node_reference_streamer
         end
 
-        def via_reader__ x
+        def via_reader x
           new x
         end
 
@@ -272,7 +272,6 @@ module Skylab::Autonomous_Component_System
       end
     end
   # ->
-    end
   end
 end
 # #tombstone - older streamers

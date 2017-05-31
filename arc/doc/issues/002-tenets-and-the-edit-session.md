@@ -487,7 +487,7 @@ an operation expression. contrast:
 in the above, the second edit session has an operaton that uses a `via`
 modifer (described below).
 
-the implementation of modifiers is currently exploratory. #open #[#008]
+the implementation of modifiers is currently exploratory. #open #[#008.A]
 we intend to make it a more extensible API (and have them be less
 hard-coded) once modifiers incubate for a while.
 

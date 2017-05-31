@@ -1,14 +1,14 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] modalities - JSON - of POS" do
+  describe "[arc] modalities - JSON - of POS" do
 
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
     use :expect_root_ACS
-    use :modalities_JSON
+    use :JSON_magnetics
 
     context "when the payload has an invalid primitivesque value COLD" do
 

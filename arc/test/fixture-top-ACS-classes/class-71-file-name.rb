@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
   fn_rx = %r(\A[^/])
   fnm = nil

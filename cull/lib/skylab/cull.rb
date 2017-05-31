@@ -277,7 +277,7 @@ module Skylab::Cull
       System_lib[].services
     end
 
-    ACS = sidesys[ :Autonomous_Component_System ]
+    ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen_NOUVEAU = sidesys[ :Brazen ]  # for [sl]
     Fields = sidesys[ :Fields ]

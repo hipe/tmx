@@ -1,13 +1,14 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] modalities - JSON - interpretation intro" do
+  describe "[arc] modalities - JSON - interpretation intro" do
 
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
     use :expect_root_ACS
+    use :JSON_magnetics_lite
 
     context "(flat structure)" do
 
@@ -182,7 +183,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       cls = const_ _which
       new_empty = cls.new_cold_root_ACS_for_expect_root_ACS
 
-      o = Home_::Modalities::JSON::Interpret.new( & oes_p )
+      o = subject_magnetics_module_::ACS_via_JSON.new( & oes_p )
 
       o.customization_structure_x = nil
       o.ACS = new_empty

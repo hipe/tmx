@@ -202,10 +202,10 @@ module Skylab::Zerk
           @__oes_pp[ @_asc ]
         end
 
-        _st = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value ]
+        _scn = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value ]
 
-        qk = ACS_::Interpretation::Build_value.call(
-          _st,
+        qk = Arc_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
+          _scn,
           @_asc,
           @_frame.ACS,
           & _oes_pp

@@ -1,9 +1,7 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Interpretation
-
-    find_handler_method = nil
-    Build_emission_handler_builder_ = -> asc, acs do  # 1x here
+  find_handler_method = nil
+  Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS = -> asc, acs do
 
       # "component handler builder" (experimental): pass component listener
       # both the component value and association whenever it emits.
@@ -29,7 +27,7 @@ module Skylab::Autonomous_Component_System
           end
         end
       end
-    end
+  end
 
     find_handler_method = -> st, acs do
 
@@ -55,5 +53,4 @@ module Skylab::Autonomous_Component_System
     end
 
     IDENTITY_ = -> x { x }
-  end
 end

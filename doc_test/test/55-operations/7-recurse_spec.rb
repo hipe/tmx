@@ -17,7 +17,7 @@ module Skylab::DocTest::TestSupport
           :filesystem, :_trueish_for_FS_,
           :system_conduit, :_trueish_for_system_,
         )
-      rescue ::Skylab::Autonomous_Component_System::MissingRequiredParameters => e
+      rescue ::Skylab::Arc::MissingRequiredParameters => e
       end
 
       e.message.include? "'recurse' is missing required parameter 'path'" or fail

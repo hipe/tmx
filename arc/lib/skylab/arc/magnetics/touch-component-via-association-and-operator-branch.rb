@@ -1,8 +1,9 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Interpretation
+  class Magnetics::TouchComponent_via_Association_and_OperatorBranch
 
-    class Touch  # result is a qk-ish
+    # #open [#008.D] - make it a magnetic by simple model
+    # result is a qk-ish
 
         # 1) by default when we create a new component value for these ones,
         #    we "attach" that value to the ACS (for example, by writing to
@@ -93,9 +94,9 @@ module Skylab::Autonomous_Component_System
 
       Build_empty_hot___ = -> asc, acs do  # result is qk
 
-        _oes_p_p = Build_emission_handler_builder_[ asc, acs ]
+        _oes_p_p = Home_::Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS[ asc, acs ]
 
-        o = ACS_::Interpretation::Build_value.begin nil, asc, acs, & _oes_p_p
+        o = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.begin nil, asc, acs, & _oes_p_p
 
         o.mixed_argument = if o.looks_like_compound_component__
           IDENTITY_
@@ -133,6 +134,5 @@ module Skylab::Autonomous_Component_System
           @_qkn
         end
       end
-    end
   end
 end

@@ -118,7 +118,7 @@ module Skylab::TanMan
   end
 
   ACS_ = Lazy_.call do
-    Autoloader_.require_sidesystem :Autonomous_Component_System
+    Autoloader_.require_sidesystem :Arc
   end
 
   Fields_lib_ = Lazy_.call do
@@ -178,7 +178,7 @@ module Skylab::TanMan
 
     # --
 
-    # = sidesys[ :Autonomous_Component_System ]  # for [#sl-002]
+    # = sidesys[ :Arc ]  # for [#sl-002]
     Basic = sidesys[ :Basic ]
     Brazen_NOUVEAU = sidesys[ :Brazen ]  # weird name for now for a while
     # = sidesys[ :Fields ]  # for [#sl-002]

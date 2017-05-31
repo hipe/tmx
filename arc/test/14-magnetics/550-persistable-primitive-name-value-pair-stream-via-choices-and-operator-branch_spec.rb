@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] for serialization" do
+  describe "[arc] magnetics - persistable primitive name value pair stream via etc" do
 
     # (intent)
 
@@ -39,7 +39,9 @@ module Skylab::Autonomous_Component_System::TestSupport
       _acs = _ACS
       _x = _cust_x
 
-      st = Home_::For_Serialization::Stream.via_customization_and_ACS _x, _acs
+      st = Home_::Magnetics_::
+        PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+      via_customization_and_ACS _x, _acs
 
       a = []
       begin

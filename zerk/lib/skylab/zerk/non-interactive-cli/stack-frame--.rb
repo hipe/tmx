@@ -352,7 +352,7 @@ module Skylab::Zerk
         end
 
         def qualified_knownness_of_touched_via_association_ asc
-          ACS_::Interpretation::Touch[ asc, _reader ]
+          Arc_::Magnetics::TouchComponent_via_Association_and_OperatorBranch[ asc, _reader ]
         end
 
         def streamer_for_navigational_node_references_  # [#030] defines "navigational"
@@ -471,7 +471,7 @@ module Skylab::Zerk
           if yes
             yes = false
             Require_ACS_[]
-            reader_builder = ACS_::ReaderWriter.method :for_componentesque
+            reader_builder = ACS_::Magnetics::OperatorBranch_via_ACS.method :for_componentesque
           end
 
           p = @_reader_builder_for_this_frame

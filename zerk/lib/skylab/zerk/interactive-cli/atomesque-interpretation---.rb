@@ -29,7 +29,7 @@ module Skylab::Zerk
         _qk = remove_instance_variable :@__qk
         _rw = @_event_loop.penultimate_frame.reader_writer
 
-        p = ACS_::Interpretation::Accept_component_change.call _qk, _rw
+        p = Arc_::Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch.call _qk, _rw
 
           # (we could pass a block for building a linked list of context)
 
@@ -62,9 +62,9 @@ module Skylab::Zerk
 
         _ACS = @_event_loop.penultimate_frame.ACS
         _asc = @_.loadable_reference.association
-        _st = remove_instance_variable :@__stream
+        _scn = remove_instance_variable :@__scanner
 
-        qk = ACS_::Interpretation::Build_value[ _st, _asc, _ACS, & _pp ]
+        qk = Arc_::Magnetics::QualifiedComponent_via_Value_and_Association[ _scn, _asc, _ACS, & _pp ]
         if qk
           @__qk = qk
           PROCEDE_
@@ -94,14 +94,14 @@ module Skylab::Zerk
         if @_.is_listy
           a = Here_::List_Interpretation_Adapter___[ s, & @_.UI_event_handler ]
           if a
-            st = Home_.lib_.fields::Argument_scanner_via_value[ a ]
+            scn = Home_.lib_.fields::Argument_scanner_via_value[ a ]
           end  # else emitted
         else
-          st = Home_.lib_.fields::Argument_scanner_via_value[ s ]
+          scn = Home_.lib_.fields::Argument_scanner_via_value[ s ]
         end
 
-        if st
-          @__stream = st
+        if scn
+          @__scanner = scn
           PROCEDE_
         else
           # (probably this means converting the input to a list failed.)

@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -59,7 +59,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def build_parameter_value_source_
-        Home_::Parameter::ValueSource_for_ArgumentScanner.new @argument_scanner
+        Home_::Magnetics::ParameterValueSource_via_ArgumentScanner.new @argument_scanner
       end
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node
@@ -241,7 +241,7 @@ module Skylab::Autonomous_Component_System
 
         _ACS = @_stack.last.ACS
 
-        ACS_::Interpretation::Build_value.call(
+        Home_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
           @argument_scanner, asc, _ACS, & @_pp )
       end
 
@@ -317,7 +317,7 @@ module Skylab::Autonomous_Component_System
         end
 
         def reader_writer
-          @___rw ||= Home_::ReaderWriter.for_componentesque @ACS
+          @___rw ||= Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @ACS
         end
 
         def name

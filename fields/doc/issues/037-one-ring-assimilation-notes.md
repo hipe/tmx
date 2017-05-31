@@ -397,7 +397,7 @@ practical reasons to employ both techniques:
     facility O: 2016-11-17 zerk/lib/skylab/zerk/argument-scanner/when/unknown-branch-item.rb
     facility N: 2016-10-26 zerk/lib/skylab/zerk/argument-scanner/when/core.rb:9
     facility M: 2016-04-09 zerk/lib/skylab/zerk/non-interactive-cli/argument-parser-controller-.rb:12
-    facility L: 2016-01-21 autonomous_component_system/lib/skylab/autonomous_component_system/parameter/normalization.rb
+    facility L: 2016-01-21 arc/lib/skylab/arc/magnetics-/normalize-via..
     facility K: 2016-01-13 zerk/lib/skylab/zerk/non-interactive-cli/core.rb:391
     facility J: 2015-06-08 fields/lib/skylab/fields/attributes/normalization/june-08-2015.rb (was "value processing")
     facility I: 2014-10-31 fields/lib/skylab/fields/attributes/association-index-.rb

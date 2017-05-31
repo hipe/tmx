@@ -1,7 +1,7 @@
-require 'skylab/autonomous_component_system'
+require 'skylab/arc'
 require 'skylab/test_support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
@@ -121,7 +121,7 @@ module Skylab::Autonomous_Component_System::TestSupport
   end
 
   Common_ = ::Skylab::Common
-  Autoloader__ = Common_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   # -- fixtures & mocks
 
@@ -175,7 +175,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    Autoloader__[ self, ::File.join( NODE_PATH__, 'fixture-top-ACS-classes' ) ]
+    Autoloader_[ self, ::File.join( NODE_PATH__, 'fixture-top-ACS-classes' ) ]
       # (a.l will no longer infer paths if they have any uppercase letters.
       #  we have "grandfathered" in the above rather than renaming the dir.)
 
@@ -223,10 +223,10 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
   end
 
-  Autoloader__[ self, NODE_PATH__ ]
+  Autoloader_[ self, NODE_PATH__ ]
 
   ACHIEVED_ = true
-  Home_ = ::Skylab::Autonomous_Component_System
+  Home_ = ::Skylab::Arc
   EMPTY_S_ = ''
   NIL_ = nil
   TS_ = self

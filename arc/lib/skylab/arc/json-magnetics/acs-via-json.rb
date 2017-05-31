@@ -1,8 +1,44 @@
-module Skylab::Autonomous_Component_System
-  # ->
-    module Modalities::JSON
+module Skylab::Arc
 
-      class Interpret  # notes in [#003.E] on JSON interpretation
+  class JSON_Magnetics::ACS_via_JSON
+
+    # (notes in [#003.E] on JSON interpretation)
+
+    # ~( poofed back into here at #history-A.1
+    Unmarshal = -> acs, cust_x, st, & pp do  # 1x
+
+      if ! pp
+        self._COVER_ME_easy
+        pp = Home_.handler_builder_for acs
+      end
+      _oes_p = pp[ acs ]
+
+      if st.respond_to? :read
+        json = st.read
+      else
+        json = ""
+        while line = st.gets
+          json.concat line
+        end
+      end
+
+      o = Here___.new( & _oes_p )
+      o.ACS = acs
+      o.customization_structure_x = cust_x
+      o.JSON = json
+
+      o.context_linked_list = begin
+
+        _context_value = -> do
+          'in input JSON'
+        end
+
+        Home_.lib_.basic::List::Linked[ nil, _context_value ]
+      end
+
+      o.execute
+    end
+    # ~)
 
         def initialize & p
 
@@ -28,7 +64,7 @@ module Skylab::Autonomous_Component_System
 
         def execute
 
-          _rw = Home_::ReaderWriter.for_componentesque(
+          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque(
             remove_instance_variable( :@ACS ) )
 
           _x = Home_.lib_.JSON.parse(
@@ -36,7 +72,7 @@ module Skylab::Autonomous_Component_System
             symbolize_names: true,
           )
 
-          _rec = Stack_Frame__.new(
+          _rec = StackFrame__.new(
             _x,
             remove_instance_variable( :@context_linked_list ),
             remove_instance_variable( :@customization_structure_x ),
@@ -46,9 +82,8 @@ module Skylab::Autonomous_Component_System
 
           _rec._execute
         end
-      end
 
-      class Interpret::Stack_Frame__
+      class StackFrame__
 
         def initialize x, context_x, cust_x, rw, on_empty, & top_oes_p
 
@@ -93,7 +128,7 @@ module Skylab::Autonomous_Component_System
              @_pair_stream = Home_.lib_.basic::Hash.pair_stream x
              ACHIEVED_
           else
-            Modalities::JSON::When_[ x, self, :Shape ]
+            JSON_Magnetics::Via_[ x, self, :Shape ]
           end
         end
 
@@ -145,7 +180,9 @@ module Skylab::Autonomous_Component_System
 
         def ___build_operator_branch
 
-          _st = ACS_::For_Serialization::Stream.via_customization_and_rw_(
+          _st = Home_::Magnetics_::
+            PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+          via_customization_and_rw_(
             @customization_structure_x, @_rw )
 
           Common_::Stream::Magnetics::OperatorBranch_via_Stream.define do |o|
@@ -165,7 +202,7 @@ module Skylab::Autonomous_Component_System
             redo
           end while nil
 
-          Modalities::JSON::When_[ extra_a, self, :Extra ]
+          JSON_Magnetics::Via_[ extra_a, self, :Extra ]
 
           UNABLE_
         end
@@ -227,7 +264,7 @@ module Skylab::Autonomous_Component_System
 
           _oes_p_p = _reinit_handlers_for asc
 
-          o = ACS_::Interpretation::Build_value.begin(
+          o = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.begin(
             _on_component, asc, _ACS, & _oes_p_p )
 
           o.construction_method = :interpret_compound_component
@@ -253,9 +290,9 @@ module Skylab::Autonomous_Component_System
 
           _json_as_h = qk.value
 
-          _rw = Home_::ReaderWriter.for_componentesque cmp
+          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque cmp
 
-          o = Interpret::Stack_Frame__.new(
+          o = StackFrame__.new(
             _json_as_h,
             _ctx_,
             cust_x,
@@ -308,7 +345,7 @@ module Skylab::Autonomous_Component_System
 
           _reinit_handlers_for asc
 
-          qk = ACS_::Interpretation::Build_value.call(
+          qk = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
             _arg_scn, asc, _ACS, & @_CURRENT_component_handler_builder )
 
           if qk
@@ -445,13 +482,13 @@ module Skylab::Autonomous_Component_System
 
             p.call do
 
-              Modalities::JSON::When_::Empty.with(
+              JSON_Magnetics::Via_::Empty.with(
                 :context_linked_list, @context_linked_list,
                 :ok, nil,  # neutralize its semantic gravity
               )
             end
           else
-            Modalities::JSON::When_[ self, :Empty ]
+            JSON_Magnetics::Via_[ self, :Empty ]
           end
         end
 
@@ -467,6 +504,8 @@ module Skylab::Autonomous_Component_System
       end
 
       UNRELIABLE_ = :_unreliable_
-    end
-  # -
+
+    Here___ = self
+  end
 end
+# #history-A.1: jostle things around

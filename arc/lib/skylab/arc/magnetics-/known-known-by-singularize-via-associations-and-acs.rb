@@ -1,6 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class Singularize___
+  class Magnetics_::KnownKnownBySingularize_via_Associations_and_ACS
 
     # if your [ac] model has a plural assocation (i.e an "argument arity"
     # that is possibly more than one), then under [ac] (at writing) it is
@@ -64,7 +64,7 @@ module Skylab::Autonomous_Component_System
 
           _scn = Home_.lib_.fields::Argument_scanner_via_value[ x ]
 
-          qk = Home_::Interpretation::Build_value.call(
+          qk = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
             _scn,
             @singular_comp_assoc,
             @ACS,

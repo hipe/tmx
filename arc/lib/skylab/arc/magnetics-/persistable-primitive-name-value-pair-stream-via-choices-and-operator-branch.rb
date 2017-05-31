@@ -1,14 +1,16 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module For_Serialization  # notes in [#003]
+  module Magnetics_::PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch
 
-    module Stream ; class << self
+    # notes in [#003]
+
+    class << self
 
       # today this stands as a the #frontier and demonstration of realizing
       # intent-specific customizations
 
       def via_customization_and_ACS cust_x, acs
-        _rw = Home_::ReaderWriter.for_componentesque acs
+        _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs
         via_customization_and_rw_ cust_x, _rw
       end
 
@@ -30,12 +32,12 @@ module Skylab::Autonomous_Component_System
 
       def ___when_customizations cust_x, str
 
-        _str_ = Home_::Intent::Streamer.via_streamer__ str
+        _str_ = Home_::Magnetics_::IntentStreamer_via_NodeReferenceStreamer.via_streamer__ str
 
         _str3_ = cust_x[ _str_ ]
 
         _str3_.to_qualified_knownness_stream
       end
-    end ; end
+    end  # >>
   end
 end

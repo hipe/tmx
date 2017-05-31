@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
   module Expect_Root_ACS
 

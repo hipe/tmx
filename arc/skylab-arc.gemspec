@@ -18,7 +18,7 @@ Gem::Specification.new do | s |
 
   s.files = inf.to_stream_of_one_or_more_codefiles.to_a
 
-  s.homepage = 'http://localhost:8080/homepage-for-ac'
+  s.homepage = 'http://localhost:8080/homepage-for-arc'
 
   s.license = 'MIT'
 

@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] (e)Xtensibility - meta components" do
+  describe "[arc] magenetics - mega components" do
 
     # (what is accomplished here is referenced elsewhere as :[#013])
 
@@ -39,7 +39,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       dangerous_memoize :_the_memoized_array do
 
         _hi = ___the_ACS_class.new
-        _st = Home_::Reflection::NodeReferenceStreamer.via_ACS( _hi ).call
+        _st = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS( _hi ).call
         _st.to_a
       end
 
@@ -83,7 +83,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           Require_it___ = Common_.memoize do
 
-            class My_Comp_Assoc < ACS_::Component_Association
+            class My_Comp_Assoc < Home_::ComponentAssociation
 
               def accept__pokemon__meta_component
                 @_is_pokemon = true ; nil

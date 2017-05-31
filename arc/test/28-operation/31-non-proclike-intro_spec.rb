@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] operation - non-proclike" do
+  describe "[arc] operation - non-proclike" do
 
     TS_[ self ]
     use :memoizer_methods

@@ -268,7 +268,7 @@ module Skylab::Snag
   end
 
   ACS_ = Lazy_.call do
-    Home_.lib_.autonomous_component_system
+    Home_.lib_.arc
   end
 
   Attributes_actor_ = -> cls, * a do
@@ -347,7 +347,7 @@ module Skylab::Snag
       System_lib[].services
     end
 
-    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Arc = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]

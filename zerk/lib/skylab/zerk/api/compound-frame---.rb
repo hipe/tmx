@@ -19,7 +19,7 @@ module Skylab::Zerk
 
         _rw = reader_writer
 
-        _p = ACS_::Interpretation::Accept_component_change.call(
+        _p = Arc_::Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch.call(
           qk,
           _rw,
         )
@@ -83,7 +83,7 @@ module Skylab::Zerk
 
         # (this one spot is the crux of the whole redesign near r/w)
 
-        @___rw ||= ACS_::ReaderWriter.for_componentesque self.ACS
+        @___rw ||= ACS_::Magnetics::OperatorBranch_via_ACS.for_componentesque self.ACS
       end
 
       def ACS

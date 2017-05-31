@@ -1,10 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] modalities - JSON - express" do
+  describe "[arc] modalities - JSON - express" do
 
     TS_[ self ]
+    use :JSON_magnetics_lite
 
     it "non-sparse one-level structure" do
 
@@ -53,7 +54,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     def _begin_to_json sn
 
-      o = Home_::Modalities::JSON::Express.new
+      o = Home_::JSON_Magnetics::JSON_via_ACS.new
       o.customization_structure_x = nil
       o.upstream_ACS = sn
       o

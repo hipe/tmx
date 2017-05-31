@@ -162,6 +162,7 @@ module Skylab::Zerk  # intro in [#001] README
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS
+    Arc_ = ACS_  # (the newer name)
     NIL_
   end
 
@@ -196,7 +197,7 @@ module Skylab::Zerk  # intro in [#001] README
       System_lib[].services
     end
 
-    ACS = sidesys[ :Autonomous_Component_System ]
+    ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]

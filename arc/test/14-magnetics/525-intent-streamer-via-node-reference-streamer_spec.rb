@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] intent" do
+  describe "[arc] intent streamer via node reference streamer" do
 
     # (the subsequent test tests `include_if` so we don't)
 
@@ -38,9 +38,9 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       _acs = _ACS
 
-      _node_sr = Home_::Reflection::NodeReferenceStreamer.via_ACS _acs
+      _node_sr = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS _acs
 
-      o = Home_::Intent::Streamer.via_streamer__ _node_sr
+      o = Home_::Magnetics_::IntentStreamer_via_NodeReferenceStreamer.via_streamer__ _node_sr
 
       _x = _cust_x
       o = _x[ o ]

@@ -46,7 +46,7 @@
              similarly, we may want to advertise "loudly" the presence of
              the magnetic so that it is not overlooked during future work,
              when we are surveying what magnetics are available when
-             considering how to pathfind a problem.
+             pathfinding a solution to a problem.
 
              finally, in the cases where there is interesting history in
              a file that *becomes* "anemic", it may be that we don't want to

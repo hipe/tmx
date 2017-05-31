@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] tenets - 7 A - the `via` modifier" do
+  describe "[arc] operation - tenet 7A - the `via` modifier" do
 
     TS_[ self ]
     use :memoizer_methods

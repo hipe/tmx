@@ -1,10 +1,37 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  # ->
+  class JSON_Magnetics::JSON_via_ACS
 
-    module Modalities::JSON
+    # (notes in [#003])
 
-      class Express  # notes in [#003]
+    # ~( poofed back into here at #history-A.1
+    Marshal = -> args, acs, & pp do  # 1x
+
+      if ! pp
+        self._COVER_ME_easy
+        pp = Home_.handler_builder_for acs
+      end
+      _oes_p = pp[ acs ]
+
+      y = args.shift
+
+      o = JSON_Magnetics::JSON_via_ACS.new( & _oes_p )
+
+      o.downstream_IO_proc = -> do
+        y
+      end
+
+      o.upstream_ACS = acs
+
+      if args.length.nonzero?
+        args.each_slice 2 do | k, x |
+          o.send :"#{ k }=", x
+        end
+      end
+
+      o.execute
+    end
+    # )
 
         def initialize & p
           @be_pretty = true
@@ -69,7 +96,9 @@ module Skylab::Autonomous_Component_System
             store[ xx ]
           end
 
-          st = Home_::For_Serialization::Stream.via_customization_and_ACS(
+          st = Home_::Magnetics_::
+            PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+          via_customization_and_ACS(
             cust_x, acs )
 
           begin
@@ -110,14 +139,14 @@ module Skylab::Autonomous_Component_System
 
             # at this point we know it's true-ish and not a compound node:
 
-            if Home_::Reflection::Looks_primitive[ x ]
+            if Reflection_looks_primitive[ x ]
 
               # if it's a primitive, store as-is
               store[ x ] ; redo
 
             else
               x_ = x.to_primitive_for_component_serialization
-              if ! Home_::Reflection::Looks_primitive[ x_ ]
+              if ! Reflection_looks_primitive[ x_ ]
                 self._COVER_ME_wrong_shape
               end
               store[ x_ ] ; redo
@@ -223,10 +252,9 @@ module Skylab::Autonomous_Component_System
         attr_reader(
           :downstream_IO,  # experimental..
         )
-      end
 
       NEWLINE_ = "\n"
       NEWLINE_BYTE___ = NEWLINE_.getbyte( 0 )
-    end
-  # -
+  end
 end
+# #history-A.1 jostle things around

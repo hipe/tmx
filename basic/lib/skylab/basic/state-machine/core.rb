@@ -40,8 +40,8 @@ module Skylab::Basic
 
         def initialize
 
-          Home_.lib_.autonomous_component_system
-          Assume_ACS_[]
+          Home_.lib_.arc
+          Require_arc_const_[]
 
           @_bx = Common_::Box.new
         end
@@ -50,7 +50,7 @@ module Skylab::Basic
 
           x_a.unshift :add, :state
 
-          ACS_.edit x_a, self
+          ARC_.edit x_a, self
         end
 
         def __state__component_association

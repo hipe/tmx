@@ -1,10 +1,10 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
     module Modifiers_
 
-      # #open [#008] imagine ways to make them extensible
+      # #open [#008.A] imagine ways to make them extensible
 
       class Parse
 

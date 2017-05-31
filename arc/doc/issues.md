@@ -88,7 +88,16 @@
 
 [#009]       intro to operations..
 
-[#008]   #possible-feature extension API for the *modifiers* for use in mutation sessions
+[#008]       (small internal tracking)
+
+             this is a broad snapshot of general "strain" [ac]
+             is showing in its age -
+               - it's pre-magentics :[#here.B] #open
+               - it's pre simple model :[#here.C] #open
+               - it's pre magnetic via simple model :[#here.D] #open
+
+       #open :[#here.A]: #possible-feature extension API for the *modifiers*
+             for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)
 
 [#007]       "expressive events" (and the canonic component events) ..

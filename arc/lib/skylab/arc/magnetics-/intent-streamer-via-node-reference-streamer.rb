@@ -1,8 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Intent
-
-    class Streamer
+  class Magnetics_::IntentStreamer_via_NodeReferenceStreamer
 
       class << self
         alias_method :via_streamer__, :new
@@ -77,6 +75,6 @@ module Skylab::Autonomous_Component_System
           end
         end
       end
-    end
+
   end
 end

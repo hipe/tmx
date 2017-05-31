@@ -1,6 +1,6 @@
-module Skylab::Autonomous_Component_System
-  # ->
-    module Modalities::JSON::When_
+module Skylab::Arc
+
+  module JSON_Magnetics::Via_
 
       module Extra
 
@@ -40,6 +40,5 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
       end
-    end
-  # -
+  end
 end

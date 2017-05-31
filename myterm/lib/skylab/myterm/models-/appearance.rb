@@ -37,7 +37,7 @@ module Skylab::MyTerm
 
       Require_ACS_[]
 
-      my_asc_p = ACS_::Component_Association.  # (b.c we have no custom class)
+      my_asc_p = ACS_::ComponentAssociation.  # (b.c we have no custom class)
         reader_of_component_associations_by_method_in self
 
       -> token_x do
@@ -76,15 +76,16 @@ module Skylab::MyTerm
     def to_component_node_reference_streamer
 
       Require_ACS_[]
+      o = Arc_::Magnetics
 
       if @adapter
 
-        ACS_::Reflection::NodeReferenceStreamer.via_ACS @adapter.implementation_
+        o::NodeReferenceStreamer_via_OperatorBranch.via_ACS @adapter.implementation_
       else
 
-        _rw = ACS_::ReaderWriter.for_componentesque self  # just reads ivar
+        _rw = o::OperatorBranch_via_ACS.for_componentesque self  # just reads ivar
 
-        _hi = ACS_::Reflection::NodeReferenceStreamer.via_reader__ _rw  # #todo - change method name
+        _hi = o::NodeReferenceStreamer_via_OperatorBranch.via_reader _rw  # #todo - change method name
 
         _hi
       end

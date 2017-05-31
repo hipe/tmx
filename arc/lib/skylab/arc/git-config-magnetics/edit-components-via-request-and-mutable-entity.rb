@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   class GitConfigMagnetics::EditComponents_via_Request_and_MutableEntity < Common_::MagneticBySimpleModel
 

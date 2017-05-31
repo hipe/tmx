@@ -1,8 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] reflection - dynamic nodes example" do
+  describe "[arc] magnetics - node reference streamer via operator branch" do
+
+    # (was: "reflection - dynamic nodes example")
 
     # (this is numbered 04 and not 01 to leave room for the (more important)
     # non-dynamic behavior that as yet does not have dedicated coverage.)
@@ -16,7 +18,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       shared_subject :_tuple do
         _o = build_root_ACS
-        st = Home_::Reflection::NodeReferenceStreamer.via_ACS( _o ).call
+        st = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS( _o ).call
         _x = st.gets
         _xx = st.gets
         _xxx = st.gets and fail

@@ -1,8 +1,8 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  module Interpretation
+  class Magnetics::QualifiedComponent_via_Value_and_Association
 
-    class Build_value  # result is a qk
+    # #open [#008.D] - could use a modern interface
       # -
         # [#006.A] "the universal component builder" explains everything
 
@@ -49,7 +49,7 @@ module Skylab::Autonomous_Component_System
           @_oes_p_p = if @emission_handler_builder
             @emission_handler_builder
           else
-            Build_emission_handler_builder_[ @association, @ACS ]
+            Home_::Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS[ @association, @ACS ]
           end
 
           if @_explicit_method_name
@@ -132,6 +132,5 @@ module Skylab::Autonomous_Component_System
           "undefined method `#{ m }` for #{ _ }"
         end
       # -
-    end
   end
 end

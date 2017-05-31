@@ -1,8 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  # ->
-
-    module Modalities::JSON::When_
+  module JSON_Magnetics::Via_
 
       Shape = Common_::Event.prototype_with(
 
@@ -35,6 +33,5 @@ module Skylab::Autonomous_Component_System
         end
         UNABLE_
       end
-    end
-  # -
+  end
 end

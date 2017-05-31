@@ -1,9 +1,16 @@
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  module Modalities::JSON
+  module JSON_Magnetics
+
+    Lite = -> tcc do
+      tcc.send :define_method, :subject_magnetics_module_ do
+        Home_::JSON_Magnetics
+      end
+    end
 
     def self.[] tcc
       tcc.include self
+      Lite[ tcc ]
     end
 
     def unmarshal_from_JSON acs, cust=nil, io

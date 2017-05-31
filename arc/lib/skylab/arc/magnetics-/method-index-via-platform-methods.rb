@@ -1,6 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class Method_Index___
+  class Magnetics_::MethodIndex_via_PlatformMethods
     # 2 ->
         def initialize meth_a
 

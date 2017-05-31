@@ -1,6 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class ReaderWriter  # see [#022] for theory
+  class Magnetics::OperatorBranch_via_ACS  # see [#022] for theory
 
     # central structure for caching whatever we *do* cache about an ACS,
     # like each of our determinations of whether or not the hook-in is
@@ -91,7 +91,7 @@ module Skylab::Autonomous_Component_System
       # (no need for customization yet)
       acs = @ACS_
       -> sym do
-        m = Component_Association::Method_name_via_name_symbol[ sym ]
+        m = ComponentAssociation::Method_name_via_name_symbol[ sym ]
         if acs.respond_to? m
           m
         end
@@ -103,7 +103,7 @@ module Skylab::Autonomous_Component_System
       if @ACS_.respond_to? m
         @ACS_.send m
       else
-        Component_Association.reader_of_component_associations_by_method_in @ACS_
+        ComponentAssociation.reader_of_component_associations_by_method_in @ACS_
       end
     end
 
@@ -157,7 +157,7 @@ module Skylab::Autonomous_Component_System
         @ACS_.method m
       else
         -> do
-          Home_::Reflection::NodeReferenceStreamer.via_reader__ self
+          Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_reader self
         end
       end
     end
@@ -168,7 +168,7 @@ module Skylab::Autonomous_Component_System
     end
 
     def __build_method_index  # [#003.B] why we cache the method index
-      Home_::Method_Index___.new @ACS_.class.instance_methods false
+      Home_::Magnetics_::MethodIndex_via_PlatformMethods.new @ACS_.class.instance_methods false
     end
 
     # -
@@ -195,7 +195,7 @@ module Skylab::Autonomous_Component_System
     end
 
     def touch_component asc  # #experimental [ze] 1x
-      Home_::Interpretation::Touch[ asc, self ]  # qk
+      Home_::Magnetics::TouchComponent_via_Association_and_OperatorBranch[ asc, self ]  # result is qk
     end
 
     def qualified_knownness_of_association asc

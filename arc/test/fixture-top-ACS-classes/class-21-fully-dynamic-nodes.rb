@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
   module Fixture_Top_ACS_Classes
 
@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       class Injector
 
         def __to_comp_node_reference_streamer
-          Home_::Reflection::NodeReferenceStreamer.via_ACS self
+          Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS self
         end
 
         def __assokie__component_association

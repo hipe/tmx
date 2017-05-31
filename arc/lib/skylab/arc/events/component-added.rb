@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Event_Support_  # [#sl-155] scope stack trick
 
@@ -17,7 +17,7 @@ module Skylab::Autonomous_Component_System
       :ok, true,
 
     ) do | y, ev |
-      Express[ y, self, ev, & expression ]
+      Express_event[ y, self, ev, & expression ]
     end
 
     expression = -> do

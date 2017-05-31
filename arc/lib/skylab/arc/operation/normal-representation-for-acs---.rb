@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -65,7 +65,7 @@ module Skylab::Autonomous_Component_System
       def _do
         @_did = true
         @_ACS = remove_instance_variable( :@_ACS_proc ).call
-        @_reader = Home_::ReaderWriter.for_componentesque @_ACS
+        @_reader = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @_ACS
         NIL_
       end
 
@@ -112,7 +112,9 @@ module Skylab::Autonomous_Component_System
 
             _st = Field_::Argument_scanner_via_value[ pair.value ]  # MODALITY user value
 
-            ok = ACS_::Interpretation::Build_value.call _st, _asc, acs, & pp
+            ok = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
+              _st, _asc, acs, & pp )
+
             ok || break  # qk
             rw.write_value ok
 

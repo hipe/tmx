@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -135,7 +135,7 @@ module Skylab::Autonomous_Component_System
           _recipient_frame = ss.fetch( -3 )
           _reader_writer = _recipient_frame.reader_writer
 
-          _ev_p = Home_::Interpretation::Accept_component_change.call(
+          _ev_p = Home_::Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch.call(
             _deliveree_frame, _reader_writer
           ) do
             _nf_a = ss[ 1 .. -2 ].map( & :name )

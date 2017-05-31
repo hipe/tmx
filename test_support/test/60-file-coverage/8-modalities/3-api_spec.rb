@@ -11,11 +11,11 @@ module Skylab::TestSupport::TestSupport
 
     it "no path argument - exception" do
 
-      Autoloader_.require_sidesystem :Autonomous_Component_System
+      Autoloader_.require_sidesystem :Arc
 
       begin
         _call_API
-      rescue ::Skylab::Autonomous_Component_System::MissingRequiredParameters => e
+      rescue ::Skylab::Arc::MissingRequiredParameters => e
       end
 
       e.message =~ %r(\bmissing required parameter 'path') || fail

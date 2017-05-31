@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -54,8 +54,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def to_association_index_
-
-        ACS_::Parameter::
+        Home_::Magnetics_::
           AssociationIndex_via_PlatformParameters_and_FormalOperation.
         call(
           @_p.parameters,

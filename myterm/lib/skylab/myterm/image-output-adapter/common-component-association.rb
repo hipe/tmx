@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   module Image_Output_Adapter
 
-    class Common_Component_Association < ACS_::Component_Association
+    class Common_Component_Association < Arc_::ComponentAssociation
 
       # here's how you implement custom meta-components #[#ac-013]:
       #

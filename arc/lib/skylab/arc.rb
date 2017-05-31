@@ -1,6 +1,6 @@
 require 'skylab/common'
 
-module Skylab::Autonomous_Component_System  # notes in [#002]
+module Skylab::Arc  # notes in [#002]
   # ->
     class << self
 
@@ -73,15 +73,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
 
       def _Mutation_Session
-        ACS_::Mutation_Session___
+        Home_::Magnetics_::Mutate_via_ArgumentScanner_and_Verb_and_ACS
       end
 
       def marshal_to_JSON * io_and_options, acs, & pp
-        Home_::Modalities::JSON::Marshal[ io_and_options, acs, & pp ]
+        Home_::JSON_Magnetics::JSON_via_ACS::Marshal[ io_and_options, acs, & pp ]
       end
 
       def unmarshal_from_JSON acs, cust, io, & pp
-        Home_::Modalities::JSON::Unmarshal[ acs, cust, io, & pp ]
+        Home_::JSON_Magnetics::ACS_via_JSON::Unmarshal[ acs, cust, io, & pp ]
       end
 
       def handler_builder_for acs  # for [#006.D] the hot event model
@@ -105,8 +105,22 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end  # >>
 
+  # -- method definitions (forward declared)
+
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
+
+  # -- these (forward declared)
+
   Common_ = ::Skylab::Common
   Lazy_ = Common_::Lazy
+
+  # --
 
   module AssociationToolkit
 
@@ -307,9 +321,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         NIL
       end
 
-      def _store ivar, x   # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-        if x ; instance_variable_set ivar, x else x end
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
     qualified_component_reader_for = nil
@@ -501,7 +513,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
   end
 
     # <-
-  class Component_Association
+  class ComponentAssociation
 
     Reader_of_CAs_by_method_in___ = -> ca_class, acs do
 
@@ -514,7 +526,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           ref_sym = ca.singplur_referent_symbol
           _m = Method_name_via_name_symbol[ ref_sym ]
           _sing_ca = read_association[ _m, ref_sym ]
-          Home_::Singularize___[ _sing_ca, sym, ca, acs ]
+          Home_::Magnetics_::KnownKnownBySingularize_via_Associations_and_ACS[ _sing_ca, sym, ca, acs ]
         else
           self._COVER_ME_no_component_model
         end
@@ -581,7 +593,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     COMPOUND_CONSTRUCTOR_METHOD_ = :interpret_compound_component
 
-    class Component_Association
+    class ComponentAssociation
 
       # assume that the ACS assumes that these structures are produced
       # lazily, on-the-fly, and are not memoized to be used beyond the
@@ -906,8 +918,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
-
-
     module By_Ivars
 
       write = -> x, asc, acs do
@@ -956,18 +966,39 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Here_ = self
     end
 
-    module Reflection
+    module Magnetics
 
-      Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!
+      Model_via_Normalization = -> n11n do  # (became #stowaway at #tombstone-3.2)
+
+        -> arg_st, & oes_p_p do
+
+          # interesting conundrum .. we see it as outside of the model's
+          # scope to have to know the name etc for the thing it's validating
+          # (experimentally)..
+
+          _oes_p = oes_p_p[ nil ]  # there is no entity to link up with
+
+          _kn = Common_::KnownKnown[ arg_st.gets_one ]
+
+          n11n.normalize_knownness _kn do | * i_a, & ev_p |
+
+            # (hi.)
+            _oes_p[ * i_a, & ev_p ]
+          end
+        end
+      end
+
+      Autoloader_[ self ]
+    end
+
+    Reflection_looks_primitive = -> x do
+      # `nil` is NOT primitive by this definition!
         case x
         when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # #[#003.J] trueish
           true
         else
           false
         end
-      end
-
-      Autoloader_[ self ]
     end
 
     Stream_ = -> a, & p do
@@ -985,6 +1016,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Field_ = Home_.lib_.fields  # idiomatic name
       NIL_
     end
+
+    # --
 
     module Lib_
 
@@ -1004,13 +1037,14 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       System_lib = sidesys[ :System ]
     end
 
+    # --
+
     ACHIEVED_ = true
     Autoloader_[ ( ACS_ = self ), Common_::Without_extension[ __FILE__ ] ]
     EMPTY_A_ = [].freeze
     EMPTY_P_ = -> { NIL_ }
     Home_ = self
     KEEP_PARSING_ = true
-    Autoloader_[ Modalities = ::Module.new ]
     MONADIC_EMPTINESS_ = -> _ { NIL_ }
     NIL_ = nil
     NOTHING_ = nil
@@ -1023,6 +1057,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     y << "building blocks. the underpinnings of early \"zerk\"."
   end
 end
+# #tombstone-3.2: lost its own file
 # #history-3.1: begin spike of brand new work for [cu] revamp
 # #tombstone: `caching_method_based_reader_for`
 # #tombstone (maybe) - how parts of this file is/were structured is/was [#bs-039]

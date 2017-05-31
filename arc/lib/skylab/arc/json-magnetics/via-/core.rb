@@ -1,8 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  # ->
-
-    module Modalities::JSON::When_
+  module JSON_Magnetics::Via_
 
       def self.[] * x_a, const
 
@@ -38,6 +36,5 @@ module Skylab::Autonomous_Component_System
       end
 
       Common_::Autoloader[ self ]
-    end
-  # -
+  end
 end

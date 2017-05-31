@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] for interface - (2) arg arity & related" do
+  describe "[arc] operation - idgi - for interface - arg arity & related" do
 
     TS_[ self ]
     use :memoizer_methods

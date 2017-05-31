@@ -1,8 +1,6 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
-  class Parameter
-
-    class AssociationIndex_via_PlatformParameters_and_FormalOperation
+  class Magnetics_::AssociationIndex_via_PlatformParameters_and_FormalOperation
 
       # 1x here. [#029]
 
@@ -90,7 +88,7 @@ module Skylab::Autonomous_Component_System
               end
             end
           else
-            Here_.new_by_ do
+            Magnetics_::WriteIntoBox_via_Scanner.new_by__ do
               if edit
                 instance_exec( & edit )
               end
@@ -141,6 +139,5 @@ module Skylab::Autonomous_Component_System
 
       # ==
       # ==
-    end
   end
 end

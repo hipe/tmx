@@ -56,3 +56,5 @@ read all of [#005] about this
 the key is getting to the persist call in the survey object..
 you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functions
 [ac] pluralton persistence dedicated tests!
+finish one new magent
+finish other new magnet

@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   # the purpose of this file is exactly twofold. it is:
   #
@@ -13,7 +13,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # publicize if needed. stowaway.
 
-    Express = -> y, expag, ev, & expression do
+    Express_event = -> y, expag, ev, & expression do
       o = ev.dup
       o.extend ExpressionMethods
       o.initialize_as_expresser expag

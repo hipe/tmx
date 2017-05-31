@@ -18,7 +18,7 @@ module Skylab::Zerk
         @_stack = []
         @_push_compound_qk[ _qk ]
 
-        @_stream = Common_::Scanner.via_array args
+        @_scanner = Common_::Scanner.via_array args
         @_pp = pp
       end
 
@@ -28,7 +28,7 @@ module Skylab::Zerk
 
         begin
 
-          if @_stream.no_unparsed_exists  # (a)
+          if @_scanner.no_unparsed_exists  # (a)
             x = __finish_as_value_inquiry_to_aforementioned_component
             break
           end
@@ -55,7 +55,7 @@ module Skylab::Zerk
       def __maybe_parse_component_association  # result parse-tuple or nil
 
         asc = @_stack.last.component_association_via_token__(
-          @_stream.head_as_is )
+          @_scanner.head_as_is )
 
         if asc
           ___maybe_parse_this_component_association asc
@@ -81,8 +81,8 @@ module Skylab::Zerk
       end
 
       def ___parse_this_component_association asc
-        @_stream.advance_one
-        if @_stream.no_unparsed_exists  # (m)
+        @_scanner.advance_one
+        if @_scanner.no_unparsed_exists  # (m)
 
           _qk = @_stack.last.qualified_knownness_of_association__ asc
           _bc = _bound_call_for _qk
@@ -101,7 +101,7 @@ module Skylab::Zerk
 
       def __parse_after_compound_association asc  # (q)
 
-        o = ACS_::Interpretation::Touch.new
+        o = Arc_::Magnetics::TouchComponent_via_Association_and_OperatorBranch.new
         o.component_association = asc
         o.reader_writer = @_stack.last.reader_writer
 
@@ -119,11 +119,11 @@ module Skylab::Zerk
 
       def _parse_after_non_compound_association asc  # (p)
 
-        qk = ACS_::Interpretation::Build_value[
-          @_stream,
+        qk = Arc_::Magnetics::QualifiedComponent_via_Value_and_Association.call(
+          @_scanner,
           asc,
           @_stack.last.ACS,
-          & @_pp ]
+          & @_pp )
 
         if qk
 
@@ -145,7 +145,7 @@ module Skylab::Zerk
 
         _rw = @_stack.last.reader_writer
 
-        fo = _rw.read_formal_operation @_stream.head_as_is
+        fo = _rw.read_formal_operation @_scanner.head_as_is
 
         if fo
           ___when_formal_operation fo
@@ -164,12 +164,13 @@ module Skylab::Zerk
 
         ss = @_stack.dup  # ours always has compound on top
 
-        ss.push Common_::Name.via_variegated_symbol @_stream.gets_one  # (e)
+        ss.push Common_::Name.via_variegated_symbol @_scanner.gets_one  # (e)
 
         # as it does in the chart, here the (g)/(f) fork must happen
         # *before* the (j)/(h) fork because of "bespoke"s.
 
-        _pvs = ACS_::Parameter::ValueSource_for_ArgumentScanner.new @_stream
+        _pvs = Arc_::Magnetics::ParameterValueSource_via_ArgumentScanner.new @_scanner
+
 
         o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, fo_p[ ss ], & @_pp
 
@@ -178,7 +179,7 @@ module Skylab::Zerk
         bc = o.execute
 
         if bc  # (g)
-          if @_stream.no_unparsed_exists  # (j)
+          if @_scanner.no_unparsed_exists  # (j)
             Result__[ bc ]
           else
             __stop_parsing_when_extra  # (h)
@@ -205,7 +206,7 @@ module Skylab::Zerk
 
         _handler.call :error, :no_such_association do
 
-          Here_::When_no_such_association___[ @_stack, @_stream ]
+          Here_::When_no_such_association___[ @_stack, @_scanner ]
         end
 
         Stop_parsing_because_unable__[]
@@ -213,7 +214,7 @@ module Skylab::Zerk
 
       def __stop_parsing_when_extra
 
-        x = @_stream.head_as_is
+        x = @_scanner.head_as_is
         _handler.call(
           :error, :expression, :arguments_continued_past_end_of_phrase
         ) do |y|
@@ -281,7 +282,7 @@ module Skylab::Zerk
         # with the others so we mock out an ersatz assoc here experimentally
 
         def model_classifications
-          ACS_::Component_Association::LOOKS_LIKE_COMPOUND
+          Arc_::ComponentAssociation::LOOKS_LIKE_COMPOUND
         end
       end
 

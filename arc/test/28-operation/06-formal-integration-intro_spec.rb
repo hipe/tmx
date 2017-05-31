@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Arc::TestSupport
 
-  describe "[ac] operation - formal integration" do
+  describe "[arc] operation - formal integration" do
 
     TS_[ self ]
     use :memoizer_methods

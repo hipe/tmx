@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Arc
 
   module Operation
 
@@ -98,10 +98,10 @@ module Skylab::Autonomous_Component_System
 
       def _accept_phrase x_a
 
-        st = Common_::Scanner.via_array x_a
+        scn = Common_::Scanner.via_array x_a
         begin
-          x = send :"__accept__#{ st.gets_one }__meta_component", st
-          st.no_unparsed_exists ? break : redo
+          x = send :"__accept__#{ scn.gets_one }__meta_component", scn
+          scn.no_unparsed_exists ? break : redo
         end while nil
         x
       end
@@ -134,8 +134,8 @@ module Skylab::Autonomous_Component_System
 
       # --
 
-      def __accept__description__meta_component st  # #during #milestone:4
-        @description_proc = st.gets_one
+      def __accept__description__meta_component scn  # #during #milestone:4
+        @description_proc = scn.gets_one
         NIL_
       end
 
@@ -143,15 +143,15 @@ module Skylab::Autonomous_Component_System
 
       # ~ availability (e.g required-ness), and parameter-level definition
 
-      def __accept__unavailability__meta_component st
-        @unavailability_proc = st.gets_one ; nil
+      def __accept__unavailability__meta_component scn
+        @unavailability_proc = scn.gets_one ; nil
       end
 
       attr_reader :unavailability_proc  # for mode-client to implement
 
-      def __accept__parameter__meta_component st
+      def __accept__parameter__meta_component scn
 
-        ACS_::Parameter.interpret_into_via_passively__ _writable_param_box, st
+        Home_::Magnetics_::WriteIntoBox_via_Scanner.interpret_into_via_passively__ _writable_param_box, scn
         NIL_
       end
 
@@ -159,14 +159,14 @@ module Skylab::Autonomous_Component_System
         @parameter_box ||= Common_::Box.new
       end
 
-      def __accept__via_ACS_by__meta_component st
+      def __accept__via_ACS_by__meta_component scn
 
         @_saw_implementation = true
 
         @_normal_representation =
-          Here_::NormalRepresentation_for_ACS___.new st.gets_one, self
+          Here_::NormalRepresentation_for_ACS___.new scn.gets_one, self
 
-        st.assert_empty
+        scn.assert_empty
 
         NIL_
       end
@@ -330,7 +330,7 @@ module Skylab::Autonomous_Component_System
 
         # (if any of the below ivars is not set you did not set a required attribute)
 
-        o = Home_::Parameter::Normalization.begin @ss_
+        o = Home_::Magnetics_::Normalize_via_ParameterStream_and_ReadableOperatorBranch_and_WritableOperatorBranch.begin @ss_
 
         o.PVS_parameter_stream_once = @PVS_parameter_stream_once
 

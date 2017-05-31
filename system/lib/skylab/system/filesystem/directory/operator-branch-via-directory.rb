@@ -607,7 +607,7 @@ module Skylab::System
       # ==
 
       ACS_ = Lazy_.call do
-      Home_.lib_.autonomous_component_system
+      Home_.lib_.arc
       end
 
       # ==

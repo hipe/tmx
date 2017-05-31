@@ -238,8 +238,8 @@ module Skylab::Basic  # introduction at [#020]
 
   Lazy_ = Common_::Lazy
 
-  Assume_ACS_ = Lazy_.call do
-    ACS_ = ::Skylab::Autonomous_Component_System
+  Require_arc_const_ = Lazy_.call do
+    ARC_ = ::Skylab::Arc
     NIL_
   end
 
@@ -315,7 +315,7 @@ module Skylab::Basic  # introduction at [#020]
       ::Treetop
     end
 
-    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Arc = sidesys[ :Arc ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]

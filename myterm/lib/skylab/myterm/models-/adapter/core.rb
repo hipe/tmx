@@ -104,7 +104,7 @@ module Skylab::MyTerm
 
         @_impl = lt.module.new self
         @_loadable_reference = lt
-        @_rw = ACS_::ReaderWriter.for_componentesque @_impl
+        @_rw = Arc_::Magnetics::OperatorBranch_via_ACS.for_componentesque @_impl
         self
       end
 
