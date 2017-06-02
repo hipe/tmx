@@ -105,11 +105,15 @@ module Skylab::Arc::TestSupport
 
     # --
 
-    def clean_expag_
+    def expag_for_modernity_
+      Autoloader_.require_sidesystem( :Zerk )::No_deps[]::API_InterfaceExpressionAgent.instance
+    end
+
+    def expag_for_cleanliness_
       Home_.lib_.brazen::API.expression_agent_instance
     end
 
-    def codifying_expag_
+    def expag_for_codifying__
       Common_::Event.codifying_expression_agent_instance
     end
 

@@ -118,11 +118,17 @@ module Skylab::Arc  # notes in [#002]
   # -- these (forward declared)
 
   Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
 
   # --
 
   module AssociationToolkit
+
+    Autoloader_[ self ]
+    lazily :Entity_by_Simplicity_via_PersistablePrimitiveNameValuePairStream do |c|
+      Home_::Magnetics::QualifiedComponent_via_Value_and_Association.const_get c, false
+    end
 
     ekp = -> do
       Home_.lib_.fields::CommonAssociation::EntityKillerParameter
@@ -959,8 +965,6 @@ module Skylab::Arc  # notes in [#002]
       end
     end
 
-    Autoloader_ = Common_::Autoloader
-
     module Operation
       Autoloader_[ self ]
       Here_ = self
@@ -991,6 +995,15 @@ module Skylab::Arc  # notes in [#002]
       Autoloader_[ self ]
     end
 
+    module Magnetics_
+
+      Autoloader_[ self ]
+
+      lazily :ModelIndexBySimplicity_via_ModelClass do |c|
+        Home_::Magnetics::QualifiedComponent_via_Value_and_Association.const_get c, false
+      end
+    end
+
     Reflection_looks_primitive = -> x do
       # `nil` is NOT primitive by this definition!
         case x
@@ -1016,6 +1029,10 @@ module Skylab::Arc  # notes in [#002]
       Field_ = Home_.lib_.fields  # idiomatic name
       NIL_
     end
+
+    # --
+
+    RuntimeError = ::Class.new ::RuntimeError
 
     # --
 

@@ -44,7 +44,7 @@ module Skylab::Arc::TestSupport
     end
 
     def expression_agent_for_expect_emission
-      codifying_expag_
+      expag_for_codifying__
     end
 
     def subject_root_ACS_class

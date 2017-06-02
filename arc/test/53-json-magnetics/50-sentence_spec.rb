@@ -144,7 +144,7 @@ module Skylab::Arc::TestSupport
     end
 
     def expression_agent_for_expect_emission
-      clean_expag_
+      expag_for_cleanliness_
     end
 
     def subject_root_ACS_class
