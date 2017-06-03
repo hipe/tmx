@@ -128,7 +128,7 @@ to `require` this gem, you simply exchange the dash for a slash:
 
 
 
-   • an "emission" is based on a [#ca-045] similar idea elsewhere:
+   • an "emission" is based on a [#co-003.2] similar idea elsewhere:
 
          +----------------------------+
          |          emission          |

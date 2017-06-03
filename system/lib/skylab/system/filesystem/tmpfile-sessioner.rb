@@ -2,7 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    class TmpfileSessioner < SimpleModel_
+    class TmpfileSessioner < Common_::SimpleModel
 
       # ->
 

@@ -274,7 +274,6 @@ module Skylab::System
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   NOTHING_ = nil
-  SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'

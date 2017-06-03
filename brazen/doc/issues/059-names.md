@@ -52,7 +52,7 @@ alongside "pairs" and "unqualified knownnesses".
 
 
 
-## a pair :[#ca-055]
+## a pair
 
 (this used to be a simple, dedicates struct; but is now under the [#co-004] stack)
 

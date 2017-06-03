@@ -4,7 +4,7 @@ module Skylab::System
 
     # ==
 
-    class DownstreamProxy < SimpleModel_
+    class DownstreamProxy < Common_::SimpleModel
 
       # the final, favorite of many #[#039.1] similar proxies
 

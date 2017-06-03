@@ -26,7 +26,7 @@ module Skylab::DocTest
     end  # >>
   end
 
-  default_handler = -> * i_a, & ev_p do  # #[#co-045]
+  default_handler = -> * i_a, & ev_p do  # this is probably nearest to an #[#co-045], but not ideal
     if :error == i_a.first
       if :expression == i_a[1]
         raise ev_p[ "" ]  # eew

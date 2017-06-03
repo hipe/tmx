@@ -23,6 +23,30 @@ module Skylab::System::TestSupport
         _state_one_after_not_empty_check.first && fail
       end
 
+      it "hunk stream - make sense (regression)" do
+
+        # (just as a fun aside of a case study, we accidentally had `||=`
+        # when we meant `!=` and so every hunk never had any more than
+        # one line; but remarkably this nonetheless worked "fine")
+        # #history-A.1
+
+        _diff = _state_one_after_not_empty_check.last
+
+        st = _diff.to_hunk_stream
+        _h1 = st.gets
+        _h2 = st.gets
+        _h3 = st.gets
+        _h4 = st.gets
+        _h4 && fail
+
+        _h1.category_symbol___ == :diff_header || fail
+        _h2.category_symbol___ == :hunk || fail
+        _h3.category_symbol___ == :hunk || fail
+
+        _h2.instance_variable_get( :@_runs ).length == 3 || fail
+        _h3.instance_variable_get( :@_runs ).length == 4 || fail
+      end
+
       it "back to line stream again (almost byte-per-byte)" do
         _guy = _state_one_after_not_empty_check.last
         act_st = _guy.to_line_stream
@@ -107,3 +131,4 @@ module Skylab::System::TestSupport
     end
   end
 end
+# :#history-A.1 (as referenced)

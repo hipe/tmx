@@ -67,6 +67,8 @@ module Skylab::TanMan
 
         _listener = -> * sym_a, & ev_p do
 
+          # (half of a #[#co-045])
+
           if :error == sym_a.first
             raise ev_p[].to_exception
           else

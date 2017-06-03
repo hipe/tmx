@@ -63,6 +63,9 @@ module Skylab::System
           @stack = [] ; @tops = []
           super
           @on_event_selectively ||= -> i, *, & ev_p do
+
+            # (half of a #[#co-045])
+
             if :error == i
               raise ev_p[].to_exception
             end

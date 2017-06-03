@@ -247,6 +247,9 @@ module Skylab::System
         def finish_when_paginated
           self
         end
+        def category_symbol___
+          :diff_header
+        end
       end
 
       class Hunk___
@@ -273,7 +276,7 @@ module Skylab::System
 
         def _add sym, md
           run = @_runs.last
-          if run.category_symbol ||= sym
+          if run.category_symbol != sym
             run.close
             run = yield.new
             @_runs.push run
@@ -295,6 +298,10 @@ module Skylab::System
 
         def to_run_stream
           Stream_[ @_runs ]
+        end
+
+        def category_symbol___
+          :hunk
         end
       end
 

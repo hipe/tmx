@@ -169,7 +169,7 @@ named like local procs, that is:
 
 
 
-## actor patterns :[#ca-045]
+## actor patterns
 
 sometimes only a name and some documentation makes the difference
 between a perceived smell and a local design pattern. we have

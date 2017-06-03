@@ -84,6 +84,7 @@ module Skylab::Fields
         if @on_event_selectively
           @on_event_selectively.call( * i_a, & ev_p )
         elsif :error == i_a.first
+          # (half of a [#co-045])
           raise ev_p[].to_exception
         end
       end

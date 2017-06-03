@@ -1225,7 +1225,7 @@ module Skylab::Common::TestSupport
       end
     end ; end
 
-    # (the class graph below is vaguely tracked by :[#045]., has mentees)
+    # (the class graph below is vaguely tracked by #[#003.2], has mentees)
 
     # ==
 

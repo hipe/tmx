@@ -30,20 +30,19 @@ module Skylab::System
       end
 
       def by
-        Diff_via___.define do |o|
+        Diff_via___.call_by do |o|
           yield o
           o.tmpfile_sessioner = @__tmpfile_sessioner
-        end.execute
+        end
       end
     end
 
     # ==
 
-    class Diff_via___ < SimpleModel_
+    class Diff_via___ < Common_::MagneticBySimpleModel
 
       def initialize
-        yield self
-        # can't freeze
+        super  # hi.
       end
 
       def left_line_stream= st
