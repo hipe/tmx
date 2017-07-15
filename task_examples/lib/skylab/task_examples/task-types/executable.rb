@@ -23,14 +23,14 @@ module Skylab::TaskExamples
 
     def ___when_not_in_PATH
       x = @executable
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "not in PATH: #{ x }"
       end
       UNABLE_
     end
 
     def __when_in_PATH path
-      @_oes_p_.call :info, :expression do |y|
+      @_listener_.call :info, :expression do |y|
         y << "#{ path }"
       end
       ACHIEVED_

@@ -46,7 +46,7 @@ module Skylab::TaskExamples
 
     def ___when_version_no ver_s, ver_r
 
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
 
         y << "version mismatch: needed #{ ver_r } had #{ ick ver_s }"
       end
@@ -55,7 +55,7 @@ module Skylab::TaskExamples
 
     def __when_version_yes ver_s, ver_r
 
-      @_oes_p_.call :info, :expression do |y|
+      @_listener_.call :info, :expression do |y|
 
         y << "version ok: version #{ ver_s } is in range #{ ver_r }"
       end
@@ -66,7 +66,7 @@ module Skylab::TaskExamples
 
       s = @must_be_in_range
       if s
-        Home_::VersionRange.build s, & @_oes_p_
+        Home_::VersionRange.build s, & @_listener_
       else
         ___when_no_range_term
       end
@@ -74,7 +74,7 @@ module Skylab::TaskExamples
 
     def ___when_no_range_term
       msg = ___say_no_term
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << msg
       end
       UNABLE_
@@ -105,7 +105,7 @@ module Skylab::TaskExamples
 
     def __do_show_version ver_s, did_use_regex
 
-      @_oes_p_.call :payload, :expression do |y|
+      @_listener_.call :payload, :expression do |y|
 
         headerize = -> s do
           "#{ hdr 'version' } #{ s }"
@@ -149,7 +149,7 @@ module Skylab::TaskExamples
         if md
           [ md[ 1 ], true ]
         else
-          @_oes_p_.call :error, :expression do |y|
+          @_listener_.call :error, :expression do |y|
             y << "using provided regex, couldn't parse version from #{ ick s }"
           end
           UNABLE_

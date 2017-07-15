@@ -21,7 +21,7 @@ module Skylab::TaskExamples
 
       p = Home_::Library_::Shellwords.method :shellescape
 
-      @_oes_p_.call :info, :expression, :fake_shell do |y|
+      @_listener_.call :info, :expression, :fake_shell do |y|
         y << "mv #{ p[ source ] } #{ p[ dest ] }"
       end
 

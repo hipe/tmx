@@ -1,19 +1,16 @@
 class Skylab::Task
 
-  class Magnetics_::Index_via_ParameterBox_and_TargetTask
-
-    def initialize & oes_p
-      @_oes_p = oes_p
-    end
+  class Magnetics_::Index_via_ParameterBox_and_TargetTask < Common_::MagneticBySimpleModel  # 2x
 
     attr_writer(
+      :listener,
       :target_task,
       :parameter_box,
     )
 
     def execute
 
-      index = Index___.new @target_task, & @_oes_p
+      index = Index___.new @target_task, & @listener
 
       state_h = {}
 
@@ -71,7 +68,7 @@ class Skylab::Task
         Home_::Events::CircularDependency.build_via__ task, index
       end
 
-      oes_p = @_oes_p
+      oes_p = @listener
       if oes_p  # #[#ca-066]
         oes_p.call :error, :circular_dependency do
           _ = build[]
@@ -99,31 +96,31 @@ class Skylab::Task
 
         @_oes_p = p
 
-        @dependants_on = ::Hash.new { |h, k| h[k] = [] }
+        @dependers_via_dependee = ::Hash.new { |h, k| h[k] = [] }
 
-        @_dependees_of_box = Common_::Box.new
+        @box_of_dependees_via_depender = Common_::Box.new
       end
 
       def add_subscription dependant_sym, dependee_sym
 
-        @dependants_on[ dependee_sym ].push dependant_sym
+        @dependers_via_dependee[ dependee_sym ].push dependant_sym
 
-        @_dependees_of_box.touch_array_and_push dependant_sym, dependee_sym
+        @box_of_dependees_via_depender.touch_array_and_push dependant_sym, dependee_sym
 
         NIL_
       end
 
       def receive_one_base_case_task_symbol sym
 
-        @dependants_on[ :_NOTHING_ ].push sym
-        @_dependees_of_box.touch_array sym
+        @dependers_via_dependee[ :_NOTHING_ ].push sym
+        @box_of_dependees_via_depender.touch_array sym
         NIL_
       end
 
       def finish
 
         # remove_instance_variable :@box_module
-        @dependants_on.default_proc = nil
+        @dependers_via_dependee.default_proc = nil
         self
       end
 
@@ -131,15 +128,12 @@ class Skylab::Task
         @_oes_p
       end
 
-      def dependees_of_box_
-        @_dependees_of_box
-      end
-
       attr_reader(
         :cache_box,
         :box_module,
 
-        :dependants_on,
+        :box_of_dependees_via_depender,
+        :dependers_via_dependee,
       )
     end
   end

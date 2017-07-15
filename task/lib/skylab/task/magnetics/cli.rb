@@ -84,6 +84,31 @@ class Skylab::Task
           o.execute
         end
       end
+
+      def __task_viz__component_operation
+
+        # (bridge this old-timey guy..)
+        o = Lazy_.call do
+          Home_::Magnetics_::Visualization_via_Tasks
+        end
+
+        yield :description, -> y do
+          o[].describe_into_under__ y, self
+        end
+
+        yield :parameter, :require, :optional,
+          :description, -> y do
+            y << "a \"require\" path (probably your gem or similar)"
+          end
+
+        -> target_task, require, & listener do
+          o[].call_by do |o|
+            o.target_task = target_task
+            o.require = require
+            o.listener = listener
+          end
+        end
+      end
     end
 
     # ==

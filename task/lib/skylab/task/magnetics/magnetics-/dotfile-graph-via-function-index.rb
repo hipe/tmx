@@ -416,12 +416,6 @@ class Skylab::Task
       CustomThingDing___ = ::Struct.new :jerby_derby, :this_one_string
 
       # ==
-
-      EMPTY_P_ = -> do
-        NOTHING_
-      end
-
-      # ==
       # ==
     end
   end

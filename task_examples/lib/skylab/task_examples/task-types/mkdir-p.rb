@@ -38,7 +38,7 @@ module Skylab::TaskExamples
 
       @_result = UNABLE_
 
-      @_oes_p_.call :error, :path_too_deep do
+      @_listener_.call :error, :path_too_deep do
         ev
       end
       UNRELIABLE_
@@ -56,7 +56,7 @@ module Skylab::TaskExamples
 
     def __on__creating_directory__ ev
 
-      @_oes_p_.call :info, :creating_directory do
+      @_listener_.call :info, :creating_directory do
         ev
       end
       UNRELIABLE_

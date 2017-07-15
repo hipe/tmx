@@ -1,9 +1,9 @@
 class Skylab::Task
 
-  class Magnetics_::Execution_via_ParameterBox_and_TargetTask
+  class Magnetics_::Execution_via_ParameterBox_and_TargetTask  # 1x
 
-    def initialize & oes_p
-      @_oes_p = oes_p
+    def initialize & p
+      @listener = p
       @parameter_box = nil
     end
 
@@ -26,29 +26,21 @@ class Skylab::Task
 
     def __resolve_index
 
-      o = Home_::Magnetics_::Index_via_ParameterBox_and_TargetTask.new( & @_oes_p )
+      _ = Home_::Magnetics_::Index_via_ParameterBox_and_TargetTask.call_by do |o|
       o.parameter_box = @parameter_box
       o.target_task = @target_task
-      index = o.execute
-      if index
-        @_index = index
-        ACHIEVED_
-      else
-        index
+        o.listener = @listener
       end
+      _store :@_index, _
     end
 
     def __resolve_plan
 
-      o = Home_::Magnetics_::Plan_via_Index.new( & @_oes_p )
+      _ = Home_::Magnetics_::Plan_via_Index.call_by do |o|
       o.index = @_index  # remove_instance_variable :@_index
-      plan = o.execute
-      if plan
-        @_plan = plan
-        ACHIEVED_
-      else
-        plan
+        o.listener = @listener
       end
+      _store :@_plan, _
     end
 
     def __do_magic
@@ -114,5 +106,10 @@ class Skylab::Task
         task.execute
       end
     end
+
+    define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+    # ==
+    # ==
   end
 end

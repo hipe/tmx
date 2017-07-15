@@ -29,7 +29,7 @@ module Skylab::TaskExamples
       _eek_message = /\A(?:(?! @).)+/.match( e.message )[ 0 ]
       path = @executable_file
 
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "#{ _eek_message } - #{ pth path }"
       end
       UNABLE_
@@ -47,7 +47,7 @@ module Skylab::TaskExamples
     def __when_executable
 
       path = @executable_file
-      @_oes_p_.call :info, :expression do |y|
+      @_listener_.call :info, :expression do |y|
         y << "ok, executable - #{ pth path }"
       end
       ACHIEVED_
@@ -56,7 +56,7 @@ module Skylab::TaskExamples
     def ___when_not_executable
 
       path = @executable_file
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "exists but is not executable - #{ pth path }"
       end
       UNABLE_

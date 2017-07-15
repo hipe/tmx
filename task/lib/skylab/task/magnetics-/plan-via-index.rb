@@ -1,6 +1,6 @@
 class Skylab::Task
 
-  class Magnetics_::Plan_via_Index
+  class Magnetics_::Plan_via_Index < Common_::MagneticBySimpleModel
 
     # we're calling this the third known implementation of [#005] pathfinding.
 
@@ -30,7 +30,7 @@ class Skylab::Task
     # this.) repeat this process until there are no more nodes in the
     # graph.
 
-    def initialize & p
+    def listener= p
       @_oes_p = p
     end
 
@@ -40,8 +40,8 @@ class Skylab::Task
 
     def execute
 
-      outie = @index.dependees_of_box_.h_
-      innie = @index.dependants_on
+      outie = @index.box_of_dependees_via_depender.h_
+      innie = @index.dependers_via_dependee
 
       subscribers = {}
       innie.each_pair do | k, a |

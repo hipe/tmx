@@ -50,7 +50,7 @@ module Skylab::TaskExamples
 
         on.err do |s|  # usually just informational output
           err.write s
-          @_oes_p_.call :info, :expression do |y|
+          @_listener_.call :info, :expression do |y|
             y << s
           end
         end
@@ -73,7 +73,7 @@ module Skylab::TaskExamples
 
       if err_s
 
-        @_oes_p_.call :error, :expression do |y|
+        @_listener_.call :error, :expression do |y|
           y << "Failed to unzip: #{ err_s }"
         end
 
@@ -82,7 +82,7 @@ module Skylab::TaskExamples
 
         if seconds >= SIGNIFICANT_SECONDS___
 
-          @_oes_p_.call :info, :expression do |y|
+          @_listener_.call :info, :expression do |y|
             y << "read #{ bytes } bytes in #{ seconds } seconds."
           end
         end
@@ -103,7 +103,7 @@ module Skylab::TaskExamples
         buff.concat esc[ s ]
       end
 
-      @_oes_p_.call :info, :expression, :system_command do |y|
+      @_listener_.call :info, :expression, :system_command do |y|
         y << buff
       end
 
@@ -129,7 +129,7 @@ module Skylab::TaskExamples
 
       path = @_destination_directory
 
-      @_oes_p_.call :info, :expression do |y|
+      @_listener_.call :info, :expression do |y|
         y << "exists, won't tar extract: #{ pth path }"
       end
       NIL_
@@ -145,7 +145,7 @@ module Skylab::TaskExamples
 
     def ___when_zero_length_file
       path = @unzip_tarball
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "tarball is zero length - #{ pth path }"
       end
       UNABLE_
@@ -170,7 +170,7 @@ module Skylab::TaskExamples
       _eek = /\A(?:(?! @).)+/.match( e.message )[ 0 ]
       path = @unzip_tarball
 
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "#{ _eek } - #{ pth path }"
       end
       UNABLE_

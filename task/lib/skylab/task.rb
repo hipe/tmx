@@ -161,6 +161,15 @@ class Skylab::Task
       def name
         self.class._task_name
       end
+
+      DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+        if x
+          instance_variable_set ivar, x ; true
+        else
+          x
+        end
+      end
+
     # -
   # -
 
@@ -371,6 +380,7 @@ class Skylab::Task
   ACHIEVED_ = true
   CLI = nil  # for host
   EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
   Home_ = self
   IDENTITY_ = -> x { x }

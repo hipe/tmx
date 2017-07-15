@@ -179,13 +179,7 @@ class Skylab::Task
         NIL_
       end
 
-      def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-        if x
-          instance_variable_set ivar, x ; true
-        else
-          x
-        end
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       def name_symbol
         @_name_symbol

@@ -28,7 +28,7 @@ class Skylab::Task
 
         _streamer = -> do
 
-          bx = index.dependees_of_box_
+          bx = index.box_of_dependees_via_depender
           a = bx.a_
           h = bx.h_
 

@@ -18,7 +18,7 @@ module Skylab::TaskExamples
 
       from = @from ; to = @move_to
 
-      @_oes_p_.call :info, :expression do |y|
+      @_listener_.call :info, :expression do |y|
         y << "mv #{ pth from } #{ pth to }"
       end
 
@@ -57,7 +57,7 @@ module Skylab::TaskExamples
 
     def __when_not_exist path
 
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "file not found - #{ pth path }"
       end
 
@@ -66,7 +66,7 @@ module Skylab::TaskExamples
 
     def __when_exist path
 
-      @_oes_p_.call :error, :expression do |y|
+      @_listener_.call :error, :expression do |y|
         y << "file exists - #{ pth path }"
       end
 

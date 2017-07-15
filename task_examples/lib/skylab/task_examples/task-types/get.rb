@@ -46,7 +46,7 @@ module Skylab::TaskExamples
 
       url, dest_path = unit.to_a
 
-      @_oes_p_.call :info, :expression, :fake_shell do |y|
+      @_listener_.call :info, :expression, :fake_shell do |y|
         _ = Home_::Library_::Shellwords.shellescape dest_path
         y << "curl -o #{ _ } #{ url }"  # or "wget -O .."
       end
@@ -78,7 +78,7 @@ module Skylab::TaskExamples
     THIS_KEY___ = 'last-modified'
 
     def ___when_etc h, unit
-      @_oes_p_.call :error, :expression, :"404" do |y|
+      @_listener_.call :error, :expression, :"404" do |y|
         y << "File not found: #{ unit.url }"  # look sort of like adsf
       end
     end
@@ -134,7 +134,7 @@ module Skylab::TaskExamples
     end
 
     def __express_zero_length_file unit
-      @_oes_p_.call :info, :expression, :overwriting_empty_file do |y|
+      @_listener_.call :info, :expression, :overwriting_empty_file do |y|
         y << "had zero byte file (strange), overwriting - #{
           }#{ pth unit.destination_path }"
       end
