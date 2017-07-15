@@ -118,6 +118,7 @@ module Skylab::Permute
   EMPTY_A_ = []
   KEEP_PARSING_ = true
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   Home_ = self
   UNABLE_ = false

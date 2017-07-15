@@ -276,6 +276,7 @@ module Skylab::TestSupport  # :[#021].
   NEWLINE_ = "\n".freeze
   NOTHING_ = nil
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   stowaway :IO, 'io/spy--'
   SPACE_ = ' '.freeze
   UNABLE_ = false

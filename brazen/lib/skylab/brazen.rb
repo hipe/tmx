@@ -249,6 +249,8 @@ module Skylab::Brazen
   NAME_SYMBOL = :name
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   stowaway :TestSupport, 'test/test-support'

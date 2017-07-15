@@ -190,6 +190,7 @@ module Skylab::GitViz
   Name_ = Common_::Name
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   MONADIC_EMPTINESS_ = -> _ {}
   SPACE_ = ' '.freeze
   UNABLE_ = false

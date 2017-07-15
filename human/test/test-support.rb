@@ -93,6 +93,7 @@ module Skylab::Human::TestSupport
   Lazy_ = Home_::Lazy_
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = Home_::NOTHING_
   TS_ = self
   UNRELIABLE_ = :_unre_

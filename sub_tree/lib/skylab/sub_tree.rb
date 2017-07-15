@@ -102,6 +102,7 @@ module Skylab::SubTree
   stowaway :Library_, 'lib-'
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   SEP_ = ::File::SEPARATOR
   Home_ = self
   SPACE_ = ' '.freeze

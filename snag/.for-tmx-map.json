@@ -1,6 +1,7 @@
 {
-  "after":"git_viz",
-  "category":"actually useful",
+  "after": "git_viz",
+  "category": "actually useful",
   "framework": "[br]",
-  "is potentially interesting application": true
+  "is potentially interesting application": true,
+  "sigil": "sn"
 }

@@ -222,6 +222,8 @@ module Skylab::Zerk  # intro in [#001] README
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   SUCCESS_EXITSTATUS = 0
   SPACE_ = ' '

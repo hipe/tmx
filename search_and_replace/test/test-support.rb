@@ -266,6 +266,7 @@ module Skylab::SearchAndReplace::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   NOTHING_ = nil
   TS_ = self
 end

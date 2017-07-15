@@ -1,6 +1,7 @@
 {
-  "after":"tabular",
-  "category":"more general libs",
-  "doc test manifest":".doc-test-manifest.list",
-  "is lib":true
+  "after": "tabular",
+  "category": "more general libs",
+  "doc test manifest": ".doc-test-manifest.list",
+  "is lib": true,
+  "sigil": "br"
 }

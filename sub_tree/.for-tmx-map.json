@@ -1,6 +1,7 @@
 {
-  "after":"system",
-  "category":"more general libs",
+  "after": "system",
+  "category": "more general libs",
   "framework": "[br]",
-  "is lib":true
+  "is lib": true,
+  "sigil": "st"
 }

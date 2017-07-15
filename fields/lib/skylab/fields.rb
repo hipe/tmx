@@ -1168,6 +1168,9 @@ module Skylab::Fields
   Lazy_ = Common_::Lazy
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    TRUE = true
+    FALSE = false
   NILADIC_TRUTH_ = -> { TRUE }
   NOTHING_ = nil
   SPACE_ = ' '

@@ -173,6 +173,8 @@ module Skylab::System::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = Home_::NIL_
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = Home_::NOTHING_
   TS_ = self
 end

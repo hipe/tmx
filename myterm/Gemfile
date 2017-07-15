@@ -1,1 +1,3 @@
 # (this Gemfile has been reverted to empty for transition)
+
+self._NEVER_CALLED__readme__  # [#tmx-002.4] explains why no bundler yet

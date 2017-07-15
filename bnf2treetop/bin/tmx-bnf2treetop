@@ -1065,7 +1065,7 @@ module Skylab::BNF2Treetop
 
 end
 
-if $PROGRAM_NAME == __FILE__
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
 
   x = Skylab::BNF2Treetop::CLI.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]

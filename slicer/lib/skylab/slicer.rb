@@ -59,6 +59,7 @@ module Skylab::Slicer
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   Home_ = self
   UNABLE_ = false
 end

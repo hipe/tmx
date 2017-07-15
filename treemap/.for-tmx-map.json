@@ -1,5 +1,6 @@
 {
-  "after":"permute",
-  "category":"toy",
-  "framework": "[br]"
+  "after": "permute",
+  "category": "toy",
+  "framework": "[br]",
+  "sigil": "tr"
 }

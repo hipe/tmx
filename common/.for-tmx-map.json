@@ -1,6 +1,7 @@
 {
-  "category":"more general libs",
-  "doc test manifest":".doc-test-manifest.list",
+  "category": "more general libs",
+  "doc test manifest": ".doc-test-manifest.list",
   "framework": "[br]",
-  "is lib": true
+  "is lib": true,
+  "sigil": "co"
 }

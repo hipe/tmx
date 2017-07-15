@@ -307,7 +307,7 @@ program = -> i, o, e, pn_s_a, argv do
   cls.new( i, o, e, pn_s_a, argv ).execute
 end
 
-if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
+if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab__Zerk__OneOffs::Git_unrename = program  # #[#ze-063.1] mountable one-off

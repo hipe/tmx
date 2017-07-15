@@ -648,7 +648,7 @@ program = -> argv, stdin, stdout, stderr, pn_s_a do
   p.call
 end
 
-if __FILE__ == $PROGRAM_NAME   # (or broader)
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab__Zerk__OneOffs::Git_breakout = program  # #[#ze-063.1] mountable one-off

@@ -1064,6 +1064,8 @@ module Skylab::Arc  # notes in [#002]
     KEEP_PARSING_ = true
     MONADIC_EMPTINESS_ = -> _ { NIL_ }
     NIL_ = nil
+    NIL = nil  # open [#sli-016.C]
+      FALSE = false ; TRUE = true
     NOTHING_ = nil
     SPACE_ = ' '.freeze
     UNABLE_ = false

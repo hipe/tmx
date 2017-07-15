@@ -1,5 +1,6 @@
 {
-  "after":"git",
-  "category":"toy",
-  "framework":"[br]"
+  "after": "git",
+  "category": "toy",
+  "framework": "[br]",
+  "sigil": "sl"
 }

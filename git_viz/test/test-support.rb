@@ -231,5 +231,6 @@ module Skylab::GitViz::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   NIL_ = nil
+  FALSE = false  # #open [#sli-116.C]
   TS_ = self
 end

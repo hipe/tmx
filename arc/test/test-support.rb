@@ -233,6 +233,7 @@ module Skylab::Arc::TestSupport
   Home_ = ::Skylab::Arc
   EMPTY_S_ = ''
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   TS_ = self
   UNABLE_ = false
 end

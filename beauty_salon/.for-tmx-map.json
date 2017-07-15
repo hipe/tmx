@@ -1,5 +1,6 @@
 {
-  "after":"treemap",
-  "category":"legacy ad-hoc util",
-  "framework": "[br]"
+  "after": "treemap",
+  "category": "legacy ad-hoc util",
+  "framework": "[br]",
+  "sigil": "bs"
 }

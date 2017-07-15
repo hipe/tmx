@@ -2152,6 +2152,7 @@ module Skylab::Common
   KEEP_PARSING_ = true
   IDENTITY_ = -> x { x }
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   NILADIC_TRUTH_ = -> { true }
   NOTHING_ = nil
 

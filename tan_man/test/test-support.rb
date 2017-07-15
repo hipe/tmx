@@ -513,6 +513,7 @@ module Skylab::TanMan::TestSupport
   FIXTURES_ENTRY_ = 'fixtures'
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   NOTHING_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self

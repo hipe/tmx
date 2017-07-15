@@ -1,6 +1,7 @@
 {
-  "after":"code_metrics",
-  "category":"bigger",
+  "after": "code_metrics",
+  "category": "bigger",
   "framework": "[br]",
-  "is potentially interesting application": true
+  "is potentially interesting application": true,
+  "sigil": "cu"
 }

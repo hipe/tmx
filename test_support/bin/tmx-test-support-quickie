@@ -37,7 +37,7 @@ program = Skylab::TestSupport::Quickie::API::CLI_for_RecursiveRunner
 # tmx "mounted one-offs". the reason we draw attention to it here is because
 # it will also hold relevance later :[#007.C]
 
-if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
+if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
 
   _d = program.call ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 

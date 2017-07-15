@@ -211,6 +211,8 @@ module Skylab::TanMan
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    FALSE = false ; TRUE = true
   NIL_AS_FAILURE_ = nil
   NOTHING_ = nil
   SPACE_ = ' '.freeze

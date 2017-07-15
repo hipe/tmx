@@ -351,7 +351,7 @@ class Skylab::Git_citxt  # #[#ze-063.1] mountable one-off
   NIL_ = nil
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   Skylab::Git_citxt.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
 else
   Skylab__Zerk__OneOffs::Git_citxt = Skylab::Git_citxt  # #[#ze-063.1] mountable one-off

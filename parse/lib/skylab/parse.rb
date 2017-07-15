@@ -104,6 +104,7 @@ module Skylab::Parse  # see [#001]
     KEEP_PARSING_ = true
     Lib_ = nil # for [sl]
     NIL_ = nil
+    NIL = nil  # open [#sli-016.C]
     Home_ = self
     UNABLE_ = false
   # <-

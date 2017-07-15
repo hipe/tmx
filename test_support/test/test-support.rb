@@ -219,6 +219,8 @@ module Skylab::TestSupport::TestSupport
   EMPTY_A_ = Common_::EMPTY_A_
   EMPTY_S_ = Common_::EMPTY_S_
   Lazy_ = Common_::Lazy
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   TS_ = self
   UNABLE_ = false

@@ -1,5 +1,6 @@
 {
-  "after":"human",
-  "category":"more general libs",
-  "is lib":true
+  "after": "human",
+  "category": "more general libs",
+  "is lib": true,
+  "sigil": "ze"
 }

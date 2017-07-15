@@ -272,6 +272,8 @@ module Skylab::System
   KEEP_PARSING_ = true
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    FALSE = false ; TRUE = true
   NILADIC_TRUTH_ = -> { true }
   NOTHING_ = nil
   SPACE_ = ' '.freeze

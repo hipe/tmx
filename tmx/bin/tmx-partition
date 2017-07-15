@@ -437,7 +437,7 @@ program = -> i, o, e, pn_s_a, argv do
   cls.new( i, o, e, pn_s_a, argv ).execute
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#020.5]
 
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else

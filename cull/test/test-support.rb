@@ -187,6 +187,7 @@ module Skylab::Cull::TestSupport
   Common___ = ::Skylab::Common
   DASH_ = Home_::DASH_
   NEWLINE_ = "\n"
+  NIL = nil  # open [#sli-016.C]
   UNDERSCORE_ = Home_::UNDERSCORE_
   TS_ = self
 end

@@ -179,6 +179,8 @@ module Skylab::Brazen::TestSupport
   EMPTY_S_ = ''.freeze
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   TS_ = self

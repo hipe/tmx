@@ -1,6 +1,7 @@
 {
-  "after":"task_examples",
-  "category":"bigger",
+  "after": "task_examples",
+  "category": "bigger",
   "framework": "[br]",
-  "is potentially interesting application": true
+  "is potentially interesting application": true,
+  "sigil": "cm"
 }

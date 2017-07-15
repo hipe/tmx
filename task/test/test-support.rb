@@ -169,6 +169,7 @@ module Skylab::Task::TestSupport
   Common_ = Home_::Common_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   TS_ = self
 end

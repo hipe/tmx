@@ -115,7 +115,7 @@ y << "turned #{ stem } #{ say_did }."
 0
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#020.5]
   exit program[ ARGV, nil, nil, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab__Zerk__OneOffs::TMX_onoff = program  # #[#ze-063.1] mountable one-off

@@ -78,6 +78,7 @@ module Skylab::Common::TestSupport
   NEWLINE_ = "\n".freeze
   NOTHING_ = nil
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   TS_ = self
   UNABLE_ = false
 end

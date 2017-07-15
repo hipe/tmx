@@ -247,7 +247,7 @@ program = -> argv, _, _, stderr, pn_s_a do
   exit_status
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab::Git_breakup = program  # while [#br-083]

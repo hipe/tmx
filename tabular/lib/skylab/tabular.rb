@@ -228,6 +228,7 @@ module Skylab::Tabular
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   UNABLE_ = false
   SPACE_ = ' '

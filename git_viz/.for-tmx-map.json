@@ -1,6 +1,7 @@
 {
-  "after":"cull",
-  "category":"actually useful",
+  "after": "cull",
+  "category": "actually useful",
   "framework": "[br]",
-  "is potentially interesting application":true
+  "is potentially interesting application": true,
+  "sigil": "gv"
 }

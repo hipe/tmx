@@ -96,6 +96,7 @@ module Skylab::TMX::TestSupport
 
   MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   NOTHING_ = Home_::NOTHING_
   Stream_ = Home_::Stream_
   TS_ = self

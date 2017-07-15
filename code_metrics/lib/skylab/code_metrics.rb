@@ -206,6 +206,7 @@ module Skylab::CodeMetrics
   NEWLINE_ = "\n"
   NOTHING_ = nil
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   SPACE_ = ' '.freeze
   UNABLE_ = false
 end

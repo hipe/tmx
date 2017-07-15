@@ -1,5 +1,6 @@
 {
-  "after":"flex2treetop",
-  "category":"legacy ad-hoc util",
-  "framework": "[CUSTOM]"
+  "after": "flex2treetop",
+  "category": "legacy ad-hoc util",
+  "framework": "[CUSTOM]",
+  "sigil": "b2t"
 }

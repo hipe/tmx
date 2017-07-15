@@ -213,7 +213,7 @@ program = -> argv, _, _, stderr, pn_s_a do
 
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#020.5]
 
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else

@@ -1,35 +1,17 @@
-require 'skylab/common'
+require "skylab/common"
 
-inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
+inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.define do |o|
 
-inf.gemspec_path = __FILE__
+  o.has_executables = false
 
-Gem::Specification.new do | s |
+  o.gemspec_path = __FILE__
+end
 
-  s.author = 'hipe'
+Gem::Specification.new do |s|
 
-  s.date = inf.date_via_now
+  inf.write_all_the_common_things_and_placeholders s
 
-  inf.derive_summmary_and_description_from_README_and_write_into s
+  s.homepage = "http://localhost:8080/homepage-for-pa"
 
-  s.email = 'my@email.com'
-
-  inf.assert_no_executables
-
-  s.files = inf.to_stream_of_one_or_more_codefiles.to_a
-
-  s.homepage = 'http://localhost:8080/homepage-for-pa'
-
-  s.license = 'MIT'
-
-  s.name = inf.gem_name_via_gemspec_path
-
-  s.require_paths = %w( lib )
-
-  s.version = inf.version_via_VERSION_file
-
-  s.add_runtime_dependency 'skylab-common', [ '0.0.0.co.pre.bleeding' ]
-
-  # s.add_development_dependency ..
-
+  s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
 end

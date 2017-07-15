@@ -108,6 +108,7 @@ module Skylab::Permute::TestSupport
 
   EMPTY_S_ = ''
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   TS_ = self
 end
 # :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

@@ -1,5 +1,6 @@
 {
-  "after":"basic",
-  "category":"more general libs",
-  "is lib":true
+  "after": "basic",
+  "category": "more general libs",
+  "is lib": true,
+  "sigil": "pl"
 }

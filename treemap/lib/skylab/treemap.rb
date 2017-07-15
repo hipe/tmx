@@ -92,6 +92,7 @@ module Skylab::Treemap
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   Autoloader_[ Output_Adapters_ = ::Module.new, :boxxy ]
   SPACE_ = ' '
   Home_ = self

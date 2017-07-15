@@ -519,7 +519,7 @@ module Skylab::Git_head
   SPACE_ = ' '
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   Skylab::Git_head.call( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] )
 else
   Skylab__Zerk__OneOffs::Git_head = Skylab::Git_head  # #[#ze-063.1] mountable one-off

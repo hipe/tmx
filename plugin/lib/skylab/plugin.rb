@@ -68,6 +68,7 @@ module Skylab::Plugin
   Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   NOTHING_ = NIL
   SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '

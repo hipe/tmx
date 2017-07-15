@@ -511,6 +511,7 @@ class TMX_snap
     ACHIEVED_ = true
     COMMIT_MESSAGE_WIDE_RX__ = %r([^ ][ ]+[^ ])
     HELP_RX__ = %r(\A--?h(?:e(?:l(?:p)?)?)?\z)
+    NIL = nil  # #open [#sli-116.C]
     NOPE__ = 5
     NOTHING_ = nil
     SPACE_ = ' '
@@ -524,7 +525,7 @@ class TMX_snap
   Common_ = ::Skylab::Common
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#020.5]
 
   d = TMX_snap.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]

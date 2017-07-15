@@ -211,6 +211,7 @@ module Skylab::Git
   GIT_EXE_ = 'git'
   KEEP_PARSING_ = true
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   ProcLike_ = Common_::ProcLike
   SPACE_ = ' '

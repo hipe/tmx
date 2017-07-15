@@ -318,6 +318,7 @@ module Skylab::Snag::TestSupport
   EMPTY_P_ = Home_::EMPTY_P_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = Home_::NOTHING_
   NEWLINE_ = "\n"
   SPACE_ = Home_::SPACE_

@@ -549,7 +549,7 @@ end
 
 # ~
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
 
   serr = $stderr
   d = Skylab::Stack.new(

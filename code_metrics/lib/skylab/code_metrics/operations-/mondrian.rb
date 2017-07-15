@@ -1214,6 +1214,7 @@
     EARLY_END_ = nil
     FNMATCH_PATTERN_PROBABLY_RX = /[\\*?\[]/  # long comment at #mon-spot-3
     Here_ = self
+    NIL = nil  # open [#sli-016.C]
     NOTHING_ = nil
     SING_PROB___ = "«singleton probably»"
     SPACE_ = ' '

@@ -2,7 +2,7 @@
 
 require 'skylab/tabular'
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
 
   d = Skylab::Tabular::Operations_::InferTable::CLI.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]

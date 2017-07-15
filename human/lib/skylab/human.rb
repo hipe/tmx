@@ -91,6 +91,8 @@ module Skylab::Human  # :[#001].
   NEWLINE_ = "\n"
   NOTHING_ = nil
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NONE_ = nil
   KEEP_PARSING_ = true
   SPACE_ = ' '

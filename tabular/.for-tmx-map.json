@@ -1,7 +1,8 @@
 {
-  "after":"arc",
-  "category":"more general libs",
-  "doc test manifest":".doc-test-manifest.list",
+  "after": "arc",
+  "category": "more general libs",
+  "doc test manifest": ".doc-test-manifest.list",
   "framework": "[CUSTOM]",
-  "is lib":true
+  "is lib": true,
+  "sigil": "tab"
 }

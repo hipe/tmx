@@ -216,7 +216,7 @@ y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
   # <-
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   exit Skylab::Git_step[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab__Zerk__OneOffs::Git_step = Skylab::Git_step  # #[#ze-063.1] mountable one-off

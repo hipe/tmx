@@ -215,6 +215,8 @@ module Skylab::TMX
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # #open [#sli-116]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '

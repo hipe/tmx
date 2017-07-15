@@ -240,6 +240,7 @@ module Skylab::Fields::TestSupport
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   Scanner_ = Home_::Scanner_
   TS_ = self

@@ -80,6 +80,7 @@ module Skylab::Plugin::TestSupport
 
   ACHIEVED_ = true
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = Home_::NOTHING_
   TS_ = self
 end

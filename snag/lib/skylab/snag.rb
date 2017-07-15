@@ -393,6 +393,8 @@ module Skylab::Snag
   stowaway :Library_, 'lib-'
   LINE_SEP_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+  FALSE = false
   KEEP_PARSING_ = true
   MONADIC_EMPTINESS_ = -> _ { }
   NEUTRAL_ = nil

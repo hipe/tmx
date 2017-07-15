@@ -166,6 +166,7 @@ module Skylab::Flex2Treetop::MyTestSupport
   ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
   NEWLINE_ = "\n"
   NIL_ = nil
+  FALSE = false  # #open [#sli-116.C]
   REAL_PROGNAME_ = 'flex2treetop'.freeze  # no easy way to mutate this?
   Stderr_Resources_ = ::Struct.new :serr
   Top_TS_ = self

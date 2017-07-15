@@ -16,7 +16,7 @@ Skylab::Doc_test = -> argv, i, o, e, pn_s_a do
   end.execute
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   d = Skylab::Doc_test[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
   if d.nonzero?
     $stderr.puts "(exitstatus: #{ d })"

@@ -1,6 +1,7 @@
 {
-  "after":"plugin",
-  "doc test manifest":".doc-test-manifest.list",
-  "category":"more general libs",
-  "is lib": true
+  "after": "plugin",
+  "doc test manifest": ".doc-test-manifest.list",
+  "category": "more general libs",
+  "is lib": true,
+  "sigil": "pa"
 }

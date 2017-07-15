@@ -347,6 +347,8 @@ module Skylab::Basic  # introduction at [#020]
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    TRUE = true
   NOTHING_ = nil
   NILADIC_FALSEHOOD_ = -> { false }
   PROCEDE_ = true

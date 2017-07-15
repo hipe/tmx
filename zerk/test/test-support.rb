@@ -413,6 +413,8 @@ module Skylab::Zerk::TestSupport
   NEWLINE_ = Home_::NEWLINE_
   No_deps_zerk_ = Home_::No_deps_zerk_
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = Home_::NOTHING_
   SPACE_ = Home_::SPACE_
   TS_ = self

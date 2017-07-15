@@ -77,7 +77,7 @@ o << "          but the subject utility is here in case it is ever not."
         0
       end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#020.5]
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab__Zerk__OneOffs::TMX_no_line_breaks = program  # #[#ze-063.1] mountable one-off

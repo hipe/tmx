@@ -175,6 +175,7 @@ module Skylab::CodeMetrics::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self

@@ -1,6 +1,7 @@
 {
-  "after":"common",
-  "category":"more general libs",
-  "doc test manifest":".doc-test-manifest.list",
-  "is lib":true
+  "after": "common",
+  "category": "more general libs",
+  "doc test manifest": ".doc-test-manifest.list",
+  "is lib": true,
+  "sigil": "fi"
 }

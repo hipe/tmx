@@ -294,6 +294,7 @@ module Skylab::Cull
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
   NIL_AS_FAILURE_ = nil
   NOTHING_ = nil
   UNABLE_ = false

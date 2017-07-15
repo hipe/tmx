@@ -213,6 +213,8 @@ module Skylab::DocTest
   IDENTITY_ = -> x { x }
   NEWLINE_ = "\n".freeze  # because #spot-2
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   UNABLE_ = false
   ZERO_LENGTH_LINE_RX_ = /\A$/

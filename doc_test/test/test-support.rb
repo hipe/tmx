@@ -236,6 +236,7 @@ module Skylab::DocTest::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NIL = nil  # #open [#sli-116.C]
   Stream_ = Home_::Stream_
   TS_ = self
 end

@@ -1,39 +1,17 @@
+require "skylab/common"
 
-self._REDO  # we need all test (support)
+inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.define do |o|
 
-require 'skylab/common'
+  o.has_executables = false
 
-inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
-
-inf.gemspec_path = __FILE__
-
-Gem::Specification.new do | s |
-
-  s.author = 'hipe'
-
-  s.date = inf.date_via_now
-
-  inf.derive_summmary_and_description_from_README_and_write_into s
-
-  s.email = 'my@email.com'
-
-  inf.assert_no_executables
-
-  s.files = inf.to_stream_of_one_or_more_codefiles.to_a
-
-  s.homepage = 'http://localhost:8080/homepage-for-hu'
-
-  s.license = 'MIT'
-
-  s.name = inf.gem_name_via_gemspec_path
-
-  s.require_paths = %w( lib )
-
-  s.version = inf.version_via_VERSION_file
-
-  s.add_runtime_dependency 'skylab-common', [ '0.0.0.co.pre.bleeding' ]
-
-  # s.add_development_dependency ..
-
+  o.gemspec_path = __FILE__
 end
 
+Gem::Specification.new do |s|
+
+  inf.write_all_the_common_things_and_placeholders s
+
+  s.homepage = "http://localhost:8080/homepage-for-hu"
+
+  s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
+end

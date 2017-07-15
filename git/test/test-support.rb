@@ -155,6 +155,7 @@ module Skylab::Git::TestSupport
   DOT_ = '.'
   NEWLINE_ = "\n"
   NIL_ = nil
+    FALSE = false
   NOTHING_ = nil
   TS_ = self
   UNDERSCORE_ = '_'

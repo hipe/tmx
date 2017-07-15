@@ -376,6 +376,8 @@ class Skylab::Task
   IDENTITY_ = -> x { x }
   NEWLINE_ = "\n"
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   NOTHING_ = nil
   SPACE_ = ' '
   UNABLE_ = false

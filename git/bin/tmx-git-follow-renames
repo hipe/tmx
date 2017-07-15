@@ -307,12 +307,13 @@ class Skylab_Git__follow_renames__one_off
     ACHIEVED_ = true
     COMMAND_HEAD__ = %w( git ).freeze
     GENERIC_ERROR_EXITSTATUS__ = 5
+    NIL = nil  # open [#sli-016.C]
     SPACE_ = ' '
     SUCCESS_EXITSTATUS__ = 0
     UNABLE_ = false
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   exit Skylab_Git__follow_renames__one_off.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
   ).execute

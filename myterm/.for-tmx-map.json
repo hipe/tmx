@@ -1,6 +1,7 @@
 {
-  "after":"snag",
-  "category":"actually useful",
+  "after": "snag",
+  "category": "actually useful",
   "framework": "[ze] (iCLI)",
-  "is potentially interesting application":true
+  "is potentially interesting application": true,
+  "sigil": "my"
 }

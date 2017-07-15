@@ -90,6 +90,8 @@ module Skylab::Parse::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   IDENTITY_ = -> x { x }
   NIL_ = nil
+  NIL = nil  # open [#sli-016.C]
+    FALSE = false ; TRUE = true
   TS_ = self
   UNDERSCORE_ = '_'
 

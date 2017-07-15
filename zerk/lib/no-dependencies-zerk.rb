@@ -1597,6 +1597,7 @@ module NoDependenciesZerk
     ACHIEVED_ = true
     DASH_ = '-'
     EMPTY_S_ = ''
+    NIL  = nil  # #open [#sli-116]
     SPACE_ = ' '
     UNABLE_ = false
     UNDERSCORE_ = '_'

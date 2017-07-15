@@ -254,7 +254,7 @@ next item.
   # -
 end
 
-if __FILE__ == $PROGRAM_NAME
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
   exit one_off.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
 else
   Skylab__Zerk__OneOffs::Test_support_subdivide = -> * five do  # #[#ze-063.1] mountable one-off

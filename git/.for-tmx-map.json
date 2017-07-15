@@ -1,6 +1,7 @@
 {
-  "after":"test_support",
-  "category":"ad-hoc libs",
+  "after": "test_support",
+  "category": "ad-hoc libs",
   "framework": "[br]",
-  "is lib": true
+  "is lib": true,
+  "sigil": "git"
 }

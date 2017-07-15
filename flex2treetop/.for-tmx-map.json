@@ -1,5 +1,6 @@
 {
-  "after":"yacc2treetop",
-  "category":"legacy ad-hoc util",
-  "framework": "[br]"
+  "after": "yacc2treetop",
+  "category": "legacy ad-hoc util",
+  "framework": "[br]",
+  "sigil": "f2t"
 }

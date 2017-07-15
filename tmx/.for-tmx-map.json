@@ -1,5 +1,6 @@
 {
-  "after":"tan_man",
-  "category":"synthesize everything",
-  "framework": "[ze]"
+  "after": "tan_man",
+  "category": "synthesize everything",
+  "framework": "[ze]",
+  "sigil": "tmx"
 }

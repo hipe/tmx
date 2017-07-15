@@ -71,6 +71,7 @@ module Skylab::SubTree::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
+    FALSE = false ; TRUE = true  # #open [#sli-116.C]
   TS_ = self
   UNDERSCORE_ = Home_::UNDERSCORE_
 end
