@@ -1,11 +1,366 @@
 #!/usr/bin/env ruby -w
 
-  require 'skylab/tmx'
+class Skylab_Slicer_OneOff_1___
 
-  sout = $stdout
+  def __describe_into y
 
-  _st = ::Skylab::TMX.build_sigilized_sidesystem_stream_plus nil
+    _BIG_TEXT = <<-HERE
 
-  _st.each do | ss |
-    sout.puts "#{ ss.sigil } #{ ss.entry_string }"
+      "sigilize" all the things. assume monolith.
+
+      a "sigil" is a short name for a sidesystem, typically used
+      when a remote sidesystem is referenced in documentation.
+      in writing, sigils are always stylized with square brackets.
+
+      the sigil for the sidesystem called "common" is "[co]".
+      even though "code_metrics" also starts with "co", *its*
+      sigil is "[cm]". the way we arrive at these short names is
+      formula-driven (and not robust against all possible sets of
+      names). (the formula is implemented at [#tmx-021.1].)
+
+      any time the "constituency" of all of the sidesystems
+      changes (that is, if you add one, remove one, or rename one)
+      you may want to "re-sigilize" to see if our formula comes
+      up with acceptible new names. it's mostly a novelty act because
+      nothing really falls over if you use the "wrong" sigils.
+      (to date we still have some old "[ca]" that need to be renamed.)
+
+      at writing each of its options is mutually exclusive: each
+      option represents an incremental step that for all but the
+      last option serves as a dry-run that allows you to preview
+      what will happen.
+
+      separately, here's one way to make a REDLIST of all the
+      sidesystems:
+
+          ./slicer/script/250-reallocate-sigils --list-only | awk '{;print $1}' > REDLIST
+    HERE
+
+    require 'strscan'
+    scn = ::StringScanner.new _BIG_TEXT
+    skip_indent = /^[ ]{6}/
+    begin
+      scn.skip skip_indent  # for some lines there is none
+      s = scn.scan %r(.*\n)
+      s || break
+      y << s
+      redo
+    end while above
+    scn.eos? || what
+    y
   end
+
+  def initialize single_option, sout, serr
+    if single_option
+      case single_option
+      when :list_sidesystems_only  # "list-sidesystems-only"
+        list_sidesystems_only = true
+      when :list_only  # "list-only"
+        list_only = true
+      when :dry
+        be_dry = true
+      else ; oops
+      end
+    end
+    @be_dry = be_dry
+    @list_only = list_only
+    @list_sidesystems_only = list_sidesystems_only
+    @sout = sout
+    @serr = serr
+  end
+
+  def execute
+
+    __init_thing_stream
+
+    if @list_sidesystems_only
+      __display_sidesystems
+    elsif __allocate_sigils
+      if @list_only
+        __display_sigils
+      else
+        __alter_json_files
+      end
+    end
+
+    @_exitstatus
+  end
+
+  def __alter_json_files
+
+    require 'json'
+
+    _idx = remove_instance_variable :@_sigilization
+    _st = _idx.to_stream
+
+    # fmt1 = "(%5s already correct)"
+
+    change_count = 0
+    skip_count = 0
+    add_count = 0
+
+    if @be_dry
+      change = -> json, json_file do
+        _d = json.length
+        @serr.puts "(wrote #{ _d } (dry) bytes)"
+      end
+    else
+      change = -> json, json_file do
+        _d = ::File.write json_file, json
+        @serr.puts "(wrote #{ _d } bytes)"
+      end
+    end
+
+    ok = _etc _st do |s10n|
+      mine = s10n.remote_item
+      json_file = mine._json_path__
+      sct = ::JSON.parse ( ::File.read json_file ), symbolize_names: true
+      existing = sct[ :sigil ]
+      new = s10n.sigil
+      if existing
+        if new == existing
+          # @serr.puts ( fmt1 % "[#{ existing }]" )
+          skip_count += 1
+        else
+          @serr.write "CHANGE [#{ existing }] to [#{ new }] .. "
+          change_count += 1
+          do_write = true
+        end
+      else
+        @serr.write "ADD [#{ new }] .. "
+        add_count += 1
+        do_write = true
+      end
+
+      if do_write
+        sct[ :sigil ] = new
+        _json = ::JSON.pretty_generate sct
+        change[ _json, json_file ]
+      end
+    end
+
+    a = []
+
+    if add_count.zero? && change_count.zero?
+      if skip_count.zero?
+        a.push "strange - no items"
+      else
+        a.push "all #{ skip_count } item(s) were already OK"
+      end
+    else
+
+      if change_count.nonzero?
+        a.push "changed: #{ change_count }"
+      end
+
+      if add_count.nonzero?
+        a.push "added: #{ add_count }"
+      end
+
+      if skip_count.nonzero?
+        a.push "already OK: #{ add_count }"
+      end
+    end
+
+    @serr.puts "(#{ a * ' ' })"
+
+    @_exitstatus = ok ? SUCCEEDED__ : FAILED__ ; nil
+  end
+
+  def __display_sigils
+
+    idx = remove_instance_variable :@_sigilization
+    _d = idx.length_of_longest_entry_string
+
+    fmt = "%#{ _d }s  [%s]"
+
+    _st = idx.to_stream
+
+    _etc _st do |s10n|
+      @sout.puts ( fmt % [ s10n.entry_string, s10n.sigil ] )
+    end
+
+    @_exitstatus = SUCCEEDED__ ; nil
+  end
+
+  def _etc st
+
+    s10n = st.gets  # sigilization
+    if s10n
+      begin
+        yield s10n
+        s10n = st.gets
+      end while s10n
+      true
+    else
+      @serr.puts "(no items)"
+      false
+    end
+  end
+
+  def __allocate_sigils
+
+    _st_ = remove_instance_variable :@_thing_stream
+
+    _st = _st_.map_by do |json_path|
+      ThisWrapper___.new json_path
+    end
+
+    require 'skylab/tmx'
+    @_sigilization = @TMX::Models::Sigil.via_stemish_stream _st
+    @_ok
+  end
+
+  def __display_sidesystems
+    @_thing_stream.each( & @sout.method( :puts ) )
+    NIL
+  end
+
+  # -- B.
+
+  def __init_thing_stream
+
+    require 'skylab/tmx' ; @TMX = ::Skylab::TMX  # sneak this in here
+
+    cmd = %w( find . -type f -depth 2 -name )
+    cmd.push @TMX::METADATA_FILENAME
+
+    opts = {}
+    out_r, out_w = ::IO.pipe
+    err_r, err_w = ::IO.pipe
+    opts[ :in  ] = :close
+    opts[ :out ] = out_w
+    opts[ :err ] = err_w
+
+    _pid = spawn( * cmd, opts )
+    w = ::Process.detach _pid
+
+    out_w.close
+    err_w.close
+
+    p = -> do
+      s = out_r.gets
+      if s
+        s.chomp!
+        s
+      else
+        s = err_r.gets
+        if s
+          @serr.puts "internal problems with find command: #{ s }"
+          @_exitstatus = w.value.exitstatus
+          @_ok = false
+        else
+          @_exitstatus = SUCCEEDED__
+          @_ok = true
+        end
+        p = Common_::EMPTY_P_
+        Common_::NOTHING_
+      end
+    end
+
+    @_thing_stream = Common_.stream do
+      p[]
+    end
+    NIL
+  end
+
+  # -- A.
+
+  # ==
+
+  class ThisWrapper___
+
+    def initialize s
+      @entry_string = ::File.basename ::File.dirname s
+      @_json_path__ = s
+    end
+
+    attr_reader(
+      :entry_string,
+      :_json_path__,
+    )
+  end
+
+  # ==
+  # ==
+  # -
+
+    these = %w( list-sidesystems-only list-only dry )
+
+    cls = self
+    argv = ::ARGV
+    serr = $stderr
+
+    FAILED__ = 5 ; SUCCEEDED__ = 0 ; NIL = nil
+
+    this_part = -> do
+      these.map do |s|
+        "--#{ s }"
+      end.join " | "
+    end
+
+    usage = -> do
+
+      serr.puts "usage: #{ $PROGRAM_NAME } [ #{ this_part[] } ]"
+    end
+
+    invite = -> do
+      serr.puts "see '#{ $PROGRAM_NAME } -h'"
+    end
+
+    help = -> do
+      usage[]
+      serr.puts
+      serr.puts "description:"
+      _yielder = ::Enumerator::Yielder.new do |s|
+        if s && s.length.nonzero?
+          s = "  #{ s }"
+        end
+        puts s
+      end
+      cls.new( nil, nil, nil ).__describe_into _yielder
+    end
+
+    require_common = -> do
+      require 'skylab/common'
+      Common_ = ::Skylab::Common
+      require_common = Common_::EMPTY_P_ ; nil
+    end
+
+    len = argv.length
+
+    if len.nonzero?
+      rx = /\A--?h(?:e(?:l(?:p)?)?)?\z/
+      if rx =~ argv.first or 1 < len && rx=~ argv.last
+        help[]
+        es = FAILED__
+      else
+        require_common[]
+        scn = Common_::Scanner.via_array argv
+        rx = /\A--(#{ these * '|' })\z/
+        md = rx.match scn.head_as_is
+        if md
+          scn.advance_one
+          if scn.no_unparsed_exists
+            single_option = md[1].gsub( '-', '_' ).intern
+          else
+            serr.puts "expecting no more tokens (had: #{ scn.head_as_is.inspect })"
+            usage[]
+            es = SUCCEEDED__
+          end
+        else
+          serr.puts "expecting #{ this_part[] } (had: #{ scn.head_as_is.inspect })"
+          invite[]
+          es = FAILED__
+        end
+      end
+    end
+
+    if ! es
+      require_common[]
+      es = cls.new( single_option, $stdout, serr ).execute
+    end
+    exit es
+  # -
+end
+# #history-A: full rewrite to out-load logic *to* here *from* sidesys
