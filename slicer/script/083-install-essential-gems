@@ -1,65 +1,684 @@
 #!/usr/bin/env ruby -w
 
-require 'skylab/slicer'
-require 'open3'
+class Skylab_Slicer_OneOff_0  # Nx
 
-top_of_universe = ::Dir.pwd
+  begin  # only for indent
 
-serr = $stderr
+    def __describe_into y
 
-# ~ boilerplate
+      these = @_this_string_array
+      num_ = these.length
+      num = 33  # meh
 
-upstream = Skylab::Slicer::Script_Support_.resolve_upstream $stdin, $stderr, ARGV
-upstream or exit( 5 )
+      _BIG_TEXT = <<-HERE
+        this is the very first script to be used to [re]install a tmx
+        installation for development from a "monolith" checkout.
+        here's some necessary background as to what's going on here:
 
-begin
+        all code assets in the tmx ecosystem are partitioned into one of
+        its (currently #{ num }) "sidesystems", and each of these is exposed
+        as a gem.
 
-  item = upstream.gets
-  item or break
-  item.chomp!
+        while it's certainly possible to install each of the gems you want
+        by doing `gem build foo.gemspec` and `gem install foo-0.0.0.gem`
+        for each of them, the series of scripts of which this is the first
+        is meant to:
 
-  path = ::File.join top_of_universe, item
+          A) free us from remembering the above
 
-  serr.puts "cd #{ path }"
-  ::Dir.chdir path
+          B) be easier than repeating these steps manually for
+             the #{ num } (or however many) gems and finally, it's meant to
 
-  cmd = [ "gem", "build", "./skylab-#{ item }.gemspec" ]
-  serr.puts cmd.join( ' ' )
+          C) provide some other tricks and development niceties to be
+             explained down the line under the scripts that provide them.
 
-  _, o, e, w = ::Open3.popen3( * cmd )
+        because all assets in this ecosystem are reached as gems, and this
+        script's purpose is to install the first of those gems, this script
+        cannot rely on *any* sidesystems code assets, including any from its
+        own host sidesystem (without some headaches).
 
-  begin
-    s = e.gets
-    s or break
-    serr.puts s
-    redo
-  end while nil
+        but once this script installs (or confirms to be installed) the #{ num_ }
+        sidesystems that it installs (these are listed below), we can then
+        use these essential sidesystems themselves to support the more
+        advanced installation and development niceties that the latter
+        scripts provide (many of which are concerned with beginning new
+        sidesystems, which is likely of no interest to you).
 
-  d = w.value.exitstatus
-  if d.nonzero?
-    serr.puts "nonzero: #{ d }"
-    exit 0
+        the latter scripts are basically just thin wrappers that each call
+        one of an excellent graph of [tas] tasks. to use these tasks we need
+        [tas], and that sidesystem needs these ones:
+
+            (#{ these * ', '})
+
+        which is the list of gems that this script installs. whew!
+
+        (and if you are curious to see what this task graph looks like,
+        then once you have installed these essential #{ num_ } sidesystems,
+        try opening up the output this in graph viz:
+
+            ./task/bin/tmx-task task-viz \\
+              Skylab::Slicer::Models_::Gemification::Tasks_::Gem_File_Builds \\
+              --require 'skylab/slicer'
+
+        woo hoo!)
+      HERE
+
+      require 'strscan'
+      scn = ::StringScanner.new _BIG_TEXT
+      skip_indent = /^[ ]{6}/
+      begin
+        scn.skip skip_indent  # for some lines there is none
+        s = scn.scan %r(.*\n)
+        s || break
+        y << s
+        redo
+      end while above
+      scn.eos? || what
+      y
+    end
+
+    def initialize stderr
+
+      @stderr = stderr
+      a = [ COMMON__ ]
+      a.concat %w(
+        system
+        basic
+        fields
+        plugin
+        task
+      )
+      a.push 'human'  # only for error messages
+      a.push 'brazen'  # would love to get rid of this
+      a.push 'zerk'
+      a.push 'tmx'  # currently this is the guy that knows "sigils"
+      a.push 'slicer'
+      @_this_string_array = a.freeze
+    end
+
+    def execute
+
+      InstallTheseSidesystemsIfNecessary___.call_by do |o|
+
+        o.after_installing_common_express = -> y do
+          y << "(run this a second time - `common` needed to be installed on its own)"
+        end
+
+        o.entry_string_array = remove_instance_variable :@_this_string_array
+        o.stderr = @stderr
+      end
+    end
+  end  # end only for indent
+
+  # quick recap on our local "unified language" -
+  #
+  #   entry_string - this is the stemmiest of stem names. comes from
+  #     "directory entry", i.e the second-from-toplevel directory in the
+  #     monolith. examples: "common", "test_support"
+  #
+  #   gem_name - for our purposes, this is "skylab-#{ entry_string }"
+  #
+  #   foobie_file (e.g) - a "file" means an "entry string", i.e not a path
+  #
+  #   foobie_path (e.g) - "path" is a qualified (relative or absoulte) filesystem path
+
+  Bruh__ = ::Class.new
+  ExitStatii__ = ::Module.new
+
+  # ==
+
+  class InstallTheseSidesystemsIfNecessary___ < Bruh__
+    include ExitStatii__
+
+    def initialize
+      @_mutex = nil
+      super
+    end
+
+    def after_installing_common_express= p
+      remove_instance_variable :@_mutex
+      @it_is_OK_to_install_common = true
+      @after_installing_common_express = p
+    end
+
+    def instead_of_installing_common_express= p
+      remove_instance_variable :@_mutex
+      @it_is_OK_to_install_common = false
+      @instead_of_installing_common_express = p
+    end
+
+    attr_writer(
+      :entry_string_array,
+      :stderr,
+    )
+
+    def execute
+
+      if __any_version_of_common_is_installed
+
+        __install_all_of_the_things
+
+      elsif __common_is_in_the_list_of_gems_to_install
+
+        __install_only_common
+      else
+        _whine_about_common
+      end
+    end
+
+    def __install_all_of_the_things
+
+      ok = _achieved_
+
+      total_built = 0
+      total_installed = 0
+
+      @entry_string_array.each do |sidesystem_name|
+
+        inst = @_gems.install_current_version_if_necessary_of sidesystem_name
+
+        ok = inst.exitstatus
+        ok.nonzero? and break
+
+        if inst.did_build
+          total_built += 1
+        end
+
+        if inst.did_install
+          total_installed += 1
+        end
+      end
+
+      if ok.zero?
+        s_a = []
+        if total_built.nonzero?
+          s_a << "#{ total_built } gem(s) built"
+        end
+        if total_installed.nonzero?
+          s_a << "#{ total_installed } gem(s) installed"
+        end
+        if s_a.length.zero?
+          @stderr.puts "(nothing to do.)"
+        else
+          @stderr.puts "(#{ s_a * ', ' })"
+        end
+      end
+
+      ok
+    end
+
+    def __install_only_common
+      if @it_is_OK_to_install_common
+        __do_install_only_common
+      else
+        _whine_about_common
+      end
+    end
+
+    def __do_install_only_common
+      _sct = @_gems.install_current_version_if_necessary_of COMMON__
+      ok = _sct.exitstatus
+      if ok.zero?
+        @after_installing_common_express[ _build_yielder ]
+      end
+      ok
+    end
+
+    def _whine_about_common
+      @stderr.puts "can't install other gems without installing `common` first"
+      _unable_
+    end
+
+    def __common_is_in_the_list_of_gems_to_install
+      @entry_string_array.include? COMMON__
+    end
+
+    def __any_version_of_common_is_installed
+      @_gems = GemsInstallationFacade.new ::File, @stderr  # 1 of 2 in world
+      @_gems.has_any_version_of COMMON__
+    end
+
+    def _build_yielder
+      ::Enumerator::Yielder.new do |s|
+        @stderr.puts s
+      end
+    end
   end
 
-  last = nil
-  begin
-    s = o.gets
-    s or break
-    last = s
-    redo
-  end while nil
+  # ==
 
-  neat = /\A[[:space:]]*File: (.+)/.match( last )[ 1 ]
+  class GemsInstallationFacade
+    include ExitStatii__
 
-  serr.puts( cmd * ' ' )
+    # build once per runtime
 
-  cmd = [ "gem", "install", "./#{ neat }" ]
+    def initialize fs, stderr
 
-  _ok = ::Kernel.system( * cmd )
-  _ok or break
+      @_index = Build_gem_index[]
 
+      require 'rubygems/gem_runner'  # (YUCK (next line too)
+      require 'rubygems/exceptions'
+      require 'fileutils'  # YUCK
 
-  redo
-end while nil
+      cm = ::Gem::CommandManager.instance
 
-serr.puts "done."
+      @__the_install_command = cm.find_command "install"
+      @__install_options = %w( --no-document ).freeze
+
+      @__the_build_command = cm.find_command "build"
+
+      @__UI = Sayer___.new stderr
+
+      @filesystem = fs
+      @stderr = stderr
+    end
+
+    # -- A.
+
+    def install_current_version_if_necessary_of entry_s
+
+      gem = __build_gem_name_derivations entry_s
+
+      ss_inst = @_index[ entry_s ]
+
+      if ss_inst
+
+        if ss_inst.__has_version_ gem.version
+          @stderr.puts "(already installed: #{ gem.gem_name } #{ gem.version.to_s })"
+          _installation false, gem
+        else
+          _installation true, gem
+        end
+      else
+        _installation true, gem
+      end
+    end
+
+    def __build_gem_name_derivations entry_s
+
+      ver_s = @filesystem.read ::File.join( entry_s, 'VERSION' )  # meh
+      ver_s.chomp!
+
+      GemNameDerivations___.call_by do |o|
+        o.version = ::Gem::Version.new ver_s
+        o.entry_string = entry_s
+      end
+    end
+
+    def _installation yes, gem  # gem = GemNameDerivations___
+
+      GemInstallation___.call_by do |o|
+        if yes
+          o.build_gem_if_necessary = true
+          o.install_gem = true
+        end
+        o.gem = gem
+        o.resources = self
+        o.stderr = @stderr
+      end
+    end
+
+    def __install_gem_ gem  # gem = GemNameDerivations___
+
+      es = nil
+      ::Gem::DefaultUserInteraction.use_ui @__UI do
+        es = @__the_install_command.invoke_with_build_args(
+          [ gem.gem_path, * @__install_options ],
+          EMPTY_A__,
+        )
+      end
+      es
+    end
+
+    def __build_gem_ gem  # gem = GemNameDerivations___
+
+      entry_s = gem.entry_string
+
+      if @filesystem.directory? entry_s
+
+        ::FileUtils.cd entry_s  # (things that happen in the gemspec assume this)
+
+        _hi = @__the_build_command.invoke_with_build_args [ gem.gemspec_file ], EMPTY_A__
+
+        gem.gem_file == _hi || sanity  # meh
+
+        ::FileUtils.cd DOT_DOT__
+
+        _achieved_
+      else
+        @stderr.puts "expected to exist and be directory: #{ entry_s }"
+        _unable_
+      end
+    end
+
+    def __do_build_gem qualified_name
+
+      # (sadly, this must be built from within the gem's dir b.c rubygems)
+
+      _gemspec_path = "#{ qualified_name }.gemspec"
+      # (result of above is directory entry)
+    end
+
+    attr_reader(  # as resources
+      :filesystem,
+    )
+
+    # -- B.
+
+    def has_any_version_of entry_s  # NOTE - this is NOT gem_name
+      @_index[ entry_s ] and true
+    end
+  end
+
+  # ==
+
+  class GemInstallation___ < Bruh__
+
+    # (this exists to be a dedicated context (magnetic) for the one specific
+    # gem, but note that the heavy lifting is actually done by the caller
+    # who holds memoized bridge structures that can be re-used across
+    # several gems.)
+    #
+    # (also, this doubles-duty as a result structure summarizing what happened.)
+
+    def initialize
+      @build_gem_if_necessary = false
+      @install_gem = false
+      super
+    end
+
+    attr_writer(
+      :build_gem_if_necessary,
+      :install_gem,
+      :no_op,
+      :gem,  # GemNameDerivations___
+      :resources,
+      :stderr,
+    )
+
+    def execute
+
+      @exitstatus = SUCCESS_EXITSTATUS__
+      @did_build = false
+      @did_install = false
+
+      if remove_instance_variable :@build_gem_if_necessary
+        __maybe_build_gem
+      end
+
+      if remove_instance_variable( :@install_gem ) && @exitstatus.zero?
+        __install_gem
+      end
+
+      remove_instance_variable :@resources
+      remove_instance_variable :@stderr
+      freeze
+    end
+
+    def __install_gem
+      ok = @resources.__install_gem_ @gem
+      if ok.zero?
+        @did_install = true
+      else
+        @exitstatus = ok
+      end
+      NIL
+    end
+
+    def __maybe_build_gem
+
+      if @resources.filesystem.exist? @gem.gem_path
+        @stderr.puts "(NOTE - using EXISTING built gem - #{ @gem.gem_path })"
+        @did_build = false
+      else
+        ok = @resources.__build_gem_ @gem
+        if ok.zero?
+          # @stderr.puts "(built gem: #{ @gem.gem_path })"  # redundant with rubygems-generated output
+          @did_build = true
+        else
+          @exitstatus = ok
+        end
+      end
+      NIL
+    end
+
+    attr_reader(
+      :did_build,
+      :did_install,
+      :exitstatus,
+    )
+  end
+
+  # ==
+
+  class GemNameDerivations___ < Bruh__
+
+    attr_writer(
+      :version,
+      :entry_string,
+    )
+
+    def execute
+
+      @gem_name = "skylab-#{ @entry_string }"
+      @gemspec_file = "#{ @gem_name }.gemspec".freeze
+      @gem_file = "#{ @gem_name }-#{ @version.to_s }.gem".freeze
+
+      head = @entry_string
+      @gem_path = ::File.join( head, @gem_file ).freeze
+      @gemspec_path = ::File.join( head, @gemspec_file ).freeze
+
+      freeze
+    end
+
+    attr_reader(
+      :entry_string,
+      :gem_name,
+      :gem_file,
+      :gem_path,
+      :gemspec_file,
+      :gemspec_path,
+      :version,
+    )
+  end
+
+  # ==
+
+  class Sayer___
+
+    def initialize serr
+      @stderr = serr
+    end
+
+    def alert_error s, q=nil  # (incomplete)
+      @stderr.puts s
+      if q
+        @stderr.puts q
+      end
+    end
+
+    def say s
+      if /\A[[:space:]]/ =~ s
+        @stderr.puts s
+      else
+        @stderr.puts "(#{ s })"
+      end
+    end
+
+    def terminate_interaction exitstatus
+      exitstatus
+    end
+  end
+
+  # ==
+
+  Build_gem_index = -> do
+
+    rx = /\Askylab-(?<entry_string>.+)\z/  # we gotta duplicate it :(
+    h = {}
+
+    ::Gem::Specification.stubs.each do |s|
+
+      md = rx.match s.name
+      md || next
+
+      k = md[ :entry_string ]
+      sct = ( h[ k ] ||= SidesystemInstallation___.new s.name )
+
+      sct.__add_gem_ s
+    end
+    h
+  end
+
+  class SidesystemInstallation___
+
+    def initialize s
+      @gems = []
+      @gem_name = s
+    end
+
+    def __add_gem_ gem
+      @gems.push gem
+    end
+
+    def __has_version_ version_OBJECT
+      @gems.detect do |gem|
+        version_OBJECT == gem.version
+      end
+    end
+
+    attr_reader(
+      :gem_name,
+      :gems,
+    )
+  end
+
+  # ==
+
+  module ExitStatii__
+
+    def _did_nothing_
+      SUCCESS_EXITSTATUS__
+    end
+
+    def _achieved_
+      SUCCESS_EXITSTATUS__
+    end
+
+    def _unable_
+      FAILURE_EXITSTATUS__
+    end
+  end
+
+  class Bruh__
+
+    class << self
+      def call_by & p
+        new( & p ).execute
+      end
+      private :new
+    end  # >>
+
+    def initialize
+      yield self
+    end
+  end
+
+  # ==
+
+  # (copy-pasted from the future..)
+
+  O = ::Module.new
+
+  O::Map_reduce_by = -> st, & p do
+    -> do
+      begin
+        item = st.call
+        item || break
+        x = p[ item ]
+        x ? break : redo
+      end while above
+      x
+    end
+  end
+
+  O::Stream_via_NonsparseArray = -> a do
+    d = -1 ; last = a.length - 1
+    -> do
+      if last != d
+        x = a.fetch( d += 1 )
+        x || sanity
+      end
+    end
+  end
+
+  # ==
+
+  # :#here-1: this is because [co] is loaded differently when in service of
+  # itself than it when it is loaded in service of all the others: the
+  # others load it as a gem (`require 'skylab/common'`) whereas it itself
+  # requires itself relatively. there is no easy way to reconcile these
+  # different ways of loading the resource in the same runtime:
+  #
+  #   - loading the same file 2x in the same runtime is horrible style
+  #     and ugly if not erroneous
+  #
+  #   - trying to hack things to avoid is is really ugly too
+
+  # ==
+
+  module GENERIC_FAILURE_STRUCTURE__ ; class << self
+    def is_ok ; false end
+    def exitstatus ; FAILURE_EXITSTATUS__ ; end
+  end ; end
+
+  # ==
+
+  COMMON__ = 'common'.freeze
+  DOT_DOT__ = '..'
+  EMPTY_A__ = [].freeze
+  FAILURE_EXITSTATUS__ = 5
+  KEEP_GOING__ = true
+  NIL = nil
+  NOTHING__ = nil
+  STOP_EARLY__ = false
+  SUCCESS_EXITSTATUS__ = 0
+
+  # ==
+  # ==
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  cls = Skylab_Slicer_OneOff_0
+  argv = ::ARGV
+  serr = $stderr
+
+  usage = -> do
+    serr.puts "usage: #{ $PROGRAM_NAME }"
+  end
+
+  if argv.length.zero?
+    _d = cls.new( serr ).execute
+    exit _d
+  else
+    rx = /\A--?h(?:e(?:l(?:p)?)?)?\z/
+    if rx =~ argv.first or 1 < argv.length && rx=~ argv.last
+      usage[]
+      serr.puts
+      serr.puts "description:"
+      _yielder = ::Enumerator::Yielder.new do |s|
+        if s && s.length.nonzero?
+          s = "  #{ s }"
+        end
+        puts s
+      end
+      cls.new( nil ).__describe_into _yielder
+    else
+      serr.puts "unexpected arguments. script takes no arguments."
+      usage[]
+      exit 5
+    end
+  end
+end
+# #tombstone-A: full rewrite when this became a big kahuna dependee

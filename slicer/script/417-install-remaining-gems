@@ -3,16 +3,89 @@
 require 'skylab/slicer'
 sli = Skylab::Slicer::API
 
-upstream = Skylab::Slicer::Script_Support_.resolve_upstream $stdin, $stderr, ARGV
-upstream or exit( 5 )
+no = 5  # generic failure exitstatus
+
+invo = Skylab::Slicer::ScriptSupport_::Invocation.define do |o|
+
+  o.describe_by do |y|
+
+    _BIG_TEXT = <<-HERE
+      install the remaining sidesystems, as indicated by the argument(s).
+
+      installation cannot be said to be complete unless all of the tests
+      pass. this is why we chose here to introduce our test runner,
+      providing explanation that will probably want to be referenced later.
+
+      if we try to run all of the tests of the entire ecosystem in one
+      process, we run out of memory and grind to a crawl. (one day maybe
+      we'll investigate why, but this is an issue we should want to be
+      able to scale around anyway, regardless of whether we must.)
+
+      as such we typically break the tests up into smaller groups
+      (with the indivisible unit being the tests under each sideystem).
+
+      here is how we run the tests in two groups:
+
+          tmx test-all -order after -slice 1st half
+
+      (and in another terminal):
+
+          tmx test-all -order after -slice 2nd half
+
+      the `slice` primary is the interface to the plugin that slices
+      out a shorter list from a longer list.
+
+      (the `-order after` modification orders the sidesystems up roughly
+      from \"easiest\" to \"hardest\", so that easier to understand teset
+      failures generally occur before more complex test failures.
+      our version of \"fail fast\" can be achieved with `-order after -reverse`.)
+
+      in the above example we broke up the tests into two groups; but
+      sometimes we want to take smaller steps, we might break it up into
+      as many as 10 (`-slice 3rd 10th`, etc). many but not all expressions
+      for ordinals are recognized.
+
+      good luck!
+    HERE
+
+    require 'strscan'
+    scn = ::StringScanner.new _BIG_TEXT
+    skip_indent = /^[ ]{6}/
+    begin
+      scn.skip skip_indent  # for some lines there is none
+      s = scn.scan %r(.*\n)
+      s || break
+      y << s
+      redo
+    end while above
+    scn.eos? || what
+    y
+  end
+
+  o.stdin = $stdin
+  o.stderr = $stderr
+  o.ARGV = ARGV
+
+  o.batch_cache = {}  # experiment - allows us to have our stream of input items
+    # (sidesystem names) "externally visible" as a loop below, while not having
+    # to do all calculations over from scratch for each invocation.
+end
+
+upstream = invo.flush_upstream_
+
+upstream or exit no
 
 begin
 
   item = upstream.gets
-  item or break
+  item || break
   item.chomp!
 
-  _ok = sli.call :gemify, :sidesystem_path, item
-  _ok or break
-  redo
-end while nil
+  ok = sli.call(
+    :gemify,
+    :sidesystem_path, item,
+    :script_invocation, invo,
+  )
+end while ok
+
+exit ok ? 0 : no

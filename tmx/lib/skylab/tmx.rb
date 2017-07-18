@@ -53,7 +53,7 @@ module Skylab::TMX
       _anything.to_stream
     end
 
-    Stemmish___ = ::Struct.new :stem
+    Stemmish___ = ::Struct.new :entry_string
 
     def to_reflective_sidesystem_stream
       installation_.to_reflective_sidesystem_stream__

@@ -4,23 +4,26 @@ module Skylab::Slicer
 
     class Tasks_::Gemspec_File < Task_[]
 
-      depends_on :README_File, :Sigil, :VERSION_File
+      depends_on(
+        :README_File,
+        :Sigil,
+        :For_TMX_Map_File,
+        :VERSION_File,
+      )
 
       def execute
 
-        sd = @Sigil.Sidesystem_Directory
-        @_fs = sd.filesystem
+        rsx = resources_
+        @_fs = rsx.filesystem
 
-        @_ss_path = sd.path
+        ss = rsx.sidesystem_path
+        @_ss_path = ss
 
-        path = ::File.join @_ss_path, "skylab-#{ @Sigil.basename }.gemspec"
+        path = ::File.join ss, "skylab-#{ ss }.gemspec"
         @path = path
 
         if @_fs.exist? @path
 
-          @_oes_p_.call :info, :expression do | y |
-            y << "no [cm] for this yet! exists - #{ path }"
-          end
           ACHIEVED_
         else
           __attempt_to_make_file
@@ -28,6 +31,7 @@ module Skylab::Slicer
       end
 
       def __attempt_to_make_file
+
         _ok = __gather_more_information
         _ok && __make_file
       end
@@ -38,10 +42,11 @@ module Skylab::Slicer
         a = ::Dir[ "#{ _dir }/*" ]  # how many can there be?
         _has_binaries = a.length.nonzero?
 
-        @_line_about_executables = if _has_binaries
-          'inf.write_one_or_more_executables_into s'
+        if _has_binaries
+
+          @_thing_1 = nil
         else
-          'inf.assert_no_executables'
+          @_thing_1 = "\n  o.has_executables = false\n\n"
         end
 
         ACHIEVED_
@@ -51,20 +56,19 @@ module Skylab::Slicer
 
         _str = Template_string___[]
         _template = Home_.lib_.basic::String::Template.via_string _str
+
+        _homepage = "http://localhost:8080/homepage-for-#{ @Sigil.sigil }"
+
         _output = _template.call(
-          author: 'hipe',
-          email: 'my@email.com',
-          homepage: "http://localhost:8080/homepage-for-#{ @Sigil.sigil }",
-          line_about_executables: @_line_about_executables,
+          xx: @_thing_1,
+          homepage: _homepage,
         )
 
         path = @path
-        io = @_fs.open path, ::File::CREAT | ::File::WRONLY
 
-        bytes = io.write _output
-        io.close
+        bytes = ::File.write path, _output
 
-        @_oes_p_.call :info, :expression do | y |
+        @_listener_.call :info, :expression do |y|
           y << "wrote #{ path } (#{ bytes } bytes)"
         end
 
@@ -74,39 +78,19 @@ module Skylab::Slicer
       Template_string___ = Common_.memoize do
 
         s = <<-HERE
-          require 'skylab/common'
+          require "skylab/common"
 
-          inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
+          inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.define do |o|
+          {{ xx }}  o.gemspec_path = __FILE__
+          end
 
-          inf.gemspec_path = __FILE__
+          Gem::Specification.new do |s|
 
-          Gem::Specification.new do | s |
+            inf.write_all_the_common_things_and_placeholders s
 
-            s.author = '{{ author }}'
+            s.homepage = "http://localhost:8080/homepage-for-{{ sigil }}"
 
-            s.date = inf.date_via_now
-
-            inf.derive_summmary_and_description_from_README_and_write_into s
-
-            s.email = '{{ email }}'
-
-            {{ line_about_executables }}
-
-            s.files = inf.to_stream_of_one_or_more_codefiles.to_a
-
-            s.homepage = '{{ homepage }}'
-
-            s.license = 'MIT'
-
-            s.name = inf.gem_name_via_gemspec_path
-
-            s.require_paths = %w( lib )
-
-            s.version = inf.version_via_VERSION_file
-
-            s.add_runtime_dependency 'skylab-common', [ '0.0.0.co.pre.bleeding' ]
-
-            # s.add_development_dependency ..
+            s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
           end
         HERE
 
@@ -114,7 +98,21 @@ module Skylab::Slicer
         s.freeze
       end
 
+      def resources_  # ick/meh
+        @README_File.resources_
+      end
+
+      attr_reader(
+        :VERSION_File,  # meh
+      )
+
+      # ==
+
       EMPTY_S_ = ''
+
+      # ==
+      # ==
     end
   end
 end
+# #history-A: dried gemspecs

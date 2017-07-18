@@ -1,25 +1,30 @@
 #!/usr/bin/env ruby -w
 
-require 'skylab/tmx'
 require 'skylab/slicer'
 
 serr = $stderr
 
-upstream = Skylab::Slicer::Script_Support_.resolve_upstream $stdin, $stderr, ARGV
+invo = Skylab::Slicer::ScriptSupport_::Invocation.define do |o|
+
+  # this is :[#161.4] - the symlinks script
+
+  o.describe_by do |y|
+    y << "YIKES! symlink the gems of the indicated sidesystems"
+    y << "so they are using the live code under development. YIKES!"
+    y << nil
+    y << "dry run is default. you have to set a special environment variable"
+    y << "(recommendation: do it on the command line: `ENV_VAR=x the/command`)"
+    y << "in order to turn dry-run off."
+  end
+
+  o.stdin = $stdin
+  o.stderr = serr
+  o.ARGV = ARGV
+end
+
+upstream = invo.flush_upstream_
+
 upstream or exit( 5 )
-
-st =  Skylab::TMX.to_reflective_sidesystem_stream
-h = {}
-
-begin
-  ni = st.gets
-  ni or break
-  h[ ni.entry_string ] = ni
-  redo
-end while nil
-
-top_of_universe = ::Dir.pwd
-
 
 if 'yes' == ::ENV['TMX_OMG']
   serr.puts "(LET'S DO IT LIVE)"
@@ -29,49 +34,61 @@ else
   _IS_LIVE = false
 end
 
+
+_ = invo.script_path_ :_essentials_script_
+load _
+h = Skylab_Slicer_OneOff_0::Build_gem_index[]
+
+
 count = 0
 
 begin
 
   item = upstream.gets
-  item or break
+  item || break
   count += 1
   item.chomp!
 
-  ni = h[ item ]
-  if ! ni
+  ss_inst = h[ item ]
+  if ! ss_inst
     serr.puts "NOT FOUND: #{ item }"
     redo
   end
 
-  stat = ::File.lstat ni.gem_path
+  _gem = ss_inst.gems.last  # yikes, many versions, is this last??
+
+  path = _gem.full_gem_path
+
+  stat = ::File.lstat path
 
   if stat.symlink?
-    serr.puts "IS ALREADY SYMLINK! skipping - #{ ni.gem_path }"
+    serr.puts "already symlink, skipping - #{ path }"
     redo
   end
 
-  cmd = [ "rm", "-rf", ni.gem_path ]
+  2 < path.length || sanity
+
+  cmd = [ "rm", "-rf", path ]
 
   serr.puts "OH MY GOD: #{ cmd * ' ' }"
 
   if _IS_LIVE
     _ok = ::Kernel.system( * cmd )
-    _ok or break
+    _ok || break
   end
 
-  exists = ::File.join top_of_universe, item
-  want = ni.gem_path
+  exists = ::File.join invo.initial_pwd, item
+  want = path
 
   cmd = "ln -s #{ exists } #{ want }"
   serr.puts cmd
 
   if _IS_LIVE
     _d = ::File.symlink exists, want
-    _d.zero? or break
+    _d.zero? || break
   end
 
   redo
-end while nil
+end while above
 
 serr.puts "(done with #{ count } items.)"

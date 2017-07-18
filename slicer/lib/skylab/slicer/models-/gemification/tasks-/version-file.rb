@@ -4,7 +4,9 @@ module Skylab::Slicer
 
     class Tasks_::VERSION_File < Task_[]
 
-      depends_on :Sidesystem_Directory, :Sigil
+      depends_on(
+        :Sidesystem_Directory,
+      )
 
       def execute
 
@@ -12,21 +14,25 @@ module Skylab::Slicer
 
         @basename = 'VERSION'
 
-        path = ::File.join sd.path, @basename
+        path = ::File.join sd.sidesystem_path, @basename
 
         if sd.filesystem.exist? path
+          @version_string = ::File.read( path ).chomp!.freeze
           ACHIEVED_
         else
-
-          _content = "0.0.0.#{ @Sigil.sigil }.pre.bleeding"
-          io = sd.filesystem.open path, ::File::WRONLY | ::File::CREAT
-          io.puts _content
-          io.close
+          @version_string = "0.0.0".freeze
+          ::File.write path, @version_string
           ACHIEVED_
         end
       end
 
-      attr_reader :basename
+      attr_reader(
+        :version_string,
+      )
+
+      # ==
+      # ==
     end
   end
 end
+# #tombstone-A: (can be temporary) more complicated file write

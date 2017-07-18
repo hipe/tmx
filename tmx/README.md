@@ -34,6 +34,13 @@ whose only purpose is to glue together other such branches.
 
 
 
+## installation
+
+see INSTALLATION.md for installation (TODO).
+
+
+
+
 ## Copyright
 
 Copyright (c) 2011 Skylab, LLC. See (EDIT: LICENSE.txt) for further details.

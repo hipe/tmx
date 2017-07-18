@@ -1,94 +1,156 @@
-# "tmx" installation
+# "tmx" installation :[#002]
 
-## installation on OSX
+## overview, TL;DR
 
-in a treatment that is perhaps too broad and too narrow at the same
-time, the end of this section is an outline detailing exactly how we get
-a development system up and running "from scratch" on a system with
-nothing but an OS (in theory).
+- what do we mean by installing "tmx"? [#here.b]
 
-First, some caveats:
+- installing the tmx "monolith" from a fresh checkout:
 
-  • here we do not cover getting our editors/IDE's set up.
+  1. install the necessary version of ruby [#here.c]
 
-  • one day it would be nice to use something like boxen for these
-    instructions, so do not get too attached to them :P
+  1. use installation script that installs the essential sidesystems [#here.d]
 
-  • today we are installing from an OS X Yostemite (10.10.5)
+  1. use installation script that installs the remaining (desired) sidesystems [#here.e]
 
-Here's the outline:
+  1. run tests to confirm installation is OK [#here.f]
 
-  1) we will use homebrew for the next step. if you have not installed
-     it before now, install it per http://brew.sh which takes around
-     2 minutes.
-
-  2) to manage different versions of ruby we will use `chruby`
-
-    • we chose `chruby` over `rbenv` and `rvm` because of the compelling
-      manifesto at [zaiste.net][].
-
-    • per the instructions there, having done `brew install chruby` we
-      add the two lines to our (in our case) .zshrc
-
-    this whole thing takes only a few minutes.
-
-  3) as the author of `chruby` does, we build the ruby we want
-     with `ruby-install`:
-
-    • per https://github.com/sstephenson/ruby-build, follow
-        "Installing as a standalone program (advanced)" (about 70 seconds)
-
-      • (using brew to install this might have worked too)
-
-    • to install openssl and ruby in this manner takes under 7 minutes:
-        mkdir ~/.rubies
-        ruby-build 2.2.3 ~/.rubies/ruby-2.2.3
-
-    • to have this new ruby appear in the list of rubies (output by the
-      `chruby` command alone), I had to open a new shell after the above
-      was completed.
-
-   4) now that our requisite ruby is installed, when we `cd` into
-      the top directory of this project, the `.ruby-version` file is
-      seen and the correct ruby version is activated (whew!). do this.
-
-      with that done, we need to install the requisite gems thru bundler:
-
-      • we had to do this, we don't know when we should have done it:
-
-        `gem update --system`
-
-        (per [this nokogiri note][])
-
-      • `gem install bundler` - takes under a minute.
-
-      • `bundle`
-
-  [zaiste.net]: http://zaiste.net/2013/04/towards_simplicity_from_rbenv_to_chruby/ zaiste.net
-
-  [this nokogiri note]: http://www.nokogiri.org/tutorials/installing_nokogiri.html#mac_os_x  this nokogiri note
+- why don't we use bundler? [#here.g]
 
 
 
 
-### other useful tools on OSX
+## what do we mean by installing "tmx"? :[#here.b]
 
-although not a part of tmx per se, we exploit this space here to remind
-ourselves of these softwares we can't do without:
+at the moment, "tmx" is the generic term for 33-or-so related gems,
+each of which can usually be categorized cleanly as either an "application"
+or a library that supports these applications. so really, "tmx" itself
+means nothing.
 
-  • ack - `brew install ack`
+we refer to these 33 interworking gems as "sidesystems". originally, we
+called them "subsystems" (borrowing the term we got from an Apple Cocoa
+book), but we eventually re-named the prefix "sub-" to "side-" to emphasize
+that none of these nodes is really highly subservient to any other; but
+rather that we visualize them as being a flat list of libraries and are
+side-by-side with each other.
 
-  • gitx
+for several years we have anticipated breaking these "sidesystems" up
+into separate code repositories; but as yet this epochial split hasn't
+ocurred. as such, we refer to the project as a "monolith" to acknowlege
+that the size of this repository is not appropriate for distribution
+to the outside world.
 
-  • macvim
-    • "janus" for same
-    • .vimrc.before, .vimrc.after, .gvimrc.after (EDIT)
+for better or worse, while this project is in its "monolith" phase there
+are particular steps necessary to go from a fresh checkout to a working
+installation (suited, necessarily, for develpment). the remainder of the
+sections in this document cover these steps.
 
 
 
 
+## install the necessary version of ruby [#here.c]
 
-## testing (too much detail)
+the details of how to install a particular version of ruby for your
+particular operating system is a bit outside our scope. but here's
+some notes for what you need to know, intermixed with how we did it
+on our own system.
+
+  - the ruby version that tmx expects is in `.ruby-version` file
+    of the root of the project.
+
+    - as this is a dotfile, you probably can't see it "normally"
+
+    - to see its contents, you can from a terminal `cd` to the
+      root of the project and do `cat .ruby-version`
+
+    - from vim in a NerdTREE window, `Ctrl-i` reveals these
+
+  - these instructions worked for us on OS X El Capitan (10.11.6)
+
+    - recent previous tmx's worked fine on Yosemite (10.10.5)
+
+    - if you're targeting Linux/BSD, you can likely adapt these
+      instructions for your platform (e.g using `apt-get` to install
+      the requisite ruby).
+
+    - we highly doubt tmx will work on Windows, and currently have
+      neither the resources or the interest to target it.
+
+  - to install the requisite version of ruby, you may weirdly want
+    to build the ruby from sources yourself, or use one of the several
+    ruby version managers.
+
+      - `rbenv` or `rvm` should work just as well, but we used `chruby`
+
+      - athough we used both of the above in the past, we switched to
+        `chruby` because it was the [simplest][zaiste.net] thing that worked.
+
+        - following the instructions from the `chruby` website
+          (or just github project page?) just worked for us.
+
+          - we used `homebrew` to install `chruby`
+
+            - install homebrew if you don't already have it
+              using http://brew.sh (~2 minutes)
+
+          - we did the thing where we added 2 lines to our `.zshrc`
+
+when all this is complete, if you `cd` into the root directory of the
+"monolith" and cat the `.ruby-version` file, it should be the same
+version as what you see when you run `ruby -v` from within this same
+directory.
+
+
+
+
+[zaiste.net]: https://zaiste.net/posts/towards_simplicity_from_rbenv_to_chruby/
+
+## using the installation scripts
+
+now, assuming that you have the requisite version of ruby as active
+in your shell session,
+
+  1. use installation script that installs the essential sidesystems :[#here.d]
+
+         ./slicer/script/083-install-essential-gems -h
+
+     reivew the above help screen, then run the command by doing the
+     same thing without the `-h` option.
+
+  1. to install the remaining sidesystems :[#here.e]
+
+    1. make a "REDLIST" following the command suggested at the end of:
+
+           ./slicer/script/250-reallocate-sigils -h
+
+    1. review this help screen then run this script:
+
+           ./slicer/script/417-install-remaining-gems -h
+
+    1. review and run this script (YIKES):
+
+           ./slicer/script/750-EEK-symlink-gems -h
+
+    1. review and run the cleanup script:
+
+           ./slicer/script/917-clean-all-gemfiles -h
+
+    1. you can remove the "REDLIST" file, too
+
+  1. to run tests at a macro level to confirm that the installation
+     is complete, follow the techniques outlined at the end of
+     this help screen:
+
+         ./slicer/script/417-install-remaining-gems -h
+
+     (this is a script we onced once before above.)
+
+     this help screen is the authoritative reference on how on
+     run the tests at a macro level. :[#here.f]
+
+
+
+
+## for posterity, related to tests above, an introduction to "chokepoints"
 
 the number of tests in this project ceilinged at 2796 tests in 427 spec
 files before we made a concerted effort to simplify and universalize
@@ -116,11 +178,75 @@ to run all "by hand", but still saves time over running all the tests at
 once. our current such sweetspot has the total test time running at
 15 seconds, which accords with our "breath" rule.
 
-we make these "chunks" by grouping particular lists of sidesystems together
-and running those chunks one at a time (currently 2 chunks). these
-chunks are listed in GREENLIST.txt.
+generally we make these chunks with the following approach:
 
-try:
+  1. line up all the sidesystem names in some particular order
 
-    ./script/test-all -h
+  2. given an "ordinal" number and a "denominator" number, run
+     a particular slice of this list (for example "the first half"
+     or "the sixth 10th", etc).
+
+
+
+
+## sidebar: why don't we use bundler (`bundle`)? :[#here.g]
+
+we tried folding bundler into the mix here, but concluded that at this
+current moment in the tmx ecosystem's development there is little to be
+gained from using it, and some nonzero cost associated with it.
+
+  - as it stands, each sidesystem can specify the versions of the other
+    sidesystems (gems) it depends on through its own `.gemspec` file. to
+    place this information redudantly in a `Gemfile` is problematic, and
+    to try to make the gemspec (and the building of the gem) depend on
+    bundler incurs a cost of dependency to a moving API with little gain.
+
+  - were it the case that we had multiple parallel ruby projects that
+    needed different versions of gems, the above would not be the case.
+
+  - while this is still in its "monolith" phase, we don't really have
+    meaningful versions yet anyway, there's just HEAD of master, and
+    every commit confirms that every sidesystem is green against every
+    other in that state (the bliss of having published nothing yet).
+
+  - bundler makes the assumption that your "project" is one gem-like
+    directory from which you will do most of your work (often a rails
+    application). tmx is decidedly not developed this way..
+
+however, longer term we will need to address the above concerns so that
+bundler works for us before we publish gems from this project, because
+it is the case that our project requires specific versions of gems,
+and bundler is the best choice to serve this need.
+
+
+
+
+## other useful tools on OSX (personal notes)
+
+although not a part of tmx per se, we exploit this space here to remind
+ourselves of these softwares we can't do without:
+
+  - ack - `brew install ack`
+
+  - gitx
+
+  - macvim
+    - "janus" for same (or not)
+    - .vimrc.before, .vimrc.after, .gvimrc.after (EDIT)
+
+
+
+
+## wishlist
+
+  - one day it would be nice to use something like boxen for these
+    instructions, so do not get too attached to them :P
+
+
+
+
+## document-meta
+
+  - #history-A: full rewrite to explain installation scripts
+    - erased note about issue with nokogiri
 _

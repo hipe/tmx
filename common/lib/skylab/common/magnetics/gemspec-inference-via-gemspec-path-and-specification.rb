@@ -3,16 +3,73 @@ module Skylab::Common
   class Magnetics::GemspecInference_via_GemspecPath_and_Specification
 
     class << self
-      alias_method :begin, :new
+      alias_method :define, :new
       undef_method :new
     end  # >>
 
+    def initialize
+
+      @has_executables = true
+
+      yield self
+
+      @gemspec_path || fail
+
+      @_dir = ::File.dirname( @gemspec_path ).freeze
+
+      @_exe_glob = ::File.join( @_dir, 'bin', '*' ).freeze
+
+      freeze
+    end
+
+    # -- write
+
     attr_writer(
       :gemspec_path,
-      :specification,
+      :has_executables,
     )
 
-    attr_reader :gemspec_path  # convenience
+    # -- read
+
+    def write_all_the_common_things_and_placeholders o  # o=spec
+
+      __write_the_first_cluster o
+      __write_the_second_cluster o
+      __write_the_third_cluster o
+      NIL
+    end
+
+    def __write_the_third_cluster o
+
+      if @has_executables
+        write_one_or_more_executables_into o
+      else
+        __assert_no_executables
+      end
+
+      a = to_stream_of_one_or_more_codefiles.to_a
+      a.push '.for-tmx-map.json'  # you can't, you might be installing [co], but it's ::Skylab::TMX::METADATA_FILENAME
+      # a.freeze  # can't, don't know why because rubygems is annoying
+      o.files = a
+
+      o.require_paths = %w( lib )
+    end
+
+    def __write_the_second_cluster o
+      derive_summmary_and_description_from_README_and_write_into o
+      o.homepage = "http://localhost:8080/homepage-for-co"
+      o.license = "MIT"
+      o.metadata[ "allowed_push_host" ] = "TODO: set to 'http://mygemserver.com'"
+    end
+
+    def __write_the_first_cluster o
+      o.name = gem_name_via_gemspec_path
+      o.version = version_via_VERSION_file
+      o.author = "hipe"
+      o.email = "«#todo»@email.com"
+    end
+
+    # -- atomic components
 
     # ~ (in alphabetical order by stem)
 
@@ -25,14 +82,14 @@ module Skylab::Common
 
     def to_stream_of_one_or_more_codefiles
 
-      head = ::File.join _dir, EMPTY_S_
+      head = ::File.join @_dir, EMPTY_S_
       paths = ::Dir[ "#{ head }lib/**/*.rb" ]
 
       if paths.length.zero?
         self._COVER_ME
       else
         r = head.length .. -1
-        Home_::Stream.via_nonsparse_array paths do | path |
+        Home_::Stream.via_nonsparse_array paths do |path|
           path[ r ]
         end
       end
@@ -42,7 +99,7 @@ module Skylab::Common
 
     def derive_summmary_and_description_from_README_and_write_into spec
 
-      io = ::File.open ::File.join( _dir, 'README.md' ), ::File::RDONLY
+      io = ::File.open ::File.join( @_dir, 'README.md' ), ::File::RDONLY
 
       paragraph_stream = Paragraph_stream_vi_IO___[ io ]
       para = paragraph_stream[]
@@ -74,7 +131,7 @@ module Skylab::Common
       end
     end
 
-    def assert_no_executables
+    def __assert_no_executables
 
       path = _to_stream_of_executables.gets
       if path
@@ -101,9 +158,7 @@ module Skylab::Common
 
     def _to_stream_of_executables
 
-      @_exe_glob = "#{ _dir }/bin/*"  # ick
-
-      Home_::Stream.via_nonsparse_array ::Dir[ @_exe_glob ] do | path |
+      Home_::Stream.via_nonsparse_array ::Dir[ @_exe_glob ] do |path|
         ::File.basename path  # be careful
       end
     end
@@ -127,16 +182,18 @@ module Skylab::Common
 
     def version_via_VERSION_file
 
-      s = ::File.read ::File.join( _dir, 'VERSION' )
+      s = ::File.read ::File.join( @_dir, 'VERSION' )
       s.chomp!
       s
     end
 
-    def _dir
-      @___dir ||= ::File.dirname( @gemspec_path )
+    # -- ..
+
+    def subject_directory
+      @_dir
     end
 
-    alias_method :subject_directory, :_dir
+    # ==
 
     Paragraph_stream_vi_IO___ = -> do
 
@@ -167,6 +224,8 @@ module Skylab::Common
             ( sentence_a ||= [] ).push s ; nil
           end
 
+          require 'strscan'
+
           begin
 
             line = io.gets
@@ -174,14 +233,9 @@ module Skylab::Common
             line.chomp!
 
             if header_rx =~ line || blank_rx =~ line
-              if pending_a || sentence_a
-                break
-              else
-                redo
-              end
+              ( pending_a || sentence_a ) ? break : redo
             end
 
-            require 'strscan'
             scn = ::StringScanner.new line
 
             begin
@@ -197,14 +251,18 @@ module Skylab::Common
               end
 
               add_pending[ scn.rest ]
-            end while nil
+              break
+            end while above
 
             redo  # go to read next line
-          end while nil
+          end while above
 
           sentence_a
         end
       end
     end.call
+
+    # ==
+    # ==
   end
 end

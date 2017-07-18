@@ -76,8 +76,8 @@ class Skylab::Task
         end
       end  # >>
 
-      def initialize & oes_p
-        @_oes_p_ = oes_p
+      def initialize & p
+        @_listener_ = p
       end
 
       # ~ behavior
@@ -86,7 +86,7 @@ class Skylab::Task
 
         # not for every task in the graph, only the "front" one
 
-        o = Home_::Magnetics_::Execution_via_ParameterBox_and_TargetTask.new( & @_oes_p_ )
+        o = Home_::Magnetics_::Execution_via_ParameterBox_and_TargetTask.new( & @_listener_ )
 
         if instance_variable_defined? :@_params
           o.parameter_box = remove_instance_variable :@_params

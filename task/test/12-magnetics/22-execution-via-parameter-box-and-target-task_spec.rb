@@ -22,7 +22,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
           def execute
 
-            @_oes_p_.call :payload, :data do
+            @_listener_.call :payload, :data do
               [ @topping, @inside, @bread ]
             end
 

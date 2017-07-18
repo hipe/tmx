@@ -15,13 +15,15 @@ module Skylab::Slicer
       edit_entity_class(
         :flag, :property, :dry_run,
         :required, :property, :sidesystem_path,
+        :property, :script_invocation,  # API-only :(
       )
 
       def produce_result
 
-        task = Here_::Tasks_::Gem_File_Builds.new( & @on_event_selectively )
+        task = Here_::Tasks_::Installed_Gem.new( & @on_event_selectively )
 
         task.add_parameter :sidesystem_path, @argument_box.fetch( :sidesystem_path )
+        task.add_parameter :script_invocation, @argument_box[ :script_invocation ]
         task.add_parameter :filesystem, ::File
 
         task.execute_as_front_task
@@ -37,5 +39,8 @@ module Skylab::Slicer
     Task_ = -> do
       Home_.lib_.task
     end
+
+    # ==
+    # ==
   end
 end
