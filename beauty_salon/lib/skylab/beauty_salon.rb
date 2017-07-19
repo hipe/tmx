@@ -56,6 +56,13 @@ module Skylab::BeautySalon
     stowaway :Text, 'text/actions/wrap'
   end
 
+  Lazy_ = Common_::Lazy
+
+  Require_brazen_LEGACY_ = Lazy_.call do
+    Brazen_ = Home_.lib_.brazen
+    NIL
+  end
+
   module Lib_
 
     sidesys, = Autoloader_.at :build_require_sidesystem_proc
@@ -101,6 +108,8 @@ module Skylab::BeautySalon
   IDENTITY_ = -> x { x }          # for fun we track this
   NEWLINE_ = "\n"
   NIL_ = nil  # to emphasize its use
+  NIL = nil  # #open [#sli-116.C]
+  NOTHING_ = nil
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false

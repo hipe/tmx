@@ -1,5 +1,10 @@
 # precedence rules for logical taxonomies :[#038]
 
+(EDIT: this whole document is now antique, belonging to the [br] era)
+
+
+
+
 ## the purpose and scope of this document..
 
 ..is to present the concept of "node" and "taxonomy", and then the concept

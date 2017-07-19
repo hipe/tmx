@@ -128,9 +128,9 @@ methods it defines is sort of a "sub-contract" with the same audience.
 
 ### "public API variant" :[#here.1.1.2]
 
-(this is one "visual" convention with two distinct meanings. the
-other meaning is described next, at [#here.1.0]. which meaning is
-intended can typically be inferred from context.)
+(NOTE this is one of two distinct meanings this visual convention
+may confer. the other meaning is descibed below, at [#here.1.1].
+which meaning is intended can typically be inferred from context.)
 
 methods defined following this convention are part of the defining
 module's public API (exactly as [#here.0.0]), but for those cases where
@@ -229,19 +229,33 @@ test easier to test but is not part of any API requirement.
 
 
 
-## :[#here.1.0] and and :#tier-3
+### `_this_form` :[#here.1.0] and :#tier-3
 
 "cozy scope" means the method is not called outside of the file it is
-defined in. "one-off scope" is cozy scope but furthermore the method is
-only ever called from one place. the significance of these tiers
-corresponds exactly to the same tiers described in [#029].
+defined in.
+
+"one-off scope" is cozy scope but furthermore the method is only ever
+called from one place. we discuss this form below at [#here.2.0].
+
+the significance of these tiers corresponds exactly to the same tiers
+described in [#029].
 
 
 
-### about `_this_convention_` as [#here.1.0]
+
+### about `_this_convention_` as [#here.1.0] :[#here.1.1]
+
+(NOTE this is one of two distinct meanings this convention may confer.
+the other meaning is descibed above, at [#here.1.1.2])
 
 as exactly a portmanteau of `library_scope_` and `_file_scope`,
-`_this_convention_` might confer this:
+we use `_this_convention_` for two distinct means with about equal
+frequency:
+
+we may use this convention when we want to emphasize that a method
+is being called over an inheritance (or actually ancestor chain) boundary;
+typically when it's a method in a parent class that "hooks out" to a method
+expected to be found in the child class (the class of the instance). maybe:
 
   - this method is only ever called from this same file it's defined in.
 
@@ -251,6 +265,22 @@ as exactly a portmanteau of `library_scope_` and `_file_scope`,
     as such it can be the case that there are multiple definitions but
     only a single location of call for such a method.
 
+
+
+
+### a "fold method" (one `__like_this`) :[#here.2.0]
+
+a method whose name leads with TWO underscores is only called from
+within the same file it is defined in (and probably from within the same
+module it is defined in, in terms of codespace); and furthermore it is
+only called from one code-place.
+
+we call it a "fold" method because it functions something like the
+code-folding feature of IDE's, except in a hard-coded manner.
+
+this form (introduced with a different name above at [#here.1.0]) has
+particular properties that are glazed over at (ancient)
+"private fold method defined" [#012].
 
 
 

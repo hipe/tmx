@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
     Actions = ::Module.new
 
-    Brazen_ = Home_.lib_.brazen
+    Require_brazen_LEGACY_[]
 
     class Actions::Ping < Brazen_::Action  # :+#stowaway (while it works)
 

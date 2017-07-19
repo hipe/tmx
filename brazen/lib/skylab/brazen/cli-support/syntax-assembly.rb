@@ -247,7 +247,12 @@ module Skylab::Brazen
         if s
           s
         else
-          ARGUMENT_MONIKER_FORMAT___ % prp.name.as_slug
+          _slug = if prp.respond_to? :name
+            prp.name.as_slug
+          else
+            prp.name_symbol.id2name.gsub UNDERSCORE_, DASH_  # #not-covered  ..
+          end
+          ARGUMENT_MONIKER_FORMAT___ % _slug
         end
       end
 

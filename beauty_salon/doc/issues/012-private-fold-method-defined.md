@@ -1,5 +1,7 @@
 # "private fold method" defined :[#012]
 
+(this is somewhat informed by the hazy notion at [#007].)
+
 a "private fold method" means: a private method that is all of:
   + only called from one other "place" (i.e line of code in the codebase)
   + exists only for one of more ("and/or") of:

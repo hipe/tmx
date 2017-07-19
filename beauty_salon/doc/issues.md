@@ -13,7 +13,10 @@
 [#029]       name conventions for constants .. #parent-node:[#030]
 [#028]       name conventions for functions and methods ..  #parent-node:[#030]
 [#026]       #parent-node: [#010] procedurally find the smaller methods
-[#025] #hole (#moved-to: [sa])
+
+[#025]       crazy town ..
+             ( #was: #moved-to: [sa] )
+
 [#024]       (#ditto)
 [#023]       (#ditto)
 [#022]       (#ditto)
