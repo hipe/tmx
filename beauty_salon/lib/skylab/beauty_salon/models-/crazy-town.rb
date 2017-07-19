@@ -46,15 +46,28 @@ module Skylab::BeautySalon
       )
 
       def produce_result
-        # via_properties_init_ivars nah.
-        p = -> do
-          p = -> { NOTHING_ }
-          "one line"
+
+        fs = ::File
+
+        bx = remove_instance_variable( :@argument_box ).h_
+
+        _path = bx.fetch :files_file
+
+        _file_path_upstream = fs.open _path
+
+        _hi = Home_::CrazyTownMagnetics_::DiffLineStream_via_Arguments.call_by do |o|
+
+          o.file_path_upstream = _file_path_upstream
+
+          o.code_selector_string = bx.fetch :code_selector
+
+          o.replacement_function_string = bx.fetch :replacement_function
+
+          o.filesystem = fs
+
+          o.listener = @on_event_selectively
         end
 
-        _hi = Common_.stream do
-          p[]
-        end
         _hi
       end
     # -
