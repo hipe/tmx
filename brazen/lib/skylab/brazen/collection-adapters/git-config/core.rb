@@ -17,11 +17,6 @@ module Skylab::Brazen
 
     class ImmutableDocument_via___ < CommonDocumentParse_
 
-      def initialize
-        @listener = nil  # not required
-        super
-      end
-
       def init_appropriate_document_instance_
         @document = Document___.new @byte_upstream_reference
         NIL
@@ -107,6 +102,11 @@ module Skylab::Brazen
     BLANK_LINE_OR_COMMENT_RX_ = /\A[ ]*(?:\r?\n?\z|[#;])/
 
     class CommonDocumentParse_   # #testpoint
+
+      def initialize
+        @listener = nil  # not required
+        super
+      end
 
       def upstream_path= path
         @byte_upstream_reference = _BUR.via_path path

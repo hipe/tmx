@@ -1,21 +1,8 @@
-require 'skylab/tmx'
+require_relative '../test-support'
 
-# (we needed this functionality for a re-factor that was happening
-# *while* the ecosystem was broken (the ecosystem installer) so we didn't
-# bother trying to have the full stack of testing tools for now..)
+module Skylab::TMX::TestSupport
 
-
-# module Skylab::TMX::TestSupport
-
-class Skylab_TMX_OneOff_1
-
-  # describe "[tmx] models - sigil" do
-  begin
-
-    def self.it s, & p
-      @_a.push [ s, p ] ; nil
-    end
-    @_a = []
+  describe "[tmx] models - sigil" do
 
     it "the result knows the length of the longest thing string" do
 
@@ -200,22 +187,12 @@ class Skylab_TMX_OneOff_1
       ::Skylab::TMX::Models::Sigil
     end
 
-    def self.__run_all_tests_
-
-      @_a.each do |_s, p|
-        new.instance_exec( & p )
-      end
-    end
-
     class X_ms_EekWrap
       def initialize s
         @entry_string = s
       end
       attr_reader :entry_string
     end
-
-    freeze  # (in case we accidentally try to re-use this same generic name elsehwere)
   end
 end
-
-Skylab_TMX_OneOff_1.__run_all_tests_
+# #history-A: at this commit we changed this from standalone style

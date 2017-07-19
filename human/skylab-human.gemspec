@@ -9,10 +9,11 @@ end
 
 Gem::Specification.new do |s|
 
-
   inf.write_all_the_common_things_and_placeholders s
 
   s.homepage = "http://localhost:8080/homepage-for-hu"
 
   s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
+
+  s.add_runtime_dependency "levenshtein", "~> 0.2"  # had: 0.2.2
 end

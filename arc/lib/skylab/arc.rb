@@ -715,12 +715,18 @@ module Skylab::Arc  # notes in [#002]
         NIL_
       end
 
-      attr_reader :description_proc
-
       def accept__description__meta_component p
         @description_proc = p
         NIL_
       end
+
+      attr_reader :description_proc
+
+      def accept__order_ordinal__meta_component d
+        @order_ordinal_ = d ; nil
+      end
+
+      attr_reader :order_ordinal_
 
       # ~ name
 
@@ -1007,7 +1013,7 @@ module Skylab::Arc  # notes in [#002]
     Reflection_looks_primitive = -> x do
       # `nil` is NOT primitive by this definition!
         case x
-        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # #[#003.J] trueish
+        when ::TrueClass, ::Integer, ::Float, ::Symbol, ::String  # #[#003.J] trueish
           true
         else
           false
@@ -1061,6 +1067,7 @@ module Skylab::Arc  # notes in [#002]
     EMPTY_A_ = [].freeze
     EMPTY_P_ = -> { NIL_ }
     Home_ = self
+    IDENTITY_ = -> x { x }
     KEEP_PARSING_ = true
     MONADIC_EMPTINESS_ = -> _ { NIL_ }
     NIL_ = nil

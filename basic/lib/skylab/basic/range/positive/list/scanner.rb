@@ -26,20 +26,25 @@ module Skylab::Basic
         _state_h[ st.i ] = st
       end
 
-      state[ :start, nil,  [ :beginning ], -> x do
+      state[ :start, nil,  [ :beginning ],
+                                        -> x do
+                                          NOTHING_  # MONADIC_EMPTINESS_
                                         end ]
       state[ :beginning, /\d+/, [ :dash, :comma ],
-                                           -> x do
+                                        -> x do
                                           curr.begin = x.to_i
                                           complete = true
                                         end ]
-      state[ :dash, /-/,      [ :ending ], -> _ do
+      state[ :dash, /-/,      [ :ending ],
+                                        -> _ do
                                           complete = false
                                         end ]
-      state[ :comma, /,/,     [ :beginning ],  -> x do
+      state[ :comma, /,/,     [ :beginning ],
+                                        -> x do
                                           ick = true
                                         end ]
-      state[ :ending, /\d+/,  [ :comma ],  -> x do
+      state[ :ending, /\d+/,  [ :comma ],
+                                        -> x do
                                           curr.end = x.to_i
                                           complete = true
                                         end ]

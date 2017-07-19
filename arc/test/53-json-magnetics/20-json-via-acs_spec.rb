@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[arc] modalities - JSON - express" do
+  describe "[arc] JSON magnetics - via ACS" do
 
     TS_[ self ]
     use :JSON_magnetics_lite

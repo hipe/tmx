@@ -88,12 +88,12 @@ class Skylab::Task
       def __task_viz__component_operation
 
         # (bridge this old-timey guy..)
-        o = Lazy_.call do
+        lib = Lazy_.call do
           Home_::Magnetics_::Visualization_via_Tasks
         end
 
         yield :description, -> y do
-          o[].describe_into_under__ y, self
+          lib[].describe_into_under__ y, self
         end
 
         yield :parameter, :require, :optional,
@@ -102,7 +102,7 @@ class Skylab::Task
           end
 
         -> target_task, require, & listener do
-          o[].call_by do |o|
+          lib[].call_by do |o|
             o.target_task = target_task
             o.require = require
             o.listener = listener

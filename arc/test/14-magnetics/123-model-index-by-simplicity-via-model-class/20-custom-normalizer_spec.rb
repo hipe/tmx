@@ -91,7 +91,7 @@ module Skylab::Arc::TestSupport
 
       given_upstream_ :gza, 23
       _ent = interpret_entity_
-      _ent.gza == "FIXNUM" || fail
+      _ent.gza == "INTEGER" || fail
     end
 
     def subject_class_

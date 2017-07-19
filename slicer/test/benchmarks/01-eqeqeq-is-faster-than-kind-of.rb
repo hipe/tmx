@@ -22,10 +22,12 @@ class Alt < TestSupport_::Benchmark::Alternative
   end
 end
 
+cls = ::Integer
+
 alts = [ ]
-alts << Alt[ "kind_of?", -> { val.kind_of? ::Fixnum } ]
-alts << Alt[ "===",      -> { ::Fixnum === val } ]
-alts << Alt[ "==",       -> { ::Fixnum == val.class } ]
+alts << Alt[ "kind_of?", -> { val.kind_of? cls } ]
+alts << Alt[ "===",      -> { cls === val } ]
+alts << Alt[ "==",       -> { cls == val.class } ]
 
 _tests = lambda do
 

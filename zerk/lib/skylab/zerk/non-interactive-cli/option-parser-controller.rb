@@ -172,7 +172,12 @@ module Skylab::Zerk
 
       def _any_desc_lines_for desc_p
         if desc_p
-          @_expag.calculate [], & desc_p
+          # (new in transition from ruby 2.2.3 to 2.4.1, check arity)
+          if 1 == desc_p.arity
+            @_expag.calculate [], & desc_p
+          else
+            @_expag.calculate( & desc_p )
+          end
         end
       end
 

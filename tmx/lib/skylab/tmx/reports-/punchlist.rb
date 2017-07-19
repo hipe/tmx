@@ -80,10 +80,12 @@ module Skylab::TMX
     #     before they are noticed, making their eventual fixing more costly
     #     than if the integration issue(s) are detected earlier.
     #
-    #   - portability: in a theoretical but much sought-after world where
-    #     not all sidesystems shoudl be assumed to exist in a given
+    #   - portability: in a theoretical but much sought-after world
+    #     ("post-monolith") where not all sidesystems should be assumed to
+    #     exist in a given
     #     installation, it's ugly if not problematic to list all sidesystems
-    #     in the same "hard-coded" file. (this becomes [#001].)
+    #     in the same "hard-coded" file. (this becomes [#020] the mountable
+    #     standalone architecture.)
     #
     #   - aesthetic bias: the ordering of the items is largely aesthetic/
     #     heuristic as discussed above; and so does not avail itself to

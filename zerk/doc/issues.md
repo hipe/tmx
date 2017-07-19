@@ -11,6 +11,11 @@
 [#064]       non-interactive CLI "fail early" notes ..
 
 [#063]       one-off mounting
+
+             (this tracks this concern as it pertains to this sidesystem.
+             see also [#tmx-020] for a good general introduction to
+             "standalone" scripts (formerly called "one-offs").)
+
              [#here.2]: help screen scraper (also tracked by [#054.3])
              [#here.1]: having to do with the "callback module"
 

@@ -117,7 +117,7 @@ module Skylab::Common::TestSupport
         emitter.call_digraph_listeners :info
         ( !! id_one ).should eql true
         id_one.should eql id_two
-        id_two.should be_kind_of ::Fixnum
+        id_two.should be_kind_of ::Integer
       end
     end
 

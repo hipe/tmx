@@ -52,12 +52,12 @@ class Skylab_Slicer_OneOff_0  # Nx
 
         which is the list of gems that this script installs. whew!
 
-        (and if you are curious to see what this task graph looks like,
+        (and if you're curious to see what this task graph looks like,
         then once you have installed these essential #{ num_ } sidesystems,
         try opening up the output this in graph viz:
 
             ./task/bin/tmx-task task-viz \\
-              Skylab::Slicer::Models_::Gemification::Tasks_::Gem_File_Builds \\
+              Skylab::Slicer::Models_::Gemification::Tasks_::Installed_Gem \\
               --require 'skylab/slicer'
 
         woo hoo!)

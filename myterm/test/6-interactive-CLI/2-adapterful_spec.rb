@@ -88,7 +88,17 @@ module Skylab::MyTerm::TestSupport
         screen 3
 
         it "shows that no path is selected" do
-          lines[ -4 ] == "  path  (none)" or fail
+
+          # #fragile-order-broke
+
+          target = "  path  (none)"
+          lines = self.lines
+
+          _yes_found = 2.upto( 3 ).detect do |d|
+            target == lines.fetch( d )
+          end
+
+          _yes_found || fail
         end
 
         it "shows the 2 background-font-related components" do
@@ -135,9 +145,33 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
+      # ~ (#fragile-order-broke  AWFUL
+
       def _these_buttons
-        last_line == "[p]ath [l]ist" or fail
+        _actual = __cached_normalized_buttons_line
+        _actual == "[l]ist [p]ath" || fail
       end
+
+      -> do
+        cache = {}
+        define_method :__cached_normalized_buttons_line do
+          k = last_line
+          cache.fetch k do
+            x = __normalize_buttons_line k
+            cache[ k ] = x
+            x
+          end
+        end
+      end.call
+
+      def __normalize_buttons_line line
+        line.split( SPACE_ ).sort.join( SPACE_ )
+      end
+
+      # ~)
     end
+
+    # ==
+    # ==
   end
 end

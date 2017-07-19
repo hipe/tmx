@@ -194,5 +194,6 @@ module Skylab::MyTerm::TestSupport
   NIL_ = nil
   NONE_ = nil
   NOTHING_ = nil
+  SPACE_ = ' '
   TS_ = self
 end

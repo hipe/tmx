@@ -60,24 +60,106 @@ module Skylab::Arc
         :on_operation,
       )
 
+      # something nasty hit us in our jump from ruby version 2.2.3 to 2.4.1 -
+      # no longer is the code order reflected in your calls to
+      # `instance_methods( false )` on a class.
+      # (of course not. why should it be?) so
+      # a founding principle of [arc] is ripped out out from under us.
+
+      # hypothetically this needn't affect everything adversely, but
+      # those apps that relied on this behavior need new markup. because
+      # associations are evaluated lazily, it's not easy to "peek" to
+      # see if the first node defines an ordinal. this is why we use this
+      # nasty constant for those classes that etc..
+
+      # after all, thogh, perhaps it's a misfeature
+
       def execute
 
         @on_association ||= default_on_association
         @on_operation ||= default_on_operation
 
+        st = @_reader.to_entry_stream__
+
+        if __do_order_fix
+          __execute_ordered st
+        else
+          __execute_unordered st
+        end
+      end
+
+      def __execute_ordered en_st
+
+        #   - sadly operations have a different API than component
+        #     associations so they each need their own handling.
+        #
+        #   - because OCD we don't want to dereference off the same shape
+        #     symbol 2x per item, so we have duplicated some logic from the
+        #     non-ordered counterpart.
+        #
+        #   - we definitely have to flush the whole stream before we can
+        #     sort it. this is not like the linked list lazy stream sorting
+        #     we do elsewhere
+
+        a = []
+        begin
+          en = en_st.gets  # [#035]
+          en || break
+          tup = send ORDERED___.fetch( en.entry_category ), en
+          tup || redo
+          a.push tup
+          redo
+        end while above
+
+        _a_ = a.sort_by do |(d, _)|
+          d
+        end
+
+        Stream_.call _a_ do |(_, ref)|
+          ref
+        end
+      end
+
+      ORDERED___ = {
+        association: :__on_association_when_ordering,
+        operation: :__on_operation_when_ordering,
+      }
+
+      def __on_operation_when_ordering en
+        op = @on_operation[ en ]
+        if op
+          ::Kernel._COVER_ME__no_prob__
+        end
+      end
+
+      def __on_association_when_ordering en
+        ref = @on_association[ en ]
+        if ref
+          _asc = ref.association
+          [ _asc.order_ordinal_, ref ]
+        end
+      end
+
+      def __execute_unordered en_st
+
         # hand-write a map-reduce for clarity
 
-        st = @_reader.to_entry_stream__
         Common_.stream do
           begin
-            en = st.gets  # [#035]
-            en or break
+            en = en_st.gets  # [#035]
+            en || break
             _ivar = IVARS___.fetch en.entry_category
             x = instance_variable_get( _ivar ).call en
-            x and break
-            redo
-          end while nil
+          end until x
           x
+        end
+      end
+
+      def __do_order_fix
+
+        cls = @_reader.ACS_.class
+        if cls.const_defined? :ACS_FIX_ORDER, false
+          cls::ACS_FIX_ORDER
         end
       end
 
@@ -93,30 +175,36 @@ module Skylab::Arc
 
       def default_on_association
 
-        p = -> first_en do
-          node = NodeReference_for_Assoc___.new @_reader
-          p = -> en do
-            node.new en
-          end
-          p[ first_en ]
-        end
-
-        -> first_en do
-          p[ first_en ]
+        _build_thing do
+          NodeReference_for_Assoc___
         end
       end
 
       def default_on_operation
 
-        p = -> first_en do
-          node = NodeReference_for_Operation___.new @_reader
-          p = -> en do
-            node.new en
-          end
-          p[ first_en ]
+        _build_thing do
+          NodeReference_for_Operation___
         end
-        -> first_en do
-          p[ first_en ]
+      end
+
+      def _build_thing
+
+        p = nil ; node_prototype = nil
+
+        main = -> en do
+          node_prototype.new en
+        end
+
+        p = -> first_en do  # en = entry node
+
+          _class = yield
+          node_prototype = _class.new @_reader
+
+          ( p = main )[ first_en ]
+        end
+
+        -> en do  # first entry
+          p[ en ]
         end
       end
 

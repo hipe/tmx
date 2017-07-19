@@ -48,11 +48,11 @@ module Skylab::Arc::TestSupport
 
       a = []
       begin
-        nt = st.gets  # [#035]
-        nt or break
-        a.push nt.name_symbol
+        ref = st.gets  # [#035]
+        ref || break
+        a.push ref.name_symbol
         redo
-      end while nil
+      end while above
       a
     end
 

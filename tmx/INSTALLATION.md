@@ -24,7 +24,7 @@
 at the moment, "tmx" is the generic term for 33-or-so related gems,
 each of which can usually be categorized cleanly as either an "application"
 or a library that supports these applications. so really, "tmx" itself
-means nothing.
+means nothing. (see also [#020.B] "what is *a* tmx?")
 
 we refer to these 33 interworking gems as "sidesystems". originally, we
 called them "subsystems" (borrowing the term we got from an Apple Cocoa

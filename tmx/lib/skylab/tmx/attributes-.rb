@@ -103,5 +103,15 @@ module Skylab::TMX
 
       end
     end
+
+    class Attributes_::Sigil
+
+      def initialize(*)
+
+      end
+    end
+
+    # ==
+    # ==
   end
 end

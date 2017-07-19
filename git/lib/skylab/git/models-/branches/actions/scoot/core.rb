@@ -1116,7 +1116,7 @@ module Skylab::Git
     end
 
     Number_of_digits_in_integer_ = -> d do
-      if ::Fixnum === d
+      if ::Integer === d
         0 > d and d *= -1  # we don't count any '-'
         num = 1 ; num += 1 while (( d /= 10 )).nonzero?
         num

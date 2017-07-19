@@ -52,7 +52,7 @@ module Skylab::DocTest
       end
 
       def UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan, & p
-        DocumentWriteMagnetics_::Upgrade.new( plan, @_choices, & p ).execute
+        Here_::DocumentWriteMagnetics_::Upgrade.new( plan, @_choices, & p ).execute
       end
 
       def to_branch_local_document_node_matcher
@@ -226,7 +226,7 @@ module Skylab::DocTest
 
       def __holy_smokes_you_want_both unasser
 
-        DocumentWriteMagnetics_::HybridSetup.by do |o|
+        Here_::DocumentWriteMagnetics_::HybridSetup.by do |o|
           o.choices = @_choices
           o.on_const_definition = method :_on_const_definition
           o.on_shared_subject = method :_on_shared_subject

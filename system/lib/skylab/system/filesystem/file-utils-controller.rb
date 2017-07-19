@@ -46,11 +46,20 @@ module Skylab::System
     end
 
     ::FileUtils.collect_method( :verbose ).each do | meth_i |
+
       define_method meth_i do | *a, &p |
+
         h = ::Hash.try_convert a.last
-        if ! h or ! h.key? :verbose
-          fu_update_option a, verbose: true
+
+        # neato - this changed in the jump from ruby 2.2.3 to 2.4.1 near named args
+        if h
+          if ! h.key? :verbose
+            h[ :verbose ] = true  # change original - ick/meh
+          end
+        else
+          a.push( verbose: true )
         end
+
         super( * a, & p )
       end
     end

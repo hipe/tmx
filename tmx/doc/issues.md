@@ -2,11 +2,12 @@
              [#here.2]: we are borrowing coverage from [gi]
        #open [#here.1]: we are lending coverage to [#ba-060.1]
 
-[#021] #hole
-             (#moved-to: [#063.2] help screen scraper)
+[#021]       models referenced externally
+             [#here.1] [ sigil ]
+             ( #was: #moved-to: [#063.2] help screen scraper)
 
-[#020] #hole ( #was: "did you mean.." )
-
+[#020]       mountable standalone scripts and related ..
+             ( #was: "did you mean.." )
 
 [#019] #open get fuzzy out of multi mode argument scanner - it should
              only happen in "omni" now (no-deps [ze]). unifying these
@@ -21,7 +22,7 @@
 [#018]       tracks our omni help screen/system.
        #open [#here.3]: what will it take for map primaries to show up in test-all?
              [#here.2]: our "mega-listing" help screen
-             [#here.1]: mounted one-off API
+             ( #was: "[#here.1]: mounted one-off API". looks like moved to [#ze-063.1] )
 
 [#017] #wish here's guys that don't have "mounting" in tmx that might want it -
              [sa], [dt], [my], [gv]
@@ -76,6 +77,9 @@
 
 [#007]       internal issues that are not public
 
+             [#here.C] (this old issue is giving this name for tracking,
+                        but its content is still down below at #here-1)
+
        #reme [#here.B] using the development dir & json files to populate
                        tmx won't fly for a production version
 
@@ -93,11 +97,16 @@
 [#003]       ( #moved-to: [#ze-054] )
              ( #was: the help screen narrative .. )
 
-[#002]       what is the front model? ..
-[#001]       "the problem with tmx" is where it hard-codes assumptions about
+[#002]       [ INSTALLATION.md ]
+
+[#007.C]     (:#here-1 - this sub-node is in this strange location b.c history)
+
+             "the problem with tmx" is where it hard-codes assumptions about
              a full or particular constituency of non-essential sidesystems..
              this applies to files in [tmx] and out, including data files/
              development guidance files (like the punchlist, like the
              greenlist), test code files (like the two in [tmx] that tests
              universe-wide integration), and any asset code files (none
              come to mind at the time).
+
+[#001]       [ the README.md ]

@@ -29,6 +29,8 @@ module Skylab::Arc
       end
   end
 
+  # -
+
     find_handler_method = -> st, acs do
 
       # shift elements from the channel on to the method
@@ -52,5 +54,7 @@ module Skylab::Arc
       m
     end
 
-    IDENTITY_ = -> x { x }
+    # ==
+    # ==
+  # -
 end

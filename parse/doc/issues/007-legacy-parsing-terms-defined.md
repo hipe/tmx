@@ -51,7 +51,7 @@ in false positives or negatives:
 
   -> x { /foo/ =~ x  }  # your successful result structure would be an integer
   -> _ { :yes == :no }  # this will always succeed: false is not nil
-  -> x { x.zero?     }  # result is false or a Fixnum, again always success.
+  -> x { x.zero?     }  # result is false or an Integer, again always success.
 
 so as it works out, we have to draw a thick line between whether we are just
 matching or also scanning.

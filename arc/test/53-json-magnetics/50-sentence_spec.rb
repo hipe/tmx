@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[arc] modalities - JSON - of POS" do
+  describe "[arc] JSON magnetics - sentence" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -122,7 +122,9 @@ module Skylab::Arc::TestSupport
           }
         HERE
 
-        root_ACS_result.should eql _exp
+        _act = root_ACS_result
+
+        _act.should eql _exp
       end
     end
 

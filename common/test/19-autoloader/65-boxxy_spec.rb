@@ -27,7 +27,10 @@ module Skylab::Common::TestSupport
         _x = mod.const_get :NCsa_spy, false
         _x == :_hello_yes_this_is_NCSA_Spy_ || fail
 
-        mod.constants == %i( LOL NCSA_Spy ) || fail
+        # when upgraded ruby from 2.2.3 to 2.4.1, order is indeterminate
+        these = mod.constants
+        these.sort!
+        these == %i( LOL NCSA_Spy ) || fail
       end
 
       def _subject_module

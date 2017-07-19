@@ -71,7 +71,19 @@ module Skylab::Cull::TestSupport
       # #cov1.2, #lends-coverage-to [#br-007.1]
 
       it "(result is number of bytes written FOR NOW)" do
-        129 == _tuple.last || fail
+
+        d = _tuple.last
+
+        # yuck the number of characters written to the file depends on
+        # the absolute path of the monolith directory. this should be
+        # changed (probably) so .. maybe an option to force relative paths
+        # for assets, even when they are longer than the absolute path. but
+        # meh that's a #todo. for now we just allow that the absolute dev
+        # directory path can be up to 40 chars long ..
+
+        d.respond_to? :bit_length or fail
+
+        ( 128..169 ).include? d or fail
       end
 
       it "emits event talkin bout added" do

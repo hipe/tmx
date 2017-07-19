@@ -11,11 +11,15 @@ module Skylab::Arc::TestSupport
 
       # -
 
+        ACS_FIX_ORDER = true  # :(
+
         def __subject__component_association
+          yield :order_ordinal, 100
           Here_::Class_92_Normal_Primitive_Lemma
         end
 
         def __verb_phrase__component_association
+          yield :order_ordinal, 300
           Verb_Phrase
         end
 

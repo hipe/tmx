@@ -8,7 +8,7 @@ module Skylab::TMX
 
     # the "installation" is the first step towards reifying a tmx instance:
     # it holds basic configuration-like parameters and brings to life the
-    # rest of the graph from that. see [#002] "tmx theory" for more.
+    # rest of the graph from that. see [#020] "mountable standalone.." for more.
 
     # see [#ze-030] "unified language" (under "sidesystems") for what
     # "gem name" means and related..

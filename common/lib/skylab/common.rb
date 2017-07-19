@@ -924,7 +924,12 @@ module Skylab::Common
     end
 
     def new_with_value x  # stay close to #here1
-      self.class.via_value_and_association x, @_association  # ..
+      # YUCK
+      if instance_variable_defined? :@_association
+        self.class.via_value_and_association x, @_association
+      else
+        self.class.via_value_and_symbol x, @_name_symbol
+      end
     end
 
     def to_unknown

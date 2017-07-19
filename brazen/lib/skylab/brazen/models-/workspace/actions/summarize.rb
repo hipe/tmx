@@ -5,6 +5,7 @@ module Skylab::Brazen
     class Actions::Summarize < Home_::Action
 
       edit_entity_class(
+        :after, :rm,
         :property_object, COMMON_PROPERTIES_[ :config_filename ],
         :required, :property, :path,
       )

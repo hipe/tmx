@@ -14,4 +14,6 @@ Gem::Specification.new do |s|
   s.homepage = "http://localhost:8080/homepage-for-ba"
 
   s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
+
+  s.add_runtime_dependency 'treetop', '~> 1.6'  # had: 1.6.8
 end

@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  module Models::Sigil
+  module Models::Sigil  # :[#021.1]
 
     # a "sigil" is simply the (so far always) 2- or 3-character wide short
     # name we use to identify (uniquely) a sidesystem within the context of

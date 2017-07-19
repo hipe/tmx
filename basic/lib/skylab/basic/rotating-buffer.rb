@@ -180,7 +180,7 @@ module Skylab::Basic
 
     def normalize_pair s, l
       if 0 > l then false else
-        ::Fixnum === l or type_error l, :Integer
+        ::Integer === l or type_error l, :Integer
         s_ = normalize_to_virtual_index s
         if s_
           max_len = @virtual_buffer_length - s_
@@ -202,7 +202,7 @@ module Skylab::Basic
     end
 
     def normalize_single s
-      ::Fixnum === s or type_error s, :Integer
+      ::Integer === s or type_error s, :Integer
       s_ = normalize_to_virtual_index s
       [ s_, true, s_ ]
     end

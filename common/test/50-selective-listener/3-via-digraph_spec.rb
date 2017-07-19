@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
 
     it "must have same arity - (a deep bug lurks behind this) - X" do
 
-      _rx = /\bwrong number of arguments \(3 for 2\)/
+      _rx = /\bwrong number of arguments \(given 3, expected 2\)/
 
       begin
         listener.maybe_receive_event :one, :two, :_no_see_

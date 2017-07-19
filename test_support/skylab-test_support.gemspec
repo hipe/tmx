@@ -25,4 +25,11 @@ Gem::Specification.new do |s|
   s.homepage = "http://localhost:8080/homepage-for-ts"
 
   s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
+
+  s.add_development_dependency "rspec", "~> 3.6"  # 3.6.0
+
+  s.add_development_dependency "adsf", "~> 1.2"  # 1.2.1
+
+    # at writing the above dependency is first hit when testing [te]
+    # we might try to phase it out or use just rack somehow #todo
 end

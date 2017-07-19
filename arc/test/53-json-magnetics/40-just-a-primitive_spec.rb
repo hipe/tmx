@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[arc] modalities - JSON - just a primitive" do
+  describe "[arc] JSON magnetics - just a primitive" do
 
     TS_[ self ]
     use :memoizer_methods

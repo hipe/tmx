@@ -14,7 +14,7 @@ external testing f.w).
 This 'Nub' is a "type DSL" - it is based around the premise that the same
 things we *always* test about a list of events can be expressed most tersely
 and readably by using a list of values each of which has a class among
-::Fixnum, ::NilClass, ::String, ::Symbol, ::Regexp (yes, we throw the duck
+::Integer, ::NilClass, ::String, ::Symbol, ::Regexp (yes, we throw the duck
 out the window).
 
 (this whole idea is probably riffing off of the syntax for rspec's
@@ -24,7 +24,7 @@ asserting different kinds of expectations.)
 For example if a certain event should have a text representation equal to a
 certain string, ::String is used for that. If its text representation should
 match a certain regexp, that is the use ::Regexp serves. (::Symbol represents
-the expected stream name of an event. ::Fixnum indicates the offset of the
+the expected stream name of an event. ::Integer indicates the offset of the
 event we are talking about. ::NilClass is used to indicate that this event we
 are referring to, we expect it to be the last event in the list of events).
 
@@ -61,7 +61,7 @@ these are expected to be called in the order MATCH [FAIL_MSG] DESC;
 NOTE - experimental syntax
 
 what does nil mean? the mnemonic is "i expect a nil value from the actual
-event array at the last explicitly stated index (expressed with a ::Fixnum).
+event array at the last explicitly stated index (expressed with an ::Integer).
 It is _the_ way to assert the expected exact number of events in the actual
 list. Using `nil` without an explicitly stated index before it is undefined.
 

@@ -42,17 +42,23 @@ module Skylab::Basic::TestSupport
     end
 
     context "convoluted example - for now it manages to vivify all of these" do
+
       snip do
         klass :Fakon__Bakon
         klass :Fakon__Jakon
         klass :Fakon__Bakon__Wilbur
         klass :Mason__Dixon
       end
+
       it ".. (but note that you will get into some problems#{
         } with cyc. deps soon!)" do
         o.klass! :Jasper, extends: :Fakon__Bakon__Wilbur
         m = o.meta_hell_anchor_module
-        m.constants.should eql([:Fakon, :Mason, :Jasper])
+
+        these = m.constants
+        these.sort!
+        these == %i( Fakon Jasper Mason ) || fail
+
         m::Fakon.constants.should eql([:Bakon, :Jakon])
       end
     end

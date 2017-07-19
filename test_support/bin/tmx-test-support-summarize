@@ -13,7 +13,14 @@ program = -> argv, in_io, out_io, err_io, pn_s_a do
 
   if argv.length.zero?
 
-    execute[ in_io, out_io ]
+    execute[ in_io, out_io, err_io ]
+
+  elsif 1 == argv.length && '-' != argv[0][0]
+
+    io = File.open argv[0]
+    d = execute[ io, out_io, err_io ]
+    io.close
+    d
 
   else
 
@@ -23,10 +30,11 @@ program = -> argv, in_io, out_io, err_io, pn_s_a do
 
     if /\A--?h(?:elp)?\z/ =~ argv.fetch( 0 )
 
-      err_io.puts "usage: #{ progname[] }"
+      err_io.puts "usage: #{ progname[] } [<file>]"
       err_io.puts
       err_io.puts "synopsis: reads an ad-hoc undocumented format from STDIN"
-      err_io.puts "          at ouputs summary info used in our commit mesages"
+      err_io.puts "          (if no arguments) or <file>."
+      err_io.puts "          ouputs summary info used in our commit mesages"
 
       0
     else
@@ -38,15 +46,24 @@ program = -> argv, in_io, out_io, err_io, pn_s_a do
   end
 end
 
-execute = -> in_io, out_io do
+execute = -> in_io, out_io, err_io do
 
-_RX1 = /\AFinished in (\d+(?:\.\d+)?) seconds?\z/
+f = '\\d+(?:\\.\\d+)?'
+
+_RX1 = /\A
+  Finished[ ]in[ ](?<total_seconds>#{ f })[ ]seconds?[ ]
+  \(files[ ]took[ ](?<load_seconds>#{ f })[ ]seconds?[ ]to[ ]load\)
+\z/x
 
 _RX2 = /\A(?<e>\d+) examples?, (?<f>\d+) failures?(?:, \d+ pending)?\z/
 
 _PARENS_RX = /\A\(.+\)\z/
 
-num_examples = 0 ; seconds = 0.0 ; num_chunks = 0
+num_examples = 0
+num_chunks = 0
+total_seconds = 0.0
+load_seconds = 0.0
+
 
 begin
 
@@ -79,14 +96,18 @@ begin
     fail "won't tally with nonzero number of failures"
   end
 
-  seconds += md[ 1 ].to_f
+  total_seconds += md[ :total_seconds ].to_f
+  load_seconds += md[ :load_seconds ].to_f
   num_examples += md_[ :e ].to_i
   redo
 
-end while nil
+end while above
+
+_this = '%.2f' % ( 100.00 * load_seconds/total_seconds )
+err_io.puts "(time spent loading files: #{ _this }%)"
 
 out_io.puts "(#{ '.' * num_chunks } #{ num_examples })"
-out_io.puts "(#{ num_chunks } in #{ seconds })"
+out_io.puts "(#{ num_chunks } in #{ total_seconds })"
 
 0
 

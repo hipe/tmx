@@ -402,6 +402,8 @@ module Skylab::Brazen
             otr.instance_variable_set :@_child_elements_,
               @_child_elements_.map( & :_DUPLICATE_DEEPLY_ )
 
+            @__width_of_subsection_name ||= nil
+
             # (or just dup..)
             %i(
               @external_normal_name_symbol

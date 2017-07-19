@@ -1,3 +1,7 @@
+[#161]       this tag tracks any issues with our "monolith" setup scripts
+             ( A:first B:second C:third D:fourth E:fifth, for now)
+             [#here.4]: the symlinks script (referenced elsewhere)
+
 [#160]       #bibliographic-reference
              "the Grymoire's" AWK tutorial
              http://www.grymoire.com/Unix/Awk.html
@@ -108,7 +112,15 @@
              ( #was: unify find command in multiple places (moved to [#sy-016]))
 [#117]       #pattern of defaults (if not nil, etc) (near [#116])
 
-[#116] #hole ( #moved-to: [#fi-012]. #was: normal normalization )
+
+[#116] #open here's what we would want to add to our sidesystem gems before publishing:
+
+             :[#here.C]: `NIL` is deprecated
+             :[#here.B]: CODE_OF_CONDUCT.md
+             :[#here.A]: LICENSE.txt
+
+             ( #was: ( #moved-to: [#fi-012]. #was: normal normalization ) )
+
 
 [#115]       #pattern of functionalizing things
 [#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
