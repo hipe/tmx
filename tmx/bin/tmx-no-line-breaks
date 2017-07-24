@@ -21,6 +21,8 @@ o << nil
 o << "          (there is some clever shell way of doing this - this work is"
 o << "          an :+#idea-kitestring on finding that.)"
 o << nil
+y << "          (UPDATE to the below update): use `paste`"  # #todo erase this whole file
+y << nil
 o << "          (UPDATE): using `awk` in the below manner is nearly equivalent,"
 o << "          and probably better because `awk` is so ubiquitously available."
 o << "          compare ours:"

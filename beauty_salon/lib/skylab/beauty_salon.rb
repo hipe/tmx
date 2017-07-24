@@ -49,6 +49,13 @@ module Skylab::BeautySalon
     end  # >>
   end
 
+  DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_ = -> e do
+    @listener.call :error, :expression do |y|
+      y << e.message
+    end
+    UNABLE_
+  end
+
   DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
     if x
       instance_variable_set ivar, x ; ACHIEVED_
@@ -64,6 +71,10 @@ module Skylab::BeautySalon
     stowaway :Text, 'text/actions/wrap'
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   Lazy_ = Common_::Lazy
 
   Require_brazen_LEGACY_ = Lazy_.call do
@@ -73,7 +84,10 @@ module Skylab::BeautySalon
 
   module Lib_
 
-    sidesys, = Autoloader_.at :build_require_sidesystem_proc
+    sidesys, = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      # :build_require_stdlib_proc,
+    )
 
     File_utils = Common_.memoize do
       require 'fileutils'
@@ -82,6 +96,11 @@ module Skylab::BeautySalon
 
     List_scanner = -> x do
       Common_::Stream::Magnetics::MinimalStream_via[ x ]
+    end
+
+    Ruby_parser = Lazy_.call do
+      require 'ruby_parser'  # gem, actually
+      ::RubyParser
     end
 
     String_scanner = Common_.memoize do
@@ -111,6 +130,7 @@ module Skylab::BeautySalon
   ACHIEVED_ = true
   Home_ = self
   CONST_SEP_ = '::'.freeze
+  DASH_ = '-'
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this

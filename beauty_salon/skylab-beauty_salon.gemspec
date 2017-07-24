@@ -11,4 +11,6 @@ Gem::Specification.new do |s|
   inf.write_all_the_common_things_and_placeholders s
 
   s.add_runtime_dependency "skylab-common", [ "0.0.0" ]
+
+  s.add_runtime_dependency 'ruby_parser', '~> 3.10'  # 3.10, sexp_processor 4.10.0
 end

@@ -14,14 +14,28 @@ module Skylab::BeautySalon
         :file_path_upstream,
         :code_selector_string,
         :replacement_function_string,
+        :report,
         :filesystem,
         :listener,
       )
 
       def execute
-        if __resolve_file_changes_for_every_file
+        if __report_name_was_provided
+          __when_report
+        elsif __resolve_file_changes_for_every_file
           __flush_stream_of_diff_lines
         end
+      end
+
+      def __when_report
+        CrazyTownMagnetics_::Result_via_ReportName.call_by do |o|
+          o.report_name = @report
+          o.listener = @listener
+        end
+      end
+
+      def __report_name_was_provided
+        @report
       end
 
       def __resolve_file_changes_for_every_file
@@ -39,16 +53,33 @@ module Skylab::BeautySalon
       end
 
       def __do_resolve_file_changes_for_every_file
-        fcx = FileChangesList___.new
+
         io = remove_instance_variable :@file_path_upstream
+
+        _line = io.gets
+        __really_do_resolve_file_changes_for_every_file _line, io
+      rescue ::Errno::EISDIR => e
+        _exception e
+      end
+
+      def __really_do_resolve_file_changes_for_every_file path, io
+
+        if path.frozen?  # assume ARGV
+          chomp = EMPTY_P_
+          close = EMPTY_P_
+        else
+          chomp = -> { path.chomp! }
+          close = -> { io.close }
+        end
+
+        fcx = FileChangesList___.new
         begin
-          file = io.gets
-          file || break
-          file.chomp!
+          chomp[]
           fc = CrazyTownMagnetics_::FileChanges_via_Path_and_Function_and_Selector.call_by do |o|
-            o.path = file
+            o.path = path
             o.code_selector = @_code_selector
             o.replacement_function = @_replacement_function
+            o.filesystem = @filesystem
             o.listener = @listener
           end
           if ! fc
@@ -56,9 +87,9 @@ module Skylab::BeautySalon
             break
           end
           fcx.__add_ fc
-          redo
-        end while above
-        io.close
+          line = io.gets
+        end while line
+        close[]
         _store :@__file_changes, fcx
       end
 
@@ -71,6 +102,8 @@ module Skylab::BeautySalon
       # -- A.
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      define_method :_exception, DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_
 
     # -
 
