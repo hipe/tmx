@@ -99,15 +99,15 @@ module Skylab::BeautySalon
 
       def __money_town
 
-        _hi = Home_::CrazyTownMagnetics_::DiffLineStream_via_Arguments.call_by do |o|
+        _hi = Home_::CrazyTownMagnetics_::Result_via_ReportName_and_Arguments.call_by do |o|
+
+          o.report_name = remove_instance_variable :@report
 
           o.file_path_upstream = remove_instance_variable :@_file_path_upstream
 
           o.code_selector_string = remove_instance_variable :@code_selector
 
           o.replacement_function_string = remove_instance_variable :@replacement_function
-
-          o.report = remove_instance_variable :@report
 
           o.filesystem = @_filesystem
 

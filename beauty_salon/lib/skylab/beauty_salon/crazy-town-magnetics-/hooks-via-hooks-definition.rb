@@ -1,40 +1,154 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::TriggerEvents_via_Sexp_and_Hooks < Common_::MagneticBySimpleModel
+  class CrazyTownMagnetics_::Hooks_via_HooksDefinition  # 1x
 
-    # this is the thing that does the thing
+    # this is the moneyshot - this is the guy that traverses every sexp
+    # of a document sexp and runs all the hooks.
 
-    begin
+    # a "hook" is a proc associated with a symbol from the grammar: each
+    # time a sexp node is encountered corresponding to that symbol, the proc
+    # is called, being passed the sexp. (the result of this call is ignored.)
+    #
+    # there need not be one hook for every symbol. even if a symbol does not
+    # have an associated hook, our traversal will nonetheless descend into
+    # those sexps that are branch-nodes (i.e "deep", recursive).
+    #
+    # currently there cannot be multiple hooks associated with one symbol.
+    # (an exception will be thrown.) you could, however, hack such an
+    # arrangement in your definition (because you can write arbitrary
+    # code in your hook).
 
-      attr_writer(
-        :sexp,
-        :code_selector,
-        :replacement_function,
-        :listener,
-      )
+    # a "document hooks plan" is simply a collection of these hooks (just
+    # a tuple). (we call it a "plan" and not "hooks" just because the former
+    # sounds more singular and concrete.)
+    #
+    # you can have several plans in one definition, so for example you could
+    # follow one set of behaviors for files that look like tests (based on
+    # their filename), and another set of behaviors for files that look like
+    # asset files. (really, this feature is just a cheap by-product of the
+    # fact that for performance reasons we evaluate definitions before we
+    # traverse files.)
 
-      def execute
+    # we follow our own simple "prototype" pattern
 
-        if false
-        require 'pp'
-        pp @sexp
-        exit 0
+    # primarily, in its current state, the bulk of the code here is for our
+    # own "getting to know" the sexp's, and asserting their shape to be
+    # used across our corups.
+
+    # -
+
+      def initialize
+        @plans = {}
+        @__mutex_for_on_each_file_path = nil
+        yield self
+        @plans.freeze
+        freeze
+      end
+
+      def define_document_hooks_plan k, & two_p
+
+        @plans[ k ] && fail
+        @plans[ k ] = :__locked__
+
+        _plan = DocumentHooksPlan___.new do |o|
+          yield o  # hi.
         end
 
-        @_debug_IO = $stderr
+        @plans[ k ] = _plan ; nil
+      end
 
-        _expression @sexp
-        ::Kernel._OKAY
+      def on_each_file_path & p
+        remove_instance_variable :@__mutex_for_on_each_file_path
+        @receive_each_file_path__ = p ; nil
+      end
+
+      def flush_to_line_stream_via_file_path_upstream_resources rsx
+
+        CrazyTownMagnetics_::LineStream_via_Resources_and_Hooks.call_by do |o|
+
+          o.file_path_upstream_resources = rsx
+
+          o.hooks = self
+        end
+      end
+
+      attr_reader(
+        :receive_each_file_path__,
+        :plans,
+      )
+    # -
+
+    # ==
+
+    class DocumentHooksPlan___
+
+      def initialize
+
+        # (prototype.)
+
+        @__strict_hook_box = Common_::Box.new
+
+        @__mutex_for_before_each_file = nil
+        @before_each_file = MONADIC_EMPTINESS_
+
+        yield self
+
+        @__hook_via_symbol_symbol = remove_instance_variable( :@__strict_hook_box ).h_
+
+        freeze
+      end
+
+      private :dup
+
+      def on_each_sexp & p
+
+        bx = @__strict_hook_box
+
+        EXPRESSIONS__.each_key do |k|
+          bx.add k, p  # ..
+        end
+
+        NIL
+      end
+
+      def before_each_file & p
+        remove_instance_variable :@__mutex_for_before_each_file
+        @before_each_file = p ; nil
+      end
+
+      # -- read
+
+      def execute_plan_against__ potential_sexp
+        @before_each_file[ potential_sexp ]
+        sexp = potential_sexp.sexp
+        if sexp
+          dup.__execute_against sexp
+        end
+      end
+
+      def __execute_against sexp  # assume dup
+
+        # probably a file BEFORE hook ..
+
+        _expression sexp
+
+        # probably a file AFTER hook ..
+
+        NIL
       end
 
       def _expression s
 
-        _sym = s.fetch 0
-        _m = EXPRESSIONS___.fetch _sym
+        sym = s.fetch 0
+        p = @__hook_via_symbol_symbol[ sym ]
+        if p
+          p[ s ]  # ignore result - don't let hooks control our flow
+        end
+        _m = EXPRESSIONS__.fetch sym
         send _m, s
       end
 
-      EXPRESSIONS___ = {
+      EXPRESSIONS__ = {  # (many of these are not expressions :P)
         array: :__array,
         attrasgn: :__attrasng,
         block: :_block,
@@ -46,6 +160,8 @@ module Skylab::BeautySalon
         colon3: :__colon3,
         const: :__const,
         defn: :__defn,
+        dstr: :__dstr,
+        evstr: :__evstr,
         gvar: :__gvar,
         iasgn: :__iasgn,
         if: :__if,
@@ -56,19 +172,36 @@ module Skylab::BeautySalon
         lvar: :__lvar,
         module: :__module,
         nil: :__nil,
+        redo: :__redo,
         rescue: :__rescue,
+        self: :__self,
+        sclass: :__singleton_class_block,
+        str: :__str,
         while: :__while,
+        yield: :__yield,
         zsuper: :__zsuper,
       }
 
       def __class s
+
         # s.fetch 1  # name thing - ignored for now
         # s.fetch 2  # parent class thing - ignored for now
 
         _tapeworm 3, s
       end
 
+      def __singleton_class_block s  # this is the block
+
+        # s.fetch 1  # the class we are mutating the singleton class of -
+                     # it could be anything NOTE, but typically in our use it's just `s(:self)`
+
+        if 1 < s.length  # (hypothetically could be empty)
+          _tapeworm 2, s
+        end
+      end
+
       def __module s
+
         # s.fetch 1  # name thing - ignored for now
         d = s.length
         case d
@@ -118,9 +251,13 @@ module Skylab::BeautySalon
       def __rescue s
         3 == s.length || fail
 
-        blk = s.fetch(1)
-        :block == blk.fetch(0) || fail
-        _block blk  # re-use the same thing used for an "ordinary" block
+        this = s.fetch(1)
+        if :block == this.fetch(0)
+          _block blk  # re-use the same thing used for an "ordinary" block
+        else
+          # (like with other blocks, this can be a single-expression instead)
+          _expression this
+        end
 
         bdy = s.fetch(2)
         :resbody == bdy.fetch(0) || fail
@@ -173,8 +310,18 @@ module Skylab::BeautySalon
         end
       end
 
+      def __yield s
+        if 1 < s.length
+          _tapeworm 1, s
+        end
+      end
+
+      def __redo s
+        _common_assertion_one_for_debugging s
+      end
+
       def __break s
-        1 == s.length || expecting_this
+        _common_assertion_one_for_debugging s
       end
 
       def _tapeworm d, s
@@ -229,42 +376,93 @@ module Skylab::BeautySalon
       end
 
       def __colon2 s
+
         # (NOTE we *think* this is for our fully qualified const names: `::Foo::Bar`)
-        _skip :colon2
+
+        3 == s.length || interesting
+
+        ::Symbol === s.fetch(2) || interesting
+
+        this = s.fetch 1
+        sym = this.fetch(0)
+        :colon2 == sym || :colon3 == sym or interesting
+
+        _expression this
       end
 
       def __colon3 s
-        _skip :colon3
+
+        _common_assertion_two_for_debugging s
       end
 
       def __gvar s
         # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
-        2 == s.length || oops
-        ::Symbol === s[1] || oops
+        _common_assertion_two_for_debugging s
       end
 
       def __ivar s
+        _common_assertion_two_for_debugging s
+      end
+
+      def __dstr s
+
+        # interesting - if the double-quoted string has interpolation things
+        # in it, the entire remainder of the string is a tapeworm of arbitary
+        # expressions (but probably every other element is a string..)
+
+        d = s.length
+        2 <= d || intersing
+        ::String === s.fetch(1) || interesting
+        if 2 < d
+          _tapeworm 2, s
+        end
+      end
+
+      def __evstr s  # (presumably "evaluate as string")
         2 == s.length || interesting
-        ::Symbol === s[1] || interesting
-        _skip :ivar
+        _expression s.fetch 1
+      end
+
+      def __str s
+        2 == s.length || interesting
+        ::String === s.fetch(1) || interesting
       end
 
       def __lit s
-        _skip :lit
+        2 == s.length || interesting
+        case s.fetch(1)
+        when ::Symbol  # is symbol
+        when ::Integer  # is integer
+        # .. flot probably ..
+        else ; interesting
+        end
+      end
+
+      def _common_assertion_two_for_debugging s
+        2 == s.length || interesting
+        ::Symbol === s.fetch(1) || interesting
+      end
+
+      def __self s
+        _common_assertion_one_for_debugging s
       end
 
       def __zsuper s
-        1 == s.length || interesting
+        _common_assertion_one_for_debugging s
       end
 
       def __nil s
-        1 == s.length || fail
+        _common_assertion_one_for_debugging s
       end
 
-      def _skip sym
-        @_debug_IO.puts "(skipping: #{ sym })"
+      def _common_assertion_one_for_debugging s
+        1 == s.length || interesting
       end
     end
+
+    # ==
+
+    MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
 
     # ==
     # ==

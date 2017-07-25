@@ -45,7 +45,7 @@ module Skylab::Brazen
 
         else
           @serr.puts "empty."
-          ACHIEVED_
+          SUCCESS_EXITSTATUS  # probably not covered anywhere.
         end
       end
 

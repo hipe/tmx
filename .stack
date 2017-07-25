@@ -59,6 +59,15 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
-you'll need quickie to support this ~6h
 ok so you want to get to getting every '.should' being converted 03:47:08
-play with ruby parser ~6h ACTIVE IN LOG
+main report.
+main report: work that diff magic on real files perhaps (one temp file)
+main report: needs arch for applying changing
+main report: parse functions (covered)
+main report: parse selectors (covered)
+indented report: uber alles
+indented report: at all (covered)
+the stub of "main" as report covered
+line numbers report covered
+file path names covered
+you'll need quickie to support this ~6h
