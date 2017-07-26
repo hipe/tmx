@@ -1,10 +1,10 @@
 ## numbering schema
 
-  - 10s:      xx
-  - 20s:      xx
-  - 30s:      xx
-  - 40s:      xx
-  - 50s:      xx
+  - 10s:      private models
+  - 20s:      private magnetics
+  - 30s:      public models
+  - 40s:      public magnetics
+  - 50s:      operations
   - 60s:      niCLI
   - 70s:      (would-be iCLI)
   - 80s:      w

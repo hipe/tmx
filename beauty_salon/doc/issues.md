@@ -1,3 +1,5 @@
+[#040] #open #easy #rename move [#sli-130]  "all the letters of the alphabet" to here
+
 [#039]       #case-study: how does my future self think this should be
              refactored? (in [mt])
 [#038]       precedence rules for logical taxonomies ..
@@ -40,8 +42,16 @@
              (this has become more generally a #tracking-tag for same.)
              :[#.B] (in [pl])
 [#009]       #backburner unwrap -- terrible idea
-[#008]       index all the vectors of `porcelain/test/porcelain_spec.rb`
-[#007]       (put this information somewhere) there is ..
+
+[#008]       ( lend & borrow dependency & coverage )
+             :[#here.1]:
+
+             ( #was: index all the vectors of `porcelain/test/porcelain_spec.rb` )
+
+[#007]       ( intra-subsystem issues )
+
+             [#here.A]: the document, which is a very early trace of etc ..
+
 [#006]       2012-10-28 #chore get ideas from skylab.rb, flatten to issues
 [#005]       2012-09-02 #feature (:convert => 'this') (to: 'this') (and ..)
 [#004]       2012-08-19 #feature be able to break up long lines #tricky

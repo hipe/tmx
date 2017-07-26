@@ -4,6 +4,10 @@ module Skylab::TestSupport
 
     class << self
 
+      def executable sym
+        ::File.join @executables_path, __exes_box.fetch( sym )
+      end
+
       def directory sym
         ::File.join @dirs_path, __dirs_box.fetch( sym )
       end
@@ -24,6 +28,14 @@ module Skylab::TestSupport
         :dirs_path,
         :files_path,
       )
+
+      def __exes_box
+        @___exes_box ||= __build_exes_box
+      end
+
+      def __build_exes_box
+        _build_box @executables_path
+      end
 
       def __dirs_box
         @___dirs_box ||= ___build_dirs_box
@@ -69,6 +81,7 @@ module Skylab::TestSupport
     dir = ::File.expand_path '../../..', Home_.dir_path
 
     @dirs_path = ::File.join( dir, 'fixture-directories' ).freeze
+    @executables_path = ::File.join( dir, 'fixture-executables' ).freeze
     @files_path = ::File.join( dir, 'fixture-files' ).freeze
     @trees_path = ::File.join( dir, 'fixture-trees' ).freeze
 

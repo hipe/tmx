@@ -60,6 +60,8 @@ finish one new magent
 finish other new magnet
 fix diff thing
 ok so you want to get to getting every '.should' being converted 03:47:08
+rebase the branch with the `expect( ).to` fix
+use this new tool to change all of your own `expect` to `anticipate` or whatever
 main report.
 main report: work that diff magic on real files perhaps (one temp file)
 main report: needs arch for applying changing
@@ -68,6 +70,3 @@ main report: parse selectors (covered)
 indented report: uber alles
 indented report: at all (covered)
 the stub of "main" as report covered
-line numbers report covered
-file path names covered
-you'll need quickie to support this ~6h

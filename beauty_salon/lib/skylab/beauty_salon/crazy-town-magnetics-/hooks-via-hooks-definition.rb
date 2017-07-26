@@ -33,7 +33,10 @@ module Skylab::BeautySalon
 
     # primarily, in its current state, the bulk of the code here is for our
     # own "getting to know" the sexp's, and asserting their shape to be
-    # used across our corups.
+    # used across our corpus.
+
+    # developer's note: conventionally a variable called `s` is for holding
+    # a string; however here `s` is used exclusively for `::Sexp` instances.
 
     # -
 
@@ -93,7 +96,13 @@ module Skylab::BeautySalon
 
         yield self
 
-        @__hook_via_symbol_symbol = remove_instance_variable( :@__strict_hook_box ).h_
+        bx = remove_instance_variable :@__strict_hook_box
+        if bx.length.zero?
+          @_has_hooks = false
+        else
+          @_has_hooks = true
+          @__hook_via_symbol_symbol = bx.h_
+        end
 
         freeze
       end
@@ -120,9 +129,11 @@ module Skylab::BeautySalon
 
       def execute_plan_against__ potential_sexp
         @before_each_file[ potential_sexp ]
-        sexp = potential_sexp.sexp
-        if sexp
-          dup.__execute_against sexp
+        if @_has_hooks
+          sexp = potential_sexp.sexp
+          if sexp
+            dup.__execute_against sexp
+          end
         end
       end
 
@@ -152,8 +163,10 @@ module Skylab::BeautySalon
         array: :__array,
         attrasgn: :__attrasng,
         block: :_block,
+        block_pass: :__block_pass,
         break: :__break,
         call: :__call,
+        case: :__case,
         cdecl: :__const_declaration,
         class: :__class,
         colon2: :__colon2,
@@ -177,17 +190,22 @@ module Skylab::BeautySalon
         self: :__self,
         sclass: :__singleton_class_block,
         str: :__str,
+        # when:  see #here1
         while: :__while,
         yield: :__yield,
         zsuper: :__zsuper,
       }
 
       def __class s
+        d = s.length
+        2 < d || interesting
 
         # s.fetch 1  # name thing - ignored for now
         # s.fetch 2  # parent class thing - ignored for now
 
-        _tapeworm 3, s
+        if 3 < d  # class can be empty
+          _tapeworm 3, s
+        end
       end
 
       def __singleton_class_block s  # this is the block
@@ -195,7 +213,7 @@ module Skylab::BeautySalon
         # s.fetch 1  # the class we are mutating the singleton class of -
                      # it could be anything NOTE, but typically in our use it's just `s(:self)`
 
-        if 1 < s.length  # (hypothetically could be empty)
+        if 2 < s.length  # (hypothetically could be empty)
           _tapeworm 2, s
         end
       end
@@ -203,11 +221,9 @@ module Skylab::BeautySalon
       def __module s
 
         # s.fetch 1  # name thing - ignored for now
-        d = s.length
-        case d
-        when 3 ; _expression s.fetch 2
-        when 2 ; NOTHING_
-        else ; never
+
+        if 2 < s.length
+          _tapeworm 2, s
         end
       end
 
@@ -286,6 +302,16 @@ module Skylab::BeautySalon
         end
       end
 
+      def __block_pass s  # for when a proc is passed as a block argument,
+
+        # as in:
+        #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
+        #                    ^^^^^^^^^^^^
+
+        2 == s.length || interesting
+        _expression s.fetch 1
+      end
+
       def __while s
         d = s.length
         4 == d || oops
@@ -294,6 +320,65 @@ module Skylab::BeautySalon
         # (NOTE) skipping descent into conditional expression
 
         _expression s.fetch 2
+      end
+
+      def __case s
+
+        # we do some "by hand" parsing of these because of the relatively
+        # particular structure of `case` (switch) expressions when compared
+        # to other language features:
+
+        # the [1] member is an expression for the value under scrutiny
+        # (superficially like the same slot in `if` but not really).
+
+        # jumping to the end of the feature for a moment, the [(N-1)] member
+        # is the `else` expression.  NOTE if an `else` clause isn't present
+        # in the feature instance, this value is `nil`; i.e this "slot"
+        # always exists whether or not it has anything in it (necessarily).
+
+        # the remaining (at least one) [2 thru (N-2)] items are `when`
+        # features. these are represented in the tree as formal `when`
+        # instances proper; but since such features should only ever occur
+        # in `switch` expressions, we don't want them in our general lookup
+        # table so we assert for them "by hand" here.
+
+        # satisfyingly, it appears to be syntactically impossible to have
+        # a `case` expression without at least one `when` component.
+
+        # for arbitrary grammers this context-sensitive situation should
+        # occur with arbitrary frequency, and so we would want to improve
+        # our "after parsing" library so this feels less like such a one-
+        # off; but with the target language this situation appears to be
+        # limited to this language feature? some other keywords that have
+        # particular context senstivity: `return`, `break`, `next`, `redo`, `rescue`, `super` ..
+        # but note some of these contextualities aren't implemented lexically
+        # but rather at runtime
+
+        d = s.length
+        # symbol, scrutinized, when, [ when, [..]] else
+        3 < d || interesting
+        _expression s.fetch 1  # the scrutinized
+
+        2.upto( d - 2 ) do |idx|  # the one or more `when` components
+
+          whn = s.fetch idx
+          :when == whn.fetch(0) || interesting  # :#here1
+
+          # each `when` has the "comparator" expression and the "consequence" expression
+          3 == whn.length || interesting
+          cmp = whn.fetch 1
+          con = whn.fetch 2
+          :array == cmp.fetch(0) || interesting
+
+          _tapeworm 1, cmp  # descend into each one of the (possibly multiple) comparator values
+
+          _expression con  # the consequence expression is any arbitrary expression
+        end
+
+        els = s.fetch d - 1
+        if els
+          _expression els
+        end
       end
 
       def __if s

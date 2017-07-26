@@ -126,5 +126,6 @@ module Skylab::BeautySalon::TestSupport
   Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly
   NIL_ = nil
     FALSE = false  # #open [#sli-116.C]
+  NOTHING_ = nil
   TS_ = self
 end

@@ -1601,7 +1601,8 @@ module Skylab::Common
       end
 
       def as_camelcase_const_string
-        _const.as_camelcase_const_string
+        o = _const
+        o && o.as_camelcase_const_string
       end
 
       def AS_CONST_STRING

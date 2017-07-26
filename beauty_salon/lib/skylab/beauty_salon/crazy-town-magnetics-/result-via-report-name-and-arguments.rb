@@ -15,20 +15,136 @@ module Skylab::BeautySalon
 
       def execute
 
-        @report_name ||= "main"
-
-        @_report_name_symbol = remove_instance_variable( :@report_name ).gsub( DASH_, UNDERSCORE_ ).intern
-
         @_dir = Home_::CrazyTownReports_.dir_path
 
-        if :list == @_report_name_symbol
-          __when_list
+        s = remove_instance_variable :@report_name
+
+        if s
+
+          md = %r(\A
+            (?<list>list)
+            |
+            (?: help (?: : (?<help_arg> .+ ) )? )
+          \z)x.match s
+
+          if md
+            arg = md[ :help_arg ]
+            if arg
+              __when_help_with_arg arg
+            elsif md[ :list ]
+              _when_list
+            else
+              __when_help_with_no_arg
+            end
+          else
+            _when_item _symbol_via_slug s
+          end
         else
-          __when_item
+          _when_item :main
         end
       end
 
-      def __when_list
+      def __when_help_with_no_arg
+
+        # function soup to duplicate something we've done a number of times
+        # before: print out the first few lines of the description lines of
+        # each report. this does not do two-pass, so there is no "column".
+
+        is_subsequent = -> { is_subsequent = -> { true } ; false }
+
+        _when_list.expand_by do |slug|
+
+          a = []
+          if is_subsequent[]
+            a.push EMPTY_S_
+          end
+
+          _write_description_lines_into a, 3, slug
+
+          Stream_[ a ]
+        end
+      end
+
+      def __when_help_with_arg arg
+
+        lines = _write_description_lines_into [], arg
+        if lines
+          Stream_[ lines ]
+        end
+      end
+
+      def _write_description_lines_into y, num=nil, slug
+
+        cls = _class_via_symbol _symbol_via_slug slug
+        if cls
+          __do_write_desc_lines_into y, num, cls, slug
+        end
+      end
+
+      def __do_write_desc_lines_into y, num, cls, slug
+
+        last = nil
+        recv_normally = -> s do
+          y << last
+          last = s
+        end
+        recv = -> s do
+          recv = recv_normally
+          last = s
+        end
+
+        reached_limit = if num
+          0 < num || sanity
+          countdown = num + 1
+          -> do
+            ( countdown -= 1 ).zero?
+          end
+        else
+          EMPTY_P_
+        end
+
+        fmt = nil
+        subsequent_line = -> s do
+          recv[ fmt % s ]
+        end
+        p = -> s do
+          fmt = "  %#{ slug.length }s  %s"
+          recv[ fmt % [ slug, s ] ]
+          fmt = fmt % CLEVER___
+          p = subsequent_line
+        end
+
+        did_reach_limit = false
+        _y = ::Enumerator::Yielder.new do |s|
+          if reached_limit[]  # before adding line so we know that there were more
+            did_reach_limit = true
+            throw :_BS_yuck_
+          end
+          p[ s || EMPTY_S_ ]
+        end
+
+        catch :_BS_yuck_ do
+          cls.describe_into_under _y, :_no_expag_yet_bs_
+        end
+
+        if did_reach_limit
+          last = if /\.$/ =~ last
+            "#{ last }."
+          else
+            "#{ last }.."
+          end
+        end
+
+        y << last
+      end
+
+      CLEVER___ = [ EMPTY_S_, '%s' ]
+
+      def _symbol_via_slug s
+        s.gsub( DASH_, UNDERSCORE_ ).intern
+      end
+
+      def _when_list
 
         # (there's a thing we have a thing for but meh, meh meh)
 
@@ -45,11 +161,10 @@ module Skylab::BeautySalon
         end
       end
 
-      def __when_item
+      def _when_item sym
 
-        _sym = remove_instance_variable :@_report_name_symbol
-        _const = Common_::Name.via_variegated_symbol( _sym ).as_camelcase_const_string
-        _class = Home_::CrazyTownReports_.const_get _const, false
+        _class = _class_via_symbol sym
+
         _class.call_by do |o|
 
           THESE___.each_pair do |write_m, read_m|  # kewel new pattern
@@ -57,6 +172,17 @@ module Skylab::BeautySalon
               o.send write_m, send( read_m )
             end
           end
+        end
+      end
+
+      def _class_via_symbol sym
+        c = Common_::Name.via_variegated_symbol( sym ).as_camelcase_const_string
+        if c
+          _class = Home_::CrazyTownReports_.const_get c, false  # ..
+          _class  # hi.
+        else
+          @listener.call( :error, :expression ) { |y| y << "bad report name" }
+          UNABLE_
         end
       end
 
@@ -87,6 +213,8 @@ module Skylab::BeautySalon
 
       # --
     # -
+
+    # ==
 
     # ==
     # ==

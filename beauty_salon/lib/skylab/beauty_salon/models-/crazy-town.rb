@@ -30,6 +30,7 @@ module Skylab::BeautySalon
           y << "this is a DEBUGGING feature: debug various specific aspects"
           y << "of the behavior by running one of several \"reports\"."
           y << "see the list of reports by passing a report named \"list\"."
+          y << "see help on any one report by passing \"help:fizz-buzz\"."
           y << "note that while the required arguments must be provided; for"
           y << "some reports they won't be processed."
           y << "(note that if we cared, we would break this out into more endpoints.)"
@@ -147,14 +148,21 @@ module Skylab::BeautySalon
           end
         elsif file_file
           if DASH_ == file_file
-            @file_path_upstream = $stdin  # NOTE [br] is unusable. #todo
+            _etc_via_IO $stdin  # NOTE [br] is unusable. #todo
             ACHIEVED_
           else
-            @_file_path_upstream = @_filesystem.open file_file  # ..
+            _etc_via_IO @_filesystem.open file_file  # ..
             ACHIEVED_
           end
         else
           __explain_must_have_one
+        end
+      end
+
+      def _etc_via_IO io
+        # wrap the IO so it has all the other stream stuff
+        @_file_path_upstream = Common_.stream do
+          io.gets
         end
       end
 

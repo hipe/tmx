@@ -19,13 +19,19 @@ module Skylab::BeautySalon
     # we consider it a "happy accident" because it led us to discover
     # this "report' architecture that we like.
 
-    # hypothetically this could be useful in a regressed form to get
+    # this script has been useful by "regressing" it to do something
+    # like a map-reduce aggregate operation: we can get
     # just a stream of the tokens in a file, if for example you are
     # trying to determine which symbols of all known grammar symbols
     # you are missing (for example to reach test coverage)
     #
     #     this_script | awk '{ if the file doesnt start with comment char, print $1 }' | sort | uniq
     #
+    #     # ie:
+    #
+    #     this_script | awk '{ if ("#" != substr($1, 1, 1)) { print $1 } }' | sort | uniq
+    #
+    # :#spot1.2
 
     # -
 

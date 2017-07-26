@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby -w
 
+# (NOTE this file may or may not be used for its original intended purpose
+# (described eponymously); but note it is used for [#bs-008.1] testing
+# ruby-parsing, which depends on its contents to a high degree of granularity!)
+
 module Skylab
   class SimpleCov
   end

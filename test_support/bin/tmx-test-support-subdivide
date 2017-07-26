@@ -248,6 +248,7 @@ next item.
     ACHIEVED_ = true
     BEGIN__ = 0
     NEXT_BEGIN___ = 1
+    NIL = nil  # #open [#sl-116.C]
     SPACE_ = ' '
     UNABLE_ = false
     # ==
