@@ -1,3 +1,5 @@
+[#041]       #crazy-town thing.dot
+
 [#040] #open #easy #rename move [#sli-130]  "all the letters of the alphabet" to here
 
 [#039]       #case-study: how does my future self think this should be

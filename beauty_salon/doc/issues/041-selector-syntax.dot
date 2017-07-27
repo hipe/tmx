@@ -1,0 +1,42 @@
+digraph g {
+
+  label="
+fig 1. a state tree defining parsing for
+our \"selector\" grammar (for #crazy-town)
+
+NOTE - this is currently very particular for
+its target use case, however longer term we
+will want to generalize this grammar
+"
+
+  node [shape=rect]
+
+  begin [label="the beginning\nstate"]
+
+  begin->state1_1 [label="the 'call'\nkeyword"]
+
+  state1_1 [label="expecting\nopen parens"]
+
+  state1_1->state1_2 [label="the '(' token"]
+
+  state1_2 [label="expecting\natomic\ncomponent name"]
+
+  state1_2->state1_3 [label="[whitespace]\n<atomic component name>"]
+
+  state1_3 [label="expecting\nboolean operator"]
+
+  state1_3->state1_4 [label="[whitespace]\n<boolean binary operator>\n(e.g \"==\" (currently only this))"]
+
+  state1_4 [label="expecting\nliteral string"]
+
+  state1_4->state1_5 [label="(parse double-quoted string)"]
+
+  state1_5 [label="expecting finish\nor another test"]
+
+  state1_5->state1_2 [label="[whitespace]\nparse boolean AND"]
+
+  state1_5->state1_6 [label="[whitespace]\nthe ')' token"]
+
+  state1_6 [label="finished."]
+
+}
