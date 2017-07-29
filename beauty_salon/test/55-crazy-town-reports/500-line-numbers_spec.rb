@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] crazy town reports - xx" do
+  describe '[bs] crazy town reports - line numbers', ct: true do
 
     TS_[ self ]
     use :memoizer_methods

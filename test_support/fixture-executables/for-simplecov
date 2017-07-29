@@ -19,7 +19,7 @@ module Skylab::SimpleCov::TestSupport
       if :orange == run_this_color
         Y << "welff you probably want orange"
       elsif :blue == run_this_color
-        Y << "what you said is the color blue"
+        Y << "what you said is" << " the color blue"
       else
         Y << "not a recognized color - #{ run_this_color }"
         usage

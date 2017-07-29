@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - selector via string' do
+  describe '[bs] crazy-town magnetics - selector via string', ct: true do
 
     TS_[ self ]
     use :memoizer_methods

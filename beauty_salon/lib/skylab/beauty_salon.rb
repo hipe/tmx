@@ -122,6 +122,7 @@ module Skylab::BeautySalon
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
+    Human = sidesys[ :Human ]
     ST__ = sidesys[ :SubTree ]
     System_lib = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]

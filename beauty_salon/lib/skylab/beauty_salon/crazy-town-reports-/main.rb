@@ -18,10 +18,10 @@ module Skylab::BeautySalon
       end
 
       attr_writer(
-        :code_selector_string,
+        :code_selector,
         :file_path_upstream_resources,
         :listener,
-        :replacement_function_string,
+        :replacement_function,
       )
 
       def execute

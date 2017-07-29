@@ -43,6 +43,7 @@ module Skylab::BeautySalon
       def initialize
         @plans = {}
         @__mutex_for_on_each_file_path = nil
+        @__mutex_for_after_last_file = nil
         yield self
         @plans.freeze
         freeze
@@ -65,6 +66,11 @@ module Skylab::BeautySalon
         @receive_each_file_path__ = p ; nil
       end
 
+      def after_last_file & p
+        remove_instance_variable :@__mutex_for_after_last_file
+        @proc_for_after_last_file__ = p ; nil
+      end
+
       def flush_to_line_stream_via_file_path_upstream_resources rsx
 
         CrazyTownMagnetics_::LineStream_via_Resources_and_Hooks.call_by do |o|
@@ -78,6 +84,7 @@ module Skylab::BeautySalon
       attr_reader(
         :receive_each_file_path__,
         :plans,
+        :proc_for_after_last_file__,
       )
     # -
 
@@ -89,14 +96,17 @@ module Skylab::BeautySalon
 
         # (prototype.)
 
-        @__strict_hook_box = Common_::Box.new
+        @_strict_hook_box = Common_::Box.new
 
         @__mutex_for_before_each_file = nil
         @before_each_file = MONADIC_EMPTINESS_
 
+        @__mutex_for_after_each_file = nil
+        @after_each_file = MONADIC_EMPTINESS_
+
         yield self
 
-        bx = remove_instance_variable :@__strict_hook_box
+        bx = remove_instance_variable :@_strict_hook_box
         if bx.length.zero?
           @_has_hooks = false
         else
@@ -109,11 +119,16 @@ module Skylab::BeautySalon
 
       private :dup
 
+      def on_this_one_kind_of_sexp__ k, & p
+
+        @_strict_hook_box.add k, p
+      end
+
       def on_each_sexp & p
 
-        bx = @__strict_hook_box
+        bx = @_strict_hook_box
 
-        EXPRESSIONS__.each_key do |k|
+        GRAMMAR_SYMBOLS.each_key do |k|
           bx.add k, p  # ..
         end
 
@@ -123,6 +138,11 @@ module Skylab::BeautySalon
       def before_each_file & p
         remove_instance_variable :@__mutex_for_before_each_file
         @before_each_file = p ; nil
+      end
+
+      def after_each_file & p
+        remove_instance_variable :@__mutex_for_after_each_file
+        @after_each_file = p ; nil
       end
 
       # -- read
@@ -135,6 +155,7 @@ module Skylab::BeautySalon
             dup.__execute_against sexp
           end
         end
+        @after_each_file[ potential_sexp ] ; nil
       end
 
       def __execute_against sexp  # assume dup
@@ -155,11 +176,11 @@ module Skylab::BeautySalon
         if p
           p[ s ]  # ignore result - don't let hooks control our flow
         end
-        _m = EXPRESSIONS__.fetch sym
+        _m = GRAMMAR_SYMBOLS.fetch sym
         send _m, s
       end
 
-      EXPRESSIONS__ = {  # (many of these are not expressions :P)
+      CrazyTownMagnetics_::Hooks_via_HooksDefinition::GRAMMAR_SYMBOLS = {
         array: :__array,
         attrasgn: :__attrasng,
         block: :_block,

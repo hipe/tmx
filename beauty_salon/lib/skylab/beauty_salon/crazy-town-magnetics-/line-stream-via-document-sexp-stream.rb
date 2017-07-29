@@ -50,23 +50,51 @@ module Skylab::BeautySalon
         main = nil ; p = nil
 
         line_st = nil
-        descended = -> do
-          line = line_st.gets
-          if line
-            line
+
+        descend_into_flush_lines_mode = -> use_this_proc_after do
+          line_st = Stream_[ line_cache ]  # not threadsafe (duh)
+          p = -> do
+            line = line_st.gets
+            if line
+              line
+            else
+              p = use_this_proc_after ; p[]
+            end
+          end ; nil
+        end
+
+        close = -> do
+          p = EMPTY_P_ ; NOTHING_
+        end
+
+        after_final_hook = -> do
+          if line_cache.length.zero?
+            close[]
           else
-            p = main ; p[]
+            descend_into_flush_lines_mode[ close ]
           end
         end
 
         main = -> do
+
           begin
             ps = st.gets
-            if ! ps
-              p = EMPTY_P_ ; break
-            end
 
             line_cache.clear  # sometimes redundant
+
+            if ! ps
+              # (when you finished processing the last file, either stop now or etc..)
+              pp = hooks.proc_for_after_last_file__
+              if pp
+                # (this proc takes no arguments, but it might write to the line cache
+                pp[]
+                after_final_hook[]
+                x = p[]
+              else
+                close[]
+              end
+              break
+            end
 
             MaybeActivatePlan___.new ps, hooks do |o|
               on_each_file_path[ ps.path, o ]
@@ -81,8 +109,7 @@ module Skylab::BeautySalon
 
             # now you have nonzero lines. flush them and come back to here.
 
-            line_st = Stream_[ line_cache ]  # not threadsafe (duh)
-            p = descended
+            descend_into_flush_lines_mode[ main ]
             x = line_st.gets
             break
           end while above

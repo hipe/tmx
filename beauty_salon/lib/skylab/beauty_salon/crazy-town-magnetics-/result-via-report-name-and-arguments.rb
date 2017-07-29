@@ -162,17 +162,53 @@ module Skylab::BeautySalon
       end
 
       def _when_item sym
-
-        _class = _class_via_symbol sym
-
-        _class.call_by do |o|
-
-          THESE___.each_pair do |write_m, read_m|  # kewel new pattern
-            if o.respond_to? write_m
-              o.send write_m, send( read_m )
-            end
+        if __resolve_class_via_symbol sym
+          if __resolve_relevant_component_values
+            __call_report_by_passing_relevant_component_values
           end
         end
+      end
+
+      def __call_report_by_passing_relevant_component_values
+        _a = remove_instance_variable :@__relevant_component_values
+        remove_instance_variable( :@_class ).call_by do |o|
+          _a.each do |(write_m, x)|
+            o.send write_m, x
+          end
+        end
+      end
+
+      def __resolve_relevant_component_values
+        a = []
+        if __write_relevant_requireds_into a
+          __write_relevant_non_requireds_into a
+          @__relevant_component_values = a ; ACHIEVED_
+        end
+      end
+
+      def __write_relevant_requireds_into a
+        _write_relevants_into a, true, REQUIRED___
+      end
+
+      def __write_relevant_non_requireds_into a
+        _write_relevants_into a, false, NON_REQUIRED___
+      end
+
+      def _write_relevants_into a, is_required, h
+        cls = @_class ; ok = true
+        h.each_pair do |write_m, read_m|
+          cls.method_defined? write_m or next
+          x = send read_m
+          if ! x && is_required
+            ok = false ; break
+          end
+          a.push [ write_m, x ]
+        end
+        ok
+      end
+
+      def __resolve_class_via_symbol sym
+        _store :@_class, _class_via_symbol( sym )
       end
 
       def _class_via_symbol sym
@@ -186,16 +222,28 @@ module Skylab::BeautySalon
         end
       end
 
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
       # -- "report resources"
 
-      THESE___ = {
-        :code_selector_string= => :code_selector_string,
+      REQUIRED___ = {
+        :code_selector= => :__build_code_selector,
+        :replacement_function= => :__build_replacement_function,  # ..
+      }
+
+      NON_REQUIRED___ = {
         :file_path_upstream_resources= => :__flush_file_path_upstream_resources,
         :listener= => :listener,
-        :replacement_function_string= => :replacement_function_string,  # ..
       }
 
       # ~ (the above items correspond to the below method defs)
+
+      def __build_code_selector
+        CrazyTownMagnetics_::Selector_via_String.call_by do |o|
+          o.string = remove_instance_variable :@code_selector_string
+          o.listener = @listener
+        end
+      end
 
       def __flush_file_path_upstream_resources
         CrazyTownMagnetics_::DocumentSexpStream_via_FilePathStream.call_by do |o|
@@ -206,9 +254,7 @@ module Skylab::BeautySalon
       end
 
       attr_reader(
-        :code_selector_string,
         :listener,
-        :replacement_function_string,
       )
 
       # --
