@@ -11,7 +11,7 @@ module Skylab::BeautySalon::TestSupport
       _lower_level_subject_magnetic || fail
     end
 
-    context 'parse tree - model case' do
+    context 'parse tree - model case', wip: true do
 
       it 'parses' do
         _parse_tree || fail
@@ -55,7 +55,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'error 1 - here' do
+    context 'error 1 - here', wip: true do
 
       it 'fails' do
         _fails
@@ -77,7 +77,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'error 2 - this' do
+    context 'error 2 - this', wip: true do
 
       it 'fails' do
         _fails
@@ -101,7 +101,7 @@ module Skylab::BeautySalon::TestSupport
 
     # ==
 
-    context 'error 3 - like so' do
+    context 'error 3 - like so', wip: true do
 
       it 'fails' do
         _fails
@@ -123,7 +123,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'error 4 - watch me work this' do
+    context 'error 4 - watch me work this', wip: true do
 
       it 'fails' do
         _fails

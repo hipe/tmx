@@ -59,18 +59,36 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
+(that commit was -1.1.1)
 ok so you want to get to getting every '.should' being converted 03:47:08
+(that commit was -1.1.2)
 rebase the branch with the `expect( ).to` fix
+(that commit was -1.1.3)
 use this new tool to change all of your own `expect` to `anticipate` or whatever
+(that commit was -1.2.1)
 main report.
+(that commit was -1.2.2)
 main report: work that diff magic on real files perhaps (one temp file)
+(that commit was -1.2.3)
 main report: needs arch for applying changing
+(that commit was -1.2.4)
 main report: parse functions (covered)
+(that commit was -1.2.5)
 main report: parse selectors (covered)
+(that commit was -1.3.1)
 indented report: uber alles
+(that commit was -1.3.2)
 indented report: at all (covered)
+(that commit was -1.4)
 the stub of "main" as report covered
+(that commit was -1.7 - -1.5)
 get everything up to the features report covered with new tech
+(possibly insert explosion of the next range here.)
 play with new tech
-see if you can use ragel for etc (maybe)
-get everything you have now as a frozen snapshot work in progress
+-1.8.1: parse component name, regex operator, regex
+-1.8.2: parse component name, equals, quoted string
+-1.8.3: re-cover: parse that component name that is not a keyword (`true`)
+-1.8.4: re-cover: parse just an identifier.
+look at every example in that one github
+-1.8.5: use that guy's presentation (we have slides only) to place parser into a class, commit
+-1.8.6: indentation correction hack YIKES!!

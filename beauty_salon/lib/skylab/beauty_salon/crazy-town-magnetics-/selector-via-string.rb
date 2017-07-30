@@ -550,4 +550,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.1: begin rewrite to use ragel
 # born.
