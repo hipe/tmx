@@ -90,5 +90,4 @@ play with new tech
 -1.8.3: re-cover: parse that component name that is not a keyword (`true`)
 -1.8.4: re-cover: parse just an identifier.
 look at every example in that one github
--1.8.5: use that guy's presentation (we have slides only) to place parser into a class, commit
 -1.8.6: indentation correction hack YIKES!!

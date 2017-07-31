@@ -1,6 +1,6 @@
 %%{
 
-  machine test_lexer;
+  machine my_grammar;
 
   integer = ('+'|'-')?[0-9]+;
 
@@ -10,23 +10,30 @@
 
 }%%
 
-%% write data;
+module Skylab__BeautySalon
 
-def run_lexer(data)
+  class CrazyTownMagnetics___Selector_via_String__ThisThing___
 
-  data = data.unpack("c*") if(data.is_a?(String))
-  eof = data.length
-  token_array = []
+    def initialize
+      %% write data;
+    end
 
-  %% write init;
-  %% write exec;
-
-  puts token_array.inspect
+    def process input_s
+      data = input_s.unpack 'c*'
+      eof = data.length
+      # stack = []
+      %% write init;
+      %% write exec;
+      cs
+    end
+  end
 end
 
 argv = ::ARGV
 if 1 == argv.length && /\A--?h(?:e(?:l(?:p)?)?)?\z/ !~ argv[0]
-  run_lexer argv.fetch 0
+  _accepter = Skylab__BeautySalon::CrazyTownMagnetics___Selector_via_String__ThisThing___.new
+  _x = _accepter.process argv.fetch 0
+  $stdout.puts "OHAI: #{ _x.inspect }"
 else
   $stderr.puts "usage: #{ $PROGRAM_NAME } <integer>"
 end
