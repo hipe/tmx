@@ -32,10 +32,13 @@ struct my_struct
   # clear out the buffer
   action clear { fsm->buflen = 0; }
 
-
   # -- these actions
 
-  action money_town_action {
+  action callish_identifier_action {
+    printf( "identifier: \"%s\"\n", fsm->buffer );
+  }
+
+  action interesting_body_action {
     printf( "money town: \"%s\"\n", fsm->buffer );
   }
 
@@ -45,18 +48,19 @@ struct my_struct
 
   # --
 
-
   identifier = [a-z] [_a-z0-9]* ;
+
+  callish_identifier = identifier >clear $append %term %callish_identifier_action ;
 
   ws = [ \t] ;
 
   true_keyword = 'true'i @true_action ;
 
-  money_town = ( identifier - 'true'i ) >clear $append %term @money_town_action;
+  interesting_body = ( identifier - 'true'i ) >clear $append %term %interesting_body_action ;
 
-  body = ( money_town | true_keyword ) ;
+  callish_body = ( interesting_body | true_keyword ) ;
 
-  main := identifier '(' ws* body ws* ')' 0 @{ res = 1; };
+  main := callish_identifier '(' ws* callish_body ws* ')' 0 @{ res = 1; };
 
 }%%
 
