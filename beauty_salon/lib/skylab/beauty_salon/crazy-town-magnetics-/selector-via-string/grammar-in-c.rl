@@ -6,9 +6,11 @@
 %%{
   machine foo;
 
-  identifier = [a-z]+;
+  identifier = [a-z] [_a-z0-9]* ;
 
-  main := identifier
+  ws = [ \t] ;
+
+  main := identifier '(' ws* identifier ws* ')'
 
   0 @{ res = 1; };
 }%%
