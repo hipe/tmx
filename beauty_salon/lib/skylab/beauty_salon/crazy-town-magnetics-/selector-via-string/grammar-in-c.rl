@@ -10,9 +10,14 @@
 
   ws = [ \t] ;
 
-  main := identifier '(' ws* identifier ws* ')'
+  money_town = identifier - 'true' ;
 
-  0 @{ res = 1; };
+  true = 'true' ;
+
+  body = ( money_town | true ) ;
+
+  main := identifier '(' ws* body ws* ')' 0 @{ res = 1; };
+
 }%%
 
 %% write data;
