@@ -33,16 +33,28 @@ struct my_struct
   action clear { fsm->buflen = 0; }
 
 
+  # -- these actions
+
+  action money_town_action {
+    printf( "money town: \"%s\"\n", fsm->buffer );
+  }
+
+  action true_action {
+    printf( "(true town)\n" );
+  }
+
+  # --
+
 
   identifier = [a-z] [_a-z0-9]* ;
 
   ws = [ \t] ;
 
-  money_town = identifier - 'true' >clear $append %term;
+  true_keyword = 'true'i @true_action ;
 
-  true = 'true' ;
+  money_town = ( identifier - 'true'i ) >clear $append %term @money_town_action;
 
-  body = ( money_town | true ) ;
+  body = ( money_town | true_keyword ) ;
 
   main := identifier '(' ws* body ws* ')' 0 @{ res = 1; };
 
