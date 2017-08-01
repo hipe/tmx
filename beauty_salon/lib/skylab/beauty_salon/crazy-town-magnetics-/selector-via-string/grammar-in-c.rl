@@ -3,14 +3,42 @@
 
 // (writing this in C so we can follow the book examples easier for now..)
 
+#define BUFLEN 1024
+
+struct my_struct
+{
+	char buffer[ BUFLEN + 1 ];
+	int buflen;
+	int cs;
+};
+
 %%{
   machine foo;
+
+  access fsm->;
+
+  # append to the buffer
+  action append {
+    if ( fsm->buflen < BUFLEN )
+      fsm->buffer[ fsm->buflen ++ ] = fc;
+  }
+
+  # terminate the buffer
+  action term {
+    if ( fsm->buflen < BUFLEN )
+      fsm->buffer[ fsm->buflen ++ ] = 0;
+  }
+
+  # clear out the buffer
+  action clear { fsm->buflen = 0; }
+
+
 
   identifier = [a-z] [_a-z0-9]* ;
 
   ws = [ \t] ;
 
-  money_town = identifier - 'true' ;
+  money_town = identifier - 'true' >clear $append %term;
 
   true = 'true' ;
 
@@ -22,17 +50,41 @@
 
 %% write data;
 
+void my_thing_init( struct my_struct * fsm )
+{
+  fsm->buflen = 0;
+  %% write init;
+}
+
+int my_thing_execute( struct my_struct *fsm, const char *data, int len )
+{
+  const char *p = data;
+  const char *pe = data + len;
+
+  int res = 0;
+
+  %% write exec;
+
+  return res;
+}
+
+#define BUFSIZE 2048
+
 int main( int argc, char **argv )
 {
-  int cs, res = 0;
+
+  struct my_struct actual_struct ;
+  struct my_struct *fsm = & actual_struct ;
+
+  int res = -1;
+
   if ( argc > 1 ) {
-    char *p = argv[1];
-    char *pe = p + strlen(p) + 1;
-    %% write init;
-    %% write exec;
+
+    my_thing_init( fsm );
+    res = my_thing_execute( fsm, argv[1], strlen( argv[1] ) + 1 );
   }
 
-  printf("result = %i\n", res );
+  printf( "result = %i\n", res );
 
   return 0;
 }
