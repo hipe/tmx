@@ -89,5 +89,9 @@ play with new tech
 -1.8.2: parse component name, equals, quoted string
 -1.8.3: re-cover: parse that component name that is not a keyword (`true`)
 -1.8.4: re-cover: parse just an identifier.
-look at every example in that one github
 -1.8.6: indentation correction hack YIKES!!
+yikes rewrite it all in ruby!
+(in C) regexp expression (or not)
+(in C) OR list (cannot be combined with AND operators)
+(in C) AND list (cannot be combined with OR operators)
+(in C) equals expression
