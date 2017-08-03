@@ -52,76 +52,74 @@ struct my_struct
     # note for now we allow no uppercase but there's a fair chance this will change..
 
   callish_identifier = identifier
+    $err{ printf( "CI err\n" ); }
     >clear $append %term
     %callish_identifier_action
-    >err{ printf( "error 1 (start)\n" ); }  # YES
-    <>err{ printf( "error 1 (middle)EVER?\n" ); }  # NUNCA
-    # %err{ printf( "error 1 (final)\n" ); }  # YES
     ;
 
   ws = [ \t] ;
 
-  true_keyword = 'true'i @true_action ;
+  true_keyword =
+    'true'i
+    $err{ printf( "err: true keyword\n" ); }
+    ;
 
-  # interesting_body = ( identifier - 'true'i )
-  #   >clear $append %term
-  #   %interesting_body_action
-  #   ;
+  test =
+    identifier
+    $err{ printf( "err: test identifier\n" ); }
+    ws*
+    '=='
+    $err{ printf( "err: equals equals\n" ); }
+    ws*
+    "'"
+    $err{ printf( "err: open single quote\n" ); }
+    identifier
+    $err{ printf( "err: single quote body\n" ); }
+    "'"
+    $err{ printf( "err: close single quote\n" ); }
+    ;
 
-  quoted_string = "'"  [^']+  "'"  ;  # not start with WS - NOTE!!! ROUGH MOCKUP !!
-
-  regexp_yikes = '/'  [^/]+  '/'   ; # not start with WS - NOTE!!! ROUGH MOCKUP !!
-
-  equals_string_predicate = '==' ws* quoted_string ;  # not start with WS
-
-  match_predicate = '=~' ws* regexp_yikes ;
-
-  test = identifier ws* ( equals_string_predicate | match_predicate ) ;  # not start with WS
-
-  subsequent_test = test ;  # not start with WS
-
-  or_list = ( '||' ws* subsequent_test ws* )+ ;
-
-  and_list = ( '&&' ws* subsequent_test ws* )+ ;
-
-  first_test = test ;  # not start with WS
-
-  interesting_body = first_test ws* ( and_list | or_list )? ;
-
-  callish_body =
+  AND_tests =
     (
-      (
-        '('
-        >err{ printf( "error 2A (start)\n"); }
-        <>err{ printf( "error 2A (middle) EVER?\n"); }
-        # %err{ printf( "error 2A (final)\n"); }
-      )
       ws*
-      (
-        ( interesting_body | true_keyword )
-        >err{ printf( "error 2B (start)\n"); }
-        <>err{ printf( "error 2B (middle) EVER?\n"); }
-        # %err{ printf( "error 2B (final)\n"); }
-      )
+      '&&'
+      $err{ printf( "err: AND AND\n" ); }
       ws*
-      (
-        ')'
-        >err{ printf( "error 2C (start)\n"); }
-        <>err{ printf( "error 2C (middle) EVER?\n"); }
-        # %err{ printf( "error 2C (final)\n"); }
-      )
-    )
+      test
+      $err{ printf( "err: subsequent\n" ); }
+    )+
     ;
 
-  finish =
+  OR_tests =
+    (
+      ws*
+      '||'
+      $err{ printf( "err: OR OR\n" ); }
+      ws*
+      test
+      $err{ printf( "err: subsequent OR test\n" ); }
+    )+
+    ;
+
+  tests = test ( AND_tests | OR_tests )? ;
+
+  root_test =
+    ( tests | true_keyword )
+    ;
+
+  main :=
+    callish_identifier
+    '('
+    $err{ printf( "err: open paren\n" ); }
+    ws*
+    root_test
+    ws*
+    ')'
+    $err{ printf( "err: close paren\n" ); }
     0
+    $err{ printf( "err: end of string\n" ); }
     @{ res = 1; }
-    >err{ printf( "error 3 (start)\n"); }  # when trailing WS
-    <>err{ printf( "error 3 (middle) EVER?\n"); }
-    %err{ printf( "error 3 (final) EVER?\n"); }
     ;
-
-  main := callish_identifier callish_body finish ;
 
 }%%
 
@@ -162,8 +160,13 @@ int main( int argc, char **argv )
     res = my_thing_execute( fsm, argv[1], strlen( argv[1] ) + 1 );
   }
 
-  printf( "result = %i\n", res );
-
-  return 0;
+  switch (res) {
+    case 1 :
+      printf( "yay.\n" ); break ;
+    case 0 :
+      printf( "failed to parse.\n" ); break ;
+    default :
+      printf( "unexpected result: %i\n", res );
+  }
 }
 // born.
