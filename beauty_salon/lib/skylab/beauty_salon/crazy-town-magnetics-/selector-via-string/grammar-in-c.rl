@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -52,7 +53,7 @@ struct my_struct
     # note for now we allow no uppercase but there's a fair chance this will change..
 
   callish_identifier = identifier
-    $err{ printf( "CI err\n" ); }
+    >err{ oops( "CI err start" ); }
     >clear $append %term
     %callish_identifier_action
     ;
@@ -61,32 +62,52 @@ struct my_struct
 
   true_keyword =
     'true'i
-    $err{ printf( "err: true keyword\n" ); }
+    >err{ oops( "true keyword start" ); }
+    ;
+
+  single_quote_char =
+
+    # this monstrosity is a workaround because when we use any of:
+    #   - the `any` macro, for example `any - ['\\']`
+    #   - the negation operator, for example `[^a-z]`
+    # it has the effect of "swallowing" the involved errors no matter how
+    # we attempt to set hooks for them..
+
+    ( [ -&(-[\]-~]
+      # ' ' (space (32)) is the first printable character and '~' (tilde (126)) is the last
+      # `[ -&]`  (space thru ampersand) are the printables before the single quote
+      # `[(-[]`  (open paren thru open bracket) are the printables between single quote & backslash
+      # `[\]-~]` (close bracket thru tilde) are the remaining ones
+      |
+
+      '\\' any
+    )
     ;
 
   test =
     identifier
-    $err{ printf( "err: test identifier\n" ); }
+    >err{ oops( "test identifier start" ); }
     ws*
     '=='
-    $err{ printf( "err: equals equals\n" ); }
+    >err{ oops( "equals equals start" ); }
+    <>err{ oops( "equals equals mid" ); }
     ws*
     "'"
-    $err{ printf( "err: open single quote\n" ); }
-    identifier
-    $err{ printf( "err: single quote body\n" ); }
+    >err{ oops( "open single quote start" ); }
+    single_quote_char *
+    >err{ oops( "single quote body" ); }
     "'"
-    $err{ printf( "err: close single quote\n" ); }
+    >err{ oops( "close single quote" ); }
     ;
 
   AND_tests =
     (
       ws*
       '&&'
-      $err{ printf( "err: AND AND\n" ); }
+      >err{ oops( "AND AND begin" ); }
+      <>err{ oops( "AND AND middle" ); }
       ws*
       test
-      $err{ printf( "err: subsequent\n" ); }
     )+
     ;
 
@@ -94,10 +115,10 @@ struct my_struct
     (
       ws*
       '||'
-      $err{ printf( "err: OR OR\n" ); }
+      >err{ oops( "OR OR begin" ); }
+      <>err{ oops( "OR OR middle" ); }
       ws*
       test
-      $err{ printf( "err: subsequent OR test\n" ); }
     )+
     ;
 
@@ -110,14 +131,14 @@ struct my_struct
   main :=
     callish_identifier
     '('
-    $err{ printf( "err: open paren\n" ); }
+    >err{ oops( "open paren start" ); }
     ws*
     root_test
     ws*
     ')'
-    $err{ printf( "err: close paren\n" ); }
+    >err{ oops( "close paren" ); }
     0
-    $err{ printf( "err: end of string\n" ); }
+    >err{ oops( "end of string" ); }
     @{ res = 1; }
     ;
 
@@ -131,10 +152,41 @@ void my_thing_init( struct my_struct * fsm )
   %% write init;
 }
 
+// YUCK we turned these into globals only for error reporting
+const char * orig_data;
+const char * p;
+const char * pe;
+
+void oops( char str[] ) {
+
+  printf( "err %s:\n", str );
+
+  printf( "  %s\n", orig_data );
+
+  int offset_into_data_string  = (int)( p - orig_data );
+
+  size_t _glyph_width = offset_into_data_string + 1;
+
+  char *glyph = malloc( _glyph_width );
+  glyph[ 0 ] = 0;  // yuck, make it a null-terminated string
+
+  int count = offset_into_data_string;
+
+  while ( 0 != count -- ) {
+    strcat( glyph, "-" );
+  }
+
+  strcat( glyph, "^" );
+
+  printf( "  %s\n", glyph );
+  free( glyph );
+}
+
 int my_thing_execute( struct my_struct *fsm, const char *data, int len )
 {
-  const char *p = data;
-  const char *pe = data + len;
+  orig_data = data;
+  p = data;
+  pe = data + len;
 
   int res = 0;
   char *eof = 0; // ??

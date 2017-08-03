@@ -92,6 +92,4 @@ play with new tech
 -1.8.6: indentation correction hack YIKES!!
 yikes rewrite it all in ruby!
 (in C) regexp expression (or not)
-(in C) OR list (cannot be combined with AND operators)
-(in C) AND list (cannot be combined with OR operators)
-(in C) equals expression
+(in C) fine tune the error reporting
