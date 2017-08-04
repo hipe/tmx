@@ -35,8 +35,20 @@ struct my_struct
 
   # -- these actions
 
+  action literal_string_body_action {
+    printf( "literal string: \"%s\"\n", fsm->buffer );
+  }
+
+  action regex_body_action {
+    printf( "regex body: \"%s\"\n", fsm->buffer );
+  }
+
+  action test_identifier_action {
+    printf( "test identifier: \"%s\"\n", fsm->buffer );
+  }
+
   action callish_identifier_action {
-    printf( "identifier: \"%s\"\n", fsm->buffer );
+    printf( "callish identifier: \"%s\"\n", fsm->buffer );
   }
 
   action interesting_body_action {
@@ -103,8 +115,10 @@ struct my_struct
     ws*
     '/'
     >err{ oops( "open forward slash" ); }
-    regex_char *
+    ( regex_char * )
     >err{ oops( "regex body" ); }
+    >clear $append %term
+    %regex_body_action
     '/'
     >err{ oops( "close forward slash" ); }
     ;
@@ -125,6 +139,8 @@ struct my_struct
   test =
     identifier
     >err{ oops( "test identifier start" ); }
+    >clear $append %term
+    %test_identifier_action
     ws*
     ( equals_predicate | regex_match_predicate )
     ;
