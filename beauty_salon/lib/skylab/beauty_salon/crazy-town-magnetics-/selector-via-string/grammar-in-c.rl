@@ -68,7 +68,7 @@ struct my_struct
   single_quote_char =
 
     # this monstrosity is a workaround because when we use any of:
-    #   - the `any` macro, for example `any - ['\\']`
+    #   - the subtraction operation, for example `any - ['\\']`
     #   - the negation operator, for example `[^a-z]`
     # it has the effect of "swallowing" the involved errors no matter how
     # we attempt to set hooks for them..
@@ -84,20 +84,49 @@ struct my_struct
     )
     ;
 
-  test =
-    identifier
-    >err{ oops( "test identifier start" ); }
+  regex_char =
+
+    # same deal as the above.
+    # for now we're not that interesting in parsing regexes robustly..
+    #
+    #     ' '(32) '.'(46) '/'(47) '0'(48) '['(91) '\\'(92) ']'(93) '~'(126)
+
+    [ -.0-[\]-~]
+    |
+    '\\' any
+    ;
+
+  regex_match_predicate =
+    '=~'
+    >err{ oops( "match operator start" ); }
+    <>err{ oops( "match operator mid" ); }
     ws*
+    '/'
+    >err{ oops( "open forward slash" ); }
+    regex_char *
+    >err{ oops( "regex body" ); }
+    '/'
+    >err{ oops( "close forward slash" ); }
+    ;
+
+  equals_predicate =
     '=='
     >err{ oops( "equals equals start" ); }
     <>err{ oops( "equals equals mid" ); }
     ws*
     "'"
-    >err{ oops( "open single quote start" ); }
+    >err{ oops( "open single quote" ); }
     single_quote_char *
     >err{ oops( "single quote body" ); }
     "'"
     >err{ oops( "close single quote" ); }
+    ;
+
+  test =
+    identifier
+    >err{ oops( "test identifier start" ); }
+    ws*
+    ( equals_predicate | regex_match_predicate )
     ;
 
   AND_tests =
