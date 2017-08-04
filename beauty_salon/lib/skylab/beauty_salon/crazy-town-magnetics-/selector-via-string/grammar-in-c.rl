@@ -24,6 +24,11 @@ struct my_struct
       fsm->buffer[ fsm->buflen ++ ] = fc;
   }
 
+  action append_when_escaped_with_a_backslash {  // meh
+    if ( fsm->buflen < BUFLEN )
+      fsm->buffer[ fsm->buflen ++ ] = fc;
+  }
+
   # terminate the buffer
   action term {
     if ( fsm->buflen < BUFLEN )
@@ -59,6 +64,14 @@ struct my_struct
     printf( "(true town)\n" );
   }
 
+  action started_AND {
+    printf( "(started AND)\n" );
+  }
+
+  action started_OR {
+    printf( "(started OR)\n" );
+  }
+
   # --
 
   identifier = [a-z] [_a-z0-9]* ;
@@ -85,15 +98,15 @@ struct my_struct
     # it has the effect of "swallowing" the involved errors no matter how
     # we attempt to set hooks for them..
 
-    ( [ -&(-[\]-~]
+      [ -&(-[\]-~]
       # ' ' (space (32)) is the first printable character and '~' (tilde (126)) is the last
       # `[ -&]`  (space thru ampersand) are the printables before the single quote
       # `[(-[]`  (open paren thru open bracket) are the printables between single quote & backslash
       # `[\]-~]` (close bracket thru tilde) are the remaining ones
+      $append
       |
-
       '\\' any
-    )
+      @append
     ;
 
   regex_char =
@@ -104,8 +117,10 @@ struct my_struct
     #     ' '(32) '.'(46) '/'(47) '0'(48) '['(91) '\\'(92) ']'(93) '~'(126)
 
     [ -.0-[\]-~]
+    $append
     |
     '\\' any
+    @append
     ;
 
   regex_match_predicate =
@@ -115,9 +130,9 @@ struct my_struct
     ws*
     '/'
     >err{ oops( "open forward slash" ); }
-    ( regex_char * )
+    regex_char *
     >err{ oops( "regex body" ); }
-    >clear $append %term
+    >clear %term
     %regex_body_action
     '/'
     >err{ oops( "close forward slash" ); }
@@ -132,6 +147,8 @@ struct my_struct
     >err{ oops( "open single quote" ); }
     single_quote_char *
     >err{ oops( "single quote body" ); }
+    >clear %term
+    %literal_string_body_action
     "'"
     >err{ oops( "close single quote" ); }
     ;
@@ -149,6 +166,7 @@ struct my_struct
     (
       ws*
       '&&'
+      >started_AND
       >err{ oops( "AND AND begin" ); }
       <>err{ oops( "AND AND middle" ); }
       ws*
@@ -160,6 +178,7 @@ struct my_struct
     (
       ws*
       '||'
+      >started_OR
       >err{ oops( "OR OR begin" ); }
       <>err{ oops( "OR OR middle" ); }
       ws*

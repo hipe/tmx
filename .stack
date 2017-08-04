@@ -90,4 +90,3 @@ play with new tech
 -1.8.3: re-cover: parse that component name that is not a keyword (`true`)
 -1.8.4: re-cover: parse just an identifier.
 -1.8.6: indentation correction hack YIKES!!
--1.9 is complete when parsing is proof-of-concept'ed in C
