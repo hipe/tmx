@@ -1,5 +1,10 @@
 #!/usr/bin/env zsh
 
+if [ "$1" != "" ] ; then
+  echo "usage: $0"
+  exit 5
+fi
+
 file1=lib/skylab/beauty_salon/crazy-town-magnetics-/selector-via-string/grammar-in-c.rl
 ragel "$file1"
 d=$?

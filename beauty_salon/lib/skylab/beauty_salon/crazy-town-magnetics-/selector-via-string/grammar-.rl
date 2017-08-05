@@ -30,7 +30,10 @@ module Skylab__BeautySalon
 end
 
 argv = ::ARGV
-if 1 == argv.length && /\A--?h(?:e(?:l(?:p)?)?)?\z/ !~ argv[0]
+
+if __FILE__ != $PROGRAM_NAME
+  # nothing - assume this is being loaded for some other purpose
+elsif 1 == argv.length && /\A--?h(?:e(?:l(?:p)?)?)?\z/ !~ argv[0]
   _accepter = Skylab__BeautySalon::CrazyTownMagnetics___Selector_via_String__ThisThing___.new
   _x = _accepter.process argv.fetch 0
   $stdout.puts "OHAI: #{ _x.inspect }"

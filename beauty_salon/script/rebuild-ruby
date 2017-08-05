@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+if [ "$1" != "" ] ; then
+  echo "usage: $0"
+  exit 5
+fi
+
+file1=lib/skylab/beauty_salon/crazy-town-magnetics-/selector-via-string/grammar-.rl
+ragel -R "$file1"
+d=$?
+echo -n "."
+if [ 0 != $d ] ; then
+  echo " (^ got exitstatus $d from 'ragel -R $file1)"
+  exit d
+fi
+
+file2=lib/skylab/beauty_salon/crazy-town-magnetics-/selector-via-string/grammar-.rb
+./script/rewrite-file-to-clean-up-warnings-via-ragel-generated-ruby "$file2"
+d=$?
+if [ 0 != $d ] ; then
+  echo " (^ get exitstatus $d from trying to remove warnings')"
+  exit d
+fi
+echo -n "."
+echo " rebuilt (ruby)."

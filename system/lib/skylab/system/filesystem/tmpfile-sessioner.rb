@@ -31,6 +31,10 @@ module Skylab::System
 
         # ~ writers
 
+        # #todo - if there's a reason to support these old-style DSL writers,
+        # explain it here; otherwise refactor them to look like writers for
+        # consistency
+
         def tmpdir_path s
           @_tmpdir_path = s
           NIL_
