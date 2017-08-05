@@ -2,11 +2,17 @@
 
   machine my_grammar;
 
-  integer = ('+'|'-')?[0-9]+;
+  callish_identifier = [a-z] [_a-z0-9]* ;
+    # pending all these:
+    #   - break out into other symbol
+    #   - capture the contents
+    #   - error emitting (YIKES)
 
-  main := |*
-    integer => { puts "Integer" };
-  *|;
+  main :=
+   callish_identifier
+   0
+   @{ res = 1; }
+   ;
 
 }%%
 
