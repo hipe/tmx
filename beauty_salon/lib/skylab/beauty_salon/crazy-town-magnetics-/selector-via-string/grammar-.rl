@@ -2,6 +2,13 @@
 
   machine my_grammar;
 
+  access @_zizzy_;
+    # this is clever:
+    #   - i came up with it. me.
+    #   - access every variable as a member variable
+    #   - we use a goofy arbitrary string just so you can track it
+
+
   callish_identifier = [a-z] [_a-z0-9]* ;
     # pending all these:
     #   - break out into other symbol
@@ -25,12 +32,12 @@ module Skylab__BeautySalon
     end
 
     def process input_s
-      data = input_s.unpack 'c*'
-      eof = data.length
+      @_zizzy_data = input_s.unpack 'c*'
+      eof = @_zizzy_data.length
       # stack = []
       %% write init;
       %% write exec;
-      cs
+      @_zizzy_cs
     end
   end
 end
