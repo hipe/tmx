@@ -1,0 +1,17 @@
+
+foo
+foo (
+foo(tru
+foo( true
+foo( true )
+foo( jama %
+foo( jama =
+foo( jama ==
+foo( jama == %
+foo( jama == '
+foo( jama == '%
+foo( jama == '%'
+foo( jama == '%' )
+foo( jama == 'A' && fama == 'B' )
+foo( jama == 'A' && fama == 'B' || bama == 'C' )
+foo( jama == 'A' && fama == 'B' && bama == 'C' )

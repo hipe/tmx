@@ -8,16 +8,33 @@
     #   - access every variable as a member variable
     #   - we use a goofy arbitrary string just so you can track it
 
+  # --
+  # (actions are high-level to low-level because we can)
 
-  callish_identifier = [a-z] [_a-z0-9]* ;
-    # pending all these:
-    #   - break out into other symbol
-    #   - capture the contents
-    #   - error emitting (YIKES)
+  action callish_identifier_action {
+    _buff = remove_instance_variable :@_current_string_buffer
+    @stderr.puts "callish identifier: #{ _buff }"
+  }
+
+  action clear {
+    __clear_string_buffer
+  }
+
+  action term {
+    __terminate_string_buffer
+  }
+
+  # --
+
+  callish_identifier =
+    ( [a-z] [_a-z0-9]* )
+    >err{ oops( "callish identifier" ); }
+    >clear %term
+    %callish_identifier_action
+    ;
 
   main :=
    callish_identifier
-   >err{ oops( "callish identifier" ); }
    0
    >err{ oops( "end of string" ); }
    @{ res = 1; }
@@ -30,6 +47,7 @@ module Skylab__BeautySalon
   class CrazyTownMagnetics___Selector_via_String__ThisThing___
 
     def initialize _, sout, serr
+
       @stderr = serr
       @stdout = sout
       %% write data;
@@ -57,9 +75,6 @@ module Skylab__BeautySalon
 
       io = @stderr
 
-      p = @_binding.local_variable_get :p
-      # pe = @_binding.local_variable_get :pe
-
       input_s = __get_original_string
 
       io.puts "err #{ msg }:"
@@ -68,17 +83,35 @@ module Skylab__BeautySalon
 
       io.puts "#{ buffer }#{ input_s }"
 
-      buffer << ( '-' * p )
+      buffer << ( '-' * _current_position )
       buffer << '^'
 
       io.puts buffer ; nil
     end
 
+    def __clear_string_buffer
+      @__begin_offset_for_string_buffer = _current_position
+    end
+
+    def __terminate_string_buffer
+      _begin = remove_instance_variable :@__begin_offset_for_string_buffer
+      _end = _current_position
+      @_current_string_buffer =
+        @_zizzy_data[ _begin ... _end ].pack( C_STAR_ ).freeze
+    end
+
+    def _current_position
+      @_binding.local_variable_get :p
+    end
+
     def __get_original_string
       d_a = @_zizzy_data
       d_a.last.zero? || fail
-      d_a[ 0 ... -1 ].pack 'c*'
+      d_a[ 0 ... -1 ].pack C_STAR_
     end
+
+    C_STAR_ = 'c*'.freeze
+
   end
 end
 
