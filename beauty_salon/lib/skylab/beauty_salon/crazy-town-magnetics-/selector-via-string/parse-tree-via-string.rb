@@ -30,11 +30,13 @@ module Skylab::BeautySalon
         # the rest of this is boring stitching - the cost of splitting
         # parsing across two files
 
-        es = _generated_grammar_module.call_by do |o|
+        _ok = _generated_grammar_module.call_by do |o|
 
           o.on_callish_identifier = method :__on_callish_identifier
 
           o.on_error_message = method :__on_error_message
+
+          o.on_true_keyword = method :__on_true_keyword
 
           o.input_string = remove_instance_variable :@string
 
@@ -43,15 +45,34 @@ module Skylab::BeautySalon
           @_grammar = o  # meh
         end
 
-        if es.zero?
-          UNABLE_
-        else
-          self._WEEEEE
+        case _ok
+        when true ; __flush_tree
+        when false ; UNABLE_
+        else never
         end
       end
 
-      def __on_callish_identifier
-        ::Kernel._OKAY
+      def __flush_tree
+
+        _yes = remove_instance_variable :@_true_keyword_was_used
+        if ! _yes
+          la_la_la
+          is_AND = nil
+          list = nil
+        end
+        o = SelectorParseTree___.new
+          o.list_is_AND_list_not_OR_list = is_AND
+          o.list_of_boolean_tests = list
+          o.feature_symbol = remove_instance_variable :@__callish_identifier_symbol
+        o.freeze
+      end
+
+      def __on_callish_identifier wat_s
+        @__callish_identifier_symbol = wat_s.intern
+      end
+
+      def __on_true_keyword
+        @_true_keyword_was_used = true
       end
 
       def __on_error_message msg
@@ -93,7 +114,11 @@ module Skylab::BeautySalon
 
     # ==
 
-    SelectorParseTree___ = ::Struct.new :AND_list_of_boolean_tests, :feature_symbol
+    SelectorParseTree___ = ::Struct.new(
+      :list_is_AND_list_not_OR_list,
+      :list_of_boolean_tests,
+      :feature_symbol,
+    )
 
     BooleanTest___ = ::Struct.new :literal_value, :symbol_symbol, :comparison_function_name_symbol
 

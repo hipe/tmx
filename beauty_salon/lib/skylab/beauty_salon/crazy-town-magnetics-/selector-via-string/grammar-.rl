@@ -18,6 +18,11 @@
     nil
   }
 
+  action true_keyword_action {
+    @on_true_keyword[]
+    nil
+  }
+
   action clear {
     @__begin_offset_for_string_buffer = current_position_
   }
@@ -28,6 +33,14 @@
 
   # --
 
+  ws = [ \t] ;
+
+  true_keyword =
+    'true'i
+    >err{ oops( "expecting true keyword" ); }
+    %true_keyword_action
+    ;
+
   callish_identifier =
     ( [a-z] [_a-z0-9]* )
     >err{ oops( "expecting callish identifier ([a-z][_a-z0-9]*)" ); }
@@ -35,12 +48,23 @@
     %callish_identifier_action
     ;
 
+  root_test =
+    ( true_keyword )
+    ;
+
   main :=
-   callish_identifier
-   0
-   >err{ oops( "expecting end of string" ); }
-   @{ res = 1; }
-   ;
+    callish_identifier
+    '('
+    >err{ oops( "expecting open parenthesis" ); }
+    ws*
+    root_test
+    ws*
+    ')'
+    >err{ oops( "expecting close parenthesis" ); }
+    0
+    >err{ oops( "expecting end of string" ); }
+    @{ @_did_finish = true; }
+    ;
 
 }%%
 
@@ -65,6 +89,7 @@ module Skylab__BeautySalon
       # hello: begin write data
       %% write data;
       # hello: end write data
+      @_did_finish = false
     end
 
     attr_writer(
@@ -72,6 +97,7 @@ module Skylab__BeautySalon
       :listener,
       :on_callish_identifier,
       :on_error_message,
+      :on_true_keyword,
     )
 
     def execute
@@ -89,7 +115,7 @@ module Skylab__BeautySalon
       @_binding = binding  # you're gonna want the `p` and `pe` local generated above #here1
       # hello i'm bewteen init and exec
       %% write exec;
-      @THE_cs
+      @_did_finish
     end
 
     # -- parsing support (methods that appear in actions)
@@ -98,7 +124,7 @@ module Skylab__BeautySalon
       _begin = remove_instance_variable :@__begin_offset_for_string_buffer
       _end = current_position_
       @_current_string_buffer =
-        @THE_data[ _begin ... _end ].pack( C_STAR_ ).freeze
+        @THE_data[ _begin ... _end ].pack( C_STAR ).freeze
     end
 
     # --

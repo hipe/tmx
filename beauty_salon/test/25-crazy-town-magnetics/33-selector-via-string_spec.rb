@@ -11,7 +11,7 @@ module Skylab::BeautySalon::TestSupport
       _lower_level_subject_magnetic || fail
     end
 
-    context 'errors, perhaps comprehensively' do
+    context 'errors (perhaps comprehensively) and some successes' do
 
       same_rx = %r<\Aexpecting callish identifier \([^)]+\):?\z>
 
@@ -33,6 +33,64 @@ module Skylab::BeautySalon::TestSupport
           y << '  %foo'
           y << '  ^'
         end
+      end
+
+      it 'good identifier only - expects open paren' do
+
+        _against 'foo'
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting open parenthesis:'
+          y << '  foo'
+          y << '  ---^'
+        end
+      end
+
+      it 'good identifer then weird char - expects open paren' do
+
+        _against 'foo%'
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting open parenthesis:'
+          y << '  foo%'
+          y << '  ---^'
+        end
+      end
+
+      it 'for now, no space between identifier and open paren' do
+
+        _against 'foo ('
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting open parenthesis:'
+          y << '  foo ('
+          y << '  ---^'
+        end
+      end
+
+      it 'after open paren, expects something (WILL EXPAND)' do
+
+        _against 'foo('
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting true keyword:'
+          y << '  foo('
+          y << '  ----^'
+        end
+      end
+
+      it 'identifier, open paren, true keyword - expects close paren (WILL EXPAND)' do
+
+        _against 'foo( true '
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting close parenthesis:'
+          y << '  foo( true '
+          y << '  ----------^'
+        end
+      end
+
+      it 'identifier, open paren, true keyword, close paren YAY' do
+
+        _against "foo( \t true)"
+        pt = _produces_parse_tree_while_emitting_nothing
+        pt.feature_symbol == :foo || fail
+        pt.list_of_boolean_tests && fail
       end
     end
 
@@ -214,6 +272,14 @@ module Skylab::BeautySalon::TestSupport
       @STRING = s
     end
 
+    def _JUST_SHOW_ME_THE_MONEY
+
+      lines, _x = __expression_lines_and_result
+      $stderr.puts "WEE:"
+      $stderr.puts lines
+      $stderr.puts "GOODBYE. " ; exit 0
+    end
+
     def _fails_with_these_normal_lines & p
 
       _lines, _x = __expression_lines_and_result
@@ -256,6 +322,20 @@ module Skylab::BeautySalon::TestSupport
       end
 
       [ lines, _x ]
+    end
+
+    def _produces_parse_tree_while_emitting_nothing
+
+      x = _lower_level_subject_magnetic.call_by do |o|
+
+        o.listener = -> * do
+          fail
+        end
+
+        o.string = remove_instance_variable :@STRING
+      end
+      x || fail
+      x
     end
 
     # --
