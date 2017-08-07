@@ -28,6 +28,10 @@
     @on_test_identifier[ _release_string_buffer ]
   }
 
+  action regex_body_action {
+    @on_regex_body[ _release_string_buffer ]
+  }
+
   action literal_string_body_action {
     @on_literal_string[ _release_string_buffer ]
   }
@@ -87,6 +91,15 @@
     @append_character
     ;
 
+  regex_char =
+    # (same as above)
+    [ -.0-[\]-~]
+    $append_character
+    |
+    '\\' any  # wrong #todo
+    @append_character
+    ;
+
   equals_predicate =
     '=='
     >err{ oops( "expecting '=='" ); }
@@ -102,13 +115,28 @@
     >err{ oops( "expecting close single quote" ); }
     ;
 
+  regex_match_predicate =
+    '=~'
+    >err{ oops( "expecting '=~'" ); }
+    <>err{ oops( "expecting '~'" ); }
+    ws*
+    '/'
+    >err{ oops( "expecting open forward slash" ); }
+    regex_char*
+    # >err{ oops( "regex body" ); }
+    >begin_char_by_char_capture %end_char_by_char_capture
+    %regex_body_action
+    '/'
+    >err{ oops( "expecting close forward slash" ); }
+    ;
+
   test =
     identifier
     >err{ oops( "expecting identifier" ); }
     >begin_capture %end_capture
     %test_identifier_action
     ws*
-    ( equals_predicate )
+    ( equals_predicate | regex_match_predicate )
     ;
 
   AND_tests =
@@ -183,8 +211,9 @@ module Skylab__BeautySalon
       :listener,
       :on_callish_identifier,
       :on_error_message,
-      :on_literal_string,
       :on_is_AND_not_OR,
+      :on_literal_string,
+      :on_regex_body,
       :on_test_identifier,
       :on_true_keyword,
     )

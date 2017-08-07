@@ -79,7 +79,7 @@ module Skylab::BeautySalon::TestSupport
 
         _against 'foo( true '
         _fails_with_these_normal_lines do |y|
-          y << %q(expecting '==' or close parenthesis:)
+          y << %q(expecting '==' or '=~' or close parenthesis:)
           y << '  foo( true '
           y << '  ----------^'
         end
@@ -97,7 +97,7 @@ module Skylab::BeautySalon::TestSupport
 
         _against 'foo( jamma'
         _fails_with_these_normal_lines do |y|
-          y << %q(expecting '==':)
+          y << %q(expecting '==' or '=~':)
           y << '  foo( jamma'
           y << '  ----------^'
         end
@@ -107,7 +107,7 @@ module Skylab::BeautySalon::TestSupport
 
         _against 'foo( jamma ='
         _fails_with_these_normal_lines do |y|
-          y << %q(expecting '=':)
+          y << %q(expecting '=' or '~':)
           y << '  foo( jamma ='
           y << '  ------------^'
         end
@@ -152,9 +152,19 @@ module Skylab::BeautySalon::TestSupport
           y << %q{  --------------^}
         end
       end
+
+      it %q(you can't do matchy with a string) do
+
+        _against %q(foo(jam =~ 'xx'))
+        _fails_with_these_normal_lines do |y|
+          y << %q(expecting open forward slash:)
+          y << %q(  foo(jam =~ 'xx'))
+          y << %q(  -----------^)
+        end
+      end
     end
 
-    context 'parse tree - with just one test component' do
+    context 'parse tree - with just one test component - a literal value test' do
 
       it 'parses' do
         _parse_tree || fail
@@ -193,7 +203,46 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'parse tree - model case', wip: true do
+    context 'parse tree - with just one test component - a regexp test' do
+
+      it 'parses' do
+        _parse_tree || fail
+      end
+
+      it 'knows the name of the feature symbol' do
+        _pt = _parse_tree
+        _pt.feature_symbol == :zz_xx || fail
+      end
+
+      it 'knows there is one boolean test' do
+        _boolean_tests_array.length == 1 || fail
+      end
+
+      it 'the boolean tests knows its left had side' do
+        _sym = _the_only_test.symbol_symbol
+        _sym == :mammer || fail
+      end
+
+      it 'knows its comparison function name symbol' do
+        _sym = _the_only_test.comparison_function_name_symbol
+        _sym == :_RX_ || fail
+      end
+
+      it 'knows its literal string (CAPTURE BROKEN CASE)' do
+        _s = _the_only_test.regexp_body_string
+        _s == 'A[a-z]' || fail
+      end
+
+      def _the_only_test
+        _boolean_tests_array.first
+      end
+
+      shared_subject :_parse_tree do
+        _parse_tree_via_string_expecting_success %q{zz_xx( mammer =~ /\\A[a-z]/ )}
+      end
+    end
+
+    context 'parse tree - model case' do
 
       it 'parses' do
         _parse_tree || fail
@@ -206,6 +255,10 @@ module Skylab::BeautySalon::TestSupport
 
       it 'knows the several boolean tests' do
         _boolean_tests_array.length == 2 || fail
+      end
+
+      it 'knows that the list of tests is AND vs OR' do
+        _parse_tree.list_is_AND_list_not_OR_list == true || fail
       end
 
       it 'each boolean test knows the left hand side' do
@@ -229,76 +282,17 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_parse_tree do
-        _parse_tree_via_string_expecting_success 'xx_yy(  qq_q== "ze ze" &&mm_m =="i\'m \\"OK\\"")'
+
+        _parse_tree_via_string_expecting_success(
+          %q{xx_yy(  qq_q== 'ze ze' &&mm_m =='i\\'m "OK"')}
+        )
       end
-    end
-
-    # ==
-
-    context 'error 3 - like so', wip: true do
-
-      # NOTE - this goes away and becomes the simpler form WHEN we re-
-      # introduce regexp based tests. at that time don't forget to remove
-      # the auxiliary method used here too (`_parse_expecting_failure`).
-
-      it 'fails' do
-        _fails
-      end
-
-      it 'this contextualized expression' do
-
-        _actual = _expect_parse_error_and_give_lines
-
-        expect_these_lines_in_array_ _actual do |y|
-          y << 'expecting "==" or "=~":'
-          y << '    dd( ee = ff )'
-          y << '    -------^'
-        end
-      end
-
-      shared_subject :_tuple do
-        _parse_expecting_failure 'dd( ee = ff )'
-      end
-    end
-
-    # ==
-
-    def _boolean_tests_array
-      _parse_tree.list_of_boolean_tests
-    end
-
-    # ==
-
-    def _parse_expecting_failure str
-
-      log = Common_.test_support::Expect_Emission::Log.for self
-
-      _x = _lower_level_subject_magnetic.call_by do |o|
-        o.string = str
-        o.listener = log.listener
-      end
-
-      [ _x, log.flush_to_array ]
     end
 
     # --
 
-    def _expect_parse_error_and_give_lines
-
-      em = _only_emission
-      em.channel_symbol_array == %i( error expression parse_error ) || fail
-      em.expression_proc[ [] ]
-    end
-
-    def _only_emission
-      em_a = _tuple.last
-      1 == em_a.length || fail
-      em_a[0]
-    end
-
-    def _fails
-      _x = _tuple.first
-      _x && fail  # i don't care nil
+    def _boolean_tests_array
+      _parse_tree.list_of_boolean_tests
     end
 
     # --
@@ -388,3 +382,4 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
+# #history-A.2: finished removing pre-ragel tests

@@ -16,6 +16,7 @@ module Skylab::BeautySalon
     # -
       def initialize
         yield self  # hi.
+        @__mutex_for_etc = nil
       end
 
       attr_writer(
@@ -36,9 +37,11 @@ module Skylab::BeautySalon
 
           o.on_test_identifier = method :__on_test_identifier
 
+          o.on_regex_body = method :__on_regex_body
+
           o.on_literal_string = method :__on_literal_string
 
-          o.on_is_AND_not_OR = -> _ { self._WEEE }
+          o.on_is_AND_not_OR = method :__on_is_AND_not_OR
 
           o.on_true_keyword = method :__on_true_keyword
 
@@ -62,7 +65,7 @@ module Skylab::BeautySalon
 
         _yes = remove_instance_variable :@_true_keyword_was_used
         if ! _yes
-          is_AND = nil
+          is_AND = remove_instance_variable :@_is_AND_not_OR
           list = remove_instance_variable :@_boolean_tests
         end
         o = SelectorParseTree___.new
@@ -78,17 +81,26 @@ module Skylab::BeautySalon
 
       # --
 
+      def __on_regex_body s
+
+        o = RegexpBooleanTest___.new
+          o.regexp_body_string = s
+          o.symbol_symbol = remove_instance_variable :@_test_identifier_symbol
+
+        _receive_boolean_test o
+      end
+
       def __on_literal_string s
 
         o = LiteralValueBooleanTest___.new
           o.literal_value = s
-          o.symbol_symbol = remove_instance_variable :@__test_identifier_symbol
+          o.symbol_symbol = remove_instance_variable :@_test_identifier_symbol
 
         _receive_boolean_test o.freeze
       end
 
       def __on_test_identifier s
-        @__test_identifier_symbol = s.intern
+        @_test_identifier_symbol = s.intern
       end
 
       def _receive_boolean_test o
@@ -97,6 +109,7 @@ module Skylab::BeautySalon
 
       def __receive_boolean_test_initally o
         @_true_keyword_was_used = false
+        @_is_AND_not_OR = nil  # if the list has one item, this shouldn't matter
         @_boolean_tests = []
         send ( @_receive_boolean_test = :__receive_boolean_test_subsequently ), o
       end
@@ -106,6 +119,11 @@ module Skylab::BeautySalon
       end
 
       # --
+
+      def __on_is_AND_not_OR is_AND
+        remove_instance_variable :@__mutex_for_etc
+        @_is_AND_not_OR = is_AND
+      end
 
       def __on_true_keyword
         @_true_keyword_was_used = true
@@ -245,6 +263,15 @@ module Skylab::BeautySalon
       :list_of_boolean_tests,
       :feature_symbol,
     )
+
+    RegexpBooleanTest___ = ::Struct.new(
+      :regexp_body_string,
+      :symbol_symbol,
+    ) do
+      def comparison_function_name_symbol
+        :_RX_
+      end
+    end
 
     LiteralValueBooleanTest___ = ::Struct.new(
       :literal_value,
