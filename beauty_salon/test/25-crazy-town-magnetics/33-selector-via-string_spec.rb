@@ -65,11 +65,11 @@ module Skylab::BeautySalon::TestSupport
         end
       end
 
-      it 'after open paren, expects something (WILL EXPAND)' do
+      it 'after open paren, expects something' do
 
         _against 'foo('
         _fails_with_these_normal_lines do |y|
-          y << 'expecting true keyword:'
+          y << 'expecting identifier or true keyword:'
           y << '  foo('
           y << '  ----^'
         end
@@ -79,7 +79,7 @@ module Skylab::BeautySalon::TestSupport
 
         _against 'foo( true '
         _fails_with_these_normal_lines do |y|
-          y << 'expecting close parenthesis:'
+          y << %q(expecting '==' or close parenthesis:)
           y << '  foo( true '
           y << '  ----------^'
         end
@@ -91,6 +91,105 @@ module Skylab::BeautySalon::TestSupport
         pt = _produces_parse_tree_while_emitting_nothing
         pt.feature_symbol == :foo || fail
         pt.list_of_boolean_tests && fail
+      end
+
+      it 'where you would expect a boolean operator (WILL EXPAND)' do
+
+        _against 'foo( jamma'
+        _fails_with_these_normal_lines do |y|
+          y << %q(expecting '==':)
+          y << '  foo( jamma'
+          y << '  ----------^'
+        end
+      end
+
+      it 'boolean operator midway through (WILL EXPAND)' do
+
+        _against 'foo( jamma ='
+        _fails_with_these_normal_lines do |y|
+          y << %q(expecting '=':)
+          y << '  foo( jamma ='
+          y << '  ------------^'
+        end
+      end
+
+      it 'expecting literal string' do
+
+        _against 'foo( jamma == %'
+        _fails_with_these_normal_lines do |y|
+          y << %q(expecting open single quote:)
+          y << '  foo( jamma == %'
+          y << '  --------------^'
+        end
+      end
+
+      it %q(literal string that doesn't close) do
+
+        _against %q{foo( jamma == '%}
+        _fails_with_these_normal_lines do |y|
+          y << 'expecting close single quote:'
+          y << %q{  foo( jamma == '%}
+          y << %q{  ----------------^}
+        end
+      end
+
+      it 'literal string that closes but no close paren' do
+
+        _against %q{foo( jamma == 'xy'}
+        _fails_with_these_normal_lines do |y|
+          y << %q(expecting '&&' or '||' or close parenthesis:)
+          y << %q{  foo( jamma == 'xy'}
+          y << %q{  ------------------^}
+        end
+      end
+
+      it 'whines about dangling whitespace' do
+
+        _against %q{foo(jam=='xy') }
+        _fails_with_these_normal_lines do |y|
+          y << %q{expecting end of input:}
+          y << %q{  foo(jam=='xy') }
+          y << %q{  --------------^}
+        end
+      end
+    end
+
+    context 'parse tree - with just one test component' do
+
+      it 'parses' do
+        _parse_tree || fail
+      end
+
+      it 'knows the name of the feature symbol' do
+        _pt = _parse_tree
+        _pt.feature_symbol == :mm_qq || fail
+      end
+
+      it 'knows there is one boolean test' do
+        _boolean_tests_array.length == 1 || fail
+      end
+
+      it 'the boolean tests knows its left had side' do
+        _sym = _the_only_test.symbol_symbol
+        _sym == :jama || fail
+      end
+
+      it 'knows its comparison function name symbol' do
+        _sym = _the_only_test.comparison_function_name_symbol
+        _sym == :_EQ_ || fail
+      end
+
+      it 'knows its literal string' do
+        _s = _the_only_test.literal_value
+        _s == '%a' || fail
+      end
+
+      def _the_only_test
+        _boolean_tests_array.first
+      end
+
+      shared_subject :_parse_tree do
+        _parse_tree_via_string_expecting_success %q{mm_qq( jama == '%a' )}
       end
     end
 
@@ -129,62 +228,18 @@ module Skylab::BeautySalon::TestSupport
         _s == %(i'm "OK") || fail
       end
 
-      def _boolean_tests_array
-        _parse_tree.AND_list_of_boolean_tests
-      end
-
       shared_subject :_parse_tree do
         _parse_tree_via_string_expecting_success 'xx_yy(  qq_q== "ze ze" &&mm_m =="i\'m \\"OK\\"")'
-      end
-    end
-
-    context 'error 1 - here', wip: true do
-
-      it 'fails' do
-        _fails
-      end
-
-      it 'this contextualized expression' do
-
-        _actual = _expect_parse_error_and_give_lines
-
-        expect_these_lines_in_array_ _actual do |y|
-          y << 'expecting close parens:'
-          y << '    xx_yy(  qq_q== "ze ze"  FOOFIE'
-          y << '    ------------------------^'
-        end
-      end
-
-      shared_subject :_tuple do
-        _parse_expecting_failure 'xx_yy(  qq_q== "ze ze"  FOOFIE'
-      end
-    end
-
-    context 'error 2 - this', wip: true do
-
-      it 'fails' do
-        _fails
-      end
-
-      it 'this contextualized expression' do
-
-        _actual = _expect_parse_error_and_give_lines
-
-        expect_these_lines_in_array_ _actual do |y|
-          y << 'expecting end of string:'
-          y << '    a(b=="c")  # wahoo'
-          y << '    ---------^'
-        end
-      end
-
-      shared_subject :_tuple do
-        _parse_expecting_failure 'a(b=="c")  # wahoo'
       end
     end
 
     # ==
 
     context 'error 3 - like so', wip: true do
+
+      # NOTE - this goes away and becomes the simpler form WHEN we re-
+      # introduce regexp based tests. at that time don't forget to remove
+      # the auxiliary method used here too (`_parse_expecting_failure`).
 
       it 'fails' do
         _fails
@@ -206,24 +261,10 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'error 4 - watch me work this', wip: true do
+    # ==
 
-      it 'fails' do
-        _fails
-      end
-
-      it 'this contextualized expression' do
-
-        _actual = _expect_parse_error_and_give_lines
-
-        expect_these_lines_in_array_ _actual do |y|
-          y << 'string is still open at end of input'
-        end
-      end
-
-      shared_subject :_tuple do
-        _parse_expecting_failure 'qq( xx == "yy'
-      end
+    def _boolean_tests_array
+      _parse_tree.list_of_boolean_tests
     end
 
     # ==
@@ -238,12 +279,6 @@ module Skylab::BeautySalon::TestSupport
       end
 
       [ _x, log.flush_to_array ]
-    end
-
-    def _parse_tree_via_string_expecting_success str
-      _lower_level_subject_magnetic.call_by do |o|
-        o.string = str
-      end
     end
 
     # --
@@ -326,13 +361,18 @@ module Skylab::BeautySalon::TestSupport
 
     def _produces_parse_tree_while_emitting_nothing
 
+      _parse_tree_via_string_expecting_success remove_instance_variable :@STRING
+    end
+
+    def _parse_tree_via_string_expecting_success string
+
       x = _lower_level_subject_magnetic.call_by do |o|
 
         o.listener = -> * do
           fail
         end
 
-        o.string = remove_instance_variable :@STRING
+        o.string = string
       end
       x || fail
       x

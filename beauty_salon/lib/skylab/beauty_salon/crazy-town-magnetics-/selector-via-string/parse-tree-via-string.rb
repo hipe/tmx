@@ -34,11 +34,17 @@ module Skylab::BeautySalon
 
           o.on_callish_identifier = method :__on_callish_identifier
 
-          o.on_error_message = method :__on_error_message
+          o.on_test_identifier = method :__on_test_identifier
+
+          o.on_literal_string = method :__on_literal_string
+
+          o.on_is_AND_not_OR = -> _ { self._WEEE }
 
           o.on_true_keyword = method :__on_true_keyword
 
           o.input_string = remove_instance_variable :@string
+
+          o.on_error_message = method :__on_error_message
 
           o.listener = @listener
 
@@ -47,7 +53,7 @@ module Skylab::BeautySalon
 
         case _ok
         when true ; __flush_tree
-        when false ; UNABLE_
+        when false ; __flush_express_error_messages  # assume some (risky!)
         else never
         end
       end
@@ -56,9 +62,8 @@ module Skylab::BeautySalon
 
         _yes = remove_instance_variable :@_true_keyword_was_used
         if ! _yes
-          la_la_la
           is_AND = nil
-          list = nil
+          list = remove_instance_variable :@_boolean_tests
         end
         o = SelectorParseTree___.new
           o.list_is_AND_list_not_OR_list = is_AND
@@ -67,34 +72,153 @@ module Skylab::BeautySalon
         o.freeze
       end
 
-      def __on_callish_identifier wat_s
-        @__callish_identifier_symbol = wat_s.intern
+      def __on_callish_identifier s
+        @__callish_identifier_symbol = s.intern
       end
+
+      # --
+
+      def __on_literal_string s
+
+        o = LiteralValueBooleanTest___.new
+          o.literal_value = s
+          o.symbol_symbol = remove_instance_variable :@__test_identifier_symbol
+
+        _receive_boolean_test o.freeze
+      end
+
+      def __on_test_identifier s
+        @__test_identifier_symbol = s.intern
+      end
+
+      def _receive_boolean_test o
+        send ( @_receive_boolean_test ||= :__receive_boolean_test_initally ), o
+      end
+
+      def __receive_boolean_test_initally o
+        @_true_keyword_was_used = false
+        @_boolean_tests = []
+        send ( @_receive_boolean_test = :__receive_boolean_test_subsequently ), o
+      end
+
+      def __receive_boolean_test_subsequently o
+        @_boolean_tests.push o
+      end
+
+      # --
 
       def __on_true_keyword
         @_true_keyword_was_used = true
       end
 
+      # -- error caching and subsequent expression
+      #
+      #    (we cache them instead of expressing them outright so we can
+      #     do the clever thing of expressing "expecting X or Y or Z")
+
       def __on_error_message msg
 
-        g = @_grammar ; me = self
+        _d = @_grammar.current_position_
+        _err = ErrorAtPostion___.new _d, msg
+        send ( @_receive_error_message ||= :__receive_initial_error_message ), _err
+      end
 
+      def __receive_initial_error_message err
+        @_errors = []
+        send ( @_receive_error_message = :__receive_subsequent_error_message ), err
+      end
+
+      def __receive_subsequent_error_message err
+        @_errors.push err
+      end
+
+      def __flush_express_error_messages  # assume some
+
+        me = self
+        _err_a = remove_instance_variable :@_errors
         @listener.call :expression, :error, :parse_error do |y|
+          me.__do_express_error_messages y, _err_a
+        end
+        UNABLE_
+      end
+
+      def __do_express_error_messages y, err_a   # assume some
+
+        err_st = Stream_[ err_a ]
+        err = nil
+        leftmost_column = nil
+        rightmost_column = nil
+
+        see_offset_normally = -> do
+          d = err.offset
+          if d < leftmost_column
+            leftmost_column = d
+          elsif d > rightmost_column
+            rightmost_column = d
+          end
+        end
+
+        see_offset = -> do
+          see_offset = see_offset_normally
+          leftmost_column = err.offset
+          rightmost_column = err.offset
+        end
+
+        message_buffer = nil
+
+        do_see_subsequent_message = -> object_s do
+          message_buffer << " or " << object_s
+        end
+
+        do_see_message = -> object_s do
+          do_see_message = do_see_subsequent_message
+          message_buffer = "expecting #{ object_s }"
+        end
+
+        see_message = -> do
+          msg = err.message
+          md = /\Aexpecting /.match msg
+          if ! md
+            self._COVER_ME__did_not_match_regexp__
+          end
+          do_see_message[ md.post_match ]
+        end
+
+        begin
+          err = err_st.gets
+          err || break
+          see_offset[]
+          see_message[]
+          redo
+        end while above
+
+        message_buffer << ':'  # COLON_
+
+
+        if leftmost_column == rightmost_column
+          offset = leftmost_column
+        else
+          self._COVER_ME__OK_but_we_are_not_expecting_this__
+        end
+
+        me = self
 
           input_s = me.__get_original_string
 
-          y << "#{ msg }:"
+        y << message_buffer
 
           buffer = '  '  # also margin
 
           y << "#{ buffer }#{ input_s }"
 
-          buffer << ( DASH_ * g.current_position_ )
+        buffer << ( DASH_ * offset )
           buffer << '^'
 
           y << buffer
-        end
+        # -
       end
+
+      ErrorAtPostion___ = ::Struct.new :offset, :message
 
       def __get_original_string
 
@@ -105,6 +229,8 @@ module Skylab::BeautySalon
         d_a.last.zero? || fail
         d_a[ 0 ... -1 ].pack _generated_grammar_module::C_STAR
       end
+
+      # --
 
       def _generated_grammar_module
         ::Skylab__BeautySalon::CrazyTownMagnetics___Selector_via_String__Grammar_
@@ -120,7 +246,14 @@ module Skylab::BeautySalon
       :feature_symbol,
     )
 
-    BooleanTest___ = ::Struct.new :literal_value, :symbol_symbol, :comparison_function_name_symbol
+    LiteralValueBooleanTest___ = ::Struct.new(
+      :literal_value,
+      :symbol_symbol,
+    ) do
+      def comparison_function_name_symbol
+        :_EQ_
+      end
+    end
 
     # ==
     # ==

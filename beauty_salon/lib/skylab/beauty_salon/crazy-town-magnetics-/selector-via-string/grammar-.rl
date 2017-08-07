@@ -13,9 +13,23 @@
   # (actions are high-level to low-level because we can)
 
   action callish_identifier_action {
-    _buff = remove_instance_variable :@_current_string_buffer
-    @on_callish_identifier[ _buff ]
-    nil
+    @on_callish_identifier[ _release_string_buffer ]
+  }
+
+  action started_OR {
+    @on_is_AND_not_OR[ false ]
+  }
+
+  action started_AND {
+    @on_is_AND_not_OR[ true ]
+  }
+
+  action test_identifier_action {
+    @on_test_identifier[ _release_string_buffer ]
+  }
+
+  action literal_string_body_action {
+    @on_literal_string[ _release_string_buffer ]
   }
 
   action true_keyword_action {
@@ -23,12 +37,25 @@
     nil
   }
 
-  action clear {
-    @__begin_offset_for_string_buffer = current_position_
+  action begin_capture {
+    @__begin_offset_for_string_buffer = p  # current_position_
   }
 
-  action term {
+  action end_capture {
     __terminate_string_buffer
+  }
+
+  action begin_char_by_char_capture {
+    @_bytes = []
+  }
+
+  action append_character {
+    @_bytes.push @THE_data.fetch p
+  }
+
+  action end_char_by_char_capture {
+    _d_a = remove_instance_variable :@_bytes
+    @_current_string_buffer = _d_a.pack( C_STAR ).freeze
   }
 
   # --
@@ -41,15 +68,77 @@
     %true_keyword_action
     ;
 
+  identifier = [a-z] [_a-z0-9]* ;
+    # note for now we allow no uppercase but there's a fair chance this will change..
+
   callish_identifier =
-    ( [a-z] [_a-z0-9]* )
+    identifier
     >err{ oops( "expecting callish identifier ([a-z][_a-z0-9]*)" ); }
-    >clear %term
+    >begin_capture %end_capture
     %callish_identifier_action
     ;
 
+  single_quote_char =
+    # (this yuck is explained in our sibling file "grammar-in-c.rl")
+    [ -&(-[\]-~]
+    $append_character
+    |
+    '\\' any
+    @append_character
+    ;
+
+  equals_predicate =
+    '=='
+    >err{ oops( "expecting '=='" ); }
+    <>err{ oops( "expecting '='" ); }
+    ws*
+    "'"
+    >err{ oops( "expecting open single quote" ); }
+    single_quote_char *
+    # >err{ oops( "expecting single quote body" ); } should never be needed b.c empty strings allows (but etc)
+    >begin_char_by_char_capture %end_char_by_char_capture
+    %literal_string_body_action
+    "'"
+    >err{ oops( "expecting close single quote" ); }
+    ;
+
+  test =
+    identifier
+    >err{ oops( "expecting identifier" ); }
+    >begin_capture %end_capture
+    %test_identifier_action
+    ws*
+    ( equals_predicate )
+    ;
+
+  AND_tests =
+    (
+      ws*
+      '&&'
+      >started_AND
+      >err{ oops( "expecting '&&'" ); }
+      <>err{ oops( "expecting '&'" ); }
+      ws*
+      test
+    )+
+    ;
+
+  OR_tests =
+    (
+      ws*
+      '||'
+      >started_OR
+      >err{ oops( "expecting '||'" ); }
+      <>err{ oops( "expecting '|'" ); }
+      ws*
+      test
+    )+
+    ;
+
+  tests = test ( AND_tests | OR_tests )? ;
+
   root_test =
-    ( true_keyword )
+    ( tests | true_keyword )
     ;
 
   main :=
@@ -62,7 +151,7 @@
     ')'
     >err{ oops( "expecting close parenthesis" ); }
     0
-    >err{ oops( "expecting end of string" ); }
+    >err{ oops( "expecting end of input" ); }
     @{ @_did_finish = true; }
     ;
 
@@ -97,6 +186,9 @@ module Skylab__BeautySalon
       :listener,
       :on_callish_identifier,
       :on_error_message,
+      :on_literal_string,
+      :on_is_AND_not_OR,
+      :on_test_identifier,
       :on_true_keyword,
     )
 
@@ -125,6 +217,10 @@ module Skylab__BeautySalon
       _end = current_position_
       @_current_string_buffer =
         @THE_data[ _begin ... _end ].pack( C_STAR ).freeze
+    end
+
+    def _release_string_buffer
+      remove_instance_variable :@_current_string_buffer
     end
 
     # --
