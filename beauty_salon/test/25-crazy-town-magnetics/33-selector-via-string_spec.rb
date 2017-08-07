@@ -11,6 +11,31 @@ module Skylab::BeautySalon::TestSupport
       _lower_level_subject_magnetic || fail
     end
 
+    context 'errors, perhaps comprehensively' do
+
+      same_rx = %r<\Aexpecting callish identifier \([^)]+\):?\z>
+
+      it 'empty string - says expecting identifier' do
+
+        _against EMPTY_S_
+        _fails_with_these_normal_lines do |y|
+          y << same_rx
+          y << '  '
+          y << '  ^'
+        end
+      end
+
+      it 'bad char for identifier as 1st char - says expecting identifier' do
+
+        _against '%foo'
+        _fails_with_these_normal_lines do |y|
+          y << same_rx
+          y << '  %foo'
+          y << '  ^'
+        end
+      end
+    end
+
     context 'parse tree - model case', wip: true do
 
       it 'parses' do
@@ -163,10 +188,6 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    def _lower_level_subject_magnetic
-      Home_::CrazyTownMagnetics_::Selector_via_String::ParseTree_via_String
-    end
-
     # --
 
     def _expect_parse_error_and_give_lines
@@ -185,6 +206,62 @@ module Skylab::BeautySalon::TestSupport
     def _fails
       _x = _tuple.first
       _x && fail  # i don't care nil
+    end
+
+    # --
+
+    def _against s
+      @STRING = s
+    end
+
+    def _fails_with_these_normal_lines & p
+
+      _lines, _x = __expression_lines_and_result
+
+      _x == false || fail
+
+      expect_these_lines_in_array_ _lines, & p
+    end
+
+    def __expression_lines_and_result
+
+      expecting_no_more_emissions = -> * do
+        fail
+      end
+
+      lines = nil
+
+      p = -> em_p, sym_a do
+        :expression == sym_a.first || fail
+        lines = []
+        _p = if do_debug
+          io = debug_IO
+          -> line { io.puts line ; lines.push line }
+        else
+          -> line { lines.push line }
+        end
+        y = ::Enumerator::Yielder.new( & _p )
+        _y_ = nil.instance_exec y, & em_p
+        y.object_id == _y_.object_id || fail
+        p = expecting_no_more_emissions
+      end
+
+      _x = _lower_level_subject_magnetic.call_by do |o|
+
+        o.listener = -> * sym_a, & em_p do
+          p[ em_p, sym_a ]
+        end
+
+        o.string = remove_instance_variable :@STRING
+      end
+
+      [ lines, _x ]
+    end
+
+    # --
+
+    def _lower_level_subject_magnetic
+      Home_::CrazyTownMagnetics_::Selector_via_String::ParseTree_via_String
     end
 
     # ==

@@ -2,22 +2,24 @@
 
   machine my_grammar;
 
-  access@_zizzy_;
+  access@THE_;
     # this is clever:
     #   - i came up with it. me.
     #   - access every variable as a member variable
-    #   - we use a goofy arbitrary string just so you can track it
+    #   - it is a sort of goofy looking name so you can track its origin
+    #   - the lack of space between `acceess` and `@_..` is yuck intentional
 
   # --
   # (actions are high-level to low-level because we can)
 
   action callish_identifier_action {
     _buff = remove_instance_variable :@_current_string_buffer
-    @stderr.puts "callish identifier: #{ _buff }"
+    @on_callish_identifier[ _buff ]
+    nil
   }
 
   action clear {
-    __clear_string_buffer
+    @__begin_offset_for_string_buffer = current_position_
   }
 
   action term {
@@ -28,7 +30,7 @@
 
   callish_identifier =
     ( [a-z] [_a-z0-9]* )
-    >err{ oops( "callish identifier" ); }
+    >err{ oops( "expecting callish identifier ([a-z][_a-z0-9]*)" ); }
     >clear %term
     %callish_identifier_action
     ;
@@ -36,7 +38,7 @@
   main :=
    callish_identifier
    0
-   >err{ oops( "end of string" ); }
+   >err{ oops( "expecting end of string" ); }
    @{ res = 1; }
    ;
 
@@ -44,87 +46,77 @@
 
 module Skylab__BeautySalon
 
-  class CrazyTownMagnetics___Selector_via_String__ThisThing___
+  # (it's not strictly necessary, but creating our own modules and being
+  # standalone (rather than using the modules and facilities of our host
+  # sidesystem) makes it easier for us to implement the detection of
+  # warnings for reasons explained at #spot1.3 but keep in mind this could change.)
 
-    def initialize _, sout, serr
+  class CrazyTownMagnetics___Selector_via_String__Grammar_
 
-      @stderr = serr
-      @stdout = sout
+    class << self
+      def call_by & p
+        new( & p ).execute
+      end
+      private :new
+    end  # >>
+
+    def initialize
+      yield self
+      # hello: begin write data
       %% write data;
+      # hello: end write data
     end
 
-    def process input_s
+    attr_writer(
+      :input_string,
+      :listener,
+      :on_callish_identifier,
+      :on_error_message,
+    )
 
-      @_zizzy_data = input_s.unpack 'c*'
+    def execute
 
-      @_zizzy_data.push 0
+      @THE_data = @input_string.unpack C_STAR
+
+      @THE_data.push 0
         # make this look like a null-terminated string in C
         # (there might be a more elegant/idiomatic way, but for now we
         # just want to fly close to the C-hosted version of this.)
 
-      eof = @_zizzy_data.length
+      eof = @THE_data.length
       # stack = []
       %% write init;
       @_binding = binding  # you're gonna want the `p` and `pe` local generated above #here1
       # hello i'm bewteen init and exec
       %% write exec;
-      @_zizzy_cs
+      @THE_cs
     end
 
-    def oops msg
-
-      io = @stderr
-
-      input_s = __get_original_string
-
-      io.puts "err #{ msg }:"
-
-      buffer = '  '  # also margin
-
-      io.puts "#{ buffer }#{ input_s }"
-
-      buffer << ( '-' * _current_position )
-      buffer << '^'
-
-      io.puts buffer ; nil
-    end
-
-    def __clear_string_buffer
-      @__begin_offset_for_string_buffer = _current_position
-    end
+    # -- parsing support (methods that appear in actions)
 
     def __terminate_string_buffer
       _begin = remove_instance_variable :@__begin_offset_for_string_buffer
-      _end = _current_position
+      _end = current_position_
       @_current_string_buffer =
-        @_zizzy_data[ _begin ... _end ].pack( C_STAR_ ).freeze
+        @THE_data[ _begin ... _end ].pack( C_STAR_ ).freeze
     end
 
-    def _current_position
+    # --
+
+    def oops msg
+      @on_error_message[ msg ]
+    end
+
+    def current_position_
       @_binding.local_variable_get :p
     end
 
-    def __get_original_string
-      d_a = @_zizzy_data
-      d_a.last.zero? || fail
-      d_a[ 0 ... -1 ].pack C_STAR_
-    end
+    attr_reader(
+      :THE_data,
+    )
 
-    C_STAR_ = 'c*'.freeze
+    C_STAR = 'c*'
 
   end
 end
-
-argv = ::ARGV
-
-if __FILE__ != $PROGRAM_NAME
-  # nothing - assume this is being loaded for some other purpose
-elsif 1 == argv.length && /\A--?h(?:e(?:l(?:p)?)?)?\z/ !~ argv[0]
-  _accepter = Skylab__BeautySalon::CrazyTownMagnetics___Selector_via_String__ThisThing___.new nil, $stdout, $stderr
-  _x = _accepter.process argv.fetch 0
-  $stdout.puts "OHAI: #{ _x.inspect }"
-else
-  $stderr.puts "usage: #{ $PROGRAM_NAME } <integer>"
-end
-
 # #born

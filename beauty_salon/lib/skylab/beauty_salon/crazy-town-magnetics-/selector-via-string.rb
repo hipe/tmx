@@ -170,7 +170,7 @@ module Skylab::BeautySalon
 
       def __first_pass
 
-        _ = ParseTree_via_String.call_by do |o|
+        _ = Here_::ParseTree_via_String.call_by do |o|
           o.string = remove_instance_variable :@string
           o.listener = @listener
         end
@@ -298,7 +298,7 @@ module Skylab::BeautySalon
       end
     # -
 
-    class ParseTree_via_String < Common_::MagneticBySimpleModel
+    class ParseTree_via_String_OLD < Common_::MagneticBySimpleModel
 
       # this follows exactly [#041] fig. 1.
 
@@ -308,6 +308,7 @@ module Skylab::BeautySalon
       )
 
       def execute
+        self._OLD_FOR_REFERENCE  # #todo
         @_scn = Home_.lib_.string_scanner.new remove_instance_variable :@string
         ok = __parse_feature_name_symbol
         ok &&= __parse_open_parens
@@ -521,10 +522,6 @@ module Skylab::BeautySalon
 
     # ==
 
-    SelectorParseTree___ = ::Struct.new :AND_list_of_boolean_tests, :feature_symbol
-
-    BooleanTest___ = ::Struct.new :literal_value, :symbol_symbol, :comparison_function_name_symbol
-
     # ==
 
     class InefficientRecordingJobber___
@@ -545,6 +542,10 @@ module Skylab::BeautySalon
         :tried_tokens,
       )
     end
+
+    # ==
+
+    Here_ = self
 
     # ==
     # ==

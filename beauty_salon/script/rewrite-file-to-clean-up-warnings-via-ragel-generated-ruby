@@ -8,7 +8,7 @@ module Skylab__BeautySalon__OneOffs__LaLaLaRuby___
 
       y << "description:"
       y << "the ragel-generated ruby generates warnings."
-      y << "long-term, we'd like to contribute to that project so it doesn't."
+      y << "long-term, we'd like to contribute to that project so it doesn't (#open [#020])."
       y << "but for now, we clean up the generated files programmatically"
       y << "(which was sort of a fun exercise anway)."
       y << nil

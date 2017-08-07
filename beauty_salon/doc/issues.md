@@ -25,7 +25,10 @@
 [#023]       (#ditto)
 [#022]       (#ditto)
 [#021]       (#ditto)
-[#020]       #done encoding issues with git config ([#ba-064])
+
+[#020] #open #wish: contribute to ragel in this one way
+             ( #was: encoding issues with git config ([#ba-064]) )
+
 [#019]       the `[*]` task of converting all `Foo_::Lib_::Bar_BAZ[]`
                to `Foo_.lib.bar_BAZ`..
 [#018]       [ why we like immutability ]
