@@ -29,6 +29,8 @@
 [#020] #open #wish: contribute to ragel in this one way
              ( #was: encoding issues with git config ([#ba-064]) )
 
+             :[#here.B]: (in "ragel notes", the dedicated document for this node)
+
 [#019]       the `[*]` task of converting all `Foo_::Lib_::Bar_BAZ[]`
                to `Foo_.lib.bar_BAZ`..
 [#018]       [ why we like immutability ]

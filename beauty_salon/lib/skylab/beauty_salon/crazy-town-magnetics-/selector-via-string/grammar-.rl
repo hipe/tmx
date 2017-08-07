@@ -175,9 +175,6 @@ module Skylab__BeautySalon
 
     def initialize
       yield self
-      # hello: begin write data
-      %% write data;
-      # hello: end write data
       @_did_finish = false
     end
 
@@ -202,6 +199,34 @@ module Skylab__BeautySalon
         # just want to fly close to the C-hosted version of this.)
 
       eof = @THE_data.length
+
+      # -- begin exactly [#020.B] as documented exhaustively there.
+
+      # (this list was originally generated. it is a known fragility/liabilitly as documented at [#same])
+
+      _my_grammar_actions = nil
+      _my_grammar_eof_actions = nil
+      _my_grammar_index_offsets = nil
+      _my_grammar_indicies = nil
+      _my_grammar_key_offsets = nil
+      _my_grammar_range_lengths = nil
+      _my_grammar_single_lengths = nil
+      _my_grammar_trans_actions = nil
+      _my_grammar_trans_keys = nil
+      _my_grammar_trans_targs = nil
+      my_grammar_start = nil
+      my_grammar_first_final = nil
+      my_grammar_error = nil
+      my_grammar_en_main = nil
+
+      sym_a, arrays = Lazy_guy___[]
+      bnd = binding
+      sym_a.each do |m|
+        bnd.local_variable_set m, arrays.send( m )
+      end
+
+      # -- end intense hack
+
       # stack = []
       %% write init;
       @_binding = binding  # you're gonna want the `p` and `pe` local generated above #here1
@@ -237,8 +262,35 @@ module Skylab__BeautySalon
       :THE_data,
     )
 
+    # ==
+    # see note [#020.B]
+
+    Lazy_guy___ = -> do
+
+      tuple = -> do
+        arrays = module TABLES____  # is module just for debuggability
+          # hello: begin write data
+          %% write data;
+          # hello: end write data
+          self
+        end
+
+        a = []
+        a.push arrays.instance_variables.map { |sym| sym[ 1..-1 ].intern }
+        a.push arrays
+        tuple = -> { a } ; a
+      end
+
+      -> { tuple[] }
+    end.call
+
+    # ==
+
     C_STAR = 'c*'
 
+    # ==
+    # ==
   end
 end
+# #history-A.1: experimentally try fragile efficientizing thing
 # #born
