@@ -1,5 +1,12 @@
 %%{
 
+  # back when we wrote this parser by hand we used [#041] fig. 1 to
+  # determine how it was implemented (almost definitively). now that we
+  # have ragel we don't have to lean on that visual aide as heavily to
+  # drive the implementation of the parsing (and in fact, ragel can
+  # do the reverse: generate a graph-viz dotfile from this grammer) but
+  # we nonetheless keep it around for reference.
+
   machine my_grammar;
 
   access@THE_;
