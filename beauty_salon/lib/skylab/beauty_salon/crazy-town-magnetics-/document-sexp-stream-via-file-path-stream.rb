@@ -140,66 +140,54 @@ module Skylab::BeautySalon
     # - # (re-open in service of potential sexp)
 
       def __sexp_via_path_ path
-        io = __open_filehandle_via_path path
-        if io
-          big_s = __big_string_via_open_filehandle io
-          if big_s
-            __sexp_via_big_string big_s, path
-          end
-        end
+        # (at #history-A.1, we got rid of meh and meh)
+
+        _two = @__ruby_parser.parse_file_with_comments path
+        WrappedDocumentAst___.new( * _two, path )
       end
 
       # -- interface with 'ruby_parser' (COMPREHENSIVE)
 
-      def __sexp_via_big_string big_s, path
-
-        _label = if path
-          "(file: #{ path })"
-        else
-          "(some big string)"  # ..
-        end
-
-        _sexp = @__ruby_parser.process big_s, _label, @__timeout_seconds  # ..
-
-        _sexp  # hi.
-      end
-
       def __init_ruby_parser
+        Load_ruby_parser_with_specific_settings___[]
 
-        _RubyParser = Home_.lib_.ruby_parser  # :#spot-1.1
-        @__ruby_parser = ::RubyParser::V24.new  # ..
-        # parser = RubyParser.new.parse _file
+        @__ruby_parser = ::Parser::CurrentRuby  # ..
 
-        @__timeout_seconds = 5  # or whatever. longer if step-debugging :/
-
+        # (:#spot1.1 used to be here, but it is DISASSOCIATED)
         NIL
       end
-
-      # -- interface with the filesystem (COMPREHENSIVE)
-
-      def __big_string_via_open_filehandle io
-        big_string = io.read
-        io.close
-        big_string
-      end
-
-      def __open_filehandle_via_path path
-        @filesystem.open path
-      rescue ::Errno::ENOENT, ::Errno::EISDIR => e  # #todo this might should happen at read not here (EISDIR)
-        __when_exception e
-      end
-
-      ::Errno::ENOENT::FEENOFENT = :xx
-
-      # -- support (re-used or likely to be )
-
-      define_method :__when_exception, DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_
     # -
 
     # ==
+
+    class WrappedDocumentAst___
+      # (it's bad style to pass a tuple around as an array)
+      def initialize ast, these, path
+        @ast_ = ast
+        @COMMENT_THINGS = these
+        @PATH = path
+      end
+      attr_reader(
+        :ast_,  # the name is a reminder that its our name not theirs
+      )
+    end
+
+    # ==
+
+    Load_ruby_parser_with_specific_settings___ = Lazy_.call do
+      require 'parser/current'
+      # opt-in to most recent AST format:
+      ::Parser::Builders::Default.emit_lambda = true
+      ::Parser::Builders::Default.emit_procarg0 = true
+    end
+
+    # ==
+
+
 
     # ==
     # ==
   end
 end
+# #history-A.1: begin to bleed in 'parser' for 'ruby_parser'
 # #born.

@@ -98,11 +98,6 @@ module Skylab::BeautySalon
       Common_::Stream::Magnetics::MinimalStream_via[ x ]
     end
 
-    Ruby_parser = Lazy_.call do
-      require 'ruby_parser'  # gem, actually
-      ::RubyParser
-    end
-
     String_scanner = Common_.memoize do
       require 'strscan'
       ::StringScanner

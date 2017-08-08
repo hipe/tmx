@@ -56,13 +56,23 @@ module Skylab::BeautySalon
 
           oo.define_document_hooks_plan :plan_A do |o|
 
-            o.on_each_sexp do |s|
-              buffer = s.fetch( 0 ).id2name
-              d = s.line
-              if d
-                buffer << SPACE_
-                buffer << d.to_s
+            o.on_each_sexp do |n|
+
+              buffer = n.type.id2name
+              loc = n.location
+
+              if loc.expression
+                d = loc.first_line
+                d_ = loc.last_line
+                if d == d_
+                  buffer << " #{ d }"
+                else
+                  buffer << " #{ d }-#{ d_ }"
+                end
+              else
+                buffer << " (no_associated_expression)"
               end
+
               y << buffer
             end
           end

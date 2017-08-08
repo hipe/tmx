@@ -2,6 +2,9 @@ module Skylab::BeautySalon
 
   class CrazyTownMagnetics_::Hooks_via_HooksDefinition  # 1x
 
+    # (NOTE - we still use the old terminology "sexp" when we should say
+    # "AST node". see also #here2 #todo)
+
     # this is the moneyshot - this is the guy that traverses every sexp
     # of a document sexp and runs all the hooks.
 
@@ -11,7 +14,7 @@ module Skylab::BeautySalon
     #
     # there need not be one hook for every symbol. even if a symbol does not
     # have an associated hook, our traversal will nonetheless descend into
-    # those sexps that are branch-nodes (i.e "deep", recursive).
+    # those sexps that are nonterminal (i.e "deep", "branchy", recursive).
     #
     # currently there cannot be multiple hooks associated with one symbol.
     # (an exception will be thrown.) you could, however, hack such an
@@ -35,8 +38,25 @@ module Skylab::BeautySalon
     # own "getting to know" the sexp's, and asserting their shape to be
     # used across our corpus.
 
+    # development notes
+    #
+    # we discovered `::AST::Processor` after this. comparison to it is
+    # instructive. it has behavior that doesn't align with us:
+    #
+    #   - processor is geared towards producing new trees from input trees
+    #
+    #   - processor is passive - it doesn't complain when it encounters
+    #     unrecognized grammatical symbols
+    #
+    #
     # developer's note: conventionally a variable called `s` is for holding
     # a string; however here `s` is used exclusively for `::Sexp` instances.
+    # NOTE - generally we are now dealing with `::Parser::AST::Node`
+    # instances instead of the (`ruby_parser`) Sexp's we used to.
+    # at present there are still some places where we use this legacy `s`
+    # name to hold these AST nodes.
+    # for new code we will use `n`, as this single letter name is rarely
+    # used for anything else in this ecosystem. :#here2
 
     # -
 
@@ -158,47 +178,86 @@ module Skylab::BeautySalon
         @after_each_file[ potential_sexp ] ; nil
       end
 
-      def __execute_against sexp  # assume dup
+      def __execute_against wast  # assume dup
 
         # probably a file BEFORE hook ..
 
-        _expression sexp
+        # ingnoring comments stuff
+        _node wast.ast_
 
         # probably a file AFTER hook ..
 
         NIL
       end
 
-      def _expression s
+      def _any_node x
+        if x
+          _node x
+        end
+      end
 
-        sym = s.fetch 0
+      def _expect sym, n
+        sym == n.type || oops
+        _node n
+      end
+
+      def _node n
+
+        sym = n.type
         p = @__hook_via_symbol_symbol[ sym ]
         if p
-          p[ s ]  # ignore result - don't let hooks control our flow
+          p[ n ]  # ignore result - don't let hooks control our flow
         end
         _m = GRAMMAR_SYMBOLS.fetch sym
-        send _m, s
+        send _m, n
       end
 
       CrazyTownMagnetics_::Hooks_via_HooksDefinition::GRAMMAR_SYMBOLS = {
+
+        # it seems a bit .. well .. "crunchy" to have all this stuff
+        # splayed out here. but:
+        #
+        #   A) it was for getting to know how the previous parsing library
+        #      parses things, and likewise can be used to see how the
+        #      current library parses things.
+        #
+        #   B) to traverse an AST recursively, we want to be able to do
+        #      this "forwardly" rather than passively reflecting on each
+        #      AST; i.e we want a sense for the discrete set of symbols
+        #      that are nonterminal rather than terminal
+        #
+        #   C) for the nascent but soon-to-be-burgeoning "selector" API
+        #      we may want fine-grained control over what behavior we
+        #      avail to each symbol, for exmaple to make complicated
+        #      representations appear simpler to the DSL.
+        #
+        #   D) it's fun to get a sense for how our own corpus covers all
+        #      grammar symbols vs. the set of all symbols.
+
+        arg: :__arg,
+        args: :__args,
         array: :__array,
         attrasgn: :__attrasng,
+        begin: :__begin,
         block: :_block,
         block_pass: :__block_pass,
         break: :__break,
         call: :__call,
         case: :__case,
+        casgn: :__const_assign,
         cdecl: :__const_declaration,
         class: :__class,
         colon2: :__colon2,
         colon3: :__colon3,
-        const: :__const,
+        const: :_const,
+        def: :__def,
         defn: :__defn,
         dstr: :__dstr,
         evstr: :__evstr,
         gvar: :__gvar,
         iasgn: :__iasgn,
         if: :__if,
+        int: :__int,
         iter: :__iter,
         ivar: :__ivar,
         lasgn: :__lasgn,
@@ -209,8 +268,10 @@ module Skylab::BeautySalon
         redo: :__redo,
         rescue: :__rescue,
         self: :__self,
+        send: :__send,
         sclass: :__singleton_class_block,
         str: :__str,
+        sym: :__sym,
         # when:  see #here1
         while: :__while,
         yield: :__yield,
@@ -218,18 +279,17 @@ module Skylab::BeautySalon
       }
 
       def __class s
-        d = s.length
-        2 < d || interesting
-
-        # s.fetch 1  # name thing - ignored for now
-        # s.fetch 2  # parent class thing - ignored for now
-
-        if 3 < d  # class can be empty
-          _tapeworm 3, s
+        a = s.children
+        _module_identifier a[0]
+        _any_module_identifier a[1]
+        x = a[2]
+        if x
+          interesting
         end
       end
 
       def __singleton_class_block s  # this is the block
+        Hi__[]
 
         # s.fetch 1  # the class we are mutating the singleton class of -
                      # it could be anything NOTE, but typically in our use it's just `s(:self)`
@@ -240,15 +300,17 @@ module Skylab::BeautySalon
       end
 
       def __module s
-
-        # s.fetch 1  # name thing - ignored for now
-
-        if 2 < s.length
-          _tapeworm 2, s
+        a = s.children
+        _module_identifier a[0]
+        if 1 == a.length
+          interesting
+        else
+          _tapeworm 1, a
         end
       end
 
       def __iter s
+        Hi__[]
 
         d = s.length
         4 == d || no_problem
@@ -275,7 +337,30 @@ module Skylab::BeautySalon
         end
       end
 
+      def __def n
+        a = n.children
+        _length 3, n
+        _symbol a[0]
+        _expect :args, a[1]
+        _node a[2]
+      end
+
+      def __args node
+        if node.children.length.nonzero?
+          _each_child_from 0, node.children do |n|
+            _expect :arg, n
+          end
+        end
+      end
+
+      def __arg n
+        a = n.children
+        _length 1, n
+        _symbol a[0]
+      end
+
       def __defn s
+        Hi__[]
 
         4 <= s.length || interesting
         # s.fetch 1  # name thing - ignored for now
@@ -286,6 +371,7 @@ module Skylab::BeautySalon
       end
 
       def __rescue s
+        Hi__[]
         3 == s.length || fail
 
         this = s.fetch(1)
@@ -301,11 +387,26 @@ module Skylab::BeautySalon
         _tapeworm 1, bdy
       end
 
+      def __begin n
+        _nonterminal n
+      end
+
       def _block s
+        Hi__[]
         _tapeworm 1, s
       end
 
+      def __send n
+        a = n.children
+        _any_node a[0]
+        _symbol a[1]
+        if 2 < a.length
+          _tapeworm 2, a
+        end
+      end
+
       def __call s
+        Hi__[]
 
         # (NOTE if you're passing some crazy `iter` *as* an argument
         # then we'll miss important things here..) we know we do
@@ -329,11 +430,13 @@ module Skylab::BeautySalon
         #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
         #                    ^^^^^^^^^^^^
 
-        2 == s.length || interesting
-        _expression s.fetch 1
+        a = s.children
+        _length 1, s
+        _node a[0]
       end
 
       def __while s
+        Hi__[]
         d = s.length
         4 == d || oops
         false == s.fetch(3) || interesting__readme__
@@ -366,7 +469,7 @@ module Skylab::BeautySalon
         # satisfyingly, it appears to be syntactically impossible to have
         # a `case` expression without at least one `when` component.
 
-        # for arbitrary grammers this context-sensitive situation should
+        # for arbitrary grammars this context-sensitive situation should
         # occur with arbitrary frequency, and so we would want to improve
         # our "after parsing" library so this feels less like such a one-
         # off; but with the target language this situation appears to be
@@ -375,107 +478,148 @@ module Skylab::BeautySalon
         # but note some of these contextualities aren't implemented lexically
         # but rather at runtime
 
-        d = s.length
-        # symbol, scrutinized, when, [ when, [..]] else
-        3 < d || interesting
-        _expression s.fetch 1  # the scrutinized
+        a = s.children
+        d = a.length
 
-        2.upto( d - 2 ) do |idx|  # the one or more `when` components
+        # scrutinized, when, [ when, [..]] else
+        2 < d || interesting
 
-          whn = s.fetch idx
-          :when == whn.fetch(0) || interesting  # :#here1
+        _node a[0]  # scrutinized
 
-          # each `when` has the "comparator" expression and the "consequence" expression
-          3 == whn.length || interesting
-          cmp = whn.fetch 1
-          con = whn.fetch 2
-          :array == cmp.fetch(0) || interesting
+        _each_child_from_to 1, a.length - 2, a do |n|
 
-          _tapeworm 1, cmp  # descend into each one of the (possibly multiple) comparator values
-
-          _expression con  # the consequence expression is any arbitrary expression
+          :when == n.type || interesting  # :#here1
+          __when n
         end
 
-        els = s.fetch d - 1
-        if els
-          _expression els
-        end
+        _any_node a[-1]
       end
 
-      def __if s
+      def __when n
+        a = n.children
+        _length 2, n
 
-        4 == s.length || interesting
-        # any one of these could go deep
+          # each `when` has the "comparator" expression and the "consequence" expression
 
-        _expression s.fetch 1
-        _expression s.fetch 2
+        _node a[0]  # if the scrutinized value is `===` to this..
+        _node a[-1]  # do this
+      end
 
-        els = s.fetch 3
-        if els
-          _expression els
-        end
+      def __if n
+        a = n.children
+        _length 3, n
+        _node a[0]  # condition expression (its trueishness determines doo-hah)
+        _node a[1]  # if true do this
+        _any_node a[2]  # else do this
       end
 
       def __yield s
+        Hi__[]
         if 1 < s.length
           _tapeworm 1, s
         end
       end
 
       def __redo s
+        Hi__[]
         _common_assertion_one_for_debugging s
       end
 
       def __break s
+        Hi__[]
         _common_assertion_one_for_debugging s
       end
 
-      def _tapeworm d, s
-        last = s.length - 1
+      def _nonterminal node
+        _tapeworm 0, node.children
+        NIL
+      end
+
+      def _tapeworm d, a
+        _each_child_from d, a do |node|
+          _node node
+        end
+      end
+
+      def _each_child_from d, a, & p
+        _each_child_from_to d, a.length - 1, a, & p
+      end
+
+      def _each_child_from_to d, last, a
         begin
-          _expression s.fetch d
+          yield a.fetch d
           last == d && break
           d += 1
           redo
         end while above
       end
 
+      def __const_assign n
+        a = n.children
+        _length 3, n
+        _any_mystery a[0]
+        _symbol a[1]
+        _node a[2]
+      end
+
       def __const_declaration s
+        Hi__[]
         3 == s.length || interesting
         # s.fetch 1  # const - ignored for now
         _expression s.fetch 2
       end
 
       def __iasgn s
+        Hi__[]
         3 == s.length || interesting
         ::Symbol === s[1] || oops
         _expression s.fetch 2
       end
 
       def __lasgn s
+        Hi__[]
         3 == s.length || interesting
         ::Symbol === s[1] || oops
         _expression s.fetch 2
       end
 
       def __attrasng s
+        Hi__[]
         4 == s.length || interesting
         :lvar == s[1].fetch(0) || interesting
         ::Symbol === s[2] || oops  # method name (e.g. `max_height=`)
         _expression s.fetch 3
       end
 
-      def __const s
-        2 == s.length || oops
-        ::Symbol === s[1] || oops
+      def _any_const_or_similar x
+        if x
+          case x.type
+          when :const ; _const x
+          when :cbase ; __cbase x
+          else ; interesting
+          end
+        end
       end
 
-      def __lvar s
-        2 == s.length || oops
-        ::Symbol === s.fetch(1) || oops
+      def __cbase n
+        _common_assertion_one_for_debugging n
+      end
+
+      def _const n
+        a = n.children
+        _length 2, n
+        _any_const_or_similar a[0]
+        _symbol a[1]
+      end
+
+      def __lvar n
+        a = n.children
+        _length 1, n
+        _symbol a[0]
       end
 
       def __array s
+        Hi__[]
         if 1 != s.length
           _tapeworm 1, s
         end
@@ -483,6 +627,7 @@ module Skylab::BeautySalon
 
       def __colon2 s
 
+        Hi__[]
         # (NOTE we *think* this is for our fully qualified const names: `::Foo::Bar`)
 
         3 == s.length || interesting
@@ -497,7 +642,7 @@ module Skylab::BeautySalon
       end
 
       def __colon3 s
-
+        Hi__[]
         _common_assertion_two_for_debugging s
       end
 
@@ -507,6 +652,7 @@ module Skylab::BeautySalon
       end
 
       def __ivar s
+        Hi__[]
         _common_assertion_two_for_debugging s
       end
 
@@ -516,25 +662,33 @@ module Skylab::BeautySalon
         # in it, the entire remainder of the string is a tapeworm of arbitary
         # expressions (but probably every other element is a string..)
 
-        d = s.length
-        2 <= d || intersing
-        ::String === s.fetch(1) || interesting
-        if 2 < d
-          _tapeworm 2, s
+        a = s.children
+        _expect :str, a[0]
+        if 1 < a.length
+          _tapeworm 1, a
         end
       end
 
       def __evstr s  # (presumably "evaluate as string")
+        Hi__[]
         2 == s.length || interesting
         _expression s.fetch 1
       end
 
       def __str s
-        2 == s.length || interesting
-        ::String === s.fetch(1) || interesting
+        a = s.children
+        _length 1, s
+        _string a[0]
+      end
+
+      def __sym n
+        a = n.children
+        _length 1, n
+        _symbol a[0]
       end
 
       def __lit s
+        Hi__[]
         2 == s.length || interesting
         case s.fetch(1)
         when ::Symbol  # is symbol
@@ -544,16 +698,47 @@ module Skylab::BeautySalon
         end
       end
 
+      def __int n
+        a = n.children
+        _length 1, n
+        __integer a[0]
+      end
+
+      def _any_module_identifier x
+        if x
+          _module_identifier x
+        end
+      end
+
+      def _module_identifier n
+        :const == n.type || fail
+        _length 2, n
+        a = n.children
+        _any_module_identifier a[0]
+        _symbol a[1]
+      end
+
+      # -- asserters & simple clients of
+
+      def _any_mystery x
+        if x
+          interesting
+        end
+      end
+
       def _common_assertion_two_for_debugging s
-        2 == s.length || interesting
-        ::Symbol === s.fetch(1) || interesting
+        a = s.children
+        _length 1, s
+        _symbol a[0]
       end
 
       def __self s
+        Hi__[]
         _common_assertion_one_for_debugging s
       end
 
       def __zsuper s
+        Hi__[]
         _common_assertion_one_for_debugging s
       end
 
@@ -562,8 +747,34 @@ module Skylab::BeautySalon
       end
 
       def _common_assertion_one_for_debugging s
-        1 == s.length || interesting
+        _length 0, s
       end
+
+      def _string x
+        ::String === x || interesting
+      end
+
+      def _symbol x
+        ::Symbol === x || interesting
+      end
+
+      def __integer x
+        ::Integer === x || interesting
+      end
+
+      def _length d, n
+        if d != n.children.length
+          interesting
+        end
+      end
+    end
+
+    # ==
+
+    Hi__ = -> do
+      _loc = caller_locations(1, 1)[0]
+      $stderr.puts "ride this: #{ _loc.base_label }"
+      exit 0
     end
 
     # ==
@@ -574,4 +785,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.1: begin refactor from 'ruby_parser' to 'parser'
 # #born

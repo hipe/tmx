@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy town reports - line numbers', ct: true, wip: true do
+  describe '[bs] crazy town reports - line numbers', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
@@ -39,22 +39,25 @@ module Skylab::BeautySalon::TestSupport
         features_seen = _tuple[1]
         # (the below list generated with the use of the trick at #spot1.2)
         %i(
-          block
+          arg
+          args
+          begin
           block_pass
-          call
           case
-          cdecl
+          casgn
           class
-          defn
+          const
+          def
           dstr
-          evstr
           gvar
           if
-          lit
+          int
           lvar
           module
           nil
+          send
           str
+          sym
         ).each do |sym|
           features_seen.delete( sym ) or fail "feature not seen: '#{ sym }'"
         end
@@ -64,62 +67,27 @@ module Skylab::BeautySalon::TestSupport
         end
       end
 
-      it 'every next line number is greater than or equal to the previous one (EXCEPT SOME)' do
+      it 'every next line number is greater than or equal to the previous one' do
 
-        # NASTY - generally, assert that each next line number in your
-        # stream (table) is greater than or equal to each previous line
-        # number. ok, that's fine. however:
-        #
-        # if-else chains appear to be parsed as sort of like recursive
-        # "trinary" trees, rather than as flat lists. so code like this:
-        #
-        #     if A ; B
-        #     elsif C ; D
-        #     else E ; end
-        #
-        # parses like this:
-        #
-        #     (if, A, B,
-        #       ( if, C, D, E )
-        #     )
-        #
-        # so that as you add each additional `elsif`, the tree grows
-        # downward instead of outward (so that the final `else` is always
-        # associated with the deepest `if`, as opposed to being the final
-        # element of the rootmost `if` (which, how could it be?)).
-        #
-        # ok, that's also fine. BUT: it also appears that each subordinate
-        # `if` tree that is "generated" from this syntactic de-sugaring
-        # expresses as its line number something like the last line that
-        # is touched by the whole (root) `if` structure..
-        #
-        # (we haven't investigated this deeply for lack of need.)
-        #
-        # in practice we hope we can avoid this tripping us up;
-        # but we want to crystalize this peculiarity here with some #eyeblood..
+        # (at #history-A.1 we had to do a NASTY accomodation to a weirdness
+        #  that happend with the old library. the weirdness appears to be
+        #  fixed now, but if you're curious, see the historypoint for a
+        #  longwinded explanation.)
 
         table = _tuple[2]
-        20 < table.length || fail  # whatever - more than the number of unique features (at writing 52)
+        20 < table.length || fail  # whatever - more than the number of unique features (at writing 79)
 
-        is_subsequent = -> do  # expect one `if`, then another `if`, then no more
-          is_subsequent = -> { is_subsequent = -> { fail } ; true }
-          false
-        end
-
+        count_of_items_without_lineno = 0
         prev = 0
-        table.each_with_index do |(kw, lineno), _d|
+        table.each do |(kw, lineno)|
+
+          if ! lineno
+            count_of_items_without_lineno += 1
+            1 < count_of_items_without_lineno && fail
+            next
+          end
 
           direction = prev <=> lineno
-
-          if :if == kw
-            # hi.
-            if is_subsequent[]
-              -1 == direction || fail  # this second `if` is "jumping ahead"
-              # to act like it is further down than it actually is. don't
-              # let it mess up the broader pattern we are asserting. YUCK!
-              next
-            end
-          end
 
           case direction
           when -1 ; prev = lineno
@@ -147,13 +115,39 @@ module Skylab::BeautySalon::TestSupport
         table = []
 
         begin
+
           line = st.gets
           line || break
-          md = /\A(?<sym_sym>[a-z]+(?:_[a-z]+)*) (?<lineno>\d+)$/.match line
+
+          md = /\A
+            (?<sym_sym>[a-z]+(?:_[a-z]+)*)
+            [ ]
+            (?:
+              (?<line_range>
+                (?<from>\d+)
+                (?: - (?<to> \d+ ) )?
+              )
+              |
+              (?:
+                \(
+                  (?<comment> [^)]+ )
+                \)
+              )
+            )
+          \z/x.match line
+
           md || fail
           k = md[ :sym_sym ].intern
           features_seen[ k ] = true
-          table.push [ k, md[ :lineno ].to_i ]
+          a = [ k ]
+          if md[ :line_range ]
+            a.push md[ :from ].to_i
+            s = md[ :to ]
+            if s
+              a.push s.to_i
+            end
+          end
+          table.push a
           redo
         end while above
 
@@ -178,3 +172,4 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
+# #history-A.1: begin refactoring from 'ruby_parser' to 'parser'
