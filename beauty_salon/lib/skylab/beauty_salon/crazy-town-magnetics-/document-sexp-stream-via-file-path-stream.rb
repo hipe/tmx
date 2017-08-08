@@ -146,6 +146,11 @@ module Skylab::BeautySalon
         WrappedDocumentAst___.new( * _two, path )
       end
 
+      def file_lines_cache__ path
+
+        ( @___file_lines_cache ||= FileLinesCacheCollection___.new( @filesystem ) ).__lines_via_path_ path
+      end
+
       # -- interface with 'ruby_parser' (COMPREHENSIVE)
 
       def __init_ruby_parser
@@ -157,6 +162,51 @@ module Skylab::BeautySalon
         NIL
       end
     # -
+
+    # ==
+
+    class FileLinesCacheCollection___
+
+      def initialize fs
+        @_cache = {}
+        @filesystem = fs
+      end
+
+      def __lines_via_path_ path
+        @_cache.fetch path do
+          x = __work path
+          @_cache[ path ] = x
+          x
+        end
+      end
+
+      def __work path
+        @filesystem.open path do |io|
+          a = [] ; line = nil
+          a.push nil  # YIKES - so that we can use line numbers not offsets to reference lines
+          begin
+            line = io.gets
+            line || break
+            line.freeze
+            a.push line
+            redo
+          end while above
+          FileLinesCache___.new a.freeze
+        end
+      end
+    end
+
+    # ==
+
+    class FileLinesCache___
+      def initialize s_a
+        @__lines = s_a
+        freeze
+      end
+      def line_via_lineno__ d
+        @__lines.fetch d
+      end
+    end
 
     # ==
 

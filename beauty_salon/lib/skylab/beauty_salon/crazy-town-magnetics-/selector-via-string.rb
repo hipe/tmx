@@ -8,16 +8,16 @@ module Skylab::BeautySalon
 
     class Selector___
 
-      def initialize gsm, list, sym
-        self._NEEDS_CLEANUP
-        @AND_list_of_boolean_tests = list
+      def initialize gsm, is_AND, list, sym
+        @list_is_AND_list_not_OR_list = is_AND
+        @list_of_boolean_tests = list
         @feature_symbol = sym
         @grammar_symbol_module = gsm
       end
 
       def on_each_occurrence_in writable_hooks_plan, & receive_wrapped_sexp
 
-        test_sexp = @grammar_symbol_module.__write_sexp_tester_ @AND_list_of_boolean_tests
+        test_sexp = @grammar_symbol_module.__write_sexp_tester_ @list_of_boolean_tests
 
         writable_hooks_plan.on_this_one_kind_of_sexp__ @feature_symbol do |s|
 
@@ -31,7 +31,7 @@ module Skylab::BeautySalon
       end
 
       attr_reader(
-        :AND_list_of_boolean_tests,
+        :list_of_boolean_tests,
         :feature_symbol,
       )
     end
@@ -55,7 +55,8 @@ module Skylab::BeautySalon
           t = remove_instance_variable :@_tree
           Selector___.new(
             remove_instance_variable( :@_grammar_symbol_module ),
-            t.AND_list_of_boolean_tests,
+            t.list_is_AND_list_not_OR_list,
+            t.list_of_boolean_tests,
             t.feature_symbol,
           )
         end
@@ -76,7 +77,7 @@ module Skylab::BeautySalon
       def __check_attribute_names
         ok = true
         h = @_grammar_symbol_module::COMPONENTS
-        @_tree.AND_list_of_boolean_tests.each do |bool_test|
+        @_tree.list_of_boolean_tests.each do |bool_test|
           k = bool_test.symbol_symbol
           if ! h[ k ]
             __levenshtein_for_component( k ) { h.keys }
@@ -186,7 +187,7 @@ module Skylab::BeautySalon
 
       # ~
 
-      class Call
+      class Send
 
         COMPONENTS = {
           method_name: :_xxx,
@@ -219,7 +220,7 @@ module Skylab::BeautySalon
             # doing, becomes a "feature")) the cost of this is - do we really
             # wanna etc? think .. think .. NOTE
 
-            _yes = target_method_name_sym == s.fetch( 2 )  # the thing.
+            _yes = target_method_name_sym == s.children[1]  # the method name
             if _yes
               new s
             end
@@ -239,14 +240,14 @@ module Skylab::BeautySalon
           # experimentally the beginning line number of the sexp is the
           # beginning line number of its root node (which we expect to be fine)
 
-          @sexp.line
+          @sexp.location.first_line
         end
 
         def end_lineno__
 
           # we don't cache this only because of how the method is used. WATCH THIS
 
-          End_line_number_recursive__[ @sexp ]  # (see comment here)
+          @sexp.location.last_line
         end
 
         # ~ )
@@ -261,44 +262,13 @@ module Skylab::BeautySalon
 
     # ==
 
-    End_line_number_recursive__ = -> s do
-
-      # NOTE this approach is fundamentally flawed as explained at
-      # [#042.B] the problem with finding ending line numbers. as
-      # an experiment we're trying it anyway because we think that at
-      # least this will tell us what we want to know (if the feature
-      # is multi-line)
-
-      offset_of_rightmost_sexp = nil
-
-      1.upto( s.length - 1 ) do |d|
-        x = s.fetch d
-        x || next  # "holes" like the `else` slot of an `if` node
-        x.respond_to? :sexp_type or next
-        offset_of_rightmost_sexp = d
-      end
-
-      if offset_of_rightmost_sexp
-        End_line_number_recursive__[ s.fetch offset_of_rightmost_sexp ]
-      else
-        s.line
-      end
-    end
-
-    # ==
-
-    # ==
-
-    # ==
-
-    # ==
-
     Here_ = self
 
     # ==
     # ==
   end
 end
+# #tombstone-A.3: sunset hackish attemt to get ending line numbers with 'ruby_parser'
 # #history-A.2: finish the bulk of the work of transition to ragel (for parsing selectors)
 # #history-A.1: begin rewrite to use ragel
 # born.

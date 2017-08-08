@@ -1,3 +1,5 @@
+[#042]       #crazy-town "musing" (currently empty, with history)
+
 [#041]       #crazy-town thing.dot
 
 [#040] #open #easy #rename move [#sli-130]  "all the letters of the alphabet" to here

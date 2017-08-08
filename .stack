@@ -73,13 +73,7 @@ main report: work that diff magic on real files perhaps (one temp file)
 main report: needs arch for applying changing
 (that commit was -1.2.4)
 main report: parse functions (covered)
-(that commit was -1.2.5)
-main report: parse selectors (covered)
 (that commit was -1.3.1)
 indented report: uber alles
 (that commit was -1.3.2)
 indented report: at all (covered)
-(that commit was -1.4)
-the stub of "main" as report covered
-get everything up to the features report covered with new tech
-( -1.6 preview selected as covered )

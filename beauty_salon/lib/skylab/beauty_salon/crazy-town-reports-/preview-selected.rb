@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::BeautySalon
 
   class CrazyTownReports_::PreviewSelected < Common_::MagneticBySimpleModel
@@ -44,7 +46,7 @@ module Skylab::BeautySalon
             o.after_each_file do |potential_sexp|
 
               if line_cache
-                line_cache.__flush_into_ y
+                line_cache.__flush_into_ y, @file_path_upstream_resources
               end
             end
           end
@@ -100,10 +102,14 @@ module Skylab::BeautySalon
 
         case begin_lineno_block <=> begin_lineno_feat
         when -1 ; __when_feature_in_or_after_block feat
-        when  0 ; __when_feature_cobegins_block__COVER_ME feat
+        when  0 ; __when_feature_cobegins_block feat
         when  1 ; interesting
         else    ; never
         end
+      end
+
+      def __when_feature_cobegins_block feat
+        @_blocks.last.__receive_feature_ feat
       end
 
       def __when_feature_in_or_after_block feat
@@ -133,10 +139,14 @@ module Skylab::BeautySalon
 
       # -- read
 
-      def __flush_into_ y
+      def __flush_into_ y, rsx
+
         y << "file: #{ @path }"
+
+        _hi = rsx.file_lines_cache__ @path
+
         @_blocks.each do |block|
-          block.__as_block_flush_into_ y
+          block.__as_block_flush_into_ y, _hi
         end
         y
       end
@@ -154,8 +164,37 @@ module Skylab::BeautySalon
         @features = [ feat ]
       end
 
-      def __as_block_flush_into_ y
-        y << "(#{ @features.length } feature(s). we want ragel instead.)"
+      def __receive_feature_ feat
+        @features.push feat
+      end
+
+      def __as_block_flush_into_ y, file_lines_cache
+
+        a = @features
+        len = a.length
+
+        feat = a.first
+        begin_lineno = feat.begin_lineno
+        end_lineno = feat.end_lineno
+        if 1 == len
+          s = SPACE_
+        else
+          d = a.last.end_lineno
+          if end_lineno < d
+            end_lineno = d
+          end
+          s = 's'
+        end
+
+        _where = if begin_lineno == end_lineno
+          "on line #{ '%3d' % begin_lineno }"
+        else
+          "on lines #{ begin_lineno }-#{ end_lineno }"
+        end
+
+        _line = file_lines_cache.line_via_lineno__ begin_lineno
+
+        y << "#{ len } feature#{ s } #{ _where }: #{ _line }"
       end
 
       def end_lineno
