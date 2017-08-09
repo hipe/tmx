@@ -9,6 +9,8 @@ module Skylab::BeautySalon::TestSupport
 
     # -
 
+    context '(detailed case)' do
+
       it 'first line is indented with no margin, and is file' do
         _tuple.first =~ /\Afile: [^[:space:]]/ || fail
       end
@@ -29,18 +31,54 @@ module Skylab::BeautySalon::TestSupport
 
         _path = TestSupport_::Fixtures.executable :for_simplecov
 
-        st = _call_subject_magnetic_by do |o|
-
-          o.file_path_upstream = Common_::Stream.via_item _path
-
-          o.filesystem = ::File
-        end
+        st = _line_stream_for_path _path
 
         first_line = st.gets
         _the_rest = st.to_a
         [ first_line, _the_rest ]
       end
-    # -
+    end
+
+    context '(coverage)' do
+
+      it 'this one file - various small' do
+        _just_make_sure_this_runs '050-various-small.rb'
+      end
+
+      it 'this one file - begin rescue end' do
+        _just_make_sure_this_runs '100-begin-rescue-end.rb'
+      end
+    end
+
+    def _just_make_sure_this_runs tail
+      _path = fixture_file_ruby_MRI_ tail
+      st = _line_stream_for_path _path
+      if do_debug
+        io = debug_IO
+        line = st.gets
+        begin
+          io.puts "wee: #{ line.inspect }"
+        end while line=st.gets
+      else
+        line = st.gets
+        line || fail  # at least one line
+        nil while line = st.gets
+      end
+    end
+
+    def fixture_file_ruby_MRI_ tail
+      ::File.join TS_.dir_path, 'fixture-files', 'ruby-current-version', tail
+    end
+
+    def _line_stream_for_path path
+
+      _call_subject_magnetic_by do |o|
+
+        o.file_path_upstream = Common_::Stream.via_item path
+
+        o.filesystem = ::File
+      end
+    end
 
     -> do
       report_name = "branchy-nodes-indented"

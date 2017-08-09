@@ -162,7 +162,11 @@ module Skylab::BeautySalon
       def _etc_via_IO io
         # wrap the IO so it has all the other stream stuff
         @_file_path_upstream = Common_.stream do
-          io.gets
+          line = io.gets
+          if line  # not covered, a line as-is is not a path
+            line.chomp!
+            line
+          end
         end
       end
 

@@ -212,7 +212,9 @@ module Skylab::BeautySalon
       end
 
       def _expect sym, n
-        sym == n.type || oops
+        if sym != n.type
+          oops
+        end
         _node n
       end
 
@@ -251,9 +253,10 @@ module Skylab::BeautySalon
         #   D) it's fun to get a sense for how our own corpus covers all
         #      grammar symbols vs. the set of all symbols.
 
-        arg: :__arg,
+        and: :__and,
+        arg: :_arg,
         args: :__args,
-        array: :__array,
+        array: :_array,
         attrasgn: :__attrasng,
         begin: :__begin,
         block: :_block,
@@ -269,54 +272,83 @@ module Skylab::BeautySalon
         const: :_const,
         def: :__def,
         defn: :__defn,
+        defs: :__defs,
         dstr: :__dstr,
+        dsym: :__dsym,
+        erange: :__erange,
         evstr: :__evstr,
+        false: :__false,
+        float: :__float,
         gvar: :__gvar,
+        gvasgn: :__gvasgn,
+        hash: :__hash,
         iasgn: :__iasgn,
+        irange: :__irange,
         if: :__if,
         int: :__int,
         iter: :__iter,
-        ivar: :__ivar,
+        ivar: :_ivar,
+        ivasgn: :__ivasgn,
+        kwbegin: :__kwbegin,
         lasgn: :__lasgn,
         lit: :__lit,
-        lvar: :__lvar,
+        lvar: :_lvar,
+        lvasgn: :_lvasgn,
+        match_with_lvasgn: :__match_with_lvasgn,
+        masgn: :__masgn,
         module: :__module,
+        next: :__next,
         nil: :__nil,
+        op_asgn: :__op_asgn,
+        or: :__or,
+        or_asgn: :__or_asgn,
         redo: :__redo,
-        rescue: :__rescue,
-        self: :__self,
-        send: :__send,
+        regexp: :__regexp,
+        rescue: :_rescue,
+        self: :_self,
+        send: :_send,
         sclass: :__singleton_class_block,
-        str: :__str,
+        splat: :__splat,
+        str: :_str,
         sym: :__sym,
+        true: :__true,
         # when:  see #here1
         while: :__while,
+        while_post: :__while_post,
         yield: :__yield,
         zsuper: :__zsuper,
       }
+
+      # -- class, module and related
 
       def __class s
         a = s.children
         _length 3, s
         _module_identifier a[0]
-        _any_module_identifier a[1]
+        _any_probably_module a[1]
         _in_stack_frame s do
-          x = a[2]
-          if x
-            interesting
+          _any_node a[2]
+        end
+      end
+
+      def _any_probably_module x
+
+        # if it's not a literal const dereference, it should be a this, right?
+
+        if x
+          if :send == x.type
+            _send x
+          else
+            _module_identifier x
           end
         end
       end
 
-      def __singleton_class_block s  # this is the block
-        Hi__[]
-
-        # s.fetch 1  # the class we are mutating the singleton class of -
-                     # it could be anything NOTE, but typically in our use it's just `s(:self)`
-
-        if 2 < s.length  # (hypothetically could be empty)
-          _tapeworm 2, s
-        end
+      def __singleton_class_block n  # this is the block
+        a = n.children
+        _length 2, n  # no
+        _self_probably a[0]
+        _tapeworm 1, a
       end
 
       def __module s
@@ -359,28 +391,86 @@ module Skylab::BeautySalon
         end
       end
 
+      # -- method definition and related
+
+      def __defs n
+        a = n.children
+        _length 4, n
+        _self_probably a[0]
+        _symbol a[1]
+        _expect :args, a[2]
+        _in_stack_frame n do
+          _node a[3]
+        end
+      end
+
       def __def n
         a = n.children
         _length 3, n
         _symbol a[0]
         _expect :args, a[1]
         _in_stack_frame n do
-          _node a[2]
+          _any_node a[2]  # defs can be blank
         end
       end
 
       def __args node
-        if node.children.length.nonzero?
-          _each_child_from 0, node.children do |n|
-            _expect :arg, n
+        a = node.children
+        if a.length.nonzero?
+          a.each do |n|
+            case n.type
+            when :arg ; _arg n  # an example of #open [#043] ([#043.B])
+            when :blockarg ; __blockarg n
+            when :procarg0 ; __procarg n
+            when :optarg   ; __optarg n
+            when :restarg  ; __restarg n
+            when :kwoptarg ; __kwoptarg n
+            else
+              oops
+            end
           end
         end
       end
 
-      def __arg n
+      def __kwoptarg n
+        _same_arg n
+      end
+
+      def __optarg n
+        _same_arg n
+      end
+
+      def _same_arg n
         a = n.children
-        _length 1, n
+        _length 2, n
         _symbol a[0]
+        _node a[1]  # the default value
+      end
+
+      def __restarg n
+        # neato - has no name if it's .. with no name
+        if n.children.length.nonzero?
+          _common_assertion_two_for_debugging n
+        end
+      end
+
+      def __procarg n
+        a = n.children
+        if 1 == a.length
+          _common_assertion_two_for_debugging n
+        else
+          _each_child a do |n_|
+            :arg == n_.type || oops
+          end
+        end
+      end
+
+      def __blockarg n
+        _common_assertion_two_for_debugging n
+      end
+
+      def _arg n
+        _common_assertion_two_for_debugging n
       end
 
       def __defn s
@@ -394,33 +484,30 @@ module Skylab::BeautySalon
         _tapeworm 3, s
       end
 
-      def __rescue s
-        Hi__[]
-        3 == s.length || fail
+      # -- calling methods (special edition - boolean operators (pretend they're special methods (functions)))
 
-        this = s.fetch(1)
-        if :block == this.fetch(0)
-          _block blk  # re-use the same thing used for an "ordinary" block
-        else
-          # (like with other blocks, this can be a single-expression instead)
-          _expression this
-        end
-
-        bdy = s.fetch(2)
-        :resbody == bdy.fetch(0) || fail
-        _tapeworm 1, bdy
+      def __or n
+        _and_or_or n
       end
 
-      def __begin n
-        _tapeworm 0, n.children
+      def __and n
+        _and_or_or n
       end
 
-      def _block s
-        Hi__[]
-        _tapeworm 1, s
+      def _and_or_or n
+        a = n.children
+        _length 2, n
+        _node a[0]
+        _node a[1]
       end
 
-      def __send n
+      # -- calling methods
+
+      def __lambda n
+        _common_assertion_one_for_debugging n
+      end
+
+      def _send n
         a = n.children
         _any_node a[0]
         _symbol a[1]
@@ -429,6 +516,57 @@ module Skylab::BeautySalon
         end
       end
 
+      def __splat n
+        _length 1, n
+        _node n.children[0]
+      end
+
+      def __block_pass s  # for when a proc is passed as a block argument,
+
+        # as in:
+        #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
+        #                    ^^^^^^^^^^^^
+
+        a = s.children
+        _length 1, s
+        _node a[0]
+      end
+
+      # -- can only happen within a method
+
+      def __yield n
+        _node_any_each_child n.children
+      end
+
+      def __zsuper n
+        _common_assertion_one_for_debugging n
+      end
+
+      # -- control flow
+
+      def __begin n
+        _node_any_each_child n.children
+      end
+
+      def _block n
+        a = n.children
+        _length 3, n
+
+        n_ = a[0]
+        k = n_.type
+        case k
+        when :send ; _send n_
+        when :lambda ; __lambda n_
+        else ;
+          interesting
+        end
+
+        _expect :args, a[1]
+
+        _any_node a[2]  # (blocks can be empty)
+      end
+
+      # (will go away)
       def __call s
         Hi__[]
 
@@ -448,26 +586,95 @@ module Skylab::BeautySalon
         end
       end
 
-      def __block_pass s  # for when a proc is passed as a block argument,
+      def __kwbegin n
+        _nothing_or_anything_or_this_switch n do |n_|
+          case n_.type
+          when :rescue ; _rescue n_
+          when :ensure ; _ensure n_
+          else
+            _node n_
+          end
+        end
+      end
 
-        # as in:
-        #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
-        #                    ^^^^^^^^^^^^
+      def _ensure n
+        a = n.children
+        _length 2, n
+        n_ = a[0]
+        if n_
+          if :rescue == n_.type
+            _rescue n_  # hi.
+          else
+            _node n_
+          end
+        end
+        _any_node a[1]
+      end
 
-        a = s.children
-        _length 1, s
-        _node a[0]
+      def _rescue n
+        a = n.children
+        _length 3, n
+
+        _node a[0]  # a `begin` block or 1 statement
+
+        n_ = a[1]
+          :resbody == n_.type || oops
+          __resbody n_
+
+        n_ = a[2]
+        if n_
+          this_is_something  # not sure, a ensure? but didn't we cover that?
+        end
+      end
+
+      def __resbody n
+        a = n.children
+        _length 3, n
+        n_ = a[0]
+          :array == n_.type || oops
+          _array n_
+        n_ = a[1]
+          :lvasgn == n_.type || oops  # .. #todo
+          _lvasgn n_
+        n_ = a[2]
+          _node n_
+      end
+
+      def _nothing_or_anything_or_this_switch n
+        a = n.children
+        case a.length
+        when 0 ; NOTHING_
+        when 1 ; yield a[0]
+        else   ; _node_each_child a
+        end
+      end
+
+      def __while_post n
+        a = n.children
+        _length 2, n
+        _condition a[0]
+        n_ = a[1]
+        :kwbegin == n_.type || fine
+        _node_each_child n_.children
       end
 
       def __while s
-        Hi__[]
-        d = s.length
-        4 == d || oops
-        false == s.fetch(3) || interesting__readme__
-        # (we're expecting the above to be true when normal, false when our style)
-        # (NOTE) skipping descent into conditional expression
+        a = s.children
+        _length 2, s
+        _condition a[0]
+        _node a[1]
+      end
 
-        _expression s.fetch 2
+      def __break n
+        _common_assertion_one_for_debugging n
+      end
+
+      def __next n
+        _common_assertion_one_for_debugging n
+      end
+
+      def __redo s
+        _common_assertion_one_for_debugging s
       end
 
       def __case s
@@ -526,57 +733,35 @@ module Skylab::BeautySalon
           # each `when` has the "comparator" expression and the "consequence" expression
 
         _node a[0]  # if the scrutinized value is `===` to this..
-        _node a[-1]  # do this
+        _any_node a[-1]  # do this (maybe do nothing)
       end
 
       def __if n
         a = n.children
         _length 3, n
-        _node a[0]  # condition expression (its trueishness determines doo-hah)
+        _condition a[0]
         _node a[1]  # if true do this
         _any_node a[2]  # else do this
       end
 
-      def __yield s
-        Hi__[]
-        if 1 < s.length
-          _tapeworm 1, s
-        end
+      def _condition n
+        # condition expression (its trueishness determines doo-hah)
+        _node n
       end
 
-      def __redo s
-        Hi__[]
-        _common_assertion_one_for_debugging s
-      end
+      # -- assignment
 
-      def __break s
-        Hi__[]
-        _common_assertion_one_for_debugging s
-      end
-
-      def _tapeworm d, a
-        _each_child_from d, a do |node|
-          _node node
-        end
-      end
-
-      def _each_child_from d, a, & p
-        _each_child_from_to d, a.length - 1, a, & p
-      end
-
-      def _each_child_from_to d, last, a
-        begin
-          yield a.fetch d
-          last == d && break
-          d += 1
-          redo
-        end while above
+      def __match_with_lvasgn n
+        a = n.children
+        _length 2, n
+        _node a[0]
+        _node a[1]
       end
 
       def __const_assign n
         a = n.children
         _length 3, n
-        _any_mystery a[0]
+        _any_const_or_similar a[0]
         _symbol a[1]
         _node a[2]
       end
@@ -588,11 +773,71 @@ module Skylab::BeautySalon
         _expression s.fetch 2
       end
 
+      def __masgn n
+        a = n.children
+        _length 2, n
+        n_ = a[0]
+        :mlhs == n_.type || oops
+        _each_child n_.children do |n3|
+          _one_of_these n3
+        end
+        _node a[1]
+      end
+
+      def __op_asgn n
+        a = n.children
+        _length 3, n
+        _one_of_these a[0]
+        _symbol a[1]  # :+
+        _node a[2]
+      end
+
+      def __or_asgn n
+        a = n.children
+        _length 2, n
+        _one_of_these a[0]
+        _node a[1]
+      end
+
+      def _one_of_these n
+        k = n.type
+        :lvasgn == k || :ivasgn == k || :gvasgn == k || oops
+        _common_assertion_two_for_debugging n
+      end
+
+      def __gvasgn n
+        _assign n
+      end
+
+      def __ivasgn n
+        _assign n
+      end
+
+      def _assign n
+        a = n.children
+        _length 2, n
+        _symbol a[0]
+        _node a[1]
+      end
+
       def __iasgn s
         Hi__[]
         3 == s.length || interesting
         ::Symbol === s[1] || oops
         _expression s.fetch 2
+      end
+
+      def _lvasgn n
+        a = n.children
+        case a.length
+        when 1  # when e.g a rescue expression
+          _symbol a[0]
+        when 2
+          _symbol a[0]
+          _node a[1]
+        else
+          oops
+        end
       end
 
       def __lasgn s
@@ -610,38 +855,10 @@ module Skylab::BeautySalon
         _expression s.fetch 3
       end
 
-      def _any_const_or_similar x
-        if x
-          case x.type
-          when :const ; _const x
-          when :cbase ; __cbase x
-          else ; interesting
-          end
-        end
-      end
-
-      def __cbase n
-        _common_assertion_one_for_debugging n
-      end
-
-      def _const n
-        a = n.children
-        _length 2, n
-        _any_const_or_similar a[0]
-        _symbol a[1]
-      end
-
-      def __lvar n
+      def _lvar n
         a = n.children
         _length 1, n
         _symbol a[0]
-      end
-
-      def __array s
-        Hi__[]
-        if 1 != s.length
-          _tapeworm 1, s
-        end
       end
 
       def __colon2 s
@@ -670,22 +887,100 @@ module Skylab::BeautySalon
         _common_assertion_two_for_debugging s
       end
 
-      def __ivar s
-        Hi__[]
+      def _ivar s
         _common_assertion_two_for_debugging s
       end
 
-      def __dstr s
+      # -- special section on consts
 
-        # interesting - if the double-quoted string has interpolation things
-        # in it, the entire remainder of the string is a tapeworm of arbitary
-        # expressions (but probably every other element is a string..)
-
-        a = s.children
-        _expect :str, a[0]
-        if 1 < a.length
-          _tapeworm 1, a
+      def _any_const_or_similar x
+        if x
+          case x.type
+          when :const ; _const x
+          when :cbase ; __cbase x
+          when :send  ; _send x
+          when :lvar  ; _lvar x
+          when :ivar  ; _ivar x
+          else
+            fine_just_weird
+          end
         end
+      end
+
+      def __cbase n
+        _common_assertion_one_for_debugging n
+      end
+
+      def _const n
+        a = n.children
+        _length 2, n
+        _any_const_or_similar a[0]
+        _symbol a[1]
+      end
+
+      def _any_module_identifier x
+        if x
+          _module_identifier x
+        end
+      end
+
+      def _module_identifier n
+        # duplicated at #temporary-spot-1 (this one will go away) #todo
+        :const == n.type || interesting
+        _length 2, n
+        a = n.children
+        _any_probably_module a[0]
+        _symbol a[1]
+      end
+
+      # -- literals
+
+      def __hash n
+        _any_each_child n.children do |n_|
+          __expect_pair n_
+        end
+      end
+
+      def __expect_pair n
+        a = n.children
+        :pair == n.type || oops
+        _length 2, n
+        _node a[0]
+        _node a[1]
+      end
+
+      def _array n
+        _node_any_each_child n.children
+      end
+
+      def __regexp n
+        a = n.children
+        len = a.length
+        last = len - 1
+        if 1 < len
+          _each_child_from_to 0, last - 1, a do |n_|
+            _node n_  # like double-quoted strings, these can be any expressions
+          end
+        end
+        :regopt == a[last].type || oops
+      end
+
+      def __dsym n
+        _double_quoted_string_and_similar n
+      end
+
+      def __dstr n
+
+        # a double-quoted string will parse into `str` unless (it seems)
+        # it has interpolated parts. presumably they must alternate between
+        # string and expression, but can start with either, we don't bother
+        # assertint which.
+
+        _double_quoted_string_and_similar n
+      end
+
+      def _double_quoted_string_and_similar n
+        _node_each_child n.children
       end
 
       def __evstr s  # (presumably "evaluate as string")
@@ -694,7 +989,7 @@ module Skylab::BeautySalon
         _expression s.fetch 1
       end
 
-      def __str s
+      def _str s
         a = s.children
         _length 1, s
         _string a[0]
@@ -717,57 +1012,114 @@ module Skylab::BeautySalon
         end
       end
 
+      def __irange n
+        _range n
+      end
+
+      def __erange n
+        _range n
+      end
+
+      def _range n
+        a = n.children
+        _length 2, n
+        _node a[0]
+        _node a[1]
+      end
+
+      def __float n
+        a = n.children
+        _length 1, n
+        ::Float === a[0] || interesting
+      end
+
       def __int n
         a = n.children
         _length 1, n
-        __integer a[0]
+        ::Integer === a[0] || interesting
       end
 
-      def _any_module_identifier x
-        if x
-          _module_identifier x
+      def _self_probably n
+        if :self != n.type
+          self._WEEE__no_problem__
         end
       end
 
-      def _module_identifier n
-        # duplicated at #temporary-spot-1 (this one will go away) #todo
-        :const == n.type || fail
-        _length 2, n
-        a = n.children
-        _any_module_identifier a[0]
-        _symbol a[1]
-      end
+      # -- "keywords" (and those literals)
 
-      # -- asserters & simple clients of
-
-      def _any_mystery x
-        if x
-          interesting
-        end
-      end
-
-      def _common_assertion_two_for_debugging s
-        a = s.children
-        _length 1, s
-        _symbol a[0]
-      end
-
-      def __self s
-        Hi__[]
+      def _self s
         _common_assertion_one_for_debugging s
       end
 
-      def __zsuper s
-        Hi__[]
-        _common_assertion_one_for_debugging s
+      def __false n
+        _common_assertion_one_for_debugging n
+      end
+
+      def __true n
+        _common_assertion_one_for_debugging n
       end
 
       def __nil s
         _common_assertion_one_for_debugging s
       end
 
-      def _common_assertion_one_for_debugging s
-        _length 0, s
+      # -- support
+
+      def _node_any_each_child a
+        if a.length.nonzero?
+          _tapeworm 0, a
+        end
+      end
+
+      def _node_each_child a
+        _tapeworm 0, a
+      end
+
+      def _any_each_child a, & p
+        if a.length.nonzero?
+          _each_child_from_to 0, a.length - 1, a, & p
+        end
+      end
+
+      def _each_child a, & p
+        _each_child_from_to 0, a.length - 1, a, & p
+      end
+
+      def _tapeworm d, a
+        _each_child_from d, a do |node|
+          _node node
+        end
+      end
+
+      def _each_child_from d, a, & p
+        _each_child_from_to d, a.length - 1, a, & p
+      end
+
+      def _each_child_from_to d, last, a
+        begin
+          yield a.fetch d
+          last == d && break
+          d += 1
+          redo
+        end while above
+      end
+
+      # -- asserters & simple clients of
+
+      def _common_assertion_two_for_debugging n
+        a = n.children
+        _length 1, n
+        _symbol a[0]
+      end
+
+      def _common_assertion_one_for_debugging n
+        _length 0, n
+      end
+
+      def _length d, n
+        if d != n.children.length
+          interesting
+        end
       end
 
       def _string x
@@ -776,16 +1128,6 @@ module Skylab::BeautySalon
 
       def _symbol x
         ::Symbol === x || interesting
-      end
-
-      def __integer x
-        ::Integer === x || interesting
-      end
-
-      def _length d, n
-        if d != n.children.length
-          interesting
-        end
       end
 
       # -- stack stuff
