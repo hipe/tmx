@@ -6,6 +6,7 @@ module Skylab::Brazen
     #     branch, we want to offer this as default implementation of
     #     `procure`, which is like a `lookup_softly` that takes a listener
     #     and emits an emission suitable for UI on failure.
+    #     (also the more powerful variant `procure_by`.)
     #
     #   - really this doesn't do much other than wrap a call to
     #     `lookup_softly` that leverages another magnetic on failure.

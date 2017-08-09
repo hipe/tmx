@@ -102,7 +102,7 @@ collision first before defining them these complex reasons:
 
    because our overarchign design axiom here is that of minimizing
    activity on the ancestor chain of clients, we do not rely on the
-   above model to achieve this described effect of inheritence with
+   above model to achieve this described effect of inheritance with
    overriding. instead we attempt to accomplish a similar effect through
    this means:
 
@@ -213,7 +213,7 @@ of them to be fast. also it is a fun experiment in general.
 
 the properties box is used for reading *and* writing (i.e storage and
 retrieval) of the frozen property objects, however it does not hold them
-directly. we leverage the platform's existing inheritence system to
+directly. we leverage the platform's existing inheritance system to
 achieve reuse of these frozen properties across definition nodes (be
 they module or class):
 

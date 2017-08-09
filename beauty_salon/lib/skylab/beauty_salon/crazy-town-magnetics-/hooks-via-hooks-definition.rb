@@ -12,6 +12,10 @@ module Skylab::BeautySalon
     # time a sexp node is encountered corresponding to that symbol, the proc
     # is called, being passed the sexp. (the result of this call is ignored.)
     #
+    # (it bears mentioning that this arrangement is broadly similar to
+    # `::AST::Processor`, however we maintain our own take(s) on this
+    # pattern as justified at #reason1.2)
+    #
     # there need not be one hook for every symbol. even if a symbol does not
     # have an associated hook, our traversal will nonetheless descend into
     # those sexps that are nonterminal (i.e "deep", "branchy", recursive).
@@ -32,22 +36,21 @@ module Skylab::BeautySalon
     # fact that for performance reasons we evaluate definitions before we
     # traverse files.)
 
-    # we follow our own simple "prototype" pattern
+    # we follow our own simple #[#sli-023] "prototype" pattern.
 
     # primarily, in its current state, the bulk of the code here is for our
     # own "getting to know" the sexp's, and asserting their shape to be
-    # used across our corpus.
+    # used across our corpus. (this was true when we used 'ruby_parser'
+    # and is still true now as we use 'parser'.)
+    #
+    # this amounts to a black-box reverse enginnering of exactly whatever
+    # grammar the remote library implements.
+    # classifications:
+    #
+    #   - terminals in a grammar senese (vs. non-terminals)
+    #   - our higher-level sense of "branchy" nodes (vs. not)
 
     # development notes
-    #
-    # we discovered `::AST::Processor` after this. comparison to it is
-    # instructive. it has behavior that doesn't align with us:
-    #
-    #   - processor is geared towards producing new trees from input trees
-    #
-    #   - processor is passive - it doesn't complain when it encounters
-    #     unrecognized grammatical symbols
-    #
     #
     # developer's note: conventionally a variable called `s` is for holding
     # a string; however here `s` is used exclusively for `::Sexp` instances.
@@ -116,6 +119,9 @@ module Skylab::BeautySalon
 
         # (prototype.)
 
+        @_has_branchy_node_hook = false
+        @__mutex_for_on_each_branchy_node = nil
+
         @_strict_hook_box = Common_::Box.new
 
         @__mutex_for_before_each_file = nil
@@ -128,16 +134,24 @@ module Skylab::BeautySalon
 
         bx = remove_instance_variable :@_strict_hook_box
         if bx.length.zero?
-          @_has_hooks = false
+          @_has_name_based_hooks = false
         else
-          @_has_hooks = true
-          @__hook_via_symbol_symbol = bx.h_
+          @_has_name_based_hooks = true
+          @_hook_via_symbol_symbol = bx.h_
         end
 
         freeze
       end
 
       private :dup
+
+      def on_each_branchy_node__ & p
+
+        remove_instance_variable :@__mutex_for_on_each_branchy_node
+        @_hook_via_symbol_symbol ||= MONADIC_EMPTINESS_  # ick/meh. overwrite OK
+        @_branchy_node_hook = p
+        @_has_branchy_node_hook = true
+      end
 
       def on_this_one_kind_of_sexp__ k, & p
 
@@ -169,7 +183,7 @@ module Skylab::BeautySalon
 
       def execute_plan_against__ potential_sexp
         @before_each_file[ potential_sexp ]
-        if @_has_hooks
+        if @_has_name_based_hooks || @_has_branchy_node_hook
           sexp = potential_sexp.sexp
           if sexp
             dup.__execute_against sexp
@@ -180,12 +194,13 @@ module Skylab::BeautySalon
 
       def __execute_against wast  # assume dup
 
-        # probably a file BEFORE hook ..
+        @_push_stack_frame = :__push_stack_frame_initially
 
-        # ingnoring comments stuff
-        _node wast.ast_
+        # ignoring comments stuff
 
-        # probably a file AFTER hook ..
+        __stack_session wast.path do
+          _node wast.ast_
+        end
 
         NIL
       end
@@ -204,10 +219,12 @@ module Skylab::BeautySalon
       def _node n
 
         sym = n.type
-        p = @__hook_via_symbol_symbol[ sym ]
+
+        p = @_hook_via_symbol_symbol[ sym ]
         if p
           p[ n ]  # ignore result - don't let hooks control our flow
         end
+
         _m = GRAMMAR_SYMBOLS.fetch sym
         send _m, n
       end
@@ -228,7 +245,7 @@ module Skylab::BeautySalon
         #
         #   C) for the nascent but soon-to-be-burgeoning "selector" API
         #      we may want fine-grained control over what behavior we
-        #      avail to each symbol, for exmaple to make complicated
+        #      avail to each symbol, for example to make complicated
         #      representations appear simpler to the DSL.
         #
         #   D) it's fun to get a sense for how our own corpus covers all
@@ -280,11 +297,14 @@ module Skylab::BeautySalon
 
       def __class s
         a = s.children
+        _length 3, s
         _module_identifier a[0]
         _any_module_identifier a[1]
-        x = a[2]
-        if x
-          interesting
+        _in_stack_frame s do
+          x = a[2]
+          if x
+            interesting
+          end
         end
       end
 
@@ -305,7 +325,9 @@ module Skylab::BeautySalon
         if 1 == a.length
           interesting
         else
-          _tapeworm 1, a
+          _in_stack_frame s do
+            _tapeworm 1, s.children
+          end
         end
       end
 
@@ -342,7 +364,9 @@ module Skylab::BeautySalon
         _length 3, n
         _symbol a[0]
         _expect :args, a[1]
-        _node a[2]
+        _in_stack_frame n do
+          _node a[2]
+        end
       end
 
       def __args node
@@ -388,7 +412,7 @@ module Skylab::BeautySalon
       end
 
       def __begin n
-        _nonterminal n
+        _tapeworm 0, n.children
       end
 
       def _block s
@@ -528,11 +552,6 @@ module Skylab::BeautySalon
       def __break s
         Hi__[]
         _common_assertion_one_for_debugging s
-      end
-
-      def _nonterminal node
-        _tapeworm 0, node.children
-        NIL
       end
 
       def _tapeworm d, a
@@ -711,6 +730,7 @@ module Skylab::BeautySalon
       end
 
       def _module_identifier n
+        # duplicated at #temporary-spot-1 (this one will go away) #todo
         :const == n.type || fail
         _length 2, n
         a = n.children
@@ -767,6 +787,115 @@ module Skylab::BeautySalon
           interesting
         end
       end
+
+      # -- stack stuff
+
+      # both as a contact exercise and to reduce moving parts, awareness of
+      # a frame stack is "baked in" to the mechanics here, regardless of
+      # whether the user has supplied a hook for listening for "branchy"
+      # nodes.
+      #
+      #   - when the hook *is* supplied, the user gets a wrapped node
+      #     that knows the depth (integer) of this node on the stack.
+      #
+      #   - but when the hook is not supplied, we don't create wrapped
+      #     node objects that would otherwise go unused.
+      #
+      #   - artificially we add a once-per-file root stack frame that
+      #     the file itself. this frame always has a depth of zero.
+      #
+      #   - then, each "branchy" node at the root level of the document
+      #     will have a frame depth of 1, and so on.
+      # --
+
+      def __stack_session path
+        @_current_stack_depth = 0
+        if @_has_branchy_node_hook
+          @_branchy_node_hook[ WrapWithDepthAtLevelZero___.new( path ) ]
+          @_push_stack_frame = :__push_stack_frame_when_listener
+        else
+          @_push_stack_frame = :__push_stack_frame_when_no_listener
+        end
+        @_pop_stack_frame = :_pop_stack_frame
+        yield
+        @_current_stack_depth.zero? || fail
+        remove_instance_variable :@_current_stack_depth ; nil
+      end
+
+      def _in_stack_frame n
+        send @_push_stack_frame, n
+        yield
+        send @_pop_stack_frame
+        NIL
+      end
+
+      def __push_first_again n
+        @_pop_stack_frame = :_pop_stack_frame
+        @_push_stack_frame = remove_instance_variable :@__push_stack_frame_on_deck
+        send @_push_stack_frame, n
+      end
+
+      def __push_stack_frame_when_listener n
+        @_current_stack_depth += 1
+        _tng = Tupling_for__[ n ]
+        @_branchy_node_hook[ WrapWithDepthNormally__.new( @_current_stack_depth, _tng ) ]
+        NIL
+      end
+
+      def __push_stack_frame_when_no_listener _n
+        @_current_stack_depth += 1
+      end
+
+      def _pop_stack_frame
+        @_current_stack_depth -= 1
+        if @_current_stack_depth.zero?
+          @__push_stack_frame_on_deck = @_push_stack_frame
+          @_push_stack_frame = :__push_first_again
+          @_pop_stack_frame = :_NEVER
+        end
+      end
+    end
+
+    # ==
+
+    class WrapWithDepthAtLevelZero___
+
+      def initialize path
+        @path = path ; freeze
+      end
+
+      def to_description
+        "file: #{ @path }"
+      end
+
+      def depth
+        0
+      end
+    end
+
+    class WrapWithDepthNormally__
+
+      def initialize d, tng
+        @depth = d
+        @tupling = tng
+        freeze
+      end
+
+      def to_description
+        @tupling.to_description
+      end
+
+      attr_reader(
+        :depth,
+        :tupling,
+      )
+    end
+
+    # ==
+
+    Tupling_for__ = -> n do
+      Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
+        specific_tupling_or_generic_tupling_for n
     end
 
     # ==

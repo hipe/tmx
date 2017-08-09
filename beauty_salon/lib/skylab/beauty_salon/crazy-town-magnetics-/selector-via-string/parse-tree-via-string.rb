@@ -26,7 +26,7 @@ module Skylab::BeautySalon
 
       def execute
 
-        require_relative 'grammar-'  # (can't autoload because #spot1.3)
+        require_relative 'grammar-'  # (can't autoload because #reason1.1)
 
         # the rest of this is boring stitching - the cost of splitting
         # parsing across two files

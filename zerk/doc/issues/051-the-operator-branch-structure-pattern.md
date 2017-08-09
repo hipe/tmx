@@ -1,5 +1,14 @@
 # the operator branch structure pattern :[#051]
 
+## synopsis
+
+"operator branch" is an interface recommendation for collections -
+a suggested API to follow (or cherry-pick from) when all other things
+are equal.
+
+
+
+
 ## introduction
 
 because of the ubiquity of hashes and their near-univeral familiarity
@@ -16,7 +25,7 @@ isomorphism with the subject.
 there is nowadays a tendency to conceive of everything that seems like
 a "collection" (as in the broad category of data structures as described
 in wikipedia) as an "operator branch" (this name to be justified below).
-the relevant point here is that at its essense an operator branch is a
+the relevant point here is that at its essence an operator branch is a
 collection of some sort of "items".
 
 whereas in a hash an item is *added* (or call it "inserted", or call it
@@ -53,6 +62,8 @@ here's some of these:
   - `dereference`
 
   - `lookup_softly`
+
+  - `procure`, `procure_by` (see [#br-085])
 
 here's some more specialized possibilites:
 

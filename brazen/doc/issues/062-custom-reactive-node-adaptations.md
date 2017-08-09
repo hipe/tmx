@@ -91,7 +91,7 @@ some important facets of this employed here:
   • the fact that we have set this const in our action adapter *base*
     class will be equivalent to having set this const to this value
     in all of its subclasses, because that's the way constants work
-    in the platform (provided you access them in the inheritence-
+    in the platform (provided you access them in the inheritance-
     sensitive way we do).
 
   • every *generated* action adapter in our application will be built of

@@ -8,16 +8,20 @@ module Skylab::BeautySalon
 
     class Selector___
 
-      def initialize gsm, is_AND, list, sym
+      def initialize tng, is_AND, list, sym
         @list_is_AND_list_not_OR_list = is_AND
         @list_of_boolean_tests = list
         @feature_symbol = sym
-        @grammar_symbol_module = gsm
+        @tupling = tng
       end
 
       def on_each_occurrence_in writable_hooks_plan, & receive_wrapped_sexp
 
-        test_sexp = @grammar_symbol_module.__write_sexp_tester_ @list_of_boolean_tests
+        test_sexp = NodeTester_via_TestList_and_Tupling___.call_by do |o|
+          o.test_list = @list_of_boolean_tests
+          o.list_is_AND_list_not_OR_list = @list_is_AND_list_not_OR_list
+          o.tupling = @tupling
+        end
 
         writable_hooks_plan.on_this_one_kind_of_sexp__ @feature_symbol do |s|
 
@@ -54,7 +58,7 @@ module Skylab::BeautySalon
         if __names_are_valid
           t = remove_instance_variable :@_tree
           Selector___.new(
-            remove_instance_variable( :@_grammar_symbol_module ),
+            remove_instance_variable( :@_tupling ),
             t.list_is_AND_list_not_OR_list,
             t.list_of_boolean_tests,
             t.feature_symbol,
@@ -76,7 +80,7 @@ module Skylab::BeautySalon
 
       def __check_attribute_names
         ok = true
-        h = @_grammar_symbol_module::COMPONENTS
+        h = @_tupling::COMPONENTS
         @_tree.list_of_boolean_tests.each do |bool_test|
           k = bool_test.symbol_symbol
           if ! h[ k ]
@@ -101,32 +105,11 @@ module Skylab::BeautySalon
       end
 
       def __check_that_we_have_our_special_meta_information_for_this_grammar_symbol
-        k = _entity_name_symbol
-        c = Common_::Name.via_variegated_symbol( k ).as_camelcase_const_string
-        mod = These___
-        if mod.const_defined? c, false
-          @_grammar_symbol_module = mod.const_get c, false
-          ACHIEVED_
-        else
-          __levenshtein_for_metafied do
-            mod.constants.map { |cc| Common_::Name.via_const_symbol( cc ).as_variegated_symbol }
-          end
-        end
-      end
 
-      def __levenshtein_for_metafied
+        _ = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
+          operator_branch.procure _entity_name_symbol, & @listener
 
-        _express_parse_error do |y|
-
-          ick_sym = _entity_name_symbol
-
-          _sym_a = yield
-
-          _s_a = _sym_a.map { |sym| "'#{ sym }'" }
-
-          y << %(currently we don't yet have metadata for grammar symbol '#{ ick_sym }'.)
-          y << "(currently we have it for #{ Common_::Oxford_and[ _s_a ] }.)"
-        end
+        _store :@_tupling, _
       end
 
       def __check_that_name_is_in_list_of_known_grammar_symbols
@@ -183,81 +166,108 @@ module Skylab::BeautySalon
 
     # -
 
-    module These___
+    # ==
 
-      # ~
+    class NodeTester_via_TestList_and_Tupling___ < Common_::MagneticBySimpleModel
 
-      class Send
+      # implement boolean "test" expressions, eg. to find all method calls
+      # in the corpus whose method name is `puts`:
+      #
+      #     method_call( method_name = 'puts' )
+      #
+      # (the above is didactic. actual labels for these terms may vary.)
+      #
+      # we produce a proc that receives document AST nodes and (when the
+      # node matches) results in a "tupling" *instance* wrapping that AST
+      # node.
 
-        COMPONENTS = {
-          method_name: :_xxx,
-        }
+      # the whole thing here is we don't create a tupling (viz wrapped node
+      # instance) for every node of this type in the corpus. rather we only
+      # create it IFF the node matches the selector body (the boolean tests).
+      #
+      # to implement this we have to access the components of the document
+      # AST nodes using those components offsets before we can wrap them
+      # in the tupling (which abstracts away the use of the offsets).
 
-        # ~ ( NOTE - this is a VERY rough proof of concept hack
-        #
-        #   - imagine a `true` primary instead (`call(true)` instead of
-        #     `call(method_name="xx")`. imagine how that would look
-        #
-        #   - most of this should be abstracted out of this one thin subclass
-        #
-        # :#here-1
+      attr_writer(
+        :list_is_AND_list_not_OR_list,
+        :test_list,
+        :tupling,
+      )
 
-        def self.__write_sexp_tester_ and_list
+      def execute
 
-          1 == and_list.length || self._HAVE_FUN__etc__
-          test_tree = and_list.fetch 0
-
-          :_EQ_ == test_tree.comparison_function_name_symbol || self._NOT_YET_IMPLEMENTED__regex_etc__
-          :method_name == test_tree.symbol_symbol || self._NO_OTHER_COMPONENTS_YET_IMPLEMENTED_
-
-          target_method_name_sym = test_tree.literal_value.intern
-
-          -> s do
-
-            # NOTE we don't create a wrapped sexp out of every (in this case)
-            # method call in the corpus. rather, we only create the wrap IFF
-            # the grammar symbol instance matches the selector (and in so
-            # doing, becomes a "feature")) the cost of this is - do we really
-            # wanna etc? think .. think .. NOTE
-
-            _yes = target_method_name_sym == s.children[1]  # the method name
-            if _yes
-              new s
-            end
-          end
+        if 1 == @test_list.length
+          _test_AST = remove_instance_variable( :@test_list )[0]
+          __test_proc_via_test_AST _test_AST
+        else
+          self._HAVE_FUN__etc__ @list_is_AND_list_not_OR_list
         end
-
-        # ~ )
-
-        def initialize s
-          @sexp = s
-        end
-
-        # ~ ( ##here-1
-
-        def begin_lineno__
-
-          # experimentally the beginning line number of the sexp is the
-          # beginning line number of its root node (which we expect to be fine)
-
-          @sexp.location.first_line
-        end
-
-        def end_lineno__
-
-          # we don't cache this only because of how the method is used. WATCH THIS
-
-          @sexp.location.last_line
-        end
-
-        # ~ )
-
-        attr_reader(
-          :sexp,
-        )
       end
 
-      # ~
+      def __test_proc_via_test_AST test_AST
+
+        NodeTester_via_Component_and_Test_AST___.call_by do |o|
+          o.component = @tupling::COMPONENTS.fetch test_AST.symbol_symbol
+          o.test_AST = test_AST
+          o.tupling = @tupling
+        end
+      end
+    end
+
+    # ==
+
+    class NodeTester_via_Component_and_Test_AST___ < Common_::MagneticBySimpleModel
+
+      # (as documented in only client, above)
+
+      attr_writer(
+        :component,
+        :test_AST,
+        :tupling,
+      )
+
+      def execute
+        send THESE___.fetch @test_AST.comparison_function_name_symbol
+      end
+
+      THESE___ = {
+        _EQ_: :__node_test_proc_for_simple_value_equality,
+      }
+
+      def __node_test_proc_for_simple_value_equality
+
+        mixed_target_value = __prepare_target_value_for_comparison
+
+        component_offset = @component.offset
+
+        -> n do
+
+          if mixed_target_value == n.children.fetch( component_offset )
+            @tupling.via_node_ n
+          end
+        end
+      end
+
+      def __prepare_target_value_for_comparison
+        send THESE2___.fetch @component.type_symbol
+      end
+
+      THESE2___ = {
+        symbol: :__prepare_target_value_for_comparison_when_symbol,
+      }
+
+      def __prepare_target_value_for_comparison_when_symbol
+
+        # for certain #reasons1.3, the target name as expressed in selectors
+        # looks like a single quoted string. befitting an AST, these names
+        # come to us as strings. it is here that we convert this target name
+        # to the same type as it will be in the document AST node (as symbol)
+        # so that we only have to make this type conversion once per query,
+        # as opposed to converting each document AST node that we traverse.
+
+        @test_AST.literal_value.intern
+      end
     end
 
     # ==

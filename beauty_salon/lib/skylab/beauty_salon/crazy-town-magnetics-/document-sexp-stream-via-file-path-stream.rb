@@ -158,7 +158,6 @@ module Skylab::BeautySalon
 
         @__ruby_parser = ::Parser::CurrentRuby  # ..
 
-        # (:#spot1.1 used to be here, but it is DISASSOCIATED)
         NIL
       end
     # -
@@ -212,13 +211,17 @@ module Skylab::BeautySalon
 
     class WrappedDocumentAst___
       # (it's bad style to pass a tuple around as an array)
+
       def initialize ast, these, path
         @ast_ = ast
         @COMMENT_THINGS = these
-        @PATH = path
+        @path = path
+        freeze
       end
+
       attr_reader(
         :ast_,  # the name is a reminder that its our name not theirs
+        :path,
       )
     end
 

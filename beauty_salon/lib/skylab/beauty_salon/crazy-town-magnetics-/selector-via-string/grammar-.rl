@@ -107,6 +107,31 @@
     @append_character
     ;
 
+  # (regarding below) when representing what amounts to "symbolic string"
+  # comparison, we choose for a particular :#reasons1.1 to mandate single
+  # quotes for these expressions instead of no quotes or double quotes:
+  #
+  #   - to use no quotes would shoot ourself in the foot for the future
+  #     if we were ever to want to support something like variables or
+  #     function calls in our boolean expression (yikes). (incidentally
+  #     really oldchool Perl made a similar mistake, at one time allowing
+  #     non-quoted "words" to serve as strings, a language feature they
+  #     later had to change.)
+  #
+  #   - double quotes are almost universally, it seems, recognized in
+  #     surface representations of strings (C-like languages, ruby, python,
+  #     etc). ruby has this weird conception of a "symbol" (an entry in the
+  #     lookup table, like an immutable string) as being distinct from a
+  #     string. because we want this to feel "conceptually" like the former
+  #     but in practice the value will often be of the latter type (and we
+  #     certainly don't want ruby-unique syntax in our selectors), we want
+  #     to keep a certain distance from a formal conception of a "string"
+  #     because it's not actually (mutable) strings we are comparing.
+  #
+  #     (but in fact it is up to the component implementation to decide how
+  #     to model the internal representation of these "symbolic strings", as
+  #     you can see at referers of the subject tag.)
+
   equals_predicate =
     '=='
     >err{ oops( "expecting '=='" ); }
@@ -197,7 +222,7 @@ module Skylab__BeautySalon
   # (it's not strictly necessary, but creating our own modules and being
   # standalone (rather than using the modules and facilities of our host
   # sidesystem) makes it easier for us to implement the detection of
-  # warnings for reasons explained at #spot1.3 but keep in mind this could change.)
+  # warnings for reasons explained at #reason1.1 but keep in mind this could change.)
 
   class CrazyTownMagnetics___Selector_via_String__Grammar_
 

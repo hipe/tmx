@@ -63,7 +63,7 @@ module Skylab::Fields::TestSupport
       end
     end
 
-    context "basic behavior of inheritence" do
+    context "basic behavior of inheritance" do
 
       shared_subject :_subject_modules do
 
@@ -98,7 +98,7 @@ module Skylab::Fields::TestSupport
       end
     end
 
-    context "for now with inheritence, re-opening properties" do
+    context "for now with inheritance, re-opening properties" do
 
       it "is something you can do" do
 

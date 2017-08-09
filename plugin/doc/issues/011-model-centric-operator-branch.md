@@ -217,7 +217,7 @@ into a grand tree of its own):
 related articles:
 
 • in [#bs-042] "this fun problem" we learn of way you can lock yourself
-  out of extensibility with inheritence when implementing something like
+  out of extensibility with inheritance when implementing something like
   the tree model.
 
 • in [#099.A] trending away from sub-clients, we whine about them there.

@@ -466,7 +466,7 @@ module Skylab::Snag
       # collection-like component, one to which files can be added and
       # removed from using standard [ac] operations.
       #
-      # we leverage this implementation through composition (not inheritence)
+      # we leverage this implementation through composition (not inheritance)
       # (but we used to just inherit) and make it so the items that are
       # added/removed are criterions (not files).
 

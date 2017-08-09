@@ -9,7 +9,7 @@ module Skylab__BeautySalon
   # (it's not strictly necessary, but creating our own modules and being
   # standalone (rather than using the modules and facilities of our host
   # sidesystem) makes it easier for us to implement the detection of
-  # warnings for reasons explained at #spot1.3 but keep in mind this could change.)
+  # warnings for reasons explained at #reason1.1 but keep in mind this could change.)
 
   class CrazyTownMagnetics___Selector_via_String__Grammar_
 

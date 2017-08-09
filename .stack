@@ -73,7 +73,8 @@ main report: work that diff magic on real files perhaps (one temp file)
 main report: needs arch for applying changing
 (that commit was -1.2.4)
 main report: parse functions (covered)
-(that commit was -1.3.1)
+( -1.4 maybe refactor that big mess of methods to use semantic tupling)
 indented report: uber alles
-(that commit was -1.3.2)
-indented report: at all (covered)
+( -1.5.1 prune unused methods )
+( -1.5.2 uber alles in ecosystem )
+( -1.5.3 uber alles in sidesystem )

@@ -21,7 +21,7 @@ module Skylab::Common::TestSupport
     # those listening arrangement we go through a variety of emitting
     # on streams (hopefully all significant permutations there).
 
-    context "simple multi-inheritence triangle graph" do
+    context "simple multi-inheritance triangle graph" do
 
       order = %i| h p b |.freeze  # hacking, pleasure, business
                                   # (and the above order is cosmetic only)

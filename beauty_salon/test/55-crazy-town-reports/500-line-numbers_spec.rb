@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'every feature is of a set of expected features' do
         features_seen = _tuple[1]
-        # (the below list generated with the use of the trick at #spot1.2)
+        # (the below list generated with the use of the trick at #doc1.1)
         %i(
           arg
           args

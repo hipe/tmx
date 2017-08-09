@@ -26,7 +26,7 @@ chain if we are an s.c), (also we (ick) skip ::Object and ::Kernel and
 `respond_to` `event_stream_graph`, and when one such module is found, add it
 to a list, and if ever one of these modules is a class, stop right then and
 there, assuming (if we understand the ancestor chain correctly) that
-inheritence itself (in conjunction with this facility) will work as expected
+inheritance itself (in conjunction with this facility) will work as expected
 
 All of this craziness is to allow the merging of graphs atop the ancestor
 graphs to see if that is a thing that is useful, but of course, it is all

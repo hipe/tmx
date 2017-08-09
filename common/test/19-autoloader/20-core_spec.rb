@@ -120,7 +120,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "inheritence - child of autoloady parent, child has dir" do
+    context "inheritance - child of autoloady parent, child has dir" do
 
       shared_subject :_module do
         fixture_directories_::Seven_Son::Child
@@ -135,7 +135,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "inheritence - child of autoloady parent, child has NO dir" do
+    context "inheritance - child of autoloady parent, child has NO dir" do
 
       shared_subject :_module do
         fixture_directories_::Seven_Son::Child2
@@ -159,7 +159,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "inheritence - child of autoloady parent, child has NO filesystem node" do
+    context "inheritance - child of autoloady parent, child has NO filesystem node" do
 
       shared_subject :_module do
         fixture_directories_::Seven_Son::Parent::Child3

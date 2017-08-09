@@ -15,7 +15,7 @@ chronological predecessors (porcelain/legacy and headless CLI) is relative
 simplicity of design:
 
 you subclasses classes, use DSL's, and that's it. no pesky instance methods
-modules or module methods modules to remember, no complex inheritence graphs
+modules or module methods modules to remember, no complex inheritance graphs
 to create. its goal is that you can write simple, usable interfaces with it
 that themselves use a simple usable interface to interact with the F-ace
 library.
@@ -66,8 +66,8 @@ an **imaginary** **hypothetical** entity relationship diagram:
     | my cli |----+
     +--------+
 
-    fig 2 - this shows the desired inheritence relationships but is impossible.
-    it is impossible because in single inheritence model, you can't have a
+    fig 2 - this shows the desired inheritance relationships but is impossible.
+    it is impossible because in single inheritance model, you can't have a
     node with more than one arrow emanating off of it.
 
 it is reasonable to add extensibility to your cli class by e.g adding

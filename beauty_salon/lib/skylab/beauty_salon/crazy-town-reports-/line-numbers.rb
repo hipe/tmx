@@ -18,6 +18,8 @@ module Skylab::BeautySalon
     # even though the report itself is a bit of an uninteresting dud,
     # we consider it a "happy accident" because it led us to discover
     # this "report' architecture that we like.
+    #
+    # (EDIT: that was all during our use of 'ruby_parser', not 'parser')
 
     # this script has been useful by "regressing" it to do something
     # like a map-reduce aggregate operation: we can get
@@ -31,7 +33,7 @@ module Skylab::BeautySalon
     #
     #     this_script | awk '{ if ("#" != substr($1, 1, 1)) { print $1 } }' | sort | uniq
     #
-    # :#spot1.2
+    # :#doc1.1
 
     # -
 

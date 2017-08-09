@@ -6,7 +6,7 @@
 [#046] #hole ( #moved-to: [#dt-xxx] )
 
 [#045]       permute (as a doctest action)
-[#044]       lexical scope vs inheritence (as it pertains to us)..
+[#044]       lexical scope vs inheritance (as it pertains to us)..
 
 [#043] #hole ( #moved-to: [#dt-xxx] )
 

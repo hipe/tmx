@@ -13,7 +13,7 @@
              (#was: track abstraction candidates near reactive model, normalization)
              (#was: we might want top invocation to be able to emit events with
              the same interface as action adapters, which would change
-             the inheritence graph considerably )
+             the inheritance graph considerably )
 [#116]       :+#tombstone: "client services" is no longer a thing
 [#115]       the `par` method of expags ..
 [#114]       (posterity) ..

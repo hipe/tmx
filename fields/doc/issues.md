@@ -55,7 +55,7 @@
              ( this identifier became a sub-identifier under [#002] )
              ( #was: #parent-node: [#002] "formal vs. actual attributes.." )
 
-[#023]       #wish - when the time comes - track inheritence merging
+[#023]       #wish - when the time comes - track inheritance merging
 
 [#022]       #track - this tracks two related phenomena, both typically
              marked by the implementation of a `normalize` method:

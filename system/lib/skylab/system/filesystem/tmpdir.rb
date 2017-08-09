@@ -32,7 +32,7 @@ module Skylab::System
       #
       #   • we can't implement as plain old actor because of the call to
       #     super below that must happen after all args are processed (:#here)
-      #     which is a reminder of why inheritence is bad.
+      #     which is a reminder of why inheritance is bad.
 
       ATTRIBUTES__ = Attributes_.call(
         be_verbose: nil,
