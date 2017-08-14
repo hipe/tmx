@@ -79,7 +79,7 @@ module Skylab::BeautySalon::TestSupport
 
         count_of_items_without_lineno = 0
         prev = 0
-        table.each do |(kw, lineno)|
+        table.each do |(_kw, lineno)|
 
           if ! lineno
             count_of_items_without_lineno += 1

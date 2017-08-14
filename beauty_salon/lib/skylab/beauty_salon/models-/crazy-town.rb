@@ -57,7 +57,7 @@ module Skylab::BeautySalon
           O
           Stream_big_string_into_[ y, _big_string ]
         end,
-        :property, :file_file,
+        :property, :files_file,
 
 
         :parameter_arity, :zero_or_more,
@@ -65,6 +65,14 @@ module Skylab::BeautySalon
           y << "a code file to make a diff against"
         end,
         :property, :file,
+
+
+        :argument_arity, :zero,
+        :parameter_arity, :zero_or_one,
+        :description, -> y do
+          y << 'this is a thing ding for mc wing ding'
+        end,
+        :property, :corpus_step,
 
 
         :branch_description, -> y do
@@ -93,7 +101,8 @@ module Skylab::BeautySalon
       )
 
       def produce_result
-        if __resolve_file_path_upstream
+
+        if __resolve_arguments
           __money_town
         end
       end
@@ -110,6 +119,8 @@ module Skylab::BeautySalon
 
           o.replacement_function_string = remove_instance_variable :@replacement_function
 
+          o.on_error_once = @_on_error_once
+
           o.filesystem = @_filesystem
 
           o.listener = @listener
@@ -118,7 +129,7 @@ module Skylab::BeautySalon
         _hi
       end
 
-      def __resolve_file_path_upstream
+      def __resolve_arguments
 
         # NOTE - we anticipate switching over to modern techniques soon
         # but for now BE CAREFUL - WE COULD CLOBBER IVARS
@@ -135,28 +146,108 @@ module Skylab::BeautySalon
 
         @listener = remove_instance_variable :@on_event_selectively  # modern way now
 
-        files = h[ :file ]
-        files && files.length.zero? && never  # when we change frameworks..
+        __resolve_file_path_upstream h[ :corpus_step ], h[ :files_file ], h[ :file ]  # duplicated :#here1
+      end
 
-        file_file = h[ :file_file ]
+      def __resolve_file_path_upstream batch_mode, files_file, files
+
+        @_on_error_once = nil  # only one guy uses this
+
+        sym_a = []
+
+        if batch_mode
+          m = :__resolve_file_path_upstream_via_corpus_step
+          x = batch_mode
+          sym_a.push :corpus_step
+        end
+
+        if files_file
+          m = :__resolve_file_path_upstream_via_files_file
+          x = files_file
+          sym_a.push :files_file
+        end
 
         if files
-          if file_file
-            __explain_that_you_cant_have_both
-          else
-            @_file_path_upstream = Stream_[ files ] ; ACHIEVED_
-          end
-        elsif file_file
-          if DASH_ == file_file
-            _etc_via_IO $stdin  # NOTE [br] is unusable. #todo
-            ACHIEVED_
-          else
-            _etc_via_IO @_filesystem.open file_file  # ..
-            ACHIEVED_
-          end
-        else
-          __explain_must_have_one
+          files.length.zero? && never  # when we change frameworks this might change
+          m = :__resolve_file_path_upstream_via_files
+          x = files
+          sym_a.push :files
         end
+
+        case 1 <=> sym_a.length
+        when  0 ; send m, x
+        when -1 ; __when_too_many sym_a
+        when  1 ; __when_none
+        else    ; never
+        end
+      end
+
+      def __when_none
+        _error do |y, me|
+          y << "must have one of #{ Common_::Oxford_or[ me._map_etc me.__these ] }"
+        end
+      end
+
+      def __when_too_many sym_a
+        _error do |y, me|
+          _adv = 2 == sym_a.length ? "both" : "all of"  # there's a thing for this but meh
+          y << "can't have #{ _adv } #{ Common_::Oxford_and[ me._map_etc sym_a ] }"
+        end
+      end
+
+      def _error
+        me = self
+        @listener.call :error, :expression do |y|
+          yield y, me
+        end
+        UNABLE_
+      end
+
+      def _map_etc sym_a
+        sym_a.map( & method( :__moniker_via_sym ) )
+      end
+
+      def __these  # (duplicates ##here1)
+        %i( files_file files corpus_step )
+      end
+
+      def __moniker_via_sym sym
+
+        # (this is impure) (duplicates ##here1)
+
+        case sym
+        when :files_file ; "--files-file"
+        when :files ; "<files>"
+        when :corpus_step ; "--corpus-step"
+        else ; never end
+      end
+
+      def __resolve_file_path_upstream_via_corpus_step _
+
+        sct = Home_::CrazyTownMagneticsForMainReport_::PathStream_via_CorpusStep.call_by do |o|
+
+          o.filesystem = @_filesystem
+          o.listener = @listener
+        end
+
+        if sct
+          @_file_path_upstream = sct.path_stream
+          @_on_error_once = sct.save_corpus_step
+          ACHIEVED_
+        end
+      end
+
+      def __resolve_file_path_upstream_via_files_file files_file
+        if DASH_ == files_file
+          _etc_via_IO $stdin  # NOTE [br] is unusable. #todo
+        else
+          _etc_via_IO @_filesystem.open files_file  # ..
+        end
+      end
+
+      def __resolve_file_path_upstream_via_files files
+        @_file_path_upstream = Stream_[ files ]
+        ACHIEVED_
       end
 
       def _etc_via_IO io
@@ -168,21 +259,7 @@ module Skylab::BeautySalon
             line
           end
         end
-      end
-
-      def __explain_that_you_cant_have_both
-        _same "can't have both", "and"
-      end
-
-      def __explain_must_have_one
-        _same "must have", "or"
-      end
-
-      def _same head, join
-        @listener.call :error, :expression do |y|
-          y << "#{ head } <file-file> #{ join } <file>"
-        end
-        UNABLE_
+        ACHIEVED_
       end
     # -
 

@@ -75,5 +75,12 @@ main report: needs arch for applying changing
 main report: parse functions (covered)
 ( -1.4 maybe refactor that big mess of methods to use semantic tupling)
 indented report: uber alles
+( -1.4.2 all tests as a corpus, holes there )
+( -1.4.3 better viz, i.e of procs )
+( -1.4.4 do the refactor that uses methods with arguments for some not all
 ( -1.5.1 prune unused methods )
 ( -1.5.2 uber alles in ecosystem )
+ - cover everything you add
+ - maybe get thru the whole corpus without coverage or committing
+ - table the idea of flabber jabber
+( -1.5.2.B commit corpus stepper )

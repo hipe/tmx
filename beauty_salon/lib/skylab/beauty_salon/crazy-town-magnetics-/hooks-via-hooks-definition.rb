@@ -130,6 +130,8 @@ module Skylab::BeautySalon
         @__mutex_for_after_each_file = nil
         @after_each_file = MONADIC_EMPTINESS_
 
+        @on_error_once = nil
+
         yield self
 
         bx = remove_instance_variable :@_strict_hook_box
@@ -179,6 +181,10 @@ module Skylab::BeautySalon
         @after_each_file = p ; nil
       end
 
+      attr_writer(
+        :on_error_once,
+      )
+
       # -- read
 
       def execute_plan_against__ potential_sexp
@@ -198,11 +204,42 @@ module Skylab::BeautySalon
 
         # ignoring comments stuff
 
+        $stderr.puts "FILE: #{ wast.path }"
+
+        __in_hacky_exception_capturing_session do
+          __boogey_down wast
+        end
+      end
+
+      def __boogey_down wast
         __stack_session wast.path do
-          _node wast.ast_
+          ast = wast.ast_
+          if ast
+            _node ast
+          else
+            # (sketch: but we have no listener #todo)
+            # @listener.call( :info, :expression, :empty_file ) { |y| y << "(file has no code)" }
+          end
         end
 
         NIL
+      end
+
+      def __in_hacky_exception_capturing_session
+        p = remove_instance_variable :@on_error_once
+        if p
+          begin
+            x = yield
+            ok = true
+          ensure
+            if ! ok
+              p[]
+            end
+          end
+          x
+        else
+          yield
+        end
       end
 
       def _any_node x
@@ -1143,7 +1180,7 @@ module Skylab::BeautySalon
       #   - but when the hook is not supplied, we don't create wrapped
       #     node objects that would otherwise go unused.
       #
-      #   - artificially we add a once-per-file root stack frame that
+      #   - artificially we add a once-per-file root stack frame for
       #     the file itself. this frame always has a depth of zero.
       #
       #   - then, each "branchy" node at the root level of the document

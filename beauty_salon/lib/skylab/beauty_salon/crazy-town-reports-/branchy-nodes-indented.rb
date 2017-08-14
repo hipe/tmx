@@ -20,6 +20,7 @@ module Skylab::BeautySalon
 
       attr_writer(
         :file_path_upstream_resources,
+        :on_error_once,
         :listener,
       )
 
@@ -41,6 +42,8 @@ module Skylab::BeautySalon
             o.on_each_branchy_node__ do |wnode|
               y << "#{ indent_s * wnode.depth }#{ wnode.to_description }"
             end
+
+            o.on_error_once = @on_error_once
           end
 
           oo.on_each_file_path do |path, o|

@@ -6,7 +6,7 @@ module NoDependenciesZerk
   # (like one that turns on coverage testing or similar), this is a
   # single-file implementation of the basics needed to make API & CLI
   #
-  # but NOTE [ze] may be loaded to handle the follwing circumstances:
+  # but NOTE [ze] may be loaded to handle the following circumstances:
   #
   #   - to express a parse failure
 
@@ -1430,6 +1430,7 @@ module NoDependenciesZerk
     class MappedScanner__ ; include ScannerMethods__
 
       def initialize p, scn
+        @_head_as_is = :_head_as_is_when_not_cached
         @_proc = p
         @_scn = scn
       end
@@ -1438,11 +1439,23 @@ module NoDependenciesZerk
         @_scn.no_unparsed_exists
       end
 
-      def head_as_is  # ..
-        @_proc[ @_scn.head_as_is ]
+      def head_as_is
+        send @_head_as_is
+      end
+
+      def _head_as_is_when_not_cached
+        x = @_proc[ @_scn.head_as_is ]
+        @_head_as_is = :__head_as_is_when_cached
+        @__cached_mixed = x
+        x
+      end
+
+      def __head_as_is_when_cached
+        @__cached_mixed
       end
 
       def advance_one
+        @_head_as_is = :_head_as_is_when_not_cached
         @_scn.advance_one
       end
     end
@@ -1533,7 +1546,7 @@ module NoDependenciesZerk
         MappedScanner__.new p, self
       end
 
-      def to_minimal_stream
+      def to_minimal_stream  # 1x
         MinimalStream___.new do
           unless no_unparsed_exists
             gets_one
