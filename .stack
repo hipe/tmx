@@ -73,14 +73,11 @@ main report: work that diff magic on real files perhaps (one temp file)
 main report: needs arch for applying changing
 (that commit was -1.2.4)
 main report: parse functions (covered)
-( -1.4 maybe refactor that big mess of methods to use semantic tupling)
+(that was 1.4)
 indented report: uber alles
-( -1.4.2 all tests as a corpus, holes there )
-( -1.4.3 better viz, i.e of procs )
-( -1.4.4 do the refactor that uses methods with arguments for some not all
-( -1.5.1 prune unused methods )
-( -1.5.2 uber alles in ecosystem )
- - cover everything you add
- - maybe get thru the whole corpus without coverage or committing
- - table the idea of flabber jabber
-( -1.5.2.B commit corpus stepper )
+THEN: maybe refactor that big mess of methods to use semantic tupling (methods with arguments for some not all)
+THEN: refactor to better viz, i.e of calls in tests
+THEN: prune unused methods (COMMIT)
+THEN: cover tests corpus (temporary commit)
+THEN: refactor to pass listeners around in a struct instead of many ivars (better for dup-and-mutate) (temporary commit)
+THEN: @on_successful_finish listener (temporary commit)

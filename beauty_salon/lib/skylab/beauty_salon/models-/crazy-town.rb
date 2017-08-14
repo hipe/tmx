@@ -38,6 +38,13 @@ module Skylab::BeautySalon
         :property, :report,
 
 
+        :parameter_arity, :zero_or_more,
+        :description, -> y do
+          y << "a code file to make a diff against"
+        end,
+        :property, :file,
+
+
         :description, -> y do
           _big_string = <<-O
             instead of using `<file> [<file> [..]]` off the command line,
@@ -60,17 +67,21 @@ module Skylab::BeautySalon
         :property, :files_file,
 
 
-        :parameter_arity, :zero_or_more,
-        :description, -> y do
-          y << "a code file to make a diff against"
-        end,
-        :property, :file,
-
-
-        :argument_arity, :zero,
+        :argument_arity, :one,
         :parameter_arity, :zero_or_one,
+        # :argument_moniker, 'CORPUS_HEAD',
         :description, -> y do
-          y << 'this is a thing ding for mc wing ding'
+          y << 'STEP (bad name #todo) (for example "foo-nani") implies "foo-nani.d"'
+          y << 'and "foo-nani.order.list" in the current directory.'
+          y << 'the former is a directory of files and the latter is a'
+          y << 'list of the basenames of those files in the order in which'
+          y << 'to traverse the files of filenames. each such file is treated'
+          y << 'as if it were passed to \'--files-file\' but additionally'
+          y << 'a mechanism is engaged such that if an exception is raised'
+          y << 'during traversal and parsing of the corpus, the path of the'
+          y << 'file you were on is written to disk so that you will continue'
+          y << 'from this point when you invoke traversal with this option'
+          y << 'subsequently.'
         end,
         :property, :corpus_step,
 
@@ -222,10 +233,11 @@ module Skylab::BeautySalon
         else ; never end
       end
 
-      def __resolve_file_path_upstream_via_corpus_step _
+      def __resolve_file_path_upstream_via_corpus_step head_s
 
         sct = Home_::CrazyTownMagneticsForMainReport_::PathStream_via_CorpusStep.call_by do |o|
 
+          o.head_string = head_s
           o.filesystem = @_filesystem
           o.listener = @listener
         end

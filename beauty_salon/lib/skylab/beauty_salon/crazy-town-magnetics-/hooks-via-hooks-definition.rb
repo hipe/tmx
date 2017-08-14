@@ -94,16 +94,6 @@ module Skylab::BeautySalon
         @proc_for_after_last_file__ = p ; nil
       end
 
-      def flush_to_line_stream_via_file_path_upstream_resources rsx
-
-        CrazyTownMagnetics_::LineStream_via_Resources_and_Hooks.call_by do |o|
-
-          o.file_path_upstream_resources = rsx
-
-          o.hooks = self
-        end
-      end
-
       attr_reader(
         :receive_each_file_path__,
         :plans,
@@ -188,30 +178,36 @@ module Skylab::BeautySalon
       # -- read
 
       def execute_plan_against__ potential_sexp
+
         @before_each_file[ potential_sexp ]
+
         if @_has_name_based_hooks || @_has_branchy_node_hook
-          sexp = potential_sexp.sexp
-          if sexp
-            dup.__execute_against sexp
-          end
+
+          dup.__execute_against potential_sexp
         end
+
         @after_each_file[ potential_sexp ] ; nil
       end
 
-      def __execute_against wast  # assume dup
+      def __execute_against potential_AST
+        __in_hacky_exception_capturing_session do
+          __do_execute_against potential_AST
+        end
+      end
+
+      def __do_execute_against potential_AST
+
+        @CURRENT_FILE = potential_AST.path
+
+        $stderr.puts "FILE: #{ @CURRENT_FILE }"
+
+        wast = potential_AST.sexp
+        # ..
 
         @_push_stack_frame = :__push_stack_frame_initially
 
         # ignoring comments stuff
 
-        $stderr.puts "FILE: #{ wast.path }"
-
-        __in_hacky_exception_capturing_session do
-          __boogey_down wast
-        end
-      end
-
-      def __boogey_down wast
         __stack_session wast.path do
           ast = wast.ast_
           if ast
@@ -291,16 +287,17 @@ module Skylab::BeautySalon
         #      grammar symbols vs. the set of all symbols.
 
         and: :__and,
+        and_asgn: :__and_asgn,
         arg: :_arg,
         args: :__args,
         array: :_array,
         attrasgn: :__attrasng,
-        begin: :__begin,
+        begin: :_begin,
         block: :_block,
         block_pass: :__block_pass,
         break: :__break,
         call: :__call,
-        case: :__case,
+        case: :_case,
         casgn: :__const_assign,
         cdecl: :__const_declaration,
         class: :__class,
@@ -308,10 +305,12 @@ module Skylab::BeautySalon
         colon3: :__colon3,
         const: :_const,
         def: :__def,
+        defined?: :__defined?,
         defn: :__defn,
         defs: :__defs,
         dstr: :__dstr,
         dsym: :__dsym,
+        ensure: :__ensure_ALONE,
         erange: :__erange,
         evstr: :__evstr,
         false: :__false,
@@ -322,7 +321,7 @@ module Skylab::BeautySalon
         iasgn: :__iasgn,
         irange: :__irange,
         if: :__if,
-        int: :__int,
+        int: :_int,
         iter: :__iter,
         ivar: :_ivar,
         ivasgn: :__ivasgn,
@@ -336,22 +335,28 @@ module Skylab::BeautySalon
         module: :__module,
         next: :__next,
         nil: :__nil,
+        nth_ref: :__nth_ref,
         op_asgn: :__op_asgn,
         or: :__or,
         or_asgn: :__or_asgn,
         redo: :__redo,
         regexp: :__regexp,
         rescue: :_rescue,
+        return: :__return,
         self: :_self,
         send: :_send,
         sclass: :__singleton_class_block,
-        splat: :__splat,
+        splat: :_splat,
         str: :_str,
+        super: :_super,
         sym: :__sym,
         true: :__true,
         # when:  see #here1
+        until: :__until,
+        until_post: :__until_post,
         while: :__while,
         while_post: :__while_post,
+        xstr: :__xstr,
         yield: :__yield,
         zsuper: :__zsuper,
       }
@@ -361,23 +366,10 @@ module Skylab::BeautySalon
       def __class s
         a = s.children
         _length 3, s
-        _module_identifier a[0]
-        _any_probably_module a[1]
+        _expect :const, a[0]
+        _any_expression_of_module a[1]
         _in_stack_frame s do
           _any_node a[2]
-        end
-      end
-
-      def _any_probably_module x
-
-        # if it's not a literal const dereference, it should be a this, right?
-
-        if x
-          if :send == x.type
-            _send x
-          else
-            _module_identifier x
-          end
         end
       end
 
@@ -385,18 +377,17 @@ module Skylab::BeautySalon
         a = n.children
         _length 2, n  # no
         _self_probably a[0]
-        _tapeworm 1, a
+        _in_stack_frame n do
+          _any_node a[1]
+        end
       end
 
-      def __module s
-        a = s.children
-        _module_identifier a[0]
-        if 1 == a.length
-          interesting
-        else
-          _in_stack_frame s do
-            _tapeworm 1, s.children
-          end
+      def __module n  # #testpoint1.35
+        a = n.children
+        _length 2, n
+        _expect :const, a[0]
+        _in_stack_frame n do
+          _any_node a[1]  # empty modules have a nil item here (THING 1)
         end
       end
 
@@ -430,14 +421,14 @@ module Skylab::BeautySalon
 
       # -- method definition and related
 
-      def __defs n
+      def __defs n  # #testpoint1.37
         a = n.children
         _length 4, n
         _self_probably a[0]
         _symbol a[1]
         _expect :args, a[2]
         _in_stack_frame n do
-          _node a[3]
+          _any_node a[3]  # empty method body like #testpoint1.38
         end
       end
 
@@ -453,19 +444,22 @@ module Skylab::BeautySalon
 
       def __args node
         a = node.children
-        if a.length.nonzero?
-          a.each do |n|
-            case n.type
-            when :arg ; _arg n  # an example of #open [#043] ([#043.B])
-            when :blockarg ; __blockarg n
-            when :procarg0 ; __procarg n
-            when :optarg   ; __optarg n
-            when :restarg  ; __restarg n
-            when :kwoptarg ; __kwoptarg n
-            else
-              oops
-            end
-          end
+        a.each do |n|
+          __arg n
+        end
+      end
+
+      def __arg n
+        case n.type
+        when :arg      ; _arg n  # an example of #open [#043] ([#043.B])
+        when :blockarg ; __blockarg n  # #testpoint1.40
+        when :procarg0 ; __procarg0 n
+        when :optarg   ; __optarg n  # #testpoint1.41
+        when :restarg  ; __restarg n
+        when :kwoptarg ; __kwoptarg n  # #testpoint1.49
+        when :mlhs     ; __mlhs_this_other_form n  # #testpoint1.32
+        else
+          oops
         end
       end
 
@@ -491,18 +485,19 @@ module Skylab::BeautySalon
         end
       end
 
-      def __procarg n
+      def __procarg0 n  # #testpoint1.21
         a = n.children
         if 1 == a.length
           _common_assertion_two_for_debugging n
         else
+          # #testpoint1.45
           _each_child a do |n_|
             :arg == n_.type || oops
           end
         end
       end
 
-      def __blockarg n
+      def __blockarg n  # #testpoint1.40 (again)
         _common_assertion_two_for_debugging n
       end
 
@@ -521,13 +516,15 @@ module Skylab::BeautySalon
         _tapeworm 3, s
       end
 
-      # -- calling methods (special edition - boolean operators (pretend they're special methods (functions)))
+      # -- language features that look like method calls
+
+      # ~ boolean operators (pretend they're special methods (functions)))
 
       def __or n
         _and_or_or n
       end
 
-      def __and n
+      def __and n  # #testpoint1.36
         _and_or_or n
       end
 
@@ -536,6 +533,12 @@ module Skylab::BeautySalon
         _length 2, n
         _node a[0]
         _node a[1]
+      end
+
+      def __defined? n  # #testpoint1.33
+        a = n.children
+        _length 1, n
+        _node a[0]
       end
 
       # -- calling methods
@@ -553,9 +556,30 @@ module Skylab::BeautySalon
         end
       end
 
-      def __splat n
+      def _splat n
+        # this is yet another #foolhardy (see)
         _length 1, n
-        _node n.children[0]
+        n_ = n.children[0]
+        case n_.type
+
+        when :lvar ; _lvar n_  # #testpoint1.19
+
+        when :ivar ; _ivar n_  # #testpoint1.18
+
+        when :send ; _node n_  # #testpoint1.17
+
+        when :block ; _node n_  # #testpoint1.16
+
+        when :const ; _const n_  # #testpoint1.15
+
+        when :begin ; _begin n_  # #testpoint1.14
+
+        when :case ; _case n_  # #testpoint1.24
+
+        else
+
+          _asgn n_ # #testpoint1.23
+        end
       end
 
       def __block_pass s  # for when a proc is passed as a block argument,
@@ -571,17 +595,35 @@ module Skylab::BeautySalon
 
       # -- can only happen within a method
 
-      def __yield n
+      def __yield n  # #testpoint1.42
+
+        # see discussion ant `_common_jump`, but see how we differ:
+        # a `yield` is passing arguments to a block or proc, so its arguments
+        # can be many unlike these others.
+        # system/lib/skylab/system/diff/core.rb:116
+
         _node_any_each_child n.children
       end
 
-      def __zsuper n
+      def __zsuper n  # `super` #testpoint1.43
+
         _common_assertion_one_for_debugging n
+      end
+
+      def _super n  # `super()` #testpoint1.13
+
+        # the zero or more children is an argument list
+
+        _node_any_each_child n.children
+      end
+
+      def __return n  # #testpoint1.31
+        _common_jump n
       end
 
       # -- control flow
 
-      def __begin n
+      def _begin n
         _node_any_each_child n.children
       end
 
@@ -592,9 +634,10 @@ module Skylab::BeautySalon
         n_ = a[0]
         k = n_.type
         case k
-        when :send ; _send n_
+        when :send ; _send n_  # #testpoint1.20
         when :lambda ; __lambda n_
-        else ;
+        when :super ; _super n_  # #testpoint1.12
+        else
           interesting
         end
 
@@ -634,6 +677,11 @@ module Skylab::BeautySalon
         end
       end
 
+      def __ensure_ALONE n
+        # the kind you see at the toplevel of method bodies
+        _ensure n  # #testpoint1.11
+      end
+
       def _ensure n
         a = n.children
         _length 2, n
@@ -649,16 +697,26 @@ module Skylab::BeautySalon
       end
 
       def _rescue n
+
+        # you can have multiple rescue clauses
+        # common/lib/skylab/common/autoloader/file-tree-.rb:215
+
+        # we still haven't figured out what the last item is for
+
         a = n.children
-        _length 3, n
+        last = a.length - 1
+
+        # (the typical rescue clause is 3 elements long)
 
         _node a[0]  # a `begin` block or 1 statement
 
-        n_ = a[1]
+        1.upto( last - 1 ) do |d|
+          n_ = a[d]
           :resbody == n_.type || oops
           __resbody n_
+        end
 
-        n_ = a[2]
+        n_ = a[last]
         if n_
           this_is_something  # not sure, a ensure? but didn't we cover that?
         end
@@ -667,14 +725,28 @@ module Skylab::BeautySalon
       def __resbody n
         a = n.children
         _length 3, n
+
+        # (the next two can be not there as in (woah crazy old)):
+        # task_examples/lib/skylab/task_examples/task-types/symlink.rb:14
+        # #todo this doens't line up with the others
+
         n_ = a[0]
+        if n_
           :array == n_.type || oops
           _array n_
+        end
+
         n_ = a[1]
-          :lvasgn == n_.type || oops  # .. #todo
-          _lvasgn n_
+        if n_
+          # (it's possible to have a rescue clause that doesn't assign to a left value)
+          _assignable n_
+        end
+
         n_ = a[2]
+        if n_
+          # (it's possible to have a rescue clause with no "do this then")
           _node n_
+        end
       end
 
       def _nothing_or_anything_or_this_switch n
@@ -686,35 +758,82 @@ module Skylab::BeautySalon
         end
       end
 
+      def __until_post n  # #testpoint1.29
+        _while_or_until_post n
+      end
+
       def __while_post n
+        _while_or_until_post n
+      end
+
+      def _while_or_until_post n
         a = n.children
         _length 2, n
         _condition a[0]
         n_ = a[1]
         :kwbegin == n_.type || fine
-        _node_each_child n_.children
+        # it's possible to have an empty body in it
+        # zerk/lib/skylab/zerk/non-interactive-cli/when-help-.rb:37
+
+        _node_any_each_child n_.children
       end
 
-      def __while s
-        a = s.children
-        _length 2, s
+      def __until n  # #testpoint1.26
+        _while_or_until n
+      end
+
+      def __while n
+        _while_or_until n
+      end
+
+      def _while_or_until n
+        a = n.children
+        _length 2, n
         _condition a[0]
         _node a[1]
       end
 
       def __break n
-        _common_assertion_one_for_debugging n
+        _common_jump n
       end
 
       def __next n
-        _common_assertion_one_for_debugging n
+        _common_jump n
       end
 
-      def __redo s
-        _common_assertion_one_for_debugging s
+      def __redo n
+        _common_jump n
       end
 
-      def __case s
+      def _common_jump n
+
+        # we'll describe first a `return` nonterminal then apply it to the
+        # others: interestingly (or not) we note that a return statement
+        # resembles superficially a method call, in that it can take
+        # parenthesis or no, and that it can take zero or one "argument".
+        # but unlike a method call, the return "call" cannot take multiple
+        # arguments, or a block argument.
+        #
+        # this appears to hold also for our other friends:
+        #   - `break`
+        #   - `next`
+        #   - `redo`
+        #   - `yield` NO (see)
+
+        # with a `next`, annoyingingly you can "pass" one expression here
+        # but look how we hack with this "feature":
+        # system/lib/skylab/system/io/line-stream-via-page-size.rb:58
+
+        a = n.children
+        case a.length
+        when 0 ; # nothing, ofc - human/lib/skylab/human/summarization.rb:24
+        when 1 ; _node a[0]  # any expression  #testpoint1.28
+        else   ;
+          probably_never
+        end
+      end
+
+      def _case n
 
         # we do some "by hand" parsing of these because of the relatively
         # particular structure of `case` (switch) expressions when compared
@@ -746,7 +865,7 @@ module Skylab::BeautySalon
         # but note some of these contextualities aren't implemented lexically
         # but rather at runtime
 
-        a = s.children
+        a = n.children
         d = a.length
 
         # scrutinized, when, [ when, [..]] else
@@ -765,19 +884,20 @@ module Skylab::BeautySalon
 
       def __when n
         a = n.children
-        _length 2, n
-
-          # each `when` has the "comparator" expression and the "consequence" expression
-
-        _node a[0]  # if the scrutinized value is `===` to this..
-        _any_node a[-1]  # do this (maybe do nothing)
+        last = a.length - 1
+        0 < last || interesting
+        0.upto( last - 1 ) do |d|
+          _node a[d]  # if the scrutnized value is `===` this..
+        end
+        _any_node a[last]  # do this (maybe do nothing)
       end
 
       def __if n
         a = n.children
         _length 3, n
         _condition a[0]
-        _node a[1]  # if true do this
+        _any_node a[1]  # if true do this
+        # NOTE an `unless` expression gets turned into `if true, no-op else ..`
         _any_node a[2]  # else do this
       end
 
@@ -788,7 +908,7 @@ module Skylab::BeautySalon
 
       # -- assignment
 
-      def __match_with_lvasgn n
+      def __match_with_lvasgn n  # #testpoint1.48
         a = n.children
         _length 2, n
         _node a[0]
@@ -798,7 +918,7 @@ module Skylab::BeautySalon
       def __const_assign n
         a = n.children
         _length 3, n
-        _any_const_or_similar a[0]
+        _any_expression_of_module a[0]
         _symbol a[1]
         _node a[2]
       end
@@ -815,31 +935,99 @@ module Skylab::BeautySalon
         _length 2, n
         n_ = a[0]
         :mlhs == n_.type || oops
-        _each_child n_.children do |n3|
-          _one_of_these n3
-        end
+        __mlhs_this_one_form n_
         _node a[1]
+      end
+
+      def __mlhs_this_other_form n  # #testpoint1.10
+        _each_child n.children do |n_|
+          :arg == n_.type || oops
+          _arg n_
+        end
+      end
+
+      def __mlhs_this_one_form n
+        _each_child n.children do |n_|
+          __assignable_in_mlhs n_
+        end
       end
 
       def __op_asgn n
         a = n.children
         _length 3, n
-        _one_of_these a[0]
+        _assignable a[0]
         _symbol a[1]  # :+
         _node a[2]
       end
 
       def __or_asgn n
+        _boolean_asgn n
+      end
+
+      def __and_asgn n  # #testpoint1.25
+        _boolean_asgn n
+      end
+
+      def _boolean_asgn n
         a = n.children
         _length 2, n
-        _one_of_these a[0]
+        _assignable a[0]
         _node a[1]
       end
 
-      def _one_of_these n
-        k = n.type
-        :lvasgn == k || :ivasgn == k || :gvasgn == k || oops
-        _common_assertion_two_for_debugging n
+      def __assignable_in_mlhs n
+
+        # (compare this to the immediately following method)
+
+        case n.type
+        when :send
+          # a send that ends up thru sugar calling `foo=`
+
+          _send n  # #testpoint1.9
+
+        when :splat
+          # you can splat parts of the list
+
+          _splat n  # #testpoint1.8
+
+        else
+          # plain old lvars
+
+          _asgn n  # testpoint1.34
+        end
+      end
+
+      def _assignable n
+
+        # (compare this to the immediately preceding method)
+
+        # what are the things that can be the left side of a `||=` or a `+=` or the several others?
+        # lvars, ivars, gvars, but also a "send" will presumably gets
+        # sugarized:
+        #
+        #   o.foo ||= :x
+        #
+        # what happes there is that the method `foo` is called then (IFF it's
+        # false-ish) the method `foo=` is called. this isn't reflected in the
+        # parse tree.
+
+        case n.type
+        when :send
+          _send n  # #testpoint1.22
+        else
+          _asgn n
+        end
+      end
+
+      def _asgn n
+        case n.type
+        when :gvasgn, :ivasgn, :lvasgn
+          _common_assertion_two_for_debugging n
+        when :casgn
+          _const n  # #testpoint1.6
+        else
+          interesting
+        end
       end
 
       def __gvasgn n
@@ -866,15 +1054,9 @@ module Skylab::BeautySalon
 
       def _lvasgn n
         a = n.children
-        case a.length
-        when 1  # when e.g a rescue expression
-          _symbol a[0]
-        when 2
-          _symbol a[0]
-          _node a[1]
-        else
-          oops
-        end
+        _length 2, n
+        _symbol a[0]
+        _node a[1]
       end
 
       def __lasgn s
@@ -919,55 +1101,60 @@ module Skylab::BeautySalon
         _common_assertion_two_for_debugging s
       end
 
-      def __gvar s
+      def __gvar n  # #testpoint1.44
+
         # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
-        _common_assertion_two_for_debugging s
+        # (see also `nth_ref` which looks superficially like a global)
+
+        _common_assertion_two_for_debugging n
       end
 
       def _ivar s
         _common_assertion_two_for_debugging s
       end
 
-      # -- special section on consts
+      # -- special section on expression of modules
 
-      def _any_const_or_similar x
+      def _any_expression_of_module x
         if x
-          case x.type
-          when :const ; _const x
-          when :cbase ; __cbase x
-          when :send  ; _send x
-          when :lvar  ; _lvar x
-          when :ivar  ; _ivar x
-          else
-            fine_just_weird
-          end
+          __expression_of_module x
         end
+      end
+
+      def __expression_of_module n
+
+        # this is yet another case of #foolhardy (see)
+
+        # partially duplicated at #temporary-spot-1. this one is now ahead. #todo
+
+        case n.type
+        when :const ; _const n  # can recurse back to here
+        when :cbase ; __cbase n  # `< ::BasicObject`
+        when :self  ; _self n  # #testpoint1.5
+        when :lvar  ; _lvar n  # #testpoint1.27
+        when :ivar  ; _ivar n  # #testpoint1.30
+        when :send  ; _send n  # #testpoint1.39
+        when :begin ; _begin n   # #testpoint1.4
+        else
+          anything_is_possible_here_but_lets_make_a_note_of_it
+        end
+      end
+
+      def _const n
+        a = n.children
+        _length 2, n
+        _any_expression_of_module a[0]
+        _symbol a[1]
       end
 
       def __cbase n
         _common_assertion_one_for_debugging n
       end
 
-      def _const n
-        a = n.children
-        _length 2, n
-        _any_const_or_similar a[0]
-        _symbol a[1]
-      end
+      # -- magic variables (globals) and similar
 
-      def _any_module_identifier x
-        if x
-          _module_identifier x
-        end
-      end
-
-      def _module_identifier n
-        # duplicated at #temporary-spot-1 (this one will go away) #todo
-        :const == n.type || interesting
-        _length 2, n
-        a = n.children
-        _any_probably_module a[0]
-        _symbol a[1]
+      def __nth_ref n  # `$1` #testpoint1.3
+        _int n  # ick/meh
       end
 
       # -- literals
@@ -1006,6 +1193,10 @@ module Skylab::BeautySalon
         _double_quoted_string_and_similar n
       end
 
+      def __xstr n # #testpoint1.2
+        _double_quoted_string_and_similar n
+      end
+
       def __dstr n
 
         # a double-quoted string will parse into `str` unless (it seems)
@@ -1017,7 +1208,10 @@ module Skylab::BeautySalon
       end
 
       def _double_quoted_string_and_similar n
-        _node_each_child n.children
+
+        # (it's possible to have an empty symbol (etc), as basic/lib/skylab/basic/module/creator.rb:193
+
+        _node_any_each_child n.children
       end
 
       def __evstr s  # (presumably "evaluate as string")
@@ -1070,16 +1264,57 @@ module Skylab::BeautySalon
         ::Float === a[0] || interesting
       end
 
-      def __int n
+      def _int n
         a = n.children
         _length 1, n
         ::Integer === a[0] || interesting
       end
 
       def _self_probably n
-        if :self != n.type
-          self._WEEE__no_problem__
+
+        # this is another #foolhardy case and its implementation must
+        # change - it's just an excercise to understand pragmatics
+
+        case n.type
+
+        when :self  # #testpoint1.38
+          _self n  # `def self.xx`
+
+        when :lvar  # #testpoint1.46
+          _lvar n  # `def o.xx`
+
+        when :const  # #testpoint1.47
+          _const n  # class << Foo::Bar
+
+        when :begin  # #testpoint1.1
+          _begin n
+
+        else
+          interesting
         end
+      end
+
+      def _CVME n  # #todo - this is temporary used in development.
+        #
+        # 1) run that one test with coverage turned on:
+        #        tmx-test-support-quickie -cover <that one spec file>
+        #
+        # 2) whatever grammar symbol methods are here that are not covered,
+        #    make a single call to this method at the beginning of that method.
+        #
+        # 3) run the indented report against the target corpus so that the
+        #    methods are called. when the below message appears, use that
+        #    information to make an appropriate test to cover the spot.
+        #
+        # 4) repeat (3) until all such spots are covered.
+        #
+        # note this could be automated somewhat, but it would require work.
+
+        io = $stderr
+        o = caller_locations( 1, 1 )[ 0 ]
+        io.puts "in this method: #{ o.base_label } (line #{ o.lineno })"
+        io.puts "(as seen in (at writing) #{ @CURRENT_FILE }:#{ n.loc.line })"
+        exit 0
       end
 
       # -- "keywords" (and those literals)
@@ -1288,6 +1523,61 @@ module Skylab::BeautySalon
     # ==
 
     MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
+
+    # ==
+
+    # :#foolhardy:
+    #
+    # the TL;DR: is that this is a developmental crutch that we will
+    # probably refactor out later, because as it is it isn't correct.
+    #
+    # this implementational quirk applies (at least) to:
+    #   - `defs`
+    #   - `splat`
+    #   - "expression of module" for example:
+    #     - the right side of `<`
+    #     - the left side of `::`
+    #
+    # in places marked with this tag (viz the above places at least), the
+    # grammatical nonterminal has as one of its components an "argument"
+    # that can in fact be any expression (presumably).
+    #
+    # for example in the case of subclassing with `<`, you could write any
+    # expression to the right side of the operator, for example a case
+    # expression that weirdly determines the superclass to use. only at
+    # runtime does the runtime resolve whether the expression produces
+    # a (subclassable) class. the point is, it still compiles with any
+    # expression there.
+    #
+    # (a more realistic example is using a case expression as the left
+    # side of a `::` operator, something we do in one place in the corpus,
+    # and is turned into a testpoint.)
+    #
+    # the real-world consequences of this dynamic spell out for us in a way
+    # that we anticipated: for example you cannot reliably find all classes
+    # in a corpus that subclass some particular class. you might find some
+    # but the dynamic nature of the language prevents you from doing this
+    # reliably with syntactic analysis alone.
+    #
+    # however as it is implemented presently, we are not so lenient.
+    # rather, we have gone thru and made a case expression with a case for
+    # every single grammatical symbol that *does* occur in our corpus;
+    # rather that doing what is correct and acceping *any* expression (so
+    # `_node`).
+    #
+    # this is for at least two reasons:
+    #
+    #   - we didn't really realize that all these things were this way
+    #     at the outset. (we didn't exactly think they were *not* this way,
+    #     either. we just hadn't really thought about it.)
+    #
+    #   - there is a tiny chance that our "granular optimism" here will
+    #     yield profit later - if for example we want to implement selectors
+    #     to be "pragmatic" rather than "pure" so that for example we *could*
+    #     find all those classes that subclass a module as expressed by a
+    #     certain const string, like "Xx::Yy". (in fact our selectors should
+    #     be flexible enough to support such a query by "pure" means, but
+    #     that's later.)
 
     # ==
     # ==

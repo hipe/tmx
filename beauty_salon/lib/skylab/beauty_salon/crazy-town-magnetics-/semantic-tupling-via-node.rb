@@ -232,19 +232,34 @@ module Skylab::BeautySalon
     # ==
 
     Symbol_array_via_module_identifier_recursive__ = -> n do
+
       # :#temporary-spot-1
-      :const == n.type || fail
-      a = n.children
-      2 == a.length || fail
-      recu = a[0]
-      _a = if recu
+
+      if :const == n.type
+        a = n.children
+        2 == a.length || fail
+        recu = a[0]
+      end
+
+      res_a = if recu
         Symbol_array_via_module_identifier_recursive__[ recu ]
       else
         []
       end
-      c = a[1]
-      ::Symbol === c || fail
-      _a.push c
+
+      case n.type
+      when :const
+        c = a[1]
+        ::Symbol === c || fail
+        res_a.push c
+      when :cbase
+        # test_support/lib/skylab/test_support.rb:2
+        res_a.push NOTHING_
+      when :self
+        res_a.push :self  # meh
+      else
+        self._COVER_ME___weahhhh___
+      end
     end
 
     # ==

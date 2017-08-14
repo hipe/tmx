@@ -50,8 +50,12 @@
 [#014]       #doc-node the `deliterate` utility
 [#013]       the problem with functions ..
 [#012]       #doc-point "private fold method" defined and explored..
+
 [#011]       #idea - terrible: results of rcov used to eliminate
                branches of unused code from sourcecode, programattically!
+
+       #wish (above, kept as-is for now so we can more easily dig history)
+
 [#010]       sl/test-support/tmpdir is a great subject
              (this has become more generally a #tracking-tag for same.)
              :[#.B] (in [pl])

@@ -1,3 +1,5 @@
+# covers: crazy-town-magnetics-/hooks-via-hooks-definition.rb
+
 require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
@@ -41,12 +43,28 @@ module Skylab::BeautySalon::TestSupport
 
     context '(coverage)' do
 
-      it 'this one file - various small' do
-        _just_make_sure_this_runs '050-various-small.rb'
+      it 'literals and assignment' do
+        _just_make_sure_this_runs '083-literals-and-assignment.rb'
       end
 
-      it 'this one file - begin rescue end' do
-        _just_make_sure_this_runs '100-begin-rescue-end.rb'
+      it 'control flow' do
+        _just_make_sure_this_runs '250-control-flow.rb'
+      end
+
+      it 'begin rescue end' do
+        _just_make_sure_this_runs '417-begin-rescue-end.rb'
+      end
+
+      it 'method definitions and method calls' do
+        _just_make_sure_this_runs '583-method-definitions-and-method-calls.rb'
+      end
+
+      it 'modules and classes' do
+        _just_make_sure_this_runs '750-modules-and-classes.rb'
+      end
+
+      it 'special and edge' do
+        _just_make_sure_this_runs '917-special-and-edge.rb'
       end
     end
 

@@ -10,6 +10,9 @@ module Skylab::TestSupport
 
       def initialize
         o = yield
+
+        @filesystem = ::File
+
         @_listener = o.listener
         @_shared_datapoint_store = o
       end
@@ -38,6 +41,7 @@ module Skylab::TestSupport
         ok = true
         ok &&= __resolve_debug_IO_which_is_for_now_required
         ok &&= __resolve_longest_common_base_path_of_all_test_files
+        ok &&= __SHIM_DIM_MC_NIM
         ok &&= __find_test_directory_in_that_path
         ok &&= __find_offset_of_project_directory_element
         ok &&= __find_gem_path_via_those_things
@@ -68,7 +72,7 @@ module Skylab::TestSupport
       end
 
       def __response
-        paths = remove_instance_variable :@__cached_test_files
+        paths = remove_instance_variable :@_cached_test_files
         Responses_::Datapoint.new -> { Stream_[ paths ] }, :test_file_path_streamer
       end
 
@@ -81,8 +85,14 @@ module Skylab::TestSupport
           rx.match( entry ).post_match.split( DASH_ ).map( & :intern )
         end
 
+        _these = remove_instance_variable :@_THESE
+
         @__caching_filter = CachingFilter___.new(
-          _lemmatics, @_coverage_root_path, & @_listener )
+          _lemmatics,
+          _these,
+          @_coverage_root_path,
+          @_debug_IO,
+          & @_listener )
 
         ACHIEVED_
       end
@@ -175,11 +185,37 @@ module Skylab::TestSupport
 
         _or_these = Common_::Oxford_or[ s_a.map( & :inspect ) ]
 
-        _this = @_longest_common_path.to_string.inspect
+        _this = @_longest_common_path_object.to_string.inspect
 
-        @_listener.call :error, :expression, :test_directory_not_found do |y|
+        @_listener.call :error, :expression, :resource_not_found do |y|
           y << "needed to find but didn't find #{ _or_these } in #{ _this }"
         end
+      end
+
+      def __SHIM_DIM_MC_NIM
+
+        # TOTALLY EXPERIMENT: tired of making things line up? wonderhack:
+
+        # NOTE performance hit..
+
+        rx = /\A[ \t]*#[ \t]*covers:[ \t]*(?<this>.+)/
+        seen = {}
+
+        @_cached_test_files.each do |test_path|
+          io = @filesystem.open test_path
+          begin
+            line = io.gets
+            md = rx.match line
+            md || break
+            this = md[ :this ]
+            seen[ this ] = true
+            redo
+          end while above
+          io.close
+        end
+
+        @_THESE = seen
+        ACHIEVED_
       end
 
       def __resolve_longest_common_base_path_of_all_test_files
@@ -202,7 +238,7 @@ module Skylab::TestSupport
         o = LongestCommonBasePath_via_Stream___.new( _use_this_stream ).execute
         if o
           did_reach_finish || self._SANITY
-          @__cached_test_files = paths_cache
+          @_cached_test_files = paths_cache
           @_longest_common_path_object = o ; true
         else
           __whine_about_no_common_base_path did_reach_finish, paths_cache
@@ -219,7 +255,7 @@ module Skylab::TestSupport
       end
 
       def _directory_exists path
-        ::File.directory? path
+        @filesystem.directory? path
       end
 
       def __resolve_debug_IO_which_is_for_now_required
@@ -262,14 +298,23 @@ module Skylab::TestSupport
         # we use the lemmatics to compare an asset path against a test
         # directory path to decide if the one is a associated with the other.
 
-        def initialize lemmatics, coverage_root_path
+        def initialize lemmatics, these, coverage_root_path, debug_IO, & p
+
+          if these
+            __prepare_decide_compoundly these
+            @_decide_further = :__decide_further_compoundly
+          else
+            @_decide_further = :_decide_further_classically
+          end
 
           @_cache = {}
           @__head_string = ::File.join coverage_root_path, EMPTY_S_
           @__lemmatics_length = lemmatics.length
           @__range = @__head_string.length .. -1
 
+          @_debug_IO = debug_IO
           @lemmatics = lemmatics
+          @_listener = p
         end
 
         def filter path
@@ -283,18 +328,32 @@ module Skylab::TestSupport
         def __decide path
           d = path.index @__head_string
           if d && d.zero?
-            __decide_further path
+            _tail = path[ @__range ]
+            send @_decide_further, _tail
           else
-            @_listener.call :error, :expression, :sanity do |y|
-              y << "STRANGE: #{ path }"
-            end
+            # @_listener.call :error, :expression, :sanity do |y|
+            @_debug_IO.puts "STRANGE: #{ path }"
+            # end
             FILTER_IT_OUT_
           end
         end
 
-        def __decide_further path
+        def __decide_further_compoundly tail
 
-          @_ENTRIES = path[ @__range ].split ::File::SEPARATOR
+          if @_THESE[ tail ]
+            THIS_ONE_STAYS_
+          else
+            _decide_further_classically tail
+          end
+        end
+
+        def __prepare_decide_compoundly these
+          @_THESE = these
+        end
+
+        def _decide_further_classically tail
+
+          @_ENTRIES = tail.split ::File::SEPARATOR
           if @_ENTRIES.length < @__lemmatics_length
             _filter_it_out
           else
@@ -543,5 +602,6 @@ module Skylab::TestSupport
     end
   end
 end
+# #tombstone-C.1: (can be temporary) add a feature that we don't cover
 # #tombstone-B: full rewrite from standalone executable to become quickie plugin
 # :+#tombstone: rspec integration (ancient)

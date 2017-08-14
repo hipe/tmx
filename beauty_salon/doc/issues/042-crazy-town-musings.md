@@ -99,6 +99,15 @@ state when we complete the traversal, but we will most likely add this.)
 
 
 
+## issues :[#here.3]
+
+  2) as referenced in [hu], we encountered an issue with procs needing
+     parens for their argument lists for the parser but not MRI..
+
+
+
+
+
 ## document-meta
 
   - #history-A.1: a blob of document text here started as a commit message.

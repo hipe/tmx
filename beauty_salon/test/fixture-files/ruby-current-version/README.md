@@ -1,12 +1,35 @@
 # readme
 
-## caveat for each of these files
+## provisions & caveats of each of these files
 
 each of these files exists to add coverage to "crazy town" for
 grammatical symbols that need to be covered.
 
-it should be safe to add components to any such file, but don't
-remove components from it.
+it should be safe to add "features" (language feature instances) to
+any such file, but don't remove features from it.
+
+
+
+
+## ordering rationale
+
+a grammar is something of a component system, with larger grammatical
+symbols being made up of smaller grammatical symbols (non-terminals
+being made of up non-terminals and terminals, and so on).
+
+pursuant to our [#ts-001] general ordering rationale, it then follows
+that we try to cover the lower-level components earlier, in front of the
+larger components (some of which in theory would need to use the smaller
+ones in order to effect themselves).
+
+we deviate from this rubric only to put the EDIT
+
+  - literals and assignments
+  - control flow
+  - begin rescue end
+  - method definitions and method calls
+  - modules and classes
+  - special and edge
 
 
 
@@ -31,6 +54,7 @@ this version.
 as it stands, anyway, we use the 'parser' gem's "current version" default
 and it itself is emitting the warning about using `2.4.0`-compliant syntax
 on our `2.4.1` code, which so far hasn't caused any issues. (near #open [#020])
+(EDIT: apparently exactly one small issue in our entire corpus)
 
 
 

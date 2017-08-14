@@ -115,7 +115,8 @@ module Skylab::Human
 
           # rows that have three columns, the default cel to use is the 3rd
 
-        -> lengthable_x, row_sym=:s do
+        # (see #history-A.1 about the next line below
+        -> ( lengthable_x, row_sym=:s ) do
 
           d = Try_convert_to_length__[ lengthable_x ]
           if d
@@ -189,3 +190,4 @@ module Skylab::Human
     end  # EN
   end
 end
+# #history-A.1 (can be temporary) help the ragel parser with parens. see [#bs-042.3.2]

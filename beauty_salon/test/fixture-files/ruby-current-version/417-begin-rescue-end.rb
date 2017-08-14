@@ -43,12 +43,4 @@ ensure
   thing_6
 end
 
-
-# this used to be in "150-control-flow.rb" but was anemic:
-
-x = nil
-case x
-when ::NilClass ;
-when ::PhilClass ; bill_class
-else
-end
+# #history-A.1: renamed in this selfsame commit

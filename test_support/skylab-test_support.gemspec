@@ -32,4 +32,11 @@ Gem::Specification.new do |s|
 
     # at writing the above dependency is first hit when testing [te]
     # we might try to phase it out or use just rack somehow #todo
+
+  s.add_development_dependency 'simplecov', '~> 0.15'
+
+    # (we need bundler)
+    # simplecov-html-0.10.2
+    # docile-1.1.5
+    # simplecov-0.15.0
 end

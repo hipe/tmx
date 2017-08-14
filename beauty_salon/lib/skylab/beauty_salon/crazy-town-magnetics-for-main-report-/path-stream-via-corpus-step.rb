@@ -11,19 +11,28 @@ module Skylab::BeautySalon
     # -
 
       attr_writer(
+        :head_string,
         :filesystem,
         :listener,
       )
 
       def initialize
-        super
-        @corpus_directory = '_CORPUS_'
-        @corpus_order_file = '_CORPUS_ORDER_'
-        @the_file = '.corpus-step.json'
+        super  # hi.
       end
 
       def execute
+        if __validate
+          __when_valid
+        end
+      end
 
+      def __validate
+        @head_string.length.zero? ? fail : true
+      end
+
+      def __when_valid
+
+        __init_names
         __init_state_file_contents
         __init_big_stepper
 
@@ -282,6 +291,15 @@ module Skylab::BeautySalon
         HERE
         io.rewind
         io
+      end
+
+      # --
+
+      def __init_names  # assume nonzero length string
+
+        @corpus_directory = "#{ @head_string }.d"
+        @corpus_order_file = "#{ @head_string }.order.list"
+        @the_file = "#{ @head_string }.step.json"
       end
 
       # --
