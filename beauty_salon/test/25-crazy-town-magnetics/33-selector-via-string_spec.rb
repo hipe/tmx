@@ -6,6 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :crazy_town
 
     it 'magnetic loads' do
       _lower_level_subject_magnetic || fail
@@ -297,87 +298,26 @@ module Skylab::BeautySalon::TestSupport
 
     # --
 
+    def _produces_parse_tree_while_emitting_nothing
+
+      expect_success_against_ remove_instance_variable :@STRING
+    end
+
     def _against s
       @STRING = s
     end
 
-    def _JUST_SHOW_ME_THE_MONEY
+    alias_method :_fails_with_these_normal_lines, :fails_with_these_normal_lines_
 
-      io = debug_IO
-      lines, _x = __expression_lines_and_result
-      io.puts "WEE:"
-      io.puts lines
-      io.puts "GOODBYE. " ; exit 0
-    end
-
-    def _fails_with_these_normal_lines & p
-
-      _lines, _x = __expression_lines_and_result
-
-      _x == false || fail
-
-      expect_these_lines_in_array_ _lines, & p
-    end
-
-    def __expression_lines_and_result
-
-      expecting_no_more_emissions = -> * do
-        fail
-      end
-
-      lines = nil
-
-      p = -> em_p, sym_a do
-        :expression == sym_a.first || fail
-        lines = []
-        _p = if do_debug
-          io = debug_IO
-          -> line { io.puts line ; lines.push line }
-        else
-          -> line { lines.push line }
-        end
-        y = ::Enumerator::Yielder.new( & _p )
-        _y_ = nil.instance_exec y, & em_p
-        y.object_id == _y_.object_id || fail
-        p = expecting_no_more_emissions
-      end
-
-      _x = _lower_level_subject_magnetic.call_by do |o|
-
-        o.listener = -> * sym_a, & em_p do
-          p[ em_p, sym_a ]
-        end
-
-        o.string = remove_instance_variable :@STRING
-      end
-
-      [ lines, _x ]
-    end
-
-    def _produces_parse_tree_while_emitting_nothing
-
-      _parse_tree_via_string_expecting_success remove_instance_variable :@STRING
-    end
-
-    def _parse_tree_via_string_expecting_success string
-
-      x = _lower_level_subject_magnetic.call_by do |o|
-
-        o.listener = -> * do
-          fail
-        end
-
-        o.string = string
-      end
-      x || fail
-      x
-    end
+    alias_method :_parse_tree_via_string_expecting_success, :expect_success_against_
 
     # --
 
     def _lower_level_subject_magnetic
       Home_::CrazyTownMagnetics_::Selector_via_String::ParseTree_via_String
     end
+
+    alias_method :subject_magnetic_, :_lower_level_subject_magnetic
 
     # ==
     # ==

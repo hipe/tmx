@@ -154,7 +154,7 @@ module Skylab::BeautySalon
 
         me = self
         _err_a = remove_instance_variable :@_errors
-        @listener.call :expression, :error, :parse_error do |y|
+        @listener.call :error, :expression, :parse_error do |y|
           me.__do_express_error_messages y, _err_a
         end
         UNABLE_

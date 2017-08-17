@@ -71,8 +71,6 @@ main report.
 main report: work that diff magic on real files perhaps (one temp file)
 (that commit was -1.2.3)
 main report: needs arch for applying changing
-(that commit was -1.2.4)
-main report: parse functions (covered)
 (that was 1.4)
 indented report: uber alles
 THEN: maybe refactor that big mess of methods to use semantic tupling
