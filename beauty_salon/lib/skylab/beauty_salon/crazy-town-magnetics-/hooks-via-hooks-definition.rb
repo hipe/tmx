@@ -298,18 +298,22 @@ module Skylab::BeautySalon
         end
         _node n
       end
+      alias_method :o, :_expect  # not sure which one we want
 
       def _node n
 
-        sym = n.type
+        _m = GRAMMAR_SYMBOLS.fetch n.type
+        _call _m, n
+      end
 
-        p = @hook_via_symbol_symbol[ sym ]
+      def _call m, n
+
+        p = @hook_via_symbol_symbol[ n.type ]
         if p
           p[ n ]  # ignore result - don't let hooks control our flow
         end
 
-        _m = GRAMMAR_SYMBOLS.fetch sym
-        send _m, n
+        send m, * n.children, n
       end
 
       CrazyTownMagnetics_::Hooks_via_HooksDefinition::GRAMMAR_SYMBOLS = {
@@ -336,23 +340,23 @@ module Skylab::BeautySalon
 
         and: :__and,
         and_asgn: :__and_asgn,
-        arg: :_arg,
+        arg: :__arg,
         args: :__args,
-        array: :_array,
-        begin: :_begin,
-        block: :_block,
+        array: :__array,
+        begin: :__begin,
+        block: :__block,
         block_pass: :__block_pass,
         break: :__break,
-        case: :_case,
+        case: :__case,
         casgn: :__const_assign,
         class: :__class,
-        const: :_const,
+        const: :__const,
         def: :__def,
         defined?: :__defined?,
         defs: :__defs,
         dstr: :__dstr,
         dsym: :__dsym,
-        ensure: :__ensure_ALONE,
+        ensure: :__ensure,
         erange: :__erange,
         false: :__false,
         float: :__float,
@@ -361,12 +365,12 @@ module Skylab::BeautySalon
         hash: :__hash,
         irange: :__irange,
         if: :__if,
-        int: :_int,
-        ivar: :_ivar,
+        int: :__int,
+        ivar: :__ivar,
         ivasgn: :__ivasgn,
         kwbegin: :__kwbegin,
-        lvar: :_lvar,
-        lvasgn: :_lvasgn,
+        lvar: :__lvar,
+        lvasgn: :__lvasgn,
         match_with_lvasgn: :__match_with_lvasgn,
         masgn: :__masgn,
         module: :__module,
@@ -378,14 +382,14 @@ module Skylab::BeautySalon
         or_asgn: :__or_asgn,
         redo: :__redo,
         regexp: :__regexp,
-        rescue: :_rescue,
+        rescue: :__rescue,
         return: :__return,
-        self: :_self,
-        send: :_send,
+        self: :__self,
+        send: :__send,
         sclass: :__singleton_class_block,
-        splat: :_splat,
-        str: :_str,
-        super: :_super,
+        splat: :__splat,
+        str: :__str,
+        super: :__super,
         sym: :__sym,
         true: :__true,
         # when:  see #here1
@@ -395,186 +399,163 @@ module Skylab::BeautySalon
         while_post: :__while_post,
         xstr: :__xstr,
         yield: :__yield,
-        zsuper: :_zsuper,
+        zsuper: :__zsuper,
       }
 
       # -- class, module and related
 
-      def __class s
-        a = s.children
-        _length 3, s
-        _expect :const, a[0]
-        _any_expression_of_module a[1]
-        _in_stack_frame s do
-          _any_node a[2]
+      def __class const, exp_mod, body, n
+        o :const, const
+        _any_expression_of_module exp_mod
+        _in_stack_frame n do
+          _any_node body
         end
       end
 
-      def __singleton_class_block n  # this is the block
-        a = n.children
-        _length 2, n  # no
-        _self_probably a[0]
+      def __singleton_class_block sc, body, n
+        _singleton_classable sc
         _in_stack_frame n do
-          _any_node a[1]
+          _any_node body
         end
       end
 
-      def __module n  # #testpoint1.35
-        a = n.children
-        _length 2, n
-        _expect :const, a[0]
+      def __module const, body, n  # #testpoint1.35
+        o :const, const
         _in_stack_frame n do
-          _any_node a[1]  # empty modules have a nil item here (THING 1)
+          _any_node body
         end
       end
 
       # -- method definition and related
 
-      def __defs n  # #testpoint1.37
-        a = n.children
-        _length 4, n
-        _self_probably a[0]
-        _symbol a[1]
-        _expect :args, a[2]
+      def __defs sc, sym, args, body, n  # #testpoint1.37
+        _singleton_classable sc
+        _symbol sym
+        o :args, args
         _in_stack_frame n do
-          _any_node a[3]  # empty method body like #testpoint1.38
+          _any_node body  # empty method body like #testpoint1.38
         end
       end
 
-      def __def n
-        a = n.children
-        _length 3, n
-        _symbol a[0]
-        _expect :args, a[1]
+      def __def sym, args, body, n
+        _symbol sym
+        o :args, args
         _in_stack_frame n do
-          _any_node a[2]  # defs can be blank
+          _any_node body  # defs can be blank
         end
       end
 
-      def __args node
-        a = node.children
-        a.each do |n|
-          __arg n
+      def __args * arg_arg_arg, _
+        arg_arg_arg.each do |n|
+          __arg_mine n
         end
       end
 
-      def __arg n
+      def __arg sym, _
+        _symbol sym
+      end
+
+      def __arg_mine n
         case n.type
-        when :arg      ; _arg n  # an example of #open [#043] ([#043.B])
-        when :blockarg ; __blockarg n  # #testpoint1.40
-        when :procarg0 ; __procarg0 n
-        when :optarg   ; __optarg n  # #testpoint1.41
-        when :restarg  ; __restarg n
-        when :kwoptarg ; __kwoptarg n  # #testpoint1.49
-        when :mlhs     ; __mlhs_this_other_form n  # #testpoint1.32
+        when :arg      ; _node n
+        when :blockarg ; _call :__blockarg, n  # #testpoint1.40
+        when :procarg0 ; _call :__procarg0, n  #
+        when :optarg   ; _call :__optarg, n    # #testpoint1.41
+        when :restarg  ; _call :__restarg, n   #
+        when :kwoptarg ; _call :__kwoptarg, n  # #testpoint1.49
+        when :mlhs     ; _call :__mlhs_this_other_form, n  # #testpoint1.10
         else
           oops
         end
       end
 
-      def __kwoptarg n
-        _same_arg n
+      def __kwoptarg sym, default_value, _
+        _symbol sym
+        _node default_value
       end
 
-      def __optarg n
-        _same_arg n
+      def __optarg sym, default_value, _
+        _symbol sym
+        _node default_value
       end
 
-      def _same_arg n
-        a = n.children
-        _length 2, n
-        _symbol a[0]
-        _node a[1]  # the default value
-      end
-
-      def __restarg n
+      def __restarg * zero_or_one, _
         # neato - has no name if it's .. with no name
-        if n.children.length.nonzero?
-          _common_assertion_two_for_debugging n
-        end
-      end
-
-      def __procarg0 n  # #testpoint1.21
-        a = n.children
-        if 1 == a.length
-          _common_assertion_two_for_debugging n
+        if zero_or_one.length.zero?
+          NOTHING_
         else
-          # #testpoint1.45
-          _each_child a do |n_|
-            :arg == n_.type || oops
-          end
+          _symbol( * zero_or_one )
         end
       end
 
-      def __blockarg n  # #testpoint1.40 (again)
-        _common_assertion_two_for_debugging n
+      def __procarg0 * one_or_more, _
+
+        case 1 <=> one_or_more.length
+
+        when -1  # #testpoint1.45
+          one_or_more.each do |n|
+            o :arg, n
+          end
+
+        when 0  # #testpoint1.21
+          _symbol one_or_more[0]
+
+        when 1 ; oops
+        end
       end
 
-      def _arg n
-        _common_assertion_two_for_debugging n
+      def __blockarg sym, _  # #testpoint1.40 (again)
+        _symbol sym
       end
 
       # -- language features that look like method calls
 
       # ~ boolean operators (pretend they're special methods (functions)))
 
-      def __or n
-        _and_or_or n
+      def __or left_node, right_node, _
+        _node left_node
+        _node right_node
       end
 
-      def __and n  # #testpoint1.36
-        _and_or_or n
+      def __and left_node, right_node, _  # #testpoint1.36
+        _node left_node
+        _node right_node
       end
 
-      def _and_or_or n
-        a = n.children
-        _length 2, n
-        _node a[0]
-        _node a[1]
-      end
-
-      def __defined? n  # #testpoint1.33
-        a = n.children
-        _length 1, n
-        _node a[0]
+      def __defined? expression, _  # #testpoint1.33
+        _node expression
       end
 
       # -- calling methods
 
-      def __lambda n
-        _common_assertion_one_for_debugging n
-      end
-
-      def _send n
-        a = n.children
-        _any_node a[0]
-        _symbol a[1]
-        if 2 < a.length
-          _tapeworm 2, a
+      def __send receiver, sym, * args, _
+        _any_node receiver
+        _symbol sym
+        args.each do |n|
+          _node n
         end
       end
 
-      def _splat n
+      def __splat n_, _
         # this is yet another #foolhardy (see)
-        _length 1, n
-        n_ = n.children[0]
+
         case n_.type
 
-        when :lvar ; _lvar n_  # #testpoint1.19
+        when :lvar  ; _node n_  # #testpoint1.19
 
-        when :ivar ; _ivar n_  # #testpoint1.18
+        when :ivar  ; _node n_  # #testpoint1.18
 
-        when :send ; _node n_  # #testpoint1.17
+        when :send  ; _node n_  # #testpoint1.17
 
         when :block ; _node n_  # #testpoint1.16
 
-        when :const ; _const n_  # #testpoint1.15
+        when :const ; _node n_  # #testpoint1.15
 
-        when :begin ; _begin n_  # #testpoint1.14
+        when :begin ; _node n_  # #testpoint1.14
 
-        when :array ; _array n_  # #testpoint1.50
+        when :array ; _node n_  # #testpoint1.50
 
-        when :case ; _case n_  # #testpoint1.24
+        when :case  ; _node n_  # #testpoint1.24
 
         else
 
@@ -582,211 +563,204 @@ module Skylab::BeautySalon
         end
       end
 
-      def __block_pass s  # for when a proc is passed as a block argument,
-
+      def __block_pass node, _
+        # for when a proc is passed as a block argument,
         # as in:
         #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
         #                    ^^^^^^^^^^^^
 
-        a = s.children
-        _length 1, s
-        _node a[0]
+        _node node
       end
 
       # -- can only happen within a method
 
-      def __yield n  # #testpoint1.42
+      def __yield * zero_or_more, _  # #testpoint1.42
 
-        # see discussion ant `_common_jump`, but see how we differ:
+        # see discussion at #common-jump, but see how we differ:
         # a `yield` is passing arguments to a block or proc, so its arguments
         # can be many unlike these others.
-        # system/lib/skylab/system/diff/core.rb:116
+        #
+        # (as seen in (at writing) system/lib/skylab/system/diff/core.rb:116)
 
-        _node_any_each_child n.children
+        zero_or_more.each do |n_|
+          _node n_
+        end
       end
 
-      def _zsuper n  # `super` #testpoint1.43
-
-        _common_assertion_one_for_debugging n
+      def __zsuper _  # `super` #testpoint1.43
+        NOTHING_
       end
 
-      def _super n  # `super()` #testpoint1.13
+      def __super * zero_or_more, _  # `super()` #testpoint1.13
 
         # the zero or more children is an argument list
 
-        _node_any_each_child n.children
+        zero_or_more.each do |n_|
+          _node n_
+        end
       end
 
-      def __return n  # #testpoint1.31
-        _common_jump n
+      def __return n_=nil, _  # #testpoint1.31
+        _any_node n_  # see #common-jump
       end
 
       # -- control flow
 
-      def _begin n
-        _node_any_each_child n.children
+      def __begin *zero_or_more, _
+        zero_or_more.each do |n_|
+          _node n_
+        end
       end
 
-      def _block n
-        a = n.children
-        _length 3, n
+      def __block block_head, args, body, _
 
-        n_ = a[0]
-        k = n_.type
-        case k
-        when :send ; _send n_  # #testpoint1.20
-        when :lambda ; __lambda n_
-        when :super ; _super n_  # #testpoint1.12
-        when :zsuper ; _zsuper n_  # #testpoint1.12.B
+        __block_head block_head
+
+        o :args, args
+
+        _any_node body  # (blocks can be empty)
+      end
+
+      def __block_head n
+
+        case n.type
+        when :send   ; _node n  # #testpoint1.20
+        when :lambda ; _call :__lambda, n
+        when :super  ; _node n  # #testpoint1.12
+        when :zsuper ; _node n  # #testpoint1.12.B
         else
           interesting
         end
-
-        _expect :args, a[1]
-
-        _any_node a[2]  # (blocks can be empty)
       end
 
-      def __kwbegin n
-        _nothing_or_anything_or_this_switch n do |n_|
+      def __lambda _
+        NOTHING_
+      end
+
+      def __kwbegin * zero_or_one_or_two, _
+
+        case zero_or_one_or_two.length
+        when 0 ; NOTHING_
+        when 1 ;
+          n_ = zero_or_one_or_two[0]
           case n_.type
-          when :rescue ; _rescue n_
-          when :ensure ; _ensure n_
+          when :rescue ; _node n_  # hi.
+          when :ensure ; _node n_
           else
             _node n_
+          end
+        else
+          zero_or_one_or_two.each do |n__|
+            _node n__
           end
         end
       end
 
-      def __ensure_ALONE n
-        # the kind you see at the toplevel of method bodies
-        _ensure n  # #testpoint1.11
-      end
+      def __ensure any_head, any_body, _
 
-      def _ensure n
-        a = n.children
-        _length 2, n
-        n_ = a[0]
-        if n_
-          if :rescue == n_.type
-            _rescue n_  # hi.
+        # (the kind you see at the toplevel of method bodies is #testpoint1.11)
+
+        if any_head
+          if :rescue == any_head.type
+            _node any_head  # hi.
           else
-            _node n_
+            _node any_head
           end
         end
-        _any_node a[1]
+
+        _any_node any_body
       end
 
-      def _rescue n
+      def __rescue begin_body, *res_bodies, mystery_last, _
 
         # you can have multiple rescue clauses
-        # common/lib/skylab/common/autoloader/file-tree-.rb:215
+        # (as seen in (at writing) common/lib/skylab/common/autoloader/file-tree-.rb:215)
 
-        # we still haven't figured out what the last item is for
-
-        a = n.children
-        last = a.length - 1
+        # we still haven't figured out what the last item is for #todo
 
         # (the typical rescue clause is 3 elements long)
 
-        _node a[0]  # a `begin` block or 1 statement
+        _node begin_body  # a `begin` block or 1 statement
 
-        1.upto( last - 1 ) do |d|
-          n_ = a[d]
+        res_bodies.each do |n_|
+
           :resbody == n_.type || oops
-          __resbody n_
+          __resbody( * n_.children )
         end
 
-        n_ = a[last]
-        if n_
+        if mystery_last
           this_is_something  # not sure, a ensure? but didn't we cover that?
         end
       end
 
-      def __resbody n
-        a = n.children
-        _length 3, n
+      def __resbody array, assignable, body
 
         # (the next two can be not there as in (woah crazy old)):
         # task_examples/lib/skylab/task_examples/task-types/symlink.rb:14
         # #todo this doens't line up with the others
 
-        n_ = a[0]
-        if n_
-          :array == n_.type || oops
-          _array n_
+        if array
+          _expect :array, array
         end
 
-        n_ = a[1]
-        if n_
+        if assignable
           # (it's possible to have a rescue clause that doesn't assign to a left value)
-          _assignable n_
+          _assignable assignable
         end
 
-        n_ = a[2]
-        if n_
+        if body
           # (it's possible to have a rescue clause with no "do this then")
+          _node body
+        end
+      end
+
+      def __until_post cond, kwbeg, _  # #testpoint1.29
+        _condition cond
+        _expect_kwbegin kwbeg
+      end
+
+      def __while_post cond, kwbeg, _
+        _condition cond
+        _expect_kwbegin kwbeg
+      end
+
+      def _expect_kwbegin n
+
+        :kwbegin == n.type || fine
+
+        # zero or more below. it's possible to have an empty body in it
+        # (as seen in (at writing) zerk/lib/skylab/zerk/non-interactive-cli/when-help-.rb:37)
+
+        n.children.each do |n_|
           _node n_
         end
       end
 
-      def _nothing_or_anything_or_this_switch n
-        a = n.children
-        case a.length
-        when 0 ; NOTHING_
-        when 1 ; yield a[0]
-        else   ; _node_each_child a
-        end
+      def __until cond, body, _  # #testpoint1.26
+        _condition cond
+        _node body
       end
 
-      def __until_post n  # #testpoint1.29
-        _while_or_until_post n
+      def __while cond, body, _
+        _condition cond
+        _node body
       end
 
-      def __while_post n
-        _while_or_until_post n
+      def __break n_=nil, _
+        _any_node n_  # see #common-jump
       end
 
-      def _while_or_until_post n
-        a = n.children
-        _length 2, n
-        _condition a[0]
-        n_ = a[1]
-        :kwbegin == n_.type || fine
-        # it's possible to have an empty body in it
-        # zerk/lib/skylab/zerk/non-interactive-cli/when-help-.rb:37
-
-        _node_any_each_child n_.children
+      def __next n_=nil, _
+        _any_node n_  # see #common-jump
       end
 
-      def __until n  # #testpoint1.26
-        _while_or_until n
+      def __redo n_=nil, _
+        _any_node n_  # see #common-jump
       end
 
-      def __while n
-        _while_or_until n
-      end
+      begin
 
-      def _while_or_until n
-        a = n.children
-        _length 2, n
-        _condition a[0]
-        _node a[1]
-      end
-
-      def __break n
-        _common_jump n
-      end
-
-      def __next n
-        _common_jump n
-      end
-
-      def __redo n
-        _common_jump n
-      end
-
-      def _common_jump n
+        # :#common-jump:
 
         # we'll describe first a `return` nonterminal then apply it to the
         # others: interestingly (or not) we note that a return statement
@@ -801,20 +775,18 @@ module Skylab::BeautySalon
         #   - `redo`
         #   - `yield` NO (see)
 
+        # when one argument is passed, it's #testpoint1.28
+
         # with a `next`, annoyingingly you can "pass" one expression here
         # but look how we hack with this "feature":
-        # system/lib/skylab/system/io/line-stream-via-page-size.rb:58
+        # (as seen in (at writing) system/lib/skylab/system/io/line-stream-via-page-size.rb:58)
 
-        a = n.children
-        case a.length
-        when 0 ; # nothing, ofc - human/lib/skylab/human/summarization.rb:24
-        when 1 ; _node a[0]  # any expression  #testpoint1.28
-        else   ;
-          probably_never
-        end
+        # the no-args form is seen everywhere, for example:
+        # (as seen in (at writing) human/lib/skylab/human/summarization.rb:24)
+
       end
 
-      def _case n
+      def __case scrutinized, *one_or_more_whens, any_else_node, _
 
         # we do some "by hand" parsing of these because of the relatively
         # particular structure of `case` (switch) expressions when compared
@@ -846,40 +818,36 @@ module Skylab::BeautySalon
         # but note some of these contextualities aren't implemented lexically
         # but rather at runtime
 
-        a = n.children
-        d = a.length
+        _node scrutinized
 
-        # scrutinized, when, [ when, [..]] else
-        2 < d || interesting
+        one_or_more_whens.length.zero? && oops
 
-        _node a[0]  # scrutinized
-
-        _each_child_from_to 1, a.length - 2, a do |n_|
+        one_or_more_whens.each do |n_|
 
           :when == n_.type || interesting  # :#here1
           __when n_
         end
 
-        _any_node a[-1]
+        _any_node any_else_node
       end
 
       def __when n
         a = n.children
-        last = a.length - 1
-        0 < last || interesting
-        0.upto( last - 1 ) do |d|
+        len = a.length
+        1 < len || interesting
+        0.upto( len - 2 ) do |d|
           _node a[d]  # if the scrutnized value is `===` this..
         end
-        _any_node a[last]  # do this (maybe do nothing)
+        _any_node a.last  # do this (maybe do nothing)
       end
 
-      def __if n
-        a = n.children
-        _length 3, n
-        _condition a[0]
-        _any_node a[1]  # if true do this
-        # NOTE an `unless` expression gets turned into `if true, no-op else ..`
-        _any_node a[2]  # else do this
+      def __if condition, if_trueish_do_this, else_do_this, _
+
+        # (an `unless` expression gets turned into `if true, no-op else ..`)
+
+        _condition condition
+        _any_node if_trueish_do_this
+        _any_node else_do_this
       end
 
       def _condition n
@@ -889,64 +857,56 @@ module Skylab::BeautySalon
 
       # -- assignment
 
-      def __match_with_lvasgn n  # #testpoint1.48
-        a = n.children
-        _length 2, n
-        _node a[0]
-        _node a[1]
+      def __match_with_lvasgn left_node, right_node, _  # #testpoint1.48
+        _node left_node
+        _node right_node
       end
 
-      def __const_assign n
-        a = n.children
-        _length 3, n
-        _any_expression_of_module a[0]
-        _symbol a[1]
-        _node a[2]
+      def __const_assign any_const, sym, rhs=nil, _
+
+        if any_const
+          __expression_of_module any_const  # fixture file: literals and assigment
+        else
+          NOTHING_  # our first fixture file
+        end
+
+        _symbol sym
+
+        _any_node rhs
       end
 
-      def __masgn n
-        a = n.children
-        _length 2, n
-        n_ = a[0]
-        :mlhs == n_.type || oops
-        __mlhs_this_one_form n_
-        _node a[1]
+      def __masgn mlhs, right_node, _
+        :mlhs == mlhs.type || oops
+        __mlhs_this_one_form mlhs
+        _node right_node
       end
 
-      def __mlhs_this_other_form n  # #testpoint1.10
-        _each_child n.children do |n_|
-          :arg == n_.type || oops
-          _arg n_
+      def __mlhs_this_other_form * one_or_more, _
+        one_or_more.each do |n_|
+          _expect :arg, n_
         end
       end
 
       def __mlhs_this_one_form n
-        _each_child n.children do |n_|
+        n.children.each do |n_|
           __assignable_in_mlhs n_
         end
       end
 
-      def __op_asgn n
-        a = n.children
-        _length 3, n
-        _assignable a[0]
-        _symbol a[1]  # :+
-        _node a[2]
+      def __op_asgn assignable, sym, rhs, _
+        _assignable assignable
+        _symbol sym  # :+
+        _node rhs
       end
 
-      def __or_asgn n
-        _boolean_asgn n
+      def __or_asgn assignable, rhs, _
+        _assignable assignable
+        _node rhs
       end
 
-      def __and_asgn n  # #testpoint1.25
-        _boolean_asgn n
-      end
-
-      def _boolean_asgn n
-        a = n.children
-        _length 2, n
-        _assignable a[0]
-        _node a[1]
+      def __and_asgn assignable, rhs, _  # #testpoint1.25
+        _assignable assignable
+        _node rhs
       end
 
       def __assignable_in_mlhs n
@@ -954,20 +914,16 @@ module Skylab::BeautySalon
         # (compare this to the immediately following method)
 
         case n.type
-        when :send
+        when :send ; _node n  # #testpoint1.9
           # a send that ends up thru sugar calling `foo=`
 
-          _send n  # #testpoint1.9
-
-        when :splat
+        when :splat ; _node n  # #testpoint1.8
           # you can splat parts of the list
 
-          _splat n  # #testpoint1.8
-
-        else
+        else  # #testpoint1.34
           # plain old lvars
 
-          _asgn n  # testpoint1.34
+          _asgn n
         end
       end
 
@@ -976,7 +932,7 @@ module Skylab::BeautySalon
         # (compare this to the immediately preceding method)
 
         # what are the things that can be the left side of a `||=` or a `+=` or the several others?
-        # lvars, ivars, gvars, but also a "send" will presumably gets
+        # lvars, ivars, gvars, but also a "send" will presumably get
         # sugarized:
         #
         #   o.foo ||= :x
@@ -986,8 +942,7 @@ module Skylab::BeautySalon
         # parse tree.
 
         case n.type
-        when :send
-          _send n  # #testpoint1.22
+        when :send ; _node n  # #testpoint1.22
         else
           _asgn n
         end
@@ -996,52 +951,46 @@ module Skylab::BeautySalon
       def _asgn n
         case n.type
         when :gvasgn, :ivasgn, :lvasgn
-          _common_assertion_two_for_debugging n
-        when :casgn
-          _const n  # #testpoint1.6
+          _symbol( * n.children )
+
+        when :casgn  # #testpoint1.6
+          _node n
         else
           interesting
         end
       end
 
-      def __gvasgn n
-        _assign n
+      def __gvasgn sym, rhs, _
+        _symbol sym
+        _node rhs
       end
 
-      def __ivasgn n
-        _assign n
+      def __ivasgn sym, rhs, _
+        _symbol sym
+        _node rhs
       end
 
-      def _assign n
-        a = n.children
-        _length 2, n
-        _symbol a[0]
-        _node a[1]
+      def __lvasgn sym, rhs, _
+        _symbol sym
+        _node rhs
       end
 
-      def _lvasgn n
-        a = n.children
-        _length 2, n
-        _symbol a[0]
-        _node a[1]
+      # ~
+
+      def __lvar sym, _
+        _symbol sym
       end
 
-      def _lvar n
-        a = n.children
-        _length 1, n
-        _symbol a[0]
-      end
-
-      def __gvar n  # #testpoint1.44
+      def __gvar sym, _  # #testpoint1.44
 
         # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
         # (see also `nth_ref` which looks superficially like a global)
 
-        _common_assertion_two_for_debugging n
+        _symbol sym
       end
 
-      def _ivar s
-        _common_assertion_two_for_debugging s
+      def __ivar sym, _
+        _symbol sym
       end
 
       # -- special section on expression of modules
@@ -1059,150 +1008,129 @@ module Skylab::BeautySalon
         # partially duplicated at #temporary-spot-1. this one is now ahead. #todo
 
         case n.type
-        when :const ; _const n  # can recurse back to here
-        when :cbase ; __cbase n  # `< ::BasicObject`
-        when :self  ; _self n  # #testpoint1.5
-        when :lvar  ; _lvar n  # #testpoint1.27
-        when :ivar  ; _ivar n  # #testpoint1.30
-        when :send  ; _send n  # #testpoint1.39
-        when :begin ; _begin n   # #testpoint1.4
+        when :const ; _node n  # can recurse back to here
+        when :cbase ; _call :__cbase, n  # `< ::BasicObject`
+        when :self  ; _node n  # #testpoint1.5
+        when :lvar  ; _node n  # #testpoint1.27
+        when :ivar  ; _node n  # #testpoint1.30
+        when :send  ; _node n  # #testpoint1.39
+        when :begin ; _node n  # #testpoint1.4
         else
           anything_is_possible_here_but_lets_make_a_note_of_it
         end
       end
 
-      def _const n
-        a = n.children
-        _length 2, n
-        _any_expression_of_module a[0]
-        _symbol a[1]
+      def __const any_mod_exp, sym, _
+        _any_expression_of_module any_mod_exp
+        _symbol sym
       end
 
-      def __cbase n
-        _common_assertion_one_for_debugging n
+      def __cbase _
+        NOTHING_
       end
 
       # -- magic variables (globals) and similar
 
-      def __nth_ref n  # `$1` #testpoint1.3
-        _int n  # ick/meh
+      def __nth_ref d, _  # `$1` #testpoint1.3
+        _integer d
       end
 
       # -- literals
 
-      def __hash n
-        _any_each_child n.children do |n_|
-          __expect_pair n_
+      def __hash *zero_or_more, _
+        zero_or_more.each do |n_|
+          :pair == n_.type || oops
+          __pair( * n_.children )
         end
       end
 
-      def __expect_pair n
-        a = n.children
-        :pair == n.type || oops
-        _length 2, n
-        _node a[0]
-        _node a[1]
+      def __pair left_node, right_node
+        _node left_node
+        _node right_node
       end
 
-      def _array n
-        _node_any_each_child n.children
+      def __array * zero_or_more, _
+        zero_or_more.each do |n_|
+          _node n_
+        end
       end
 
-      def __regexp n
-        a = n.children
-        len = a.length
-        last = len - 1
+      def __regexp * one_or_more, _
+
+        len = one_or_more.length
         if 1 < len
-          _each_child_from_to 0, last - 1, a do |n_|
-            _node n_  # like double-quoted strings, these can be any expressions
+          0.upto( len - 2 ) do |d|
+            # like double-quoted strings, these can be any expressions
+            _node one_or_more[ d ]
           end
         end
-        :regopt == a[last].type || oops
+
+        :regopt == one_or_more.last.type || oops
       end
 
-      def __dsym n
-        _double_quoted_string_and_similar n
+      def __dsym * zero_or_more, _
+        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
       end
 
-      def __xstr n # #testpoint1.2
-        _double_quoted_string_and_similar n
+      def __xstr * zero_or_more, _  # #testpoint1.2
+        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
       end
 
-      def __dstr n
+      def __dstr * zero_or_more, _
 
         # a double-quoted string will parse into `str` unless (it seems)
         # it has interpolated parts. presumably they must alternate between
         # string and expression, but can start with either, we don't bother
         # assertint which.
 
-        _double_quoted_string_and_similar n
+        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
       end
 
-      def _double_quoted_string_and_similar n
+      # :#double-quoted-string-like:
+      # for all of these, it's possible to have an empty symbol, backticks, etc
+      # (as seen in (at writing) basic/lib/skylab/basic/module/creator.rb:193)
 
-        # (it's possible to have an empty symbol (etc), as basic/lib/skylab/basic/module/creator.rb:193
-
-        _node_any_each_child n.children
+      def __str s, _
+        _string s
       end
 
-      def _str s
-        a = s.children
-        _length 1, s
-        _string a[0]
+      def __sym sym, _
+        _symbol sym
       end
 
-      def __sym n
-        a = n.children
-        _length 1, n
-        _symbol a[0]
+      def __irange begin_node, end_node, _
+        _node begin_node
+        _node end_node
       end
 
-      def __irange n
-        _range n
+      def __erange begin_node, end_node, _
+        _node begin_node
+        _node end_node
       end
 
-      def __erange n
-        _range n
+      def __float f, _
+        ::Float === f || interesting
       end
 
-      def _range n
-        a = n.children
-        _length 2, n
-        _node a[0]
-        _node a[1]
+      def __int d, _
+        _integer d
       end
 
-      def __float n
-        a = n.children
-        _length 1, n
-        ::Float === a[0] || interesting
+      def _integer d
+        ::Integer === d || interesting
       end
 
-      def _int n
-        a = n.children
-        _length 1, n
-        ::Integer === a[0] || interesting
-      end
-
-      def _self_probably n
+      def _singleton_classable n
 
         # this is another #foolhardy case and its implementation must
         # change - it's just an excercise to understand pragmatics
 
         case n.type
 
-        when :self  # #testpoint1.38
-          _self n  # `def self.xx`
-
-        when :lvar  # #testpoint1.46
-          _lvar n  # `def o.xx`
-
-        when :const  # #testpoint1.47
-          _const n  # class << Foo::Bar
-
-        when :begin  # #testpoint1.1
-          _begin n
-
+        when :self   ; _node n   # `def self.xx`        #testpoint1.38
+        when :lvar   ; _node n   # `def o.xx`           #testpoint1.46
+        when :const  ; _node n   # `class << Foo::Bar`  #testpoint1.47
+        when :begin  ; _node n   #                      #testpoint1.1
         else
           interesting
         end
@@ -1233,80 +1161,23 @@ module Skylab::BeautySalon
 
       # -- "keywords" (and those literals)
 
-      def _self s
-        _common_assertion_one_for_debugging s
+      def __self _
+        NOTHING_
       end
 
-      def __false n
-        _common_assertion_one_for_debugging n
+      def __false _
+        NOTHING_
       end
 
-      def __true n
-        _common_assertion_one_for_debugging n
+      def __true _
+        NOTHING_
       end
 
-      def __nil s
-        _common_assertion_one_for_debugging s
-      end
-
-      # -- support
-
-      def _node_any_each_child a
-        if a.length.nonzero?
-          _tapeworm 0, a
-        end
-      end
-
-      def _node_each_child a
-        _tapeworm 0, a
-      end
-
-      def _any_each_child a, & p
-        if a.length.nonzero?
-          _each_child_from_to 0, a.length - 1, a, & p
-        end
-      end
-
-      def _each_child a, & p
-        _each_child_from_to 0, a.length - 1, a, & p
-      end
-
-      def _tapeworm d, a
-        _each_child_from d, a do |node|
-          _node node
-        end
-      end
-
-      def _each_child_from d, a, & p
-        _each_child_from_to d, a.length - 1, a, & p
-      end
-
-      def _each_child_from_to d, last, a
-        begin
-          yield a.fetch d
-          last == d && break
-          d += 1
-          redo
-        end while above
+      def __nil _
+        NOTHING_
       end
 
       # -- asserters & simple clients of
-
-      def _common_assertion_two_for_debugging n
-        a = n.children
-        _length 1, n
-        _symbol a[0]
-      end
-
-      def _common_assertion_one_for_debugging n
-        _length 0, n
-      end
-
-      def _length d, n
-        if d != n.children.length
-          interesting
-        end
-      end
 
       def _string x
         ::String === x || interesting
@@ -1494,6 +1365,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.3: converted hard-coded hook methods to "expand" nodes via method argument signature
 # #history-A.2 (can be temporary): remove last traces of 'ruby_parser'
 # #history-A.1: begin refactor from 'ruby_parser' to 'parser'
 # #born

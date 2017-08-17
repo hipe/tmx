@@ -38,8 +38,8 @@ module Skylab::BeautySalon::TestSupport
       it 'every feature is of a set of expected features' do
         features_seen = _tuple[1]
         # (the below list generated with the use of the trick at #doc1.1)
-        # `arg` was removed from the below list, "broke" at #open [#040.B] :#history-A.2
         %i(
+          arg
           args
           begin
           block_pass
@@ -176,5 +176,4 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
-# #history-A.2 (can be temporary) when a small bug opened
 # #history-A.1: begin refactoring from 'ruby_parser' to 'parser'

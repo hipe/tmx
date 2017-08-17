@@ -22,12 +22,10 @@ end
 
 
 
-# list expansion in proc args (`mlhs`) #testpoint1.32
+# list expansion in proc args (`mlhs`) #testpoint1.10
 # (as seen in (at writing) basic/lib/skylab/basic/method.rb:146)
 
 # DOES THIS NOT ALSO COVER? (#todo)
-# `mlhs` this other form - multi assignment as list assignment block args #testpoint1.10
-# (as seen in (at writing) basic/lib/skylab/basic/method.rb:146)
 
 my_method do |q, (z, _)|
   my_other_method q, z

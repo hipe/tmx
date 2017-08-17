@@ -1,8 +1,3 @@
-[#043] #open #crazy-town when you descend into a grammar symbol "by hand"
-             you lose the ability to have a hook into it. use `_expect`
-             instead
-             :[#here.B]: tracks one occurrence of it (two sides of the issue)
-
 [#042]       #crazy-town "musing" (currently empty, with history)
 
 [#041]       #crazy-town thing.dot
