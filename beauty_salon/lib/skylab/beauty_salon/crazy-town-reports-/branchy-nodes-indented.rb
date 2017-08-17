@@ -9,6 +9,7 @@ module Skylab::BeautySalon
       def self.describe_into_under y, expag
 
         y << 'this one is a bit of a "contact exercise" to work with stacks.'
+        y << '(we also use it for coverage)'
         y << 'summarize every file in two ways:'
         y << nil
         y << '  1) pretending that it\'s python, use indentation only'
@@ -20,7 +21,7 @@ module Skylab::BeautySalon
 
       attr_writer(
         :file_path_upstream_resources,
-        :on_error_once,
+        :named_listeners,
         :listener,
       )
 
@@ -43,7 +44,9 @@ module Skylab::BeautySalon
               y << "#{ indent_s * wnode.depth }#{ wnode.to_description }"
             end
 
-            o.on_error_once = @on_error_once
+            o.named_listeners = @named_listeners
+
+            o.listener = @listener
           end
 
           oo.on_each_file_path do |path, o|

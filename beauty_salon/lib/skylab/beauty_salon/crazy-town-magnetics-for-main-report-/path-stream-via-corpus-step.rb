@@ -45,9 +45,10 @@ module Skylab::BeautySalon
 
         _st = __flush_stream
 
-        o = Result___.new
+        o = Result___.new ; begin
           o.path_stream = _st
           o.save_corpus_step = method :__SAVE
+        end
         o.freeze
       end
 
@@ -66,7 +67,7 @@ module Skylab::BeautySalon
             p = lo_mode_read
             p[]
           else
-            $stderr.puts "(reached the end - maybe close that one file)"
+            __yay_made_it_to_the_end
             NOTHING_
           end
         end
@@ -251,6 +252,18 @@ module Skylab::BeautySalon
         rescue ::Errno::ENOENT
           __write_file
         end
+      end
+
+      def __yay_made_it_to_the_end
+        io = remove_instance_variable :@_writable_IO
+        path = io.path
+        # --
+        @listener.call :info, :expression do |y|
+          y << "yay! made it to the end. removing: #{ path }"
+        end
+        io.close
+        _d = @filesystem.unlink path
+        1 == _d || self._COVER_ME__unexpected_exitstatus_from_unlink__
       end
 
       def __SAVE

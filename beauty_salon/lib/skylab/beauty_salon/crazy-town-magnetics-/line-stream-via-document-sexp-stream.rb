@@ -150,7 +150,7 @@ module Skylab::BeautySalon
 
         _plan_sym = remove_instance_variable :@__plan_symbol
         _plan = @__hooks.plans.fetch _plan_sym
-        _plan.execute_plan_against__ remove_instance_variable :@__potential_sexp
+        _plan.execute_plan_against remove_instance_variable :@__potential_sexp
       end
     end
     # ==

@@ -9,7 +9,7 @@ module Skylab::BeautySalon
         :file_path_upstream,
         :filesystem,
         :listener,
-        :on_error_once,
+        :named_listeners,
         :replacement_function_string,
         :report_name,
       )
@@ -234,7 +234,7 @@ module Skylab::BeautySalon
 
       NON_REQUIRED___ = {
         :file_path_upstream_resources= => :__flush_file_path_upstream_resources,
-        :on_error_once= => :on_error_once,
+        :named_listeners= => :named_listeners,
         :listener= => :listener,
       }
 
@@ -257,7 +257,7 @@ module Skylab::BeautySalon
 
       attr_reader(
         :listener,
-        :on_error_once,
+        :named_listeners,
       )
 
       # --

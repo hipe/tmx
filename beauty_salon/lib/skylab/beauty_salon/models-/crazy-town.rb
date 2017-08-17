@@ -130,7 +130,7 @@ module Skylab::BeautySalon
 
           o.replacement_function_string = remove_instance_variable :@replacement_function
 
-          o.on_error_once = @_on_error_once
+          o.named_listeners = @_named_listeners
 
           o.filesystem = @_filesystem
 
@@ -162,7 +162,7 @@ module Skylab::BeautySalon
 
       def __resolve_file_path_upstream batch_mode, files_file, files
 
-        @_on_error_once = nil  # only one guy uses this
+        @_named_listeners = nil  # only one guy uses this
 
         sym_a = []
 
@@ -242,12 +242,26 @@ module Skylab::BeautySalon
           o.listener = @listener
         end
 
-        if sct
-          @_file_path_upstream = sct.path_stream
-          @_on_error_once = sct.save_corpus_step
-          ACHIEVED_
-        end
+        sct and __receive_these sct
       end
+
+      def __receive_these sct
+
+        @_file_path_upstream = sct.path_stream
+
+        o = NamedListeners___.new ; begin
+
+          o.on_error_once = sct.save_corpus_step
+        end
+        o.freeze
+
+        @_named_listeners = o.freeze
+        ACHIEVED_
+      end
+
+      NamedListeners___ = ::Struct.new(
+        :on_error_once,
+      )
 
       def __resolve_file_path_upstream_via_files_file files_file
         if DASH_ == files_file

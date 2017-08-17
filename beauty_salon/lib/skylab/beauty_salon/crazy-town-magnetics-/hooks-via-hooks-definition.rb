@@ -77,7 +77,7 @@ module Skylab::BeautySalon
         @plans[ k ] && fail
         @plans[ k ] = :__locked__
 
-        _plan = DocumentHooksPlan___.new do |o|
+        _plan = DocumentHooksPlan_via_Definition___.call_by do |o|
           yield o  # hi.
         end
 
@@ -103,14 +103,12 @@ module Skylab::BeautySalon
 
     # ==
 
-    class DocumentHooksPlan___
+    class DocumentHooksPlan_via_Definition___ < Common_::MagneticBySimpleModel
 
       def initialize
 
-        # (prototype.)
-
-        @_has_branchy_node_hook = false
         @__mutex_for_on_each_branchy_node = nil
+        @branchy_node_hook = nil
 
         @_strict_hook_box = Common_::Box.new
 
@@ -120,29 +118,16 @@ module Skylab::BeautySalon
         @__mutex_for_after_each_file = nil
         @after_each_file = MONADIC_EMPTINESS_
 
-        @on_error_once = nil
+        @listener = nil  # some reports know they don't need this
+        @named_listeners = nil
 
         yield self
-
-        bx = remove_instance_variable :@_strict_hook_box
-        if bx.length.zero?
-          @_has_name_based_hooks = false
-        else
-          @_has_name_based_hooks = true
-          @_hook_via_symbol_symbol = bx.h_
-        end
-
-        freeze
       end
-
-      private :dup
 
       def on_each_branchy_node__ & p
 
         remove_instance_variable :@__mutex_for_on_each_branchy_node
-        @_hook_via_symbol_symbol ||= MONADIC_EMPTINESS_  # ick/meh. overwrite OK
-        @_branchy_node_hook = p
-        @_has_branchy_node_hook = true
+        @branchy_node_hook = p
       end
 
       def on_this_one_kind_of_sexp__ k, & p
@@ -172,70 +157,133 @@ module Skylab::BeautySalon
       end
 
       attr_writer(
-        :on_error_once,
+        :listener,
+        :named_listeners,
       )
 
-      # -- read
+      def execute
 
-      def execute_plan_against__ potential_sexp
+        bx = remove_instance_variable :@_strict_hook_box
+        bn_p = @branchy_node_hook
 
-        @before_each_file[ potential_sexp ]
-
-        if @_has_name_based_hooks || @_has_branchy_node_hook
-
-          dup.__execute_against potential_sexp
+        if bx.length.zero? && ! bn_p
+          SimpleGuy___.new(
+            @before_each_file,
+            @after_each_file,
+          )
+        else
+          ComplexGuy___.new(
+            bx.h_,
+            bn_p,
+            @named_listeners,
+            @before_each_file,
+            @after_each_file,
+            @listener,
+          )
         end
+      end
+    end
 
-        @after_each_file[ potential_sexp ] ; nil
+    # ==
+
+    class SimpleGuy___
+
+      def initialize h, h_
+        @before_each_file = h
+        @after_each_file = h_
       end
 
-      def __execute_against potential_AST
-        __in_hacky_exception_capturing_session do
-          __do_execute_against potential_AST
+      def execute_plan_against potential_AST
+        @before_each_file[ potential_AST ]
+        @after_each_file[ potential_AST ]
+        NIL
+      end
+    end
+
+    # ==
+
+    class ComplexGuy___
+
+      def initialize hvss_h, bn_p, named_listeners, bef_h, aef_h, p
+
+        if ! hvss_h
+          hvss_h = MONADIC_EMPTINESS_
         end
+
+        @after_each_file = aef_h
+        @before_each_file = bef_h
+        @branchy_node_hook = bn_p
+        @hook_via_symbol_symbol = hvss_h
+        @listener = p
+        @named_listeners = named_listeners
       end
 
-      def __do_execute_against potential_AST
+      def execute_plan_against potential_AST
 
-        @CURRENT_FILE = potential_AST.path
+        @before_each_file[ potential_AST ]
 
-        $stderr.puts "FILE: #{ @CURRENT_FILE }"
+        StackSession_via_Potential_AST___.new(
+          potential_AST,
+          @branchy_node_hook,
+          @hook_via_symbol_symbol,
+          @listener,
+        ).execute
 
-        wast = potential_AST.sexp
-        # ..
-
-        @_push_stack_frame = :__push_stack_frame_initially
-
-        # ignoring comments stuff
-
-        __stack_session wast.path do
-          ast = wast.ast_
-          if ast
-            _node ast
-          else
-            # (sketch: but we have no listener #todo)
-            # @listener.call( :info, :expression, :empty_file ) { |y| y << "(file has no code)" }
-          end
+        ok = true
+      ensure
+        if ! ok
+          __when_errored
         end
-
+        @after_each_file[ potential_AST ]
         NIL
       end
 
-      def __in_hacky_exception_capturing_session
-        p = remove_instance_variable :@on_error_once
-        if p
-          begin
-            x = yield
-            ok = true
-          ensure
-            if ! ok
-              p[]
-            end
-          end
-          x
-        else
-          yield
+      def __when_errored
+        sct = @named_listeners
+        if sct
+          p = sct.on_error_once
         end
+        if p
+          p[]
+        end
+        NIL
+      end
+    end
+
+    # ==
+
+    class StackSession_via_Potential_AST___
+
+      def initialize o, bn_p, h, p
+
+        @_push_stack_frame = :__push_stack_frame_initially
+
+        @potential_AST = o
+        @branchy_node_hook = bn_p
+        @hook_via_symbol_symbol = h
+        @listener = p
+      end
+
+      def execute
+        __stack_session do
+          __via_wrapped_AST
+        end
+        NIL
+      end
+
+      def __via_wrapped_AST
+
+        wast = @potential_AST.sexp
+
+        # ignoring comments stuff
+
+        ast = wast.ast_
+        if ast
+          _node ast
+        else
+          @listener.call( :info, :expression, :empty_file ) { |y| y << "(file has no code)" }
+        end
+        NIL
       end
 
       def _any_node x
@@ -255,7 +303,7 @@ module Skylab::BeautySalon
 
         sym = n.type
 
-        p = @_hook_via_symbol_symbol[ sym ]
+        p = @hook_via_symbol_symbol[ sym ]
         if p
           p[ n ]  # ignore result - don't let hooks control our flow
         end
@@ -873,10 +921,10 @@ module Skylab::BeautySalon
 
         _node a[0]  # scrutinized
 
-        _each_child_from_to 1, a.length - 2, a do |n|
+        _each_child_from_to 1, a.length - 2, a do |n_|
 
-          :when == n.type || interesting  # :#here1
-          __when n
+          :when == n_.type || interesting  # :#here1
+          __when n_
         end
 
         _any_node a[-1]
@@ -1422,10 +1470,11 @@ module Skylab::BeautySalon
       #     will have a frame depth of 1, and so on.
       # --
 
-      def __stack_session path
+      def __stack_session
         @_current_stack_depth = 0
-        if @_has_branchy_node_hook
-          @_branchy_node_hook[ WrapWithDepthAtLevelZero___.new( path ) ]
+        bn_p = @branchy_node_hook
+        if bn_p
+          bn_p[ WrapWithDepthAtLevelZero___.new( _path ) ]
           @_push_stack_frame = :__push_stack_frame_when_listener
         else
           @_push_stack_frame = :__push_stack_frame_when_no_listener
@@ -1434,6 +1483,10 @@ module Skylab::BeautySalon
         yield
         @_current_stack_depth.zero? || fail
         remove_instance_variable :@_current_stack_depth ; nil
+      end
+
+      def _path
+        @potential_AST.path
       end
 
       def _in_stack_frame n
@@ -1452,7 +1505,7 @@ module Skylab::BeautySalon
       def __push_stack_frame_when_listener n
         @_current_stack_depth += 1
         _tng = Tupling_for__[ n ]
-        @_branchy_node_hook[ WrapWithDepthNormally__.new( @_current_stack_depth, _tng ) ]
+        @branchy_node_hook[ WrapWithDepthNormally__.new( @_current_stack_depth, _tng ) ]
         NIL
       end
 

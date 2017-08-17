@@ -303,10 +303,11 @@ module Skylab::BeautySalon::TestSupport
 
     def _JUST_SHOW_ME_THE_MONEY
 
+      io = debug_IO
       lines, _x = __expression_lines_and_result
-      $stderr.puts "WEE:"
-      $stderr.puts lines
-      $stderr.puts "GOODBYE. " ; exit 0
+      io.puts "WEE:"
+      io.puts lines
+      io.puts "GOODBYE. " ; exit 0
     end
 
     def _fails_with_these_normal_lines & p

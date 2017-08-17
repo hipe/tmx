@@ -79,5 +79,3 @@ THEN: maybe refactor that big mess of methods to use semantic tupling (methods w
 THEN: refactor to better viz, i.e of calls in tests
 THEN: prune unused methods (COMMIT)
 THEN: cover tests corpus (temporary commit)
-THEN: refactor to pass listeners around in a struct instead of many ivars (better for dup-and-mutate) (temporary commit)
-THEN: @on_successful_finish listener (temporary commit)
