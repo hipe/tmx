@@ -128,6 +128,19 @@ end
 
 
 
+## `super` with yes args and a block #testpoint1.12.B
+
+def my_method_4_B x
+
+  super x do |q|
+    q << 1
+  end
+end
+
+
+
+
+
 # `yield` #testpoint1.42
 # (as seen in (at writing) common/lib/skylab/common/stream/magnetics/each-pairable-via-stream.rb:25)
 

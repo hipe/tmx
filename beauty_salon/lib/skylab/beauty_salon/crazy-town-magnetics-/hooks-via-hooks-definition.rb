@@ -339,43 +339,32 @@ module Skylab::BeautySalon
         arg: :_arg,
         args: :__args,
         array: :_array,
-        attrasgn: :__attrasng,
         begin: :_begin,
         block: :_block,
         block_pass: :__block_pass,
         break: :__break,
-        call: :__call,
         case: :_case,
         casgn: :__const_assign,
-        cdecl: :__const_declaration,
         class: :__class,
-        colon2: :__colon2,
-        colon3: :__colon3,
         const: :_const,
         def: :__def,
         defined?: :__defined?,
-        defn: :__defn,
         defs: :__defs,
         dstr: :__dstr,
         dsym: :__dsym,
         ensure: :__ensure_ALONE,
         erange: :__erange,
-        evstr: :__evstr,
         false: :__false,
         float: :__float,
         gvar: :__gvar,
         gvasgn: :__gvasgn,
         hash: :__hash,
-        iasgn: :__iasgn,
         irange: :__irange,
         if: :__if,
         int: :_int,
-        iter: :__iter,
         ivar: :_ivar,
         ivasgn: :__ivasgn,
         kwbegin: :__kwbegin,
-        lasgn: :__lasgn,
-        lit: :__lit,
         lvar: :_lvar,
         lvasgn: :_lvasgn,
         match_with_lvasgn: :__match_with_lvasgn,
@@ -406,7 +395,7 @@ module Skylab::BeautySalon
         while_post: :__while_post,
         xstr: :__xstr,
         yield: :__yield,
-        zsuper: :__zsuper,
+        zsuper: :_zsuper,
       }
 
       # -- class, module and related
@@ -436,34 +425,6 @@ module Skylab::BeautySalon
         _expect :const, a[0]
         _in_stack_frame n do
           _any_node a[1]  # empty modules have a nil item here (THING 1)
-        end
-      end
-
-      def __iter s
-        Hi__[]
-
-        d = s.length
-        4 == d || no_problem
-
-        # [1]
-        call = s.fetch 1
-          :call == call.fetch(0) || interesting
-          # call.fetch(1) - the receiver
-          # call.fetch(2) - the method name (or :lambda for `->`)
-
-        # [2]
-        args = s.fetch 2
-          # ignoring each of the args
-          if 0 != args
-            :args == args.fetch(0) || interesting
-          end
-
-        # [3]
-        wat = s.fetch 3
-        if :block == wat.fetch(0)
-          _expression wat
-        else
-          _expression wat  # a proc with one statement
         end
       end
 
@@ -553,17 +514,6 @@ module Skylab::BeautySalon
         _common_assertion_two_for_debugging n
       end
 
-      def __defn s
-        Hi__[]
-
-        4 <= s.length || interesting
-        # s.fetch 1  # name thing - ignored for now
-
-        s.fetch( 2 ).first == :args || interesting  # ignored for now
-
-        _tapeworm 3, s
-      end
-
       # -- language features that look like method calls
 
       # ~ boolean operators (pretend they're special methods (functions)))
@@ -622,6 +572,8 @@ module Skylab::BeautySalon
 
         when :begin ; _begin n_  # #testpoint1.14
 
+        when :array ; _array n_  # #testpoint1.50
+
         when :case ; _case n_  # #testpoint1.24
 
         else
@@ -653,7 +605,7 @@ module Skylab::BeautySalon
         _node_any_each_child n.children
       end
 
-      def __zsuper n  # `super` #testpoint1.43
+      def _zsuper n  # `super` #testpoint1.43
 
         _common_assertion_one_for_debugging n
       end
@@ -685,6 +637,7 @@ module Skylab::BeautySalon
         when :send ; _send n_  # #testpoint1.20
         when :lambda ; __lambda n_
         when :super ; _super n_  # #testpoint1.12
+        when :zsuper ; _zsuper n_  # #testpoint1.12.B
         else
           interesting
         end
@@ -692,26 +645,6 @@ module Skylab::BeautySalon
         _expect :args, a[1]
 
         _any_node a[2]  # (blocks can be empty)
-      end
-
-      # (will go away)
-      def __call s
-        Hi__[]
-
-        # (NOTE if you're passing some crazy `iter` *as* an argument
-        # then we'll miss important things here..) we know we do
-        # this in some places, like old state machine specifications..
-
-        # s.fetch 1  # receiver - ignored for now
-        # s.fetch 2  # method name symbol - USE SOON
-
-        d = s.length
-        2 < d || never
-        if 3 == d
-          NOTHING_
-        else
-          _tapeworm 3, s
-        end
       end
 
       def __kwbegin n
@@ -971,13 +904,6 @@ module Skylab::BeautySalon
         _node a[2]
       end
 
-      def __const_declaration s
-        Hi__[]
-        3 == s.length || interesting
-        # s.fetch 1  # const - ignored for now
-        _expression s.fetch 2
-      end
-
       def __masgn n
         a = n.children
         _length 2, n
@@ -1093,13 +1019,6 @@ module Skylab::BeautySalon
         _node a[1]
       end
 
-      def __iasgn s
-        Hi__[]
-        3 == s.length || interesting
-        ::Symbol === s[1] || oops
-        _expression s.fetch 2
-      end
-
       def _lvasgn n
         a = n.children
         _length 2, n
@@ -1107,46 +1026,10 @@ module Skylab::BeautySalon
         _node a[1]
       end
 
-      def __lasgn s
-        Hi__[]
-        3 == s.length || interesting
-        ::Symbol === s[1] || oops
-        _expression s.fetch 2
-      end
-
-      def __attrasng s
-        Hi__[]
-        4 == s.length || interesting
-        :lvar == s[1].fetch(0) || interesting
-        ::Symbol === s[2] || oops  # method name (e.g. `max_height=`)
-        _expression s.fetch 3
-      end
-
       def _lvar n
         a = n.children
         _length 1, n
         _symbol a[0]
-      end
-
-      def __colon2 s
-
-        Hi__[]
-        # (NOTE we *think* this is for our fully qualified const names: `::Foo::Bar`)
-
-        3 == s.length || interesting
-
-        ::Symbol === s.fetch(2) || interesting
-
-        this = s.fetch 1
-        sym = this.fetch(0)
-        :colon2 == sym || :colon3 == sym or interesting
-
-        _expression this
-      end
-
-      def __colon3 s
-        Hi__[]
-        _common_assertion_two_for_debugging s
       end
 
       def __gvar n  # #testpoint1.44
@@ -1262,12 +1145,6 @@ module Skylab::BeautySalon
         _node_any_each_child n.children
       end
 
-      def __evstr s  # (presumably "evaluate as string")
-        Hi__[]
-        2 == s.length || interesting
-        _expression s.fetch 1
-      end
-
       def _str s
         a = s.children
         _length 1, s
@@ -1278,17 +1155,6 @@ module Skylab::BeautySalon
         a = n.children
         _length 1, n
         _symbol a[0]
-      end
-
-      def __lit s
-        Hi__[]
-        2 == s.length || interesting
-        case s.fetch(1)
-        when ::Symbol  # is symbol
-        when ::Integer  # is integer
-        # .. flot probably ..
-        else ; interesting
-        end
       end
 
       def __irange n
@@ -1567,14 +1433,6 @@ module Skylab::BeautySalon
 
     # ==
 
-    Hi__ = -> do
-      _loc = caller_locations(1, 1)[0]
-      $stderr.puts "ride this: #{ _loc.base_label }"
-      exit 0
-    end
-
-    # ==
-
     MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
 
     # ==
@@ -1636,5 +1494,6 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.2 (can be temporary): remove last traces of 'ruby_parser'
 # #history-A.1: begin refactor from 'ruby_parser' to 'parser'
 # #born

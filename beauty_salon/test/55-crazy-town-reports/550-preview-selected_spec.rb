@@ -16,7 +16,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'offers suggestions' do
         _hi = _lines.last
-        _hi == %q(did you mean 'class', 'sclass', 'case', 'hash' or 'lasgn'?) || fail
+        _hi == %q(did you mean 'class', 'sclass', 'case' or 'hash'?) || fail
       end
 
       shared_subject :_lines do
@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'says no' do
         _hi = _lines.first
-        _hi == %q(currently we don't yet have metadata for grammar symbol 'colon2'.) || fail
+        _hi == %q(currently we don't yet have metadata for grammar symbol 'nth_ref'.) || fail
       end
 
       it 'offers suggestions' do
@@ -40,7 +40,7 @@ module Skylab::BeautySalon::TestSupport
 
       shared_subject :_lines do
         _lines_of_parse_failure_by_call_subject_magnetic_by do |o|
-          o.code_selector_string = %q{colon2(aa=='bb')}
+          o.code_selector_string = %q{nth_ref(aa=='bb')}
         end
       end
     end

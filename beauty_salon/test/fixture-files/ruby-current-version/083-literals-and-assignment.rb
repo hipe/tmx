@@ -222,6 +222,14 @@ end ).my_third_method( & my_proc )
 
 
 
+# splat a literal array #testpoint1.50
+# (as seen in (at writing) human/test/270-NLP/010-EN/281-contextualization/150-against-subject-association-without-channel_spec.rb )
+
+my_method( * [ 1, 2, 3] )
+
+
+
+
 # splat a case statement (`case`) #testpoint1.24
 # (as seen in (at writing) common/lib/skylab/common/box/algorithms--.rb:39)
 

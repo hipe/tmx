@@ -77,5 +77,3 @@ main report: parse functions (covered)
 indented report: uber alles
 THEN: maybe refactor that big mess of methods to use semantic tupling (methods with arguments for some not all)
 THEN: refactor to better viz, i.e of calls in tests
-THEN: prune unused methods (COMMIT)
-THEN: cover tests corpus (temporary commit)
