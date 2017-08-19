@@ -35,6 +35,8 @@ module Skylab
 
       o :spec_rb do
 
+        # (see also [#dt-005.3])
+
         "#{ test_file_basename_suffix_stem }#{ _EXTNAME }".freeze
       end
 

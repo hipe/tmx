@@ -2,11 +2,13 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugins::Cover  # :[#002]
+    class Plugins::Cover  # see [#002]. (full algorithm)
 
       # ironically or not this is not covered as well as it could be
       # (at writing only the "find longest common base path" magnet is),
       # (but at least it is working again for the first time in years)
+
+      # but see [#doc] for extensive explanation of behavior and API.
 
       def initialize
         o = yield
@@ -53,7 +55,7 @@ module Skylab::TestSupport
       def __MONEY
 
         x = __response
-        filter = remove_instance_variable :@__caching_filter
+        filter = remove_instance_variable :@_caching_filter
         coverage_root_path = @_coverage_root_path
 
         require 'simplecov'
@@ -65,7 +67,7 @@ module Skylab::TestSupport
             filter.filter source_file.filename
           end
 
-          root coverage_root_path
+          root coverage_root_path  # :#here2
         end
 
         x
@@ -78,23 +80,81 @@ module Skylab::TestSupport
 
       def __resolve_caching_filter
 
-        rx = /\A(?:\d+-)?/
+        rx = /\A(?:\d+-)?/  # :#here1
 
-        _r = @_offset_of_project_directory_element + 1 .. -1
-        _lemmatics = @_argument_path_object.elements[ _r ].map do |entry|
+        d = @_offset_of_project_directory_element_for_argument_path_MIGHT_BE_NEGATIVE
+
+        # `d` points to the imagined offset of the project component in the
+        # argument path. why this is typcally `-1` is explained here:
+        #
+        # what is typical (but not mandatory) is that you are in the root
+        # directory of your project (so, the toplevel directory).
+        #
+        # what is furthermore typical is that you will have supplied a path
+        # or paths on the command line that are relative and downwards-only
+        # from where you stand (so plain old paths "like/this").
+        #
+        # (if one or a few "." or ".." is in your path, this is both
+        # undefined and terrifying to imagine.)
+        #
+        # as such, if you are at the root of your project and all these
+        # other "typical" provisions hold, the project component of your
+        # path corresponds to the directory you are in, and that directory
+        # is not reflected directly in your argument path but is instead
+        # sort of floating off to the left side from it.
+        #
+        # this is why `d` is `-1` is because it's the imaginary slot to
+        # the left of offset `0` (the first component in your path).
+        # it is CRUCIAL that we don't accidentally use a negative integer
+        # as a real index into an array, because etc.
+
+        d += 1  # after this line, `d` points to `test`
+
+        d += 1  # after this line, `d` points to the first element after `test`
+
+        0 <= d or self._COVER_ME__youre_in_too_deep__
+
+        _r = d .. -1
+
+        @_lemmatics = @_argument_path_object.elements[ _r ].map do |entry|
           rx.match( entry ).post_match.split( DASH_ ).map( & :intern )
         end
 
-        _these = remove_instance_variable :@_THESE
+        if @_lemmatics.length.zero?
+          if @_these_hash.length.zero?
+            _when_all_pass
+          else
+            __when_all_pass_and_some_specified
+          end
+        else
+          _init_caching_filter_normally
+        end
+      end
 
-        @__caching_filter = CachingFilter___.new(
-          _lemmatics,
-          _these,
+      def __when_all_pass_and_some_specified
+        d = @_these_hash.length
+        _info do |y|
+          y << "(all files pass given the arguments, #{
+            }regardless of #{ d } magic lines.)"
+        end
+        _when_all_pass
+      end
+
+      def _when_all_pass
+        _info() { "(all files pass given these arguments.)" }
+        _init_caching_filter_normally
+      end
+
+      def _init_caching_filter_normally
+
+        @_caching_filter = CachingFilter___.new(
+          remove_instance_variable( :@_lemmatics ),
+          remove_instance_variable( :@_these_hash ),
           @_coverage_root_path,
           @_debug_IO,
           & @_listener )
 
-        ACHIEVED_
+        ACHIEVED_  # convenience
       end
 
       def __infer_root_path_via_gem_path
@@ -122,8 +182,8 @@ module Skylab::TestSupport
 
         # this is where it gets weird - we're assuming our hacks ..
 
-        _guy = @_project_path_object.elements.fetch(
-          @_offset_of_project_directory_element )
+        _guy = @_absolute_project_path_object.elements.fetch(
+          @_offset_of_project_directory_element_for_absolute_path )
 
         _glob = ::File.join Gem.dir, 'gems', "*#{ _guy }*"
 
@@ -138,30 +198,51 @@ module Skylab::TestSupport
 
       def __find_offset_of_project_directory_element
 
-        d = remove_instance_variable :@__index_of_test_directory
-        path_o = remove_instance_variable :@_longest_common_path_object
-        proj_path_o = path_o.new_via_elements path_o.elements[ 0, d ]
+        itd_d = remove_instance_variable :@__index_of_test_directory
+
+        arg_path_o = remove_instance_variable :@_longest_common_path_object
+
+        _shorter_elements = arg_path_o.elements[ 0, itd_d ]
+
+        # (the above is zero length if we are inside the project (which is typical))
+
+        proj_path_o = arg_path_o.new_via_elements _shorter_elements
 
         proj_path = proj_path_o.to_string
-        if ! proj_path_o.is_absolute
-          abs_proj_path = ::File.expand_path proj_path
+
+        if proj_path_o.is_absolute
+
+          abs_proj_path_o = proj_path_o ; proj_path_o = nil
+
+          abs_proj_path = proj_path ; proj_path = nil
+
+          abs_d = itd_d - 1
+
+          arg_d = abs_d
+        else
+
+          abs_proj_path = ::File.expand_path proj_path ; proj_path = nil
+
           abs_proj_path_o = proj_path_o.class.via_path abs_proj_path
-          _this_much_longer =
-            abs_proj_path_o.elements.length - proj_path_o.elements.length
-          d += _this_much_longer
-          proj_path = abs_proj_path ; proj_path_o = abs_proj_path_o
+
+          _this_much_longer = abs_proj_path_o.elements.length -
+            proj_path_o.elements.length ; proj_path_o = nil
+
+          arg_d = itd_d - 1
+
+          abs_d = arg_d + _this_much_longer
         end
 
-        if _directory_exists proj_path
-          if d.zero?
-            self._COVER_ME__cannot__
-          else
-            @_argument_path_object = path_o
-            @_offset_of_project_directory_element = d - 1
-            @_project_path_object = proj_path_o ; ACHIEVED_
-          end
+        if ! _directory_exists abs_proj_path
+          self._COVER_ME__project_directory_not_found
+        elsif 1 > abs_d
+          self._COVER_ME__cannot__
         else
-          self._COVER_ME__directory_not_found__
+          @_argument_path_object = arg_path_o
+          @_offset_of_project_directory_element_for_argument_path_MIGHT_BE_NEGATIVE = arg_d
+          @_offset_of_project_directory_element_for_absolute_path = abs_d
+          @_absolute_project_path_object = abs_proj_path_o
+          ACHIEVED_
         end
       end
 
@@ -195,28 +276,95 @@ module Skylab::TestSupport
       def __SHIM_DIM_MC_NIM
 
         # TOTALLY EXPERIMENT: tired of making things line up? wonderhack:
+        #
+        # you can now broaden the set of files that will be matched for
+        # coverage by specifying them explicitly at the top of your test
+        # file with contiguous, first-line-anchored lines like this:
+        #
+        #     # covers: foo-/bar-baz--/wazooza.rb
+        #     # covers: some/other/file.rb
 
-        # NOTE performance hit..
-
-        rx = /\A[ \t]*#[ \t]*covers:[ \t]*(?<this>.+)/
         seen = {}
 
-        @_cached_test_files.each do |test_path|
-          io = @filesystem.open test_path
-          begin
-            line = io.gets
-            md = rx.match line
-            md || break
-            this = md[ :this ]
-            seen[ this ] = true
-            redo
-          end while above
-          io.close
-        end
+        count_of_magic_lines = 0
+        count_of_participating_files = 0
+        count_of_total_files = @_cached_test_files.length
 
-        @_THESE = seen
+        path_st = Stream_[ @_cached_test_files ]
+
+        #   - a non-participating file does not break the indexing.
+        #     (with long lists of files this could cause noticeable latency.)
+        #
+        #   - for a file to be recognized as participating, its magic lines
+        #     must be head-anchored and contigous (i.e line 1, 2 & 3 not
+        #     line 5, 7 & 9.)
+
+        begin
+          path = path_st.gets
+          path || break
+          md_st = __matchdata_stream_via_path path
+          md = md_st.call
+          md || redo
+          count_of_participating_files += 1
+          begin
+            count_of_magic_lines += 1
+            seen[ md[ :this ] ] = true
+            md = md_st.call
+          end while md
+          redo
+        end while above
+
+        __express_these_statistics(
+          count_of_magic_lines,
+          count_of_participating_files,
+          count_of_total_files,
+        )
+
+        @_these_hash = seen
         ACHIEVED_
       end
+
+      def __express_these_statistics(
+        count_of_magic_lines,
+        count_of_participating_files,
+        count_of_total_files
+      )
+
+        if count_of_participating_files.zero?
+          _info(){ "(searched #{ count_of_total_files } #{
+            }file(s) for magic lines, found none.)" }
+        else
+          _info do |y|
+            if count_of_participating_files == count_of_total_files
+              if 1 == count_of_total_files
+                y << "(we see you, #{ count_of_magic_lines } magic line(s))"
+              else
+                y << "(saw #{ count_of_magic_lines } magic line(s) #{
+                  }in all #{ count_of_total_files } files.)"
+              end
+            else
+              y << "(saw magic lines in #{ count_of_participating_files } #{
+                }of #{ count_of_total_files } files.)"
+            end
+          end
+        end
+        NIL
+      end
+
+      def __matchdata_stream_via_path test_path
+        io = @filesystem.open test_path
+        -> do
+          line = io.gets  # we're gonna assume every test file has at least one line
+          md = /\A[ \t]*#[ \t]*covers:[ \t]*(?<this>.+)/.match line
+          if md
+            md
+          else
+            io.close ; NOTHING_  # hope the user discards this proc now
+          end
+        end
+      end
+
+      # --
 
       def __resolve_longest_common_base_path_of_all_test_files
 
@@ -267,54 +415,65 @@ module Skylab::TestSupport
         if x ; instance_variable_set ivar, x ; ACHIEVED_ ; else x end
       end
 
+      # --
+
+      def _info & msg_p
+        if 1 == msg_p.arity
+          @_listener.call :info, :expression, & msg_p
+        else
+          @_listener.call :info, :expression do |y|
+            y << calculate( & msg_p )
+          end
+        end
+        NIL
+      end
+
       # ==
 
       class CachingFilter___
 
-        # (for whatever reason, simplecov emits the same paths multiple times)
+        def initialize lemmatics, explicits, coverage_root_path, debug_IO, & p
 
-        # for a longest common base path of
-        #
-        #     test/80-frobits/90-fiz-buzulator
-        #
-        # (note the leading numbers in directory names,
-        # which we often use for [#ts-001] regression name conventions),
-        #
-        # and a gem path of
-        #
-        #     /usr/me/.gem/my-great_gem-3.0.0/lib/my/great_gem
-        #
-        # this implies there is a directory something like
-        #
-        #     /usr/me/.gem/my-great_gem-3.0.0/lib/my/great_gem/frobits-/fiz-buzulator--
-        #
-        # (note the trailing dashes in some directory names, used pursuant
-        # to [#bs-029] module naming conventions),
-        #
-        # the "lemmatics" of this path of interest is:
-        #
-        #     [ [:frobits], [:fiz, buzulator] ]
-        #
-        # we use the lemmatics to compare an asset path against a test
-        # directory path to decide if the one is a associated with the other.
+          if lemmatics.length.zero?
+            # if you have no lemmatics it is IFF there was no longest common
+            # base path of your test files. this means cover every file that
+            # is loaded that is under your #here2 `root`. it is then a waste
+            # to check explicits. this was expressed already.
 
-        def initialize lemmatics, these, coverage_root_path, debug_IO, & p
+            @_decide_contained_path = :__pass_all_paths
 
-          if these
-            __prepare_decide_compoundly these
-            @_decide_further = :__decide_further_compoundly
+          elsif explicits.length.zero?
+
+            # you have only lemmatics
+
+            _receive_lemmatics lemmatics
+            @_decide_contained_path = :__decide_using_lemmatics_only
+
           else
-            @_decide_further = :_decide_further_classically
+            # you have both. we'll check the one before the other because
+            # the one (a hash lookup of a path) is faster than the other.
+
+            _receive_lemmatics lemmatics
+            _receive_explicits explicits
+            @_decide_contained_path = :__decide_using_both
           end
 
           @_cache = {}
           @__head_string = ::File.join coverage_root_path, EMPTY_S_
-          @__lemmatics_length = lemmatics.length
           @__range = @__head_string.length .. -1
 
           @_debug_IO = debug_IO
           @lemmatics = lemmatics
           @_listener = p
+        end
+
+        def _receive_lemmatics a
+          @__lemmatics_length = a.length
+          @_lemmatics = a ; nil
+        end
+
+        def _receive_explicits x
+          @__explicits = x ; nil
         end
 
         def filter path
@@ -328,8 +487,7 @@ module Skylab::TestSupport
         def __decide path
           d = path.index @__head_string
           if d && d.zero?
-            _tail = path[ @__range ]
-            send @_decide_further, _tail
+            send @_decide_contained_path, path
           else
             # @_listener.call :error, :expression, :sanity do |y|
             @_debug_IO.puts "STRANGE: #{ path }"
@@ -338,59 +496,79 @@ module Skylab::TestSupport
           end
         end
 
-        def __decide_further_compoundly tail
-
-          if @_THESE[ tail ]
-            THIS_ONE_STAYS_
+        def __decide_using_both path
+          tail = _localize_path path
+          if _match_against_explicits tail
+            _filter_it_in
+          elsif _match_against_lemmatics tail
+            _filter_it_in
           else
-            _decide_further_classically tail
+            _filter_it_out
           end
         end
 
-        def __prepare_decide_compoundly these
-          @_THESE = these
+        def __decide_using_lemmatics_only path
+          _tail = _localize_path path
+          _yes = _match_against_lemmatics _tail
+          _yes ? _filter_it_in : _filter_it_out
         end
 
-        def _decide_further_classically tail
+        def __decide_using_explicits_only path
+          _tail = _localize_path path
+          _yes = _match_against_explicits _tail
+          _yes ? _filter_it_in : _filter_it_out
+        end
+
+        def _localize_path path
+          path[ @__range ]
+        end
+
+        def __pass_all_paths _path
+          THIS_ONE_STAYS_
+        end
+
+        def _match_against_lemmatics tail
 
           @_ENTRIES = tail.split ::File::SEPARATOR
           if @_ENTRIES.length < @__lemmatics_length
-            _filter_it_out
+            DOES_NOT_MATCH_
           else
-            __decide_even_further
+            __work_via_entries
           end
         end
 
-        def __decide_even_further
+        def __work_via_entries
 
-          yes = FILTER_IT_OUT_
           target_scn = Common_::Scanner.via_array @lemmatics
           actual_st = __actual_lemmatic_stream_via_entries
 
           begin
+
             actual_lemmatic = actual_st.gets
-            actual_lemmatic || break  # any time you run out of actuals here, no match
+
+            if ! actual_lemmatic
+              # any time you run out of actuals here, no match
+              does_or_does_not_match = DOES_NOT_MATCH_
+              break
+            end
 
             target_lemmatic = target_scn.gets_one
 
             if target_lemmatic != actual_lemmatic
+              does_or_does_not_match = DOES_NOT_MATCH_
               break
             end
 
             if target_scn.no_unparsed_exists
               # (if you reach the end of the target chain, it's a match)
-              yes = THIS_ONE_STAYS_
+              does_or_does_not_match = DOES_MATCH_
               break
             end
 
             redo
           end while above
 
-          if FILTER_IT_OUT_ == yes
-            _filter_it_out
-          else
-            __filter_it_in
-          end
+          does_or_does_not_match
         end
 
         def __actual_lemmatic_stream_via_entries
@@ -419,12 +597,16 @@ module Skylab::TestSupport
           end
         end
 
+        def _match_against_explicits tail
+          @__explicits[ tail ]
+        end
+
         def _filter_it_out
           @_debug_IO.puts "filtered out: #{ _pretty_entries }"
           FILTER_IT_OUT_
         end
 
-        def __filter_it_in
+        def _filter_it_in
           @_debug_IO.puts "filtered in:  #{ _pretty_entries }"
           THIS_ONE_STAYS_
         end
@@ -435,6 +617,8 @@ module Skylab::TestSupport
 
         # --
 
+        DOES_MATCH_ = true
+        DOES_NOT_MATCH_ = false
         FILTER_IT_OUT_ = true
         THIS_ONE_STAYS_ = false
 
@@ -461,34 +645,43 @@ module Skylab::TestSupport
         end
 
         def execute
+
+          @_seen_more_than_zero = false
+          @_seen_more_than_one = false
+
+          keep_going = KEEP_GOING_
           st = remove_instance_variable :@__stream
-          path = st.call
-          if path
 
-            begin
-              keep_going = send @_see_path, path
-              keep_going || break
-              path = st.call
-            end while path
+          begin
+            path = st.call
+            path || break
+            keep_going = send @_see_path, path
+            keep_going || break
+            redo
+          end while above
 
-            if keep_going
-              __finish
-            end
-          else
-            NOTHING_
+          if @_seen_more_than_zero && keep_going
+            __finish
           end
         end
 
         def __see_first_path path
-          @__first_path = path
+          @_first_path = path
           @_longest_common_elements = path.elements.dup
           @_longest_common_elements_length = @_longest_common_elements.length
           @_is_absolute = path.is_absolute
-          @_see_path = :__see_nonfirst_path
+          @_see_path = :__see_second_path
+          @_seen_more_than_zero = true
           KEEP_GOING_
         end
 
-        def __see_nonfirst_path path
+        def __see_second_path path
+          @_seen_more_than_one = true
+          @_see_path = :__see_third_or_later_path
+          send @_see_path, path
+        end
+
+        def __see_third_or_later_path path
           if @_is_absolute == path.is_absolute
             __when_same_category path
           else
@@ -530,8 +723,68 @@ module Skylab::TestSupport
         end
 
         def __finish
-          remove_instance_variable( :@__first_path ).new_via_elements(
-            remove_instance_variable( :@_longest_common_elements ) )
+
+          if @_seen_more_than_one
+            _thing_via_elements _release_longest_common_elements
+          else
+            __when_seen_exactly_one
+          end
+        end
+
+        def __when_seen_exactly_one
+
+          # consider the characteristics of a list of multiple paths:
+          #
+          # for one, assume that every path in the list is a unique path in
+          # that list, making the list also a set. (we'll leave as undefined
+          # what happens if the list has duplicates.)
+          #
+          # for two, assume that every path in the set is only ever of a
+          # file, and not of a directory. this means that no path in the set
+          # is ever a "base path" of any other path in the set.
+          #
+          # now we can't prove it, but we hope it holds as empirically
+          # evident that for such sets, the longest common base path will
+          # never be equal to one of the paths (i.e it will always be
+          # unequal to each of the paths).
+          #
+          # and conversely (and more obviously), whenever your set is of
+          # size one, the longest common base path *is* *always* equal to
+          # that selfsame path.
+
+          # now a corollary of the above two axioms: the only way we end up
+          # with a "basename" from a test file *in* the longest common base
+          # path is when our list is size one (assuming name conventions).
+          # furthermore our LCBP *always* has this characteristic in these
+          # cases.
+
+          _basename_tail = Home_.spec_rb
+
+          _rx = /\A
+            (?<stemmish>
+              (?:\d+-)?
+              [a-z].*
+            )
+            #{ ::Regexp.escape _basename_tail }
+          #\z/x
+          # (we could do the removal of the any leading digits here,
+          #  but it should happen #here1)
+
+          s_a = _release_longest_common_elements
+          md = _rx.match s_a.last
+          md || self._COVER_ME__xx__
+
+          s_a[ -1 ] = md[ :stemmish ]  # ick mutate original
+
+          _thing_via_elements s_a.freeze
+        end
+
+        def _thing_via_elements s_a
+          remove_instance_variable( :@_first_path ).new_via_elements s_a
+        end
+
+        def _release_longest_common_elements
+          remove_instance_variable :@_longest_common_elements
         end
       end
 

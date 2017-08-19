@@ -199,12 +199,15 @@
 
 [#004]       quickie ..
 
-[#002] #open cover and finish "pending" feature to be feature complete
+
+[#002]       our two coverage plugins. see this document.
+
+       #open [#here.G] sunset slowie coverage plugin OR:
+             cover and finish "pending" feature to be feature complete
 
              ( #was: coverage is waiting for [#tmx-011] upgrade rspec )
              (and presumably some other things.._
 
-             coverage is a no fun zone ..
              ( #was: #done Constants too )
 
 [#001]       test-suite architecture and conventions..

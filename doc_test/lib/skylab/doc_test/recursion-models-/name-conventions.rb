@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class RecursionModels_::NameConventions  # exactly #note-2 in [#005] (see)
+  class RecursionModels_::NameConventions  # exactly :[#005.3] (see)
 
     class << self
 

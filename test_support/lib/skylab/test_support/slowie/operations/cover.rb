@@ -29,7 +29,7 @@ module Skylab::TestSupport
       def __express_furloughed
 
         @_emit.call :error, :expression, :furloughed do |y|
-          y << "\"cover\" is furloughed, probably won't be on for a while (is [#002])"
+          y << "\"cover\" is furloughed, probably won't be on for a while (is [#002.G])"
         end
 
         UNABLE_
@@ -229,7 +229,7 @@ module Skylab::TestSupport
         end  # if false
 
       if false
-      # ~ as plugin (we have to re-write looking like a plugin because [#002])
+      # ~ as plugin (we have to re-write looking like a plugin because [#002.G])
 
       class << self
         alias_method :via_plugin_identifier_and_resources, :new
@@ -245,7 +245,7 @@ module Skylab::TestSupport
       def each_capability
       end
 
-      # ~ lots of these are duplicated because [#002]
+      # ~ lots of these are duplicated because [#002.G]
 
       ACHIEVED_ = true
       DO_NOT_WANT__ = true  # sic

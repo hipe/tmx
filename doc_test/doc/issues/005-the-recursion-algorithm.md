@@ -18,7 +18,7 @@ assumptions out of the subject code. whether this comes from for example
 configuration files or environment variables or user interface elements
 is outside of this scope.
 
-(this "name conventions" participant is discussed further at #note-2 below.)
+(this "name conventions" participant is discussed further at [#here.3] below.)
 
 
 
@@ -36,11 +36,14 @@ is outside of this scope.
 
 ## participants in the pipeline
 
-### name conventions :#note-2
+### name conventions :[#here.3]
 
 this is a repurposing of a same-named node in [ts]. it has diverged
 from there (outside and in) so much that probably they are permananty
 separate now (but maybe the subject could fold back into there one day).
+
+(also there is new documentation at [#ts-002.4] that describes pretty
+much the same thing.)
 
 the subject's purpose is to encapsulate those functions and elements
 that relate to "filename patterns" and "stemming" in the following chain

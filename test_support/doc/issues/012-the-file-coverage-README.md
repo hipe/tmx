@@ -11,6 +11,8 @@ picture, and hold the remaining tree up agains the "hub" node, or parent of
 the test tree. it makes more sense if you use the "-tct" option to see the
 two trees that go into making the final tree.
 
+(EDIT: [#002] is in the process of explaining this better.)
+
 
 
 

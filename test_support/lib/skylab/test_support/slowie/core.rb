@@ -215,11 +215,11 @@ module Skylab::TestSupport
 
     # --
 
-      if false  # reference for #open [#002] coverage
+      if false  # reference for #open [#002.G] slowie coverage
 
       # ~ outside the main flow: coverage specifics
 
-      def __load_and_start_coverage_plugin_if_necessary  # [#002] ..
+      def __load_and_start_coverage_plugin_if_necessary  # [#002.G] ..
 
         d = @argv.index COVERAGE_SWITCH___
         if d
