@@ -1,4 +1,6 @@
-# covers: crazy-town-magnetics-/hooks-via-hooks-definition.rb
+# covers: crazy-town-magnetics-/node-processor-via-methods.rb
+
+# (the above is :#depencency1.1)
 
 require_relative '../test-support'
 

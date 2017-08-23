@@ -18,31 +18,44 @@ module Skylab::BeautySalon
 
         @_dir = Home_::CrazyTownReports_.dir_path
 
-        s = remove_instance_variable :@report_name
-
-        if s
-
-          md = %r(\A
-            (?<list>list)
-            |
-            (?: help (?: : (?<help_arg> .+ ) )? )
-          \z)x.match s
-
-          if md
-            arg = md[ :help_arg ]
-            if arg
-              __when_help_with_arg arg
-            elsif md[ :list ]
-              _when_list
-            else
-              __when_help_with_no_arg
-            end
+        if __special_operation_was_requested
+          if __help_was_requested_with_argument
+            __when_help_with_argument
+          elsif __help_list_was_requested
+            _when_list
           else
-            _when_item _symbol_via_slug s
+            __when_help_with_no_arg
           end
+        elsif @report_name
+          _when_item _symbol_via_slug @report_name
         else
           _when_item :main
         end
+      end
+
+      def __maybe_parse_report_name
+        if @report_name
+          __parse_report_name
+        end
+      end
+
+      def __special_operation_was_requested
+
+        md = %r(\A
+          (?<list>list)
+          |
+          (?: help (?: : (?<help_arg> .+ ) )? )
+        \z)x.match @report_name
+
+        _store :@_matchdata, md
+      end
+
+      def __help_was_requested_with_argument
+        _store :@__help_argument_string, @_matchdata[ :help_arg ]
+      end
+
+      def __help_list_was_requested
+        @_matchdata[ :list ]
       end
 
       def __when_help_with_no_arg
@@ -66,9 +79,12 @@ module Skylab::BeautySalon
         end
       end
 
-      def __when_help_with_arg arg
+      def __when_help_with_argument
 
-        lines = _write_description_lines_into [], arg
+        _arg = remove_instance_variable :@__help_argument_string
+
+        lines = _write_description_lines_into [], _arg
+
         if lines
           Stream_[ lines ]
         end
@@ -229,7 +245,7 @@ module Skylab::BeautySalon
 
       REQUIRED___ = {
         :code_selector= => :__build_code_selector,
-        :replacement_function= => :__build_replacement_function,  # ..
+        :replacement_function= => :__build_replacement_function,
       }
 
       NON_REQUIRED___ = {
@@ -248,7 +264,7 @@ module Skylab::BeautySalon
       end
 
       def __flush_file_path_upstream_resources
-        CrazyTownMagnetics_::DocumentSexpStream_via_FilePathStream.call_by do |o|
+        CrazyTownMagnetics_::DocumentNodeStream_via_FilePathStream.call_by do |o|
           o.file_path_upstream = remove_instance_variable :@file_path_upstream
           o.filesystem = @filesystem
           o.listener = @listener

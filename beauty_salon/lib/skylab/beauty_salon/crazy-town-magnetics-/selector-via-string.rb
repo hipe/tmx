@@ -23,7 +23,7 @@ module Skylab::BeautySalon
           o.tupling = @tupling
         end
 
-        writable_hooks_plan.on_this_one_kind_of_sexp__ @feature_symbol do |s|
+        writable_hooks_plan.on_this_one_type_of_node @feature_symbol do |s|
 
           wrapped = test_sexp[ s ]
           if wrapped
@@ -114,7 +114,7 @@ module Skylab::BeautySalon
 
       def __check_that_name_is_in_list_of_known_grammar_symbols
 
-        h = CrazyTownMagnetics_::Hooks_via_HooksDefinition::GRAMMAR_SYMBOLS
+        h = CrazyTownMagnetics_::NodeProcessor_via_Methods.grammar_reflection_hash
         if h[ _entity_name_symbol ]
           ACHIEVED_
         else

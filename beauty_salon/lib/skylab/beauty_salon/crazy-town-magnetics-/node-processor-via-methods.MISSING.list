@@ -1,0 +1,28 @@
+# strange, we've got some that they don't have:
+lambda
+procarg0
+# in theirs only:
+kwsplat
+cvar
+cvasgn
+arg_expr
+back_ref
+match_current_line
+undef
+alias
+cbase
+kwarg
+kwrestarg
+csend
+not
+for
+retry
+preexe
+postexe
+iflipflop
+eflipflop
+shadowarg
+complex
+rational
+__FILE__
+__LINE__

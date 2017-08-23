@@ -65,13 +65,10 @@ ok so you want to get to getting every '.should' being converted 03:47:08
 rebase the branch with the `expect( ).to` fix
 (that commit was -1.1.3)
 use this new tool to change all of your own `expect` to `anticipate` or whatever
-(that commit was -1.2.1)
-main report.
-(that commit was -1.2.2)
-main report: work that diff magic on real files perhaps (one temp file)
-(that commit was -1.2.3)
-main report: needs arch for applying changing
-(that was 1.4)
 indented report: uber alles
-THEN: maybe refactor that big mess of methods to use semantic tupling
 THEN: refactor to better viz, i.e of calls in tests
+(-1.3.N refactor your tupling to complement the hooks mesh
+think about how your tupling can be recursive and lazy (still immutable)
+(-1.3.N with your rough-ass tupling cover a change being made (say, to method calls))
+understand Parser nodes - how can we unparse?
+cover a "faithless" simple use-case

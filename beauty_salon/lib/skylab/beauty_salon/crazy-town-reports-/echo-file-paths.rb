@@ -20,7 +20,7 @@ module Skylab::BeautySalon
 
         @file_path_upstream_resources.line_stream_via_file_chunked_functional_definition do |y, oo|
 
-          oo.define_document_hooks_plan :plan_A do |o|
+          oo.define_document_processor :plan_A do |o|
 
             o.before_each_file do |potential_sexp|
 
@@ -30,7 +30,7 @@ module Skylab::BeautySalon
 
           oo.on_each_file_path do |path, o|
 
-            o.execute_document_hooks_plan :plan_A
+            o.execute_document_processor :plan_A
           end
         end
       end

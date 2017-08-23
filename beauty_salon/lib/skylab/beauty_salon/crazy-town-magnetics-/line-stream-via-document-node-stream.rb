@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::LineStream_via_DocumentSexpStream < Common_::MagneticBySimpleModel
+  class CrazyTownMagnetics_::LineStream_via_DocumentNodeStream < Common_::MagneticBySimpleModel
 
     # at a macro level: for the typical report (a category that to date
     # encompasses every report we've conceived of), we hit a wall if we
@@ -32,18 +32,18 @@ module Skylab::BeautySalon
     # -
 
       attr_writer(
-        :hooks,
+        :document_processors,
         :per_file_line_cache,
-        :potential_sexp_stream,
+        :potential_node_stream,
       )
 
       def execute
 
-        st = remove_instance_variable :@potential_sexp_stream
+        st = remove_instance_variable :@potential_node_stream
 
-        hooks = remove_instance_variable :@hooks
+        dp = remove_instance_variable :@document_processors
 
-        on_each_file_path = hooks.receive_each_file_path__
+        on_each_file_path = dp.receive_each_file_path__
 
         line_cache = remove_instance_variable :@per_file_line_cache
 
@@ -84,7 +84,7 @@ module Skylab::BeautySalon
 
             if ! ps
               # (when you finished processing the last file, either stop now or etc..)
-              pp = hooks.proc_for_after_last_file__
+              pp = dp.proc_for_after_last_file__
               if pp
                 # (this proc takes no arguments, but it might write to the line cache
                 pp[]
@@ -96,7 +96,7 @@ module Skylab::BeautySalon
               break
             end
 
-            MaybeActivatePlan___.new ps, hooks do |o|
+            MaybeActivatePlan___.new ps, dp do |o|
               on_each_file_path[ ps.path, o ]
             end
 
@@ -131,26 +131,26 @@ module Skylab::BeautySalon
       # executed on every path in the big stream of paths, this exists
       # one-to-one with a DSL context that exists per one path
 
-      def initialize ps, hooks
-        @__mutex_for_execute_document_hooks_plan = nil
-        @__potential_sexp = ps
-        @__hooks = hooks
+      def initialize ps, dp
+        @__mutex_for_execute_document_processor = nil
+        @__potential_node = ps
+        @__document_processors = dp
         yield self
         send remove_instance_variable :@__execute
       end
 
-      def execute_document_hooks_plan plan_sym
+      def execute_document_processor sym
 
-        remove_instance_variable :@__mutex_for_execute_document_hooks_plan
-        @__plan_symbol = plan_sym
-        @__execute = :__do_execute_document_hooks_plan ; nil
+        remove_instance_variable :@__mutex_for_execute_document_processor
+        @__processor_symbol = sym
+        @__execute = :__do_execute_document_processor ; nil
       end
 
-      def __do_execute_document_hooks_plan
+      def __do_execute_document_processor
 
-        _plan_sym = remove_instance_variable :@__plan_symbol
-        _plan = @__hooks.plans.fetch _plan_sym
-        _plan.execute_plan_against remove_instance_variable :@__potential_sexp
+        _dp_sym = remove_instance_variable :@__processor_symbol
+        _dp = @__document_processors.document_processors_hash.fetch _dp_sym
+        _dp.process_document remove_instance_variable :@__potential_node
       end
     end
     # ==

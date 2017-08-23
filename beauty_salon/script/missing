@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby -w
+
+# module BigWorld::MyProject
+#   class MyMagnetics::MyClass
+#     # -
+#       def xx
+#         code()
+
+        argv = ::ARGV
+        sout = $stdout
+        serr = $stderr
+
+        y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
+
+        if argv.length.nonzero?
+
+          prog_name = -> { s = ::File.basename $PROGRAM_NAME ; prog_name = -> { s } ; s }
+          usage_line = -> { "usage: '#{ prog_name[] }'" }
+
+
+          if %r(\A--?h(?:e(?:l(?:p)?)?)?\z)i =~ argv[0]
+            y <<  usage_line[]
+            y << nil
+            y <<  "description:"
+            y <<  "writes to STDOUT any grammar symbols found in the remote"
+            y <<  "library that are not covered by our local code. (for crazy-town.)"
+            exitstatus = 0
+          else
+            y <<  "unexpected argument: #{ argv[0].inspect }"
+            y <<  usage_line[]
+            y <<  "use '#{ prog_name[] } -h' for help."
+            exitstatus = 5  # GENERIC_ERROR
+          end
+          exit exitstatus
+        end
+
+
+        require 'parser'
+        require 'skylab/beauty_salon'
+
+
+        _my_h = Skylab::BeautySalon::CrazyTownMagnetics_::NodeProcessor_via_Methods.grammar_reflection_hash
+
+        my_set = Set.new _my_h.keys
+
+        their_set = Parser::Meta::NODE_TYPES
+
+        mine_only = my_set - their_set
+
+        theirs_only = their_set - my_set
+
+        if mine_only.length.nonzero?
+          y << "# strange, we've got some that they don't have:"
+          mine_only.each do |s|
+            y << s
+          end
+          did = true
+        end
+
+        if theirs_only.length.nonzero?
+          if did
+            y << "# in theirs only:"
+          end
+
+          theirs_only.each do |s|
+            sout.puts s
+          end
+        end
+
+        exit 0
+# #born

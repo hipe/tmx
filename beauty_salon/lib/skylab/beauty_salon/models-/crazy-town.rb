@@ -272,7 +272,53 @@ module Skylab::BeautySalon
       end
 
       def __resolve_file_path_upstream_via_files files
-        @_file_path_upstream = Stream_[ files ]
+
+        # hand-written map-expand
+
+        descended = main = p = nil
+        dir = nil
+
+        st = Stream_[ files ]
+
+        main = -> do
+          path = st.gets
+          path || break
+          if @_filesystem.directory? path
+            dir = path
+            p = descended
+            p[]
+          else
+            path
+          end
+        end
+
+        _PATTERN = "*#{ Autoloader_::EXTNAME }"
+        _TYPE_FILE = %w(-type f)
+
+        descended = -> do
+          _use_dir = dir ; dir = nil
+          use_st = Home_.lib_.system_lib::Find.with(
+            :path, _use_dir,
+            :filename, _PATTERN,
+            :freeform_query_infix_words, _TYPE_FILE,
+            & @listener
+          ).to_path_stream
+          p = -> do
+            path = use_st.gets
+            if path
+              path
+            else
+              p = main
+              p[]
+            end
+          end
+          p[]
+        end
+
+        p = main
+        @_file_path_upstream = Common_.stream do
+          p[]
+        end
         ACHIEVED_
       end
 

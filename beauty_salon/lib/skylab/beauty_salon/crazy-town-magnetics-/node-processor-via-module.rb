@@ -1,24 +1,8 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::Processor_via_Module
+  class CrazyTownMagnetics_::NodeProcessor_via_Module
 
-    # (:#reason1.2:)
-    #
-    # inspired exactly by the excellently documented `::AST::Processor`,
-    # this is our own take on it with the following:
-    #
-    #   - fine-grained control (potentially) of what to do when there
-    #     is no corresponding doo-hah for the node type
-    #
-    #   - for better or worse, module-centric instead of method-centric
-    #     constituency modeling (so, one module per node type (instead of
-    #     one method per node) for those node types you're interested
-    #     in modeling).
-    #
-    #     this avails us to a more declarative- and less imperative-style,
-    #     more well suited to hierarchical meta-data.
-    #
-    #   - compound processors - processors that rely on processors (imagined)
+    # see "declarative (structural) grammar reflection" :[#021.I]
 
     # implementation-wise, we employ the [#ze-051] "operator branch" pattern
     #

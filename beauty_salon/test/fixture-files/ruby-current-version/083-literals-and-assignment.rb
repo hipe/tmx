@@ -209,6 +209,7 @@ x = my_method( * [x].compact )
 
 # splat expand a deep-ass expression (`block`) #testpoint1.16
 # (as seen in (at writing) plugin/lib/skylab/plugin/bundle/enhance.rb:60)
+# also #testpoint1.20
 
 my_proc = nil
 

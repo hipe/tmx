@@ -19,7 +19,7 @@ module Skylab::BeautySalon
     # we consider it a "happy accident" because it led us to discover
     # this "report' architecture that we like.
     #
-    # (EDIT: that was all during our use of 'ruby_parser', not 'parser')
+    # (historical: that was all during our use of 'ruby_parser', not 'parser')
 
     # this script has been useful by "regressing" it to do something
     # like a map-reduce aggregate operation: we can get
@@ -56,9 +56,9 @@ module Skylab::BeautySalon
 
         @file_path_upstream_resources.line_stream_via_file_chunked_functional_definition do |y, oo|
 
-          oo.define_document_hooks_plan :plan_A do |o|
+          oo.define_document_processor :plan_A do |o|
 
-            o.on_each_sexp do |n|
+            o.on_each_node do |n|
 
               buffer = n.type.id2name
               loc = n.location
@@ -83,7 +83,7 @@ module Skylab::BeautySalon
 
             y << "# (file: #{ path })"
 
-            o.execute_document_hooks_plan :plan_A
+            o.execute_document_processor :plan_A
           end
         end
       end

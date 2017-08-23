@@ -25,7 +25,9 @@ combination of leading and/or trailing (eek!) underscores in its name.
 the primary value of this (arguably convoluted) naming convention is
 that it produces code that is optimized for refactoring: we can know
 immedatiately the "cost of refactoring" a method only be looking at its
-name.
+name. (generally, the prettier a method name is, the more expensive it
+is to refactor (and conversely the uglier a method name is, the cheaper
+it is to refactor).)
 
 as for the cost of using this convention itself, it is mitigated by
 these two characteristics:

@@ -16,7 +16,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'offers suggestions' do
         _hi = _lines.last
-        _hi == %q(did you mean 'class', 'sclass', 'case' or 'hash'?) || fail
+        _hi == %q(did you mean 'class', 'sclass', 'case', 'hash' or 'mlhs'?) || fail
       end
 
       shared_subject :_lines do

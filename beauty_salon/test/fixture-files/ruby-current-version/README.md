@@ -22,7 +22,8 @@ that we try to cover the lower-level components earlier, in front of the
 larger components (some of which in theory would need to use the smaller
 ones in order to effect themselves).
 
-we deviate from this rubric only to put the EDIT
+(we deviate from this rubric only to put the "special" and edge cases
+at the end, for inexplicable OCD reasons.)
 
   - literals and assignments
   - control flow
@@ -53,8 +54,11 @@ this version.
 
 as it stands, anyway, we use the 'parser' gem's "current version" default
 and it itself is emitting the warning about using `2.4.0`-compliant syntax
-on our `2.4.1` code, which so far hasn't caused any issues. (near #open [#020])
-(EDIT: apparently exactly one small issue in our entire corpus)
+on our `2.4.1` code, which so far hasn't caused any issues.
+
+(#open [#020.C] tracks the one small issue we had with this (with 'parser'
+failing to parse something that's MRI compliant in our current version;
+it was quite small..)
 
 
 

@@ -55,7 +55,7 @@ module Skylab::BeautySalon
       end.call
 
       def operator_branch
-        @___ob ||= Home_::CrazyTownMagnetics_::Processor_via_Module[ Constituents___ ]
+        @___ob ||= Home_::CrazyTownMagnetics_::NodeProcessor_via_Module[ Constituents___ ]
       end
     end  # >>
 

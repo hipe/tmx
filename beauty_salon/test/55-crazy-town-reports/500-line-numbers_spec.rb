@@ -45,6 +45,7 @@ module Skylab::BeautySalon::TestSupport
           block_pass
           case
           casgn
+          cbase
           class
           const
           def

@@ -1,290 +1,24 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::Hooks_via_HooksDefinition  # 1x
+  class CrazyTownMagnetics_::NodeProcessor_via_Methods  # (module name is #depencency1.1)
 
-    # (NOTE - we still use the old terminology "sexp" when we should say
-    # "AST node". see also #here2 #todo)
 
-    # this is the moneyshot - this is the guy that traverses every sexp
-    # of a document sexp and runs all the hooks.
+    # there's a lot to say about this node. [#021] grew out of this.
+    # see especially [#021.B] and [#021.D].
 
-    # a "hook" is a proc associated with a symbol from the grammar: each
-    # time a sexp node is encountered corresponding to that symbol, the proc
-    # is called, being passed the sexp. (the result of this call is ignored.)
-    #
-    # (it bears mentioning that this arrangement is broadly similar to
-    # `::AST::Processor`, however we maintain our own take(s) on this
-    # pattern as justified at #reason1.2)
-    #
-    # there need not be one hook for every symbol. even if a symbol does not
-    # have an associated hook, our traversal will nonetheless descend into
-    # those sexps that are nonterminal (i.e "deep", "branchy", recursive).
-    #
-    # currently there cannot be multiple hooks associated with one symbol.
-    # (an exception will be thrown.) you could, however, hack such an
-    # arrangement in your definition (because you can write arbitrary
-    # code in your hook).
-
-    # a "document hooks plan" is simply a collection of these hooks (just
-    # a tuple). (we call it a "plan" and not "hooks" just because the former
-    # sounds more singular and concrete.)
-    #
-    # you can have several plans in one definition, so for example you could
-    # follow one set of behaviors for files that look like tests (based on
-    # their filename), and another set of behaviors for files that look like
-    # asset files. (really, this feature is just a cheap by-product of the
-    # fact that for performance reasons we evaluate definitions before we
-    # traverse files.)
-
-    # we follow our own simple #[#sli-023] "prototype" pattern.
-
-    # primarily, in its current state, the bulk of the code here is for our
-    # own "getting to know" the sexp's, and asserting their shape to be
-    # used across our corpus. (this was true when we used 'ruby_parser'
-    # and is still true now as we use 'parser'.)
-    #
-    # this amounts to a black-box reverse enginnering of exactly whatever
-    # grammar the remote library implements.
-    # classifications:
-    #
-    #   - terminals in a grammar senese (vs. non-terminals)
-    #   - our higher-level sense of "branchy" nodes (vs. not)
-
-    # development notes
-    #
-    # developer's note: conventionally a variable called `s` is for holding
-    # a string; however here `s` is used exclusively for `::Sexp` instances.
-    # NOTE - generally we are now dealing with `::Parser::AST::Node`
-    # instances instead of the (`ruby_parser`) Sexp's we used to.
-    # at present there are still some places where we use this legacy `s`
-    # name to hold these AST nodes.
-    # for new code we will use `n`, as this single letter name is rarely
-    # used for anything else in this ecosystem. :#here2
+    class << self
+      define_method :grammar_reflection_hash, ( Lazy_.call do
+        CrazyTownMagnetics_::NodeDispatcher_via_Everything::This_crazy_thing[ Here___ ]
+      end )
+    end  # >>
 
     # -
 
-      def initialize
-        @plans = {}
-        @__mutex_for_on_each_file_path = nil
-        @__mutex_for_after_last_file = nil
-        yield self
-        @plans.freeze
-        freeze
+      def initialize o
+        @_node_dispatcher = o
       end
 
-      def define_document_hooks_plan k, & two_p
-
-        @plans[ k ] && fail
-        @plans[ k ] = :__locked__
-
-        _plan = DocumentHooksPlan_via_Definition___.call_by do |o|
-          yield o  # hi.
-        end
-
-        @plans[ k ] = _plan ; nil
-      end
-
-      def on_each_file_path & p
-        remove_instance_variable :@__mutex_for_on_each_file_path
-        @receive_each_file_path__ = p ; nil
-      end
-
-      def after_last_file & p
-        remove_instance_variable :@__mutex_for_after_last_file
-        @proc_for_after_last_file__ = p ; nil
-      end
-
-      attr_reader(
-        :receive_each_file_path__,
-        :plans,
-        :proc_for_after_last_file__,
-      )
-    # -
-
-    # ==
-
-    class DocumentHooksPlan_via_Definition___ < Common_::MagneticBySimpleModel
-
-      def initialize
-
-        @__mutex_for_on_each_branchy_node = nil
-        @branchy_node_hook = nil
-
-        @_strict_hook_box = Common_::Box.new
-
-        @__mutex_for_before_each_file = nil
-        @before_each_file = MONADIC_EMPTINESS_
-
-        @__mutex_for_after_each_file = nil
-        @after_each_file = MONADIC_EMPTINESS_
-
-        @listener = nil  # some reports know they don't need this
-        @named_listeners = nil
-
-        yield self
-      end
-
-      def on_each_branchy_node__ & p
-
-        remove_instance_variable :@__mutex_for_on_each_branchy_node
-        @branchy_node_hook = p
-      end
-
-      def on_this_one_kind_of_sexp__ k, & p
-
-        @_strict_hook_box.add k, p
-      end
-
-      def on_each_sexp & p
-
-        bx = @_strict_hook_box
-
-        GRAMMAR_SYMBOLS.each_key do |k|
-          bx.add k, p  # ..
-        end
-
-        NIL
-      end
-
-      def before_each_file & p
-        remove_instance_variable :@__mutex_for_before_each_file
-        @before_each_file = p ; nil
-      end
-
-      def after_each_file & p
-        remove_instance_variable :@__mutex_for_after_each_file
-        @after_each_file = p ; nil
-      end
-
-      attr_writer(
-        :listener,
-        :named_listeners,
-      )
-
-      def execute
-
-        bx = remove_instance_variable :@_strict_hook_box
-        bn_p = @branchy_node_hook
-
-        if bx.length.zero? && ! bn_p
-          SimpleGuy___.new(
-            @before_each_file,
-            @after_each_file,
-          )
-        else
-          ComplexGuy___.new(
-            bx.h_,
-            bn_p,
-            @named_listeners,
-            @before_each_file,
-            @after_each_file,
-            @listener,
-          )
-        end
-      end
-    end
-
-    # ==
-
-    class SimpleGuy___
-
-      def initialize h, h_
-        @before_each_file = h
-        @after_each_file = h_
-      end
-
-      def execute_plan_against potential_AST
-        @before_each_file[ potential_AST ]
-        @after_each_file[ potential_AST ]
-        NIL
-      end
-    end
-
-    # ==
-
-    class ComplexGuy___
-
-      def initialize hvss_h, bn_p, named_listeners, bef_h, aef_h, p
-
-        if ! hvss_h
-          hvss_h = MONADIC_EMPTINESS_
-        end
-
-        @after_each_file = aef_h
-        @before_each_file = bef_h
-        @branchy_node_hook = bn_p
-        @hook_via_symbol_symbol = hvss_h
-        @listener = p
-        @named_listeners = named_listeners
-      end
-
-      def execute_plan_against potential_AST
-
-        @before_each_file[ potential_AST ]
-
-        StackSession_via_Potential_AST___.new(
-          potential_AST,
-          @branchy_node_hook,
-          @hook_via_symbol_symbol,
-          @listener,
-        ).execute
-
-        ok = true
-      ensure
-        if ! ok
-          __when_errored
-        end
-        @after_each_file[ potential_AST ]
-        NIL
-      end
-
-      def __when_errored
-        sct = @named_listeners
-        if sct
-          p = sct.on_error_once
-        end
-        if p
-          p[]
-        end
-        NIL
-      end
-    end
-
-    # ==
-
-    class StackSession_via_Potential_AST___
-
-      def initialize o, bn_p, h, p
-
-        @_push_stack_frame = :__push_stack_frame_initially
-
-        @potential_AST = o
-        @branchy_node_hook = bn_p
-        @hook_via_symbol_symbol = h
-        @listener = p
-      end
-
-      def execute
-        __stack_session do
-          __via_wrapped_AST
-        end
-        NIL
-      end
-
-      def __via_wrapped_AST
-
-        wast = @potential_AST.sexp
-
-        # ignoring comments stuff
-
-        ast = wast.ast_
-        if ast
-          _node ast
-        else
-          @listener.call( :info, :expression, :empty_file ) { |y| y << "(file has no code)" }
-        end
-        NIL
-      end
+      # -- boilerplate ..
 
       def _any_node x
         if x
@@ -302,42 +36,14 @@ module Skylab::BeautySalon
 
       def _node n
 
-        _m = GRAMMAR_SYMBOLS.fetch n.type
-        _call _m, n
+        m = CHILDREN_OF_ENTRYPOINT___.fetch n.type
+        _a = _pre_descend m, n
+        send m, * _a
       end
 
-      def _call m, n
+      # what are these hashes for? [#021.D]
 
-        p = @hook_via_symbol_symbol[ n.type ]
-        if p
-          p[ n ]  # ignore result - don't let hooks control our flow
-        end
-
-        send m, * n.children, n
-      end
-
-      CrazyTownMagnetics_::Hooks_via_HooksDefinition::GRAMMAR_SYMBOLS = {
-
-        # it seems a bit .. well .. "crunchy" to have all this stuff
-        # splayed out here. but:
-        #
-        #   A) it was for getting to know how the previous parsing library
-        #      parses things, and likewise can be used to see how the
-        #      current library parses things.
-        #
-        #   B) to traverse an AST recursively, we want to be able to do
-        #      this "forwardly" rather than passively reflecting on each
-        #      AST; i.e we want a sense for the discrete set of symbols
-        #      that are nonterminal rather than terminal
-        #
-        #   C) for the nascent but soon-to-be-burgeoning "selector" API
-        #      we may want fine-grained control over what behavior we
-        #      avail to each symbol, for example to make complicated
-        #      representations appear simpler to the DSL.
-        #
-        #   D) it's fun to get a sense for how our own corpus covers all
-        #      grammar symbols vs. the set of all symbols.
-
+      CHILDREN_OF_ENTRYPOINT___ = {
         and: :__and,
         and_asgn: :__and_asgn,
         arg: :__arg,
@@ -404,82 +110,116 @@ module Skylab::BeautySalon
 
       # -- class, module and related
 
-      def __class const, exp_mod, body, n
+      def __class const, exp_mod, body, self_node
         o :const, const
         _any_expression_of_module exp_mod
-        _in_stack_frame n do
+        _in_stack_frame self_node do
           _any_node body
         end
       end
 
-      def __singleton_class_block sc, body, n
+      def __singleton_class_block sc, body, self_node
         _singleton_classable sc
-        _in_stack_frame n do
+        _in_stack_frame self_node do
           _any_node body
         end
       end
 
-      def __module const, body, n  # #testpoint1.35
+      def __module const, body, self_node  # #testpoint1.35
         o :const, const
-        _in_stack_frame n do
+        _in_stack_frame self_node do
           _any_node body
         end
       end
 
       # -- method definition and related
 
-      def __defs sc, sym, args, body, n  # #testpoint1.37
+      def __defs sc, sym, args, body, self_node  # #testpoint1.37
         _singleton_classable sc
         _symbol sym
         o :args, args
-        _in_stack_frame n do
+        _in_stack_frame self_node do
           _any_node body  # empty method body like #testpoint1.38
         end
       end
 
-      def __def sym, args, body, n
+      def __def sym, args, body, self_node
         _symbol sym
         o :args, args
-        _in_stack_frame n do
+        _in_stack_frame self_node do
           _any_node body  # defs can be blank
         end
       end
 
-      def __args * arg_arg_arg, _
+      # ~ (blocks are like procs are like method defs..)
+
+      def __block block_head, args, body
+
+        m = CHILDREN_OF_BLOCK___.fetch block_head.type
+        _a = _pre_descend m, block_head
+        send m, * _a
+
+        o :args, args
+
+        _any_node body  # (blocks can be empty)
+      end
+
+      CHILDREN_OF_BLOCK___ = {
+        lambda: :__lambda_as_block_child,
+        send: :__send_as_block_child,
+        super: :__super_as_block_child,
+        zsuper: :__zsuper_as_block_child,
+      }
+
+      def __lambda_as_block_child
+        NOTHING_
+      end
+
+      def __zsuper_as_block_child
+        # #todo in corpus but not covered.
+        # as seen in (a writing) brazen/test/433-collection-adapters/031-git-config/400-mutable/040-counterpart-parsing-canon_spec.rb)
+        NOTHING_
+      end
+
+      # ~
+
+      def __args * arg_arg_arg
         arg_arg_arg.each do |n|
-          __arg_mine n
+          m = CHILDREN_OF_ARGS___.fetch n.type
+          _a = _pre_descend m, n
+          send m, * _a
         end
       end
 
-      def __arg sym, _
+      CHILDREN_OF_ARGS___ = {
+        arg:      :__arg_as_child_of_args,
+        blockarg: :__blockarg,  # #testpoint1.40
+        procarg0: :__procarg0,
+        optarg:   :__optarg,  # #testpoint1.41
+        restarg:  :__restarg,
+        kwoptarg: :__kwoptarg,  # #testpoint1.49
+        mlhs:     :__mlhs_this_other_form,  # #testpoint1.10
+      }
+
+      def __arg_as_child_of_args sym
         _symbol sym
       end
 
-      def __arg_mine n
-        case n.type
-        when :arg      ; _node n
-        when :blockarg ; _call :__blockarg, n  # #testpoint1.40
-        when :procarg0 ; _call :__procarg0, n  #
-        when :optarg   ; _call :__optarg, n    # #testpoint1.41
-        when :restarg  ; _call :__restarg, n   #
-        when :kwoptarg ; _call :__kwoptarg, n  # #testpoint1.49
-        when :mlhs     ; _call :__mlhs_this_other_form, n  # #testpoint1.10
-        else
-          oops
-        end
+      def __arg sym
+        _symbol sym
       end
 
-      def __kwoptarg sym, default_value, _
+      def __kwoptarg sym, default_value
         _symbol sym
         _node default_value
       end
 
-      def __optarg sym, default_value, _
+      def __optarg sym, default_value
         _symbol sym
         _node default_value
       end
 
-      def __restarg * zero_or_one, _
+      def __restarg * zero_or_one
         # neato - has no name if it's .. with no name
         if zero_or_one.length.zero?
           NOTHING_
@@ -488,7 +228,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __procarg0 * one_or_more, _
+      def __procarg0 * one_or_more
 
         case 1 <=> one_or_more.length
 
@@ -504,7 +244,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __blockarg sym, _  # #testpoint1.40 (again)
+      def __blockarg sym  # #testpoint1.40 (again)
         _symbol sym
       end
 
@@ -512,32 +252,45 @@ module Skylab::BeautySalon
 
       # ~ boolean operators (pretend they're special methods (functions)))
 
-      def __or left_node, right_node, _
+      def __or left_node, right_node
         _node left_node
         _node right_node
       end
 
-      def __and left_node, right_node, _  # #testpoint1.36
+      def __and left_node, right_node  # #testpoint1.36
         _node left_node
         _node right_node
       end
 
-      def __defined? expression, _  # #testpoint1.33
+      def __defined? expression  # #testpoint1.33
         _node expression
       end
 
       # -- calling methods
 
-      def __send receiver, sym, * args, _
+      def __send_as_block_child receiver, sym, *args  # #testpoint1.20
+
+        # #todo the "as block child" of `send` is identical to oridnary send
+        # not covered but in corpus
+        # as seen in (at writing): common/test/fixture-directories/twlv-dli/glient.rb
+
         _any_node receiver
         _symbol sym
-        args.each do |n|
-          _node n
+        args.each do |n_|
+          _node n_
         end
       end
 
-      def __splat n_, _
-        # this is yet another #foolhardy (see)
+      def __send receiver, sym, * args
+        _any_node receiver
+        _symbol sym
+        args.each do |n_|
+          _node n_
+        end
+      end
+
+      def __splat n_
+        # another (TEMPORARY) "foolhardy" [#doc.G] (see)
 
         case n_.type
 
@@ -563,19 +316,20 @@ module Skylab::BeautySalon
         end
       end
 
-      def __block_pass node, _
+      def __block_pass n_
         # for when a proc is passed as a block argument,
         # as in:
         #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
         #                    ^^^^^^^^^^^^
 
-        _node node
+        _node n_
       end
 
       # -- can only happen within a method
 
-      def __yield * zero_or_more, _  # #testpoint1.42
+      def __yield * zero_or_more  # #testpoint1.42
 
+        # syntax sidebar:
         # see discussion at #common-jump, but see how we differ:
         # a `yield` is passing arguments to a block or proc, so its arguments
         # can be many unlike these others.
@@ -587,11 +341,22 @@ module Skylab::BeautySalon
         end
       end
 
-      def __zsuper _  # `super` #testpoint1.43
+      def __zsuper  # `super` #testpoint1.43
         NOTHING_
       end
 
-      def __super * zero_or_more, _  # `super()` #testpoint1.13
+      def __super_as_block_child * args
+
+        # #todo - is the same as next
+        # with no arg: #testpoint1.12
+        # with some args: #testpoitn1.12.B
+
+        args.each do |n_|
+          _node n_
+        end
+      end
+
+      def __super * zero_or_more  # `super()` #testpoint1.13
 
         # the zero or more children is an argument list
 
@@ -600,44 +365,19 @@ module Skylab::BeautySalon
         end
       end
 
-      def __return n_=nil, _  # #testpoint1.31
+      def __return n_=nil  # #testpoint1.31
         _any_node n_  # see #common-jump
       end
 
       # -- control flow
 
-      def __begin *zero_or_more, _
+      def __begin *zero_or_more
         zero_or_more.each do |n_|
           _node n_
         end
       end
 
-      def __block block_head, args, body, _
-
-        __block_head block_head
-
-        o :args, args
-
-        _any_node body  # (blocks can be empty)
-      end
-
-      def __block_head n
-
-        case n.type
-        when :send   ; _node n  # #testpoint1.20
-        when :lambda ; _call :__lambda, n
-        when :super  ; _node n  # #testpoint1.12
-        when :zsuper ; _node n  # #testpoint1.12.B
-        else
-          interesting
-        end
-      end
-
-      def __lambda _
-        NOTHING_
-      end
-
-      def __kwbegin * zero_or_one_or_two, _
+      def __kwbegin * zero_or_one_or_two
 
         case zero_or_one_or_two.length
         when 0 ; NOTHING_
@@ -656,7 +396,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __ensure any_head, any_body, _
+      def __ensure any_head, any_body
 
         # (the kind you see at the toplevel of method bodies is #testpoint1.11)
 
@@ -671,8 +411,9 @@ module Skylab::BeautySalon
         _any_node any_body
       end
 
-      def __rescue begin_body, *res_bodies, mystery_last, _
+      def __rescue begin_body, *res_bodies, mystery_last
 
+        # syntax sidebar:
         # you can have multiple rescue clauses
         # (as seen in (at writing) common/lib/skylab/common/autoloader/file-tree-.rb:215)
 
@@ -683,15 +424,17 @@ module Skylab::BeautySalon
         _node begin_body  # a `begin` block or 1 statement
 
         res_bodies.each do |n_|
-
-          :resbody == n_.type || oops
-          __resbody( * n_.children )
+          send CHILDREN_OF_RES_BODY___.fetch( n_.type ), * n_.children
         end
 
         if mystery_last
           this_is_something  # not sure, a ensure? but didn't we cover that?
         end
       end
+
+      CHILDREN_OF_RES_BODY___ = {
+        resbody: :__resbody,
+      }
 
       def __resbody array, assignable, body
 
@@ -714,12 +457,12 @@ module Skylab::BeautySalon
         end
       end
 
-      def __until_post cond, kwbeg, _  # #testpoint1.29
+      def __until_post cond, kwbeg  # #testpoint1.29
         _condition cond
         _expect_kwbegin kwbeg
       end
 
-      def __while_post cond, kwbeg, _
+      def __while_post cond, kwbeg
         _condition cond
         _expect_kwbegin kwbeg
       end
@@ -736,31 +479,31 @@ module Skylab::BeautySalon
         end
       end
 
-      def __until cond, body, _  # #testpoint1.26
+      def __until cond, body  # #testpoint1.26
         _condition cond
         _node body
       end
 
-      def __while cond, body, _
+      def __while cond, body
         _condition cond
         _node body
       end
 
-      def __break n_=nil, _
+      def __break n_=nil
         _any_node n_  # see #common-jump
       end
 
-      def __next n_=nil, _
+      def __next n_=nil
         _any_node n_  # see #common-jump
       end
 
-      def __redo n_=nil, _
+      def __redo n_=nil
         _any_node n_  # see #common-jump
       end
 
       begin
 
-        # :#common-jump:
+        # syntax sidebar: :#common-jump:
 
         # we'll describe first a `return` nonterminal then apply it to the
         # others: interestingly (or not) we note that a return statement
@@ -786,21 +529,23 @@ module Skylab::BeautySalon
 
       end
 
-      def __case scrutinized, *one_or_more_whens, any_else_node, _
+      def __case scrutinized, *one_or_more_whens, any_else_node
+
+        # syntax sidebar: case statements are fun
 
         # we do some "by hand" parsing of these because of the relatively
         # particular structure of `case` (switch) expressions when compared
         # to other language features:
 
-        # the [1] member is an expression for the value under scrutiny
+        # the first component is an expression for the value under scrutiny
         # (superficially like the same slot in `if` but not really).
 
-        # jumping to the end of the feature for a moment, the [(N-1)] member
+        # jumping to the end of the feature for a moment, the last component
         # is the `else` expression.  NOTE if an `else` clause isn't present
         # in the feature instance, this value is `nil`; i.e this "slot"
         # always exists whether or not it has anything in it (necessarily).
 
-        # the remaining (at least one) [2 thru (N-2)] items are `when`
+        # the remaining (at least one) components (offsets 1 thru N-2) are `when`
         # features. these are represented in the tree as formal `when`
         # instances proper; but since such features should only ever occur
         # in `switch` expressions, we don't want them in our general lookup
@@ -823,16 +568,18 @@ module Skylab::BeautySalon
         one_or_more_whens.length.zero? && oops
 
         one_or_more_whens.each do |n_|
-
-          :when == n_.type || interesting  # :#here1
-          __when n_
+          send CHILDREN_OF_CASE___.fetch( n_.type ), n_
         end
 
         _any_node any_else_node
       end
 
-      def __when n
-        a = n.children
+      CHILDREN_OF_CASE___ = {
+        when: :__when,  # :#here1
+      }
+
+      def __when n_
+        a = n_.children
         len = a.length
         1 < len || interesting
         0.upto( len - 2 ) do |d|
@@ -841,7 +588,7 @@ module Skylab::BeautySalon
         _any_node a.last  # do this (maybe do nothing)
       end
 
-      def __if condition, if_trueish_do_this, else_do_this, _
+      def __if condition, if_trueish_do_this, else_do_this
 
         # (an `unless` expression gets turned into `if true, no-op else ..`)
 
@@ -850,61 +597,48 @@ module Skylab::BeautySalon
         _any_node else_do_this
       end
 
-      def _condition n
+      def _condition n_
         # condition expression (its trueishness determines doo-hah)
-        _node n
+        _node n_
       end
 
       # -- assignment
 
-      def __match_with_lvasgn left_node, right_node, _  # #testpoint1.48
+      def __match_with_lvasgn left_node, right_node  # #testpoint1.48
         _node left_node
         _node right_node
       end
 
-      def __const_assign any_const, sym, rhs=nil, _
-
-        if any_const
-          __expression_of_module any_const  # fixture file: literals and assigment
-        else
-          NOTHING_  # our first fixture file
-        end
-
-        _symbol sym
-
-        _any_node rhs
-      end
-
-      def __masgn mlhs, right_node, _
+      def __masgn mlhs, right_node
         :mlhs == mlhs.type || oops
         __mlhs_this_one_form mlhs
         _node right_node
       end
 
-      def __mlhs_this_other_form * one_or_more, _
+      def __mlhs_this_other_form * one_or_more
         one_or_more.each do |n_|
           _expect :arg, n_
         end
       end
 
-      def __mlhs_this_one_form n
-        n.children.each do |n_|
+      def __mlhs_this_one_form mlhs
+        mlhs.children.each do |n_|
           __assignable_in_mlhs n_
         end
       end
 
-      def __op_asgn assignable, sym, rhs, _
+      def __op_asgn assignable, sym, rhs
         _assignable assignable
         _symbol sym  # :+
         _node rhs
       end
 
-      def __or_asgn assignable, rhs, _
+      def __or_asgn assignable, rhs
         _assignable assignable
         _node rhs
       end
 
-      def __and_asgn assignable, rhs, _  # #testpoint1.25
+      def __and_asgn assignable, rhs  # #testpoint1.25
         _assignable assignable
         _node rhs
       end
@@ -949,39 +683,78 @@ module Skylab::BeautySalon
       end
 
       def _asgn n
-        case n.type
-        when :gvasgn, :ivasgn, :lvasgn
-          _symbol( * n.children )
 
-        when :casgn  # #testpoint1.6
-          _node n
-        else
-          interesting
+        m = CHILDREN_OF_ASSIGNMENT___.fetch n.type
+        _a = _pre_descend m, n
+        send m, * _a
+      end
+
+      CHILDREN_OF_ASSIGNMENT___ = {
+        # ( these are repeats of symbols, but shorter versions.. #todo )
+        # ( if these have context-consistent variations in their signature,
+        #   are they really variations of the same symbol or are they
+        #   different symbols? :#provision1.2)
+
+        casgn: :__NOT_short_casgn,  # #testpoint1.6
+        gvasgn: :__short_gvasgn,
+        ivasgn: :__short_ivasgn,
+        lvasgn: :__short_lvasgn,
+      }
+
+      def __NOT_short_casgn wat, const
+        if wat
+          self._COVER_ME__this_one_term__  # #todo
         end
+        _symbol const
       end
 
-      def __gvasgn sym, rhs, _
+      def __const_assign any_const, sym, rhs=nil
+
+        if any_const
+          __expression_of_module any_const  # fixture file: literals and assigment
+        else
+          NOTHING_  # our first fixture file
+        end
+
+        _symbol sym
+
+        _any_node rhs
+      end
+
+      def __short_gvasgn sym
+        _symbol sym
+      end
+
+      def __gvasgn sym, rhs
         _symbol sym
         _node rhs
       end
 
-      def __ivasgn sym, rhs, _
+      def __ivasgn sym, rhs
         _symbol sym
         _node rhs
       end
 
-      def __lvasgn sym, rhs, _
+      def __short_ivasgn sym
+        _symbol sym
+      end
+
+      def __short_lvasgn sym
+        _symbol sym
+      end
+
+      def __lvasgn sym, rhs
         _symbol sym
         _node rhs
       end
 
       # ~
 
-      def __lvar sym, _
+      def __lvar sym
         _symbol sym
       end
 
-      def __gvar sym, _  # #testpoint1.44
+      def __gvar sym  # #testpoint1.44
 
         # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
         # (see also `nth_ref` which looks superficially like a global)
@@ -989,7 +762,7 @@ module Skylab::BeautySalon
         _symbol sym
       end
 
-      def __ivar sym, _
+      def __ivar sym
         _symbol sym
       end
 
@@ -1003,13 +776,16 @@ module Skylab::BeautySalon
 
       def __expression_of_module n
 
-        # this is yet another case of #foolhardy (see)
+        # another (TEMPORARY) "foolhardy" [#doc.G] (see)
 
         # partially duplicated at #temporary-spot-1. this one is now ahead. #todo
 
         case n.type
         when :const ; _node n  # can recurse back to here
-        when :cbase ; _call :__cbase, n  # `< ::BasicObject`
+
+        when :cbase ; __dispatch_cbase n  # `< ::BasicObject`
+          # #TODO above needs reflection exposure
+
         when :self  ; _node n  # #testpoint1.5
         when :lvar  ; _node n  # #testpoint1.27
         when :ivar  ; _node n  # #testpoint1.30
@@ -1020,42 +796,50 @@ module Skylab::BeautySalon
         end
       end
 
-      def __const any_mod_exp, sym, _
+      def __const any_mod_exp, sym
         _any_expression_of_module any_mod_exp
         _symbol sym
       end
 
-      def __cbase _
+      def __dispatch_cbase n
+        _a = _pre_descend :__cbase, n
+        __cbase( * _a )
+      end
+
+      def __cbase
         NOTHING_
       end
 
       # -- magic variables (globals) and similar
 
-      def __nth_ref d, _  # `$1` #testpoint1.3
+      def __nth_ref d  # `$1` #testpoint1.3
         _integer d
       end
 
       # -- literals
 
-      def __hash *zero_or_more, _
+      def __hash *zero_or_more
         zero_or_more.each do |n_|
-          :pair == n_.type || oops
-          __pair( * n_.children )
+          send CHILDREN_OF_HASH___.fetch( n_.type ), * n_.children
         end
       end
+
+      CHILDREN_OF_HASH___ = {
+        pair: :__pair,  # #todo not exposed
+      }
 
       def __pair left_node, right_node
         _node left_node
         _node right_node
       end
 
-      def __array * zero_or_more, _
+      def __array * zero_or_more
         zero_or_more.each do |n_|
           _node n_
         end
       end
 
-      def __regexp * one_or_more, _
+      def __regexp * one_or_more
 
         len = one_or_more.length
         if 1 < len
@@ -1065,18 +849,27 @@ module Skylab::BeautySalon
           end
         end
 
-        :regopt == one_or_more.last.type || oops
+        CHILDREN_OF_REGEXP___.fetch( one_or_more.last.type ) && fail  # see
       end
 
-      def __dsym * zero_or_more, _
+      CHILDREN_OF_REGEXP___ = {
+        regopt: NOTHING_,  # #todo further testing is needed to determine
+        # if this is a problem on our end or the remote end (we think the
+        # latter); the fact that we aren't ever getting any children under
+        # this node.. #open :[#020.C]
+      }
+
+      def __dsym * zero_or_more
         zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
       end
 
-      def __xstr * zero_or_more, _  # #testpoint1.2
+      def __xstr * zero_or_more  # #testpoint1.2
         zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
       end
 
-      def __dstr * zero_or_more, _
+      def __dstr * zero_or_more
+
+        # syntax sidebar:
 
         # a double-quoted string will parse into `str` unless (it seems)
         # it has interpolated parts. presumably they must alternate between
@@ -1090,40 +883,35 @@ module Skylab::BeautySalon
       # for all of these, it's possible to have an empty symbol, backticks, etc
       # (as seen in (at writing) basic/lib/skylab/basic/module/creator.rb:193)
 
-      def __str s, _
+      def __str s
         _string s
       end
 
-      def __sym sym, _
+      def __sym sym
         _symbol sym
       end
 
-      def __irange begin_node, end_node, _
+      def __irange begin_node, end_node
         _node begin_node
         _node end_node
       end
 
-      def __erange begin_node, end_node, _
+      def __erange begin_node, end_node
         _node begin_node
         _node end_node
       end
 
-      def __float f, _
+      def __float f
         ::Float === f || interesting
       end
 
-      def __int d, _
+      def __int d
         _integer d
-      end
-
-      def _integer d
-        ::Integer === d || interesting
       end
 
       def _singleton_classable n
 
-        # this is another #foolhardy case and its implementation must
-        # change - it's just an excercise to understand pragmatics
+        # another (TEMPORARY) "foolhardy" [#doc.G]
 
         case n.type
 
@@ -1136,21 +924,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def _CVME n  # #todo - this is temporary used in development.
-        #
-        # 1) run that one test with coverage turned on:
-        #        tmx-test-support-quickie -cover <that one spec file>
-        #
-        # 2) whatever grammar symbol methods are here that are not covered,
-        #    make a single call to this method at the beginning of that method.
-        #
-        # 3) run the indented report against the target corpus so that the
-        #    methods are called. when the below message appears, use that
-        #    information to make an appropriate test to cover the spot.
-        #
-        # 4) repeat (3) until all such spots are covered.
-        #
-        # note this could be automated somewhat, but it would require work.
+      def _CVME n  # (exactly [#doc.H])
 
         io = $stderr
         o = caller_locations( 1, 1 )[ 0 ]
@@ -1161,23 +935,23 @@ module Skylab::BeautySalon
 
       # -- "keywords" (and those literals)
 
-      def __self _
+      def __self
         NOTHING_
       end
 
-      def __false _
+      def __false
         NOTHING_
       end
 
-      def __true _
+      def __true
         NOTHING_
       end
 
-      def __nil _
+      def __nil
         NOTHING_
       end
 
-      # -- asserters & simple clients of
+      # -- "type" assertion *of* terminal components
 
       def _string x
         ::String === x || interesting
@@ -1187,184 +961,30 @@ module Skylab::BeautySalon
         ::Symbol === x || interesting
       end
 
-      # -- stack stuff
+      def _integer d
+        ::Integer === d || interesting
+      end
 
-      # both as a contact exercise and to reduce moving parts, awareness of
-      # a frame stack is "baked in" to the mechanics here, regardless of
-      # whether the user has supplied a hook for listening for "branchy"
-      # nodes.
-      #
-      #   - when the hook *is* supplied, the user gets a wrapped node
-      #     that knows the depth (integer) of this node on the stack.
-      #
-      #   - but when the hook is not supplied, we don't create wrapped
-      #     node objects that would otherwise go unused.
-      #
-      #   - artificially we add a once-per-file root stack frame for
-      #     the file itself. this frame always has a depth of zero.
-      #
-      #   - then, each "branchy" node at the root level of the document
-      #     will have a frame depth of 1, and so on.
       # --
 
-      def __stack_session
-        @_current_stack_depth = 0
-        bn_p = @branchy_node_hook
-        if bn_p
-          bn_p[ WrapWithDepthAtLevelZero___.new( _path ) ]
-          @_push_stack_frame = :__push_stack_frame_when_listener
-        else
-          @_push_stack_frame = :__push_stack_frame_when_no_listener
-        end
-        @_pop_stack_frame = :_pop_stack_frame
-        yield
-        @_current_stack_depth.zero? || fail
-        remove_instance_variable :@_current_stack_depth ; nil
+      def _in_stack_frame n, & p
+        @_node_dispatcher.stack.in_stack_frame__ p, n
       end
 
-      def _path
-        @potential_AST.path
+      def _pre_descend m, n
+        @_node_dispatcher.pre_descend__ m, n
       end
-
-      def _in_stack_frame n
-        send @_push_stack_frame, n
-        yield
-        send @_pop_stack_frame
-        NIL
-      end
-
-      def __push_first_again n
-        @_pop_stack_frame = :_pop_stack_frame
-        @_push_stack_frame = remove_instance_variable :@__push_stack_frame_on_deck
-        send @_push_stack_frame, n
-      end
-
-      def __push_stack_frame_when_listener n
-        @_current_stack_depth += 1
-        _tng = Tupling_for__[ n ]
-        @branchy_node_hook[ WrapWithDepthNormally__.new( @_current_stack_depth, _tng ) ]
-        NIL
-      end
-
-      def __push_stack_frame_when_no_listener _n
-        @_current_stack_depth += 1
-      end
-
-      def _pop_stack_frame
-        @_current_stack_depth -= 1
-        if @_current_stack_depth.zero?
-          @__push_stack_frame_on_deck = @_push_stack_frame
-          @_push_stack_frame = :__push_first_again
-          @_pop_stack_frame = :_NEVER
-        end
-      end
-    end
+    # -
 
     # ==
 
-    class WrapWithDepthAtLevelZero___
-
-      def initialize path
-        @path = path ; freeze
-      end
-
-      def to_description
-        "file: #{ @path }"
-      end
-
-      def depth
-        0
-      end
-    end
-
-    class WrapWithDepthNormally__
-
-      def initialize d, tng
-        @depth = d
-        @tupling = tng
-        freeze
-      end
-
-      def to_description
-        @tupling.to_description
-      end
-
-      attr_reader(
-        :depth,
-        :tupling,
-      )
-    end
-
-    # ==
-
-    Tupling_for__ = -> n do
-      Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-        specific_tupling_or_generic_tupling_for n
-    end
-
-    # ==
-
-    MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
-
-    # ==
-
-    # :#foolhardy:
-    #
-    # the TL;DR: is that this is a developmental crutch that we will
-    # probably refactor out later, because as it is it isn't correct.
-    #
-    # this implementational quirk applies (at least) to:
-    #   - `defs`
-    #   - `splat`
-    #   - "expression of module" for example:
-    #     - the right side of `<`
-    #     - the left side of `::`
-    #
-    # in places marked with this tag (viz the above places at least), the
-    # grammatical nonterminal has as one of its components an "argument"
-    # that can in fact be any expression (presumably).
-    #
-    # for example in the case of subclassing with `<`, you could write any
-    # expression to the right side of the operator, for example a case
-    # expression that weirdly determines the superclass to use. only at
-    # runtime does the runtime resolve whether the expression produces
-    # a (subclassable) class. the point is, it still compiles with any
-    # expression there.
-    #
-    # (a more realistic example is using a case expression as the left
-    # side of a `::` operator, something we do in one place in the corpus,
-    # and is turned into a testpoint.)
-    #
-    # the real-world consequences of this dynamic spell out for us in a way
-    # that we anticipated: for example you cannot reliably find all classes
-    # in a corpus that subclass some particular class. you might find some
-    # but the dynamic nature of the language prevents you from doing this
-    # reliably with syntactic analysis alone.
-    #
-    # however as it is implemented presently, we are not so lenient.
-    # rather, we have gone thru and made a case expression with a case for
-    # every single grammatical symbol that *does* occur in our corpus;
-    # rather that doing what is correct and acceping *any* expression (so
-    # `_node`).
-    #
-    # this is for at least two reasons:
-    #
-    #   - we didn't really realize that all these things were this way
-    #     at the outset. (we didn't exactly think they were *not* this way,
-    #     either. we just hadn't really thought about it.)
-    #
-    #   - there is a tiny chance that our "granular optimism" here will
-    #     yield profit later - if for example we want to implement selectors
-    #     to be "pragmatic" rather than "pure" so that for example we *could*
-    #     find all those classes that subclass a module as expressed by a
-    #     certain const string, like "Xx::Yy". (in fact our selectors should
-    #     be flexible enough to support such a query by "pure" means, but
-    #     that's later.)
+    Here___ = self
 
     # ==
     # ==
   end
 end
+# #history-A.4: extracted longer comments, many mechanics out to own files
 # #history-A.3: converted hard-coded hook methods to "expand" nodes via method argument signature
 # #history-A.2 (can be temporary): remove last traces of 'ruby_parser'
 # #history-A.1: begin refactor from 'ruby_parser' to 'parser'

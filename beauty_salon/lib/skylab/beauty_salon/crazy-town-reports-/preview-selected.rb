@@ -24,7 +24,7 @@ module Skylab::BeautySalon
           line_cache = nil
           stats = Stats___.new
 
-          oo.define_document_hooks_plan :plan_A do |o|
+          oo.define_document_processor :plan_A do |o|
 
             curr_path = nil
 
@@ -53,7 +53,7 @@ module Skylab::BeautySalon
 
           oo.on_each_file_path do |path, o|
 
-            o.execute_document_hooks_plan :plan_A
+            o.execute_document_processor :plan_A
           end
 
           oo.after_last_file do

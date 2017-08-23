@@ -84,9 +84,9 @@ module Skylab::BeautySalon
 
   module Lib_
 
-    sidesys, = Autoloader_.at(
+    sidesys, gem = Autoloader_.at(
       :build_require_sidesystem_proc,
-      # :build_require_stdlib_proc,
+      :build_require_stdlib_proc,
     )
 
     File_utils = Common_.memoize do
@@ -114,6 +114,8 @@ module Skylab::BeautySalon
     Tree_lib = -> do
       ST__[]::Tree
     end
+
+    Unparser = gem[ :Unparser ]
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]

@@ -23,15 +23,28 @@
 [#025]       crazy town ..
              ( #was: #moved-to: [sa] )
 
-[#024]       (#ditto)
-[#023]       (#ditto)
-[#022]       (#ditto)
-[#021]       (#ditto)
+[#024] #hole
+             ( #was: #moved-to: [sa] )
+[#023] #hole
+             ( #was: #moved-to: [sa] )
+
+[#022] #open #crazy-town get structural, imperative-based declarations in
+             that one file to *complement* (not redund) with the main file.
+             we're saving this to wait until after proof-of-concept rewrite
+             the bad way with 'parser' first before we wreck everything..
+
+             ( #was: #moved-to: [sa] )
+
+[#021]       #crazy-town our take on an AST processor ..
+             ( #was: #moved-to: [sa] )
 
 [#020] #open #wish: contribute to ragel in this one way
              ( #was: encoding issues with git config ([#ba-064]) )
 
              :[#here.B]: (in "ragel notes", the dedicated document for this node)
+
+       #open :[#here.C]: we'll piggyback our issuse with 'parser' in here
+             too. (see referrent)
 
 [#019]       the `[*]` task of converting all `Foo_::Lib_::Bar_BAZ[]`
                to `Foo_.lib.bar_BAZ`..
@@ -63,6 +76,7 @@
 
 [#007]       ( intra-subsystem issues )
 
+             [#here.B]: tickler: one day #crazy-town target multiple syntax versions
              [#here.A]: the document, which is a very early trace of etc ..
 
 [#006]       2012-10-28 #chore get ideas from skylab.rb, flatten to issues

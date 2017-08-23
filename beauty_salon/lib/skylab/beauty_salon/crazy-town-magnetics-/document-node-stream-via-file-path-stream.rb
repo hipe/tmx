@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::DocumentSexpStream_via_FilePathStream < Common_::SimpleModel
+  class CrazyTownMagnetics_::DocumentNodeStream_via_FilePathStream < Common_::SimpleModel
 
     # mainly, convert a stream of paths to a stream of "potential sexps":
     #
@@ -39,24 +39,24 @@ module Skylab::BeautySalon
         # before we even evaluate our defition (because our event hooks
         # rely on closure scope)
 
-        lc = CrazyTownMagnetics_::LineStream_via_DocumentSexpStream::StatefulLineCachingThing.new
+        lc = CrazyTownMagnetics_::LineStream_via_DocumentNodeStream::StatefulLineCachingThing.new
 
-        hooks = CrazyTownMagnetics_::Hooks_via_HooksDefinition.new do |o|
+        _dp = CrazyTownMagnetics_::DocumentProcessors_via_Definition.call_by do |o|
           yield lc.line_yielder, o
         end
 
         _etc_st = remove_instance_variable :@__potential_sexp_stream
 
-        CrazyTownMagnetics_::LineStream_via_DocumentSexpStream.call_by do |o|
-          o.hooks = hooks
+        CrazyTownMagnetics_::LineStream_via_DocumentNodeStream.call_by do |o|
+          o.document_processors = _dp
           o.per_file_line_cache = lc.line_cache
-          o.potential_sexp_stream = _etc_st
+          o.potential_node_stream = _etc_st
         end
       end
 
       def __init_potential_sexp_stream
 
-        proto = PotentialSexp___.new self
+        proto = Potential_AST___.new self
 
         _file_path_st = remove_instance_variable :@file_path_upstream
 
@@ -71,7 +71,7 @@ module Skylab::BeautySalon
 
     # ==
 
-    class PotentialSexp___
+    class Potential_AST___
 
       # wrap a filesystem path (that perhaps has no or an invalid referrant)
       # such that statefully & lazily it attempts to evaluate a sexp value
