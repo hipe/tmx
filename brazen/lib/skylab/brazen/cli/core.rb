@@ -1,6 +1,210 @@
 module Skylab::Brazen
 
-  class CLI < ::Class.new ::Class.new  # see [#002]
+  CLI = ::Class.new ::Class.new ::Class.new  # see [#002]
+  # (the above is an atrocity but it will go away eventually. it's because #here3.)
+
+  class CLI  # (open up scope of old thing, target particular indent. closes #here1)
+  class CLI::CLI_for_BeautySalon_PIONEER
+
+    # NOTE
+    #
+    #   - this is a bleeding edge pioneer
+    #
+    #   - ultimately it is meant to replace the legacy [br] CLI, which is
+    #     why it is being injected into this file.
+    #
+    #   - its injection here is abrubt because we need it now for a
+    #     several-tangets-deep quest chain
+    #
+    #   - [ze] niCLI is too complicated for us - it presupposes [acs] etc
+    #
+    #   - [tmx] CLI is the main mentor for this, and [sn] (which has no CLI yet)
+
+    class << self
+      alias_method :begin_by, :new
+      undef_method :new
+    end  # >>
+
+    # -
+
+      # -- strange interface because:
+      #   - there is a standard way to invoke CLI: `CLI.new( [ 5 things ] ).execute`
+      #   - composition not inheritance
+      #   - this is similar to [#ze-003]
+
+      def initialize
+
+        if ! CLI.const_defined? :UI_
+          require 'no-dependencies-zerk'
+          CLI.const_set :UI_, ::NoDependenciesZerk
+        end
+
+        yield self
+      end
+
+      attr_writer(
+        :application_module,
+        :operator_branch,
+      )
+
+      def new a, _i, o, e, pns_a
+        @ARGV = a
+        @program_name_string_array = pns_a
+        @stderr = e
+        @stdout = o
+        self
+      end
+
+      # --
+
+      def execute  # result in exitstatus
+
+        @listener = method :__receive_emission
+        __init_argument_scanner_via_listener
+        __init_omni_branch
+
+        bc = __flush_to_bound_call_of_operator
+        if bc
+          @_exitstatus = 0
+          x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+          if x
+            self._COVER_ME__express_result__
+          else
+            @_exitstatus
+          end
+        else
+          bc.nil? ? 0 : 5
+        end
+      end
+
+      def __flush_to_bound_call_of_operator
+
+        if @args.no_unparsed_exists
+          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ @omni ]
+
+        elsif @args.scan_operator_symbol_softly
+
+          lu = @omni.flush_to_lookup_operator
+          lu and __bound_call_via_operator lu
+
+        elsif @args.scan_primary_symbol_softly
+          @omni.flush_to_lookup_current_and_parse_remaining_primaries
+
+        else
+          @args.when_malformed_primary_or_operator
+        end
+      end
+
+      def __express_help
+
+        _mod = Zerk_lib_[]::NonInteractiveCLI::Help::ScreenForBranch
+
+        desc_proc_via_module = -> mod do
+          -> y do
+            mod.describe_into_under y, self
+          end
+        end
+
+        _mod.express_into @stderr do |o|
+
+          o.expression_agent ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
+
+          o.item_normal_tuple_stream __items
+
+          o.express_usage_section get_program_name
+
+          o.express_description_section desc_proc_via_module[ @application_module ]
+
+          o.express_items_sections -> ref do
+            _x = ref.dereference_loadable_reference
+            desc_proc_via_module[ _x ]
+          end
+
+        end
+      end
+
+      def __items
+        @operator_branch.to_loadable_reference_stream.map_by do |key_x|
+          [ :operator, key_x ]
+        end
+      end
+
+      def __bound_call_via_operator lu
+        _action_class = lu.mixed_business_value.dereference_loadable_reference
+        _inst = _action_class.new(){ self }
+        Common_::BoundCall[ nil, _inst, :execute ]
+      end
+
+      # ~ (for above)
+
+      attr_reader(
+        :listener,
+      )
+
+      # --
+
+      def __init_omni_branch
+        @omni = UI_::ParseArguments_via_FeaturesInjections.define do |fi|
+          __inject_features fi
+        end
+      end
+
+      def __inject_features fi
+
+        fi.argument_scanner = @args
+
+        fi.add_lazy_operators_injection_by do |o|
+          __add_injection o
+        end
+
+        fi.add_primaries_injection PRIMARIES___, self
+      end
+
+      PRIMARIES___ = {
+        help: :__express_help,
+      }
+
+      def __add_injection inj
+
+        inj.operators = @operator_branch
+
+        inj.injector = :_bs_hi_
+      end
+
+      def __init_argument_scanner_via_listener
+
+        @args = UI_::CLI_ArgumentScanner.define do |o|
+          o.ARGV = remove_instance_variable :@ARGV
+          o.listener = @listener
+        end
+        NIL
+      end
+
+      def __receive_emission *chan, & em_p
+
+        expr = UI_::CLI_Express_via_Emission.define do |o|
+          o.emission_proc_and_channel em_p, chan
+          o.stderr = @stderr
+        end
+        sct = expr.execute
+        if sct && sct.was_error
+          __when_result_was_error chan
+        end
+      end
+
+      def __when_result_was_error _chan
+        @stderr.puts "try '#{ get_program_name } -h'"
+        NIL
+      end
+
+      def get_program_name
+        ::File.basename @program_name_string_array.last  # meh
+      end
+    # -
+  end
+  end  # :#here1
+
+  class CLI  # (re-open..)
 
     class << self
 
@@ -24,6 +228,8 @@ module Skylab::Brazen
         79  # :+#idea-kitestring for ncurses maybe
       end
     end  # >>
+
+    # (:#here3:)
 
     Top_Invocation__ = self
 
@@ -2223,4 +2429,5 @@ module Skylab::Brazen
     When_ = -> { o::When }
   end
 end
+# #history-A.1: begin splicing matryoshka-killer in to legacy file
 # #tombstone: re-entrancy

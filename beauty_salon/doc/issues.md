@@ -25,7 +25,8 @@
 
 [#024] #hole
              ( #was: #moved-to: [sa] )
-[#023] #hole
+
+[#023] #open ween off of [br]  (this is for tracking related todo's)
              ( #was: #moved-to: [sa] )
 
 [#022] #open #crazy-town get structural, imperative-based declarations in

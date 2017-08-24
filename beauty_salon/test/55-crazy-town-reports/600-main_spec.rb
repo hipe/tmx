@@ -29,7 +29,7 @@ module Skylab::BeautySalon::TestSupport
         _exp_s = <<~O
           @@ -11,12 +11,12 @@
            
-               this 'ping' do
+               this 'perng' do
            
           -      _em = expect_nootral_event :pirng
           +      _em = chamonay(:pirng)
@@ -62,9 +62,11 @@ module Skylab::BeautySalon::TestSupport
           _st = __INCREDIBLE_HACK paths
             # (by way of everything else, cover directories here)
 
+          _this_path = ::File.join TS_.dir_path, 'fixture-functions', 'la-la-015.rb'
+
           o.file_path_upstream = _st
           o.code_selector_string = "send(method_name=='expect_nootral_event')"
-          o.replacement_function_string = 'file:test/fixture-functions/la-la-015.rb'
+          o.replacement_function_string = "file:#{ _this_path }"
         end
 
         _3_lines = [ st.gets, st.gets, st.gets ]

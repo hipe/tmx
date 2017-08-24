@@ -61,7 +61,7 @@ module Skylab::BeautySalon::TestSupport
 
       cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
 
-      cli.invoke 'beauty-salon', 'ping'
+      cli.invoke 'beauty-salon', 'ping-orig'
 
       cli.expect_on_stderr "hello from beauty salon.\n"
 

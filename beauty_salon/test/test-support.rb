@@ -105,6 +105,10 @@ module Skylab::BeautySalon::TestSupport
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 
+  Non_Interactive_CLI = -> tcc do
+    Home_.lib_.zerk.test_support::Non_Interactive_CLI[ tcc ]
+  end
+
   # --
 
   def self._MY_BIN_PATH
@@ -115,6 +119,10 @@ module Skylab::BeautySalon::TestSupport
 
   Fixture_file_ = -> tail do  # 1x
     ::File.join TS_.dir_path, 'fixture-files', tail
+  end
+
+  Zerk_test_support_ = -> do
+    Home_.lib_.zerk.test_support
   end
 
   # --

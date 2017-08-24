@@ -50,7 +50,7 @@ module Skylab::Zerk
 
         # (it must be that at least one intermediary between where the
         # defintion is read and when the final front scanner is constructed
-        # because, for exampe, sub-scanners typically need to be constructed
+        # because, for example, sub-scanners typically need to be constructed
         # with the emission listener but the emission listener might be set
         # after the sub-scanners are defined.)
 

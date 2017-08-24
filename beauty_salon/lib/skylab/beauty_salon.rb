@@ -24,6 +24,18 @@ module Skylab::BeautySalon
     end
   end  # >>
 
+  lazily :CLI2 do
+
+    Home_.lib_.brazen  # (touch early, make the rest more readable.)
+
+    ::Skylab::Brazen::CLI::CLI_for_BeautySalon_PIONEER.begin_by do |o|
+
+      o.operator_branch = Operator_branch___[]
+
+      o.application_module = Home_
+    end
+  end
+
   lazily :CLI do
     class CLI < Home_.lib_.brazen::CLI
 
@@ -47,6 +59,30 @@ module Skylab::BeautySalon
         bc and bc.receiver.send bc.method_name, * bc.args
       end
     end  # >>
+  end
+
+  Lazy_ = Common_::Lazy
+
+  Operator_branch___ = Lazy_.call do
+
+    lib = Home_.lib_
+
+    lib.plugin::ModelCentricOperatorBranch.define do |o|
+
+      _MTk = lib.zerk::MicroserviceToolkit  # MTk_
+
+      same = 'actions'
+
+      o.add_actions_module_path_tail ::File.join 'ping', same
+
+      o.models_branch_module = Home_::Models_
+
+      o.bound_call_via_action_with_definition_by = -> act do
+        _MTk::BoundCall_of_Operation_with_Definition[ act ]
+      end
+
+      o.filesystem = ::Dir
+    end
   end
 
   DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_ = -> e do
@@ -74,8 +110,6 @@ module Skylab::BeautySalon
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end
-
-  Lazy_ = Common_::Lazy
 
   Require_brazen_LEGACY_ = Lazy_.call do
     Brazen_ = Home_.lib_.brazen
@@ -120,6 +154,7 @@ module Skylab::BeautySalon
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Human = sidesys[ :Human ]
+    Plugin = sidesys[ :Plugin ]
     ST__ = sidesys[ :SubTree ]
     System_lib = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]

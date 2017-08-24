@@ -9,7 +9,7 @@ module Skylab::BeautySalon::TestSupport
 
     it "ping" do
 
-      call_API :ping
+      call_API :ping_orig
 
       _em = expect_neutral_event :ping
 

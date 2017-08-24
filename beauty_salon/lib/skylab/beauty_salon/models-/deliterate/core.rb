@@ -6,7 +6,7 @@ module Skylab::BeautySalon
 
     Require_brazen_LEGACY_[]
 
-    class Actions::Ping < Brazen_::Action  # :+#stowaway (while it works)
+    class Actions::PingOrig < Brazen_::Action  # :+#stowaway (while it works)
 
       @is_promoted = true
 

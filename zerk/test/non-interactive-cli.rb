@@ -123,10 +123,26 @@ module Skylab::Zerk::TestSupport
       # and that is part of the assertion, not done here.
 
       def to_output_line_stream
-        Common_::Stream.via_nonsparse_array( niCLI_state.lines ).map_reduce_by do |li|
-          if :o == li.stream_symbol
+        _to_line_string_stream_ZE_niCLI( :o ) { NOTHING_ }
+      end
+
+      def to_errput_line_stream_strictly
+        _to_line_string_stream_ZE_niCLI( :e ) { fail }
+      end
+
+      def _to_line_string_stream_ZE_niCLI sym
+        Home_::Stream_[ niCLI_state.lines ].map_reduce_by do |li|
+          if sym == li.stream_symbol
             li.string
+          else
+            yield
           end
+        end
+      end
+
+      def to_line_stream
+        Home_::Stream_.call niCLI_state.lines do |o|
+          o.string
         end
       end
 
@@ -148,12 +164,20 @@ module Skylab::Zerk::TestSupport
         _niCLI_state_lines.fetch 0
       end
 
+      def second_line_string
+        second_line.string
+      end
+
       def second_line
         _niCLI_state_lines.fetch 1
       end
 
       def last_line
         _niCLI_state_lines.fetch( -1 )
+      end
+
+      def third_and_final_line_string
+        third_and_final_line.string
       end
 
       def third_and_final_line

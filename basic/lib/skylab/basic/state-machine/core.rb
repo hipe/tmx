@@ -133,10 +133,10 @@ module Skylab::Basic
 
       class << self
 
-        def interpret_compound_component st
+        def interpret_compound_component scn
           new do
-            @name_symbol = st.gets_one
-            process_argument_scanner_passively st
+            @name_symbol = scn.gets_one
+            process_argument_scanner_passively scn
           end
         end
 
@@ -184,12 +184,12 @@ module Skylab::Basic
 
         rx = gets_one
 
-        _accept_barrier_to_entry do |st|
+        _accept_barrier_to_entry do |scn|
 
-          if ! st.no_unparsed_exists
-            md = rx.match st.head_as_is
+          if ! scn.no_unparsed_exists
+            md = rx.match scn.head_as_is
             if md
-              st.advance_one
+              scn.advance_one
               md
             end
           end

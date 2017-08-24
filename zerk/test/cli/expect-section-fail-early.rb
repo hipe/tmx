@@ -192,8 +192,10 @@ module Skylab::Zerk::TestSupport
       end
 
       def __receive_first_emission em
-        s = em.string
-        if s
+        if Is_blank_line_emission__[ em ]
+          fail AssertionFailed, __say_expecting_string_but_had_none
+        else
+          s = em.string
           md = SECTION_OPENER_RX___.match s
           if md
             if @header_string == md[ :header ]
@@ -206,8 +208,6 @@ module Skylab::Zerk::TestSupport
           else
             fail AssertionFailed, __say_expecting_match(s)
           end
-        else
-          fail AssertionFailed, __say_expecting_string_but_had_none
         end
       end
 
@@ -225,16 +225,16 @@ module Skylab::Zerk::TestSupport
 
       def _receive_subsequent_emission_normally em
 
-        s = em.string
-        if s
+        if Is_blank_line_emission__[ em ]
+          __receive_locally_first_blank_line em
+        else
+          s = em.string
           if INDENTED_RX__ =~ s
             @emissions.push em
             :_stay_
           else
             fail AssertionFailed, __say_annoying(s)
           end
-        else
-          __receive_locally_first_blank_line em
         end
       end
 
@@ -247,9 +247,11 @@ module Skylab::Zerk::TestSupport
       end
 
       def __receive_line_after_mystery_blank_line em
-        s = em.string
-        s || self._SANITY  # two blank lines in a row is perhaps unheard of
-        if INDENTED_RX__ =~ s
+
+        Is_blank_line_emission__[ em ] && self._SANITY__readme__
+          # two blank lines in a row is perhaps unheard of
+
+        if INDENTED_RX__ =~ em.string
           @emissions.push em
           @_receive = :_receive_subsequent_emission_normally
           :_stay_
@@ -297,6 +299,7 @@ module Skylab::Zerk::TestSupport
       def to_index_of_common_item_list
 
         muta = nil
+
         _st = Stream_.call @emissions do |em|
           em.string || ( muta ||= "" )
         end
@@ -338,10 +341,14 @@ module Skylab::Zerk::TestSupport
 
       def number_of_lines
         num = @emissions.length
-        if ! @emissions.last.string
+        if Is_blank_line_emission__[ @emissions.last ]
           num -= 1
         end
         num
+      end
+
+      def TO_LINE_STRINGS  # not covered but useful in debugging
+        @emissions.map { |em| em.string }
       end
 
       attr_reader(
@@ -1131,6 +1138,28 @@ module Skylab::Zerk::TestSupport
       end
 
       attr_accessor :children
+    end
+
+    Is_blank_line_emission__ = -> em do
+
+      # whether or not:
+      #
+      #   - lines should be capped with an end-of-line sequence
+      #   - NIL means "empty line"
+      #
+      # is something we do not want to be strict about at this late
+      # stage in the pipeline.
+
+      s = em.string
+      if s
+        if s.length.zero?
+          TS_._COVER_ME__probably_blank_line_but_where_
+        else
+          NEWLINE_ == s
+        end
+      else
+        ACHIEVED_
+      end
     end
 
     Magnetics__ = -> do

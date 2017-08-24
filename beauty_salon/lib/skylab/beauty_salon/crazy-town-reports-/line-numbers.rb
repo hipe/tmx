@@ -4,6 +4,8 @@ module Skylab::BeautySalon
 
     # check out this bittersweet creation myth:
     #
+    # (historical: the below was during our use of 'ruby_parser', not 'parser')
+    #
     # for better or worse, when we were playing with this external tech,
     # we accidentally used the (ahem, conventional, stdlib) method name
     # `lineno` instead of what the external library uses (`line`).

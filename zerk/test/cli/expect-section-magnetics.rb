@@ -160,7 +160,7 @@ module Skylab::Zerk::TestSupport
         )
 
         o.add_state(
-          :only_header_line, :entered_by_regex, %r(\A(?<header>[^:]+):\z),
+          :only_header_line, :entered_by_regex, %r(\A(?<header>[^:]+):$),
           :on_entry, -> sm do
             sm.downstream.__receive_header_ sm.user_matchdata
             :first_item_line
@@ -352,12 +352,14 @@ module Skylab::Zerk::TestSupport
 
           _md = %r(\A-*).match moniker
 
-          _key = Key_via_moniker__[ _md.post_match ]
+          s = _md.post_match.freeze
+
+          x = Key_via_moniker__[ s ]
 
           _ary = remove_instance_variable :@_desc_pieces
 
-          @_h[ _key ] = @_items.length
-          @_items.push Item___.new _ary
+          @_h[ x ] = @_items.length
+          @_items.push Item___.new x, s, _ary
           NIL
         end
       end
@@ -390,12 +392,16 @@ module Skylab::Zerk::TestSupport
 
       class Item___
 
-        def initialize s_a
+        def initialize x, s, s_a
           @desc_string_array = s_a
+          @label = s
+          @mixed_normal_key = x
         end
 
         attr_reader(
           :desc_string_array,
+          :label,
+          :mixed_normal_key,
         )
       end
 
