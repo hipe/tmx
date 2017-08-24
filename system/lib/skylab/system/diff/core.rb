@@ -42,6 +42,7 @@ module Skylab::System
     class Diff_via___ < Common_::MagneticBySimpleModel
 
       def initialize
+        @do_result_in_line_stream = false
         super  # hi.
       end
 
@@ -56,6 +57,7 @@ module Skylab::System
       end
 
       attr_writer(
+        :do_result_in_line_stream,
         :tmpfile_sessioner,
       )
 
@@ -79,9 +81,23 @@ module Skylab::System
       end
 
       def __work
-        _process = __build_process
-        _hunk_st = Here_::Magnetics::HunkStream_via_FileDiffProcess[ _process ]
-        Here_::Magnetics::Diff_via_HunkStream[ _hunk_st ]
+
+        process = __build_process
+
+        magnet = Here_::Magnetics::HunkStream_via_FileDiffProcess
+
+        if @do_result_in_line_stream
+
+          magnet.call_by do |o|
+            o.do_result_in_line_stream = true
+            o.process = process
+          end
+        else
+          _hunk_st = magnet.call_by do |o|
+            o.process = process
+          end
+          Here_::Magnetics::Diff_via_HunkStream[ _hunk_st ]
+        end
       end
 
       def __build_process
@@ -89,10 +105,10 @@ module Skylab::System
         read_out, write_out = ::IO.pipe
         read_err, write_err = ::IO.pipe
 
-        cmd = [ * DIFF_COMMAND_HEAD__, @_left_path, @_right_path ]
+        _cmd = [ * DIFF_COMMAND_HEAD__, @_left_path, @_right_path ]
 
         pid = ::Kernel.spawn(
-          * cmd,
+          * _cmd,
           err: write_err,
           out: write_out,
         )

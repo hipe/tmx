@@ -263,6 +263,13 @@ module Skylab::BeautySalon
         end
       end
 
+      def __build_replacement_function
+        CrazyTownMagnetics_::ReplacementFunction_via_String.call_by do |o|
+          o.string = remove_instance_variable :@replacement_function_string
+          o.listener = @listener
+        end
+      end
+
       def __flush_file_path_upstream_resources
         CrazyTownMagnetics_::DocumentNodeStream_via_FilePathStream.call_by do |o|
           o.file_path_upstream = remove_instance_variable :@file_path_upstream

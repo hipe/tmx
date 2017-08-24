@@ -25,47 +25,53 @@ module Skylab::BeautySalon
       )
 
       def execute
-
-        if __parse_those_two_things
-          if __resolve_dynamic_hook_definition
-            __flush_to_lines_of_the_diff_of_every_file
-          end
+        if __resolve_dynamic_hook_definition
+          __flush_definition
         end
       end
 
-      def __flush_to_lines_of_the_diff_of_every_file
+      def __flush_definition
 
         _dhd = remove_instance_variable :@__dynamic_hook_definition
 
         _rsx = remove_instance_variable :@file_path_upstream_resources
         _rsx.line_stream_via_file_chunked_functional_definition do |y, oo|
 
-          oo.define_document_hooks_plan :_main_ do |o|
+          oo.define_document_processor :_main_ do |o|
 
             _dhd.flush_definition__ y, o  # hi.
           end
 
           oo.on_each_file_path do |path, o|
-            o.execute_document_hooks_plan :_main_
+            o.execute_document_processor :_main_
           end
         end
       end
 
       def __resolve_dynamic_hook_definition
 
-        _ = Home_::CrazyTownMagneticsForMainReport_::FileChanges_via_HooksDefinition_via_Functions_and_Selector.call_by do |o|
-          o.replacement_function = remove_instance_variable :@__replacement_function
-          o.code_selector = remove_instance_variable :@__code_selector
+        _ = Home_::CrazyTownMagneticsForMainReport_::ChangedFile_via_HooksDefinition_via_Functions_and_Selector.call_by do |o|
+
+          o.receive_changed_file = method :__receive_changed_file
+
+          o.replacement_function = remove_instance_variable :@replacement_function
+          o.code_selector = remove_instance_variable :@code_selector
           o.listener = @listener
         end
 
         _store :@__dynamic_hook_definition, _
       end
 
-      def __parse_those_two_things
-        @__replacement_function = :_repl_func_placeholder_
-        @__code_selector = :_code_selector_placeholder_
-        ACHIEVED_
+      def __receive_changed_file y, io, sb
+
+        _ = Home_::CrazyTownMagneticsForMainReport_::DiffLineStream_via_ChangedFile.call_by do |o|
+          o.line_yielder = y
+          o.changed_file_IO = io
+          o.source_buffer = sb
+          o.listener = @listener
+        end
+
+        _  # hi #todo
       end
 
       # -- A.
@@ -76,32 +82,6 @@ module Skylab::BeautySalon
 
     # -
 
-
-    # ==
-
-    class FileChangesList___
-
-      def initialize
-        @count = 0
-        @paths = []
-        @_a = []
-      end
-
-      def __add_ fc
-        @count += 1
-        @paths.push fc.path
-        @_a.push fc ; nil
-      end
-
-      def fetch d
-        @_a.fetch d
-      end
-
-      attr_reader(
-        :count,
-        :paths,
-      )
-    end
 
     # ==
     # ==

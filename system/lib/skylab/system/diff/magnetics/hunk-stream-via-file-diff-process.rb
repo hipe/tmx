@@ -2,19 +2,62 @@ module Skylab::System
 
   class Diff
 
-    class Magnetics::HunkStream_via_FileDiffProcess < Common_::Monadic
+    class Magnetics::HunkStream_via_FileDiffProcess < Common_::MagneticBySimpleModel
 
       # a state machine for parsing a unified diff of two files
 
       # -
-        def initialize pcs
-          @process = pcs
+
+        attr_writer(
+          :do_result_in_line_stream,
+          :process,
+        )
+
+        def initialize
+          @do_result_in_line_stream = false
+          super
         end
 
         def execute
+          if @do_result_in_line_stream
+            __flush_to_line_stream
+          else
+            __flush_to_hunk_stream
+          end
+        end
+
+        def __flush_to_hunk_stream
           @_gets_hunk = :__gets_first_hunk
           Common_.stream do
             send @_gets_hunk
+          end
+        end
+
+        def __flush_to_line_stream
+          out = @process.out
+          p = nil
+          main = -> do
+            line = out.gets
+            if line
+              line
+            else
+              @_expected_exitstatus = 1
+              _check_and_close
+            end
+          end
+          p = -> do
+            line = out.gets
+            if line
+              p = main
+              line
+            else
+              p = nil
+              @_expected_exitstatus = 0
+              _check_and_close
+            end
+          end
+          Common_.stream do
+            p[]
           end
         end
 
@@ -363,4 +406,5 @@ module Skylab::System
     end
   end
 end
+# #history-B.1: inject experimental line-based option (needs coverage)
 # #history: full rewrite of ancient [tm] thing

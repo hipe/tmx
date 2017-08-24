@@ -69,6 +69,5 @@ indented report: uber alles
 THEN: refactor to better viz, i.e of calls in tests
 (-1.3.N refactor your tupling to complement the hooks mesh
 think about how your tupling can be recursive and lazy (still immutable)
-(-1.3.N with your rough-ass tupling cover a change being made (say, to method calls))
 understand Parser nodes - how can we unparse?
-cover a "faithless" simple use-case
+location map - this is the key

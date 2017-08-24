@@ -271,7 +271,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __resolve_file_path_upstream_via_files files
+      def __resolve_file_path_upstream_via_files files  # #testpoint
 
         # hand-written map-expand
 

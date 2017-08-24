@@ -138,8 +138,17 @@ module Skylab::BeautySalon
           method_name: Component__[
             offset: 1,
             type: :symbol,
+            via: :Symbol_via_symbol__,
           ]
         }
+
+        def method_name= x
+          _lazy_auto_setter_ x
+        end
+
+        def method_name
+          _lazy_auto_getter_
+        end
       end
     end
 
@@ -161,25 +170,89 @@ module Skylab::BeautySalon
 
       def initialize n
         @node = n
-        # (can't freeze because we derive things lazily e.g #here1)
+        # (can't freeze because we derive things lazily e.g #here1) :#here2
+      end
+
+      def new_by
+        mutable = self.class.allocate
+        mutable.__init_as_recorder
+        yield mutable
+        mutable.__finish_mutation_against @node
+      end
+
+      def __init_as_recorder
+        @_pending_writes_ = []
+      end
+
+      def __finish_mutation_against node
+
+        _a_a = remove_instance_variable :@_pending_writes_
+
+        shallowly_mutable_array = node.children.dup
+
+        _a_a.each do |(d, x)|  # #here3
+          shallowly_mutable_array[ d ] = x
+        end
+
+        shallowly_mutable_array.freeze
+
+        _new_properties = { location: node.location }
+
+        @node = node.updated(
+          nil,
+          shallowly_mutable_array,
+          _new_properties,
+        )
+
+        self  # not freezing because #here2
+      end
+
+      def to_code
+        # (we know we want to improve this but we are locking it down)
+        Home_.lib_.unparser.unparse @node
+      end
+
+      # --
+      #   these are insane but it's OK. the first time they are called, they
+      #   ** REWRITE THE METHOD OF THE ACTUAL CLASS ** (not singleton class)
+
+      def _lazy_auto_setter_ x
+
+        m = caller_locations( 1, 1 )[0].base_label.intern
+
+        cmp = _component_via_symbol m[ 0 ... -1 ].intern
+
+        _method_body = Writers__.const_get( cmp._via_, false )[ m, cmp ]
+
+        _redefine_method _method_body, m
+
+        send m, x  # dogfood
       end
 
       def _lazy_auto_getter_
 
-        # this is insane but it's OK. the first time this is called, it
-        # ** REWRITES THE METHOD OF THE ACTUAL CLASS ** (not singleton class)
-
-        cls = self.class
         m = caller_locations( 1, 1 )[0].base_label.intern
-        cmp = cls::COMPONENTS.fetch m
 
-        _method_body = These___.const_get( cmp._via_, false )[ m, cmp ]
+        cmp = _component_via_symbol m
 
-        cls.send :undef_method, m
-        cls.send :define_method, m, _method_body
+        _method_body = Readers__.const_get( cmp._via_, false )[ m, cmp ]
+
+        _redefine_method _method_body, m
 
         send m  # dogfood
       end
+
+      def _redefine_method method_body, m
+        cls = self.class
+        cls.send :undef_method, m
+        cls.send :define_method, m, method_body
+      end
+
+      def _component_via_symbol sym
+        self.class::COMPONENTS.fetch sym
+      end
+
+      # --
 
       def begin_lineno__
         @node.location.first_line
@@ -188,12 +261,18 @@ module Skylab::BeautySalon
       def end_lineno__
         @node.location.last_line
       end
+
+      def node_loc  # meh
+        @node.loc
+      end
     end
 
     # ==
 
-    These___ = ::Module.new
-    These___::String_via_module_identifier__ = -> cmp_sym, cmp do
+    Writers__ = ::Module.new
+    Readers__ = ::Module.new
+
+    Readers__::String_via_module_identifier__ = -> cmp_sym, cmp do
 
       Memoize_into_ivar__.call cmp_sym, cmp do |offset|
         -> do
@@ -203,7 +282,15 @@ module Skylab::BeautySalon
       end
     end
 
-    These___::Symbol_via_symbol__ = -> cmp_sym, cmp do
+    # ~
+
+    Writers__::Symbol_via_symbol__ = -> cmp_sym, cmp do
+      -> sym do
+        @_pending_writes_.push [ cmp.offset, sym ] ; sym  # per #here3
+      end
+    end
+
+    Readers__::Symbol_via_symbol__ = -> cmp_sym, cmp do
 
       Memoize_into_ivar__.call cmp_sym, cmp do |offset|
         -> do
