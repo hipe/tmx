@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] CLI - deliterate" do
+  describe "[bs] CLI - deliterate", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

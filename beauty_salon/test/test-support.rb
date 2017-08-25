@@ -32,6 +32,11 @@ module Skylab::BeautySalon::TestSupport
 
   module InstanceMethods___
 
+    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Expect_Line::
+          Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    end
+
     def expect_these_lines_in_array_ a, & p
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
@@ -98,6 +103,35 @@ module Skylab::BeautySalon::TestSupport
 
   # -- bundles
 
+  module My_API
+
+    def self.[] tcc
+      Memoizer_Methods[ tcc ]
+      Expect_Emission_Fail_Early[ tcc ]
+      tcc.include self
+    end
+
+    def expect_API_result_for_failure_
+      expect_result nil
+    end
+
+    def expect_API_result_for_success_  # track this idea
+      expect_result nil
+    end
+
+    def expression_agent
+      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
+    end
+
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
+    def subject_API
+      Home_::API::API2  # #open [#023]
+    end
+  end
+
   module Modality_Agnostic_Interface_Things
 
     def self.[] tcc ; tcc.include self end
@@ -119,6 +153,7 @@ module Skylab::BeautySalon::TestSupport
     define_method :all_toplevel_actions_normal_symbols_, ( Lazy_.call do
       [
         :ping,
+        :deliterate,
       ].freeze
     end )
   end

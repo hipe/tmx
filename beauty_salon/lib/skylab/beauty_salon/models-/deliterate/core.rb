@@ -1,54 +1,61 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < Home_.lib_.brazen::Model
+  class Models_::Deliterate
 
-    Actions = ::Module.new
+    class << self
 
-    Require_brazen_LEGACY_[]
+      def describe_into_under y, expag
 
-    class Actions::PingOrig < Brazen_::Action  # :+#stowaway (while it works)
-
-      @is_promoted = true
-
-      def produce_result
-        @on_event_selectively.call :info, :expression, :ping do | y |
-          y << "hello from beauty salon."
+        countdown = 3
+        _use_y = ::Enumerator::Yielder.new do |line|
+          y << line
+          countdown -= 1
+          countdown.zero? and throw :_stop_BS_
         end
-        :hello_from_beauty_salon
+        catch :_stop_BS_ do
+          Describe_into_under__[ _use_y, expag ]
+        end
+        y
       end
-    end
+    end  # >>
 
-    class Actions::Deliterate < Brazen_::Action
+    # -
 
-      @is_promoted = true
+      def initialize
+        o = yield
+        @_argument_scanner_ = o.argument_scanner
+        @_associations_ = {}  # #[#br-011]
+      end
 
-      Brazen_::Modelesque.entity self
+      def definition ; [  # to #here1
 
-      edit_entity_class(
+        :description, -> y do
+          self._HELLO__hello__  # #todo
+          Describe_into_under__[ y, self ]
+        end,
 
         :required, :property, :comment_line_downstream,
+
         :required, :property, :code_line_downstream,
 
         :required, :property, :line_upstream,
 
         :required,
-        :integer_greater_than_or_equal_to, 1,
         :property, :from_line,
+        :must_be_integer_greater_than_or_equal_to, 1,
 
         :required,
-        :integer,
-        :ad_hoc_normalizer, -> qkn, & oes_p do
-
-          Home_.lib_.basic::Range.normalize_qualified_knownness(
-            qkn, :is, -1, :or, :begin, 1,
-            & oes_p )
-        end,
-
         :property, :to_line,
+        :normalize_by, -> qkn, & p do
+          This_compound_normalization___[].__call_ p, qkn
+        end,
+      ] ; end
 
-        :branch_description, -> y do
-          # <- 2
-      _big_string =  <<-O.gsub %r(^ {8}), EMPTY_S_
+      Describe_into_under__ = -> y, expag do
+
+        _big_string = nil  # (interesting - you get a warning if a heredoc is a result)
+        expag.calculate do
+          _big_string = <<~O
         from line <from-line> to line <to-line> of file <file>, use a
         simple character-scanning ** HACK ** to partition each line of
         code into comment and not-comment.
@@ -80,24 +87,27 @@ module Skylab::BeautySalon
         it could possibly be: it matches the first '#' it sees in the line
         and interprets that to be the beginning of a comment, with no
         regard for its "context".
-      O
+          O
+        end  # end calculate
 
-      scn = Home_.lib_.basic::String::LineStream_via_String[ _big_string ]
-      while (( s = scn.gets ))
-        y << s
-      end
-      NIL_
-    # -> 2
-        end,
-      )
-      # <- 2
+        st = Basic_[]::String::LineStream_via_String[ _big_string ]
+        while (( line = st.gets ))
+          y << line
+        end
+        y
+    end
 
-    def produce_result
+    # -
+    def execute
 
-      via_properties_init_ivars
       ok = normalize_range
       ok && prepare
       ok && __work
+      if ok
+        NOTHING_  # all our output is in side effects
+      else
+        NOTHING_  # downgrade false to nil
+      end
     end
 
     def normalize_range           # for example,
@@ -114,13 +124,14 @@ module Skylab::BeautySalon
 
     def __maybe_express_upside_down_range
 
-      foz = formal_properties
+      foz = @_associations_
       fl = foz.fetch :from_line
       tl = foz.fetch :to_line
+
       d = @from_line
       d_ = @to_line
 
-      maybe_send_event :error, :expression, :upside_down_range do | y |
+      _listener_.call :error, :expression, :upside_down_range do |y|
 
         y << "#{ par tl } (#{ val d_ }) #{
           }cannot be less than #{ par fl } (#{ val d })"
@@ -295,7 +306,110 @@ module Skylab::BeautySalon
       COMMENT_LINE_PREFIX__ = 'comment line:  '
       SKIP_LINE_PREFIX__ = 'skipping line: '
 
+
+      def _simplified_write_ x, k
+        instance_variable_set :"@#{ k }", x
+      end
+
+      def _simplified_read_ k
+        ::Kernel._OKAY
+      end
+
+      def _listener_
+        @_argument_scanner_.listener
+      end
+
+      attr_reader(
+        :_argument_scanner_,
+      )
+    # -
+    # ==
+
+    This_compound_normalization___ = Lazy_.call do
+
+      CompoundNormalization___.new(
+        Must_be_integer___[],
+        Must_be_in_a_particular_range___[],
+      )
     end
+
+    Must_be_in_a_particular_range___ = -> do
+      Basic_[]::Range::Normalization.with(
+        :is, -1,
+        :or,
+        :begin, 1,
+      )
+    end
+
+    Must_be_integer___ = -> do
+      Basic_[]::Number::Normalization.with(
+        :number_set, :integer,
+      )
+    end
+
+    class CompoundNormalization___
+
+      # (compound normalizations happend more concisely "declaratively"
+      # under [br] - you could simply chain the declarations in order.
+      # here, etc.)
+
+      def initialize first, second, * rest
+        @normalizations = [ first, second, * rest ].freeze
+      end
+
+      def __call_ p, qkn
+        CompoundNormalize___.new( p, qkn, @normalizations ).execute
+      end
+    end
+
+    class CompoundNormalize___
+
+      def initialize p, qkn, n11n_a
+        @listener = p
+        @normalizations = n11n_a
+        @QKN = qkn
+      end
+
+      def execute
+        if @QKN.is_effectively_known
+          __do_execute
+        else
+          @QKN.to_knownness
+        end
+      end
+
+      def __do_execute
+
+        ok = true ; x = nil
+
+        current_QKN = @QKN
+        len = @normalizations.length
+
+        0.upto( len - 2 ) do |d|
+          _n11n = @normalizations.fetch d
+          kn = _n11n.normalize_qualified_knownness current_QKN, & @listener
+          if ! kn
+            ok = kn ; x = kn ; break
+          end
+          current_QKN = current_QKN.new_with_value kn.value
+        end
+
+        if ok
+          _n11n = @normalizations.fetch len - 1
+          x = _n11n.normalize_qualified_knownness current_QKN, & @listener
+        end
+        x
+      end
+    end
+
+    # ==
+
+    Actions = nil  # provision [#pl-011.3] (we are the action)
+
+    # ==
+    # ==
   end
 end
+# #
+# #history-B.1: GUT .. #tombstone-B.2 get rid of old ping
 # :+#tombstone: interactive mode

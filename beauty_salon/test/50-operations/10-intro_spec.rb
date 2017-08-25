@@ -7,8 +7,7 @@ module Skylab::BeautySalon::TestSupport
   describe '[bs] operations - intro' do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :expect_emission_fail_early
+    use :my_API
     use :modality_agnostic_interface_things
 
     context '1.1) strange arg' do
@@ -107,22 +106,6 @@ module Skylab::BeautySalon::TestSupport
       _these = all_toplevel_actions_normal_symbols_.map { |s| "'#{ s }'" }
 
       my_oxford_and_ "available operator", ": ", _these
-    end
-
-    def expect_API_result_for_failure_
-      expect_result nil
-    end
-
-    def expression_agent
-      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
-    end
-
-    def ignore_emissions_whose_terminal_channel_is_in_this_hash
-      NOTHING_
-    end
-
-    def subject_API
-      Home_::API::API2  # #open [#023]
     end
   end
 end

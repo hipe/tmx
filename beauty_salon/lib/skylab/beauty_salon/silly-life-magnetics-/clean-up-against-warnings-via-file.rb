@@ -266,7 +266,7 @@ module Skylab::BeautySalon
       def __has_any_lines_of_errput
 
         _s = remove_instance_variable :@__errput_lines_big_string
-        st = Home_.lib_.basic::String::LineStream_via_String[ _s ]
+        st = Basic_[]::String::LineStream_via_String[ _s ]
         line = st.gets
         if line
           @__first_line_of_errput = line ; @__errput_line_upstream = st ; ACHIEVED_

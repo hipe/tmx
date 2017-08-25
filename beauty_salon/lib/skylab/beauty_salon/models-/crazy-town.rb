@@ -340,7 +340,7 @@ module Skylab::BeautySalon
     Stream_big_string_into_ = -> y, big_string do
       # assume at least one line. because OCD, stream each line line by line
       #
-      scn = Home_.lib_.basic::String::LineStream_via_String[ big_string ]
+      scn = Basic_[]::String::LineStream_via_String[ big_string ]
       line = scn.gets
       rx = /\A#{ ::Regexp.escape %r(\A[ ]+).match( line )[ 0 ] }/
       begin

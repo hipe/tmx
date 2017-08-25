@@ -2,125 +2,230 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] operations - deliterate" do
+  describe '[bs] operations - deliterate' do
 
     TS_[ self ]
-    use :expect_event
+    use :my_API
 
-    it "ping" do
+    context 'bad range (first term)' do
 
-      call_API :ping_orig
+      it 'fails' do
+        _tuple || fail
+      end
 
-      _em = expect_neutral_event :ping
+      it 'line (NOTE still needs legacy expag)' do
+        _ev = _tuple.first
+        _actual_s = black_and_white _ev
+        _actual_s ==
+          "'from-line' must be greater than or equal to 1, had -1" or fail
+      end
 
-      black_and_white( _em.cached_event_value ).should eql(
-        "hello from beauty salon." )
+      shared_subject :_tuple do
 
-      expect_no_more_events
+        _call_from_to( -1, 2 )
 
-      @result.should eql :hello_from_beauty_salon
+        _tuple_via_expecting_this_one_error :invalid_property_value
+      end
     end
 
-    it "bad range (first term)" do
+    context 'bad range (second term) - epic error message' do
 
-      _from_to( -1, 2 )
+      it 'fails' do
+        _tuple || fail
+      end
 
-      _em = expect_not_OK_event_ :number_too_small
+      it 'line' do
 
-      black_and_white( _em.cached_event_value ).should eql(
-        "'from-line' must be greater than or equal to 1, had -1" )
+        _ev = _tuple.first
 
-      expect_fail
+        _actual_s = black_and_white _ev
+
+        _actual_s == (
+          "'to-line' must be -1 or greater than or equal to 1. had -2"
+        ) || fail
+      end
+
+      shared_subject :_tuple do
+
+        _call_from_to 1, -2
+
+        _tuple_via_expecting_this_one_error :not_in_range
+      end
     end
 
-    it "bad range (second term) - epic error message" do
+    context 'bad range (relative)' do
 
-      _from_to 1, -2
+      it 'fails' do
+        _tuple || fail
+      end
 
-      _em = expect_not_OK_event_(
-        :actual_property_is_outside_of_formal_property_set )
+      it 'line' do
 
-      black_and_white( _em.cached_event_value ).should eql(
-        "'to-line' must be -1 or greater than or equal to 1. had -2" )
+        _actual_lines = _tuple.first
 
-      expect_fail
+        _actual_lines == [
+          "'to-line' (2) cannot be less than 'from-line' (3)"
+        ] || fail
+      end
+
+      shared_subject :_tuple do
+
+        _call_from_to 3, 2
+
+        _tuple_via_expecting_this_one_error :expression, :upside_down_range
+      end
     end
 
-    it "bad range (relative)" do
+    context 'work' do
 
-      _from_to 3, 2
+      it 'hi' do
+        _tuple || fail
+      end
 
-      _em = expect_not_OK_event :upside_down_range
+      it 'code stripped of comments is output to STDOUT' do
 
-      black_and_white( _em.cached_event_value ).should eql (
-        "'to-line' (2) cannot be less than 'from-line' (3)" )
-
-      expect_fail
-    end
-
-    def _from_to from_d, to_d
-
-      call_API( * _subject_action,
-        * _dummy_args,
-        :from_line, from_d,
-        :to_line, to_d,
-      )
-    end
-
-    def _dummy_args
-
-      [ :comment_line_downstream, :_x_,
-        :code_line_downstream, :_xx_,
-        :line_upstream, :_xxx_, ]
-    end
-
-    it "work" do
-
-      cls = ::Class.new ::Array
-
-      me = self
-      cls.send :define_method, :<< do | s |
-
-        if me.do_debug
-          me.debug_IO.puts "#{ @__moniker }: #{ s }"
+        _actual = _tuple.first
+        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          y << 'wowza'
+          y << 'nowza'
+          y << 'gowza'
         end
-
-        super( s )
       end
 
-      cls.send :define_method, :initialize do | mnkr |
-        @__moniker = mnkr
+      it 'the comments that were stripped are output to STDERR' do
+
+        _actual = _tuple[1]
+        expect_these_lines_in_array_ _actual do |y|
+          y << 'commentie'
+          y << 'fommentie'
+        end
       end
 
-      sout = cls.new :sout
-      serr = cls.new :serr
+      shared_subject :_tuple do
 
-      st = Home_.lib_.basic::String::LineStream_via_String[ <<-HERE.unindent ]
+        _line_st = Home_.lib_.basic::String::LineStream_via_String[ <<~HERE ]
         howza
         wowza # commentie
         nowza
         gowza # fommentie
         lowza # zomentie
         bowza
-      HERE
 
-      call_API( * _subject_action,
+      HERE
+        __flush_tuple_via_expecting_success _line_st
+      end
+
+      def __flush_tuple_via_expecting_success line_st
+
+        sout = _new_local_spy :sout
+        serr = _new_local_spy :serr
+
+        call( * _subject_action,
 
         :comment_line_downstream, serr,
         :code_line_downstream, sout,
-        :line_upstream, st,
+        :line_upstream, line_st,
         :from_line, 2,
         :to_line, 4,
       )
 
-      sout.should eql [ "wowza\n", "nowza\n", "gowza\n"]
-      serr.should eql [ "commentie", "fommentie" ]
-
-      expect_succeed
+        expect_API_result_for_success_
+        [
+          sout._release_array_,
+          serr._release_array_,
+        ]
+      end
     end
+
+    # -- assertion
+
+    def black_and_white ev  # (copy pasted instead of bring in big lib)
+      _expag = expression_agent
+      ev.express_into_under "", _expag
+    end
+
+    # -- setup
+
+    def _tuple_via_expecting_this_one_error * sym
+
+      tuple = []
+
+      expect :error, * sym do |em_x|
+        tuple.push em_x
+      end
+
+      expect_API_result_for_failure_
+
+      tuple
+    end
+
+    def _call_from_to from_d, to_d
+      call( * _subject_action,
+        * _dummy_args,
+        :from_line, from_d,
+        :to_line, to_d,
+      )
+    end
+
+    def _new_local_spy sym
+      X_opdel_Spy.new sym, self
+    end
+
+    memoize :_dummy_args do
+      [ :comment_line_downstream, :_x_,
+        :code_line_downstream, :_xx_,
+        :line_upstream, :_xxx_, ].freeze
+    end
+
+    def expression_agent
+      X_opdel_Expag[]
+    end
+
+    # ==
+
+    class X_opdel_Spy
+
+      def initialize moniker_x, tc
+        if tc.do_debug
+          @debug_IO = tc.debug_IO
+          @_recv = :__receive_loudly
+        else
+          @_recv = :_receive_normally
+        end
+        @moniker = moniker_x
+        @array = []
+      end
+
+      def << s
+        send @_recv, s
+      end
+
+      def __receive_loudly s
+        @debug_IO.puts "#{ @moniker }: #{ s }"
+        _receive_normally s
+      end
+
+      def _receive_normally s
+        @array.push s ; nil
+      end
+
+      def _release_array_
+        remove_instance_variable( :@array ).freeze
+      end
+    end
+
+    # ==
+
+    X_opdel_Expag = Lazy_.call do
+      _Zerk = Home_.lib_.zerk
+      _Zerk::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.via_expression_agent_injection :_no_BS_
+    end
+
+    # ==
 
     def _subject_action
       :deliterate
     end
   end
 end
+# #history-A.1: full rewrite during wean off [br]

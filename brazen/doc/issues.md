@@ -264,7 +264,7 @@
 [#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc
 
-[#011] #hole
+[#011] #open `@_associations_` in the new way ([tm] needs refactor to use ours)
              ( #was: the unobtrusive lexical-esque etc. #moved-to: [#ba-045] )
              ( was: #parent-node: [#001] the event narrative )
 

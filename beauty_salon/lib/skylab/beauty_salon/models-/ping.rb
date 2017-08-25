@@ -24,7 +24,7 @@ module Skylab::BeautySalon
       end
     # -
 
-    Actions = nil  # only while #open [#023]
+    Actions = nil  # provision [#pl-011.3] (we are the action)
 
   end
 end

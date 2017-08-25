@@ -16,16 +16,16 @@ module Skylab::Basic
         end
       end  # >>
 
-      def initialize & oes_p
+      def initialize & p
 
-        @on_event_selectively = oes_p
+        @listener = p
         @qualified_knownness = nil
       end
 
     private
 
       def qualified_knownness=
-        _receive_arg gets_one
+        _receive_qualified_knownness gets_one
       end
 
       def begin=
@@ -59,15 +59,25 @@ module Skylab::Basic
 
     public
 
-      def against_value x, & x_p
-
-        otr = dup
-        otr._receive_value x
-        if x_p
-          self._COVER_ME_and_complete_me  # the method is not written
-          otr.accept_selective_listener_proc x_p
+      def against_value x, & p
+        _execute_by p do |o|
+          o._receive_value x
         end
-        otr.execute
+      end
+
+      def normalize_qualified_knownness qkn, & p
+        _execute_by p do |o|
+          o._receive_qualified_knownness qkn
+        end
+      end
+
+      def _execute_by p
+        o = dup
+        if p
+          o.listener = p
+        end
+        yield o
+        o.execute
       end
 
       def execute
@@ -81,22 +91,26 @@ module Skylab::Basic
         __normal_normalize
       end
 
-    private
+    protected
 
       def _receive_value x
 
         _kn = Common_::QualifiedKnownKnown.via_value_and_association(
           x, Home_.default_property )
 
-        _receive_arg _kn
+        _receive_qualified_knownness _kn
       end
-      protected :_receive_value
 
-      def _receive_arg arg
-        @qualified_knownness = arg
+      def _receive_qualified_knownness qkn
+        @qualified_knownness = qkn
         KEEP_PARSING_
       end
 
+      attr_writer(
+        :listener,
+      )
+
+    private
 
       def _flush_some_current_mutable_range_to_or_list
         @or_a ||= []
@@ -123,9 +137,9 @@ module Skylab::Basic
 
         else
 
-          oes_p = @on_event_selectively
-          if oes_p
-            oes_p.call :error, :not_in_range do
+          p = @listener
+          if p
+            p.call :error, :not_in_range do
               Explanation__.with QKN__, @qualified_knownness, :or_a, @or_a
             end
           end

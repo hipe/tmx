@@ -28,7 +28,7 @@ module Skylab::BeautySalon
             markdown-ish.
           HERE
 
-          _st = Home_.lib_.basic::String.result_via_map_chain( s,
+          _st = Basic_[]::String.result_via_map_chain( s,
             :mutate_by_unindenting,
             :line_stream_via_string,
           )
@@ -72,7 +72,7 @@ module Skylab::BeautySalon
           # ( was #[#fi-004.5], used to have what is now [#br.024.C] shape )
 
           if qkn.is_known_known
-            Home_.lib_.basic::Number::Normalization.via(
+            Basic_[]::Number::Normalization.via(
               :number_set, :integer,
               :minimum, 1,
               :qualified_knownness, qkn, & oes_p )
@@ -343,7 +343,7 @@ module Skylab::BeautySalon
 
         def __init_range_list_scanner
 
-          pa = Home_.lib_.basic::Range::Positive::List::Scanner.new
+          pa = Basic_[]::Range::Positive::List::Scanner.new
 
           pa.unexpected_proc = -> x, exp_a do
 
@@ -377,7 +377,7 @@ module Skylab::BeautySalon
 
         def __init_union
 
-          un = Home_.lib_.basic::Range::Positive::Union.new
+          un = Basic_[]::Range::Positive::Union.new
 
           un.unexpected_proc = -> msg_s do
 

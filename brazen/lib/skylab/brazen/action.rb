@@ -95,12 +95,29 @@ module Skylab::Brazen
         end
       end
 
-      _fo_st = Common_.stream do
+      asc_st = Common_.stream do
         p[]
       end
 
+      # ~ ( :[#011]: this one experimental feature
+
+      _use_asc_st = if act.instance_variable_defined? :@_associations_
+        h = act.instance_variable_get :@_associations_
+        Common_.stream do
+          asc = asc_st.gets
+          if asc
+            h[ asc.name_symbol ] = asc
+          end
+          asc
+        end
+      else
+        asc_st
+      end
+
+      # ~ )
+
       _ok = mtk[]::Normalization.call_by do |o|
-        o.association_stream_newschool = _fo_st
+        o.association_stream_newschool = _use_asc_st
         o.entity_nouveau = act
         o.will_nilify  # (things don't usually explode without this)
       end

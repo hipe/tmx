@@ -110,6 +110,9 @@ module Skylab::BeautySalon
 
       o.add_actions_module_path_tail ::File.join 'ping', same
 
+      o.add_actions_module_path_tail ::File.join 'deliterate', same
+        # (doesn't have an actual actions directory - all are stowaway)
+
       o.models_branch_module = Home_::Models_
 
       o.bound_call_via_action_with_definition_by = -> act do
@@ -165,6 +168,10 @@ module Skylab::BeautySalon
   Require_brazen_LEGACY_ = Lazy_.call do
     Brazen_ = Home_.lib_.brazen
     NIL
+  end
+
+  Basic_ = -> do
+    Home_.lib_.basic
   end
 
   module Lib_

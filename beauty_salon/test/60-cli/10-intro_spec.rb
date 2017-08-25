@@ -113,7 +113,7 @@ module Skylab::BeautySalon::TestSupport
       it 'first section - usage' do
         _ = _section :usage
         _actual_s = _.expect_exactly_one_line
-        _ = _expected_operators_string_array * '|'
+        _ = _expected_operators_string_array * ' | '
         _actual_s == "usage: chimmy { #{ _ } } [opts]\n" || fail
       end
 
@@ -239,9 +239,7 @@ module Skylab::BeautySalon::TestSupport
 
     -> do
 
-      operators = [
-        ping_token,
-      ]
+      operators = nil
 
       primaries = %w(
         -help
@@ -250,7 +248,7 @@ module Skylab::BeautySalon::TestSupport
       define_method :_expected_operators_string_array do
         if ! operators
           operators = all_toplevel_actions_normal_symbols_.map do |sym|
-            sym.id2name.gsub UNDERSCORE_, DASH_
+            sym.id2name.gsub Home_::UNDERSCORE_, Home_::DASH_
           end
         end
         operators
