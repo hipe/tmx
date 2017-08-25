@@ -80,7 +80,7 @@ module Skylab::Zerk
         # o.command_string = .. hm..
         d = o.execute  # formerly `produce_result`
         d.zero?  # sanity - assert shape
-        @CLI.init_exitstatus_ d
+        @CLI.receive_exitstatus d
         NIL_
       end
 

@@ -20,7 +20,7 @@ module Skylab::BeautySalon
         @listener.call :info, :expression, :hello do |y|
           y << "[bs] says #{ em 'hello' }"
         end
-        NIL
+        :hello_from_beauty_salon
       end
     # -
 

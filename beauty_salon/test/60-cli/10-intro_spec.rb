@@ -8,6 +8,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :modality_agnostic_interface_things
     use :CLI
 
     context '(temporary context for #open [#023])' do
@@ -88,9 +89,14 @@ module Skylab::BeautySalon::TestSupport
         argv ping_token
       end
 
-      it 'first (only) line is styled' do
+      it 'first line is styled' do
         _ = first_line_string
         _ == "[bs] says \e[1;32mhello\e[0m\n" || fail
+      end
+
+      it 'second line is the symbol' do
+        _ = second_and_final_line_string
+        _ == "hello_from_beauty_salon\n" || fail
       end
 
       it 'exitstatus is success' do
@@ -242,27 +248,28 @@ module Skylab::BeautySalon::TestSupport
       )
 
       define_method :_expected_operators_string_array do
+        if ! operators
+          operators = all_toplevel_actions_normal_symbols_.map do |sym|
+            sym.id2name.gsub UNDERSCORE_, DASH_
+          end
+        end
         operators
       end
 
       define_method :_expected_primaries_string_array do
         primaries
       end
+
     end.call
 
     def _expect_AND_list actual_s, lemma_s, these
 
-      _use_noun_phrase = if 1 == these.length
-        lemma_s
-      else
-        lemma_s.sub( %r(y\z), 'ie' ) << 's'  # egads
-      end
+      _head_s = "available #{ lemma_s }"
 
-      _ = Common_::Oxford_and[ these ]
+      buffer = my_oxford_and_ _head_s, ": ", these
+      buffer << NEWLINE_
 
-      _expected_s = "available #{ _use_noun_phrase }: #{ _ }\n"
-
-      actual_s == _expected_s || fail
+      actual_s == buffer || fail
     end
 
     def expect_invite_to_base_help_ s
@@ -279,7 +286,7 @@ module Skylab::BeautySalon::TestSupport
 
     # -- setup
 
-    define_method :invocation_strings_for_expect_stdout_stderr, ( Home_::Lazy_.call do
+    define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
       [ 'chimmy' ].freeze
     end )
 

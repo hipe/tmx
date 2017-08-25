@@ -110,6 +110,9 @@ module Skylab::Zerk
           elsif x.respond_to? :ascii_only?
             shape = :stringish
 
+          elsif x.respond_to? :id2name
+            shape = :stringish
+
           elsif x.respond_to? :infinite?
             shape = :floatish
 
@@ -217,7 +220,7 @@ module Skylab::Zerk
         if p
           p[ d ]
         else
-          @CLI.init_exitstatus_ d
+          @CLI.receive_exitstatus d
         end
         NIL_
       end

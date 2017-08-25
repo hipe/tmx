@@ -67,11 +67,10 @@ module Skylab::Brazen
         if bc
           @_exitstatus = 0
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-          if x
-            self._COVER_ME__express_result__
-          else
-            @_exitstatus
+          if ! x.nil?
+            Zerk_lib_[]::CLI::ExpressResult[ x, self ]
           end
+          @_exitstatus
         else
           bc.nil? ? 0 : 5
         end
@@ -107,7 +106,7 @@ module Skylab::Brazen
 
         _mod.express_into @stderr do |o|
 
-          o.expression_agent ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
+          o.expression_agent UI_::CLI_InterfaceExpressionAgent.instance
 
           o.item_normal_tuple_stream __items
 
@@ -135,7 +134,11 @@ module Skylab::Brazen
         Common_::BoundCall[ nil, _inst, :execute ]
       end
 
-      # ~ (for above)
+      # ~ (for above) (see also #here4)
+
+      def receive_exitstatus d
+        @_exitstatus = d ; nil
+      end
 
       attr_reader(
         :listener,
@@ -199,6 +202,12 @@ module Skylab::Brazen
 
       def get_program_name
         ::File.basename @program_name_string_array.last  # meh
+      end
+
+      # ~ :#here4 - for [ze]
+
+      def sout
+        @stdout
       end
     # -
   end

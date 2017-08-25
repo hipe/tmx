@@ -592,7 +592,7 @@ module Skylab::Zerk
       # [br]'s "when's" are shaped like a bc & always result in an exitstatus.
 
       _x = whn.receiver.send whn.method_name, * whn.args, & whn.block
-      init_exitstatus_ _x
+      receive_exitstatus _x
       STOP_PARSING_
     end
 
@@ -794,7 +794,7 @@ module Skylab::Zerk
     # -- exit statii
 
     def init_exitstatus_for_ k
-      init_exitstatus_ exitstatus_for_ k
+      receive_exitstatus exitstatus_for_ k
     end
 
     def maybe_upgrade_exitstatus_for k
@@ -812,7 +812,7 @@ module Skylab::Zerk
       NIL_
     end
 
-    def init_exitstatus_ d
+    def receive_exitstatus d
       @_exitstatus = d ; nil
     end
 

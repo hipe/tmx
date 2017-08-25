@@ -61,7 +61,7 @@ module Skylab::Zerk
             @CLI.express_stack_invite_ :for_more
 
             if @_greatest_exitstatus
-              @CLI.init_exitstatus_ @_greatest_exitstatus
+              @CLI.receive_exitstatus @_greatest_exitstatus
             else
               @CLI.init_exitstatus_for_ :_component_unavailable_
             end

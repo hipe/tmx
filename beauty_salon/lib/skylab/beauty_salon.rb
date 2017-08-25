@@ -30,7 +30,7 @@ module Skylab::BeautySalon
 
     ::Skylab::Brazen::CLI::CLI_for_BeautySalon_PIONEER.begin_by do |o|
 
-      o.operator_branch = Operator_branch___[]
+      o.operator_branch = Operator_branch_[]
 
       o.application_module = Home_
     end
@@ -61,15 +61,50 @@ module Skylab::BeautySalon
     end  # >>
   end
 
+  module API::API2  # #open [#023]
+
+    class << self
+
+      def call * a, & p
+        invocation_via_argument_array( a, & p ).execute
+      end
+
+      def invocation_via_argument_array a, & p
+        Require_user_interface_libs_[]
+        _as = MTk_::API_ArgumentScanner.new a, & p
+        MicroserviceInvocation___.new InvocationResources___.new _as
+      end
+    end  # >>
+  end
+
+  class MicroserviceInvocation___
+
+    def initialize ir
+      @invocation_resources = ir
+    end
+
+    def execute
+      _ob = Operator_branch_[]
+      oper = MTk_::ParseOperator_via[ self, _ob ]
+      if oper
+        _model_ref = oper.mixed_business_value
+        bc = _model_ref.bound_call_of_operator_via_invocation_resouces @invocation_resources
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
+    end
+
+    attr_reader(
+      :invocation_resources,
+    )
+  end
+
   Lazy_ = Common_::Lazy
 
-  Operator_branch___ = Lazy_.call do
+  Operator_branch_ = Lazy_.call do
 
-    lib = Home_.lib_
+    Home_.lib_.plugin::ModelCentricOperatorBranch.define do |o|
 
-    lib.plugin::ModelCentricOperatorBranch.define do |o|
-
-      _MTk = lib.zerk::MicroserviceToolkit  # MTk_
+      Require_user_interface_libs_[]
 
       same = 'actions'
 
@@ -78,11 +113,27 @@ module Skylab::BeautySalon
       o.models_branch_module = Home_::Models_
 
       o.bound_call_via_action_with_definition_by = -> act do
-        _MTk::BoundCall_of_Operation_with_Definition[ act ]
+        MTk_::BoundCall_of_Operation_with_Definition[ act ]
       end
 
       o.filesystem = ::Dir
     end
+  end
+
+  class InvocationResources___
+    def initialize as
+      @argument_scanner = as
+    end
+    def listener
+      @argument_scanner.listener
+    end
+    attr_reader(
+      :argument_scanner,
+    )
+  end
+
+  Require_user_interface_libs_ = Lazy_.call do
+    MTk_ = Home_.lib_.zerk::MicroserviceToolkit
   end
 
   DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_ = -> e do

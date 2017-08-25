@@ -164,6 +164,14 @@ module Skylab::Zerk::TestSupport
         _niCLI_state_lines.fetch 0
       end
 
+      def second_and_final_line_string
+        second_and_final_line.string
+      end
+
+      def second_and_final_line
+        _N_and_final_line 2
+      end
+
       def second_line_string
         second_line.string
       end
@@ -181,9 +189,13 @@ module Skylab::Zerk::TestSupport
       end
 
       def third_and_final_line
+        _N_and_final_line 3
+      end
+
+      def _N_and_final_line d
         a = _niCLI_state_lines
-        3 == a.length or fail
-        a.fetch 2
+        d == a.length or fail
+        a.fetch( d - 1 )
       end
 
       def __line_content_hack d

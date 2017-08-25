@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'skylab/beauty_salon'
 require 'skylab/test_support'
 
@@ -91,10 +93,42 @@ module Skylab::BeautySalon::TestSupport
     end
   end
 
+  Home_ = ::Skylab::BeautySalon
+  Lazy_ = Home_::Lazy_
+
   # -- bundles
+
+  module Modality_Agnostic_Interface_Things
+
+    def self.[] tcc ; tcc.include self end
+
+    def my_oxford_and_ lemma_s, anything=nil, these
+
+      buffer = ::String.new
+
+      if 1 == these.length
+        buffer << lemma_s
+      else
+        buffer << lemma_s.sub( %r(y\z), 'ie' )
+        buffer << 's'  # egads
+      end
+      anything and buffer << anything
+      buffer << Common_::Oxford_and[ these ]
+    end
+
+    define_method :all_toplevel_actions_normal_symbols_, ( Lazy_.call do
+      [
+        :ping,
+      ].freeze
+    end )
+  end
 
   Expect_Event = -> tcc do
     Common_.test_support::Expect_Emission[ tcc ]
+  end
+
+  Expect_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -127,13 +161,14 @@ module Skylab::BeautySalon::TestSupport
 
   # --
 
-  Home_ = ::Skylab::BeautySalon
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  DELIMITER_ = Home_::NEWLINE_
+
+    NEWLINE_ = Home_::NEWLINE_
+  DELIMITER_ = NEWLINE_
   EMPTY_S_ = Home_::EMPTY_S_
   Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly
   NIL_ = nil
