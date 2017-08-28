@@ -25,6 +25,12 @@ module Skylab::Fields
           end
         end )
 
+        def redefine  # experiment ([tm], [bs])
+          otr = dup
+          yield otr
+          otr.freeze
+        end
+
         def will_describe_by_this p
           send ( @_receive_description ||= :__receive_1st_description ), p
         end
@@ -83,6 +89,10 @@ module Skylab::Fields
           @is_required = true ; ACHIEVED_
         end
 
+        def have_argument_that_is_optional
+          _argument_arity_mutex :@argument_is_optional
+        end
+
         def be_flag
           _argument_arity_mutex :@is_flag
         end
@@ -121,7 +131,7 @@ module Skylab::Fields
           :default_by,
           :describe_by,
           :normalize_by,
-          :is_flag, :is_glob,
+          :is_flag, :is_glob, :argument_is_optional,  # (mutually exclusive)
           :is_required,
           :name_symbol,
         )

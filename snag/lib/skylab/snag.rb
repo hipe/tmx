@@ -154,8 +154,8 @@ module Skylab::Snag
 
       o.models_branch_module = Models_
 
-      o.bound_call_via_action_with_definition_by = -> act do
-        MTk_::BoundCall_of_Operation_with_Definition[ act ]
+      o.bound_call_when_operation_with_definition_by = -> oo do
+        MTk_::BoundCall_of_Operation_with_Definition[ oo.operation ]
       end
 
       o.filesystem = ::Dir

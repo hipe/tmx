@@ -91,6 +91,20 @@ module Skylab::Parse
         end
       end
 
+      def DEREFERENCE_INJECTION k  # (experiment for [br] under [bs])
+        d = @_length - 1
+        begin
+          inj = @_injections.fetch d
+          if k == inj.injection_identifier
+            found = inj.injection_implementation
+            break
+          end
+          d.zero? && break
+          d -= 1
+          redo
+        end while above
+        found || fail
+      end
     # -
     # ==
 

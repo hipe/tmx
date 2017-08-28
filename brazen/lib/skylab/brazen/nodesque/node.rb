@@ -38,7 +38,7 @@ module Skylab::Brazen
 
     def description_proc_for_summary_of_under _ada, exp
 
-      # #[#002]an-optimization-for-summary-of-child-under-parent
+      # #[#002] "an optimization for summary of child under parent"
       # the default behavior is to re-use the expag of the parent
 
       description_proc

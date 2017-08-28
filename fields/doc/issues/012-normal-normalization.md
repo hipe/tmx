@@ -21,10 +21,11 @@ we critique this model.
   - [#here.3] cost-benefit analysis of RISC
   - [#here.F] full algorithm in pseudocode
   - [#here.e] is it flexible?
+  - [#here.10] provision
   - [#here.appendix-A] definitions of terms
   - [#here.h] the old but still open "N-meta proposition"
   - [#here.K] code notes
-  - [#here.i] is the oldest pseduocode, being kept for posterity for now
+  - [#here.i] is the oldest pseudocode, being kept for posterity for now
 
 
 
@@ -1037,6 +1038,24 @@ the central requirement for our "entity-killer" phase of development
 (somehow).
 
 [tm] is the frontier of this sort of thing, and it appears that yes. (EDIT)
+
+
+
+
+## provision - :[#here.10]
+
+[#ze-060.3] explains when we do and don't want to use `argument_is_optional`.
+this provision merely states that when an argument is presented (but the
+"flag" is nonetheless invoked) we pass `true` as its value.
+
+  - we can't pass `nil` because (under our new simplified way) it gets
+    treated indifferently from as if it wasn't passed.
+
+  - to keep things simple we don't deal with [#co-004] wrapped values
+    after this point in the pipeline.
+
+  - `true` will work as long as this is CLI-only. when not, something else
+    of the above provisions must change.
 
 
 

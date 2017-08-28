@@ -242,8 +242,10 @@ module NoDependenciesZerk
 
       def scan_primary_symbol_softly
         @_write_CPS_ ||= :_write_CPS_initially
-        md = PRIMARY_RX__.match head_as_is
+        s = head_as_is
+        md = PRIMARY_RX__.match s
         if md
+          @current_primary_token = s
           _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
           send @_write_CPS_, _
           advance_one
@@ -254,6 +256,24 @@ module NoDependenciesZerk
           ACHIEVED_
         else
           NIL  # #nodeps-coverpoint-2
+        end
+      end
+
+      def current_primary_token
+        @current_primary_token  # hi.
+      end
+
+      def scan_when_argument_is_optional  # 1x [fi]
+
+        # see [#here.3] about this particular argument arity.
+        # hint: it may be CLI-only
+
+        if no_unparsed_exists
+          ::Skylab::Common::KNOWN_UNKNOWN
+        elsif head_looks_like_optional_argument
+          ::Skylab::Common::KNOWN_UNKNOWN
+        else
+          self._COVER_ME
         end
       end
 
@@ -468,9 +488,16 @@ module NoDependenciesZerk
 
       def scan_primary_symbol
         # (under API, we don't check if it's a symbol but we could)
-        send ( @_write_CPS_ ||= :_write_CPS_initially ), head_as_is
+        x = head_as_is
+        @current_primary_token = x
+        send ( @_write_CPS_ ||= :_write_CPS_initially ), x
         advance_one
         ACHIEVED_
+      end
+
+      def current_primary_token
+        # (under API, is same)
+        current_primary_symbol
       end
 
       def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ _

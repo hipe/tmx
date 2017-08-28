@@ -141,8 +141,8 @@ module Skylab::TanMan
 
         o.models_branch_module = Home_::Models_
 
-        o.bound_call_via_action_with_definition_by = -> act do
-          Home_::Model_::Bound_call_via_action_with_definition[ act ]
+        o.bound_call_when_operation_with_definition_by = -> oo do
+          Home_::Model_::Bound_call_via_action_with_definition[ oo.operation ]
         end
 
         o.filesystem = ::Dir

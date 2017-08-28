@@ -70,7 +70,7 @@ module Skylab::BeautySalon
           "+++ #{ b_path }",
         ]
 
-        first_three_lines_scn = Common_::Scanner.via_array _first_three_lines
+        first_three_lines_scn = Scanner_[ _first_three_lines ]
         real_diff_line_stream = nil
 
         p = nil ; main = nil

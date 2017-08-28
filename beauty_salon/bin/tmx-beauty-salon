@@ -2,6 +2,7 @@
 
 require 'skylab/beauty_salon'
 
+# (below while #open [#023])
 x = Skylab::BeautySalon::CLI2.new(
   ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 ).execute

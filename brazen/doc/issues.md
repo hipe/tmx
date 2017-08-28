@@ -151,8 +151,12 @@
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [ CLI revelation gone ], [#ze-029] sets the stage nicely)
-[#062]       #parent-node: [#002] custom reactive node adaptations ..
+
+[#062]       association injection and related ..
+       #open modernize this document for [ze]-era and remove the next line:
+             ( #old-name: #parent-node: [#002] custom reactive node adaptations .. )
              ( #moved-to: [#ze-001] )
+
 [#061]       #tracking-tag `members` as a universal thing
 [#060]   #track custom CLI adapter resolution client needs not covered here;
              ways we customize CLI action adapter rendering
@@ -284,5 +288,10 @@
              ( #was: #done re-arch expressions agents to work correctly with 'par')k
 [#004]       #parent-node: [#002] the help renderer narrative ..
 [#003]       #parent-node: [#002] the CLI state processors narrative ..
+
 [#002]       #doc-node brazen CLI and definition of "modality"
+
+       #open [#here.2]  (for matryoshka wean) restore parameter
+             classification for CLI (see this section in document)
+
 [#001]       #doc-node the entity enhacnement narrative ..

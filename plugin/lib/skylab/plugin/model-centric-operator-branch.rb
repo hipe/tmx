@@ -56,7 +56,7 @@ module Skylab::Plugin
       end
 
       attr_writer(
-        :bound_call_via_action_with_definition_by,
+        :bound_call_when_operation_with_definition_by,
         :filesystem,
         :models_branch_module,
       )
@@ -66,7 +66,7 @@ module Skylab::Plugin
         fs = remove_instance_variable :@filesystem
 
         _ir = LocalInvocationResources___.new(
-          remove_instance_variable( :@bound_call_via_action_with_definition_by ),
+          remove_instance_variable( :@bound_call_when_operation_with_definition_by ),
           fs,
         )
 
@@ -436,18 +436,18 @@ module Skylab::Plugin
       )
 
       def bound_call_of_operator_via_invocation invo
-        _bound_call_of_operator_by do |o|
+        bound_call_of_operator_by do |o|
           o.remote_invocation = invo
         end
       end
 
       def bound_call_of_operator_via_invocation_resouces rirsx
-        _bound_call_of_operator_by do |o|
+        bound_call_of_operator_by do |o|
           o.remote_invocation_resources = rirsx
         end
       end
 
-      def _bound_call_of_operator_by
+      def bound_call_of_operator_by  # [bs]
 
         # (must be reentrant - is evident if you run all tests in the file)
 
@@ -911,13 +911,30 @@ module Skylab::Plugin
 
     class BoundCall_via_Action__ < TheseGuys__
 
+      def initialize
+        @customize_normalization_by = nil
+        @inject_definitions_by = nil
+        @receive_operation_by = nil
+        super
+      end
+
       attr_writer(
         :action_class,
+        :customize_normalization_by,
+        :inject_definitions_by,
+        :receive_operation_by,
       )
 
       def execute
 
-        op = @action_class.new(){ @_MIXED_ }
+        op = @action_class.new do
+          @invocation_or_resources.value  # the class is supposed to know which it is
+        end
+
+        p = remove_instance_variable :@receive_operation_by
+        if p
+          p[ op ]
+        end
 
         if op.respond_to? :to_bound_call_of_operator
 
@@ -925,13 +942,27 @@ module Skylab::Plugin
 
         elsif op.respond_to? :definition
 
-          @local_invocation_resources.bound_call_via_action_with_definition_by[ op ]
+          _less_things = Details__.new(
+            @customize_normalization_by,
+            @inject_definitions_by,
+            op,
+            @invocation_or_resources,
+          )
+          @local_invocation_resources.
+            bound_call_when_operation_with_definition_by[ _less_things ]
 
         else
           Common_::BoundCall.by( & op.method( :execute ) )
         end
       end
     end
+
+    Details__ = ::Struct.new(
+      :customize_normalization_by,
+      :inject_definitions_by,
+      :operation,
+      :invocation_or_resources,
+    )
 
     # ~
 
@@ -954,7 +985,7 @@ module Skylab::Plugin
             @invocation_stack_top_name_symbol
 
           o.proc = @proc
-          o.microservice_invocation = @_MIXED_  # eew
+          o.invocation_or_resources = @invocation_or_resources
         end
       end
     end
@@ -964,11 +995,16 @@ module Skylab::Plugin
     class TheseGuys__
 
       def remote_invocation= x
-        @_MIXED_ = x
+        _A_or_B :_invocation_PL_, x
       end
 
       def remote_invocation_resources= x
-        @_MIXED_ = x
+        _A_or_B :_invocation_resources_PL_, x
+      end
+
+      def _A_or_B which, x
+        @invocation_or_resources = Common_::Pair.via_value_and_name_symbol x, which
+        x
       end
 
       attr_writer(
@@ -1017,12 +1053,12 @@ module Skylab::Plugin
           h[k] = x ; x  # always "actions" => `Actions` (maybe `Operations`)
         end
 
-        @bound_call_via_action_with_definition_by = p
+        @bound_call_when_operation_with_definition_by = p
         @filesystem = fs
       end
 
       attr_reader(
-        :bound_call_via_action_with_definition_by,
+        :bound_call_when_operation_with_definition_by,
         :const_cache,
       )
     end

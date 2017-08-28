@@ -827,19 +827,38 @@ module Skylab::Common
     attr_accessor :x_a_length
   end
 
-  Pair = ::Struct.new :value_x, :name_x do  # :[#055].
-
+  module Pair  # :[#055].
     class << self
-      alias_method :via_value_and_name, :new
-      undef_method :[]
-      undef_method :new
+      def via_value_and_name x, nm
+        ValueAndNamePair___.new x, nm
+      end
+      def via_value_and_name_symbol x, sym
+        ValueAndNameSymbolPair___.new x, sym
+      end
     end  # >>
-
-    alias_method :name_symbol, :name_x  # as you like it
-    alias_method :to_sym, :name_x
-
-    def new_with_value x
-      self.class.new x, name_symbol
+    CommonPair__ = ::Class.new
+    class ValueAndNamePair___ < CommonPair__
+      def initialize x, nm
+        @name = nm
+        super x
+      end
+      attr_reader :name
+    end
+    class ValueAndNameSymbolPair___ < CommonPair__
+      def initialize x, sym
+        @name_symbol = sym
+        super x
+      end
+      attr_reader :name_symbol
+    end
+    class CommonPair__
+      def initialize x
+        @value = x
+      end
+      def new_with_value x
+        self.class.new x, name_symbol
+      end
+      attr_reader :value
     end
   end
 
@@ -1377,8 +1396,8 @@ module Skylab::Common
       end
 
       def const_missing sym
-        $i += 1
-        $stderr.puts "(BL:#{ THING_DING_FORMAT_ % $i } #{ self }::#{ sym })"
+
+        # $i += 1 ; $stderr.puts "(BL:#{ DBG_NUM_FORMAT_ % $i } #{ self }::#{ sym })"
 
         nv = boxxy_module_as_operator_branch.name_and_value_for_const_missing_ sym
         if nv
@@ -1426,8 +1445,9 @@ module Skylab::Common
       # -- autoload "reading"
 
       def const_missing x  # accept symbol or string
-        $i += 1
-        $stderr.puts "(AL:#{ THING_DING_FORMAT_ % $i } #{ self }::#{ x })"
+
+        # $i += 1 ; $stderr.puts "(AL:#{ DBG_NUM_FORMAT_ % $i } #{ self }::#{ x })"
+
         nv = Here_::ConstMissing_.new( x, self ).execute
         if nv
           nv.const_value
@@ -1503,7 +1523,7 @@ module Skylab::Common
         if a.length.zero?
           Name::Modality_Functions::Labelize
         else
-          :Name::Modality_Functions::Labelize[ * a ]
+          Name::Modality_Functions::Labelize[ * a ]
         end
       end
 
@@ -2146,9 +2166,8 @@ module Skylab::Common
 
   # --
 
-      $stderr.puts "\n\nDONT FORGET [co]\n\n"
-      THING_DING_FORMAT_ = "%3i"
-      $i = 0
+      # #todo
+      # $i = 0 ; DBG_NUM_FORMAT_ = "%3i"  # #todo
 
   ACHIEVED_ = true
   CONST_SEPARATOR = '::'.freeze

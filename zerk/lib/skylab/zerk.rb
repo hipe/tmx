@@ -110,6 +110,10 @@ module Skylab::Zerk  # intro in [#001] README
 
     lazily :BoundCall_of_Operation_with_Definition, & br
 
+    lazily :ActionToolkit do
+      br_lib[]
+    end
+
     lazily :BoundCall_of_Operation_via_Proc do |c|
       Home_.lib_.basic::Function.const_get c, false
     end
@@ -125,6 +129,10 @@ module Skylab::Zerk  # intro in [#001] README
     lazily :ParseArguments_via_FeaturesInjections, & ndz
 
     lazily :API_ArgumentScanner, & ndz
+
+    lazily :EntityKillerParameter do |c|
+      Home_.lib_.fields::CommonAssociation::EntityKillerParameter
+    end
 
     lazily :AssociationToolkit do |c|
       Home_.lib_.ACS.const_get c, false

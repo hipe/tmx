@@ -5,17 +5,7 @@ module Skylab::BeautySalon
     class << self
 
       def describe_into_under y, expag
-
-        countdown = 3
-        _use_y = ::Enumerator::Yielder.new do |line|
-          y << line
-          countdown -= 1
-          countdown.zero? and throw :_stop_BS_
-        end
-        catch :_stop_BS_ do
-          Describe_into_under__[ _use_y, expag ]
-        end
-        y
+        Describe_into_under__[ y, expag ]
       end
     end  # >>
 
@@ -56,6 +46,10 @@ module Skylab::BeautySalon
         _big_string = nil  # (interesting - you get a warning if a heredoc is a result)
         expag.calculate do
           _big_string = <<~O
+        this was developed to help "refactor" literate-programming-style
+        comments out of code-lines so they can be put into their own
+        comment sections (near the code).
+
         from line <from-line> to line <to-line> of file <file>, use a
         simple character-scanning ** HACK ** to partition each line of
         code into comment and not-comment.
@@ -312,7 +306,10 @@ module Skylab::BeautySalon
       end
 
       def _simplified_read_ k
-        ::Kernel._OKAY
+        ivar = :"@#{ k }"
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        end
       end
 
       def _listener_

@@ -15,6 +15,7 @@ module Skylab::BeautySalon::TestSupport
     # ~ begin temporary block
 
     use :non_interactive_CLI  # (move this up at #open [#023])
+    use :my_CLI
 
     context '0) no args at all' do
 
@@ -147,7 +148,7 @@ module Skylab::BeautySalon::TestSupport
         these_lines = nil
         special = {}
         special[ ping_token ] = -> item do
-          these_lines = item.desc_string_array
+          these_lines = item.description_line_array
         end
 
         pool = {}
@@ -187,35 +188,22 @@ module Skylab::BeautySalon::TestSupport
 
       shared_subject :__sections do
 
-        string_st = to_errput_line_stream_strictly
-
-        o = Zerk_test_support_[]::CLI::Expect_Section_Fail_Early.define
         h = {}
+        parse_help_screen_fail_early_ do |o|
 
-        o.expect_section 'usage' do |sect|
-          h[ :usage ] = sect
+          o.expect_section 'usage' do |sect|
+            h[ :usage ] = sect
+          end
+
+          o.expect_section 'description' do |sect|
+            h[ :description ] = sect
+          end
+
+          o.expect_section 'operations' do |sect|
+            h[ :operations ] = sect
+          end
         end
-
-        o.expect_section 'description' do |sect|
-          h[ :description ] = sect
-        end
-
-        o.expect_section 'operations' do |sect|
-          h[ :operations ] = sect
-        end
-
-        spy = o.finish.to_spy_under self
-        io = spy.spying_IO
-
-        begin
-          line = string_st.gets
-          line || break
-          io.puts line
-          redo
-        end while above
-
-        spy.finish
-        h
+        h.freeze
       end
     end
 
@@ -284,13 +272,6 @@ module Skylab::BeautySalon::TestSupport
 
     # -- setup
 
-    define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
-      [ 'chimmy' ].freeze
-    end )
-
-    def subject_CLI
-      Home_::CLI2
-    end
     end  # ~ end temporary block
 
     # #open [#023] away the below (old-style tests)

@@ -1,5 +1,23 @@
 # (quick definition of "modality") :[#002]
 
+
+## table of contents
+
+  - mile-hile overview of "modality"
+  - introduction (legacy)
+  - an optimization for summary of child under parent [#here.A]
+  - the "error level" can increase but not decrease [#here.B]
+  - experimental generated syntax aesthetics [#here.C]
+  - method note about help screen rendering (DISASSOCIATED)
+  - property categorization [#here.E]
+  - (code annotation) [#here.F]
+  - optional arguments [#here.G], [#here.7]
+
+
+
+
+## mile-high overview of "modality"
+
 we lean so heavily on this term in this universe that it has become
 something of an idiom. rougly it means "kind of interface." it is an
 attempt to model a taxonomy of user interfaces.
@@ -77,7 +95,7 @@ it's that simple.
 
 
 
-## :#an-optimization-for-summary-of-child-under-parent (:A)
+## an optimization for summary of child under parent :[#here.A]
 
 in practice so far, something like only 1 out of 50 adapters
 needs to build its own expression agent when that of its
@@ -92,13 +110,13 @@ would still need to use its own expression agent might be:
 
 the reason we sidestep this unless necessary is for the 49
 out of 50 cases, we can avoid doing unnecessary (and
-relatively costly) property catorization (and the less costly
+relatively costly) [#here.E] property catorization (and the less costly
 building of the new expag) just to get those 2 lines.
 
 
 
 
-## the "error level" can increase but not decrease :#note-075
+## the "error level" can increase but not decrease :[#here.B]
 
 for the lazy. every action invocation may trigger multiple events, but
 can only result in one exit status. we derive the exit status from the
@@ -135,7 +153,7 @@ unset so we can more easily track when & where we fail to set it.
 
 
 
-## experimental generated syntax aesthetics :#note-575
+## experimental generated syntax aesthetics :[#here.C]
 
 experimental aesthetics - when there is nothing filling the
 trailing optional arg "slot", let a would-be option fill this spot.
@@ -180,8 +198,7 @@ mixing in the other module (see "[#]/figure-1").
 
 
 
-
-## property categorization (:E)
+## property categorization :[#here.E] :[#here.5]
 
 a central feature of [br] CLI, property categorization is a concrete
 manifestion of the whole underlying [br] experiment, one that traces its
@@ -209,7 +226,7 @@ functional shortcomings:
 
 
 
-## :#note-610
+## :[#here.F]
 
 sadly we still have some cases to filter out. in the cases where
 properties are actually "officious" options (things like --version and
@@ -219,7 +236,7 @@ become arguments. this could stand to be improved.
 
 
 
-## Spot-1
+## optional arguments :[#here.G] :[#here.7]
 
 fields that take optional arguments are a nastly class of formal
 properties that we only support because we have to because of their

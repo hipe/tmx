@@ -157,7 +157,7 @@ module Skylab::BeautySalon
 
       def __init_pieces
 
-        @_scn = Common_::Scanner.via_array remove_instance_variable :@stack
+        @_scn = Scanner_[ remove_instance_variable :@stack ]
         r, s = @_scn.gets_one
 
         @_pieces = []

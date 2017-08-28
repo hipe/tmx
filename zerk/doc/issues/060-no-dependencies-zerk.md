@@ -1,5 +1,14 @@
 # no dependencies zerk :[#060]
 
+## table of contents (partial)
+
+  - about the structure of "primary found".. :[#here.A]
+  - (see inline) [#here.B]
+  - this one weird new argument arity [#here.3]
+
+
+
+
 ## objective & scope (overview)
 
   - tools for implementing a rudimentary API & CLI in one swing
@@ -16,9 +25,11 @@ single-file implementation of the basics needed to make API & CLI
 
 
 
-## etc
+
+## adjacent reading
 
 see [#053] discussion of feature injection
+also see [#br-062] association injection and related.
 
 
 
@@ -89,5 +100,35 @@ so we use our custom struct ("primary found") where it makes sense to.
 
 
 
-## tombstones
+## the "argument is optional" argument arity :[#here.3]
+
+this is for the (in practice) CLI-only argument arity where a
+flag's argument is optional. (that is, it is meaningful to pass
+this flag alone, and also meaningful to pass this flag with an
+argument.)
+
+  - we avoid this argument arity generally because it doesn't
+    isomorph well into other modalities. (in a GUI you should do
+    something like a checkbox and a text input that is enabled/
+    shown only when the checkbox is checked. in API you would have
+    to do some kind of complicated parsing involving two primaries,
+    the one being valid only immediately after the other.
+
+  - however we support this argument arity for CLI because it is
+    idiomatic as it occurs in parsing `--help [arg]`.
+
+  - success is guaranteed because the scanner is guaranteed to be
+    in one of these three states and each state is valid: either
+    the scanner is empty or the scanner's head token looks like a
+    primary or the scanner's head token does not.
+
+  - see also [#br-002.7] which is exactly about this in CLI (much older text)
+
+  - see also the (ancient) [#014] arity exegesis.
+
+
+
+
+## document-meta
+
   - #tombstone-A: full rewrite of legacy [fa] content

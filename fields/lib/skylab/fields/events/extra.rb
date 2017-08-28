@@ -8,6 +8,7 @@ module Skylab::Fields
 
       # (see #here-1 about 2 others)
       :did_you_mean_tokens, nil,
+      :did_you_mean_map_by_symbol, nil,
       :prefixed_conjunctive_phrase_context_proc, nil,
       :prefixed_conjunctive_phrase_context_stack, nil,
       :suffixed_prepositional_phrase_context_proc, nil,
@@ -87,7 +88,7 @@ module Skylab::Fields
 
         def __do_express_second_line
 
-          if __has_no_did_you_menas
+          if __has_no_did_you_means
             __express_no_did_you_means
 
           elsif __has_only_one_unrecognized_item &&
@@ -146,7 +147,7 @@ module Skylab::Fields
           end
         end
 
-        def __has_no_did_you_menas
+        def __has_no_did_you_means
           @did_you_mean_tokens.length.zero?
         end
 
@@ -173,12 +174,17 @@ module Skylab::Fields
 
         def _express_did_you_mean sym_a  # actually sym_a or s_a
 
+          m = @did_you_mean_map_by_symbol
+
           y = @_line_downstream
+
           @_expression_agent.calculate do
 
-            # ..
+            if m
+              code = method m
+            else
               code = method :mixed_primitive  # used to be `code`, `ick_mixed`
-            # ..
+            end
 
             # -
 

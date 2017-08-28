@@ -69,7 +69,7 @@ module Skylab::Plugin::TestSupport
 
           o.filesystem = :_no_filesystem_used_in_this_test_PL_
 
-          o.bound_call_via_action_with_definition_by = -> xx do
+          o.bound_call_when_operation_with_definition_by = -> oo do
             TS_._NEVER_CALLED
           end
         end

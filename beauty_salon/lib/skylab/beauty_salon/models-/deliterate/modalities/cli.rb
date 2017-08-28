@@ -4,75 +4,97 @@ module Skylab::BeautySalon
 
     module Modalities::CLI
 
-      Actions = ::Module.new
-      class Actions::Deliterate < Brazen_::CLI::Action_Adapter
+      Inject_and_deinject_associations = -> o do
 
-        # (what happens here is mentored by [gi])
+        # ==
 
-        MUTATE_THESE_PROPERTIES = [
-          :code_line_downstream,
-          :comment_line_downstream,
-          :line_upstream,
-        ]
+        #   - remove this association from the UI entirely
+        #   - assign stdout to that ivar instead
 
-        def mutate__code_line_downstream__properties
+        k = :code_line_downstream
 
-          substitute_value_for_argument :code_line_downstream do
-            @resources.sout
+        o.deinject_association k
+
+        o.assign k do |rsx|
+          rsx.stdout
+        end
+
+
+        # ==
+
+        #   - remove this association from the UI entirely
+        #   - assign something special to that ivar instead
+
+        k = :comment_line_downstream
+
+        o.deinject_association k
+
+        o.assign k do |rsx|
+          serr = rsx.stderr
+          ::Enumerator::Yielder.new do |line|
+            serr.puts line
           end
         end
 
-        def mutate__comment_line_downstream__properties
 
-          # by design, the back service adds no newlines to these flushed
-          # paragraphs. if we don't do this ourselves it's contrary to the
-          # modality convention and looks/behaves kind of nastily.
+        # ==
 
-          _y = ::Enumerator::Yielder.new do | line |
-            @resources.serr.puts line
-          end
+        -> do  # (scope)
 
-          substitute_value_for_argument :comment_line_downstream do
-            _y
-          end
-        end
+          # this amounts to a dastardly demonstration of how association
+          # injection/de-injection can change the interface quite a lot.
+          # this is perhaps a smell that instead justifies a dedicated
+          # custom action. this is referenced by :[#br-062.3].
 
-        def mutate__line_upstream__properties
+          # in effect, we swap-in a "file" parameter for the "line upstream"
+          # parameter; something that adds new behavior and requires work:
 
-          mfp = mutable_front_properties
-          mfp.remove :line_upstream
+          #   - remove this association from the UI entirely.
+          #   - add a whole other association, and some more abuse
+          #   - at the end, make it look like we wrote to the original ivar
 
-          _prp = build_property(
-            :file,
+
+          frontend_sym = :file
+          backend_sym = :line_upstream
+
+
+          o.deinject_association backend_sym
+
+          o.inject_association_via_definition(
             :required,
+            :property,
+            frontend_sym,
             :description, -> y do
               y << "a file with code in it"
             end,
           )
 
-          mfp.add :file, _prp
-          NIL_
-        end
+          o.inject_ad_hoc_normalization do |op, rsx|
 
-        def prepare_backstream_call x_a
+            _trueish_x = op._simplified_read_ frontend_sym  # (was required, is guaranteed here)
 
-          _qkn = remove_backstream_argument :file
+            _asc = op.instance_variable_get( :@_associations_ ).fetch frontend_sym
 
-          kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
+            _qkn = Common_::QualifiedKnownness.via_value_and_association _trueish_x, _asc
 
-            :qualified_knownness_of_path, _qkn,
-            :filesystem, @resources.bridge_for( :filesystem ),
-            & handle_event_selectively
-          )
+            kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
 
-          if kn
-            x_a.push :line_upstream, kn.value
-            ACHIEVED_
-          else
-            kn
+              :qualified_knownness_of_path, _qkn,
+              :filesystem, rsx.filesystem,
+              & op.listener
+            )
+
+            if kn
+              op._simplified_write_ kn.value, backend_sym
+              ACHIEVED_
+            end
           end
-        end
-      end
-    end
+        end.call  # scope
+
+        # ==
+        # ==
+      end  # `Inject_and_deinject_associations`
+    end  # `CLI`
   end
 end
+# #history-A.1: full rewrite during sunset matryoshka

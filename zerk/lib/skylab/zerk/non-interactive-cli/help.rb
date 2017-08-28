@@ -192,12 +192,14 @@ module Skylab::Zerk
           item = -> pa do
 
             name = pa.name
-            buffer = fmt % name.as_slug
+            buffer << ( fmt % name.as_slug )
 
             desc_p = description_proc_for[ pa.loadable_reference ]
             if desc_p
               p = first_line
               _express_into y, desc_p
+            else
+              puts.call buffer
             end
             NIL
           end
@@ -239,7 +241,7 @@ module Skylab::Zerk
           end
 
           subsequent_line = -> line do
-            if line
+            if line && NEWLINE_ != line  # allow HEREDOCs and line-by-line
               @puts.call "#{ @margin }#{ line }"
             else
               @puts.call line

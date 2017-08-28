@@ -148,7 +148,7 @@ module Skylab::Brazen
           ACHIEVED_
         end
 
-        def __make_aesthetic_readjustments  # #note-575
+        def __make_aesthetic_readjustments  # [#002.C]
 
           # if (a), (b) and (c)
 
@@ -160,7 +160,7 @@ module Skylab::Brazen
           end
         end
 
-        def ___make_experimental_aestethic_adjustment  # #note-610
+        def ___make_experimental_aestethic_adjustment  # [#002.F]
 
           skip = Home_::CLI_Support.standard_action_property_box_.h_
 

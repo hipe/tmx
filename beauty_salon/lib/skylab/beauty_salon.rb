@@ -72,7 +72,7 @@ module Skylab::BeautySalon
       def invocation_via_argument_array a, & p
         Require_user_interface_libs_[]
         _as = MTk_::API_ArgumentScanner.new a, & p
-        MicroserviceInvocation___.new InvocationResources___.new _as
+        MicroserviceInvocation___.new InvocationResources_.new _as
       end
     end  # >>
   end
@@ -115,15 +115,20 @@ module Skylab::BeautySalon
 
       o.models_branch_module = Home_::Models_
 
-      o.bound_call_via_action_with_definition_by = -> act do
-        MTk_::BoundCall_of_Operation_with_Definition[ act ]
+      o.bound_call_when_operation_with_definition_by = -> sct do
+        MTk_::BoundCall_of_Operation_with_Definition.call_by do |oo|
+          oo.customize_normalization_by = sct.customize_normalization_by
+          oo.inject_definitions_by = sct.inject_definitions_by
+          oo.operation = sct.operation
+          oo.invocation_or_resources = sct.invocation_or_resources
+        end
       end
 
       o.filesystem = ::Dir
     end
   end
 
-  class InvocationResources___
+  class InvocationResources_
     def initialize as
       @argument_scanner = as
     end
@@ -163,6 +168,10 @@ module Skylab::BeautySalon
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
   end
 
   Require_brazen_LEGACY_ = Lazy_.call do

@@ -34,9 +34,13 @@ module Skylab::Brazen
 
       def initialize
 
+        # (ick/meh)
         if ! CLI.const_defined? :UI_
+          o = CLI
+          o.const_set :Zerk_, Zerk_lib_[]
+          o.const_set :MTk_, Zerk_::MicroserviceToolkit
           require 'no-dependencies-zerk'
-          CLI.const_set :UI_, ::NoDependenciesZerk
+          o.const_set :UI_, ::NoDependenciesZerk
         end
 
         yield self
@@ -48,6 +52,10 @@ module Skylab::Brazen
       )
 
       def new a, _i, o, e, pns_a
+
+        @__mutex_stack = nil  # a placeholder as a reminder that currently we aren't doing this right
+        @_has_stack = false
+
         @ARGV = a
         @program_name_string_array = pns_a
         @stderr = e
@@ -63,23 +71,23 @@ module Skylab::Brazen
         __init_argument_scanner_via_listener
         __init_omni_branch
 
+        @_exitstatus = 0
         bc = __flush_to_bound_call_of_operator
         if bc
-          @_exitstatus = 0
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
           if ! x.nil?
-            Zerk_lib_[]::CLI::ExpressResult[ x, self ]
+            Zerk_::CLI::ExpressResult[ x, self ]
           end
-          @_exitstatus
-        else
-          bc.nil? ? 0 : 5
+        elsif ! bc.nil?
+          _maybe_increase_errorlevel GENERIC_ERROR_EXITSTATUS
         end
+        @_exitstatus
       end
 
       def __flush_to_bound_call_of_operator
 
         if @args.no_unparsed_exists
-          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ @omni ]
+          Zerk_::ArgumentScanner::When::No_arguments[ @omni ]
 
         elsif @args.scan_operator_symbol_softly
 
@@ -94,47 +102,204 @@ module Skylab::Brazen
         end
       end
 
-      def __express_help
+      def __bound_call_via_operator lu
 
-        _mod = Zerk_lib_[]::NonInteractiveCLI::Help::ScreenForBranch
+        _ref = lu.mixed_business_value
 
-        desc_proc_via_module = -> mod do
-          -> y do
-            mod.describe_into_under y, self
+        _ref.bound_call_of_operator_by do |o|
+
+          o.customize_normalization_by = -> n11n do
+            n11n.be_fuzzy
           end
+
+          o.inject_definitions_by = method :__inject_modality_specific_definitions
+
+          # (which of the below two you use makes no difference - by either
+          # name, it is what is passed into construction of the operator.)
+          # o.remote_invocation = self
+
+          o.remote_invocation_resources = self
+
+          o.receive_operation_by = method :__receive_operation
         end
+      end
+
+      def __receive_operation op
+        remove_instance_variable :@__mutex_stack
+        @_has_stack = true
+        @stack = []
+        @stack.push StackFrame___.new(
+          op,
+          @args.current_operator_symbol,
+        )
+        @stack.freeze ; nil
+      end
+
+      StackFrame___ = ::Struct.new(
+        :operation,
+        :name_symbol,
+      )
+
+      def __inject_modality_specific_definitions o  # association stream controller, from #spot1.1
+
+        __inject_CUSTOM_modality_specific_definitions o
+        _help_asc = __build_help_association_bound_to_self
+        o.inject_association _help_asc
+        NIL
+      end
+
+      def __inject_CUSTOM_modality_specific_definitions o
+        op = @stack.last.operation
+        mod = op.class
+        modz = mod.const_get :Modalities, false
+        if modz
+          cli_mod = modz.const_get :CLI, false
+        end
+        if cli_mod
+          cli_mod::Inject_and_deinject_associations[ o ]
+        end
+        NIL
+      end
+
+      def __build_help_association_bound_to_self
+
+        _proto = Memoized_help_association_prototype___[]
+
+        _proto.redefine do |o|
+          o.will_normalize_by( & method( :__receive_help_request ) )
+        end
+      end
+
+      def __receive_help_request qkn
+
+        # (the listener block that is passed to this *is* `@listener`,
+        # but as a proc instead of as a bound method.)
+
+        # observe [#ze-060.3] about this crazy new argument arity EXPERIMENTAL
+
+        if qkn.is_known_known
+          x = qkn.value
+          if true == x  # [#fi-012.10] explains exactly this crutch
+            __express_operation_help
+          else
+            ::Kernel._OKAY__have_fun__specific_argument_to_help
+          end
+        else
+          # this normalization runs whether or not the flas was passed.
+          # don't stop everything just because the flag was not passed.
+          qkn  # #[bs]:COVERPOINT2.1
+        end
+      end
+
+      def __express_operation_help
+
+        op = @stack.last.operation
+        @_operation_associations = op.instance_variable_get :@_associations_
+          # (this is a violation in 2 ways, but it's experimental..)
+
+        _tuple_st = __to_item_normal_tuple_stream_when_operation
+
+        _desc_proc = Desc_proc_via_module__[ op.class ]  # EEW
+
+        _program_name = get_program_name
+
+        _mod = Zerk_::NonInteractiveCLI::Help::ScreenForEndpoint
 
         _mod.express_into @stderr do |o|
 
-          o.expression_agent UI_::CLI_InterfaceExpressionAgent.instance
+          _same_help o
 
-          o.item_normal_tuple_stream __items
+          o.item_normal_tuple_stream _tuple_st
+
+          o.express_usage_section _program_name
+
+          o.express_description_section _desc_proc
+
+          o.express_items_sections -> prim_sym do
+
+            asc = @_operation_associations.fetch prim_sym
+            p = asc.describe_by
+            if p
+              p
+            else
+              NOTHING_  # hi.
+            end
+          end
+        end
+
+        STOP_PARSING_
+      end
+
+      def __express_help
+
+        shorten_the_description = -> mod do
+
+          -> y do
+
+            countdown = 3
+            _use_y = ::Enumerator::Yielder.new do |line|
+              y << line
+              countdown -= 1
+              countdown.zero? and throw :_yikes_001_BR_
+            end
+
+            catch :_yikes_001_BR_ do
+              mod.describe_into_under _use_y, self
+            end
+            y
+          end
+        end
+
+        _mod = Zerk_::NonInteractiveCLI::Help::ScreenForBranch
+
+        _mod.express_into @stderr do |o|
+
+          _same_help o
+
+          o.item_normal_tuple_stream __to_item_normal_tuple_stream
 
           o.express_usage_section get_program_name
 
-          o.express_description_section desc_proc_via_module[ @application_module ]
+          o.express_description_section Desc_proc_via_module__[ @application_module ]
 
           o.express_items_sections -> ref do
-            _x = ref.dereference_loadable_reference
-            desc_proc_via_module[ _x ]
+            _mod = ref.dereference_loadable_reference
+            shorten_the_description[ _mod ]
           end
 
         end
       end
 
-      def __items
+      def _same_help o
+        o.expression_agent _expag_instance
+      end
+
+      def _expag_instance
+        ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
+      end
+
+      def __to_item_normal_tuple_stream_when_operation
+        # #open [#br-002.5]
+        h = @_operation_associations
+        Stream_.call h.keys do |k|
+          [ :primary, k ]
+        end
+      end
+
+      def __to_item_normal_tuple_stream
         @operator_branch.to_loadable_reference_stream.map_by do |key_x|
           [ :operator, key_x ]
         end
       end
 
-      def __bound_call_via_operator lu
-        _action_class = lu.mixed_business_value.dereference_loadable_reference
-        _inst = _action_class.new(){ self }
-        Common_::BoundCall[ nil, _inst, :execute ]
-      end
-
       # ~ (for above) (see also #here4)
+
+      def _maybe_increase_errorlevel d  # #[#002.B]
+        if @_exitstatus < d
+          @_exitstatus = d
+        end
+        NIL
+      end
 
       def receive_exitstatus d
         @_exitstatus = d ; nil
@@ -157,7 +322,8 @@ module Skylab::Brazen
         fi.argument_scanner = @args
 
         fi.add_lazy_operators_injection_by do |o|
-          __add_injection o
+          o.operators = @operator_branch
+          o.injector = :_inj_BS_
         end
 
         fi.add_primaries_injection PRIMARIES___, self
@@ -166,13 +332,6 @@ module Skylab::Brazen
       PRIMARIES___ = {
         help: :__express_help,
       }
-
-      def __add_injection inj
-
-        inj.operators = @operator_branch
-
-        inj.injector = :_bs_hi_
-      end
 
       def __init_argument_scanner_via_listener
 
@@ -187,24 +346,41 @@ module Skylab::Brazen
 
         expr = UI_::CLI_Express_via_Emission.define do |o|
           o.emission_proc_and_channel em_p, chan
+          o.expression_agent_by = -> { _expag_instance }
           o.stderr = @stderr
         end
+
         sct = expr.execute
+
         if sct && sct.was_error
           __when_result_was_error chan
         end
       end
 
       def __when_result_was_error _chan
+        _maybe_increase_errorlevel GENERIC_ERROR_EXITSTATUS
         @stderr.puts "try '#{ get_program_name } -h'"
         NIL
       end
 
       def get_program_name
-        ::File.basename @program_name_string_array.last  # meh
+        buffer = ::File.basename @program_name_string_array.last  # meh
+        if @_has_stack
+          scn = Scanner_[ @stack ]
+          begin
+            _frame = scn.gets_one
+            buffer << SPACE_
+            buffer << _frame.name_symbol.id2name.gsub( UNDERSCORE_, DASH_ )
+          end until scn.no_unparsed_exists
+        end
+        buffer
       end
 
       # ~ :#here4 - for [ze]
+
+      def argument_scanner  # for self..
+        @args
+      end
 
       def sout
         @stdout
@@ -549,7 +725,7 @@ module Skylab::Brazen
 
       ## ~~ event receiving & sending
 
-      def maybe_use_exit_status d  # #note-075
+      def maybe_use_exit_status d  # #[#002.B]
 
         d or raise ::ArgumentError
 
@@ -1608,7 +1784,7 @@ module Skylab::Brazen
 
       def description_proc_for_summary_under exp
 
-        # #[#002]an-optimization-for-summary-of-child-under-parent
+        # #[#002.A] "an optimization for summary of child under parent"
 
         @bound.description_proc_for_summary_of_under self, exp
       end
@@ -2140,7 +2316,7 @@ module Skylab::Brazen
 
             if Field_::Argument_is_optional[ prp ]
 
-              if true == x  # :Spot-1 ([#])
+              if true == x  # #[#here.G]
                 x = nil
               end
             end
@@ -2420,6 +2596,31 @@ module Skylab::Brazen
       end
     end
 
+    # ==
+
+    Memoized_help_association_prototype___ = Lazy_.call do
+
+      _defn = [
+        :property,
+        :help,
+        :argument_is_optional,
+        :description, -> { "this screen" },
+      ]
+      _gi = MTk_::EntityKillerParameter.grammatical_injection
+      _scn = Scanner_[ _defn ]
+      _gi.gets_one_item_via_scanner_fully _scn
+    end
+
+    # ==
+
+    Desc_proc_via_module__ = -> mod do
+      -> y do
+        mod.describe_into_under y, self
+      end
+    end
+
+    # ==
+
     o = Home_::CLI_Support
 
     When_help__ = -> do
@@ -2427,6 +2628,8 @@ module Skylab::Brazen
     end
 
     # ==
+
+    STOP_PARSING_ = nil
 
     # ==
 
@@ -2436,6 +2639,9 @@ module Skylab::Brazen
     Here_ = self
     SUCCESS_EXITSTATUS = o::SUCCESS_EXITSTATUS
     When_ = -> { o::When }
+
+    # ==
+    # ==
   end
 end
 # #history-A.1: begin splicing matryoshka-killer in to legacy file

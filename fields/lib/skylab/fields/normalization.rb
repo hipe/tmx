@@ -19,6 +19,7 @@ module Skylab::Fields
 
         def initialize
 
+          @__do_be_fuzzy = false
           @__do_parse_passively = false
           @_execute = :__execute_algorithmically
           @__mutex_only_one_argument_scanner = nil
@@ -30,6 +31,8 @@ module Skylab::Fields
           @_result = :__result_normally
 
           @association_source = nil
+          @attribute_lemma_symbol = nil
+          @did_you_mean_map_by_symbol = nil
           @listener = nil
           yield self
         end
@@ -161,6 +164,12 @@ module Skylab::Fields
           @_result = m ; nil
         end
 
+        def be_fuzzy
+          # (there is also the scanner reader `can_fuzzy` but we instead
+          # require that it be specified explicitly.)
+          @__do_be_fuzzy = true
+        end
+
         def will_nilify
           @_do_nilify_ = true
         end
@@ -225,17 +234,20 @@ module Skylab::Fields
 
         attr_writer(
           :arguments_to_default_proc_by,
+          :attribute_lemma_symbol,
+          :did_you_mean_map_by_symbol,
           :listener,
         )
 
         # -- G: execution
 
         def execute
+          @_missing_required_MIXED_associations = nil  #  used to be _prepare_to_execute
           send @_execute
         end
 
         def __execute_by_checking_for_missing_requireds_only
-          _prepare_to_execute
+          # _prepare_to_execute
           ok = @association_source.traverse_associations_checking_for_missing_requireds_only__ self
           ok &&= _react_to_any_missing_requireds
           ok and send @_result
@@ -243,7 +255,7 @@ module Skylab::Fields
 
         def __execute_algorithmically
 
-          _prepare_to_execute
+          # _prepare_to_execute
 
           if @_my_arg_scanner  # (assimilating [#037.5.G] is when this became a branch)
 
@@ -255,10 +267,6 @@ module Skylab::Fields
 
           ok &&= _react_to_any_missing_requireds
           ok and send @_result
-        end
-
-        def _prepare_to_execute
-          @_missing_required_MIXED_associations = nil
         end
 
         def _receive_valid_value_store vvs
@@ -286,13 +294,22 @@ module Skylab::Fields
             end
 
             asc = @_mixed_association_soft_reader[ _unsanitized_key ]
+
             if ! asc
               if @__do_parse_passively  # :#coverpoint1.5:
                 # in a passive parse, when you encounter an unrecognizable
                 # scanner head you merely stop parsing, you do not fail.
                 break
+              end
+              if @__do_be_fuzzy
+                asc = __parse_association_fuzzily
+                if ! asc
+                  kp = _unable
+                  break
+                end
               else
-                kp = __when_primary_not_found ; break
+                kp = _when_primary_not_found
+                break
               end
             end
 
@@ -315,6 +332,21 @@ module Skylab::Fields
           else
             FALSE
           end
+        end
+
+        def __parse_association_fuzzily
+
+          _rx = /\A#{ ::Regexp.escape _unsanitized_key }/
+          sym_a = @_mixed_association_soft_reader.keys.grep _rx  # :#here14
+          case 1 <=> sym_a.length
+          when  0 ; @_mixed_association_soft_reader.fetch sym_a.first
+          when  1 ; _when_primary_not_found
+          when -1 ; self._COVER_ME__when_ambiguous__
+          end
+        end
+
+        def _unsanitized_key
+          @_my_arg_scanner._unsanitized_key_
         end
 
         def __execute_via_custom_proc
@@ -649,9 +681,13 @@ module Skylab::Fields
           end
         end
 
-        o.association_soft_reader = h.method :[]
+        o.association_soft_reader = h
+        # (we have to pretend we don't know this is an array everywhere,
+        #  but awfully we cheat #here14.)
 
-        o.extroverted_diminishing_pool = pool ; nil
+        o.extroverted_diminishing_pool = pool
+
+        # :#here13 is where you could remove associations for masking
       end
 
       Common_flush_injection_for_extroverted_tail__ = -> o, n11n do
@@ -805,7 +841,12 @@ module Skylab::Fields
         def __resolve_unsanitized_value
           kn = @_callbacks_.__resolve_unsanitized_value_for_ @normal_association
           if kn
-            @_unsanitized_value_ = kn.value ; ACHIEVED_
+            if kn.is_known_known
+              @_unsanitized_value_ = kn.value
+            else
+              @_unsanitized_value_ = true  # :[#here.10]
+            end
+            ACHIEVED_
           end
         end
 
@@ -1046,17 +1087,32 @@ module Skylab::Fields
 
         # -- C: matching the argument scanner head against an association
 
-        def __when_primary_not_found  # :#here4 lazily detect callbacks
+        def _when_primary_not_found  # :#here4 lazily detect callbacks
 
           # in order to assimilate parts of our very old "attributes actor"
           # API, allow that the client might define this idiomatic method
+
+          if __oldschool_entity_thing_not_covered
+            __when_primary_not_found_do_oldschool_entity_thing_NOT_COVERED
+          else
+            __when_primary_not_found_express_this_fact_somehow
+          end
+        end
+
+        # ~
+
+        def __oldschool_entity_thing_not_covered
 
           if instance_variable_defined? :@entity
             if @entity.respond_to? :when_after_process_iambic_fully_stream_has_content
               _yes = true
             end
           end
-          if _yes
+          _yes
+        end
+
+        def __when_primary_not_found_do_oldschool_entity_thing_NOT_COVERED
+
             ::Kernel._NO_PROBLEM__but_cover_me__
             user_x = @entity.when_after_process_iambic_fully_stream_has_content argument_scanner
             if user_x
@@ -1065,12 +1121,11 @@ module Skylab::Fields
             else
               user_x  # false or nil
             end
-          else
-            __when_primary_not_found_express_event_somehow
-          end
         end
 
-        def __when_primary_not_found_express_event_somehow
+        # ~
+
+        def __when_primary_not_found_express_this_fact_somehow
 
           ev_early_to_be_safe = __build_primary_not_found_event  # for now NOTE
 
@@ -1097,9 +1152,12 @@ module Skylab::Fields
           end
           _these = _maybe_special_noun_lemma
 
+          _unrec_token_x = @_my_arg_scanner._unrecognized_primary_token_
+
           _ev = Home_::Events::Extra.with(
-            :unrecognized_token, _unsanitized_key,
+            :unrecognized_token, _unrec_token_x,
             :did_you_mean_tokens, _did_you_mean,
+            :did_you_mean_map_by_symbol, @did_you_mean_map_by_symbol,
             * _these,
           )
           _ev  # hi. #todo
@@ -1109,18 +1167,17 @@ module Skylab::Fields
 
           # { :attribute | :member | :parameter | :primary | :property | :field }
 
-          s = @association_source.use_this_noun_lemma_to_mean_attribute
-          if s
-            [ :noun_lemma, s ]
+          x = @attribute_lemma_symbol
+          if ! x
+            x = @association_source.use_this_noun_lemma_to_mean_attribute
+          end
+          if x
+            [ :noun_lemma, x ]
           end
         end
 
         def _association_key
           @_current_normal_association.name_symbol
-        end
-
-        def _unsanitized_key
-          @_my_arg_scanner._unsanitized_key_
         end
 
         def _unable
@@ -1326,20 +1383,31 @@ module Skylab::Fields
           @native_argument_scanner.current_primary_symbol
         end
 
+        def _unrecognized_primary_token_
+          @native_argument_scanner.current_primary_token
+        end
+
         def _match_unsanitized_value_ normal_asc
 
           remove_instance_variable :@_ick
 
           if normal_asc.is_glob
-            @_eew = false
+            @_advancement_is_required_EEW = false
             a = @native_argument_scanner.scan_glob_values
             if a
               Common_::KnownKnown[ a ]
             end
 
           elsif normal_asc.is_flag
-            @_eew = false
+            @_advancement_is_required_EEW = false
             @native_argument_scanner.scan_flag_value
+
+          elsif normal_asc.argument_is_optional
+            @_advancement_is_required_EEW = false
+            @native_argument_scanner.scan_when_argument_is_optional
+            # as it works out this is a modalty-specific argument arity.
+            # we like to avoid it but it is idiomatic in CLI's for `--help [cmd]`
+
           else
             _match_unsanitized_monadic_value_
           end
@@ -1347,7 +1415,7 @@ module Skylab::Fields
 
         def _match_unsanitized_monadic_value_
 
-            @_eew = true
+            @_advancement_is_required_EEW = true
             unsanitized_value = nil
             _ok = @native_argument_scanner.map_value_by do |x|
               unsanitized_value = x ; true
@@ -1362,7 +1430,7 @@ module Skylab::Fields
           # we hate this, but for now, meh: [#ze-052.2] be OCD about don't
           # advance until valid, but only for certain argument arities.
           @_ick = nil
-          if remove_instance_variable :@_eew
+          if remove_instance_variable :@_advancement_is_required_EEW
             @native_argument_scanner.advance_one ; nil
           end
         end
@@ -1380,6 +1448,10 @@ module Skylab::Fields
           # simple scanners do not have special parsing to detect tokens
           # that look like primaries. leave the scanner as-is. follow [#012.L.1]
           TRUE
+        end
+
+        def _unrecognized_primary_token_
+          @native_argument_scanner.head_as_is
         end
 
         def _unsanitized_key_

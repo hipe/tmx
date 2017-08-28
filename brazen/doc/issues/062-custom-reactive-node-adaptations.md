@@ -1,4 +1,34 @@
+# association injection and related :[#062]
 # custom reactive node adaptations
+
+## table of contents :[#here.a]
+
+  - table of contents [#here.a]
+  - synopsis [#here.b]  (has [#here.3])
+
+
+
+
+## synopsis :[#here.b]
+
+  - you can inject arbitrary new associations into your action
+    (after it constructs, realized before or as it is normalized).
+
+  - you can remove arbitrary associations. (we call this "de-injection").
+
+  - you can assign aribtrary parameters (really, just setting ivars).
+
+  - you can ad action-level (not association-level) ad-hoc normalizers
+    to your action in this same context.
+
+  - this is meant to help you allow to "steer" the way your action is
+    adapted for this or that particular modality; but can become a
+    smell if overused. (see example in [bs] that links back to [#here.3]).
+
+
+
+
+(EDIT: everything below this is legacy, half is OK..)
 
 ## fine-tuning modality expression decisions
 
@@ -8,6 +38,7 @@ usability concern and other times out of necessity you will need to
 modify the choices that would have otherwise been made by this
 inference; when expressing outwardly and interpreting inwardly the
 behavior and data of your particular actions.
+(EDIT: fine tune the above for [ze]-era)
 
 first of all, it's worth understanding the reasons not to do this:
 
@@ -109,4 +140,13 @@ some important facets of this employed here:
   • setting the list-of-names const to false-ish is equivalent to the
     empty list. you may want to modify your base class to ignore a list
     set by a parent class.
+
+
+
+
+## document-meta
+
+  - #history-A.1: begin injection of [ze]-era talk of "injection".
+
+  - #pending-rename: to "association injection and related"
 _

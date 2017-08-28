@@ -87,9 +87,10 @@ module Skylab::Zerk::TestSupport
 
           md = %r(\A[^\[]+).match line
           _head = md[0]
-          _tail = md.post_match
+          tail = md.post_match
+          tail.chomp!  # some need this, some don't
 
-          s_a = _tail.split %r((?<=\])[ ])   # "[ -jif-jaf ..] [ -wib ..] [ -xx ..] .."
+          s_a = tail.split %r((?<=\])[ ])   # "[ -jif-jaf ..] [ -wib ..] [ -xx ..] .."
           if '..' == s_a.last  # DOT_DOT_
             had = true
             s_a.pop
@@ -102,7 +103,7 @@ module Skylab::Zerk::TestSupport
               _had = true
             end
             _k = Normal_symbol_via_slug__[ md[:slug] ]
-            h[ _k ] = Item___.new d, _had
+            h[ _k ] = ItemIndex___.new d, _had
           end
           CommonBranchUsageLine___.new had, h, _head
         end
@@ -112,7 +113,7 @@ module Skylab::Zerk::TestSupport
       class CommonBranchUsageLine___
 
         def initialize had, h, head
-          @had = had
+          @had_ellipsis = had
           @head = head
           @item_index = h
         end
@@ -124,8 +125,142 @@ module Skylab::Zerk::TestSupport
         )
       end
 
-      Item___ = ::Struct.new :offset, :had_ellipsis
+      ItemIndex___ = ::Struct.new :offset, :had_ellipsis
     end
+
+    # ==
+
+    CommonItemsSection_via_LineStream_EXPERIMENTAL_ALTERNATIVE = -> st do  # [bs]
+
+      # (this is slap-dash function soup made to address a shortcoming
+      #  in the next magnetic. with plain old programming we parse such a
+      #  section here, where we use a state machine there..) (#history-A.1)
+
+      # -
+        scn = st.flush_to_scanner
+        scn.advance_one  # guaranteed to be the header line. no need to check again
+
+        p = nil ; md = nil ; transition = nil ; expect_blank = nil ; add_item = nil
+
+        rx = /\A
+          (?<margin>[ ]{2,})
+          (?<item>[[:graph:]]+)
+          (?:
+            [ ]{2,}
+            (?<desc>[[:graph:]].+)
+          )?
+        $/x
+
+        after_blank = nil
+        unhinged = -> line do
+          md = rx.match line
+          if md[ :desc ]
+            transition[]
+          else
+            add_item[ md[ :item ] ]
+            after_blank = unhinged
+            p = expect_blank
+          end
+        end
+
+        expect_blank = -> line do
+          NEWLINE_ == line || fail
+          p = after_blank
+        end
+
+        item_label = nil
+        desc_lines = nil
+
+        rx2 = nil
+        after_descy_item = nil
+
+        transition = -> do
+          item_label = md[ :item ]
+          desc_lines = [ md[ :desc ] ]
+          p = after_descy_item
+          after_blank = after_descy_item
+          _d = md.offset( :desc ).first
+          rx2 = /\A[ ]{#{ _d }}(?<desc>[[:graph:]].+)$/
+        end
+
+        close_off_that_item = nil
+        smooth_sailing = nil
+
+        after_descy_item = -> line do
+          if NEWLINE_ == line
+            close_off_that_item[]
+            p = smooth_sailing
+          else
+            md = rx2.match line
+            desc_lines.push md[ :desc ]
+          end
+        end
+
+        smooth_sailing = -> line do
+          md = rx.match line
+          if md[ :desc ]
+            item_label = md[ :item ]
+            desc_lines = [ md[ :desc ] ]
+            p = after_descy_item
+          else
+            add_item[ md[ :item ] ]
+            p = expect_blank
+          end
+        end
+
+        close_off_that_item = -> do
+          add_item[ desc_lines.freeze, item_label ]
+          item_label = nil
+          desc_lines = nil
+        end
+
+        result_item_list = []
+        result_offset_via_key = {}
+        add_item = -> lines=nil, item_s do
+          d = result_item_list.length
+          item = Item__.new lines, item_s
+          result_item_list.push item
+          result_offset_via_key[ item.mixed_normal_key ] = d
+        end
+
+        p = unhinged
+        begin
+          p[ scn.gets_one ]
+        end until scn.no_unparsed_exists
+
+        if item_label
+          close_off_that_item[]
+        end
+
+        Index___.new(
+          result_offset_via_key,
+          result_item_list,
+        )
+      # -
+    end
+
+    class Index___
+
+      def initialize h, a
+        @dereference = h  # offset via key
+        @items = a
+      end
+
+      def dereference x
+        @items.fetch @dereference.fetch x
+      end
+
+      def to_keys_set
+        require 'set'
+        ::Set.new @dereference.keys
+      end
+
+      attr_reader(
+        :items,
+      )
+    end
+
+    # ==
 
     class CommonItemsSection_via_LineStream < Common_::Monadic  # 1x
 
@@ -348,18 +483,15 @@ module Skylab::Zerk::TestSupport
 
         def _swallow_item
 
-          moniker = remove_instance_variable( :@_col_A ).strip
-
-          _md = %r(\A-*).match moniker
-
-          s = _md.post_match.freeze
-
-          x = Key_via_moniker__[ s ]
+          _item_label = remove_instance_variable( :@_col_A ).strip
 
           _ary = remove_instance_variable :@_desc_pieces
 
-          @_h[ x ] = @_items.length
-          @_items.push Item___.new x, s, _ary
+          item = Item__.new _ary, _item_label
+
+          @_h[ item.mixed_normal_key ] = @_items.length
+
+          @_items.push item
           NIL
         end
       end
@@ -387,26 +519,9 @@ module Skylab::Zerk::TestSupport
           :items,
         )
       end
-
-      # ==
-
-      class Item___
-
-        def initialize x, s, s_a
-          @desc_string_array = s_a
-          @label = s
-          @mixed_normal_key = x
-        end
-
-        attr_reader(
-          :desc_string_array,
-          :label,
-          :mixed_normal_key,
-        )
-      end
-
-      # ==
     end
+
+    # ==
 
     module SectionsOldSchool_via_LineStream
 
@@ -490,7 +605,29 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    Key_via_moniker__ = -> moniker do
+    class Item__
+
+      def initialize desc_s_a, item_label
+
+        _md = %r(\A-*).match item_label
+
+        @mixed_normal_key = Key_via_moniker___[ _md.post_match ]
+
+        @description_line_array = desc_s_a
+
+        @label = item_label
+      end
+
+      attr_reader(
+        :description_line_array,
+        :label,
+        :mixed_normal_key,
+      )
+    end
+
+    # ==
+
+    Key_via_moniker___ = -> moniker do
       if CLEAN_RX___ =~ moniker
         Normal_symbol_via_slug__[ moniker ]
       else
@@ -516,3 +653,4 @@ module Skylab::Zerk::TestSupport
 
   end  # support
 end
+# #history-A.1: spike function soup without coverage

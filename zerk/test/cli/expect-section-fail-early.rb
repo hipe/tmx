@@ -296,20 +296,14 @@ module Skylab::Zerk::TestSupport
         Magnetics__[]::CommonOperatorUsageLineIndex_via_Line[ _first_line ]
       end
 
-      def to_index_of_common_item_list
-
-        muta = nil
-
-        _st = Stream_.call @emissions do |em|
-          em.string || ( muta ||= "" )
-        end
-        # (because `chomp!` is used, string can't be the frozen EMPTY_S_)
-
-        Magnetics__[]::CommonItemsSection_via_LineStream[ _st ]
+      def to_index_of_common_item_list_EXPERIMENTAL_ALTERNATIVE  # (see)
+        _st = _to_string_stream
+        Magnetics__[]::CommonItemsSection_via_LineStream_EXPERIMENTAL_ALTERNATIVE[ _st ]
       end
 
-      def to_index_of_common_operator_item_list
-        ::Kernel._K
+      def to_index_of_common_item_list
+        _st = _to_string_stream
+        Magnetics__[]::CommonItemsSection_via_LineStream[ _st ]
       end
 
       def expect_exactly_one_line
@@ -345,6 +339,16 @@ module Skylab::Zerk::TestSupport
           num -= 1
         end
         num
+      end
+
+      def _to_string_stream
+
+        muta = nil
+
+        Stream_.call @emissions do |em|
+          em.string || ( muta ||= '' )
+        end
+        # (because `chomp!` is used, string can't be the frozen EMPTY_S_)
       end
 
       def TO_LINE_STRINGS  # not covered but useful in debugging

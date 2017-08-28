@@ -78,7 +78,7 @@ module Skylab::Brazen
 
         :option_argument_moniker, 'cmd',
         :parameter_arity, :zero_or_one,
-        :argument_arity, :zero_or_one,  # LOOK Spot-1
+        :argument_arity, :zero_or_one,  # #[#002.G]
       )
 
       bx.freeze

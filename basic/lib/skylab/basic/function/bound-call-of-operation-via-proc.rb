@@ -36,8 +36,8 @@ module Skylab::Basic
       end
 
       attr_writer(
+        :invocation_or_resources,
         :invocation_stack_top_name_symbol,  # will probably build out eventually
-        :microservice_invocation,
         :proc,
       )
 
@@ -58,7 +58,7 @@ module Skylab::Basic
         end
 
         if remove_instance_variable :@__it_does_take_a_block
-          p = @microservice_invocation.invocation_resources.listener
+          p = _invocation_resources.listener
         end
 
         the_proc = remove_instance_variable :@proc
@@ -71,16 +71,31 @@ module Skylab::Basic
       end
 
       def __build_stackish
-        freeze  # #here1
+        a = [
+          @invocation_or_resources.value,
+          @invocation_stack_top_name_symbol,
+        ]
+        case @invocation_or_resources.name_symbol
+        when :_invocation_PL_
+          FrameWhenInvo___.new( * a )
+        when :_invocation_resources_PL_
+          self._COVER_ME__easy__
+        else ; never
+        end
       end
+
+      FrameWhenInvo___ = ::Struct.new(
+        :microservice_invocation,
+        :invocation_stack_top_name_symbol,
+      )
 
       def __procure_arguments_hash_by_normalizing
 
         _fo_st = Stream_.call @_parameter_name_symbols do |name_sym|
-          HiJimothy___[ name_sym ]
+          YuckStubbyFakeAssociation___[ name_sym ]
         end
 
-        invo_rsx = @microservice_invocation.invocation_resources
+        invo_rsx = _invocation_resources
 
         _arg_scn = invo_rsx.argument_scanner
         _listener = invo_rsx.listener  # probably comes from above
@@ -98,6 +113,25 @@ module Skylab::Basic
         if _ok
           @__parameter_values_hash = h ; ACHIEVED_
         end
+      end
+
+      def _invocation_resources  # 2x
+        send( @_invocation_resources ||= :__invocation_resources_initially )
+      end
+
+      def __invocation_resources_initially
+        o = @invocation_or_resources.value
+        _x = case @invocation_or_resources.name_symbol
+        when :_invocation_PL_ ; o.invocation_resources
+        when :_invocation_resources_PL_ ; self._COVER_ME__already_done__ ; o
+        else ; never
+        end
+        @___invocation_resources = _x
+        send( @_invocation_resources = :___invocation_resources )
+      end
+
+      def ___invocation_resources
+        @___invocation_resources
       end
 
       def __init_whether_it_takes_the_stackish
@@ -129,16 +163,11 @@ module Skylab::Basic
         @__it_does_take_a_block = takes_block
         @_parameter_name_symbols = name_sym_a ; nil
       end
-
-      attr_reader(  # :#here1
-        :microservice_invocation,
-        :invocation_stack_top_name_symbol,
-      )
     # -
 
     # ==
 
-    HiJimothy___ = ::Struct.new :name_symbol do
+    YuckStubbyFakeAssociation___ = ::Struct.new :name_symbol do
 
       def is_required
         TRUE
@@ -158,6 +187,10 @@ module Skylab::Basic
 
       def do_guard_against_clobber
         TRUE
+      end
+
+      def argument_is_optional
+        NOTHING_
       end
 
       def is_glob

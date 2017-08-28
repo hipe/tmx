@@ -204,12 +204,6 @@ module Skylab::TanMan
 
       class ApplicationSpecificCustomizedAssociation____ < _common_association_class
 
-        def redefine  # experiment
-          otr = dup
-          yield otr
-          otr.freeze
-        end
-
         def be_optional
           @is_required = false ; nil
         end

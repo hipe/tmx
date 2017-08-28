@@ -10,7 +10,7 @@ module Skylab::CodeMetrics
 
       def description_proc_for_summary_of_under__ bound, exp
 
-        # #[#br-002]:A finally here is the end of the line for this.
+        # #[#br-002.A] finally here is the end of the line for this.
         # (we want to move this up or do away with the optimization..)
         # this is necessary because we are surprisingly uncommon in our
         # behavior of rendering properties in the first 2 lines of desc.
@@ -84,7 +84,7 @@ module Skylab::CodeMetrics
       def init_categorized_properties
 
         # this won't make any sense without a deep understanding of
-        # [#br-002]E property categorization.
+        # [#br-002.5] property categorization.
 
         # categorize our properties differently than what is default. by
         # default, the first of the two "glob" parameters would become an

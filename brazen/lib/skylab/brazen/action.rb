@@ -3,8 +3,10 @@ module Skylab::Brazen
 # ===( SNIP
   Action = ::Class.new Home_::Nodesque::Node  # :[#024] (and see)
   class Action  # (will be renamed ActionToolkit)
+    # (actually see bottom of file)
 
     mtk = -> { ::Skylab::Zerk::MicroserviceToolkit }  # it is assumed
+    MTk__ = mtk
 
     BoundCall_of_Operation_via = -> microservice_invo, oper_branch do
 
@@ -15,7 +17,7 @@ module Skylab::Brazen
       end
     end
 
-    # ~
+    # ==
 
     ParseOperator_via = -> microservice_invo, oper_branch do
 
@@ -31,10 +33,17 @@ module Skylab::Brazen
       end.parse_operator
     end
 
-    # ~
+    # === (the next three or so magnets are the sole implementors of
+    #      [#062] "association injection and related" (see).)
 
-    BoundCall_of_Operation_with_Definition = -> act do
+    # ==
 
+    class BoundCall_of_Operation_with_Definition < Common_::MagneticBySimpleModel
+
+      # #open [#tm-032.2] now that this is a magnetic and not a proc,
+      # refactor [tm] to be not redundant with here and DRY it up.
+      # then EDIT this message in the next paragraph:
+      #
       # (for now, if you want your own action grammar you'll have to
       # copy-paste-modify such a function, as [tm] does)
 
@@ -53,81 +62,380 @@ module Skylab::Brazen
       # we want to produce a stream that is is only of the associations (so
       # a map-reduce). but also: one special kind of item is itself a stream
       # of more associations (so a map-expand) (and this does not recurse).
-      #
-      # this is hand-written "for clarity" (and we're not even sure if etc.)
 
-      _defn_a = act.definition
+      class << self
+        def call op
+          call_by do |o|
+            o.operation = op
+          end
+        end
+        alias_method :[], :call
+      end  # >>
 
-      st = Action_grammar___[].stream_via_array _defn_a
+      def initialize
+        @customize_normalization_by = nil
+        @inject_definitions_by = nil
+        super
+        @action_grammar = Action_grammar___[]  # ..
+      end
 
-      qual_item = nil
-      proc_for_list = nil
-      p = main = -> do
+      attr_writer(
+        :customize_normalization_by,
+        :inject_definitions_by,
+        :invocation_or_resources,
+        :operation,
+      )
+
+      def execute
+
+        __read_injections
+
+        __init_association_stream
+
+        if __normalize
+
+          __inject_assignments
+
+          # (downgrade false to nil)
+          Common_::BoundCall.by( & @operation.method( :execute ) )
+        end
+      end
+
+      def __normalize
+        if __normalize_declaratives
+          __normalize_imperatives
+        end
+      end
+
+      def __normalize_imperatives
+        a = remove_instance_variable :@_ad_hoc_normalizations
+        if a
+          __do_normalize_ad_hoc_normalizations a
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __do_normalize_ad_hoc_normalizations a
+        ok = ACHIEVED_ ; op = @operation ; rsx = _invocation_resources
+        a.each do |p|
+          ok = p[ op, rsx ]
+          ok || break
+        end
+        ok
+      end
+
+      def __normalize_declaratives
+
+        _ok = MTk__[]::Normalization.call_by do |o|
+
+          # main input payloads -
+          o.association_stream_newschool = remove_instance_variable :@__association_stream
+          o.entity_nouveau = @operation
+
+          # behavior -
+          o.will_nilify
+            # (this option itself is cosmetic - without it only warnings.
+            # however its side effect is to make every association "extroverted"
+            # so that they are all traversed. changing this might mean death.)
+
+          # how expressions are produced -
+          o.attribute_lemma_symbol = :primary
+          o.did_you_mean_map_by_symbol = :prim
+
+          p = remove_instance_variable :@customize_normalization_by
+          if p
+            p[ o ]
+          end
+        end
+
+        _ok  # hi. #todo
+      end
+
+      def __init_association_stream
+
+        # [#011]: this one experimental feature
+        if @operation.instance_variable_defined? :@_associations_
+          _h = @operation.instance_variable_get :@_associations_
+        end
+
+        @__association_stream = AssociationStream_via_Definition___.call_by do |o|
+
+          o.remove_these_and_add_these = remove_instance_variable :@_removes_adds
+
+          o.write_associations_into_this_hash = _h
+
+          o.definition_array = @operation.definition
+          o.action_grammar = @action_grammar
+        end
+        NIL
+      end
+
+      def __read_injections
+        p = remove_instance_variable :@inject_definitions_by
+        if p
+          __do_process_injections p
+        else
+          @_ad_hoc_normalizations = nil
+          @_injected_assignments = nil
+          @_removes_adds = nil
+        end
+      end
+
+      def __do_process_injections p
+
+        @_remove_these = nil
+        @_add_these = nil
+        @_injected_assignments = nil
+        p[ self ]  # :#spot1.1
+        @_removes_adds = [
+          remove_instance_variable( :@_remove_these ),
+          remove_instance_variable( :@_add_these ),
+        ]  # NOTE both elements above might be nil. consumer beware
+        NIL
+      end
+
+      # -- for above
+
+      def inject_ad_hoc_normalization & p
+        ( @_ad_hoc_normalizations ||= [] ).push p ; nil
+      end
+
+      def inject_association_via_definition * sym_a
+        _gi = @action_grammar.DEREFERENCE_INJECTION :_parameter_BR_
+        _scn = Scanner_[ sym_a ]
+        _asc = _gi.gets_one_item_via_scanner_fully _scn
+        inject_association _asc
+      end
+
+      def deinject_association k
+        ( @_remove_these ||= [] ).push k ; nil
+      end
+
+      def inject_association asc
+        ( @_add_these ||= [] ).push asc ; nil
+      end
+
+      def assign k, & p
+        ( @_injected_assignments ||= [] ).push [ p, k ] ; nil
+      end
+
+      # --
+
+      def __inject_assignments
+        a = remove_instance_variable :@_injected_assignments
+        a and __process_injected_assignments a
+      end
+
+      def __process_injected_assignments a
+
+        # EXPERIMENTAL details
+
+        rsx = _invocation_resources
+        op = @operaiton
+
+        a.each do |(p, k)|
+          _x = p[ rsx, op ]
+          op._simplified_write_ _x, k
+        end
+
+        NIL
+      end
+
+      def _invocation_resources
+        pair = @invocation_resources
+        x = pair.value
+        case pair.name_symbol
+        when :_invocation_PL_ ; x.invocation_resources
+        when :_invocation_resources_PL_ ; x
+        else ; never
+        end
+      end
+    end
+
+    # ==
+
+    class AssociationStream_via_Definition___ < Common_::MagneticBySimpleModel
+
+      # (skip over non-association parsed items, like the description proc)
+
+      def initialize
+        @inject_definitions_by = nil
+        super
+      end
+
+      attr_writer(
+        :action_grammar,
+        :definition_array,
+        :remove_these_and_add_these,
+        :write_associations_into_this_hash,
+      )
+
+      def execute
+
+        remove_these, add_these = remove_instance_variable :@remove_these_and_add_these
+
+        if remove_these
+          pool = ::Hash[ remove_these.map { |k| [k, true] } ]
+        end
+
+        st = AssociationStream_via_Definition_PURELY_.call_by do |o|
+
+          if add_these
+            o.inject_these_associations_at_the_end = add_these
+          end
+
+          if remove_these  # (after `add_these` above)
+            o.at_end_of_stream_also_do_this do
+              if pool.length.nonzero?
+                self._COVER_ME__items_to_remove_not_found__
+              end
+              NOTHING_
+            end
+          end
+
+          o.definition_array = remove_instance_variable :@definition_array
+          o.action_grammar = remove_instance_variable :@action_grammar
+        end
+
+        if remove_these
+          st = __do_the_pool_based_reduction pool, st
+        end
+
+        h = remove_instance_variable :@write_associations_into_this_hash
+        if h
+          st.map_by do |asc|
+            h[ asc.name_symbol ] = asc
+            asc
+          end
+        else
+          st  # [gi]
+        end
+      end
+
+      def __do_the_pool_based_reduction pool, st
+        st.reduce_by do |asc|
+          _yes = pool.delete asc.name_symbol
+          ! _yes
+        end
+      end
+    end
+
+    # ==
+
+    class AssociationStream_via_Definition_PURELY_ < Common_::MagneticBySimpleModel
+
+      def initialize
+        @_at_end_of_stream_queue_array = nil
+        super
+        a = remove_instance_variable :@_at_end_of_stream_queue_array
+        if a
+          @_at_end_of_stream_queue_scanner = Scanner_[ a ]
+          @_at_end_of_stream = :__at_end_of_stream_shift_queue
+        else
+          @_at_end_of_stream = :_at_end_of_stream_result_in_nothing
+        end
+      end
+
+      def inject_these_associations_at_the_end= asc_a
+        at_end_of_stream_also_do_this do
+          _stream_over_each_item_then_do_this asc_a do
+            send @_at_end_of_stream
+          end
+        end
+      end
+
+      def at_end_of_stream_also_do_this & p
+        ( @_at_end_of_stream_queue_array ||= [] ).push p ; nil
+      end
+
+      attr_writer(
+        :action_grammar,
+        :definition_array,
+      )
+
+      def execute
+        @_gets = :__gets_initially
+        Common_.stream do
+          send @_gets
+        end
+      end
+
+      def __gets_initially
+        _defn_a = remove_instance_variable :@definition_array
+        @_qualified_item_stream = @action_grammar.stream_via_array _defn_a
+        @_gets = :_gets_main
+        send @_gets
+      end
+
+      def _gets_main
         begin
-          qual_item = st.gets
-          qual_item || break
+          qual_item = @_qualified_item_stream.gets
+          unless qual_item
+            x = send @_at_end_of_stream
+            break
+          end
           case qual_item.injection_identifier
           when :_parameter_BR_
             x = qual_item.item
             break
           when :_parameTERS_BR_
-            p = proc_for_list[]
-            x = p[]
+            x = __expand qual_item
             break
           when :_description_BR_
             redo
-          else ; no
           end
           never
         end while above
         x
       end
 
-      proc_for_list = -> do
-        a = qual_item.item
-        len = a.length
-        last = len - 1
-        Common_::Stream.via_times len do |d|
-          if last == d
-            p = main
-          end
-          a.fetch d
+      def __expand qual_item
+
+        _stream_over_each_item_then_do_this qual_item.item do
+          send( @_gets = :_gets_main )
         end
       end
 
-      asc_st = Common_.stream do
+      def _stream_over_each_item_then_do_this item_a, & after
+
+        len = item_a.length
+        len.zero? && self._COVER_ME__readme__just_call_the_proc__95_percent_sure_its_fine__  # #todo
+        last = len - 1
+        @__stream = Common_::Stream.via_times len do |d|
+          if last == d
+            remove_instance_variable :@__stream
+            @__yikes = after
+            @_gets = :__gets_via_yikes
+          end
+          item_a.fetch d
+        end
+        send( @_gets = :__gets_via_stream )
+      end
+
+      def __gets_via_stream
+        @__stream.gets
+      end
+
+      def __gets_via_yikes
+        remove_instance_variable( :@__yikes ).call
+      end
+
+      def __at_end_of_stream_shift_queue
+        p = @_at_end_of_stream_queue_scanner.gets_one
+        if @_at_end_of_stream_queue_scanner.no_unparsed_exists
+          remove_instance_variable :@_at_end_of_stream_queue_scanner
+          @_at_end_of_stream = :_at_end_of_stream_result_in_nothing
+        end
         p[]
       end
 
-      # ~ ( :[#011]: this one experimental feature
-
-      _use_asc_st = if act.instance_variable_defined? :@_associations_
-        h = act.instance_variable_get :@_associations_
-        Common_.stream do
-          asc = asc_st.gets
-          if asc
-            h[ asc.name_symbol ] = asc
-          end
-          asc
-        end
-      else
-        asc_st
-      end
-
-      # ~ )
-
-      _ok = mtk[]::Normalization.call_by do |o|
-        o.association_stream_newschool = _use_asc_st
-        o.entity_nouveau = act
-        o.will_nilify  # (things don't usually explode without this)
-      end
-
-      if _ok  # downgrade false to nil
-        Common_::BoundCall.by( & act.method( :execute ) )
+      def _at_end_of_stream_result_in_nothing
+        NOTHING_
       end
     end
 
-    # ~
+    # ==
 
     Action_grammar___ = Lazy_.call do
 
@@ -137,7 +445,7 @@ module Skylab::Brazen
       # apps that want to do fancy things like [tm] can inject custom
       # grammars instead.
 
-      _param_gi = Home_.lib_.fields::CommonAssociation::EntityKillerParameter.grammatical_injection
+      _param_gi = MTk__[]::EntityKillerParameter.grammatical_injection
 
       _g = Home_.lib_.parse_lib::IambicGrammar.define do |o|
 
@@ -758,5 +1066,6 @@ module Skylab::Brazen
     end
   end
 end
+# #pending-rename: operation toolkit
 # #history-A.1: first injection of post-[br] distillation
 # :+#tombstone: to_trio_stream (`to_qualified_knownness_stream`)

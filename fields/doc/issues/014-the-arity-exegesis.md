@@ -306,6 +306,11 @@ isomorphic with a simpler one we haven't come up with yet. if so, hopefully
 this analysis will be a stepping stone towards that. but for now, we are
 left with a matrix of common examples from nature:
 
+(EDIT: the below is probably out of sync with how we see it now.
+we might want to flip "argument" and "parameter" to see how that looks.
+anyway, [#ze-060.3] is the current home for the topic of (what we now call)
+an argument arity of zero or one, which is a sort of edge-arity used only
+in CLI (typically for `--help`).)
 
                  an argument arity of zero      an argument arity of one
 
