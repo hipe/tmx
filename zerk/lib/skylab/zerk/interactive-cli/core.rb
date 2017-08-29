@@ -128,18 +128,18 @@ module Skylab::Zerk
 
     def ___init_expression_agent
 
-      expag = Home_::CLI::InterfaceExpressionAgent::
-        THE_LEGACY_CLASS.new_proc_based
+      @_expression_agent = Home_::CLI::InterfaceExpressionAgent::
+          THE_LEGACY_CLASS.proc_based_by do |o|
 
-      expag.expression_strategy_for_property = -> _prp do
-        :render_property_in_black_and_white_customly
+        o.expression_strategy_for_property = -> _prp do
+          :render_property_in_black_and_white_customly
+        end
+
+        o.render_property_in_black_and_white_customly = -> prp, _expag do
+          prp.name.as_human
+        end
       end
-
-      expag.render_property_in_black_and_white_customly = -> prp, _expag do
-        prp.name.as_human
-      end
-
-      @_expression_agent = expag ; nil
+      NIL
     end
 
     def receive_uncategorized_emission i_a, & ev_p

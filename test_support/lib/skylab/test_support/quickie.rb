@@ -1797,7 +1797,7 @@ module Skylab::TestSupport
       # arguments for other options; contrast to [#br-074].
       # the platform o.p is not sympathetic to causes like this at all.
 
-      rx = /\A-(?<lineno>\d+)(?:-(?<to_lineno>\d+))?\z/
+      rx = /\A-(?<lineno>\d+)(?:[-:](?<to_lineno>\d+))?\z/
 
       -> argv do
         d = 0

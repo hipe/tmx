@@ -75,13 +75,15 @@ module Skylab::BeautySalon
 
             _asc = op.instance_variable_get( :@_associations_ ).fetch frontend_sym
 
-            _qkn = Common_::QualifiedKnownness.via_value_and_association _trueish_x, _asc
+            _qkn = Common_::QualifiedKnownKnown.via_value_and_association _trueish_x, _asc
+
+            _fs = rsx.filesystem
 
             kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
 
               :qualified_knownness_of_path, _qkn,
-              :filesystem, rsx.filesystem,
-              & op.listener
+              :filesystem, _fs,
+              & op._listener_
             )
 
             if kn
@@ -94,6 +96,32 @@ module Skylab::BeautySalon
         # ==
         # ==
       end  # `Inject_and_deinject_associations`
+
+      # ===
+      # rather than using the standard resources, for this operation we use
+      # a resources that has our custom expag. this is in part an exercise,
+      # and in part to work around rendering stuff near #open [#br-002.5].
+
+      Inject_resources = -> op, cli do
+        cli.redefine do |o|
+          o.expression_agent_by do
+            Expag___[ op ]
+          end
+        end
+      end
+
+      Expag___ = -> op do
+
+        ::Skylab::Zerk::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.proc_based_by do |o|
+
+          o.render_property_by do |asc, expag|
+            "«#{ asc.name_symbol.id2name.gsub UNDERSCORE_, DASH_ }»"  # #guillemets
+          end
+        end
+      end
+
+      # ===
+      # ===
     end  # `CLI`
   end
 end

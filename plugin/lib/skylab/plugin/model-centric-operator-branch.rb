@@ -907,14 +907,15 @@ module Skylab::Plugin
 
     # ==
 
-    TheseGuys__ = ::Class.new Common_::MagneticBySimpleModel
+    BoundCallByWhat__ = ::Class.new Common_::MagneticBySimpleModel
 
-    class BoundCall_via_Action__ < TheseGuys__
+    class BoundCall_via_Action__ < BoundCallByWhat__
 
       def initialize
         @customize_normalization_by = nil
         @inject_definitions_by = nil
         @receive_operation_by = nil
+        @receive_operation_module_by = nil
         super
       end
 
@@ -923,12 +924,24 @@ module Skylab::Plugin
         :customize_normalization_by,
         :inject_definitions_by,
         :receive_operation_by,
+        :receive_operation_module_by,
       )
 
       def execute
 
-        op = @action_class.new do
-          @invocation_or_resources.value  # the class is supposed to know which it is
+        p = remove_instance_variable :@receive_operation_module_by
+        if p
+          p[ @action_class ]
+        end
+
+        op = @action_class.allocate
+        rr = @_resourcey_reference_
+        if rr && rr.is_proc_based
+          rr.close op
+        end
+
+        op.send :initialize do
+          rr.value
         end
 
         p = remove_instance_variable :@receive_operation_by
@@ -946,7 +959,7 @@ module Skylab::Plugin
             @customize_normalization_by,
             @inject_definitions_by,
             op,
-            @invocation_or_resources,
+            @_resourcey_reference_,
           )
           @local_invocation_resources.
             bound_call_when_operation_with_definition_by[ _less_things ]
@@ -966,7 +979,7 @@ module Skylab::Plugin
 
     # ~
 
-    class BoundCall_via_Proc___ < TheseGuys__
+    class BoundCall_via_Proc___ < BoundCallByWhat__
 
       # (this seems anemic because it seems to do almost nothing, but
       # you gotta, because we gotta receive the invocation resources
@@ -985,31 +998,96 @@ module Skylab::Plugin
             @invocation_stack_top_name_symbol
 
           o.proc = @proc
-          o.invocation_or_resources = @invocation_or_resources
+          o.invocation_or_resources = @_resourcey_reference_
         end
       end
     end
 
     # ~
 
-    class TheseGuys__
+    class BoundCallByWhat__
+
+      def initialize
+        @__mutex_for_resourcey_reference = nil
+        @_resourcey_reference_ = nil
+        super
+      end
+
+      def remote_invocation_resources_by= p
+        _recv_resourcey_reference ResourceyReferenceRsxProc___.new p ; p
+      end
 
       def remote_invocation= x
-        _A_or_B :_invocation_PL_, x
+        _recv_resourcey_reference ResourceyReferenceInvoValue___.new x ; x
       end
 
       def remote_invocation_resources= x
-        _A_or_B :_invocation_resources_PL_, x
+        _recv_resourcey_reference ResourceyReferenceRsxValue___.new x ; x
       end
 
-      def _A_or_B which, x
-        @invocation_or_resources = Common_::Pair.via_value_and_name_symbol x, which
-        x
+      def _recv_resourcey_reference rr
+        remove_instance_variable :@__mutex_for_resourcey_reference
+        @_resourcey_reference_ = rr
       end
 
       attr_writer(
         :local_invocation_resources,
       )
+    end
+
+    ProcBased__ = ::Class.new ; ValueBased__ = ::Class.new
+
+    class ResourceyReferenceRsxProc___ < ProcBased__
+      def name_symbol
+        :_invocation_resources_PL_
+      end
+    end
+
+    class ResourceyReferenceInvoValue___ < ValueBased__
+      def name_symbol
+        :_invocation_PL_
+      end
+    end
+
+    class ResourceyReferenceRsxValue___ < ValueBased__
+      def name_symbol
+        :_invocation_resources_PL_
+      end
+    end
+
+    class ProcBased__
+
+      def initialize p
+        @__proc = p
+      end
+
+      def close op
+        _p = remove_instance_variable :@__proc
+        @__value = _p[ op ]
+        @value = :__via_value ; nil
+      end
+
+      def value
+        send @value
+      end
+
+      def __via_value
+        @__value
+      end
+
+      def is_proc_based
+        true
+      end
+    end
+
+    class ValueBased__
+      def initialize x
+        @value = x
+      end
+      attr_reader :value
+      def is_proc_based
+        false
+      end
     end
 
     # ==

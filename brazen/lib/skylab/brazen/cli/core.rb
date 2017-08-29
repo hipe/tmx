@@ -53,6 +53,12 @@ module Skylab::Brazen
 
       def new a, _i, o, e, pns_a
 
+        @expression_agent = :__expression_agent_defaultly
+
+        if block_given?
+          yield self  # [bs] (tests)
+        end
+
         @__mutex_stack = nil  # a placeholder as a reminder that currently we aren't doing this right
         @_has_stack = false
 
@@ -61,6 +67,27 @@ module Skylab::Brazen
         @stderr = e
         @stdout = o
         self
+      end
+
+      def expression_agent_by= p
+        @expression_agent = :__expression_agent_via_proc_initially
+        @__expression_agent_proc = p
+      end
+
+      def filesystem= x
+        @filesystem = :__read_filesystem
+        @__filesystem = x
+      end
+
+      def redefine
+        Resources_HOT_NEW_TAKE___.define do |o|
+          yield o
+          o.receive_error_channel_by = method :_receive_error_channel
+          o.argument_scanner = @args
+          o.stderr = @stderr
+          o.stdout = @stdout
+          o.filesystem_by = method :filesystem
+        end
       end
 
       # --
@@ -108,20 +135,29 @@ module Skylab::Brazen
 
         _ref.bound_call_of_operator_by do |o|
 
-          o.customize_normalization_by = -> n11n do
-            n11n.be_fuzzy
+          o.receive_operation_module_by = method :__receive_operation_module
+
+          o.remote_invocation_resources_by = -> op do
+            p = remove_instance_variable :@__inject_resources
+            if p
+              p[ op, self ]
+            else
+              self
+            end
           end
+
+          o.receive_operation_by = method :__receive_operation
 
           o.inject_definitions_by = method :__inject_modality_specific_definitions
 
-          # (which of the below two you use makes no difference - by either
-          # name, it is what is passed into construction of the operator.)
-          # o.remote_invocation = self
-
-          o.remote_invocation_resources = self
-
-          o.receive_operation_by = method :__receive_operation
+          o.customize_normalization_by = -> n11n do
+            n11n.be_fuzzy
+          end
         end
+      end
+
+      def __resources_when_custom_expag p, op
+        _expag = p[ op ]
       end
 
       def __receive_operation op
@@ -142,22 +178,26 @@ module Skylab::Brazen
 
       def __inject_modality_specific_definitions o  # association stream controller, from #spot1.1
 
-        __inject_CUSTOM_modality_specific_definitions o
+        p = remove_instance_variable :@__inject_and_deinject
+        if p
+          p[ o ]
+        end
         _help_asc = __build_help_association_bound_to_self
         o.inject_association _help_asc
         NIL
       end
 
-      def __inject_CUSTOM_modality_specific_definitions o
-        op = @stack.last.operation
-        mod = op.class
+      def __receive_operation_module mod
         modz = mod.const_get :Modalities, false
         if modz
           cli_mod = modz.const_get :CLI, false
         end
         if cli_mod
-          cli_mod::Inject_and_deinject_associations[ o ]
+          p1 = cli_mod::Inject_and_deinject_associations
+          p2 = cli_mod::Inject_resources
         end
+        @__inject_and_deinject = p1
+        @__inject_resources = p2
         NIL
       end
 
@@ -274,10 +314,6 @@ module Skylab::Brazen
         o.expression_agent _expag_instance
       end
 
-      def _expag_instance
-        ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
-      end
-
       def __to_item_normal_tuple_stream_when_operation
         # #open [#br-002.5]
         h = @_operation_associations
@@ -291,23 +327,6 @@ module Skylab::Brazen
           [ :operator, key_x ]
         end
       end
-
-      # ~ (for above) (see also #here4)
-
-      def _maybe_increase_errorlevel d  # #[#002.B]
-        if @_exitstatus < d
-          @_exitstatus = d
-        end
-        NIL
-      end
-
-      def receive_exitstatus d
-        @_exitstatus = d ; nil
-      end
-
-      attr_reader(
-        :listener,
-      )
 
       # --
 
@@ -353,13 +372,13 @@ module Skylab::Brazen
         sct = expr.execute
 
         if sct && sct.was_error
-          __when_result_was_error chan
+          _receive_error_channel chan
         end
       end
 
-      def __when_result_was_error _chan
+      def _receive_error_channel _chan
         _maybe_increase_errorlevel GENERIC_ERROR_EXITSTATUS
-        @stderr.puts "try '#{ get_program_name } -h'"
+        @stderr.puts "try '#{ get_program_name } -h'"  # ..
         NIL
       end
 
@@ -376,15 +395,63 @@ module Skylab::Brazen
         buffer
       end
 
-      # ~ :#here4 - for [ze]
+      # -- for [ze]
+
+      def _maybe_increase_errorlevel d  # #[#002.B]
+        if @_exitstatus < d
+          @_exitstatus = d
+        end
+        NIL
+      end
+
+      def receive_exitstatus d
+        @_exitstatus = d ; nil
+      end
 
       def argument_scanner  # for self..
         @args
       end
 
+      def _expag_instance
+        send @expression_agent
+      end
+
+      def expression_agent
+        send @expression_agent
+      end
+
+      def __expression_agent_via_proc_initially
+        _p = remove_instance_variable :@__expression_agent_proc
+        @__expression_agent = _p[ self ]
+        @expression_agent = :__expression_agent_via_instance
+        send @expression_agent
+      end
+
+      def __expression_agent_via_instance
+        @__expression_agent
+      end
+
+      def __expression_agent_defaultly
+        ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
+      end
+
       def sout
         @stdout
       end
+
+      def filesystem
+        send @filesystem
+      end
+
+      def __read_filesystem
+        @__filesystem
+      end
+
+
+      attr_reader(
+        :listener,
+      )
+
     # -
   end
   end  # :#here1
@@ -2373,6 +2440,77 @@ module Skylab::Brazen
     end
 
     # -- lower-level performers
+
+    class Resources_HOT_NEW_TAKE___ < Common_::SimpleModel
+
+      def initialize
+        yield self
+        @listener = method :__receive_emission
+      end
+
+      def expression_agent_by & p
+        @expression_agent = :__expression_agent_via_proc
+        @__expag_proc = p
+      end
+
+      def filesystem_by= p
+        @filesystem = :__filesystem_via_proc
+        @__filesystem_proc = p
+      end
+
+      attr_writer(
+        :argument_scanner,
+        :filesystem,
+        :stderr,
+        :stdout,
+        :receive_error_channel_by,
+      )
+
+      # --
+
+      def __receive_emission *chan, & em_p
+
+        expr = UI_::CLI_Express_via_Emission.define do |o|
+          o.emission_proc_and_channel em_p, chan
+          o.expression_agent_by = method :expression_agent
+          o.stderr = @stderr
+        end
+        sct = expr.execute
+        if sct && sct.was_error
+          @receive_error_channel_by[ chan ]
+        end
+      end
+
+      def expression_agent
+        send @expression_agent
+      end
+      def __expression_agent_via_proc
+        _p = remove_instance_variable :@__expag_proc
+        @__expag = _p[]
+        send( @expression_agent = :__expag_via_value )
+      end
+      def __expag_via_value
+        @__expag
+      end
+
+      def filesystem
+        send @filesystem
+      end
+      def __filesystem_via_proc
+        @__FS = remove_instance_variable( :@__filesystem_proc )[]
+        send( @filesystem = :__filesystem_via_value )
+      end
+      def __filesystem_via_value
+        @__FS
+      end
+
+      attr_reader(
+        :argument_scanner,
+        :listener,
+        :stderr,
+        :stdout,
+      )
+    end
 
     class Resources  # see [#110]
 

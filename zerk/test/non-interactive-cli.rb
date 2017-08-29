@@ -123,11 +123,15 @@ module Skylab::Zerk::TestSupport
       # and that is part of the assertion, not done here.
 
       def to_output_line_stream
-        _to_line_string_stream_ZE_niCLI( :o ) { NOTHING_ }
+        _to_line_string_stream_ZE_niCLI( :o ) { SKIP_ }
       end
 
       def to_errput_line_stream_strictly
         _to_line_string_stream_ZE_niCLI( :e ) { fail }
+      end
+
+      def to_errput_line_stream
+        _to_line_string_stream_ZE_niCLI( :e ) { SKIP_ }
       end
 
       def _to_line_string_stream_ZE_niCLI sym
@@ -344,6 +348,7 @@ module Skylab::Zerk::TestSupport
     end
 
     Here_ = self
+    SKIP_ = nil
   end
 end
 # #tombstone: we once had room for a more sophisticated DSL but didn't use it

@@ -12,8 +12,12 @@ module Skylab::BeautySalon
     # -
 
       def initialize
+
         o = yield
+
         @_argument_scanner_ = o.argument_scanner
+        @_listener_ = o.listener
+
         @_associations_ = {}  # #[#br-011]
       end
 
@@ -312,12 +316,9 @@ module Skylab::BeautySalon
         end
       end
 
-      def _listener_
-        @_argument_scanner_.listener
-      end
-
       attr_reader(
         :_argument_scanner_,
+        :_listener_,
       )
     # -
     # ==

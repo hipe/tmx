@@ -25,6 +25,7 @@ module Skylab::BeautySalon
     # -
 
     Actions = nil  # provision [#pl-011.3] (we are the action)
+    Modalities = nil
 
   end
 end

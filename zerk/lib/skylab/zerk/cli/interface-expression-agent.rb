@@ -11,17 +11,16 @@ module Skylab::Zerk
         end
 
         def __instance
-          el = new_proc_based
-
-          el.expression_strategy_for_property = -> _prp do
-            :render_property_as_unknown
+          proc_based_by do |o|
+            o.expression_strategy_for_property = -> _prp do
+              :render_property_as_unknown
+            end
           end
-
-          el
         end
 
-        def new_proc_based
-          via_expression_agent_injection ProcBasedArgumentElementExpresser___.new
+        def proc_based_by & p
+          _inj = ProcBasedArgumentElementExpresser___.define( & p )
+          via_expression_agent_injection _inj
         end
 
         alias_method :via_expression_agent_injection, :new
@@ -30,16 +29,8 @@ module Skylab::Zerk
 
       # --
 
-      def initialize ar
-        @_injection = ar
-      end
-
-      def expression_strategy_for_property= p
-        @_injection._expression_strategy_for_property = p
-      end
-
-      def render_property_in_black_and_white_customly= p
-        @_injection._etc_customly = p
+      def initialize inj
+        @_injection = inj
       end
 
       # --
@@ -158,7 +149,7 @@ module Skylab::Zerk
       end
 
       def render_property_in_black_and_white_customly asc
-        @_injection._etc_customly[ asc, self ]
+        @_injection.render_property_in_black_and_white_customly asc, self
       end
 
       def render_property_as__option__ asc
@@ -208,7 +199,16 @@ module Skylab::Zerk
       end
 
       def oper sym
+        self._WRONG
         "--#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
+      end
+
+      def ick_prim sym
+        prim( sym ).inspect
+      end
+
+      def prim sym
+        "-#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
       end
 
       # -- support
@@ -259,26 +259,38 @@ module Skylab::Zerk
 
       # ==
 
-      class ProcBasedArgumentElementExpresser___
+      class ProcBasedArgumentElementExpresser___ < Common_::SimpleModel
 
         # instead of subclassing your expag..
 
-        attr_writer(
-          :_etc_customly,
-          :_expression_strategy_for_property,
-        )
+        def render_property_by & two_p
 
-        def _etc_customly
-          @_etc_customly
+          self.expression_strategy_for_property = -> _prp do
+            :render_property_in_black_and_white_customly
+          end
+
+          self.render_property_in_black_and_white_customly = -> asc, expag do
+            two_p[ asc, expag ]  # hi.
+          end
+          NIL
         end
 
+        attr_writer(
+          :expression_strategy_for_property,
+          :render_property_in_black_and_white_customly,
+        )
+
         def expression_strategy_for_property asc
-          @_expression_strategy_for_property[ asc ]
+          @expression_strategy_for_property[ asc ]
+        end
+
+        def render_property_in_black_and_white_customly asc, expag
+          @render_property_in_black_and_white_customly[ asc, expag ]
         end
       end
 
       # ==
-
+      # ==
     end  # the legacy class
   end  # module "interface expression agent"
 end

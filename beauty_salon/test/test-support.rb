@@ -103,41 +103,6 @@ module Skylab::BeautySalon::TestSupport
 
   # -- bundles
 
-  module My_CLI
-
-    def self.[] tcc
-      tcc.include self
-    end
-
-    def parse_help_screen_fail_early_
-
-      string_st = to_errput_line_stream_strictly
-
-      o = Zerk_test_support_[]::CLI::Expect_Section_Fail_Early.define
-      yield o
-      spy = o.finish.to_spy_under self
-      io = spy.spying_IO
-
-      begin
-        line = string_st.gets
-        line || break
-        io.puts line
-        redo
-      end while above
-
-      spy.finish
-      NIL
-    end
-
-    define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
-      [ 'chimmy' ].freeze
-    end )
-
-    def subject_CLI
-      Home_::CLI2
-    end
-  end
-
   module My_API
 
     def self.[] tcc
@@ -236,14 +201,15 @@ module Skylab::BeautySalon::TestSupport
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-
-    NEWLINE_ = Home_::NEWLINE_
-  DELIMITER_ = NEWLINE_
+  DASH_ = Home_::DASH_
   EMPTY_S_ = Home_::EMPTY_S_
+  NEWLINE_ = Home_::NEWLINE_
+    DELIMITER_ = NEWLINE_
   Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly
   NIL_ = nil
     NIL = nil  # #open [#sli-116.C]
     FALSE = false  # #open [#sli-116.C]
   NOTHING_ = nil
   TS_ = self
+  UNDERSCORE_ = Home_::UNDERSCORE_
 end

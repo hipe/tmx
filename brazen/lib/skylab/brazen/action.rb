@@ -232,7 +232,7 @@ module Skylab::Brazen
         # EXPERIMENTAL details
 
         rsx = _invocation_resources
-        op = @operaiton
+        op = @operation
 
         a.each do |(p, k)|
           _x = p[ rsx, op ]
@@ -243,7 +243,7 @@ module Skylab::Brazen
       end
 
       def _invocation_resources
-        pair = @invocation_resources
+        pair = @invocation_or_resources
         x = pair.value
         case pair.name_symbol
         when :_invocation_PL_ ; x.invocation_resources

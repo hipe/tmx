@@ -236,7 +236,7 @@ module Skylab::BeautySalon::TestSupport
       define_method :_expected_operators_string_array do
         if ! operators
           operators = all_toplevel_actions_normal_symbols_.map do |sym|
-            sym.id2name.gsub Home_::UNDERSCORE_, Home_::DASH_
+            sym.id2name.gsub UNDERSCORE_, DASH_
           end
         end
         operators

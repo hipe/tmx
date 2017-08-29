@@ -123,10 +123,18 @@ module Skylab::TestSupport
 
         _s_a = invocation_strings_for_expect_stdout_stderr  # #hook-out:1
 
-        _x = self.CLI_options_for_expect_stdout_stderr
+        args = [ argv, * g.values_at( :i, :o, :e ), _s_a ]
 
-        invo = build_invocation_for_expect_stdout_stderr(
-          argv, * g.values_at( :i, :o, :e ), _s_a, * _x )
+        x = self.CLI_options_for_expect_stdout_stderr
+        if x
+          if x.respond_to? :call
+            use_p = x
+          else
+            args.concat x
+          end
+        end
+
+        invo = build_invocation_for_expect_stdout_stderr( * args, & use_p )
 
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
           @for_expect_stdout_stderr_prepare_invocation[ invo ]
@@ -139,9 +147,9 @@ module Skylab::TestSupport
         NIL
       end
 
-      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra
+      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra, & p
 
-        subject_CLI.new( argv, sin, sout, serr, pn_s_a, * xtra )  # #hook-out
+        subject_CLI.new( argv, sin, sout, serr, pn_s_a, * xtra, & p )  # #hook-out
       end
 
       def __build_IO_spy_group_for_expect_stdout_stderr

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
@@ -59,13 +61,7 @@ module Skylab::BeautySalon::TestSupport
 
         shared_subject :_tuple do
           _actual = second_line_string
-          md0 = %r(\Adid you mean (?<rest>[-, a-z]+)\?$).match _actual
-          md0 || fail
-          md1 = %r([ ]or[ ]).match md0[ :rest ]
-          md1 || fail
-          s_a = md1.pre_match.split ', '
-          s_a.push md1.post_match
-          s_a
+          oxford_split_or_ _actual, 'did you mean ','?'
         end
       end
 
@@ -155,30 +151,119 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    $stderr.puts "2 TESTS COMMENTED OUT in [bs]"
-    if false
-    it "no ent" do
+    context 'missing required' do
 
-      _path = TestSupport_::Fixtures.file( :not_here )
+      given do
+        argv( * same )
+      end
 
-      invoke 'deliterate', '1', '2', _path
+      it 'line 1 whines(#open [#br-002.5] will change this)' do
+        _hi = first_line_string
+        _s_a = oxford_split_and_ _hi, 'missing required primaries '
+        require 'set'  # ..
+        _actual = ::Set.new _s_a
+        _expected = ::Set.new( %w( "-file" "-to-line" "-from-line" ) )
+        _actual == _expected || fail
+      end
 
-      expect :styled, :e, /\Afailed because no such <file> - /
-      expect_specifically_invited_to :deliterate
+      it 'line 2 - deep invite' do
+        _expect_deep_invite second_and_final_line_string
+      end
+
+      it 'failed' do
+        _expect_exitstatus_for_failure
+      end
     end
 
-    it "money" do
+    context 'integer not integer'
 
-      _path = Fixture_file_[ '01-some-code.code' ]
+    context 'file not found' do
 
-      invoke 'deliterate', '3', '5', _path
+      given do
+        _path = TestSupport_::Fixtures.file :not_here
+        if false  # while #open [#br-002.5]
+        argv( * same, '1', '2', _path )
+        end
+        argv( * same,
+          '-from-line', '1',
+          '-to-line', '2',
+          '-file', _path,
+        )
+      end
 
-      expect :o, "    def normalize_range"
-      expect :o, EMPTY_S_
-      expect :o, "      if @to_line < @from_line"
-      expect :e, "for example, you could deliterate these lines."
-      expect_succeed
+      it 'first line - styled whine (#open [#br-002.5])' do
+        _actual = Home_.lib_.zerk::CLI::Styling::Unstyle_styled[ first_line_string ]
+        _actual =~ %r(\ANo such «file» - [[:graph:]]+$) || fail
+      end
+
+      it 'second line - invite' do
+        _expect_deep_invite second_and_final_line_string
+      end
+
+      it 'failed' do
+        _expect_exitstatus_for_failure
+      end
+
+      def CLI_options_for_expect_stdout_stderr
+        X_cdelit_this_CLI_setup
+      end
     end
+
+    context 'money' do
+
+      given do
+
+        _path = Fixture_file_[ '01-some-code.code' ]
+
+        if false  # while #open [#br-002.5]
+        argv( * same, '3', '3', _path )
+        end
+        argv( * same,
+          '-from-line', '3',
+          '-to-line', '5',
+          '-file', _path,
+        )
+      end
+
+      it 'the STDOUT lines are the code lines only' do
+
+        _actual = _tuple.first
+
+        expect_these_lines_in_array_ _actual do |y|
+          y << "    def normalize_range\n"
+          y << NEWLINE_
+          y << "      if @to_line < @from_line\n"
+        end
+      end
+
+      it 'the STDERR lines are the comment lines only' do
+
+        _actual = _tuple.last
+
+        expect_these_lines_in_array_ _actual do |y|
+          y << "for example, you could deliterate these lines.\n"
+        end
+      end
+
+      it 'succeeded' do
+        _expect_exitstatus_for_success
+      end
+
+      shared_subject :_tuple do
+        outs = [] ; errs = []
+        op_h = {
+          o: outs.method( :push ),
+          e: errs.method( :push ),
+        }
+        niCLI_state.lines.each do |line|
+          op_h.fetch( line.stream_symbol )[ line.string ]
+        end
+        [ outs, errs ]
+      end
+
+      def CLI_options_for_expect_stdout_stderr
+        X_cdelit_this_CLI_setup
+      end
     end
 
     # ==
@@ -193,6 +278,18 @@ module Skylab::BeautySalon::TestSupport
 
     def _expect_exitstatus_for_success
       exitstatus.zero? || fail
+    end
+
+    # ==
+
+    X_cdelit_this_CLI_setup = -> cli do
+
+      cli.expression_agent_by = -> _cli do
+        self._NEVER
+        TS_::My_CLI::Legacy_expag_instance[]
+      end
+
+      cli.filesystem = ::File
     end
 
     # ==
