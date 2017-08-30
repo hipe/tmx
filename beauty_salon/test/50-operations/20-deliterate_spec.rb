@@ -217,7 +217,7 @@ module Skylab::BeautySalon::TestSupport
     # ==
 
     X_opdel_Expag = Lazy_.call do
-      _Zerk = Home_.lib_.zerk
+      _Zerk = Zerk_lib_[]
       _Zerk::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.via_expression_agent_injection :_no_BS_
     end
 

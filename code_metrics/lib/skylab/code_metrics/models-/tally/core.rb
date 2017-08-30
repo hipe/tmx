@@ -32,7 +32,7 @@ module Skylab::CodeMetrics
 
     def description_proc_for_summary_of_under ada, exp
 
-      # #[#br-002.A] because we reference our own properties in the above,
+      # #[#br-002.1] because we reference our own properties in the above,
       # we need to create explicitly our own expag. this is nasty because
       # it jumps down to the agnostic layer and then back up ..
 

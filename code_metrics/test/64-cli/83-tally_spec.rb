@@ -13,7 +13,7 @@ module Skylab::CodeMetrics::TestSupport
         _subject
       end
 
-      it "properties render correctly in the summary [#br-002.A]" do
+      it "properties render correctly in the summary [#br-002.1]" do
 
         act = _subject.to_column_B_string :unstyled
 

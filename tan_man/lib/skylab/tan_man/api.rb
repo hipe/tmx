@@ -150,7 +150,8 @@ module Skylab::TanMan
     end
 
     class InterfaceExpressionAgent___
-      # follows [#ze-040]:#the-semantic-markup-guidelines
+
+      # follows #[#ze-040.8] "the semantic markup guidelines"
 
       class << self
         def instance

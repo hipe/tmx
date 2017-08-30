@@ -77,6 +77,21 @@ module Skylab::Common::TestSupport
         NIL
       end
 
+      # ~
+
+      def black_and_white ev
+        _black_and_white_into_CO "", ev
+      end
+
+      def black_and_white_lines ev
+        _black_and_white_into_CO [], ev
+      end
+
+      def _black_and_white_into_CO y, ev
+        _expag = expression_agent
+        ev.express_into_under y, _expag
+      end
+
       # --
 
       def expect_result x
@@ -293,9 +308,16 @@ module Skylab::Common::TestSupport
 
       def _receive_non_ignored_actual_emission ae
 
-        _expag = @test_context.expression_agent
-        _io = _debug_IO
-        ae.express_into_under_debuggingly _io, _expag
+        expag = @test_context.expression_agent
+        io = _debug_IO
+
+        ae._express_channel_into_ io
+        if ae.emission_looks_like_expression
+          ae._express_body_into_under_when_expression_ io, expag
+        else
+          _ev = ae.emission_proc.call
+          _ev.express_into_under io, expag
+        end
         NIL
       end
 
@@ -514,14 +536,22 @@ module Skylab::Common::TestSupport
           y
         end
 
-        def express_into_under_debuggingly y, expag
-          y << "#{ @channel_symbol_array.inspect }#{ NEWLINE_ }"
+        def express_into_under_debuggingly y, expag  # [tm]
+          _express_channel_into_ y
           if emission_looks_like_expression
-            _first_N_lines_HACKISHLY_under( -1, expag ) do |line|
-              y << "  #{ line.inspect }#{ NEWLINE_ }"
-            end
+            _express_body_into_under_when_expression_ y, expag
           end
           y
+        end
+
+        def _express_channel_into_ y
+          y << "#{ @channel_symbol_array.inspect }#{ NEWLINE_ }"
+        end
+
+        def _express_body_into_under_when_expression_ y, expag
+          _first_N_lines_HACKISHLY_under( -1, expag ) do |line|
+            y << "  #{ line.inspect }#{ NEWLINE_ }"
+          end
         end
 
         def _first_N_lines_HACKISHLY_under n, expag  # assume expression

@@ -324,7 +324,7 @@ module Skylab::Zerk
       # exactly to the expression of one screen (or super-section, document,
       # etc.), because visual separation between sections is important and
       # only relevant in the context of one such node (perhaps by definition,
-      # see [#br-002]/figure-3)). (or call `clear` between "screens" to re-use
+      # see [#br-002]:figure-3)). (or call `clear` between "screens" to re-use
       # this same boundarizer.)
 
       def initialize y

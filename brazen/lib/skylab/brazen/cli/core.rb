@@ -303,8 +303,14 @@ module Skylab::Brazen
           o.express_description_section Desc_proc_via_module__[ @application_module ]
 
           o.express_items_sections -> ref do
-            _mod = ref.dereference_loadable_reference
-            shorten_the_description[ _mod ]
+            mod = ref.dereference_loadable_reference
+            if mod.respond_to? :describe_into_under
+              shorten_the_description[ mod ]
+            else
+              -> y do
+                y << "«#{ ref.name_symbol.id2name.gsub UNDERSCORE_, DASH_ } has no description [br]»"  # #guillemets
+              end
+            end
           end
 
         end
@@ -315,7 +321,7 @@ module Skylab::Brazen
       end
 
       def __to_item_normal_tuple_stream_when_operation
-        # #open [#br-002.5]
+        # #open [#br-002.5] modality-targeted association classification
         h = @_operation_associations
         Stream_.call h.keys do |k|
           [ :primary, k ]
@@ -1851,7 +1857,7 @@ module Skylab::Brazen
 
       def description_proc_for_summary_under exp
 
-        # #[#002.A] "an optimization for summary of child under parent"
+        # #[#002.1] "an optimization for summary of child under parent"
 
         @bound.description_proc_for_summary_of_under self, exp
       end

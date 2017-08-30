@@ -113,6 +113,8 @@ module Skylab::BeautySalon
       o.add_actions_module_path_tail ::File.join 'deliterate', same
         # (doesn't have an actual actions directory - all are stowaway)
 
+      o.add_actions_module_path_tail ::File.join 'text', same
+
       o.models_branch_module = Home_::Models_
 
       o.bound_call_when_operation_with_definition_by = -> sct do
@@ -126,6 +128,25 @@ module Skylab::BeautySalon
 
       o.filesystem = ::Dir
     end
+  end
+
+  module CommonActionMethods_
+
+    def _simplified_write_ x, k
+      instance_variable_set :"@#{ k }", x
+    end
+
+    def _simplified_read_ k
+      ivar = :"@#{ k }"
+      if instance_variable_defined? ivar
+        instance_variable_get ivar
+      end
+    end
+
+    attr_reader(
+      :_argument_scanner_,
+      :_listener_,
+    )
   end
 
   class InvocationResources_
@@ -159,6 +180,7 @@ module Skylab::BeautySalon
     end
   end
 
+  # while #open [#now]
   module Models_
 
     Autoloader_[ self, :boxxy ]
@@ -195,10 +217,6 @@ module Skylab::BeautySalon
       ::FileUtils
     end
 
-    List_scanner = -> x do
-      Common_::Stream::Magnetics::MinimalStream_via[ x ]
-    end
-
     String_scanner = Common_.memoize do
       require 'strscan'
       ::StringScanner
@@ -206,10 +224,6 @@ module Skylab::BeautySalon
 
     System = -> do
       System_lib[].services
-    end
-
-    Token_buffer = -> x, y do
-      Basic[]::Token::Buffer.new x, y
     end
 
     Tree_lib = -> do

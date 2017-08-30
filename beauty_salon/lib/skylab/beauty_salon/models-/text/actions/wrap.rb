@@ -1,22 +1,24 @@
 module Skylab::BeautySalon
 
-  Models_::Text = ::Module.new  # assert creation of declared stowaway
-
   module Models_::Text
 
-    Actions = ::Module.new
+    Actions = ::Module.new  # while #open [#now]
 
-    Require_brazen_LEGACY_[]
+    class Actions::Wrap  # :[#033].
 
-    class Actions::Wrap < Brazen_::Action  # :[#033]., :+[#ba-033]
+      Actions = nil  # WHY  # while #open [#now]
 
-      @is_promoted = true
+      # near #[#ba-033] the word wrap narrative
 
-      Brazen_::Modelesque.entity( self,
+      class << self
+        def describe_into_under y, expag
+          expag.calculate y, & Describe_into__
+        end
+      end  # >>
 
-        :branch_description, -> y do
+      Describe_into__ = -> y do
 
-          s = <<-HERE
+        _big_str = <<~HERE
             outputs to stdout (unless stated otherwise) the selected lines
             after having applied the hacky wrap filter to it (effectively re-
             breaking the lines so they are flush-left ragged right, and all
@@ -26,16 +28,17 @@ module Skylab::BeautySalon
             NOTE a) this is just an exploratory hack, "we are doing it wrong",
             and b) this is NOT intended for code, only comments or very simple
             markdown-ish.
-          HERE
+        HERE
 
-          _st = Basic_[]::String.result_via_map_chain( s,
-            :mutate_by_unindenting,
-            :line_stream_via_string,
-          )
-          _st.join_into y
-        end,
+        _st = Basic_[]::String::LineStream_via_String[ _big_str ]
+        _st.join_into y
+      end
 
-        :inflect, :noun, :lemma_string,  # say "couldn't wrap text", not "couldn't wrap a text"
+      # used to: :inflect, :noun, :lemma_string,  # say "couldn't wrap text", not "couldn't wrap a text"
+
+      def definition ; [
+
+        :description, Describe_into__,
 
         :required,
         :property, :output_bytestream,
@@ -43,6 +46,7 @@ module Skylab::BeautySalon
         :required,
         :property, :informational_downstream,
 
+        :property, :lines,
         :description, -> y do
           y << 'apply the filter only to this range of lines (e.g "-l 1-16,26-38").'
           y << "a range can be a single number. multiple ranges can be specified"
@@ -52,12 +56,18 @@ module Skylab::BeautySalon
           y << "ignored. see how overlapping ranges are processed by turning"
           y << "on `--verbose`."
         end,
-        :ad_hoc_normalizer, -> arg, & oes_p do
-          Actors_::Normalize_line_ranges.new( arg, & oes_p ).execute
-        end,
-        :default, '1-',
-        :property, :lines,
 
+        :normalize_by, -> qkn, & p do
+          self._COVER_ME__probably_fine__
+          LineRanges_via_String__.new( qkn, & p ).execute
+        end,
+
+        :default_by, -> _op, & _p do
+          Default_line_ranges___[]
+        end,
+
+        :required,
+        :property, :num_chars_wide,
         :description, -> y do
 
           prp = action_reflection.front_properties.fetch :num_chars_wide
@@ -67,7 +77,7 @@ module Skylab::BeautySalon
           y << "how wide can the longest line be? (default: #{ val _x })"
         end,
         :default, 80,
-        :ad_hoc_normalizer, -> qkn, & oes_p do
+        :normalize_by, -> qkn, & oes_p do
 
           # ( was #[#fi-004.5], used to have what is now [#br.024.C] shape )
 
@@ -80,35 +90,38 @@ module Skylab::BeautySalon
             qkn  # required-ness is out of our scope
           end
         end,
-        :required,
-        :property, :num_chars_wide,
 
         :flag,
+        :property, :preview,
         :description, -> y do
           y << 'output only those output lines that are the'
           y << 'result of the input lines indicated by `--lines`.'
           y << 'all output goes to stderr.'
         end,
-        :property, :preview,
 
         :flag,
+        :property, :verbose,
         :description, -> y do
           y << 'verbose output'
         end,
-        :property, :verbose,
 
         :flag,
+        :property, :number_the_lines,
         :description, -> y do
           y << 'Number the output lines, starting at 1.'
           y << "(only honored in verbose preview mode for now..)"
         end,
-        :property, :number_the_lines,
 
         :required,
         :property, :upstream,
-      )
+      ] ; end
 
-      def produce_result
+      def initialize
+        o = yield
+        @_argument_scanner_ = o.argument_scanner
+      end
+
+      def execute
 
         __init_ivars
         __inspect_union
@@ -117,39 +130,47 @@ module Skylab::BeautySalon
 
       def __init_ivars
 
-        h = @argument_box.h_
-        @be_verbose = h[ :verbose ]
-        @do_number_the_lines = h[ :number_the_lines ]
-        @do_preview = h[ :preview ]
+        # -- (adopt our local idiom for boolean parameters, for now (bridge to legacy))
 
-        @informational_downstream = h.fetch :informational_downstream
+        @do_number_the_lines = remove_instance_variable :@number_the_lines
+
+        @do_preview = remove_instance_variable :@preview
+
+        @be_verbose = remove_instance_variable :@verbose
+
+        # -- (other name changes (bridge to legacy))
+
+        @line_range_union = remove_instance_variable :@lines
+
+        # --
 
         __HEADER = if @do_preview && @be_verbose && @do_number_the_lines
           "     + "
         end
 
         @line_buffer = Text_::WrappedLines_via_Lines_and_Width___.new(
-          h.fetch( :num_chars_wide ),
+          @num_chars_wide,
           -> line do
             @downstream << "#{ __HEADER }#{ line }"
           end )
 
-        @line_range_union = h.fetch :lines
+        @token_buffer = Basic_[]::Token::Buffer.new(
+          %r([[:space:]]*),
+          %r([^[:space:]]+),
+        )
 
         @line_range_union ||= self._DESIGN_ME
 
         @line_no_fmt = '%4d'
 
-        @token_buffer = Home_.lib_.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
-
-        @upstream = h.fetch :upstream
-
         # ~
+
+        ob = remove_instance_variable :@output_bytestream
 
         @downstream = if @do_preview
           @informational_downstream
         else
-          h.fetch :output_bytestream
+          ob
         end
 
         NIL_
@@ -161,7 +182,7 @@ module Skylab::BeautySalon
 
           lru = @line_range_union
 
-          @on_event_selectively.call :info, :expression, :line_range_union do | y |
+          _listener_.call :info, :expression, :line_range_union do | y |
             y << "(line range union: #{ lru.description_under self })\n"
           end
         end
@@ -183,10 +204,12 @@ module Skylab::BeautySalon
 
         path = @upstream_path
 
-        @on_event_selectively.call :info, :expression, :empty_file do | y |
+        _listener_.call :info, :expression, :empty_file do | y |
 
           y < "(file had no lines - #{ pth path })"
         end
+
+        _maybe_close_upstream
 
         ACHIEVED_
       end
@@ -234,17 +257,25 @@ module Skylab::BeautySalon
             cold_line[]
           end
           line = @upstream.gets
-          line or break
-          redo
+          if line
+            redo
+          end
+          _maybe_close_upstream
+          break
         end while nil
 
         ok and begin
           if did_engage
-            ACHIEVED_
+            NIL_AS_SUCCESS_
           else
             __when_no_lines_were_in_range
           end
         end
+      end
+
+      def _maybe_close_upstream
+        @upstream.close  # ..
+        NIL
       end
 
       def __when_no_lines_were_in_range
@@ -252,7 +283,7 @@ module Skylab::BeautySalon
         d = @upstream.lineno
         lru = @line_range_union
 
-        @on_event_selectively.call :info, :expression do | y |
+        _listener_.call :info, :expression do | y |
 
           y << "(the lines of the file (#{
             }#{ d.zero? ? 'none' : "1-#{ d }" }) did not #{
@@ -290,31 +321,36 @@ module Skylab::BeautySalon
         ACHIEVED_
       end
 
-      # ~
+      def _listener_  # override our more complicated way FOR NOW ..
+        @_argument_scanner_.listener
+      end
 
-      Actors_ = ::Module.new
-      class Actors_::Normalize_line_ranges  # 1x
+      include CommonActionMethods_
 
-        # :+[#br-024.C] (still?) assume that x is nil or an array.
+      # ==
 
-        def initialize arg, & oes_p
+      class LineRanges_via_String__  # 1x
 
-          @on_event_selectively = oes_p
-          @_qualified_knownness = arg
+        # #[#br-024.3] (still?) assume that x is nil or an array.
+
+        def initialize qkn, & p
+
+          @listener = p
+          @qualified_knownness = qkn
         end
 
         def execute
-          @x = @_qualified_knownness.value
+          @x = @qualified_knownness.value
           if @x
             __when_value
           else
-            @_qualified_knownness.to_knownness  # leave value as-is
+            @qualified_knownness.to_knownness  # leave value as-is
           end
         end
 
         def __when_value
 
-          @upstream = Home_.lib_.list_scanner @x
+          @upstream = Common_::Stream::Magnetics::MinimalStream_via[ @x ]
           __init_range_list_scanner
           __init_union
 
@@ -359,8 +395,7 @@ module Skylab::BeautySalon
 
           @ok = false
 
-          @on_event_selectively.call :error, :invalid_property_value, :lines do
-
+          @listener.call :error, :invalid_property_value, :lines do
 
             Common_::Event.inline_not_OK_with :invalid_range,
                 :x, x, :exp_a, exp_a do | y, o |
@@ -383,7 +418,7 @@ module Skylab::BeautySalon
 
             @ok = false
 
-            @on_event_selectively.call :error, :invalid_property_value, :lines do
+            @listener.call :error, :invalid_property_value, :lines do
 
               Common_::Event.inline_not_OK_with :invalid_lines_identifier, :s, s do | y, o |
 
@@ -394,9 +429,22 @@ module Skylab::BeautySalon
 
           @union = un ; nil
         end
+      end  # normalize line ranges
+
+      # ==
+
+      Default_line_ranges___ = Lazy_.call do
+
+        _arg = Common_::QualifiedKnownKnown.via_value_and_symbol '1-', NOTHING_
+        LineRanges_via_String__.new( _arg ).execute
       end
+
+      # ==
+      # ==
     end
 
+    NIL_AS_SUCCESS_ = nil  # side-effects only
     Text_ = self
   end
 end
+# history-A.1: begin wean off matryoshka

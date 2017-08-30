@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] CLI - wrap" do
+  describe "[bs] CLI - wrap", wip: true do
 
     TS_[ self ]
     use :CLI

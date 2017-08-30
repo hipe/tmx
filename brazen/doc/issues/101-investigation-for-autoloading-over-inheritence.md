@@ -21,7 +21,7 @@ assumption that is however fair in this universe).
 ## about the code generally
 
   • if this isn't used on a client subclass of one of our pantheon
-    classes (those in [#002]/figure-1), behavior is undefined.
+    classes (those in [#002]:figure-1), behavior is undefined.
 
   • we do *not* *ever* use the default value of `true` for the
     `inherit` parameter in the calls to `const_get`: this can cause

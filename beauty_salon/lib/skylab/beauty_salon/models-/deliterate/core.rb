@@ -304,22 +304,7 @@ module Skylab::BeautySalon
       COMMENT_LINE_PREFIX__ = 'comment line:  '
       SKIP_LINE_PREFIX__ = 'skipping line: '
 
-
-      def _simplified_write_ x, k
-        instance_variable_set :"@#{ k }", x
-      end
-
-      def _simplified_read_ k
-        ivar = :"@#{ k }"
-        if instance_variable_defined? ivar
-          instance_variable_get ivar
-        end
-      end
-
-      attr_reader(
-        :_argument_scanner_,
-        :_listener_,
-      )
+      include CommonActionMethods_
     # -
     # ==
 

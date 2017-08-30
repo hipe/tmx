@@ -1,3 +1,5 @@
+# frozen_string_literal: will_not_work_here  #here1
+
 require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
@@ -5,66 +7,123 @@ module Skylab::BeautySalon::TestSupport
   describe "[bs] operations - wrap" do
 
     TS_[ self ]
-    use :expect_event
+    use :my_API
+    use :modality_agnostic_interface_things
 
-    it "number not number" do
+    subject_dig = %i( text wrap )
 
-      _with :num_chars_wide, 'zango'
-      expect_failed_by_ :uninterpretable_under_number_set
+    context 'number not a number' do
+
+      it 'fails' do
+        _event || fail
+      end
+
+      it 'explains' do
+        _ev = _event
+        _actual = black_and_white _ev
+        _actual == "'num-chars-wide' must be an integer, had \"zango\"" || fail
+      end
+
+      shared_subject :_event do
+
+        call( * subject_dig,
+          :num_chars_wide, 'zango',
+        )
+        expect_failed_by_ :uninterpretable_under_number_set
+      end
     end
 
-    it "number too low" do
+    context 'number too low' do
 
-      _with :num_chars_wide, -1
-      expect_failed_by_ :number_too_small
+      it 'fails' do
+        _event || fail
+      end
+
+      it 'explains' do
+        _ev = _event
+        _actual = black_and_white _ev
+        _actual == "'num-chars-wide' must be greater than or equal to 1, had -1" || fail
+      end
+
+      shared_subject :_event do
+
+        call( * subject_dig,
+          :num_chars_wide, -1,
+        )
+        expect_failed_by_ :number_too_small
+      end
     end
 
-    it "some money" do
+    context 'money' do
 
-      _path = _universal_fixture( :three_lines )
-      _with(
-        :informational_downstream, ( _a = [] ),
-        :output_bytestream, ( _a_ = [] ),
-        :upstream, ::File.open( _path ),
-        :num_chars_wide, 22,
-      )
+      it 'wrapped.' do
+        _actual = _tuple[1]
+        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          # :#here1:
+          y << "it's time for"
+          y << "WAZOOZLE, see"
+          y << "fazzoozle my noozle"
+          y << "when i say \"wazoozle\""
+          y << "i mean WaZOOzle!"
+        end
+      end
 
-      _a.length.should be_zero
+      it '(no info messages)' do
+        _tuple.first.length.zero? || fail
+      end
 
-      _a_.should eql([
-        "it's time for\n",
-        "WAZOOZLE, see\n",
-        "fazzoozle my noozle\n",
-        "when i say \"wazoozle\"\n",
-        "i mean WaZOOzle!\n",
-      ])
+      shared_subject :_tuple do
 
-      expect_succeed
+        info_output_lines = []  # (you could use e.g EMPTY_A_ to assert this implicitly)
+        payload_output_lines = []
+
+        _path = universal_fixture_ :three_lines
+
+        _upstream_io = ::File.open _path  # #TODO - does this get closed?
+
+        call( * subject_dig,
+
+          :output_bytestream, payload_output_lines,
+          :informational_downstream, info_output_lines,
+
+          :upstream, _upstream_io,
+          :num_chars_wide, 22,
+        )
+
+        expect_API_result_for_success_
+
+        [ info_output_lines, payload_output_lines ]
+      end
     end
 
-    def _universal_fixture sym
+    # -- setup & execution
+
+    def expect_failed_by_ sym  # #TODO - this overwrites some other same name method
+
+      # (there's a issue - these emissions should be corrected to have
+      # this same symbol)
+
+      ev = nil
+      expect :error, :invalid_property_value do |ev_|
+        ev = ev_
+      end
+      expect_result nil  # (expect_API_result_for_success_, expect_API_result_for_failure_ are same)
+      ev.terminal_channel_symbol == sym || fail
+      ev
+    end
+
+    def expression_agent  # override our own simpler default
+      expression_agent_instance_for_legacy_API_
+    end
+
+    def universal_fixture_ sym
       TestSupport_::Fixtures.file( sym )
     end
 
-    def _with * x_a
+    # ==
 
-      h = {
-        upstream: :_x_,
-        num_chars_wide: 1,
-        informational_downstream: :_xx_,
-        output_bytestream: :_xxx_,
-      }
-
-      x_a.each_slice 2 do | k, x |
-        h[ k ] = x
-      end
-
-      call_API( :wrap,
-        :upstream, h.fetch( :upstream ),
-        :num_chars_wide, h.fetch( :num_chars_wide ),
-        :informational_downstream, h.fetch( :informational_downstream ),
-        :output_bytestream, h.fetch( :output_bytestream ),
-      )
-    end
+    # ==
+    # ==
   end
 end
+# #history-A.1: full rewrite for ween off matryoshka

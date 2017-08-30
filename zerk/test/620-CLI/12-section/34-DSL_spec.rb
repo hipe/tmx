@@ -13,7 +13,7 @@ module Skylab::Zerk::TestSupport
       shared_subject :_state do
 
         # currently this serves as the only documentation for [#061.2].
-        # reviewing [#br-002]/figure-3 will assist in understanding the
+        # reviewing [#br-002]:figure-3 will assist in understanding the
         # conceptual document structure.
         #
         # look at the below `yield_` calls and image they are real yields.

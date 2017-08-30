@@ -163,7 +163,7 @@ module Skylab::TanMan
 
     private
 
-      # follows [#ze-040]:#the-semantic-markup-guidelines
+      # follows #[#ze-040.8] "the semantic markup guidelines"
 
       green = 32 ; strong = 1
 

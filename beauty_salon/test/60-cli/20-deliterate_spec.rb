@@ -192,7 +192,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'first line - styled whine (#open [#br-002.5])' do
-        _actual = Home_.lib_.zerk::CLI::Styling::Unstyle_styled[ first_line_string ]
+        _actual = Zerk_lib_[]::CLI::Styling::Unstyle_styled[ first_line_string ]
         _actual =~ %r(\ANo such «file» - [[:graph:]]+$) || fail
       end
 

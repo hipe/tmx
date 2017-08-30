@@ -4,10 +4,6 @@ module Skylab::Basic
 
     class << self
 
-      def result_via_map_chain x, * method_names  # silly fun
-        SillyFunMapChain___.new( x, method_names ).execute
-      end
-
       def build_proc_for_string_begins_with_string * a
         if a.length.zero?
           Here_::Small_Procs__::Build_proc_for_string_begins_with_string
@@ -134,32 +130,6 @@ module Skylab::Basic
         Here_::ViaMixed__.call_via_arglist a
       end
     end  # >>
-
-    class SillyFunMapChain___
-
-      def initialize x, m_a
-        @__initial_value = x
-        @__operation_names = m_a
-      end
-
-      def execute
-        x = remove_instance_variable :@__initial_value
-        _m_a = remove_instance_variable :@__operation_names
-        _m_a.each do |m|
-          x = send m, x
-        end
-        x
-      end
-
-      def mutate_by_unindenting s
-        Here_.mutate_by_unindenting s
-        s
-      end
-
-      def line_stream_via_string s
-        Here_::LineStream_via_String[ s ]
-      end
-    end
 
     class N_Lines  # :[#030].
 
@@ -494,5 +464,6 @@ module Skylab::Basic
     LINE_RX_  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
   end
 end
+# #tombstone: sunset "silly fun map chain" - new HEREDOC `~>` obviates this somewhat
 # #history: "tailer via separator" moved here from [cm]
 # #history: quoted string literal library moved here from [dt] models/string

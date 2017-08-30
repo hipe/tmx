@@ -6,14 +6,29 @@ module Skylab::Zerk
 
       class << self
 
-        def instance  # see #note-br-10 in [#ze-040]. this is for hacks
+        # --
+        #   - for the legacy (but probably enduring) style of expag, to use
+        #     a singleton like this comes with [#040.15] costs.
+        #
+        #   - this is a fallback implementation that does ugly, placeholder
+        #     styling, if you haven't yet or don't care to do a complicated
+        #     expag-bound-to-action and [#br-002.5] association classification)
+        #
+
+        def instance
           @___instance ||= __instance
         end
 
         def __instance
           proc_based_by do |o|
-            o.expression_strategy_for_property = -> _prp do
-              :render_property_as_unknown
+
+            o.render_property_by do |asc, _expag|
+              _slug = if asc.respond_to? :name
+                self._HELLO__easy_etc__  # #todo
+              else
+                asc.name_symbol.id2name.gsub UNDERSCORE_, DASH_
+              end
+              "«[ze]#{ _slug }»"  # #guillemets
             end
           end
         end
@@ -279,6 +294,8 @@ module Skylab::Zerk
           :expression_strategy_for_property,
           :render_property_in_black_and_white_customly,
         )
+
+        # -- read:
 
         def expression_strategy_for_property asc
           @expression_strategy_for_property[ asc ]

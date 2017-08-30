@@ -1,6 +1,28 @@
 # what is the deal with expression agents? :[#040]
 
-## design objectives for the new expression agent technique
+## table of contents
+
+  - (tracks old method) [#here.1]
+  - origin story (SEPARATE DOCUMENT) [#here.2]
+  - design obejctives for the new expression agent technique [#here.d]
+  - about the new methods (STUB) (ALSO: the issue to unify API/CLI expags) [#here.3]
+  - objective & scope [#here.e]
+  - "musings" [#here.f]
+  - [old intro]  [#here.g]
+  - the semantic markup guideliness  [#here.8]
+  - it is different from pen (OLD) [#here.i]
+  - this is why we can't have nice public business methods [#here.j]
+  - facts on implementation so far [#here.k]
+  - describing the message pipeline (INCORRECT) [#here.l]
+  - the distinction between an expression agent and an expression services [#here.m]
+  - ancient note about pen [#here.n]
+  - NAME ME thing
+  - when to subclass expression agents (DEPRECATED) [#here.p]
+
+
+
+
+## design objectives for the new expression agent technique :[#here.d]
 
   - expression agents are stateless
   - expression agents can often have no member data
@@ -8,11 +30,13 @@
   - the newest scanner is the way
 
 
+
 ## about the new methods :[#here.3]
 
 
 
-## objective & scope
+
+## objective & scope :[#here.e]
 
 generally we use "expression agents" when we want to say something.
 in an ideally simple scenario, in your "domain" you have a particular
@@ -25,7 +49,7 @@ we use XXX
 
 
 
-## MUSINGS
+## MUSINGS :[#here.f]
 
 expression agent classes themselves should be small, and their instances
 can usually be stateless and without member data, so usually we implement
@@ -33,12 +57,13 @@ them as singleton.
 
 whereas we used to use this "NLP Agent" to XX we YY
 
+(EDIT: this is in conflict with [#.xx] below)
 
 
 
 
 
-## (the rest)
+## (the rest) :[#here.g]
 (EDIT: parts of this document are very old..)
 
 
@@ -58,6 +83,7 @@ vast empire: this one grain of sand: "Pen (at this level) is an experimental
 attempt to generalize and unify a subset of the interface-level string
 decorating functions so that the same utterances can be articulated across
 multiple modalities to whatever extent possible :[#!br-092]"
+
 
 
 
@@ -175,7 +201,6 @@ for your business concerns.
 
 
 
-
 ## thoughts on usage
 
 as far as support libraries in this universe are concerned, the expression
@@ -189,7 +214,9 @@ agents are modality-specific and/or carry aesthetic design decisions in them,
 decisions that should be made explicitly by the application rather than any
 support library.
 
-### it is different from pen
+
+
+### it is different from pen :[#here.i]
 
 not in what it does but how it is used - the pen was integrated tightly
 with the "sub-client" - for most if not all of pen's methods we would create
@@ -225,7 +252,9 @@ the last two examples, where there is a strong line of demarcation separating
 the concerns of utterance production from the other business concerns of
 the client (not shown).
 
-#### "this is why we can't have nice public business methods"
+
+
+### "this is why we can't have nice public business methods" :[#here.j]
 
 above we explained that we want to create a separation between the client
 objects that produce expressions from the methods that help to decorate those
@@ -260,7 +289,9 @@ sub-class of your expression agent class, with all of its business methods
 made public (this can be done in only a few lines of dark hackery).
 
 
-## facts on implementations so far
+
+
+## facts on implementations so far :[#here.k]
 
 the above said, we so far have only developed expression agents for two
 classes of application: those variously of the API and CLI variety. (of
@@ -270,7 +301,12 @@ assumptions, but will hopefully allow us to retain its same spirit.)
 
 [..]
 
-## integration approaches (fact and fancy) so far
+
+
+
+## integration approaches (fact and fancy) so far :[#here.l]
+
+
 
 ### a purely headful API, for e.g
 
@@ -278,6 +314,8 @@ you could make a "purely headful" API, that is, your API cannot be used
 unless it is attached to a ("modality") client. (hm this is a good idea,
 we should reconceive things this way. it's a different way of saying what
 we are currently doing..)
+
+
 
 ### one particularly granulated pipeline:
 
@@ -313,7 +351,9 @@ we are currently doing..)
                                                           [ ~ human ]
 
 
-## the distinction between an expression agent and an expression services
+
+
+## the distinction between an expression agent and an expression services :[#here.m]
 
 the former has private methods. utterances are intended to be evaluated inside
 of it. the latter reveals usually these same methods as public (this is the
@@ -322,7 +362,10 @@ that can be called..).
 
 the reason we made "expression services" separate from "expression agents" is..
 
-## "expression services" are to help transition off of pen [#052:02]
+
+
+
+## "expression services" are to help transition off of pen [#052:02] :[#here.n]
 
 but they should be considered deprectated. this is why our (at the time of
 writing) headless expression services-related modules have two underscores
@@ -330,9 +373,10 @@ at the end of there name - as a reminder that they are deprecated.
 
 
 
+
 ## case studies & notes
 
-### :#note-br-10, :#point-10
+### the cost of a singleton (legacy tag: :#point-10) :[#here.15]
 
 using the expression agent singleton is for hacks and one-offs. the
 expression agent has a long-running NLP agent holds state of the speech
@@ -345,10 +389,13 @@ we intentionally do not offer any cache clearing facilities: this would
 be a step in the wrong direction. in a mature application each action will
 create its own expression agent instance.
 
+(likewise, as a three years later edit to the above thought, an expression
+agent singleton cannot be bound to an action, for example for the purposes
+of [#br-005.2] modality-specific parameter rendering.)
 
 
 
-### :#case-study-st-2: when to subclass expression agents
+### when to subclass expression agents (legacy tag: :#case-study-st-2) :[#here.p]
 
 the more important questions is "when *not* to?" and the answer is
 "usually.": the expression agent is the one component that we have no

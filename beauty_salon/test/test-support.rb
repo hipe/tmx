@@ -123,6 +123,11 @@ module Skylab::BeautySalon::TestSupport
       ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
     end
 
+    define_method :expression_agent_instance_for_legacy_API_, ( Lazy_.call do
+      Zerk_lib_[]::API::InterfaceExpressionAgent::
+          THE_LEGACY_CLASS.via_expression_agent_injection :_no_injection_from_BS_
+    end )
+
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
       NOTHING_
     end
@@ -154,6 +159,7 @@ module Skylab::BeautySalon::TestSupport
       [
         :ping,
         :deliterate,
+        :text,
       ].freeze
     end )
   end
@@ -175,7 +181,7 @@ module Skylab::BeautySalon::TestSupport
   end
 
   Non_Interactive_CLI = -> tcc do
-    Home_.lib_.zerk.test_support::Non_Interactive_CLI[ tcc ]
+    Zerk_test_support_[]::Non_Interactive_CLI[ tcc ]
   end
 
   # --
@@ -191,7 +197,11 @@ module Skylab::BeautySalon::TestSupport
   end
 
   Zerk_test_support_ = -> do
-    Home_.lib_.zerk.test_support
+    Zerk_lib_[].test_support
+  end
+
+  Zerk_lib_ = -> do
+    Home_.lib_.zerk
   end
 
   # --

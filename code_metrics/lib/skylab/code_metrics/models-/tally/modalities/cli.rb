@@ -10,7 +10,7 @@ module Skylab::CodeMetrics
 
       def description_proc_for_summary_of_under__ bound, exp
 
-        # #[#br-002.A] finally here is the end of the line for this.
+        # #[#br-002.1] finally here is the end of the line for this.
         # (we want to move this up or do away with the optimization..)
         # this is necessary because we are surprisingly uncommon in our
         # behavior of rendering properties in the first 2 lines of desc.

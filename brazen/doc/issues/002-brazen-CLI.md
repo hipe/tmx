@@ -5,8 +5,8 @@
 
   - mile-hile overview of "modality"
   - introduction (legacy)
-  - an optimization for summary of child under parent [#here.A]
-  - the "error level" can increase but not decrease [#here.B]
+  - an optimization for summary of child under parent [#here.1]
+  - the "error level" can increase but not decrease [#here.2]
   - experimental generated syntax aesthetics [#here.C]
   - method note about help screen rendering (DISASSOCIATED)
   - property categorization [#here.E]
@@ -95,7 +95,7 @@ it's that simple.
 
 
 
-## an optimization for summary of child under parent :[#here.A]
+## an optimization for summary of child under parent :[#here.1]
 
 in practice so far, something like only 1 out of 50 adapters
 needs to build its own expression agent when that of its
@@ -116,7 +116,7 @@ building of the new expag) just to get those 2 lines.
 
 
 
-## the "error level" can increase but not decrease :[#here.B]
+## the "error level" can increase but not decrease :[#here.2] :[#here.B]
 
 for the lazy. every action invocation may trigger multiple events, but
 can only result in one exit status. we derive the exit status from the
@@ -198,7 +198,7 @@ mixing in the other module (see "[#]/figure-1").
 
 
 
-## property categorization :[#here.E] :[#here.5]
+## modality-specific association categorization :[#here.5]
 
 a central feature of [br] CLI, property categorization is a concrete
 manifestion of the whole underlying [br] experiment, one that traces its
