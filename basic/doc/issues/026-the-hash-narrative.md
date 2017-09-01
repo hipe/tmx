@@ -1,14 +1,15 @@
 # the hash narrative :[#026]
 
 
-## :#storypoint-005 introduction
+## objective & scope
 
 this node is for things around and related to hashes. it does not implement
 a hashtable itself.
 
 
 
-## :#storypoint-105 the `unpack_*` methods
+
+## the `unpack_*` methods :[#here.2]
 
 in other worlds this idea is generally referred to as a "hash slice", but
 here, we go deep on slice. we use set theory on your slice. instead of one

@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Hash  # read [#026] the hash narrative #storypoint-005 introduction
+  module Hash  # doc: [#026] the hash narrative
 
     class << self
 
@@ -40,7 +40,7 @@ module Skylab::Basic
       #     name  # => "me"
       #     age  # => 2
       #
-      # but read [#026] the hash narrative # #storypoint-105
+      # but read [#026.2] "the unpack_* methods"
 
       Unpack_equal__ = -> h, * k_a do
         Validate_superset[ h, k_a ]

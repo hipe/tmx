@@ -75,6 +75,14 @@ module Skylab::System
         end
       end
 
+      def close
+        if @_is_closed
+          self._COVER_ME__already_closed__  # raise ::IOError.new "closed stream"
+        else
+          @_is_closed = true ; nil
+        end
+      end
+
       def closed?
         @_is_closed
       end

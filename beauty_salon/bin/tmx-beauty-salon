@@ -3,9 +3,14 @@
 require 'skylab/beauty_salon'
 
 # (below while #open [#023])
-x = Skylab::BeautySalon::CLI2.new(
+
+_cli = Skylab::BeautySalon::CLI2.new(
   ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-).execute
+) do |o|
+  o.filesystem = ::File
+end
+
+x = _cli.execute
 
 if x.respond_to? :id2name
   $stderr.puts "(result: #{ x })"

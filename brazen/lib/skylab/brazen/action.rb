@@ -184,6 +184,7 @@ module Skylab::Brazen
 
       def __do_process_injections p
 
+        @_ad_hoc_normalizations = nil  # might add none
         @_remove_these = nil
         @_add_these = nil
         @_injected_assignments = nil

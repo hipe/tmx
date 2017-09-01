@@ -7,6 +7,7 @@ module Skylab::Git
       Actions = ::Module.new
 
       ::Kernel._I_AM_ONE
+      # (see similar in [bs] that happend for matryoshka wean)
       class Actions::ReNumber < Brazen_::CLI::Action_Adapter
 
         MUTATE_THESE_PROPERTIES =  [ :branch_name_stream ]

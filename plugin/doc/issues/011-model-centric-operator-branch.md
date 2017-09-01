@@ -1,5 +1,17 @@
 # model-centric operator branch :[#011]
 
+## table of contents/quick jump
+
+  - synopsis
+  - philosophical underpinnings
+  - case-study/tutorial [#here.1]
+  - code dive [#here.C]
+  - this one pattern [#here.2]
+  - codepoint (defined in code) [#here.4]
+
+
+
+
 ## synopsis
 
 perhaps the most ambitious-yet implementation of a [#ze-051]
@@ -133,6 +145,47 @@ the mercy of how the filesystem orders the entries it produces
 ordering is consistent, unlike in [br]-era where we would get a
 different ordering based on what nodes were already loaded.)
 
+
+
+
+
+## code dive :[#here.C]
+
+(about code subject,)
+
+  - mutually exclusively, the client can pass *either* an "invocation"
+    *or* an "invocation resources".
+
+  - the umbrella term we use over both of these is the "resourcey".
+
+  - this "resourcey" object is what is yielded to the action when
+    it is constructed, and so it (alone) determines what resources and
+    application state information the action instance may access and
+    know about.
+
+  - the "invocation resources" is conceptually inside the "invocation",
+    and so to chose the one provides access to the other, but:
+
+  - the "invocation resources" (when compared to the "invocation") is
+    is stateless and immutable so one should prefer to pass it over
+    the "invocation" when possible,
+
+  - however some clients may want to play with fire and let their
+    action instance have access the entire application invocation for
+    whatever nefarious or smelly reason. (it is recommended to start
+    out with the one and only switch to the other as a crutch.)
+
+our main interest in managing it to the degree that we do is:
+
+  - A. we want to preserve (in a `name_symbol`) which "type" was
+    passed so that downstream clients can be aware of this.
+
+  - B. for our own uses we need to access the invocation resources.
+    with the small adapter pattern we apply here, we may do so
+    uniformly elsewhere while isolating this mess to here.
+
+  - C. almost as an unrelated concern (violation of SRP), we also
+    read and carry the hooks..
 
 
 

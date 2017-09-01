@@ -13,7 +13,7 @@ module Skylab::BeautySalon::TestSupport
 
     same = %w( deliterate )
 
-    context '0) no args' do  # :#[br]:COVERPOINT2.1
+    context '0) no args' do  # :COVERPOINT2.1:[br]
 
       given do
         argv( * same )
@@ -128,22 +128,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_sections do
-        h = {}
-        parse_help_screen_fail_early_ do |o|
-
-          o.expect_section 'usage' do |sect|
-            h[ :usage ] = sect
-          end
-
-          o.expect_section 'description' do |sect|
-            h[ :description ] = sect
-          end
-
-          o.expect_section 'primaries' do |sect|
-            h[ :primaries ] = sect
-          end
-        end
-        h.freeze
+        parse_help_screen_sections_ :usage, :description, :primaries
       end
 
       it 'succeeds' do
@@ -161,8 +146,8 @@ module Skylab::BeautySalon::TestSupport
         _hi = first_line_string
         _s_a = oxford_split_and_ _hi, 'missing required primaries '
         require 'set'  # ..
-        _actual = ::Set.new _s_a
-        _expected = ::Set.new( %w( "-file" "-to-line" "-from-line" ) )
+        _actual = _s_a.to_set
+        _expected = %w( "-file" "-to-line" "-from-line" ).to_set
         _actual == _expected || fail
       end
 
@@ -192,7 +177,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'first line - styled whine (#open [#br-002.5])' do
-        _actual = Zerk_lib_[]::CLI::Styling::Unstyle_styled[ first_line_string ]
+        _actual = unstyle_styled_ first_line_string
         _actual =~ %r(\ANo such «file» - [[:graph:]]+$) || fail
       end
 
@@ -250,15 +235,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_tuple do
-        outs = [] ; errs = []
-        op_h = {
-          o: outs.method( :push ),
-          e: errs.method( :push ),
-        }
-        niCLI_state.lines.each do |line|
-          op_h.fetch( line.stream_symbol )[ line.string ]
-        end
-        [ outs, errs ]
+        partition_expressed_lines_into_output_lines_and_errput_lines_
       end
 
       def CLI_options_for_expect_stdout_stderr

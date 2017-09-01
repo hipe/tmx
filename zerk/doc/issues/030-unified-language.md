@@ -1,5 +1,15 @@
 # unified language :[#030]
 
+
+## table of contents (allocations/quick jump)
+
+  - "reasoning" [#here.1]
+  - legacy document [#here.2]
+  - "unified language for operational nodes" [#here.3]
+
+
+
+
 ## (for perahps all 3 bundled modalities)
 
   • "stack frame" - a frame on the [#ac-031] "selection stack"

@@ -1,0 +1,12 @@
+digraph g {
+  subgraph cluster_0 {
+    label="nonterminal\ngrammatical symbols"
+    subgraph cluster_1 {
+      label="operators"
+      node_1_0 [label="operations\n(a.k.a \"actions\")"]
+      node_1_1 [label="branch nodes"]
+    }
+    node_0_0 [label="primaries"]
+  }
+  label="fig 1. unified language\nfor operational nodes"
+}

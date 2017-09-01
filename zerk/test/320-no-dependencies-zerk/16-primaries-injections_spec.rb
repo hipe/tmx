@@ -48,7 +48,8 @@ module Skylab::Zerk::TestSupport
       context "but the lookup" do
 
         it "did not find" do
-          findation_.result == false || fail
+          _x = findation_.result
+          _x.nil? || fail
         end
 
         it "emits a `primary_parse_error` (not a parse error)" do

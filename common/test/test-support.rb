@@ -79,6 +79,7 @@ module Skylab::Common::TestSupport
   NOTHING_ = nil
   NIL_ = nil
   NIL = nil  # open [#sli-016.C]
+    TRUE = true  # same
   TS_ = self
   UNABLE_ = false
 end

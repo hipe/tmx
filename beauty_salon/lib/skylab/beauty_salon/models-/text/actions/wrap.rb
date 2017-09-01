@@ -58,7 +58,6 @@ module Skylab::BeautySalon
         end,
 
         :normalize_by, -> qkn, & p do
-          self._COVER_ME__probably_fine__
           LineRanges_via_String__.new( qkn, & p ).execute
         end,
 
@@ -70,9 +69,10 @@ module Skylab::BeautySalon
         :property, :num_chars_wide,
         :description, -> y do
 
-          prp = action_reflection.front_properties.fetch :num_chars_wide
-          prp.has_primitive_default or fail
-          _x = prp.primitive_default_value
+          _asc = action_reflection.dereference_association :num_chars_wide
+          # waiting to eliminate: has_primitive_default primitive_default_value
+          _kn = _asc.default_by[]
+          _x = _kn.value
 
           y << "how wide can the longest line be? (default: #{ val _x })"
         end,
@@ -118,7 +118,8 @@ module Skylab::BeautySalon
 
       def initialize
         o = yield
-        @_argument_scanner_ = o.argument_scanner
+        @invo_resources_ = o
+        @_associations_ = {}
       end
 
       def execute
@@ -321,11 +322,19 @@ module Skylab::BeautySalon
         ACHIEVED_
       end
 
+      include CommonActionMethods_
+
       def _listener_  # override our more complicated way FOR NOW ..
-        @_argument_scanner_.listener
+        _argument_scanner_.listener
       end
 
-      include CommonActionMethods_
+      def _argument_scanner_
+        @invo_resources_.argument_scanner
+      end
+
+      attr_reader(
+        :_associations_,
+      )
 
       # ==
 

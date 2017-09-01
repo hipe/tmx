@@ -26,6 +26,11 @@ module Skylab::Plugin
     #
     # (more about each above sub-convention at its corresponding section below.)
 
+    # the code file is in three sections (easy jump):
+    #   - section 1 of 3 - define-time
+    #   - section 2 of 3 - operator branch via [3 means]
+    #   - section 3 of 3 - support (shared)
+
     class << self
 
       def define & p
@@ -164,7 +169,8 @@ module Skylab::Plugin
         end
       end
 
-      def dereference k
+      def dereference ref
+        k = ref.intern
         _x = lookup_softly k
         _x or raise ::NameError, k
         _x
@@ -412,6 +418,8 @@ module Skylab::Plugin
     # ==
 #=== END LEGACY
 
+    BoundCallOfOpMethods__ = ::Module.new  # (re-opens)
+
     class LazyLoadableReference_for_ModelProbably___ < Common_::SimpleModel
 
       # when there's a file to load, do it late (hence "lazy").
@@ -435,17 +443,7 @@ module Skylab::Plugin
         :sub_branch_const,
       )
 
-      def bound_call_of_operator_via_invocation invo
-        bound_call_of_operator_by do |o|
-          o.remote_invocation = invo
-        end
-      end
-
-      def bound_call_of_operator_via_invocation_resouces rirsx
-        bound_call_of_operator_by do |o|
-          o.remote_invocation_resources = rirsx
-        end
-      end
+      include BoundCallOfOpMethods__
 
       def bound_call_of_operator_by  # [bs]
 
@@ -456,7 +454,7 @@ module Skylab::Plugin
 
         if mod.respond_to? :const_get
           if mod.const_get c, false
-            do_this = :__conventional
+            do_this = :__branchy
           else
             do_this = :__action  # as described [#here.3], this is how we
             # hack having an action "sitting" in a spot where a model is
@@ -467,33 +465,42 @@ module Skylab::Plugin
           do_this = :__proc
         end
 
+        rh = ResourcerAndHooks__.define do |o|
+          yield o  # hi.
+        end
+
         case do_this
-        when :__conventional
+        when :__branchy
 
           BoundCall_via_Branch___.call_by do |o|
-            yield o  # write resources or invocation
             o.business_module = mod
             o.glob_resources = @glob_resources
             o.local_invocation_resources = @local_invocation_resources
             o.sub_branch_const = c
+            o.resourcer_and_hooks = rh
           end
         when :__action
 
           BoundCall_via_Action__.call_by do |o|
-            yield o  # ..
             o.action_class = mod
             o.local_invocation_resources = @local_invocation_resources
+            o.resourcer_and_hooks = rh
           end
         when :__proc
 
-          BoundCall_via_Proc___.call_by do |o|
-            yield o
+          _rrh = rh.close_resourcey_reference
+          _rr = _rrh.resourcey_reference
+
+          ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_via_Proc.call_by do |o|
+
             o.invocation_stack_top_name_symbol = @name_symbol
             o.proc = mod
-            o.local_invocation_resources = @local_invocation_resources
+            o.invocation_or_resources = _rr
           end
         end
       end
+
+      alias_method :_bound_call_of_operator_by_, :bound_call_of_operator_by
 
       def dereference_loadable_reference  # as used by [sn]. might rename to "derefence"
         send @_business_module
@@ -520,83 +527,130 @@ module Skylab::Plugin
       alias_method :intern, :name_symbol  # :[#008.3] #borrow-coverage from [sn]
     end
 
-    class BoundCall_via_Branch___ < Common_::MagneticBySimpleModel
+    BoundCallByWhat__ = ::Class.new Common_::MagneticBySimpleModel  # (re-opens)
 
-      # for conventional operations. this is probably the essential algorithm
-      # of the file: resolve an operator branch and use it to parse the next
-      # step.
+    class BoundCall_via_Branch___ < BoundCallByWhat__
 
-      def remote_invocation= invo
-        @_remote_invocation_resources = :__RIR_via_invo
-        @_bound_call_via_found_operator = :__bound_call_via_found_op_and_invo
-        @_remote_invocation = invo
-      end
-
-      def remote_invocation_resources= rsx
-        @_remote_invocation_resources = :__RIR_via_selfsame_instance
-        @_bound_call_via_found_operator = :__bound_call_via_found_op_and_invo_rsx
-        @_remote_invo_resources_instance = rsx
-      end
+      # for conventional operations. this is probably the essential
+      # algorithm of the file: resolve an operator branch and use it to
+      # parse the next step.
 
       attr_writer(
         :business_module,
         :glob_resources,
-        :local_invocation_resources,
         :sub_branch_const,
       )
 
       def execute
         __init_things_and_operator_branch
-        if __find_operator
-          __bound_call_via_found_operator
+        __fake_build_and_send_the_not_really_operation
+        found = __find_operator
+        if found
+
+          # (seems like we should recurse)
+            __at_endpoint found
         end
       end
 
-      def __bound_call_via_found_operator
+      def __at_endpoint found
 
-        _op_ref = remove_instance_variable( :@__found_operator ).mixed_business_value
-        send @_bound_call_via_found_operator, _op_ref
-      end
+        _op_ref = found.mixed_business_value
+        _cls = _op_ref.dereference_loadable_reference
 
-      def __bound_call_via_found_op_and_invo op_ref
+        _x = BoundCall_via_Action__.call_by do |o|  # like #here3
+          o.action_class = _cls
+          o.local_invocation_resources = @local_invocation_resources
+          o.resourcer_and_hooks = @resourcey_and_resourcer_and_hooks.resourcer_and_hooks
+        end
 
-        _invo = remove_instance_variable :@_remote_invocation
-        op_ref.bound_call_of_operator_via_invocation _invo
-      end
-
-      def __bound_call_via_found_op_and_invo_rsx op_ref
-
-        _rir = remove_instance_variable :@_remote_invo_resources_instance
-        op_ref.bound_call_of_operator_via_invocation_resouces _rir
+        _x  # #todo
       end
 
       # --
 
       def __find_operator
 
-        _rir = send @_remote_invocation_resources
+        p = @resourcey_and_resourcer_and_hooks.hooks.operator_via_branch_by
+        if p
+          p[ self ]
+        else
+          __find_operator_when_branch_normally
+        end
+      end
 
-        _ob = remove_instance_variable :@__operator_branch
+      def __find_operator_when_branch_normally
 
-        _ = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+        # this is codepoint :[#doc.4] (referenced by [br])
 
-          o.argument_scanner = _rir.argument_scanner
+        _as = __argument_scanner
+
+        _ob = release_operator_branch
+
+        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+
+          o.argument_scanner = _as
 
           o.add_operators_injection_by do |inj|
             inj.operators = _ob
-            inj.injector = :_no_injector_for_now_from_BR_
+            inj.injector = :_no_injector_for_now_from_PU_
           end
-        end.parse_operator
+        end
 
-        _store :@__found_operator, _
+        _ = _omni.parse_operator
+        _  # #todo hi.
       end
 
-      def __RIR_via_invo
-        @_remote_invocation.invocation_resources
+      def __argument_scanner
+
+        _rr = @resourcey_and_resourcer_and_hooks.resourcey_reference
+        _irsx = _rr.remote_invocation_resources
+        _as = _irsx.argument_scanner
+        _as  # hi. #todo
       end
 
-      def __RIR_via_selfsame_instance
-        @_remote_invo_resources_instance
+      def release_operator_branch  # (for above and API)
+        remove_instance_variable :@__operator_branch
+      end
+
+      def __fake_build_and_send_the_not_really_operation
+
+        # branchy nodes [#ze-030.3] are operators but not operations. in
+        # our new simplified conception these branch nodes have no formal
+        # parameters of their own, so there is no parametric state to
+        # maintain, so not only do we *not* create instances of these nodes,
+        # we couldn't even if we wanted to because we use modules (not
+        # classes) to represent them.
+        #
+        # however, the client reasonably deserves to be notified of each
+        # next parsed branch node through the same mechanism through which
+        # we send it info about the endpoints we parse.
+        #
+        # this is not all just cosmetic. this is an injection point. we
+        # cannot access the argument scanner we need to complete the parse
+        # until the client has been given a chance to inject new resources,
+        # and we can't do that until we've passed it the would-be instance.
+
+        rh = remove_instance_variable :@resourcer_and_hooks
+        ho = rh.hooks
+        mod = @business_module
+
+        ho.maybe_send_operation_module do
+          mod
+        end
+
+        same = Lazy_.call do
+          NotAnInstance___[ mod ]
+        end
+
+        @resourcey_and_resourcer_and_hooks = rh.close_resourcey_reference do
+          same[]
+        end
+
+        ho.maybe_send_operation_instance do
+          same[]
+        end
+
+        NIL
       end
 
       # --
@@ -618,6 +672,8 @@ module Skylab::Plugin
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
+
+    NotAnInstance___ = ::Struct.new :the_business_module
 
     # ~ 2. via ACTION paths
 
@@ -704,22 +760,25 @@ module Skylab::Plugin
         :stem,
       )
 
-      def bound_call_of_operator_via_invocation invo
+      include BoundCallOfOpMethods__
 
-        BoundCall_via_Action__.call_by do |o|
-          o.action_class = send @_action_module
-          o.remote_invocation = invo
+      def _bound_call_of_operator_by_
+        _rh = ResourcerAndHooks__.define do |o|
+          yield o
+        end
+        BoundCall_via_Action__.call_by do |o|  # :#here3
+          o.action_class = _action_module
           o.local_invocation_resources = @local_invocation_resources
+          o.resourcer_and_hooks = _rh
         end
       end
 
-      def bound_call_of_operator_via_invocation_resouces rirsx
+      def dereference_loadable_reference
+        _action_module
+      end
 
-        BoundCall_via_Action__.call_by do |o|
-          o.action_class = send @_action_module
-          o.remote_invocation_resources = rirsx
-          o.local_invocation_resources = @local_invocation_resources
-        end
+      def _action_module
+        send @_action_module
       end
 
       def __action_module_initially
@@ -771,29 +830,40 @@ module Skylab::Plugin
         @__splay = splay
       end
 
-      def bound_call_of_operator_via_invocation invo
-        _by do |o|
-          o.remote_invocation = invo
-        end
-      end
+      include BoundCallOfOpMethods__
 
-      def bound_call_of_operator_via_invocation_resouces irsx
-        _by do |o|
-          o.remote_invocation_resources = irsx
-        end
-      end
-
-      def _by
-        BoundCall_via_Action__.call_by do |o|
+      def _bound_call_of_operator_by_
+        _cb = ResourcerAndHooks__.define do |o|
           yield o
-          o.action_class = @__splay.const_get @__const, false
-          o.local_invocation_resources = @__local_invocation_resources
         end
+        _cls = dereference_loadable_reference
+        BoundCall_via_Action__.call_by do |o|
+          o.action_class = _cls
+          o.local_invocation_resources = @__local_invocation_resources
+          o.resourcer_and_hooks = _cb
+        end
+      end
+
+      def dereference_loadable_reference
+        @__splay.const_get @__const, false
       end
 
       attr_reader(
         :name_symbol,
       )
+    end
+
+    module BoundCallOfOpMethods__  # (re-open)
+      def bound_call_of_operator_via_invocation invo  # [br]
+        _bound_call_of_operator_by_ do |o|
+          o.remote_invocation = invo
+        end
+      end
+      def bound_call_of_operator_via_invocation_resouces irsx  # [bs] [sn]
+        _bound_call_of_operator_by_ do |o|
+          o.remote_invocation_resources = irsx
+        end
+      end
     end
 
     # == section 3 of 3 - support (shared)
@@ -907,47 +977,15 @@ module Skylab::Plugin
 
     # ==
 
-    BoundCallByWhat__ = ::Class.new Common_::MagneticBySimpleModel
-
     class BoundCall_via_Action__ < BoundCallByWhat__
-
-      def initialize
-        @customize_normalization_by = nil
-        @inject_definitions_by = nil
-        @receive_operation_by = nil
-        @receive_operation_module_by = nil
-        super
-      end
 
       attr_writer(
         :action_class,
-        :customize_normalization_by,
-        :inject_definitions_by,
-        :receive_operation_by,
-        :receive_operation_module_by,
       )
 
       def execute
 
-        p = remove_instance_variable :@receive_operation_module_by
-        if p
-          p[ @action_class ]
-        end
-
-        op = @action_class.allocate
-        rr = @_resourcey_reference_
-        if rr && rr.is_proc_based
-          rr.close op
-        end
-
-        op.send :initialize do
-          rr.value
-        end
-
-        p = remove_instance_variable :@receive_operation_by
-        if p
-          p[ op ]
-        end
+        op = __build_operation
 
         if op.respond_to? :to_bound_call_of_operator
 
@@ -955,11 +993,14 @@ module Skylab::Plugin
 
         elsif op.respond_to? :definition
 
+          rrh = @resourcey_and_resourcer_and_hooks
+          ho = rrh.hooks
+
           _less_things = Details__.new(
-            @customize_normalization_by,
-            @inject_definitions_by,
+            ho.customize_normalization_by,
+            ho.inject_definitions_by,
             op,
-            @_resourcey_reference_,
+            rrh.resourcey_reference,
           )
           @local_invocation_resources.
             bound_call_when_operation_with_definition_by[ _less_things ]
@@ -967,6 +1008,35 @@ module Skylab::Plugin
         else
           Common_::BoundCall.by( & op.method( :execute ) )
         end
+      end
+
+      def __build_operation
+
+        rh = remove_instance_variable :@resourcer_and_hooks
+        cls = @action_class
+        ho = rh.hooks
+
+        ho.maybe_send_operation_module do
+          cls
+        end
+
+        op = cls.allocate
+
+        rrh = rh.close_resourcey_reference do
+          op
+        end
+
+        op.send :initialize do
+          rrh.resourcey_reference.value
+        end
+
+        ho.maybe_send_operation_instance do
+          op
+        end
+
+        @resourcey_and_resourcer_and_hooks = rrh
+
+        op
       end
     end
 
@@ -979,38 +1049,24 @@ module Skylab::Plugin
 
     # ~
 
-    class BoundCall_via_Proc___ < BoundCallByWhat__
-
-      # (this seems anemic because it seems to do almost nothing, but
-      # you gotta, because we gotta receive the invocation resources
-      # in the normal way.)
+    class BoundCallByWhat__  # (re-open)
 
       attr_writer(
-        :invocation_stack_top_name_symbol,
-        :proc,
+        :local_invocation_resources,
+        :resourcer_and_hooks,
       )
-
-      def execute
-
-        ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_via_Proc.call_by do |o|
-
-          o.invocation_stack_top_name_symbol =
-            @invocation_stack_top_name_symbol
-
-          o.proc = @proc
-          o.invocation_or_resources = @_resourcey_reference_
-        end
-      end
+      attr_reader(
+        :resourcer_and_hooks,
+      )
     end
 
-    # ~
-
-    class BoundCallByWhat__
+    class ResourcerAndHooks__ < Common_::SimpleModel  # exactly [#doc.C]
 
       def initialize
+        @hooks = Hooks___.new
         @__mutex_for_resourcey_reference = nil
-        @_resourcey_reference_ = nil
         super
+        @hooks.freeze
       end
 
       def remote_invocation_resources_by= p
@@ -1022,34 +1078,133 @@ module Skylab::Plugin
       end
 
       def remote_invocation_resources= x
-        _recv_resourcey_reference ResourceyReferenceRsxValue___.new x ; x
+        _recv_resourcey_reference ResourceyReferenceRsxValue__.new x ; x
       end
 
       def _recv_resourcey_reference rr
         remove_instance_variable :@__mutex_for_resourcey_reference
-        @_resourcey_reference_ = rr
+        @__resourcey_reference = rr ; nil
       end
 
-      attr_writer(
-        :local_invocation_resources,
+      # --
+
+      def customize_normalization_by= p
+        @hooks.customize_normalization_by = p
+      end
+
+      def inject_definitions_by= p
+        @hooks.inject_definitions_by = p
+      end
+
+      def operator_via_branch_by= p
+        @hooks.operator_via_branch_by = p
+      end
+
+      def receive_operation_by= p
+        @hooks.receive_operation_by = p
+      end
+
+      def receive_operation_module_by= p
+        @hooks.receive_operation_module_by = p
+      end
+
+      # --
+
+      def close_resourcey_reference
+
+        _use_resourcey = @__resourcey_reference.close_by do
+          yield
+        end
+
+        ResourceyAndResourcerAndHooks___.new _use_resourcey, self
+      end
+
+      attr_reader(
+        :hooks,
       )
     end
 
+    class ResourceyAndResourcerAndHooks___
+
+      def initialize rr, rh
+        @resourcey_reference = rr
+        @resourcer_and_hooks = rh
+      end
+
+      def hooks
+        @resourcer_and_hooks.hooks
+      end
+
+      attr_reader(
+        :resourcer_and_hooks,
+        :resourcey_reference,
+      )
+    end
+
+    class Hooks___
+
+      def initialize
+        @customize_normalization_by = nil
+        @inject_definitions_by = nil
+        @operator_via_branch_by = nil
+        @receive_operation_by = nil
+        @receive_operation_module_by = nil
+      end
+
+      attr_accessor(
+        :customize_normalization_by,
+        :inject_definitions_by,
+        :operator_via_branch_by,
+        :receive_operation_by,
+        :receive_operation_module_by,
+      )
+
+      def maybe_send_operation_instance
+        p = @receive_operation_by
+        if p
+          _op = yield
+          p[ _op ]
+        end
+        NIL
+      end
+
+      def maybe_send_operation_module
+        p = @receive_operation_module_by
+        if p
+          _op_mod = yield
+          p[ _op_mod ]
+        end
+        NIL
+      end
+    end
+
     ProcBased__ = ::Class.new ; ValueBased__ = ::Class.new
+    InvoMethods__ = ::Module.new ; ResourcesMethods__ = ::Module.new
 
     class ResourceyReferenceRsxProc___ < ProcBased__
+
+      include ResourcesMethods__
+
+      def close_by
+        _op = yield
+        _xx = @_proc_[ _op ]
+        ResourceyReferenceRsxValue__.new _xx
+      end
+
       def name_symbol
         :_invocation_resources_PL_
       end
     end
 
     class ResourceyReferenceInvoValue___ < ValueBased__
+      include InvoMethods__
       def name_symbol
         :_invocation_PL_
       end
     end
 
-    class ResourceyReferenceRsxValue___ < ValueBased__
+    class ResourceyReferenceRsxValue__ < ValueBased__
+      include ResourcesMethods__
       def name_symbol
         :_invocation_resources_PL_
       end
@@ -1058,35 +1213,35 @@ module Skylab::Plugin
     class ProcBased__
 
       def initialize p
-        @__proc = p
-      end
-
-      def close op
-        _p = remove_instance_variable :@__proc
-        @__value = _p[ op ]
-        @value = :__via_value ; nil
-      end
-
-      def value
-        send @value
-      end
-
-      def __via_value
-        @__value
-      end
-
-      def is_proc_based
-        true
+        @_proc_ = p
       end
     end
 
     class ValueBased__
+
       def initialize x
         @value = x
+        freeze
       end
+
+      def close_by
+        self
+      end
+
       attr_reader :value
-      def is_proc_based
-        false
+    end
+
+    module InvoMethods__
+
+      def remote_invocation_resources
+        @value.invocation_resources
+      end
+    end
+
+    module ResourcesMethods__
+
+      def remote_invocation_resources
+        @value
       end
     end
 

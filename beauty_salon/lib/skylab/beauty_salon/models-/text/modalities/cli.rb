@@ -4,54 +4,107 @@ module Skylab::BeautySalon
 
     module Modalities::CLI
 
-      Actions = ::Module.new
-      class Actions::Wrap < Brazen_::CLI::Action_Adapter
+      Inject_and_deinject_associations = nil
+      Inject_resources = nil
+    end
 
-        # (what happens here is also mentored by [gi])
+    Actions.const_get :Wrap, false  # ..
 
-        MUTATE_THESE_PROPERTIES = [
-          :informational_downstream,
-          :output_bytestream,
-          :upstream,
-        ]
+    class Actions::Wrap
+      Modalities = ::Module.new
+    end
 
-        def mutate__informational_downstream__properties
+    module Actions::Wrap::Modalities::CLI
 
-          substitute_value_for_argument :informational_downstream do
-            @resources.serr
-          end
+      Inject_and_deinject_associations = -> o do
+
+        # ([gi] will do something similar)
+
+        # take this association out of the UI. assign this value instead.
+        k = :informational_downstream
+        o.deinject_association k
+        o.assign k do |rsx|
+          rsx.stderr
         end
 
-        def mutate__output_bytestream__properties
-
-          substitute_value_for_argument :output_bytestream do
-            @resources.sout
-          end
+        # take this association out of the UI. assign this value instead.
+        k = :output_bytestream
+        o.deinject_association k
+        o.assign k do |rsx|
+          rsx.stdout
         end
 
-        def mutate__upstream__properties
+        # basically add a bunch of stuff to a selfsame association
+        k = :upstream
+        o.deinject_association k
+        o.inject_association_via_definition(
+          :required,
+          :property,
+          k,
+          :description, -> y do
+            y << 'if `-`, non-interactive STDIN is expected'
+          end,
+          :normalize_by, -> qkn, & p do
 
-          mutable_front_properties.replace_by :upstream do | prp |
+            rsx = @invo_resources_  # :COVERPOINT2.2:[fi] (an experimental massive hack just for us)
+            _stdin = rsx.stdin
+            _fs = rsx.filesystem
 
-            prp.dup.describe_by do | y |
-              y << "if `-`, non-interactive STDIN is expected"
-            end
+            _kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
+
+              :qualified_knownness_of_path, qkn,
+              :stdin, _stdin,
+              :recognize_common_string_patterns,
+              :dash_means, :stdin,
+              :filesystem, _fs,
+              & p )
+
+            _kn  # hi. #todo
+          end,
+        )
+        NIL
+      end
+
+      Inject_resources = -> op, cli do
+        cli.redefine do |o|
+          o.expression_agent_by do
+            Expag___[ op, cli ]
           end
+        end
+      end
 
-          mutable_back_properties.replace_by :upstream do | prp |
+      Expag___ = -> op, cli do  # copy-paste
 
-            prp.dup.append_ad_hoc_normalizer do | arg, & oes_p |
+        _class = ::Skylab::Zerk::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS
 
-              Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
-
-                :qualified_knownness_of_path, arg,
-                :stdin, @resources.sin,
-                :recognize_common_string_patterns,
-                :dash_means, :stdin,
-                :filesystem, Home_.lib_.system.filesystem,
-                & oes_p )
-            end
+        if false
+        _class.proc_based_by do |o|
+          o.render_property_by do |asc, expag|
+            "«#{ asc.name_symbol.id2name.gsub UNDERSCORE_, DASH_ }»"  # #guillemets
           end
+        end
+        end  # if false #todo
+
+        _class.via_expression_agent_injection MyInjection___.new( op, cli )
+      end
+
+      class MyInjection___
+
+        def initialize op, cli
+          @operation = op
+          @CLI = cli
+        end
+
+        def dereference_association sym
+          @operation._associations_.fetch sym
+        end
+
+        def expression_strategy_for_property _asc
+          :render_property_in_black_and_white_customly
+        end
+
+        def render_property_in_black_and_white_customly asc, expag
+          "«#{ asc.name_symbol.id2name.gsub UNDERSCORE_, DASH_ }»"  # #guillemets
         end
       end
 
@@ -60,3 +113,4 @@ module Skylab::BeautySalon
     end
   end
 end
+# #history-A.1: full rewrite during matryoshka wean

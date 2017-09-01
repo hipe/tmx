@@ -38,12 +38,12 @@ module Skylab::Zerk::TestSupport
       class CommonBranchUsageLine___
 
         def initialize head, mid, tail
-          @_item_index = :__item_index_initially
+          @item_index = :__item_index_initially
           @head = head ; @mid = mid ; @tail = tail
         end
 
         def item_index
-          send @_item_index
+          send @item_index
         end
 
         def __item_index_initially
@@ -52,8 +52,7 @@ module Skylab::Zerk::TestSupport
             h[ Normal_symbol_via_slug__[ s ] ] = d
           end
           @__item_index = h.freeze
-          @_item_index = :__item_index_normally
-          send @_item_index
+          send( @item_index = :__item_index_normally )
         end
 
         def __item_index_normally
@@ -105,12 +104,12 @@ module Skylab::Zerk::TestSupport
             _k = Normal_symbol_via_slug__[ md[:slug] ]
             h[ _k ] = ItemIndex___.new d, _had
           end
-          CommonBranchUsageLine___.new had, h, _head
+          CommonOperatorUsageLine___.new had, h, _head
         end
         alias_method :[], :call
       end  # >>
 
-      class CommonBranchUsageLine___
+      class CommonOperatorUsageLine___
 
         def initialize had, h, head
           @had_ellipsis = had

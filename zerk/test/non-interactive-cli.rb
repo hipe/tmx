@@ -122,6 +122,10 @@ module Skylab::Zerk::TestSupport
       # convert them this early because we often have to de-style them
       # and that is part of the assertion, not done here.
 
+      def to_output_line_stream_strictly
+        _to_line_string_stream_ZE_niCLI( :o ) { fail }
+      end
+
       def to_output_line_stream
         _to_line_string_stream_ZE_niCLI( :o ) { SKIP_ }
       end

@@ -10,6 +10,22 @@ module Skylab::BeautySalon::TestSupport
 
     # -
 
+      # == methods that help you make assertions
+
+      def parse_help_screen_sections_ * sym_a
+        h = {}
+        parse_help_screen_fail_early_ do |o|
+
+          sym_a.each do |sym|
+
+            o.expect_section sym.id2name do |sect|
+              h[ sym ] = sect
+            end
+          end
+        end
+        h.freeze
+      end
+
       def parse_help_screen_fail_early_
 
         string_st = to_errput_line_stream_strictly
@@ -64,7 +80,35 @@ module Skylab::BeautySalon::TestSupport
         s_a
       end
 
-      # --
+      def partition_expressed_lines_into_output_lines_and_errput_lines_
+        outs = [] ; errs = []
+        op_h = {
+          o: outs.method( :push ),
+          e: errs.method( :push ),
+        }
+        niCLI_state.lines.each do |line|
+          op_h.fetch( line.stream_symbol )[ line.string ]
+        end
+        [ outs, errs ]
+      end
+
+      def unstyle_styled_ s
+        Zerk_lib_[]::CLI::Styling::Unstyle_styled[ s ]
+      end
+
+      # -- (overwritten to simplify)
+
+      def fails
+        _d = exitstatus
+        5 == _d || fail
+      end
+
+      def succeeds
+        _d = exitstatus
+        _d.zero? || fail
+      end
+
+      # == hook-ins
 
       define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
         [ 'chimmy' ].freeze

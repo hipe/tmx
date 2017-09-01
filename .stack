@@ -73,8 +73,10 @@ understand Parser nodes - how can we unparse?
 answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`)
 location map - this is the key
 make reports more like actions
+fields/events/ambiguous todo
+clean up that crazy hack in an isolated commit
+in [br] cli that #maybe1 would be nice
 simplify argument scanning - match a grammar symbol without advancing scanner
 migrate [bs] to [ze]  (see [#now] in [bs])
 ct ping under CLI2
 ct ping under API2
-wrap under CLI2

@@ -341,7 +341,7 @@ module Skylab::Fields
           case 1 <=> sym_a.length
           when  0 ; @_mixed_association_soft_reader.fetch sym_a.first
           when  1 ; _when_primary_not_found
-          when -1 ; self._COVER_ME__when_ambiguous__
+          when -1 ; __when_ambiguous sym_a
           end
         end
 
@@ -1005,8 +1005,28 @@ module Skylab::Fields
           _resolve_sanitized_value_through_ad_hoc_normalizer_CL _qkn
         end
 
-        def _resolve_sanitized_value_through_ad_hoc_normalizer_CL _qkn
-          kn = @normal_association.normalize_by[ _qkn, & @_callbacks_.listener ]
+        $count_FI = 0
+        def _resolve_sanitized_value_through_ad_hoc_normalizer_CL qkn
+
+          # EXPERIMENTAL CHANGE for [bs]:COVERPOINT2.2
+
+          call_me = @normal_association.normalize_by
+          context = @_valid_value_store_
+          listener = @_callbacks_.listener
+
+          $count_FI += 1
+          $stderr.puts "(CRAZY HACK: #{ $count_FI } (for #{ context.class })"
+
+          # --
+
+          context.define_singleton_method :_FML_FI_, & call_me
+
+          kn = context._FML_FI_ qkn, & listener
+
+          context.singleton_class.send :undef_method, :_FML_FI_
+
+          # END EXPERIMENTAL CHANGE
+
           if kn
             if kn.is_known_known
               @_sanitized_value_ = kn.value
@@ -1087,6 +1107,13 @@ module Skylab::Fields
 
         # -- C: matching the argument scanner head against an association
 
+        def __when_ambiguous sym_a  # [bs]:COVERPOINT2.3
+          ev_early_to_be_safe = __build_ambigous_event sym_a
+          _express_argument_error_somehow :ambiguous do
+            ev_early_to_be_safe
+          end
+        end
+
         def _when_primary_not_found  # :#here4 lazily detect callbacks
 
           # in order to assimilate parts of our very old "attributes actor"
@@ -1131,17 +1158,20 @@ module Skylab::Fields
 
           # like #here2, some of these are and some of these aren't like this
 
-          if @listener
-
-            @listener.call :error, :argument_error, :primary_not_found do
-              ev_early_to_be_safe
-            end
-
-            _unable
-          else
-            _e = ev_early_to_be_safe.to_exception
-            raise _e
+          _express_argument_error_somehow :primary_not_found do
+            ev_early_to_be_safe
           end
+        end
+
+        def __build_ambigous_event sym_a
+
+          # yuck - since fuzzy only happens on CLI
+          _yuck = sym_a.map { |sym| sym.id2name.gsub UNDERSCORE_, DASH_ }
+
+          Home_::Events::Ambiguous.with(
+            :x, _unrecognized_token,
+            :name_string_array, _yuck,
+          )
         end
 
         def __build_primary_not_found_event
@@ -1152,7 +1182,7 @@ module Skylab::Fields
           end
           _these = _maybe_special_noun_lemma
 
-          _unrec_token_x = @_my_arg_scanner._unrecognized_primary_token_
+          _unrec_token_x = _unrecognized_token
 
           _ev = Home_::Events::Extra.with(
             :unrecognized_token, _unrec_token_x,
@@ -1161,6 +1191,27 @@ module Skylab::Fields
             * _these,
           )
           _ev  # hi. #todo
+        end
+
+        def _unrecognized_token
+          @_my_arg_scanner._unrecognized_primary_token_
+        end
+
+        def _express_argument_error_somehow term_sym
+
+          ev_early_to_be_safe = yield
+
+          if @listener
+
+            @listener.call :error, :argument_error, term_sym do
+              ev_early_to_be_safe
+            end
+
+            _unable
+          else
+            _e = ev_early_to_be_safe.to_exception
+            raise _e
+          end
         end
 
         def _maybe_special_noun_lemma
@@ -1559,6 +1610,7 @@ module Skylab::Fields
 
       # ==
 
+      DASH_ = '-'
       MONADIC_TRUTH_ = -> _ { true }
       UNDERSCORE_ = '_'
       USE_WHATEVER_IS_DEFAULT_ = nil

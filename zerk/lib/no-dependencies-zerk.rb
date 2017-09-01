@@ -834,29 +834,44 @@ module NoDependenciesZerk
         end
       end
 
-      def flush_to_lookup_current_and_parse_remaining_primaries
+      def flush_to_lookup_current_and_parse_remaining_primaries  # #assume1
 
-        # assume grammar has primaries, and one primary is parsed and on deck
-        ok = false
         begin
-          o = lookup_current_primary_symbol_semi_softly
-          o.had_unrecoverable_error_which_was_expressed && break
-          if ! o.was_found
-            __whine_about_primary_not_found
-            break
-          end
-          _injn = @_primaries_injections.fetch( o.injection_offset ).injection
-          parsed_OK = _injn._parse_found_feature_ o  # EXPERIMENT
-          if ! parsed_OK
-            ok = parsed_OK ; break
-          end
+          ok = process_primary_at_head
+          ok || break
+
           if @argument_scanner.no_unparsed_exists
             ok = true
             break
           end
+
           @argument_scanner.scan_primary_symbol ? redo : break
         end while above
         ok
+      end
+
+      def process_primary_at_head  # #assume1
+        lu = __find_primary_which_is_at_head
+        if lu
+          _injn = @_primaries_injections.fetch( lu.injection_offset ).injection
+          _ok = _injn._parse_found_feature_ lu  # EXPERIMENT
+          _ok  # hi. #todo
+        end
+      end
+
+      # :#assume1: grammar has primaries, and one primary is parsed and on deck
+
+      def __find_primary_which_is_at_head
+
+        lu = lookup_current_primary_symbol_semi_softly
+        if lu.had_unrecoverable_error_which_was_expressed
+          UNABLE_
+        elsif lu.was_found
+          lu
+        else
+          __whine_about_primary_not_found
+          UNABLE_
+        end
       end
 
       # some of the below for #nodeps-coverpoint-3

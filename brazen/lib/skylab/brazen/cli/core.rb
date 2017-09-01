@@ -44,6 +44,8 @@ module Skylab::Brazen
         end
 
         yield self
+        @ORIG_OPERATOR_BRANCH = @operator_branch  # THE WORST
+        @_has_stack = false
       end
 
       attr_writer(
@@ -51,7 +53,7 @@ module Skylab::Brazen
         :operator_branch,
       )
 
-      def new a, _i, o, e, pns_a
+      def new a, i, o, e, pns_a
 
         @expression_agent = :__expression_agent_defaultly
 
@@ -59,13 +61,28 @@ module Skylab::Brazen
           yield self  # [bs] (tests)
         end
 
-        @__mutex_stack = nil  # a placeholder as a reminder that currently we aren't doing this right
-        @_has_stack = false
+        # --
+
+        # this is fun and goofy and awful - because of our faustian bargain
+        # that everything is a prototype and not a class, you don't get a
+        # fresh instance for every invocation under your tests YIKES ..
+
+        if @_has_stack
+          @operator_branch = @ORIG_OPERATOR_BRANCH  # THE WORST
+          remove_instance_variable :@omni
+          remove_instance_variable :@stack
+          @_has_stack = false
+        end
+
+        # ==
 
         @ARGV = a
         @program_name_string_array = pns_a
+
         @stderr = e
+        @stdin = i
         @stdout = o
+
         self
       end
 
@@ -84,8 +101,7 @@ module Skylab::Brazen
           yield o
           o.receive_error_channel_by = method :_receive_error_channel
           o.argument_scanner = @args
-          o.stderr = @stderr
-          o.stdout = @stdout
+          o.__stdin_stdout_stderr_ @stdin, @stdout, @stderr
           o.filesystem_by = method :filesystem
         end
       end
@@ -96,7 +112,7 @@ module Skylab::Brazen
 
         @listener = method :__receive_emission
         __init_argument_scanner_via_listener
-        __init_omni_branch
+        _init_omni_branch_for :_hello_1_BR_, @operator_branch
 
         @_exitstatus = 0
         bc = __flush_to_bound_call_of_operator
@@ -113,20 +129,8 @@ module Skylab::Brazen
 
       def __flush_to_bound_call_of_operator
 
-        if @args.no_unparsed_exists
-          Zerk_::ArgumentScanner::When::No_arguments[ @omni ]
-
-        elsif @args.scan_operator_symbol_softly
-
-          lu = @omni.flush_to_lookup_operator
-          lu and __bound_call_via_operator lu
-
-        elsif @args.scan_primary_symbol_softly
-          @omni.flush_to_lookup_current_and_parse_remaining_primaries
-
-        else
-          @args.when_malformed_primary_or_operator
-        end
+        lu = _process_any_primaries_and_lookup_next_operator
+        lu and __bound_call_via_operator lu
       end
 
       def __bound_call_via_operator lu
@@ -135,40 +139,119 @@ module Skylab::Brazen
 
         _ref.bound_call_of_operator_by do |o|
 
-          o.receive_operation_module_by = method :__receive_operation_module
+          o.operator_via_branch_by = -> mag do
+            __operator_via_branch mag  # hi.
+          end
 
           o.remote_invocation_resources_by = -> op do
             p = remove_instance_variable :@__inject_resources
             if p
-              p[ op, self ]
+              irsx = p[ op, self ]
+              # NASTY ##maybe1 - the current top operator is certainly liable
+              # to render its own help screen, and if it does its any custom
+              # expag is what it should get when it renders. yes do #maybel
+              __CHANGE_expression_agent irsx.expression_agent
+              irsx
             else
               self
             end
           end
 
-          o.receive_operation_by = method :__receive_operation
-
-          o.inject_definitions_by = method :__inject_modality_specific_definitions
-
           o.customize_normalization_by = -> n11n do
             n11n.be_fuzzy
           end
+
+          o.receive_operation_module_by = method :__receive_operation_module
+
+          o.receive_operation_by = method :__receive_operation
+
+          o.inject_definitions_by = method :__inject_modality_specific_definitions
         end
       end
 
-      def __resources_when_custom_expag p, op
-        _expag = p[ op ]
+      def __operator_via_branch mag
+
+        # when parsing at a non-root branch node, CLI (unlike API) needs to
+        # inject the help primary and react appropriately if it's invoked.
+        #
+        # do exactly like [#pl-011.4] but try to re-use our root-level
+        # parsing pipeine instead.
+
+        ob = mag.release_operator_branch
+
+        # NOTE see ##maybe1
+        remove_instance_variable :@operator_branch
+        @operator_branch = ob
+
+        _init_omni_branch_for :_hello_2_BR_, ob
+
+        _process_any_primaries_and_lookup_next_operator
+      end
+
+      def _process_any_primaries_and_lookup_next_operator
+
+        # here's the essence of CLI parsing (in our conception) from a
+        # branchy node (root and non-root alike): process the zero-or-more
+        # non-primaries and then one operator.
+        #
+        #   - if you never get to an operator, there's nothing more to do.
+        #
+        #   - any of the zero or more primaries that is processed can have
+        #     arbitrary side-effects, and can effectively end the invocation.
+        #
+        #   - note that any primaries positioned after the any leftmost
+        #     operator will not get parsed here.
+        #
+        # an imaginary example:
+        #
+        #     my-app -v some-guy -quiet -x action -h
+        #            ^^ ^^^^^^^^
+        #            pp oooooooo
+        #
+        #                        ^^^^^^ ^^ ^^^^^^
+        #                        oooooo oo pppppp
+
+        args = @args ; omni = @omni
+        begin
+
+          # if scanner empty, end of the line. done.
+          if args.no_unparsed_exists
+            Zerk_::ArgumentScanner::When::No_arguments[ omni ]
+            break
+          end
+
+          # if head looks like primary, try parse and repeat.
+          if args.scan_primary_symbol_softly
+            _kp = omni.process_primary_at_head
+            _kp ? redo : break
+          end
+
+          # if head looks like operator:
+          if args.scan_operator_symbol_softly
+            op_found = omni.flush_to_lookup_operator
+            # (whether it succeeded or fail, we get off here.)
+            break
+          end
+
+          # head looks like neither primary nor operator. whine and done
+          args.when_malformed_primary_or_operator
+          break
+        end while above
+        op_found
       end
 
       def __receive_operation op
-        remove_instance_variable :@__mutex_stack
-        @_has_stack = true
-        @stack = []
+
+        if ! @_has_stack
+          @stack = []
+          @_has_stack = true
+        end
+
         @stack.push StackFrame___.new(
           op,
           @args.current_operator_symbol,
         )
-        @stack.freeze ; nil
+        NIL
       end
 
       StackFrame___ = ::Struct.new(
@@ -227,7 +310,7 @@ module Skylab::Brazen
         else
           # this normalization runs whether or not the flas was passed.
           # don't stop everything just because the flag was not passed.
-          qkn  # #[bs]:COVERPOINT2.1
+          qkn  # [bs]:COVERPOINT2.1
         end
       end
 
@@ -317,7 +400,7 @@ module Skylab::Brazen
       end
 
       def _same_help o
-        o.expression_agent _expag_instance
+        o.expression_agent _VOLATILE_expag_instance
       end
 
       def __to_item_normal_tuple_stream_when_operation
@@ -336,23 +419,25 @@ module Skylab::Brazen
 
       # --
 
-      def __init_omni_branch
+      def _init_omni_branch_for inj_sym, ob
+
+        # NOTE - might be overwriting existing omni. see ##maybe1
+
         @omni = UI_::ParseArguments_via_FeaturesInjections.define do |fi|
-          __inject_features fi
+
+          fi.argument_scanner = @args
+
+          fi.add_lazy_operators_injection_by do |o|
+            o.operators = ob
+            o.injector = inj_sym
+          end
+
+          fi.add_primaries_injection PRIMARIES___, self
         end
+        NIL
       end
 
-      def __inject_features fi
-
-        fi.argument_scanner = @args
-
-        fi.add_lazy_operators_injection_by do |o|
-          o.operators = @operator_branch
-          o.injector = :_inj_BS_
-        end
-
-        fi.add_primaries_injection PRIMARIES___, self
-      end
+      # (:#maybe1: @operator_branch and @omni are properties of stack frame)
 
       PRIMARIES___ = {
         help: :__express_help,
@@ -371,7 +456,7 @@ module Skylab::Brazen
 
         expr = UI_::CLI_Express_via_Emission.define do |o|
           o.emission_proc_and_channel em_p, chan
-          o.expression_agent_by = -> { _expag_instance }
+          o.expression_agent_by = -> { _VOLATILE_expag_instance }
           o.stderr = @stderr
         end
 
@@ -418,7 +503,12 @@ module Skylab::Brazen
         @args
       end
 
-      def _expag_instance
+      def __CHANGE_expression_agent expag
+        @expression_agent = :_expression_agent_via_instance
+        @_expression_agent = expag ; nil
+      end
+
+      def _VOLATILE_expag_instance
         send @expression_agent
       end
 
@@ -428,13 +518,13 @@ module Skylab::Brazen
 
       def __expression_agent_via_proc_initially
         _p = remove_instance_variable :@__expression_agent_proc
-        @__expression_agent = _p[ self ]
-        @expression_agent = :__expression_agent_via_instance
+        @_expression_agent = _p[ self ]
+        @expression_agent = :_expression_agent_via_instance
         send @expression_agent
       end
 
-      def __expression_agent_via_instance
-        @__expression_agent
+      def _expression_agent_via_instance
+        @_expression_agent
       end
 
       def __expression_agent_defaultly
@@ -2464,11 +2554,13 @@ module Skylab::Brazen
         @__filesystem_proc = p
       end
 
+      def __stdin_stdout_stderr_ i, o, e
+        @stdin = i ; @stdout = o ; @stderr = e ; nil
+      end
+
       attr_writer(
         :argument_scanner,
         :filesystem,
-        :stderr,
-        :stdout,
         :receive_error_channel_by,
       )
 
@@ -2514,6 +2606,7 @@ module Skylab::Brazen
         :argument_scanner,
         :listener,
         :stderr,
+        :stdin,
         :stdout,
       )
     end

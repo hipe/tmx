@@ -288,7 +288,7 @@ module Skylab::Zerk::TestSupport
         @_test_context = tc
       end
 
-      def to_index_of_common_branch_usage_line  # 1x [tmx]
+      def to_index_of_common_branch_usage_line  # [tmx] [bs]
         Magnetics__[]::CommonBranchUsageLineIndex_via_Line[ _first_line ]
       end
 
