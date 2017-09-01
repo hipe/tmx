@@ -133,7 +133,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def subject_API
-      Home_::API::API2  # #open [#023]
+      Home_::API
     end
   end
 
@@ -158,6 +158,7 @@ module Skylab::BeautySalon::TestSupport
     define_method :all_toplevel_actions_normal_symbols_, ( Lazy_.call do
       [
         :ping,
+        :crazy_town,
         :deliterate,
         :text,
       ].freeze

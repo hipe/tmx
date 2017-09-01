@@ -5,7 +5,7 @@ module Skylab::BeautySalon::TestSupport
   describe '[bs] crazy town reports - main', ct: true do
 
     TS_[ self ]
-    use :memoizer_methods
+    use :my_API
 
     context 'wee' do
 
@@ -59,7 +59,7 @@ module Skylab::BeautySalon::TestSupport
 
           paths = []
           paths << ::File.join( TS_.dir_path, 'fixture-files/tree-005-minimal' )
-          _st = __INCREDIBLE_HACK paths
+          _st = __expanded_stream_via_paths paths
             # (by way of everything else, cover directories here)
 
           _this_path = ::File.join TS_.dir_path, 'fixture-functions', 'la-la-015.rb'
@@ -91,15 +91,21 @@ module Skylab::BeautySalon::TestSupport
     end
     end.call
 
-    def __INCREDIBLE_HACK paths
-      # (we would like to cover this map-expand without going thru the CLI)
-      o = Home_::Models_::CrazyTown.allocate
-      o.instance_variable_set :@_filesystem, ::File
-      o.instance_variable_set :@listener, -> * chan, & em_p do
+    def __expanded_stream_via_paths paths
+
+      # this is a bit of a crutch/band-aid over the fact that probably
+      # the thing that resolve the file paths upstream is written into
+      # the action when it should probably be its own magnet.
+      # mainly we wan to cover the map-expand logic there.
+
+      _ir = X_ctr_InvocationResourcesStub.new do |*chan, &em_p|
         if :find_command_args != chan.last
           _DIE_ON_THING em_p, chan
         end
       end
+
+      o = Home_::Models_::CrazyTown.new { _ir }
+
       _ok = o.__resolve_file_path_upstream_via_files paths
       _ok ? o.remove_instance_variable( :@_file_path_upstream ) : false
     end
@@ -118,6 +124,25 @@ module Skylab::BeautySalon::TestSupport
     def _subject_magnetic
       Home_::CrazyTownMagnetics_::Result_via_ReportName_and_Arguments
     end
+
+    # ==
+
+    class X_ctr_InvocationResourcesStub
+
+      def initialize & p
+        @argument_scanner = X_ctr_ListenerHaver.new p
+      end
+
+      def filesystem  # ..
+        ::File
+      end
+
+      attr_reader(
+        :argument_scanner,
+      )
+    end
+
+    X_ctr_ListenerHaver = ::Struct.new :listener
 
     # ==
     # ==

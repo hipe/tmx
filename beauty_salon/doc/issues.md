@@ -23,7 +23,8 @@
 [#025]       crazy town ..
              ( #was: #moved-to: [sa] )
 
-[#024] #hole
+[#024] #open #SMALL fix sytax highlighting YUCK so you can use `~>` HEREDOC,
+             which in turn will make "line stream via big string" less chunky
              ( #was: #moved-to: [sa] )
 
 [#023] #open ween off of [br]  (this is for tracking related todo's)

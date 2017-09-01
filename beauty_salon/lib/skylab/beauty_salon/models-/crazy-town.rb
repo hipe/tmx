@@ -1,31 +1,33 @@
 module Skylab::BeautySalon
 
-  # NOTE - this file is just GLUE for the legacy [br] app code to
-  # our modern techniques..
+  class Models_::CrazyTown
 
-  Require_brazen_LEGACY_[]
-
-  class Models_::CrazyTown < Brazen_::Action
+    def self.describe_into_under y, expag
+      Describe_into_under___[ y, expag ]
+    end
 
     # -
+      def definition ; [
 
-      Brazen_::Modelesque.entity self
+        :description, -> y do
+          self._COVER_ME__la_la_easy__
+        end,
 
-      edit_entity_class(
-
+        :required,
+        :property, :code_selector,
         :description, -> y do
           y << "«description coming soon»"
         end,
-        :required, :property, :code_selector,
 
-
+        :required,
+        :property,
+        :replacement_function,
         :description, -> y do
           y << "«description coming soon»"
         end,
-        :required, :property, :replacement_function,
 
 
-        :parameter_arity, :zero_or_one,
+        :property, :report,
         :description, -> y do
           y << "this is a DEBUGGING feature: debug various specific aspects"
           y << "of the behavior by running one of several \"reports\"."
@@ -35,16 +37,16 @@ module Skylab::BeautySalon
           y << "some reports they won't be processed."
           y << "(note that if we cared, we would break this out into more endpoints.)"
         end,
-        :property, :report,
 
 
-        :parameter_arity, :zero_or_more,
+        :glob,
+        :property, :file,
         :description, -> y do
           y << "a code file to make a diff against"
         end,
-        :property, :file,
 
 
+        :property, :files_file,
         :description, -> y do
           _big_string = <<-O
             instead of using `<file> [<file> [..]]` off the command line,
@@ -64,11 +66,9 @@ module Skylab::BeautySalon
           O
           Stream_big_string_into_[ y, _big_string ]
         end,
-        :property, :files_file,
 
 
-        :argument_arity, :one,
-        :parameter_arity, :zero_or_one,
+        :property, :corpus_step,
         # :argument_moniker, 'CORPUS_HEAD',
         :description, -> y do
           y << 'STEP (bad name #todo) (for example "foo-nani") implies "foo-nani.d"'
@@ -83,10 +83,9 @@ module Skylab::BeautySalon
           y << 'from this point when you invoke traversal with this option'
           y << 'subsequently.'
         end,
-        :property, :corpus_step,
+      ] end
 
-
-        :branch_description, -> y do
+      Describe_into_under___ = -> y, _expag do
 
           _big_string =  <<-O
             this is a ROUGH prototype for a long deferred dream.
@@ -107,12 +106,16 @@ module Skylab::BeautySalon
           O
 
           Stream_big_string_into_[ y, _big_string ]
-          NIL
-        end,
-      )
+      end
 
-      def produce_result
+      def initialize
+        o = yield
+        @_argument_scanner_ = o.argument_scanner
+        @_filesystem = o.filesystem
+        # @_associations_ = {}  we don't need this yet
+      end
 
+      def execute
         if __resolve_arguments
           __money_town
         end
@@ -134,7 +137,7 @@ module Skylab::BeautySalon
 
           o.filesystem = @_filesystem
 
-          o.listener = @listener
+          o.listener = _listener_
         end
 
         _hi
@@ -142,22 +145,13 @@ module Skylab::BeautySalon
 
       def __resolve_arguments
 
-        # NOTE - we anticipate switching over to modern techniques soon
-        # but for now BE CAREFUL - WE COULD CLOBBER IVARS
+        # (as a pointless added sanity check for now, assert assumptions redundantly)
 
-        h = remove_instance_variable( :@argument_box ).h_
+        @code_selector || fail
 
-        @code_selector = h.fetch :code_selector
+        @replacement_function || fail
 
-        @replacement_function = h.fetch :replacement_function
-
-        @report = h[ :report ]
-
-        @_filesystem = ::File
-
-        @listener = remove_instance_variable :@on_event_selectively  # modern way now
-
-        __resolve_file_path_upstream h[ :corpus_step ], h[ :files_file ], h[ :file ]  # duplicated :#here1
+        __resolve_file_path_upstream @corpus_step, @files_file, @file  # duplicated :#here1
       end
 
       def __resolve_file_path_upstream batch_mode, files_file, files
@@ -208,7 +202,7 @@ module Skylab::BeautySalon
 
       def _error
         me = self
-        @listener.call :error, :expression do |y|
+        _listener_.call :error, :expression do |y|
           yield y, me
         end
         UNABLE_
@@ -239,7 +233,7 @@ module Skylab::BeautySalon
 
           o.head_string = head_s
           o.filesystem = @_filesystem
-          o.listener = @listener
+          o.listener = _listener_
         end
 
         sct and __receive_these sct
@@ -301,7 +295,7 @@ module Skylab::BeautySalon
             :path, _use_dir,
             :filename, _PATTERN,
             :freeform_query_infix_words, _TYPE_FILE,
-            & @listener
+            & _listener_
           ).to_path_stream
           p = -> do
             path = use_st.gets
@@ -333,13 +327,19 @@ module Skylab::BeautySalon
         end
         ACHIEVED_
       end
+
+      include CommonActionMethods_
+
+      def _listener_
+        @_argument_scanner_.listener
+      end
     # -
 
     # ==
 
     Stream_big_string_into_ = -> y, big_string do
       # assume at least one line. because OCD, stream each line line by line
-      #
+      # #open [#024] this will get simpler
       scn = Basic_[]::String::LineStream_via_String[ big_string ]
       line = scn.gets
       rx = /\A#{ ::Regexp.escape %r(\A[ ]+).match( line )[ 0 ] }/
@@ -350,6 +350,10 @@ module Skylab::BeautySalon
       end while line
       y
     end
+
+    # ==
+
+    Actions = nil
 
     # ==
     # ==

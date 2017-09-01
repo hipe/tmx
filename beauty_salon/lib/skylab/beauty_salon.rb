@@ -49,22 +49,6 @@ module Skylab::BeautySalon
 
     class << self
 
-      def call * x_a, & oes_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-
-      def call_via_mutable_box__ * i_a, bx, & x_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-    end  # >>
-  end
-
-  module API::API2  # #open [#023]
-
-    class << self
-
       def call * a, & p
         invocation_via_argument_array( a, & p ).execute
       end
@@ -108,12 +92,21 @@ module Skylab::BeautySalon
 
       same = 'actions'
 
-      o.add_actions_module_path_tail ::File.join 'ping', same
+      _ = -> slug do
+        o.add_actions_module_path_tail ::File.join( slug, same )
+      end
 
-      o.add_actions_module_path_tail ::File.join 'deliterate', same
-        # (doesn't have an actual actions directory - all are stowaway)
+      _[ 'ping' ]
+        # (no actual actions directory or file so we need to declare it.)
 
-      o.add_actions_module_path_tail ::File.join 'text', same
+      _[ 'crazy-town' ]
+        # (same as ping)
+
+      _[ 'deliterate' ]
+        # (same as ping)
+
+      _[ 'text' ]
+        # (this one has a classical structure, but none of the others do)
 
       o.models_branch_module = Home_::Models_
 
@@ -152,12 +145,14 @@ module Skylab::BeautySalon
   class InvocationResources_
     def initialize as
       @argument_scanner = as
+      @filesystem = ::File  # maybe one day etc
     end
     def listener
       @argument_scanner.listener
     end
     attr_reader(
       :argument_scanner,
+      :filesystem,
     )
   end
 
