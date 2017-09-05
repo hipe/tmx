@@ -115,7 +115,7 @@ module Skylab::BeautySalon::TestSupport
       end )
 
       def subject_CLI
-        Home_::CLI2
+        Home_::CLI
       end
     # -
 

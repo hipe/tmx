@@ -77,5 +77,3 @@ fields/events/ambiguous todo
 clean up that crazy hack in an isolated commit
 in [br] cli that #maybe1 would be nice
 simplify argument scanning - match a grammar symbol without advancing scanner
-migrate [bs] to [ze]  (see [#now] in [bs])
-ct ping under CLI2

@@ -1,3 +1,5 @@
+[#043] #open track mounting executables (lost when wean off [br])
+
 [#042]       #crazy-town "musing" (currently empty, with history)
 
 [#041]       #crazy-town thing.dot
@@ -27,7 +29,8 @@
              which in turn will make "line stream via big string" less chunky
              ( #was: #moved-to: [sa] )
 
-[#023] #open ween off of [br]  (this is for tracking related todo's)
+[#023] #open remaining CLI/API (UI) issues with #crazy-town
+             ( #was: ween off of [br]  (this is for tracking related todo's) )
              ( #was: #moved-to: [sa] )
 
 [#022] #open #crazy-town get structural, imperative-based declarations in

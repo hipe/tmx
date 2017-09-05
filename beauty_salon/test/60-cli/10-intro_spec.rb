@@ -9,12 +9,7 @@ module Skylab::BeautySalon::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :modality_agnostic_interface_things
-    use :CLI
-
-    context '(temporary context for #open [#023])' do
-    # ~ begin temporary block
-
-    use :non_interactive_CLI  # (move this up at #open [#023])
+    use :non_interactive_CLI
     use :my_CLI
 
     context '0) no args at all' do
@@ -270,35 +265,7 @@ module Skylab::BeautySalon::TestSupport
       exitstatus.zero? || fail
     end
 
-    # -- setup
-
-    end  # ~ end temporary block
-
-    # #open [#023] away the below (old-style tests)
-
-    it "ping" do
-
-      invoke 'ping-orig'
-      expect :e, "hello from beauty salon."
-      expect_no_more_lines
-      @exitstatus.should eql :hello_from_beauty_salon
-    end
-
-    it "help screen" do
-
-      invoke '-h'
-
-      _guy = flush_invocation_to_help_screen_tree
-
-      sect = _guy.children[ 1 ]
-
-      _rx = Zerk_lib_[]::CLI::Styling::SIMPLE_STYLE_RX
-      s = sect.x.string.gsub _rx, EMPTY_S_
-      s or fail
-
-      4 <= sect.children.length or fail
-
-    end
   end
 end
+# #history-A.2: finish weaning off matryoshka CLI
 # #history-A.1: begin injecting code for [ze]-era CLI

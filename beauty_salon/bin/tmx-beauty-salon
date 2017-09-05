@@ -2,9 +2,7 @@
 
 require 'skylab/beauty_salon'
 
-# (below while #open [#023])
-
-_cli = Skylab::BeautySalon::CLI2.new(
+_cli = Skylab::BeautySalon::CLI.new(
   ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 ) do |o|
   o.filesystem = ::File

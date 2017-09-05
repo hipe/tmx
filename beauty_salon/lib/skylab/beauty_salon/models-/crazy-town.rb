@@ -93,6 +93,7 @@ module Skylab::BeautySalon
 
             #todo something is broken in [br] so the remainder of this help
             screen never appears anywhere. erase this line when this is fixed.
+            #open [#023] the above - close it and cover help screen when this is covered
 
             (can be relative to PWD) to a ruby code file.
             (yes eventually we would want to perhaps take each filename
@@ -112,7 +113,7 @@ module Skylab::BeautySalon
         o = yield
         @_argument_scanner_ = o.argument_scanner
         @_filesystem = o.filesystem
-        # @_associations_ = {}  we don't need this yet
+        @_associations_ = {}  # we need this only for help
       end
 
       def execute
@@ -353,6 +354,7 @@ module Skylab::BeautySalon
 
     # ==
 
+    Modalities = nil
     Actions = nil
 
     # ==

@@ -249,9 +249,16 @@ module Skylab::BeautySalon::TestSupport
 
       cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
 
-      cli.invoke 'beauty-salon', 'ping-orig'
+      cli.invoke 'beauty-salon', 'ping'
 
-      cli.expect_on_stderr "hello from beauty salon.\n"
+      cli.on_stream :serr
+
+      cli.expect_line_by do |line|
+        _unstyled = cli.unstyle_styled line
+        _unstyled == "[bs] says hello" || fail
+      end
+
+      cli.expect_on_stdout 'hello_from_beauty_salon'
 
       cli.expect_succeed_under self
     end

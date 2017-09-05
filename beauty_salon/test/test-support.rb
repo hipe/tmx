@@ -51,10 +51,6 @@ module Skylab::BeautySalon::TestSupport
       TestSupport_.debug_IO
     end
 
-    def subject_CLI
-      Home_::CLI
-    end
-
     define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
 
       a = %w( zippo ).freeze
@@ -175,10 +171,6 @@ module Skylab::BeautySalon::TestSupport
 
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
-  end
-
-  CLI = -> tcc do
-    Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 
   Non_Interactive_CLI = -> tcc do

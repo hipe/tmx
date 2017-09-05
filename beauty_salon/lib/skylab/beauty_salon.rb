@@ -24,7 +24,7 @@ module Skylab::BeautySalon
     end
   end  # >>
 
-  lazily :CLI2 do
+  lazily :CLI do
 
     Home_.lib_.brazen  # (touch early, make the rest more readable.)
 
@@ -36,13 +36,8 @@ module Skylab::BeautySalon
     end
   end
 
-  lazily :CLI do
-    class CLI < Home_.lib_.brazen::CLI
-
+  if false  # #open [#043]
       expose_executables_with_prefix 'tmx-beauty-salon-'
-
-      self
-    end
   end
 
   module API

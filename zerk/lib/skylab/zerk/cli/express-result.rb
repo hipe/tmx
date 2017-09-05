@@ -111,7 +111,7 @@ module Skylab::Zerk
             shape = :stringish
 
           elsif x.respond_to? :id2name
-            shape = :stringish
+            shape = :symbol
 
           elsif x.respond_to? :infinite?
             shape = :floatish
@@ -173,6 +173,10 @@ module Skylab::Zerk
 
       def expressive
         @x.express_into_under @__y, @CLI.expression_agent ; nil
+      end
+
+      def symbol
+        _puts @x.id2name ; nil
       end
 
       def stringish

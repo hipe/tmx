@@ -110,34 +110,53 @@ module Skylab::Brazen
 
       def execute  # result in exitstatus
 
-        @listener = method :__receive_emission
-        __init_argument_scanner_via_listener
-        _init_omni_branch_for :_hello_1_BR_, @operator_branch
-
-        @_exitstatus = 0
-        bc = __flush_to_bound_call_of_operator
+        bc = to_bound_call
         if bc
-          x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-          if ! x.nil?
-            Zerk_::CLI::ExpressResult[ x, self ]
-          end
+          _x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+          _x.nil? || self._README__readme__  # see #here3
         elsif ! bc.nil?
           _maybe_increase_errorlevel GENERIC_ERROR_EXITSTATUS
         end
         @_exitstatus
       end
 
-      def __flush_to_bound_call_of_operator
+      def to_bound_call
 
-        lu = _process_any_primaries_and_lookup_next_operator
-        lu and __bound_call_via_operator lu
+        #  - for compatibility with "a tmx"
+        #  - despite name, *not* re-entrant
+
+        @_exitstatus = 0
+        @listener = method :__receive_emission
+        __init_argument_scanner_via_listener
+        _init_omni_branch_for :_hello_1_BR_, @operator_branch
+        ok = __resolve_operator
+        ok &&= __resolve_non_wrapped_bound_call_via_operator
+        ok && __wrapped_bound_call_via_non_wrapped_bound_call
       end
 
-      def __bound_call_via_operator lu
+      # -- little helpers for above
 
-        _ref = lu.mixed_business_value
+      def __wrapped_bound_call_via_non_wrapped_bound_call
 
-        _ref.bound_call_of_operator_by do |o|
+        # :#here2: reasonably the "a [tmx]" that mounts this client should
+        # not have knowledge of how to express its result value. this adds
+        # a frame to the real call stack, but meh.
+
+        bc = remove_instance_variable :@__non_wrapped_bound_call
+        Common_::BoundCall.by do
+          x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+          if ! x.nil?
+            Zerk_::CLI::ExpressResult[ x, self ]
+          end
+          NIL  # <- important
+        end
+      end
+
+      def __resolve_non_wrapped_bound_call_via_operator
+
+        _ref = remove_instance_variable :@__operator
+
+        _ = _ref.bound_call_of_operator_by do |o|
 
           o.operator_via_branch_by = -> mag do
             __operator_via_branch mag  # hi.
@@ -167,6 +186,13 @@ module Skylab::Brazen
 
           o.inject_definitions_by = method :__inject_modality_specific_definitions
         end
+
+        _store :@__non_wrapped_bound_call, _
+      end
+
+      def __resolve_operator
+        lu = _process_any_primaries_and_lookup_next_operator
+        _store :@__operator, ( lu && lu.mixed_business_value )
       end
 
       def __operator_via_branch mag
@@ -485,6 +511,8 @@ module Skylab::Brazen
         end
         buffer
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # -- for [ze]
 
