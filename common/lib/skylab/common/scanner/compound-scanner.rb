@@ -24,6 +24,10 @@ module Skylab::Common
         @_scanner_proc_array.push -> { st } ; nil
       end
 
+      def add_scanner_by & p  # #covered-by [bs] (thru [pl])
+        @_scanner_proc_array.push p
+      end
+
       def __finish
         CustomScanner___.new(
           remove_instance_variable( :@_scanner_proc_array ),

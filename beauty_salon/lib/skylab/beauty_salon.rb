@@ -50,7 +50,7 @@ module Skylab::BeautySalon
 
       def invocation_via_argument_array a, & p
         Require_user_interface_libs_[]
-        _as = MTk_::API_ArgumentScanner.new a, & p
+        _as = MTk_::API_ArgumentScanner.narrator_for a, & p
         MicroserviceInvocation___.new InvocationResources_.new _as
       end
     end  # >>
@@ -66,7 +66,7 @@ module Skylab::BeautySalon
       _ob = Operator_branch_[]
       oper = MTk_::ParseOperator_via[ self, _ob ]
       if oper
-        _model_ref = oper.mixed_business_value
+        _model_ref = oper.trueish_feature_value
         bc = _model_ref.bound_call_of_operator_via_invocation_resouces @invocation_resources
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
@@ -127,21 +127,21 @@ module Skylab::BeautySalon
     end
 
     attr_reader(
-      :_argument_scanner_,
+      :_argument_scanner_narrator_,
       :_listener_,
     )
   end
 
   class InvocationResources_
-    def initialize as
-      @argument_scanner = as
+    def initialize nar
+      @argument_scanner_narrator = nar
       @filesystem = ::File  # maybe one day etc
     end
     def listener
-      @argument_scanner.listener
+      @argument_scanner_narrator.listener
     end
     attr_reader(
-      :argument_scanner,
+      :argument_scanner_narrator,
       :filesystem,
     )
   end

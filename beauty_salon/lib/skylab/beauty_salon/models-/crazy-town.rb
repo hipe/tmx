@@ -28,8 +28,8 @@ module Skylab::BeautySalon
           end
         end
 
-        o.loadable_reference_stream_by do
-          ob.to_loadable_reference_stream.map_by do |ref|
+        o.SYMBOLISH_REFERENCE_SCANNER_BY do  # [pl]
+          ob.to_symbolish_reference_scanner.map_by do |ref|
             Report__.new ref
           end
         end
@@ -171,8 +171,8 @@ module Skylab::BeautySalon
         ]
       end
 
-      def _argument_scanner_
-        @_user_resources.argument_scanner
+      def _argument_scanner_narrator_
+        @_user_resources.argument_scanner_narrator
       end
 
       def _listener_

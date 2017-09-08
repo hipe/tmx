@@ -56,7 +56,7 @@ module Skylab::TanMan
 
         rsx = _invocation_resources_
 
-        ok = as_attributes_actor_parse_and_normalize rsx.argument_scanner do |o|
+        ok = as_attributes_actor_parse_and_normalize rsx.argument_scanner_narrator do |o|
           o.listener = rsx.listener
         end
 

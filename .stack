@@ -72,7 +72,6 @@ think about how your tupling can be recursive and lazy (still immutable)
 understand Parser nodes - how can we unparse?
 answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`)
 location map - this is the key
-fields/events/ambiguous todo
 clean up that crazy hack in an isolated commit
 simplify argument scanning - match a grammar symbol without advancing scanner
 NoDependenciesZerk::OperatorFound__ - rename `loadable_reference` to just `plain_reference`

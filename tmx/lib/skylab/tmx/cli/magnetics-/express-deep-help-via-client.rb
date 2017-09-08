@@ -10,7 +10,7 @@ module Skylab::TMX
           @CLI = cli
           @filesystem = ::Dir
           @line_downstream = cli.stderr
-          @omni = cli.omni
+          @_omni = cli.current_argument_parsing_idioms
         end
 
         def execute
@@ -146,38 +146,38 @@ module Skylab::TMX
 
         def __to_sidesystems_of_interest_scanner
 
-          scn = @omni.to_operator_loadable_reference_scanner
-          scn.advance_one while ::Symbol === scn.head_as_is  # horrible
-
-          # because tmx mounts its own one-offs to look like operators
-          # (and we assume a particular order where one-offs are last),
-          # we stop at the first one-off we see. :/
-
-          stay = {
-            zerk_one_off_category_symbol: false,
-            zerk_sidesystem_loadable_reference_category_symbol: true
-          }
+          scn = @_omni.features.TO_FLATTENED_QUALIFIED_FEATURE_SCANNER do |o|
+            o.strict_injector_symbol_pass_filter = {
+              tmx_primaries: false,
+              tmx_intrinsic: false,
+              tmx_mountable_sidesystem: true,
+              tmx_mountable_one_off: false,
+              # zerk_one_off_category_symbol: false,
+             #  zerk_sidesystem_loadable_reference_category_symbol: true
+            }
+          end
 
           p = -> do
             # hand-written map-reduce for clarity
             until scn.no_unparsed_exists
-              lt = scn.gets_one
-              stay.fetch( lt.category_symbol ) || break
-              sub_scn = lt.to_one_off_scanner_via_filesystem @filesystem
+
+              qfeat = scn.gets_one
+              _sidesys = qfeat.value
+              sub_scn = _sidesys.to_one_off_scanner_via_filesystem @filesystem
+
               if sub_scn.no_unparsed_exists
                 # if no one-offs under the operator
                 next
               end
-              x = Sidesystem___.new sub_scn, lt
+              x = Sidesystem___.new sub_scn, qfeat
               break
             end
             x
           end
 
-          _st = Common_.stream do
+          ::NoDependenciesZerk::Scanner_by.new do
             p[]
           end
-          _st.flush_to_scanner
         end
       # -
 
@@ -185,18 +185,18 @@ module Skylab::TMX
 
       class Sidesystem___
 
-        def initialize sub_scn, lt
-          @loadable_reference = lt
+        def initialize sub_scn, qfeat
+          @qualified_feature = qfeat
           @sub_scanner = sub_scn
         end
 
         def slug
-          @loadable_reference.slug
+          @qualified_feature.value.slug
         end
 
         attr_reader(
-          :loadable_reference,
-          :sub_scanner
+          :qualified_feature,
+          :sub_scanner,
         )
       end
 

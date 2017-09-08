@@ -7,6 +7,8 @@
     # (e.g class) is opened, or when the same module's scope again closes
     # (with an `end` keyword).
     #
+    # (#open [#007.G] EDIT the above calculus has changed now with [bs])
+    #
     # (this facility is usable to us because it tells us line numbers
     # (otherwise we'd have to go much darker); however we can't get
     # notified of the blocks used when defining procs yet. we might hack
@@ -49,6 +51,9 @@
     #
     # EDIT: the lightweight "framework" we made for the above ended
     # up becoming [#ze-060] the "no dependencies zerk" file
+
+    # local abbreviations:
+    #   `ff` - feature found
 
     # -
 
@@ -103,24 +108,31 @@
 
         listener = method :__receive_emission
 
-        scn = Interface__::CLI_ArgumentScanner.define do |o|  # resource will move
-          o.default_primary_symbol = :path
-          o.initial_ARGV_offset = 1
-          o.ARGV = argv
-          o.listener = listener
-        end
+        nar = Interface__::CLI_ArgumentScanner.narrator_for argv, & listener
+
+        nar.token_scanner.advance_one  # (as confirmed above (ish), we already
+        # parsed thef first token of the ARGV (our own name), so skip it.
 
         # frontier an experimental pattern - aggregate
         # primary sets of different stakeholders here
 
-        op = Operation__.new scn, @stderr
-        @_scn = scn
+        op = Operation__.new nar, @stderr
+        @argument_scanner_narrator = nar
+
         @_operation = op
-        _o = Interface__::ParseArguments_via_FeaturesInjections.define do |o|
-          o.argument_scanner = scn
-          o.add_primaries_injection Operation__::PRIMARIES, op
-          o.add_primaries_injection CLI_PRIMARIES___, self
+
+        _o = Interface__::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
+
+          o.add_primaries_injection Operation__::PRIMARIES, :__inj1_cm
+          o.add_injector op, :__inj1_cm
+
+          o.add_primaries_injection CLI_PRIMARIES___, :__inj2_cm
+          o.add_injector self, :__inj2_cm
+
+          o.default_primary_symbol = :path
+          o.argument_scanner_narrator = nar
         end
+
         _ok = _o.flush_to_parse_primaries
         _ok  # #todo
       end
@@ -136,7 +148,7 @@
 
       # -- process primaries
 
-      def __when_help
+      def __when_help _ff
 
         Code_metrics_[]
 
@@ -159,8 +171,12 @@
         EARLY_END_  # always stop
       end
 
-      def _parse_positive_nonzero_integer
-        _store @_scn.current_primary_as_ivar, @_scn.parse_positive_nonzero_integer
+      def _parse_positive_nonzero_integer ff
+
+        vm = @argument_scanner_narrator.procure_positive_nonzero_integer_after_feature_match ff.feature_match
+        if vm
+          _my_store vm
+        end
       end
 
       def __receive_emission * chan, & msg_p
@@ -184,6 +200,12 @@
 
       def _expression_agent
         Interface__::CLI_InterfaceExpressionAgent.instance
+      end
+
+      def _my_store vm
+        @argument_scanner_narrator.advance_past_match vm
+        instance_variable_set vm.feature_match.TO_IVAR, vm.mixed
+        ACHIEVED_
       end
 
       DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
@@ -263,7 +285,7 @@
         @_debug_IO = debug_IO
         @_is_mock_run = false
         @_listener = scn.listener
-        @_scn = scn
+        @argument_scanner_narrator = scn
 
         @_system_services = :__system_services_initially
         @_system_services_is_built = false
@@ -381,19 +403,20 @@
 
       # -- processing primaries
 
-      def __when_ping
+      def __when_ping _ff
         @_listener.call :info, :expression, :ping do |y|
           y << "hello from mondrian"
         end
         EARLY_END_
       end
 
-      def __when_verbose
+      def __when_verbose ff
         if @_system_services_is_built
-          __whine_about_verbose
+          __whine_about_verbose ff
         else
+          @argument_scanner_narrator.advance_past_match ff.feature_match
           if @be_verbose
-            __info_about_verb_levels
+            _info_about_verb_levels
           else
             @be_verbose = true
           end
@@ -401,10 +424,13 @@
         end
       end
 
-      def __whine_about_verbose
-        @_scn.no_because do |y|
-          y << "for now, can't turn on {{ prim }} after paths are processed."
+      def __whine_about_verbose ff
+        @argument_scanner_narrator.no_because_by do |o|
+          o.message_proc = -> y do
+            y << "for now, can't turn on {{ feature }} after paths are processed."
           y << "try putting the flag earlier in the request."
+          end
+          o.feature_match = ff.feature_match
         end
       end
 
@@ -414,14 +440,19 @@
         end
       end
 
-      def _parse_path_list_item
-        @_scn.map_value_by do |s|
+      def _parse_path_list_item ff
+
+        vm = @argument_scanner_narrator.procure_trueish_match_after_feature_match ff.feature_match
+        if vm
+          s = vm.mixed
           if MOCK_PATH_ONE___ == s
             @_is_mock_run = true
-            _accept_list_item :_mock_path_1_
+            _accept_list_item :_mock_path_1_, vm
           else
-          path = send( @_system_services ).normalize_user_path s
-          path and _accept_list_item path
+            path = send( @_system_services ).normalize_user_path s
+            if path
+              _accept_list_item path, vm
+            end
           end
         end
       end
@@ -442,51 +473,59 @@
 
       # ~ candidates to push up to [ze] somehow
 
-      def __parse_list_item
+      def __parse_list_item ff
 
         #  - curate that the argument scanner is non-empty
         #  - if not initialized, create a mutable array in the ivar
         #  - acccept the head argument into the array (even if the
         #    head argument is a blank string (e.g the empty string)).
 
-        @_scn.map_value_by do |s|
-          _accept_list_item s
+        vm = _procure_any_match ff
+        if vm
+          _accept_list_item vm.mixed, vm
         end
       end
 
-      def __parse_item
+      def __parse_item ff
 
         #  - curate that the argument scanner is non-empty
         #  - curate there is not already a non-nil value in the ivar "slot"
         #  - acccept the head argument into the slot (even if the
         #    head argument is a blank string (e.g the empty string)).
 
-        @_scn.map_value_by do |s|
-          ivar = @_scn.current_primary_as_ivar
+        vm = _procure_any_match ff
+        if vm
+          ivar = vm.feature_match.TO_IVAR
           if instance_variable_defined? ivar
             x = instance_variable_get ivar
           end
           if x.nil?
-            @_scn.advance_one
-            instance_variable_set ivar, s
+            @argument_scanner_narrator.advance_past_match vm
+            instance_variable_set ivar, vm.mixed
             ACHIEVED_
           else
-            __when_value_is_already_set x
+            __when_value_is_already_set vm
           end
         end
       end
 
-      def __when_value_is_already_set x
-        sym = @_scn.current_primary_symbol
-        @_scn.no_because do |y|
-          y << "ambiguous: #{ prim sym } specified multiple times #{
-            }but takes only one value"
+      def __when_value_is_already_set vm
+
+        @argument_scanner_narrator.no_because_by do |o|
+
+          o.message_proc = -> do
+            "ambiguous: {{ feature }} specified multiple times but only #{
+              }takes one value"
+          end
+
+          o.value_match = vm  # (could be etc instead)
         end
       end
 
-      def _accept_list_item x
-        @_scn.advance_one
-        ivar = :"#{ @_scn.current_primary_as_ivar }s"
+      def _accept_list_item x, vm  # track #[#ze-023.3] native..
+        # implementations of list/globs. note that we pluralize the name here
+        @argument_scanner_narrator.advance_past_match vm
+        ivar = :"#{ vm.feature_match.TO_IVAR }s"
         if instance_variable_defined? ivar
           a = instance_variable_get ivar
         end
@@ -497,9 +536,14 @@
         ACHIEVED_
       end
 
-      def __when_list_etc
+      def __when_list_etc ff
+        @argument_scanner_narrator.advance_past_match ff.feature_match
         @do_list_etc = true
         ACHIEVED_
+      end
+
+      def _procure_any_match ff
+        @argument_scanner_narrator.procure_any_match_after_feature_match ff.feature_match
       end
 
       attr_reader(

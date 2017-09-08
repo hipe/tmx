@@ -21,22 +21,21 @@ module Skylab::Plugin::TestSupport
       end
 
       it "to LT stream - loadable references know their name based on filename alone" do
-        _hi = _ob
-        st = _hi.to_loadable_reference_stream
-        lt = st.gets
+
+        lt = _this_one_scanner_expect_one_item
         lt.name_symbol == :zib_flib || fail
       end
 
       it "make that call" do
 
         _rsx = _build_resources :inigo_montoya, :wahoo
-        lt = _ob.to_loadable_reference_stream.gets
+        lt = _this_one_scanner_expect_one_item
         bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
         _wat = bc.receiver.send bc.method_name, * bc.args, & bc.block
         _wat == [ :woohoo, :wahoo ] || fail
       end
 
-      it "when failure strikes" do  # #lends-coverage to [#ze-008.4]
+      it "when failure strikes" do  # (used to lend coverage to [ze]. might still.)
 
         chan = nil ; msg_p = nil
 
@@ -44,7 +43,7 @@ module Skylab::Plugin::TestSupport
           chan = a ; msg_p = p
         end
 
-        lt = _ob.to_loadable_reference_stream.gets
+        lt = _this_one_scanner_expect_one_item
 
         _bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
 
@@ -57,6 +56,19 @@ module Skylab::Plugin::TestSupport
         #_expag = Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
 
         #_wee = _expag.calculate [], & msg_p
+      end
+
+      def _this_one_scanner_expect_one_item
+        scn = __this_one_scanner
+        lref = scn.gets_one
+        scn.no_unparsed_exists || fail  # or not
+        lref
+      end
+
+      def __this_one_scanner
+        Home_::Zerk_no_deps_[]  # while #open [#ze-068] unify scanners
+        _hi = _ob
+        _hi.to_symbolish_reference_scanner
       end
 
       shared_subject :_ob do
@@ -80,7 +92,7 @@ module Skylab::Plugin::TestSupport
 
     def _build_resources * x_a, & p
 
-      _scn = Zerk_lib_[]::No_deps[]::API_ArgumentScanner.new x_a, & p
+      _scn = Zerk_lib_[]::No_deps[]::API_ArgumentScanner.narrator_for x_a, & p
 
       X_mcob_Resources.new _scn
     end
@@ -98,11 +110,11 @@ module Skylab::Plugin::TestSupport
             def initialize
               o = yield
               o.__HELLO_MY_OWN_RESOURCES__
-              @__as = o.argument_scanner
+              @__as = o.argument_scanner_narrator
             end
 
             def execute
-              [ :woohoo, @__as.head_as_is ]
+              [ :woohoo, @__as.token_scanner.head_as_is ]
             end
 
             ZubFlub = nil  # new - say it has no sub-actions ..
@@ -117,7 +129,7 @@ module Skylab::Plugin::TestSupport
       end
     end
 
-    X_mcob_Resources = ::Struct.new :argument_scanner do
+    X_mcob_Resources = ::Struct.new :argument_scanner_narrator do
       def __HELLO_MY_OWN_RESOURCES__
         NIL
       end

@@ -5,8 +5,8 @@ module Skylab::TestSupport
     class Plugins::Depth
 
       def initialize
-        o = yield
-        @_argument_scanner = o.argument_scanner
+        o = yield  # microservice
+        @_narrator = o.argument_scanner_narrator
         @_shared_datapoint_store = o
       end
 
@@ -26,21 +26,34 @@ module Skylab::TestSupport
         y << "a test-suite one layer at a time."
       end
 
-      def parse_argument_scanner_head
-        send ( @_parse_argument_scanner_head ||= :__parse_first )
+      def parse_argument_scanner_head feat_found
+        send ( @_parse_argument_scanner_head ||= :__parse_first ), feat_found
       end
 
-      def __parse_first
+      def __parse_first feat_found
         @_parse_argument_scanner_head = :__CLOSED__or_watever__
-        _ok = __resolve_matchdata
-        _ok && __via_matchdata
+        if __resolve_matchdata feat_found
+          ok = __via_matchdata
+          if ok
+            @_narrator.advance_past_match remove_instance_variable :@__value_match
+          end
+          ok
+        end
       end
 
-      def __resolve_matchdata
-        _ = @_argument_scanner.parse_argument_via_regexp RANGE_RX___ do
-          '{{ prim }} must be an integer or range (had: {{ ick }})'
+      def __resolve_matchdata feat_found
+
+        fm = feat_found.feature_match
+
+        vm = @_narrator.procure_matching_match_after_feature_match RANGE_RX___, fm do
+          '{{ feature }} must be an integer or range (had: {{ mixed_value }})'
         end
-        _store :@__matchdata, _
+        if vm
+          @__feature_match = fm
+          @__matchdata = vm.mixed
+          @__value_match = vm
+          ACHIEVED_
+        end
       end
 
       _DIGIT_ = '-?[0-9]+'
@@ -54,11 +67,11 @@ module Skylab::TestSupport
         max = max_s.to_i
         min = min_s ? min_s.to_i : max
         if 0 > min
-          _no { "{{ prim }} min must be non-negative (had: #{ min })" }
+          _no { "{{ feature }} min must be non-negative (had: #{ min })" }
         elsif 0 > max
-          _no { "{{ prim }} max must be non-negative (had: #{ max })" }
+          _no { "{{ feature }} max must be non-negative (had: #{ max })" }
         elsif min > max
-          _no { "{{ prim }} min must be less than or equal to max #{
+          _no { "{{ feature }} min must be less than or equal to max #{
             }(min: #{ min }, max: #{ max })" }
         else
           @_range = ::Range.new min, max
@@ -86,11 +99,11 @@ module Skylab::TestSupport
       end
 
       def __a_depth_of_zero_always_filters_out_all_spec_files
-        _notice { "({{ prim }} of 0 always filters out all spec files.)" }
+        _notice { "({{ feature }} of 0 always filters out all spec files.)" }
       end
 
       def __nothing_more_to_do_because_no_spec_files
-        _notice { "({{ prim }} will have no effect because there are no spec files.)" }
+        _notice { "({{ feature }} will have no effect because there are no spec files.)" }
       end
 
       def __determine_min_and_max
@@ -214,16 +227,28 @@ module Skylab::TestSupport
       end
 
       def __express_everything_was_filtered
-        _notice { "{{ prim }} filters out every spec file. nothing to do." }
+        _notice { "{{ feature }} filters out every spec file. nothing to do." }
         NIL
       end
 
       def _no & msg
-        @_argument_scanner.no_because( & msg )
+        _no_because_by msg do |o|
+          o.channel_tail :primary_parse_error
+        end
       end
 
       def _notice & msg
-        @_argument_scanner.express_info( & msg )
+        _no_because_by msg do |o|
+          o.channel = [ :info, :expression, :notice ]
+        end
+      end
+
+      def _no_because_by msg
+        @_narrator.no_because_by do |o|
+          yield o
+          o.message_proc = msg
+          o.feature_match = @__feature_match
+        end
       end
 
       def _stop
@@ -233,7 +258,6 @@ module Skylab::TestSupport
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # ==
-
       # ==
     end
   end

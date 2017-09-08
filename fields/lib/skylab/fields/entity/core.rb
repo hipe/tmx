@@ -849,7 +849,7 @@ module Skylab::Fields
     end
 
     DEFINITION_FOR_THE_METHOD_CALLED_GETS_ONE___ = -> do  # `gets_one`
-      @_argument_scanner_.gets_one
+      @_argument_scanner_narrator_.gets_one
     end
 
     # ~ models

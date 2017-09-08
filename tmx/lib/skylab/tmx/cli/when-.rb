@@ -19,6 +19,8 @@ module Skylab::TMX
       # help switch against a particular set of design objectives, of which
       # there are surprisingly many needed to make this behave unsurprisingly:
       #
+      #   - (this note is somewhat redundant with a long note in the test)
+      #
       #   - distinctive of a tmx is that the presence of verbose modifiers
       #     alters the particular help expression behavior.
       #
@@ -54,17 +56,17 @@ module Skylab::TMX
       #     stop of the application anyway).
 
       def initialize o
-        @args = o.args
-        @omni = o.omni
+        @_omni = o.current_argument_parsing_idioms
+        @argument_scanner_narrator = @_omni.argument_scanner_narrator
         @CLI = o
       end
 
       def execute
         @_is_root = __is_root
         if @_is_root
-          if _argument_scanner_is_empty
+          if no_unparsed_exists
             _money
-          elsif _scan_primary_symbol_softly
+          elsif match_primary_shaped_token
             if __parse_primaries
               _money
             end
@@ -149,7 +151,7 @@ module Skylab::TMX
 
         top = @CLI.selection_stack.last
 
-        as = top.argument_scanner
+        as = top.argument_scanner_narrator
 
         if as.respond_to? :add_primary_at_position
           @_is_multimode = true
@@ -181,98 +183,75 @@ module Skylab::TMX
         @CLI.stderr
       end
 
-      # == [ze] #nodeps-Coverpoint-5 was created to cover this.
+      # == [ze] #Coverpoint1.5 was created to cover this.
+      #         see that test file for an in-depth, comprehensive explanation
 
       def __parse_primaries
 
-        # generally, parse the zero or more contiguous tokens immediately
-        # following the ~"-h" token that look like verboses. perhaps only
-        # these cases can cause it to fail:
-        #
-        #   - ambiguity of ~"-v" with some other primary
-        #     (actually any ambiguity at this point)
-        #   - too many verboses (because verifying expected semantics is important)
-
         begin
-          __lookup_primary
-          if __lookup_was_ambiguous
+
+          if ! look_up_primary_via_match
+
+            if ! primary_was_ambiguous_or_similar
+              _show_help_screen
+            end
             break
           end
-          if ! __primary_was_found
-            _retreat_one
-            _show_help_screen
-            break
-          end
+
           if ! __found_primary_was_verbose
-            _retreat_one
             _show_help_screen
             break
           end
-          if __verbose_limit_is_reached
-            __whine_about_too_many_verbose
+
+          if __verbose_limit_reached
             break
           end
-          if _argument_scanner_is_empty
+
+          if no_unparsed_exists
             _show_help_screen
             break
           end
-          if ! _scan_primary_symbol_softly
+
+          if ! match_primary_shaped_token
             self._COVER_ME__say_something_about_going_to_ignore_this_term__
             _show_help_screen
             break
           end
+
           redo
         end while above
 
         remove_instance_variable :@_ok
       end
 
-      def _argument_scanner_is_empty
-        @args.no_unparsed_exists
-      end
-
-      def _scan_primary_symbol_softly
-        @args.scan_primary_symbol_softly
-      end
-
-      def __lookup_primary
-        @_lookup = @omni.lookup_current_primary_symbol_semi_softly
-        NIL
-      end
-
-      def __lookup_was_ambiguous
-        did = @_lookup.had_unrecoverable_error_which_was_expressed
-        did && @_ok = false
-        did
-      end
-
-      def __primary_was_found
-        @_lookup.was_found
+      def primary_was_ambiguous_or_similar
+        yes = super
+        if yes
+          @_ok = false
+        end
+        yes
       end
 
       def __found_primary_was_verbose
-        :verbose == @_lookup.primary_symbol
+        @_primary_found = release_primary_found
+        :verbose == @_primary_found.primary_match.primary_symbol
       end
 
-      def __verbose_limit_is_reached
+      def __verbose_limit_reached
 
-        # this is a copy-paste of bespoke test case: [ze] #nodeps-Coverpoint-1-1
+        # this is a copy-paste of bespoke test case: [ze] #Coverpoint1.1
 
-        found = remove_instance_variable :@_lookup
-        injr = @omni.injector_via_primary_found found
+        found = remove_instance_variable :@_primary_found
+        injr = @_omni.features.injector_via_primary_found found
         injr.object_id == @CLI.object_id || fail
-        _ok = injr.send found.trueish_item_value
-        ! _ok
-      end
-
-      def __whine_about_too_many_verbose
-        @_ok = false
-        NOTHING_ # (did)
-      end
-
-      def _retreat_one
-        @args.retreat_one
-        NIL
+        ok = injr.send found.trueish_feature_value
+        if ok
+          @argument_scanner_narrator.advance_past_match found.primary_match
+          false
+        else
+          @_ok = false
+          true
+        end
       end
 
       def _show_help_screen
@@ -281,6 +260,7 @@ module Skylab::TMX
 
       # ==
 
+      include Interface_::NarratorMethods
       include WhenSupport_
     end
 
@@ -311,8 +291,5 @@ module Skylab::TMX
 
       # ==
     end  # WhenSupport___
-
-    Events_ = ::Module.new  # meh
-    Events_::MountRelated = ::Module.new
   end  # CLI
 end

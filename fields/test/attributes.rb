@@ -171,7 +171,7 @@ module Skylab::Fields::TestSupport
       def __build_API_style_argument_scanner_ATTR a, & p
 
         _MTk_ = Zerk_lib_[]::MicroserviceToolkit
-        _MTk_::API_ArgumentScanner.new a, & p
+        _MTk_::API_ArgumentScanner.narrator_for a, & p
       end
 
       def given_definition_ * x_a
@@ -278,7 +278,7 @@ module Skylab::Fields::TestSupport
 
       def initialize
         o = yield
-        @_argument_scanner_ = o.first
+        @_argument_scanner_narrator_ = o.first
       end
 
       def _simplified_write_ x, k
@@ -293,11 +293,11 @@ module Skylab::Fields::TestSupport
       end
 
       def _listener_
-        @_argument_scanner_.listener
+        @_argument_scanner_narrator_.listener
       end
 
-      def _argument_scanner_
-        @_argument_scanner_  # hi.
+      def _argument_scanner_narrator_
+        @_argument_scanner_narrator_  # hi.
       end
     end
 

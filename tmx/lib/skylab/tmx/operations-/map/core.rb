@@ -30,8 +30,11 @@ module Skylab::TMX
         @json_file_stream_by = x
       end
 
+      def argument_scanner_narrator= x
+        @argument_scanner = x  # while open [#ze-068]
+      end
+
       attr_writer(
-        :argument_scanner,
         :attributes_module_by,  # for [#006]
       )
 
@@ -419,8 +422,6 @@ module Skylab::TMX
           [ :primary, key_x ]
         end
       end
-
-      # ~
 
       attr_reader(
         :argument_scanner,  # for collaborators

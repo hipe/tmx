@@ -32,7 +32,7 @@ our main implementation objectives are to make this robust while
 avoiding any extraneous "hits" to the filesystem. as a startingpoint
 to imagine our implementation, we'll accept as axiomatic that under
 "ordinary" operation we model the "resource" we get back from the
-filesystem as a [#co-069] simple scanner. (in fact it comes to us as
+filesystem as a [#co-069] simple stream. (in fact it comes to us as
 an array of strings, but we don't exploit that structure as an array
 directly [#co-016.1.5] for [#co-016.1.6] reasons.)
 
@@ -42,12 +42,12 @@ importance (most important first) are:
   1. only ever "hit" the filesystem at most once per operator
      branch instance.
 
-  1. (as a corollary of above) when the scanner has exhausted,
+  1. (as a corollary of above) when the stream has exhausted,
      use the values of the cache (explained below) to produce a
      scanner when requested.
 
-  1. (as a corollary of the first) at each advancement of the
-     scanner (and mapping of its value (which turns path strings
+  1. (as a corollary of the first) at each step in the
+     stream (and mapping of its value (which turns path strings
      into "items")), cache the result of this map as the "item"
      that will forever after (for the lifetime of the subject
      instance) be used for the item at this position or retrieved
@@ -59,7 +59,7 @@ importance (most important first) are:
      subject instances lazily, the answer is "probably not".)
 
 the general idea of the above (of caching the items of a stream
-(or in this case scanner) and exposing a random access for such
+(or scanner) and exposing a random access for such
 a cache) has an implementation at [#co-016.4].
 
 as A) we suspect that the coverage we have given the subject is
@@ -74,6 +74,8 @@ of algorithms.)
 
 
 ## synthesis of the implementation objectives into pseudocode :[#here.C]
+
+we implement our stream as a scanner.
 
 this state machine can only be understood (if at all) by reading
 the below explanations in conjuction with the accompanying graph
@@ -96,7 +98,7 @@ at [#here.figure-1]
      to an immutable structure that holds atomic values of points of
      definition for future reference by other pariticipants.
 
-     to emphasize that this scanner (stream-like) holds resources that
+     to emphasize that this scanner holds resources that
      are only ever procured once per the lifetime of the subject instance,
      we sometimes refer to it as "The One" scanner.
 

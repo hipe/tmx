@@ -20,7 +20,7 @@ module Skylab::TMX
       end
 
       def execute
-        as = @CLI.selection_stack.last.argument_scanner
+        as = @CLI.selection_stack.last.argument_scanner_narrator
         as.advance_one
         @argument_scanner = as
         if ! as.no_unparsed_exists && HELP_RX =~ as.head_as_is

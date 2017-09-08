@@ -37,8 +37,8 @@ module Skylab::Git
 
     def invocation_via_argument_array a, & p
       Require_microservice_toolkit___[]
-      _as = MTk_::API_ArgumentScanner.new a, & p
-      MicroserviceInvocation___.new InvocationResources___.new _as
+      _nar = MTk_::API_ArgumentScanner.narrator_for a, & p
+      MicroserviceInvocation___.new InvocationResources___.new _nar
     end
   end  # >>
 
@@ -111,8 +111,8 @@ module Skylab::Git
 
   class InvocationResources___
 
-    def initialize as
-      @argument_scanner = as
+    def initialize nar
+      @argument_scanner_narrator = nar
     end
 
     def filesystem
@@ -124,11 +124,11 @@ module Skylab::Git
     end
 
     def listener
-      @argument_scanner.listener
+      @argument_scanner_narrator.listener
     end
 
     attr_reader(
-      :argument_scanner,
+      :argument_scanner_narrator,
     )
   end
 

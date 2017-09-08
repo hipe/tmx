@@ -7,19 +7,19 @@ module Skylab::TestSupport
       # -
 
         def initialize
-          microservice = yield
-          @lazy_index = microservice.lazy_index
-          @listener = microservice.listener
-          @operator_branch = microservice.operator_branch
+          o = yield  # microservice
+          @lazy_index = o.lazy_index
+          @listener = o.listener
+          @_narrator = o.argument_scanner_narrator
+          @operator_branch = o.operator_branch
         end
 
         def description_proc
           -> y { y << "this screen" }
         end
 
-        def parse_argument_scanner_head
-          # (scanner is already advanced past activating token
-          ACHIEVED_
+        def parse_argument_scanner_head feat
+          @_narrator.advance_past_match feat.feature_match  # it's a flag - nothing to do
         end
 
         def release_agent_profile

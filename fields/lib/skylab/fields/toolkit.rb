@@ -23,7 +23,7 @@ module Skylab::Fields
           self._WHERE  # #see #tombstone-B
         end
 
-        o.argument_scanner = ent._argument_scanner_  # ..
+        o.argument_scanner_narrator = ent._argument_scanner_narrator_  # ..
 
         if o.listener
           self._COVER_ME

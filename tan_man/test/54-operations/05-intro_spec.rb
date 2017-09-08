@@ -62,7 +62,7 @@ module Skylab::TanMan::TestSupport
 
       call_API :ping, :wahootey
 
-      expect :error, :argument_error, :primary_not_found do |ev|
+      expect :error, :argument_error, :unknown_primary do |ev|
 
         _a = ev.express_into_under [], expression_agent
         expect_these_lines_in_array_ _a do |y|

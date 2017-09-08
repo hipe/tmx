@@ -490,6 +490,12 @@ module Skylab::Common
       end
     end
 
+    def flush_to_NO_DEPS_ZERK_scanner  # #open [#ze-068]
+      ::NoDependenciesZerk::Scanner_by.new do
+        call
+      end
+    end
+
     def flush_to_scanner
       Stream::Magnetics::Scanner_via_Stream[ self ]
     end

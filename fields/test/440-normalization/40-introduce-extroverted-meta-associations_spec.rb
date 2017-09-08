@@ -54,7 +54,7 @@ module Skylab::Fields::TestSupport
 
           a = _N_things
 
-          expect_channel_ a, :error, :argument_error, :primary_not_found
+          expect_channel_ a, :error, :argument_error, :unknown_primary
 
           _lines = black_and_white_lines_via_event_ a[1].call
           expect_these_lines_in_array_ _lines do |y|

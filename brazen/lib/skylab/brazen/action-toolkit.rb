@@ -10,9 +10,10 @@ module Skylab::Brazen
 
     BoundCall_of_Operation_via = -> microservice_invo, oper_branch do
 
-      act = ParseOperator_via[ microservice_invo, oper_branch ]
-      if act
-        _ref = act.mixed_business_value
+      operator_found = ParseOperator_via[ microservice_invo, oper_branch ]
+      if operator_found
+
+        _ref = operator_found.trueish_feature_value
         _ref.bound_call_of_operator_via_invocation microservice_invo
       end
     end
@@ -21,16 +22,25 @@ module Skylab::Brazen
 
     ParseOperator_via = -> microservice_invo, oper_branch do
 
-      mtk[]::ParseArguments_via_FeaturesInjections.define do |o|
+      nar = microservice_invo.invocation_resources.argument_scanner_narrator
 
-        o.argument_scanner = microservice_invo.invocation_resources.argument_scanner
+      of = mtk[]::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
 
         o.add_operators_injection_by do |inj|
 
           inj.operators = oper_branch
-          inj.injector = :_no_injector_from_BR_
         end
-      end.parse_operator
+
+        o.argument_scanner_narrator = nar
+
+      end.procure_operator
+
+      if of
+        # (this has gotta happen somewhere. since "parse" is in our name, here.)
+        nar.advance_past_match of.operator_match
+      end
+
+      of
     end
 
     # === (the next three or so magnets are the sole implementors of
@@ -843,11 +853,11 @@ module Skylab::Brazen
     end
 
     def set_argument_scanner__ x
-      @_argument_scanner_ = x
+      @_argument_scanner_narrator_ = x
     end
 
     def remove_argument_scanner__
-      remove_instance_variable :@_argument_scanner_
+      remove_instance_variable :@_argument_scanner_narrator_
     end
 
     def when_after_process_iambic_fully_stream_has_content scn

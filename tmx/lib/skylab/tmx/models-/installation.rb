@@ -24,10 +24,23 @@ module Skylab::TMX
       Home_::Magnetics_::ManifestStream_via_Installation[ self ]
     end
 
+    def to_symbolish_reference_scanner
+      _stream_or_scanner do |paths|
+        ::NoDependenciesZerk::Scanner_via_Array.new paths  # open [#ze-068]
+      end
+    end
+
     def to_sidesystem_reference_stream
+      _stream_or_scanner do |paths|
+        Stream_[ paths ]
+      end
+    end
+
+    def _stream_or_scanner
 
       # if you would want the same results as what we see in the `map`
-      # operation, see discussion at [#007.B] (inline)
+      # operation, using development dir & json files here won't fly
+      # for a production version. see discussion at [#007.B] (inline)
 
       name_elements_for = nil
 
@@ -49,7 +62,9 @@ module Skylab::TMX
 
       _big_list = __build_filesystem_listing_of_all_participating_gems
 
-      Stream_.call _big_list do |path|
+      _st_or_scn = yield _big_list
+
+      _st_or_scn.map_by do |path|
         p[ path ]
       end
     end

@@ -11,11 +11,12 @@ module Skylab::TestSupport
       # but see [#doc] for extensive explanation of behavior and API.
 
       def initialize
-        o = yield
+        o = yield  # microservice
 
         @filesystem = ::File
 
         @_listener = o.listener
+        @_narrator = o.argument_scanner_narrator
         @_shared_datapoint_store = o
       end
 
@@ -28,8 +29,8 @@ module Skylab::TestSupport
         y << "subtree inferred by the test files"
       end
 
-      def parse_argument_scanner_head
-        ACHIEVED_  # it's a flag; nothing to do.
+      def parse_argument_scanner_head feat
+        @_narrator.advance_past_match feat.feature_match  # it's a flag - nothing to do
       end
 
       def release_agent_profile

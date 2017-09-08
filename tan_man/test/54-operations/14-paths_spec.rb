@@ -58,7 +58,7 @@ module Skylab::TanMan::TestSupport
         call_API :paths, :wiz, :waz, :wazoozle
 
         lines = nil
-        expect :error, :argument_error, :primary_not_found do |ev|
+        expect :error, :argument_error, :unknown_primary do |ev|
           lines = black_and_white_lines ev
         end
 

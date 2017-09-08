@@ -1,5 +1,8 @@
 # the formal box narrative :[#061]
 
+
+## (track if you ever want to_scanner :[#here.2])
+
 ## obviation path
 
 (being kept for posterity now, this was the conversion table)

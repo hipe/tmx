@@ -32,7 +32,7 @@ module Skylab::TMX::TestSupport
       on_stream :serr
       md = nil
       expect_line_by do |line|
-        md = %r(\Aambiguous primary \"p\" - did you mean (?<list>.+)\?\z).match line
+        md = %r(\Aambiguous operator \"p\" - did you mean (?<list>.+)\?\z).match line
         md || fail
       end
       expect_failed_normally_

@@ -13,9 +13,9 @@ module Skylab::TMX
         @_emit = p
       end
 
-      attr_writer(
-        :argument_scanner,
-      )
+      def argument_scanner_narrator= as
+        @argument_scanner = as  # while #open [#ze-068]
+      end
 
       def execute
         __init

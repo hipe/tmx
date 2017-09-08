@@ -41,7 +41,7 @@ module Skylab::Fields::TestSupport
           class X_cimai_CW
 
             def zizzie=
-              scn = @_argument_scanner_
+              scn = @_argument_scanner_narrator_
               @zizzie = [ :_yes_, scn.gets_one, scn.gets_one ]
               true  # KEEP_PARSING_
             end

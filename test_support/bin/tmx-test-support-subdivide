@@ -9,8 +9,11 @@ class << one_off
 
       require 'no-dependencies-zerk'
       @_lib = ::NoDependenciesZerk
+
+      extend @_lib::NarratorMethods  # ick/meh - we want this dep only at runtime
+
       @_listener = method :__receive_emission
-      @_args = @_lib::CLI_ArgumentScanner.new a, & @_listener
+      @argument_scanner_narrator = @_lib::CLI_ArgumentScanner.narrator_for a, & @_listener
 
       @sout = o ; @stderr = e ; @program_name_string_array = pn_s_a
       self
@@ -44,10 +47,10 @@ class << one_off
     end
 
     def __parse_arguments
-      if @_args.no_unparsed_exists
+      if no_unparsed_exists
         _parse_arguments_normally
       else
-        md = %r(\A(?<A>\d+)[-:](?<B>\d+)(?:[-:](?<C>\d+))?\z).match @_args.head_as_is
+        md = %r(\A(?<A>\d+)[-:](?<B>\d+)(?:[-:](?<C>\d+))?\z).match _token_scanner.head_as_is
         if md
           __fun_with_matchdata md
         else
@@ -58,7 +61,7 @@ class << one_off
 
     def __fun_with_matchdata md
 
-      @_args.advance_one
+      _token_scanner.advance_one
       d_a = [ md[ :A ].to_i, md[ :B ].to_i ]
       # we do this fliparound for convenience, giving the user the
       # freedom to supply the first two numbers in the "wrong" order.
@@ -71,7 +74,7 @@ class << one_off
       if s
         @number_of_items = s.to_i
       end
-      if @_args.no_unparsed_exists
+      if no_unparsed_exists
         ACHIEVED_
       else
         _parse_arguments_normally
@@ -79,7 +82,14 @@ class << one_off
     end
 
     def _parse_arguments_normally
-      @_lib::ParseArguments_via_FeaturesInjections.call @_args, PRIMARIES___, self
+
+      _omni = @_lib::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
+        o.add_primaries_injection PRIMARIES___, :_self_as_injector_
+        o.add_injector self, :_self_as_injector_
+        o.argument_scanner_narrator = @argument_scanner_narrator
+      end
+
+      _omni.flush_to_parse_primaries
     end
 
     PRIMARIES_DESCRIPTIONS___ = {
@@ -102,7 +112,7 @@ class << one_off
       help: :__express_help,
     }
 
-    def __express_help
+    def __express_help _feature
 
       require 'skylab/zerk'
       _Help = ::Skylab::Zerk::NonInteractiveCLI::Help
@@ -172,12 +182,12 @@ next item.
       end
     end
 
-    def __parse_positive_nonzero_integer
-      _store @_args.current_primary_as_ivar, @_args.parse_positive_nonzero_integer
+    def __parse_positive_nonzero_integer ff
+      _my_store @argument_scanner_narrator.procure_positive_nonzero_integer_after_feature_match ff.feature_match
     end
 
-    def _parse_non_neg_integer
-      _store @_args.current_primary_as_ivar, @_args.parse_non_negative_integer
+    def _parse_non_neg_integer ff
+      _my_store @argument_scanner_narrator.procure_non_negative_integer_after_feature_match ff.feature_match
     end
 
     def __receive_emission * chan, & em_p
@@ -231,12 +241,17 @@ next item.
       NIL
     end
 
-    def _store ivar, x
-      if x
-        instance_variable_set ivar, x ; ACHIEVED_
-      else
-        x
+    def _my_store vm
+      # NOTE - we are polluting the namespace, collision is possible.
+      # we are using it for both business parameters and CLI mechanicals
+      if vm
+        @argument_scanner_narrator.advance_past_match vm
+        instance_variable_set vm.feature_match.TO_IVAR, vm.mixed ; ACHIEVED_
       end
+    end
+
+    def _token_scanner
+      @argument_scanner_narrator.token_scanner
     end
 
     attr_reader(

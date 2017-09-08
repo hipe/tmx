@@ -61,7 +61,7 @@ module Skylab::TestSupport::TestSupport
           end
 
           msgs = nil
-          expect :info, :expression do |y|
+          expect :info, :expression, :notice do |y|
             msgs = y
           end
 

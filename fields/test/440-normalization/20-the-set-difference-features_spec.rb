@@ -59,7 +59,7 @@ module Skylab::Fields::TestSupport
           o.listener = _p
         end
 
-        expect :error, :argument_error, :primary_not_found do |ev|
+        expect :error, :argument_error, :unknown_primary do |ev|
           _s_a = ev.express_into_under [], expression_agent
           expect_these_lines_in_array_ _s_a do |y|
             y << "unrecognized member :b"

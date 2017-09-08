@@ -6,14 +6,14 @@ module Skylab::TestSupport
 
       def initialize
 
-        microservice = yield
+        o = yield  # microservice
 
-        @_argument_scanner = microservice.argument_scanner
         @_did_release = false
-        @_listener = microservice.listener
+        @_listener = o.listener
         @_mixed_path_arguments = []  # #testpoint
+        @_narrator = o.argument_scanner_narrator
 
-        @test_filename_tail = microservice.test_filename_tail
+        @test_filename_tail = o.test_filename_tail
       end
 
       def description_proc
@@ -25,10 +25,12 @@ module Skylab::TestSupport
         y << "in the indicated path(s)"
       end
 
-      def parse_argument_scanner_head
-        x = @_argument_scanner.parse_trueish_primary_value
-        if x
-          @_mixed_path_arguments.push x ; ACHIEVED_
+      def parse_argument_scanner_head feat_found
+
+        vm = @_narrator.procure_trueish_match_after_feature_match feat_found.feature_match
+        if vm
+          @_mixed_path_arguments.push vm.mixed
+          @_narrator.advance_past_match vm
         end
       end
 

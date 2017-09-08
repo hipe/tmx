@@ -46,7 +46,7 @@ module Skylab::TMX
         def initialize cli
 
           @_once = nil ; @_once2 = nil
-          @omni = cli.omni
+          @_omni = cli.current_argument_parsing_idioms
           @client = cli
         end
 
@@ -60,7 +60,7 @@ module Skylab::TMX
         def to_item_normal_tuple_stream
           remove_instance_variable :@_once
           @_eek = {}
-          __to_item_normal_tuple_scanner.to_minimal_stream
+          __to_item_normal_tuple_scanner.flush_to_minimal_stream
         end
 
         def description_proc_reader
@@ -73,7 +73,7 @@ module Skylab::TMX
 
         def __to_item_normal_tuple_scanner
           scn = __to_operator_normal_tuple_scanner
-          if @omni.has_primaries  # probably always
+          if @_omni.features.has_primaries  # probably always
             scn.concat_scanner __to_primary_normal_tuple_scanner
           else
             scn
@@ -82,11 +82,11 @@ module Skylab::TMX
 
         def __to_operator_normal_tuple_scanner
 
-          scn = __to_reduced_operator_loadable_reference_scanner
-
-          scn.map_by do |symbol_or_loadable_reference|
-            @_eek[ symbol_or_loadable_reference.intern ] = scn.current_injection.injector
-            [ :operator, symbol_or_loadable_reference ]  # [#ze-062] sneak in an l.t not a symbol
+          _scn = __to_reduced_operator_loadable_reference_scanner
+          _scn.map_by do |qfeat|
+            sref = qfeat.symbolish_reference
+            @_eek[ sref.intern ] = qfeat.injection_symbol
+            [ :operator, sref ]  # [#ze-062] sneak in an l.t not a symbol
           end
         end
 
@@ -94,9 +94,10 @@ module Skylab::TMX
 
           stay = __to_stay_map
 
-          @omni.to_operator_loadable_reference_scanner do |o|
-            o.big_step_pass_filter = -> scn do
-              k = scn.current_injection.injector
+          @_omni.features.TO_FLATTENED_QUALIFIED_FEATURE_SCANNER do |o|
+
+            o.INJECTION_PASS_FILTER_BY do |inj_ref|
+              k = inj_ref.injection.injection_symbol  # #open [#ze-069]
               yes = stay.fetch k
               if yes
                 ( @_describers ||= {} )[ k ] = OPER_DESCRIBERS___.fetch( k ).new @client
@@ -114,6 +115,7 @@ module Skylab::TMX
             _do_show_mountable_sidesystems = true
           end
           {
+            tmx_primaries: false,
             tmx_intrinsic: true,
             tmx_mountable_sidesystem: _do_show_mountable_sidesystems,
             tmx_mountable_one_off: true,
@@ -126,9 +128,9 @@ module Skylab::TMX
 
         def __to_primary_normal_tuple_scanner  # assume has primaries
           ( @_describers ||= {} )[ :primary ] = PrimaryDescriber___.new @client
-          @omni.to_primary_symbol_scanner.map_by do |sym|
-            @_eek[ sym ] = :primary
-            [ :primary, sym ]
+          @_omni.features.to_primary_symbolish_scanner.map_by do |sref|
+            @_eek[ sref.intern ] = :primary
+            [ :primary, sref ]
           end
         end
 
@@ -186,13 +188,13 @@ module Skylab::TMX
           NOTHING_
         end
 
-        def _description_proc_for_  loadable_reference
+        def _description_proc_for_ ss_lref
 
-          _ = loadable_reference.category_symbol  # [#ze-062]
-          :zerk_sidesystem_loadable_reference_category_symbol == _sym || self._SANITY
+          _ = ss_lref.reference_category_symbol  # [#ze-062]
+          _ == :SIDESYSTEM_LOADABLE_REFERENCE_ze || self._SANITY
 
           -> y do
-            _mod = loadable_reference.require_sidesystem_module
+            _mod = ss_lref.require_sidesystem_module
             _mod.describe_into_under y, self
           end
         end

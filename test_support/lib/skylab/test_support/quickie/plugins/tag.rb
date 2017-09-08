@@ -5,7 +5,8 @@ module Skylab::TestSupport
     class Plugins::Tag
 
       def initialize
-        o = yield
+        o = yield  # microservice
+        @_narrator = o.argument_scanner_narrator
         @_shared_datapoint_store = o
         @_unparsed_tag_expressions = []
       end
@@ -18,10 +19,11 @@ module Skylab::TestSupport
         y << "passes through to the test runner."
       end
 
-      def parse_argument_scanner_head
-        x = @_shared_datapoint_store.argument_scanner.parse_trueish_primary_value
-        if x
-          @_unparsed_tag_expressions.push x ; ACHIEVED_
+      def parse_argument_scanner_head feat
+        vm = @_narrator.procure_trueish_match_after_feature_match feat.feature_match
+        if vm
+          @_unparsed_tag_expressions.push vm.mixed
+          @_narrator.advance_past_match vm
         end
       end
 

@@ -5,7 +5,9 @@ module Skylab::TestSupport
     class Plugins::ListFiles
 
       def initialize
-        @_shared_datapoint_store = yield
+        o = yield  # microservice
+        @_narrator = o.argument_scanner_narrator
+        @_shared_datapoint_store = o
       end
 
       def description_proc
@@ -17,8 +19,8 @@ module Skylab::TestSupport
         y << "test file(s) then exit"
       end
 
-      def parse_argument_scanner_head
-        ACHIEVED_   # it's a flag; nothing to do.
+      def parse_argument_scanner_head feat
+        @_narrator.advance_past_match feat.feature_match  # it's a flag - nothing to do
       end
 
       def release_agent_profile

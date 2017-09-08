@@ -49,21 +49,18 @@ module Skylab::TestSupport
 
           @_CLI_MTk = Zerk_lib_[]::CLI::MicroserviceToolkit
 
-          as = @_CLI_MTk::ArgumentScanner.define do |o|
-
-            o.default_primary_symbol = :path  # <- when there is an argument
-              # without a primary before it, use this as the primary
-
-            o.ARGV = remove_instance_variable :@__ARGV
-            o.listener = method :__receive_emission
-          end
+          _argv = remove_instance_variable :@__ARGV
+          _p = method :__receive_emission
+          nar = @_CLI_MTk::CLI_ArgumentScanner.narrator_for _argv, & _p
 
           __init_listener
-          @__argument_scanner = as
+          @__argument_scanner_narrator = nar
           @_did_err = false
 
           x = Here_::TreeRunnerMicroservice.call_by do |o|
-            o.argument_scanner = as
+            o.argument_scanner_narrator = nar
+            o.default_primary_symbol = :path  # <- when there is an argument
+              # without a primary before it, use this as the primary
           end
 
           __flush_any_invite
@@ -109,7 +106,7 @@ module Skylab::TestSupport
             if :expression == chan[1]
               case chan[2]
               when :primary_parse_error
-                if :primary_not_found == chan[3]
+                if :unknown_primary == chan[3]
                   _maybe_upgrade_invite_to_plain_parse_error
                 else
                   _maybe_upgrade_invite_to_primary_parse_error
@@ -128,8 +125,15 @@ module Skylab::TestSupport
         end
 
         def _maybe_upgrade_invite_to_primary_parse_error
+
           _maybe_upgrade_invite 4 do
-            [ :_invite_to_primaries_, { _curr_prim_sym => true } ]
+            k = __curr_prim_sym
+            if k
+              _h = { _k => true }
+              [ :_invite_to_primaries_, _h ]
+            else
+              [ :_invite_plainly_ ]
+            end
           end
         end
 
@@ -161,8 +165,15 @@ module Skylab::TestSupport
           NIL
         end
 
-        def _curr_prim_sym
-          @__argument_scanner.current_primary_symbol
+        def __curr_prim_sym
+
+          nar = @__argument_scanner_narrator
+          unless nar.token_scanner.no_unparsed_exists
+            ma = nar.match_primary_shaped_token
+          end
+          if ma
+            ma.primary_symbol
+          end
         end
 
         # ~ read
@@ -263,15 +274,15 @@ module Skylab::TestSupport
 
         def initialize p, a
 
-          as = No_deps_zerk_[]::API_ArgumentScanner.new a, & p
+          nar = No_deps_zerk_[]::API_ArgumentScanner.narrator_for a, & p
 
           @__tree_runner_microservice = Here_::TreeRunnerMicroservice.define do |o|
-            o.argument_scanner = as
+            o.argument_scanner_narrator = nar
             o.listener = method :__receive_emission
           end
           # (above ivar name is a #testpoint)
 
-          @argument_scanner = as
+          @argument_scanner_narrator = nar
         end
 
         def execute
@@ -284,7 +295,7 @@ module Skylab::TestSupport
             _something = receive_resource_request p, chan
             _something  # #hi.
           else
-            _maybe_line_medium = @argument_scanner.listener[ * chan, & p ]
+            _maybe_line_medium = @argument_scanner_narrator.listener[ * chan, & p ]
             _maybe_line_medium  # #hi.
           end
         end
@@ -307,7 +318,7 @@ module Skylab::TestSupport
         end
 
         def __line_downstream_for_help
-          @argument_scanner.listener.call :error, :expression, :mode_mismatch do |y|
+          @argument_scanner_narrator.listener.call :error, :expression, :mode_mismatch do |y|
             y << "no 'help' for API client"
           end
           NOTHING_

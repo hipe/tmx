@@ -129,7 +129,7 @@ module Skylab::Fields
 
             define_method wm do
 
-              mutate_entity_against_upstream[ self, @_argument_scanner_ ]
+              mutate_entity_against_upstream[ self, @_argument_scanner_narrator_ ]
             end
 
             private wm

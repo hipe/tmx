@@ -211,7 +211,7 @@ module Skylab::Plugin
             end
             break
           end
-          _scn = invo_or_rsx.remote_invocation_resources.argument_scanner
+          _scn = invo_or_rsx.remote_invocation_resources.argument_scanner_narrator
           curr_lref = Step_when_branchy___[ _scn, step, curr_lref ]
         end while curr_lref
         bc
@@ -241,23 +241,23 @@ module Skylab::Plugin
         :invocation_or_resources,
       )
 
-      Step_when_branchy___ = -> args, step, lref do  # lref #here5
+      Step_when_branchy___ = -> nar, step, lref do  # lref #here5
 
         _ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH lref
 
-        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
-
-          o.argument_scanner = args
+        _omni = MTk_::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
 
           o.add_operators_injection_by do |inj|
             inj.operators = _ob
-            inj.injector = :_no_injector_for_now_from_PL_
           end
+
+          o.argument_scanner_narrator = nar
         end
 
-        operator_found = _omni.parse_operator
+        operator_found = _omni.procure_operator
         if operator_found
-          operator_found.mixed_business_value
+          nar.advance_past_match operator_found.operator_match  # new since the 2nd wave
+          operator_found.trueish_feature_value
         end
       end
     end
@@ -298,6 +298,7 @@ module Skylab::Plugin
 
         when :__proc
           ProcBasedActionStep__.define do |o|
+            o.etc_etc_symbol = lref.name_symbol
             o.proc = mixed
           end
         end
@@ -387,18 +388,18 @@ module Skylab::Plugin
     class ProcBasedActionStep__ < Step__
 
       attr_writer(
+        :etc_etc_symbol,
         :proc
       )
 
       def __bound_call_via_invocation_or_resources_ invo_or_rsx  # (we want this to become a API hook-out method #todo)
 
-        _scn = invo_or_rsx.remote_invocation_resources.argument_scanner
-        _sym = _scn.current_operator_symbol
         _hot_take = MTk_::BoundCall_of_Operation_via_Proc.call_by do |o|
           o.invocation_or_resources = invo_or_rsx
-          o.invocation_stack_top_name_symbol = _sym
+          o.invocation_stack_top_name_symbol = @etc_etc_symbol
           o.proc = @proc
         end
+
         _hot_take  # hi. #todo
       end
 
@@ -455,6 +456,10 @@ module Skylab::Plugin
 
       def to_loadable_reference_stream
         @_implementor._to_loadable_reference_stream
+      end
+
+      def to_symbolish_reference_scanner
+        @_implementor._to_symbolish_reference_scanner
       end
 
       def __build_loadable_reference_via_path path
@@ -812,6 +817,10 @@ module Skylab::Plugin
         @_implementor._to_loadable_reference_stream
       end
 
+      def to_symbolish_reference_scanner
+        @_implementor._to_symbolish_reference_scanner
+      end
+
       def __build_loadable_reference_via_path path
 
         tail = @__localize[ path ]
@@ -899,15 +908,15 @@ module Skylab::Plugin
       def lookup_softly_by & p
         @lookup_softly = p ; nil
       end
-      def loadable_reference_stream_by & p
-        @to_loadable_reference_stream = p ; nil
+      def SYMBOLISH_REFERENCE_SCANNER_BY & p  # [bs]
+        @to_symbolish_reference_scanner = p ; nil
       end
       # --
       def lookup_softly k
         @lookup_softly[ k ]
       end
-      def to_loadable_reference_stream
-        @to_loadable_reference_stream[]
+      def to_symbolish_reference_scanner
+        @to_symbolish_reference_scanner[]
       end
     end
 
@@ -956,7 +965,12 @@ module Skylab::Plugin
         send @_lookup, k
       end
 
-      def _to_loadable_reference_stream
+      def _to_loadable_reference_stream  # [bs]
+        self._README__either_just_convert_scanner_to_stream_or_use_scanner__
+        send @_splay
+      end
+
+      def _to_symbolish_reference_scanner
         send @_splay
       end
 
@@ -1001,22 +1015,25 @@ module Skylab::Plugin
         # multiple test files, leading to the reuse of the same microservice
         # operator branch across several invocations
 
-        Common_::Stream::CompoundStream.define do |o|
+        Common_::Scanner::CompoundScanner.define do |o|
 
-          o.add_stream _splay_of_cached
+          o.add_scanner _splay_of_cached
 
-          o.add_stream_by( & method( :_to_remaining_live_splay ) )
+          o.add_scanner_by do
+            _to_remaining_live_splay  # hi.
+          end
         end
       end
 
       def _to_remaining_live_splay
-        Common_.stream do
+        ::NoDependenciesZerk::Scanner_by.new do
           @_open && _gets_reference
         end
       end
 
       def _splay_of_cached
-        Stream_[ @_cached_loadable_reference_via_normal_name.values ]
+        ::NoDependenciesZerk::Scanner_via_Array.new(
+          @_cached_loadable_reference_via_normal_name.values )
       end
 
       # -- support
@@ -1219,4 +1236,5 @@ module Skylab::Plugin
     # ==
   end
 end
+# #history-A.2: during 2nd wave, stream to scanner
 # #history: moved from [br] to [pl] for substantial reconception (splicing)

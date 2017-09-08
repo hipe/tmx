@@ -81,7 +81,7 @@ module Skylab::CodeMetrics::TestSupport
       it "not look like an integer" do
 
         invoke me, same, '1.0'
-        expect_on_stderr "#{ same } must be an integer (had \"1.0\")"
+        expect_on_stderr %(#{ same } does not look like integer: "1.0")
         _expect_failed_commonly
       end
 

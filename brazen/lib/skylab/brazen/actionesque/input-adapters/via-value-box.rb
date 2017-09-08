@@ -54,7 +54,7 @@ module Skylab::Brazen
 
           end
 
-          act.remove_instance_variable :@_argument_scanner_
+          act.remove_instance_variable :@_argument_scanner_narrator_
 
           kp
         end

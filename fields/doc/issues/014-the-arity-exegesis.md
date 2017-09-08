@@ -6,9 +6,24 @@
 likely stale but overall is hopefully still legit.)
 
 
+## table of contents
+
+  - introduction to `arity` thru the case study of "parameter arity" [#here.s2]
+  - the gory detals [#here.s3]
+  - a constructed example: pseudo-HTTP [#here.s4]
+  - many emergent counts to chose from [#here.s5]
+  - there is for any given formal parameter the count of actual parameters that.. [#here.s6]
+  - what is the sensical range of arguments that may be associated with.. [#here.G]
+  - meta-analysis: justification for the dichotomy, and the arities [#here.8]
+  - what about many arguments (zero or more, one or more)? [#here.s9]
+  - some more thoughts on isomorphisms and equivalencies [#here.s10]
+  - supporting concepts defined in detail (the *really* boring part) [#here.s11]
+  - concluding thoughts on our approach [#here.s12]
 
 
-## introduction to `arity` thru the case study of "parameter arity"
+
+
+## introduction to `arity` thru the case study of "parameter arity" :[#here.s2]
 
 prerequisites:
 
@@ -130,7 +145,7 @@ suggest), but this is done purely as a dalliance:
 
 
 
-## the gory detals
+## the gory detals :[#here.s3]
 
 to define `arity`, a word that itself is not in "most"
 "dictionaries", we employ another "neologism" : "sensical".
@@ -155,7 +170,7 @@ for any particular locality may be modeled as an arity).
 
 
 
-## a constructed example: pseudo-HTTP
+## a constructed example: pseudo-HTTP :[#here.s4]
 
 Let's construct a simple imagined world of "parameters" where every `formal`
 parameter in a request frame is either "required" or "optional"; and given a
@@ -190,7 +205,7 @@ at least worth mentioning their existence now.)
 
 
 
-## many emergent counts to chose from
+## many emergent counts to chose from :[#here.s5]
 
 (sidebar: "emergent counts"
 
@@ -227,7 +242,7 @@ for one,
 
 
 
-## there is for any given formal parameter the count of actual parameters that..
+## there is for any given formal parameter the count of actual parameters that.. :[#here.s6]
 
 ..may sensically be associated with it.
 
@@ -409,7 +424,9 @@ filenames, including `git-add` and `git-rm`, just to cite two more.
 up but you cannot say anything", which sadly does occur in that space.
 
 
-## meta-analysis: justification for the dichotomy, and the arities
+
+
+## meta-analysis: justification for the dichotomy, and the arities :[#here.8]
 
 it bears pointing out at this point that a lot of this is arbitrary
 and/or a pragmatic arrangement of the problem to suit the kind of solutions
@@ -438,7 +455,10 @@ put into the `parameter` axis and not the `argument` axis, although with
 effort we may be able to prove that there is some isomorphism there
 (that is, that they are equivalent)..
 
-## what about many arguments (zero or more, one or more)?
+
+
+
+## what about many arguments (zero or more, one or more)? :[#here.s9]
 
 (below we will use the term "field" as shorthand for `formal parameter`.)
 
@@ -502,7 +522,10 @@ and for the former to allow for `zero or more` and the latter to allow
 for `zero`. there is simply no other solution that adequately described
 the phenomenon without feeling itself hacky.
 
-## some more thoughts on isomorphisms and equivalencies
+
+
+
+## some more thoughts on isomorphisms and equivalencies :[#here.s10]
 
 as stated above, we model the `arity dichotomy` especially so we can represent
 the edgy polyadic/niladic options like the incrementing -v (verbose) flag, an
@@ -536,6 +559,8 @@ parameters and actual parameters, and that there exist emergent counts from
 these, and that it is useful to associate one of a particular class of arities
 to these counts.
 
+
+
 ### what about the infinity of arities not included here?
 
 certainly there exist arities not among the "useful five" on the one axis or
@@ -561,9 +586,14 @@ as it stands for reasons we will touch on in this conclusion, this model
 to cover the 95% use case of interfaces in such a way that is as powerful
 as is necessary and then as intuitive as possible.
 
-## supporting concepts defined in detail (the *really* boring part)
+
+
+
+## supporting concepts defined in detail (the *really* boring part) :[#here.s11]
 
 so, what do we know?
+
+
 
 ### we know what an arity is
 
@@ -577,6 +607,7 @@ ranges. what do we mean by `simple range` and `compound range`?
       and integer equal to or greater than the first element in the tuple
         - or -
       nil to mean positive infinity.
+
 
 #### some things about ranges (sidebar!)
 
@@ -600,11 +631,17 @@ every non-negative integer is a simple range. but whatevs.
     (a compound range is a range so it can be made of other compound
     ranges but stahp.)
 
+
+
+
 ### we know what a count is
 
 but really quick let's define it:
 
   `count` - a number from the set of non-negative integers {0, 1, 2, 3, ...}
+
+
+
 
 ### we know what an arity is for
 
@@ -613,7 +650,10 @@ is a `simple range` as defined above. With any given such arity, we can take
 any given `count` and definitively say whether that arity "includes" that
 count. whew! that's why we defined those. ick.
 
-## concluding thoughts on our approach
+
+
+
+## concluding thoughts on our approach [#here.s12]
 
 we hope we have demonstrated that sizeable expressive power comes from
 this relatively simple model: using two metafields with (for now) four and

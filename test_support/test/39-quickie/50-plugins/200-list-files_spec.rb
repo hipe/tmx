@@ -79,7 +79,7 @@ module Skylab::TestSupport::TestSupport
 
         shared_subject :messages do
           call :list_files, :jajoomba
-          messages_via_expect_fail :error, :expression, :primary_parse_error, :primary_not_found
+          messages_via_expect_fail :error, :expression, :primary_parse_error, :unknown_primary
         end
       # -
     end

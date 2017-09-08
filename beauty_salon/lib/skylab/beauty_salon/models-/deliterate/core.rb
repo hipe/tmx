@@ -15,7 +15,8 @@ module Skylab::BeautySalon
 
         o = yield
 
-        @_argument_scanner_ = o.argument_scanner
+        @_argument_scanner_narrator_ = o.argument_scanner_narrator
+
         @_listener_ = o.listener
 
         @_associations_ = {}  # #[#br-011]

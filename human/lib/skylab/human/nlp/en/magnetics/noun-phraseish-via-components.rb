@@ -119,7 +119,7 @@ module Skylab::Human
         # but it makes for more readable sexp's
 
         _asc = COMPONENTS.attribute :suffixed_proper_constituency
-        _asc.as_association_write_into_against self, @_argument_scanner_
+        _asc.as_association_write_into_against self, @_argument_scanner_narrator_
       end
 
       def __suffixed_modifier_phrase__component_association

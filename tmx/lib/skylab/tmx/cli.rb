@@ -1,3 +1,5 @@
+require 'no-dependencies-zerk'
+
 module Skylab::TMX
 
   class CLI
@@ -13,16 +15,16 @@ module Skylab::TMX
 
     Invocation___ = self
 
+    Interface_ = ::NoDependenciesZerk
+
     class Invocation___
 
       def initialize argv, sin, sout, serr, pn_s_a
 
-        Require_interface_lib___[]
-
         @_do_dispatch_help = false
         @_data_emission_handler_method_via_terminal_channel_symbol = nil
         @listener = method :__receive_emission
-        @args = __argument_scanner_via_argv_and_listener argv
+        @argument_scanner_narrator = __argument_scanner_via_argv_and_listener argv
         @__presumably_real_ARGV = argv
         @selection_stack = [ __build_root_frame ]
         @verbose_count_ = 0
@@ -34,10 +36,8 @@ module Skylab::TMX
       end
 
       def __argument_scanner_via_argv_and_listener argv
-        Interface__::CLI_ArgumentScanner.define do |o|
-          o.ARGV = argv
-          o.listener = @listener
-        end
+
+        Interface_::CLI_ArgumentScanner.narrator_for argv, & @listener
       end
 
       def __build_root_frame
@@ -45,7 +45,7 @@ module Skylab::TMX
           rf.didactics_by = -> do
             CLI::Magnetics_::HelpScreenDidactics_via_TMX_HostClient[ self ]
           end
-          rf.argument_scanner = @args
+          rf.argument_scanner_narrator = @argument_scanner_narrator
         end
       end
 
@@ -93,28 +93,33 @@ module Skylab::TMX
         @exitstatus
       end
 
-      # --
+      # -- parsing
 
       def __bound_call
 
-        @omni = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
+        Zerk_lib_[]  # `Zerk_` is assumed throughout
+
+        @_omni = Interface_::ArgumentParsingIdioms_via_FeaturesInjections.define do |fi|
           __inject_features fi
         end
-        if @args.no_unparsed_exists
+
+        if no_unparsed_exists
           _when_no_arguments
-        elsif _scan_operator_symbol_softly
-          lu = @omni.flush_to_lookup_operator
-          lu and __bound_call_via_found_operator lu
-        elsif _scan_primary_symbol_softly
+        elsif match_operator_shaped_token
+          if procure_operator_via_match
+            __bound_call_via_found_operator
+          end
+        elsif match_primary_shaped_token
           __when_primary_at_head
         else
-          _fail_about_unknown_primary_or_operator
+          when_malformed_primary_or_operator
         end
       end
 
       def __when_primary_at_head
         # help probably
-        ok = @omni.flush_to_lookup_current_and_parse_remaining_primaries
+        _pm = release_primary_match
+        ok = @_omni.flush_to_find_and_process_this_and_remaining_primaries _pm
         if ok
           if @verbose_count_.nonzero?
             @stderr.puts "(-verbose is for -help)"
@@ -122,30 +127,31 @@ module Skylab::TMX
           _when_no_arguments  # assume parsed -v but no -h
         elsif @_do_dispatch_help
           # assume nonempty argument scanner
-          if _scan_operator_symbol_softly
-            lu = @omni.flush_to_lookup_operator
-            lu and __bound_call_via_found_operator_when_dispatch_help lu
+          if match_operator_shaped_token
+            if procure_operator_via_match
+              __bound_call_via_found_operator_when_dispatch_help
+            end
           else
-            _fail_about_unknown_primary_or_operator
+            when_malformed_primary_or_operator
           end
         else
           ok  # assume EARLY_END from help
         end
       end
 
-      def _fail_about_unknown_primary_or_operator
-        @args.when_malformed_primary_or_operator
+      def current_argument_parsing_idioms
+        @_omni
       end
 
       def _when_no_arguments
-        Zerk_lib_[]::ArgumentScanner::When::No_arguments[ @omni ]
+        Zerk_lib_[]::ArgumentScanner::When::No_arguments[ @_omni ]
       end
 
       def __inject_features fi
 
-        fi.argument_scanner = @args
+        fi.argument_scanner_narrator = @argument_scanner_narrator
 
-        fi.add_hash_based_operators_injection OPERATORS___, :tmx_intrinsic
+        fi.add_hash_based_operators_injection OPERATORS___, :_expect_no_, :tmx_intrinsic
 
         fi.add_lazy_operators_injection_by do |o|
           __add_sidesystem_mounter_lazily o
@@ -155,7 +161,9 @@ module Skylab::TMX
           __add_one_off_mounter_lazily o
         end
 
-        fi.add_primaries_injection PRIMARIES___, self
+        fi.add_primaries_injection PRIMARIES___, :_self_as_injector_, :tmx_primaries
+
+        fi.add_injector self, :_self_as_injector_
       end
 
       def __add_sidesystem_mounter_lazily inj
@@ -168,7 +176,7 @@ module Skylab::TMX
         end
 
         inj.operators = ssm
-        inj.injector = :tmx_mountable_sidesystem
+        inj.injection_symbol = :tmx_mountable_sidesystem
         @__sidesys_mounter = ssm ; nil
       end
 
@@ -195,7 +203,7 @@ module Skylab::TMX
         end
 
         inj.operators = ob
-        inj.injector = :tmx_mountable_one_off
+        inj.injection_symbol = :tmx_mountable_one_off
         @__one_off_mounter = ob ; nil
       end
 
@@ -203,32 +211,37 @@ module Skylab::TMX
         Home_.installation_
       end
 
-      def __bound_call_via_found_operator_when_dispatch_help lu
-        _to_operator_adapter_for( lu ).to_bound_call_for_help
+      def __bound_call_via_found_operator_when_dispatch_help
+        _flush_to_operator_adapter_via_operator_found.to_bound_call_for_help
       end
 
-      def __bound_call_via_found_operator lu
-        _to_operator_adapter_for( lu ).to_bound_call_for_invocation
+      def __bound_call_via_found_operator
+        _flush_to_operator_adapter_via_operator_found.to_bound_call_for_invocation
       end
 
-      def _to_operator_adapter_for lu
-        case lu.injector
+      def _flush_to_operator_adapter_via_operator_found
+
+        of = release_operator_found
+        x = of.trueish_feature_value
+        inj_ref = @_omni.features.injection_reference_via_operator_found of
+
+        # if this is a help dispatch, we do *not* advance the scanner past
+        # the help token, but leave it pointing to it (as a promise to #hereA-a):
+
+        if ! @_do_dispatch_help
+          @_omni.argument_scanner_narrator.advance_past_match of.operator_match
+        end
+
+        case inj_ref.injection.injection_symbol
         when :tmx_intrinsic
-          OperatorAdapter_for_Intrinsic___.new lu, self
+          OperatorAdapter_for_Intrinsic___.new x, self
         when :tmx_mountable_sidesystem
-          OperatorAdapter_for_MountableSidesystem___.new lu, self
+          OperatorAdapter_for_MountableSidesystem___.new x, self
         when :tmx_mountable_one_off
           @_express = :__receive_exitstatus_of_one_off
-          lu.mixed_business_value.TO_OPERATOR_ADAPTER_FOR self
+          x.TO_OPERATOR_ADAPTER_FOR self
+        else no
         end
-      end
-
-      def _scan_operator_symbol_softly
-        @args.scan_operator_symbol_softly
-      end
-
-      def _scan_primary_symbol_softly
-        @args.scan_primary_symbol_softly
       end
 
       OPERATOR_DESCRIPTIONS = {
@@ -252,9 +265,11 @@ module Skylab::TMX
       }
 
       PRIMARIES___ = {
-        help: :_express_help,
+        help: :__express_help_newschool,
         verbose: :_process_verbose,
       }
+
+      include Interface_::NarratorMethods
 
       # -- test all
 
@@ -311,7 +326,7 @@ module Skylab::TMX
         _push_frame do |fr|
 
           fr.name_symbol = :test_all
-          fr.argument_scanner = arg_scn
+          fr.argument_scanner_narrator = arg_scn
 
           fr.define_didactics_by do |dida|
             Zerk_::Models::Didactics.define_conventionaly dida, api
@@ -323,7 +338,7 @@ module Skylab::TMX
           if bc.receiver.respond_to? :test_directory_collection
 
             CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation.new(
-              bc, @selection_stack.last.argument_scanner, self ).execute
+              bc, @selection_stack.last.argument_scanner_narrator, self ).execute
           else
             bc
           end
@@ -371,7 +386,7 @@ module Skylab::TMX
 
         o = Home_::API.begin( & @listener )
 
-        o.argument_scanner = __argument_scanner_for_reports
+        o.argument_scanner_narrator = __argument_scanner_for_reports
 
         o.to_bound_call_of_operator
       end
@@ -407,7 +422,7 @@ module Skylab::TMX
 
         o = Home_::API.begin( & @listener )
 
-        o.argument_scanner = __argument_scanner_for_map
+        o.argument_scanner_narrator = __argument_scanner_for_map
 
         o.to_bound_call_of_operator
       end
@@ -501,12 +516,18 @@ module Skylab::TMX
         y << "(this screen.)"
       end
 
-      def _express_help
+      def __express_help_newschool pf
+        @argument_scanner_narrator.advance_past_match pf.primary_match
+        _express_help
+      end
+
+      def _express_help  # this must stay monadic per hackish [#052.C]
         CLI::When_::Help[ self ]
       end
 
       def __describe_verbose y
-        y << "includes \"mountable sidesystems\" in the help listing"
+        y << '1x: include "mountable sidesystems" in the help listing'
+        y << '2x: crazy experimental tree visualization'
       end
 
       def _process_verbose
@@ -523,11 +544,6 @@ module Skylab::TMX
 
       def describe_into y
         y << "experiment.."
-      end
-
-      def argument_scanner  # because we are top, we don't alter our stream
-        self._CONTACT_CHECK
-        NOTHING_
       end
 
       # --
@@ -633,14 +649,53 @@ module Skylab::TMX
       end
 
       def _user_scanner
-        d, a = @args.close_and_release
-        if @_do_dispatch_help  # :#here-1
-          HELP_RX =~ a.first || self._SANITY
-          d == 2 || self._HMM
-          a[0] = a[1]  # probably not useful
-          a[1] = '-help'  # like HELP_SWITCH_LONG_ but assert our way
-          d -= 1
+
+        # mainly, convert the scanner from a remote type to a locally
+        # familiar implementation (but only while #open [#ze-070]).
+        #
+        # :#hereA: supreme hack - consider that there are these two ways
+        # to accomplish non-root help:
+        #
+        #     [ .., '-hel', <feature>, .. ]
+        #
+        # and:
+        #
+        #     [ .., <feature>, '-hel', .. ]
+        #
+        # call the first way "dispatched" and the second way "sovereign".
+        # note each way can have zero or more tokens after the span of
+        # interest. so, the hack: in order for there to be less execution
+        # paths past this point to accomplish the same thing, we hackishly
+        # unify these two cases by turning the dispatched form into the
+        # sovereign form, such that the operator actually sees the selfsame
+        # token that invoked our own help..
+
+        ts =  remove_instance_variable( :@argument_scanner_narrator ).token_scanner
+
+        if @_do_dispatch_help
+
+          ts.no_unparsed_exists && self._WHY  # per #hereA-a, you promised
+
+          d, a = ts.LIQUIDATE_TOKEN_SCANNER ; ts = nil
+
+          d == 1 || self._SANITY__expected_a_particular_advancement_of_scanner__
+
+          help_token = a[0]
+          HELP_RX =~ help_token || self._SANITY__just_making_sure_this_is_the_help_we_expected
+
+          a[0] = a[1]  # probably never seen
+
+          a[1] = help_token  # let the client deal with parsing it
+
+          # note that `d` points at the help token now
+
+        elsif ts.no_unparsed_exists
+          d = 0 ; a = EMPTY_A_
+        else
+          d, a = ts.LIQUIDATE_TOKEN_SCANNER
         end
+
+        # #open [#ze-068] or #open [#ze-070], one or both may effect the bloew
         Common_::Scanner.via_start_index_and_array d, a
       end
 
@@ -662,7 +717,7 @@ module Skylab::TMX
           end
         end
 
-        expr = Interface__::CLI_Express_via_Emission.define do |o|
+        expr = Interface_::CLI_Express_via_Emission.define do |o|
 
           o.expression_agent_by = -> do
             _HORRIBLE[]
@@ -689,7 +744,7 @@ module Skylab::TMX
         when :parse_error
           _invite_to_general_help
 
-        when :primary_parse_error
+        when :feature_parse_error, :primary_parse_error
           # :#coverpoint-1-F: for now, on a primary parse error, we invite
           # to a help IFF it presumably belongs to the root. in future etc.
           if 1 == @selection_stack.length
@@ -710,7 +765,7 @@ module Skylab::TMX
       end
 
       def __expression_agent_for_minimal
-        Interface__::CLI_InterfaceExpressionAgent.instance
+        Interface_::CLI_InterfaceExpressionAgent.instance
       end
 
       def _invite_to_general_help
@@ -799,11 +854,10 @@ module Skylab::TMX
 
         real = remove_instance_variable :@__presumably_real_ARGV
 
-        scn = remove_instance_variable :@args
-        if ! scn.is_closed
-          _, a = scn.close_and_release__
-          a.object_id == real.object_id || self._SANITY
-        end
+        _omni = remove_instance_variable :@_omni
+        _ts = _omni.argument_scanner_narrator.token_scanner
+        _ivars = _ts.instance_variables
+        _ivars.length.nonzero? && self._SANITY
 
         real.replace s_a
         NIL
@@ -816,7 +870,7 @@ module Skylab::TMX
         #  we want to make it clear that we ourselves are totally done
         #  parsing (or otherwise referencing) arguments)
 
-        remove_instance_variable :@args
+        remove_instance_variable :@argument_scanner_narrator
       end
 
       attr_writer(
@@ -824,9 +878,7 @@ module Skylab::TMX
       )
 
       attr_reader(
-        :args,
         :listener,
-        :omni,
         :program_name_string_array,
         :selection_stack,
         :stderr,
@@ -888,26 +940,26 @@ module Skylab::TMX
 
     class OperatorAdapter_for_Intrinsic___
 
-      def initialize lu, cli
-        @lookup = lu
+      def initialize x, cli
+        @trueish_feature_value = x
         @CLI = cli
       end
 
       def to_bound_call_for_help
-        # (the work is done #here-1)
+        # (for this kind of help on this kind of operator, the heavy lifting is #hereA)
         @CLI.do_dispatch_help_ = true
         to_bound_call_for_invocation
       end
 
       def to_bound_call_for_invocation
-        @CLI.send @lookup.mixed_business_value
+        @CLI.send @trueish_feature_value
       end
     end
 
     class OperatorAdapter_for_MountableSidesystem___
 
-      def initialize lu, cli
-        @lookup = lu
+      def initialize x, cli
+        @trueish_feature_value = x
         @sidesystem_mounter = cli.remove_instance_variable :@__sidesys_mounter
       end
 
@@ -920,7 +972,7 @@ module Skylab::TMX
       end
 
       def _LT
-        @lookup.mixed_business_value
+        @trueish_feature_value
       end
     end
 
@@ -938,11 +990,13 @@ module Skylab::TMX
       end
 
       attr_writer(
-        :argument_scanner,  # @__argument_scanner
         :below_didactics_by,
-        :name,  # k
-        :name_symbol,  # :@__name_symbol
-        :operator_instance,  # @__operator_instance
+        :name,
+        :name_symbol,
+        :operator_instance,
+      )
+      attr_accessor(
+        :argument_scanner_narrator,
       )
 
       def didactics_by
@@ -972,30 +1026,18 @@ module Skylab::TMX
       def operator_instance__  # special needs only
         @operator_instance
       end
-
-      attr_reader(
-        :argument_scanner,
-      )
     end
 
     class RootFrame___ < SimpleModel_
 
       attr_accessor(
-        :argument_scanner,
+        :argument_scanner_narrator,
         :didactics_by,
       )
 
       def to_didactics
         @didactics_by.call
       end
-    end
-
-    # ==
-
-    Require_interface_lib___ = Lazy_.call do
-      require 'no-dependencies-zerk'
-      Interface__ = ::NoDependenciesZerk
-      NIL
     end
 
     # ==

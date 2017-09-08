@@ -56,7 +56,7 @@ module Skylab::Fields
 
       bx ||= MONADIC_EMPTINESS_
 
-      instance_variable_set :@_argument_scanner_, scn
+      instance_variable_set :@_argument_scanner_narrator_, scn
 
       begin
 
@@ -80,7 +80,7 @@ module Skylab::Fields
         scn.no_unparsed_exists ? break : redo
       end while above
 
-      remove_instance_variable :@_argument_scanner_
+      remove_instance_variable :@_argument_scanner_narrator_
     end
     kp
   end
@@ -432,11 +432,11 @@ module Skylab::Fields
         public :_write_defined_associations_into_normalization_FI_  # for #here4
 
         def gets_one  # #public-API #hook-in
-          @_argument_scanner_.gets_one
+          @_argument_scanner_narrator_.gets_one
         end
 
         def argument_scanner  # n.c
-          @_argument_scanner_
+          @_argument_scanner_narrator_
         end
 
         def when_after_process_iambic_fully_stream_has_content scn  # :+#public-API
@@ -580,7 +580,11 @@ module Skylab::Fields
             # :#spot1-5 some association interpreters need to write directly
             # :#spot1-4 in error cases we inspect the entity lazily for handlers
 
-          o.argument_scanner = @_scanner
+          if @_scanner.respond_to? :match_primary_shaped_token
+            o.argument_scanner_narrator = @_scanner
+          else
+            o.argument_scanner = @_scanner
+          end
         end
         _ok  # hi. #todo
       end
@@ -1157,7 +1161,7 @@ module Skylab::Fields
   end
 
   ACHIEVED_ = true
-  ARGUMENT_SCANNER_IVAR_ = :@_argument_scanner_
+  ARGUMENT_SCANNER_IVAR_ = :@_argument_scanner_narrator_
   CLI = nil  # for host
   CONST_SEP_ = Common_::CONST_SEPARATOR
   EMPTY_A_ = []

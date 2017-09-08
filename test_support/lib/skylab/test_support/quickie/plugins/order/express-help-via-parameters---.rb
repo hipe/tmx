@@ -134,7 +134,7 @@ module Skylab::TestSupport
               entries have the same effective integer. (we could, but we
               don't want to support trees like this.)
 
-          4) those in group (B) are sorted by whatever rational the platform
+          4) those in group (B) are sorted by whatever rationale the platform
              uses by default for sorting strings. but NOTE it is not
              recommended that this behavior be seen as reliable! it is
              implemented mostly to normalize any unreliability from the
@@ -155,14 +155,14 @@ module Skylab::TestSupport
           all invalid input will have its failure explained:
 
             • because these are ordinals and not offsets, 0 is invalid.
-            • negative numbers aer not (yet) supported.
+            • negative numbers are not (yet) supported.
 
           you can use the literal string 'N' (without the quotes) to signify
           the last file in the ordered list. so if there are six spec files;
           `#{ flag }=4-N` will select the fourth, fifth and sixth files.
 
           `#{ flag }=1-N` will always do all the files in order, however
-          many files there are. you can use 'n' anywhere you would use 'N'.
+          many files there are. you can use little 'n' instead of big 'N'.
 
           flipping the order of the two numbers so that the 'N'
           term comes before the 'M' term will reverse the order of the files.

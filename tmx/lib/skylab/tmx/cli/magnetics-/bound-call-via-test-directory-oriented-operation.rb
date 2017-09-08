@@ -152,7 +152,7 @@ module Skylab::TMX
 
         as = @argument_scanner
 
-        map_op.argument_scanner = as
+        map_op.argument_scanner_narrator = as
 
         map_op.attributes_module_by = -> { Home_::Attributes_ }
           # necessary for it to be able to parse '-order' primary
@@ -297,7 +297,7 @@ module Skylab::TMX
           if max_count == @current_verbosity_COUNT
             __when_hit_max max_count
           else
-            @CLI.selection_stack.last.argument_scanner.advance_one
+            @CLI.selection_stack.last.argument_scanner_narrator.advance_one
             d = @current_verbosity_COUNT
             @current_verbosity_COUNT = d + 1
             @_handle_a.fetch( d )[ @CLI ]

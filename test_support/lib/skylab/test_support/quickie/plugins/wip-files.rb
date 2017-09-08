@@ -8,7 +8,7 @@ module Skylab::TestSupport
       # (wormhole with [#sa-024])
 
       def initialize
-        o = yield
+        o = yield  # microservice
         @_client_listener = o.listener
         @_shared_datapoint_store = o
       end
@@ -23,8 +23,8 @@ module Skylab::TestSupport
         y << "(no dry-run yet, but only mutates unmodified files)"
       end
 
-      def parse_argument_scanner_head
-        ACHIEVED_  # it's a flag; nothing to do
+      def parse_argument_scanner_head feat
+        @_narrator.advance_past_match feat.feature_match  # it's a flag - nothing to do
       end
 
       def release_agent_profile

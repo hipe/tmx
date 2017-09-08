@@ -24,8 +24,8 @@ module Skylab::Snag
 
       def _microservice_invocation p, a
         Require_microservice_toolkit__[]
-        _as = MTk_::API_ArgumentScanner.new a, & p
-        MicroserviceInvocation__.new InvocationResources___.new _as
+        _nar = MTk_::API_ArgumentScanner.narrator_for a, & p
+        MicroserviceInvocation__.new InvocationResources___.new _nar
       end
     end  # >>
   end
@@ -67,7 +67,7 @@ module Skylab::Snag
       oper = MTk_::ParseOperator_via[ self, _ob ]
 
       if oper
-        _lt = oper.mixed_business_value
+        _lt = oper.trueish_feature_value
         _lt.bound_call_of_operator_via_invocation_resouces @invocation_resources
       end
     end
@@ -81,16 +81,16 @@ module Skylab::Snag
 
   class InvocationResources___  # :#here, #testpoint
 
-    def initialize as
-      @argument_scanner = as
+    def initialize nar
+      @argument_scanner_narrator = nar
     end
     protected :initialize  # for #here-2
 
     def call_snag_API__ * a, & p
       _use_p = p || listener
-      _as = MTk_::API_ArgumentScanner.new a, & _use_p
+      _nar = MTk_::API_ArgumentScanner.narrator_for a, & _use_p
       otr = dup
-      otr.initialize _as  # :#here-2
+      otr.initialize _nar  # :#here-2
       MicroserviceInvocation__.new( otr ).execute
     end
 
@@ -126,10 +126,10 @@ module Skylab::Snag
     end
 
     def listener
-      @argument_scanner.listener
+      @argument_scanner_narrator.listener
     end
 
-    attr_reader :argument_scanner
+    attr_reader :argument_scanner_narrator
 
     def HELLO_INVO_RSX ; end
   end
@@ -167,7 +167,7 @@ module Skylab::Snag
   module ActionRelatedMethods_
 
     def init_action_ rsx  # resources, #here
-      @_argument_scanner_ = rsx.argument_scanner
+      @_argument_scanner_narrator_ = rsx.argument_scanner_narrator
     end
 
     define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -184,10 +184,10 @@ module Skylab::Snag
     end
 
     def _listener_
-      @_argument_scanner_.listener
+      @_argument_scanner_narrator_.listener
     end
 
-    attr_reader :_argument_scanner_
+    attr_reader :_argument_scanner_narrator_
   end
 
   # == ping is a stowaway

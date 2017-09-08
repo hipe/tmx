@@ -225,7 +225,7 @@ module Skylab::Fields
         end
 
         def _same m
-          _x = @_argument_scanner_.gets_one
+          _x = @_argument_scanner_narrator_.gets_one
           ( @unrecognized_tokens ||= [] ).send m, _x ; KEEP_PARSING_
         end
 

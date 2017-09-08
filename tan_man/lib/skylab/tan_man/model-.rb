@@ -410,8 +410,8 @@ module Skylab::TanMan
         _invocation_resources_.listener
       end
 
-      def _argument_scanner_
-        _invocation_resources_.argument_scanner
+      def _argument_scanner_narrator_
+        _invocation_resources_.argument_scanner_narrator
       end
 
       def _invocation_resources_

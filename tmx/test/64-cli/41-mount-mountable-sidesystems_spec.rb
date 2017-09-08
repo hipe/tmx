@@ -30,8 +30,8 @@ module Skylab::TMX::TestSupport
 
       shared_subject :_subject do
         invoke 'm'
-        # ambiguous primary "m" - did you mean map, mocking-jay or mapelthorpe?
-        parse_splay_ %r(\Aambiguous primary "m" - did you mean )
+        # ambiguous operator "m" - did you mean map, mocking-jay or mapelthorpe?
+        parse_splay_ %r(\Aambiguous operator "m" - did you mean )
       end
     end
 

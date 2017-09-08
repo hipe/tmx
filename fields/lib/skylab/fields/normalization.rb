@@ -39,26 +39,18 @@ module Skylab::Fields
 
         # -- specify the argument source (if any)
 
+        # #here6 - now we require you to specify which kind of scanner
+
+        def argument_scanner_narrator= nar
+          _receive_argument_scanner NarratorAdapter___.new nar ; nar
+        end
+
         def argument_scanner= scn
-
-          # ##here6 for now we are not giving special separate exposure
-          # for "interfacey" argument scanners vs plain old scanners.
-          # but we might one day..
-          #
-          # we wanted them to have a uniform interface but that might
-          # not be easy
-
-          if scn.respond_to? :scan_glob_values
-            _receive_argument_scanner ComplexArgScanner___.new scn
-          else
-            _receive_simple_argument_scanner scn
-          end
-          scn
+          _receive_simple_argument_scanner scn ; scn
         end
 
         def argument_array= a
-          _receive_simple_argument_scanner Scanner_[ a ]
-          a
+          _receive_simple_argument_scanner Scanner_[ a ] ; a
         end
 
         def _receive_simple_argument_scanner scn
@@ -327,7 +319,7 @@ module Skylab::Fields
         end
 
         def __no_more_arguments
-          if @_my_arg_scanner.__no_more_arguments_
+          if @_my_arg_scanner._no_more_arguments_
             remove_instance_variable :@_my_arg_scanner ; true
           else
             FALSE
@@ -1158,7 +1150,7 @@ module Skylab::Fields
 
           # like #here2, some of these are and some of these aren't like this
 
-          _express_argument_error_somehow :primary_not_found do
+          _express_argument_error_somehow :unknown_primary do
             ev_early_to_be_safe
           end
         end
@@ -1169,7 +1161,7 @@ module Skylab::Fields
           _yuck = sym_a.map { |sym| sym.id2name.gsub UNDERSCORE_, DASH_ }
 
           Home_::Events::Ambiguous.with(
-            :x, _unrecognized_token,
+            :mixed_token, _unrecognized_token,
             :name_string_array, _yuck,
           )
         end
@@ -1418,78 +1410,127 @@ module Skylab::Fields
 
       # ==
 
-      MyScanner__ = ::Class.new
+      class NarratorAdapter___  # MyScanner__
 
-      class ComplexArgScanner___ < MyScanner__
+        # dodgily we allow this one outside thing ([#ze-052], argument
+        # scanner) to be recognized here. crucially, we have wrapped it
+        # behind this facade.
+        #
+        # at #history-A.2 its interface improved but it was a major,
+        # backwards-incompatible change. for now here we are sticking with
+        # the old way and back-filling stateful logic from there to here.
 
         def initialize scn
-          @_ick = nil ; super
+          @__this_method = scn.token_scanner.method :no_unparsed_exists
+          @native_argument_scanner = scn
         end
 
         def _scan_primary_symbol_
-          @native_argument_scanner.scan_primary_symbol
+          # we don't remeber the semantics of '"scan", we think it is this
+          fm = @native_argument_scanner.procure_primary_shaped_match
+          if fm
+            @_fm = fm ; @_unsani_k = :__unsanitized_key_via_this ; ACHIEVED_
+          else
+            @_fm = nil ; remove_instance_variable :@_fm
+            @_unsani_k = :_NONE ; UNABLE_
+          end
         end
 
         def _unsanitized_key_
-          @native_argument_scanner.current_primary_symbol
+          send @_unsani_k
+        end
+
+        def __unsanitized_key_via_this
+          @_fm.feature_symbol
         end
 
         def _unrecognized_primary_token_
-          @native_argument_scanner.current_primary_token
+          @native_argument_scanner.token_scanner.head_as_is
         end
 
         def _match_unsanitized_value_ normal_asc
 
-          remove_instance_variable :@_ick
-
           if normal_asc.is_glob
-            @_advancement_is_required_EEW = false
-            a = @native_argument_scanner.scan_glob_values
-            if a
-              Common_::KnownKnown[ a ]
-            end
+            __known_when_glob
 
           elsif normal_asc.is_flag
-            @_advancement_is_required_EEW = false
-            @native_argument_scanner.scan_flag_value
+            __known_when_flag
 
           elsif normal_asc.argument_is_optional
-            @_advancement_is_required_EEW = false
-            @native_argument_scanner.scan_when_argument_is_optional
-            # as it works out this is a modalty-specific argument arity.
-            # we like to avoid it but it is idiomatic in CLI's for `--help [cmd]`
+            __known_when_optional_argument
 
           else
             _match_unsanitized_monadic_value_
           end
         end
 
-        def _match_unsanitized_monadic_value_
+        def __known_when_glob
+          # (at #history-A.2 backfilled this stuff in to here from there)
+          vm = _procure_AND_NOTE_value_match
+          if vm
+            x = vm.mixed
+            if ::Array.try_convert x  # remove at [#008.2] on stack
+              self._THIS_HAS_CHANGED__if_its_glob_just_pass_a_single_value_at_a_time__
+            else
+              Common_::KnownKnown[ [ x ] ]
+            end
+          end
+        end
 
-            @_advancement_is_required_EEW = true
-            unsanitized_value = nil
-            _ok = @native_argument_scanner.map_value_by do |x|
-              unsanitized_value = x ; true
-            end
-            if _ok
-              Common_::KnownKnown[ unsanitized_value ]
-            end
+        def __known_when_flag
+          @_advance_past_this_match = @_fm
+          Common_::KnownKnown.trueish_instance
+        end
+
+        def __known_when_optional_argument
+
+          # as it works out this is a modalty-specific argument arity.
+          # we like to avoid it but it is idiomatic in CLI's for `--help [cmd]`
+
+          vm = @native_argument_scanner.
+            match_optional_argument_after_feature_match @_fm
+          if vm
+            ::Kernel._A  # might have done something at #history-A.2
+          else
+            @_advance_past_this_match = @_fm
+            Common_::KNOWN_UNKNOWN
+          end
+        end
+
+        def _match_unsanitized_monadic_value_
+          vm = _procure_AND_NOTE_value_match
+          if vm
+            Common_::KnownKnown[ vm.mixed ]
+          end
+        end
+
+        def _procure_AND_NOTE_value_match
+          vm = @native_argument_scanner.procure_any_match_after_feature_match @_fm
+          if vm
+            @_advance_past_this_match = vm
+          end
+          vm
         end
 
         def _when_primary_completed_
 
-          # we hate this, but for now, meh: [#ze-052.2] be OCD about don't
-          # advance until valid, but only for certain argument arities.
-          @_ick = nil
-          if remove_instance_variable :@_advancement_is_required_EEW
-            @native_argument_scanner.advance_one ; nil
-          end
+          _xm = remove_instance_variable :@_advance_past_this_match
+          @native_argument_scanner.advance_past_match _xm
+          NIL
         end
+
+        def _no_more_arguments_
+          @__this_method[]
+        end
+
+        attr_reader(
+          :native_argument_scanner,
+        )
       end
 
       # ~
 
-      class SimpleArgScanner___ < MyScanner__
+      class SimpleArgScanner___ #  MyScanner__
 
         def initialize scn
           @native_argument_scanner = scn
@@ -1535,16 +1576,7 @@ module Skylab::Fields
           NOTHING_  # :[#012.L.1]: CHANGED
         end
 
-        attr_reader :native_argument_scanner
-      end
-
-      class MyScanner__
-
-        def initialize scn
-          @native_argument_scanner = scn
-        end
-
-        def __no_more_arguments_
+        def _no_more_arguments_
           @native_argument_scanner.no_unparsed_exists
         end
 
@@ -1619,6 +1651,7 @@ module Skylab::Fields
     # -
   end
 end
+# #history-A.2 - 2nd wave of argument scanning
 # #history-037.5.C - the "FUN" methods and more "association index"-related, 1st pass
 # #history-037.5.I - experimental assimilation of the facility from "association index"
 # #history-037.5.G - "normalization against model" (file assimilated)

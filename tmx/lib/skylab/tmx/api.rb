@@ -15,7 +15,8 @@ module Skylab::TMX
 
       def invocation_via_argument_array x_a, & p
         o = self.begin( & p )
-        o.argument_scanner = Zerk_lib_[]::API::ArgumentScanner.via_array x_a, & p
+        # (below while #open [#ze-068])
+        o.argument_scanner_narrator = Zerk_lib_[]::API::ArgumentScanner.via_array x_a, & p
         o
       end
 
@@ -34,7 +35,7 @@ module Skylab::TMX
       end
 
       attr_writer(
-        :argument_scanner,
+        :argument_scanner_narrator,
       )
 
       def execute
@@ -48,7 +49,7 @@ module Skylab::TMX
 
         _ada = Operations_module_operator_branch___[]
 
-        item = @argument_scanner.match_branch(
+        item = @argument_scanner_narrator.match_branch(
           :business_item, :against_branch, _ada )
 
         if item
@@ -88,16 +89,16 @@ module Skylab::TMX
 
         o = nil
 
-        as = @argument_scanner
+        nar = @argument_scanner_narrator
 
         op = _operation_class.begin( & @_emit )
 
-        op.argument_scanner = as
+        op.argument_scanner_narrator = nar
 
         @_emit.call :data, :operator_resolved do |fr|
 
           fr.name = name
-          fr.argument_scanner = as
+          fr.argument_scanner_narrator = nar
           fr.operator_instance = op
 
           fr.define_didactics_by do |dida|
@@ -105,7 +106,7 @@ module Skylab::TMX
           end
         end
 
-        @argument_scanner.advance_one
+        @argument_scanner_narrator.advance_one
 
         Common_::BoundCall[ nil, op, :execute ]
       end

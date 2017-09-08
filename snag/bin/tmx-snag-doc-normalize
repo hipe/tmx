@@ -25,7 +25,10 @@ program = -> argv, sin, sout, serr, pn_s_a do
     end
   end.call
 
+  if false  # anybody that needs highline should not be a one-off.
+    # this is commented out so just the help screen works. probably archive this
   require 'highline/import' ; require 'set'
+  end
 
   # imaginary module begin
 

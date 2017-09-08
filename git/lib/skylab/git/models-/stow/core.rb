@@ -315,11 +315,11 @@ module Skylab::Git
       end
 
       def _listener_
-        _argument_scanner_.listener
+        _argument_scanner_narrator_.listener
       end
 
-      def _argument_scanner_
-        _invocation_resources_.argument_scanner
+      def _argument_scanner_narrator_
+        _invocation_resources_.argument_scanner_narrator
       end
 
       def _filesystem_

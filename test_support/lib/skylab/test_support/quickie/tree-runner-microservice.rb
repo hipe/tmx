@@ -44,15 +44,22 @@ module Skylab::TestSupport
       # ==
 
       # -
+
+        def initialize
+          @default_primary_symbol = nil
+          super
+        end
+
         attr_writer(
-          :argument_scanner,
+          :argument_scanner_narrator,
+          :default_primary_symbol,
           :listener,
         )
 
         def __prepare  # makes testing easier to do this outside of execute
           __init_operator_branch
           __init_plugin_lazy_index
-          @listener ||= @argument_scanner.listener
+          @listener ||= @argument_scanner_narrator.listener
           self
         end
 
@@ -248,13 +255,22 @@ module Skylab::TestSupport
 
         def __parse_arguments
 
-          as = @argument_scanner
-          yes = ! as.no_unparsed_exists
-          yes &&= as.scan_primary_symbol_softly
-          if yes && :ping == as.current_primary_symbol
+          nar = @argument_scanner_narrator
+          ts = nar.token_scanner
+
+          unless ts.no_unparsed_exists
+            match = nar.match_primary_shaped_token
+            if match
+              if :ping == match.primary_symbol
+                yes_ping = true
+              end
+            end
+          end
+
+          if yes_ping
             __express_ping
           else
-            __parse_arguments_via_omni
+            __parse_arguments_via_omni match
           end
         end
 
@@ -267,39 +283,49 @@ module Skylab::TestSupport
           ACHIEVED_
         end
 
-        def __parse_arguments_via_omni
+        def __parse_arguments_via_omni primary_match
 
-          @omni = @_MTk::ParseArguments_via_FeaturesInjections.define do |o|
-            o.argument_scanner = @argument_scanner
+          omni = @_MTk::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
+            o.argument_scanner_narrator = @argument_scanner_narrator
             o.add_lazy_primaries_injection_by do |inj|
               inj.primaries = @operator_branch
               inj.parse_by = method :__PARSE_HEAD_VIA_PLUGIN
             end
+            sym = @default_primary_symbol
+            if sym
+              o.default_primary_symbol = sym
+            end
           end
 
-          if @argument_scanner.has_current_primary_symbol
+          # (the below grammar is duplicated at covered at [bs] #Coverpoint1.6)
+
+          @omni = omni
+          nar = omni.argument_scanner_narrator
+
+          if primary_match
 
             # if you parsed one primary initially (softly), bogey down
-            @omni.flush_to_lookup_current_and_parse_remaining_primaries
 
-          elsif @argument_scanner.no_unparsed_exists
+            omni.flush_to_find_and_process_this_and_remaining_primaries primary_match
+
+          elsif nar.token_scanner.no_unparsed_exists
 
             # (no args will always fail (right?) but ride along.. #coverpoint-2-1)
             ACHIEVED_
 
           else
-            self._COVER_ME__see_tombstone_for_ideas__  # (was #tombstone-C)
+            omni.flush_to_parse_primaries  # (was #tombstone-C)
           end
         end
 
         def __PARSE_HEAD_VIA_PLUGIN primary_found
 
-          _custom_loadable_reference = primary_found.trueish_item_value
+          _custom_loadable_reference = primary_found.trueish_feature_value
           _custom_loadable_reference.HELLO_LOADABLE_REFERENCE
 
           d = @lazy_index.offset_of_touched_plugin_via_user_value _custom_loadable_reference
           pi = @lazy_index.dereference_plugin d
-          ok = pi.parse_argument_scanner_head
+          ok = pi.parse_argument_scanner_head primary_found
           if ok
             @lazy_index.enqueue d
           end
@@ -350,7 +376,7 @@ module Skylab::TestSupport
         # --
 
         attr_reader(
-          :argument_scanner,
+          :argument_scanner_narrator,
           :lazy_index,
           :listener,
           :operator_branch,

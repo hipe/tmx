@@ -6,7 +6,7 @@ module Skylab::Fields
 
       :ambiguous_property,
 
-      :x, nil,  # #todo rename to `mixed_token`
+      :mixed_token, nil,  # #todo rename to `mixed_token`
       :name_string_array, nil,
       :name, nil,
       :error_category, :argument_error,
@@ -19,7 +19,7 @@ module Skylab::Fields
       name = o.name
       name ||= Common_::Name.via_variegated_symbol DEFAULT_PROPERTY_LEMMA_
 
-      y << "ambiguous #{ name.as_human } #{ ick o.x } - did you mean #{ or_ _s_a }?"
+      y << "ambiguous #{ name.as_human } #{ ick o.mixed_token } - did you mean #{ or_ _s_a }?"
 
     end
 
@@ -50,7 +50,7 @@ module Skylab::Fields
         end
 
         with(
-          :x, x,
+          :mixed_token, x,
           :name_string_array, _name_s_a,
           :name, _name )
       end

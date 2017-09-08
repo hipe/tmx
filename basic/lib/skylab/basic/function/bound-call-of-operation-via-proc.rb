@@ -109,7 +109,7 @@ module Skylab::Basic
 
         invo_rsx = _invocation_resources
 
-        _arg_scn = invo_rsx.argument_scanner
+        _nar = invo_rsx.argument_scanner_narrator
         _listener = invo_rsx.listener  # probably comes from above
 
         h = {}
@@ -117,7 +117,7 @@ module Skylab::Basic
         _ok = MTk_[]::Normalization.call_by do |o|
 
           o.hash_store = h
-          o.argument_scanner = _arg_scn
+          o.argument_scanner_narrator = _nar
           o.association_stream_newschool = _fo_st
           o.listener = _listener
         end

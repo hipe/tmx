@@ -20,6 +20,16 @@ module Skylab::TMX::TestSupport
 
       # -- read
 
+      def to_symbolish_reference_scanner
+        # if we ever want `to_scanner` on a box, #track :[#co-061.2]
+        # (near #open [#ze-068] unify scanners)
+        bx  = _cached_box
+        h = bx.h_
+        ::NoDependenciesZerk::Scanner_via_Array.new( bx.a_ ).map_by do |k|
+          h.fetch k
+        end
+      end
+
       def to_sidesystem_reference_stream
         _cached_box.to_value_stream
       end

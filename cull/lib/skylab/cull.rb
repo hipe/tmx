@@ -28,8 +28,8 @@ module Skylab::Cull
 
     def invocation_via_argument_array a, & p
       Require_microservice_toolkit___[]
-      _as = MTk_::API_ArgumentScanner.new a, & p
-      MicroserviceInvocation___.new InvocationResources___.new _as
+      _nar = MTk_::API_ArgumentScanner.narrator_for a, & p
+      MicroserviceInvocation___.new InvocationResources___.new _nar
     end
   end  # >>
 
@@ -133,8 +133,8 @@ module Skylab::Cull
       _invocation_resources_.listener
     end
 
-    def _argument_scanner_
-      _invocation_resources_.argument_scanner
+    def _argument_scanner_narrator_
+      _invocation_resources_.argument_scanner_narrator
     end
 
     def _invocation_resources_
@@ -199,7 +199,7 @@ module Skylab::Cull
   class InvocationResources___
 
     def initialize as
-      @argument_scanner = as
+      @argument_scanner_narrator = as
     end
 
     def filesystem
@@ -213,11 +213,11 @@ module Skylab::Cull
     end
 
     def listener
-      @argument_scanner.listener
+      @argument_scanner_narrator.listener
     end
 
     attr_reader(
-      :argument_scanner,
+      :argument_scanner_narrator,
     )
   end
 

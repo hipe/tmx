@@ -31,7 +31,7 @@ module Skylab::TestSupport::TestSupport
 
       it "API - splay" do
         call :wuz_up
-        expect :error, :expression, :primary_parse_error, :primary_not_found do |y|
+        expect :error, :expression, :primary_parse_error, :unknown_primary do |y|
           y[0] == "unknown primary 'wuz_up'" || fail
           y[1] =~ /\Aavailable primaries: '/ || fail
         end

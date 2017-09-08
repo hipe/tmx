@@ -52,12 +52,17 @@ module Skylab::CodeMetrics::TestSupport
 
         _Mondrian = _subject_library
         _Interface = _interface_library
-        _scn = _Interface::API_ArgumentScanner.new x_a, & p
-        op = _Mondrian::Operation__.new _scn, debug_IO
 
-        _ok = _Interface::ParseArguments_via_FeaturesInjections.define do |o|
-          o.argument_scanner = _scn
-          o.add_primaries_injection op.class::PRIMARIES, op
+        nar = _Interface::API_ArgumentScanner.narrator_for x_a, & p
+        op = _Mondrian::Operation__.new nar, debug_IO
+
+        _ok = _Interface::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
+
+          o.add_primaries_injection op.class::PRIMARIES, :_inj_cm
+          o.add_injector op, :_inj_cm
+
+          o.argument_scanner_narrator = nar
+
         end.flush_to_parse_primaries
 
         _ = _ok && op.execute

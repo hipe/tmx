@@ -325,11 +325,11 @@ module Skylab::BeautySalon
       include CommonActionMethods_
 
       def _listener_  # override our more complicated way FOR NOW ..
-        _argument_scanner_.listener
+        _argument_scanner_narrator_.listener
       end
 
-      def _argument_scanner_
-        @invo_resources_.argument_scanner
+      def _argument_scanner_narrator_
+        @invo_resources_.argument_scanner_narrator
       end
 
       attr_reader(

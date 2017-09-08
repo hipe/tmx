@@ -24,6 +24,8 @@
 
 [#061]       the box narrative ..
 
+       #track :[#here.2] if you ever want `to_scanner`
+
 [#060]       the name narrative ..
 [#059]       [ bound call ]
              ( #was: #done #parent-node: [#016] "signal processing scans.." ) )

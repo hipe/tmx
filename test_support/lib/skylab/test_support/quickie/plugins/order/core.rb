@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::TestSupport
 
   module Quickie
@@ -6,6 +8,7 @@ module Skylab::TestSupport
 
       def initialize
         o = yield
+        @_narrator = o.argument_scanner_narrator
         @_listener = o.listener
         @_shared_datapoint_store = o
       end
@@ -15,32 +18,28 @@ module Skylab::TestSupport
       end
 
       def __describe_into y
-        y << "(use \"#{ _moniker } help\")"
+        y << "(use \"#{ _moniker } help\" for help on this plugin.)"
       end
 
-      def parse_argument_scanner_head
-        send ( @_parse_argument_scanner_head ||= :__parse_first )
+      def parse_argument_scanner_head feat_found
+        send ( @_parse_argument_scanner_head ||= :__parse_first ), feat_found
       end
 
-      def __parse_first
+      def __parse_first feat_found
+
+        # #tombstone-A.1 we used to do optional arguments differently
 
         @_parse_argument_scanner_head = :__CLOSED__or_watever__
 
-        as = @_shared_datapoint_store.argument_scanner
-        if ! as.no_unparsed_exists
-          if as.can_optional_argument
-            if as.head_looks_like_optional_argument
-              s = as.head_as_is
-              as.advance_one
-            end
-          else
-            s = as.head_as_is
-            as.advance_one
-          end
-        end
-
-        if ! s
+        nar = @_narrator
+        fm = feat_found.feature_match
+        vm = nar.match_optional_argument_after_feature_match fm
+        if vm
+          s = vm.mixed
+          nar.advance_past_match vm
+        else
           s = DEFAULT__
+          nar.advance_past_match fm
         end
 
         if 'help' == s
@@ -148,3 +147,4 @@ module Skylab::TestSupport
     end
   end
 end
+# #tombstone-A.1: we used to do optional arguments by hand

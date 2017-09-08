@@ -349,6 +349,7 @@ class Skylab::Git_citxt  # #[#ze-063.1] mountable one-off
 
   ERROR_ = 5
   NIL_ = nil
+    NIL = nil  # open [#sli-016.C]
 end
 
 if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]

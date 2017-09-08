@@ -22,10 +22,14 @@ module Skylab::TMX
           _  # #todo
         end
 
-        def dereference lt
-          _sym = lt.category_symbol  # [#ze-062]
-          :zerk_sidesystem_loadable_reference_category_symbol == _sym || self._OK_FINE
-          lt
+        def dereference ref
+          _sym = ref.reference_category_symbol  # [#ze-062]
+          :SIDESYSTEM_LOADABLE_REFERENCE_ze == _sym || self._OK_FINE
+          ref
+        end
+
+        def to_symbolish_reference_scanner
+          @installation.to_symbolish_reference_scanner
         end
 
         def to_loadable_reference_stream  # 1x [ze]

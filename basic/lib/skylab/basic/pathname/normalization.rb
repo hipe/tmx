@@ -51,7 +51,7 @@ module Skylab::Basic
 
         def qualified_knownness=
           @_do_freeze = false
-          @qualified_knownness = @_argument_scanner_.gets_one
+          @qualified_knownness = @_argument_scanner_narrator_.gets_one
           KEEP_PARSING_
         end
 

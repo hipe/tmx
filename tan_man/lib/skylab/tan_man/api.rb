@@ -13,12 +13,12 @@ module Skylab::TanMan
 
       def invocation_via_argument_array a=nil, & p  # #testpoint
         Require_microservice_toolkit_[]
-        _as = if a
-          MTk_::API_ArgumentScanner.new a, & p
+        _nar = if a
+          MTk_::API_ArgumentScanner.narrator_for a, & p
         elsif p
           ListenerOnly___.new p
         end
-        MicroserviceInvocation___.new InvocationResources___.new _as
+        MicroserviceInvocation___.new InvocationResources___.new _nar
       end
 
       def expression_agent_instance  # :+[#051]
@@ -76,8 +76,8 @@ module Skylab::TanMan
         # that the "kernel" (monolith) used to be responsible for.
         # see #[#007.C] throughout lib.)
 
-        _as = MTk_::API_ArgumentScanner.new sym_a, & @invocation_resources.listener
-        _rsx = @invocation_resources.__dup_invocation_resources_ _as
+        _nar = MTk_::API_ArgumentScanner.narrator_for sym_a, & @invocation_resources.listener
+        _rsx = @invocation_resources.__dup_invocation_resources_ _nar
         _invo = self.class.new _rsx
         _invo.execute
       end
@@ -95,8 +95,8 @@ module Skylab::TanMan
 
     class InvocationResources___
 
-      def initialize as
-        @argument_scanner = as
+      def initialize nar
+        @argument_scanner_narrator = nar
         freeze
       end
 
@@ -110,11 +110,11 @@ module Skylab::TanMan
       end
 
       def listener
-        @argument_scanner.listener
+        @argument_scanner_narrator.listener
       end
 
       attr_reader(
-        :argument_scanner,
+        :argument_scanner_narrator,
       )
 
       def filesystem

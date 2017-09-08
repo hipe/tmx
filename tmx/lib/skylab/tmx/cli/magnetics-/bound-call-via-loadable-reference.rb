@@ -53,13 +53,29 @@ module Skylab::TMX
 
         def __init_ARGV_for_sidesystem
 
-          _scn = @CLI.release_argument_scanner_for_mounted_operator
-          d, argv = _scn.close_and_release
+          ts = @CLI.release_argument_scanner_for_mounted_operator.token_scanner
+
           if @is_for_help
-            argv.replace [ HELP_SWITCH_LONG_, * argv[ d .. -1 ] ]
+            d, argv = ts.LIQUIDATE_TOKEN_SCANNER  # implicit assertion
+            # YUCK accomodate the 2 forms of help request, use original token. see #hereA in cli.rb
+            2 <= argv.length || fail
+            if HELP_RX =~ argv[0]
+              argv[ 1, 1 ] = EMPTY_A_
+
+            elsif HELP_RX =~ argv[1]
+              argv[ 0, 1 ] = EMPTY_A_
+
+            else
+              self._SANITY
+            end
+          elsif ts.no_unparsed_exists
+            argv = EMPTY_A_  # there is danger here
           else
+            d, argv = ts.LIQUIDATE_TOKEN_SCANNER  # implicit assertion
             argv[ 0, d ] = EMPTY_A_
+              # (typically, removes head span of ARGV holding sidesystem name)
           end
+
           @__ARGV_for_sidesystem = argv
           NIL
         end
@@ -95,9 +111,6 @@ module Skylab::TMX
       # -
 
       # ==
-
-      HELP_SWITCH_LONG_ = '--help'
-
       # ==
     end
   end

@@ -302,9 +302,9 @@ module Skylab::Common
           once = -> do
             did = true
             at_end = -> do
-              remove_instance_variable :@_argument_scanner_
+              remove_instance_variable :@_argument_scanner_narrator_
             end
-            @_argument_scanner_ = scn
+            @_argument_scanner_narrator_ = scn
             NIL_
           end
 
@@ -359,7 +359,7 @@ module Skylab::Common
         end
 
         def gets_one  # :+#cp
-          @_argument_scanner_.gets_one
+          @_argument_scanner_narrator_.gets_one
         end
 
       protected

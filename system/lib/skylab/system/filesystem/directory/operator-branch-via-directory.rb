@@ -217,6 +217,10 @@ module Skylab::System
         send @_read_for_random_access, ref.intern
       end
 
+      def to_symbolish_reference_scanner
+        send( @_read_for_stream ).flush_to_NO_DEPS_ZERK_scanner
+      end
+
       def to_loadable_reference_stream
         send @_read_for_stream
       end

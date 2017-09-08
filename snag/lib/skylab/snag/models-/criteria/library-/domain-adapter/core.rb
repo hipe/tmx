@@ -18,31 +18,29 @@ module Skylab::Snag
 
             mutable_me = __begin_mutable_me
 
-            st = invo_rsx.microservice_operator_branch_.to_loadable_reference_stream
+            scn = invo_rsx.microservice_operator_branch_.to_symbolish_reference_scanner
 
-            begin
+            until scn.no_unparsed_exists
 
-              ref = st.gets
-              ref || break
+              ref = scn.gets_one
 
               x = ref.dereference_loadable_reference
               if ! x.respond_to? :const_get
-                redo  # maybe the "silo" is not a module. (ping used to be this. no longer)
+                next  # maybe the "silo" is not a module. (ping used to be this. no longer)
               end
 
               expads = x.const_get :ExpressionAdapters, false
               if ! expads
-                redo  # the "silo" is stating explicitly that it doesn't participate
+                next  # the "silo" is stating explicitly that it doesn't participate
               end
 
               p = expads.const_get :EN, false
               if ! p
-                redo
+                next
               end
 
               p[ mutable_me ]
-              redo
-            end while above
+            end
 
             mutable_me
           end

@@ -176,7 +176,7 @@ module Skylab::TestSupport
 
       @listener.call :data, :operator_resolved do |frame|
 
-        frame.argument_scanner = @argument_scanner
+        frame.argument_scanner_narrator = @argument_scanner
 
         frame.define_didactics_by do |dida|
           send ro.didactics_method_name, dida, ro

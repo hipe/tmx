@@ -41,6 +41,7 @@ module Skylab::Brazen
           o.const_set :MTk_, Zerk_::MicroserviceToolkit
           require 'no-dependencies-zerk'
           o.const_set :UI_, ::NoDependenciesZerk
+          self.class.include UI_::NarratorMethods  # <-- YIKES
         end
 
         @_receive_root_expression_agent_proc = :__NOT_YET_OPEN
@@ -63,7 +64,8 @@ module Skylab::Brazen
 
       def new a, i, o, e, pns_a
 
-        __init_argument_scanner_via_ARGV a
+        @argument_scanner_narrator =
+          UI_::CLI_ArgumentScanner.narrator_for a, & @listener
 
         @expression_agent_by = nil
         @_receive_root_expression_agent_proc = :__receive_root_expression_agent_proc
@@ -114,7 +116,7 @@ module Skylab::Brazen
         Resources_HOT_NEW_TAKE___.define do |o|
           yield o
           o.receive_error_channel_by = method :_receive_error_channel
-          o.argument_scanner = @args
+          o.argument_scanner_narrator = @argument_scanner_narrator
           o.__stdin_stdout_stderr_ @stdin, @stdout, @stderr
           o.filesystem_by = method :filesystem
         end
@@ -143,9 +145,9 @@ module Skylab::Brazen
 
         __init_stack
         begin
-          operator_found = __process_any_primaries_and_lookup_next_operator
-          operator_found || break
-          _lref = operator_found.mixed_business_value
+          _ok = __process_any_primaries_and_lookup_next_operator
+          _ok || break
+          _lref = current_operator_found.trueish_feature_value
           step = MTk_::ModelCentricOperatorBranch::STEP_VIA_LOADABLE_REFERENCE[ _lref ]  # #open #[#pl-007.2] stil incubating
           if step.is_branchy_step
             __push_branchy_stack_frame step
@@ -213,33 +215,37 @@ module Skylab::Brazen
         #
         #            [one step]  [another step]
 
-        args = @args ; omni = @stack.last._omni_branch_
         begin
 
           # if scanner empty, end of the line. done.
-          if args.no_unparsed_exists
-            Zerk_::ArgumentScanner::When::No_arguments[ omni ]
+          if no_unparsed_exists
+            Zerk_::ArgumentScanner::When::No_arguments[ current_argument_parsing_idioms ]
             break
           end
 
           # if head looks like primary, try parse and repeat.
-          if args.scan_primary_symbol_softly
-            _kp = omni.process_primary_at_head
+          if match_primary_shaped_token
+            _kp = procure_and_process_primary_via_match
             _kp ? redo : break
           end
 
           # if head looks like operator:
-          if args.scan_operator_symbol_softly
-            operator_found = omni.flush_to_lookup_operator
+          if match_operator_shaped_token
+            yes = procure_operator_via_match
             # (whether it succeeded or fail, we get off here.)
             break
           end
 
           # head looks like neither primary nor operator. whine and done
-          args.when_malformed_primary_or_operator
+          when_malformed_primary_or_operator
           break
         end while above
-        operator_found
+
+        yes
+      end
+
+      def current_argument_parsing_idioms
+        @stack.last._omni_branch_
       end
 
       def __receive_help_request qkn
@@ -311,7 +317,9 @@ module Skylab::Brazen
         STOP_PARSING_
       end
 
-      def __express_branch_help
+      def __express_branch_help ff
+
+        @argument_scanner_narrator.advance_past_match ff.feature_match
 
         shorten_the_description = -> mod do
 
@@ -390,19 +398,12 @@ module Skylab::Brazen
       end
 
       def __to_item_normal_tuple_stream
-        @stack.last._operator_branch_.to_loadable_reference_stream.map_by do |key_x|
+
+        @stack.last._operator_branch_.to_symbolish_reference_scanner.map_by do |key_x|
           [ :operator, key_x ]
-        end
+        end.flush_to_minimal_stream
       end
 
-      def __init_argument_scanner_via_ARGV argv
-
-        @args = UI_::CLI_ArgumentScanner.define do |o|
-          o.ARGV = argv
-          o.listener = @listener
-        end
-        NIL
-      end
 
       def __receive_emission *chan, & em_p
 
@@ -445,17 +446,23 @@ module Skylab::Brazen
 
       def __push_terminal_stack_frame_and_produce_bound_call step
 
+        _of = release_operator_found
+        om = _of.operator_match
+        @argument_scanner_narrator.advance_past_match om
+
         BoundCall_via_etc___.call_by do |o|
           o.receive_stack_frame_by do |frame|
             @stack.push frame  # hi.
           end
           o.step = step
-          o.current_operator_symbol = @args.current_operator_symbol
+          o.operator_symbol = om.operator_symbol
           o.invocation = self
         end
       end
 
       def __push_branchy_stack_frame step
+
+        fm = release_operator_found.feature_match
 
         mod = step.business_module
 
@@ -465,11 +472,13 @@ module Skylab::Brazen
         ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH @stack.last._operator_branch_  # #open #[#pl-007.2] still incubating
         _omni = _omni_branch_for :_hello_2_BR_, ob
 
+        @argument_scanner_narrator.advance_past_match fm
+
         @stack.push( NonRootNonTerminalFrame___.define do |o|
           o._omni_branch_ = _omni
           o._operator_branch_ = ob
           o._business_module_ = mod
-          o._name_symbol = @args.current_operator_symbol
+          o._name_symbol = fm.feature_symbol
           o._expression_agent_by_ = NOTHING_
         end )
         NIL
@@ -496,16 +505,17 @@ module Skylab::Brazen
 
       def _omni_branch_for inj_sym, ob
 
-        UI_::ParseArguments_via_FeaturesInjections.define do |fi|
-
-          fi.argument_scanner = @args
+        UI_::ArgumentParsingIdioms_via_FeaturesInjections.define do |fi|
 
           fi.add_lazy_operators_injection_by do |o|
             o.operators = ob
-            o.injector = inj_sym
+            o.injection_symbol = inj_sym
           end
 
-          fi.add_primaries_injection PRIMARIES___, self
+          fi.add_primaries_injection PRIMARIES___, :_inj_br
+          fi.add_injector self, :_inj_br
+
+          fi.argument_scanner_narrator = @argument_scanner_narrator
         end
       end
 
@@ -544,10 +554,6 @@ module Skylab::Brazen
         @_exitstatus = d ; nil
       end
 
-      def argument_scanner  # for self..
-        @args
-      end
-
       def __expression_agent_defaultly
         ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
       end
@@ -565,6 +571,7 @@ module Skylab::Brazen
       end
 
       attr_reader(
+        :argument_scanner_narrator,  # [bs]
         :listener,
       )
     # -
@@ -578,7 +585,7 @@ module Skylab::Brazen
       end
 
       attr_writer(
-        :current_operator_symbol,
+        :operator_symbol,
         :invocation,
         :step,
       )
@@ -667,7 +674,7 @@ module Skylab::Brazen
 
         _fr = TerminalFrame___.define do |o|
           o.__operation_ = @_operation
-          o._name_symbol = remove_instance_variable :@current_operator_symbol
+          o._name_symbol = remove_instance_variable :@operator_symbol
           o._expression_agent_by_ = remove_instance_variable :@__expression_agent_proc
         end
         remove_instance_variable( :@__receive_stack_frame )[ _fr ]
@@ -2737,9 +2744,11 @@ module Skylab::Brazen
       end
 
       attr_writer(
-        :argument_scanner,
         :filesystem,
         :receive_error_channel_by,
+      )
+      attr_accessor(
+        :argument_scanner_narrator,
       )
 
       # --
@@ -2781,7 +2790,6 @@ module Skylab::Brazen
       end
 
       attr_reader(
-        :argument_scanner,
         :listener,
         :stderr,
         :stdin,

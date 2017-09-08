@@ -47,7 +47,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :object_argument,
-          @_argument_scanner_ )
+          @_argument_scanner_narrator_ )
       end
 
       def subject
@@ -66,7 +66,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :subject_argument,
-          @_argument_scanner_ )
+          @_argument_scanner_narrator_ )
       end
 
       def verb=
@@ -75,7 +75,7 @@ module Skylab::Human
           :via, :argument_scanner,
           :add,
           :verb,
-          @_argument_scanner_ )
+          @_argument_scanner_narrator_ )
       end
 
       attr_reader :verb_argument
