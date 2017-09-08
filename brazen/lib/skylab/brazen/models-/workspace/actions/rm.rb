@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actions::Rm < Home_::Action
+    class Actions::Rm < Home_::ActionToolkit
 
       edit_entity_class(
         :after, :ping,

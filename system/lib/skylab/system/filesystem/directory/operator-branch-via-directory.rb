@@ -6,7 +6,7 @@ module Skylab::System
 
       # "implementation objectives", pseudocode, and historical context in :[#040].
 
-      # as an operator branch, this is referenced with :[#ze-051.G].
+      # as an operator branch, this is referenced with :[#ze-051.7].
 
     # this operates strictly thru a filesystem controller so it is
     # compatible with a stubbed filesystem.

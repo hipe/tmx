@@ -18,6 +18,8 @@ module Skylab::Zerk
 
       class ScreenForBranch < ScreenForWhichever__
 
+        attr_writer :custom_items_section_label_via_type_symbol
+
         def express_usage_section program_name
 
           @express_boundary[]
@@ -98,12 +100,11 @@ module Skylab::Zerk
         end  # >>
 
         def initialize
-
+          @custom_items_section_label_via_type_symbol = nil
           @expression_agent = nil
           @has_item_groups = false
           @expression_agent = nil
           @margin = TWO_SPACES___
-
           yield self
         end
 
@@ -160,7 +161,10 @@ module Skylab::Zerk
 
           puts = @puts
 
-          puts.call "#{ LABEL_FOR___.fetch group.normal_item_type_symbol }:"
+          label_s = __label_via_type_symbol group.normal_item_type_symbol
+          if label_s
+            puts.call "#{ label_s }:"
+          end
 
           fmt = "#{ @margin }%#{ @max_name_width }s"
 
@@ -222,6 +226,18 @@ module Skylab::Zerk
             redo
           end while nil
           NIL
+        end
+
+        def __label_via_type_symbol type_sym
+          p = @custom_items_section_label_via_type_symbol
+          if p
+            x = p[ type_sym ]
+          end
+          if x.nil?
+            LABEL_FOR___.fetch type_sym
+          else
+            x
+          end
         end
 
         LABEL_FOR___ = {

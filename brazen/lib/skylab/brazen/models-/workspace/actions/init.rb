@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-  class Actions::Init < Home_::Action
+  class Actions::Init < Home_::ActionToolkit
 
     edit_entity_class(
 

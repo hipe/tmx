@@ -969,8 +969,13 @@ module NoDependenciesZerk
       end
 
       def to_primary_symbol_scanner  # assume
+
         _to_primaries_injections_offset_scanner.expand_by do |d|
-          @_primaries_injections.fetch( d ).injection.to_loadable_reference_scanner
+
+          _inj = @_primaries_injections.fetch( d ).injection
+          _inj.to_loadable_reference_scanner.map_by do |ref|
+            ref.intern
+          end
         end
       end
 
@@ -1166,7 +1171,11 @@ module NoDependenciesZerk
       end
 
       def to_loadable_reference_scanner
-        Scanner_by.new( & @_substrate_adapter_.to_loadable_reference_stream )
+        Scanner_by.new( & to_loadable_reference_stream )
+      end
+
+      def to_loadable_reference_stream
+        @_substrate_adapter_.to_loadable_reference_stream
       end
 
       def loadable_reference_via_symbol sym

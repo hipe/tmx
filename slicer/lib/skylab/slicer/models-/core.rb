@@ -6,7 +6,7 @@ module Skylab::Slicer
 
   # ~ stowaway
 
-  class Action_ < Brazen_::Action
+  class Action_ < Brazen_::ActionToolkit
     Brazen_::Modelesque.entity self
   end
 

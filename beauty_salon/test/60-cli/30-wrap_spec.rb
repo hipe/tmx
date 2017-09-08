@@ -60,7 +60,7 @@ module Skylab::BeautySalon::TestSupport
       it 'description' do
 
         _sect = _sections.fetch :description
-        _sect.emissions[0].string.include? 'umbrella' or fail
+        _sect.emissions[0].string.include? 'text-related actions' or fail  # (generated text by [br])
       end
 
       it 'operations constituency' do

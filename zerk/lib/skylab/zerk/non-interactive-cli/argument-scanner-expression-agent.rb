@@ -13,10 +13,10 @@ module Skylab::Zerk
 
       alias_method :calculate, :instance_exec
 
-      def say_primary_alternation_ st
+      def say_primary_alternation_ internable_st
 
-        _mid = st.join_into_with_by "", " | " do |sym|
-          prim sym
+        _mid = internable_st.join_into_with_by ::String.new, ' | ' do |o_x|
+          prim o_x.intern
         end
 
         "{ #{ _mid } }"

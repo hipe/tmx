@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownReports_::Main < Common_::MagneticBySimpleModel
+  class CrazyTownReports_::Replace < Common_::MagneticBySimpleModel
 
     # -
 
@@ -50,7 +50,7 @@ module Skylab::BeautySalon
 
       def __resolve_dynamic_hook_definition
 
-        _ = Home_::CrazyTownMagneticsForMainReport_::ChangedFile_via_HooksDefinition_via_Functions_and_Selector.call_by do |o|
+        _ = Home_::CrazyTownReportMagnetics_::ChangedFile_via_HooksDefinition_via_Functions_and_Selector.call_by do |o|
 
           o.receive_changed_file = method :__receive_changed_file
 
@@ -64,7 +64,7 @@ module Skylab::BeautySalon
 
       def __receive_changed_file y, io, sb
 
-        _ = Home_::CrazyTownMagneticsForMainReport_::DiffLineStream_via_ChangedFile.call_by do |o|
+        _ = Home_::CrazyTownReportMagnetics_::DiffLineStream_via_ChangedFile.call_by do |o|
           o.line_yielder = y
           o.changed_file_IO = io
           o.source_buffer = sb

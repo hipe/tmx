@@ -52,7 +52,7 @@ module Skylab::Common
 
     Autoloader[ Actions, :boxxy ]  # eew
 
-    class Actions::Fire < Brazen_::Action
+    class Actions::Fire < Brazen_::ActionToolkit
 
       include Common_Action_Methods_
 

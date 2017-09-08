@@ -216,7 +216,7 @@ module Skylab::Brazen
 
     module Actions
 
-      class Ping < Home_::Action
+      class Ping < Home_::ActionToolkit
 
         def produce_result
           maybe_send_event :payload, :ping do

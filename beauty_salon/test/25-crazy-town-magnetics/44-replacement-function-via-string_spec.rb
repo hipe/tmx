@@ -62,7 +62,7 @@ module Skylab::BeautySalon::TestSupport
 
     it %q{file doesn't define const} do
 
-      _against "file:#{ _this_function_path 'la-la-005.rb' }"
+      _against "file:#{ fixture_functions_ 'la-la-005.rb' }"
 
       fails_with_these_normal_lines_ do |y|
 
@@ -90,13 +90,8 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_result do
-        expect_success_against_ "file:#{ _this_function_path 'la-la-010.rb' }"
+        expect_success_against_ "file:#{ fixture_functions_ 'la-la-010.rb' }"
       end
-    end
-
-    def _this_function_path tail
-
-      ::File.join TS_.dir_path, 'fixture-functions', tail
     end
 
     def _against s

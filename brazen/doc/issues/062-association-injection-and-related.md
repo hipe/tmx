@@ -1,5 +1,4 @@
 # association injection and related :[#062]
-# custom reactive node adaptations
 
 ## table of contents :[#here.a]
 
@@ -147,6 +146,4 @@ some important facets of this employed here:
 ## document-meta
 
   - #history-A.1: begin injection of [ze]-era talk of "injection".
-
-  - #pending-rename: to "association injection and related"
 _

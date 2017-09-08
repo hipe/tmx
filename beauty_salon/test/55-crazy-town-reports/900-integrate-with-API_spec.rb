@@ -23,9 +23,12 @@ module Skylab::BeautySalon::TestSupport
 
       shared_subject :_lines do
 
+        _the_file = fixture_functions_ 'la-la-020.rb'
+
         call( * dig,
-          :code_selector, :_BS_,
-          :replacement_function, :_BS_,
+          :replace,
+          :code_selector, %{send(method_name=='xx')},
+          :replacement_function, "file:#{ _the_file }",
         )
 
         lines = nil

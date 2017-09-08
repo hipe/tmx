@@ -23,7 +23,7 @@ module Skylab::SubTree
       end )
 
       def action_class_
-        Home_.lib_.brazen::Action
+        Home_.lib_.brazen::ActionToolkit
       end
     end  # >>
   end

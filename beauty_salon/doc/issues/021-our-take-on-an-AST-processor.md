@@ -294,7 +294,7 @@ nodes.
     and newer code uses the new name (`node` or `n`).
 
   - oh by the way we typically don't encourage single-letter variable names
-    (except for [#sli-130] these), but for the host project we deal with
+    (except for [#bs-040] these), but for the host project we deal with
     nodes (formally AST's) so much that to use this one domain-specific
     abbreviation makes code much less noisy horizontally.
 

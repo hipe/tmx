@@ -6,7 +6,7 @@ module Skylab::BeautySalon
 
     # implementation-wise, we employ the [#ze-051] "operator branch" pattern
     #
-    #   - superficially simliar to [#ze-051.B] but it's simple enough we
+    #   - superficially simliar to [#ze-051.2] but it's simple enough we
     #     might as well re-write it. (we don't take an index-first approach
     #     here.)
 
@@ -41,8 +41,9 @@ module Skylab::BeautySalon
 
       def __when_not_found listener, ref_sym
 
+        me = self
         listener.call :error, :expression, :parse_error do |y|
-          __levenshtein_into y, ref_sym
+          me.__levenshtein_into y, ref_sym
         end
         UNABLE_
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
@@ -6,6 +8,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :my_reports
 
     context 'weird name' do
 
@@ -113,11 +116,9 @@ module Skylab::BeautySalon::TestSupport
 
         st = _call_subject_magnetic_by do |o|
 
-          o.file_path_upstream = Common_::Stream.via_item _path
+          o.argument_paths = [ _path ]
 
           o.code_selector_string = %q{send(method_name=='<<')}
-
-          o.filesystem = ::File
         end
 
         first_line = st.gets
@@ -133,6 +134,7 @@ module Skylab::BeautySalon::TestSupport
 
       _x = _call_subject_magnetic_by do |o|
         o.listener = log.listener
+        o.argument_paths = EMPTY_A_  # can be written with more stuff
         yield o
       end
 
@@ -140,24 +142,17 @@ module Skylab::BeautySalon::TestSupport
 
       em_a = log.flush_to_array
       1 == em_a.length || fail
-      em_a[0].expression_proc[ [] ]
+      _expag = expression_agent
+      _expag.calculate [], & em_a[0].expression_proc
     end
 
-    -> do
-      report_name = "preview-selected"
-    define_method :_call_subject_magnetic_by do |&p|
-
-      _subject_magnetic.call_by do |o|
-        o.report_name = report_name
-        o.filesystem = NOTHING_
-        o.listener = nil
-        p[ o ]
-      end
+    def _call_subject_magnetic_by & p
+      call_report_ p, :preview_selected
     end
-    end.call
 
-    def _subject_magnetic
-      Home_::CrazyTownMagnetics_::Result_via_ReportName_and_Arguments
+    def expression_agent
+      # (same as My_API -- .. -- .. -- )
+      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
     end
 
     # ==

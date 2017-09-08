@@ -58,9 +58,9 @@ module Skylab::TestSupport
         end
 
         def __description_reader
-          -> k do
-            _asset_reference = @operator_branch.dereference k
-            _ = @lazy_index.dereference_plugin_via_user_value _asset_reference
+          -> ref do
+            ref.HELLO_LOADABLE_REFERENCE
+            _ = @lazy_index.dereference_plugin_via_loadable_reference ref
             _wow = _.description_proc
             _wow  # #todo
           end

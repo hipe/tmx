@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Module::OperatorBranch_via_Module < Common_::SimpleModel  # :[#ze-051.B]
+  class Module::OperatorBranch_via_Module < Common_::SimpleModel  # :[#ze-051.2]
 
     # ([tab])
     #
@@ -16,8 +16,8 @@ module Skylab::Basic
     # defined on the filesystem (and isomorphically at that -- no stowaways,
     # one file-or-directory per-node); then look at
     #
-    #   - [#ze-051.C] (for autoloaderized modules) and
-    #   - [#ze-051.G] (for directories thru filesystem directly; no autoloading)
+    #   - [#ze-051.3] (for autoloaderized modules) (in [ze]) and
+    #   - [#ze-051.7] (for directories thru filesystem directly; no autoloading) (in [sy])
 
     # -
 

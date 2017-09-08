@@ -235,7 +235,7 @@ module Skylab::Brazen
         #            pp oooooooo
         #
         #                        ^^^^^^ ^^ ^^^^^^
-        #                        oooooo oo pppppp
+        #                        pppppp pp oooooo
 
         args = @args ; omni = @omni
         begin
@@ -346,9 +346,15 @@ module Skylab::Brazen
         @_operation_associations = op.instance_variable_get :@_associations_
           # (this is a violation in 2 ways, but it's experimental..)
 
-        _tuple_st = __to_item_normal_tuple_stream_when_operation
+        _desc_proc = if op.respond_to? :describe_into_under
+          Desc_proc_via_describer__[ op ]
+        elsif op.class.respond_to? :describe_into_under
+          Desc_proc_via_describer__[ op.class ]
+        else
+          self._COVER_ME
+        end
 
-        _desc_proc = Desc_proc_via_module__[ op.class ]  # EEW
+        _tuple_st = __to_item_normal_tuple_stream_when_operation
 
         _program_name = get_program_name
 
@@ -399,17 +405,41 @@ module Skylab::Brazen
           end
         end
 
+        mother_mod = if @_has_stack
+          @stack.last.operation.the_business_module
+        else
+          @application_module
+        end
+
+        desc_p = if mother_mod.respond_to? :describe_into_under
+          Desc_proc_via_describer__[ mother_mod ]
+        elsif @_has_stack
+          slug = @stack.last.name_symbol.id2name.gsub UNDERSCORE_, DASH_
+          -> y do
+            y << "«#{ slug }-related actions [br]»"  # #guillemets
+          end
+        end
+
+        c = :CUSTOM_ITEMS_SECTION_LABEL_VIA_TYPE_SYMBOL
+        if mother_mod.const_defined? c, false
+          etc_x = mother_mod.const_get c, false
+        end
+
         _mod = Zerk_::NonInteractiveCLI::Help::ScreenForBranch
 
         _mod.express_into @stderr do |o|
 
           _same_help o
 
+          o.custom_items_section_label_via_type_symbol = etc_x
+
           o.item_normal_tuple_stream __to_item_normal_tuple_stream
 
           o.express_usage_section get_program_name
 
-          o.express_description_section Desc_proc_via_module__[ @application_module ]
+          if desc_p
+            o.express_description_section desc_p
+          end
 
           o.express_items_sections -> ref do
             mod = ref.dereference_loadable_reference
@@ -2878,7 +2908,7 @@ module Skylab::Brazen
 
     # ==
 
-    Desc_proc_via_module__ = -> mod do
+    Desc_proc_via_describer__ = -> mod do
       -> y do
         mod.describe_into_under y, self
       end

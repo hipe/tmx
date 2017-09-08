@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
@@ -6,9 +8,10 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :my_reports
 
-    it 'subject magnetic loads' do
-      _subject_magnetic || fail
+    it 'API const loads' do
+      Home_::API || fail
     end
 
     it 'the "file paths" report (the equivalent of `ping`) - just echos the paths, no parse' do
@@ -18,9 +21,9 @@ module Skylab::BeautySalon::TestSupport
       # -
         _st = _call_subject_magnetic_by do |o|
 
-          o.report_name = 'echo-file-paths'
+          o.report_name = :echo_file_paths
 
-          o.file_path_upstream = Home_::Stream_[ same ]
+          o.argument_paths = same
         end
       # -
 
@@ -152,25 +155,14 @@ module Skylab::BeautySalon::TestSupport
 
       _call_subject_magnetic_by do |o|
 
-        o.report_name = 'line-numbers'
+        o.report_name = :line_numbers
 
-        o.file_path_upstream = Common_::Stream.via_item path
-
-        o.filesystem = ::File
+        o.argument_paths = [ path ]
       end
     end
 
-    def _call_subject_magnetic_by
-
-      _subject_magnetic.call_by do |o|
-        o.filesystem = NOTHING_
-        o.listener = NOTHING_
-        yield o
-      end
-    end
-
-    def _subject_magnetic
-      Home_::CrazyTownMagnetics_::Result_via_ReportName_and_Arguments
+    def _call_subject_magnetic_by & p
+      call_report_ p, NOTHING_  # see how it's used
     end
 
     # ==

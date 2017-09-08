@@ -29,27 +29,19 @@ module Skylab::Plugin::TestSupport
 
         _k = this_one_natural_key_
 
-        _at = ob.module.entry_tree.asset_reference_via_entry_group_head _k
+        mod = ob.module
 
-        _trueish_x = EEK_TrueishItemValue___[ _at ]
+        _aref = mod.entry_tree.asset_reference_via_entry_group_head _k
+
+        _this_class = Home_.lib_.zerk::ArgumentScanner::
+            OperatorBranch_via_AutoloaderizedModule::
+              LoadableReferenceIsh___  # [ze]:TESTPOINT1
+
+        _trueish_x = _this_class.new _aref, mod
 
         _d = subj.offset_of_touched_plugin_via_user_value _trueish_x
 
         [ _d, _trueish_x ]
-      end
-
-      EEK_TrueishItemValue___ = ::Struct.new :asset_reference do
-
-        # (in production we now have the "trueish item value" of this one
-        # kind of operator branch be a custom "loadable reference". (it's
-        # potentially confusing: often we think of the "keys" as loadable references
-        # (even when symbols) but in this case the "values" are too). because
-        # that's what we're doing in production and we're in the middle of
-        # debuging it, we follow suite here too. but not it's very short-lived
-
-        def HELLO_LOADABLE_REFERENCE
-          NIL
-        end
       end
 
       def subject_from_state_one_

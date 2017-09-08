@@ -2,7 +2,7 @@ module Skylab::CodeMetrics
 
   Require_brazen_[]  # 1 of 2
 
-  class Models_::Tally < Brazen_::Action
+  class Models_::Tally < Brazen_::ActionToolkit
 
     def self.entity_enhancement_module
       Brazen_::Modelesque::Entity

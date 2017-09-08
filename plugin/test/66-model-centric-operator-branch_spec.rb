@@ -165,7 +165,7 @@ module Skylab::Plugin::TestSupport
 
           module Models_
 
-            class Node_1_Action < BRAZEN[]::Action
+            class Node_1_Action < BRAZEN[]::ActionToolkit
 
             end
 
@@ -173,11 +173,11 @@ module Skylab::Plugin::TestSupport
 
               module Actions
 
-                class Node_3_Act_2 < BRAZEN[]::Action
+                class Node_3_Act_2 < BRAZEN[]::ActionToolkit
 
                 end
 
-                class Node_3_Act_3 < BRAZEN[]::Action
+                class Node_3_Act_3 < BRAZEN[]::ActionToolkit
 
                   @is_promoted = true
                 end

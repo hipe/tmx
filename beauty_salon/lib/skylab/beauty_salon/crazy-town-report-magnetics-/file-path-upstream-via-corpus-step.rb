@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagneticsForMainReport_::PathStream_via_CorpusStep < Common_::MagneticBySimpleModel
+  class CrazyTownReportMagnetics_::FilePathUpstream_via_CorpusStep < Common_::MagneticBySimpleModel
 
     # this is a scratch-an-itch self-contained pet project ..
     #

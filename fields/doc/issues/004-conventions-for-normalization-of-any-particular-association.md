@@ -560,7 +560,7 @@ also it bears mentioning that this simple arrangement has proven
 in nature as well as in our examples the notification yielder often gets the
 variable name `y`. we employ this pattern frequently enough that we feel it
 warrants an idiom that owns an entire letter of the alphabet (for now)
-[#sl-130]. (more of the "historical reasons" of this: `y` was used to hold
+[#bs-040]. (more of the "historical reasons" of this: `y` was used to hold
 the yielder in the first blog article (or email or something) succeeded in
 demonstrating to the author how to do anything powerful with enumerators.)
 

@@ -81,9 +81,9 @@ module Skylab::BeautySalon
 
   Operator_branch_ = Lazy_.call do
 
-    Home_.lib_.plugin::ModelCentricOperatorBranch.define do |o|
+    Require_user_interface_libs_[]
 
-      Require_user_interface_libs_[]
+    MTk_::ModelCentricOperatorBranch.define do |o|
 
       same = 'actions'
 

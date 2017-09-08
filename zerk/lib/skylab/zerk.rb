@@ -93,7 +93,7 @@ module Skylab::Zerk  # intro in [#001] README
     Autoloader_[ self ]
 
     br_lib = Lazy_.call do
-      Home_.lib_.brazen::Action  # (to be renamed `ActionToolkit`)
+      Home_.lib_.brazen::ActionToolkit
     end
 
     br = -> c do

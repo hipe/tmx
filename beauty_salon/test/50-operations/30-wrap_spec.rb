@@ -74,7 +74,7 @@ module Skylab::BeautySalon::TestSupport
 
       shared_subject :_tuple do
 
-        info_output_lines = []  # (you could use e.g EMPTY_A_ to assert this implicitly)
+        info_output_lines = EMPTY_A_  # implicity asserts that it is not written to
         payload_output_lines = []
 
         _path = universal_fixture_ :three_lines

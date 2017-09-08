@@ -36,7 +36,7 @@ module Skylab::Brazen
       end
 
       def action_base_class
-        Home_::Action
+        Home_::ActionToolkit
       end
     end  # >>
 

@@ -453,7 +453,8 @@ module Skylab::Plugin
         c = @sub_branch_const  # `Actions`, probably
 
         if mod.respond_to? :const_get
-          if mod.const_get c, false
+          actz = mod.const_get c, false
+          if actz
             do_this = :__branchy
           else
             do_this = :__action  # as described [#here.3], this is how we
@@ -473,6 +474,7 @@ module Skylab::Plugin
         when :__branchy
 
           BoundCall_via_Branch___.call_by do |o|
+            o.actions_branch_module = actz
             o.business_module = mod
             o.glob_resources = @glob_resources
             o.local_invocation_resources = @local_invocation_resources
@@ -536,6 +538,7 @@ module Skylab::Plugin
       # parse the next step.
 
       attr_writer(
+        :actions_branch_module,
         :business_module,
         :glob_resources,
         :sub_branch_const,
@@ -548,7 +551,7 @@ module Skylab::Plugin
         if found
 
           # (seems like we should recurse)
-            __at_endpoint found
+          __at_endpoint found
         end
       end
 
@@ -657,15 +660,20 @@ module Skylab::Plugin
 
       def __init_things_and_operator_branch
 
-        @_actions_branch_module =
-          @business_module.const_get @sub_branch_const, false
+        actz = @actions_branch_module
 
-        @__operator_branch = if @_actions_branch_module.respond_to? :dir_path
-          _gr = @glob_resources.dup_for @_actions_branch_module
+        @__operator_branch = if actz.respond_to? :dir_path
+          _gr = @glob_resources.dup_for actz
           OperatorBranch_via_ACTION_Paths___.new _gr, @local_invocation_resources
+
+        elsif actz.respond_to? :call
+
+          # OperatorBranch_via_Definition.define( & actz )  # (was)
+          actz.call
+
         else
           OperatorBranch_via_Action_CONSTANTS___.call(
-            @_actions_branch_module, @local_invocation_resources )
+            actz, @local_invocation_resources )
         end
         NIL
       end
@@ -809,6 +817,7 @@ module Skylab::Plugin
       # much less moving parts because the constants (nodes) are already loaded
 
       # -
+
         Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
           o.module = splay
           o.loadable_reference_by = -> const do
@@ -816,6 +825,24 @@ module Skylab::Plugin
           end
         end
       # -
+    end
+
+    # ~ 4. experiment [bs]
+
+    class OperatorBranch_via_Definition < Common_::SimpleModel
+      def lookup_softly_by & p
+        @lookup_softly = p ; nil
+      end
+      def loadable_reference_stream_by & p
+        @to_loadable_reference_stream = p ; nil
+      end
+      # --
+      def lookup_softly k
+        @lookup_softly[ k ]
+      end
+      def to_loadable_reference_stream
+        @to_loadable_reference_stream[]
+      end
     end
 
     class AlreadyLoadedLoadableReference___
@@ -992,18 +1019,8 @@ module Skylab::Plugin
           op.to_bound_call_of_operator
 
         elsif op.respond_to? :definition
-
-          rrh = @resourcey_and_resourcer_and_hooks
-          ho = rrh.hooks
-
-          _less_things = Details__.new(
-            ho.customize_normalization_by,
-            ho.inject_definitions_by,
-            op,
-            rrh.resourcey_reference,
-          )
           @local_invocation_resources.
-            bound_call_when_operation_with_definition_by[ _less_things ]
+            bound_call_when_operation_with_definition_by[ _less_things( op ) ]
 
         else
           Common_::BoundCall.by( & op.method( :execute ) )
@@ -1037,6 +1054,19 @@ module Skylab::Plugin
         @resourcey_and_resourcer_and_hooks = rrh
 
         op
+      end
+
+      def _less_things op  # ..than self
+
+        rrh = @resourcey_and_resourcer_and_hooks
+        ho = rrh.hooks
+
+        Details__.new(
+          ho.customize_normalization_by,
+          ho.inject_definitions_by,
+          op,
+          rrh.resourcey_reference,
+        )
       end
     end
 

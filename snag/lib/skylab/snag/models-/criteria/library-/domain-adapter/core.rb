@@ -22,10 +22,10 @@ module Skylab::Snag
 
             begin
 
-              lt = st.gets
-              lt || break
+              ref = st.gets
+              ref || break
 
-              x = lt.dereference_loadable_reference
+              x = ref.dereference_loadable_reference
               if ! x.respond_to? :const_get
                 redo  # maybe the "silo" is not a module. (ping used to be this. no longer)
               end

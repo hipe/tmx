@@ -41,6 +41,10 @@ module Skylab::BeautySalon::TestSupport
       TestSupport_::Expect_these_lines_in_array[ a, p, self ]
     end
 
+    def fixture_functions_ tail
+      ::File.join TS_.dir_path, 'fixture-functions', tail
+    end
+
     attr_reader :do_debug
 
     def debug!
@@ -161,6 +165,87 @@ module Skylab::BeautySalon::TestSupport
     end )
   end
 
+  module My_Reports
+
+    def self.[] tcc
+      tcc.include self
+    end
+
+    def call_report_ p, report_slug
+
+      a, pp = Iambic_via_Definition___.call_by do |o|
+        o.report_name = report_slug
+        o.listener = -> * chan, & em_p do
+          self.DIE_ON_UNEXPECTED_EMISSION em_p, chan
+        end
+        p[ o ]
+      end
+      Home_::API.invocation_via_argument_array( a, & pp ).execute
+    end
+
+    def DIE_ON_UNEXPECTED_EMISSION em_p, chan
+
+      io = debug_IO
+      io.puts "GONNA DIE: #{ chan.inspect }"
+      y = ::Enumerator::Yielder.new do |line|
+        io.puts "YERP: #{ line }"
+      end
+      em_p[ y ]
+      exit 0
+    end
+  end
+
+  class Iambic_via_Definition___ < Home_::Common_::MagneticBySimpleModel
+
+    # the initial take of these tests happened when the reports were
+    # implemented as plain old magnetics behind an ad-hoc operator branch-
+    # ish behind a legacy framework. now reports are implemented behind the
+    # current toolkits with a formal operator branch (but they are still
+    # plain old magnetics). :[#007.C]
+    # SO the subject exposes an interface that *was* geared towards calling
+    # one of the frontmost magnetics that called the report magnets. now
+    # it is a facade that just calls the plain old API. (there's such a
+    # nuanced pipeline that it's not recommended that you try to call these
+    # report magnets by hand.)
+
+    def initialize
+      @_pairs = []
+      super
+    end
+
+    def replacement_function_string= s
+      s || no
+      @_pairs.push [ :replacement_function, s ]  # look
+    end
+
+    def code_selector_string= s
+      s || no
+      @_pairs.push [ :code_selector, s ]  # look
+    end
+
+    def argument_paths= paths
+      paths.each do |path|
+        @_pairs.push [ :file, path ]
+      end
+    end
+
+    attr_writer(
+      :listener,
+      :report_name,
+    )
+
+    def execute
+      a = [ :crazy_town ]
+      a.push remove_instance_variable :@report_name
+      remove_instance_variable( :@_pairs ).each do |k, x|
+        a.push k, x
+      end
+      _li = remove_instance_variable :@listener
+      instance_variables.length.nonzero? && fail
+      [ a, _li ]
+    end
+  end
+
   Expect_Event = -> tcc do
     Common_.test_support::Expect_Emission[ tcc ]
   end
@@ -205,6 +290,7 @@ module Skylab::BeautySalon::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = Home_::DASH_
+  EMPTY_A_ = [].freeze  # (very important that you freeze)
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
     DELIMITER_ = NEWLINE_

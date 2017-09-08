@@ -2,7 +2,7 @@ module Skylab::Common
 
   module Models_::Event
 
-    class Actions::Viz < Brazen_::Action
+    class Actions::Viz < Brazen_::ActionToolkit
 
       include Common_Action_Methods_
 

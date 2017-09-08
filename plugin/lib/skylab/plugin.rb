@@ -58,8 +58,6 @@ module Skylab::Plugin
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
-  Autoloader_[ Bundle = ::Module.new ]
-
   ACHIEVED_ = true
   CLI = nil  # for host
   DASH_ = '-'

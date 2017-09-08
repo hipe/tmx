@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
 # ===( SNIP
-  Action = ::Class.new Home_::Nodesque::Node  # :[#024] (and see)
-  class Action  # (will be renamed ActionToolkit)
+  ActionToolkit = ::Class.new Home_::Nodesque::Node  # :[#024] (and see)
+  class ActionToolkit
     # (actually see bottom of file)
 
     mtk = -> { ::Skylab::Zerk::MicroserviceToolkit }  # it is assumed
@@ -498,7 +498,7 @@ module Skylab::Brazen
 
 # ===)
 
-  class Action < Home_::Nodesque::Node  # see [#024]
+  class ActionToolkit < Home_::Nodesque::Node  # see [#024]
 
     # -- Actionability - identity in & navigation of the ractive model
 
@@ -1067,6 +1067,5 @@ module Skylab::Brazen
     end
   end
 end
-# #pending-rename: operation toolkit
 # #history-A.1: first injection of post-[br] distillation
 # :+#tombstone: to_trio_stream (`to_qualified_knownness_stream`)

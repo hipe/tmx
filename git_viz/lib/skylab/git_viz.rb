@@ -83,7 +83,7 @@ module Skylab::GitViz
   Lazy_ = Common_::Lazy
 
   Require_things_ = Lazy_.call do
-    Action_ = Home_.lib_.brazen::Action
+    Action_ = Home_.lib_.brazen::ActionToolkit
     NIL
   end
 

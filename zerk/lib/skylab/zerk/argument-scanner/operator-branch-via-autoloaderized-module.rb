@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_AutoloaderizedModule < Common_::SimpleModel  # :[#051.C].
+    class OperatorBranch_via_AutoloaderizedModule < Common_::SimpleModel  # :[#051.3].
 
       # the adaptation of #[#051] for autoloaderized modules.
       #
@@ -12,8 +12,8 @@ module Skylab::Zerk
       # now this is being used to drive the rewrite of [ts] quickie plugins..
       #
       # see also
-      #   - [#051.B] "via module" for boxxy-like unobtrusiveness
-      #   - [#051.G] for directories thru filesystem directly; no autoloading
+      #   - [#051.2] "via module" for boxxy-like unobtrusiveness (in [ba])
+      #   - [#051.7] for directories thru filesystem directly; no autoloading (in [sy])
 
       # -
 
@@ -59,50 +59,42 @@ module Skylab::Zerk
 
         # ~ experiment for [pl]
 
-        def natural_key_of my_custom_loadable_reference  # #here
+        def natural_key_of my_custom_loadable_reference  # #here1
           my_custom_loadable_reference.asset_reference.entry_group_head
-        end
-
-        def dereference_user_value my_custom_loadable_reference  # #here
-
-          ref = my_custom_loadable_reference.asset_reference
-
-          _cls = if ref.value_is_known
-            ref.value  # :[#008.2] #borrow-coverage from [ts]
-          else
-            Autoloader_.const_reduce_by do |o|
-              o.from_module = @module
-              o.const_path = [ ref.entry_group_head ]
-              o.autoloaderize
-            end
-          end
-          _cls  # #todo
         end
 
         # ~
 
-        def lookup_softly k  # #[#ze-051.1] "trueish item value"
+        def lookup_softly key_x  # #[#ze-051.1] "trueish item value"
 
-          ref = @module.entry_tree.
-            asset_reference_via_entry_group_head Slug_via_symbol__[k]
-          if ref
-            _trueish_item_value_via_asset_reference ref
+          ::Symbol === key_x || self._OK__but_just_checking__
+
+          _slug = Slug_via_symbol__[ key_x.intern ]  # #here2
+
+          ar = _entry_tree.asset_reference_via_entry_group_head _slug
+
+          if ar
+            _trueish_item_value_via_asset_reference ar
           end
         end
 
-        def dereference k  # #[#ze-051.1] "trueish item value"
+        def dereference key_x  # #[#ze-051.1] "trueish item value"
 
-          _at = @module.entry_tree.
-            dereference_asset_reference_via_entry_group_head Slug_via_symbol__[k]
-          _trueish_item_value_via_asset_reference _at
+          ::Symbol === key_x || self._FIX_THIS
+
+          _slug = Slug_via_symbol__[ key_x.intern ]  # #here2
+
+          _ar = _entry_tree.dereference_asset_reference_via_entry_group_head _slug
+
+          _trueish_item_value_via_asset_reference _ar
         end
 
         def to_pair_stream
 
-          @module.entry_tree.to_asset_reference_stream.map_by do |ref|
+          _to_asset_reference_stream.map_by do |aref|
 
-            _sym = Symbol_via_slug__[ ref.entry_group_head ]
-            _x = _trueish_item_value_via_asset_reference ref
+            _sym = Symbol_via_slug__[ aref.entry_group_head ]
+            _x = _trueish_item_value_via_asset_reference aref
 
             Common_::QualifiedKnownKnown.via_value_and_symbol _x, _sym
           end
@@ -110,16 +102,25 @@ module Skylab::Zerk
 
         def to_loadable_reference_stream
 
-          @module.entry_tree.to_asset_reference_stream.map_by do |sm|
-            Symbol_via_slug__[ sm.entry_group_head ]
+          _to_asset_reference_stream.map_by do |aref|
+
+            _trueish_item_value_via_asset_reference aref
           end
         end
 
         def to_slug_stream  # 1x for [tmx]. not an API #hook-out
 
-          @module.entry_tree.to_asset_reference_stream.map_by do |sm|
-            sm.entry_group_head
+          _to_asset_reference_stream.map_by do |aref|
+            aref.entry_group_head
           end
+        end
+
+        def _to_asset_reference_stream
+          _entry_tree.to_asset_reference_stream
+        end
+
+        def _entry_tree
+          @module.entry_tree
         end
 
         def _trueish_item_value_via_asset_reference ref
@@ -135,19 +136,34 @@ module Skylab::Zerk
       # -
       # ==
 
-      Slug_via_symbol__ = -> k do
-        k.id2name.gsub UNDERSCORE_, DASH_
-      end
-
-      Symbol_via_slug__ = -> s do
-        s.gsub( DASH_, UNDERSCORE_ ).intern
-      end
-
-      class LoadableReferenceIsh___  # :#here
+      class LoadableReferenceIsh___  # :#here1  # :TESTPOINT1:[pl]
 
         def initialize ref, mod
           @asset_reference = ref
           @module = mod
+        end
+
+        def dereference_loadable_reference
+          ref = @asset_reference
+          if ref.value_is_known
+            ref.value  # #hi. :[#008.2] #borrow-coverage from [ts]
+          else
+            Autoloader_.const_reduce_by do |o|
+              o.const_path = [ ref.entry_group_head ]
+              o.from_module = @module
+              o.autoloaderize
+            end
+            # (if the below borks, then probably @module wasn't autoloaded)
+            ref.value
+          end
+        end
+
+        def intern  # :#here2: internally we allow ourselves to know shape
+          name_symbol
+        end
+
+        def name_symbol
+          @name_symbol ||= Symbol_via_slug__[ @asset_reference.entry_group_head ]
         end
 
         attr_reader(
@@ -160,6 +176,19 @@ module Skylab::Zerk
         end
       end
 
+      # ==
+
+      Slug_via_symbol__ = -> k do
+        k.id2name.gsub UNDERSCORE_, DASH_
+      end
+
+      Symbol_via_slug__ = -> s do
+        s.gsub( DASH_, UNDERSCORE_ ).intern
+      end
+
+      # (above #open [#bs-044] - these are oft-repeated function written by hand)
+
+      # ==
       # ==
     end
   end

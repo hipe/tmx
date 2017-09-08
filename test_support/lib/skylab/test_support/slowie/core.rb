@@ -422,6 +422,10 @@ module Skylab::TestSupport
         :__bound_call_for_class_based_operation
       end
 
+      def intern
+        @intern ||= @name.as_lowercase_with_underscores_symbol
+      end
+
       attr_reader(
         :name,
       )

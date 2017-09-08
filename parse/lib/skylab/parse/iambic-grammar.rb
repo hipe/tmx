@@ -358,6 +358,14 @@ module Skylab::Parse
 
       # -- "read"
 
+      def STREAM_VIA_TOKEN_SCANNER scn  # [bs]
+        Common_.stream do
+          unless scn.no_unparsed_exists
+            gets_one_item_via_scanner scn
+          end
+        end
+      end
+
       def gets_one_item_via_scanner_fully scn
         item = gets_one_item_via_scanner scn
         if scn.no_unparsed_exists

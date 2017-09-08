@@ -18,13 +18,13 @@ module Skylab::Plugin
       )
 
       def dereference_plugin_via_normal_symbol sym
-        _lt = @operator_branch.dereference sym
-        dereference_plugin_via_user_value _lt
+        _ref_x = @operator_branch.dereference sym
+        dereference_plugin_via_loadable_reference _ref_x
       end
 
-      def dereference_plugin_via_user_value lt  # #here
-        lt.HELLO_LOADABLE_REFERENCE
-        dereference_plugin offset_of_touched_plugin_via_user_value lt
+      def dereference_plugin_via_loadable_reference ref_x  # #here
+        ref_x.HELLO_LOADABLE_REFERENCE
+        dereference_plugin offset_of_touched_plugin_via_user_value ref_x
       end
 
       def offset_of_touched_plugin_via_normal_symbol sym  # 1x [ts]
@@ -45,11 +45,11 @@ module Skylab::Plugin
         end
       end
 
-      def __load_plugin lt
+      def __load_plugin ref
 
-        lt.HELLO_LOADABLE_REFERENCE
+        ref.HELLO_LOADABLE_REFERENCE
 
-        cls = @operator_branch.dereference_user_value lt  # #here
+        cls = ref.dereference_loadable_reference  # #here
         # ..
         @construct_plugin_by[ cls ]
       end

@@ -1,4 +1,6 @@
-# all the letters of the alphabet :[#130]
+# name conventions for single-letter variables :[#040]
+
+(EDIT: this document is very old but at a cursory glance it looks close to current)
 
 a - array! used often as a variable suffix and standalone.
 b - rarely used. not used for boolean or block, because of the confusion
@@ -60,4 +62,3 @@ z - nope. (has very rarely been used to hold the index of the last item in
 the most important things in this list are `a`, `i`, `p`, `x` `y`
 
 happy dark hacking
-# #pending-rename per #open [#bs-040]

@@ -19,9 +19,9 @@ module Skylab::BeautySalon::TestSupport
         argv( * dig )
       end
 
-      it 'first line whine' do
+      it 'first line is a splay' do
         _actual = first_line_string
-        _actual =~ /\Amissing required / || fail
+        _actual =~ /\Aavailable operators and primaries: / || fail
       end
 
       it 'second line invite' do

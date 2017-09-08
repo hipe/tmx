@@ -43,7 +43,7 @@ module Skylab::Treemap
 
     define_singleton_method :common_action_class, ( Lazy_.call do
 
-      class Common_Action_Class___ < Home_.lib_.brazen::Action
+      class Common_Action_Class___ < Home_.lib_.brazen::ActionToolkit
 
         Home_.lib_.brazen::Modelesque.entity self
 

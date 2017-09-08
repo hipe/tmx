@@ -87,7 +87,8 @@
 
 [#016]       [ actor ]  (will move from [co])
 
-[#015] #hole
+[#015] #open whether or not `_simplified_read_` and `_simplified_write_` is necessary
+             (this might become an API point)
 
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 

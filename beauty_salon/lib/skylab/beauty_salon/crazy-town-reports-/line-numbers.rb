@@ -90,6 +90,7 @@ module Skylab::BeautySalon
         end
       end
     # -
+    Modalities = nil
   end
 end
 # #born.

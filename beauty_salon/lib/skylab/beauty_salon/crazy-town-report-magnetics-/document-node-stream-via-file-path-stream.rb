@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagnetics_::DocumentNodeStream_via_FilePathStream < Common_::SimpleModel
+  class CrazyTownReportMagnetics_::DocumentNodeStream_via_FilePathStream < Common_::SimpleModel
 
     # mainly, convert a stream of paths to a stream of "potential sexps":
     #
@@ -39,15 +39,16 @@ module Skylab::BeautySalon
         # before we even evaluate our defition (because our event hooks
         # rely on closure scope)
 
-        lc = CrazyTownMagnetics_::LineStream_via_DocumentNodeStream::StatefulLineCachingThing.new
+        lib = Home_::CrazyTownMagnetics_
+        lc = lib::LineStream_via_DocumentNodeStream::StatefulLineCachingThing.new
 
-        _dp = CrazyTownMagnetics_::DocumentProcessors_via_Definition.call_by do |o|
+        _dp = lib::DocumentProcessors_via_Definition.call_by do |o|
           yield lc.line_yielder, o
         end
 
         _etc_st = remove_instance_variable :@__potential_sexp_stream
 
-        CrazyTownMagnetics_::LineStream_via_DocumentNodeStream.call_by do |o|
+        lib::LineStream_via_DocumentNodeStream.call_by do |o|
           o.document_processors = _dp
           o.per_file_line_cache = lc.line_cache
           o.potential_node_stream = _etc_st

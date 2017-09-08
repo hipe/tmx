@@ -65,17 +65,17 @@ module Skylab::Zerk
         def initialize
           @_count = 0
           @_operator_braches = []
-          @_value_stores = []
+          @_mixed_injections = []
           yield self
         end
 
         # -- define time
 
-        def add_entity_and_operator_branch vs, ob
+        def add_entity_and_operator_branch inj_x, ob
           d = @_count
           @_count += 1
           @_operator_braches[d] = ob
-          @_value_stores[d] = vs
+          @_mixed_injections[d] = inj_x
           NIL
         end
 
@@ -102,7 +102,7 @@ module Skylab::Zerk
           @_count.times do |d|
             trueish_x = @_operator_braches[d].lookup_softly k
             trueish_x || next
-            my_trueish_x = _special_value @_value_stores.fetch(d), trueish_x
+            my_trueish_x = _qualified_injection trueish_x, @_mixed_injections.fetch(d)
             break
           end
           my_trueish_x
@@ -121,14 +121,15 @@ module Skylab::Zerk
 
             ob = @_operator_braches.fetch d
 
-            vs = @_value_stores.fetch d
+            inj_x = @_mixed_injections.fetch d
 
-            p = ob.method :dereference
+            ob.to_loadable_reference_stream.map_by do |lref|
 
-            ob.to_loadable_reference_stream.map_by do |k|
+              _qi = _qualified_injection lref, inj_x
 
-              _x = _special_value vs, p[ k ]
-              Common_::QualifiedKnownKnown.via_value_and_symbol _x , k
+              _symbol = lref.intern
+
+              Common_::QualifiedKnownKnown.via_value_and_symbol _qi, _symbol
             end
 
           end.expand_by do |st|
@@ -146,8 +147,8 @@ module Skylab::Zerk
           end
         end
 
-        def _special_value x, xx
-          ValueStoreAndUserValue___.new x, xx
+        def _qualified_injection ref, inj_x
+          MixedUserValueAndMixedInjection___.new ref, inj_x
         end
       # -
 
@@ -163,7 +164,7 @@ module Skylab::Zerk
 
           routing = o.branch_item_value
 
-          _value_store = routing.value_store
+          _mixed_injection = routing.mixed_injection
 
           _user_x = routing.mixed_user_value
 
@@ -171,14 +172,17 @@ module Skylab::Zerk
             via_user_value_and_normal_symbol(
               _user_x, o.branch_item_normal_symbol )
 
-          _value_store.at_from_syntaxish _item_again
+          _mixed_injection.at_from_syntaxish _item_again
         end
       end ; end
 
       # ==
 
-      ValueStoreAndUserValue___ = ::Struct.new :value_store, :mixed_user_value
-        # (the above members are public API ([tmx]))
+      MixedUserValueAndMixedInjection___ = ::Struct.new(
+        :mixed_user_value,
+        :mixed_injection,
+      )
+      # (the above members are public API ([tmx]))
 
       # ==
     end

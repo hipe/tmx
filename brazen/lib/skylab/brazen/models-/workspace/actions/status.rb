@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actions::Status < Home_::Action
+    class Actions::Status < Home_::ActionToolkit
 
       # (incidentally a hotbed of event experimentation for #emission-as-result..)
 

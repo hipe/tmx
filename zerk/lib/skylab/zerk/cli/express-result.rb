@@ -45,7 +45,7 @@ module Skylab::Zerk
 
       def execute
         _determine_strategy
-        _act
+        _express
         if @_do_set_exitstatus
           __init_exitstatus 0
         end
@@ -65,7 +65,7 @@ module Skylab::Zerk
             _determine_strategy
           end
           begin
-            _act
+            _express
             @x = st.gets
             @x or break
             redo
@@ -152,7 +152,7 @@ module Skylab::Zerk
 
       # --
 
-      def _act
+      def _express
         send @shape ; nil
       end
 

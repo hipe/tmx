@@ -2,7 +2,7 @@
 
 module Skylab::BeautySalon
 
-  class CrazyTownMagneticsForMainReport_::DiffLineStream_via_ChangedFile < Common_::MagneticBySimpleModel
+  class CrazyTownReportMagnetics_::DiffLineStream_via_ChangedFile < Common_::MagneticBySimpleModel
 
     # given the real file's path and the changed file in a *tmpfile*,
     # produce a stream of diff lines but alter the first few lines of

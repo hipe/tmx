@@ -85,7 +85,9 @@
 [#132]       #bibliographic-reference: xUnit Test Patterns: Refactoring
                Test Code, Gerard Meszaros, 2007
 [#131]       #tracking-tag all extlib - we are trying to avoiding these.
-[#130]       #doc-point  all the letters of the alphabet ..
+
+[#130] #hole
+             ( #was: "all the letters of the alphabet". #moved-to: [#bs-040] )
 
 [#129]       #bibliographic-reference: _Clean Code_, Robert C. Martin, 2009
 

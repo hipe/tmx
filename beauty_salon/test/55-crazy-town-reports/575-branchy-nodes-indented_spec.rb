@@ -1,4 +1,5 @@
 # covers: crazy-town-magnetics-/node-processor-via-methods.rb
+# frozen_string_literal: true
 
 # (the above is :#depencency1.1)
 
@@ -10,6 +11,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :my_reports
 
     # -
 
@@ -94,27 +96,12 @@ module Skylab::BeautySalon::TestSupport
 
       _call_subject_magnetic_by do |o|
 
-        o.file_path_upstream = Common_::Stream.via_item path
-
-        o.filesystem = ::File
+        o.argument_paths = [ path ]
       end
     end
 
-    -> do
-      report_name = "branchy-nodes-indented"
-    define_method :_call_subject_magnetic_by do |&p|
-
-      _subject_magnetic.call_by do |o|
-        o.report_name = report_name
-        o.filesystem = NOTHING_
-        o.listener = nil
-        p[ o ]
-      end
-    end
-    end.call
-
-    def _subject_magnetic
-      Home_::CrazyTownMagnetics_::Result_via_ReportName_and_Arguments
+    def _call_subject_magnetic_by & p
+      call_report_ p, :branchy_nodes_indented
     end
 
     # ==

@@ -5,7 +5,7 @@ module Skylab::Git
     Require_brazen_[]
 
     ::Kernel._I_AM_ONE
-    class Actions::Scoot < Brazen_::Action
+    class Actions::Scoot < Brazen_::ActionToolkit
 
       @instance_description_proc = -> y do
         y << 'furloughed (used sunsetted plugins arch; no coverage at all)'

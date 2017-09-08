@@ -7,7 +7,7 @@ module Skylab::CodeMetrics
 
     My_Entity__ = Brazen_::Modelesque::Entity
 
-    class Report_Action < Brazen_::Action
+    class Report_Action < Brazen_::ActionToolkit
 
       class << self
 

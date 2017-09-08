@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CrazyTownMagneticsForMainReport_::
+  class CrazyTownReportMagnetics_::
       ChangedFile_via_HooksDefinition_via_Functions_and_Selector < Common_::MagneticBySimpleModel
 
     # because the interfaces of these magnets are so event-driven and

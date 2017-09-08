@@ -35,8 +35,8 @@ module Skylab::Fields
           [ ent, o.listener ]  # (last element is the block to pass)
         end
 
-        ent.respond_to? :_simplified_read_ or no  # #todo
-        ent.respond_to? :_simplified_write_ or no  # #todo
+        ent.respond_to? :_simplified_read_ or no  # #open [#015] (next line too)
+        ent.respond_to? :_simplified_write_ or no
 
         o.valid_value_store = ent
       end

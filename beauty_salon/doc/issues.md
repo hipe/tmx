@@ -1,10 +1,12 @@
+[#044] #open use case in [ze]
+
 [#043] #open track mounting executables (lost when wean off [br])
 
 [#042]       #crazy-town "musing" (currently empty, with history)
 
 [#041]       #crazy-town thing.dot
 
-[#040] #open #easy #rename move [#sli-130]  "all the letters of the alphabet" to here
+[#040]       all the letters of the alphabet ..
 
 [#039]       #case-study: how does my future self think this should be
              refactored? (in [mt])
@@ -81,6 +83,7 @@
 
 [#007]       ( intra-subsystem issues )
 
+             [#here.C]: design decision: reports are simple magnetics, not actions
              [#here.B]: tickler: one day #crazy-town target multiple syntax versions
              [#here.A]: the document, which is a very early trace of etc ..
 
