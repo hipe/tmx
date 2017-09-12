@@ -224,11 +224,11 @@ module Skylab::TMX
 
     Report_name_collection___ = Lazy_.call do
 
-      Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |defn|
+      Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
 
-        defn.module = Home_::Reports_
+        o.module = Home_::Reports_
 
-        defn.channel_for_unknown_by do |idea|
+        o.channel_for_unknown_by do |idea|
 
           chan = idea.get_channel
           d = 2
@@ -236,11 +236,13 @@ module Skylab::TMX
           chan
         end
 
-        defn.express_unknown_by do |o|
+        o.express_unknown_by do |oo|
 
-          o.express_unknown_item_smart_prefixed "unknown report"
-          o.express_via_template "available reports: {{ say_splay }}"
+          oo.express_unknown_item_smart_prefixed "unknown report"
+          oo.express_via_template "available reports: {{ say_splay }}"
         end
+
+        o.sub_branch_const = :Actions
       end
     end
 

@@ -456,6 +456,8 @@ module Skylab::Snag
         _cc = _crx.__the_criterion_collection
         _cc  # hi. #todo
       end
+
+      Actions = nil
     end
 
     # ==

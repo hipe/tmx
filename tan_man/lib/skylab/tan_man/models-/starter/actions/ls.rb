@@ -172,6 +172,7 @@ module Skylab::TanMan
 
       # ==
 
+      Actions = nil
       Here_ = self
 
       # ==

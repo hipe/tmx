@@ -41,6 +41,8 @@ module Skylab::Cull
         end
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

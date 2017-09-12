@@ -71,14 +71,26 @@ module Skylab::Basic
       end
 
       def __build_stackish
+
+        # so proc-as-actions can have some sense of self-awareness (that
+        # they can use in expressions), we want them to be able to know
+        # their own name and some kind of name for the application.
+        #
+        # if ever the MTk_ API API maintains a real invocation stack (even
+        # just as an array of symbols), this would simplify down; and we
+        # would pass something like the invocation or invocation resources
+        # itself to the proc #[#pl-008.6]. but in its stead, we sort of build
+        # this faux-resources thing that makes it sort of look like we have
+        # such a stack when actually we don't.
+
         a = [
           @invocation_or_resources.value,
           @invocation_stack_top_name_symbol,
         ]
         case @invocation_or_resources.name_symbol
-        when :_invocation_PL_
+        when :INVOCATION_SHAPE_pl
           FrameWhenInvo___.new( * a )
-        when :_invocation_resources_PL_
+        when :INVOCATION_RESOURCES_SHAPE_pl
           self._COVER_ME__easy__
         else ; never
         end
@@ -116,22 +128,7 @@ module Skylab::Basic
       end
 
       def _invocation_resources  # 2x
-        send( @_invocation_resources ||= :__invocation_resources_initially )
-      end
-
-      def __invocation_resources_initially
-        o = @invocation_or_resources.value
-        _x = case @invocation_or_resources.name_symbol
-        when :_invocation_PL_ ; o.invocation_resources
-        when :_invocation_resources_PL_ ; self._COVER_ME__already_done__ ; o
-        else ; never
-        end
-        @___invocation_resources = _x
-        send( @_invocation_resources = :___invocation_resources )
-      end
-
-      def ___invocation_resources
-        @___invocation_resources
+        @invocation_or_resources.remote_invocation_resources
       end
 
       def __init_whether_it_takes_the_stackish

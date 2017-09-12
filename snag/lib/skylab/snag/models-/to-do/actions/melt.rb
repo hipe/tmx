@@ -308,6 +308,7 @@ module Skylab::Snag
 
       # ==
 
+      Actions = nil
       This_ = self
 
       # ==

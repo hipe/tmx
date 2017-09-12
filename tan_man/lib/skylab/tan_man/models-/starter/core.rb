@@ -35,6 +35,8 @@ module Skylab::TanMan
 
     DEFAULT_STARTER_ = 'minimal.dot'
 
+    Here_ = self
+
     # ==
     # ==
   end

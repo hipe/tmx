@@ -235,6 +235,8 @@ module Skylab::Snag
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
+      Actions = nil
+
       # ==
       # ==
     end

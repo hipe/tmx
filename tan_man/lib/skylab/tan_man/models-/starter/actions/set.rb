@@ -47,7 +47,7 @@ module Skylab::TanMan
 
         def __normalize_starter
 
-          sct = Actions::Ls.lookup_starter_by_ do |o|
+          sct = Here_::Actions::Ls.lookup_starter_by_ do |o|
             o.starter_tail = remove_instance_variable :@starter_name
             o.microservice_invocation = @_microservice_invocation_
             o.listener = _listener_
@@ -59,6 +59,11 @@ module Skylab::TanMan
         end
 
       # -
+
+      Actions = nil
+
+      # ==
+      # ==
     end
   end
 end

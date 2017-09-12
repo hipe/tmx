@@ -105,13 +105,8 @@ module Skylab::BeautySalon
 
       o.models_branch_module = Home_::Models_
 
-      o.bound_call_when_operation_with_definition_by = -> sct do
-        MTk_::BoundCall_of_Operation_with_Definition.call_by do |oo|
-          oo.customize_normalization_by = sct.customize_normalization_by
-          oo.inject_definitions_by = sct.inject_definitions_by
-          oo.operation = sct.operation
-          oo.invocation_or_resources = sct.invocation_or_resources
-        end
+      o.bound_call_when_operation_with_definition_by = -> oo do
+        MTk_::BoundCall_of_Operation_with_Definition[ oo.operation ]
       end
 
       o.filesystem = ::Dir

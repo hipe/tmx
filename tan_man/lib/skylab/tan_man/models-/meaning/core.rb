@@ -134,6 +134,8 @@ module Skylab::TanMan
           x
         end
       end
+
+      Actions = nil
     end
 
     # ==

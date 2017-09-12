@@ -57,6 +57,8 @@ module Skylab::Cull
         Home_.lib_.ACS::GitConfigMagnetics
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

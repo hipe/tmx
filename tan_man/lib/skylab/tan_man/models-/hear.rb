@@ -87,6 +87,8 @@ module Skylab::TanMan
       def _to_exposure_stream
         Memoized_exposure_operator_branch___[].to_dereferenced_item_stream
       end
+
+      Actions = nil
     end
 
     Heard___ = ::Struct.new(

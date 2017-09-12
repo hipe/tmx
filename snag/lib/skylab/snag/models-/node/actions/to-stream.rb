@@ -81,6 +81,8 @@ module Skylab::Snag
         end
       end
 
+      Actions = nil
+
       # ==
     end
   end

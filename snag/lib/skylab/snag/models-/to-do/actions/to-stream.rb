@@ -65,6 +65,8 @@ module Skylab::Snag
         o.listener = _listener_
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

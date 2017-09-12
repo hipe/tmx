@@ -42,6 +42,8 @@ module Skylab::Snag
         _ok && persist_node_
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

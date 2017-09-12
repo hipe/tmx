@@ -16,16 +16,6 @@ module Skylab::Plugin
 
   # ==
 
-  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
-    if x
-      instance_variable_set ivar, x
-    else
-      x
-    end
-  end
-
-  # ==
-
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end

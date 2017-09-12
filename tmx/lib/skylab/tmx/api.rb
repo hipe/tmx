@@ -60,14 +60,16 @@ module Skylab::TMX
 
       Operations_module_operator_branch___ = Lazy_.call do
 
-        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |defn|
+        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
 
-          defn.module = Home_::Operations_
+          o.module = Home_::Operations_
 
-          defn.express_unknown_by do |o|
-            o.express_unknown_item_smart_prefixed "unknown operation"
-            o.express_via_template "available operations: {{ say_splay }}"
+          o.express_unknown_by do |oo|
+            oo.express_unknown_item_smart_prefixed "unknown operation"
+            oo.express_via_template "available operations: {{ say_splay }}"
           end
+
+          o.sub_branch_const = :Actions
         end
       end
 #==TO

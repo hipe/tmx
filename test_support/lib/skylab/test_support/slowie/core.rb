@@ -327,6 +327,7 @@ module Skylab::TestSupport
       _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define do |o|
         o.module = Here_::Operations
         o.loadable_reference_class = ModuleBasedRouting___
+        o.sub_branch_const = :Action
       end
 
       @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|
@@ -399,12 +400,22 @@ module Skylab::TestSupport
 
     # == (would go up) :#here
 
-    class ModuleBasedRouting___
+    class ModuleBasedRouting___ < Common_::SimpleModel
 
-      def initialize at, mod
-        @module = mod
-        @name = Common_::Name.via_slug at.entry_group_head
+      def initialize
+        yield self
+        # can't freeze because memoizes things lazily
       end
+
+      def asset_reference= ar
+        @name = Common_::Name.via_slug ar.entry_group_head
+        NIL
+      end
+
+      attr_accessor(
+        :module,
+        :sub_branch_const,
+      )
 
       def operation_class
         @module.const_get @name.as_camelcase_const_string, false

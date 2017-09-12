@@ -32,6 +32,7 @@ module Skylab::Cull
 
         :_hi_again_
       end
+      Actions = nil
     end
 
     # ==

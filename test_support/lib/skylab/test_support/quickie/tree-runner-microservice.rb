@@ -340,6 +340,7 @@ module Skylab::TestSupport
             Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.
           define do |o|
             o.module = Here_::Plugins
+            o.sub_branch_const = :Actions
           end
           NIL
         end

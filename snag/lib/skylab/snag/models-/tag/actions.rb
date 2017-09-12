@@ -39,6 +39,8 @@ module Skylab::Snag
 
         _store_ :@_node_, _
       end
+
+      Actions = nil
     end
 
     # ==
@@ -84,6 +86,8 @@ module Skylab::Snag
 
         persist_node_ if ok
       end
+
+      Actions = nil
     end
 
     # ==
@@ -123,6 +127,8 @@ module Skylab::Snag
 
         persist_node_ if ok
       end
+
+      Actions = nil
     end
 
     # ==

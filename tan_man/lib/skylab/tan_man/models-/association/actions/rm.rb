@@ -48,6 +48,8 @@ module Skylab::TanMan
         end
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

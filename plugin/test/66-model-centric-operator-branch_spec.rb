@@ -104,6 +104,8 @@ module Skylab::Plugin::TestSupport
             def execute
               [ :woohoo, @__as.head_as_is ]
             end
+
+            ZubFlub = nil  # new - say it has no sub-actions ..
           end
 
           # (because this doesn't define `dir_path`, it does not recurse)

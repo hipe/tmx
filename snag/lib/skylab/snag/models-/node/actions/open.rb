@@ -136,6 +136,11 @@ module Skylab::Snag
           @_x
         end
       end
+
+      Actions = nil
+
+      # ==
+      # ==
     end
   end
 end

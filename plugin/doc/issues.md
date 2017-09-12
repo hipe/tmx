@@ -14,11 +14,16 @@
 [#009]       pros and const of the add method pattern
 
 [#008]       coverage assets & liabilities
+             [#here.7] (see)
+             [#here.6] single codepoint tagged for multiple purposes (see).
              [#here.2], [#here.3], [#here.4], [#here.5] borrow
              [#here.1] "the plugin manifesto" ..
              ( #was: delegation .. )
 
-[#007]       the dependencies narrative ..
+[#007]       (smalls & internal)
+       #open [#here.2] experimental new API function is experimental
+             [#here.1] #fallow the lazy index ..
+
 [#006]       #track pub-sub hacks (mutations) #universal
 [#005]       [ pub-sub ]  (currently implemented by [#007])
 

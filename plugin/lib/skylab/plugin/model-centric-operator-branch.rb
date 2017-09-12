@@ -27,9 +27,15 @@ module Skylab::Plugin
     # (more about each above sub-convention at its corresponding section below.)
 
     # the code file is in three sections (easy jump):
-    #   - section 1 of 3 - define-time
-    #   - section 2 of 3 - operator branch via [3 means]
-    #   - section 3 of 3 - support (shared)
+    #   - section 1 of 4 - define-time
+    #   - section 2 of 4 - steps
+    #   - section 3 of 4 - operator branch via [3 means]
+    #   - section 4 of 4 - support (shared)
+
+    # local name convetions
+    #   - `bcdv` - bound call definition values
+    #   - `lirsx` - local invocation resources
+    #   - `lref` - [lazy] loadable reference
 
     class << self
 
@@ -39,7 +45,7 @@ module Skylab::Plugin
       end
     end  # >>
 
-    # == section 1 of 3 - define-time
+    # == section 1 of 4 - define-time
 
     class Define___ < Common_::MagneticBySimpleModel
 
@@ -84,9 +90,12 @@ module Skylab::Plugin
         remove_instance_variable( :@_a ).each do |obj|
           obj.write_into_using paths, gr
         end
-        _path_scanner = Scanner_[ paths ]
 
-        OperatorBranch_via_ActionsPaths___.new _path_scanner, gr, _ir
+        OperatorBranch_via_ActionsPaths___.define do |o|
+          o.path_scanner = Scanner_[ paths ]
+          o.local_invocation_resources = _ir
+          o.glob_resources = gr
+        end
       end
     end
 
@@ -149,24 +158,288 @@ module Skylab::Plugin
       ::RuntimeError.new "this is probably not what you want. zero paths - #{ glob }"
     end
 
-    # == section 2 of 3 - operator branch via [3 means]
+    # == section 2 of 4 - steps
+    #    the purpose of a "step" object is to allow the consuming client to
+    #    parse a token stream in .. steps such that at each step it can see
+    #    whether this step is "branchy" or not.
+
+    class BoundCall_via_etc_STOWAWAY___ < Common_::MagneticBySimpleModel
+
+      #   - this whole thing is relevant to API only. logically it duplicates
+      #     the comparable but more complex [#br-007.2] counterpart :[#008.6]
+      #
+      #   - as such it's a bit out of scope for the host file, so it's
+      #     considered a stowaway.
+      #
+      #   - this is placed relatively high in the file because A) invocation
+      #     is high level and B) so it can flow with the steps function used next
+      #
+      # EXPERIMENTAL - it used to be that the real call-stack would deepen
+      # with the deepening of the invocation path (until a bound call was
+      # produced, at which point the real stack pops back down).
+      #
+      # now, experimentally we instead want to do a loop-based "recursion"
+      # to mimic the [#br-008.7] CLI approach :[#007.3]
+      #
+      # this new treatment might yield improved behavior (at a probably
+      # negligible cost) because it determines the "shape" of the asset
+      # discretely rather than probablistically
+      #
+      # currently we do *not* build an invocation stack for API ivocations
+      # (we just loop). but one subscriber is interested in this (in [cu])
+      # and if we made this change another subscriber would simplify (in [ba]).
+
+      attr_writer(
+        :bound_call_definition_values,
+        :local_invocation_resources,
+        :loadable_reference,
+      )
+
+      def execute
+
+        bcdv = remove_instance_variable :@bound_call_definition_values
+        invo_or_rsx = bcdv.invocation_or_resources
+        curr_lref = remove_instance_variable :@loadable_reference
+
+        begin
+          step = STEP_VIA_LOADABLE_REFERENCE[ curr_lref ]
+          unless step.is_branchy_step
+            bc = if step.has_action_class
+              Bound_call_via_action_class___[ step, bcdv, @local_invocation_resources ]
+            else
+              step.__bound_call_via_invocation_or_resources_ invo_or_rsx
+            end
+            break
+          end
+          _scn = invo_or_rsx.remote_invocation_resources.argument_scanner
+          curr_lref = Step_when_branchy___[ _scn, step, curr_lref ]
+        end while curr_lref
+        bc
+      end
+
+      Bound_call_via_action_class___ = -> step, bcdv, lirsx do
+
+        # (this is not a method on the step because the other mode client
+        #  rolls its own, a bit more like visitor pattern)
+
+        op = step.action_class.allocate
+
+        op.send :initialize do
+          bcdv.invocation_or_resources.value
+        end
+
+        step.bound_call_via_non_definition_based_or op do
+          o = Details___.new
+            o.operation = op
+            o.invocation_or_resources = bcdv.invocation_or_resources
+          lirsx.bound_call_when_operation_with_definition_by[ o ]
+        end
+      end
+
+      Details___ = ::Struct.new(
+        :operation,
+        :invocation_or_resources,
+      )
+
+      Step_when_branchy___ = -> args, step, lref do  # lref #here5
+
+        _ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH lref
+
+        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+
+          o.argument_scanner = args
+
+          o.add_operators_injection_by do |inj|
+            inj.operators = _ob
+            inj.injector = :_no_injector_for_now_from_PL_
+          end
+        end
+
+        operator_found = _omni.parse_operator
+        if operator_found
+          operator_found.mixed_business_value
+        end
+      end
+    end
+
+    STEP_VIA_LOADABLE_REFERENCE = -> lref do
+      # #open [#007.2] this is still experimental and incubating. consumer: [br]
+      # -
+        mixed = lref.dereference_loadable_reference
+
+        if mixed.respond_to? :const_get
+
+          actz = mixed.const_get lref.sub_branch_const, true  # classically `Actions`
+          # (we do ascend into lexically parent modules - this could bite us, but it's useful in [sg])
+          if actz
+            do_this = :__branchy
+          else
+            do_this = :__action  # as described [#here.3], this is how we
+            # hack having an action "sitting" in a spot where a model is
+            # supposed to go.  :[#008.4] #borrow-coverage from [sn]
+          end
+        else
+          do_this = :__proc
+        end
+
+        case do_this
+
+        when :__branchy
+          BranchyStep___.define do |o|
+            o.actions_branch_module = actz
+            o.business_module = mixed
+            o.sub_branch_const = lref.sub_branch_const
+          end
+
+        when :__action
+          ClassBasedActionStep___.define do |o|
+            o.action_class = mixed
+          end
+
+        when :__proc
+          ProcBasedActionStep__.define do |o|
+            o.proc = mixed
+          end
+        end
+      # -
+    end
+
+    Step__ = ::Class.new Common_::SimpleModel
+
+    class BranchyStep___ < Step__
+
+      attr_writer(
+        :actions_branch_module,
+        :sub_branch_const,
+      )
+      attr_accessor(
+        :business_module,
+      )
+
+      def BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH lref  # #here4 or #here5
+        # also #open [#007.2] still incubating, also used in [br]
+
+        actz = @actions_branch_module
+
+        if actz.respond_to? :dir_path
+
+          _gr = lref.glob_resources.dup_for actz  # :#here3
+          OperatorBranch_via_ACTION_Paths___.define do |o|
+            o.glob_resources = _gr
+            o.local_invocation_resources = lref.local_invocation_resources
+            o.sub_branch_const = @sub_branch_const
+          end
+
+        elsif actz.respond_to? :call
+
+          # OperatorBranch_via_Definition.define( & actz )  # (was)
+          actz.call
+
+        else
+
+          # much less moving parts because the constants (nodes) are already loaded :#here6
+
+          Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
+
+            o.loadable_reference_by = -> const do
+
+              AlreadyLoadedLoadableReference___.define do |oo|
+                oo.const = const
+                oo.module = actz
+                oo.sub_branch_const = @sub_branch_const
+              end
+            end
+            o.module = actz
+          end
+        end
+      end
+
+      def is_branchy_step
+        true
+      end
+    end
+
+    class ClassBasedActionStep___ < Step__
+
+      attr_accessor(
+        :action_class,
+      )
+
+      def bound_call_via_non_definition_based_or op  # [br] probably
+        if op.respond_to? :to_bound_call_of_operator
+          op.to_bound_call_of_operator
+        elsif op.respond_to? :definition
+          yield
+        else
+          Common_::BoundCall.by( & op.method( :execute ) )
+        end
+      end
+
+      def has_action_class
+        true
+      end
+
+      def is_branchy_step
+        false
+      end
+    end
+
+    class ProcBasedActionStep__ < Step__
+
+      attr_writer(
+        :proc
+      )
+
+      def __bound_call_via_invocation_or_resources_ invo_or_rsx  # (we want this to become a API hook-out method #todo)
+
+        _scn = invo_or_rsx.remote_invocation_resources.argument_scanner
+        _sym = _scn.current_operator_symbol
+        _hot_take = MTk_::BoundCall_of_Operation_via_Proc.call_by do |o|
+          o.invocation_or_resources = invo_or_rsx
+          o.invocation_stack_top_name_symbol = _sym
+          o.proc = @proc
+        end
+        _hot_take  # hi. #todo
+      end
+
+      def has_action_class
+        false
+      end
+
+      def is_branchy_step
+        false
+      end
+    end
+
+    # == section 3 of 4 - operator branch via [3 means]
 
     # ~ 1. via actionS paths
 
-    class OperatorBranch_via_ActionsPaths___
+    class OperatorBranch_via_ActionsPaths___ < Common_::SimpleModel  # :#here4
 
       # very close to [#pl-012] "operator branch via directories one deeper".
       # also stay close to our counterpart #here1.
 
-      def initialize scn, gr, lirx
-        @glob_resources = gr
-        @local_invocation_resources = lirx
+      attr_writer(
+        :path_scanner,
+      )
+      attr_accessor(
+        :glob_resources,  # #here3
+        :local_invocation_resources,
+      )
 
-        @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
+      def initialize
+        yield self
 
-        @_implementor = CachingOperatorBranch__.new scn do |path|
+        _scn = remove_instance_variable :@path_scanner
+
+        @_implementor = CachingOperatorBranch__.new _scn do |path|
           __build_loadable_reference_via_path path  # hi.
         end
+
+        @__localize = Home_.lib_.basic::Pathname::Localizer[ @glob_resources.path_head ]
+
+        freeze
       end
 
       def dereference ref
@@ -418,9 +691,7 @@ module Skylab::Plugin
     # ==
 #=== END LEGACY
 
-    BoundCallOfOpMethods__ = ::Module.new  # (re-opens)
-
-    class LazyLoadableReference_for_ModelProbably___ < Common_::SimpleModel
+    class LazyLoadableReference_for_ModelProbably___ < Common_::SimpleModel  # :#here5
 
       # when there's a file to load, do it late (hence "lazy").
       #
@@ -437,72 +708,36 @@ module Skylab::Plugin
       end
 
       attr_writer(
+        :single_element_const_path,
+      )
+      attr_accessor(
         :glob_resources,
         :local_invocation_resources,
-        :single_element_const_path,
         :sub_branch_const,
       )
 
-      include BoundCallOfOpMethods__
-
-      def bound_call_of_operator_by  # [bs]
-
-        # (must be reentrant - is evident if you run all tests in the file)
-
-        mod = dereference_loadable_reference
-        c = @sub_branch_const  # `Actions`, probably
-
-        if mod.respond_to? :const_get
-          actz = mod.const_get c, false
-          if actz
-            do_this = :__branchy
-          else
-            do_this = :__action  # as described [#here.3], this is how we
-            # hack having an action "sitting" in a spot where a model is
-            # supposed to go.  :[#008.4] #borrow-coverage from [sn]
-          end
-        else
-          c && self._SANITY__if_you_want_to_use_a_proc_in___
-          do_this = :__proc
-        end
-
-        rh = ResourcerAndHooks__.define do |o|
-          yield o  # hi.
-        end
-
-        case do_this
-        when :__branchy
-
-          BoundCall_via_Branch___.call_by do |o|
-            o.actions_branch_module = actz
-            o.business_module = mod
-            o.glob_resources = @glob_resources
-            o.local_invocation_resources = @local_invocation_resources
-            o.sub_branch_const = c
-            o.resourcer_and_hooks = rh
-          end
-        when :__action
-
-          BoundCall_via_Action__.call_by do |o|
-            o.action_class = mod
-            o.local_invocation_resources = @local_invocation_resources
-            o.resourcer_and_hooks = rh
-          end
-        when :__proc
-
-          _rrh = rh.close_resourcey_reference
-          _rr = _rrh.resourcey_reference
-
-          ::Skylab::Zerk::MicroserviceToolkit::BoundCall_of_Operation_via_Proc.call_by do |o|
-
-            o.invocation_stack_top_name_symbol = @name_symbol
-            o.proc = mod
-            o.invocation_or_resources = _rr
-          end
+      # -- ( used to be spread throughout
+      def bound_call_of_operator_via_invocation invo  # [br]
+        _bound_call_of_operator_by do |o|
+          o.remote_invocation = invo
         end
       end
-
-      alias_method :_bound_call_of_operator_by_, :bound_call_of_operator_by
+      def bound_call_of_operator_via_invocation_resouces irsx  # [bs] [sn]
+        _bound_call_of_operator_by do |o|
+          o.remote_invocation_resources = irsx
+        end
+      end
+      def _bound_call_of_operator_by & p
+        _open_bcd = BoundCallDefinition___.define do |o|
+          yield o
+        end
+        BoundCall_via_etc_STOWAWAY___.call_by do |o|
+          o.loadable_reference = self
+          o.bound_call_definition_values = _open_bcd.close_bound_call_definition  # simple town - pass nothing
+          o.local_invocation_resources = @local_invocation_resources
+        end
+      end
+      # -- )
 
       def dereference_loadable_reference  # as used by [sn]. might rename to "derefence"
         send @_business_module
@@ -529,163 +764,9 @@ module Skylab::Plugin
       alias_method :intern, :name_symbol  # :[#008.3] #borrow-coverage from [sn]
     end
 
-    BoundCallByWhat__ = ::Class.new Common_::MagneticBySimpleModel  # (re-opens)
-
-    class BoundCall_via_Branch___ < BoundCallByWhat__
-
-      # for conventional operations. this is probably the essential
-      # algorithm of the file: resolve an operator branch and use it to
-      # parse the next step.
-
-      attr_writer(
-        :actions_branch_module,
-        :business_module,
-        :glob_resources,
-        :sub_branch_const,
-      )
-
-      def execute
-        __init_things_and_operator_branch
-        __fake_build_and_send_the_not_really_operation
-        found = __find_operator
-        if found
-
-          # (seems like we should recurse)
-          __at_endpoint found
-        end
-      end
-
-      def __at_endpoint found
-
-        _op_ref = found.mixed_business_value
-        _cls = _op_ref.dereference_loadable_reference
-
-        _x = BoundCall_via_Action__.call_by do |o|  # like #here3
-          o.action_class = _cls
-          o.local_invocation_resources = @local_invocation_resources
-          o.resourcer_and_hooks = @resourcey_and_resourcer_and_hooks.resourcer_and_hooks
-        end
-
-        _x  # #todo
-      end
-
-      # --
-
-      def __find_operator
-
-        p = @resourcey_and_resourcer_and_hooks.hooks.operator_via_branch_by
-        if p
-          p[ self ]
-        else
-          __find_operator_when_branch_normally
-        end
-      end
-
-      def __find_operator_when_branch_normally
-
-        # this is codepoint :[#doc.4] (referenced by [br])
-
-        _as = __argument_scanner
-
-        _ob = release_operator_branch
-
-        _omni = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
-
-          o.argument_scanner = _as
-
-          o.add_operators_injection_by do |inj|
-            inj.operators = _ob
-            inj.injector = :_no_injector_for_now_from_PU_
-          end
-        end
-
-        _ = _omni.parse_operator
-        _  # #todo hi.
-      end
-
-      def __argument_scanner
-
-        _rr = @resourcey_and_resourcer_and_hooks.resourcey_reference
-        _irsx = _rr.remote_invocation_resources
-        _as = _irsx.argument_scanner
-        _as  # hi. #todo
-      end
-
-      def release_operator_branch  # (for above and API)
-        remove_instance_variable :@__operator_branch
-      end
-
-      def __fake_build_and_send_the_not_really_operation
-
-        # branchy nodes [#ze-030.3] are operators but not operations. in
-        # our new simplified conception these branch nodes have no formal
-        # parameters of their own, so there is no parametric state to
-        # maintain, so not only do we *not* create instances of these nodes,
-        # we couldn't even if we wanted to because we use modules (not
-        # classes) to represent them.
-        #
-        # however, the client reasonably deserves to be notified of each
-        # next parsed branch node through the same mechanism through which
-        # we send it info about the endpoints we parse.
-        #
-        # this is not all just cosmetic. this is an injection point. we
-        # cannot access the argument scanner we need to complete the parse
-        # until the client has been given a chance to inject new resources,
-        # and we can't do that until we've passed it the would-be instance.
-
-        rh = remove_instance_variable :@resourcer_and_hooks
-        ho = rh.hooks
-        mod = @business_module
-
-        ho.maybe_send_operation_module do
-          mod
-        end
-
-        same = Lazy_.call do
-          NotAnInstance___[ mod ]
-        end
-
-        @resourcey_and_resourcer_and_hooks = rh.close_resourcey_reference do
-          same[]
-        end
-
-        ho.maybe_send_operation_instance do
-          same[]
-        end
-
-        NIL
-      end
-
-      # --
-
-      def __init_things_and_operator_branch
-
-        actz = @actions_branch_module
-
-        @__operator_branch = if actz.respond_to? :dir_path
-          _gr = @glob_resources.dup_for actz
-          OperatorBranch_via_ACTION_Paths___.new _gr, @local_invocation_resources
-
-        elsif actz.respond_to? :call
-
-          # OperatorBranch_via_Definition.define( & actz )  # (was)
-          actz.call
-
-        else
-          OperatorBranch_via_Action_CONSTANTS___.call(
-            actz, @local_invocation_resources )
-        end
-        NIL
-      end
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-    end
-
-    NotAnInstance___ = ::Struct.new :the_business_module
-
     # ~ 2. via ACTION paths
 
-    class OperatorBranch_via_ACTION_Paths___
+    class OperatorBranch_via_ACTION_Paths___ < Common_::SimpleModel
 
       # an "actION" path is different from an "actionS" path. the first
       # represents a would-be filesystem path (actually "node path") for an
@@ -697,7 +778,16 @@ module Skylab::Plugin
       # the counterpart class for "actionS" is #here1. some copy-pasta,
       # but we are different because we don't hop 2-deep, we hop 1-deep.
 
-      def initialize gr, lirsx
+      attr_writer(
+        :glob_resources,
+        :local_invocation_resources,
+        :sub_branch_const,
+      )
+
+      def initialize
+        yield self
+
+        gr = @glob_resources
 
         _glob = ::File.join gr.path_head, GLOB_STAR_
 
@@ -708,12 +798,10 @@ module Skylab::Plugin
 
         @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
 
-        @local_invocation_resources = lirsx
-        @glob_resources = gr
-
         @_implementor = CachingOperatorBranch__.new _path_scn do |path|
           __build_loadable_reference_via_path path
         end
+        freeze
       end
 
       def lookup_softly k
@@ -745,6 +833,7 @@ module Skylab::Plugin
           o.glob_resources = @glob_resources
           o.local_invocation_resources = @local_invocation_resources
           o.stem = _stem
+          o.sub_branch_const = @sub_branch_const
         end
       end
     end
@@ -767,19 +856,9 @@ module Skylab::Plugin
         :local_invocation_resources,
         :stem,
       )
-
-      include BoundCallOfOpMethods__
-
-      def _bound_call_of_operator_by_
-        _rh = ResourcerAndHooks__.define do |o|
-          yield o
-        end
-        BoundCall_via_Action__.call_by do |o|  # :#here3
-          o.action_class = _action_module
-          o.local_invocation_resources = @local_invocation_resources
-          o.resourcer_and_hooks = _rh
-        end
-      end
+      attr_accessor(
+        :sub_branch_const,
+      )
 
       def dereference_loadable_reference
         _action_module
@@ -811,21 +890,8 @@ module Skylab::Plugin
     end
 
     # ~ 3. via action CONSTANTS
+    # (moved to #here6)
 
-    OperatorBranch_via_Action_CONSTANTS___ = -> splay, lirsx do
-
-      # much less moving parts because the constants (nodes) are already loaded
-
-      # -
-
-        Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
-          o.module = splay
-          o.loadable_reference_by = -> const do
-            AlreadyLoadedLoadableReference___.new const, splay, lirsx
-          end
-        end
-      # -
-    end
 
     # ~ 4. experiment [bs]
 
@@ -845,31 +911,21 @@ module Skylab::Plugin
       end
     end
 
-    class AlreadyLoadedLoadableReference___
+    class AlreadyLoadedLoadableReference___ < Common_::SimpleModel
 
-      def initialize const, splay, lirsx
-
-        @name_symbol = Common_::Name.via_const_symbol( const ).
+      def const= c
+        @name_symbol = Common_::Name.via_const_symbol( c ).
           as_lowercase_with_underscores_symbol
-
-        @__const = const
-        @__local_invocation_resources = lirsx
-        @__splay = splay
+        @__const = c
       end
 
-      include BoundCallOfOpMethods__
-
-      def _bound_call_of_operator_by_
-        _cb = ResourcerAndHooks__.define do |o|
-          yield o
-        end
-        _cls = dereference_loadable_reference
-        BoundCall_via_Action__.call_by do |o|
-          o.action_class = _cls
-          o.local_invocation_resources = @__local_invocation_resources
-          o.resourcer_and_hooks = _cb
-        end
+      def module= x
+        @__splay = x
       end
+
+      attr_accessor(
+        :sub_branch_const,
+      )
 
       def dereference_loadable_reference
         @__splay.const_get @__const, false
@@ -880,20 +936,7 @@ module Skylab::Plugin
       )
     end
 
-    module BoundCallOfOpMethods__  # (re-open)
-      def bound_call_of_operator_via_invocation invo  # [br]
-        _bound_call_of_operator_by_ do |o|
-          o.remote_invocation = invo
-        end
-      end
-      def bound_call_of_operator_via_invocation_resouces irsx  # [bs] [sn]
-        _bound_call_of_operator_by_ do |o|
-          o.remote_invocation_resources = irsx
-        end
-      end
-    end
-
-    # == section 3 of 3 - support (shared)
+    # == section 4 of 4 - support (shared)
 
     class CachingOperatorBranch__
 
@@ -1002,101 +1045,13 @@ module Skylab::Plugin
       end
     end
 
-    # ==
-
-    class BoundCall_via_Action__ < BoundCallByWhat__
-
-      attr_writer(
-        :action_class,
-      )
-
-      def execute
-
-        op = __build_operation
-
-        if op.respond_to? :to_bound_call_of_operator
-
-          op.to_bound_call_of_operator
-
-        elsif op.respond_to? :definition
-          @local_invocation_resources.
-            bound_call_when_operation_with_definition_by[ _less_things( op ) ]
-
-        else
-          Common_::BoundCall.by( & op.method( :execute ) )
-        end
-      end
-
-      def __build_operation
-
-        rh = remove_instance_variable :@resourcer_and_hooks
-        cls = @action_class
-        ho = rh.hooks
-
-        ho.maybe_send_operation_module do
-          cls
-        end
-
-        op = cls.allocate
-
-        rrh = rh.close_resourcey_reference do
-          op
-        end
-
-        op.send :initialize do
-          rrh.resourcey_reference.value
-        end
-
-        ho.maybe_send_operation_instance do
-          op
-        end
-
-        @resourcey_and_resourcer_and_hooks = rrh
-
-        op
-      end
-
-      def _less_things op  # ..than self
-
-        rrh = @resourcey_and_resourcer_and_hooks
-        ho = rrh.hooks
-
-        Details__.new(
-          ho.customize_normalization_by,
-          ho.inject_definitions_by,
-          op,
-          rrh.resourcey_reference,
-        )
-      end
-    end
-
-    Details__ = ::Struct.new(
-      :customize_normalization_by,
-      :inject_definitions_by,
-      :operation,
-      :invocation_or_resources,
-    )
-
     # ~
 
-    class BoundCallByWhat__  # (re-open)
-
-      attr_writer(
-        :local_invocation_resources,
-        :resourcer_and_hooks,
-      )
-      attr_reader(
-        :resourcer_and_hooks,
-      )
-    end
-
-    class ResourcerAndHooks__ < Common_::SimpleModel  # exactly [#doc.C]
+    class BoundCallDefinition___ < Common_::SimpleModel  # exactly [#doc.C]
 
       def initialize
-        @hooks = Hooks___.new
         @__mutex_for_resourcey_reference = nil
         super
-        @hooks.freeze
       end
 
       def remote_invocation_resources_by= p
@@ -1113,100 +1068,23 @@ module Skylab::Plugin
 
       def _recv_resourcey_reference rr
         remove_instance_variable :@__mutex_for_resourcey_reference
-        @__resourcey_reference = rr ; nil
+        @__open_resourcey_reference = rr ; nil
       end
 
       # --
 
-      def customize_normalization_by= p
-        @hooks.customize_normalization_by = p
-      end
+      def close_bound_call_definition
 
-      def inject_definitions_by= p
-        @hooks.inject_definitions_by = p
-      end
-
-      def operator_via_branch_by= p
-        @hooks.operator_via_branch_by = p
-      end
-
-      def receive_operation_by= p
-        @hooks.receive_operation_by = p
-      end
-
-      def receive_operation_module_by= p
-        @hooks.receive_operation_module_by = p
-      end
-
-      # --
-
-      def close_resourcey_reference
-
-        _use_resourcey = @__resourcey_reference.close_by do
+        _resourcey_reference = @__open_resourcey_reference.close_by do
           yield
         end
-
-        ResourceyAndResourcerAndHooks___.new _use_resourcey, self
-      end
-
-      attr_reader(
-        :hooks,
-      )
-    end
-
-    class ResourceyAndResourcerAndHooks___
-
-      def initialize rr, rh
-        @resourcey_reference = rr
-        @resourcer_and_hooks = rh
-      end
-
-      def hooks
-        @resourcer_and_hooks.hooks
-      end
-
-      attr_reader(
-        :resourcer_and_hooks,
-        :resourcey_reference,
-      )
-    end
-
-    class Hooks___
-
-      def initialize
-        @customize_normalization_by = nil
-        @inject_definitions_by = nil
-        @operator_via_branch_by = nil
-        @receive_operation_by = nil
-        @receive_operation_module_by = nil
-      end
-
-      attr_accessor(
-        :customize_normalization_by,
-        :inject_definitions_by,
-        :operator_via_branch_by,
-        :receive_operation_by,
-        :receive_operation_module_by,
-      )
-
-      def maybe_send_operation_instance
-        p = @receive_operation_by
-        if p
-          _op = yield
-          p[ _op ]
-        end
-        NIL
-      end
-
-      def maybe_send_operation_module
-        p = @receive_operation_module_by
-        if p
-          _op_mod = yield
-          p[ _op_mod ]
-        end
-        NIL
+        BoundCallDefinitionValues___.new _resourcey_reference
       end
     end
+
+    BoundCallDefinitionValues___ = ::Struct.new(
+      :invocation_or_resources,
+    )
 
     ProcBased__ = ::Class.new ; ValueBased__ = ::Class.new
     InvoMethods__ = ::Module.new ; ResourcesMethods__ = ::Module.new
@@ -1222,21 +1100,21 @@ module Skylab::Plugin
       end
 
       def name_symbol
-        :_invocation_resources_PL_
+        :INVOCATION_RESOURCES_SHAPE_pl
       end
     end
 
     class ResourceyReferenceInvoValue___ < ValueBased__
       include InvoMethods__
       def name_symbol
-        :_invocation_PL_
+        :INVOCATION_SHAPE_pl
       end
     end
 
     class ResourceyReferenceRsxValue__ < ValueBased__
       include ResourcesMethods__
       def name_symbol
-        :_invocation_resources_PL_
+        :INVOCATION_RESOURCES_SHAPE_pl
       end
     end
 

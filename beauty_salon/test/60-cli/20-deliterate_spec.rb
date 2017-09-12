@@ -261,7 +261,7 @@ module Skylab::BeautySalon::TestSupport
 
     X_cdelit_this_CLI_setup = -> cli do
 
-      cli.expression_agent_by = -> _cli do
+      cli.expression_agent_by = -> do
         self._NEVER
         TS_::My_CLI::Legacy_expag_instance[]
       end

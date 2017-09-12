@@ -172,10 +172,12 @@ module Skylab::TanMan
         end
       end ; end
 
-      # ==
-      # ==
 
+      Actions = nil
       This_ = self
+
+      # ==
+      # ==
     end
   end
 end

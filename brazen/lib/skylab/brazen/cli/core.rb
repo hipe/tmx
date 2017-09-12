@@ -43,23 +43,36 @@ module Skylab::Brazen
           o.const_set :UI_, ::NoDependenciesZerk
         end
 
+        @_receive_root_expression_agent_proc = :__NOT_YET_OPEN
         yield self
-        @ORIG_OPERATOR_BRANCH = @operator_branch  # THE WORST
-        @_has_stack = false
+
+        @listener = method :__receive_emission  # passed around a lot.
+        # currently not configurable. one of the main things CLI does
+        # is interpret emissions in a modality-appropriate way.
+
+        @stack = []  # asking for trouble - use the same array throughout faustian bargain
       end
 
-      attr_writer(
-        :application_module,
-        :operator_branch,
-      )
+      def operator_branch= ob
+        @__root_operator_branch = ob
+      end
+
+      def application_module= mod
+        @__root_application_module = mod
+      end
 
       def new a, i, o, e, pns_a
 
-        @expression_agent = :__expression_agent_defaultly
+        __init_argument_scanner_via_ARGV a
+
+        @expression_agent_by = nil
+        @_receive_root_expression_agent_proc = :__receive_root_expression_agent_proc
 
         if block_given?
           yield self  # [bs] (tests)
         end
+
+        remove_instance_variable :@_receive_root_expression_agent_proc
 
         # --
 
@@ -67,16 +80,13 @@ module Skylab::Brazen
         # that everything is a prototype and not a class, you don't get a
         # fresh instance for every invocation under your tests YIKES ..
 
-        if @_has_stack
-          @operator_branch = @ORIG_OPERATOR_BRANCH  # THE WORST
-          remove_instance_variable :@omni
-          remove_instance_variable :@stack
-          @_has_stack = false
+        if @stack.length.nonzero?
+          @stack.clear  # hello - you will never see this at any individual test YIKES
         end
+        @_exitstatus = 0
 
         # ==
 
-        @ARGV = a
         @program_name_string_array = pns_a
 
         @stderr = e
@@ -87,8 +97,12 @@ module Skylab::Brazen
       end
 
       def expression_agent_by= p
-        @expression_agent = :__expression_agent_via_proc_initially
-        @__expression_agent_proc = p
+        send @_receive_root_expression_agent_proc, p
+      end
+
+      def __receive_root_expression_agent_proc p
+        @_receive_root_expression_agent_proc = :_CLOSED
+        @expression_agent_by = p
       end
 
       def filesystem= x
@@ -113,7 +127,7 @@ module Skylab::Brazen
         bc = to_bound_call
         if bc
           _x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-          _x.nil? || self._README__readme__  # see #here3
+          _x.nil? || self._README__readme__  # see #here2
         elsif ! bc.nil?
           _maybe_increase_errorlevel GENERIC_ERROR_EXITSTATUS
         end
@@ -123,26 +137,36 @@ module Skylab::Brazen
       def to_bound_call
 
         #  - for compatibility with "a tmx"
-        #  - despite name, *not* re-entrant
+        #  - this is arranged so at a glance, we can see that endpoint
+        #    trees can be recursively deep
+        #  - [#pl-007.3] retrofitted to look like this :[#008.7]
 
-        @_exitstatus = 0
-        @listener = method :__receive_emission
-        __init_argument_scanner_via_listener
-        _init_omni_branch_for :_hello_1_BR_, @operator_branch
-        ok = __resolve_operator
-        ok &&= __resolve_non_wrapped_bound_call_via_operator
-        ok && __wrapped_bound_call_via_non_wrapped_bound_call
+        __init_stack
+        begin
+          operator_found = __process_any_primaries_and_lookup_next_operator
+          operator_found || break
+          _lref = operator_found.mixed_business_value
+          step = MTk_::ModelCentricOperatorBranch::STEP_VIA_LOADABLE_REFERENCE[ _lref ]  # #open #[#pl-007.2] stil incubating
+          if step.is_branchy_step
+            __push_branchy_stack_frame step
+            redo
+          end
+          bc = __push_terminal_stack_frame_and_produce_bound_call step
+          break
+        end while above
+        if bc
+          __wrapped_bound_call_via_non_wrapped_bound_call bc
+        end
       end
 
       # -- little helpers for above
 
-      def __wrapped_bound_call_via_non_wrapped_bound_call
+      def __wrapped_bound_call_via_non_wrapped_bound_call bc
 
         # :#here2: reasonably the "a [tmx]" that mounts this client should
         # not have knowledge of how to express its result value. this adds
         # a frame to the real call stack, but meh.
 
-        bc = remove_instance_variable :@__non_wrapped_bound_call
         Common_::BoundCall.by do
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
           if ! x.nil?
@@ -152,81 +176,31 @@ module Skylab::Brazen
         end
       end
 
-      def __resolve_non_wrapped_bound_call_via_operator
+      def __process_any_primaries_and_lookup_next_operator
 
-        _ref = remove_instance_variable :@__operator
-
-        _ = _ref.bound_call_of_operator_by do |o|
-
-          o.operator_via_branch_by = -> mag do
-            __operator_via_branch mag  # hi.
-          end
-
-          o.remote_invocation_resources_by = -> op do
-            p = remove_instance_variable :@__inject_resources
-            if p
-              irsx = p[ op, self ]
-              # NASTY ##maybe1 - the current top operator is certainly liable
-              # to render its own help screen, and if it does its any custom
-              # expag is what it should get when it renders. yes do #maybel
-              __CHANGE_expression_agent irsx.expression_agent
-              irsx
-            else
-              self
-            end
-          end
-
-          o.customize_normalization_by = -> n11n do
-            n11n.be_fuzzy
-          end
-
-          o.receive_operation_module_by = method :__receive_operation_module
-
-          o.receive_operation_by = method :__receive_operation
-
-          o.inject_definitions_by = method :__inject_modality_specific_definitions
-        end
-
-        _store :@__non_wrapped_bound_call, _
-      end
-
-      def __resolve_operator
-        lu = _process_any_primaries_and_lookup_next_operator
-        _store :@__operator, ( lu && lu.mixed_business_value )
-      end
-
-      def __operator_via_branch mag
-
-        # when parsing at a non-root branch node, CLI (unlike API) needs to
-        # inject the help primary and react appropriately if it's invoked.
+        # how we parse an endpoint tree request as CLI from branch node:
         #
-        # do exactly like [#pl-011.4] but try to re-use our root-level
-        # parsing pipeine instead.
-
-        ob = mag.release_operator_branch
-
-        # NOTE see ##maybe1
-        remove_instance_variable :@operator_branch
-        @operator_branch = ob
-
-        _init_omni_branch_for :_hello_2_BR_, ob
-
-        _process_any_primaries_and_lookup_next_operator
-      end
-
-      def _process_any_primaries_and_lookup_next_operator
-
-        # here's the essence of CLI parsing (in our conception) from a
-        # branchy node (root and non-root alike): process the zero-or-more
-        # non-primaries and then one operator.
+        # the "current node" is an "omni branch", viz, a branch that
+        # knows of both its primaries and its operators.
+        #
+        # without proof, we posit that *all* ARGV's can be parsed as
+        # a series of zero or more "steps" where each step is:
+        #
+        #   - (when ARGV is empty, you are done.)
+        #   - parse zero or more contiguous primaries
+        #   - parse zero or one operator
+        #   - i.e repeat the above until ARGV is empty (or unrecognized item)
+        #
+        # subject method is concerned only with effecting *one* such step so:
         #
         #   - if you never get to an operator, there's nothing more to do.
         #
         #   - any of the zero or more primaries that is processed can have
         #     arbitrary side-effects, and can effectively end the invocation.
+        #     result is false-ish in such cases.
         #
-        #   - note that any primaries positioned after the any leftmost
-        #     operator will not get parsed here.
+        #   - note that any primaries that occur after any nextmost operator
+        #     will not get parsed in this step - we stop at the any operator.
         #
         # an imaginary example:
         #
@@ -236,8 +210,10 @@ module Skylab::Brazen
         #
         #                        ^^^^^^ ^^ ^^^^^^
         #                        pppppp pp oooooo
+        #
+        #            [one step]  [another step]
 
-        args = @args ; omni = @omni
+        args = @args ; omni = @stack.last._omni_branch_
         begin
 
           # if scanner empty, end of the line. done.
@@ -254,7 +230,7 @@ module Skylab::Brazen
 
           # if head looks like operator:
           if args.scan_operator_symbol_softly
-            op_found = omni.flush_to_lookup_operator
+            operator_found = omni.flush_to_lookup_operator
             # (whether it succeeded or fail, we get off here.)
             break
           end
@@ -263,60 +239,7 @@ module Skylab::Brazen
           args.when_malformed_primary_or_operator
           break
         end while above
-        op_found
-      end
-
-      def __receive_operation op
-
-        if ! @_has_stack
-          @stack = []
-          @_has_stack = true
-        end
-
-        @stack.push StackFrame___.new(
-          op,
-          @args.current_operator_symbol,
-        )
-        NIL
-      end
-
-      StackFrame___ = ::Struct.new(
-        :operation,
-        :name_symbol,
-      )
-
-      def __inject_modality_specific_definitions o  # association stream controller, from #spot1.1
-
-        p = remove_instance_variable :@__inject_and_deinject
-        if p
-          p[ o ]
-        end
-        _help_asc = __build_help_association_bound_to_self
-        o.inject_association _help_asc
-        NIL
-      end
-
-      def __receive_operation_module mod
-        modz = mod.const_get :Modalities, false
-        if modz
-          cli_mod = modz.const_get :CLI, false
-        end
-        if cli_mod
-          p1 = cli_mod::Inject_and_deinject_associations
-          p2 = cli_mod::Inject_resources
-        end
-        @__inject_and_deinject = p1
-        @__inject_resources = p2
-        NIL
-      end
-
-      def __build_help_association_bound_to_self
-
-        _proto = Memoized_help_association_prototype___[]
-
-        _proto.redefine do |o|
-          o.will_normalize_by( & method( :__receive_help_request ) )
-        end
+        operator_found
       end
 
       def __receive_help_request qkn
@@ -329,7 +252,7 @@ module Skylab::Brazen
         if qkn.is_known_known
           x = qkn.value
           if true == x  # [#fi-012.10] explains exactly this crutch
-            __express_operation_help
+            __express_terminal_help
           else
             ::Kernel._OKAY__have_fun__specific_argument_to_help
           end
@@ -340,16 +263,19 @@ module Skylab::Brazen
         end
       end
 
-      def __express_operation_help
+      def __express_terminal_help
 
-        op = @stack.last.operation
+        op = @stack.last.__operation_
         @_operation_associations = op.instance_variable_get :@_associations_
           # (this is a violation in 2 ways, but it's experimental..)
 
-        _desc_proc = if op.respond_to? :describe_into_under
-          Desc_proc_via_describer__[ op ]
+        describer = if op.respond_to? :describe_into_under
+          op
         elsif op.class.respond_to? :describe_into_under
-          Desc_proc_via_describer__[ op.class ]
+          op.class
+        end
+        _desc_proc = if describer
+          Desc_proc_via_describer__[ describer ]
         else
           self._COVER_ME
         end
@@ -385,7 +311,7 @@ module Skylab::Brazen
         STOP_PARSING_
       end
 
-      def __express_help
+      def __express_branch_help
 
         shorten_the_description = -> mod do
 
@@ -405,16 +331,12 @@ module Skylab::Brazen
           end
         end
 
-        mother_mod = if @_has_stack
-          @stack.last.operation.the_business_module
-        else
-          @application_module
-        end
+        mother_mod = @stack.last._business_module_
 
         desc_p = if mother_mod.respond_to? :describe_into_under
           Desc_proc_via_describer__[ mother_mod ]
-        elsif @_has_stack
-          slug = @stack.last.name_symbol.id2name.gsub UNDERSCORE_, DASH_
+        elsif 1 < @stack.length
+          slug = @stack.last._name_symbol.id2name.gsub UNDERSCORE_, DASH_
           -> y do
             y << "«#{ slug }-related actions [br]»"  # #guillemets
           end
@@ -456,7 +378,7 @@ module Skylab::Brazen
       end
 
       def _same_help o
-        o.expression_agent _VOLATILE_expag_instance
+        o.expression_agent expression_agent
       end
 
       def __to_item_normal_tuple_stream_when_operation
@@ -468,41 +390,15 @@ module Skylab::Brazen
       end
 
       def __to_item_normal_tuple_stream
-        @operator_branch.to_loadable_reference_stream.map_by do |key_x|
+        @stack.last._operator_branch_.to_loadable_reference_stream.map_by do |key_x|
           [ :operator, key_x ]
         end
       end
 
-      # --
-
-      def _init_omni_branch_for inj_sym, ob
-
-        # NOTE - might be overwriting existing omni. see ##maybe1
-
-        @omni = UI_::ParseArguments_via_FeaturesInjections.define do |fi|
-
-          fi.argument_scanner = @args
-
-          fi.add_lazy_operators_injection_by do |o|
-            o.operators = ob
-            o.injector = inj_sym
-          end
-
-          fi.add_primaries_injection PRIMARIES___, self
-        end
-        NIL
-      end
-
-      # (:#maybe1: @operator_branch and @omni are properties of stack frame)
-
-      PRIMARIES___ = {
-        help: :__express_help,
-      }
-
-      def __init_argument_scanner_via_listener
+      def __init_argument_scanner_via_ARGV argv
 
         @args = UI_::CLI_ArgumentScanner.define do |o|
-          o.ARGV = remove_instance_variable :@ARGV
+          o.ARGV = argv
           o.listener = @listener
         end
         NIL
@@ -512,7 +408,7 @@ module Skylab::Brazen
 
         expr = UI_::CLI_Express_via_Emission.define do |o|
           o.emission_proc_and_channel em_p, chan
-          o.expression_agent_by = -> { _VOLATILE_expag_instance }
+          o.expression_agent_by = -> { expression_agent }
           o.stderr = @stderr
         end
 
@@ -529,14 +425,105 @@ module Skylab::Brazen
         NIL
       end
 
+      # == stack & family
+
+      def expression_agent
+
+        # new in this work, the expression agent's determination is via the
+        # stack. whichever topmost frame has a customization (injection)
+        # determines the expag (with the root frame needing always to be
+        # there and have a default). (#history-A.2 comment has more)
+
+        d = @stack.length
+        until d.zero?
+          d -= 1
+          expag_p = @stack[d]._expression_agent_by_
+          expag_p && break
+        end
+        expag_p.call
+      end
+
+      def __push_terminal_stack_frame_and_produce_bound_call step
+
+        BoundCall_via_etc___.call_by do |o|
+          o.receive_stack_frame_by do |frame|
+            @stack.push frame  # hi.
+          end
+          o.step = step
+          o.current_operator_symbol = @args.current_operator_symbol
+          o.invocation = self
+        end
+      end
+
+      def __push_branchy_stack_frame step
+
+        mod = step.business_module
+
+        _o = Injections__.new mod
+        _o.is_empty || self._HAVE_FUN
+
+        ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH @stack.last._operator_branch_  # #open #[#pl-007.2] still incubating
+        _omni = _omni_branch_for :_hello_2_BR_, ob
+
+        @stack.push( NonRootNonTerminalFrame___.define do |o|
+          o._omni_branch_ = _omni
+          o._operator_branch_ = ob
+          o._business_module_ = mod
+          o._name_symbol = @args.current_operator_symbol
+          o._expression_agent_by_ = NOTHING_
+        end )
+        NIL
+      end
+
+      def __init_stack
+
+        _expag_p = if @expression_agent_by
+          @expression_agent_by
+        else
+          method :__expression_agent_defaultly
+        end
+
+        ob = @__root_operator_branch
+
+        @stack.push( RootFrame___.define do |o|
+          o._expression_agent_by_ = _expag_p
+          o._operator_branch_ = ob
+          o._omni_branch_ = _omni_branch_for :_hello_1_BR_, ob
+          o._business_module_ = @__root_application_module
+        end )
+        NIL
+      end
+
+      def _omni_branch_for inj_sym, ob
+
+        UI_::ParseArguments_via_FeaturesInjections.define do |fi|
+
+          fi.argument_scanner = @args
+
+          fi.add_lazy_operators_injection_by do |o|
+            o.operators = ob
+            o.injector = inj_sym
+          end
+
+          fi.add_primaries_injection PRIMARIES___, self
+        end
+      end
+
+      PRIMARIES___ = {
+        help: :__express_branch_help,
+      }
+
+      # --
+
       def get_program_name
         buffer = ::File.basename @program_name_string_array.last  # meh
-        if @_has_stack
+        if 1 < @stack.length
           scn = Scanner_[ @stack ]
+          scn.advance_one
           begin
             _frame = scn.gets_one
             buffer << SPACE_
-            buffer << _frame.name_symbol.id2name.gsub( UNDERSCORE_, DASH_ )
+            buffer << _frame._name_symbol.id2name.gsub( UNDERSCORE_, DASH_ )
           end until scn.no_unparsed_exists
         end
         buffer
@@ -561,30 +548,6 @@ module Skylab::Brazen
         @args
       end
 
-      def __CHANGE_expression_agent expag
-        @expression_agent = :_expression_agent_via_instance
-        @_expression_agent = expag ; nil
-      end
-
-      def _VOLATILE_expag_instance
-        send @expression_agent
-      end
-
-      def expression_agent
-        send @expression_agent
-      end
-
-      def __expression_agent_via_proc_initially
-        _p = remove_instance_variable :@__expression_agent_proc
-        @_expression_agent = _p[ self ]
-        @expression_agent = :_expression_agent_via_instance
-        send @expression_agent
-      end
-
-      def _expression_agent_via_instance
-        @_expression_agent
-      end
-
       def __expression_agent_defaultly
         ::NoDependenciesZerk::CLI_InterfaceExpressionAgent.instance
       end
@@ -601,12 +564,169 @@ module Skylab::Brazen
         @__filesystem
       end
 
-
       attr_reader(
         :listener,
       )
-
     # -
+
+    class BoundCall_via_etc___ < Common_::MagneticBySimpleModel
+
+      # logically duplicates the simpler [#pl-008.6] :[#007.2]
+
+      def receive_stack_frame_by & p
+        @__receive_stack_frame = p ; nil
+      end
+
+      attr_writer(
+        :current_operator_symbol,
+        :invocation,
+        :step,
+      )
+
+      def execute
+        if @step.has_action_class
+          @_action_class = remove_instance_variable( :@step ).action_class
+          __when_action_class
+        else
+          self._HAVE_FUN__maybe_make_proxy_for_procs__what_about_injections__
+        end
+      end
+
+      def __when_action_class
+
+        # tangled sequence mainly so that the user hook that determines
+        # the invocation resources can itself see the operation instance
+        # (again see commit comment #history-A.2. incubating..)
+
+        # 1. allocate. (you can't get resources until #here4)
+
+        @_operation = @_action_class.allocate
+
+        __init_injections
+
+        # 2. call injection hook to determine resources
+
+        __init_invocation_slash_resources_and_expag_proc
+
+        # 3. initialize operation, push stack and determine bound call
+
+        @_operation.send :initialize do
+          @_invocation_or_resources.value
+        end
+
+        __push_terminal_stack_frame
+
+        if @_operation.respond_to? :definition
+          __when_definition
+        else
+          remove_instance_variable( :@_injections_and_deinjections ) and self._NO
+          __when_no_definition
+        end
+      end
+
+      def __when_no_definition
+
+        remove_instance_variable :@_invocation_or_resources
+        remove_instance_variable :@invocation
+        _op = remove_instance_variable :@_operation
+        Common_::BoundCall[ nil, _op, :execute ]
+      end
+
+      def __when_definition
+
+        p = remove_instance_variable( :@invocation ).method :__receive_help_request
+
+        _help_asc = Memoized_help_association_prototype___[].redefine do |o|
+          o.will_normalize_by do |qkn|
+            p[ qkn ]  # hi.
+          end
+        end
+
+        p_ = remove_instance_variable :@_injections_and_deinjections
+
+        _use_inj_and_deinj = -> o do  # association stream controller, from #spot1.1
+          if p_
+            p_[ o ]
+          end
+          o.inject_association _help_asc
+        end
+
+        MTk_::BoundCall_of_Operation_with_Definition.call_by do |o|
+          o.customize_normalization_by = Be_fuzzy___
+          o.inject_definitions_by = _use_inj_and_deinj
+          o.operation = remove_instance_variable :@_operation
+          o.invocation_or_resources = remove_instance_variable :@_invocation_or_resources
+        end
+      end
+
+      Be_fuzzy___ = -> n11n do
+        n11n.be_fuzzy
+      end
+
+      def __push_terminal_stack_frame
+
+        _fr = TerminalFrame___.define do |o|
+          o.__operation_ = @_operation
+          o._name_symbol = remove_instance_variable :@current_operator_symbol
+          o._expression_agent_by_ = remove_instance_variable :@__expression_agent_proc
+        end
+        remove_instance_variable( :@__receive_stack_frame )[ _fr ]
+        NIL
+      end
+
+      def __init_invocation_slash_resources_and_expag_proc
+
+        inj_rsx = remove_instance_variable :@__inject_resources
+        if inj_rsx
+          hot_take = inj_rsx[ @_operation, @invocation ]
+          iorsx = Common_::Pair.via_value_and_name_symbol hot_take, :INVOCATION_RESOURCES_SHAPE_pl
+          expag = hot_take.expression_agent
+        else
+          iorsx = Common_::Pair.via_value_and_name_symbol @invocation, :INVOCATION_SHAPE_pl
+        end
+
+        if expag
+          _expag_p = -> { expag }  # #todo make lazy expag higher up
+        end
+
+        @__expression_agent_proc = _expag_p
+        @_invocation_or_resources = iorsx ; nil
+      end
+
+      def __init_injections
+        o = Injections__.new remove_instance_variable :@_action_class
+        @_injections_and_deinjections = o.injections_and_deinjections
+        @__inject_resources = o.inject_resources
+        o = nil
+      end
+    end
+
+    class Injections__
+
+      def initialize mod
+        modz = mod.const_get :Modalities, false
+        if modz
+          cli_mod = modz.const_get :CLI, false
+        end
+        if cli_mod
+          inj_and_deinj = cli_mod::Inject_and_deinject_associations
+          inj_rsx = cli_mod::Inject_resources
+        end
+        if inj_and_deinj || inj_rsx
+          @injections_and_deinjections = inj_and_deinj
+          @inject_resources = inj_rsx
+        else
+          @is_empty = true
+        end
+        freeze
+      end
+
+      attr_reader(
+        :inject_resources,
+        :injections_and_deinjections,
+        :is_empty,
+      )
+    end
   end
   end  # :#here1
 
@@ -2908,15 +3028,13 @@ module Skylab::Brazen
 
     # ==
 
-    Desc_proc_via_describer__ = -> mod do
+    Desc_proc_via_describer__ = -> o do
       -> y do
-        mod.describe_into_under y, self
+        o.describe_into_under y, self
       end
     end
 
     # ==
-
-    o = Home_::CLI_Support
 
     When_help__ = -> do
       Zerk_lib_[]::NonInteractiveCLI::Help
@@ -2924,9 +3042,78 @@ module Skylab::Brazen
 
     # ==
 
+    # inspired by (and perhaps improves on) the frame architecture of [tmx].
+    #
+    # with this stack frame class graph as it is, all endpoint executions
+    # will have stacks that look like:
+    #
+    #     <root-frame> <non-root-non-terminal-frame>* <terminal-frame>
+    #
+    # an inspection/visualization the above structure-grammar and/or the
+    # class hierarchy reveals limitations of this work (some or all of
+    # which may be self-imposed); for example:
+    #
+    #   - the root frame cannot also be a terminal frame
+    #
+    #   - likewise a branch frame is tautologically not a terminal frame.
+    #     (although in CLI, you are allowed to terminate on a branch frame
+    #     successfully if it is a help inquiry.)
+    #
+    # to challenge these provisions is an avenue of possible future work.
+    #
+    # it may be that some of the classes' existence is only didactic - they
+    # do not add anything to their parent class other than a meaningful name
+    # that asserts (softly) the correct positioning of such a frame in the
+    # stack. where this occurs (if at all) this is only for self-documenting
+    # code and future-proofing. as the code is in flux, so is the veracity
+    # of this paragraph.
+
+    o = Class.method :new
+    Frame__ = o[ Common_::SimpleModel ]  # abstract
+    BranchyFrame__ = o[ Frame__ ]  # abstract
+    RootFrame___ = o[ BranchyFrame__ ]
+    NonRootNonTerminalFrame___ = o[ BranchyFrame__ ]
+    TerminalFrame___ = o[ Frame__ ]
+    NonRootFrame__ = ::Module.new  # absract
+
+    class TerminalFrame___
+      attr_accessor(
+        :__operation_,
+      )
+      include NonRootFrame__
+    end
+
+    class NonRootNonTerminalFrame___
+      include NonRootFrame__
+    end
+
+    class BranchyFrame__
+      attr_accessor(
+        :_omni_branch_,
+        :_operator_branch_,
+        :_business_module_,
+      )
+    end
+
+    module NonRootFrame__
+      attr_accessor(
+        :_name_symbol,
+      )
+    end
+
+    class Frame__
+      attr_accessor(
+        :_expression_agent_by_,
+      )
+    end
+
+    # ==
+
     STOP_PARSING_ = nil
 
     # ==
+
+    o  = Home_::CLI_Support
 
     CLI_ = self
     DASH_BYTE_ = DASH_.getbyte 0
@@ -2939,5 +3126,6 @@ module Skylab::Brazen
     # ==
   end
 end
+# #history-A.2 (can be temporary): commit comment as referenced
 # #history-A.1: begin splicing matryoshka-killer in to legacy file
 # #tombstone: re-entrancy

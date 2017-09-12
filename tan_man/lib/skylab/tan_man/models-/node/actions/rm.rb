@@ -34,6 +34,8 @@ module Skylab::TanMan
         _ent || NIL_AS_FAILURE_
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

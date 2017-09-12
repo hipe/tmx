@@ -42,6 +42,8 @@ module Skylab::Snag
         _last_action || NOTHING_  # [#007.C]
       end
 
+      Actions = nil
+
       # ==
       # ==
     end

@@ -328,17 +328,13 @@ module Skylab::TestSupport
       end
 
       def __receive_subsequent_TCC_in_basic_mode tcc
-        self._COVER_ME
-        me = self  # #open [#007.D]
-        @_client.listener.call :info, :expression, :multiple_describes do |y|
-          y << me.__say_multiple_describes
-        end
+        self._COVER_ME  #open [#007.D]
+        @_client._puts __say_multiple_describes_NOT_COVERED
         @_receive_TCC = :_receive_TCC_in_basic_mode
         send @_receive_TCC, tcc
       end
 
-      def __say_multiple_describes
-        self._NOT_YET_COVERED
+      def __say_multiple_describes_NOT_COVERED
         "quickie note - if you want to have multiple root-level #{
             }`describe`s aggregated into one test run, you should try #{
             }the undocumented, experimental recursive test runner. running #{

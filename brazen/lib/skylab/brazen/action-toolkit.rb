@@ -247,8 +247,8 @@ module Skylab::Brazen
         pair = @invocation_or_resources
         x = pair.value
         case pair.name_symbol
-        when :_invocation_PL_ ; x.invocation_resources
-        when :_invocation_resources_PL_ ; x
+        when :INVOCATION_SHAPE_pl ; x.invocation_resources
+        when :INVOCATION_RESOURCES_SHAPE_pl ; x
         else ; never
         end
       end

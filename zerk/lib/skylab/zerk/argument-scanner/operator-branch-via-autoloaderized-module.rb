@@ -21,6 +21,7 @@ module Skylab::Zerk
 
           @_custom_emitter = nil
           yield self
+          @sub_branch_const || fail
           @loadable_reference_class ||= LoadableReferenceIsh___
 
           ce = remove_instance_variable :@_custom_emitter
@@ -52,6 +53,7 @@ module Skylab::Zerk
 
         attr_writer(
           :loadable_reference_class,
+          :sub_branch_const,
           :module,
         )
 
@@ -125,7 +127,11 @@ module Skylab::Zerk
 
         def _trueish_item_value_via_asset_reference ref
 
-          @loadable_reference_class.new ref, @module
+          @loadable_reference_class.define do |o|
+            o.asset_reference = ref
+            o.module = @module
+            o.sub_branch_const = @sub_branch_const
+          end
         end
 
         attr_reader(
@@ -136,12 +142,17 @@ module Skylab::Zerk
       # -
       # ==
 
-      class LoadableReferenceIsh___  # :#here1  # :TESTPOINT1:[pl]
+      class LoadableReferenceIsh___ < Common_::SimpleModel  # :#here1  # :TESTPOINT1:[pl]
 
-        def initialize ref, mod
-          @asset_reference = ref
-          @module = mod
+        def asset_reference= ar
+          @name_symbol = Symbol_via_slug__[ ar.entry_group_head ]
+          @asset_reference = ar
         end
+
+        attr_accessor(
+          :module,
+          :sub_branch_const,
+        )
 
         def dereference_loadable_reference
           ref = @asset_reference
@@ -162,13 +173,9 @@ module Skylab::Zerk
           name_symbol
         end
 
-        def name_symbol
-          @name_symbol ||= Symbol_via_slug__[ @asset_reference.entry_group_head ]
-        end
-
         attr_reader(
           :asset_reference,
-          :module,
+          :name_symbol,
         )
 
         def HELLO_LOADABLE_REFERENCE  # #temporary

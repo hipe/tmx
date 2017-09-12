@@ -16,6 +16,7 @@ module Skylab::BeautySalon
 
       ob = ::Skylab::Zerk::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
         o.module = Home_::CrazyTownReports_
+        o.sub_branch_const = :Actions
       end
 
       MTk_::ModelCentricOperatorBranch::OperatorBranch_via_Definition.define do |o|
@@ -57,6 +58,10 @@ module Skylab::BeautySalon
         @__use_this_proxy
       end
 
+      def sub_branch_const
+        @_.sub_branch_const
+      end
+
       def intern
         @_.intern
       end
@@ -73,13 +78,15 @@ module Skylab::BeautySalon
       def respond_to? m
         case m
         when :describe_into_under ; true
+        when :const_get ; true  # yikes for this commit
         else no
         end
       end
 
-      def const_get c, _
+      def const_get c, _=nil
         case c
-        when :Modalities ; false  # ..
+        when :Modalities ; nil  # ..
+        when :Actions ; nil
         else ; no
         end
       end

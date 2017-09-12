@@ -37,7 +37,11 @@ module Skylab::Plugin::TestSupport
             OperatorBranch_via_AutoloaderizedModule::
               LoadableReferenceIsh___  # [ze]:TESTPOINT1
 
-        _trueish_x = _this_class.new _aref, mod
+        _trueish_x = _this_class.define do |o|
+          o.asset_reference = _aref
+          o.module = mod
+          o.sub_branch_const = :Actions
+        end
 
         _d = subj.offset_of_touched_plugin_via_user_value _trueish_x
 
@@ -78,6 +82,7 @@ module Skylab::Plugin::TestSupport
     Build_real_operator_branch___ = -> do
       Zerk_lib_[]::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
         o.module = Home_
+        o.sub_branch_const = :Actions
       end
     end
 

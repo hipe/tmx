@@ -113,7 +113,7 @@ module Skylab::TanMan
 
         def __resolve_starter_via_workspace_plus
 
-          _ = Actions::Get.call_directly_ @_microservice_invocation_ do |o|
+          _ = Here_::Actions::Get.call_directly_ @_microservice_invocation_ do |o|
             o.mutable_workspace = @_mutable_workspace_
           end
           _store_ :@_starter, _
@@ -134,7 +134,7 @@ module Skylab::TanMan
 
         def __resolve_starter_via_workspace
 
-          _ = Actions::Get.call_directly_ @_microservice_invocation_ do |o|
+          _ = Here_::Actions::Get.call_directly_ @_microservice_invocation_ do |o|
 
             o.workspace_path = @workspace_path
             o.config_filename = @config_filename
@@ -146,7 +146,7 @@ module Skylab::TanMan
 
         def __with_default_starter
 
-          o = Actions::Get.default_starter__ @_microservice_invocation_
+          o = Here_::Actions::Get.default_starter__ @_microservice_invocation_
           if o
             __emit_thing_about_using_default_starter o
             @_starter = o
@@ -204,6 +204,8 @@ module Skylab::TanMan
           "{{ #{ _ } }}"
         end
       end ; end
+
+      Actions = nil
 
       # ==
       # ==

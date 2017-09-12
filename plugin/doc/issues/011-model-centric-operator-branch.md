@@ -7,7 +7,6 @@
   - case-study/tutorial [#here.1]
   - code dive [#here.C]
   - this one pattern [#here.2]
-  - codepoint (defined in code) [#here.4]
 
 
 

@@ -57,6 +57,7 @@ module Skylab::Git
           end
         end
       end
+      Actions = nil
     end
 
     class Actions::Save
@@ -99,6 +100,7 @@ module Skylab::Git
           o.listener = _listener_
         end
       end
+      Actions = nil
     end
 
     class Actions::Pop
@@ -139,6 +141,7 @@ module Skylab::Git
           o.listener = _listener_
         end
       end
+      Actions = nil
     end
 
     class Actions::Show
@@ -162,6 +165,7 @@ module Skylab::Git
 
         _build_expressive_stow :yes_colo
       end
+      Actions = nil
     end
 
     class Actions::Status
@@ -185,6 +189,7 @@ module Skylab::Git
         ok = _resolve_versioned_directory
         ok && @_versioned_directory.to_entity_stream
       end
+      Actions = nil
     end
 
     class Actions::List
@@ -207,6 +212,7 @@ module Skylab::Git
 
         _new_stows_collection.to_entity_stream
       end
+      Actions = nil
     end
 
     module CommonActionMethods__

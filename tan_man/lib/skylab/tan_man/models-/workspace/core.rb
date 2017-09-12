@@ -92,6 +92,8 @@ module Skylab::TanMan
 
         [ :existed, path ]
       end
+
+      Actions = nil
     end
 
     class Actions::Init
@@ -144,6 +146,8 @@ module Skylab::TanMan
 
         NIL
       end
+
+      Actions = nil
     end
 
     # :#here1
