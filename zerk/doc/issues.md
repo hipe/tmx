@@ -1,3 +1,14 @@
+[#070] #open multi-mode argument scanner is an atrocity, unify how
+             features are injected between [tmx] and [bs] (YIKES)
+
+[#069] #wish the lazy injection's symbolic name (used to be injector) should
+             be stipulated without the injection needing to be dereferenced.
+
+[#068] #open unify scanners between [co] and no deps [ze]  (let [ze] win some how)
+             (#related: [#070])
+
+[#067] #wish optional arguments (with #nodeps parsing), in-the-wild [ts]
+
 [#066]       [ model re-use ]
              it's ghastly. although you could sub-class model actions,
              don't. doing so becomes a liability for the host application.
@@ -153,6 +164,7 @@
 
 [#023]       CLI for..
            #track :[#here.3]: glob in niCLI
+      #wish  (same as above, but for no-deps. track native implementations) [cm] also called "list"
              ( #was: #open de-generalize the invites )
              :[#here.2]: styling diaspora
              :[#here.1]: styling
@@ -192,10 +204,19 @@
 
 [#008]       coverage assets & liabilities (& other misc small)
 
-             [#here.2-5] borrow coverage
+             [#here.5] borrow coverage
+             [#here.4] borrow coverage
+       #open [#here.3]
+             [#here.2] borrow coverage
        #open [#here.1]: eventually de-dup this with [#sy-029] OGDL
 
 [#007] "threads" (tracking tags for experimentals towards public API)
+
+             [#this.I] - track other guys that do this integer parsing  (1x here)
+
+             [#this.H] - we are at the boundary between two parsing paradigms.
+             the remote client expects the scanner to be advanced *past*
+             the primary token..
 
              :[#this.G] - waiting for [br] to sunset
        #wish [#this.F] (crossreference to [#050.I]) total cels plus viz

@@ -152,7 +152,7 @@ module Skylab::Zerk::TestSupport
       Metrics_as_Option_Parser___.new 3, 16
     end
 
-    class Metrics_as_Option_Parser___  # :#spot-2
+    class Metrics_as_Option_Parser___  # :#spot1.2
 
       def initialize si_d, si_w
         @_si_s = SPACE_ * si_d

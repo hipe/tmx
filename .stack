@@ -41,6 +41,7 @@ unify emission class with the others..
 fold-in expect emission (oldschool)
 fold-in "fail early"
 make names modern ("emission.rb")
+(somewhere: multi-mode argument scanner away, for 2nd wave and [br] injection)
 cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
 cull/test/54-operations/62-mutator/25-actions_spec.rb
 cull/test/54-operations/37-upstream/50-map/50-markdown-vertical_spec.rb
@@ -59,6 +60,8 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
+rename all operator branch to feature branch YIKES
+.to_symbolish_reference_scanner not .to_loadable_reference_stream (right?)
 (that commit was -1.1.1)
 ok so you want to get to getting every '.should' being converted 03:47:08
 (that commit was -1.1.2)
@@ -73,5 +76,3 @@ understand Parser nodes - how can we unparse?
 answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`)
 location map - this is the key
 clean up that crazy hack in an isolated commit
-simplify argument scanning - match a grammar symbol without advancing scanner
-NoDependenciesZerk::OperatorFound__ - rename `loadable_reference` to just `plain_reference`

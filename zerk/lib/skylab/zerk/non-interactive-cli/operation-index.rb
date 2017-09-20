@@ -217,7 +217,7 @@ module Skylab::Zerk
 
       def __maybe_reindex_appropriated_as_argument
 
-        @_primitivesque_appropriation_op_box.remove @_k  # :#spot-3
+        @_primitivesque_appropriation_op_box.remove @_k  # :#spot1.3
         _reindex_appropriated_as_argument
       end
 
@@ -382,7 +382,7 @@ module Skylab::Zerk
 
       def is_appropriated_ k  # #as o.i,
 
-        # tells #spot-4 when we need to write *from* ACS tree *to* param store)
+        # tells #spot1.4 when we need to write *from* ACS tree *to* param store)
 
         _ = @_my_set_symbol_via_name_symbol.fetch k  # until not..
         TREAT_AS_APPROPRIATED___.fetch _

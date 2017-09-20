@@ -42,10 +42,6 @@ module Skylab::Zerk::TestSupport
         the_scanner_emits_that_it_did_not_parse_the_primary
       end
 
-      it subdesc.attempting_to_read_the_current_primary_symbol_raises do
-        attempting_to_read_the_current_primary_symbol_raises
-      end
-
       it subdesc.after_not_parsing_the_primary_the_scanner_is_not_empty do
         after_not_parsing_the_primary_the_scanner_is_not_empty
       end
@@ -55,7 +51,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def expression_agent
-        TestSupport_::THE_EMPTY_EXPRESSION_AGENT
+        expression_agent_for_CLI
       end
 
       # --
@@ -79,8 +75,12 @@ module Skylab::Zerk::TestSupport
         the_scanner_parses_the_primary
       end
 
-      it subdesc.after_parsing_the_primary_the_scanner_knows_it_is_empty do
-        after_parsing_the_primary_the_scanner_knows_it_is_empty
+      it subdesc.after_matching_the_primary_the_scanner_is_still_not_empty do
+        after_matching_the_primary_the_scanner_is_still_not_empty
+      end
+
+      it subdesc.after_accepting_the_match_the_scanner_IS_empty do
+        after_accepting_the_match_the_scanner_IS_empty
       end
 
       subcanon.write_definitions_into self
@@ -93,10 +93,7 @@ module Skylab::Zerk::TestSupport
     canon.finish_canon  # just checks if we forgot any tests
 
     def _subject_module_via * s_a, & l
-      scanner_class.define do |o|
-        o.ARGV = s_a
-        o.listener = l
-      end
+      scanner_class.narrator_for s_a, & l
     end
 
     def scanner_class

@@ -367,5 +367,6 @@ module Skylab::Zerk
     end
   end
 end
+# #pending-rename: unknown feature
 # :#history-B (probably temporary)
 # #history: broke out from main "when" node

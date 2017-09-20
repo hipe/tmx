@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
@@ -16,11 +18,11 @@ module Skylab::Zerk::TestSupport
       context "parsing softly" do
 
         it "does not parse" do
-          parsation_.result.nil? || fail  # :#nodeps-coverpoint-1
+          parsation_.result.nil? || fail  # :#Coverpoint1.1
         end
 
         it "does not advances scanner" do
-          parsation_.scanner.head_as_is == "-xx-yy2" || fail
+          parsation_.token_scanner.head_as_is == "-xx-yy2" || fail
         end
       end
 
@@ -36,12 +38,14 @@ module Skylab::Zerk::TestSupport
 
       context "parsing softly" do
 
-        it "succeeded" do
-          parsation_.result || fail
+        it 'succeeds' do
+          _match = parsation_.result
+          _match.operator_symbol == :xx_yy3 || fail
         end
 
-        it "advances scanner" do
-          parsation_.scanner.head_as_is == "zz" || fail
+        it 'does NOT advance scanner' do
+          _ = parsation_.token_scanner.head_as_is
+          _ == 'xx-yy3' || fail
         end
       end
 
@@ -97,22 +101,27 @@ module Skylab::Zerk::TestSupport
       context "parsing softly" do
 
         it "succeeds" do
-          parsation_.result || fail
+          _ = parsation_.result
+          _.operator_symbol == :xx_yy2 || fail
         end
 
-        it "advances scanner" do
-          parsation_.scanner.head_as_is == "zz" || fail
+        it 'did NOT advance scanner' do
+          parsation_.token_scanner.head_as_is == 'xx-yy2' || fail
         end
       end
 
       context "and the lookup" do
 
         it "you can see the business value from the find result" do
-          findation_.result.mixed_business_value == :zzz || fail
+          _ = findation_.result
+          _.trueish_feature_value == :zzz || fail
         end
 
         it "you can reach the injector from the find result" do
-          findation_.result.injector == :_INJECTOR_2_ || fail
+          o = findation_
+          inj_ref = o.omni.features.operators_injections.fetch o.result.injection_offset
+          _inj = inj_ref.injection
+          _inj.injection_symbol == :_INJECTION_2_ || fail
         end
       end
 
@@ -130,7 +139,7 @@ module Skylab::Zerk::TestSupport
 
     def _flush_parsation log=nil
       omni = dup_and_mutate_omni_
-      _x = omni.scan_operator_symbol_softly
+      _x = omni.argument_scanner_narrator.match_operator_shaped_token
       parsation_via_ _x, omni, log
     end
 
@@ -142,7 +151,7 @@ module Skylab::Zerk::TestSupport
 
     def _flush_findation
       o = parsation_
-      _x = o.omni.flush_to_lookup_operator
+      _x = o.omni.procure_operator
       findation_via_ _x, o.omni, o.log
     end
 

@@ -38,10 +38,17 @@ module Skylab::Zerk
           Common_::QualifiedKnownKnown.via_value_and_symbol @hash.fetch(k), k
         end
 
+        def to_symbolish_reference_scanner
+          ::NoDependenciesZerk::Scanner_via_Array.new @hash.keys
+        end
+
         def to_loadable_reference_stream
           Stream_[ @hash.keys ]
         end
       # -
+
+      # ==
+      # ==
     end
   end
 end

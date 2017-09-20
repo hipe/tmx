@@ -91,6 +91,10 @@ module Skylab::Zerk
         end
       end
 
+      def intern  # be symbolish
+        @___intern ||= @gem_name_elements.entry_string.intern
+      end
+
       attr_reader(
         :_const_path_array_guess_,
         :require_path,
@@ -204,8 +208,8 @@ module Skylab::Zerk
         :gem_name_elements,
       )
 
-      def category_symbol
-        :zerk_sidesystem_loadable_reference_category_symbol
+      def reference_category_symbol
+        :SIDESYSTEM_LOADABLE_REFERENCE_ze
       end
     end
 

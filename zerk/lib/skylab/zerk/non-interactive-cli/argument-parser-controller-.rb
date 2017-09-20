@@ -204,7 +204,7 @@ module Skylab::Zerk
 
               # provisioning happens at the modality level. so we have to do
               # it now because the default proc won't be there on the back..
-              # this is :#spot-6.
+              # this is :#spot1.6.
 
               asc = fo
               _anything = fo.default_proc.call

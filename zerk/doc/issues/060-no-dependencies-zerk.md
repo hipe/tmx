@@ -2,6 +2,7 @@
 
 ## table of contents (partial)
 
+  - method categories (on the narrator probably) [#here.D]
   - about the structure of "primary found".. :[#here.A]
   - (see inline) [#here.B]
   - this one weird new argument arity [#here.3]
@@ -28,6 +29,7 @@ single-file implementation of the basics needed to make API & CLI
 
 ## adjacent reading
 
+see [#052] the argument scanner architecture
 see [#053] discussion of feature injection
 also see [#br-062] association injection and related.
 

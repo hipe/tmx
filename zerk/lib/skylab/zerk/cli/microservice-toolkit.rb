@@ -46,7 +46,7 @@ module Skylab::Zerk
       Egads___[]
     end
 
-    lazily :ArgumentScanner do
+    lazily :CLI_ArgumentScanner do
       No_deps_zerk_[]::CLI_ArgumentScanner
     end
 

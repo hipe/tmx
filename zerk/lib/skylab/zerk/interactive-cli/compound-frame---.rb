@@ -53,7 +53,7 @@ module Skylab::Zerk
       NIL_
     end
 
-    def to_every_node_reference_stream_  # near c.p w/ #spot-7
+    def to_every_node_reference_stream_  # near c.p w/ #spot1.7
 
       Common_::Stream.via_nonsparse_array @_loadable_references_for_UI do |x|
         x.node_reference

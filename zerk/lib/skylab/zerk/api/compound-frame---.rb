@@ -32,7 +32,7 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_every_node_reference_stream_  # near c.p w/ #spot-7
+      def to_every_node_reference_stream_  # near c.p w/ #spot1.7
 
         sr = reader_writer.to_node_reference_streamer
 

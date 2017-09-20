@@ -15,12 +15,14 @@ module Skylab::Zerk::TestSupport
 
       context "parsing softly" do
 
+        # #coverpoint1.2
+
         it "does not parse" do
           parsation_.result.nil? || fail
         end
 
         it "does not advance scanner" do
-          parsation_.scanner.head_as_is == "xx-yy2" || fail
+          parsation_.token_scanner.head_as_is == "xx-yy2" || fail
         end
       end
 
@@ -37,11 +39,13 @@ module Skylab::Zerk::TestSupport
       context "parsing softly" do
 
         it "succeeds" do
-          parsation_.result || fail
+          _match = parsation_.result
+          _match.primary_symbol == :xx_yy2 || fail
         end
 
-        it "advances scanner" do
-          parsation_.scanner.head_as_is == "zz" || fail
+        it 'does NOT advance scanner' do
+          _ = parsation_.token_scanner.head_as_is
+          _ == '-xx-yy2' || fail
         end
       end
 
@@ -98,23 +102,25 @@ module Skylab::Zerk::TestSupport
       context "parsing softly" do
 
         it "succeeds" do
-          parsation_.result || fail
+          _ = parsation_.result
+          _.primary_symbol == :zz || fail
         end
 
-        it "advances scanner" do
-          parsation_.scanner.head_as_is == "qq" || fail
+        it 'does NOT advance scanner' do
+          parsation_.token_scanner.head_as_is == '-zz' || fail
         end
       end
 
       context "and the flushing of the rest of the parse" do
 
         it "the parse succeeds" do
-          findation_.result == true || fail
+          _ = findation_.result
+          _ == true || fail
         end
 
         it "the injector received the value" do
           _ = findation_
-          _inj = _.omni.__PRIMARIES_INJECTOR
+          _inj = _.omni.features.instance_variable_get( :@_injector_box ).fetch :_inj_1_ze
           _inj.ZZ == 'qq' || fail
         end
       end
@@ -137,13 +143,13 @@ module Skylab::Zerk::TestSupport
 
     def _flush_findation
       o = parsation_
-      _x = o.omni.flush_to_lookup_current_and_parse_remaining_primaries
+      _x = o.omni.flush_to_find_and_process_this_and_remaining_primaries o.result
       findation_via_ _x, o.omni, o.log
     end
 
     def _flush_parsation log=nil
       omni = produce_omni_
-      _x = omni.scan_primary_symbol_softly
+      _x = omni.argument_scanner_narrator.match_primary_shaped_token
       parsation_via_ _x, omni, log
     end
 
@@ -160,13 +166,14 @@ module Skylab::Zerk::TestSupport
       _PRIMARIES = {
         zz: :__parse_zz,
       }
-      _args = remove_instance_variable :@argument_scanner
 
-      primary_injector = X_nodes_PrimaryInjectorTwo___.new _args
+      nar = remove_instance_variable :@NARRATOR
+
+      primaries_injector = X_nodeps_PrimaryInjectorTwo___.new nar
 
       _lib = No_Dependencies_Zerk::Subject_library_[]
 
-      omni = _lib::ParseArguments_via_FeaturesInjections.define do |fi|
+      omni = _lib::ArgumentParsingIdioms_via_FeaturesInjections.define do |fi|
 
         fi.add_hash_based_operators_injection _OPERATIONS, :_no_
 
@@ -175,16 +182,16 @@ module Skylab::Zerk::TestSupport
             xx_yy2: :zzz,
           }
           o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
-          o.injector = :_INJECTOR_2_
+          o.injection_symbol = :_INJECTION_2_
         end
 
-        fi.add_primaries_injection _PRIMARIES, primary_injector
+        fi.add_primaries_injection _PRIMARIES, :_inj_1_ze
 
-        fi.argument_scanner = _args
-      end
+        fi.add_injector primaries_injector, :_inj_1_ze
 
-      omni.send :define_singleton_method, :__PRIMARIES_INJECTOR do
-        primary_injector
+        fi.argument_scanner_narrator = nar
+
+        :__PRIMARIES_INJECTOR
       end
 
       omni
@@ -202,16 +209,18 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class X_nodes_PrimaryInjectorTwo___
+    class X_nodeps_PrimaryInjectorTwo___
 
-      def initialize scn
-        @_scn = scn
+      def initialize nar
+        @_narrator = nar
       end
 
-      def __parse_zz
-        @ZZ = @_scn.head_as_is
-        @_scn.advance_one
-        ACHIEVED_
+      def __parse_zz feat
+        vm = @_narrator.procure_any_match_after_feature_match feat.feature_match
+        if vm
+          @ZZ = vm.mixed
+          @_narrator.advance_past_match vm
+        end
       end
 
       attr_reader :ZZ

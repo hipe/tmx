@@ -191,7 +191,7 @@ module Skylab::Zerk
         # "appropriateds" but [ac] doesn't have any built-in sense for what
         # those even are. so here is where we transfer those values from the
         # ACS tree to the parameter store for the operation implementation.
-        # (:#spot-4: write from ACS tree into parameter store.)
+        # (:#spot1.4: write from ACS tree into parameter store.)
 
         p = @_operation_index.evaluation_proc_for_ self
 
@@ -222,7 +222,7 @@ module Skylab::Zerk
       end
 
       def evaluate_provisioned_parameter__ par
-        # (for now is same as bespokes but only because of #spot-6)
+        # (for now is same as bespokes but only because of #spot1.6)
         @real_store_.evaluation_of par
       end
 

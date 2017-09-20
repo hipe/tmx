@@ -2,10 +2,17 @@ module Skylab::Zerk::TestSupport
 
   module No_Dependencies_Zerk
 
-    def self.[] tcc
+    class << self
+
+      def [] tcc
       tcc.send :define_singleton_method, :begin_scanner_canon, MM_01___
       tcc.include InstaceMethods___
-    end
+      end
+
+      def lib
+        Home_::No_deps[]
+      end
+    end  # >>
 
     # -
 
@@ -34,7 +41,7 @@ module Skylab::Zerk::TestSupport
         oo.writable_module Sandbox___
 
         oo.add_test :the_empty_scanner_knows_it_is_empty do
-          state_0.no_unparsed_exists || fail
+          innermost_scanner_( state_0 ).no_unparsed_exists || fail
         end
 
         oo.add_sequential_memoization :state_0 do
@@ -46,7 +53,7 @@ module Skylab::Zerk::TestSupport
         oo.add_context :subcanon_for_non_primary_head do |o|
 
           o.add_test :at_the_beginning_the_scanner_knows_it_has_some_unparsed do
-            state_0[0].no_unparsed_exists && fail
+            innermost_scanner_( state_0[0] ).no_unparsed_exists && fail
           end
 
           o.add_test :the_scanner_does_not_parse_the_primary do
@@ -64,18 +71,8 @@ module Skylab::Zerk::TestSupport
             self.expect_that_lines_express_appropriately _lines
           end
 
-          o.add_test :attempting_to_read_the_current_primary_symbol_raises do
-            _cls = Subject_library_[]::ScannerIsNotInThatState
-            _scn = state_1[1] || fail
-            begin
-              _scn.current_primary_symbol
-            rescue _cls => e
-            end
-            e.message == "cannot read `current_primary_symbol` from beginning state" || fail
-          end
-
           o.add_test :after_not_parsing_the_primary_the_scanner_is_not_empty do
-            state_1[1].no_unparsed_exists && fail
+            innermost_scanner_( state_1[1] ).no_unparsed_exists && fail
           end
 
           o.add_sequential_memoization :state_0 do
@@ -87,9 +84,9 @@ module Skylab::Zerk::TestSupport
 
           o.add_sequential_memoization :state_1 do |state_0|
             scn = state_0[0]
-            _yes_or_no = scn.scan_primary_symbol
+            _match = scn.procure_primary_shaped_match
             _em = state_0[1].gets
-            [ _yes_or_no, scn, _em ]
+            [ _match, scn, _em ]
           end
         end
 
@@ -98,69 +95,58 @@ module Skylab::Zerk::TestSupport
         oo.add_context :subcanon_for_primary_head do |o|
 
           o.add_test :at_the_beginning_the_scanner_knows_it_has_some_unparsed do
-            state_0.no_unparsed_exists && fail
+            innermost_scanner_( state_0 ).no_unparsed_exists && fail
           end
 
           o.add_test :the_scanner_parses_the_primary do
 
             tuple = state_1
-            tuple.first || fail
-            tuple[1].current_primary_symbol == :prim_1 || fail
+            match = tuple.first
+            match.primary_symbol == :prim_1 || fail
+            # ..
           end
 
-          o.add_test :after_parsing_the_primary_the_scanner_knows_it_is_empty do
-            state_1[1].no_unparsed_exists || fail
+          o.add_test :after_matching_the_primary_the_scanner_is_still_not_empty do
+
+            state_1.last && fail
+          end
+
+          o.add_test :after_accepting_the_match_the_scanner_IS_empty do
+
+            state_2 || fail
           end
 
           o.add_sequential_memoization :state_0 do
             build_scanner
           end
 
-          o.add_sequential_memoization :state_1 do |scn|
-            _yes_or_no = scn.scan_primary_symbol
-            [ _yes_or_no, scn ]
+          o.add_sequential_memoization :state_1 do |nar|
+
+            _match = nar.procure_primary_shaped_match
+            _yes = innermost_scanner_( nar ).no_unparsed_exists
+            [ _match, nar, _yes ]
+          end
+
+          o.add_sequential_memoization :state_2 do |state_1|
+
+            match, nar = state_1
+            nar.advance_past_match match
+            innermost_scanner_( nar ).no_unparsed_exists
           end
         end
       end
     end
 
     # ==
+
+    module InstaceMethods___
+
+      def innermost_scanner_ nar
+        nar.token_scanner
+      end
+    end
 
     Sandbox___ = ::Module.new
-
-    # ==
-
-    Argument_scanner_for_testing = Lazy_.call do
-
-      # there are parts of the argument scanner "canon" that we don't
-      # actually want to bother implementing in the API argument scanner.
-      # so for now we make a subclass of that with stub implementations
-      # to get a sense for how it would look.
-
-      Subject_library_[]
-
-      class ArgumentScannerForTesting___ < ::NoDependenciesZerk::API_ArgumentScanner
-
-        def scan_primary_symbol
-          sym = head_as_is
-          if :_not_a_primary_ == sym
-            __whine_about_not_a_primary sym
-            false
-          else
-            super
-          end
-        end
-
-        def __whine_about_not_a_primary sym
-          @listener.call :error, :expression, :parse_error do |y|
-            y << "does not look like a primary: #{ sym.inspect }"
-          end
-          NIL
-        end
-
-        self
-      end
-    end
 
     # ==
 
@@ -168,13 +154,16 @@ module Skylab::Zerk::TestSupport
 
       class Client
 
-        def initialize scn
-          @_args = scn
+        def initialize nar
+          @_narrator = nar
         end
 
-        def _at_color
-          @color = @_args.head_as_is
-          @_args.advance_one ; true
+        def _at_color feat
+          vm = @_narrator.procure_any_match_after_feature_match feat.feature_match
+          if vm
+            @color = vm.mixed
+            @_narrator.advance_past_match vm
+          end
         end
 
         attr_reader(
@@ -184,13 +173,16 @@ module Skylab::Zerk::TestSupport
 
       class Operation
 
-        def initialize scn
-          @_args = scn
+        def initialize nar
+          @_narrator = nar
         end
 
-        def _at_shape
-          @shape = @_args.head_as_is
-          @_args.advance_one ; true
+        def _at_shape feat
+          vm = @_narrator.procure_any_match_after_feature_match feat.feature_match
+          if vm
+            @shape = vm.mixed
+            @_narrator.advance_past_match vm
+          end
         end
 
         attr_reader(

@@ -307,7 +307,7 @@ module Skylab::Zerk
 
       For_table_page_column_build_new_observation_of_max___ = -> o do
 
-        # (you might want to push this up to be a common observation function :#spot-8)
+        # (you might want to push this up to be a common observation function :#spot1.8)
 
         min = nil ; max = nil
 

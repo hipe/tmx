@@ -33,6 +33,10 @@ module Skylab::Zerk
         s.inspect
       end
 
+      def ick_prim sym
+        prim( sym ).inspect
+      end
+
       def oper sym
         sym.id2name.gsub UNDERSCORE_, DASH_
       end

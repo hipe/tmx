@@ -1,0 +1,76 @@
+digraph g {
+
+  graph [
+    rankdir="LR"
+  ]
+
+  subgraph cluster_0 {
+
+    label="argument parsing idioms\n(constructed with branch-specific feature injections)"
+
+    node_0_1 [
+      label="flush_to_parse_primaries
+      |.."
+      shape=record
+    ]
+
+    subgraph cluster_1 {
+
+      label="argument scanner narrator\n(modality agnostic interface)"
+
+      node_1_1 [
+        label="procure_primary_shaped_match
+        |match_primary_shaped_token
+        |match_optional_argument_after_feature_match
+        |procure_any_match_after_feature_match
+        |procure_trueish_match_after_feature_match
+        |procure_matching_match_after_feature_match
+        |..
+        |advance_past_match"
+        shape=record
+      ]
+
+      subgraph cluster_2 {
+
+        label="modality adapter scanner\n(injected per modality)"
+
+        node_2_1 [
+          label="_match_primary_shaped_token_
+          |_procure_primary_via_shape_match_
+          |_match_optional_argument_
+          |.."
+          shape=record
+        ]
+
+        subgraph cluster_3 {
+
+          label="token scanner\n(modality agnostic)"
+
+          node_3_1 [
+            label="no_unparsed_exists
+            |head_as_is
+            |has_offset
+            |value_at
+            |advance_one
+            |advance_this_many"
+            shape=record
+          ]
+        }
+      }
+    }
+  }
+
+  node_0_1->node_1_1
+  node_1_1->node_0_1
+
+  node_1_1->node_2_1
+  node_2_1->node_1_1
+
+  node_3_1->node_2_1
+  node_2_1->node_3_1
+
+  label="fig 1. new architecture for argument scanning.
+each tier is explained in the counterpart document.
+(many 'primary' methods have an 'operator' counterpart.)"
+
+}

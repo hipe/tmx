@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module NoDependenciesZerk
 
   # freshly abtracted from [cm], officially this is [#060]
+  # (those (many) parts having to do with argument scanning are [#052])
 
   # when you need to make a client that doesn't load a lot of files
   # (like one that turns on coverage testing or similar), this is a
@@ -9,6 +12,8 @@ module NoDependenciesZerk
   # but NOTE [ze] may be loaded to handle the following circumstances:
   #
   #   - to express a parse failure
+
+  #   - [#052.H] local conventions are used.
 
   # -
 
@@ -25,6 +30,484 @@ module NoDependenciesZerk
     SimpleModel = ::Class.new  # forward declaration
     MagneticBySimpleModel = ::Class.new SimpleModel
 
+    # = shared life (higher level)
+
+    DEFINITION_FOR_THE_METHOD_CALLED_STORE = -> ivar, x do
+      if x
+        instance_variable_set ivar, x ; true
+      end
+    end
+
+    module NarratorMethods  # EXPERIMENT tier [#052.G] five of The N Tiers
+
+    private
+
+      def no_unparsed_exists
+        @argument_scanner_narrator.token_scanner.no_unparsed_exists
+      end
+
+      def match_operator_shaped_token
+        _ = @argument_scanner_narrator.match_operator_shaped_token
+        _store_ :@__operator_match_NDZ, _
+      end
+
+      def match_primary_shaped_token
+        _ = @argument_scanner_narrator.match_primary_shaped_token
+        _store_ :@__primary_match_NDZ, _
+      end
+
+      def procure_and_process_primary_via_match  # [bs]
+        _omni = current_argument_parsing_idioms
+        _omni._procure_and_process_primary_via_match release_primary_match
+      end
+
+      def procure_operator_via_match
+        _om = release_operator_match
+        _ = current_argument_parsing_idioms.procure_operator_via_operator_match _om
+        _store_ :@__operator_found_NDZ, _
+      end
+
+      def look_up_primary_via_match
+        _match = release_primary_match
+        lu = current_argument_parsing_idioms.unified_lookup_of_primary _match
+        if lu.was_found
+          @__primary_found_NDZ = lu.feature_found ; true
+        else
+          @__primary_lookup_NDZ = lu ; false
+        end
+      end
+
+      def primary_was_ambiguous_or_similar
+        _lu = remove_instance_variable :@__primary_lookup_NDZ
+        ! _lu.not_found_was_NOT_expressed
+      end
+
+      def release_operator_found
+        remove_instance_variable :@__operator_found_NDZ
+      end
+
+      def current_operator_found  # EXPERIMENT for [br]
+        @__operator_found_NDZ
+      end
+
+      def release_primary_found
+        remove_instance_variable :@__primary_found_NDZ
+      end
+
+      def release_operator_match
+        remove_instance_variable :@__operator_match_NDZ
+      end
+
+      def release_primary_match
+        remove_instance_variable :@__primary_match_NDZ
+      end
+
+      def when_malformed_primary_or_operator
+        @argument_scanner_narrator.__when_malformed_primary_or_operator_
+      end
+
+      define_method :_store_, DEFINITION_FOR_THE_METHOD_CALLED_STORE
+    end
+
+    class ArgumentParsingIdioms_via_FeaturesInjections < SimpleModel  # ("omni") tier [#052.F] four of The N Tiers
+
+      class << self
+        def define
+          _fi = FeaturesInjections_via_Definition___.define do |o|
+            yield o  # hi.
+          end
+          new _fi
+        end
+        private :new
+      end
+
+      def redefine  # note [#052.F.2] - used only in testing and here's why
+        super  # hi.
+      end
+
+      attr_writer(
+        :argument_scanner_narrator,
+      )
+
+      def initialize fi
+
+        these = fi.__release_things_to_pass_up
+        nar = these.argument_scanner_narrator
+        sym = these.default_primary_symbol
+
+        # (PRIM_SYM = procure and process primary at head)
+        if sym
+          @_PRIM_SYM = :__PRIM_SYM_when_default_primary_symbol
+          @__primary_match_prototype = PrimaryMatch__.new sym, 0  # NOTE THE MAGIC of the zero-length carbon offset
+        else
+          @_PRIM_SYM = :__PRIM_SYM_normally
+        end
+
+        if nar
+          @argument_scanner_narrator = nar
+        end
+
+        @features = fi
+
+        freeze
+      end
+
+      def procure_operator
+        if @argument_scanner_narrator.token_scanner.no_unparsed_exists  # #covered-by [bs]
+          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ self ]
+        else
+          __procure_operator_when_some
+        end
+      end
+
+      def __procure_operator_when_some
+        match = @argument_scanner_narrator.procure_operator_shaped_match
+        if match
+          procure_operator_via_operator_match match
+        end
+      end
+
+      def flush_to_find_and_process_this_and_remaining_primaries match
+
+        if _procure_and_process_primary_via_match match
+          flush_to_parse_primaries
+        end
+      end
+
+      def flush_to_parse_primaries
+
+        # parse every of the zero or more remaining tokens as primaries or
+        # whine. NOTE this is the only way to reach `default_primary_symbol`
+
+        ok = ACHIEVED_
+        scn = @argument_scanner_narrator.token_scanner
+        until scn.no_unparsed_exists
+          ok = send @_PRIM_SYM
+          ok || break
+        end
+        ok
+      end
+
+      def __PRIM_SYM_when_default_primary_symbol  # assume 1. #Coverpoint1.6
+
+        match = @argument_scanner_narrator.match_primary_shaped_token
+        if ! match
+          match = @__primary_match_prototype.dup
+        end
+        _procure_and_process_primary_via_match match
+      end
+
+      def __PRIM_SYM_normally  # assume 1
+
+        match = @argument_scanner_narrator.procure_primary_shaped_match
+        if match
+          _procure_and_process_primary_via_match match
+        end
+      end
+
+      def _procure_and_process_primary_via_match match
+
+        found_primary = __procure_primary_via_match match
+        if found_primary
+          @features.__process_found_primary_ found_primary, self  # #[#007.H] no advance
+        end
+      end
+
+      def procure_operator_via_operator_match match
+        @argument_scanner_narrator.modality_adapter_scanner.
+          _procure_operator_via_shape_match_ match, self
+      end
+
+      def __procure_primary_via_match match
+        @argument_scanner_narrator.modality_adapter_scanner.
+          _procure_primary_via_shape_match_ match, self
+      end
+
+      def unified_lookup_of_primary match
+        @argument_scanner_narrator.modality_adapter_scanner.
+          _unified_lookup_of_primary_ match, self
+      end
+
+      attr_reader(
+        :features,
+        :argument_scanner_narrator,
+      )
+    end
+
+    class ArgumentScannerNarrator__  # tier [#052.E] three of The N Tiers
+
+      def initialize p, mas
+        @listener = p
+        @modality_adapter_scanner = mas
+        freeze
+      end
+
+      # (sections and section contents follow [#052.E.2] proscribed order.)
+
+      # -- `procure_X_after`
+
+      def procure_positive_nonzero_integer_after_feature_match fm
+        _procure_via_PLAIN_METHOD_after fm, :__normalize_positive_nonzero_integer
+      end
+
+      def procure_non_negative_integer_after_feature_match fm
+        _procure_via_PLAIN_METHOD_after fm, :__normalize_non_negative_integer
+      end
+
+      def procure_matching_match_after_feature_match rx, fm, & msg_p  # (production: 1x [ts])
+        __procure_via_MAP_FILTER_PROC_after fm, msg_p, __regex_map_filter( rx )
+      end
+
+      def procure_trueish_match_after_feature_match fm
+        __procure_via_IS_after fm, :__is_trueish
+      end
+
+      def procure_any_match_after_feature_match fm
+        _procure_any_after fm  # hi.
+      end
+
+      # -- `procure_X`
+
+      def procure_operator_shaped_match
+        _procure_via_match :match_operator_shaped_token
+      end
+
+      def procure_primary_shaped_match
+        _procure_via_match :match_primary_shaped_token
+      end
+
+      # -- `match_X`
+
+      def match_optional_argument_after_feature_match fm
+        # (you can't procure an optional argument - it's optinal so you can't fail)
+        if token_scanner.has_offset fm.offsets  # so they don't have to
+          @modality_adapter_scanner._match_optional_argument_ fm
+        end
+      end
+
+      def match_operator_shaped_token
+        @modality_adapter_scanner._match_operator_shaped_token_
+      end
+
+      def match_primary_shaped_token
+        @modality_adapter_scanner._match_primary_shaped_token_
+      end
+
+      # -- normal normalizers (i.e corral them into one place)
+
+      def __normalize_positive_nonzero_integer vm
+        _integer_that( vm ) { |d| 0 < d }
+      end
+
+      def __normalize_non_negative_integer vm
+        _integer_that( vm ) { |d| 0 <= d }
+      end
+
+      def _integer_that vm
+        vm = @modality_adapter_scanner._normalize_integer_ vm, self
+        if vm
+          if yield vm.mixed
+            vm
+          else
+            _base_label = caller_locations( 1, 1 )[ 0 ].base_label  # DIRTY TRICK
+            _stem = /\A_*normalize_(.+)_integer\z/.match( _base_label )[1]
+            _no_because_value vm do
+              "{{ feature }} must be #{ Humanize__[ _stem ] } (had {{ mixed_value }})"
+            end
+          end
+        end
+      end
+
+      def __regex_map_filter rx
+        -> vm do
+          md = rx.match vm.mixed
+          if md
+            vm.CHANGE_VALUE md
+          end
+        end
+      end
+
+      def __is_trueish vm
+        @modality_adapter_scanner._is_trueish_ vm
+      end
+
+      # -- support. (see [#052.E.3] normalization categories for methods)
+
+      def __when_malformed_primary_or_operator_  # #covered-by [tmx]
+        s = token_scanner.head_as_is
+        no_because :feature_parse_error do |y|
+          if s.include? UNDERSCORE_ and %r(\A[a-z0-9_]+\z) =~ s
+            _hint = " (did you mean #{ s.gsub UNDERSCORE_, DASH_ }?)"
+          end
+          y << "unknown primary or operator: {{ head_as_is }}#{ _hint }"
+        end
+      end
+
+      def _procure_via_PLAIN_METHOD_after fm, m
+        vm = _procure_any_after fm
+        if vm
+          send m, vm
+        end
+      end
+
+      def __procure_via_MAP_FILTER_PROC_after fm, msg_p, map_filter
+        vm = _procure_any_after fm
+        if vm
+          __normal_normalize_for_MAP_FILTER_PROC_after vm, msg_p, map_filter
+        end
+      end
+
+      def __procure_via_IS_after fm, m
+        vm = _procure_any_after fm
+        if vm
+          __normal_normalize_for_IS_after vm, m
+        end
+      end
+
+      def _procure_via_match m
+        fm = send m
+        if fm
+          fm
+        else
+          _no_because_does_not_look_like_feature m
+        end
+      end
+
+      def _procure_any_after fm
+        target_offset = fm.offsets
+        ts = token_scanner
+        if ts.has_offset target_offset
+          ValueMatch__.new ts.value_at( target_offset ), 1, fm
+        else
+          __no_because_missing_argument fm
+        end
+      end
+
+      def __normal_normalize_for_IS_after vm, m
+        yes = send m, vm
+        if yes
+          vm
+        else
+          fm = vm.feature_match
+          _moniker = Humanize__[ /\A_*is_/.match( m ).post_match ]
+          _msg = "{{ feature }} must be #{ _moniker } (had {{ mixed_value }})"
+          no_because_by do |o|
+            o.message_template_string = _msg
+            o.feature_match = fm
+          end
+        end
+      end
+
+      def __normal_normalize_for_MAP_FILTER_PROC_after vm, msg_p, map_filter
+        use_vm = map_filter[ vm ]
+        if use_vm
+          use_vm
+        else
+          __no_because_not_valid vm, & msg_p
+        end
+      end
+
+      def __no_because_not_valid vm, & msg_p
+        _no_because_value vm do |o|
+          if msg_p
+            o.message_proc = msg_p
+          else
+            o.message_template_string = '{{ mixed_value }} is not a valid {{ feature }}'
+          end
+        end
+      end
+
+      def __no_because_does_not_look_like vm, sym  # compare #here2
+        _no_because_value vm do |o|
+          o.message_template_string =
+            "{{ feature }} does not look like #{ Humanize__[ sym.id2name ] }: {{ mixed_value }}"
+        end
+      end
+
+      def __no_because_missing_argument fm
+        _no_because_feature fm do |o|
+          o.message_template_string = '{{ feature }} requires an argument'
+        end
+      end
+
+      def _no_because_value vm, & p
+        no_because_by do |o|
+          _same_trick o, p
+          o.value_match = vm
+          o.channel_tail vm.feature_match.parse_error_symbol_
+        end
+      end
+
+      def _no_because_feature fm, & p
+        no_because_by do |o|
+          _same_trick o, p
+          o.feature_match = fm
+        end
+      end
+
+      def _same_trick o, p
+        if p.arity.zero?
+          o.message_proc = p
+        else
+          p[ o ]
+        end
+      end
+
+      def _no_because_does_not_look_like_feature m  # compare #here2
+        _no_because_failure_to_match_feature m do |moniker|
+          "does not look like #{ moniker }: {{ head_as_is }}"
+        end
+      end
+
+      def _no_because_end_of_input_for_feature m
+        _no_because_failure_to_match_feature m do |moniker|
+          "expected #{ moniker } at end of input"
+        end
+      end
+
+      def _no_because_failure_to_match_feature m
+        stem = /\Amatch_([a-z_]+)_shaped_token\z/.match( m )[1]
+        no_because :"#{ stem }_parse_error" do  # `operator_parse_error` `primary_parse_error`
+          yield Humanize__[ stem ]
+        end
+      end
+
+      def no_because one, *rest, & msg_p
+        no_because_by do |o|
+          o.channel_tail one, * rest
+          o.message_proc = msg_p
+        end
+      end
+
+      def no_because_by
+        Zerk_lib_[]::ArgumentScanner::When::BestExpresserEver.call_by do |o|
+          yield o
+          o.argument_scanner_narrator = self
+        end
+        UNABLE_
+      end
+
+      def advance_past_match match
+        match._become_accepted_
+        case match.offsets
+        when 1 ; token_scanner.advance_one
+        when 0 ; NOTHING_  # #Coverpoint1.6 - default primary symbol, probably
+        when 2 ; token_scanner.advance_this_many 2  # #Coverpoint1.6
+        else no
+        end
+        ACHIEVED_  # convenience
+      end
+
+      def token_scanner
+        @modality_adapter_scanner.token_scanner
+      end
+
+      attr_reader(
+        :listener,
+        :modality_adapter_scanner,
+      )
+    end
+
     # = CLI life
 
     class CLI_Express_via_Emission < MagneticBySimpleModel
@@ -32,14 +515,6 @@ module NoDependenciesZerk
       def emission_proc_and_channel p, chan
         @channel = chan ; @emission_proc = p ; nil
       end
-
-      attr_writer(
-        :client,  # for `data`, `resource`, reaching expag, `stderr`
-        :expression_agent_by,
-        :resource_by,
-        :signal_by,
-        :stderr,
-      )
 
       def initialize
         @client = nil
@@ -49,6 +524,14 @@ module NoDependenciesZerk
         yield self
         # (but don't freeze)
       end
+
+      attr_writer(
+        :client,
+        :expression_agent_by,
+        :resource_by,
+        :signal_by,
+        :stderr,
+      )
 
       def execute
         method_name = nil
@@ -171,251 +654,159 @@ module NoDependenciesZerk
 
     # ==
 
-    ArgumentScannerMethods__ = ::Module.new  # forward declaration
-
-    class CLI_ArgumentScanner < SimpleModel
-
-      include ArgumentScannerMethods__
+    class CLI_ArgumentScanner  # tier [#052.E] two of The N Tiers (two of two)
 
       class << self
-        def new argv, & l
-          define do |o|
-            o.ARGV = argv
-            o.listener = l
-          end
+        def narrator_for s_a, & p
+          _me = new p, TokenScanner__.new( s_a )
+          ArgumentScannerNarrator__.new p, _me
         end
+        private :new
       end  # >>
 
-      def initialize
+      def initialize p, ts
+        @listener = p
+        @token_scanner = ts
+        freeze
+      end
 
-        @initial_ARGV_offset = 0
-        @default_primary_symbol = nil
-        @listener = nil
-        yield self
-        s_a = remove_instance_variable :@ARGV
-        len = s_a.length
-        d = remove_instance_variable :@initial_ARGV_offset
-        if len == d
-          @no_unparsed_exists = true
-          freeze
+      def _normalize_integer_ vm, nar
+        s = vm.mixed
+        if %r(\A-?\d+\z) =~ s
+          vm.CHANGE_VALUE s.to_i
         else
-          @_array = s_a
-          @_current_index = d  # name is #testpoint
-          @_last_index = s_a.length - 1
+          nar.__no_because_does_not_look_like vm, :integer
         end
       end
 
-      attr_writer(
-        :ARGV,
-        :default_primary_symbol,
-        :initial_ARGV_offset,
-        :listener,
-      )
+      def _is_trueish_ vm
+        vm.mixed.length.nonzero?  # experiment
+      end
 
-      # --
+      def _match_optional_argument_ fm  # assume has offset. counterpart: #[#052.E.3]
+        _s = @token_scanner.value_at fm.offsets
+        if PRIMARY_RX__ !~ _s
+          ValueMatch__.new _s, 1, fm
+        end
+      end
 
-      def scan_operator_symbol_softly
-        s = head_as_is
-        if OPERATOR_RX___ =~ s
-          _ = s.gsub( DASH_, UNDERSCORE_ ).intern
-          send ( @_write_COS_ ||= :_write_COS_initially ), _
-          advance_one
-          ACHIEVED_
+      def _procure_operator_via_shape_match_ operator_match, omni
+        lu = _unified_lookup_of_operator operator_match, omni
+        if lu.was_found
+          lu.feature_found
+        elsif lu.not_found_was_NOT_expressed
+          Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ omni ]
+        end
+      end
+
+      def _procure_primary_via_shape_match_ primary_match, omni
+        lu = _unified_lookup_of_primary_ primary_match, omni
+        if lu.was_found
+          lu.feature_found
+        elsif lu.not_found_was_NOT_expressed
+          Zerk_lib_[]::ArgumentScanner::When::Unknown_primary[ omni ]
+        end
+      end
+
+      def _unified_lookup_of_operator operator_match, omni
+        found = omni.features._find_operator_via_shape_match operator_match
+        if found
+          UnifiedFound__.new found
         else
-          NIL  # #nodeps-coverpoint-1
+          _unified_fuzz operator_match, omni, :__find_all_operators_matching_, :_operator_
+        end
+      end
+
+      def _unified_lookup_of_primary_ primary_match, omni
+        found = omni.features._find_primary_via_shape_match primary_match
+        if found
+          UnifiedFound__.new found
+        else
+          _unified_fuzz primary_match, omni, :__find_all_primaries_matching_, :_primary_
+        end
+      end
+
+      def _unified_fuzz match, omni, m, type  # #coverpoint1.4
+
+        _sym_head = match.feature_symbol
+        _rx = /\A#{ ::Regexp.escape _sym_head.id2name }/
+        a = omni.features.send m, _rx
+
+        case 1 <=> a.length
+        when 0  # when found
+          UnifiedFound__.new a.fetch 0
+
+        when 1  # when not found
+          NOT_FOUND___
+
+        else  # when ambiguous
+          Zerk_lib_[]::ArgumentScanner::When::Ambiguous[ a, omni, type ]
+          UNRECOVERABLE___
+        end
+      end
+
+      def _match_operator_shaped_token_  # assume 1
+        s = @token_scanner.head_as_is
+        if OPERATOR_RX___ =~ s
+          OperatorMatch__.new s.gsub( DASH_, UNDERSCORE_ ).intern
+        else
+          NIL  # #Coverpoint1.1
         end
       end
 
       OPERATOR_RX___ = /\A[a-z][a-z0-9]*(?:-[a-z0-9]+)*\z/i
 
-      def current_operator_as_matcher
-        %r(\A#{ ::Regexp.escape current_operator_symbol.id2name })i
-      end
-
-      def scan_primary_symbol  # exactly as [#ze-052.1] canon
-        if scan_primary_symbol_softly
-          ACHIEVED_
-        else
-          __when_malformed_primary
-        end
-      end
-
-      def scan_primary_symbol_softly
-        @_write_CPS_ ||= :_write_CPS_initially
-        s = head_as_is
-        md = PRIMARY_RX__.match s
+      def _match_primary_shaped_token_  # assume 1
+        _s = @token_scanner.head_as_is
+        md = PRIMARY_RX__.match _s
         if md
-          @current_primary_token = s
-          _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
-          send @_write_CPS_, _
-          advance_one
-          ACHIEVED_
-        elsif @default_primary_symbol
-          # #not-covered - blind faith
-          send @_write_CPS_, @default_primary_symbol
-          ACHIEVED_
+          _ = md[1].gsub( DASH_, UNDERSCORE_ ).intern
+          PrimaryMatch__.new _
         else
-          NIL  # #nodeps-coverpoint-2
+          NIL  # #coverpoint1.2
         end
-      end
-
-      def current_primary_token
-        @current_primary_token  # hi.
-      end
-
-      def scan_when_argument_is_optional  # 1x [fi]
-
-        # see [#here.3] about this particular argument arity.
-        # hint: it may be CLI-only
-
-        if no_unparsed_exists
-          ::Skylab::Common::KNOWN_UNKNOWN
-        elsif head_looks_like_optional_argument
-          ::Skylab::Common::KNOWN_UNKNOWN
-        else
-          self._COVER_ME
-        end
-      end
-
-      def head_looks_like_optional_argument  # assume no empty
-        PRIMARY_RX__ !~ head_as_is
       end
 
       PRIMARY_RX__ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
 
-      def __receive_corrected_primary_normal_symbol sym
-        remove_instance_variable :@_CPS_ ; @_CPS_ = sym ; nil
-      end
-
-      # --
-
-      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ scn  # #TWOPLE
-        # assume: a `current_primary_symbol` with no exact match
-        rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
-        a = []
-        until scn.no_unparsed_exists
-          twople = scn.gets_one
-          rx =~ twople.last.intern or next
-          a.push twople
-        end
-        a
-      end
-
-      def parse_positive_nonzero_integer
-        _integer_that { |d_| 0 < d_ }
-      end
-
-      def parse_non_negative_integer
-        _integer_that { |d_| -1 < d_ }
-      end
-
-      def _integer_that & p
-        d = __head_as_integer
-        if d
-          if yield d
-            advance_one
-            d
-          else
-            __when_integer_is_not d, caller_locations( 1, 1 )[ 0 ]
-          end
-        end
-      end
-
-      def __when_integer_is_not d, loc
-        _s = %r(\Aparse_(.+)_integer\z).match( loc.base_label )[ 1 ]
-        _human = _s.gsub UNDERSCORE_, SPACE_
-        no_because { "{{ prim }} must be #{ _human } (had #{ d })" }
-      end
-
-      def __head_as_integer
-        map_value_by do |s|
-          if %r(\A-?\d+\z) =~ s
-            s.to_i
-          else
-            no_because { "{{ prim }} must be an integer (had #{ s.inspect })" }
-          end
-        end
-      end
-
-      # --
-
-      def when_malformed_primary_or_operator  # courtesy, for proximity to below
-        s = head_as_is
-        no_because do |y|
-          if s.include? UNDERSCORE_ and %r(\A[a-z0-9_]+\z) =~ s
-            _hint = " (did you mean #{ s.gsub UNDERSCORE_, DASH_ }?)"
-          end
-          y << "unknown primary or operator: #{ s.inspect }#{ _hint }"
-        end
-      end
-
-      def __when_malformed_primary
-        s = head_as_is
-        no_because do |y|
-          y << "does not look like primary: #{ s.inspect }"
-        end
-      end
-
-      # --
-
-      def retreat_one  # we don't clear current_primary_symbol !
-        if no_unparsed_exists
-          @no_unparsed_exists = false
-          @_current_index = @_last_index
-        else
-          @_current_index.zero? && self._SANITY
-          @_current_index -= 1 ; nil
-        end
-        NIL
-      end
-
-      def advance_one
-        if @_last_index == @_current_index
-          @_current_index += 1  # #nodeps-coverpoint-4
-          @no_unparsed_exists = true
-          # can't freeze because the current primary may be set
-        else
-          @_current_index += 1
-        end
-        NIL
-      end
-
-      def close_and_release  # #experiment  1x here 1x [tmx]
-        @is_closed = true
-        remove_instance_variable :@_last_index
-        a = [ remove_instance_variable( :@_current_index ),
-          remove_instance_variable( :@_array ) ]
-        freeze
-        a
-      end
-
-      # --
-
-      def head_as_is
-        @_array.fetch @_current_index
-      end
-
       attr_reader(
-        :has_current_primary_symbol,
-        :is_closed,
-        :listener,
-        :no_unparsed_exists,
+        :token_scanner,
       )
+    end
 
-      def can_optional_argument
-        true
+    class UnifiedFound__
+      def initialize fo
+        @feature_found = fo
       end
-
-      def can_fuzzy
+      attr_reader :feature_found
+      def was_found
         true
       end
     end
+
+    module UNRECOVERABLE___ ; class << self
+      def not_found_was_NOT_expressed ; false end
+      def was_found ; false end
+    end end
+
+    module NOT_FOUND___ ; class << self
+      def not_found_was_NOT_expressed ; true end
+      def was_found ; false end
+    end ; end
 
     # ==
 
     InterfaceExpressionAgent__ = ::Class.new  # forward declaration
 
     class CLI_InterfaceExpressionAgent < InterfaceExpressionAgent__
+
+      def ick_oper_via_head_as_is_ s
+        s.inspect
+      end
+
+      def ick_prim_via_head_as_is_ s
+        s.inspect
+      end
 
       def ick_oper sym
         oper( sym ).inspect
@@ -455,97 +846,85 @@ module NoDependenciesZerk
 
     # = API life
 
-    class API_ArgumentScanner
+    class API_ArgumentScanner  # tier [#052.E] two of The N Tiers (one of two)
 
-      include ArgumentScannerMethods__
+      class << self
+        def narrator_for s_a, & p
+          _me = new TokenScanner__.new s_a
+          ArgumentScannerNarrator__.new p, _me
+        end
+        private :new
+      end  # >>
 
-      def initialize a, & l
-        @listener = l  # not used here presently, just a courtesy
-        if a.length.zero?
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_array = a
-          @_current_index = 0
-          @_last_index = a.length - 1
+      def initialize ts
+        @token_scanner = ts
+        freeze
+      end
+
+      def _normalize_integer_ vm, nar  # this is perhaps just a contact exercise ..
+        if ::Integer === vm.mixed
+          vm
+        else  # (in API as opposed to CLI the value could be any object, so cautiously)
+          nar._no_because_value vm do
+            "{{ feature }} must be integer type (was #{ vm.mixed.class }): {{ mixed_value_CAUTIOUSLY }}"
+          end
         end
       end
 
-      def scan_operator_symbol_softly
-        scan_operator_symbol  # (see)
+      def _is_trueish_ vm
+        vm.mixed
       end
 
-      def scan_primary_symbol_softly
-        scan_primary_symbol  # (see)
+      def _match_optional_argument_ fm  # assume has offset. see [#052.E.3]
+        _x = @token_scanner.value_at fm.offsets
+        ValueMatch__.new _x, 1, fm
       end
 
-      def scan_operator_symbol
-        # (under API, we don't check if it's a symbol :#here-2 but we could)
-        send ( @_write_COS_ ||= :_write_COS_initially ), head_as_is
-        advance_one
-        ACHIEVED_
+      def _procure_operator_via_shape_match_ operator_match, omni  # #covered-by [pl]
+
+        found_operator = omni.features._find_operator_via_shape_match operator_match
+        if found_operator
+          found_operator
+        else
+          Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ omni ]
+        end
       end
 
-      def scan_primary_symbol
+      def _procure_primary_via_shape_match_ primary_match, omni
+
+        found_primary = omni.features._find_primary_via_shape_match primary_match
+        if found_primary
+          found_primary
+        else
+          Zerk_lib_[]::ArgumentScanner::When::Unknown_primary[ omni ]  # #covered-by [ts]
+        end
+      end
+
+      def _match_operator_shaped_token_  # assume 1. #covered-by [pl]
+        OperatorMatch__.new @token_scanner.head_as_is
+      end
+
+      def _match_primary_shaped_token_  # assume 1
         # (under API, we don't check if it's a symbol but we could)
-        x = head_as_is
-        @current_primary_token = x
-        send ( @_write_CPS_ ||= :_write_CPS_initially ), x
-        advance_one
-        ACHIEVED_
-      end
-
-      def current_primary_token
-        # (under API, is same)
-        current_primary_symbol
-      end
-
-      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ _
-        # assume: a `current_primary_symbol` with no exact match
-        LENGTH_ZERO___
-      end
-
-      module LENGTH_ZERO___ ; class << self ; def length ; 0 end end end
-
-      def _fuzzy_lookup_primary_or_fail h
-        When_primary_not_found__[ h, self ]
-      end
-
-      def advance_one
-        if @_last_index == @_current_index
-          remove_instance_variable :@_array
-          remove_instance_variable :@_current_index
-          remove_instance_variable :@_last_index
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_current_index += 1
-        end
-        NIL
-      end
-
-      def head_as_is
-        @_array.fetch @_current_index
+        PrimaryMatch__.new @token_scanner.head_as_is
       end
 
       attr_reader(
-        :has_current_primary_symbol,
-        :listener,
-        :no_unparsed_exists,
+        :token_scanner,
       )
-
-      def can_optional_argument
-        false
-      end
-
-      def can_fuzzy
-        false
-      end
     end
 
     # ==
 
     class API_InterfaceExpressionAgent < InterfaceExpressionAgent__
+
+      def ick_oper_via_head_as_is_ sym  # #experiment
+        _same sym
+      end
+
+      def ick_prim_via_head_as_is_ sym
+        _same sym
+      end
 
       def ick_oper sym
         _same sym
@@ -586,14 +965,14 @@ module NoDependenciesZerk
       end
     end
 
-    # = modality-agnostic life
+    # = shared life (again)
 
-    Check_requireds = -> o, ivars, & p do
+    Check_requireds = -> o, ivars, & p do  # [ts], [cm]
 
-      # (this oft-repeated logic is tagged by :[#fi-037.5.B].)
+      # ultra minimal subset of [#fi-012] normalization. :[#fi-037.5.B]
 
-      when_missing = nil
-      missing = nil
+      when_missing = nil ; missing = nil
+
       main = -> do
         ivars.each do |ivar|
           if o.instance_variable_defined? ivar
@@ -617,7 +996,7 @@ module NoDependenciesZerk
             prim sym
           end
           simple_inflection do
-            y << "required: #{ oxford_join "", _scn, " and " }"
+            y << "required: #{ oxford_join ::String.new, _scn, " and " }"
           end
         end
         UNABLE_
@@ -626,34 +1005,42 @@ module NoDependenciesZerk
       main[]
     end
 
-    class ParseArguments_via_FeaturesInjections < SimpleModel  # "omni branch"
-
-      class << self
-        def call scn, prim_h, client
-          define do |o|
-            o.argument_scanner = scn
-            o.add_primaries_injection prim_h, client
-          end.flush_to_parse_primaries
-        end
-        alias_method :[], :call
-      end  # >>
+    class FeaturesInjections_via_Definition___ < SimpleModel
 
       def initialize
+
         @_add_operators_injection = :__add_first_operators_injection
         @_add_primaries_injection = :__add_first_primaries_injection
+
+        @argument_scanner_narrator = nil
+        @default_primary_symbol = nil
+        @has_operators = false
+        @has_primaries = false
+
         yield self
+
+        if @has_operators
+          @operators_injections.freeze
+        end
+        if @has_primaries
+          @primaries_injections.freeze
+        end
+        remove_instance_variable :@_add_operators_injection
+        remove_instance_variable :@_add_primaries_injection
+        # freeze #here1
       end
 
       attr_writer(
-        :argument_scanner,
+        :argument_scanner_narrator,
+        :default_primary_symbol,
       )
 
-      def add_hash_based_operators_injection h, injector
-        _add_operators_injection HashBasedFeaturesInjection__.new( h, injector )
+      def add_hash_based_operators_injection h, injector_sym, injection_sym=nil
+        _add_operators_injection HashBasedFeaturesInjection__.new( h, injector_sym, injection_sym )
       end
 
-      def add_primaries_injection h, injector  # (is the counterpart to above)
-        _add_primaries_injection HashBasedFeaturesInjection__.new( h, injector )
+      def add_primaries_injection h, injector_sym, injection_sym=nil  # (is the counterpart to above)
+        _add_primaries_injection HashBasedFeaturesInjection__.new( h, injector_sym, injection_sym )
       end
 
       def add_lazy_operators_injection_by & p
@@ -679,7 +1066,8 @@ module NoDependenciesZerk
 
       def __add_first_operators_injection ada
         @has_operators = true
-        @_operators_injections = []
+        @_offset_of_last_operator_injection = -1
+        @operators_injections = []
         @_add_operators_injection = :__add_operators_injection_normally
         send @_add_operators_injection, ada
       end
@@ -687,317 +1075,195 @@ module NoDependenciesZerk
       def __add_first_primaries_injection ada
         @has_primaries = true
         @_offset_of_last_primary_injection = -1
-        @_primaries_injections = []
+        @primaries_injections = []
         @_add_primaries_injection = :__add_primaries_injection_normally
         send @_add_primaries_injection, ada
       end
 
       def __add_operators_injection_normally ada
-        @_operators_injections.push ada ; nil
+        @_offset_of_last_operator_injection += 1
+        @operators_injections.push ada ; nil
       end
 
       def __add_primaries_injection_normally ada
         @_offset_of_last_primary_injection += 1
-        @_primaries_injections.push ada ; nil
+        @primaries_injections.push ada ; nil
       end
 
-      # -- NOTE the below might break out
+      def add_injector x, sym
+        h = ( @_injector_box ||= {} )
+        h.key? sym and fail
+        h[ sym ] = x ; nil
+      end
 
-      def parse_operator
+      def __release_things_to_pass_up
 
-        # the hierarchy is `parse` (which calls `lookup` (which calls `scan`))
+        x = PassUp___.new(
+          remove_instance_variable( :@argument_scanner_narrator ),
+          remove_instance_variable( :@default_primary_symbol ),
+        )
+        freeze  # #here1
+        x
+      end
 
-        if @argument_scanner.no_unparsed_exists
-          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ self ]
+      PassUp___ = ::Struct.new(
+        :argument_scanner_narrator,
+        :default_primary_symbol,
+      )
 
-        elsif scan_operator_symbol_softly
-          flush_to_lookup_operator
+      # -- read
 
-        else
-          # (assume this will never hit API while #here-2)
-          when_malformed_primary_or_operator
+      def TO_FLATTENED_QUALIFIED_FEATURE_SCANNER  # experimental new assist usu for help screens
+        Zerk_lib_[]::ArgumentScanner::Magnetics::FlattenedQualifiedFeatureScanner_via_Injections.call_by do |o|
+          yield o if block_given?
+          o.injections = self
         end
       end
 
-      def scan_operator_symbol_softly
-        @argument_scanner.scan_operator_symbol_softly
+      def __process_found_primary_ found, omni  # #[#007.H] for now, client advances
+        _inj_ref = _injection_reference_via_primary_found found
+        _br = _inj_ref.injection
+        _ok = _br._process_found_primary_ found, omni  # EXPERIMENT
       end
 
-      def scan_primary_symbol_softly
-        @argument_scanner.scan_primary_symbol_softly
+      def injector_via_primary_found found   # [tmx]
+        _inj_ref = _injection_reference_via_primary_found found
+        @_injector_box.fetch _inj_ref.injector_symbol
       end
 
-      def flush_to_lookup_operator  # assume:
-
-        #  - assume `scan_operator_symbol_softly` succeeds
-        #  - assume there are some operators injections
-        #
-        #  result is a "found tuple" if found, and FOR NOW
-        #  on failure we emit here and result in false.
-
-        sym = @argument_scanner.current_operator_symbol
-        scn = to_operators_injections_scanner
-
-        begin
-          inj = scn.gets_one
-          inj = inj.injection
-          trueish_item_value = inj.lookup_softly sym
-        end until trueish_item_value || scn.no_unparsed_exists
-
-        if trueish_item_value
-          OperatorFound__[ inj.injector, trueish_item_value, sym ]
-        elsif @argument_scanner.can_fuzzy
-          __fuzzy_lookup_operator
-        else
-          _when_operator_not_found  # :[#008.4] #borrow-coverage from [pl]
-        end
+      def injection_reference_via_operator_found found  # [tmx]
+        @operators_injections.fetch found.injection_offset
       end
 
-      def __fuzzy_lookup_operator
-        a = __all_fuzzily_matching_operators_found
-        case 1 <=> a.length
-        when 0  # when found
-          a.fetch 0
-        when 1  # when not found
-          _when_operator_not_found
-        else  # when ambiguous
-          _scn = Scanner_via_Array.call a do |of|
-            of.loadable_reference.intern  # [#ze-062]
-          end
-          Ambiguous__[ _scn, :_operator_, @argument_scanner ]
-        end
+      def _injection_reference_via_primary_found found  # [tmx]
+        @primaries_injections.fetch found.injection_offset
       end
 
-      def _when_operator_not_found
-        Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ self ]
+      def __find_all_operators_matching_ rx
+
+        _scn = _to_operators_injections_offset_scanner_downwards
+        _find_all_matching _scn, rx, @operators_injections, OperatorFound__
       end
 
-      def __all_fuzzily_matching_operators_found
+      def __find_all_primaries_matching_ rx
+
+        _scn = _to_primaries_injections_offset_scanner_downwards
+        _find_all_matching _scn, rx, @primaries_injections, PrimaryFound__
+      end
+
+      def _find_operator_via_shape_match operator_match
+
+        _scn = _to_operators_injections_offset_scanner_upwards
+        _find_via_shape_match(
+          _scn, operator_match, @operators_injections, OperatorFound__ )
+      end
+
+      def _find_primary_via_shape_match primary_match
+
+        _scn = _to_primaries_injections_offset_scanner_upwards
+        _find_via_shape_match(
+          _scn, primary_match, @primaries_injections, PrimaryFound__ )
+      end
+
+      def _find_all_matching scn, rx, injections, cls
         a = []
-        rx = @argument_scanner.current_operator_as_matcher
-        scn = to_operator_loadable_reference_scanner
         until scn.no_unparsed_exists
-          if rx =~ scn.head_as_is.intern  # honor [#062]
-            a.push scn.to_found
+          offset = scn.gets_one
+          inj_ref = injections.fetch offset
+          br = inj_ref.injection
+
+          scn_ = br.to_symbolish_reference_scanner
+          until scn_.no_unparsed_exists
+            ref = scn_.gets_one
+            if rx !~ ref.intern
+              next
+            end
+            _fo = cls.define do |o|
+              o.injection_offset = offset
+              o.trueish_feature_value = br.dereference ref
+              o._match_ = cls.match_class.new ref.intern
+            end
+            a.push _fo
           end
-          scn.advance_one
         end
         a
       end
 
-      def dereference_operator sym
-        ::Symbol === sym or raise ::TypeError
-        # (because we never make an index of all operators across all injections)
-        scn = to_operators_injections_scanner
-        begin
-          injn = scn.gets_one.injection
-          trueish_item_value = injn.lookup_softly sym
-          trueish_item_value && break
-          redo
-        end while above
-        trueish_item_value || self._SANITY
-        OperatorFound__[ injn.injector, trueish_item_value, sym ]
-      end
+      def _find_via_shape_match scn, match, injections, cls
 
-      def to_operator_loadable_reference_scanner
-        OperatorLoadableReferenceScanner___.define do |o|
-          yield o if block_given?
-          o.injections = to_operators_injections_scanner
-        end
-      end
-
-      def to_operator_symbol_scanner
-        to_operators_injections_scanner.expand_by do |injt|
-          injt.injection.to_loadable_reference_scanner
-        end
-      end
-
-      def to_operators_injections_scanner
-        Scanner_via_Array.new @_operators_injections
-      end
-
-      def flush_to_parse_primaries
-
-        # if there are any tokens remaining on the scanner,
-        # parse them as primaries or whine appropriately
-
-        args = @argument_scanner
-        if args.no_unparsed_exists
-          ACHIEVED_
-        else
-          ok = args.scan_primary_symbol
-          if ok
-            flush_to_lookup_current_and_parse_remaining_primaries
-          else
-            ok
-          end
-        end
-      end
-
-      def flush_to_lookup_current_and_parse_remaining_primaries  # #assume1
-
-        begin
-          ok = process_primary_at_head
-          ok || break
-
-          if @argument_scanner.no_unparsed_exists
-            ok = true
-            break
-          end
-
-          @argument_scanner.scan_primary_symbol ? redo : break
-        end while above
-        ok
-      end
-
-      def process_primary_at_head  # #assume1
-        lu = __find_primary_which_is_at_head
-        if lu
-          _injn = @_primaries_injections.fetch( lu.injection_offset ).injection
-          _ok = _injn._parse_found_feature_ lu  # EXPERIMENT
-          _ok  # hi. #todo
-        end
-      end
-
-      # :#assume1: grammar has primaries, and one primary is parsed and on deck
-
-      def __find_primary_which_is_at_head
-
-        lu = lookup_current_primary_symbol_semi_softly
-        if lu.had_unrecoverable_error_which_was_expressed
-          UNABLE_
-        elsif lu.was_found
-          lu
-        else
-          __whine_about_primary_not_found
-          UNABLE_
-        end
-      end
-
-      # some of the below for #nodeps-coverpoint-3
-
-      def lookup_current_primary_symbol_semi_softly
-
-        # assume grammar has primaries and one primary is parsed and on deck
-        # result is always of a tuple strain:
-        #   `had_unrecoverable_error_which_was_expressed` t/f (currently for ambiguous only)
-        #   if above,
-        #     this is the only case where something is expressed (not soft, hence semi-soft)
-        #   otherwise
-        #     `was_found` t/f
-        #     if found,
-        #       [primary found structure]
-
-        k = @argument_scanner.current_primary_symbol
-        pf = __primary_found_via_lookup_primary_softly_via_symbol k
-        if pf
-          pf
-        else
-          __when_primary_not_found_by_exact_match
-        end
-      end
-
-      def __when_primary_not_found_by_exact_match
-        a = @argument_scanner.
-          _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_(
-            __to_primary_TWOPLE_scanner )
-        case 1 <=> a.length
-        when 0  # when exactly one found
-          __when_found_exactly_one_thru_fuzzy( * a.fetch(0) )
-        when 1  # when none found
-          NOT_FOUND___
-        when -1  # when ambiguous
-          _scn = Scanner_via_Array.new( a ).map_by() { |two| two.last.intern }
-          Ambiguous__[ _scn, :_primary_, @argument_scanner ]
-          UNRECOVERABLE___
-        end
-      end
-
-      module NOT_FOUND___ ; class << self
-        def was_found ; false end
-        def had_unrecoverable_error_which_was_expressed ; false end
-      end ; end
-
-      module UNRECOVERABLE___ ; class << self
-        def had_unrecoverable_error_which_was_expressed ; true end
-      end end
-
-      def __when_found_exactly_one_thru_fuzzy inj_offset, correct_k
-
-        ::Symbol === correct_k || self._RETHINK  # #todo
-
-        @argument_scanner.__receive_corrected_primary_normal_symbol correct_k
-
-        _ob = @_primaries_injections.fetch( inj_offset ).injection
-
-        _some_trueish_item_value = _ob.dereference correct_k
-
-        PrimaryFound__.define do |o|
-          o.injection_offset = inj_offset
-          o.primary_symbol = correct_k
-          o.trueish_item_value = _some_trueish_item_value
-        end
-      end
-
-      def injector_via_primary_found found  # see [#060.A.2]
-        @_primaries_injections.fetch( found.injection_offset ).injection.injector
-      end
-
-      def __whine_about_primary_not_found
-        _avail_prim_scn = to_primary_symbol_scanner
-        When_primary_not_found___[ _avail_prim_scn, @argument_scanner ]
-      end
-
-      # -- read primaries
-
-      def __primary_found_via_lookup_primary_softly_via_symbol k
-
-        scn = _to_primaries_injections_offset_scanner
+        k = match.feature_symbol
         until scn.no_unparsed_exists
           offset = scn.gets_one
-          _inj = @_primaries_injections.fetch( offset ).injection
-          trueish_item_value = _inj.lookup_softly k
-          trueish_item_value || next
-          pf = PrimaryFound__.define do |o|
+          _br = injections.fetch( offset ).injection
+          x = _br.lookup_softly k
+          x || next
+          fo = cls.define do |o|
             o.injection_offset = offset
-            o.primary_symbol = k
-            o.trueish_item_value = trueish_item_value
+            o.trueish_feature_value = x
+            o._match_ = match
           end
           break
         end
-        pf
+        fo
       end
 
-      def to_primary_symbol_scanner  # assume
+      def to_operator_symbolish_scanner__  # assume
+        _ = _to_injections_scanner _to_operators_injections_offset_scanner_downwards, @operators_injections
+        _.expand_by do |inj|
+          inj.injection.to_symbolish_reference_scanner
+        end
+      end
 
-        _to_primaries_injections_offset_scanner.expand_by do |d|
+      def to_primary_symbolish_scanner  # assume. [tmx]
+        _ = _to_injections_scanner _to_primaries_injections_offset_scanner_downwards, @primaries_injections
+        _.expand_by do |inj|
+          inj.injection.to_symbolish_reference_scanner
+        end
+      end
 
-          _inj = @_primaries_injections.fetch( d ).injection
-          _inj.to_loadable_reference_scanner.map_by do |ref|
-            ref.intern
+      def _to_injections_scanner scn, a
+        scn.map_by do |offset|
+          a.fetch offset
+        end
+      end
+
+      def _to_operators_injections_offset_scanner_downwards
+        _to_injections_offset_scanner_downwards @_offset_of_last_operator_injection
+      end
+
+      def _to_primaries_injections_offset_scanner_downwards
+        _to_injections_offset_scanner_downwards @_offset_of_last_primary_injection
+      end
+
+      def _to_operators_injections_offset_scanner_upwards
+        _to_injections_offset_scanner_upwards @_offset_of_last_operator_injection
+      end
+
+      def _to_primaries_injections_offset_scanner_upwards
+        _to_injections_offset_scanner_upwards @_offset_of_last_primary_injection
+      end
+
+      def _to_injections_offset_scanner_downwards offset_of_last_injection
+
+        # we want down (as opposed to up) typically for documentation so
+        # that the screen order follows the code order of the injections
+
+        current = -1
+        Scanner_by.new do
+          if current != offset_of_last_injection
+            current += 1
           end
         end
       end
 
-      def __to_primary_TWOPLE_scanner
+      def _to_injections_offset_scanner_upwards offset_of_last_injection
 
-        _to_primaries_injections_offset_scanner.expand_by do |d|
+        # we want up (as opposed to down) typically for interpreting input,
+        # so that injections added more recently can trump those that came
+        # before. (throwback to when we used to index every primary in a
+        # common, single hash!)
 
-          _inj = @_primaries_injections.fetch( d ).injection
-
-          _inj.to_loadable_reference_scanner.map_by do |loadable_reference|
-
-            [ d, loadable_reference.intern ]  # :#TWOPLE
-          end
-        end
-      end
-
-      def _to_primaries_injections_offset_scanner
-
-        # give priority to those primaries injected most recently, so that
-        # this still behaves the way it did when we indexed every primary
-        # into a single hash.
-        countdown = @_offset_of_last_primary_injection + 1
+        countdown = offset_of_last_injection + 1
         Scanner_by.new do
           if countdown.nonzero?
             countdown -= 1
@@ -1005,114 +1271,83 @@ module NoDependenciesZerk
         end
       end
 
-      # --
-
       attr_reader(
-        :argument_scanner,
-        :has_operators,
-        :has_primaries,
+        :has_operators,  # #covered-by [tmx]
+        :has_primaries,  # SAME
+        :_injector_box,
+        :operators_injections,
+        :primaries_injections,
       )
     end
 
-    Ambiguous__ = -> sym_scn, which, argument_scanner do
+    class TokenScanner__  # tier [052.C] one of The N Tiers (see)
 
-      case which
-      when :_operator_
-        noun, ick_m, good_m, curr_m = "operator", :ick_oper, :oper, :current_operator_symbol
-      when :_primary_
-        noun, ick_m, good_m, curr_m = "primary", :ick_prim, :prim, :current_primary_symbol
-      end
-
-      k = argument_scanner.send curr_m
-
-      argument_scanner.no_because do |y|
-
-        buff = "did you mean "
-
-        simple_inflection do
-          oxford_join buff, sym_scn, " or " do |sym|
-            send good_m, sym
-          end
+      def initialize a
+        len = a.length
+        if len.zero?
+          @no_unparsed_exists = true
+          freeze
+        else
+          @_final_offset = len - 1
+          @_current_offset = 0
+          @_array = a
         end
-
-        y << "ambiguous primary #{ send ick_m, k } - #{ buff }?"
-      end
-    end
-
-    ScannerMethods__ = ::Module.new
-
-    class OperatorLoadableReferenceScanner___ < SimpleModel
-      include ScannerMethods__
-
-      # a custom scanner that traverses over all operators of all
-      # injections, exposing the current injection at any point
-
-      def initialize
-        @big_step_pass_filter = nil
-        yield self
-        @current_injection = @head_as_is = nil
-        advance_big
       end
 
-      attr_writer(
-        :injections,
-        :big_step_pass_filter,
-      )
+      def gets_one
+        x = head_as_is
+        advance_one
+        x
+      end
+
+      def head_as_is
+        @_array.fetch @_current_offset
+      end
+
+      def value_at positive_d
+        @_array.fetch( positive_d + @_current_offset )
+      end
+
+      def advance_this_many n
+        n.times do
+          advance_one
+        end
+        NIL
+      end
 
       def advance_one
-        send @_advance
-      end
-
-      def advance_big
-        if @injections.no_unparsed_exists
-          remove_instance_variable :@injections
-          remove_instance_variable :@_advance
+        if @_final_offset == @_current_offset
+          remove_instance_variable :@_array
+          remove_instance_variable :@_current_offset
+          remove_instance_variable :@_final_offset
           @no_unparsed_exists = true
-          remove_instance_variable :@head_as_is
-          remove_instance_variable :@current_injection
-          freeze ; nil
+          freeze
         else
-          injection = @injections.gets_one.injection
-          loadable_references = injection.to_loadable_reference_scanner
-          if loadable_references.no_unparsed_exists
-            advance_big
-          else
-            @current_injection = injection
-            if ( ! @big_step_pass_filter ) || @big_step_pass_filter[ self ]
-              @_loadable_references = loadable_references
-              @_advance = :_advance_small
-              _advance_small
-            else
-              @_advance = nil
-              advance_big
-            end
-          end
+          @_current_offset += 1
         end
+        NIL
       end
 
-      def _advance_small
-        @head_as_is = @_loadable_references.gets_one
-        if @_loadable_references.no_unparsed_exists
-          remove_instance_variable :@_loadable_references
-          @_advance = :advance_big ; nil
-        end
+      def has_offset d  # assume 0 or more
+        ( d + @_current_offset ) <= @_final_offset
       end
 
-      def to_found
-        _mixed_business_value = @current_injection.dereference @head_as_is
-        OperatorFound__[ @current_injection.injector, _mixed_business_value, @head_as_is ]
+      def LIQUIDATE_TOKEN_SCANNER  # only while #open [#068] and/or #open [#070]
+        remove_instance_variable :@_final_offset
+        a = [
+          remove_instance_variable( :@_current_offset ),
+          remove_instance_variable( :@_array ),
+        ]
+        freeze
+        a
       end
 
       attr_reader(
-        :current_injection,
-        :head_as_is,
         :no_unparsed_exists,
       )
     end
 
-    OperatorFound__ = ::Struct.new :injector, :mixed_business_value, :loadable_reference
-
-    # --
+    # ==
 
     LazyFeaturesInjectionReference__ = ::Class.new
     class LazyOperatorsInjectionReference___ < LazyFeaturesInjectionReference__
@@ -1160,240 +1395,79 @@ module NoDependenciesZerk
     class LazyFeaturesInjectionRealized__
 
       attr_writer :parse_by
-      attr_accessor :injector
+      attr_accessor :injection_symbol
 
-      def _parse_found_feature_ o
-        @parse_by[ o ]
+      def _process_found_primary_ found, omni  # #[#007.H] now, client advances
+        if 1 == @parse_by.arity  # meh
+          @parse_by[ found ]
+        else
+          @parse_by[ found, omni ]
+        end
       end
 
       def lookup_softly k  # #[#ze-051.1] "trueish item value"
         @_substrate_adapter_.lookup_softly k
       end
 
-      def to_loadable_reference_scanner
-        Scanner_by.new( & to_loadable_reference_stream )
-      end
-
-      def to_loadable_reference_stream
-        @_substrate_adapter_.to_loadable_reference_stream
-      end
-
-      def loadable_reference_via_symbol sym
-        @_substrate_adapter_.loadable_reference_via_symbol sym
-      end
-
       def dereference ref
         @_substrate_adapter_.dereference ref
+      end
+
+      def to_symbolish_reference_scanner
+        @_substrate_adapter_.to_symbolish_reference_scanner
       end
     end
 
     class HashBasedFeaturesInjection__
-      def initialize h, inj
+
+      # (this is the only f.i that doesn't wrap around a features branch)
+
+      def initialize h, injector_sym, injection_sym
+
+        if injector_sym
+          @injector_symbol = injector_sym
+        end
+
+        if injection_sym
+          @injection_symbol = injection_sym
+        end
+
         @_hash = h
-        @injector = inj
       end
-      def _parse_found_feature_ o  # experiment
-        @injector.send o.trueish_item_value
+
+      def _process_found_primary_ found, omni  # experiment
+
+        # here we assume that the right-hand side of the hash is method
+        # names to be sent to a regisered "injection receiver"
+        # #[#007.H] we do NOT (any longer) advance scanner here (#history-C.1) 
+
+        _receiver = omni.features.injector_via_primary_found found
+        _receiver.send found.trueish_feature_value, found
       end
+
       def injection
         self
       end
+
       def lookup_softly k
         @_hash[ k ]
       end
-      def to_loadable_reference_scanner
-        Scanner_via_Array[ @_hash.keys ]
-      end
-      def loadable_reference_via_symbol k
-        k
-      end
+
       def dereference k
         @_hash.fetch k
       end
+
+      def to_symbolish_reference_scanner
+        Scanner_via_Array[ @_hash.keys ]
+      end
+
       attr_reader(
-        :injector,
+        :injection_symbol,
+        :injector_symbol,
       )
     end
 
     # ==
-
-    module ArgumentScannerMethods__
-
-      # -- higher-level parsers
-
-      def parse_argument_via_regexp rx, & msg  # #experiment [ts]
-        map_trueish_value_by do |x|
-          md = rx.match x
-          if md
-            advance_one ; md
-          else
-            @LAST_REGEXP = rx
-            no_because( & msg )
-            remove_instance_variable :@LAST_REGEXP
-            UNABLE_
-          end
-        end
-      end
-
-      def scan_glob_values  # currently nothing fancy. maybe one day CLI etc
-        map_value_by do |x|
-          if ::Array.try_convert x  # remove at [#008.2] on stack
-            self._THIS_HAS_CHANGED__if_its_glob_just_pass_a_single_value_at_a_time__
-          end
-          advance_one ; [ x ]
-        end
-      end
-
-      def scan_flag_value  # currently if a flag is mentioned, it's true. maybe one day etc
-        Zerk_lib_[]::Common_::KnownKnown.trueish_instance
-      end
-
-      def parse_trueish_primary_value  # as in `parse_primary_value`. :[#008.3] #borrow-coverage from [ts]
-
-        map_trueish_value_by do |x|
-          advance_one ; x
-        end
-      end
-
-      def map_trueish_value_by
-        map_value_by do |x|
-          if x
-            yield x
-          else
-            no_because { "{{ prim }} must be trueish (had #{ x.inspect })" }
-          end
-        end
-      end
-
-      def map_value_by
-        if no_unparsed_exists
-          no_because { "{{ prim }} requires an argument" }
-        else
-          yield head_as_is
-        end
-      end
-
-      # -- lower-level parsing and reading
-
-      def _write_COS_initially sym
-        @_read_COS_ = :__read_COS_normally
-        @_write_COS_ = :__write_COS_normally
-        send @_write_COS_, sym
-      end
-
-      def _write_CPS_initially sym
-        @has_current_primary_symbol = true
-        @_read_CPS_ = :__read_CPS_normally
-        @_write_CPS_ = :__write_CPS_normally
-        send @_write_CPS_, sym
-      end
-
-      def current_operator_symbol
-        send ( @_read_COS_ ||= :__read_COS_initially )
-      end
-
-      def current_primary_as_ivar
-        :"@#{ current_primary_symbol }"
-      end
-
-      def current_primary_symbol
-        send ( @_read_CPS_ ||= :__read_CPS_initially )
-      end
-
-      def __read_COS_initially
-        raise _not_in_that_state 'current_operator_symbol'
-      end
-
-      def __read_CPS_initially
-        raise _not_in_that_state 'current_primary_symbol'
-      end
-
-      def _not_in_that_state s
-        raise ScannerIsNotInThatState, "cannot read `#{ s }` from beginning state"
-      end
-
-      def __write_COS_normally sym
-        @_COS_ = sym ; nil
-      end
-
-      def __write_CPS_normally sym
-        @_CPS_ = sym ; nil
-      end
-
-      def __read_COS_normally
-        @_COS_
-      end
-
-      def __read_CPS_normally
-        @_CPS_
-      end
-
-      # -- emission support
-
-      def no_because *channel_tail, & msg_p
-        if channel_tail.length.zero?
-          channel_tail.push :primary_parse_error
-        end
-        _the_best_expresser_ever msg_p, :error, :expression, * channel_tail
-        UNABLE_
-      end
-
-      def express_info * channel_tail, & msg_p
-        _the_best_expresser_ever msg_p, :info, :expression, * channel_tail
-        NIL
-      end
-
-      def _the_best_expresser_ever msg_p, * channel
-
-        scn = self
-        @listener.call( * channel ) do |y|
-
-          map = -> sym do
-            case sym
-            when :prim
-              prim scn.current_primary_symbol
-            when :ick
-              ick_mixed scn.head_as_is
-            else never
-            end
-          end
-
-          _y = ::Enumerator::Yielder.new do |line|
-            y << ( line.gsub %r(\{\{[ ]*([a-z_]+)[ ]*\}\}) do
-              map[ $~[1].intern ]
-            end )
-          end
-
-          if msg_p.arity.zero?
-            _y << calculate( & msg_p )
-          else
-            calculate _y, & msg_p
-          end
-          y
-        end
-
-        NIL
-      end
-    end
-
-    When_primary_not_found___ = -> avail_prim_scn, args do
-
-      k = args.current_primary_symbol
-
-      args.no_because :primary_parse_error, :primary_not_found do |y|
-
-        y << "unknown primary #{ ick_prim k }"
-
-        simple_inflection do
-
-          _ = oxford_join "", avail_prim_scn, " and " do |sym|
-            prim sym
-          end
-
-          y << "#{ n "available primary" }: #{ _ }"
-        end
-      end
-    end
 
     class InterfaceExpressionAgent__  # theory at [#040]
 
@@ -1412,22 +1486,116 @@ module NoDependenciesZerk
         o.calculate( & p )
       end
 
+      def ick_mixed_CAUTIOUSLY x
+        # because this uses a HUGE stack of dependencies we keep it separate for now
+        Zerk_lib_[].lib_.basic::String.via_mixed x
+      end
+
       def humanize sym  # (bringing back this ancient thing)
         sym.id2name.gsub UNDERSCORE_, SPACE_
       end
     end
 
-    class PrimaryFound__ < SimpleModel  # structure backstory at [#here.A]
+    class OperatorFound__ < SimpleModel
       attr_accessor(
         :injection_offset,
-        :primary_symbol,
-        :trueish_item_value,
+        :operator_match,
+        :trueish_feature_value,
       )
-      def was_found ; true end
-      def had_unrecoverable_error_which_was_expressed ; false end
+      alias_method :_match_=, :operator_match=
+      alias_method :feature_match, :operator_match
+      def self.match_class
+        OperatorMatch__
+      end
     end
 
-    # = support
+    class PrimaryFound__ < SimpleModel  # structure backstory at [#060.A]
+      attr_accessor(
+        :injection_offset,
+        :primary_match,
+        :trueish_feature_value,
+      )
+      alias_method :_match_=, :primary_match=
+      alias_method :feature_match, :primary_match
+      def self.match_class
+        PrimaryMatch__
+      end
+    end
+
+    Match__ = ::Class.new
+
+    class ValueMatch__ < Match__
+
+      def initialize x, offsets, fm
+        @mixed = x
+        @feature_match = fm
+        super( offsets + fm.offsets )
+      end
+
+      def CHANGE_VALUE x
+        # (this is a violation, but it's probably harmless)
+        @mixed = x ; self
+      end
+
+      def _become_accepted_
+        @feature_match._become_accepted_
+        super
+      end
+
+      attr_reader(
+        :feature_match,
+        :mixed,
+      )
+    end
+
+    class OperatorMatch__ < Match__
+      def initialize sym, offsets=1
+        @operator_symbol = sym
+        super offsets
+      end
+      attr_reader :operator_symbol
+      alias_method :feature_symbol, :operator_symbol
+      def parse_error_symbol_
+        :operator_parse_error
+      end
+      def expression_agent_method_
+        :oper
+      end
+    end
+
+    class PrimaryMatch__ < Match__
+      def initialize sym, offsets=1
+        @primary_symbol = sym
+        super offsets
+      end
+      attr_reader :primary_symbol
+      alias_method :feature_symbol, :primary_symbol
+      def parse_error_symbol_
+        :primary_parse_error
+      end
+      def expression_agent_method_
+        :prim
+      end
+    end
+
+    class Match__
+      def initialize d
+        @__mutex_for_is_accepted = false
+        @offsets = d
+      end
+      def _become_accepted_
+        remove_instance_variable :@__mutex_for_is_accepted
+        NIL
+      end
+      def TO_IVAR
+        :"@#{ feature_symbol }"
+      end
+      attr_reader :offsets
+    end
+
+    # == support
+
+    ScannerMethods__ = ::Module.new
 
     class Scanner_via_Array ; include ScannerMethods__
 
@@ -1597,7 +1765,7 @@ module NoDependenciesZerk
         MappedScanner__.new p, self
       end
 
-      def to_minimal_stream  # 1x
+      def flush_to_minimal_stream  # 2x
         MinimalStream___.new do
           unless no_unparsed_exists
             gets_one
@@ -1652,9 +1820,7 @@ module NoDependenciesZerk
       ::Skylab::Zerk
     end
 
-    # ==
-
-    ScannerIsNotInThatState = ::Class.new ::RuntimeError
+    Humanize__ = -> stem { stem.split( UNDERSCORE_ ).join SPACE_ }
 
     # ==
 
@@ -1669,5 +1835,6 @@ module NoDependenciesZerk
     # ==
   # -
 end
+# #history-C.1: almost full rewrite for 2nd wave
 # :#tombstone-B: no more `emission_handler_methods`
 # #tombstone: (temporary) used to close primaries

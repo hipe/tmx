@@ -33,19 +33,28 @@ whereas in a hash an item is *added* (or call it "inserted", or call it
 say it's "associated" with a key); in an operator branch the terminology
 we use is "reference" (as opposed to "key").
 
-  - the item *reference* is (usually) not the *item*
+  - the *reference* is *not* the *feature* (as far as you know)
 
 
 
 
-## synopsis of possible exposures  :[#here.2]
+## rules for references
+
+  - the reference must be trueish.
+  - the reference must respond to `intern`.
+  - `intern` must produce `::Symbol`.
+
+
+
+
+## an interface superset (i.e guideline), not an interface
 
 one key "thing" about operator branches is that it's not a strict
 "interface" per se, but more of a set of method names with well-defined
 semantics, acting as a sort of "guideline" for how collections should
 be interfaced; for lack of any compelling reason not to. participating
 clients are free to cherry-pick whichever methods from this set it makes
-sense to; and so
+sense to. and so:
 
   - it *cannot* be assumed that anything calling itself an operator branch
     responds to any *particular* one of these methods.
@@ -53,15 +62,33 @@ sense to; and so
   - it *can* be assumed that anything calling itself an operator branch
     implements at least one (and probably a few) of these methods.
 
+but we categorize these into "essentials" and "extras":
+
+
+
+
+## the essential methods of a features branch
+
+they are:
+
+  - `to_symbolish_reference_scanner`
+  - `dereference` - see discussion [#here.1] below
+
+
+
+
+
+## synopsis of possible exposures  :[#here.2]
+
 here's some of these:
 
   - `to_loadable_reference_stream`
+     DEPRECATED
 
   - `to_dereferenced_item_stream`
+     DEPRECATED
 
-  - `dereference`
-
-  - `lookup_softly`
+  - `lookup_softly`, see discussion [#here.1] below
 
   - `procure`, `procure_by` (see [#br-085])
 
@@ -142,7 +169,7 @@ nodes into a compound such structure too.)
 
 the primary point of this node is to state it explicitly that these two
 methods (in their many adaptation manifestations) must result in the same
-kind of structure, a "trueish item value". the shape of this object is
+kind of structure, a "trueish feature value". the shape of this object is
 totally "mixed" and unknowable to the subject, except to know that it
 must be trueish. (agreeing to this formally allows us to implement the
 many adaptations of `lookup_softly` without needing to wrap its positive

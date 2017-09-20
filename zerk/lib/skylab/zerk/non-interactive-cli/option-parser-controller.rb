@@ -48,7 +48,7 @@ module Skylab::Zerk
 
           if a || ( bx && bx.length.nonzero? )
 
-            # box could have been emptied at #spot-3 :#here-1
+            # box could have been emptied at #spot1.3 :#here-1
 
             __work a, bx
           end
@@ -80,7 +80,7 @@ module Skylab::Zerk
 
       def __work a, bx  # assume one or both
 
-        @_expag = @_operation_index.root_frame__.CLI.expression_agent  # :#spot-1
+        @_expag = @_operation_index.root_frame__.CLI.expression_agent  # :#spot1.1
         @_scope_index = @_operation_index.scope_index_
 
         if bx

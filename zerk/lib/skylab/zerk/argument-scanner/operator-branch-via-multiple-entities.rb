@@ -27,7 +27,7 @@ module Skylab::Zerk
       #
       #
       #
-      # ## about our "mutability model" :#note-2
+      # ## about our "mutability model" :#here1
       #
       # most adaptations of operator branches seem to adhere to a
       # "mutability model" whereby they themselves are immutable (or could
@@ -83,7 +83,7 @@ module Skylab::Zerk
 
         def parse_all_from argument_scanner
 
-          # (normally you wouldn't expose a method like this, but for #note-2)
+          # (normally you wouldn't expose a method like this, but for #here1)
 
           _ = Here_::Syntaxish.via_operator_branch self
 

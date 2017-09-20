@@ -253,7 +253,8 @@ module Skylab::Zerk
         :path,
       )
 
-      def category_symbol
+      def reference_category_symbol
+        ::Kernel._OKAY__readme__  # don't use the below name, use ONE_OFF_CATEGORY_SYMBOL_ze
         :zerk_one_off_category_symbol
       end
     # -
@@ -327,10 +328,14 @@ module Skylab::Zerk
         _pnsa = [ * @CLI.program_name_string_array,
                   * @one_off.program_name_tail_string_array ]
 
-        _scn = @CLI.release_argument_scanner_for_mounted_operator
+        ts = @CLI.release_argument_scanner_for_mounted_operator.token_scanner
 
-        d, argv = _scn.close_and_release
-        argv[ 0, d ] = EMPTY_A_
+        if ts.no_unparsed_exists
+          argv = EMPTY_A_
+        else
+          d, argv = ts.LIQUIDATE_TOKEN_SCANNER
+          argv[ 0, d ] = EMPTY_A_
+        end
 
         _args = [ argv, @CLI.stdin, @CLI.stdout, @CLI.stderr, _pnsa ]
 

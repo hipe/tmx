@@ -99,7 +99,7 @@ module Skylab::Zerk
         # we built the o.i. SO if we don't have the o.i then we know that
         # ARGV is empty! when ARGV is empty and there are no stated formal
         # parameters, then we can avoid doing #heavy-lift of o.i entirely..
-        # :#spot-2
+        # :#spot1.2
 
         @_determine_APC = false
 

@@ -51,7 +51,7 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
-  Node_reference_4_category_ = -> nt do  # might become :[#ac-034]. :#spot-5
+  Node_reference_4_category_ = -> nt do  # might become :[#ac-034]. :#spot1.5
 
     if :operation == nt.node_reference_category
       :operation
@@ -126,7 +126,7 @@ module Skylab::Zerk  # intro in [#001] README
       Home_.lib_.fields.const_get c, false
     end
 
-    lazily :ParseArguments_via_FeaturesInjections, & ndz
+    lazily :ArgumentParsingIdioms_via_FeaturesInjections, & ndz
 
     lazily :API_ArgumentScanner, & ndz
 

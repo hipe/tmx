@@ -848,7 +848,7 @@ module Skylab::Zerk
 
     # ==
 
-    Formal_node_3_category_ = -> fn do  # see #spot-5
+    Formal_node_3_category_ = -> fn do  # see #spot1.5
 
       if :formal_operation == fn.formal_node_category
         :formal_operation

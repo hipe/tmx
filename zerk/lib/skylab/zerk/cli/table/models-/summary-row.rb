@@ -161,7 +161,7 @@ module Skylab::Zerk
 
       module CommonFieldObservers___
 
-        # (#spot-8 references a "max" implementation in the wild)
+        # (#spot1.8 references a "max" implementation in the wild)
 
         CountTheNonEmptyStrings = -> o do
 

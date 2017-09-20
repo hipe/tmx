@@ -102,6 +102,14 @@ module Skylab::Zerk
           end
         end
 
+        def to_symbolish_reference_scanner
+
+          _st = _to_asset_reference_stream.map_by do |aref|
+            aref.entry_group_head.gsub( DASH_, UNDERSCORE_ ).intern
+          end
+          _st.flush_to_NO_DEPS_ZERK_scanner
+        end
+
         def to_loadable_reference_stream
 
           _to_asset_reference_stream.map_by do |aref|

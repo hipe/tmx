@@ -254,6 +254,8 @@ else
     whine[ "cannot use #{ current_primary } because of an option that came before it" ]
   end
 
+  # -- FROM here..
+
   parse_any_value = -> do
     if len == offset
       whine[ "argument expected for #{ current_primary }" ]
@@ -274,6 +276,8 @@ else
       end
     end
   end
+
+  # -- .. to HERE is similar to [#007.I]
 
   o = {}
   o[ load_only_key ] = -> do

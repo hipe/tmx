@@ -24,7 +24,7 @@ module Skylab::Zerk
 
       # ==
 
-      Oncer__ = -> do  # #note-2
+      Oncer__ = -> do  # [#052.SUNSETTING.d5]
 
         awful = -1
 
@@ -125,7 +125,7 @@ module Skylab::Zerk
 
         def __receive_add_primary_ sym, p_a
 
-          # temporarily we can take liberties with the signature .. #note-3
+          # temporarily we can take liberties with the .. see [#here.C]
 
           bx = Common_::Box.new
 
@@ -517,7 +517,7 @@ module Skylab::Zerk
 
       class Search___
 
-        # "all about parsing added primaries" [#052] #note-2
+        # "all about parsing added primaries" [#052.SUNSETTING.d3]
 
         def initialize req, as
 
@@ -558,7 +558,7 @@ module Skylab::Zerk
               redo  # NOTE if client did not advance scanner infinite loop
             end
 
-            x = The_no_op_item__[]  # EEK #note-4
+            x = The_no_op_item__[]  # EEK [#052.SUNSETTING.d7]
               #not-covered - hits IFF `-verbose` at end
               #experimental :#scn-note-1 :#here2
 
@@ -924,7 +924,7 @@ module Skylab::Zerk
             self._WALK_THRU_WITH_ME
           else
             AS_Lib__::Magnetics::ItemNotFound_via_ReasoningSymbol.call(
-              :unknown_primary )
+              :unknown_primary )  # name is public API
           end
         end
 
@@ -1310,3 +1310,5 @@ module Skylab::Zerk
     end
   end
 end
+# #pending-rename: probably rename to something like "dig" scanner
+# #history-A.1: spike temporary bridge as we enter 2nd wave of [ze] arg scanner

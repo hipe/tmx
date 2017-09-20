@@ -49,7 +49,7 @@ module Skylab::Zerk
         end
 
         attr_reader(
-          :CLI,  # #spot-1
+          :CLI,  # #spot1.1
         )
 
         def name

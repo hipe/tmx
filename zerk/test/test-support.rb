@@ -216,7 +216,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def expression_agent_for_API
-      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance  # ..
+      Expag_for_API__[]
     end
 
     # -- practically (if not actually) functions & derivatives
@@ -244,6 +244,17 @@ module Skylab::Zerk::TestSupport
   end
 
 #==END
+
+  # - :#here2
+
+    def expression_agent_for_CLI
+      Expag_for_CLI___[]
+    end
+
+    def expression_agent_for_API
+      Expag_for_API__[]
+    end
+  # -
 
   TestSupport_ = ::Skylab::TestSupport
   TestSupport_::Quickie.
@@ -287,6 +298,8 @@ module Skylab::Zerk::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    # (re-opens #here2)
   # -
 
   # -- fixtures & mocks
@@ -347,6 +360,14 @@ module Skylab::Zerk::TestSupport
     Home_.lib_.brazen::CLI_Support
   end
 
+  Expag_for_CLI___ = -> do
+    No_deps_zerk_[]::CLI_InterfaceExpressionAgent.instance
+  end
+
+  Expag_for_API__ = -> do
+    No_deps_zerk_[]::API_InterfaceExpressionAgent.instance
+  end
+
   # -- test lib nodes
 
   module Use_
@@ -392,6 +413,14 @@ module Skylab::Zerk::TestSupport
   end
 
   # --
+
+  Array_via_scanner_ = -> scn do  # scanners are better than arrays - don't promote
+    a = []
+    until scn.no_unparsed_exists
+      a.push scn.gets_one
+    end
+    a
+  end
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p

@@ -44,12 +44,8 @@ module Skylab::Zerk::TestSupport
     # -- assertion
 
     def _result_array
-      a = []
-      scn = _result
-      until scn.no_unparsed_exists
-        a.push scn.gets_one
-      end
-      a
+      _scn = _result
+      Array_via_scanner_[ _scn ]
     end
 
     def _result
