@@ -80,4 +80,3 @@ uses class-based reflection structures fully for its traversal
 see if you can phase-in class-based reflection for just some of it
 figure out a tiny test case for a proof of concept of how class-based can replace function-based "for free"
 gather supposed requirements for these (we should be able to infer them from the current thing) maybe as notes in the test
-commit just the placeholders (comments)

@@ -107,7 +107,7 @@ module Skylab::BeautySalon
       def __check_that_we_have_our_special_meta_information_for_this_grammar_symbol
 
         _ = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-          operator_branch.procure _entity_name_symbol, & @listener
+          tuplings_as_feature_branch.procure _entity_name_symbol, & @listener
 
         _store :@_tupling, _
       end

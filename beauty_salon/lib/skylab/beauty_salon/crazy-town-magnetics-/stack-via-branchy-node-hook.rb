@@ -67,7 +67,7 @@ module Skylab::BeautySalon
         _same_in_stack_frame do
 
           _tup = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-            specific_tupling_or_generic_tupling_for n
+            tuplings_as_feature_branch.specific_tupling_or_generic_tupling_for n
 
           _sf = ItemStackFrame___.new @current_depth_offset, _tup
 

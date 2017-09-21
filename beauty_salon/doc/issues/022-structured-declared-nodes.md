@@ -1,4 +1,27 @@
 # structured business classes :[#022]
+## declarative (structural) grammar reflection
+
+NOTE (EDIT) once #open [#022] is closed, the wording here should be
+worded to reflect the fact that this complements (or maybe will replace!
+gulp) the work at that one main file.
+
+inspired exactly by the excellently documented `::AST::Processor`,
+this is our own (second of two) take on it with the following:
+
+  - [ all of the reasons cited at [#021.C] ]
+
+  - for better or worse, module-centric instead of method-centric
+    constituency modeling (so, one module per node type (instead of
+    one method per node) for those node types you're interested
+    in modeling).
+
+  - this avails us to a more declarative- and less imperative-style,
+    more well suited to hierarchical meta-data.
+
+  - compound processors - processors that rely on processors (imagined)
+
+
+
 
 synopsis: generally this is a generic AST processor that wraps
 *certain* grammar symbol instances into our "tupling" structures

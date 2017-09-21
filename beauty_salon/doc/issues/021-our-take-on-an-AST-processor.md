@@ -6,7 +6,7 @@
 
   - what is this "document processors?" :[#here.B]
 
-  - why not use `::AST::Processor`? :[#here.c]
+  - why not use `::AST::Processor`? :[#here.C]
 
   - what are these hashes for? :[#here.D]  [ EDIT ]
 
@@ -87,7 +87,7 @@ we follow our own simple #[#sli-023] "prototype" pattern. or we don't. EDIT
 
 
 
-## why not use `::AST::Processor`? :[#here.c]
+## why not use `::AST::Processor`? :[#here.C]
 
 the `'parser'` gem provides a well-documented facility for accomplishing
 more-or-less what our subject facility attempts. so why re-invent the wheel?
@@ -447,30 +447,6 @@ in detail, here's the intended usage of the subject method:
      methods should be up to 100%.
 
 note this could be automated somewhat, but it would require work.
-
-
-
-
-## declarative (structural) grammar reflection :[#here.I]
-
-NOTE (EDIT) once #open [#022] is closed, the wording here should be
-worded to reflect the fact that this complements (or maybe will replace!
-gulp) the work at that one main file.
-
-inspired exactly by the excellently documented `::AST::Processor`,
-this is our own (second of two) take on it with the following:
-
-  - [ all of the reasons cited at [#here.c] above ]
-
-  - for better or worse, module-centric instead of method-centric
-    constituency modeling (so, one module per node type (instead of
-    one method per node) for those node types you're interested
-    in modeling).
-
-  - this avails us to a more declarative- and less imperative-style,
-    more well suited to hierarchical meta-data.
-
-  - compound processors - processors that rely on processors (imagined)
 
 
 
