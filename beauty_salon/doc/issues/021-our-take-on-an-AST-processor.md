@@ -41,7 +41,7 @@ generally, the efforts under this rubric have one primary objective:
     to our own work.
 
 we do this by writing assertive code that does not fail silently,
-and running it with our entire "ecosystem" as a corupus. not only
+and running it with our entire "ecosystem" as a corpus. not only
 does this serve our primary objective above but it also gives us
 insight into the peculiarities of our corpus's "pragmatics" (as in
 socio-linguistics) of the host language.

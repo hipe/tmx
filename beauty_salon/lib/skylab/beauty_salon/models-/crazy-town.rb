@@ -29,8 +29,10 @@ module Skylab::BeautySalon
         end
 
         o.SYMBOLISH_REFERENCE_SCANNER_BY do  # [pl]
-          ob.to_symbolish_reference_scanner.map_by do |ref|
-            Report__.new ref
+
+          ob.to_symbolish_reference_scanner.map_by do |k|
+
+            Report__.new ob.dereference k
           end
         end
       end

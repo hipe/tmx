@@ -231,8 +231,12 @@ module Skylab::BeautySalon
     Load_ruby_parser_with_specific_settings___ = Lazy_.call do
       require 'parser/current'
       # opt-in to most recent AST format:
+
+      ::Parser::Builders::Default.modernize
+      if false  # above should be same as:  (#todo)
       ::Parser::Builders::Default.emit_lambda = true
       ::Parser::Builders::Default.emit_procarg0 = true
+      end
     end
 
     # ==

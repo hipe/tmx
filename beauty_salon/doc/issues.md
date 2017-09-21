@@ -3,7 +3,7 @@
 
 [#043] #open track mounting executables (lost when wean off [br])
 
-[#042]       #crazy-town "musing" (currently empty, with history)
+[#042]       #crazy-town "musings" - assorted (voluminous) documentation
 
 [#041]       #crazy-town thing.dot
 
@@ -40,6 +40,8 @@
              that one file to *complement* (not redund) with the main file.
              we're saving this to wait until after proof-of-concept rewrite
              the bad way with 'parser' first before we wreck everything..
+
+       #also: this identifier now tracks the relevant node
 
              ( #was: #moved-to: [sa] )
 

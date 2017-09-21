@@ -1,37 +1,8 @@
 module Skylab::BeautySalon
 
-  module CrazyTownMagnetics_::SemanticTupling_via_Node
+  module CrazyTownMagnetics_::SemanticTupling_via_Node  # see :[#022]
 
-    # synopsis: generally this is a generic AST processor that wraps
-    # *certain* grammar symbol instances into our "tupling" structures
-    # that makes accessing certain properties easier through derived getters.
-
-    # read the blurb at `::AST::Node`, which is essential to understand
-    # the justification of our API here. the gist of it is, making
-    # *subclasses* of `::AST::Node` tailored to the specific grammatical
-    # symbols (for example, a ClassNode subclass) is not appropriate.
-    #
-    # they then recommend using `::AST::Processor` in its stead.
-    #
-    # the problem with `::AST`'s processor approach is that it hard-codes
-    # non-semantic offsets into the code.
-    #
-    # the work here tries to bridge that gap, centralizing all knowlege
-    # of component offsets in one place, reducing the strain on would-be
-    # AST processors to have to know this.
-    #
-    # this intends to have the effect of making processor code more readable,
-    # as well as centralizing the offset knowledge in one place to make the
-    # code more resilient in a DRY sense.
-
-    # we also expose a composition-not-inheritance approach, whereby
-    # (optionally) you can wrap a document AST node in such a "tupling"
-    # so that you can just have the getters you might want as referenced
-    # in the referenced remote documentation.
-    #
-    # (by the way, we introduce "tupling" as a neo-logism to mean a struct-
-    # like instance that relates an ordered, fixed-length list to certain
-    # semantic names associated with offsets into that list.)
+    # experiment.
 
     class << self
 
@@ -77,6 +48,278 @@ module Skylab::BeautySalon
     end  # (re-opens below)
 
     module Constituents___
+
+      #
+      # Literals
+      #
+
+      # Singletons
+
+      # nil (placeheld)
+
+      # true (placeheld)
+
+      # false (placeheld)
+
+      # Numerics
+
+      # integer (placeheld)
+
+      # float (placeheld)
+
+      # rational (placeheld)
+
+      # complex (placeheld)
+
+      # Strings
+
+      # str (placeheld)
+
+      # dstr (placeheld)
+
+      # __FILE__ (placeheld)
+
+      # Symbols
+
+      # sym (placeheld)
+
+      # dsym (placeheld)
+
+      # Executable strings
+
+      # xstr (placeheld)
+
+      # Indented (interpolated, noninterpolated, executable) strings
+
+      # (this section is relevant to the builder class but not us.
+      # it's here for consistency/completeness.)
+
+      # Regular expressions
+
+      # regopt (placeheld)
+
+      # regexp (placeheld)
+
+      # Arrays
+
+      # array (placeheld)
+
+      # splat (placeheld)
+
+      # Hashes
+
+      # pair (placeheld)
+
+      # kwsplat (placeheld)
+
+      # hash (placeheld)
+
+      # Ranges
+
+      # irange (placeheld)
+
+      # erange (placeheld)
+
+      #
+      # Access
+      #
+
+      # self (placeheld)
+
+      # ident (placeheld)
+
+      # ivar (placeheld)
+
+      # gvar (placeheld)
+
+      # cvar (placeheld)
+
+      # back_ref (placeheld)
+
+      # nth_ref (placeheld)
+
+      # const (placeheld)
+
+      # __ENCODING__ (placeheld)
+
+      #
+      # Assignment
+      #
+
+      # cvasgn (placeheld)
+
+      # ivasgn (placeheld)
+
+      # gvasgn (placeheld)
+
+      # casgn (placeheld)
+
+      # lvasgn (placeheld)
+
+      # and_asgn (placeheld)
+
+      # or_asgn (placeheld)
+
+      # op_asgn (placeheld)
+
+      # mlhs (placeheld)
+
+      # masgn (placeheld)
+
+      #
+      # Class and module definition
+      #
+
+      # class (placeheld)
+
+      # sclass (placeheld)
+
+      # module (placeheld)
+
+      #
+      # Method (un)definition
+      #
+
+      # def (placeheld)
+
+      # defs (placeheld)
+
+      # undef (placeheld)
+
+      # alias (placeheld)
+
+      #
+      # Formal arguments
+      #
+
+      # args (placeheld)
+
+      # arg (placeheld)
+
+      # optarg (placeheld)
+
+      # restarg (placeheld)
+
+      # kwarg (placeheld)
+
+      # kwoptarg (placeheld)
+
+      # kwrestarg (placeheld)
+
+      # shadowarg (placeheld)
+
+      # blockarg (placeheld)
+
+      # procarg0 (placeheld)
+
+      # Ruby 1.8 block arguments
+
+      # NOTE - we are skipping this section for now
+
+      # wontdo: (arg, arg_expr, restarg, restarg_expr, blockarg, blockarg_expr)
+
+      # MacRuby Objective-C arguments
+
+      # NOTE - we are skipping this section for now
+
+      # wontdo: (objc_kwarg, restarg, objc_restarg)
+
+      #
+      # Method calls
+      #
+
+      # csend (placeheld)
+
+      # send (placeheld)
+
+      # lambda (placeheld)
+
+      # block (placeheld)
+
+      # (NOTE - we might be missing some stuff near above)
+
+      # block_pass (placeheld)
+
+      # not (placeheld)
+
+      # match_with_lvasgn (placeheld)
+
+      #
+      # Control flow
+      #
+
+      # Logical operations: and, or
+
+      # and (placeheld)
+
+      # or (placeheld)
+
+      # Conditionals
+
+      # if (placeheld)
+
+      # Case matching
+
+      # when (placeheld)
+
+      # case (placeheld)
+
+      # Loops
+
+      # while (placeheld)
+
+      # until (placeheld)
+
+      # while_post (placeheld)
+
+      # until_post (placeheld)
+
+      # for (placeheld)
+
+      # Keywords
+
+      # (NOTE - for now we are extrapolating the extend of this from ruby24.y
+      # we greped for the builder method then reduced this with scripting:)
+
+      # break (placeheld)
+
+      # defined? (placeheld)
+
+      # next (placeheld)
+
+      # redo (placeheld)
+
+      # retry (placeheld)
+
+      # return (placeheld)
+
+      # super (placeheld)
+
+      # yield (placeheld)
+
+      # zsuper (placeheld)
+
+      # BEGIN, END
+
+      # preexe (placeheld)
+
+      # postexe (placeheld)
+
+      # Exception handling
+
+      # resbody (placeheld)
+
+      # rescue (placeheld)
+
+      # ensure (placeheld)
+
+      #
+      # Expression grouping
+      #
+
+      # begin (placeheld)
+
+      # kwbegin (placeheld)
 
       class Class < Tupling__
 
@@ -369,4 +612,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.1: inject comment placeholder for every grammar symbol saw visually
 # #born.
