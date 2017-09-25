@@ -1,4 +1,5 @@
-# structured business classes :[#022]
+# structured declared nodes :[#022]
+
 ## declarative (structural) grammar reflection
 
 NOTE (EDIT) once #open [#022] is closed, the wording here should be
@@ -54,3 +55,47 @@ in the referenced remote documentation.
 like instance that relates an ordered, fixed-length list to certain
 semantic names associated with offsets into that list.)
 
+
+
+
+## this list of features
+
+  - the consts defined under that one module are only all the classes
+    we have defined that isomorph with the set of all grammar symbols
+    we support. (A)
+
+  - feature: that one thing with the strangely spelled grammar symbols
+    that don't isomorph directly. (B)
+
+  - feature: the "any" modifier. (C)
+
+  - feature: the "arities": one (only ever implied never stated),
+    zero or more, one or more. (note these don't conflict with the
+    "any" modifier. "any" is always an indication that it could be
+    nil: it can be nil IFF the "any" modifier is used. in "any zero
+    or more", this means it's nil, the zero length array, or a non-
+    zero length array. (D)
+
+  - feature: "probablistic groups" (needs a better name). these need
+    to be defined before the constituencies are defined; these specify
+    sets of allowable (or maybe just expected) grammar symbols that
+    are allowed at this constituent slot. (E)
+
+  - central feature: the recursive function (not defined here) takes
+    an "injected context" that is the one to decide (in effect) what
+    algorithm is in control. (F)
+
+  - feature: arbitrarily ordered arity evaluation (experiment).
+    superficially this system is like the formal argument arities of
+    the host language; but it frees itself from limitations there. (etc) (G)
+
+  - feature: lazy evaluation of constituency groups. for regression-
+    friendliness and perhaps speed of file load-time, EXPERIMENTALLY
+    we won't evaluate a constituency definition until the first time
+    it is used. (H)
+
+  - feature: inheritence. in order to re-use same-constituencies across
+    different grammar symbols, we allow that a child class can descend
+    from a base class that uses this system. HOWEVER a child class cannot
+    then define things.. (either use `define_constituents` or
+    `redefine_constituents`, or simly assert no re-defintion.) (I)

@@ -70,7 +70,23 @@ module Skylab::TanMan
       Item___.new @_sym, @_label, is_first, @_sym_a
     end
 
-    RX___ = /[ ]*\((?<sym>[A-Z])\)(?:->\((?<these>[A-Z](?:,[A-Z])*)\))?\z/
+    Describe_that_one_rx = -> y do
+      y << %q{items that contain a string like "(A)", or "(A)->(B)",}
+      y << %q{or "(A)->(B,C)" (where A, B and C are any capital letter A-Z)}
+    end
+
+    RX___ = /
+      [ ]*
+      \(
+        (?<sym>[A-Z])
+      \)
+      (?:
+        ->
+        \(
+          (?<these> [A-Z] (?:,[A-Z])*  )
+        \)
+      )?
+    \z/x
 
     # ==
 

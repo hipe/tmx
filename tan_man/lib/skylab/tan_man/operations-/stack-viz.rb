@@ -4,21 +4,32 @@ module Skylab::TanMan
 
     def initialize argv, streamer, client
 
+      @__mutex_for_exitstatus = nil
+
+      @_do_open = false
+      @_last_N = nil
+
       @argv = argv
       @client = client
       @streamer = streamer
-
-      @_do_open = false
     end
 
     def execute
 
-      @_mixed_result = 0
-      stay = __process_argv
-      stay && __init_listener
-      stay &&= __init_graph_line_stream
-      stay && __via_graph_line_stream
-      @_mixed_result
+      ok = __process_argv
+      ok && __init_listener
+      ok &&= __resolve_line_upstream
+      ok && __init_item_stream_via_line_upstrem_stream
+      if ok
+        d = remove_instance_variable :@_last_N
+        if d
+          ok = __reduce_item_stream_by_this d
+        end
+      end
+      ok && __init_graph_via_item_stream
+      ok && __init_graph_linesteam_via_graph
+      ok && __via_graph_line_stream
+      remove_instance_variable :@__exitstatus
     end
 
     def __process_argv
@@ -36,13 +47,18 @@ module Skylab::TanMan
 
       did_request_help = false
       do_open = false
+      last_N = nil
 
-      op.on '-h', '--help', 'this.' do
-        did_request_help = true
+      op.on '-l', '--last N', 'only look at the last N items on the stack', ::Integer do |d|
+        last_N = d
       end
 
       op.on '-o', '--open', 'will attempt to open the file' do
         do_open = true
+      end
+
+      op.on '-h', '--help', 'this screen (help for "viz").' do
+        did_request_help = true
       end
 
       begin
@@ -53,29 +69,39 @@ module Skylab::TanMan
       if e
         __when_parse_error e
       elsif did_request_help
+        if ( do_open || last_N )
+          @client.stderr.puts "(ignoring some options)"
+        end
         __when_did_request_help op
       else
-        @_do_open = true
-        STAY_
+        @_last_N = last_N
+        @_do_open = do_open
+        ACHIEVED_
       end
     end
 
     def __when_did_request_help op
-      io = @client.stderr
-      io.puts "usage: #{ _my_program_name } [options]"
-      io.puts
-      io.puts "synsopsis: hackish experiment .."
-      io.puts
-      io.puts "options:"
-      op.summarize( & io.method( :puts ) )
-      DONE_
+
+      puts = @client.stderr.method :puts
+      y = ::Enumerator::Yielder.new( & puts )
+      y << "usage: #{ _my_program_name } [options]"
+      y << nil
+      y << "synsopsis: hackish experiment: those"
+      Home_::StackMagnetics_::ItemStream_via_LineStream::Describe_that_one_rx[ y ]
+      y << "will be used to define a dependency graph illustrating"
+      y << "the interdependencies between the items."
+      y << "(note that the maximum number of participating nodes is"
+      y << "intentionally limited to 26.)"
+      y << nil
+      y << "options:"
+      op.summarize( & puts )
+      _exit_early
     end
 
     def __when_parse_error e
       @client.stderr.puts e.message
       @client.stderr.puts "use `#{ _my_program_name } -h` for help."
-      @_mixed_result = 5
-      DONE_
+      _fail
     end
 
     def _my_program_name
@@ -89,7 +115,10 @@ module Skylab::TanMan
       if @_do_open
         __open st
       else
-        @_mixed_result = st
+        puts = @client.stdout.method :puts
+        line = nil
+        puts line while ( line = st.gets )
+        __succeed
         NIL
       end
     end
@@ -118,21 +147,42 @@ module Skylab::TanMan
       self._NEVER_SEE
     end
 
-    def __init_graph_line_stream
-
-      st = @streamer.call
-      if st
-        __init_graph_line_stream_via_stream st
-      else
-        st
-      end
+    def __init_graph_linesteam_via_graph
+      _ = remove_instance_variable :@__graph
+      @__graph_line_stream = Home_::StackMagnetics_::
+        LineStream_via_Graph[ _, & @listener ]
+      NIL
     end
 
-    def __init_graph_line_stream_via_stream st
-      _st = Home_::StackMagnetics_::ItemStream_via_LineStream[ st, & @listener ]
-      _gr = Home_::StackMagnetics_::Graph_via_ItemStream[ _st, & @listener ]
-      _st = Home_::StackMagnetics_::LineStream_via_Graph[ _gr, & @listener ]
-      _store :@__graph_line_stream, _st
+    def __init_graph_via_item_stream
+      _ = remove_instance_variable :@_item_stream
+      @__graph = Home_::StackMagnetics_::Graph_via_ItemStream[ _, & @listener ]
+      NIL
+    end
+
+    def __reduce_item_stream_by_this d
+      0 < d or self._COVER_ME__last_N_value_must_be_positive_nonzero__
+      upstream = remove_instance_variable :@_item_stream
+      count = 0
+      @_item_stream = Common_.stream do
+        if count < d
+          count += 1
+          upstream.gets
+        end
+      end
+      ACHIEVED_
+    end
+
+    def __init_item_stream_via_line_upstrem_stream
+      _line_st = remove_instance_variable :@__line_upstream
+      @_item_stream = Home_::StackMagnetics_::
+        ItemStream_via_LineStream[ _line_st, & @listener ]
+      NIL
+    end
+
+    def __resolve_line_upstream
+      _str = remove_instance_variable :@streamer
+      _my_store :@__line_upstream, _str.call
     end
 
     def __init_listener
@@ -157,11 +207,38 @@ module Skylab::TanMan
       end ; nil
     end
 
-    define_method :store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    # --
+
+    def _my_store ivar, x  # compare DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+      if x
+        instance_variable_set ivar, x ; ACHIEVED_
+      else
+        _fail
+      end
+    end
+
+    def _fail
+      _receive_exitstatus 5
+      DONE_
+    end
+
+    def _exit_early
+      _receive_exitstatus 0
+      DONE_
+    end
+
+    def __succeed
+      _receive_exitstatus 0
+      ACHIEVED_
+    end
+
+    def _receive_exitstatus d
+      remove_instance_variable :@__mutex_for_exitstatus
+      @__exitstatus = d ; nil
+    end
 
     # ==
 
     DONE_ = false
-    STAY_ = true
   end
 end
