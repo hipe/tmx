@@ -360,6 +360,9 @@ module Skylab::BeautySalon
           _lazy_auto_getter_
         end
       end
+
+      Items = nil  # NOTE - etc
+      IRREGULAR_NAMES = nil  # NOTE - this is NOT structurally where this goes
     end
 
     # ==

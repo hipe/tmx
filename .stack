@@ -81,7 +81,7 @@ see if you can phase-in class-based reflection for just some of it
 figure out a tiny test case for a proof of concept of how class-based can replace function-based "for free"
 gather supposed requirements for these (we should be able to infer them from the current thing) maybe as notes in the test
 inheritence (I)->(H)
-lazy evaluation of constituencies (H)->(B)
+lazy evaluation of constituencies (H)
 arbitrarily prioritized arity evaluation (G)->(L)
 these guys (L)->(N,O,P)
 assert "any"-ness (N)->(J)
@@ -93,5 +93,3 @@ injected context (F)->(G)
 parse probablistic groups (E)->(K)
 parse the aritites (D)->(K)
 parse the "any" modifier (C)->(K)
-the grammar symbols module can accomodate weird spellings (B)->(A)
-consts isomorph with the extent of the grammar symbols (A)

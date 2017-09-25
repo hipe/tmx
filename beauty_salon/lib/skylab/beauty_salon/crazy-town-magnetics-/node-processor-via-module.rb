@@ -9,6 +9,9 @@ module Skylab::BeautySalon
     #   - superficially simliar to [#ze-051.2] but it's simple enough we
     #     might as well re-write it. (we don't take an index-first approach
     #     here.)
+    #
+    #   - NOTE we are grafting "new way" into "old way" .. maybe do the
+    #     coverage thing while #open [#022]
 
     class << self
       alias_method :[], :new
@@ -17,7 +20,18 @@ module Skylab::BeautySalon
 
     # -
       def initialize mod
+
+        h = mod::IRREGULAR_NAMES
+        if h
+          @_lookup_class_const = :__lookup_class_const_initially
+          @_irregulars_pool = h.dup
+        else
+          @_lookup_class_const = :_derive_class_const_normally
+        end
+
+        @_const_via_symbol = {}
         @_do_index = true
+        @_items_module = mod::Items
         @_valid_const_via_normal_name_symbol = {}
         @module = mod
       end
@@ -50,6 +64,11 @@ module Skylab::BeautySalon
         end
       end
 
+      def dereference sym
+        _c = __class_const_via_name_symbol sym
+        @_items_module.const_get _c, false
+      end
+
       def __when_not_found listener, ref_sym
 
         me = self
@@ -69,6 +88,33 @@ module Skylab::BeautySalon
 
         y << %(currently we don't yet have metadata for grammar symbol '#{ ick_sym }'.)
         y << "(currently we have it for #{ Common_::Oxford_and[ _s_a ] }.)"
+      end
+
+      def __class_const_via_name_symbol sym
+        c = @_const_via_symbol[ sym ]
+        if ! c
+          c = send @_lookup_class_const, sym
+          @_const_via_symbol[ sym ] = c
+        end
+        c
+      end
+
+      def __lookup_class_const_initially sym
+        c = @_irregulars_pool.delete sym
+        if c
+          if @_irregulars_pool.length.zero?
+            remove_instance_variable :@_irregulars_pool
+            @_lookup_class_const = :_derive_class_const_normally
+          end
+          c
+        else
+          _derive_class_const_normally sym
+        end
+      end
+
+      def _derive_class_const_normally sym
+        Common_::Name.via_lowercase_with_underscores_symbol( sym ).
+            as_camelcase_const_string.intern
       end
 
       def __valid_const_via_normal_name_symbol ref_sym
