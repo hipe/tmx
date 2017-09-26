@@ -36,6 +36,61 @@ module Skylab::BeautySalon
         @module = mod
       end
 
+      # -- grammar symbol services
+
+      def __child_association_via_symbol_ sym
+
+        # NOTE - the below might become procedurally generated or etc. ("RX")
+        md = /\A
+          (?<any> any_ )?
+
+          (?:
+           (?<zero_or_more> zero_or_more_ ) |
+           (?<one_or_more> one_or_more_ )
+          )?
+
+          .+_
+
+          (?<probablistic_group>[a-z]*[a-rt-z])s?
+        \z/x.match sym
+        md || fail
+
+        ChildAssociation___.define do |o|
+
+          if md.offset( :zero_or_more ).first
+            # ..
+            o.has_plural_arity = true
+          elsif md.offset( :one_or_more ).first
+            # ..
+            o.has_plural_arity = true
+          end
+
+          pgroup = md[ :probablistic_group ].intern
+          if :expression != pgroup
+            o.group_INFORMATION = __group_etc pgroup
+          end
+
+          if md.offset( :any ).first
+            o.is_any = true
+          end
+
+          # .. o.xx = sym
+        end
+      end
+
+      def __group_etc pgroup
+        cache = ( @___groups_cache ||= {} )
+        cache.fetch pgroup do
+          _h = @module.const_get :GROUPS, false
+          _a = _h.fetch pgroup  # ..
+          x = ::Hash[ _a.map { |sym| [ sym, true ] } ].freeze
+          cache[ pgroup ] = x
+          x
+        end
+      end
+
+      # --
+
       def specific_tupling_or_generic_tupling_for n
         cache = ( @___class_via_node_type ||= {} )
         k = n.type
@@ -66,7 +121,7 @@ module Skylab::BeautySalon
 
       def dereference sym
         _c = __class_const_via_name_symbol sym
-        @_items_module.const_get _c, false
+        @_items_module.const_get _c, false  # :#here4
       end
 
       def __when_not_found listener, ref_sym
@@ -94,6 +149,11 @@ module Skylab::BeautySalon
         c = @_const_via_symbol[ sym ]
         if ! c
           c = send @_lookup_class_const, sym
+
+          # redundant with #here4, do a thing to the class only once
+          _cls = @_items_module.const_get c, false
+          _cls.__receive_constituent_construction_services_ self
+
           @_const_via_symbol[ sym ] = c
         end
         c
@@ -165,6 +225,62 @@ module Skylab::BeautySalon
     # -
 
     # ==
+
+    class GrammarSymbol
+
+      class << self
+
+        def inherited chld
+          chld.__init_as_grammar_symbol_class
+        end
+
+        def __init_as_grammar_symbol_class
+          @__mutex_for_define_children = nil
+        end
+
+        def __receive_constituent_construction_services_ x
+          @__constituent_construction_services = x
+        end
+
+        def children * sym_a
+          remove_instance_variable :@__mutex_for_define_children  # implicit assertion - only once
+          @_child_associations_index = :__child_associations_index_initially
+          @__unevaluated_definition_of_children = sym_a
+        end
+
+        def children_association_index
+          send @_child_associations_index
+        end
+
+        def __child_associations_index_initially
+
+          @_child_associations_index = :__child_associations_index_subsequently
+
+          _sym_a = remove_instance_variable :@__unevaluated_definition_of_children
+          svcs = remove_instance_variable :@__constituent_construction_services
+
+          index_of_etc = nil
+          once = -> d do
+            index_of_etc = d ; once = nil
+          end
+
+          a = []
+          _sym_a.each_with_index do |sym, d|
+            asc = svcs.__child_association_via_symbol_ sym
+            if asc.has_plural_arity
+              once[ d ]
+            end
+            a.push asc
+          end
+          @__CAI = ChildAssociationIndex___.new index_of_etc, a.freeze
+          send @_child_associations_index
+        end
+
+        def __child_associations_index_subsequently
+          @__CAI
+        end
+      end  # >>
+    end
 
     Tupling = ::Class.new  # (forward declaration)
 
@@ -282,6 +398,32 @@ module Skylab::BeautySalon
       def node_loc  # meh
         @node.loc
       end
+    end
+
+    # ==
+
+    class ChildAssociationIndex___
+
+      def initialize d, a
+        if d
+          @index_of_assocation_with_plural_arity = d
+        end
+        @associations = a
+      end
+
+      attr_reader(
+        :associations,
+        :index_of_assocation_with_plural_arity,
+      )
+    end
+
+    class ChildAssociation___ < Common_::SimpleModel
+
+      attr_accessor(
+        :group_INFORMATION,
+        :has_plural_arity,
+        :is_any,
+      )
     end
 
     # ==

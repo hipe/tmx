@@ -29,8 +29,9 @@ module Skylab::BeautySalon::TestSupport
 
         _mod = module X_ctm_npvm_mis::ThisOneGuy
           module Items
-            Joomie = true
-            XxxFoomie = true
+            o = X_ctm_npvm_mis::THIS_ONE_MOCK
+            Joomie = o
+            XxxFoomie = o
           end
           IRREGULAR_NAMES = nil
           self
@@ -60,9 +61,10 @@ module Skylab::BeautySalon::TestSupport
         _mod = module X_ctm_npvm_mis::ThisOtherGuy
 
           module Items
-            NormieFormie = true
-            X__doofined__ = true
-            X__FOOLE__ = true
+            o = X_ctm_npvm_mis::THIS_ONE_MOCK
+            NormieFormie = o
+            X__doofined__ = o
+            X__FOOLE__ = o
           end
 
           IRREGULAR_NAMES = {
@@ -76,6 +78,7 @@ module Skylab::BeautySalon::TestSupport
         _subject_magnetic[ _mod ]
       end
     end
+
     def _deref sym
       _man_town.dereference sym
     end
@@ -84,7 +87,12 @@ module Skylab::BeautySalon::TestSupport
       Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
     end
 
-    X_ctm_npvm_mis = ::Module.new  # const namespace for tests in this file
+    module X_ctm_npvm_mis  # const namespace for tests in this file
+      module THIS_ONE_MOCK ; class << self
+        def __receive_constituent_construction_services_ _
+        end
+      end ; end
+    end
   end
 end
 # #born.
