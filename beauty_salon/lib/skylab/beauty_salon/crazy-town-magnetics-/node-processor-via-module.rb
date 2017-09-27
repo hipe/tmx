@@ -38,7 +38,7 @@ module Skylab::BeautySalon
 
       # -- grammar symbol services
 
-      def __child_association_via_symbol_ sym
+      def __child_association_via_symbol_and_offset_ sym, d
 
         # NOTE - the below might become procedurally generated or etc. ("RX")
         md = /\A
@@ -49,9 +49,17 @@ module Skylab::BeautySalon
            (?<one_or_more> one_or_more_ )
           )?
 
-          .+_
+          (?<stem>  .+   )
+          _
 
-          (?<probablistic_group>[a-z]*[a-rt-z])s?
+          (?<probablistic_group>
+            (?!component)
+            [a-z]*[a-rt-z]
+          )
+          s?
+          (?<component>
+            _component
+          )?
         \z/x.match sym
         md || fail
 
@@ -75,7 +83,13 @@ module Skylab::BeautySalon
             o.is_any = true
           end
 
+          if md.offset( :component ).first
+            o.is_component = true
+          end
+
+          o.stem_symbol = md[ :stem ].intern
           o.association_symbol = sym
+          o.offset = d
         end
       end
 
@@ -262,27 +276,20 @@ module Skylab::BeautySalon
 
         if ai.has_plural_arity_as_index
 
-          here = ai.index_of_assocation_with_plural_arity
-          here.times do |d|
-            visit[ cx.fetch( d ), ascs.fetch( d ) ]
-          end
+          ai.for_offsets_stretched_to_length num_children do |o|
 
-          cx_d = here
-          asc = ascs.fetch here
-          num_at_end = ai.number_of_associations_at_the_end
-          stop_here = num_children - num_at_end - 1
+            o.first_third do |d|
+              visit[ cx.fetch( d ), ascs.fetch( d ) ]
+            end
 
-          begin
-            visit[ cx.fetch( cx_d ), asc ]
-            stop_here == cx_d and break
-            cx_d += 1
-            redo
-          end while above
+            asc = ascs.fetch ai.offset_of_association_with_plural_arity
+            o.middle_third do |cx_d|
+              visit[ cx.fetch( cx_d ), asc ]
+            end
 
-          asc_d = here
-          num_at_end.times do
-            cx_d += 1 ; asc_d += 1
-            visit[ cx.fetch( cx_d ), ascs.fetch( asc_d ) ]
+            o.final_third do |cx_d, asc_d|
+              visit[ cx.fetch( cx_d ), ascs.fetch( asc_d ) ]
+            end
           end
         else
           cx.each_with_index do |x, d_|
@@ -327,6 +334,38 @@ module Skylab::BeautySalon
           TRAVERSAL_EXPERIMENT__[ ast, p, self ]
         end
 
+        # ~
+
+        def DEREFERENCE_COMPONENT sym  # (change scope of name for production)  # #testpoint
+          _d = _component_index.fetch( sym )
+          children_association_index.associations.fetch _d
+        end
+
+        def to_symbolish_reference_scanner_OF_COMPONENTS  # (change scope of name for production)  #testpoint
+          _h = _component_index
+          Scanner_[ _h.keys ]
+        end
+
+        def _component_index
+          send( @_component_index ||= :__component_index_initially )
+        end
+
+        def __component_index_initially
+          @_component_index = :__component_index
+          ai = children_association_index
+          if ! ai.has_components
+            self._COVER_ME__meh_no_components_meh__
+          end
+          @__component_index = ComponentIndex_via_AssociationIndex___[ ai ]
+          send @_component_index
+        end
+
+        def __component_index
+          @__component_index
+        end
+
+        # ~
+
         def children_association_index
           send @_child_associations_index
         end
@@ -344,14 +383,23 @@ module Skylab::BeautySalon
           end
 
           a = []
+          has_components = false
+
           _sym_a.each_with_index do |sym, d|
-            asc = svcs.__child_association_via_symbol_ sym
+            asc = svcs.__child_association_via_symbol_and_offset_ sym, d
             if asc.has_plural_arity
               once[ d ]
             end
+            if asc.is_component
+              if asc.has_plural_arity
+                self._COVER_ME__cant_be_both_component_and_have_plural_arity__
+              end
+              has_components = true
+            end
             a.push asc
           end
-          @__CAI = ChildAssociationIndex___.new index_of_etc, a.freeze
+
+          @__CAI = ChildAssociationIndex___.new index_of_etc, has_components, a.freeze
           send @_child_associations_index
         end
 
@@ -481,9 +529,44 @@ module Skylab::BeautySalon
 
     # ==
 
+    ComponentIndex_via_AssociationIndex___ = -> ai do
+      # -
+        hard_offset_via_component_stem_symbol = {}
+
+        ascs = ai.associations
+        num_assocs = ascs.length
+
+        ai.for_offsets_stretched_to_length num_assocs do |o|
+
+          o.first_third do |d|
+            asc = ascs.fetch d
+            if asc.is_component
+              hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d
+            end
+          end
+
+          o.middle_third do |_|
+            NOTHING_
+          end
+
+          neg = - num_assocs
+          o.final_third do |d|
+            asc = ascs.fetch d
+            if asc.is_component
+              hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d + neg
+            end
+          end
+        end
+
+        hard_offset_via_component_stem_symbol
+      # -
+    end
+
+    # ==
+
     class ChildAssociationIndex___
 
-      def initialize d, a
+      def initialize d, has_components, a
         len = a.length
         if d
           if a.fetch( d ).has_expectation_of_zero_or_more
@@ -492,26 +575,78 @@ module Skylab::BeautySalon
             min = len
           end
           @number_of_associations_at_the_end = len - d - 1
-          @index_of_assocation_with_plural_arity = d
+          @offset_of_association_with_plural_arity = d
           @has_plural_arity_as_index = true
         else
           min = len
           max = len
         end
+
+        if has_components
+          @has_components = true
+        end
+
         @minimum_number_of_children = min
         @maximum_number_of_children = max
         @associations = a
         freeze
       end
 
+      def for_offsets_stretched_to_length num_children, & p
+
+        # assume has plural arity. abstract the traversal of an array of
+        # real children, associated with their corresponding associations.
+        # could be efficitized, but meh
+
+        a = [] ; TheseHooks___.new a, p
+        first, mid, final = a ; a = nil
+
+        here = @offset_of_association_with_plural_arity
+        here.times( & first )
+
+        cx_d = here
+        num_at_end = @number_of_associations_at_the_end
+        stop_here = num_children - num_at_end - 1
+
+        begin
+          mid[ cx_d ]
+          stop_here == cx_d and break
+          cx_d += 1
+          redo
+        end while above
+
+        asc_d = here
+        num_at_end.times do
+          cx_d += 1 ; asc_d += 1
+          final[ cx_d, asc_d ]
+        end
+        NIL
+      end
+
       attr_reader(
         :associations,
+        :has_components,
         :has_plural_arity_as_index,
-        :index_of_assocation_with_plural_arity,
         :minimum_number_of_children,
         :maximum_number_of_children,
         :number_of_associations_at_the_end,
+        :offset_of_association_with_plural_arity,
       )
+    end
+
+    class TheseHooks___
+      def initialize a, p
+        @a = a ; p[ self ] ; remove_instance_variable :@a  # sanity
+      end
+      def first_third & p
+        @a[0] = p
+      end
+      def middle_third & p
+        @a[1] = p
+      end
+      def final_third & p
+        @a[2] = p
+      end
     end
 
     class ChildAssociation___ < Common_::SimpleModel
@@ -523,6 +658,9 @@ module Skylab::BeautySalon
         :has_expectation_of_zero_or_more,  # assume `has_plural_arity`
         :has_plural_arity,
         :is_any,
+        :is_component,
+        :offset,
+        :stem_symbol,
       )
     end
 

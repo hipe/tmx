@@ -99,3 +99,5 @@ semantic names associated with offsets into that list.)
     from a base class that uses this system. HOWEVER a child class cannot
     then define things.. (either use `define_constituents` or
     `redefine_constituents`, or simly assert no re-defintion.) (I)
+
+  - feature: "components", as described in [#here.4]  (in a test file)
