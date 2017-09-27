@@ -7,7 +7,7 @@ module Skylab::BeautySalon::TestSupport
 
   class << self
     def [] tcc
-      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.extend ModuleMethods___
       tcc.include InstanceMethods___
     end
   end  # >>
@@ -17,18 +17,21 @@ module Skylab::BeautySalon::TestSupport
   TestSupport_::Quickie.
     enhance_test_support_module_with_the_method_called_describe self
 
-  # -
-    Use_method___ = -> do
+  module ModuleMethods___
+
+    def use sym
+      lib( sym )[ self ]
+    end
+
+    -> do
       h = {}
-      -> sym do
-        ( h.fetch sym do
-          x = TestSupport_.fancy_lookup sym, TS_
-          h[ sym ] = x
-          x
-        end )[ self ]
-      end
+      define_method :lib, ( -> sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        h[ sym ] = x
+        x
+      end )
     end.call
-  # -
+  end
 
   module InstanceMethods___
 

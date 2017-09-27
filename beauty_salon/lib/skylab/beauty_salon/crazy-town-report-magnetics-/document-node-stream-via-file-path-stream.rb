@@ -155,10 +155,7 @@ module Skylab::BeautySalon
       # -- interface with 'ruby_parser' (COMPREHENSIVE)
 
       def __init_ruby_parser
-        Load_ruby_parser_with_specific_settings___[]
-
-        @__ruby_parser = ::Parser::CurrentRuby  # ..
-
+        @__ruby_parser = For_now_always_the_same_ruby_parser_with_certain_settings___[]
         NIL
       end
     # -
@@ -228,20 +225,24 @@ module Skylab::BeautySalon
 
     # ==
 
-    Load_ruby_parser_with_specific_settings___ = Lazy_.call do
-      require 'parser/current'
-      # opt-in to most recent AST format:
+    For_now_always_the_same_ruby_parser_with_certain_settings___ = Lazy_.call do  # #testpoint
 
-      ::Parser::Builders::Default.modernize
-      if false  # above should be same as:  (#todo)
-      ::Parser::Builders::Default.emit_lambda = true
-      ::Parser::Builders::Default.emit_procarg0 = true
-      end
+      # require 'parser/current'  # we don't want the warning about etc
+      require 'parser'
+
+      parser = ::Parser
+      parser::Builders::Default.modernize
+
+      # doing the above is the same as doing
+        # Default.emit_lambda = true
+        # Default.emit_procarg0 = true
+      # for which "all new code should set this attribute to true"
+
+      require 'parser/ruby24'
+      parser::Ruby24
     end
 
     # ==
-
-
 
     # ==
     # ==

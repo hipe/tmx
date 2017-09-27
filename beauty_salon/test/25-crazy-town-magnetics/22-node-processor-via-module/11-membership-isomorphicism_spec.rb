@@ -6,6 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    lib :crazy_town_THIS_STUFF  # just load do not enhance
 
     it '(subject magnetic loads)' do
       _subject_magnetic || fail
@@ -29,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
 
         _mod = module X_ctm_npvm_mis::ThisOneGuy
           module Items
-            o = X_ctm_npvm_mis::THIS_ONE_MOCK
+            o = TS_::Crazy_Town::THIS_STUFF::THIS_ONE_MOCK
             Joomie = o
             XxxFoomie = o
           end
@@ -61,7 +62,7 @@ module Skylab::BeautySalon::TestSupport
         _mod = module X_ctm_npvm_mis::ThisOtherGuy
 
           module Items
-            o = X_ctm_npvm_mis::THIS_ONE_MOCK
+            o = TS_::Crazy_Town::THIS_STUFF::THIS_ONE_MOCK
             NormieFormie = o
             X__doofined__ = o
             X__FOOLE__ = o
@@ -87,12 +88,7 @@ module Skylab::BeautySalon::TestSupport
       Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
     end
 
-    module X_ctm_npvm_mis  # const namespace for tests in this file
-      module THIS_ONE_MOCK ; class << self
-        def __receive_constituent_construction_services_ _
-        end
-      end ; end
-    end
+    X_ctm_npvm_mis = ::Module.new
   end
 end
 # #born.

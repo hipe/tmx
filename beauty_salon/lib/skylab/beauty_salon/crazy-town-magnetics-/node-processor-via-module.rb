@@ -58,7 +58,7 @@ module Skylab::BeautySalon
         ChildAssociation___.define do |o|
 
           if md.offset( :zero_or_more ).first
-            # ..
+            o.has_expectation_of_zero_or_more = true
             o.has_plural_arity = true
           elsif md.offset( :one_or_more ).first
             # ..
@@ -67,14 +67,15 @@ module Skylab::BeautySalon
 
           pgroup = md[ :probablistic_group ].intern
           if :expression != pgroup
-            o.group_INFORMATION = __group_etc pgroup
+            o.group_symbol = pgroup
+            o.group_information = __group_etc pgroup
           end
 
           if md.offset( :any ).first
             o.is_any = true
           end
 
-          # .. o.xx = sym
+          o.association_symbol = sym
         end
       end
 
@@ -226,6 +227,78 @@ module Skylab::BeautySalon
 
     # ==
 
+    class TRAVERSAL_EXPERIMENT__  # (maybe rename to "recurse")
+
+      def self.call ast, recv, gram_symbol
+
+        ai = gram_symbol.children_association_index
+
+        cx = ast.children
+        num_children = cx.length
+
+        if ai.minimum_number_of_children > num_children
+          raise MyException__.new :minimum_number_of_children_not_satisfied
+        end
+
+        if (( max = ai.maximum_number_of_children )) && max < num_children
+          raise MyException__.new :maximum_number_of_children_exceeded
+        end
+
+        ascs = ai.associations
+
+        visit = -> x, asc do  # #todo
+
+          if x
+            if (( gi = asc.group_information )) && ! gi[ x.type ]
+              raise MyException__.new :group_affiliation_not_met
+            end
+            recv[ x, asc ]
+          elsif asc.is_any
+            recv[ x, asc ]
+          else
+            raise MyException__.new :missing_expected_child
+          end
+        end
+
+        if ai.has_plural_arity_as_index
+
+          here = ai.index_of_assocation_with_plural_arity
+          here.times do |d|
+            visit[ cx.fetch( d ), ascs.fetch( d ) ]
+          end
+
+          cx_d = here
+          asc = ascs.fetch here
+          num_at_end = ai.number_of_associations_at_the_end
+          stop_here = num_children - num_at_end - 1
+
+          begin
+            visit[ cx.fetch( cx_d ), asc ]
+            stop_here == cx_d and break
+            cx_d += 1
+            redo
+          end while above
+
+          asc_d = here
+          num_at_end.times do
+            cx_d += 1 ; asc_d += 1
+            visit[ cx.fetch( cx_d ), ascs.fetch( asc_d ) ]
+          end
+        else
+          cx.each_with_index do |x, d_|
+            visit[ x, ascs.fetch( d_ ) ]
+          end
+        end
+        NIL
+      end
+
+      class << self
+        alias_method :[], :call
+      end  # >>
+    end
+
+    # ==
+
     class GrammarSymbol
 
       class << self
@@ -238,7 +311,7 @@ module Skylab::BeautySalon
           @__mutex_for_define_children = nil
         end
 
-        def __receive_constituent_construction_services_ x
+        def __receive_constituent_construction_services_ x  # #testpoint
           @__constituent_construction_services = x
         end
 
@@ -246,6 +319,12 @@ module Skylab::BeautySalon
           remove_instance_variable :@__mutex_for_define_children  # implicit assertion - only once
           @_child_associations_index = :__child_associations_index_initially
           @__unevaluated_definition_of_children = sym_a
+        end
+
+        # -- read
+
+        def accept_visitor_by ast, & p
+          TRAVERSAL_EXPERIMENT__[ ast, p, self ]
         end
 
         def children_association_index
@@ -405,22 +484,43 @@ module Skylab::BeautySalon
     class ChildAssociationIndex___
 
       def initialize d, a
+        len = a.length
         if d
+          if a.fetch( d ).has_expectation_of_zero_or_more
+            min = len - 1
+          else
+            min = len
+          end
+          @number_of_associations_at_the_end = len - d - 1
           @index_of_assocation_with_plural_arity = d
+          @has_plural_arity_as_index = true
+        else
+          min = len
+          max = len
         end
+        @minimum_number_of_children = min
+        @maximum_number_of_children = max
         @associations = a
+        freeze
       end
 
       attr_reader(
         :associations,
+        :has_plural_arity_as_index,
         :index_of_assocation_with_plural_arity,
+        :minimum_number_of_children,
+        :maximum_number_of_children,
+        :number_of_associations_at_the_end,
       )
     end
 
     class ChildAssociation___ < Common_::SimpleModel
 
       attr_accessor(
-        :group_INFORMATION,
+        :association_symbol,
+        :group_information,
+        :group_symbol,
+        :has_expectation_of_zero_or_more,  # assume `has_plural_arity`
         :has_plural_arity,
         :is_any,
       )
@@ -541,6 +641,23 @@ module Skylab::BeautySalon
           x
         end
       end
+    end
+
+    # ==
+
+    class MyException__ < ::Exception  # #testpoint
+
+      def initialize sym
+        @symbol = sym
+      end
+
+      def message
+        @symbol.id2name.gsub UNDERSCORE_, SPACE_
+      end
+
+      attr_reader(
+        :symbol,
+      )
     end
 
     # ==

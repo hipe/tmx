@@ -6,6 +6,78 @@ module Skylab::BeautySalon::TestSupport
       tc.include self
     end
 
+    module THIS_STUFF
+
+      def self.[] tc
+        tc.include self
+      end
+
+      # -- build these things
+
+      define_method :builder_thing_, ( Lazy_.call do
+
+        Home_::CrazyTownReportMagnetics_::DocumentNodeStream_via_FilePathStream::
+            For_now_always_the_same_ruby_parser_with_certain_settings___[]
+
+        -> sym, * rest do
+          ::Parser::AST::Node.new sym, rest
+        end
+      end )
+
+      # -- build these things
+
+      def build_subject_branch_ *these, c, & p
+
+        mod = ::Module.new
+        sandbox_module_.const_set c, mod
+
+        items_mod = ::Module.new
+        mod.const_set :Items, items_mod
+
+        ( these.length / 2 ).times do |d|
+          d <<= 1
+          _cls = these.fetch d
+          _c_ = these.fetch d+1
+
+          items_mod.const_set _c_, _cls
+        end
+
+        if p
+          mod.module_exec( & p )
+        end
+
+        if ! mod.const_defined? :IRREGULAR_NAMES, false
+          mod.const_set :IRREGULAR_NAMES, nil
+        end
+
+        subject_magnetic_[ mod ]
+      end
+
+      def build_subclass_with_these_children_ c, * sym_a
+
+        cls = ::Class.new subject_base_class_
+        sandbox_module_.const_set c, cls
+        cls.class_exec do
+          children( * sym_a )
+        end
+        cls
+      end
+
+      def subject_base_class_
+        subject_magnetic_::GrammarSymbol
+      end
+
+      def subject_magnetic_
+        Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
+      end
+
+      module THIS_ONE_MOCK ; class << self
+        def __receive_constituent_construction_services_ _
+          NOTHING_
+        end
+      end ; end
+    end
+
     # -
 
       def fails_with_these_normal_lines_ & p
