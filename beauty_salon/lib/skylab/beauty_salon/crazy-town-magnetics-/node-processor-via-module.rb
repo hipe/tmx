@@ -63,33 +63,55 @@ module Skylab::BeautySalon
         \z/x.match sym
         md || fail
 
-        ChildAssociation___.define do |o|
+        # -- lvars not matchdata (for some) just for readability
 
-          if md.offset( :zero_or_more ).first
-            o.has_expectation_of_zero_or_more = true
-            o.has_plural_arity = true
-          elsif md.offset( :one_or_more ).first
-            # ..
-            o.has_plural_arity = true
-          end
+        if md.offset( :zero_or_more ).first
+          has_expectation_of_zero_or_more = true
+          has_plural_arity = true
+        elsif md.offset( :one_or_more ).first
+          has_plural_arity = true
+        end
 
-          pgroup = md[ :probablistic_group ].intern
-          if :expression != pgroup
-            o.group_symbol = pgroup
-            o.group_information = __group_etc pgroup
-          end
+        is_any = md.offset( :any ).first
+        is_component = md.offset( :component ).first
+        pgroup = md[ :probablistic_group ].intern
 
-          if md.offset( :any ).first
-            o.is_any = true
-          end
+        # -- use the lvars
 
-          if md.offset( :component ).first
-            o.is_component = true
-          end
-
-          o.stem_symbol = md[ :stem ].intern
+        same = -> o do
           o.association_symbol = sym
           o.offset = d
+        end
+
+        if is_component
+
+          # #open #here6
+          has_plural_arity && readme
+          is_any && readme
+          :expression == pgroup || readme
+
+          ComponentAssociation___.define do |o|
+            o.stem_symbol = md[ :stem ].intern
+            same[ o ]
+          end
+        else
+          StructuredChildAssociation___.define do |o|
+            # (which ivars are set show a "feature bias")
+            if :expression != pgroup
+              o.group_symbol = pgroup
+              o.group_information = __group_etc pgroup
+            end
+            if has_plural_arity
+              o.has_plural_arity = true
+              if has_expectation_of_zero_or_more
+                o.has_expectation_of_zero_or_more = true
+              end
+            end
+            if is_any
+              o.is_any = true
+            end
+            same[ o ]
+          end
         end
       end
 
@@ -261,7 +283,6 @@ module Skylab::BeautySalon
         ascs = ai.associations
 
         visit = -> x, asc do  # #todo
-
           if x
             if (( gi = asc.group_information )) && ! gi[ x.type ]
               raise MyException__.new :group_affiliation_not_met
@@ -319,7 +340,11 @@ module Skylab::BeautySalon
         end
 
         def __receive_constituent_construction_services_ x  # #testpoint
-          @__constituent_construction_services = x
+          @_constituent_construction_services = x
+        end
+
+        def _constituent_construction_services
+          @_constituent_construction_services  # hi.
         end
 
         def children * sym_a
@@ -375,38 +400,120 @@ module Skylab::BeautySalon
           @_child_associations_index = :__child_associations_index_subsequently
 
           _sym_a = remove_instance_variable :@__unevaluated_definition_of_children
-          svcs = remove_instance_variable :@__constituent_construction_services
+          svcs = @_constituent_construction_services
 
-          index_of_etc = nil
+          index_of_plural = nil
           once = -> d do
-            index_of_etc = d ; once = nil
+            index_of_plural = d ; once = nil
           end
 
           a = []
           has_components = false
 
           _sym_a.each_with_index do |sym, d|
+
             asc = svcs.__child_association_via_symbol_and_offset_ sym, d
-            if asc.has_plural_arity
-              once[ d ]
-            end
+
             if asc.is_component
+
               if asc.has_plural_arity
                 self._COVER_ME__cant_be_both_component_and_have_plural_arity__
               end
               has_components = true
+
+            elsif asc.has_plural_arity
+              once[ d ]
             end
+
             a.push asc
           end
 
-          @__CAI = ChildAssociationIndex___.new index_of_etc, has_components, a.freeze
+          # (we can't write methods until we know if there's a plural)
+
+          ai = ChildAssociationIndex___.new index_of_plural, has_components, a.freeze
+
+          if index_of_plural
+
+            num_ascs = a.length
+            ai.for_offsets_stretched_to_length num_ascs do |o|
+
+              o.first_third do |d|
+                a.fetch( d )._write_methods_for_non_plural_ self, d
+              end
+
+              neg = - num_ascs
+              o.middle_third do |d|
+
+                # make a reader for variable-length segment of the children.
+                # we don't know beforehand how many children we will have
+                # (only that the number accords to our arity category :#here5).
+                # the subject range for any given actual array of children is
+                # a function of: the formal offset of the subject association,
+                # the number of formals, and the number of actual children.
+
+                _hard_offset = d + neg
+                0 > _hard_offset || fail
+                a.fetch( d ).__write_methods_for_plural_ self, _hard_offset
+              end
+
+              o.final_third do |d|
+                a.fetch( d )._write_methods_for_non_plural_ self, d + neg
+              end
+            end
+          else
+            a.each_with_index do |asc, d|
+              asc._write_methods_for_non_plural_ self, d
+            end
+          end
+
+          @__CAI = ai
           send @_child_associations_index
         end
 
         def __child_associations_index_subsequently
           @__CAI
         end
+
+        alias_method :via_node_, :new
+        undef_method :new
       end  # >>
+
+      def initialize n
+
+        # if you're using this class for wrapping (not just traversal), we
+        # bring out the big guns. the next line:
+        #
+        #   - evaluates the association definitions if they haven't
+        #     been evaluatied yet, which writes methods to our class (yikes!)
+
+        _ai = self.class.children_association_index
+
+        _ai.associations.each do |asc|
+
+          instance_variable_set asc.appropriate_ivar, asc.method_name_for_read_initially
+        end
+        @_node_ = n  # so named because @ordinary_ivars are in userspace
+      end
+
+      def _node_children_normalized_BS
+        @___node_children_normalized_BS ||= __node_children_normalized_BS
+      end
+
+      def __node_children_normalized_BS
+        # of children/each child, assert trueish-ness (any-ness), group,
+        # and children length. (the lattermost is assumed #here5)
+        a = []
+        self.class.accept_visitor_by @_node_ do |x, _asc|
+          a.push x
+        end
+        a.freeze
+      end
+
+      def _build_structured_child_BS ast
+        _svcs = self.class._constituent_construction_services
+        _cls = _svcs.dereference ast.type
+        _cls.via_node_ ast
+      end
     end
 
     Tupling = ::Class.new  # (forward declaration)
@@ -649,18 +756,146 @@ module Skylab::BeautySalon
       end
     end
 
-    class ChildAssociation___ < Common_::SimpleModel
+    CommonChildAssociation__ = ::Class.new Common_::SimpleModel
+
+    class ComponentAssociation___ < CommonChildAssociation__
+
+      # #open :#here6: from the inside and outside, this is undergoing an
+      # "emergent design" incubation period. for one thing it needs a name change
+
+      def initialize
+        yield self
+        super
+      end
 
       attr_accessor(
-        :association_symbol,
+        :stem_symbol,
+      )
+
+      def _write_methods_for_non_plural_ cls, hard_offset
+
+        # currently while we assume that COMPONENT is a simple primary,
+        # likewise keep the reading simple - memoization wouldn't gain anything
+
+        cls.send :define_method, @stem_symbol do
+          @_node_.children.fetch hard_offset
+        end
+      end
+
+      def group_information
+        NOTHING_
+      end
+
+      def is_component
+        true
+      end
+
+      def has_plural_arity
+        false
+      end
+    end
+
+    class StructuredChildAssociation___ < CommonChildAssociation__
+
+      def initialize
+        yield self
+        @method_name_for_read_subsequently = :"__#{ @association_symbol }_subsequently"
+        super
+      end
+
+      attr_accessor(
         :group_information,
         :group_symbol,
         :has_expectation_of_zero_or_more,  # assume `has_plural_arity`
         :has_plural_arity,
         :is_any,
-        :is_component,
+      )
+
+      def __write_methods_for_plural_ cls, hard_offset
+
+        r = @offset .. hard_offset
+
+        _write_memoizing_methods cls, @association_symbol do
+          cx = @_node_.children
+          cx.frozen? || sanity
+          sublist = cx[ r ].freeze
+          # (you could maintain a mapping between offset systems instead, but meh)
+          SickMemoizerBro___.new sublist.length do |d|
+            ast = sublist.fetch d
+            ast || sanity
+            _build_structured_child_BS ast
+          end
+        end
+      end
+
+      def _write_methods_for_non_plural_ cls, hard_offset  # put at for STRUCT CHILD
+
+        # NOTE move this comment #todo
+        # here is an example of where we expose structured recursion to the
+        # same kind of structural validation we assert when traversing otherwise
+
+        _write_memoizing_methods cls, @association_symbol do
+          _x_a = _node_children_normalized_BS
+          ast = _x_a.fetch hard_offset
+          if ast
+            _build_structured_child_BS ast
+          end
+        end
+      end
+
+      attr_reader(
+        :method_name_for_read_subsequently,
+      )
+
+      def is_component
+        false
+      end
+    end
+
+    class CommonChildAssociation__
+
+      def initialize
+        @appropriate_ivar = :"@#{ @association_symbol }"
+        @method_name_for_read_initially = :"__#{ @association_symbol }_initially"
+        freeze
+      end
+
+      attr_accessor(
+        :association_symbol,
         :offset,
-        :stem_symbol,
+      )
+
+      def _write_memoizing_methods cls, m, & p
+
+        # an abstraction of the common pattern for implementing a lazily
+        # memoized property by using an ivar (named exactly as the property)
+        # that holds a method name used to read the property.
+
+        asc = self ; ivar = @appropriate_ivar ; k = @association_symbol
+
+        cls.class_exec do
+
+          define_method m do
+            send instance_variable_get ivar
+          end
+
+          define_method asc.method_name_for_read_initially do
+            _x = instance_exec( & p )
+            ( @_structured_child_cache_ ||= {} )[ k ] = _x
+            instance_variable_set ivar, asc.method_name_for_read_subsequently
+            send instance_variable_get ivar
+          end
+
+          define_method asc.method_name_for_read_subsequently do
+            @_structured_child_cache_.fetch k
+          end
+        end
+        NIL
+      end
+
+      attr_reader(
+        :appropriate_ivar,
+        :method_name_for_read_initially,
       )
     end
 
@@ -795,6 +1030,35 @@ module Skylab::BeautySalon
 
       attr_reader(
         :symbol,
+      )
+    end
+
+    # ==
+
+    class SickMemoizerBro___
+
+      def initialize d, & p
+        @_state_via_offset = ::Array.new d
+        @_cached_value_via_offset = ::Array.new d
+        @_proc = p
+        @length = d
+      end
+
+      def dereference d
+        state = @_state_via_offset.fetch d
+        if state
+          :cached == state || no
+          @_cached_value_via_offset.fetch d
+        else
+          @_state_via_offset[ d ] = :locked
+          @_cached_value_via_offset[ d ] = @_proc[ d ]
+          @_state_via_offset[ d ] = :cached
+          dereference d
+        end
+      end
+
+      attr_reader(
+        :length,
       )
     end
 

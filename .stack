@@ -61,24 +61,27 @@ finish one new magent
 finish other new magnet
 fix diff thing
 rename all operator branch to feature branch YIKES
-.to_symbolish_reference_scanner not .to_loadable_reference_stream (right?)
-(that commit was -1.1.1)
-ok so you want to get to getting every '.should' being converted 03:47:08
-(that commit was -1.1.2)
-rebase the branch with the `expect( ).to` fix
-(that commit was -1.1.3)
-use this new tool to change all of your own `expect` to `anticipate` or whatever
-indented report: uber alles
-THEN: refactor to better viz, i.e of calls in tests
-(-1.3.N refactor your tupling to complement the hooks mesh
-think about how your tupling can be recursive and lazy (still immutable)
-understand Parser nodes - how can we unparse?
-answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`)
-location map - this is the key
 clean up that crazy hack in an isolated commit
-uses class-based reflection structures fully for its traversal
-see if you can phase-in class-based reflection for just some of it
-figure out a tiny test case for a proof of concept of how class-based can replace function-based "for free"
-gather supposed requirements for these (we should be able to infer them from the current thing) maybe as notes in the test
-inheritence (I)
-injected context (F)
+these near term applications of guy (A)->(C,D)
+ok so you want to get to getting every '.should' being converted 07-19 03:47:08 (C)->(E)
+rebase the branch with the `expect( ).to` fix (E)->(S)
+.to_symbolish_reference_scanner not .to_loadable_reference_stream (right?) (D)->(B)
+use this new tool to change all of your own `expect` to `anticipate` or whatever (S)->(B)
+these near term applications of guy (B)->(G)
+indented report: uber alles (G)->(H)
+better viz, i.e of calls in tests (H)->(O)
+general open questions of Parser lib/API (U)->(K,L,M)
+understand Parser nodes - how can we unparse? (K)->(V)
+answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`) (L)->(V)
+location map - this is the key (M)->(V)
+general open questions of Parser lib/API (V)
+uses class-based reflection structures fully for its traversal (O)->(I)
+inheritence (I)->(P)
+see if you can phase-in class-based reflection for just some of it (P)->(Q)
+proof of concept of class-based traversal cheaply (Q)->(F)
+injected context (F)->(R)
+write requirements in a test file for class-based traversal (R)->(T)
+(acceptance: four) refactor your tupling to complement the hooks mesh (T)->(Y)
+replace the oldschool `send` grammar symbol with new (hackish hybrid code) (Y)->(N)
+cover reading & writing components (N)->(J)
+think about how your tupling can be recursive and lazy (still immutable) (J)

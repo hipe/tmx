@@ -1,6 +1,16 @@
 # structured declared nodes :[#022]
 
-## declarative (structural) grammar reflection
+## table of contents
+
+  - declarative (structural) grammar refection [#here.A]
+  - (reserved for the blurb after the new intro [#here.s2])
+  - the list of features [#here.s3]
+  - "components" (special associations) (in a test file) [#here.4]
+
+
+
+
+## declarative (structural) grammar reflection :[#here.A]
 
 NOTE (EDIT) once #open [#022] is closed, the wording here should be
 worded to reflect the fact that this complements (or maybe will replace!

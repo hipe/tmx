@@ -14,10 +14,17 @@ module Skylab::BeautySalon::TestSupport
 
       # -- build these things
 
+      def parse_this_string_for_real_ ruby_s
+        _parser = Real_parser_for_current_ruby__[]
+        _AST_node = _parser.parse ruby_s
+        _AST_node  # hi.todo
+      end
+
+      # -- build these things
+
       define_method :builder_thing_, ( Lazy_.call do
 
-        Home_::CrazyTownReportMagnetics_::DocumentNodeStream_via_FilePathStream::
-            For_now_always_the_same_ruby_parser_with_certain_settings___[]
+        Real_parser_for_current_ruby__[]  # load 2 things
 
         -> sym, * rest do
           ::Parser::AST::Node.new sym, rest
@@ -157,6 +164,15 @@ module Skylab::BeautySalon::TestSupport
       end
 
     # -
+
+    Real_parser_for_current_ruby__ = -> do
+      Home_::CrazyTownReportMagnetics_::
+          DocumentNodeStream_via_FilePathStream::
+          For_now_always_the_same_ruby_parser_with_certain_settings___[]
+    end
+
+    # ==
+    # ==
   end
 end
 # #born: broke out of a spec file
