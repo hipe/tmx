@@ -373,6 +373,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #pending-rename: "structured node" or similar
 # #history-A.2: move oldschool support out so it's just constituents
 # #history-A.1: inject comment placeholder for every grammar symbol saw visually
 # #born.

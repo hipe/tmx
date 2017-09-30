@@ -54,6 +54,24 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    context 'write a new primitive value (formerly called "component")' do
+
+      it 'new guy is produced' do
+        _new_guy || fail
+      end
+
+      it 'the new guy has the new primitive component' do
+        _new_guy.methodo_nameo == :zing_zang || fail
+      end
+
+      shared_subject :_new_guy do
+        _guy = _this_one_structured_node
+        _guy.new_by do |o|
+          o.methodo_nameo = :zing_zang
+        end
+      end
+    end
+
     shared_subject :_this_listy_child do
       _guy = _this_one_structured_node
       _guy.zero_or_more_argumentoso_expressions

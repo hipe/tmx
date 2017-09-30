@@ -495,6 +495,13 @@ module Skylab::BeautySalon
         @_node_ = n  # so named because @ordinary_ivars are in userspace
       end
 
+      def new_by & edit
+        CrazyTownMagnetics_::StructuredNode_via_Writes.call_by do |o|
+          o.structured_node = self
+          o.edit = edit
+        end
+      end
+
       def _node_children_normalized_BS
         @___node_children_normalized_BS ||= __node_children_normalized_BS
       end
@@ -514,6 +521,10 @@ module Skylab::BeautySalon
         _cls = _svcs.dereference ast.type
         _cls.via_node_ ast
       end
+
+      attr_reader(
+        :_node_,
+      )
     end
 
     Tupling = ::Class.new  # (forward declaration)
