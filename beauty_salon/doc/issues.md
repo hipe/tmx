@@ -86,6 +86,9 @@
 
 [#007]       ( intra-subsystem issues )
 
+       #open [#here.F]: the fate of components. component-related concerns,
+              like primitive type..
+
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but
                about whether we will ever support arbitrarily prioritized optionals.

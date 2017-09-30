@@ -79,28 +79,51 @@ module Skylab::BeautySalon
       end
 
       def __check_attribute_names
+
         ok = true
-        h = @_tupling::COMPONENTS
+
+        if @_tupling.GRAMMAR_SYMBOL_IS_OLD_WAY
+          has = @_tupling::COMPONENTS
+          to_symbol_scanner = -> do
+            Scanner_[ h.keys ]
+          end
+        else
+          has = @_tupling.component_index_has_reference_as_function__
+          to_symbol_scanner = -> do
+            @_tupling.component_index_to_symbolish_reference_scanner__
+          end
+        end
+
         @_tree.list_of_boolean_tests.each do |bool_test|
           k = bool_test.symbol_symbol
-          if ! h[ k ]
-            __levenshtein_for_component( k ) { h.keys }
+          if ! has[ k ]
+            __levenshtein_for_component k, & to_symbol_scanner
             ok = false ; break
           end
         end
+
         ok
       end
 
       def __levenshtein_for_component ick_sym
 
-        _express_parse_error do |y|
+        _express_parse_error do |y, expag|
 
-          _sym_a = yield
+          ent_sym = _entity_name_symbol
 
-          _s_a = _sym_a.map { |sym| "'#{ sym }'" }
+          expag.calculate do
 
-          y << %(grammar symbol '#{ _entity_name_symbol }' has no component "#{ ick_sym }".)
-          y << "known component(s): #{ Common_::Oxford_and[ _s_a ] }"
+            y << %(grammar symbol '#{ ent_sym }' has no component "#{ ick_sym }".)
+
+            simple_inflection do
+
+              _sym_scn = yield
+              buff = oxford_join ::String.new, _sym_scn do |sym|
+                "'#{ sym }'"
+              end
+              y << "#{ the_only_ }known #{ n 'component' }: #{ buff }"
+            end
+          end
         end
       end
 
@@ -148,7 +171,7 @@ module Skylab::BeautySalon
 
       def _express_parse_error
         @listener.call :error, :expression, :parse_error do |y|
-          yield y
+          yield y, self
         end
         UNABLE_
       end
@@ -207,8 +230,14 @@ module Skylab::BeautySalon
 
       def __test_proc_via_test_AST test_AST
 
+        _component = if @tupling.GRAMMAR_SYMBOL_IS_OLD_WAY   # while #open [#022]
+          @tupling::COMPONENTS.fetch test_AST.symbol_symbol
+        else
+          @tupling.dereference_component__ test_AST.symbol_symbol
+        end
+
         NodeTester_via_Component_and_Test_AST___.call_by do |o|
-          o.component = @tupling::COMPONENTS.fetch test_AST.symbol_symbol
+          o.component = _component
           o.test_AST = test_AST
           o.tupling = @tupling
         end

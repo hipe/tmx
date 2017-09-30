@@ -94,13 +94,13 @@ module Skylab::BeautySalon::TestSupport
 
       it 'deref' do
         _ = _this_one_class
-        _hi = _.DEREFERENCE_COMPONENT :methodo_nameo
+        _hi = _.dereference_component__ :methodo_nameo
         _hi.stem_symbol == :methodo_nameo || fail
       end
 
       it 'list' do
         _ = _this_one_class
-        scn = _.to_symbolish_reference_scanner_OF_COMPONENTS
+        scn = _.component_index_to_symbolish_reference_scanner__
         scn.head_as_is == :methodo_nameo || fail
         scn.advance_one
         scn.no_unparsed_exists || fail

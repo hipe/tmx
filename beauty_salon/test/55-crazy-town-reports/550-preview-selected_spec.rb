@@ -57,7 +57,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'offers suggestions' do
         _hi = _lines.last
-        _hi == %q(known component(s): 'method_name')
+        _hi == %q(the only known component: 'method_name') || fail
       end
 
       shared_subject :_lines do

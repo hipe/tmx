@@ -79,6 +79,9 @@ module Skylab::BeautySalon::TestSupport
       end
 
       module THIS_ONE_MOCK ; class << self
+        def tap_class
+          NOTHING_
+        end
         def __receive_constituent_construction_services_ _
           NOTHING_
         end

@@ -95,6 +95,12 @@ module Skylab::Human
           end
         end
 
+        def the_only_
+          if 1 == count_for_inflection
+            'the only '
+          end
+        end
+
         def no_double_negative lemma_x  # #cov2.1
 
           # (strongly recommended that you read the explanation at the spec)

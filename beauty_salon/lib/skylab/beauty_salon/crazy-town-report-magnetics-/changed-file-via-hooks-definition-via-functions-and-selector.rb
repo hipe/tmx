@@ -81,7 +81,7 @@ module Skylab::BeautySalon
       end
 
       def __push_ s, tupling
-        send @receive, s, tupling.node_loc.expression
+        send @receive, s, tupling.node_location.expression
       end
 
       def __receive_initially s, source_range

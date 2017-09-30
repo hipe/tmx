@@ -150,15 +150,27 @@ module Skylab::BeautySalon
       end
 
       def lookup_softly ref_sym
+
+        # NOTE - when grammar is implemented through the "structured" approach
+        # comprehensively, there should be no need for soft lookup ever (right?) #todo
+
+        # while #open [#022] acceptance 4
+
+        if :send == ref_sym
+          dereference ref_sym
+        else
         c = __valid_const_via_normal_name_symbol ref_sym
         if c
           _dereference_via_internal_key c
+        end
         end
       end
 
       def dereference sym
         _c = __class_const_via_name_symbol sym
-        @_items_module.const_get _c, false  # :#here4
+        cls = @_items_module.const_get _c, false  # :#here4
+        cls.tap_class  # see
+        cls
       end
 
       def __when_not_found listener, ref_sym
@@ -361,12 +373,19 @@ module Skylab::BeautySalon
 
         # ~
 
-        def DEREFERENCE_COMPONENT sym  # (change scope of name for production)  # #testpoint
+        def dereference_component__ sym  # #testpoint
           _d = _component_index.fetch( sym )
           children_association_index.associations.fetch _d
         end
 
-        def to_symbolish_reference_scanner_OF_COMPONENTS  # (change scope of name for production)  #testpoint
+        def component_index_has_reference_as_function__
+          h = _component_index
+          -> k do
+            h.key? k  # hi.
+          end
+        end
+
+        def component_index_to_symbolish_reference_scanner__  # #testpoint
           _h = _component_index
           Scanner_[ _h.keys ]
         end
@@ -474,6 +493,14 @@ module Skylab::BeautySalon
           @__CAI
         end
 
+        def tap_class  # hacky thing to set breakpoints for particular classes, from the "grammar"
+          NOTHING_
+        end
+
+        def GRAMMAR_SYMBOL_IS_OLD_WAY
+          false
+        end
+
         alias_method :via_node_, :new
         undef_method :new
       end  # >>
@@ -522,6 +549,33 @@ module Skylab::BeautySalon
         _cls.via_node_ ast
       end
 
+      # -- special interests
+
+      def to_code
+        # #copy-paste modified from #here7
+        # (we know we want to improve this but we are locking it down)
+
+        lib = Home_.lib_
+        # ~(it's futile trying to get rid of the warning - maybe
+        _unp = lib.unparser
+        # ~)
+        _unp.unparse @_node_
+      end
+
+      def begin_lineno__
+        _node_location.first_line
+      end
+
+      def end_lineno__
+        _node_location.last_line
+      end
+
+      def _node_location
+        @_node_.location
+      end
+
+      alias_method :node_location, :_node_location  # meh
+
       attr_reader(
         :_node_,
       )
@@ -542,6 +596,11 @@ module Skylab::BeautySalon
       # NOTE - this is the oldschool guy. subject to get rewritten fully
 
       class << self
+
+        def GRAMMAR_SYMBOL_IS_OLD_WAY
+          true
+        end
+
         alias_method :via_node_, :new
         undef_method :new
       end  # >>
@@ -586,6 +645,7 @@ module Skylab::BeautySalon
       end
 
       def to_code
+        # #copy-pasted to #here7
         # (we know we want to improve this but we are locking it down)
         Home_.lib_.unparser.unparse @node
       end
@@ -593,19 +653,6 @@ module Skylab::BeautySalon
       # --
       #   these are insane but it's OK. the first time they are called, they
       #   ** REWRITE THE METHOD OF THE ACTUAL CLASS ** (not singleton class)
-
-      def _lazy_auto_setter_ x
-
-        m = caller_locations( 1, 1 )[0].base_label.intern
-
-        cmp = _component_via_symbol m[ 0 ... -1 ].intern
-
-        _method_body = Writers__.const_get( cmp._via_, false )[ m, cmp ]
-
-        _redefine_method _method_body, m
-
-        send m, x  # dogfood
-      end
 
       def _lazy_auto_getter_
 
@@ -640,8 +687,8 @@ module Skylab::BeautySalon
         @node.location.last_line
       end
 
-      def node_loc  # meh
-        @node.loc
+      def node_location  # meh
+        @node.location
       end
     end
 
@@ -793,6 +840,12 @@ module Skylab::BeautySalon
         end
       end
 
+      def type_symbol
+        # here is a key point of #open [#007.F] - see how we would like this
+        # to be declared instead of us just assuming it here:
+        :symbol
+      end
+
       def group_information
         NOTHING_
       end
@@ -939,16 +992,9 @@ module Skylab::BeautySalon
     # Component readers and writers
     #
 
-    Writers__ = ::Module.new
     Readers__ = ::Module.new
 
     # ==
-
-    Writers__::Symbol_via_symbol = -> cmp_sym, cmp do
-      -> sym do
-        @_pending_writes_.push [ cmp.offset, sym ] ; sym  # per #here3
-      end
-    end
 
     Readers__::Symbol_via_symbol = -> cmp_sym, cmp do
 

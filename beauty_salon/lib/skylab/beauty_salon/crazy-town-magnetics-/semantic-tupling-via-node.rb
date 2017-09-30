@@ -4,6 +4,10 @@ module Skylab::BeautySalon
 
     # experiment.
 
+    # NOTE remember while #open [#022] acceptance 4:
+    #   - Here___ not Constituents___
+    #   - Items not Constituents___
+
     class << self
       define_method :tuplings_as_feature_branch, ( Lazy_.call do
         CrazyTownMagnetics_::NodeProcessor_via_Module[ Constituents___ ]
@@ -11,6 +15,7 @@ module Skylab::BeautySalon
     end  # >>
 
     o = CrazyTownMagnetics_::NodeProcessor_via_Module
+    GrammarSymbol__ = o::GrammarSymbol
     Tupling__ = o::Tupling
     Component__ = o::Component
 
@@ -199,6 +204,16 @@ module Skylab::BeautySalon
 
       # send (placeheld)
 
+      module Items
+      class Send < GrammarSymbol__
+        children(
+          :XXX_receiver_expression,
+          :method_name_expression_component,
+          :zero_or_more_XXX_arg_expressions,
+        )
+      end
+      end
+
       # lambda (placeheld)
 
       # block (placeheld)
@@ -342,27 +357,8 @@ module Skylab::BeautySalon
         end
       end
 
-      class Send < Tupling__
-
-        COMPONENTS = {
-          method_name: Component__[
-            offset: 1,
-            type: :symbol,
-            via: :Symbol_via_symbol,
-          ]
-        }
-
-        def method_name= x
-          _lazy_auto_setter_ x
-        end
-
-        def method_name
-          _lazy_auto_getter_
-        end
-      end
-
-      Items = nil  # NOTE - etc
-      IRREGULAR_NAMES = nil  # NOTE - this is NOT structurally where this goes
+      IRREGULAR_NAMES = nil
+      GROUPS = nil
     end
 
     # ==
