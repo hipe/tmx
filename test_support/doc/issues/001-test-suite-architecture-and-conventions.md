@@ -10,6 +10,12 @@ in the filesystem node's entry name.
 it for new tests because there is good reason to do so and no good reason
 not to.)
 
+(test suites must NEVER assume their cases will be run in a particular
+order with respect to each other. i.e a passing test suite must still pass
+with its test cases run in any random order. "regression friendliness" is
+merely a developmental nicety that is intended to help troubleshoot things
+more smoothly when something goes wrong.)
+
 this is to say, a priori knowledge of any (test or application) framework
 and its various conceptions of terms like "models", "features", "functions",
 "integration" etc must NOT be assumed when determining the "regression

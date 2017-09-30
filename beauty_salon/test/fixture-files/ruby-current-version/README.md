@@ -32,6 +32,9 @@ at the end, for inexplicable OCD reasons.)
   - modules and classes
   - special and edge
 
+(note: #spot1.1 (another test-level README like this one) improves on
+the above taxonomy.)
+
 
 
 

@@ -88,7 +88,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     shared_subject :_this_one_structured_node do
-      _ast = parse_this_string_for_real_ '1.foo 2, 3'
+      _ast = vendor_node_via_string_ '1.foo 2, 3'
       _cls = _this_one_class
       _cls.via_node_ _ast
     end

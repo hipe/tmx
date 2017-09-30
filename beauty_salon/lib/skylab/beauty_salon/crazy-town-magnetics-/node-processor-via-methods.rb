@@ -778,8 +778,6 @@ module Skylab::BeautySalon
 
         # another (TEMPORARY) "foolhardy" [#doc.G] (see)
 
-        # partially duplicated at #temporary-spot-1. this one is now ahead. #todo
-
         case n.type
         when :const ; _node n  # can recurse back to here
 

@@ -155,8 +155,10 @@ module Skylab::BeautySalon
         # comprehensively, there should be no need for soft lookup ever (right?) #todo
 
         # while #open [#022] acceptance 4
-
-        if :send == ref_sym
+        case ref_sym
+          when :send,
+            :class,
+            :module
           dereference ref_sym
         else
         c = __valid_const_via_normal_name_symbol ref_sym
@@ -260,7 +262,9 @@ module Skylab::BeautySalon
       end
 
       def _dereference_via_internal_key c
-        @module.const_get c, false
+        cls = @module.const_get c, false
+        cls.tap_class
+        cls
       end
 
       def __internal_key_via_normal_name_symbol ref_sym
@@ -409,6 +413,12 @@ module Skylab::BeautySalon
         end
 
         # ~
+
+        def MEMBERS  # not covered, use in development
+          children_association_index.associations.map do |asc|
+            asc._SYMBOL_FOR_MEMBERS_
+          end
+        end
 
         def children_association_index
           send @_child_associations_index
@@ -599,6 +609,10 @@ module Skylab::BeautySalon
 
         def GRAMMAR_SYMBOL_IS_OLD_WAY
           true
+        end
+
+        def tap_class
+          NOTHING_
         end
 
         alias_method :via_node_, :new
@@ -840,6 +854,10 @@ module Skylab::BeautySalon
         end
       end
 
+      def _SYMBOL_FOR_MEMBERS_
+        @stem_symbol
+      end
+
       def type_symbol
         # here is a key point of #open [#007.F] - see how we would like this
         # to be declared instead of us just assuming it here:
@@ -905,6 +923,10 @@ module Skylab::BeautySalon
             _build_structured_child_BS ast
           end
         end
+      end
+
+      def _SYMBOL_FOR_MEMBERS_
+        @association_symbol
       end
 
       attr_reader(
@@ -1009,52 +1031,11 @@ module Skylab::BeautySalon
 
     # ==
 
-    Readers__::String_via_module_identifier = -> cmp_sym, cmp do
-
-      Memoize_into_ivar__.call cmp_sym, cmp do |offset|
-        -> do
-          _sym_a = Symbol_array_via_module_identifier_recursive__[ @node.children[ offset ] ]
-          _sym_a.join( COLON_COLON_ ).freeze
-        end
-      end
-    end
-
     #
     # component readers and writers (support)
     #
 
     # support for component readers
-
-    Symbol_array_via_module_identifier_recursive__ = -> n do
-
-      # :#temporary-spot-1
-
-      if :const == n.type
-        a = n.children
-        2 == a.length || fail
-        recu = a[0]
-      end
-
-      res_a = if recu
-        Symbol_array_via_module_identifier_recursive__[ recu ]
-      else
-        []
-      end
-
-      case n.type
-      when :const
-        c = a[1]
-        ::Symbol === c || fail
-        res_a.push c
-      when :cbase
-        # test_support/lib/skylab/test_support.rb:2
-        res_a.push NOTHING_
-      when :self
-        res_a.push :self  # meh
-      else
-        self._COVER_ME___weahhhh___
-      end
-    end
 
     # support for component writers
 
@@ -1120,8 +1101,6 @@ module Skylab::BeautySalon
     end
 
     # ==
-
-    COLON_COLON_ = '::'
 
     # ==
     # ==

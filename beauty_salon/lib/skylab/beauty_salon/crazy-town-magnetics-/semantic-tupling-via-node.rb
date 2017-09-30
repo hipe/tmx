@@ -20,6 +20,8 @@ module Skylab::BeautySalon
     Component__ = o::Component
 
     module Constituents___
+    # below to #here1
+    module Items
 
       #
       # Literals
@@ -102,6 +104,12 @@ module Skylab::BeautySalon
 
       # ivar (placeheld)
 
+      class Ivar < GrammarSymbol__
+        children(
+          :symbol_expression_component,
+        )
+      end
+
       # gvar (placeheld)
 
       # cvar (placeheld)
@@ -111,6 +119,25 @@ module Skylab::BeautySalon
       # nth_ref (placeheld)
 
       # const (placeheld)
+
+      class Const < GrammarSymbol__
+
+        def _to_friendly_string
+          my_s = symbol.id2name
+          sn = any_parent_const_expression
+          if sn
+            buff = sn._to_friendly_string  # #TODO there are tons of holes here
+            buff << COLON_COLON_ << my_s
+          else
+            my_s
+          end
+        end
+
+        children(
+          :any_parent_const_expression,
+          :symbol_expression_component,
+        )
+      end
 
       # __ENCODING__ (placeheld)
 
@@ -144,9 +171,34 @@ module Skylab::BeautySalon
 
       # class (placeheld)
 
+      class Class < GrammarSymbol__
+
+        def to_description
+          "class: #{ todo_module_identifier_const._to_friendly_string }"
+        end
+
+        children(
+          :todo_module_identifier_const,
+          :any_superclass_expression,  # TODO: group: "expression of module"
+          :any_body_expression,
+        )
+      end
+
       # sclass (placeheld)
 
       # module (placeheld)
+
+      class Module < GrammarSymbol__
+
+        def to_description
+          "module: #{ todo_module_identifier_const._to_friendly_string }"
+        end
+
+        children(
+          :todo_module_identifier_const,
+          :any_body_expression,
+        )
+      end
 
       #
       # Method (un)definition
@@ -204,14 +256,12 @@ module Skylab::BeautySalon
 
       # send (placeheld)
 
-      module Items
       class Send < GrammarSymbol__
         children(
           :XXX_receiver_expression,
           :method_name_expression_component,
           :zero_or_more_XXX_arg_expressions,
         )
-      end
       end
 
       # lambda (placeheld)
@@ -303,41 +353,7 @@ module Skylab::BeautySalon
 
       # kwbegin (placeheld)
 
-      class Class < Tupling__
-
-        COMPONENTS = {
-          module_identifier: Component__[
-            offset: 0,
-            via: :String_via_module_identifier,
-          ],
-        }
-
-        def to_description
-          "class: #{ module_identifier }"
-        end
-
-        def module_identifier
-          _lazy_auto_getter_
-        end
-      end
-
-      class Module < Tupling__
-
-        COMPONENTS = {
-          module_identifier: Component__[
-            offset: 0,
-            via: :String_via_module_identifier,
-          ],
-        }
-
-        def to_description
-          "module: #{ module_identifier }"
-        end
-
-        def module_identifier
-          _lazy_auto_getter_
-        end
-      end
+    end  # :#here1
 
       class Def < Tupling__
 
@@ -358,12 +374,19 @@ module Skylab::BeautySalon
       end
 
       IRREGULAR_NAMES = nil
-      GROUPS = nil
     end
 
+    Constituents___::GROUPS = {
+      const: [
+        :const,
+      ],
+    }
+
     # ==
 
     # ==
+
+    COLON_COLON_ = '::'.freeze
 
     # ==
     # ==

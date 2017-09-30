@@ -12,9 +12,25 @@ module Skylab::BeautySalon::TestSupport
         tc.include self
       end
 
+      # -- assert help
+
+      def at_ m
+        _sn = structured_node_
+        _sn.send m
+      end
+
       # -- build these things
 
-      def parse_this_string_for_real_ ruby_s
+      def structured_node_via_string_ s
+        n = vendor_node_via_string_ s
+        # (very wound-up for now)
+        _magnetic = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node
+        _feature_branch = _magnetic.tuplings_as_feature_branch
+        _class = _feature_branch.dereference n.type
+        _class.via_node_ n
+      end
+
+      def vendor_node_via_string_ ruby_s
         _parser = Real_parser_for_current_ruby__[]
         _AST_node = _parser.parse ruby_s
         _AST_node  # hi.todo
