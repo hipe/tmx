@@ -67,7 +67,7 @@ module Skylab::BeautySalon
         _same_in_stack_frame do
 
           _tup = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-            tuplings_as_feature_branch.specific_tupling_or_generic_tupling_for n
+            structured_nodes_as_feature_branch.some_structured_node_for__ n
 
           _sf = ItemStackFrame___.new @current_depth_offset, _tup
 
@@ -101,19 +101,19 @@ module Skylab::BeautySalon
 
     class ItemStackFrame___
 
-      def initialize d, tng
+      def initialize d, sn
         @depth = d
-        @tupling = tng
+        @structured_node = sn
         freeze
       end
 
       def to_description
-        @tupling.to_description
+        @structured_node.to_description
       end
 
       attr_reader(
         :depth,
-        :tupling,
+        :structured_node,
       )
     end
 

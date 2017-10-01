@@ -35,7 +35,9 @@ this is our own (second of two) take on it with the following:
 
 
 synopsis: generally this is a generic AST processor that wraps
-*certain* grammar symbol instances into our "tupling" structures
+*certain* grammar symbol instances
+(EDIT: while open [#022])
+into our "structured node" structures
 that makes accessing certain properties easier through derived getters.
 
 read the blurb at `::AST::Node`, which is essential to understand
@@ -57,13 +59,9 @@ as well as centralizing the offset knowledge in one place to make the
 code more resilient in a DRY sense.
 
 we also expose a composition-not-inheritance approach, whereby
-(optionally) you can wrap a document AST node in such a "tupling"
+(optionally) you can wrap a document AST node as such a structured node
 so that you can just have the getters you might want as referenced
 in the referenced remote documentation.
-
-(by the way, we introduce "tupling" as a neo-logism to mean a struct-
-like instance that relates an ordered, fixed-length list to certain
-semantic names associated with offsets into that list.)
 
 
 

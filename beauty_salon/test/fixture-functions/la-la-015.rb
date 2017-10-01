@@ -1,8 +1,8 @@
 module Skylab::BeautySalon::CrazyTownFunctions
 
-  La_La_015 = -> tupling do
+  La_La_015 = -> structured_node do
 
-    tupling.new_by do |o|
+    structured_node.new_by do |o|
       o.method_name = :chamonay
     end.to_code
   end

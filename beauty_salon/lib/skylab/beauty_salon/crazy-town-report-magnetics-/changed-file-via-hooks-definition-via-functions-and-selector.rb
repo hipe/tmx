@@ -44,13 +44,13 @@ module Skylab::BeautySalon
           NOTHING_  # hi.
         end
 
-        @code_selector.on_each_occurrence_in oo do |tupling|
+        @code_selector.on_each_occurrence_in oo do |structured_node|
 
-          s = user_function[ tupling ]
+          s = user_function[ structured_node ]
 
           ::String === s || self._COVER_ME__strange_result_from_user_function__
 
-          ( guy ||= Guy___.new @receive_changed_file ).__push_ s, tupling
+          ( guy ||= Guy___.new @receive_changed_file ).__push_ s, structured_node
 
           NIL
         end
@@ -80,8 +80,8 @@ module Skylab::BeautySalon
         @_stack = []
       end
 
-      def __push_ s, tupling
-        send @receive, s, tupling.node_location.expression
+      def __push_ s, structured_node
+        send @receive, s, structured_node.node_location.expression
       end
 
       def __receive_initially s, source_range

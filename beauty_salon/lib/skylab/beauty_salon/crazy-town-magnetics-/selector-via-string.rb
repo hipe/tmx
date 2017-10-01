@@ -8,19 +8,19 @@ module Skylab::BeautySalon
 
     class Selector___
 
-      def initialize tng, is_AND, list, sym
+      def initialize snc, is_AND, list, sym
         @list_is_AND_list_not_OR_list = is_AND
         @list_of_boolean_tests = list
         @feature_symbol = sym
-        @tupling = tng
+        @structured_node_class = snc
       end
 
       def on_each_occurrence_in writable_hooks_plan, & receive_wrapped_sexp
 
-        test_sexp = NodeTester_via_TestList_and_Tupling___.call_by do |o|
+        test_sexp = NodeTester_via_TestList_and_StructuredNodeClass___.call_by do |o|
           o.test_list = @list_of_boolean_tests
           o.list_is_AND_list_not_OR_list = @list_is_AND_list_not_OR_list
-          o.tupling = @tupling
+          o.structured_node_class = @structured_node_class
         end
 
         writable_hooks_plan.on_this_one_type_of_node @feature_symbol do |s|
@@ -58,7 +58,7 @@ module Skylab::BeautySalon
         if __names_are_valid
           t = remove_instance_variable :@_tree
           Selector___.new(
-            remove_instance_variable( :@_tupling ),
+            remove_instance_variable( :@_structured_node_class ),
             t.list_is_AND_list_not_OR_list,
             t.list_of_boolean_tests,
             t.feature_symbol,
@@ -82,16 +82,10 @@ module Skylab::BeautySalon
 
         ok = true
 
-        if @_tupling.GRAMMAR_SYMBOL_IS_OLD_WAY
-          has = @_tupling::COMPONENTS
-          to_symbol_scanner = -> do
-            Scanner_[ h.keys ]
-          end
-        else
-          has = @_tupling.component_index_has_reference_as_function__
-          to_symbol_scanner = -> do
-            @_tupling.component_index_to_symbolish_reference_scanner__
-          end
+        has = @_structured_node_class.component_index_has_reference_as_function__
+
+        to_symbol_scanner = -> do
+          @_structured_node_class.component_index_to_symbolish_reference_scanner__
         end
 
         @_tree.list_of_boolean_tests.each do |bool_test|
@@ -130,9 +124,9 @@ module Skylab::BeautySalon
       def __check_that_we_have_our_special_meta_information_for_this_grammar_symbol
 
         _ = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-          tuplings_as_feature_branch.procure _entity_name_symbol, & @listener
+          structured_nodes_as_feature_branch.procure _entity_name_symbol, & @listener
 
-        _store :@_tupling, _
+        _store :@_structured_node_class, _
       end
 
       def __check_that_name_is_in_list_of_known_grammar_symbols
@@ -191,7 +185,7 @@ module Skylab::BeautySalon
 
     # ==
 
-    class NodeTester_via_TestList_and_Tupling___ < Common_::MagneticBySimpleModel
+    class NodeTester_via_TestList_and_StructuredNodeClass___ < Common_::MagneticBySimpleModel
 
       # implement boolean "test" expressions, eg. to find all method calls
       # in the corpus whose method name is `puts`:
@@ -201,21 +195,21 @@ module Skylab::BeautySalon
       # (the above is didactic. actual labels for these terms may vary.)
       #
       # we produce a proc that receives document AST nodes and (when the
-      # node matches) results in a "tupling" *instance* wrapping that AST
+      # node matches) results in a structured node wrapping that AST
       # node.
 
-      # the whole thing here is we don't create a tupling (viz wrapped node
-      # instance) for every node of this type in the corpus. rather we only
+      # the whole thing here is we don't create a structured node instance
+      # for every node of this type in the corpus. rather we only
       # create it IFF the node matches the selector body (the boolean tests).
       #
       # to implement this we have to access the components of the document
       # AST nodes using those components offsets before we can wrap them
-      # in the tupling (which abstracts away the use of the offsets).
+      # in the structured node class (which abstracts away the use of the offsets).
 
       attr_writer(
         :list_is_AND_list_not_OR_list,
+        :structured_node_class,
         :test_list,
-        :tupling,
       )
 
       def execute
@@ -230,16 +224,12 @@ module Skylab::BeautySalon
 
       def __test_proc_via_test_AST test_AST
 
-        _component = if @tupling.GRAMMAR_SYMBOL_IS_OLD_WAY   # while #open [#022]
-          @tupling::COMPONENTS.fetch test_AST.symbol_symbol
-        else
-          @tupling.dereference_component__ test_AST.symbol_symbol
-        end
+        _component = @structured_node_class.dereference_component__ test_AST.symbol_symbol
 
         NodeTester_via_Component_and_Test_AST___.call_by do |o|
           o.component = _component
           o.test_AST = test_AST
-          o.tupling = @tupling
+          o.structured_node_class = @structured_node_class
         end
       end
     end
@@ -252,8 +242,8 @@ module Skylab::BeautySalon
 
       attr_writer(
         :component,
+        :structured_node_class,
         :test_AST,
-        :tupling,
       )
 
       def execute
@@ -273,7 +263,7 @@ module Skylab::BeautySalon
         -> n do
 
           if mixed_target_value == n.children.fetch( component_offset )
-            @tupling.via_node_ n
+            @structured_node_class.via_node_ n
           end
         end
       end

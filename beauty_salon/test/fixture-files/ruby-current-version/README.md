@@ -74,7 +74,7 @@ three things about targeting arbitrary (syntactic) versions of ruby:
     current scope, which is reasonable given how young this project is.
 
   - if we ever attempt such a thing, it would require a significant
-    re-architecting of our "hooks" and "tupling" architectures, something
+    re-architecting of our "hooks" and "structured node" architectures, something
     we are giving thought to currently but it is not an implementation
     priority.
 

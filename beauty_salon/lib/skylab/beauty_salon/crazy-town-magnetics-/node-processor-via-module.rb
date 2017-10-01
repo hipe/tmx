@@ -128,12 +128,12 @@ module Skylab::BeautySalon
 
       # --
 
-      def specific_tupling_or_generic_tupling_for n
+      def some_structured_node_for__ n
         cache = ( @___class_via_node_type ||= {} )
         k = n.type
         _cls = cache.fetch k do
           cls = lookup_softly k
-          cls ||= GenericTupling___
+          cls ||= GenericGrammarSymbol___
           cache[ k ] = cls
           cls
         end
@@ -157,6 +157,7 @@ module Skylab::BeautySalon
         # while #open [#022] acceptance 4
         case ref_sym
           when :send,
+            :def,
             :class,
             :module
           dereference ref_sym
@@ -343,6 +344,26 @@ module Skylab::BeautySalon
 
     # ==
 
+    class GenericGrammarSymbol___
+
+      # (for perhaps only one report.. should go away after #open [#022])
+
+      class << self
+        alias_method :via_node_, :new
+        undef_method :new
+      end  # >>
+
+      def initialize n
+        @__node = n
+      end
+
+      def to_description
+        @__node.type.id2name
+      end
+    end
+
+    # ==
+
     class GrammarSymbol
 
       class << self
@@ -507,10 +528,6 @@ module Skylab::BeautySalon
           NOTHING_
         end
 
-        def GRAMMAR_SYMBOL_IS_OLD_WAY
-          false
-        end
-
         alias_method :via_node_, :new
         undef_method :new
       end  # >>
@@ -589,121 +606,6 @@ module Skylab::BeautySalon
       attr_reader(
         :_node_,
       )
-    end
-
-    Tupling = ::Class.new  # (forward declaration)
-
-    class GenericTupling___ < Tupling
-
-      def to_description
-        @node.type.id2name
-      end
-    end
-
-    class Tupling
-
-      # NOTE - this name will change
-      # NOTE - this is the oldschool guy. subject to get rewritten fully
-
-      class << self
-
-        def GRAMMAR_SYMBOL_IS_OLD_WAY
-          true
-        end
-
-        def tap_class
-          NOTHING_
-        end
-
-        alias_method :via_node_, :new
-        undef_method :new
-      end  # >>
-
-      def initialize n
-        @node = n
-        # (can't freeze because we derive things lazily e.g #here1) :#here2
-      end
-
-      def new_by
-        mutable = self.class.allocate
-        mutable.__init_as_recorder
-        yield mutable
-        mutable.__finish_mutation_against @node
-      end
-
-      def __init_as_recorder
-        @_pending_writes_ = []
-      end
-
-      def __finish_mutation_against node
-
-        _a_a = remove_instance_variable :@_pending_writes_
-
-        shallowly_mutable_array = node.children.dup
-
-        _a_a.each do |(d, x)|  # #here3
-          shallowly_mutable_array[ d ] = x
-        end
-
-        shallowly_mutable_array.freeze
-
-        _new_properties = { location: node.location }
-
-        @node = node.updated(
-          nil,
-          shallowly_mutable_array,
-          _new_properties,
-        )
-
-        self  # not freezing because #here2
-      end
-
-      def to_code
-        # #copy-pasted to #here7
-        # (we know we want to improve this but we are locking it down)
-        Home_.lib_.unparser.unparse @node
-      end
-
-      # --
-      #   these are insane but it's OK. the first time they are called, they
-      #   ** REWRITE THE METHOD OF THE ACTUAL CLASS ** (not singleton class)
-
-      def _lazy_auto_getter_
-
-        m = caller_locations( 1, 1 )[0].base_label.intern
-
-        cmp = _component_via_symbol m
-
-        _method_body = Readers__.const_get( cmp._via_, false )[ m, cmp ]
-
-        _redefine_method _method_body, m
-
-        send m  # dogfood
-      end
-
-      def _redefine_method method_body, m
-        cls = self.class
-        cls.send :undef_method, m
-        cls.send :define_method, m, method_body
-      end
-
-      def _component_via_symbol sym
-        self.class::COMPONENTS.fetch sym
-      end
-
-      # --
-
-      def begin_lineno__
-        @node.location.first_line
-      end
-
-      def end_lineno__
-        @node.location.last_line
-      end
-
-      def node_location  # meh
-        @node.location
-      end
     end
 
     # ==
@@ -983,75 +885,6 @@ module Skylab::BeautySalon
         :appropriate_ivar,
         :method_name_for_read_initially,
       )
-    end
-
-    # ==
-
-    class Component
-
-      # NOTE - might deprecate - holdover from old way
-
-      class << self
-        alias_method :[], :new
-        undef_method :new
-      end  # >>
-
-      def initialize offset: nil, type: nil, via: nil
-        @offset = offset
-        type and @type_symbol = type
-        via and @_via_ = via
-        freeze
-      end
-
-      attr_reader(
-        :offset,
-        :type_symbol,
-        :_via_,
-      )
-    end
-
-    #
-    # Component readers and writers
-    #
-
-    Readers__ = ::Module.new
-
-    # ==
-
-    Readers__::Symbol_via_symbol = -> cmp_sym, cmp do
-
-      Memoize_into_ivar__.call cmp_sym, cmp do |offset|
-        -> do
-          sym = @node.children[ offset ]
-          ::Symbol === sym || fail
-          sym
-        end
-      end
-    end
-
-    # ==
-
-    #
-    # component readers and writers (support)
-    #
-
-    # support for component readers
-
-    # support for component writers
-
-    Memoize_into_ivar__ = -> cmp_sym, cmp, & pp do
-
-      p = pp[ cmp.offset ]
-      ivar = :"@___GENERATED_#{ cmp_sym }"
-      -> do
-        if instance_variable_defined? ivar
-          instance_variable_get ivar
-        else
-          x = instance_exec( & p )
-          instance_variable_set ivar, x  # :#here1
-          x
-        end
-      end
     end
 
     # ==

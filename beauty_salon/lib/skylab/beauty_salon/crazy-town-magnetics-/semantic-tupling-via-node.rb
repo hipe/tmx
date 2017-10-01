@@ -9,15 +9,13 @@ module Skylab::BeautySalon
     #   - Items not Constituents___
 
     class << self
-      define_method :tuplings_as_feature_branch, ( Lazy_.call do
+      define_method :structured_nodes_as_feature_branch, ( Lazy_.call do
         CrazyTownMagnetics_::NodeProcessor_via_Module[ Constituents___ ]
       end )
     end  # >>
 
     o = CrazyTownMagnetics_::NodeProcessor_via_Module
     GrammarSymbol__ = o::GrammarSymbol
-    Tupling__ = o::Tupling
-    Component__ = o::Component
 
     module Constituents___
     # below to #here1
@@ -206,6 +204,17 @@ module Skylab::BeautySalon
 
       # def (placeheld)
 
+      class Def < GrammarSymbol__
+
+        def to_description
+          "def: #{ symbol }"
+        end
+
+        children(
+          :symbol_expression_component,
+        )
+      end
+
       # defs (placeheld)
 
       # undef (placeheld)
@@ -354,24 +363,6 @@ module Skylab::BeautySalon
       # kwbegin (placeheld)
 
     end  # :#here1
-
-      class Def < Tupling__
-
-        COMPONENTS = {
-          method_name: Component__[
-            offset: 0,
-            via: :Symbol_via_symbol,
-          ],
-        }
-
-        def to_description
-          "def: #{ method_name }"
-        end
-
-        def method_name
-          _lazy_auto_getter_
-        end
-      end
 
       IRREGULAR_NAMES = nil
     end

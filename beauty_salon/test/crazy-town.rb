@@ -25,7 +25,7 @@ module Skylab::BeautySalon::TestSupport
         n = vendor_node_via_string_ s
         # (very wound-up for now)
         _magnetic = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node
-        _feature_branch = _magnetic.tuplings_as_feature_branch
+        _feature_branch = _magnetic.structured_nodes_as_feature_branch
         _class = _feature_branch.dereference n.type
         _class.via_node_ n
       end
