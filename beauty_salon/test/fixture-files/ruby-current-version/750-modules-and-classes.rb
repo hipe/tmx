@@ -2,6 +2,7 @@
 
 
 # `module` #testpoint1.35
+# while #open [#022] the above is DETATCHED
 # (as seen in (at writing) common/test/fixture-directories/five/core.rb:1)
 
 module MyModule1::MyModule2::MyModule3

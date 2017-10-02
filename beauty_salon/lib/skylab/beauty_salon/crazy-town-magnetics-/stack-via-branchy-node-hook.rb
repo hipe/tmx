@@ -18,6 +18,11 @@ module Skylab::BeautySalon
       def execute
 
         if @branchy_node_hook
+
+          @__grammar_symbol_feature_branch = Home_::CrazyTownMagnetics_::
+              SemanticTupling_via_Node.structured_nodes_as_feature_branch
+
+          @_thing_cache = {}
           @for_file = :__for_file_when_listener
         else
           @for_file = :__for_file_when_no_listener
@@ -66,10 +71,9 @@ module Skylab::BeautySalon
 
         _same_in_stack_frame do
 
-          _tup = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-            structured_nodes_as_feature_branch.some_structured_node_for__ n
+          _sn = __some_structured_node_for n
 
-          _sf = ItemStackFrame___.new @current_depth_offset, _tup
+          _sf = ItemStackFrame___.new @current_depth_offset, _sn
 
           @branchy_node_hook[ _sf ]
 
@@ -77,6 +81,16 @@ module Skylab::BeautySalon
 
           NIL
         end
+      end
+
+      def __some_structured_node_for n
+        k = n.type
+        _cls = @_thing_cache.fetch k do
+          x = @__grammar_symbol_feature_branch.some_structured_node_class_for__ k
+          @_thing_cache[ k ] = x
+          x
+        end
+        _cls.via_node_ n
       end
 
       def __in_stack_frame_when_no_listener _

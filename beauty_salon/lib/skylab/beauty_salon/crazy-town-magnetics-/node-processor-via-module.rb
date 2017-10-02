@@ -23,16 +23,15 @@ module Skylab::BeautySalon
 
         h = mod::IRREGULAR_NAMES
         if h
-          @_lookup_class_const = :__lookup_class_const_initially
+          @_unsanitized_const_for = :__unsanitized_const_complicatedly
           @_irregulars_pool = h.dup
         else
-          @_lookup_class_const = :_derive_class_const_normally
+          @_unsanitized_const_for = :_unsanitized_const_derivationally
         end
 
-        @_const_via_symbol = {}
-        @_do_index = true
+        @_const_for_existent_prepared_class_via_symbol = {}
         @_items_module = mod::Items
-        @_valid_const_via_normal_name_symbol = {}
+
         @module = mod
       end
 
@@ -128,162 +127,155 @@ module Skylab::BeautySalon
 
       # --
 
-      def some_structured_node_for__ n
-        cache = ( @___class_via_node_type ||= {} )
-        k = n.type
-        _cls = cache.fetch k do
-          cls = lookup_softly k
-          cls ||= GenericGrammarSymbol___
-          cache[ k ] = cls
-          cls
-        end
-        _cls.via_node_ n
-      end
-
-      def procure ref_sym, & listener
-        cls = lookup_softly ref_sym
-        if cls
-          cls
-        else
-          __when_not_found listener, ref_sym
+      def procure__ k, & p
+        _of k, -> c do
+          _the c
+        end, -> do
+          _load k, IDENTITY_, -> do
+            __when_not_found p, k
+          end
         end
       end
 
-      def lookup_softly ref_sym
-
-        # NOTE - when grammar is implemented through the "structured" approach
-        # comprehensively, there should be no need for soft lookup ever (right?) #todo
-
-        # while #open [#022] acceptance 4
-        case ref_sym
-          when :send,
-            :def,
-            :class,
-            :module
-          dereference ref_sym
-        else
-        c = __valid_const_via_normal_name_symbol ref_sym
-        if c
-          _dereference_via_internal_key c
-        end
+      def some_structured_node_class_for__ k  # assume client caches result
+        _of k, -> c do
+          _the c
+        end, -> do
+          _load k, IDENTITY_, -> do
+            GenericGrammarSymbol___  # while #open #[#022]
+          end
         end
       end
 
-      def dereference sym
-        _c = __class_const_via_name_symbol sym
-        cls = @_items_module.const_get _c, false  # :#here4
-        cls.tap_class  # see
-        cls
+      def has_reference_FOR_TRANSITION_ASSUME_RESULT_IS_CACHED__ k
+        _of k, MONADIC_TRUTH_, -> do
+          _load k, MONADIC_TRUTH_, EMPTY_P_
+        end
       end
 
-      def __when_not_found listener, ref_sym
+      def dereference k
+        _of k, -> c do
+          _the c
+        end, -> do
+          _load k, IDENTITY_
+        end
+      end
+
+      # --
+
+      def __when_not_found listener, k
 
         me = self
         listener.call :error, :expression, :parse_error do |y|
-          me.__levenshtein_into y, ref_sym
+          me.__levenshtein_into_under y, k, self
         end
         UNABLE_
       end
 
-      def __levenshtein_into y, ick_sym
+      def __levenshtein_into_under y, ick_sym, expag
 
-        @_do_index && __index_all
-
-        _sym_a = @_valid_const_via_normal_name_symbol.keys
-
-        _s_a = _sym_a.map { |sym| "'#{ sym }'" }
+        scn = __woot_scanner  # seee
 
         y << %(currently we don't yet have metadata for grammar symbol '#{ ick_sym }'.)
-        y << "(currently we have it for #{ Common_::Oxford_and[ _s_a ] }.)"
-      end
 
-      def __class_const_via_name_symbol sym
-        c = @_const_via_symbol[ sym ]
-        if ! c
-          c = send @_lookup_class_const, sym
-
-          # redundant with #here4, do a thing to the class only once
-          _cls = @_items_module.const_get c, false
-          _cls.__receive_constituent_construction_services_ self
-
-          @_const_via_symbol[ sym ] = c
+        expag.calculate do
+          simple_inflection do
+            _buff = oxford_join scn do |k|
+              "'#{ k }'"
+            end
+            y << "(currently we have it for #{ _buff }.)"
+          end
         end
-        c
       end
 
-      def __lookup_class_const_initially sym
+      def __woot_scanner
+
+        # (we don't want to need this elsewhere. at full realization of #open [#022]..)
+        # (it's a serious headache to try to read from the cache and deal with irregular names)
+
+        scn = Home_.lib_.zerk::No_deps[]::Scanner_via_Array.new @_items_module.constants
+        same = -> c do
+          Common_::Name.via_const_symbol( c ).as_lowercase_with_underscores_symbol
+        end
+        h = @module::IRREGULAR_NAMES
+        if h
+          inv = h.invert
+          use = -> c do
+            inv[ c ] || same[ c ]
+          end
+        else
+          use = same
+        end
+        scn.map_by do |c|
+          use[ c ]  # hi.
+        end
+      end
+
+      # --
+
+      def _of k, yes, no
+        c = @_const_for_existent_prepared_class_via_symbol[ k ]
+        if c
+          yes[ c ]
+        else
+          no[]
+        end
+      end
+
+      def _load k, recv_class, when_not_found=nil
+        c = __unsanitized_const_for k
+        finish_load = -> do
+          cls = _the c
+          cls.tap_class  # see
+          @_const_for_existent_prepared_class_via_symbol[ k ] = c  # ONLY PLACE
+          cls.__receive_constituent_construction_services_ self
+          recv_class[ cls ]
+        end
+        if when_not_found
+          if @_items_module.const_defined? c, false
+            finish_load[]
+          else
+            when_not_found[]
+          end
+        else
+          finish_load[]
+        end
+      end
+
+      def _the c
+        @_items_module.const_get c, false
+      end
+
+      # --
+
+      def __unsanitized_const_for k
+        send @_unsanitized_const_for, k
+      end
+
+      def __unsanitized_const_complicatedly sym
         c = @_irregulars_pool.delete sym
         if c
           if @_irregulars_pool.length.zero?
-            remove_instance_variable :@_irregulars_pool
-            @_lookup_class_const = :_derive_class_const_normally
+            @_irregulars_pool = nil
+            @_unsanitized_const_for = :_unsanitized_const_derivationally
           end
           c
         else
-          _derive_class_const_normally sym
+          _unsanitized_const_derivationally sym
         end
       end
 
-      def _derive_class_const_normally sym
-        Common_::Name.via_lowercase_with_underscores_symbol( sym ).
+      def _unsanitized_const_derivationally k
+        Common_::Name.via_lowercase_with_underscores_symbol( k ).
             as_camelcase_const_string.intern
       end
-
-      def __valid_const_via_normal_name_symbol ref_sym
-        c = @_valid_const_via_normal_name_symbol[ ref_sym ]
-        if c
-          c
-        else
-          __valid_const_via_lookup_and_cache ref_sym
-        end
-      end
-
-      def __valid_const_via_lookup_and_cache ref_sym
-        c_s = __internal_key_via_normal_name_symbol ref_sym
-        if @module.const_defined? c_s, false
-          c = c_s.intern
-          @_valid_const_via_normal_name_symbol[ ref_sym ] = c
-          c
-        end
-      end
-
-      def __index_all
-
-        @_do_index = false
-
-        @module.constants.each do |c|
-
-          _ref_sym = __normal_symbol_name_via_internal_key c
-
-          # any of these that we have already seen we are creating
-          # redundantly (because we don't index early). ich muss sein
-
-          @_valid_const_via_normal_name_symbol[ _ref_sym ] = c
-        end
-      end
-
-      def _dereference_via_internal_key c
-        cls = @module.const_get c, false
-        cls.tap_class
-        cls
-      end
-
-      def __internal_key_via_normal_name_symbol ref_sym
-        Common_::Name.via_variegated_symbol( ref_sym ).as_camelcase_const_string
-      end
-
-      def __normal_symbol_name_via_internal_key c
-        Common_::Name.via_const_symbol( c ).as_variegated_symbol
-      end
-
     # -
 
     # ==
 
-    class TRAVERSAL_EXPERIMENT__  # (maybe rename to "recurse")
-
-      def self.call ast, recv, gram_symbol
-
+    TRAVERSAL_EXPERIMENT___ = -> ast, recv, gram_symbol do
+      # (maybe rename to "recurse")
+      # -
         ai = gram_symbol.children_association_index
 
         cx = ast.children
@@ -335,11 +327,7 @@ module Skylab::BeautySalon
           end
         end
         NIL
-      end
-
-      class << self
-        alias_method :[], :call
-      end  # >>
+      # -
     end
 
     # ==
@@ -393,7 +381,7 @@ module Skylab::BeautySalon
         # -- read
 
         def accept_visitor_by ast, & p
-          TRAVERSAL_EXPERIMENT__[ ast, p, self ]
+          TRAVERSAL_EXPERIMENT___[ ast, p, self ]
         end
 
         # ~
@@ -606,6 +594,8 @@ module Skylab::BeautySalon
       attr_reader(
         :_node_,
       )
+
+      IS_BRANCHY = false  # experiment. [#007.G]
     end
 
     # ==
@@ -677,26 +667,30 @@ module Skylab::BeautySalon
 
         # assume has plural arity. abstract the traversal of an array of
         # real children, associated with their corresponding associations.
-        # could be efficitized, but meh
+        # could be efficientized, but meh
 
         a = [] ; TheseHooks___.new a, p
         first, mid, final = a ; a = nil
 
+        # -- the number of itmes in the 1st 3rd is equal to this one offset
+
         here = @offset_of_association_with_plural_arity
         here.times( & first )
+        cx_d = here - 1
 
-        cx_d = here
+        # -- where we stop in the middle 3rd depends on how many children
+
         num_at_end = @number_of_associations_at_the_end
-        stop_here = num_children - num_at_end - 1
+        last_offset_of_middle_run = num_children - num_at_end - 1
 
-        begin
-          mid[ cx_d ]
-          stop_here == cx_d and break
+        until last_offset_of_middle_run == cx_d
           cx_d += 1
-          redo
-        end while above
+          mid[ cx_d ]
+        end
 
-        asc_d = here
+        # -- the last 3rd iterates N times, but tell it the asc offset too
+
+        asc_d = here  # will advance immediately
         num_at_end.times do
           cx_d += 1 ; asc_d += 1
           final[ cx_d, asc_d ]
@@ -934,6 +928,8 @@ module Skylab::BeautySalon
     end
 
     # ==
+
+    MONADIC_TRUTH_ = -> _ { true }
 
     # ==
     # ==

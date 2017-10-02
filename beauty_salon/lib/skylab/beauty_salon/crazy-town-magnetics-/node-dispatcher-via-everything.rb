@@ -16,6 +16,8 @@ module Skylab::BeautySalon
     #     (typically this magic name is employed only on the methods for
     #     "branchy" nodes.)
     #
+    #     this might go away with #open [#022] structured uber alles
+    #
     #   - either there is or isn't a hook associated with this node type
     #     (either because there is a universal hook or because there is a
     #     type-based hook box). the work of determining this also can be
@@ -119,8 +121,12 @@ module Skylab::BeautySalon
 
         _my_method_name = @_cached_work_via_tuple_key.fetch compound_key do
           x = send @_work, * compound_key
-          @_seen_via_method_name[ m ] && fail  # assert uniqueness of method name. see [#doc]
-          @_seen_via_method_name[ m ] = true
+
+          if :_FOR_TRANSITION_use_remote_class != m
+            @_seen_via_method_name[ m ] && fail  # assert uniqueness of method name. see [#doc]
+            @_seen_via_method_name[ m ] = true
+          end
+
           @_cached_work_via_tuple_key[ compound_key ] = x
           x
         end
@@ -133,7 +139,9 @@ module Skylab::BeautySalon
       def __work_when_type_based_hooks m, node_type
 
         if @_hook_via_node_type[ node_type ]
-          if _is_plus_one m
+          if :_FOR_TRANSITION_use_remote_class == m
+            :__node_type_specific_hook_and_NEW_WAY
+          elsif _is_plus_one m
             :__node_type_specific_hook_and_plus_one
           else
             :__node_type_specific_hook_and_not_plus_one
@@ -145,7 +153,9 @@ module Skylab::BeautySalon
 
       def __work_when_universal_hook m, _
 
-        if _is_plus_one m
+        if :_FOR_TRANSITION_use_remote_class == m
+          :__universal_hook_and_NEW_WAY
+        elsif _is_plus_one m
           :__universal_hook_and_plus_one
         else
           :__universal_hook_and_not_plus_one
@@ -154,7 +164,9 @@ module Skylab::BeautySalon
 
       def _work_when_no_hooks_here( m, * )
 
-        if _is_plus_one m
+        if :_FOR_TRANSITION_use_remote_class == m
+          :__NEW_WAY
+        elsif _is_plus_one m
           :__plus_one
         else
           :__not_plus_one
@@ -167,6 +179,11 @@ module Skylab::BeautySalon
         two && :self_node == two.last  # see [#021.F]
       end
 
+      def __node_type_specific_hook_and_NEW_WAY n
+        @_hook_via_node_type[ n.type ][ n ]
+        [ n ]
+      end
+
       def __node_type_specific_hook_and_plus_one n
         ::Kernel._OKAY
       end
@@ -174,6 +191,11 @@ module Skylab::BeautySalon
       def __node_type_specific_hook_and_not_plus_one n
         @_hook_via_node_type[ n.type ][ n ]
         n.children
+      end
+
+      def __universal_hook_and_NEW_WAY n
+        @universal_hook[ n ]
+        [ n ]
       end
 
       def __universal_hook_and_plus_one n
@@ -184,6 +206,10 @@ module Skylab::BeautySalon
       def __universal_hook_and_not_plus_one n
         @universal_hook[ n ]  # see #here1
         n.children
+      end
+
+      def __NEW_WAY n
+        [ n ]
       end
 
       def __plus_one n

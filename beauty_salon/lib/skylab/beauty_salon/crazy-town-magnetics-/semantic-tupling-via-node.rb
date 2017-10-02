@@ -4,21 +4,15 @@ module Skylab::BeautySalon
 
     # experiment.
 
-    # NOTE remember while #open [#022] acceptance 4:
-    #   - Here___ not Constituents___
-    #   - Items not Constituents___
-
     class << self
       define_method :structured_nodes_as_feature_branch, ( Lazy_.call do
-        CrazyTownMagnetics_::NodeProcessor_via_Module[ Constituents___ ]
+        CrazyTownMagnetics_::NodeProcessor_via_Module[ Here___ ]
       end )
     end  # >>
 
     o = CrazyTownMagnetics_::NodeProcessor_via_Module
     GrammarSymbol__ = o::GrammarSymbol
 
-    module Constituents___
-    # below to #here1
     module Items
 
       #
@@ -180,6 +174,8 @@ module Skylab::BeautySalon
           :any_superclass_expression,  # TODO: group: "expression of module"
           :any_body_expression,
         )
+
+        IS_BRANCHY = true
       end
 
       # sclass (placeheld)
@@ -196,6 +192,8 @@ module Skylab::BeautySalon
           :todo_module_identifier_const,
           :any_body_expression,
         )
+
+        IS_BRANCHY = true
       end
 
       #
@@ -212,7 +210,11 @@ module Skylab::BeautySalon
 
         children(
           :symbol_expression_component,
+          :WHAT_IS_ARGS_expression,
+          :any_BODY_expression,
         )
+
+        IS_BRANCHY = true
       end
 
       # defs (placeheld)
@@ -266,11 +268,14 @@ module Skylab::BeautySalon
       # send (placeheld)
 
       class Send < GrammarSymbol__
+
         children(
-          :XXX_receiver_expression,
+          :any_XXX_receiver_expression,
           :method_name_expression_component,
           :zero_or_more_XXX_arg_expressions,
         )
+
+        IS_BRANCHY = false
       end
 
       # lambda (placeheld)
@@ -361,16 +366,16 @@ module Skylab::BeautySalon
       # begin (placeheld)
 
       # kwbegin (placeheld)
-
-    end  # :#here1
-
-      IRREGULAR_NAMES = nil
     end
 
-    Constituents___::GROUPS = {
+    GROUPS = {
       const: [
         :const,
       ],
+    }
+
+    IRREGULAR_NAMES = {
+      :defined? => :X__defined_question_mark__,
     }
 
     # ==
@@ -378,6 +383,7 @@ module Skylab::BeautySalon
     # ==
 
     COLON_COLON_ = '::'.freeze
+    Here___ = self
 
     # ==
     # ==

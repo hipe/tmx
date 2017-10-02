@@ -132,4 +132,5 @@ module Skylab::BeautySalon::TestSupport
     X_ctm_npvm_comp = ::Module.new  # const namespace for tests in this file
   end
 end
+# :#history-A.1: begin to dismantle method-based grammar representation
 # #born.

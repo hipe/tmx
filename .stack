@@ -62,7 +62,7 @@ finish other new magnet
 fix diff thing
 rename all operator branch to feature branch YIKES
 clean up that crazy hack in an isolated commit
-(N)(Q)(R)(T)
+(F)(J)(N)(O)(P)(Q)(R)(T)(Y)(Z)
 these near term applications of guy (A)->(C,D)
 ok so you want to get to getting every '.should' being converted 07-19 03:47:08 (C)->(E)
 rebase the branch with the `expect( ).to` fix (E)->(S)
@@ -79,5 +79,4 @@ general open questions of Parser lib/API (V)
 (to explode: 9 categories, one by one) (T)->(I)
 inheritence (I)->(W)
 fix components (W)->(X)
-one of each from the 9 categories (X)->(Y)
-(acceptance: four) crazy hybrid thing with injected context, write requirements in test, is POC of class-based traversal cheaply (Y)
+one of each from the 9 categories (X)

@@ -2,7 +2,6 @@ module Skylab::BeautySalon
 
   class CrazyTownMagnetics_::NodeProcessor_via_Methods  # (module name is #depencency1.1)
 
-
     # there's a lot to say about this node. [#021] grew out of this.
     # see especially [#021.B] and [#021.D].
 
@@ -15,7 +14,52 @@ module Skylab::BeautySalon
     # -
 
       def initialize o
+
+        @_structured_nodes = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.structured_nodes_as_feature_branch
+
+        @_FOR_TRANSITION_cache_one = {}
+
         @_node_dispatcher = o
+      end
+
+      YIKES___ = ::Hash.new { |h, k| h[k] = ::Hash.new { |hh,kk| hh[ kk ] = false ; true } }
+        # only while open [#022], supress redudnant message
+
+      def _FOR_TRANSITION_use_remote_class n
+
+        # #open [#007.I] we are entertaining ideas of this whole ship being
+        # run with a hand-made stack so that our call stack doesn't get so
+        # ridiculously tall: each truly branch node (that is, most of them)
+        # gets its own frame on the stack. modify the below remote method so
+        # it results in a qualified (or not) scanner of its children. this
+        # scanner in effect comprises the frame on the stack. at each child,
+        # if it is a terminal, yield it or whatever, and otherwise add *it*
+        # as a frame on the stack and so on. would be fun to benchmark the
+        # two..
+
+        cls = @_structured_nodes.dereference n.type
+
+        same = -> do
+          cls.accept_visitor_by n do |x, asc|
+            if x
+              if asc.is_component
+                if YIKES___[ n.type ][ asc.association_symbol ]
+                  $stderr.puts "(skipping #{ asc.association_symbol } of #{ n.type })"
+                end
+              else
+                _node x
+              end
+            end
+          end
+        end
+
+        if cls::IS_BRANCHY
+          _in_stack_frame n do
+            same[]
+          end
+        else
+          same[]
+        end
       end
 
       # -- boilerplate ..
@@ -35,10 +79,32 @@ module Skylab::BeautySalon
       alias_method :o, :_expect  # not sure which one we want
 
       def _node n
-
-        m = CHILDREN_OF_ENTRYPOINT___.fetch n.type
+        m = __shoopy_doopie_one n
         _a = _pre_descend m, n
         send m, * _a
+      end
+
+      def __shoopy_doopie_one n
+        @_FOR_TRANSITION_cache_one.fetch n.type do
+          k = n.type
+          x = __shoopy_doopie_decide_which_way_to_go k
+          @_FOR_TRANSITION_cache_one[ k ] = x
+          x
+        end
+      end
+
+      def __shoopy_doopie_decide_which_way_to_go k
+
+        m = CHILDREN_OF_ENTRYPOINT___.fetch k  # (note fetch not aref)
+
+        if @_structured_nodes.has_reference_FOR_TRANSITION_ASSUME_RESULT_IS_CACHED__ k
+          if m
+            $stderr.puts "MAKE THIS GUY NIL: #{ m } (in #{ __FILE__ } #{ __LINE__ }" ; exit 0
+          end
+          :_FOR_TRANSITION_use_remote_class
+        else
+          m || kristen_chenowythe
+        end
       end
 
       # what are these hashes for? [#021.D]
@@ -55,9 +121,10 @@ module Skylab::BeautySalon
         break: :__break,
         case: :__case,
         casgn: :__const_assign,
-        class: :__class,
-        const: :__const,
-        def: :__def,
+        cbase: :__cbase,
+        class: nil,
+        const: nil,
+        def: nil,
         defined?: :__defined?,
         defs: :__defs,
         dstr: :__dstr,
@@ -72,14 +139,14 @@ module Skylab::BeautySalon
         irange: :__irange,
         if: :__if,
         int: :__int,
-        ivar: :__ivar,
+        ivar: nil,
         ivasgn: :__ivasgn,
         kwbegin: :__kwbegin,
         lvar: :__lvar,
         lvasgn: :__lvasgn,
         match_with_lvasgn: :__match_with_lvasgn,
         masgn: :__masgn,
-        module: :__module,
+        module: nil,
         next: :__next,
         nil: :__nil,
         nth_ref: :__nth_ref,
@@ -91,7 +158,7 @@ module Skylab::BeautySalon
         rescue: :__rescue,
         return: :__return,
         self: :__self,
-        send: :__send,
+        send: nil,
         sclass: :__singleton_class_block,
         splat: :__splat,
         str: :__str,
@@ -110,13 +177,7 @@ module Skylab::BeautySalon
 
       # -- class, module and related
 
-      def __class const, exp_mod, body, self_node
-        o :const, const
-        _any_expression_of_module exp_mod
-        _in_stack_frame self_node do
-          _any_node body
-        end
-      end
+      # (tombstone: __class)
 
       def __singleton_class_block sc, body, self_node
         _singleton_classable sc
@@ -125,12 +186,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __module const, body, self_node  # #testpoint1.35
-        o :const, const
-        _in_stack_frame self_node do
-          _any_node body
-        end
-      end
+      # (tombstone: __module)
 
       # -- method definition and related
 
@@ -143,13 +199,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __def sym, args, body, self_node
-        _symbol sym
-        o :args, args
-        _in_stack_frame self_node do
-          _any_node body  # defs can be blank
-        end
-      end
+      # (tombstone: __def)
 
       # ~ (blocks are like procs are like method defs..)
 
@@ -281,13 +331,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __send receiver, sym, * args
-        _any_node receiver
-        _symbol sym
-        args.each do |n_|
-          _node n_
-        end
-      end
+      # (tombstone: __send)
 
       def __splat n_
         # another (TEMPORARY) "foolhardy" [#doc.G] (see)
@@ -762,17 +806,9 @@ module Skylab::BeautySalon
         _symbol sym
       end
 
-      def __ivar sym
-        _symbol sym
-      end
+      # (tombstone: __ivar)
 
       # -- special section on expression of modules
-
-      def _any_expression_of_module x
-        if x
-          __expression_of_module x
-        end
-      end
 
       def __expression_of_module n
 
@@ -780,10 +816,7 @@ module Skylab::BeautySalon
 
         case n.type
         when :const ; _node n  # can recurse back to here
-
-        when :cbase ; __dispatch_cbase n  # `< ::BasicObject`
-          # #TODO above needs reflection exposure
-
+        when :cbase ; _node n  # `< ::BasicObject`
         when :self  ; _node n  # #testpoint1.5
         when :lvar  ; _node n  # #testpoint1.27
         when :ivar  ; _node n  # #testpoint1.30
@@ -794,15 +827,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __const any_mod_exp, sym
-        _any_expression_of_module any_mod_exp
-        _symbol sym
-      end
-
-      def __dispatch_cbase n
-        _a = _pre_descend :__cbase, n
-        __cbase( * _a )
-      end
+      # (tombstone: __const)
 
       def __cbase
         NOTHING_
@@ -982,6 +1007,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.5: begin to remove methods obviated by declarative structures
 # #history-A.4: extracted longer comments, many mechanics out to own files
 # #history-A.3: converted hard-coded hook methods to "expand" nodes via method argument signature
 # #history-A.2 (can be temporary): remove last traces of 'ruby_parser'

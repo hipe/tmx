@@ -12,8 +12,12 @@ module Skylab::Slicer::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
+  if ! $PROGRAM_NAME.include? '/benchmarks/'
+    # YUCK - benchmarking has its own UI and we don't want the below to
+    # intercept the processing of the ARGV. quick & dirty workaround
   TestSupport_::Quickie.
     enhance_test_support_module_with_the_method_called_describe self
+  end
 
   # -
     Use_method___ = -> sym do
@@ -53,6 +57,7 @@ module Skylab::Slicer::TestSupport
 
   Brazen_ = Home_::Brazen_
   NIL_ = nil
+    NIL = nil  # #open [#sli-116.C]
   NOTHING_ = nil
   TS_ = self
 end

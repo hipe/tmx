@@ -86,6 +86,13 @@
 
 [#007]       ( intra-subsystem issues )
 
+       #open [#here.I]: this idea
+
+             [#here.G]: whether or not "branchiness" should be markup in the
+             grammar. that this is a const and not a method is because it's
+             20% faster.
+             (see also #this-commit message)
+
        #open [#here.F]: the fate of components. component-related concerns,
               like primitive type..
 
