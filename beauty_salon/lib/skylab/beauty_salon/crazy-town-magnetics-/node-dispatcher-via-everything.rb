@@ -16,7 +16,7 @@ module Skylab::BeautySalon
     #     (typically this magic name is employed only on the methods for
     #     "branchy" nodes.)
     #
-    #     this might go away with #open [#022] structured uber alles
+    #     this might go away with #open [#022.E2] structured uber alles
     #
     #   - either there is or isn't a hook associated with this node type
     #     (either because there is a universal hook or because there is a

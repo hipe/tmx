@@ -47,7 +47,8 @@ module Skylab::BeautySalon::TestSupport
     #   - this is a proto-fitting (opposite of retro-fitting, get it?) of
     #     components as they existed in the pre-new-way way.
     #
-    #   - the old was was was obscure, hard-to-read API
+    #   - the old way was an obscure, hard-to-read API
+    #     (if you are curious, one of the history markers is a tombstone there.)
     #
     #   - this new way aims to be an afterthought that fits in nicely
     #     with the "associations" (formal children) architecture.
@@ -57,7 +58,7 @@ module Skylab::BeautySalon::TestSupport
     #     obvious in the metadata, like stipulating that the children are
     #     primaries (like integers or symbols), or something about group
     #     associations; but before we can know what this simplification would
-    #     require, we have to finish #open [#022] melting the 4 classes.
+    #     require, we have to finish #open [#022.E2] (but actually not) melting the 4 classes.
 
     TS_[ self ]
     use :memoizer_methods

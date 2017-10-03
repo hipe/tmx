@@ -15,7 +15,8 @@ module Skylab::BeautySalon
 
       def initialize o
 
-        @_structured_nodes = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.structured_nodes_as_feature_branch
+        @_structured_nodes = Home_::CrazyTownMagnetics_::
+          SemanticTupling_via_Node.structured_nodes_as_feature_branch
 
         @_FOR_TRANSITION_cache_one = {}
 
@@ -23,7 +24,7 @@ module Skylab::BeautySalon
       end
 
       YIKES___ = ::Hash.new { |h, k| h[k] = ::Hash.new { |hh,kk| hh[ kk ] = false ; true } }
-        # only while open [#022], supress redudnant message
+        # only while open [#022.E2], supress redudnant message
 
       def _FOR_TRANSITION_use_remote_class n
 
@@ -112,14 +113,15 @@ module Skylab::BeautySalon
       CHILDREN_OF_ENTRYPOINT___ = {
         and: :__and,
         and_asgn: :__and_asgn,
-        arg: :__arg,
-        args: :__args,
+        arg: nil,
+        args: nil,
         array: :__array,
-        begin: :__begin,
+        begin: nil,
         block: :__block,
+        blockarg: nil,  # #testpoint1.40
         block_pass: :__block_pass,
         break: :__break,
-        case: :__case,
+        case: nil,
         casgn: :__const_assign,
         cbase: :__cbase,
         class: nil,
@@ -138,24 +140,29 @@ module Skylab::BeautySalon
         hash: :__hash,
         irange: :__irange,
         if: :__if,
-        int: :__int,
+        int: nil,
         ivar: nil,
-        ivasgn: :__ivasgn,
+        ivasgn: nil,
         kwbegin: :__kwbegin,
-        lvar: :__lvar,
-        lvasgn: :__lvasgn,
+        kwoptarg: :__kwoptarg,  # #testpoint1.49
+        lvar: nil,
+        lvasgn: nil,
         match_with_lvasgn: :__match_with_lvasgn,
         masgn: :__masgn,
+        mlhs: :__mlhs_this_other_form,  # #testpoint1.10
         module: nil,
         next: :__next,
-        nil: :__nil,
+        nil: nil,
         nth_ref: :__nth_ref,
         op_asgn: :__op_asgn,
+        optarg: nil,
         or: :__or,
         or_asgn: :__or_asgn,
+        procarg0: :__procarg0,
         redo: :__redo,
         regexp: :__regexp,
         rescue: :__rescue,
+        restarg: :__restarg,
         return: :__return,
         self: :__self,
         send: nil,
@@ -165,7 +172,7 @@ module Skylab::BeautySalon
         super: :__super,
         sym: :__sym,
         true: :__true,
-        # when:  see #here1
+        when: nil,
         until: :__until,
         until_post: :__until_post,
         while: :__while,
@@ -231,43 +238,16 @@ module Skylab::BeautySalon
         NOTHING_
       end
 
-      # ~
+      # (tombstone: __args)
 
-      def __args * arg_arg_arg
-        arg_arg_arg.each do |n|
-          m = CHILDREN_OF_ARGS___.fetch n.type
-          _a = _pre_descend m, n
-          send m, * _a
-        end
-      end
-
-      CHILDREN_OF_ARGS___ = {
-        arg:      :__arg_as_child_of_args,
-        blockarg: :__blockarg,  # #testpoint1.40
-        procarg0: :__procarg0,
-        optarg:   :__optarg,  # #testpoint1.41
-        restarg:  :__restarg,
-        kwoptarg: :__kwoptarg,  # #testpoint1.49
-        mlhs:     :__mlhs_this_other_form,  # #testpoint1.10
-      }
-
-      def __arg_as_child_of_args sym
-        _symbol sym
-      end
-
-      def __arg sym
-        _symbol sym
-      end
+      # (tombstone: __arg)
 
       def __kwoptarg sym, default_value
         _symbol sym
         _node default_value
       end
 
-      def __optarg sym, default_value
-        _symbol sym
-        _node default_value
-      end
+      # (tombstone: __optarg)
 
       def __restarg * zero_or_one
         # neato - has no name if it's .. with no name
@@ -294,9 +274,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __blockarg sym  # #testpoint1.40 (again)
-        _symbol sym
-      end
+      # (tombstone: __blockarg)
 
       # -- language features that look like method calls
 
@@ -415,11 +393,7 @@ module Skylab::BeautySalon
 
       # -- control flow
 
-      def __begin *zero_or_more
-        zero_or_more.each do |n_|
-          _node n_
-        end
-      end
+      # (tombstone: __begin)
 
       def __kwbegin * zero_or_one_or_two
 
@@ -570,67 +544,11 @@ module Skylab::BeautySalon
 
         # the no-args form is seen everywhere, for example:
         # (as seen in (at writing) human/lib/skylab/human/summarization.rb:24)
-
       end
 
-      def __case scrutinized, *one_or_more_whens, any_else_node
+      # (tombstone: __when)
 
-        # syntax sidebar: case statements are fun
-
-        # we do some "by hand" parsing of these because of the relatively
-        # particular structure of `case` (switch) expressions when compared
-        # to other language features:
-
-        # the first component is an expression for the value under scrutiny
-        # (superficially like the same slot in `if` but not really).
-
-        # jumping to the end of the feature for a moment, the last component
-        # is the `else` expression.  NOTE if an `else` clause isn't present
-        # in the feature instance, this value is `nil`; i.e this "slot"
-        # always exists whether or not it has anything in it (necessarily).
-
-        # the remaining (at least one) components (offsets 1 thru N-2) are `when`
-        # features. these are represented in the tree as formal `when`
-        # instances proper; but since such features should only ever occur
-        # in `switch` expressions, we don't want them in our general lookup
-        # table so we assert for them "by hand" here.
-
-        # satisfyingly, it appears to be syntactically impossible to have
-        # a `case` expression without at least one `when` component.
-
-        # for arbitrary grammars this context-sensitive situation should
-        # occur with arbitrary frequency, and so we would want to improve
-        # our "after parsing" library so this feels less like such a one-
-        # off; but with the target language this situation appears to be
-        # limited to this language feature? some other keywords that have
-        # particular context senstivity: `return`, `break`, `next`, `redo`, `rescue`, `super` ..
-        # but note some of these contextualities aren't implemented lexically
-        # but rather at runtime
-
-        _node scrutinized
-
-        one_or_more_whens.length.zero? && oops
-
-        one_or_more_whens.each do |n_|
-          send CHILDREN_OF_CASE___.fetch( n_.type ), n_
-        end
-
-        _any_node any_else_node
-      end
-
-      CHILDREN_OF_CASE___ = {
-        when: :__when,  # :#here1
-      }
-
-      def __when n_
-        a = n_.children
-        len = a.length
-        1 < len || interesting
-        0.upto( len - 2 ) do |d|
-          _node a[d]  # if the scrutnized value is `===` this..
-        end
-        _any_node a.last  # do this (maybe do nothing)
-      end
+      # (tombstone: __case)
 
       def __if condition, if_trueish_do_this, else_do_this
 
@@ -774,10 +692,7 @@ module Skylab::BeautySalon
         _node rhs
       end
 
-      def __ivasgn sym, rhs
-        _symbol sym
-        _node rhs
-      end
+      # (tombstone: __ivasgn)
 
       def __short_ivasgn sym
         _symbol sym
@@ -787,16 +702,11 @@ module Skylab::BeautySalon
         _symbol sym
       end
 
-      def __lvasgn sym, rhs
-        _symbol sym
-        _node rhs
-      end
+      # (tombstone: __lvasgn)
 
       # ~
 
-      def __lvar sym
-        _symbol sym
-      end
+      # (tombstone: __lvar)
 
       def __gvar sym  # #testpoint1.44
 
@@ -928,9 +838,7 @@ module Skylab::BeautySalon
         ::Float === f || interesting
       end
 
-      def __int d
-        _integer d
-      end
+      # (tombstone: __int)
 
       def _singleton_classable n
 
@@ -970,9 +878,7 @@ module Skylab::BeautySalon
         NOTHING_
       end
 
-      def __nil
-        NOTHING_
-      end
+      # (tombstone: __nil)
 
       # -- "type" assertion *of* terminal components
 

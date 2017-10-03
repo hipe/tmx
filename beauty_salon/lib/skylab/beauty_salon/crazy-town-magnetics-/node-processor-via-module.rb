@@ -9,9 +9,6 @@ module Skylab::BeautySalon
     #   - superficially simliar to [#ze-051.2] but it's simple enough we
     #     might as well re-write it. (we don't take an index-first approach
     #     here.)
-    #
-    #   - NOTE we are grafting "new way" into "old way" .. maybe do the
-    #     coverage thing while #open [#022]
 
     class << self
       alias_method :[], :new
@@ -48,14 +45,18 @@ module Skylab::BeautySalon
            (?<one_or_more> one_or_more_ )
           )?
 
+          (?:
           (?<stem>  .+   )
           _
+          )?
 
           (?<probablistic_group>
             (?!component)
             [a-z]*[a-rt-z]
           )
-          s?
+
+          (?<s>s)?
+
           (?<component>
             _component
           )?
@@ -71,9 +72,16 @@ module Skylab::BeautySalon
           has_plural_arity = true
         end
 
+        pgroup_s = md[ :probablistic_group ]
+        if ! has_plural_arity && md.offset( :s ).first
+          # if the group name "looks plural" but the association isn't
+          # plural, leave it alone (yes we might use a scanner instead)
+          pgroup_s << md[ :s ]
+        end
+        pgroup = pgroup_s.intern
+
         is_any = md.offset( :any ).first
         is_component = md.offset( :component ).first
-        pgroup = md[ :probablistic_group ].intern
 
         # -- use the lvars
 
@@ -142,7 +150,7 @@ module Skylab::BeautySalon
           _the c
         end, -> do
           _load k, IDENTITY_, -> do
-            GenericGrammarSymbol___  # while #open #[#022]
+            GenericGrammarSymbol___  # after #open #[#022.E2] we shouldn't need these
           end
         end
       end
@@ -190,7 +198,7 @@ module Skylab::BeautySalon
 
       def __woot_scanner
 
-        # (we don't want to need this elsewhere. at full realization of #open [#022]..)
+        # (we don't want to need this elsewhere. at full realization of #open [#022.E2]..)
         # (it's a serious headache to try to read from the cache and deal with irregular names)
 
         scn = Home_.lib_.zerk::No_deps[]::Scanner_via_Array.new @_items_module.constants
@@ -334,7 +342,7 @@ module Skylab::BeautySalon
 
     class GenericGrammarSymbol___
 
-      # (for perhaps only one report.. should go away after #open [#022])
+      # (for perhaps only one report.. should go away after #open [#022.E2])
 
       class << self
         alias_method :via_node_, :new

@@ -6,13 +6,14 @@
   - (reserved for the blurb after the new intro [#here.s2])
   - the list of features [#here.s3]
   - "components" (special associations) (in a test file) [#here.4]
+  - #open track places where inheritence yadda [#here.E]
 
 
 
 
 ## declarative (structural) grammar reflection :[#here.A]
 
-NOTE (EDIT) once #open [#022] is closed, the wording here should be
+NOTE (EDIT) once #open [#022.E2] is closed, the wording here should be
 worded to reflect the fact that this complements (or maybe will replace!
 gulp) the work at that one main file.
 
@@ -36,7 +37,7 @@ this is our own (second of two) take on it with the following:
 
 synopsis: generally this is a generic AST processor that wraps
 *certain* grammar symbol instances
-(EDIT: while open [#022])
+(EDIT: after #open [#022.E2] this should read "all" grammar symbol instances)
 into our "structured node" structures
 that makes accessing certain properties easier through derived getters.
 
@@ -109,3 +110,20 @@ in the referenced remote documentation.
     `redefine_constituents`, or simly assert no re-defintion.) (I)
 
   - feature: "components", as described in [#here.4]  (in a test file)
+
+
+
+
+## "components" (special associations) (in a test file) [#here.4]
+
+
+
+
+# #open track places where inheritence yadda [#here.E]
+
+for now, this tag tracks places where we thing the declared structured
+grammar reppresentation could be aided by inheritence, but no such facility
+is yet covered, supported or implemented. this gathering, then, should serve
+as an aide to gathering requirements to that end, and then refactor all
+referrents, and erase this clause or re-write it to describe the expressive
+feature.

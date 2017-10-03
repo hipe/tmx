@@ -14,17 +14,17 @@ module Skylab::BeautySalon::TestSupport
 
       it 'says no' do
         _hi = _lines.first
-        _hi == 'unrecognized grammar symbol "klass".' || fail
+        _hi == 'unrecognized grammar symbol "kwoptarggo".' || fail
       end
 
       it 'offers suggestions' do
         _hi = _lines.last
-        _hi == %q(did you mean 'class', 'sclass', 'case', 'cbase', 'hash' or 'mlhs'?) || fail
+        _hi == %q(did you mean 'kwoptarg' or 'optarg'?) || fail
       end
 
       shared_subject :_lines do
         _lines_of_parse_failure_by_call_subject_magnetic_by do |o|
-          o.code_selector_string = %q{klass(aa=='bb')}
+          o.code_selector_string = %q{kwoptarggo(aa=='bb')}
         end
       end
     end

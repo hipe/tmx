@@ -64,7 +64,7 @@ module Skylab::BeautySalon::TestSupport
 
         _cls = build_subclass_with_these_children_( :XX3,
           :one_or_more_wazoogle_expressions,
-          :wazingle_expressions,
+          :wazingle_expression,
         )
         build_subject_branch_ _cls, :MisraTopeka, :ThisOtherGuy
       end

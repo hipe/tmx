@@ -36,10 +36,13 @@
              ( #was: ween off of [br]  (this is for tracking related todo's) )
              ( #was: #moved-to: [sa] )
 
-[#022] #open #crazy-town get structural, imperative-based declarations in
+[#022]       mainly, this is to track the document about declared, structural
+             grammar symbols. but also:
+
+       #open [#here.E2] get structural, imperative-based declarations in
              that one file to *complement* (not redund) with the main file.
-             we're saving this to wait until after proof-of-concept rewrite
-             the bad way with 'parser' first before we wreck everything..
+
+       #open [#here.E] tracks future places to refactor-in (see document)
 
        #also: this identifier now tracks the relevant node
 

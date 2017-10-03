@@ -26,6 +26,8 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    # (covering accessign an ivar is done over at #testpoint2.5 expressions grouping)
+
     # --
 
     def _left_shark
@@ -36,4 +38,5 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
+# :#testpoint2.3
 # #born.

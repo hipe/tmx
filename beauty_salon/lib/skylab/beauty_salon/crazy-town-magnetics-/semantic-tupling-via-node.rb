@@ -23,6 +23,11 @@ module Skylab::BeautySalon
 
       # nil (placeheld)
 
+      class Nil < GrammarSymbol__  # #open #[022.E]
+        children(
+        )
+      end
+
       # true (placeheld)
 
       # false (placeheld)
@@ -30,6 +35,12 @@ module Skylab::BeautySalon
       # Numerics
 
       # integer (placeheld)
+
+      class Int < GrammarSymbol__
+        children(
+          :as_integer_expression_component,
+        )
+      end
 
       # float (placeheld)
 
@@ -110,6 +121,14 @@ module Skylab::BeautySalon
 
       # nth_ref (placeheld)
 
+      # lvar (placeheld)
+
+      class Lvar < GrammarSymbol__
+        children(
+          :symbol_expression_component,
+        )
+      end
+
       # const (placeheld)
 
       class Const < GrammarSymbol__
@@ -141,11 +160,25 @@ module Skylab::BeautySalon
 
       # ivasgn (placeheld)
 
+      class Ivasgn < GrammarSymbol__
+        children(
+          :ivar_as_symbol_expression_component,
+          :right_hand_side_expression,
+        )
+      end
+
       # gvasgn (placeheld)
 
       # casgn (placeheld)
 
       # lvasgn (placeheld)
+
+      class Lvasgn < GrammarSymbol__  # #open [#022.E]
+        children(
+          :lvar_as_symbol_expression_component,
+          :right_hand_side_expression,
+        )
+      end
 
       # and_asgn (placeheld)
 
@@ -210,7 +243,7 @@ module Skylab::BeautySalon
 
         children(
           :symbol_expression_component,
-          :WHAT_IS_ARGS_expression,
+          :args,
           :any_BODY_expression,
         )
 
@@ -229,9 +262,29 @@ module Skylab::BeautySalon
 
       # args (placeheld)
 
+      class Args < GrammarSymbol__
+        children(
+          :zero_or_more_argfellows,
+        )
+      end
+
       # arg (placeheld)
 
+      class Arg < GrammarSymbol__
+        children(
+          :as_symbol_expression_component,  # trying different name
+        )
+      end
+
       # optarg (placeheld)
+
+      class Optarg < GrammarSymbol__  # #testpoint1.41
+
+        children(
+          :as_symbol_expression_component,
+          :default_value_expression,
+        )
+      end
 
       # restarg (placeheld)
 
@@ -244,6 +297,12 @@ module Skylab::BeautySalon
       # shadowarg (placeheld)
 
       # blockarg (placeheld)
+
+      class Blockarg < GrammarSymbol__  # #open [#022.E] looks like Arg. #testpoint1.40
+        children(
+          :as_symbol_expression_component,
+        )
+      end
 
       # procarg0 (placeheld)
 
@@ -308,7 +367,37 @@ module Skylab::BeautySalon
 
       # when (placeheld)
 
+      class When < GrammarSymbol__
+
+        children(
+          :one_or_more_matchable_expressions,
+          :any_consequence_expression,
+        )
+      end
+
       # case (placeheld)
+
+      class Case < GrammarSymbol__
+
+        # the history of this symbol is of particular significance. its
+        # method-based predecessor had a giant comment blurb (commemorated
+        # under #history-A.3) explaining the peculiar grammatical
+        # characteristics of the AST for case expressions (EXPR when+ EXPR?).
+        #
+        # its code was considerably more lines and considerably less readable.
+        # that this is now served so succinctly by the component grammar is
+        # no coincidence: we had exactly this challenging (er) case in mind
+        # when we designed it. element-by-element you can read the archived
+        # comment and see descriptions that foretold its features.
+        #
+        # (specifically, "one or more", "any-ness", groups.)
+
+        children(
+          :scrutinized_expression,
+          :one_or_more_whens,
+          :any_else_expression,
+        )
+      end
 
       # Loops
 
@@ -363,14 +452,36 @@ module Skylab::BeautySalon
       # Expression grouping
       #
 
+      class Begin < GrammarSymbol__
+
+        children(
+          :zero_or_more_expressions,
+        )
+      end
+
       # begin (placeheld)
 
       # kwbegin (placeheld)
     end
 
     GROUPS = {
+      argfellow: [
+        :arg,
+        :blockarg,
+        :kwoptarg,
+        :mlhs,
+        :optarg,
+        :procarg0,
+        :restarg,
+      ],
+      args: [
+        :args,
+      ],
       const: [
         :const,
+      ],
+      when: [
+        :when,
       ],
     }
 
@@ -389,6 +500,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# :#history-A.3: as referenced
 # #pending-rename: "structured node" or similar
 # #history-A.2: move oldschool support out so it's just constituents
 # #history-A.1: inject comment placeholder for every grammar symbol saw visually

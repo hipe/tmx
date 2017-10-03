@@ -62,6 +62,7 @@ module Skylab::BeautySalon::TestSupport
           send
           str
           sym
+          when
         ).each do |sym|
           features_seen.delete( sym ) or fail "feature not seen: '#{ sym }'"
         end
