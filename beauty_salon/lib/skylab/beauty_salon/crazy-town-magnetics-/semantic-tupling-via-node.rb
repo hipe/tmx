@@ -38,7 +38,7 @@ module Skylab::BeautySalon
 
       class Int < GrammarSymbol__
         children(
-          :as_integer_expression_component,
+          :as_integer_integer_terminal,
         )
       end
 
@@ -109,7 +109,7 @@ module Skylab::BeautySalon
 
       class Ivar < GrammarSymbol__
         children(
-          :symbol_expression_component,
+          :symbol_terminal,
         )
       end
 
@@ -125,7 +125,7 @@ module Skylab::BeautySalon
 
       class Lvar < GrammarSymbol__
         children(
-          :symbol_expression_component,
+          :symbol_terminal,
         )
       end
 
@@ -146,7 +146,7 @@ module Skylab::BeautySalon
 
         children(
           :any_parent_const_expression,
-          :symbol_expression_component,
+          :symbol_symbol_terminal,
         )
       end
 
@@ -162,7 +162,7 @@ module Skylab::BeautySalon
 
       class Ivasgn < GrammarSymbol__
         children(
-          :ivar_as_symbol_expression_component,
+          :ivar_as_symbol_symbol_terminal,
           :right_hand_side_expression,
         )
       end
@@ -175,7 +175,7 @@ module Skylab::BeautySalon
 
       class Lvasgn < GrammarSymbol__  # #open [#022.E]
         children(
-          :lvar_as_symbol_expression_component,
+          :lvar_as_symbol_symbol_terminal,
           :right_hand_side_expression,
         )
       end
@@ -242,7 +242,7 @@ module Skylab::BeautySalon
         end
 
         children(
-          :symbol_expression_component,
+          :symbol_terminal,
           :args,
           :any_BODY_expression,
         )
@@ -272,7 +272,7 @@ module Skylab::BeautySalon
 
       class Arg < GrammarSymbol__
         children(
-          :as_symbol_expression_component,  # trying different name
+          :as_symbol_symbol_terminal,  # trying different name
         )
       end
 
@@ -281,7 +281,7 @@ module Skylab::BeautySalon
       class Optarg < GrammarSymbol__  # #testpoint1.41
 
         children(
-          :as_symbol_expression_component,
+          :as_symbol_symbol_terminal,
           :default_value_expression,
         )
       end
@@ -300,7 +300,7 @@ module Skylab::BeautySalon
 
       class Blockarg < GrammarSymbol__  # #open [#022.E] looks like Arg. #testpoint1.40
         children(
-          :as_symbol_expression_component,
+          :as_symbol_symbol_terminal,
         )
       end
 
@@ -330,7 +330,7 @@ module Skylab::BeautySalon
 
         children(
           :any_XXX_receiver_expression,
-          :method_name_expression_component,
+          :method_name_symbol_terminal,
           :zero_or_more_XXX_arg_expressions,
         )
 

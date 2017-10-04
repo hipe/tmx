@@ -23,9 +23,6 @@ module Skylab::BeautySalon
         @_node_dispatcher = o
       end
 
-      YIKES___ = ::Hash.new { |h, k| h[k] = ::Hash.new { |hh,kk| hh[ kk ] = false ; true } }
-        # only while open [#022.E2], supress redudnant message
-
       def _FOR_TRANSITION_use_remote_class n
 
         # #open [#007.I] we are entertaining ideas of this whole ship being
@@ -43,10 +40,8 @@ module Skylab::BeautySalon
         same = -> do
           cls.accept_visitor_by n do |x, asc|
             if x
-              if asc.is_component
-                if YIKES___[ n.type ][ asc.association_symbol ]
-                  $stderr.puts "(skipping #{ asc.association_symbol } of #{ n.type })"
-                end
+              if asc.is_terminal
+                asc.hacky_type_check_when_trueish_ x
               else
                 _node x
               end

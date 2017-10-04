@@ -77,5 +77,4 @@ answer the question: what is the rel. between `def x_map` and the list of nodes?
 location map - this is the key (M)->(V)
 general open questions of Parser lib/API (V)
 (to explode: 9 categories, one by one) (T)->(I)
-inheritence (I)->(W)
-fix components (W)
+inheritence (I)

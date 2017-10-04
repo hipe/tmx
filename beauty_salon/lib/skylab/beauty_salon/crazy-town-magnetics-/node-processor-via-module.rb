@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::BeautySalon
 
   class CrazyTownMagnetics_::NodeProcessor_via_Module
@@ -34,7 +36,7 @@ module Skylab::BeautySalon
 
       # -- grammar symbol services
 
-      def __child_association_via_symbol_and_offset_ sym, d
+      def __child_association_via_symbol_and_offset_ sym, d  # #testpoint
 
         # NOTE - the below might become procedurally generated or etc. ("RX")
         md = /\A
@@ -45,25 +47,10 @@ module Skylab::BeautySalon
            (?<one_or_more> one_or_more_ )
           )?
 
-          (?:
-          (?<stem>  .+   )
-          _
-          )?
-
-          (?<probablistic_group>
-            (?!component)
-            [a-z]*[a-rt-z]
-          )
-
-          (?<s>s)?
-
-          (?<component>
-            _component
-          )?
+          (?<rest> .+ )
         \z/x.match sym
-        md || fail
 
-        # -- lvars not matchdata (for some) just for readability
+        # -- first, depluralize (and finish using the matchdata)
 
         if md.offset( :zero_or_more ).first
           has_expectation_of_zero_or_more = true
@@ -72,16 +59,33 @@ module Skylab::BeautySalon
           has_plural_arity = true
         end
 
-        pgroup_s = md[ :probablistic_group ]
-        if ! has_plural_arity && md.offset( :s ).first
-          # if the group name "looks plural" but the association isn't
-          # plural, leave it alone (yes we might use a scanner instead)
-          pgroup_s << md[ :s ]
-        end
-        pgroup = pgroup_s.intern
-
+        s_a = md[ :rest ].split UNDERSCORE_
         is_any = md.offset( :any ).first
-        is_component = md.offset( :component ).first
+        md = nil
+
+        if has_plural_arity && /s\z/ =~ s_a.last
+
+          # if the remainder string "looks plural" here what you really
+          # mean is the singular form but YIKES will break for some inflections..
+
+          s_a.last[ $~.offset( 0 ).first, 1 ] = EMPTY_S_
+        end
+
+        # -- then decice if NT or T
+
+        if s_a.fetch( -1 ) == 'terminal'
+          is_terminal = true
+          s_a.pop
+          terminal_type_sym = s_a.pop.intern
+          stem = if s_a.length.zero?
+            terminal_type_sym
+          else
+            s_a.join( UNDERSCORE_ ).intern
+          end
+        else
+          group = s_a.last.intern
+          s_a = nil  # nonterminals only use their full association name
+        end
 
         # -- use the lvars
 
@@ -90,23 +94,27 @@ module Skylab::BeautySalon
           o.offset = d
         end
 
-        if is_component
+        if is_terminal
 
-          # #open #here6
-          has_plural_arity && readme
-          is_any && readme
-          :expression == pgroup || readme
+          if has_plural_arity
+            raise MyException__.new :terminals_cannot_currently_be_plural_for_lack_of_need
+          end
 
-          ComponentAssociation___.define do |o|
-            o.stem_symbol = md[ :stem ].intern
+          if is_any
+            raise MyException__.new :we_have_never_needed_terminals_to_have_the_ANY_modifier
+          end
+
+          TerminalAssociation___.define do |o|
+            o.stem_symbol = stem
+            o.type_symbol = terminal_type_sym
             same[ o ]
           end
         else
           StructuredChildAssociation___.define do |o|
             # (which ivars are set show a "feature bias")
-            if :expression != pgroup
-              o.group_symbol = pgroup
-              o.group_information = __group_etc pgroup
+            if :expression != group
+              o.group_symbol = group
+              o.group_information = __group_etc group
             end
             if has_plural_arity
               o.has_plural_arity = true
@@ -122,13 +130,13 @@ module Skylab::BeautySalon
         end
       end
 
-      def __group_etc pgroup
+      def __group_etc group
         cache = ( @___groups_cache ||= {} )
-        cache.fetch pgroup do
+        cache.fetch group do
           _h = @module.const_get :GROUPS, false
-          _a = _h.fetch pgroup  # ..
+          _a = _h.fetch group  # ..
           x = ::Hash[ _a.map { |sym| [ sym, true ] } ].freeze
-          cache[ pgroup ] = x
+          cache[ group ] = x
           x
         end
       end
@@ -418,7 +426,7 @@ module Skylab::BeautySalon
         def __component_index_initially
           @_component_index = :__component_index
           ai = children_association_index
-          if ! ai.has_components
+          if ! ai.has_writable_terminals
             self._COVER_ME__meh_no_components_meh__
           end
           @__component_index = ComponentIndex_via_AssociationIndex___[ ai ]
@@ -454,18 +462,18 @@ module Skylab::BeautySalon
           end
 
           a = []
-          has_components = false
+          has_writable_terminals = false
 
           _sym_a.each_with_index do |sym, d|
 
             asc = svcs.__child_association_via_symbol_and_offset_ sym, d
 
-            if asc.is_component
+            if asc.is_terminal
 
               if asc.has_plural_arity
                 self._COVER_ME__cant_be_both_component_and_have_plural_arity__
               end
-              has_components = true
+              has_writable_terminals = true
 
             elsif asc.has_plural_arity
               once[ d ]
@@ -476,7 +484,7 @@ module Skylab::BeautySalon
 
           # (we can't write methods until we know if there's a plural)
 
-          ai = ChildAssociationIndex___.new index_of_plural, has_components, a.freeze
+          ai = ChildAssociationIndex___.new index_of_plural, has_writable_terminals, a.freeze
 
           if index_of_plural
 
@@ -619,7 +627,7 @@ module Skylab::BeautySalon
 
           o.first_third do |d|
             asc = ascs.fetch d
-            if asc.is_component
+            if asc.is_terminal
               hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d
             end
           end
@@ -631,7 +639,7 @@ module Skylab::BeautySalon
           neg = - num_assocs
           o.final_third do |d|
             asc = ascs.fetch d
-            if asc.is_component
+            if asc.is_terminal
               hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d + neg
             end
           end
@@ -645,7 +653,7 @@ module Skylab::BeautySalon
 
     class ChildAssociationIndex___
 
-      def initialize d, has_components, a
+      def initialize d, has_writable_terminals, a
         len = a.length
         if d
           if a.fetch( d ).has_expectation_of_zero_or_more
@@ -661,8 +669,8 @@ module Skylab::BeautySalon
           max = len
         end
 
-        if has_components
-          @has_components = true
+        if has_writable_terminals
+          @has_writable_terminals = true
         end
 
         @minimum_number_of_children = min
@@ -708,8 +716,8 @@ module Skylab::BeautySalon
 
       attr_reader(
         :associations,
-        :has_components,
         :has_plural_arity_as_index,
+        :has_writable_terminals,
         :minimum_number_of_children,
         :maximum_number_of_children,
         :number_of_associations_at_the_end,
@@ -734,10 +742,7 @@ module Skylab::BeautySalon
 
     CommonChildAssociation__ = ::Class.new Common_::SimpleModel
 
-    class ComponentAssociation___ < CommonChildAssociation__
-
-      # #open :#here6: from the inside and outside, this is undergoing an
-      # "emergent design" incubation period. for one thing it needs a name change
+    class TerminalAssociation___ < CommonChildAssociation__
 
       def initialize
         yield self
@@ -746,6 +751,7 @@ module Skylab::BeautySalon
 
       attr_accessor(
         :stem_symbol,
+        :type_symbol,
       )
 
       def _write_methods_for_non_plural_ cls, hard_offset
@@ -758,21 +764,36 @@ module Skylab::BeautySalon
         end
       end
 
-      def _SYMBOL_FOR_MEMBERS_
-        @stem_symbol
+      # ~ ( #open [#007.F]
+      # having a hard-coded set of available terminal types is kinda awful
+      # but A) we're just trying to make it up the run for now and B) we
+      # want to let this incubate a bit as we soak out into the grammar.
+
+      def hacky_type_check__ x
+        if x
+          hacky_type_check_when_trueish_ x
+        end
       end
 
-      def type_symbol
-        # here is a key point of #open [#007.F] - see how we would like this
-        # to be declared instead of us just assuming it here:
-        :symbol
+      def hacky_type_check_when_trueish_ x
+        case @type_symbol
+        when :symbol ; ::Symbol === x || self._COVER_ME__type_mismatch__
+        when :integer ; ::Integer === x || self._COVER_ME__type_mismatch__
+        else ; self._COVER_ME__its_reasonable_to_want_more_types_here__
+        end
+      end
+
+      # ~ )
+
+      def _SYMBOL_FOR_MEMBERS_
+        @stem_symbol
       end
 
       def group_information
         NOTHING_
       end
 
-      def is_component
+      def is_terminal
         true
       end
 
@@ -837,7 +858,7 @@ module Skylab::BeautySalon
         :method_name_for_read_subsequently,
       )
 
-      def is_component
+      def is_terminal
         false
       end
     end

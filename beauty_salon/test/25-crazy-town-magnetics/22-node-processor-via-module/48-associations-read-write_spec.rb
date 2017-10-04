@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - read and write components', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - read and write terminals', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
@@ -16,7 +16,7 @@ module Skylab::BeautySalon::TestSupport
       _first_recursion || fail
     end
 
-    context 'the second child - read a COMPONENT. use just the stem name' do
+    context 'the second child - read the terminal. uses just the stem name' do
 
       it 'works' do
         _second_child || fail
@@ -54,13 +54,13 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'write a new primitive value (formerly called "component")' do
+    context 'write a new primitive value to the terminal' do
 
       it 'new guy is produced' do
         _new_guy || fail
       end
 
-      it 'the new guy has the new primitive component' do
+      it 'the new guy has the new primitive value (accessed with stem name)' do
         _new_guy.methodo_nameo == :zing_zang || fail
       end
 
@@ -103,12 +103,12 @@ module Skylab::BeautySalon::TestSupport
 
       _cls = build_subclass_with_these_children_( :XX1,
         :receiverosa_expression,
-        :methodo_nameo_expression_component,
+        :methodo_nameo_symbol_terminal,
         :zero_or_more_argumentoso_expressions,
       )
 
       _cls2 = build_subclass_with_these_children_( :XX2,
-        :valuu_expression_component,  # TODO - x
+        :valuu_TYPENOTCOVERED2_terminal,
       )
 
       build_subject_branch_(

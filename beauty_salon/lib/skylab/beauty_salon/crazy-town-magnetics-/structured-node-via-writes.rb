@@ -117,7 +117,7 @@ module Skylab::BeautySalon
           current_real_offset += 1
           if any_pair
             x, = any_pair  # (second value is asc)
-            if asc.is_component
+            if asc.is_terminal
               new_children_array.push x
             else
               ::Kernel._COVER_ME__be_sure_this_is_a_structured_child__
@@ -221,9 +221,9 @@ module Skylab::BeautySalon
         these = __associations
         cls.class_exec do
           these.each do |asc|
-            if asc.is_component
+            if asc.is_terminal  # (NOTE all terminals are writable for now)
               define_method :"#{ asc.stem_symbol }=" do |x|
-                __receive_component_write x, asc
+                __receive_terminal_write x, asc
               end
             elsif asc.has_plural_arity
               define_method asc.association_symbol do
@@ -282,11 +282,9 @@ module Skylab::BeautySalon
         ::Kernel._COVER_ME__write_a_structured_child__
       end
 
-      def __receive_component_write x, asc
-        _same_receive x, asc
-      end
+      def __receive_terminal_write x, asc
 
-      def _same_receive x, asc
+        asc.hacky_type_check__ x
 
         h = @_data_for_write_via_association_symbol
         k = asc.association_symbol

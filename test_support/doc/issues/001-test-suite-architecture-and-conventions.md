@@ -1,25 +1,55 @@
 # test suite architecture and conventions :[#001]
 
-## synopsis & overview
+## overview through justification
 
-tests are architected into a file tree that confers a "regression friendly"
-order; an order that must be expressed solely by the use of leading integers
-in the filesystem node's entry name.
+when it comes to structuring our test suites, we have taken to following
+the following convention almost universally.
 
 (this convention is optional; but as a practical matter we always follow
 it for new tests because there is good reason to do so and no good reason
 not to.)
 
-(test suites must NEVER assume their cases will be run in a particular
+we call it "regression friendly order". the idea is that simpler things
+should generally be tested first, before testing the more complicated
+things that may depend on the simpler things.
+
+a "regression friendly order" can also have value in the reverse: to run
+tests in this order (with the more complex, integration-y tests first)
+can generally make you more likely to detect failures in your system
+earlier (depending, of course, on lots of factors).
+
+it bears mentioning now that test suites must NEVER *assume* that their
+test cases will be run in a particular
 order with respect to each other. i.e a passing test suite must still pass
 with its test cases run in any random order. "regression friendliness" is
 merely a developmental nicety that is intended to help troubleshoot things
-more smoothly when something goes wrong.)
+more smoothly when something goes wrong.
 
-this is to say, a priori knowledge of any (test or application) framework
+
+
+
+## the buy-in cost (and other sub-conventions implementation details)
+
+implemention wise, the convention is deceptively simple: we generally name
+*all* our test files and *all* of our test directories (those directories
+under the directory called "test" or equivalent, that have tests in them)
+with a two- or three-digit number (being padded with leading zeros for
+visual aesthetics). yes, it can look a bit visually weird (if not ugly) to
+the uninitiated eye.
+
+(how a filesystem tree is flattened into an ordered list of filesystem
+paths under this convention is perhaps obvious and is explained below.)
+
+another point to make is that
+a priori knowledge of any (test or application) framework
 and its various conceptions of terms like "models", "features", "functions",
 "integration" etc must NOT be assumed when determining the "regression
 friendly" order of any given test filetree for a project.
+
+that is, it's not "fair" for you to assume that the test runner should know
+that "unit" tests (say) come before "functional" tests come before
+"integration" tests. these idioms are somewhat framework dependent, and the
+subject convention strives to be framework de-coupled.
 
 rather, the filetree of tests will generally try to follow the structure of
 the asset tree to the extent that it doesn't betray its numbering scheme.
@@ -28,16 +58,21 @@ an arbitrarily deep filetree tree of nodes (each entry of which has a
 locally unique leading integer) is isomorphed into a flat list (stream) of
 test files in this manner: recursively from the root node, each node is
 visited in order according to its number (regardless of whether it is a
-branch or leaf node). as branch nodes are encountered in this manner they
-are descended into.
+branch or leaf node; i.e, directory or file). as branch nodes are
+encountered in this manner they are descended into, repeated recursively.
 
 this system for expressing a "regression friendly" order is both univerally
 applicable and arbitrarily customizable to the specific use-cases and
 architecture choices of the particular project, regardless of frameworks
 used, etc.
 
+one or more tiny other points of sub-convention:
+
   - subtrees of fixtures (of any shape) should generally occur
-    "flatly" one level under the "test" directory.
+    "flatly" one level under the "test" directory. (that is, we do
+    not put them close to the test files that use them.)
+
+(EDIT: the above (newer content) may be largely redudant with the below.)
 
 
 

@@ -114,7 +114,7 @@ in the referenced remote documentation.
 
 
 
-## "components" (special associations) (in a test file) [#here.4]
+## terminal associations (in a test file) [#here.4]
 
 
 

@@ -323,9 +323,19 @@ module Skylab::TestSupport
           end
         end
 
+        # #todo (the big kahuna instead of the below hack)
+
         IT_RX__ = /\A
           (?<margin> [ \t]* )
-          it[ ]"(?<inside>[^"]+)"[ ]do
+          it[ ](?:
+
+            "    (?<inside>  [^"]+  ) "
+            |
+            '    (?<inside>  [^']+  ) '
+            |
+            %\{  (?<inside>  [^}]+  )  \}
+          )
+          [ ] do
         $/x
 
         # of "foo - bar - baz"..

@@ -96,8 +96,7 @@
              20% faster.
              (see also #this-commit message)
 
-       #open [#here.F]: the fate of components. component-related concerns,
-              like primitive type..
+       #open [#here.F] there is currently a hard-coded set of available terminal types
 
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but
