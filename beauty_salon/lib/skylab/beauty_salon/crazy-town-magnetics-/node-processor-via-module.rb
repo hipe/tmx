@@ -372,26 +372,24 @@ module Skylab::BeautySalon
 
       class << self
 
-        def inherited chld
-          chld.__init_as_grammar_symbol_class
-        end
-
-        def __init_as_grammar_symbol_class
-          @__mutex_for_define_children = nil
-        end
-
         def __receive_constituent_construction_services_ x  # #testpoint
           @_constituent_construction_services = x
         end
 
-        def _constituent_construction_services
+        def __constituent_construction_services
           @_constituent_construction_services  # hi.
         end
 
         def children * sym_a
-          remove_instance_variable :@__mutex_for_define_children  # implicit assertion - only once
-          @_child_associations_index = :__child_associations_index_initially
-          @__unevaluated_definition_of_children = sym_a
+
+          # (exactly as described in the implementation section of [#022.E])
+
+          if self::ASSOCIATIONS
+            raise MyException__.new :cannot_redefine_or_add_to_any_existing_children_definition
+          end
+
+          const_set :ASSOCIATIONS, LazilyEvaluatedChildren___.new( self, sym_a )
+          NIL
         end
 
         # -- read
@@ -446,87 +444,20 @@ module Skylab::BeautySalon
         end
 
         def children_association_index
-          send @_child_associations_index
-        end
-
-        def __child_associations_index_initially
-
-          @_child_associations_index = :__child_associations_index_subsequently
-
-          _sym_a = remove_instance_variable :@__unevaluated_definition_of_children
-          svcs = @_constituent_construction_services
-
-          index_of_plural = nil
-          once = -> d do
-            index_of_plural = d ; once = nil
+          asc = self::ASSOCIATIONS
+          if ! asc.__is_realized_
+            asc.__realize_ @_constituent_construction_services
           end
-
-          a = []
-          has_writable_terminals = false
-
-          _sym_a.each_with_index do |sym, d|
-
-            asc = svcs.__child_association_via_symbol_and_offset_ sym, d
-
-            if asc.is_terminal
-
-              if asc.has_plural_arity
-                self._COVER_ME__cant_be_both_component_and_have_plural_arity__
-              end
-              has_writable_terminals = true
-
-            elsif asc.has_plural_arity
-              once[ d ]
-            end
-
-            a.push asc
-          end
-
-          # (we can't write methods until we know if there's a plural)
-
-          ai = ChildAssociationIndex___.new index_of_plural, has_writable_terminals, a.freeze
-
-          if index_of_plural
-
-            num_ascs = a.length
-            ai.for_offsets_stretched_to_length num_ascs do |o|
-
-              o.first_third do |d|
-                a.fetch( d )._write_methods_for_non_plural_ self, d
-              end
-
-              neg = - num_ascs
-              o.middle_third do |d|
-
-                # make a reader for variable-length segment of the children.
-                # we don't know beforehand how many children we will have
-                # (only that the number accords to our arity category :#here5).
-                # the subject range for any given actual array of children is
-                # a function of: the formal offset of the subject association,
-                # the number of formals, and the number of actual children.
-
-                _hard_offset = d + neg
-                0 > _hard_offset || fail
-                a.fetch( d ).__write_methods_for_plural_ self, _hard_offset
-              end
-
-              o.final_third do |d|
-                a.fetch( d )._write_methods_for_non_plural_ self, d + neg
-              end
-            end
-          else
-            a.each_with_index do |asc, d|
-              asc._write_methods_for_non_plural_ self, d
-            end
-          end
-
-          @__CAI = ai
-          send @_child_associations_index
+          asc.__index_
         end
+      end # >>
+    end  # (will re-open)
 
-        def __child_associations_index_subsequently
-          @__CAI
-        end
+    # ==
+
+    class GrammarSymbol  # (re-open)
+
+      class << self
 
         def tap_class  # hacky thing to set breakpoints for particular classes, from the "grammar"
           NOTHING_
@@ -575,7 +506,7 @@ module Skylab::BeautySalon
       end
 
       def _build_structured_child_BS ast
-        _svcs = self.class._constituent_construction_services
+        _svcs = self.class.__constituent_construction_services
         _cls = _svcs.dereference ast.type
         _cls.via_node_ ast
       end
@@ -611,7 +542,100 @@ module Skylab::BeautySalon
         :_node_,
       )
 
+      ASSOCIATIONS = nil  # as described in [#022.E]
       IS_BRANCHY = false  # experiment. [#007.G]
+    end
+
+    # ==
+
+    class LazilyEvaluatedChildren___
+
+      def initialize cls, sym_a
+
+        @__class = cls
+        @__is_realized_ = false
+        @__unevaluated_definition_of_children = sym_a
+      end
+
+      def __realize_ svcs
+
+        cls = remove_instance_variable :@__class
+        @__is_realized_ = true
+
+        _sym_a = remove_instance_variable :@__unevaluated_definition_of_children
+
+        index_of_plural = nil
+        once = -> d do
+          index_of_plural = d ; once = nil
+        end
+
+        a = []
+        has_writable_terminals = false
+
+        _sym_a.each_with_index do |sym, d|
+
+          asc = svcs.__child_association_via_symbol_and_offset_ sym, d
+
+          if asc.is_terminal
+
+            if asc.has_plural_arity
+              cls._COVER_ME__cant_be_both_component_and_have_plural_arity__
+            end
+            has_writable_terminals = true
+
+          elsif asc.has_plural_arity
+            once[ d ]
+          end
+
+          a.push asc
+        end
+
+        # (we can't write methods until we know if there's a plural)
+
+        ai = ChildAssociationIndex___.new index_of_plural, has_writable_terminals, a.freeze
+
+        if index_of_plural
+
+          num_ascs = a.length
+          ai.for_offsets_stretched_to_length num_ascs do |o|
+
+            o.first_third do |d|
+              a.fetch( d )._write_methods_for_non_plural_ cls, d
+            end
+
+            neg = - num_ascs
+            o.middle_third do |d|
+
+              # make a reader for variable-length segment of the children.
+              # we don't know beforehand how many children we will have
+              # (only that the number accords to our arity category :#here5).
+              # the subject range for any given actual array of children is
+              # a function of: the formal offset of the subject association,
+              # the number of formals, and the number of actual children.
+
+              _hard_offset = d + neg
+              0 > _hard_offset || fail
+              a.fetch( d ).__write_methods_for_plural_ cls, _hard_offset
+            end
+
+            o.final_third do |d|
+              a.fetch( d )._write_methods_for_non_plural_ cls, d + neg
+            end
+          end
+        else
+          a.each_with_index do |asc, d|
+            asc._write_methods_for_non_plural_ cls, d
+          end
+        end
+
+        @__index_ = ai ;
+        NIL
+      end
+
+      attr_reader(
+        :__index_,
+        :__is_realized_,
+      )
     end
 
     # ==
@@ -964,4 +988,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #tombstone-A.1: changed association store to accomodate inheritence
 # #broke-out from "selector via string"

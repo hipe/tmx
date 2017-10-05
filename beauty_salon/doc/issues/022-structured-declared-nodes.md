@@ -119,11 +119,31 @@ in the referenced remote documentation.
 
 
 
-# #open track places where inheritence yadda [#here.E]
+## EXPERIMENTAL - limited support for grammar symbol inheritence [#here.E]
 
-for now, this tag tracks places where we thing the declared structured
-grammar reppresentation could be aided by inheritence, but no such facility
-is yet covered, supported or implemented. this gathering, then, should serve
-as an aide to gathering requirements to that end, and then refactor all
-referrents, and erase this clause or re-write it to describe the expressive
-feature.
+it might be the thing that our version of inheritence is simply a way
+to let an identical structural constituency (of associations) be shared
+across multiple const assignments *and* class objects.
+
+as such we would want a way to ensure that the child class does not
+try to add more children to the definition. (this would be confusion -
+the `children` expression would be not telling the whole story. it would
+be counter to our founding design principles to support this. in such
+a case, the desiger must simply rewrite the assocations (or do the other
+kind of clever re-use if you must))
+
+
+
+### implementation
+
+since we have a weird requirement (don't add assocations) we can implement
+this in a weird way that makes it easier: *every* such class (execept our
+ultimate base class) will assume that somewhere in its ancestor chain is
+a value retreivable by a particular const ("the const").
+
+the base class will set "the const" to a falseish.
+
+definitions "come in" thru the `children` method. we need some place to
+store the definition. (we're not parsing it yet.) simply, "every time"
+a definition comes in, we bork if the const evaluates to trueish
+(reflecting it having already been set *anywhere* up the ancestor chain).

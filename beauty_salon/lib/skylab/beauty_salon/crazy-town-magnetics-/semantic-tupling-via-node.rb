@@ -13,6 +13,16 @@ module Skylab::BeautySalon
     o = CrazyTownMagnetics_::NodeProcessor_via_Module
     GrammarSymbol__ = o::GrammarSymbol
 
+    #
+    # Base classes for grammar symbol classes that have the same structure
+    #
+
+    class CommonArg__ < GrammarSymbol__
+      children(
+        :as_symbol_symbol_terminal,
+      )
+    end
+
     module Items
 
       #
@@ -173,7 +183,7 @@ module Skylab::BeautySalon
 
       # lvasgn (placeheld)
 
-      class Lvasgn < GrammarSymbol__  # #open [#022.E]
+      class Lvasgn < GrammarSymbol__
         children(
           :lvar_as_symbol_symbol_terminal,
           :right_hand_side_expression,
@@ -270,10 +280,8 @@ module Skylab::BeautySalon
 
       # arg (placeheld)
 
-      class Arg < GrammarSymbol__
-        children(
-          :as_symbol_symbol_terminal,  # trying different name
-        )
+      class Arg < CommonArg__
+
       end
 
       # optarg (placeheld)
@@ -298,10 +306,8 @@ module Skylab::BeautySalon
 
       # blockarg (placeheld)
 
-      class Blockarg < GrammarSymbol__  # #open [#022.E] looks like Arg. #testpoint1.40
-        children(
-          :as_symbol_symbol_terminal,
-        )
+      class Blockarg < CommonArg__  #testpoint1.40
+
       end
 
       # procarg0 (placeheld)
@@ -500,6 +506,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.4: when we introduced inheritence
 # :#history-A.3: as referenced
 # #pending-rename: "structured node" or similar
 # #history-A.2: move oldschool support out so it's just constituents

@@ -270,4 +270,5 @@ module Skylab::BeautySalon::TestSupport
     X_ctm_npvm_sa = ::Module.new  # const namespace for tests in this file
   end
 end
+# #pending-rename: "association structural assertions" and/or something about "plurality" and "any-ness"
 # #born.

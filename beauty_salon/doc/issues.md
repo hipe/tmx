@@ -101,7 +101,6 @@
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but
                about whether we will ever support arbitrarily prioritized optionals.
-             [#here.D]: inheritence of structured node classes
              [#here.C]: design decision: reports are simple magnetics, not actions
              [#here.B]: tickler: one day #crazy-town target multiple syntax versions
              [#here.A]: the document, which is a very early trace of etc ..

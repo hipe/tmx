@@ -122,4 +122,5 @@ module Skylab::BeautySalon::TestSupport
     X_ctm_npvm_pca = ::Module.new  # const namespace for tests in this file
   end
 end
+# #pending-rename: perhaps remove "child" from the name for consistency
 # #born.
