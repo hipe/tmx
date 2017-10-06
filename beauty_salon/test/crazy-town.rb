@@ -6,6 +6,38 @@ module Skylab::BeautySalon::TestSupport
       tc.include self
     end
 
+    CommonInstanceMethods__ = ::Module.new
+
+    ASSOCIATION_LYFE = ::Object.new
+
+    def ASSOCIATION_LYFE.[] tcc
+      tcc.extend ASSOCIATION_LYFE_ModuleMethods___
+      tcc.include ASSOCIATION_LYFE_InstanceMethods___
+    end
+
+    module ASSOCIATION_LYFE_ModuleMethods___
+
+      def given sym
+
+        shared_subject :subject_association_ do
+          build_association_ sym
+        end
+
+        define_method :given_symbol_ do
+          sym
+        end
+      end
+    end
+
+    module ASSOCIATION_LYFE_InstanceMethods___
+
+      def build_association_ sym
+        subject_branch_.__child_association_via_symbol_and_offset_ sym, 1414
+      end
+
+      include CommonInstanceMethods__
+    end
+
     module THIS_STUFF
 
       def self.[] tc
@@ -47,52 +79,7 @@ module Skylab::BeautySalon::TestSupport
         end
       end )
 
-      # -- build these things
-
-      def build_subject_branch_ *these, c, & p
-
-        mod = ::Module.new
-        sandbox_module_.const_set c, mod
-
-        items_mod = ::Module.new
-        mod.const_set :Items, items_mod
-
-        ( these.length / 2 ).times do |d|
-          d <<= 1
-          _cls = these.fetch d
-          _c_ = these.fetch d+1
-
-          items_mod.const_set _c_, _cls
-        end
-
-        if p
-          mod.module_exec( & p )
-        end
-
-        if ! mod.const_defined? :IRREGULAR_NAMES, false
-          mod.const_set :IRREGULAR_NAMES, nil
-        end
-
-        subject_magnetic_[ mod ]
-      end
-
-      def build_subclass_with_these_children_ c, * sym_a
-
-        cls = ::Class.new subject_base_class_
-        sandbox_module_.const_set c, cls
-        cls.class_exec do
-          children( * sym_a )
-        end
-        cls
-      end
-
-      def subject_base_class_
-        subject_magnetic_::GrammarSymbol
-      end
-
-      def subject_magnetic_
-        Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
-      end
+      include CommonInstanceMethods__
 
       module THIS_ONE_MOCK ; class << self
         def tap_class
@@ -183,6 +170,72 @@ module Skylab::BeautySalon::TestSupport
       end
 
     # -
+
+    module CommonInstanceMethods__
+
+      def build_subclass_with_these_children_ c, * sym_a
+
+        cls = ::Class.new subject_base_class_
+        sandbox_module_.const_set c, cls
+        cls.class_exec do
+          children( * sym_a )
+        end
+        cls
+      end
+
+      def build_subject_branch_ *these, c, & p
+
+        mod = ::Module.new
+        sandbox_module_.const_set c, mod
+
+        items_mod = if these.length.zero?
+          :xx_hi_xx
+        else
+          ::Module.new
+        end
+
+        mod.const_set :Items, items_mod
+
+        ( these.length / 2 ).times do |d|
+          d <<= 1
+          _cls = these.fetch d
+          _c_ = these.fetch d+1
+
+          items_mod.const_set _c_, _cls
+        end
+
+        if p
+          mod.module_exec( & p )
+        end
+
+        Default_these_things[ mod ]
+
+        subject_magnetic_[ mod ]
+      end
+
+      def subject_base_class_
+        subject_magnetic_::GrammarSymbol
+      end
+
+      def subject_magnetic_
+        Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
+      end
+    end
+
+    # ==
+
+    Default_these_things = -> mod do
+
+      if ! mod.const_defined? :IRREGULAR_NAMES, false
+        mod.const_set :IRREGULAR_NAMES, nil
+      end
+
+      if ! mod.const_defined? :TERMINAL_TYPE_SANITIZERS, false
+        mod.const_set :TERMINAL_TYPE_SANITIZERS, nil
+      end
+    end
+
+    # ==
 
     Real_parser_for_current_ruby__ = -> do
       Home_::CrazyTownReportMagnetics_::

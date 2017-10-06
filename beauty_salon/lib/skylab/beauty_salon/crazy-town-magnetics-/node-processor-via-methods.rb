@@ -39,12 +39,10 @@ module Skylab::BeautySalon
 
         same = -> do
           cls.accept_visitor_by n do |x, asc|
-            if x
-              if asc.is_terminal
-                asc.hacky_type_check_when_trueish_ x
-              else
-                _node x
-              end
+            if asc.is_terminal
+              asc.assert_type_of_terminal_value_ x
+            elsif x
+              _node x
             end
           end
         end

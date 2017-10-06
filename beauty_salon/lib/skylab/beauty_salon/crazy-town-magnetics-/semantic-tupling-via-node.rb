@@ -491,6 +491,15 @@ module Skylab::BeautySalon
       ],
     }
 
+    TERMINAL_TYPE_SANITIZERS = {  # (explained at [#022.F])
+      symbol: -> x do
+        ::Symbol === x
+      end,
+      integer: -> x do
+        ::Integer === x
+      end,
+    }
+
     IRREGULAR_NAMES = {
       :defined? => :X__defined_question_mark__,
     }

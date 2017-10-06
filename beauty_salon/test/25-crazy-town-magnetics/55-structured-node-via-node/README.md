@@ -92,7 +92,7 @@ here's our ordering:
   - method calls
   - class and module definition
 
-again it is perhaps arbitrary, but here is the rational:
+again it is perhaps arbitrary, but here is the rationale:
 
   - we have flip-flopped "assignment" and "access" because (conceptually,
     at least) you need to be able to assign in order to access (but not the
@@ -114,7 +114,7 @@ again it is perhaps arbitrary, but here is the rational:
     smaller component of which method are made up of; we introduce the
     lower-level pieces first.
 
-  - (note we have put method calls immediate after method definition,
+  - (note we have put method calls immediately after method definition,
     becuase of the one-way dependency there. however in practice it's quite
     hard to write even a small ruby program without a method call, so this
     is a case where the conceptual trumps the practical.)

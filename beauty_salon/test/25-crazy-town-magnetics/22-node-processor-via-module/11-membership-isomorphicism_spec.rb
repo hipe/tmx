@@ -29,12 +29,15 @@ module Skylab::BeautySalon::TestSupport
       shared_subject :_man_town do
 
         _mod = module X_ctm_npvm_mis::ThisOneGuy
+
           module Items
             o = TS_::Crazy_Town::THIS_STUFF::THIS_ONE_MOCK
             Joomie = o
             XxxFoomie = o
           end
-          IRREGULAR_NAMES = nil
+
+          Crazy_Town::Default_these_things[ self ]
+
           self
         end
 
@@ -72,6 +75,8 @@ module Skylab::BeautySalon::TestSupport
             :doofined? => :X__doofined__,
             :__FOOLE__ => :X__FOOLE__,
           }
+
+          Crazy_Town::Default_these_things[ self ]
 
           self
         end

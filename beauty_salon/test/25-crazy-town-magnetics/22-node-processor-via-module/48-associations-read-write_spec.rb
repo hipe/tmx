@@ -103,7 +103,7 @@ module Skylab::BeautySalon::TestSupport
 
       _cls = build_subclass_with_these_children_( :XX1,
         :receiverosa_expression,
-        :methodo_nameo_symbol_terminal,
+        :methodo_nameo_zymbol_terminal,
         :zero_or_more_argumentoso_expressions,
       )
 
@@ -115,7 +115,13 @@ module Skylab::BeautySalon::TestSupport
         _cls, :Sendoid,
         _cls2, :Int,
         :ThisOneGuy,
-      )
+      ) do
+        self::TERMINAL_TYPE_SANITIZERS = {
+          zymbol: -> x do  # MONADIC_TRUTH_
+            true  # hi.
+          end,
+        }
+      end
     end
 
     # ~)

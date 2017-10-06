@@ -284,7 +284,7 @@ module Skylab::BeautySalon
 
       def __receive_terminal_write x, asc
 
-        asc.hacky_type_check__ x
+        asc.assert_type_of_terminal_value_ x
 
         h = @_data_for_write_via_association_symbol
         k = asc.association_symbol

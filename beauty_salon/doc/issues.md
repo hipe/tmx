@@ -96,8 +96,6 @@
              20% faster.
              (see also #this-commit message)
 
-       #open [#here.F] there is currently a hard-coded set of available terminal types
-
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but
                about whether we will ever support arbitrarily prioritized optionals.

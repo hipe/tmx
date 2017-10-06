@@ -107,6 +107,7 @@ module Skylab::BeautySalon
           TerminalAssociation___.define do |o|
             o.stem_symbol = stem
             o.type_symbol = terminal_type_sym
+            o.terminal_type_sanitizers = @module::TERMINAL_TYPE_SANITIZERS
             same[ o ]
           end
         else
@@ -773,6 +774,10 @@ module Skylab::BeautySalon
         super
       end
 
+      attr_writer(
+        :terminal_type_sanitizers,
+      )
+
       attr_accessor(
         :stem_symbol,
         :type_symbol,
@@ -788,22 +793,12 @@ module Skylab::BeautySalon
         end
       end
 
-      # ~ ( #open [#007.F]
-      # having a hard-coded set of available terminal types is kinda awful
-      # but A) we're just trying to make it up the run for now and B) we
-      # want to let this incubate a bit as we soak out into the grammar.
+      def assert_type_of_terminal_value_ x  # as documented at [#022.F]
 
-      def hacky_type_check__ x
-        if x
-          hacky_type_check_when_trueish_ x
-        end
-      end
-
-      def hacky_type_check_when_trueish_ x
-        case @type_symbol
-        when :symbol ; ::Symbol === x || self._COVER_ME__type_mismatch__
-        when :integer ; ::Integer === x || self._COVER_ME__type_mismatch__
-        else ; self._COVER_ME__its_reasonable_to_want_more_types_here__
+        _x = @terminal_type_sanitizers.fetch @type_symbol
+        _yes = _x[ x ]
+        if ! _yes
+          raise MyException__.new :terminal_type_assertion_failure
         end
       end
 

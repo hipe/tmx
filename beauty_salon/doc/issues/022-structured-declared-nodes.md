@@ -5,7 +5,8 @@
   - declarative (structural) grammar refection [#here.A]
   - (reserved for the blurb after the new intro [#here.s2])
   - the list of features [#here.s3]
-  - "components" (special associations) (in a test file) [#here.4]
+  - terminals (special associations) (in a test file) [#here.4]
+  - terminal type assertion [#here.F]
   - #open track places where inheritence yadda [#here.E]
 
 
@@ -109,12 +110,39 @@ in the referenced remote documentation.
     then define things.. (either use `define_constituents` or
     `redefine_constituents`, or simly assert no re-defintion.) (I)
 
-  - feature: "components", as described in [#here.4]  (in a test file)
+  - feature: "terminals", as described in [#here.4]  (in a test file)
 
 
 
 
 ## terminal associations (in a test file) [#here.4]
+
+
+
+
+## terminal type asssertions :[#here.F]
+
+we assert the "type" of terminal values only as a safeguard to assert
+that our understanding of the AST model accurately reflects the structure
+of the actual AST tree.
+
+it should be the case that this feature could be removed and have no
+behavioral impact on the library (as with "assert" statements in C, say).
+
+details: currently:
+
+  - there is an implicit assertion that all terminal values will
+    be non-nil (maybe).
+
+  - the asserter is not resolved at definition time (nothing is)
+
+  - the asserter is not resolved at definition resolution time
+    (but the thing that will resolve the asserter is resolved.)
+
+  - the asserter is resolved at document parse time.
+
+to ease the pressure when testing, we currently resolve these
+late. maybe this has a cost for a large corpus.
 
 
 

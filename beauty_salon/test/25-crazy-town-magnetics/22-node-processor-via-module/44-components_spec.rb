@@ -72,18 +72,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
-
-    class << self
-      def given sym
-        shared_subject :_subject do
-          _build sym
-        end
-        define_method :_given_symbol do
-          sym
-        end
-      end
-    end  # >>
+    use :crazy_town_ASSOCIATION_LYFE
 
     # (the below was proudly initiated by `tmx-test-support permute`)
 
@@ -248,7 +237,6 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-
     # ==
 
     context 'there is (virtually) a components feature branch' do
@@ -288,7 +276,7 @@ module Skylab::BeautySalon::TestSupport
 
     def _associaton_symbol_is_as_received
       _actual = _subject.association_symbol
-      _expected = _given_symbol
+      _expected = given_symbol_
       _actual == _expected || fail
     end
 
@@ -329,7 +317,7 @@ module Skylab::BeautySalon::TestSupport
       _exe_cls = subject_magnetic_::MyException__
 
       begin
-        _build _given_symbol
+        build_association_ given_symbol_
       rescue _exe_cls => e
       end
 
@@ -340,18 +328,12 @@ module Skylab::BeautySalon::TestSupport
       _subject || fail
     end
 
-    def _build sym
-      _thing.__child_association_via_symbol_and_offset_ sym, 1414
+    def _subject
+      subject_association_
     end
 
-    shared_subject :_thing do
-
-      mod = ::Module.new
-      mod::Items = :xx_hi_xx
-      mod::IRREGULAR_NAMES = nil
-      sandbox_module_::Moddo = mod
-
-      subject_magnetic_[ mod ]
+    shared_subject :subject_branch_ do
+      build_subject_branch_ :Moddo
     end
 
     def sandbox_module_
