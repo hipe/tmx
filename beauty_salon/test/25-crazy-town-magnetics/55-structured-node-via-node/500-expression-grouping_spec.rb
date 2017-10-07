@@ -46,7 +46,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'the right hand side is the coveted lvar' do
-        x = _subject.right_hand_side_expression
+        x = _subject.zero_or_one_right_hand_side_expression
         x._node_.type == :lvar || fail
         x.symbol == :righty || fail
       end

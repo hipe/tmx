@@ -46,6 +46,8 @@ rx = /\A
   qq
 \z/.xi
 
+# (the regexp options above are #testpoint1.53)
+
 rx = /
   #{ x }
 /
@@ -75,6 +77,10 @@ h = {
 
 
 # -- assignment!
+
+# of the below assignments that are "weird", probably they are part of
+# #testpoint1.54, i.e all the grammar symbols that have as an association
+# `zero_or_one_right_hand_side_expression`
 
 y = nil
 

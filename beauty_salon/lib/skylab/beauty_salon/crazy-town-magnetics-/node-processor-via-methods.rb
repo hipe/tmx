@@ -108,7 +108,7 @@ module Skylab::BeautySalon
         and_asgn: :__and_asgn,
         arg: nil,
         args: nil,
-        array: :__array,
+        array: nil,
         begin: nil,
         block: :__block,
         blockarg: nil,  # #testpoint1.40
@@ -122,16 +122,16 @@ module Skylab::BeautySalon
         def: nil,
         defined?: :__defined?,
         defs: :__defs,
-        dstr: :__dstr,
-        dsym: :__dsym,
+        dstr: nil,
+        dsym: nil,
         ensure: :__ensure,
-        erange: :__erange,
-        false: :__false,
-        float: :__float,
+        erange: nil,
+        false: nil,
+        float: nil,
         gvar: :__gvar,
         gvasgn: :__gvasgn,
-        hash: :__hash,
-        irange: :__irange,
+        hash: nil,
+        irange: nil,
         if: :__if,
         int: nil,
         ivar: nil,
@@ -151,26 +151,28 @@ module Skylab::BeautySalon
         optarg: nil,
         or: :__or,
         or_asgn: :__or_asgn,
+        pair: nil,
         procarg0: :__procarg0,
         redo: :__redo,
-        regexp: :__regexp,
+        regexp: nil,
+        regopt: nil,
         rescue: :__rescue,
         restarg: :__restarg,
         return: :__return,
         self: :__self,
         send: nil,
         sclass: :__singleton_class_block,
-        splat: :__splat,
-        str: :__str,
+        splat: nil,
+        str: nil,
         super: :__super,
-        sym: :__sym,
-        true: :__true,
+        sym: nil,
+        true: nil,
         when: nil,
         until: :__until,
         until_post: :__until_post,
         while: :__while,
         while_post: :__while_post,
-        xstr: :__xstr,
+        xstr: nil,
         yield: :__yield,
         zsuper: :__zsuper,
       }
@@ -304,32 +306,7 @@ module Skylab::BeautySalon
 
       # (tombstone: __send)
 
-      def __splat n_
-        # another (TEMPORARY) "foolhardy" [#doc.G] (see)
-
-        case n_.type
-
-        when :lvar  ; _node n_  # #testpoint1.19
-
-        when :ivar  ; _node n_  # #testpoint1.18
-
-        when :send  ; _node n_  # #testpoint1.17
-
-        when :block ; _node n_  # #testpoint1.16
-
-        when :const ; _node n_  # #testpoint1.15
-
-        when :begin ; _node n_  # #testpoint1.14
-
-        when :array ; _node n_  # #testpoint1.50
-
-        when :case  ; _node n_  # #testpoint1.24
-
-        else
-
-          _asgn n_ # #testpoint1.23
-        end
-      end
+      # (tombstone: __splat) (was a foolhardy [#doc.G] GONE)
 
       def __block_pass n_
         # for when a proc is passed as a block argument,
@@ -744,92 +721,33 @@ module Skylab::BeautySalon
 
       # -- literals
 
-      def __hash *zero_or_more
-        zero_or_more.each do |n_|
-          send CHILDREN_OF_HASH___.fetch( n_.type ), * n_.children
-        end
-      end
+      # (tombstone: __hash)
 
-      CHILDREN_OF_HASH___ = {
-        pair: :__pair,  # #todo not exposed
-      }
+      # (tombstone: __pair)
 
-      def __pair left_node, right_node
-        _node left_node
-        _node right_node
-      end
+      # (tombstone: __array)
 
-      def __array * zero_or_more
-        zero_or_more.each do |n_|
-          _node n_
-        end
-      end
+      # (tombstone: __regexp)
 
-      def __regexp * one_or_more
+      # (tombstone: __dsym)
 
-        len = one_or_more.length
-        if 1 < len
-          0.upto( len - 2 ) do |d|
-            # like double-quoted strings, these can be any expressions
-            _node one_or_more[ d ]
-          end
-        end
+      # (tomstone: __xstr)
 
-        CHILDREN_OF_REGEXP___.fetch( one_or_more.last.type ) && fail  # see
-      end
-
-      CHILDREN_OF_REGEXP___ = {
-        regopt: NOTHING_,  # #todo further testing is needed to determine
-        # if this is a problem on our end or the remote end (we think the
-        # latter); the fact that we aren't ever getting any children under
-        # this node.. #open :[#020.C]
-      }
-
-      def __dsym * zero_or_more
-        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
-      end
-
-      def __xstr * zero_or_more  # #testpoint1.2
-        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
-      end
-
-      def __dstr * zero_or_more
-
-        # syntax sidebar:
-
-        # a double-quoted string will parse into `str` unless (it seems)
-        # it has interpolated parts. presumably they must alternate between
-        # string and expression, but can start with either, we don't bother
-        # assertint which.
-
-        zero_or_more.each { |n_| _node n_ }  # #double-quoted-string-like
-      end
+      # (tomstone: __dstr) (had syntax sidebar)
 
       # :#double-quoted-string-like:
       # for all of these, it's possible to have an empty symbol, backticks, etc
       # (as seen in (at writing) basic/lib/skylab/basic/module/creator.rb:193)
 
-      def __str s
-        _string s
-      end
+      # (tombstone: __str)
 
-      def __sym sym
-        _symbol sym
-      end
+      # (tombstone: __sym)
 
-      def __irange begin_node, end_node
-        _node begin_node
-        _node end_node
-      end
+      # (tombstone: __irange)
 
-      def __erange begin_node, end_node
-        _node begin_node
-        _node end_node
-      end
+      # (tombstone: __erange)
 
-      def __float f
-        ::Float === f || interesting
-      end
+      # (tomstone: __float)
 
       # (tombstone: __int)
 
@@ -863,21 +781,13 @@ module Skylab::BeautySalon
         NOTHING_
       end
 
-      def __false
-        NOTHING_
-      end
+      # (tombstone: __false)
 
-      def __true
-        NOTHING_
-      end
+      # (tombstone: __true)
 
       # (tombstone: __nil)
 
       # -- "type" assertion *of* terminal components
-
-      def _string x
-        ::String === x || interesting
-      end
 
       def _symbol x
         ::Symbol === x || interesting

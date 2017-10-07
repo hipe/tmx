@@ -21,6 +21,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'right hand side - any expression, appropriate to the thing' do
         # (this type of grammar symbol is covered in a previous test. make minimal contact here.)
+        # #testpoint1.54
         _x = _right_shark
         _x._node_.type == :int || fail
       end
@@ -68,7 +69,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _right_shark
-      at_ :right_hand_side_expression
+      at_ :zero_or_one_right_hand_side_expression
     end
 
     # ==

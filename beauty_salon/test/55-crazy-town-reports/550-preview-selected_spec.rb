@@ -18,8 +18,26 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'offers suggestions' do
+
+        # as long as this keeps chaning while we add classes during the
+        # structured uber alles era (while open [#022.E2],
+        # we don't care to cover this to a level of detail so tight that
+        # the exact constituency is asserted. it is enough just to assert
+        # that what is expressed looks right, roughly.
+
         _hi = _lines.last
-        _hi == %q(did you mean 'kwoptarg' or 'optarg'?) || fail
+        _rest = %r(\Adid you mean '(.+)'\?\z).match( _hi )[1]
+        _these = _rest.split %r(', '|' or ')
+        count = 0 ; strange = nil
+        _these.each do |type_s|
+          if type_s.include? 'arg'
+            count += 1
+          else
+            ( strange ||= [] ).push type_s
+          end
+        end
+        5 == count || fail  # meh
+        strange == %w( op_asgn ) || fail  # as necessary
       end
 
       shared_subject :_lines do

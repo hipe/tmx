@@ -23,6 +23,18 @@ module Skylab::BeautySalon
       )
     end
 
+    class CommonRange__ < GrammarSymbol__
+      children(
+        :begin_expression,
+        :end_expression,
+      )
+    end
+
+    class CommonSingleton__ < GrammarSymbol__
+      children(
+      )
+    end
+
     module Items
 
       #
@@ -33,14 +45,18 @@ module Skylab::BeautySalon
 
       # nil (placeheld)
 
-      class Nil < GrammarSymbol__  # #open #[022.E]
-        children(
-        )
+      class Nil < CommonSingleton__
       end
 
       # true (placeheld)
 
+      class True < CommonSingleton__
+      end
+
       # false (placeheld)
+
+      class False < CommonSingleton__
+      end
 
       # Numerics
 
@@ -54,27 +70,78 @@ module Skylab::BeautySalon
 
       # float (placeheld)
 
+      class Float < GrammarSymbol__
+        children(
+          :as_float_float_terminal,
+        )
+      end
+
       # rational (placeheld)
+      # #open [#045] we don't even know how to make his. it's not Rational( 1 )
 
       # complex (placeheld)
+      # #open [#045] not yet needed for our corpus
 
       # Strings
 
       # str (placeheld)
 
+      class Str < GrammarSymbol__
+        children(
+          :as_string_string_terminal,
+        )
+      end
+
       # dstr (placeheld)
 
+      class Dstr < GrammarSymbol__
+
+        # syntax sidebar:
+
+        # a double-quoted string will parse into `str` unless (it seems)
+        # it has interpolated parts. presumably they must alternate between
+        # string and expression, but can start with either, we don't bother
+        # asserting which. #double-quoted-string-like
+
+        children(
+          :one_or_more_SEE_ME_expressions,
+        )
+      end
+
       # __FILE__ (placeheld)
+
+      # #open [#045] wow is this really nowhere in our corpus?
 
       # Symbols
 
       # sym (placeheld)
 
+      class Sym < GrammarSymbol__
+        children(
+          :as_symbol_symbol_terminal,
+        )
+      end
+
       # dsym (placeheld)
+
+      class Dsym < GrammarSymbol__
+        # #double-quoted-string-like
+        children(
+          :zero_or_more_SEE_MEE_expressions,
+        )
+      end
 
       # Executable strings
 
       # xstr (placeheld)
+
+      class Xstr < GrammarSymbol__
+        # #testpoint1.2
+        # #double-quoted-string-like
+        children(
+          :zero_or_more_SEE_ME_expressions,
+        )
+      end
 
       # Indented (interpolated, noninterpolated, executable) strings
 
@@ -85,27 +152,105 @@ module Skylab::BeautySalon
 
       # regopt (placeheld)
 
+      class Regopt < GrammarSymbol__
+
+        # #todo further testing is needed to determine if this is a problem
+        # on our end or the remote end (we think the latter); the fact that
+        # we aren't ever getting any children under this node.. #open :[#020.C]
+        # #testpoint1.53
+
+        children(
+        )
+      end
+
       # regexp (placeheld)
+
+      class Regexp < GrammarSymbol__
+        children(
+          :zero_or_more_expressions,  # #double-quoted-string-like
+          :regexopt,
+        )
+      end
 
       # Arrays
 
       # array (placeheld)
 
+      class Array < GrammarSymbol__
+        children(
+          :zero_or_more_expressions,
+        )
+      end
+
       # splat (placeheld)
+
+      class Splat < GrammarSymbol__
+
+        # it appears (unsurprisingly, in hindsight) that the accompanying
+        # term to a splat (its operand) can be any expression. in the legacy
+        # way (pre structured uber alles) we didn't really think about this
+        # so we ended up with imperative code that had specific handling of
+        # every type of expression that followed a splat in our corpus.
+        #
+        # we have dissolved this specific handling in the code because it
+        # was incorrect. ("incomplete" if you insist.) however we have
+        # preserved the testpoint associations with their corresponding
+        # types because A) maybe we'll want it and B) it's sort of an
+        # interesting snapshot of the code pragmatics in our corpus.
+        #
+
+        # we used to cover these with dedicated assertive code (the
+        # oldschool equivalent to today's type) that was "foolhardy" [#doc.G]
+        #
+        #   - begin  #testpoint1.14
+        #   - const  #testpoint1.15
+        #   - block  #testpoint1.16
+        #   - send  #testpoint1.17
+        #   - ivar  #testpoint1.18
+        #   - lvar  #testpoint1.19
+        #   - asgn  #testpoint1.23
+        #   - case #testpoint1.24
+        #   - array #testpoint1.50
+
+        children(
+          :expression,
+        )
+      end
 
       # Hashes
 
       # pair (placeheld)
 
+      class Pair < GrammarSymbol__
+        children(
+          :key_expression,
+          :value_expression,
+        )
+      end
+
       # kwsplat (placeheld)
 
+      # #open [#045] is this really nowhere in our corpus?
+
       # hash (placeheld)
+
+      class Hash < GrammarSymbol__
+        children(
+          :zero_or_more_pairs,
+        )
+      end
 
       # Ranges
 
       # irange (placeheld)
 
+      class Irange < CommonRange__
+      end
+
       # erange (placeheld)
+
+      class Erange < CommonRange__
+      end
 
       #
       # Access
@@ -173,7 +318,7 @@ module Skylab::BeautySalon
       class Ivasgn < GrammarSymbol__
         children(
           :ivar_as_symbol_symbol_terminal,
-          :right_hand_side_expression,
+          :zero_or_one_right_hand_side_expression,  # #testpoint1.54
         )
       end
 
@@ -186,7 +331,7 @@ module Skylab::BeautySalon
       class Lvasgn < GrammarSymbol__
         children(
           :lvar_as_symbol_symbol_terminal,
-          :right_hand_side_expression,
+          :zero_or_one_right_hand_side_expression, # #testpoint1.54
         )
       end
 
@@ -470,7 +615,7 @@ module Skylab::BeautySalon
       # kwbegin (placeheld)
     end
 
-    GROUPS = {
+    GROUPS = {  # exactly [#022.I]
       argfellow: [
         :arg,
         :blockarg,
@@ -486,14 +631,26 @@ module Skylab::BeautySalon
       const: [
         :const,
       ],
+      pair: [
+        :pair,
+      ],
+      regexopt: [
+        :regopt,
+      ],
       when: [
         :when,
       ],
     }
 
     TERMINAL_TYPE_SANITIZERS = {  # (explained at [#022.F])
+      string: -> x do
+        ::String === x
+      end,
       symbol: -> x do
         ::Symbol === x
+      end,
+      float: -> x do
+        ::Float === x
       end,
       integer: -> x do
         ::Integer === x

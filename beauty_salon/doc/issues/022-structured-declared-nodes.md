@@ -9,6 +9,7 @@
   - overview the less interesting toplevel features [#here.s8]
   - terminals (special associations) (in a test file) [#here.4]
   - terminal type assertion [#here.F]
+  - groups [#here.I]
   - inheritence [#here.E]
 
 
@@ -101,11 +102,7 @@ in the referenced remote documentation.
     please search the subject tag for all significant disussion of the
     arities in the asset code and tests.
 
-  - node type groups.
-    in flux.
-    for non-terminal associations, any final token other than "expression"
-    will be taken to indicate a "group", which is simply a symbolic name
-    pointing to a list of possible node types that can occupy the "slot".
+  - node type groups. see [#here.I]
 
   - "terminals" as described in [#here.4]  (in a test file)
 
@@ -156,6 +153,61 @@ details: currently:
 
 to ease the pressure when testing, we currently resolve these
 late. maybe this has a cost for a large corpus.
+
+
+
+
+## groups [#here.I]
+
+(likely permanent in spirit, but likely in flux in implementation EDIT after #open [#022.E2])
+
+this facet of associations has to do with expressing what types of nodes
+(as in `::Parser::AST::Node#type`) may occupy the corresponding "slot"
+represented by the association.
+
+this facility does not apply to terminal associations, because terminal
+associations' corresponding data nodes are simple primitive values that
+have no *node* type.
+
+(sadly we must take care to distinguish whay we mean by "type". in this
+section we typically mean "node type" and not "primitive type".)
+
+we may, then, for the non-terminal "slots" express sets of allowable node
+types for the given slot. these sets are expressed (through reference) as
+simple lists (arrays) of symbols, each symbol being a type name of a type
+allowed to occupy that slot.
+
+  - sometimes you will want to express that only one type of node
+    may occupy that slot. in these cases make a group with one member.
+
+formally every given non-terminal association has a "group affiliation"
+which is expressed as the last token of the association. this group
+affiliation is the name of a group, which is defined (somewhere) and points
+to the list of allowable types for a slot like that as explained above.
+
+  - currently groups names must be limited to one token. so you can
+    have a group named `bar`, but not `foo_bar`.
+
+  - the group called `expression` is magic shorthand to mean "any type of
+    node may occupy this slot". in practice this keyword probably short-
+    circuits a lot of the machinery explained here, which is why you
+    frequently see this group used in tests when groupiness is outside
+    the scope of the test.
+
+  - whether or not the syntax allows it (we're not sure), a group
+    name of `terminal` really should be avoided. (assume it is disallowed.)
+    to use such a group name would make a non-terminal association look
+    like a terminal association to the eye if not the interpreter.
+
+during things like traversal or structural recursion, the node's node type
+will be checked against the group (a simple list of symbols of allowed
+types, probably turned into a hash), and an exception will be raised on
+unexpected types.
+
+like terminal type assertions above [#here.F], this facility exists
+purely to sanity-check the user's grammar against the corpus (document).
+for normal use-cases this facility will have no noticeable behavior.
+it's like `assert` statements in C.
 
 
 

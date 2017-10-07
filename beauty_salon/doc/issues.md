@@ -1,3 +1,8 @@
+[#045] #open we have no intention of making #crazy-town platform language
+             complete until quite a ways later. our current intention is
+             to get it to work for our own corpus as a refactoring tool.
+             when we publish this we will strive for some kind of "completeness"
+
 [#044] #open use case in [ze]
              [#here.2] another one in [ze]
 
