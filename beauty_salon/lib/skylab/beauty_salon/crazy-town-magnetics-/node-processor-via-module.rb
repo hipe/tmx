@@ -42,21 +42,29 @@ module Skylab::BeautySalon
         md = /\A
           (?<any> any_ )?
 
-          (?:
-           (?<zero_or_more> zero_or_more_ ) |
-           (?<one_or_more> one_or_more_ )
+          (?<plurality>
+            (?<zero_or>
+              zero_or_ (?:
+                more_ |
+                (?<max_is_one> one_ )
+              )
+            ) |
+            one_or_more_
           )?
-
           (?<rest> .+ )
         \z/x.match sym
 
         # -- first, depluralize (and finish using the matchdata)
 
-        if md.offset( :zero_or_more ).first
-          has_expectation_of_zero_or_more = true
+        if md.offset( :plurality ).first
           has_plural_arity = true
-        elsif md.offset( :one_or_more ).first
-          has_plural_arity = true
+          if md.offset( :zero_or ).first
+            if md.offset( :max_is_one ).first
+              max_is_one = true
+            end
+          else
+            min_is_one = true
+          end
         end
 
         s_a = md[ :rest ].split UNDERSCORE_
@@ -119,8 +127,10 @@ module Skylab::BeautySalon
             end
             if has_plural_arity
               o.has_plural_arity = true
-              if has_expectation_of_zero_or_more
-                o.has_expectation_of_zero_or_more = true
+              if min_is_one
+                o.minimum_is_one = true
+              elsif max_is_one
+                o.maximum_is_one = true
               end
             end
             if is_any
@@ -596,40 +606,14 @@ module Skylab::BeautySalon
         ai = ChildAssociationIndex___.new index_of_plural, has_writable_terminals, a.freeze
 
         if index_of_plural
-
-          num_ascs = a.length
-          ai.for_offsets_stretched_to_length num_ascs do |o|
-
-            o.first_third do |d|
-              a.fetch( d )._write_methods_for_non_plural_ cls, d
-            end
-
-            neg = - num_ascs
-            o.middle_third do |d|
-
-              # make a reader for variable-length segment of the children.
-              # we don't know beforehand how many children we will have
-              # (only that the number accords to our arity category :#here5).
-              # the subject range for any given actual array of children is
-              # a function of: the formal offset of the subject association,
-              # the number of formals, and the number of actual children.
-
-              _hard_offset = d + neg
-              0 > _hard_offset || fail
-              a.fetch( d ).__write_methods_for_plural_ cls, _hard_offset
-            end
-
-            o.final_third do |d|
-              a.fetch( d )._write_methods_for_non_plural_ cls, d + neg
-            end
-          end
+          Write_methods_for_variable_length_children_array___[ cls, ai ]
         else
           a.each_with_index do |asc, d|
             asc._write_methods_for_non_plural_ cls, d
           end
         end
 
-        @__index_ = ai ;
+        @__index_ = ai
         NIL
       end
 
@@ -637,6 +621,40 @@ module Skylab::BeautySalon
         :__index_,
         :__is_realized_,
       )
+    end
+
+    # ==
+
+    Write_methods_for_variable_length_children_array___ = -> cls, ai do
+
+      a = ai.associations
+      here = ai.offset_of_association_with_plural_arity
+      plur_asc = a.fetch here
+      num_ascs = a.length
+
+      ai.for_offsets_stretched_to_length num_ascs do |o|
+
+        o.first_third do |d|
+          a.fetch( d )._write_methods_for_non_plural_ cls, d
+        end
+
+        neg = - num_ascs
+
+        o.middle_third do |d|
+          d == here || sanity
+          if plur_asc.maximum_is_one
+            plur_asc.__write_methods_for_winker_ cls, here, num_ascs  # (see)
+          else
+            _hard_offset = d + neg
+            0 > _hard_offset || fail
+            plur_asc.__write_methods_for_plural_ cls, _hard_offset  # (see)
+          end
+        end
+
+        o.final_third do |d|
+          a.fetch( d )._write_methods_for_non_plural_ cls, d + neg
+        end
+      end
     end
 
     # ==
@@ -681,11 +699,22 @@ module Skylab::BeautySalon
       def initialize d, has_writable_terminals, a
         len = a.length
         if d
-          if a.fetch( d ).has_expectation_of_zero_or_more
-            min = len - 1
-          else
+
+          plur_asc = a.fetch d
+
+          if plur_asc.minimum_is_one
             min = len
+            max = NO_LIMIT_
+
+          elsif plur_asc.maximum_is_one
+            min = len - 1
+            max = len
+
+          else
+            min = len - 1
+            max = NO_LIMIT_
           end
+
           @number_of_associations_at_the_end = len - d - 1
           @offset_of_association_with_plural_arity = d
           @has_plural_arity_as_index = true
@@ -832,12 +861,20 @@ module Skylab::BeautySalon
       attr_accessor(
         :group_information,
         :group_symbol,
-        :has_expectation_of_zero_or_more,  # assume `has_plural_arity`
+        :maximum_is_one,  # assume `has_plural_arity`, assume never co-occurs with below
+        :minimum_is_one,  # assume `has_plural_arity`, assume never co-occurs with above
         :has_plural_arity,
         :is_any,
       )
 
       def __write_methods_for_plural_ cls, hard_offset
+
+        # make a reader for variable-length segment of the children. we
+        # don't know beforehand how many children we will have (only that
+        # the number accords to our arity category :#here5). the subject
+        # range for any given actual array of children is a function of:
+        # the formal offset of the subject association, the number of
+        # formals, and the number of actual children.
 
         r = @offset .. hard_offset
 
@@ -850,6 +887,38 @@ module Skylab::BeautySalon
             ast = sublist.fetch d
             ast || sanity
             _build_structured_child_BS ast
+          end
+        end
+      end
+
+      def __write_methods_for_winker_ cls, here, num_ascs
+
+        # "winker" is now shorthand for "association whose arity is zero or
+        # one". this means its actual value can either be there nor not be
+        # there. whereas in the case of the "any" modifier the value can
+        # either be nil or not nil, but must take up width (one slot) in the
+        # children array; in the subject case when the value is not present
+        # it takes up no width in the array.
+        #
+        # although (like the "plural" association above) the children array
+        # has a variable length segment; the maximum possible length for this
+        # segment is 1 making the use of the "list" structure superflous here.
+        #
+        # #[#022.G]
+
+        _write_memoizing_methods cls, @association_symbol do
+
+          x_a = _node_children_normalized_BS
+          case x_a.length
+          when num_ascs  # #testpoint1.52
+            ast = x_a.fetch here
+            if ast
+              _build_structured_child_BS ast
+            end
+          when num_ascs - 1  # #testpoint1.51
+            NOTHING_
+          else
+            never
           end
         end
       end
@@ -978,6 +1047,7 @@ module Skylab::BeautySalon
     # ==
 
     MONADIC_TRUTH_ = -> _ { true }
+    NO_LIMIT_ = nil
 
     # ==
     # ==

@@ -4,10 +4,12 @@
 
   - declarative (structural) grammar refection [#here.A]
   - (reserved for the blurb after the new intro [#here.s2])
-  - the list of features [#here.s3]
+  - overview of the toplevel features [#here.s3]
+  - overview the association definition features [#here.G]
+  - overview the less interesting toplevel features [#here.s8]
   - terminals (special associations) (in a test file) [#here.4]
   - terminal type assertion [#here.F]
-  - #open track places where inheritence yadda [#here.E]
+  - inheritence [#here.E]
 
 
 
@@ -68,49 +70,60 @@ in the referenced remote documentation.
 
 
 
-## this list of features
+## overview of the toplevel features [#here.s3]
 
   - the consts defined under that one module are only all the classes
     we have defined that isomorph with the set of all grammar symbols
-    we support. (A)
+    we support.
 
-  - feature: that one thing with the strangely spelled grammar symbols
-    that don't isomorph directly. (B)
-
-  - feature: the "any" modifier. (C)
-
-  - feature: the "arities": one (only ever implied never stated),
-    zero or more, one or more. (note these don't conflict with the
-    "any" modifier. "any" is always an indication that it could be
-    nil: it can be nil IFF the "any" modifier is used. in "any zero
-    or more", this means it's nil, the zero length array, or a non-
-    zero length array. (D)
-
-  - feature: "probablistic groups" (needs a better name). these need
-    to be defined before the constituencies are defined; these specify
-    sets of allowable (or maybe just expected) grammar symbols that
-    are allowed at this constituent slot. (E)
+  - at the sub-"grammar symbol" level, the main feature is the association
+    definition grammar, overviewed in the next section.
 
   - central feature: the recursive function (not defined here) takes
     an "injected context" that is the one to decide (in effect) what
-    algorithm is in control. (F)
+    algorithm is in control.
 
-  - feature: arbitrarily ordered arity evaluation (experiment).
-    superficially this system is like the formal argument arities of
-    the host language; but it frees itself from limitations there. (etc) (G)
 
-  - feature: lazy evaluation of constituency groups. for regression-
-    friendliness and perhaps speed of file load-time, EXPERIMENTALLY
-    we won't evaluate a constituency definition until the first time
-    it is used. (H)
 
-  - feature: inheritence. in order to re-use same-constituencies across
-    different grammar symbols, we allow that a child class can descend
-    from a base class that uses this system. HOWEVER a child class cannot
-    then define things.. (either use `define_constituents` or
-    `redefine_constituents`, or simly assert no re-defintion.) (I)
 
-  - feature: "terminals", as described in [#here.4]  (in a test file)
+## overview of the association definition features [#here.G]
+
+  - "any"-ness. the "any" modifier applied to an association indicates that
+    its corresponding node, value, or list structure in the corresponding
+    actual structured node can be nil.
+
+  - the plural arities:
+    they are:
+      - zero or more
+      - one or more
+      - zero or one
+
+    please search the subject tag for all significant disussion of the
+    arities in the asset code and tests.
+
+  - node type groups.
+    in flux.
+    for non-terminal associations, any final token other than "expression"
+    will be taken to indicate a "group", which is simply a symbolic name
+    pointing to a list of possible node types that can occupy the "slot".
+
+  - "terminals" as described in [#here.4]  (in a test file)
+
+
+
+
+## overview of less interesting toplevel features [#here.s8]
+
+  - lazy evaluation of associations. for a variety of reasons (efficiency
+    of execution for small stories, regression friendliness for better
+    coverage), nothing about the defined associations are evaluated until
+    some point after when they are defined.
+
+  - inheritence. please see [#here.E]
+
+  - accomodation of strange casings. for grammar symbol names that won't
+    translate directly into a valid const name, we have a declarative
+    facility for this.
 
 
 
@@ -149,16 +162,36 @@ late. maybe this has a cost for a large corpus.
 
 ## EXPERIMENTAL - limited support for grammar symbol inheritence [#here.E]
 
-it might be the thing that our version of inheritence is simply a way
-to let an identical structural constituency (of associations) be shared
-across multiple const assignments *and* class objects.
+we allow that a grammar symbol class can inherit from another grammar
+symbol class (and when we say inherit we mean in the plain old ruby
+class sense) with these justifications/provisions/caveats:
 
-as such we would want a way to ensure that the child class does not
-try to add more children to the definition. (this would be confusion -
-the `children` expression would be not telling the whole story. it would
-be counter to our founding design principles to support this. in such
-a case, the desiger must simply rewrite the assocations (or do the other
-kind of clever re-use if you must))
+  - this facility exists only so the same constituency (i.e same set, same
+    order) of associations may be duplicated across several grammar symbol
+    classes. it's a pragmatic refinement made for that set or sets of
+    grammar symbols (in the practical grammar) that have the same
+    constituency of associations.
+
+  - to allow the child class to add to its list of associations presents
+    these problems:
+
+      - a definitional API would have to be designed and exposed that
+        allows the designer to insert new associations at arbitrary
+        locations in the existing list. there's no pretty way to do this.
+
+      - such a "feature" would be counter to our founding design principle.
+        the participating child classes would not be revealing their full
+        constituency at a glance. "immediate, full, concise expressiveness"
+        would be violated.
+
+    as such we have prohibited this via this provision: in any class
+    ancestor chain whose base class is our grammar symbol class; at most
+    one class in that chain may invoke the `children` method.
+
+    the designer who is thwarted by this limitation must for now simply
+    rewrite the associations (or do the other kind of clever re-use if
+    you must)
+
 
 
 

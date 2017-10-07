@@ -12,7 +12,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = _ast_with_two_elements
       _cls = _class_for_switchoid
-      _e, = _expect_exception _ast, _cls
+      _e = _expect_exception _ast, _cls
 
       _e.symbol == :minimum_number_of_children_not_satisfied || fail
     end
@@ -21,9 +21,63 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = _ast_with_four_elements
       _cls = _class_for_dualoid
-      _e, = _expect_exception _ast, _cls
+      _e = _expect_exception _ast, _cls
 
       _e.symbol == :maximum_number_of_children_exceeded || fail
+    end
+
+    it 'against zib-bob when has too many' do
+
+      _ast = _ast_with_three_elements
+      _cls = _class_for_winker
+      _e = _expect_exception _ast, _cls
+      _e.symbol == :maximum_number_of_children_exceeded || fail
+    end
+
+    it 'against zib-bob when has too few' do
+
+      _ast = _ast_with_zero_elements
+      _cls = _class_for_winker
+      _e = _expect_exception _ast, _cls
+      _e.symbol == :minimum_number_of_children_not_satisfied || fail
+    end
+
+    it 'against zib-bob when the greater possible length' do
+
+      _ast = _ast_with_two_elements
+      _cls = _class_for_winker
+      _vals = _expect_values _ast, _cls
+      _vals == [ 123, 456 ] || fail
+    end
+
+    it 'against zib-bob when has the lesser possible length (money shot)' do
+
+      _ast = _ast_with_one_element
+      _cls = _class_for_winker
+      _vals = _expect_values _ast, _cls
+      _vals == [ 1234 ] || fail
+    end
+
+    it 'this dingus - nil' do  #testpoint1.51
+
+      _ast = _ast_with_one_element
+      _cls = _class_for_winker
+      o = _cls.via_node_ _ast
+      o.lefty == 1234 || fail
+      o.zero_or_one_righty_expression.nil? || fail
+    end
+
+    it 'this dingus - something (HAS RECURSION)' do  # #testpoint1.52
+
+      _ast0 = builder_thing_[ :numbo_tron, 456 ]
+      _ast = builder_thing_[ :meh, 3232, _ast0 ]
+
+      _cls = _class_for_winker
+      o = _cls.via_node_ _ast
+      o.lefty == 3232 || fail
+      x = o.zero_or_one_righty_expression
+      x || fail
+      x.tha_digit == 456 || fail
     end
 
     it 'distribute two elements into two slots (INTERFACE EXPERIMENTAL)' do
@@ -55,14 +109,14 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_that_is_quote_winking
       _cls = _class_for_dualoid
 
-      _e, pairs = _expect_exception _ast, _cls
+      _e, pairs = _expect_exception_tuple _ast, _cls
 
       _e.symbol == :missing_expected_child || fail
 
       pairs.length == 1 || fail
     end
 
-    it %q{but the addition of 'any' lets he hole thru} do
+    it %q{but the addition of 'any' lets the hole thru} do
 
       _ast = _ast_that_is_quote_winking
       _cls = _class_for_dualoid_but_winking_OK
@@ -76,7 +130,7 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_left_is_not_numeric
       _cls = _class_for_winkie
 
-      e, = _expect_exception _ast, _cls
+      e = _expect_exception _ast, _cls
       e.symbol == :group_affiliation_not_met || fail
     end
 
@@ -85,7 +139,7 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_right_is_not_numeric
       _cls = _class_for_winkie
 
-      e, pairs = _expect_exception _ast, _cls
+      e, pairs = _expect_exception_tuple _ast, _cls
       e.symbol == :group_affiliation_not_met || fail
       pairs.length == 1 || fail
     end
@@ -122,6 +176,10 @@ module Skylab::BeautySalon::TestSupport
     # --
 
     def _expect_exception ast, cls
+      _expect_exception_tuple( ast, cls ).first
+    end
+
+    def _expect_exception_tuple ast, cls
       pairs = nil
       begin
         cls.accept_visitor_by ast do |*a|
@@ -172,13 +230,19 @@ module Skylab::BeautySalon::TestSupport
       o[ :winkie_WOULD_BE, _ast_winky_left, NOTHING_ ]
     end
 
+    shared_subject :_ast_with_zero_elements do
+      builder_thing_[ :meh ]
+    end
+
     shared_subject :_ast_that_is_other do
       builder_thing_[ :other_thing, :oThEr_tHiNg ]
     end
 
     shared_subject :_ast_that_is_numeric do
-      builder_thing_[ :inty, 5678 ]
+      builder_thing_[ :inty, 1234 ]
     end
+
+    alias_method :_ast_with_one_element, :_ast_that_is_numeric
 
     shared_subject :_ast_that_is_quote_winking do
       builder_thing_[ :dualoid_WOULD_BE, 321, nil ]
@@ -186,6 +250,10 @@ module Skylab::BeautySalon::TestSupport
 
     shared_subject :_ast_with_two_elements do
       builder_thing_[ :switchoid_WOULD_BE, 123, 456 ]
+    end
+
+    shared_subject :_ast_with_three_elements do
+      builder_thing_[ :meh, 123, 456, 789 ]
     end
 
     shared_subject :_ast_with_four_elements do
@@ -208,6 +276,28 @@ module Skylab::BeautySalon::TestSupport
 
     def _class_for_dualoid
       _this_one_feature_branch.dereference :dualoid
+    end
+
+    def _class_for_winker
+      _this_third_feature_branch.dereference :zib_bob
+    end
+
+    shared_subject :_this_third_feature_branch do
+
+      _cls = build_subclass_with_these_children_( :XX3_1,
+        :lefty_numzo_terminal,
+        :zero_or_one_righty_expression,
+      )
+
+      _cls2 = build_subclass_with_these_children_( :XX3_2,
+        :tha_digit_numzo_terminal,
+      )
+
+      build_subject_branch_(
+        _cls, :ZibBob,
+        _cls2, :NumboTron,
+        :ThisThirdGuy,
+      )
     end
 
     shared_subject :_this_other_feature_branch do
