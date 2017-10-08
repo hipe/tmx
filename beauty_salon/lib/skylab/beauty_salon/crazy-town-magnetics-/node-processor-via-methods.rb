@@ -104,7 +104,7 @@ module Skylab::BeautySalon
       # what are these hashes for? [#021.D]
 
       CHILDREN_OF_ENTRYPOINT___ = {
-        and: :__and,
+        and: nil,
         and_asgn: nil,
         arg: nil,
         args: nil,
@@ -113,30 +113,30 @@ module Skylab::BeautySalon
         block: :__block,
         blockarg: nil,  # #testpoint1.40
         block_pass: :__block_pass,
-        break: :__break,
+        break: nil,
         case: nil,
         casgn: nil,  # (formerly __const_assign)
         cbase: :__cbase,
         class: nil,
         const: nil,
         def: nil,
-        defined?: :__defined?,
+        defined?: nil,
         defs: :__defs,
         dstr: nil,
         dsym: nil,
-        ensure: :__ensure,
+        ensure: nil,
         erange: nil,
         false: nil,
         float: nil,
-        gvar: :__gvar,
+        gvar: nil,
         gvasgn: nil,
         hash: nil,
         irange: nil,
-        if: :__if,
+        if: nil,
         int: nil,
         ivar: nil,
         ivasgn: nil,
-        kwbegin: :__kwbegin,
+        kwbegin: nil,
         kwoptarg: :__kwoptarg,  # #testpoint1.49
         lvar: nil,
         lvasgn: nil,
@@ -144,37 +144,38 @@ module Skylab::BeautySalon
         masgn: nil,
         mlhs: nil,  # (formerly: __mlhs_this_other_form)
         module: nil,
-        next: :__next,
+        next: nil,
         nil: nil,
         nth_ref: :__nth_ref,
         op_asgn: nil,
         optarg: nil,
-        or: :__or,
+        or: nil,
         or_asgn: nil,
         pair: nil,
         procarg0: :__procarg0,
-        redo: :__redo,
+        redo: nil,
         regexp: nil,
         regopt: nil,
-        rescue: :__rescue,
+        rescue: nil,
+        resbody: nil,
         restarg: :__restarg,
-        return: :__return,
-        self: :__self,
+        return: nil,
+        self: nil,
         send: nil,
         sclass: :__singleton_class_block,
         splat: nil,
         str: nil,
-        super: :__super,
+        super: nil,
         sym: nil,
         true: nil,
         when: nil,
-        until: :__until,
-        until_post: :__until_post,
-        while: :__while,
-        while_post: :__while_post,
+        until: nil,
+        until_post: nil,
+        while: nil,
+        while_post: nil,
         xstr: nil,
-        yield: :__yield,
-        zsuper: :__zsuper,
+        yield: nil,
+        zsuper: nil,
       }
 
       # -- class, module and related
@@ -275,19 +276,11 @@ module Skylab::BeautySalon
 
       # ~ boolean operators (pretend they're special methods (functions)))
 
-      def __or left_node, right_node
-        _node left_node
-        _node right_node
-      end
+      # (tombstone: __or)
 
-      def __and left_node, right_node  # #testpoint1.36
-        _node left_node
-        _node right_node
-      end
+      # (tombstone: __and)
 
-      def __defined? expression  # #testpoint1.33
-        _node expression
-      end
+      # (tombstone: __defined?)
 
       # -- calling methods
 
@@ -319,23 +312,9 @@ module Skylab::BeautySalon
 
       # -- can only happen within a method
 
-      def __yield * zero_or_more  # #testpoint1.42
+      # (tombstone: __yield)
 
-        # syntax sidebar:
-        # see discussion at #common-jump, but see how we differ:
-        # a `yield` is passing arguments to a block or proc, so its arguments
-        # can be many unlike these others.
-        #
-        # (as seen in (at writing) system/lib/skylab/system/diff/core.rb:116)
-
-        zero_or_more.each do |n_|
-          _node n_
-        end
-      end
-
-      def __zsuper  # `super` #testpoint1.43
-        NOTHING_
-      end
+      # (tombstone: __zsuper)
 
       def __super_as_block_child * args
 
@@ -348,191 +327,39 @@ module Skylab::BeautySalon
         end
       end
 
-      def __super * zero_or_more  # `super()` #testpoint1.13
+      # (tombstone: __super)
 
-        # the zero or more children is an argument list
-
-        zero_or_more.each do |n_|
-          _node n_
-        end
-      end
-
-      def __return n_=nil  # #testpoint1.31
-        _any_node n_  # see #common-jump
-      end
+      # (tombstone: __return)
 
       # -- control flow
 
       # (tombstone: __begin)
 
-      def __kwbegin * zero_or_one_or_two
+      # (tombstone: __kwbegin)
 
-        case zero_or_one_or_two.length
-        when 0 ; NOTHING_
-        when 1 ;
-          n_ = zero_or_one_or_two[0]
-          case n_.type
-          when :rescue ; _node n_  # hi.
-          when :ensure ; _node n_
-          else
-            _node n_
-          end
-        else
-          zero_or_one_or_two.each do |n__|
-            _node n__
-          end
-        end
-      end
+      # (tombstone: __ensure)
 
-      def __ensure any_head, any_body
+      # (tombstone: __rescue)
 
-        # (the kind you see at the toplevel of method bodies is #testpoint1.11)
+      # (tombstone: __until_post)
 
-        if any_head
-          if :rescue == any_head.type
-            _node any_head  # hi.
-          else
-            _node any_head
-          end
-        end
+      # (tombstone: __while_post)
 
-        _any_node any_body
-      end
+      # (tombstone: __until)
 
-      def __rescue begin_body, *res_bodies, mystery_last
+      # (tombstone: __while)
 
-        # syntax sidebar:
-        # you can have multiple rescue clauses
-        # (as seen in (at writing) common/lib/skylab/common/autoloader/file-tree-.rb:215)
+      # (tombstone __break)
 
-        # we still haven't figured out what the last item is for #todo
+      # (tombstone: __next)
 
-        # (the typical rescue clause is 3 elements long)
-
-        _node begin_body  # a `begin` block or 1 statement
-
-        res_bodies.each do |n_|
-          send CHILDREN_OF_RES_BODY___.fetch( n_.type ), * n_.children
-        end
-
-        if mystery_last
-          this_is_something  # not sure, a ensure? but didn't we cover that?
-        end
-      end
-
-      CHILDREN_OF_RES_BODY___ = {
-        resbody: :__resbody,
-      }
-
-      def __resbody array, assignable, body
-
-        # (the next two can be not there as in (woah crazy old)):
-        # task_examples/lib/skylab/task_examples/task-types/symlink.rb:14
-        # #todo this doens't line up with the others
-
-        if array
-          _expect :array, array
-        end
-
-        if assignable
-          # (it's possible to have a rescue clause that doesn't assign to a left value)
-          _assignable assignable
-        end
-
-        if body
-          # (it's possible to have a rescue clause with no "do this then")
-          _node body
-        end
-      end
-
-      def __until_post cond, kwbeg  # #testpoint1.29
-        _condition cond
-        _expect_kwbegin kwbeg
-      end
-
-      def __while_post cond, kwbeg
-        _condition cond
-        _expect_kwbegin kwbeg
-      end
-
-      def _expect_kwbegin n
-
-        :kwbegin == n.type || fine
-
-        # zero or more below. it's possible to have an empty body in it
-        # (as seen in (at writing) zerk/lib/skylab/zerk/non-interactive-cli/when-help-.rb:37)
-
-        n.children.each do |n_|
-          _node n_
-        end
-      end
-
-      def __until cond, body  # #testpoint1.26
-        _condition cond
-        _node body
-      end
-
-      def __while cond, body
-        _condition cond
-        _node body
-      end
-
-      def __break n_=nil
-        _any_node n_  # see #common-jump
-      end
-
-      def __next n_=nil
-        _any_node n_  # see #common-jump
-      end
-
-      def __redo n_=nil
-        _any_node n_  # see #common-jump
-      end
-
-      begin
-
-        # syntax sidebar: :#common-jump:
-
-        # we'll describe first a `return` nonterminal then apply it to the
-        # others: interestingly (or not) we note that a return statement
-        # resembles superficially a method call, in that it can take
-        # parenthesis or no, and that it can take zero or one "argument".
-        # but unlike a method call, the return "call" cannot take multiple
-        # arguments, or a block argument.
-        #
-        # this appears to hold also for our other friends:
-        #   - `break`
-        #   - `next`
-        #   - `redo`
-        #   - `yield` NO (see)
-
-        # when one argument is passed, it's #testpoint1.28
-
-        # with a `next`, annoyingingly you can "pass" one expression here
-        # but look how we hack with this "feature":
-        # (as seen in (at writing) system/lib/skylab/system/io/line-stream-via-page-size.rb:58)
-
-        # the no-args form is seen everywhere, for example:
-        # (as seen in (at writing) human/lib/skylab/human/summarization.rb:24)
-      end
+      # (tombstone: __redo)
 
       # (tombstone: __when)
 
       # (tombstone: __case)
 
-      def __if condition, if_trueish_do_this, else_do_this
-
-        # (an `unless` expression gets turned into `if true, no-op else ..`)
-
-        _condition condition
-        _any_node if_trueish_do_this
-        _any_node else_do_this
-      end
-
-      def _condition n_
-        # condition expression (its trueishness determines doo-hah)
-        _node n_
-      end
+      # (tombstone: __if)
 
       # -- assignment
 
@@ -550,21 +377,6 @@ module Skylab::BeautySalon
       # (tombstone: __or_asgn)
 
       # (tombstone: __and_asgn)
-
-      def _assignable n
-        case n.type
-        when :send ; _node n  # #testpoint1.22
-        else
-          _asgn n
-        end
-      end
-
-      def _asgn n
-
-        m = CHILDREN_OF_ASSIGNMENT___.fetch n.type
-        _a = _pre_descend m, n
-        send m, * _a
-      end
 
       CHILDREN_OF_ASSIGNMENT___ = {
         # ( these are repeats of symbols, but shorter versions.. #todo )
@@ -612,13 +424,7 @@ module Skylab::BeautySalon
 
       # (tombstone: __lvar)
 
-      def __gvar sym  # #testpoint1.44
-
-        # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
-        # (see also `nth_ref` which looks superficially like a global)
-
-        _symbol sym
-      end
+      # (tombstone: __gvar)
 
       # (tombstone: __ivar)
 
@@ -711,9 +517,7 @@ module Skylab::BeautySalon
 
       # -- "keywords" (and those literals)
 
-      def __self
-        NOTHING_
-      end
+      # (tombstone: __self)
 
       # (tombstone: __false)
 

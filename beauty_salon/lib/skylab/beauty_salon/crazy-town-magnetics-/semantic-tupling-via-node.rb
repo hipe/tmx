@@ -17,10 +17,66 @@ module Skylab::BeautySalon
     # Base classes for grammar symbol classes that have the same structure
     #
 
+    class WhileOrUntilPost__ < GrammarSymbol__
+      children(
+        :CONDITION_expression,
+        :kwbegin,
+      )
+    end
+
+    class WhileOrUntil__ < GrammarSymbol__
+      children(
+        :CONDITION_expression,
+        :BODY_expression,
+      )
+    end
+
+    class AndOrOr__ < GrammarSymbol__
+      children(
+        :LEFT_expression,
+        :RIGHT_expression,
+      )
+    end
+
     class BoolAsgn__ < GrammarSymbol__
       children(
-        :assignableforoperator,
+        :assignablecommon,
         :right_hand_side_expression,
+      )
+    end
+
+    class YieldLike__ < GrammarSymbol__  # :#here3
+      children(
+        :zero_or_more_ACTUAL_ARGUMENT_expressions,
+      )
+    end
+
+    class CommonJump__ < GrammarSymbol__
+
+      # syntax sidebar: we'll describe first a `return` nonterminal then
+      # apply it to the others: interestingly (or not) we note that a return
+      # statement resembles superficially a method call, in that it can take
+      # parenthesis or no, and that it can take zero or one "argument".
+      # but unlike a method call, the return "call" cannot take multiple
+      # arguments, or a block argument.
+      #
+      # when one argument is passsed with such a feature, it's #testpoint1.28
+      #
+      # this grammatical category appears to hold to other constructs like:
+      # `break`,`next`, `redo`.
+      #
+      # think how with `next` or `redo`, passing one argument with it seems
+      # to make no sense; but see:
+      #
+      # (as seen in (at writing) system/lib/skylab/system/io/line-stream-via-page-size.rb:58)
+
+      # the no-args form is seen everywhere, for example:
+      # (as seen in (at writing) human/lib/skylab/human/summarization.rb:24)
+
+      # note that `yield` (and others) is in a different category (see #here3)
+
+      children(
+        :zero_or_one_SINGLE_expression,
       )
     end
 
@@ -265,7 +321,12 @@ module Skylab::BeautySalon
 
       # self (placeheld)
 
+      class Self < CommonSingleton__
+      end
+
       # ident (placeheld)
+
+      # #open [#045] no trace of this
 
       # ivar (placeheld)
 
@@ -277,9 +338,23 @@ module Skylab::BeautySalon
 
       # gvar (placeheld)
 
+      class Gvar < GrammarSymbol__  # #testpoint1.44
+
+        # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
+        # (see also `nth_ref` which looks superficially like a global)
+
+        children(
+          :CHOOPIE_DOOPIE_symbol_terminal,
+        )
+      end
+
       # cvar (placeheld)
 
+      # #open [#045] uh .. where?
+
       # back_ref (placeheld)
+
+      # #open [#045] dam son .. really?
 
       # nth_ref (placeheld)
 
@@ -315,6 +390,8 @@ module Skylab::BeautySalon
       end
 
       # __ENCODING__ (placeheld)
+
+      # #open [#045] rien
 
       #
       # Assignment
@@ -381,7 +458,7 @@ module Skylab::BeautySalon
 
       class OpAsgn < GrammarSymbol__
         children(
-          :assignableforoperator,
+          :assignablecommon,
           :SIGN_SYMBOL_symbol_terminal,  # :+, etc
           :right_hand_side_expression,
         )
@@ -571,11 +648,28 @@ module Skylab::BeautySalon
 
       # and (placeheld)
 
+      class And < AndOrOr__  # #testpoint1.36
+      end
+
       # or (placeheld)
+
+      class Or < AndOrOr__
+      end
 
       # Conditionals
 
       # if (placeheld)
+
+      class If < GrammarSymbol__
+
+        # (an `unless` expression gets turned into `if true, no-op else ..`)
+
+        children(
+          :CONDITION_expression,
+          :any_IF_TRUE_DO_THIS_expression,
+          :any_ELSE_DO_THIS_expression,
+        )
+      end
 
       # Case matching
 
@@ -617,50 +711,148 @@ module Skylab::BeautySalon
 
       # while (placeheld)
 
+      class While < WhileOrUntil__
+      end
+
       # until (placeheld)
+
+      class Until < WhileOrUntil__  # #testpoint1.26
+      end
+
+      class WhileOrUntil__ < GrammarSymbol__
+      end
 
       # while_post (placeheld)
 
+      class WhilePost < WhileOrUntilPost__
+      end
+
       # until_post (placeheld)
+
+      class UntilPost < WhileOrUntilPost__  # #testpoint1.29
+      end
 
       # for (placeheld)
 
+      # #open [#045] because it's non-idiomatic, we don't use this
+
       # Keywords
 
-      # (NOTE - for now we are extrapolating the extend of this from ruby24.y
+      # (NOTE - for now we are extrapolating the extent of this from ruby24.y
       # we greped for the builder method then reduced this with scripting:)
 
       # break (placeheld)
 
+      class Break < CommonJump__
+      end
+
       # defined? (placeheld)
+
+      class X__defined_question_mark__ < GrammarSymbol__  # #testpoint1.33
+        children(
+          :expression,
+        )
+      end
 
       # next (placeheld)
 
+      class Next < CommonJump__
+      end
+
       # redo (placeheld)
+
+      class Redo < CommonJump__
+      end
 
       # retry (placeheld)
 
+      # #open [#045] no trace of this in our corpus
+
       # return (placeheld)
+
+      class Return < CommonJump__  #testpoint1.31
+      end
 
       # super (placeheld)
 
+      class Super < YieldLike__  # as in `super()` #testpoint1.13
+      end
+
       # yield (placeheld)
 
+      class Yield < YieldLike__  # #testpoint1.42
+
+        # syntax sidebar: see discussion at #common-jump, but see how we
+        # differ: a `yield` is passing arguments to a block or proc, so its
+        # arguments can be many unlike these others.
+        #
+        # (as seen in (at writing) system/lib/skylab/system/diff/core.rb:116)
+      end
+
       # zsuper (placeheld)
+
+      class Zsuper < CommonSingleton__  # `super` #testpoint1.43
+      end
 
       # BEGIN, END
 
       # preexe (placeheld)
 
+      # #open [#045] no trace of this in corpus as far as we know
+
       # postexe (placeheld)
+
+      # #open [#045] no trace of this in corpus as far as we know
 
       # Exception handling
 
       # resbody (placeheld)
 
+      class Resbody < GrammarSymbol__
+
+        # in a single-line affixed rescue clause, it's possible to have no
+        # assignment and no body as seen in (at writing)
+        # task_examples/lib/skylab/task_examples/task-types/symlink.rb:14
+
+        children(
+
+          :any_array,
+            # an array whose each item in an expression an exception class
+
+          :any_assignablecommon,
+            # the rescue clause need not assign to a left value
+
+          :any_BODY_expression,
+            # it's possible to have a rescue clause with no "do this then"
+        )
+      end
+
       # rescue (placeheld)
 
+      class Rescue < GrammarSymbol__
+
+        # syntax sidebar:
+        # remember you can have multiple rescue clauses
+        # (as seen in (at writing) common/lib/skylab/common/autoloader/file-tree-.rb:215)
+
+        # (the typical rescue clause is 3 elements long)
+
+        children(
+          :BEGIN_BODY_expression,  # a `begin` block or 1 statement
+          :one_or_more_resbodys,
+          :any_MYSTERY_expression,  # not sure, a ensure? but didn't we cover that? #todo
+        )
+      end
+
       # ensure (placeheld)
+
+      class Ensure < GrammarSymbol__
+        # (the kind you see at the toplevel of method bodies is #testpoint1.11)
+        children(
+          :any_HEAD_expression,  # sometimes not always a `rescue` (not confirmed)
+          :any_BODY_expression,
+        )
+      end
 
       #
       # Expression grouping
@@ -676,6 +868,19 @@ module Skylab::BeautySalon
       # begin (placeheld)
 
       # kwbegin (placeheld)
+
+      class Kwbegin < GrammarSymbol__
+
+        # zero or more below. it's possible to have an empty body in it
+        # (as seen in (at writing) zerk/lib/skylab/zerk/non-interactive-cli/when-help-.rb:37
+
+        # (there was once some special code to anticipate that if there's
+        # only one child, it might be a `rescue` or an `ensure`. but meh. #history-A.5)
+
+        children(
+          :zero_or_more_expressions,
+        )
+      end
     end
 
     these_four_asgn = [
@@ -694,6 +899,9 @@ module Skylab::BeautySalon
         :optarg,
         :procarg0,
         :restarg,
+      ],
+      array: [
+        :array,
       ],
       arg: [
         :arg,
@@ -716,7 +924,7 @@ module Skylab::BeautySalon
 
         * these_four_asgn,  # plain old ivars etc #testpoint1.34
       ],
-      assignableforoperator: [
+      assignablecommon: [
 
         # (compare this to #here1)
 
@@ -739,11 +947,17 @@ module Skylab::BeautySalon
       mlhs: [
         :mlhs,
       ],
+      kwbegin: [
+        :kwbegin,
+      ],
       pair: [
         :pair,
       ],
       regexopt: [
         :regopt,
+      ],
+      resbody: [
+        :resbody,
       ],
       when: [
         :when,
@@ -780,6 +994,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# :#history-A.5: as referenced
 # #history-A.4: when we introduced inheritence
 # :#history-A.3: as referenced
 # #pending-rename: "structured node" or similar
