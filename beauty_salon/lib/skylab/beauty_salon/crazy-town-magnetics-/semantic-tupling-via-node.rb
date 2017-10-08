@@ -17,6 +17,13 @@ module Skylab::BeautySalon
     # Base classes for grammar symbol classes that have the same structure
     #
 
+    class BoolAsgn__ < GrammarSymbol__
+      children(
+        :assignableforoperator,
+        :right_hand_side_expression,
+      )
+    end
+
     class CommonArg__ < GrammarSymbol__
       children(
         :as_symbol_symbol_terminal,
@@ -288,6 +295,8 @@ module Skylab::BeautySalon
 
       class Const < GrammarSymbol__
 
+        # TODO - #here2
+
         def _to_friendly_string
           my_s = symbol.id2name
           sn = any_parent_const_expression
@@ -313,6 +322,8 @@ module Skylab::BeautySalon
 
       # cvasgn (placeheld)
 
+      # #open [#045] never seen before
+
       # ivasgn (placeheld)
 
       class Ivasgn < GrammarSymbol__
@@ -324,26 +335,78 @@ module Skylab::BeautySalon
 
       # gvasgn (placeheld)
 
+      class Gvasgn < GrammarSymbol__
+        children(
+          :UMM_symbol_terminal,
+          :zero_or_one_right_hand_side_expression,
+        )
+      end
+
       # casgn (placeheld)
+
+      class Casgn < GrammarSymbol__
+
+        # :#here2 this is structurally a subset of the other guy
+
+        # deep form: fixture file: literals and assigment
+        # non-deep form: fixture file: the first one
+
+        children(
+          :any_PARENT_CONST_expression,
+          :SYMBOL_symbol_terminal,
+          :zero_or_one_right_hand_side_expression,
+        )
+      end
 
       # lvasgn (placeheld)
 
       class Lvasgn < GrammarSymbol__
         children(
           :lvar_as_symbol_symbol_terminal,
-          :zero_or_one_right_hand_side_expression, # #testpoint1.54
+          :zero_or_one_right_hand_side_expression,  # #testpoint1.54
         )
       end
 
       # and_asgn (placeheld)
 
+      class AndAsgn < BoolAsgn__  # #testpoint1.25
+      end
+
       # or_asgn (placeheld)
+
+      class OrAsgn < BoolAsgn__
+      end
 
       # op_asgn (placeheld)
 
+      class OpAsgn < GrammarSymbol__
+        children(
+          :assignableforoperator,
+          :SIGN_SYMBOL_symbol_terminal,  # :+, etc
+          :right_hand_side_expression,
+        )
+      end
+
       # mlhs (placeheld)
 
+      class Mlhs < GrammarSymbol__  # #testpoint1.10
+
+        # (presumably: 'multi left-hand side' or something)
+
+        children(
+          :one_or_more_assignableformlhss,  # YUCK that name TODO
+        )
+      end
+
       # masgn (placeheld)
+
+      class Masgn < GrammarSymbol__
+
+        children(
+          :mlhs,
+          :right_hand_side_expression,
+        )
+      end
 
       #
       # Class and module definition
@@ -615,6 +678,13 @@ module Skylab::BeautySalon
       # kwbegin (placeheld)
     end
 
+    these_four_asgn = [
+      :casgn,
+      :gvasgn,
+      :ivasgn,
+      :lvasgn,
+    ]
+
     GROUPS = {  # exactly [#022.I]
       argfellow: [
         :arg,
@@ -625,11 +695,49 @@ module Skylab::BeautySalon
         :procarg0,
         :restarg,
       ],
+      arg: [
+        :arg,
+      ],
       args: [
         :args,
       ],
+      assignableformlhs: [
+
+        :arg,
+
+        # (this is compared to :#here1)
+        # TODO - do you really want this distinction? compare and contrast
+
+        :send,  # #testpoint1.9
+          # a send that ends up thru sugar calling `foo=`
+
+        :splat,  # #testpoint1.8
+          # you can splat parts of the list
+
+        * these_four_asgn,  # plain old ivars etc #testpoint1.34
+      ],
+      assignableforoperator: [
+
+        # (compare this to #here1)
+
+        # what are the things that can be the left side of a `||=` or a `+=`
+        # or the several others? lvars, ivars, gvars, but also a "send" which
+        # gets "sugarized":
+        #
+        #   o.foo ||= :x
+        #
+        # what happens there is that the method `foo` is called then (IFF it's
+        # false-ish) the method `foo=` is called. this isn't reflected in the
+        # parse tree.
+
+        * these_four_asgn,
+        :send,   # #testpoint1.22
+      ],
       const: [
         :const,
+      ],
+      mlhs: [
+        :mlhs,
       ],
       pair: [
         :pair,

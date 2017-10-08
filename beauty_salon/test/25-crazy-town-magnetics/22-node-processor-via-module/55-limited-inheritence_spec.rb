@@ -113,7 +113,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    it 'borks if you try to add do true inheritence' do
+    it 'borks if you try to add do true inheritence', ex: true do
 
       _base_cls = _this_one_base_class
 

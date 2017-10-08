@@ -8,7 +8,7 @@ module Skylab::BeautySalon::TestSupport
     use :memoizer_methods
     use :crazy_town_THIS_STUFF
 
-    it 'minimum number of children not satisfied' do
+    it 'minimum number of children not satisfied', ex: true do
 
       _ast = _ast_with_two_elements
       _cls = _class_for_switchoid
@@ -17,7 +17,7 @@ module Skylab::BeautySalon::TestSupport
       _e.symbol == :minimum_number_of_children_not_satisfied || fail
     end
 
-    it 'maximum number of children exceeded' do
+    it 'maximum number of children exceeded', ex: true do
 
       _ast = _ast_with_four_elements
       _cls = _class_for_dualoid
@@ -26,7 +26,7 @@ module Skylab::BeautySalon::TestSupport
       _e.symbol == :maximum_number_of_children_exceeded || fail
     end
 
-    it 'against zib-bob when has too many' do
+    it 'against zib-bob when has too many', ex: true do
 
       _ast = _ast_with_three_elements
       _cls = _class_for_winker
@@ -34,7 +34,7 @@ module Skylab::BeautySalon::TestSupport
       _e.symbol == :maximum_number_of_children_exceeded || fail
     end
 
-    it 'against zib-bob when has too few' do
+    it 'against zib-bob when has too few', ex: true do
 
       _ast = _ast_with_zero_elements
       _cls = _class_for_winker
@@ -104,7 +104,7 @@ module Skylab::BeautySalon::TestSupport
       vals == [ 12, 34, 56, 78 ] || fail
     end
 
-    it 'fail an any-ness assertion' do
+    it 'fail an any-ness assertion', ex: true do
 
       _ast = _ast_that_is_quote_winking
       _cls = _class_for_dualoid
@@ -125,7 +125,7 @@ module Skylab::BeautySalon::TestSupport
       _vals == [ 321, nil ] || fail
     end
 
-    it 'group mismatch' do
+    it 'group mismatch', ex: true do
 
       _ast = _ast_left_is_not_numeric
       _cls = _class_for_winkie
@@ -134,7 +134,7 @@ module Skylab::BeautySalon::TestSupport
       e.symbol == :group_affiliation_not_met || fail
     end
 
-    it %q{'any' plus 'group' with fail on other in the 'any' slot} do
+    it %q{'any' plus 'group' with fail on other in the 'any' slot}, ex: true do
 
       _ast = _ast_right_is_not_numeric
       _cls = _class_for_winkie

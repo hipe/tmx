@@ -18,7 +18,7 @@ module Skylab::BeautySalon::TestSupport
         subject_association_ || fail
       end
 
-      it 'but FAILS if you try to yadda' do
+      it 'but FAILS if you try to yadda', ex: true do
         _asc = subject_association_
         begin
          _asc.assert_type_of_terminal_value_ nil
@@ -32,7 +32,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'a terminal association WITH the corresponding type sanitizers' do
+    context 'a terminal association WITH the corresponding type sanitizers', ex: true do
 
       given :la_la_la_terminal
 

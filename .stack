@@ -62,7 +62,7 @@ finish other new magnet
 fix diff thing
 rename all operator branch to feature branch YIKES
 clean up that crazy hack in an isolated commit
-(F)(N)(R)(T)(W)(X)(Y)(Z)
+(F)(N)(Q)(R)(T)(W)(X)(Y)(Z)
 these near term applications of guy (A)->(C,D)
 ok so you want to get to getting every '.should' being converted 07-19 03:47:08 (C)->(E)
 rebase the branch with the `expect( ).to` fix (E)->(S)
@@ -82,5 +82,4 @@ ALL remaining method (un)definition (F)->(I)
 ALL remaining formal arguments (I)->(J)
 ALL remaining expression grouping (J)->(O)
 ALL remaining control flow (O)->(P)
-ALL remaining access (P)->(Q)
-ALL remaining assignment (Q)
+ALL remaining access (P)

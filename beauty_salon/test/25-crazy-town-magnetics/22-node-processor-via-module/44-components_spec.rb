@@ -160,7 +160,7 @@ module Skylab::BeautySalon::TestSupport
 
       given :one_or_more_fafooza_terminals
 
-      it 'errors specifically' do
+      it 'errors specifically', ex: true do
         _expect_exception :terminals_cannot_currently_be_plural_for_lack_of_need
       end
     end
@@ -169,7 +169,7 @@ module Skylab::BeautySalon::TestSupport
 
       given :any_fafooza_terminal
 
-      it 'errors specifically' do
+      it 'errors specifically', ex: true do
         _expect_exception :we_have_never_needed_terminals_to_have_the_ANY_modifier
       end
     end

@@ -105,7 +105,7 @@ module Skylab::BeautySalon
 
       CHILDREN_OF_ENTRYPOINT___ = {
         and: :__and,
-        and_asgn: :__and_asgn,
+        and_asgn: nil,
         arg: nil,
         args: nil,
         array: nil,
@@ -115,7 +115,7 @@ module Skylab::BeautySalon
         block_pass: :__block_pass,
         break: :__break,
         case: nil,
-        casgn: :__const_assign,
+        casgn: nil,  # (formerly __const_assign)
         cbase: :__cbase,
         class: nil,
         const: nil,
@@ -129,7 +129,7 @@ module Skylab::BeautySalon
         false: nil,
         float: nil,
         gvar: :__gvar,
-        gvasgn: :__gvasgn,
+        gvasgn: nil,
         hash: nil,
         irange: nil,
         if: :__if,
@@ -141,16 +141,16 @@ module Skylab::BeautySalon
         lvar: nil,
         lvasgn: nil,
         match_with_lvasgn: :__match_with_lvasgn,
-        masgn: :__masgn,
-        mlhs: :__mlhs_this_other_form,  # #testpoint1.10
+        masgn: nil,
+        mlhs: nil,  # (formerly: __mlhs_this_other_form)
         module: nil,
         next: :__next,
         nil: nil,
         nth_ref: :__nth_ref,
-        op_asgn: :__op_asgn,
+        op_asgn: nil,
         optarg: nil,
         or: :__or,
-        or_asgn: :__or_asgn,
+        or_asgn: nil,
         pair: nil,
         procarg0: :__procarg0,
         redo: :__redo,
@@ -541,72 +541,17 @@ module Skylab::BeautySalon
         _node right_node
       end
 
-      def __masgn mlhs, right_node
-        :mlhs == mlhs.type || oops
-        __mlhs_this_one_form mlhs
-        _node right_node
-      end
+      # (tombstone: __masgn)
 
-      def __mlhs_this_other_form * one_or_more
-        one_or_more.each do |n_|
-          _expect :arg, n_
-        end
-      end
+      # (tombstone: __mlhs_this_other_form)
 
-      def __mlhs_this_one_form mlhs
-        mlhs.children.each do |n_|
-          __assignable_in_mlhs n_
-        end
-      end
+      # (tombstone: __op_asgn)
 
-      def __op_asgn assignable, sym, rhs
-        _assignable assignable
-        _symbol sym  # :+
-        _node rhs
-      end
+      # (tombstone: __or_asgn)
 
-      def __or_asgn assignable, rhs
-        _assignable assignable
-        _node rhs
-      end
-
-      def __and_asgn assignable, rhs  # #testpoint1.25
-        _assignable assignable
-        _node rhs
-      end
-
-      def __assignable_in_mlhs n
-
-        # (compare this to the immediately following method)
-
-        case n.type
-        when :send ; _node n  # #testpoint1.9
-          # a send that ends up thru sugar calling `foo=`
-
-        when :splat ; _node n  # #testpoint1.8
-          # you can splat parts of the list
-
-        else  # #testpoint1.34
-          # plain old lvars
-
-          _asgn n
-        end
-      end
+      # (tombstone: __and_asgn)
 
       def _assignable n
-
-        # (compare this to the immediately preceding method)
-
-        # what are the things that can be the left side of a `||=` or a `+=` or the several others?
-        # lvars, ivars, gvars, but also a "send" will presumably get
-        # sugarized:
-        #
-        #   o.foo ||= :x
-        #
-        # what happes there is that the method `foo` is called then (IFF it's
-        # false-ish) the method `foo=` is called. this isn't reflected in the
-        # parse tree.
-
         case n.type
         when :send ; _node n  # #testpoint1.22
         else
@@ -640,18 +585,7 @@ module Skylab::BeautySalon
         _symbol const
       end
 
-      def __const_assign any_const, sym, rhs=nil
-
-        if any_const
-          __expression_of_module any_const  # fixture file: literals and assigment
-        else
-          NOTHING_  # our first fixture file
-        end
-
-        _symbol sym
-
-        _any_node rhs
-      end
+      # (tombstone: __const_assign)
 
       def __short_gvasgn sym
         _symbol sym
