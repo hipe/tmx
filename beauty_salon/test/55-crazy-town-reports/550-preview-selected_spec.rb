@@ -36,32 +36,14 @@ module Skylab::BeautySalon::TestSupport
             ( strange ||= [] ).push type_s
           end
         end
-        5 == count || fail  # meh
-        strange == %w( op_asgn ) || fail  # as necessary
+        # -- the below changes as necessary
+        2 == count || fail
+        strange && fail
       end
 
       shared_subject :_lines do
         _lines_of_parse_failure_by_call_subject_magnetic_by do |o|
           o.code_selector_string = %q{kwoptarggo(aa=='bb')}
-        end
-      end
-    end
-
-    context 'name with no meta' do
-
-      it 'says no' do
-        _hi = _lines.first
-        _hi == %q(currently we don't yet have metadata for grammar symbol 'nth_ref'.) || fail
-      end
-
-      it 'offers suggestions' do
-        _hi = _lines.last
-        _hi =~ /\A\(currently we have it for '[a-z]/ || fail
-      end
-
-      shared_subject :_lines do
-        _lines_of_parse_failure_by_call_subject_magnetic_by do |o|
-          o.code_selector_string = %q{nth_ref(aa=='bb')}
         end
       end
     end

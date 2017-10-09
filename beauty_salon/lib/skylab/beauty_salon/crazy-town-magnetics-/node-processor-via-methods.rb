@@ -96,8 +96,10 @@ module Skylab::BeautySalon
             $stderr.puts "MAKE THIS GUY NIL: #{ m } (in #{ __FILE__ } #{ __LINE__ }" ; exit 0
           end
           :_FOR_TRANSITION_use_remote_class
+        elsif m
+          m
         else
-          m || kristen_chenowythe
+          kristen_chenowythe
         end
       end
 
@@ -110,18 +112,18 @@ module Skylab::BeautySalon
         args: nil,
         array: nil,
         begin: nil,
-        block: :__block,
+        block: nil,
         blockarg: nil,  # #testpoint1.40
-        block_pass: :__block_pass,
+        block_pass: nil,
         break: nil,
         case: nil,
         casgn: nil,  # (formerly __const_assign)
-        cbase: :__cbase,
+        cbase: nil,
         class: nil,
         const: nil,
         def: nil,
         defined?: nil,
-        defs: :__defs,
+        defs: nil,
         dstr: nil,
         dsym: nil,
         ensure: nil,
@@ -138,15 +140,16 @@ module Skylab::BeautySalon
         ivasgn: nil,
         kwbegin: nil,
         kwoptarg: nil,
+        lambda: nil,
         lvar: nil,
         lvasgn: nil,
-        match_with_lvasgn: :__match_with_lvasgn,
+        match_with_lvasgn: nil,
         masgn: nil,
         mlhs: nil,  # (formerly: __mlhs_this_other_form)
         module: nil,
         next: nil,
         nil: nil,
-        nth_ref: :__nth_ref,
+        nth_ref: nil,
         op_asgn: nil,
         optarg: nil,
         or: nil,
@@ -162,7 +165,7 @@ module Skylab::BeautySalon
         return: nil,
         self: nil,
         send: nil,
-        sclass: :__singleton_class_block,
+        sclass: nil,
         splat: nil,
         str: nil,
         super: nil,
@@ -182,57 +185,23 @@ module Skylab::BeautySalon
 
       # (tombstone: __class)
 
-      def __singleton_class_block sc, body, self_node
-        _singleton_classable sc
-        _in_stack_frame self_node do
-          _any_node body
-        end
-      end
+      # (tombstone: __sclass)
 
       # (tombstone: __module)
 
       # -- method definition and related
 
-      def __defs sc, sym, args, body, self_node  # #testpoint1.37
-        _singleton_classable sc
-        _symbol sym
-        o :args, args
-        _in_stack_frame self_node do
-          _any_node body  # empty method body like #testpoint1.38
-        end
-      end
+      # (tombstone: __defs)
 
       # (tombstone: __def)
 
       # ~ (blocks are like procs are like method defs..)
 
-      def __block block_head, args, body
+      # (tombstone: __block)
 
-        m = CHILDREN_OF_BLOCK___.fetch block_head.type
-        _a = _pre_descend m, block_head
-        send m, * _a
+      # (tombstone: __lambda_as_block_child)
 
-        o :args, args
-
-        _any_node body  # (blocks can be empty)
-      end
-
-      CHILDREN_OF_BLOCK___ = {
-        lambda: :__lambda_as_block_child,
-        send: :__send_as_block_child,
-        super: :__super_as_block_child,
-        zsuper: :__zsuper_as_block_child,
-      }
-
-      def __lambda_as_block_child
-        NOTHING_
-      end
-
-      def __zsuper_as_block_child
-        # #todo in corpus but not covered.
-        # as seen in (a writing) brazen/test/433-collection-adapters/031-git-config/400-mutable/040-counterpart-parsing-canon_spec.rb)
-        NOTHING_
-      end
+      # (tombstone: __zsuper_as_block_child)
 
       # (tombstone: __args)
 
@@ -260,31 +229,13 @@ module Skylab::BeautySalon
 
       # -- calling methods
 
-      def __send_as_block_child receiver, sym, *args  # #testpoint1.20
-
-        # #todo the "as block child" of `send` is identical to oridnary send
-        # not covered but in corpus
-        # as seen in (at writing): common/test/fixture-directories/twlv-dli/glient.rb
-
-        _any_node receiver
-        _symbol sym
-        args.each do |n_|
-          _node n_
-        end
-      end
+      # (tombstone: __send_as_block_child)
 
       # (tombstone: __send)
 
       # (tombstone: __splat) (was a foolhardy [#doc.G] GONE)
 
-      def __block_pass n_
-        # for when a proc is passed as a block argument,
-        # as in:
-        #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
-        #                    ^^^^^^^^^^^^
-
-        _node n_
-      end
+      # (tombstone: __block_pass)
 
       # -- can only happen within a method
 
@@ -292,16 +243,7 @@ module Skylab::BeautySalon
 
       # (tombstone: __zsuper)
 
-      def __super_as_block_child * args
-
-        # #todo - is the same as next
-        # with no arg: #testpoint1.12
-        # with some args: #testpoitn1.12.B
-
-        args.each do |n_|
-          _node n_
-        end
-      end
+      # (tombstone: __super_as_block_child)
 
       # (tombstone: __super)
 
@@ -339,10 +281,7 @@ module Skylab::BeautySalon
 
       # -- assignment
 
-      def __match_with_lvasgn left_node, right_node  # #testpoint1.48
-        _node left_node
-        _node right_node
-      end
+      # (tombstone: __match_with_lvasgn)
 
       # (tombstone: __masgn)
 
@@ -354,45 +293,11 @@ module Skylab::BeautySalon
 
       # (tombstone: __and_asgn)
 
-      CHILDREN_OF_ASSIGNMENT___ = {
-        # ( these are repeats of symbols, but shorter versions.. #todo )
-        # ( if these have context-consistent variations in their signature,
-        #   are they really variations of the same symbol or are they
-        #   different symbols? :#provision1.2)
-
-        casgn: :__NOT_short_casgn,  # #testpoint1.6
-        gvasgn: :__short_gvasgn,
-        ivasgn: :__short_ivasgn,
-        lvasgn: :__short_lvasgn,
-      }
-
-      def __NOT_short_casgn wat, const
-        if wat
-          self._COVER_ME__this_one_term__  # #todo
-        end
-        _symbol const
-      end
-
       # (tombstone: __const_assign)
 
-      def __short_gvasgn sym
-        _symbol sym
-      end
-
-      def __gvasgn sym, rhs
-        _symbol sym
-        _node rhs
-      end
+      # (tombstone: __gvasgn)
 
       # (tombstone: __ivasgn)
-
-      def __short_ivasgn sym
-        _symbol sym
-      end
-
-      def __short_lvasgn sym
-        _symbol sym
-      end
 
       # (tombstone: __lvasgn)
 
@@ -406,34 +311,13 @@ module Skylab::BeautySalon
 
       # -- special section on expression of modules
 
-      def __expression_of_module n
-
-        # another (TEMPORARY) "foolhardy" [#doc.G] (see)
-
-        case n.type
-        when :const ; _node n  # can recurse back to here
-        when :cbase ; _node n  # `< ::BasicObject`
-        when :self  ; _node n  # #testpoint1.5
-        when :lvar  ; _node n  # #testpoint1.27
-        when :ivar  ; _node n  # #testpoint1.30
-        when :send  ; _node n  # #testpoint1.39
-        when :begin ; _node n  # #testpoint1.4
-        else
-          anything_is_possible_here_but_lets_make_a_note_of_it
-        end
-      end
-
       # (tombstone: __const)
 
-      def __cbase
-        NOTHING_
-      end
+      # (tombstone: __cbase)
 
       # -- magic variables (globals) and similar
 
-      def __nth_ref d  # `$1` #testpoint1.3
-        _integer d
-      end
+      # (tombstone: __nth_ref)
 
       # -- literals
 
@@ -451,10 +335,6 @@ module Skylab::BeautySalon
 
       # (tomstone: __dstr) (had syntax sidebar)
 
-      # :#double-quoted-string-like:
-      # for all of these, it's possible to have an empty symbol, backticks, etc
-      # (as seen in (at writing) basic/lib/skylab/basic/module/creator.rb:193)
-
       # (tombstone: __str)
 
       # (tombstone: __sym)
@@ -466,21 +346,6 @@ module Skylab::BeautySalon
       # (tomstone: __float)
 
       # (tombstone: __int)
-
-      def _singleton_classable n
-
-        # another (TEMPORARY) "foolhardy" [#doc.G]
-
-        case n.type
-
-        when :self   ; _node n   # `def self.xx`        #testpoint1.38
-        when :lvar   ; _node n   # `def o.xx`           #testpoint1.46
-        when :const  ; _node n   # `class << Foo::Bar`  #testpoint1.47
-        when :begin  ; _node n   #                      #testpoint1.1
-        else
-          interesting
-        end
-      end
 
       def _CVME n  # (exactly [#doc.H])
 

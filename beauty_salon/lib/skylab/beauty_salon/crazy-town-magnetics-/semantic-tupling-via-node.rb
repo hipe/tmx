@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::BeautySalon
 
   module CrazyTownMagnetics_::SemanticTupling_via_Node  # see :[#022]
@@ -31,7 +33,7 @@ module Skylab::BeautySalon
       )
     end
 
-    class AndOrOr__ < GrammarSymbol__
+    class Dualoid__ < GrammarSymbol__
       children(
         :LEFT_expression,
         :RIGHT_expression,
@@ -358,12 +360,23 @@ module Skylab::BeautySalon
 
       # nth_ref (placeheld)
 
+      class NthRef < GrammarSymbol__  # `$1` #testpoint1.3
+        children(
+          :INTEGER_integer_terminal,
+        )
+      end
+
       # lvar (placeheld)
 
       class Lvar < GrammarSymbol__
         children(
           :symbol_terminal,
         )
+      end
+
+      # cbase (placeheld)
+
+      class Cbase < CommonSingleton__
       end
 
       # const (placeheld)
@@ -403,7 +416,7 @@ module Skylab::BeautySalon
 
       # ivasgn (placeheld)
 
-      class Ivasgn < GrammarSymbol__
+      class Ivasgn < GrammarSymbol__   # one of ##here5
         children(
           :ivar_as_symbol_symbol_terminal,
           :zero_or_one_right_hand_side_expression,  # #testpoint1.54
@@ -412,7 +425,7 @@ module Skylab::BeautySalon
 
       # gvasgn (placeheld)
 
-      class Gvasgn < GrammarSymbol__
+      class Gvasgn < GrammarSymbol__  # one of ##here5
         children(
           :UMM_symbol_terminal,
           :zero_or_one_right_hand_side_expression,
@@ -421,9 +434,12 @@ module Skylab::BeautySalon
 
       # casgn (placeheld)
 
-      class Casgn < GrammarSymbol__
+      class Casgn < GrammarSymbol__  # one of ##here5
 
         # :#here2 this is structurally a subset of the other guy
+        #
+        # when this is as ##here5, #testpoint1.6 shows that it's not
+        # the short form that is surfaced.
 
         # deep form: fixture file: literals and assigment
         # non-deep form: fixture file: the first one
@@ -437,7 +453,7 @@ module Skylab::BeautySalon
 
       # lvasgn (placeheld)
 
-      class Lvasgn < GrammarSymbol__
+      class Lvasgn < GrammarSymbol__  # one of ##here5
         children(
           :lvar_as_symbol_symbol_terminal,
           :zero_or_one_right_hand_side_expression,  # #testpoint1.54
@@ -485,6 +501,13 @@ module Skylab::BeautySalon
         )
       end
 
+      # :#here5: the grammar symbols in this group, they typically have a
+      # symbol for a left side, and a righthand side that's the expression
+      # to be assigned. however, they all have a short form where only the
+      # left hand side is present. these variations are probably context-
+      # consistent. (so we ask, are they really variations of the same
+      # symbol or are they different symbols? :#provision1.2)
+
       #
       # Class and module definition
       #
@@ -507,6 +530,19 @@ module Skylab::BeautySalon
       end
 
       # sclass (placeheld)
+
+      class Sclass < GrammarSymbol__
+
+        def to_description
+          'sclass'
+        end
+
+        children(
+          :SINGLETON_CLASSABLE_expression,
+          :any_body_expression,
+        )
+        IS_BRANCHY = true
+      end
 
       # module (placeheld)
 
@@ -547,9 +583,29 @@ module Skylab::BeautySalon
 
       # defs (placeheld)
 
+      class Defs < GrammarSymbol__  # #testpoint1.37
+
+        def to_description
+          "defs: #{ symbol }"
+        end
+
+        children(
+          :SINGLETON_CLASSABLE_expression,  # see #here4
+          :symbol_terminal,
+          :args,
+          :any_BODY_expression,  # empty method body like #testpoint1.38
+        )
+
+        IS_BRANCHY = true
+      end
+
       # undef (placeheld)
 
+      # #open [#045] perhaps no trace of this in our corpus
+
       # alias (placeheld)
+
+      # #open [#045] perhaps no trace of this in our corpus
 
       #
       # Formal arguments
@@ -684,6 +740,8 @@ module Skylab::BeautySalon
 
       # csend (placeheld)
 
+      # #open [#045] no trace of this in our corpus
+
       # send (placeheld)
 
       class Send < GrammarSymbol__
@@ -699,15 +757,44 @@ module Skylab::BeautySalon
 
       # lambda (placeheld)
 
+      class Lambda < CommonSingleton__
+        # (this doesn't seem right that it's a singleton .. probably pragmatic)
+      end
+
       # block (placeheld)
 
       # (NOTE - we might be missing some stuff near above)
 
+      class Block < GrammarSymbol__
+        children(
+          :blockhead,
+          :args,
+          :any_BODY_expression,  # (blocks can be empty)
+        )
+      end
+
       # block_pass (placeheld)
+
+      class BlockPass < GrammarSymbol__
+
+        # for when a proc is passed as a block argument,
+        # as in:
+        #     foomie.toumie( & xx(yy(zz)) )  # (the part beginning with `&` & ending with `zz))`
+        #                    ^^^^^^^^^^^^
+
+        children(
+          :expression,
+        )
+      end
 
       # not (placeheld)
 
+      # #open [#045] really?
+
       # match_with_lvasgn (placeheld)
+
+      class MatchWithLvasgn < Dualoid__  # #testpoint1.48
+      end
 
       #
       # Control flow
@@ -717,12 +804,12 @@ module Skylab::BeautySalon
 
       # and (placeheld)
 
-      class And < AndOrOr__  # #testpoint1.36
+      class And < Dualoid__  # #testpoint1.36
       end
 
       # or (placeheld)
 
-      class Or < AndOrOr__
+      class Or < Dualoid__
       end
 
       # Conditionals
@@ -952,6 +1039,28 @@ module Skylab::BeautySalon
       end
     end
 
+    # this was another [#doc.G] where we tracked things that ended up being
+    # not a thing. here's what we used to call "expression of module":
+    #
+    #  - begin  #testpoint1.4
+    #  - self  #testpoint1.5
+    #  - lvar  #testpoint1.27
+    #  - ivar  #testpoint1.30
+    #  - send  #testpoint1.39
+
+    # :#here4: as [#doc.G], any expression can be "opened" into its
+    # singleton (syntactically). before we appreciated that, we tracked the
+    # different kinds of things that can be the operand here:
+    #
+    #   - begin  #testpoint1.1
+    #   - const (as `class << Foo::Bar`)  #testpoint1.47
+    #   - lvar (as in `def o.xx`)  #testpoint1.46
+    #   - self (as in `def self.xx`)  #testpoint1.38
+
+    # :#double-quoted-string-like:
+    # for all of these, it's possible to have an empty symbol, backticks, etc
+    # (as seen in (at writing) basic/lib/skylab/basic/module/creator.rb:193)
+
     these_four_asgn = [
       :casgn,
       :gvasgn,
@@ -1009,6 +1118,17 @@ module Skylab::BeautySalon
 
         * these_four_asgn,
         :send,   # #testpoint1.22
+      ],
+      blockhead: [
+        # (not sure if this is just a pragmatic decoration or a real thing)
+        :lambda,
+
+        :send,  # #testpoint1.20
+          # as seen in (at writing): common/test/fixture-directories/twlv-dli/glient.rb
+        :super,
+          # with no arg: #testpoint1.12  with some args: #testpoint1.12.B
+        :zsuper,
+          # as seen in (a writing) brazen/test/433-collection-adapters/031-git-config/400-mutable/040-counterpart-parsing-canon_spec.rb)
       ],
       const: [
         :const,
