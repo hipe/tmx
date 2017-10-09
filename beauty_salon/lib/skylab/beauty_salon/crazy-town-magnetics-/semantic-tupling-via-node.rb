@@ -566,7 +566,6 @@ module Skylab::BeautySalon
       # arg (placeheld)
 
       class Arg < CommonArg__
-
       end
 
       # optarg (placeheld)
@@ -581,33 +580,103 @@ module Skylab::BeautySalon
 
       # restarg (placeheld)
 
+      class Restarg < GrammarSymbol__
+
+        # neato - has no name if it's .. with no name
+
+        children(
+          :zero_or_one_OHAI_symbol_terminal,  # :#spot1.2 - special provision made for this form
+        )
+      end
+
       # kwarg (placeheld)
+
+      # #open [#045] we never use this
 
       # kwoptarg (placeheld)
 
+      class Kwoptarg < GrammarSymbol__  # #testpoint1.49
+        children(
+          :OHAI_symbol_terminal,
+          :DEFAULT_VALUE_expression,
+        )
+      end
+
       # kwrestarg (placeheld)
 
+      # #open [#045] we don't use this but probably should
+
       # shadowarg (placeheld)
+
+      # #open [#045] never seen this before
 
       # blockarg (placeheld)
 
       class Blockarg < CommonArg__  #testpoint1.40
-
       end
 
       # procarg0 (placeheld)
+
+      module Procarg0
+
+        # this grammar symbol isn't like the others. the structural
+        # variability that this grammar symbol introduces is something
+        # that the association grammar alone cannot accomodate:
+        #
+        # when your proc has a plain old arg like normal, the AST's only
+        # child is a symbol for the arguement's name #testpoint1.21
+        #
+        # however if you do one of these `-> |(foo,bar)| {..}`, then the
+        # AST is a wholly differently structured beast #testpoint1.45
+        #
+        # EXPERIMENTALLY (#todo) we're hacking thru an experiment with
+        # a factory pattern to accomodate this shenanigan. no dedicated
+        # coverage unless this really becomes a thing, for now.
+
+        class << self
+          def tap_class
+            NIL  # hi.
+          end
+          def receive_constituent_construction_services_ svcs
+            Multi.receive_constituent_construction_services_ svcs
+            CommonForm.receive_constituent_construction_services_ svcs
+            NIL
+          end
+          def accept_visitor_by n, & p
+            if 1 == n.children.length
+              CommonForm.accept_visitor_by n, & p
+            else
+              Multi.accept_visitor_by n, & p
+            end
+          end
+        end  # >>
+
+        class Multi < GrammarSymbol__
+          children(
+            :one_or_more_args,
+          )
+        end
+
+        class CommonForm < GrammarSymbol__
+          children(
+            :NAME_SYMBOL_symbol_terminal,
+          )
+        end
+
+        IS_BRANCHY = false
+      end
 
       # Ruby 1.8 block arguments
 
       # NOTE - we are skipping this section for now
 
-      # wontdo: (arg, arg_expr, restarg, restarg_expr, blockarg, blockarg_expr)
+      # wontdo: (arg, arg_expr, restarg_expr, blockarg, blockarg_expr)
 
       # MacRuby Objective-C arguments
 
       # NOTE - we are skipping this section for now
 
-      # wontdo: (objc_kwarg, restarg, objc_restarg)
+      # wontdo: (objc_kwarg, objc_restarg)
 
       #
       # Method calls

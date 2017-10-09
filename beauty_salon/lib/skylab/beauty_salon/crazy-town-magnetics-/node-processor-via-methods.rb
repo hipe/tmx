@@ -137,7 +137,7 @@ module Skylab::BeautySalon
         ivar: nil,
         ivasgn: nil,
         kwbegin: nil,
-        kwoptarg: :__kwoptarg,  # #testpoint1.49
+        kwoptarg: nil,
         lvar: nil,
         lvasgn: nil,
         match_with_lvasgn: :__match_with_lvasgn,
@@ -152,13 +152,13 @@ module Skylab::BeautySalon
         or: nil,
         or_asgn: nil,
         pair: nil,
-        procarg0: :__procarg0,
+        procarg0: nil,
         redo: nil,
         regexp: nil,
         regopt: nil,
         rescue: nil,
         resbody: nil,
-        restarg: :__restarg,
+        restarg: nil,
         return: nil,
         self: nil,
         send: nil,
@@ -238,37 +238,13 @@ module Skylab::BeautySalon
 
       # (tombstone: __arg)
 
-      def __kwoptarg sym, default_value
-        _symbol sym
-        _node default_value
-      end
+      # (tombstone: __kwoptarg)
 
       # (tombstone: __optarg)
 
-      def __restarg * zero_or_one
-        # neato - has no name if it's .. with no name
-        if zero_or_one.length.zero?
-          NOTHING_
-        else
-          _symbol( * zero_or_one )
-        end
-      end
+      # (tombstone: __restarg)
 
-      def __procarg0 * one_or_more
-
-        case 1 <=> one_or_more.length
-
-        when -1  # #testpoint1.45
-          one_or_more.each do |n|
-            o :arg, n
-          end
-
-        when 0  # #testpoint1.21
-          _symbol one_or_more[0]
-
-        when 1 ; oops
-        end
-      end
+      # (tombstone: __procarg0)
 
       # (tombstone: __blockarg)
 

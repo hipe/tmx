@@ -85,7 +85,7 @@ module Skylab::BeautySalon::TestSupport
         def tap_class
           NOTHING_
         end
-        def __receive_constituent_construction_services_ _
+        def receive_constituent_construction_services_ _
           NOTHING_
         end
       end ; end

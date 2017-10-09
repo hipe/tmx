@@ -104,7 +104,7 @@ module Skylab::BeautySalon
 
         if is_terminal
 
-          if has_plural_arity
+          if has_plural_arity && ! max_is_one
             raise MyException__.new :terminals_cannot_currently_be_plural_for_lack_of_need
           end
 
@@ -113,6 +113,11 @@ module Skylab::BeautySalon
           end
 
           TerminalAssociation___.define do |o|
+
+            if max_is_one
+              o.BE_SPECIAL
+            end
+
             o.stem_symbol = stem
             o.type_symbol = terminal_type_sym
             o.terminal_type_sanitizers = @module::TERMINAL_TYPE_SANITIZERS
@@ -255,7 +260,7 @@ module Skylab::BeautySalon
           cls = _the c
           cls.tap_class  # see
           @_const_for_existent_prepared_class_via_symbol[ k ] = c  # ONLY PLACE
-          cls.__receive_constituent_construction_services_ self
+          cls.receive_constituent_construction_services_ self
           recv_class[ cls ]
         end
         if when_not_found
@@ -383,7 +388,7 @@ module Skylab::BeautySalon
 
       class << self
 
-        def __receive_constituent_construction_services_ x  # #testpoint
+        def receive_constituent_construction_services_ x  # #testpoint
           @_constituent_construction_services = x
         end
 
@@ -589,8 +594,8 @@ module Skylab::BeautySalon
 
           if asc.is_terminal
 
-            if asc.has_plural_arity
-              cls._COVER_ME__cant_be_both_component_and_have_plural_arity__
+            if asc.has_plural_arity && ! asc.maximum_is_one
+              cls._COVER_ME__cant_be_both_terminal_and_have_truly_plural_arity__
             end
             has_writable_terminals = true
 
@@ -799,8 +804,13 @@ module Skylab::BeautySalon
     class TerminalAssociation___ < CommonChildAssociation__
 
       def initialize
+        @has_plural_arity = false
         yield self
         super
+      end
+
+      def BE_SPECIAL  # experiment for #spot1.2
+        @has_plural_arity = true
       end
 
       attr_writer(
@@ -841,12 +851,16 @@ module Skylab::BeautySalon
         NOTHING_
       end
 
-      def is_terminal
+      attr_reader(
+        :has_plural_arity,
+      )
+
+      def maximum_is_one  # only when relevant
         true
       end
 
-      def has_plural_arity
-        false
+      def is_terminal
+        true
       end
     end
 

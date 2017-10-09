@@ -156,12 +156,26 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'terminal, plural' do
+    context 'terminal, plural - normally not allowed EXPERIMENTAL' do
 
       given :one_or_more_fafooza_terminals
 
       it 'errors specifically', ex: true do
         _expect_exception :terminals_cannot_currently_be_plural_for_lack_of_need
+      end
+    end
+
+    context 'terminal, plural - this one kind allowed EXPERIMENTAL' do
+
+      given :zero_or_one_FAZOOZA_symbol_terminals
+
+      it 'builds' do
+        _builds
+      end
+
+      it 'details' do
+        _is_terminal
+        _is_plural
       end
     end
 
