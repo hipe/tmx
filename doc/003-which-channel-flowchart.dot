@@ -1,0 +1,50 @@
+digraph g {
+  t_start [label="start" shape=rect]
+
+  t_start->q_oc
+
+  q_oc->t_oc [label=yes]
+  q_oc->q_kiki [label=no]
+
+  q_kiki->t_kiki [label=yes]
+  q_kiki->q_memes [label=no]
+
+  q_memes->t_memes [label=yes]
+  q_memes->q_vobes [label=no]
+
+  q_vobes->t_vobes [label=yes]
+  q_vobes->q_vidya [label=no]
+
+  q_vidya->t_vidya [label=yes]
+  q_vidya->q_autists [label=no]
+
+  q_autists->t_autists [label=yes]
+  q_autists->q_tech [label=no]
+
+  q_tech->t_tech [label=yes]
+  q_tech->q_bouba [label=no]
+
+  q_bouba->t_bouba [label=yes]
+  q_bouba->t_kiki [label=no]
+
+/* */
+
+  q_autists [label="is it\nabout creative\ntechnique?" shape=diamond]
+  q_bouba [label="is it\nfriendly/\nhappy?" shape=diamond]
+  q_kiki [label="is it\nkiki?" shape=diamond]
+  q_memes [label="is it\na meme?" shape=diamond]
+  q_oc [label="is it\nyour own\nO.C.?" shape=diamond]
+  q_tech [label="is it related\nto tech?" shape=diamond]
+  q_vidya [label="is it\nrelated to\nvideo games?" shape=diamond]
+  q_vobes [label="is it\n\"vobey\"?" shape=diamond]
+
+  t_autists [label="#autists" shape=rect]
+  t_bouba [label="#bouba" shape=rect]
+  t_kiki [label="#kiki" shape=rect]
+  t_memes [label="#memes" shape=rect]
+  t_oc [label="#oc" shape=rect]
+  t_tech [label="#tech" shape=rect]
+  t_vidya [label="#gaming" shape=rect]
+  t_vobes [label="#vobes" shape=rect]
+
+}
