@@ -186,4 +186,16 @@ end
 def x.my_method
 end
 
+
+
+
+# -- special/perlish
+
+
+
+# `match_with_lvasgn` #testpoint1.48
+# (as seen in (at writing) arc/lib/skylab/arc/magnetics/qualified-component-via-value-and-association.rb:425)
+
+/xxx/ =~ x
+
 # #born

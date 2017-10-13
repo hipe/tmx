@@ -106,4 +106,16 @@ else
 end
 
 
+
+
+
+# -- keywords
+
+
+
+# `defined?` #testpoint1.33
+# (as seen in (at writing) test_support/lib/skylab/test_support/slowie/core.rb:374)
+
+defined? x
+
 # #born

@@ -3,6 +3,7 @@
 ## table of contents
 
   - TL;DR: (synopsis) [#here.s1]
+  - contextualizing preface [#here.s2]
   - the received order and our re-ordering rationale [#here.b]  [#here.s3]
   - finally - our ordering with numbers [#here.d]
   - appendix: about older tests [#here.s5]
@@ -15,6 +16,22 @@
 we changed the order of the categories of grammatical symbols from the
 order that the `parser` gem uses, for reasons. our order is presented in
 the [#here.d] last section of this document.
+
+
+
+
+## contextualizing preface :[#here.s2]
+
+although per #open [#007.B] this is currently a given,
+the test files sibling to this file target (conceptually) one specific
+version of the target language (or perhaps it is a superset of several
+versions). more precisely, it targets our targeting of one specific
+version of the remote ("vendor") library, which itself is targeting one
+specific version ..
+
+it is for this reason that we want this test branch node (folder) to
+happen somewhat after the more essential features of the grammar symbol
+modeling system.
 
 
 
@@ -115,7 +132,7 @@ again it is perhaps arbitrary, but here is the rationale:
     lower-level pieces first.
 
   - (note we have put method calls immediately after method definition,
-    becuase of the one-way dependency there. however in practice it's quite
+    because of the one-way dependency there. however in practice it's quite
     hard to write even a small ruby program without a method call, so this
     is a case where the conceptual trumps the practical.)
 

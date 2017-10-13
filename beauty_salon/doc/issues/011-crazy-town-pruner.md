@@ -23,7 +23,7 @@ the theory behind this project is that we use coverage information in
 concert with some kind of "smart" AST's to programmatically *prune* a
 codebase of code that is not covered.
 
-(EDIT)
+(edit the above #open [#047])
 
 
 

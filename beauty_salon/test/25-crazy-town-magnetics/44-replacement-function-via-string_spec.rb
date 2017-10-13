@@ -6,10 +6,10 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town
+    use :crazy_town_PARSY_TOWN
 
     it 'magnetic loads' do
-      subject_magnetic_ || fail
+      parsy_subject_magnetic_ || fail
     end
 
     it 'empty string' do
@@ -98,8 +98,8 @@ module Skylab::BeautySalon::TestSupport
       @STRING = s
     end
 
-    def subject_magnetic_
-      Home_::CrazyTownMagnetics_::ReplacementFunction_via_String
+    def parsy_subject_magnetic_
+      main_magnetics_::ReplacementFunction_via_String
     end
   end
 end

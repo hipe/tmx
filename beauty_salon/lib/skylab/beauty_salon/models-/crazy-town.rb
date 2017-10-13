@@ -264,6 +264,16 @@ module Skylab::BeautySalon
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
+      def __appropriate_grammar_symbol_feature_branch
+
+        # (used by one normalization here.)
+
+        # to [#007.B] support multiple ruby language versions, this
+        # would have to change from being hard-coded as it is here:
+
+        Home_::CrazyTownMagnetics_::StructuredNode_via_Node.structured_nodes_as_feature_branch
+      end
+
       def _filesystem
         @_user_resources.filesystem
       end
@@ -287,9 +297,13 @@ module Skylab::BeautySalon
           y << "«description coming soon»"
         end,
         :normalize_by, -> qkn, & p do
+
+          _fb = __appropriate_grammar_symbol_feature_branch
+
           wrap_thing.call qkn do
             Home_::CrazyTownMagnetics_::Selector_via_String.call_by do |o|
               o.string = qkn.value
+              o.grammar_symbols_feature_branch = _fb
               o.listener = p
             end
           end

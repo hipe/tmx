@@ -4,10 +4,12 @@ module Skylab::BeautySalon
 
     # for reports that want it, maintain a stack (or something like it),
     # avoiding creating extraneous objects when there is no listener for
-    # "branchy" nodes. see [#021.E]
+    # "branchy" nodes. continued at [#021.E]
 
     # for no particular reason except living dangerously, this is written
     # to be re-used across files..
+
+    self._TEMPORARILY_ON_HOLD  # while #open [#048]
 
     # -
 
@@ -20,7 +22,7 @@ module Skylab::BeautySalon
         if @branchy_node_hook
 
           @__grammar_symbol_feature_branch = Home_::CrazyTownMagnetics_::
-              SemanticTupling_via_Node.structured_nodes_as_feature_branch
+              StructuredNode_via_Node.structured_nodes_as_feature_branch
 
           @_thing_cache = {}
           @for_file = :__for_file_when_listener
@@ -32,6 +34,7 @@ module Skylab::BeautySalon
       end
 
       def for_file__ wast, & p
+        self._DISCONNECTED__at_this_commit__
         send @for_file, wast, & p
       end
 

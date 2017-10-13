@@ -2,44 +2,46 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - structural assertions', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - association assert any, plural, group', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
+    use :crazy_town_structured_nodes
 
     it 'minimum number of children not satisfied', ex: true do
 
       _ast = _ast_with_two_elements
       _cls = _class_for_switchoid
-      _e = _expect_exception _ast, _cls
-
-      _e.symbol == :minimum_number_of_children_not_satisfied || fail
+      expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
+        _go _ast, _cls
+      end
     end
 
     it 'maximum number of children exceeded', ex: true do
 
       _ast = _ast_with_four_elements
       _cls = _class_for_dualoid
-      _e = _expect_exception _ast, _cls
-
-      _e.symbol == :maximum_number_of_children_exceeded || fail
+      expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+        _go _ast, _cls
+      end
     end
 
     it 'against zib-bob when has too many', ex: true do
 
       _ast = _ast_with_three_elements
       _cls = _class_for_winker
-      _e = _expect_exception _ast, _cls
-      _e.symbol == :maximum_number_of_children_exceeded || fail
+      expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+        _go _ast, _cls
+      end
     end
 
     it 'against zib-bob when has too few', ex: true do
 
       _ast = _ast_with_zero_elements
       _cls = _class_for_winker
-      _e = _expect_exception _ast, _cls
-      _e.symbol == :minimum_number_of_children_not_satisfied || fail
+      expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
+        _go _ast, _cls
+      end
     end
 
     it 'against zib-bob when the greater possible length' do
@@ -69,8 +71,8 @@ module Skylab::BeautySalon::TestSupport
 
     it 'this dingus - something (HAS RECURSION)' do  # #testpoint1.52
 
-      _ast0 = builder_thing_[ :numbo_tron, 456 ]
-      _ast = builder_thing_[ :meh, 3232, _ast0 ]
+      _ast0 = _build_node :numbo_tron, 456
+      _ast = _build_node :meh, 3232, _ast0
 
       _cls = _class_for_winker
       o = _cls.via_node_ _ast
@@ -109,10 +111,10 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_that_is_quote_winking
       _cls = _class_for_dualoid
 
-      _e, pairs = _expect_exception_tuple _ast, _cls
-
-      _e.symbol == :missing_expected_child || fail
-
+      pairs = []
+      expect_exception_with_this_symbol_ :missing_expected_child do
+        _write_pairs_before_exception_into pairs, _ast, _cls
+      end
       pairs.length == 1 || fail
     end
 
@@ -130,8 +132,9 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_left_is_not_numeric
       _cls = _class_for_winkie
 
-      e = _expect_exception _ast, _cls
-      e.symbol == :group_affiliation_not_met || fail
+      expect_exception_with_this_symbol_ :group_affiliation_not_met do
+        _go _ast, _cls
+      end
     end
 
     it %q{'any' plus 'group' with fail on other in the 'any' slot}, ex: true do
@@ -139,8 +142,10 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_right_is_not_numeric
       _cls = _class_for_winkie
 
-      e, pairs = _expect_exception_tuple _ast, _cls
-      e.symbol == :group_affiliation_not_met || fail
+      pairs = []
+      expect_exception_with_this_symbol_ :group_affiliation_not_met do
+        _write_pairs_before_exception_into pairs, _ast, _cls
+      end
       pairs.length == 1 || fail
     end
 
@@ -175,24 +180,16 @@ module Skylab::BeautySalon::TestSupport
 
     # --
 
-    def _expect_exception ast, cls
-      _expect_exception_tuple( ast, cls ).first
-    end
-
-    def _expect_exception_tuple ast, cls
-      pairs = nil
-      begin
-        cls.accept_visitor_by ast do |*a|
-          ( pairs ||= [] ).push a
-        end
-      rescue subject_magnetic_::MyException__ => e
+    def _write_pairs_before_exception_into pairs, ast, cls
+      cls.each_qualified_child ast do |*a|
+        ( pairs ||= [] ).push a
       end
-      [ e, pairs ]
+      fail
     end
 
     def _expect_values ast, cls
       vals = []
-      cls.accept_visitor_by ast do |x|
+      cls.each_qualified_child ast do |x|
         vals.push x
       end
       vals
@@ -201,64 +198,72 @@ module Skylab::BeautySalon::TestSupport
     def _expect_values_and_associations ast, cls
 
       vals = [] ; ascs = []
-      cls.accept_visitor_by ast do |x, asc|
+      cls.each_qualified_child ast do |x, asc|
         vals.push x
         ascs.push asc
       end
       [ vals, ascs ]
     end
 
+    def _go ast, cls
+      cls.each_qualified_child ast do
+        NOTHING_
+      end
+    end
+
     # --
 
     shared_subject :_ast_left_is_not_numeric do
-      o = builder_thing_
+      o = parser_AST_node_builder_
       _ast_winky_left = _ast_that_is_other
       _ast_winky_right = _ast_that_is_numeric
       o[ :winkie_WOULD_BE, _ast_winky_left, _ast_winky_right ]
     end
 
     shared_subject :_ast_right_is_not_numeric do
-      o = builder_thing_
+      o = parser_AST_node_builder_
       _ast_winky_left = _ast_that_is_numeric
       _ast_winky_right = _ast_that_is_other
       o[ :winkie_WOULD_BE, _ast_winky_left, _ast_winky_right ]
     end
 
     shared_subject :_ast_right_is_not_present do
-      o = builder_thing_
+      o = parser_AST_node_builder_
       _ast_winky_left = _ast_that_is_numeric
       o[ :winkie_WOULD_BE, _ast_winky_left, NOTHING_ ]
     end
 
     shared_subject :_ast_with_zero_elements do
-      builder_thing_[ :meh ]
+      _build_node :meh
     end
 
     shared_subject :_ast_that_is_other do
-      builder_thing_[ :other_thing, :oThEr_tHiNg ]
+      _build_node :other_thing, :oThEr_tHiNg
     end
 
     shared_subject :_ast_that_is_numeric do
-      builder_thing_[ :inty, 1234 ]
+      _build_node :inty, 1234
     end
 
     alias_method :_ast_with_one_element, :_ast_that_is_numeric
 
     shared_subject :_ast_that_is_quote_winking do
-      builder_thing_[ :dualoid_WOULD_BE, 321, nil ]
+      _build_node :dualoid_WOULD_BE, 321, nil
     end
 
     shared_subject :_ast_with_two_elements do
-      builder_thing_[ :switchoid_WOULD_BE, 123, 456 ]
+      _build_node :switchoid_WOULD_BE, 123, 456
     end
 
     shared_subject :_ast_with_three_elements do
-      builder_thing_[ :meh, 123, 456, 789 ]
+      _build_node :meh, 123, 456, 789
     end
 
     shared_subject :_ast_with_four_elements do
-      builder_thing_[ :dualoid_WOULD_BE, 12, 34, 56, 78 ]
+      _build_node :dualoid_WOULD_BE, 12, 34, 56, 78
     end
+
+    alias_method :_build_node, :build_parser_AST_node__
 
     # --
 
@@ -297,17 +302,23 @@ module Skylab::BeautySalon::TestSupport
         _cls, :ZibBob,
         _cls2, :NumboTron,
         :ThisThirdGuy,
-      )
+      ) do
+        self::TERMINAL_TYPE_SANITIZERS = {
+          numzo: -> x do
+            ::Integer === x  # ..
+          end,
+        }
+      end
     end
 
     shared_subject :_this_other_feature_branch do
 
-      _cls = build_subclass_with_these_children_( :XX2_1,
+      _cls = build_subclass_with_these_children_( :MyDualoid_2,
         :left_numerick,
         :any_right_numerick,
       )
 
-      _cls2 = build_subclass_with_these_children_( :XX2_2,
+      _cls2 = build_subclass_with_these_children_( :MySingloid_2,
         :integer_value,
       )
 
@@ -327,18 +338,18 @@ module Skylab::BeautySalon::TestSupport
 
     shared_subject :_this_one_feature_branch do
 
-      _cls = build_subclass_with_these_children_( :XX1,
+      _cls = build_subclass_with_these_children_( :MySendoid_1,
         :value_under_scrutiny_expression,
         :one_or_more_whon_expressions,
         :any_elze_expression,
       )
 
-      _cls2 = build_subclass_with_these_children_( :XX2,
+      _cls2 = build_subclass_with_these_children_( :MyDualoid_1,
         :lefty_expression,
         :righty_expression,
       )
 
-      _cls3 = build_subclass_with_these_children_( :XX3,
+      _cls3 = build_subclass_with_these_children_( :MyWinkingDualoid_1,
         :lefty_expression,
         :any_righty_expression,
       )
@@ -354,11 +365,10 @@ module Skylab::BeautySalon::TestSupport
     # --
 
     def sandbox_module_
-      X_ctm_npvm_sa
+      X_ctm_npvm_aapg
     end
 
-    X_ctm_npvm_sa = ::Module.new  # const namespace for tests in this file
+    X_ctm_npvm_aapg = ::Module.new  # const namespace for tests in this file
   end
 end
-# #pending-rename: "association structural assertions" and/or something about "plurality" and "any-ness"
 # #born.

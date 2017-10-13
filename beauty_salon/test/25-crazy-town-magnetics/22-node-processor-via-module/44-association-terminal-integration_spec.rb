@@ -4,7 +4,7 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - terminal associations', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - association terminal integration', ct: true do
 
     # :[#022.4]: terminal associations (building off ideas in [#doc])
     #
@@ -16,7 +16,19 @@ module Skylab::BeautySalon::TestSupport
     #   - here we use the concept to model the end-of-the-line, primitive
     #     data of AST's (things like integers, strings and so on.)
     #
-    #   - experimentally the grammar is EDIT
+    #   - experimentally the association grammar is written such that:
+    #     A) you cannot model terminals with a truly plural assocation
+    #     (fortunately the target grammar is OK with this) and B) terminals
+    #     must be defined with a terminal type (any mono-tokened symbolic
+    #     name) that will be used to sanity check the type of the terminal
+    #     and C) you *can* define the any-ness of the terminal association.
+    #
+    # Preface:
+    #
+    #   - if you have any familiarity with the association grammar, the
+    #     below description might seem overblown. but note that the below
+    #     was synthesized before the association grammar even existed. so,
+    #     you can then see traces of its beginnings here.
     #
     # Story and initial requirements
     #
@@ -53,11 +65,12 @@ module Skylab::BeautySalon::TestSupport
     #     name.
     #
     #   - then the "structured uber alles" overhaul brought us an expressive,
-    #     concise grammar a side benefit of which was that a wrapped form
+    #     concise grammar a side benefit of whose was that a wrapped form
     #     of every child was accessible by name; no longer just those under
     #     associations specially marked as "component". in contrast, this
     #     made the "old way" appear as an obscure, hard-to-read API
-    #     (which can be seed under EDIT make a history marker).
+    #     (which can be seen in the asset code that served this test file
+    #     in the state immediately before #history-A.1).
     #
     #   - this kicked us into an existential quandry of exactly what a
     #     "component" is. in its received state, two salient characteristics:
@@ -67,8 +80,9 @@ module Skylab::BeautySalon::TestSupport
     #     named "terminals", we have made this rename but note that this
     #     writability has carried along with it for now.
     #
-    #
-    #   - (EDIT: something about both points above)
+    #   - as such this new synthesis makes the sensical (but not fully
+    #     powerful) provision that currently you can only mutate terminal
+    #     nodes (really, just dup-and-mutate)
 
     TS_[ self ]
     use :memoizer_methods
@@ -247,7 +261,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       def _association_index
-        _this_one_class.children_association_index
+        _this_one_class.association_index
       end
     end
 
@@ -257,13 +271,13 @@ module Skylab::BeautySalon::TestSupport
 
       it 'deref' do
         _ = _this_one_class
-        _hi = _.dereference_component__ :methodo_nameo
+        _hi = _.dereference_terminal_association__ :methodo_nameo
         _hi.stem_symbol == :methodo_nameo || fail
       end
 
       it 'list' do
         _ = _this_one_class
-        scn = _.component_index_to_symbolish_reference_scanner__
+        scn = _.to_symbolish_reference_scanner_of_terminals_as_grammar_symbol_class__
         scn.head_as_is == :methodo_nameo || fail
         scn.advance_one
         scn.no_unparsed_exists || fail
@@ -328,14 +342,9 @@ module Skylab::BeautySalon::TestSupport
 
     def _expect_exception sym
 
-      _exe_cls = subject_magnetic_::MyException__
-
-      begin
+      expect_exception_with_this_symbol_ sym do
         build_association_ given_symbol_
-      rescue _exe_cls => e
       end
-
-      e.symbol == sym || fail
     end
 
     def _builds
@@ -351,12 +360,11 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def sandbox_module_
-      X_ctm_npvm_comp
+      X_ctm_npvm_ati
     end
 
-    X_ctm_npvm_comp = ::Module.new  # const namespace for tests in this file
+    X_ctm_npvm_ati = ::Module.new  # const namespace for tests in this file
   end
 end
-# #pending-rename: association grammar integration
 # :#history-A.1: begin to dismantle method-based grammar representation
 # #born.

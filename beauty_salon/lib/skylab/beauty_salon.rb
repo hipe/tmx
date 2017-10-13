@@ -165,6 +165,21 @@ module Skylab::BeautySalon
     end
   end
 
+  class MyException_ < ::Exception  # #testpoint
+
+    def initialize sym
+      @symbol = sym
+    end
+
+    def message
+      @symbol.id2name.gsub UNDERSCORE_, SPACE_
+    end
+
+    attr_reader(
+      :symbol,
+    )
+  end
+
   # while #open [#now]
   module Models_
 
@@ -230,7 +245,7 @@ module Skylab::BeautySalon
   Home_ = self
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'
-  EMPTY_P_ = -> {}
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
   NEWLINE_ = "\n"

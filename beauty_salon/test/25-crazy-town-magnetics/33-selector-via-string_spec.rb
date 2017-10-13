@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town
+    use :crazy_town_PARSY_TOWN
 
     it 'magnetic loads' do
       _lower_level_subject_magnetic || fail
@@ -314,10 +314,10 @@ module Skylab::BeautySalon::TestSupport
     # --
 
     def _lower_level_subject_magnetic
-      Home_::CrazyTownMagnetics_::Selector_via_String::ParseTree_via_String
+      main_magnetics_::Selector_via_String::ParseTree_via_String
     end
 
-    alias_method :subject_magnetic_, :_lower_level_subject_magnetic
+    alias_method :parsy_subject_magnetic_, :_lower_level_subject_magnetic
 
     # ==
     # ==

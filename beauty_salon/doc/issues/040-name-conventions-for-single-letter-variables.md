@@ -1,6 +1,6 @@
 # name conventions for single-letter variables :[#040]
 
-(EDIT: this document is very old but at a cursory glance it looks close to current)
+(#open [#047]: this document is very old but at a cursory glance it looks close to current)
 
 a - array! used often as a variable suffix and standalone.
 b - rarely used. not used for boolean or block, because of the confusion

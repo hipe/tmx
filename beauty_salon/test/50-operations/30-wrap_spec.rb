@@ -29,7 +29,7 @@ module Skylab::BeautySalon::TestSupport
         call( * subject_dig,
           :num_chars_wide, 'zango',
         )
-        expect_failed_by_ :uninterpretable_under_number_set
+        _my_expect_failed_by :uninterpretable_under_number_set
       end
     end
 
@@ -50,7 +50,7 @@ module Skylab::BeautySalon::TestSupport
         call( * subject_dig,
           :num_chars_wide, -1,
         )
-        expect_failed_by_ :number_too_small
+        _my_expect_failed_by :number_too_small
       end
     end
 
@@ -79,18 +79,20 @@ module Skylab::BeautySalon::TestSupport
 
         _path = universal_fixture_ :three_lines
 
-        _upstream_io = ::File.open _path  # #TODO - does this get closed?
+        upstream_io = ::File.open _path
 
         call( * subject_dig,
 
           :output_bytestream, payload_output_lines,
           :informational_downstream, info_output_lines,
 
-          :upstream, _upstream_io,
+          :upstream, upstream_io,
           :num_chars_wide, 22,
         )
 
         expect_API_result_for_success_
+
+        upstream_io.closed? || fail  # #testpoint3.1
 
         [ info_output_lines, payload_output_lines ]
       end
@@ -98,7 +100,7 @@ module Skylab::BeautySalon::TestSupport
 
     # -- setup & execution
 
-    def expect_failed_by_ sym  # #TODO - this overwrites some other same name method
+    def _my_expect_failed_by sym
 
       # (there's a issue - these emissions should be corrected to have
       # this same symbol)

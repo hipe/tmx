@@ -7,7 +7,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy town reports - branchy nodes indented', ct: true do
+  describe '[bs] crazy town reports - branchy nodes indented', ct: true, wip: true do
 
     TS_[ self ]
     use :memoizer_methods

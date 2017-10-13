@@ -35,6 +35,15 @@ module Skylab::BeautySalon::TestSupport
 
   module InstanceMethods___
 
+    def expect_exception_with_this_symbol_ sym
+      begin
+        yield
+      rescue Home_::MyException_ => e
+      end
+      e || fail
+      e.symbol == sym || fail
+    end
+
     def expect_these_lines_in_array_with_trailing_newlines_ a, & p
       TestSupport_::Expect_Line::
           Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
@@ -74,16 +83,11 @@ module Skylab::BeautySalon::TestSupport
       Home_::API
     end
 
-    # -- retrofit
-
-    def expect_failed_by_ sym
-
-      em = expect_not_OK_event
-      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
-      expect_no_more_events
-      @result.should eql false
-      em
+    def main_magnetics_
+      Home_::CrazyTownMagnetics_
     end
+
+    # -- retrofit
 
     def expect_not_OK_event_ sym
       em = expect_not_OK_event

@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy town reports - integrate with API' do
+  describe '[bs] crazy town reports - integrate with API', ct: true do
 
     TS_[ self ]
     use :my_API

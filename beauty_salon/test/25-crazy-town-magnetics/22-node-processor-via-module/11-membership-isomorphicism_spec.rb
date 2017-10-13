@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    lib :crazy_town_THIS_STUFF  # just load do not enhance
+    lib :crazy_town_structured_nodes  # just load do not enhance
 
     it '(subject magnetic loads)' do
       _subject_magnetic || fail
@@ -31,7 +31,7 @@ module Skylab::BeautySalon::TestSupport
         _mod = module X_ctm_npvm_mis::ThisOneGuy
 
           module Items
-            o = TS_::Crazy_Town::THIS_STUFF::THIS_ONE_MOCK
+            o = TS_::Crazy_Town::Structured_Nodes::THIS_ONE_MOCK
             Joomie = o
             XxxFoomie = o
           end
@@ -65,7 +65,7 @@ module Skylab::BeautySalon::TestSupport
         _mod = module X_ctm_npvm_mis::ThisOtherGuy
 
           module Items
-            o = TS_::Crazy_Town::THIS_STUFF::THIS_ONE_MOCK
+            o = TS_::Crazy_Town::Structured_Nodes::THIS_ONE_MOCK
             NormieFormie = o
             X__doofined__ = o
             X__FOOLE__ = o
@@ -90,7 +90,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _subject_magnetic
-      Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
+      main_magnetics_::NodeProcessor_via_Module
     end
 
     X_ctm_npvm_mis = ::Module.new

@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
+    use :crazy_town_structured_nodes
 
     # #covers:`class` #covers:`module`
 

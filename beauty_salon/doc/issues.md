@@ -1,3 +1,13 @@
+[#049] #open flicker as documented
+
+[#048] #open temporarily breaking the branchy nodes report for sane worksize
+
+[#047] #small #open track many places where documentation is known to be
+             in need of freshening up
+
+[#046] #open this almost one-off script wasn't covered and is not broken
+             by structured uber-alles
+
 [#045] #open we have no intention of making #crazy-town platform language
              complete until quite a ways later. our current intention is
              to get it to work for our own corpus as a refactoring tool.
@@ -33,7 +43,7 @@
 [#025]       crazy town ..
              ( #was: #moved-to: [sa] )
 
-[#024] #open #SMALL fix sytax highlighting YUCK so you can use `~>` HEREDOC,
+[#024] #small #open fix sytax highlighting YUCK so you can use `~>` HEREDOC,
              which in turn will make "line stream via big string" less chunky
              ( #was: #moved-to: [sa] )
 
@@ -94,7 +104,13 @@
 
 [#007]       ( intra-subsystem issues )
 
-       #open [#here.I]: this idea
+      #small #open [#here.K]: as commented
+
+      #small #open #possible-optimization [#here.J]: as commented
+
+      #small #open [#here.I]: as commented
+
+      #small #open [#here.H]: as commented
 
              [#here.G]: whether or not "branchiness" should be markup in the
              grammar. that this is a const and not a method is because it's
@@ -104,8 +120,16 @@
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but
                about whether we will ever support arbitrarily prioritized optionals.
+
+             [#here.D]: the provision that we assert the many things we assert
+             of our formal grammar against the actual AST node (tree). things
+             like: arity, group, terminal type. (summary: it has a cost but we
+             see it as justified to sanity-check our model (grammar))
+
              [#here.C]: design decision: reports are simple magnetics, not actions
+
              [#here.B]: tickler: one day #crazy-town target multiple syntax versions
+
              [#here.A]: the document, which is a very early trace of etc ..
 
 [#006]       2012-10-28 #chore get ideas from skylab.rb, flatten to issues

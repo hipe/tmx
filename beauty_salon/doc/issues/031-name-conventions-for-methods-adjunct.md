@@ -1,6 +1,6 @@
 # the control-flow method-naming idiomspace :[#031]
 
-(EDIT: the meaning of the `resolve_` prefix has changed subtly,
+(#open [#047]: the meaning of the `resolve_` prefix has changed subtly,
 necessitating a rewrite for this document.
 as well, it is generally very old, and may be archived entirely.)
 

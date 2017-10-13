@@ -22,18 +22,17 @@ that we try to cover the lower-level components earlier, in front of the
 larger components (some of which in theory would need to use the smaller
 ones in order to effect themselves).
 
-(we deviate from this rubric only to put the "special" and edge cases
-at the end, for inexplicable OCD reasons.)
+the below order is now a reflection of the more deeply justified order
+established at #spot1.1, which we came up with after the initial draft
+of our order here but is more deeply justified there and is otherwise
+identical in spirit.
 
-  - literals and assignments
-  - control flow
-  - begin rescue end
-  - method definitions and method calls
-  - modules and classes
-  - special and edge
-
-(note: #spot1.1 (another test-level README like this one) improves on
-the above taxonomy.)
+  - literals, assignments (a merge of two categories) (111)
+  - [assignment - nothing]
+  - control flow (389)
+  - expression grouping (formerly called "begin rescue end") (500)
+  - method (un)definition, method calls (a merge of 2) (777)
+  - class and module definitions (944)
 
 
 

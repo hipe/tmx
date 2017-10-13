@@ -1,6 +1,6 @@
 # name conventions :[#030]
 
-(EDIT: this document is old. it is still 95% relevant but could use some
+(#open [#047]: this document is old. it is still 95% relevant but could use some
 cleanup near style :+#todo. the child nodes of this node is where it gets
 more interesting).
 
@@ -8,7 +8,7 @@ more interesting).
 
 ## some thoughts on the name `name` :[#]:A
 
-(EDIT: we use the name `name` strictly for name functions..but this may
+(#open [#047]: we use the name `name` strictly for name functions .. but this may
 change. the platform uses it for a const name, we may eschew using it at
 all for this reason - collisions with the platform method are
 problematic)

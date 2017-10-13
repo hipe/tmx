@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - read and write terminals', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - association terminal read write', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
+    use :crazy_town_structured_nodes
 
     it 'builds (use `via_node_)' do
       _this_one_structured_node || fail
@@ -93,7 +93,7 @@ module Skylab::BeautySalon::TestSupport
       _cls.via_node_ _ast
     end
 
-    # ~( NOTE - copy paste of previous test!
+    # ~( NOTE - copy-paste-modify of previous test!
 
     def _this_one_class
       _this_one_feature_branch.dereference :sendoid
@@ -127,10 +127,10 @@ module Skylab::BeautySalon::TestSupport
     # ~)
 
     def sandbox_module_
-      X_ctm_npvm_wrc
+      X_ctm_npvm_atrw
     end
 
-    X_ctm_npvm_wrc = ::Module.new  # const namespace for tests in this file
+    X_ctm_npvm_atrw = ::Module.new  # const namespace for tests in this file
   end
 end
 # #born.

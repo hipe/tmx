@@ -38,6 +38,7 @@
         require 'parser'
         require 'skylab/beauty_salon'
 
+        ::Kernel._OPEN__readme__  # #open [#046]
 
         _my_h = Skylab::BeautySalon::CrazyTownMagnetics_::NodeProcessor_via_Methods.grammar_reflection_hash
 

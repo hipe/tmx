@@ -44,8 +44,9 @@ module Skylab::BeautySalon
 
     # -
       attr_writer(
-        :string,
+        :grammar_symbols_feature_branch,
         :listener,
+        :string,
       )
 
       def execute
@@ -82,10 +83,10 @@ module Skylab::BeautySalon
 
         ok = true
 
-        has = @_structured_node_class.component_index_has_reference_as_function__
+        has = @_structured_node_class.terminal_association_index_has_reference_as_function__
 
         to_symbol_scanner = -> do
-          @_structured_node_class.component_index_to_symbolish_reference_scanner__
+          @_structured_node_class.to_symbolish_reference_scanner_of_terminals_as_grammar_symbol_class__
         end
 
         @_tree.list_of_boolean_tests.each do |bool_test|
@@ -123,33 +124,35 @@ module Skylab::BeautySalon
 
       def __check_that_we_have_our_special_meta_information_for_this_grammar_symbol
 
-        _ = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node.
-          structured_nodes_as_feature_branch.procure__ _entity_name_symbol, & @listener
+        _ = @grammar_symbols_feature_branch.procure__ _entity_name_symbol, & @listener
 
         _store :@_structured_node_class, _
       end
 
+      # ~( ##spot1.3: probably has redundancy with this other levenshtein
+
       def __check_that_name_is_in_list_of_known_grammar_symbols
 
-        h = CrazyTownMagnetics_::NodeProcessor_via_Methods.grammar_reflection_hash
-        if h[ _entity_name_symbol ]
+        fb = @grammar_symbols_feature_branch
+
+        if fb.has_reference__ _entity_name_symbol
+          $stderr.puts "ONCE: #{ _entity_name_symbol }"
           ACHIEVED_
         else
-          __levenshtein_for_entity_name { h.keys }
+          _scn = fb.to_symbolish_reference_scanner_
+          __levenshtein_for_entity_name _scn
         end
       end
 
-      def __levenshtein_for_entity_name
+      def __levenshtein_for_entity_name sym_scn
 
         _express_parse_error do |y|
-
-          _ks = yield
 
           ick_sym = _entity_name_symbol
 
           _s_a = Home_.lib_.human::Levenshtein.via(
             :item_string, ick_sym.id2name,
-            :items, _ks,
+            :items, sym_scn,
             :stringify_by, -> k { k.id2name },
             :map_result_items_by, -> s { %('#{ s }') },
             :closest_N_items, 3,
@@ -224,10 +227,10 @@ module Skylab::BeautySalon
 
       def __test_proc_via_test_AST test_AST
 
-        _component = @structured_node_class.dereference_component__ test_AST.symbol_symbol
+        _asc = @structured_node_class.dereference_terminal_association__ test_AST.symbol_symbol
 
         NodeTester_via_Component_and_Test_AST___.call_by do |o|
-          o.component = _component
+          o.terminal_association = _asc
           o.test_AST = test_AST
           o.structured_node_class = @structured_node_class
         end
@@ -241,8 +244,8 @@ module Skylab::BeautySalon
       # (as documented in only client, above)
 
       attr_writer(
-        :component,
         :structured_node_class,
+        :terminal_association,
         :test_AST,
       )
 
@@ -258,7 +261,7 @@ module Skylab::BeautySalon
 
         mixed_target_value = __prepare_target_value_for_comparison
 
-        component_offset = @component.offset
+        component_offset = @terminal_association.offset
 
         -> n do
 
@@ -269,7 +272,7 @@ module Skylab::BeautySalon
       end
 
       def __prepare_target_value_for_comparison
-        send THESE2___.fetch @component.type_symbol
+        send THESE2___.fetch @terminal_association.type_symbol
       end
 
       THESE2___ = {

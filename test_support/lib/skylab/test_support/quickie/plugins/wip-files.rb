@@ -10,6 +10,7 @@ module Skylab::TestSupport
       def initialize
         o = yield  # microservice
         @_client_listener = o.listener
+        @_narrator = o.argument_scanner_narrator
         @_shared_datapoint_store = o
       end
 

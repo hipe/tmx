@@ -105,11 +105,11 @@ module Skylab::BeautySalon
         if is_terminal
 
           if has_plural_arity && ! max_is_one
-            raise MyException__.new :terminals_cannot_currently_be_plural_for_lack_of_need
+            raise MyException_.new :terminals_cannot_currently_be_plural_for_lack_of_need
           end
 
           if is_any
-            raise MyException__.new :we_have_never_needed_terminals_to_have_the_ANY_modifier
+            raise MyException_.new :we_have_never_needed_terminals_to_have_the_ANY_modifier
           end
 
           TerminalAssociation___.define do |o|
@@ -174,12 +174,13 @@ module Skylab::BeautySalon
           _the c
         end, -> do
           _load k, IDENTITY_, -> do
-            GenericGrammarSymbol___  # after #open #[#022.E2] we shouldn't need these
+            GenericGrammarSymbol___  # after #open #[#048] we shouldn't need these
           end
         end
       end
 
-      def has_reference_FOR_TRANSITION_ASSUME_RESULT_IS_CACHED__ k
+      def has_reference__ k
+        # (assume result is cached so you don't techincally need to cache it here)
         _of k, MONADIC_TRUTH_, -> do
           _load k, MONADIC_TRUTH_, EMPTY_P_
         end
@@ -195,6 +196,8 @@ module Skylab::BeautySalon
 
       # --
 
+      # ~( ##spot1.3: probably has redunancy with this other levenshtein
+
       def __when_not_found listener, k
 
         me = self
@@ -206,7 +209,7 @@ module Skylab::BeautySalon
 
       def __levenshtein_into_under y, ick_sym, expag
 
-        scn = __woot_scanner  # seee
+        scn = to_symbolish_reference_scanner_  # see
 
         y << %(currently we don't yet have metadata for grammar symbol '#{ ick_sym }'.)
 
@@ -220,9 +223,9 @@ module Skylab::BeautySalon
         end
       end
 
-      def __woot_scanner
+      def to_symbolish_reference_scanner_
+        $stderr.puts "MAKE A NAME OUT OF EVERYTHING ONCE"
 
-        # (we don't want to need this elsewhere. at full realization of #open [#022.E2]..)
         # (it's a serious headache to try to read from the cache and deal with irregular names)
 
         scn = Home_.lib_.zerk::No_deps[]::Scanner_via_Array.new @_items_module.constants
@@ -242,6 +245,8 @@ module Skylab::BeautySalon
           use[ c ]  # hi.
         end
       end
+
+      # ~)
 
       # --
 
@@ -305,68 +310,9 @@ module Skylab::BeautySalon
 
     # ==
 
-    TRAVERSAL_EXPERIMENT___ = -> ast, recv, gram_symbol do
-      # (maybe rename to "recurse")
-      # -
-        ai = gram_symbol.children_association_index
-
-        cx = ast.children
-        num_children = cx.length
-
-        if ai.minimum_number_of_children > num_children
-          raise MyException__.new :minimum_number_of_children_not_satisfied
-        end
-
-        if (( max = ai.maximum_number_of_children )) && max < num_children
-          raise MyException__.new :maximum_number_of_children_exceeded
-        end
-
-        ascs = ai.associations
-
-        visit = -> x, asc do  # #todo
-          if x
-            if (( gi = asc.group_information )) && ! gi[ x.type ]
-              raise MyException__.new :group_affiliation_not_met
-            end
-            recv[ x, asc ]
-          elsif asc.is_any
-            recv[ x, asc ]
-          else
-            raise MyException__.new :missing_expected_child
-          end
-        end
-
-        if ai.has_plural_arity_as_index
-
-          ai.for_offsets_stretched_to_length num_children do |o|
-
-            o.first_third do |d|
-              visit[ cx.fetch( d ), ascs.fetch( d ) ]
-            end
-
-            asc = ascs.fetch ai.offset_of_association_with_plural_arity
-            o.middle_third do |cx_d|
-              visit[ cx.fetch( cx_d ), asc ]
-            end
-
-            o.final_third do |cx_d, asc_d|
-              visit[ cx.fetch( cx_d ), ascs.fetch( asc_d ) ]
-            end
-          end
-        else
-          cx.each_with_index do |x, d_|
-            visit[ x, ascs.fetch( d_ ) ]
-          end
-        end
-        NIL
-      # -
-    end
-
-    # ==
-
     class GenericGrammarSymbol___
 
-      # (for perhaps only one report.. should go away after #open [#022.E2])
+      # (we shouldn't need this any more now that we have structured uber-alles. but confirm at #open [#048])
 
       class << self
         alias_method :via_node_, :new
@@ -401,7 +347,7 @@ module Skylab::BeautySalon
           # (exactly as described in the implementation section of [#022.E])
 
           if self::ASSOCIATIONS
-            raise MyException__.new :cannot_redefine_or_add_to_any_existing_children_definition
+            raise MyException_.new :cannot_redefine_or_add_to_any_existing_children_definition
           end
 
           const_set :ASSOCIATIONS, LazilyEvaluatedChildren___.new( self, sym_a )
@@ -410,70 +356,86 @@ module Skylab::BeautySalon
 
         # -- read
 
-        def accept_visitor_by ast, & p
-          TRAVERSAL_EXPERIMENT___[ ast, p, self ]
+        def each_qualified_child n
+
+          # (you may be tempted to want to optimize this for, say, singleton
+          # grammar symbols (that never have children) so you can write this
+          # assuming a scanner with at least one element; BUT even when the
+          # formal length expectation is zero, we still have to check this
+          # formal assumption against the actual length (provided that that's
+          # still our [#007.D] provision) and it behooves us to do all such
+          # assertion with the same machinery.) #testpoint2.11
+
+          scn = build_qualified_children_scanner_for_ n
+
+          until scn.no_unparsed_exists
+            _x = if scn.current_association_is_terminal
+              scn.current_terminal_AST_node
+            else
+              scn.current_nonterminal_AST_node
+            end
+            yield _x, scn.current_association
+            scn.advance_one
+          end
+        end
+
+        def build_qualified_children_scanner_for_ n
+          CrazyTownMagnetics_::Dispatcher_via_Hooks::
+              QualifiedChildrenScanner.for n, association_index
         end
 
         # ~
 
-        def dereference_component__ sym  # #testpoint
-          _d = _component_index.fetch( sym )
-          children_association_index.associations.fetch _d
+        def dereference_terminal_association__ sym  # #testpoint
+          _d = _terminal_association_index.fetch( sym )
+          association_index.associations.fetch _d
         end
 
-        def component_index_has_reference_as_function__
-          h = _component_index
+        def terminal_association_index_has_reference_as_function__
+          h = _terminal_association_index
           -> k do
             h.key? k  # hi.
           end
         end
 
-        def component_index_to_symbolish_reference_scanner__  # #testpoint
-          _h = _component_index
+        def to_symbolish_reference_scanner_of_terminals_as_grammar_symbol_class__  # #testpoint
+          _h = _terminal_association_index
           Scanner_[ _h.keys ]
         end
 
-        def _component_index
-          send( @_component_index ||= :__component_index_initially )
+        def _terminal_association_index
+          send( @_terminal_association_index ||= :__terminal_association_index_initially )
         end
 
-        def __component_index_initially
-          @_component_index = :__component_index
-          ai = children_association_index
+        def __terminal_association_index_initially
+          @_terminal_association_index = :__terminal_association_index
+          ai = association_index
           if ! ai.has_writable_terminals
-            self._COVER_ME__meh_no_components_meh__
+            self._COVER_ME__meh_no_terminals_meh__
           end
-          @__component_index = ComponentIndex_via_AssociationIndex___[ ai ]
-          send @_component_index
+          @__terminal_association_index = TerminalAssociationIndex_via_AssociationIndex___[ ai ]
+          send @_terminal_association_index
         end
 
-        def __component_index
-          @__component_index
+        def __terminal_association_index
+          @__terminal_association_index
         end
 
         # ~
 
         def MEMBERS  # not covered, use in development
-          children_association_index.associations.map do |asc|
+          association_index.associations.map do |asc|
             asc._SYMBOL_FOR_MEMBERS_
           end
         end
 
-        def children_association_index
+        def association_index
           asc = self::ASSOCIATIONS
           if ! asc.__is_realized_
             asc.__realize_ @_constituent_construction_services
           end
           asc.__index_
         end
-      end # >>
-    end  # (will re-open)
-
-    # ==
-
-    class GrammarSymbol  # (re-open)
-
-      class << self
 
         def tap_class  # hacky thing to set breakpoints for particular classes, from the "grammar"
           NOTHING_
@@ -491,7 +453,7 @@ module Skylab::BeautySalon
         #   - evaluates the association definitions if they haven't
         #     been evaluatied yet, which writes methods to our class (yikes!)
 
-        _ai = self.class.children_association_index
+        _ai = self.class.association_index
 
         _ai.associations.each do |asc|
 
@@ -515,7 +477,7 @@ module Skylab::BeautySalon
         # of children/each child, assert trueish-ness (any-ness), group,
         # and children length. (the lattermost is assumed #here5)
         a = []
-        self.class.accept_visitor_by @_node_ do |x, _asc|
+        self.class.each_qualified_child @_node_ do |x, _asc|
           a.push x
         end
         a.freeze
@@ -576,44 +538,19 @@ module Skylab::BeautySalon
       def __realize_ svcs
 
         cls = remove_instance_variable :@__class
+
         @__is_realized_ = true
 
-        _sym_a = remove_instance_variable :@__unevaluated_definition_of_children
-
-        index_of_plural = nil
-        once = -> d do
-          index_of_plural = d ; once = nil
-        end
-
-        a = []
-        has_writable_terminals = false
-
-        _sym_a.each_with_index do |sym, d|
-
-          asc = svcs.__child_association_via_symbol_and_offset_ sym, d
-
-          if asc.is_terminal
-
-            if asc.has_plural_arity && ! asc.maximum_is_one
-              cls._COVER_ME__cant_be_both_terminal_and_have_truly_plural_arity__
-            end
-            has_writable_terminals = true
-
-          elsif asc.has_plural_arity
-            once[ d ]
-          end
-
-          a.push asc
-        end
+        ai = AssociationIndex___.new(
+          remove_instance_variable( :@__unevaluated_definition_of_children ),
+          svcs )
 
         # (we can't write methods until we know if there's a plural)
 
-        ai = ChildAssociationIndex___.new index_of_plural, has_writable_terminals, a.freeze
-
-        if index_of_plural
+        if ai.has_plural_arity_as_index
           Write_methods_for_variable_length_children_array___[ cls, ai ]
         else
-          a.each_with_index do |asc, d|
+          ai.associations.each_with_index do |asc, d|
             asc._write_methods_for_non_plural_ cls, d
           end
         end
@@ -637,7 +574,7 @@ module Skylab::BeautySalon
       plur_asc = a.fetch here
       num_ascs = a.length
 
-      ai.for_offsets_stretched_to_length num_ascs do |o|
+      ai._each_association_offset_categorized do |o|
 
         o.first_third do |d|
           a.fetch( d )._write_methods_for_non_plural_ cls, d
@@ -664,19 +601,19 @@ module Skylab::BeautySalon
 
     # ==
 
-    ComponentIndex_via_AssociationIndex___ = -> ai do
+    TerminalAssociationIndex_via_AssociationIndex___ = -> ai do
       # -
-        hard_offset_via_component_stem_symbol = {}
+        hard_offset_via_terminal_stem_symbol = {}
 
         ascs = ai.associations
         num_assocs = ascs.length
 
-        ai.for_offsets_stretched_to_length num_assocs do |o|
+        ai._each_association_offset_categorized do |o|
 
           o.first_third do |d|
             asc = ascs.fetch d
             if asc.is_terminal
-              hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d
+              hard_offset_via_terminal_stem_symbol[ asc.stem_symbol ] = d
             end
           end
 
@@ -688,24 +625,53 @@ module Skylab::BeautySalon
           o.final_third do |d|
             asc = ascs.fetch d
             if asc.is_terminal
-              hard_offset_via_component_stem_symbol[ asc.stem_symbol ] = d + neg
+              hard_offset_via_terminal_stem_symbol[ asc.stem_symbol ] = d + neg
             end
           end
         end
 
-        hard_offset_via_component_stem_symbol
+        hard_offset_via_terminal_stem_symbol
       # -
     end
 
     # ==
 
-    class ChildAssociationIndex___
+    class AssociationIndex___  # #testpoint
 
-      def initialize d, has_writable_terminals, a
+      def initialize sym_a, svcs
+
+        plur_d = nil
+        once = -> d do
+          plur_d = d ; once = nil
+        end
+
+        a = []
+        has_writable_terminals = false
+
+        sym_a.each_with_index do |sym, d|
+
+          asc = svcs.__child_association_via_symbol_and_offset_ sym, d
+
+          if asc.is_terminal
+
+            if asc.has_plural_arity && ! asc.maximum_is_one
+              ::Kernel._COVER_ME__cant_be_both_terminal_and_have_truly_plural_arity__
+            end
+            has_writable_terminals = true
+
+          elsif asc.has_plural_arity
+            once[ d ]
+          end
+
+          a.push asc
+        end
+
+        # -- only: plur_d, has_writable_terminals, a
+
         len = a.length
-        if d
+        if plur_d
 
-          plur_asc = a.fetch d
+          plur_asc = a.fetch plur_d
 
           if plur_asc.minimum_is_one
             min = len
@@ -720,8 +686,8 @@ module Skylab::BeautySalon
             max = NO_LIMIT_
           end
 
-          @number_of_associations_at_the_end = len - d - 1
-          @offset_of_association_with_plural_arity = d
+          @number_of_associations_at_the_end = len - plur_d - 1
+          @offset_of_association_with_plural_arity = plur_d
           @has_plural_arity_as_index = true
         else
           min = len
@@ -738,39 +704,12 @@ module Skylab::BeautySalon
         freeze
       end
 
-      def for_offsets_stretched_to_length num_children, & p
+      def _each_association_offset_categorized( & p )  # #testpoint
 
-        # assume has plural arity. abstract the traversal of an array of
-        # real children, associated with their corresponding associations.
-        # could be efficientized, but meh
+        # (this used to be the "stretch" thing)
 
-        a = [] ; TheseHooks___.new a, p
-        first, mid, final = a ; a = nil
-
-        # -- the number of itmes in the 1st 3rd is equal to this one offset
-
-        here = @offset_of_association_with_plural_arity
-        here.times( & first )
-        cx_d = here - 1
-
-        # -- where we stop in the middle 3rd depends on how many children
-
-        num_at_end = @number_of_associations_at_the_end
-        last_offset_of_middle_run = num_children - num_at_end - 1
-
-        until last_offset_of_middle_run == cx_d
-          cx_d += 1
-          mid[ cx_d ]
-        end
-
-        # -- the last 3rd iterates N times, but tell it the asc offset too
-
-        asc_d = here  # will advance immediately
-        num_at_end.times do
-          cx_d += 1 ; asc_d += 1
-          final[ cx_d, asc_d ]
-        end
-        NIL
+        CrazyTownMagnetics_::Dispatcher_via_Hooks::
+            EachAssociationOffsetCategorized[ p, self ]
       end
 
       attr_reader(
@@ -782,21 +721,6 @@ module Skylab::BeautySalon
         :number_of_associations_at_the_end,
         :offset_of_association_with_plural_arity,
       )
-    end
-
-    class TheseHooks___
-      def initialize a, p
-        @a = a ; p[ self ] ; remove_instance_variable :@a  # sanity
-      end
-      def first_third & p
-        @a[0] = p
-      end
-      def middle_third & p
-        @a[1] = p
-      end
-      def final_third & p
-        @a[2] = p
-      end
     end
 
     CommonChildAssociation__ = ::Class.new Common_::SimpleModel
@@ -824,8 +748,8 @@ module Skylab::BeautySalon
 
       def _write_methods_for_non_plural_ cls, hard_offset
 
-        # currently while we assume that COMPONENT is a simple primary,
-        # likewise keep the reading simple - memoization wouldn't gain anything
+        # keep it simple - memoization wouldn't gain anything.
+        # since it's a terminal (i.e primitive) value, there's not wrapping
 
         cls.send :define_method, @stem_symbol do
           @_node_.children.fetch hard_offset
@@ -837,7 +761,7 @@ module Skylab::BeautySalon
         _x = @terminal_type_sanitizers.fetch @type_symbol
         _yes = _x[ x ]
         if ! _yes
-          raise MyException__.new :terminal_type_assertion_failure
+          raise MyException_.new :terminal_type_assertion_failure
         end
       end
 
@@ -939,7 +863,6 @@ module Skylab::BeautySalon
 
       def _write_methods_for_non_plural_ cls, hard_offset  # put at for STRUCT CHILD
 
-        # NOTE move this comment #todo
         # here is an example of where we expose structured recursion to the
         # same kind of structural validation we assert when traversing otherwise
 
@@ -1014,23 +937,6 @@ module Skylab::BeautySalon
 
     # ==
 
-    class MyException__ < ::Exception  # #testpoint
-
-      def initialize sym
-        @symbol = sym
-      end
-
-      def message
-        @symbol.id2name.gsub UNDERSCORE_, SPACE_
-      end
-
-      attr_reader(
-        :symbol,
-      )
-    end
-
-    # ==
-
     class SickMemoizerBro___
 
       def initialize d, & p
@@ -1067,5 +973,6 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #tombstone-A.2: replaced recursive method call-based traversal with scanner-based
 # #tombstone-A.1: changed association store to accomodate inheritence
 # #broke-out from "selector via string"

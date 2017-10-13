@@ -2,9 +2,10 @@
 
 module Skylab::BeautySalon
 
-  module CrazyTownMagnetics_::SemanticTupling_via_Node  # see :[#022]
+  module CrazyTownMagnetics_::StructuredNode_via_Node  # see :[#022]
 
     # experiment.
+    # NOTE - this should be tied to a ruby version range, but we ..
 
     class << self
       define_method :structured_nodes_as_feature_branch, ( Lazy_.call do
@@ -265,7 +266,7 @@ module Skylab::BeautySalon
         #
 
         # we used to cover these with dedicated assertive code (the
-        # oldschool equivalent to today's type) that was "foolhardy" [#doc.G]
+        # oldschool equivalent to today's type) #[#021.G] "foolhardy"
         #
         #   - begin  #testpoint1.14
         #   - const  #testpoint1.15
@@ -383,13 +384,13 @@ module Skylab::BeautySalon
 
       class Const < GrammarSymbol__
 
-        # TODO - #here2
+        # structurally this is a superset of #here2, but no inheritence because [#022.E.2]
 
         def _to_friendly_string
           my_s = symbol.id2name
           sn = any_parent_const_expression
           if sn
-            buff = sn._to_friendly_string  # #TODO there are tons of holes here
+            buff = sn._to_friendly_string  # #open [#007.K] there are tons of holes here
             buff << COLON_COLON_ << my_s
           else
             my_s
@@ -436,13 +437,14 @@ module Skylab::BeautySalon
 
       class Casgn < GrammarSymbol__  # one of ##here5
 
-        # :#here2 this is structurally a subset of the other guy
-        #
         # when this is as ##here5, #testpoint1.6 shows that it's not
         # the short form that is surfaced.
 
         # deep form: fixture file: literals and assigment
         # non-deep form: fixture file: the first one
+
+        # :#here2 this is structurally a subset of the other guy but we
+        # cannot do inheritence beause [#022.E.2]
 
         children(
           :any_PARENT_CONST_expression,
@@ -487,7 +489,7 @@ module Skylab::BeautySalon
         # (presumably: 'multi left-hand side' or something)
 
         children(
-          :one_or_more_assignableformlhss,  # YUCK that name TODO
+          :one_or_more_assignableformlhss,  # #open :[#007.I]: YUCK that name
         )
       end
 
@@ -522,7 +524,7 @@ module Skylab::BeautySalon
 
         children(
           :todo_module_identifier_const,
-          :any_superclass_expression,  # TODO: group: "expression of module"
+          :any_superclass_expression,  # used to be "expression of module" see #here6
           :any_body_expression,
         )
 
@@ -698,11 +700,12 @@ module Skylab::BeautySalon
             CommonForm.receive_constituent_construction_services_ svcs
             NIL
           end
-          def accept_visitor_by n, & p
+          def each_qualified_child n, & p
+            ::Kernel._OKAY
             if 1 == n.children.length
-              CommonForm.accept_visitor_by n, & p
+              CommonForm.each_qualified_child n, & p
             else
-              Multi.accept_visitor_by n, & p
+              Multi.each_qualified_child n, & p
             end
           end
         end  # >>
@@ -1039,8 +1042,8 @@ module Skylab::BeautySalon
       end
     end
 
-    # this was another [#doc.G] where we tracked things that ended up being
-    # not a thing. here's what we used to call "expression of module":
+    # this was another case of #[#021.G] "foolhardy". as mentioned there,
+    # here's what we used to call "expression of module": :#here6
     #
     #  - begin  #testpoint1.4
     #  - self  #testpoint1.5
@@ -1048,7 +1051,7 @@ module Skylab::BeautySalon
     #  - ivar  #testpoint1.30
     #  - send  #testpoint1.39
 
-    # :#here4: as [#doc.G], any expression can be "opened" into its
+    # :#here4: as developed in  #[#021.G] "foolhardy", any expression can be "opened" into its
     # singleton (syntactically). before we appreciated that, we tracked the
     # different kinds of things that can be the operand here:
     #
@@ -1092,7 +1095,7 @@ module Skylab::BeautySalon
         :arg,
 
         # (this is compared to :#here1)
-        # TODO - do you really want this distinction? compare and contrast
+        # #open [#007.H]: do you really want this distinction? compare and contrast
 
         :send,  # #testpoint1.9
           # a send that ends up thru sugar calling `foo=`
@@ -1186,7 +1189,6 @@ end
 # :#history-A.5: as referenced
 # #history-A.4: when we introduced inheritence
 # :#history-A.3: as referenced
-# #pending-rename: "structured node" or similar
 # #history-A.2: move oldschool support out so it's just constituents
 # #history-A.1: inject comment placeholder for every grammar symbol saw visually
 # #born.

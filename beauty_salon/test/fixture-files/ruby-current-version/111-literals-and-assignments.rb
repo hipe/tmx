@@ -121,6 +121,20 @@ $my_global ||= x
 
 
 
+# (magic) `gvar` #testpoint1.44
+# (as seen in (at writing) common/lib/skylab/common/name/conversion-functions.rb:57)
+
+x, y, z = $~.captures
+
+
+
+# nth_ref #testpoint1.3
+
+x = $1
+
+
+
+
 # -- list assignment
 
 

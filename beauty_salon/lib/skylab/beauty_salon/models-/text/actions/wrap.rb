@@ -191,7 +191,7 @@ module Skylab::BeautySalon
 
       def __process_upstream_lines
 
-        line = @upstream.gets
+        line = _gets_line
         if line
           __process_nonzero_upstream_lines line
 
@@ -209,8 +209,6 @@ module Skylab::BeautySalon
 
           y < "(file had no lines - #{ pth path })"
         end
-
-        _maybe_close_upstream
 
         ACHIEVED_
       end
@@ -254,16 +252,14 @@ module Skylab::BeautySalon
           if @line_range_union.include? @upstream.lineno
             ok = hot_line[]
             ok or break
+            if @upstream.closed?
+              break  # #testpoint3.1
+            end
           else
             cold_line[]
           end
-          line = @upstream.gets
-          if line
-            redo
-          end
-          _maybe_close_upstream
-          break
-        end while nil
+          line = _gets_line
+        end while line
 
         ok and begin
           if did_engage
@@ -272,11 +268,6 @@ module Skylab::BeautySalon
             __when_no_lines_were_in_range
           end
         end
-      end
-
-      def _maybe_close_upstream
-        @upstream.close  # ..
-        NIL
       end
 
       def __when_no_lines_were_in_range
@@ -303,7 +294,7 @@ module Skylab::BeautySalon
 
           @token_buffer.gets_proc = -> do
             if @line_range_union.include?( @upstream.lineno + 1 )
-              @upstream.gets
+              _gets_line
             end
           end
 
@@ -321,6 +312,17 @@ module Skylab::BeautySalon
 
         ACHIEVED_
       end
+
+      DEFINITION_FOR_THE_METHOD_CALLED_GETS_LINE__ = -> do
+        line = @upstream.gets
+        if line
+          line
+        else
+          @upstream.close  # ..   and #testpoint3.1
+        end
+      end
+
+      define_method :_gets_line, DEFINITION_FOR_THE_METHOD_CALLED_GETS_LINE__
 
       include CommonActionMethods_
 
@@ -366,7 +368,7 @@ module Skylab::BeautySalon
           @ok = true
 
           begin
-            x = @upstream.gets
+            x = _gets_line
             x or break
             @rls.string = x
             begin
@@ -385,6 +387,8 @@ module Skylab::BeautySalon
             UNABLE_
           end
         end
+
+        define_method :_gets_line, DEFINITION_FOR_THE_METHOD_CALLED_GETS_LINE__
 
         def __init_range_list_scanner
 

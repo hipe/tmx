@@ -4,13 +4,13 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - terminal type checking', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - association terminal type assertion', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
     use :crazy_town_ASSOCIATION_LYFE
 
-    context 'a terminal association WITHOUT the rorrespoindng type sanitizers' do
+    context 'a terminal association WITHOUT the correspoindng type sanitizers' do
 
       given :la_la_la_terminal
 
@@ -38,11 +38,9 @@ module Skylab::BeautySalon::TestSupport
 
       it 'if you try yadda and yadda is wrong - LOOSE' do
         _asc = subject_association_
-        begin
+        expect_exception_with_this_symbol_ :terminal_type_assertion_failure do
           _asc.assert_type_of_terminal_value_ 123
-        rescue subject_magnetic_::MyException__ => e
         end
-        e.symbol == :terminal_type_assertion_failure || fail
       end
 
       it 'if you try yadda and yadda is right - WIN (no exception. result is nil' do
@@ -62,11 +60,10 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def sandbox_module_
-      X_ctm_npvm_ttc
+      X_ctm_npvm_atta
     end
 
-    X_ctm_npvm_ttc = ::Module.new  # const namespace for tests in this file
+    X_ctm_npvm_atta = ::Module.new  # const namespace for tests in this file
   end
 end
-# #pending-rename: association grammar integration
 # #born.

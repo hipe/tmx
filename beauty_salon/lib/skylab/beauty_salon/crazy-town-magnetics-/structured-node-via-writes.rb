@@ -104,7 +104,7 @@ module Skylab::BeautySalon
 
         h = remove_instance_variable( :@__hash_of_writes ).dup  # was immutable
 
-        ascs = @structured_node.class.children_association_index.associations
+        ascs = @structured_node.class.association_index.associations
         num_ascs = ascs.length
 
         step = nil
@@ -248,7 +248,7 @@ module Skylab::BeautySalon
       end
 
       def __associations
-        @structured_node.class.children_association_index.associations
+        @structured_node.class.association_index.associations
       end
     end
 

@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town magnetics - NPvM - parse child associations', ct: true do
+  describe '[bs] crazy-town magnetics - NPvM - lazy. parse any, plural, group', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
+    use :crazy_town_structured_nodes
 
     it %q{you wouldn't know it by looking, but defs are eval'd lazily} do
 
@@ -112,15 +112,14 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _assocs_index
-      _class.children_association_index
+      _class.association_index
     end
 
     def sandbox_module_
-      X_ctm_npvm_pca
+      X_ctm_npvm_lapg
     end
 
-    X_ctm_npvm_pca = ::Module.new  # const namespace for tests in this file
+    X_ctm_npvm_lapg = ::Module.new  # const namespace for tests in this file
   end
 end
-# #pending-rename: perhaps remove "child" from the name for consistency
 # #born.

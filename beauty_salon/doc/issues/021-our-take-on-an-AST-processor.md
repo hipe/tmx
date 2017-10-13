@@ -4,21 +4,17 @@
 
   - introduction [#here.[a]]
 
-  - what is this "document processors?" :[#here.B]
+  - introduction to hooks :[#here.B]
 
   - why not use `::AST::Processor`? :[#here.C]
 
-  - what are these hashes for? :[#here.D]  [ EDIT ]
-
-  - grammar symbols and method in detail :[#here.J]
+  - vaguely, our requirements for traversing :[#here.D]
 
   - awareness of stack frame :[#here.E]
 
   - small developer's notes :[#here.F]
 
   - foolhardy :[#here.G]
-
-  - temporary debugging method :[#here.H]
 
   - declarative (structural) grammar reflection :[#here.I]
 
@@ -31,7 +27,7 @@ the earliest form of the earliest member asset node under this rubric
 was born from necessity: we wrote our (originally named) "hooks via [etc]"
 magnetic because we needed the behavior.
 
-shorty *after* its birth, we discoverd that ours was a pattern exhibited
+shorty *after* its birth, we discovered that ours was a pattern exhibited
 squarely by the remote `::AST::Processor`, whose succint documentation
 serves as good background reading for this document.
 
@@ -54,7 +50,7 @@ our secondary objective will one day be our primary objective:
 
 
 
-## what is this "document processor"? :[#here.B]
+## introduction to hooks :[#here.B]
 
 this is the moneyshot - this is the guy that traverses every node
 of the document AST and runs all the hooks.
@@ -72,8 +68,9 @@ currently there cannot be multiple hooks associated with one symbol.
 arrangement in your definition (because you can write arbitrary
 code in your hook).
 
-a "document processor" is simply a collection of these hooks (just
-a tuple). (what it is is under flux EDIT)
+a "document processor" is simply a collection of these hooks, so called
+because one or more documents can be feed into this (stateless) document
+processor to effect its hooks against document.
 
 you can have several plans in one definition, so for example you could
 follow one set of behaviors for files that look like tests (based on
@@ -81,8 +78,6 @@ their filename), and another set of behaviors for files that look like
 asset files. (really, this feature is just a cheap by-product of the
 fact that for performance reasons we evaluate definitions before we
 traverse files.)
-
-we follow our own simple #[#sli-023] "prototype" pattern. or we don't. EDIT
 
 
 
@@ -116,130 +111,28 @@ more-or-less what our subject facility attempts. so why re-invent the wheel?
 
 
 
-## what are these hashes for? :[#here.D]
+## vaguely, our requirements for traversal :[#here.D]
 
-first, here were the original objectives of this (at one time
-only) hash (but what's after this is more important):
-
-  - it was for getting to know how the previous parsing library
-    parsed things, and likewise can be used to see how the
-    current library parses things.
+  - originally this was for getting to know how the previous parsing library
+    parsed things. then, this was for getting to know how the current parsing
+    library parses things. always, this was used for implementing the "hooks"
+    facility which underlies our essential function/report ("replace").
+    as discusses at [#here.F] we will rely for a long time on using this to
+    assert outwardly that our expectation of the grammar matches the reality.
 
   - to traverse an AST recursively, we want to be able to do
     this "forwardly" rather than passively reflecting on each
     AST; i.e we want a sense for the discrete set of symbols
     that are nonterminal rather than terminal
 
-  - for the nascent but soon-to-be-burgeoning "selector" API
-    we may want fine-grained control over what behavior we
-    avail to each symbol, for example to make complicated
-    representations appear simpler to the DSL.
-
   - it's fun to get a sense for the statistics (the grammar symbol
     distribution) of our own corpus vs the set of all known grammar
     symbols.
-
-Here is the new deal, some requirements:
-
-  - we want these hashes to appear as they are, as simple as
-    possible, with one grammar symbol name being related to
-    one method name and that's it. :(A)
-
-  - we want these hashes to be *no* more lenient than the grammar,
-    i.e we want each grammar symbol to be supported only where it
-    is possible to occur so e.g you can't have a `when` symbol occur
-    at the root of your document; it has to be in a `case` expression.
 
   - as described [#here.B], allow that 0 or 1 arbitrary user hook proc
     is associated with each grammar symbol; BUT NOW: don't check for
     the existence of this hook proc every time the grammar symbol is
     encountered. "optimize" this decision by memoizing it away (per plan).
-
-  - every traversal method takes the children of the subject node
-    "splayed out" - the (human) author of the method should make choices
-    for how to "splat" the method's argument signature to accord
-    semantically with what is probably the grammar rule for that nonterminal
-    (a didactic example: `def __method_call( method_name_symbol, * args )`)
-
-    furthermore, (and towards (A) keeping things looking simple in the
-    hashes), we put some nasty but useful magic in there: IFF the
-    argument signature of the traversal method's *last* formal argument
-    is named `self_node`, this will get placed in it the while node itself.
-    (everything else stated above still holds, about the "splaying out".)
-    :[#here.D.2]
-
-  - the two above points together (whether and how a grammar symbol
-    is hooked-in to, and whether the traveral method take an additional
-    special argument to be the whole node), this combination of factors
-    permutes out to six permutations ((no hooks | universal hook | name-based
-    hook) x (no extra argument|extra argument)) for which we have six
-    possible methods, one of which is the right one to call for any given
-    tuple of grammar-symbol-plus-traversal-method-name tuple. whew!
-    we memoize which method is the right method per tuple, which happens
-    at the node tagged with the subject.
-
-
-
-
-
-
-## grammar symbols and method in detail :[#here.J]
-
-consider the relationship between grammar symbol names and method
-names. are they one-to-one? one-to-many? many-to-many?
-
-
-
-### many methods to one grammar symbol?
-
-as it is there are sometimes many method names for one grammar symbol
-name. this happens when the same grammar symbol appears in different
-lookup hashes and there's a different "right hand side" value (i.e method
-name) for these different entries. this, in turn, happens because you want
-to assert or recognize context-specific variations of the grammar symbol.
-
-  - whether or not this arrangement is optimal is outside of our
-    domain here. (see #provision1.2)
-
-as such, know that a given grammar symbol does not have a one-to-one
-relationship with a given method name; but rather it is one-to-many.
-
-
-
-### many grammar symbols to one method?
-
-there are a few corollaries of such a hypothetical arrangement:
-
-  - coverage. in normal "imperative" style code, you have function
-    definitions and function calls, and you can see coverage reporting
-    for each of these sides. (that is, you can see if you have functions
-    you defined that you never called, and also you can see if you have
-    function calls that are never executed.) in our "declarative" style
-    with lookup hashes, you only get one side of this coverage but not
-    the other. (coverage doesn't tell you if you have hash elements that
-    are never accessed.)
-
-  - method-name-as-key. there is certainly grammar-symbol-specific data
-    that you we to cache (namely, whether there is a grammar-symbol-specific
-    user-supplied hook). under the subject provision, it would then be non-
-    workable to use the method name as a key into this cache because the
-    method name does not uniquely identify one grammar symbol.
-
-our solution at the moment addresses both of these concerns (but note that
-all of this is subject to change):
-
-  - for reading and writing to the cache we use a "compound key", a tuple
-    of grammar symbol name and method name. even if we want things to be
-    one method name per grammar symbol, there are not enough safeguards
-    built into the language to stop us from really screwing ourselves if
-    we accidentally associate different grammar symbols with one method
-    name, and we use only the method name as a key.
-
-  - when we do the work, check a *second* index that is method-name only
-    to assert that we are not using the same method across different
-    grammar symbols. if we want to change things so that we *can* adopt this
-    DRY provision we can, but we have to do so only after taking all of the
-    above concerns into account.
 
 
 
@@ -308,21 +201,121 @@ plain old impossible for us to parse some things to the degree of
 meaning we might want, depending on what your expectations are.
 
 in spite of, because of, or unrelated to this: as a developmental
-crutch that we really should refactor out later, we have written
-some parts of our generic processor to be more explicit syntactically
-than the language actually is; that is, incorrect. (below we describe
-this as "granular optimism".)
+crutch we originally wrote portions of our grammar reflection with too
+much "granular optimism", a concept whose development will comprise the
+remainder of this section.
 
-this implementational quirk applies (or did at one time) at least to:
-  - `defs`
-  - `splat`
-  - "expression of module" for example:
-    - the right side of `<`
-    - the left side of `::`
+although we think we have (as of this writing) refactored out all
+"granular optimism", this idea remains as a historical footnote because
+(erroneous as they were) these associations we made between certain grammar
+symbols have left their traces in the form of certain testpoint associations
+that we have preserved for the sake of enriching the story nonetheless.
 
-in places marked with this tag (viz the above places at least), the
-grammatical nonterminal has as one of its components an "argument"
-that can in fact be any expression (presumably).
+to begin to explain what we mean by "granular optimism" we start from
+a counterpoint: consider the `case` grammar symbol. its second formal
+association is (at writing) called `one_or_more_whens`. seeing that "whens"
+at the end of the association name tells us that there is a [#022.I] "group"
+called "when". either by looking at the group or by knowing the grammar, we
+can see that this group has only one member: the grammar symbol `when`.
+
+furthermore, with a priori knowledge of the grammar we can know that the
+only place a `when` ever occurs is as the child of a `case`. so `case`
+cannot exist without `when` and `when` never occurs outside of `case`.
+
+this is a particularly extreme example of a strong association between
+grammar symbols. (in fact we're not sure if the platform language has any
+other grammar symbols with a relationship like this.)
+
+we might (confusingly) call this association "one-to-one". it's potentially
+confusing because we're not talking about the [#022.G] arity of the
+association, which represents the valid "counts" for the number of child
+AST's that the association "slot" can have. here we're talking about how
+many other grammar symbols a given grammar symbol is "had" by.
+
+for an association category that's not as strong but still significant,
+consider the `args` grammar symbol. this symbol models the formal arguments
+to a method or proc or block definition. again, with a priori knowledge of
+the grammar it follows intuitively that the types of things (grammar
+symbols) that can be children of an `args` will be of a limited set. i.e
+when you define a method you can't just plop arbitrary expressions in the
+`args` part:
+
+    def foo_bar( var, 1+2 )  # syntax error - the second thing doesn't look like a formal arg
+      # ..
+    end
+
+the grammar symbols that are valid under `args` have names like `arg`,
+`optarg`, `kwoptarg`; several others.
+
+this introduces (potentially) a new type of relationship that we'd call
+a one-to-many "polymorphic" association. the "one-to-many" is to say that
+(for example) a `kwoptarg` only ever occurs under an `args` node; but this
+is not to say that every `args` node has a `kwoptarg`.
+
+in more detail, an `args` node need not have any children, but if it does
+have children we can (try to) assert the set of all possible grammar symbol
+names for each child that we could possibly have in this (plural) association.
+
+(NOTE that the above alone does not constitue a "proof" of this relationship
+between these particular grammar symbols. our goal is merely to introduce
+the categories of association as a concept, and try to provide examples that
+we can imagine as possibly having this relationship.)
+
+to round out a triptych of categories, a last category of association that
+we might offer is the "anything" set: given that (it seems) any kind of
+grammatical phenomenon in ruby can be used as an expression, and certain
+grammatical association "slots" accept any expression (in fact many do);
+then there are certain grammatical assocation "slots" that accept any kind
+of grammatical phenomenon. what?
+
+consider subclassing. when we subclass we typically put a `const` expression
+in the right hand side of the `<` operator:
+
+    class MyClass < Foo::Bar
+    end
+
+however, did you know you can validly put *any* expression in that "slot"
+and it will still compile?
+
+    class MyClass < ( require 'foo-bar.rb' )
+    end
+
+(put the above in a file and `ruby -wc tmp.rb` that file. `Syntax OK`)
+
+now, we don't recommend that you ever write code in that manner. more
+specifically, even if you could get the above to "work" we're strongly
+suggesting *against* you ever doing so. but the point here is that the
+language might not be as syntactically strict as you think in several
+regards.
+
+this anticipation of expecting a `const` expression in that "slot" (even
+though no such grammatical requirement exists), this is what we called
+"granular optimism". again as we said at the beginning, we have (we think)
+refactored out all such granular optimisms from our grammar.
+
+now that we have introduced the concept of association categories (and
+suggested three of them), we can approach our objective: formally we
+might define "granular optimism" as the application of an association
+category (or just [#022.I] group affiliation) as a constraint; when the
+constraint is in fact more restrictive than the grammar dictates.
+
+for historical posterity (and to add context to certain testpoint
+associations), here are cases where we fell victim to granular optimism:
+
+  - `defs` ( e.g `def o.foo ; ..` ) - the "operand" here is just any expression
+
+  - `splat` ( e.g the `*` and after in `def foo( * wee)` ) - the "operand"
+      of a splat can be any expression. at runtime an array is attempted
+      to be resolved from the result of this expression.
+
+  - the right hand operand of `<` (for subclassing) as explored above.
+
+  - the left side of `::` - can be any expression but at runtime must
+    resolve into a module (e.g class) else exception.
+
+(historical note: for the last two cases above, we used to call this
+apparition of a grammatical concept "expression of module".)
+
 
 
 
@@ -414,43 +407,7 @@ this is for at least two reasons:
 
 
 
-## temporary debugging method :[#here.H]
-
-this method will probably go away when things settle down (#todo will it?).
-the overall objective is that we get detailed information about a
-grammatical symbol that is missing coverage in terms that relate this "hole"
-back to our code, so that we can amend our tests to cover these cases.
-in detail, here's the intended usage of the subject method:
-
-  1) run that one test with coverage turned on:
-         tmx-test-support-quickie -cover <the spec for the indented report>
-
-  2) using the coverage report generated by the above, derive (in your
-     head iteratively, or in writing) a set of the grammar symbol methods
-     that did not get covered by our test suite. in each of those methods,
-     make a single call to the subject method at the beginning of that method.
-
-  3) run the indented report against the target corpus using "corpus
-     mode" of the CLI (documented under its `--help`). doing so should
-     call all the hook methods that we care to cover for our purposes.
-     when the subject method is called, it prints out two lines of
-     information explaining this hole, and exits (at which point the state
-     of the macro batch operation (i.e how far it got) is written to disk
-     by the "corpus mode" plugin).
-
-  4) use the 2 lines of information written by the above to make the
-     appropriate test (i.e add fixture code) so that the missing hook
-     method is now implemented and/or covered.
-
-  5) repeat (3) and (4) until you eliminate all such calls to the subject
-     method, at which point your coverage of all our grammar symbol
-     methods should be up to 100%.
-
-note this could be automated somewhat, but it would require work.
-
-
-
-
 ## (document-meta)
 
+  - #history-A.2 - remove *tons* of stuff from the old, method-based way
   - #history-A.1 - original content broke out of asset file.

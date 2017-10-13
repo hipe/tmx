@@ -1,6 +1,6 @@
 # precedence rules for logical taxonomies :[#038]
 
-(EDIT: this whole document is now antique, belonging to the [br] era)
+(#open [#047]: this whole document is now antique, belonging to the [br] era)
 
 
 
@@ -59,7 +59,7 @@ proxies everwhere...
 
 
 
-(EDIT: content below the line is historical and has not yet been merged in.)
+(#open [#047]: content below the line is even older than this already old document)
 
 -----
 

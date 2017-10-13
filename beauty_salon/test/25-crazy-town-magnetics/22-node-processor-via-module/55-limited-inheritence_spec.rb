@@ -6,19 +6,20 @@ module Skylab::BeautySalon::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :crazy_town_THIS_STUFF
+    use :crazy_town_structured_nodes
 
     # NOTE - there is a quirk to using inheritence that is either OK or
     # icky depending on perspective:
     #
     #   1) we don't want to have any classes under Items that are not
     #      grammar symbol classes that correspond to real grammar elements.
+    #      (in fact, this either *is* a requirement or *should be* (will be) one.)
     #
-    #   2) as such, an abstract base class should be housed outside of
+    #   2) as such, an abstract base class should be [/must be] housed outside of
     #      (and above) the Items module.
     #
     #   3) in practice all base classes will be abstract, because there
-    #      is no inherit-and-modify (associations) (i.e it's not true
+    #      is no inherit-and-modify (associations) (i.e we do not offer true
     #      inheritence, just re-use of definitions); and as such, to make
     #      this non-abstract inheritence would introduce a non-justifiable
     #      asymmetry.
@@ -87,14 +88,14 @@ module Skylab::BeautySalon::TestSupport
 
         _fb = _state1.last
         _cls = _fb.dereference :another_child
-        _x = _cls.children_association_index
+        _x = _cls.association_index
       end
 
       shared_subject :_state1 do
 
         fb = _state_0
         _cls = fb.dereference :one_child
-        _x = _cls.children_association_index
+        _x = _cls.association_index
         [ _x, fb ]
       end
 
@@ -119,18 +120,14 @@ module Skylab::BeautySalon::TestSupport
 
       chld_cls = ::Class.new _base_cls
       sandbox_module_.const_set :Case01, chld_cls
-      e = nil
-      here = subject_magnetic_
+      me = self
       chld_cls.class_exec do
-        begin
+        me.expect_exception_with_this_symbol_ :cannot_redefine_or_add_to_any_existing_children_definition do
           children(
             :thing_three_xx_terminal,
           )
-        rescue here::MyException__ => e
         end
       end
-
-      e.symbol == :cannot_redefine_or_add_to_any_existing_children_definition || fail
     end
 
     shared_subject :_this_one_base_class do

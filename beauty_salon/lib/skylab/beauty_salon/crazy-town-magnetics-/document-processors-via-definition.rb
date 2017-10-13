@@ -70,10 +70,9 @@ module Skylab::BeautySalon
 
       # ~  type-based node hooks cannot currently be used with an
       #    "on each node" type hook (by design). shut out the other
-      #    the first time you get one of these.  ##provision1.1
+      #    the first time you get one of these.  ##here1 (a provision)
 
       def on_this_one_type_of_node k, & p  # 1x
-
         send @on_this_one_type_of_node, p, k
       end
 
@@ -102,7 +101,7 @@ module Skylab::BeautySalon
       #      subsequent definition clobber the previous or are they a list
       #      to be executed in sequence?)
       #
-      #    so shut out etc.  ##provision1.1
+      #    so shut out etc.  ##here1 (a provision)
 
       def on_each_node & p
         send @on_each_node, p
@@ -213,7 +212,9 @@ module Skylab::BeautySalon
 
       def __flush_dispatcher
 
-        CrazyTownMagnetics_::NodeDispatcher_via_Everything.call_by do |o|
+        _fb = CrazyTownMagnetics_::StructuredNode_via_Node.structured_nodes_as_feature_branch
+
+        CrazyTownMagnetics_::Dispatcher_via_Hooks.define do |o|
 
           o.type_based_hook_box = @_._type_based_hook_box_
           o.universal_hook = @_._universal_hook_
@@ -222,7 +223,7 @@ module Skylab::BeautySalon
           # NOTE here is where for now we hard-code this syntax-specific
           # thing. maybe one day etc. #[#007.B]
 
-          o.node_processor_via_methods = CrazyTownMagnetics_::NodeProcessor_via_Methods
+          o.grammar_symbols_feature_branch = _fb
 
           o.listener = @_.listener
         end
@@ -277,6 +278,18 @@ module Skylab::BeautySalon
 
     # ==
     # ==
+
+    # :#here1: (a provision) we assume this provision which to us amounts to:
+    #
+    #   - `~universal_hook` and `~type_based_hook_box` are mutually
+    #     exclusive. it's possible that neither is set. (so 3 permutations.)
+    #
+    #   - when one of the above is set, `~branchy_node_hook` is either
+    #     set or not set (i.e no relation).
+    #
+    #   - if neither of the above is set, `~branchy_node_hook` must be
+    #     set. (so 5 permutations in total). whew!
+    # )
   end
 end
 # #broke out of sibling

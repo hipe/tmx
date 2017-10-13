@@ -31,7 +31,7 @@ module Skylab::BeautySalon::TestSupport
       _actual == same || fail
     end
 
-    context 'line numbers against one file (the one fixture codefile we have)' do
+    context 'line numbers against one file (the one fixture codefile we have)' do  # #testpoint2.11
 
       it 'the first line looks like a comment line, expresses the filename' do
         first_line = _tuple[0]

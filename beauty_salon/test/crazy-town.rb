@@ -2,10 +2,6 @@ module Skylab::BeautySalon::TestSupport
 
   module Crazy_Town
 
-    def self.[] tc
-      tc.include self
-    end
-
     CommonInstanceMethods__ = ::Module.new
 
     ASSOCIATION_LYFE = ::Object.new
@@ -38,7 +34,7 @@ module Skylab::BeautySalon::TestSupport
       include CommonInstanceMethods__
     end
 
-    module THIS_STUFF
+    module Structured_Nodes
 
       def self.[] tc
         tc.include self
@@ -56,7 +52,7 @@ module Skylab::BeautySalon::TestSupport
       def structured_node_via_string_ s
         n = vendor_node_via_string_ s
         # (very wound-up for now)
-        _magnetic = Home_::CrazyTownMagnetics_::SemanticTupling_via_Node
+        _magnetic = main_magnetics_::StructuredNode_via_Node
         _feature_branch = _magnetic.structured_nodes_as_feature_branch
         _class = _feature_branch.dereference n.type
         _class.via_node_ n
@@ -68,16 +64,18 @@ module Skylab::BeautySalon::TestSupport
         _AST_node  # hi.todo
       end
 
-      # -- build these things
+      # -- build parser AST nodes
 
-      define_method :builder_thing_, ( Lazy_.call do
+      def build_parser_AST_node__ sym, * rest
+        Build_vendor_parser_AST_node__[ sym, rest ]
+      end
 
-        Real_parser_for_current_ruby__[]  # load 2 things
-
-        -> sym, * rest do
-          ::Parser::AST::Node.new sym, rest
+      define_method :parser_AST_node_builder_, -> do
+        p = -> sym, * rest do
+          Build_vendor_parser_AST_node__[ sym, rest ]
         end
-      end )
+        -> { p }
+      end.call
 
       include CommonInstanceMethods__
 
@@ -91,7 +89,13 @@ module Skylab::BeautySalon::TestSupport
       end ; end
     end
 
-    # -
+    # ==
+
+    module PARSY_TOWN
+
+      def self.[] tcc
+        tcc.include self
+      end
 
       def fails_with_these_normal_lines_ & p
 
@@ -125,7 +129,7 @@ module Skylab::BeautySalon::TestSupport
           p = expecting_no_more_emissions
         end
 
-        _x = subject_magnetic_.call_by do |o|
+        _x = parsy_subject_magnetic_.call_by do |o|
 
           o.listener = -> * sym_a, & em_p do
             p[ em_p, sym_a ]
@@ -139,7 +143,7 @@ module Skylab::BeautySalon::TestSupport
 
       def expect_success_against_ string
 
-        x = subject_magnetic_.call_by do |o|
+        x = parsy_subject_magnetic_.call_by do |o|
 
           o.listener = -> * sym_a, & em_p do
             lines = _lines_via_thing_CT em_p, sym_a
@@ -168,8 +172,68 @@ module Skylab::BeautySalon::TestSupport
         y.object_id == _y_.object_id || fail
         lines
       end
+      # include CommonInstanceMethods__
+    end
 
-    # -
+    # ==
+
+    module Traversal
+
+      def self.[] tc
+        tc.include self
+      end
+
+      # -
+
+        define_singleton_method :shared_subject, & TestSupport_::DANGEROUS_MEMOIZE
+
+        def define_subject_magnetic_
+          magnetic_for_traversal_.define do |o|
+            yield o
+          end
+        end
+
+        shared_subject :ast_node_of_addition_of_three_integers_ do
+          s = parser_AST_node_builder_
+          _left_term = s[ :zend, s[ :ind, 1 ], :+, s[ :ind, 2 ] ]
+          s[ :zend, _left_term, :+, s[ :ind, 3 ] ]
+        end
+
+        shared_subject :feature_branch_for_traversal_one_ do
+
+          _cls = build_subclass_with_these_children_( :My_send,
+            :receiverosa_expression,
+            :methodo_nameo_zymbol_terminal,
+            :zero_or_more_argumentoso_expressions,
+          )
+
+          _cls2 = build_subclass_with_these_children_( :My_ind,
+            :MY_INDEGER_indeger_terminal,
+          )
+
+          build_subject_branch_(
+            _cls, :Zend,
+            _cls2, :Ind,
+            :ThisOneGuy,
+          ) do
+            self::TERMINAL_TYPE_SANITIZERS = {
+              indeger: -> x do
+                ::Integer === x
+              end,
+              zymbol: -> x do
+                ::Symbol === x
+              end,
+            }
+          end
+        end
+
+        def magnetic_for_traversal_
+          main_magnetics_::Dispatcher_via_Hooks
+        end
+      # -
+    end
+
+    # ==
 
     module CommonInstanceMethods__
 
@@ -210,16 +274,18 @@ module Skylab::BeautySalon::TestSupport
 
         Default_these_things[ mod ]
 
-        subject_magnetic_[ mod ]
+        feature_branch_magnetic_[ mod ]
       end
 
       def subject_base_class_
-        subject_magnetic_::GrammarSymbol
+        feature_branch_magnetic_::GrammarSymbol
       end
 
-      def subject_magnetic_
-        Home_::CrazyTownMagnetics_::NodeProcessor_via_Module
+      def feature_branch_magnetic_
+        main_magnetics_::NodeProcessor_via_Module
       end
+
+      alias_method :subject_magnetic_, :feature_branch_magnetic_
     end
 
     # ==
@@ -237,11 +303,25 @@ module Skylab::BeautySalon::TestSupport
 
     # ==
 
+    Build_vendor_parser_AST_node__ = -> do
+      once = -> do
+        once = nil ; Real_parser_for_current_ruby__[] ; nil
+      end
+      -> sym, rest do
+        once && once[]
+        ::Parser::AST::Node.new sym, rest
+      end
+    end.call
+
     Real_parser_for_current_ruby__ = -> do
       Home_::CrazyTownReportMagnetics_::
           DocumentNodeStream_via_FilePathStream::
           For_now_always_the_same_ruby_parser_with_certain_settings___[]
     end
+
+    # ==
+
+    DoccyWrap = ::Struct.new :ast_
 
     # ==
     # ==

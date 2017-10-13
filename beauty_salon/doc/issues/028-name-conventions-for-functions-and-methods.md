@@ -123,7 +123,7 @@ rather, just as the level of API exposure of a node is a sort of
 "contract" between the node and its intended audience, the scope of the
 methods it defines is sort of a "sub-contract" with the same audience.
 
-(EDIT: the above should have an example if we stick with it.)
+(#open [#047]: the above should have an example if we stick with it.)
 
 
 
@@ -652,7 +652,7 @@ here but there are some that are not.
 
 ### :#signing
 
-(EDIT: away this)
+(#open [#047]: away this)
 
 when we use the verb "sign" in the context of events we mean the process
 of in some way adding more context to an event to make it clearer for
@@ -680,7 +680,7 @@ in summary, for a class or instance that participates in "iambics",
   - ! `new`    explicitly not proscribed here - never takes iambics
 
 
-the rest of this is rambling that could use an (EDIT)
+the rest of this is rambling that could use an edit #open [#047]
 
 the meta-classification of "iambic" applies tautologically to method
 name conventions that apply to iambic methods. that is, if any method
@@ -1008,7 +1008,7 @@ to change). they are:
 
 ### the original version
 
-(EDIT: this older style (which uses abbreviated words in method names
+(#open [#047]: this older style (which uses abbreviated words in method names
 but otherwise has obvious parallels to the current convention system)
 is VERY deprecated, but there is still some ancient code somewhere that
 uses this probably..)
