@@ -7,7 +7,7 @@ require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy town reports - branchy nodes indented', ct: true, wip: true do
+  describe '[bs] crazy town reports - branchy nodes indented', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
@@ -48,27 +48,23 @@ module Skylab::BeautySalon::TestSupport
     context '(coverage)' do
 
       it 'literals and assignment' do
-        _just_make_sure_this_runs '083-literals-and-assignment.rb'
+        _just_make_sure_this_runs '111-literals-and-assignments.rb'
       end
 
       it 'control flow' do
-        _just_make_sure_this_runs '250-control-flow.rb'
+        _just_make_sure_this_runs '389-control-flow.rb'
       end
 
       it 'begin rescue end' do
-        _just_make_sure_this_runs '417-begin-rescue-end.rb'
+        _just_make_sure_this_runs '500-expression-grouping.rb'
       end
 
       it 'method definitions and method calls' do
-        _just_make_sure_this_runs '583-method-definitions-and-method-calls.rb'
+        _just_make_sure_this_runs '777-method-definitions-and-calls.rb'
       end
 
       it 'modules and classes' do
-        _just_make_sure_this_runs '750-modules-and-classes.rb'
-      end
-
-      it 'special and edge' do
-        _just_make_sure_this_runs '917-special-and-edge.rb'
+        _just_make_sure_this_runs '944-class-and-module-definition.rb'
       end
     end
 

@@ -59,7 +59,7 @@ module Skylab::BeautySalon
 
         @on_this_one_type_of_node = :__on_this_type_of_node_initially
 
-        @__mutex_for_on_each_branchy_node = nil
+        @__mutex_for_custom_stack_hooks = nil
 
         @__mutex_for_before_each_file = nil
 
@@ -117,10 +117,10 @@ module Skylab::BeautySalon
 
       # ~
 
-      def on_each_branchy_node__ & p
+      def customize_stack_hooks_by__ & p
 
-        remove_instance_variable :@__mutex_for_on_each_branchy_node
-        @_branchy_node_hook_ = p
+        remove_instance_variable :@__mutex_for_custom_stack_hooks
+        @_custom_stack_hooks_ = p
       end
 
       def before_each_file & p
@@ -146,7 +146,7 @@ module Skylab::BeautySalon
       attr_reader(
         :_after_each_file_,
         :_before_each_file_,
-        :_branchy_node_hook_,
+        :_custom_stack_hooks_,
         :_has_type_based_hooks_,
         :_has_universal_hook_,
         :listener,
@@ -185,7 +185,7 @@ module Skylab::BeautySalon
           yes = true
         elsif @_._has_universal_hook_
           yes = true
-        elsif @_._branchy_node_hook_
+        elsif @_._custom_stack_hooks_
           yes = true
         end
         if yes
@@ -218,7 +218,7 @@ module Skylab::BeautySalon
 
           o.type_based_hook_box = @_._type_based_hook_box_
           o.universal_hook = @_._universal_hook_
-          o.branchy_node_hook = @_._branchy_node_hook_
+          o.custom_stack_hooks = @_._custom_stack_hooks_
 
           # NOTE here is where for now we hard-code this syntax-specific
           # thing. maybe one day etc. #[#007.B]
@@ -271,10 +271,6 @@ module Skylab::BeautySalon
         NIL
       end
     end
-
-    # ==
-
-    MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
 
     # ==
     # ==

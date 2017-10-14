@@ -573,6 +573,7 @@ module Skylab::Brazen
       attr_reader(
         :argument_scanner_narrator,  # [bs]
         :listener,
+        :stderr,  # #open [#ze-071] needs coverage
       )
     # -
 

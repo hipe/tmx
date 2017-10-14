@@ -687,26 +687,37 @@ module Skylab::BeautySalon
         # however if you do one of these `-> |(foo,bar)| {..}`, then the
         # AST is a wholly differently structured beast #testpoint1.45
         #
-        # EXPERIMENTALLY (#todo) we're hacking thru an experiment with
+        # EXPERIMENTALLY (#note :[#007.F]) we're hacking thru an experiment with
         # a factory pattern to accomodate this shenanigan. no dedicated
         # coverage unless this really becomes a thing, for now.
 
         class << self
+
           def tap_class
             NIL  # hi.
           end
+
           def receive_constituent_construction_services_ svcs
             Multi.receive_constituent_construction_services_ svcs
             CommonForm.receive_constituent_construction_services_ svcs
             NIL
           end
+
           def each_qualified_child n, & p
-            ::Kernel._OKAY
-            if 1 == n.children.length
-              CommonForm.each_qualified_child n, & p
+            self._ONCE_WAS_FOUND_NOW_IS_LOST
+            _dispatch :each_qualified_child, n, & p
+          end
+
+          def build_qualified_children_scanner_for_ n
+            _dispatch :build_qualified_children_scanner_for_, n
+          end
+
+          def _dispatch m, n, & any_p
+            ( if 1 == n.children.length
+              CommonForm
             else
-              Multi.each_qualified_child n, & p
-            end
+              Multi
+            end ).send m, n, & any_p
           end
         end  # >>
 
@@ -876,9 +887,6 @@ module Skylab::BeautySalon
       # until (placeheld)
 
       class Until < WhileOrUntil__  # #testpoint1.26
-      end
-
-      class WhileOrUntil__ < GrammarSymbol__
       end
 
       # while_post (placeheld)

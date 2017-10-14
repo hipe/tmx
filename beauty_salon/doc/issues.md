@@ -1,12 +1,11 @@
 [#049] #open flicker as documented
 
-[#048] #open temporarily breaking the branchy nodes report for sane worksize
+[#048] #hole
 
 [#047] #small #open track many places where documentation is known to be
              in need of freshening up
 
-[#046] #open this almost one-off script wasn't covered and is not broken
-             by structured uber-alles
+[#046] #hole
 
 [#045] #open we have no intention of making #crazy-town platform language
              complete until quite a ways later. our current intention is
@@ -116,6 +115,8 @@
              grammar. that this is a const and not a method is because it's
              20% faster.
              (see also #this-commit message)
+
+      #note [#here.F]: factory pattern is unofficial; clunky.
 
              [#here.E]: (needs a better home) the main mapping challenge
                this is not just the stuff about plural associations, but

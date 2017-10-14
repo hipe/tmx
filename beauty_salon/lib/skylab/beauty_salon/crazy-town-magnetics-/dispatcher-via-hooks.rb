@@ -24,73 +24,179 @@ module Skylab::BeautySalon
       # traverse every node of the document recursively, calling the
       # appropriate hooks along the way. more at [#021.B] and [#021.D].
 
+      # behavior/implementation wise, we're tryna come to a sensible API:
+      #
+      #   - only because of the requirement profile, we are mutually
+      #     exclusive with all the kinds of hooks. also there must be one
+      #     kind of hook. so, we require exactly one kind of hook.
+      #
+      #   - there is only one report pioneering the would-be detailed
+      #     stack API. it's incubating there.
+
       def initialize
-        @branchy_node_hook = nil
-        @_hook_via_node_type = nil
-        @universal_hook = nil
+
+        @_prepare_method = nil
+
         yield self
-        __prepare
-      end
 
-      def type_based_hook_box= bx
-        @_hook_via_node_type = ( bx && bx.h_ ) ; bx
-      end
-
-      attr_writer(
-        :branchy_node_hook,
-        :grammar_symbols_feature_branch,
-        :listener,
-        :universal_hook,
-      )
-
-      def __prepare
-
-        if @_hook_via_node_type
-
-          if @universal_hook
-            raise MyException_.new :cannot_be_build_with_both_kinds_of_hooks
-          end
-          @_visit_nonterminal = method :__visit_nonterminal_customly
-
-        elsif @universal_hook
-
-          if 2 == @universal_hook.arity
-            @_visit_nonterminal = method :__visit_nonterminal_universally_two_arg_form
-          else
-            @_visit_nonterminal = @universal_hook
-          end
-        else
+        if ! @_prepare_method
           raise MyException_.new :must_be_build_with_some_hooks
         end
 
-        @_visit_terminal = -> do
-          # currently nothing is exposed necessitating us to yield this out
-          # to any receiver. but: engage the terminal type assertion check
-          @_stack.last._scanner.current_terminal_AST_node
-          NIL
+        send(
+          remove_instance_variable( :@_prepare_method ),
+          remove_instance_variable( :@__prepare_value ) )
+
+        @_stack = []
+        freeze ; nil
+      end
+
+      #
+      # Custom
+      #
+
+      def custom_stack_hooks= p
+        _maybe p, :__will_custom
+      end
+
+      def __will_custom define
+        define[ self ]
+        NIL
+      end
+
+      #
+      # Type-based
+      #
+
+      def type_based_hook_box= bx
+        _maybe bx, :__will_type_based
+      end
+
+      def __will_type_based bx
+
+        # for each nonterminal node,
+        # either there is or isn't a hook associated with this node type.
+        # the work of determining this can be cached lazily per grammar
+        # symbol. since these characteristics don't change for the lifetime
+        # of the parse, it feels clunky  to check them both over and over
+        # again at every node we traverse but #open [#007.J] possible
+        # optimization: would this be better if did the cache thing?
+
+        p_h = bx.h_ ; bx = nil
+
+        will_push_to_stack_by do |o|
+          -> n do
+            o.push_stack_via_node n
+            p = p_h[ n.type ]
+            if p
+              # we could just as soon pass a structured node but we don't: #testpoint2.12
+              # _cls = @grammar_symbols_feature_branch.dereference n.type
+              # _sn = _cls.via_node_ n ; p[ _sn ]
+              p[ n ]
+            end
+          end
         end
+
+        will_start_with_stack_normally
+        will_visit_terminal_normally
+        will_finish_with_stack_normally
+        NIL
+      end
+
+      #
+      # Universal
+      #
+
+      def universal_hook= p
+        _maybe p, :__will_universal
+      end
+
+      def __will_universal p
+
+        if 2 == p.arity
+          will_push_to_stack_by do |o|
+            -> n do
+              o.push_stack_via_node n
+              p[ o.stack_length, n ]  # ##here1
+            end
+          end
+        else
+          will_push_to_stack_by do |o|
+            -> n do
+              o.push_stack_via_node n
+              p[ n ]
+            end
+          end
+        end
+
+        will_start_with_stack_normally
+        will_visit_terminal_normally
+        will_finish_with_stack_normally
+        NIL
+      end
+
+      #
+      #
+      #
+
+      def _maybe x, m
+        if x
+          if @_prepare_method
+            raise MyException_.new :cannot_be_build_with_both_kinds_of_hooks  # ..
+          end
+          @__prepare_value = x
+          @_prepare_method = m
+        end
+        x
+      end
+
+      attr_writer(
+        :grammar_symbols_feature_branch,
+        :listener,
+      )
+
+      # --
+
+      def will_start_with_stack_by & p
+        @_start_with_stack = p
+      end
+
+      def will_start_with_stack_normally
+        @_start_with_stack = MONADIC_EMPTINESS_
+      end
+
+      def will_push_to_stack_by
+        @_push_to_stack = yield self
+      end
+
+      def will_visit_terminal_normally
+
+        # currently nothing is exposed necessitating us to yield this out
+        # to any receiver. but: engage the terminal type assertion check
+
+        @_visit_terminal = -> do
+          @_stack.last._scanner.current_terminal_AST_node
+        end
+        NIL
+      end
+
+      def will_finish_with_stack_by & p
+        @_finish_with_stack = p
+      end
+
+      def will_finish_with_stack_normally
+        @_finish_with_stack = EMPTY_P_
       end
 
       # -- read
 
       def dispatch_wrapped_document_AST__ wrapped_document_AST  # #testpoint
 
-        # implement exactly [#022.J] DIY stack for efficient traversal
+        @_start_with_stack[ wrapped_document_AST.path ]
 
-        stack = []
-        @_stack = stack
-
-        push = -> n do
-          _cls = @grammar_symbols_feature_branch.dereference n.type
-          stack.push Frame___.new _cls.build_qualified_children_scanner_for_ n
-          @_visit_nonterminal[ n ]
-          NIL
-        end
-
-        ast = wrapped_document_AST.ast_
-        if ast
-          push[ ast ]  # (assume `ast_` is a nonterminal)
-          ast = nil
+        n = wrapped_document_AST.ast_
+        if n
+          __do_dispatch_document_AST n
         else
           self._COVER_ME__this_once_worked_long_ago_like_so__
           @listener.call :info, :expression, :empty_file do |y|
@@ -98,16 +204,28 @@ module Skylab::BeautySalon
           end
         end
 
+        @_finish_with_stack[]
+        @_stack.length.zero? || fail
+
+        NIL
+      end
+
+      def __do_dispatch_document_AST document_n
+
+        # implement exactly [#022.J] DIY stack for efficient traversal
+
+        stack = @_stack
+
+        @_push_to_stack[ document_n ]
+
         begin  # assume stack is not empty
           scn = stack.last._scanner
           if scn.no_unparsed_exists
-            $stderr.puts "#{ _PREFIX }(DOING NOTHING ABOUT POPPING THE STACK)"
-            stack.pop
-            if stack.length.zero?
-              $stderr.puts "#{ _PREFIX }(DOING NOTHING ABOUT FINISHED WITH STACK)"
-              break
+            __pop_stack
+            if stack.length.nonzero?
+              redo
             end
-            redo
+            break
           end
 
           if scn.current_association_is_terminal
@@ -120,7 +238,7 @@ module Skylab::BeautySalon
 
           n = scn.current_nonterminal_AST_node
           if n
-            push[ n ]
+            @_push_to_stack[ n ]
           else
             NOTHING_  # #testpoint2.11 (tested quite late)
           end
@@ -131,43 +249,51 @@ module Skylab::BeautySalon
         NIL
       end
 
-      def __visit_nonterminal_universally_two_arg_form n
-        @universal_hook[ @_stack.length, n ]  # ##here1
+      # --
+
+      def push_stack_via_node n
+        _push nil, n
+      end
+
+      def push_stack_via_node_and_pop_callback_by n, & p
+        _push p, n
+      end
+
+      def _push p, n
+        _cls = @grammar_symbols_feature_branch.dereference n.type
+        _scn = _cls.build_qualified_children_scanner_for_ n
+        @_stack.push Frame___.new p, _scn
         NIL
       end
 
-      def __visit_nonterminal_customly n
+      def __pop_stack
 
-        # either there is or isn't a hook associated with this node type
-        # the work of determining this can be cached lazily per grammar
-        # symbol. since these characteristics don't change for the lifetime
-        # of the parse, it feels clunky  to check them both over and over
-        # again at every node we traverse but #open [#007.J] possible
-        # optimization: would this be better if did the cache thing?
-
-        p = @_hook_via_node_type[ n.type ]
+        _frame = @_stack.pop
+        p = _frame.__pop_hook
         if p
-
-          # we could easily pass a structured node but we don't: #testpoint2.12
-          # _cls = @grammar_symbols_feature_branch.dereference n.type
-          # _sn = _cls.via_node_ n ; p[ _sn ]
-
-          p[ n ]
-          NIL
+          p[]
         end
+
+        NIL
       end
 
-      def _PREFIX
-        '.' * @_stack.length
+      def stack_length
+        @_stack.length
       end
+
+      attr_reader(
+        :grammar_symbols_feature_branch,
+      )
     end
 
     class Frame___
-      def initialize scn
+      def initialize p, scn
+        @__pop_hook = p
         @_scanner = scn
         freeze
       end
       attr_reader(
+        :__pop_hook,
         :_scanner,
       )
     end

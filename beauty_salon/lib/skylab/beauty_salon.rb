@@ -248,6 +248,7 @@ module Skylab::BeautySalon
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
+  MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NIL_ = nil  # to emphasize its use
   NIL = nil  # #open [#sli-116.C]

@@ -34,15 +34,17 @@
           exit exitstatus
         end
 
-
         require 'parser'
         require 'skylab/beauty_salon'
 
-        ::Kernel._OPEN__readme__  # #open [#046]
+        _fb = Skylab::BeautySalon::CrazyTownMagnetics_::
+          StructuredNode_via_Node.structured_nodes_as_feature_branch
 
-        _my_h = Skylab::BeautySalon::CrazyTownMagnetics_::NodeProcessor_via_Methods.grammar_reflection_hash
-
-        my_set = Set.new _my_h.keys
+        my_set = ::Set.new
+        scn = _fb.to_symbolish_reference_scanner_
+        begin
+          my_set.add scn.gets_one
+        end until scn.no_unparsed_exists
 
         their_set = Parser::Meta::NODE_TYPES
 

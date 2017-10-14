@@ -321,7 +321,11 @@ module Skylab::BeautySalon::TestSupport
 
     # ==
 
-    DoccyWrap = ::Struct.new :ast_
+    DoccyWrap = ::Struct.new :ast_ do  # 1x
+      def path
+        :_no_see_CT
+      end
+    end
 
     # ==
     # ==

@@ -72,6 +72,7 @@ module Skylab::Zerk
           end while nil
         else
           # #not-covered #open [#sn-034]
+          # #small #open [#071]
           @CLI.stderr.puts "(the list had no items ([ze]) #not-covered.)"
         end
         NIL_
