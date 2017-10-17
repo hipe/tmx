@@ -64,7 +64,7 @@ module Skylab::BeautySalon::TestSupport
     #     class to point to *particular* *offsets* of the actual children by
     #     name.
     #
-    #   - then the "structured uber alles" overhaul brought us an expressive,
+    #   - then the "structure über alles" overhaul brought us an expressive,
     #     concise grammar a side benefit of whose was that a wrapped form
     #     of every child was accessible by name; no longer just those under
     #     associations specially marked as "component". in contrast, this

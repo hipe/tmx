@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
     # -
 
-      # this is the "glue" magnetic. stay close to the [#025] algorithm
+      # this is the "glue" magnetic. stay close to the [#025.H] algorithm
 
       def self.describe_into_under y, expag
         y << 'the main thing. result is a stream of lines of a patch'

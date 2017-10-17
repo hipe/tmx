@@ -11,7 +11,6 @@
   - terminal type assertion [#here.F]
   - groups [#here.I]
   - inheritence [#here.E]
-  - implementation detail: efficient traversal [#here.J]
 
 
 
@@ -25,11 +24,11 @@ this take on a node processor began as an experiment and then
   - our traversal of documents
   - our housing of (our reflection of) platform language grammar
   - our means of validating references to grammar symbols in the UI
-  - our means of exposint wrapped ("structured") node to hooks
+  - our means of exposing wrapped ("structured") node to hooks
 
 some justifications and philosophies behind this, our second take on it:
 
-  - [ all of the reasons cited at [#021.C] ]
+  - [ all of the reasons cited at [#021.C] "why not use AST::Processor?" ]
 
   - for better or worse, module-centric instead of method-centric
     constituency modeling (so, one module per node type (instead of
@@ -39,13 +38,15 @@ some justifications and philosophies behind this, our second take on it:
   - this avails us to a more declarative- and less imperative-style,
     more well suited to hierarchical meta-data.
 
+  - the conception of the above two points is now narrated in [#025].
+
   - compound processors - processors that rely on processors (imagined)
 
 
 
 
 synopsis: generally this is a generic AST processor that wraps (what was
-one some but is now at #history-A.1) *all* document AST nodes
+once some but is now at #history-A.1) *all* document AST nodes
 into our "structured node" structures
 that makes accessing certain properties easier through derived getters.
 
@@ -130,6 +131,8 @@ in the referenced remote documentation.
 
 
 ## terminal associations (in a test file) [#here.4]
+
+(this tag's only occurrence under `test/` points to the content.)
 
 
 
@@ -268,35 +271,6 @@ a definition comes in, we bork if the const evaluates to trueish
 
 
 
-## implementation detail: efficient traversal :[#here.J]
-
-at #history-A.1, document AST traversal was overhauled like so:
-
-  - before "structured uber alles", every actual nonterminal grammar
-    symbol was visited by a call to a counterpart method, recursively.
-    (at writing was the first commit where this changed.)
-
-  - a side-effect of this older sub-architecture was that the real call
-    stacks got ridiculously deep. (their depth was directly related to the
-    depth of the document).
-
-  - deep call stacks can be a sign of poor use of resources, as well as
-    an eyesore when trying to debug an error.
-
-  - now, each truly branch node (that is, most of them) gets its own frame
-    on a hand-made stack.
-
-  - we can produce a scanner for every such node. this scanner in effect
-    comprises the frame on the stack (or is part of it). using this scanner:
-
-  - at each child, if it is terminal, yield it or whatever, and otherwise
-    (yield it as necessary) and add *it* as a frame on the stack and so on.
-
-  - would be fun to benchmark both approaches
-
-
-
-
 ## document-meta
 
-  - :#history-A.1: realize the final "structured uber-alles" & corollaries
+  - :#history-A.1: realize the final "structure über alles" & corollaries

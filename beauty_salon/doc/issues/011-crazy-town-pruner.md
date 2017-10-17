@@ -15,6 +15,7 @@ not missing an opportunity.
 
 coverage tools allow us to determine what code is and isn't executed
 durings tests at a level of granularity of (if we like) the line-level.
+(see cross-reference: [#025.D])
 
 our parsing facilities, in turn, allow us to represent the code as AST's,
 which can know what line of code they correspond to.

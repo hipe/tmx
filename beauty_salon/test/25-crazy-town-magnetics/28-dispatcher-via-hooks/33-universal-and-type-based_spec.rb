@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport
 
     # the main objective of this one is to help usher forth the new traveral
     # mechanism that is scanner-based and DIY-stacking, instead of arbitrary
-    # method call recursion. exactly [#022.J].
+    # method call recursion. exactly [#025.F] the by-hand stack algorithm.
 
     TS_[ self ]
     use :memoizer_methods

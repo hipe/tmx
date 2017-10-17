@@ -254,7 +254,7 @@ module Skylab::BeautySalon
 
         # it appears (unsurprisingly, in hindsight) that the accompanying
         # term to a splat (its operand) can be any expression. in the legacy
-        # way (pre structured uber alles) we didn't really think about this
+        # way (pre structure über alles) we didn't really think about this
         # so we ended up with imperative code that had specific handling of
         # every type of expression that followed a splat in our corpus.
         #
@@ -391,6 +391,7 @@ module Skylab::BeautySalon
           sn = any_parent_const_expression
           if sn
             buff = sn._to_friendly_string  # #open [#007.K] there are tons of holes here
+            # (more accurately, [#025.D] the language is too dynamic to make this reliably feasible)
             buff << COLON_COLON_ << my_s
           else
             my_s

@@ -2,15 +2,11 @@
 
 ## table of contents
 
-  - introduction [#here.[a]]
+  - introduction [#here.A]
 
   - introduction to hooks :[#here.B]
 
   - why not use `::AST::Processor`? :[#here.C]
-
-  - vaguely, our requirements for traversing :[#here.D]
-
-  - awareness of stack frame :[#here.E]
 
   - small developer's notes :[#here.F]
 
@@ -21,7 +17,7 @@
 
 
 
-## introduction :[#here.[a]]
+## introduction :[#here.A]
 
 the earliest form of the earliest member asset node under this rubric
 was born from necessity: we wrote our (originally named) "hooks via [etc]"
@@ -79,6 +75,11 @@ asset files. (really, this feature is just a cheap by-product of the
 fact that for performance reasons we evaluate definitions before we
 traverse files.)
 
+(#open [#047] maybe unify all occurrences of "plan" and/or
+"document processsor" to use our most recent label for this: "dispatcher".
+*or* land on a different label *like* document processor. it's really
+"document processor via hooks", isn't it.)
+
 
 
 
@@ -108,59 +109,7 @@ more-or-less what our subject facility attempts. so why re-invent the wheel?
     be fun to step through the implementation of the remote and decide
     if it's compelling to flip to it.
 
-
-
-
-## vaguely, our requirements for traversal :[#here.D]
-
-  - originally this was for getting to know how the previous parsing library
-    parsed things. then, this was for getting to know how the current parsing
-    library parses things. always, this was used for implementing the "hooks"
-    facility which underlies our essential function/report ("replace").
-    as discusses at [#here.F] we will rely for a long time on using this to
-    assert outwardly that our expectation of the grammar matches the reality.
-
-  - to traverse an AST recursively, we want to be able to do
-    this "forwardly" rather than passively reflecting on each
-    AST; i.e we want a sense for the discrete set of symbols
-    that are nonterminal rather than terminal
-
-  - it's fun to get a sense for the statistics (the grammar symbol
-    distribution) of our own corpus vs the set of all known grammar
-    symbols.
-
-  - as described [#here.B], allow that 0 or 1 arbitrary user hook proc
-    is associated with each grammar symbol; BUT NOW: don't check for
-    the existence of this hook proc every time the grammar symbol is
-    encountered. "optimize" this decision by memoizing it away (per plan).
-
-
-
-
-## awareness of stack frame :[#here.E]
-
-both as a contact exercise and to reduce moving parts, awareness of
-a frame stack is "baked in" to the mechanics here, regardless of
-whether the user has supplied a hook for listening for "branchy"
-nodes.
-
-  - when the hook *is* supplied, the user gets a wrapped node
-    that knows the depth (integer) of this node on the stack.
-
-  - but when the hook is *not* supplied, we don't create wrapped
-    node objects that would otherwise go unused.
-
-  - artificially we add a once-per-file root stack frame for
-    the file itself. this frame always has a depth of zero.
-
-  - then, each "branchy" node at the root level of the document
-    will have a frame depth of 1, and so on.
-
-        file: foo-bar.rx     # depth: 0
-          class: FooBar      # depth: 1
-            def: frobulate   # depth: 2
-        file: other-file.rx  # depth: 0
-
+most of the above ideas are given more detailed treatment near [#025.A].
 
 
 

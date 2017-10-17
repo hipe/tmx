@@ -1,0 +1,54 @@
+digraph g {
+
+node [shape=rect]
+
+node001_traverse [label="the ability to\ntraverse an\nAST document (01)"]
+
+node002_expose [label="the ability to expose AST
+nodes in a way that allows
+us to acccess its children with
+semantic names instead of offsets (02)" ]
+
+node003_find [label="the ability to (for example)
+find a particular node or nodes
+with certain characteristics (03)" ]
+
+node004_goal [label="our ultimate goal (s)
+(for the sake of this
+discussion (04)" ]
+
+node005_replace [label="the ability to (for example)
+offer a replacement expression
+for a node programmatically in
+a way that is intuitive, concise
+and readable (05)" ]
+
+node006_grammar [label="grammar\nrepresentation\n(dependents form reqs) (06)"]
+
+node007_hand_stack [label="hand-written\nstack (07)"]
+
+node008_methods_past [label="we used to traverse\nwith methods (08)"]
+
+node009_branchy [label="the branchy report\nhas a summarized stack (09)"]
+
+node004_goal->node005_replace
+node005_replace->node003_find
+node005_replace->node002_expose
+node003_find->node001_traverse
+node003_find->node006_grammar
+node003_find->node002_expose [style=dashed label="(weak)"]
+node002_expose->node006_grammar
+node001_traverse->node006_grammar [style=dashed label="(weak)"]
+node001_traverse->node007_hand_stack
+node007_hand_stack->node008_methods_past
+node009_branchy->node007_hand_stack
+
+
+label="
+fig. 1 - different requirements and
+how they depend on each other.
+(the arrows mean \"depends on\".)
+(this was a rough guide to the massive
+rewrite (several days) that led to [#025])
+"
+}

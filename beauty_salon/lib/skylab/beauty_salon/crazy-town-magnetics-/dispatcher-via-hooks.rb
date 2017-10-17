@@ -22,7 +22,11 @@ module Skylab::BeautySalon
 
       # receive each AST document node (wrapped so you can see the path).
       # traverse every node of the document recursively, calling the
-      # appropriate hooks along the way. more at [#021.B] and [#021.D].
+      # appropriate hooks along the way. be sure to see also:
+      #
+      #   - [#025.F] (and some after) how we traverse efficiently
+      #
+      #   - [#021.B] introduction to hooks
 
       # behavior/implementation wise, we're tryna come to a sensible API:
       #
@@ -212,7 +216,7 @@ module Skylab::BeautySalon
 
       def __do_dispatch_document_AST document_n
 
-        # implement exactly [#022.J] DIY stack for efficient traversal
+        # implement exactly [#025.F] DIY stack for efficient traversal
 
         stack = @_stack
 
@@ -308,7 +312,7 @@ module Skylab::BeautySalon
       # time (except at the end of scan), the current child AST node is
       # available as well as its associated association. note that the
       # association doesn't change with the child IFF it's the any plural
-      # (variable-length) run of children. exactly [#022.J]
+      # (variable-length) run of children. exactly [#025.F]
 
       # only because the algorithms call for it and/or out of deference to
       # typeism, we make a big deal about whether or not the assoc is

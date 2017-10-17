@@ -173,9 +173,7 @@ module Skylab::BeautySalon
         _of k, -> c do
           _the c
         end, -> do
-          _load k, IDENTITY_, -> do
-            GenericGrammarSymbol___  # after #open #[#048] we shouldn't need these
-          end
+          _load k, IDENTITY_
         end
       end
 
@@ -307,26 +305,6 @@ module Skylab::BeautySalon
             as_camelcase_const_string.intern
       end
     # -
-
-    # ==
-
-    class GenericGrammarSymbol___
-
-      # (we shouldn't need this any more now that we have structured uber-alles. but confirm at #open [#048])
-
-      class << self
-        alias_method :via_node_, :new
-        undef_method :new
-      end  # >>
-
-      def initialize n
-        @__node = n
-      end
-
-      def to_description
-        @__node.type.id2name
-      end
-    end
 
     # ==
 
@@ -973,6 +951,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #tombstone-A.3: got rid of generic grammar symbol class because structure über alles
 # #tombstone-A.2: replaced recursive method call-based traversal with scanner-based
 # #tombstone-A.1: changed association store to accomodate inheritence
 # #broke-out from "selector via string"

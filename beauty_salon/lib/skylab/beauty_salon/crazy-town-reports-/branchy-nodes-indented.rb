@@ -57,7 +57,7 @@ module Skylab::BeautySalon
     # ==
 
     # at this #history-A.1 we "in-loaded" (opposite of off-loaded) lots of
-    # code and logic.
+    # code and logic. [#025.G] is dedicated to explaining this report.
 
     My_custom_stack_thing___ = -> y, svc do
 

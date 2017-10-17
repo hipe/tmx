@@ -5,12 +5,15 @@
 [#047] #small #open track many places where documentation is known to be
              in need of freshening up
 
-[#046] #hole
+[#046] #open remaining CLI/API (UI) issues with #crazy-town
 
 [#045] #open we have no intention of making #crazy-town platform language
              complete until quite a ways later. our current intention is
              to get it to work for our own corpus as a refactoring tool.
              when we publish this we will strive for some kind of "completeness"
+
+             a finishing point of this *might* be (in a single commit) to
+             sunset all references of ~"what we used to do in the old days"
 
 [#044] #open use case in [ze]
              [#here.2] another one in [ze]
@@ -39,7 +42,7 @@
 [#028]       name conventions for functions and methods ..  #parent-node:[#030]
 [#026]       #parent-node: [#010] procedurally find the smaller methods
 
-[#025]       crazy town ..
+[#025]       #crazy-town implementation ..
              ( #was: #moved-to: [sa] )
 
 [#024] #small #open fix sytax highlighting YUCK so you can use `~>` HEREDOC,
