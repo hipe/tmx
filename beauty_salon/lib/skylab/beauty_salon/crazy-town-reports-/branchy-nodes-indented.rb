@@ -63,8 +63,8 @@ module Skylab::BeautySalon
 
       margin = MARGIN_CACHE___
 
-      recv = -> wnode do
-        y << "#{ margin[ wnode.depth ] }#{ wnode.to_description }"
+      recv = -> frame do
+        y << "#{ margin[ frame.depth ] }#{ frame.to_description }"
       end
 
       my_stack_depth = 0
@@ -73,14 +73,20 @@ module Skylab::BeautySalon
 
       build_when_branchy = -> o do
 
-        -> n do
+        -> n, sym do
 
           my_stack_depth += 1
 
           _cls = gram_syms.dereference n.type
           _sn = _cls.via_node_ n
 
-          recv[ ItemStackFrame___.new( my_stack_depth, _sn ) ]
+          _fcls = case sym
+          when :_blocky_ ; BlockExperiment___
+          when :_normal_ ; ItemStackFrame___
+          else ; no
+          end
+
+          recv[ _fcls.new( my_stack_depth, _sn ) ]
 
           o.push_stack_via_node_and_pop_callback_by n do
 
@@ -89,11 +95,18 @@ module Skylab::BeautySalon
         end
       end
 
-      is_branchy = ::Hash.new do |h, k|
+      branchy_profile = ::Hash.new do |h, k|
         _cls = gram_syms.dereference k
-        yes = _cls::IS_BRANCHY
-        h[ k ] = yes
-        yes
+        _yes = _cls::IS_BRANCHY
+        if _yes
+          x = if :block == k
+            :_blocky_
+          else
+            :_normal_
+          end
+        end
+        h[ k ] = x
+        x
       end
 
       svc.will_push_to_stack_by do |o|
@@ -101,9 +114,10 @@ module Skylab::BeautySalon
         when_branchy = build_when_branchy[ o ]
 
         -> n do
-          _is_branchy = is_branchy[ n.type ]
-          if _is_branchy
-            when_branchy[ n ]
+
+          prof = branchy_profile[ n.type ]
+          if prof
+            when_branchy[ n, prof ]
           else
             o.push_stack_via_node n
           end
@@ -121,6 +135,44 @@ module Skylab::BeautySalon
 
       svc.will_visit_terminal_normally
       NIL
+    end
+
+    CommonFrame__ = ::Class.new
+
+    # ==
+
+    class BlockExperiment___ < CommonFrame__
+
+      def to_description
+
+        # VERY experimental - there's no way all blocks will play nice here
+
+        sn = @structured_node
+        bh = sn.blockhead
+
+        if :send == bh.node_type
+
+          sn = bh
+          m = sn.method_name
+
+          _yes = case m
+          when :it ; true
+          when :describe ; true
+          when :context ; true
+          end
+
+          if _yes
+            buff = m.id2name
+            buff << ': '  # COLON_ SPACE_
+            _str_sn = sn.zero_or_more_arg_expressions.dereference 0
+            buff << _str_sn.as_string.inspect
+          else
+            "block: #{ m }"
+          end
+        else
+          "block: «some block»"
+        end
+      end
     end
 
     # ==
@@ -142,7 +194,16 @@ module Skylab::BeautySalon
 
     # ==
 
-    class ItemStackFrame___
+    class ItemStackFrame___ < CommonFrame__
+
+      def to_description
+        @structured_node.to_description
+      end
+    end
+
+    # ==
+
+    class CommonFrame__
 
       def initialize d, sn
         @depth = d
@@ -150,13 +211,8 @@ module Skylab::BeautySalon
         freeze
       end
 
-      def to_description
-        @structured_node.to_description
-      end
-
       attr_reader(
         :depth,
-        :structured_node,
       )
     end
 
@@ -178,5 +234,6 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.2: accomplished visualization of blocks as stack elements
 # #history-A.1: assimilated other file (only took those 2 model classes)
 # #born.

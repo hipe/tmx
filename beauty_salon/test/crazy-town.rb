@@ -66,10 +66,6 @@ module Skylab::BeautySalon::TestSupport
 
       # -- build parser AST nodes
 
-      def build_parser_AST_node__ sym, * rest
-        Build_vendor_parser_AST_node__[ sym, rest ]
-      end
-
       define_method :parser_AST_node_builder_, -> do
         p = -> sym, * rest do
           Build_vendor_parser_AST_node__[ sym, rest ]
@@ -275,6 +271,24 @@ module Skylab::BeautySalon::TestSupport
         Default_these_things[ mod ]
 
         feature_branch_magnetic_[ mod ]
+      end
+
+      define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
+
+      shared_subject :ast_with_zero_elements_ do
+        build_parser_AST_node_ :meh
+      end
+
+      shared_subject :ast_with_one_element_that_is_numeric_ do
+        build_parser_AST_node_ :inty, 1234
+      end
+
+      shared_subject :ast_with_two_elements_ do
+        build_parser_AST_node_ :switchoid_WOULD_BE, 123, 456
+      end
+
+      def build_parser_AST_node_ sym, * rest
+        Build_vendor_parser_AST_node__[ sym, rest ]
       end
 
       def subject_base_class_

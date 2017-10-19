@@ -42,7 +42,8 @@ module Skylab::BeautySalon::TestSupport
           strange.nil? || fail
         elsif 5 == count
           # (this happens when you run only this file)
-          strange == %w(op_asgn kwbegin lvar) || fail
+          # strange == %w(op_asgn kwbegin lvar) || fail
+          strange == %w( op_asgn ) || fail
         else
           fail
         end

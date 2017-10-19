@@ -98,45 +98,33 @@ module Skylab::BeautySalon
         # -- use the lvars
 
         same = -> o do
+
+          if has_plural_arity
+            o.__receive_pluralism min_is_one, max_is_one
+          end
+
           o.association_symbol = sym
           o.offset = d
         end
 
         if is_terminal
 
-          if has_plural_arity && ! max_is_one
-            raise MyException_.new :terminals_cannot_currently_be_plural_for_lack_of_need
-          end
-
           if is_any
             raise MyException_.new :we_have_never_needed_terminals_to_have_the_ANY_modifier
           end
 
           TerminalAssociation___.define do |o|
-
-            if max_is_one
-              o.BE_SPECIAL
-            end
-
             o.stem_symbol = stem
             o.type_symbol = terminal_type_sym
             o.terminal_type_sanitizers = @module::TERMINAL_TYPE_SANITIZERS
             same[ o ]
           end
         else
-          StructuredChildAssociation___.define do |o|
-            # (which ivars are set show a "feature bias")
+          NonTerminalAssociation___.define do |o|
+            # (which ivars are set show a #"feature bias")
             if :expression != group
               o.group_symbol = group
               o.group_information = __group_etc group
-            end
-            if has_plural_arity
-              o.has_plural_arity = true
-              if min_is_one
-                o.minimum_is_one = true
-              elsif max_is_one
-                o.maximum_is_one = true
-              end
             end
             if is_any
               o.is_any = true
@@ -494,6 +482,10 @@ module Skylab::BeautySalon
 
       alias_method :node_location, :_node_location  # meh
 
+      def node_type
+        @_node_.type
+      end
+
       attr_reader(
         :_node_,
       )
@@ -563,11 +555,11 @@ module Skylab::BeautySalon
         o.middle_third do |d|
           d == here || sanity
           if plur_asc.maximum_is_one
-            plur_asc.__write_methods_for_winker_ cls, here, num_ascs  # (see)
+            plur_asc._write_methods_for_winker_ cls, here, num_ascs  # (see)
           else
             _hard_offset = d + neg
             0 > _hard_offset || fail
-            plur_asc.__write_methods_for_plural_ cls, _hard_offset  # (see)
+            plur_asc._write_methods_for_unbounded_plural_ cls, _hard_offset  # (see)
           end
         end
 
@@ -630,15 +622,12 @@ module Skylab::BeautySalon
 
           asc = svcs.__child_association_via_symbol_and_offset_ sym, d
 
-          if asc.is_terminal
-
-            if asc.has_plural_arity && ! asc.maximum_is_one
-              ::Kernel._COVER_ME__cant_be_both_terminal_and_have_truly_plural_arity__
-            end
-            has_writable_terminals = true
-
-          elsif asc.has_plural_arity
+          if asc.has_plural_arity
             once[ d ]
+          end
+
+          if asc.is_terminal
+            has_writable_terminals = true
           end
 
           a.push asc
@@ -701,18 +690,20 @@ module Skylab::BeautySalon
       )
     end
 
-    CommonChildAssociation__ = ::Class.new Common_::SimpleModel
+    CommonAssociation__ = ::Class.new Common_::SimpleModel
 
-    class TerminalAssociation___ < CommonChildAssociation__
+    class TerminalAssociation___ < CommonAssociation__
 
       def initialize
+
         @has_plural_arity = false
         yield self
-        super
-      end
 
-      def BE_SPECIAL  # experiment for #spot1.2
-        @has_plural_arity = true
+        if @has_plural_arity && ! self.minimum_is_one  # sanity
+          _write_ivars_for_memoization
+        end
+
+        super
       end
 
       attr_writer(
@@ -723,6 +714,51 @@ module Skylab::BeautySalon
         :stem_symbol,
         :type_symbol,
       )
+
+      def _write_methods_for_winker_ cls, here, num_ascs
+
+        # like #here2 but simpler because we aren't wrapping. for whatever
+        # reason, we won't memoize even though there is memoizable work
+
+        # there's an inconsistency here - although we don't (as we never do)
+        # assert type, we do assert (redunantly) arity (because it's free)
+
+        higher_length = num_ascs
+        lower_length = num_ascs - 1
+
+        cls.send :define_method, @association_symbol do
+
+          cx = @_node_.children
+          case cx.length
+          when lower_length ; NOTHING_
+          when higher_length ; cx.fetch here
+          else
+            raise MyException_.new :maximum_number_of_children_exceeded  # REDUNDANT
+          end
+        end
+      end
+
+      def _write_methods_for_unbounded_plural_ cls, hard_offset
+
+        # much like #here1 the NT variant, but here we don't need to do
+        # anything fancy with lazy memoizing the list items themselves
+        # because we don't wrap terminals. we do however memoize the whole
+        # list array lazily (because we have to. we can't calculate it now.)
+
+        r = @offset .. hard_offset
+
+        _write_memoizing_methods cls, @association_symbol do
+
+          cx = @_node_.children
+          cx.frozen? || sanity
+
+          # (there's a potential "optimzation" the where when plural
+          # association is the only association, there is no reason to
+          # slice the array but meh)
+
+          cx[ r ].freeze
+        end
+      end
 
       def _write_methods_for_non_plural_ cls, hard_offset
 
@@ -743,8 +779,6 @@ module Skylab::BeautySalon
         end
       end
 
-      # ~ )
-
       def _SYMBOL_FOR_MEMBERS_
         @stem_symbol
       end
@@ -753,44 +787,33 @@ module Skylab::BeautySalon
         NOTHING_
       end
 
-      attr_reader(
-        :has_plural_arity,
-      )
-
-      def maximum_is_one  # only when relevant
-        true
-      end
-
       def is_terminal
         true
       end
     end
 
-    class StructuredChildAssociation___ < CommonChildAssociation__
+    class NonTerminalAssociation___ < CommonAssociation__
 
       def initialize
         yield self
-        @method_name_for_read_subsequently = :"__#{ @association_symbol }_subsequently"
+        _write_ivars_for_memoization
         super
       end
 
       attr_accessor(
         :group_information,
         :group_symbol,
-        :maximum_is_one,  # assume `has_plural_arity`, assume never co-occurs with below
-        :minimum_is_one,  # assume `has_plural_arity`, assume never co-occurs with above
-        :has_plural_arity,
         :is_any,
       )
 
-      def __write_methods_for_plural_ cls, hard_offset
+      def _write_methods_for_unbounded_plural_ cls, hard_offset
 
         # make a reader for variable-length segment of the children. we
         # don't know beforehand how many children we will have (only that
         # the number accords to our arity category :#here5). the subject
         # range for any given actual array of children is a function of:
         # the formal offset of the subject association, the number of
-        # formals, and the number of actual children.
+        # formals, and the number of actual children. :#here1
 
         r = @offset .. hard_offset
 
@@ -799,7 +822,7 @@ module Skylab::BeautySalon
           cx.frozen? || sanity
           sublist = cx[ r ].freeze
           # (you could maintain a mapping between offset systems instead, but meh)
-          SickMemoizerBro___.new sublist.length do |d|
+          LazilyEvaluatedMemoizingFixedLengthList___.new sublist.length do |d|
             ast = sublist.fetch d
             ast || sanity
             _build_structured_child_BS ast
@@ -807,7 +830,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def __write_methods_for_winker_ cls, here, num_ascs
+      def _write_methods_for_winker_ cls, here, num_ascs
 
         # "winker" is now shorthand for "association whose arity is zero or
         # one". this means its actual value can either be there nor not be
@@ -820,7 +843,7 @@ module Skylab::BeautySalon
         # has a variable length segment; the maximum possible length for this
         # segment is 1 making the use of the "list" structure superflous here.
         #
-        # #[#022.G]
+        # :#here2 #[#022.G]
 
         _write_memoizing_methods cls, @association_symbol do
 
@@ -857,27 +880,41 @@ module Skylab::BeautySalon
         @association_symbol
       end
 
-      attr_reader(
-        :method_name_for_read_subsequently,
-      )
-
       def is_terminal
         false
       end
     end
 
-    class CommonChildAssociation__
+    class CommonAssociation__
 
       def initialize
         @appropriate_ivar = :"@#{ @association_symbol }"
-        @method_name_for_read_initially = :"__#{ @association_symbol }_initially"
         freeze
+      end
+
+      def _write_ivars_for_memoization
+        @method_name_for_read_initially = :"__#{ @association_symbol }_initially"
+        @method_name_for_read_subsequently = :"__#{ @association_symbol }_subsequently"
       end
 
       attr_accessor(
         :association_symbol,
         :offset,
       )
+
+      def __receive_pluralism min_is_one, max_is_one
+
+        # which ivars are set show a #"feature bias")
+
+        if max_is_one
+          min_is_one && fail
+          @maximum_is_one = true
+        elsif min_is_one
+          @minimum_is_one = true
+        end
+
+        @has_plural_arity = true ; nil
+      end
 
       def _write_memoizing_methods cls, m, & p
 
@@ -909,13 +946,17 @@ module Skylab::BeautySalon
 
       attr_reader(
         :appropriate_ivar,
+        :maximum_is_one,  # assume `has_plural_arity`, assume never co-occurs with below
         :method_name_for_read_initially,
+        :method_name_for_read_subsequently,
+        :minimum_is_one,  # assume `has_plural_arity`, assume never co-occurs with above
+        :has_plural_arity,
       )
     end
 
     # ==
 
-    class SickMemoizerBro___
+    class LazilyEvaluatedMemoizingFixedLengthList___
 
       def initialize d, & p
         @_state_via_offset = ::Array.new d

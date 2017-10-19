@@ -10,7 +10,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'minimum number of children not satisfied', ex: true do
 
-      _ast = _ast_with_two_elements
+      _ast = ast_with_two_elements_
       _cls = _class_for_switchoid
       expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
         _go _ast, _cls
@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'against zib-bob when has too few', ex: true do
 
-      _ast = _ast_with_zero_elements
+      _ast = ast_with_zero_elements_
       _cls = _class_for_winker
       expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
         _go _ast, _cls
@@ -46,7 +46,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'against zib-bob when the greater possible length' do
 
-      _ast = _ast_with_two_elements
+      _ast = ast_with_two_elements_
       _cls = _class_for_winker
       _vals = _expect_values _ast, _cls
       _vals == [ 123, 456 ] || fail
@@ -54,7 +54,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'against zib-bob when has the lesser possible length (money shot)' do
 
-      _ast = _ast_with_one_element
+      _ast = ast_with_one_element_that_is_numeric_
       _cls = _class_for_winker
       _vals = _expect_values _ast, _cls
       _vals == [ 1234 ] || fail
@@ -62,7 +62,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'this dingus - nil' do  #testpoint1.51
 
-      _ast = _ast_with_one_element
+      _ast = ast_with_one_element_that_is_numeric_
       _cls = _class_for_winker
       o = _cls.via_node_ _ast
       o.lefty == 1234 || fail
@@ -84,7 +84,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'distribute two elements into two slots (INTERFACE EXPERIMENTAL)' do
 
-      _ast = _ast_with_two_elements
+      _ast = ast_with_two_elements_
       _cls = _class_for_dualoid
       _vals = _expect_values _ast, _cls
       _vals == [ 123, 456 ] || fail
@@ -216,43 +216,29 @@ module Skylab::BeautySalon::TestSupport
     shared_subject :_ast_left_is_not_numeric do
       o = parser_AST_node_builder_
       _ast_winky_left = _ast_that_is_other
-      _ast_winky_right = _ast_that_is_numeric
+      _ast_winky_right = ast_with_one_element_that_is_numeric_
       o[ :winkie_WOULD_BE, _ast_winky_left, _ast_winky_right ]
     end
 
     shared_subject :_ast_right_is_not_numeric do
       o = parser_AST_node_builder_
-      _ast_winky_left = _ast_that_is_numeric
+      _ast_winky_left = ast_with_one_element_that_is_numeric_
       _ast_winky_right = _ast_that_is_other
       o[ :winkie_WOULD_BE, _ast_winky_left, _ast_winky_right ]
     end
 
     shared_subject :_ast_right_is_not_present do
       o = parser_AST_node_builder_
-      _ast_winky_left = _ast_that_is_numeric
+      _ast_winky_left = ast_with_one_element_that_is_numeric_
       o[ :winkie_WOULD_BE, _ast_winky_left, NOTHING_ ]
-    end
-
-    shared_subject :_ast_with_zero_elements do
-      _build_node :meh
     end
 
     shared_subject :_ast_that_is_other do
       _build_node :other_thing, :oThEr_tHiNg
     end
 
-    shared_subject :_ast_that_is_numeric do
-      _build_node :inty, 1234
-    end
-
-    alias_method :_ast_with_one_element, :_ast_that_is_numeric
-
     shared_subject :_ast_that_is_quote_winking do
       _build_node :dualoid_WOULD_BE, 321, nil
-    end
-
-    shared_subject :_ast_with_two_elements do
-      _build_node :switchoid_WOULD_BE, 123, 456
     end
 
     shared_subject :_ast_with_three_elements do
@@ -263,7 +249,7 @@ module Skylab::BeautySalon::TestSupport
       _build_node :dualoid_WOULD_BE, 12, 34, 56, 78
     end
 
-    alias_method :_build_node, :build_parser_AST_node__
+    alias_method :_build_node, :build_parser_AST_node_
 
     # --
 

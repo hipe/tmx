@@ -73,9 +73,6 @@
 
              :[#here.B]: (in "ragel notes", the dedicated document for this node)
 
-       #open :[#here.C]: we'll piggyback our issuse with 'parser' in here
-             too. (see referrent)
-
 [#019]       the `[*]` task of converting all `Foo_::Lib_::Bar_BAZ[]`
                to `Foo_.lib.bar_BAZ`..
 [#018]       [ why we like immutability ]

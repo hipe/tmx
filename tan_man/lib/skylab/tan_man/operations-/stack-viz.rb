@@ -68,6 +68,9 @@ module Skylab::TanMan
 
       if e
         __when_parse_error e
+      elsif @argv.length.nonzero?
+        @client.stderr.puts "unexpected argument: #{ @argv[0].inspect }"
+        _fail
       elsif did_request_help
         if ( do_open || last_N )
           @client.stderr.puts "(ignoring some options)"

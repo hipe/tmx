@@ -220,12 +220,10 @@ module Skylab::BeautySalon
 
       class Regopt < GrammarSymbol__
 
-        # #todo further testing is needed to determine if this is a problem
-        # on our end or the remote end (we think the latter); the fact that
-        # we aren't ever getting any children under this node.. #open :[#020.C]
         # #testpoint1.53
 
         children(
+          :zero_or_more_symbol_terminals,
         )
       end
 
@@ -644,7 +642,7 @@ module Skylab::BeautySalon
         # neato - has no name if it's .. with no name
 
         children(
-          :zero_or_one_OHAI_symbol_terminal,  # :#spot1.2 - special provision made for this form
+          :zero_or_one_OHAI_symbol_terminal,  # :#testpoint1.55
         )
       end
 
@@ -764,10 +762,8 @@ module Skylab::BeautySalon
         children(
           :any_XXX_receiver_expression,
           :method_name_symbol_terminal,
-          :zero_or_more_XXX_arg_expressions,
+          :zero_or_more_arg_expressions,
         )
-
-        IS_BRANCHY = false
       end
 
       # lambda (placeheld)
@@ -781,11 +777,14 @@ module Skylab::BeautySalon
       # (NOTE - we might be missing some stuff near above)
 
       class Block < GrammarSymbol__
+
         children(
           :blockhead,
           :args,
           :any_BODY_expression,  # (blocks can be empty)
         )
+
+        IS_BRANCHY = true  # :#history-A.7
       end
 
       # block_pass (placeheld)
@@ -1195,6 +1194,7 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# :#history-A.7: branchy report gets deeper
 # :#history-A.5: as referenced
 # #history-A.4: when we introduced inheritence
 # :#history-A.3: as referenced

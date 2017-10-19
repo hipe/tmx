@@ -16,12 +16,19 @@ module Skylab::BeautySalon::TestSupport
     #   - here we use the concept to model the end-of-the-line, primitive
     #     data of AST's (things like integers, strings and so on.)
     #
-    #   - experimentally the association grammar is written such that:
-    #     A) you cannot model terminals with a truly plural assocation
-    #     (fortunately the target grammar is OK with this) and B) terminals
-    #     must be defined with a terminal type (any mono-tokened symbolic
-    #     name) that will be used to sanity check the type of the terminal
-    #     and C) you *can* define the any-ness of the terminal association.
+    #   - we use the concept of terminals because A) they model the
+    #     tendencies of the target grammar as it appears in practice and
+    #     B) our [#025.F] traversal algorithm (as probably all of them)
+    #     depends on knowing which nodes are terminal vs. nonterminal.
+    #
+    #   - terminal assocations require a terminal type. there are no
+    #     built-in terminal types. they are always user-defined.
+    #
+    #   - currently, the "any" modifier cannot modify any terminal
+    #     association, but we can change this if ever needed.
+    #
+    #   - as of #history-A.2, the full suite of [#022.G] plural arities can
+    #     be used with terminal associations.
     #
     # Preface:
     #
@@ -170,35 +177,112 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'terminal, plural - normally not allowed EXPERIMENTAL' do
-
-      given :one_or_more_fafooza_terminals
-
-      it 'errors specifically', ex: true do
-        _expect_exception :terminals_cannot_currently_be_plural_for_lack_of_need
-      end
-    end
-
-    context 'terminal, plural - this one kind allowed EXPERIMENTAL' do
-
-      given :zero_or_one_FAZOOZA_symbol_terminals
-
-      it 'builds' do
-        _builds
-      end
-
-      it 'details' do
-        _is_terminal
-        _is_plural
-      end
-    end
-
     context 'terminal, any' do
 
       given :any_fafooza_terminal
 
       it 'errors specifically', ex: true do
         _expect_exception :we_have_never_needed_terminals_to_have_the_ANY_modifier
+      end
+    end
+
+    it 'terminal zero or more parses, details look OK' do
+
+      asc = _terminal_zero_or_more
+      asc || fail
+      asc.is_terminal || fail
+      asc.minimum_is_one && fail
+      asc.maximum_is_one && fail
+    end
+
+    it 'terminal one or more parses, details look OK' do
+
+      asc = _terminal_one_or_more
+      asc || fail
+      asc.is_terminal || fail
+      asc.minimum_is_one || fail
+      asc.maximum_is_one && fail
+    end
+
+    it 'terminal zero or one parses, details look OK' do
+
+      asc = _terminal_zero_or_one
+      asc || fail
+      asc.is_terminal || fail
+      asc.minimum_is_one && fail
+      asc.maximum_is_one || fail
+    end
+
+    context %q{write methods for oridnary plural - NOTE we don't typecheck here} do
+
+      it 'writes method' do
+        _class_realised || fail
+      end
+
+      it 'the zero length case OK' do
+        _given_AST ast_with_zero_elements_
+        _how_bout_nau 0
+      end
+
+      it 'the one length case OK' do
+        _given_AST ast_with_one_element_that_is_numeric_
+        _how_bout_nau 1
+      end
+
+      it 'the two length case OK' do
+        _given_AST ast_with_two_elements_
+        _how_bout_nau 2
+      end
+
+      def _how_bout_nau d
+        _ast = remove_instance_variable :@AST
+        _cls = _class_realised
+        _sn = _cls.via_node_ _ast
+        _x_a = _sn.zero_or_more_zymbolio_terminals
+        _x_a.length == d || fail
+      end
+
+      shared_subject :_class_realised do
+        cls = _this_one_feature_branch.dereference :regoptoid
+        cls.association_index  # kicks the realization of the associations, i.e write methods
+        cls
+      end
+    end
+
+    context 'write methods for winker' do
+
+      it 'writes method' do
+        _class_realised || fail
+      end
+
+      it 'the zero length case nil' do
+        _given_AST ast_with_zero_elements_
+        _guy.nil? || fail
+      end
+
+      it 'the one length case OK (NOTE - no type confirmation)' do
+        _given_AST ast_with_one_element_that_is_numeric_
+        _guy == 1234 || fail
+      end
+
+      it 'the two length case not OK' do
+        _given_AST ast_with_two_elements_
+        expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+          _guy
+        end
+      end
+
+      def _guy
+        _ast = remove_instance_variable :@AST
+        _cls = _class_realised
+        _sn = _cls.via_node_ _ast
+        _sn.zero_or_one_hallo_symbol_terminals
+      end
+
+      shared_subject :_class_realised do
+        cls = _this_one_feature_branch.dereference :restargoid
+        cls.association_index  # kicks the realization of the associations, i.e write methods
+        cls
       end
     end
 
@@ -290,16 +374,38 @@ module Skylab::BeautySalon::TestSupport
 
     shared_subject :_this_one_feature_branch do
 
-      _cls = build_subclass_with_these_children_( :XX1,
+      _cls = build_subclass_with_these_children_( :XX1_sendoid,
         :receiverosa_expression,
         :methodo_nameo_symbol_terminal,
         :zero_or_more_argumentoso_expressions,
       )
 
+      _cls2 = build_subclass_with_these_children_( :XX1_regression,
+        :zero_or_more_zymbolio_terminals,
+      )
+
+      _cls3 = build_subclass_with_these_children_( :XX1_resetargoid,
+        :zero_or_one_hallo_symbol_terminals,  # :#testpoint1.55
+      )
+
       build_subject_branch_(
         _cls, :Sendoid,
+        _cls2, :Regoptoid,
+        _cls3, :Restargoid,
         :ThisOneGuy,
       )
+    end
+
+    shared_subject :_terminal_zero_or_more do
+      build_association_ :zero_or_more_squaron_terminals
+    end
+
+    shared_subject :_terminal_one_or_more do
+      build_association_ :one_or_more_squaron_terminals
+    end
+
+    shared_subject :_terminal_zero_or_one do
+      build_association_ :zero_or_one_squaron_terminal
     end
 
     def _associaton_symbol_is_as_received
@@ -351,6 +457,10 @@ module Skylab::BeautySalon::TestSupport
       _subject || fail
     end
 
+    def _given_AST ast
+      @AST = ast
+    end
+
     def _subject
       subject_association_
     end
@@ -366,5 +476,6 @@ module Skylab::BeautySalon::TestSupport
     X_ctm_npvm_ati = ::Module.new  # const namespace for tests in this file
   end
 end
+# :#history-A.2: re-architect terminals to be fully plural, mostly indifferently
 # :#history-A.1: begin to dismantle method-based grammar representation
 # #born.

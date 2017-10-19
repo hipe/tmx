@@ -44,7 +44,7 @@ rx = //
 
 rx = /\A
   qq
-\z/.xi
+\z/xi
 
 # (the regexp options above are #testpoint1.53)
 
