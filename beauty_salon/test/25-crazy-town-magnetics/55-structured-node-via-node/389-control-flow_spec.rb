@@ -16,7 +16,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'first child builds and is the thing' do
         _x = _scrutinized
-        _x._node_.type == :int || fail  # covered in #testpoint1.1
+        _x.node_type == :int || fail  # covered in #testpoint1.1
       end
 
       it 'second child (component) builds' do
@@ -25,7 +25,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'third child builds and is' do
         _x = _else
-        _x._node_.type == :int || fail  # covered in #testpoint1.1
+        _x.node_type == :int || fail  # covered in #testpoint1.1
       end
 
       def structured_node_
@@ -39,13 +39,13 @@ module Skylab::BeautySalon::TestSupport
         matchers = _first_when.one_or_more_matchable_expressions
         matchers.length == 1 || fail
         x = matchers.dereference 0
-        x._node_.type == :int || fail
+        x.node_type == :int || fail
         x.as_integer == 3 || fail  # (not supposed to do this here but meh)
       end
 
       it 'the consequence expression' do
         _x = _first_when.any_consequence_expression
-        _x._node_.type == :nil || fail
+        _x.node_type == :nil || fail
       end
 
       def _first_when

@@ -39,7 +39,9 @@ module Skylab::BeautySalon
 
           oo.define_document_processor :_main_ do |o|
 
-            _dhd.flush_definition__ y, o  # hi.
+            _dhd.flush_definition__ y, o
+
+            o.listener = @listener
           end
 
           oo.on_each_file_path do |path, o|

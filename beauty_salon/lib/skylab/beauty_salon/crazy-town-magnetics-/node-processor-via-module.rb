@@ -300,12 +300,13 @@ module Skylab::BeautySalon
 
       class << self
 
-        def receive_constituent_construction_services_ x  # #testpoint
-          @_constituent_construction_services = x
+        def _structured_node_via_node n
+          _cls = @_constituent_construction_services.dereference n.type
+          _cls.via_node_ n
         end
 
-        def __constituent_construction_services
-          @_constituent_construction_services  # hi.
+        def receive_constituent_construction_services_ x  # #testpoint
+          @_constituent_construction_services = x
         end
 
         def children * sym_a
@@ -425,7 +426,20 @@ module Skylab::BeautySalon
 
           instance_variable_set asc.appropriate_ivar, asc.method_name_for_read_initially
         end
-        @_node_ = n  # so named because @ordinary_ivars are in userspace
+
+        @AST_node_ = n  # so named because @ordinary_ivars are in userspace
+
+        yield self if block_given?
+
+        # we don't freeze only because of how we lazy memoize wrapped children value
+      end
+
+      def DIG_AND_CHANGE_TERMINAL * sym_a, x
+        CrazyTownMagnetics_::StructuredNode_via_Writes::DIG_ETC.call_by do |o|
+          o.new_value = x
+          o.dig_symbols = sym_a
+          o.structured_node = self
+        end
       end
 
       def new_by & edit
@@ -433,6 +447,11 @@ module Skylab::BeautySalon
           o.structured_node = self
           o.edit = edit
         end
+      end
+
+      def each_qualified_offset_categorized_ & p
+        CrazyTownMagnetics_::Dispatcher_via_Hooks::
+            EachQualifiedOffsetCategorized[ p, self ]
       end
 
       def _node_children_normalized_BS
@@ -443,16 +462,16 @@ module Skylab::BeautySalon
         # of children/each child, assert trueish-ness (any-ness), group,
         # and children length. (the lattermost is assumed #here5)
         a = []
-        self.class.each_qualified_child @_node_ do |x, _asc|
+        self.class.each_qualified_child @AST_node_ do |x, _asc|
           a.push x
         end
         a.freeze
       end
 
-      def _build_structured_child_BS ast
-        _svcs = self.class.__constituent_construction_services
-        _cls = _svcs.dereference ast.type
-        _cls.via_node_ ast
+      def memoize_component_CT_ x, asc
+        ( @_structured_child_cache_ ||= {} )[ asc.association_symbol ] = x
+        instance_variable_set asc.appropriate_ivar, asc.method_name_for_read_subsequently
+        NIL
       end
 
       # -- special interests
@@ -465,29 +484,27 @@ module Skylab::BeautySalon
         # ~(it's futile trying to get rid of the warning - maybe
         _unp = lib.unparser
         # ~)
-        _unp.unparse @_node_
+        _unp.unparse @AST_node_
       end
 
       def begin_lineno__
-        _node_location.first_line
+        node_location.first_line
       end
 
       def end_lineno__
-        _node_location.last_line
+        node_location.last_line
       end
 
-      def _node_location
-        @_node_.location
+      def node_location
+        @AST_node_.location
       end
-
-      alias_method :node_location, :_node_location  # meh
 
       def node_type
-        @_node_.type
+        @AST_node_.type
       end
 
       attr_reader(
-        :_node_,
+        :AST_node_,
       )
 
       ASSOCIATIONS = nil  # as described in [#022.E]
@@ -617,19 +634,33 @@ module Skylab::BeautySalon
 
         a = []
         has_writable_terminals = false
+        offset_via_appropriate_symbol = {}
 
         sym_a.each_with_index do |sym, d|
 
           asc = svcs.__child_association_via_symbol_and_offset_ sym, d
 
-          if asc.has_plural_arity
-            once[ d ]
-          end
-
           if asc.is_terminal
-            has_writable_terminals = true
+            if asc.has_plural_arity
+              once[ d ]
+              if asc.maximum_is_one
+                has_writable_terminals = true
+                k = asc.stem_symbol
+              else
+                k = asc.association_symbol
+              end
+            else
+              has_writable_terminals = true
+              k = asc.stem_symbol
+            end
+          else
+            k = asc.association_symbol
+            if asc.has_plural_arity
+              once[ d ]
+            end
           end
 
+          offset_via_appropriate_symbol[ k ] = a.length
           a.push asc
         end
 
@@ -661,6 +692,7 @@ module Skylab::BeautySalon
           max = len
         end
 
+        # (see #here3)
         if has_writable_terminals
           @has_writable_terminals = true
         end
@@ -668,6 +700,7 @@ module Skylab::BeautySalon
         @minimum_number_of_children = min
         @maximum_number_of_children = max
         @associations = a
+        @__offset_via_appropriate_symbol = offset_via_appropriate_symbol.freeze
         freeze
       end
 
@@ -677,6 +710,10 @@ module Skylab::BeautySalon
 
         CrazyTownMagnetics_::Dispatcher_via_Hooks::
             EachAssociationOffsetCategorized[ p, self ]
+      end
+
+      def dereference k
+        @associations.fetch @__offset_via_appropriate_symbol.fetch k
       end
 
       attr_reader(
@@ -699,7 +736,7 @@ module Skylab::BeautySalon
         @has_plural_arity = false
         yield self
 
-        if @has_plural_arity && ! self.minimum_is_one  # sanity
+        if has_truly_plural_arity  # sanity
           _write_ivars_for_memoization
         end
 
@@ -728,7 +765,7 @@ module Skylab::BeautySalon
 
         cls.send :define_method, @association_symbol do
 
-          cx = @_node_.children
+          cx = @AST_node_.children
           case cx.length
           when lower_length ; NOTHING_
           when higher_length ; cx.fetch here
@@ -749,7 +786,7 @@ module Skylab::BeautySalon
 
         _write_memoizing_methods cls, @association_symbol do
 
-          cx = @_node_.children
+          cx = @AST_node_.children
           cx.frozen? || sanity
 
           # (there's a potential "optimzation" the where when plural
@@ -766,7 +803,7 @@ module Skylab::BeautySalon
         # since it's a terminal (i.e primitive) value, there's not wrapping
 
         cls.send :define_method, @stem_symbol do
-          @_node_.children.fetch hard_offset
+          @AST_node_.children.fetch hard_offset
         end
       end
 
@@ -818,15 +855,14 @@ module Skylab::BeautySalon
         r = @offset .. hard_offset
 
         _write_memoizing_methods cls, @association_symbol do
-          cx = @_node_.children
+
+          cx = @AST_node_.children
           cx.frozen? || sanity
+
           sublist = cx[ r ].freeze
           # (you could maintain a mapping between offset systems instead, but meh)
-          LazilyEvaluatedMemoizingFixedLengthList___.new sublist.length do |d|
-            ast = sublist.fetch d
-            ast || sanity
-            _build_structured_child_BS ast
-          end
+
+          Listy___.new sublist, self.class
         end
       end
 
@@ -852,7 +888,7 @@ module Skylab::BeautySalon
           when num_ascs  # #testpoint1.52
             ast = x_a.fetch here
             if ast
-              _build_structured_child_BS ast
+              self.class._structured_node_via_node ast
             end
           when num_ascs - 1  # #testpoint1.51
             NOTHING_
@@ -871,7 +907,7 @@ module Skylab::BeautySalon
           _x_a = _node_children_normalized_BS
           ast = _x_a.fetch hard_offset
           if ast
-            _build_structured_child_BS ast
+            self.class._structured_node_via_node ast
           end
         end
       end
@@ -909,8 +945,11 @@ module Skylab::BeautySalon
         if max_is_one
           min_is_one && fail
           @maximum_is_one = true
-        elsif min_is_one
-          @minimum_is_one = true
+        else
+          if min_is_one
+            @minimum_is_one = true
+          end
+          @has_truly_plural_arity = true
         end
 
         @has_plural_arity = true ; nil
@@ -932,8 +971,7 @@ module Skylab::BeautySalon
 
           define_method asc.method_name_for_read_initially do
             _x = instance_exec( & p )
-            ( @_structured_child_cache_ ||= {} )[ k ] = _x
-            instance_variable_set ivar, asc.method_name_for_read_subsequently
+            memoize_component_CT_ _x, asc
             send instance_variable_get ivar
           end
 
@@ -951,18 +989,54 @@ module Skylab::BeautySalon
         :method_name_for_read_subsequently,
         :minimum_is_one,  # assume `has_plural_arity`, assume never co-occurs with above
         :has_plural_arity,
+        :has_truly_plural_arity,
       )
     end
 
     # ==
 
-    class LazilyEvaluatedMemoizingFixedLengthList___
+    class Listy___
 
-      def initialize d, & p
-        @_state_via_offset = ::Array.new d
-        @_cached_value_via_offset = ::Array.new d
-        @_proc = p
-        @length = d
+      def initialize sublist, snc
+
+        len = sublist.length
+
+        @_state_via_offset = ::Array.new len
+        @_cached_value_via_offset = ::Array.new len
+
+        @_sublist = sublist
+        @_structured_node_class = snc
+
+        @length = len
+        freeze
+      end
+
+      def DUPLICATUS d, new_child_sn
+
+        # -- 1. dup all of the things
+
+        a1 = @_state_via_offset.dup
+        a2 = @_cached_value_via_offset.dup
+        sublist = @_sublist.dup
+        snc = @_structured_node_class
+        len = @length
+
+        # -- 2. modify
+
+        a1[ d ] = :cached
+        a2[ d ] = new_child_sn
+        sublist[ d ] = new_child_sn.AST_node_
+
+        # -- 3. finish
+
+        self.class.allocate.instance_exec do
+          @_state_via_offset = a1
+          @_cached_value_via_offset = a2
+          @_sublist = sublist.freeze
+          @_structured_node_class = snc
+          @length = len
+          freeze
+        end
       end
 
       def dereference d
@@ -972,7 +1046,10 @@ module Skylab::BeautySalon
           @_cached_value_via_offset.fetch d
         else
           @_state_via_offset[ d ] = :locked
-          @_cached_value_via_offset[ d ] = @_proc[ d ]
+          n = @_sublist.fetch d
+          n || sanity
+          _sn = @_structured_node_class._structured_node_via_node n
+          @_cached_value_via_offset[ d ] = _sn
           @_state_via_offset[ d ] = :cached
           dereference d
         end
@@ -992,6 +1069,13 @@ module Skylab::BeautySalon
     # ==
   end
 end
+
+# :#here3: #open [#007.L]: there's the old way of editing terminals, and
+# (with this DIG thing) the new way. the new way is incubating, but if it
+# settles it may obviate the old way. anyway: under the old way, the
+# terminal association is editable IFF it is not truly plural.
+
+
 # #tombstone-A.3: got rid of generic grammar symbol class because structure über alles
 # #tombstone-A.2: replaced recursive method call-based traversal with scanner-based
 # #tombstone-A.1: changed association store to accomodate inheritence

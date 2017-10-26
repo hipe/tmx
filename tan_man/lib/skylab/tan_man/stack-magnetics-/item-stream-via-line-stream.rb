@@ -30,8 +30,10 @@ module Skylab::TanMan
       @_line.chomp!
       md = RX___.match @_line
       if md
+        @_had_explicit_thing = true
         __line_via_matchdata md
       else
+        @_had_explicit_thing = false
         @_sym = __anon
         @_label = @_line
         @_sym_a = nil
@@ -67,7 +69,7 @@ module Skylab::TanMan
         is_first = true
       end
 
-      Item___.new @_sym, @_label, is_first, @_sym_a
+      Item___.new @_had_explicit_thing, @_sym, @_label, is_first, @_sym_a
     end
 
     Describe_that_one_rx = -> y do
@@ -92,8 +94,9 @@ module Skylab::TanMan
 
     class Item___
 
-      def initialize sym, s, is_first, dsym
+      def initialize yes, sym, s, is_first, dsym
         @dependency_symbols = dsym
+        @had_explicit_identifier = yes
         @is_first = is_first
         @item_label = s
         @item_symbol = sym
@@ -101,6 +104,7 @@ module Skylab::TanMan
 
       attr_reader(
         :dependency_symbols,
+        :had_explicit_identifier,
         :is_first,
         :item_label,
         :item_symbol,

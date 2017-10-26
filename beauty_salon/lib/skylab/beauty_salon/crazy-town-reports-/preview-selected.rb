@@ -49,6 +49,8 @@ module Skylab::BeautySalon
                 line_cache.__flush_into_ y, @file_path_upstream_resources
               end
             end
+
+            o.listener = @listener
           end
 
           oo.on_each_file_path do |path, o|
@@ -254,4 +256,3 @@ module Skylab::BeautySalon
   end
 end
 # #born.
-

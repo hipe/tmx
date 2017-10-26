@@ -835,7 +835,7 @@ module Skylab::BeautySalon
         # (an `unless` expression gets turned into `if true, no-op else ..`)
 
         children(
-          :CONDITION_expression,
+          :condition_expression,
           :any_IF_TRUE_DO_THIS_expression,
           :any_ELSE_DO_THIS_expression,
         )

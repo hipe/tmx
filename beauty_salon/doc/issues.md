@@ -1,6 +1,7 @@
 [#049] #open flicker as documented
 
-[#048] #hole
+[#048]       #parent-node: [#010] procedurally find the smaller methods
+             (cross-referenced only in [dt])
 
 [#047] #small #open track many places where documentation is known to be
              in need of freshening up
@@ -40,7 +41,7 @@
 [#030]       name conventions ..
 [#029]       name conventions for constants .. #parent-node:[#030]
 [#028]       name conventions for functions and methods ..  #parent-node:[#030]
-[#026]       #parent-node: [#010] procedurally find the smaller methods
+[#026]       unparsing ..
 
 [#025]       #crazy-town implementation ..
              ( #was: #moved-to: [sa] )
@@ -102,6 +103,8 @@
              ( #was: index all the vectors of `porcelain/test/porcelain_spec.rb` )
 
 [#007]       ( intra-subsystem issues )
+
+      #small #open [#here.L]: as commented
 
       #small #open [#here.K]: as commented
 

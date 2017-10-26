@@ -63,6 +63,8 @@ module Skylab::BeautySalon
 
         @__potential_sexp_stream = _file_path_st.map_by do |path|
 
+          $stderr.puts "OHAI: #{ path }"  # #todo - leaving this in until maybe there is a verbose mode ..
+
           proto.dup.__init_new_instance_ path
         end
 

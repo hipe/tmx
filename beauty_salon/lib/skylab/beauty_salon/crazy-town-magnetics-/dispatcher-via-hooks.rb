@@ -472,6 +472,48 @@ module Skylab::BeautySalon
     end
 
     #
+    # EXPERIMENT
+    #
+
+    EachQualifiedOffsetCategorized = -> defn_p, sn do  # 1x
+
+      ai = sn.class.association_index
+
+      p_a = [] ; TheseHooks__.new p_a, defn_p
+      rc = RangesCompound_via_Count[ sn.AST_node_.children.length, ai ]
+
+      a = ai.associations
+
+      sing = -> recv, scn do
+        begin
+          recv[ scn.current_child_offset, a.fetch( scn.current_association_offset ) ]
+          scn.advance_one
+        end until scn.no_unparsed_exists
+      end
+
+      fr = rc.first_range
+      if fr
+        sing[ p_a.fetch( 0 ), fr.to_parallel_offset_scanner ]
+      end
+
+      mr = rc.middle_range
+      if mr
+        scn = mr.to_parallel_offset_scanner
+        recv = p_a.fetch( 1 )[ a.fetch( scn.current_association_offset ) ]
+        begin
+          recv[ scn.current_child_offset ]
+          scn.advance_one
+        end until scn.no_unparsed_exists
+      end
+
+      lr = rc.last_range
+      if lr
+        sing[ p_a.fetch( 2 ), lr.to_parallel_offset_scanner ]
+      end
+      NIL
+    end
+
+    #
     # Traverse the offsets of associations using 3 categories.
     #
 
@@ -486,7 +528,7 @@ module Skylab::BeautySalon
 
       -> p, ai do
 
-        p_a = [] ; TheseHooks___.new p_a, p
+        p_a = [] ; TheseHooks__.new p_a, p
         rc = RangesCompound_via_Count[ ai.associations.length, ai ]
 
         fr = rc.first_range
@@ -507,7 +549,7 @@ module Skylab::BeautySalon
       end
     end.call
 
-    class TheseHooks___
+    class TheseHooks__
       def initialize a, p
         @a = a ; p[ self ] ; remove_instance_variable :@a  # sanity
       end

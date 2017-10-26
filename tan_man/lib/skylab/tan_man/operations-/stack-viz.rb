@@ -6,6 +6,7 @@ module Skylab::TanMan
 
       @__mutex_for_exitstatus = nil
 
+      @_do_auto_tail = false
       @_do_open = false
       @_last_N = nil
 
@@ -24,6 +25,8 @@ module Skylab::TanMan
         d = remove_instance_variable :@_last_N
         if d
           ok = __reduce_item_stream_by_this d
+        elsif remove_instance_variable :@_do_auto_tail
+          ok = __reduce_item_stream_by_auto_tail
         end
       end
       ok && __init_graph_via_item_stream
@@ -46,14 +49,23 @@ module Skylab::TanMan
       op = ::OptionParser.new
 
       did_request_help = false
+      do_auto_tail = false
       do_open = false
       last_N = nil
+      used_normal_option = nil
+
+      op.on '-t', '--auto-tail', 'only use the final, contiguous, participating lines' do
+        used_normal_option = true
+        do_auto_tail = true
+      end
 
       op.on '-l', '--last N', 'only look at the last N items on the stack', ::Integer do |d|
+        used_normal_option = true
         last_N = d
       end
 
       op.on '-o', '--open', 'will attempt to open the file' do
+        used_normal_option = true
         do_open = true
       end
 
@@ -69,15 +81,18 @@ module Skylab::TanMan
       if e
         __when_parse_error e
       elsif @argv.length.nonzero?
-        @client.stderr.puts "unexpected argument: #{ @argv[0].inspect }"
-        _fail
+        _fail_saying "unexpected argument: #{ @argv[0].inspect }"
       elsif did_request_help
-        if ( do_open || last_N )
+        if used_normal_option
           @client.stderr.puts "(ignoring some options)"
         end
         __when_did_request_help op
+      elsif last_N && do_auto_tail
+        @client.stderr.puts '`last N` and `auto-tail` are mutually exclusive.'
+        _fail_saying 'use one or the other, not both.'
       else
         @_last_N = last_N
+        @_do_auto_tail = do_auto_tail
         @_do_open = do_open
         ACHIEVED_
       end
@@ -163,6 +178,26 @@ module Skylab::TanMan
       NIL
     end
 
+    def __reduce_item_stream_by_auto_tail
+
+      upstream = remove_instance_variable :@_item_stream
+
+      p = -> do
+        line = upstream.gets
+        if line.had_explicit_identifier  # NOTE - we don't check for EOS because meh
+          line
+        else
+          @client.stderr.puts "(because `auto-tail` stopping early at #{ line.item_label.inspect })"
+          p = EMPTY_P_ ; NOTHING_
+        end
+      end
+
+      @_item_stream = Common_.stream do
+        p[]
+      end
+      ACHIEVED_
+    end
+
     def __reduce_item_stream_by_this d
       0 < d or self._COVER_ME__last_N_value_must_be_positive_nonzero__
       upstream = remove_instance_variable :@_item_stream
@@ -218,6 +253,11 @@ module Skylab::TanMan
       else
         _fail
       end
+    end
+
+    def _fail_saying msg
+      @client.stderr.puts msg
+      _fail
     end
 
     def _fail

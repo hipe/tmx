@@ -328,9 +328,13 @@ module Skylab::BeautySalon::TestSupport
     end.call
 
     Real_parser_for_current_ruby__ = -> do
-      Home_::CrazyTownReportMagnetics_::
+      Report_magnetics__[]::
           DocumentNodeStream_via_FilePathStream::
           For_now_always_the_same_ruby_parser_with_certain_settings___[]
+    end
+
+    Report_magnetics__ = -> do
+      Home_::CrazyTownReportMagnetics_
     end
 
     # ==

@@ -62,14 +62,21 @@ finish other new magnet
 fix diff thing
 rename all operator branch to feature branch YIKES
 clean up that crazy hack in an isolated commit
-(A)(B)(F)(I)(G)(H)(J)(N)(O)(Q)(R)(T)(W)(X)(Y)(Z).
-ok so you want to get to getting every '.should' being converted 07-19 03:47:08 (C)->(E)
+(J)(N)(O)(Q)(R)(T)(W)(X)(Y)(Z).
+ok so you want to get to getting every '.should' being converted 07-19 03:47:08 (C)->(G,E)
 rebase the branch with the `expect( ).to` fix (E)->(S)
-.to_symbolish_reference_scanner not .to_loadable_reference_stream (right?) (D)->(A)
-use this new tool to change all of your own `expect` to `anticipate` or whatever (S)->(A)
+.to_symbolish_reference_scanner not .to_loadable_reference_stream (-1) (right?) (D)
+use this new tool to change all of your own `expect` to `anticipate` or whatever (-2) (S)->(I,H)
 general open questions of Parser lib/API (U)->(K,L,M)
 understand Parser nodes - how can we unparse? (K)->(V)
 answer the question: what is the rel. between `def x_map` and the list of nodes? (in `parser/builder/defaults`) (L)->(V)
 location map - this is the key (M)->(V)
 general open questions of Parser lib/API (V)
-all known near-term practical applications of this (A)
+all known near-term practical applications of this (A)->(C,D)
+same three steps for method calls - rough pass, test, final commit (-2) (H)
+definitions: figure out how you're going to test, test, final commit (-3) (G)->(F)
+you could get rid of a lot of the other guys, asking the question of how (I)
+TODOs (F)
+lock it down as a rough pass (F)->(B)
+get it to run against all the method definitions (B)
+DUPLICATUS DIG AND CHANGE TERMINAL

@@ -24,7 +24,7 @@ module Skylab::BeautySalon::TestSupport
         # (this activated lvasgn but does not own it. that's in #testpoint2.2)
         _ary_ish = _main_thing
         _hi = _ary_ish.dereference 0
-        _hi._node_.type == :lvasgn || fail
+        _hi.node_type == :lvasgn || fail
       end
 
       def structured_node_
@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport
       # #covers:`ivasgn` (do it here not there just because meh)
 
       it 'the expression is an ivasgn' do
-        _subject._node_.type == :ivasgn || fail
+        _subject.node_type == :ivasgn || fail
       end
 
       it 'the left hand side (the ivar) is a symbol (INCLUDES the "@" part)' do
@@ -47,7 +47,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'the right hand side is the coveted lvar' do
         x = _subject.zero_or_one_right_hand_side_expression
-        x._node_.type == :lvar || fail
+        x.node_type == :lvar || fail
         x.symbol == :righty || fail
       end
 

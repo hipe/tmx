@@ -23,7 +23,7 @@ module Skylab::BeautySalon::TestSupport
         # (this type of grammar symbol is covered in a previous test. make minimal contact here.)
         # #testpoint1.54
         _x = _right_shark
-        _x._node_.type == :int || fail
+        _x.node_type == :int || fail
       end
 
       def _left_shark_method_name
@@ -50,7 +50,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'right hand side - any expression, appropriate to the thing' do
         _x = _right_shark
-        _x._node_.type == :nil || fail
+        _x.node_type == :nil || fail
       end
 
       shared_subject :structured_node_ do

@@ -13,6 +13,288 @@ module Skylab::BeautySalon
     # create a duplicate of an existing structured node with particular
     # edits to it..
 
+    # there is an "old way" and an experimental "new way"
+
+    class DIG_ETC < Common_::MagneticBySimpleModel
+
+      attr_writer(
+        :dig_symbols,
+        :new_value,
+        :structured_node,
+      )
+
+      def execute
+        __init_stack
+        __flush_stack
+      end
+
+      def __flush_stack
+
+        # here's the main doo-hah: x
+
+        new_c = nil
+
+        process_frame_normally = -> frame do
+          new_c = frame._new_component_via_new_component_ new_c ; nil
+        end
+
+        process_frame = -> frame do
+          process_frame = process_frame_normally
+          _x = remove_instance_variable :@new_value
+          new_c = frame.__new_component_via_new_terminal_value _x ; nil
+        end
+
+        stack = remove_instance_variable :@__stack
+        begin
+          process_frame[ stack.pop ]
+        end until stack.length.zero?
+
+        new_c
+      end
+
+      def __init_stack
+
+        stack = []
+        scn = Common_::Scanner.via_array remove_instance_variable :@dig_symbols
+        sn = remove_instance_variable :@structured_node
+
+        begin
+          k = scn.gets_one
+
+          stack.push StructuredFrame___.new( k, sn )
+
+          if scn.no_unparsed_exists
+            break
+          end
+
+          _asc = sn.class.association_index.dereference k
+          if _asc.has_truly_plural_arity
+            listy = sn.send k
+            d = scn.gets_one
+            stack.push ListyFrame___.new( d, listy )
+            if scn.no_unparsed_exists
+              break
+            end
+            sn = listy.dereference d
+          else
+            sn = sn.send k
+          end
+          redo
+        end while above
+
+        @__stack = stack ; nil
+      end
+    end
+
+    class ListyFrame___
+
+      def initialize d, listy
+        @listy = listy
+        @offset = d
+        freeze
+      end
+
+      def _new_component_via_new_component_ new_c
+
+        @listy.DUPLICATUS @offset, new_c
+      end
+    end
+
+    class StructuredFrame___
+
+      def initialize sym, sn
+
+        @_asc = sn.class.association_index.dereference sym
+
+        @dereferencing_symbol = sym
+        @structured_node = sn
+
+        freeze
+      end
+
+      def _new_component_via_new_component_ new_c
+
+        if @_asc.has_truly_plural_arity
+          __new_component_via_listy new_c
+        else
+          __new_component_via_new_component new_c
+        end
+      end
+
+      #
+      # These
+      #
+
+      # NOTE - all 3 of the methods in this section use a bespoke reader
+      # method (used in each method here but used nowhere outside of here)
+      # which intends to lead us to a literate, drawn-out, readable style.
+      # the results to this end are mixed, in that these methods could stand
+      # to be DRY'ed up more; however for now we leave it as-is #incubating
+
+      def __new_component_via_listy listy  # (3/3)
+
+        # this one is fun: our traversal tool steps along every *child*, not
+        # just every *association*. (the difference is only significant in
+        # the plural association.) in the case of receiving a new listy,
+        # we need to re-write every new child. we'll also see if we can
+        # inject the entire new listy in there, too (a new thing).
+
+        add_new_child, same, finish = _these_controllers
+
+        offset_into_list = -1
+        special = -> _d do
+          offset_into_list += 1
+          _sn = listy.dereference offset_into_list
+          _x = _sn.AST_node_  # hrm ..
+          add_new_child[ _x ]
+        end
+
+        asc = nil
+
+        @structured_node.each_qualified_offset_categorized_ do |o|
+
+          o.first_third do |d, _asc|
+            same[ d ]
+          end
+
+          o.middle_third do |asc_|
+            asc = asc_
+            -> d do
+              special[ d ]
+            end
+          end
+
+          o.final_third do |d, _asc|
+            same[ d ]
+          end
+        end
+
+        finish.call do |o|
+          o.memoize_component_CT_ listy, asc
+        end
+      end
+
+      def __new_component_via_new_component sn  # (2/3)
+
+        # (structurally similar to the next method)
+
+        add_new_child, same, finish = _these_controllers
+
+        dynamic_subsequently = -> d, _asc do
+          same[ d ]
+        end
+
+        found_asc = nil
+        dynamic = -> d, asc do
+          if asc.is_terminal
+            same[ d ]
+          elsif @dereferencing_symbol == asc.association_symbol
+            dynamic = dynamic_subsequently
+            found_asc = asc
+            add_new_child[ sn.AST_node_ ]
+          else
+            same[ d ]
+          end
+        end
+
+        @structured_node.each_qualified_offset_categorized_ do |o|
+
+          o.first_third do |d, asc|
+            dynamic[ d, asc ]
+          end
+
+          o.middle_third do |asc|
+            -> d do
+              same[ d ]
+            end
+          end
+
+          o.final_third do |d, asc|
+            dynamic[ d, asc ]
+          end
+        end
+
+        finish.call do |o|
+          o.memoize_component_CT_ sn, found_asc
+        end
+      end
+
+      def __new_component_via_new_terminal_value x  # (1/3)
+
+        # with every qualified child from the first and third runs (i.e all
+        # those not in the plural run), search for the one that is terminal
+        # and has the name of the subject. when this association is found,
+        # instead write the new child. for *all* others, write the original.
+
+        add_new_child, same, finish = _these_controllers
+
+        dynamic_subsequently = -> d, _asc do
+          same[ d ]
+        end
+
+        dynamic = -> d, asc do
+          if asc.is_terminal
+            if asc.has_plural_arity
+              self._COVER_ME__fine__
+            end
+            if @dereferencing_symbol == asc.stem_symbol
+              add_new_child[ x ]
+              dynamic = dynamic_subsequently
+            else
+              same[ d ]
+            end
+          else
+            same[ d ]
+          end
+        end
+
+        @structured_node.each_qualified_offset_categorized_ do |o|
+
+          o.first_third do |d, asc|
+            dynamic[ d, asc ]
+          end
+
+          o.middle_third do |asc|
+            -> d do
+              same[ d ]
+            end
+          end
+
+          o.final_third do |d, asc|
+            dynamic[ d, asc ]
+          end
+        end
+
+        finish[]
+      end
+
+      def _these_controllers
+
+        new_cx = []
+        did = false
+        sn = @structured_node
+        n = sn.AST_node_
+        orig_cx = n.children
+
+        _add_child = -> x do
+          did = true
+          new_cx.push x ; nil
+        end
+
+        _old_child = -> d do
+          new_cx.push orig_cx.fetch d
+        end
+
+        _finish = -> & p do
+          did || sanity
+          _ast_n = Dangerous_updated__[ new_cx.freeze, n ]
+          sn.class.via_node_ _ast_n, & p
+        end
+
+        [ _add_child, _old_child, _finish ]
+      end
+    end
+
     # -
       attr_writer(
         :edit,
@@ -29,21 +311,10 @@ module Skylab::BeautySalon
 
         _new_cx = remove_instance_variable :@__new_children_array
 
-        _new_properties = { location: @_original_node.location }
-
-          # NOTE - this will very likely bite us - we carry over the location
-          # map of the original after having edited it..
-
-
-        _new_node = @_original_node.updated(
-          nil,
-          _new_cx,
-          _new_properties,
-        )
+        _new_node = Dangerous_updated__[ _new_cx, @_original_node ]
 
           # NOTE - originally we thought of trying to carry over cached
           # structured nodes that hadn't changed; but meh..
-
 
         @structured_node.class.via_node_ _new_node
       end
@@ -109,7 +380,7 @@ module Skylab::BeautySalon
 
         step = nil
 
-        @_original_node = @structured_node._node_
+        @_original_node = @structured_node.AST_node_
         existing_children_array = @_original_node.children
         current_real_offset = -1
 
@@ -176,6 +447,16 @@ module Skylab::BeautySalon
       end
 
     # -
+
+    Dangerous_updated__ = -> new_cx, n do
+
+      _new_properties = { location: n.location }
+
+        # NOTE - this will very likely bite us - we carry over the location
+        # map of the original after having edited it..
+
+      n.updated nil, new_cx, _new_properties
+    end
 
     class HashOfWrites__via_TheseTwo___
 
@@ -322,4 +603,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.1: spike the new dig experiment
 # #abstracted from sibling file with source still in existence (progressive refactor)

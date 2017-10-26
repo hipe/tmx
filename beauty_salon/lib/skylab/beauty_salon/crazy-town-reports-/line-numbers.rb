@@ -43,7 +43,7 @@ module Skylab::BeautySalon
 
         y << 'simply output the symbol name of EVERY sexp in each file, alongside the line-number'
         y << 'as reported by the parser. output is two-columns (or maybe one for those (any) that'
-        y << 'report false-is for a line number).'
+        y << 'report false-ish for a line number).'
         y << nil
         y << 'note that the amount of output in terms of line numbers will be something like'
         y << '10x the amount of input (depending of course on etc.)'

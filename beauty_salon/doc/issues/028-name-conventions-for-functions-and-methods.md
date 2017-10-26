@@ -173,30 +173,19 @@ not allowed to occupy names `_like_these_`.
 
 ### "library scope" :[#here.0.1]
 
-this strange looking but often used convention has a variety of similar
-meanings:
+for a method that looks `like_this_`,
 
-  • if you're seeing this in a method call, the method is defined
-    somewhere "above" the node you found it in, but still in the same
-    library (usu. sidesystem).
+  - this method is *not* part of the sidesystem's public API. do not call
+    this method unless you are writing code into the same sidesystem that
+    holds the method definition.
 
-    if you're reading this as a method definition, it is intended to be
-    used only from within nodes "below" yours.
-
-    we see this particular use often in our tests by test support
-    methods that are used in more than one file but still just a part
-    of the test suite itself and not an external library.
-
-  • we often use this convention to indicate that the method has a
-    definition in something like an abstract base class - the method
-    is intended to be used by instances of child classes of the base
-    class. if you're seeing this in a call, it means you proably want
-    to look to a parent class (or just module) for the definition.
-
-  • "collaborator" - if you're calling such a method and you are
-    crossing library (i.e sidesystem) lines, this means you are
-    knowingly circumventing the public API of the object, and you run
-    the risk of getting broken if its implementation changes.
+  - for whatever reason, this pattern is frequently seen in tests where
+    you have a helper method defined somewhere in a test support module
+    that is part of the same sidesystem to which the files of the tests
+    you are writing belong. (that is: for whatever reason, this pattern
+    is frequently seen in tests, where frequently both the method call(s)
+    and method definition are under the same `test` directory, but in two
+    different files.)
 
 
 
