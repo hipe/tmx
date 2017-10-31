@@ -23,7 +23,7 @@ larger components (some of which in theory would need to use the smaller
 ones in order to effect themselves).
 
 the below order is now a reflection of the more deeply justified order
-established at #spot1.1, which we came up with after the initial draft
+established at [#023.F], which we came up with after the initial draft
 of our order here but is more deeply justified there and is otherwise
 identical in spirit.
 

@@ -414,7 +414,7 @@ module Skylab::BeautySalon
 
             #todo something is broken in [br] so the remainder of this help
             screen never appears anywhere. erase this line when this is fixed.
-            #open [#023] the above - close it and cover help screen when this is covered
+            #open [#050] the above - close it and cover help screen when this is covered
 
             (can be relative to PWD) to a ruby code file.
             (yes eventually we would want to perhaps take each filename

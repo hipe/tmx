@@ -18,6 +18,50 @@ module Skylab::BeautySalon::TestSupport
         structured_node_ || fail
       end
 
+      it 'say hello to our little magnet friend' do
+        subject_magnetic_ || fail
+      end
+
+      it 'the replacement lines preserve the indent present in the original document' do
+        # #testpoint3.2
+        _thing_ding( 1 ) == 2 || fail
+      end
+
+      it 'the first line, however is not indented at all' do
+        _thing_ding( 0 ) == 0 || fail
+      end
+
+      it 'the last lines does NOT have the trailing newline!' do
+        _lines.fetch( 3 ) =~ /\bend\z/ || fail
+      end
+
+      it 'the replacements were made (byte-by-byte verification, too)' do
+
+        expect_these_lines_in_array_ _lines do |y|
+
+          y << %r(\bmy_lvar = some_method_call  # lvasgn\b)
+          y << "  if my_lvar  # conditional, lvar access\n"
+          y << "    true  # literal\n"
+          y << %r(\A  end$)
+        end
+      end
+
+      def _thing_ding d
+        _lines_ = _lines
+        _line = _lines_.fetch d
+        md = _line.match %r(\A[ ]+)
+        if md
+          beg, end_ = md.offset 0
+          end_ - beg
+        else
+          0
+        end
+      end
+
+      shared_subject :_lines do
+        _money.split %r(^)
+      end
+
       shared_subject :structured_node_ do
 
         _sn = _structured_node_before
@@ -47,6 +91,15 @@ module Skylab::BeautySalon::TestSupport
             end
         O
       end
+    end
+
+    def _money
+      _sn = structured_node_
+      _sn.to_code_LOSSLESS_EXPERIMENT__
+    end
+
+    def subject_magnetic_
+      Home_::CrazyTownReportMagnetics_::String_via_StructuredNode
     end
   end
 end

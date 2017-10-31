@@ -1,3 +1,5 @@
+[#050] #open remaining CLI/API (UI) issues with #crazy-town
+
 [#049] #open flicker as documented
 
 [#048]       #parent-node: [#010] procedurally find the smaller methods
@@ -50,7 +52,8 @@
              which in turn will make "line stream via big string" less chunky
              ( #was: #moved-to: [sa] )
 
-[#023] #open remaining CLI/API (UI) issues with #crazy-town
+[#023]       grammatical symbol ordering rationale ..
+
              ( #was: ween off of [br]  (this is for tracking related todo's) )
              ( #was: #moved-to: [sa] )
 

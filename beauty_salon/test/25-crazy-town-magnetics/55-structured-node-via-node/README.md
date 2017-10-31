@@ -1,12 +1,12 @@
-# ordering rationale
+# ordering rationale :[#023]
 
 ## table of contents
 
   - TL;DR: (synopsis) [#here.s1]
   - contextualizing preface [#here.s2]
   - the received order and our re-ordering rationale [#here.b]  [#here.s3]
-  - finally - our ordering with numbers [#here.d]
-  - appendix: about older tests [#here.s5]
+  - finally - our ordering with numbers [#here.D]
+  - appendix: about older tests [#here.F]
 
 
 
@@ -144,7 +144,7 @@ again it is perhaps arbitrary, but here is the rationale:
 
 
 
-## finally - our ordering with numbers :[#here.d]
+## finally - our ordering with numbers :[#here.D]
 
 (from `tmx-test-support-subdivide 0:1000:9`)
 
@@ -161,11 +161,19 @@ again it is perhaps arbitrary, but here is the rationale:
 
 
 
-## appendix: about older tests
+## appendix: about older tests :[#here.F]
 
-the place that references :#spot1.1 (another test-level README, like this
-one) has an older take on the taxonomy that we came up with (willfully)
+the place that references this section (another test-level README, as this
+document once was)
+has an older take on the taxonomy that we came up with (willfully)
 before discovering what the `parser` gem used. the taxonomy there is
 (we are relieved to report) almost a perfectly clean subset of our taxonomy
 here. however #todo boy is it tempting to re-order the contents of those
 files to match the received order described in [#here.b].
+
+
+
+
+## document-meta
+
+  - #pending-rename: promote this to be [#023]. think of a good name.

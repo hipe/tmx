@@ -38,7 +38,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     # (we don't cover the helpscreen because it's too big..)
-    # but sign off on the above choice after #open [#023]
+    # but sign off on the above choice after #open [#050]
 
     def _expect_invite_line actual
       actual == "try 'chimmy crazy-town -h'\n" || fail

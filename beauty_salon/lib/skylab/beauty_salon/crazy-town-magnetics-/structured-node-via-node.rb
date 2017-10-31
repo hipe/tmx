@@ -760,7 +760,7 @@ module Skylab::BeautySalon
       class Send < GrammarSymbol__
 
         children(
-          :any_XXX_receiver_expression,
+          :any_receiver_expression,
           :method_name_symbol_terminal,
           :zero_or_more_arg_expressions,
         )
@@ -836,8 +836,8 @@ module Skylab::BeautySalon
 
         children(
           :condition_expression,
-          :any_IF_TRUE_DO_THIS_expression,
-          :any_ELSE_DO_THIS_expression,
+          :any_if_true_do_this_expression,
+          :any_else_do_this_expression,
         )
       end
 
