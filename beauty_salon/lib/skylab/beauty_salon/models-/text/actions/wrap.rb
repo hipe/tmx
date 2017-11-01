@@ -253,7 +253,7 @@ module Skylab::BeautySalon
             ok = hot_line[]
             ok or break
             if @upstream.closed?
-              break  # #testpoint3.1
+              break  # #coverpoint3.1
             end
           else
             cold_line[]
@@ -318,7 +318,7 @@ module Skylab::BeautySalon
         if line
           line
         else
-          @upstream.close  # ..   and #testpoint3.1
+          @upstream.close  # ..   and #coverpoint3.1
         end
       end
 

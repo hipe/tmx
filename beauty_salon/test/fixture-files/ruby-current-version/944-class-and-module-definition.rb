@@ -24,7 +24,7 @@ y = nil
 
 
 
-# an `lvar` as module #testpoint1.27
+# an `lvar` as module #coverpoint1.27
 # (as seen in (at writing) common/lib/skylab/common/callback-tree.rb:380)
 
 x::MyClass.my_method
@@ -32,7 +32,7 @@ x::MyClass.my_method
 
 
 
-# `ivar` as module #testpoint1.30
+# `ivar` as module #coverpoint1.30
 # (as seen in (at writing) fields/lib/skylab/fields/entity/core.rb:276)
 
 @my_ivar::MyClass.my_method
@@ -40,7 +40,7 @@ x::MyClass.my_method
 
 
 
-# an arbitrary expression as a module #testpoint1.4
+# an arbitrary expression as a module #coverpoint1.4
 # (as seen in (at writing) human/lib/skylab/human.rb:22)
 
 Attributes_actor_ = -> cls, * a do
@@ -55,7 +55,7 @@ end
 
 class MyClass333
 
-  # an expression (or anything) for the singleton class argument #testpoint1.1
+  # an expression (or anything) for the singleton class argument #coverpoint1.1
   # (as seen in (at writing) snag/lib/skylab/snag/models-/node-identifier/core.rb:7)
 
   ChuMani = ::Module.new
@@ -79,7 +79,7 @@ end
 
 
 
-# subclass self #testpoint1.5
+# subclass self #coverpoint1.5
 # (as seen in (at writing) common/test/fixture-directories/seven-son/parent/core.rb)
 
 class MyClass666
@@ -92,7 +92,7 @@ end
 
 
 
-# subclass crazy expression #testpoint1.39
+# subclass crazy expression #coverpoint1.39
 # (as seen in (at writing) common/lib/skylab/common/cli.rb:3)
 
 class MyClass777 < MyModule.my_method.my_other_method::MyClass
@@ -106,7 +106,7 @@ end
 #
 #    NOTE - same
 
-# #testpoint1.47
+# #coverpoint1.47
 # (as seen in (at writing) fields/lib/skylab/fields/events/ambiguous.rb:26)
 
 class << MyModule::MyClass

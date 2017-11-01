@@ -45,14 +45,14 @@ module Skylab::BeautySalon::TestSupport
       _last_range && fail
     end
 
-    it 'with just enough - yes, no, no' do  # #testpoint2.7
+    it 'with just enough - yes, no, no' do  # #coverpoint2.7
       _using_range_compound _range_compound_lesser
       _first_range || fail
       _middle_range && fail
       _last_range && fail
     end
 
-    it 'with one more than minimum has first range - yes, yes, no' do  # #testpoint2.8
+    it 'with one more than minimum has first range - yes, yes, no' do  # #coverpoint2.8
       _using_range_compound _range_compound_one_more_than_minimum
       _first_range || fail
       _middle_range || fail
@@ -64,14 +64,14 @@ module Skylab::BeautySalon::TestSupport
       _is_the_empty_range_compound || fail
     end
 
-    it 'kleene star against two - no, yes, no' do  # #testpoint2.9
+    it 'kleene star against two - no, yes, no' do  # #coverpoint2.9
       _using_range_compound _range_compound_kleene_star_against_two
       _first_range && fail
       _middle_range || fail
       _last_range && fail
     end
 
-    it 'some at end - yes, yes, yes' do  # #testpoint2.10
+    it 'some at end - yes, yes, yes' do  # #coverpoint2.10
       _using_range_compound _range_compound_caseoid_fuller
       _first_range || fail
       _middle_range || fail

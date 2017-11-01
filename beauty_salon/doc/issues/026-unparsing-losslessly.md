@@ -98,7 +98,7 @@ that we have chosen in our subject library):
 
   - `method_name`
   - `args`
-  - `any_BODY_expression`
+  - `any_body_expression`
 
 also, within the (vendor) AST node, we can access its "map". while the
 ordered membership here is probably an emergent by-product of the target
@@ -131,7 +131,7 @@ with child components of our structured node.
         |  def xx a, b~do_some_thing~  end
     ->  |      c1 ccc2 cccccccccccc3
 
-so `c1` is `method_name`, `c2` is `args`, and `c3` is `any_BODY_expression`.
+so `c1` is `method_name`, `c2` is `args`, and `c3` is `any_body_expression`.
 a few things to note about this one: 1) our method name is again
 represented in this structure as it was before in our map structure.
 2) we haven't shown any newlines as being under the domain of any range
@@ -173,7 +173,7 @@ so finally, here's gonna be our general approach:
   - so the very first thing is, we need the offset into the (any) first
     character of the first line of the full surface string in the source.
     (how this is acquired is not important, but it's something like
-    `@structured_node.node_location.expression.begin_pos`.)
+    `@structured_node._node_location_.expression.begin_pos`.)
 
   - so traverse along the formal actions. we make "hops" from one "semantic
     column" to another, at each hop taking particular actions based on what

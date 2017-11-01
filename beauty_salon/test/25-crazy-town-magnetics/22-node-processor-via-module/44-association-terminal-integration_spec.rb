@@ -385,7 +385,7 @@ module Skylab::BeautySalon::TestSupport
       )
 
       _cls3 = build_subclass_with_these_children_( :XX1_resetargoid,
-        :zero_or_one_hallo_symbol_terminals,  # :#testpoint1.55
+        :zero_or_one_hallo_symbol_terminals,  # :#coverpoint1.55
       )
 
       build_subject_branch_(

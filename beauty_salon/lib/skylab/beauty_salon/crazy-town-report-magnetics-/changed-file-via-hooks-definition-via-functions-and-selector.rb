@@ -81,7 +81,7 @@ module Skylab::BeautySalon
       end
 
       def __push_ s, structured_node
-        send @receive, s, structured_node.node_location.expression
+        send @receive, s, structured_node._node_location_.expression
       end
 
       def __receive_initially s, source_range

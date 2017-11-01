@@ -21,9 +21,9 @@ module Skylab::BeautySalon::TestSupport
 
       it 'right hand side - any expression, appropriate to the thing' do
         # (this type of grammar symbol is covered in a previous test. make minimal contact here.)
-        # #testpoint1.54
+        # #coverpoint1.54
         _x = _right_shark
-        _x.node_type == :int || fail
+        _x._node_type_ == :int || fail
       end
 
       def _left_shark_method_name
@@ -50,7 +50,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'right hand side - any expression, appropriate to the thing' do
         _x = _right_shark
-        _x.node_type == :nil || fail
+        _x._node_type_ == :nil || fail
       end
 
       shared_subject :structured_node_ do
@@ -76,5 +76,5 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
-# :#testpoint2.2
+# :#coverpoint2.2
 # #born.

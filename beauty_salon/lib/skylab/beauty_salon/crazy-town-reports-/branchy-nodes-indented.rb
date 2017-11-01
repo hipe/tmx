@@ -150,7 +150,7 @@ module Skylab::BeautySalon
         sn = @structured_node
         bh = sn.blockhead
 
-        if :send == bh.node_type
+        if :send == bh._node_type_
 
           sn = bh
           m = sn.method_name

@@ -107,15 +107,17 @@
 
 [#007]       ( intra-subsystem issues )
 
-      #small #open [#here.L]: as commented
+      #small #open [#here.M] maybe one day unify association names
 
-      #small #open [#here.K]: as commented
+      #small #open [#here.L]: as commented. DigAndChangeTerminal etc may obivate old way
 
-      #small #open #possible-optimization [#here.J]: as commented
+      #small #open [#here.K]: as commented. tons of holes for `_to_friendly_string`
 
-      #small #open [#here.I]: as commented
+      #small #open #possible-optimization [#here.J]: as commented - we shift an array
 
-      #small #open [#here.H]: as commented
+      #small #open [#here.I]: as commented. the group name `assignableformlhss`
+
+      #small #open [#here.H]: as commented. do we really want this mlhs group?
 
              [#here.G]: whether or not "branchiness" should be markup in the
              grammar. that this is a const and not a method is because it's

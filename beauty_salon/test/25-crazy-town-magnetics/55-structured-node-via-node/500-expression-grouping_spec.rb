@@ -21,10 +21,10 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it %q{access the first sub-expression (here it's an lvar)} do
-        # (this activated lvasgn but does not own it. that's in #testpoint2.2)
+        # (this activated lvasgn but does not own it. that's in #coverpoint2.2)
         _ary_ish = _main_thing
         _hi = _ary_ish.dereference 0
-        _hi.node_type == :lvasgn || fail
+        _hi._node_type_ == :lvasgn || fail
       end
 
       def structured_node_
@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport
       # #covers:`ivasgn` (do it here not there just because meh)
 
       it 'the expression is an ivasgn' do
-        _subject.node_type == :ivasgn || fail
+        _subject._node_type_ == :ivasgn || fail
       end
 
       it 'the left hand side (the ivar) is a symbol (INCLUDES the "@" part)' do
@@ -47,7 +47,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'the right hand side is the coveted lvar' do
         x = _subject.zero_or_one_right_hand_side_expression
-        x.node_type == :lvar || fail
+        x._node_type_ == :lvar || fail
         x.symbol == :righty || fail
       end
 
@@ -85,9 +85,9 @@ module Skylab::BeautySalon::TestSupport
     # with (2)) in service of (1).
     #
     # as such, this story covers points "virtually" below in other places:
-    # 1) the `lvasgn` assignment belongs (nominally) in #testpoint2.2
+    # 1) the `lvasgn` assignment belongs (nominally) in #coverpoint2.2
     # (assignment); and 2) the accessing of the lvar should be in
-    # #testpoint2.3 (access). but as we have demonstrated above, at least
+    # #coverpoint2.3 (access). but as we have demonstrated above, at least
     # two of these points we cannot test in isolation; i.e they need to be
     # a part of this complete story, with all three parts in concert.
     #
@@ -105,5 +105,5 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
-# :#testpoint2.5
+# :#coverpoint2.5
 # #born.

@@ -15,7 +15,10 @@ module Skylab::BeautySalon
 
     # there is an "old way" and an experimental "new way"
 
-    class DIG_ETC < Common_::MagneticBySimpleModel
+    class DigAndChangeTerminal < Common_::MagneticBySimpleModel  # 1x
+
+      # (this is functionally redundant with the other magent in this file.
+      # experimental new form should obviate old form #open [#007.L].)
 
       attr_writer(
         :dig_symbols,
@@ -96,7 +99,7 @@ module Skylab::BeautySalon
 
       def _new_component_via_new_component_ new_c
 
-        @listy.DUPLICATUS @offset, new_c
+        @listy.dup_as_list__ @offset, new_c
       end
     end
 

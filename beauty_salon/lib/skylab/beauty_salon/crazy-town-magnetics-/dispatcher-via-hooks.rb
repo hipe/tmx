@@ -93,7 +93,7 @@ module Skylab::BeautySalon
             o.push_stack_via_node n
             p = p_h[ n.type ]
             if p
-              # we could just as soon pass a structured node but we don't: #testpoint2.12
+              # we could just as soon pass a structured node but we don't: #coverpoint2.12
               # _cls = @grammar_symbols_feature_branch.dereference n.type
               # _sn = _cls.via_node_ n ; p[ _sn ]
               p[ n ]
@@ -244,7 +244,7 @@ module Skylab::BeautySalon
           if n
             @_push_to_stack[ n ]
           else
-            NOTHING_  # #testpoint2.11 (tested quite late)
+            NOTHING_  # #coverpoint2.11 (tested quite late)
           end
 
           scn.advance_one
@@ -327,7 +327,7 @@ module Skylab::BeautySalon
           cx = n.children
           rc = RangesCompound_via_Count[ cx.length, ai ]
           if rc.is_the_empty_range_compound
-            Common_::THE_EMPTY_SCANNER  # #testpoint2.11 (quite late)
+            Common_::THE_EMPTY_SCANNER  # #coverpoint2.11 (quite late)
           else
             new rc, cx, ai
           end
@@ -599,24 +599,24 @@ module Skylab::BeautySalon
         here = ai.offset_of_association_with_plural_arity
 
         if here.zero?
-          NOTHING_  # #testpoint2.9
+          NOTHING_  # #coverpoint2.9
         else
-          first_r = ParallelRunRange__.new 0, 0, here  # #testpoint2.7
+          first_r = ParallelRunRange__.new 0, 0, here  # #coverpoint2.7
         end
 
         num_at_end = ai.number_of_associations_at_the_end
 
         width_of_middle_run = num_children - here - num_at_end
         if width_of_middle_run.zero?
-          NOTHING_  # #testpoint2.7
+          NOTHING_  # #coverpoint2.7
         else
-          middle_r = PluralRunRange___.new here, width_of_middle_run  # #testpoint2.8
+          middle_r = PluralRunRange___.new here, width_of_middle_run  # #coverpoint2.8
         end
 
         if num_at_end.zero?
-          NOTHING_  # #testpoint2.7
+          NOTHING_  # #coverpoint2.7
         else
-          last_r = ParallelRunRange__.new here + width_of_middle_run, here + 1, num_at_end  # #testpoint2.10
+          last_r = ParallelRunRange__.new here + width_of_middle_run, here + 1, num_at_end  # #coverpoint2.10
         end
 
         RangesCompound__.new first_r, middle_r, last_r

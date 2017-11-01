@@ -34,5 +34,5 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
-# :#testpoint2.1
+# :#coverpoint2.1
 # #born.

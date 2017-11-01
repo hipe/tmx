@@ -24,7 +24,7 @@ module Skylab::BeautySalon::TestSupport
 
     it %{'args' is just there as this useless thing} do
       _x = _args
-      _x.node_type == :args || fail
+      _x._node_type_ == :args || fail
     end
 
     it '..necessitating this weirdly named thing' do
@@ -39,7 +39,7 @@ module Skylab::BeautySalon::TestSupport
     it 'this other kind' do
       x = _argfellows.dereference 1
       x.as_symbol == :y || fail
-      x.default_value_expression.node_type == :nil || fail
+      x.default_value_expression._node_type_ == :nil || fail
     end
 
     it 'this third kind' do
@@ -66,7 +66,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _thing_one
-      :symbol
+      :method_name
     end
 
     # ==

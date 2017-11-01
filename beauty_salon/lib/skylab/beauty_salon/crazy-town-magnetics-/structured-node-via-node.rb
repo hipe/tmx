@@ -29,8 +29,8 @@ module Skylab::BeautySalon
 
     class WhileOrUntil__ < GrammarSymbol__
       children(
-        :CONDITION_expression,
-        :BODY_expression,
+        :condition_expression,
+        :body_expression,
       )
     end
 
@@ -63,7 +63,7 @@ module Skylab::BeautySalon
       # but unlike a method call, the return "call" cannot take multiple
       # arguments, or a block argument.
       #
-      # when one argument is passsed with such a feature, it's #testpoint1.28
+      # when one argument is passsed with such a feature, it's #coverpoint1.28
       #
       # this grammatical category appears to hold to other constructs like:
       # `break`,`next`, `redo`.
@@ -170,7 +170,7 @@ module Skylab::BeautySalon
         # asserting which. #double-quoted-string-like
 
         children(
-          :one_or_more_SEE_ME_expressions,
+          :one_or_more_dynamic_expressions,
         )
       end
 
@@ -202,7 +202,7 @@ module Skylab::BeautySalon
       # xstr (placeheld)
 
       class Xstr < GrammarSymbol__
-        # #testpoint1.2
+        # #coverpoint1.2
         # #double-quoted-string-like
         children(
           :zero_or_more_SEE_ME_expressions,
@@ -220,7 +220,7 @@ module Skylab::BeautySalon
 
       class Regopt < GrammarSymbol__
 
-        # #testpoint1.53
+        # #coverpoint1.53
 
         children(
           :zero_or_more_symbol_terminals,
@@ -266,15 +266,15 @@ module Skylab::BeautySalon
         # we used to cover these with dedicated assertive code (the
         # oldschool equivalent to today's type) #[#021.G] "foolhardy"
         #
-        #   - begin  #testpoint1.14
-        #   - const  #testpoint1.15
-        #   - block  #testpoint1.16
-        #   - send  #testpoint1.17
-        #   - ivar  #testpoint1.18
-        #   - lvar  #testpoint1.19
-        #   - asgn  #testpoint1.23
-        #   - case #testpoint1.24
-        #   - array #testpoint1.50
+        #   - begin  #coverpoint1.14
+        #   - const  #coverpoint1.15
+        #   - block  #coverpoint1.16
+        #   - send  #coverpoint1.17
+        #   - ivar  #coverpoint1.18
+        #   - lvar  #coverpoint1.19
+        #   - asgn  #coverpoint1.23
+        #   - case #coverpoint1.24
+        #   - array #coverpoint1.50
 
         children(
           :expression,
@@ -339,7 +339,7 @@ module Skylab::BeautySalon
 
       # gvar (placeheld)
 
-      class Gvar < GrammarSymbol__  # #testpoint1.44
+      class Gvar < GrammarSymbol__  # #coverpoint1.44
 
         # (interesting, rescuing an exception is syntactic sugar for `e = $!`)
         # (see also `nth_ref` which looks superficially like a global)
@@ -359,7 +359,7 @@ module Skylab::BeautySalon
 
       # nth_ref (placeheld)
 
-      class NthRef < GrammarSymbol__  # `$1` #testpoint1.3
+      class NthRef < GrammarSymbol__  # `$1` #coverpoint1.3
         children(
           :INTEGER_integer_terminal,
         )
@@ -419,7 +419,7 @@ module Skylab::BeautySalon
       class Ivasgn < GrammarSymbol__   # one of ##here5
         children(
           :ivar_as_symbol_symbol_terminal,
-          :zero_or_one_right_hand_side_expression,  # #testpoint1.54
+          :zero_or_one_right_hand_side_expression,  # #coverpoint1.54
         )
       end
 
@@ -436,7 +436,7 @@ module Skylab::BeautySalon
 
       class Casgn < GrammarSymbol__  # one of ##here5
 
-        # when this is as ##here5, #testpoint1.6 shows that it's not
+        # when this is as ##here5, #coverpoint1.6 shows that it's not
         # the short form that is surfaced.
 
         # deep form: fixture file: literals and assigment
@@ -457,13 +457,13 @@ module Skylab::BeautySalon
       class Lvasgn < GrammarSymbol__  # one of ##here5
         children(
           :lvar_as_symbol_symbol_terminal,
-          :zero_or_one_right_hand_side_expression,  # #testpoint1.54
+          :zero_or_one_right_hand_side_expression,  # #coverpoint1.54
         )
       end
 
       # and_asgn (placeheld)
 
-      class AndAsgn < BoolAsgn__  # #testpoint1.25
+      class AndAsgn < BoolAsgn__  # #coverpoint1.25
       end
 
       # or_asgn (placeheld)
@@ -483,7 +483,7 @@ module Skylab::BeautySalon
 
       # mlhs (placeheld)
 
-      class Mlhs < GrammarSymbol__  # #testpoint1.10
+      class Mlhs < GrammarSymbol__  # #coverpoint1.10
 
         # (presumably: 'multi left-hand side' or something)
 
@@ -570,13 +570,13 @@ module Skylab::BeautySalon
       class Def < GrammarSymbol__
 
         def to_description
-          "def: #{ symbol }"
+          "def: #{ method_name }"
         end
 
         children(
-          :symbol_terminal,
+          :method_name_symbol_terminal,
           :args,
-          :any_BODY_expression,
+          :any_body_expression,
         )
 
         IS_BRANCHY = true
@@ -584,7 +584,7 @@ module Skylab::BeautySalon
 
       # defs (placeheld)
 
-      class Defs < GrammarSymbol__  # #testpoint1.37
+      class Defs < GrammarSymbol__  # #coverpoint1.37
 
         def to_description
           "defs: #{ symbol }"
@@ -594,7 +594,7 @@ module Skylab::BeautySalon
           :SINGLETON_CLASSABLE_expression,  # see #here4
           :symbol_terminal,
           :args,
-          :any_BODY_expression,  # empty method body like #testpoint1.38
+          :any_BODY_expression,  # empty method body like #coverpoint1.38
         )
 
         IS_BRANCHY = true
@@ -627,7 +627,7 @@ module Skylab::BeautySalon
 
       # optarg (placeheld)
 
-      class Optarg < GrammarSymbol__  # #testpoint1.41
+      class Optarg < GrammarSymbol__  # #coverpoint1.41
 
         children(
           :as_symbol_symbol_terminal,
@@ -642,7 +642,7 @@ module Skylab::BeautySalon
         # neato - has no name if it's .. with no name
 
         children(
-          :zero_or_one_OHAI_symbol_terminal,  # :#testpoint1.55
+          :zero_or_one_symbol_terminal,  # :#coverpoint1.55
         )
       end
 
@@ -652,10 +652,10 @@ module Skylab::BeautySalon
 
       # kwoptarg (placeheld)
 
-      class Kwoptarg < GrammarSymbol__  # #testpoint1.49
+      class Kwoptarg < GrammarSymbol__  # #coverpoint1.49
         children(
-          :OHAI_symbol_terminal,
-          :DEFAULT_VALUE_expression,
+          :as_symbol_symbol_terminal,
+          :default_value_expression,
         )
       end
 
@@ -669,7 +669,7 @@ module Skylab::BeautySalon
 
       # blockarg (placeheld)
 
-      class Blockarg < CommonArg__  #testpoint1.40
+      class Blockarg < CommonArg__  #coverpoint1.40
       end
 
       # procarg0 (placeheld)
@@ -681,10 +681,10 @@ module Skylab::BeautySalon
         # that the association grammar alone cannot accomodate:
         #
         # when your proc has a plain old arg like normal, the AST's only
-        # child is a symbol for the arguement's name #testpoint1.21
+        # child is a symbol for the arguement's name #coverpoint1.21
         #
         # however if you do one of these `-> |(foo,bar)| {..}`, then the
-        # AST is a wholly differently structured beast #testpoint1.45
+        # AST is a wholly differently structured beast #coverpoint1.45
         #
         # EXPERIMENTALLY (#note :[#007.F]) we're hacking thru an experiment with
         # a factory pattern to accomodate this shenanigan. no dedicated
@@ -694,6 +694,10 @@ module Skylab::BeautySalon
 
           def tap_class
             NIL  # hi.
+          end
+
+          def via_node_ n
+            _dispatch :via_node_, n
           end
 
           def receive_constituent_construction_services_ svcs
@@ -728,7 +732,7 @@ module Skylab::BeautySalon
 
         class CommonForm < GrammarSymbol__
           children(
-            :NAME_SYMBOL_symbol_terminal,
+            :as_symbol_symbol_terminal,
           )
         end
 
@@ -781,7 +785,7 @@ module Skylab::BeautySalon
         children(
           :blockhead,
           :args,
-          :any_BODY_expression,  # (blocks can be empty)
+          :any_body_expression,  # (blocks can be empty)
         )
 
         IS_BRANCHY = true  # :#history-A.7
@@ -807,7 +811,7 @@ module Skylab::BeautySalon
 
       # match_with_lvasgn (placeheld)
 
-      class MatchWithLvasgn < Dualoid__  # #testpoint1.48
+      class MatchWithLvasgn < Dualoid__  # #coverpoint1.48
       end
 
       #
@@ -818,7 +822,7 @@ module Skylab::BeautySalon
 
       # and (placeheld)
 
-      class And < Dualoid__  # #testpoint1.36
+      class And < Dualoid__  # #coverpoint1.36
       end
 
       # or (placeheld)
@@ -886,7 +890,7 @@ module Skylab::BeautySalon
 
       # until (placeheld)
 
-      class Until < WhileOrUntil__  # #testpoint1.26
+      class Until < WhileOrUntil__  # #coverpoint1.26
       end
 
       # while_post (placeheld)
@@ -896,7 +900,7 @@ module Skylab::BeautySalon
 
       # until_post (placeheld)
 
-      class UntilPost < WhileOrUntilPost__  # #testpoint1.29
+      class UntilPost < WhileOrUntilPost__  # #coverpoint1.29
       end
 
       # for (placeheld)
@@ -915,7 +919,7 @@ module Skylab::BeautySalon
 
       # defined? (placeheld)
 
-      class X__defined_question_mark__ < GrammarSymbol__  # #testpoint1.33
+      class X__defined_question_mark__ < GrammarSymbol__  # #coverpoint1.33
         children(
           :expression,
         )
@@ -937,17 +941,17 @@ module Skylab::BeautySalon
 
       # return (placeheld)
 
-      class Return < CommonJump__  #testpoint1.31
+      class Return < CommonJump__  #coverpoint1.31
       end
 
       # super (placeheld)
 
-      class Super < YieldLike__  # as in `super()` #testpoint1.13
+      class Super < YieldLike__  # as in `super()` #coverpoint1.13
       end
 
       # yield (placeheld)
 
-      class Yield < YieldLike__  # #testpoint1.42
+      class Yield < YieldLike__  # #coverpoint1.42
 
         # syntax sidebar: see discussion at #common-jump, but see how we
         # differ: a `yield` is passing arguments to a block or proc, so its
@@ -958,7 +962,7 @@ module Skylab::BeautySalon
 
       # zsuper (placeheld)
 
-      class Zsuper < CommonSingleton__  # `super` #testpoint1.43
+      class Zsuper < CommonSingleton__  # `super` #coverpoint1.43
       end
 
       # BEGIN, END
@@ -1014,7 +1018,7 @@ module Skylab::BeautySalon
       # ensure (placeheld)
 
       class Ensure < GrammarSymbol__
-        # (the kind you see at the toplevel of method bodies is #testpoint1.11)
+        # (the kind you see at the toplevel of method bodies is #coverpoint1.11)
         children(
           :any_HEAD_expression,  # sometimes not always a `rescue` (not confirmed)
           :any_BODY_expression,
@@ -1053,20 +1057,20 @@ module Skylab::BeautySalon
     # this was another case of #[#021.G] "foolhardy". as mentioned there,
     # here's what we used to call "expression of module": :#here6
     #
-    #  - begin  #testpoint1.4
-    #  - self  #testpoint1.5
-    #  - lvar  #testpoint1.27
-    #  - ivar  #testpoint1.30
-    #  - send  #testpoint1.39
+    #  - begin  #coverpoint1.4
+    #  - self  #coverpoint1.5
+    #  - lvar  #coverpoint1.27
+    #  - ivar  #coverpoint1.30
+    #  - send  #coverpoint1.39
 
     # :#here4: as developed in  #[#021.G] "foolhardy", any expression can be "opened" into its
     # singleton (syntactically). before we appreciated that, we tracked the
     # different kinds of things that can be the operand here:
     #
-    #   - begin  #testpoint1.1
-    #   - const (as `class << Foo::Bar`)  #testpoint1.47
-    #   - lvar (as in `def o.xx`)  #testpoint1.46
-    #   - self (as in `def self.xx`)  #testpoint1.38
+    #   - begin  #coverpoint1.1
+    #   - const (as `class << Foo::Bar`)  #coverpoint1.47
+    #   - lvar (as in `def o.xx`)  #coverpoint1.46
+    #   - self (as in `def self.xx`)  #coverpoint1.38
 
     # :#double-quoted-string-like:
     # for all of these, it's possible to have an empty symbol, backticks, etc
@@ -1105,13 +1109,13 @@ module Skylab::BeautySalon
         # (this is compared to :#here1)
         # #open [#007.H]: do you really want this distinction? compare and contrast
 
-        :send,  # #testpoint1.9
+        :send,  # #coverpoint1.9
           # a send that ends up thru sugar calling `foo=`
 
-        :splat,  # #testpoint1.8
+        :splat,  # #coverpoint1.8
           # you can splat parts of the list
 
-        * these_four_asgn,  # plain old ivars etc #testpoint1.34
+        * these_four_asgn,  # plain old ivars etc #coverpoint1.34
       ],
       assignablecommon: [
 
@@ -1128,16 +1132,16 @@ module Skylab::BeautySalon
         # parse tree.
 
         * these_four_asgn,
-        :send,   # #testpoint1.22
+        :send,   # #coverpoint1.22
       ],
       blockhead: [
         # (not sure if this is just a pragmatic decoration or a real thing)
         :lambda,
 
-        :send,  # #testpoint1.20
+        :send,  # #coverpoint1.20
           # as seen in (at writing): common/test/fixture-directories/twlv-dli/glient.rb
         :super,
-          # with no arg: #testpoint1.12  with some args: #testpoint1.12.B
+          # with no arg: #coverpoint1.12  with some args: #coverpoint1.12.B
         :zsuper,
           # as seen in (a writing) brazen/test/433-collection-adapters/031-git-config/400-mutable/040-counterpart-parsing-canon_spec.rb)
       ],

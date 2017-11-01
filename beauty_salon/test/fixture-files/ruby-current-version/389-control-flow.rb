@@ -10,7 +10,7 @@ y = nil
 
 # `and` / `or` (seen as a bit like an `if-then`)
 
-# #testpoint1.36
+# #coverpoint1.36
 # (as seen in (at this writing) common/test/fixture-trees-volatile/three/level-1/level-2/leaf-3.rb:4)
 
 
@@ -27,7 +27,7 @@ y = nil
 
 
 
-# `until` #testpoint1.26
+# `until` #coverpoint1.26
 # (as seen in (at writing) common/lib/skylab/common/ordered-dictionary.rb:106)
 
 last = nil
@@ -83,7 +83,7 @@ end while above
 
 
 
-# common jump with one arg #testpoint1.28
+# common jump with one arg #coverpoint1.28
 # (as seen in (at writing) common/lib/skylab/common/autoloader/value-via-const-path.rb:63)
 
 
@@ -113,7 +113,7 @@ end
 
 
 
-# `defined?` #testpoint1.33
+# `defined?` #coverpoint1.33
 # (as seen in (at writing) test_support/lib/skylab/test_support/slowie/core.rb:374)
 
 defined? x

@@ -12,7 +12,7 @@ end
 
 
 
-# just a plain old proc arg (`procarg0`) #testpoint1.21
+# just a plain old proc arg (`procarg0`) #coverpoint1.21
 # (as seen in (at writing) common/lib/skylab/common/event/magnetics-.rb:11)
 
 my_method do |q|
@@ -22,7 +22,7 @@ end
 
 
 
-# list expansion in proc args (`mlhs`) #testpoint1.10
+# list expansion in proc args (`mlhs`) #coverpoint1.10
 # (as seen in (at writing) basic/lib/skylab/basic/method.rb:146)
 
 # DOES THIS NOT ALSO COVER? (#todo)
@@ -38,7 +38,7 @@ end
 
 
 
-# `optarg` #testpoint1.41
+# `optarg` #coverpoint1.41
 # (as seen in (at writing) common/lib/skylab/common/event/makers-/hooks.rb:11)
 
 x = -> p=nil do
@@ -48,7 +48,7 @@ end
 
 
 
-# `procarg0` #testpoint1.45
+# `procarg0` #coverpoint1.45
 # (as seen in (at writing) common/lib/skylab/common/event/makers-/data-event.rb:92)
 
 my_method do |(var1, var2)|
@@ -58,7 +58,7 @@ end
 
 
 
-# take a proc or block as an arg (`blockarg`) #testpoint1.40
+# take a proc or block as an arg (`blockarg`) #coverpoint1.40
 # (as seen in (at writing) common/test/box.rb:14)
 
 def my_method_1 & p
@@ -68,7 +68,7 @@ end
 
 
 
-# keyword args (`kwoptarg`) #testpoint1.49
+# keyword args (`kwoptarg`) #coverpoint1.49
 # (as seen in (at writing) beauty_salon/lib/skylab/beauty_salon/crazy-town-magnetics-/semantic-tupling-via-node.rb:71)
 
 def my_method_1_B offset: nil, type: nil, via: nil
@@ -80,7 +80,7 @@ end
 
 
 
-# `return` #testpoint1.31
+# `return` #coverpoint1.31
 # (as seen in (at writing) basic/lib/skylab/basic/number/en.rb:34)
 
 def my_method_2 x
@@ -93,7 +93,7 @@ end
 
 
 
-# `super` with no args (a bit magic) #testpoint1.43
+# `super` with no args (a bit magic) #coverpoint1.43
 # (as seen in (at writing) common/lib/skylab/common/actor/curried--.rb:15)
 
 def my_method_3_A
@@ -103,7 +103,7 @@ end
 
 
 
-# a `super` with two args #testpoint1.13
+# a `super` with two args #coverpoint1.13
 # (as seen in (at writing) common/lib/skylab/common/callback-tree.rb:354))
 
 def my_method_3 x
@@ -113,7 +113,7 @@ end
 
 
 
-# `super` with no args and a block #testpoint1.12
+# `super` with no args and a block #coverpoint1.12
 # (as seen in (at writing) basic/lib/skylab/basic/yielder.rb:90)
 
 def my_method_4 x
@@ -126,7 +126,7 @@ end
 
 
 
-## `super` with yes args and a block #testpoint1.12.B
+## `super` with yes args and a block #coverpoint1.12.B
 
 def my_method_4_B x
 
@@ -139,7 +139,7 @@ end
 
 
 
-# `yield` #testpoint1.42
+# `yield` #coverpoint1.42
 # (as seen in (at writing) common/lib/skylab/common/stream/magnetics/each-pairable-via-stream.rb:25)
 
 def my_method_5 var1
@@ -149,7 +149,7 @@ end
 
 
 
-# `ensure` when it is at the toplevel of the method #testpoint1.11
+# `ensure` when it is at the toplevel of the method #coverpoint1.11
 # (as seen in (at writing) flex2treetop/lib/skylab/flex2treetop.rb:759)
 
 def my_method_6
@@ -165,13 +165,13 @@ end
 
 #    NOTE - same
 
-# `defs` #testpoint1.37
+# `defs` #coverpoint1.37
 # common/test/fixture-directories/sxtn-boxstow/shimmy-jimmy/chumba-wumba.rb:7
 
 
 
 
-# `defs` on self #testpoint1.38
+# `defs` on self #coverpoint1.38
 # (as seen in (at writing) common/test/fixture-directories/sxtn-boxstow/shimmy-jimmy/chumba-wumba.rb:7)
 
 def self.my_method
@@ -180,7 +180,7 @@ end
 
 
 
-# `defs` on any arbitrary lvar or whatever #testpoint1.46
+# `defs` on any arbitrary lvar or whatever #coverpoint1.46
 # (as seen in (at writing) common/lib/skylab/common/digraph.rb:359)
 
 def x.my_method
@@ -193,7 +193,7 @@ end
 
 
 
-# `match_with_lvasgn` #testpoint1.48
+# `match_with_lvasgn` #coverpoint1.48
 # (as seen in (at writing) arc/lib/skylab/arc/magnetics/qualified-component-via-value-and-association.rb:425)
 
 /xxx/ =~ x

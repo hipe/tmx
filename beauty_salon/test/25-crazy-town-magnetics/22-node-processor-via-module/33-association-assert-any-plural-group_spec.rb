@@ -60,7 +60,7 @@ module Skylab::BeautySalon::TestSupport
       _vals == [ 1234 ] || fail
     end
 
-    it 'this dingus - nil' do  #testpoint1.51
+    it 'this dingus - nil' do  #coverpoint1.51
 
       _ast = ast_with_one_element_that_is_numeric_
       _cls = _class_for_winker
@@ -69,7 +69,7 @@ module Skylab::BeautySalon::TestSupport
       o.zero_or_one_righty_expression.nil? || fail
     end
 
-    it 'this dingus - something (HAS RECURSION)' do  # #testpoint1.52
+    it 'this dingus - something (HAS RECURSION)' do  # #coverpoint1.52
 
       _ast0 = _build_node :numbo_tron, 456
       _ast = _build_node :meh, 3232, _ast0

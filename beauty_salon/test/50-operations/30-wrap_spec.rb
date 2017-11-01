@@ -92,7 +92,7 @@ module Skylab::BeautySalon::TestSupport
 
         expect_API_result_for_success_
 
-        upstream_io.closed? || fail  # #testpoint3.1
+        upstream_io.closed? || fail  # #coverpoint3.1
 
         [ info_output_lines, payload_output_lines ]
       end

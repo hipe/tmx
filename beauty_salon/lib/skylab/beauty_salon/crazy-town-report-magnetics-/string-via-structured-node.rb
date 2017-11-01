@@ -2,18 +2,52 @@
 
 module Skylab::BeautySalon
 
-  module CrazyTownReportMagnetics_::String_via_StructuredNode  # 1x. exactly [#023]
+  module CrazyTownReportMagnetics_::String_via_StructuredNode  # 1x.
+
+    # exactly [#026] unparsing losslessly.
+
+    # it bears mentioning somewhere that a lot of this is aspirational
+    # rather than fully jelled. every place where we use a `custom_method`
+    # is some place that could be better served by our declarative approach,
+    # but as it is we have no easy way of exploiting our declarative
+    # approach *under* an imperative approach. #incubating
 
     META_MAPPINGS___ = {
+
+      # for each type of location map, associate its range items with the
+      # child components of AST nodes (actually structured nodes) in terms
+      # of what order they occur in with respect to each other. see [#doc]
 
       # (because we can, we follow a top-down ordering of [#023.D]
 
       # -- class and module definition
 
+      # -- method (un)definition
+
+      definition: {
+        these: [
+          [ :range, :keyword ],
+          [ :custom_method, :__alternation_operator_or_name ],
+          [ :range, :operator ],
+          [ :both,  :range, :name, :assoc, :method_name_symbol_terminal ],
+          [ :assoc, :args ],
+          [ :assoc, :any_body_expression ],
+          [ :range, :end ],
+        ],
+      },
+
       # -- method calls
+
+      operator: {  # #coverpoint3.4
+        these: [
+          # [ :range, :operator ],
+          [ :custom_method, :__operator ],
+        ],
+      },
 
       send: {
         these: [
+          [ :custom_method, :__if_prefixed_method_name_then_etc ],
           [ :assoc, :any_receiver_expression ],
           [ :custom_method, :__if_bracketed_method_name_then_etc ],
           [ :range, :dot ],
@@ -25,9 +59,9 @@ module Skylab::BeautySalon
         ],
       },
 
-      # -- method (un)definition
-
       # -- formal arguments
+
+      # objc_kwarg: nil, # keyword operator argument  probably never gonna use
 
       # -- expression grouping
 
@@ -53,6 +87,10 @@ module Skylab::BeautySalon
         ],
       },
 
+      for: nil,  # keyword in begin end
+      rescue_body: nil,  # keyword assoc begin
+      ternary: nil,  # question colon
+
       # -- assignment
 
       variable: {
@@ -66,13 +104,35 @@ module Skylab::BeautySalon
 
       # -- access
 
+      constant: {
+        these: [
+          [ :assoc, :any_parent_const_expression ],
+          [ :range, :double_colon ],
+          [ :both, :range, :name, :assoc, :symbol_symbol_terminal ],
+          [ :custom_method, :__if_operator_cover_me ],
+          # [ :range, :operator ],
+        ],
+      },
+
       # -- literals
+
+      heredoc: nil,  # heredoc_body heredoc_end
 
       # -- (very generic)
 
       collection: {
         these: [
           [ :custom_method, :__for_collection ],
+        ],
+      },
+      keyword: {
+        these: [
+          [ :custom_method, :__for_keyword_init ],
+          [ :range, :keyword ],
+          [ :custom_method, :__for_keyword_condition_slot ],
+          [ :range, :begin ],
+          [ :custom_method, :__for_keyword_body_slot ],
+          [ :range, :end ],
         ],
       },
       map: {
@@ -104,7 +164,7 @@ module Skylab::BeautySalon
 
       def structured_node= sn
 
-        loc = sn.node_location
+        loc = sn._node_location_
         @_loc_map_index = LOC_MAP_INDEX_VIA_CLASS___[ loc.class ]
         @location = loc
 
@@ -119,7 +179,7 @@ module Skylab::BeautySalon
 
         # exactly [#026.D]: figure out the very first starting offset
 
-        r = @structured_node.node_location.expression
+        r = @structured_node._node_location_.expression
         _be_at_offset r.begin_pos
         @source_buffer_string = r.source_buffer.source
         NIL
@@ -163,21 +223,192 @@ module Skylab::BeautySalon
       # Custom methods
       #
 
+      # -- Operator
+
+      def __alternation_operator_or_name  # for `Definition`  # AFTER __for_variable_write_right_hand_side
+        _op_col = _gets_one_semantic_column
+        _nm_col = _gets_one_semantic_column
+        _common_alternation _nm_col, _op_col
+      end
+
+      def _common_alternation nm_col, op_col
+        nm_col.range.range_attr_name == :name || fail
+        op_col.range_attr_name == :operator || fail
+        _no_operator
+        _effect_non_method_column nm_col
+        NIL
+      end
+
+      def __operator
+
+        # before descending, flush pending range so our weird child
+        # doesn't have to worry about it
+
+        a = @_association_index.associations
+        case a.length
+        when 1
+          _operator_when_one_component a.fetch 0
+        when 2
+          __operator_with_two_components( * a )
+        else ; no
+        end
+      end
+
+      def __operator_with_two_components left_asc, right_asc
+
+        __operator_this_component left_asc
+        __operator_operator
+        _operator_when_one_component right_asc
+      end
+
+      def _operator_when_one_component asc  # near #here1
+        if asc.is_terminal
+          if asc.has_truly_plural_arity
+            ::Kernel._COVER_ME__etc__
+          else
+            expr_loc = @structured_node._node_location_.expression
+            _write_static_string_to_here expr_loc.begin_pos  # :#here3
+            _write_terminal_value_of asc  # #coverpoint3.5
+            _be_at_offset expr_loc.end_pos
+          end
+        else  # #coverpoint3.4
+          _recurse_via_nonterminal_association asc
+        end
+        _be_in_state :did_custom
+      end
+
+      def __operator_this_component asc
+        if asc.is_terminal
+          if asc.has_truly_plural_arity
+            ::Kernel._COVER_ME__etc__
+          else
+            _write_terminal_value_of asc  # #coverpoint3.5
+          end
+        else
+          _recurse_via_nonterminal_association asc
+        end
+      end
+
+      def __operator_operator
+        r = @location.operator
+        if r
+          _write_static_string_to_here r.end_pos  # #coverpoint3.4
+        else
+          NOTHING_  # #coverpoint3.5
+        end
+      end
+
       # -- Send
 
       # normally a send is RECEIVER DOT SELECTOR BEGIN ARGS END
-      # here is is RECEIVER OPEN ARGS CLOSE
+
+      # in an expression like `! @yadda`, this is dressed as a send as:
+      #     SELECTOR RECEIVER
+
+      def __if_prefixed_method_name_then_etc
+        @_method_name_symbol = @structured_node.method_name
+        @_is = @_method_name_symbol =~ /\A[^_[:alpha:]]/
+        if @_is
+          case @_method_name_symbol
+          when :! ; __send_when_operator_prefixed
+          end
+        end
+      end
 
       def __if_bracketed_method_name_then_etc
 
-        sym = @structured_node.method_name
-        if /\A[^_[:alpha:]]/ =~ sym
-          case sym
-          when :[] ; __send_as_brackets_simple
-          when :[]= ; __send_as_brackets_cha_cha
-          else ; self._COVER__WEE__
+        if @_is
+          case @_method_name_symbol
+          when :[] ; __send_when_brackets_simple
+          when :[]= ; __send_when_brackets_with_assign
+          when :== ; __send_when_operator_infixed
+          else ;
+            self._COVER__WEE__
           end
         end
+      end
+
+      def __send_when_operator_prefixed  # #coverpoint3.3
+
+        _send_assert_arg_number 0
+        _send_assert_selector_not_operator
+        _recurse_into_structured_node @structured_node.any_receiver_expression
+        _send_end
+      end
+
+      def __send_when_brackets_with_assign
+
+        key_sd, value_sd = _send_assert_arg_number 2
+        _send_assert_selector_and_operator
+
+        # (write the '[ ' and) write the key expression
+        _recurse_into_structured_node key_sd
+
+        # (write the ' ] = ' and) write the value expression
+        _recurse_into_structured_node value_sd
+
+        _send_end
+      end
+
+      def __send_when_operator_infixed  # #coverpoint3.6
+
+        _rhs, = _send_assert_arg_number 1
+        _send_assert_selector_not_operator
+        # (rely on the below to draw all of " == xxx")
+        _recurse_into_structured_node _rhs
+        _send_end
+      end
+
+      def __send_when_brackets_simple
+
+        _send_assert_selector_not_operator
+        listlike = @structured_node.zero_or_more_arg_expressions
+        if listlike.length.zero?
+          NOTHING_  # #coverpoint3.7
+        else
+          _recurse_into_listlike listlike
+        end
+        _write_static_string_to_here @location.selector.end_pos  # ' ]'
+        _send_end
+      end
+
+      # ~ support
+
+      def _send_assert_arg_number len
+
+        listlike = @structured_node.zero_or_more_arg_expressions
+        len == listlike.length || sanity
+        if len.nonzero?
+          a = ::Array.new len
+          len.times do |d|
+            a[ d ] = listlike.dereference d
+          end
+          a
+        end
+      end
+
+      def _send_assert_selector_and_operator
+        @location.selector || sanity  # '[ 33 ]'
+        @location.operator || sanity  # '='
+        _send_assert_never_these
+      end
+
+      def _send_assert_selector_not_operator
+        @location.selector || sanity  # '=='
+        @location.operator && sanity
+        _send_assert_never_these
+      end
+
+      def _send_assert_never_these
+        @location.dot && sanity
+        @location.begin && sanity
+        @location.end && sanity
+      end
+
+      def _send_end
+        # (if abstract this, rename it "will end early")
+        @_semantic_column_scanner = Common_::THE_EMPTY_SCANNER
+        _be_in_state :did_custom
       end
 
       # -- Conditional
@@ -231,12 +462,30 @@ module Skylab::BeautySalon
         NIL
       end
 
-      FOR_VARIABLES_SANITY___ = -> do  # could probably be distilled
+      FOR_VARIABLES_SANITY___ = -> do
+
+        # the declarative, structural info here serves no purpose other than
+        # to assert that for any given relevant grammar symbol, its relevant
+        # components have the names we expect them to have. maybe one day if
+        # component names unify #open :[#007.M] we can do away with it.
+
+        common_rhs = :default_value_expression
         zero_or_one = :zero_or_one_right_hand_side_expression
+        common = :as_symbol_symbol_terminal
         short_one = :symbol_terminal
         {
+          ivasgn: [ :ivar_as_symbol_symbol_terminal, zero_or_one ],
           lvasgn: [ :lvar_as_symbol_symbol_terminal, zero_or_one ],
           # --
+          kwoptarg: [ common, common_rhs ],
+          optarg: [ common, common_rhs ],
+          # --
+          arg: common,
+          blockarg: common,
+          procarg0: common,  # #coverpoint3.9
+          restarg: :zero_or_one_symbol_terminal,
+          # --
+          ivar: short_one,
           lvar: short_one,
         }.freeze
       end.call
@@ -244,11 +493,19 @@ module Skylab::BeautySalon
       def __for_variable_write_right_hand_side
         m = remove_instance_variable :@__right_hand_side_method_symbol
         if m
-          sn = @structured_node.send m
-          sn || self._COVER_ME__la_la__
-          _recurse_into_structured_node sn
-          _be_in_state :did_custom  # or other
+          __for_variable_do_write_right_hand_side m
         end
+      end
+
+      def __for_variable_do_write_right_hand_side m
+
+        sn = @structured_node.send m
+        sn || self._COVER_ME__la_la__
+
+        # _write_static_string_to_here @location.operator.end_pos  # #here3 instead
+
+        _recurse_into_structured_node sn
+        _be_in_state :did_custom  # or other
       end
 
       # -- Collection
@@ -266,6 +523,27 @@ module Skylab::BeautySalon
           else ; cover_me
           end
         end
+      end
+
+      def __collection_when_block
+
+        # BLOCKHEAD ARGS BEGIN ANY_BODY_EXPRESSION END
+
+        sn = @structured_node
+        bh_sn = sn.blockhead
+        args_sn = sn.args
+        body_sn = sn.any_body_expression
+        sn = nil
+
+        _recurse_into_structured_node bh_sn  # `->`, `frob`
+
+        _recurse_into_structured_node args_sn
+
+        if body_sn
+          _recurse_into_structured_node body_sn
+        end
+
+        _write_static_string_to_here @location.end.end_pos
       end
 
       def __collection_when_plural
@@ -298,7 +576,9 @@ module Skylab::BeautySalon
         else ; no end
 
         m = @_child_association.association_symbol
-        exp_m == m || sanity
+        if exp_m != m
+          sanity
+        end
 
         list_like = @structured_node.send m
 
@@ -321,9 +601,70 @@ module Skylab::BeautySalon
           args: [ :zero_or_more_argfellows, :it_varies ],  #  the '|' uses as doo-hahs
           array: [ common, :yep ],
           begin: [ common, :it_varies ],
-          dstr: [ :zero_or_more_dynamic_expressions, :yep ],
+          dstr: [ :one_or_more_dynamic_expressions, :yep ],
+          mlhs: [ :one_or_more_assignableformlhss, :yep ],
         }.freeze
       end.call
+
+      def __collection_when_terminal  # (if this gives you trouble, use #here2)
+
+        _m, _sub_asc_sym = FOR_COLLECTION_FOR_TERMINALS___.fetch _node_type
+
+        @_child_association.association_symbol == _sub_asc_sym || sanity
+
+        _x = @structured_node.send @_child_association.stem_symbol
+
+        send _m, _x
+      end
+
+      FOR_COLLECTION_FOR_TERMINALS___ = {
+        sym: [ :__when_sym, :as_symbol_symbol_terminal ],
+        str: [ :__when_str, :as_string_string_terminal ],
+      }
+
+      def __when_str s
+
+        beg_r = @location.begin
+        end_r = @location.end
+
+        # (we assume the below inconsistency is unintentional)
+
+        if beg_r
+          end_r || fail
+          _write_static_string_to_here beg_r.end_pos
+          _with_sanity_and s, end_r.begin_pos
+          _write_static_string_to_here end_r.end_pos  # #coverpoint3.5
+        else
+          end_r && fail
+          # this happens ..
+          _with_sanity s
+        end
+      end
+
+      def __when_sym sym
+        @location.end && no
+        _write_static_string_to_here @location.begin.end_pos  # '[ :', eg
+        _with_sanity sym.id2name
+      end
+
+      def _with_sanity new_s
+
+        _with_sanity_and new_s, @location.expression.end_pos
+      end
+
+      def _with_sanity_and new_s, end_d
+
+        current_s = @source_buffer_string[ _cursor ... end_d ]
+
+        if current_s != new_s
+          self._COVER_ME__escaping_is_a_thing__
+        end
+
+        @byte_downstream << new_s
+
+        _be_at_offset end_d
+        _be_in_state :both  # equivalent
+      end
 
       def __child_association_is_truly_plural
         asc = remove_instance_variable( :@_assocs ).fetch 0
@@ -334,6 +675,108 @@ module Skylab::BeautySalon
       def __has_one_child_association
         @_assocs = @_association_index.associations
         1 == @_assocs.length
+      end
+
+      # -- Keyword
+
+      # ~ keyword entrypoints
+
+      def __for_keyword_init
+        case _node_type
+        when :while ; __for_keyword_init_for_while
+        when :if ; __for_keyword_init_for_if
+        else ; hi
+        end
+      end
+
+      def __for_keyword_condition_slot
+        send remove_instance_variable :@_keyword_method_for_condition_slot
+      end
+
+      def __for_keyword_body_slot
+        send remove_instance_variable :@_keyword_method_for_body_slot
+      end
+
+      # ~ support above
+
+      def __for_keyword_init_for_while
+
+        _keyword_will_use_these_two_components(
+          @structured_node.condition_expression,
+          @structured_node.body_expression,
+        )
+
+        if _keyword_components_are_forward
+          __keywords_will_write_slots_forwardly
+        else
+          no_problem
+        end
+      end
+
+      def __for_keyword_init_for_if
+
+        sn = @structured_node
+        cond_sn = sn.condition_expression
+        then_sn = sn.any_if_true_do_this_expression
+        else_sn = sn.any_else_do_this_expression
+
+        _keyword_will_use_these_two_components cond_sn, then_sn
+
+        if _keyword_components_are_forward
+          sanity  # isn't the whole Condition structure for this?
+        else
+          then_sn || sanity
+          else_sn && sanity
+          __keywords_will_write_slots_backwardly
+        end
+      end
+
+      def __keywords_will_write_slots_backwardly
+
+        #     normally:         KEYWORD CONDITION BEGIN BODY END
+        #     annoyingly:  BODY KEYWORD CONDITION
+
+        _keyword_write_body_component
+        @_keyword_method_for_condition_slot = :_keyword_write_condition_component
+        @_keyword_method_for_body_slot = :__no_op
+      end
+
+      def __keywords_will_write_slots_forwardly
+        @_keyword_method_for_condition_slot = :_keyword_write_condition_component
+        @_keyword_method_for_body_slot = :_keyword_write_body_component
+      end
+
+      def _keyword_will_use_these_two_components cond_sn, then_sn
+        @_SN_kw_component_for_condition = cond_sn
+        @_SN_kw_component_for_body = then_sn ; nil
+      end
+
+      def _keyword_components_are_forward
+
+        _sn = @_SN_kw_component_for_condition
+        _sn_ = @_SN_kw_component_for_body
+        _d = _sn._node_location_.expression.begin_pos
+        _d_ = _sn_._node_location_.expression.begin_pos
+        case _d <=> _d_
+        when -1 ; true
+        when  1 ; false
+        else    ; never
+        end
+      end
+
+      # ~ keyword writing execution
+
+      def _keyword_write_condition_component
+        _keyword_write_component :@_SN_kw_component_for_condition
+      end
+
+      def _keyword_write_body_component
+        _keyword_write_component :@_SN_kw_component_for_body
+      end
+
+      def _keyword_write_component ivar
+        _sn = remove_instance_variable ivar
+        _recurse_into_structured_node _sn
       end
 
       # -- Map (the base class)
@@ -359,6 +802,12 @@ module Skylab::BeautySalon
         NIL
       end
 
+      def _recurse_via_nonterminal_association asc
+        sn = @structured_node.send asc.association_symbol
+        sn || self._COVER_ME__la_la__
+        _recurse_into_structured_node sn
+      end
+
       def _recurse_into_structured_node sn
 
         _d = self.class.call_by do |o|  # Recurse__
@@ -370,6 +819,16 @@ module Skylab::BeautySalon
 
         _be_at_offset _d
         NIL
+      end
+
+      def __if_operator_cover_me
+        _no_operator
+      end
+
+      def _no_operator
+        if @location.operator
+          self._COVER_ME__fun_la_la__
+        end
       end
 
       #
@@ -431,7 +890,9 @@ module Skylab::BeautySalon
           end: :__transition_from_start_to_end,
         },
         both: {
+          assoc: :__transition_from_both_to_assoc,
           range: :__transition_from_both_to_range,
+          end: :__transition_from_both_to_end,
         },
         range: {
           both: :__transition_from_range_to_both,
@@ -465,8 +926,17 @@ module Skylab::BeautySalon
 
       # -- from both
 
+      def __transition_from_both_to_assoc
+        _common_transition_to_assoc
+      end
+
       def __transition_from_both_to_range
         _common_transition_to_range
+      end
+
+      def __transition_from_both_to_end
+        # nothing to do. assoc printed stuff
+        _be_in_state :end
       end
 
       # -- from range
@@ -515,23 +985,7 @@ module Skylab::BeautySalon
 
       def _effect_both
 
-        tasc = @_current_association
-        tasc.is_terminal || assumption_failed
-
-        _m = if tasc.has_plural_arity  # ..
-          tasc.association_symbol
-        else
-          tasc.stem_symbol
-        end
-
-        x = @structured_node.send _m
-
-        case tasc.type_symbol
-        when :symbol
-          @byte_downstream << x.id2name
-        else
-          self._COVER_ME__fun_and_easy__
-        end
+        __write_terminal_value
 
         # now that you have output the possibly modified value, this is key:
         # advance the cursor to the character just past etc
@@ -565,6 +1019,51 @@ module Skylab::BeautySalon
       end
 
       #
+      # Write terminals :#here2
+      #
+
+      def __write_terminal_value
+        _write_terminal_value_of @_current_association
+      end
+
+      def _write_terminal_value_of tasc
+
+        tasc.is_terminal || assumption_failed
+        if tasc.has_truly_plural_arity
+          self._COVER_ME__etc__
+        else
+          __write_terminal_value_normally tasc
+        end
+      end
+
+      def __write_terminal_value_normally tasc  # assume not truly plural
+
+        _m = if tasc.has_plural_arity
+          tasc.association_symbol  # #coverpoint3.5
+        else
+          tasc.stem_symbol
+        end
+
+        x = @structured_node.send _m
+
+        if x.nil?
+          self._COVER_ME__etc__
+        end
+
+        case tasc.type_symbol
+        when :symbol
+          @byte_downstream << x.id2name
+        when :integer
+          @byte_downstream << ( '%d' % x )
+        when :float
+          @byte_downstream << x.to_s  # YIKES
+            # (stringifying a float is nontrivial - maybe look at `unparse`)
+        else
+          self._COVER_ME__trivially_easy_probably_but_readme__
+        end
+      end
+
+      #
       # Flushing parts of the received string
       #
 
@@ -572,9 +1071,9 @@ module Skylab::BeautySalon
         _vr = _current_vendor_range
         d = _vr.begin_pos
         if _cursor < d
-          _write_static_string_to_here d  # #testpoint3.2
+          _write_static_string_to_here d  # #coverpoint3.2
         else
-          NOTHING_  # #testpoint3.2
+          NOTHING_  # #coverpoint3.2
         end
       end
 
@@ -616,11 +1115,19 @@ module Skylab::BeautySalon
       #
 
       def _node_type
-        @structured_node.node_type
+        @structured_node._node_type_
       end
 
       def _cursor
         @current_pending_start_offset_to_flush
+      end
+
+      def __no_op
+        NOTHING_
+      end
+
+      def _buff
+        @byte_downstream
       end
     end
 

@@ -331,7 +331,7 @@ module Skylab::BeautySalon
           # formal length expectation is zero, we still have to check this
           # formal assumption against the actual length (provided that that's
           # still our [#007.D] provision) and it behooves us to do all such
-          # assertion with the same machinery.) #testpoint2.11
+          # assertion with the same machinery.) #coverpoint2.11
 
           scn = build_qualified_children_scanner_for_ n
 
@@ -434,8 +434,13 @@ module Skylab::BeautySalon
         # we don't freeze only because of how we lazy memoize wrapped children value
       end
 
+      # NOTE :#here4: generally avoid the [#028.0.0] ordinary method names
+      # namespace when naming methods here. that namespace should be left
+      # completely open for users and/or the grammar module. instead we use
+      # [#028.1.1.2] or others. exceptions are marekd with the subject tag.
+
       def DIG_AND_CHANGE_TERMINAL * sym_a, x
-        CrazyTownMagnetics_::StructuredNode_via_Writes::DIG_ETC.call_by do |o|
+        CrazyTownMagnetics_::StructuredNode_via_Writes::DigAndChangeTerminal.call_by do |o|
           o.new_value = x
           o.dig_symbols = sym_a
           o.structured_node = self
@@ -443,6 +448,7 @@ module Skylab::BeautySalon
       end
 
       def new_by & edit
+        # (this method name violated #here4 but is idiomatic within our ecosystem)
         CrazyTownMagnetics_::StructuredNode_via_Writes.call_by do |o|
           o.structured_node = self
           o.edit = edit
@@ -481,8 +487,10 @@ module Skylab::BeautySalon
       end
 
       def to_code
+
         # #copy-paste modified from #here7
         # (we know we want to improve this but we are locking it down)
+        # (this method name violates #here5 but is idomatic with vendor lib)
 
         lib = Home_.lib_
         # ~(it's futile trying to get rid of the warning - maybe
@@ -492,18 +500,18 @@ module Skylab::BeautySalon
       end
 
       def begin_lineno__
-        node_location.first_line
+        _node_location_.first_line
       end
 
       def end_lineno__
-        node_location.last_line
+        _node_location_.last_line
       end
 
-      def node_location
+      def _node_location_
         @AST_node_.location
       end
 
-      def node_type
+      def _node_type_
         @AST_node_.type
       end
 
@@ -889,12 +897,12 @@ module Skylab::BeautySalon
 
           x_a = _node_children_normalized_BS
           case x_a.length
-          when num_ascs  # #testpoint1.52
+          when num_ascs  # #coverpoint1.52
             ast = x_a.fetch here
             if ast
               self.class._structured_node_via_node ast
             end
-          when num_ascs - 1  # #testpoint1.51
+          when num_ascs - 1  # #coverpoint1.51
             NOTHING_
           else
             never
@@ -1015,7 +1023,7 @@ module Skylab::BeautySalon
         freeze
       end
 
-      def DUPLICATUS d, new_child_sn
+      def dup_as_list__ d, new_child_sn
 
         # -- 1. dup all of the things
 

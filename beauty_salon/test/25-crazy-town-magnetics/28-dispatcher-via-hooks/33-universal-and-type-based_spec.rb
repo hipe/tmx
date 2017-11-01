@@ -90,7 +90,7 @@ module Skylab::BeautySalon::TestSupport
       tuple = __this_other_tuple ast_node_of_addition_of_three_integers_
       3 == tuple.length || fail
       tuple.each do |n|
-        # per #testpoint2.12, we get AST nodes not structured nodes, but could
+        # per #coverpoint2.12, we get AST nodes not structured nodes, but could
         # sn._node_.type == :ind || fail
         n.type == :ind || fail
       end

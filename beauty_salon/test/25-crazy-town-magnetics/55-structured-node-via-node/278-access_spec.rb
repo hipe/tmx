@@ -26,7 +26,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    # (covering accessign an ivar is done over at #testpoint2.5 expressions grouping)
+    # (covering accessign an ivar is done over at #coverpoint2.5 expressions grouping)
 
     # --
 
@@ -38,5 +38,5 @@ module Skylab::BeautySalon::TestSupport
     # ==
   end
 end
-# :#testpoint2.3
+# :#coverpoint2.3
 # #born.

@@ -31,7 +31,7 @@ x = :" foo #{ x } bee"  # symbol with interpolation
 
 
 
-# backticks with interpolation #testpoint1.2
+# backticks with interpolation #coverpoint1.2
 # (from (at writing) git/test/test-support.rb:72)
 
 x = `echo #{ a.length } && echo #{ a.class } 'again'`
@@ -46,7 +46,7 @@ rx = /\A
   qq
 \z/xi
 
-# (the regexp options above are #testpoint1.53)
+# (the regexp options above are #coverpoint1.53)
 
 rx = /
   #{ x }
@@ -79,7 +79,7 @@ h = {
 # -- assignment!
 
 # of the below assignments that are "weird", probably they are part of
-# #testpoint1.54, i.e all the grammar symbols that have as an association
+# #coverpoint1.54, i.e all the grammar symbols that have as an association
 # `zero_or_one_right_hand_side_expression`
 
 y = nil
@@ -88,7 +88,7 @@ x += y  # this is what we call op_asgn  (there are several other permutations)
 
 x ||= y  # this is some kind of doo-hah boolean assignment thing
 
-x &&= method_call  # #testpoint1.25
+x &&= method_call  # #coverpoint1.25
   # (as in (at writing) common/lib/skylab/common/models-/event/actions/viz.rb:50)
 
 
@@ -101,7 +101,7 @@ x &&= method_call  # #testpoint1.25
 
 # ~ (looks like) assignment thru method sugar
 
-# sugar sugar (note it calls *two* methods) #testpoint1.22
+# sugar sugar (note it calls *two* methods) #coverpoint1.22
 # (as in (at writing) common/lib/skylab/common/bundles.rb:129)
 
 x.my_getter_setter ||= y
@@ -121,14 +121,14 @@ $my_global ||= x
 
 
 
-# (magic) `gvar` #testpoint1.44
+# (magic) `gvar` #coverpoint1.44
 # (as seen in (at writing) common/lib/skylab/common/name/conversion-functions.rb:57)
 
 x, y, z = $~.captures
 
 
 
-# nth_ref #testpoint1.3
+# nth_ref #coverpoint1.3
 
 x = $1
 
@@ -138,7 +138,7 @@ x = $1
 # -- list assignment
 
 
-# plain old lvar list assignment #testpoint1.34
+# plain old lvar list assignment #coverpoint1.34
 # (as in (at writing) basic/lib/skylab/basic/range/positive/union.rb:48)
 
 x, y = []  # (sneak empty array parsing into it)
@@ -147,7 +147,7 @@ x, y = []  # (sneak empty array parsing into it)
 
 
 
-# the terms of your list assignment can be method calls (`send`) #testpoint1.9
+# the terms of your list assignment can be method calls (`send`) #coverpoint1.9
 # (as seen in (at writing) human/lib/skylab/human/nlp/en/contextualization/magnetics-/line-contextualization-via-line.rb:90)
 
 
@@ -160,7 +160,7 @@ x.my_attr_3 =
 
 
 
-# subtly different form of above #testpoint1.8
+# subtly different form of above #coverpoint1.8
 # (as in (at writing) arc/lib/skylab/arc/operation/when-not-available.rb:16)
 
 ( * x, y ) = [1,2,3]
@@ -168,7 +168,7 @@ x.my_attr_3 =
 
 
 
-# list assignment but it's two consts (`casgn`) #testpoint1.6
+# list assignment but it's two consts (`casgn`) #coverpoint1.6
 
 # (as seen in (at writing) task/lib/skylab/task/magnetics/magnetics/function-stack-via-collection-and-parameters-and-target.rb:398)
 
@@ -187,7 +187,7 @@ end
 #    splat so we will have to alter our handling functions accordingly.
 
 
-# you can splat on an lvar #testpoint1.19
+# you can splat on an lvar #coverpoint1.19
 # (as seen in (at writing) basic/lib/skylab/basic/function/core.rb:88)
 
 my_method( * x ).execute
@@ -195,7 +195,7 @@ my_method( * x ).execute
 
 
 
-# you can splat a plain old ivar #testpoint1.18
+# you can splat a plain old ivar #coverpoint1.18
 # (as seen in (at writing) basic/lib/skylab/basic/proxy/makers/functional/core.rb:99)
 
 x = [ y, * @my_ivar ]
@@ -203,7 +203,7 @@ x = [ y, * @my_ivar ]
 
 
 
-# a splat can be used in the middle of an actual argument list (splat a const) #testpoint1.15
+# a splat can be used in the middle of an actual argument list (splat a const) #coverpoint1.15
 # (as seen in (at writing) human/lib/skylab/human/nlp/en/phrase-structure-/models/irregular/core.rb:70)
 
 my_method( x, * @my_ivar::MY_CONST )
@@ -211,7 +211,7 @@ my_method( x, * @my_ivar::MY_CONST )
 
 
 
-# you can follow a splat star with an arbitrary expression `begin` #testpoint1.14
+# you can follow a splat star with an arbitrary expression `begin` #coverpoint1.14
 # (as seen in (at writing) zerk/lib/skylab/zerk/non-interactive-cli/core.rb:194)
 
 x[ * ( y if 1 == x ) ]
@@ -219,7 +219,7 @@ x[ * ( y if 1 == x ) ]
 
 
 
-# splat a complex-ass expression (`send`) #testpoint1.17
+# splat a complex-ass expression (`send`) #coverpoint1.17
 # (as seen in (at writing) basic/lib/skylab/basic/class/models-.rb:18)
 
 x = my_method( * [x].compact )
@@ -227,9 +227,9 @@ x = my_method( * [x].compact )
 
 
 
-# splat expand a deep-ass expression (`block`) #testpoint1.16
+# splat expand a deep-ass expression (`block`) #coverpoint1.16
 # (as seen in (at writing) plugin/lib/skylab/plugin/bundle/enhance.rb:60)
-# also #testpoint1.20
+# also #coverpoint1.20
 
 my_proc = nil
 
@@ -243,7 +243,7 @@ end ).my_third_method( & my_proc )
 
 
 
-# splat a literal array #testpoint1.50
+# splat a literal array #coverpoint1.50
 # (as seen in (at writing) human/test/270-NLP/010-EN/281-contextualization/150-against-subject-association-without-channel_spec.rb )
 
 my_method( * [ 1, 2, 3] )
@@ -251,7 +251,7 @@ my_method( * [ 1, 2, 3] )
 
 
 
-# splat a case statement (`case`) #testpoint1.24
+# splat a case statement (`case`) #coverpoint1.24
 # (as seen in (at writing) common/lib/skylab/common/box/algorithms--.rb:39)
 
 my_proc[ * case 1 <=> x
