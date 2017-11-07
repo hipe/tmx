@@ -43,7 +43,15 @@ module Skylab::BeautySalon::TestSupport
         elsif 5 == count
           # (this happens when you run only this file)
           # strange == %w(op_asgn kwbegin lvar) || fail
-          strange == %w( op_asgn ) || fail
+          h = {}
+          strange.each do |s|
+            h[s] = true
+          end
+          h.delete 'op_asgn' or fail
+          h.delete 'kwbegin'
+          if h.length.nonzero?
+            fail
+          end
         else
           fail
         end

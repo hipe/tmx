@@ -100,7 +100,7 @@ module Skylab::System
         end
       end
 
-      def __build_process
+      def __build_process  # this is a #[#sy-041] manual `popen3`
 
         read_out, write_out = ::IO.pipe
         read_err, write_err = ::IO.pipe

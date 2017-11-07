@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'skylab/common'
 
 module Skylab::BeautySalon
@@ -247,6 +249,7 @@ module Skylab::BeautySalon
   DASH_ = '-'
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
+  GLOB_STAR_ = '*'
   IDENTITY_ = -> x { x }          # for fun we track this
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"

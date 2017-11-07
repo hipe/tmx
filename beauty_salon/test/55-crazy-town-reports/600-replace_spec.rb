@@ -59,7 +59,8 @@ module Skylab::BeautySalon::TestSupport
         st = _call_subject_magnetic_by do |o|
 
           paths = []
-          paths << ::File.join( TS_.dir_path, 'fixture-files/tree-005-minimal' )
+
+          paths << Fixture_file_[ 'tree-005-minimal' ]
 
           _this_path = fixture_functions_ 'la-la-015.rb'
 

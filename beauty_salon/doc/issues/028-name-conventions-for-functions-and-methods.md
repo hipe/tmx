@@ -647,7 +647,7 @@ when we use the verb "sign" in the context of events we mean the process
 of in some way adding more context to an event to make it clearer for
 example under what action it occurred. we are not yet sure whether it
 makes more sense to "sign" an event in a sender method or a receiver
-method; so as such we are encouraging the use of more descrptive names
+method; so as such we are encouraging the use of more descriptive names
 for methods that sign the events they produce or transform.
 
 

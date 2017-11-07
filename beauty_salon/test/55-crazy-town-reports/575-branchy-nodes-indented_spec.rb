@@ -85,7 +85,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def fixture_file_ruby_MRI_ tail
-      ::File.join TS_.dir_path, 'fixture-files', 'ruby-current-version', tail
+      Ruby_current_version_fixture_file_[ tail ]
     end
 
     def _line_stream_for_path path

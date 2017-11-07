@@ -2,6 +2,8 @@ module Skylab::System
 
   class Find  # see [#016].
     # -
+      #   - remember there is the [#041.2] pipe-find-into-grep experiment
+
       # -
         # synopsis:
         #
@@ -131,6 +133,7 @@ module Skylab::System
         end
 
         attr_reader :args
+        alias_method :to_command_tokens, :args  # look like grep. #todo get rid of above method
 
         def filename_array
           @unescaped_filename_a

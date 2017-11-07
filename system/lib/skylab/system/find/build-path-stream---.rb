@@ -76,4 +76,5 @@ module Skylab::System
     end
   end
 end
+# #pending-rename: might as well, right?
 # #tombstone: we used to let the defalt inline event expression happen

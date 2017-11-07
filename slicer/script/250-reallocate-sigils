@@ -218,7 +218,7 @@ class Skylab_Slicer_OneOff_1___
 
   # -- B.
 
-  def __init_thing_stream
+  def __init_thing_stream  # this is a #[#sy-041] manual `popen3`
 
     require 'skylab/tmx' ; @TMX = ::Skylab::TMX  # sneak this in here
 

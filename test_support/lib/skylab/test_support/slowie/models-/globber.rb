@@ -72,6 +72,8 @@ module Skylab::TestSupport
 
         # (TL;DR: early optimization uses system IPC instead of one ruby line)
         #
+        # this is a #[#sy-041] manual `popen3`
+        #
         # for thousands of test files, we consider it needlessly wasteful
         # to ask ruby to allocate memory for one string for each test file
         # path when all we are doing is aggregating a count of the items

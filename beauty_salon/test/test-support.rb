@@ -54,7 +54,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def fixture_functions_ tail
-      ::File.join TS_.dir_path, 'fixture-functions', tail
+      Fixture_function_path__[ tail ]
     end
 
     attr_reader :do_debug
@@ -277,7 +277,23 @@ module Skylab::BeautySalon::TestSupport
 
   # --
 
-  Fixture_file_ = -> tail do  # 1x
+  Ruby_current_version_fixture_file_ = -> tail do
+    ::File.join Ruby_current_version_dir_[], tail
+  end
+
+  Ruby_current_version_dir_ = Lazy_.call do
+    Fixture_file_[ 'ruby-current-version' ]
+  end
+
+  Fixture_function_path__ = -> tail do
+    ::File.join Fixture_function_dir_[], tail
+  end
+
+  Fixture_function_dir_ = Lazy_.call do
+    ::File.join TS_.dir_path, 'fixture-functions'
+  end
+
+  Fixture_file_ = -> tail do
     ::File.join TS_.dir_path, 'fixture-files', tail
   end
 

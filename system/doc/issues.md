@@ -1,3 +1,7 @@
+[#041]       track all the external guys that do a "manual" `popen3` (this
+             is perhaps preferred now)
+             [#041.2] - our central pipe-find-to-grep
+
 [#040]       operator branch via directory ..
        #open [#here.F]: clean this up after an incubation period
 

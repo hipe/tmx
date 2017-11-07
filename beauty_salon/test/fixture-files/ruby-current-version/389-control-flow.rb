@@ -118,4 +118,7 @@ end
 
 defined? x
 
+
+# (fixed_string11  this is for a test. it's supposed to be "eleven" not "one")
+
 # #born

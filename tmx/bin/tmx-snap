@@ -376,7 +376,7 @@ class TMX_snap
         NIL
       end
 
-      def _EEEGADS command_s_a
+      def _EEEGADS command_s_a  # this is a #[#sy-041] manual `popen3`
 
         # command_s_a.unshift 'echo'  # hackish way to get dry run
 

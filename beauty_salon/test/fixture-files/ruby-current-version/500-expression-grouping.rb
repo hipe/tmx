@@ -18,6 +18,8 @@ ensure
   thing_3
 end
 
+# fixed_string1
+
 begin
   thing_1
 rescue ::Xx => e
