@@ -106,7 +106,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class ReportAsActionInstance___
+    class ReportAsActionInstance___  # #testpoint
 
       def initialize rc
 
@@ -129,21 +129,22 @@ module Skylab::BeautySalon
         end
       end
 
-      def __initialize
+      def __initialize  # #testpoint
 
         idx = Home_::CrazyTownReportMagnetics_::Index_via_ReportClass.new @report_class
 
-        @add_these_formals = idx.add_these_formals or no
-        @does_need_listener = idx.does_need_listener
-        @does_need_named_listeners = idx.does_need_named_listeners
-        @has_file_things = idx.has_file_things
+        @_involves_path_upstream = idx.involves_path_upstream
+
+        @__add_these_formals = idx.add_these_formals or no
+        @__does_need_named_listeners = idx.does_need_named_listeners
+        @__does_need_listener = idx.does_need_listener
 
         @_user_resources = yield
         @_named_listeners = nil
         NIL
       end
 
-      def respond_to? m  # not necessary, just safeguard
+      def respond_to? m
         case m
         when :to_bound_call_of_operator ; false
         when :definition ; true
@@ -167,7 +168,7 @@ module Skylab::BeautySalon
       end
 
       def definition
-        _a = remove_instance_variable :@add_these_formals
+        _a = remove_instance_variable :@__add_these_formals
         [
           :properties, _a,
         ]
@@ -199,8 +200,14 @@ module Skylab::BeautySalon
       end
 
       def execute
-        if @has_file_things
-          if __file_things
+        if @_involves_path_upstream
+          if __has_fixed_string_macro
+            if __prepare_when_fixed_string_macro
+              if _resolve_file_path_upstream_resources_via_file_path_upstream
+                _money_town
+              end
+            end
+          elsif _resolve_file_path_upstream_resources
             _money_town
           end
         else
@@ -208,57 +215,104 @@ module Skylab::BeautySalon
         end
       end
 
+      # --
+
+      def __prepare_when_fixed_string_macro
+
+        Home_::CrazyTownReportMagnetics_::PrepareAction_via_MacroString.call_by do |o|
+
+          o.receive_file_path_process = method :__receive_file_path_process
+          o.writable_parameters_hash = @_params
+          o.macro_string = remove_instance_variable :@__macro_string
+          o.file_path_upstream_via_arguments = method :_file_path_upstream_via_arguments
+          o.user_resources = @_user_resources
+          o.listener = _listener_
+        end
+      end
+
+      def __receive_file_path_process pcs  # ..
+
+        p = -> do
+          s = pcs.gets_one_stdout_line
+          if s
+            s
+          else
+            pcs.was_OK  # hi. did
+            p = nil ; NOTHING_
+          end
+        end
+
+        @_file_path_upstream = Common_.stream do
+          p[]
+        end
+
+        NIL
+      end
+
+      def __has_fixed_string_macro
+        _store :@__macro_string, @_params.delete( :macro )
+      end
+
+      # --
+
       def _money_town
 
         h = remove_instance_variable :@_params
         h.delete :help  # ick/meh
 
-        _WOW = @report_class.call_by do |o|
+        @report_class.call_by do |o|
 
           h.each_pair do |k, x|
             o.send :"#{ k }=", x
           end
-          if @has_file_things
+
+          if @_involves_path_upstream
             o.file_path_upstream_resources = remove_instance_variable :@__file_path_upstream_resources
           end
-          if @does_need_named_listeners
+
+          if remove_instance_variable :@__does_need_named_listeners
             o.named_listeners = remove_instance_variable :@_named_listeners
           end
-          if @does_need_listener
+
+          if remove_instance_variable :@__does_need_listener
             o.listener = _listener
           end
         end
-        _WOW  # hi. #todo
       end
 
-      def __file_things
-        if __first_file_thing
-          __second_file_thing
+      def _resolve_file_path_upstream_resources
+        if __resolve_file_path_upstream
+          _resolve_file_path_upstream_resources_via_file_path_upstream
         end
       end
 
-      def __second_file_thing
+      def _resolve_file_path_upstream_resources_via_file_path_upstream
         _ = Home_::CrazyTownReportMagnetics_::DocumentNodeStream_via_FilePathStream.call_by do |o|
-          o.file_path_upstream = remove_instance_variable :@__file_path_upstream
+          o.file_path_upstream = remove_instance_variable :@_file_path_upstream
           o.filesystem = _filesystem
           o.listener = _listener
         end
         _store :@__file_path_upstream_resources, _
       end
 
-      def __first_file_thing
+      def __resolve_file_path_upstream
+        sct = _file_path_upstream_via_arguments
+        if sct
+          @_file_path_upstream = sct.file_path_upstream
+          @_named_listeners = sct.named_listeners
+          ACHIEVED_
+        end
+      end
+
+      def _file_path_upstream_via_arguments
         fd = @_fetch_delete
-        sct = Home_::CrazyTownReportMagnetics_::FilePathUpstream_via_Arguments.call_by do |o|
+        Home_::CrazyTownReportMagnetics_::FilePathUpstream_via_Arguments.call_by do |o|
+          yield o if block_given?
           o.batch_mode = fd[ :corpus_step ]
           o.files = fd[ :file ]
           o.files_file = fd[ :files_file ]
           o.filesystem = _filesystem
           o.listener = _listener
-        end
-        if sct
-          @__file_path_upstream = sct.file_path_upstream
-          @_named_listeners = sct.named_listeners
-          ACHIEVED_
         end
       end
 
@@ -382,6 +436,14 @@ module Skylab::BeautySalon
           y << 'from this point when you invoke traversal with this option'
           y << 'subsequently.'
         end,
+
+
+        :property, :macro,
+        :description, -> y do
+          y << 'the macro EXPERIMENT - for now experiment'
+        end,
+
+        # REMINDER: doo-hahs you add to the above may need to be added to #spot1.1
       ]
 
       _scn = Scanner_[ _defn_a ]
@@ -400,7 +462,8 @@ module Skylab::BeautySalon
           qkn.new_with_value x
         end
       else
-        ::Kernel._OKAY
+        $stderr.puts "NOT COVERED - letting this not provided thing slide thru normalization - #{ qkn.name_symbol }"
+        qkn
       end
     end
 

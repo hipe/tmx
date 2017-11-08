@@ -67,6 +67,14 @@ module Skylab::Zerk
 
         # ~
 
+        def procure_by
+          Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_OperatorBranch.call_by do |o|
+            o.item_lemma_symbol = nil  # hi. can be overridden next
+            yield o
+            o.operator_branch = self
+          end
+        end
+
         def lookup_softly key_x  # #[#ze-051.1] "trueish item value"
 
           ::Symbol === key_x || self._OK__but_just_checking__

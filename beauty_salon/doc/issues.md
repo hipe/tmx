@@ -107,6 +107,9 @@
 
 [#007]       ( intra-subsystem issues )
 
+             [#here.N] as long as the only entrypoint into whole-word
+             filtering is thru macros, #track it
+
       #small #open [#here.M] maybe one day unify association names
 
       #small #open [#here.L]: as commented. DigAndChangeTerminal etc may obivate old way

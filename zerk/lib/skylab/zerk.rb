@@ -208,6 +208,7 @@ module Skylab::Zerk  # intro in [#001] README
     ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
+    Brazen_NOUVEAU = Brazen
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
     Open_3 = stdlib[ :Open3 ]

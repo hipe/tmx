@@ -69,7 +69,10 @@ module Skylab::Zerk
 
             _primary = @primary_channel_symbol || :error
             head = [ _primary, :expression, :parse_error ]
-            head.push @terminal_channel_symbol  # ..
+            sym = @terminal_channel_symbol
+            if sym
+              head.push sym
+            end
             head
           end
 

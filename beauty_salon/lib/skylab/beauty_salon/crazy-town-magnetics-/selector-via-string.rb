@@ -166,12 +166,13 @@ module Skylab::BeautySalon
         @_tree.feature_symbol
       end
 
-      def _express_parse_error
-        @listener.call :error, :expression, :parse_error do |y|
-          yield y, self
+      def _express_parse_error & these_two_p
+        __express_error :parse_error do |y|
+          these_two_p[ y, self ]
         end
-        UNABLE_
       end
+
+      define_method :__express_error, DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_
 
       def __first_pass
 

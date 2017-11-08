@@ -144,6 +144,10 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    it %q(with macro, confirm that it doesn't let you also specify selector)
+
+    it %q(with macro, confirm that it doesn't let you also specify repl func)
+
     def _lines_of_parse_failure_by_call_subject_magnetic_by
 
       log = Common_.test_support::Expect_Emission::Log.for self

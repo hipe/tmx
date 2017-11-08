@@ -10,27 +10,6 @@ module Skylab::BeautySalon::TestSupport
     use :memoizer_methods
     use :my_reports
 
-    it 'API const loads' do
-      Home_::API || fail
-    end
-
-    it 'the "file paths" report (the equivalent of `ping`) - just echos the paths, no parse' do
-
-      same = %w( floofie flaffie )
-
-      # -
-        _st = _call_subject_magnetic_by do |o|
-
-          o.report_name = :echo_file_paths
-
-          o.argument_paths = same
-        end
-      # -
-
-      _actual = _st.to_a
-      _actual == same || fail
-    end
-
     context 'line numbers against one file (the one fixture codefile we have)' do  # #coverpoint2.11
 
       it 'the first line looks like a comment line, expresses the filename' do
@@ -155,15 +134,12 @@ module Skylab::BeautySalon::TestSupport
     def __line_numbers_line_stream_for_path path
 
       _call_subject_magnetic_by do |o|
-
-        o.report_name = :line_numbers
-
         o.argument_paths = [ path ]
       end
     end
 
     def _call_subject_magnetic_by & p
-      call_report_ p, NOTHING_  # see how it's used
+      call_report_ p, :line_numbers
     end
 
     # ==

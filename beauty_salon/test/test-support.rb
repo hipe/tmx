@@ -127,13 +127,8 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def expression_agent
-      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
+      Expression_agent_preferred_[]
     end
-
-    define_method :expression_agent_instance_for_legacy_API_, ( Lazy_.call do
-      Zerk_lib_[]::API::InterfaceExpressionAgent::
-          THE_LEGACY_CLASS.via_expression_agent_injection :_no_injection_from_BS_
-    end )
 
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
       NOTHING_
@@ -182,10 +177,10 @@ module Skylab::BeautySalon::TestSupport
 
       a, pp = Iambic_via_Definition___.call_by do |o|
         o.report_name = report_slug
-        o.listener = -> * chan, & em_p do
+        p[ o ]
+        o.listener ||= -> * chan, & em_p do  # :#here1
           self.DIE_ON_UNEXPECTED_EMISSION em_p, chan
         end
-        p[ o ]
       end
       Home_::API.invocation_via_argument_array( a, & pp ).execute
     end
@@ -220,6 +215,11 @@ module Skylab::BeautySalon::TestSupport
       super
     end
 
+    def macro_string= s
+      s || no
+      @_pairs.push [ :macro, s ]
+    end
+
     def replacement_function_string= s
       s || no
       @_pairs.push [ :replacement_function, s ]  # look
@@ -228,6 +228,11 @@ module Skylab::BeautySalon::TestSupport
     def code_selector_string= s
       s || no
       @_pairs.push [ :code_selector, s ]  # look
+    end
+
+    def files_file= s
+      s || no
+      @_pairs.push [ :files_file, s ] ; nil
     end
 
     def argument_paths= paths
@@ -239,6 +244,9 @@ module Skylab::BeautySalon::TestSupport
     attr_writer(
       :listener,
       :report_name,
+    )
+    attr_reader(
+      :listener,  # #here1
     )
 
     def execute
@@ -276,6 +284,22 @@ module Skylab::BeautySalon::TestSupport
   end
 
   # --
+
+  Stem_via_filesystem_path_ = -> path do
+    bn = ::File.basename path
+    d = ::File.extname( path ).length
+    d.zero? ? bn : bn[ 0 ... - d ]
+  end
+
+  Expression_agent_from_legacy_ = Lazy_.call do
+    _Zerk = Zerk_lib_[]
+    _Zerk::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.
+      via_expression_agent_injection :_no_injection_from_BS_
+  end
+
+  Expression_agent_preferred_ = -> do
+    ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
+  end
 
   Ruby_current_version_fixture_file_ = -> tail do
     ::File.join Ruby_current_version_dir_[], tail

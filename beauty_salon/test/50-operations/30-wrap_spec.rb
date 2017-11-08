@@ -115,7 +115,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def expression_agent  # override our own simpler default
-      expression_agent_instance_for_legacy_API_
+      Expression_agent_from_legacy_[]
     end
 
     def universal_fixture_ sym

@@ -101,11 +101,11 @@ module Skylab::BeautySalon
 
       def __do_resolve_grep_command
 
-        _grep = @_old_way.grep(
+        _grep = @_lib::Grep.with(
           # ! :fixed_string_pattern  # (we want whole word match so we can't use this one)
           :grep_extended_regexp_string, remove_instance_variable( :@__sanitized_name_pattern ),
           :freeform_options, ['--files-with-matches'],
-        )
+        ).finish
 
         _store :@__grep_command, _grep
       end
@@ -135,30 +135,16 @@ module Skylab::BeautySalon
 
       def __resolve_find_command
 
-        @_old_way = Home_.lib_.system
+        @_lib = Home_.lib_.system_lib
 
-        _find = @_old_way.find(
+        _find = @_lib::Find.with(
           :paths, remove_instance_variable( :@dirs ),
           :filename, remove_instance_variable( :@name_pattern ),
-          :when_command, -> mag do
-            mag  # IDENTITY_
-          end,
         )
         _store :@__find_command, _find
       end
 
-      def _express_error sym, & p
-        _use_p = if p.arity.zero?
-          -> y do
-            _msg = calculate( & p )
-            y << _msg
-          end
-        else
-          p
-        end
-        @listener.call :error, :expression, sym, & _use_p
-        UNABLE_
-      end
+      define_method :_express_error, DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     # -
@@ -167,4 +153,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.1: xx
 # #born.

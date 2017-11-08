@@ -15,11 +15,18 @@ module Skylab::Brazen
 
     # -
       def initialize
+
         @be_fuzzy = false
         @item_lemma_symbol = nil
         @primary_channel_symbol = nil
+        @terminal_channel_symbol = nil
         super
       end
+
+      def needle_symbol= sym
+        @needle_item = ThisOneWrapper___[ sym ] ; sym
+      end
+      ThisOneWrapper___ = ::Struct.new :normal_symbol
 
       def will_be_fuzzy
         @be_fuzzy = true
@@ -31,6 +38,7 @@ module Skylab::Brazen
         :needle_item,
         :operator_branch,
         :primary_channel_symbol,
+        :terminal_channel_symbol,
       )
 
       def execute
@@ -109,6 +117,7 @@ module Skylab::Brazen
           o.shape_symbol = :business_item
           o.terminal_channel_symbol = :business_item_not_found
           o.primary_channel_symbol = @primary_channel_symbol  # nil OK
+          o.terminal_channel_symbol = @terminal_channel_symbol  # nil OK
           o.listener = @listener
         end
         NIL

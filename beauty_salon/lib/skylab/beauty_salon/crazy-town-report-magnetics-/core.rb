@@ -30,11 +30,12 @@ module Skylab::BeautySalon
         freeze
       end
 
-      def __add_many_things_for_etc
-        @has_file_things = true
+      def __will_produce_file_path_upstream_resources
+        @involves_path_upstream = true
         _add_formal_parameter :file
         _add_formal_parameter :files_file
         _add_formal_parameter :corpus_step
+        _add_formal_parameter :macro
       end
 
       def __add_the_code_selector_formal_parameter
@@ -61,16 +62,17 @@ module Skylab::BeautySalon
         :add_these_formals,
         :does_need_listener,
         :does_need_named_listeners,
-        :has_file_things,
+        :involves_path_upstream,
       )
     end
 
     MAP_THING___ = {
       :code_selector= => :__add_the_code_selector_formal_parameter,
-      :file_path_upstream_resources= => :__add_many_things_for_etc,
+      :file_path_upstream_resources= => :__will_produce_file_path_upstream_resources,
       :listener= => :__thing_for_listener,
       :named_listeners= => :__thing_for_named_listeners,
       :replacement_function= => :__add_the_replacement_function_formal_parameter,
+      # :#spot1.1
     }
 
     # ==

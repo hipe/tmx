@@ -58,7 +58,7 @@ module Skylab::BeautySalon
       )
 
       def __flush_stream
-        # hand-written map-expand
+        # hand-written flat-map
         p = nil
         lo_mode_read = nil
         hi_mode_read = -> do
@@ -317,16 +317,7 @@ module Skylab::BeautySalon
 
       # --
 
-      def _express_error * chan_sym, & p
-        if p.arity.zero?
-          msg_proc = p
-          p = -> y do
-            y << calculate( & msg_proc )
-          end
-        end
-        @listener.call :error, :expression, * chan_sym, & p
-        UNABLE_
-      end
+      define_method :_express_error, DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 

@@ -146,16 +146,45 @@ module Skylab::BeautySalon
       :argument_scanner_narrator,
       :filesystem,
     )
+    def spawner
+      ::Kernel
+    end
+    def piper
+      ::IO
+    end
+    def process_waiter
+      ::Process
+    end
   end
 
   Require_user_interface_libs_ = Lazy_.call do
     MTk_ = Home_.lib_.zerk::MicroserviceToolkit
   end
 
-  DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_ = -> e do
-    @listener.call :error, :expression do |y|
-      y << e.message
+  DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_ = -> * chan_tail_sym_a, & p do
+
+    # (common shorthands used when expressing errors)
+
+    _use_p = case p.arity
+
+    when 0
+      -> y do
+        _msg = calculate( & p )
+        y << _msg
+      end
+
+    when 1
+      p
+
+    when 2
+      me = self
+      -> y do
+        calculate y, me, & p
+      end
+    else ; no
     end
+
+    @listener.call :error, :expression, * chan_tail_sym_a, & _use_p
     UNABLE_
   end
 

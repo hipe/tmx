@@ -32,7 +32,7 @@ module Skylab::BeautySalon::TestSupport
         )
 
         lines = nil
-        expect :error, :expression do |y|
+        expect :error, :expression, :argument_error do |y|
           lines = y
         end
         expect_result nil

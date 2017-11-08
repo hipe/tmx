@@ -92,9 +92,8 @@ module Skylab::BeautySalon::TestSupport
         path = pcs.gets_one_stdout_line
         path || break
 
-        bn = ::File.basename path
-        d = ::File.extname( path ).length
-        _stem = d.zero? ? bn : bn[ 0 ... - d ]
+        _stem = Stem_via_filesystem_path_[ path ]
+
         _dn = ::File.dirname path
         _bndn = ::File.basename _dn
 

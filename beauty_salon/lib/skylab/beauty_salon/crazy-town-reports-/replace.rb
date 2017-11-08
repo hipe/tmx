@@ -78,8 +78,6 @@ module Skylab::BeautySalon
 
       # -- A.
 
-      define_method :_exception, DEFINITION_FOR_THE_METHOD_CALLED_EXCEPTION_
-
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
     # -

@@ -178,7 +178,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def expression_agent
-      X_opdel_Expag[]
+      Expression_agent_from_legacy_[]
     end
 
     # ==
@@ -213,15 +213,6 @@ module Skylab::BeautySalon::TestSupport
         remove_instance_variable( :@array ).freeze
       end
     end
-
-    # ==
-
-    X_opdel_Expag = Lazy_.call do
-      _Zerk = Zerk_lib_[]
-      _Zerk::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.via_expression_agent_injection :_no_BS_
-    end
-
-    # ==
 
     def _subject_action
       :deliterate
