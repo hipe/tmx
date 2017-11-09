@@ -14,7 +14,19 @@ module Skylab::BeautySalon
   class CrazyTownMagnetics_::Selector_via_String::ParseTree_via_String < Common_::MagneticBySimpleModel
 
     # -
+
+      class << self
+        def manually_define_by_EXPERIMENTAL__
+          o = define do
+            NOTHING_
+          end
+          yield o
+          o._flush_tree
+        end
+      end  # >>
+
       def initialize
+        @__mutex_for_feature_symbol = nil
         yield self  # hi.
         @__mutex_for_etc = nil
       end
@@ -55,13 +67,13 @@ module Skylab::BeautySalon
         end
 
         case _ok
-        when true ; __flush_tree
+        when true ; _flush_tree
         when false ; __flush_express_error_messages  # assume some (risky!)
         else never
         end
       end
 
-      def __flush_tree
+      def _flush_tree
 
         _yes = remove_instance_variable :@_true_keyword_was_used
         if ! _yes
@@ -76,7 +88,12 @@ module Skylab::BeautySalon
       end
 
       def __on_callish_identifier s
-        @__callish_identifier_symbol = s.intern
+        self.feature_symbol = s.intern
+      end
+
+      def feature_symbol= sym
+        remove_instance_variable :@__mutex_for_feature_symbol
+        @__callish_identifier_symbol = sym
       end
 
       # --
@@ -91,12 +108,18 @@ module Skylab::BeautySalon
       end
 
       def __on_literal_string s
+        _sym = remove_instance_variable :@_test_identifier_symbol
+        add_test_for_equals_string s, _sym
+      end
+
+      def add_test_for_equals_string s, sym
 
         o = LiteralValueBooleanTest___.new
           o.literal_value = s
-          o.symbol_symbol = remove_instance_variable :@_test_identifier_symbol
+          o.symbol_symbol = sym
 
         _receive_boolean_test o.freeze
+        NIL
       end
 
       def __on_test_identifier s

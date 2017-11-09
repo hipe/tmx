@@ -13,6 +13,11 @@ module Skylab::BeautySalon
       # interface with the action to convert a macro string into the
       # necessary pieces implied by it ..
 
+      def takes_these yes2, yes1
+        @takes_replacement_function = yes2
+        @takes_code_selector = yes1 ; nil
+      end
+
       attr_writer(
         :receive_file_path_process,
         :writable_parameters_hash,
@@ -29,24 +34,33 @@ module Skylab::BeautySalon
         ok &&= __resolve_macro_dirs_when_macro_args
         ok &&= __resolve_unsanitized_before_string
         ok &&= __resolve_file_path_upstream_via_macro_dirs
-        ok &&= __finish_prepare_for_macro
+        ok &&= __maybe_resolve_code_selector
+        ok &&= __maybe_resolve_replacement_function
         ok
       end
 
-      def __finish_prepare_for_macro
-        if @_macro_args.finished_parsing_early
-          ACHIEVED_
+      def __maybe_resolve_replacement_function
+        if @takes_replacement_function
+          __do_resolve_replacement_function
         else
-          __cha_cha
+          ACHIEVED_
         end
       end
 
-      def __cha_cha
-        self._FOR_EXAMPLE
-        h = @writable_parameters_hash
-        h[ :code_selector ] = :Xxxx
-        h[ :replacement_function ] = :Yxxx
-        ACHIEVED_
+      def __maybe_resolve_code_selector
+        if @takes_code_selector
+          __do_resolve_code_selector
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __do_resolve_code_selector
+        cs = @_macro_args.curate_code_selector
+        if cs
+          @writable_parameters_hash[ :code_selector ] = cs
+          ACHIEVED_
+        end
       end
 
       def __resolve_file_path_upstream_via_macro_dirs
@@ -107,10 +121,22 @@ module Skylab::BeautySalon
           h[ k ]
         end
         if bads.length.nonzero?
-          self._COVER_ME__whine_about_conditionally_blacklisted_parameters_present__
+          __when_conditional_anti_requirements_present bads
         else
           ACHIEVED_
         end
+      end
+
+      def __when_conditional_anti_requirements_present bads
+        @listener.call :error, :expression, :argument_error do |y|
+          simple_inflection do
+            _ = oxford_join ::String.new, Scanner_[ bads ], ' or ' do |sym|
+              prim sym
+            end
+            y << "when you use a macro you cannot also pass #{ _ }"
+          end
+        end
+        UNABLE_
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -177,7 +203,24 @@ module Skylab::BeautySalon
       define_method :_express_error, DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_
     end
 
-    module Home_::MethodsForUserOfMacroParsingIdioms
+    Home_::ForMacros = ::Module.new
+
+    class Home_::ForMacros::CompoundCodeSelector_EXPERIMENTAL  # 1x
+
+      def initialize * sel_a
+        @__selectors = sel_a.freeze
+        freeze
+      end
+
+      def on_each_occurrence_in writable_hooks_plan, & receive_wrapped_sexp
+        @__selectors.each do |sel|
+          sel.on_each_occurrence_in writable_hooks_plan, & receive_wrapped_sexp
+        end
+        NIL
+      end
+    end
+
+    module Home_::ForMacros::MethodsForParsingIdioms
     private
 
       def init_macro_parsing_idioms p, scn
@@ -190,11 +233,6 @@ module Skylab::BeautySalon
 
       def curate_via_regex rx, sym
         @_idioms_.curate_via_regex rx, sym
-      end
-
-    public
-      def finished_parsing_early
-        @_idioms_.finished_parsing_early
       end
     end
 
@@ -261,10 +299,6 @@ module Skylab::BeautySalon
         end
 
         y << "expecting #{ _hum }#{ _mid }#{ _postfix_contextualization }"
-      end
-
-      def finished_parsing_early
-        @_scn.eos?
       end
 
       define_method :_error, DEFINITION_FOR_THE_METHOD_CALLED_EXPRESS_ERROR_

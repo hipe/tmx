@@ -139,6 +139,9 @@ module Skylab::BeautySalon
         @__does_need_named_listeners = idx.does_need_named_listeners
         @__does_need_listener = idx.does_need_listener
 
+        @_takes_code_selector = idx.takes_code_selector
+        @_takes_replacement_function = idx.takes_replacement_function
+
         @_user_resources = yield
         @_named_listeners = nil
         NIL
@@ -202,12 +205,13 @@ module Skylab::BeautySalon
       def execute
         if @_involves_path_upstream
           if __has_fixed_string_macro
-            if __prepare_when_fixed_string_macro
-              if _resolve_file_path_upstream_resources_via_file_path_upstream
-                _money_town
-              end
-            end
-          elsif _resolve_file_path_upstream_resources
+            ok = __prepare_when_fixed_string_macro
+            ok &&= _resolve_file_path_upstream_resources_via_file_path_upstream
+          else
+            ok = __require_these_two_things_late
+            ok &&= _resolve_file_path_upstream_resources
+          end
+          if ok
             _money_town
           end
         else
@@ -220,6 +224,11 @@ module Skylab::BeautySalon
       def __prepare_when_fixed_string_macro
 
         Home_::CrazyTownReportMagnetics_::PrepareAction_via_MacroString.call_by do |o|
+
+          o.takes_these(
+            remove_instance_variable( :@_takes_replacement_function ),
+            remove_instance_variable( :@_takes_code_selector ),
+          )
 
           o.receive_file_path_process = method :__receive_file_path_process
           o.writable_parameters_hash = @_params
@@ -251,6 +260,30 @@ module Skylab::BeautySalon
 
       def __has_fixed_string_macro
         _store :@__macro_string, @_params.delete( :macro )
+      end
+
+      # ~
+
+      def __require_these_two_things_late
+        miss = []
+        _require_this_thing miss, :@_takes_code_selector, :code_selector
+        _require_this_thing miss, :@_takes_replacement_function, :replacement_function
+        if miss.length.zero?
+          ACHIEVED_
+        else
+          _listener.call :error, :expression, :argument_error do |y|
+            y << "missing requiried #{ s 'parameter' } #{ _ }"
+          end
+          UNABLE_
+        end
+      end
+
+      def _require_this_thing miss, ivar, sym
+        if remove_instance_variable ivar
+          if ! @_params[ sym ]
+            miss << sym
+          end
+        end
       end
 
       # --
@@ -345,7 +378,6 @@ module Skylab::BeautySalon
 
       _defn_a = [
 
-        :required,
         :property, :code_selector,
         :description, -> y do
           y << "«description coming soon»"
@@ -364,7 +396,6 @@ module Skylab::BeautySalon
         end,
 
 
-        :required,
         :property,
         :replacement_function,
         :description, -> y do

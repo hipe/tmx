@@ -5,7 +5,7 @@ module Skylab::BeautySalon
   class CrazyTownMacros_::Method
     # -
 
-      include Home_::MethodsForUserOfMacroParsingIdioms
+      include Home_::ForMacros::MethodsForParsingIdioms
 
       def initialize listener, scn
         init_macro_parsing_idioms listener, scn
@@ -14,6 +14,30 @@ module Skylab::BeautySalon
       def _validate_
         self  # (we do all our parsing lazily)
       end
+
+      # --
+
+      def curate_code_selector
+
+        s = unsanitized_before_string
+        s || sanity
+
+        mod = Home_::CrazyTownMagnetics_::StructuredNode_via_Node
+
+        _sel_1 = mod.selector_via_define_EXPERIMENTAL do |o|
+          o.add_test_for_equals_string s, :method_name
+          o.feature_symbol = :send
+        end
+
+        _sel_2 = mod.selector_via_define_EXPERIMENTAL do |o|
+          o.add_test_for_equals_string s, :method_name
+          o.feature_symbol = :def
+        end
+
+        Home_::ForMacros::CompoundCodeSelector_EXPERIMENTAL.new _sel_1, _sel_2
+      end
+
+      # --
 
       def unsanitized_before_string
         send( @_UBS ||= :__UBS_initially )

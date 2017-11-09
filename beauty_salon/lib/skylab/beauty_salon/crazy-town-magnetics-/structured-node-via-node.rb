@@ -8,6 +8,16 @@ module Skylab::BeautySalon
     # NOTE - this should be tied to a ruby version range, but we ..
 
     class << self
+
+      def selector_via_define_EXPERIMENTAL
+
+        _fb = structured_nodes_as_feature_branch
+
+        Home_::CrazyTownMagnetics_::Selector_via_String.selector_via_define_via_EXPERIMENTAL__ _fb do |o|
+          yield o
+        end
+      end
+
       define_method :structured_nodes_as_feature_branch, ( Lazy_.call do
         CrazyTownMagnetics_::NodeProcessor_via_Module[ Here___ ]
       end )

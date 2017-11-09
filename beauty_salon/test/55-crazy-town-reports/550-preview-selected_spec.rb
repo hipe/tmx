@@ -98,6 +98,8 @@ module Skylab::BeautySalon::TestSupport
         # assert that at least one of the lines talks about more than one feature
         # assert that each line number is always greater than the previous line number
 
+        # NOTE - this was written before #here1, which might help clean this up
+
         middle_lines = _tuple[1]
 
         3 < middle_lines.length || fail
@@ -144,9 +146,112 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    it %q(with macro, confirm that it doesn't let you also specify selector)
+    it 'whine about how for this case we need the search string' do
 
-    it %q(with macro, confirm that it doesn't let you also specify repl func)
+      anticipate_ :error, :expression, :argument_error do |y|
+        y == ['expecting unsanitized before string at end of macro string'] || fail
+      end
+
+      _x = _call_subject_magnetic_by do |o|
+        o.argument_paths = [ Ruby_current_version_dir_[] ]
+        o.macro_string = 'method:'
+      end
+
+      _x.nil? || fail
+    end
+
+    it %q[with macro, confirm that it doesn't let you also specify selector (or repl f)] do
+
+      anticipate_ :error, :expression, :argument_error do |y|
+        y << "when you use a macro you cannot also pass 'code_selector'"
+      end
+
+      _x = _call_subject_magnetic_by do |o|
+        o.argument_paths = [ 'xx_dir' ]
+        o.macro_string = 'method:xx_meth'
+        o.code_selector_string = %q{send(method_name=='<<')}
+      end
+
+      _x.nil? || fail
+    end
+
+    context 'macro money' do
+
+      it 'out of three files, 2 were hits' do
+        _pages.length == 2 || fail
+      end
+
+      it 'number of features counts calls AND definitions NOT longer matches' do
+
+        _pages.first[ :features_count ] == 2 || fail
+      end
+
+      it 'one definition, 4 calls (3 of which are nested/recursive), one needle in comment' do
+
+        _pages.last[ :features_count ] == 5 || fail
+      end
+
+      it 'the multi-line part shows how many lines the match covers' do
+        _d_a_a = _pages.last[ :lines_series ]
+        d_a = _d_a_a.last
+        ( d_a.fetch( 1 ) - d_a[ 0 ] ) == 5 || fail
+      end
+
+      it 'the summary' do
+        _s = _pages.last.fetch :other
+        _s == "# (7 total match(es) in 2 file(s))" || fail
+      end
+
+      shared_subject :_pages do
+
+        _path = Fixture_tree_for_case_one_[]
+
+        _st = _call_subject_magnetic_by do |o|
+          o.argument_paths = [ _path ]
+          o.macro_string = 'method:ravi_bhalla'
+        end
+        __build_this_one_index _st
+      end
+    end
+
+    def __build_this_one_index st  # :#here1
+
+      #  [
+      #    { features_count: 3,
+      #      lines_series: [ [1], [3,5], [7] ],
+      #      other: "ttoal: xx",
+      #    },
+      #    ..
+      #  ]
+
+      pages = []
+      page_rx = /\Afile: [[:print:]]/
+
+      begin
+        line = st.gets
+        line || break
+        if page_rx =~ line
+          pages.push( features_count: 0, lines_series:[] )
+          redo
+        end
+        stats = pages.last
+        md = /\A(\d+) features? +on lines? +(\d+)(?:-(\d+))?: +[[:print:]]/.match line
+        if md
+          stats[ :features_count ] += md[1].to_i
+          range = [ md[2].to_i ]
+          s = md[3]
+          if s
+            range.push s.to_i
+          end
+          stats[ :lines_series ].push range
+          redo
+        end
+        stats[ :other ] && fail
+        stats[ :other ] = line
+        redo  # but actually probably you are done
+      end while above
+      pages
+    end
 
     def _lines_of_parse_failure_by_call_subject_magnetic_by
 

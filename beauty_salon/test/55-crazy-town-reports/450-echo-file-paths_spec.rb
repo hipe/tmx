@@ -19,7 +19,7 @@ module Skylab::BeautySalon::TestSupport
       same = %w( floofie flaffie )
 
       # -
-        _anticipate_no_emissions
+        anticipate_no_emissions_
         _st = _call do |o|
           o.argument_paths = same
         end
@@ -66,7 +66,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'if you pass multiple ways, it whines' do
 
-      _anticipate :error, :expression, :argument_error do |y|
+      anticipate_ :error, :expression, :argument_error do |y|
         y == [%q(can't have both --files-file and <files>)] || fail  # ..
       end
 
@@ -80,7 +80,7 @@ module Skylab::BeautySalon::TestSupport
 
     it %q(if you don't pass the one kind of parameter corresponding to macro, whines) do
 
-      _anticipate :error, :expression, :argument_error do |y|
+      anticipate_ :error, :expression, :argument_error do |y|
         y == [%q(when you employ 'macro', you must employ 'files', not 'files_file')] || fail
       end
 
@@ -94,7 +94,7 @@ module Skylab::BeautySalon::TestSupport
 
     it %q(if you don't pass any, whines) do
 
-      _anticipate :error, :expression, :argument_error do |y|
+      anticipate_ :error, :expression, :argument_error do |y|
         y == ["must have one of --files-file, <files> or --corpus-step"] || fail  # ..
       end
 
@@ -109,7 +109,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'you need to pass a delimiter' do
 
-      _anticipate :error, :expression, :argument_error do |y|
+      anticipate_ :error, :expression, :argument_error do |y|
         y == ['expecting delimiter ":" or "/" at end of macro string'] || fail
       end
 
@@ -123,7 +123,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'you need to pass a search term' do
 
-      _anticipate :error, :expression, :argument_error do |y|
+      anticipate_ :error, :expression, :argument_error do |y|
         y == ['expecting unsanitized before string near ":"'] || fail
       end
 
@@ -137,7 +137,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'MONEY' do
 
-      _anticipate_no_emissions
+      anticipate_no_emissions_
 
       _st = _call do |o|
         o.macro_string = 'method:fixed_string1'
@@ -173,7 +173,7 @@ module Skylab::BeautySalon::TestSupport
     def _expect_failure_tuple_by_call * chan
 
       msgs = nil
-      _anticipate :error, :expression, * chan do |y|
+      anticipate_ :error, :expression, * chan do |y|
         msgs = y
       end
 
@@ -184,49 +184,12 @@ module Skylab::BeautySalon::TestSupport
       [ _x, msgs ]
     end
 
-    def _anticipate * chan, & msg
-
-      spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
-      spy.expect_emission msg, chan
-      @EMISSION_SPY = spy ; nil
-    end
-
-    def _anticipate_no_emissions
-      @EMISSION_SPY = nil
-    end
-
-    def _call
-
-      spy = remove_instance_variable :@EMISSION_SPY
-      if spy
-        _use_listener = spy.listener
-      end
-
-      _use_p = -> o do
-        yield o
-        o.listener = _use_listener
-      end
-
-      same = -> do
-        call_report_ _use_p, :echo_file_paths
-      end
-
-      if spy
-        spy.call_by do
-          same[]
-        end
-        spy.execute_under self
-      else
-        same[]
-      end
+    def _call & p
+      call_report_ p, :echo_file_paths
     end
 
     def expression_agent
       Expression_agent_preferred_[]
-    end
-
-    def ignore_emissions_whose_terminal_channel_is_in_this_hash
-      NOTHING_
     end
 
     # ==

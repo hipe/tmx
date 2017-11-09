@@ -39,10 +39,12 @@ module Skylab::BeautySalon
       end
 
       def __add_the_code_selector_formal_parameter
+        @takes_code_selector = true
         _add_formal_parameter :code_selector
       end
 
       def __add_the_replacement_function_formal_parameter
+        @takes_replacement_function = true
         _add_formal_parameter :replacement_function
       end
 
@@ -63,6 +65,8 @@ module Skylab::BeautySalon
         :does_need_listener,
         :does_need_named_listeners,
         :involves_path_upstream,
+        :takes_code_selector,
+        :takes_replacement_function,
       )
     end
 

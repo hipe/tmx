@@ -87,6 +87,10 @@ module Skylab::BeautySalon::TestSupport
       Home_::CrazyTownMagnetics_
     end
 
+    def ignore_emissions_whose_terminal_channel_is_in_this_hash
+      NOTHING_
+    end
+
     # -- retrofit
 
     def expect_not_OK_event_ sym
@@ -174,6 +178,29 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def call_report_ p, report_slug
+      if instance_variable_defined? :@EMISSION_SPY
+        spy = remove_instance_variable :@EMISSION_SPY
+      end
+      if spy
+        __call_report_with_expectations_MR spy, p, report_slug
+      else
+        _call_report_coldly_MR p, report_slug
+      end
+    end
+
+    def __call_report_with_expectations_MR spy, p, report_slug
+
+      spy.call_by do
+        _use_p = -> o do
+          p[ o ]
+          o.listener = spy.listener
+        end
+        _call_report_coldly_MR _use_p, report_slug
+      end
+      spy.execute_under self
+    end
+
+    def _call_report_coldly_MR p, report_slug
 
       a, pp = Iambic_via_Definition___.call_by do |o|
         o.report_name = report_slug
@@ -183,6 +210,17 @@ module Skylab::BeautySalon::TestSupport
         end
       end
       Home_::API.invocation_via_argument_array( a, & pp ).execute
+    end
+
+    def anticipate_ * chan, & msg
+      _spy = ( @EMISSION_SPY ||= begin
+        Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      end )
+      _spy.expect_emission msg, chan ; nil
+    end
+
+    def anticipate_no_emissions_
+      @EMISSION_SPY = nil
     end
 
     def DIE_ON_UNEXPECTED_EMISSION em_p, chan
@@ -315,6 +353,10 @@ module Skylab::BeautySalon::TestSupport
 
   Fixture_function_dir_ = Lazy_.call do
     ::File.join TS_.dir_path, 'fixture-functions'
+  end
+
+  Fixture_tree_for_case_one_ = Lazy_.call do
+    Fixture_file_[ 'tree-010-yadda' ]
   end
 
   Fixture_file_ = -> tail do

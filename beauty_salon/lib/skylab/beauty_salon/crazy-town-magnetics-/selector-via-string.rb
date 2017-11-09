@@ -4,6 +4,25 @@ module Skylab::BeautySalon
 
   class CrazyTownMagnetics_::Selector_via_String < Common_::MagneticBySimpleModel
 
+    class << self
+
+      def selector_via_define_via_EXPERIMENTAL__ fb
+
+        _tree = Here_::ParseTree_via_String.manually_define_by_EXPERIMENTAL__ do |o|
+          yield o
+        end
+
+        _me = define do |o|
+          o._tree = _tree
+          o.grammar_symbols_feature_branch = fb
+          o.listener = -> * { fail }
+        end
+
+        _x = _me._second_pass
+        _x  # hi.
+      end
+    end  # >>
+
     # ==
 
     class Selector___
@@ -51,11 +70,11 @@ module Skylab::BeautySalon
 
       def execute
         if __first_pass
-          __second_pass
+          _second_pass
         end
       end
 
-      def __second_pass
+      def _second_pass
         if __names_are_valid
           t = remove_instance_variable :@_tree
           Selector___.new(
@@ -183,6 +202,8 @@ module Skylab::BeautySalon
         _store :@_tree, _
       end
 
+      attr_writer :_tree  # EXPERIMENT
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
     # -
@@ -207,7 +228,7 @@ module Skylab::BeautySalon
       # create it IFF the node matches the selector body (the boolean tests).
       #
       # to implement this we have to access the components of the document
-      # AST nodes using those components offsets before we can wrap them
+      # AST nodes using those components' offsets before we can wrap them
       # in the structured node class (which abstracts away the use of the offsets).
 
       attr_writer(

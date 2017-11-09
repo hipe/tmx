@@ -111,7 +111,7 @@ module Skylab::BeautySalon
       end
 
       def __when_feature_cobegins_block feat
-        @_blocks.last.__receive_feature_ feat
+        @_blocks.last.push_feature feat
       end
 
       def __when_feature_in_or_after_block feat
@@ -122,7 +122,7 @@ module Skylab::BeautySalon
         case end_lineno_block <=> begin_lineno_feat
         when -1 ; __when_feature_begins_after_block_ends feat
         when  0 ; __add_feature_into_block__COVER_ME feat
-        when  1 ; interesting
+        when  1 ; __when_feature_begins_BEFORE_block_ends feat
         else    ; never
         end
       end
@@ -130,11 +130,25 @@ module Skylab::BeautySalon
       def __when_feature_begins_after_block_ends feat
 
         if @_blocks.last.end_lineno + 1 == feat.begin_lineno
-          __append_feature_which_will_begin_next_line_in_block__COVER_ME feat
+          __append_feature_which_will_begin_next_line_in_block feat
         else
           @_blocks.push LineBlock__.new feat
           DID_ADD_FEATURE_
         end
+      end
+
+      def __when_feature_begins_BEFORE_block_ends feat
+        # (whatever)
+        _same feat
+      end
+
+      def __append_feature_which_will_begin_next_line_in_block feat
+        _same feat
+      end
+
+      def _same feat
+        @_blocks.last.push_feature feat
+        DID_ADD_FEATURE_
       end
 
       DID_ADD_FEATURE_ = nil
@@ -166,7 +180,7 @@ module Skylab::BeautySalon
         @features = [ feat ]
       end
 
-      def __receive_feature_ feat
+      def push_feature feat
         @features.push feat
       end
 
