@@ -107,6 +107,9 @@
 
 [#007]       ( intra-subsystem issues )
 
+      #small #open [#here.O] when you're really close to the end, rename
+             "callish identifier" as something like "grammar symbol name"
+
              [#here.N] as long as the only entrypoint into whole-word
              filtering is thru macros, #track it
 

@@ -55,6 +55,14 @@ module Skylab::BeautySalon
         end
       end
 
+      def __do_resolve_replacement_function
+        rf = @_macro_args.curate_replacement_function
+        if rf
+          @writable_parameters_hash[ :replacement_function ] = rf
+          ACHIEVED_
+        end
+      end
+
       def __do_resolve_code_selector
         cs = @_macro_args.curate_code_selector
         if cs
@@ -205,6 +213,18 @@ module Skylab::BeautySalon
 
     Home_::ForMacros = ::Module.new
 
+    class Home_::ForMacros::HandMadeReplacementFunction_EXPERIMENTAL
+
+      def initialize & p
+        @user_function = p
+        freeze
+      end
+
+      attr_reader(
+        :user_function,
+      )
+    end
+
     class Home_::ForMacros::CompoundCodeSelector_EXPERIMENTAL  # 1x
 
       def initialize * sel_a
@@ -220,40 +240,35 @@ module Skylab::BeautySalon
       end
     end
 
-    module Home_::ForMacros::MethodsForParsingIdioms
-    private
-
-      def init_macro_parsing_idioms p, scn
-        @_idioms_ = MacroParsingIdioms___.new p, scn ; nil
-      end
-
-      def curate_one_of_these * s_a, sym
-        @_idioms_.curate_one_of s_a, sym
-      end
-
-      def curate_via_regex rx, sym
-        @_idioms_.curate_via_regex rx, sym
-      end
-    end
-
-    class MacroParsingIdioms___
+    class Home_::ForMacros::ParsingIdioms
 
       def initialize p, scn
         @_scn = scn
         @listener = p
       end
 
-      def curate_one_of s_a, sym
+      def curate_fixed_string s, sym
+        len = s.length
+        act = @_scn.peek len
+        if act and s == act
+          @_scn.pos += len
+          ACHIEVED_
+        else
+          _fail_one_of_these [ s ], sym
+        end
+      end
+
+      def curate_one_of_these * s_a, sym
         s = @_scn.peek 1
         if s and s_a.include? s
           @_scn.pos += 1
           s.freeze
         else
-          __fail_one_of_these s_a, sym
+          _fail_one_of_these s_a, sym
         end
       end
 
-      def __fail_one_of_these s_a, sym
+      def _fail_one_of_these s_a, sym
 
         _error :argument_error do |y, me|
 
@@ -267,13 +282,13 @@ module Skylab::BeautySalon
         end
       end
 
-      def curate_via_regex rx, ivar
+      def curate_via_regex rx, sym
         s = @_scn.scan rx
         if s
           s.freeze
         else
           _error :argument_error do |y, me|
-            me._express_expecting_into_under y, ivar, self
+            me._express_expecting_into_under y, sym, self
           end
         end
       end

@@ -78,6 +78,72 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    it 'we need the one more term here' do
+
+      anticipate_ :error, :expression, :argument_error do |y|
+        y == ['expecting delimiter ":" at end of macro string'] || fail
+      end
+
+      _path = Fixture_tree_for_case_one_[]
+
+      _x = _call_subject_magnetic_by do |o|
+        o.argument_paths = [ _path ]
+        o.macro_string = 'method:ravi_bhalla'
+      end
+
+      _x.nil? || fail
+    end
+
+    it 'MONEY MAYBE' do  # #coverpoint4.2
+
+      _path = Fixture_tree_for_case_one_[]
+
+      st = _call_subject_magnetic_by do |o|
+        o.argument_paths = [ _path ]
+        o.macro_string = 'method:danica_roem:DANICA_ROEM_123'
+      end
+
+      __expect_these_lines_in_array_CUSTOM st do |o|
+        o.call 'diff'
+        o.call '---'
+        o.call '+++'
+        o.call '@@ '
+        o.call 3, nil
+        o.call '-  '
+        o.call '+  '
+      end
+
+      count = 0
+      count += 1 while st.gets  # exhaust any open resources
+      42 == count || fail  # ..
+    end
+
+    def __expect_these_lines_in_array_CUSTOM st
+
+      yield -> d=1, s do
+        if s
+          go = -> line  do
+            _act = line[ 0, s.length ]
+            if s != _act
+              fail
+            end
+          end
+        else
+          go = -> line do
+            if /\A[ ]+/ !~ line
+              fail
+            end
+          end
+        end
+
+        d.times do
+          line = st.gets
+          line || fail
+          go[ line ]
+        end
+      end
+    end
+
     # -
 
     def _call_subject_magnetic_by & p

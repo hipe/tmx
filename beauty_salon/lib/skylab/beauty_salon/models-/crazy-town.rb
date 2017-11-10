@@ -493,8 +493,7 @@ module Skylab::BeautySalon
           qkn.new_with_value x
         end
       else
-        $stderr.puts "NOT COVERED - letting this not provided thing slide thru normalization - #{ qkn.name_symbol }"
-        qkn
+        qkn  # #coverpoint4.2
       end
     end
 

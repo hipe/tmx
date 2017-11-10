@@ -321,9 +321,10 @@ module Skylab::BeautySalon
           case @_method_name_symbol
           when :[] ; __send_when_brackets_simple
           when :[]= ; __send_when_brackets_with_assign
-          when :== ; __send_when_operator_infixed
+          when :== ; _send_when_operator_infixed
+          when :+, :-, :*, :/ ; _send_when_operator_infixed
           else ;
-            self._COVER__WEE__
+            self._COVER__theres_an_operator_like_method_name_we_havent_covered_yet__
           end
         end
       end
@@ -350,7 +351,7 @@ module Skylab::BeautySalon
         _send_end
       end
 
-      def __send_when_operator_infixed  # #coverpoint3.6
+      def _send_when_operator_infixed  # #coverpoint3.6
 
         _rhs, = _send_assert_arg_number 1
         _send_assert_selector_not_operator
