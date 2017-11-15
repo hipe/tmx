@@ -29,7 +29,7 @@ module Skylab::BeautySalon
           [ :range, :keyword ],
           [ :custom_method, :__alternation_operator_or_name ],
           [ :range, :operator ],
-          [ :both,  :range, :name, :assoc, :method_name_symbol_terminal ],
+          [ :both,  :range, :name, :assoc, :method_name ],
           [ :assoc, :args ],
           [ :assoc, :any_body_expression ],
           [ :range, :end ],
@@ -51,7 +51,7 @@ module Skylab::BeautySalon
           [ :assoc, :any_receiver_expression ],
           [ :custom_method, :__if_bracketed_method_name_then_etc ],
           [ :range, :dot ],
-          [ :both, :range, :selector, :assoc, :method_name_symbol_terminal ],
+          [ :both, :range, :selector, :assoc, :method_name ],
           # [ :range, :operator ],
           [ :range, :begin ],  # '('
           [ :assoc, :zero_or_more_arg_expressions ],
@@ -108,7 +108,7 @@ module Skylab::BeautySalon
         these: [
           [ :assoc, :any_parent_const_expression ],
           [ :range, :double_colon ],
-          [ :both, :range, :name, :assoc, :symbol_symbol_terminal ],
+          [ :both, :range, :name, :assoc, :symbol ],
           [ :custom_method, :__if_operator_cover_me ],
           # [ :range, :operator ],
         ],
@@ -137,7 +137,7 @@ module Skylab::BeautySalon
       },
       map: {
         these: [
-          [ :custom_method, :__for_map_expect_singleton ],
+          [ :custom_method, :__for_map_expect_singleton_USUALLY ],
         ],
       },
     }
@@ -169,7 +169,6 @@ module Skylab::BeautySalon
         @location = loc
 
         cls = sn.class
-        @_my_association_index = ASC_INDEX_VIA_CLASS___[ cls ]
         @_association_index = cls.association_index
 
         @structured_node = sn
@@ -182,6 +181,8 @@ module Skylab::BeautySalon
         r = @structured_node._node_location_.expression
         _be_at_offset r.begin_pos
         @source_buffer_string = r.source_buffer.source
+          # (the implicit assumption being that the whole tree is in one file)
+        @parent_node_type = nil
         NIL
       end
 
@@ -189,6 +190,7 @@ module Skylab::BeautySalon
         :byte_downstream,
         :current_pending_start_offset_to_flush,
         :source_buffer_string,
+        :parent_node_type,
       )
 
       #
@@ -199,8 +201,7 @@ module Skylab::BeautySalon
 
         @_current_state_symbol = :start
 
-        @_semantic_column_scanner = Common_::Scanner.via_array(
-          @_loc_map_index.semantic_columns )
+        @_semantic_column_scanner = Scanner_[ @_loc_map_index.semantic_columns ]
 
         begin
           col = _gets_one_semantic_column
@@ -432,7 +433,7 @@ module Skylab::BeautySalon
         end
       end
 
-      # -- Variable (opeartor above, Map below)
+      # -- Variable (operator above, Map below)
 
       def __for_variable_prepare_customly
 
@@ -450,7 +451,7 @@ module Skylab::BeautySalon
         else ; never
         end
 
-        name_asc_sym = name_asc.association_symbol
+        name_asc_sym = name_asc.use_symbol_
 
         # ~(
         exp_sym, exp_sym_ = FOR_VARIABLES_SANITY___.fetch _node_type
@@ -472,11 +473,11 @@ module Skylab::BeautySalon
 
         common_rhs = :default_value_expression
         zero_or_one = :zero_or_one_right_hand_side_expression
-        common = :as_symbol_symbol_terminal
-        short_one = :symbol_terminal
+        common = :as_symbol
+        short_one = :symbol
         {
-          ivasgn: [ :ivar_as_symbol_symbol_terminal, zero_or_one ],
-          lvasgn: [ :lvar_as_symbol_symbol_terminal, zero_or_one ],
+          ivasgn: [ :ivar_as_symbol, zero_or_one ],
+          lvasgn: [ :lvar_as_symbol, zero_or_one ],
           # --
           kwoptarg: [ common, common_rhs ],
           optarg: [ common, common_rhs ],
@@ -484,7 +485,7 @@ module Skylab::BeautySalon
           arg: common,
           blockarg: common,
           procarg0: common,  # #coverpoint3.9
-          restarg: :zero_or_one_symbol_terminal,
+          restarg: :symbol,
           # --
           ivar: short_one,
           lvar: short_one,
@@ -514,13 +515,14 @@ module Skylab::BeautySalon
       def __for_collection
         if __has_one_child_association
           if __child_association_is_truly_plural
-            __collection_when_plural
+            _collection_when_plural
           else
             __collection_when_terminal
           end
         else
           case _node_type
           when :block ; __collection_when_block
+          when :regexp ; __collection_when_regexp
           else ; cover_me
           end
         end
@@ -547,15 +549,31 @@ module Skylab::BeautySalon
         _write_static_string_to_here @location.end.end_pos
       end
 
-      def __collection_when_plural
+      def __collection_when_regexp  # begins #coverpoint4.4
+
+        @_child_association = @_association_index.dereference :zero_or_more_expressions
+
+        _collection_when_plural
+
+        remove_instance_variable :@_child_association
+
+        @_current_association = @_association_index.dereference :regexopt
+
+        # (even when there's no regexp opts theres a component and
+        #  a location map pointing to a zero-width range so meh..)
+
+        _common_transition_to_assoc
+      end
+
+      def _collection_when_plural
 
         beg_r = @location.begin
         if beg_r
-          has_begin = true
+          has_begin = true  # e.g '%w('
         end
         end_r = @location.end
         if end_r
-          has_end = true
+          has_end = true  # e.g ')'
         end
 
         exp_m, exp = FOR_COLLECTION_FOR_PLURALS___.fetch _node_type
@@ -602,28 +620,44 @@ module Skylab::BeautySalon
           args: [ :zero_or_more_argfellows, :it_varies ],  #  the '|' uses as doo-hahs
           array: [ common, :yep ],
           begin: [ common, :it_varies ],
-          dstr: [ :one_or_more_dynamic_expressions, :yep ],
+          dstr: [ :zero_or_more_dynamic_expressions, :yep ],
           mlhs: [ :one_or_more_assignableformlhss, :yep ],
+          regexp: [ :zero_or_more_expressions, :yep ],
         }.freeze
       end.call
 
-      def __collection_when_terminal  # (if this gives you trouble, use #here2)
+      def __collection_when_terminal
+
+        # (this string handling is dis-unified with #[#007.Q]
 
         _m, _sub_asc_sym = FOR_COLLECTION_FOR_TERMINALS___.fetch _node_type
 
-        @_child_association.association_symbol == _sub_asc_sym || sanity
+        @_child_association.use_symbol_ == _sub_asc_sym || sanity
 
         _x = @structured_node.send @_child_association.stem_symbol
+
+        # #coverpoint4.3 - in some lists you gotta write the static spaces between
+        _write_static_string_to_here @location.expression.begin_pos
 
         send _m, _x
       end
 
       FOR_COLLECTION_FOR_TERMINALS___ = {
-        sym: [ :__when_sym, :as_symbol_symbol_terminal ],
-        str: [ :__when_str, :as_string_string_terminal ],
+        sym: [ :__when_sym, :as_symbol ],
+        str: [ :__when_str, :as_string ],
       }
 
       def __when_str s
+
+        # this is kinda nasty:
+        #
+        #   - for one thing, `begin` and `end` should be a package deal:
+        #     assert that either both are present or neither are present.
+        #
+        #   - when both present, hackishly assume it's one of the two kinds
+        #     of strings and proceed to there.
+        #
+        #   - otherwise, enter my dark chamber.
 
         beg_r = @location.begin
         end_r = @location.end
@@ -632,39 +666,116 @@ module Skylab::BeautySalon
 
         if beg_r
           end_r || fail
-          _write_static_string_to_here beg_r.end_pos
-          _with_sanity_and s, end_r.begin_pos
-          _write_static_string_to_here end_r.end_pos  # #coverpoint3.5
+          __with_optimistic_escaping_hack_write_string s, beg_r.end_pos, end_r
         else
           end_r && fail
-          # this happens ..
-          _with_sanity s
+          case @parent_node_type
+          when :regexp
+            __with_optimistic_escaping_hack_write_regex s
+          when :dstr
+            # nothing special - it will barf if we're wrong [st]
+            _write_literal_string_fallibly s, _expression_end_pos
+          when :array  # #coverpoint4.3 (again?)
+            _write_literal_string_fallibly s, _expression_end_pos
+          else
+            byebug
+            self._COVER_ME__whole_for_kind_of_str_that_might_need_escaping__
+          end
         end
       end
 
+      def __with_optimistic_escaping_hack_write_regex s
+
+        open_s = @source_buffer_string[ @current_pending_start_offset_to_flush - 1, 1 ]
+        case open_s
+        when FORWARD_SLASH_
+          use_s = s.gsub FORWARD_SLASH_, '\\/'
+        when '('  # OPEN_PARENTHESIS_  # meh
+          use_s = s  # meh
+        when '}'  # #coverpoint4.8
+          use_s = s  # NOT OK
+        when '{'
+          use_s = s  # NOT OK - snag/test/64-cli/85-to-do_spec.rb:17
+        else
+          self._COVER_ME__as_yet_unencountered_string_delimiter__
+        end
+
+        _write_literal_string_fallibly use_s, _expression_end_pos
+      end
+
+      FORWARD_SLASH_ = '/'
+
+      def __with_optimistic_escaping_hack_write_string s, end_d, end_r  # beg_d = begin range end pos
+
+        # the vendor library (reasonably) hands us a real-life string that
+        # looks like the literal string begin represented. imagine this in
+        # the case of a single-quoted literal string `'ed\'s id'`:
+        #
+        #   - the string this literal expression represents ("ed's id") is
+        #     (um) 7 characters wide.
+        #
+        #   - the representation of this literal expression in the source
+        #     (file) (not counting the bounding single quotes) is *8*
+        #     characters wide. (the backslash takes up a character).
+        #
+        #   - so how many characters are in the string in the parse tree?
+        #
+        # the answer is 7 - so the string that the vendor lib hands us is
+        # like the real string being expressed, not the way it happens to
+        # be represented in the source file.
+
+        # this seems appropriate - but now to go backwards we have to yadda.
+        # this might not always be easy or possible..
+
+        # ~(  started from _write_static_string_to_here
+        beg_d = @current_pending_start_offset_to_flush
+        dist_d = end_d - beg_d
+        1 == dist_d || 2 == dist_d || see_me ; dist_d = nil
+        quot = @source_buffer_string[ beg_d ... end_d ]
+        @byte_downstream << quot
+        _be_at_offset end_d
+        # ~)
+
+        replace_with_s = VERY_ROUGH_INCOMPLETE___.fetch quot
+        if replace_with_s
+          use_s = s.gsub( quot ) { replace_with_s }  # (backslash has magic meaning in repl expr
+        else
+          use_s = s
+        end
+
+        _write_literal_string_fallibly use_s, end_r.begin_pos
+
+        _write_static_string_to_here end_r.end_pos  # #coverpoint3.5
+      end
+
+      VERY_ROUGH_INCOMPLETE___ = {
+        # (This is done correctly elsewhere.)
+        "'" => "\\'",  # SINGLE_QUOTE_  #coverpoint4.6
+        '"' => '\\"',  # DOUBLE_QUOTE_  #coverpoint4.5
+        '%(' => nil,  # #coverpoint4.7
+      }
       def __when_sym sym
         @location.end && no
         _write_static_string_to_here @location.begin.end_pos  # '[ :', eg
-        _with_sanity sym.id2name
+        _write_literal_string_fallibly sym.id2name, _expression_end_pos
       end
 
-      def _with_sanity new_s
-
-        _with_sanity_and new_s, @location.expression.end_pos
-      end
-
-      def _with_sanity_and new_s, end_d
+      def _write_literal_string_fallibly new_s, end_d
 
         current_s = @source_buffer_string[ _cursor ... end_d ]
 
         if current_s != new_s
-          self._COVER_ME__escaping_is_a_thing__
+          self._COVER_ME__better_escaping_logic_might_be_necessary__
         end
 
         @byte_downstream << new_s
 
         _be_at_offset end_d
         _be_in_state :both  # equivalent
+      end
+
+      def _expression_end_pos
+        @location.expression.end_pos
       end
 
       def __child_association_is_truly_plural
@@ -782,11 +893,32 @@ module Skylab::BeautySalon
 
       # -- Map (the base class)
 
+      def __for_map_expect_singleton_USUALLY
+        case _node_type
+        when :regopt
+          __when_regopt
+        else
+          @_association_index.length.zero? || oops
+          __for_map_expect_singleton
+        end
+      end
+
+      def __when_regopt
+        # (these get a (completely unstructured) "map" location map, so we
+        # do them all "by hand") #coverpoint4.4
+        sym_a = @structured_node.zero_or_more_symbol_terminals
+        sym_a.each do |sym|
+          ::Symbol === sym || oops
+          @byte_downstream << sym.id2name
+        end
+        _be_at_offset @location.expression.end_pos
+        _be_in_state :did_custom
+      end
+
       def __for_map_expect_singleton
 
         # (like `nil`, etc)
 
-        @_my_association_index.length.zero? || oops
         _write_static_string_to_here @location.expression.end_pos
         _be_in_state :did_custom
       end
@@ -816,6 +948,7 @@ module Skylab::BeautySalon
           o.current_pending_start_offset_to_flush = @current_pending_start_offset_to_flush
           o.byte_downstream = @byte_downstream
           o.source_buffer_string = @source_buffer_string
+          o.parent_node_type = _node_type
         end
 
         _be_at_offset _d
@@ -855,8 +988,7 @@ module Skylab::BeautySalon
           else
             remove_instance_variable :@__name_association_symbol
           end
-          _d = @_my_association_index.fetch _use_sym
-          asc = @_association_index.associations.fetch _d
+          asc = @_association_index.dereference _use_sym
         end
 
         if asc
@@ -975,11 +1107,6 @@ module Skylab::BeautySalon
       #
 
       def _common_transition_to_both
-
-        # flush the static string up to the beginning of the current range
-        # (of this column). write the terminal value (TODO). make a note of
-        # the range (that points to the original string).
-
         __flush_to_BEGINNING_of_current_range
         _effect_both
       end
@@ -1020,7 +1147,7 @@ module Skylab::BeautySalon
       end
 
       #
-      # Write terminals :#here2
+      # Write terminals #refactor-me (not DRY) #[#007.Q]
       #
 
       def __write_terminal_value
@@ -1130,6 +1257,16 @@ module Skylab::BeautySalon
       def _buff
         @byte_downstream
       end
+
+      # --TEMPORARY
+
+      def _AN
+        @structured_node.AST_node_
+      end
+
+      def _SN
+        @structured_node
+      end
     end
 
     # ==
@@ -1141,16 +1278,6 @@ module Skylab::BeautySalon
       x = LocationMapIndex___.new _xx
       h[ cls ] = x
       x
-    end
-
-    ASC_INDEX_VIA_CLASS___ = ::Hash.new do |h, cls|
-      a = cls.association_index.associations
-      h_ = {}
-      a.each_with_index do |asc, d|
-        h_[ asc.association_symbol ] = d
-      end
-      h[ cls ] = h_.freeze
-      h_
     end
 
     # ==

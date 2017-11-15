@@ -56,6 +56,15 @@ module Skylab::BeautySalon::TestSupport
 
       shared_subject :_tuple do
 
+        scn = Home_::Scanner_.call(
+          # (emissions are not the focus of this test case so we fudge
+          #  over them, but strictly so because meh)
+          [
+            [ :info, :event, :find_command_args, ],
+            [ :info, :expression, :processing_next_file ],
+          ]
+        )
+
         st = _call_subject_magnetic_by do |o|
 
           paths = []
@@ -69,11 +78,13 @@ module Skylab::BeautySalon::TestSupport
           o.replacement_function_string = "file:#{ _this_path }"
 
           o.listener = -> * chan, & _p do
-            :find_command_args == chan.last || fail
+            _exp = scn.gets_one
+            _exp == chan || fail
           end
         end
 
         _3_lines = [ st.gets, st.gets, st.gets ]
+        scn.no_unparsed_exists || fail
         [ _3_lines, st ]
       end
     end

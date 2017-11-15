@@ -224,6 +224,16 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def DIE_ON_UNEXPECTED_EMISSION em_p, chan
+      if :info == chan[0] && :expression == chan[1]
+        # if we're not capturing any emssions at all,
+        # let `info` slide by without freaking out
+        NOTHING_  # hi.
+      else
+        __do_die_yadda_MR em_p, chan
+      end
+    end
+
+    def __do_die_yadda_MR em_p, chan
 
       io = debug_IO
       io.puts "GONNA DIE: #{ chan.inspect }"

@@ -471,7 +471,10 @@ module Skylab::BeautySalon
 
         :property, :macro,
         :description, -> y do
-          y << 'the macro EXPERIMENT - for now experiment'
+          y << 'the macro EXPERIMENT - these are typically exposures of'
+          y << 'replacement operations that are streamlined so that they'
+          y << 'require no code to be provided by the user.'
+          y << 'at writing there is only one macro - that for method names.'
         end,
 
         # REMINDER: doo-hahs you add to the above may need to be added to #spot1.1

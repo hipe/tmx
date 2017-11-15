@@ -392,7 +392,7 @@ module Skylab::BeautySalon
 
         def MEMBERS  # not covered, use in development
           association_index.associations.map do |asc|
-            asc._SYMBOL_FOR_MEMBERS_
+            asc.use_symbol_
           end
         end
 
@@ -728,6 +728,10 @@ module Skylab::BeautySalon
         @associations.fetch @__offset_via_appropriate_symbol.fetch k
       end
 
+      def length
+        @associations.length
+      end
+
       attr_reader(
         :associations,
         :has_plural_arity_as_index,
@@ -828,7 +832,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def _SYMBOL_FOR_MEMBERS_
+      def use_symbol_
         @stem_symbol
       end
 
@@ -924,7 +928,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def _SYMBOL_FOR_MEMBERS_
+      def use_symbol_
         @association_symbol
       end
 

@@ -180,7 +180,8 @@ module Skylab::BeautySalon
         # asserting which. #double-quoted-string-like
 
         children(
-          :one_or_more_dynamic_expressions,
+          :zero_or_more_dynamic_expressions,
+            # (as zero, TODO not covered - zerk/test/610-CLI/20-expect-section-magnetics_spec.rb:10)
         )
       end
 

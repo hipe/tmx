@@ -77,13 +77,13 @@ note we are showing "the edge of the paper" so we can see that the thing
 is indented by two spaces.
 
 we want to visualize this as a continuous stream of bytes (in part because
-later we'll be emplying it as an "ASCII grid") so we'll flatten all the
+later we'll be employing it as an "ASCII grid") so we'll flatten all the
 lines into one line:
 
     +-----
     |  def xx a, b~do_some_thing~  end
 
-note we are using `~` to signify a newline so that its visual representation
+we are using `~` to signify a newline so that its visual representation
 takes only one character of width.
 
 so, when we parse this with the vendor library and wrap it in our own work,

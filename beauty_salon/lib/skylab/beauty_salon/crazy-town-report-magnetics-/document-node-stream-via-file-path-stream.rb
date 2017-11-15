@@ -63,7 +63,9 @@ module Skylab::BeautySalon
 
         @__potential_sexp_stream = _file_path_st.map_by do |path|
 
-          $stderr.puts "OHAI: #{ path }"  # #todo - leaving this in until maybe there is a verbose mode ..
+          @listener.call :info, :expression, :processing_next_file do |y|
+            y << "(processing file: #{ path })"  # #wish [#007.P] a verbose mode
+          end
 
           proto.dup.__init_new_instance_ path
         end

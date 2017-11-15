@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport
 
           invoke '.'
 
-          expect "#{ _head } not found in \. or 1 dir up"
+          expect "#{ _head } not found in . or 1 dir up"
 
           expect_exitstatus_for_resource_not_found
         end

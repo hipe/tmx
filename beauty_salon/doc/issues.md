@@ -107,6 +107,10 @@
 
 [#007]       ( intra-subsystem issues )
 
+      #small #refactor [#here.Q] string handling and similar is dis-unified
+
+      #small #wish [#here.P] a verbose mode
+
       #small #open [#here.O] when you're really close to the end, rename
              "callish identifier" as something like "grammar symbol name"
 

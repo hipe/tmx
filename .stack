@@ -61,7 +61,7 @@ finish one new magent
 finish other new magnet
 fix diff thing
 rename all operator branch to feature branch YIKES
-clean up that crazy hack in an isolated commit
+clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
 all known near-term practial applications of this (Z) (Z)->(W,Y)
 .to_symbolish_reference_scanner not .to_loadable_reference_stream (-1) (right?) (Y) (Y)
 convert every '.should' to `expect( ).to` 07-19 03:47:08 (W) (W)->(V)

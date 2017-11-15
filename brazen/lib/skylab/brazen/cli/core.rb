@@ -570,6 +570,22 @@ module Skylab::Brazen
         @__filesystem
       end
 
+      # ~( [bs] only. leaving room to for etc.
+
+      def piper
+        ::IO
+      end
+
+      def spawner
+        ::Kernel
+      end
+
+      def process_waiter
+        ::Process
+      end
+
+      # ~)
+
       attr_reader(
         :argument_scanner_narrator,  # [bs]
         :listener,
