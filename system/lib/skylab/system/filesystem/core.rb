@@ -122,8 +122,8 @@ module Skylab::System
         ::Dir.mkdir path, * int
       end
 
-      def mkdir_p path, & oes_p  # experimental alternative to f.u
-        Home_::Filesystem::Mkdir_p[ path, self, & oes_p ]
+      def mkdir_p path, & p  # experimental alternative to f.u
+        Home_::Filesystem::Mkdir_p[ path, self, & p ]
       end
 
       def rmdir path

@@ -13,7 +13,7 @@ this is the rationale for the regression order of the toplevel nodes -
   - recursive test support functioning ("quickie recursive runner") (#40)
 
   - expectation libraries (at toplevel)
-    - expect stdout sterr (#50)
+    - want stdout sterr (#50)
 
   - things that could perhaps become their own gems (2)
     - file-coverage (#60)

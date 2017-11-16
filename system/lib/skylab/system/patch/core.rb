@@ -46,11 +46,11 @@ module Skylab::System
           system_conduit: nil,
         )
 
-        def initialize & oes_p
+        def initialize & p
 
-          if oes_p
-            -1 == oes_p.arity or self._MODERNIZE_ME
-            @on_event_selectively = oes_p
+          if p
+            -1 == p.arity or self._MODERNIZE_ME
+            @listener = p
           end
 
           @dry = nil
@@ -149,13 +149,13 @@ module Skylab::System
 
         def __when_probably_succeeded o, w
 
-          if @on_event_selectively
+          if @listener
 
             begin
               s = o.gets
               s or break
               -> s_ do
-                @on_event_selectively.call :info, :process_line do
+                @listener.call :info, :process_line do
                   Process_Line_[ s_ ].to_event
                 end
               end.call s
@@ -196,9 +196,9 @@ module Skylab::System
 
           d = w.value.exitstatus
 
-          if @on_event_selectively
+          if @listener
 
-            @on_event_selectively.call :error, :nonzero_exitstatus do
+            @listener.call :error, :nonzero_exitstatus do
 
               __build_nonzero_event d, s_a
             end

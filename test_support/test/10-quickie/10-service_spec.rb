@@ -87,8 +87,8 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           ke = begin_mock_module_
-          ke.expect_to_have_method_defined :describe
-          ke.expect_to_have_method_defined :should
+          ke.want_to_have_method_defined :describe
+          ke.want_to_have_method_defined :should
           ke
         end
 
@@ -135,7 +135,7 @@ module Skylab::TestSupport::TestSupport
       def kernel_module_
         ke = begin_mock_module_
         ke.have_method_not_defined :should
-        ke.expect_to_have_method_defined :should
+        ke.want_to_have_method_defined :should
         ke
       end
     end
@@ -164,7 +164,7 @@ module Skylab::TestSupport::TestSupport
 
       def kernel_module_
         ke = begin_mock_module_
-        ke.expect_to_have_method_defined :should
+        ke.want_to_have_method_defined :should
         ke
       end
     end
@@ -208,7 +208,7 @@ module Skylab::TestSupport::TestSupport
           start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
 
           mock_TS_module = begin_mock_module_
-          mock_TS_module.expect_to_have_singleton_method_defined :describe
+          mock_TS_module.want_to_have_singleton_method_defined :describe
 
           rt.send subject_method, mock_TS_module
 
@@ -218,7 +218,7 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           mod = begin_mock_module_
-          mod.expect_to_have_method_defined :should
+          mod.want_to_have_method_defined :should
           mod
         end
 
@@ -239,7 +239,7 @@ module Skylab::TestSupport::TestSupport
           end
 
           mock_TS_module = begin_mock_module_
-          mock_TS_module.expect_to_have_singleton_method_defined :describe
+          mock_TS_module.want_to_have_singleton_method_defined :describe
 
           rt.send subject_method, mock_TS_module
 
@@ -249,7 +249,7 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           mod = begin_mock_module_
-          mod.expect_to_have_method_defined :should
+          mod.want_to_have_method_defined :should
           mod
         end
 

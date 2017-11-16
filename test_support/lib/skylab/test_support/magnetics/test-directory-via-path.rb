@@ -24,7 +24,7 @@ module Skylab::TestSupport
 
       def initialize & p
         @be_verbose = false
-        @on_event_selectively = p
+        @listener = p
       end
 
       def execute
@@ -75,7 +75,7 @@ module Skylab::TestSupport
 
       def __when_not_found num_dirs_looked
 
-        @on_event_selectively.call :error, :resource_not_found do
+        @listener.call :error, :resource_not_found do
 
           Home_.lib_.system_lib::Filesystem::Walk.build_resource_not_found_event(
             @start_path,
@@ -107,7 +107,7 @@ module Skylab::TestSupport
             end
           end
           if yes
-            @on_event_selectively[ * i_a, & ev_p ]
+            @listener[ * i_a, & ev_p ]
           end
           NIL
         end

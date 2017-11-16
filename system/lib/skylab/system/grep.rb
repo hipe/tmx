@@ -33,8 +33,10 @@ module Skylab::System
       end  # >>
 
       def initialize & p
-        @_mutex_main = nil
-        @_any_oes_p = p
+        @_has_fixed_string_pattern = nil
+        @_has_grep_extended_regexp_string = nil
+        @_has_ruby_regexp = nil
+        @_any_p = p
       end
 
       def __init_via_iambic x_a
@@ -46,21 +48,39 @@ module Skylab::System
     private
 
       def ruby_regexp=
-        remove_instance_variable :@_mutex_main
-        @ruby_regexp = gets_one
-        @_resolve_regexp = :__resolve_regexp_via_ruby_regexp ; ACHIEVED_
+        _maybe_accept :__do_accept_ruby_regexp
+      end
+
+      def __do_accept_ruby_regexp s
+        @ruby_regexp = s
+        @_has_ruby_regexp = true ; ACHIEVED_
       end
 
       def grep_extended_regexp_string=
-        remove_instance_variable :@_mutex_main
-        @grep_extended_regexp_string = gets_one
-        @_resolve_regexp = :__resolve_regexp_via_egrep_string ; ACHIEVED_
+        _maybe_accept :__do_accept_grep_extended_regexp_string
+      end
+
+      def __do_accept_grep_extended_regexp_string s
+        @grep_extended_regexp_string = s
+        @_has_grep_extended_regexp_string = true ; ACHIEVED_
       end
 
       def fixed_string_pattern=  # #not-covered (worked once)
-        remove_instance_variable :@_mutex_main
-        @fixed_string_pattern = gets_one
-        @_resolve_regexp = :__resolve_regexp_via_fixed_string_pattern ; ACHIEVED_
+        _maybe_accept :__do_accept_fixed_string_pattern
+      end
+
+      def __do_accept_fixed_string_pattern s
+        @fixed_string_pattern = s
+        @_has_fixed_string_pattern = true ; ACHIEVED_
+      end
+
+      def _maybe_accept m
+        s = gets_one
+        if s
+          send m, s
+        else
+          ACHIEVED_
+        end
       end
 
     public
@@ -74,7 +94,22 @@ module Skylab::System
       alias_method :finish, :execute  # #todo
 
       def ___resolve_regexp
-        send remove_instance_variable :@_resolve_regexp
+
+        if @_has_fixed_string_pattern
+          @_has_grep_extended_regexp_string && argument_error
+          @_has_ruby_regexp && argument_error
+          __resolve_regexp_via_fixed_string_pattern
+
+        elsif @_has_grep_extended_regexp_string
+          # prefer this over ruby even if one is set?
+          __resolve_regexp_via_egrep_string
+
+        elsif @_has_ruby_regexp
+          __resolve_regexp_via_ruby_regexp
+
+        else
+          argument_error
+        end
       end
 
       def __resolve_regexp_via_ruby_regexp
@@ -106,7 +141,7 @@ module Skylab::System
 
       def ___when_no_support_for_ruby_regexp_options i_a
 
-        p = @_any_oes_p
+        p = @_any_p
         if p
           p.call :error, :regexp_option_not_supported do
 
@@ -266,7 +301,7 @@ module Skylab::System
 
       def ___when_system_error err_s
 
-        p = @_any_oes_p
+        p = @_any_p
         if p
           p.call :error, :system_call_error do
             Common_::Event.inline_not_OK_with :system_call_error,

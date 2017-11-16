@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - filesystem - directory (operator branch via directory)" do
+  describe "[sy] - filesystem - directory (feature branch via directory)" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -10,20 +10,20 @@ module Skylab::System::TestSupport
     it "splay over empty directory" do
 
       _given_stubbed_empty_directory
-      _expect_no_items
+      _want_no_items
     end
 
     it "splay over noent directory" do
 
       _given_real_no_ent_directory
-      _expect_no_items
+      _want_no_items
     end
 
     it "splay over non empty directory" do
 
       _given_stubbed_NON_empty_directory
 
-      _expect_names(
+      _want_names(
         :red_time,
         :orange_pal,
         :yellow_friend,
@@ -39,7 +39,7 @@ module Skylab::System::TestSupport
         o.glob_entry = '*.yes'
       end
 
-      _expect_names(
+      _want_names(
         :orange_pal,
         :blue_buddy,
       )
@@ -53,7 +53,7 @@ module Skylab::System::TestSupport
         o.filename_pattern = /\A(re|bl)/
       end
 
-      _expect_names(
+      _want_names(
         :red_time,
         :blue_buddy,
       )
@@ -72,7 +72,7 @@ module Skylab::System::TestSupport
 
         _actual = _ev.express_into_under [], expression_agent_of_API_classic_
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << /\ANo such file or directory - «.+no-ent»\z/
         end
       end
@@ -86,7 +86,7 @@ module Skylab::System::TestSupport
         end
 
         a = []
-        expect :error, :enoent do |ev|
+        want :error, :enoent do |ev|
           a.push ev
         end
 
@@ -165,15 +165,15 @@ module Skylab::System::TestSupport
       end
 
       it "an item that you dereference before it was reached in the stream is same item both times" do
-        _expect_same_item :fourth_dereffed, :fourth
+        _want_same_item :fourth_dereffed, :fourth
       end
 
       it "mid stream, dereference an item that was streamed over before your first dereferece. same" do
-        _expect_same_item :first, :first_dereffed
+        _want_same_item :first, :first_dereffed
       end
 
       it "after stream closes, dereference an item you streamed over. same" do
-        _expect_same_item :fifth, :fifth_dereffed
+        _want_same_item :fifth, :fifth_dereffed
       end
 
       shared_subject :_binding do
@@ -216,9 +216,9 @@ module Skylab::System::TestSupport
       end
     end
 
-    # -- expect
+    # -- want (née "expect")
 
-    def _expect_same_item var_one, var_two
+    def _want_same_item var_one, var_two
 
       bnd = _binding
       item_one = bnd.local_variable_get var_one
@@ -246,15 +246,15 @@ module Skylab::System::TestSupport
       end
     end
 
-    def _expect_no_items
+    def _want_no_items
       _st = _flush_to_stream
       _one = _st.gets
       _one && fail
     end
 
-    def _expect_names * sym_a
-      _ob = _flush_to_OB
-      st = _ob.to_loadable_reference_stream
+    def _want_names * sym_a
+      _fb = _flush_to_OB
+      st = _fb.to_loadable_reference_stream
       actual_sym_a = []
       while item=st.gets
         actual_sym_a.push item.normal_symbol
@@ -263,8 +263,8 @@ module Skylab::System::TestSupport
     end
 
     def _flush_to_stream
-      _ob = _flush_to_OB
-      _st = _ob.to_loadable_reference_stream
+      _fb = _flush_to_OB
+      _st = _fb.to_loadable_reference_stream
       _st
     end
 
@@ -272,7 +272,7 @@ module Skylab::System::TestSupport
 
       p_a = remove_instance_variable :@PREPARATIONS
 
-      _ob = _subject_module.define do |o|
+      _fb = _subject_module.define do |o|
 
         p_a.each do |p|
           p[ o ]
@@ -286,7 +286,7 @@ module Skylab::System::TestSupport
         end
       end
 
-      _ob  # hi.
+      _fb  # hi.
     end
 
     # -- setup
@@ -336,13 +336,13 @@ module Skylab::System::TestSupport
       end
     end
 
-    def expect * chan, & recv
-      _spy.expect_emission recv, chan
+    def want * chan, & recv
+      _spy.want_emission recv, chan
       NIL
     end
 
     def _spy
-      @EMISSION_SPY ||= Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      @EMISSION_SPY ||= Common_.test_support::Want_Emission_Fail_Early::Spy.new
     end
 
     # -- support
@@ -352,7 +352,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject_module
-      Home_::Filesystem::Directory::OperatorBranch_via_Directory
+      Home_::Filesystem::Directory::FeatureBranch_via_Directory
     end
 
     X_fs_dir_Item_via_Path = -> path do

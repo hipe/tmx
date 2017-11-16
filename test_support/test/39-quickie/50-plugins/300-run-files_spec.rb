@@ -35,7 +35,7 @@ module Skylab::TestSupport::TestSupport
           call :run_files, :path, _dir
 
           msgs = nil
-          expect :info, :expression, :number_of_files do |y|
+          want :info, :expression, :number_of_files do |y|
             msgs = y
           end
 
@@ -55,7 +55,7 @@ module Skylab::TestSupport::TestSupport
             see[ path ]
           end
 
-          expect_succeed
+          want_succeed
 
           [ yes, msgs, count ]
         end

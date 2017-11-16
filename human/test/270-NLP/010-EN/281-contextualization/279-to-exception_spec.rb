@@ -13,9 +13,9 @@ module Skylab::Human::TestSupport
 
     context "(the normalest example)" do
 
-      given do |oes_p|
+      given do |p|
 
-        oes_p.call :error, :expression do |y|
+        p.call :error, :expression do |y|
           y << highlight( 'ding' )
           y << 'dong'
         end
@@ -37,9 +37,9 @@ module Skylab::Human::TestSupport
 
     context "two edges in one test eek" do
 
-      given do |oes_p|
+      given do |p|
 
-        oes_p.call :info, :expression, :errno_enoent do |y|
+        p.call :info, :expression, :errno_enoent do |y|
           y << highlight( 'ding' )
           y << 'dong'
         end

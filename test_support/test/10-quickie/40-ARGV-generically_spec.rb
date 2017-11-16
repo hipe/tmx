@@ -14,14 +14,14 @@ module Skylab::TestSupport::TestSupport
     it "strange args won't drop into recursive runner FOR NOW.." do
       # (but now this is #wish [#030.4])
       invoke 'wizz', 'popper'
-      expect_on_stderr "unexpected arguments: \"wizz\" [..]"
-      expect_CLI_failed_commonly_
+      want_on_stderr "unexpected arguments: \"wizz\" [..]"
+      want_CLI_failed_commonly_
     end  # :#here
 
     it "strange options" do
       invoke '--zizzy', '-h', 'no-see'
-      expect_on_stderr 'invalid option: --zizzy'
-      expect_CLI_failed_commonly_
+      want_on_stderr 'invalid option: --zizzy'
+      want_CLI_failed_commonly_
     end
 
     it "help screen!" do
@@ -52,11 +52,11 @@ module Skylab::TestSupport::TestSupport
         line == "usage: ruby TEST_FILE [options]" || fail
         blank_line_then[ options ]
       end
-      expect_each_by do |line|
+      want_each_by do |line|
         p[ line ]
         NIL
       end
-      expect_succeed
+      want_succeed
 
       expect = -> k do
         seen.delete( k ) || fail
@@ -75,9 +75,9 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    def expect_CLI_failed_commonly_
-      expect "try 'ruby zizzy-the-test-file -h' for help"
-      expect_fail
+    def want_CLI_failed_commonly_
+      want "try 'ruby zizzy-the-test-file -h' for help"
+      want_fail
     end
 
     # ==

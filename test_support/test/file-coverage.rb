@@ -55,7 +55,7 @@ module Skylab::TestSupport::TestSupport
       _cx = classifications_via_path_magnetic_::Classifications___[ t_or_a, f_or_d, r_or_nr ]
       _fs = __real_filesystem
       _nc = name_conventions_
-      _oes_p = event_log.handle_event_selectively
+      _p = event_log.handle_event_selectively
 
       @tree = compound_tree_via_classifications_magnetic_.call(
         _cx,
@@ -63,7 +63,7 @@ module Skylab::TestSupport::TestSupport
         test_dir_for_build_compound_tree,
         _nc,
         _fs,
-        & _oes_p
+        & _p
       )
       NIL
     end
@@ -81,7 +81,7 @@ module Skylab::TestSupport::TestSupport
     end
   end
 
-  module Expect_Node_Characteristics
+  module Want_Node_Characteristics
 
     class << self
       def [] tcm
@@ -89,40 +89,40 @@ module Skylab::TestSupport::TestSupport
       end
     end  # >>
 
-    def expect_tests_but_no_assets_ node
+    def want_tests_but_no_assets_ node
 
-      _expect_tests node
-      _expect_NO_assets node
+      _want_tests node
+      _want_NO_assets node
     end
 
-    def expect_assets_but_no_tests_ node
+    def want_assets_but_no_tests_ node
 
-      _expect_assets node
-      _expect_NO_tests node
+      _want_assets node
+      _want_NO_tests node
     end
 
-    def expect_assets_and_tests_ node
+    def want_assets_and_tests_ node
 
-      _expect_assets node
-      _expect_tests node
+      _want_assets node
+      _want_tests node
     end
 
-    def _expect_assets node
+    def _want_assets node
 
       node.node_payload.has_assets or fail _say_expected( :assets, node )
     end
 
-    def _expect_tests node
+    def _want_tests node
 
       node.node_payload.has_tests or fail _say_expected( :tests, node )
     end
 
-    def _expect_NO_assets node
+    def _want_NO_assets node
 
       node.node_payload.has_assets and fail _say_expected( :no, :assets, node )
     end
 
-    def _expect_NO_tests node
+    def _want_NO_tests node
 
       node.node_payload.has_tests and fail _say_expected( :no, :tests, node )
     end
@@ -139,9 +139,8 @@ module Skylab::TestSupport::TestSupport
     end
   end
 
-  Expect_Stdin_Stdout = -> tcm do
-    tcm.include Home_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+  Want_Stdin_Stdout = -> tcm do
+    tcm.include Home_::Want_Stdout_Stderr::Test_Context_Instance_Methods
   end
 
   # ->

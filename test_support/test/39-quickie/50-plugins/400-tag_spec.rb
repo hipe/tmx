@@ -23,18 +23,18 @@ _SUPREME_HACK = -> do
         it "will see this one because of its tag (apple)", find_me: true, tempurature: :cold do
 
           call :tag, "find_me", :doc_only, :path, eek
-          _expect_only_these_examples "(apple)"
+          _want_only_these_examples "(apple)"
         end
 
         it "won't see this one because of its tag (grape)", avoid_me: true, tempurature: :hot do
 
           call :tag, "~avoid_me", :doc_only, :path, eek
-          _expect_examples_do_not_contain "(grape)"
+          _want_examples_do_not_contain "(grape)"
         end
 
         it "some specific value of some tag (pear)", tempurature: :cold do
           call :tag, "tempurature:cold", :doc_only, :path, eek
-          _expect_only_these_examples "(apple)", "(pear)"
+          _want_only_these_examples "(apple)", "(pear)"
         end
 
       # -
@@ -42,13 +42,13 @@ _SUPREME_HACK = -> do
 
     number_of_examples = 3
 
-    define_method :_expect_examples_do_not_contain do |*black_s_a|
+    define_method :_want_examples_do_not_contain do |*black_s_a|
 
-      _expect_number = number_of_examples - black_s_a.length
+      _want_number = number_of_examples - black_s_a.length
 
-      _expect_number.times do
+      _want_number.times do
 
-        expect :data, :example do |eg|
+        want :data, :example do |eg|
 
           actual_s = eg.description_stack.last
           black_s_a.each do |black_s|
@@ -59,18 +59,18 @@ _SUPREME_HACK = -> do
         end
       end
 
-      expect :info, :expression, :number_of_files
+      want :info, :expression, :number_of_files
 
-      expect_succeed
+      want_succeed
     end
 
     # ==
 
-    def _expect_only_these_examples * pool_s_a
+    def _want_only_these_examples * pool_s_a
 
       pool_s_a.length.times do
 
-        expect :data, :example do |eg|
+        want :data, :example do |eg|
 
           actual_s = eg.description_stack.last
           idx = pool_s_a.length.times.detect do |d|
@@ -81,9 +81,9 @@ _SUPREME_HACK = -> do
         end
       end
 
-      expect :info, :expression, :number_of_files
+      want :info, :expression, :number_of_files
 
-      expect_succeed
+      want_succeed
 
       pool_s_a.length.nonzero? and fail "never found #{ pool_s_a * ' and ' }"
     end

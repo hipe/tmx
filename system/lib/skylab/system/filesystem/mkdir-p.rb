@@ -15,11 +15,11 @@ module Skylab::System
       # however, lest it make itself fail on subsequent invocations on a
       # sub-directory of the same directory (encountered))
 
-      def initialize path, fs, & oes_p
+      def initialize path, fs, & p
 
         @filesystem = fs
         @path = path
-        @on_event_selectively = oes_p
+        @listener = p
       end
 
       def execute
@@ -82,9 +82,9 @@ module Skylab::System
 
         exists = dh.path
 
-        _oes_p = remove_instance_variable :@on_event_selectively
+        _p = remove_instance_variable :@listener
 
-        _oes_p.call :info, :mkdir_p do
+        _p.call :info, :mkdir_p do
           __build_event stack.dup.freeze, exists
         end
 

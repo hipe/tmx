@@ -159,7 +159,7 @@ module Skylab::Human
       end
     end  # covered by #C15n-test-family-5
 
-    def emission_handler_via_emission_handler & downstream_oes_p
+    def emission_handler_via_emission_handler & downstream_p
 
       # (method name is referenced in the document.)
 
@@ -169,7 +169,7 @@ module Skylab::Human
         inst = me.dup
         inst.channel = sym_a
         inst.emission_proc = ev_p
-        inst.downstream_selective_listener_proc = downstream_oes_p
+        inst.downstream_selective_listener_proc = downstream_p
         inst._common_express
       end
     end

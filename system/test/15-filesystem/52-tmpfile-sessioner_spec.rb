@@ -32,7 +32,7 @@ module Skylab::System::TestSupport
     it "get busy" do
 
       _o = _common_setup_two
-      _expect_good_session _o
+      _want_good_session _o
     end
 
     it "convoluted proof of rollover" do
@@ -41,7 +41,7 @@ module Skylab::System::TestSupport
 
         o.max_number_of_simultaneous_tmpfiles 2
 
-        _expect_good_session o
+        _want_good_session o
 
       end
     end
@@ -100,7 +100,7 @@ module Skylab::System::TestSupport
       end
     end
 
-    def _expect_good_session o
+    def _want_good_session o
 
       hold_on_to_fh = nil
       _x = o.session do | fh |

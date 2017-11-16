@@ -4,10 +4,10 @@ module Skylab::TestSupport
 
     # modeled like an actor but wraps something that is long-running.
 
-    def initialize doc_root_s, * x_a, & oes_p
+    def initialize doc_root_s, * x_a, & p
 
       @doc_root = doc_root_s
-      @_oes_p = oes_p
+      @_listener = p
 
       @filesystem = nil
       @PID_path = nil
@@ -50,7 +50,7 @@ module Skylab::TestSupport
 
     def ___resolve_PID_classifications
 
-      x = Here_::Classify_PID_file___[ @PID_path, @filesystem, & @_oes_p ]
+      x = Here_::Classify_PID_file___[ @PID_path, @filesystem, & @_listener ]
       if x
         @_PID_file = x
         ACHIEVED_
@@ -73,7 +73,7 @@ module Skylab::TestSupport
     def __when_PID_file_existed
 
       kn = @processes.record_for(
-        @_PID_file.PID, :etime, :pid, :state, & @_oes_p )
+        @_PID_file.PID, :etime, :pid, :state, & @_listener )
 
       if kn
         if kn.is_known_known
@@ -90,7 +90,7 @@ module Skylab::TestSupport
 
     def ___express_that_process_is_still_running rec
 
-      @_oes_p.call :info, :expression, :already_running do | y |
+      @_listener.call :info, :expression, :already_running do | y |
 
         unit, x = Home_.lib_.basic::Time::EN::Summarize[ rec.etime.to_i ]
 
@@ -108,7 +108,7 @@ module Skylab::TestSupport
 
       path = @_PID_file.path
 
-      @_oes_p.call :info, :expression, :removing_stale_PID do | y |
+      @_listener.call :info, :expression, :removing_stale_PID do | y |
         y << "removing stale PID file - #{ pth path }"
       end
 
@@ -129,7 +129,7 @@ module Skylab::TestSupport
         :path, @doc_root,
         :must_be_ftype, :DIRECTORY_FTYPE,
         :filesystem, @filesystem,
-        & @_oes_p )
+        & @_listener )
     end
 
     def __process_is_still_running
@@ -138,7 +138,7 @@ module Skylab::TestSupport
 
     def __start_server
 
-      o = Here_::Rainbow_Kick___.new( & @_oes_p )
+      o = Here_::Rainbow_Kick___.new( & @_listener )
       o.doc_root = @doc_root
       o.filesystem = @filesystem
       o.PID_path = @_PID_file.path

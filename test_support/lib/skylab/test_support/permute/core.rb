@@ -4,10 +4,10 @@ module Skylab::TestSupport
 
     module API ; class << self
 
-      def call * x_a, & oes_p
+      def call * x_a, & p
         Zerk_lib_[]
         _acs = Root_Autonomous_Component_System.__instance
-        Zerk_::API.call( x_a, _acs ) { |_| oes_p }
+        Zerk_::API.call( x_a, _acs ) { |_| p }
       end
     end ; end
 
@@ -32,9 +32,9 @@ module Skylab::TestSupport
 
       def __ping__component_operation
 
-        -> &oes_p do
+        -> &p do
 
-          oes_p.call :info, :expression, :ping do |y|
+          p.call :info, :expression, :ping do |y|
             y << "ping from permute."
           end
           NOTHING_
@@ -84,21 +84,21 @@ module Skylab::TestSupport
 
           _x = st.gets_one
           _kn = Common_::QualifiedKnownKnown.via_value_and_symbol _x, :test_file
-          _oes_p = pp[ nil ]
+          _p = pp[ nil ]
 
           _real_FS = @_filesystem_proc.call
 
           _kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
             :qualified_knownness_of_path, _kn,
             :filesystem, _real_FS,
-            & _oes_p )
+            & _p )
 
           _kn
         end
       end
 
-      def execute & oes_p
-        @_on_event_selectively = oes_p
+      def execute & p
+        @_on_event_selectively = p
         extend Permutations_Implementation___
         execute
       end

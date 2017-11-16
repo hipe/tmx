@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport
       line 3
       line 3
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "'line' 3 overlaps with existing 'line' 3. #{
           }combine these ranges."
       end
@@ -30,7 +30,7 @@ module Skylab::TestSupport::TestSupport
 
       from_to 2, 1
 
-      expect_fail :upsidedown_range do |y|
+      want_fail :upsidedown_range do |y|
         y << "'to' must be greater than 'from'"
         y << "(had from: 2 and to: 1)"
       end
@@ -40,7 +40,7 @@ module Skylab::TestSupport::TestSupport
 
       from_to 3, 3
 
-      expect_fail :upsidedown_range do |y|
+      want_fail :upsidedown_range do |y|
         y << "'to' must be greater than 'from'"
         y << "(had from: 3 and to: 3)"
       end
@@ -51,7 +51,7 @@ module Skylab::TestSupport::TestSupport
       from_to 3, 7
       from_to 5, 9
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 5 'to' 9 overlaps with existing range #{
           }'from' 3 'to' 7. combine these ranges."
       end
@@ -62,7 +62,7 @@ module Skylab::TestSupport::TestSupport
       from 7
       from 10
 
-      expect_fail :bad_sequence do |y|
+      want_fail :bad_sequence do |y|
         y << "'from' cannot follow unclosed 'from'"
       end
     end
@@ -72,7 +72,7 @@ module Skylab::TestSupport::TestSupport
       from 7
       line 10
 
-      expect_fail :bad_sequence do |y|
+      want_fail :bad_sequence do |y|
         y << "'line' cannot follow unclosed 'from'"
       end
     end
@@ -82,7 +82,7 @@ module Skylab::TestSupport::TestSupport
       to 7
       to 10
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 1 'to' 10 #{
           }overlaps with existing range 'from' 1 'to' 7. combine these ranges."
       end
@@ -93,7 +93,7 @@ module Skylab::TestSupport::TestSupport
       from_to 9, 10
       from_to 3, 7
 
-      expect_succeed
+      want_succeed
     end
 
     it "ranges in order with respect to each other are OK" do
@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport
       line 9
       from_to 11, 12
 
-      expect_succeed
+      want_succeed
     end
 
     it "but you can't have a range kissing another range (encourage normal input)" do
@@ -110,7 +110,7 @@ module Skylab::TestSupport::TestSupport
       from_to 10, 12
       from_to 7, 9
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 7 'to' 9 kisses existing range 'from' 10 'to' 12. #{
           }combine these ranges."
       end
@@ -121,7 +121,7 @@ module Skylab::TestSupport::TestSupport
       line 10
       from_to 7, 9
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 7 'to' 9 kisses existing 'line' 10. #{
           }combine these ranges."
       end
@@ -133,7 +133,7 @@ module Skylab::TestSupport::TestSupport
       line 10
       from_to 5, 8
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 5 'to' 8 overlaps with existing range 'from' 4 'to' 6. #{
           }combine these ranges."
       end
@@ -145,7 +145,7 @@ module Skylab::TestSupport::TestSupport
       line 10
       from_to 7, 8
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 7 'to' 8 kisses existing range 'from' 4 'to' 6. #{
           }combine these ranges."
       end
@@ -157,7 +157,7 @@ module Skylab::TestSupport::TestSupport
       from_to 10, 12
       from_to 8, 11
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 8 'to' 11 overlaps with existing range 'from' 10 'to' 12. #{
           }combine these ranges."
       end
@@ -169,7 +169,7 @@ module Skylab::TestSupport::TestSupport
       from_to 10, 12
       from_to 8, 9
 
-      expect_fail do |y|
+      want_fail do |y|
         y << "range 'from' 8 'to' 9 kisses existing range 'from' 10 'to' 12. #{
           }combine these ranges."
       end
@@ -181,7 +181,7 @@ module Skylab::TestSupport::TestSupport
       line 10
       line 8
 
-      expect_succeed
+      want_succeed
     end
 
     def expression_agent

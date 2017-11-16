@@ -2,11 +2,11 @@ module Skylab::System
 
   module Filesystem
 
-    class Directory::OperatorBranch_via_Directory < Common_::SimpleModel
+    class Directory::FeatureBranch_via_Directory < Common_::SimpleModel
 
       # "implementation objectives", pseudocode, and historical context in :[#040].
 
-      # as an operator branch, this is referenced with :[#ze-051.7].
+      # as an feature branch, this is referenced with :[#ze-051.7].
 
     # this operates strictly thru a filesystem controller so it is
     # compatible with a stubbed filesystem.
@@ -122,12 +122,12 @@ module Skylab::System
 
     # ~~ delete (by way of ACS)
 
-    def __remove__component qk, & oes_p_p
+    def __remove__component qk, & p_p
 
       # per ACS, assume that last we checked, item is present in collection
       # this is only exploraory - we emit an event on success
 
-        listener = oes_p_p[ NOTHING_ ]
+        listener = p_p[ NOTHING_ ]
 
         _confirm_by = -> do
           ACS_[].send_component_removed qk, self, & listener
@@ -152,24 +152,24 @@ module Skylab::System
     # ~~~ ACS hook-outs *for* edit session (remove if exists, create if not exist)
 
       # 6
-    def expect_component_not__exists__ qk, & oes_p
+    def want_component_not__exists__ qk, & p
 
       _found = first_equivalent_item qk.value
       if _found
-        ACS_[].send_component_already_added qk, self, & oes_p
+        ACS_[].send_component_already_added qk, self, & p
       else
         true
       end
     end
 
       # 7
-    def expect_component__exists__ qk, & oes_p
+    def want_component__exists__ qk, & p
 
       _found = first_equivalent_item qk.value
       if _found
         true
       else
-        ACS_[].send_component_not_found qk, self, & oes_p
+        ACS_[].send_component_not_found qk, self, & p
       end
     end
 
@@ -187,13 +187,13 @@ module Skylab::System
 
       def procure_by
 
-        Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_OperatorBranch.call_by do |o|
+        Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_FeatureBranch.call_by do |o|
 
           o.item_lemma_symbol = @item_lemma_symbol  # can be nil ; do this before below to allow per-call customization
 
           yield o
 
-          o.operator_branch = self
+          o.feature_branch = self
         end
       end
 

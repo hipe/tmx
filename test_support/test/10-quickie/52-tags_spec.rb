@@ -6,16 +6,16 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :quickie
 
     it "invalid tag - bespoke whining" do
       # -
         call :tag, "%%YIPEE%%"
-        expect :error, :expression, :parse_error, :invalid_tag_expression do |y|
+        want :error, :expression, :parse_error, :invalid_tag_expression do |y|
           y == [ %(invalid 'tag' expression: "%%YIPEE%%") ] || fail
         end
-        expect_API_result_for_fail_
+        want_API_result_for_fail_
       # -
     end
 
@@ -72,8 +72,8 @@ module Skylab::TestSupport::TestSupport
           :tag, :zib_zub,
         )
 
-        expect_example_ %w( c1 eg2 )
-        expect_example_ %w( eg4 )
+        want_example_ %w( c1 eg2 )
+        want_example_ %w( eg4 )
 
         _statistics = execute
         [ ran_these, _statistics ]
@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport
           :tag, "~shib_shub", # <-
         )
 
-        expect_example_ %w( c1 eg2 )
+        want_example_ %w( c1 eg2 )
 
         _statistics = execute
         [ ran_these, _statistics ]
@@ -137,15 +137,15 @@ module Skylab::TestSupport::TestSupport
             end
           end
 
-          o.expect_lines_by = method :__expect_these_lines
+          o.want_lines_by = method :__want_these_lines
         end
 
         [ seen ]
       end
 
-      def __expect_these_lines o
-        o.expect %(invalid --tag expression: "%%MAZINGA%%")
-        o.expect "try 'ruby sperk.kd -h' for help"
+      def __want_these_lines o
+        o.want %(invalid --tag expression: "%%MAZINGA%%")
+        o.want "try 'ruby sperk.kd -h' for help"
       end
 
       def ARGV_
@@ -173,21 +173,21 @@ module Skylab::TestSupport::TestSupport
             a
           end
 
-          o.expect_lines_by = method :__expect_these_lines
+          o.want_lines_by = method :__want_these_lines
         end
       end
 
-      def __expect_these_lines o
+      def __want_these_lines o
 
-        o.expect "Run options:"
-        o.expect "  include {:zib_zub=>true}"
-        o.expect "  exclude {:shib_shub=>true}"
-        o.expect
-        o.expect EMPTY_S_  # <- this one might an accident (the root node with no desc)?
-        o.expect                "  c1"
-        o.expect_styled_content "    eg2", :green
-        expect_finished_line_ o
-        o.expect_styled_content "1 example, 0 failures", :green
+        o.want "Run options:"
+        o.want "  include {:zib_zub=>true}"
+        o.want "  exclude {:shib_shub=>true}"
+        o.want
+        o.want EMPTY_S_  # <- this one might an accident (the root node with no desc)?
+        o.want                "  c1"
+        o.want_styled_content "    eg2", :green
+        want_finished_line_ o
+        o.want_styled_content "1 example, 0 failures", :green
       end
 
       def ARGV_

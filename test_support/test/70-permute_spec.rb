@@ -90,7 +90,7 @@ module Skylab::TestSupport::TestSupport
         # etc 2
       HERE
 
-        lib = Home_::Expect_Line
+        lib = Home_::Want_Line
         _actual_st = root_ACS_state.result
         _exp_st = Home_.lib_.basic::String::LineStream_via_String[ _exp ]
 

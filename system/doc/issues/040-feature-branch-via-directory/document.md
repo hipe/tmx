@@ -1,4 +1,4 @@
-# operator branch via directory :[#040]
+# feature branch via directory :[#040]
 
 ## intro & historical context
 
@@ -6,7 +6,7 @@ a hybrid amalgam of an older effort and a fresh, newer effort. the
 older effort was once called "directory as collection" and was part
 of the [br]-era "collection" proto-API. because of its strong
 similarity to the now ubiquitous and superficially simple [#ze-051]
-"operator branch" interface, we are altering the older API so that
+"feature branch" interface, we are altering the older API so that
 it becomes a superset of (and uses the same name as) the newer
 emerging API.
 

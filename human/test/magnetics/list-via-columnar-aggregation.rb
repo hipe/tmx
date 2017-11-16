@@ -51,12 +51,12 @@ module Skylab::Human::TestSupport
       @a_a.push x_a ; nil
     end
 
-    def expect_line s
+    def want_line s
       s_ = output_scn.gets
       s_.should eql s
     end
 
-    def expect_no_more_lines
+    def want_no_more_lines
       s = output_scn.gets
       s and fail "no: #{ s.inspect }"
     end

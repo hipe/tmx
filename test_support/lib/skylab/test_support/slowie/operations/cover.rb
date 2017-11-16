@@ -39,13 +39,13 @@ module Skylab::TestSupport
 
         # assume coverage has been requested
 
-        def initialize resources, & oes_p
+        def initialize resources, & p
 
-          _pn = oes_p.call :for_plugin, :program_name
+          _pn = p.call :for_plugin, :program_name
 
           @command_name = "(XX #{ _pn } XX)"
           @serr = resources.serr
-          @stateful_matcher = Stateful_Matcher___.new resources, & oes_p
+          @stateful_matcher = Stateful_Matcher___.new resources, & p
 
         end
 
@@ -91,8 +91,8 @@ module Skylab::TestSupport
           # passed sometimes many times) based on the sidesystem it appears
           # in. cache this decision.
 
-          def initialize resources, & oes_p
-            @on_event_selectively = oes_p
+          def initialize resources, & p
+            @listener = p
             @serr = resources.serr
           end
 
@@ -102,7 +102,7 @@ module Skylab::TestSupport
 
             self._HELLO  # change below to use sidesys_inference_stream_proc
 
-            @root_path = @on_event_selectively.call :for_plugin, :r_oot_directory_path
+            @root_path = @listener.call :for_plugin, :r_oot_directory_path
             d_a = ( 0 ... @ARGV_coverage_switch_index ).to_a
             d_a.concat ( @ARGV_coverage_switch_index + 1 ... @ARGV.length ).to_a
 
@@ -143,7 +143,7 @@ module Skylab::TestSupport
 
             h = @simple_sidesystem_index
 
-            @on_event_selectively.call :error, :expression do | y |
+            @listener.call :error, :expression do | y |
 
               _middle_two = if 3 > h.length
                 h.keys
@@ -236,7 +236,7 @@ module Skylab::TestSupport
         private :new
       end  # >>
 
-      def initialize _plugin_idx, _resources, & oes_p
+      def initialize _plugin_idx, _resources, & p
       end
 
       def each_reaction

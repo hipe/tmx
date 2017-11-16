@@ -5,7 +5,7 @@ module Skylab::TestSupport
     class Magnetics_::Classifications_via_Path < Common_::Dyadic
 
       def initialize td, path, & p
-        @on_event_selectively = p
+        @listener = p
         @path = path
         @test_dir = td
       end
@@ -27,7 +27,7 @@ module Skylab::TestSupport
 
       def __when_noent e
 
-        @on_event_selectively.call :error, :resource_not_found do
+        @listener.call :error, :resource_not_found do
 
           Common_::Event::Via_exception.via(
             :exception, e,

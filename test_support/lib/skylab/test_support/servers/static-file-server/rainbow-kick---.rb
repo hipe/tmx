@@ -5,7 +5,7 @@ module Skylab::TestSupport
     class Rainbow_Kick___  # as [#gv-021]
 
       def initialize & p
-        @_oes_p = p
+        @_listener = p
       end
 
       attr_writer(
@@ -92,7 +92,7 @@ module Skylab::TestSupport
           d = io.write "#{ child_PID  }\n"
         end
 
-        @_oes_p.call :info, :expression, :ok do | y |
+        @_listener.call :info, :expression, :ok do | y |
 
           y << "(wrote #{ path } (#{ d } bytes))"
 
@@ -108,7 +108,7 @@ module Skylab::TestSupport
 
         trap :INT do
 
-          @_oes_p.call :info, :expression, :goodbye do | y |
+          @_listener.call :info, :expression, :goodbye do | y |
             y << "received interrupt signal. goodbye."
           end
 

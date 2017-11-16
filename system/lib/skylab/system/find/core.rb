@@ -40,8 +40,8 @@ module Skylab::System
           end
         end
 
-      def statuser_by & oes_p
-        Statuser__.new oes_p
+      def statuser_by & p
+        Statuser__.new p
       end
 
         private :new
@@ -51,7 +51,7 @@ module Skylab::System
 
         def initialize & x_p
 
-          @on_event_selectively = x_p || DEFAULT_ON_EVENT_SELECTIVELY___
+          @listener = x_p || DEFAULT_ON_EVENT_SELECTIVELY___
 
           @sanitized_freeform_query_infix_words = nil
           @sanitized_freeform_query_postfix_words = nil
@@ -72,8 +72,8 @@ module Skylab::System
           end
         end
 
-        def with * x_a, & oes_p
-          dup.__init_new x_a, & oes_p
+        def with * x_a, & p
+          dup.__init_new x_a, & p
         end
 
         def initialize_copy _otr_
@@ -83,15 +83,15 @@ module Skylab::System
           # dup-and-mutate pattern. as such we do not freeze the dup #note-130
         end
 
-        def __init_new x_a, & oes_p
+        def __init_new x_a, & p
 
           # when the client wants to dup-and-muate a session. for now this
           # is written to allow only the argument paths to change (and etc):
 
           @unescaped_path_a = @unescaped_path_a.dup
 
-          if oes_p
-            @on_event_selectively = oes_p
+          if p
+            @listener = p
           end
 
           kp = process_argument_scanner_fully scanner_via_array x_a
@@ -275,8 +275,12 @@ module Skylab::System
         end
 
         def path_stream_via system_conduit
-          @args and begin
-            Find_::Build_path_stream___[ @args, system_conduit, & @on_event_selectively ]
+          if @args
+            Find_::PathStream_via_SystemCommand___.call(
+              @args,
+              system_conduit,
+              & @listener
+            )
           end
         end
 
@@ -286,8 +290,8 @@ module Skylab::System
           x = otr.__args_via_flush
           if x
             @args = x
-            if @on_event_selectively
-              @on_event_selectively.call :info, :event, :find_command_args do
+            if @listener
+              @listener.call :info, :event, :find_command_args do
                 express_under :Event
               end
             end
@@ -429,7 +433,7 @@ module Skylab::System
       # this is an experimental salve for that, but not perfect because the
       # client still has to know a lot to use this.
 
-      def initialize oes_p
+      def initialize p
 
         did = -> do
           @ok = false
@@ -439,8 +443,8 @@ module Skylab::System
           if :error == i_a.fetch(0)
             did[]
           end
-          if oes_p
-            oes_p[ * i_a, & x_p ]
+          if p
+            p[ * i_a, & x_p ]
           end
           :_sy_unreliable_
         end

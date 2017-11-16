@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :quickie
 
     line_numbers_hack = -> mod do
@@ -61,28 +61,28 @@ module Skylab::TestSupport::TestSupport
     it "not look like integer" do
 
       call :from, '-3woot'
-      expect :error, :expression, :parse_error, :must_be_digit do |y|
+      want :error, :expression, :parse_error, :must_be_digit do |y|
         y == [ "'from' must be digit" ] || fail
       end
-      expect_API_result_for_fail_
+      want_API_result_for_fail_
     end
 
     it "look like negative integer" do
 
       call :to, '-1'
-      expect :error, :expression, :parse_error, :digit_is_negative do |y|
+      want :error, :expression, :parse_error, :digit_is_negative do |y|
         y == [ "'to' cannot be negative" ] || fail
       end
-      expect_API_result_for_fail_
+      want_API_result_for_fail_
     end
 
     it "is zero" do
 
       call :line, "0"
-      expect :error, :expression, :parse_error, :digit_is_zero do |y|
+      want :error, :expression, :parse_error, :digit_is_zero do |y|
         y == [ "'line' cannot be zero" ] || fail
       end
-      expect_API_result_for_fail_
+      want_API_result_for_fail_
     end
 
     it "two ranges are OR'ed together" do
@@ -96,8 +96,8 @@ module Skylab::TestSupport::TestSupport
           :from, 16, :to, 20,
         )
 
-        expect_example_ %w( c1 eg1 )
-        expect_example_ %w( eg4 )
+        want_example_ %w( c1 eg1 )
+        want_example_ %w( eg4 )
         _stats = execute
         _stats.example_count == 2 || fail
         a == [ :eg_1_ran, :eg_4_ran ] || fail
@@ -114,8 +114,8 @@ module Skylab::TestSupport::TestSupport
           :from, 15,
         )
 
-        expect_example_ %w( eg3 )
-        expect_example_ %w( eg4 )
+        want_example_ %w( eg3 )
+        want_example_ %w( eg4 )
         _stats = execute
         _stats.example_count == 2 || fail
         a == [ :eg_3_ran, :eg_4_ran ] || fail
@@ -133,9 +133,9 @@ module Skylab::TestSupport::TestSupport
           :line, 20,
         )
 
-        expect_example_ %w( c1 eg1 )
-        expect_example_ %w( c1 eg2 )
-        expect_example_ %w( eg4 )
+        want_example_ %w( c1 eg1 )
+        want_example_ %w( c1 eg2 )
+        want_example_ %w( eg4 )
         _stats = execute
         _stats.example_count == 3 || fail
         a == [ :eg_1_ran, :eg_2_ran, :eg_4_ran ] || fail
@@ -164,20 +164,20 @@ module Skylab::TestSupport::TestSupport
             a
           end
 
-          o.expect_lines_by = method :__expect_these_lines
+          o.want_lines_by = method :__want_these_lines
         end
       end
 
-      def __expect_these_lines o
+      def __want_these_lines o
 
-        o.expect "Run options: include {:line_numbers=>[5,20-∞]}"
-        o.expect
-        o.expect EMPTY_S_  # <- this one might an accident (the root node with no desc)?
-        o.expect                "  c1"
-        o.expect_styled_content "    eg1", :green
-        o.expect_styled_content "  eg4", :green
-        expect_finished_line_ o
-        o.expect_styled_content "2 examples, 0 failures", :green
+        o.want "Run options: include {:line_numbers=>[5,20-∞]}"
+        o.want
+        o.want EMPTY_S_  # <- this one might an accident (the root node with no desc)?
+        o.want                "  c1"
+        o.want_styled_content "    eg1", :green
+        o.want_styled_content "  eg4", :green
+        want_finished_line_ o
+        o.want_styled_content "2 examples, 0 failures", :green
       end
 
       def ARGV_

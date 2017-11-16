@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport
           1.should_ eql 2
         end
 
-        expect_example_fails_with_message_ 'expected 2, got 1'
+        want_example_fails_with_message_ 'expected 2, got 1'
       end
 
       it "when equal" do
@@ -25,7 +25,7 @@ module Skylab::TestSupport::TestSupport
           1.should_ eql 1
         end
 
-        expect_example_passes_with_message_ 'equals 1'
+        want_example_passes_with_message_ 'equals 1'
       end
     end
 
@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport
           'foo'.should_ match %r(bar)
         end
 
-        expect_example_fails_with_message_ 'expected /bar/, had "foo"'
+        want_example_fails_with_message_ 'expected /bar/, had "foo"'
       end
 
       it "when matches" do
@@ -46,7 +46,7 @@ module Skylab::TestSupport::TestSupport
           'BEEFUS BOQUEEFUS'.should_ match %r(\Abeef.+boqueef)i
         end
 
-        expect_example_passes_with_message_ "matches /\\Abeef.+boqueef/i"
+        want_example_passes_with_message_ "matches /\\Abeef.+boqueef/i"
       end
     end
 
@@ -60,7 +60,7 @@ module Skylab::TestSupport::TestSupport
           end.should_ raise_error ::RuntimeError, /dinglebat/
         end
 
-        expect_example_fails_with_message_(
+        want_example_fails_with_message_(
           "expected helf to match (?-mix:dinglebat)" )
       end
 
@@ -72,7 +72,7 @@ module Skylab::TestSupport::TestSupport
           end.should_ raise_error ::NoMemoryError, 'helf'
         end
 
-        expect_example_fails_with_message_(
+        want_example_fails_with_message_(
           'expected NoMemoryError, had RuntimeError' )
       end
 
@@ -84,7 +84,7 @@ module Skylab::TestSupport::TestSupport
           end.should_ raise_error %r(wondertard)
         end
 
-        expect_example_fails_with_message_(
+        want_example_fails_with_message_(
           "expected lambda to raise, didn't raise anything." )
       end
 
@@ -96,7 +96,7 @@ module Skylab::TestSupport::TestSupport
           end.should_ raise_error 'wankerberries'
         end
 
-        expect_example_fails_with_message_(
+        want_example_fails_with_message_(
           "expected lambda to raise, didn't raise anything." )
       end
 
@@ -108,7 +108,7 @@ module Skylab::TestSupport::TestSupport
           end.should_ raise_error ::RuntimeError, 'helf'
         end
 
-        expect_example_passes_with_message_(
+        want_example_passes_with_message_(
           "raises RuntimeError matching (?-mix:\\Ahelf\\z)" )
       end
     end
@@ -126,7 +126,7 @@ module Skylab::TestSupport::TestSupport
           2.should_ be_even
         end
 
-        expect_example_passes_with_message_ "is even"
+        want_example_passes_with_message_ "is even"
       end
 
       it "when the subject does *not* matdch the dynamically created predicate" do
@@ -136,7 +136,7 @@ module Skylab::TestSupport::TestSupport
           3.should_ be_even
         end
 
-        expect_example_fails_with_message_ "expected 3 to be even"
+        want_example_fails_with_message_ "expected 3 to be even"
       end
     end
 
@@ -151,7 +151,7 @@ module Skylab::TestSupport::TestSupport
           [ :A ].should_ be_include :A
         end
 
-        expect_example_passes_with_message_ "includes :A"
+        want_example_passes_with_message_ "includes :A"
       end
 
       it "when not match" do
@@ -161,7 +161,7 @@ module Skylab::TestSupport::TestSupport
           [ :A ].should_ be_include :B
         end
 
-        expect_example_fails_with_message_ "expected [:A] to include :B"
+        want_example_fails_with_message_ "expected [:A] to include :B"
       end
     end
 

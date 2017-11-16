@@ -17,7 +17,7 @@ module Skylab::System::TestSupport
                 version 2.3
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
     it "vendor example 2 (2 of 5)" do
@@ -28,7 +28,7 @@ module Skylab::System::TestSupport
           bar.so version 2.3
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
     it "vendor example 2 (4 of 5)" do
@@ -43,10 +43,10 @@ module Skylab::System::TestSupport
                     2.3
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
-    def _expect_this_same_tree_stream
+    def _want_this_same_tree_stream
 
       tree = @st.gets
 

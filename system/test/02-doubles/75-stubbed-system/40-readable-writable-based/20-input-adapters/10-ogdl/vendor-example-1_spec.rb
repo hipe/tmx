@@ -15,7 +15,7 @@ module Skylab::System::TestSupport
           bar.so
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
     it "vendor example 1 (2 of 5)" do
@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
           bar.so
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
     it "vendor example 1 (3 of 5)" do
@@ -35,7 +35,7 @@ module Skylab::System::TestSupport
           foo.so, bar.so
       HERE
 
-      _expect_this_same_tree_stream
+      _want_this_same_tree_stream
     end
 
     it "vendor example 1 (4 of 5) - PARENTHESIS NOT YET IMPLEMENTED" do
@@ -52,7 +52,7 @@ module Skylab::System::TestSupport
       e.name.should eql :_PARENS_NOT_IMPLEMENTED
     end
 
-    def _expect_this_same_tree_stream
+    def _want_this_same_tree_stream
 
       tree = @st.gets
       tree.string.should eql 'libraries'

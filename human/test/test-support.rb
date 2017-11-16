@@ -74,8 +74,8 @@ module Skylab::Human::TestSupport
     end
   end ; end
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

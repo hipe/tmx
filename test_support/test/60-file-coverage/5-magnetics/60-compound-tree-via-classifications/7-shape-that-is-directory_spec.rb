@@ -5,10 +5,10 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] file-coverage - magnetics - CTvC - shape that is directory" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :file_coverage
     use :file_coverage_compound_tree
-    use :file_coverage_expect_node_characteristics
+    use :file_coverage_want_node_characteristics
 
     it "minimal positive case" do
 
@@ -43,31 +43,31 @@ module Skylab::TestSupport::TestSupport
     it "level 0 test without asset is expressed" do
 
       _path 'twna'
-      _expect_test_without_asset 'twna_speg.kode'
+      _want_test_without_asset 'twna_speg.kode'
     end
 
     it "level 0 asset without test is expressed" do
 
       _path 'awnt'
-      _expect_asset_without_test 'awnt---.kode'
+      _want_asset_without_test 'awnt---.kode'
     end
 
     it "level 1 asset without test is expressed" do
 
       _path 'dir-with/awnt2'
-      _expect_asset_without_test 'awnt2.kode'
+      _want_asset_without_test 'awnt2.kode'
     end
 
     it "level 1 test without asset is expressed (in a folder with normal tests)" do
 
       _path 'aa-bb/twna2'
-      _expect_test_without_asset 'twna2_speg.kode'
+      _want_test_without_asset 'twna2_speg.kode'
     end
 
     it "level 1 test without asset is expressed (in its own folder)" do
 
       _path 'dir-with-2/twna3'
-      _expect_test_without_asset 'twna3_speg.kode'
+      _want_test_without_asset 'twna3_speg.kode'
     end
 
     it "some file are ignored per the name conventions" do
@@ -79,8 +79,8 @@ module Skylab::TestSupport::TestSupport
 
       _path 'aa-bb'
 
-      expect_assets_and_tests_ @node[ 'from-one' ]
-      expect_assets_and_tests_ @node[ 'from-another' ]
+      want_assets_and_tests_ @node[ 'from-one' ]
+      want_assets_and_tests_ @node[ 'from-another' ]
     end
 
     def _path s
@@ -109,18 +109,18 @@ module Skylab::TestSupport::TestSupport
       @tree
     end
 
-    def _expect_asset_without_test file_entry_s
+    def _want_asset_without_test file_entry_s
 
-      expect_assets_but_no_tests_ @node
+      want_assets_but_no_tests_ @node
 
       a = @node.node_payload.asset_file_entry_s_a
       a.length.should eql 1
       a.first.should eql file_entry_s
     end
 
-    def _expect_test_without_asset file_entry_s
+    def _want_test_without_asset file_entry_s
 
-      expect_tests_but_no_assets_ @node
+      want_tests_but_no_assets_ @node
 
       a = @node.node_payload.test_file_entry_s_a
       a.length.should eql 1

@@ -43,7 +43,7 @@ module Skylab::Slicer::TestSupport
       Home_::CLI
     end
 
-    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+    define_method :get_invocation_strings_for_want_stdout_stderr, -> do
       s_a = [ 'sli' ]
       -> do
         s_a

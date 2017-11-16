@@ -9,7 +9,7 @@ module Skylab::Human::TestSupport
     module DSL
 
       def self.[] tcc
-        Expect_Event[ tcc ]
+        Want_Event[ tcc ]
         tcc.send :define_singleton_method, :given, Emit_by___
         tcc.include self
       end
@@ -113,9 +113,9 @@ module Skylab::Human::TestSupport
 
         # -- run the thing
 
-        _recording_oes_p = event_log.handle_event_selectively
+        _recording_p = event_log.handle_event_selectively
 
-        _use_this = co.emission_handler_via_emission_handler( & _recording_oes_p )
+        _use_this = co.emission_handler_via_emission_handler( & _recording_p )
 
         _use_this.call( * dsl.channel, & dsl.emission_proc )
 

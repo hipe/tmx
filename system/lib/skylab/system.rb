@@ -131,7 +131,7 @@ module Skylab::System
         @_branch_module = Home_
 
         @_loadable_references = Home_.lib_.plugin::Magnetics::
-            OperatorBranch_via_DirectoryOneDeeper.
+            FeatureBranch_via_DirectoryOneDeeper.
         define do |o|
 
           # NOTE: the only use this has to us for now is constituency validation

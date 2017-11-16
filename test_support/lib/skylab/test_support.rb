@@ -77,9 +77,9 @@ module Skylab::TestSupport  # :[#021].
     end
   end
 
-  Expect_these_lines_in_array = -> act_s_a, p, tc do
+  Want_these_lines_in_array = -> act_s_a, p, tc do
 
-    Home_::Expect_Line::Expect_these_lines_in_array[ act_s_a, p, tc ]
+    Home_::Want_Line::Want_these_lines_in_array[ act_s_a, p, tc ]
   end
 
   # --

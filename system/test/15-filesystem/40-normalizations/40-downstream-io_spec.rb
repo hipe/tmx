@@ -13,7 +13,7 @@ module Skylab::System::TestSupport
 
       against_ @_path
 
-      _expect_overwrote
+      _want_overwrote
     end
 
     it "exists, formal force, actual force is known and true" do
@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
         :force_arg, __build_force_yes_arg,
       )
 
-      _expect_overwrote
+      _want_overwrote
     end
 
     it "exists, formal force, actual force is known and false" do
@@ -35,13 +35,13 @@ module Skylab::System::TestSupport
         :force_arg, __build_force_no_arg,
       )
 
-      _em = expect_not_OK_event :missing_required_properties
+      _em = want_not_OK_event :missing_required_properties
 
       _sym = _em.cached_event_value.terminal_channel_symbol
 
       :missing_required_permission == _sym or fail
 
-      expect_fail
+      want_fail
     end
 
     def __build_force_yes_arg
@@ -62,8 +62,8 @@ module Skylab::System::TestSupport
       )
 
       against_ _path
-      expect_not_OK_event :parent_directory_must_exist
-      expect_fail
+      want_not_OK_event :parent_directory_must_exist
+      want_fail
     end
 
     it "no exist, parent directory is file" do
@@ -74,11 +74,11 @@ module Skylab::System::TestSupport
       )
       against_ _path
 
-      expect_not_OK_event :exception do | ev |
+      want_not_OK_event :exception do | ev |
         :errno_enotdir == ev.terminal_channel_symbol or fail
       end
 
-      expect_fail
+      want_fail
     end
 
     it "no exist, dry run" do
@@ -90,8 +90,8 @@ module Skylab::System::TestSupport
         :is_dry_run, true,
       )
 
-      expect_neutral_event :before_probably_creating_new_file
-      expect_no_more_events
+      want_neutral_event :before_probably_creating_new_file
+      want_no_more_events
 
       x = @result.value
       d = x.write 'abc'
@@ -112,10 +112,10 @@ module Skylab::System::TestSupport
       NIL_
     end
 
-    def _expect_overwrote
+    def _want_overwrote
 
-      expect_neutral_event :before_editing_existing_file
-      expect_no_more_events
+      want_neutral_event :before_editing_existing_file
+      want_no_more_events
 
       io = @result.value
       io.write 'hey'

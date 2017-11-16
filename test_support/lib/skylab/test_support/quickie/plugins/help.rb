@@ -11,7 +11,7 @@ module Skylab::TestSupport
           @lazy_index = o.lazy_index
           @listener = o.listener
           @_narrator = o.argument_scanner_narrator
-          @operator_branch = o.operator_branch
+          @feature_branch = o.feature_branch
         end
 
         def description_proc
@@ -52,7 +52,7 @@ module Skylab::TestSupport
         end
 
         def __item_normal_tuple_stream
-          @operator_branch.to_loadable_reference_stream.map_by do |sym|
+          @feature_branch.to_loadable_reference_stream.map_by do |sym|
             [ :primary, sym ]
           end
         end

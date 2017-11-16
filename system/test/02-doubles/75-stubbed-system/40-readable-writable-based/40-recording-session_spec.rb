@@ -5,7 +5,7 @@ module Skylab::System::TestSupport
   describe "[sy] doubles - stubbed-system - recording session (#LIVE)" do
 
     TS_[ self ]
-    use :expect_line
+    use :want_line
     use :doubles_stubbed_system
 
     it "works" do

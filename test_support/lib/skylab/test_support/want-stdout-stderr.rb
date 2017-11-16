@@ -1,9 +1,9 @@
 module Skylab::TestSupport
 
-  module Expect_Stdout_Stderr  # lots of "theory" in [#029]
+  module Want_Stdout_Stderr  # lots of "theory" in [#029]
 
     # NOTE this mutates strings under "oldchool" techniques! (see [#]scope )
-    # assumes {  @IO_spy_group_for_expect_stdout_stderr | your own `flush_baked_emission_array` }
+    # assumes {  @IO_spy_group_for_want_stdout_stderr | your own `flush_baked_emission_array` }
 
     module Test_Context_Instance_Methods
 
@@ -11,75 +11,75 @@ module Skylab::TestSupport
 
       def flush_invocation_to_help_screen_oriented_state  # current favorite
 
-        _state = flush_frozen_state_from_expect_stdout_stderr
+        _state = flush_frozen_state_from_want_stdout_stderr
 
         help_screen_oriented_state_via_invocation_state _state
       end
 
       def help_screen_oriented_state_via_invocation_state state  # [y2]
 
-        _cls = _expect_section::Help_Screen_State
+        _cls = _want_section::Help_Screen_State
 
         _cls.via :state, state, :stream, :e
       end
 
       def flush_invocation_to_help_screen_tree
 
-        _state = flush_frozen_state_from_expect_stdout_stderr
+        _state = flush_frozen_state_from_want_stdout_stderr
 
-        _expect_section.tree_via :state, _state, :stream, :e
+        _want_section.tree_via :state, _state, :stream, :e
       end
 
-      define_method :_expect_section, ( Lazy_.call do
-        Home_.lib_.zerk.test_support::CLI::Expect_Section_Fail_Early
+      define_method :_want_section, ( Lazy_.call do
+        Home_.lib_.zerk.test_support::CLI::Want_Section_Fail_Early
       end )
 
-      def flush_frozen_state_from_expect_stdout_stderr
+      def flush_frozen_state_from_want_stdout_stderr
 
         remove_instance_variable :@invocation
 
         Frozen_State___.new(
           remove_instance_variable( :@exitstatus ),
-          release_lines_for_expect_stdout_stderr,
+          release_lines_for_want_stdout_stderr,
         ).freeze
       end
 
       def flush_baked_emission_array  # :+#hook-near #universal
-        release_lines_for_expect_stdout_stderr
+        release_lines_for_want_stdout_stderr
       end
 
-      def release_lines_for_expect_stdout_stderr
-        _ = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+      def release_lines_for_want_stdout_stderr
+        _ = remove_instance_variable :@IO_spy_group_for_want_stdout_stderr
         _.release_lines
       end
 
       # -- optional support for "full stack" CLI testing
 
-      def using_expect_stdout_stderr_invoke_via_argv a  # might mutate arg
+      def using_want_stdout_stderr_invoke_via_argv a  # might mutate arg
 
-        using_expect_stdout_stderr_invoke_via(
+        using_want_stdout_stderr_invoke_via(
           :mutable_argv, a,
-          :prefix, argv_prefix_for_expect_stdout_stderr,
+          :prefix, argv_prefix_for_want_stdout_stderr,
         )
       end
 
-      def argv_prefix_for_expect_stdout_stderr  # #hook-in:1
+      def argv_prefix_for_want_stdout_stderr  # #hook-in:1
         NIL_
       end
 
-      def using_expect_stdout_stderr_invoke_with_no_prefix * argv
+      def using_want_stdout_stderr_invoke_with_no_prefix * argv
 
-        using_expect_stdout_stderr_invoke_via(
+        using_want_stdout_stderr_invoke_via(
           :mutable_argv, argv,
           :prefix, nil,
         )
       end
 
-      def using_expect_stdout_stderr_invoke_via * x_a
-        using_expect_stdout_stderr_invoke_via_iambic x_a
+      def using_want_stdout_stderr_invoke_via * x_a
+        using_want_stdout_stderr_invoke_via_iambic x_a
       end
 
-      def using_expect_stdout_stderr_invoke_via_iambic x_a
+      def using_want_stdout_stderr_invoke_via_iambic x_a
 
         opt = Options___.new
         x_a.each_slice 2 do | k, x |
@@ -91,9 +91,9 @@ module Skylab::TestSupport
           mutable_argv[ 0, 0 ] = prefix
         end
 
-        init_invocation_for_expect_stdout_stderr mutable_argv
+        init_invocation_for_want_stdout_stderr mutable_argv
 
-        path = working_directory_for_expect_stdout_stderr
+        path = working_directory_for_want_stdout_stderr
         if path
           orig_pwd = ::Dir.pwd
           do_debug and debug_IO.puts "cd #{ path }"
@@ -110,22 +110,22 @@ module Skylab::TestSupport
         NIL
       end
 
-      def working_directory_for_expect_stdout_stderr
+      def working_directory_for_want_stdout_stderr
         NOTHING_
       end
 
       Options___ = ::Struct.new :mutable_argv, :prefix
 
-      def init_invocation_for_expect_stdout_stderr argv
+      def init_invocation_for_want_stdout_stderr argv
 
-        g = __build_IO_spy_group_for_expect_stdout_stderr
-        @IO_spy_group_for_expect_stdout_stderr = g
+        g = __build_IO_spy_group_for_want_stdout_stderr
+        @IO_spy_group_for_want_stdout_stderr = g
 
-        _s_a = invocation_strings_for_expect_stdout_stderr  # #hook-out:1
+        _s_a = invocation_strings_for_want_stdout_stderr  # #hook-out:1
 
         args = [ argv, * g.values_at( :i, :o, :e ), _s_a ]
 
-        x = self.CLI_options_for_expect_stdout_stderr
+        x = self.CLI_options_for_want_stdout_stderr
         if x
           if x.respond_to? :call
             use_p = x
@@ -134,10 +134,10 @@ module Skylab::TestSupport
           end
         end
 
-        invo = build_invocation_for_expect_stdout_stderr( * args, & use_p )
+        invo = build_invocation_for_want_stdout_stderr( * args, & use_p )
 
-        if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
-          @for_expect_stdout_stderr_prepare_invocation[ invo ]
+        if instance_variable_defined? :@for_want_stdout_stderr_prepare_invocation
+          @for_want_stdout_stderr_prepare_invocation[ invo ]
         else
           prepare_subject_CLI_invocation invo
         end
@@ -147,12 +147,12 @@ module Skylab::TestSupport
         NIL
       end
 
-      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra, & p
+      def build_invocation_for_want_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra, & p
 
         subject_CLI.new( argv, sin, sout, serr, pn_s_a, * xtra, & p )  # #hook-out
       end
 
-      def __build_IO_spy_group_for_expect_stdout_stderr
+      def __build_IO_spy_group_for_want_stdout_stderr
 
         g = Home_::IO.spy.group.new
 
@@ -162,11 +162,11 @@ module Skylab::TestSupport
 
         g.debug_IO = debug_IO  # :+#hook-out
 
-        g.add_stream :i, ( stdin_for_expect_stdout_stderr || :__instream_not_used_yet__ )
+        g.add_stream :i, ( stdin_for_want_stdout_stderr || :__instream_not_used_yet__ )
 
         g.add_stream :o
 
-        io = stderr_for_expect_stdout_stderr
+        io = stderr_for_want_stdout_stderr
         if io
           g.add_stream :e, io
         else
@@ -175,15 +175,15 @@ module Skylab::TestSupport
         g
       end
 
-      attr_accessor :IO_spy_group_for_expect_stdout_stderr, :invocation  # for hax
+      attr_accessor :IO_spy_group_for_want_stdout_stderr, :invocation  # for hax
 
-      alias_method :init_invocation_for_expect_stdout_stderr_,
-        :init_invocation_for_expect_stdout_stderr  # for hax
+      alias_method :init_invocation_for_want_stdout_stderr_,
+        :init_invocation_for_want_stdout_stderr  # for hax
 
-      attr_reader :stdin_for_expect_stdout_stderr,  # :+#hook-in
-        :stderr_for_expect_stdout_stderr
+      attr_reader :stdin_for_want_stdout_stderr,  # :+#hook-in
+        :stderr_for_want_stdout_stderr
 
-      def CLI_options_for_expect_stdout_stderr
+      def CLI_options_for_want_stdout_stderr
         NIL_
       end
 
@@ -221,23 +221,23 @@ module Skylab::TestSupport
 
       # ~ simple expect "macros"
 
-      def expect_header_line s
-        expect :styled, s  # no expectation of colons here, because [#072]
+      def want_header_line s
+        want :styled, s  # no expectation of colons here, because [#072]
       end
 
-      # ~ expect
+      # ~ want (née "expect")
 
-      def expect * x_a, & p
+      def want * x_a, & p
 
-        expect_stdout_stderr_via_arglist x_a, & p
+        want_stdout_stderr_via_arglist x_a, & p
       end
 
-      def expect_stdout_stderr_via_arglist x_a, & p
+      def want_stdout_stderr_via_arglist x_a, & p
 
-        expect_stdout_stderr_via Expectation.via_args( x_a, & p )
+        want_stdout_stderr_via Expectation.via_args( x_a, & p )
       end
 
-      def expect_stdout_stderr_via exp
+      def want_stdout_stderr_via exp
 
         @__sout_serr_expectation__ = exp
 
@@ -260,21 +260,21 @@ module Skylab::TestSupport
 
       # ~ for the end
 
-      def expect_fail
-        expect_no_more_lines
-        expect_result_for_failure
+      def want_fail
+        want_no_more_lines
+        want_result_for_failure
       end
 
-      def expect_succeed
-        expect_no_more_lines
-        expect_result_for_success
+      def want_succeed
+        want_no_more_lines
+        want_result_for_success
       end
 
-      def expect_result_for_failure
-        exitstatus.should eql result_for_failure_for_expect_stdout_stderr  # :+#hook-out
+      def want_result_for_failure
+        exitstatus.should eql result_for_failure_for_want_stdout_stderr  # :+#hook-out
       end
 
-      def expect_result_for_success
+      def want_result_for_success
         exitstatus.should be_zero
       end
 
@@ -284,9 +284,9 @@ module Skylab::TestSupport
 
       # ~ support & other expectations
 
-      def expect_maybe_a_blank_line
+      def want_maybe_a_blank_line
 
-        st = stream_for_expect_stdout_stderr
+        st = stream_for_want_stdout_stderr
 
         if st.unparsed_exists and NEWLINE_ == st.head_as_is.string
           st.advance_one
@@ -294,16 +294,16 @@ module Skylab::TestSupport
         end
       end
 
-      def expect_a_blank_line
+      def want_a_blank_line
 
-        st = stream_for_expect_stdout_stderr
+        st = stream_for_want_stdout_stderr
         _x = st.gets_one
         _x.string.should eql NEWLINE_
       end
 
-      def expect_no_more_lines
+      def want_no_more_lines
 
-        st = stream_for_expect_stdout_stderr
+        st = stream_for_want_stdout_stderr
 
         if st.unparsed_exists
           _x = st.head_as_is
@@ -352,11 +352,11 @@ module Skylab::TestSupport
         s
       end
 
-      def flush_to_expect_stdout_stderr_emission_summary_expecter
+      def flush_to_want_stdout_stderr_emission_summary_expecter
 
         # (it would be nice to use Enumerable.chunk but we have a reduce too)
 
-        st = stream_for_expect_stdout_stderr
+        st = stream_for_want_stdout_stderr
         y = []
 
         sym = nil
@@ -388,7 +388,7 @@ module Skylab::TestSupport
 
         _st = sout_serr_line_stream_for_contiguous_lines_on_stream sym
 
-        Home_::Expect_Line::Scanner.via_line_stream _st
+        Home_::Want_Line::Scanner.via_line_stream _st
       end
 
       def sout_serr_line_stream_for_contiguous_lines_on_stream sym
@@ -422,22 +422,22 @@ module Skylab::TestSupport
 
       # ~ support for the oldschool way
 
-      def sout_serr_expect_given_regex  # [te]
-        if _sout_serr_expect_and_resolve_emission_line
+      def sout_serr_want_given_regex  # [te]
+        if _sout_serr_want_and_resolve_emission_line
           @__sout_serr_line__.should match @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end
 
-      def sout_serr_expect_given_string  # [te]
-        if _sout_serr_expect_and_resolve_emission_line
+      def sout_serr_want_given_string  # [te]
+        if _sout_serr_want_and_resolve_emission_line
           @__sout_serr_line__.should eql @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end
 
-      def _sout_serr_expect_and_resolve_emission_line
-        if _sout_serr_expect_and_resolve_emission
+      def _sout_serr_want_and_resolve_emission_line
+        if _sout_serr_want_and_resolve_emission
           line = @__sout_serr_emission__.string
           s = line.chomp!  # NOTE - we mutate it for now!
           if s
@@ -453,7 +453,7 @@ module Skylab::TestSupport
       end
 
       def __sout_serr_receive_chomped_emission_line line
-        if @__sout_serr_expectation__.expect_is_styled
+        if @__sout_serr_expectation__.want_is_styled
           s = line.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
           if s
             @__sout_serr_line__ = s
@@ -467,7 +467,7 @@ module Skylab::TestSupport
         end
       end
 
-      def _sout_serr_expect_and_resolve_emission
+      def _sout_serr_want_and_resolve_emission
         exp = @__sout_serr_expectation__
         st = @__sout_serr_actual_stream__
         if st.unparsed_exists
@@ -496,7 +496,7 @@ module Skylab::TestSupport
       def stdout_stderr_against_emission em
 
         _st = Common_::Stream.via_item( em ).flush_to_scanner
-        self.stream_for_expect_stdout_stderr = _st
+        self.stream_for_want_stdout_stderr = _st
         NIL_
       end
 
@@ -505,18 +505,18 @@ module Skylab::TestSupport
         # the subject of your tests will be this array of emissions.
 
         _st = Common_::Scanner.via_array em_a
-        self.stream_for_expect_stdout_stderr = _st
+        self.stream_for_want_stdout_stderr = _st
         NIL_
       end
 
-      def stream_for_expect_stdout_stderr= x
+      def stream_for_want_stdout_stderr= x
 
         @__sout_serr_is_baked__ = true
 
         @__sout_serr_actual_stream__ = x
       end
 
-      def stream_for_expect_stdout_stderr
+      def stream_for_want_stdout_stderr
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
@@ -564,8 +564,8 @@ module Skylab::TestSupport
 
       def initialize st, & p
 
-        @expect_is_styled = false
-        @method_name = :_sout_serr_expect_and_resolve_emission
+        @want_is_styled = false
+        @method_name = :_sout_serr_want_and_resolve_emission
         @stream_symbol = nil
 
         process_argument_scanner_passively st
@@ -580,7 +580,7 @@ module Skylab::TestSupport
     private
 
       def styled=
-        @expect_is_styled = true
+        @want_is_styled = true
         KEEP_PARSING_
       end
 
@@ -591,13 +591,13 @@ module Skylab::TestSupport
       end
 
       def Regexp st
-        @method_name = :sout_serr_expect_given_regex
+        @method_name = :sout_serr_want_given_regex
         @pattern_x = st.gets_one
         KEEP_PARSING_
       end
 
       def String st
-        @method_name = :sout_serr_expect_given_string
+        @method_name = :sout_serr_want_given_string
         @pattern_x = st.gets_one
         KEEP_PARSING_
       end
@@ -614,7 +614,7 @@ module Skylab::TestSupport
       end
 
       attr_reader(
-        :expect_is_styled,
+        :want_is_styled,
         :method_name,
         :pattern_x,
         :receive_unstyled_string,
@@ -649,21 +649,21 @@ module Skylab::TestSupport
 
         m = exp.method_name
         if m
-          @_against_string = if exp.expect_is_styled
+          @_against_string = if exp.want_is_styled
             __unstyle line_o.string
           else
             __chomp line_o.string
           end
 
           send m
-        elsif exp.expect_is_styled
+        elsif exp.want_is_styled
           self._ETC
         end
 
         if @_failures
           ___when_failed
         else
-          @_matchdata || :_expect_stdout_stderr_matched_
+          @_matchdata || :_want_stdout_stderr_matched_
         end
       end
 
@@ -710,7 +710,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      def sout_serr_expect_given_regex
+      def sout_serr_want_given_regex
 
         md = @_expectation.pattern_x.match @_against_string
         if md
@@ -724,7 +724,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      def sout_serr_expect_given_string
+      def sout_serr_want_given_string
 
         if @_expectation.pattern_x != @_against_string
           _add_failure @_against_string, @_expectation.pattern_x, :string
@@ -770,7 +770,7 @@ module Skylab::TestSupport
         @_st = Common_::Stream.via_nonsparse_array a
       end
 
-      def expect_chunk num_x=nil, stream_symbol
+      def want_chunk num_x=nil, stream_symbol
 
         cx = @_st.gets
         if cx
@@ -794,7 +794,7 @@ module Skylab::TestSupport
         end
       end
 
-      def expect_no_more_chunks
+      def want_no_more_chunks
         cx = @_st.gets
         if cx
           fail "expected no more chunks, had #{ cx.describe }"

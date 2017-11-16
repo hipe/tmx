@@ -10,12 +10,12 @@ module Skylab::TestSupport::TestSupport
 
       def fails_because_no_test_directories_ sym
 
-        expect :error, :expression, :operation_parse_error, :missing_required_arguments do |y|
+        want :error, :expression, :operation_parse_error, :missing_required_arguments do |y|
 
           y.first == "can't :#{ sym } without test directories. (maybe use :test_directory.)" || fail
         end
 
-        expect_result UNABLE_
+        want_result UNABLE_
       end
 
       def ignore_these_common_emissions_

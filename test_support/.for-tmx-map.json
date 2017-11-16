@@ -1,6 +1,6 @@
 {
-  "after": "sub_tree",
-  "category": "more general libs",
+  "after": "human",
+  "category": "practical essentials",
   "is lib": true,
   "sigil": "ts"
 }

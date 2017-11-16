@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class Expect_line  # :[#038]
+  class Want_line  # :[#038]
 
     # assumes @output_s
 
@@ -135,17 +135,17 @@ module Skylab::TestSupport
 
       # ~ using a stateful scanner
 
-      def expect_next_nonblank_line_is string
+      def want_next_nonblank_line_is string
         advance_to_next_nonblank_line
         line.should eql string
       end
 
       def advance_to_rx rx
-        expect_line_scanner.advance_to_rx rx
+        want_line_scanner.advance_to_rx rx
       end
 
       def advance_to_next_rx rx
-        expect_line_scanner.advance_to_next_rx rx
+        want_line_scanner.advance_to_next_rx rx
       end
 
       def next_nonblank_line
@@ -153,38 +153,38 @@ module Skylab::TestSupport
       end
 
       def next_line
-        expect_line_scanner.next_line
+        want_line_scanner.next_line
       end
 
       def advance_to_next_nonblank_line
-        expect_line_scanner.advance_to_next_rx NONBLANK_RX__
+        want_line_scanner.advance_to_next_rx NONBLANK_RX__
       end
 
       def line
-        @expect_line_scanner.line
+        @want_line_scanner.line
       end
 
-      def expect_line_scanner
-        @expect_line_scanner ||= __build_expect_line_scanner
+      def want_line_scanner
+        @want_line_scanner ||= __build_expect_line_scanner
       end
 
       def __build_expect_line_scanner
 
-        st = line_stream_for_expect_line
+        st = line_stream_for_want_line
         if st
-          Expect_Line_::Scanner.via_stream st
+          Want_Line_::Scanner.via_stream st
         else
-          Expect_Line_::Scanner.via_string @output_s
+          Want_Line_::Scanner.via_string @output_s
         end
       end
 
-      attr_reader :line_stream_for_expect_line
+      attr_reader :line_stream_for_want_line
     end
 
     NONBLANK_RX__ = /[^[:space:]]/
   end
 
-  module Expect_Line
+  module Want_Line
 
     # ==
 
@@ -235,7 +235,7 @@ module Skylab::TestSupport
         freeze
       end
 
-      def expect_against_line_stream_under act_st, tc
+      def want_against_line_stream_under act_st, tc
 
         _exp_st = __to_expected_line_stream
 
@@ -324,7 +324,7 @@ module Skylab::TestSupport
 
     # ==
 
-    Expect_same_lines = -> do
+    Want_same_lines = -> do
       convert = -> x do
         if x.respond_to? :gets
           x
@@ -337,14 +337,14 @@ module Skylab::TestSupport
       end
     end.call
 
-    Expect_same_string = -> actual_s, expected_s, context do
+    Want_same_string = -> actual_s, expected_s, context do
 
       p = Home_.lib_.basic::String::LineStream_via_String
 
       Streams_have_same_content[ p[ actual_s ], p[ expected_s ], context ]
     end
 
-    Expect_these_lines_in_array_with_trailing_newlines = -> mixed_upstream, p, context do
+    Want_these_lines_in_array_with_trailing_newlines = -> mixed_upstream, p, context do
 
       ExpectThese__.call_by do |o|
         o.map_expectations_by do |exp_x|
@@ -359,7 +359,7 @@ module Skylab::TestSupport
       end
     end
 
-    Expect_these_lines_in_array = -> mixed_upstream, p, context do
+    Want_these_lines_in_array = -> mixed_upstream, p, context do
 
       ExpectThese__.call_by do |o|
 
@@ -601,9 +601,9 @@ module Skylab::TestSupport
 
       # ~ convenience macros for paraphernalia
 
-      def expect_header sym
+      def want_header sym
 
-        s = expect_styled_line
+        s = want_styled_line
         if s
 
           exp = "#{ sym }\n"
@@ -621,7 +621,7 @@ module Skylab::TestSupport
         end
       end
 
-      def expect_styled_line
+      def want_styled_line
 
         @line = @up.gets
         if @line
@@ -655,7 +655,7 @@ module Skylab::TestSupport
         end
       end
 
-      def expect_nonblank_line
+      def want_nonblank_line
 
         @line = @up.gets
         BLANK_RX___ =~ @line and fail "expected nonblank, had #{ @line.inspect }"
@@ -666,7 +666,7 @@ module Skylab::TestSupport
 
         _ok = exactly_one_blank_line
 
-        _ok && expect_that_line_matches( rx )
+        _ok && want_that_line_matches( rx )
       end
 
       def exactly_one_blank_line
@@ -684,7 +684,7 @@ module Skylab::TestSupport
         "needed one #{ s }, had #{ d } (#{ at_where 'near ' })"
       end
 
-      def expect_blank_line
+      def want_blank_line
 
         @line = @up.gets
         BLANK_RX___ =~ @line or fail ___say_current_line_not_blank
@@ -758,12 +758,12 @@ module Skylab::TestSupport
         "never found before end of file: #{ desc_s }"
       end
 
-      def expect_that_next_line_matches rx
+      def want_that_next_line_matches rx
         @line = @up.gets
-        expect_that_line_matches rx
+        want_that_line_matches rx
       end
 
-      def expect_that_line_matches rx
+      def want_that_line_matches rx
 
         if rx.respond_to? :ascii_only?
           if rx == @line
@@ -834,7 +834,7 @@ module Skylab::TestSupport
         s
       end
 
-      def expect_no_more_lines
+      def want_no_more_lines
         @line = @up.gets
         if @line
           fail "expected no more lines#{ at_where ', had ' }"
@@ -913,7 +913,7 @@ module Skylab::TestSupport
 
     # ==
 
-    Expect_line::Expect_Line_ = self
+    Want_line::Want_Line_ = self
     LINE_TERMINATION_SEQUENCE_RXS__ = '(?:\n|\r\n?|\z)'
     LINE_RX__ = /[^\r\n]*#{ LINE_TERMINATION_SEQUENCE_RXS__ }/
 

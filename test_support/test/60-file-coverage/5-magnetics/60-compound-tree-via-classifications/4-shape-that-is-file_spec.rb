@@ -5,7 +5,7 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] file-coverage - magnetics - CTvC - shape that is file" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :file_coverage
     use :file_coverage_compound_tree
 

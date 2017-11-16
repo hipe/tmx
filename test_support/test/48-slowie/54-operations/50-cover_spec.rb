@@ -5,21 +5,21 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] slowie - operations - cover" do
 
     TS_[ self ]
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :slowie
 
     it "coverage is disabled, but at least it tells you this" do
 
       call :cover
 
-      expect :error, :expression, :furloughed do |y|
+      want :error, :expression, :furloughed do |y|
 
         y.first.include? '"cover" is furloughed' or fail
       end
 
       ignore_these_common_emissions_
 
-      expect_result UNABLE_
+      want_result UNABLE_
     end
   end
 end

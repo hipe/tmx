@@ -12,8 +12,8 @@ module Skylab::System::TestSupport
       _path = TestSupport_::Fixtures.file :not_here
       against_ _path
 
-      expect_not_OK_event :enoent
-      expect_fail
+      want_not_OK_event :enoent
+      want_fail
     end
 
     it "`create_if_not_exist` - creates" do
@@ -26,8 +26,8 @@ module Skylab::System::TestSupport
         :create_if_not_exist,
       )
 
-      expect_neutral_event :creating_directory
-      expect_no_more_events
+      want_neutral_event :creating_directory
+      want_no_more_events
 
       ::File.basename( @result.value ).should eql 'mambazo'
     end
@@ -38,7 +38,7 @@ module Skylab::System::TestSupport
 
       against_ _path
 
-      _expect_same
+      _want_same
     end
 
     it "curry" do  # :#cov1.1
@@ -53,17 +53,17 @@ module Skylab::System::TestSupport
       o.frozen? or fail
 
       @result = o.against_path _three_lines
-      _expect_same
+      _want_same
     end
 
     def _three_lines
       TestSupport_::Fixtures.file( :three_lines )
     end
 
-    def _expect_same
+    def _want_same
 
-      expect_not_OK_event :wrong_ftype
-      expect_fail
+      want_not_OK_event :wrong_ftype
+      want_fail
     end
 
     def subject_

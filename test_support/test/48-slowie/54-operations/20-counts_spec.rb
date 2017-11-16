@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :slowie
 
     it "test directories are required" do
@@ -63,7 +63,7 @@ module Skylab::TestSupport::TestSupport
         )
 
         table_schema = nil
-        expect :data, :table_schema do |ts|
+        want :data, :table_schema do |ts|
           table_schema = ts
         end
 

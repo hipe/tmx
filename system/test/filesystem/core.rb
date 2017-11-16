@@ -3,7 +3,7 @@ module Skylab::System::TestSupport
   module Filesystem::Normalizations
 
     def self.[] tcm
-      Expect_Event[ tcm ]
+      Want_Event[ tcm ]
       tcm.include self
     end
 

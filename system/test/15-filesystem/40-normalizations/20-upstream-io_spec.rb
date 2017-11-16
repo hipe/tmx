@@ -15,11 +15,11 @@ module Skylab::System::TestSupport
 
       against_ _
 
-      _em = expect_not_OK_event :stat_error
+      _em = want_not_OK_event :stat_error
 
       black_and_white( _em.cached_event_value ).should match %r(\ANo such file or directory )
 
-      expect_fail
+      want_fail
     end
 
     it "not exist (path arg passed, name is used)" do
@@ -31,11 +31,11 @@ module Skylab::System::TestSupport
         :qualified_knownness_of_path, _pa,
       )
 
-      _em = expect_not_OK_event :stat_error
+      _em = want_not_OK_event :stat_error
 
       black_and_white( _em.cached_event_value ).should match %r(\ANo such 'wazoozie' - )
 
-      expect_fail
+      want_fail
     end
 
     def _not_here
@@ -45,14 +45,14 @@ module Skylab::System::TestSupport
     it "wrong ftype" do
 
       against_ TestSupport_::Fixtures.directory :empty_esque_directory
-      expect_not_OK_event :wrong_ftype
-      expect_fail
+      want_not_OK_event :wrong_ftype
+      want_fail
     end
 
     it "exist" do
 
       against_ TestSupport_::Fixtures.file :three_lines
-      expect_no_events
+      want_no_events
       kn = @result
       kn.is_known_known or fail
       io = kn.value
@@ -67,8 +67,8 @@ module Skylab::System::TestSupport
         :path, 'no-see',
       )
 
-      expect_not_OK_event :ambiguous_upstream_arguments
-      expect_fail
+      want_not_OK_event :ambiguous_upstream_arguments
+      want_fail
     end
 
     def _non_interactive_stdin

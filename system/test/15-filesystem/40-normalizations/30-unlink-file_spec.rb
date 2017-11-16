@@ -26,8 +26,8 @@ module Skylab::System::TestSupport
         :probably_exists,
       )
 
-      expect_not_OK_event :errno_enoent
-      expect_fail
+      want_not_OK_event :errno_enoent
+      want_fail
     end
 
     it "do it" do
@@ -38,7 +38,7 @@ module Skylab::System::TestSupport
 
       against_ path
       @result.should eql true
-      expect_no_more_events
+      want_no_more_events
     end
 
     def subject_

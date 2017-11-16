@@ -1,6 +1,6 @@
 {
-  "after": "brazen",
-  "category": "more general libs",
+  "after": "basic",
+  "category": "practical essentials",
   "doc test manifest": ".doc-test-manifest.list",
   "is lib": true,
   "sigil": "hu"

@@ -5,9 +5,9 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] file-coverage - modalities - API" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :file_coverage
-    use :file_coverage_expect_node_characteristics
+    use :file_coverage_want_node_characteristics
 
     it "no path argument - exception" do
 
@@ -25,12 +25,12 @@ module Skylab::TestSupport::TestSupport
 
       _call_API :path, 'not-absolute-path'
 
-      expect_not_OK_event :invalid_property_value do |ev|
+      want_not_OK_event :invalid_property_value do |ev|
         _hi = black_and_white( ev )
         _hi == "'path' cannot be relative - \"not-absolut[..]\"" || fail
       end
 
-      expect_fail
+      want_fail
     end
 
     it "easy boogie against the project tree" do
@@ -58,8 +58,8 @@ module Skylab::TestSupport::TestSupport
     it "do not boogie - noent" do
 
       _against_path fixture_tree( :one, 'not-there.rx' )
-      expect_not_OK_event :find_error
-      expect_fail
+      want_not_OK_event :find_error
+      want_fail
     end
 
     it "sub-tree under the test dir (counterparted)" do
@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport
       _against_path fixture_tree( :three, 'test', 'aa-bb' )
       _common_result_for_three
 
-      expect_assets_and_tests_ @result.tree[ 'from-one' ]
+      want_assets_and_tests_ @result.tree[ 'from-one' ]
     end
 
     it "sub-tree within the asset inner tree (counterparted)" do
@@ -75,7 +75,7 @@ module Skylab::TestSupport::TestSupport
       _against_path fixture_tree( :three, 'aa-bb--' )
       _common_result_for_three
 
-      expect_tests_but_no_assets_ @result.tree[ 'from-one' ]
+      want_tests_but_no_assets_ @result.tree[ 'from-one' ]
     end
 
     it "sub-tree within asset inner tree (no counterpart)" do
@@ -85,7 +85,7 @@ module Skylab::TestSupport::TestSupport
       x = @result.tree.fetch_only_child
       x.slug.should eql 'awnt2'
 
-      expect_assets_but_no_tests_ x
+      want_assets_but_no_tests_ x
     end
 
     # sub-tree within test dir (no counterpart) :+#skipped-because-boring
@@ -96,7 +96,7 @@ module Skylab::TestSupport::TestSupport
 
       x.children_count.should eql 3
 
-      expect_assets_and_tests_ x[ 'from-another' ]
+      want_assets_and_tests_ x[ 'from-another' ]
     end
 
     it "fix for gem-likes" do
@@ -104,7 +104,7 @@ module Skylab::TestSupport::TestSupport
       _path = fixture_tree :'4_gem_like'
       _against_path _path
 
-      expect_no_events
+      want_no_events
 
       pl = @result.tree['wan-noodle']['zeepie'].node_payload
       pl.asset_file_entry_s_a == %w( zeepie--.kode ) || fail
@@ -120,8 +120,8 @@ module Skylab::TestSupport::TestSupport
     def _call_API * x_a
 
       x_a.unshift :file_coverage
-      _oes_p = event_log.handle_event_selectively
-      call_API_via_iambic x_a, & _oes_p
+      _p = event_log.handle_event_selectively
+      call_API_via_iambic x_a, & _p
       NIL
     end
 

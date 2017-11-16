@@ -60,9 +60,9 @@ module Skylab::System::TestSupport
 
   module InstanceMethods___
 
-    def expect_these_lines_in_array_ act_s_a, & p
+    def want_these_lines_in_array_ act_s_a, & p
 
-      TestSupport_::Expect_Line::Expect_these_lines_in_array.call(
+      TestSupport_::Want_Line::Want_these_lines_in_array.call(
         act_s_a, p, self )
     end
 
@@ -129,12 +129,12 @@ module Skylab::System::TestSupport
 
   # -- test library nodes
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
-  Expect_Line = -> tcc do
-    TestSupport_::Expect_line[ tcc ]
+  Want_Line = -> tcc do
+    TestSupport_::Want_line[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

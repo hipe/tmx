@@ -5,7 +5,7 @@ module Skylab::System::TestSupport
   describe "[sy] patch - integration" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "file against file" do
 
@@ -14,7 +14,7 @@ module Skylab::System::TestSupport
       _against :target_file, path,
         :patch_file, patch_file_for_file
 
-      _expect_common_event_pattern
+      _want_common_event_pattern
 
       ::File.read( path ).should eql "after\n"
     end
@@ -26,7 +26,7 @@ module Skylab::System::TestSupport
       _against :target_directory, path,
         :patch_file, patch_file_for_directory
 
-      _expect_common_event_pattern
+      _want_common_event_pattern
 
       ::File.read( _expected_path_that_will_be_created ).should eql "huzzah\n"
     end
@@ -44,7 +44,7 @@ module Skylab::System::TestSupport
           +after
         HERE
 
-      _expect_common_event_pattern
+      _want_common_event_pattern
 
       ::File.read( path ).should eql "after\n"
     end
@@ -59,7 +59,7 @@ module Skylab::System::TestSupport
           +hizzie
         HERE
 
-      _expect_common_event_pattern
+      _want_common_event_pattern
 
       ::File.read( _expected_path_that_will_be_created ).should eql "hizzie\n"
     end
@@ -117,12 +117,12 @@ module Skylab::System::TestSupport
 
     _PATCHING_FILE_RX = /\Apatching file /
 
-    define_method :_expect_common_event_pattern do
+    define_method :_want_common_event_pattern do
 
-      _em = expect_neutral_event :process_line
+      _em = want_neutral_event :process_line
       line = black_and_white _em.cached_event_value
       line.should match _PATCHING_FILE_RX
-      expect_succeed
+      want_succeed
     end
 
     # ~ expected files

@@ -10,7 +10,7 @@ module Skylab::Human::TestSupport
 
     # -
 
-      def e_ expected_string  # "e_" = "expect_"
+      def e_ expected_string  # "e_" = "want_"
 
         _exp_fr = __build_the_magnetic_expression_session
 

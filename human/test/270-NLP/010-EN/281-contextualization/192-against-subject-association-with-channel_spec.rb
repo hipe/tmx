@@ -13,13 +13,13 @@ module Skylab::Human::TestSupport
 
     context "(the normalest example)" do
 
-      given do |oes_p|
+      given do |p|
 
         selection_stack no_name_, assoc_( :item ), assoc_( :add )
 
         subject_association assoc_ :left_shark
 
-        oes_p.call :error, :expression do |y|
+        p.call :error, :expression do |y|
           y << "should have been at #{ highlight 'this' } superbowl"
           y << "sho nuff"
         end
@@ -49,13 +49,13 @@ module Skylab::Human::TestSupport
 
     context "(parens, info, one level shallower)" do
 
-      given do |oes_p|
+      given do |p|
 
         selection_stack no_name_, assoc_( :frob )
 
         subject_association assoc_ :left_shark
 
-        oes_p.call :info, :expression do |y|
+        p.call :info, :expression do |y|
           y << "(was converted to #{ highlight 'this' })"
           y << "yup"
         end
@@ -77,13 +77,13 @@ module Skylab::Human::TestSupport
 
     context "(success..)" do  # :#c15n-testpoint-1
 
-      given do |oes_p|
+      given do |p|
 
         selection_stack no_name_, assoc_( :item ), assoc_( :send )
 
         subject_association assoc_ :left_shark
 
-        oes_p.call :success, :expression do |y|
+        p.call :success, :expression do |y|
           y << "(Sent item.)"
           y << "yay"
         end

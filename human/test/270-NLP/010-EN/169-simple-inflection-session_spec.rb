@@ -225,12 +225,12 @@ module Skylab::Human::TestSupport
         @COUNT = d
       end
 
-      def _expect expect_s
+      def _expect want_s
 
         sess = X_nlp_en_sis_SessionClass.new
         sess.write_count_for_inflection remove_instance_variable :@COUNT
         actual_s = _express_by sess
-        actual_s == expect_s or actual_s.should eql expect_s
+        actual_s == want_s or actual_s.should eql want_s
       end
     end
 

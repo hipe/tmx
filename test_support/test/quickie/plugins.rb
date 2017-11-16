@@ -5,7 +5,7 @@ module Skylab::TestSupport::TestSupport
     module Plugins
 
       def self.[] tcc
-        Zerk_test_support_[]::Expect_CLI_or_API[ self ]
+        Zerk_test_support_[]::Want_CLI_or_API[ self ]
         tcc.include self
       end
 
@@ -21,11 +21,11 @@ module Skylab::TestSupport::TestSupport
         end
 
         def messages_via_no_transition_found_
-          messages_via_expect_fail :error, :expression, :no_transition_found
+          messages_via_want_fail :error, :expression, :no_transition_found
         end
 
-        def expect_these_lines_via_no_transition_found_ & p
-          expect_these_lines_via_expect_fail :error, :expression, :no_transition_found, & p
+        def want_these_lines_via_no_transition_found_ & p
+          want_these_lines_via_want_fail :error, :expression, :no_transition_found, & p
         end
 
         def use_fake_paths_ mock_key

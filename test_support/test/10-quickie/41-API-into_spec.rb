@@ -6,13 +6,13 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :quickie
 
     it "call with strange primary - raises key error" do
       call :za_zoom
       begin
-        expect_result :_no_see_ts_
+        want_result :_no_see_ts_
       rescue ::KeyError => e
       end
       e.message == "key not found: :za_zoom" || fail
@@ -20,10 +20,10 @@ module Skylab::TestSupport::TestSupport
 
     it "call without the required primary" do
       call
-      expect :error, :expression, :missing_requireds do |y|
+      want :error, :expression, :missing_requireds do |y|
         y == [ "missing required argument(s): (load_tests_by)" ] || fail
       end
-      expect_API_result_for_fail_
+      want_API_result_for_fail_
     end
 
     context "look at this variety of emissions and results that we get.." do
@@ -66,12 +66,12 @@ module Skylab::TestSupport::TestSupport
           end
         end
 
-        expect :data, :example do |eg|
+        want :data, :example do |eg|
           eg.passed || fail
           eg.description_stack == [ "c 1", "eg 1" ] || fail
         end
 
-        expect :data, :example do |eg|
+        want :data, :example do |eg|
           eg.passed && fail
           eg.description_stack == [ "eg 2" ] || fail
         end
@@ -159,7 +159,7 @@ module Skylab::TestSupport::TestSupport
       _stats.example_count == 7 || fail
     end
 
-    alias_method :_expect, :expect_example_
+    alias_method :_expect, :want_example_
 
     # ==
 

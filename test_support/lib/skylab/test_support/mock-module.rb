@@ -57,11 +57,11 @@ module Skylab::TestSupport
         _add_expectation_of_read true, sym, :_method_
       end
 
-      def expect_to_have_singleton_method_defined sym
+      def want_to_have_singleton_method_defined sym
         _add_expectation_of_write sym, :_singleton_method_
       end
 
-      def expect_to_have_method_defined sym
+      def want_to_have_method_defined sym
         _add_expectation_of_write sym, :_method_
       end
 

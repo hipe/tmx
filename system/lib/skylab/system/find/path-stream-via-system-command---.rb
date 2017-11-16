@@ -2,12 +2,12 @@ module Skylab::System
 
   class Find
 
-    class Build_path_stream___ < Common_::Dyadic
+    class PathStream_via_SystemCommand___ < Common_::Dyadic
 
       def initialize x, sc, & p
         @args = x
         @system_conduit = sc
-        @on_event_selectively = p
+        @listener = p
       end
 
       # try to read from the process's STDOUT *first* before seeing if
@@ -57,7 +57,7 @@ module Skylab::System
 
       def maybe_send_error_via_find_error_string error_s
 
-        @on_event_selectively.call :error, :find_error do
+        @listener.call :error, :find_error do
 
           Common_::Event.inline_not_OK_with :find_error, :message, error_s do |y, o|
 
@@ -76,5 +76,4 @@ module Skylab::System
     end
   end
 end
-# #pending-rename: might as well, right?
 # #tombstone: we used to let the defalt inline event expression happen

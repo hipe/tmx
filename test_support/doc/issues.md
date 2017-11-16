@@ -18,7 +18,7 @@
 [#039] #hole (#was: lend/borrow coverage, moved to [#008])
              ( #moved-to: [#dt-xxx] )
 
-[#038]       expect line
+[#038]       want line
 
 [#037]       fixtures
 
@@ -67,7 +67,7 @@
 
              ( #was: #moved-to: [#dt-xxx] )
 
-[#029]       #track the 'expect' omnibus and narrative ..
+[#029]       #track the "want" (née "expect") omnibus and narrative ..
 [#028]   #watching what do we have to do to get our custom predicates to
              work in both
              ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))

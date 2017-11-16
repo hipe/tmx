@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :slowie
 
     it "loads" do
@@ -29,11 +29,11 @@ module Skylab::TestSupport::TestSupport
         call :strange
 
         lines = nil
-        expect :error, :expression, :parse_error, :unknown_primary do |y|
+        want :error, :expression, :parse_error, :unknown_primary do |y|
           lines = y
         end
 
-        expect_result UNABLE_
+        want_result UNABLE_
 
         lines
       end
@@ -43,14 +43,14 @@ module Skylab::TestSupport::TestSupport
 
       call :ping
 
-      expect :info, :expression, :ping do |y|
+      want :info, :expression, :ping do |y|
 
         y.first == "ping: Skylab::Zerk::API::ArgumentScannerExpressionAgent" || fail
       end
 
       ignore_emissions_whose_terminal_channel_symbol_is :operator_resolved
 
-      expect_result :_hello_from_slowie_
+      want_result :_hello_from_slowie_
     end
   end
 end

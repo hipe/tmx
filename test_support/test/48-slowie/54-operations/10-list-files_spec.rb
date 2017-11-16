@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :slowie
 
     it "for now (and probably always), can't list files without test directory" do
@@ -22,11 +22,11 @@ module Skylab::TestSupport::TestSupport
 
       call :list_files, :test_directory, _test_directory_no_exist
 
-      expect :info, :event, :find_command_args do |ev|
+      want :info, :event, :find_command_args do |ev|
         ev || fail
       end
 
-      expect :error, :find_error do |ev|
+      want :error, :find_error do |ev|
         ev || fail
       end
 

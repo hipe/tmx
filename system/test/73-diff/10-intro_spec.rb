@@ -71,7 +71,7 @@ module Skylab::System::TestSupport
            l10
         HERE
 
-        lib = TestSupport_::Expect_Line
+        lib = TestSupport_::Want_Line
 
         _exp_st = Basic_[]::String::LineStream_via_String[ _exp_str ]
 

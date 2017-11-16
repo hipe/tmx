@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :quickie
 
     same_describe_for = -> ran_these, mod do
@@ -91,9 +91,9 @@ module Skylab::TestSupport::TestSupport
           :from, 40, :to, 90,
         )
 
-        expect_example_ %w( flower eg2 )
-        expect_example_ %w( flower orchid eg3 )
-        expect_example_ %w( flower orchid eg5 )
+        want_example_ %w( flower eg2 )
+        want_example_ %w( flower orchid eg3 )
+        want_example_ %w( flower orchid eg5 )
 
         _statistics = execute
         _state = [ ran_these, _statistics ]

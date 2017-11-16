@@ -1,4 +1,4 @@
-# the expect omnibus :[#029]
+# the want omnibus :[#029]
 
 ## :scope (and about newschool v. oldschool near newlines)
 
@@ -59,8 +59,8 @@ against shared (a.k.e "memoized") "state" structures.
 
 ## oldschool #intro
 
-over the years 'expect' has developed syntactic idioms; that is, almost all
-the various implementations of the 'expect' method in our tests have similar
+over the years 'want' has developed syntactic idioms; that is, almost all
+the various implementations of the 'want' method in our tests have similar
 grammar and semantics, yet few of them are totally compatible.
 
 test facilities like this present special philisophical challenges with
@@ -117,8 +117,8 @@ at that)
 
 ## primitive approaches:
 
-  [sg] expect STREAM_I, RX
-  [ba] expect STRING
+  [sg] want STREAM_I, RX
+  [ba] want STRING
 
 
 
@@ -128,7 +128,7 @@ at that)
 
   [gi] has two
 
-    • a primitive expect
+    - a primitive want
       • channel is hard-coded to method name
       • STRING | RX
     • a decend one:
@@ -142,7 +142,7 @@ at that)
 
   [fa] has an antiquated inteface for it
 
-    • one 'expect' call is for asserting over *all* remaining output
+    • one 'want' call is for asserting over *all* remaining output
 
 
 ## heavyweight approaches:
@@ -156,8 +156,8 @@ at that)
     • optionally yields to an arbitrary block
 
    ( [gv] ignorably also has:
-       • a very custom 'expect' for its mock system
-       • a simple custom 'expect' for whatever )
+       - a very custom 'want' for its mock system
+       - a simple custom 'want' for whatever )
 
   [ta] (IN A BRANCH, SOMETHING INCREDIBLE)
 

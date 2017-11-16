@@ -32,11 +32,11 @@ module Skylab::TestSupport::TestSupport
           NIL
         end
 
-        def expect_fail tail_sym=:ranges_touch
+        def want_fail tail_sym=:ranges_touch
 
-          spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+          spy = Common_.test_support::Want_Emission_Fail_Early::Spy.new
 
-          spy.expect :error, :expression, :parse_error, tail_sym do |actual_lines|
+          spy.want :error, :expression, :parse_error, tail_sym do |actual_lines|
 
             actual_scanner = Common_::Scanner.via_array actual_lines
 
@@ -82,7 +82,7 @@ module Skylab::TestSupport::TestSupport
           spy.execute_under self
         end
 
-        def expect_succeed
+        def want_succeed
 
           _guy = subject_class_.new do |*chan, &msg|
             _ILR_express_emission_to_debug_IO msg, chan

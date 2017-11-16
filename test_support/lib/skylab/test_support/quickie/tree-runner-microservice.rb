@@ -57,7 +57,7 @@ module Skylab::TestSupport
         )
 
         def __prepare  # makes testing easier to do this outside of execute
-          __init_operator_branch
+          __init_feature_branch
           __init_plugin_lazy_index
           @listener ||= @argument_scanner_narrator.listener
           self
@@ -288,7 +288,7 @@ module Skylab::TestSupport
           omni = @_MTk::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
             o.argument_scanner_narrator = @argument_scanner_narrator
             o.add_lazy_primaries_injection_by do |inj|
-              inj.primaries = @operator_branch
+              inj.primaries = @feature_branch
               inj.parse_by = method :__PARSE_HEAD_VIA_PLUGIN
             end
             sym = @default_primary_symbol
@@ -338,7 +338,7 @@ module Skylab::TestSupport
           Require_plugin_[]
           @lazy_index = Plugin_::Models::LazyIndex.define do |o|
 
-            o.operator_branch = @operator_branch
+            o.feature_branch = @feature_branch
 
             o.construct_plugin_by = method :__construct_plugin_via_class
           end
@@ -357,13 +357,13 @@ module Skylab::TestSupport
 
         # ~
 
-        def __init_operator_branch
+        def __init_feature_branch
 
           @_MTk = Zerk_lib_[]::MicroserviceToolkit
 
           @_has_result = false  # might be temporary
-          @operator_branch =
-            Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.
+          @feature_branch =
+            Zerk_::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.
           define do |o|
             o.module = Here_::Plugins
             o.sub_branch_const = :Actions
@@ -379,7 +379,7 @@ module Skylab::TestSupport
           :argument_scanner_narrator,
           :lazy_index,
           :listener,
-          :operator_branch,
+          :feature_branch,
         )
       # -
 

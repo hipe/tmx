@@ -13,7 +13,7 @@ module Skylab::Human::TestSupport
 
     context "(voila)" do
 
-      given do |oes_p|
+      given do |p|
 
         selection_stack no_name_, assoc_( :item ), assoc_( :add )
 
@@ -23,7 +23,7 @@ module Skylab::Human::TestSupport
           s_a.join Home_::SPACE_
         end
 
-        oes_p.call :error, :itemzie_not_foundie do
+        p.call :error, :itemzie_not_foundie do
 
           Home_.lib_.fields::Events::Extra.with(
             :unrecognized_token, 'bezo',

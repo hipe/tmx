@@ -58,8 +58,8 @@ module Skylab::TestSupport
       end
     end
 
-    Ping___ = -> & oes_p do
-      oes_p.call :info, :expression, :ping do |y|
+    Ping___ = -> & p do
+      p.call :info, :expression, :ping do |y|
         y << "pong from #{ highlight '[ts]' }!"
       end
       NOTHING_

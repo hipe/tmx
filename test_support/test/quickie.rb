@@ -12,8 +12,8 @@ module Skylab::TestSupport::TestSupport
 
       # -- context-level testing (targeting CLI client)
 
-      def expect_finished_line_ o
-        o.expect %r(\A\nFinished in \d+(?:\.\d+)?(?:e-\d+)? seconds?\z)
+      def want_finished_line_ o
+        o.want %r(\A\nFinished in \d+(?:\.\d+)?(?:e-\d+)? seconds?\z)
       end
 
       def run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ & p
@@ -31,7 +31,7 @@ module Skylab::TestSupport::TestSupport
         _lib = Zerk_test_support_[]::Non_Interactive_CLI::Fail_Early
 
         sess = _lib::SingleStreamExpectations.define do |o|
-          args.expect_lines_by[ o ]  # hi.
+          args.want_lines_by[ o ]  # hi.
         end.to_assertion_session_under self
 
         if sout_not_serr
@@ -54,7 +54,7 @@ module Skylab::TestSupport::TestSupport
 
       class TheseArgs___ < Common_::SimpleModel
         attr_accessor(
-          :expect_lines_by,
+          :want_lines_by,
           :receive_test_support_module_by,
         )
       end
@@ -75,13 +75,13 @@ module Skylab::TestSupport::TestSupport
         @EXAMPLE_BODY = p
       end
 
-      def expect_example_passes_with_message_ s
+      def want_example_passes_with_message_ s
         exe = _execute_the_example
         :pass == exe.category_symbol or fail "expected pass, had fail"
         exe.message == s or fail _say_bad_message( exe, s )
       end
 
-      def expect_example_fails_with_message_ s
+      def want_example_fails_with_message_ s
         exe = _execute_the_example
         :fail == exe.category_symbol or fail "expected fail, had pass"
         exe.message == s or fail _say_bad_message( exe, s )
@@ -101,8 +101,8 @@ module Skylab::TestSupport::TestSupport
         ExampleExecutionState_via_ExampleBody___[ _p ]
       end
 
-      def expect_example_ s_a  # for API calls
-        expect :data, :example do |eg|
+      def want_example_ s_a  # for API calls
+        want :data, :example do |eg|
           if eg.description_stack != s_a
             fail
           end
@@ -111,8 +111,8 @@ module Skylab::TestSupport::TestSupport
 
       # --
 
-      def expect_API_result_for_fail_
-        expect_result NIL
+      def want_API_result_for_fail_
+        want_result NIL
       end
 
       # --
@@ -165,7 +165,7 @@ module Skylab::TestSupport::TestSupport
       _dangerous_memoize :kernel_module_with_rspec_not_loaded_ do
         Home_::MockModule.define do |o|
           o.have_method_not_defined :should
-          o.expect_to_have_method_defined :should
+          o.want_to_have_method_defined :should
         end
       end
 

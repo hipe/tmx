@@ -29,12 +29,12 @@ module Skylab::System
 
         include Common_::Event::ReceiveAndSendMethods
 
-        def initialize & oes_p
+        def initialize & p
 
           @argument_path_might_be_target_path = nil
           @do_lock = false
           @ftype = nil
-          @on_event_selectively = oes_p
+          @listener = p
           @prop = nil
           @property_symbol = nil
         end
@@ -194,7 +194,7 @@ module Skylab::System
             :do_lock_file, @do_lock,
             :must_be_ftype, ( @ftype || :FILE_FTYPE ),
             :filesystem, @filesystem,
-            & @on_event_selectively )
+            & @listener )
 
           if kn
             if @do_lock

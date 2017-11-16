@@ -11,13 +11,13 @@ module Skylab::TestSupport::TestSupport
       # :[#039.3] #lend-coverage to [ta], [ze]
       # #needs-invite
       call :tree, :list_files, :path, 'xx'
-      expect :error, :expression, :ambiguous do |msgs|
-        expect_these_lines_in_array msgs do |y|
+      want :error, :expression, :ambiguous do |msgs|
+        want_these_lines_in_array msgs do |y|
           y << "both 'tree' and 'list_files' transition to 'finished'"
           y << "so you can't have both of them at the same time."
         end
       end
-      expect_fail
+      want_fail
     end
 
     # - context (hacked path)
@@ -38,7 +38,7 @@ module Skylab::TestSupport::TestSupport
             st.to_a
           end
 
-          expect_these_lines_in_array _these do |y|
+          want_these_lines_in_array _these do |y|
             y << "kniff/knaff"
             y << " ├zingo"
             y << " │ ├bongo"

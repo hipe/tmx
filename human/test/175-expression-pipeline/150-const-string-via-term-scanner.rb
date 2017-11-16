@@ -27,12 +27,12 @@ module Skylab::Human::TestSupport
       @WORDS = s_a
     end
 
-    def _expect expect_const
+    def _expect want_const
       _words = remove_instance_variable :@WORDS
       _scn = Home_::Scanner_[ _words ]
       actual = Home_::ExpressionPipeline_::ConstString_via_TermScanner[ _scn ].intern
-      if actual != expect_const
-        fail "expected `#{ expect_const }`, had `#{ actual }`"
+      if actual != want_const
+        fail "expected `#{ want_const }`, had `#{ actual }`"
       end
     end
 

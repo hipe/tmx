@@ -5,7 +5,7 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] magnetics - test directory via path" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "loads" do
       _subject_magnetic
@@ -18,7 +18,7 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 0
       end
 
-      expect_not_OK_event :resource_not_found do | ev |
+      want_not_OK_event :resource_not_found do | ev |
         ev_ = ev.to_event
         ev_.start_path ==_the_asset_file_path || fail
         ev_.num_dirs_looked.zero? || fail
@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport
         ev_.ok == false || fail
       end
 
-      expect_fail
+      want_fail
     end
 
     it "against a test file when the root dir is not found" do
@@ -36,8 +36,8 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 0
       end
 
-      expect_not_OK_event :resource_not_found
-      expect_fail
+      want_not_OK_event :resource_not_found
+      want_fail
     end
 
     it "against an asset file when the root dir is found" do
@@ -47,7 +47,7 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 2
       end
 
-      expect_that_the_root_is_found
+      want_that_the_root_is_found
     end
 
     it "against a test file when the root dir is found" do
@@ -57,7 +57,7 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 2
       end
 
-      expect_that_the_root_is_found
+      want_that_the_root_is_found
     end
 
     it "on the root dir itself - root is found" do
@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 1
       end
 
-      expect_that_the_root_is_found
+      want_that_the_root_is_found
     end
 
     it "on the test dir itself - root is found" do
@@ -77,15 +77,15 @@ module Skylab::TestSupport::TestSupport
         max_num_dirs 1
       end
 
-      expect_that_the_root_is_found
+      want_that_the_root_is_found
     end
 
     # ~ test setup & asset execution
 
     def given
 
-      _oes_p = event_log.handle_event_selectively
-      o = _subject_magnetic.new( & _oes_p )
+      _p = event_log.handle_event_selectively
+      o = _subject_magnetic.new( & _p )
 
       yield
 
@@ -128,7 +128,7 @@ module Skylab::TestSupport::TestSupport
     # ~ test assertion
 
     exp = nil
-    define_method :expect_that_the_root_is_found do
+    define_method :want_that_the_root_is_found do
 
       exp ||= ::File.join _fixture_tree, Home_::Init.test_directory_entry_name
       @result == exp || fail

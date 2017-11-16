@@ -6,10 +6,10 @@ module Skylab::TestSupport
 
     module API ; class << self
 
-      def call * x_a, & oes_p
+      def call * x_a, & p
 
         Zerk_lib_[]::API.call x_a, Here_.__root_ACS do |_|
-          oes_p
+          p
         end
       end
     end ; end  # >>
@@ -124,19 +124,19 @@ module Skylab::TestSupport
           _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol _x, :path
           _n11n = Home_.lib_.basic::Pathname::Normalization.with :absolute
           _n11n.normalize_qualified_knownness _qkn do |*i_a, &ev_p|
-            _oes_p = pp[ :_fc_hi_ ]
-            _oes_p[ * i_a, & ev_p ]
+            _p = pp[ :_fc_hi_ ]
+            _p[ * i_a, & ev_p ]
           end
         end
       end
 
-      def execute & oes_p
+      def execute & p
         FileCoverageExecution___.new(
           @path,
           @test_directory_filename,
           @test_file_suffixes,
           @_filesystem_p,
-          & oes_p ).execute
+          & p ).execute
       end
     end
 
@@ -151,7 +151,7 @@ module Skylab::TestSupport
       #
       #    - let [ac] avoid unnecessarily indexing all these methods
 
-      def initialize pa, tdfn, tfs_a, fs_p, & oes_p
+      def initialize pa, tdfn, tfs_a, fs_p, & p
 
         @be_verbose = false  # may be an option one day. turning this on
         # will lead to a sub-node emitting every find command, for e.g
@@ -163,7 +163,7 @@ module Skylab::TestSupport
         @test_file_suffix_array = tfs_a || Test_file_suffix_array__[]
 
         @_filesystem_p = fs_p
-        @_on_event_selectively = oes_p
+        @_on_event_selectively = p
         NIL
       end
 

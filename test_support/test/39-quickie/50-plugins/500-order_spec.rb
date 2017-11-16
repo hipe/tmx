@@ -14,10 +14,10 @@ module Skylab::TestSupport::TestSupport
         it "API - bad argument - whines" do
 
           call :order, 'fetty'
-          expect :error, :expression, :primary_parse_error do |y|
+          want :error, :expression, :primary_parse_error do |y|
             y == [ "expecting <digit> or \"N\" for \"fetty\"" ] || fail
           end
-          expect_fail
+          want_fail
         end
       # -
     # -
@@ -29,21 +29,21 @@ module Skylab::TestSupport::TestSupport
         invoke "-order", "help"
         on_stream :serr
         count = 0
-        expect_each_by do |line|
+        want_each_by do |line|
           count += 1
           NIL
         end
-        expect_succeed
+        want_succeed
         ( 50 .. 60 ).include? count or fail
       end
 
       it "API - help - can't" do
 
         call :order, 'help'
-        expect :error, :expression, :mode_mismatch do |y|
+        want :error, :expression, :mode_mismatch do |y|
           y == [ "no 'help' for API client" ] || fail
         end
-        expect_fail
+        want_fail
       end
     # -
 
@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport
             st.to_a
           end
 
-          expect_these_lines_in_array _these do |y|
+          want_these_lines_in_array _these do |y|
             y << "fake-path/010-herkemer/020-xx.xx"
             y << "fake-path/030-jumanji/010-yy.xx"
             y << "fake-path/030-jumanji/040-chim-chum.xx"
@@ -84,11 +84,11 @@ module Skylab::TestSupport::TestSupport
             y << 789
           end
 
-          expect :error, :expression, :primary_parse_error do |y|
+          want :error, :expression, :primary_parse_error do |y|
             y == [ "second term cannot be greater than 3. (had 4.)" ] || fail
           end
 
-          expect_fail
+          want_fail
         end
 
         def prepare_subject_API_invocation invo

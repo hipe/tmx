@@ -18,7 +18,7 @@ module Skylab::TestSupport
 
       def initialize
 
-        @operator_branch = Zerk_::ArgumentScanner::OperatorBranch_via_Hash[ PRIMARIES ]
+        @feature_branch = Zerk_::ArgumentScanner::FeatureBranch_via_Hash[ PRIMARIES ]
 
         o = yield
 
@@ -86,7 +86,7 @@ module Skylab::TestSupport
       end
 
       attr_reader(  # for pre-execution syntax hacks
-        :operator_branch,
+        :feature_branch,
         :test_directory_collection,
       )
     end

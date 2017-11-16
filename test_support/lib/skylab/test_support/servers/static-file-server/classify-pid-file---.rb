@@ -13,7 +13,7 @@ module Skylab::TestSupport
 
       def initialize path, fs, & p
         @filesystem = fs
-        @_oes_p = p
+        @_listener = p
         @_PID_path = path
       end
 
@@ -54,7 +54,7 @@ module Skylab::TestSupport
 
       def __when_strange_inode x
 
-        @_oes_p.call :error, :expression, :nope do | y |
+        @_listener.call :error, :expression, :nope do | y |
           y << "no: #{ x }"
         end
 
@@ -75,7 +75,7 @@ module Skylab::TestSupport
           :path, _dirname,
           :must_be_ftype, :DIRECTORY_FTYPE,
           :filesystem, _real_FS,
-          & @_oes_p )
+          & @_listener )
 
         if _dir_exists
           @_file_did_exist = false
@@ -114,7 +114,7 @@ module Skylab::TestSupport
       def ___when_strange_content
 
         path = @_PID_path
-        @_oes_p.call :error, :expression, :nope do | y |
+        @_listener.call :error, :expression, :nope do | y |
           y << "contents must look like digit - #{ pth path }"
         end
         UNABLE_

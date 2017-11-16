@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :file_coverage
-    use :file_coverage_expect_stdin_stdout
+    use :file_coverage_want_stdin_stdout
 
     _ACTION = 'file-c'
 
@@ -43,8 +43,8 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :__coarse_parse do
         _invoke '-h', _ACTION
-        _lines = release_lines_for_expect_stdout_stderr
-        Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse.new _lines
+        _lines = release_lines_for_want_stdout_stderr
+        Zerk_test_support_[]::CLI::Want_Section_Coarse_Parse.new _lines
       end
     end
 
@@ -54,12 +54,12 @@ module Skylab::TestSupport::TestSupport
       _invoke _ACTION, '--test-file-suffi', '_speg.kode', _path
 
       on_stream :o
-      expect :styled, "└──( foo.kode <-> foo_speg.kode )"
-      expect_succeed
+      want :styled, "└──( foo.kode <-> foo_speg.kode )"
+      want_succeed
     end
 
     def _invoke * argv
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
     end
 
     def _path sym, s=nil
@@ -72,17 +72,17 @@ module Skylab::TestSupport::TestSupport
       end
     end
 
-    def _expect_generic_invite
+    def _want_generic_invite
 
-      expect "use '#{ _prog_name } -h' for help"
+      want "use '#{ _prog_name } -h' for help"
     end
 
-    def result_for_failure_for_expect_stdout_stderr
+    def result_for_failure_for_want_stdout_stderr
 
       Home_::CLI_support_[]::GENERIC_ERROR_EXITSTATUS
     end
 
-    def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a
+    def build_invocation_for_want_stdout_stderr argv, sin, sout, serr, pn_s_a
 
       Home_::CLI.new argv, sin, sout, serr, pn_s_a do |o|
 
@@ -98,7 +98,7 @@ module Skylab::TestSupport::TestSupport
       _PN_S_A.fetch 0
     end
 
-    define_method :invocation_strings_for_expect_stdout_stderr do
+    define_method :invocation_strings_for_want_stdout_stderr do
       _PN_S_A
     end
   end

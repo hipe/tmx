@@ -15,19 +15,19 @@ module Skylab::TestSupport::TestSupport
         it "API - must look like range" do
 
           call :depth, 'xx'
-          expect :error, :expression, :primary_parse_error do |y|
+          want :error, :expression, :primary_parse_error do |y|
             y == [ %('depth' must be an integer or range (had: "xx")) ] || fail
           end
-          expect_fail
+          want_fail
         end
 
         it "API - must be a forward range" do
 
           call :depth, '5-4'
-          expect :error, :expression, :primary_parse_error do |y|
+          want :error, :expression, :primary_parse_error do |y|
             y == [ "'depth' min must be less than or equal to max (min: 5, max: 4)" ] || fail
           end
-          expect_fail
+          want_fail
         end
       # -
     end
@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport
       context "API - yay" do
 
         it "it reduces the list" do
-          expect_these_lines_in_array _tuple[0] do |y|
+          want_these_lines_in_array _tuple[0] do |y|
             y << 'dip/dop/doop/deep/dope'
             y << 'fanduckle/fondookel/fif-diffle/foip'
           end
@@ -61,7 +61,7 @@ module Skylab::TestSupport::TestSupport
           end
 
           msgs = nil
-          expect :info, :expression, :notice do |y|
+          want :info, :expression, :notice do |y|
             msgs = y
           end
 

@@ -12,18 +12,18 @@ module Skylab::TestSupport::TestSupport
 
       it "API - whines about not reaching endpoint" do
         call
-        expect_these_lines_via_no_transition_found_ do |y|
+        want_these_lines_via_no_transition_found_ do |y|
           write_messages_into_for_no_transition_because_nothing_pending_ y
         end
       end
 
       it "CLI - whines about not reaching endpoint (STUB)" do
         invoke
-        expect_these_lines_on_stderr do |y|
+        want_these_lines_on_stderr do |y|
           write_messages_into_for_no_transition_because_nothing_pending_ y
           write_messages_into_for_invite_generically_ y
         end
-        expect_fail
+        want_fail
       end
     end
 
@@ -31,21 +31,21 @@ module Skylab::TestSupport::TestSupport
 
       it "API - splay" do
         call :wuz_up
-        expect :error, :expression, :primary_parse_error, :unknown_primary do |y|
+        want :error, :expression, :primary_parse_error, :unknown_primary do |y|
           y[0] == "unknown primary 'wuz_up'" || fail
           y[1] =~ /\Aavailable primaries: '/ || fail
         end
-        expect_fail
+        want_fail
       end
 
       it "CLI - splay" do
         invoke '-wuz-up'
-        expect_these_lines_on_stderr do |y|
+        want_these_lines_on_stderr do |y|
           y << 'unknown primary "-wuz-up"'
           y << %r(\Aavailable primaries: -[a-z])
           write_messages_into_for_invite_generically_ y
         end
-        expect_fail
+        want_fail
       end
     end
 
@@ -55,17 +55,17 @@ module Skylab::TestSupport::TestSupport
 
       it "API (symbol result is result of invocation)" do
         call :ping
-        expect :info, :expression, :ping do |y|
+        want :info, :expression, :ping do |y|
           y[0] == "#{ same } *hello*" || fail
         end
-        expect_result :_ping_from_quickie_tree_runner_microservice_
+        want_result :_ping_from_quickie_tree_runner_microservice_
       end
 
       it "CLI (symbol result is swallowed by client)" do
         invoke '-ping'
         on_stream :serr
-        expect_styled_line "#{ same } ", [ "hello", [:strong, :green] ], [ EMPTY_S_, :no_style ]
-        expect_succeed
+        want_styled_line "#{ same } ", [ "hello", [:strong, :green] ], [ EMPTY_S_, :no_style ]
+        want_succeed
       end
     end
 
@@ -74,10 +74,10 @@ module Skylab::TestSupport::TestSupport
       it "API (!)" do
 
         call :help
-        expect :error, :expression, :mode_mismatch do |y|
+        want :error, :expression, :mode_mismatch do |y|
           y[0] == "no 'help' for API client" || fail
         end
-        expect_fail
+        want_fail
       end
 
       context "CLI" do
@@ -114,7 +114,7 @@ module Skylab::TestSupport::TestSupport
         # TL;DR: we sneak coverage of fuzzy #here for now. fuzzy resolution
         # deserves its own dedicated test, but we can't use a fuzzy
         # invocation of `ping` because `ping` is hard-coded not to use the
-        # operator branch. we could do a dedicated test of `-help` as fuzzy
+        # feature branch. we could do a dedicated test of `-help` as fuzzy
         # but `-help` is a heavy lift, so building the same (big) help
         # screen twice feels like a waste. we could skip the coverage of
         # fuzzy in this commit but then we can't allow ourselves to commit
@@ -175,12 +175,12 @@ module Skylab::TestSupport::TestSupport
             blank_then[ description ]
           end
 
-          expect_each_by do |line|
+          want_each_by do |line|
             p[ line ]
             NIL
           end
 
-          expect_succeed
+          want_succeed
           seen
         end
       end

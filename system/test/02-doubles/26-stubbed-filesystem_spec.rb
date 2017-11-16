@@ -20,7 +20,7 @@ module Skylab::System::TestSupport
 
       o = _incomplete_client_class.new
 
-      _expect_no_method :manifest_path_for_stubbed_FS do
+      _want_no_method :manifest_path_for_stubbed_FS do
         o.send :stubbed_filesystem
       end
     end
@@ -32,7 +32,7 @@ module Skylab::System::TestSupport
       cls.send :define_method, :manifest_path_for_stubbed_FS do :_MPFSFS_ end
 
       o = cls.new
-      _expect_no_method :cache_hash_for_stubbed_FS do
+      _want_no_method :cache_hash_for_stubbed_FS do
         o.send :stubbed_filesystem
       end
     end
@@ -66,22 +66,22 @@ module Skylab::System::TestSupport
 
     it "`directory?` - if a node has children, it is a directory" do
 
-      _expect_is_directory '/compound'
+      _want_is_directory '/compound'
     end
 
     it "`directory?` - also, if a node's entry ends in a '/' it is a dir" do
 
-      _expect_is_directory '/absolut/directory-hack/'
+      _want_is_directory '/absolut/directory-hack/'
     end
 
     it "`directory?` - whether or not you use a trailing slash in arg path" do
 
-      _expect_is_directory '/absolut/directory-hack'
+      _want_is_directory '/absolut/directory-hack'
     end
 
     it "`directory?` - multiple trailing slashes !!??" do
 
-      _expect_is_directory 'relatif/directory-hack///'
+      _want_is_directory 'relatif/directory-hack///'
     end
 
     it "`build_directory_object` when yes" do
@@ -112,7 +112,7 @@ module Skylab::System::TestSupport
         "Not a directory @ MOCKED_dir_initialize - /compound/absolut" )
     end
 
-    def _expect_is_directory path
+    def _want_is_directory path
 
       fs = _fs
       fs.directory?( path ) or fail
@@ -123,7 +123,7 @@ module Skylab::System::TestSupport
       _good_client.send :stubbed_filesystem
     end
 
-    def _expect_no_method sym
+    def _want_no_method sym
 
       begin
         yield

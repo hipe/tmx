@@ -183,12 +183,12 @@ module Skylab::TestSupport::TestSupport
 
   # --
 
-  Expect_Emission_Fail_Early = -> tcc do
-    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  Want_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Want_Emission_Fail_Early[ tcc ]
   end
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

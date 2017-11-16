@@ -31,14 +31,14 @@ module Skylab::TestSupport
 
       def do__build_sidesystem_tree__
 
-        p = @on_event_selectively.call :for_plugin, :sidesystem_stream_proc
+        p = @listener.call :for_plugin, :sidesystem_stream_proc
 
         p and __build_sidesystem_tree p
       end
 
       def __build_sidesystem_tree p
 
-        @on_event_selectively.call :from_plugin, :sidesystem_box do
+        @listener.call :from_plugin, :sidesystem_box do
 
           bx = Common_::Box.new
 
@@ -65,7 +65,7 @@ module Skylab::TestSupport
 
         ok = false
 
-        @on_event_selectively.call :from_plugin, :test_file_stream do
+        @listener.call :from_plugin, :test_file_stream do
 
           st = __build_stream_of_test_files
           ok = st ? ACHIEVED_ : st
@@ -138,7 +138,7 @@ module Skylab::TestSupport
           @resources.serr.puts "(cannot process whitelist with this source)"
           UNABLE_
         else
-          _bx = @on_event_selectively.call :for_plugin, :sidesystem_box
+          _bx = @listener.call :for_plugin, :sidesystem_box
           _stream _bx
         end
       end
@@ -276,7 +276,7 @@ module Skylab::TestSupport
 
         if no_matches
 
-          @on_event_selectively.call :error, :expression, :didnt_match_anything do | y |
+          @listener.call :error, :expression, :didnt_match_anything do | y |
 
             a = no_matches.map do | mtch |
               ick mtch.s
@@ -293,7 +293,7 @@ module Skylab::TestSupport
 
         if ambi
 
-          @on_event_selectively.call :error, :expression, :ambiguous_fuzzy_matches do | y |
+          @listener.call :error, :expression, :ambiguous_fuzzy_matches do | y |
 
             ambi.each do | mtch |
 

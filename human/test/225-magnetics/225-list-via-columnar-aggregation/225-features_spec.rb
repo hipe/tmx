@@ -29,14 +29,14 @@ module Skylab::Human::TestSupport
       end
 
       it "zero items" do
-        expect_line 'nerp'
-        expect_no_more_lines
+        want_line 'nerp'
+        want_no_more_lines
       end
 
       it "one item" do
         push 'wizzie'
-        expect_line 'wizzie'
-        expect_no_more_lines
+        want_line 'wizzie'
+        want_no_more_lines
       end
     end
 
@@ -63,9 +63,9 @@ module Skylab::Human::TestSupport
       it "works." do
         push 'ding', 'dung'
         push 'ding', 'dong'
-        expect_line 'DONG dung'
-        expect_line 'ding dong'
-        expect_no_more_lines
+        want_line 'DONG dung'
+        want_line 'ding dong'
+        want_no_more_lines
       end
     end
 
@@ -92,9 +92,9 @@ module Skylab::Human::TestSupport
       it "works" do
         push 'i', ' want candy', 'no see 1'
         push 'you', ' want candy', 'no see 2'
-        expect_line 'i want candy'
-        expect_line 'you want candy also'
-        expect_no_more_lines
+        want_line 'i want candy'
+        want_line 'you want candy also'
+        want_no_more_lines
       end
     end
 

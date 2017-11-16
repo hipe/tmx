@@ -2,7 +2,7 @@
              is perhaps preferred now)
              [#041.2] - our central pipe-find-to-grep
 
-[#040]       operator branch via directory ..
+[#040]       feature branch via directory ..
        #open [#here.F]: clean this up after an incubation period
 
 [#039]

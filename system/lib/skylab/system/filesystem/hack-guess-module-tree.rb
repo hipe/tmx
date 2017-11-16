@@ -62,7 +62,7 @@ module Skylab::System
           @resolve_line_upstream_method_name = :when_no_upstream
           @stack = [] ; @tops = []
           super
-          @on_event_selectively ||= -> i, *, & ev_p do
+          @listener ||= -> i, *, & ev_p do
 
             # (half of a #[#co-045])
 

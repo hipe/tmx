@@ -51,7 +51,7 @@ module Skylab::TestSupport
       @argument_scanner = scn
       @listener = scn.listener
 
-      __init_operator_branch
+      __init_feature_branch
       self
     end
 
@@ -81,7 +81,7 @@ module Skylab::TestSupport
     def __to_bound_call_when_arguments
 
       item_of_compound_branch = @argument_scanner.match_branch(
-        :primary, :value, :against_branch, @_operator_branch )
+        :primary, :value, :against_branch, @_feature_branch )
 
       if item_of_compound_branch
 
@@ -235,7 +235,7 @@ module Skylab::TestSupport
         require "#{ HERE_ }/plugins--/express-coverage"
 
         pu = Plugins__::Express_Coverage::Back.
-          new( @resources, & @on_event_selectively )
+          new( @resources, & @listener )
 
         pu.ARGV = @argv
         pu.ARGV_coverage_switch_index = d
@@ -257,7 +257,7 @@ module Skylab::TestSupport
     def description_proc_reader_for_didactics
       -> k do
 
-        trueish_x = @_operator_branch.lookup_softly k
+        trueish_x = @_feature_branch.lookup_softly k
 
         if trueish_x
 
@@ -272,7 +272,7 @@ module Skylab::TestSupport
 
     def to_item_normal_tuple_stream_for_didactics
 
-      @_operator_branch.to_loadable_reference_stream.map_by do |key_x|
+      @_feature_branch.to_loadable_reference_stream.map_by do |key_x|
         [ :primary, key_x ]
       end
     end
@@ -316,25 +316,25 @@ module Skylab::TestSupport
 
     # --
 
-    def __init_operator_branch
+    def __init_feature_branch
 
       lib = Zerk_lib_[]::ArgumentScanner
 
-      _ping_ob = lib::OperatorBranch_via_FREEFORM.define do |defn|
+      _ping_fb = lib::FeatureBranch_via_FREEFORM.define do |defn|
         defn.add :ping, MethodBasedRouting___.new( :__invoke_ping, :__describe_ping )
       end
 
-      _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define do |o|
+      _main_fb = lib::FeatureBranch_via_AutoloaderizedModule.define do |o|
         o.module = Here_::Operations
         o.loadable_reference_class = ModuleBasedRouting___
         o.sub_branch_const = :Action
       end
 
-      @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|
+      @_feature_branch = lib::FeatureBranch_via_MultipleEntities.define do |o|
 
-        o.add_entity_and_operator_branch :_ignored_ts_, _main_ob
+        o.add_entity_and_feature_branch :_ignored_ts_, _main_fb
 
-        o.add_entity_and_operator_branch :_ignored_ts_, _ping_ob
+        o.add_entity_and_feature_branch :_ignored_ts_, _ping_fb
       end
 
       NIL
@@ -353,7 +353,7 @@ module Skylab::TestSupport
       if as.no_unparsed_exists
         ACHIEVED_
       else
-        _ = Zerk_::ArgumentScanner::Syntaxish.via_operator_branch op.operator_branch
+        _ = Zerk_::ArgumentScanner::Syntaxish.via_feature_branch op.feature_branch
         _.parse_all_into_from op, as
       end
     end

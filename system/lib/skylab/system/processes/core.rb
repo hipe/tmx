@@ -18,7 +18,7 @@ module Skylab::System
 
       rx = /\A(?:(?<days>[0-9]+)-)?(?:(?<H>\d\d):)?(?<M>\d\d):(?<S>\d\d)\z/
 
-      fld.interpret = -> s, & oes_p do
+      fld.interpret = -> s, & p do
 
         md = rx.match s
 
@@ -37,7 +37,7 @@ module Skylab::System
 
     o[ :pid ] = -> fld do
 
-      fld.interpret = -> s, & oes_p do
+      fld.interpret = -> s, & p do
 
         if s
           Common_::KnownKnown[ s.to_i ]
@@ -47,7 +47,7 @@ module Skylab::System
 
     o[ :state ] = -> fld do
 
-      fld.interpret = -> s, & oes_p do
+      fld.interpret = -> s, & p do
         if s
           Common_::KnownKnown[ s ]
         end
@@ -89,8 +89,8 @@ module Skylab::System
       )
     end
 
-    def record_for d, * sym_a, & oes_p
-      Record_For___.new( d, sym_a,  @_mama, & oes_p ).execute
+    def record_for d, * sym_a, & p
+      Record_For___.new( d, sym_a,  @_mama, & p ).execute
     end
 
     class Record_For___
@@ -98,7 +98,7 @@ module Skylab::System
       def initialize d, sym_a, mama, & p
         @d = d
         @_mama = mama
-        @_oes_p = p
+        @_listener = p
         @sym_a = sym_a
       end
 
@@ -220,7 +220,7 @@ module Skylab::System
         e = @_e ; w = @_w
         s ||= e.gets
 
-        @_oes_p.call :error, :expression, :etc do | y |
+        @_listener.call :error, :expression, :etc do | y |
 
           es = -> do
             " (exitstatus: #{ w.value.exitstatus })"

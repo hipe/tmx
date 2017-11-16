@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport
 
         run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ do |o|
           o.receive_test_support_module_by = method :__receive_test_support_module
-          o.expect_lines_by = method :__expect_these_lines
+          o.want_lines_by = method :__want_these_lines
         end
       end
 
@@ -41,12 +41,12 @@ module Skylab::TestSupport::TestSupport
         a
       end
 
-      def __expect_these_lines o
-        o.expect                "desc 1"
-        o.expect                "  ctxt 1"
-        o.expect_styled_content "    eg 1", :green
-        expect_finished_line_ o
-        o.expect_styled_content "1 example, 0 failures", :green
+      def __want_these_lines o
+        o.want                "desc 1"
+        o.want                "  ctxt 1"
+        o.want_styled_content "    eg 1", :green
+        want_finished_line_ o
+        o.want_styled_content "1 example, 0 failures", :green
       end
     end
 
