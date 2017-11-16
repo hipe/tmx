@@ -85,7 +85,7 @@ module Skylab::Git::TestSupport
       Home_::API
     end
 
-    def expect_neutral_event_ sym
+    def want_neutral_event_ sym
 
       # legacy [br] (somehow, somewhere) "upgrades" an expression to an
       # event, and in so doing **changes the signature** from what was
@@ -104,7 +104,7 @@ module Skylab::Git::TestSupport
       # the signatures of our emissions change even when our application
       # code remains the same change, an so tests break. :#history-A.1
 
-      expect_neutral_event_or_expression sym
+      want_neutral_event_or_expression sym
     end
 
     attr_accessor :do_debug
@@ -120,9 +120,9 @@ module Skylab::Git::TestSupport
 
   # --
 
-  Expect_Event = -> tcc do
+  Want_Event = -> tcc do
 
-    Common_.test_support::Expect_Emission[ tcc ]
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

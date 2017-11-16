@@ -13,12 +13,12 @@ module Skylab::Git::TestSupport
 
         path = _save_via_3 'foo', '.', 'calc'
 
-        expect_neutral_event :command
-        expect_neutral_event :mkdir
-        expect_neutral_event :mkdir
-        expect_neutral_event_ :file_utils_mv_event
-        expect_neutral_event_ :file_utils_mv_event
-        expect_neutral_event_ :file_utils_mv_event
+        want_neutral_event :command
+        want_neutral_event :mkdir
+        want_neutral_event :mkdir
+        want_neutral_event_ :file_utils_mv_event
+        want_neutral_event_ :file_utils_mv_event
+        want_neutral_event_ :file_utils_mv_event
 
         st = dirs_in_ path
         st.gets.should eql './calc'
@@ -60,10 +60,10 @@ module Skylab::Git::TestSupport
 
         path = _save_via_3 'bar', 'dippy', 'calc'
 
-        expect_neutral_event :command
-        expect_neutral_event :mkdir  # make the "bar" stow directory
-        expect_neutral_event :mkdir  # make the "dippy" diretory under that
-        expect_neutral_event_ :file_utils_mv_event  # move the one file
+        want_neutral_event :command
+        want_neutral_event :mkdir  # make the "bar" stow directory
+        want_neutral_event :mkdir  # make the "dippy" diretory under that
+        want_neutral_event_ :file_utils_mv_event  # move the one file
 
         st = dirs_in_ ::File.join( path, 'calc' )
 

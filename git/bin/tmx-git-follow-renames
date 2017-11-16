@@ -126,7 +126,7 @@ class Skylab_Git__follow_renames__one_off
         @_commit = ci
         @_found_rename_in_this_commit = false  # sanity
 
-        st = __file_operation_stream_via_sha ci.sha_string
+        st = __file_operation_stream_via_sha ci.SHA_string
         begin
           # (for now, all of them to excercize the parsing)
           fo = st.gets
@@ -282,7 +282,7 @@ class Skylab_Git__follow_renames__one_off
     # ==
 
     Commit_like_this__ = -> ci do
-      "#{ Short__[ ci.sha_string ] } #{ ci.date_string } #{ ci.time_string } #{ ci.zone_string }"
+      "#{ Short__[ ci.SHA_string ] } #{ ci.date_string } #{ ci.time_string } #{ ci.zone_string }"
     end
 
     Short__ = -> sha do

@@ -164,7 +164,7 @@ y << "target distance must be at a minimum N-1."
 
         bc = @_branch_collection
 
-        @on_event_selectively.call :error, :expression, :too_few_branches do | y |
+        @listener.call :error, :expression, :too_few_branches do | y |
 
           st = bc.to_stream
           one = st.gets
@@ -216,7 +216,7 @@ y << "target distance must be at a minimum N-1."
 
       def __when_failed_constituency miss_a
 
-        @on_event_selectively.call :error, :expression, :strange_items do | y |
+        @listener.call :error, :expression, :strange_items do | y |
 
           # #open [#hu-034] `sp_` was borky for this..
 
@@ -231,9 +231,9 @@ y << "target distance must be at a minimum N-1."
       def __resolve_renames
 
         o = if @_is_contraction
-          Sessions_::Contraction.new( & @on_event_selectively )
+          Sessions_::Contraction.new( & @listener )
         else
-          Sessions_::Expansion.new( & @on_event_selectively )
+          Sessions_::Expansion.new( & @listener )
         end
 
         o.from = @_from
@@ -423,7 +423,7 @@ y << "target distance must be at a minimum N-1."
           from = @from ; to = @to ; num = @_num_scale_items
           dc = @minus ; td = @_target_distance ; md = @_min_distance
 
-          @on_event_selectively.call :error, :expression, :too_much_squeeze do | y |
+          @listener.call :error, :expression, :too_much_squeeze do | y |
 
             y << "between #{ from } and #{ to } there are #{ num } items."
 
@@ -441,7 +441,7 @@ y << "target distance must be at a minimum N-1."
         attr_writer :from, :item_box, :to
 
         def initialize & p
-          @on_event_selectively = p
+          @listener = p
         end
 
         def init_derived_ivars_

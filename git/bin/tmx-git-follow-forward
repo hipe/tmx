@@ -139,14 +139,14 @@ class Skylab_Git__follow_forward__one_off
 
         ci = __last_commit
         ci || break
-        if last_seen_sha == ci.sha_string
+        if last_seen_sha == ci.SHA_string
           # the the last commit to touch the file in its new path is the
           # rename commit that moved it there, which we already did so
           break
         end
-        last_seen_sha = ci.sha_string
+        last_seen_sha = ci.SHA_string
 
-        o = __parse_show_screen_for ci.sha_string
+        o = __parse_show_screen_for ci.SHA_string
 
         if o.is_rename
 
@@ -262,7 +262,7 @@ class Skylab_Git__follow_forward__one_off
     # ==
 
     Commit_like_this__ = -> ci do
-      "#{ Short__[ ci.sha_string ] } #{ ci.date_string } #{ ci.time_string }"
+      "#{ Short__[ ci.SHA_string ] } #{ ci.date_string } #{ ci.time_string }"
     end
 
     Short__ = -> sha do

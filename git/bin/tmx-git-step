@@ -124,14 +124,14 @@ y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
     def __git_add_file
 
       @_i.puts "git add #{ @_file_of_interest }"
-      _expect_nothing
+      _want_nothing
     end
 
     def __git_confirm_change
 
       @_i.puts "git status --porcelain"
 
-      s = _expect_sout_string
+      s = _want_sout_string
 
       a = s.split NEWLINE_
 
@@ -153,12 +153,12 @@ y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
 
       @_this_step_number = @_last_step_number + 1
       @_i.puts "git commit -m \"(step #{ @_this_step_number })\""
-      _expect_sout
+      _want_sout
     end
 
-    def _expect_sout
+    def _want_sout
 
-      s = _expect_sout_string
+      s = _want_sout_string
       if s
         @serr.write s
         ACHIEVED_
@@ -169,7 +169,7 @@ y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
       end
     end
 
-    def _expect_sout_string
+    def _want_sout_string
 
       _select
       io = @_aa.first.first
@@ -180,7 +180,7 @@ y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
       end
     end
 
-    def _expect_nothing
+    def _want_nothing
       _select
       if @_aa
         s = @_aa.first.first.read_nonblock CHUNK_SIZE_

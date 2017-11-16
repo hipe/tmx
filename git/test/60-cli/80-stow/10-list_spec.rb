@@ -13,10 +13,10 @@ module Skylab::Git::TestSupport
 
       cd_ _path do
         invoke 'stow', 'list'
-        expect :o, "stow-1"
-        expect :o, "stow-2"
-        expect :e, "(2 stows total)"
-        expect_succeed
+        want :o, "stow-1"
+        want :o, "stow-2"
+        want :e, "(2 stows total)"
+        want_succeed
       end
     end
   end

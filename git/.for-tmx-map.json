@@ -1,6 +1,6 @@
 {
-  "after": "test_support",
-  "category": "ad-hoc libs",
+  "after": "brazen",
+  "category": "vendor adapters",
   "framework": "[br]",
   "is lib": true,
   "sigil": "git"

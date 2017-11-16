@@ -22,9 +22,9 @@ module Skylab::Git
         :file_relpath,
       )
 
-      def __curry s, o, & oes_p
+      def __curry s, o, & p
 
-        @on_event_selectively = oes_p
+        @listener = p
         @resources = o
         @stow_path = s
         freeze
@@ -67,7 +67,7 @@ module Skylab::Git
           Models_::File_Stat.new(
             st,
             @resources,
-            & @on_event_selectively )
+            & @listener )
         end
       end
 
@@ -77,7 +77,7 @@ module Skylab::Git
           @file_relpath,
           @stow_path,
           @resources,
-          & @on_event_selectively )
+          & @listener )
 
         if fp
           fp.to_patch_item_stream

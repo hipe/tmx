@@ -40,9 +40,9 @@ module Skylab::Git::TestSupport
       end
 
       it "looks right (2 lines)" do
-        expect_part_ "renamed to fileA-3"
-        expect_part_ "renamed to fileA-4"
-        expect_no_more_output_lines_
+        want_part_ "renamed to fileA-3"
+        want_part_ "renamed to fileA-4"
+        want_no_more_output_lines_
       end
 
       def the_system_conduit_

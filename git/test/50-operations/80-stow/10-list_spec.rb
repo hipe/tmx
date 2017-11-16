@@ -15,13 +15,13 @@ module Skylab::Git::TestSupport
       )
 
       actual_lines = nil
-      expect_emission :payload, :expression, :ping do |y|
+      want_emission :payload, :expression, :ping do |y|
         actual_lines = y
       end
 
       actual_lines == [ "(out: hi)" ] || fail
 
-      expect_no_more_events
+      want_no_more_events
 
       @result.should eql :pingback_from_API
     end
@@ -35,13 +35,13 @@ module Skylab::Git::TestSupport
       _x = _st.gets
       _x.should be_nil
 
-      _em = expect_not_OK_event :enoent
+      _em = want_not_OK_event :enoent
 
       ev = _em.cached_event_value.to_event
 
       ev.message_head.should eql "No such file or directory"
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "list no stows (empty directory) - vanilla plain (no events)" do
@@ -52,7 +52,7 @@ module Skylab::Git::TestSupport
       _x = _st.gets
       _x.should be_nil
 
-      expect_no_events
+      want_no_events
     end
 
     it "list 2 stows" do
@@ -71,7 +71,7 @@ module Skylab::Git::TestSupport
       stow.object_id.should eql oid
 
       st.gets.should be_nil
-      expect_no_events
+      want_no_events
     end
 
     def _against path

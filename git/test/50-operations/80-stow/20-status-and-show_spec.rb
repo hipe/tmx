@@ -54,14 +54,14 @@ module Skylab::Git::TestSupport
         :project_path, '/wiffy',
       )
 
-      expect_neutral_event :command, /\Acommand: git ls-files /
+      want_neutral_event :command, /\Acommand: git ls-files /
 
       st = @result
       st.gets.should eql "diffy/derpus"
       st.gets.should eql "diffy/nerpus/herpus"
       st.gets.should be_nil
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     def __this_mock_system_conduit
@@ -87,14 +87,14 @@ module Skylab::Git::TestSupport
 
       o = _to_line_scanner _st
 
-      o.expect_styled_line.should eql "flip.txt      | 2 ++"
+      o.want_styled_line.should eql "flip.txt      | 2 ++"
 
-      o.expect_styled_line.should eql "flop/floop.tx | 4 ++++"
+      o.want_styled_line.should eql "flop/floop.tx | 4 ++++"
 
       o.next_line.should eql(
         "2 files changed, 6 insertions(+), 0 deletions(-)" )
 
-      o.expect_no_more_lines
+      o.want_no_more_lines
     end
 
     it "show - it can also do the --patch format" do
@@ -137,7 +137,7 @@ module Skylab::Git::TestSupport
 
     def _to_line_scanner st
 
-      TestSupport_::Expect_Line::Scanner.via_line_stream st
+      TestSupport_::Want_Line::Scanner.via_line_stream st
     end
   end
 end

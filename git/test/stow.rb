@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
     def self.[] tcc
 
-      TS_::Expect_Event[ tcc ]
+      TS_::Want_Event[ tcc ]
       tcc.include Instance_Methods___
     end
 

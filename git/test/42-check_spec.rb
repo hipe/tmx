@@ -6,7 +6,7 @@ module Skylab::Git::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     context "(context)" do
 
@@ -82,7 +82,7 @@ module Skylab::Git::TestSupport
         _ = _subject_ _unchanged_path
         _ == true or fail
 
-        expect_no_emissions
+        want_no_emissions
       end
 
       def emission_array

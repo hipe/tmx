@@ -9,8 +9,8 @@ module Skylab::Git
 
     extend ProcLike_
 
-    def initialize prcs, & oes_p
-      @listener = oes_p
+    def initialize prcs, & p
+      @listener = p
       @process = prcs
       @_when_no_lines_at_all = :__when_no_lines_at_all_normally
     end

@@ -8,11 +8,11 @@ module Skylab::Git
       # like a commit in a project, one that can be displayed in a manner
       # similar to the output of `git show --stat`
 
-      def initialize s, rsc, & oes_p
+      def initialize s, rsc, & p
 
         @resources = rsc
         @stow_path = s
-        @on_event_selectively = oes_p
+        @listener = p
       end
 
       def to_styled_line_stream
@@ -129,7 +129,7 @@ module Skylab::Git
         item_p = Models_::Item.curry(
           @stow_path,
           @resources,
-          & @on_event_selectively )
+          & @listener )
 
         _, o, e, w = @resources.system_conduit.popen3(
           * ITEMS_STREAM_COMMAND___,

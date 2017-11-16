@@ -97,7 +97,7 @@ module Skylab::Git
 
       def initialize( & p )
 
-        @_oes_p = p  # nil OK
+        @_listener = p  # nil OK
         @system_conduit = nil
       end
 
@@ -112,24 +112,24 @@ module Skylab::Git
 
       # --
 
-      def status_via_path path, & oes_p  # experimental newer inerface for [dt]
+      def status_via_path path, & p  # experimental newer inerface for [dt]
 
-        chk = _begin_check oes_p, path
+        chk = _begin_check p, path
         chk.extend StructureBased__
         chk.execute
       end
 
-      def check path, & oes_p
+      def check path, & p
 
-        chk = _begin_check oes_p, path
+        chk = _begin_check p, path
         chk.extend EmissionBased___
         chk.execute
       end
 
-      def _begin_check oes_p, path
+      def _begin_check p, path
 
-        _oes_p = oes_p || @_oes_p  # nil OK
-        Check__.new path, @system_conduit, & _oes_p
+        _p = p || @_listener  # nil OK
+        Check__.new path, @system_conduit, & _p
       end
     end
 
@@ -151,8 +151,8 @@ module Skylab::Git
       #
       # annoyingly, the output from the command is identical xx
 
-      def initialize path, sc, & oes_p
-        @_oes_p = oes_p
+      def initialize path, sc, & p
+        @_listener = p
         @path = path
         @system_conduit = sc
       end
@@ -176,7 +176,7 @@ module Skylab::Git
 
         # expect unversioned outside of directory
 
-        if @_oes_p
+        if @_listener
 
           s.chomp!
           if %r(\Afatal: Not a git repository \(or any of the parent directories\): \.git$) =~ s
@@ -185,7 +185,7 @@ module Skylab::Git
 
           path = @path
 
-          @_oes_p.call :error, :expression, :error_from_git do |y|
+          @_listener.call :error, :expression, :error_from_git do |y|
 
             y << "#{ s } - #{ pth path }"
           end
@@ -440,11 +440,11 @@ module Skylab::Git
       end
 
       def when_symmetric_idiom_ sym
-        if @_oes_p
+        if @_listener
           s = message_via_symbol sym
           path = @path
           s.chomp!
-          @_oes_p.call :error, :expression do |y|
+          @_listener.call :error, :expression do |y|
             y << "#{ s } - #{ pth path }"
           end
         end
@@ -453,14 +453,14 @@ module Skylab::Git
 
       def when_asymmetric_idiom_ sym
 
-        if @_oes_p
+        if @_listener
           s = message_via_symbol sym
           _ = Adjective__[ @index_symbol ]
           __ = Adjective__[ @worktree_symbol ]
 
           path = @path
 
-          @_oes_p.call :error, :expression do |y|
+          @_listener.call :error, :expression do |y|
             y << "#{ s } (#{ _ } in index and #{ __ } in tree) - #{ pth path }"
           end
         end

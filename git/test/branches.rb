@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
     def self.[] tcc
 
-      Common_.test_support::Expect_Emission[ tcc ]
+      Common_.test_support::Want_Emission[ tcc ]
       tcc.include Instance_Methods___
     end
 

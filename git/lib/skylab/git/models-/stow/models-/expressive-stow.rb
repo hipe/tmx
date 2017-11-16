@@ -10,9 +10,9 @@ module Skylab::Git
       # delegating to this node the need to carry all the resorces and
       # modality-specific rendering knowledge.
 
-      def initialize style_x, stow, rsc, & oes_p
+      def initialize style_x, stow, rsc, & p
 
-        @on_event_selectively = oes_p
+        @listener = p
         @resources = rsc
         @style_x = style_x
         @stow = stow
@@ -44,7 +44,7 @@ module Skylab::Git
         Models_::TreeStat.new(
           @stow.path,
           @resources,
-          & @on_event_selectively
+          & @listener
         )
       end
 

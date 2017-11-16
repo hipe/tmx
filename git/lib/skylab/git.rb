@@ -91,7 +91,7 @@ module Skylab::Git
 
   Operator_branch___ = Lazy_.call do
 
-    MTk_::ModelCentricOperatorBranch.define do |o|  # (find the implementation in [pl])
+    MTk_::ModelCentricFeatureBranch.define do |o|  # (find the implementation in [pl])
 
       # (every imaginable detail of the below is explained at [#pl-011.1])
 

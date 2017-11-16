@@ -15,12 +15,12 @@ module Skylab::Git::TestSupport
 
         _against 'n.s', 'n.s', 'stow-wadoodle', _stoz
 
-        _em = expect_not_OK_event :component_not_found
+        _em = want_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should match(
           /\Athere is no stow "stow-wadoodle" in stows collection «[^»]+»\z/ )
 
-        expect_fail
+        want_fail
       end
     end
 
@@ -29,11 +29,11 @@ module Skylab::Git::TestSupport
       it "move the stashed files back, prunes empty dir in stow tree" do
 
         _path = _pop_into_working_dir_Y_stow_X '.', 'project', 'dingle'
-        __expect_these_paths _path
-        __expect_these_events
+        __want_these_paths _path
+        __want_these_events
       end
 
-      def __expect_these_paths td_path
+      def __want_these_paths td_path
 
         st = dirs_in_ ::File.join td_path, 'stoz'
 
@@ -48,15 +48,15 @@ module Skylab::Git::TestSupport
         st.gets.should be_nil
       end
 
-      def __expect_these_events
+      def __want_these_events
 
-        expect_neutral_event_ :mkdir
-        expect_neutral_event_ :mkdir
-        expect_neutral_event_ :mkdir
-        expect_neutral_event_ :file_utils_mv_event
-        expect_neutral_event_ :file_utils_mv_event
-        expect_neutral_event_ :file_utils_mv_event
-        expect_no_more_events
+        want_neutral_event_ :mkdir
+        want_neutral_event_ :mkdir
+        want_neutral_event_ :mkdir
+        want_neutral_event_ :file_utils_mv_event
+        want_neutral_event_ :file_utils_mv_event
+        want_neutral_event_ :file_utils_mv_event
+        want_no_more_events
       end
 
       def _prepared_tmpdir
@@ -80,9 +80,9 @@ module Skylab::Git::TestSupport
 
         path = _pop_into_working_dir_Y_stow_X 'dir-2', 'proj-1', 'sto-1'
 
-        expect_neutral_event :mkdir
-        expect_neutral_event_ :file_utils_mv_event
-        expect_succeed
+        want_neutral_event :mkdir
+        want_neutral_event_ :file_utils_mv_event
+        want_succeed
 
         st = dirs_in_ path
         st_ = files_in_ path

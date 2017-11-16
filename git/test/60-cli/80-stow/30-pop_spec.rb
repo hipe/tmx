@@ -7,7 +7,7 @@ module Skylab::Git::TestSupport
     TS_[ self ]
     use :CLI
 
-    # expect ERR_I, /\A\(while listing stash.+no stashes found in /
+    # want ERR_I, /\A\(while listing stash.+no stashes found in /
 
     it "try to pop from within unversioned directory (SEE HERE ON FAILURE)" do
 
@@ -34,10 +34,10 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'no-see-stow'
       end
 
-      expect :e, /\Afailed because "\.git" not found in \. or \d+ dirs up\z/
+      want :e, /\Afailed because "\.git" not found in \. or \d+ dirs up\z/
 
-      _expect_common_invite_line
-      expect_no_more_lines
+      _want_common_invite_line
+      want_no_more_lines
       @exitstatus.zero? and fail  # `resource_not_found` (11)
     end
 
@@ -50,10 +50,10 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'wazoozle'
       end
 
-      expect :e, %r(\Acouldn't pop stow because #{
+      want :e, %r(\Acouldn't pop stow because #{
         }there is no stow "wazoozle" in stows collection \.\./Stows\z)
 
-      _expect_common_failure
+      _want_common_failure
     end
 
     it "succeed in poppping a stow (verbose when option)" do
@@ -66,9 +66,9 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'stow-1'
       end
 
-      expect :e, %r(\Amkdir [^ ]+/zerf\b)
-      expect :e, "mv ../Stows/stow-1/zerf/ziff.txt ./zerf/ziff.txt"
-      expect_succeed
+      want :e, %r(\Amkdir [^ ]+/zerf\b)
+      want :e, "mv ../Stows/stow-1/zerf/ziff.txt ./zerf/ziff.txt"
+      want_succeed
 
       st = files_in_ tmpdir_path
       st.gets.should eql './projo/zerf/ziff.txt'
@@ -89,13 +89,13 @@ module Skylab::Git::TestSupport
       td.path
     end
 
-    def _expect_common_failure
-      _expect_common_invite_line
-      expect_fail
+    def _want_common_failure
+      _want_common_invite_line
+      want_fail
     end
 
-    def _expect_common_invite_line
-      expect_specific_invite_line_to :stow, :pop
+    def _want_common_invite_line
+      want_specific_invite_line_to :stow, :pop
     end
   end
 end

@@ -4,14 +4,14 @@ module Skylab::Git
 
     class << self
 
-      def via_project_path_and_cetera pp, sc, & oes_p
+      def via_project_path_and_cetera pp, sc, & p
 
-        repo = Home_.lib_.git_viz.repository.via_path pp, sc, & oes_p
+        repo = Home_.lib_.git_viz.repository.via_path pp, sc, & p
 
-        repo and __via_at_one_time_valid_project_path repo.path, sc, & oes_p
+        repo and __via_at_one_time_valid_project_path repo.path, sc, & p
       end
 
-      def __via_at_one_time_valid_project_path path, system_conduit, & oes_p
+      def __via_at_one_time_valid_project_path path, system_conduit, & p
 
         i, o, e, w = system_conduit.popen3(
           'git', 'branch',
@@ -22,11 +22,11 @@ module Skylab::Git
         if s
           self._COVER_ME
         else
-          __via_these o, w, & oes_p
+          __via_these o, w, & p
         end
       end
 
-      def __via_these o, w, & oes_p
+      def __via_these o, w, & p
 
         _st = Common_.stream do
           s = o.gets

@@ -87,14 +87,14 @@ module Skylab::Git::TestSupport
         TS_::CommonTabularScreenIndex.new lines
       end
 
-      def expect_part_ part
+      def want_part_ part
         x = _ooao_part_stream.gets
         if part != x
           x.should eql part
         end
       end
 
-      def expect_no_more_output_lines_
+      def want_no_more_output_lines_
         x = _ooao_part_stream.gets
         if x
           fail "unexpected extra output line (with: #{ x.inspect })"

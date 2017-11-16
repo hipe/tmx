@@ -5,18 +5,18 @@ module Skylab::Git::TestSupport
   describe "[gi] CLI - branches - re-number", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "\"to\" and \"from\" must be in the collection" do
 
       _against [ 1, 3, 5 ], [ 2, 4, 999 ]
 
-      _em = expect_not_OK_event :strange_items
+      _em = want_not_OK_event :strange_items
 
       black_and_white( _em.cached_event_value ).should eql(
         "2 and 4 must be in the collection" )
 
-      expect_fail
+      want_fail
     end
 
     it "expand - results are in descending order" do
@@ -44,21 +44,21 @@ module Skylab::Git::TestSupport
 
       _against [ 1, 3, 5, 7, 9, 11 ], [ 3, 9, -4 ]
 
-      _em = expect_not_OK_event :too_much_squeeze
+      _em = want_not_OK_event :too_much_squeeze
 
       _actual = black_and_white_lines _em.cached_event_value
 
-      expect_these_lines_in_array_ _actual do |y|
+      want_these_lines_in_array_ _actual do |y|
         y << "between 3 and 9 there are 4 items."
         y << "desired contraction of -4 would bring distance down to 2, #{
          }but distance cannot go below 3 for 4 items."
       end
 
-      expect_fail
+      want_fail
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_Line::Want_these_lines_in_array[ a, p, self ]
     end
 
     def _against d_a, trip

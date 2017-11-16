@@ -2,7 +2,7 @@ module Skylab::Git
 
   class Models_::Stow
 
-    class Models_::StowsOperatorBranchFacade
+    class Models_::StowsFeatureBranchFacade
 
       # model a collection of "stows". in implementation, this means that
       # this models a directory that contains nothing but other directories.
@@ -11,7 +11,7 @@ module Skylab::Git
 
         @filesystem = fs
         @kernel = k
-        @on_event_selectively = p
+        @listener = p
         @path = path
       end
 
@@ -44,7 +44,7 @@ module Skylab::Git
           :ACS, self,
         )
 
-        @on_event_selectively.call :error, :component_not_found do
+        @listener.call :error, :component_not_found do
           _ev
         end
 
@@ -59,12 +59,12 @@ module Skylab::Git
           flyweight.reinitialize_as_flyweight_ path
         end
         p = -> path do
-          flyweight = Stow_.new_flyweight @kernel, & @on_event_selectively
+          flyweight = Stow_.new_flyweight @kernel, & @listener
           p = main
           p[ path ]
         end
 
-        _OB = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
+        _OB = Home_.lib_.system_lib::Filesystem::Directory::FeatureBranch_via_Directory
         _dac = _OB.define do |o|
 
           o.loadable_reference_via_path_by = -> path do
@@ -74,25 +74,25 @@ module Skylab::Git
           o.startingpoint_path = @path
           o.directory_is_assumed_to_exist = false  # so it whines
           o.filesystem_for_globbing = @filesystem
-          o.listener = @on_event_selectively
+          o.listener = @listener
         end
 
         _dac.to_loadable_reference_stream
       end
 
-      def produce_available_identifier name, & oes_p
+      def produce_available_identifier name, & p
 
         if RX___ =~ name
 
           id = ID___.new ::File.join( @path, name ), name
 
           if @filesystem.exist? id.path
-            __when_exist id, & oes_p
+            __when_exist id, & p
           else
             id
           end
         else
-          __when_invalid_chars name, & oes_p
+          __when_invalid_chars name, & p
         end
       end
 
@@ -100,18 +100,18 @@ module Skylab::Git
 
       RX___ = /\A [_a-z0-9]+ (?: - [_a-z0-9]+ )* \z/ix
 
-      def __when_invalid_chars name, & oes_p
+      def __when_invalid_chars name, & p
 
-        oes_p.call :error, :expression, :invalid_stow_name do | y |
+        p.call :error, :expression, :invalid_stow_name do | y |
 
           y << "stow name contains invalid characters: #{ ick name }"
         end
         UNABLE_
       end
 
-      def __when_exist id, & oes_p
+      def __when_exist id, & p
 
-        oes_p.call :error, :expression, :name_collision do | y |
+        p.call :error, :expression, :name_collision do | y |
 
           y << "a stow already exists with that name: #{ pth id.path }"
         end

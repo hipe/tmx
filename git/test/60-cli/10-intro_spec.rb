@@ -15,24 +15,24 @@ module Skylab::Git::TestSupport
     it "ping payload channel (expect STDOUT)" do
 
       invoke 'ping', 'foo'
-      expect :o, '(out: foo)'
-      expect_no_more_lines
+      want :o, '(out: foo)'
+      want_no_more_lines
       @exitstatus.should eql :pingback_from_API
     end
 
     it "ping error channel (expect STDERR)" do
 
       invoke 'ping', '--channel', 'inf', 'faz'
-      expect :e, '(inf: faz)'
-      expect_succeed
+      want :e, '(inf: faz)'
+      want_succeed
     end
 
     it "ping error channel (expect STDERR)" do
 
       invoke 'ping', '--channel', 'ero', 'wrong'
-      expect :e, '(failed because pretending this was wrong: "wrong")'
-      expect_specific_invite_line_to :ping
-      expect_fail
+      want :e, '(failed because pretending this was wrong: "wrong")'
+      want_specific_invite_line_to :ping
+      want_fail
     end
 
     # (mounted one-offs are covered in "integration")

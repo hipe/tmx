@@ -10,11 +10,11 @@ module Skylab::Git
       private :new
     end
 
-    def initialize path, cmd_proto, sys, & oes_p
+    def initialize path, cmd_proto, sys, & p
       @command_prototype = cmd_proto
       @path = path
       @system = sys
-      @listener = oes_p
+      @listener = p
     end
 
     def execute
@@ -33,7 +33,7 @@ module Skylab::Git
 
       line = o.execute
       if line
-        Home_::Models::Commit::Simple.new( * line.split( SPACE_ ) )
+        Home_::Models::Commit::Simple.new( * line.split( SPACE_ ), nil )
       else
         line  # unable
       end

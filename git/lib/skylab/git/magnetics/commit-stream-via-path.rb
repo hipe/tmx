@@ -82,7 +82,7 @@ module Skylab::Git
     def _item_via_line
       @_line.chomp!
       _a = remove_instance_variable( :@_line ).split SPACE_
-      Home_::Models::Commit::Simple.new( * _a )
+      Home_::Models::Commit::Simple.new( * _a, nil )
     end
   end
 end

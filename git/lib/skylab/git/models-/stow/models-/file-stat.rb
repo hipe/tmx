@@ -19,7 +19,7 @@ module Skylab::Git
         @name
       end
 
-      def initialize patch_item_stream, rsc, & oes_p
+      def initialize patch_item_stream, rsc, & p
 
         @deletions = 0
         @insertions = 0

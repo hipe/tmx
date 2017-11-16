@@ -11,7 +11,7 @@ module Skylab::Git
         :project_path,
       )
 
-      def initialize current_relpath, project_dir, sc, & oes_p
+      def initialize current_relpath, project_dir, sc, & p
 
         if DOT_ == current_relpath
           @current_relpath = nil
@@ -20,7 +20,7 @@ module Skylab::Git
           @current_relpath = current_relpath
         end
 
-        @on_event_selectively = oes_p
+        @listener = p
         @project_path = project_dir
         @_sc = sc
       end
@@ -37,7 +37,7 @@ module Skylab::Git
 
           s = e.gets
           if s
-            @on_event_selectively.call :error, :expression, :unexpected do | y |
+            @listener.call :error, :expression, :unexpected do | y |
               y << "unexpected errput: #{ s }"
             end
             p = EMPTY_P_
@@ -91,7 +91,7 @@ module Skylab::Git
 
       def __maybe_say_command cmd
 
-        @on_event_selectively.call :info, :expression, :command do | y |
+        @listener.call :info, :expression, :command do | y |
 
           p = Home_.lib_.shellwords.method :shellescape
           y << "command: #{ cmd.map( & p ).join( SPACE_ ) }"

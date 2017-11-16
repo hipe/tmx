@@ -12,9 +12,9 @@ module Skylab::Git::TestSupport
 
       cli.invoke 'git', 'ping'
 
-      cli.expect_on_stderr "hello from git.\n"
+      cli.want_on_stderr "hello from git.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     it "citxt" do
@@ -23,9 +23,9 @@ module Skylab::Git::TestSupport
 
       cli.invoke 'git', 'citxt', '--ping'
 
-      cli.expect_on_stderr "hello from citxt."
+      cli.want_on_stderr "hello from citxt."
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     it "yes fuzzy happens between two one-offs (breakout vs. breakup)" do
@@ -36,15 +36,15 @@ module Skylab::Git::TestSupport
 
       cli.invoke 'git', 'break'
 
-      cli.expect_on_stderr %(ambiguous action "break" - #{
+      cli.want_on_stderr %(ambiguous action "break" - #{
         }did you mean "breakout" or "breakup"?)
 
-      cli.expect_line_by do |line|
+      cli.want_line_by do |line|
         _s = cli.unstyle_styled line
         _s == %(use 'xmt git -h' for help) || fail
       end
 
-      cli.expect_fail_under self
+      cli.want_fail_under self
     end
 
     it "breakup" do
@@ -53,9 +53,9 @@ module Skylab::Git::TestSupport
 
       cli.invoke 'git', 'breakup', '--ping'
 
-      cli.expect_on_stderr "hello from breakup."
+      cli.want_on_stderr "hello from breakup."
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     it "uncommit" do
@@ -64,9 +64,9 @@ module Skylab::Git::TestSupport
 
       cli.invoke 'git', 'uncommit', '--ping'
 
-      cli.expect_on_stderr "hello from uncommit."
+      cli.want_on_stderr "hello from uncommit."
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     def _same

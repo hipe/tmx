@@ -4,11 +4,11 @@ module Skylab::Git
 
     extend ProcLike_
 
-    def initialize pcs, & oes_p
+    def initialize pcs, & p
       @_command = pcs.command
       @_serr = pcs.err
       @_wait = pcs.wait
-      @_on_event_selectively = oes_p
+      @_on_event_selectively = p
     end
 
     def execute

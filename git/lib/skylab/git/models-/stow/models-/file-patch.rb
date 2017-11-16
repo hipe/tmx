@@ -29,7 +29,7 @@ module Skylab::Git
         @filesystem = rsc.filesystem
         @system_conduit = rsc.system_conduit
 
-        @on_event_selectively = p
+        @listener = p
       end
 
       def to_patch_item_stream
@@ -67,7 +67,7 @@ module Skylab::Git
 
           __finish
         else
-          @on_event_selectively.call :info, :emission, :skipping do | y |
+          @listener.call :info, :emission, :skipping do | y |
             y << "# skipping #{ @file_relpath }: #{ s }"
           end
           NIL_

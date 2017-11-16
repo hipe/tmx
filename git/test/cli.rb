@@ -16,7 +16,7 @@ module Skylab::Git::TestSupport
         Home_::CLI
       end
 
-      define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+      define_method :get_invocation_strings_for_want_stdout_stderr, -> do
         a = [ 'gi' ]
         -> do
           a

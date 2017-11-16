@@ -21,14 +21,14 @@ module Skylab::Git
       def execute
 
         ch = @channel
-        oes_p = _listener_
+        p = _listener_
         x = @zerp
         # --
         if ch
           case ch
           when 'ero'
 
-            oes_p.call :error, :expression, :fake_error do | y |
+            p.call :error, :expression, :fake_error do | y |
 
               y << "(pretending this was wrong: #{ ick x })"
             end
@@ -36,7 +36,7 @@ module Skylab::Git
 
           when 'inf'
 
-            oes_p.call :info, :expression, :for_ping do | y |
+            p.call :info, :expression, :for_ping do | y |
               y << "(inf: #{ x })"
             end
             ACHIEVED_
@@ -44,13 +44,13 @@ module Skylab::Git
         else
 
           if x
-            oes_p.call :payload, :expression, :ping do | y |
+            p.call :payload, :expression, :ping do | y |
 
               y << "(out: #{ x })"
             end
             :pingback_from_API
           else
-            oes_p.call :info, :expression, :ping do | y |
+            p.call :info, :expression, :ping do | y |
               y << "hello from git."
             end
             :hello_from_git
@@ -273,15 +273,15 @@ module Skylab::Git
           _sn )
       end
 
-      def _init_stows_collection & oes_p
+      def _init_stows_collection & p
 
-        @_stows_collection = _new_stows_collection( & oes_p )
+        @_stows_collection = _new_stows_collection( & p )
         NIL_
       end
 
       def _new_stows_collection
 
-        Here_::Models_::StowsOperatorBranchFacade.new(
+        Here_::Models_::StowsFeatureBranchFacade.new(
           @stows_path,
           _filesystem_,
           @_microservice_invocation_,
@@ -344,8 +344,8 @@ module Skylab::Git
 
       class << self
 
-        def new_flyweight k, & oes_p
-          new( k, & oes_p ).__init_as_flyweight
+        def new_flyweight k, & p
+          new( k, & p ).__init_as_flyweight
         end
 
         def via_path path
@@ -355,11 +355,11 @@ module Skylab::Git
         end
       end  # >>
 
-      def initialize k, & oes_p
+      def initialize k, & p
 
         # NOTE might be an entity, might be a UI node!
         @kernel = k
-        @on_event_selectively = oes_p
+        @listener = p
       end
 
       def __init_as_flyweight
