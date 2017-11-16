@@ -60,12 +60,12 @@ module Skylab::Tabular::TestSupport
 
       # ~ (sadly..)
 
-      def expect_on_stderr s
+      def want_on_stderr s
         tab_did || tab_init
         super s
       end
 
-      def expect_on_stdout s
+      def want_on_stdout s
         tab_did || tab_init
         super s
       end
@@ -84,14 +84,14 @@ module Skylab::Tabular::TestSupport
 
       attr_reader :tab_did
 
-      def expect_invite_etc_
-        expect_usage_line_
-        expect "use 'tab -h' for help"
-        expect_fail
+      def want_invite_etc_
+        want_usage_line_
+        want "use 'tab -h' for help"
+        want_fail
       end
 
-      def expect_usage_line_
-        expect_on_stderr "usage: '(e.g) cat some-file | tab [options]'"
+      def want_usage_line_
+        want_on_stderr "usage: '(e.g) cat some-file | tab [options]'"
       end
 
       # --

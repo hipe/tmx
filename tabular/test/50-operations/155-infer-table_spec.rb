@@ -23,11 +23,11 @@ module Skylab::Tabular::TestSupport
         call :strange
 
         _2_lines = nil
-        expect :error, :expression, :parse_error, :unknown_primary do |y|
+        want :error, :expression, :parse_error, :unknown_primary do |y|
           _2_lines = y
         end
 
-        expect_result NIL
+        want_result NIL
 
         _2_lines
       end
@@ -37,22 +37,22 @@ module Skylab::Tabular::TestSupport
 
       call :ping
 
-      expect :info, :expression, :ping do |y|
+      want :info, :expression, :ping do |y|
         y.first == [ "hello from tabular!" ]
       end
 
-      expect_result :_ping_from_tabular_
+      want_result :_ping_from_tabular_
     end
 
     it "can't table without a m.t.s" do
 
       call :infer_table
 
-      expect :error, :expression, :missing_required_parameter do |y|
+      want :error, :expression, :missing_required_parameter do |y|
         y.first.include?( "must have a mixed tuple upstream" ) || fail
       end
 
-      expect_result NIL
+      want_result NIL
     end
 
     it "negatives OK" do
@@ -73,7 +73,7 @@ module Skylab::Tabular::TestSupport
         exp << "-20         too cold to bike"
         exp << "  0  ++     barely OK       "
         exp << " 30  +++++  OK to bike      "
-        exp.expect_no_more_lines
+        exp.want_no_more_lines
       end
     end
 
@@ -91,7 +91,7 @@ module Skylab::Tabular::TestSupport
         exp = _expecter_via_operation op
         exp << "jumanny-fumanny-2  77  +++   thing 1B  12  +++ "
         exp << "thing-2            99  ++++  thing 2B  16  ++++"
-        exp.expect_no_more_lines
+        exp.want_no_more_lines
       end
     end
 
@@ -116,7 +116,7 @@ module Skylab::Tabular::TestSupport
         exp << "one    two "
         exp << "three  four"
         exp << "           "
-        exp.expect_no_more_lines
+        exp.want_no_more_lines
       end
     end
 
@@ -139,13 +139,13 @@ module Skylab::Tabular::TestSupport
         exp = _expecter_via_operation op
         exp << "| one   | two |"
         exp << "| three |     |"
-        exp.expect_no_more_lines
+        exp.want_no_more_lines
       end
     end
 
     def _expecter_via_operation op
       _act_st = op.to_line_stream
-      TestSupport_::Expect_Line::Scanner.via_stream _act_st
+      TestSupport_::Want_Line::Scanner.via_stream _act_st
     end
 
     def _mixed_tuple_stream_via * a_a

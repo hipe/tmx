@@ -67,7 +67,7 @@ module Skylab::Tabular::TestSupport
   module Operation_one_day_operations
 
     def self.[] tcc
-      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+      Common_.test_support::Want_Emission_Fail_Early[ tcc ]
       tcc.include self
     end
 

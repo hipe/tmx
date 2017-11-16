@@ -68,8 +68,8 @@ module Skylab::Parse::TestSupport
 
   module Test_Support_Bundles___
 
-    Expect_Event = -> tcm do
-      Common_.test_support::Expect_Emission[ tcm ]
+    Want_Event = -> tcm do
+      Common_.test_support::Want_Emission[ tcm ]
     end
 
     Iambic_Grammar = -> tcc do

@@ -17,7 +17,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "whine and usage and invite" do
-        _expect_expecting_STDIN_etc
+        _want_expecting_STDIN_etc
       end
     end
 
@@ -29,7 +29,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "whine about opts" do
-        _expect_unknown_option_zoopie_etc
+        _want_unknown_option_zoopie_etc
       end
     end
 
@@ -41,7 +41,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "whine about expecting stdin" do
-        _expect_expecting_STDIN_etc
+        _want_expecting_STDIN_etc
       end
     end
 
@@ -53,7 +53,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "whine" do
-        _expect_unknown_option_zoopie_etc
+        _want_unknown_option_zoopie_etc
       end
     end
 
@@ -65,7 +65,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "displays help and exits" do
-        _expect_help_etc
+        _want_help_etc
       end
     end
 
@@ -77,7 +77,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "displays help and exits (even though non-interactive)" do
-        _expect_help_etc
+        _want_help_etc
       end
     end
 
@@ -89,7 +89,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "gently mentions it but does not fail" do
-        _expect_no_lines_in_input
+        _want_no_lines_in_input
       end
     end
 
@@ -101,7 +101,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "gently mentions it but does not fail" do
-        _expect_no_lines_in_input
+        _want_no_lines_in_input
       end
     end
 
@@ -118,51 +118,51 @@ module Skylab::Tabular::TestSupport
       it "looks good" do
 
                           #one456789ten3456789twenty6789thirty6789f
-        expect_on_stdout  "jumanny-fumanny-1     32  ++++++++++++++"
-        expect_on_stdout  "an-other-alternative  16  +++++++       "
+        want_on_stdout  "jumanny-fumanny-1     32  ++++++++++++++"
+        want_on_stdout  "an-other-alternative  16  +++++++       "
 
         # (summaries later, probably as an option.)
-        expect_succeed
+        want_succeed
       end
     end
 
-    def _expect_help_etc
+    def _want_help_etc
 
-      expect_usage_line_
-      expect_empty_puts
+      want_usage_line_
+      want_empty_puts
 
-      expect %r(\Asynopsis: [a-z])i
-      expect_empty_puts
+      want %r(\Asynopsis: [a-z])i
+      want_empty_puts
 
-      expect 'options:'
+      want 'options:'
 
       spy = _once_asserter.once
       p = spy.proc
 
-      expect_each_by do |line|
+      want_each_by do |line|
         p[ line ]
         NOTHING_
       end
 
-      expect_succeed
+      want_succeed
 
       spy.close
     end
 
-    def _expect_no_lines_in_input
-      expect_on_stderr '(no lines in input. done.)'
-      expect_succeed
+    def _want_no_lines_in_input
+      want_on_stderr '(no lines in input. done.)'
+      want_succeed
     end
 
-    def _expect_unknown_option_zoopie_etc
-      expect_on_stderr %r(\Aunknown primary "--zoopie\"\z)
-      expect_on_stderr %r(\Aexpecting \{)
-      expect_invite_etc_
+    def _want_unknown_option_zoopie_etc
+      want_on_stderr %r(\Aunknown primary "--zoopie\"\z)
+      want_on_stderr %r(\Aexpecting \{)
+      want_invite_etc_
     end
 
-    def _expect_expecting_STDIN_etc
-      expect_on_stderr "expecting STDIN"
-      expect_invite_etc_
+    def _want_expecting_STDIN_etc
+      want_on_stderr "expecting STDIN"
+      want_invite_etc_
     end
 
     shared_subject :_once_asserter do

@@ -19,7 +19,7 @@ module Skylab::Tabular::TestSupport
         "bbb  222",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y.yield "aaa", 111
         y.yield "bbb", 222
       end
@@ -32,7 +32,7 @@ module Skylab::Tabular::TestSupport
         "three 4\n",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y.yield 'one', 2
         y.yield 'three', 4
       end
@@ -44,7 +44,7 @@ module Skylab::Tabular::TestSupport
         " -55    \r",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y << -55
       end
     end
@@ -57,7 +57,7 @@ module Skylab::Tabular::TestSupport
         " 0   00.000  \r\n",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y.yield 1.2, -33.44
         y.yield( -55, 66 )
         y.yield 0, 0.0
@@ -72,7 +72,7 @@ module Skylab::Tabular::TestSupport
         "yEs nO",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y.yield true, false
         y.yield true, false
         y.yield true, false
@@ -86,7 +86,7 @@ module Skylab::Tabular::TestSupport
         "'single quotes'",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y << 'double quotes'
         y << 'single quotes'
       end
@@ -99,7 +99,7 @@ module Skylab::Tabular::TestSupport
         "\n",
       )
 
-      _expect_these_mixed_tuples do |y|
+      _want_these_mixed_tuples do |y|
         y << 'something'
         y.yield
       end
@@ -111,7 +111,7 @@ module Skylab::Tabular::TestSupport
         '3 "double quo',
       )
 
-      spy.expect :error, :expression, :parse_error, :non_terminated_quote do |y|
+      spy.want :error, :expression, :parse_error, :non_terminated_quote do |y|
         y.first == 'non terminated quote? "\"double quo"' || fail
       end
 
@@ -120,7 +120,7 @@ module Skylab::Tabular::TestSupport
 
     def _begin_failure_spy_via_lines * lines
 
-      spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      spy = Common_.test_support::Want_Emission_Fail_Early::Spy.new
 
       spy.call_by do |p|
 
@@ -155,7 +155,7 @@ module Skylab::Tabular::TestSupport
       _
     end
 
-    def _expect_these_mixed_tuples
+    def _want_these_mixed_tuples
 
       st = remove_instance_variable :@__mt_st
 

@@ -1,6 +1,6 @@
 {
-  "after": "arc",
-  "category": "more general libs",
+  "after": "parse",
+  "category": "ancillary essentials",
   "doc test manifest": ".doc-test-manifest.list",
   "framework": "[CUSTOM]",
   "is lib": true,

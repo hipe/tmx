@@ -31,21 +31,21 @@ module Skylab::Parse
         private :new
       end  # >>
 
-      def initialize & oes_p
+      def initialize & p
         # (one important external lib doesn't play nice with our above setup..)
-        if oes_p
-          @_oes_p = oes_p
+        if p
+          @_listener = p
         end
       end
 
-      def output_node_via_input_stream in_st, & oes_p
+      def output_node_via_input_stream in_st, & p
 
-        dup.__init( in_st, & oes_p ).__parse
+        dup.__init( in_st, & p ).__parse
       end
 
-      def __init in_st, & oes_p
-        if oes_p
-          @_oes_p = oes_p
+      def __init in_st, & p
+        if p
+          @_listener = p
         end
         @_in_st = in_st
         self
@@ -225,7 +225,7 @@ module Skylab::Parse
 
         @_in_st.current_index = @__very_first_index
 
-        @_oes_p.call :error, :expecting do
+        @_listener.call :error, :expecting do
 
           _build_expecting_event _was_token, p
 

@@ -63,7 +63,7 @@ module Skylab::Tabular
 
     def __resolve_loadable_reference
 
-      _ada = Operations_module_operator_branch___[]
+      _ada = Operations_module_feature_branch___[]
 
       _lt = @argument_scanner.match_branch(
         :business_item, :value, :against_branch, _ada )
@@ -74,9 +74,9 @@ module Skylab::Tabular
     define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
   end
 
-  Operations_module_operator_branch___ = Lazy_.call do  # c.p/m from [tmx]
+  Operations_module_feature_branch___ = Lazy_.call do  # c.p/m from [tmx]
 
-    Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |defn|
+    Home_.lib_.basic::Module::FeatureBranch_via_Module.define do |defn|
 
       defn.module = Home_::Operations_
       defn.express_unknown_by do |o|

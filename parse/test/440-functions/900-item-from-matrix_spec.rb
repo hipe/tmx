@@ -5,7 +5,7 @@ module Skylab::Parse::TestSupport
   describe "[pa] functions - item from matrix" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     define_singleton_method :memoize_ do | sym, & p |
 
@@ -29,7 +29,7 @@ module Skylab::Parse::TestSupport
 
         _go( in_st, & handle_event_selectively_ ).should eql false
 
-        _ev = _expect_common_event
+        _ev = _want_common_event
         black_and_white( _ev ).should eql( _at_end_expecting 'frodo', 'bilbo' )
       end
 
@@ -48,7 +48,7 @@ module Skylab::Parse::TestSupport
 
         _go( in_st, & handle_event_selectively_ ).should eql false
 
-        ev = _expect_common_event
+        ev = _want_common_event
 
         black_and_white( ev ).should eql(
           "#{ _uninterpretable 'nodo' }#{ _expecting 'baggins' }" )
@@ -67,7 +67,7 @@ module Skylab::Parse::TestSupport
 
         _go( in_st, & handle_event_selectively_ ).should eql false
 
-        black_and_white( _expect_common_event ).should eql(
+        black_and_white( _want_common_event ).should eql(
           _at_end_expecting 'baggins' )
 
         in_st.current_index.should be_zero
@@ -79,7 +79,7 @@ module Skylab::Parse::TestSupport
 
         _go( in_st, & handle_event_selectively_ ).should eql false
 
-        black_and_white( _expect_common_event ).should eql(
+        black_and_white( _want_common_event ).should eql(
           "#{ _uninterpretable 'nodo' }#{ _expecting 'frodo', 'bilbo' }" )
 
         in_st.current_index.should be_zero
@@ -192,9 +192,9 @@ module Skylab::Parse::TestSupport
       end
     end  # >>
 
-    def _expect_common_event
+    def _want_common_event
 
-      _em = expect_not_OK_event :expecting
+      _em = want_not_OK_event :expecting
       _em.cached_event_value
     end
   end

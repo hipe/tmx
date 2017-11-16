@@ -114,9 +114,7 @@ module Skylab::Tabular
 
         _line_upstreamer = method :__procure_line_upstream
 
-        _arg_scn =
-            Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.
-        define do |o|
+        _arg_scn = Zerk_lib_[]::NonInteractiveCLI::DigScanner.define do |o|
 
           o.user_scanner _real_arg_scn
 

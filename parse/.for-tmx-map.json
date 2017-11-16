@@ -1,7 +1,7 @@
 {
-  "after": "plugin",
+  "after": "system",
   "doc test manifest": ".doc-test-manifest.list",
-  "category": "more general libs",
+  "category": "ancillary essentials",
   "is lib": true,
   "sigil": "pa"
 }
