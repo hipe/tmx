@@ -1,6 +1,6 @@
 {
-  "after": "slicer",
-  "category": "toy",
+  "after": "sub_tree",
+  "category": "ancillary applications",
   "framework": "[ze] (niCLI)",
   "sigil": "pe"
 }

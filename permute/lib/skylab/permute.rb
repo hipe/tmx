@@ -3,8 +3,8 @@ require 'skylab/common'
 module Skylab::Permute
 
   module API ; class << self
-    def call * x_a, & oes_p
-      Zerk_lib_[]::API.call x_a, AutonomousComponentSystem_.instance_ do oes_p end
+    def call * x_a, & p
+      Zerk_lib_[]::API.call x_a, AutonomousComponentSystem_.instance_ do p end
     end
   end ; end
 
@@ -33,8 +33,8 @@ module Skylab::Permute
 
       yield :description, -> y { y << "(ping the backend)" }
 
-      -> & oes_p do
-        oes_p.call :info, :expression, :ping do |y|
+      -> & p do
+        p.call :info, :expression, :ping do |y|
           y << "hello from permute."  # for [tmx]
         end
         NOTHING_

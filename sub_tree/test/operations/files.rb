@@ -25,7 +25,7 @@ module Skylab::SubTree::TestSupport
       Home_.lib_.system.test_support::STUBS.noninteractive_IO_instance
     end
 
-    def black_and_white_expression_agent_for_expect_emission
+    def black_and_white_expression_agent_for_want_emission
       produce_action_specific_expag_safely_
     end
 

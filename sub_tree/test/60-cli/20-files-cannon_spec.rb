@@ -7,29 +7,27 @@ module Skylab::SubTree::TestSupport
     TS_[ self ]
     use :CLI_for_files
 
-    define_method :expect, instance_method( :expect )  # because rspec
-
     it "1.2 : one unrec opt : msg / usage / invite" do
 
       local_invoke '-x'
 
-      expect 'invalid option: -x'
-      expect "use 'stflz files -h' for help"
-      expect_errored_generically
+      want 'invalid option: -x'
+      want "use 'stflz files -h' for help"
+      want_errored_generically
     end
 
     it "1.4 one rec opt : -h (as prefix) - beautiful help screen" do
 
       invoke '-h', 'files'
 
-      _expect_beautiful_help
+      _want_beautiful_help
     end
 
     it "1.4 one rec opt : -h (as postfix) - beautiful help screen" do
 
       invoke 'files', '-h'
 
-      _expect_beautiful_help
+      _want_beautiful_help
     end
 
     it "expag says 'both'" do
@@ -51,11 +49,11 @@ module Skylab::SubTree::TestSupport
       _s.should eql 'both «foo-bar» and «baz» are ok.'
     end
 
-    def _expect_beautiful_help
+    def _want_beautiful_help
 
       ( 18 .. 20 ).should be_include(
 
-        @IO_spy_group_for_expect_stdout_stderr.lines.length )
+        @IO_spy_group_for_want_stdout_stderr.lines.length )
     end
   end
 end

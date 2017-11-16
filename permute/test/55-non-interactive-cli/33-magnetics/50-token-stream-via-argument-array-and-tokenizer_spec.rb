@@ -6,7 +6,7 @@ module Skylab::Permute::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     context "no args" do
 
@@ -19,7 +19,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "explains" do
-        expect_emission :error, :expression, :parse_error do |y|
+        want_emission :error, :expression, :parse_error do |y|
           y == [ "expecting categories and values" ] || fail
         end
       end
@@ -36,7 +36,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "emits help directive" do
-        expect_emission :extra_functional, :help do |xx|
+        want_emission :extra_functional, :help do |xx|
           xx == :_no_data_from_help_for_now_ || fail
         end
       end
@@ -56,7 +56,7 @@ module Skylab::Permute::TestSupport
 
         result_is_nothing
 
-        expect_emission :extra_functional, :help do |xx|
+        want_emission :extra_functional, :help do |xx|
           xx == :_no_data_from_help_for_now_ || fail
         end
       end
@@ -88,7 +88,7 @@ module Skylab::Permute::TestSupport
 
       it "event explains" do
 
-        expect_emission :error, :case, :no_available_state_transition do |ev|
+        want_emission :error, :case, :no_available_state_transition do |ev|
           _lines = black_and_white ev
           _lines == 'expecting long switch at "-c"' || fail
         end
@@ -98,7 +98,7 @@ module Skylab::Permute::TestSupport
     context "ok" do
 
       shared_subject :_this do
-        __expect_no_emission_against '--longer', 'l1', '-s', 'short'
+        __want_no_emission_against '--longer', 'l1', '-s', 'short'
       end
 
       it "result has tags of lexical category type" do
@@ -124,21 +124,21 @@ module Skylab::Permute::TestSupport
 
     def _against * argv  # result in state
 
-      _oes_p = event_log.handle_event_selectively
-      x = _send _oes_p, argv
+      _p = event_log.handle_event_selectively
+      x = _send _p, argv
       x && Home_._PROBABLY_NOT
       _em_a = remove_instance_variable( :@event_log ).flush_to_array
       _State.new argv, x, _em_a
     end
 
-    def __expect_no_emission_against * argv  # result in state
+    def __want_no_emission_against * argv  # result in state
 
-      _x = _send Expect_no_emission_, argv
+      _x = _send Want_no_emission_, argv
       _State.new argv, _x
     end
 
-    def _send oes_p, argv
-      Home_::CLI::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ argv, & oes_p ]
+    def _send p, argv
+      Home_::CLI::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ argv, & p ]
     end
 
     def _argv_after
@@ -149,7 +149,7 @@ module Skylab::Permute::TestSupport
       TS_::X_nicli_mags_tsvaaats = ::Struct.new :_argv, :result, :emission_array
     end
 
-    def state_for_expect_emission
+    def state_for_want_emission
       _this
     end
   end

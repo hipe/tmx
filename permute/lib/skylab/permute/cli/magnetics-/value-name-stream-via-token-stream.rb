@@ -6,7 +6,7 @@ module Skylab::Permute
 
       def initialize ts, & p
         @token_stream = ts
-        @on_event_selectively = p
+        @listener = p
       end
 
       def execute
@@ -56,7 +56,7 @@ module Skylab::Permute
         _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
           short_category_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
           o.qualified_knownness = _qkn
 
@@ -68,7 +68,7 @@ module Skylab::Permute
 
           o.levenshtein_number = -1
 
-          o.listener = @on_event_selectively
+          o.listener = @listener
         end
 
         if cat_o
@@ -84,7 +84,7 @@ module Skylab::Permute
         _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+        cat_o = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
           o.qualified_knownness = _qkn
 

@@ -5,42 +5,40 @@ module Skylab::SubTree::TestSupport
   describe "[st] modality integration - CLI - canon" do
 
     TS_[ self ]
-    use :CLI, :expect_expression
-
-    define_method :expect, instance_method( :expect )  # #because-rspec
+    use :CLI, :want_expression
 
     it "invoke the ping of the API, adapted to this modality" do
       invoke 'ping'
-      expect :styled, 'hello from sub tree.'
-      expect_no_more_lines
+      want :styled, 'hello from sub tree.'
+      want_no_more_lines
       @exitstatus.should eql :hello_from_sub_tree
     end
 
     it "0   : no args        : expecting / usage / invite" do
       invoke
-      expect "expecting <action>"
-      expect :styled, _usage_rx
-      _expect_generic_invite
+      want "expecting <action>"
+      want :styled, _usage_rx
+      _want_generic_invite
     end
 
     it "1.1 : one unrec arg  : msg / expecting / invite" do
       invoke 'borf'
-      expect "unrecognized action \"borf\""
-      _expect_known_actions
-      _expect_generic_invite
+      want "unrecognized action \"borf\""
+      _want_known_actions
+      _want_generic_invite
     end
 
     it "1.2 : one unrec opt  : expecting / invite" do
       invoke '-z'
-      expect 'invalid option: -z'
-      _expect_generic_invite
+      want 'invalid option: -z'
+      _want_generic_invite
     end
 
     it "1.3 : one opt : `-h` : usage / invite" do
 
       invoke '-h'
 
-      big = @IO_spy_group_for_expect_stdout_stderr.lines.map do | ln |
+      big = @IO_spy_group_for_want_stdout_stderr.lines.map do | ln |
         ln.string
       end.join EMPTY_S_
 
@@ -50,19 +48,19 @@ module Skylab::SubTree::TestSupport
 
       big.should match %r(\binspired by unix\b)
 
-      expect_success_result
+      want_success_result
     end
 
     it "2.1 : `-h unrec`     : msg invite" do
 
       invoke '-h', 'wat'
-      expect_unrecognized_action :wat
-      _expect_known_actions
-      _expect_generic_invite
+      want_unrecognized_action :wat
+      _want_known_actions
+      _want_generic_invite
     end
 
-    def expect_unrecognized_action sym  # #todo
-      expect :e, "unrecognized action #{ sym.id2name.inspect }"
+    def want_unrecognized_action sym  # #todo
+      want :e, "unrecognized action #{ sym.id2name.inspect }"
     end
 
     -> do
@@ -81,13 +79,13 @@ module Skylab::SubTree::TestSupport
 
       generic_help_string = "use '#{ cmd_name } -h' for help"
 
-      define_method :_expect_generic_invite do
-        expect generic_help_string
-        expect_errored_generically
+      define_method :_want_generic_invite do
+        want generic_help_string
+        want_errored_generically
       end
 
 
-      define_method :_expect_known_actions do
+      define_method :_want_known_actions do
 
         _emmi = @__sout_serr_actual_stream__.gets_one
 

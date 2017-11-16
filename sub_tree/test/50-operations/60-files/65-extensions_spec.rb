@@ -5,7 +5,7 @@ module Skylab::SubTree::TestSupport
   describe "[st] operations - files - extensions" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :operations_files
 
     _MTIME = "\\d+ [acdehikmnorswy]{1,3}"
@@ -22,14 +22,14 @@ module Skylab::SubTree::TestSupport
           :output_stream, io
       end
 
-      scn = TestSupport_::Expect_Line::Scanner.via_string io.string
+      scn = TestSupport_::Want_Line::Scanner.via_string io.string
       scn.next_line.should eql ".\n"
       scn.next_line.should match %r(\A├── foo.kode #{ _MTIME }$)
       scn.next_line.should match %r(\A└── test$)
       scn.next_line.should match %r(\A    └── foo_speg\.kode #{ _MTIME }$)
       scn.next_line.should be_nil
 
-      expect_succeed
+      want_succeed
     end
 
     it "a multi-buffer extension - `line count` (results in table renderer)" do
@@ -43,7 +43,7 @@ module Skylab::SubTree::TestSupport
           :output_stream, io
       end
 
-      _expect_only_informational_events
+      _want_only_informational_events
 
       st = @result.to_line_stream
 
@@ -69,7 +69,7 @@ module Skylab::SubTree::TestSupport
 
       io.string.should eql EMPTY_S_
 
-      _expect_only_informational_events
+      _want_only_informational_events
 
       st = @result.to_line_stream
 
@@ -84,7 +84,7 @@ module Skylab::SubTree::TestSupport
       st.gets.should be_nil
     end
 
-    def _expect_only_informational_events
+    def _want_only_informational_events
 
       _ = @event_log.gets
       :wordcount_command == _.channel_symbol_array.last or fail
@@ -92,7 +92,7 @@ module Skylab::SubTree::TestSupport
       _ = @event_log.gets
       :find_exitstatus == _.channel_symbol_array.last or fail
 
-      expect_no_more_events
+      want_no_more_events
 
       NIL_
     end

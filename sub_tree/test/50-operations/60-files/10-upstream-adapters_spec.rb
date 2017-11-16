@@ -5,7 +5,7 @@ module Skylab::SubTree::TestSupport
   describe "[st] operations - files - upstream adapters" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :operations_files
 
     it "stdin and file - can't read from both stdin and file" do
@@ -15,7 +15,7 @@ module Skylab::SubTree::TestSupport
         :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
-      _em = expect_not_OK_event
+      _em = want_not_OK_event
 
       _actual = black_and_white _em.cached_event_value
 
@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport
 
       _actual.should match _rx
 
-      expect_fail
+      want_fail
     end
 
     it "file and one path - can't read from both path and file" do
@@ -38,12 +38,12 @@ module Skylab::SubTree::TestSupport
         :path, [ :x ],
         :output_stream, :x
 
-      _em = expect_not_OK_event
+      _em = want_not_OK_event
 
       _em.cached_event_value.to_event.a.map( & :name_symbol ).should eql(
         [ :file_of_input_paths, :path ] )
 
-      expect_fail
+      want_fail
     end
 
     it "all three - can't read from a, b, and c" do
@@ -53,7 +53,7 @@ module Skylab::SubTree::TestSupport
         :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
-      _em = expect_not_OK_event
+      _em = want_not_OK_event
 
       black_and_white( _em.cached_event_value ).should eql(
         "can't read input from #{
@@ -63,7 +63,7 @@ module Skylab::SubTree::TestSupport
         } and #{
         }«input-stream»#{
         } at the same time" )
-      expect_fail
+      want_fail
     end
 
     it "reads from an open filehandle" do
@@ -74,7 +74,7 @@ module Skylab::SubTree::TestSupport
 
       call_API :files, :input_stream, fh, :output_stream, io
 
-      expect_succeed
+      want_succeed
 
       io.string.should eql _PRETTY_
 
@@ -89,7 +89,7 @@ module Skylab::SubTree::TestSupport
         :file_of_input_paths, fixture_file( :one_find ),
         :output_stream, io
 
-      expect_succeed
+      want_succeed
 
       io.string.should eql _PRETTY_
     end
@@ -102,10 +102,10 @@ module Skylab::SubTree::TestSupport
         :path, %w( not-there ),
         :output_stream, io
 
-      expect_not_OK_event :find_error,
+      want_not_OK_event :find_error,
         'find: not-there: No such file or directory (exitstatus: 1)'
 
-      expect_fail
+      want_fail
     end
 
     it "from good path (using find) - pretty (well done)" do
@@ -116,7 +116,7 @@ module Skylab::SubTree::TestSupport
         :path, [ fixture_tree( :one ) ],
         :output_stream, io
 
-      _act = TestSupport_::Expect_line.shell( io.string ).excerpt( -4 .. -1 ).unindent
+      _act = TestSupport_::Want_line.shell( io.string ).excerpt( -4 .. -1 ).unindent
 
       _exp = <<-HERE.unindent
         └── one

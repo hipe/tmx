@@ -15,14 +15,14 @@ module Skylab::Permute
       # we MUST result in falseish. for (2), there cannot be any "commentary"
       # events emitted; the result is the stream.
 
-      def initialize argv, & oes_p
+      def initialize argv, & p
 
         @argument_array = argv
         @do_mutate_argument_array = true
         @long_help_switch = LONG_HELP__
         @short_help_switch = SHORT_HELP___
 
-        @_on_event_selectively = oes_p
+        @_on_event_selectively = p
       end
 
       LONG_HELP__ = '--help'

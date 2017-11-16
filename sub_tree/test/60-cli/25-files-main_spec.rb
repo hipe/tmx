@@ -107,11 +107,11 @@ describe "[st] CLI - files - main" do
 
       cli.on_stream :serr
 
-      cli.expect_line_by do |line|
+      cli.want_line_by do |line|
         cli.unstyle_styled( line ) == "hello from sub tree.\n" || fail
       end
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 end
 

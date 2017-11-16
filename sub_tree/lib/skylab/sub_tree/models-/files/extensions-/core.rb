@@ -38,7 +38,7 @@ module Skylab::SubTree
 
       class Extensions_
 
-        def initialize & oes_p
+        def initialize & p
 
           @bx = Common_::Box.new
 
@@ -46,14 +46,14 @@ module Skylab::SubTree
 
           @item_operator_i_a = nil
 
-          @on_event_selectively = oes_p
+          @listener = p
 
         end
 
         def load_extension qualified_knownness
 
           ext = Extensions_.const_get( qualified_knownness.name.as_const, false ).
-            new qualified_knownness, & @on_event_selectively
+            new qualified_knownness, & @listener
 
           __categorize_operation_mode ext
 

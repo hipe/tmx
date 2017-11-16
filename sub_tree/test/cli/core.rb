@@ -18,13 +18,13 @@ module Skylab::SubTree::TestSupport
       end
     end  # >>
 
-    # -- hook-ins/outs for expect stdout stderr
+    # -- hook-ins/outs for want stdout stderr
 
     def subject_CLI
       Home_::CLI
     end
 
-    define_method :invocation_strings_for_expect_stdout_stderr, -> do
+    define_method :invocation_strings_for_want_stdout_stderr, -> do
       a = [ 'stcli' ].freeze
       -> do
         a
@@ -33,7 +33,7 @@ module Skylab::SubTree::TestSupport
 
     # --
 
-    module Expect_Expression
+    module Want_Expression
 
       class << self
 
@@ -46,31 +46,31 @@ module Skylab::SubTree::TestSupport
         end
       end  # >>
 
-      include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+      include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
 
       # (adpated from [br])
 
       def invoke * argv
-        using_expect_stdout_stderr_invoke_via_argv argv
+        using_want_stdout_stderr_invoke_via_argv argv
       end
 
       -> do
 
         generic_exitstatus = 5  # meh
 
-        define_method :expect_errored_generically do
-          expect_no_more_lines
+        define_method :want_errored_generically do
+          want_no_more_lines
           @exitstatus.should eql generic_exitstatus
         end
 
       end.call  # etc
 
-      def expect_succeed
-        expect_no_more_lines
-        expect_success_result
+      def want_succeed
+        want_no_more_lines
+        want_success_result
       end
 
-      def expect_success_result
+      def want_success_result
         @exitstatus.should be_zero
       end
     end

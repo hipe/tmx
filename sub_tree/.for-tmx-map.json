@@ -1,6 +1,6 @@
 {
-  "after": "system",
-  "category": "more general libs",
+  "after": "git",
+  "category": "ancillary applications",
   "framework": "[br]",
   "is lib": true,
   "sigil": "st"

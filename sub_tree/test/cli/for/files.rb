@@ -6,7 +6,7 @@ module Skylab::SubTree::TestSupport
       tcc.include self
     end
 
-    _ = TS_.lib_ :CLI_expect_expression
+    _ = TS_.lib_ :CLI_want_expression
 
     include _.instance_methods_module__
 
@@ -18,17 +18,17 @@ module Skylab::SubTree::TestSupport
       nil
     end
 
-    def make expect_str
+    def make want_str
 
       io = Home_::Library_::StringIO.new @paths_string
       io.rewind
-      @stdin_for_expect_stdout_stderr = io
+      @stdin_for_want_stdout_stderr = io
       local_invoke
 
-      _unindent expect_str
-      flush_to_string_contiguous_lines_on_stream( :o ).should eql expect_str
+      _unindent want_str
+      flush_to_string_contiguous_lines_on_stream( :o ).should eql want_str
 
-      expect_succeed
+      want_succeed
     end
 
     def _unindent str
@@ -38,7 +38,7 @@ module Skylab::SubTree::TestSupport
 
     def local_invoke * argv
       argv.unshift 'files'
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
     end
 
     def produce_action_specific_expag_safely_
@@ -51,7 +51,7 @@ module Skylab::SubTree::TestSupport
       Home_::CLI
     end
 
-    define_method :invocation_strings_for_expect_stdout_stderr, -> do
+    define_method :invocation_strings_for_want_stdout_stderr, -> do
       a = [ 'stflz' ].freeze
       -> do
         a

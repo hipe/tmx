@@ -55,11 +55,11 @@ module Skylab::Permute::TestSupport
     end  # >>
 
     pn_s_a = nil
-    define_method :invocation_strings_for_expect_stdout_stderr do
+    define_method :invocation_strings_for_want_stdout_stderr do
       pn_s_a ||= %w([pe])
     end
 
-    def _WAS_ get_invocation_strings_for_expect_stdout_stderr
+    def _WAS_ get_invocation_strings_for_want_stdout_stderr
       %w( pmt )
     end
 
@@ -74,7 +74,7 @@ module Skylab::Permute::TestSupport
 
   # --
 
-  Expect_no_emission_ = -> * x_a do
+  Want_no_emission_ = -> * x_a do
     fail "expected no events, had #{ x_a.inspect }"
   end
 
@@ -82,8 +82,8 @@ module Skylab::Permute::TestSupport
 
   module Use__
 
-    Expect_event = -> tcm do
-      Common_.test_support::Expect_Emission[ tcm ]
+    Want_event = -> tcm do
+      Common_.test_support::Want_Emission[ tcm ]
     end
 
     Memoizer_methods = -> tcm do

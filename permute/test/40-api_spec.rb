@@ -12,11 +12,11 @@ module Skylab::Permute::TestSupport
 
       call_API :ping
 
-      expect_emission :info, :expression, :ping do |y|
+      want_emission :info, :expression, :ping do |y|
         y == [ "hello from permute." ] || fail
       end
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     context "ping (as multitest context)" do
@@ -49,7 +49,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "succeeds" do
-        expect_trueish_result
+        want_trueish_result
       end
 
       it "the values are tuples (structs) with the members in order" do

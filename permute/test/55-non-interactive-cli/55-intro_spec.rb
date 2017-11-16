@@ -65,9 +65,9 @@ module Skylab::Permute::TestSupport
 
         cli.invoke 'permute', 'ping'
 
-        cli.expect_on_stderr "hello from permute."
+        cli.want_on_stderr "hello from permute."
 
-        cli.expect_succeed_under self
+        cli.want_succeed_under self
       end
     end
 
@@ -167,7 +167,7 @@ module Skylab::Permute::TestSupport
 
       shared_subject :_coarse_parse do
         _ = niCLI_state.lines
-        Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse.new _
+        Zerk_test_support_[]::CLI::Want_Section_Coarse_Parse.new _
       end
     end
 
@@ -204,7 +204,7 @@ module Skylab::Permute::TestSupport
 
         _exp_st = Home_.lib_.basic::String::LineStream_via_String[ _exp ]
 
-        TestSupport_::Expect_Line::Streams_have_same_content[ _st_, _exp_st, self ]
+        TestSupport_::Want_Line::Streams_have_same_content[ _st_, _exp_st, self ]
       end
     end
   end

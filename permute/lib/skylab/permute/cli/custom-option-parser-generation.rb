@@ -154,7 +154,7 @@ module Skylab::Permute
 
         def execute  # side-effects only
 
-          @_oes_p = method :___handle_anything
+          @_listener = method :___handle_anything
 
           ok = __resolve_token_stream_via_ARGV_and_tokenizer
           ok &&= __resolve_value_name_stream_via_token_stream
@@ -200,13 +200,13 @@ module Skylab::Permute
         def __resolve_value_name_stream_via_token_stream
 
           _ts = remove_instance_variable :@__token_stream
-          _ = Here_::Magnetics_::ValueNameStream_via_TokenStream[ _ts, & @_oes_p ]
+          _ = Here_::Magnetics_::ValueNameStream_via_TokenStream[ _ts, & @_listener ]
           _if _, :@__value_name_stream
         end
 
         def __resolve_token_stream_via_ARGV_and_tokenizer
 
-          _ts = Here_::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ @_argv, & @_oes_p ]
+          _ts = Here_::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ @_argv, & @_listener ]
           _if _ts, :@__token_stream
         end
 

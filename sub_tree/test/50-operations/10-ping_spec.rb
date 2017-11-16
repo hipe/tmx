@@ -5,7 +5,7 @@ module Skylab::SubTree::TestSupport
   describe "[st] operations -  ping" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "loads." do
 

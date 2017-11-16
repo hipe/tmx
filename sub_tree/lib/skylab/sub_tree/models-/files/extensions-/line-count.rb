@@ -6,8 +6,8 @@ module Skylab::SubTree
 
       class Extensions_::Line_Count
 
-        def initialize qualified_knownness, & oes_p
-          @on_event_selectively = oes_p
+        def initialize qualified_knownness, & p
+          @listener = p
           @qualified_knownness = qualified_knownness
         end
 
@@ -46,7 +46,7 @@ module Skylab::SubTree
               lf.input_line  # you must not shellescape: no shell used
             end ) ]
 
-            @on_event_selectively.call :info, :wordcount_command do
+            @listener.call :info, :wordcount_command do
               __build_wordcount_command_event cmd_s_a
             end
 
@@ -85,7 +85,7 @@ module Skylab::SubTree
           o.read  # toss
           d = t.value.exitstatus
 
-          @on_event_selectively.call :error, :expression, :find do | y |
+          @listener.call :error, :expression, :find do | y |
             y << "(find (exitstatus #{ d }) wrote to errstream - #{ s })"
           end
           UNABLE_
@@ -135,11 +135,11 @@ module Skylab::SubTree
           d = t.value.exitstatus
           if d.zero?
 
-            @on_event_selectively.call :info, :expression, :find_exitstatus do | y |
+            @listener.call :info, :expression, :find_exitstatus do | y |
               y << "(find exitstatus #{ d })"
             end
           else
-            @on_event_selectively.call :error, :expression, :find_exitstatus do | y |
+            @listener.call :error, :expression, :find_exitstatus do | y |
               y << "(find exitstatus #{ d })"
             end
           end
