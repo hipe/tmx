@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport
     # -
       # --
 
-      def expect_retrieve_ k, v
+      def want_retrieve_ k, v
         _inst = subject_instance_
         x = nil
         res = _inst.insert_or_retrieve k, nil do |x_|
@@ -52,14 +52,14 @@ module Skylab::Basic::TestSupport
 
       # -- deep audit 1
 
-      def expect_prev_and_next_ exp_prev, link, exp_next
+      def want_prev_and_next_ exp_prev, link, exp_next
 
-        _expect_one_side link, :is_head, :@prev, exp_prev, :prev
-        _expect_one_side link, :is_tail, :@next, exp_next, :next
+        _want_one_side link, :is_head, :@prev, exp_prev, :prev
+        _want_one_side link, :is_tail, :@next, exp_next, :next
         NIL
       end
 
-      def _expect_one_side link, is_head_or_tail_m, ivar, exp_sym, prev_or_next_m
+      def _want_one_side link, is_head_or_tail_m, ivar, exp_sym, prev_or_next_m
 
         if link.send is_head_or_tail_m
           link.instance_variable_defined?( ivar ) and fail

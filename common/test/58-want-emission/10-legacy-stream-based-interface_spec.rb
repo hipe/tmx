@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] expect emission - legacy stream-based interface" do
+  describe "[co] want emission - legacy stream-based interface" do
 
     # NOTE - reading tests that test libraries intended to be used for tests
     # is always confusing, but fortunately our naming conventions help
@@ -23,8 +23,8 @@ module Skylab::Common::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_meta
-    use :expect_emission
+    use :want_emission_meta
+    use :want_emission
 
     def _expev_fail msg  # "trap" these ("crude") kinds of failures  BE CAREFUL
 
@@ -39,18 +39,18 @@ module Skylab::Common::TestSupport
         :_no_see_fake_event_
       end
 
-      expect_no_events
+      want_no_events
 
-      expect_lone_failure_ 'expected no more events, had [:bizzie, :bazzie]'
+      want_lone_failure_ 'expected no more events, had [:bizzie, :bazzie]'
     end
 
     it "when had none and expect one" do
 
       event_log.handle_event_selectively  # kick it (see [#065]#note-B)
 
-      expect_one_event :wazlow
+      want_one_event :wazlow
 
-      expect_lone_failure_ "expected another event, had none"
+      want_lone_failure_ "expected another event, had none"
     end
 
     context "(trap calls to quickie's fails - tests quickie only but etc..)" do
@@ -68,92 +68,92 @@ module Skylab::Common::TestSupport
 
         _send_potential_OK_event_on_channel_x_y
 
-        _em = expect_not_OK_event :y
+        _em = want_not_OK_event :y
 
         _ = "expected event's `ok` value to be negative, was true"
 
-        expect_lone_failure_ _
+        want_lone_failure_ _
 
-        expect_OK_emission_ _em
+        want_OK_emission_ _em
       end
 
       it "does match the trilean" do
 
         _send_potential_not_OK_event_on_channel_x_y
 
-        _em = expect_not_OK_event :y
+        _em = want_not_OK_event :y
 
-        expect_nothing_failed_
+        want_nothing_failed_
 
-        expect_not_OK_emission_ _em
+        want_not_OK_emission_ _em
       end
 
       it "doesn't match the TCS" do
 
         _send_potential_OK_event_on_channel_x_y
 
-        _em = expect_event :z
+        _em = want_event :z
 
-        expect_lone_failure_ "expected `z` event, had `y`"
+        want_lone_failure_ "expected `z` event, had `y`"
 
-        expect_OK_emission_ _em
+        want_OK_emission_ _em
       end
 
       it "does match the TCS" do
 
         _send_potential_OK_event_on_channel_x_y
 
-        _em = expect_event :y
+        _em = want_event :y
 
-        expect_nothing_failed_
+        want_nothing_failed_
 
-        expect_OK_emission_ _em
+        want_OK_emission_ _em
       end
 
       it "doesn't match string message" do
 
         _send_potential_neutral_event_on_channel_x_y
 
-        _em = expect_neutral_event :y, 'shimmy'
+        _em = want_neutral_event :y, 'shimmy'
 
-        expect_lone_failure_ 'expected "shimmy", had "i am a neutral event"'
+        want_lone_failure_ 'expected "shimmy", had "i am a neutral event"'
 
-        expect_neutral_emission_ _em
+        want_neutral_emission_ _em
       end
 
       it "does match string message" do
 
         _send_potential_not_OK_event_on_channel_x_y
 
-        _em = expect_not_OK_event :y, "i am a failure event"
+        _em = want_not_OK_event :y, "i am a failure event"
 
-        expect_nothing_failed_
+        want_nothing_failed_
 
-        expect_not_OK_emission_ _em
+        want_not_OK_emission_ _em
       end
 
       it "doesn't match message via regexp" do
 
         _send_potential_neutral_event_on_channel_x_y
 
-        _em = expect_neutral_event :y, /\AI am a neutral event\z/
+        _em = want_neutral_event :y, /\AI am a neutral event\z/
 
         _ = 'did not match /\AI am a neutral event\z/ - "i am a neutral event"'
 
-        expect_lone_failure_ _
+        want_lone_failure_ _
 
-        expect_neutral_emission_ _em
+        want_neutral_emission_ _em
       end
 
       it "does match message via regexp" do
 
         _send_potential_neutral_event_on_channel_x_y
 
-        _em = expect_neutral_event :y, /\AI am a neutral event\z/i
+        _em = want_neutral_event :y, /\AI am a neutral event\z/i
 
-        expect_nothing_failed_
+        want_nothing_failed_
 
-        expect_neutral_emission_ _em
+        want_neutral_emission_ _em
       end
 
       def _send_potential_not_OK_event_on_channel_x_y
@@ -182,5 +182,4 @@ module Skylab::Common::TestSupport
     end
   end
 end
-
 # #tombstone - old expect event (commit previous to this one)

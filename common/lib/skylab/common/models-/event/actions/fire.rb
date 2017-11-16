@@ -19,7 +19,7 @@ module Skylab::Common
 
   Models_::Ping = -> pxy do
 
-    pxy.on_event_selectively.call :info, :expression, :ping do | y |
+    pxy.listener.call :info, :expression, :ping do | y |
       y << "hello from common."
     end
     :hello_from_common

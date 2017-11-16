@@ -45,9 +45,9 @@ module Skylab::Basic::TestSupport
 
           module Models_  # the default source for unbound models
 
-            Some_func_one = -> arg_a, arg_b, bound, & oes_p do
+            Some_func_one = -> arg_a, arg_b, bound, & p do
 
-              oes_p.call :ohai, :ohey do
+              p.call :ohai, :ohey do
                 [ arg_b, arg_a ]
               end
 

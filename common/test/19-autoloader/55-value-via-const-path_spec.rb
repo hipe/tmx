@@ -48,7 +48,7 @@ module Skylab::Common::TestSupport
         rescue _name_error_class => e
         end
 
-        _expect_same_name_error e
+        _want_same_name_error e
       end
 
       it "invalid const name and your else block takes one arg - o" do
@@ -59,10 +59,10 @@ module Skylab::Common::TestSupport
         end
 
         _ == :hi or fail
-        _expect_same_name_error ev.to_exception
+        _want_same_name_error ev.to_exception
       end
 
-      def _expect_same_name_error e
+      def _want_same_name_error e
 
         ( _name_error_class === e ) or fail
         e.message =~ %r(\Awrong constant name '123fml' for const reduce\z) or fail

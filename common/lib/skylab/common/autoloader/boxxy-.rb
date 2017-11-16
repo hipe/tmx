@@ -16,7 +16,7 @@ module Skylab::Common
 
       # ==
 
-      class OperatorBranch_via_Module  # 1x
+      class FeatureBranch_via_Module  # 1x
 
         class << self
           alias_method :call, :new
@@ -44,7 +44,7 @@ module Skylab::Common
           @_augment = :__augment_while_active
         end
 
-        # ~( exposition of a selection of [#ze-051.2] operator branch methods
+        # ~( exposition of a selection of [#ze-051.2] feature branch methods
         #
         #    - experimental, #open [#041] only covered by [cu]
         #
@@ -130,7 +130,7 @@ module Skylab::Common
 
           MyConstMissing___.call_by do |o|
             yield o
-            o.operator_branch = self
+            o.feature_branch = self
             o.module = @module
           end
         end
@@ -313,7 +313,7 @@ module Skylab::Common
           @wrong_const = x
         end
 
-        def operator_branch= ob
+        def feature_branch= ob
           @_correct_name = ob.method :_correct_name
           @index = ob.index
         end

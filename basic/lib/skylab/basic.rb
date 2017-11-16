@@ -203,8 +203,8 @@ module Skylab::Basic  # introduction at [#020]
   private
 
     def maybe_send_event * i_a, & ev_p
-      if @on_event_selectively
-        @on_event_selectively[ * i_a, & ev_p ]
+      if @listener
+        @listener[ * i_a, & ev_p ]
       else
         raise ev_p[].to_exception
       end

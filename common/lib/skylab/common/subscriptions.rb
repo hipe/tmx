@@ -72,9 +72,9 @@ module Skylab::Common
       @delegate = x ; nil
     end
 
-    def delegate_to_selectively oes_p
+    def delegate_to_selectively p
       @delegate = Event_Receiver___.new do |ev|
-        oes_p.call do
+        p.call do
           ev
         end
       end

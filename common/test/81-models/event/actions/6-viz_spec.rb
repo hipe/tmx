@@ -5,7 +5,7 @@ module Skylab::Common::TestSupport
   describe "[co] [..] viz" do
 
     TS_[ self ]
-    use :expect_emission
+    use :want_emission
 
     it "with the ideal case - works" do
 
@@ -28,7 +28,7 @@ module Skylab::Common::TestSupport
         }
       HERE
 
-      expect_succeed
+      want_succeed
     end
 
     def subject_API

@@ -60,7 +60,7 @@ module Skylab::Basic
       nil
     end
 
-    def normalize & oes_p
+    def normalize & p
       @a.sort!
       st = Home_::List::LineStream_via_Array[ @a ]
       prev = st.gets
@@ -79,8 +79,8 @@ module Skylab::Basic
       end
       if elim
         @a.compact!
-        if oes_p
-          oes_p.call :info do
+        if p
+          p.call :info do
             elim
           end
         else

@@ -6,7 +6,7 @@ module Skylab::Basic::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     shared_subject :_state_machine do
 
@@ -103,14 +103,14 @@ module Skylab::Basic::TestSupport
 
       _against Common_::THE_EMPTY_SCANNER
 
-      _expect_failed_with "expecting long switch at end of input"
+      _want_failed_with "expecting long switch at end of input"
     end
 
     it "bad input " do
 
       st = _upstream '-foo', 'bar'
       _against st
-      _expect_failed_with 'expecting long switch at "-foo"'
+      _want_failed_with 'expecting long switch at "-foo"'
       st.current_index.should be_zero
     end
 
@@ -118,7 +118,7 @@ module Skylab::Basic::TestSupport
 
       st = _upstream '--foo'
       _against st
-      _expect_failed_with "expecting value at end of input"
+      _want_failed_with "expecting value at end of input"
       st.current_index.should eql 1
     end
 
@@ -126,7 +126,7 @@ module Skylab::Basic::TestSupport
 
       st = _upstream '--foo', 'bar'
       _against st
-      _expect_same_result
+      _want_same_result
       st.current_index.should eql 2
     end
 
@@ -136,7 +136,7 @@ module Skylab::Basic::TestSupport
 
       st = _upstream '--foo=bar'
       _against st
-      _expect_same_result
+      _want_same_result
       st.current_index.should eql 1
     end
 
@@ -177,18 +177,18 @@ module Skylab::Basic::TestSupport
       NIL
     end
 
-    def _expect_failed_with s
+    def _want_failed_with s
 
-      _em = expect_not_OK_event :no_available_state_transition
+      _em = want_not_OK_event :no_available_state_transition
 
       black_and_white( _em.cached_event_value ).should eql s
 
-      expect_fail
+      want_fail
     end
 
-    def _expect_same_result
+    def _want_same_result
 
-      expect_no_events
+      want_no_events
 
       a = @result
 

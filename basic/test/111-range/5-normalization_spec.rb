@@ -5,26 +5,26 @@ module Skylab::Basic::TestSupport
   describe "[ba] range normalization" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "outside left" do
 
       _against( -2 )
-      _expect_common_failure(
+      _want_common_failure(
         "'argument' must be between -1 and 2 inclusive. had -2" )
     end
 
     it "outside right" do
 
       _against 3
-      _expect_common_failure %r(inclusive\. had 3\z)
+      _want_common_failure %r(inclusive\. had 3\z)
     end
 
     it "inside" do
 
       _against( -1 )
 
-      expect_no_events
+      want_no_events
 
       _kn = @result
       _kn.is_known_known or fail
@@ -41,16 +41,16 @@ module Skylab::Basic::TestSupport
       NIL_
     end
 
-    def _subject_call * x_a, & oes_p
+    def _subject_call * x_a, & p
 
-      _normalization_class.call_via_iambic x_a, & oes_p
+      _normalization_class.call_via_iambic x_a, & p
     end
 
-    def _expect_common_failure x
+    def _want_common_failure x
 
       false == @result or fail
 
-      _em = expect_event_ :actual_property_is_outside_of_formal_property_set
+      _em = want_event_ :actual_property_is_outside_of_formal_property_set
 
       actual_s = black_and_white _em.cached_event_value
 

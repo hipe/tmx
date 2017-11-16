@@ -22,41 +22,41 @@ module Skylab::Common::TestSupport
       it "access first then last" do
 
         _with_memoized
-        _expect_lookup_softly "A", :A
-        _expect_lookup_softly "C", :C
+        _want_lookup_softly "A", :A
+        _want_lookup_softly "C", :C
       end
 
       it "access last then first (exercises cache) " do
 
         _with_rebuilt
-        _expect_lookup_softly "C", :C
-        _expect_lookup_softly "A", :A
+        _want_lookup_softly "C", :C
+        _want_lookup_softly "A", :A
       end
 
       it "ask for offset of already indexed" do
 
         _with_rebuilt
         _lookup_softly :A
-        _expect_offset 0, :A
+        _want_offset 0, :A
       end
 
       it "ask for offset of not yet indexed" do
 
         _with_rebuilt
-        _expect_offset 2, :C
+        _want_offset 2, :C
       end
 
       it "ask for offset of doesn't exist when not yet cached" do
 
         _with_rebuilt
-        _expect_offset nil, :D
+        _want_offset nil, :D
       end
 
       it "ask for offset of doesn't exist when cached" do
 
         _with_rebuilt
         _lookup_softly :C
-        _expect_offset nil, :D
+        _want_offset nil, :D
       end
 
       it "to value stream before cached" do
@@ -86,11 +86,11 @@ module Skylab::Common::TestSupport
       #
       # (NOTE - as an afterthought we have altered the above to insulate
       # it from the particular business names, when the subject was
-      # retrofitted to accord to with operator branched. adhering to a
+      # retrofitted to accord to with feature branched. adhering to a
       # "rule of 2's" for future tests (if you use a business name more
       # than 2x, hide it behind a local method) might be good..)
 
-      def _expect_offset x, sym
+      def _want_offset x, sym
 
         _actual = @SUBJECT.offset_via_reference sym
         _actual == x || fail
@@ -100,7 +100,7 @@ module Skylab::Common::TestSupport
         @SUBJECT.to_dereferenced_item_stream
       end
 
-      def _expect_lookup_softly x, sym
+      def _want_lookup_softly x, sym
         _actual = _lookup_softly sym
         _actual == x || fail
       end
@@ -138,7 +138,7 @@ module Skylab::Common::TestSupport
     end
 
     def _subject_module
-      Home_::Stream::Magnetics::OperatorBranch_via_Stream
+      Home_::Stream::Magnetics::FeatureBranch_via_Stream
     end
 
     # ==

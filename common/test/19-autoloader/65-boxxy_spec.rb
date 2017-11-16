@@ -196,24 +196,24 @@ module Skylab::Common::TestSupport
 
         _actual_h = ::Hash[ const_a.map { |c| [ Home_::Distill[ c ], nil ] } ]
 
-        _expect_h = {
+        _want_h = {
           Home_::Distill[ "shimmy_jimmy" ] => nil,
           Home_::Distill[ "shammy_jammy" ] => nil,
         }
 
-        _hashes_have_same_keys _actual_h, _expect_h
+        _hashes_have_same_keys _actual_h, _want_h
       end
 
       it "the one constant uses the stowaway name, trumping the filesystem node" do
 
         _actual_h = ::Hash[ _these_two.map { |c| [ c, nil ] } ]
 
-        _expect_h = {
+        _want_h = {
           ShimmyJIMMY: nil,
           Shammy_Jammy: nil,
         }
 
-        _hashes_have_same_keys _actual_h, _expect_h
+        _hashes_have_same_keys _actual_h, _want_h
       end
 
       it "the constant names are ordered with the stowaway const(s) first " do
@@ -245,11 +245,11 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    def _hashes_have_same_keys actual_h, expect_h
+    def _hashes_have_same_keys actual_h, want_h
 
       p = Home_.lib_.basic::Hash::Validate_superset
-      p[ expect_h, actual_h.keys ]
-      p[ actual_h, expect_h.keys ]
+      p[ want_h, actual_h.keys ]
+      p[ actual_h, want_h.keys ]
     end
 
     # ==

@@ -6,8 +6,8 @@ module Skylab::Basic::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_normalization
+    use :want_event
+    use :want_normalization
 
     it "loads" do
       _subject_module
@@ -26,52 +26,52 @@ module Skylab::Basic::TestSupport
 
       it "against nil does nothing - checking required-ness is outside of scope" do
         normalize_against_ nil
-        expect_nothing_
+        want_nothing_
       end
 
       it "against false results in false - this is your problem not ours" do
 
         normalize_against_ false
-        expect_output_value_was_not_written_
-        expect_no_events
+        want_output_value_was_not_written_
+        want_no_events
         @result_x.should eql false
       end
 
       it 'against the empty string - "your value cannot be empty" (ever)' do
 
         normalize_against_ Home_::EMPTY_S_
-        expect_output_value_was_not_written_
+        want_output_value_was_not_written_
         @result_x.should eql false
-        expect_not_OK_event_ :path_cannot_be_empty,
+        want_not_OK_event_ :path_cannot_be_empty,
           '(par «your_value») cannot be empty - (ick "")'
-        expect_no_more_events
+        want_no_more_events
       end
 
       it "against the root path - OK" do
-        _expect_the_passthru_normalization_with '/'
+        _want_the_passthru_normalization_with '/'
       end
 
       it "against the pwd dot - OK" do
-        _expect_the_passthru_normalization_with '.'
+        _want_the_passthru_normalization_with '.'
       end
 
       it "against dot dot - OK" do
-        _expect_the_passthru_normalization_with '..'
+        _want_the_passthru_normalization_with '..'
       end
 
       it "BUT two contiguous separators with nothing between them - NO" do
 
         normalize_against_ '//'
-        expect_errored_with_ :path_cannot_contain_repeated_separators,
+        want_errored_with_ :path_cannot_contain_repeated_separators,
           '(par «your_value») cannot contain repeated separators - (ick "//")'
       end
 
       it "against a normal, single-term absolute path - OK" do
-        _expect_the_passthru_normalization_with '/foo'
+        _want_the_passthru_normalization_with '/foo'
       end
 
       it "against a single-term abspath with a trailing slash - OK" do
-        _expect_the_passthru_normalization_with '/foo/'
+        _want_the_passthru_normalization_with '/foo/'
       end
     end
 
@@ -83,12 +83,12 @@ module Skylab::Basic::TestSupport
 
       it "an abspath - NO" do
         normalize_against_ '/'
-        expect_errored_with_ :path_cannot_be_absolute,
+        want_errored_with_ :path_cannot_be_absolute,
           '(par «your_value») cannot be absolute - (ick "/")'
       end
 
       it "a relpath - YES" do
-        _expect_the_passthru_normalization_with 'A'
+        _want_the_passthru_normalization_with 'A'
       end
     end
 
@@ -99,12 +99,12 @@ module Skylab::Basic::TestSupport
       end
 
       it "an abspath - YES" do
-        _expect_the_passthru_normalization_with '/'
+        _want_the_passthru_normalization_with '/'
       end
 
       it "a relpath - NO" do
         normalize_against_ ' '
-        expect_errored_with_ :path_cannot_be_relative,
+        want_errored_with_ :path_cannot_be_relative,
           '(par «your_value») cannot be relative - (ick " ")'
       end
     end
@@ -121,12 +121,12 @@ module Skylab::Basic::TestSupport
 
       it "no" do
         normalize_against_ '..'
-        expect_errored_with_ :path_cannot_contain_dot_dot,
+        want_errored_with_ :path_cannot_contain_dot_dot,
           '(par «your_value») cannot contain dot dot - (ick "..")'
       end
 
       it "yes" do
-        _expect_the_passthru_normalization_with '...'
+        _want_the_passthru_normalization_with '...'
       end
     end
 
@@ -142,12 +142,12 @@ module Skylab::Basic::TestSupport
 
       it "in the middle - no" do
         normalize_against_ 'a/./c'
-        expect_errored_with_ :path_cannot_contain_single_dot,
+        want_errored_with_ :path_cannot_contain_single_dot,
           '(par «your_value») cannot contain single dot - (ick "a/./c")'
       end
 
       it "but same with dot dot is ok" do
-        _expect_the_passthru_normalization_with 'a/../c'
+        _want_the_passthru_normalization_with 'a/../c'
       end
     end
 
@@ -163,24 +163,24 @@ module Skylab::Basic::TestSupport
 
       it "no" do
         normalize_against_ '...'
-        expect_errored_with_ :path_cannot_contain_dot_file,
+        want_errored_with_ :path_cannot_contain_dot_file,
           '(par «your_value») cannot contain dot file - (ick "...")'
       end
 
       it "yes LOOK" do
-        _expect_the_passthru_normalization_with './*'
+        _want_the_passthru_normalization_with './*'
       end
     end
 
-    def _expect_the_passthru_normalization_with s
+    def _want_the_passthru_normalization_with s
       normalize_against_ s
-      expect_the_passthru_normalization__
+      want_the_passthru_normalization__
     end
 
-    def expect_errored_with * a, & p
-      expect_output_value_was_not_written_
+    def want_errored_with * a, & p
+      want_output_value_was_not_written_
       @result_x.should eql false
-      expect_not_OK_event( * a, & p )
+      want_not_OK_event( * a, & p )
     end
 
     def _new_subject * x_a

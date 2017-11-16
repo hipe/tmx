@@ -54,17 +54,17 @@ module Skylab::Basic
 
         include Brazen_.branchesque_defaults::Bound_Methods
 
-        def initialize unb, ke, & oes_p
+        def initialize unb, ke, & p
 
           @kernel = ke
-          @on_event_selectively = oes_p
+          @listener = p
           @unbound = unb
         end
 
         # ~ indexing & reflection
 
         def to_unordered_selection_stream
-          @unbound.build_unordered_selection_stream( & @on_event_selectively )
+          @unbound.build_unordered_selection_stream( & @listener )
         end
 
         # ~ invocation & used by modality interpreters

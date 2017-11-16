@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport
     use :string  # only defines `subject_module_`
 
     it "a string 10 chars wide gets quoted and becomes 12 characters wide" do
-      __expect_quotes 'ten_chars_'
+      __want_quotes 'ten_chars_'
     end
 
     it "the quoting happens via 'inspect' so things get escaped too" do
@@ -70,7 +70,7 @@ module Skylab::Basic::TestSupport
       end
     end
 
-    def __expect_quotes s
+    def __want_quotes s
       subject( s ).should eql "\"#{ s }\""
     end
 

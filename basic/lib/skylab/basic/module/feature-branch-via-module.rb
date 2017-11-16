@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Module::OperatorBranch_via_Module < Common_::SimpleModel  # :[#ze-051.2]
+  class Module::FeatureBranch_via_Module < Common_::SimpleModel  # :[#ze-051.2]
 
     # ([tab])
     #

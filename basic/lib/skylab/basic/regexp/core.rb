@@ -9,8 +9,8 @@ module Skylab::Basic
         Component_Model[ & build ]
       end
 
-      def marshal_load s, & oes_p
-        Marshal_load___[ s, & oes_p ]
+      def marshal_load s, & p
+        Marshal_load___[ s, & p ]
       end
 
       def options_via_regexp rx
@@ -51,8 +51,8 @@ module Skylab::Basic
 
     class Marshal_load___ < Common_::Monadic
 
-      def initialize s, & oes_p
-        @on_event_selectively = oes_p
+      def initialize s, & p
+        @listener = p
         @string = s
       end
 
@@ -70,7 +70,7 @@ module Skylab::Basic
 
       def __when_no_md
 
-        @on_event_selectively.call :error, :not_parsable_as_regex do
+        @listener.call :error, :not_parsable_as_regex do
 
           Common_::Event.inline_not_OK_with :not_parsable_as_regex,
             :string, @string
@@ -113,7 +113,7 @@ module Skylab::Basic
 
         ev = Common_::Event::Via_exception.via :exception, @e
 
-        @on_event_selectively.call :error, ev.terminal_channel_symbol do
+        @listener.call :error, ev.terminal_channel_symbol do
           ev
         end
 
@@ -209,9 +209,9 @@ module Skylab::Basic
           NIL_
         end
 
-        def _failed & oes_p_p
-          _oes_p = oes_p_p[ nil ]
-          @on_failure_to_match[ :_reserved_, & _oes_p ]
+        def _failed & p_p
+          _p = p_p[ nil ]
+          @on_failure_to_match[ :_reserved_, & _p ]
           UNABLE_
         end
 

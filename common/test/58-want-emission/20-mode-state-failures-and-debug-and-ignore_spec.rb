@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] expect emission - mode state failures, debug, ignore" do
+  describe "[co] want emission - mode state failures, debug, ignore" do
 
     TS_[ self ]
-    use :expect_emission_meta
-    use :expect_emission
+    use :want_emission_meta
+    use :want_emission
 
     it "mode-state failure - you can't set an option after the first emission" do
 
@@ -14,7 +14,7 @@ module Skylab::Common::TestSupport
         :_no_see_
       end
 
-      _expect_state_faulure :record_time do
+      _want_state_faulure :record_time do
         @event_log.set_hash_of_terminal_channels_to_ignore Home_::EMPTY_P_
       end
     end
@@ -29,18 +29,18 @@ module Skylab::Common::TestSupport
 
       :hi == _em.channel_symbol_array.fetch( 0 ) or fail
 
-      _expect_state_faulure :closed do
+      _want_state_faulure :closed do
         send_potential_event_ :hi do
           :_no_see_
         end
       end
     end
 
-    def _expect_state_faulure sym
+    def _want_state_faulure sym
 
       begin
         yield
-      rescue TS_::Expect_Emission::MethodNotAvailableFromCurrentState => e
+      rescue TS_::Want_Emission::MethodNotAvailableFromCurrentState => e
       end
 
       e.message.include? "has moved to '#{ sym }' state" or fail
@@ -53,7 +53,7 @@ module Skylab::Common::TestSupport
         _this_same_ignoration_test
       end
 
-      attr_reader :ignore_for_expect_emission  # 1 of 2
+      attr_reader :ignore_for_want_emission  # 1 of 2
     end
 
     context "when `do_debug` is on" do
@@ -115,7 +115,7 @@ module Skylab::Common::TestSupport
           io.gets and fail
         end
 
-        attr_reader :ignore_for_expect_emission  # 2 of 2
+        attr_reader :ignore_for_want_emission  # 2 of 2
       end
     end
 
@@ -123,7 +123,7 @@ module Skylab::Common::TestSupport
 
     define_method :_this_same_ignoration_test do
 
-      @ignore_for_expect_emission = _IGNORE_ZIZZO
+      @ignore_for_want_emission = _IGNORE_ZIZZO
 
       send_potential_event_ :zizzo do
         self._NEVER

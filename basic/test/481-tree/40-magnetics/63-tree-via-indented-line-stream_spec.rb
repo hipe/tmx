@@ -5,12 +5,12 @@ module Skylab::Basic::TestSupport
   describe "[ba] tree - magnetics - via indented line stream" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :tree
 
     it "none" do
       _against_lines nil
-      expect_no_events
+      want_no_events
       @tree.should be_nil
     end
 
@@ -26,7 +26,7 @@ module Skylab::Basic::TestSupport
       tree.parent.object_id.should eql @tree.object_id
       tree.children_count.should be_zero
       tree.children.should be_nil
-      expect_no_events
+      want_no_events
     end
 
     it "when a line does not have the glyph" do
@@ -37,9 +37,9 @@ module Skylab::Basic::TestSupport
 
       @tree.should eql false
 
-      expect_not_OK_event_ :line_does_not_have_glyph
+      want_not_OK_event_ :line_does_not_have_glyph
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "two in a row at the same level" do
@@ -66,8 +66,8 @@ module Skylab::Basic::TestSupport
          + bar
       HERE
       @tree.should eql false
-      expect_not_OK_event :invalid_dedent
-      expect_no_more_events
+      want_not_OK_event :invalid_dedent
+      want_no_more_events
     end
 
     it "one child" do
@@ -116,7 +116,7 @@ module Skylab::Basic::TestSupport
       HERE
       _against_lines omg
       _to_normal_string.should eql omg
-      expect_no_events
+      want_no_events
     end
 
     it "`build_using` allows you to map the received string values to whatever" do
@@ -152,13 +152,13 @@ module Skylab::Basic::TestSupport
 
     def build_tree
 
-      _oes_p = handle_event_selectively_
+      _p = handle_event_selectively_
 
       @tree = subject_module_.via(
         :indented_line_stream, @lines,
         :build_using, handle_build,
         :glyph, '+ ',
-        & _oes_p )
+        & _p )
 
       NIL_
     end

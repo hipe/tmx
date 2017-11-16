@@ -10,22 +10,22 @@ module Skylab::Common::TestSupport
 
         it "Foo_Bar => foo-bar" do
 
-          expect :Foo_Bar, :foo_bar
+          want :Foo_Bar, :foo_bar
         end
 
         it "Foo_Bar_XL => foo-bar-XL" do
 
-          expect :Foo_Bar_XL, :foo_bar_XL
+          want :Foo_Bar_XL, :foo_bar_XL
         end
 
         it "MPC_cone => MPC-cone" do
 
-          expect :MPC_cone, :MPC_cone
+          want :MPC_cone, :MPC_cone
         end
 
         it "TOP_Secret___ => TOP_secret" do
 
-          expect :TOP_Secret___, :TOP_secret
+          want :TOP_Secret___, :TOP_secret
         end
       end
 
@@ -33,11 +33,11 @@ module Skylab::Common::TestSupport
 
         it "FreiTag => frei-tag" do
 
-          expect :FreiTag, :frei_tag
+          want :FreiTag, :frei_tag
         end
       end
 
-      def expect sym, s
+      def want sym, s
 
         _nf = subject.via_const_symbol sym
         _s = _nf.as_variegated_symbol

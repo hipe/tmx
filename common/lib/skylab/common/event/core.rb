@@ -510,7 +510,7 @@ module Skylab::Common
         end
 
         def handle_event_selectively
-          @on_event_selectively ||= __produce_handle_event_selectively_proc
+          @listener ||= __produce_handle_event_selectively_proc
         end
 
         def handle_event_selectively_via_channel
@@ -528,9 +528,9 @@ module Skylab::Common
         end
 
         def produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
-          if @on_event_selectively
+          if @listener
             -> i_a, & ev_p do
-              @on_event_selectively[ * i_a, & ev_p ]
+              @listener[ * i_a, & ev_p ]
             end
           end
         end
@@ -538,7 +538,7 @@ module Skylab::Common
         # ~ common & courtesy
 
         def change_selective_listener_via_channel_proc x
-          @on_event_selectively = nil
+          @listener = nil
           @handle_event_selectively_via_channel_proc = x ; nil
         end
 
@@ -553,18 +553,18 @@ module Skylab::Common
 
         class << self
 
-          def bookends * a, & oes_p
-            Bookends__.new( a, & oes_p ).produce_selective_listener_proc
+          def bookends * a, & p
+            Bookends__.new( a, & p ).produce_selective_listener_proc
           end
 
-          def full * a, & oes_p
-            Full__.new( a, & oes_p ).produce_selective_listener_proc
+          def full * a, & p
+            Full__.new( a, & p ).produce_selective_listener_proc
           end
         end
 
-        def initialize a, & oes_p
+        def initialize a, & p
           @delegate, @channel_i = a
-          @fallback_selective_listener_proc = oes_p
+          @fallback_selective_listener_proc = p
         end
 
         def produce_selective_listener_proc

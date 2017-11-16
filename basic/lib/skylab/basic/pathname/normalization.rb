@@ -11,7 +11,7 @@ module Skylab::Basic
         def initialize & p
 
           if p
-            @on_event_selectively = p
+            @listener = p
           end
 
           @_do_freeze = true
@@ -84,22 +84,22 @@ module Skylab::Basic
 
       public
 
-        def normalize_value x, & oes_p
+        def normalize_value x, & p
 
           normalize_qualified_knownness(
             Common_::QualifiedKnownKnown.via_value_and_symbol( x, :path ),
-            & oes_p )
+            & p )
         end
 
-        def normalize_qualified_knownness qkn, & oes_p
+        def normalize_qualified_knownness qkn, & p
           otr = dup
-          otr.init_copy qkn, & oes_p
+          otr.init_copy qkn, & p
           otr.execute
         end
 
-        protected def init_copy qkn, & oes_p
+        protected def init_copy qkn, & p
           @qualified_knownness = qkn
-          oes_p and @on_event_selectively = oes_p
+          p and @listener = p
           nil
         end
 

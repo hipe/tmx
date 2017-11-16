@@ -12,8 +12,8 @@ module Skylab::Basic
 
       include Simple_Selective_Sender_Methods_
 
-      def initialize & oes_p
-        @on_event_selectively = oes_p
+      def initialize & p
+        @listener = p
       end
 
       def execute
@@ -129,7 +129,7 @@ module Skylab::Basic
           if :error == i
             ok = false
           end
-          @on_event_selectively.call i, * i_a, & ev_p
+          @listener.call i, * i_a, & ev_p
         end
         [ ok, x ]
       end

@@ -10,17 +10,17 @@ module Skylab::Basic::TestSupport
 
     it "tries to find the shortest unique head-anchored substrings" do
       with 'closure', 'swift', 'scala'
-      expect 'c', 'sw', 'sc'
+      want 'c', 'sw', 'sc'
     end
 
     it "when strings are same in all but last letter - full strings" do
       with 'zap', 'zab'
-      expect 'zap', 'zab'
+      want 'zap', 'zab'
     end
 
     it "when strings are already unique - first letter" do
       with 'ep', 'pe'
-      expect 'e', 'p'
+      want 'e', 'p'
     end
 
     it "when one string is the head of another string - shorter becomes nil" do
@@ -39,7 +39,7 @@ module Skylab::Basic::TestSupport
       @result = subject s_a
     end
 
-    def expect * s_a
+    def want * s_a
       @result.map( & :hotstring ).should eql s_a
     end
 

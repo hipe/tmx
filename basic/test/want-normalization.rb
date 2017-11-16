@@ -2,11 +2,11 @@ module Skylab::Basic
 
   module TestSupport
 
-    module Expect_Normalization
+    module Want_Normalization
 
       class << self
         def [] test_ctxt_cls
-          # TestSupport_::Expect_Event[ test_ctxt_cls ]  assumed?
+          # TestSupport_::Want_Event[ test_ctxt_cls ]  assumed?
           test_ctxt_cls.include Instance_Methods__
           nil
         end
@@ -18,11 +18,11 @@ module Skylab::Basic
 
       _cls = subject_normalization_
 
-      _oes_p = handle_event_selectively_
+      _p = handle_event_selectively_
 
       @input_arg = _mock_argument x
 
-      ok_arg = _cls.normalize_qualified_knownness @input_arg, & _oes_p
+      ok_arg = _cls.normalize_qualified_knownness @input_arg, & _p
 
       if ok_arg
         @output_value_was_written = true
@@ -40,11 +40,11 @@ module Skylab::Basic
       Mock_arg__[].call_via_arglist a
     end
 
-    def expect_the_passthru_normalization__
+    def want_the_passthru_normalization__
 
-      expect_no_events
+      want_no_events
 
-      expect_output_value_was_written_
+      want_output_value_was_written_
 
       qkn = @input_arg
       kn = @output_arg
@@ -65,18 +65,18 @@ module Skylab::Basic
      "expected (non-qualified) knownness had #{ kn.class }"
     end
 
-    def expect_nothing_
+    def want_nothing_
 
-      expect_output_value_was_not_written_
-      expect_no_events
+      want_output_value_was_not_written_
+      want_no_events
       @result_x.should be_nil
     end
 
-    def expect_output_value_was_written_
+    def want_output_value_was_written_
       @output_value_was_written.should eql true
     end
 
-    def expect_output_value_was_not_written_
+    def want_output_value_was_not_written_
       @output_value_was_written.should eql false
     end
   end

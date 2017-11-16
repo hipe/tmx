@@ -42,7 +42,7 @@ module Skylab::Basic::TestSupport
       end
 
       it "retrieve the one item by key" do
-        expect_retrieve_ :key_1, :value_1
+        want_retrieve_ :key_1, :value_1
       end
 
       it "(deep audit of structure)" do
@@ -57,9 +57,9 @@ module Skylab::Basic::TestSupport
 
         # [ ] _head_link [ ] [ ] content_link [ ] [ ] _tail_link [ ]
 
-        expect_prev_and_next_ nil, linkA, :linkB
-        expect_prev_and_next_ :linkA, linkB, :linkC
-        expect_prev_and_next_ :linkB, linkC, nil
+        want_prev_and_next_ nil, linkA, :linkB
+        want_prev_and_next_ :linkA, linkB, :linkC
+        want_prev_and_next_ :linkB, linkC, nil
       end
 
       shared_subject :subject_instance_ do

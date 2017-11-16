@@ -236,11 +236,11 @@ module Skylab::Basic
           @name_s
         end
 
-        def new k, & oes_p
+        def new k, & p
 
           @__cx ||= Signature_Classifications___.new( @_p )
 
-          As_Bound_Action___.new @__cx, k, self, & oes_p
+          As_Bound_Action___.new @__cx, k, self, & p
         end
 
         attr_reader(
@@ -294,15 +294,15 @@ module Skylab::Basic
 
         include Brazen_.actionesque_defaults::Bound_Methods
 
-        def initialize cx, k, unbound, & oes_p
+        def initialize cx, k, unbound, & p
 
           @kernel = k
-          @on_event_selectively = oes_p
+          @listener = p
           @signature_classifications = cx
           @unbound = unbound
         end
 
-        attr_reader :unbound, :on_event_selectively
+        attr_reader :unbound, :listener
 
         def accept_parent_node _
         end
@@ -460,7 +460,7 @@ module Skylab::Basic
 
           if cx.accepts_block
 
-            p = @on_event_selectively
+            p = @listener
           end
 
           Common_::BoundCall[ arglist, @unbound._p, :call, & p ]
@@ -468,7 +468,7 @@ module Skylab::Basic
 
         def _maybe_send_event * i_a, & ev_p
 
-          @on_event_selectively[ * i_a, & ev_p ]
+          @listener[ * i_a, & ev_p ]
         end
 
         def _sign_event ev

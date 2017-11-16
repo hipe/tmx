@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Expect_Emission  # some notes in [#065]
+  module Want_Emission  # some notes in [#065]
 
     # per name conventions, all method *and ivar* names with neither leading
     # nor trailing underscores are part of the [sub-]subject's public API.
@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
       end
     end  # >>
 
-    IGNORE_METHOD__ = :ignore_for_expect_emission
+    IGNORE_METHOD__ = :ignore_for_want_emission
 
     OPTS___ = {
 
@@ -81,34 +81,34 @@ module Skylab::Common::TestSupport
           NIL
         end
 
-        def expect_one_event_and_neutral_result * x_a, & p
+        def want_one_event_and_neutral_result * x_a, & p
           em = _next_actual_expev_emission do | em_ |
             em_.should _match_expev_em_via_TCS( * x_a, & p )
           end
           if em
-            _expect_no_next_actual_expev_emission
+            _want_no_next_actual_expev_emission
             # (note we don't let a failure above mess up the rest:)
             em
           end
         end
 
-        def expect_one_event * x_a, & p
+        def want_one_event * x_a, & p
           em = _next_actual_expev_emission do | em_ |
             em_.should _match_expev_em_via_TCS( * x_a, & p )
           end
           if em
-            _expect_no_next_actual_expev_emission
+            _want_no_next_actual_expev_emission
             em
           end
         end
 
-        def expect_not_OK_event * x_a, & p
+        def want_not_OK_event * x_a, & p
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_3( false, * x_a, & p )
           end
         end
 
-        def expect_neutral_event_or_expression sym
+        def want_neutral_event_or_expression sym
 
           # (bandaid to acommodate weening off [br] as described in [gi])
 
@@ -125,25 +125,25 @@ module Skylab::Common::TestSupport
           end
         end
 
-        def expect_neutral_event * x_a, & p
+        def want_neutral_event * x_a, & p
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_3( nil, * x_a, & p )
           end
         end
 
-        def expect_OK_event * x_a, & p
+        def want_OK_event * x_a, & p
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_3( true, * x_a, & p )
           end
         end
 
-        def expect_event * x_a, & p
+        def want_event * x_a, & p
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_TCS_and_message( * x_a, & p )
           end
         end
 
-        def expect * sym_a, & p  # EXPERIMENT
+        def want * sym_a, & p  # EXPERIMENT
 
           _next_actual_expev_emission do |em|
 
@@ -160,12 +160,12 @@ module Skylab::Common::TestSupport
           end
         end
 
-        def expect_no_events
-          _expect_no_next_actual_expev_emission
+        def want_no_events
+          _want_no_next_actual_expev_emission
         end
 
-        def expect_no_more_events
-          _expect_no_next_actual_expev_emission
+        def want_no_more_events
+          _want_no_next_actual_expev_emission
         end
 
         def flush_to_event_stream
@@ -174,28 +174,28 @@ module Skylab::Common::TestSupport
 
         # ~ emission..
 
-        def expect_emission * sym_a, & exp_y_p
+        def want_emission * sym_a, & exp_y_p
 
           # (written to accomodate the "expression" shape of event)
           # (experimentally now a hybrid of oldschool/newschool
 
           if instance_variable_defined? :@event_log
-            __expect_emission_oldschool exp_y_p, sym_a
+            __want_emission_oldschool exp_y_p, sym_a
           else
             _em = only_emission
-            _do_expect_emission _em, exp_y_p, sym_a
+            _do_want_emission _em, exp_y_p, sym_a
           end
         end
 
-        def __expect_emission_oldschool exp_y_p, sym_a
+        def __want_emission_oldschool exp_y_p, sym_a
 
           _next_actual_expev_emission do |em|
 
-            _do_expect_emission em, exp_y_p, sym_a
+            _do_want_emission em, exp_y_p, sym_a
           end
         end
 
-        def _do_expect_emission em, p, sym_a
+        def _do_want_emission em, p, sym_a
 
           if em.channel_symbol_array == sym_a
             if p
@@ -227,52 +227,52 @@ module Skylab::Common::TestSupport
 
         # ~ support and resolution
 
-        def expect_failed_by * x_a, & x_p
+        def want_failed_by * x_a, & x_p
           em = _next_actual_expev_emission do | em_ |
             if 1 == x_a.length
               x_a.push nil
             end
             em_.should _match_expev_em_via_3( false, * x_a, & x_p )
           end
-          expect_fail
+          want_fail
           em
         end
 
-        def expect_fail
-          __expev_expect_failed_result
-          _expect_no_next_actual_expev_emission
+        def want_fail
+          __expev_want_failed_result
+          _want_no_next_actual_expev_emission
         end
 
-        def expect_neutralled
-          expect_neutral_result
-          _expect_no_next_actual_expev_emission
+        def want_neutralled
+          want_neutral_result
+          _want_no_next_actual_expev_emission
         end
 
-        def expect_succeed
-          expect_succeeded_result
-          _expect_no_next_actual_expev_emission
+        def want_succeed
+          want_succeeded_result
+          _want_no_next_actual_expev_emission
         end
 
-        def __expev_expect_failed_result
+        def __expev_want_failed_result
 
           if subject_API_value_of_failure != @result
             _expev_fail Say_unexpected_result__[ @result, subject_API_value_of_failure ]
           end
         end
 
-        def expect_neutral_result
+        def want_neutral_result
           if nil != @result
             _expev_fail Say_unexpected_result__[ @result, nil ]
           end
         end
 
-        def expect_succeeded_result
+        def want_succeeded_result
           if true != @result
             _expev_fail Say_unexpected_result__[ @result, true ]
           end
         end
 
-        def expect_freeform_event sym, & ev_p  # this is a retrofit -
+        def want_freeform_event sym, & ev_p  # this is a retrofit -
           # a new method to make old code work in the old way [cm]
           _next_actual_expev_emission do | em |
             em.should _match_expev_em_via_TCS( sym, & ev_p )
@@ -386,11 +386,11 @@ module Skylab::Common::TestSupport
         "expected another event, had none"
       end
 
-      def _expect_no_next_actual_expev_emission
+      def _want_no_next_actual_expev_emission
 
         em = _gets_expev_emission
         if em
-          _expev_fail ___say_expect_no_more_expev_events_had_emission em
+          _expev_fail ___say_want_no_more_expev_events_had_emission em
         else
           ACHIEVED_  # not sure
         end
@@ -400,8 +400,8 @@ module Skylab::Common::TestSupport
         fail s
       end
 
-      def ___say_expect_no_more_expev_events_had_emission em
-        "expected no more events, had #{ _expect_event_description em }"
+      def ___say_want_no_more_expev_events_had_emission em
+        "expected no more events, had #{ _want_event_description em }"
       end
 
       def _gets_expev_emission  # a compound assumption.. (#note-B)
@@ -460,7 +460,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      def _expect_event_description em
+      def _want_event_description em
         em.channel_symbol_array.inspect
       end
 
@@ -473,20 +473,20 @@ module Skylab::Common::TestSupport
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
       def fails
-        _state = state_for_expect_emission
-        expect_failure_value _state.result
+        _state = state_for_want_emission
+        want_failure_value _state.result
       end
 
-      def expect_failure_value x
+      def want_failure_value x
         x == false || fail( "did not fail - expected false, had #{ String_via_mixed__[ x ] }" )
       end
 
       def result_is_nothing
-        state = state_for_expect_emission
+        state = state_for_want_emission
         state.result.nil? || fail( "needed nil had #{ String_via_mixed__[ state.result ] }" )
       end
 
-      def expect_no_emissions
+      def want_no_emissions
         a = emission_array
         if a
           a.length.zero? || fail
@@ -521,7 +521,7 @@ module Skylab::Common::TestSupport
       end
 
       def emission_array
-        state_for_expect_emission.emission_array
+        state_for_want_emission.emission_array
       end
 
       def be_emission_beginning_with * x_a, & x_p
@@ -577,11 +577,11 @@ module Skylab::Common::TestSupport
         if respond_to? BLACK_AND_WHITE_EXPEV_METHOD__
           send BLACK_AND_WHITE_EXPEV_METHOD__
         else
-          black_and_white_expression_agent_for_expect_emission_normally
+          black_and_white_expression_agent_for_want_emission_normally
         end
       end
 
-      def black_and_white_expression_agent_for_expect_emission_normally
+      def black_and_white_expression_agent_for_want_emission_normally
         Black_and_white_expression_agent__[]
       end
 
@@ -589,11 +589,11 @@ module Skylab::Common::TestSupport
         if respond_to? MY_EXPEV_METHOD__
           send MY_EXPEV_METHOD__
         else
-          expression_agent_for_expect_emission_normally
+          expression_agent_for_want_emission_normally
         end
       end
 
-      def expression_agent_for_expect_emission_normally
+      def expression_agent_for_want_emission_normally
         Codifying_expresion_agent__[]
       end
     end
@@ -1394,11 +1394,11 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_expect_emission
-    DEBUGGING_EXPEV_METHOD__ = :expect_event_debugging_expression_agent
+    BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_want_emission
+    DEBUGGING_EXPEV_METHOD__ = :want_event_debugging_expression_agent
     EXPEV_METHOD__ = :expression_agent
-    MY_EXPEV_METHOD__ = :expression_agent_for_expect_emission
-    UNRELIABLE_ = :_unreliable_from_expect_event_
+    MY_EXPEV_METHOD__ = :expression_agent_for_want_emission
+    UNRELIABLE_ = :_unreliable_from_want_event_
   end
 end
 # #tombstone-C: no more double-building. now when debugging events, etc

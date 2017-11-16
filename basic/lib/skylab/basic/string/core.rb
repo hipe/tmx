@@ -220,7 +220,7 @@ module Skylab::Basic
 
           nb_t_rx = /\A[-A-Za-z0-9_]+\z/  # or w/e
 
-          same = -> arg_st, & oes_p_p do
+          same = -> arg_st, & p_p do
 
             x = arg_st.head_as_is
 
@@ -230,9 +230,9 @@ module Skylab::Basic
 
             else
 
-              _oes_p = oes_p_p[ nil ]  # no entity
+              _p = p_p[ nil ]  # no entity
 
-              _oes_p.call :error, :expression, :is_not, :nonblank_token do | y |
+              _p.call :error, :expression, :is_not, :nonblank_token do | y |
                 y << "must be a valid nonblank token (had #{ ick x })"
               end
 
@@ -248,9 +248,9 @@ module Skylab::Basic
 
           o.matcher = /[^[:space:]]/
 
-          o.on_failure_to_match = -> _reserved, & oes_p do
+          o.on_failure_to_match = -> _reserved, & p do
 
-            oes_p.call :error, :expression, :is_not, :nonblank do | y |
+            p.call :error, :expression, :is_not, :nonblank do | y |
               y << "cannot be blank"
             end
 

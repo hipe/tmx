@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Expect_Emission_Fail_Early  # [#065]:"future expect vs. expect event"
+  module Want_Emission_Fail_Early  # [#065]:"future want vs. want event"
 
     # (this is a would-be replacement for the legacy facility that is
     # in this selfsame file EEK)
@@ -32,7 +32,7 @@ module Skylab::Common::TestSupport
 
       def lines_via_this_kind_of_failure_via_array sym_a
         lines = nil
-        expect_on_channel sym_a do |y|
+        want_on_channel sym_a do |y|
           lines = y
         end
         x = self.send_subject_call
@@ -58,7 +58,7 @@ module Skylab::Common::TestSupport
         _EEFE_dispatcher.receive_call_via_proc p
       end
 
-      def expect_emission_fail_early_listener
+      def want_emission_fail_early_listener
         _EEFE_dispatcher.listener
       end
 
@@ -67,12 +67,12 @@ module Skylab::Common::TestSupport
         NIL
       end
 
-      def expect * chan, & recv_msg
+      def want * chan, & recv_msg
         _EEFE_dispatcher.receive_emission_expectation recv_msg, chan
         NIL
       end
 
-      def expect_on_channel chan, & recv_msg
+      def want_on_channel chan, & recv_msg
         _EEFE_dispatcher.receive_emission_expectation recv_msg, chan
         NIL
       end
@@ -94,7 +94,7 @@ module Skylab::Common::TestSupport
 
       # --
 
-      def expect_result x
+      def want_result x
         @EEFE_dispatcher.receive_expect_result x, self
       end
 
@@ -144,11 +144,11 @@ module Skylab::Common::TestSupport
         @_dispatcher.receive_call_via_proc p
       end
 
-      def expect * chan, & recv_msg
+      def want * chan, & recv_msg
         @_dispatcher.receive_emission_expectation recv_msg, chan
       end
 
-      def expect_emission recv_msg, chan
+      def want_emission recv_msg, chan
         @_dispatcher.receive_emission_expectation recv_msg, chan
       end
 
@@ -156,7 +156,7 @@ module Skylab::Common::TestSupport
         @_dispatcher._DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
       end
 
-      def expect_result_under x, tc
+      def want_result_under x, tc
         @_dispatcher.receive_expect_result x, tc
       end
 
@@ -199,7 +199,7 @@ module Skylab::Common::TestSupport
       end
 
       def receive_expect_result x, tc
-        _ = @_mode_implementation._flusher_for_expect_result_ x, tc
+        _ = @_mode_implementation._flusher_for_want_result_ x, tc
         _receive_executable_flusher _
       end
 
@@ -266,7 +266,7 @@ module Skylab::Common::TestSupport
         DEBUG_AND_EXIT_Flusher___.new( * _release_these, tc )
       end
 
-      def _flusher_for_expect_result_ x, tc
+      def _flusher_for_want_result_ x, tc
         ValueBasedFlusher___.new x, * _release_these, tc
       end
 
@@ -704,7 +704,7 @@ module Skylab::Common::TestSupport
         _no
       end
 
-      def _flusher_for_expect_result_(*)
+      def _flusher_for_want_result_(*)
         _no
       end
 

@@ -60,7 +60,7 @@ module Skylab::Basic
 
       def __error rest_s
 
-        @on_event_selectively.call :error, :expression,
+        @listener.call :error, :expression,
             :unable_to_convert_grep_regex do | y, o |
 
           y << "unexpected word boundary near #{ ick rest_s }"

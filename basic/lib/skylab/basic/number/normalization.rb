@@ -27,11 +27,11 @@ module Skylab::Basic
           minimum: nil,
         )
 
-        def initialize & oes_p
+        def initialize & p
 
-          if oes_p
-            -1 == oes_p.arity or self._MODERNIZE_ME  # #todo
-            @on_event_selectively = oes_p
+          if p
+            -1 == p.arity or self._MODERNIZE_ME  # #todo
+            @listener = p
           end
 
           @qualified_knownness = nil
@@ -84,20 +84,20 @@ module Skylab::Basic
           end
         end
 
-        def normalize_qualified_knownness qkn, & oes_p
+        def normalize_qualified_knownness qkn, & p
           otr = dup
-          otr._init_copy_with :qualified_knownness, qkn, & oes_p
+          otr._init_copy_with :qualified_knownness, qkn, & p
           otr.execute
         end
 
-        def normalize_knownness kn, & oes_p
+        def normalize_knownness kn, & p
           otr = dup
-          otr._init_copy_with :knownness, kn, & oes_p
+          otr._init_copy_with :knownness, kn, & p
           otr.execute
         end
 
-        def _init_copy_with * x_a, & oes_p
-          oes_p and @on_event_selectively = oes_p
+        def _init_copy_with * x_a, & p
+          p and @listener = p
           process_iambic_fully x_a
           _normalize_self
         end

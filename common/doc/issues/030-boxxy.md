@@ -21,7 +21,7 @@ ordinary way, ignorant of this underlying hack. (i.e autoloading adds
 magic to `const_missing`; and the subject hooks into that magic (A) and
 (B) adds magic to `constants` as well.)
 
-and there is now the "operator branch" underlying interface (and
+and there is now the "feature branch" underlying interface (and
 implementation) that is now exposed to access facility-specific features.
 
 there is, however, an inherent problem in the primary provision of the
@@ -34,7 +34,7 @@ the const `StAy_oUT_My_MaNs_DMs` until we load the file.)
 some solutions to problems like these are described [#here.c] below.
 
 there are also other more modern attempts to provide behavior like this
-in the [#ze-051] strain of operator branches (which the subject has now
+in the [#ze-051] strain of feature branches (which the subject has now
 recently joined). (look at those dealing with the filesystem.)
 these other approaches are generally simpler, more focused, and do not
 hold the subject's "primary provision" of hacking the methods of platform
@@ -237,7 +237,7 @@ names repeatedly.
 
 but we do not cache every name structure that we build because
 (depending on how it's used) it could eat up a lot of memory
-unnecessarily. (imagine if the "operator branch" was use to parse
+unnecessarily. (imagine if the "feature branch" was use to parse
 arbitrary input streams.) so we only cache those names that are
 determined to be members of the boxxy module.
 
@@ -274,7 +274,7 @@ absence).
 our answer to this, then, is that rather than the hidden magic of opt-in
 mokeypatching, we opt for a "composition" approach where we have smaller,
 dedicated classes that encompass this behavior as something like a
-"collection controller" (now "operator branch").
+"collection controller" (now "feature branch").
 
 reminder: per [#030.D.3], we do not assume a static constantspace.
 

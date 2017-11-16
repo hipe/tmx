@@ -1398,14 +1398,14 @@ module Skylab::Common
     module BoxxyMethods____
 
       def constants
-        boxxy_module_as_operator_branch.boxxy_enhanced_constants_
+        boxxy_module_as_feature_branch.boxxy_enhanced_constants_
       end
 
       def const_missing sym
 
         # $i += 1 ; $stderr.puts "(BL:#{ DBG_NUM_FORMAT_ % $i } #{ self }::#{ sym })"
 
-        nv = boxxy_module_as_operator_branch.name_and_value_for_const_missing_ sym
+        nv = boxxy_module_as_feature_branch.name_and_value_for_const_missing_ sym
         if nv
           nv.const_value
         else
@@ -1420,8 +1420,8 @@ module Skylab::Common
         NOTHING_  # take default
       end
 
-      def boxxy_module_as_operator_branch
-        @___boxxy_OB ||= Here_::Boxxy_::OperatorBranch_via_Module[ self ]
+      def boxxy_module_as_feature_branch
+        @___boxxy_OB ||= Here_::Boxxy_::FeatureBranch_via_Module[ self ]
       end
 
       attr_reader(

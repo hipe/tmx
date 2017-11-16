@@ -6,7 +6,7 @@ module Skylab::Basic::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     shared_subject :_state_machine do
 

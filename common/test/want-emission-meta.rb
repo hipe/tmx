@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Expect_Emission_Meta
+  module Want_Emission_Meta
 
     def self.[] tcc
       tcc.include self
@@ -64,7 +64,7 @@ module Skylab::Common::TestSupport
 
       # -- meta-expectation
 
-      def expect_lone_failure_ msg
+      def want_lone_failure_ msg
 
         if [ msg ] != @_fail_log
           if @_fail_log
@@ -76,7 +76,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      def expect_nothing_failed_
+      def want_nothing_failed_
 
         if _fail_log
           _ = @_fail_log.fetch 0
@@ -86,21 +86,21 @@ module Skylab::Common::TestSupport
 
       attr_reader :_fail_log
 
-      def expect_not_OK_emission_ em
+      def want_not_OK_emission_ em
 
         if false != _trilene( em )
           _really_fail "needed not OK event, `ok` was #{ _say_trilene em }"
         end
       end
 
-      def expect_neutral_emission_ em
+      def want_neutral_emission_ em
 
         if ! _trilene( em ).nil?
           _really_fail "needed neutral event, `ok` was #{ _say_trilene em }"
         end
       end
 
-      def expect_OK_emission_ em
+      def want_OK_emission_ em
 
         if true != _trilene( em )
           _really_fail "needed OK event, `ok` was #{ _say_trilene em }"
@@ -120,7 +120,7 @@ module Skylab::Common::TestSupport
       end
 
       def subject_
-        Home_::TestSupport::Expect_Emission
+        Home_::TestSupport::Want_Emission
       end
     # -
   end

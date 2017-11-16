@@ -29,59 +29,59 @@ module Skylab::Basic::TestSupport
 
       it "when empty" do
         against EMPTY_A_
-        expect nil
+        want nil
       end
 
       it "when 1x1" do
         against %w(one)
-        expect %w(one)
+        want %w(one)
       end
 
       it "when 1x2" do
         against %w(one/two)
-        expect %w(one two)
+        want %w(one two)
       end
 
       it "when 1x3" do
         against %w(one/two/three)
-        expect %w(one two three)
+        want %w(one two three)
       end
 
       it "when 2x1 (different)" do
         against %w(one two)
-        expect nil
+        want nil
       end
 
       it "when 2x1 (same)" do
         against %w(yup yup)
-        expect %w(yup)
+        want %w(yup)
       end
 
       it "when 2x2 (some)" do
         against %w(a/b a/c)
-        expect %w(a)
+        want %w(a)
       end
 
       it "when 2x2 (none)" do
         against %w(x/a y/a)
-        expect nil
+        want nil
       end
 
       it "when 2x2 (all)" do # actually should become 1x2
         against %w(p/q p/q)
-        expect %w(p q)
+        want %w(p q)
       end
 
       it "when 3x3 (some)" do
         against %w(a/b/c a/b/f/g a/b/f/h a/b/l/m/n)
-        expect %w(a b)
+        want %w(a b)
       end
 
       def against s_a
         @s_a = s_a
       end
 
-      def expect s_a
+      def want s_a
 
         _ = subject_module_.via :paths, @s_a
         _act = _.longest_common_base_path

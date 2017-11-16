@@ -5,7 +5,7 @@ module Skylab::Common::TestSupport
   describe "[co] [..] fire" do
 
     TS_[ self ]
-    use :expect_emission
+    use :want_emission
 
     it "with the ideal case - works" do
 
@@ -18,12 +18,12 @@ module Skylab::Common::TestSupport
         :channel, 'hacking'
       )
 
-      _em = expect_event :event_event
+      _em = want_event :event_event
 
       black_and_white( _em.cached_event_value ).should match(
         %r(\Aevent: #<Skylab::Common::TestSupport::.*\bMock_Old_Event) )
 
-      expect_succeed
+      want_succeed
     end
 
     def subject_API

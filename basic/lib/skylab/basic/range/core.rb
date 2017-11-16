@@ -7,9 +7,9 @@ module Skylab::Basic
 
     class << self
 
-      def normalize_qualified_knownness qkn, * x_a, & oes_p
+      def normalize_qualified_knownness qkn, * x_a, & p
         x_a.push :qualified_knownness, qkn
-        Here_::Normalization.call_via_iambic x_a, & oes_p
+        Here_::Normalization.call_via_iambic x_a, & p
       end
     end  # >>
 

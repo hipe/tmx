@@ -18,7 +18,7 @@ module Skylab::Common::TestSupport
       end
 
       it "ok." do
-        expect 'mkdir -p'
+        want 'mkdir -p'
       end
     end
 
@@ -32,16 +32,16 @@ module Skylab::Common::TestSupport
 
       cli.invoke 'common', 'ping'
 
-      cli.expect_on_stderr "hello from common.\n"
+      cli.want_on_stderr "hello from common.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
-    def expect expect_s
+    def want want_s
       s = fu_output_message_for cmd, arg
       md = _subject.match s
       md or fail "did not match: #{ s.inspect }"
-      md[ :predicate ].should eql expect_s
+      md[ :predicate ].should eql want_s
       md[ :argument ].should eql arg
     end
 

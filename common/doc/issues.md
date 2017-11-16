@@ -13,7 +13,7 @@
              redundanty with something somewhere..)
              also track flip-flop emitting ..
 
-[#065]       [expect event]
+[#065]       [want event]
 
 [#064]    #to-explore imagine threads, etc
 [#063]       #tracking in-situ, also, wishlist: "struct-like". imagine:

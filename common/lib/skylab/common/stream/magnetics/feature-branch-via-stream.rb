@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Stream::Magnetics::OperatorBranch_via_Stream < SimpleModel
+  class Stream::Magnetics::FeatureBranch_via_Stream < SimpleModel
 
     # this is :[#016.4], which is refereneced (only ever) by [sy] which
     # has what is likely an improvement on this implementation, but

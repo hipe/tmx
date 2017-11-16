@@ -10,7 +10,7 @@ module Skylab::Basic
         end
       end
 
-      def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=File::SEPARATOR, & oes_p
+      def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=File::SEPARATOR, & p
 
         a = real_parts.dup
         ok = true
@@ -19,7 +19,7 @@ module Skylab::Basic
           s = rel_parts.fetch d
           if DOT_DOT_ == s
             if a.length.zero?
-              ok = when_dot_dot_error real_parts, rel_parts, sep, & oes_p
+              ok = when_dot_dot_error real_parts, rel_parts, sep, & p
               ok or break
             else
               a.pop
@@ -34,9 +34,9 @@ module Skylab::Basic
 
     private
 
-      def when_dot_dot_error real_parts, rel_parts, sep, & oes_p
-        if oes_p
-          oes_p.call :error, :cannot_go_higher_than_top do
+      def when_dot_dot_error real_parts, rel_parts, sep, & p
+        if p
+          p.call :error, :cannot_go_higher_than_top do
             build_dot_dot_event real_parts, rel_parts, sep
           end
         else

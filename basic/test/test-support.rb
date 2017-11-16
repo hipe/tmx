@@ -70,23 +70,23 @@ module Skylab::Basic
         event_log.handle_event_selectively
       end
 
-      def expect_errored_with_ sym, msg=nil
+      def want_errored_with_ sym, msg=nil
 
-        em = expect_errored_with nil, msg
+        em = want_errored_with nil, msg
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end
 
-      def expect_not_OK_event_ sym, msg=nil
+      def want_not_OK_event_ sym, msg=nil
 
-        em = expect_not_OK_event nil, msg
+        em = want_not_OK_event nil, msg
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end
 
-      def expect_event_ sym
+      def want_event_ sym
 
-        em = expect_event
+        em = want_event
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end
@@ -119,18 +119,18 @@ module Skylab::Basic
 
     # --
 
-    Expect_CLI = -> tcc do
+    Want_CLI = -> tcc do
       Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
     end
 
-    Expect_Event = -> test_context_class do
+    Want_Event = -> test_context_class do
 
-      Home_::Common_.test_support::Expect_Emission[ test_context_class ]
+      Home_::Common_.test_support::Want_Emission[ test_context_class ]
     end
 
     Future_Expect = -> tcc do
 
-      Home_::Common_.test_support::Expect_Emission_Fail_Early::Legacy[ tcc ]
+      Home_::Common_.test_support::Want_Emission_Fail_Early::Legacy[ tcc ]
     end
 
     Memoizer_Methods = -> tcc do

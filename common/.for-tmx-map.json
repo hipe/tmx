@@ -1,5 +1,5 @@
 {
-  "category": "more general libs",
+  "category": "core essentials",
   "doc test manifest": ".doc-test-manifest.list",
   "framework": "[br]",
   "is lib": true,

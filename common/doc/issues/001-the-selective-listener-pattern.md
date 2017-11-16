@@ -28,7 +28,7 @@ the salient charactersistics of this model are:
   • in order to faciliate the above, the producer has (either as
     intrinsic member data or as a block passed to some method) a
     "selective listener proc" (known idiomatically in the code
-    as variants of as `on_event_selectively` or `oes_p`).
+    as variants of as `listener` or `p`).
 
   • the producer emits potential events by calling its selective
     listener proc with N args and a block. *each* of the N args

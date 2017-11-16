@@ -18,8 +18,8 @@ module Skylab::Basic::TestSupport
 
             module Actions
 
-              Node_5_func = -> arg1, bnd, & oes_p do
-                oes_p.call :hi_from_5
+              Node_5_func = -> arg1, bnd, & p do
+                p.call :hi_from_5
                 "(5 says: pong: #{ arg1 })"
               end
             end
@@ -29,8 +29,8 @@ module Skylab::Basic::TestSupport
             module Actions
               module Node_6_Mod
                 module Actions
-                  Node_7_func = -> arg1, bnd, & oes_p do
-                    oes_p.call :hi_from_7
+                  Node_7_func = -> arg1, bnd, & p do
+                    p.call :hi_from_7
                     "(7 says: pong: #{ arg1 })"
                   end
                 end
@@ -42,9 +42,9 @@ module Skylab::Basic::TestSupport
             Actions = nil
           end
 
-          Node_Four_which_is_Function = -> arg1, bnd, & oes_p do
+          Node_Four_which_is_Function = -> arg1, bnd, & p do
 
-            oes_p.call :info, :expression, :wazoozie do | y |
+            p.call :info, :expression, :wazoozie do | y |
 
               y << "#{ highlight 'yay' } wahoo: #{ arg1 }"
             end
