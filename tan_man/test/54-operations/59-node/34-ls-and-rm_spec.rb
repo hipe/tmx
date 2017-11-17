@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_node
 
 # (1/N)
@@ -29,7 +29,7 @@ module Skylab::TanMan::TestSupport
 
         _actual = black_and_white_lines _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'section "digraph" not found in tan-man.conf'
         end
       end
@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :config_component_not_found do |ev|
+        want :error, :config_component_not_found do |ev|
           a.push ev
         end
 
@@ -98,7 +98,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :node_not_found do |ev|
+        want :error, :node_not_found do |ev|
           a.push ev
         end
         a.push execute
@@ -129,7 +129,7 @@ module Skylab::TanMan::TestSupport
         sct = _tuple.first
         io = ::File.open sct.dotfile_path
 
-        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+        want_these_lines_in_array_with_trailing_newlines_ io do |y|
           y << "digraph {"
           y << "  }"
         end
@@ -176,7 +176,7 @@ module Skylab::TanMan::TestSupport
           :config_filename, o.config_filename,
         )
 
-        expect :success, :wrote_resource do |ev|
+        want :success, :wrote_resource do |ev|
           a.push ev
         end
 

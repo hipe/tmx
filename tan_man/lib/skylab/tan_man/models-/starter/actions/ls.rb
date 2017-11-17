@@ -5,8 +5,8 @@ module Skylab::TanMan
     class Actions::Ls
 
       # this became the frontier case for trying to unify similar work
-      # as an "operator branch", and using [#br-085] the reconceived
-      # "item via operator branch".
+      # as an "feature branch", and using [#br-085] the reconceived
+      # "item via feature branch".
       #
       # NOTE we have yet to go back and sponge up whatever similar redundant
       # code this is replacing.
@@ -14,7 +14,7 @@ module Skylab::TanMan
       # or main interest in such an effort is to
       #
       #   - succesfully implement the collection of starters as an
-      #     operator branch.
+      #     feature branch.
       #
       #   - reuse this same collection as much as is reasonably possible
       #     across all of the silo's actions.
@@ -35,17 +35,17 @@ module Skylab::TanMan
 
         def execute
 
-          _ob = _dangerously_memoized_operator_branch
-          _st = _ob.to_loadable_reference_stream
+          _fb = _dangerously_memoized_feature_branch
+          _st = _fb.to_loadable_reference_stream
           _st  # hi.
         end
 
         -> do
           yes = true ; x = nil
-          define_method :_dangerously_memoized_operator_branch do
+          define_method :_dangerously_memoized_feature_branch do
             if yes
               yes = false
-              x = __build_operator_branch
+              x = __build_feature_branch
               x
             else
               x  # (#cov2.2 (all the tests in the file) will hit this)
@@ -53,13 +53,13 @@ module Skylab::TanMan
           end
         end.call
 
-        def __build_operator_branch
+        def __build_feature_branch
 
           _path = __startingpoint_path
           _fs = _invocation_resources_.filesystem
 
           Home_.lib_.system_lib::Filesystem::
-          Directory::OperatorBranch_via_Directory.define do |o|
+          Directory::FeatureBranch_via_Directory.define do |o|
 
             o.loadable_reference_via_path_by = -> path do
               CacheableDereferencableItem__.new path  # hi.
@@ -107,9 +107,9 @@ module Skylab::TanMan
 
           _op = Here_.new do @microservice_invocation end
 
-          _ob = _op._dangerously_memoized_operator_branch
+          _fb = _op._dangerously_memoized_feature_branch
 
-          item = _ob.procure_by do |o|
+          item = _fb.procure_by do |o|
 
             o.needle_item = needle_item
 
@@ -144,7 +144,7 @@ module Skylab::TanMan
 
       class CacheableDereferencableItem__
 
-        # (to compat with the operator branch
+        # (to compat with the feature branch
 
         def initialize path
 

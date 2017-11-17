@@ -12,7 +12,7 @@ module Skylab::TanMan
 
     # ==
 
-    class NodesOperatorBranchFacade_TM
+    class NodesFeatureBranchFacade_TM
 
       def initialize dc
         @_digraph_controller = dc  # ivar name is #testpoint

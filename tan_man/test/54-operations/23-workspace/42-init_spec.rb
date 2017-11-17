@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
     context "(successfully)" do
@@ -23,7 +23,7 @@ module Skylab::TanMan::TestSupport
 
         _io = ::File.open _path
 
-        o = TestSupport_::Expect_Line::Scanner.via_line_stream _io
+        o = TestSupport_::Want_Line::Scanner.via_line_stream _io
 
         o.next_line =~ /\A# created by tan man \d{4}-\d\d-\d\d \d\d:\d\d:\d\d/ or fail
 
@@ -58,15 +58,15 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :info, :creating_directory do |ev|
+        want :info, :creating_directory do |ev|
           a.push ev
         end
 
-        expect :info, :collection_resource_committed_changes do |ev|
+        want :info, :collection_resource_committed_changes do |ev|
           a.push ev
         end
 
-        expect_result NIL
+        want_result NIL
 
         a.push empty_work_dir, config_filename
         a

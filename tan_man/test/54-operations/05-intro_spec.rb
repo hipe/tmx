@@ -6,20 +6,20 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
 
     it "the API is called with `call` - the empty call reports as error" do
 
       call_API
 
-      expect :error, :expression, :parse_error, :no_arguments do |a|
+      want :error, :expression, :parse_error, :no_arguments do |a|
 
-        expect_these_lines_in_array_ a do |y|
+        want_these_lines_in_array_ a do |y|
           y << /\Aavailable operators: '/
         end
       end
 
-      expect_fail
+      want_fail
     end
 
     context "call with strange name" do
@@ -49,11 +49,11 @@ module Skylab::TanMan::TestSupport
         call_API :wazii, :wazoo
 
         lines = nil
-        expect :error, :expression, :parse_error, :unknown_operator do |y|
+        want :error, :expression, :parse_error, :unknown_operator do |y|
           lines = y
         end
 
-        expect_fail
+        want_fail
         lines
       end
     end
@@ -62,29 +62,29 @@ module Skylab::TanMan::TestSupport
 
       call_API :ping, :wahootey
 
-      expect :error, :argument_error, :unknown_primary do |ev|
+      want :error, :argument_error, :unknown_primary do |ev|
 
         _a = ev.express_into_under [], expression_agent
-        expect_these_lines_in_array_ _a do |y|
+        want_these_lines_in_array_ _a do |y|
           y << "unrecognized attribute :wahootey"
           y << "expecting no attributes"  # #lends-coverage to [#fi-008.15]
         end
       end
 
-      expect_fail
+      want_fail
     end
 
     it "sing sing sing to me" do
 
       call_API :ping
 
-      expect :info, :ping do |ev|
+      want :info, :ping do |ev|
 
         _y = ev.express_into_under [], expression_agent
         _y == [ "tannimous mannimous says *hello*" ] || fail
       end
 
-      expect_result :hello_from_tan_man
+      want_result :hello_from_tan_man
     end
   end
 end

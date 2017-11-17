@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :operations
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
 
 # (1/N)
     context do

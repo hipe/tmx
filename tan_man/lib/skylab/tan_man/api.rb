@@ -127,7 +127,7 @@ module Skylab::TanMan
 
     Operator_branch___ = Lazy_.call do
 
-      MTk_::ModelCentricOperatorBranch.define do |o|
+      MTk_::ModelCentricFeatureBranch.define do |o|
 
         # (every imaginable detail of the below is explained at [#pl-011.1])
 

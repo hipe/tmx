@@ -14,7 +14,7 @@ module Skylab::TanMan::TestSupport
       ::File.join TS_.dir_path, 'fixture-dot-files-for-parsing'
     end )
 
-    def expect_digraph_document_sexp
+    def want_digraph_document_sexp
       x = result
       part = Parent_module_name__[ x.class ]
       if SEXPS__ == part

@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_meaning
 
     context "(success)" do
@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
 
       it "content" do
         _s = _tuple.fetch 0
-        scn = TestSupport_::Expect_Line::Scanner.via_string _s
+        scn = TestSupport_::Want_Line::Scanner.via_string _s
         scn.advance_N_lines 2
         _actual = scn.gets
         _actual == "fizzle [fillcolor=\"#79f234\", label=fizzle, style=filled]\n" || fail
@@ -52,11 +52,11 @@ module Skylab::TanMan::TestSupport
           :output_string, s,
         )
 
-        expect :info, :updated_attributes do |ev|
+        want :info, :updated_attributes do |ev|
           a.push ev
         end
 
-        expect :success, :wrote_resource
+        want :success, :wrote_resource
 
         a.push execute
       end

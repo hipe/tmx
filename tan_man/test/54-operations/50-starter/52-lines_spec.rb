@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
     context "against default (using the flag requesting the default starter)" do
@@ -15,7 +15,7 @@ module Skylab::TanMan::TestSupport
 
         _actual = _tuple.last
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
 
           # (at writing we have to include the newlines here instead of using
           # the dedicated method for this because the strings aren't mutable.)
@@ -32,7 +32,7 @@ module Skylab::TanMan::TestSupport
 
         _actual = _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "using default starter: minimal.dot"
         end
       end
@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport
           :use_default,
         )
 
-        expect :info, :expression, :using_default_starter do |y|
+        want :info, :expression, :using_default_starter do |y|
           a.push y
         end
 
@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport
 
       it "emits" do
         _actual = _tuple.first
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "using starter: holy-smack.dot"
         end
       end
@@ -98,7 +98,7 @@ module Skylab::TanMan::TestSupport
           :config_filename, cfn,
         )
 
-        expect :info, :expression, :using_starter do |y|
+        want :info, :expression, :using_starter do |y|
           a.push y
         end
 

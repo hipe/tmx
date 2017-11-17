@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
     # (1/N)
@@ -20,11 +20,11 @@ module Skylab::TanMan::TestSupport
         * _subject_action,
       )
 
-      expect :error, COMMON_MISS_ do |ev|
+      want :error, COMMON_MISS_ do |ev|
         ev.to_event.reasons.first == :workspace_path
       end
 
-      expect_fail
+      want_fail
     end
 
     # (2/N)
@@ -37,9 +37,9 @@ module Skylab::TanMan::TestSupport
         :workspace_path, workspace_path,
       )
 
-      expect :error, :start_directory_is_not_directory
+      want :error, :start_directory_is_not_directory
 
-      expect_fail
+      want_fail
     end
 
     # (3/N)
@@ -73,11 +73,11 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :resource_not_found do |ev|
+        want :error, :resource_not_found do |ev|
           a.push ev
         end
 
-        expect_fail
+        want_fail
         a
       end
     end
@@ -111,7 +111,7 @@ module Skylab::TanMan::TestSupport
           :workspace_path, _workspace_path,
         )
 
-        expect :error, :config_component_not_found do |ev|
+        want :error, :config_component_not_found do |ev|
           a.push ev
         end
 
@@ -154,7 +154,7 @@ module Skylab::TanMan::TestSupport
 
         item = '"[a-z]+(?:-[a-z]+)*\\.dot"'
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'unrecognized starter "this-starter-does-not-exist.dot"'
           y << %r(\Adid you mean (#{ item }(?:, #{ item })* or #{ item })\?\z)
         end
@@ -173,7 +173,7 @@ module Skylab::TanMan::TestSupport
         )
 
         event = nil
-        expect :error, :item_not_found do |ev|
+        want :error, :item_not_found do |ev|
           event = ev
         end
 

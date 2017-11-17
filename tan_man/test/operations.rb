@@ -53,20 +53,20 @@ module Skylab::TanMan::TestSupport
         sct.did_write || fail
         # sct.user_value.HELLO_ENTITY  assumes did below
         _big_s = tup.__output_string_
-        TestSupport_::Expect_Line::Scanner.via_string _big_s
+        TestSupport_::Want_Line::Scanner.via_string _big_s
       end
 
-      def expect_did_not_write__
+      def want_did_not_write__
         tuple_.writey_struct.did_write && fail
       end
 
-      def expect_did_write_
+      def want_did_write_
         tuple_.writey_struct.did_write || fail
       end
 
       # -- setup
 
-      def expect_succeed
+      def want_succeed
         sct = execute
         sct.did_write  # assert responds to
         sct.user_value.HELLO_ENTITY
@@ -182,14 +182,14 @@ module Skylab::TanMan::TestSupport
     # ==
 
     Legacy_Methods_For_Emission = -> tcc do
-      tcc.send :define_method, :expect_OK_event,
+      tcc.send :define_method, :want_OK_event,
         DEFINITION_FOR_THE_METHOD_CALLED_EXPECT_OK_EVENT___
       NIL
     end
 
     # -
       DEFINITION_FOR_THE_METHOD_CALLED_EXPECT_OK_EVENT___ = -> term_chan_sym do
-        expect :info, term_chan_sym
+        want :info, term_chan_sym
         # (these emissions should generally be structured events whose members
         # and expression we have already tested in previous test files)
         NIL
@@ -223,10 +223,10 @@ module Skylab::TanMan::TestSupport
       _lines[ r ]
     end
 
-    def expect_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
+    def want_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
 
-      TestSupport_::Expect_Line::
-        Expect_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
+      TestSupport_::Want_Line::
+        Want_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
 
       NIL
     end

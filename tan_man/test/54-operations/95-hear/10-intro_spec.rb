@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
 
 # (1/N)
     context "unrecognized input" do
@@ -40,7 +40,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :unrecognized_utterance do |ev|
+        want :error, :unrecognized_utterance do |ev|
           a.push ev
         end
 

@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_association
 
 # (1/N)
@@ -35,7 +35,7 @@ module Skylab::TanMan::TestSupport
       end
 
       it "dedicated emission" do
-        expect_message_ 'node not found - "foo"'
+        want_message_ 'node not found - "foo"'
       end
 
       shared_subject :tuple_ do
@@ -52,7 +52,7 @@ module Skylab::TanMan::TestSupport
       end
 
       it "dedicated emission" do
-        expect_message_ 'node not found - "bar"' || fail
+        want_message_ 'node not found - "bar"' || fail
       end
 
       shared_subject :tuple_ do
@@ -69,7 +69,7 @@ module Skylab::TanMan::TestSupport
       end
 
       it "dedicated emission" do
-        expect_message_ "association not found - 'foo -> bar'"
+        want_message_ "association not found - 'foo -> bar'"
       end
 
       shared_subject :tuple_ do
@@ -95,11 +95,11 @@ module Skylab::TanMan::TestSupport
 
         tuple_for_money_town_ do |tup|  # ick/meh
 
-          expect :info, :deleted_association do |ev|
+          want :info, :deleted_association do |ev|
             tup.event_of_significance = ev
           end
 
-          expect :success, :wrote_resource
+          want :success, :wrote_resource
         end
       end
     end

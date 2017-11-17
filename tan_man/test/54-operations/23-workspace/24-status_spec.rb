@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
     context "dir w/o config file - is not failure, result is \"promise\"" do
@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport
 
         _lines = black_and_white_lines _ev
 
-        expect_these_lines_in_array_ _lines do |y|
+        want_these_lines_in_array_ _lines do |y|
           y << '"tan-man-workspace/config.ini" not found in fixture-directories'
         end
       end
@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport
         call_API :workspace, :status, :path, dirs
 
         ev = nil
-        expect :info, :resource_not_found do |ev_|
+        want :info, :resource_not_found do |ev_|
           ev = ev_
         end
 
@@ -60,7 +60,7 @@ module Skylab::TanMan::TestSupport
       end
 
       it "emits" do
-        expect_these_lines_in_array_ _tuple.last do |y|
+        want_these_lines_in_array_ _tuple.last do |y|
           y << "resource exists - tan-man.conf"
         end
       end
@@ -74,7 +74,7 @@ module Skylab::TanMan::TestSupport
         )
 
         lines = nil
-        expect :info, :expression, :resource_existed do |y|
+        want :info, :expression, :resource_existed do |y|
           lines = y
         end
 

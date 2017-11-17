@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
 
       # -- expectations
 
-      def expect_message_ msg
+      def want_message_ msg
 
         _ev = event_
         _actual = black_and_white _ev
@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
         _will_call_API EMPTY_S_
           # (frozen string asserts that etc)
 
-        expect :error, term_chan_sym do |ev|
+        want :error, term_chan_sym do |ev|
           tup.event_of_significance = ev
         end
 
@@ -94,7 +94,7 @@ module Skylab::TanMan::TestSupport
         NIL
       end
 
-      def with_operator_branch_for_associations_  # (has counterpart in node)
+      def with_feature_branch_for_associations_  # (has counterpart in node)
 
         _client = TS_::Models::Dot_File.PARSER_INSTANCE
 
@@ -102,7 +102,7 @@ module Skylab::TanMan::TestSupport
 
         _client.parse_file _path do |dc|
 
-          ob = Here___.__lib::AssocOperatorBranchFacade_TM.new dc
+          ob = Here___.__lib::AssocFeatureBranchFacade_TM.new dc
           x = yield ob
           x
         end

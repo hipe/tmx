@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :operations  # for #here1
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
 
 # (1/N)
 
@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport
         :input_string, s,
         :output_string, s )
 
-        expect :info, :updated_attributes
+        want :info, :updated_attributes
         a = [ s ]
         a.push execute
       end

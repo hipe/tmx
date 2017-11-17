@@ -53,7 +53,7 @@ module Skylab::TanMan
       end
     end.call
 
-    def meaning_values_via_meaning_name meaning_name_s, & oes_p
+    def meaning_values_via_meaning_name meaning_name_s, & p
 
       trail_a = []
       h = {}
@@ -86,10 +86,10 @@ module Skylab::TanMan
       end
 
       if terminal_a.length.zero?
-        oes_p ||= -> *, & ev_p do
+        p ||= -> *, & ev_p do
           raise ev_p[]
         end
-        oes_p.call :error, :interminal_meaning, * ( :circular if is_circular ) do
+        p.call :error, :interminal_meaning, * ( :circular if is_circular ) do
           if is_circular
             Circular___[].with :trail_a, trail_a
           else

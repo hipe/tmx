@@ -48,7 +48,7 @@ module Skylab::TanMan
           _prototype_name_symbol = sym
         end
 
-        _guy = AssocOperatorBranchFacade_TM.new @_mutable_digraph_
+        _guy = AssocFeatureBranchFacade_TM.new @_mutable_digraph_
 
         ent = _guy.touch_association_by_ do |o|
 

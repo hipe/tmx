@@ -39,7 +39,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def execute_via_heard pt, & oes_p
+          def execute_via_heard pt, & p
             self._DO_ME
           end
         end
@@ -82,7 +82,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def execute_via_heard hrd, & oes_p
+          def execute_via_heard hrd, & p
             self._DO_ME
           end
         end
@@ -96,18 +96,18 @@ module Skylab::TanMan
 
         def execute
 
-          _with_mutable_operator_branch_ do
-            __via_mutable_operator_branch
+          _with_mutable_feature_branch_ do
+            __via_mutable_feature_branch
           end
         end
 
-        def __via_mutable_operator_branch
+        def __via_mutable_feature_branch
 
           pt = @_parse_tree_
           _value_s = pt.fetch( 2 ).join SPACE_
           _name_s = pt.fetch( 0 ).join SPACE_
 
-          @_mutable_operator_branch_.add_meaning_by_ do |o|
+          @_mutable_feature_branch_.add_meaning_by_ do |o|
 
             o.force_is_present = true  # because this is "set" not "create"
             o.value_string = _value_s
@@ -121,12 +121,12 @@ module Skylab::TanMan
       class ImplementationForApply___ < CommonImplementation__
 
         def execute
-          _with_mutable_operator_branch_ do
-            __via_mutable_operator_branch
+          _with_mutable_feature_branch_ do
+            __via_mutable_feature_branch
           end
         end
 
-        def __via_mutable_operator_branch
+        def __via_mutable_feature_branch
 
           pt = @_parse_tree_
           _node_label_s = pt.first.join SPACE_
@@ -134,7 +134,7 @@ module Skylab::TanMan
 
           _is_dry = @_qualified_knownness_box_[ :dry_run ].value
 
-          @_mutable_operator_branch_.into_node_apply_meaning_by_ do |o|
+          @_mutable_feature_branch_.into_node_apply_meaning_by_ do |o|
             o.node_label = _node_label_s
             o.meaning_name_string = _meaning_name_s
             o.is_dry = _is_dry
@@ -154,15 +154,15 @@ module Skylab::TanMan
           @_listener_ = p
         end
 
-        def _with_mutable_operator_branch_
+        def _with_mutable_feature_branch_
 
           _with_mutable_digraph do
 
-            @_mutable_operator_branch_ =
-              Here_::MeaningsOperatorBranchFacade_.new @_mutable_digraph_
+            @_mutable_feature_branch_ =
+              Here_::MeaningsFeatureBranchFacade_.new @_mutable_digraph_
 
             x = yield
-            remove_instance_variable :@_mutable_operator_branch_
+            remove_instance_variable :@_mutable_feature_branch_
             x
           end
         end

@@ -6,7 +6,7 @@ module Skylab::TanMan
 
     # (begins as entity class #here1)
 
-    class AssocOperatorBranchFacade_TM
+    class AssocFeatureBranchFacade_TM
       # was: Collection_Controller___ < Model_::DocumentEntity::Collection_Controller
 
       def initialize dc

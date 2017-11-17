@@ -5,9 +5,9 @@ module Skylab::TanMan::TestSupport
   describe "[tm] operations - graph - use" do
 
     TS_[ self ]
-    # use :expect_line
+    # use :want_line
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
     # (1/N)
@@ -27,11 +27,11 @@ module Skylab::TanMan::TestSupport
         call_API( * _subject_action )
 
         a = []
-        expect :error, :missing_required_attributes do |ev|
+        want :error, :missing_required_attributes do |ev|
           a.push ev
         end
 
-        expect_fail
+        want_fail
         a
       end
     end
@@ -58,11 +58,11 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :missing_required_attributes do |ev|
+        want :error, :missing_required_attributes do |ev|
           a.push ev
         end
 
-        expect_fail
+        want_fail
         a
       end
     end
@@ -91,11 +91,11 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :resource_not_found do |ev|
+        want :error, :resource_not_found do |ev|
           a.push ev
         end
 
-        expect_fail
+        want_fail
         a.push workspace_path
         a
       end
@@ -125,11 +125,11 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :invalid_property_value do |ev|
+        want :error, :invalid_property_value do |ev|
           a.push ev
         end
 
-        expect_fail
+        want_fail
 
         a
       end
@@ -171,7 +171,7 @@ module Skylab::TanMan::TestSupport
 
         _call_API_with_digraph_path_and_workspace_path digraph_path, workspace_path
 
-        expect :resource_not_found, :parent_directory_must_exist do |ev|
+        want :resource_not_found, :parent_directory_must_exist do |ev|
           a.push ev
         end
 
@@ -209,7 +209,7 @@ module Skylab::TanMan::TestSupport
         # (under #tombstone-A we used to make this through a patch)
 
         a = []
-        expect :error, :wrong_ftype do |ev|
+        want :error, :wrong_ftype do |ev|
           a.push ev
         end
 
@@ -228,7 +228,7 @@ module Skylab::TanMan::TestSupport
 
         _ev = _tuple.first
         _actual = black_and_white_lines _ev
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "expected section name in tm-conferg.file:1:2"
           y << "  1: [\"whtvr\"]\n"
           y << "      ^"
@@ -244,7 +244,7 @@ module Skylab::TanMan::TestSupport
         _call_API_with_digraph_path_and_workspace_path digraph_path, path
 
         a = []
-        expect :error, :config_parse_error do |ev|
+        want :error, :config_parse_error do |ev|
           a.push ev
         end
 
@@ -278,7 +278,7 @@ module Skylab::TanMan::TestSupport
         _path = ::File.join _tuple[1], cfn
         _actual = ::File.open _path, ::File::RDONLY
 
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << "[digraph]"
           y << /\Apath = [[:graph:]]/
           y << "[wiw]"
@@ -291,11 +291,11 @@ module Skylab::TanMan::TestSupport
 
         _call_API_with_digraph_path_and_workspace_path( * a )
 
-        expect :info, :related_to_assignment_change, :added do |ev|
+        want :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 
-        expect :info, :success, :collection_resource_committed_changes do |ev|
+        want :info, :success, :collection_resource_committed_changes do |ev|
           a.push ev
         end
 
@@ -323,7 +323,7 @@ module Skylab::TanMan::TestSupport
     #
     #   - it used to be that we had a special method for asserting
     #     expectation of a set of events without regard to what order they
-    #     occurred in (`_expect_events_order_insensitive`). at first
+    #     occurred in (`_want_events_order_insensitive`). at first
     #     appearance the (now preferred) "fail early" technique is at odds
     #     with this pool-based technique because the former requires that
     #     you forward-declare all expected emissions in the order they are
@@ -360,7 +360,7 @@ module Skylab::TanMan::TestSupport
         _workspace_path = _tuple[0]  # workspace_path
         _config_path = ::File.join _workspace_path, cfn
         actual = ::File.open _config_path
-        expect_these_lines_in_array_with_trailing_newlines_ actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ actual do |y|
           y << "[ digraph ]"
           y << "path = make-me.dot"
           y << "starter = shorty-short.dot"
@@ -435,11 +435,11 @@ module Skylab::TanMan::TestSupport
 
         o = __begin_gather_events_by_terminal_channel_symbol
 
-        o.expect :info, :adding_extension
-        o.expect :info, :before_probably_creating_new_file
-        o.expect :info, :wrote_file
-        o.expect :info, :related_to_assignment_change, :added
-        o.expect :info, :success, :collection_resource_committed_changes
+        o.want :info, :adding_extension
+        o.want :info, :before_probably_creating_new_file
+        o.want :info, :wrote_file
+        o.want :info, :related_to_assignment_change, :added
+        o.want :info, :success, :collection_resource_committed_changes
 
         a.push execute
         a.push o.__release_hash
@@ -451,7 +451,7 @@ module Skylab::TanMan::TestSupport
     # of what used to be test 9; hence there is nothing in the 10 "slot")
 
     def __begin_gather_events_by_terminal_channel_symbol
-      X_oper_graph_use_ThisThing.new method :expect
+      X_oper_graph_use_ThisThing.new method :want
     end
 
     class X_oper_graph_use_ThisThing
@@ -471,7 +471,7 @@ module Skylab::TanMan::TestSupport
         @expect = p
       end
 
-      def expect * sym_a
+      def want * sym_a
         @expect.call( * sym_a ) do |ev|
           @_event_via_terminal_channel_symbol[ sym_a.last ] = ev
         end

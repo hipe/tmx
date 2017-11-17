@@ -15,7 +15,7 @@ module Skylab::TanMan
         :is_dry,
         :listener,
         :meaning_name_string,
-        :meanings_operator_branch,
+        :meanings_feature_branch,
         :mutable_digraph,
         :node_label,
       )
@@ -42,7 +42,7 @@ module Skylab::TanMan
 
         _normal_meaning_name = remove_instance_variable( :@meaning ).natural_key_string
 
-        @meaning_stream = @meanings_operator_branch.to_meaning_entity_stream_  # (preserve below legacy for now..)
+        @meaning_stream = @meanings_feature_branch.to_meaning_entity_stream_  # (preserve below legacy for now..)
 
         _s_a = Models_::Meaning::Graph__.new(  # yes, [#076] graph is a one-off
           @meaning_stream
@@ -80,7 +80,7 @@ module Skylab::TanMan
 
       def when_failed_to_parse_meaning_string s
 
-        @on_event_selectively.call :error, :failed_to_parse_meaning_string do
+        @listener.call :error, :failed_to_parse_meaning_string do
 
           Common_::Event.inline_not_OK_with(
             :failed_to_parse_meaning_string,
@@ -138,7 +138,7 @@ module Skylab::TanMan
 
       def when_conflict conflict_h
 
-        @on_event_selectively.call :error, :unresolvable_conflicts_in_meaning do
+        @listener.call :error, :unresolvable_conflicts_in_meaning do
 
           Common_::Event.inline_not_OK_with :unresolvable_conflicts_in_meaning,
               :conflict_h, conflict_h,
@@ -218,7 +218,7 @@ module Skylab::TanMan
 
         _meaning_head = remove_instance_variable :@meaning_name_string
 
-        _meaning = @meanings_operator_branch.one_entity_against_natural_key_fuzzily_(
+        _meaning = @meanings_feature_branch.one_entity_against_natural_key_fuzzily_(
           _meaning_head, & @listener )
 
         _store :@meaning, _meaning
@@ -226,7 +226,7 @@ module Skylab::TanMan
 
       def __resolve_node_via_node_label
 
-        _NODES_OB = Models_::Node::NodesOperatorBranchFacade_TM.new @mutable_digraph
+        _NODES_OB = Models_::Node::NodesFeatureBranchFacade_TM.new @mutable_digraph
 
         _node_label = remove_instance_variable :@node_label
 

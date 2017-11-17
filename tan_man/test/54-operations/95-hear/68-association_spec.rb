@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations_legacy_methods_for_hear
 
     # temporary in this file: DEBUG_ALL_BY_FLUSH_AND_EXIT
@@ -18,32 +18,32 @@ module Skylab::TanMan::TestSupport
       end
 
       it "(did not write)" do
-        expect_did_not_write__
+        want_did_not_write__
       end
 
       shared_subject :tuple_ do
       add_association_to_abstract_graph 'buy almond milk', 'get to the store'
       hear_words %w( buy almond milk depends on get to the store )
-      expect_OK_event :found_existing_node
-      expect_OK_event :found_existing_node
-      expect_OK_event :found_existing_association
-      expect_succeed
+      want_OK_event :found_existing_node
+      want_OK_event :found_existing_node
+      want_OK_event :found_existing_association
+      want_succeed
       end
     end
 
 # (2/N)
     context do
     it "create one association (the 2 nodes exist already)" do
-        expect_did_write_ || fail
+        want_did_write_ || fail
       end
 
       shared_subject :tuple_ do
       add_nodes_to_abstract_graph 'zip win', 'zip work'
       hear_words %w( zip win depends on zip work )
-      expect_OK_event :found_existing_node
-      expect_OK_event :found_existing_node
-      expect_OK_event :created_association
-      expect_succeed
+      want_OK_event :found_existing_node
+      want_OK_event :found_existing_node
+      want_OK_event :created_association
+      want_succeed
       end
 
       it "(content, partial)" do
@@ -58,17 +58,17 @@ module Skylab::TanMan::TestSupport
 # (3/N)
     context do
     it "create 2 nodes and one association (empty document)" do
-        expect_did_write_ || fail
+        want_did_write_ || fail
       end
 
       shared_subject :tuple_ do
       begin_empty_abstract_graph
       hear_words %w( zip win solidly depends on zip work hard )
 
-      expect_OK_event :created_node
-      expect_OK_event :created_node
-      expect_OK_event :created_association
-      expect_succeed
+      want_OK_event :created_node
+      want_OK_event :created_node
+      want_OK_event :created_association
+      want_succeed
       end
 
       it "(content, partial)" do
@@ -87,16 +87,16 @@ module Skylab::TanMan::TestSupport
 # (4/N)
     context do
     it "create 2 nodes and one association (single rando node document)" do
-        expect_did_write_ || fail
+        want_did_write_ || fail
       end
 
       shared_subject :tuple_ do
       add_nodes_to_abstract_graph 'zip doodle'
       hear_words %w( zip win solidly depends on zip work hard )
-      expect_OK_event :created_node
-      expect_OK_event :created_node
-      expect_OK_event :created_association
-      expect_succeed
+      want_OK_event :created_node
+      want_OK_event :created_node
+      want_OK_event :created_association
+      want_succeed
       end
 
       it "(content, partial)" do

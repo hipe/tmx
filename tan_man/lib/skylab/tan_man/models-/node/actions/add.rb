@@ -36,9 +36,9 @@ module Skylab::TanMan
 
       def __money
 
-        _ob = Here_::NodesOperatorBranchFacade_TM.new @_mutable_digraph_
+        _fb = Here_::NodesFeatureBranchFacade_TM.new @_mutable_digraph_
 
-        _ = _ob.node_by_ do |o|
+        _ = _fb.node_by_ do |o|
 
           o.unsanitized_label_string = @node_name
           o.top_channel_for_created_symbol = :success  # not `info`

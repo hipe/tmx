@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
 
     # (largely the tests here are for covering integration of the MSTk
     #  with the use of a simple attributes actor which remarkably seems
@@ -20,7 +20,7 @@ module Skylab::TanMan::TestSupport
 
       it "explains" do
 
-        expect_these_lines_in_array_ _tuple do |y|
+        want_these_lines_in_array_ _tuple do |y|
           y << "missing required parameters :path and :verb\n"
         end
       end
@@ -30,11 +30,11 @@ module Skylab::TanMan::TestSupport
         call_API :paths
 
         lines = nil
-        expect :error, COMMON_MISS_ do |ev|
+        want :error, COMMON_MISS_ do |ev|
           lines = black_and_white_lines ev
         end
 
-        expect_fail
+        want_fail
 
         lines
       end
@@ -48,7 +48,7 @@ module Skylab::TanMan::TestSupport
 
       it "explains (only the first unrecognized token)" do
 
-        expect_these_lines_in_array_ _tuple do |y|
+        want_these_lines_in_array_ _tuple do |y|
           y << 'unrecognized attribute :wiz'
         end
       end
@@ -58,11 +58,11 @@ module Skylab::TanMan::TestSupport
         call_API :paths, :wiz, :waz, :wazoozle
 
         lines = nil
-        expect :error, :argument_error, :unknown_primary do |ev|
+        want :error, :argument_error, :unknown_primary do |ev|
           lines = black_and_white_lines ev
         end
 
-        expect_fail
+        want_fail
 
         lines
       end
@@ -74,28 +74,28 @@ module Skylab::TanMan::TestSupport
 
         call_API :paths, :path, :generated_grammar_dir, :verb, :wiznippl
 
-        expect :error, :unrecognized_verb do |ev|
+        want :error, :unrecognized_verb do |ev|
           _a = black_and_white_lines ev
-          expect_these_lines_in_array_ _a do |y|
+          want_these_lines_in_array_ _a do |y|
             y << 'unrecognized verb "wiznippl". did you mean "retrieve"?'
           end
         end
 
-        expect_fail
+        want_fail
       end
 
       it "strange noun" do
 
         call_API :paths, :path, :waznoozle, :verb, :retrieve
 
-        expect :error, :unknown_path do |ev|
+        want :error, :unknown_path do |ev|
           _a = black_and_white_lines ev
-          expect_these_lines_in_array_ _a do |y|
+          want_these_lines_in_array_ _a do |y|
             y << 'unknown path "waznoozle". did you mean "generated-grammar-dir"?'
           end
         end
 
-        expect_fail
+        want_fail
       end
 
       it "retrieves (and possibly generates) the GGD path" do
@@ -112,7 +112,7 @@ module Skylab::TanMan::TestSupport
         _tail == Home_.lib_.tmpdir_stem || fail
       end
 
-      def black_and_white_expression_agent_for_expect_emission
+      def black_and_white_expression_agent_for_want_emission
         expression_agent_for_CLI_TM
       end
     end

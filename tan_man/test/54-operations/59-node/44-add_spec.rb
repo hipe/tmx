@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_node
 
 # (1/N)
@@ -16,15 +16,15 @@ module Skylab::TanMan::TestSupport
     context "add a minimal node to the minimal string" do
 
       it "result is the entity that was created (currently flyweight is used)" do
-        _expect_result_that_is_node_for :bae
+        _want_result_that_is_node_for :bae
       end
 
       it "content bytes are correct" do
-        _expect_content "digraph{bae [label=bae]}"
+        _want_content "digraph{bae [label=bae]}"
       end
 
       it "main event explains, reflects" do
-        _expect_event_for_created_node "bae"
+        _want_event_for_created_node "bae"
       end
 
       shared_subject :_tuple do
@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport
 
         _mutate_string_by_adding_node s, 'bae'
 
-        _expect_common_events_and_execute a
+        _want_common_events_and_execute a
       end
     end
 
@@ -42,15 +42,15 @@ module Skylab::TanMan::TestSupport
     context "add one before" do
 
       it "result.." do
-        _expect_result_that_is_node_for :bar
+        _want_result_that_is_node_for :bar
       end
 
       it "content.." do
-        _expect_content "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
+        _want_content "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
       end
 
       it "main event.." do
-        _expect_event_for_created_node "bar"
+        _want_event_for_created_node "bar"
       end
 
       shared_subject :_tuple do
@@ -60,7 +60,7 @@ module Skylab::TanMan::TestSupport
 
         _mutate_string_by_adding_node s, "bar"
 
-        _expect_common_events_and_execute a
+        _want_common_events_and_execute a
       end
     end
 
@@ -68,15 +68,15 @@ module Skylab::TanMan::TestSupport
     context "add one after" do
 
       it "result.." do
-        _expect_result_that_is_node_for :foo
+        _want_result_that_is_node_for :foo
       end
 
       it "content.." do
-        _expect_content "digraph{\n bar\nfoo [label=foo]}"
+        _want_content "digraph{\n bar\nfoo [label=foo]}"
       end
 
       it "main event.." do
-        _expect_event_for_created_node "foo"
+        _want_event_for_created_node "foo"
       end
 
       shared_subject :_tuple do
@@ -86,7 +86,7 @@ module Skylab::TanMan::TestSupport
 
         _mutate_string_by_adding_node s, "foo"
 
-        _expect_common_events_and_execute a
+        _want_common_events_and_execute a
       end
     end
 
@@ -113,7 +113,7 @@ module Skylab::TanMan::TestSupport
 
         _mutate_string_by_adding_node s, "zoz"
 
-        expect :error, :found_existing_node do |ev|
+        want :error, :found_existing_node do |ev|
           a.push ev
         end
 
@@ -125,15 +125,15 @@ module Skylab::TanMan::TestSupport
     context "add one in between" do
 
       it "result.." do
-        _expect_result_that_is_node_for :menengitis
+        _want_result_that_is_node_for :menengitis
       end
 
       it "content.." do
-        _expect_content " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
+        _want_content " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
       end
 
       it "main event.." do
-        _expect_event_for_created_node "menengitis"
+        _want_event_for_created_node "menengitis"
       end
 
       shared_subject :_tuple do
@@ -143,7 +143,7 @@ module Skylab::TanMan::TestSupport
 
         _mutate_string_by_adding_node s, "menengitis"
 
-        _expect_common_events_and_execute a
+        _want_common_events_and_execute a
       end
     end
 
@@ -165,7 +165,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           a.push all_nodes_right_now_count_
         touch_node_via_label 'feep'
@@ -185,7 +185,7 @@ module Skylab::TanMan::TestSupport
 
       it "labels" do
         _actual = _tuple.first
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "MiLk the catfish"
           y << "milk the cat"
           y << "milk the cow"
@@ -194,7 +194,7 @@ module Skylab::TanMan::TestSupport
 
       it "symbols (generated ID's)" do
         _actual = _tuple.last
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << :milk_3
           y << :milk_2
           y << :milk
@@ -203,7 +203,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
 
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
@@ -245,7 +245,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
 
           a = []
 
@@ -282,7 +282,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
 
           o = touch_node_via_label input
 
@@ -297,7 +297,7 @@ module Skylab::TanMan::TestSupport
 
     end.call  # :here3
 
-    def _expect_event_for_created_node label_s
+    def _want_event_for_created_node label_s
 
       ev = _main_event
       _actual = black_and_white ev
@@ -308,25 +308,25 @@ module Skylab::TanMan::TestSupport
       ev.ok || fail
     end
 
-    def _expect_common_events_and_execute a
+    def _want_common_events_and_execute a
 
-      expect :success, :created_node do |ev|
+      want :success, :created_node do |ev|
         a.push ev
       end
 
-      expect :success, :wrote_resource do |ev|
+      want :success, :wrote_resource do |ev|
         a.push ev
       end
 
       a.push execute
     end
 
-    def _expect_content exp_s
+    def _want_content exp_s
       _actual = _tuple.fetch 0
       _actual == exp_s || fail
     end
 
-    def _expect_result_that_is_node_for sym
+    def _want_result_that_is_node_for sym
       _node = _result
       _node.node_identifier_symbol_ == sym || fail
     end

@@ -6,9 +6,9 @@ module Skylab::TanMan::TestSupport
     # encapsulates the ancillary session of our business parser to work with
     # the smaller ad-hoc grammars we have in testing.
 
-    def initialize oes_p
+    def initialize p
       @bx = Home_::Common_::Box.new
-      @listener = oes_p
+      @listener = p
       yield self
     end
 
@@ -47,9 +47,9 @@ module Skylab::TanMan::TestSupport
 
     class Produce_parse_tree_custom___ < Home_::Models_::DotFile::ParseTree_via_ByteUpstreamReference
 
-      def initialize bx, & oes_p
+      def initialize bx, & p
         @_h = bx.h_
-        @listener = oes_p
+        @listener = p
         @byte_upstream_reference = @_h.fetch :buid
         nil
       end

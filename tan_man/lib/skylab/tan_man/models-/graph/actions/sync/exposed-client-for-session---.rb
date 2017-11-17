@@ -12,9 +12,9 @@ module Skylab::TanMan
 
           dc = remove_instance_variable :@digraph_controller
 
-          @_nodes_OB = Models_::Node::NodesOperatorBranchFacade_TM.new dc
+          @_nodes_OB = Models_::Node::NodesFeatureBranchFacade_TM.new dc
 
-          @_assocs_OB = Models_::Association::AssocOperatorBranchFacade_TM.new dc
+          @_assocs_OB = Models_::Association::AssocFeatureBranchFacade_TM.new dc
 
           @_tick = 0  # how much work is done
         end

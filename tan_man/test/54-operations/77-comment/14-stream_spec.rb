@@ -19,31 +19,31 @@ module Skylab::TanMan::TestSupport
 # (1/N)
       it "the empty string is NO lines" do
         with EMPTY_S_
-        expect
+        want
       end
 
 # (2/N)
       it "a single newline is ONE line" do
         with NEWLINE_
-        expect EMPTY_S_
+        want EMPTY_S_
       end
 
 # (3/N)
       it "one line" do
         with "ohai\n"
-        expect 'ohai'
+        want 'ohai'
       end
 
 # (4/N)
       it "two lines" do
         with "foo\nbar"
-        expect 'foo', 'bar'
+        want 'foo', 'bar'
       end
 
 # (5/N)
       it "interceding blank lines are still there" do
         with "a\n\nc"
-        expect 'a', EMPTY_S_, 'c'
+        want 'a', EMPTY_S_, 'c'
       end
 
       use :of_string
@@ -55,13 +55,13 @@ module Skylab::TanMan::TestSupport
 # (6/N)
       it "one line" do
         with "  # zanger \n"
-        expect ' zanger '
+        want ' zanger '
       end
 
 # (7/N)
       it "two lines" do
         with " # feeple\n#deeple"
-        expect ' feeple', 'deeple'
+        want ' feeple', 'deeple'
       end
 
       use :of_comment_string
@@ -72,13 +72,13 @@ module Skylab::TanMan::TestSupport
 # (8/N)
       it "one line" do
         with '/*ha*/'
-        expect 'ha'
+        want 'ha'
       end
 
 # (9/N)
       it "two lines" do
         with "   /*  one\ntwo */  "
-        expect '  one', 'two '
+        want '  one', 'two '
       end
 
       use :of_comment_string
@@ -88,7 +88,7 @@ module Skylab::TanMan::TestSupport
       @s = s
     end
 
-    def expect * s_a
+    def want * s_a
       _subject = Home_::Models_::Comment::LineStream
       scn = _subject.send use_method, @s
       a = []

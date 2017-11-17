@@ -16,9 +16,9 @@ module Skylab::TanMan::TestSupport
 
       cli.invoke 'tan-man', 'ping'
 
-      cli.expect_on_stderr "hello from tan man.\n"
+      cli.want_on_stderr "hello from tan man.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
   end
 end

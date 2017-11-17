@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport
 
       # -- assertion
 
-      def expect_result_from_add_is_entity__
+      def want_result_from_add_is_entity__
         _t = tuple_
         _rslt = _t.result_of_API_call
         ent = _rslt.user_value
@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
         ent.dereference( :value ) == "bar" || fail
       end
 
-      def expect_content_from_add_is__ expected_s
+      def want_content_from_add_is__ expected_s
         _actual = s
         _actual == expected_s || fail
       end
@@ -49,7 +49,7 @@ module Skylab::TanMan::TestSupport
 
         call_API_for_add_meaning_ s
 
-        expect :success, :wrote_resource
+        want :success, :wrote_resource
 
         _x = execute
         ThisOneTuple___.new _x, s

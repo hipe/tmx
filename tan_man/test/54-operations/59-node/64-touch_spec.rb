@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_node
 
 # (1/N)
@@ -32,7 +32,7 @@ module Skylab::TanMan::TestSupport
       end
 
       shared_subject :_tuple do
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           _ent = touch_node_via_label "cyan"
           a.push _ent
@@ -65,7 +65,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           _ent = touch_node_via_label str
           a.push _ent
@@ -95,7 +95,7 @@ module Skylab::TanMan::TestSupport
       it "the last three lines should look like this" do  # -11/N
 
         _actual = _THIS_MANY_LAST_N_LINES 3
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << "blue [label=blue]"
           y << "cyan [label=cyan]"
           y << "}"
@@ -104,7 +104,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           _ent = touch_node_via_label "cyan"
           a.push _ent
@@ -133,7 +133,7 @@ module Skylab::TanMan::TestSupport
 
       it "last 6 lines.." do  # -9/N
         _actual = _THIS_MANY_LAST_N_LINES 6
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << '*/'
           y << ""
           y << "cyan [label=cyan]"
@@ -145,7 +145,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           a.push touch_node_via_label 'cyan'
           a.push to_two_arrays__labels_and_symbols_
@@ -171,7 +171,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           touch_node_via_label "beta"
           a.push to_one_array__symbols_
@@ -194,7 +194,7 @@ module Skylab::TanMan::TestSupport
       end
 
       shared_subject :_tuple do
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           touch_node_via_label "ham"
           a.push to_one_array__symbols_
@@ -217,7 +217,7 @@ module Skylab::TanMan::TestSupport
       end
 
       shared_subject :_tuple do
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
           a = []
           touch_node_via_label "zap"
           a.push to_one_array__symbols_
@@ -261,7 +261,7 @@ module Skylab::TanMan::TestSupport
 
       shared_subject :_tuple do
 
-        with_operator_branch_for_nodes_ do
+        with_feature_branch_for_nodes_ do
 
           a = []
 
@@ -272,7 +272,7 @@ module Skylab::TanMan::TestSupport
             touch_node_via_label "yeti", & p
           end
 
-          expect :info, :found_existing_node do |ev|
+          want :info, :found_existing_node do |ev|
             a.push ev
           end
 

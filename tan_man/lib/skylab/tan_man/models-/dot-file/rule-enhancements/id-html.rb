@@ -10,7 +10,7 @@ module Skylab::TanMan
       '"' => 'quot', "'" => 'apos', '&' => 'amp', '<' => 'lt', '>' => 'gt',
     }
 
-    define_method :escape_ID_string__ do |string, & oes_p|
+    define_method :escape_ID_string__ do |string, & p|
 
       # currently we go with a narrow whitelist. in the future we could
       # expand this trivially but currently extenstive support for HTML
@@ -31,7 +31,7 @@ module Skylab::TanMan
       end
 
       if xtra_a
-        oes_p.call :error, :invalid_characters do
+        p.call :error, :invalid_characters do
           __build_invalid_characters_event xtra_a.uniq
         end
         UNABLE_

@@ -18,7 +18,7 @@ class Skylab::Stack
       @argv, @stdin, @stdout, @stderr, @pn_s_a, @_filesystem = six
 
       y = nil
-      @_oes_p = -> * _sym_a, & ev_p do
+      @_listener = -> * _sym_a, & ev_p do
 
         y ||= ::Enumerator::Yielder.new do | s |
           @stderr.puts s
@@ -252,7 +252,7 @@ class Skylab::Stack
 
         express_popped[]
 
-        @_oes_p.call :info, :expression, :removing_file do | y |
+        @_listener.call :info, :expression, :removing_file do | y |
           y << "(stack cleared. removing file.)"
         end
 
@@ -268,7 +268,7 @@ class Skylab::Stack
 
         new_topmost_line.chomp!  # EEK/meh
 
-        @_oes_p.call :info, :expression, :current_top do | y |
+        @_listener.call :info, :expression, :current_top do | y |
           y << "(new top: #{ new_topmost_line })"
         end
 
@@ -305,7 +305,7 @@ class Skylab::Stack
           if md
             d = num.to_i
           else
-            @_oes_p.call :error, :message, :invalid_input do |y|
+            @_listener.call :error, :message, :invalid_input do |y|
               y << "must be a positive integer - #{ num.inspect }"
             end
           end
@@ -342,7 +342,7 @@ class Skylab::Stack
     end
 
     def _when_stack_empty
-      @_oes_p.call :info, :expression, :stack_empty do |y|
+      @_listener.call :info, :expression, :stack_empty do |y|
         y << "(stack empty.)"
       end
       Stream__.new do
@@ -371,7 +371,7 @@ class Skylab::Stack
       -> item_number_A, item_number_B do
         io = _read_writable_IO
         if io
-          o = Swap___.new( & @_oes_p )
+          o = Swap___.new( & @_listener )
           o.IO = io
           o.number_A = item_number_A
           o.number_B = item_number_B
@@ -384,7 +384,7 @@ class Skylab::Stack
       begin
         @_filesystem.open _path, ::File::RDONLY
       rescue ::Errno::ENOENT => e
-        @_oes_p.call :info, :expression, :no_file do | y |
+        @_listener.call :info, :expression, :no_file do | y |
           y << e.message
         end
         UNABLE_
@@ -405,8 +405,8 @@ class Skylab::Stack
     end
 
     class Swap___
-      def initialize & oes_p
-        @_oes_p = oes_p
+      def initialize & p
+        @_listener = p
       end
       attr_writer(
         :IO,
@@ -431,7 +431,7 @@ class Skylab::Stack
         if md
           d = md[0].to_i
           if 0 == d
-            @_oes_p.call :error, :expression, :invalid_digit do | y |
+            @_listener.call :error, :expression, :invalid_digit do | y |
               y << "#{ par sym } cannot be less than one (had #{ ick d })"
             end
             UNABLE_
@@ -440,7 +440,7 @@ class Skylab::Stack
             ACHIEVED_
           end
         else
-          @_oes_p.call :error, :expression, :invalid_digit do | y |
+          @_listener.call :error, :expression, :invalid_digit do | y |
             y << "#{ par sym } doesn't look like positive integer: #{ ick s }"
           end
           UNABLE_
@@ -476,7 +476,7 @@ class Skylab::Stack
       end
 
       def __when_same
-        @_oes_p.call :error, :expression, :wont_swap_same do | y |
+        @_listener.call :error, :expression, :wont_swap_same do | y |
           y << "won't swap the same number"
         end
         UNABLE_
@@ -511,7 +511,7 @@ class Skylab::Stack
           sym = :number_B
         end
 
-        @_oes_p.call :error, :expression, :too_large do | y |
+        @_listener.call :error, :expression, :too_large do | y |
           y << "#{ your }#{ par sym } cannot be greater than #{
             }#{ val limit_d } (had #{ val had_d })"
         end

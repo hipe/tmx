@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
 
 # (1/N)
@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
 
         _actual = black_and_white_lines _ev
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
 
           y << 'unrecognized starter "wiz"'
 
@@ -43,7 +43,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :item_not_found do |ev|
+        want :error, :item_not_found do |ev|
           a.push ev
         end
         # (used to emit `business_item_not_found` before #history-A.1)
@@ -60,9 +60,9 @@ module Skylab::TanMan::TestSupport
         :starter_name, "digr",
       )
 
-      expect :error, COMMON_MISS_
+      want :error, COMMON_MISS_
 
-      expect_fail
+      want_fail
     end
 # (3/N)
     context "good name, workspace path, but config parse error" do
@@ -76,7 +76,7 @@ module Skylab::TanMan::TestSupport
         _ev = _tuple.first
         _actual = black_and_white_lines _ev
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
 
           y << "expected open square bracket in tm-conferg.file:1:1"
           y << "  1: using_starter=hoitus-toitus.dot\n"
@@ -96,7 +96,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :config_parse_error do |ev|
+        want :error, :config_parse_error do |ev|
           a.push ev
         end
 
@@ -128,7 +128,7 @@ module Skylab::TanMan::TestSupport
         _workspace_path = _tuple.first
         _path = ::File.join _workspace_path, cfn
         _io = ::File.open _path
-        expect_these_lines_in_array_ _io do |y|
+        want_these_lines_in_array_ _io do |y|
           y << "[ digraph ]\n"
           y << %r(\Astarter = [^ ]+#{ ::Regexp.escape ::File::SEPARATOR }digraph\.dot\n\z)
         end
@@ -149,11 +149,11 @@ module Skylab::TanMan::TestSupport
           :config_filename, cfn,
         )
 
-        expect :info, :related_to_assignment_change, :changed do |ev|
+        want :info, :related_to_assignment_change, :changed do |ev|
           a.push ev
         end
 
-        expect :info, :success, :collection_resource_committed_changes do |ev|
+        want :info, :success, :collection_resource_committed_changes do |ev|
           a.push ev
         end
 

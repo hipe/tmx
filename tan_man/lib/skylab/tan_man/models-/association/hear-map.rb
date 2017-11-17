@@ -83,7 +83,7 @@ module Skylab::TanMan
 
         def __via_mutable_digraph
 
-          _oper = Models_::Association::AssocOperatorBranchFacade_TM.new @_mutable_digraph_
+          _oper = Models_::Association::AssocFeatureBranchFacade_TM.new @_mutable_digraph_
 
           _ent = _oper.touch_association_by_ do |o|
 

@@ -24,7 +24,7 @@ module Skylab::TanMan
 
       def __via_immutable_digraph
 
-        NodesOperatorBranchFacade_TM.new( @_immutable_digraph_ ).to_node_entity_stream_
+        NodesFeatureBranchFacade_TM.new( @_immutable_digraph_ ).to_node_entity_stream_
       end
 
       Actions = nil

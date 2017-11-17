@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :operations
     use :operations_legacy_methods_for_emission
 
@@ -51,7 +51,7 @@ module Skylab::TanMan::TestSupport
 
         a = []
         event = nil
-        expect :error, :non_one_IO do |ev|
+        want :error, :non_one_IO do |ev|
           event = ev
         end
         a.push execute
@@ -73,7 +73,7 @@ module Skylab::TanMan::TestSupport
 
         _actual = black_and_white_lines _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "expecting opening digraph line (e.g \"digraph{\") #{
             }near line 1: \"wazoozle\\n\""
         end
@@ -88,7 +88,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect :error, :input_parse_error do |ev|
+        want :error, :input_parse_error do |ev|
           a.push ev
         end
 
@@ -124,7 +124,7 @@ module Skylab::TanMan::TestSupport
         :output_path, out_a
         )
 
-        _expect_wrote
+        _want_wrote
 
         a = [ same_bytes ]
         a.push out_a
@@ -152,7 +152,7 @@ module Skylab::TanMan::TestSupport
         )
 
         a = []
-        expect(
+        want(
           :error, :hereput_and_output_waypoints_are_the_same,
         )
 
@@ -171,7 +171,7 @@ module Skylab::TanMan::TestSupport
 
         _actual_s = _tuple.first
         _actual = _actual_s.split %r(^)
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << "digraph{"
           y << "x [label=EX]"  # note quotes were removed
           y << "p -> q"  # note order was alphabetized
@@ -188,10 +188,10 @@ module Skylab::TanMan::TestSupport
           :output_string, s,
         )
 
-      expect_OK_event :created_node
-      expect_OK_event :created_association
-      expect_OK_event :created_association
-        _expect_wrote
+      want_OK_event :created_node
+      want_OK_event :created_association
+      want_OK_event :created_association
+        _want_wrote
 
         a = [s]
         a.push execute
@@ -220,8 +220,8 @@ module Skylab::TanMan::TestSupport
           :output_string, s,
         )
 
-      expect_OK_event :created_association
-        _expect_wrote
+      want_OK_event :created_association
+        _want_wrote
 
         a = [s]
         a.push execute
@@ -248,9 +248,9 @@ module Skylab::TanMan::TestSupport
           i_am_this,
         )
 
-      expect_OK_event :created_association
-      expect_OK_event :found_existing_association
-        _expect_wrote
+      want_OK_event :created_association
+      want_OK_event :found_existing_association
+        _want_wrote
 
         a = [ i_am_this ]
         a.push execute
@@ -305,7 +305,7 @@ module Skylab::TanMan::TestSupport
 
         _scn = Home_.lib_.basic::String::LineStream_via_String[ _actual ]
 
-        expect_these_lines_in_array_with_trailing_newlines_ _scn do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _scn do |y|
 
           y << "digraph{"
           y << " # hehe"
@@ -343,9 +343,9 @@ module Skylab::TanMan::TestSupport
         :output_string, output_s
         )
 
-      expect_OK_event :found_existing_node
-      expect_OK_event :created_node
-        _expect_wrote
+      want_OK_event :found_existing_node
+      want_OK_event :created_node
+        _want_wrote
 
         a = [ output_s ]
         a.push execute
@@ -373,16 +373,16 @@ module Skylab::TanMan::TestSupport
 
     # ignore_these_events :wrote_resource  # <- keep this out - assert it explicitly
 
-    def _expect_wrote
-      expect :success, :wrote_resource
+    def _want_wrote
+      want :success, :wrote_resource
     end
 
     def _subject_action
       [ :graph, :sync ]
     end
 
-    def expression_agent_for_expect_emission
-      black_and_white_expression_agent_for_expect_emission  # BE CAREFUL
+    def expression_agent_for_want_emission
+      black_and_white_expression_agent_for_want_emission  # BE CAREFUL
     end
   end
 end

@@ -27,9 +27,9 @@ module Skylab::TanMan
 
       def __via_mutable_digraph
 
-        _ob = NodesOperatorBranchFacade_TM.new @_mutable_digraph_
+        _fb = NodesFeatureBranchFacade_TM.new @_mutable_digraph_
 
-        _ent = _ob.procure_node_removal_via_label__ @node_name, & _listener_
+        _ent = _fb.procure_node_removal_via_label__ @node_name, & _listener_
 
         _ent || NIL_AS_FAILURE_
       end

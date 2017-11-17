@@ -14,7 +14,7 @@ module Skylab::TanMan
       def initialize avr, fs, & p
         @association_value_reader = avr
         @filesystem = fs
-        @on_event_selectively = p
+        @listener = p
       end
 
       include Common_::Event::ReceiveAndSendMethods
@@ -154,7 +154,7 @@ module Skylab::TanMan
         sym_a = Magnetics_::HackPeekConstArray_via_AssetPath.call(
           uow.input_path,
           @filesystem,
-          & @on_event_selectively )
+          & @listener )
 
         if sym_a
 

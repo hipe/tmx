@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models_::Meaning
 
-    class MeaningsOperatorBranchFacade_
+    class MeaningsFeatureBranchFacade_
 
       def initialize dc
 
@@ -14,7 +14,7 @@ module Skylab::TanMan
         Here_::Magnetics_::ApplyMeaning_via_Node_and_Meaning.call_by do |o|
           yield o
           o.mutable_digraph = @__mutable_digraph
-          o.meanings_operator_branch = self
+          o.meanings_feature_branch = self
         end
       end
 

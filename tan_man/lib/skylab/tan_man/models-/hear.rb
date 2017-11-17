@@ -85,7 +85,7 @@ module Skylab::TanMan
       end
 
       def _to_exposure_stream
-        Memoized_exposure_operator_branch___[].to_dereferenced_item_stream
+        Memoized_exposure_feature_branch___[].to_dereferenced_item_stream
       end
 
       Actions = nil
@@ -99,14 +99,14 @@ module Skylab::TanMan
 
     # ==
 
-    Memoized_exposure_operator_branch___ = Lazy_.call do  # :#here1
+    Memoized_exposure_feature_branch___ = Lazy_.call do  # :#here1
 
       _unordered_st = To_stream_of_unordered_exposures___[]
 
       _ordered_exposure_st = Home_.lib_.brazen_NOUVEAU::
         Ordered_stream_via_participating_stream[ _unordered_st ]
 
-      Common_::Stream::Magnetics::OperatorBranch_via_Stream.define do |o|
+      Common_::Stream::Magnetics::FeatureBranch_via_Stream.define do |o|
         o.upstream = _ordered_exposure_st
         o.key_method_name = :name_value_for_order
       end
@@ -175,10 +175,10 @@ module Skylab::TanMan
 
     To_stream_of_participating_silos___ = -> do
 
-      # (weirdly, for once we don't memoize this operator branch because
+      # (weirdly, for once we don't memoize this feature branch because
       #  we're already memoizing its leaf nodes of interest #here1)
 
-      Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
+      Home_.lib_.system_lib::Filesystem::Directory::FeatureBranch_via_Directory.define do |o|
 
         mod = Models_
 

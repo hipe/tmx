@@ -20,7 +20,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def execute_via_heard hrd, & oes_p
+          def execute_via_heard hrd, & p
 
             bx = hrd.qualified_knownness_box
             x = bx.remove :word
@@ -36,7 +36,7 @@ module Skylab::TanMan
 
             bx.add :args, s_a[ 2 .. -1 ]  # b.c above
 
-            sess = Custom_Session___.new( bx, hrd.kernel, & oes_p )
+            sess = Custom_Session___.new( bx, hrd.kernel, & p )
             ok = sess.touch_workspace do
               ::Dir.pwd
             end
@@ -46,10 +46,10 @@ module Skylab::TanMan
 
           class Custom_Session___
 
-            def initialize bx, k, & oes_p
+            def initialize bx, k, & p
               @bx = bx
               @kernel = k
-              @on_event_selectively = oes_p
+              @listener = p
             end
 
             def touch_workspace & path_p
@@ -58,7 +58,7 @@ module Skylab::TanMan
               @bx.add :just_looking, _pair
 
               @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(
-                @bx, & @on_event_selectively )
+                @bx, & @listener )
 
               if ! @ws
                 __create_ws_at_path path_p[]
@@ -71,7 +71,7 @@ module Skylab::TanMan
 
               @ws = @kernel.silo( :workspace ).call :init,
                 :qualified_knownness_box, @bx,
-                :with, :path, path, & @on_event_selectively
+                :with, :path, path, & @listener
 
               @ws and ACHIEVED_
             end
@@ -86,7 +86,7 @@ module Skylab::TanMan
               @kernel.silo( :graph ).call :use,
                 :preconditions, bx,
                 :with, :digraph_path, _f, # #open [#016] ..
-                & @on_event_selectively
+                & @listener
             end
 
             def __produce_some_graph_filehandle

@@ -35,7 +35,7 @@ module Skylab::TanMan::TestSupport
       [ s_a, sym_a ]
     end
 
-    def with_operator_branch_for_nodes_  # (has counterpart in assoc)
+    def with_feature_branch_for_nodes_  # (has counterpart in assoc)
 
       _client = TS_::Models::Dot_File.PARSER_INSTANCE
 
@@ -43,7 +43,7 @@ module Skylab::TanMan::TestSupport
 
       _client.parse_file _path do |dc|
 
-        @OB_FOR_NODES = Here__.__lib::NodesOperatorBranchFacade_TM.new dc
+        @OB_FOR_NODES = Here__.__lib::NodesFeatureBranchFacade_TM.new dc
         x = yield
         remove_instance_variable :@OB_FOR_NODES
         x

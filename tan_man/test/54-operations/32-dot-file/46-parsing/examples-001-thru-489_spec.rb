@@ -18,7 +18,7 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
       end
 
       it "produces a digraph document sexp" do
-        expect_digraph_document_sexp
+        want_digraph_document_sexp
       end
     end
 
@@ -31,7 +31,7 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
       end
 
       it "produces a digraph document sexp" do
-        expect_digraph_document_sexp
+        want_digraph_document_sexp
       end
     end
   end

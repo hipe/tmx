@@ -435,7 +435,7 @@ module Skylab::TanMan
         # (even doing a trick with currying the performer). now we honor
         # one further level of abstraction and stay behind the "o.b" facade:
 
-        @_nodes = Models_::Node::NodesOperatorBranchFacade_TM.new @digraph_controller
+        @_nodes = Models_::Node::NodesFeatureBranchFacade_TM.new @digraph_controller
 
         _ok = __resolve_from_node
         _ok && __resolve_to_node

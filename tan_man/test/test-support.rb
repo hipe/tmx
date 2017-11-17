@@ -140,13 +140,13 @@ module Skylab::TanMan::TestSupport
 
   module InstanceMethods___
 
-    # include Expect_Event__::Test_Context_Instance_Methods  # #todo
+    # include Want_Event__::Test_Context_Instance_Methods  # #todo
 
     # -- expectations
 
-    def expect_committed_changes_
+    def want_committed_changes_
 
-      _em = expect_OK_event :success
+      _em = want_OK_event :success
 
       ev = _em.cached_event_value
 
@@ -173,26 +173,26 @@ module Skylab::TanMan::TestSupport
       io = debug_IO
       io.puts "(MESSAGE FROM EMISSION:"
       _y = ::Enumerator::Yielder.new { |s| io.puts "  #{ s }" }
-      _expag = black_and_white_expression_agent_for_expect_emission
+      _expag = black_and_white_expression_agent_for_want_emission
       o.send m, _y, _expag
       io.puts "<-THAT)"
       NIL
     end
 
-    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines.call(
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::Want_these_lines_in_array_with_trailing_newlines.call(
         a, p, self )
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
 
     def expression_agent_for_CLI_TM
       Home_::CLI::InterfaceExpressionAgent___.instance
     end
 
-    def black_and_white_expression_agent_for_expect_emission
+    def black_and_white_expression_agent_for_want_emission
       Home_::API::expression_agent_instance
     end
 
@@ -272,7 +272,7 @@ module Skylab::TanMan::TestSupport
 
       # life is easier if we don't have to ignore 'manually' the below event
 
-      _oes_p = -> * sym_a, & ev_p do
+      _p = -> * sym_a, & ev_p do
 
         case sym_a.last
         when :using_parser_files, :creating, :mkdir_p
@@ -283,12 +283,12 @@ module Skylab::TanMan::TestSupport
       end
 
       # but if you wanted to test for specific events here:
-      # _oes_p = listener_
+      # _p = listener_
 
       _head = Localize_grammar_path___[ @grammar_class.dir_path ]
       _path = ::File.join _head, ALWAYS_G1__
 
-      @parse = TS_::Parse.new _oes_p do |o|
+      @parse = TS_::Parse.new _p do |o|
 
         o.root_for_relative_paths_for_load TS_.dir_path  # same as #here
 
@@ -474,17 +474,17 @@ module Skylab::TanMan::TestSupport
 
   # == :#here2
 
-  Expect_CLI_Or_API = -> tcc do
-    Home_::Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
+  Want_CLI_Or_API = -> tcc do
+    Home_::Zerk_lib_[].test_support::Want_CLI_or_API[ tcc ]
     tcc.send :alias_method, :call_API, :call  # legacy
   end
 
-  Expect_Line = -> tcc do
-    TestSupport_::Expect_line[ tcc ]
+  Want_Line = -> tcc do
+    TestSupport_::Want_line[ tcc ]
   end
 
-  Expect_Emission_Classic = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ] # #here3
+  Want_Emission_Classic = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ] # #here3
   end
 
   Memoizer_Methods = -> tcc do

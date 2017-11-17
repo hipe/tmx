@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_association
 
 # (1/N)
@@ -29,7 +29,7 @@ module Skylab::TanMan::TestSupport
         a = black_and_white_lines ev
         a.concat black_and_white_lines ev_
 
-        expect_these_lines_in_array_ a do |y|
+        want_these_lines_in_array_ a do |y|
           y << "needed exactly 1 input-related argument, had 0"
           y << "(provide 'input-string', 'input-path' or 'workspace-path')"
           y << "needed exactly 1 output-related argument, had 0"
@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport
         )
         a = []
         2.times do
-          expect :error, :non_one_IO do |ev|
+          want :error, :non_one_IO do |ev|
             a.push ev
           end
         end
@@ -98,16 +98,16 @@ module Skylab::TanMan::TestSupport
         a = [ release_output_string_ ]
 
         2.times do
-          expect :info, :created_node do |ev|
+          want :info, :created_node do |ev|
             a.push ev
           end
         end
 
-        expect :info, :created_association do |ev|
+        want :info, :created_association do |ev|
           a.push ev
         end
 
-        expect :success, :wrote_resource do |ev|  # check this 1x only in file
+        want :success, :wrote_resource do |ev|  # check this 1x only in file
           a.push ev
         end
 
@@ -145,10 +145,10 @@ module Skylab::TanMan::TestSupport
 
         call_API_for_associate_ "alpha", "peanut gallery"
         a = [ release_output_string_ ]
-        expect( :info, :found_existing_node ) { |ev| a.push ev }
-        expect :info, :created_node
-        expect :info, :created_association
-        _expect_emission_for_wrote_resource
+        want( :info, :found_existing_node ) { |ev| a.push ev }
+        want :info, :created_node
+        want :info, :created_association
+        _want_emission_for_wrote_resource
         a.push execute
       end
 
@@ -178,9 +178,9 @@ module Skylab::TanMan::TestSupport
         a = []
         call_API_for_associate_ "alpha", "gamma"
 
-        _expect_emissions_for_found_existing_nodes
+        _want_emissions_for_found_existing_nodes
 
-        expect :info, :found_existing_association do |ev|
+        want :info, :found_existing_association do |ev|
           a.push ev  # offest 0
         end
 
@@ -218,7 +218,7 @@ module Skylab::TanMan::TestSupport
 
         call_API_for_associate_ "feasly", "teasly"
         a = [ release_output_string_ ]
-        _expect_emissions_for_created_all
+        _want_emissions_for_created_all
         a.push execute
       end
 
@@ -243,7 +243,7 @@ module Skylab::TanMan::TestSupport
       shared_subject :_tuple do
         call_API_for_associate_ "foo", "bar's mother"
         a = [ release_output_string_ ]
-        _expect_emissions_for_created_all
+        _want_emissions_for_created_all
         a.push execute
       end
 
@@ -267,8 +267,8 @@ module Skylab::TanMan::TestSupport
       shared_subject :_tuple do
         a = []
         call_API_for_associate_ "a", "b", :prototype, :clancy
-        _expect_emissions_for_created_nodes
-        expect( :error, :association_prototype_not_found ) { |ev| a.push ev }
+        _want_emissions_for_created_nodes
+        want( :error, :association_prototype_not_found ) { |ev| a.push ev }
         a.push execute
       end
 
@@ -301,7 +301,7 @@ module Skylab::TanMan::TestSupport
 
         call_by do |p|
 
-          with_operator_branch_for_associations_ do |ob|
+          with_feature_branch_for_associations_ do |ob|
 
             ob.touch_association_by_ do |o|
               o.from_and_to_labels "c", "d"
@@ -319,7 +319,7 @@ module Skylab::TanMan::TestSupport
           end
         end
 
-        2.times { _expect_emission_for_created_all_no_write }
+        2.times { _want_emission_for_created_all_no_write }
 
         a[ 0 ] = execute
         a
@@ -352,7 +352,7 @@ module Skylab::TanMan::TestSupport
 
         a = [ release_output_string_ ]
 
-        _expect_emissions_for_created_all
+        _want_emissions_for_created_all
 
         a.push execute
       end
@@ -383,7 +383,7 @@ module Skylab::TanMan::TestSupport
 
         a = [ release_output_string_ ]
 
-        _expect_emissions_for_created_all
+        _want_emissions_for_created_all
 
         a.push execute
       end
@@ -427,9 +427,9 @@ module Skylab::TanMan::TestSupport
         )
         a = [ s ]
 
-        _expect_emissions_for_found_existing_nodes
-        _expect_emission_for_created_association
-        _expect_emission_for_wrote_resource
+        _want_emissions_for_found_existing_nodes
+        _want_emission_for_created_association
+        _want_emission_for_wrote_resource
 
         a.push execute
       end
@@ -450,35 +450,35 @@ module Skylab::TanMan::TestSupport
 
     # -- setup
 
-    def _expect_emissions_for_created_all  # 1x
-      _expect_emission_for_created_all_no_write
-      expect :success, :wrote_resource
+    def _want_emissions_for_created_all  # 1x
+      _want_emission_for_created_all_no_write
+      want :success, :wrote_resource
       NIL
     end
 
-    def _expect_emission_for_created_all_no_write
-      _expect_emissions_for_created_nodes
-      _expect_emission_for_created_association
+    def _want_emission_for_created_all_no_write
+      _want_emissions_for_created_nodes
+      _want_emission_for_created_association
     end
 
-    def _expect_emission_for_created_association
-      expect :info, :created_association
+    def _want_emission_for_created_association
+      want :info, :created_association
     end
 
-    def _expect_emissions_for_created_nodes
+    def _want_emissions_for_created_nodes
 
-      2.times { expect :info, :created_node }
+      2.times { want :info, :created_node }
     end
 
-    def _expect_emissions_for_found_existing_nodes  # 1x
+    def _want_emissions_for_found_existing_nodes  # 1x
       2.times do
-        expect :info, :found_existing_node
+        want :info, :found_existing_node
       end
       NIL
     end
 
-    def _expect_emission_for_wrote_resource
-      expect :success, :wrote_resource
+    def _want_emission_for_wrote_resource
+      want :success, :wrote_resource
     end
 
     def call_API_for_associate_ from_s, to_s, * xtra

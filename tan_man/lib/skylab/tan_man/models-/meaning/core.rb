@@ -29,14 +29,14 @@ module Skylab::TanMan
 
         def execute
           @dry_run = nil
-          with_read_write_operator_branch_facade_ do
-            __via_operator_branch
+          with_read_write_feature_branch_facade_ do
+            __via_feature_branch
           end
         end
 
-        def __via_operator_branch
+        def __via_feature_branch
 
-          _ent = @_operator_branch_.add_meaning_by_ do |o|
+          _ent = @_feature_branch_.add_meaning_by_ do |o|
 
             o.value_string = remove_instance_variable :@value
             o.name_string = remove_instance_variable :@name
@@ -57,8 +57,8 @@ module Skylab::TanMan
         end
 
         def execute
-          __with_read_only_operator_branch_facade_ do
-            @_operator_branch_.to_meaning_entity_stream_
+          __with_read_only_feature_branch_facade_ do
+            @_feature_branch_.to_meaning_entity_stream_
           end
         end
       end
@@ -86,14 +86,14 @@ module Skylab::TanMan
         end
 
         def execute
-          with_read_write_operator_branch_facade_ do
-            __via_operator_branch
+          with_read_write_feature_branch_facade_ do
+            __via_feature_branch
           end
         end
 
-        def __via_operator_branch
+        def __via_feature_branch
 
-          @_operator_branch_.into_node_apply_meaning_by_ do |o|
+          @_feature_branch_.into_node_apply_meaning_by_ do |o|
             o.node_label = @node_label
             o.meaning_name_string = @meaning_name
             o.is_dry = remove_instance_variable :@dry_run
@@ -115,22 +115,22 @@ module Skylab::TanMan
         Home_::DocumentMagnetics_::CommonAssociations.all_
       end
 
-      def with_read_write_operator_branch_facade_
+      def with_read_write_feature_branch_facade_
 
         with_mutable_digraph_ do
-          @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_mutable_digraph_
+          @_feature_branch_ = Here_::MeaningsFeatureBranchFacade_.new @_mutable_digraph_
           x = yield
-          remove_instance_variable :@_operator_branch_
+          remove_instance_variable :@_feature_branch_
           x
         end
       end
 
-      def __with_read_only_operator_branch_facade_
+      def __with_read_only_feature_branch_facade_
 
         with_immutable_digraph_ do
-          @_operator_branch_ = Here_::MeaningsOperatorBranchFacade_.new @_immutable_digraph_
+          @_feature_branch_ = Here_::MeaningsFeatureBranchFacade_.new @_immutable_digraph_
           x = yield
-          remove_instance_variable :@_operator_branch_
+          remove_instance_variable :@_feature_branch_
           x
         end
       end

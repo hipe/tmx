@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_CLI_or_API
+    use :want_CLI_or_API
     use :models_meaning
 
     # (formatting in this file is currently jagged in the interest of preserving legacy for now)
@@ -88,9 +88,9 @@ module Skylab::TanMan::TestSupport
 
       it "(content (partial))" do
 
-      scn = TestSupport_::Expect_Line::Scanner.via_string s
+      scn = TestSupport_::Want_Line::Scanner.via_string s
       scn.advance_N_lines 4
-        expect_these_lines_in_array_with_trailing_newlines_ scn do |y|
+        want_these_lines_in_array_with_trailing_newlines_ scn do |y|
           y << "  # biff : baz"
           y << "  #  foo : bar"
           y << nil  # experiment: quit early
@@ -134,15 +134,15 @@ module Skylab::TanMan::TestSupport
         call_API_for_add_meaning_ s
 
         a = []
-        expect :error, :name_collision do |ev|
+        want :error, :name_collision do |ev|
           a.push ev
         end
         a.push execute
       end
     end
 
-    alias_method :_succeeds, :expect_result_from_add_is_entity__
-    alias_method :_content, :expect_content_from_add_is__
+    alias_method :_succeeds, :want_result_from_add_is_entity__
+    alias_method :_content, :want_content_from_add_is__
 
 # (7/N)
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
