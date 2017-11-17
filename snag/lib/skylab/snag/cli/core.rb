@@ -78,7 +78,7 @@ module Skylab::Snag
       def prepare_backstream_call x_a
 
         @_filesystem = Home_.lib_.system.filesystem
-        @_oes_p = handle_event_selectively
+        @_listener = handle_event_selectively
 
         @_hy = @bound.hybrid
 
@@ -108,7 +108,7 @@ module Skylab::Snag
 
         path = bx.fetch :upstream_reference
         path = Home_::Models_::NodeCollection::Nearest_path.call(
-          path, @_filesystem, & @_oes_p )
+          path, @_filesystem, & @_listener )
 
         # )
 
@@ -190,7 +190,7 @@ module Skylab::Snag
       def __prepare_backstream_for_report bx
 
         o = Home_::Models_::NodeCollection::Magnetics::Expression_of_OpenNodes_via_Arguments.
-          new( & @_oes_p )
+          new( & @_listener )
 
         o.filesystem = @_filesystem
         o.kernel = application_kernel
@@ -205,7 +205,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_opening bx
 
-        o = Home_::Models_::Node::Actions::Open.new( application_kernel, & @_oes_p )
+        o = Home_::Models_::Node::Actions::Open.new( application_kernel, & @_listener )
 
         o.argument_box = bx
 

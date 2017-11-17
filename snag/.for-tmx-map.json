@@ -1,6 +1,6 @@
 {
-  "after": "git_viz",
-  "category": "actually useful",
+  "after": "task_examples",
+  "category": "project management experiments",
   "framework": "[br]",
   "is potentially interesting application": true,
   "sigil": "sn"

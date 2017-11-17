@@ -8,8 +8,8 @@ class Skylab::Task
       # using plain old regex, and how the heck you are supposed to develop
       # this way. it is a MUST READ if you're reading this.
 
-      def initialize st, & oes_p
-        @on_event_selectively = oes_p
+      def initialize st, & p
+        @listener = p
         @token_stream = st
       end
 
@@ -235,10 +235,10 @@ class Skylab::Task
 
         o = o.finish
 
-        oes_p = @on_event_selectively
+        p = @listener
 
-        if oes_p
-          oes_p.call( * o.get_channel ) do
+        if p
+          p.call( * o.get_channel ) do
             o
           end
           UNABLE_

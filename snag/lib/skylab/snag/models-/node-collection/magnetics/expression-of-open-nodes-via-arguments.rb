@@ -4,8 +4,8 @@ module Skylab::Snag
 
     class Magnetics::Expression_of_OpenNodes_via_Arguments
 
-      def initialize & oes_p
-        @oes_p = oes_p
+      def initialize & p
+        @listener = p
       end
 
       attr_writer(
@@ -26,7 +26,7 @@ module Skylab::Snag
 
       def execute
 
-        _st = @kernel.call :criteria, :to_criteria_stream, & @oes_p
+        _st = @kernel.call :criteria, :to_criteria_stream, & @listener
 
         s = 'open'
         found = _st.flush_until_detect do | crit |
@@ -49,7 +49,7 @@ module Skylab::Snag
           :issues_via_criteria,
           :criteria, _s_a,
           :upstream_reference, @upstream_reference,
-          & @oes_p
+          & @listener
 
         if st
           if @number_limit

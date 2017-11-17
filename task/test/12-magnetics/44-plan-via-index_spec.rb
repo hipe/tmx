@@ -88,7 +88,7 @@ module Skylab::Task::TestSupport
       shared_subject :state_ do
 
         _nodes
-        el = Home_::Common_.test_support::Expect_Emission::Log.new
+        el = Home_::Common_.test_support::Want_Emission::Log.new
         _ = el.handle_event_selectively
         _task = X_G_Circ_A.new( & _ )
         x = _task.execute_as_front_task
@@ -97,7 +97,7 @@ module Skylab::Task::TestSupport
 
         _ev = _em.cached_event_value
 
-        _expag = common_expression_agent_for_expect_emission_
+        _expag = common_expression_agent_for_want_emission_
 
         _s_a = _ev.express_into_under [], _expag
 

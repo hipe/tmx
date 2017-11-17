@@ -9,27 +9,27 @@ module Skylab::Snag::TestSupport
 
     it "regular style - works, is hard to read and boring" do
       invoke( * _action, '-p', _common_pattern, _some_todos )
-      __expect_regular_style
+      __want_regular_style
     end
 
-    def __expect_regular_style
+    def __want_regular_style
 
-      expect :o, %r{/ferbis\.code:2:beta %to-dew\z}
-      expect :o, %r{jerbis/one\.code:1:line one\b}
-      expect :o, %r{jerbis/one\.code:3:line three\b}
-      expect :e, /\A\(3 to dos total\)\z/
+      want :o, %r{/ferbis\.code:2:beta %to-dew\z}
+      want :o, %r{jerbis/one\.code:1:line one\b}
+      want :o, %r{jerbis/one\.code:3:line three\b}
+      want :e, /\A\(3 to dos total\)\z/
 
-      expect_succeed
+      want_succeed
     end
 
     it "black and white tree" do
 
       invoke( * _action, '-t', '-p', _common_pattern, _some_todos )
 
-      __expect_black_and_white_tree
+      __want_black_and_white_tree
     end
 
-    def __expect_black_and_white_tree
+    def __want_black_and_white_tree
 
       on_stream :o
       o = flush_to_content_scanner
@@ -37,15 +37,15 @@ module Skylab::Snag::TestSupport
       o.next_line.should eql "├── ferbis.code\n"
       o.finish.should eql 5
 
-      _expect_common_finish
+      _want_common_finish
     end
 
     it "the `show_command` modifier short-circuits" do
 
       invoke( * _action, '--show-command', '-p', 'zipperly', _some_todos )
 
-      expect :o, /\Agenerated `find` command: "find -[a-zA-Z]\b/
-      expect_result_for_success
+      want :o, /\Agenerated `find` command: "find -[a-zA-Z]\b/
+      want_result_for_success
     end
 
     it "colorized tree" do
@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport
       o.next_line[ 0, 15 ].should eql "│  └── \e[1;33m2"
       o.finish.should eql 4
 
-      _expect_common_finish
+      _want_common_finish
     end
 
     it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
@@ -69,9 +69,9 @@ module Skylab::Snag::TestSupport
 
       cli.invoke 'snag', 'ping'
 
-      cli.expect_on_stderr "hello from snag.\n"
+      cli.want_on_stderr "hello from snag.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     define_method :_action, -> do
@@ -90,10 +90,10 @@ module Skylab::Snag::TestSupport
       Fixture_tree_[ :some_todos ]
     end
 
-    def _expect_common_finish
+    def _want_common_finish
       on_stream :e
-      expect "(found 3 to do's total)"
-      expect_succeed
+      want "(found 3 to do's total)"
+      want_succeed
     end
   end
 end

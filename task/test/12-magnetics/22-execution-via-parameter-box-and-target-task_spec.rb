@@ -6,7 +6,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     context "parameters - as [fi]-style hash.." do
 

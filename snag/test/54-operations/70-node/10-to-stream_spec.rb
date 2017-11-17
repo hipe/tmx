@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operatons - node - to-stream" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "upstream identifer not resolved - you won't see it till you gets" do
 
@@ -16,7 +16,7 @@ module Skylab::Snag::TestSupport
       _x = st.gets
       _x.should  eql false
 
-      expect_not_OK_event :stat_error
+      want_not_OK_event :stat_error
     end
 
     it "uses flyweighting" do
@@ -68,13 +68,13 @@ module Skylab::Snag::TestSupport
       call_API :node, :to_stream,
         :identifier, '-12'
 
-      _em = expect_not_OK_event :expecting_number
+      _em = want_not_OK_event :expecting_number
 
       black_and_white( _em.cached_event_value ).should eql(
         "'node-identifier-number-component' #{
          }must be a non-negative integer, had \"-12\"" )
 
-      expect_fail
+      want_fail
     end
 
     it "`identifier` (RESULT SHAPE IS EXPERIMENTAL)" do
@@ -83,7 +83,7 @@ module Skylab::Snag::TestSupport
         :identifier, '0002',
         :upstream_reference, _alpha_path
 
-      expect_no_events
+      want_no_events
       st = @result.body.to_business_row_stream_
 
       st.gets.s.should eql "[#002]       #done wizzle bizzle 2013-11-11\n"

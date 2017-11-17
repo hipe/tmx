@@ -6,7 +6,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_
@@ -26,7 +26,7 @@ module Skylab::TaskExamples::TestSupport
 
         _from = non_existent_file_path_
         _to = other_non_existent_file_path_
-        _expect_emission _from, _to
+        _want_emission _from, _to
       end
 
       it "fails" do
@@ -47,7 +47,7 @@ module Skylab::TaskExamples::TestSupport
 
         _from = one_existent_file_path_
         _to = other_existent_file_path_
-        _expect_emission _from, _to
+        _want_emission _from, _to
       end
 
       it "fails" do
@@ -70,7 +70,7 @@ module Skylab::TaskExamples::TestSupport
         _from = td.touch 'za-za'
         _to = ::File.join( td.path, 'foo-foo' )
 
-        _expect_emission _from, _to
+        _want_emission _from, _to
       end
 
       it "succeeds" do
@@ -82,7 +82,7 @@ module Skylab::TaskExamples::TestSupport
       end
     end
 
-    def _expect_emission from, to
+    def _want_emission from, to
 
       state_where_emission_is_expected_(
         :filesystem, real_filesystem_,

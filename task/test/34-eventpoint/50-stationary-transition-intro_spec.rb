@@ -59,10 +59,10 @@ module Skylab::Task::TestSupport
       end
 
       against_path_expect_steps_ _path do
-        expect_step_ :_ag_bu, :A, :B
-        expect_step_ :_ag_qvi_ONE, :B, :B
-        expect_step_ :_ag_qvi_TWO, :B, :B
-        expect_step_ :_ag_bu, :B, :C
+        want_step_ :_ag_bu, :A, :B
+        want_step_ :_ag_qvi_ONE, :B, :B
+        want_step_ :_ag_qvi_TWO, :B, :B
+        want_step_ :_ag_bu, :B, :C
       end
     end
 

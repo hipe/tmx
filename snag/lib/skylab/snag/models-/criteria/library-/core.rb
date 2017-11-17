@@ -94,12 +94,12 @@ module Skylab::Snag
         end
       end
 
-      Parse_highest_scoring_candidate_ = -> in_st, ada_st, oes_p, & on_p do
+      Parse_highest_scoring_candidate_ = -> in_st, ada_st, p, & on_p do
 
         # ( :+#abstraction-candidate would become [#pl-003] )
 
         cand_a = Produce_highest_scoring_candidates_[
-          in_st, ada_st, oes_p, & on_p ]
+          in_st, ada_st, p, & on_p ]
 
         case 1 <=> cand_a.length
         when 0
@@ -114,14 +114,14 @@ module Skylab::Snag
         end
       end
 
-      Produce_highest_scoring_candidates_ = -> in_st, ada_st, oes_p, & on_p do
+      Produce_highest_scoring_candidates_ = -> in_st, ada_st, p, & on_p do
 
         d = in_st.current_index
         e_a = nil
         cand_a = []
         max = 0
 
-        cache_expectations = if oes_p
+        cache_expectations = if p
           -> * i_a, & ev_p do
             e_a ||= []
             e_a.push [ i_a, ev_p ]
@@ -155,7 +155,7 @@ module Skylab::Snag
 
           if e_a  # near [#012]
             e_a.each do | i_a_, ev_p_ |
-              oes_p.call( * i_a_, & ev_p_ )
+              p.call( * i_a_, & ev_p_ )
             end
           end
 
@@ -174,7 +174,7 @@ module Skylab::Snag
 
       Candidate___ = ::Struct.new :distance, :output_node, :adapter
 
-      Parse_static_sequence_ = -> in_st, s_a, & oes_p do
+      Parse_static_sequence_ = -> in_st, s_a, & p do
 
         # ~ :+#abstraction-candidate :[#pa-008].
 
@@ -187,9 +187,9 @@ module Skylab::Snag
           s = s_a.fetch d_
           if in_st.no_unparsed_exists  # reached end of input prematurely
 
-            if oes_p
+            if p
               d__ = in_st.current_index
-              oes_p.call :error, :expecting do
+              p.call :error, :expecting do
 
                 Expecting_[ d__, s, in_st ]
               end
@@ -201,9 +201,9 @@ module Skylab::Snag
 
           if s != _s_  # if doesn't match at this column, we are done.
 
-            if oes_p
+            if p
               d__ = in_st.current_index
-              oes_p.call :error, :expecting do
+              p.call :error, :expecting do
 
                 Expecting_[ d__, s, in_st ]
               end
@@ -235,7 +235,7 @@ module Skylab::Snag
 
         last = x_a.length - 3
 
-        -> in_st, & oes_p do
+        -> in_st, & p do
 
           if in_st.unparsed_exists
 
@@ -271,7 +271,7 @@ module Skylab::Snag
             if did_match
               in_st.advance_one
               x
-            elsif oes_p
+            elsif p
               self._FUN_AND_EASY  # near [#012]
             end
           end

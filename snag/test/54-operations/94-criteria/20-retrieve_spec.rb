@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - criteria - retrieve" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :criteria_operations
 
     it "use a persistent criteria" do

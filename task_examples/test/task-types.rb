@@ -85,7 +85,7 @@ module Skylab::TaskExamples::TestSupport
 
       # -- parametrically structural assertion
 
-      def expect_missing_required_attributes_are_ * sym_a
+      def want_missing_required_attributes_are_ * sym_a
 
         o = state_
         false == o.result or fail
@@ -198,7 +198,7 @@ module Skylab::TaskExamples::TestSupport
 
     module Instance_Methods__
 
-      def common_expression_agent_for_expect_emission_
+      def common_expression_agent_for_want_emission_
         Home_.lib_.brazen::API.expression_agent_instance
       end
     end

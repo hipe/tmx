@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event, :ignore, :find_command_args
+    use :want_event, :ignore, :find_command_args
 
     it "one fine | multiple matches on one line | multiple patterns " do
 
@@ -72,12 +72,12 @@ module Skylab::Snag::TestSupport
 
       _st.gets.should be_nil
 
-      __expect_event_about_did_not_match
+      __want_event_about_did_not_match
     end
 
-    def __expect_event_about_did_not_match
+    def __want_event_about_did_not_match
 
-      expect_neutral_event :did_not_match do | ev |
+      want_neutral_event :did_not_match do | ev |
 
         ev = ev.to_event
 
@@ -89,7 +89,7 @@ module Skylab::Snag::TestSupport
         ev.line[ -6 .. -1 ].should eql "a tag\n"
       end
 
-      expect_no_more_events
+      want_no_more_events
     end
   end
 end

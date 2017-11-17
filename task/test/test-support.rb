@@ -83,7 +83,7 @@ module Skylab::Task::TestSupport
       o
     end
 
-    def common_expression_agent_for_expect_emission_
+    def common_expression_agent_for_want_emission_
       Home_.lib_.brazen::API.expression_agent_instance
     end
 
@@ -109,7 +109,7 @@ module Skylab::Task::TestSupport
       state_.message
     end
 
-    def state_for_expect_emission
+    def state_for_want_emission
       state_
     end
   end
@@ -122,8 +122,8 @@ module Skylab::Task::TestSupport
 
   # -- these
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   module Magnetics_CLI

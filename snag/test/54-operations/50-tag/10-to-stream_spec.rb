@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - tag - to-stream", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :byte_up_and_downstreams
 
     context "(with this manifest)" do
@@ -16,13 +16,13 @@ module Skylab::Snag::TestSupport
           :upstream_reference, :xxx,
           :node_identifier, 'Xxx'
 
-        _em = expect_not_OK_event :expecting_number
+        _em = want_not_OK_event :expecting_number
 
         black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
            }must be a non-negative integer, had \"Xxx\"" )
 
-        expect_fail
+        want_fail
       end
 
       it "ok with two tags" do

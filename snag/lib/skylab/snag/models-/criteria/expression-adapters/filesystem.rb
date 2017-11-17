@@ -11,12 +11,12 @@ module Skylab::Snag
         end
       end  # >>
 
-      def initialize a, & oes_p_p
+      def initialize a, & p_p
 
         @col_x, @word_array, @ent, @tmpfile_sessioner, @FS = a
 
-        if oes_p_p
-          @_oes_p_p = oes_p_p
+        if p_p
+          @_listenerer = p_p
         end
 
         @dir_path = @col_x.startingpoint_path
@@ -85,9 +85,9 @@ module Skylab::Snag
         # it's otherwise bad design to have this look identitcal to a non-
         # saving criteria run. so we emit something here "manually":
 
-        _oes_p = @_oes_p_p[ self ]
+        _p = @_listenerer[ self ]
 
-        _oes_p.call :info, :added_entity do
+        _p.call :info, :added_entity do
 
           _nf = @col_x.to_model_name  # why we added [#sy-008.2] (for us)
 

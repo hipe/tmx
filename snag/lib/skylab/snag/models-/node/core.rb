@@ -88,40 +88,40 @@ module Skylab::Snag
 
     # -- Operations (sort of)
 
-    def prepend_string s, & oes_p
+    def prepend_string s, & p
 
-      edit :prepend, :string, s, & oes_p
+      edit :prepend, :string, s, & p
     end
 
-    def append_string s, & oes_p
+    def append_string s, & p
 
-      edit :append, :string, s, & oes_p
+      edit :append, :string, s, & p
     end
 
-    def prepend_tag symbol, & oes_p
+    def prepend_tag symbol, & p
 
-      edit :prepend, :tag, symbol, & oes_p
+      edit :prepend, :tag, symbol, & p
     end
 
-    def append_tag symbol, & oes_p
+    def append_tag symbol, & p
 
-      edit :append, :tag, symbol, & oes_p
+      edit :append, :tag, symbol, & p
     end
 
-    def remove_tag symbol, & oes_p
+    def remove_tag symbol, & p
 
-      edit :remove, :tag, symbol, & oes_p
+      edit :remove, :tag, symbol, & p
     end
 
-    def edit * x_a, & oes_p
+    def edit * x_a, & p
 
       # this is a boundary between cold and hot [#ac-006]
 
-      _oes_p_p = -> _ do
-        oes_p
+      _p_p = -> _ do
+        p
       end
 
-      ACS_[].edit x_a, self, & _oes_p_p
+      ACS_[].edit x_a, self, & _p_p
     end
 
     # -- Components
@@ -173,37 +173,37 @@ module Skylab::Snag
       _route_test :absent, * x_a, & x_p
     end
 
-    def expect_component__present__ qk, & x_p
+    def want_component__present__ qk, & x_p
       _route_test :present, qk, & x_p
     end
 
-    def expect_component__absent__ qk, & x_p
+    def want_component__absent__ qk, & x_p
       _route_test :absent, qk, & x_p
     end
 
     def _route_test adj, qk, & x_p
 
-      send :"__expect__#{ qk.name.as_variegated_symbol }__is__#{ adj }__",
+      send :"__want__#{ qk.name.as_variegated_symbol }__is__#{ adj }__",
         qk, & x_p
     end
 
-    def __expect__tag__is__present__ qk, & oes_p
+    def __want__tag__is__present__ qk, & p
 
       tag = qk.value
       existing = first_equivalent_item tag
       if existing
         ACHIEVED_
       else
-        ACS_[].send_component_not_found qk, self, & oes_p
+        ACS_[].send_component_not_found qk, self, & p
       end
     end
 
-    def __expect__tag__is__absent__ qk, & oes_p
+    def __want__tag__is__absent__ qk, & p
 
       tag = qk.value
       existing = first_equivalent_item tag
       if existing
-        ACS_[].send_component_already_added qk, self, & oes_p
+        ACS_[].send_component_already_added qk, self, & p
       else
         ACHIEVED_
       end
@@ -226,24 +226,24 @@ module Skylab::Snag
       x || self._COVER_ME  # as soon as you have valid false-ishes, things change
     end
 
-    def __prepend__component qk, & oes_p_p
+    def __prepend__component qk, & p_p
 
-      _mutable_body_for_mutation_session.prepend_component_ qk, & oes_p_p
+      _mutable_body_for_mutation_session.prepend_component_ qk, & p_p
     end
 
-    def __append__component qk, & oes_p_p
+    def __append__component qk, & p_p
 
-      _mutable_body_for_mutation_session.append_component_ qk, & oes_p_p
+      _mutable_body_for_mutation_session.append_component_ qk, & p_p
     end
 
-    def __remove__component qk, & oes_p_p
+    def __remove__component qk, & p_p
 
-      o = _mutable_body_for_mutation_session.remove_component_ qk, & oes_p_p
+      o = _mutable_body_for_mutation_session.remove_component_ qk, & p_p
       if o
 
-        _oes_p = oes_p_p[ self ]
+        _p = p_p[ self ]
 
-        ACS_[].send_component_removed qk, self, & _oes_p
+        ACS_[].send_component_removed qk, self, & _p
       end
       o
     end
@@ -482,8 +482,8 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_component scn, & oes_p_p
-          Interpret_mixed_message___[ scn, & oes_p_p ]
+        def interpret_component scn, & p_p
+          Interpret_mixed_message___[ scn, & p_p ]
         end
       end  # >>
     end
@@ -514,12 +514,12 @@ module Skylab::Snag
       end
     end
 
-    Normalize_ID_ = -> qkn, & oes_p do  # 1x. eventing is per [br] API
+    Normalize_ID_ = -> qkn, & p do  # 1x. eventing is per [br] API
 
       x = ( qkn.value if qkn.is_known_known )
       if x
 
-        o = HomeModels__::NodeIdentifier.via_user_value_ x, & oes_p  # yes
+        o = HomeModels__::NodeIdentifier.via_user_value_ x, & p  # yes
 
         if o
           Common_::KnownKnown[ o ]

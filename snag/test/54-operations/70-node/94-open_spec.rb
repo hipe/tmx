@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - node - open" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :my_tmpdir_
     use :byte_up_and_downstreams
 
@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
 O
       )
 
-      ev = expect_OK_event( :wrote ).cached_event_value.to_event
+      ev = want_OK_event( :wrote ).cached_event_value.to_event
       ev.bytes or fail
       ev.path or fail
 

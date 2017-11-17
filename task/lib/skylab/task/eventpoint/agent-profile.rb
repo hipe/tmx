@@ -8,7 +8,7 @@ class Skylab::Task
 
     class Dispatcher < Base_Dispatcher___
 
-      def initialize resources, & oes_p
+      def initialize resources, & p
 
         @all_capabilities = {}
 
@@ -60,7 +60,7 @@ class Skylab::Task
 
         Me_::Modality_Adapters_::ARGV::Produce_bound_call.new(
 
-          input_x, @state_machine, self, & @on_event_selectively
+          input_x, @state_machine, self, & @listener
 
         ).execute
       end
@@ -72,8 +72,8 @@ class Skylab::Task
 
     class << self
 
-      def express_help_into rsc, & oes_p
-        Me_::Events_::Express_Help.new( rsc, & oes_p ).execute
+      def express_help_into rsc, & p
+        Me_::Events_::Express_Help.new( rsc, & p ).execute
       end
     end  # >>
 

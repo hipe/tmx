@@ -7,7 +7,7 @@ module Skylab::Snag
       def initialize nu, & x_p
 
         if x_p
-          @_oes_p = x_p
+          @_listener = x_p
         end
 
         @node_upstream = nu
@@ -177,7 +177,7 @@ module Skylab::Snag
       end
 
       def _send_info_string  s
-        @_oes_p.call :info, :expression do | y |
+        @_listener.call :info, :expression do | y |
           y << s
         end
         NIL_

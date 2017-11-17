@@ -5,36 +5,36 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - node - close" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :byte_up_and_downstreams
     use :nodes
 
     it "closing one with a funny looking name - whines gracefully" do
 
       _against 'abc'
-      expect_failed_by :expecting_number
+      want_failed_by :expecting_number
     end
 
     it "closing one that doesn't exist - whines gracefully" do
 
       _against '867'
-      expect_failed_by :component_not_found
+      want_failed_by :component_not_found
     end
 
     it "closing one that is already closed - whines gracefully" do
 
       _against '002'
 
-      expect_not_OK_event :component_not_found,
+      want_not_OK_event :component_not_found,
         "node [#2] does not have tag \"#open\""
 
       _expect :component_already_added, "node [#2] already has tag #done"
 
-      expect_neutralled
+      want_neutralled
     end
 
-    def expression_agent_for_expect_emission
-      black_and_white_expression_agent_for_expect_emission_normally
+    def expression_agent_for_want_emission
+      black_and_white_expression_agent_for_want_emission_normally
     end
 
     it "closing one that has no taggings at all - works, reindents" do
@@ -43,12 +43,12 @@ module Skylab::Snag::TestSupport
 
       _against '001'
 
-      _em = expect_not_OK_event :component_not_found
+      _em = want_not_OK_event :component_not_found
 
       black_and_white( _em.cached_event_value ).should eql(
         "node [#1] does not have tag \"#open\"" )
 
-      expect_noded_ 1
+      want_noded_ 1
 
       scn = scanner_via_output_string_
 
@@ -66,7 +66,7 @@ module Skylab::Snag::TestSupport
       _DS_ID downstream_ID_for_output_string_ivar_
       _against '0003'
 
-      expect_OK_event :component_removed, "removed tag #open from node [#3]"
+      want_OK_event :component_removed, "removed tag #open from node [#3]"
 
       @output_s.should eql <<-O
 [#003]       #done biff bazz this 2nd will get flowed into the previous one
@@ -103,7 +103,7 @@ module Skylab::Snag::TestSupport
 
     def _expect sym, s
 
-      _em = expect_neutral_event sym
+      _em = want_neutral_event sym
 
       black_and_white( _em.cached_event_value ).should eql s
 

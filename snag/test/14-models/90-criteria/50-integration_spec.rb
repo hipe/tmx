@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - criteria - integration" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     context "(against alpha manifest)" do
 

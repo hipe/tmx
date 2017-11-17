@@ -30,7 +30,7 @@ module Skylab::Task::TestSupport
 
       # -- assertion
 
-      def expect_stack_ * const_a
+      def want_stack_ * const_a
 
         _o = _begin_session
         ok, const_a_ = _o.execute
@@ -64,7 +64,7 @@ module Skylab::Task::TestSupport
         NIL
       end
 
-      def expect_failure_structure__
+      def want_failure_structure__
 
         o = _begin_session do |o_|
           o_.do_trace = true

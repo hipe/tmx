@@ -103,7 +103,7 @@ module Skylab::Snag
 
         string_value  = /[a-zA-Z_] [a-zA-Z0-9_']* /x  # Bill's_Barbecue_2015 or whatever meh
 
-        -> scn, & oes_p_p do
+        -> scn, & p_p do
 
           a = nil
 
@@ -147,9 +147,9 @@ module Skylab::Snag
 
           if a
             a.freeze
-          elsif oes_p_p
-            _oes_p = oes_p_p[ nil ]
-            _oes_p.call :error, :parse_error, :suffix_expected do
+          elsif p_p
+            _p = p_p[ nil ]
+            _p.call :error, :parse_error, :suffix_expected do
               Expecting___[ scn, :suffix ]
             end
           end

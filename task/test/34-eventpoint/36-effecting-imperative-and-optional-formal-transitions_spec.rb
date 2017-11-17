@@ -73,7 +73,7 @@ module Skylab::Task::TestSupport
 
     it "profile 2 alone won't reach an endpoint" do
 
-      _em = expect_failure_and_emission_when_find_path_by_ do |o|
+      _em = want_failure_and_emission_when_find_path_by_ do |o|
 
         o.add_pending_task :_task_that_uses_profile_2_, _agent_two
       end

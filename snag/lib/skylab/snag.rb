@@ -62,9 +62,9 @@ module Skylab::Snag
       # the uncharacteristically simple requirement that actions are built
       # with only the resources and not the "whole stack" invocation.)
 
-      _ob = @invocation_resources.microservice_operator_branch_
+      _fb = @invocation_resources.microservice_feature_branch_
 
-      oper = MTk_::ParseOperator_via[ self, _ob ]
+      oper = MTk_::ParseOperator_via[ self, _fb ]
 
       if oper
         _lt = oper.trueish_feature_value
@@ -112,7 +112,7 @@ module Skylab::Snag
       Models_::NodeCollection::FilesystemAdapter.new _filesystem
     end
 
-    def microservice_operator_branch_
+    def microservice_feature_branch_
       Operator_branch___[]
     end
 
@@ -140,7 +140,7 @@ module Skylab::Snag
 
     Require_microservice_toolkit__[]  # necessary only from some tests
 
-    MTk_::ModelCentricOperatorBranch.define do |o|
+    MTk_::ModelCentricFeatureBranch.define do |o|
 
       # (every imaginable detail of the below is explained at [#pl-011.1])
 
@@ -255,10 +255,10 @@ module Skylab::Snag
 
   # ==
 
-  INTERPRET_OUT_OF_UNDER_METHOD_ = -> x, moda, & oes_p do
+  INTERPRET_OUT_OF_UNDER_METHOD_ = -> x, moda, & p do
 
     self::ExpressionAdapters.const_get( moda.intern, false ).
-      const_get( :Interpret, false )[ x, moda, & oes_p ]
+      const_get( :Interpret, false )[ x, moda, & p ]
   end
 
   # ==

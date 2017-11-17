@@ -212,7 +212,7 @@ class Skylab::Task
 
       _cls = @index.box_module.const_get @sym, false
 
-      _cls.new( & @index.on_event_selectively )
+      _cls.new( & @index.listener )
     end
   end
 
@@ -275,7 +275,7 @@ class Skylab::Task
     def ___build_dereference index
 
       _attrs = as_attributes_
-      _ = index.on_event_selectively
+      _ = index.listener
       Home_::Models_::Parameter::Collection_as_Dependency.new @_sym, _attrs, & _
     end
 

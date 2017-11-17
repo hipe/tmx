@@ -15,7 +15,7 @@ module Skylab::Task::TestSupport
         remove_instance_variable :@STEP_SCANNER
       end
 
-      def expect_step_ mixed_id_x, from_sym, dest_sym
+      def want_step_ mixed_id_x, from_sym, dest_sym
         if @STEP_SCANNER.no_unparsed_exists
           fail __say_missing_step mixed_id_x
         else
@@ -37,13 +37,13 @@ module Skylab::Task::TestSupport
         "expected no more steps, had '#{ _.mixed_task_identifier }'"
       end
 
-      def expect_failure_and_emission_when_find_path_by_
+      def want_failure_and_emission_when_find_path_by_
 
         _pool = build_pending_execution_pool_ do |o|
           yield o
         end
 
-        expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
+        want_failure_and_emission_from_trying_to_find_path_ _pool, graph_
       end
 
       def find_path_by_
@@ -55,7 +55,7 @@ module Skylab::Task::TestSupport
         find_path_ _pool, graph_
       end
 
-      def expect_failure_and_emission_from_trying_to_find_path_ pool, graph
+      def want_failure_and_emission_from_trying_to_find_path_ pool, graph
 
         log = build_event_log_
 
@@ -92,14 +92,14 @@ module Skylab::Task::TestSupport
 
       def black_and_white_lines_of_ em
 
-        # is basically `black_and_white_expression_agent_for_expect_emission`
+        # is basically `black_and_white_expression_agent_for_want_emission`
         _for_example = expression_agent
         _wat = em.express_into_under [], _for_example
         _wat  # hi. #todo
       end
 
       def build_event_log_
-        Common_.test_support::Expect_Emission::Log.for self
+        Common_.test_support::Want_Emission::Log.for self
       end
 
       def find_path_ pool, graph

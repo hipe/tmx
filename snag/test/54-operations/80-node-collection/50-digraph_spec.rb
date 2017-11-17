@@ -6,13 +6,13 @@ module Skylab::Snag::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early  # <- oooOOOooh
+    use :want_emission_fail_early  # <- oooOOOooh
 
     context "when no nodes of interest in upstream" do
 
       it "produces an empty graph" do
 
-        expect_these_lines_in_array_ _these.last do |y|
+        want_these_lines_in_array_ _these.last do |y|
           y << _open_digraph_line
           y << _style_line
           y << _close_digraph_line
@@ -34,11 +34,11 @@ module Skylab::Snag::TestSupport
           :upstream_reference, Fixture_file_[ :rochambeaux_mani ],
         )
 
-        expect :info, :expression do |y|
+        want :info, :expression do |y|
           expressed_lines = y
         end
 
-        expect_result ACHIEVED_
+        want_result ACHIEVED_
 
         [ expressed_lines, produced_lines ]
       end
@@ -48,7 +48,7 @@ module Skylab::Snag::TestSupport
 
       it "OK" do
 
-        expect_these_lines_in_array_ _these.last do |y|
+        want_these_lines_in_array_ _these.last do |y|
 
           y << _open_digraph_line
 
@@ -74,7 +74,7 @@ module Skylab::Snag::TestSupport
           :upstream_reference, Fixture_file_[ :for_digraph_simple_mani ],
         )
 
-        expect_result ACHIEVED_
+        want_result ACHIEVED_
 
         [ produced_lines ]
       end

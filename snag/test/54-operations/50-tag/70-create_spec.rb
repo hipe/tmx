@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - tag - create" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :byte_up_and_downstreams
     use :nodes
 
@@ -15,50 +15,50 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 'ziffy', :tag, :x
 
-        _em = expect_not_OK_event :expecting_number
+        _em = want_not_OK_event :expecting_number
 
         black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
             }must be a non-negative integer, had \"ziffy\"" )
 
-        expect_fail
+        want_fail
       end
 
       it "the node identifier's referrant must resolve" do
 
         _call :node_identifier, '00002', :tag, :x
 
-        _em = expect_not_OK_event :component_not_found
+        _em = want_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should match(
           %r(\Athere is no node "\[#2\]") )
 
-        expect_fail
+        want_fail
       end
 
       it "the tag must be well-formed" do
 
         _call :node_identifier, 3, :tag, 'foo bar'
 
-        _em = expect_not_OK_event :invalid_tag_stem
+        _em = want_not_OK_event :invalid_tag_stem
 
         black_and_white( _em.cached_event_value ).should eql(
           "tag must be alphanumeric separated with dashes - #{
             }invalid tag name: \"#foo bar\"" )
 
-        expect_fail
+        want_fail
       end
 
       it "it won't let you add a tag redundantly [#001] 'hi'" do
 
         _call :node_identifier, 1, :tag, 'hi'
 
-        _em = expect_neutral_event :component_already_added
+        _em = want_neutral_event :component_already_added
 
         black_and_white( _em.cached_event_value ).should eql(
           "node [#1] already has tag #hi" )
 
-        expect_fail
+        want_fail
       end
 
       it "to [#07] append tag '2014-ok'" do
@@ -75,7 +75,7 @@ module Skylab::Snag::TestSupport
         scn.next_line.should eql "[#01] this is one #hi\n"
         scn.next_line.should be_nil
 
-        expect_noded_ 7
+        want_noded_ 7
       end
 
       def _call * x_a, & x_p

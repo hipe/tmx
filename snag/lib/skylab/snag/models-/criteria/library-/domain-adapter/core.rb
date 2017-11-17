@@ -18,7 +18,7 @@ module Skylab::Snag
 
             mutable_me = __begin_mutable_me
 
-            scn = invo_rsx.microservice_operator_branch_.to_symbolish_reference_scanner
+            scn = invo_rsx.microservice_feature_branch_.to_symbolish_reference_scanner
 
             until scn.no_unparsed_exists
 
@@ -99,21 +99,21 @@ module Skylab::Snag
 
         # ~ public API for private ancillary nodes (actors etc)
 
-        def interpret__model_reflection__via__singular_model_name__ in_st, & oes_p
+        def interpret__model_reflection__via__singular_model_name__ in_st, & p
 
-          _produce_one_model_reflection_by in_st, oes_p do | model_rfx |
+          _produce_one_model_reflection_by in_st, p do | model_rfx |
             model_rfx.to_item_for_singular_name
           end
         end
 
-        def interpret__model_reflection__via__plural_model_name__ in_st, & oes_p
+        def interpret__model_reflection__via__plural_model_name__ in_st, & p
 
-          _produce_one_model_reflection_by in_st, oes_p do | model_rfx |
+          _produce_one_model_reflection_by in_st, p do | model_rfx |
             model_rfx.to_item_for_plural_name
           end
         end
 
-        def _produce_one_model_reflection_by in_st, oes_p, & rfx_p
+        def _produce_one_model_reflection_by in_st, p, & rfx_p
 
           _f = Home_.lib_.parse_lib.function(
 
@@ -124,7 +124,7 @@ module Skylab::Snag
             _to_model_reflection_stream( & rfx_p )
           end
 
-          pair = _f.output_node_via_input_stream in_st, & oes_p
+          pair = _f.output_node_via_input_stream in_st, & p
           pair and pair.value
         end
 
@@ -146,9 +146,9 @@ module Skylab::Snag
           Produce_highest_scoring_candidates_.call(
               in_st,
               _ada_st,
-              x_p ) do | in_st_, f, & oes_p_ |
+              x_p ) do | in_st_, f, & p_ |
 
-            f.interpret_verb_phrase_head_out_of_under_ in_st_, g_ctxt, & oes_p_
+            f.interpret_verb_phrase_head_out_of_under_ in_st_, g_ctxt, & p_
           end
         end
 

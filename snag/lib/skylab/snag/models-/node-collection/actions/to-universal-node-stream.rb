@@ -23,7 +23,7 @@ module Skylab::Snag
           x
         end
 
-        @_oes_p = -> sym, * i_a, & ev_p do
+        @_listener = -> sym, * i_a, & ev_p do
           ev = ev_p[]
           if :info != sym
             e.write "error: "
@@ -53,7 +53,7 @@ module Skylab::Snag
         @fn = COMMON_MANIFEST_FILENAME_
 
         path = Walk_upwards_to_find_nearest_surrounding_path_[
-          @dir, @fn, self._FILESYSTEM, & @_oes_p ]
+          @dir, @fn, self._FILESYSTEM, & @_listener ]
 
         if path
           @_path = path
@@ -74,7 +74,7 @@ module Skylab::Snag
 
         @_mani_st = Common_::Stream.via_nonsparse_array _s_a do | path |
 
-           Models_::NodeCollection.via_path path, & @_oes_p
+           Models_::NodeCollection.via_path path, & @_listener
         end
 
         ACHIEVED_

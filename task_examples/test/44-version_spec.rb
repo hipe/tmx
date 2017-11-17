@@ -28,7 +28,7 @@ module Skylab::TaskExamples::TestSupport
       shared_subject :state_ do
 
         _str = "abc1.2.3def4.5"
-        el = Common_.test_support::Expect_Emission::Log.new
+        el = Common_.test_support::Want_Emission::Log.new
         _ = el.handle_event_selectively
         _x = _subject.parse _str, & _
         _a = el.flush_to_array
@@ -41,7 +41,7 @@ module Skylab::TaskExamples::TestSupport
 
       it "emits" do
 
-        Expect_Event[ singleton_class ]  # wee hah
+        Want_Event[ singleton_class ]  # wee hah
 
         _be_msg = match %r(\Amultiple version strings matched)
 

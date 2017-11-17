@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - criteria - library - disambiguation" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :criteria_magnetics
 
     it "build this adapter" do
@@ -18,14 +18,14 @@ module Skylab::Snag::TestSupport
       st = input_stream_via_array %w( is blue and pink or green )
 
       _x = against_ st, & handle_event_selectively_  # , & _ignore_expecting
-      __expect_result_for_ambiguity _x, st
+      __want_result_for_ambiguity _x, st
     end
 
-    def __expect_result_for_ambiguity x, st
+    def __want_result_for_ambiguity x, st
 
       x.should eql false
 
-      _em = expect_not_OK_event :ambiguity
+      _em = want_not_OK_event :ambiguity
 
       black_and_white( _em.cached_event_value ).should eql(
         "\"or\" is ambiguous here because of a previous \"and\"" )
@@ -60,7 +60,7 @@ module Skylab::Snag::TestSupport
 
       _x = against_ st, & handle_event_selectively_
 
-      expect_not_OK_event :ambiguity
+      want_not_OK_event :ambiguity
       _x.should eql false
     end
 
@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
 
       _s = visual_tree_against_ st
 
-      _expect_parsed_everything st
+      _want_parsed_everything st
 
       _s.should eql __tree_viz_for_branch_down
     end
@@ -143,7 +143,7 @@ module Skylab::Snag::TestSupport
       end
     end
 
-    def _expect_parsed_everything st
+    def _want_parsed_everything st
 
       if st.unparsed_exists
 

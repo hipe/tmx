@@ -5,20 +5,20 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - date" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     # -
       it "invalid" do
 
         subject 'foo'
-        expect_not_OK_event :invalid_date, 'invalid date: (ick "foo")'
-        expect_fail
+        want_not_OK_event :invalid_date, 'invalid date: (ick "foo")'
+        want_fail
       end
 
       it "valid" do
 
         subject '1234-56-78'
-        expect_no_more_events
+        want_no_more_events
         @result.value.string.should eql '1234-56-78'
       end
 

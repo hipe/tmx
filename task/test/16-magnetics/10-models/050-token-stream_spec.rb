@@ -28,13 +28,13 @@ module Skylab::Task::TestSupport
 
       it "end on a separator" do
 
-        _expect_error 'foo, bar, ', _COMMON_ERROR,
+        _want_error 'foo, bar, ', _COMMON_ERROR,
           /\Aexpecting word [^ ]+ at end of input\z/
       end
 
       it "on word with invalid chars" do
 
-        _expect_error "foo, BAR", _COMMON_ERROR,
+        _want_error "foo, BAR", _COMMON_ERROR,
           /\Aexpecting word [^ ]+ at "BAR"\z/
       end
 
@@ -63,12 +63,12 @@ module Skylab::Task::TestSupport
 
       it "weird extension" do
 
-        _expect_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
+        _want_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
       end
 
       it "no extension" do
 
-        _expect_error 'foo', _COMMON_ERROR,
+        _want_error 'foo', _COMMON_ERROR,
           /\Aexpecting end expression [^ ]+ at end of input\z/
       end
 
@@ -96,7 +96,7 @@ module Skylab::Task::TestSupport
 
       it "weird extension (same)" do
 
-        _expect_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
+        _want_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
       end
 
       it "no extension - in contrast to the other, here it is ok" do
@@ -122,7 +122,7 @@ module Skylab::Task::TestSupport
 
 
 
-    def _expect_error input_string, error_category_sym, message_rx=nil
+    def _want_error input_string, error_category_sym, message_rx=nil
 
       _tok = _tokenizer
 

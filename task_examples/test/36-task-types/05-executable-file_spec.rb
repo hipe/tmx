@@ -6,7 +6,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_

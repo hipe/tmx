@@ -6,7 +6,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_
@@ -35,7 +35,7 @@ module Skylab::TaskExamples::TestSupport
         end
 
         it "just reports the output" do
-          _expect_labelled_as_version 'version 1.2.34 is the version'
+          _want_labelled_as_version 'version 1.2.34 is the version'
         end
 
         def _parse_with
@@ -54,7 +54,7 @@ module Skylab::TaskExamples::TestSupport
           end
 
           it "shows the matched portion of the output" do
-            _expect_labelled_as_version '1.3.78'
+            _want_labelled_as_version '1.3.78'
           end
 
           def _version_from
@@ -139,7 +139,7 @@ module Skylab::TaskExamples::TestSupport
 
           it "says that it matches" do
 
-            __expect_OK 'version 1.2.1 is in range 1.2+'
+            __want_OK 'version 1.2.1 is in range 1.2+'
           end
 
           def _version_from
@@ -235,18 +235,18 @@ module Skylab::TaskExamples::TestSupport
       eql "using provided regex, couldn't parse version from #{ _ }"
     end
 
-    def _expect_labelled_as_version s
+    def _want_labelled_as_version s
 
       payload_expression_message_.should eql "version: #{ s }"
     end
 
-    def __expect_OK s
+    def __want_OK s
 
       info_expression_message_.should eql "version ok: #{ s }"
     end
 
-    def expression_agent_for_expect_emission
-      common_expression_agent_for_expect_emission_
+    def expression_agent_for_want_emission
+      common_expression_agent_for_want_emission_
     end
   end
 end

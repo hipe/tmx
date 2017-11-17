@@ -8,7 +8,7 @@ module Skylab::Snag::TestSupport
     # because of the manner in which is it tested it must be here instead.)
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "no false-ish'es (false)" do  # #lends-coverage to [#pl-008.2]
 
@@ -52,11 +52,11 @@ module Skylab::Snag::TestSupport
 
     def _expect sym, s
 
-      ev = expect_not_OK_event( sym ).cached_event_value
+      ev = want_not_OK_event( sym ).cached_event_value
 
       black_and_white( ev ).should eql s
 
-      expect_fail
+      want_fail
 
       ev.to_event
     end

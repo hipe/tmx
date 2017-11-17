@@ -60,7 +60,7 @@ module Skylab::Task::TestSupport
           }
         HERE
 
-        _expect_same_lines _st, _exp
+        _want_same_lines _st, _exp
       end
 
       it "oh look a graph (it did the inversion)" do
@@ -75,11 +75,11 @@ module Skylab::Task::TestSupport
           }
         HERE
 
-        _expect_same_lines _st, _exp
+        _want_same_lines _st, _exp
       end
 
-      def _expect_same_lines exp_x, act_x
-        TestSupport_::Expect_Line::Expect_same_lines[ exp_x, act_x, self ]
+      def _want_same_lines exp_x, act_x
+        TestSupport_::Want_Line::Want_same_lines[ exp_x, act_x, self ]
       end
     end
   end

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class << self
 
-      def normalize_qualified_knownness qkn, & oes_p  # #[#fi-004.5]
+      def normalize_qualified_knownness qkn, & p  # #[#fi-004.5]
 
         if qkn.is_known_known
 
@@ -12,7 +12,7 @@ module Skylab::Snag
 
             qkn.new_with_value new qkn.value
           else
-            oes_p.call :error, :invalid_date do
+            p.call :error, :invalid_date do
               __build_invalid_date_event qkn.value
             end
             UNABLE_

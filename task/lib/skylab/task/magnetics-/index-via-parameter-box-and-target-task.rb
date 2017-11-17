@@ -68,9 +68,9 @@ class Skylab::Task
         Home_::Events::CircularDependency.build_via__ task, index
       end
 
-      oes_p = @listener
-      if oes_p  # #[#ca-066]
-        oes_p.call :error, :circular_dependency do
+      p = @listener
+      if p  # #[#ca-066]
+        p.call :error, :circular_dependency do
           _ = build[]
           _
         end
@@ -94,7 +94,7 @@ class Skylab::Task
         @box_module = Home_.lib_.basic::Module.
           value_via_relative_path( tsk.class, '..' )  # DOT_DOT_
 
-        @_oes_p = p
+        @_listener = p
 
         @dependers_via_dependee = ::Hash.new { |h, k| h[k] = [] }
 
@@ -124,8 +124,8 @@ class Skylab::Task
         self
       end
 
-      def on_event_selectively
-        @_oes_p
+      def listener
+        @_listener
       end
 
       attr_reader(

@@ -5,7 +5,7 @@ module Skylab::Snag
     class Magnetics_::ToDoStream_via_MatchingLineStream < Common_::Dyadic
 
       def initialize st, psa, & p
-        @on_event_selectively = p
+        @listener = p
         @pattern_s_a = psa
         @st = st
       end
@@ -23,7 +23,7 @@ module Skylab::Snag
 
         @pattern_s_a.each_with_index do | s, d |
 
-          rx_s = Rx_Lib__::PlatformRegexpString_via_GrepRegexpString[ s, & @on_event_selectively ]
+          rx_s = Rx_Lib__::PlatformRegexpString_via_GrepRegexpString[ s, & @listener ]
           if rx_s
             rx_s_a[ d ] = rx_s
           else
@@ -62,7 +62,7 @@ module Skylab::Snag
 
       def __when_no_matches line_o
 
-        @on_event_selectively.call :info, :did_not_match do
+        @listener.call :info, :did_not_match do
           __build_did_not_match_event line_o
         end
         NOTHING_

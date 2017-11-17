@@ -35,7 +35,7 @@ module Skylab::Task::TestSupport
 
       it "sig 2 short-circuits - sig 1 is not happy b.c it needs B" do
 
-        _em = expect_failure_and_emission_when_find_path_by_ do |o|
+        _em = want_failure_and_emission_when_find_path_by_ do |o|
           o.add_pending_task :_ag1, _pro1_must_B
           o.add_pending_task :_ag2, _pro2B_can_A2C_can_B2C
         end
@@ -104,10 +104,10 @@ module Skylab::Task::TestSupport
         end
 
         against_path_expect_steps_ _path do
-          expect_step_ :_ag4, :A, :B
-          expect_step_ :_ag1, :B, :B
-          expect_step_ :_ag3, :B, :B
-          expect_step_ :_ag2, :B, :C
+          want_step_ :_ag4, :A, :B
+          want_step_ :_ag1, :B, :B
+          want_step_ :_ag3, :B, :B
+          want_step_ :_ag2, :B, :C
         end
       end
 

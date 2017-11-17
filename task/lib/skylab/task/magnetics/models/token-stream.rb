@@ -44,15 +44,15 @@ class Skylab::Task
 
       Home_.lib_.string_scanner
 
-      def token_stream_via_string big_string, & oes_p
-        dup.__become_stream_for big_string, & oes_p  # #[#sl-023] dup-and-mutate
+      def token_stream_via_string big_string, & p
+        dup.__become_stream_for big_string, & p  # #[#sl-023] dup-and-mutate
       end
 
       # == (was)
 
-        def __become_stream_for big_string, & oes_p
+        def __become_stream_for big_string, & p
 
-          @on_event_selectively = oes_p
+          @listener = p
 
           @_scn = ::StringScanner.new big_string
           @ok = true
@@ -255,9 +255,9 @@ class Skylab::Task
             y << _message
           end
 
-          oes_p = @on_event_selectively
-          if oes_p
-            oes_p.call :error, :expression, :unexpected_input do |y|
+          p = @listener
+          if p
+            p.call :error, :expression, :unexpected_input do |y|
               express_into_under[ y, self ]
             end
             UNABLE_

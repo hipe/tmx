@@ -41,9 +41,9 @@ module Skylab::Snag
       end
     end  # >>
 
-    def edit * x_a, & oes_p
+    def edit * x_a, & p
 
-      ACS_[].edit( x_a, self ) { |_| oes_p }
+      ACS_[].edit( x_a, self ) { |_| p }
     end
 
     def __node__component_association

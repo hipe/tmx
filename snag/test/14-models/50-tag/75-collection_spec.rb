@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport
     # currently there is no actual "tag collection" asset node
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :byte_up_and_downstreams
 
     it "minimal positive case" do
@@ -20,7 +20,7 @@ module Skylab::Snag::TestSupport
         tag.intern
       end.to_a.should eql [ :A ]
 
-      expect_no_events
+      want_no_events
     end
 
     it "don't use the hash character here" do
@@ -29,7 +29,7 @@ module Skylab::Snag::TestSupport
 
       ok = o.prepend_tag :"#A", & handle_event_selectively_
 
-      _em = expect_not_OK_event :invalid_tag_stem
+      _em = want_not_OK_event :invalid_tag_stem
 
       _em.cached_event_value.tag_s.should eql '##A'
 
@@ -73,15 +73,15 @@ module Skylab::Snag::TestSupport
       o = _new_node_via_identifier_and_body _id( 4 ), _body
 
       _ok = o.prepend_tag :boo, & handle_event_selectively_
-      expect_no_events
+      want_no_events
       _ok or fail
 
       o.express_N_units_into_under 3, y=[], _expag( 23, 7, 3 )
 
-      __expect_prepended y
+      __want_prepended y
     end
 
-    def __expect_prepended y
+    def __want_prepended y
 
       y[ 0 ].should eql "not a business line\n"
       y[ 1 ].should eql "[#004]       #boo #foo\n"
@@ -98,15 +98,15 @@ module Skylab::Snag::TestSupport
       o = _new_node_via_identifier_and_body _id( 3 ), _body
 
       _ok = o.append_tag :zoo, & handle_event_selectively_
-      expect_no_events
+      want_no_events
       _ok or fail
 
       y =[]
       o.express_into_under( y, _expag( 22, 7, 3 ) )
-      __expect_appended y
+      __want_appended y
     end
 
-    def __expect_appended y
+    def __want_appended y
 
       a = _body.send :_sstr_a
       y[ 0 ].should eql a[ 0 ].s

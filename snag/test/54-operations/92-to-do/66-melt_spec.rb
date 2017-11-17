@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     TS_[ self ]
 
-    use :expect_event, :ignore, :find_command_args
+    use :want_event, :ignore, :find_command_args
 
     use :byte_up_and_downstreams
     use :my_tmpdir_
@@ -18,7 +18,7 @@ module Skylab::Snag::TestSupport
         :path, Fixture_tree_[ :some_todos ],
       )
 
-      _expect_same
+      _want_same
     end
 
     it "if files are matched but no content, is same" do
@@ -29,19 +29,19 @@ module Skylab::Snag::TestSupport
         :name, '*.code',
       )
 
-      _expect_same
+      _want_same
     end
 
-    def _expect_same
+    def _want_same
 
-      _em = expect_neutral_event :no_matches
+      _em = want_neutral_event :no_matches
 
       black_and_white( _em.cached_event_value ).should match(
         /\Athere are no found todos #{
          }in files whose name matched "\*\.[a-z]{2,4}" #{
           }in «[^»]+»\z/ )
 
-      expect_neutralled
+      want_neutralled
     end
 
     it "with plain old todo's with no message, explains the pain" do
@@ -53,7 +53,7 @@ module Skylab::Snag::TestSupport
         :name, '*.code',
       )
 
-      _em = expect_neutral_event :no_matches
+      _em = want_neutral_event :no_matches
 
       black_and_white( _em.cached_event_value ).should match(
         /\Aof the 3 found todos, #{
@@ -84,14 +84,14 @@ module Skylab::Snag::TestSupport
         :name, '*.sc',
       )
 
-      __expect_these_events
+      __want_these_events
     end
 
-    def __expect_these_events
+    def __want_these_events
 
-      expect_OK_event :wrote
+      want_OK_event :wrote
 
-      ev = expect_neutral_event( :process_line ).cached_event_value
+      ev = want_neutral_event( :process_line ).cached_event_value
 
       black_and_white( ev ).should match %r(\Apatching file .+jeebis.sc$)
 
@@ -106,11 +106,11 @@ module Skylab::Snag::TestSupport
       fh.gets.should eql "[#001]       we should fix this\n"
       fh.gets.should be_nil
 
-      ev = expect_OK_event( :summary ).cached_event_value.to_event
+      ev = want_OK_event( :summary ).cached_event_value.to_event
       ev.number_of_files_seen_here.should eql 1
       ev.number_of_qualified_matches.should eql 1
       ev.number_of_seen_matches.should eql 1
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "multiple files, dry run" do
@@ -127,22 +127,22 @@ module Skylab::Snag::TestSupport
         :dry_run,
       )
 
-      __expect_these_multiple_files_events
+      __want_these_multiple_files_events
     end
 
-    def __expect_these_multiple_files_events
+    def __want_these_multiple_files_events
 
-      expect_OK_event :wrote
-      expect_neutral_event :process_line
-      expect_OK_event :wrote
-      expect_neutral_event :process_line
+      want_OK_event :wrote
+      want_neutral_event :process_line
+      want_OK_event :wrote
+      want_neutral_event :process_line
 
-      _em = expect_OK_event :summary
+      _em = want_OK_event :summary
 
       black_and_white( _em.cached_event_value ).should eql(
         '(dryly) changed the 3 qualified todos of 5 todos in 2 files' )
 
-      expect_succeed
+      want_succeed
     end
 
     def _manifest_file

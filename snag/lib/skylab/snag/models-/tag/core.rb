@@ -14,11 +14,11 @@ module Skylab::Snag
         ].intern
       end
 
-      def interpret_component scn, & oes_p_p  # [#ac-002]#Tenet6
+      def interpret_component scn, & p_p  # [#ac-002]#Tenet6
 
-        _oes_p = oes_p_p[ nil ]
+        _p = p_p[ nil ]
 
-        arg = Here_::Magnetics_::NormalizedStem_via_Token[ scn.gets_one, & _oes_p ]
+        arg = Here_::Magnetics_::NormalizedStem_via_Token[ scn.gets_one, & _p ]
         arg and begin
           new arg.value
         end

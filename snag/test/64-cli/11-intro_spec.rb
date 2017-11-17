@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
       it "1.2  (strange opt) - reason / invite" do
 
         invoke '-x'
-        expect "invalid option: -x"
+        want "invalid option: -x"
         o invite_rx
         o
       end
@@ -39,8 +39,8 @@ module Skylab::Snag::TestSupport
       it "1.3  (good arg) (ping)" do
 
         invoke 'ping'
-        expect 'hello from snag.'
-        expect_no_more_lines
+        want 'hello from snag.'
+        want_no_more_lines
         @exitstatus.should eql :hello_from_snag
       end
 
@@ -51,15 +51,15 @@ module Skylab::Snag::TestSupport
         on_stream :e
         o = flush_to_content_scanner
 
-        o.expect_styled_line.should match usage_rx
-        o.expect_nonblank_line
-        o.expect_blank_line
-        o.expect_header :actions
+        o.want_styled_line.should match usage_rx
+        o.want_nonblank_line
+        o.want_blank_line
+        o.want_header :actions
 
         o.advance_to_before_Nth_last_line 1
-        o.expect_styled_line.should match deeper_invite_rx
+        o.want_styled_line.should match deeper_invite_rx
 
-        expect_succeed
+        want_succeed
       end
 
       it "2.3x4H (good arg/good opt) (help postfix) (param API)" do
@@ -95,13 +95,13 @@ module Skylab::Snag::TestSupport
       invoke 'open', '-1', '--upstream-identifier', Path_alpha_[]
 
       on_stream :o
-      expect '---'
-      _expect_identifier '005'
-      expect %r(\Amessage[ ]+: #open \.\z)
+      want '---'
+      _want_identifier '005'
+      want %r(\Amessage[ ]+: #open \.\z)
 
-      expect :e, "(one node total)"
+      want :e, "(one node total)"
 
-      expect_no_more_lines
+      want_no_more_lines
 
       @exitstatus.should be_zero
     end
@@ -112,18 +112,18 @@ module Skylab::Snag::TestSupport
         Fixture_tree_[ :for_report_01_small_variety ]
 
       on_stream :o
-      _expect_separator
+      _want_separator
 
-      _expect_identifier '004.2'
-      expect %r(\Amessage[ ]+: ##{}open this is #feature-creep but meh\z)
+      _want_identifier '004.2'
+      want %r(\Amessage[ ]+: ##{}open this is #feature-creep but meh\z)
 
-      _expect_separator
-      _expect_identifier '004'
-      expect %r(\Amessage[ ]+: ##{}open here's an open guy with two lines\z)
+      _want_separator
+      _want_identifier '004'
+      want %r(\Amessage[ ]+: ##{}open here's an open guy with two lines\z)
 
-      expect :e, "(2 nodes total)"
+      want :e, "(2 nodes total)"
 
-      expect_no_more_lines
+      want_no_more_lines
 
       @exitstatus.should be_zero
     end
@@ -141,28 +141,28 @@ module Skylab::Snag::TestSupport
       invoke 'open', 'wazeezle', '--try-to-reappropriate',
         '--upstream-identifier', td.to_path
 
-      expect :e, %r(\Aopened a node: updated [^ ]+ \(131 bytes\)\z)
+      want :e, %r(\Aopened a node: updated [^ ]+ \(131 bytes\)\z)
 
       on_stream :o
-      _expect_separator
-      _expect_identifier '002'
-      expect %r(\Amessage +: #open wazeezle \( #was: #done wiz.+\)\z)
+      _want_separator
+      _want_identifier '002'
+      want %r(\Amessage +: #open wazeezle \( #was: #done wiz.+\)\z)
 
-      expect_no_more_lines
+      want_no_more_lines
 
       @exitstatus.should be_zero
     end
 
-    define_method :_expect_separator, ( -> do
+    define_method :_want_separator, ( -> do
       bar = '---'
       -> do
-        expect bar
+        want bar
       end
     end.call )
 
-    def _expect_identifier s
+    def _want_identifier s
 
-      expect %r(\Aidentifier[ ]+: \[##{ ::Regexp.escape s }\]\z)
+      want %r(\Aidentifier[ ]+: \[##{ ::Regexp.escape s }\]\z)
     end
   end
 end

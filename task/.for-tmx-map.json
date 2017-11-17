@@ -1,6 +1,6 @@
 {
-  "after": "css_convert",
-  "category": "task family",
+  "after": "cull",
+  "category": "project management experiments",
   "doc test manifest": ".doc-test-manifest.json",
   "framework": "[ze]",
   "is lib": true,

@@ -69,16 +69,16 @@ module Skylab::Task::TestSupport
       end
 
       it "didn't expect this token" do
-        expect_unexpected_token_cateogory_ :via
+        want_unexpected_token_cateogory_ :via
       end
 
       it "expected these tokens" do
-        expect_expected_token_categories_ :other, :and, :end
+        want_expected_token_categories_ :other, :and, :end
       end
 
       it "this explanation (byte-for-byte)" do
 
-        expect_failure_message_lines_ do |y|
+        want_failure_message_lines_ do |y|
 
           y << "did not expect to encounter keyword 'via' at this point."
           y << "expected 'and', a business word or end of input."
@@ -102,15 +102,15 @@ module Skylab::Task::TestSupport
       it "'via' after 'as' fails (expects these things)" do
 
         input_word_array %w( a as b via c )
-        expect_unexpected_token_cateogory_ :via
-        expect_expected_token_categories_ :other, :end
+        want_unexpected_token_cateogory_ :via
+        want_expected_token_categories_ :other, :end
       end
 
       it "'as' after 'via' fails (expects these things)" do
 
         input_word_array %w( a via b as c )
-        expect_unexpected_token_cateogory_ :as
-        expect_expected_token_categories_ :and, :other, :end
+        want_unexpected_token_cateogory_ :as
+        want_expected_token_categories_ :and, :other, :end
       end
 
       it "what if the input stream fails? (then no events from us)" do

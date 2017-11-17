@@ -10,11 +10,11 @@ module Skylab::Snag
 
           # ( local name convention: `resolve` ::= `interpret` `synthesize` )
 
-          def initialize s_a, domain, & oes_p
+          def initialize s_a, domain, & p
 
             @domain = domain
             @in_st = Home_.lib_.parse_lib::Input_Streams_::Array.new s_a
-            @on_event_selectively = oes_p
+            @listener = p
           end
 
           def execute
@@ -45,7 +45,7 @@ module Skylab::Snag
 
             _ok = _interpret :model_reflection, :singular_model_name
 
-            _ok && Keyword_that__[ @in_st, & @on_event_selectively ]
+            _ok && Keyword_that__[ @in_st, & @listener ]
           end
 
           # "the thing [is].."  (conditional expressions look best in this form)
@@ -61,7 +61,7 @@ module Skylab::Snag
 
             _ok = _interpret :model_reflection, :plural_model_name
 
-            _ok && Keyword_that__[ @in_st, & @on_event_selectively ]
+            _ok && Keyword_that__[ @in_st, & @listener ]
           end
 
           Keyword_that__ = Build_simple_word_parser_[
@@ -69,7 +69,7 @@ module Skylab::Snag
 
           def __resolve_tree_of_predicates  # this is an attempt at [#005] a model solution for this
 
-            ok = _interpret_one_verb_phrase( & @on_event_selectively )
+            ok = _interpret_one_verb_phrase( & @listener )
             ok && begin
               ok_ = __interpret_first_AND_or_OR_verb_phrase
               while ok_

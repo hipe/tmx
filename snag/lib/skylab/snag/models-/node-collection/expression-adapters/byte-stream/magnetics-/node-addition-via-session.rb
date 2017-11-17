@@ -7,7 +7,7 @@ module Skylab::Snag
       class Magnetics_::NodeAddition_via_Session < Common_::Monadic
 
         def initialize o, & p
-          @on_event_selectively = p
+          @listener = p
           @session = o
         end
 
@@ -19,7 +19,7 @@ module Skylab::Snag
 
             o.reset_the_entity_upstream
 
-            Rewrite[ id, o, & @on_event_selectively ]
+            Rewrite[ id, o, & @listener ]
 
             # <-
         end

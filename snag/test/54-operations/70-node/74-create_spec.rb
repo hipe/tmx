@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - node - create" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :byte_up_and_downstreams
     use :nodes
 
@@ -27,7 +27,7 @@ module Skylab::Snag::TestSupport
       scn.next_line.should eql "[#01]       #hi\n"
       scn.next_line.should be_nil
 
-      expect_noded_ 3
+      want_noded_ 3
     end
   end
 end

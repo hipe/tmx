@@ -38,13 +38,13 @@ module Skylab::Snag
 
         # ~ for [#ac-002] the ACS (compliments same in parent class)
 
-        def __add__component cx, qk, & oes_p_p
+        def __add__component cx, qk, & p_p
 
           node = qk.value
 
-          _oes_p = oes_p_p[ node ]  # transition from hot to cold
+          _p = p_p[ node ]  # transition from hot to cold
 
-          persist_entity cx, node, & _oes_p
+          persist_entity cx, node, & _p
         end
 
         # c r u d
@@ -94,17 +94,17 @@ module Skylab::Snag
 
         # ~ retrieve one
 
-        def entity_via_intrinsic_key node_id_x, & oes_p
+        def entity_via_intrinsic_key node_id_x, & p
 
           id = Models_::NodeIdentifier.via_user_value_(
-            node_id_x, & oes_p )
+            node_id_x, & p )
 
-          id and entity_via_identifier_object id, & oes_p
+          id and entity_via_identifier_object id, & p
         end
 
-        def entity_via_identifier_object id_o, & oes_p
+        def entity_via_identifier_object id_o, & p
 
-          st = to_entity_stream( & oes_p )
+          st = to_entity_stream( & p )
 
           st and begin
 
@@ -114,7 +114,7 @@ module Skylab::Snag
 
             node or begin
 
-              oes_p.call :error, :component_not_found do
+              p.call :error, :component_not_found do
                 __build_enity_not_found_event id_o
               end
               UNABLE_
@@ -150,10 +150,10 @@ module Skylab::Snag
 
         # ~ retrieve many ( counterpart to [#br-032] to_entity_stream_via_model )
 
-        def to_entity_stream & oes_p  #
+        def to_entity_stream & p  #
 
           Here_::Magnetics_::NodeStream_via_LineStream.call(
-            self, @byte_upstream_ID, & oes_p )
+            self, @byte_upstream_ID, & p )
         end
 
         def upstream_reference

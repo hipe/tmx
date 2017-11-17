@@ -56,13 +56,13 @@ module Skylab::TaskExamples
         end
       end  # >>
 
-      When_bad_string___ = -> s, & oes_p do
+      When_bad_string___ = -> s, & p do
 
         msg = "Bad range assertion expression for version component:#{
           }#{ s.inspect }. We need something more like \"1.5+\" or \"1.2.3\"."
 
-        if oes_p
-          oes_p.call :error, :expression do |y|
+        if p
+          p.call :error, :expression do |y|
             y << msg
           end
           UNABLE_

@@ -6,7 +6,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_
@@ -23,7 +23,7 @@ module Skylab::TaskExamples::TestSupport
 
       it "whines about missing required fields" do
 
-        expect_missing_required_attributes_are_ :build_dir, :filesystem, :unzip_tarball
+        want_missing_required_attributes_are_ :build_dir, :filesystem, :unzip_tarball
       end
 
       def build_arguments_
@@ -146,7 +146,7 @@ module Skylab::TaskExamples::TestSupport
 
         it "errput lists etc" do
 
-          expag = common_expression_agent_for_expect_emission_
+          expag = common_expression_agent_for_want_emission_
 
           s_a = []
           emission_array[ 1 .. -1 ].each do |em|

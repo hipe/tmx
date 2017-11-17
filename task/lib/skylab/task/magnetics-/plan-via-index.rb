@@ -31,7 +31,7 @@ class Skylab::Task
     # graph.
 
     def listener= p
-      @_oes_p = p
+      @_listener = p
     end
 
     attr_writer(

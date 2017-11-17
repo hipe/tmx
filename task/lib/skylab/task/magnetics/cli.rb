@@ -75,8 +75,8 @@ class Skylab::Task
           y << "outputs a dotfile rendering the \"magnetics\" directory"
         end
 
-        -> path, & oes_p do
-          o = Visualize_Magnetics___.new( & oes_p )
+        -> path, & p do
+          o = Visualize_Magnetics___.new( & p )
           o.do_open = @open
           o.path = path
           o.path_is_a_call_spec = @extended
@@ -117,9 +117,9 @@ class Skylab::Task
 
       # (keep heavy lifting out of here. this is for synthesizing etc.)
 
-      def initialize & oes_p
+      def initialize & p
         @do_open = false
-        @_oes_p = oes_p
+        @_listener = p
       end
 
       attr_writer(
@@ -156,7 +156,7 @@ class Skylab::Task
         fh.close
 
         path = fh.path
-        @_oes_p.call :info, :expression, :attempting_to_open do |y|
+        @_listener.call :info, :expression, :attempting_to_open do |y|
           y << "(attempting to open #{ pth path })"
         end
 

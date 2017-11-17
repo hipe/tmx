@@ -8,7 +8,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_
@@ -24,7 +24,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       it "missung requireds" do
-        expect_missing_required_attributes_are_(
+        want_missing_required_attributes_are_(
           :build_dir, :filesystem, :tarball_to, :url )
       end
 

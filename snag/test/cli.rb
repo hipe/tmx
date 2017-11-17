@@ -19,9 +19,7 @@ module Skylab::Snag::TestSupport
       end
 
       def [] tcm
-
-        tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+        tcm.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.include Here___
         @p_a.each do | p |
           p[ tcm ]
@@ -40,7 +38,7 @@ module Skylab::Snag::TestSupport
         end
         @p_a.push -> tcm do
 
-          tcm.send :define_method, :result_for_failure_for_expect_stdout_stderr do
+          tcm.send :define_method, :result_for_failure_for_want_stdout_stderr do
             p_[]
           end
         end
@@ -53,7 +51,7 @@ module Skylab::Snag::TestSupport
 
         @p_a.push -> tcm do
 
-          tcm.send :define_method, :invocation_strings_for_expect_stdout_stderr do
+          tcm.send :define_method, :invocation_strings_for_want_stdout_stderr do
             a
           end
         end
@@ -73,7 +71,7 @@ module Skylab::Snag::TestSupport
     end  # >>
 
     def invoke * argv
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
     end
 
     def o * x_a, & p  # legacy
@@ -81,10 +79,10 @@ module Skylab::Snag::TestSupport
       if x_a.length.nonzero? || p
 
         x_a.unshift :styled
-        expect_stdout_stderr_via_arglist x_a, & p
+        want_stdout_stderr_via_arglist x_a, & p
       else
 
-        expect_fail
+        want_fail
       end
     end
     Here___ = self

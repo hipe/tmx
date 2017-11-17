@@ -61,7 +61,7 @@ module Skylab::TaskExamples::TestSupport
       false == _x or fail
     end
 
-    def state_for_expect_emission
+    def state_for_want_emission
       state_
     end
   end
@@ -138,8 +138,8 @@ module Skylab::TaskExamples::TestSupport
 
   # ~ these
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

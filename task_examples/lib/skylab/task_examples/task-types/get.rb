@@ -97,7 +97,7 @@ module Skylab::TaskExamples
         _destination_path = ::File.join build_dir, tail
         unit = Unit___.new _url, _destination_path
 
-        _ok = ___unit_does_procure unit
+        _ok = ___unit_dprocure unit
         if _ok
           unit_a.push unit
         end
@@ -106,7 +106,7 @@ module Skylab::TaskExamples
       @units_of_work = unit_a ; nil
     end
 
-    def ___unit_does_procure unit
+    def ___unit_dprocure unit
 
       begin
         stat = ::File.stat unit.destination_path
@@ -127,7 +127,7 @@ module Skylab::TaskExamples
     end
 
     def ___express_nonzero_length_file unit
-      @_oes_p.call :info, :expression, :wont_overwrite_file do |y|
+      @_listener.call :info, :expression, :wont_overwrite_file do |y|
         y << "assuming already downloaded b/c exists #{
           }(erase/move to re-download) - #{ pth unit.destination_path }"
       end

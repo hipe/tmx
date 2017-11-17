@@ -5,7 +5,7 @@ module Skylab::Snag
     class Magnetics_::NormalizedStem_via_Token < Common_::Monadic  # 1x <
 
       def initialize x, & p
-        @on_event_selectively = p
+        @listener = p
         @x = x
       end
 
@@ -42,7 +42,7 @@ module Skylab::Snag
       end
 
       def _when_invalid
-        @on_event_selectively.call :error, :invalid_tag_stem do
+        @listener.call :error, :invalid_tag_stem do
           __build_invalid_event
         end
         UNABLE_

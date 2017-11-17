@@ -15,7 +15,7 @@ module Skylab::Snag
         )
 
         def initialize & p
-          @on_event_selectively = p
+          @listener = p
           @simple_line_upstream = nil
         end
 
@@ -53,7 +53,7 @@ module Skylab::Snag
         def __via_etc_resolve_SLS
 
           _ = @byte_upstream_ID.to_minimal_line_stream(
-            & @on_event_selectively )
+            & @listener )
 
           _store :@simple_line_upstream, _
         end

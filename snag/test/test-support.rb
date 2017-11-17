@@ -56,8 +56,8 @@ module Skylab::Snag::TestSupport
 
     # -- assertions
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
 
     # -- setup
@@ -98,7 +98,7 @@ module Skylab::Snag::TestSupport
   module Operations
 
     def self.[] tcc
-      Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
+      Zerk_lib_[].test_support::Want_CLI_or_API[ tcc ]
       tcc.include self
     end
 
@@ -168,13 +168,13 @@ module Skylab::Snag::TestSupport
     end
 
     def scanner_via_string_ s
-      TestSupport_::Expect_Line::Scanner.via_string s
+      TestSupport_::Want_Line::Scanner.via_string s
     end
   end
 
   # -- test-support extension modules for models & similar
 
-  module Expect_Piece
+  module Want_Piece
 
     class << self
       def [] tcm
@@ -182,7 +182,7 @@ module Skylab::Snag::TestSupport
       end
     end  # >>
 
-    def expect_piece_ i, x
+    def want_piece_ i, x
 
       part = @piece_st.gets
       part or fail "expected more parts, had none"
@@ -191,7 +191,7 @@ module Skylab::Snag::TestSupport
       part
     end
 
-    def expect_no_more_pieces_
+    def want_no_more_pieces_
 
       x = @piece_st.gets
       x and fail "expecting no more parts, had #{ x.category_symbol }"
@@ -200,27 +200,28 @@ module Skylab::Snag::TestSupport
 
   Nodes = -> tcc do
 
-    tcc.send :define_method, :expect_noded_, -> node_id_d do
-      expect_no_more_events
+    tcc.send :define_method, :want_noded_, -> node_id_d do
+      want_no_more_events
       @result.ID.to_i.should eql node_id_d
     end
   end
 
   # -- short test support extensions
 
-  Expect_Stdout_Stderr = -> tcm do
+  Want_Stdout_Stderr = -> tcm do
 
-    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    tcm.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
+    ::Kernel._CHANGED
     # tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
     NIL
   end
 
-  Expect_Emission_Fail_Early = -> tcc do
-    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  Want_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Want_Emission_Fail_Early[ tcc ]
   end
 
-  Expect_Event = -> tcc, x=nil do  # deprected-ish. as you can, etc
-    Common_.test_support::Expect_Emission[ tcc, x ]
+  Want_Event = -> tcc, x=nil do  # deprected-ish. as you can, etc
+    Common_.test_support::Want_Emission[ tcc, x ]
   end
 
   Memoizer_Methods = -> tcc do

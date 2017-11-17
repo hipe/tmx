@@ -36,10 +36,10 @@ class Skylab::Task
       # represents all the parameters that a particular node requires/
       # honors.
 
-      def initialize sym, attrs, & oes_p
+      def initialize sym, attrs, & p
         @_attrs = attrs
         @_name_symbol = sym
-        @_oes_p = oes_p
+        @_listener = p
       end
 
       def accept index, & visit
@@ -103,7 +103,7 @@ class Skylab::Task
 
           o.WILL_CHECK_FOR_MISSING_REQUIREDS_ONLY
           o.WILL_RESULT_IN_SELF_ON_SUCCESS
-          o.listener = @_oes_p
+          o.listener = @_listener
         end
 
         _store :@_normalization, _n11n

@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - criteria - create" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :criteria_operations
 
     it "action has custom syntax: can't edit and save at the same time" do
@@ -20,10 +20,10 @@ module Skylab::Snag::TestSupport
         :edit, :hi,
         & handle_event_selectively_ )
 
-      expect_not_OK_event :syntax,
+      want_not_OK_event :syntax,
         'can\'t simultaneously (par "save") and (par "edit")'
 
-      expect_fail
+      want_fail
     end
 
     it "name must be valid" do
@@ -35,8 +35,8 @@ module Skylab::Snag::TestSupport
         :save, '-not-valid-',
         & handle_event_selectively_ )
 
-      expect_not_OK_event :invalid_name, "invalid name (ick_mixed \"-not-valid-\")"
-      expect_fail
+      want_not_OK_event :invalid_name, "invalid name (ick_mixed \"-not-valid-\")"
+      want_fail
     end
 
     it "yes" do
@@ -71,7 +71,7 @@ module Skylab::Snag::TestSupport
       st.gets.ID.to_i.should eql 5
       st.gets.ID.to_i.should eql 7
 
-      _em = expect_OK_event :added_entity
+      _em = want_OK_event :added_entity
 
       black_and_white( _em.cached_event_value ).should match(
         %r(\Aadded \"#{ fn }\" to persi) )

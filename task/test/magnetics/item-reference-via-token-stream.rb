@@ -45,7 +45,7 @@ module Skylab::Task::TestSupport
           _state.ok && fail
         end
 
-        def expect_failure_message_lines_ & y_p
+        def want_failure_message_lines_ & y_p
 
           _actual_s_a = _ITvTS_failure_event.express_into_under []
 
@@ -74,13 +74,13 @@ module Skylab::Task::TestSupport
           end
         end
 
-        def expect_unexpected_token_cateogory_ sym
+        def want_unexpected_token_cateogory_ sym
 
           _ev = _ITvTS_failure_event
           _ev.unexpected_token_category == sym || fail
         end
 
-        def expect_expected_token_categories_ * exp_sym_a
+        def want_expected_token_categories_ * exp_sym_a
 
           _ev = _ITvTS_failure_event
           act_sym_a = _ev.expected_token_categories

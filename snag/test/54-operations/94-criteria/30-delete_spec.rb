@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - criteria - delete - (NOT FULLY INTEGRATED)" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :my_tmpdir_
 
     it "backend - yes" do
@@ -19,10 +19,10 @@ module Skylab::Snag::TestSupport
 
       o = _common
 
-      expect_neutral_event :file_utils_mv_event,
+      want_neutral_event :file_utils_mv_event,
         /\Amv \(pth "[^"]+"\) \(pth "[^"]+"\)\z/
 
-      _em = expect_OK_event :component_removed
+      _em = want_OK_event :component_removed
 
       black_and_white( _em.cached_event_value ).should eql(
         'removed criteria "zap-tango" from persisted criteria collection' )
@@ -36,12 +36,12 @@ module Skylab::Snag::TestSupport
 
       x = _common
 
-      _em = expect_not_OK_event :component_not_found
+      _em = want_not_OK_event :component_not_found
 
       black_and_white( _em.cached_event_value ).should eql(
         'persisted criteria collection does not have criteria "zap-tango"' )
 
-      expect_no_more_events
+      want_no_more_events
 
       x.should eql false
     end

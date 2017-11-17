@@ -31,7 +31,7 @@ module Skylab::Task::TestSupport
 
       it "against an empty pool" do
 
-        _em = expect_failure_and_emission_when_find_path_by_ do |_|
+        _em = want_failure_and_emission_when_find_path_by_ do |_|
           NOTHING_
         end
 
@@ -49,7 +49,7 @@ module Skylab::Task::TestSupport
 
       it "reconcile with one dud signature" do
 
-        _em = expect_failure_and_emission_when_find_path_by_ do |o|
+        _em = want_failure_and_emission_when_find_path_by_ do |o|
 
           o.add_pending_task :_the_empty_agent, agent_
         end
@@ -61,7 +61,7 @@ module Skylab::Task::TestSupport
 
       it "same as above but 2x subjects" do
 
-        _em = expect_failure_and_emission_when_find_path_by_ do |o|
+        _em = want_failure_and_emission_when_find_path_by_ do |o|
           o.add_pending_task :_empty_agent_1, agent_
           o.add_pending_task :_empty_agent_2, agent_
         end
@@ -145,7 +145,7 @@ module Skylab::Task::TestSupport
 
       it "reconcile with ambiguous nudges - soft failure" do
 
-        _em = expect_failure_and_emission_when_find_path_by_ do |o|
+        _em = want_failure_and_emission_when_find_path_by_ do |o|
           o.add_pending_task :_beavis_agent, agent_
           o.add_pending_task :_butthead_agent, agent_
         end

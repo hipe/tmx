@@ -8,9 +8,9 @@ module Skylab::Snag
 
         # (this was a mentor to #[#ba-044.2]. student has surpassed teacher.)
 
-        def initialize * a, & oes_p
+        def initialize * a, & p
 
-          @on_event_selectively = oes_p
+          @listener = p
           @state, vmp, sym, vmp_, @in_st, @grammatical_context, @ada = a
 
           @named_functions_ = @ada.named_functions_
@@ -208,7 +208,7 @@ module Skylab::Snag
         def _parse_verb_modifier_phrase
 
           on = @ada.verb_modifier_phrase_via_input_stream_(
-            @in_st, & @on_event_selectively )
+            @in_st, & @listener )
 
           if on
             @vmp = on
@@ -229,7 +229,7 @@ module Skylab::Snag
 
         def _ambiguous sym
 
-          @on_event_selectively.call :error, :parse_error, :ambiguity do
+          @listener.call :error, :parse_error, :ambiguity do
 
             Common_::Event.inline_not_OK_with :ambiguous,
                 :x, @sym,

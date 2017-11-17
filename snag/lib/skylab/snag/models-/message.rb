@@ -49,10 +49,10 @@ module Skylab::Snag
 
         d = gets_one
 
-        @p_a.push -> arg, & oes_p do
+        @p_a.push -> arg, & p do
           s = arg.value
           if d < s.length
-            _express arg, :character_limit_exceeded, oes_p do
+            _express arg, :character_limit_exceeded, p do
               "messages cannot be longer than #{ d } characters #{
                 } (your message was #{ s.length } chars"
             end
@@ -65,12 +65,12 @@ module Skylab::Snag
 
       def must_be_trueish=
 
-        @p_a.push -> arg, & oes_p do
+        @p_a.push -> arg, & p do
           x = arg.value
           if x
             arg
           else
-            _express arg, :not_a_string, oes_p do
+            _express arg, :not_a_string, p do
               "need string, had #{ ick x }"
             end
           end
@@ -106,13 +106,13 @@ module Skylab::Snag
 
     public
 
-      def normalize_qualified_knownness qkn, & oes_p_p
+      def normalize_qualified_knownness qkn, & p_p
 
-        oes_p = oes_p_p[ nil ]
+        listener = p_p[ nil ]
 
-        @p_a.each do | p |
+        @p_a.each do |normalize|
 
-          qkn = p[ qkn, & oes_p ]
+          qkn = normalize[ qkn, & listener ]
           qkn or break
         end
         qkn
@@ -122,10 +122,10 @@ module Skylab::Snag
 
       def _black_regex rx, & str_p
 
-        @p_a.push -> arg, & oes_p do
+        @p_a.push -> arg, & p do
 
           if rx =~ arg.value
-            _express arg, :string_has_extraordinary_features, oes_p do
+            _express arg, :string_has_extraordinary_features, p do
 
               "#{ instance_exec( & str_p ) }: #{ ick arg.value }"
             end
@@ -136,9 +136,9 @@ module Skylab::Snag
         KEEP_PARSING_
       end
 
-      def _express arg, term_chan_sym, oes_p, & str_p
+      def _express arg, term_chan_sym, p, & str_p
 
-        oes_p.call :error, :uninterpretable, term_chan_sym do
+        p.call :error, :uninterpretable, term_chan_sym do
 
           Common_::Event.inline_not_OK_with(
 

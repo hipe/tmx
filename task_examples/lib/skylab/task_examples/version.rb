@@ -4,8 +4,8 @@ module Skylab::TaskExamples
 
     class << self
 
-      def parse str, & oes_p
-        Parse___[ str,  self, & oes_p ]
+      def parse str, & p
+        Parse___[ str,  self, & p ]
       end
 
       alias_method :__new, :new
@@ -18,10 +18,10 @@ module Skylab::TaskExamples
 
     class Parse___ < Common_::Dyadic
 
-      def initialize str, base_cls, & oes_p
+      def initialize str, base_cls, & p
         @string = str
         @base_class = base_cls
-        @_oes_p = oes_p
+        @_listener = p
       end
 
       def execute
@@ -74,7 +74,7 @@ module Skylab::TaskExamples
 
       def ___when_etc
         s = @_scan.string
-        _oes_p.call :error, :expression do |y|
+        _p.call :error, :expression do |y|
           y << "version pattern not matched anywhere in string: #{ ick s }"
         end
         UNABLE_
@@ -95,15 +95,15 @@ module Skylab::TaskExamples
 
       def ___when_oh_noes
         s = @_scan.string
-        _oes_p.call :error, :expression, :ambiguous do |y|
+        _p.call :error, :expression, :ambiguous do |y|
           y << "multiple version strings matched in string: #{ ick s }"
         end
         UNABLE_
       end
 
-      def _oes_p
-        if @_oes_p
-          @_oes_p
+      def _p
+        if @_listener
+          @_listener
         else
           Default_on_event_selectively___
         end

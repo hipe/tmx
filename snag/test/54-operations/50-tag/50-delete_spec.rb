@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - tag - delete" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :my_tmpdir_
     use :byte_up_and_downstreams
     use :nodes
@@ -16,24 +16,24 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 10, :tag, :x
 
-        _em = expect_not_OK_event :component_not_found
+        _em = want_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should match(
           /\Athere is no node "\[#10\]" in [^ ]+sutherlands\./ )
 
-        expect_fail
+        want_fail
       end
 
       it "node is found but doesn't have tag" do
 
         _call :node_identifier, 1, :tag, :three
 
-        _em = expect_not_OK_event :component_not_found
+        _em = want_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should eql(
           "node [#1] does not have tag \"#three\"" )  # :+[#015]
 
-        expect_fail
+        want_fail
       end
 
       it "remove a tag at the end" do
@@ -47,12 +47,12 @@ module Skylab::Snag::TestSupport
         scn.next_line.should eql "[#3]   donald #four\n"
         scn.next_line.should be_nil
 
-        _em = expect_OK_event :component_removed
+        _em = want_OK_event :component_removed
 
         black_and_white( _em.cached_event_value ).should eql(
           "removed tag #two from node [#1]" )
 
-        expect_noded_ 1
+        want_noded_ 1
       end
 
       it "remove a tag in the middle (USE THE TEMPFILE)" do
@@ -67,7 +67,7 @@ module Skylab::Snag::TestSupport
           :upstream_reference, my_tmpfile_path,
           :node_identifier, 1, :tag, :one
 
-        ev = expect_OK_event( :component_removed ).cached_event_value.to_event
+        ev = want_OK_event( :component_removed ).cached_event_value.to_event
 
         ev.component.intern.should eql :one
 

@@ -370,9 +370,9 @@ module Skylab::Snag
         _normal_symbol = Common_::Name.via_const_symbol( sym_a.fetch 0 ).
           as_lowercase_with_underscores_symbol  # NodeCollection -> node_collection etc
 
-        _ob = @_invocation_resources.microservice_operator_branch_
+        _fb = @_invocation_resources.microservice_feature_branch_
 
-        _loadable_reference = _ob.dereference _normal_symbol
+        _loadable_reference = _fb.dereference _normal_symbol
 
         _business_module = _loadable_reference.dereference_loadable_reference
 
@@ -505,7 +505,7 @@ module Skylab::Snag
 
         _path = remove_instance_variable :@directory_path
 
-        _OB = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory
+        _OB = Home_.lib_.system_lib::Filesystem::Directory::FeatureBranch_via_Directory
 
         @_imp = _OB.define do |o|
 
@@ -541,8 +541,8 @@ module Skylab::Snag
 
       [ :__add__component,
         :__remove__component,
-        :expect_component_not__exists__,
-        :expect_component__exists__,
+        :want_component_not__exists__,
+        :want_component__exists__,
       ].each do |m|
         define_method m do |qk, & p_or_pp|
           @_imp.send m, qk, & p_or_pp

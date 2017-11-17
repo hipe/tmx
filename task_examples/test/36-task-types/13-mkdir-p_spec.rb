@@ -8,7 +8,7 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :task_types
 
     def subject_class_
@@ -33,7 +33,7 @@ module Skylab::TaskExamples::TestSupport
 
       it "whines about required arg missing if you try to run it" do
 
-        expect_missing_required_attributes_are_ :mkdir_p
+        want_missing_required_attributes_are_ :mkdir_p
       end
 
       def build_arguments_

@@ -15,7 +15,7 @@ module Skylab::Task::TestSupport
 
         given_array_ _same_thing
         target_ :first_line_map  # (when we targeted `contextualized_expression`, new problems)
-        expect_stack_(
+        want_stack_(
           :First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom,
           :Lemmas_via_Normal_Selection_Stack,
           :Normal_Selection_Stack_via_Selection_Stack,
@@ -31,7 +31,7 @@ module Skylab::Task::TestSupport
         customize_by_ do |o|
           o.preferred_waypoint_node = :event
         end
-        expect_stack_(
+        want_stack_(
           :First_Line_Map_via_Evento_Trilean_Idiom,
           :Evento_Trilean_Idiom_via_Event_and_Trilean,
           :Trilean_via_Channel,

@@ -12,7 +12,7 @@ module Skylab::Snag
 
           sess.register_properties do | o |
 
-            _rw = ACS_[]::Magnetics::OperatorBranch_via_ACS.for_componentesque first
+            _rw = ACS_[]::Magnetics::FeatureBranch_via_ACS.for_componentesque first
 
             comp_assoc_for = _rw.association_reader
 

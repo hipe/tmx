@@ -5,8 +5,8 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - tag - expression adapters - byte stream" do
 
     TS_[ self ]
-    use :expect_piece
-    use :expect_event
+    use :want_piece
+    use :want_event
 
     context "a single-line case of medium complexity" do
 
@@ -15,9 +15,9 @@ module Skylab::Snag::TestSupport
         # #lends-coverage to [#fi-008.10]
 
         _init_piece_stream
-        expect_piece_ :string, 'hi '
-        expect_piece_ :tag, '#normal-tag'
-        expect_piece_ :string, ' '
+        want_piece_ :string, 'hi '
+        want_piece_ :tag, '#normal-tag'
+        want_piece_ :string, ' '
       end
 
       it "the structured piece's `whole_string` includes the parens" do
@@ -46,10 +46,10 @@ module Skylab::Snag::TestSupport
           st.gets
         end
 
-        expect_piece_ :string, ' and '
-        expect_piece_ :tag, '#normal-again'
-        expect_piece_ :string, '.'
-        expect_no_more_pieces_
+        want_piece_ :string, ' and '
+        want_piece_ :tag, '#normal-again'
+        want_piece_ :string, '.'
+        want_no_more_pieces_
       end
 
       dangerous_memoize :_nasty do

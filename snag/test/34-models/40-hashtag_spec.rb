@@ -5,36 +5,36 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - hashtag" do
 
     TS_[ self ]
-    use :expect_piece
+    use :want_piece
 
     context "parses" do
 
       it "empty string" do
 
         _scan ''
-        expect_no_more_pieces_
+        want_no_more_pieces_
       end
 
       it "string with only one space" do
 
         _scan SPACE_
-        expect_piece_ :string, SPACE_
-        expect_no_more_pieces_
+        want_piece_ :string, SPACE_
+        want_no_more_pieces_
       end
 
       it "string with only one tag" do
 
         _scan '#foo'
-        expect_piece_ :hashtag, '#foo'
-        expect_no_more_pieces_
+        want_piece_ :hashtag, '#foo'
+        want_no_more_pieces_
       end
 
       it "two adjacent tags" do
 
         _scan '#a#b'
-        expect_piece_ :hashtag, '#a'
-        expect_piece_ :hashtag, '#b'
-        expect_no_more_pieces_
+        want_piece_ :hashtag, '#a'
+        want_piece_ :hashtag, '#b'
+        want_no_more_pieces_
       end
 
       it "minimal use-case of name-value extension" do
@@ -54,32 +54,32 @@ module Skylab::Snag::TestSupport
       it "normal complexity" do
 
         _scan _normal_complexity
-        expect_piece_ :string, 'this is some code '
-        expect_piece_ :hashtag, '#public-API'
-        expect_piece_ :string, ', '
-        expect_piece_ :hashtag, '#bill-Deblazio'
-        expect_piece_ :string, ':2014 wee'
-        expect_no_more_pieces_
+        want_piece_ :string, 'this is some code '
+        want_piece_ :hashtag, '#public-API'
+        want_piece_ :string, ', '
+        want_piece_ :hashtag, '#bill-Deblazio'
+        want_piece_ :string, ':2014 wee'
+        want_no_more_pieces_
       end
 
       it "normal complexity (with name-value extension)" do
 
         _scan_with_values _normal_complexity
-        expect_piece_ :string, 'this is some code '
-        o = expect_piece_ :hashtag, '#public-API'
+        want_piece_ :string, 'this is some code '
+        o = want_piece_ :hashtag, '#public-API'
         o.value_is_known_is_known.should be_nil
 
-        expect_piece_ :string, ', '
+        want_piece_ :string, ', '
 
-        o = expect_piece_ :hashtag, '#bill-Deblazio:2014'
+        o = want_piece_ :hashtag, '#bill-Deblazio:2014'
 
         o.value_is_known.should eql true
 
         o.get_name_string.should eql '#bill-Deblazio'
         o.get_value_string.should eql '2014'
 
-        expect_piece_ :string ,' wee'
-        expect_no_more_pieces_
+        want_piece_ :string ,' wee'
+        want_no_more_pieces_
       end
 
       memoize :_normal_complexity do
@@ -89,9 +89,9 @@ module Skylab::Snag::TestSupport
       it "edge case: a comma breaks the value" do  # :+#was:parse-values
 
         _scan '#foo:bar,baz'
-        expect_piece_ :hashtag, '#foo'
-        expect_piece_ :string, ':bar,baz'
-        expect_no_more_pieces_
+        want_piece_ :hashtag, '#foo'
+        want_piece_ :string, ':bar,baz'
+        want_no_more_pieces_
       end
     end
 
@@ -109,16 +109,16 @@ module Skylab::Snag::TestSupport
       it "x." do
 
         _scan "hi#there\n"
-        expect_piece_ :string, 'hi'
-        expect_piece_ :hashtag, '#there'
-        expect_piece_ :string, "\n"
-        expect_no_more_pieces_
+        want_piece_ :string, 'hi'
+        want_piece_ :hashtag, '#there'
+        want_piece_ :string, "\n"
+        want_no_more_pieces_
 
         @piece_st.reinitialize_string_scanner_ "#there hi\n"
-        expect_piece_ :hashtag, "#there"
-        expect_piece_ :string, ' hi'
-        expect_piece_ :string, "\n"
-        expect_no_more_pieces_
+        want_piece_ :hashtag, "#there"
+        want_piece_ :string, ' hi'
+        want_piece_ :string, "\n"
+        want_no_more_pieces_
       end
     end
 

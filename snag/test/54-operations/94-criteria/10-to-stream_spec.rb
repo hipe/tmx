@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] operations - criteria - to-stream" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :criteria_operations
 
     it "`to_criteria_stream` lists the files that are in the folder" do
