@@ -96,7 +96,7 @@ module Skylab::Brazen::TestSupport
 
         yes = true ; x = nil
 
-        define_method :working_directory_for_expect_stdout_stderr do
+        define_method :working_directory_for_want_stdout_stderr do
           if yes
             yes = false
             x = instance_exec( & p )
@@ -109,7 +109,7 @@ module Skylab::Brazen::TestSupport
 
     module Instance_Methods___
 
-    def argv_prefix_for_expect_stdout_stderr
+    def argv_prefix_for_want_stdout_stderr
       self.class.sub_action_s_a
     end
 
@@ -159,12 +159,12 @@ module Skylab::Brazen::TestSupport
 
     # ~ expectation support
 
-    def expect_localized_invite_line
-      expect :styled, localized_invite_line_rx
+    def want_localized_invite_line
+      want :styled, localized_invite_line_rx
     end
 
-    def expect_exitstatus_for_resource_not_found
-      expect_exitstatus_for :resource_not_found
+    def want_exitstatus_for_resource_not_found
+      want_exitstatus_for :resource_not_found
     end
 
     def ick x

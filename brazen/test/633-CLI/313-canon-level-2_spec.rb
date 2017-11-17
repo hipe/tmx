@@ -15,19 +15,19 @@ module Skylab::Brazen::TestSupport
       it "  0) (no args) - error / usage / invite" do
 
         invoke
-        expect_branch_expression_pattern_zero__
+        want_branch_expression_pattern_zero__
       end
 
       it "1.1) (funky arg) error / usage / invite" do
 
         invoke 'fiffle'
-        expect_branch_expression_pattern_one_dot_one__
+        want_branch_expression_pattern_one_dot_one__
       end
 
       it "1.2) (funky opt) error / invite" do
 
         invoke '-x'
-        expect_branch_expression_pattern_one_dot_two__
+        want_branch_expression_pattern_one_dot_two__
       end
     end
 
@@ -63,7 +63,7 @@ module Skylab::Brazen::TestSupport
 
       shared_subject :state_ do
 
-        using_expect_stdout_stderr_invoke_via(
+        using_want_stdout_stderr_invoke_via(
           :mutable_argv, [ '-h', 'workspace' ],
           :prefix, nil,
         )
@@ -95,26 +95,26 @@ module Skylab::Brazen::TestSupport
     def _usage
 
       on_lines_from_help_screen_section_ 'usage'
-      expect_branch_usage_line_
-      expect_stdout_stderr_via branch_secondary_syntax_line_
-      expect_a_blank_line
+      want_branch_usage_line_
+      want_stdout_stderr_via branch_secondary_syntax_line_
+      want_a_blank_line
     end
 
     def _desc
 
       on_lines_from_help_screen_section_ 'description'
-      expect :styled, %r(\Adescription: .*\bworkspaces?\b)
-      expect_no_more_lines
+      want :styled, %r(\Adescription: .*\bworkspaces?\b)
+      want_no_more_lines
     end
 
     def _actions
 
       on_body_lines_from_help_screen_section_ 'actions'
-      expect %r(\A[ ]{4,}-h, --help \[cmd\][ ]{10,}this screen \(or)
-      expect %r(\A[ ]{4,}ping\z)
-      expect %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)
-      expect %r(\A[ ]{4,}summarize\z)
-      expect_a_blank_line
+      want %r(\A[ ]{4,}-h, --help \[cmd\][ ]{10,}this screen \(or)
+      want %r(\A[ ]{4,}ping\z)
+      want %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)
+      want %r(\A[ ]{4,}summarize\z)
+      want_a_blank_line
     end
 
     def _invite

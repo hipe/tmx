@@ -54,8 +54,8 @@ module Skylab::Brazen
         @stack = []  # asking for trouble - use the same array throughout faustian bargain
       end
 
-      def operator_branch= ob
-        @__root_operator_branch = ob
+      def feature_branch= ob
+        @__root_feature_branch = ob
       end
 
       def application_module= mod
@@ -148,7 +148,7 @@ module Skylab::Brazen
           _ok = __process_any_primaries_and_lookup_next_operator
           _ok || break
           _lref = current_operator_found.trueish_feature_value
-          step = MTk_::ModelCentricOperatorBranch::STEP_VIA_LOADABLE_REFERENCE[ _lref ]  # #open #[#pl-007.2] stil incubating
+          step = MTk_::ModelCentricFeatureBranch::STEP_VIA_LOADABLE_REFERENCE[ _lref ]  # #open #[#pl-007.2] stil incubating
           if step.is_branchy_step
             __push_branchy_stack_frame step
             redo
@@ -399,7 +399,7 @@ module Skylab::Brazen
 
       def __to_item_normal_tuple_stream
 
-        @stack.last._operator_branch_.to_symbolish_reference_scanner.map_by do |key_x|
+        @stack.last._feature_branch_.to_symbolish_reference_scanner.map_by do |key_x|
           [ :operator, key_x ]
         end.flush_to_minimal_stream
       end
@@ -469,14 +469,14 @@ module Skylab::Brazen
         _o = Injections__.new mod
         _o.is_empty || self._HAVE_FUN
 
-        ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH @stack.last._operator_branch_  # #open #[#pl-007.2] still incubating
+        ob = step.BRANCHY_FEATURE_BRANCH_VIA_PARENT_FEATURE_BRANCH @stack.last._feature_branch_  # #open #[#pl-007.2] still incubating
         _omni = _omni_branch_for :_hello_2_BR_, ob
 
         @argument_scanner_narrator.advance_past_match fm
 
         @stack.push( NonRootNonTerminalFrame___.define do |o|
           o._omni_branch_ = _omni
-          o._operator_branch_ = ob
+          o._feature_branch_ = ob
           o._business_module_ = mod
           o._name_symbol = fm.feature_symbol
           o._expression_agent_by_ = NOTHING_
@@ -492,11 +492,11 @@ module Skylab::Brazen
           method :__expression_agent_defaultly
         end
 
-        ob = @__root_operator_branch
+        ob = @__root_feature_branch
 
         @stack.push( RootFrame___.define do |o|
           o._expression_agent_by_ = _expag_p
-          o._operator_branch_ = ob
+          o._feature_branch_ = ob
           o._omni_branch_ = _omni_branch_for :_hello_1_BR_, ob
           o._business_module_ = @__root_application_module
         end )
@@ -1928,7 +1928,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      def __derelativize_path qkn, & oes_p
+      def __derelativize_path qkn, & p
 
         if qkn.is_known_known
           path = qkn.value
@@ -2367,7 +2367,7 @@ module Skylab::Brazen
         # will for example first check if a special method is defined which
         # corresponds to the channel name in some way and instead use that.
 
-        @on_event_selectively ||= -> * i_a, & x_p do
+        @listener ||= -> * i_a, & x_p do
           receive_uncategorized_emission i_a, & x_p
         end
       end
@@ -2948,9 +2948,9 @@ module Skylab::Brazen
 
     class Bound_Kernel___
 
-      def initialize k, & oes_p
+      def initialize k, & p
         @kernel = k
-        @on_event_selectively = oes_p
+        @listener = p
       end
 
       # ~ delegation & related
@@ -2962,7 +2962,7 @@ module Skylab::Brazen
       def to_unordered_selection_stream
 
         @kernel.build_unordered_selection_stream(
-          & @on_event_selectively )
+          & @listener )
       end
 
       def fast_lookup
@@ -3115,7 +3115,7 @@ module Skylab::Brazen
     class BranchyFrame__
       attr_accessor(
         :_omni_branch_,
-        :_operator_branch_,
+        :_feature_branch_,
         :_business_module_,
       )
     end

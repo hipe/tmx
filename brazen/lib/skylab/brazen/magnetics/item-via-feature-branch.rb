@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Magnetics::Item_via_OperatorBranch < Common_::MagneticBySimpleModel  # :[#085]
+  class Magnetics::Item_via_FeatureBranch < Common_::MagneticBySimpleModel  # :[#085]
 
     #   - for the familiar (and now universal) interface of an operator
     #     branch, we want to offer this as default implementation of
@@ -36,14 +36,14 @@ module Skylab::Brazen
         :item_lemma_symbol,
         :listener,
         :needle_item,
-        :operator_branch,
+        :feature_branch,
         :primary_channel_symbol,
         :terminal_channel_symbol,
       )
 
       def execute
 
-        lr = @operator_branch.lookup_softly @needle_item.normal_symbol
+        lr = @feature_branch.lookup_softly @needle_item.normal_symbol
           # (might change the above to pass the whole item)
           # ("lr" stands for "loadable reference")
 
@@ -69,7 +69,7 @@ module Skylab::Brazen
           end
 
           o.item_stream_by do
-            @operator_branch.to_loadable_reference_stream
+            @feature_branch.to_loadable_reference_stream
           end
 
           o.string_via_target = -> item do
@@ -103,14 +103,14 @@ module Skylab::Brazen
 
       def __when_not_found
 
-        Home_.lib_.zerk::ArgumentScanner::When::UnknownBranchItem.call_by do |o|
+        Home_.lib_.zerk::ArgumentScanner::When::UnknownFeature.call_by do |o|
 
           o.strange_value_by = -> do
             @needle_item.normal_symbol
           end
 
           o.available_item_internable_stream_by = -> do
-            @operator_branch.to_loadable_reference_stream  # ..
+            @feature_branch.to_loadable_reference_stream  # ..
           end
 
           o.item_lemma_symbol = @item_lemma_symbol  # nil OK

@@ -10,12 +10,12 @@ module Skylab::Brazen
         # (we're
         # calling this the second known implementation of [#ta-005] pathfinding.)
 
-        def initialize id_a, bx, id, action, kernel, & oes_p
+        def initialize id_a, bx, id, action, kernel, & p
 
           @action = action
           @identifier_a = id_a
           @kernel = kernel
-          @on_event_selectively = oes_p
+          @listener = p
           @self_id = id
 
           @box = if bx
@@ -62,10 +62,10 @@ module Skylab::Brazen
               x = if relies_on_self
                 # resolve a self-reliance only after the other deps are done
                 _me_silo = @kernel.silo_via_identifier me_id
-                _me_silo.precondition_for_self @action, me_id, @box, & @on_event_selectively
+                _me_silo.precondition_for_self @action, me_id, @box, & @listener
               else
                 _silo = @kernel.silo_via_identifier me_id
-                _silo.precondition_for @action, me_id, @box, & @on_event_selectively
+                _silo.precondition_for @action, me_id, @box, & @listener
               end
               if x
                 @box.add me_k, x

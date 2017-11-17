@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :collection_adapters_git_config_mutable
 
     context "to a section with no assignments" do
@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport
 
         it "document is modified correctly" do
 
-          expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
             y << "[foo]"
             y << "is-on = true"
           end
@@ -56,7 +56,7 @@ module Skylab::Brazen::TestSupport
 
         it "document is modified correctly" do
 
-          expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
             y << "[foo]"
             y << "hi = foo bar"
           end
@@ -86,7 +86,7 @@ module Skylab::Brazen::TestSupport
 
         it "document is modified correctly" do
 
-          expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
             y << "[foo]"
             y << 'hi = " foo"'
           end
@@ -108,7 +108,7 @@ module Skylab::Brazen::TestSupport
 
         it "document is modified correctly" do
 
-          expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+          want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
             y << "[foo]"
             y << %(hi = \\\\ \\" \\\n \\t \\b)
           end
@@ -134,14 +134,14 @@ module Skylab::Brazen::TestSupport
       it "changes it (minimal)" do  # :#cov1.2
         _sect = _dereference_section :foo
         _sect[ :bar ] = 'win'
-        expect_document_content "[foo]\nbar = win\n"
+        want_document_content "[foo]\nbar = win\n"
       end
 
       it "changes it when quotes are necessary to add" do
 
         _sect = _dereference_section :foo
         _sect[ :bar ] = ' a'
-        expect_document_content "[foo]\nbar = \" a\"\n"
+        want_document_content "[foo]\nbar = \" a\"\n"
       end
     end
 
@@ -152,7 +152,7 @@ module Skylab::Brazen::TestSupport
       it "changes it when quotes can be removed" do
         _sect = _dereference_section :foo
         _sect[ :bar ] = 11
-        expect_document_content "[foo]\nbar = 11\n"
+        want_document_content "[foo]\nbar = 11\n"
       end
     end
 
@@ -176,7 +176,7 @@ module Skylab::Brazen::TestSupport
 
     def _flush_common_triadic_tuple
       a = []
-      expect :info, :related_to_assignment_change, :added do |ev|
+      want :info, :related_to_assignment_change, :added do |ev|
         a.push ev
       end
       _x = execute

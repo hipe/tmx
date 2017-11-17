@@ -21,9 +21,9 @@ module Skylab::Brazen
         Home_::CommonAssociations::LEGACY.new entity_enhancement_module, & edit_p
       end
 
-      def edit_entity kernel, oes_p, & edit_p
+      def edit_entity kernel, p, & edit_p
 
-        new( kernel, & oes_p ).first_edit( & edit_p )
+        new( kernel, & p ).first_edit( & edit_p )
       end
 
       def entity_enhancement_module
@@ -85,7 +85,7 @@ module Skylab::Brazen
     end
 
     def _via_unbounds_indexation m
-      unbounds_indexation_.send m, & @on_event_selectively
+      unbounds_indexation_.send m, & @listener
     end
 
     def unbounds_indexation_
@@ -156,7 +156,7 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
-      def precondition_for action, id, box, & oes_p
+      def precondition_for action, id, box, & p
         id = @model_class.persist_to
         if id
 
@@ -186,9 +186,9 @@ module Skylab::Brazen
 
     # -- As instance --
 
-    def initialize kernel, & oes_p  # #note-180 do not set error count here
+    def initialize kernel, & p  # #note-180 do not set error count here
 
-      @on_event_selectively = oes_p or self._WHY
+      @listener = p or self._WHY
       @kernel = kernel
       @kernel.do_debug and @kernel.debug_IO.
         puts ">> >> >> >> MADE #{ name.as_slug } CTRL"
@@ -284,18 +284,18 @@ module Skylab::Brazen
 
     # ~ c r u d
 
-    def intrinsic_persist_before_persist_in_collection( *, & oes_p )
+    def intrinsic_persist_before_persist_in_collection( *, & p )
       ACHIEVED_
     end
 
-    def persist_via_action action, & oes_p  # :+public-API :+#hook-in
+    def persist_via_action action, & p  # :+public-API :+#hook-in
 
       # (override this if you need more than just the argument box)
 
-      entity_collection.persist_entity action.argument_box, self, & oes_p
+      entity_collection.persist_entity action.argument_box, self, & p
     end
 
-    def intrinsic_delete_before_delete_in_collection _action, & oes_p
+    def intrinsic_delete_before_delete_in_collection _action, & p
       ACHIEVED_
     end
 
@@ -356,7 +356,7 @@ module Skylab::Brazen
 
     def accept_selective_event_listener__ x
       @__HESVC_p__ = nil
-      @on_event_selectively = x ; nil
+      @listener = x ; nil
     end
 
     # ~ the stack (silo, etc)
@@ -377,10 +377,10 @@ module Skylab::Brazen
 
     class << self
 
-      def new_flyweight kernel, & oes_p
+      def new_flyweight kernel, & p
 
         me = self
-        _edit_entity_directly kernel, oes_p do
+        _edit_entity_directly kernel, p do
           @property_box = Home_::Modelesque::Flyweight::Property_Box.new me
         end
       end
@@ -399,9 +399,9 @@ module Skylab::Brazen
 
     class << self
 
-      def unmarshalled kernel, oes_p, & edit_p  # produce an entity from pers.
+      def unmarshalled kernel, p, & edit_p  # produce an entity from pers.
 
-        _edit_entity_directly kernel, oes_p do
+        _edit_entity_directly kernel, p do
 
           @came_from_persistence = true
 
@@ -436,9 +436,9 @@ module Skylab::Brazen
 
     ## -- internal support for concerns above
 
-    def self._edit_entity_directly boundish, oes_p, & edit_p
+    def self._edit_entity_directly boundish, p, & edit_p
 
-      o = new boundish, & oes_p
+      o = new boundish, & p
       o.instance_exec( & edit_p )
       o
     end

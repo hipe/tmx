@@ -11,7 +11,7 @@ module Skylab::Brazen
       )
 
       def initialize & p
-        @on_event_selectively = p
+        @listener = p
       end
 
       def execute
@@ -79,7 +79,7 @@ module Skylab::Brazen
       end
 
       def get_property_hash_scan_via_payload_h h
-        fly = @model_class.new_flyweight @kernel, & @on_event_selectively
+        fly = @model_class.new_flyweight @kernel, & @listener
         box = fly.properties
         Common_::Stream.via_nonsparse_array( h[ ROWS__ ] ).map_by do |x|
           box.replace_hash x.fetch VALUE__

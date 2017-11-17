@@ -14,7 +14,7 @@ module Skylab::Brazen
       o :description, -> y do
         y << "the name of the database"
       end,
-      :ad_hoc_normalizer, -> qkn, & oes_p do
+      :ad_hoc_normalizer, -> qkn, & p do
 
         if ! qkn.is_effectively_known
 
@@ -25,7 +25,7 @@ module Skylab::Brazen
           qkn.to_knownness  # valid!
 
         else
-          oes_p.call :error, :invalid_property_value do
+          p.call :error, :invalid_property_value do
             Common_::Event.inline_not_OK_with(
               :name_must_be_lowercase_alphanumeric_with_dashes,
                 :name_s, qkn.value )
@@ -55,7 +55,7 @@ module Skylab::Brazen
 
       end,
       :default, '5984',
-      :ad_hoc_normalizer, -> qkn, & oes_p do
+      :ad_hoc_normalizer, -> qkn, & p do
         if qkn.is_known_known
           x = qkn.value
         end
@@ -63,7 +63,7 @@ module Skylab::Brazen
           if /\A[0-9]{1,4}\z/ =~ x
             qkn.to_knownness
           else
-            oes_p.call :error, :invalid_property_value do
+            p.call :error, :invalid_property_value do
               Common_::Event.inline_not_OK_with(
                 :port_must_be_one_to_four_digits, :port_s, x )
             end
@@ -104,46 +104,46 @@ module Skylab::Brazen
 
     # ~ c r u d
 
-    def persist_entity bx, entity, & oes_p
+    def persist_entity bx, entity, & p
 
-      _ok = entity.intrinsic_persist_before_persist_in_collection bx, & oes_p
+      _ok = entity.intrinsic_persist_before_persist_in_collection bx, & p
 
       _ok && Couch_::Magnetics::PersistEntity_via_Entity_and_Collection.call(
-        bx[ :dry_run ], entity, self, & oes_p )
+        bx[ :dry_run ], entity, self, & p )
     end
 
-    def intrinsic_persist_before_persist_in_collection _, & oes_p
+    def intrinsic_persist_before_persist_in_collection _, & p
 
-      oes_p ||= handle_event_selectively
-      Couch_::Magnetics::TouchCollection_via_Collection[ self, & oes_p ]
+      p ||= handle_event_selectively
+      Couch_::Magnetics::TouchCollection_via_Collection[ self, & p ]
       ACHIEVED_  # #note-085
     end
 
-    def entity_via_intrinsic_key id, & oes_p
-      Couch_::Magnetics::Retrieve_collection_entity[ id, self, @kernel, & oes_p ]
+    def entity_via_intrinsic_key id, & p
+      Couch_::Magnetics::Retrieve_collection_entity[ id, self, @kernel, & p ]
     end
 
-    def to_entity_stream_via_model cls, & oes_p
+    def to_entity_stream_via_model cls, & p
 
       Couch_::Magnetics::EntityStream_via_Collection.via(
         :model_class, cls,
         :collection, self,
         :kernel, @kernel,
-        & oes_p )
+        & p )
     end
 
-    def delete_entity action, ent, & oes_p
-      _ok = ent.intrinsic_delete_before_delete_in_collection action, & oes_p
-      _ok && Couch_::Magnetics::DeleteEntity_via_Entity_and_Collection[ action, ent, self, & oes_p ]
+    def delete_entity action, ent, & p
+      _ok = ent.intrinsic_delete_before_delete_in_collection action, & p
+      _ok && Couch_::Magnetics::DeleteEntity_via_Entity_and_Collection[ action, ent, self, & p ]
     end
 
-    def intrinsic_delete_before_delete_in_collection action, & oes_p
+    def intrinsic_delete_before_delete_in_collection action, & p
 
       Couch_::Magnetics::DeleteCollection_via_Collection.call(
         action.knownness( :dry_run ),
         action.knownness( :force ),
         self,
-        _HTTP_remote, & ( oes_p || handle_event_selectively ) )
+        _HTTP_remote, & ( p || handle_event_selectively ) )
 
       # NOTE  :+[#086] any failure from above is ignored - we want the
       # the failure of the one not to prevent the other from proceding
@@ -182,13 +182,13 @@ module Skylab::Brazen
 
     class Silo_Daemon < Home_::Silo::Daemon
 
-      def precondition_for_self _action, _id, box, & oes_p
+      def precondition_for_self _action, _id, box, & p
         :"???"  # we might want to use this for write-collection operations
       end
 
-      def precondition_for act, id, box, & oes_p
+      def precondition_for act, id, box, & p
         box.fetch( :workspace ).entity_via_intrinsic_key id do | * i_a, & ev_p |
-          oes_p.call( * i_a  ) do
+          p.call( * i_a  ) do
             ev_p[].new_inline_with :invite_to_action, [ :collection, :couch, :add ]
           end
         end

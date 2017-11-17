@@ -18,7 +18,7 @@ module Skylab::Brazen
     public
 
       def ensure_exists_when_201_created _
-        @on_event_selectively.call :info, :created_collection do
+        @listener.call :info, :created_collection do
           bld_created_collection_event
         end
         ACHIEVED_
@@ -30,7 +30,7 @@ module Skylab::Brazen
       end
 
       def ensure_exists_when_412_precondition_failed o
-        @on_event_selectively.call :info, :collection_exists do
+        @listener.call :info, :collection_exists do
           bld_collection_exists_event
         end
         nil

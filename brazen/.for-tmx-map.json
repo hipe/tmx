@@ -1,6 +1,6 @@
 {
-  "after": "tabular",
-  "category": "more general libs",
+  "after": "plugin",
+  "category": "frameworky essentials",
   "doc test manifest": ".doc-test-manifest.list",
   "is lib": true,
   "sigil": "br"

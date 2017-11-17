@@ -577,16 +577,16 @@ module Skylab::Brazen
 
     # -- As instance --
 
-    def initialize kernel, & oes_p
+    def initialize kernel, & p
 
-      oes_p or raise ::ArgumentError
+      p or raise ::ArgumentError
       kernel.respond_to? :reactive_tree_seed or raise ::ArgumentError, __say_not_kernel( kernel )
 
       @formal_properties = nil
       @preconditions = nil
       @kernel = kernel
 
-      __accept_selective_listener_proc oes_p
+      __accept_selective_listener_proc p
     end
 
     def __say_not_kernel k
@@ -636,8 +636,8 @@ module Skylab::Brazen
 
     class << self
 
-      def edit_and_call boundish, oes_p, & edit_p  # experimental
-        new( boundish, & oes_p ).__edit_and_call( & edit_p )
+      def edit_and_call boundish, p, & edit_p  # experimental
+        new( boundish, & p ).__edit_and_call( & edit_p )
       end
     end
 
@@ -759,7 +759,7 @@ module Skylab::Brazen
 
     def __resolve_preconditions_via_formal_preconditions a
 
-      oes_p = handle_event_selectively
+      p = handle_event_selectively
 
       bx = Home_::Actionesque::Preconditions::Produce_Box.new(
         a,  # the identifiers for silos i depend on
@@ -767,7 +767,7 @@ module Skylab::Brazen
         silo_module.node_identifier,  # my identifier
         self,  # the action
         @kernel,
-        & oes_p ).produce_box
+        & p ).produce_box
 
       bx and begin
         @preconditions = bx
@@ -951,11 +951,11 @@ module Skylab::Brazen
 
   public
 
-    def __accept_selective_listener_proc oes_p  # ..
+    def __accept_selective_listener_proc p  # ..
 
-      @_upstream_event_handler = oes_p
+      @_upstream_event_handler = p
 
-      @on_event_selectively = -> * i_a, & ev_p do
+      @listener = -> * i_a, & ev_p do
 
         receive_uncategorized_emission i_a, & ev_p
       end

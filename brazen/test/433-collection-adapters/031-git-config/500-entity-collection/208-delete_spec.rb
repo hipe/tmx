@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport
 
         _actual = _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
 
           y << 'cannot delete foot wear "zeg zeg"'
 
@@ -37,7 +37,7 @@ module Skylab::Brazen::TestSupport
         end
 
         a = []
-        spy.expect :error, :expression, :component_not_found do |y|
+        spy.want :error, :expression, :component_not_found do |y|
           a.push y
         end
 

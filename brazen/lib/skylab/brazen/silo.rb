@@ -69,7 +69,7 @@ module Skylab::Brazen
         end
       end
 
-      def __via_unresolved_identifier id, & oes_p  # #note-40, :+[#pa-002]
+      def __via_unresolved_identifier id, & p  # #note-40, :+[#pa-002]
 
         id = id.as_mutable_for_resolving
 
@@ -86,7 +86,7 @@ module Skylab::Brazen
           target_s = full_raw_s_a.fetch index
 
           if ! mod_a
-            mod_a = __real_modules_array_via_unbound node_x, & oes_p
+            mod_a = __real_modules_array_via_unbound node_x, & p
             local_index = -1
           end
 
@@ -111,7 +111,7 @@ module Skylab::Brazen
             mod_a = nil
 
           when  1
-            x = __when_not_found id, target_s, & oes_p
+            x = __when_not_found id, target_s, & p
             break
 
           when -1
@@ -122,10 +122,10 @@ module Skylab::Brazen
         x
       end
 
-      def __when_not_found id, target_s, & oes_p
+      def __when_not_found id, target_s, & p
 
-        if oes_p
-          oes_p.call :not_found do
+        if p
+          p.call :not_found do
             _build_model_not_found_event id, target_s
           end
         else
@@ -166,14 +166,14 @@ module Skylab::Brazen
         end
       end
 
-      def __real_modules_array_via_unbound unb, & oes_p
+      def __real_modules_array_via_unbound unb, & p
 
         if unb.respond_to? :build_unordered_selection_stream
 
           # the above method is the universal way to detect a [normal]
           # unbound. despite this:
 
-          _st = unb.build_unordered_real_stream( & oes_p )
+          _st = unb.build_unordered_real_stream( & p )
 
           _st.to_a  # or cover me
 
@@ -227,20 +227,20 @@ module Skylab::Brazen
         @silo_module.name_function.as_lowercase_with_underscores_symbol
       end
 
-      def call * x_a, & oes_p
-        bc = _bound_call_via x_a, & oes_p
+      def call * x_a, & p
+        bc = _bound_call_via x_a, & p
         bc and bc.receiver.send( bc.method_name, * bc.args )
       end
 
-      def bound_call * x_a, & oes_p
-        _bound_call_via x_a, & oes_p
+      def bound_call * x_a, & p
+        _bound_call_via x_a, & p
       end
 
-      def _bound_call_via x_a, & oes_p
+      def _bound_call_via x_a, & p
 
-        o = Home_::Actionesque_ProduceBoundCall.new @kernel, & oes_p
+        o = Home_::Actionesque_ProduceBoundCall.new @kernel, & p
         o.iambic = x_a
-        bound = @silo_module.new @kernel, & oes_p
+        bound = @silo_module.new @kernel, & p
         o.current_bound = bound
         o.unbound_stream = bound.to_unordered_real_stream
           # real not, selection or index (for now)

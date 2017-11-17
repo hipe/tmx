@@ -191,7 +191,7 @@ module Skylab::Brazen
 
     def handle_event_selectively  # idiomatic accessor for this, :+#public-API
 
-      @on_event_selectively
+      @listener
     end
   end
 end

@@ -171,7 +171,7 @@ module Skylab::Brazen
 
             # experimentally, the child action "takes over" the parent
 
-            @parent_node.accept_selective_event_listener__ @on_event_selectively
+            @parent_node.accept_selective_event_listener__ @listener
 
             @edited_entity = @parent_node.first_edit do | o |
               o.preconditions @preconditions
@@ -213,14 +213,14 @@ module Skylab::Brazen
 
       private
 
-        def produce_one_entity & oes_p
-          oes_p ||= handle_event_selectively
+        def produce_one_entity & p
+          p ||= handle_event_selectively
           @__entity_stream = entity_collection.to_entity_stream_via_model(
-            _model_class, & oes_p )
-          __via_entity_stream_and_dsc_for_one_produce_entity( & oes_p )
+            _model_class, & p )
+          __via_entity_stream_and_dsc_for_one_produce_entity( & p )
         end
 
-        def __via_entity_stream_and_dsc_for_one_produce_entity & oes_p
+        def __via_entity_stream_and_dsc_for_one_produce_entity & p
           one = @__entity_stream.gets
           if one
             x = @__entity_stream.gets
@@ -237,17 +237,17 @@ module Skylab::Brazen
           @__entity_stream = nil
           if one
             if had_many
-              __via_dsc_for_one_produce_entity_when_had_many_via_last one, & oes_p
+              __via_dsc_for_one_produce_entity_when_had_many_via_last one, & p
             else
               one
             end
           else
-            __for_one_resolve_entity_when_had_none( & oes_p )
+            __for_one_resolve_entity_when_had_none( & p )
           end
         end
 
-        def __via_dsc_for_one_produce_entity_when_had_many_via_last one, & oes_p
-          oes_p.call :info, :single_entity_resolved_with_ambiguity do
+        def __via_dsc_for_one_produce_entity_when_had_many_via_last one, & p
+          p.call :info, :single_entity_resolved_with_ambiguity do
             __build_single_entity_resolved_with_ambiguity
           end
           one
@@ -271,9 +271,9 @@ module Skylab::Brazen
           end
         end
 
-        def __for_one_resolve_entity_when_had_none & oes_p
+        def __for_one_resolve_entity_when_had_none & p
 
-          oes_p.call :error, :component_not_found do
+          p.call :error, :component_not_found do
 
             Home_.lib_.ACS::Events::ComponentNotFound.with(
               :component_association, _model_class,
@@ -308,28 +308,28 @@ module Skylab::Brazen
 
           __init_selective_listener_proc_for_delete
 
-          oes_p = handle_event_selectively
+          p = handle_event_selectively
 
           ok = __via_args_resolve_subject_entity
 
           ok &&= @subject_entity.intrinsic_delete_before_delete_in_collection(
-            self, & oes_p )
+            self, & p )
 
-          ok and entity_collection.delete_entity self, @subject_entity, & oes_p
+          ok and entity_collection.delete_entity self, @subject_entity, & p
         end
 
         def __init_selective_listener_proc_for_delete
 
           _ = Common_::Event.produce_handle_event_selectively_through_methods
 
-          upstream_oes_p = @on_event_selectively
+          upstream_p = @listener
 
-          _oes_p = _.full self, :while_deleting_entity do | * i_a, & ev_p |
+          _p = _.full self, :while_deleting_entity do | * i_a, & ev_p |
 
-            upstream_oes_p[ * i_a, & ev_p ]
+            upstream_p[ * i_a, & ev_p ]
           end
 
-          @on_event_selectively = _oes_p
+          @listener = _p
 
           NIL_
         end

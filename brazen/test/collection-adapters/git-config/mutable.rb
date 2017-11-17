@@ -79,15 +79,15 @@ module Skylab::Brazen::TestSupport
 
     # ~ expectations
 
-    def expect_document_content expected_string
+    def want_document_content expected_string
       _actual_string = __document_content
       _actual_string.should eql expected_string
     end
 
-    def expect_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
+    def want_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
 
-      TestSupport_::Expect_Line::
-        Expect_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
+      TestSupport_::Want_Line::
+        Want_these_lines_in_array_with_trailing_newlines[ act_s_a, p, self ]
 
       NIL
     end
@@ -100,8 +100,8 @@ module Skylab::Brazen::TestSupport
       @document.write_bytes_into []
     end
 
-    def expect_one_event_ sym
-      em = expect_event
+    def want_one_event_ sym
+      em = want_event
       ev = em.cached_event_value.to_event
       ev.terminal_channel_symbol.should eql sym
       if block_given?
@@ -113,7 +113,7 @@ module Skylab::Brazen::TestSupport
     # ~ setup
 
     def will_call_by_
-      p = expect_emission_fail_early_listener
+      p = want_emission_fail_early_listener
       call_by do
         yield p
       end

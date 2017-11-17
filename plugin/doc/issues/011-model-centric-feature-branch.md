@@ -1,4 +1,4 @@
-# model-centric operator branch :[#011]
+# model-centric feature branch :[#011]
 
 ## table of contents/quick jump
 
@@ -14,9 +14,9 @@
 ## synopsis
 
 perhaps the most ambitious-yet implementation of a [#ze-051]
-"operator branch", one that attempts to shoehorn the massive collection
+"feature branch", one that attempts to shoehorn the massive collection
 of architectural conventions of [br] "reactive trees" into the minimal
-interface of an operator branch..
+interface of an feature branch..
 
 the subject (in its current incarnation) was born to assuage the PLETHORA
 (14?) of sidesystems that use the old [br] architecture, into the modern

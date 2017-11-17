@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :collection_adapters_git_config_mutable
 
     with_a_document_with_a_section_called_foo
@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport
       end
 
       it "document is modified SOMEWHAT" do
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << "[foo]"
           y << "[wizzie]"
         end
@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport
         end
 
         a = []
-        expect :error, :invalid_variable_name do |ev|
+        want :error, :invalid_variable_name do |ev|
           a.push ev
         end
         a.push execute
@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
 
       _actual = @document.to_line_stream
 
-      expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+      want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
         y << '[foo]'
         y << '[wizzie]'
         y << 'fum-fum = he he'

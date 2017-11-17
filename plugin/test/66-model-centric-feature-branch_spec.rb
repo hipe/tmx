@@ -17,7 +17,7 @@ module Skylab::Plugin::TestSupport
     context "hi" do
 
       it "builds" do
-        _ob || fail
+        _feature_branch || fail
       end
 
       it "to LT stream - loadable references know their name based on filename alone" do
@@ -67,11 +67,11 @@ module Skylab::Plugin::TestSupport
 
       def __this_one_scanner
         Home_::Zerk_no_deps_[]  # while #open [#ze-068] unify scanners
-        _hi = _ob
+        _hi = _feature_branch
         _hi.to_symbolish_reference_scanner
       end
 
-      shared_subject :_ob do
+      shared_subject :_feature_branch do
 
         _subject_module.define do |o|
 
@@ -269,7 +269,7 @@ module Skylab::Plugin::TestSupport
     # ==
 
     def _subject_module
-      Home_::ModelCentricOperatorBranch
+      Home_::ModelCentricFeatureBranch
     end
 
     # ==

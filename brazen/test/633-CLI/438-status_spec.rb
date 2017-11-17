@@ -20,11 +20,11 @@ module Skylab::Brazen::TestSupport
 
         invoke 'x'
 
-        expect :styled, /#{ env 'max-num-dirs' } must be an #{
+        want :styled, /#{ env 'max-num-dirs' } must be an #{
           }integer, had #{ ick 'potato' }\z/
 
-        expect_localized_invite_line
-        expect_errored
+        want_localized_invite_line
+        want_errored
       end
     end
 
@@ -36,11 +36,11 @@ module Skylab::Brazen::TestSupport
 
         invoke 'x'
 
-        expect :styled, /#{ env 'max-num-dirs' } must be non-negative, #{
+        want :styled, /#{ env 'max-num-dirs' } must be non-negative, #{
           }had #{ ick( -1 ) }/
 
-        expect_localized_invite_line
-        expect_errored
+        want_localized_invite_line
+        want_errored
       end
     end
 
@@ -52,8 +52,8 @@ module Skylab::Brazen::TestSupport
 
         invoke '.'
 
-        expect %r(\bno directories were searched\.\z)
-        expect_exitstatus_for_resource_not_found
+        want %r(\bno directories were searched\.\z)
+        want_exitstatus_for_resource_not_found
       end
     end
 
@@ -69,9 +69,9 @@ module Skylab::Brazen::TestSupport
 
           invoke '.'
 
-          expect "#{ _head } not found in . or 1 dir up"
+          want "#{ _head } not found in . or 1 dir up"
 
-          expect_exitstatus_for_resource_not_found
+          want_exitstatus_for_resource_not_found
         end
       end
 
@@ -81,17 +81,17 @@ module Skylab::Brazen::TestSupport
 
         it "not found, and note the language change" do
           invoke '.'
-          expect_same_result
+          want_same_result
         end
 
         it "with no path argument, uses default of '.' (same as above)" do
           invoke
-          expect_same_result
+          want_same_result
         end
 
-        def expect_same_result
-          expect "#{ _head } not found in ."
-          expect_exitstatus_for_resource_not_found
+        def want_same_result
+          want "#{ _head } not found in ."
+          want_exitstatus_for_resource_not_found
         end
       end
 
@@ -99,9 +99,9 @@ module Skylab::Brazen::TestSupport
 
         it "says as much" do  # #lends-coverage to #[#fi-008.6]
           invoke 'foozie'
-          expect :styled, %r(#{ par 'path' } does not exist - \./foozie\z)
-          expect_action_invite_line_
-          expect_errored
+          want :styled, %r(#{ par 'path' } does not exist - \./foozie\z)
+          want_action_invite_line_
+          want_errored
         end
       end
     end
@@ -109,15 +109,15 @@ module Skylab::Brazen::TestSupport
     # ~ ad-hoc business for this file
 
     def invoke * argv
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
     end
 
     dangerous_memoize :_head do
       'while determining a workspace, "brazen.conf"'
     end
 
-    def expect_negative_exitstatus
-      expect_no_more_lines
+    def want_negative_exitstatus
+      want_no_more_lines
       @exitstatus.should eql Home_::API.exit_statii.fetch :is_negative
     end
   end

@@ -15,7 +15,7 @@ module Skylab::Brazen
       )
 
       def initialize & _
-        @on_event_selectively = _
+        @listener = _
       end
 
       def execute
@@ -125,7 +125,7 @@ module Skylab::Brazen
             :create,
             :is_dry_run, @is_dry,
             :filesystem, Home_.lib_.system.filesystem,
-            & @on_event_selectively )
+            & @listener )
 
           if ! kn
             ok = kn
@@ -146,14 +146,14 @@ module Skylab::Brazen
           @document.write_to_path_by do |o|
             o.path = @path
             o.is_dry = @is_dry
-            o.listener = @on_event_selectively
+            o.listener = @listener
           end
         end
       end
 
       def when_exist
 
-        @on_event_selectively.call :error, :directory_already_has_config_file do
+        @listener.call :error, :directory_already_has_config_file do
 
           Common_::Event.inline_not_OK_with(
             :directory_already_has_config_file,

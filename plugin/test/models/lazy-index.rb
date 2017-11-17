@@ -24,7 +24,7 @@ module Skylab::Plugin::TestSupport
 
         subj, ob = tuple_from_state_one_
 
-        # (pretend that the operator branch produced the loadable reference (in
+        # (pretend that the feature branch produced the loadable reference (in
         # this branch's case an asset reference) through streaming or whatever)
 
         _k = this_one_natural_key_
@@ -34,7 +34,7 @@ module Skylab::Plugin::TestSupport
         _aref = mod.entry_tree.asset_reference_via_entry_group_head _k
 
         _this_class = Home_.lib_.zerk::ArgumentScanner::
-            OperatorBranch_via_AutoloaderizedModule::
+            FeatureBranch_via_AutoloaderizedModule::
               LoadableReferenceIsh___  # [ze]:TESTPOINT1
 
         _trueish_x = _this_class.define do |o|
@@ -56,11 +56,11 @@ module Skylab::Plugin::TestSupport
 
       shared_subject :tuple_from_state_one_ do
 
-        ob = Build_real_operator_branch___[]
+        ob = Build_real_feature_branch___[]
 
         subj = subject_module_.define do |o|
 
-          o.operator_branch = ob
+          o.feature_branch = ob
 
           o.construct_plugin_by = -> cls do
             cls.name.split( '::' ).last.upcase << "!"  # :#here
@@ -79,8 +79,8 @@ module Skylab::Plugin::TestSupport
 
     # ==
 
-    Build_real_operator_branch___ = -> do
-      Zerk_lib_[]::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
+    Build_real_feature_branch___ = -> do
+      Zerk_lib_[]::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.define do |o|
         o.module = Home_
         o.sub_branch_const = :Actions
       end

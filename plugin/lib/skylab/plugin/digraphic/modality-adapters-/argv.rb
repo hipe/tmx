@@ -360,12 +360,12 @@ module Skylab::Plugin
 
       class Aggregate_Parse_Session
 
-        def initialize input_x, indexes, & oes_p
+        def initialize input_x, indexes, & p
 
           @indexes = indexes
           @input_x = input_x
           @occurrence_a = indexes.occurrence_a
-          @on_event_selectively = oes_p
+          @listener = p
           @plugin_a = indexes.plugin_a
 
           # ~ written to when the parse happens:
@@ -389,7 +389,7 @@ module Skylab::Plugin
           ACHIEVED_
         rescue ::OptionParser::ParseError => e
 
-          @on_event_selectively.call :error, :exception, :optparse_parse do
+          @listener.call :error, :exception, :optparse_parse do
             e
           end
           UNABLE_
@@ -475,12 +475,12 @@ module Skylab::Plugin
 
         # #storypoint-11, #storypoint-21
 
-        def initialize input_x, state_machine, indexes, & oes_p
+        def initialize input_x, state_machine, indexes, & p
 
           @digraph = state_machine.digraph
           @state_machine = state_machine
 
-          super( input_x, indexes, & oes_p )
+          super( input_x, indexes, & p )
         end
 
         def execute
@@ -495,7 +495,7 @@ module Skylab::Plugin
 
           @step_a = Me_::Dispatcher::Find_plan.new(
             @actuals_known, @traversals, @state_machine, @indexes,
-            & @on_event_selectively ).execute
+            & @listener ).execute
 
           @step_a && ACHIEVED_
         end
@@ -506,7 +506,7 @@ module Skylab::Plugin
 
           @step_a.each_with_index do | step, d |
             if @plugin_a.fetch( step.plugin_idx ).respond_to? :process_ARGV
-              step.does_process_input = true
+              step.dprocess_input = true
               step_index_of_last_one_to_get_argv = d
             end
           end
@@ -529,7 +529,7 @@ module Skylab::Plugin
             Plan___.new(
               @argv_2, @input_x, @prcs_argv_meth_name,
               @step_a, @indexes,
-              & @on_event_selectively ),
+              & @listener ),
 
             :execute_the_plan )
         end
@@ -537,10 +537,10 @@ module Skylab::Plugin
 
       class Plan___
 
-        def initialize working_argv, real_argv, input_method_name, step_a, idxs, & oes_p
+        def initialize working_argv, real_argv, input_method_name, step_a, idxs, & p
 
           @input_method_name = input_method_name
-          @on_event_selectively = oes_p
+          @listener = p
           @plugin_a = idxs.plugin_a
           @real_ARGV = real_argv
           @step_a = step_a
@@ -570,7 +570,7 @@ module Skylab::Plugin
 
               step.write_actuals_into_plugin de
 
-              if step.does_process_input
+              if step.dprocess_input
                 ok = de.send @input_method_name, input_x
                 ok or break
 
@@ -590,7 +590,7 @@ module Skylab::Plugin
         end
 
         def _when_unprocessed_input input_x
-          @on_event_selectively.call :error, :expression do | y |
+          @listener.call :error, :expression do | y |
             y << "unhandled argument: #{ input_x.first.inspect }"
           end
           NIL_

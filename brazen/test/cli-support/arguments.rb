@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport
         NIL_
       end
 
-      def expect_failure_ event_channel_sym, x_i
+      def want_failure_ event_channel_sym, x_i
 
         x = @__result
         if x
@@ -58,7 +58,7 @@ module Skylab::Brazen::TestSupport
         end
       end
 
-      def expect_success_ * x_a
+      def want_success_ * x_a
         a = @__normalization.release_result_iambic
         a.should eql x_a
       end

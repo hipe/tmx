@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :collection_adapters_git_config_entity_collection
 
     context "when you try to update a no ent" do
@@ -63,7 +63,7 @@ module Skylab::Brazen::TestSupport
 
         _actual = _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
 
           y << 'cannot update: no existing foot wear "flip floppzz"'
 
@@ -83,7 +83,7 @@ module Skylab::Brazen::TestSupport
         end
 
         a = []
-        expect :error, :expression, :component_not_found do |y|
+        want :error, :expression, :component_not_found do |y|
           a.push y
         end
 
@@ -101,7 +101,7 @@ module Skylab::Brazen::TestSupport
 
       it "explains" do
         _actual = _tuple.first
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "cannot update: section in document has unrecognized assignment: 'flimbitty_bimbitty'"
         end
       end
@@ -118,7 +118,7 @@ module Skylab::Brazen::TestSupport
         end
 
         a = []
-        expect :error, :expression, :unrecognized_assignments do |y|
+        want :error, :expression, :unrecognized_assignments do |y|
           a.push y
         end
 
@@ -153,7 +153,7 @@ module Skylab::Brazen::TestSupport
 
         _actual = black_and_white_lines _tuple[1]
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'value changed - ( main-color : "black" )'
         end
       end
@@ -162,7 +162,7 @@ module Skylab::Brazen::TestSupport
 
         _actual = black_and_white_lines _tuple[2]
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'added value - ( weight-in-ounces : 12.5 )'
         end
       end
@@ -194,11 +194,11 @@ module Skylab::Brazen::TestSupport
           fac.update _ent, & p
         end
 
-        expect :info, :related_to_assignment_change, :changed do |ev|
+        want :info, :related_to_assignment_change, :changed do |ev|
           a.push ev
         end
 
-        expect :info, :related_to_assignment_change, :added do |ev|
+        want :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 

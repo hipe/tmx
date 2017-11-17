@@ -32,9 +32,9 @@ class Kernel  # [#015]
     bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
   end
 
-  def bound_call_via_mutable_iambic x_a, & oes_p
+  def bound_call_via_mutable_iambic x_a, & p
 
-    o = Home_::Actionesque_ProduceBoundCall.new self, & oes_p
+    o = Home_::Actionesque_ProduceBoundCall.new self, & p
     o.iambic = x_a
     o.module = @module
     o.execute
@@ -120,9 +120,9 @@ class Kernel  # [#015]
     _silos.via_normal_stream st
   end
 
-  def silo_via_identifier id, & oes_p
+  def silo_via_identifier id, & p
 
-    _silos.via_identifier id, & oes_p
+    _silos.via_identifier id, & p
   end
 
   def _silos

@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport
 
       _actual = doc.write_bytes_into []
 
-      expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+      want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
         y << '[se-ct "sub.sect"]'
         y << 'two-characters = \\\\b'
       end
@@ -76,7 +76,7 @@ module Skylab::Brazen::TestSupport
 
         _actual = _doc.to_line_stream
 
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << "# hello mother"
         end
       end

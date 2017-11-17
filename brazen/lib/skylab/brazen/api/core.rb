@@ -4,8 +4,8 @@ module Skylab::Brazen
 
     class << self
 
-      def call * x_a, & oes_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+      def call * x_a, & p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & p
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 

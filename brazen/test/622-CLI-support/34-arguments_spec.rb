@@ -60,44 +60,44 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 comes up short" do
         against_
-        expect_failure_ :missing, :alpha
+        want_failure_ :missing, :alpha
       end
 
       it "with 1 comes us short" do
         against_ :A
-        expect_failure_ :missing, :beta
+        want_failure_ :missing, :beta
       end
 
       it "with 2 comes up short" do
         against_ :A, :B
-        expect_failure_ :missing, :epsilon
+        want_failure_ :missing, :epsilon
       end
 
       it "with 3 comes up short" do
         against_ :A, :B, :C
-        expect_failure_ :missing, :zeta
+        want_failure_ :missing, :zeta
       end
 
       it "with 4 comes up just right" do
         against_ :A, :B, :C, :D
-        expect_success_ :alpha, :A, :beta, :B, :epsilon, :C, :zeta, :D
+        want_success_ :alpha, :A, :beta, :B, :epsilon, :C, :zeta, :D
       end
 
       it "with 5 comes up just right" do
         against_ :A, :B, :C, :D, :E
-        expect_success_ :alpha, :A, :beta, :B, :gamma, :C,
+        want_success_ :alpha, :A, :beta, :B, :gamma, :C,
           :epsilon, :D, :zeta, :E
       end
 
       it "with 6 comes up just right" do
         against_ :A, :B, :C, :D, :E, :F
-        expect_success_ :alpha, :A, :beta, :B, :gamma, :C, :delta, :D,
+        want_success_ :alpha, :A, :beta, :B, :gamma, :C, :delta, :D,
           :epsilon, :E, :zeta, :F
       end
 
       it "with 7 comes up long" do
         against_ :A, :B, :C, :D, :E, :F, :G
-        expect_failure_ :extra, :E
+        want_failure_ :extra, :E
       end
     end
 
@@ -115,22 +115,22 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 comes up short" do
         against_
-        expect_failure_ :missing, :foo
+        want_failure_ :missing, :foo
       end
 
       it "with 1 comes up ok" do
         against_ :A
-        expect_success_ :foo, :A
+        want_success_ :foo, :A
       end
 
       it "with 2 comes up OK" do
         against_ :A, :B
-        expect_success_ :foo, :A, :bar, :B
+        want_success_ :foo, :A, :bar, :B
       end
 
       it "with 3 comes up long" do
         against_ :A, :B, :C
-        expect_failure_ :extra, :C
+        want_failure_ :extra, :C
       end
     end
 
@@ -148,22 +148,22 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 comes up short" do
         against_
-        expect_failure_ :missing, :bar
+        want_failure_ :missing, :bar
       end
 
       it "with 1 comes up OK" do
         against_ :A
-        expect_success_ :bar, :A
+        want_success_ :bar, :A
       end
 
       it "with 2 comes up OK" do
         against_ :A, :B
-        expect_success_ :foo, :A, :bar, :B
+        want_success_ :foo, :A, :bar, :B
       end
 
       it "with 3 comes up long (NOTE which argument is considered 'extra')" do
         against_ :A, :B, :C
-        expect_failure_ :extra, :B
+        want_failure_ :extra, :B
       end
     end
 
@@ -180,17 +180,17 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 comes up short" do
         against_
-        expect_failure_ :missing, :foo
+        want_failure_ :missing, :foo
       end
 
       it "with 1 comes up just right" do
         against_ :A
-        expect_success_ :foo, :A
+        want_success_ :foo, :A
       end
 
       it "with 2 comes up long" do
         against_ :A, :B
-        expect_failure_ :extra, :B
+        want_failure_ :extra, :B
       end
     end
 
@@ -206,17 +206,17 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 comes up OK" do
         against_
-        expect_success_
+        want_success_
       end
 
       it "with 1 comes up just right" do
         against_ :A
-        expect_success_ :foo, :A
+        want_success_ :foo, :A
       end
 
       it "with 2 comes up long" do
         against_ :A, :B
-        expect_failure_ :extra, :B
+        want_failure_ :extra, :B
       end
     end
 
@@ -230,12 +230,12 @@ module Skylab::Brazen::TestSupport
 
       it "with 0 ok" do
         against_
-        expect_success_
+        want_success_
       end
 
       it "with 1 comes up long" do
         against_ :A
-        expect_failure_ :extra, :A
+        want_failure_ :extra, :A
       end
     end
   end

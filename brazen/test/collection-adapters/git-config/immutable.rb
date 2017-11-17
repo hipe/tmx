@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport
       end
     end  # >>
 
-    def expect_no_sections_from str
+    def want_no_sections_from str
 
       @document = subject_module_document_via_string_ str do
         TS_._OOPS
@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport
 
     def a_section_parses
       with "[sectum]\n"
-      expect_config do |conf|
+      want_config do |conf|
         conf.sections.length.should eql 1
         conf.sections.first.external_normal_name_symbol.should eql :sectum
       end
@@ -31,7 +31,7 @@ module Skylab::Brazen::TestSupport
         [scto]
          # commo
       HERE
-      expect_config do |conf|
+      want_config do |conf|
         conf.sections.length.should eql 1
         conf.sections.first.external_normal_name_symbol.should eql :scto
       end
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport
 
            ; wazoozle
       HERE
-      expect_config do |conf|
+      want_config do |conf|
         conf.sections.length.should eql 1
         conf.sections.first.external_normal_name_symbol.should eql :scton
       end
@@ -53,7 +53,7 @@ module Skylab::Brazen::TestSupport
 
     def the_subsection_name_parses
       with '[ -.secto-2014.08 "foo \\" \\\\ " ]'
-      expect_config do |conf|
+      want_config do |conf|
         sect = conf.sections.first
         sect.internal_normal_name_string.should eql '-.secto-2014.08'
         sect.subsection_string == 'foo " \\ ' || fail
@@ -67,7 +67,7 @@ module Skylab::Brazen::TestSupport
         [WiZ]
       HERE
 
-      expect_config do |conf|
+      want_config do |conf|
 
         conf.sections.map { |x| x.external_normal_name_symbol }.should eql [ :wiz, :wiz ]
       end
@@ -100,7 +100,7 @@ module Skylab::Brazen::TestSupport
         [SECT]
         foo=bar
       HERE
-      expect_config do |conf|
+      want_config do |conf|
         _sect = conf.sections.dereference :sect
         ast = _sect.assignments.first
         ast.internal_normal_name_string.should eql 'foo'
@@ -120,7 +120,7 @@ module Skylab::Brazen::TestSupport
         quotes-with-etc=  "so; you think you can \\"dance\\" ? "  ; huzzah
       HERE
 
-      expect_config do |conf|
+      want_config do |conf|
 
         _assmts = conf.sections.dereference( :secto ).assignments
         o = _assmts.method :dereference  # LOOK
@@ -137,7 +137,7 @@ module Skylab::Brazen::TestSupport
       @input_string = s ; nil
     end
 
-    def expect_config
+    def want_config
 
       conf = subject_module_document_via_string_ @input_string do |*a, & p|
         debug_IO.puts "uh-oh (on #{ a.inspect })"

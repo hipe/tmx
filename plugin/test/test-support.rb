@@ -54,9 +54,9 @@ module Skylab::Plugin::TestSupport
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  Expect_Event = -> tcc do
+  Want_Event = -> tcc do
 
-    Common_.test_support::Expect_Emission[ tcc ]
+    Common_.test_support::Want_Emission[ tcc ]
 
     NIL_
   end

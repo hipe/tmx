@@ -112,7 +112,7 @@ module Skylab::Plugin::TestSupport
     end
 
     def _subject_module
-      Home_::Magnetics::OperatorBranch_via_DirectoryOneDeeper
+      Home_::Magnetics::FeatureBranch_via_DirectoryOneDeeper
     end
   end
 end

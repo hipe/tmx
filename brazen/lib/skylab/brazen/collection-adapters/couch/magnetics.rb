@@ -39,7 +39,7 @@ module Skylab::Brazen
           h = @payload_h.fetch PROPERTIES__
           revision_s = @payload_h.fetch REVISION__
 
-          ent = @model_class.edit_entity @kernel, @on_event_selectively do | o |
+          ent = @model_class.edit_entity @kernel, @listener do | o |
             o.edit_pairs h, IDENTITY_, & :intern
           end
 
@@ -98,7 +98,7 @@ module Skylab::Brazen
         mc = @kernel.unbound_via(
           :identifier,
           @entity_identifier,
-          & @on_event_selectively )
+          & @listener )
 
         if mc
           @model_class = mc

@@ -4,7 +4,7 @@ EDIT: we are keeping this because we love it, but [br] no longer has
 these four specific tiers built into it. now, [br] knows only that
 there is a model class and a silo daemon.
 
-see also [#pl-011] an explanation of a model-centric operator branch.
+see also [#pl-011] an explanation of a model-centric feature branch.
 
 
 

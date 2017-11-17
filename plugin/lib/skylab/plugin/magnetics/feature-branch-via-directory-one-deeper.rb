@@ -1,6 +1,6 @@
 module Skylab::Plugin
 
-  class Magnetics::OperatorBranch_via_DirectoryOneDeeper  # :[#012].
+  class Magnetics::FeatureBranch_via_DirectoryOneDeeper  # :[#012].
 
     # (look for this reference in [br] - we are making a close cousin)
 

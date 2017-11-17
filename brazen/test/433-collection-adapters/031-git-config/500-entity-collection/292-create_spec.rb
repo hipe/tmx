@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :collection_adapters_git_config_entity_collection
 
     context "when you try to create one that already exists" do
@@ -23,7 +23,7 @@ module Skylab::Brazen::TestSupport
 
       it "explains" do
         _actual = _tuple.first
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'cannot create: foot wear "my favorite cons" already exists'
         end
       end
@@ -40,7 +40,7 @@ module Skylab::Brazen::TestSupport
         end
 
         a = []
-        expect :error, :expression, :entity_exists do |y|
+        want :error, :expression, :entity_exists do |y|
           a.push y
         end
 
@@ -109,11 +109,11 @@ module Skylab::Brazen::TestSupport
           fac.create _ent, & p
         end
 
-        expect :info, :related_to_assignment_change, :added do |ev|
+        want :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 
-        expect :info, :related_to_assignment_change, :added do |ev|
+        want :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 

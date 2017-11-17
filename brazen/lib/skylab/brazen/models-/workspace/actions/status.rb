@@ -81,7 +81,7 @@ module Skylab::Brazen
 
         emit_emission = -> do
           x = em ; em = nil
-          @on_event_selectively.call( * x.category, & x.emission_value_proc )
+          @listener.call( * x.category, & x.emission_value_proc )
           UNRELIABLE_
         end
 
@@ -91,7 +91,7 @@ module Skylab::Brazen
           NIL_
         end
 
-        _oes_p = -> * i_a, & ev_p do
+        _p = -> * i_a, & ev_p do
 
           # whether this is the final or an intermediate emission ..
 
@@ -106,7 +106,7 @@ module Skylab::Brazen
         _ok = @_workspace.resolve_nearest_existent_surrounding_path(
           @argument_box.fetch( :max_num_dirs ),
           :prop, formal_properties.fetch( :path ),
-          & _oes_p )
+          & _p )
 
         if _ok
           em && emit_emission[]
@@ -139,7 +139,7 @@ module Skylab::Brazen
 
         Common_::Emission.via_category em.category do
 
-          @on_event_selectively[ * em.category, & em.emission_value_proc ]
+          @listener[ * em.category, & em.emission_value_proc ]
 
           NIL_  # important
         end

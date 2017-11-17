@@ -62,29 +62,29 @@ module Skylab::Brazen::TestSupport
 
         on_lines_from_help_screen_section_ 'description'
 
-        expect :styled, %r(\Adescription: .+\bstatus\b)
+        want :styled, %r(\Adescription: .+\bstatus\b)
 
-        expect_no_more_lines  # (because how trees are parsed)
-        # expect_maybe_a_blank_line (would work too)
+        want_no_more_lines  # (because how trees are parsed)
+        # want_maybe_a_blank_line (would work too)
       end
 
       it "option section has verbose option and help option" do
 
         on_body_lines_from_help_screen_section_ 'options'
-        expect_option :verbose
-        expect_option :help, %r(this screen)
+        want_option :verbose
+        want_option :help, %r(this screen)
       end
 
       it "arguments section is `singular`, has `path` item" do
 
         on_body_lines_from_help_screen_section_ 'argument'
-        expect_item :path, %r(\blocation\b.+), :styled, %r(\bneat\b)
+        want_item :path, %r(\blocation\b.+), :styled, %r(\bneat\b)
       end
 
       it "environemnt variables section oh my" do
 
         on_body_lines_from_help_screen_section_ 'environment variable'
-        expect_item :BRAZEN_MAX_NUM_DIRS, %r(\bhow far\b)
+        want_item :BRAZEN_MAX_NUM_DIRS, %r(\bhow far\b)
       end
     end
 

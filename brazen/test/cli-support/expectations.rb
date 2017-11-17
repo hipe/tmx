@@ -17,13 +17,8 @@ module Skylab::Brazen::TestSupport
     class << self
 
       def [] tcc
-
-        tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-
-        tcc.send :define_method, :expect, tcc.instance_method( :expect )  # :+#this-rspec-annoyance
-
+        tcc.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
         tcc.include self
-
         NIL_
       end
 
@@ -38,15 +33,15 @@ module Skylab::Brazen::TestSupport
     def line_oriented_state_from_invoke * argv
       line_oriented_state_from_invoke_using(
         :mutable_argv, argv,
-        :prefix, argv_prefix_for_expect_stdout_stderr,
+        :prefix, argv_prefix_for_want_stdout_stderr,
       )
     end
 
     def line_oriented_state_from_invoke_using * x_a
 
-      using_expect_stdout_stderr_invoke_via_iambic x_a
+      using_want_stdout_stderr_invoke_via_iambic x_a
 
-      _state = flush_frozen_state_from_expect_stdout_stderr
+      _state = flush_frozen_state_from_want_stdout_stderr
 
       Line_Oriented_State___.new _state
     end
@@ -54,15 +49,15 @@ module Skylab::Brazen::TestSupport
     # -- invocation
 
     def invoke * argv
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
     end
 
-    def invocation_strings_for_expect_stdout_stderr
-      get_invocation_strings_for_expect_stdout_stderr
+    def invocation_strings_for_want_stdout_stderr
+      get_invocation_strings_for_want_stdout_stderr
     end
 
     s_a = nil
-    define_method :get_invocation_strings_for_expect_stdout_stderr do
+    define_method :get_invocation_strings_for_want_stdout_stderr do
 
       # override if you want the would-be program name in your assertions
       # to look more natural. see [#ts-029]#hook-out:1.
@@ -77,7 +72,7 @@ module Skylab::Brazen::TestSupport
 
     # -- the general shape of invocation (exitstatus, which streams)
 
-    def result_for_failure_for_expect_stdout_stderr
+    def result_for_failure_for_want_stdout_stderr
       Home_::CLI_Support::GENERIC_ERROR_EXITSTATUS
     end
 
@@ -87,16 +82,16 @@ module Skylab::Brazen::TestSupport
 
     # -- macros (predicates over several lines)
 
-    def expect_usaged_and_invited
-      expect_usage_line
-      expect_generically_invited
+    def want_usaged_and_invited
+      want_usage_line
+      want_generically_invited
     end
 
     # -- invalid / unexpected / expecting
 
-    def expect_whine_about_unrecognized_option s
+    def want_whine_about_unrecognized_option s
 
-      expect_stdout_stderr_via invalid_option s
+      want_stdout_stderr_via invalid_option s
     end
 
     def invalid_option sw
@@ -104,9 +99,9 @@ module Skylab::Brazen::TestSupport
       expectation "invalid option: #{ sw }"
     end
 
-    def expect_unrecognized_action sym
+    def want_unrecognized_action sym
 
-      expect_stdout_stderr_via unrecognized_action sym
+      want_stdout_stderr_via unrecognized_action sym
     end
 
     def unrecognized_action sym
@@ -114,9 +109,9 @@ module Skylab::Brazen::TestSupport
       expectation "unrecognized action \"#{ sym }\""
     end
 
-    def expect_expecting_action_line
+    def want_expecting_action_line
 
-      expect_stdout_stderr_via expecting_action_line
+      want_stdout_stderr_via expecting_action_line
     end
 
     def expecting_action_line
@@ -124,9 +119,9 @@ module Skylab::Brazen::TestSupport
       expectation :styled, "expecting <action>"
     end
 
-    def expect_unexpected_argument s
+    def want_unexpected_argument s
 
-      expect_stdout_stderr_via unexpected_argument s
+      want_stdout_stderr_via unexpected_argument s
     end
 
     def unexpected_argument s
@@ -136,13 +131,13 @@ module Skylab::Brazen::TestSupport
 
     # -- usage (syntax summaries, suggestions)
 
-    def expect_usage_line
-      expect :styled, "usage: #{ _sub_program_name } <action> [..]"
+    def want_usage_line
+      want :styled, "usage: #{ _sub_program_name } <action> [..]"
     end
 
-    def expect_express_all_known_actions
+    def want_express_all_known_actions
 
-      _s = expect( :styled ) { |x| x }  # IDENTITY_
+      _s = want( :styled ) { |x| x }  # IDENTITY_
       _a = /\Aknown actions are \('([^\)]+)'\)\z/.match( _s )[ 1 ].split( "', '" )
 
       _s_a = the_list_of_all_visible_actions_for_CLI_expectations
@@ -160,15 +155,15 @@ module Skylab::Brazen::TestSupport
 
     # -- item-by-item parsing of helpscreens (oldchool)
 
-    def expect_option sym, rx=nil
+    def want_option sym, rx=nil
       if rx
         _xtra_rxs = "[ ]{10,}.*#{ rx.source }.*"
       end
       s = sym.id2name
-      expect %r(\A[ ]{4,}-#{ s[0] }, --#{ s }#{ _xtra_rxs }\z)
+      want %r(\A[ ]{4,}-#{ s[0] }, --#{ s }#{ _xtra_rxs }\z)
     end
 
-    def expect_item sym, * x_a
+    def want_item sym, * x_a
 
       a = []
 
@@ -185,7 +180,7 @@ module Skylab::Brazen::TestSupport
 
       a.push %r(\A[ ]{4,}<?#{ ::Regexp.escape s }>?[ ]{10,}#{ _xtra_rxs }\z)
 
-      x = expect( * a )
+      x = want( * a )
 
       while x_a.length.nonzero?
         d = x_a.length
@@ -203,41 +198,41 @@ module Skylab::Brazen::TestSupport
 
         d == x_a.length and raise ::ArgumentError, "#{ x_a.first.inspect }"
 
-        x = expect( * a )
+        x = want( * a )
       end
       x
     end
 
     # -- invitations
 
-    def expect_generically_invited
-      expect_generic_invite_line
-      expect_fail
+    def want_generically_invited
+      want_generic_invite_line
+      want_fail
     end
 
-    def expect_specifically_invited_to sym
-      expect_specific_invite_line_to sym
-      expect_fail
+    def want_specifically_invited_to sym
+      want_specific_invite_line_to sym
+      want_fail
     end
 
-    def expect_generic_invite_line
+    def want_generic_invite_line
 
-      _expect_styled_invite_to _sub_program_name
+      _want_styled_invite_to _sub_program_name
     end
 
-    def expect_specific_invite_line_to * sym_a
+    def want_specific_invite_line_to * sym_a
 
-      _expect_styled_invite_to _sub_program_name, * sym_a
+      _want_styled_invite_to _sub_program_name, * sym_a
     end
 
     def _sub_program_name
 
-      get_invocation_strings_for_expect_stdout_stderr.join SPACE_
+      get_invocation_strings_for_want_stdout_stderr.join SPACE_
     end
 
-    def _expect_styled_invite_to * parts
+    def _want_styled_invite_to * parts
 
-      expect_stdout_stderr_via _styled_invite_to_parts parts
+      want_stdout_stderr_via _styled_invite_to_parts parts
     end
 
     def styled_invite_to * parts

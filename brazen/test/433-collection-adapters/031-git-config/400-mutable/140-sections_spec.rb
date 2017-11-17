@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] collection adaptes - git config - mutable - sections" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :collection_adapters_git_config_mutable
 
     context "to an empty document" do
@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport
 
       it "add a section" do
         el = touch_section 'foo'
-        expect_document_content "[foo]\n"
+        want_document_content "[foo]\n"
         el._category_symbol_ == :_section_or_subsection_ || fail
       end
 
@@ -28,14 +28,14 @@ module Skylab::Brazen::TestSupport
 
         ok == Home_::UNABLE_ || fail
 
-        expect_one_event :invalid_section_name do |ev|
+        want_one_event :invalid_section_name do |ev|
           ev.invalid_section_name == 'foo_bar' || fail
         end
       end
 
       it "add a section with a subsection" do
         touch_section 'bar', 'foo'
-        expect_document_content "[foo \"bar\"]\n"
+        want_document_content "[foo \"bar\"]\n"
       end
 
       it "add a section with a subsection with an invalid name" do
@@ -46,7 +46,7 @@ module Skylab::Brazen::TestSupport
 
         ok = _secs.touch_section "bar\nbaz", 'foo', & _p
 
-        expect_event :invalid_subsection_name,
+        want_event :invalid_subsection_name,
 
           /\Asubsection names can contain any characters except newline #{
            }\(\(ick "bar\\n"\)\)\z/
@@ -63,12 +63,12 @@ module Skylab::Brazen::TestSupport
 
       it "add a section that comes lexcially before" do
         touch_section 'fo'
-        expect_document_content "[fo]\n[foo]\n"
+        want_document_content "[fo]\n[foo]\n"
       end
 
       it "add the same section (does add, retrieves!)" do
         secto = touch_section 'foo'
-        expect_document_content "[foo]\n"
+        want_document_content "[foo]\n"
 
         secto_ = touch_section 'foo'
         secto.should be_respond_to :subsection_string
@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport
 
       it "add a section that comes lexcially after" do
         touch_section 'fooo'
-        expect_document_content "[foo]\n[fooo]\n"
+        want_document_content "[foo]\n[fooo]\n"
       end
     end
 
@@ -87,27 +87,27 @@ module Skylab::Brazen::TestSupport
 
       it "add a subsection that comes before (because ss)" do
         touch_section 'baq', 'foo'
-        expect_document_content "[foo \"baq\"]\n[foo \"bar\"]\n"
+        want_document_content "[foo \"baq\"]\n[foo \"bar\"]\n"
       end
 
       it "add a section that comes before" do
         touch_section 'foo'
-        expect_document_content "[foo]\n[foo \"bar\"]\n"
+        want_document_content "[foo]\n[foo \"bar\"]\n"
       end
 
       it "add the same subsection" do
         touch_section 'bar', 'foo'
-        expect_document_content "[foo \"bar\"]\n"
+        want_document_content "[foo \"bar\"]\n"
       end
 
       it "add a subsection that comes after" do
         touch_section 'baz', 'foo'
-        expect_document_content "[foo \"bar\"]\n[foo \"baz\"]\n"
+        want_document_content "[foo \"bar\"]\n[foo \"baz\"]\n"
       end
 
       it "add a section that comes after" do
         touch_section 'fooz'
-        expect_document_content "[foo \"bar\"]\n[fooz]\n"
+        want_document_content "[foo \"bar\"]\n[fooz]\n"
       end
     end
 
@@ -117,7 +117,7 @@ module Skylab::Brazen::TestSupport
 
       it "add a section that comes in the middle" do
         touch_section 'camma'
-        expect_document_content "[beta]\n[camma]\n[delta]\n"
+        want_document_content "[beta]\n[camma]\n[delta]\n"
       end
     end
   end

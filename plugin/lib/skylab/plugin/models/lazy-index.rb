@@ -14,11 +14,11 @@ module Skylab::Plugin
 
       attr_writer(
         :construct_plugin_by,
-        :operator_branch,
+        :feature_branch,
       )
 
       def dereference_plugin_via_normal_symbol sym
-        _ref_x = @operator_branch.dereference sym
+        _ref_x = @feature_branch.dereference sym
         dereference_plugin_via_loadable_reference _ref_x
       end
 
@@ -28,13 +28,13 @@ module Skylab::Plugin
       end
 
       def offset_of_touched_plugin_via_normal_symbol sym  # 1x [ts]
-        _lt = @operator_branch.dereference sym
+        _lt = @feature_branch.dereference sym
         offset_of_touched_plugin_via_user_value _lt
       end
 
       def offset_of_touched_plugin_via_user_value lt  # #here
         lt.HELLO_LOADABLE_REFERENCE
-        key_x = @operator_branch.natural_key_of lt
+        key_x = @feature_branch.natural_key_of lt
         @_offset_via_natural_key.fetch key_x do
           plugin = __load_plugin lt  # if nil/false, it's OK we cache that too
           d = @_plugins.length

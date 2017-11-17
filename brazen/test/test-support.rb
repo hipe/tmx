@@ -34,9 +34,9 @@ module Skylab::Brazen::TestSupport
 
   module InstanceMethods___
 
-    def expect_these_lines_in_array_ act_s_a, & p
+    def want_these_lines_in_array_ act_s_a, & p
 
-      TestSupport_::Expect_Line::Expect_these_lines_in_array.call(
+      TestSupport_::Want_Line::Want_these_lines_in_array.call(
         act_s_a, p, self )
     end
 
@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport
       ev.express_into_under [], _expag
     end
 
-    def black_and_white_expression_agent_for_expect_emission
+    def black_and_white_expression_agent_for_want_emission
       This_one_expression_agent___[]
     end
 
@@ -62,7 +62,7 @@ module Skylab::Brazen::TestSupport
 
       # (when your OCD prevents you from pulling in the test support module whole hog)
 
-      Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      Common_.test_support::Want_Emission_Fail_Early::Spy.new
     end
 
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
@@ -131,12 +131,12 @@ module Skylab::Brazen::TestSupport
 
   module TestLib_
 
-    Expect_emission_fail_early = -> tcc do
-      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+    Want_emission_fail_early = -> tcc do
+      Common_.test_support::Want_Emission_Fail_Early[ tcc ]
     end
 
-    Expect_event = -> test_context_cls do
-      Common_.test_support::Expect_Emission[ test_context_cls ]
+    Want_event = -> test_context_cls do
+      Common_.test_support::Want_Emission[ test_context_cls ]
     end
 
     Fileutils = Lazy_.call do

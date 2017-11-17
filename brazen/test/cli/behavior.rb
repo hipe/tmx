@@ -43,15 +43,15 @@ module Skylab::Brazen::TestSupport
 
         o.call :_deep_strings do
 
-          s_a_ = invocation_strings_for_expect_stdout_stderr.dup
-          a = argv_prefix_for_expect_stdout_stderr
+          s_a_ = invocation_strings_for_want_stdout_stderr.dup
+          a = argv_prefix_for_want_stdout_stderr
           if a
             s_a_.concat a
           end
           s_a_.freeze
         end
 
-        send :define_method, :argv_prefix_for_expect_stdout_stderr do
+        send :define_method, :argv_prefix_for_want_stdout_stderr do
 
           # #ts-029]#hook-in:1
 
@@ -68,34 +68,34 @@ module Skylab::Brazen::TestSupport
 
     # -- the general shape of invocation (exitstatus, which streams)
 
-    def expect_errored_with sym
-      expect_no_more_lines
-      expect_exitstatus_for sym
+    def want_errored_with sym
+      want_no_more_lines
+      want_exitstatus_for sym
     end
 
     def results_in_error_exitstatus_
       state_.exitstatus.should match_common_error_code_
     end
 
-    def expect_exitstatus_for sym
+    def want_exitstatus_for sym
       @exitstatus.should eql Home_::API.exit_statii.fetch sym
     end
 
-    def expect_errored
-      expect_no_more_lines
-      expect_generic_error_exitstatus
+    def want_errored
+      want_no_more_lines
+      want_generic_error_exitstatus
     end
 
-    def expect_generic_error_exitstatus
+    def want_generic_error_exitstatus
       @exitstatus.should match_common_error_code_
     end
 
     def match_common_error_code_
-      eql result_for_failure_for_expect_stdout_stderr
+      eql result_for_failure_for_want_stdout_stderr
     end
 
-    def expect_succeed
-      expect_no_more_lines
+    def want_succeed
+      want_no_more_lines
       @exitstatus.should match_successful_exitstatus
     end
 
@@ -113,18 +113,18 @@ module Skylab::Brazen::TestSupport
 
 # ________BEGIN: these need improvement somehow
 
-    def expect_branch_expression_pattern_zero__
-      expect_expecting_action_line
-      expect_branch_usage_line_
-      expect_action_invite_line_
-      expect_errored
+    def want_branch_expression_pattern_zero__
+      want_expecting_action_line
+      want_branch_usage_line_
+      want_action_invite_line_
+      want_errored
     end
 
-    def expect_branch_expression_pattern_one_dot_one__
-      expect_unrecognized_action :fiffle
-      expect_stdout_stderr_via known_actions_are_
-      expect_action_invite_line_
-      expect_errored
+    def want_branch_expression_pattern_one_dot_one__
+      want_unrecognized_action :fiffle
+      want_stdout_stderr_via known_actions_are_
+      want_action_invite_line_
+      want_errored
     end
 
     def known_actions_are_
@@ -138,11 +138,11 @@ module Skylab::Brazen::TestSupport
       expectation :styled, _rx
     end
 
-    def expect_branch_expression_pattern_one_dot_two__
+    def want_branch_expression_pattern_one_dot_two__
 
-      expect_stdout_stderr_via invalid_option '-x'
-      expect_action_invite_line_
-      expect_errored
+      want_stdout_stderr_via invalid_option '-x'
+      want_action_invite_line_
+      want_errored
     end
 
 # ________END
@@ -151,9 +151,9 @@ module Skylab::Brazen::TestSupport
 
     # -- usage (syntax summaries, suggestions)
 
-    def expect_branch_usage_line_
+    def want_branch_usage_line_
 
-      expect_stdout_stderr_via branch_usage_line_
+      want_stdout_stderr_via branch_usage_line_
     end
 
     def branch_usage_line_
@@ -166,9 +166,9 @@ module Skylab::Brazen::TestSupport
       expectation "#{ SPACE_ * 7 }#{ _invocation_string } -h [cmd]"
     end
 
-    def _expect_action_usage_line
+    def _want_action_usage_line
 
-      expect_stdout_stderr_via action_usage_line_
+      want_stdout_stderr_via action_usage_line_
     end
 
     def action_usage_line_
@@ -178,9 +178,9 @@ module Skylab::Brazen::TestSupport
 
     # -- invitations
 
-    def expect_branch_invite_line_
+    def want_branch_invite_line_
 
-      expect_stdout_stderr_via branch_invite_line_
+      want_stdout_stderr_via branch_invite_line_
     end
 
     def branch_invite_line_
@@ -189,9 +189,9 @@ module Skylab::Brazen::TestSupport
       expectation :styled, _s
     end
 
-    def expect_action_invite_line_
+    def want_action_invite_line_
 
-      expect_stdout_stderr_via action_invite_line_
+      want_stdout_stderr_via action_invite_line_
     end
 
     def action_invite_line_
@@ -232,7 +232,7 @@ module Skylab::Brazen::TestSupport
 
       _st_ = st.flush_to_scanner
 
-      self.stream_for_expect_stdout_stderr = _st_
+      self.stream_for_want_stdout_stderr = _st_
 
       NIL_
     end

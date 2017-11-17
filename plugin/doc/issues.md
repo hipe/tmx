@@ -5,7 +5,7 @@
 [#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
 
-[#011]       model-centric operator branch ..
+[#011]       model-centric feature branch ..
 
              :[#here.3]: as described in the document, used to be called "promoted"
              ( #was: legacy table for a help screen is not covered )

@@ -42,7 +42,7 @@ module Skylab::Brazen
 
     # ~~ init
 
-    def init_workspace * x_a, & oes_p  # any result
+    def init_workspace * x_a, & p  # any result
 
       bx = @property_box
       x_a.unshift(
@@ -50,7 +50,7 @@ module Skylab::Brazen
         :config_filename, bx.fetch( :config_filename ) )
 
       _ok = Here_::Magnetics::InitWorkspace_via_PathHead_and_PathTail.
-        call_via_iambic x_a, & oes_p
+        call_via_iambic x_a, & p
 
       _store :@_surrounding_path_exists, _ok
     end
@@ -68,9 +68,9 @@ module Skylab::Brazen
       end
     end
 
-    def resolve_nearest_existent_surrounding_path max_num_dirs, * x_a, & oes_p
+    def resolve_nearest_existent_surrounding_path max_num_dirs, * x_a, & p
 
-      oes_p or raise ::ArgumentError  # just because we always do anyway
+      p or raise ::ArgumentError  # just because we always do anyway
 
       max_num_dirs ||= -1  # see #note-040 "why we do this here"
       x_a.unshift :max_num_dirs_to_look, max_num_dirs
@@ -78,7 +78,7 @@ module Skylab::Brazen
       x_a.push :start_path, bx.fetch( :surrounding_path ),
         :filename, bx.fetch( :config_filename )
 
-      surrounding_path = Home_.lib_.system_lib::Filesystem::Walk.call_via_iambic x_a, & oes_p
+      surrounding_path = Home_.lib_.system_lib::Filesystem::Walk.call_via_iambic x_a, & p
 
       if surrounding_path
         @property_box.replace :surrounding_path, surrounding_path
@@ -110,39 +110,39 @@ module Skylab::Brazen
 
     # ~~ c r u d
 
-    def persist_entity( x=nil, ent, & oes_p )
+    def persist_entity( x=nil, ent, & p )
 
-      cfg = _config( & oes_p )
+      cfg = _config( & p )
       cfg and begin
-        cfg.persist_entity( * x, ent, & oes_p )
+        cfg.persist_entity( * x, ent, & p )
       end
     end
 
-    def entity_via_intrinsic_key id, & oes_p
-      cfg = _config( & oes_p )
+    def entity_via_intrinsic_key id, & p
+      cfg = _config( & p )
       cfg and begin
-        cfg.entity_via_intrinsic_key id, & oes_p
+        cfg.entity_via_intrinsic_key id, & p
       end
     end
 
-    def to_entity_stream_via_model cls, & oes_p
-      cfg = _config( & oes_p )
+    def to_entity_stream_via_model cls, & p
+      cfg = _config( & p )
       cfg and begin
-        cfg.to_entity_stream_via_model cls, & oes_p
+        cfg.to_entity_stream_via_model cls, & p
       end
     end
 
-    def delete_entity act, ent, & oes_p
-      cfg = _config( & oes_p )
+    def delete_entity act, ent, & p
+      cfg = _config( & p )
       cfg and begin
-        cfg.delete_entity act, ent, & oes_p
+        cfg.delete_entity act, ent, & p
       end
     end
 
     # ~ for actions
 
-    def resolve_document_ & oes_p
-      _config( & oes_p ) ? ACHIEVED_ : UNABLE_
+    def resolve_document_ & p
+      _config( & p ) ? ACHIEVED_ : UNABLE_
     end
 
     attr_reader :config_
@@ -237,17 +237,17 @@ module Skylab::Brazen
 
       # ~ custom exposures
 
-      def workspace_via_qualified_knownness_box box, & oes_p
-        WS_via_qualified_knownness_box___.new( box, @silo_module, @kernel, & oes_p ).execute
+      def workspace_via_qualified_knownness_box box, & p
+        WS_via_qualified_knownness_box___.new( box, @silo_module, @kernel, & p ).execute
       end
 
       # ~ hook-outs / hook-ins
 
-      def precondition_for action, id, box, & oes_p
+      def precondition_for action, id, box, & p
 
         _bx = action.to_qualified_knownness_box_proxy
 
-        WS_via_qualified_knownness_box___.new( _bx, @silo_module, @kernel, & oes_p ).execute
+        WS_via_qualified_knownness_box___.new( _bx, @silo_module, @kernel, & p ).execute
       end
 
       def any_mutated_formals_for_depender_action_formals x
@@ -539,16 +539,16 @@ module Skylab::Brazen
       # and as nephews to this file node) instad of this for all new work
       # (since #tombstone-B) - this will be phased out when [br] weens off [br] (sic).
 
-      def initialize bx, sm, k, & oes_p
+      def initialize bx, sm, k, & p
 
         @bx = bx
         @kernel = k
         @silo_module = sm
-        @on_event_selectively = oes_p
+        @listener = p
 
         _ = Common_::Event.produce_handle_event_selectively_through_methods
 
-        @oes_p = _.bookends self, :Workspace_via_qualified_knownness_boX do | * i_a, & ev_p |
+        @_customized_listener = _.bookends self, :Workspace_via_qualified_knownness_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
       end
@@ -564,7 +564,7 @@ module Skylab::Brazen
           __execute_via_workspace_path ws_path
         else
 
-          @on_event_selectively.call :error, :missing_required_properties do
+          @listener.call :error, :missing_required_properties do
 
             _prp = Home_.lib_.basic::MinimalProperty.via_variegated_symbol(
               :workspace_path )
@@ -581,7 +581,7 @@ module Skylab::Brazen
 
       def __execute_via_workspace_path ws_path
 
-        @ws = @silo_module.edit_entity @kernel, @oes_p do |o|
+        @ws = @silo_module.edit_entity @kernel, @_customized_listener do |o|
           o.edit_with(
             :config_filename, @bx.fetch( :config_filename ).value,
             :surrounding_path, @bx.fetch( :workspace_path ).value )
@@ -595,7 +595,7 @@ module Skylab::Brazen
         did_find = @ws.resolve_nearest_existent_surrounding_path(
           bx.fetch( :max_num_dirs ).value,
           :prop, bx.fetch( :workspace_path ).association,
-          & @oes_p )
+          & @_customized_listener )
 
         if did_find
 

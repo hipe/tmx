@@ -8,11 +8,11 @@ module Skylab::Brazen::TestSupport
     use :collection_adapters_git_config_immutable
 
     it "the empty string parses" do
-      expect_no_sections_from EMPTY_S_
+      want_no_sections_from EMPTY_S_
     end
 
     it "one space parses" do
-      expect_no_sections_from SPACE_
+      want_no_sections_from SPACE_
     end
 
     it "a section and a comment parses" do

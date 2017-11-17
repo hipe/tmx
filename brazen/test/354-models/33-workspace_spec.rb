@@ -5,14 +5,14 @@ module Skylab::Brazen::TestSupport
   describe "[br] models workspace" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "ping the workspace silo" do
 
       call_API :workspace, :ping
 
-      expect_event :ping, 'hello from (app_name_string)'
-      expect_no_more_events
+      want_event :ping, 'hello from (app_name_string)'
+      want_no_more_events
 
       @result.should eql :_hello_from_brazen_
     end
@@ -40,7 +40,7 @@ module Skylab::Brazen::TestSupport
       ev.num_dirs_looked.should eql 1
       ev.start_path.should eql @ws_tmpdir.to_path
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "when provide 'good' path and maxdirs=`, OK" do
@@ -68,7 +68,7 @@ module Skylab::Brazen::TestSupport
 
       ev.config_path.should eql _exp
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "summarize with empty path" do
@@ -78,9 +78,9 @@ module Skylab::Brazen::TestSupport
       call_API :workspace, :summarize,
         :path, @ws_tmpdir.to_path
 
-      expect_not_OK_event :resource_not_found
+      want_not_OK_event :resource_not_found
 
-      expect_fail
+      want_fail
     end
 
     it "summarize (a development proxy of 'plural_noun')" do
@@ -94,18 +94,18 @@ module Skylab::Brazen::TestSupport
         :path, _workspace_path,
       )
 
-      expect_no_events
+      want_no_events
 
       em = @result
       em.category.should eql [ :info, :summary ]
       ev = em.emission_value_proc.call
 
-      _expag = black_and_white_expression_agent_for_expect_emission
+      _expag = black_and_white_expression_agent_for_want_emission
       _actual = ev.express_into_under [], _expag
 
       _ = '[^[:alnum:]]*'
 
-      expect_these_lines_in_array_ _actual do |y|
+      want_these_lines_in_array_ _actual do |y|
 
         y << %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
         y << %r(\A#{ _ }2 poet or authors\z)

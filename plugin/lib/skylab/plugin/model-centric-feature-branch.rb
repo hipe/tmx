@@ -1,6 +1,6 @@
 module Skylab::Plugin
 
-  module ModelCentricOperatorBranch
+  module ModelCentricFeatureBranch
 
     # introduction and tutorial/case-study at [#011]
 
@@ -29,7 +29,7 @@ module Skylab::Plugin
     # the code file is in three sections (easy jump):
     #   - section 1 of 4 - define-time
     #   - section 2 of 4 - steps
-    #   - section 3 of 4 - operator branch via [3 means]
+    #   - section 3 of 4 - feature branch via [3 means]
     #   - section 4 of 4 - support (shared)
 
     # local name convetions
@@ -91,7 +91,7 @@ module Skylab::Plugin
           obj.write_into_using paths, gr
         end
 
-        OperatorBranch_via_ActionsPaths___.define do |o|
+        FeatureBranch_via_ActionsPaths___.define do |o|
           o.path_scanner = Scanner_[ paths ]
           o.local_invocation_resources = _ir
           o.glob_resources = gr
@@ -243,12 +243,12 @@ module Skylab::Plugin
 
       Step_when_branchy___ = -> nar, step, lref do  # lref #here5
 
-        _ob = step.BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH lref
+        _fb = step.BRANCHY_FEATURE_BRANCH_VIA_PARENT_FEATURE_BRANCH lref
 
         _omni = MTk_::ArgumentParsingIdioms_via_FeaturesInjections.define do |o|
 
           o.add_operators_injection_by do |inj|
-            inj.operators = _ob
+            inj.operators = _fb
           end
 
           o.argument_scanner_narrator = nar
@@ -317,7 +317,7 @@ module Skylab::Plugin
         :business_module,
       )
 
-      def BRANCHY_OPERATOR_BRANCH_VIA_PARENT_OPERATOR_BRANCH lref  # #here4 or #here5
+      def BRANCHY_FEATURE_BRANCH_VIA_PARENT_FEATURE_BRANCH lref  # #here4 or #here5
         # also #open [#007.2] still incubating, also used in [br]
 
         actz = @actions_branch_module
@@ -325,7 +325,7 @@ module Skylab::Plugin
         if actz.respond_to? :dir_path
 
           _gr = lref.glob_resources.dup_for actz  # :#here3
-          OperatorBranch_via_ACTION_Paths___.define do |o|
+          FeatureBranch_via_ACTION_Paths___.define do |o|
             o.glob_resources = _gr
             o.local_invocation_resources = lref.local_invocation_resources
             o.sub_branch_const = @sub_branch_const
@@ -333,14 +333,14 @@ module Skylab::Plugin
 
         elsif actz.respond_to? :call
 
-          # OperatorBranch_via_Definition.define( & actz )  # (was)
+          # FeatureBranch_via_Definition.define( & actz )  # (was)
           actz.call
 
         else
 
           # much less moving parts because the constants (nodes) are already loaded :#here6
 
-          Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
+          Home_.lib_.basic::Module::FeatureBranch_via_Module.define do |o|
 
             o.loadable_reference_by = -> const do
 
@@ -412,13 +412,13 @@ module Skylab::Plugin
       end
     end
 
-    # == section 3 of 4 - operator branch via [3 means]
+    # == section 3 of 4 - feature branch via [3 means]
 
     # ~ 1. via actionS paths
 
-    class OperatorBranch_via_ActionsPaths___ < Common_::SimpleModel  # :#here4
+    class FeatureBranch_via_ActionsPaths___ < Common_::SimpleModel  # :#here4
 
-      # very close to [#pl-012] "operator branch via directories one deeper".
+      # very close to [#pl-012] "feature branch via directories one deeper".
       # also stay close to our counterpart #here1.
 
       attr_writer(
@@ -434,7 +434,7 @@ module Skylab::Plugin
 
         _scn = remove_instance_variable :@path_scanner
 
-        @_implementor = CachingOperatorBranch__.new _scn do |path|
+        @_implementor = CachingFeatureBranch__.new _scn do |path|
           __build_loadable_reference_via_path path  # hi.
         end
 
@@ -511,22 +511,22 @@ module Skylab::Plugin
         :unbound_stream,
       )
 
-      def initialize k, & oes_p
+      def initialize k, & p
         @current_bound = nil
         @subject_unbound = k
-        @on_event_selectively = oes_p
+        @listener = p
         @mutable_box = nil
       end
 
       def iambic= x_a
 
-        if :on_event_selectively == x_a[ -2 ]  # #[#br-049] case study: ordering hacks
-          oes_p = x_a[ -1 ]
+        if :listener == x_a[ -2 ]  # #[#br-049] case study: ordering hacks
+          p = x_a[ -1 ]
           x_a[ -2, 2 ] = EMPTY_A_
         end
 
-        if oes_p
-          @on_event_selectively = oes_p
+        if p
+          @listener = p
         end
 
         @argument_scanner = Common_::Scanner.via_array x_a
@@ -535,9 +535,9 @@ module Skylab::Plugin
 
       def mutable_box= bx
 
-        oes_p = bx.remove :on_event_selectively do end
-        if oes_p
-          @on_event_selectively = oes_p
+        p = bx.remove :listener do end
+        if p
+          @listener = p
         end
         @mutable_box = bx
         NIL_
@@ -545,7 +545,7 @@ module Skylab::Plugin
 
       def execute
 
-        @on_event_selectively ||= __produce_some_handle_event_selectively
+        @listener ||= __produce_some_handle_event_selectively
 
         _ok = __resolve_bound
         _ok && __via_bound_produce_bound_call
@@ -556,7 +556,7 @@ module Skylab::Plugin
         if @argument_scanner.unparsed_exists
 
           @unbound_stream = @subject_unbound.build_unordered_selection_stream(
-            & @on_event_selectively )
+            & @listener )
 
           __parse_arugument_stream_against_unbound_stream
         else
@@ -613,7 +613,7 @@ module Skylab::Plugin
         if unb
 
           bnd = @current_bound
-          @current_bound = unb.new @subject_unbound, & @on_event_selectively
+          @current_bound = unb.new @subject_unbound, & @listener
           if bnd
             @current_bound.accept_parent_node bnd
           end
@@ -651,7 +651,7 @@ module Skylab::Plugin
 
       def _end_in_error_with * x_a
 
-        _result = @on_event_selectively.call :error, x_a.first do
+        _result = @listener.call :error, x_a.first do
           Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
         end
 
@@ -771,7 +771,7 @@ module Skylab::Plugin
 
     # ~ 2. via ACTION paths
 
-    class OperatorBranch_via_ACTION_Paths___ < Common_::SimpleModel
+    class FeatureBranch_via_ACTION_Paths___ < Common_::SimpleModel
 
       # an "actION" path is different from an "actionS" path. the first
       # represents a would-be filesystem path (actually "node path") for an
@@ -803,7 +803,7 @@ module Skylab::Plugin
 
         @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
 
-        @_implementor = CachingOperatorBranch__.new _path_scn do |path|
+        @_implementor = CachingFeatureBranch__.new _path_scn do |path|
           __build_loadable_reference_via_path path
         end
         freeze
@@ -904,7 +904,7 @@ module Skylab::Plugin
 
     # ~ 4. experiment [bs]
 
-    class OperatorBranch_via_Definition < Common_::SimpleModel
+    class FeatureBranch_via_Definition < Common_::SimpleModel
       def lookup_softly_by & p
         @lookup_softly = p ; nil
       end
@@ -947,7 +947,7 @@ module Skylab::Plugin
 
     # == section 4 of 4 - support (shared)
 
-    class CachingOperatorBranch__
+    class CachingFeatureBranch__
 
       def initialize scn, & p
         @_cached_loadable_reference_via_normal_name = {}
@@ -1013,7 +1013,7 @@ module Skylab::Plugin
 
         # "in nature" this doesn't happen unless (e.g) in [sn] you running
         # multiple test files, leading to the reuse of the same microservice
-        # operator branch across several invocations
+        # feature branch across several invocations
 
         Common_::Scanner::CompoundScanner.define do |o|
 

@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] collections - couch - actions - create (COVER edit sess, precons)" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "with no name: mersing required attr: argument error" do
 
@@ -37,13 +37,13 @@ module Skylab::Brazen::TestSupport
         :workspace_path,
         TestSupport_::Fixtures.file( :not_here )
 
-      _em = expect_not_OK_event :start_directory_is_not_directory
+      _em = want_not_OK_event :start_directory_is_not_directory
 
       _sym = _em.cached_event_value.to_event.terminal_channel_symbol
 
       :start_directory_does_not_exist == _sym or fail
 
-      expect_fail
+      want_fail
     end
 
     it "with an empty directory workspace path" do
@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport
         TestSupport_::Fixtures.directory( :empty_esque_directory ),
       )
 
-      _em = expect_not_OK_event :resource_not_found
+      _em = want_not_OK_event :resource_not_found
 
       ev = _em.cached_event_value.to_event
 
@@ -62,7 +62,7 @@ module Skylab::Brazen::TestSupport
 
       _em.cached_event_value.to_event.invite_to_action.should eql [ :init ]
 
-      expect_fail
+      want_fail
     end
   end
 end

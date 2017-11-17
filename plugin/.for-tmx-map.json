@@ -1,6 +1,6 @@
 {
-  "after": "basic",
-  "category": "more general libs",
+  "after": "zerk",
+  "category": "frameworky essentials",
   "is lib": true,
   "sigil": "pl"
 }

@@ -278,10 +278,10 @@ module Skylab::Brazen
 
           def __add_ad_hoc_normalization n11n
 
-            append_ad_hoc_normalizer_ do | qkn, & oes_p |
+            append_ad_hoc_normalizer_ do | qkn, & p |
 
               if qkn.is_effectively_known
-                n11n.normalize_qualified_knownness qkn, & oes_p
+                n11n.normalize_qualified_knownness qkn, & p
               else
                 qkn.to_knownness
               end
@@ -297,10 +297,10 @@ module Skylab::Brazen
               :minimum, 0,
             )
 
-            append_ad_hoc_normalizer_ do | qkn, & oes_p |
+            append_ad_hoc_normalizer_ do | qkn, & p |
 
               if qkn.is_effectively_known
-                n11n.normalize_qualified_knownness qkn, & oes_p
+                n11n.normalize_qualified_knownness qkn, & p
               else
                 qkn.to_knownness
               end

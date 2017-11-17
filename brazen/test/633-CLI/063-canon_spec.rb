@@ -102,10 +102,10 @@ module Skylab::Brazen::TestSupport
 
         on_body_lines_from_help_screen_section_ 'actions'
 
-        expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
+        want %r(\A  +-h, --help \[cmd\]  +this screen\.?)
 
         expected_action_name_string_array_.each do |s|
-          send :"expect__#{ s }__item"
+          send :"want__#{ s }__item"
         end
       end
 
@@ -118,25 +118,25 @@ module Skylab::Brazen::TestSupport
       %w(init status workspace collection source)
     end
 
-    def expect__init__item
-      expect_item :init, :styled, %r(\binit a <workspace>),
+    def want__init__item
+      want_item :init, :styled, %r(\binit a <workspace>),
         %r(\bthis is the second line of the init description\b)
     end
 
-    def expect__status__item
-      expect_item :status, %r(\bstatus\b.+\bworkspace)
+    def want__status__item
+      want_item :status, %r(\bstatus\b.+\bworkspace)
     end
 
-    def expect__workspace__item
-      expect_item :workspace, %r(\bmanage workspaces\b)
+    def want__workspace__item
+      want_item :workspace, %r(\bmanage workspaces\b)
     end
 
-    def expect__collection__item
-      expect_item :collection, %r(\bmanage collections\b)
+    def want__collection__item
+      want_item :collection, %r(\bmanage collections\b)
     end
 
-    def expect__source__item
-      expect_item :source, %r(\bmanage sources\b)
+    def want__source__item
+      want_item :source, %r(\bmanage sources\b)
     end
 
     context "2.4x3) help with a good argument" do
@@ -153,9 +153,9 @@ module Skylab::Brazen::TestSupport
       it "usage" do
 
         on_lines_from_help_screen_section_ 'usage'
-        expect :styled, 'usage: xaz init [-d] [-v] <path>'
-        expect %r(\A[ ]{7}xaz init -h\z)
-        expect_maybe_a_blank_line
+        want :styled, 'usage: xaz init [-d] [-v] <path>'
+        want %r(\A[ ]{7}xaz init -h\z)
+        want_maybe_a_blank_line
       end
 
       it "description" do
@@ -174,24 +174,24 @@ module Skylab::Brazen::TestSupport
 
         stdout_stderr_against_emissions a
 
-        expect :styled, 'init a <workspace>'
-        expect 'this is the second line of the init description'
-        expect_maybe_a_blank_line
+        want :styled, 'init a <workspace>'
+        want 'this is the second line of the init description'
+        want_maybe_a_blank_line
       end
 
       it "options" do
 
         on_body_lines_from_help_screen_section_ 'options'
-        expect %r(\A[ ]{4}-d, --dry-run\z)
-        expect %r(\A[ ]{4}-v, --verbose\z)
-        expect %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
-        expect_maybe_a_blank_line
+        want %r(\A[ ]{4}-d, --dry-run\z)
+        want %r(\A[ ]{4}-v, --verbose\z)
+        want %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
+        want_maybe_a_blank_line
       end
 
       it "argument" do
 
         on_body_lines_from_help_screen_section_ 'argument'
-        expect %r(\A[ ]{4}<?path?>[ ]{7,}the dir)
+        want %r(\A[ ]{4}<?path?>[ ]{7,}the dir)
       end
     end
   end

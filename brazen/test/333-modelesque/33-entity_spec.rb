@@ -66,7 +66,7 @@ module Skylab::Brazen::TestSupport
         class E__Integer
 
           def initialize
-            @on_event_selectively = nil
+            @listener = nil
             super
           end
 
@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport
           end
 
           def handle_event_selectively
-            @on_event_selectively
+            @listener
           end
 
           self
@@ -104,7 +104,7 @@ module Skylab::Brazen::TestSupport
         ok = nil
 
         _subject_class.new do
-          @on_event_selectively = p
+          @listener = p
           ok = process_and_normalize_for_test_ :zoip, -3
         end
         ok.should eql false
