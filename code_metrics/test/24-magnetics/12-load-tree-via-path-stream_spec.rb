@@ -53,7 +53,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def _same_order
-      _expect_normal_paths do |y|
+      _want_normal_paths do |y|
         y << %w( one )
         y << %w( one two )
       end
@@ -61,7 +61,7 @@ module Skylab::CodeMetrics::TestSupport
 
     # -- expectations
 
-    def _expect_normal_paths
+    def _want_normal_paths
       st = load_tree_.to_pre_order_normal_path_stream
       _y = ::Enumerator::Yielder.new do |s_a|
         act_s_a = st.gets

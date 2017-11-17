@@ -6,7 +6,7 @@ module Skylab::CodeMetrics
         :file_array,
         :filter_array,
         :label,
-        :on_event_selectively,
+        :listener,
         :system_conduit,
         :totaller_class,
       )
@@ -31,14 +31,14 @@ module Skylab::CodeMetrics
 
           cmd_s = "cat #{ lib.shellescape_path file } | #{ cmd_tail_s }"
 
-          @on_event_selectively.call :info, :data, :wc_pipey_command_string do
+          @listener.call :info, :data, :wc_pipey_command_string do
             cmd_s
           end
 
           _, o, e, w = @system_conduit.popen3 cmd_s
 
           y = Home_::ThroughputAdapters_::SynchronousRead.call(
-            [], nil, o, e, w, & @on_event_selectively )
+            [], nil, o, e, w, & @listener )
 
           if y
             ok = __process_lines y, file

@@ -28,7 +28,7 @@ module Skylab::GitViz::TestSupport
         Home_::VCS_Adapters_::Git
       end
 
-      def expect_result_for_failure  # #hook-out
+      def want_result_for_failure  # #hook-out
         @result.should eql false
       end
 
@@ -41,7 +41,7 @@ module Skylab::GitViz::TestSupport
 
     Repository = -> tcc do
 
-      TS_::Expect_Event[ tcc ]
+      TS_::Want_Event[ tcc ]
       TS_::Stubbed_filesystem[ tcc ]
       TS_::Stubbed_system[ tcc ]
       tcc.include Instance_Methods__
@@ -85,9 +85,9 @@ module Skylab::GitViz::TestSupport
           a.push CONSTANTS__.lookup :__mock_resources
           a.push stubbed_filesystem
 
-          _oes_p = handle_event_selectively_
+          _p = handle_event_selectively_
 
-          x = subject_VCS::Models_::Bundle.build_bundle_via( * a, & _oes_p )
+          x = subject_VCS::Models_::Bundle.build_bundle_via( * a, & _p )
 
           if x
             @bundle = x

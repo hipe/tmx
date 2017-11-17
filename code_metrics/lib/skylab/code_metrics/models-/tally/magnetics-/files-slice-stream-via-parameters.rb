@@ -12,10 +12,10 @@ module Skylab::CodeMetrics
         :system_conduit,
       )
 
-      def initialize( & oes_p )
+      def initialize( & p )
         @ignore_paths = nil
         @name_patterns = nil
-        @_on_event_selectively = oes_p
+        @_on_event_selectively = p
       end
 
       def execute

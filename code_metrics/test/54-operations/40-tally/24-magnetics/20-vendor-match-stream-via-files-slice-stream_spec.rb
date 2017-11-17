@@ -6,7 +6,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :operations_tally_magnetics
 
     it "loads" do
@@ -20,7 +20,7 @@ module Skylab::CodeMetrics::TestSupport
       _ok = o.execute
       _ok.should eql false
 
-      _em = expect_not_OK_event
+      _em = want_not_OK_event
 
       _act = _em.to_black_and_white_line
 

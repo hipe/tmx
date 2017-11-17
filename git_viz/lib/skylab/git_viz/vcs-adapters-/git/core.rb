@@ -13,15 +13,15 @@ module Skylab::GitViz
 
       class << self
 
-        def via_system_conduit sc, & oes_p
-          new sc, & oes_p
+        def via_system_conduit sc, & p
+          new sc, & p
         end
 
         private :new
       end  # >>
 
-      def initialize sc, & oes_p
-        @on_event_selectively = oes_p
+      def initialize sc, & p
+        @listener = p
         @system_conduit = sc
       end
 
@@ -31,7 +31,7 @@ module Skylab::GitViz
           path,
           system,
           filesystem,
-          & @on_event_selectively )
+          & @listener )
       end
 
       def models
@@ -40,7 +40,7 @@ module Skylab::GitViz
 
       def ping
 
-        @on_event_selectively.call :payload, :expression, :ping do | y |
+        @listener.call :payload, :expression, :ping do | y |
           y << "hello from front."
         end
 

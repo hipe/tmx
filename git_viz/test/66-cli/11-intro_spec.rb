@@ -7,47 +7,45 @@ module Skylab::GitViz::TestSupport
     TS_[ self ]
     use :my_CLI
 
-    define_method :expect, instance_method( :expect )  # because rspec
-
     it "0   invoke with no args - e/u/i" do
       invoke
-      expect_expecting_action_line
-      expect_usaged_and_invited
+      want_expecting_action_line
+      want_usaged_and_invited
     end
 
     it "1.1 invoke with strange arg - w/e/i" do
       invoke 'strange'
-      expect_unrecognized_action :strange
-      expect_express_all_known_actions
-      expect_generically_invited
+      want_unrecognized_action :strange
+      want_express_all_known_actions
+      want_generically_invited
     end
 
     it "1.2 invoke with strange option - SAME (b.c legacy)" do
       invoke '-x'
-      expect_whine_about_unrecognized_option '-x'
-      expect_generically_invited
+      want_whine_about_unrecognized_option '-x'
+      want_generically_invited
     end
 
     _HELLO = 'hello from git viz.'.freeze
 
     it "1.3 just a simple ping" do
       invoke 'ping'
-      expect :e, _HELLO
-      expect_no_more_lines
+      want :e, _HELLO
+      want_no_more_lines
       @exitstatus.should eql :hello_from_git_viz
     end
 
     it "1.4 helf" do
       invoke '-h'
       ( 9 .. 9 ).should be_include count_contiguous_lines_on_stream( :e )
-      expect_no_more_lines
+      want_no_more_lines
       @exitstatus.should be_zero
     end
 
     it "N   ping with an option to use the pay channel" do
       invoke 'ping', '--on-channel', 'payload'
-      expect :o, _HELLO
-      expect_no_more_lines
+      want :o, _HELLO
+      want_no_more_lines
       @exitstatus.should eql :hello_from_git_viz
     end
   end

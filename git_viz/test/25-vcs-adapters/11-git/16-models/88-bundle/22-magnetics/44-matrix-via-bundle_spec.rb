@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport
 
       bundle_against_ '/m04/repo'
 
-      expect_no_events
+      want_no_events
 
       @bundle.build_matrix_via_repository @repository
     end

@@ -64,7 +64,7 @@ module Skylab::GitViz::TestSupport
 
     def start_directory_noent_
 
-      _em = expect_failed_by :start_directory_is_not_directory
+      _em = want_failed_by :start_directory_is_not_directory
 
       ev = _em.cached_event_value
 
@@ -124,7 +124,7 @@ module Skylab::GitViz::TestSupport
       Home_::CLI
     end
 
-    def get_invocation_strings_for_expect_stdout_stderr
+    def get_invocation_strings_for_want_stdout_stderr
       %w( gvz )
     end
 
@@ -133,17 +133,17 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  Expect_Event = -> tcc do  # `tcc` = test context class
+  Want_Event = -> tcc do  # `tcc` = test context class
 
     tcc.include(
-      Home_::Common_.test_support::Expect_Emission::Test_Context_Instance_Methods )
+      Home_::Common_.test_support::Want_Emission::Test_Context_Instance_Methods )
 
     NIL_
   end
 
-  Expect_Line = -> tcc do
+  Want_Line = -> tcc do
 
-    TestSupport_::Expect_line[ tcc ]
+    TestSupport_::Want_line[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -164,11 +164,11 @@ module Skylab::GitViz::TestSupport
   module Reactive_Model
 
     def self.[] tcc
-      Expect_Event[ tcc ]
+      Want_Event[ tcc ]
       tcc.include self
     end
 
-    def subject_API  # #hook-out for "expect event"
+    def subject_API  # #hook-out for "want event"
       Home_::API
     end
 

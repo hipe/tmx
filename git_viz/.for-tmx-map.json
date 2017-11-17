@@ -1,6 +1,6 @@
 {
-  "after": "cull",
-  "category": "actually useful",
+  "after": "code_metrics",
+  "category": "visualization experiments",
   "framework": "[br]",
   "is potentially interesting application": true,
   "sigil": "gv"

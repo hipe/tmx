@@ -81,12 +81,12 @@ module Skylab::CodeMetrics::TestSupport
       Home_::CLI
     end
 
-    _dangerous_memoize :memoized_invocation_strings_for_expect_stdout_stderr_ do
-      get_invocation_strings_for_expect_stdout_stderr
+    _dangerous_memoize :memoized_invocation_strings_for_want_stdout_stderr_ do
+      get_invocation_strings_for_want_stdout_stderr
     end
 
     s = '[CoMe]'
-    define_method :get_invocation_strings_for_expect_stdout_stderr_ do
+    define_method :get_invocation_strings_for_want_stdout_stderr_ do
       [ s ]  # some places need this as mutable (to build sub-program name)
     end
 
@@ -127,16 +127,16 @@ module Skylab::CodeMetrics::TestSupport
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
-  Expect_Emission_Fail_Early = -> tcc do
-    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  Want_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Want_Emission_Fail_Early[ tcc ]
   end
 
-  Expect_Stdout_Stderr = -> tcc do
-    tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+  Want_Stdout_Stderr = -> tcc do
+    tcc.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
   end
 
   Memoizer_Methods = -> tcc do

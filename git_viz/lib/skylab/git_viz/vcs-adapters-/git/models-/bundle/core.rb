@@ -6,14 +6,14 @@ module Skylab::GitViz
 
       class << self
 
-        def build_bundle_via relpath, repo, rsx, filesystem, & oes_p
+        def build_bundle_via relpath, repo, rsx, filesystem, & p
 
           Here_::Magnetics_::Bundle_via_Path_and_Repository.call(
             relpath,
             repo,
             rsx,
             filesystem,
-            & ( oes_p || repo.handle_event_selectively )
+            & ( p || repo.handle_event_selectively )
           )
         end
 

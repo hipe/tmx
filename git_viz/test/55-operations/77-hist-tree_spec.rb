@@ -22,16 +22,16 @@ module Skylab::GitViz::TestSupport
     it "path is file (mocked) - x" do
 
       _call_API_against_path "/m03/repo/dirzo/it's just/funky like that"
-      expect_failed_by :wrong_ftype
+      want_failed_by :wrong_ftype
     end
 
     it "path is valid (mock) - o" do
 
       call_API_for_hist_tree_against_path_ '/m03/repo/dirzo'
-      __expect_bundle
+      __want_bundle
     end
 
-    def __expect_bundle
+    def __want_bundle
 
       _mbndl = @result
 

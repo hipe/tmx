@@ -5,7 +5,7 @@ module Skylab::CodeMetrics::TestSupport
   describe "[cm] magnetics (private) - const" do
 
     TS_[ self ]
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
     use :treemap_node  # for only one method
 
     it "loads" do
@@ -89,8 +89,8 @@ module Skylab::CodeMetrics::TestSupport
 
       def _expect * sym_a, & p
 
-        expect_on_channel sym_a, & p
-        expect_result false
+        want_on_channel sym_a, & p
+        want_result false
       end
 
       def expression_agent

@@ -15,19 +15,19 @@ module Skylab::GitViz::TestSupport
 
       call_API :ping, :not_an_arg, :_no_see_
 
-      _em = expect_not_OK_event :error
+      _em = want_not_OK_event :error
 
       _sym = _em.cached_event_value.to_event.terminal_channel_symbol
 
       :unrecognized_argument == _sym || fail
 
-      expect_fail
+      want_fail
     end
 
     it "simple ping" do
 
       call_API :ping
-      expect_neutral_event :ping
+      want_neutral_event :ping
       @result.should eql :hello_from_git_viz
     end
 
@@ -36,7 +36,7 @@ module Skylab::GitViz::TestSupport
       call_API :ping, :secret_x, :k
 
       @result.should eql "hi: k"
-      expect_no_more_events
+      want_no_more_events
     end
   end
 end

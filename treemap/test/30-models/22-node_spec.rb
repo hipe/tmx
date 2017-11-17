@@ -49,18 +49,18 @@ module Skylab::Treemap::TestSupport
              └child 4 - 9.04
         HERE
 
-        _expect_etc _node, _st
+        _want_etc _node, _st
       end
 
       def __line_stream_via_big_string big_s
         Home_.lib_.basic::String::LineStream_via_String[ big_s ]
       end
 
-      def _expect_etc node, exp_st
+      def _want_etc node, exp_st
 
         _act_st = __build_line_stream_via_node_for_debugging node
 
-        TestSupport_::Expect_Line::Streams_have_same_content[ _act_st, exp_st, self ]
+        TestSupport_::Want_Line::Streams_have_same_content[ _act_st, exp_st, self ]
       end
 
       def __build_line_stream_via_node_for_debugging node

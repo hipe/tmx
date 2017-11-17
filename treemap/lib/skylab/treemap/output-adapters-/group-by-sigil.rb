@@ -6,7 +6,7 @@ module Skylab::Treemap
     # as well as being a frontier-pusher for the new [tr].)
 
     def initialize o, & p
-      @_oes_p = p
+      @_listener = p
       @_sout = o.stdout_
     end
 
@@ -181,7 +181,7 @@ module Skylab::Treemap
 
       when_failed_to_match_sigil = -> o_ do
 
-        @_oes_p.call :error, :expression do | y |
+        @_listener.call :error, :expression do | y |
           y << "failed to match sigil on line #{ o_.lineno }:"
           y << o_.content.inspect
         end
@@ -218,7 +218,7 @@ module Skylab::Treemap
       if :info == i_a.first && :data == i_a[ 1 ]
         send :"__receive__#{ i_a.last }__", ev_p[]
       else
-        @_oes_p.call( * i_a, & ev_p )
+        @_listener.call( * i_a, & ev_p )
       end
     end
 

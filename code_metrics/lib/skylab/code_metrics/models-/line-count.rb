@@ -48,7 +48,7 @@ module Skylab::CodeMetrics
 
       def __via_file_array
 
-        @on_event_selectively.call :info, :data, :file_list do
+        @listener.call :info, :data, :file_list do
           @file_array_
         end
 
@@ -69,7 +69,7 @@ module Skylab::CodeMetrics
         o.count_comment_lines = ! h[ :without_comment_lines ]
         o.file_array = @file_array_
         o.label = '.'
-        o.on_event_selectively = @on_event_selectively
+        o.listener = @listener
         o.system_conduit = system_conduit_
         o.totaller_class = Totaller_class___[]
         o.execute
@@ -121,7 +121,7 @@ module Skylab::CodeMetrics
 
       def __recurse_via_command y, cmd
 
-        @on_event_selectively.call :info, :line_count_command do  # ancitipating an active front
+        @listener.call :info, :line_count_command do  # ancitipating an active front
           cmd.to_event
         end
 

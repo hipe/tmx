@@ -6,7 +6,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
 
     it "you can see just a list of the would-be nodes to load" do
 

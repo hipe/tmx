@@ -7,7 +7,7 @@ module Skylab::CodeMetrics
         :count_comment_lines,
         :file_array,
         :label,
-        :on_event_selectively,
+        :listener,
         :system_conduit,
         :totaller_class
       )
@@ -26,7 +26,7 @@ module Skylab::CodeMetrics
 
         o.label = @label
         o.file_array = @file_array
-        o.on_event_selectively = @on_event_selectively
+        o.listener = @listener
         o.system_conduit = @system_conduit
         o.totaller_class = @totaller_class
 
@@ -67,7 +67,7 @@ module Skylab::CodeMetrics
           filter_a << "grep -v '^[ \t]*#'"
         end
 
-        @on_event_selectively.call :info, :data, :linecount_NLP_frame do
+        @listener.call :info, :data, :linecount_NLP_frame do
           o
         end
 

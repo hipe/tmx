@@ -8,7 +8,7 @@ module Skylab::GitViz
 
         # (a VERY custom session interface)
 
-        def initialize stats, repo, rsx, & oes_p
+        def initialize stats, repo, rsx, & p
 
           @ci_sha_a = []
           @ci_cache = {}
@@ -21,7 +21,7 @@ module Skylab::GitViz
             -> x { x }  # IDENTITY_
           end
 
-          @on_event_selectively = oes_p
+          @listener = p
           @repo = repo
           @statistics = stats
 
@@ -57,7 +57,7 @@ module Skylab::GitViz
             i_a, ev_p = Here_::Events_.potential_event_for_log(
               e, t, ::File.join( @repo.path, @normal_received_path ) )
 
-            @on_event_selectively.call( * i_a,  ev_p )
+            @listener.call( * i_a,  ev_p )
           end
         end
 

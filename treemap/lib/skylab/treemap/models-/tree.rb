@@ -69,13 +69,13 @@ module Skylab::Treemap
 
         def __resolve_output_adapter
 
-          ob = Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
+          ob = Home_.lib_.basic::Module::FeatureBranch_via_Module.define do |o|
             o.module = Output_Adapters_
           end
 
           _qkn = qualified_knownness :output_adapter
 
-          ref = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+          ref = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
             o.qualified_knownness = _qkn
 

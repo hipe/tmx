@@ -13,15 +13,15 @@ module Skylab::Treemap::TestSupport
     context "one component, zero-weight leaf" do
 
       it "mesh branch with 1 child node" do
-        expect_mesh_branch_with_this_many_nodes_ 1
+        want_mesh_branch_with_this_many_nodes_ 1
       end
 
       it "root rectangle has nonzero volume" do
-        expect_nonzero_volume_ root_rectangle_
+        want_nonzero_volume_ root_rectangle_
       end
 
       it "child rectangle has zero volume" do
-        expect_zero_volume_ child_rectangle_at_offset_ 0
+        want_zero_volume_ child_rectangle_at_offset_ 0
       end
 
       shared_subject :mondrian_tree_ do
@@ -38,11 +38,11 @@ module Skylab::Treemap::TestSupport
     context "one component, nonzero-weight leaf" do
 
       it "mesh branch with 1 child" do
-        expect_mesh_branch_with_this_many_nodes_ 1
+        want_mesh_branch_with_this_many_nodes_ 1
       end
 
       it "child rectangle has nonzero volume" do
-        expect_nonzero_volume_ child_rectangle_at_offset_ 0
+        want_nonzero_volume_ child_rectangle_at_offset_ 0
       end
 
       it "(for now, the lone child allocates a NEW but identical sub-rect)" do
@@ -75,7 +75,7 @@ module Skylab::Treemap::TestSupport
       end
 
       it "associated node is a branch with two sub-nodes" do
-        expect_mesh_branch_with_this_many_nodes_ 2
+        want_mesh_branch_with_this_many_nodes_ 2
       end
 
       it "each of those subnodes has translated/scaled rects that look right" do
@@ -240,7 +240,7 @@ module Skylab::Treemap::TestSupport
 
       it "those branch nodes in the data MUST correspond to visual branch nodes.." do
 
-        expect_mesh_branch_with_this_many_nodes_ 3
+        want_mesh_branch_with_this_many_nodes_ 3
 
         _hi = child_mesh_nodes_.map do |an_|
           an_.is_branch
@@ -263,16 +263,16 @@ module Skylab::Treemap::TestSupport
 
     # -- expectation support
 
-    def expect_mesh_branch_with_this_many_nodes_ len
+    def want_mesh_branch_with_this_many_nodes_ len
       root_mesh_node_.is_branch || fail
       child_mesh_nodes_.length == len || fail
     end
 
-    def expect_nonzero_volume_ rect
+    def want_nonzero_volume_ rect
       rect.has_zero_volume && fail
     end
 
-    def expect_zero_volume_ rect
+    def want_zero_volume_ rect
       rect.has_zero_volume || fail
     end
 

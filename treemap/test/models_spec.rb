@@ -5,17 +5,17 @@ module Skylab::Treemap::TestSupport
   describe "[tr] models" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "ping OK" do
 
       call_API :ping
 
-      expect_neutral_event :ping, 'hello from (app_name_string).'
+      want_neutral_event :ping, 'hello from (app_name_string).'
 
       @result.should eql :hello_from_treemap
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "tmx integration (stowaway)", TMX_CLI_integration: true do
@@ -26,9 +26,9 @@ module Skylab::Treemap::TestSupport
 
       cli.invoke 'treemap', 'ping'
 
-      cli.expect_on_stderr "hello from treemap.\n"
+      cli.want_on_stderr "hello from treemap.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
   end
 end

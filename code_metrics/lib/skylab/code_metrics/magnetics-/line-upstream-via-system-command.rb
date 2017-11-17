@@ -3,7 +3,7 @@ module Skylab::CodeMetrics
     class Magnetics_::Line_Upstream_via_System_Command
 
       def initialize & p
-        @on_event_selectively = p
+        @listener = p
       end
 
       attr_writer(

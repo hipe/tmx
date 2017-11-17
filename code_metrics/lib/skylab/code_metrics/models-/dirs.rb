@@ -79,7 +79,7 @@ module Skylab::CodeMetrics
         o.count_comment_lines = ! h[ :without_comment_lines ]
         o.file_array = y
         o.label = ::File.basename dir
-        o.on_event_selectively = @on_event_selectively
+        o.listener = @listener
         o.system_conduit = system_conduit_
         o.totaller_class = @_totes_class
 
@@ -153,12 +153,12 @@ module Skylab::CodeMetrics
         _, o, e, w = system_conduit_.popen3( * @_find_dirs_command.args )
 
         y = Home_::ThroughputAdapters_::SynchronousRead.call(
-          [], nil, o, e, w, & @on_event_selectively )
+          [], nil, o, e, w, & @listener )
 
         if y
           @_dirs = y
 
-          @on_event_selectively.call :info, :data, :file_list do
+          @listener.call :info, :data, :file_list do
             @_dirs
           end
 
@@ -182,7 +182,7 @@ module Skylab::CodeMetrics
 
         if cmd
 
-          @on_event_selectively.call :info, :find_dirs_command do
+          @listener.call :info, :find_dirs_command do
             cmd.to_event
           end
 

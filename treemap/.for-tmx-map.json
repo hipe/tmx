@@ -1,6 +1,6 @@
 {
-  "after": "permute",
-  "category": "toy",
+  "after": "git_viz",
+  "category": "visualization experiments",
   "framework": "[br]",
   "sigil": "tr"
 }

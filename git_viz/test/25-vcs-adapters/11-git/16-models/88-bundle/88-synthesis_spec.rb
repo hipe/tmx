@@ -17,13 +17,13 @@ module Skylab::GitViz::TestSupport
     it "file - soft error" do
 
       bundle_against_ "/m03/repo/dirzo/it's just/funky like that"
-      expect_failed_by :wrong_ftype
+      want_failed_by :wrong_ftype
     end
 
     it "dir that is not tracked - soft error" do
 
       bundle_against_ "/m03/repo/these-dirs/not-tracked"
-      expect_failed_by :directory_is_not_tracked
+      want_failed_by :directory_is_not_tracked
     end
 
     it "boogie boogie boogie boogie boogie" do
@@ -34,10 +34,10 @@ module Skylab::GitViz::TestSupport
       bnch.should be_respond_to :ci_box
       bnch.trails.length.should eql 3
       @trail = bnch.trails.fetch 0
-      __expect_trail
+      __want_trail
     end
 
-    def __expect_trail
+    def __want_trail
 
       trl = @trail
       a = trl.filechanges

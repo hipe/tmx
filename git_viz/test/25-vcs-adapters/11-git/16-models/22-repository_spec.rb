@@ -15,22 +15,22 @@ module Skylab::GitViz::TestSupport
 
       x = front_.ping
 
-      expect_neutral_event :ping, "hello from front."
+      want_neutral_event :ping, "hello from front."
 
       x.should eql :hello_from_front
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "just go ahead and TRY to give this low-level nerk a relpath" do
 
-      __expect_relative_paths_are_not_honored_here do
+      __want_relative_paths_are_not_honored_here do
 
         init_respository_via_path_ 'anything'
       end
     end
 
-    def __expect_relative_paths_are_not_honored_here
+    def __want_relative_paths_are_not_honored_here
       begin
         yield
       rescue Home_::ArgumentError => e
@@ -44,10 +44,10 @@ module Skylab::GitViz::TestSupport
 
       _ev = start_directory_noent_
 
-      __expect_totally_doesnt_exist _ev
+      __want_totally_doesnt_exist _ev
     end
 
-    def __expect_totally_doesnt_exist ev
+    def __want_totally_doesnt_exist ev
 
       ev.exception or fail
       ev.prop or fail
@@ -58,7 +58,7 @@ module Skylab::GitViz::TestSupport
 
       init_respository_via_path_ '/m02/repo/core.py'
 
-      expect_no_more_events
+      want_no_more_events
 
       @repository.should be_respond_to :fetch_commit_via_identifier
     end

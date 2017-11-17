@@ -47,19 +47,19 @@ module Skylab::CodeMetrics::TestSupport
 
       cli.invoke 'code-metrics', 'ping'
 
-      cli.expect_on_stderr "hello from code metrics.\n"
+      cli.want_on_stderr "hello from code metrics.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     # -- etc
 
-    def invocation_strings_for_expect_stdout_stderr
-      memoized_invocation_strings_for_expect_stdout_stderr_
+    def invocation_strings_for_want_stdout_stderr
+      memoized_invocation_strings_for_want_stdout_stderr_
     end
 
-    def get_invocation_strings_for_expect_stdout_stderr
-      get_invocation_strings_for_expect_stdout_stderr_
+    def get_invocation_strings_for_want_stdout_stderr
+      get_invocation_strings_for_want_stdout_stderr_
     end
   end
 end

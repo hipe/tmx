@@ -165,7 +165,7 @@ module Skylab::CodeMetrics
         cmd = build_find_files_command_via_paths_ @argument_box.fetch :path
         if cmd
 
-          @on_event_selectively.call :info, :find_files_command do
+          @listener.call :info, :find_files_command do
             cmd.to_event
           end
 

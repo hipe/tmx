@@ -23,15 +23,15 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "every non-root child has a short name" do
-        expect_every_non_root_child_has_a_short_name_
+        want_every_non_root_child_has_a_short_name_
       end
 
       it "terminal nodes have weights" do
-        expect_every_non_root_terminal_child_has_weights_
+        want_every_non_root_terminal_child_has_weights_
       end
 
       it "root node has an appropriate label string" do
-        expect_root_node_has_an_appropriate_label_string_
+        want_root_node_has_an_appropriate_label_string_
       end
 
       shared_subject :treemap_node_ do
@@ -82,15 +82,15 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "every non-root child has a short name" do
-        expect_every_non_root_child_has_a_short_name_
+        want_every_non_root_child_has_a_short_name_
       end
 
       it "terminal nodes have weights" do
-        expect_every_non_root_terminal_child_has_weights_
+        want_every_non_root_terminal_child_has_weights_
       end
 
       it "root node has an appropriate label string" do
-        expect_root_node_has_an_appropriate_label_string_
+        want_root_node_has_an_appropriate_label_string_
       end
 
       def treemap_node_

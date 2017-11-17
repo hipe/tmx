@@ -5,21 +5,21 @@ module Skylab::CodeMetrics::TestSupport
   describe "[cm] operations - line count" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "ping" do
 
       call_API :ping
-      expect_neutral_event :ping, "hello from code metrics."
-      expect_no_more_events
+      want_neutral_event :ping, "hello from code metrics."
+      want_no_more_events
       @result.should eql :hello_from_code_metrics
     end
 
     it "noent" do
 
       call_API :line_count, :path, [ Fixture_file_[ "not-there.code" ] ]
-      expect_not_OK_event :enoent, /\ANo such file or directory - /
-      expect_no_more_events
+      want_not_OK_event :enoent, /\ANo such file or directory - /
+      want_no_more_events
       @result.should eql nil
     end
 
@@ -27,14 +27,14 @@ module Skylab::CodeMetrics::TestSupport
 
       call_API :line_count, * _same
 
-      _linecount_NLP_frame = _expect_these_events
+      _linecount_NLP_frame = _want_these_events
 
       y = _linecount_NLP_frame.express_into_line_context( [] )
 
       y.should eql [ 'including blank lines and comment lines' ]
 
-      expect_freeform_event :wc_command
-      expect_no_more_events
+      want_freeform_event :wc_command
+      want_no_more_events
 
       totes = @result
       totes.count.should eql 9
@@ -63,14 +63,14 @@ module Skylab::CodeMetrics::TestSupport
         :without_comment_lines,
         :without_blank_lines
 
-      _linecount_NLP_frame = _expect_these_events
+      _linecount_NLP_frame = _want_these_events
 
       y = _linecount_NLP_frame.express_into_line_context []
 
       y.should eql [ 'excluding blank lines and comment lines' ]
 
-      expect_freeform_event :wc_pipey_command_string
-      expect_freeform_event :wc_pipey_command_string
+      want_freeform_event :wc_pipey_command_string
+      want_freeform_event :wc_pipey_command_string
 
       totes = @result
       totes.count.should eql 4
@@ -80,13 +80,13 @@ module Skylab::CodeMetrics::TestSupport
       [ :path, [ Fixture_file_directory_[] ], :include_name, [ '*.code' ] ]
     end
 
-    def _expect_these_events
+    def _want_these_events
 
-      expect_neutral_event :line_count_command
+      want_neutral_event :line_count_command
 
-      expect_freeform_event :file_list
+      want_freeform_event :file_list
 
-      _em = expect_freeform_event :linecount_NLP_frame
+      _em = want_freeform_event :linecount_NLP_frame
 
       _em.cached_event_value
     end

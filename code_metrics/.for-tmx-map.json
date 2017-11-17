@@ -1,6 +1,6 @@
 {
-  "after": "task_examples",
-  "category": "bigger",
+  "after": "beauty_salon",
+  "category": "visualization experiments",
   "framework": "[br]",
   "is potentially interesting application": true,
   "sigil": "cm"

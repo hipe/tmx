@@ -17,7 +17,7 @@ module Skylab::GitViz::TestSupport
       sparse_matrix [ nil ], nil, [ 23 ]
 
       _go
-      _expect_headers '2001'
+      _want_headers '2001'
     end
 
     it "annual - three events into two adjacent buckets" do
@@ -31,7 +31,7 @@ module Skylab::GitViz::TestSupport
       sparse_matrix [ 10, nil, 12 ], nil,
                     [ nil, 11, 13 ]
       _go
-      _expect_headers '2001', '2002'
+      _want_headers '2001', '2002'
     end
 
     it "annual - three events into two non-adjacent buckets" do
@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport
       sparse_matrix [ 10, nil, 12 ], nil,
                     [ nil, 11, 13 ]
       _go
-      _expect_headers '2001', '2002', '2003'
+      _want_headers '2001', '2002', '2003'
     end
 
     it "semi-annual - 2 adjacent with a year jump" do
@@ -59,7 +59,7 @@ module Skylab::GitViz::TestSupport
                     [ 98, 3 ]
 
       _go
-      _expect_headers '2001', '2002'
+      _want_headers '2001', '2002'
     end
 
     it "semi-annual - Q1, Q2, Q3" do
@@ -74,7 +74,7 @@ module Skylab::GitViz::TestSupport
                     [ nil, 50, 100 ]
 
       _go
-      _expect_headers '2001', '2nd½'
+      _want_headers '2001', '2nd½'
     end
 
     it "quarterly - start at not the start, have some holes" do
@@ -101,7 +101,7 @@ module Skylab::GitViz::TestSupport
 
 
       _go
-      _expect_headers '2001', '  Q2', '    ', '  Q4', '2002', '  Q2', '  Q3'
+      _want_headers '2001', '  Q2', '    ', '  Q4', '2002', '  Q2', '  Q3'
     end
 
     it "monthly - skip first 2 months of the next year" do
@@ -119,7 +119,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, nil, 1, 1, 1 ]
 
       _go
-      _expect_headers '2001', ' Dec', '2002', '    ', ' Mar', ' Apr'
+      _want_headers '2001', ' Dec', '2002', '    ', ' Mar', ' Apr'
     end
 
     it "weekly - etc" do
@@ -136,7 +136,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, nil, 1, 1, 1 ]
 
       _go
-      _expect_headers '2001', 'wk52', '2002', 'wk 2'
+      _want_headers '2001', 'wk52', '2002', 'wk 2'
     end
 
     it "weekly - when the year turns over it displays it even if hole" do
@@ -150,7 +150,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, 1 ]
 
       _go
-      _expect_headers '2001', '2002', 'wk 2'
+      _want_headers '2001', '2002', 'wk 2'
     end
 
     it "daily - gets really interesting" do
@@ -168,7 +168,7 @@ module Skylab::GitViz::TestSupport
                     [ nil, 1, nil, 2, 3 ]
 
       _go
-      _expect_headers '2001', 'Feb ', ' 8th', ' Fri', 'Feb ', '11th', ' Mon'
+      _want_headers '2001', 'Feb ', ' 8th', ' Fri', 'Feb ', '11th', ' Mon'
     end
 
     it "daily - say sunday when you have to" do
@@ -187,7 +187,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, 2, 3, 4, 5, 6, 7 ]
 
       _go
-      _expect_headers '2001', 'Feb ', ' 8th', ' Fri', ' Sat', ' Sun', ' Mon'
+      _want_headers '2001', 'Feb ', ' 8th', ' Fri', ' Sat', ' Sun', ' Mon'
     end
 
     it "three shift - minimal iteresting" do
@@ -207,7 +207,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, 2, 3, 4, 5, 6 ]
 
       _go
-      _expect_headers '2001', ' Feb', ' 6th', ' Wed', ' 8AM', ' 4PM'
+      _want_headers '2001', ' Feb', ' 6th', ' Wed', ' 8AM', ' 4PM'
 
     end
 
@@ -234,7 +234,7 @@ module Skylab::GitViz::TestSupport
                     [ 1, 2, 3, 4, 5, 6, 7, 8, 8, 10 ]
 
       _go
-      _expect_headers '2001', ' Feb', ' 8th', ' Fri', '    ',
+      _want_headers '2001', ' Feb', ' 8th', ' Fri', '    ',
         ' 4PM', ' Sat', ' 8AM', ' 4PM', '11th',' 8AM', ' 4PM'
     end
 
@@ -250,7 +250,7 @@ module Skylab::GitViz::TestSupport
 
       sparse_matrix [ 1, 2, 3, 4, 5 ], nil, [ 2, 2, 2, 2, 2 ]
       _go
-      _expect_headers '2001', ' Feb', ' 8th', ' 7AM', ' 8AM'
+      _want_headers '2001', ' Feb', ' 8th', ' 7AM', ' 8AM'
     end
 
     def _go
@@ -352,7 +352,7 @@ module Skylab::GitViz::TestSupport
       Home_::ScaleTime_
     end
 
-    def _expect_headers * s_a
+    def _want_headers * s_a
 
       st = Home_.lib_.basic::String::LineStream_via_String[ @io.string ]
       s_a_ = ::Array.new 4

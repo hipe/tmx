@@ -129,7 +129,7 @@ module Skylab::CodeMetrics
       @_pattern_strings = @argument_box.fetch :word  # eek
 
       o = Here_::Magnetics_::Vendor_Match_Stream_via_Files_Slice_Stream.
-        new( & @on_event_selectively )
+        new( & @listener )
 
       o.files_slice_stream = remove_instance_variable :@_files_slice_stream
 

@@ -56,12 +56,12 @@ module Skylab::CodeMetrics::TestSupport
 
         4 == sm.length or fail
 
-        expect_absolute_path_ sm.fetch( 0 ).fetch( 0 )
-        expect_integer_ sm.fetch( 0 ).fetch( 1 )
-        expect_percent_ sm.fetch( 1 ).fetch( 2 )
-        expect_percent_ sm.fetch( 2 ).fetch( 3 )
+        want_absolute_path_ sm.fetch( 0 ).fetch( 0 )
+        want_integer_ sm.fetch( 0 ).fetch( 1 )
+        want_percent_ sm.fetch( 1 ).fetch( 2 )
+        want_percent_ sm.fetch( 2 ).fetch( 3 )
 
-        expect_pluses_ sm, 0..2, 4, :high, :low, :low
+        want_pluses_ sm, 0..2, 4, :high, :low, :low
       end
 
       it "summary" do
@@ -108,13 +108,13 @@ module Skylab::CodeMetrics::TestSupport
         row1.fetch( 0 ).should eql '*.code'
         row2.fetch( 0 ).should eql '*.file'
 
-        expect_integer_ row1.fetch( 1 ), 2..2
-        expect_integer_ row2.fetch( 1 ), 1..1
+        want_integer_ row1.fetch( 1 ), 2..2
+        want_integer_ row2.fetch( 1 ), 1..1
 
-        expect_percent_ row1.fetch( 2 )
-        expect_percent_ row2.fetch( 3 )
+        want_percent_ row1.fetch( 2 )
+        want_percent_ row2.fetch( 3 )
 
-        expect_pluses_ sm, 0..1, 4, :high, :low
+        want_pluses_ sm, 0..1, 4, :high, :low
       end
 
       it "summary" do
@@ -175,10 +175,10 @@ module Skylab::CodeMetrics::TestSupport
 
         column[ 2 ].should eql %w( 12 3 15 )
 
-        expect_percent_ sm[ 0 ][ 3 ], 80.0
-        expect_percent_ sm[ 1 ][ 4 ], 25.0
+        want_percent_ sm[ 0 ][ 3 ], 80.0
+        want_percent_ sm[ 1 ][ 4 ], 25.0
 
-        expect_pluses_ sm, 0..1, 5, :high, :low
+        want_pluses_ sm, 0..1, 5, :high, :low
       end
     end
   end

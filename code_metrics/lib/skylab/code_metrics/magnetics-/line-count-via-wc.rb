@@ -6,7 +6,7 @@ module Skylab::CodeMetrics
 
         :file_array,
         :label,
-        :on_event_selectively,
+        :listener,
         :system_conduit,
         :totaller_class,
       )
@@ -56,7 +56,7 @@ module Skylab::CodeMetrics
 
         cmd_s = cmd * SPACE_  # BE CAREFUL
 
-        @on_event_selectively.call :info, :data, :wc_command do
+        @listener.call :info, :data, :wc_command do
           WC_Command___.new cmd_s
         end
 
@@ -71,7 +71,7 @@ module Skylab::CodeMetrics
         _, o, e, w = @system_conduit.popen3 @_command_string  # (was [#004])
 
         y = Home_::ThroughputAdapters_::SynchronousRead.call(
-          [], nil, o, e, w, & @on_event_selectively )
+          [], nil, o, e, w, & @listener )
 
         if y
           @_output_lines = y

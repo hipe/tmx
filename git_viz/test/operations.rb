@@ -16,7 +16,7 @@ module Skylab::GitViz::TestSupport
 
         def [] tcm
 
-          TS_::Expect_Event[ tcm ]
+          TS_::Want_Event[ tcm ]
           TS_::Stubbed_filesystem[ tcm ]
           TS_::Stubbed_system[ tcm ]
 

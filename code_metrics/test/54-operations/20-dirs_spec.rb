@@ -5,7 +5,7 @@ module Skylab::CodeMetrics::TestSupport
   describe "[cm] operations - dirs" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "ok." do
 

@@ -10,8 +10,8 @@ module Skylab::CodeMetrics
         :pattern_strings,
       )
 
-      def initialize( & oes_p )
-        @_on_event_selectively = oes_p
+      def initialize( & p )
+        @_on_event_selectively = p
       end
 
       def execute

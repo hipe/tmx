@@ -2,7 +2,7 @@ module Skylab::CodeMetrics::TestSupport
 
   class CLI::Classify_Common_Screen
 
-    # (this is probably a predecessor to etc in [br] "expect section")
+    # (this is probably a predecessor to etc in [br] "want section")
 
     class << self
 
@@ -129,7 +129,7 @@ module Skylab::CodeMetrics::TestSupport
 
       # ~ expectations
 
-      define_method :expect_absolute_path_, -> do
+      define_method :want_absolute_path_, -> do
 
         rx = /\A\/.+[a-z]+\.code\z/
 
@@ -141,7 +141,7 @@ module Skylab::CodeMetrics::TestSupport
         end
       end.call
 
-      define_method :expect_integer_, -> do
+      define_method :want_integer_, -> do
 
         rx = /\A  (?<num>  \d+  ) \z/x
 
@@ -162,17 +162,17 @@ module Skylab::CodeMetrics::TestSupport
 
       end.call
 
-      define_method :expect_percent_, -> do
+      define_method :want_percent_, -> do
 
         rx = /\A (?<num> \d{1,3} \. \d\d ) % \z/x
 
-        -> x, expect_f=nil do
+        -> x, want_f=nil do
 
           md = rx.match x
 
           if md
-            if expect_f
-              md[ :num ].to_f.should eql expect_f
+            if want_f
+              md[ :num ].to_f.should eql want_f
             end
           else
             fail "expecting this to look like percent - #{ x.inspect }"
@@ -180,9 +180,9 @@ module Skylab::CodeMetrics::TestSupport
         end
       end.call
 
-      def expect_pluses_ sm, row_range, col_index, * more_or_less
+      def want_pluses_ sm, row_range, col_index, * more_or_less
 
-        o = Expect_Pluses___.new
+        o = Want_Pluses___.new
         o.column_index = col_index
         o.row_classifications = more_or_less
         o.row_range = row_range
@@ -191,7 +191,7 @@ module Skylab::CodeMetrics::TestSupport
         o.execute
       end
 
-      class Expect_Pluses___
+      class Want_Pluses___
 
         attr_writer(
           :column_index,

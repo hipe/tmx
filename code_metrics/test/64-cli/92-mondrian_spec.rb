@@ -13,17 +13,17 @@ module Skylab::CodeMetrics::TestSupport
     it "ping" do
 
       invoke me, '-ping'
-      expect_on_stderr 'hello from mondrian'
-      expect_succeed
+      want_on_stderr 'hello from mondrian'
+      want_succeed
     end
 
     it "strange primary - unknown // available" do
 
       invoke me, '-ziz-wiz'
-      expect_on_stderr "unknown primary \"-ziz-wiz\""
-      expect %r(\Aavailable primaries: .*(?<![[:alnum:]])-width\b)
+      want_on_stderr "unknown primary \"-ziz-wiz\""
+      want %r(\Aavailable primaries: .*(?<![[:alnum:]])-width\b)
         # the above is currently very long but meh
-      _expect_failed_commonly
+      _want_failed_commonly
     end
 
     ambi_N = 4
@@ -33,10 +33,10 @@ module Skylab::CodeMetrics::TestSupport
       on_stream :serr
       _rx = %r(\Aambiguous primary "-he" - did you mean (.+)\?\z)
       md = nil
-      expect_line_by do |line|
+      want_line_by do |line|
         md = _rx.match line
       end
-      _expect_failed_commonly
+      _want_failed_commonly
 
       _these = md[1].split %r(,[ ]| or )
       ambi_N == _these.length or fail  # ..
@@ -46,9 +46,9 @@ module Skylab::CodeMetrics::TestSupport
 
       invoke me
 
-      expect_on_stderr %r(\Arequired: -path and\b)
+      want_on_stderr %r(\Arequired: -path and\b)
 
-      _expect_failed_commonly
+      _want_failed_commonly
     end
 
     it "money (mocked)" do
@@ -62,9 +62,9 @@ module Skylab::CodeMetrics::TestSupport
         +------+
       HERE
 
-      expect_on_stdout_lines_in_big_string _big_string
+      want_on_stdout_lines_in_big_string _big_string
 
-      expect_succeed
+      want_succeed
     end
 
     context "numeric option" do
@@ -74,22 +74,22 @@ module Skylab::CodeMetrics::TestSupport
       it "argument stream end early - talkin bout expecting" do
 
         invoke me, same
-        expect_on_stderr "#{ same } requires an argument"
-        _expect_failed_commonly
+        want_on_stderr "#{ same } requires an argument"
+        _want_failed_commonly
       end
 
       it "not look like an integer" do
 
         invoke me, same, '1.0'
-        expect_on_stderr %(#{ same } does not look like integer: "1.0")
-        _expect_failed_commonly
+        want_on_stderr %(#{ same } does not look like integer: "1.0")
+        _want_failed_commonly
       end
 
       it "not positive nonzero (clever thing with method names)" do
 
         invoke me, same, '0'
-        expect_on_stderr "#{ same } must be positive nonzero (had 0)"
-        _expect_failed_commonly
+        want_on_stderr "#{ same } must be positive nonzero (had 0)"
+        _want_failed_commonly
       end
 
       it "money" do
@@ -104,8 +104,8 @@ module Skylab::CodeMetrics::TestSupport
           +----------+
         HERE
 
-        expect_on_stdout_lines_in_big_string _big_string
-        expect_succeed
+        want_on_stdout_lines_in_big_string _big_string
+        want_succeed
       end
     end
 
@@ -127,7 +127,7 @@ module Skylab::CodeMetrics::TestSupport
         end
         NIL
       end
-      expect_each_on_stderr_by do |line|
+      want_each_on_stderr_by do |line|
         p[ line ]
       end
 
@@ -137,17 +137,17 @@ module Skylab::CodeMetrics::TestSupport
         %r(\Ausage: ze-pnsa.*(?<![a-z])-path(?!-)),
       ]
 
-      expect_succeed
+      want_succeed
 
       if stack.length.nonzero?
         fail
       end
     end
 
-    def _expect_failed_commonly
-      # expect "try 'ze-pnsa -h'
+    def _want_failed_commonly
+      # want "try 'ze-pnsa -h'
         # for now, no invites just to be like `find`
-      expect_fail
+      want_fail
     end
 
     def subject_CLI

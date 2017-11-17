@@ -34,12 +34,12 @@ module Skylab::CodeMetrics::TestSupport
       Execution_Snapshot___.new _em_a, @exitstatus
     end
 
-    def invocation_strings_for_expect_stdout_stderr
-      memoized_invocation_strings_for_expect_stdout_stderr_
+    def invocation_strings_for_want_stdout_stderr
+      memoized_invocation_strings_for_want_stdout_stderr_
     end
 
-    def get_invocation_strings_for_expect_stdout_stderr
-      get_invocation_strings_for_expect_stdout_stderr_
+    def get_invocation_strings_for_want_stdout_stderr
+      get_invocation_strings_for_want_stdout_stderr_
     end
   end
 

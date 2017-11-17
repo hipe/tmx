@@ -8,7 +8,7 @@ module Skylab::CodeMetrics
 
       def produce_result
 
-        @on_event_selectively.call :info, :expression, :ping do | y |
+        @listener.call :info, :expression, :ping do | y |
           y << "hello from code metrics."
         end
         :hello_from_code_metrics

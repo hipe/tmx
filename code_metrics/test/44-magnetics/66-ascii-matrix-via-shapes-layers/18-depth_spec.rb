@@ -43,7 +43,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "every byte is correct" do
-        expect_every_byte_is_correct_
+        want_every_byte_is_correct_
       end
     end
 

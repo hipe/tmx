@@ -6,9 +6,9 @@ module Skylab::CodeMetrics
 
       class << self
 
-        def call y, _, sout, serr, w, & oes_p
+        def call y, _, sout, serr, w, & p
           o = new
-          o.on_event_selectively = oes_p
+          o.listener = p
           o.sout = sout
           o.serr = serr
           o.w = w
@@ -29,7 +29,7 @@ module Skylab::CodeMetrics
       end
 
       attr_writer(
-        :on_event_selectively,
+        :listener,
         :sout,
         :serr,
         :w, :y )
@@ -51,9 +51,9 @@ module Skylab::CodeMetrics
           did_human_keepalive_behavior = true
 
           if num_souts.zero?
-            @on_event_selectively.call :info, :moment, :thinking_heartbeat
+            @listener.call :info, :moment, :thinking_heartbeat
           else
-            @on_event_selectively.call :info, :data, :working_heartbeat do
+            @listener.call :info, :data, :working_heartbeat do
               num_souts
             end
             num_souts = 0
@@ -76,7 +76,7 @@ module Skylab::CodeMetrics
         sess.on @serr do | s |
           s.chomp!
           ok = UNABLE_
-          @on_event_selectively.call :error, :expression, :unexpected_errput do | y_ |
+          @listener.call :error, :expression, :unexpected_errput do | y_ |
             y_ << "unexpected errput: #{ s }"
           end
         end
@@ -85,7 +85,7 @@ module Skylab::CodeMetrics
 
         if did_human_keepalive_behavior
 
-          @on_event_selectively.call :info, :done
+          @listener.call :info, :done
         end
 
         ok && @y

@@ -4,9 +4,9 @@ module Skylab::Treemap
 
     class << self
 
-      def call o_st, & oes_p
+      def call o_st, & p
 
-        new( o_st, & oes_p ).execute
+        new( o_st, & p ).execute
       end
 
       def required_stream
@@ -14,9 +14,9 @@ module Skylab::Treemap
       end
     end  # >>
 
-    def initialize o_st, & oes_p
+    def initialize o_st, & p
       @o_st = o_st
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def execute
@@ -35,7 +35,7 @@ module Skylab::Treemap
 
           branch_cache_a = []
 
-          @_oes_p.call :info, :data, :branch_cache_array do
+          @_listener.call :info, :data, :branch_cache_array do
             branch_cache_a
           end
 

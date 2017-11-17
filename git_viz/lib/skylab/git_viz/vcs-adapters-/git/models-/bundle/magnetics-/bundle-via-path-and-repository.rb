@@ -14,7 +14,7 @@ module Skylab::GitViz
         )
 
         def initialize & p
-          @on_event_selectively = p
+          @listener = p
         end
 
         def execute
@@ -22,7 +22,7 @@ module Skylab::GitViz
           statistics = []
 
           @build_trail = Magnetics_::Trail_via_Paths_and_Repository.new(
-            statistics, @repo, @rsx, & @on_event_selectively )
+            statistics, @repo, @rsx, & @listener )
 
           @list_of_trails = []
 
@@ -41,7 +41,7 @@ module Skylab::GitViz
 
           _ = _n11n.with :relative, :downward_only  #, :no_single_dots
 
-          arg = _.normalize_value @path, & @on_event_selectively
+          arg = _.normalize_value @path, & @listener
 
           arg and begin
 
@@ -61,7 +61,7 @@ module Skylab::GitViz
           kn = Home_.lib_.system_lib::Filesystem::Normalizations::ExistentDirectory.via(
             :path, _path,
             :filesystem, @filesystem,
-            & @on_event_selectively )
+            & @listener )
 
           if kn
             kn.value.to_path  # sanity check that result is a dir object
@@ -94,7 +94,7 @@ module Skylab::GitViz
           else
             i_a, ev_p = Here_::Events_.potential_event_for_ls_files(
               e, t, full_POI )
-            @on_event_selectively.call( * i_a, & ev_p )
+            @listener.call( * i_a, & ev_p )
             UNABLE_
           end
         end

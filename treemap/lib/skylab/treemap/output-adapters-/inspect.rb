@@ -3,7 +3,7 @@ module Skylab::Treemap
   class Output_Adapters_::Inspect
 
     def initialize o, & p
-      @_oes_p = p
+      @_listener = p
       @_serr = o.stderr_
     end
 
@@ -33,7 +33,7 @@ module Skylab::Treemap
       if :info == i_a.first && :data == i_a[ 1 ]
         send :"__receive__#{ i_a.last }__", ev_p[]
       else
-        @_oes_p.call( * i_a, & ev_p )
+        @_listener.call( * i_a, & ev_p )
       end
     end
 

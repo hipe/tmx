@@ -12,8 +12,8 @@ module Skylab::CodeMetrics::TestSupport
     it "0.0 - nothing" do
 
       invoke
-      expect_expecting_action_line
-      expect_usaged_and_invited
+      want_expecting_action_line
+      want_usaged_and_invited
     end
 
     context "1.4 - help at level 0" do
@@ -62,9 +62,9 @@ module Skylab::CodeMetrics::TestSupport
 
       invoke 'line-count', '-h'
 
-      exp = flush_to_expect_stdout_stderr_emission_summary_expecter
-      exp.expect_chunk 24, :e
-      exp.expect_no_more_chunks
+      exp = flush_to_want_stdout_stderr_emission_summary_expecter
+      exp.want_chunk 24, :e
+      exp.want_no_more_chunks
     end
   end
 end

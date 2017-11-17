@@ -33,7 +33,7 @@ module Skylab::CodeMetrics
         ) do | * i_a, & ev_p |
 
           if :info != i_a.first
-            @on_event_selectively.call( * i_a, & ev_p )
+            @listener.call( * i_a, & ev_p )
           end
         end
       end
@@ -51,7 +51,7 @@ module Skylab::CodeMetrics
 
       def maybe_send_event_about_noent_ e
 
-        @on_event_selectively.call :info, :enoent do
+        @listener.call :info, :enoent do
 
           Common_::Event::Via_exception.via(
             :exception, e,
@@ -65,7 +65,7 @@ module Skylab::CodeMetrics
       def line_upstream_via_system_command_ a
 
         _ = Home_::Magnetics_::Line_Upstream_via_System_Command
-        o = _.new( & @on_event_selectively )
+        o = _.new( & @listener )
         o.system_command_string_array = a
         o.system_conduit = system_conduit_
         o.execute
@@ -102,7 +102,7 @@ module Skylab::CodeMetrics
 
         :argument_arity, :zero_or_more,
 
-        :ad_hoc_normalizer, -> qkn, & oes_p do
+        :ad_hoc_normalizer, -> qkn, & p do
           a = qkn.value
           if '[]' == a.last
             a.clear  # EGADS!

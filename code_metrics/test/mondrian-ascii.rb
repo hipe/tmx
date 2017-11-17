@@ -82,7 +82,7 @@ module Skylab::CodeMetrics::TestSupport
 
     Big_stringer_prototype___ = Lazy_.call do
 
-      TestSupport_::Expect_Line::DemarcatedBigString.define do |o|
+      TestSupport_::Want_Line::DemarcatedBigString.define do |o|
         o.demarcator_string = "¦"
         o.have_the_effect_of_chomping_lines = true
       end
@@ -103,13 +103,13 @@ module Skylab::CodeMetrics::TestSupport
         exit 0
       end
 
-      def expect_every_byte_is_correct_
+      def want_every_byte_is_correct_
 
         _act_st = _mondrian_ASCII_build_line_stream
 
         _exp = big_stringer
 
-        _exp.expect_against_line_stream_under _act_st, self
+        _exp.want_against_line_stream_under _act_st, self
       end
 
       def _mondrian_ASCII_build_line_stream

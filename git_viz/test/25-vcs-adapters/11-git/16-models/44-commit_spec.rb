@@ -13,9 +13,9 @@ module Skylab::GitViz::TestSupport
 
       _against_string 'no-such-commit'
 
-      expect_event_sequence_for_noent_SHA_ 'no-such-commit'
+      want_event_sequence_for_noent_SHA_ 'no-such-commit'
       @ci.should eql false
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "build a commit object from a typical commit - lookup FC counts" do
@@ -24,8 +24,8 @@ module Skylab::GitViz::TestSupport
 
       _against_string 'fafa003'
 
-      expect_next_system_command_emission_
-      expect_no_more_events
+      want_next_system_command_emission_
+      want_no_more_events
 
       fc = @ci.fetch_filechange_via_end_path(
         "dirzo/everybody in the room is floating" )

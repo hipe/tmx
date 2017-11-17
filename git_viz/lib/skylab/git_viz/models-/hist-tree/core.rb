@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   Models_ = ::Module.new  # must create - is registered stowaway
 
-  Models_::Ping = -> on_channel=nil, secret_x=nil, bnd, & oes_p do
+  Models_::Ping = -> on_channel=nil, secret_x=nil, bnd, & p do
 
       if secret_x
         "hi: #{ secret_x }"
@@ -15,7 +15,7 @@ module Skylab::GitViz
           :info
         end
 
-        oes_p.call _chn, :expression, :ping do | y |
+        p.call _chn, :expression, :ping do | y |
 
           y << "hello from #{ bnd.kernel.app_name_string }."
         end
@@ -115,7 +115,7 @@ module Skylab::GitViz
           @repo,
           _rsx,
           h.fetch( :filesystem ),
-          & @on_event_selectively )
+          & @listener )
 
         @mutable_VCS_bundle && ACHIEVED_
       end

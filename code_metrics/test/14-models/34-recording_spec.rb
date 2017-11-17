@@ -12,7 +12,7 @@ module Skylab::CodeMetrics::TestSupport
 
     it "whine on not absolute path" do
       against_line_ "1 class Foo x/y/zz"
-      _expect_whine do |y|
+      _want_whine do |y|
         y[0] == "expected path near \"x/y/zz\\n\"" || fail
       end
     end
@@ -72,7 +72,7 @@ module Skylab::CodeMetrics::TestSupport
       @LINE = line
     end
 
-    def _expect_whine & p
+    def _want_whine & p
       _geld( & p )
     end
 
@@ -84,7 +84,7 @@ module Skylab::CodeMetrics::TestSupport
       line = remove_instance_variable :@LINE
       line << NEWLINE_
       if block_given?
-        log = Common_.test_support::Expect_Emission::Log.for self
+        log = Common_.test_support::Want_Emission::Log.for self
         _p = log.handle_event_selectively
         _x = _subject_module::Tuple_via_line__.call(
           line, X_pmods_rec_path_cache, & _p )

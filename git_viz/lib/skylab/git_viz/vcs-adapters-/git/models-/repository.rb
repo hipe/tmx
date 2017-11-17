@@ -6,13 +6,13 @@ module Skylab::GitViz
 
       class << self
 
-        def new_via path, system, filesystem, & oes_p
+        def new_via path, system, filesystem, & p
 
-          dir = Find_repository_path___[ path, filesystem, & oes_p ]
+          dir = Find_repository_path___[ path, filesystem, & p ]
 
           if dir
 
-            new path, dir, system, & oes_p
+            new path, dir, system, & p
           else
             dir
           end
@@ -26,9 +26,9 @@ module Skylab::GitViz
         :relative_path_of_interest,
       )
 
-      def initialize arg_path, project_path, system, & oes_p
+      def initialize arg_path, project_path, system, & p
 
-        @on_event_selectively = oes_p
+        @listener = p
 
         @path = project_path
 
@@ -47,11 +47,11 @@ module Skylab::GitViz
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 
-      def fetch_commit_via_identifier id_s, & oes_p
+      def fetch_commit_via_identifier id_s, & p
 
-        oes_p ||= @on_event_selectively
+        p ||= @listener
 
-        Models_::Commit.fetch_via_identifier__ id_s, self, & oes_p
+        Models_::Commit.fetch_via_identifier__ id_s, self, & p
       end
 
       def repo_popen_3_ * s_a
@@ -72,14 +72,14 @@ module Skylab::GitViz
       class Find_repository_path___
 
         class << self
-          def [] path, fs, & oes_p
-            new( path, fs, & oes_p ).execute
+          def [] path, fs, & p
+            new( path, fs, & p ).execute
           end
           private :new
         end  # >>
 
-        def initialize path, fs, & oes_p
-          @path = path ; @fs = fs ; @on_event_selectively = oes_p
+        def initialize path, fs, & p
+          @path = path ; @fs = fs ; @listener = p
         end
 
         def execute
@@ -114,7 +114,7 @@ module Skylab::GitViz
             :filename, VENDOR_DIR_,
             :max_num_dirs_to_look, -1,
             :ftype, _FS::DIRECTORY_FTYPE,
-            & @on_event_selectively )
+            & @listener )
         end
       end
     end

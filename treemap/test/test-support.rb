@@ -21,8 +21,8 @@ module Skylab::Treemap::TestSupport
       common_magnets_and_models: -> tcc do
         TS_::Common_Magnets_And_Models[ tcc ]
       end,
-      expect_event: -> tcc do
-        Home_::Common_.test_support::Expect_Emission[ tcc ]
+      want_event: -> tcc do
+        Home_::Common_.test_support::Want_Emission[ tcc ]
       end,
       memoizer_methods: -> tcc do
         TestSupport_::Memoization_and_subject_sharing[ tcc ]
@@ -36,12 +36,12 @@ module Skylab::Treemap::TestSupport
 
   module InstanceMethods___
 
-    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_Line::Want_these_lines_in_array[ a, p, self ]
     end
 
     def debug!

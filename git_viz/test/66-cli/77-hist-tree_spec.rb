@@ -9,7 +9,7 @@ module Skylab::GitViz::TestSupport
     use :VCS_adapters_git_bundles
     use :my_CLI  # order matters
 
-    context "help screen - expect [#br-042] back-to-front property mutation" do
+    context "help screen - want [#br-042] back-to-front property mutation" do
 
       shared_subject :state_ do
 
@@ -47,16 +47,16 @@ module Skylab::GitViz::TestSupport
       invoke 'hi', 'x'
 
       on_stream :e
-      expect :styled, 'expecting <path>'
-      expect_result_for_failure
+      want :styled, 'expecting <path>'
+      want_result_for_failure
     end
 
     it "when width is not valid" do
 
       invoke 'hi', '--', '-1', 'x'
 
-      expect :styled, 'failed because <width> must be greater than or equal to 1, had -1'
-      expect_result_for_failure
+      want :styled, 'failed because <width> must be greater than or equal to 1, had -1'
+      want_result_for_failure
     end
 
     it "DAY VIEW!" do
@@ -65,7 +65,7 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '--', '46', _the_path
 
-      __expect_day_view_dots
+      __want_day_view_dots
     end
 
     it "SHIFT VIEW!" do
@@ -74,13 +74,13 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '--', '47', _the_path
 
-      __expect_shift_view_dots
+      __want_shift_view_dots
     end
 
     def _common_prepare
 
-      @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
-      @stderr_for_expect_stdout_stderr = mock_stderr_instance_for_CLI_expectations
+      @for_want_stdout_stderr_prepare_invocation = method :__prepare_invo
+      @stderr_for_want_stdout_stderr = mock_stderr_instance_for_CLI_expectations
     end
 
     def __prepare_invo invo
@@ -101,48 +101,48 @@ module Skylab::GitViz::TestSupport
 
     # ~ expects
 
-    def __expect_day_view_dots
+    def __want_day_view_dots
 
       on_stream :o
 
-      expect "                                     1J  "
-      expect "                                     9a3M"
-      expect "                                     9nro"
-      expect "                                     9 dn"
-      expect " ├everybody in the room is floating | •• "
-      expect " ├it's just                         |"
-      expect " │ └funky like that                 |• ⬤ "
-      expect " └move-after                        |  ●●"
+      want "                                     1J  "
+      want "                                     9a3M"
+      want "                                     9nro"
+      want "                                     9 dn"
+      want " ├everybody in the room is floating | •• "
+      want " ├it's just                         |"
+      want " │ └funky like that                 |• ⬤ "
+      want " └move-after                        |  ●●"
 
-      expect_succeed
+      want_succeed
     end
 
-    def __expect_shift_view_dots
+    def __want_shift_view_dots
 
       on_stream :o
 
-      expect "                                     1         "
-      expect "                                     9J28 38 M8"
-      expect "                                     9anA rA oA"
-      expect "                                     9ndM dM nM"
-      expect " ├everybody in the room is floating |   •  •   "
-      expect " ├it's just                         |"
-      expect " │ └funky like that                 |•     ⬤   "
-      expect " └move-after                        |      ●  ●"
+      want "                                     1         "
+      want "                                     9J28 38 M8"
+      want "                                     9anA rA oA"
+      want "                                     9ndM dM nM"
+      want " ├everybody in the room is floating |   •  •   "
+      want " ├it's just                         |"
+      want " │ └funky like that                 |•     ⬤   "
+      want " └move-after                        |      ●  ●"
 
-      expect_succeed
+      want_succeed
     end
 
-    def __FOR_THE_FUTURE_expect_solid_dots
+    def __FOR_THE_FUTURE_want_solid_dots
 
       on_stream :o
 
-      expect " ├everybody in the room is floating |   ⦿ •  "
-      expect " ├it's just                         |"
-      expect " │ └funky like that                 | ⦿   ⬤  "
-      expect " └move-after                        |     ⦿ ●"
+      want " ├everybody in the room is floating |   ⦿ •  "
+      want " ├it's just                         |"
+      want " │ └funky like that                 | ⦿   ⬤  "
+      want " └move-after                        |     ⦿ ●"
 
-      expect_succeed
+      want_succeed
     end
 
     def manifest_path_for_stubbed_FS

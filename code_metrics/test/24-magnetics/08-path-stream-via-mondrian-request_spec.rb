@@ -19,7 +19,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "the one path" do
-        __expect_paths do |y|
+        __want_paths do |y|
           y << '/jimmy/jammy'
         end
       end
@@ -103,7 +103,7 @@ module Skylab::CodeMetrics::TestSupport
       end
     end
 
-    def __expect_paths
+    def __want_paths
 
       st = build_path_stream_
 

@@ -61,7 +61,7 @@ module Skylab::CodeMetrics::TestSupport
         Statistics___.new max_depth, number_of_leaf_nodes
       end
 
-      def expect_every_non_root_terminal_child_has_weights_
+      def want_every_non_root_terminal_child_has_weights_
 
         __TMN_expect_of_every_leaf_child_of treemap_node_ do |tr|
           d = tr.main_quantity
@@ -81,7 +81,7 @@ module Skylab::CodeMetrics::TestSupport
         end while above
       end
 
-      def expect_every_non_root_child_has_a_short_name_
+      def want_every_non_root_child_has_a_short_name_
 
         _TMN_expect_of_every_non_root_child do |tr|
           s = tr.label_string
@@ -94,7 +94,7 @@ module Skylab::CodeMetrics::TestSupport
         end
       end
 
-      def expect_root_node_has_an_appropriate_label_string_
+      def want_root_node_has_an_appropriate_label_string_
 
         s = treemap_node_.label_string
 

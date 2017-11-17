@@ -5,7 +5,7 @@ module Skylab::Treemap::TestSupport
   describe "[tr] output-adapters - group by sigil" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "OK (small representative sample)" do
 
@@ -27,11 +27,11 @@ module Skylab::Treemap::TestSupport
         :output_adapter, 'group-by-sigi',
       )
 
-      expect_succeed
+      want_succeed
 
       stdout.rewind
 
-      expect_these_lines_in_array_with_trailing_newlines_ stdout do |y|
+      want_these_lines_in_array_with_trailing_newlines_ stdout do |y|
         y << '[ab]...(3)'
         y << '[cd].(1)'
         y << '(4 tests over 2 sigil changes)'
