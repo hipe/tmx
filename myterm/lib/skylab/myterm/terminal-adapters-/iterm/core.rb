@@ -9,8 +9,8 @@ module Skylab::MyTerm
       undef_method :new
     end  # >>
 
-    def initialize magnetics, & oes_p
-      @_oes_p = oes_p
+    def initialize magnetics, & p
+      @_listener = p
       @_vendor_magnetics = magnetics
     end
 
@@ -27,7 +27,7 @@ module Skylab::MyTerm
     # -- setting the background image
 
     def __set_background_image_via_image
-      Magnetics_::Set_Background_Image_via_Image[ self, & @_oes_p ]
+      Magnetics_::Set_Background_Image_via_Image[ self, & @_listener ]
     end
 
     # -- resolving the OSA script
@@ -51,7 +51,7 @@ module Skylab::MyTerm
     # --
 
     def check_version_of_iterm_
-      @___CV_of_iT_qk ||= Magnetics_::Compatible_Version_of_Iterm[ self, & @_oes_p ]
+      @___CV_of_iT_qk ||= Magnetics_::Compatible_Version_of_Iterm[ self, & @_listener ]
       @___CV_of_iT_qk.value
     end
 
@@ -71,7 +71,7 @@ module Skylab::MyTerm
       if instance_variable_defined? ivar
         instance_variable_get( ivar ) ? ACHIEVED_ : UNABLE_
       else
-        x = p_ish[ self, & @_oes_p ]
+        x = p_ish[ self, & @_listener ]
         if x
           instance_variable_set( ivar, x ) ; ACHIEVED_
         else

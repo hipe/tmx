@@ -166,7 +166,7 @@ module Skylab::DocTest
 
       scn = Home_::RecursionModels_::EntryScanner.via_path_ @argument_path
       scn.pos = len
-      scn.expect_one_separator__
+      scn.want_one_separator__
 
       lib = scn.scan_entry
 

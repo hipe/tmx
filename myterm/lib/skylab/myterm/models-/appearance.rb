@@ -80,12 +80,12 @@ module Skylab::MyTerm
 
       if @adapter
 
-        o::NodeReferenceStreamer_via_OperatorBranch.via_ACS @adapter.implementation_
+        o::NodeReferenceStreamer_via_FeatureBranch.via_ACS @adapter.implementation_
       else
 
-        _rw = o::OperatorBranch_via_ACS.for_componentesque self  # just reads ivar
+        _rw = o::FeatureBranch_via_ACS.for_componentesque self  # just reads ivar
 
-        _hi = o::NodeReferenceStreamer_via_OperatorBranch.via_reader _rw  # #todo - change method name
+        _hi = o::NodeReferenceStreamer_via_FeatureBranch.via_reader _rw  # #todo - change method name
 
         _hi
       end

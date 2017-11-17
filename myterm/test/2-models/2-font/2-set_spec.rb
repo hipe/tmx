@@ -54,7 +54,7 @@ module Skylab::MyTerm::TestSupport
 
         _em = last_emission
         _ev = _em.cached_event_value
-        _ev.express_into_under [], expression_agent_for_expect_emission
+        _ev.express_into_under [], expression_agent_for_want_emission
       end
 
       it "says that your font wasn't recognized (NOTE contextualiztion removed)" do

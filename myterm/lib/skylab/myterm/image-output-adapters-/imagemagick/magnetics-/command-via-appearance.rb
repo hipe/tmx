@@ -5,7 +5,7 @@ module Skylab::MyTerm
     class Magnetics_::Command_via_Appearance < Common_::Monadic
 
       def initialize o, & p
-        @_mags = o ; @_oes_p = p
+        @_mags = o ; @_listener = p
       end
 
       def execute
@@ -75,7 +75,7 @@ module Skylab::MyTerm
 
       def ___qkn_stream_via acs
 
-        _rw = Arc_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs  # meh
+        _rw = Arc_::Magnetics::FeatureBranch_via_ACS.for_componentesque acs  # meh
 
         _o = _rw.to_non_operation_node_reference_streamer
 
@@ -138,7 +138,7 @@ module Skylab::MyTerm
 
       def __finish
 
-        remove_instance_variable :@_oes_p
+        remove_instance_variable :@_listener
         remove_instance_variable :@_mags
         remove_instance_variable :@_special
 
@@ -157,23 +157,23 @@ module Skylab::MyTerm
 
       # --
 
-      def send_into_system_conduit_ sycond, & oes_p
+      def send_into_system_conduit_ sycond, & p
 
         _, o, e, w = sycond.popen3( * @string_array )
 
         s = e.gets
         if s
-          ___when_one_error_line s, w, & oes_p
+          ___when_one_error_line s, w, & p
         else
           __when_no_error_lines o, w
         end
       end
 
-      def ___when_one_error_line s, w, & oes_p
+      def ___when_one_error_line s, w, & p
 
         # (might block if you try to read more now)
 
-        oes_p.call :error, :expression, :system_call_failed do |y|
+        p.call :error, :expression, :system_call_failed do |y|
           y << s
         end
 

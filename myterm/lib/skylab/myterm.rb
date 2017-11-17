@@ -97,13 +97,13 @@ module Skylab::MyTerm
 
   module Models_
 
-    Color = -> arg_st, & oes_p_p do  # stowaway
+    Color = -> arg_st, & p_p do  # stowaway
 
       _String = Home_.lib_.basic::String
 
       _ = _String.component_model_for :NONBLANK_TOKEN
 
-      _[ arg_st, & oes_p_p ]
+      _[ arg_st, & p_p ]
     end
 
     Autoloader_[ self ]

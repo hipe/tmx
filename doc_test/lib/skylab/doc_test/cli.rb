@@ -103,7 +103,7 @@ module Skylab::DocTest
 
         #== EXPERIMENT
 
-        @_oes_p = cli.build_common_emission_handler_where do |o|
+        @_listener = cli.build_common_emission_handler_where do |o|
 
           o.selection_stack = ss
 
@@ -153,7 +153,7 @@ module Skylab::DocTest
 
       def __result_via_upstream_line_stream
 
-        op = Home_::Operations_::Synchronize.new( & @_oes_p )
+        op = Home_::Operations_::Synchronize.new( & @_listener )
 
         op.asset_line_stream =
           remove_instance_variable :@__asset_line_stream
@@ -204,7 +204,7 @@ module Skylab::DocTest
       end
 
       def __express_exception e
-        @_oes_p.call :error, :expression do |y|
+        @_listener.call :error, :expression do |y|
           y << e.message
         end
       end

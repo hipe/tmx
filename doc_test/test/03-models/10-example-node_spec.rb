@@ -42,7 +42,7 @@ module Skylab::DocTest::TestSupport
 
       it "wahoootey (widget)" do
 
-        _expect_big_string _widget_subject_instance, <<-HERE.unindent
+        _want_big_string _widget_subject_instance, <<-HERE.unindent
           def test_case_smooth_mamma_jamma
             code line w/o ting ting
             some( thing ).must eql :thang
@@ -52,7 +52,7 @@ module Skylab::DocTest::TestSupport
 
       it "wahoootey (real)" do
 
-        _expect_big_string _real_subject_instance, <<-HERE.unindent
+        _want_big_string _real_subject_instance, <<-HERE.unindent
           it "smooth mamma jamma" do
             code line w/o ting ting
             some( thing ).should eql :thang
@@ -81,10 +81,10 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    def _expect_big_string subject_instance, big_exp_s
+    def _want_big_string subject_instance, big_exp_s
 
-      expect_actual_line_stream_has_same_content_as_expected_(
-        subject_instance.to_line_stream( & Expect_no_emission_ ),
+      want_actual_line_stream_has_same_content_as_expected_(
+        subject_instance.to_line_stream( & Want_no_emission_ ),
         line_stream_via_string_( big_exp_s ),
       )
     end

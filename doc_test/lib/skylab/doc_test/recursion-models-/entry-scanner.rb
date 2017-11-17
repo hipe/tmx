@@ -15,7 +15,7 @@ module Skylab::DocTest
       @_scn.pos = d
     end
 
-    def expect_one_separator__
+    def want_one_separator__
       _d = @_scn.skip SEP_RX__
       _d || self._SANITY
     end

@@ -7,7 +7,7 @@ module Skylab::MyTerm
       THRESHOLD_ITERM2_VERSION___ = [ 2, 9, 20140903 ]
 
       def initialize o, & p
-        @_mags = o ; @_oes_p = p
+        @_mags = o ; @_listener = p
       end
 
       def execute
@@ -57,7 +57,7 @@ module Skylab::MyTerm
             a.push s.to_i
             next
           end
-          @_oes_p.call :error, :emission, :etc do |y|
+          @_listener.call :error, :emission, :etc do |y|
             y << "version component is not an integer: #{ s.inspect } (of #{ v_s.inspect })"
           end
           ok = false

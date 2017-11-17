@@ -64,12 +64,12 @@ module Skylab::MyTerm::TestSupport
     def self.[] tcc
 
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
-      _ = Zerk_test_support_[].lib :expect_screens
+      _ = Zerk_test_support_[].lib :want_screens
       _[ tcc ]
       tcc.include self
     end
 
-    def prepare_CLI_for_expect_screens cli, fc, sc
+    def prepare_CLI_for_want_screens cli, fc, sc
 
       # (if set, the last two above are from the `given` DSL)
 
@@ -110,9 +110,9 @@ module Skylab::MyTerm::TestSupport
       tcc.include self
     end
 
-    def zerk_API_call oes_p, x_a  # #spot-2
+    def zerk_API_call p, x_a  # #spot-2
       @root_ACS = build_root_ACS_for_testing_
-      Home_::Call_.call( x_a, @root_ACS ) { |_| oes_p }
+      Home_::Call_.call( x_a, @root_ACS ) { |_| p }
     end
   end
 

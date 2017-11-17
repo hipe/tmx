@@ -55,8 +55,8 @@ module Skylab::DocTest
       Any_value__
     end
 
-    def execute & oes_p
-      @_on_event_selectively = oes_p
+    def execute & p
+      @_on_event_selectively = p
       extend ImplementationAssistance___
       execute
     end

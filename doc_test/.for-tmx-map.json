@@ -1,6 +1,6 @@
 {
-  "after": "myterm",
-  "category": "actually useful",
+  "after": "treemap",
+  "category": "flagship experiments",
   "framework": "[ze] (niCLI)",
   "is potentially interesting application": true,
   "sigil": "dt"

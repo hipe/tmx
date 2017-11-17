@@ -13,7 +13,7 @@ module Skylab::MyTerm
 
       def initialize acs, & p
         @appearance_ = acs
-        @_oes_p = p
+        @_listener = p
       end
 
       def build_imagemagick_command__
@@ -42,7 +42,7 @@ module Skylab::MyTerm
         if instance_variable_defined? ivar
           instance_variable_get( ivar ) ? ACHIEVED_ : UNABLE_
         else
-          x = p_ish[ self, & @_oes_p ]
+          x = p_ish[ self, & @_listener ]
           instance_variable_set ivar, x  # cache the work whether succeeded or failed
           x ? ACHIEVED_ : UNABLE_
         end

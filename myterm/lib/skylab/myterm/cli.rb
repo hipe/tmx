@@ -144,7 +144,7 @@ module Skylab::MyTerm
         _ACS = @CLI.top_frame.ACS
 
         ok = Call_.call [ :adapter, @_val ], _ACS do |_|
-          @CLI.on_event_selectively
+          @CLI.listener
         end
 
         if ok

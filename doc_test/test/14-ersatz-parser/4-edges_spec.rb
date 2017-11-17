@@ -6,7 +6,7 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :ersatz_parser
 
     # -
@@ -22,7 +22,7 @@ module Skylab::DocTest::TestSupport
         HERE
 
         _parse _input_string
-        _expect_error '"hey"', 2
+        _want_error '"hey"', 2
       end
 
       it "when a closing line is in too far" do
@@ -37,13 +37,13 @@ module Skylab::DocTest::TestSupport
         HERE
 
         _parse _input_string
-        _expect_error '"hej"', 2
+        _want_error '"hej"', 2
       end
 
       it "when it doesn't appear to end" do
 
         _parse _same_string
-        _expect_error '"oi"', 2
+        _want_error '"oi"', 2
       end
 
       it "without event handler, throws exception" do
@@ -57,14 +57,14 @@ module Skylab::DocTest::TestSupport
         rescue _ec => e
         end
 
-        expect_message = <<-HERE.unindent
+        want_message = <<-HERE.unindent
           hack failed: couldn't find end line for node opened on line 2
             line 2: "  begin \\"oi\\"\\n"
             (3 lines in file.)
         HERE
-        expect_message.chomp!  # we put no trailing LTS's in exception messages
+        want_message.chomp!  # we put no trailing LTS's in exception messages
 
-        e.message == expect_message || fail
+        e.message == want_message || fail
       end
 
       shared_subject :_same_string do
@@ -78,11 +78,11 @@ module Skylab::DocTest::TestSupport
 
     # -
 
-    def _expect_error substr, lineno
+    def _want_error substr, lineno
 
       @_result == false || fail
 
-      expect_one_event :parse_error do |em|
+      want_one_event :parse_error do |em|
         em.lineno == lineno || fail
         em.line.include? substr or fail
         em.error_subcategory == :ending_line_not_found
@@ -91,9 +91,9 @@ module Skylab::DocTest::TestSupport
 
     def _parse input_string
 
-      _oes_p = event_log.handle_event_selectively
+      _p = event_log.handle_event_selectively
 
-      @_result = grammar_one_parser_.parse_string input_string, & _oes_p
+      @_result = grammar_one_parser_.parse_string input_string, & _p
 
       NIL_
     end

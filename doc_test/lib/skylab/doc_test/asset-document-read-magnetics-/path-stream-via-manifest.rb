@@ -14,7 +14,7 @@ module Skylab::DocTest
               :ftype, @filesystem.constants::FILE_FTYPE,
               :max_num_dirs_to_look, -1,
               :prop, @path_prop,
-              & @on_event_selectively )
+              & @listener )
 
             if @surrounding_path
               @manifest_path = ::File.join @surrounding_path, @doc_test_files_file
@@ -28,7 +28,7 @@ module Skylab::DocTest
             kn = Home_.lib_.system_lib::Filesystem::Normalizations::Upstream_IO.via(
               :path, @matnifest_path,
               :filesystem, etc,
-              & @on_event_selectively )
+              & @listener )
 
             if kn
               @open_file_IO = kn.value ; ACHIEVED_

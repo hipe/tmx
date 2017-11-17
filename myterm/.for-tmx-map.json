@@ -1,6 +1,6 @@
 {
-  "after": "snag",
-  "category": "actually useful",
+  "after": "doc_test",
+  "category": "flagship experiments",
   "framework": "[ze] (iCLI)",
   "is potentially interesting application": true,
   "sigil": "my"

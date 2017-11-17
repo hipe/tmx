@@ -104,7 +104,7 @@ module Skylab::DocTest::TestSupport
 
       _act_st = qeg.example_node.to_line_stream
 
-      expect_actual_line_stream_has_same_content_as_expected_ _act_st, _exp_st
+      want_actual_line_stream_has_same_content_as_expected_ _act_st, _exp_st
     end
 
     def __qualified_example_via_regex rx
@@ -122,7 +122,7 @@ module Skylab::DocTest::TestSupport
 
       _cx = real_default_choices_
 
-      _xx = _cr.to_content_line_stream_given__( _cx, & Expect_no_emission_ )
+      _xx = _cr.to_content_line_stream_given__( _cx, & Want_no_emission_ )
 
       qeg.example_node.replace_constituent_lines _xx
 

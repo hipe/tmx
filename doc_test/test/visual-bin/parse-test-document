@@ -84,7 +84,7 @@ build_digit_parser_for = -> sw_s do
   end
 end
 
-expect_more_after = -> sw_s do
+want_more_after = -> sw_s do
 
   if empty[]
     invite_exit[ "expected more arguments after #{ sw_s } expression" ]
@@ -112,14 +112,14 @@ if '-batch' == arg
 
       skip_h[ p[ shift[] ] ] = true
 
-      expect_more_after[ skip_switch ]
+      want_more_after[ skip_switch ]
 
       arg = shift[]
     end while skip_switch == arg
 
   elsif from_switch == arg
     from_d = build_digit_parser_for[ from_switch ][ shift[] ]
-    expect_more_after[ from_switch ]
+    want_more_after[ from_switch ]
     arg = shift[]
   end
 end

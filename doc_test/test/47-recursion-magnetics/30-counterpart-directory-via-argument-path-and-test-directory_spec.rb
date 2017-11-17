@@ -13,22 +13,22 @@ module Skylab::DocTest::TestSupport
 
     it "given one business dir down below, finds counterpart dir" do
       _against some_real_magnetics_directory_, my_real_test_directory_
-      _expect_same
+      _want_same
     end
 
     it "given counterpart dir itself, same" do
       _against my_real_counterpart_directory_, my_real_test_directory_
-      _expect_same
+      _want_same
     end
 
     it "given lib dir, same" do
       _against ::File.join( sidesystem_path_, 'lib' ), my_real_test_directory_
-      _expect_same
+      _want_same
     end
 
     it "given project dir, same" do
       _against sidesystem_path_, my_real_test_directory_
-      _expect_same
+      _want_same
     end
 
     def _against arg_path, test_dir
@@ -38,7 +38,7 @@ module Skylab::DocTest::TestSupport
       @_result = _subject_mag[ arg_path, test_dir, _nc, _fs ]
     end
 
-    def _expect_same
+    def _want_same
       __expect my_real_counterpart_directory_
     end
 

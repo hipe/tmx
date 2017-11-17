@@ -62,7 +62,7 @@ module Skylab::DocTest::TestSupport
 
       it "const definition" do
 
-        expect_unindented_at_ 0, <<-HERE
+        want_unindented_at_ 0, <<-HERE
           before :all do
             class X_xkcd_Bar
               xx
@@ -73,7 +73,7 @@ module Skylab::DocTest::TestSupport
 
       it "shared subject" do
 
-        expect_unindented_at_ 1, <<-HERE
+        want_unindented_at_ 1, <<-HERE
           shared_subject :p do
             foo = X_xkcd_Bar.new
 
@@ -89,7 +89,7 @@ module Skylab::DocTest::TestSupport
 
       it "first test" do
 
-        expect_unindented_at_ 2, <<-HERE
+        want_unindented_at_ 2, <<-HERE
           it "description for the first test" do
             ( p[ 1, 2, 3 ] ).should eql "no: 3 for 1..2"
           end

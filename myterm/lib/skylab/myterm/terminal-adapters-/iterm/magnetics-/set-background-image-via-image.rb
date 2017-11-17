@@ -7,7 +7,7 @@ module Skylab::MyTerm
       # depends_on :OSA_Script, :Compatible_Version_of_Iterm (would be)
 
       def initialize o, & p
-        @_mags = o ; @_oes_p = p
+        @_mags = o ; @_listener = p
       end
 
       def execute
@@ -20,7 +20,7 @@ module Skylab::MyTerm
       def __via_OSA_script_set_BGI
 
         _sycon = @_mags.system_conduit_
-        @_OSA_script.send_into_system_conduit_ _sycon, & @_oes_p
+        @_OSA_script.send_into_system_conduit_ _sycon, & @_listener
       end
 
       def __resolve_OSA_script

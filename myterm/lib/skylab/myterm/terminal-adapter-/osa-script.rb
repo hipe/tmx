@@ -37,9 +37,9 @@ module Skylab::MyTerm
         @__one_big_string = s ; freeze
       end
 
-      def send_into_system_conduit sycond, & oes_p
+      def send_into_system_conduit sycond, & p
 
-        Execution___.new( sycond, self, & oes_p ).execute
+        Execution___.new( sycond, self, & p ).execute
       end
 
       def each_line( & p )
@@ -70,8 +70,8 @@ module Skylab::MyTerm
 
       class Execution___
 
-        def initialize system_conduit, osa_script, & oes_p
-          @_oes_p = oes_p
+        def initialize system_conduit, osa_script, & p
+          @_listener = p
           @OSA_script = osa_script
           @system_conduit = system_conduit
         end

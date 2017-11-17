@@ -103,7 +103,7 @@ module Skylab::DocTest::TestSupport
 
       o.original_test_path = path[ 'original.test.kode' ]
 
-      o.to_string__( & Expect_no_emission_ )
+      o.to_string__( & Want_no_emission_ )
     end
   end
 end

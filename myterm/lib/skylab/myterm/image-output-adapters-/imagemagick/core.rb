@@ -67,14 +67,14 @@ module Skylab::MyTerm
       _o.to_unavailability
     end
 
-    def _begin_terminal_mutation_session & oes_p
+    def _begin_terminal_mutation_session & p
 
-      _ = _begin_IM_session( & oes_p )
-      Home_::Terminal_Adapters_::Iterm.begin_terminal_mutation_session___( _, & oes_p )
+      _ = _begin_IM_session( & p )
+      Home_::Terminal_Adapters_::Iterm.begin_terminal_mutation_session___( _, & p )
     end
 
-    def _begin_IM_session & oes_p
-      Here_::ClientForMagnetics___.begin_hot_session__ self, & oes_p
+    def _begin_IM_session & p
+      Here_::ClientForMagnetics___.begin_hot_session__ self, & p
     end
 
     # -- Components
@@ -93,11 +93,11 @@ module Skylab::MyTerm
 
       yield :is_used_to_make_image, false
 
-      -> st, & oes_p do
+      -> st, & p do
 
         @background_font ||= Home_::Models_::Font.interpret_compound_component IDENTITY_, nil, self
 
-        kn = @background_font.interpret_path_ st, & oes_p
+        kn = @background_font.interpret_path_ st, & p
 
         if kn
           @background_font.accept_path__ kn
@@ -197,9 +197,9 @@ module Skylab::MyTerm
           "#{ w_s }x#{ h_s }"
         end
 
-        o.on_failure_to_match = -> _reserved, & oes_p do
+        o.on_failure_to_match = -> _reserved, & p do
 
-          oes_p.call :error, :expression, :is_not, :width_height do | y |
+          p.call :error, :expression, :is_not, :width_height do | y |
             y << "must be of the form \"123x456\""
           end
         end

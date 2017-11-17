@@ -42,7 +42,7 @@ module Skylab::DocTest::TestSupport
       end
 
       it "emits" do
-        expect_emission :error, :stat_error do |ev|
+        want_emission :error, :stat_error do |ev|
           _msg = black_and_white ev
           _msg.include? "No such file or directory -" or fail
         end
@@ -65,11 +65,11 @@ module Skylab::DocTest::TestSupport
       end
 
       it "appears to succeed" do
-        expect_trueish_result
+        want_trueish_result
       end
 
       it "no unexpected emissions" do
-        expect_no_emissions
+        want_no_emissions
       end
 
       context "result.." do
@@ -125,18 +125,18 @@ module Skylab::DocTest::TestSupport
 
         _execute :first_UoW
 
-        expect_emission :info, :expression, :file_write_summary, :skipped
+        want_emission :info, :expression, :file_write_summary, :skipped
 
-        expect_no_emissions
+        want_no_emissions
       end
 
       it "second - test file exists and has unversioend changes - skip" do
 
         _execute :second_UoW
 
-        expect_emission :info, :expression, :file_write_summary, :skipped
+        want_emission :info, :expression, :file_write_summary, :skipped
 
-        expect_no_emissions
+        want_no_emissions
       end
 
       # tests that have portions of their names in all caps [#029] #note-5
@@ -154,8 +154,8 @@ module Skylab::DocTest::TestSupport
         ::File.unlink path  # manual-cleanup - do before assertions
 
         stat.size.zero? && fail   # we assert content elsewhere
-        expect_emission :info, :expression, :file_write_summary, :created
-        expect_no_emissions
+        want_emission :info, :expression, :file_write_summary, :created
+        want_no_emissions
       end
 
       context "fourth - test file exists but has no unversioned changes - UPDATE.." do
@@ -182,8 +182,8 @@ module Skylab::DocTest::TestSupport
 
           @event_log = _state.emission_stream
 
-          expect_emission :info, :expression, :file_write_summary, :updated
-          expect_no_emissions
+          want_emission :info, :expression, :file_write_summary, :updated
+          want_no_emissions
         end
 
         it "content looks good" do
@@ -214,7 +214,7 @@ module Skylab::DocTest::TestSupport
         X_ari_Struct2 = ::Struct.new :content_before, :content_after, :emission_stream
       end
 
-      def expect_no_emissions  # (local "correction")
+      def want_no_emissions  # (local "correction")
         @event_log.gets && fail
       end
 
@@ -274,7 +274,7 @@ module Skylab::DocTest::TestSupport
     end
 
     h = { find_command_args: true }
-    define_method :ignore_for_expect_emission do
+    define_method :ignore_for_want_emission do
       h
     end
   end

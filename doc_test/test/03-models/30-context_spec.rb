@@ -24,11 +24,11 @@ module Skylab::DocTest::TestSupport
 
       it "(every byte)" do
 
-        _a_st = _a.first.to_line_stream( & Expect_no_emission_ )
+        _a_st = _a.first.to_line_stream( & Want_no_emission_ )
 
         _e_st = _ELC_line_stream_after %r(\bthe above makes this\z)
 
-        expect_actual_line_stream_has_same_content_as_expected_ _a_st, _e_st
+        want_actual_line_stream_has_same_content_as_expected_ _a_st, _e_st
       end
     end
 
@@ -51,12 +51,12 @@ module Skylab::DocTest::TestSupport
       it "(every byte)" do
 
         _a_st = Home_::AssetDocumentReadMagnetics_::
-          LineStream_via_NodeStream[ Stream_[ _a ], & Expect_no_emission_ ]
+          LineStream_via_NodeStream[ Stream_[ _a ], & Want_no_emission_ ]
 
         _e_st = _ELC_line_stream_after %r(\byou'll get\z)
         _ELC_close_if_necessary
 
-        expect_actual_line_stream_has_same_content_as_expected_ _a_st, _e_st
+        want_actual_line_stream_has_same_content_as_expected_ _a_st, _e_st
       end
     end
 

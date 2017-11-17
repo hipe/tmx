@@ -40,7 +40,7 @@ module Skylab::DocTest::TestSupport
           end
         HERE
 
-        expect_actual_line_stream_has_same_content_as_expected_(
+        want_actual_line_stream_has_same_content_as_expected_(
           Stream_[ _many_lines ],
           line_stream_via_string_( _expect ),
         )

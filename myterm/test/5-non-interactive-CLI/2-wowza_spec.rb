@@ -14,12 +14,12 @@ module Skylab::MyTerm::TestSupport
       end
 
       it 'whines' do
-        expect :first_line, "'adapter' (an entitesque) is not accessed with that syntax."
-        expect :exitstatus, :_parse_error_
+        want :first_line, "'adapter' (an entitesque) is not accessed with that syntax."
+        want :exitstatus, :_parse_error_
       end
 
       it 'invites' do
-        expect :invite, :from_top, :about_arguments
+        want :invite, :from_top, :about_arguments
       end
     end
 
@@ -30,12 +30,12 @@ module Skylab::MyTerm::TestSupport
       end
 
       it 'hi' do
-        expect :penultimate_line, 'can\'t produce an image without "background font" and "label"'
+        want :penultimate_line, 'can\'t produce an image without "background font" and "label"'
       end
 
       it "invite (about nothing in particular)" do
 
-        expect :invite, :when_adapter_activated, :from, 'osa-script'
+        want :invite, :when_adapter_activated, :from, 'osa-script'
       end
     end
 
@@ -52,17 +52,17 @@ module Skylab::MyTerm::TestSupport
       it 'whines EEW' do  # #wish [#016] maybe after #milestone-9
 
         _ = "bg font failed to OSA script because unrecognized font path \"not-a-font\""
-        expect :third_from_last_line, _
+        want :third_from_last_line, _
       end
 
       it "did you mean" do
 
-        expect :penultimate_line, %r(\Adid you mean ['"]?[a-z])
+        want :penultimate_line, %r(\Adid you mean ['"]?[a-z])
       end
 
       it "invite" do
 
-        expect :invite, :when_adapter_activated, :from, 'osa-script', :about_options
+        want :invite, :when_adapter_activated, :from, 'osa-script', :about_options
       end
     end
 
@@ -77,15 +77,15 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "succeeds" do
-        expect :succeeds
+        want :succeeds
       end
 
       it "emits as info the imagemagick command" do
-        expect :penultimate_line, %r(\(attempting: convert -font )
+        want :penultimate_line, %r(\(attempting: convert -font )
       end
 
       it "says that it set it" do
-        expect :last_line, %r(\Aapparently set iTerm background image to )
+        want :last_line, %r(\Aapparently set iTerm background image to )
       end
 
       def system_conduit_for_niCLI_

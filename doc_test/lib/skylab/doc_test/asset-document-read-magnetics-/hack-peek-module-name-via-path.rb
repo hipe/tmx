@@ -11,11 +11,11 @@ module Skylab::DocTest
 
       class << self
 
-        def _call * a, & oes_p
+        def _call * a, & p
           if 1 == a.length  # almost #[#ca-057]
             a.unshift :path
           end
-          call_via_iambic a, & oes_p
+          call_via_iambic a, & p
         end
 
         alias_method :[], :_call
@@ -24,12 +24,12 @@ module Skylab::DocTest
         private :new
       end  # >>
 
-      def initialize & oes_p
+      def initialize & p
         @line_upstream = nil
-        @on_event_selectively = nil
+        @listener = nil
         @path = nil
-        if oes_p
-          @on_event_selectively = oes_p
+        if p
+          @listener = p
         end
       end
 
@@ -48,7 +48,7 @@ module Skylab::DocTest
           :filesystem, @filesystem,
           :path, @path,
           :line_upstream, @line_upstream,
-          & @on_event_selectively
+          & @listener
         )
 
         if tr
@@ -225,7 +225,7 @@ module Skylab::DocTest
       end
 
       def _event
-        @___EC ||= Event_Controller_.new( @on_event_selectively )
+        @___EC ||= Event_Controller_.new( @listener )
       end
     # -
   end

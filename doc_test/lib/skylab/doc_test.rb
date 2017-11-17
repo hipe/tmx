@@ -20,8 +20,8 @@ module Skylab::DocTest
 
   module API
     class << self
-      def call * x_a, & oes_p
-        Call_ACS_.call( x_a, Root_Autonomous_Component_System_.instance_ ) {|_| oes_p }
+      def call * x_a, & p
+        Call_ACS_.call( x_a, Root_Autonomous_Component_System_.instance_ ) {|_| p }
       end
     end  # >>
   end
@@ -65,9 +65,9 @@ module Skylab::DocTest
 
       yield :description, -> y { y << "just a simple ping." }
 
-      -> & oes_p do
+      -> & p do
 
-        oes_p.call :payload, :expression, :ping do |y|
+        p.call :payload, :expression, :ping do |y|
           y << "pong from doc-test#{ highlight '!' }"
         end
 

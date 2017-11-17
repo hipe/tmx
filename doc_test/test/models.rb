@@ -14,7 +14,7 @@ module Skylab::DocTest::TestSupport
         _cae = __copula_assertion_entity_via_code_line _cl
         _cac = __copula_assertion_controller_via_copula_assertion_entity _cae
 
-        el = Common_.test_support::Expect_Emission::Log.for self
+        el = Common_.test_support::Want_Emission::Log.for self
 
         _l = el.handle_event_selectively
 
@@ -29,13 +29,13 @@ module Skylab::DocTest::TestSupport
       def __copula_assertion_controller_via_copula_assertion_entity cae
 
         copula_assertion_view_controller_class_.via_two_(
-          cae, :_expect_cx_not_used_ )
+          cae, :_want_cx_not_used_ )
       end
 
       def __copula_assertion_entity_via_code_line cl
 
         Home_::Models_::CopulaAssertion.via_code_line__(
-          cl, :_expect_cx_not_used_ )
+          cl, :_want_cx_not_used_ )
       end
 
       def __code_line_via_string str

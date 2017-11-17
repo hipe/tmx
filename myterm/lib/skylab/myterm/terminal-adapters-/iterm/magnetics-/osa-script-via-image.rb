@@ -6,9 +6,9 @@ module Skylab::MyTerm
 
       # (cold.)
 
-      def initialize mags, & oes_p
+      def initialize mags, & p
 
-        @_oes_p = oes_p
+        @_listener = p
         @_unsanitized_image_path = mags.image_
       end
 
@@ -22,15 +22,15 @@ module Skylab::MyTerm
         y
       end
 
-      def send_into_system_conduit_ sycond, & oes_p
+      def send_into_system_conduit_ sycond, & p
 
-        ok_x = @_OSA_script.send_into_system_conduit sycond, & oes_p
+        ok_x = @_OSA_script.send_into_system_conduit sycond, & p
         if ok_x
 
           md = %r(\Ascript result: apparently set bg image to (.+)$).match ok_x
           if md && md[ 1 ] == @image_path
 
-            ___when_apparently_succeeded( & oes_p )
+            ___when_apparently_succeeded( & p )
           else
             self._COVER_ME_system_rejected_request
           end
@@ -39,11 +39,11 @@ module Skylab::MyTerm
         end
       end
 
-      def ___when_apparently_succeeded & oes_p
+      def ___when_apparently_succeeded & p
 
         path = @image_path
 
-        oes_p.call :info, :expression, :success do |y|
+        p.call :info, :expression, :success do |y|
           y << "apparently set iTerm background image to #{ pth path }"
         end
 
@@ -65,7 +65,7 @@ module Skylab::MyTerm
 
         @_OSA_script = Home_::Terminal_Adapter_::OSA_Script.via_one_big_string _
 
-        remove_instance_variable :@_oes_p
+        remove_instance_variable :@_listener
         freeze
       end
 

@@ -34,8 +34,8 @@ module Skylab::DocTest::TestSupport
       exp_st = fi.line_stream_via_regex %r(\bproduces this\z)
       fi.close_if_necessary
 
-      expect_actual_line_stream_has_same_content_as_expected_(
-        o::LineStream_via_NodeStream[ _ns, & Expect_no_emission_ ],
+      want_actual_line_stream_has_same_content_as_expected_(
+        o::LineStream_via_NodeStream[ _ns, & Want_no_emission_ ],
         exp_st,
       )
     end

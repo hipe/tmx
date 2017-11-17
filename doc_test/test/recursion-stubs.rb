@@ -74,15 +74,15 @@ module Skylab::DocTest::TestSupport
 
         _asset_st = __asset_stream_via_filesystem fs
 
-        event_log = Common_.test_support::Expect_Emission::Log.for self
+        event_log = Common_.test_support::Want_Emission::Log.for self
 
-        _oes_p = event_log.handle_event_selectively
+        _p = event_log.handle_event_selectively
 
         _mock_index = the_stub_index_
 
         _DO_NOT_LIST = false
 
-        _st = against_ _mock_index, _asset_st, _DO_NOT_LIST, _VCS_rdr, fs, & _oes_p
+        _st = against_ _mock_index, _asset_st, _DO_NOT_LIST, _VCS_rdr, fs, & _p
 
         __tuple_array_via_stream _st, event_log, fs
       end
@@ -363,11 +363,11 @@ module Skylab::DocTest::TestSupport
           @mode.zero? || fail  # expect NO other flags
           _open_read_only
         else
-          __expect_some_sensical_kind_of_write
+          __want_some_sensical_kind_of_write
         end
       end
 
-      def __expect_some_sensical_kind_of_write
+      def __want_some_sensical_kind_of_write
 
         @_do_append && fail  # we never append (these aren't logfiles)
 

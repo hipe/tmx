@@ -6,7 +6,7 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :recursion_magnetics
 
     it "loads" do
@@ -17,7 +17,7 @@ module Skylab::DocTest::TestSupport
 
       _against_expecting_error the_noent_directory_
 
-      expect_emission :error, :find_error do |em|
+      want_emission :error, :find_error do |em|
 
         _lines = black_and_white_lines em
         _lines.fetch(0).include? "not-here.d: No such file or directory" or fail
@@ -121,11 +121,11 @@ module Skylab::DocTest::TestSupport
 
       el.set_hash_of_terminal_channels_to_ignore( find_command_args: true )
 
-      _oes_p = el.handle_event_selectively
+      _p = el.handle_event_selectively
 
-      _result = _subject_mag[ test_dir, :_nvr_, _name_conventions, _sc, & _oes_p ]
+      _result = _subject_mag[ test_dir, :_nvr_, _name_conventions, _sc, & _p ]
 
-      expect_failure_value _result
+      want_failure_value _result
       NIL
     end
 

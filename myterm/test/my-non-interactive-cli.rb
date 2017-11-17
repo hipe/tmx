@@ -73,7 +73,7 @@ module Skylab::MyTerm::TestSupport
 
       # --
 
-      def expect * x_a
+      def want * x_a
         Expectation___.new( x_a ).matches? niCLI_state
       end
 
@@ -119,7 +119,7 @@ module Skylab::MyTerm::TestSupport
 
       def invite
         extend Syntax_for_Invite___
-        __expect_invite
+        __want_invite
       end
 
       # -- ordinal line related
@@ -160,13 +160,13 @@ module Skylab::MyTerm::TestSupport
       def _line_at_index d
         extend Syntax_for_Line__
         @_line_offset = d
-        __expect_line
+        __want_line
       end
 
       # -- e.s related
 
       def succeeds
-        _expect_exitstatus 0
+        _want_exitstatus 0
       end
 
       def exitstatus
@@ -174,14 +174,14 @@ module Skylab::MyTerm::TestSupport
         sym = @_st.gets_one
         d = Home_::Zerk_::NonInteractiveCLI::Exit_status_for___[ sym ]
         d or fail __say_bad_es sym
-        _expect_exitstatus d
+        _want_exitstatus d
       end
 
       def __say_bad_es sym
         "not an exitstatus: '#{ sym }'"
       end
 
-      def _expect_exitstatus d
+      def _want_exitstatus d
         _actual = @_state.exitstatus
         if _actual == d
           ACHIEVED_
@@ -210,14 +210,14 @@ module Skylab::MyTerm::TestSupport
 
     module Syntax_for_Invite___
 
-      def __expect_invite
-        @__expect_adapter_activated = false
+      def __want_invite
+        @__want_adapter_activated = false
         @_about = nil
         NOTHING_
       end
 
       def when_adapter_activated
-        @__expect_adapter_activated = true ; nil
+        @__want_adapter_activated = true ; nil
       end
 
       def from_top
@@ -243,7 +243,7 @@ module Skylab::MyTerm::TestSupport
 
         buff = ""
 
-        if @__expect_adapter_activated
+        if @__want_adapter_activated
           buff << " -ai"  # meh
         end
 
@@ -280,19 +280,19 @@ module Skylab::MyTerm::TestSupport
 
     module Syntax_for_Line__
 
-      def __expect_line
-        @_expect_on_channel = :e
-        @_expect_is_styled = false
+      def __want_line
+        @_want_on_channel = :e
+        @_want_is_styled = false
         _peek_for_matchee
       end
 
       def styled
-        @_expect_is_styled = true
+        @_want_is_styled = true
         _peek_for_matchee
       end
 
       def o
-        @_expect_on_channel = :o
+        @_want_on_channel = :o
         _peek_for_matchee
       end
 
@@ -315,9 +315,9 @@ module Skylab::MyTerm::TestSupport
         sym, @_use_s = @_state.lines.fetch @_line_offset
         @_use_s.chomp!
 
-        if sym == @_expect_on_channel
+        if sym == @_want_on_channel
 
-          if @_expect_is_styled
+          if @_want_is_styled
             if _is_styled
               send @_matchee_shape
             else

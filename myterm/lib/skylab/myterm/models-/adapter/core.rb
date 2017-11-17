@@ -31,9 +31,9 @@ module Skylab::MyTerm
 
         _x = @_arg_scn.head_as_is
 
-        @_oes_p = @_pp[ nil ]
+        @_listener = @_pp[ nil ]
 
-        lr = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+        lr = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
           o.string_via_item_by do |lr_|
             lr_.stem
@@ -47,7 +47,7 @@ module Skylab::MyTerm
 
           o.levenshtein_number = 3  # to exercise the machinery
 
-          o.listener = @_oes_p
+          o.listener = @_listener
         end
 
         if lr
@@ -104,7 +104,7 @@ module Skylab::MyTerm
 
         @_impl = lt.module.new self
         @_loadable_reference = lt
-        @_rw = Arc_::Magnetics::OperatorBranch_via_ACS.for_componentesque @_impl
+        @_rw = Arc_::Magnetics::FeatureBranch_via_ACS.for_componentesque @_impl
         self
       end
 

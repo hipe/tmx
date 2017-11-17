@@ -25,7 +25,7 @@ module Skylab::MyTerm::TestSupport
         font = __first_font
         s = ""
         oid = s.object_id
-        _ = font.express_into_under s, expression_agent_for_expect_emission
+        _ = font.express_into_under s, expression_agent_for_want_emission
         _.length.should be_nonzero
         _.object_id.should eql oid
       end

@@ -13,15 +13,15 @@ module Skylab::MyTerm
 
       def initialize k, & pp
 
-        1 == pp.arity or self._NEEDED_pp_probably_had_oes_p_README
+        1 == pp.arity or self._NEEDED_pp_probably_had_p_README
 
         # subject is produced to assist both opertions and associations
         # (components) so we must use the lowest common denominator shape
-        # of handler here (the `pp` not the `oes_p`).
+        # of handler here (the `pp` not the `p`).
 
         @_do_summarize = true  # eew - e.g for "did you mean", don't repeat
 
-        @_oes_p = pp[ nil ]
+        @_listener = pp[ nil ]
 
         @kernel_ = k
 
@@ -31,7 +31,7 @@ module Skylab::MyTerm
 
       def lookup_font_path__ _action_sym, path
 
-        _ = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+        _ = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
           o.set_qualified_knownness_value_and_symbol path, :font_path
 
@@ -53,7 +53,7 @@ module Skylab::MyTerm
 
           o.levenshtein_number = 3
 
-          o.listener = @_oes_p
+          o.listener = @_listener
         end
         _  # hi.
       end
@@ -116,13 +116,13 @@ module Skylab::MyTerm
         fonts_dir = @_fonts_dir
 
         if saw_none
-          @_oes_p.call :info, :expression, :not_found do |y|
+          @_listener.call :info, :expression, :not_found do |y|
             y << "(no fonts found - #{ pth fonts_dir })"
           end
         end
 
         if skipped
-          @_oes_p.call :info, :expression, :skipped do |y|
+          @_listener.call :info, :expression, :skipped do |y|
             y << "(skipped: #{ skipped.inspect })"
           end
         end

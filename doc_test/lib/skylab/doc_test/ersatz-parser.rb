@@ -67,11 +67,11 @@ module Skylab::DocTest
 
       class Parse___
 
-        def initialize st, g, & oes_p
+        def initialize st, g, & p
           @_branch_nonterminals = g.branch_nonterminals
           @_default_branch_end_matcher_builder = g.default_branch_end_matcher_builder
           @_line_stream = st
-          @__on_event_selectively = oes_p  # any
+          @__on_event_selectively = p  # any
         end
 
         def execute
@@ -121,10 +121,10 @@ module Skylab::DocTest
             y << "  (#{ total_lines } lines in file.)\n"
           end
 
-          oes_p = @__on_event_selectively
+          p = @__on_event_selectively
 
-          if oes_p
-            oes_p.call :error, :parse_error do
+          if p
+            p.call :error, :parse_error do
               ev
             end
             UNABLE_

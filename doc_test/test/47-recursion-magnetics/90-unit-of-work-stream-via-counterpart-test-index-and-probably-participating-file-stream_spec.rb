@@ -170,7 +170,7 @@ module Skylab::DocTest::TestSupport
 
           _exp_st = Line_stream_via_string_[ _exp_s ]
 
-          TestSupport_::Expect_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
+          TestSupport_::Want_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
         end
       end
     end
@@ -185,8 +185,8 @@ module Skylab::DocTest::TestSupport
 
 
 
-    def against_ cti, ppfs, do_list, vcs_rdr, fs, & any_oes_p
-      _subject_mag[ cti, ppfs, do_list, vcs_rdr, fs, & any_oes_p ]
+    def against_ cti, ppfs, do_list, vcs_rdr, fs, & any_p
+      _subject_mag[ cti, ppfs, do_list, vcs_rdr, fs, & any_p ]
     end
 
     def _subject_mag

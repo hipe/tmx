@@ -55,19 +55,19 @@ module Skylab::DocTest::TestSupport
       NIL
     end
 
-    def expect_actual_big_string_has_same_content_as_expected_ a_s, e_s
-      expect_actual_line_stream_has_same_content_as_expected_(
+    def want_actual_big_string_has_same_content_as_expected_ a_s, e_s
+      want_actual_line_stream_has_same_content_as_expected_(
         line_stream_via_string_( a_s ),
         line_stream_via_string_( e_s ),
       )
     end
 
-    def expect_actual_line_stream_has_same_content_as_expected_ a_st, e_st
-      TestSupport_::Expect_Line::Streams_have_same_content[ a_st, e_st, self ]
+    def want_actual_line_stream_has_same_content_as_expected_ a_st, e_st
+      TestSupport_::Want_Line::Streams_have_same_content[ a_st, e_st, self ]
     end
 
     def begin_expect_line_scanner_for_line_stream_ st
-      TestSupport_::Expect_Line::Scanner.via_stream st
+      TestSupport_::Want_Line::Scanner.via_stream st
     end
 
     def line_stream_via_string_ whole_string
@@ -149,7 +149,7 @@ module Skylab::DocTest::TestSupport
     end
     # -
 
-      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra
+      def build_invocation_for_want_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra
 
         Home_::CLI.new argv, sin, sout, serr, pn_s_a do |cli|
 
@@ -182,7 +182,7 @@ module Skylab::DocTest::TestSupport
     end
   end.call
 
-  Expect_no_emission_ = -> * a do
+  Want_no_emission_ = -> * a do
     fail "no: #{ a.inspect }"
   end
 
@@ -200,12 +200,12 @@ module Skylab::DocTest::TestSupport
 
   # --
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
-  Expect_Line = -> tcc do
-    TestSupport_::Expect_line[ tcc ]
+  Want_Line = -> tcc do
+    TestSupport_::Want_line[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

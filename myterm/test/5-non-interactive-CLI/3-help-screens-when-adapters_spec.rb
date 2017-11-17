@@ -10,7 +10,7 @@ module Skylab::MyTerm::TestSupport
 
     include TS_::My_Non_Interactive_CLI::InstanceMethods
 
-    Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse[ self ]
+    Zerk_test_support_[]::CLI::Want_Section_Coarse_Parse[ self ]
 
     def prepare_subject_CLI_invocation invo
       prepare_CLI_for_niCLI_ invo

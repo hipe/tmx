@@ -27,13 +27,13 @@ module Skylab::DocTest
       private :new
     end  # >>
 
-    def initialize td, cd, nc, sc, & oes_p
+    def initialize td, cd, nc, sc, & p
       @counterpart_directory = cd
       @name_conventions = nc
       @system_conduit = sc
       @test_directory = td
       @the_find_service = Home_.lib_.system.find  # module
-      @_on_event_selectively = oes_p  # not guaranteed
+      @_on_event_selectively = p  # not guaranteed
     end
 
     def execute

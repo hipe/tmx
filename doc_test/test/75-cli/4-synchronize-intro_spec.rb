@@ -63,7 +63,7 @@ module Skylab::DocTest::TestSupport
 
       dangerous_memoize :niCLI_help_screen do
         _lines = niCLI_state.lines
-        Home_::Zerk_::TestSupport::CLI::Expect_Section_Coarse_Parse.new _lines
+        Home_::Zerk_::TestSupport::CLI::Want_Section_Coarse_Parse.new _lines
       end
     end
 

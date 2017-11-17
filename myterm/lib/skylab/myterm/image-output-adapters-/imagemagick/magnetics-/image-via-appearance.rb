@@ -5,7 +5,7 @@ module Skylab::MyTerm
     class Magnetics_::Image_via_Appearance < Common_::Monadic
 
       def initialize mags, & p
-        @_mags = mags ; @_oes_p = p
+        @_mags = mags ; @_listener = p
       end
 
       def execute
@@ -20,7 +20,7 @@ module Skylab::MyTerm
 
         _sycond = @_mags.system_conduit_
 
-        ok = @_IM_command.send_into_system_conduit_ _sycond, & @_oes_p
+        ok = @_IM_command.send_into_system_conduit_ _sycond, & @_listener
         if ok
           @_IM_command.image_path
         else
@@ -32,7 +32,7 @@ module Skylab::MyTerm
 
         o = @_IM_command
 
-        @_oes_p.call :info, :expression, :command do |y|
+        @_listener.call :info, :expression, :command do |y|
 
           y << "(attempting: #{ o.thru_shellescape_ })"
         end

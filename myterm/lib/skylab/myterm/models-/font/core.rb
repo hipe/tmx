@@ -115,9 +115,9 @@ module Skylab::MyTerm
         y << 'hackishly list the known fonts'
       end
 
-      -> & oes_p do
+      -> & p do
 
-        _o = _build_new_collection_controller { |_| oes_p }
+        _o = _build_new_collection_controller { |_| p }
 
         _st = _o.to_expressing_path_stream_
 

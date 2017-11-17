@@ -20,7 +20,7 @@ module Skylab::DocTest::TestSupport
 
       # --
 
-      def expect_unindented_at_ d, big_s
+      def want_unindented_at_ d, big_s
 
         big_s.unindent
 
@@ -44,7 +44,7 @@ module Skylab::DocTest::TestSupport
           end
         end
 
-        TestSupport_::Expect_Line::Streams_have_same_content.call(
+        TestSupport_::Want_Line::Streams_have_same_content.call(
           _actual_st, _expected_line_stream, self )
 
         NIL

@@ -43,7 +43,7 @@ module Skylab::DocTest::TestSupport
 
         it "structure" do
 
-          _expect_structure [
+          _want_structure [
             :blank_line,
             :nonblank_line,
             [ :nonblank_line,
@@ -85,7 +85,7 @@ module Skylab::DocTest::TestSupport
 
         it "structure" do
 
-          _expect_structure [
+          _want_structure [
             [ :nonblank_line,
               :nonblank_line,
               :ending_line,
@@ -108,7 +108,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    def _expect_structure exp_a
+    def _want_structure exp_a
       _act = Summarize_structure_recursive__[ [], _the_parse ]
       _act == exp_a || fail
     end

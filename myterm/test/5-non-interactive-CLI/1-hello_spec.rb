@@ -21,16 +21,16 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "whine" do
-        expect :exitstatus, :_parse_error_
-        expect :first_line, 'unrecognized node name "ping"'
+        want :exitstatus, :_parse_error_
+        want :first_line, 'unrecognized node name "ping"'
       end
 
       it "did you mean" do
-        expect :second_line, %r(\Adid you mean "[a-z])
+        want :second_line, %r(\Adid you mean "[a-z])
       end
 
       it "invite" do
-        expect :invite, :from_top, :about_arguments
+        want :invite, :from_top, :about_arguments
       end
     end
 
@@ -41,12 +41,12 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "customized whine" do
-        expect :exitstatus, :_parse_error_
-        expect :first_line, 'expected -h or -a. had "-xyz".'
+        want :exitstatus, :_parse_error_
+        want :first_line, 'expected -h or -a. had "-xyz".'
       end
 
       it "invite" do
-        expect :invite, :from_top, :about_arguments
+        want :invite, :from_top, :about_arguments
       end
     end
 
@@ -57,12 +57,12 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "whines" do
-        expect :exitstatus, :_parse_error_
-        expect :first_line, :styled, "expecting <compound-or-operation>: { 'list' }"
+        want :exitstatus, :_parse_error_
+        want :first_line, :styled, "expecting <compound-or-operation>: { 'list' }"
       end
 
       it "invite" do
-        expect :invite, :from, "adapters", :about_arguments
+        want :invite, :from, "adapters", :about_arguments
       end
     end
 
@@ -73,7 +73,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "no star" do
-        expect :only_line, :o, "  'imagemagick'"
+        want :only_line, :o, "  'imagemagick'"
       end
     end
 
@@ -84,15 +84,15 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "specific whine" do
-        expect :first_line, 'unrecognized adapter name "jabooti"'
+        want :first_line, 'unrecognized adapter name "jabooti"'
       end
 
       it "did you mean" do
-        expect :second_line, %(did you mean "imagemagick"?)
+        want :second_line, %(did you mean "imagemagick"?)
       end
 
       it "(no invite for now)" do
-        expect :number_of_lines, 2
+        want :number_of_lines, 2
       end
     end
 
@@ -103,12 +103,12 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "first line confirms change" do
-        expect :succeeds
-        expect :first_line, "set adapter to 'imagemagick'"
+        want :succeeds
+        want :first_line, "set adapter to 'imagemagick'"
       end
 
       it "lists with star" do
-        expect :second_line, :o, "• 'imagemagick'"
+        want :second_line, :o, "• 'imagemagick'"
       end
     end
   end

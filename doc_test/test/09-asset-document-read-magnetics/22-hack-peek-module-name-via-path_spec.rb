@@ -33,12 +33,12 @@ module Skylab::DocTest::TestSupport
       _name = _subject(
         :path, '/var/xkcd/skorlorb/morta-horl/porse/voa-ordered-set--.rb',
         :line_upstream, _line_ups,
-        & method( :___expect_no_event ) )
+        & method( :___want_no_event ) )
 
       _name == "Skorlab::MortaHorl::Porse::Voa_ordered_set__" or fail
     end
 
-    def ___expect_no_event * i_a
+    def ___want_no_event * i_a
       fail "not expected: #{ i_a.inspect }"
     end
 

@@ -50,7 +50,7 @@ module Skylab::DocTest::TestSupport
       end
 
       it 'emits nothing' do
-        expect_no_emissions
+        want_no_emissions
       end
 
       it 'content looks right (most bytes)' do
@@ -72,11 +72,11 @@ module Skylab::DocTest::TestSupport
 
         _info.example_count == 2 || fail
 
-        o.expect_that_line_matches "  end\n"
+        o.want_that_line_matches "  end\n"
 
-        o.expect_that_next_line_matches "end\n"
+        o.want_that_next_line_matches "end\n"
 
-        o.expect_no_more_lines
+        o.want_no_more_lines
       end
     end
 
@@ -145,7 +145,7 @@ module Skylab::DocTest::TestSupport
 
         # -- compare the two
 
-        expect_actual_big_string_has_same_content_as_expected_ actual, expected
+        want_actual_big_string_has_same_content_as_expected_ actual, expected
       end
     end
 
