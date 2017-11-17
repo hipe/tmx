@@ -90,9 +90,9 @@ describe "[bnf2tt] CLI" do
 
     cli.invoke 'bnf2treetop', '--ping'
 
-    cli.expect_on_stderr "hello from bnf2treetop."
+    cli.want_on_stderr "hello from bnf2treetop."
 
-    cli.expect_succeed_under self
+    cli.want_succeed_under self
   end
 
   def do_debug

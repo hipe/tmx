@@ -3,7 +3,7 @@ require_relative 'test-support'
 describe "[cssc] when parsing directives" do
 
   Skylab::CSS_Convert::TestSupport[ self ]
-  use :expect_event
+  use :want_event
 
   it "should parse platonic ideal" do
 

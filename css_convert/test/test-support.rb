@@ -28,8 +28,8 @@ module Skylab::CSS_Convert::TestSupport
 
   USE___ = {
 
-    expect_event: -> tcc do
-      Home_::Common_.test_support::Expect_Emission[ tcc ]
+    want_event: -> tcc do
+      Home_::Common_.test_support::Want_Emission[ tcc ]
     end,
 
     my_CLI_expectations: -> tcc do
@@ -40,7 +40,7 @@ module Skylab::CSS_Convert::TestSupport
           Home_::CLI
         end
 
-        def get_invocation_strings_for_expect_stdout_stderr
+        def get_invocation_strings_for_want_stdout_stderr
           [ 'czz' ]
         end
       end
@@ -84,7 +84,7 @@ module Skylab::CSS_Convert::TestSupport
       # if the parser emits old-style resource-based events,
       # we turn them into new-style selective events.
 
-      p = event_log.handle_event_selectively  # from `expect_event`
+      p = event_log.handle_event_selectively  # from `want_event`
 
       _rsx = Selective_Listener_as_Resources___.new( & p )
 
@@ -100,7 +100,7 @@ module Skylab::CSS_Convert::TestSupport
       :serr,
     )
 
-    def initialize & oes_p
+    def initialize & p
 
       @serr = Basic_[]::String::Receiver::As_IO.new do | o |
 
@@ -108,7 +108,7 @@ module Skylab::CSS_Convert::TestSupport
 
           # when we call `puts` on our stderr proxy, turn it into an event:
 
-          oes_p.call :info, :expression, :line do | y |
+          p.call :info, :expression, :line do | y |
             y.send :<<, * a
           end
           NIL_

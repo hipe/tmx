@@ -62,7 +62,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "2.1  with one giberrsh arg - explain that file is not found" do
 
-        @stdin_for_expect_stdout_stderr = _mock_stdin
+        @stdin_for_want_stdout_stderr = _mock_stdin
 
         invoke 'trans', 'not-there.txt', '-'
         want :styled, %r(\bno such <flex-file> - not-there\.txt\z)
@@ -71,10 +71,10 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "1.4  read flex file, write treetop grammar to stdout" do
 
-        @stdin_for_expect_stdout_stderr = _mock_stdin
+        @stdin_for_want_stdout_stderr = _mock_stdin
 
         invoke 'trans', fixture_flex_( :mini ), '-'
-        __expect_all_this
+        __want_all_this
       end
 
       it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
@@ -90,9 +90,9 @@ module Skylab::Flex2Treetop::MyTestSupport
         cli.want_succeed_under self
       end
 
-      def __expect_all_this
+      def __want_all_this
 
-        @line_stream_for_expect_line =
+        @line_stream_for_want_line =
 
           sout_serr_line_stream_for_contiguous_lines_on_stream :o
 
@@ -112,14 +112,14 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def invoke * argv
-        using_expect_stdout_stderr_invoke_via_argv argv
+        using_want_stdout_stderr_invoke_via_argv argv
       end
 
       def subject_CLI
         Home_::CLI
       end
 
-      define_method :invocation_strings_for_expect_stdout_stderr, -> do
+      define_method :invocation_strings_for_want_stdout_stderr, -> do
         a =  nil
         -> do
           a ||= [ _program_name ]
@@ -145,7 +145,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         want_fail
       end
 
-      def result_for_failure_for_expect_stdout_stderr
+      def result_for_failure_for_want_stdout_stderr
         Home_::Brazen_::CLI_Support::GENERIC_ERROR_EXITSTATUS
       end
 

@@ -1,6 +1,6 @@
 {
-  "after": "yacc2treetop",
-  "category": "legacy ad-hoc util",
+  "after": "permute",
+  "category": "parsing utilities",
   "framework": "[br]",
   "sigil": "f2t"
 }

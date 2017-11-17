@@ -1,6 +1,6 @@
 {
-  "after": "flex2treetop",
-  "category": "legacy ad-hoc util",
+  "after": "yacc2treetop",
+  "category": "parsing utilities",
   "framework": "[CUSTOM]",
   "sigil": "b2t"
 }

@@ -97,8 +97,8 @@ module Skylab::CSS_Convert
 
       ATTRIBUTES = attrs  # hotdog it for transparency
 
-      def initialize & oes_p
-        @on_event_selectively = oes_p
+      def initialize & p
+        @listener = p
       end
 
       def as_attributes_actor_normalize
@@ -220,10 +220,10 @@ module Skylab::CSS_Convert
 
       handle_event_selectively
 
-      oes_p = @on_event_selectively
-      @on_event_selectively = -> * i_a, & ev_p do
+      p = @listener
+      @listener = -> * i_a, & ev_p do
 
-        oes_p[ * i_a, & ev_p ]
+        p[ * i_a, & ev_p ]
       end
 
       super
@@ -327,7 +327,7 @@ module Skylab::CSS_Convert
       _directive_parser = Home_::Directive__::Parser.new(
         _out_dir_base,
         @resources,
-        & @on_event_selectively )
+        & @listener )
 
       dirx = _directive_parser.parse_path @_directives_path
       if dirx
@@ -371,7 +371,7 @@ module Skylab::CSS_Convert
     end
 
     def __build_attribute_values_store
-      Conversion_parameters_class___[].new( & @on_event_selectively )
+      Conversion_parameters_class___[].new( & @listener )
     end
 
     # ~ queue (somewhat boilerplate adaptation to agent)

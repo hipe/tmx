@@ -128,7 +128,7 @@ module Skylab::CSS_Convert
           if :error == i_a.first
             raise ev_p[].to_exception
           else
-            @on_event_selectively[ * i_a, & ev_p ]
+            @listener[ * i_a, & ev_p ]
           end
         end
 

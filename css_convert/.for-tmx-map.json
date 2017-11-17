@@ -1,6 +1,6 @@
 {
   "after": "bnf2treetop",
-  "category": "legacy ad-hoc util",
+  "category": "parsing utilities",
   "framework": "[br] (isomorphic methods client)",
   "sigil": "cc"
 }

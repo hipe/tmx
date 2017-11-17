@@ -1,6 +1,6 @@
 {
-  "after": "beauty_salon",
-  "category": "legacy ad-hoc util",
+  "after": "flex2treetop",
+  "category": "parsing utilities",
   "framework": "[CUSTOM]",
   "sigil": "y2t"
 }

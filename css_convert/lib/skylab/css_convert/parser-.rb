@@ -36,9 +36,9 @@ module Skylab::CSS_Convert
 
   class Parser_::Common_Base
 
-    def initialize out_dir_head, resources, & oes_p
+    def initialize out_dir_head, resources, & p
 
-      @on_event_selectively = oes_p
+      @listener = p
       @out_dir_head = out_dir_head
       @resources = resources
     end
@@ -67,7 +67,7 @@ module Skylab::CSS_Convert
         _Treetop::Parse_via_ByteUpstreamReference_and_ParserClass.call_by do |o|
           yield o
           o.accept_parser_class cls
-          o.listener = @on_event_selectively
+          o.listener = @listener
         end
       else
         cls
@@ -81,7 +81,7 @@ module Skylab::CSS_Convert
         if :error == i_a.first
           raise ev_p[].to_exception
         else
-          @on_event_selectively.call( * i_a, & ev_p )
+          @listener.call( * i_a, & ev_p )
         end
       end
 

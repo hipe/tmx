@@ -23,15 +23,15 @@ module Skylab::Yacc2Treetop::TestSupport
 
     o = {}
 
-    o[ :expect_CLI ] = -> tcc do
+    o[ :want_CLI ] = -> tcc do
       require 'skylab/brazen'
       ::Skylab::Brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
       tcc.extend CLI_Module_Methods__
       tcc.include CLI_Instance_Methods__
     end
 
-    o[ :expect_event ] = -> tcc do
-      Common_.test_support::Expect_Emission[ tcc ]
+    o[ :want_event ] = -> tcc do
+      Common_.test_support::Want_Emission[ tcc ]
     end
 
     o[ :memoizer_methods ] = -> tcc do
@@ -104,11 +104,11 @@ module Skylab::Yacc2Treetop::TestSupport
 
     def __build_invocation_state argv
 
-      using_expect_stdout_stderr_invoke_via_argv argv
-      flush_frozen_state_from_expect_stdout_stderr
+      using_want_stdout_stderr_invoke_via_argv argv
+      flush_frozen_state_from_want_stdout_stderr
     end
 
-    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+    define_method :get_invocation_strings_for_want_stdout_stderr, -> do
       a = %w( y2tt ).freeze
       -> do
         a

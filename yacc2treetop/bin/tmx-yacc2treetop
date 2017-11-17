@@ -114,19 +114,19 @@ module Skylab::Yacc2Treetop
             rm.send :"#{ k }=", v
           end
 
-          oes_p = -> * i_a, & ev_p do
+          p = -> * i_a, & ev_p do
             __receive i_a, & ev_p
           end
 
           a.length.times do | d |
-            es = rm.send :"do__#{ a.fetch d }__", & oes_p
+            es = rm.send :"do__#{ a.fetch d }__", & p
             if es.nonzero?
               break
             end
           end
 
           if es.zero? && @_do_main
-            es = @reactive_model_.main( * argv, & oes_p )
+            es = @reactive_model_.main( * argv, & p )
           end
         end
 
@@ -516,13 +516,13 @@ module Skylab::Yacc2Treetop
       false
     end
 
-    def do__ping__ & oes_p
+    def do__ping__ & p
 
-      oes_p.call :info, :expression, :ping do | y |
+      p.call :info, :expression, :ping do | y |
         y << "hello from yacc2treetop."
       end
 
-      oes_p.call :result do
+      p.call :result do
         :hello_from_yacc2treetop
       end
 
@@ -533,9 +533,9 @@ module Skylab::Yacc2Treetop
       'Display version information'
     end
 
-    def do__version__ & oes_p
+    def do__version__ & p
 
-      oes_p.call :payload, :expression, :version do | y |
+      p.call :payload, :expression, :version do | y |
         y << VERSION
       end
 
@@ -546,9 +546,9 @@ module Skylab::Yacc2Treetop
       'Output the yacc treetop grammar (grammar) to stdout (devel)'
     end
 
-    def do__tt_grammar__ & oes_p
+    def do__tt_grammar__ & p
 
-      oes_p.call :payload, :expression, :treetop_grammar do | y |
+      p.call :payload, :expression, :treetop_grammar do | y |
         y << GRAMMAR_TEXT__
       end
       SUCCESS_EXITSTATUS_
@@ -558,14 +558,14 @@ module Skylab::Yacc2Treetop
       'List examples that are expected to work.'
     end
 
-    def do__tests__ & oes_p
+    def do__tests__ & p
 
-      oes_p.call :info, :expression, :line do | y |
+      p.call :info, :expression, :line do | y |
         y << "Some examples to try:"
       end
 
       FIXTURES___.each do | f |
-        oes_p.call :fixture do
+        p.call :fixture do
           f
         end
       end
@@ -585,15 +585,15 @@ module Skylab::Yacc2Treetop
       :grammar,
     )
 
-    def main yacc_file, & oes_p
+    def main yacc_file, & p
 
-      up_io = __produce_upstream_IO yacc_file, & oes_p
+      up_io = __produce_upstream_IO yacc_file, & p
 
       if up_io
 
-        down_io = oes_p.call :stdout, :resource  # for now
+        down_io = p.call :stdout, :resource  # for now
 
-        o = Translation__.new( & oes_p )
+        o = Translation__.new( & p )
         o.downstream = down_io
         o.upstream = up_io
         o.wrap_in_grammar = @grammar
@@ -603,13 +603,13 @@ module Skylab::Yacc2Treetop
       end
     end
 
-    def __produce_upstream_IO yacc_file, & oes_p
+    def __produce_upstream_IO yacc_file, & p
 
       if DASH_ == yacc_file
 
-        io = oes_p.call :stdin, :resource
+        io = p.call :stdin, :resource
         if io.tty?
-          oes_p.call :error, :expression do | y |
+          p.call :error, :expression do | y |
             y << "avoiding use of #{ DASH_.inspect } on interactive terminal."
           end
           UNABLE_
@@ -622,7 +622,7 @@ module Skylab::Yacc2Treetop
         rescue ::Errno::ENOENT => e
           md = /\A(.+) @ [a-z_]+ - (.+)\z/.match e.message
 
-          oes_p.call :error, :expression, :line do | y |
+          p.call :error, :expression, :line do | y |
             y << md.captures.join( ': ' )
           end
           UNABLE_
@@ -668,9 +668,9 @@ module Skylab::Yacc2Treetop
       :wrap_in_grammar,
     )
 
-    def initialize & oes_p
+    def initialize & p
       @_in_the_future = nil
-      @on_event_selectively = oes_p
+      @listener = p
     end
 
     def execute
@@ -759,7 +759,7 @@ module Skylab::Yacc2Treetop
     def __when_parse_failure
 
       msg = @_parser.failure_reason || __say_no_reason  # (not our name)
-      @on_event_selectively.call :error, :expression, :line do | y |
+      @listener.call :error, :expression, :line do | y |
         y << msg
       end
       UNABLE_
@@ -848,7 +848,7 @@ module Skylab::Yacc2Treetop
     attr_reader(
       :builder,
       :downstream,
-      :on_event_selectively,
+      :listener,
       :wrap_in_grammar,
     )
   end
