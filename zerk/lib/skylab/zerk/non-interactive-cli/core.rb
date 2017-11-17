@@ -104,7 +104,7 @@ module Skylab::Zerk
       # do this after any `dup` has been called so that the same CLI
       # *prototype* will not reuse the same ACS instance across its instances.
 
-      @_oes_p = method :on_ACS_emission_  # (only do this in 1 place)
+      @_listener = method :on_ACS_emission_  # (only do this in 1 place)
 
       _p = remove_instance_variable :@root_ACS_proc
 
@@ -232,7 +232,7 @@ module Skylab::Zerk
 
     def ___procure_current_navigational_formal_node
 
-      fn = @_top.lookup_formal_node__ head_as_is, :navigational, & @_oes_p
+      fn = @_top.lookup_formal_node__ head_as_is, :navigational, & @_listener
       if ! fn  # probably the above emitted t3 or t4
         _done_because :argument
       end
@@ -473,7 +473,7 @@ module Skylab::Zerk
 
       yield o
 
-      o.emission_handler_via_emission_handler( & @_oes_p )
+      o.emission_handler_via_emission_handler( & @_listener )
     end
 
     def _parsed_OK
@@ -506,7 +506,7 @@ module Skylab::Zerk
         UNRELIABLE_
       end
 
-      call_oes_p = -> * i_a, & ev_p do
+      call_p = -> * i_a, & ev_p do
         if :error == i_a.first
           touch_whenner[]
         end
@@ -515,7 +515,7 @@ module Skylab::Zerk
       end
 
       _pp = -> _ do
-        call_oes_p
+        call_p
       end
 
       _fo = @_fo_frame.formal_operation_
@@ -699,8 +699,8 @@ module Skylab::Zerk
 
     # -- emission handing support
 
-    def on_event_selectively  # [sa]
-      @_oes_p
+    def listener  # [sa]
+      @_listener
     end
 
     def on_ACS_emission_ * i_a, & ev_p

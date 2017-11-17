@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
       call_by do
 
         @root_ACS = build_root_ACS
-        @root_ACS.set_verb_phrase_for_expect_root_ACS :_xXx_
+        @root_ACS.set_verb_phrase_for_want_root_ACS :_xXx_
 
         call :verb_phrase  # #test-09
       end

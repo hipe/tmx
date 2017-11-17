@@ -20,58 +20,58 @@ module Skylab::Zerk::TestSupport
         _ze_niCLI_client.invoke_via_argv argv
       end
 
-      def expect_empty_puts
-        @ze_niCLI_client.expect nil
+      def want_empty_puts
+        @ze_niCLI_client.want nil
       end
 
-      def expect_line_by m=nil, & p
+      def want_line_by m=nil, & p
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_line_by( & p )
+        @ze_niCLI_client.want_line_by( & p )
       end
 
-      def expect_each_on_stdout_by m=nil, & p
+      def want_each_on_stdout_by m=nil, & p
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_each_on_stdout_by( & p )
+        @ze_niCLI_client.want_each_on_stdout_by( & p )
       end
 
-      def expect_each_on_stderr_by m=nil, & p
+      def want_each_on_stderr_by m=nil, & p
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_each_on_stderr_by( & p )
+        @ze_niCLI_client.want_each_on_stderr_by( & p )
       end
 
-      def expect_each_by m=nil, & p
+      def want_each_by m=nil, & p
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_each_by( & p )
+        @ze_niCLI_client.want_each_by( & p )
       end
 
-      def expect_on_stderr_lines_in_big_string m=nil, big_s
+      def want_on_stderr_lines_in_big_string m=nil, big_s
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_on_stderr_lines_in_big_string big_s
+        @ze_niCLI_client.want_on_stderr_lines_in_big_string big_s
       end
 
-      def expect_on_stdout_lines_in_big_string m=nil, big_s
+      def want_on_stdout_lines_in_big_string m=nil, big_s
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_on_stdout_lines_in_big_string big_s
+        @ze_niCLI_client.want_on_stdout_lines_in_big_string big_s
       end
 
-      def expect_lines_in_big_string m=nil, big_s
+      def want_lines_in_big_string m=nil, big_s
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_lines_in_big_string big_s
+        @ze_niCLI_client.want_lines_in_big_string big_s
       end
 
-      def expect_on_stderr m=nil, exp_x
+      def want_on_stderr m=nil, exp_x
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_on_stderr exp_x
+        @ze_niCLI_client.want_on_stderr exp_x
       end
 
-      def expect_on_stdout m=nil, exp_x
+      def want_on_stdout m=nil, exp_x
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect_on_stdout exp_x
+        @ze_niCLI_client.want_on_stdout exp_x
       end
 
-      def expect m=nil, exp_x
+      def want m=nil, exp_x
         m and @ze_niCLI_client.using_method m
-        @ze_niCLI_client.expect exp_x
+        @ze_niCLI_client.want exp_x
       end
 
       def on_stream sym
@@ -82,12 +82,12 @@ module Skylab::Zerk::TestSupport
         @ze_niCLI_client.DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER self
       end
 
-      def expect_fail
-        _ze_niCLI_release_client.expect_fail_under self
+      def want_fail
+        _ze_niCLI_release_client.want_fail_under self
       end
 
-      def expect_succeed
-        _ze_niCLI_release_client.expect_succeed_under self
+      def want_succeed
+        _ze_niCLI_release_client.want_succeed_under self
       end
 
       def _ze_niCLI_client
@@ -137,40 +137,40 @@ module Skylab::Zerk::TestSupport
         @_setup.ARGV = argv ; nil
       end
 
-      def expect_styled_line_via chunks
+      def want_styled_line_via chunks
         _ = StyledLineExpectation___.new chunks, @_method, @_stream
         @_setup._add _, @_stream
       end
 
-      def expect_line_by & p
+      def want_line_by & p
         __add_proc_for_line_based_expectation p
       end
 
-      def expect_each_on_stdout_by & p
+      def want_each_on_stdout_by & p
         @_stream = :sout
         _add_proc_based_expectation p
       end
 
-      def expect_each_on_stderr_by & p
+      def want_each_on_stderr_by & p
         @_stream = :serr
         _add_proc_based_expectation p
       end
 
-      def expect_each_by & p
+      def want_each_by & p
         _add_proc_based_expectation p
       end
 
-      def expect_on_stderr_lines_in_big_string big_s
+      def want_on_stderr_lines_in_big_string big_s
         @_stream = :serr
         _add_big_string_based_expectation big_s
       end
 
-      def expect_on_stdout_lines_in_big_string big_s
+      def want_on_stdout_lines_in_big_string big_s
         @_stream = :sout
         _add_big_string_based_expectation big_s
       end
 
-      def expect_lines_in_big_string big_s
+      def want_lines_in_big_string big_s
         _add_big_string_based_expectation big_s
         NIL
       end
@@ -193,17 +193,17 @@ module Skylab::Zerk::TestSupport
         NIL
       end
 
-      def expect_on_stderr exp_x
+      def want_on_stderr exp_x
         @_stream = :serr
         _add_line_based_expectation exp_x
       end
 
-      def expect_on_stdout exp_x
+      def want_on_stdout exp_x
         @_stream = :sout
         _add_line_based_expectation exp_x
       end
 
-      def expect m=nil, exp_x
+      def want m=nil, exp_x
         @_method = m if m
         _add_line_based_expectation exp_x
       end
@@ -229,19 +229,19 @@ module Skylab::Zerk::TestSupport
           io.puts "(going to flush and exit the lines from #{ @_stream })"
           p = io.method :puts
         end
-        expect_each_by( & p )
+        want_each_by( & p )
         invo = _invocation_under( tc ).execute
         d = invo.exitstatus
         io.puts "(exitstatus: #{ d } from invocation under test -- GOODBYE FROM [ze])"
         ::Kernel.exit 0
       end
 
-      def expect_fail_under tc
-        _invocation_under( tc ).execute.__expect_failed
+      def want_fail_under tc
+        _invocation_under( tc ).execute.__want_failed
       end
 
-      def expect_succeed_under tc
-        _invocation_under( tc ).execute.__expect_succeeded
+      def want_succeed_under tc
+        _invocation_under( tc ).execute.__want_succeeded
       end
 
       def _invocation_under tc
@@ -280,7 +280,7 @@ module Skylab::Zerk::TestSupport
 
       # ~
 
-      def __expect_failed
+      def __want_failed
         if @exitstatus.zero?
           __when_exitstatus_zero
         end
@@ -292,7 +292,7 @@ module Skylab::Zerk::TestSupport
 
       # ~
 
-      def __expect_succeeded
+      def __want_succeeded
         if @exitstatus.nonzero?
           __when_exitstatus_nonzero
         end
@@ -390,7 +390,7 @@ module Skylab::Zerk::TestSupport
             o.receive_by = method :_receive
           end
         else
-          Expect_nothing_on__[ :sout ]
+          Want_nothing_on__[ :sout ]
         end
 
         _serr_spy = if has[ :serr ]
@@ -398,7 +398,7 @@ module Skylab::Zerk::TestSupport
             o.receive_by = method :_receive
           end
         else
-          Expect_nothing_on__[ :serr ]
+          Want_nothing_on__[ :serr ]
         end
 
         @_sout_spy = _sout_spy
@@ -661,11 +661,11 @@ module Skylab::Zerk::TestSupport
 
       # -- write
 
-      def expect_big_string s
+      def want_big_string s
         _add BigStringBasedExpectation__.new( s, @method_name, @serr_or_sout )
       end
 
-      def expect_styled_content str, * sym_a
+      def want_styled_content str, * sym_a
 
         # (full justification at [#here.A])
 
@@ -673,7 +673,7 @@ module Skylab::Zerk::TestSupport
         # ..
         _styled = Home_::CLI::Styling::Stylify[ sym_a, md[ :content ] ]
         _final = "#{ md[ :margin ] }#{ _styled }"
-        expect _final
+        want _final
       end
 
       THIS_RX___ = /\A
@@ -681,7 +681,7 @@ module Skylab::Zerk::TestSupport
         (?<content>.+)
       \z/x  # note that as an implicit assertion and for now, assert no "\n"
 
-      def expect exp_x=nil
+      def want exp_x=nil
         _add Line_based_expectation__[ exp_x, @method_name, @serr_or_sout ]
       end
 
@@ -1237,11 +1237,11 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    Expect_nothing_on__ = -> do
+    Want_nothing_on__ = -> do
 
       h = {}
 
-      expect_nothing = -> s, method_name, stream_sym do
+      want_nothing = -> s, method_name, stream_sym do
         _msg = "was not expecting anything on '#{ stream_sym }' #{
           } (had: #{ [ s, method_name, stream_sym ].inspect })"
         raise ExpectationFailure__, _msg
@@ -1251,7 +1251,7 @@ module Skylab::Zerk::TestSupport
         h.fetch sym do
           x = StreamSpy__.define do |o|
             o.serr_or_sout = sym
-            o.receive_by = expect_nothing
+            o.receive_by = want_nothing
           end
           h[ sym ] = x
           x

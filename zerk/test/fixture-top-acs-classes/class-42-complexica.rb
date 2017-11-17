@@ -56,12 +56,12 @@ module Skylab::Zerk::TestSupport
         end
 
         def __ope2__component_operation
-          -> & oes_p do
+          -> & p do
             if @_pval
               self._K
             else
 
-              oes_p.call :info, :expression do |y|
+              p.call :info, :expression do |y|
                 y << "hello from ope2 with #{ highlight 'no' } params set."
               end
 
@@ -104,12 +104,12 @@ module Skylab::Zerk::TestSupport
 
         def __ope3__component_operation
 
-          -> & oes_p do
+          -> & p do
 
             _ = @_parent.__primi2
             __ = @primi3
 
-            oes_p.call :info, :expression do |y|
+            p.call :info, :expression do |y|
               y << "(p2: #{ _ }, p3: #{ __ })"
             end
 

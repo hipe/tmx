@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - multi-mode argument scanner - front tokens" do
+  describe "[ze] niCLI - dig scanner - front tokens" do
 
     TS_[ self ]
     use :non_interactive_CLI_argument_scanner

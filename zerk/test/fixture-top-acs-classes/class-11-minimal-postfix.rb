@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
     class Class_11_Minimal_Postfix  # 4x
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         alias_method :new_cold_root_ACS_for_iCLI_test, :new
         alias_method :new_cold_root_ACS_for_niCLI_test, :new
         private :new

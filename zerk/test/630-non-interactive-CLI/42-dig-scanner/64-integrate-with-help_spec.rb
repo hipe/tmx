@@ -77,17 +77,17 @@ module Skylab::Zerk::TestSupport
 
       def __build_this_one_spy_around sects_h
 
-        o = TS_::CLI::Expect_Section_Fail_Early.define
+        o = TS_::CLI::Want_Section_Fail_Early.define
 
-        o.expect_section "usage" do |sect|
+        o.want_section "usage" do |sect|
           sects_h[ :usage ] = sect
         end
 
-        o.expect_section "description" do |sect|
+        o.want_section "description" do |sect|
           sects_h[ :description ] = sect
         end
 
-        o.expect_section "primaries" do |sect|
+        o.want_section "primaries" do |sect|
           sects_h[ :primaries ] = sect
         end
 
@@ -135,7 +135,7 @@ module Skylab::Zerk::TestSupport
 
       never_call = -> { fail }
 
-      Home_::NonInteractiveCLI::MultiModeArgumentScanner.define do |o|
+      Home_::NonInteractiveCLI::DigScanner.define do |o|
 
         o.subtract_primary :remote_primary_one
 

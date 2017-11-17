@@ -47,13 +47,13 @@ module Skylab::Zerk
 
         def __at_against_hash
           @_arglist_.advance_one
-          @operator_branch = Here_::OperatorBranch_via_Hash[ @_arglist_.gets_one ]
+          @feature_branch = Here_::FeatureBranch_via_Hash[ @_arglist_.gets_one ]
           NIL
         end
 
         def __at_against_branch
           @_arglist_.advance_one
-          @operator_branch = @_arglist_.gets_one
+          @feature_branch = @_arglist_.gets_one
           NIL
         end
 
@@ -74,14 +74,14 @@ module Skylab::Zerk
         attr_reader(
           :be_passive,
           :do_result_in_value,
-          :operator_branch,
+          :feature_branch,
           :shape_symbol,
         )
       end
 
 #==FROM
 
-    class BranchItem_via_OperatorBranch
+    class BranchItem_via_FeatureBranch
 
       # this "facilitator" has a strange, session-heavy interface because [#052] #note-1
 
@@ -114,8 +114,8 @@ module Skylab::Zerk
 
       # --
 
-      def operator_branch
-        @request.operator_branch
+      def feature_branch
+        @request.feature_branch
       end
 
       attr_reader(

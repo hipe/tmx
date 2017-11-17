@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] non-interactive CLI - help permutations for operation" do
 
     TS_[ self ]
-    use :CLI_expect_section_coarse_parse
+    use :CLI_want_section_coarse_parse
 
     context "ask for help of any navigational *within* an oper. (as arg)" do
 
@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for_referent_not_found_
+        want_exitstatus_for_referent_not_found_
       end
 
       it "very specific message" do
@@ -36,7 +36,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "first usage line" do
@@ -69,7 +69,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "first usage line" do
@@ -94,7 +94,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "first usage line" do
@@ -123,7 +123,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "first usage line" do

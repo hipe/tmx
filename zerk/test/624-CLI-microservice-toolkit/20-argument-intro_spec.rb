@@ -19,15 +19,15 @@ module Skylab::Zerk::TestSupport
       it "0 args - no output, result is result" do
 
         invoke
-        expect_no_more_lines
+        want_no_more_lines
         @exitstatus.should eql :_zoink_
       end
 
       it "1 args - whines of unexpected, result is multi line" do
 
         invoke 'foo'
-        expect_unexpected_argument 'foo'
-        expect_common_failure_
+        want_unexpected_argument 'foo'
+        want_common_failure_
       end
 
       shared_subject :client_class_ do
@@ -42,8 +42,8 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def expect_this_usage_
-        expect :styled, :e, 'usage: zeepo noink'
+      def want_this_usage_
+        want :styled, :e, 'usage: zeepo noink'
       end
     end
 
@@ -52,21 +52,21 @@ module Skylab::Zerk::TestSupport
       it "0 args - first line is styled whine of missing arg" do
 
         invoke
-        expect :styled, :e, /\Aexpecting: <mono-arg>\z/
-        expect_common_failure_
+        want :styled, :e, /\Aexpecting: <mono-arg>\z/
+        want_common_failure_
       end
 
       it "1 args - no output, result is result" do
 
         invoke 'foo'
-        expect_succeeded_with_ '->foo<-'
+        want_succeeded_with_ '->foo<-'
       end
 
       it "2 args - whines of unexpected" do
 
         invoke 'aa', 'bb'
-        expect_unexpected_argument 'bb'
-        expect_common_failure_
+        want_unexpected_argument 'bb'
+        want_common_failure_
       end
 
       shared_subject :client_class_ do
@@ -81,8 +81,8 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def expect_this_usage_
-        expect :styled, :e, 'usage: zeepo naples <mono-arg>'
+      def want_this_usage_
+        want :styled, :e, 'usage: zeepo naples <mono-arg>'
       end
     end
 
@@ -91,19 +91,19 @@ module Skylab::Zerk::TestSupport
       it "0 args - no output, result is reesult" do
 
         invoke
-        expect_succeeded_with_ '{{  }}'
+        want_succeeded_with_ '{{  }}'
       end
 
       it "1 args - o" do
 
         invoke 'foo'
-        expect_succeeded_with_ '{{ foo }}'
+        want_succeeded_with_ '{{ foo }}'
       end
 
       it "2 args - o" do
 
         invoke 'foo', 'blearg'
-        expect_succeeded_with_ '{{ foo -- blearg }}'
+        want_succeeded_with_ '{{ foo -- blearg }}'
       end
 
       shared_subject :client_class_ do
@@ -125,26 +125,26 @@ module Skylab::Zerk::TestSupport
       it "0 args - whines of missing" do
         # #lends-coverage to [#fi-008.5]
         invoke
-        expect :styled, :e, 'expecting: <apple>'
-        expect_common_failure_
+        want :styled, :e, 'expecting: <apple>'
+        want_common_failure_
       end
 
       it "1 args - o" do
 
         invoke 'foo'
-        expect_succeeded_with_ '_foo_'
+        want_succeeded_with_ '_foo_'
       end
 
       it "2 args - o" do
 
         invoke 'x', 'y'
-        expect_succeeded_with_ '_x*y_'
+        want_succeeded_with_ '_x*y_'
       end
 
       it "3 args - o" do
 
         invoke %w( x y z )
-        expect_succeeded_with_ '_x*y*z_'
+        want_succeeded_with_ '_x*y*z_'
       end
 
       shared_subject :client_class_ do
@@ -159,9 +159,9 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def expect_this_usage_
+      def want_this_usage_
 
-        expect :styled, :e, "usage: zeepo liffe #{
+        want :styled, :e, "usage: zeepo liffe #{
           }<apple> [<annane> [<annane> [..]]]"
       end
     end
@@ -172,7 +172,7 @@ module Skylab::Zerk::TestSupport
 
         invoke
 
-        st = stream_for_expect_stdout_stderr
+        st = stream_for_want_stdout_stderr
         _line_o = st.gets_one
 
         st = Home_::CLI::Styling::ChunkStream_via_String[ _line_o.string ]
@@ -191,13 +191,13 @@ module Skylab::Zerk::TestSupport
         scn = st.gets
         scn && fail
 
-        expect_common_failure_
+        want_common_failure_
       end
 
       it "1 arg - o" do
 
         invoke 'sure'
-        expect_succeeded_with_ 'sure'
+        want_succeeded_with_ 'sure'
       end
 
       shared_subject :client_class_ do
@@ -212,9 +212,9 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def expect_this_usage_
+      def want_this_usage_
 
-        expect :styled, :e, "usage: zeepo feeples #{
+        want :styled, :e, "usage: zeepo feeples #{
           }[<lip> [<lip> [..]]] <nip>"
       end
     end
@@ -224,27 +224,27 @@ module Skylab::Zerk::TestSupport
       it "0 args - whines of missing" do
 
         invoke
-        expect :styled, :e, /\Aexpecting: <zing>\z/
-        expect_common_failure_
+        want :styled, :e, /\Aexpecting: <zing>\z/
+        want_common_failure_
       end
 
       it "1 arg - whines of missing" do
 
         invoke 'win'
-        expect :styled, "expecting: [<zang> [..]] <zhang>"
-        expect_common_failure_
+        want :styled, "expecting: [<zang> [..]] <zhang>"
+        want_common_failure_
       end
 
       it "2 args - o" do
 
         invoke 'one', 'two'
-        expect_succeeded_with_ '(one|two)'
+        want_succeeded_with_ '(one|two)'
       end
 
       it "3 args - o" do
 
         invoke 'A', 'B', 'C'
-        expect_succeeded_with_ '(A|B|C)'
+        want_succeeded_with_ '(A|B|C)'
       end
 
       shared_subject :client_class_ do
@@ -259,9 +259,9 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def expect_this_usage_
+      def want_this_usage_
 
-        expect :styled, :e, "usage: zeepo fooples #{
+        want :styled, :e, "usage: zeepo fooples #{
           }<zing> [<zang> [<zang> [..]]] <zhang>"
       end
     end

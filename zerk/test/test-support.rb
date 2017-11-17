@@ -24,7 +24,7 @@ module Skylab::Zerk::TestSupport
   end  # >>
 
 #==BEGIN
-  module Expect_CLI_or_API
+  module Want_CLI_or_API
 
     # experiment: allow CLI and API tests of a common-enough complexity to
     # co-exist side-by-side in the same node.
@@ -56,7 +56,7 @@ module Skylab::Zerk::TestSupport
 
     def _init_for_call_to_API_ZE
       @API_OR_CLI = :API
-      @API = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      @API = Common_.test_support::Want_Emission_Fail_Early::Spy.new
       NIL
     end
 
@@ -64,36 +64,36 @@ module Skylab::Zerk::TestSupport
 
     # ~ of CLI
 
-    def expect_on_stderr s
-      @CLI.expect_on_stderr s
+    def want_on_stderr s
+      @CLI.want_on_stderr s
     end
 
-    def expect_on_stdout s
-      @CLI.expect_on_stdout s
+    def want_on_stdout s
+      @CLI.want_on_stdout s
     end
 
     def on_stream sym
       @CLI.on_stream sym
     end
 
-    def expect_styled_line * chunks
-      @CLI.expect_styled_line_via chunks
+    def want_styled_line * chunks
+      @CLI.want_styled_line_via chunks
     end
 
-    def expect_each_by & p
-      @CLI.expect_each_by( & p )
+    def want_each_by & p
+      @CLI.want_each_by( & p )
     end
 
     # ~ shared syntax
 
-    def expect *a, &p
-      send EXPECT___.fetch( @API_OR_CLI ), a, & p
+    def want *a, &p
+      send Want___.fetch( @API_OR_CLI ), a, & p
     end
 
-    EXPECT___ = { API: :_expect_for_API_ZE, CLI: :__expect_for_CLI_ZE }
+    Want___ = { API: :_want_for_API_ZE, CLI: :__want_for_CLI_ZE }
 
-    def __expect_for_CLI_ZE a
-      @CLI.expect( * a )
+    def __want_for_CLI_ZE a
+      @CLI.want( * a )
     end
 
     # ~ of API
@@ -103,82 +103,82 @@ module Skylab::Zerk::TestSupport
       NIL
     end
 
-    def expect_these_lines_on_stderr
+    def want_these_lines_on_stderr
       # experiment - not ideal because it confuses who's driving
       on_stream :serr
       _y = ::Enumerator::Yielder.new do |line|
-        expect line
+        want line
       end
       yield _y
       NIL
     end
 
-    def expect_these_lines_via_expect_fail * chan, & p
-      _msgs = _messages_via_expect_fail_ZE chan
-      expect_these_lines_in_array _msgs, & p
+    def want_these_lines_via_want_fail * chan, & p
+      _msgs = _messages_via_want_fail_ZE chan
+      want_these_lines_in_array _msgs, & p
     end
 
-    def messages_via_expect_fail * chan
-      _messages_via_expect_fail_ZE chan
+    def messages_via_want_fail * chan
+      _messages_via_want_fail_ZE chan
     end
 
-    def _messages_via_expect_fail_ZE chan
+    def _messages_via_want_fail_ZE chan
       msgs = nil
-      _expect_for_API_ZE chan do |y|
+      _want_for_API_ZE chan do |y|
         msgs = y
       end
-      expect_fail
+      want_fail
       msgs
     end
 
-    def _expect_for_API_ZE a, & p
-      @API.expect_emission p, a
+    def _want_for_API_ZE a, & p
+      @API.want_emission p, a
     end
 
     # -- finishers
 
-    def expect_fail
-      send EXPECT_FAIL___.fetch @API_OR_CLI
+    def want_fail
+      send WANT_FAIL___.fetch @API_OR_CLI
     end
 
-    EXPECT_FAIL___ = {
-      API: :_expect_nil_result_for_API_ZE,
-      CLI: :__expect_fail_for_CLI_ZE,
+    WANT_FAIL___ = {
+      API: :_want_nil_result_for_API_ZE,
+      CLI: :__want_fail_for_CLI_ZE,
     }
 
-    def __expect_fail_for_CLI_ZE
-      @CLI.expect_fail_under self
+    def __want_fail_for_CLI_ZE
+      @CLI.want_fail_under self
     end
 
-    def _expect_nil_result_for_API_ZE
+    def _want_nil_result_for_API_ZE
 
       # [#ze-026.1] NIL (not FALSE) happens when failure :#here
 
-      @API.expect_result_under NIL, self
+      @API.want_result_under NIL, self
     end
 
-    def expect_succeed
-      send EXPECT_SUCCEED___.fetch @API_OR_CLI
+    def want_succeed
+      send WANT_SUCCEED___.fetch @API_OR_CLI
     end
 
-    EXPECT_SUCCEED___ = {
-      API: :__expect_succeed_for_API_ZE,
-      CLI: :__expect_succeed_for_CLI_ZE,
+    WANT_SUCCEED___ = {
+      API: :__want_succeed_for_API_ZE,
+      CLI: :__want_succeed_for_CLI_ZE,
     }
 
-    def __expect_succeed_for_CLI_ZE
-      @CLI.expect_succeed_under self
+    def __want_succeed_for_CLI_ZE
+      @CLI.want_succeed_under self
     end
 
-    def __expect_succeed_for_API_ZE
+    def __want_succeed_for_API_ZE
 
       # [#ze-026.1] NIL (not TRUE) happens when success :#here
 
-      @API.expect_result_under NIL, self
+      @API.want_result_under NIL, self
     end
 
-    def expect_result x
-      @API.expect_result_under x, self
+    def want_result x
+      @API.want_result_under x, self
     end
 
     def execute
@@ -221,24 +221,24 @@ module Skylab::Zerk::TestSupport
 
     # -- practically (if not actually) functions & derivatives
 
-    def expect_these_lines_in_messages & p
-      expect_these_lines_in_array messages, & p
+    def want_these_lines_in_messages & p
+      want_these_lines_in_array messages, & p
     end
 
-    def expect_these_lines_in_array actual_messages, & p
+    def want_these_lines_in_array actual_messages, & p
 
-      TestSupport_::Expect_these_lines_in_array[ actual_messages, p, self ]
+      TestSupport_::Want_these_lines_in_array[ actual_messages, p, self ]
     end
 
     # ~ shameless copy-paste from [#co-065] - will go away if it interferes
 
     def black_and_white ev
-      _expag = black_and_white_expression_agent_for_expect_emission
+      _expag = black_and_white_expression_agent_for_want_emission
       ev.express_into_under "", _expag
     end
 
     def black_and_white_lines ev
-      _expag = black_and_white_expression_agent_for_expect_emission
+      _expag = black_and_white_expression_agent_for_want_emission
       ev.express_into_under [], _expag
     end
   end
@@ -276,7 +276,7 @@ module Skylab::Zerk::TestSupport
     # --
 
     def build_root_ACS  # cp from [ac]
-      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
+      subject_root_ACS_class.new_cold_root_ACS_for_want_root_ACS
     end
 
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
@@ -284,7 +284,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def event_log_
-      Common_.test_support::Expect_Emission::Log
+      Common_.test_support::Want_Emission::Log
     end
 
     # --
@@ -383,22 +383,22 @@ module Skylab::Zerk::TestSupport
         tcc.include self
       end
 
-      def zerk_API_call oes_p, x_a
-        @root_ACS ||= subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
-        Home_::API.call( x_a, @root_ACS ) { |_| oes_p }
+      def zerk_API_call p, x_a
+        @root_ACS ||= subject_root_ACS_class.new_cold_root_ACS_for_want_root_ACS
+        Home_::API.call( x_a, @root_ACS ) { |_| p }
       end
     end
 
-    Expect_emission_fail_early = -> tcc do
-      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+    Want_emission_fail_early = -> tcc do
+      Common_.test_support::Want_Emission_Fail_Early[ tcc ]
     end
 
-    Expect_event = -> tcc do
-      Common_.test_support::Expect_Emission[ tcc ]
+    Want_event = -> tcc do
+      Common_.test_support::Want_Emission[ tcc ]
     end
 
-    Expect_stdout_stderr = -> tcc do
-      tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    Want_stdout_stderr = -> tcc do
+      tcc.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
     end
 
     Memoizer_methods = -> tcc do
@@ -408,7 +408,7 @@ module Skylab::Zerk::TestSupport
 
   # --
 
-  Expect_no_emission_ = -> * i_a do
+  Want_no_emission_ = -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
   end
 

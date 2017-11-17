@@ -9,8 +9,8 @@ module Skylab::Zerk::TestSupport
     def self.[] tcc
 
       Use_::Memoizer_methods[ tcc ]
-      Use_::Expect_event[ tcc ]
-      ACS_.test_support::Expect_Root_ACS[ tcc ]
+      Use_::Want_event[ tcc ]
+      ACS_.test_support::Want_Root_ACS[ tcc ]
 
       tcc.send :define_singleton_method, :call_by, Call_by_method___
       tcc.include self
@@ -31,7 +31,7 @@ module Skylab::Zerk::TestSupport
         root_ACS_result.should eql Home_::UNABLE_
       end
 
-      def expect_trueish_result
+      def want_trueish_result
         x = root_ACS_result
         if ! x
           fail "expected trueish result, had #{ x.inspect }"
@@ -120,13 +120,13 @@ module Skylab::Zerk::TestSupport
 
         el = event_log
 
-        _use_oes_p = if el
+        _use_p = if el
           el.handle_event_selectively
         else
-          Expect_no_events_because_event_log_was_falseish___
+          Want_no_events_because_event_log_was_falseish___
         end
 
-        result = zerk_API_call _use_oes_p, x_a
+        result = zerk_API_call _use_p, x_a
 
         if instance_variable_defined? :@root_ACS
           _o = remove_instance_variable :@root_ACS
@@ -135,24 +135,24 @@ module Skylab::Zerk::TestSupport
         root_ACS_state_via result, _o
       end
 
-      def zerk_API_call oes_p, x_a  # result is result
+      def zerk_API_call p, x_a  # result is result
 
-        subject_API.call( * x_a, & oes_p )
+        subject_API.call( * x_a, & p )
       end
 
       # -- hook-outs/ins
 
-      def state_for_expect_emission
+      def state_for_want_emission
         root_ACS_state
       end
 
-      define_method :expression_agent_for_expect_emission, ( Lazy_.call do
+      define_method :expression_agent_for_want_emission, ( Lazy_.call do
         Home_.lib_.brazen::API.expression_agent_instance
       end )
 
     # -
 
-    Expect_no_events_because_event_log_was_falseish___ = -> * x_a, & _ev_p do
+    Want_no_events_because_event_log_was_falseish___ = -> * x_a, & _ev_p do
       fail "no events were expected because `event_log` was false-ish (had: #{ x_a.inpsect })"
     end
   end

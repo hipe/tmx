@@ -2,12 +2,12 @@ module Skylab::Zerk::TestSupport
 
   module Non_Interactive_CLI
 
-    # just a hopefully semi-thin layer on top of "expect stdout stderr"
+    # just a hopefully semi-thin layer on top of "want stdout stderr"
 
     PUBLIC = true  # [dt]
 
     def self.[] tcc
-      Use_::Expect_stdout_stderr[ tcc ]
+      Use_::Want_stdout_stderr[ tcc ]
       tcc.send :define_singleton_method, :given, Given___
       tcc.include self
     end
@@ -48,7 +48,7 @@ module Skylab::Zerk::TestSupport
 
       def be_general_invite_line_from_root
 
-        s_a = invocation_strings_for_expect_stdout_stderr
+        s_a = invocation_strings_for_want_stdout_stderr
 
         _exp = expectation :styled,
           :e, "use '#{ s_a.join SPACE_ } -h' for help"
@@ -101,7 +101,7 @@ module Skylab::Zerk::TestSupport
           redo
         end while nil
 
-        s_a_ = invocation_strings_for_expect_stdout_stderr.dup
+        s_a_ = invocation_strings_for_want_stdout_stderr.dup
         s_a.reverse!
         s_a_.concat s_a
         s_a_.join SPACE_
@@ -228,11 +228,11 @@ module Skylab::Zerk::TestSupport
         exitstatus.should be_nonzero
       end
 
-      def expect_exitstatus_for_referent_not_found_
-        expect_exitstatus_for :referent_not_found
+      def want_exitstatus_for_referent_not_found_
+        want_exitstatus_for :referent_not_found
       end
 
-      def expect_exitstatus_for k
+      def want_exitstatus_for k
         _d = Home_::NonInteractiveCLI::Exit_status_for___[ k ]
         exitstatus.should eql _d
       end
@@ -249,10 +249,10 @@ module Skylab::Zerk::TestSupport
 
       def coarse_parse_via_invoke * argv  # see also "help screens"
 
-        using_expect_stdout_stderr_invoke_via_argv argv
+        using_want_stdout_stderr_invoke_via_argv argv
         # (result is nil. ivars are set.)
-        _lines = release_lines_for_expect_stdout_stderr
-        TS_::CLI::Expect_Section_Coarse_Parse.new _lines
+        _lines = release_lines_for_want_stdout_stderr
+        TS_::CLI::Want_Section_Coarse_Parse.new _lines
       end
 
       def argv * argv  # see DSL tombstone
@@ -261,13 +261,13 @@ module Skylab::Zerk::TestSupport
 
       def argv_array argv
 
-        using_expect_stdout_stderr_invoke_via_argv argv
+        using_want_stdout_stderr_invoke_via_argv argv
 
-        # based off of `flush_frozen_state_from_expect_stdout_stderr`:
+        # based off of `flush_frozen_state_from_want_stdout_stderr`:
 
         My_State___.new(
           remove_instance_variable( :@exitstatus ),
-          release_lines_for_expect_stdout_stderr,
+          release_lines_for_want_stdout_stderr,
           remove_instance_variable( :@invocation ),
         )
       end
@@ -301,13 +301,13 @@ module Skylab::Zerk::TestSupport
 
       # TestSupport_::Memoization_and_subject_sharing[ self ]
 
-      define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
+      define_method :invocation_strings_for_want_stdout_stderr, ( Lazy_.call do
         [ 'xyzi' ]
       end )
 
       # -- assertion support
 
-      def result_for_failure_for_expect_stdout_stderr
+      def result_for_failure_for_want_stdout_stderr
         Home_::GENERIC_ERROR_EXITSTATUS
       end
     # -

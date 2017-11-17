@@ -28,14 +28,14 @@ module Skylab::Zerk
         end
 
         _otr = self.class._begin_empty
-        _otr.__init_for_recursion fo, ts, @_operation_index, & @_oes_p
+        _otr.__init_for_recursion fo, ts, @_operation_index, & @_listener
       end
 
-      def __init_for_recursion fo, ts, bi, & oes_p
+      def __init_for_recursion fo, ts, bi, & p
 
         @did_emit_ = false
         @formal_operation = fo
-        @_oes_p = oes_p
+        @_listener = p
         @parameter_value_source =
           Arc_::Magnetics::ParameterValueSource_via_ArgumentScanner.
             the_empty_value_source
@@ -108,13 +108,13 @@ module Skylab::Zerk
 
       def execute
 
-        @_oes_p ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
-        @real_store_ = @formal_operation.begin_parameter_store( & @_oes_p )
+        @_listener ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
+        @real_store_ = @formal_operation.begin_parameter_store( & @_listener )
         @_accept_to_real_store = @real_store_.method :accept_parameter_value
 
         ___init_stated_box
 
-        o = @formal_operation.begin_preparation( & @_oes_p )
+        o = @formal_operation.begin_preparation( & @_listener )
 
         o.PVS_parameter_stream_once = method :__PVS_parameter_stream_once
 
@@ -246,7 +246,7 @@ module Skylab::Zerk
         if kn
           kn.value  # can be nil
         else
-          @_oes_p
+          @_listener
         end
       end
 
@@ -258,10 +258,10 @@ module Skylab::Zerk
 
       def ___determine_some_handler
 
-        oes_p = @_pp[ :_not_sure_ ]
-        if oes_p
+        p = @_pp[ :_not_sure_ ]
+        if p
           -> i_a, & ev_p do
-            oes_p[ * i_a, & ev_p ]
+            p[ * i_a, & ev_p ]
           end
         else
           method :___handle_emission

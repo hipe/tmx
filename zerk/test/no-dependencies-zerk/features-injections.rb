@@ -27,7 +27,7 @@ module Skylab::Zerk::TestSupport
 
       # -- expect
 
-      def expect_succeeded_
+      def want_succeeded_
         executed_tuple_.result || fail
       end
 
@@ -55,7 +55,7 @@ module Skylab::Zerk::TestSupport
         @ze_FI_DSL_parameters_for_parse.args = s_a ; nil
       end
 
-      def expect_failure
+      def want_failure
         @ze_FI_DSL_parameters_for_parse.do_expect_failure = true ; nil
       end
 
@@ -92,7 +92,7 @@ module Skylab::Zerk::TestSupport
         _cls = parser_class_
 
         if params.do_expect_failure
-          log = Common_.test_support::Expect_Emission::Log.for self
+          log = Common_.test_support::Want_Emission::Log.for self
           p = log.handle_event_selectively
         end
 
@@ -197,7 +197,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def build_new_event_log_
-        Common_.test_support::Expect_Emission::Log.for self
+        Common_.test_support::Want_Emission::Log.for self
       end
 
       def clientesque_primaries_
@@ -269,7 +269,7 @@ module Skylab::Zerk::TestSupport
             xx_yy1: :xxx,
             he_ha: :yyy,
           }
-          o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
+          o.operators = Home_::ArgumentScanner::FeatureBranch_via_Hash[ _h ]
           o.injection_symbol = :_INJECTION_1_
         end
 
@@ -277,7 +277,7 @@ module Skylab::Zerk::TestSupport
           _h = {
             xx_yy2: :zzz,
           }
-          o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
+          o.operators = Home_::ArgumentScanner::FeatureBranch_via_Hash[ _h ]
           o.injection_symbol = :_INJECTION_2_
         end
 

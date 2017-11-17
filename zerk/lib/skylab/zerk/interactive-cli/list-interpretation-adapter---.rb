@@ -7,9 +7,9 @@ module Skylab::Zerk
     # #open after incubation (which will be after [#009]), de-dup this
     # with [#sy-029] OGDL which should be similar.. or don't
 
-    def initialize s, & oes_p
+    def initialize s, & p
       @_scn = Home_.lib_.string_scanner.new s
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def execute
@@ -181,7 +181,7 @@ module Skylab::Zerk
 
     def __error_escape_character_with_nothing_after_it
 
-      @_oes_p.call( * THESE__, :escape_character_with_nothing_after_it ) do |y|
+      @_listener.call( * THESE__, :escape_character_with_nothing_after_it ) do |y|
         y << "escape character with nothing after it"
       end
       _errored
@@ -189,7 +189,7 @@ module Skylab::Zerk
 
     def _error_no_closing_quote
       sym = @_last_quote_style
-      @_oes_p.call( * THESE__, :unclosed_quote ) do |y|
+      @_listener.call( * THESE__, :unclosed_quote ) do |y|
         y << "expecting #{ QUOTE_STRING___.fetch( sym ).inspect }."
       end
       _errored
@@ -198,7 +198,7 @@ module Skylab::Zerk
     def __error_unexpected_character_in_unquoted_string
 
       char = @_scn.peek 1
-      @_oes_p.call( * THESE__, :unexpected_character_in_unquoted_string ) do |y|
+      @_listener.call( * THESE__, :unexpected_character_in_unquoted_string ) do |y|
         y << "unexpected character in unquoted string: #{ char.inspect }"
       end
       _errored

@@ -39,8 +39,8 @@ module Skylab::Zerk
         @__one_off = oo
       end
 
-      def new _this, _k, & oes_p
-        LEGACY_OneOff_as_Bound__.new self, @__one_off, & oes_p
+      def new _this, _k, & p
+        LEGACY_OneOff_as_Bound__.new self, @__one_off, & p
       end
 
       attr_reader(
@@ -56,7 +56,7 @@ module Skylab::Zerk
 
     class LEGACY_OneOff_as_Bound__  # will re-open
 
-      def bound_call_under fr, & _oes_p  # [tmx]
+      def bound_call_under fr, & _p  # [tmx]
 
         _proc_like = @_one_off.require_proc_like
 
@@ -265,7 +265,7 @@ module Skylab::Zerk
 
       class LEGACY_OneOff_as_Bound__
 
-        def initialize bound, oo, & oes_p
+        def initialize bound, oo, & p
 
           @_bound = bound
           @_one_off = oo

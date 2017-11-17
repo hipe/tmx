@@ -130,7 +130,7 @@ module Skylab::Zerk::TestSupport
         }
 
         y = nil
-        spy.expect :error, :expression, :parse_error, :ambiguous do |y_|
+        spy.want :error, :expression, :parse_error, :ambiguous do |y_|
           y = y_
         end
 

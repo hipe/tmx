@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] CLI - expect section magnetics (might be #feature-island)" do
+  describe "[ze] CLI - want section magnetics (might be #feature-island)" do
 
     # #legacy-coverpoint-1
 
@@ -119,7 +119,7 @@ module Skylab::Zerk::TestSupport
       _scn = Basic_[]::String::LineStream_via_String[ s ]
 
       @sections =
-        TS_::CLI::Expect_Section_Magnetics::SectionsOldSchool_via_LineStream.call(
+        TS_::CLI::Want_Section_Magnetics::SectionsOldSchool_via_LineStream.call(
         _scn )
 
       NIL

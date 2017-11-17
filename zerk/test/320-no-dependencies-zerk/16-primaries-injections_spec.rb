@@ -181,7 +181,7 @@ module Skylab::Zerk::TestSupport
           _h = {
             xx_yy2: :zzz,
           }
-          o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
+          o.operators = Home_::ArgumentScanner::FeatureBranch_via_Hash[ _h ]
           o.injection_symbol = :_INJECTION_2_
         end
 

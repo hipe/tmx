@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
 
     it "loads." do
       _subject_module
@@ -38,11 +38,11 @@ module Skylab::Zerk::TestSupport
         end
 
         y = nil
-        expect :error, :expression, :parse_error, :expected_symbol do |y_|
+        want :error, :expression, :parse_error, :expected_symbol do |y_|
           y = y_
         end
 
-        expect_result UNABLE_
+        want_result UNABLE_
 
         if 1 == y.length
           y = Hackily_unwrap_wrapped_line_[ y[0] ]
@@ -82,7 +82,7 @@ module Skylab::Zerk::TestSupport
           as.parse_primary_value
         end
 
-        _expect_failure_and_produce_lines(
+        _want_failure_and_produce_lines(
           :error, :expression, :primary_parse_error, :primary_value_not_provided )
       end
     end
@@ -141,7 +141,7 @@ module Skylab::Zerk::TestSupport
           _as.parse_primary_value :must_be_trueish
         end
 
-        _expect_failure_and_produce_lines(
+        _want_failure_and_produce_lines(
           :error, :expression, :primary_parse_error, :not_trueish )
       end
     end
@@ -165,7 +165,7 @@ module Skylab::Zerk::TestSupport
           _as.parse_primary_value :must_be_integer_that_is_non_negative
         end
 
-        _expect_failure_and_produce_lines(
+        _want_failure_and_produce_lines(
           :error, :expression, :primary_parse_error, :not_integer )
       end
     end
@@ -189,7 +189,7 @@ module Skylab::Zerk::TestSupport
           _as.parse_primary_value :must_be_integer_that_is_positive_nonzero
         end
 
-        _expect_failure_and_produce_lines(
+        _want_failure_and_produce_lines(
           :error, :expression, :primary_parse_error, :not_positive_nonzero )
       end
     end
@@ -217,7 +217,7 @@ module Skylab::Zerk::TestSupport
           __call_this_one_custom_parser as
         end
 
-        _expect_failure_and_produce_lines(
+        _want_failure_and_produce_lines(
           :error, :expression, :primary_parse_error, :custom_wazoozle_range )
       end
     end
@@ -239,18 +239,18 @@ module Skylab::Zerk::TestSupport
       _d  # #todo
     end
 
-    def _expect_failure_and_produce_lines * sym_a
+    def _want_failure_and_produce_lines * sym_a
       y = nil
-      expect_on_channel sym_a do |y_|
+      want_on_channel sym_a do |y_|
         y = y_
       end
-      expect_result UNABLE_
+      want_result UNABLE_
       y
     end
 
     def _build_argument_scanner_with_listener * x_a
 
-      _l = expect_emission_fail_early_listener
+      _l = want_emission_fail_early_listener
       _subject_module.via_array x_a, & _l
     end
 

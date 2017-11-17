@@ -45,7 +45,7 @@ module Skylab::Zerk::TestSupport
 
           _a = [ :baking_temp, 378, :organic, :sprouted ]
 
-          ascn = Home_::API::ArgumentScanner.via_array _a, & Expect_no_emission_
+          ascn = Home_::API::ArgumentScanner.via_array _a, & Want_no_emission_
 
           bread_op = ts_::Bread.new ascn
 
@@ -65,9 +65,9 @@ module Skylab::Zerk::TestSupport
 
       shared_subject :_subject do
 
-        _ob = lib_::OperatorBranch_via_Hash[ ts_::Bread::PRIMARIES ]
+        _fb = lib_::FeatureBranch_via_Hash[ ts_::Bread::PRIMARIES ]
 
-        _subject_module.via_operator_branch _ob
+        _subject_module.via_feature_branch _fb
       end
 
     # -

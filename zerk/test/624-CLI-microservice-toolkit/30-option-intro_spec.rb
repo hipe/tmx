@@ -20,34 +20,34 @@ module Skylab::Zerk::TestSupport
       it "2.3. invoke (just the arg)" do
 
         invoke 'wen-kel', 'biz'
-        expect :e, "«biz with {}»"
-        expect_no_more_lines
+        want :e, "«biz with {}»"
+        want_no_more_lines
         @exitstatus.should eql :yerp
       end
 
       it "3.4 invoke (good opt)" do
 
         invoke 'wen-kel', 'biz', '--ex', 'yuss'
-        _expect_same_yuss
+        _want_same_yuss
       end
 
       it "3.4 invoke (same but infix)" do
 
         invoke 'wen-kel', '--ex', 'yuss', 'biz'
-        _expect_same_yuss
+        _want_same_yuss
       end
 
-      def _expect_same_yuss
-        expect :e, '«biz with {:ex=>"yuss"}»'
-        expect_no_more_lines
+      def _want_same_yuss
+        want :e, '«biz with {:ex=>"yuss"}»'
+        want_no_more_lines
         @exitstatus.should eql :yerp
       end
 
       it "3.2 invoke (bad opt)" do
 
         invoke 'wen-kel', 'x', '--ziz'
-        expect :e, "invalid option: --ziz"
-        expect_specifically_invited_to 'wen-kel'
+        want :e, "invalid option: --ziz"
+        want_specifically_invited_to 'wen-kel'
       end
 
       context "2.4 help (postfix)" do
@@ -101,18 +101,18 @@ module Skylab::Zerk::TestSupport
       end
 
       def _usage_section
-        expect_section_ "usage", _expect_usage
+        want_section_ "usage", _want_usage
       end
 
       def _options_section
-        expect_section_ "options", _expect_options
+        want_section_ "options", _want_options
       end
 
       def _argument_section
-        expect_section_ "argument", _expect_argument
+        want_section_ "argument", _want_argument
       end
 
-      memoize :_expect_usage do
+      memoize :_want_usage do
         <<-HERE.unindent
           usage: zeepo wen-kel [-x FUN] <bar>
                  zeepo wen-kel -h
@@ -120,7 +120,7 @@ module Skylab::Zerk::TestSupport
         HERE
       end
 
-      memoize :_expect_options do
+      memoize :_want_options do
         <<-HERE.unindent
           options
               -x, --ex <wat-fun>               ohai
@@ -129,7 +129,7 @@ module Skylab::Zerk::TestSupport
         HERE
       end
 
-      memoize :_expect_argument do
+      memoize :_want_argument do
         <<-HERE.unindent
           argument
               <bar>

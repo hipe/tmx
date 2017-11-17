@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
           %w( r4c1x r4c2x ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| r1c1  | r1c2  |'
           y << '| r2c1x | r2c2x |'
           y << '| r3c1xx | r3c2xx |'
@@ -35,7 +35,7 @@ module Skylab::Zerk::TestSupport
           %w( r3c1 r3c2 ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| r1c1   | r1c2   |'
           y << '| r2c1xx | r2c2xx |'
           y << '| r3c1   | r3c2   |'
@@ -61,7 +61,7 @@ module Skylab::Zerk::TestSupport
           %w( r3c1 r3c2 ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "| header 1 | header 2 |"
           y << "| r1c1     | r1c2     |"
           y << "| r2c1     | r2c2     |"

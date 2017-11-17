@@ -110,10 +110,10 @@ module Skylab::Zerk
 
       def __build_handler_builder
 
-        oes_p = @UI_event_handler
+        p = @UI_event_handler
 
         -> _ do
-          oes_p
+          p
         end
       end
 

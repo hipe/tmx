@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI_expect_section_coarse_parse
+    use :CLI_want_section_coarse_parse
 
     context "(the bespoke required arg)" do
 

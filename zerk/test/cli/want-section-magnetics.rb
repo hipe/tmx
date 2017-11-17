@@ -1,8 +1,8 @@
 module Skylab::Zerk::TestSupport
 
-  module CLI::ExpectSectionMagneticsSupport__  # #[#sl-155]
+  module CLI::WantSectionMagneticsSupport__  # #[#sl-155]
 
-  module CLI::Expect_Section_Magnetics  # :[#054.2]
+  module CLI::Want_Section_Magnetics  # :[#054.2]
 
     # the second ever in the #[#054] strain, this was the first ever
     # to parse a help screen with a state machine. the scope of the file
@@ -139,7 +139,7 @@ module Skylab::Zerk::TestSupport
         scn = st.flush_to_scanner
         scn.advance_one  # guaranteed to be the header line. no need to check again
 
-        p = nil ; md = nil ; transition = nil ; expect_blank = nil ; add_item = nil
+        p = nil ; md = nil ; transition = nil ; want_blank = nil ; add_item = nil
 
         rx = /\A
           (?<margin>[ ]{2,})
@@ -158,11 +158,11 @@ module Skylab::Zerk::TestSupport
           else
             add_item[ md[ :item ] ]
             after_blank = unhinged
-            p = expect_blank
+            p = want_blank
           end
         end
 
-        expect_blank = -> line do
+        want_blank = -> line do
           NEWLINE_ == line || fail
           p = after_blank
         end
@@ -203,7 +203,7 @@ module Skylab::Zerk::TestSupport
             p = after_descy_item
           else
             add_item[ md[ :item ] ]
-            p = expect_blank
+            p = want_blank
           end
         end
 

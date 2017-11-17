@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_AutoloaderizedModule < Common_::SimpleModel  # :[#051.3].
+    class FeatureBranch_via_AutoloaderizedModule < Common_::SimpleModel  # :[#051.3].
 
       # the adaptation of #[#051] for autoloaderized modules.
       #
@@ -68,10 +68,10 @@ module Skylab::Zerk
         # ~
 
         def procure_by
-          Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_OperatorBranch.call_by do |o|
+          Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_FeatureBranch.call_by do |o|
             o.item_lemma_symbol = nil  # hi. can be overridden next
             yield o
-            o.operator_branch = self
+            o.feature_branch = self
           end
         end
 

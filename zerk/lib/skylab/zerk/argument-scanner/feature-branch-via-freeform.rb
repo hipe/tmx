@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_FREEFORM  # #cover-me 1x [ts]  :[#051.F].
+    class FeatureBranch_via_FREEFORM  # #cover-me 1x [ts]  :[#051.F].
 
       # #[#051] - experiment. (used by the client to let method-based
       # and filesystem-based operations live in the same compound operator

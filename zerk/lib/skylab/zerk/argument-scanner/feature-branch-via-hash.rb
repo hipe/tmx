@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_Hash  # :[#051.A].
+    class FeatureBranch_via_Hash  # :[#051.A].
 
       # frontier adaptation of #[#051] (hashes)
       # (#a.s-coverpoint-1)

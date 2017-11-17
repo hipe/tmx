@@ -99,7 +99,7 @@ module Skylab::Zerk
           @client = cl
           @__n11n = no
           @__operation_index = oi
-          @__oes_pp = pp
+          @__listenerp = pp
         end
 
         def execute
@@ -146,7 +146,7 @@ module Skylab::Zerk
             # whatever this qkn represents, we've got to pass it indiferrently
             # to the client (that is, not as a parameter necessarily.)
 
-            ok = Receive_ARGV_value_.new( qkn, @__operation_index, @client, :_TEMP_VIA_ARGV_, & @__oes_pp ).execute
+            ok = Receive_ARGV_value_.new( qkn, @__operation_index, @client, :_TEMP_VIA_ARGV_, & @__listenerp ).execute
             ok or break  # or not. but yes you really should.
 
             redo

@@ -10,10 +10,10 @@ module Skylab::Zerk::TestSupport
 
     def against_tuples_expect_lines_ * a_a, & p
 
-      against_matrix_expect_lines_ a_a, & p
+      against_matrix_want_lines_ a_a, & p
     end
 
-    def against_matrix_expect_lines_ a_a, & p
+    def against_matrix_want_lines_ a_a, & p
 
       against_stream_expect_lines_ Home_::Stream_[ a_a ], & p
     end

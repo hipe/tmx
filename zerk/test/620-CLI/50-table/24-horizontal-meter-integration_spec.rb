@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
 
       it "(bytes are correct)" do
 
-        against_matrix_expect_lines_ same_matrix do |y|
+        against_matrix_want_lines_ same_matrix do |y|
           y << "Subproduct  num test files                 "
           y << "      face           121    +++++++++++++++"
           y << "  headless            44.0  +++++          "
@@ -154,7 +154,7 @@ module Skylab::Zerk::TestSupport
 
       it "(bytes are correct)" do
 
-        against_matrix_expect_lines_ same_matrix do |y|
+        against_matrix_want_lines_ same_matrix do |y|
 
           y << "Subproduct  num test files                 "
           y << "      face           121    •••••••••••••••"  # for now
@@ -181,7 +181,7 @@ module Skylab::Zerk::TestSupport
 
       it "(bytes are correct)" do
 
-        against_matrix_expect_lines_ same_matrix do |y|
+        against_matrix_want_lines_ same_matrix do |y|
 
           y << "Subproduct  num test files                 "
           y << "      face           121    •••••••••••••••"
@@ -198,7 +198,7 @@ module Skylab::Zerk::TestSupport
           [ 'zerk',  66 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
 
           y << "Subproduct  num test files                 "
           y << "      face           -20    ---------------"

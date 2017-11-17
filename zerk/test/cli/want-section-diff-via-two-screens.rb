@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class CLI::ExpectSectionDiff_via_TwoScreens < Common_::Dyadic
+  class CLI::WantSectionDiff_via_TwoScreens < Common_::Dyadic
 
     # assume that the two toplevel arguments being compared behave as
     # platform Struct's, and have the same members..

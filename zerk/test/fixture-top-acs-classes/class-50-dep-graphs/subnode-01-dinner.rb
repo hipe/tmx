@@ -7,16 +7,16 @@ module Skylab::Zerk::TestSupport
       class << self
         alias_method :new_cold_root_ACS_for_iCLI_test, :new
         alias_method :new_cold_root_ACS_for_niCLI_test, :new
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         undef_method :new
       end  # >>
 
       def __get_card__component_operation
-        -> money, & oes_p do
+        -> money, & p do
           if 5 <= money
             :_subway_card_
           else
-            oes_p.call :error, :expression, :insufficient_funds do |y|
+            p.call :error, :expression, :insufficient_funds do |y|
               y << "insufficient funds: need 5 had #{ ick money }"
             end
             UNABLE_

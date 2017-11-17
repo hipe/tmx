@@ -1,6 +1,6 @@
 {
-  "after": "human",
-  "category": "more general libs",
+  "after": "arc",
+  "category": "frameworky essentials",
   "is lib": true,
   "sigil": "ze"
 }

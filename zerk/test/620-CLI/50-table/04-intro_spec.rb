@@ -118,7 +118,7 @@ module Skylab::Zerk::TestSupport
             %w( ddddd e f )
           ]
 
-          against_matrix_expect_lines_ _matr do |y|
+          against_matrix_want_lines_ _matr do |y|
 
             y << "->   Eat;  Mouth;   hi <-"
             y << "->  aaaa;     bb;  ccc <-"

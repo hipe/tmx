@@ -59,7 +59,7 @@ module Skylab::Zerk::TestSupport
       end
 
       shared_subject :_option_line do
-        _cp = TS_::CLI::Expect_Section_Coarse_Parse.new niCLI_state.lines
+        _cp = TS_::CLI::Want_Section_Coarse_Parse.new niCLI_state.lines
         _dex = _cp.section( :options ).to_option_index
         _dex.h_.fetch '-p'
       end

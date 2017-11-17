@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class CLI::Expect_Section_Coarse_Parse
+  class CLI::Want_Section_Coarse_Parse
 
     # the fourth of #[#054], this is :[#054.4] (a blind rewrite)
     #
@@ -213,7 +213,7 @@ module Skylab::Zerk::TestSupport
         oim = Option_Index_Matcher___.new sw, long_plus, self
         if desc
           oim.desc = desc
-          oim.expect_desc_was_styled = true  # ..
+          oim.want_desc_was_styled = true  # ..
         end
         oim
       end
@@ -568,13 +568,13 @@ module Skylab::Zerk::TestSupport
       def initialize sw, long, ctx
         @ctx = ctx
         @desc = nil
-        @expect_desc_was_styled = nil
+        @want_desc_was_styled = nil
         @sw = sw
         @long = long
       end
 
       attr_writer(
-        :expect_desc_was_styled,
+        :want_desc_was_styled,
         :desc,
       )
 
@@ -624,7 +624,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def __styled
-        if @expect_desc_was_styled
+        if @want_desc_was_styled
           if @_ol.was_styled
             ACHIEVED_
           else

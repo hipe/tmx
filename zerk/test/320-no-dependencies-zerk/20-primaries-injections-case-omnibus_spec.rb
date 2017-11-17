@@ -120,7 +120,7 @@ module Skylab::Zerk::TestSupport
 
       given do
         args '-ver'
-        expect_failure
+        want_failure
       end
 
       it "whines about ambiguity" do
@@ -171,7 +171,7 @@ module Skylab::Zerk::TestSupport
 
       given do
         args '-verp', '-verp', '-verp'
-        expect_failure
+        want_failure
       end
 
       it "fails talkin bout etc" do

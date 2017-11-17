@@ -136,7 +136,7 @@ module Skylab::Zerk
     end
 
     def model_emission_handler__
-      @___oes_p ||= -> * i_a, & ev_p do
+      @___listener ||= -> * i_a, & ev_p do
         receive_uncategorized_emission i_a, & ev_p
       end
     end

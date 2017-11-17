@@ -101,7 +101,7 @@ module Skylab::Zerk
         self
       end
 
-      def on_event_selectively
+      def listener
         # (if you memoize this you gotta clear it at the `dup`)
         -> * i_a, & ev_p do
           handle i_a, & ev_p

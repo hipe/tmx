@@ -41,7 +41,7 @@ module Skylab::Zerk
         Matcher___.new self, a
       end
 
-      def available_branch_internable_stream_via_operator_branch ob, _
+      def available_branch_internable_stream_via_feature_branch ob, _
 
         ob.to_loadable_reference_stream
       end
@@ -165,10 +165,10 @@ module Skylab::Zerk
 
         def __branch_item_categorization_via_normal_symbol k
 
-          trueish_x = @request.operator_branch.lookup_softly k
+          trueish_x = @request.feature_branch.lookup_softly k
           if trueish_x
 
-            _obe = Home_::ArgumentScanner::OperatorBranchItem.
+            _obe = Home_::ArgumentScanner::FeatureBranchItem.
               via_user_value_and_normal_symbol trueish_x, k
 
             @_::ItemFound_via_Item[ _obe ]

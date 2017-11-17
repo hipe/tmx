@@ -182,7 +182,7 @@ module Skylab::Zerk
 
         def execute
 
-          When::UnknownBranchItem.call_by do |o|
+          When::UnknownFeature.call_by do |o|
             @out = o
             __populate_idea
           end
@@ -194,7 +194,7 @@ module Skylab::Zerk
           @out.shape_symbol = @_shape_symbol
           @out.terminal_channel_symbol = @__terminal_channel_symbol
 
-          if __has_operator_branch
+          if __has_feature_branch
             __populate_splayer
           end
 
@@ -207,10 +207,10 @@ module Skylab::Zerk
           NIL
         end
 
-        def __has_operator_branch
-          ob = @_request.operator_branch
+        def __has_feature_branch
+          ob = @_request.feature_branch
           if ob
-            @_operator_branch = ob  # `_store` DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+            @_feature_branch = ob  # `_store` DEFINITION_FOR_THE_METHOD_CALLED_STORE_
             @out.talker = ob  # sneak this in here
             ACHIEVED_
           end
@@ -219,9 +219,9 @@ module Skylab::Zerk
         def __populate_splayer
 
           _p = @_argument_scanner.method(
-            :available_branch_internable_stream_via_operator_branch )
+            :available_branch_internable_stream_via_feature_branch )
 
-          ob = @_operator_branch ; sym = @_shape_symbol
+          ob = @_feature_branch ; sym = @_shape_symbol
 
           @out.available_item_internable_stream_by = -> do
             _p[ ob, sym ]

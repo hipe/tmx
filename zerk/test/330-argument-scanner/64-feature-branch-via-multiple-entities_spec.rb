@@ -74,23 +74,23 @@ module Skylab::Zerk::TestSupport
 
     def _scenario_tuple_via_tokens * x_a
 
-      argument_scanner = Home_::API::ArgumentScanner.via_array x_a, & Expect_no_emission_
+      argument_scanner = Home_::API::ArgumentScanner.via_array x_a, & Want_no_emission_
 
       bread_op = ts_::Bread.new argument_scanner
 
       peanut_butter_op = ts_::PeanutButter.new argument_scanner
 
-      pb_ob = peanut_butter_op.operator_branch
+      pb_fb = peanut_butter_op.feature_branch
 
-      _real_br_op = bread_op.operator_branch
+      _real_br_op = bread_op.feature_branch
 
-      use_br_ob = lib_::OperatorBranch_via_OtherBranch.define _real_br_op do |o|
+      use_br_fb = lib_::FeatureBranch_via_OtherBranch.define _real_br_op do |o|
         o.not :baking_temp, :organic
       end
 
       _subj = _subject_module.define do |o|
-        o.add_entity_and_operator_branch bread_op, use_br_ob
-        o.add_entity_and_operator_branch peanut_butter_op, pb_ob
+        o.add_entity_and_feature_branch bread_op, use_br_fb
+        o.add_entity_and_feature_branch peanut_butter_op, pb_fb
       end
 
       _classes  # load them
@@ -117,7 +117,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def _subject_module
-      Home_::ArgumentScanner::OperatorBranch_via_MultipleEntities
+      Home_::ArgumentScanner::FeatureBranch_via_MultipleEntities
     end
   end
 end

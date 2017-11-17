@@ -300,8 +300,8 @@ module Skylab::Zerk
 
         # --
 
-        def lookup_and_attach_frame__ token, set_sym, & oes_p
-          fn = Lookup__.new( token, set_sym, self, & oes_p ).execute
+        def lookup_and_attach_frame__ token, set_sym, & p
+          fn = Lookup__.new( token, set_sym, self, & p ).execute
           if fn
             send ATTACH_FOR___.fetch( fn.formal_node_category ), fn
           else
@@ -314,8 +314,8 @@ module Skylab::Zerk
           formal_operation: :attach_operation_frame_via_formal_operation_,
         }
 
-        def lookup_formal_node__ token, set_sym, & oes_p
-          Lookup__.new( token, set_sym, self, & oes_p ).execute
+        def lookup_formal_node__ token, set_sym, & p
+          Lookup__.new( token, set_sym, self, & p ).execute
         end
 
         def __attach_frame_via_association asc
@@ -352,7 +352,7 @@ module Skylab::Zerk
         end
 
         def qualified_knownness_of_touched_via_association_ asc
-          Arc_::Magnetics::TouchComponent_via_Association_and_OperatorBranch[ asc, _reader ]
+          Arc_::Magnetics::TouchComponent_via_Association_and_FeatureBranch[ asc, _reader ]
         end
 
         def streamer_for_navigational_node_references_  # [#030] defines "navigational"
@@ -471,7 +471,7 @@ module Skylab::Zerk
           if yes
             yes = false
             Require_ACS_[]
-            reader_builder = ACS_::Magnetics::OperatorBranch_via_ACS.method :for_componentesque
+            reader_builder = ACS_::Magnetics::FeatureBranch_via_ACS.method :for_componentesque
           end
 
           p = @_reader_builder_for_this_frame
@@ -584,11 +584,11 @@ module Skylab::Zerk
         #       + try to be helpful with an emission
         #       + result is false
 
-        def initialize token, set_sym, services, & oes_p
+        def initialize token, set_sym, services, & p
           @services = services
           @set_sym = set_sym
           @token = token
-          @_oes_p = oes_p
+          @_listener = p
         end
 
         def execute
@@ -629,7 +629,7 @@ module Skylab::Zerk
           # issue with the scope of this node v.s its client. might push up)
 
           fn = @_formal_node
-          @_oes_p.call :error, :expression, :result_node_is_wrong_shape do |y|
+          @_listener.call :error, :expression, :result_node_is_wrong_shape do |y|
             y << "#{ nm fn.name } (#{ which_s }) #{
               }is not accessed with that syntax."
           end
@@ -645,7 +645,7 @@ module Skylab::Zerk
           # "did you mean (..)"-style emission. result is the found nerp
           # or false.
 
-          nt = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+          nt = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
             _m = APPROPRIATE_STREAMER___.fetch @set_sym
 
@@ -664,7 +664,7 @@ module Skylab::Zerk
 
             o.levenshtein_number = LEVENSHTEIN_NUMBER_  # see
 
-            o.listener = @_oes_p
+            o.listener = @_listener
           end
 
           if nt

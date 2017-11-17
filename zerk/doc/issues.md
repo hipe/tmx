@@ -1,6 +1,6 @@
 [#071] #small #open - cover me (as documented) (referenced in [br] too)
 
-[#070] #open multi-mode argument scanner is an atrocity, unify how
+[#070] #open dig scanner is an atrocity, unify how
              features are injected between [tmx] and [bs] (YIKES)
 
 [#069] #wish the lazy injection's symbolic name (used to be injector) should
@@ -70,7 +70,7 @@
 
 [#052]       argument scanner ("a.s")
 
-[#051]       the moving-target "operator branch" API,
+[#051]       the moving-target "feature branch" API,
              justified aptly in document.
              the comprehensive manifest of implementors is:
 
@@ -228,7 +228,7 @@
              #thread-two - `gets` resulting in `nil` == interrupt
              #!thread-one - used to be "hot model", now we use cold model
 
-[#006]       expect screens ..
+[#006]       want screens ..
 [#005]       [the view maker maker]
 
 [#004]       iCLI (the bundled modality)..

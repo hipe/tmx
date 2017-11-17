@@ -72,7 +72,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "no emissions" do
-        expect_no_emissions
+        want_no_emissions
       end
     end
 

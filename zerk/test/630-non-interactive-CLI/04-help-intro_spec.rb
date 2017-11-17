@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI_expect_section_coarse_parse
+    use :CLI_want_section_coarse_parse
 
     it "1.4)   topmost help screen shows desc of op that is in frame 1" do
 

@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_screens
+    use :want_screens
 
     context "(this one tree)" do
 

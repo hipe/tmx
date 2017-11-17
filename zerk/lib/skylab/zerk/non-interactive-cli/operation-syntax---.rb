@@ -148,7 +148,7 @@ module Skylab::Zerk
 
       def initialize qkn, oi, client, tmp_sym, & pp
         @__client = client
-        @__oes_pp = pp
+        @__listenerp = pp
         @_oi = oi
         @_qkn = qkn
         @TEMP_SYM = tmp_sym
@@ -197,9 +197,9 @@ module Skylab::Zerk
 
         @_frame = @_si.modality_frame_via_node_name_symbol_ @_k
 
-        _oes_pp = -> _ do
+        _pp = -> _ do
           # the model doesn't know the component's asssociation but we do:
-          @__oes_pp[ @_asc ]
+          @__listenerp[ @_asc ]
         end
 
         _scn = Home_.lib_.fields::Argument_scanner_via_value[ @_qkn.value ]
@@ -208,7 +208,7 @@ module Skylab::Zerk
           _scn,
           @_asc,
           @_frame.ACS,
-          & _oes_pp
+          & _pp
         )
         if qk
           @_component_qk = qk ; ACHIEVED_

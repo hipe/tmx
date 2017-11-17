@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_MultipleEntities  # :[#051.E].
+    class FeatureBranch_via_MultipleEntities  # :[#051.E].
 
       # NOTE :#open: this needs to be de-duped with the new work
       # in "no-deps" near its own feature injection. ideally this node
@@ -11,12 +11,12 @@ module Skylab::Zerk
       # #[#051] :[#053] - this is currently *the* center of implementation
       # for "feature injection". (theory at document.)
       #
-      # is an operator branch that is an aggregation of N different other
-      # operator branches. each branch that goes into the definition of the
+      # is an feature branch that is an aggregation of N different other
+      # feature branches. each branch that goes into the definition of the
       # subject must be associated with a "value store".
       #
       # the subject exposes special method for parsing, outside of the API
-      # of normal operator branches (discussed below). this parsing will
+      # of normal feature branches (discussed below). this parsing will
       # dispatch each "at" occurrence to the appropriate value store to
       # further process that portion of the argument scanner head it is
       # interested in.
@@ -29,7 +29,7 @@ module Skylab::Zerk
       #
       # ## about our "mutability model" :#here1
       #
-      # most adaptations of operator branches seem to adhere to a
+      # most adaptations of feature branches seem to adhere to a
       # "mutability model" whereby they themselves are immutable (or could
       # be) and also their member objects are immutable too, recursively.
       #
@@ -71,7 +71,7 @@ module Skylab::Zerk
 
         # -- define time
 
-        def add_entity_and_operator_branch inj_x, ob
+        def add_entity_and_feature_branch inj_x, ob
           d = @_count
           @_count += 1
           @_operator_braches[d] = ob
@@ -85,7 +85,7 @@ module Skylab::Zerk
 
           # (normally you wouldn't expose a method like this, but for #here1)
 
-          _ = Here_::Syntaxish.via_operator_branch self
+          _ = Here_::Syntaxish.via_feature_branch self
 
           _ok = _.parse_all_into_from(
             DISPATCHING_VALUE_RECEIVER___, argument_scanner )
@@ -168,7 +168,7 @@ module Skylab::Zerk
 
           _user_x = routing.mixed_user_value
 
-          _item_again = Here_::OperatorBranchItem.
+          _item_again = Here_::FeatureBranchItem.
             via_user_value_and_normal_symbol(
               _user_x, o.branch_item_normal_symbol )
 

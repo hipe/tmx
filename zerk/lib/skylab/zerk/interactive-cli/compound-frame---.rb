@@ -170,7 +170,7 @@ module Skylab::Zerk
     end
 
     def reader_writer
-      @_rw ||= ACS_::Magnetics::OperatorBranch_via_ACS.for_componentesque @ACS
+      @_rw ||= ACS_::Magnetics::FeatureBranch_via_ACS.for_componentesque @ACS
     end
 
     def name  # will fail for root compound frame

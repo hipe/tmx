@@ -46,7 +46,7 @@ module Skylab::Zerk::TestSupport
         after_not_parsing_the_primary_the_scanner_is_not_empty
       end
 
-      def expect_that_lines_express_appropriately y
+      def want_that_lines_express_appropriately y
         y == [ "does not look like primary: \"aa-zz\"" ] || fail
       end
 

@@ -4,9 +4,9 @@ module Skylab::Zerk
 
     class Syntaxish  # :[#056]
 
-      # one level of abstraction higher than an operator branch, exposes
+      # one level of abstraction higher than an feature branch, exposes
       # and bundles together methods for techniques commonly associated
-      # with operator branches.
+      # with feature branches.
       #
       # meant to help DRY up a fleet of operations thru composition not
       # inheritance - the operations init a member variable with the
@@ -25,14 +25,14 @@ module Skylab::Zerk
       # #a.s-coverpoint-2
 
       class << self
-        alias_method :via_operator_branch, :new
+        alias_method :via_feature_branch, :new
         undef_method :new
       end  # >>
 
       # -
 
         def initialize ob
-          @operator_branch = ob
+          @feature_branch = ob
         end
 
         def parse_all_into_from operation, argument_scanner
@@ -40,12 +40,12 @@ module Skylab::Zerk
             operation,
             argument_scanner,
             NOTHING_,  # coming soon
-            @operator_branch
+            @feature_branch
           ).execute
         end
 
         attr_reader(
-          :operator_branch,
+          :feature_branch,
         )
       # -
 
@@ -55,7 +55,7 @@ module Skylab::Zerk
 
         def initialize op, as, _COMING_SOON, ob
           @argument_scanner = as
-          @operator_branch = ob
+          @feature_branch = ob
           @operation = op
         end
 
@@ -64,7 +64,7 @@ module Skylab::Zerk
             ACHIEVED_
           else
             @__matcher = @argument_scanner.matcher_for(
-              :primary, :against_branch, @operator_branch )
+              :primary, :against_branch, @feature_branch )
             begin
               ok = __parse_primary
               ok || break

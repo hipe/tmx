@@ -26,7 +26,7 @@ we are trying to use the same setup across different cases; but so far
 
 
 
-## `expect_styled_content` :[#here.A]
+## `want_styled_content` :[#here.A]
 
 the subject method is a "standalone" "macro" (standalone because
 it implements its distinct features all in this method) that

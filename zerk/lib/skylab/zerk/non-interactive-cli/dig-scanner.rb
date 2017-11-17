@@ -2,11 +2,11 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class MultiModeArgumentScanner < Home_::ArgumentScanner::CommonImplementation
+    class DigScanner < Home_::ArgumentScanner::CommonImplementation
 
       # the "flagship" and more complicated of the two argument scanner
       # implementations, this is a compound scanner made up of up to 3
-      # kinds of sub-scanners that.. (see [#052] "the multi-mode..")
+      # kinds of sub-scanners that.. (see [#052] "dig scanner")
 
       # (reminder: we might make use of the obscure name convention of
       # [#bs-028.2.1] (`__this_convention_`).)
@@ -327,16 +327,16 @@ module Skylab::Zerk
 
         # --
 
-        def available_branch_internable_stream_via_operator_branch ob, shape_sym
+        def available_branch_internable_stream_via_feature_branch ob, shape_sym
           send THESE_3__.fetch( shape_sym ), ob
         end
 
         THESE_3__ = {
           business_item: :__available_business_internable_stream_via_operation_branch,
-          primary: :__available_primary_internable_stream_via_operator_branch,
+          primary: :__available_primary_internable_stream_via_feature_branch,
         }
 
-        def __available_primary_internable_stream_via_operator_branch ob
+        def __available_primary_internable_stream_via_feature_branch ob
 
           _st = ob.to_loadable_reference_stream.map_by do |key_x|
             [ :primary, key_x ]
@@ -374,7 +374,7 @@ module Skylab::Zerk
 
           if itr.has_addeds
 
-            _ = itr.addeds_as_operator_branchish.to_loadable_reference_stream.map_by do |key_x|
+            _ = itr.addeds_as_feature_branchish.to_loadable_reference_stream.map_by do |key_x|
               [ :primary, key_x ]
             end
 
@@ -800,7 +800,7 @@ module Skylab::Zerk
           k = @_real_scn.head_as_is.name_symbol
           k == wfr.well_formed_symbol || self._SANITY
 
-          _x = wfr.request.operator_branch.dereference k
+          _x = wfr.request.feature_branch.dereference k
 
           _dbi = DefaultedBranchItem___.via_user_value_and_normal_symbol _x, k
 
@@ -905,11 +905,11 @@ module Skylab::Zerk
 
           itr = @_itemer
           if itr.has_addeds
-            fuz.visit AddedBranchItem__, itr.addeds_as_operator_branchish
+            fuz.visit AddedBranchItem__, itr.addeds_as_feature_branchish
           end
           itr = nil
 
-          fuz.visit OperatorBranchItem__, wfr.request.operator_branch
+          fuz.visit FeatureBranchItem__, wfr.request.feature_branch
 
           catzn = fuz.maybe_finish
           if catzn
@@ -1029,7 +1029,7 @@ module Skylab::Zerk
 
         # called "itemer" because it produces (primary or business) items.
         #
-        # a façade that stands in front of the real operator branch,
+        # a façade that stands in front of the real feature branch,
         # serving lookup requests of it while effecting addeds and removeds.
         #
         # encapsulates the storage of addeds and removeds so that is
@@ -1089,8 +1089,8 @@ module Skylab::Zerk
 
         # -- readers
 
-        def addeds_as_operator_branchish
-          @___AaOB ||= Addeds_as_OperatorBranch___.new @_addeds_box
+        def addeds_as_feature_branchish
+          @___AaOB ||= Addeds_as_FeatureBranch___.new @_addeds_box
         end
 
         def _do_primary_categorization_thru_exact_match_via_WFR_ wfr
@@ -1103,9 +1103,9 @@ module Skylab::Zerk
           if p
             item = AddedBranchItem__.via_user_value_and_normal_symbol p, k
           else
-            trueish_x = wfr.request.operator_branch.lookup_softly k
+            trueish_x = wfr.request.feature_branch.lookup_softly k
             if trueish_x
-              item = OperatorBranchItem__.via_user_value_and_normal_symbol trueish_x, k
+              item = FeatureBranchItem__.via_user_value_and_normal_symbol trueish_x, k
             end
           end
 
@@ -1117,9 +1117,9 @@ module Skylab::Zerk
           req = wfr.request
 
           k = wfr.well_formed_symbol
-          trueish_x = req.operator_branch.lookup_softly k
+          trueish_x = req.feature_branch.lookup_softly k
           if trueish_x
-            _item = OperatorBranchItem__.via_user_value_and_normal_symbol trueish_x, k
+            _item = FeatureBranchItem__.via_user_value_and_normal_symbol trueish_x, k
             AS_Lib__::Magnetics::ItemFound_via_Item[ _item ]
           elsif req.do_fuzzy_lookup
             __business_categorization_fuzzily wfr
@@ -1131,7 +1131,7 @@ module Skylab::Zerk
         def __business_categorization_fuzzily wfr
 
           fuz = Fuzz__.new wfr.well_formed_symbol
-          fuz.visit OperatorBranchItem__, wfr.request.operator_branch
+          fuz.visit FeatureBranchItem__, wfr.request.feature_branch
           catzn = fuz.maybe_finish
           if catzn
             catzn
@@ -1169,7 +1169,7 @@ module Skylab::Zerk
 
       # ==
 
-      class Addeds_as_OperatorBranch___
+      class Addeds_as_FeatureBranch___
 
         def initialize bx
           @_box = bx
@@ -1306,9 +1306,8 @@ module Skylab::Zerk
         end
       end
 
-      OperatorBranchItem__ = AS_Lib__::OperatorBranchItem
+      FeatureBranchItem__ = AS_Lib__::FeatureBranchItem
     end
   end
 end
-# #pending-rename: probably rename to something like "dig" scanner
 # #history-A.1: spike temporary bridge as we enter 2nd wave of [ze] arg scanner

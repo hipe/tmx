@@ -13,7 +13,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_screens
+    use :want_screens
 
     given do
       common_compound_frame_for_design_

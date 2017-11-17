@@ -101,7 +101,7 @@ module Skylab::Zerk
 
       def __parse_after_compound_association asc  # (q)
 
-        o = Arc_::Magnetics::TouchComponent_via_Association_and_OperatorBranch.new
+        o = Arc_::Magnetics::TouchComponent_via_Association_and_FeatureBranch.new
         o.component_association = asc
         o.reader_writer = @_stack.last.reader_writer
 

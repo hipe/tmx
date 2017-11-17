@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
       context "one intended for the higher-level injector goes there" do
 
         it "succeeds" do
-          expect_succeeded_
+          want_succeeded_
         end
 
         it "wrote" do
@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
       context "one intended for the lower-level injector goes there" do
 
         it "succeeds" do
-          expect_succeeded_
+          want_succeeded_
         end
 
         it "wrote" do

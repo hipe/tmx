@@ -100,7 +100,7 @@ module Skylab::Zerk
 
     BranchItem = ::Class.new
 
-    class OperatorBranchItem < BranchItem  # >= 2x
+    class FeatureBranchItem < BranchItem  # >= 2x
 
       def item_category_symbol
         :item_that_is_primary_hash_value_based

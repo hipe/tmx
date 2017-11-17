@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - multi-mode argument scanner - subtract primary" do
+  describe "[ze] niCLI - dig scanner - subtract primary" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
         end
 
         y = nil
-        spy.expect :error, :expression, :parse_error, :subtracted_primary_was_referenced do |y_|
+        spy.want :error, :expression, :parse_error, :subtracted_primary_was_referenced do |y_|
           y = y_
         end
 

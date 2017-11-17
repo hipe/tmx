@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] non-interactive CLI - help permutations for component" do
 
     TS_[ self ]
-    use :CLI_expect_section_coarse_parse
+    use :CLI_want_section_coarse_parse
 
     context "ask for help of bad node in first frame (as arg)" do
 
@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for_referent_not_found_
+        want_exitstatus_for_referent_not_found_
       end
 
       it "first line says unrec" do
@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for_referent_not_found_
+        want_exitstatus_for_referent_not_found_
       end
 
       it "first line says unrec *contextualized*" do
@@ -60,7 +60,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "two usage lines" do
@@ -87,7 +87,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "succeeds" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "two usage lines" do
@@ -110,7 +110,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "works - first line" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "two usage lines" do
@@ -137,7 +137,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "works - first line" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "two usage lines" do
@@ -160,7 +160,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "works - first line" do
-        expect_result_for_success
+        want_result_for_success
       end
 
       it "two usage lines" do

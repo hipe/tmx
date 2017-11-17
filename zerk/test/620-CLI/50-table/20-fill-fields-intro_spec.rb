@@ -76,7 +76,7 @@ module Skylab::Zerk::TestSupport
           %w( wee ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| hihihih | hi  |'
           y << '| weeweew | wee |'
         end
@@ -89,7 +89,7 @@ module Skylab::Zerk::TestSupport
           %w( wee123456 ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| h | hi        |'
           y << '| w | wee123456 |'
         end
@@ -102,7 +102,7 @@ module Skylab::Zerk::TestSupport
           %w( wee1234567 ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '|  | hi         |'
           y << '|  | wee1234567 |'
         end
@@ -139,7 +139,7 @@ module Skylab::Zerk::TestSupport
           %w( yes ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| -->yayayaya<-- | yayayaya | ya  |'
           y << '| -->yesyesye<-- | yesyesye | yes |'
         end
@@ -159,7 +159,7 @@ module Skylab::Zerk::TestSupport
           %w( 012345678901234567890123 ),
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
 
           ss = "|  |  | beeboo                   |"
           y << ss

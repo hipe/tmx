@@ -86,13 +86,13 @@ module Skylab::Zerk
 
       def parse_one_modality_frame_ set_sym, modality_frame
 
-        _oes_p = -> * i_a, & ev_p do
+        _p = -> * i_a, & ev_p do
           @CLI.handle_ACS_emission_ i_a, & ev_p  # (hi.) unreliable
         end
 
         fr = modality_frame.lookup_and_attach_frame__(
           @_upstream.head_as_is,
-          set_sym, & _oes_p )
+          set_sym, & _p )
 
         if fr
           @_upstream.advance_one

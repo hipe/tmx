@@ -123,7 +123,7 @@ module Skylab::Zerk::TestSupport
 
       lib = No_Dependencies_Zerk::Subject_library_[]
 
-      _ob = Home_.lib_.basic::Module::OperatorBranch_via_Module.define do |o|
+      _fb = Home_.lib_.basic::Module::FeatureBranch_via_Module.define do |o|
         o.module = X_nodeps_dp_Plergins
         # o.sub_branch_const = :Erksherns
       end
@@ -141,7 +141,7 @@ module Skylab::Zerk::TestSupport
             _ok
           end
 
-          inj.primaries = _ob
+          inj.primaries = _fb
         end
 
         o.default_primary_symbol = :perth_olio

@@ -14,8 +14,8 @@ module Skylab::Zerk::TestSupport
       it "when no o.p, **option-looking args are still parsed as opts**" do
 
         invoke '-x'
-        expect :e, "invalid option: -x"
-        expect_result_for_failure
+        want :e, "invalid option: -x"
+        want_result_for_failure
       end
 
       shared_subject :client_class_ do

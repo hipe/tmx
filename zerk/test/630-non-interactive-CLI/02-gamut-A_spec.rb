@@ -118,7 +118,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails with specific exitstatus" do
-        expect_exitstatus_for :component_rejected_request
+        want_exitstatus_for :component_rejected_request
       end
 
       it "treats operation name as verb and message as predicate" do
@@ -139,7 +139,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for :_parse_error_
+        want_exitstatus_for :_parse_error_
       end
 
       it "whines" do
@@ -158,7 +158,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for :missing_required_parameters
+        want_exitstatus_for :missing_required_parameters
       end
 
       it "whines about missing required argument (knows it is an argument)" do

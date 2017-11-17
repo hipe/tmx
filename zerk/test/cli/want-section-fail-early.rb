@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class CLI::Expect_Section_Fail_Early
+  class CLI::Want_Section_Fail_Early
 
     # the first of four similar facilities, this is :[#054.1] of #[#054]
 
@@ -55,7 +55,7 @@ module Skylab::Zerk::TestSupport
         @_expectations = []
       end
 
-      def expect_section header_s, & p
+      def want_section header_s, & p
         @_expectations.push SectionExpectation___.new p, header_s ; nil
       end
 
@@ -306,8 +306,8 @@ module Skylab::Zerk::TestSupport
         Magnetics__[]::CommonItemsSection_via_LineStream[ _st ]
       end
 
-      def expect_exactly_one_line
-        expect_number_of_lines 1
+      def want_exactly_one_line
+        want_number_of_lines 1
         _first_line
       end
 
@@ -315,11 +315,11 @@ module Skylab::Zerk::TestSupport
         @emissions.fetch( 0 ).string
       end
 
-      def expect_number_of_lines d
-        expect_range_of_lines d..d
+      def want_number_of_lines d
+        want_range_of_lines d..d
       end
 
-      def expect_range_of_lines r
+      def want_range_of_lines r
         d = number_of_lines
         if r.include? d
           true
@@ -1167,7 +1167,7 @@ module Skylab::Zerk::TestSupport
     end
 
     Magnetics__ = -> do
-      CLI::Expect_Section_Magnetics
+      CLI::Want_Section_Magnetics
     end
 
     EMPTY_P_ = Home_::EMPTY_P_

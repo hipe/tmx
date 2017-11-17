@@ -18,7 +18,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "no events" do
-        expect_no_emissions
+        want_no_emissions
       end
 
       it "ok" do
@@ -62,7 +62,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "emits nothing" do
-        expect_no_emissions
+        want_no_emissions
       end
 
       it "result is a qk about the component" do

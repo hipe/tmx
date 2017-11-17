@@ -4,11 +4,11 @@ module Skylab::Zerk
 
   Buttonesque_Interpretation_Adapter_ = -> s, ada do
 
-    oes_p = ada.UI_event_handler
+    p = ada.UI_event_handler
 
     _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol s, :argument  # ..
 
-    _ = Home_.lib_.brazen::Magnetics::Item_via_OperatorBranch::FYZZY.call_by do |o|
+    _ = Home_.lib_.brazen::Magnetics::Item_via_FeatureBranch::FYZZY.call_by do |o|
 
       # -- setup
 
@@ -43,7 +43,7 @@ module Skylab::Zerk
         # the result from the callback here is false on error (nowadays
         # we treat it as `UNRELIABLE_`)
 
-        x = oes_p[ * i_a, & ev_p ]
+        x = p[ * i_a, & ev_p ]
 
         if :error == i_a.first  # then result is
           :_unreliable_ == x or self._SANITY

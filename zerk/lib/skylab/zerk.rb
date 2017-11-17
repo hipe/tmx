@@ -118,7 +118,7 @@ module Skylab::Zerk  # intro in [#001] README
       Home_.lib_.basic::Function.const_get c, false
     end
 
-    lazily :ModelCentricOperatorBranch do |c|
+    lazily :ModelCentricFeatureBranch do |c|
       Home_.lib_.plugin.const_get c, false
     end
 

@@ -29,11 +29,11 @@ module Skylab::Zerk
         _qk = remove_instance_variable :@__qk
         _rw = @_event_loop.penultimate_frame.reader_writer
 
-        p = Arc_::Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch.call _qk, _rw
+        p = Arc_::Magnetics::WriteComponent_via_QualifiedComponent_and_FeatureBranch.call _qk, _rw
 
           # (we could pass a block for building a linked list of context)
 
-        @_model_oes_p.call :info, :set_leaf_component do
+        @_model_p.call :info, :set_leaf_component do
 
           # we almost could do without this message ('set foo to "BAR"')
           # but for now we think it's good to have the feedback. and #grease
@@ -54,10 +54,10 @@ module Skylab::Zerk
       def __via_stream
 
         @_event_loop = @_.event_loop
-        @_model_oes_p = @_.model_emission_handler__
+        @_model_p = @_.model_emission_handler__
 
         _pp = -> _ do
-          @_model_oes_p
+          @_model_p
         end
 
         _ACS = @_event_loop.penultimate_frame.ACS

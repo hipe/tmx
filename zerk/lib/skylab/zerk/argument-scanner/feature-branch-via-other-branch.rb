@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_OtherBranch  # :[#051.D].
+    class FeatureBranch_via_OtherBranch  # :[#051.D].
 
       # #[#051] - experimentally for applying a mutation "mapping" over
       # another branch (for now only for subtraction) (abstracted from other)

@@ -205,7 +205,7 @@ module Skylab::Zerk
         def initialize argv, op, oi, client, op_lib, & pp
           @_argv = argv
           @client = client
-          @__oes_pp = pp
+          @__listenerp = pp
           @__oi = oi
           @__op = op
           @__op_lib = op_lib
@@ -293,7 +293,7 @@ module Skylab::Zerk
 
         def ___receive qk  # (thoughts on availability.. #"c4")
 
-          ok = Receive_ARGV_value_.new( qk, @__oi, @client, :_TEMP_VIA_OPTS_, & @__oes_pp ).execute
+          ok = Receive_ARGV_value_.new( qk, @__oi, @client, :_TEMP_VIA_OPTS_, & @__listenerp ).execute
 
           if ! ok
             # (because of the way o.p is, we can't elegantly signal a stop)

@@ -31,7 +31,7 @@
 
   - code note: local abbreviations [#here.H]
 
-  - the multi-mode argument scanner - a proper introduction [#here.SUNSETTING.d1]
+  - the dig scanner - a proper introduction [#here.SUNSETTING.d1]
   - comments from the original construction site [#here.SUNSETTING.d2]
   - all about parsing added primaries [#here.SUNSETTING.d3]
   - on the interface of the subject "facilitator" performer [#here.SUNSETTING.d4]
@@ -559,7 +559,7 @@ and so on, possibly for { primary | operator | field } { match | found }
 
 
 
-## "the multi-mode argument scanner" :[#here.SUNSETTING.d1]
+## "the dig scanner" :[#here.SUNSETTING.d1]
 
 the "flagship" and more complicated of the two argument scanner
 implementations, this is a compound scanner made up of up to 3
@@ -661,7 +661,7 @@ CLI you can assume all elements of ARGV are strings).
 
 TL;DR: strange, session-heavy inteface for reasons
 
-given the particular argument scanner's head and a "operator branch",
+given the particular argument scanner's head and a "feature branch",
 the (two) various argument scanner implementations probably solve
 for a formal primary in more or less the same way from some certain
 high level. and regardless, in cases of failure they should express
@@ -755,8 +755,6 @@ this is not a item."
 
 
 ## document-meta
-
-  - #pending-rename: from "the philosophy of X" to "the X architecture" maybe
 
   - #tombstone-A.1: during 2nd wave:
     - got rid of absurd justification of weird scanner advancing rules around default primaries

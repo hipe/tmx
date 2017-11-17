@@ -176,9 +176,9 @@ module Skylab::Zerk
 
       def __knownness_via_non_customized_operation_dependency
 
-        _oes_p = @_procure_bound_call.on_unavailable_kn_.value
+        _p = @_procure_bound_call.on_unavailable_kn_.value
 
-        ok_x = @_bc.receiver.send @_bc.method_name, * @_bc.args, & _oes_p
+        ok_x = @_bc.receiver.send @_bc.method_name, * @_bc.args, & _p
         if ok_x
 
           if @_procure_bound_call.did_emit_

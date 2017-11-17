@@ -93,8 +93,8 @@ module Skylab::Zerk::TestSupport
         _sym
       end
 
-      def operator_branch
-        @___ob ||= Home_::ArgumentScanner::OperatorBranch_via_Hash[ self.class::PRIMARIES ]
+      def feature_branch
+        @___fb ||= Home_::ArgumentScanner::FeatureBranch_via_Hash[ self.class::PRIMARIES ]
       end
     end
 

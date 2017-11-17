@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - multi mode argument scanner - subtract primaries" do
+  describe "[ze] niCLI - dig scanner - subtract primaries" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -156,7 +156,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def subject_module_
-      Home_::NonInteractiveCLI::MultiModeArgumentScanner
+      Home_::NonInteractiveCLI::DigScanner
     end
   end
 end

@@ -49,7 +49,7 @@ module Skylab::Zerk::TestSupport
           [ 'donut', 2.78 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| coffee | 0.7223 | 7.23 |'
           y << '| donut  | 0.2777 | 2.78 |'
         end
@@ -64,7 +64,7 @@ module Skylab::Zerk::TestSupport
           [ 'header x' ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| coffee   | 1.0 | 7.23 |'
           y << '| header x |     |      |'
         end
@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
           [ 'header x' ],  # (assumes #here page_size of 2)
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| coffee | 0.7223 | 7.23 |'
           y << '| donut  | 0.2777 | 2.78 |'
           y << '| header x |        |      |'
@@ -122,7 +122,7 @@ module Skylab::Zerk::TestSupport
           [ 1 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| 0.8 |'
           y << '| 0.2 |'
         end
@@ -160,7 +160,7 @@ module Skylab::Zerk::TestSupport
           [ 1 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| % 80.00 |'
           y << '| % 20.00 |'
         end

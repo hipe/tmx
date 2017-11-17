@@ -134,7 +134,7 @@ module Skylab::Zerk
       _asc = lt.node_reference.association
       _rw = @top_frame.reader_writer
 
-      Arc_::Magnetics::TouchComponent_via_Association_and_OperatorBranch[ _asc, _rw ].value
+      Arc_::Magnetics::TouchComponent_via_Association_and_FeatureBranch[ _asc, _rw ].value
         # result is the ACS itself
     end
 

@@ -18,7 +18,7 @@ module Skylab::Zerk::TestSupport
           [ 'cc',  33],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "( a  ;    1 )"
           y << "( bbb; 2222 )"
           y << "( cc ;   33 )"
@@ -32,7 +32,7 @@ module Skylab::Zerk::TestSupport
           [ 'bbb', -2222 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "( a  ;     1 )"
           y << "( bbb; -2222 )"
         end
@@ -46,7 +46,7 @@ module Skylab::Zerk::TestSupport
           [ 'cc',  33.0 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "( a  ;   1.11 )"
           y << "( bbb; 222.2  )"
           y << "( cc ;  33.0  )"
@@ -60,7 +60,7 @@ module Skylab::Zerk::TestSupport
           [ 'bbb', -222.2 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "( a  ;    1.11 )"
           y << "( bbb; -222.2  )"
         end
@@ -74,7 +74,7 @@ module Skylab::Zerk::TestSupport
           [ 56.789 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "(  1.23  )"
           y << "(  4     )"
           y << "( 56.789 )"
@@ -88,7 +88,7 @@ module Skylab::Zerk::TestSupport
           [ false ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "(  true )"
           y << "( false )"
         end
@@ -109,7 +109,7 @@ module Skylab::Zerk::TestSupport
             [ true ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y <<  '( wolulu          )'
           y <<  '(                 )'
           y <<  '(             123 )'
@@ -128,7 +128,7 @@ module Skylab::Zerk::TestSupport
             [ 45.6, 'hey' ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y <<  '(  0.123;  4.56 )'
           y <<  '( hi    ; 78.9  )'
           y <<  '( 45.6  ; hey   )'
@@ -143,7 +143,7 @@ module Skylab::Zerk::TestSupport
             [ 'bo', nil ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y <<  '( foo; -4567 )'
           y <<  '(    ;    89 )'
           y <<  '( bo ;       )'
@@ -163,7 +163,7 @@ module Skylab::Zerk::TestSupport
           [ 1234.567891, 0 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '  -1.1122 blah '
           y << '   1       2   '
           y << '  34.5    56   '
@@ -181,7 +181,7 @@ module Skylab::Zerk::TestSupport
           [ 1,    1,         'e',    0 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '123  123   1233  3.1415'
           y << 'j   meeper eff   3.14  '
           y << ' 12    1.2 ef   23.1415'

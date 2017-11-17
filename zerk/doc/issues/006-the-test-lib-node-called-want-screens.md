@@ -1,11 +1,11 @@
-# the test library node called "expect screens"
+# the test library node called "want screens"
 
 ## objective & scope synopsis
 
-  • is a reconception of "expect interactive"
+  • is a reconception of "want interactive"
     * seeks to be a replacement for it (details below)
 
-  • is intended *not* to be used for anything ther than zerk interfaces
+  • is intended *not* to be used for anything other than zerk interfaces
 
   • uses the "dangerous memoize" pattern
 
@@ -19,7 +19,7 @@ applications as produced by "zerk". the problem is exactly like the problem
 of testing interactivity in a web browser (although much simpler) and
 our effort at a solution is inspired by the efforts in that space.
 
-our previous solution before this was "expect interactive" which had
+our previous solution before this was "want interactive" which had
 significant (show-stopping) emergent shortcomings as a byproduct of its
 intrinsic design traits:
 

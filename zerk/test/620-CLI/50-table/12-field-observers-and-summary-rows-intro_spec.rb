@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
 
       it "here is the longhand form of making a \"total\" cel (summary row)" do
 
-        _expect_this_same_table_from_this_same_design_and_input
+        _want_this_same_table_from_this_same_design_and_input
       end
 
       shared_subject :design_ish_ do
@@ -48,7 +48,7 @@ module Skylab::Zerk::TestSupport
 
       it "..are available through the `do_this` modifier. (here's SumTheNumerics)" do
 
-        _expect_this_same_table_from_this_same_design_and_input
+        _want_this_same_table_from_this_same_design_and_input
       end
 
       shared_subject :design_ish_ do
@@ -82,7 +82,7 @@ module Skylab::Zerk::TestSupport
           [ nil ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "| A        |"
           y << "|      3   |"
           y << "| B        |"
@@ -107,7 +107,7 @@ module Skylab::Zerk::TestSupport
           [ 6 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << "|      3 |"
           y << "|      6 |"
           y << "| (9, 0) |"
@@ -119,14 +119,14 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    def _expect_this_same_table_from_this_same_design_and_input
+    def _want_this_same_table_from_this_same_design_and_input
 
       _matr = [
         [ 'coffee', 7.23 ],
         [ 'donut', 2.78 ],
       ]
 
-      against_matrix_expect_lines_ _matr do |y|
+      against_matrix_want_lines_ _matr do |y|
         y << '| coffee    |  7.23 |'
         y << '| donut     |  2.78 |'
         y << '| (total)   | 10.01 |'

@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI_expect_section_coarse_parse
+    use :CLI_want_section_coarse_parse
 
     context "help screen" do
 
@@ -36,7 +36,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for :missing_required_parameters
+        want_exitstatus_for :missing_required_parameters
       end
 
       it "explains" do
@@ -54,7 +54,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for :component_rejected_request
+        want_exitstatus_for :component_rejected_request
       end
 
       it "says elaborate thing (language a bit awkward per model)" do

@@ -63,7 +63,7 @@ module Skylab::Zerk::TestSupport
 
       _exp_st = Basic_[]::String::LineStream_via_String[ big_str ]
 
-      TestSupport_::Expect_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
+      TestSupport_::Want_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
       NIL
     end
 

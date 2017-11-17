@@ -68,7 +68,7 @@ module Skylab::Zerk::TestSupport
             sym == :primary_parse_error || sym == :parse_error || fail  # for now meh
             _expag = self.expression_agent
             _lines = em.express_into_under [], _expag
-            self.expect_that_lines_express_appropriately _lines
+            self.want_that_lines_express_appropriately _lines
           end
 
           o.add_test :after_not_parsing_the_primary_the_scanner_is_not_empty do
@@ -77,7 +77,7 @@ module Skylab::Zerk::TestSupport
 
           o.add_sequential_memoization :state_0 do
 
-            log = Common_.test_support::Expect_Emission::Log.for self
+            log = Common_.test_support::Want_Emission::Log.for self
             _scn = build_scanner( & log.handle_event_selectively )
             [ _scn, log ]
           end

@@ -32,32 +32,32 @@ module Skylab::Zerk::TestSupport
 
     it "no-styled string - stream with one item as-is" do
       against_string_ "foo"
-      expect_ "foo"
+      want_ "foo"
     end
 
     it "even if the string has what LOOKS like an excape sequence but isn't" do
       same = "foo\e[32;mbar"
       against_string_ same
-      expect_ same
+      want_ same
     end
 
     it "first money variation A" do
       against_string_ "\e[32;1mfoo"
-      expect_ EMPTY_S_ do |y|
+      want_ EMPTY_S_ do |y|
         y << [ [:green, :strong], "foo" ]
       end
     end
 
     it "first money variation B" do
       against_string_ "hi\e[32;1mfoo"
-      expect_ "hi" do |y|
+      want_ "hi" do |y|
         y << [ [:green, :strong], "foo" ]
       end
     end
 
     it "typical" do
       against_string_ "how \e[32;1mARE\e[0m you?"
-      expect_ "how " do |y|
+      want_ "how " do |y|
         y << [ [:green, :strong], "ARE" ]
         y << [ [:no_style], " you?" ]
       end
@@ -67,7 +67,7 @@ module Skylab::Zerk::TestSupport
 
       against_string_ "hello \e[32;1mTHERE\e[0m"
 
-      expect_ "hello " do |y|
+      want_ "hello " do |y|
         y << [ [:green, :strong], "THERE" ]
         y << [ [:no_style], EMPTY_S_ ]
       end
@@ -77,7 +77,7 @@ module Skylab::Zerk::TestSupport
       @STRING = s
     end
 
-    def expect_ head_s
+    def want_ head_s
 
       st = flush_to_subject_result_
       s = st.gets

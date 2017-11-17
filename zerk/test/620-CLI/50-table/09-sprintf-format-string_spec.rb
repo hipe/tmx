@@ -33,7 +33,7 @@ module Skylab::Zerk::TestSupport
           [ 'yyy', -1.23456 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| xx  | wee:  1.23 |'
           y << '| yyy | wee: -1.23 |'
         end
@@ -47,7 +47,7 @@ module Skylab::Zerk::TestSupport
           [ 'zz', '(total: xxxxx)' ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| xx  |     wee:  1.23 |'
           y << '| yyy |     wee: -1.23 |'
           y << '| zz  | (total: xxxxx) |'
@@ -63,7 +63,7 @@ module Skylab::Zerk::TestSupport
           [ 'too big', -12345.6 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| ok      | wee:  1.23 |'
           y << '| too big | wee: -12345.60 |'  # NOTE broken layout - column too wide
         end
@@ -78,7 +78,7 @@ module Skylab::Zerk::TestSupport
           [ 'zz2', 0.0 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
           y << '| xx  | wee:  1.23 |'
           y << '| yyy | wee: -1.23 |'
           y << '| zz  | wee:  0.00 |'
@@ -107,7 +107,7 @@ module Skylab::Zerk::TestSupport
           [ 'zero as float', 0.0 ],
         ]
 
-        against_matrix_expect_lines_ _matr do |y|
+        against_matrix_want_lines_ _matr do |y|
 
           y << '| blunt header 1   | blunt header 2 |'
           y << '| integer          |           3    |'

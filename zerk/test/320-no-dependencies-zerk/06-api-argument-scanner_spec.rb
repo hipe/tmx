@@ -56,7 +56,7 @@ module Skylab::Zerk::TestSupport
 
       subcanon.write_definitions_into self
 
-      def expect_that_lines_express_appropriately y
+      def want_that_lines_express_appropriately y
         y == [ "does not look like primary: :_not_a_primary_" ] || fail
       end
 

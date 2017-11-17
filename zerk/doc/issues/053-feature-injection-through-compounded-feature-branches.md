@@ -1,4 +1,4 @@
-# feature injection through compounded operator branches :[#053]
+# feature injection through compounded feature branches :[#053]
 
 
 ## brief statement of the problem
@@ -61,7 +61,7 @@ that will be complicit in the merge..
 
 ## hash collisions between branches :#note-1
 
-what if two or more of the operator branches share the same key for
+what if two or more of the feature branches share the same key for
 their branch items?
 
 there used to be define-time collision detection (tacitly) between

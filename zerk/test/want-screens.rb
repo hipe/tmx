@@ -1,9 +1,9 @@
 module Skylab::Zerk::TestSupport
 
-  module Expect_Screens  # objective & scope at [#006]
+  module Want_Screens  # objective & scope at [#006]
 
     # (unofficially this node is sometimes associated with
-    # the name/prefix "iCLI" as well as "expect_screens")
+    # the name/prefix "iCLI" as well as "want_screens")
 
     PUBLIC = true  # [sa]
 
@@ -54,14 +54,14 @@ module Skylab::Zerk::TestSupport
 
         cli = Home_::InteractiveCLI.begin
 
-        cli.root_ACS_by do  # ignore oes_p
-          build_root_ACS_for_expect_screens
+        cli.root_ACS_by do  # ignore p
+          build_root_ACS_for_want_screens
         end
 
         cli.to_classesque
       end
 
-      def build_root_ACS_for_expect_screens
+      def build_root_ACS_for_want_screens
 
         _ = subject_root_ACS_class
         _.new_cold_root_ACS_for_iCLI_test  # #cold-model
@@ -259,7 +259,7 @@ module Skylab::Zerk::TestSupport
 
         cli = _CLI_class.new EMPTY_A_, fake.sin, fake.sout, fake.serr, PN_S_A___
 
-        prepare_CLI_for_expect_screens(
+        prepare_CLI_for_want_screens(
           cli, sct.__filesystem_conduit, sct.__system_conduit )
 
         if muta_p
@@ -289,7 +289,7 @@ module Skylab::Zerk::TestSupport
         fake.flush_to_state
       end
 
-      def prepare_CLI_for_expect_screens cli, fc, sc
+      def prepare_CLI_for_want_screens cli, fc, sc
 
         if fc
           cli.filesystem_conduit = fc

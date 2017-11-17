@@ -31,7 +31,7 @@ module Skylab::Zerk::TestSupport
       given do
         args_for_API :chimmy_chonga
         args_for_CLI '-chimmy-chonga'
-        expect_failure
+        want_failure
       end
 
       it 'fails in API' do
@@ -81,7 +81,7 @@ module Skylab::Zerk::TestSupport
 
       given do
         args_for_API :chimmy_chonga, nil
-        expect_failure
+        want_failure
       end
 
       it 'fails for API' do
@@ -129,7 +129,7 @@ module Skylab::Zerk::TestSupport
       given do
         args_for_API :chimmy_chonga, 'fonsi'
         args_for_CLI '-chimmy-chonga', 'cardi'
-        expect_failure
+        want_failure
       end
 
       it 'fails for API' do
@@ -160,7 +160,7 @@ module Skylab::Zerk::TestSupport
       given do
         args_for_API :chimmy_chonga, 'fonsi'
         args_for_CLI '-chimmy-chonga', 'cardi'
-        expect_failure
+        want_failure
       end
 
       it 'fails for API' do
@@ -194,7 +194,7 @@ module Skylab::Zerk::TestSupport
       given do
         args_for_API :human_age, '1'
         args_for_CLI '-human-age', 'one'
-        expect_failure
+        want_failure
       end
 
       it 'fails for API' do
@@ -217,7 +217,7 @@ module Skylab::Zerk::TestSupport
       given do
         args_for_API :human_age, 0
         args_for_CLI '-human-age', '0'
-        expect_failure
+        want_failure
       end
 
       it 'fails for API' do

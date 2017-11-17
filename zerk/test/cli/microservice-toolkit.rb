@@ -23,7 +23,7 @@ module Skylab::Zerk::TestSupport
         s = __appropriate_action_slug
         @appropriate_action_slug_ = s
         argv.unshift s
-        using_expect_stdout_stderr_invoke_via_argv argv
+        using_want_stdout_stderr_invoke_via_argv argv
       end
     end
 
@@ -54,40 +54,40 @@ module Skylab::Zerk::TestSupport
 
     def _same * x_a, argv
 
-      using_expect_stdout_stderr_invoke_via_argv argv
+      using_want_stdout_stderr_invoke_via_argv argv
 
-      _state = flush_frozen_state_from_expect_stdout_stderr
+      _state = flush_frozen_state_from_want_stdout_stderr
 
       x_a.push :state, _state, :stream, :e
 
-      _cls = TS_::CLI::Expect_Section_Fail_Early::Help_Screen_State
+      _cls = TS_::CLI::Want_Section_Fail_Early::Help_Screen_State
 
       _cls.via_iambic x_a
     end
 
-    def expect_section_ k, exp  # assume `state_`
+    def want_section_ k, exp  # assume `state_`
 
       _t = state_.lookup k
       _act = _t.to_string :unstyled
       _act.should eql exp
     end
 
-    def expect_common_failure_
+    def want_common_failure_
 
-      expect_this_usage_
-      expect_specific_invite_line_
-      expect_fail
+      want_this_usage_
+      want_specific_invite_line_
+      want_fail
     end
 
-    def expect_specific_invite_line_
+    def want_specific_invite_line_
 
-      expect :styled, :e, /\Ause 'zeepo #{ @appropriate_action_slug_ } -h'#{
+      want :styled, :e, /\Ause 'zeepo #{ @appropriate_action_slug_ } -h'#{
         } for help\z/
     end
 
-    def expect_succeeded_with_ s
-      expect :o, s
-      expect_succeed
+    def want_succeeded_with_ s
+      want :o, s
+      want_succeed
     end
 
     def subject_class_
@@ -101,7 +101,7 @@ module Skylab::Zerk::TestSupport
     s = 'zeepo'.freeze
     s_a = [ s ].freeze
 
-    define_method :get_invocation_strings_for_expect_stdout_stderr do
+    define_method :get_invocation_strings_for_want_stdout_stderr do
       s_a
     end
   end
