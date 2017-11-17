@@ -18,9 +18,9 @@ module Skylab::Cull
         @name_field_sym = md.post_match.intern
       end
 
-      def [] estream, & oes_p
+      def [] estream, & p
 
-        @oes_p = oes_p  # meh
+        @listener = p  # meh
 
         h = {}  # feature_occurrence_entity_name_symbol_a_h
 

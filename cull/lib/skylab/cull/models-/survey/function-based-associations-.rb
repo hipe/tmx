@@ -8,9 +8,9 @@ module Skylab::Cull
         private :new
       end  # >>
 
-      def initialize survey, & oes_p
+      def initialize survey, & p
         @survey = survey
-        @_emit = oes_p
+        @_emit = p
       end
 
       def add arg, box

@@ -8,14 +8,14 @@ module Skylab::Cull
 
         class << self
 
-          def via_path path, & oes_p
-            new path, & oes_p
+          def via_path path, & p
+            new path, & p
           end
         end
 
-        def initialize path, & oes_p
+        def initialize path, & p
           @path = path
-          @_emit = oes_p
+          @_emit = p
         end
 
         def to_persistable_primitive_name_value_pair_stream_recursive_ survey

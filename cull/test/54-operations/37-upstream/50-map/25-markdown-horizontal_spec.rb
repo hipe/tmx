@@ -5,13 +5,13 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - upstream map (markdown (horizontal)", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "money" do  # #lends-coverage to #[#fi-008.6]
 
       map_against_file :horizontal_01_first_my_md
-      expect_no_events
+      want_no_events
       st = @result
 
       e1 = st.gets

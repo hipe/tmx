@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Mutator
 
-      Items__::Remove_empty_actual_properties = -> ent, & oes_p do
+      Items__::Remove_empty_actual_properties = -> ent, & p do
 
         st = ent.to_actual_property_stream
 

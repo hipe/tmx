@@ -8,13 +8,13 @@ module Skylab::Cull
         private :new
       end  # >>
 
-      def initialize survey, & oes_p
+      def initialize survey, & p
         Home._REFACTOR__to_take_listener_as_arg__
 
         @call_a = nil
 
         @survey = survey
-        @_emit = oes_p
+        @_emit = p
 
         cfg = survey.config_for_read_
         if cfg

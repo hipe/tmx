@@ -173,8 +173,8 @@ module Skylab::Cull
       def __find_association_for_this_section_name
 
         @_current_association_symbol = @_current_section.external_normal_name_symbol
-        _ob = _associations_operator_branch
-        item = _ob.lookup_softly @_current_association_symbol
+        _fb = _associations_feature_branch
+        item = _fb.lookup_softly @_current_association_symbol
         if item
           # (shed the intricacies of the remote library now by exploding the item)
           @_current_association_module = item.value
@@ -193,8 +193,8 @@ module Skylab::Cull
         _fail
       end
 
-      def _associations_operator_branch
-        @associations_module.boxxy_module_as_operator_branch
+      def _associations_feature_branch
+        @associations_module.boxxy_module_as_feature_branch
       end
 
       # --

@@ -6,12 +6,12 @@ module Skylab::Cull
 
     class << self
 
-      def unmarshal s, & oes_p
-        Here_::Unmarshal__.new( & oes_p ).unmarshal s
+      def unmarshal s, & p
+        Here_::Unmarshal__.new( & p ).unmarshal s
       end
 
-      def unmarshal_via_string_and_module s, mod, & oes_p
-        Here_::Unmarshal__.new( & oes_p ).unmarshal_via_call_expression_and_module s, mod
+      def unmarshal_via_string_and_module s, mod, & p
+        Here_::Unmarshal__.new( & p ).unmarshal_via_call_expression_and_module s, mod
       end
     end  # >>
 
@@ -64,11 +64,11 @@ module Skylab::Cull
 
     RX___ = /[\(\)\[\],"]/
 
-    def [] ent, & oes_p
-      @p[ ent, & oes_p ]
+    def [] ent, & p
+      @p[ ent, & p ]
     end
 
-    def __first_call ent, & oes_p
+    def __first_call ent, & p
 
       p = @composition.defined_function
       a = @composition.args
@@ -79,7 +79,7 @@ module Skylab::Cull
         @p = p
       end
 
-      @p[ ent, & oes_p ]
+      @p[ ent, & p ]
     end
 
     Here_ = self

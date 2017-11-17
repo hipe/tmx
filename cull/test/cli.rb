@@ -3,10 +3,7 @@ module Skylab::Cull::TestSupport
   module CLI
 
     def self.[] tcc
-
-      tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-      tcc.send :define_method, :expect, tcc.instance_method( :expect )  # #rspec-annoyance
-
+      tcc.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
       tcc.include self
     end
 
@@ -24,14 +21,14 @@ module Skylab::Cull::TestSupport
       g.add_stream :o
       g.add_stream :e
 
-      @IO_spy_group_for_expect_stdout_stderr = g
+      @IO_spy_group_for_want_stdout_stderr = g
 
       @exitstatus = Home_::CLI.new( argv, nil, * g.values_at( :o, :e ), [ 'kul' ] ).execute
 
       nil
     end
 
-    def expect_exitstatus_for_general_failure
+    def want_exitstatus_for_general_failure
 
       @exitstatus.should eql(
         Home_::Brazen_::API.exit_statii.fetch :generic_error )

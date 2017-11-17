@@ -5,13 +5,13 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - mutator actions", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "lists" do
 
       call_API :mutator, :list
-      expect_no_events
+      want_no_events
 
       st = @result
       x = st.gets

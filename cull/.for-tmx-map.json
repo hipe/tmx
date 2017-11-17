@@ -1,6 +1,6 @@
 {
-  "after": "code_metrics",
-  "category": "bigger",
+  "after": "css_convert",
+  "category": "aspirational experiments",
   "framework": "[br]",
   "is potentially interesting application": true,
   "sigil": "cu"

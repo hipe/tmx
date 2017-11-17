@@ -36,20 +36,20 @@ module Skylab::Cull::TestSupport
 
     # -- assertion support (newer)
 
-    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
-      TestSupport_::Expect_Line::Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
 
     # ~( during legacy use
-    def black_and_white_expression_agent_for_expect_emission
+    def black_and_white_expression_agent_for_want_emission
       _this_expag_TS
     end
 
-    def expression_agent_for_expect_emission
+    def expression_agent_for_want_emission
       _this_expag_TS
     end
     # ~)
@@ -110,23 +110,23 @@ module Skylab::Cull::TestSupport
 
     # ~ retrofit
 
-    def expect_not_OK_event_ sym
+    def want_not_OK_event_ sym
 
-      em = expect_not_OK_event
+      em = want_not_OK_event
       em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
       em
     end
 
-    def expect_event_ sym
+    def want_event_ sym
 
-      em = expect_event
+      em = want_event
       em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
       em
     end
 
-    def expect_OK_event_ sym
+    def want_OK_event_ sym
 
-      em = expect_OK_event
+      em = want_OK_event
       em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
       em
     end
@@ -160,8 +160,8 @@ module Skylab::Cull::TestSupport
 
     # tcc = test context class
 
-    Expect_Event = -> tcc do
-      Common___.test_support::Expect_Emission[ tcc ]
+    Want_Event = -> tcc do
+      Common___.test_support::Want_Emission[ tcc ]
     end
 
     Memoizer_Methods = -> tcc do

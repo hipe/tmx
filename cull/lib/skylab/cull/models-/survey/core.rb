@@ -95,7 +95,7 @@ module Skylab::Cull
 
     module Magnetics_  # (legacy placement)
 
-      SurveyPath_via_Path = -> path, & oes_p do
+      SurveyPath_via_Path = -> path, & p do
 
         arg = Common_::QualifiedKnownKnown.via_value_and_symbol path, :path
 
@@ -107,7 +107,7 @@ module Skylab::Cull
           :ftype, _FS::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
           :prop, arg.association,
-          & oes_p )
+          & p )
 
         if surrounding_path
           ::File.join surrounding_path, FILENAME_
@@ -338,12 +338,12 @@ module Skylab::Cull
         end
       end
 
-      def _associations_operator_branch_
-        Here_::Associations_.boxxy_module_as_operator_branch
+      def _associations_feature_branch_
+        Here_::Associations_.boxxy_module_as_feature_branch
       end
 
-      def _models_operator_branch_  # :#spot2.1
-        _models_module_.boxxy_module_as_operator_branch
+      def _models_feature_branch_  # :#spot2.1
+        _models_module_.boxxy_module_as_feature_branch
       end
 
       def _THESE_ASSOCIATIONS_
@@ -362,7 +362,7 @@ module Skylab::Cull
     module Associations_
 
       Autoloader_[ self, :boxxy ]
-      # (this is the frontier use-case [#co-030.5] boxxy as operator branch)
+      # (this is the frontier use-case [#co-030.5] boxxy as feature branch)
 
       same = -> c do
         Here_.const_get :FunctionBasedAssociations_, false

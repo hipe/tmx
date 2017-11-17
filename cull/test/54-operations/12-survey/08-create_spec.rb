@@ -6,7 +6,7 @@ module Skylab::Cull::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "loads" do
@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
 
       it "modality-specific styled message comes through" do
 
-        expect_these_lines_in_array_ _tuple.first do |y|
+        want_these_lines_in_array_ _tuple.first do |y|
 
           y << "the 'ping' action of cull says *hello*!"
         end
@@ -40,10 +40,10 @@ module Skylab::Cull::TestSupport
           & _p )
 
         a = []
-        expect_emission :info, :expression, :ping do |y|
+        want_emission :info, :expression, :ping do |y|
           a.push y
         end
-        expect_no_more_events
+        want_no_more_events
 
         a.push x
       end
@@ -52,8 +52,8 @@ module Skylab::Cull::TestSupport
 # (2/N)
     it "ping the model node" do
       call_API :survey, :ping
-      expect_OK_event :ping, 'cull says *hello*'
-      expect_no_more_events
+      want_OK_event :ping, 'cull says *hello*'
+      want_no_more_events
       @result.should eql :_hi_again_
     end
 
@@ -64,8 +64,8 @@ module Skylab::Cull::TestSupport
           * _subject_action,
           :path, _path,
         )
-      expect_not_OK_event :directory_exists
-      expect_fail
+      want_not_OK_event :directory_exists
+      want_fail
     end
 
 # (4/N)
@@ -79,8 +79,8 @@ module Skylab::Cull::TestSupport
         )
 
       em = @result
-      expect_neutral_event :creating_directory
-      expect_OK_event_ :collection_resource_committed_changes
+      want_neutral_event :creating_directory
+      want_OK_event_ :collection_resource_committed_changes
 
       em.category.should eql [ :info, :created_survey ]
 

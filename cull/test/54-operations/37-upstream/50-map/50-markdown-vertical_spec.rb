@@ -5,13 +5,13 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - upstream map (markdown (vertical)", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "files must be absolute here" do
       call_API :upstream, :map, :upstream, 'non-absolute-path'
-      expect_not_OK_event :path_must_be_absolute
-      expect_fail
+      want_not_OK_event :path_must_be_absolute
+      want_fail
     end
 
 # (2/N)
@@ -19,19 +19,19 @@ module Skylab::Cull::TestSupport
 
       markdown_map_against_file :zero_bytes
 
-      _em = expect_not_OK_event :early_end_of_stream
+      _em = want_not_OK_event :early_end_of_stream
 
       black_and_white( _em.cached_event_value ).should match(
         /\Aearly end of stream - there were no markdown tables anywhere/ )
 
-      expect_fail
+      want_fail
     end
 
 # (3/N)
     it "file with one empty line" do
       markdown_map_against_file :one_newline_only
-      expect_not_OK_event :early_end_of_stream
-      expect_fail
+      want_not_OK_event :early_end_of_stream
+      want_fail
     end
 
     def markdown_map_against_file sym
@@ -45,7 +45,7 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc
 
-      expect_no_events
+      want_no_events
 
       st = @result
 
@@ -69,12 +69,12 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc, :table_number, '0'
 
-      _em = expect_not_OK_event_ :number_too_small
+      _em = want_not_OK_event_ :number_too_small
 
       black_and_white( _em.cached_event_value ).should match(
         /\A'table-number' must be greater than or equal to 1, had 0/ )
 
-      expect_fail
+      want_fail
     end
 
 # (6/N)
@@ -82,12 +82,12 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc, :table_number, '6'
 
-      _em = expect_not_OK_event :early_end_of_stream
+      _em = want_not_OK_event :early_end_of_stream
 
       black_and_white( _em.cached_event_value ).should match(
         / - needed 6 but had only 5 markdown tables in the entirety of the\b/ )
 
-      expect_fail
+      want_fail
     end
 
 # (7/N)
@@ -95,7 +95,7 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc, :table_number, '5'
 
-      expect_no_events
+      want_no_events
 
       st = @result
       e1 = st.gets

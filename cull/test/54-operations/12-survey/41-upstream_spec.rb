@@ -6,14 +6,14 @@ module Skylab::Cull::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "a random string with no prefix - treated as path" do
       # :#cov1.1
       freshly_initted_against 'zoidberg'
-      expect_not_OK_event :path_must_be_absolute
-      expect_fail
+      want_not_OK_event :path_must_be_absolute
+      want_fail
     end
 
 # (2/N)
@@ -21,19 +21,19 @@ module Skylab::Cull::TestSupport
 
       freshly_initted_against "zoidberg:no see"
 
-      _em = expect_not_OK_event_ :unrecognized_argument
+      _em = want_not_OK_event_ :unrecognized_argument
 
       black_and_white_lines( _em.cached_event_value ).should eql(
         [ 'unrecognized prefix "zoidberg"', 'did you mean "file"?' ] )
 
-      expect_fail
+      want_fail
     end
 
 # (3/N)
     it "use the 'file' prefix but noent" do
       freshly_initted_against 'file:wazoo.json'
-      expect_not_OK_event_ :errno_enoent
-      expect_fail
+      want_not_OK_event_ :errno_enoent
+      want_fail
     end
 
     def freshly_initted_against s
@@ -55,14 +55,14 @@ module Skylab::Cull::TestSupport
         :upstream, 'file:strange-ext.beefer'
       )
 
-      _em = expect_not_OK_event :invalid_extension
+      _em = want_not_OK_event :invalid_extension
 
       s_a = black_and_white_lines _em.cached_event_value
 
       s_a.first.should eql 'unrecognized extension ".beefer"'
       s_a.last.should eql 'did you mean ".json" or ".markdown"?'
 
-      expect_no_more_events
+      want_no_more_events
     end
 
 # (5/N)
@@ -103,7 +103,7 @@ module Skylab::Cull::TestSupport
 
       it "content" do
         io = ::File.open ::File.join _tuple[-2], config_tail_
-        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+        want_these_lines_in_array_with_trailing_newlines_ io do |y|
           y << "# ohai"
           y << %r(\A\[upstream "file:[^ ]+not\.json"\]\n\z)
           y << "adapter = json"
@@ -118,11 +118,11 @@ module Skylab::Cull::TestSupport
 
         a = []
 
-        expect :info, :related_to_assignment_change, :added do |ev|
+        want :info, :related_to_assignment_change, :added do |ev|
           a.push ev
         end
 
-        _expect_common_success_finish a
+        _want_common_success_finish a
         a.push path
         a.push x
       end
@@ -147,7 +147,7 @@ module Skylab::Cull::TestSupport
         _path = _tuple[0]
         io = ::File.open ::File.join( _path, config_tail_ )
 
-        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+        want_these_lines_in_array_with_trailing_newlines_ io do |y|
 
            y << "# ohai i am some config file"  # (as it was in the beginning)
            y << %r(\A\[ upstream "file:[^ ]+not\.json" \]\n\z)
@@ -163,11 +163,11 @@ module Skylab::Cull::TestSupport
 
         a = [ path ]  # _tuple[0]
 
-        expect :info, :related_to_assignment_change, :no_change do |ev|
+        want :info, :related_to_assignment_change, :no_change do |ev|
           a.push ev  # _tuple[1]
         end
 
-        _expect_common_success_finish
+        _want_common_success_finish
         a.push x  # _tuple.last
       end
     end
@@ -184,7 +184,7 @@ module Skylab::Cull::TestSupport
 
       it "explains" do
         _actual = _tuple.first
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'the document has more than one existing "upstream" section.'
           y << "must have at most one."
         end
@@ -197,7 +197,7 @@ module Skylab::Cull::TestSupport
         x = _call_API_with_path_and_file _path, _existent_but_not_JSON_file
 
         a = []
-        expect :error, :expression, :multiple_sections_for_singleton do |y|
+        want :error, :expression, :multiple_sections_for_singleton do |y|
           a.push y
         end
 
@@ -227,7 +227,7 @@ module Skylab::Cull::TestSupport
         )
 
         a = []
-        expect :error, :expression, :no_upstream_set do |y|
+        want :error, :expression, :no_upstream_set do |y|
           a.push y
         end
         a.push x
@@ -245,7 +245,7 @@ module Skylab::Cull::TestSupport
       it "emits something talkin bout removed (in a non-document-centric-way)" do
 
         _actual = _tuple[1]
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << %r(\Aremoved upstream \(JSON file: [^ ]+\bshamonay\.file\)\z)
         end
       end
@@ -262,7 +262,7 @@ module Skylab::Cull::TestSupport
         _path = ::File.join _head, config_filename
         io = ::File.open _path
 
-        expect_these_lines_in_array_with_trailing_newlines_ io do |y|
+        want_these_lines_in_array_with_trailing_newlines_ io do |y|
           y << "# ohai i am some config file"
         end
 
@@ -283,11 +283,11 @@ module Skylab::Cull::TestSupport
           :path, path,
         )
 
-        expect :info, :expression, :removed_entity do |y|
+        want :info, :expression, :removed_entity do |y|
           a.push y  # _tuple[1]
         end
 
-        expect :info, :collection_resource_committed_changes do |ev|
+        want :info, :collection_resource_committed_changes do |ev|
           a.push ev  # _tuple[2]
         end
 
@@ -297,7 +297,7 @@ module Skylab::Cull::TestSupport
 
     # -- assert
 
-    def _expect_common_success_finish a=nil
+    def _want_common_success_finish a=nil
 
       if a
         p = -> ev do
@@ -305,9 +305,9 @@ module Skylab::Cull::TestSupport
         end
       end
 
-      expect :info, :set_upstream, & p
+      want :info, :set_upstream, & p
 
-      expect :info, :collection_resource_committed_changes, & p
+      want :info, :collection_resource_committed_changes, & p
 
       NIL
     end

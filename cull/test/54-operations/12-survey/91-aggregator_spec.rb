@@ -5,7 +5,7 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - survey - aggregators", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "add a strange name" do
@@ -14,8 +14,8 @@ module Skylab::Cull::TestSupport
         :add_aggregator, 'wiff-nabble-paws( cantankerous )',
         :path, dir( :freshly_initted )
 
-      expect_not_OK_event :uninitialized_constant
-      expect_fail
+      want_not_OK_event :uninitialized_constant
+      want_fail
     end
 
 # (2/N)
@@ -30,9 +30,9 @@ module Skylab::Cull::TestSupport
         :path, _path,
       )
 
-      expect_neutral_event :added_function_call
+      want_neutral_event :added_function_call
 
-      expect_OK_event_ :collection_resource_committed_changes
+      want_OK_event_ :collection_resource_committed_changes
 
       content_of_the_file( td ).scan( /(?<=^function = ).+/ ).should(
         eql( [
@@ -55,7 +55,7 @@ module Skylab::Cull::TestSupport
         :add_aggregator, 'unique-feat',
         :remove_aggregator, 'unique-feature'
 
-      expect_no_events
+      want_no_events
 
       st = @result
       st.gets.should eql "ruby"
@@ -76,7 +76,7 @@ module Skylab::Cull::TestSupport
         :upstream, file( :mutators_01_simple_md ),
         :table_number, 2
 
-      expect_no_events
+      want_no_events
 
       st = @result
 

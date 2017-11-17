@@ -8,14 +8,14 @@ module Skylab::Cull
 
       class << self
 
-        def via_table_number_and_path d, path, & oes_p
-          new d, path, & oes_p
+        def via_table_number_and_path d, path, & p
+          new d, path, & p
         end
       end
 
-      def initialize d=nil, path, & oes_p
+      def initialize d=nil, path, & p
         @table_number = d
-        super path, & oes_p
+        super path, & p
       end
 
       def to_descriptive_event  # (or `to_event`)

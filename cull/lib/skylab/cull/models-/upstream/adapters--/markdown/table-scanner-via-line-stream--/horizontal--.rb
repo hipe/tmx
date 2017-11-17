@@ -8,7 +8,7 @@ module Skylab::Cull
 
         class Horizontal__
 
-          def initialize ls, line_, line, & oes_p
+          def initialize ls, line_, line, & p
 
             # make it look as if we aren't already two lines into the scan:
 

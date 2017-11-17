@@ -8,7 +8,7 @@ module Skylab::Cull
 
         class Vertical__
 
-          def initialize ls, sexp, & oes_p
+          def initialize ls, sexp, & p
 
             last_pipe_index = sexp.number_of_pipes - 1
             d = 0

@@ -6,27 +6,27 @@ module Skylab::Cull::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "with a noent path" do
       against ::File.join TS_.dir_path, 'no-ent'
-      expect_not_OK_event_ :start_directory_does_not_exist
-      expect_fail
+      want_not_OK_event_ :start_directory_does_not_exist
+      want_fail
     end
 
 # (2/N)
     it "with a path that is a file" do
       against __FILE__
-      expect_not_OK_event :start_directory_is_not_directory
-      expect_fail
+      want_not_OK_event :start_directory_is_not_directory
+      want_fail
     end
 
 # (3/N)
     it "with a path that is a directory but workspace not found" do
       against TestSupport_::Fixtures.directory :empty_esque_directory
-      expect_not_OK_event :resource_not_found
-      expect_fail
+      want_not_OK_event :resource_not_found
+      want_fail
     end
 
 # (4/N)
@@ -56,7 +56,7 @@ module Skylab::Cull::TestSupport
           :path, fixture_directory_( :strange_section ),
         )
         a = []
-        expect :error, :expression, :unrecognized_section_name do |y|
+        want :error, :expression, :unrecognized_section_name do |y|
           a.push y
         end
         a.push x
@@ -91,11 +91,11 @@ module Skylab::Cull::TestSupport
         )
 
         a = []
-        expect :error, :expression, :primitive_type_error do |y|
+        want :error, :expression, :primitive_type_error do |y|
           a.push y
         end
 
-        expect :error, :expression, :unrecognized_associations do |y|
+        want :error, :expression, :unrecognized_associations do |y|
           a.push y
         end
 
@@ -112,7 +112,7 @@ module Skylab::Cull::TestSupport
       y = []
       against fixture_directory_ :upstream_foo
       scn = @result
-      expag = expression_agent_for_expect_emission_normally
+      expag = expression_agent_for_want_emission_normally
       begin
         o = scn.gets
         o || break

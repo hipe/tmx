@@ -45,13 +45,13 @@ module Skylab::Cull
     Autoloader_[ self, :boxxy ]  # because #spot2.1
   end
 
-  Models_::Ping = -> some_word, stackish, & oes_p do
+  Models_::Ping = -> some_word, stackish, & p do
 
     # (for a class-based ping, see #spot1.1)
     # this is the pioneer (and perhaps sole client) of the "stackish" view
     # above. if ever API gets a real stack this might change subtly #[#pl-008.6]
 
-    oes_p.call :info, :expression, :ping do |y|
+    p.call :info, :expression, :ping do |y|
       buffer = ::String.new "the '"
       buffer << stackish.invocation_stack_top_name_symbol.id2name
       buffer << "' action of "
@@ -175,7 +175,7 @@ module Skylab::Cull
 
   Operator_branch___ = Lazy_.call do
 
-    MTk_::ModelCentricOperatorBranch.define do |o|  # (find the implementation in [pl])
+    MTk_::ModelCentricFeatureBranch.define do |o|  # (find the implementation in [pl])
 
       # (every imaginable detail of the below is explained at [#pl-011.1])
 

@@ -5,7 +5,7 @@ module Skylab::Cull::TestSupport
   describe "[cu] operations - survey - mutator", wip: true do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
 # (1/N)
     it "add strange name" do
@@ -15,8 +15,8 @@ module Skylab::Cull::TestSupport
         :add_mutator, 'zoink',
         :path, freshly_initted_path_
 
-      expect_not_OK_event :uninitialized_constant
-      expect_fail
+      want_not_OK_event :uninitialized_constant
+      want_fail
     end
 
 # (2/N)
@@ -28,11 +28,11 @@ module Skylab::Cull::TestSupport
         :add_mutator, 'remove-emp',
         :path, td.to_path
 
-      expect_event :added_function_call
+      want_event :added_function_call
 
-      expect_event_ :collection_resource_committed_changes
+      want_event_ :collection_resource_committed_changes
 
-      expect_succeed
+      want_succeed
 
       sh = _line_shell td
 
@@ -55,7 +55,7 @@ module Skylab::Cull::TestSupport
 
         :add_mutator, 'remove-empty'
 
-      expect_no_events
+      want_no_events
 
       st = @result
       ent = st.gets
@@ -78,7 +78,7 @@ module Skylab::Cull::TestSupport
         :path, _path,
       )
 
-      expect_no_events
+      want_no_events
       st = @result
 
       st.gets.to_even_iambic.should eql(  # empty cel is removed:
@@ -98,8 +98,8 @@ module Skylab::Cull::TestSupport
         :remove_mutator, 'nope',
         :path, dir( :one_mutator )
 
-      expect_not_OK_event :uninitialized_constant
-      expect_fail
+      want_not_OK_event :uninitialized_constant
+      want_fail
 
     end
 
@@ -110,8 +110,8 @@ module Skylab::Cull::TestSupport
         :remove_mutator, "split-and-pro( sophie's chioce, true, )",
         :path, dir( :one_mutator )
 
-      expect_not_OK_event :function_call_not_found
-      expect_fail
+      want_not_OK_event :function_call_not_found
+      want_fail
 
     end
 
@@ -124,7 +124,7 @@ module Skylab::Cull::TestSupport
         :remove_mutator, 'remove-em(x,y)',
         :path, td.to_path
 
-      sh = _expect_remove_worked td
+      sh = _want_remove_worked td
 
       sh.next_line.should be_include 'empty-act( fuz bif, true, 1.3 )'
       sh.next_line.should eql "# comment 1\n"
@@ -143,7 +143,7 @@ module Skylab::Cull::TestSupport
         :remove_mutator, 'remove-em( fuz bif, true, 1.3 )',
         :path, td.to_path
 
-      sh = _expect_remove_worked td
+      sh = _want_remove_worked td
 
       sh.next_line.should be_include 'stay'
       sh.next_line.should be_include 'comment 2'
@@ -153,13 +153,13 @@ module Skylab::Cull::TestSupport
 
     end
 
-    def _expect_remove_worked td
+    def _want_remove_worked td
 
-      expect_neutral_event :removed_function_call
+      want_neutral_event :removed_function_call
 
-      expect_OK_event_ :collection_resource_committed_changes
+      want_OK_event_ :collection_resource_committed_changes
 
-      expect_succeed
+      want_succeed
 
       sh = _line_shell td
       sh.advance_to_next_rx %r(\A\[ *report *\])
@@ -167,7 +167,7 @@ module Skylab::Cull::TestSupport
     end
 
     def _line_shell td
-      TestSupport_::Expect_line.shell content_of_the_file td
+      TestSupport_::Want_line.shell content_of_the_file td
     end
   end
 end

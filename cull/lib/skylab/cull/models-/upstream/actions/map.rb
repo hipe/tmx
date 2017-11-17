@@ -6,13 +6,13 @@ module Skylab::Cull
 
       Brazen_::Modelesque.entity self,
 
-          :ad_hoc_normalizer, -> qkn, & oes_p do
+          :ad_hoc_normalizer, -> qkn, & p do
             if qkn.is_known_known
               Home_.lib_.basic::Number::Normalization.via(
                 :qualified_knownness, qkn,
                 :number_set, :integer,
                 :minimum, 1,
-                & oes_p )
+                & p )
             else
               qkn.to_knownness
             end

@@ -8,8 +8,8 @@ module Skylab::Cull
 
         class << self
 
-          def [] fh, & oes_p
-            new( fh, & oes_p ).execute
+          def [] fh, & p
+            new( fh, & p ).execute
           end
         end
 
@@ -25,7 +25,7 @@ module Skylab::Cull
           end
         end
 
-        def initialize fh, & oes_p
+        def initialize fh, & p
           @fh = fh
           @p = -> do
 

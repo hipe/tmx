@@ -10,30 +10,30 @@ module Skylab::Cull::TestSupport
 # (1/N)
     it "0   no args" do
       invoke
-      expect :styled, /\Aexpecting <action>\z/i
-      expect :styled, /\Ausage: kul <action> \[\.\.\]\z/i
-      expect_top_invite_line
-      expect_no_more_lines
-      expect_exitstatus_for_general_failure
+      want :styled, /\Aexpecting <action>\z/i
+      want :styled, /\Ausage: kul <action> \[\.\.\]\z/i
+      want_top_invite_line
+      want_no_more_lines
+      want_exitstatus_for_general_failure
     end
 
 # (2/N)
     it "1.2 strange arg" do
       invoke 'cow'
-      expect_unrecognized_action :cow
-      expect :styled, /\Aknown actions are \('ping', 'create'/
-      expect_top_invite_line
+      want_unrecognized_action :cow
+      want :styled, /\Aknown actions are \('ping', 'create'/
+      want_top_invite_line
     end
 
-    def expect_unrecognized_action sym
-      expect :e, "unrecognized action #{ sym.id2name.inspect }"
+    def want_unrecognized_action sym
+      want :e, "unrecognized action #{ sym.id2name.inspect }"
     end
 
 # (3/N)
     it "1.3 easy money" do
       invoke 'ping'
-      expect "hello from cull."
-      expect_no_more_lines
+      want "hello from cull."
+      want_no_more_lines
       @exitstatus.should eql :hello_from_cull
     end
 
@@ -46,13 +46,13 @@ module Skylab::Cull::TestSupport
 
       cli.invoke 'cull', 'ping'
 
-      cli.expect_on_stderr "hello from cull.\n"
+      cli.want_on_stderr "hello from cull.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
-    def expect_top_invite_line
-      expect :styled, /\Ause 'kul -h' for help\z/i
+    def want_top_invite_line
+      want :styled, /\Ause 'kul -h' for help\z/i
     end
   end
 end

@@ -4,8 +4,8 @@ module Skylab::Cull
 
     class Unmarshal__  # see #note-006 in [#006]
 
-      def initialize & oes_p
-        @_emit = oes_p
+      def initialize & p
+        @_emit = p
       end
 
       def unmarshal s

@@ -20,7 +20,7 @@ module Skylab::Cull
         @x = x
       end
 
-      def [] ent, & oes_p
+      def [] ent, & p
 
         prp = ent.actual_property_via_name_symbol @prp_sym
         if prp
