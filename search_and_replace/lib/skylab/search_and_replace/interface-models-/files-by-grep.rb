@@ -17,12 +17,12 @@ module Skylab::SearchAndReplace
       :for,
     )
 
-    def initialize & oes_p
+    def initialize & p
 
       @do_highlight = nil
       @egrep_pattern = nil
       @for = :paths
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def to_file_path_stream * x_a, & pp
@@ -33,7 +33,7 @@ module Skylab::SearchAndReplace
     end
 
     def execute
-      o = Home_::Magnetics_::Grep_Path_Stream_via_Parameters.new( & @_oes_p )
+      o = Home_::Magnetics_::Grep_Path_Stream_via_Parameters.new( & @_listener )
       o.grep_extended_regexp_string = @egrep_pattern
       o.for = @for
       o.ruby_regexp = @ruby_regexp
@@ -43,7 +43,7 @@ module Skylab::SearchAndReplace
     end
 
     def handle_event_selectively_for_zerk  # because [#ac-027]
-      @_oes_p
+      @_listener
     end
   end
 end

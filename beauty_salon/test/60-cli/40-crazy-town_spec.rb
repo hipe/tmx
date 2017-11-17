@@ -25,14 +25,14 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'second line invite' do
-        _expect_invite_line second_and_final_line_string
+        _want_invite_line second_and_final_line_string
       end
 
       it 'fails' do
         fails
       end
 
-      def CLI_options_for_expect_stdout_stderr
+      def CLI_options_for_want_stdout_stderr
         X_ct_use_real_filesystem
       end
     end
@@ -40,7 +40,7 @@ module Skylab::BeautySalon::TestSupport
     # (we don't cover the helpscreen because it's too big..)
     # but sign off on the above choice after #open [#050]
 
-    def _expect_invite_line actual
+    def _want_invite_line actual
       actual == "try 'chimmy crazy-town -h'\n" || fail
     end
 

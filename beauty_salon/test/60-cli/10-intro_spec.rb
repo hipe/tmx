@@ -19,15 +19,15 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'first line - splay' do
-        expect_splay_of_both_ first_line_string
+        want_splay_of_both_ first_line_string
       end
 
       it 'second line - invite to base hlep' do
-        expect_invite_to_base_help_ second_line_string
+        want_invite_to_base_help_ second_line_string
       end
 
       it 'results in failure exitstatus' do
-        expect_failure_exitstatus_
+        want_failure_exitstatus_
       end
     end
 
@@ -42,15 +42,15 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'second line - splay' do
-        expect_splay_of_operators_ second_line_string
+        want_splay_of_operators_ second_line_string
       end
 
       it 'third line - invite to base help' do
-        expect_invite_to_base_help_ third_and_final_line_string
+        want_invite_to_base_help_ third_and_final_line_string
       end
 
       it 'results in failure exitstatus' do
-        expect_failure_exitstatus_
+        want_failure_exitstatus_
       end
     end
 
@@ -65,15 +65,15 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'second line - splay' do
-        expect_splay_of_primaries_ second_line_string
+        want_splay_of_primaries_ second_line_string
       end
 
       it 'third line - invite to base help' do
-        expect_invite_to_base_help_ third_and_final_line_string
+        want_invite_to_base_help_ third_and_final_line_string
       end
 
       it 'results in failure exitstatus' do
-        expect_failure_exitstatus_
+        want_failure_exitstatus_
       end
     end
 
@@ -96,7 +96,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'exitstatus is success' do
-        expect_success_exitstatus_
+        want_success_exitstatus_
       end
     end
 
@@ -108,7 +108,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'first section - usage' do
         _ = _section :usage
-        _actual_s = _.expect_exactly_one_line
+        _actual_s = _.want_exactly_one_line
         _ = _expected_operators_string_array * ' | '
         _actual_s == "usage: chimmy { #{ _ } } [opts]\n" || fail
       end
@@ -186,15 +186,15 @@ module Skylab::BeautySalon::TestSupport
         h = {}
         parse_help_screen_fail_early_ do |o|
 
-          o.expect_section 'usage' do |sect|
+          o.want_section 'usage' do |sect|
             h[ :usage ] = sect
           end
 
-          o.expect_section 'description' do |sect|
+          o.want_section 'description' do |sect|
             h[ :description ] = sect
           end
 
-          o.expect_section 'operations' do |sect|
+          o.want_section 'operations' do |sect|
             h[ :operations ] = sect
           end
         end
@@ -204,20 +204,20 @@ module Skylab::BeautySalon::TestSupport
 
     # -- assertion
 
-    def expect_splay_of_operators_ s
-      _expect_AND_list s, 'operator', _expected_operators_string_array
+    def want_splay_of_operators_ s
+      _want_AND_list s, 'operator', _expected_operators_string_array
     end
 
-    def expect_splay_of_primaries_ s
-      _expect_AND_list s, 'primary', _expected_primaries_string_array
+    def want_splay_of_primaries_ s
+      _want_AND_list s, 'primary', _expected_primaries_string_array
     end
 
-    def expect_splay_of_both_ s
+    def want_splay_of_both_ s
       _these = [
         * _expected_operators_string_array,
         * _expected_primaries_string_array,
       ]
-      _expect_AND_list s, 'operators and primary', _these
+      _want_AND_list s, 'operators and primary', _these
     end
 
     -> do
@@ -243,7 +243,7 @@ module Skylab::BeautySalon::TestSupport
 
     end.call
 
-    def _expect_AND_list actual_s, lemma_s, these
+    def _want_AND_list actual_s, lemma_s, these
 
       _head_s = "available #{ lemma_s }"
 
@@ -253,15 +253,15 @@ module Skylab::BeautySalon::TestSupport
       actual_s == buffer || fail
     end
 
-    def expect_invite_to_base_help_ s
+    def want_invite_to_base_help_ s
       s == "try 'chimmy -h'\n" || fail
     end
 
-    def expect_failure_exitstatus_
+    def want_failure_exitstatus_
       exitstatus == 5 || fail
     end
 
-    def expect_success_exitstatus_
+    def want_success_exitstatus_
       exitstatus.zero? || fail
     end
 

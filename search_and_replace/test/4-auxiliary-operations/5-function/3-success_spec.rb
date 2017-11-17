@@ -42,7 +42,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _performance
 
-        expect_edit_session_output_(
+        want_edit_session_output_(
           "  ok oh my geez --> ORLY-->holy foxx: ahah<--YARLY <--\n" )
       end
     end

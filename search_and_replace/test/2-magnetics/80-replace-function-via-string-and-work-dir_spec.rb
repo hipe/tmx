@@ -5,7 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] magnetics - (80) build replace function" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
     use :SES_replace_function  # 1x
 
     it "a replace function can be used for oridnary string substitution" do
@@ -16,14 +16,14 @@ module Skylab::SearchAndReplace::TestSupport
 
       against_ "durfie Jimbo wahootey"
 
-      expect_ "durfie foo wahootey"
+      want_ "durfie foo wahootey"
     end
 
     it "but if you use the mustache open curlies, watch out:" do
 
       rf_ "{{"
 
-      expect_event :replace_function_parse_error,
+      want_event :replace_function_parse_error,
         "expecting <capture reference> or \"{{\":\n#{
         }\n#{
         }^"
@@ -38,7 +38,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       against_ "it's *neat*"
 
-      expect_ "it's _neat_"
+      want_ "it's _neat_"
 
     end
 
@@ -50,7 +50,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       against_ "XY"
 
-      expect_ 'foo {{ foo {{ '
+      want_ 'foo {{ foo {{ '
 
     end
 
@@ -62,7 +62,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       against_ "well Susan"
 
-      expect_ "well HI susan."
+      want_ "well HI susan."
 
     end
   end

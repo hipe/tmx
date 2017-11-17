@@ -90,7 +90,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_result do
-        expect_success_against_ "file:#{ fixture_functions_ 'la-la-010.rb' }"
+        want_success_against_ "file:#{ fixture_functions_ 'la-la-010.rb' }"
       end
     end
 

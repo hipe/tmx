@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _A [0,1]
         _B [0,3]
-        expect_chunks :A, [[0,1], [:B,0,3]]
+        want_chunks :A, [[0,1], [:B,0,3]]
       end
 
       it "above but with more \"lines\"" do
@@ -24,7 +24,7 @@ module Skylab::SearchAndReplace::TestSupport
         _A [3,5], [7,8]
         _B [3,5],       [8,10], [13,15]
 
-        expect_chunks :A, [[3,5], [:B,3,5], [7,8], [:B,8,10]],
+        want_chunks :A, [[3,5], [:B,3,5], [7,8], [:B,8,10]],
                       :B, [[13,15]]
       end
 
@@ -40,7 +40,7 @@ module Skylab::SearchAndReplace::TestSupport
         _A [1,2], [6,7], [16,17]
         _B [3,5], [8,10], [13,15], [18,20]
 
-        expect_chunks :A, [[1,2],[:B,3,5],[6,7], [:B,8,10]],
+        want_chunks :A, [[1,2],[:B,3,5],[6,7], [:B,8,10]],
                       :B, [[13,15]],
                       :A, [[16,17], [:B,18,20]]
       end
@@ -51,7 +51,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _B       [4,5], [7, 8], [9,10],       [13,14]
 
-        expect_chunks :A, [[1,2],[:B,4,5]], :B, [[7,8],[9,10]], :A, [[10,11],[:B, 13,14]]
+        want_chunks :A, [[1,2],[:B,4,5]], :B, [[7,8],[9,10]], :A, [[10,11],[:B, 13,14]]
       end
 
       it "jimmers" do
@@ -60,7 +60,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _B          [13,14], [14,14]
 
-        expect_chunks :A, [[10,11], [:B,13,14]], :B, [[14,14]]
+        want_chunks :A, [[10,11], [:B,13,14]], :B, [[14,14]]
       end
     end
 

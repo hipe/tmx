@@ -58,7 +58,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'wrapped.' do
         _actual = _tuple[1]
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           # :#here1:
           y << "it's time for"
           y << "WAZOOZLE, see"
@@ -90,7 +90,7 @@ module Skylab::BeautySalon::TestSupport
           :num_chars_wide, 22,
         )
 
-        expect_API_result_for_success_
+        want_API_result_for_success_
 
         upstream_io.closed? || fail  # #coverpoint3.1
 
@@ -106,10 +106,10 @@ module Skylab::BeautySalon::TestSupport
       # this same symbol)
 
       ev = nil
-      expect :error, :invalid_property_value do |ev_|
+      want :error, :invalid_property_value do |ev_|
         ev = ev_
       end
-      expect_result nil  # (expect_API_result_for_success_, expect_API_result_for_failure_ are same)
+      want_result nil  # (want_API_result_for_success_, want_API_result_for_failure_ are same)
       ev.terminal_channel_symbol == sym || fail
       ev
     end

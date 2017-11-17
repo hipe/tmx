@@ -300,7 +300,7 @@ module Skylab::BeautySalon::TestSupport
 
     def _produces_parse_tree_while_emitting_nothing
 
-      expect_success_against_ remove_instance_variable :@STRING
+      want_success_against_ remove_instance_variable :@STRING
     end
 
     def _against s
@@ -309,7 +309,7 @@ module Skylab::BeautySalon::TestSupport
 
     alias_method :_fails_with_these_normal_lines, :fails_with_these_normal_lines_
 
-    alias_method :_parse_tree_via_string_expecting_success, :expect_success_against_
+    alias_method :_parse_tree_via_string_expecting_success, :want_success_against_
 
     # --
 

@@ -55,7 +55,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "exitstatus was failure because skipped some files with changes" do
 
-        expect_exitstatus_for :component_rejected_request
+        want_exitstatus_for :component_rejected_request
       end
 
       it "no summary (only 3 content lines) for now because of simplified etc" do
@@ -84,7 +84,7 @@ module Skylab::SearchAndReplace::TestSupport
         HERE
         _act = niCLI_state.freeform_x
 
-        TestSupport_::Expect_Line::Expect_same_string[ _act, _exp, self ]
+        TestSupport_::Want_Line::Want_same_string[ _act, _exp, self ]
       end
 
       it "skipped file that was under VCS with changes" do

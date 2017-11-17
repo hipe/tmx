@@ -31,13 +31,13 @@ module Skylab::SearchAndReplace
 
     class << self
 
-      def call * x_a, & oes_p
+      def call * x_a, & p
 
         root = Root_Autonomous_Component_System_.new  # #cold-model
         root._init_with_defaults
 
         _pp = -> _ do
-          oes_p
+          p
         end
 
         Require_zerk_[]
@@ -151,18 +151,18 @@ module Skylab::SearchAndReplace
 
       _lib = Home_.lib_.basic::Regexp
 
-      use_oes_p = nil
+      use_p = nil
 
-      _oes_p = -> * i_a, & ev_p do
-        use_oes_p ||= pp[ self ]
-        use_oes_p[ * i_a, & ev_p ]
+      _p = -> * i_a, & ev_p do
+        use_p ||= pp[ self ]
+        use_p[ * i_a, & ev_p ]
       end
 
       if LENIENT_RX_RX___ !~ s
         s = "/#{ s }/"  # effectively normalize input, so we can use marshal load
       end
 
-      rx = _lib.marshal_load s, & _oes_p
+      rx = _lib.marshal_load s, & _p
 
       if rx
         Common_::KnownKnown[ rx ]

@@ -35,11 +35,11 @@ module Skylab::BeautySalon::TestSupport
         call :wazoo
 
         tuple = []
-        expect :error, :expression, :parse_error, :unknown_operator do |lines|
+        want :error, :expression, :parse_error, :unknown_operator do |lines|
           tuple.push lines
         end
 
-        expect_API_result_for_failure_
+        want_API_result_for_failure_
         tuple
       end
     end
@@ -60,11 +60,11 @@ module Skylab::BeautySalon::TestSupport
         call
 
         tuple = []
-        expect :error, :expression, :parse_error, :no_arguments do |lines|
+        want :error, :expression, :parse_error, :no_arguments do |lines|
           tuple.push lines
         end
 
-        expect_API_result_for_failure_
+        want_API_result_for_failure_
         tuple
       end
     end
@@ -85,11 +85,11 @@ module Skylab::BeautySalon::TestSupport
         call :ping
 
         tuple = []
-        expect :info, :expression, :hello do |y|
+        want :info, :expression, :hello do |y|
           tuple.push y
         end
 
-        expect_result :hello_from_beauty_salon
+        want_result :hello_from_beauty_salon
         tuple
       end
     end

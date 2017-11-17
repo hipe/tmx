@@ -31,7 +31,7 @@ module Skylab::SearchAndReplace
 
       def initialize es, ss
         @edit_session = es
-        @_oes_p = ss.on_event_selectively
+        @_listener = ss.listener
         @shared_session = ss
       end
 
@@ -68,7 +68,7 @@ module Skylab::SearchAndReplace
 
         ok = true
         while mc
-          ok = mc.engage_replacement( & @_oes_p )
+          ok = mc.engage_replacement( & @_listener )
           ok or break
           d += 1
           mc = mc.next_match_controller
@@ -107,7 +107,7 @@ module Skylab::SearchAndReplace
 
         fh.truncate bytesize  # as covered by #spot-9
 
-        @_oes_p.call :_, :expression do |y|
+        @_listener.call :_, :expression do |y|
 
           y << "wrote #{ d } change#{ s d } #{
             }(#{ bytesize }#{ ' dry' if is_dry } byte#{ s bytesize }) - #{ pth path }"
@@ -179,9 +179,9 @@ module Skylab::SearchAndReplace
 
         def ___build_checker
 
-          _oes_p = @checker_handler_expresser.on_event_selectively
+          _p = @checker_handler_expresser.listener
 
-          o = Home_.lib_.git.check_SCM::Session.begin( & _oes_p )
+          o = Home_.lib_.git.check_SCM::Session.begin( & _p )
 
           o.system_conduit = @system_conduit
 
@@ -196,12 +196,12 @@ module Skylab::SearchAndReplace
           @on_success && @on_success[] ; nil
         end
 
-        def on_event_selectively
+        def listener
 
           # for edit session - e.g will be used to display summary info
           # and any errors when replacing.
 
-          @handler_expresser.on_event_selectively
+          @handler_expresser.listener
         end
       end
 

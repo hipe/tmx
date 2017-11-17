@@ -37,7 +37,7 @@ module Skylab::SearchAndReplace::TestSupport
         last_emission.should _be_this
       end
 
-      def expression_agent_for_expect_emission
+      def expression_agent_for_want_emission
         Common_::Event.codifying_expression_agent_instance
       end
     end

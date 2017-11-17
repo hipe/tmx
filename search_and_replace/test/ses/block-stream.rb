@@ -67,22 +67,22 @@ module Skylab::SearchAndReplace::TestSupport
 
       # ~
 
-      def begin_expect_atoms_for_ a
+      def begin_want_atoms_for_ a
         @atoms = a
         @cursor = 0
       end
 
-      def expect_atoms_ * a
+      def want_atoms_ * a
 
-        _expect_atoms a
+        _want_atoms a
       end
 
-      def expect_last_atoms_ * a
-        _expect_atoms a
-        end_expect_atoms_
+      def want_last_atoms_ * a
+        _want_atoms a
+        end_want_atoms_
       end
 
-      def _expect_atoms a
+      def _want_atoms a
 
         len = a.length
         a_ = @atoms[ @cursor, len ]
@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace::TestSupport
         x
       end
 
-      def end_expect_atoms_
+      def end_want_atoms_
         @atoms.length == @cursor or fail
       end
 

@@ -10,7 +10,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     module InstanceMethods
 
-      def expect_edit_session_output_ string
+      def want_edit_session_output_ string
 
         es = mutated_edit_session_
 
@@ -66,11 +66,11 @@ module Skylab::SearchAndReplace::TestSupport
 
       # --
 
-      def expect_no_matches_
+      def want_no_matches_
         number_of_match_controllers_.should be_zero
       end
 
-      def expect_one_match_
+      def want_one_match_
         number_of_match_controllers_.should eql 1
       end
 

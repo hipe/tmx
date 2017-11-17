@@ -3,7 +3,7 @@ module Skylab::SearchAndReplace
   class Magnetics_::All_Remaining_via_Parameters
 
     def initialize & p
-      @_oes_p = p
+      @_listener = p
     end
 
     attr_writer(
@@ -76,7 +76,7 @@ module Skylab::SearchAndReplace
       ma_tot = @_total_matches
       rp_tot = @_total_replacements
 
-      @_oes_p.call :info, :expression, :job_summary do |y|
+      @_listener.call :info, :expression, :job_summary do |y|
 
         done = '. done.'
         if er_tot.nonzero?

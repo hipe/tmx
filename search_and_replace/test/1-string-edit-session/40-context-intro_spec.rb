@@ -39,8 +39,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         for_context_stream_ during_throughput_line_stream_
         for_first_and_only_line_
-        expect_last_atoms_ :match, 3, :orig, :content, "bunnny", :static, * _NL
-        end_expect_atoms_
+        want_last_atoms_ :match, 3, :orig, :content, "bunnny", :static, * _NL
+        end_want_atoms_
       end
     end
 
@@ -65,19 +65,19 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "no before lines" do
 
-          expect_no_lines_in_ before_throughput_line_stream_
+          want_no_lines_in_ before_throughput_line_stream_
         end
 
         it "no after lines" do
 
-          expect_no_lines_in_ after_throughput_line_stream_
+          want_no_lines_in_ after_throughput_line_stream_
         end
 
         it "during - atoms show both replacement vs original characters" do
 
           for_context_stream_ during_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
+          want_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
         end
       end
 
@@ -92,22 +92,22 @@ module Skylab::SearchAndReplace::TestSupport
 
           for_context_stream_ during_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
+          want_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
         end
 
         it "after - one line - NOTE: continues the context of previous section" do
 
           for_context_stream_ after_throughput_line_stream_
           for_first_and_only_line_
-          expect_atoms_ :static_continuing, :content, "bunie "
-          expect_last_atoms_ :match, 4, :orig, :content, "bunny", :static, * _NL
+          want_atoms_ :static_continuing, :content, "bunie "
+          want_last_atoms_ :match, 4, :orig, :content, "bunny", :static, * _NL
         end
 
         it "before - one line" do
 
           for_context_stream_ before_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :match, 2, :orig, :content, "buny", :static, * _NL
+          want_last_atoms_ :match, 2, :orig, :content, "buny", :static, * _NL
         end
       end
     end

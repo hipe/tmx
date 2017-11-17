@@ -179,11 +179,11 @@ module Skylab::BeautySalon
 
       def __resolve_macro_class_via_macro_slug
 
-        _ob = This_ob___[]
+        _fb = This_ob___[]
         _slug = remove_instance_variable :@__macro_slug
         _key = _slug.gsub( DASH_, UNDERSCORE_ ).intern
 
-        lref = _ob.procure_by do |o|
+        lref = _fb.procure_by do |o|
           o.needle_symbol = _key
           o.item_lemma_symbol = :macro
           o.listener = @listener
@@ -197,7 +197,7 @@ module Skylab::BeautySalon
 
       This_ob___ = Lazy_.call do
         _mod = Home_::CrazyTownMacros_
-        ::Skylab::Zerk::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
+        ::Skylab::Zerk::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.define do |o|
           o.module = _mod
           o.sub_branch_const = :not_used_BS
         end

@@ -1,4 +1,4 @@
-# ordering rationale :[#023]
+# grammar symbol category ordering rationale :[#023]
 
 ## table of contents
 
@@ -176,4 +176,4 @@ files to match the received order described in [#here.b].
 
 ## document-meta
 
-  - #pending-rename: promote this to be [#023]. think of a good name.
+  - renamed from a README.md

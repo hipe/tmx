@@ -13,9 +13,9 @@ module Skylab::SearchAndReplace
     )
     attr_writer( * PARAMETERS.symbols )
 
-    def initialize & oes_p
+    def initialize & p
       @egrep_pattern = nil
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def finish__files_by_grep__by o  # see sib
@@ -61,7 +61,7 @@ module Skylab::SearchAndReplace
 
     def _begin_common_file_session_stream
 
-      o = Home_::Magnetics_::FileSession_Stream_via_Parameters.new( & @_oes_p )
+      o = Home_::Magnetics_::FileSession_Stream_via_Parameters.new( & @_listener )
       o.ruby_regexp = @ruby_regexp
       o.upstream_path_stream = @files_by_grep
       o.grep_extended_regexp_string = @egrep_pattern
@@ -69,7 +69,7 @@ module Skylab::SearchAndReplace
     end
 
     def handle_event_selectively_for_zerk
-      @_oes_p
+      @_listener
     end
 
     define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_

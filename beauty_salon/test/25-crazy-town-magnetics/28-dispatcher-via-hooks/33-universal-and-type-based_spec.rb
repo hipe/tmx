@@ -22,7 +22,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     it 'must be build with some hooks' do
-      expect_exception_with_this_symbol_ :must_be_build_with_some_hooks do
+      want_exception_with_this_symbol_ :must_be_build_with_some_hooks do
         define_subject_magnetic_ do |_|
           NOTHING_
         end
@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     it %q{can't be build with both kinds of hooks} do
-      expect_exception_with_this_symbol_ :cannot_be_build_with_both_kinds_of_hooks do
+      want_exception_with_this_symbol_ :cannot_be_build_with_both_kinds_of_hooks do
         define_subject_magnetic_ do |o|
           o.type_based_hook_box = Common_::Box.the_empty_box
           o.universal_hook = :_trueish_
@@ -80,7 +80,7 @@ module Skylab::BeautySalon::TestSupport
 
         _ast = s[ :zend, _left_term, :frobulate ]
 
-      expect_exception_with_this_symbol_ :terminal_type_assertion_failure do
+      want_exception_with_this_symbol_ :terminal_type_assertion_failure do
         _this_common_tuple _ast
       end
     end

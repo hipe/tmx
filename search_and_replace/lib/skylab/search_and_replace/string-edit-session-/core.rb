@@ -28,7 +28,7 @@ module Skylab::SearchAndReplace
 
       # --
 
-      def write_output_lines_into y, & oes_p  # convenience for the lazy..
+      def write_output_lines_into y, & p  # convenience for the lazy..
 
         bytesize = 0
         st = to_line_stream
@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace
         end while nil
 
         if block_given?
-          oes_p.call :info, :data, :number_of_bytes_written do
+          p.call :info, :data, :number_of_bytes_written do
             bytesize
           end
         end

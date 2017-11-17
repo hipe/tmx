@@ -85,7 +85,7 @@ module Skylab::BeautySalon::TestSupport
       it 'code stripped of comments is output to STDOUT' do
 
         _actual = _tuple.first
-        expect_these_lines_in_array_with_trailing_newlines_ _actual do |y|
+        want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
           y << 'wowza'
           y << 'nowza'
           y << 'gowza'
@@ -95,7 +95,7 @@ module Skylab::BeautySalon::TestSupport
       it 'the comments that were stripped are output to STDERR' do
 
         _actual = _tuple[1]
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'commentie'
           y << 'fommentie'
         end
@@ -129,7 +129,7 @@ module Skylab::BeautySalon::TestSupport
         :to_line, 4,
       )
 
-        expect_API_result_for_success_
+        want_API_result_for_success_
         [
           sout._release_array_,
           serr._release_array_,
@@ -150,11 +150,11 @@ module Skylab::BeautySalon::TestSupport
 
       tuple = []
 
-      expect :error, * sym do |em_x|
+      want :error, * sym do |em_x|
         tuple.push em_x
       end
 
-      expect_API_result_for_failure_
+      want_API_result_for_failure_
 
       tuple
     end

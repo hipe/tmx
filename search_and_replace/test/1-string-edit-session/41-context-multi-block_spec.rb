@@ -33,7 +33,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(the replacement looks good)" do
 
-          expect_edit_session_output_ unindent_ <<-HERE
+          want_edit_session_output_ unindent_ <<-HERE
             line 1
             line 2
             ohai
@@ -103,7 +103,7 @@ module Skylab::SearchAndReplace::TestSupport
 
           for_context_stream_ during_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :match, 0, :orig, :content, "ohai", :static, * _NL
+          want_last_atoms_ :match, 0, :orig, :content, "ohai", :static, * _NL
         end
       end
 
@@ -119,7 +119,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(the replacement looks good)" do
 
-          expect_edit_session_output_ unindent_ <<-HERE
+          want_edit_session_output_ unindent_ <<-HERE
             line 1
             line 2
             yerp
@@ -151,30 +151,30 @@ module Skylab::SearchAndReplace::TestSupport
 
           for_context_stream_ during_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :match, 0, :repl, :content, "yerp", :static, * _NL
+          want_last_atoms_ :match, 0, :repl, :content, "yerp", :static, * _NL
         end
       end
 
       def _before_is_none
-        expect_no_lines_in_ before_throughput_line_stream_
+        want_no_lines_in_ before_throughput_line_stream_
       end
 
       def _after_is_none
-        expect_no_lines_in_ after_throughput_line_stream_
+        want_no_lines_in_ after_throughput_line_stream_
       end
 
       def _before_is_legit
 
         for_context_stream_ before_throughput_line_stream_
         for_first_and_only_line_
-        expect_last_atoms_ :static_continuing, :content, "line 2", * _NL
+        want_last_atoms_ :static_continuing, :content, "line 2", * _NL
       end
 
       def _after_is_legit
 
         for_context_stream_ after_throughput_line_stream_
         for_first_and_only_line_
-        expect_last_atoms_ :static, :content, "line 4", * _NL
+        want_last_atoms_ :static, :content, "line 4", * _NL
       end
     # -
   end

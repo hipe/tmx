@@ -28,11 +28,11 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 0
+        want_atoms_after_having_replaced_for_Nth_line_ 0
 
-        expect_atoms_ :match, 0, :repl, :content, "b"
+        want_atoms_ :match, 0, :repl, :content, "b"
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
@@ -55,13 +55,13 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 0
+        want_atoms_after_having_replaced_for_Nth_line_ 0
 
-        expect_atoms_ :match, 0, :repl, :content, 'wak'
-        expect_atoms_ :static, :content, ' and '
-        expect_atoms_ :match, 1, :orig, :content, 'GAK'
-        expect_atoms_ :static, :LTS_begin, "\n", :LTS_end
-        end_expect_atoms_
+        want_atoms_ :match, 0, :repl, :content, 'wak'
+        want_atoms_ :static, :content, ' and '
+        want_atoms_ :match, 1, :orig, :content, 'GAK'
+        want_atoms_ :static, :LTS_begin, "\n", :LTS_end
+        end_want_atoms_
       end
     end
   end

@@ -6,7 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
 
     it "the subject performer loads" do
       _subject

@@ -11,8 +11,8 @@ module Skylab::SearchAndReplace
     )
     attr_writer( * PARAMETERS.symbols )
 
-    def initialize & oes_p
-      @_oes_p = oes_p
+    def initialize & p
+      @_listener = p
     end
 
     def finish__files_by_grep__by o  # #[#ze-031]
@@ -23,14 +23,14 @@ module Skylab::SearchAndReplace
     def execute
 
       st = @files_by_grep
-      _oes_p = @_oes_p
+      _p = @_listener
       # -
 
         tot_paths = 0 ; tot_matches = 0
 
         summarize = -> do
           summarize = EMPTY_P_
-          _oes_p.call :info, :expression, :summary do | y |
+          _p.call :info, :expression, :summary do | y |
 
             _ = plural_noun tot_matches, 'line'
             __ = plural_noun tot_paths, 'path'
@@ -55,7 +55,7 @@ module Skylab::SearchAndReplace
     end
 
     def handle_event_selectively_for_zerk
-      @_oes_p
+      @_listener
     end
   end
 end

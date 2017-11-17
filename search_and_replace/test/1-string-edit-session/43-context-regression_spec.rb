@@ -39,7 +39,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(the replacement looks good)" do
 
-        expect_edit_session_output_ unindent_ <<-HERE
+        want_edit_session_output_ unindent_ <<-HERE
           JE zoo
           JIM
         HERE
@@ -49,19 +49,19 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "during looks good" do
 
-        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'JIM'
         end
       end
 
       it "after looks good" do
 
-        expect_no_lines_in_ after_throughput_line_stream_
+        want_no_lines_in_ after_throughput_line_stream_
       end
 
       it "before looks good" do
 
-        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'JE zoo'
         end
       end

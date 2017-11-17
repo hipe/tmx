@@ -12,7 +12,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = ast_with_two_elements_
       _cls = _class_for_switchoid
-      expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
+      want_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
         _go _ast, _cls
       end
     end
@@ -21,7 +21,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = _ast_with_four_elements
       _cls = _class_for_dualoid
-      expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+      want_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
         _go _ast, _cls
       end
     end
@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = _ast_with_three_elements
       _cls = _class_for_winker
-      expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+      want_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
         _go _ast, _cls
       end
     end
@@ -39,7 +39,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = ast_with_zero_elements_
       _cls = _class_for_winker
-      expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
+      want_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
         _go _ast, _cls
       end
     end
@@ -48,7 +48,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = ast_with_two_elements_
       _cls = _class_for_winker
-      _vals = _expect_values _ast, _cls
+      _vals = _want_values _ast, _cls
       _vals == [ 123, 456 ] || fail
     end
 
@@ -56,7 +56,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = ast_with_one_element_that_is_numeric_
       _cls = _class_for_winker
-      _vals = _expect_values _ast, _cls
+      _vals = _want_values _ast, _cls
       _vals == [ 1234 ] || fail
     end
 
@@ -86,7 +86,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = ast_with_two_elements_
       _cls = _class_for_dualoid
-      _vals = _expect_values _ast, _cls
+      _vals = _want_values _ast, _cls
       _vals == [ 123, 456 ] || fail
     end
 
@@ -94,7 +94,7 @@ module Skylab::BeautySalon::TestSupport
 
       _ast = _ast_with_four_elements
       _cls = _class_for_switchoid
-      vals, ascs = _expect_values_and_associations _ast, _cls
+      vals, ascs = _want_values_and_associations _ast, _cls
 
       ascs.map( & :association_symbol ) == %i(
         value_under_scrutiny_expression
@@ -112,7 +112,7 @@ module Skylab::BeautySalon::TestSupport
       _cls = _class_for_dualoid
 
       pairs = []
-      expect_exception_with_this_symbol_ :missing_expected_child do
+      want_exception_with_this_symbol_ :missing_expected_child do
         _write_pairs_before_exception_into pairs, _ast, _cls
       end
       pairs.length == 1 || fail
@@ -123,7 +123,7 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_that_is_quote_winking
       _cls = _class_for_dualoid_but_winking_OK
 
-      _vals = _expect_values _ast, _cls
+      _vals = _want_values _ast, _cls
       _vals == [ 321, nil ] || fail
     end
 
@@ -132,7 +132,7 @@ module Skylab::BeautySalon::TestSupport
       _ast = _ast_left_is_not_numeric
       _cls = _class_for_winkie
 
-      expect_exception_with_this_symbol_ :group_affiliation_not_met do
+      want_exception_with_this_symbol_ :group_affiliation_not_met do
         _go _ast, _cls
       end
     end
@@ -143,7 +143,7 @@ module Skylab::BeautySalon::TestSupport
       _cls = _class_for_winkie
 
       pairs = []
-      expect_exception_with_this_symbol_ :group_affiliation_not_met do
+      want_exception_with_this_symbol_ :group_affiliation_not_met do
         _write_pairs_before_exception_into pairs, _ast, _cls
       end
       pairs.length == 1 || fail
@@ -174,7 +174,7 @@ module Skylab::BeautySalon::TestSupport
         _ast = _ast_right_is_not_present
         _cls = _class_for_winkie
 
-        _expect_values_and_associations _ast, _cls
+        _want_values_and_associations _ast, _cls
       end
     end
 
@@ -187,7 +187,7 @@ module Skylab::BeautySalon::TestSupport
       fail
     end
 
-    def _expect_values ast, cls
+    def _want_values ast, cls
       vals = []
       cls.each_qualified_child ast do |x|
         vals.push x
@@ -195,7 +195,7 @@ module Skylab::BeautySalon::TestSupport
       vals
     end
 
-    def _expect_values_and_associations ast, cls
+    def _want_values_and_associations ast, cls
 
       vals = [] ; ascs = []
       cls.each_qualified_child ast do |x, asc|

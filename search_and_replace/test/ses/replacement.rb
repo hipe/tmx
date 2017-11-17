@@ -11,7 +11,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       tcc.include SES::InstanceMethods  # build_edit_session_via_
 
-      tcc.include SES::Block_Stream::InstanceMethods  # begin_expect_atoms_for_
+      tcc.include SES::Block_Stream::InstanceMethods  # begin_want_atoms_for_
 
       tcc.include self
     end
@@ -42,12 +42,12 @@ module Skylab::SearchAndReplace::TestSupport
         _all_lines_after_having_engaged_replacement.length
       end
 
-      def expect_atoms_after_having_replaced_for_Nth_line_ d
+      def want_atoms_after_having_replaced_for_Nth_line_ d
 
         _ = _all_lines_after_having_engaged_replacement
         _line_throughput = _.fetch d
 
-        begin_expect_atoms_for_ _line_throughput.a
+        begin_want_atoms_for_ _line_throughput.a
         NIL_
       end
 

@@ -19,7 +19,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    Common_.test_support::Expect_Emission_Fail_Early[ self ]
+    Common_.test_support::Want_Emission_Fail_Early[ self ]
 
     context "(context)" do
 
@@ -87,7 +87,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       def __BIG_state
 
-        _listener = expect_emission_fail_early_listener
+        _listener = want_emission_fail_early_listener
 
         _stubbed_microservice = X_co_integ_StubbedMicroservice.define do |o|
           o.listener = _listener
@@ -102,15 +102,15 @@ module Skylab::SearchAndReplace::TestSupport
 
         o.the_path_of_the_file_that_changed = remove_instance_variable :@_path_of_file_B
 
-        expect :info, :expression, :skip do |y|
+        want :info, :expression, :skip do |y|
           o.skip_messages = y
         end
 
-        expect :info, :expression, :rewrote_file do |y|
+        want :info, :expression, :rewrote_file do |y|
           o.rewrote_messages = y
         end
 
-        expect :info, :expression, :summary do |y|
+        want :info, :expression, :summary do |y|
           o.summary_messages = y
         end
 
@@ -227,10 +227,15 @@ module Skylab::SearchAndReplace::TestSupport
     # ==
 
     class X_co_integ_StubbedMicroservice < Common_::SimpleModel
+
       attr_accessor(
         :listener,
         :release_test_file_path_streamer_,
       )
+
+      def argument_scanner_narrator
+        :_no_argument_scanner_narrator_SA
+      end
     end
 
     # ==

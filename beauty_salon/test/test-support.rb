@@ -35,7 +35,7 @@ module Skylab::BeautySalon::TestSupport
 
   module InstanceMethods___
 
-    def expect_exception_with_this_symbol_ sym
+    def want_exception_with_this_symbol_ sym
       begin
         yield
       rescue Home_::MyException_ => e
@@ -44,13 +44,13 @@ module Skylab::BeautySalon::TestSupport
       e.symbol == sym || fail
     end
 
-    def expect_these_lines_in_array_with_trailing_newlines_ a, & p
-      TestSupport_::Expect_Line::
-          Expect_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::
+          Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
 
     def fixture_functions_ tail
@@ -67,7 +67,7 @@ module Skylab::BeautySalon::TestSupport
       TestSupport_.debug_IO
     end
 
-    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+    define_method :get_invocation_strings_for_want_stdout_stderr, -> do
 
       a = %w( zippo ).freeze
       -> do
@@ -93,15 +93,15 @@ module Skylab::BeautySalon::TestSupport
 
     # -- retrofit
 
-    def expect_not_OK_event_ sym
-      em = expect_not_OK_event
+    def want_not_OK_event_ sym
+      em = want_not_OK_event
       em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
       em
     end
 
-    def expect_OK_event_ sym=nil, msg=nil
+    def want_OK_event_ sym=nil, msg=nil
 
-      em = expect_OK_event nil, msg
+      em = want_OK_event nil, msg
       if sym
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
       end
@@ -118,16 +118,16 @@ module Skylab::BeautySalon::TestSupport
 
     def self.[] tcc
       Memoizer_Methods[ tcc ]
-      Expect_Emission_Fail_Early[ tcc ]
+      Want_Emission_Fail_Early[ tcc ]
       tcc.include self
     end
 
-    def expect_API_result_for_failure_
-      expect_result nil
+    def want_API_result_for_failure_
+      want_result nil
     end
 
-    def expect_API_result_for_success_  # track this idea
-      expect_result nil
+    def want_API_result_for_success_  # track this idea
+      want_result nil
     end
 
     def expression_agent
@@ -214,9 +214,9 @@ module Skylab::BeautySalon::TestSupport
 
     def anticipate_ * chan, & msg
       _spy = ( @EMISSION_SPY ||= begin
-        Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+        Common_.test_support::Want_Emission_Fail_Early::Spy.new
       end )
-      _spy.expect_emission msg, chan ; nil
+      _spy.want_emission msg, chan ; nil
     end
 
     def anticipate_no_emissions_
@@ -248,9 +248,9 @@ module Skylab::BeautySalon::TestSupport
   class Iambic_via_Definition___ < Home_::Common_::MagneticBySimpleModel
 
     # the initial take of these tests happened when the reports were
-    # implemented as plain old magnetics behind an ad-hoc operator branch-
+    # implemented as plain old magnetics behind an ad-hoc feature branch-
     # ish behind a legacy framework. now reports are implemented behind the
-    # current toolkits with a formal operator branch (but they are still
+    # current toolkits with a formal feature branch (but they are still
     # plain old magnetics). :[#007.C]
     # SO the subject exposes an interface that *was* geared towards calling
     # one of the frontmost magnetics that called the report magnets. now
@@ -309,12 +309,12 @@ module Skylab::BeautySalon::TestSupport
     end
   end
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
-  Expect_Emission_Fail_Early = -> tcc do
-    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  Want_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Want_Emission_Fail_Early[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

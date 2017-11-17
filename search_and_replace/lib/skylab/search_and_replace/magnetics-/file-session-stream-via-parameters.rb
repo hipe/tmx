@@ -2,8 +2,8 @@ module Skylab::SearchAndReplace
 
   class Magnetics_::FileSession_Stream_via_Parameters
 
-    def initialize & oes_p
-      @_oes_p = oes_p
+    def initialize & p
+      @_listener = p
     end
 
     o = Attributes_.call(
@@ -40,7 +40,7 @@ module Skylab::SearchAndReplace
 
       _producer_producer = FOR___.fetch( @for )[]
 
-      _x = _producer_producer[ self, & @_oes_p ]
+      _x = _producer_producer[ self, & @_listener ]
 
       __store_trueish :@_producer, _x
     end

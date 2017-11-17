@@ -11,12 +11,12 @@ module Skerlerb::BootySooloon::TerstSerppert
 
     this 'perng' do
 
-      _em = expect_nootral_event :pirng
+      _em = want_nootral_event :pirng
 
       black_and_white( _em.cached_event_value ).should eql(
         "hello from beauty salon." )
     end
 
-    expect_nootral_event :purng
+    want_nootral_event :purng
   end
 end

@@ -32,19 +32,19 @@ module Skylab::SearchAndReplace::TestSupport
         1 == a.length or fail
         _chunk_1 = a.first
         1 == _chunk_1.length or fail
-        expect_span _chunk_1.first, 0, 0, :B
+        want_span _chunk_1.first, 0, 0, :B
       end
 
       it "one A, no B" do
         _A [1,2]
         _B
-        expect_chunks :A, [[1,2]]
+        want_chunks :A, [[1,2]]
       end
 
       it "two B's only" do
         _A
         _B [3,2], [1,0]
-        expect_chunks :B, [[3,2], [1,0]]
+        want_chunks :B, [[3,2], [1,0]]
       end
 
       it "an A out in front THEN a B" do
@@ -52,7 +52,7 @@ module Skylab::SearchAndReplace::TestSupport
         _A [6,9]
         _B        [10,11]
 
-        expect_chunks :A, [[6,9]], :B, [[10,11]]
+        want_chunks :A, [[6,9]], :B, [[10,11]]
       end
 
       it "as above but touch" do
@@ -60,21 +60,21 @@ module Skylab::SearchAndReplace::TestSupport
         _A [1,2]
         _B      [2,3]
 
-        expect_chunks :B, [[2,3], [:A,1,2]]  # NOTE order is not OK
+        want_chunks :B, [[2,3], [:A,1,2]]  # NOTE order is not OK
       end
 
       it "A B A (cleanly)" do
 
         _A [0,1],         [4,5]
         _B         [2,3]
-        expect_chunks :A, [[0,1]], :B, [[2,3]], :A, [[4,5]]
+        want_chunks :A, [[0,1]], :B, [[2,3]], :A, [[4,5]]
       end
 
       it "two A's, second one kisses first of two B's. still separate" do
 
         _A [0,1], [2,3]
         _B              [3,4], [4,5]
-        expect_chunks :A, [[0,1], [2,3]], :B, [[3,4], [4,5]]
+        want_chunks :A, [[0,1], [2,3]], :B, [[3,4], [4,5]]
       end
     end
 
@@ -84,7 +84,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _A [77,99]
         _B [77,99]
-        expect_chunks :B, [[77,99], [:A,77,99]]
+        want_chunks :B, [[77,99], [:A,77,99]]
       end
 
       it "one overlap when during B, there is a B-jut overlap, swallow 1 A," do
@@ -95,7 +95,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _B [1,2], [3,4], [5,7]
 
-        expect_chunks :B, [[1,2], [3,4], [5,7], [:A,6,7]], :A, [[8,9]]
+        want_chunks :B, [[1,2], [3,4], [5,7], [:A,6,7]], :A, [[8,9]]
       end
     end
 

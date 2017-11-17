@@ -15,8 +15,8 @@ module Skylab::SearchAndReplace
       #
       # this will definitely be touched by #open [#004] locking/mtime etc.
 
-      def initialize & oes_p
-        @on_event_selectively = oes_p
+      def initialize & p
+        @listener = p
       end
 
       attr_writer(
@@ -61,7 +61,7 @@ module Skylab::SearchAndReplace
 
       def ___express_unexpected_mv_msg msg
         self._COVER_ME
-        @on_event_selectively.call(
+        @listener.call(
           :error,
           :expression,
           :moving_tmpfile_to_real_file,
@@ -97,7 +97,7 @@ module Skylab::SearchAndReplace
 
         sym = :will_not_write_empty_file
 
-        @on_event_selectively.call :error, sym do
+        @listener.call :error, sym do
           Common_::Event.inline_not_OK_with sym, :path, _path
         end
         UNABLE_

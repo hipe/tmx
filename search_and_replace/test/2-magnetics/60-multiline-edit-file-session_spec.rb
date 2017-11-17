@@ -44,7 +44,7 @@ module Skylab::SearchAndReplace::TestSupport
           fazzoozle my noozle - when i say "wazoozle" i mean WaZOOzle!
       HERE
 
-      expect_edit_session_output_ _exp
+      want_edit_session_output_ _exp
     end
 
     shared_subject :_match_controller_array do

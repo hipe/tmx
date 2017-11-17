@@ -255,7 +255,7 @@ module Skylab::BeautySalon::TestSupport
 
     def _lines_of_parse_failure_by_call_subject_magnetic_by
 
-      log = Common_.test_support::Expect_Emission::Log.for self
+      log = Common_.test_support::Want_Emission::Log.for self
 
       _x = _call_subject_magnetic_by do |o|
         o.listener = log.listener

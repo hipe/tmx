@@ -54,7 +54,7 @@ module Skylab::SearchAndReplace::TestSupport
         # we exhaust the stream, and we can't emit any events once the event
         # log has closed, then we must exhaust the stream before the event
         # log closes. so we exhaust the stream by flushing it to an array
-        # before the "expect event" library closes the log & makes the state.
+        # before the "want event" library closes the log & makes the state.
 
         super result.to_a, acs
       end

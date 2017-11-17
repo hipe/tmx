@@ -25,11 +25,11 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'line 2 - invite' do
-        _expect_deep_invite second_and_final_line_string
+        _want_deep_invite second_and_final_line_string
       end
 
       it 'fails' do
-        _expect_exitstatus_for_failure
+        _want_exitstatus_for_failure
       end
     end
 
@@ -67,11 +67,11 @@ module Skylab::BeautySalon::TestSupport
 
       it 'third line - DEEPER invite' do
         _actual = third_and_final_line_string
-        _expect_deep_invite _actual
+        _want_deep_invite _actual
       end
 
       it 'fails' do
-        _expect_exitstatus_for_failure
+        _want_exitstatus_for_failure
       end
     end
 
@@ -109,7 +109,7 @@ module Skylab::BeautySalon::TestSupport
       it 'items - description with one line' do
 
         _actual = _items_index.dereference( :file ).description_line_array
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'a file with code in it'
         end
       end
@@ -132,7 +132,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'succeeds' do
-        _expect_exitstatus_for_success
+        _want_exitstatus_for_success
       end
     end
 
@@ -152,11 +152,11 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'line 2 - deep invite' do
-        _expect_deep_invite second_and_final_line_string
+        _want_deep_invite second_and_final_line_string
       end
 
       it 'failed' do
-        _expect_exitstatus_for_failure
+        _want_exitstatus_for_failure
       end
     end
 
@@ -182,14 +182,14 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'second line - invite' do
-        _expect_deep_invite second_and_final_line_string
+        _want_deep_invite second_and_final_line_string
       end
 
       it 'failed' do
-        _expect_exitstatus_for_failure
+        _want_exitstatus_for_failure
       end
 
-      def CLI_options_for_expect_stdout_stderr
+      def CLI_options_for_want_stdout_stderr
         X_cdelit_this_CLI_setup
       end
     end
@@ -214,7 +214,7 @@ module Skylab::BeautySalon::TestSupport
 
         _actual = _tuple.first
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "    def normalize_range\n"
           y << NEWLINE_
           y << "      if @to_line < @from_line\n"
@@ -225,35 +225,35 @@ module Skylab::BeautySalon::TestSupport
 
         _actual = _tuple.last
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "for example, you could deliterate these lines.\n"
         end
       end
 
       it 'succeeded' do
-        _expect_exitstatus_for_success
+        _want_exitstatus_for_success
       end
 
       shared_subject :_tuple do
         partition_expressed_lines_into_output_lines_and_errput_lines_
       end
 
-      def CLI_options_for_expect_stdout_stderr
+      def CLI_options_for_want_stdout_stderr
         X_cdelit_this_CLI_setup
       end
     end
 
     # ==
 
-    def _expect_deep_invite line
+    def _want_deep_invite line
       line == "try 'chimmy deliterate -h'\n" || fail
     end
 
-    def _expect_exitstatus_for_failure
+    def _want_exitstatus_for_failure
       exitstatus.zero? && fail
     end
 
-    def _expect_exitstatus_for_success
+    def _want_exitstatus_for_success
       exitstatus.zero? || fail
     end
 

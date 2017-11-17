@@ -99,7 +99,7 @@ module Skylab::BeautySalon::TestSupport
 
         x == false || fail
 
-        expect_these_lines_in_array_ lines, & p
+        want_these_lines_in_array_ lines, & p
       end
 
       def JUST_SHOW_ME_THE_LINES
@@ -137,7 +137,7 @@ module Skylab::BeautySalon::TestSupport
         [ lines, _x ]
       end
 
-      def expect_success_against_ string
+      def want_success_against_ string
 
         x = parsy_subject_magnetic_.call_by do |o|
 

@@ -78,7 +78,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "finds three files" do
-        __expect_basenames %w( one-file.txt three-file.txt four-file.txt )
+        __want_basenames %w( one-file.txt three-file.txt four-file.txt )
       end
 
       it "shows find command" do
@@ -176,7 +176,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    def __expect_basenames a
+    def __want_basenames a
 
       st = screen.to_content_line_stream_on :serr
       st.gets  # #open [#006] (only one for find. none for other)

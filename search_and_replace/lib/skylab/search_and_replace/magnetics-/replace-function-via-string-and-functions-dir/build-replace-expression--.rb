@@ -11,7 +11,7 @@ module Skylab::SearchAndReplace
         )
 
         def initialize & x_p
-          @_oes_p = x_p
+          @_listener = x_p
         end
 
         def execute
@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace
             fu = Build_fulfiller___.call(
               @custom_symbols,
               @functions_dir,
-              & @_oes_p )
+              & @_listener )
 
           else
             fu = ___when_no_functions_directory
@@ -48,7 +48,7 @@ module Skylab::SearchAndReplace
 
           sym_a = @custom_symbols
 
-          @_oes_p.call(
+          @_listener.call(
 
             :error, :expression, :functions_directory_required
 
@@ -69,7 +69,7 @@ module Skylab::SearchAndReplace
           ReplacementExpression___.define do |o|
             o.capture_identifier = @capture_identifier
             o.fulfiller = @fulfiller
-            o.listener = @_oes_p
+            o.listener = @_listener
             o.method_call_chain = @method_call_chain
           end
         end
@@ -145,10 +145,10 @@ module Skylab::SearchAndReplace
 
           include Common_::Event::ReceiveAndSendMethods
 
-          def initialize sym_a, path, & oes_p
+          def initialize sym_a, path, & p
             @custom_symbols = sym_a
             @functions_directory = path
-            @_oes_p = oes_p
+            @_listener = p
           end
 
           def execute
@@ -181,7 +181,7 @@ module Skylab::SearchAndReplace
 
           def when_missing_files
 
-            @_oes_p.call :error, :missing_function_definitions do
+            @_listener.call :error, :missing_function_definitions do
               build_missing_function_definitions_event
             end
             UNABLE_
@@ -243,7 +243,7 @@ module Skylab::SearchAndReplace
 
             _tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
               @path,
-              & @_oes_p )
+              & @_listener )
 
             __store_trueish :@tree, _tree
           end

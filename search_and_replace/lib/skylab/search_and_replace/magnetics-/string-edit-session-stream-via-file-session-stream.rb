@@ -10,9 +10,9 @@ module Skylab::SearchAndReplace
 
     class Sessioner___
 
-      def initialize up, & oes_p
+      def initialize up, & p
 
-        @_oes_p = oes_p
+        @_listener = p
         @_values = up
       end
 
@@ -66,7 +66,7 @@ module Skylab::SearchAndReplace
           x = Home_::Magnetics_::Replace_Function_via_String_and_Functions_Dir.call(
             s,
             dir,
-            & @_oes_p )
+            & @_listener )
 
           if x
             @_replacement_function = x

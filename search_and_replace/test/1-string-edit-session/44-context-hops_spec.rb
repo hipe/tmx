@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "(output looks like input)" do
-        expect_edit_session_output_ _same_string
+        want_edit_session_output_ _same_string
       end
 
       shared_subject :_same_string do
@@ -59,20 +59,20 @@ module Skylab::SearchAndReplace::TestSupport
         shared_context_lines
 
         it "during" do
-          expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+          want_paragraph_for_context_stream_ during_throughput_line_stream_ do
             _ 'wahootey41 hello41 wahootey42'
           end
         end
 
         it "after" do
-          expect_paragraph_for_context_stream_ after_throughput_line_stream_ do
+          want_paragraph_for_context_stream_ after_throughput_line_stream_ do
             _ 'hello42'
             _ 'wahootey43'
           end
         end
 
         it "before" do
-          expect_no_lines_in_ before_throughput_line_stream_
+          want_no_lines_in_ before_throughput_line_stream_
         end
       end
 
@@ -82,20 +82,20 @@ module Skylab::SearchAndReplace::TestSupport
         shared_context_lines
 
         it "before" do
-          expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
+          want_paragraph_for_context_stream_ before_throughput_line_stream_ do
             _ 'wahootey41 hello41 wahootey42'
             _ 'hello42'
           end
         end
 
         it "during" do
-          expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+          want_paragraph_for_context_stream_ during_throughput_line_stream_ do
             _ 'wahootey43'
           end
         end
 
         it "after" do
-          expect_no_lines_in_ after_throughput_line_stream_
+          want_no_lines_in_ after_throughput_line_stream_
         end
       end
     end
@@ -136,11 +136,11 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "(output looks like input)" do
-        expect_edit_session_output_ _same_string
+        want_edit_session_output_ _same_string
       end
 
       it "before" do
-        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'line 1 X'
           _ 'line 2 X'
           _ 'line 3 •'
@@ -151,13 +151,13 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "during" do
-        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'line 7 X'
         end
       end
 
       it "after" do
-        expect_paragraph_for_context_stream_ after_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ after_throughput_line_stream_ do
           _ 'jeff bezos'
         end
       end

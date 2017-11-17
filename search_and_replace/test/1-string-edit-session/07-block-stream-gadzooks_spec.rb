@@ -62,26 +62,26 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "static block as throughput atoms" do
 
-        begin_expect_atoms_for_ atoms_of_ block_at_ 1
+        begin_want_atoms_for_ atoms_of_ block_at_ 1
 
         o :static, :content, "45", :LTS_begin, "\r\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
 
       it "last matches block (orig) as throughput atoms" do
 
-        begin_expect_atoms_for_ atoms_of_ block_at_ 2
+        begin_want_atoms_for_ atoms_of_ block_at_ 2
 
         o :static, :content, "89", :LTS_begin, "\r"
         o :match, 0, :orig, :LTS_continuing, "\n", :LTS_end  # case 11
 
-        end_expect_atoms_
+        end_want_atoms_
       end
 
       it "big kahuna (orig) as throughput atoms" do  # case 10 of #spot-6
 
-        begin_expect_atoms_for_ atoms_of_ first_block_
+        begin_want_atoms_for_ atoms_of_ first_block_
 
         o :static, :content, "0", :match, 0, :orig, :content, "1", :LTS_begin, "\r\n", :LTS_end
         o :content, "45", :LTS_begin, "\r", :static, :LTS_continuing, "\n", :LTS_end
@@ -90,10 +90,10 @@ module Skylab::SearchAndReplace::TestSupport
         o :content, "67", :LTS_begin, "\r\n", :LTS_end
         o :content, "0", :static, :content, "o", :LTS_begin, "\r\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
-    alias_method :o, :expect_atoms_
+    alias_method :o, :want_atoms_
   end
 end

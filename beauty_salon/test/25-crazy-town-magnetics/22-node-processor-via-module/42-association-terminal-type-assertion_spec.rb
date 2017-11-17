@@ -38,7 +38,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'if you try yadda and yadda is wrong - LOOSE' do
         _asc = subject_association_
-        expect_exception_with_this_symbol_ :terminal_type_assertion_failure do
+        want_exception_with_this_symbol_ :terminal_type_assertion_failure do
           _asc.assert_type_of_terminal_value_ 123
         end
       end

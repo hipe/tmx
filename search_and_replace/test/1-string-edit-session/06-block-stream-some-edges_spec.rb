@@ -34,7 +34,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms for matches block" do
 
-        begin_expect_atoms_for_ atoms_of_ first_block_
+        begin_want_atoms_for_ atoms_of_ first_block_
 
         o :static, :LTS_begin, "\r"
         o :match, 0, :orig, :LTS_continuing, "\n", :LTS_end
@@ -42,7 +42,7 @@ module Skylab::SearchAndReplace::TestSupport
         o :match, 1, :orig
         o :static, :LTS_continuing, "\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
@@ -67,14 +67,14 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms for matches block" do
 
-        begin_expect_atoms_for_ atoms_of_ first_block_
+        begin_want_atoms_for_ atoms_of_ first_block_
 
         o :static, :content, "A"
         o :match, 0, :orig, :LTS_begin, "\n", :LTS_end, :content, "B"
         o :static, :LTS_begin, "\n", :LTS_end
         o :match, 1, :orig, :content, "C", :LTS_begin, "\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
@@ -97,13 +97,13 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms for matches block" do
 
-        begin_expect_atoms_for_ atoms_of_ first_block_
+        begin_want_atoms_for_ atoms_of_ first_block_
 
         o :match, 0, :orig, :LTS_begin, "\n", :LTS_end
         o :match, 1, :orig, :LTS_begin, "\r"
         o :static, :LTS_continuing, "\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms for matches block" do
 
-        begin_expect_atoms_for_ atoms_of_ block_at_ 1
+        begin_want_atoms_for_ atoms_of_ block_at_ 1
 
         o :static, :content, "f"
         o :match, 0, :orig, :content, "oo", :LTS_begin, "\n", :LTS_end,
@@ -136,7 +136,7 @@ module Skylab::SearchAndReplace::TestSupport
           :content, "ba"
         o :static, :content, "z", :LTS_begin, "\n", :LTS_end
 
-        end_expect_atoms_
+        end_want_atoms_
       end
     end
 
@@ -151,7 +151,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "atoms for matches block" do
 
-        begin_expect_atoms_for_ atoms_of_ first_block_
+        begin_want_atoms_for_ atoms_of_ first_block_
 
         o :match, 0, :orig, :content, "bunny"
         o :static, :content, " "
@@ -160,6 +160,6 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    alias_method :o, :expect_atoms_
+    alias_method :o, :want_atoms_
   end
 end

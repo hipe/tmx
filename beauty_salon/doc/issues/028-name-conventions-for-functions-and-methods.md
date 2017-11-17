@@ -568,15 +568,15 @@ here but there are some that are not.
   stream or setter method in a DSL for setting handler procs, but
   otherwise we don't like it for public method names, per the below
   rule about "receive". we now discourage `on_error`, `on_info` etc
-  and rather prefer something like `on_event_selectively` where the
+  and rather prefer something like `listener` where the
   caller does the dispatching herself (see `receive` below).
 
 + `on_event` as a named argument this is what to use if your event model
-  is non-selective, but we prefer (see below) `on_event_selectively`).
+  is non-selective, but we prefer (see below) `listener`).
   do not use this for a method name unless it is an old-fashioned DSL
   setter.
 
-+ `on_event_selectively` as a named argument this is now the preferred
++ `listener` as a named argument this is now the preferred
   means of passing event handler from caller to actor. do not use this
   name for a method name unless it is an old-fashioned DSL setter.
 

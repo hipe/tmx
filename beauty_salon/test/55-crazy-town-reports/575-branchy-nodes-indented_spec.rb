@@ -23,7 +23,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'these exact lines' do
         _lines = _tuple.last
-        expect_these_lines_in_array_ _lines do |y|
+        want_these_lines_in_array_ _lines do |y|
           y << '  module: Skylab'
           y << '    class: SimpleCov'
           y << '  module: Skylab::SimpleCov::TestSupport'

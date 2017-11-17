@@ -32,7 +32,7 @@ module Skylab::BeautySalon
 
     ::Skylab::Brazen::CLI::CLI_for_BeautySalon_PIONEER.begin_by do |o|
 
-      o.operator_branch = Operator_branch_[]
+      o.feature_branch = Operator_branch_[]
 
       o.application_module = Home_
     end
@@ -65,8 +65,8 @@ module Skylab::BeautySalon
     end
 
     def execute
-      _ob = Operator_branch_[]
-      oper = MTk_::ParseOperator_via[ self, _ob ]
+      _fb = Operator_branch_[]
+      oper = MTk_::ParseOperator_via[ self, _fb ]
       if oper
         _model_ref = oper.trueish_feature_value
         bc = _model_ref.bound_call_of_operator_via_invocation_resouces @invocation_resources
@@ -85,7 +85,7 @@ module Skylab::BeautySalon
 
     Require_user_interface_libs_[]
 
-    MTk_::ModelCentricOperatorBranch.define do |o|
+    MTk_::ModelCentricFeatureBranch.define do |o|
 
       same = 'actions'
 

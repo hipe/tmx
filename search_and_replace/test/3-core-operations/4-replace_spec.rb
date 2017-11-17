@@ -61,9 +61,9 @@ module Skylab::SearchAndReplace::TestSupport
         es = _proto.dup  # this IS the use of [#014]
         _mc = es.first_match_controller
 
-        _oes_p = event_log.handle_event_selectively
+        _p = event_log.handle_event_selectively
 
-        _ok_x = _mc.engage_replacement( & _oes_p )
+        _ok_x = _mc.engage_replacement( & _p )
 
         a = [ es ]
         a.push @event_log.flush_to_array
@@ -95,9 +95,9 @@ module Skylab::SearchAndReplace::TestSupport
 
           el = build_event_log  # create a new one, because etc..
 
-          _oes_p = el.handle_event_selectively
+          _p = el.handle_event_selectively
 
-          _x = mutated_edit_session_.write_output_lines_into "", & _oes_p
+          _x = mutated_edit_session_.write_output_lines_into "", & _p
 
           _emissions = el.flush_to_array
 

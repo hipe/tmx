@@ -25,14 +25,14 @@ module Skylab::BeautySalon::TestSupport
 
     it 'too few - exception early' do
       _ai = _AI_one_sendoid
-      expect_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
+      want_exception_with_this_symbol_ :minimum_number_of_children_not_satisfied do
         _build_compound_via_count_and_AI 1, _ai
       end
     end
 
     it 'too many - exception early' do
       _ai = _AI_two_dualoid
-      expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+      want_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
         _build_compound_via_count_and_AI 3, _ai
       end
     end

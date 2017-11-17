@@ -14,7 +14,7 @@ module Skylab::BeautySalon::TestSupport
 
         _a = _tuple.first
 
-        expect_these_lines_in_array_ _a do |y|
+        want_these_lines_in_array_ _a do |y|
           same_1 = 'a/.+005-xx-yy\.rb'
           same_2 = 'b/.+005-xx-yy\.rb'
           y << %r(\Adiff -U #{ same_1 } #{ same_2 }\z)
@@ -32,14 +32,14 @@ module Skylab::BeautySalon::TestSupport
            
                this 'perng' do
            
-          -      _em = expect_nootral_event :pirng
+          -      _em = want_nootral_event :pirng
           +      _em = chamonay(:pirng)
            
                  black_and_white( _em.cached_event_value ).should eql(
                    "hello from beauty salon." )
                end
            
-          -    expect_nootral_event :purng
+          -    want_nootral_event :purng
           +    chamonay(:purng)
              end
            end
@@ -47,7 +47,7 @@ module Skylab::BeautySalon::TestSupport
 
         exp_st = Home_.lib_.basic::String::LineStream_via_String[ _exp_s ]
 
-        expect_these_lines_in_array_ _actual_st do |y|
+        want_these_lines_in_array_ _actual_st do |y|
           while line=exp_st.gets
             y << line
           end
@@ -74,7 +74,7 @@ module Skylab::BeautySalon::TestSupport
           _this_path = fixture_functions_ 'la-la-015.rb'
 
           o.argument_paths = paths
-          o.code_selector_string = "send(method_name=='expect_nootral_event')"
+          o.code_selector_string = "send(method_name=='want_nootral_event')"
           o.replacement_function_string = "file:#{ _this_path }"
 
           o.listener = -> * chan, & _p do
@@ -114,7 +114,7 @@ module Skylab::BeautySalon::TestSupport
         o.macro_string = 'method:danica_roem:DANICA_ROEM_123'
       end
 
-      __expect_these_lines_in_array_CUSTOM st do |o|
+      __want_these_lines_in_array_CUSTOM st do |o|
         o.call 'diff'
         o.call '---'
         o.call '+++'
@@ -129,7 +129,7 @@ module Skylab::BeautySalon::TestSupport
       42 == count || fail  # ..
     end
 
-    def __expect_these_lines_in_array_CUSTOM st
+    def __want_these_lines_in_array_CUSTOM st
 
       yield -> d=1, s do
         if s

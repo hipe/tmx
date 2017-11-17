@@ -6,7 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
       tcc.extend SES::Common_DSL::ModuleMethods
       tcc.include SES::Common_DSL::InstanceMethods
       tcc.include SES::InstanceMethods
-      tcc.include SES::Block_Stream::InstanceMethods  # expect_atoms_
+      tcc.include SES::Block_Stream::InstanceMethods  # want_atoms_
       tcc.extend Module_Methods___
       tcc.include Instance_Methods___
     end
@@ -75,7 +75,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       # --
 
-      def expect_paragraph_for_context_stream_ st, & p
+      def want_paragraph_for_context_stream_ st, & p
         @context_stream = st
         instance_exec( & p )
         remove_instance_variable :@context_stream
@@ -124,10 +124,10 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def for_context_line_ tl
-        begin_expect_atoms_for_ tl.a ; nil
+        begin_want_atoms_for_ tl.a ; nil
       end
 
-      def expect_no_lines_in_ st
+      def want_no_lines_in_ st
         st.gets and fail
       end
 

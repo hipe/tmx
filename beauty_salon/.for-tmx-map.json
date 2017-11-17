@@ -1,6 +1,6 @@
 {
-  "after": "treemap",
-  "category": "legacy ad-hoc util",
+  "after": "search_and_replace",
+  "category": "code refactoring",
   "framework": "[br]",
   "sigil": "bs"
 }

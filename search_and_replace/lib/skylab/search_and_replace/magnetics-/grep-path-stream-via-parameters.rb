@@ -2,14 +2,14 @@ module Skylab::SearchAndReplace
 
   class Magnetics_::Grep_Path_Stream_via_Parameters
 
-    def initialize & oes_p
+    def initialize & p
 
       @chunk_size = 50  # ..
       @grep_extended_regexp_string = nil
       @ruby_regexp = nil
       @_shellwords = Home_.lib_.shellwords
 
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     attr_writer(
@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace
       cmd = gr.to_command
       _command_string = cmd.command_string
 
-      @_oes_p.call :info, :expression, :grep_command_head do |y|
+      @_listener.call :info, :expression, :grep_command_head do |y|
 
         # (see tombstone for the beginnings of a structured event)
 
@@ -61,7 +61,7 @@ module Skylab::SearchAndReplace
           end
         else
           # (not covered)
-          @_oes_p.call :error, :expression, :counts_by_grep do |y|
+          @_listener.call :error, :expression, :counts_by_grep do |y|
             y << "failed to match line from grep: #{ path.inspect }"
           end
           NIL_
@@ -181,7 +181,7 @@ module Skylab::SearchAndReplace
         :grep_extended_regexp_string, @grep_extended_regexp_string,
         :ruby_regexp, @ruby_regexp,
         :freeform_options, a,
-        & @_oes_p )
+        & @_listener )
 
       __store_trueish :@_grep_command, _gr
     end

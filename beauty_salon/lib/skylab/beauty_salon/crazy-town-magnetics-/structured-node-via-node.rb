@@ -181,7 +181,7 @@ module Skylab::BeautySalon
 
         children(
           :zero_or_more_dynamic_expressions,
-            # (as zero, TODO not covered - zerk/test/610-CLI/20-expect-section-magnetics_spec.rb:10)
+            # (as zero, TODO not covered - zerk/test/610-CLI/20-want-section-magnetics_spec.rb:10)
         )
       end
 

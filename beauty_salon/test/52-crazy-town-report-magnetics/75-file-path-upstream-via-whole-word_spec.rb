@@ -11,7 +11,7 @@ module Skylab::BeautySalon::TestSupport
 
     it 'when you use a crazy-looking fixed string' do
       _msgs = _error_messages_via_fixed_string 'not#valid'
-      expect_these_lines_in_array_ _msgs do |y|
+      want_these_lines_in_array_ _msgs do |y|
         y << 'currently, your name pattern must contain only letters, numbers and underscores'
         y << '(bad character: "#")'
       end
@@ -111,7 +111,7 @@ module Skylab::BeautySalon::TestSupport
 
     def _error_messages_via_fixed_string needle_s
 
-      _expect_early_error_messages_when_call_by do |o|
+      _want_early_error_messages_when_call_by do |o|
         o.set_whole_word_match_fixed_string needle_s
         o.add_dir _no_ent_dir
         o.set_name_pattern _common_name_pattern
@@ -120,16 +120,16 @@ module Skylab::BeautySalon::TestSupport
 
     def _error_messages_via_dir path
 
-      _expect_early_error_messages_when_call_by do |o|
+      _want_early_error_messages_when_call_by do |o|
         o.set_whole_word_match_fixed_string 'must_be_valid'
         o.add_dir path
         o.set_name_pattern _common_name_pattern
       end
     end
 
-    def _expect_early_error_messages_when_call_by
+    def _want_early_error_messages_when_call_by
 
-      log = Common_.test_support::Expect_Emission::Log.for self
+      log = Common_.test_support::Want_Emission::Log.for self
       _x = _call_by do |o|
         yield o
         o.listener = log.listener

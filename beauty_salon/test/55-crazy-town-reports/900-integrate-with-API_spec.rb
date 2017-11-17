@@ -16,7 +16,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'NOTE we have hardcoded CLI things' do
         _actual = _lines
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "must have one of --files-file, <files> or --corpus-step"
         end
       end
@@ -32,10 +32,10 @@ module Skylab::BeautySalon::TestSupport
         )
 
         lines = nil
-        expect :error, :expression, :argument_error do |y|
+        want :error, :expression, :argument_error do |y|
           lines = y
         end
-        expect_result nil
+        want_result nil
         lines
       end
     end

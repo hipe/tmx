@@ -52,13 +52,13 @@ module Skylab::SearchAndReplace
 
         # -- engagement
 
-        def engage_replacement & oes_p
+        def engage_replacement & p
 
           _proc_like = @block.replacement_function__
 
           presumably_string = _proc_like.call(
             @matchdata,  # (#we-might pass a custom structure instead..)
-            & oes_p )
+            & p )
 
           if presumably_string
 
@@ -68,7 +68,7 @@ module Skylab::SearchAndReplace
             ACHIEVED_
           else
             # #not-covered (i.e #open [#034])
-            oes_p.call :error, :expression, :invalid_replacement_value do |y|
+            p.call :error, :expression, :invalid_replacement_value do |y|
               y << "got strange result from replace function: #{ presumably_string.inspect }"
             end
             UNABLE_

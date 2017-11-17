@@ -39,7 +39,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'the replacements were made (byte-by-byte verification, too)' do
 
-        expect_these_lines_in_array_ _lines do |y|
+        want_these_lines_in_array_ _lines do |y|
 
           y << %r(\bmy_lvar = some_method_call  # lvasgn\b)
           y << "  if my_lvar  # conditional, lvar access\n"
@@ -104,7 +104,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'neat' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "def dadunk foo, bar=nil, baz: nil\n"
           y << "  Const_CHANGED::Const2\n"
           y << 'end'
@@ -147,7 +147,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << '"ernexpercted ergumernt \\"berta\\""'
         end
       end
@@ -167,7 +167,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "'ernexpercted ergumernt \\'berta\\''"
         end
       end
@@ -187,7 +187,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << '"qux fif gobble: #{ nil }"'
         end
       end
@@ -207,7 +207,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << 'frobulate %w(   uno  dos )'
         end
       end
@@ -229,7 +229,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << %[%(did'ya mean "foo"?)]
         end
       end
@@ -249,7 +249,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << '/\Achapo queepo\z/imx'
         end
       end
@@ -277,7 +277,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "_ = nil\n"
           y << '%r(\Aexpercting \{ #{ _ }(?: \| #{ _ }){4,} \}\z)'
         end
@@ -299,7 +299,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "-> wat do\n"
           y << 'end'
         end
@@ -321,7 +321,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "frob do |em|\n"
           y << 'end'
         end
@@ -343,7 +343,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "def frob * args, & wee\n"
           y << "  @qq_qq = :xx\n"
           y << "  @xx_xx\n"
@@ -370,7 +370,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "if @xx\n"
           y << "  @yy if @qq\n"
           y << 'end'
@@ -394,7 +394,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "go = -> ( (foo, bar) ) do\n"
           y << "end\n"
           y << "while go[]\n"
@@ -422,7 +422,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "md = nil\n"
           y << 'md[ :foo ]'
         end
@@ -444,7 +444,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << 'map( & :wa_hoo )'
         end
       end
@@ -464,7 +464,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "left_x = nil ; right_x = 3.33  # see\n"
           y << 'left_x == right_x || frob'
         end
@@ -486,7 +486,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << "! @me"
         end
       end
@@ -506,7 +506,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'unparses' do
-        expect_these_lines_in_array_ _build_lines do |y|
+        want_these_lines_in_array_ _build_lines do |y|
           y << '@jim[ 33 ] = "hi"'
         end
       end

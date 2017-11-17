@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace::TestSupport
       shared_string_edit_session_controllers_with_no_mutation_
 
       it "one match" do
-        expect_one_match_
+        want_one_match_
       end
 
       it "three blocks - traverse from begin to end and back again" do

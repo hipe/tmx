@@ -8,7 +8,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     def rf_ replace_function_string
 
-      _oes_p = event_log.handle_event_selectively
+      _p = event_log.handle_event_selectively
 
       _ = magnetics_::Replace_Function_via_String_and_Functions_Dir
 
@@ -18,7 +18,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         :_no_work_dir_,
 
-        & _oes_p ]
+        & _p ]
       NIL_
     end
 
@@ -33,8 +33,8 @@ module Skylab::SearchAndReplace::TestSupport
       NIL_
     end
 
-    def expect_ expect_string
-      @output_string.should eql expect_string
+    def want_ want_string
+      @output_string.should eql want_string
     end
   end
 end

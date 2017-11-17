@@ -14,12 +14,12 @@ module Skylab::BeautySalon
 
       Require_user_interface_libs_[]  # because test
 
-      ob = ::Skylab::Zerk::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
+      ob = ::Skylab::Zerk::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.define do |o|
         o.module = Home_::CrazyTownReports_
         o.sub_branch_const = :Actions
       end
 
-      MTk_::ModelCentricOperatorBranch::OperatorBranch_via_Definition.define do |o|
+      MTk_::ModelCentricFeatureBranch::FeatureBranch_via_Definition.define do |o|
 
         o.lookup_softly_by do |k|
           ref = ob.lookup_softly k

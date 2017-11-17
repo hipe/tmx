@@ -18,7 +18,7 @@ module Skylab::BeautySalon::TestSupport
 
           sym_a.each do |sym|
 
-            o.expect_section sym.id2name do |sect|
+            o.want_section sym.id2name do |sect|
               h[ sym ] = sect
             end
           end
@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
 
         string_st = to_errput_line_stream_strictly
 
-        o = Zerk_test_support_[]::CLI::Expect_Section_Fail_Early.define
+        o = Zerk_test_support_[]::CLI::Want_Section_Fail_Early.define
         yield o
         spy = o.finish.to_spy_under self
         io = spy.spying_IO
@@ -110,7 +110,7 @@ module Skylab::BeautySalon::TestSupport
 
       # == hook-ins
 
-      define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
+      define_method :invocation_strings_for_want_stdout_stderr, ( Lazy_.call do
         [ 'chimmy' ].freeze
       end )
 

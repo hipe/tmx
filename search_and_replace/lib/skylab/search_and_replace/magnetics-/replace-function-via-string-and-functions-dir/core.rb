@@ -2,13 +2,13 @@ module Skylab::SearchAndReplace
 
   class Magnetics_::Replace_Function_via_String_and_Functions_Dir < Common_::Dyadic
 
-    def initialize string, functions_dir, & oes_p
+    def initialize string, functions_dir, & p
 
       @_a = []
       @functions_dir = functions_dir
       @_scn = Home_.lib_.string_scanner.new string
 
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def execute
@@ -80,7 +80,7 @@ module Skylab::SearchAndReplace
 
     def ___when_invalid_escape_sequence s ; self._COVER_ME
 
-      @_oes_p.call :error, :expression, :invalid_escape_sequence do |y|
+      @_listener.call :error, :expression, :invalid_escape_sequence do |y|
         y << s
       end
 
@@ -176,7 +176,7 @@ module Skylab::SearchAndReplace
         :capture_identifier, d,
         :method_call_chain, s_a,
         :functions_dir, @functions_dir,
-        & @_oes_p )
+        & @_listener )
 
       if repl_expr
         @_a.push repl_expr ; ACHIEVED_
@@ -187,7 +187,7 @@ module Skylab::SearchAndReplace
 
     def _expected * x_a
 
-      @_oes_p.call :replace_function_parse_error do
+      @_listener.call :replace_function_parse_error do
         Self_::Parse_error__[ * x_a, @_scn ]
       end
       UNABLE_

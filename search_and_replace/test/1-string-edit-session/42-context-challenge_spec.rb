@@ -43,7 +43,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(output looks right)" do
 
-          expect_edit_session_output_ unindent_ <<-HERE
+          want_edit_session_output_ unindent_ <<-HERE
             zero_then
             one
             AND
@@ -60,7 +60,7 @@ module Skylab::SearchAndReplace::TestSupport
 
           for_context_stream_ during_throughput_line_stream_
           for_first_and_only_line_
-          expect_last_atoms_ :static_continuing, :content, "two",
+          want_last_atoms_ :static_continuing, :content, "two",
             :match, 1, :repl, :content, "_2_and", :static, * _NL
         end
 
@@ -70,12 +70,12 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "after - first line" do
           for_context_line_ _after_lines.fetch 0
-          expect_last_atoms_ :static_continuing, :content, "three", :match, 2, :repl, * _NL
+          want_last_atoms_ :static_continuing, :content, "three", :match, 2, :repl, * _NL
         end
 
         it "after - second line (note replacement delineation is used)" do
           for_context_line_ _after_lines.fetch 1
-          expect_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
+          want_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
         end
 
         shared_subject :_after_lines do
@@ -88,12 +88,12 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "before - first line" do
           for_context_line_ _before_lines.fetch 0
-          expect_last_atoms_ :static, :content, "one", :match, 0, :repl, * _NL
+          want_last_atoms_ :static, :content, "one", :match, 0, :repl, * _NL
         end
 
         it "before - second line" do
           for_context_line_ _before_lines.fetch 1
-          expect_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
+          want_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
         end
 
         shared_subject :_before_lines do
@@ -135,7 +135,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(output looks right)" do
 
-        expect_edit_session_output_ unindent_ <<-HERE
+        want_edit_session_output_ unindent_ <<-HERE
           zip nourk 1
           nourk 2
           nourk 3 zip
@@ -149,7 +149,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "the line of - note it's three lines now. you get all three." do
 
-        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'zap nelf 1'
           _ 'nelf 2'
           _ 'nelf 3 zap'
@@ -158,12 +158,12 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "there are no two after" do
 
-        expect_no_lines_in_ after_throughput_line_stream_
+        want_no_lines_in_ after_throughput_line_stream_
       end
 
       it "the two before (ditto)" do
 
-        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'nourk 2'
           _ 'nourk 3 zip'
         end
@@ -202,7 +202,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(content looks right)" do
 
-        expect_edit_session_output_ unindent_ <<-HERE
+        want_edit_session_output_ unindent_ <<-HERE
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff
@@ -213,21 +213,21 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "the line of" do
 
-        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'JIM zam JOM'
         end
       end
 
       it "asked for two after, only got one" do
 
-        expect_paragraph_for_context_stream_ after_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ after_throughput_line_stream_ do
           _ 'ziff JUP zaff'
         end
       end
 
       it "asked for two before, only got one" do
 
-        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
+        want_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'zo JE zoo'
         end
       end

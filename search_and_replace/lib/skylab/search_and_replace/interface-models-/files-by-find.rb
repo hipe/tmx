@@ -12,9 +12,9 @@ module Skylab::SearchAndReplace
     )
     attr_writer( * PARAMETERS.symbols )
 
-    def initialize & oes_p
+    def initialize & p
       @filename_patterns = nil
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def execute
@@ -25,7 +25,7 @@ module Skylab::SearchAndReplace
         :paths, @paths,
         :freeform_query_infix_words, %w(-type f),
         :when_command, IDENTITY_,
-        & @_oes_p )
+        & @_listener )
 
       if cmd
         cmd.to_path_stream
@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace
     end
 
     def handle_event_selectively_for_zerk  # for [#ac-027]
-      @_oes_p
+      @_listener
     end
   end
 end

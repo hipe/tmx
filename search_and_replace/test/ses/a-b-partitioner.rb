@@ -25,7 +25,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       # -- assert
 
-      def expect_chunks * x_a
+      def want_chunks * x_a
 
         st = _to_chunk_stream
         d = 0
@@ -45,7 +45,7 @@ module Skylab::SearchAndReplace::TestSupport
               (use_sym, * use_pair) = span_exp
             end
 
-            expect_span chunk.fetch( d_ ), * use_pair, use_sym
+            want_span chunk.fetch( d_ ), * use_pair, use_sym
           end
         end
 
@@ -56,7 +56,7 @@ module Skylab::SearchAndReplace::TestSupport
         NIL_
       end
 
-      def expect_span match, beg, ending, sym
+      def want_span match, beg, ending, sym
 
         match._category_symbol_.should eql sym
         match._category_symbol_ == sym or fail

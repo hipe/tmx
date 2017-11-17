@@ -182,7 +182,7 @@ module Skylab::BeautySalon::TestSupport
       given :any_fafooza_terminal
 
       it 'errors specifically', ex: true do
-        _expect_exception :we_have_never_needed_terminals_to_have_the_ANY_modifier
+        _want_exception :we_have_never_needed_terminals_to_have_the_ANY_modifier
       end
     end
 
@@ -267,7 +267,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'the two length case not OK' do
         _given_AST ast_with_two_elements_
-        expect_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
+        want_exception_with_this_symbol_ :maximum_number_of_children_exceeded do
           _guy
         end
       end
@@ -446,9 +446,9 @@ module Skylab::BeautySalon::TestSupport
       _subject.is_any || fail
     end
 
-    def _expect_exception sym
+    def _want_exception sym
 
-      expect_exception_with_this_symbol_ sym do
+      want_exception_with_this_symbol_ sym do
         build_association_ given_symbol_
       end
     end

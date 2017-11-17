@@ -156,7 +156,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- hook-ins/outs
 
-    # ~ [co] "expect emission [fail early]"
+    # ~ [co] "want emission [fail early]"
 
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
       NOTHING_
@@ -188,7 +188,7 @@ module Skylab::SearchAndReplace::TestSupport
       def [] tcc
         TestSupport_::Memoization_and_subject_sharing[ tcc ]
         Require_zerk__[]
-        Zerk_.test_support::Expect_Screens[ tcc ]
+        Zerk_.test_support::Want_Screens[ tcc ]
         tcc.include self ; nil
       end
     end  # >>
@@ -226,7 +226,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     def build_root_ACS
 
-      # _oes_p = event_log.handle_event_selectively  # #cold-model
+      # _p = event_log.handle_event_selectively  # #cold-model
 
       root = Home_::Root_Autonomous_Component_System_.new
       root._init_with_defaults
@@ -240,13 +240,13 @@ module Skylab::SearchAndReplace::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Emission[ tcc ]
+  Want_Event = -> tcc do
+    Common_.test_support::Want_Emission[ tcc ]
   end
 
   Zerk_Help_Screens = -> tcc do
     Require_zerk__[]
-    Zerk_.test_support::CLI::Expect_Section_Coarse_Parse[ tcc ]
+    Zerk_.test_support::CLI::Want_Section_Coarse_Parse[ tcc ]
   end
 
   # --

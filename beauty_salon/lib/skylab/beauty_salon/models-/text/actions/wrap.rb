@@ -77,7 +77,7 @@ module Skylab::BeautySalon
           y << "how wide can the longest line be? (default: #{ val _x })"
         end,
         :default, 80,
-        :normalize_by, -> qkn, & oes_p do
+        :normalize_by, -> qkn, & p do
 
           # ( was #[#fi-004.5], used to have what is now [#br.024.C] shape )
 
@@ -85,7 +85,7 @@ module Skylab::BeautySalon
             Basic_[]::Number::Normalization.via(
               :number_set, :integer,
               :minimum, 1,
-              :qualified_knownness, qkn, & oes_p )
+              :qualified_knownness, qkn, & p )
           else
             qkn  # required-ness is out of our scope
           end

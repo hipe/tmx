@@ -10,11 +10,11 @@ module Skylab::SearchAndReplace
 
     class Sessioner___
 
-      def initialize up, & oes_p
+      def initialize up, & p
 
         @__prototype = Session___.new(
           up.ruby_regexp,
-          & oes_p )
+          & p )
       end
 
       def produce_file_session_via_ordinal_and_path d, path
@@ -28,7 +28,7 @@ module Skylab::SearchAndReplace
 
         @ruby_regexp = rx
 
-        @_oes_p = p
+        @_listener = p
         freeze
       end
 

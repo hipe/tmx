@@ -6,7 +6,7 @@ module Skylab::BeautySalon
 
     # see "declarative (structural) grammar reflection" :[#022.A]
 
-    # implementation-wise, we employ the [#ze-051] "operator branch" pattern
+    # implementation-wise, we employ the [#ze-051] "feature branch" pattern
     #
     #   - superficially simliar to [#ze-051.2] but it's simple enough we
     #     might as well re-write it. (we don't take an index-first approach

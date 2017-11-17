@@ -23,8 +23,8 @@ module Skylab::SearchAndReplace
 
     class << self
 
-      def prototype  & oes_p
-        new( & oes_p )
+      def prototype  & p
+        new( & p )
       end
 
       def the_empty_unit_of_work
@@ -34,9 +34,9 @@ module Skylab::SearchAndReplace
       private :new
     end
 
-    def initialize & oes_p
+    def initialize & p
       @instance_count = 0
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     # -- as proto
@@ -103,7 +103,7 @@ module Skylab::SearchAndReplace
       _st = @_file_session.to_line_stream
 
       o = Home_::Magnetics_::Write_changed_file_via_mutable_file_session.
-        new( & @_oes_p )
+        new( & @_listener )
 
       o.line_stream = _st
       o.path = path
@@ -251,7 +251,7 @@ module Skylab::SearchAndReplace
     end
 
     def _engage_current_match_which_is_disengaged
-      ok = @current_match_controller.engage_replacement( & @_oes_p )  # RESULT
+      ok = @current_match_controller.engage_replacement( & @_listener )  # RESULT
       if ok
         @engaged_count += 1
       end

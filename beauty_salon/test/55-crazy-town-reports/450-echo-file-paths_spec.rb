@@ -58,7 +58,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       shared_subject :_tuple do
-        _expect_failure_tuple_by_call :parse_error do |o|
+        _want_failure_tuple_by_call :parse_error do |o|
           o.macro_string = 'foo-bar'
         end
       end
@@ -151,7 +151,7 @@ module Skylab::BeautySalon::TestSupport
         Stem_via_filesystem_path_[ path ]
       end
 
-      expect_these_lines_in_array_ _st do |y|
+      want_these_lines_in_array_ _st do |y|
         # (this order is system dependend. #fragile-test)
         y << '500-expression-grouping'
         y << 'la-la-010'
@@ -170,7 +170,7 @@ module Skylab::BeautySalon::TestSupport
       _x.nil? || fail
     end
 
-    def _expect_failure_tuple_by_call * chan
+    def _want_failure_tuple_by_call * chan
 
       msgs = nil
       anticipate_ :error, :expression, * chan do |y|

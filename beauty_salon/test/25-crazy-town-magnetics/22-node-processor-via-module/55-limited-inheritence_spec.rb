@@ -122,7 +122,7 @@ module Skylab::BeautySalon::TestSupport
       sandbox_module_.const_set :Case01, chld_cls
       me = self
       chld_cls.class_exec do
-        me.expect_exception_with_this_symbol_ :cannot_redefine_or_add_to_any_existing_children_definition do
+        me.want_exception_with_this_symbol_ :cannot_redefine_or_add_to_any_existing_children_definition do
           children(
             :thing_three_xx_terminal,
           )

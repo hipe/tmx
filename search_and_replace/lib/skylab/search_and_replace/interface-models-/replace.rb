@@ -16,9 +16,9 @@ module Skylab::SearchAndReplace
 
     attr_reader( * PARAMETERS.symbols( :_read ) )
 
-    def initialize & oes_p
+    def initialize & p
       @functions_directory = nil
-      @_oes_p = oes_p
+      @_listener = p
     end
 
     def finish__matches__by o
@@ -38,7 +38,7 @@ module Skylab::SearchAndReplace
     end
 
     def handle_event_selectively_for_zerk
-      @_oes_p
+      @_listener
     end
   end
 end

@@ -39,28 +39,28 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "first" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 0
+        want_atoms_after_having_replaced_for_Nth_line_ 0
 
-        expect_atoms_ :static, :content, "on"
-        expect_atoms_ :match, 0, :repl, :content, "iguruma", * _NL
+        want_atoms_ :static, :content, "on"
+        want_atoms_ :match, 0, :repl, :content, "iguruma", * _NL
       end
 
       it "second line is from the first replacement" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 1
-        expect_last_atoms_ :match_continuing, :content, "and PCRE are", * _NL
+        want_atoms_after_having_replaced_for_Nth_line_ 1
+        want_last_atoms_ :match_continuing, :content, "and PCRE are", * _NL
       end
 
       it "third is same as orig" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 2
-        expect_last_atoms_ :static, :content, "two", * _NL
+        want_atoms_after_having_replaced_for_Nth_line_ 2
+        want_last_atoms_ :static, :content, "two", * _NL
       end
 
       it "fourth is second replacement" do
 
-        expect_atoms_after_having_replaced_for_Nth_line_ 3
-        expect_last_atoms_ :match, 1, :repl, :content, "rx engines"
+        want_atoms_after_having_replaced_for_Nth_line_ 3
+        want_last_atoms_ :match, 1, :repl, :content, "rx engines"
       end
     end
   end

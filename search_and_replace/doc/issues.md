@@ -181,7 +181,7 @@
 
 [#002]       unified language ..
              ( #was: dry run )
-             ( #was: annihilate all traces of "expect interactive" )
+             ( #was: annihilate all traces of "want interactive" )
              ( #was: -wip-them-all (in [ts]) *uses* this guy..
              we need to decide how to cover.. )
 

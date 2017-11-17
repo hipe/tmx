@@ -126,7 +126,7 @@ module Skylab::BeautySalon::TestSupport
 
         _actual = _items_index.dereference( :num_chars_wide ).description_line_array
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "how wide can the longest line be? (default: 80)"
         end
       end
@@ -151,7 +151,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'whines' do
-        expect_failure_message_ %r(\Aambiguous upstream arguments - canno)
+        want_failure_message_ %r(\Aambiguous upstream arguments - canno)
       end
 
       it 'fails' do
@@ -179,7 +179,7 @@ module Skylab::BeautySalon::TestSupport
 
       it 'errput lines are talkin bout that revolution' do
         _actual = _tuple.last
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << "(line range union: 1-INFINITY)\n"
         end
       end
@@ -225,12 +225,12 @@ module Skylab::BeautySalon::TestSupport
 
         _actual = first_line_string.split ' - '
 
-        expect_these_lines_in_array_ _actual do |y|
+        want_these_lines_in_array_ _actual do |y|
           y << 'ambiguous attribute "-num"'
           y << %(did you mean "num-chars-wide" or "number-the-lines"?\n)
         end
 
-        _expect_same_invite
+        _want_same_invite
       end
 
       it 'fails' do
@@ -253,19 +253,19 @@ module Skylab::BeautySalon::TestSupport
 
       cli.on_stream :serr
 
-      cli.expect_line_by do |line|
+      cli.want_line_by do |line|
         _unstyled = cli.unstyle_styled line
         _unstyled == "[bs] says hello" || fail
       end
 
-      cli.expect_on_stdout 'hello_from_beauty_salon'
+      cli.want_on_stdout 'hello_from_beauty_salon'
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
 
     # -- assertion assistance
 
-    def expect_failure_message_ x
+    def want_failure_message_ x
 
       _actual = first_line_string
       if x.respond_to? :ascii_only?
@@ -273,10 +273,10 @@ module Skylab::BeautySalon::TestSupport
       else
         _actual =~ x || fail
       end
-      _expect_same_invite
+      _want_same_invite
     end
 
-    def _expect_same_invite
+    def _want_same_invite
       _actual = second_and_final_line_string
       _actual == "try 'chimmy text wrap -h'\n" || fail
     end
@@ -312,7 +312,7 @@ module Skylab::BeautySalon::TestSupport
 
     # ~
 
-    def CLI_options_for_expect_stdout_stderr
+    def CLI_options_for_want_stdout_stderr
       if self.NO_FILESYSTEM
         NOTHING_
       else
@@ -328,7 +328,7 @@ module Skylab::BeautySalon::TestSupport
 
     # ~
 
-    def stdin_for_expect_stdout_stderr
+    def stdin_for_want_stdout_stderr
       @STDIN
     end
 

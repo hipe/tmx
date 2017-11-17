@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace::TestSupport
       string_edit_session_controllers_once_
 
       it "has one match controller" do
-        expect_one_match_
+        want_one_match_
       end
     end
 
@@ -50,7 +50,7 @@ module Skylab::SearchAndReplace::TestSupport
       string_edit_session_controllers_once_
 
       it "no matches" do
-        expect_no_matches_
+        want_no_matches_
       end
     end
 
@@ -64,7 +64,7 @@ module Skylab::SearchAndReplace::TestSupport
       string_edit_session_controllers_once_
 
       it "no matches" do
-        expect_no_matches_
+        want_no_matches_
       end
     end
 
