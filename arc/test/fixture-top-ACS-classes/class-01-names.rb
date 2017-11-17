@@ -6,7 +6,7 @@ module Skylab::Arc::TestSupport
 
       class << self
 
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
 
         def interpret_compound_component p, & _  # #experimental [#003.F.2] compounds
           if p
@@ -41,16 +41,16 @@ module Skylab::Arc::TestSupport
 
         rx = /\A[A-Z]/
 
-        -> st, & oes_p_p do
+        -> st, & p_p do
 
           s = st.gets_one
           if rx =~ s
             Common_::KnownKnown[ s ]
           else
 
-            _oes_p = oes_p_p[ nil ]
+            _p = p_p[ nil ]
 
-            _oes_p.call :error, :expression, :no do | y |
+            _p.call :error, :expression, :no do | y |
               y << "can't be lowercase (had #{ ick s })"
             end
             false
@@ -71,7 +71,7 @@ module Skylab::Arc::TestSupport
     class Credits_Name
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 

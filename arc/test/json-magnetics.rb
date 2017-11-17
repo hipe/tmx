@@ -17,9 +17,9 @@ module Skylab::Arc::TestSupport
 
       block_given? and raise ::ArgumentError
 
-      _oes_p = event_log.handle_event_selectively
+      _p = event_log.handle_event_selectively
       _pp = -> _ do
-        _oes_p
+        _p
       end
 
       _x = Home_.unmarshal_from_JSON acs, cust, io, & _pp
@@ -31,9 +31,9 @@ module Skylab::Arc::TestSupport
 
       block_given? and raise ::ArgumentError
 
-      _oes_p = event_log.handle_event_selectively
+      _p = event_log.handle_event_selectively
       _pp = -> _ do
-        _oes_p
+        _p
       end
 
       Home_.marshal_to_JSON io, * x_a, acs, & _pp

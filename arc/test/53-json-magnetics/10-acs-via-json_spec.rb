@@ -6,8 +6,8 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
     use :JSON_magnetics_lite
 
     context "(flat structure)" do
@@ -162,8 +162,8 @@ module Skylab::Arc::TestSupport
 
     def _state_from s
 
-      _oes_p = event_log.handle_event_selectively
-      x = _do_from _oes_p, s
+      _p = event_log.handle_event_selectively
+      x = _do_from _p, s
       if x
         res = true  # fake it - does not matter
         o = x
@@ -178,12 +178,12 @@ module Skylab::Arc::TestSupport
       _do_from No_events_, s
     end
 
-    def _do_from oes_p, json
+    def _do_from p, json
 
       cls = const_ _which
-      new_empty = cls.new_cold_root_ACS_for_expect_root_ACS
+      new_empty = cls.new_cold_root_ACS_for_want_root_ACS
 
-      o = subject_magnetics_module_::ACS_via_JSON.new( & oes_p )
+      o = subject_magnetics_module_::ACS_via_JSON.new( & p )
 
       o.customization_structure_x = nil
       o.ACS = new_empty
@@ -201,7 +201,7 @@ module Skylab::Arc::TestSupport
       root_ACS_result.should be_common_result_for_failure
     end
 
-    def expression_agent_for_expect_emission
+    def expression_agent_for_want_emission
       expag_for_cleanliness_
     end
 

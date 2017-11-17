@@ -6,8 +6,8 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     extend Top_TS_
 
-    use :expect_event
-    use :expect_line
+    use :want_event
+    use :want_line
 
       it "load" do
 
@@ -18,8 +18,8 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :ping, :arg_1, :_x_
 
-        expect_neutral_event :ping, 'helo:(_x_)'
-        expect_no_more_events
+        want_neutral_event :ping, 'helo:(_x_)'
+        want_no_more_events
         @result.should eql :_cheeky_monkey_
       end
 
@@ -27,11 +27,11 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :wiggle, :you_never, :see_these, :args
 
-        expect_not_OK_event :no_such_action do  | ev |
+        want_not_OK_event :no_such_action do  | ev |
 
           ev.action_name.should eql :wiggle
         end
-        expect_fail
+        want_fail
       end
 
       it "version" do
@@ -64,10 +64,10 @@ module Skylab::Flex2Treetop::MyTestSupport
           :resources, Mock_resources_[],
           * _outpath_arg( '_no_see_' )
 
-        expect_not_OK_event_ :errno_enoent,
+        want_not_OK_event_ :errno_enoent,
           %r(\bNo such \(par flex_file\) - \(pth ".+not-there\.flex"\)\z)
 
-        expect_fail
+        want_fail
       end
 
       it "infile not file" do
@@ -77,25 +77,25 @@ module Skylab::Flex2Treetop::MyTestSupport
           :resources, Mock_resources_[],
           * _outpath_arg( '_meh_' )
 
-        em = expect_not_OK_event :wrong_ftype
+        em = want_not_OK_event :wrong_ftype
 
         black_and_white( em.cached_event_value ).should match(
           %r(\A«[^»]+/fixture-files» exists but is not a file, it is a directory\b) )
 
-        expect_fail
+        want_fail
       end
 
       it "infile exist, outfile exist and force not present" do
 
         call_API :translate, * _etc( _file_with_some_content )
 
-        _em = expect_not_OK_event_ :missing_required_permission
+        _em = want_not_OK_event_ :missing_required_permission
 
         black_and_white( _em.cached_event_value ).should match(
           %r(\A'output-path' exists, won't overwrite without 'force': #{
             }«[^»]+file-with-some-content) )
 
-        expect_fail
+        want_fail
       end
 
       it "infile exist, outfile not file" do
@@ -106,13 +106,13 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate, :force, :flex_file, _in_path, * _etc( _out_path )
 
-        _em = expect_not_OK_event_ :errno_eisdir
+        _em = want_not_OK_event_ :errno_eisdir
 
         _rx = %r(\AIs a directory - «.+/fixture-files)
 
         black_and_white( _em.cached_event_value ).should match _rx
 
-        expect_fail
+        want_fail
       end
 
       it "minimal case" do
@@ -139,7 +139,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def __expect_last_few_lines
 
-        scn = @expect_line_scanner
+        scn = @want_line_scanner
 
         exp_a = <<-'HERE'.unindent.split %r((?<=\n))
           rule ignore_comments
@@ -149,9 +149,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         scn.advance_to_before_Nth_last_line exp_a.length
 
-        exp_a.each do | expect_line |
+        exp_a.each do | want_line |
 
-          scn.next_line.should eql expect_line
+          scn.next_line.should eql want_line
         end
       end
 
@@ -167,7 +167,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         line.should eql "grammar Danbury\n"
 
-        _count = @expect_line_scanner.skip_lines_that_match(
+        _count = @want_line_scanner.skip_lines_that_match(
 
           /\A[ ]{2,}[^[:space:]]|\A\n\z/ )
 
@@ -196,9 +196,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         :translated == @result or fail
 
-        expect_neutral_event :before_probably_creating_new_file
-        expect_neutral_event :cant_deduce_rule
-        expect_no_more_events
+        want_neutral_event :before_probably_creating_new_file
+        want_neutral_event :cant_deduce_rule
+        want_no_more_events
 
         @output_s = ::File.read @outpath
         NIL_
@@ -212,16 +212,16 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         :translate_failure == @result or fail
 
-        expect_neutral_event :before_probably_creating_new_file
+        want_neutral_event :before_probably_creating_new_file
 
-        _em = expect_not_OK_event :invalid_NS
+        _em = want_not_OK_event :invalid_NS
 
         black_and_white( _em.cached_event_value ).should eql(
 
           "grammar namespaces look like \"Foo::BarBaz\". #{
             }this is not a valid grammar namespace: \"Doonesbury Cartoon\"" )
 
-        expect_no_more_events
+        want_no_more_events
 
         ::File.read( @outpath ).should match( /\A# Auto[^\n]+\n\z/ )
       end
@@ -251,7 +251,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         next_line.should eql "[:file,\n"
 
-        scn = @expect_line_scanner
+        scn = @want_line_scanner
 
         _count = scn.skip_until_before_Nth_last_line 1
         _count.should eql 59
@@ -275,10 +275,10 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         ::File.exist?( @outpath ) and fail
 
-        expect_not_OK_event :enoent,
+        want_not_OK_event :enoent,
           %r(\ANo such file or directory #{ ICK_ }- [^ ]+/not-a-dir\z)
 
-        expect_no_more_events
+        want_no_more_events
       end
 
       it "parser from FS - saj thing - OK", alone: true do
@@ -295,9 +295,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _API_invoke_with_parser_dir _path
 
-        expect_neutral_event :wrote_grammar
-        expect_neutral_event :writing_compiled
-        expect_neutral_event :wrote_compiled
+        want_neutral_event :wrote_grammar
+        want_neutral_event :writing_compiled
+        want_neutral_event :wrote_compiled
 
         if :filesystem_touched == @result
           __single_case
@@ -305,18 +305,18 @@ module Skylab::Flex2Treetop::MyTestSupport
           __group_case
         end
 
-        expect_no_more_events
+        want_no_more_events
       end
 
       def __single_case
 
-        expect_neutral_event :touched
+        want_neutral_event :touched
       end
 
       def __group_case
 
         :cannot_use_FS_flex_file_parser_already_loaded == @result or fail
-        expect_not_OK_event :ff_parser_already
+        want_not_OK_event :ff_parser_already
       end
 
       def _API_invoke_with_parser_dir x
@@ -353,7 +353,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def _skip_blanks_and_comments
 
-        expect_line_scanner.advance_past_lines_that_match %r(\A(?:#|$))
+        want_line_scanner.advance_past_lines_that_match %r(\A(?:#|$))
 
         NIL_
       end

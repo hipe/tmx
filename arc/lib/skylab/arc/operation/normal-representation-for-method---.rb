@@ -56,17 +56,17 @@ module Skylab::Arc
 
         args.push @_single_argument_qk
 
-        oes_p = nil
-        oes_p_p = -> xx do
-          oes_p_p = -> _ do
-            oes_p
+        p = nil
+        p_p = -> xx do
+          p_p = -> _ do
+            p
           end
-          oes_p = ip.call_handler_
-          oes_p_p[ xx ]
+          p = ip.call_handler_
+          p_p[ xx ]
         end
 
-        _oes_p_p = -> x_ do
-          oes_p_p[ x_ ]
+        _p_p = -> x_ do
+          p_p[ x_ ]
         end
 
         _m = :"__#{ ss.fetch( -1 ).name.as_variegated_symbol }__component"
@@ -75,7 +75,7 @@ module Skylab::Arc
           args,
           ss.fetch( -2 ).ACS,  # receiver
           _m,
-          & _oes_p_p
+          & _p_p
         ]
 
         Here_::Delivery_::Deliverable.new modz, ss, _bc

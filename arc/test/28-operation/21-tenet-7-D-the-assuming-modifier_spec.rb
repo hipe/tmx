@@ -65,11 +65,11 @@ module Skylab::Arc::TestSupport
 
         def edit_entity * x_a, & x_p
 
-          _oes_p_p = -> _ do
+          _p_p = -> _ do
             x_p
           end
 
-          ACS_[].edit x_a, self, & _oes_p_p
+          ACS_[].edit x_a, self, & _p_p
         end
 
         def __jimmy__component_association
@@ -81,20 +81,20 @@ module Skylab::Arc::TestSupport
           end
         end
 
-        def expect_component__fun__ _, & oes_p
+        def want_component__fun__ _, & p
           if @is_fun
             true
           else
-            oes_p[ :beep ]
+            p[ :beep ]
             false
           end
         end
 
-        def expect_component__good_times__ _, & oes_p
+        def want_component__good_times__ _, & p
           if @is_good_times
             true
           else
-            oes_p[ :meep ]
+            p[ :meep ]
             false
           end
         end

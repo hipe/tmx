@@ -54,7 +54,7 @@ module Skylab::Arc::TestSupport
 
         given_upstream_ :bleecko_blicko, :no_see
 
-        expect :error, :expression, :unrecognized_property do |y|
+        want :error, :expression, :unrecognized_property do |y|
           a.push y
         end
 
@@ -121,7 +121,7 @@ module Skylab::Arc::TestSupport
 
         given_upstream_ :thing_count, "-1"
 
-        expect :error, :expression, :range_error do |y|
+        want :error, :expression, :range_error do |y|
           a.push y
         end
         a.push execute

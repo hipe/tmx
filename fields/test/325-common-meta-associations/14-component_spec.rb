@@ -8,7 +8,7 @@ module Skylab::Fields::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :attributes_meta_associations
 
       context "(context)" do

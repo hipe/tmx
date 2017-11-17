@@ -5,7 +5,7 @@ module Skylab::Arc::TestSupport
     class Class_41_Sentence
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 
@@ -27,7 +27,7 @@ module Skylab::Arc::TestSupport
           @subject = x ; nil
         end
 
-        def set_verb_phrase_for_expect_root_ACS o
+        def set_verb_phrase_for_want_root_ACS o
           @verb_phrase = o ; nil
         end
 

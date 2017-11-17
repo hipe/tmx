@@ -6,8 +6,8 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
     use :JSON_magnetics
 
     context "when the payload has an invalid primitivesque value COLD" do
@@ -44,7 +44,7 @@ module Skylab::Arc::TestSupport
           em = only_emission
           em.is_expression || fail
 
-          _expag = expression_agent_for_expect_emission
+          _expag = expression_agent_for_want_emission
           _lines = _expag.calculate [], & em.expression_proc
 
           [ _lines, em ]
@@ -140,12 +140,12 @@ module Skylab::Arc::TestSupport
 
       o_._set_object 'chocolate'
 
-      o.set_verb_phrase_for_expect_root_ACS o_
+      o.set_verb_phrase_for_want_root_ACS o_
 
       o
     end
 
-    def expression_agent_for_expect_emission
+    def expression_agent_for_want_emission
       expag_for_cleanliness_
     end
 

@@ -39,7 +39,7 @@ module Skylab::Arc::TestSupport
       dangerous_memoize :_the_memoized_array do
 
         _hi = ___the_ACS_class.new
-        _st = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS( _hi ).call
+        _st = Home_::Magnetics::NodeReferenceStreamer_via_FeatureBranch.via_ACS( _hi ).call
         _st.to_a
       end
 

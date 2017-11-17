@@ -22,7 +22,7 @@ module Skylab::Fields
 
       _ca.argument_value_consumer_by_ do |_atr|
 
-        -> x, oes_p do
+        -> x, p do
 
           bx = box[]
           if bx.has_key x  # as #here
@@ -32,13 +32,13 @@ module Skylab::Fields
 
             _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol x, :attribute_value
 
-            when_failed[ _qkn, bx, & oes_p ]
+            when_failed[ _qkn, bx, & p ]
           end
         end
       end
     end
 
-    Normalize_via_qualified_known = -> qkn, & oes_p do
+    Normalize_via_qualified_known = -> qkn, & p do
 
       # assumes `enum_box` (values ignored) as part of the qkn assoc.
 
@@ -49,7 +49,7 @@ module Skylab::Fields
         if bx.has_key qkn.value  # as #here
           qkn.to_knownness
         else
-          when_failed[ qkn, bx, & oes_p ]
+          when_failed[ qkn, bx, & p ]
         end
       else
 
@@ -60,7 +60,7 @@ module Skylab::Fields
       end
     end
 
-    when_failed = -> qkn, bx, & oes_p do
+    when_failed = -> qkn, bx, & p do
 
       build_the_event = -> do
         Here_::Build_extra_value_event.call(  # 1x
@@ -70,9 +70,9 @@ module Skylab::Fields
         )
       end
 
-      if oes_p
+      if p
 
-        oes_p.call :error, :invalid_attribute_value do
+        p.call :error, :invalid_attribute_value do
           build_the_event[]
         end  # result is unreliable
 

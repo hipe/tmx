@@ -4,36 +4,36 @@ module Skylab::Arc  # notes in [#002]
   # ->
     class << self
 
-      def create x_a, acs, & oes_p_p  # :Tenet2, (same as below)
+      def create x_a, acs, & p_p  # :Tenet2, (same as below)
 
-        o = _Mutation_Session.new( & oes_p_p )
+        o = _Mutation_Session.new( & p_p )
         o.accept_argument_array x_a
         o.ACS = acs
         o.macro_operation_method_name = :create
         o.execute
       end
 
-      def edit x_a, acs, & oes_p_p  # :Tenet3, [#006.E] hot binding
+      def edit x_a, acs, & p_p  # :Tenet3, [#006.E] hot binding
 
-        o = _Mutation_Session.new( & oes_p_p )
+        o = _Mutation_Session.new( & p_p )
         o.accept_argument_array x_a
         o.ACS = acs
         o.macro_operation_method_name = :edit
         o.execute
       end
 
-      def interpret scn, acs, & oes_p_p  # #Tenet6, [#006.F] "HB again"
+      def interpret scn, acs, & p_p  # #Tenet6, [#006.F] "HB again"
 
-        o = _Mutation_Session.new( & oes_p_p )
+        o = _Mutation_Session.new( & p_p )
         o.ACS = acs
         o.argument_scanner = scn
         o.macro_operation_method_name = :interpret
         o.execute
       end
 
-      def send_component_already_added qk, acs, & oes_p
+      def send_component_already_added qk, acs, & p
 
-        oes_p.call :error, :component_already_added do
+        p.call :error, :component_already_added do
 
           Home_::Events::ComponentAlreadyAdded.with(
             :component, qk.value,
@@ -46,9 +46,9 @@ module Skylab::Arc  # notes in [#002]
         UNABLE_  # important
       end
 
-      def send_component_not_found qkn, acs, & oes_p
+      def send_component_not_found qkn, acs, & p
 
-        oes_p.call :error, :component_not_found do
+        p.call :error, :component_not_found do
 
           Home_::Events::ComponentNotFound.with(
             :component, qkn.value,
@@ -59,9 +59,9 @@ module Skylab::Arc  # notes in [#002]
         UNABLE_  # important
       end
 
-      def send_component_removed qk, acs, & oes_p
+      def send_component_removed qk, acs, & p
 
-        oes_p.call :info, :component_removed do
+        p.call :info, :component_removed do
 
           Home_::Events::ComponentRemoved.with(
             :component, qk.value,
@@ -364,7 +364,7 @@ module Skylab::Arc  # notes in [#002]
     QualifiedComponent_via___ = -> sym, ent do
       # -
 
-        ob = ent._associations_operator_branch_
+        ob = ent._associations_feature_branch_
 
         _item = ob.dereference sym
 
@@ -391,9 +391,9 @@ module Skylab::Arc  # notes in [#002]
 
       # (you don't have to use the filesystem to represent your assocs but it is default)
       # -
-        _ob = ent._associations_operator_branch_
+        _fb = ent._associations_feature_branch_
 
-        _st = _ob.to_loadable_reference_stream
+        _st = _fb.to_loadable_reference_stream
 
         asc_via_item = association_reader_via_entity[ ent ]
 
@@ -980,20 +980,20 @@ module Skylab::Arc  # notes in [#002]
 
       Model_via_Normalization = -> n11n do  # (became #stowaway at #tombstone-3.2)
 
-        -> arg_st, & oes_p_p do
+        -> arg_st, & p_p do
 
           # interesting conundrum .. we see it as outside of the model's
           # scope to have to know the name etc for the thing it's validating
           # (experimentally)..
 
-          _oes_p = oes_p_p[ nil ]  # there is no entity to link up with
+          _p = p_p[ nil ]  # there is no entity to link up with
 
           _kn = Common_::KnownKnown[ arg_st.gets_one ]
 
           n11n.normalize_knownness _kn do | * i_a, & ev_p |
 
             # (hi.)
-            _oes_p[ * i_a, & ev_p ]
+            _p[ * i_a, & ev_p ]
           end
         end
       end

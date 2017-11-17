@@ -7,8 +7,8 @@ module Skylab::Arc
         # [#006.A] "the universal component builder" explains everything
 
         class << self
-          def call ma, asc, acs, & oes_p_p
-            new( ma, asc, acs, & oes_p_p ).execute
+          def call ma, asc, acs, & p_p
+            new( ma, asc, acs, & p_p ).execute
           end
           alias_method :[], :call
 
@@ -45,7 +45,7 @@ module Skylab::Arc
 
           @_did_prepare_call ||= _prepare_call
 
-          @_oes_p_p = if @emission_handler_builder
+          @_listenerer = if @emission_handler_builder
             @emission_handler_builder
           else
             Home_::Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS[ @association, @ACS ]
@@ -59,7 +59,7 @@ module Skylab::Arc
         end
 
         def ___via_proc_like_call
-          kn = @_receiver[ @mixed_argument, & @_oes_p_p ]
+          kn = @_receiver[ @mixed_argument, & @_listenerer ]
           if kn
             kn.to_qualified_known_around @association
           else
@@ -111,7 +111,7 @@ module Skylab::Arc
             xtra.push @ACS
           end
 
-          cmp = @_receiver.send m, @mixed_argument, * xtra, & @_oes_p_p
+          cmp = @_receiver.send m, @mixed_argument, * xtra, & @_listenerer
           if cmp
             Common_::QualifiedKnownKnown[ cmp, @association ]
           else

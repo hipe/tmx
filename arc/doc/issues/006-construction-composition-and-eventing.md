@@ -143,7 +143,7 @@ component itself, because of how the custodian built the handler
 
 in order for the ACS to have this ability (i.e in order for this API
 to support the possibility of this, regardless of what the ACS wants),
-this call to the library method *must* take an `oes_p_p` - style block.
+this call to the library method *must* take an `p_p` - style block.
 
 if the ACS uses a "cold" event model (where event handlers ride along
 with operation invocations and not an intrinsic part of ACS's), then

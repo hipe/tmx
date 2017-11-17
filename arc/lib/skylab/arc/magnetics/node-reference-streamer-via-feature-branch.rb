@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  class Magnetics::NodeReferenceStreamer_via_OperatorBranch
+  class Magnetics::NodeReferenceStreamer_via_FeatureBranch
 
     # :[#036]
 
@@ -36,7 +36,7 @@ module Skylab::Arc
           # for clients (ACS or otherwise) who don't know or care about
           # holding a reader-writer themselves..
 
-          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs
+          _rw = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque acs
           ___via_reader _rw
         end
 

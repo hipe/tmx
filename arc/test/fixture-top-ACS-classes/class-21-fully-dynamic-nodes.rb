@@ -5,7 +5,7 @@ module Skylab::Arc::TestSupport
     class Class_21_Fully_Dynamic_Nodes
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 
@@ -20,7 +20,7 @@ module Skylab::Arc::TestSupport
       class Injector
 
         def __to_comp_node_reference_streamer
-          Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS self
+          Home_::Magnetics::NodeReferenceStreamer_via_FeatureBranch.via_ACS self
         end
 
         def __assokie__component_association

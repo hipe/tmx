@@ -6,7 +6,7 @@ module Skylab::Fields::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :attributes_meta_associations
 
       context "(context)" do
@@ -33,7 +33,7 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails (with nil)" do
-            expect_this_other_false_or_nil_ state_.result
+            want_this_other_false_or_nil_ state_.result
           end
 
           it "emits" do

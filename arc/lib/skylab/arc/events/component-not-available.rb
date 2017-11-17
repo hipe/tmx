@@ -7,7 +7,7 @@ module Skylab::Arc
     Act = -> unava_p, asc, ss do
 
       x = unava_p[]
-      if false  # oes_p
+      if false  # p
         # ..
       elsif x
         self._A

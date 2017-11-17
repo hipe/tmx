@@ -5,7 +5,7 @@ module Skylab::Arc::TestSupport
     class Class_24_Multi_Intent
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 

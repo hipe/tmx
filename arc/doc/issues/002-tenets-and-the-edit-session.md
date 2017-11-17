@@ -546,7 +546,7 @@ component thru the latter's implementation of the "operation method"
 (e.g `__set__component`) derived from the operation verb in the edit
 expression.
 
-normally the singature of this call is (currently) `(x, ca, & oes_p)`
+normally the singature of this call is (currently) `(x, ca, & p)`
 where `x` is the component and `ca` is  the component association
 structure.
 
@@ -564,7 +564,7 @@ but here's this too:
 
     edit_entity :set, :severity, :SEVERE
 
-    # probably calls `subject.__set__component qk, & oes_p`
+    # probably calls `subject.__set__component qk, & p`
     # where `qk` is a qualified knownness wrapping the value and the
     # association (of :SEVERE and "severity").
 
@@ -572,7 +572,7 @@ but here's this too:
       :using, :one,
       :using, :two,
       :set, :severity, :SEVERE
-    )  # calls `subject.__set__component :one, :two, qk, & oes_p`
+    )  # calls `subject.__set__component :one, :two, qk, & p`
 
 
 

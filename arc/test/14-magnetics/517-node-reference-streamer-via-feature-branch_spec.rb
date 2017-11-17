@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[arc] magnetics - node reference streamer via operator branch" do
+  describe "[arc] magnetics - node reference streamer via feature branch" do
 
     # (was: "reflection - dynamic nodes example")
 
@@ -12,13 +12,13 @@ module Skylab::Arc::TestSupport
     TS_[ self ]
     use :memoizer_methods
     # NOTE - see #expect-no-events below
-    use :expect_root_ACS
+    use :want_root_ACS
 
     context "fully dynamic association" do
 
       shared_subject :_tuple do
         _o = build_root_ACS
-        st = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS( _o ).call
+        st = Home_::Magnetics::NodeReferenceStreamer_via_FeatureBranch.via_ACS( _o ).call
         _x = st.gets
         _xx = st.gets
         _xxx = st.gets and fail

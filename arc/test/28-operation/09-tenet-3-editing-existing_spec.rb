@@ -75,13 +75,13 @@ module Skylab::Arc::TestSupport
           @year = year
         end
 
-        def edit_entity * x_a, & oes_p
+        def edit_entity * x_a, & p
 
-          _oes_p_p = -> _ do
-            oes_p
+          _p_p = -> _ do
+            p
           end
 
-          ACS_[].edit x_a, self, & _oes_p_p
+          ACS_[].edit x_a, self, & _p_p
         end
 
         attr_reader(
@@ -93,15 +93,15 @@ module Skylab::Arc::TestSupport
 
           yield :can, :set
 
-          -> in_st, & oes_p_p do
+          -> in_st, & p_p do
 
             s = in_st.gets_one
             if /\A[a-z]+\z/ =~ s
               Common_::KnownKnown[ s ]
             else
 
-              if oes_p_p
-                oes_p_p[ nil ].call :error, :expression do | y |
+              if p_p
+                p_p[ nil ].call :error, :expression do | y |
                   y << "all caps? #{ s.inspect }"
                 end
               end

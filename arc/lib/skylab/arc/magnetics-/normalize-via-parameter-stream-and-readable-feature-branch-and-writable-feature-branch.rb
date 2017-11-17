@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  class Magnetics_::Normalize_via_ParameterStream_and_ReadableOperatorBranch_and_WritableOperatorBranch
+  class Magnetics_::Normalize_via_ParameterStream_and_ReadableFeatureBranch_and_WritableFeatureBranch
 
       # 1x. [ac] only. [#028] (and see open tag below)
 
@@ -168,10 +168,10 @@ module Skylab::Arc
           :exception_class_by, -> { Home_::MissingRequiredParameters },
         )
 
-        oes_p = @on_missing_required
+        p = @on_missing_required
 
-        if oes_p
-          oes_p.call :error, :missing_required_parameters do
+        if p
+          p.call :error, :missing_required_parameters do
             ev
           end
           UNABLE_

@@ -52,7 +52,7 @@ module Skylab::Arc
             break
           end
 
-          o = Home_::Magnetics::TouchComponent_via_Association_and_OperatorBranch.new
+          o = Home_::Magnetics::TouchComponent_via_Association_and_FeatureBranch.new
           o.component_association = asc
           o.reader_writer = rw
           qk = o.execute

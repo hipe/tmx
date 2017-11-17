@@ -33,12 +33,12 @@ module Skylab::Fields::TestSupport
 
         p = nil ; with = nil ; without = nil
 
-        define_method :expect_missing_required_message_with_newline_ do |msg, * sym_a|
+        define_method :want_missing_required_message_with_newline_ do |msg, * sym_a|
           p && p[]
           with[ msg, sym_a, self ]
         end
 
-        define_method :expect_missing_required_message_without_newline_ do |msg, * sym_a|
+        define_method :want_missing_required_message_without_newline_ do |msg, * sym_a|
           p && p[]
           without[ msg, sym_a, self ]
         end
@@ -46,8 +46,8 @@ module Skylab::Fields::TestSupport
         p = -> do
           p = nil
           word = 'parameter'
-          with = Expect_missinger_[ word, NEWLINE_ ]
-          without = Expect_missinger_[ word ]
+          with = Want_missinger_[ word, NEWLINE_ ]
+          without = Want_missinger_[ word ]
         end
       end.call
     # -
@@ -128,13 +128,13 @@ module Skylab::Fields::TestSupport
         tcc.include self
       end
 
-      # -- EEK for now we don't want to mess with the dependency of "expect event fail early"
+      # -- EEK for now we don't want to mess with the dependency of "want event fail early"
 
-      def expect_channel_looks_like_missing_required_ a
-        expect_channel_ a, :error, :missing_required_attributes
+      def want_channel_looks_like_missing_required_ a
+        want_channel_ a, :error, :missing_required_attributes
       end
 
-      def expect_channel_ a, * chan
+      def want_channel_ a, * chan
         a[0] == chan || fail
       end
 

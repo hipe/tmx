@@ -16,8 +16,8 @@ module Skylab::Arc::TestSupport
 
       # -- setup
 
-      def expect * chan, & p
-        __spy_MIBS.expect_emission p, chan
+      def want * chan, & p
+        __spy_MIBS.want_emission p, chan
         NIL
       end
 
@@ -31,7 +31,7 @@ module Skylab::Arc::TestSupport
 
       def __build_spy_MIBS
 
-        spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+        spy = Common_.test_support::Want_Emission_Fail_Early::Spy.new
 
         spy.call_by do |p|
           _interpret_entity_MIBS p

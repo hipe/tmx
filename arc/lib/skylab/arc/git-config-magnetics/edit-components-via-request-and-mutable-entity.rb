@@ -8,8 +8,8 @@ module Skylab::Arc
 
       def mutable_entity= ent
 
-        @_associations_operator_branch = ent._associations_operator_branch_
-        @_models_operator_branch_ = ent._models_operator_branch_
+        @_associations_feature_branch = ent._associations_feature_branch_
+        @_models_feature_branch_ = ent._models_feature_branch_
         @mutable_entity = ent
       end
 
@@ -74,7 +74,7 @@ module Skylab::Arc
         # remote performer because pluralton associtions are so experimental
         # and we are already assuming a lot..
 
-        _item = @_models_operator_branch_.dereference @_current_MODEL_symbol
+        _item = @_models_feature_branch_.dereference @_current_MODEL_symbol
         _model_mod = _item.value
 
         _ent = @mutable_entity.define_and_assign_component_by do |o|
@@ -218,7 +218,7 @@ module Skylab::Arc
 
       def __when_unset
 
-        @_current_association = @_models_operator_branch_.dereference @_current_MODEL_symbol
+        @_current_association = @_models_feature_branch_.dereference @_current_MODEL_symbol
 
         if @mutable_entity._knows_value_for_association_ @_current_association
           __do_unset
@@ -303,7 +303,7 @@ module Skylab::Arc
       end
 
       def __init_association_via_parameter_symbol
-        @_association = @_associations_operator_branch.dereference @_current_parameter_symbol
+        @_association = @_associations_feature_branch.dereference @_current_parameter_symbol
         NIL
       end
 

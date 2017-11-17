@@ -4,8 +4,8 @@ module Skylab::Arc::TestSupport
 
     class Class_72_Big_Loada
 
-      def initialize & oes_p
-        @_oes_p = oes_p
+      def initialize & p
+        @_listener = p
         @bar = :_yoohoo_
       end
 
@@ -19,7 +19,7 @@ module Skylab::Arc::TestSupport
 
       def execute
 
-        @_oes_p.call :info, :expression, :k do |y|
+        @_listener.call :info, :expression, :k do |y|
           y << highlight( 'k.' )
         end
 

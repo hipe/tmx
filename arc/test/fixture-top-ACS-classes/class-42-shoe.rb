@@ -7,17 +7,17 @@ module Skylab::Arc::TestSupport
       # -
 
         class << self
-          alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+          alias_method :new_cold_root_ACS_for_want_root_ACS, :new
           private :new
         end  # >>
 
         def edit * x_a, & x_p
 
-          _oes_p_p = -> _ do
+          _p_p = -> _ do
             x_p
           end
 
-          Home_.edit x_a, self, & _oes_p_p
+          Home_.edit x_a, self, & _p_p
         end
 
         def __lace__component_association
@@ -95,7 +95,7 @@ module Skylab::Arc::TestSupport
             if call_p
               use_p = call_p
             else
-              self._COVER_ME  # use @oes_p_
+              self._COVER_ME  # use @listener_
             end
 
             use_p.call :info, :expression, :hi do | y |

@@ -1,6 +1,6 @@
 {
-  "after": "common",
-  "category": "more general libs",
+  "after": "tabular",
+  "category": "modeling essentials",
   "doc test manifest": ".doc-test-manifest.list",
   "is lib": true,
   "sigil": "fi"

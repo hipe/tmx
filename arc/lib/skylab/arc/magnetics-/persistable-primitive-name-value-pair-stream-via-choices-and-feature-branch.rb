@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  module Magnetics_::PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch
+  module Magnetics_::PersistablePrimitiveNameValuePairStream_via_Choices_and_FeatureBranch
 
     # notes in [#003]
 
@@ -10,7 +10,7 @@ module Skylab::Arc
       # intent-specific customizations
 
       def via_customization_and_ACS cust_x, acs
-        _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque acs
+        _rw = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque acs
         via_customization_and_rw_ cust_x, _rw
       end
 

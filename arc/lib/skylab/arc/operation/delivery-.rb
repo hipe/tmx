@@ -87,9 +87,9 @@ module Skylab::Arc
           @_assuming.each do |assu|
 
             _m = if assu.is_negated
-              :"expect_component_not__#{ assu.symbol }__"
+              :"want_component_not__#{ assu.symbol }__"
             else
-              :"expect_component__#{ assu.symbol }__"
+              :"want_component__#{ assu.symbol }__"
             end
 
             bc = @_bound_call
@@ -135,7 +135,7 @@ module Skylab::Arc
           _recipient_frame = ss.fetch( -3 )
           _reader_writer = _recipient_frame.reader_writer
 
-          _ev_p = Home_::Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch.call(
+          _ev_p = Home_::Magnetics::WriteComponent_via_QualifiedComponent_and_FeatureBranch.call(
             _deliveree_frame, _reader_writer
           ) do
             _nf_a = ss[ 1 .. -2 ].map( & :name )
@@ -163,7 +163,7 @@ module Skylab::Arc
         # --
 
         def _emission_handler
-          @___oes_p ||= ___carefully_determine_emission_handler
+          @___listener ||= ___carefully_determine_emission_handler
         end
 
         def ___carefully_determine_emission_handler

@@ -7,7 +7,7 @@ module Skylab::Fields
       # this is "one ring": the place where normalization algorithms
       # go to achieve immortality. main algorithm (etching) in [#012]
 
-      # this feels close to an "operator branch", but for now, not yet
+      # this feels close to an "feature branch", but for now, not yet
 
       # we are almost finished with [#037] the effort of "one ring"
       # unification, but this file file/node still has:

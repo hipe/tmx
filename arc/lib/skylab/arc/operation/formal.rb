@@ -230,9 +230,9 @@ module Skylab::Arc
 
       def deliverable_for_imperative_phrase_ ip
 
-        ss = ip.selection_stack_ ; oes_p = ip.call_handler_
+        ss = ip.selection_stack_ ; p = ip.call_handler_
 
-        o = self.class::Preparation.new self, ss, & oes_p
+        o = self.class::Preparation.new self, ss, & p
 
         o.PVS_parameter_stream_once = -> do
           _association_index.to_native_association_stream
@@ -244,7 +244,7 @@ module Skylab::Arc
 
         o.on_unavailable = NOTHING_  # raise exceptions
 
-        o.parameter_store = begin_parameter_store_( & oes_p )
+        o.parameter_store = begin_parameter_store_( & p )
 
         o.parameter_value_source = ip.build_parameter_value_source_
 
@@ -330,7 +330,7 @@ module Skylab::Arc
 
         # (if any of the below ivars is not set you did not set a required attribute)
 
-        o = Home_::Magnetics_::Normalize_via_ParameterStream_and_ReadableOperatorBranch_and_WritableOperatorBranch.begin @ss_
+        o = Home_::Magnetics_::Normalize_via_ParameterStream_and_ReadableFeatureBranch_and_WritableFeatureBranch.begin @ss_
 
         o.PVS_parameter_stream_once = @PVS_parameter_stream_once
 

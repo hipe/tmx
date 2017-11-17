@@ -317,7 +317,7 @@ module Skylab::Arc
         end
 
         def reader_writer
-          @___rw ||= Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @ACS
+          @___rw ||= Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque @ACS
         end
 
         def name

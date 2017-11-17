@@ -66,9 +66,9 @@ module Skylab::Arc::TestSupport
 
         class << self
 
-          def edit_entity * x_a, & oes_p
+          def edit_entity * x_a, & p
             ACS_[].create x_a, new do | _ |
-              oes_p
+              p
             end
           end
 
@@ -79,7 +79,7 @@ module Skylab::Arc::TestSupport
 
           yield :can, :set
 
-          -> st, & oes_p_p do
+          -> st, & p_p do
 
             s = st.head_as_is
             if /\A[A-Z ]+\z/ =~ s
@@ -87,9 +87,9 @@ module Skylab::Arc::TestSupport
               Common_::KnownKnown[ s ]
             else
 
-              _oes_p = oes_p_p[ nil ]
+              _p = p_p[ nil ]
 
-              _oes_p.call :error, :expression do | y |
+              _p.call :error, :expression do | y |
                 y << "name must be in all caps"
               end
 
@@ -120,7 +120,7 @@ module Skylab::Arc::TestSupport
 
       class ACS_28_6_3_Age
 
-        def self.interpret_component st, & oes_p
+        def self.interpret_component st, & p
           d = st.gets_one
           if 0 > d
             self._COVER_ME

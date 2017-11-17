@@ -24,7 +24,7 @@ module Skylab::Arc::TestSupport
 
         given_upstream_ :email, 100
 
-        expect :error, :expression, :type_error do |y|
+        want :error, :expression, :type_error do |y|
           a.push y
         end
 
@@ -48,7 +48,7 @@ module Skylab::Arc::TestSupport
 
         given_upstream_ :email, "nyla"
 
-        expect :error, :expression, :yup do |y|
+        want :error, :expression, :yup do |y|
           a.push y
         end
 
@@ -79,7 +79,7 @@ module Skylab::Arc::TestSupport
 
         given_upstream_ :gza, nil
 
-        expect :error, :expression, :yup_is_required do |y|
+        want :error, :expression, :yup_is_required do |y|
           a.push y
         end
 

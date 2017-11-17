@@ -45,9 +45,9 @@ module Skylab::Fields
           otr
         end
 
-        def _init_dup_as_curry & oes_p
-          if oes_p
-            @_oes_p_ = oes_p
+        def _init_dup_as_curry & p
+          if p
+            @_listener_ = p
           end
           @_remainder_box = @_remainder_box.dup
           NIL_
@@ -115,10 +115,10 @@ module Skylab::Fields
 
       module Curried_Call_Instance_Methods__
 
-        def _call_as_curry_via_arglist a, & oes_p
+        def _call_as_curry_via_arglist a, & p
 
-          if oes_p
-            @_oes_p_ = oes_p
+          if p
+            @_listener_ = p
           end
 
           full_bx = self.class::ATTRIBUTES.ivars_box_.h_
@@ -132,9 +132,9 @@ module Skylab::Fields
           execute
         end
 
-        def __call_as_curry_via_iambic x_a, & oes_p
-          if oes_p
-            @_oes_p_ = oes_p
+        def __call_as_curry_via_iambic x_a, & p
+          if p
+            @_listener_ = p
           end
           remove_instance_variable :@_remainder_box
           full_bx = self.class::ATTRIBUTES.ivars_box_.h_

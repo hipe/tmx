@@ -44,7 +44,7 @@ module Skylab::Fields::TestSupport
 
                 ivar = asc.as_ivar  # be careful doing it here (what if ivar name changed later in the meta assocs?)
 
-                -> x, _oes_p do
+                -> x, _p do
 
                   ent = @_normalization_.entity
 

@@ -43,11 +43,11 @@ module Skylab::Fields::TestSupport
       end
 
       it "still works as a property ofc" do
-        expect_works_as_property _subject_module
+        want_works_as_property _subject_module
       end
 
       it "reflect with your meta-properties" do
-        expect_reflects _subject_module
+        want_reflects _subject_module
       end
     end
 
@@ -72,20 +72,20 @@ module Skylab::Fields::TestSupport
       end
 
       it "works as property" do
-        expect_works_as_property _subject_module
+        want_works_as_property _subject_module
       end
 
       it "reflects" do
-        expect_reflects _subject_module
+        want_reflects _subject_module
       end
     end
 
-    def expect_works_as_property cls
+    def want_works_as_property cls
       foo = cls.with :foo, :bar
       foo.instance_variable_get( :@foo ).should eql :bar
     end
 
-    def expect_reflects cls
+    def want_reflects cls
       cls.properties[ :foo ].fun_ness.should eql :really_fun
     end
   end

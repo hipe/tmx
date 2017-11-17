@@ -9,7 +9,7 @@ module Skylab::Arc::TestSupport
     TS_[ self ]
     use :memoizer_methods
     # NOTE - see #expect-no-events below
-    use :expect_root_ACS
+    use :want_root_ACS
 
     shared_subject :_ACS do
       build_root_ACS
@@ -40,7 +40,7 @@ module Skylab::Arc::TestSupport
       _x = _cust_x
 
       st = Home_::Magnetics_::
-        PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+        PersistablePrimitiveNameValuePairStream_via_Choices_and_FeatureBranch.
       via_customization_and_ACS _x, _acs
 
       a = []

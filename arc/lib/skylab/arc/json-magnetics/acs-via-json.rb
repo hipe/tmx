@@ -11,7 +11,7 @@ module Skylab::Arc
         self._COVER_ME_easy
         pp = Home_.handler_builder_for acs
       end
-      _oes_p = pp[ acs ]
+      _p = pp[ acs ]
 
       if st.respond_to? :read
         json = st.read
@@ -22,7 +22,7 @@ module Skylab::Arc
         end
       end
 
-      o = Here___.new( & _oes_p )
+      o = Here___.new( & _p )
       o.ACS = acs
       o.customization_structure_x = cust_x
       o.JSON = json
@@ -42,7 +42,7 @@ module Skylab::Arc
 
         def initialize & p
 
-          @_caller_oes_p = p
+          @_caller_p = p
           @context_linked_list = nil
           @on_empty_JSON_object = nil
         end
@@ -64,7 +64,7 @@ module Skylab::Arc
 
         def execute
 
-          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque(
+          _rw = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque(
             remove_instance_variable( :@ACS ) )
 
           _x = Home_.lib_.JSON.parse(
@@ -78,19 +78,19 @@ module Skylab::Arc
             remove_instance_variable( :@customization_structure_x ),
             _rw,
             @on_empty_JSON_object,
-            & @_caller_oes_p )
+            & @_caller_p )
 
           _rec._execute
         end
 
       class StackFrame__
 
-        def initialize x, context_x, cust_x, rw, on_empty, & top_oes_p
+        def initialize x, context_x, cust_x, rw, on_empty, & top_p
 
           @context_linked_list = context_x
           @customization_structure_x = cust_x
           @on_empty_JSON_object = on_empty
-          @_original_caller_oes_p = top_oes_p
+          @_original_caller_p = top_p
           @_rw = rw
           @_x = x
         end
@@ -137,7 +137,7 @@ module Skylab::Arc
           deeps = nil
           shallows = nil
 
-          ob = ___build_operator_branch
+          ob = ___build_feature_branch
           st = remove_instance_variable :@_pair_stream
 
           begin
@@ -171,21 +171,21 @@ module Skylab::Arc
           if has_extra
             __when_extra sym, st
           else
-            @_operator_branch = ob
+            @_feature_branch = ob
             @_unorderd_deeps = deeps
             @_unorderd_shallows = shallows
             ACHIEVED_
           end
         end
 
-        def ___build_operator_branch
+        def ___build_feature_branch
 
           _st = Home_::Magnetics_::
-            PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+            PersistablePrimitiveNameValuePairStream_via_Choices_and_FeatureBranch.
           via_customization_and_rw_(
             @customization_structure_x, @_rw )
 
-          Common_::Stream::Magnetics::OperatorBranch_via_Stream.define do |o|
+          Common_::Stream::Magnetics::FeatureBranch_via_Stream.define do |o|
             o.upstream = _st
             o.key_method_name = :name_symbol
           end
@@ -262,10 +262,10 @@ module Skylab::Arc
 
           asc = qk.association
 
-          _oes_p_p = _reinit_handlers_for asc
+          _p_p = _reinit_handlers_for asc
 
           o = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.begin(
-            _on_component, asc, _ACS, & _oes_p_p )
+            _on_component, asc, _ACS, & _p_p )
 
           o.construction_method = :interpret_compound_component
 
@@ -290,7 +290,7 @@ module Skylab::Arc
 
           _json_as_h = qk.value
 
-          _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque cmp
+          _rw = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque cmp
 
           o = StackFrame__.new(
             _json_as_h,
@@ -298,7 +298,7 @@ module Skylab::Arc
             cust_x,
             _rw,
             @on_empty_JSON_object,
-            & @_original_caller_oes_p )
+            & @_original_caller_p )
 
           _xx_ = o._execute
 
@@ -394,10 +394,10 @@ module Skylab::Arc
           # emit an emission with the exact same signature but contextualized
 
           me = self
-          orig_oes_p = @_original_caller_oes_p
+          orig_p = @_original_caller_p
 
-          oes_p = -> * i_a, & ev_p do
-            orig_oes_p.call( * i_a ) do |y=nil|
+          p = -> * i_a, & ev_p do
+            orig_p.call( * i_a ) do |y=nil|
 
               if :expression == i_a.fetch( 1 )
                 me.__express_contextualized_expression y, asc, self, & ev_p
@@ -409,10 +409,10 @@ module Skylab::Arc
           end
 
           @_CURRENT_component_handler_builder = -> _ do
-            oes_p
+            p
           end
 
-          @_CURRENT_component_oes_p = oes_p
+          @_CURRENT_component_p = p
 
           NIL_
         end
@@ -452,7 +452,7 @@ module Skylab::Arc
           # making unserialization errors consistent with respect to content,
           # not surface representation.
 
-          ob = @_operator_branch
+          ob = @_feature_branch
 
           qkn_a.sort_by do |qk|
 
@@ -499,7 +499,7 @@ module Skylab::Arc
         end
 
         def caller_emission_handler_  # assume it's about to be used
-          @_original_caller_oes_p
+          @_original_caller_p
         end
       end
 

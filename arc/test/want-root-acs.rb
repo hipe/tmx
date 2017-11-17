@@ -1,6 +1,6 @@
 module Skylab::Arc::TestSupport
 
-  module Expect_Root_ACS
+  module Want_Root_ACS
 
     def self.[] tcc
       tcc.include self

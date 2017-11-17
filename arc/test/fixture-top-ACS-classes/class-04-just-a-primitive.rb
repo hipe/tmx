@@ -5,7 +5,7 @@ module Skylab::Arc::TestSupport
     class Class_04_Just_a_Primitive
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 

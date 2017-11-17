@@ -6,8 +6,8 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
     use :JSON_magnetics
 
     context "persist this ACS when empty - OK" do
@@ -83,7 +83,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "emits nothing" do
-        expect_no_emissions
+        want_no_emissions
       end
 
       it "unmarshalled OK" do

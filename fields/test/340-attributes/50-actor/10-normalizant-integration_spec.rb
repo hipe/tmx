@@ -6,7 +6,7 @@ module Skylab::Fields::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :attributes
 
     # ==
@@ -47,14 +47,14 @@ module Skylab::Fields::TestSupport
         end
 
         it "fails (`with` results in false)" do
-          expect_this_other_false_or_nil_ state_.result
+          want_this_other_false_or_nil_ state_.result
         end
 
         it "expresses" do
 
           _be_this = be_emission :error, :missing_required_attributes do |ev|
             _ = black_and_white ev
-            expect_missing_required_message_with_newline_ _, :other
+            want_missing_required_message_with_newline_ _, :other
           end
 
           only_emission.should _be_this

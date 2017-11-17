@@ -5,10 +5,10 @@ module Skylab::Fields
     # LEGACY (used maybe 1x in real life)
 
     # -
-      def initialize namelist=nil, & oes_p
+      def initialize namelist=nil, & p
         @a = []
         @d = -1
-        @on_event_selectively = oes_p
+        @listener = p
         if namelist
           push_frame Name_frame_via_namelist___[ namelist ]
         end
@@ -81,8 +81,8 @@ module Skylab::Fields
       end
 
       def maybe_send_event * i_a, & ev_p  # #[#ca-066]
-        if @on_event_selectively
-          @on_event_selectively.call( * i_a, & ev_p )
+        if @listener
+          @listener.call( * i_a, & ev_p )
         elsif :error == i_a.first
           # (half of a [#co-045])
           raise ev_p[].to_exception
@@ -118,7 +118,7 @@ module Skylab::Fields
 
         def initialize bx
           @bx = bx
-          @on_event_selectively = nil
+          @listener = nil
         end
 
         def any_all_names
@@ -146,7 +146,7 @@ module Skylab::Fields
 
         def initialize h
           @h = h
-          @on_event_selectively = nil
+          @listener = nil
           freeze
         end
 
@@ -176,7 +176,7 @@ module Skylab::Fields
         def initialize i_a  # mutates
           @i_a = i_a.freeze
           @h = ::Hash[ i_a.map { |i| [ i, nil ] } ]
-          @on_event_selectively = nil
+          @listener = nil
         end
 
         def all_names

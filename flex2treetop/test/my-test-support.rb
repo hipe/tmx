@@ -77,9 +77,9 @@ module Skylab::Flex2Treetop::MyTestSupport
         TestSupport_.debug_IO
       end
 
-      def expect_not_OK_event_ sym, msg=nil
+      def want_not_OK_event_ sym, msg=nil
 
-        em = expect_not_OK_event nil, msg
+        em = want_not_OK_event nil, msg
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end
@@ -122,27 +122,25 @@ module Skylab::Flex2Treetop::MyTestSupport
     end.call
   end
 
-  module Expect_Event
+  module Want_Event
 
     class << self
 
       def [] tcm
 
-        tcm.include Common_.test_support::Expect_Emission::Test_Context_Instance_Methods
+        tcm.include Common_.test_support::Want_Emission::Test_Context_Instance_Methods
         tcm.include self
       end
     end  # >>
   end
 
-  Expect_Line = -> tcm do
+  Want_Line = -> tcm do
 
-    TestSupport_::Expect_line[ tcm ]
+    TestSupport_::Want_line[ tcm ]
   end
 
-  Expect_Stdout_Stderr = -> tcm do
-
-    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+  Want_Stdout_Stderr = -> tcm do
+    tcm.include TestSupport_::Want_Stdout_Stderr::Test_Context_Instance_Methods
   end
 
   Common_ = ::Skylab::Common

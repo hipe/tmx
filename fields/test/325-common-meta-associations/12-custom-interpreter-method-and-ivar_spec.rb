@@ -141,7 +141,7 @@ module Skylab::Fields::TestSupport
       context "use this one \"macro\"" do
 
         it "OK number is OK" do
-          _expect_this_value_is_OK( -2 )
+          _want_this_value_is_OK( -2 )
         end
 
         context "not OK number is not OK" do
@@ -172,7 +172,7 @@ module Skylab::Fields::TestSupport
       context "use this other \"macro\"" do
 
         it "OK number is OK" do
-          _expect_this_value_is_OK( 0 )
+          _want_this_value_is_OK( 0 )
         end
 
         context "not OK number is not OK" do
@@ -203,7 +203,7 @@ module Skylab::Fields::TestSupport
       context "use this third \"macro\"" do
 
         it "OK number is OK" do
-          _expect_this_value_is_OK 1
+          _want_this_value_is_OK 1
         end
 
         context "not OK number is not OK" do
@@ -271,7 +271,7 @@ module Skylab::Fields::TestSupport
         sct.freeze
       end
 
-      def _expect_this_value_is_OK d
+      def _want_this_value_is_OK d
 
         _attr = _association
         _qkn = Common_::QualifiedKnownKnown.via_value_and_symbol d, :_no_see_FI_

@@ -1,6 +1,6 @@
 {
-  "after": "parse",
-  "category": "more general libs",
+  "after": "fields",
+  "category": "modeling essentials",
   "is lib": true,
   "sigil": "arc"
 }

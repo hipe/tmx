@@ -65,7 +65,7 @@ module Skylab::Arc
       def _do
         @_did = true
         @_ACS = remove_instance_variable( :@_ACS_proc ).call
-        @_reader = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @_ACS
+        @_reader = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque @_ACS
         NIL_
       end
 

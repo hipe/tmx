@@ -32,7 +32,7 @@ module Skylab::Fields::TestSupport
     # ([#ze-027] is another place where we use set theory.)
 
     TS_[ self ]
-    use :expect_emission_fail_early
+    use :want_emission_fail_early
 
     it "loads" do
       subject_module_ || fail
@@ -50,7 +50,7 @@ module Skylab::Fields::TestSupport
       # -
         any_object = ::Object.new
 
-        _p = expect_emission_fail_early_listener
+        _p = want_emission_fail_early_listener
 
         _normalize_by do |o|
           o.argument_array = [ :a, "one", :b, "two", :c, "three", :d, "four" ]
@@ -59,15 +59,15 @@ module Skylab::Fields::TestSupport
           o.listener = _p
         end
 
-        expect :error, :argument_error, :unknown_primary do |ev|
+        want :error, :argument_error, :unknown_primary do |ev|
           _s_a = ev.express_into_under [], expression_agent
-          expect_these_lines_in_array_ _s_a do |y|
+          want_these_lines_in_array_ _s_a do |y|
             y << "unrecognized member :b"
             y << "did you mean :c?"
           end
         end
 
-        expect_result false
+        want_result false
       # -
     end
 
@@ -83,7 +83,7 @@ module Skylab::Fields::TestSupport
           # o.listener = _p
         end
 
-        expect_result true
+        want_result true
       # -
     end
 
@@ -98,7 +98,7 @@ module Skylab::Fields::TestSupport
           o.ivar_store = any_object
         end
 
-        expect_result true
+        want_result true
       # -
     end
 
@@ -106,7 +106,7 @@ module Skylab::Fields::TestSupport
 
       # -
 
-        _p = expect_emission_fail_early_listener
+        _p = want_emission_fail_early_listener
 
         any_object = ::Object.new
 
@@ -118,12 +118,12 @@ module Skylab::Fields::TestSupport
           o.listener = _p
         end
 
-        expect :error, :missing_required_attributes do |ev|
+        want :error, :missing_required_attributes do |ev|
           _lines = ev.express_into_under [], expression_agent
           _lines == ["missing required member 'b'\n"] || fail
         end
 
-        expect_result false
+        want_result false
       # -
     end
 
@@ -138,7 +138,7 @@ module Skylab::Fields::TestSupport
 
       # -
 
-        _p = expect_emission_fail_early_listener
+        _p = want_emission_fail_early_listener
 
         obj = ::Object.new
 
@@ -154,11 +154,11 @@ module Skylab::Fields::TestSupport
         end
 
         ev = nil
-        expect :error, :missing_required_attributes do |ev_|
+        want :error, :missing_required_attributes do |ev_|
           ev = ev_
         end
 
-        expect_result false
+        want_result false
 
         ev.reasons.to_a == [:b] || fail
       # -

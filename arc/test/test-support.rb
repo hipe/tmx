@@ -73,7 +73,7 @@ module Skylab::Arc::TestSupport
       [ "{}\n" ]
     end
 
-    def state_for_expect_emission
+    def state_for_want_emission
       root_ACS_state
     end
 
@@ -85,15 +85,15 @@ module Skylab::Arc::TestSupport
 
       _cls = subject_root_ACS_class
 
-      root = _cls.new_cold_root_ACS_for_expect_root_ACS
+      root = _cls.new_cold_root_ACS_for_want_root_ACS
 
-      oes_p = event_log.handle_event_selectively
+      p = event_log.handle_event_selectively
 
-      _oes_p_p = -> _ do
-        oes_p
+      _p_p = -> _ do
+        p
       end
 
-      @result = Home_.edit x_a, root, & _oes_p_p
+      @result = Home_.edit x_a, root, & _p_p
       @root_ACS = root
 
       NIL_
@@ -120,7 +120,7 @@ module Skylab::Arc::TestSupport
     # --
 
     def build_root_ACS  # build cold root
-      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
+      subject_root_ACS_class.new_cold_root_ACS_for_want_root_ACS
     end
   end
 
@@ -140,11 +140,11 @@ module Skylab::Arc::TestSupport
     class Class_01_Empty
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_want_root_ACS, :new
         private :new
       end  # >>
 
-      def initialize & oes_p
+      def initialize & p
         @_IGNORED_EVENT_HANDLER = true
       end
 
@@ -170,8 +170,8 @@ module Skylab::Arc::TestSupport
         st.advance_one
         Common_::KnownKnown[ s ]
       else
-        _oes_p = pp[ nil ]
-        _oes_p.call :error, :expression, :nope do |y|
+        _p = pp[ nil ]
+        _p.call :error, :expression, :nope do |y|
           y << "(must be a lowercase word (had: #{ ick s }).)"
           y << "so i guess that's that."
         end
@@ -218,8 +218,8 @@ module Skylab::Arc::TestSupport
 
   module TestLib_
 
-    Expect_event = -> tcc do
-      Common_.test_support::Expect_Emission[ tcc ]
+    Want_event = -> tcc do
+      Common_.test_support::Want_Emission[ tcc ]
     end
 
     Memoizer_methods = -> tcc do

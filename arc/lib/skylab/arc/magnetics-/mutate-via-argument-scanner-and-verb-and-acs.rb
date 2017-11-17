@@ -5,10 +5,10 @@ module Skylab::Arc
     # notes in [#002]
     # -
 
-      def initialize & oes_p_p
-        if oes_p_p
-          if 1 == oes_p_p.arity
-            @pp_ = oes_p_p
+      def initialize & p_p
+        if p_p
+          if 1 == p_p.arity
+            @pp_ = p_p
           else
             self._BECOME_THE_FUTURE
           end
@@ -133,7 +133,7 @@ module Skylab::Arc
 
       def _prepare_unit_of_work_queue
 
-        _rw = Home_::Magnetics::OperatorBranch_via_ACS.for_componentesque @ACS
+        _rw = Home_::Magnetics::FeatureBranch_via_ACS.for_componentesque @ACS
         # (#[#023] - a read/writer is one-to-one with an ACS, so etc..)
 
         a = []

@@ -33,8 +33,8 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     class << self
 
-      def call * x_a, & oes_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+      def call * x_a, & p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & p
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
@@ -439,11 +439,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     cls_p = Common_::Memoize[ & p ]
 
-    -> * x_a, & oes_p do
+    -> * x_a, & p do
 
       _cls = cls_p.call
 
-      sess = _cls.via_iambic x_a, & oes_p
+      sess = _cls.via_iambic x_a, & p
 
       if sess
         sess.procede_until_endpoint_
@@ -470,8 +470,8 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       wrap_in_grammar_s: :optional,
     )
 
-    def initialize & oes_p
-      @on_event_selectively = oes_p
+    def initialize & p
+      @listener = p
     end
 
     def procede_until_endpoint_
@@ -495,7 +495,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       dn_ID = @downstream_ID ; up_ID = @upstream_ID ; verb_s = @verb_s
 
-      @on_event_selectively.call :info, :express, :doing do | y |
+      @listener.call :info, :express, :doing do | y |
 
         _dn_s = dn_ID.description_under self
         _up_s = up_ID.description_under self
@@ -521,7 +521,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
         :do_show_sexp_only, @do_show_sexp_only,
         :resources, @resources,
         :wrap_in_grammar_s, @wrap_in_grammar_s,
-        & @on_event_selectively )
+        & @listener )
     end
 
     # ~ we comport with [#bs-031] control-flow method-naming idioms
@@ -547,7 +547,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __when_enoent e
 
-      @on_event_selectively.call :error, :expression, :enoent do | y |
+      @listener.call :error, :expression, :enoent do | y |
         y << e.message
       end
 
@@ -566,7 +566,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       path = @FS_parser_dir ; stat = @stat
 
-      @on_event_selectively.call :error, :expression, :not_dir do | y |
+      @listener.call :error, :expression, :not_dir do | y |
         y << "parser dir was #{ stat.ftype } - #{ pth path }"
       end
 
@@ -613,7 +613,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
         path = @compiled_grammar_path
 
-        @on_event_selectively.call :info, :expression, :using do | y |
+        @listener.call :info, :expression, :using do | y |
           y << "using: #{ path }"
         end
 
@@ -647,7 +647,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       path = @grammar_path
 
-      @on_event_selectively.call :info, :expression, :wrote_grammar do | y |
+      @listener.call :info, :expression, :wrote_grammar do | y |
         y << "wrote #{ path } (#{ bytes } bytes)."
       end
 
@@ -658,14 +658,14 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       path = @compiled_grammar_path
 
-      @on_event_selectively.call :info, :expression, :writing_compiled do | y |
+      @listener.call :info, :expression, :writing_compiled do | y |
         y << "writing #{ path } .."
       end
 
       bytes = LIB_.treetop::Compiler::GrammarCompiler.
         new.compile @grammar_path, @compiled_grammar_path
 
-      @on_event_selectively.call :info, :expression, :wrote_compiled do | y |
+      @listener.call :info, :expression, :wrote_compiled do | y |
         y << " done (treetop wrote #{ bytes } bytes)."
       end
 
@@ -687,7 +687,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __when_flexfile_parser_already_loaded
 
-      @on_event_selectively.call :error, :expression, :ff_parser_already do | y |
+      @listener.call :error, :expression, :ff_parser_already do | y |
         y << "cannot use FS parser, a parser class is already loaded #{
           }(maybe because you are running all the tests at once?)"
       end
@@ -728,7 +728,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __when_reached_FS_parser
 
-      @on_event_selectively.call :info, :expression, :touched do | y |
+      @listener.call :info, :expression, :touched do | y |
         y << "touched files. nothing more to do."
       end
 
@@ -750,8 +750,8 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       resources: nil,
     )
 
-    def initialize & oes_p
-      @on_event_selectively = oes_p
+    def initialize & p
+      @listener = p
     end
 
     def procede_until_endpoint_
@@ -818,7 +818,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       s = parser.failure_reason  # (not our name)
 
-      @on_event_selectively.call :error, :expression, :no_parser_result do | y |
+      @listener.call :error, :expression, :no_parser_result do | y |
         y << ( s || "Got nil from parse without reason" )
       end
 
@@ -879,7 +879,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       sess = Translation_Session___.new
 
-      sess.on_event_selectively =  @on_event_selectively
+      sess.listener =  @listener
 
       sess.wrap_in_grammar_s = @wrap_in_grammar_s
 
@@ -901,7 +901,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       attr_accessor(
         :builder,
         :grammar_s,
-        :on_event_selectively,
+        :listener,
         :wrap_in_grammar_s,
       )
 
@@ -975,7 +975,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
       def maybe_receive_event * i_a, & x_p
 
-        @on_event_selectively.call( * i_a, & x_p )
+        @listener.call( * i_a, & x_p )
         NIL_
       end
     end

@@ -6,15 +6,15 @@ module Skylab::Arc
 
       Require_fields_lib_[]
 
-      Act = -> oes_p, unava_p, fo do
+      Act = -> p, unava_p, fo do
 
         # so many permutations. is mentee of #here-1
 
         x = unava_p.call
-        if oes_p
+        if p
           if x
             ( * sym_a, ev_p ) = x
-            oes_p.call( * sym_a, & ev_p )
+            p.call( * sym_a, & ev_p )
             UNABLE_
           else
             self._B

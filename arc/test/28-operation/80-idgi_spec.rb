@@ -6,8 +6,8 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
 
     context "invalid under the plural" do
 
@@ -59,7 +59,7 @@ module Skylab::Arc::TestSupport
       class MC_2_Xx
 
         class << self
-          alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+          alias_method :new_cold_root_ACS_for_want_root_ACS, :new
           private :new
         end  # >>
 
@@ -76,11 +76,11 @@ module Skylab::Arc::TestSupport
 
           yield :is_singular_of, :paths
 
-          -> st, & oes_p_p do
+          -> st, & p_p do
 
             s = st.gets_one
             if ::File::SEPARATOR == s[ 0 ]
-              oes_p_p[ nil ].call :error, :expression, :cant_have_it
+              p_p[ nil ].call :error, :expression, :cant_have_it
               UNABLE_
             else
               Common_::KnownKnown[ s ]

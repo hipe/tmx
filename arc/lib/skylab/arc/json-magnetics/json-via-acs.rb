@@ -11,11 +11,11 @@ module Skylab::Arc
         self._COVER_ME_easy
         pp = Home_.handler_builder_for acs
       end
-      _oes_p = pp[ acs ]
+      _p = pp[ acs ]
 
       y = args.shift
 
-      o = JSON_Magnetics::JSON_via_ACS.new( & _oes_p )
+      o = JSON_Magnetics::JSON_via_ACS.new( & _p )
 
       o.downstream_IO_proc = -> do
         y
@@ -36,7 +36,7 @@ module Skylab::Arc
         def initialize & p
           @be_pretty = true
           @customization_structure_x = nil
-          @on_event_selectively = p
+          @listener = p
         end
 
         attr_writer(
@@ -97,7 +97,7 @@ module Skylab::Arc
           end
 
           st = Home_::Magnetics_::
-            PersistablePrimitiveNameValuePairStream_via_Choices_and_OperatorBranch.
+            PersistablePrimitiveNameValuePairStream_via_Choices_and_FeatureBranch.
           via_customization_and_ACS(
             cust_x, acs )
 
@@ -188,7 +188,7 @@ module Skylab::Arc
             bytes = ___write_string_to_line_oriented_context io, s
           end
 
-          @on_event_selectively.call :info, :wrote do
+          @listener.call :info, :wrote do
 
             Home_.lib_.system_lib::Filesystem::Events::Wrote.with(
               :bytes, bytes,

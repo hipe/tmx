@@ -5,7 +5,7 @@ module Skylab::Fields::TestSupport
   describe "[fi] stack - intro" do
 
     TS_[ self ]
-    use :expect_event
+    use :want_event
 
     it "loads" do
       _subject
@@ -30,11 +30,11 @@ module Skylab::Fields::TestSupport
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       x.should eql false
 
-      expect_not_OK_event :unrecognized_argument do |ev|
+      want_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_tokens == [ :derp, :nerp ] || fail
       end
 
-      expect_no_more_events
+      want_no_more_events
     end
 
     it "strange name frame with no event receiver will raise an exeption" do
@@ -64,11 +64,11 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :b, :B2
       x = stack.dereference :c
 
-      expect_not_OK_event :unrecognized_argument do |ev|
+      want_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_token == :c || fail
       end
 
-      expect_no_more_events
+      want_no_more_events
       x.should eql false
     end
 

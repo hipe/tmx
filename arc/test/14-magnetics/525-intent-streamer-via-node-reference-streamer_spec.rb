@@ -9,7 +9,7 @@ module Skylab::Arc::TestSupport
     TS_[ self ]
     use :memoizer_methods
     # NOTE - see #expect-no-events below
-    use :expect_root_ACS
+    use :want_root_ACS
 
     shared_subject :_ACS do
       build_root_ACS
@@ -38,7 +38,7 @@ module Skylab::Arc::TestSupport
 
       _acs = _ACS
 
-      _node_sr = Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_ACS _acs
+      _node_sr = Home_::Magnetics::NodeReferenceStreamer_via_FeatureBranch.via_ACS _acs
 
       o = Home_::Magnetics_::IntentStreamer_via_NodeReferenceStreamer.via_streamer__ _node_sr
 

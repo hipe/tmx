@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  class Magnetics::TouchComponent_via_Association_and_OperatorBranch
+  class Magnetics::TouchComponent_via_Association_and_FeatureBranch
 
     # #open [#008.D] - make it a magnetic by simple model
     # result is a qk-ish
@@ -94,9 +94,9 @@ module Skylab::Arc
 
       Build_empty_hot___ = -> asc, acs do  # result is qk
 
-        _oes_p_p = Home_::Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS[ asc, acs ]
+        _p_p = Home_::Magnetics_::EmissionHandlerBuilder_via_Association_and_ACS[ asc, acs ]
 
-        o = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.begin nil, asc, acs, & _oes_p_p
+        o = Home_::Magnetics::QualifiedComponent_via_Value_and_Association.begin nil, asc, acs, & _p_p
 
         o.mixed_argument = if o.looks_like_compound_component__
           IDENTITY_

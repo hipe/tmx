@@ -268,7 +268,7 @@ module Skylab::Fields::TestSupport
         rescue Home_::ArgumentError => e
         end
 
-        expect_missing_required_message_without_newline_ e.message, :baz
+        want_missing_required_message_without_newline_ e.message, :baz
       end
     end
 
@@ -296,10 +296,10 @@ module Skylab::Fields::TestSupport
         rescue Home_::ArgumentError => e
         end
 
-        expect_missing_required_message_without_newline_ e.message, :foo
+        want_missing_required_message_without_newline_ e.message, :foo
       end
     end
 
-    define_method :expect_missing_required_message_without_newline_, Common_Frame.definition_for_etc
+    define_method :want_missing_required_message_without_newline_, Common_Frame.definition_for_etc
   end
 end

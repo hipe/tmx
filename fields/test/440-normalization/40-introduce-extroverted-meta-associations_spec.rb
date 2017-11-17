@@ -39,7 +39,7 @@ module Skylab::Fields::TestSupport
           rescue Home_::ArgumentError => e
           end
 
-          expect_missing_required_message_without_newline_ e.message, :beta, :delta
+          want_missing_required_message_without_newline_ e.message, :beta, :delta
         end
       end
 
@@ -54,10 +54,10 @@ module Skylab::Fields::TestSupport
 
           a = _N_things
 
-          expect_channel_ a, :error, :argument_error, :unknown_primary
+          want_channel_ a, :error, :argument_error, :unknown_primary
 
           _lines = black_and_white_lines_via_event_ a[1].call
-          expect_these_lines_in_array_ _lines do |y|
+          want_these_lines_in_array_ _lines do |y|
             y << 'unrecognized attribute :aa'
             y << 'did you mean :alpha, :beta or :gamma?'
           end
@@ -78,9 +78,9 @@ module Skylab::Fields::TestSupport
           # #coverpoint1.2: `id2name` is a necessary thing, and "parameter" the word
 
           a = _N_things
-          expect_channel_looks_like_missing_required_ a
+          want_channel_looks_like_missing_required_ a
           _line = black_and_white_line_via_event_ a[1].call
-          expect_missing_required_message_with_newline_ _line, :beta, :delta
+          want_missing_required_message_with_newline_ _line, :beta, :delta
         end
 
         shared_subject :_N_things do

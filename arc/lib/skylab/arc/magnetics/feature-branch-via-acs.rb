@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  class Magnetics::OperatorBranch_via_ACS  # see [#022] for theory
+  class Magnetics::FeatureBranch_via_ACS  # see [#022] for theory
 
     # central structure for caching whatever we *do* cache about an ACS,
     # like each of our determinations of whether or not the hook-in is
@@ -157,7 +157,7 @@ module Skylab::Arc
         @ACS_.method m
       else
         -> do
-          Home_::Magnetics::NodeReferenceStreamer_via_OperatorBranch.via_reader self
+          Home_::Magnetics::NodeReferenceStreamer_via_FeatureBranch.via_reader self
         end
       end
     end
@@ -195,7 +195,7 @@ module Skylab::Arc
     end
 
     def touch_component asc  # #experimental [ze] 1x
-      Home_::Magnetics::TouchComponent_via_Association_and_OperatorBranch[ asc, self ]  # result is qk
+      Home_::Magnetics::TouchComponent_via_Association_and_FeatureBranch[ asc, self ]  # result is qk
     end
 
     def qualified_knownness_of_association asc

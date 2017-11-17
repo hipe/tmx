@@ -57,10 +57,10 @@ module Skylab::Fields::TestSupport
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
   end
 
-  Expect_missinger_ = -> noun_lemma, yes_newline=nil do
+  Want_missinger_ = -> noun_lemma, yes_newline=nil do
 
     # produces a function that assists in the definitions for the methods
-    # called `expect_missing_required_message_with_newline_` etc ick/meh
+    # called `want_missing_required_message_with_newline_` etc ick/meh
 
     -> msg, sym_a, tc do
 
@@ -90,8 +90,8 @@ module Skylab::Fields::TestSupport
       _lines  # hi. #todo
     end
 
-    def expect_these_lines_in_array_ a, & p
-      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
 
     def my_all_purpose_expression_agent_
@@ -105,15 +105,15 @@ module Skylab::Fields::TestSupport
 
     # ~ :[#007.E] we might go indifferent to false or nil here but not sure
 
-    def expect_this_one_false_or_nil_NOT_USED_ x
-      _expect_false_or_nil_TS x, nil
+    def want_this_one_false_or_nil_NOT_USED_ x
+      _want_false_or_nil_TS x, nil
     end
 
-    def expect_this_other_false_or_nil_ x
-      _expect_false_or_nil_TS x, false
+    def want_this_other_false_or_nil_ x
+      _want_false_or_nil_TS x, false
     end
 
-    def _expect_false_or_nil_TS act, exp
+    def _want_false_or_nil_TS act, exp
       if act != exp
         _ = if act
           "<##{ act.class }>"
@@ -138,7 +138,7 @@ module Skylab::Fields::TestSupport
       event_log.handle_event_selectively
     end
 
-    def state_for_expect_emission
+    def state_for_want_emission
       state_
     end
   end
@@ -193,11 +193,11 @@ module Skylab::Fields::TestSupport
       def lib
         Home_::Stack::CommonFrame
       end
-      def definition_for_etc  # `expect_missing_required_message_without_newline_`
+      def definition_for_etc  # `want_missing_required_message_without_newline_`
         @___etc ||= __etc
       end
       def __etc
-        p = Expect_missinger_[ 'field' ]
+        p = Want_missinger_[ 'field' ]
         -> msg, * sym_a do
           p[ msg, sym_a, self ]
         end
@@ -207,14 +207,14 @@ module Skylab::Fields::TestSupport
 
   # --
 
-  Expect_Emission_Fail_Early = -> tcc do
+  Want_Emission_Fail_Early = -> tcc do
 
-    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+    Common_.test_support::Want_Emission_Fail_Early[ tcc ]
   end
 
-  Expect_Event = -> tcm do
+  Want_Event = -> tcm do
 
-    Common_.test_support::Expect_Emission[ tcm ]
+    Common_.test_support::Want_Emission[ tcm ]
   end
 
   Memoizer_Methods = -> tcc do

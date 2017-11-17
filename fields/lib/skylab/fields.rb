@@ -458,21 +458,21 @@ module Skylab::Fields
         include ModuleMethods__
 
         def backwards_curry  # eek
-          -> * x_a, & oes_p do
-            Home_::CurriedActor_.backwards_curry__ self, x_a, & oes_p
+          -> * x_a, & p do
+            Home_::CurriedActor_.backwards_curry__ self, x_a, & p
           end
         end
 
-        def curry_with * x_a, & oes_p
-          Home_::CurriedActor_.curry__ self, x_a, & oes_p
+        def curry_with * x_a, & p
+          Home_::CurriedActor_.curry__ self, x_a, & p
         end
 
-        def [] * a, & oes_p
-          call_via_arglist a, & oes_p
+        def [] * a, & p
+          call_via_arglist a, & p
         end
 
-        def call * a, & oes_p
-          call_via_arglist a, & oes_p
+        def call * a, & p
+          call_via_arglist a, & p
         end
 
         def call_via_arglist a, & x_p

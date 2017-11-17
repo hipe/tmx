@@ -6,7 +6,7 @@ module Skylab::Fields::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
+    use :want_event
     use :attributes
 
     # ==
@@ -46,11 +46,11 @@ module Skylab::Fields::TestSupport
             false == _ or fail
 
             msg = nil
-            expect_event :missing_required_attributes do |ev|
+            want_event :missing_required_attributes do |ev|
               msg = black_and_white ev
             end
 
-            expect_missing_required_message_with_newline_ msg, :last_name
+            want_missing_required_message_with_newline_ msg, :last_name
           end
 
           it "using the empty store" do  # features used by [ta] only
@@ -62,9 +62,9 @@ module Skylab::Fields::TestSupport
 
             false == _ or fail
 
-            expect_event :missing_required_attributes do |ev|
+            want_event :missing_required_attributes do |ev|
               _msg = black_and_white ev
-              expect_missing_required_message_with_newline_ _msg, :last_name, :soc
+              want_missing_required_message_with_newline_ _msg, :last_name, :soc
             end
           end
 
@@ -91,7 +91,7 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails" do  # :#coverpoint1.4
-            expect_this_other_false_or_nil_ state_.result
+            want_this_other_false_or_nil_ state_.result
           end
 
           it "emits" do
@@ -99,7 +99,7 @@ module Skylab::Fields::TestSupport
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
               _msg = black_and_white ev
-              expect_missing_required_message_with_newline_ _msg, :last_name, :soc
+              want_missing_required_message_with_newline_ _msg, :last_name, :soc
             end
 
             only_emission.should _be_this
@@ -226,7 +226,7 @@ module Skylab::Fields::TestSupport
           end
 
           it "fails (with nil)" do
-            expect_this_other_false_or_nil_ _state_tuple.fetch 0
+            want_this_other_false_or_nil_ _state_tuple.fetch 0
           end
 
           it "emits" do
@@ -234,7 +234,7 @@ module Skylab::Fields::TestSupport
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
               _msg = black_and_white ev
-              expect_missing_required_message_with_newline_ _msg, :b
+              want_missing_required_message_with_newline_ _msg, :b
             end
 
             only_emission.should _be_this

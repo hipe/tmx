@@ -134,7 +134,7 @@ module Skylab::Fields::TestSupport
             :secret_horrible_dont_do_this, :_make_the_default_not_OK_,
             :faflooka, :F1
           )
-          expect_channel_looks_like_missing_required_ a
+          want_channel_looks_like_missing_required_ a
           _ev = a[1].call
           _ev.reasons.to_a == [ :jamooka ] || fail
         end

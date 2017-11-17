@@ -147,7 +147,7 @@ module Skylab::Fields
 
         ca.argument_value_consumer_by_ do |_atr|
 
-          -> x, _oes_p do
+          -> x, _p do
             asc = @_normalization_.association_index.read_association_ sym
             mutate_for_redirect_ x, asc
             asc.flush_DSL_for_interpretation_ self  # result is kp
@@ -202,7 +202,7 @@ module Skylab::Fields
 
         @_association_.argument_value_consumer_by_ do |_atr|
 
-          -> x, _oes_p do
+          -> x, _p do
 
             # "flag of" must have the *full* pipeline of the referrant -
             # read *and* write.

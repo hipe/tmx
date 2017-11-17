@@ -1,6 +1,6 @@
 module Skylab::Arc
 
-  Magnetics::WriteComponent_via_QualifiedComponent_and_OperatorBranch =
+  Magnetics::WriteComponent_via_QualifiedComponent_and_FeatureBranch =
     # this name is wishful thinking..
 
       # ==

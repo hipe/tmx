@@ -6,8 +6,8 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
 
     it "missing required args raises semantic arg error" do
 
@@ -43,7 +43,7 @@ module Skylab::Arc::TestSupport
       end
     end
 
-    def expression_agent_for_expect_emission
+    def expression_agent_for_want_emission
       expag_for_codifying__
     end
 

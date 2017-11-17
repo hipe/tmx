@@ -6,14 +6,14 @@ module Skylab::Arc::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_root_ACS
+    use :want_event
+    use :want_root_ACS
 
     context "2 deep" do
 
       call_by_ do
         _ = event_log.handle_event_selectively
-        shoe = _shoe_model.new_cold_root_ACS_for_expect_root_ACS
+        shoe = _shoe_model.new_cold_root_ACS_for_want_root_ACS
         @result = shoe.edit :set, :lace, :color, "red", & _
         @root_ACS = shoe ; nil
       end
@@ -61,7 +61,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "no events" do
-        expect_no_emissions
+        want_no_emissions
       end
     end
 
@@ -92,10 +92,10 @@ module Skylab::Arc::TestSupport
     end
 
     def _new_shoe
-      _shoe_model.new_cold_root_ACS_for_expect_root_ACS
+      _shoe_model.new_cold_root_ACS_for_want_root_ACS
     end
 
-    def expression_agent_for_expect_emission
+    def expression_agent_for_want_emission
       expag_for_cleanliness_
     end
 

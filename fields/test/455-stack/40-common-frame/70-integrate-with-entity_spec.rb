@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
       rescue ::ArgumentError => e
       end
 
-      expect_missing_required_message_without_newline_ e.message, :bar
+      want_missing_required_message_without_newline_ e.message, :bar
     end
 
     it "works with all" do
@@ -51,7 +51,7 @@ module Skylab::Fields::TestSupport
       [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
     end
 
-    define_method :expect_missing_required_message_without_newline_, Common_Frame.definition_for_etc
+    define_method :want_missing_required_message_without_newline_, Common_Frame.definition_for_etc
 
     def _subject_class
       X_cf_Inter_1

@@ -21,7 +21,7 @@ for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
 signature and semantics:
 
-    normalize_qualified_knownness <qualified-knownness>, & <oes_p>
+    normalize_qualified_knownness <qualified-knownness>, & <listener>
 
 the result of such a method (or proc as appropriate) must be assumed to
 be either false-ish for all cases of failure, or otherwise (and true-ish)
