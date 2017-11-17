@@ -21,7 +21,7 @@ module Skylab::Slicer::TestSupport
 
   # -
     Use_method___ = -> sym do
-      :expect_CLI == sym or fail
+      :want_CLI == sym or fail
       Brazen_.test_support.lib( :CLI_support_expectations )[ self ]
       NIL_
     end

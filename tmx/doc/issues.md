@@ -9,12 +9,12 @@
 [#020]       mountable standalone scripts and related ..
              ( #was: "did you mean.." )
 
-[#019] #open get fuzzy out of multi mode argument scanner - it should
+[#019] #open get fuzzy out of dig scanner - it should
              only happen in "omni" now (no-deps [ze]). unifying these
              might take work.
 
              tmx CLI fuzzy resolution for the first token must not happen
-             at the level of a single operator branch (for #here these
+             at the level of a single feature branch (for #here these
              three categories). rather, the fuzzy search must happen across
              all N sources in series, for it to work correctly.
 

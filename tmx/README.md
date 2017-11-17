@@ -26,7 +26,7 @@ available as "Testing and Metaprogramming eXeriments". but meh.
 
 ## what is tmx here?
 
-in the context of the diaspora before you, "tmx" is an "operator branch"
+in the context of the diaspora before you, "tmx" is an "feature branch"
 whose only purpose is to glue together other such branches.
 
 (EDIT: the above used to reference what is now [#pl-011] but may no longer be relevant)

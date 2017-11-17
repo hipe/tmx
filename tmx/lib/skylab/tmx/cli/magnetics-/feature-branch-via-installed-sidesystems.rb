@@ -2,7 +2,7 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::OperatorBranch_via_InstalledSidesystems < SimpleModel_ # 1x
+    class Magnetics_::FeatureBranch_via_InstalledSidesystems < SimpleModel_ # 1x
 
       # when the front element of the ARGV directly corresponds to a
       # sidesystem (gem), then resolution of the remote operator is much

@@ -43,7 +43,7 @@ module Skylab::TMX::TestSupport
       shared_subject :_result_and_lines do
 
         lines = nil
-        expect :error, :expression, :parse_error do |y|
+        want :error, :expression, :parse_error do |y|
           lines = y
         end
 

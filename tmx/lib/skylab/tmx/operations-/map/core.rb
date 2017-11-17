@@ -21,8 +21,8 @@ module Skylab::TMX
         @_seen_last_reorder_plan = false
         @stream_modifiers_were_used = false
 
-        @operator_branch = Zerk_::ArgumentScanner::
-          OperatorBranch_via_Hash[ PRIMARIES___ ]
+        @feature_branch = Zerk_::ArgumentScanner::
+          FeatureBranch_via_Hash[ PRIMARIES___ ]
       end
 
       def json_file_stream_by= x  # for [#006]
@@ -161,7 +161,7 @@ module Skylab::TMX
         if ! @argument_scanner.no_unparsed_exists
 
           @__matcher = @argument_scanner.matcher_for(
-            :primary, :value, :against_branch, @operator_branch )
+            :primary, :value, :against_branch, @feature_branch )
 
           begin
             ok = __parse_one_primary_term
@@ -418,14 +418,14 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream_for_didactics
-        @operator_branch.to_loadable_reference_stream.map_by do |key_x|
+        @feature_branch.to_loadable_reference_stream.map_by do |key_x|
           [ :primary, key_x ]
         end
       end
 
       attr_reader(
         :argument_scanner,  # for collaborators
-        :operator_branch,  # for [#006] feature injection
+        :feature_branch,  # for [#006] feature injection
         :stream_modifiers_were_used,  # ditto
       )
     # -

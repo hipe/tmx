@@ -16,28 +16,28 @@ module Skylab::TMX::TestSupport
     context "these three distinct cases have the same error message" do
 
       it "strange primary" do
-        _expect_bad_primary '-strange'
+        _want_bad_primary '-strange'
       end
 
       it "non-primary when primary expected (FOR NOW)" do
-        _expect_bad_primary 'beepo'
+        _want_bad_primary 'beepo'
       end
 
       it "try to access primary that is blacklisted" do
-        _expect_bad_primary '-json-file-stream'
+        _want_bad_primary '-json-file-stream'
       end
 
-      def _expect_bad_primary same
+      def _want_bad_primary same
 
         invoke _subject_operation, same
 
-        expect_on_stderr "unknown primary \"#{ same }\""
+        want_on_stderr "unknown primary \"#{ same }\""
 
         _ = '-[a-z]+(?:-[a-z]+)*'
 
-        expect %r(\Aexpecting \{ #{ _ }(?: \| #{ _ }){4,} \}\z)
+        want %r(\Aexpecting \{ #{ _ }(?: \| #{ _ }){4,} \}\z)
 
-        expect_failed_normally_
+        want_failed_normally_
       end
     end
 
@@ -94,7 +94,7 @@ module Skylab::TMX::TestSupport
     it "help for subject the other way works the same" do
 
       invoke '-help', _subject_operation
-      _actual = _expect_common_help_screen_sections
+      _actual = _want_common_help_screen_sections
       _expected = _sections_for_help_screen_normally
 
       diff = _expected.diff_against _actual
@@ -106,22 +106,22 @@ module Skylab::TMX::TestSupport
     shared_subject :_sections_for_help_screen_normally do
 
       invoke _subject_operation, '-help'
-      _expect_common_help_screen_sections
+      _want_common_help_screen_sections
     end
 
-    def _expect_common_help_screen_sections
+    def _want_common_help_screen_sections
 
-        expect_common_help_screen_sections_by_ do |sct, o|
+        want_common_help_screen_sections_by_ do |sct, o|
 
-          o.expect_section "usage" do |sect|
+          o.want_section "usage" do |sect|
             sct.usage = sect
           end
 
-          o.expect_section "description" do |sect|
+          o.want_section "description" do |sect|
             sct.description = sect
           end
 
-          o.expect_section "primaries" do |sect|  # NOTE the name
+          o.want_section "primaries" do |sect|  # NOTE the name
             sct.main_items = sect
           end
         end
@@ -131,9 +131,9 @@ module Skylab::TMX::TestSupport
 
       it "works" do
         invoke _subject_operation
-        expect_on_stdout 'tyris'
-        expect 'deka'
-        expect_succeed
+        want_on_stdout 'tyris'
+        want 'deka'
+        want_succeed
       end
 
       given_ %w( tyris deka )
@@ -145,9 +145,9 @@ module Skylab::TMX::TestSupport
 
         it "works as expected (note default record separator is a SPACE)" do
           _invoke_same
-          expect_on_stdout "damud 44"
-          expect "adder 33"
-          expect_succeed
+          want_on_stdout "damud 44"
+          want "adder 33"
+          want_succeed
         end
 
         given_ %w( damud adder )
@@ -157,8 +157,8 @@ module Skylab::TMX::TestSupport
 
         it "displays a DASH for the value" do
           _invoke_same
-          expect_on_stdout "frim_frum -"
-          expect_succeed
+          want_on_stdout "frim_frum -"
+          want_succeed
         end
 
         given_ %w( frim_frum )
@@ -191,12 +191,12 @@ module Skylab::TMX::TestSupport
         end
       end
 
-      expect_each_on_stderr_by do |line|
+      want_each_on_stderr_by do |line|
         see[ line ]
         NIL
       end
 
-      expect_succeed
+      want_succeed
 
       if find
         fail "did not find: #{ find.inspect } in #{ count } lines"
@@ -209,10 +209,10 @@ module Skylab::TMX::TestSupport
 
       it "works" do
         invoke _subject_operation, '-slice', '2nd', 'half'
-        expect_on_stdout 'stern'
-        expect 'damud'
-        expect 'guld'
-        expect_succeed
+        want_on_stdout 'stern'
+        want 'damud'
+        want 'guld'
+        want_succeed
       end
 
       given_ %w( tyris trix stern damud guld )

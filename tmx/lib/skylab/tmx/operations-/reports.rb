@@ -224,7 +224,7 @@ module Skylab::TMX
 
     Report_name_collection___ = Lazy_.call do
 
-      Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
+      Zerk_::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.define do |o|
 
         o.module = Home_::Reports_
 

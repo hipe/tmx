@@ -58,11 +58,11 @@ module Skylab::Slicer
             end
             p = EMPTY_P_
             x = if bx.length.zero?
-              @on_event_selectively.call :info, :expression, :all_OK do | y |
+              @listener.call :info, :expression, :all_OK do | y |
                 y << "(all #{ ok_count } OK in greenlist)"
               end
             else
-              @on_event_selectively.call :error, :expression, :extra do | y |
+              @listener.call :error, :expression, :extra do | y |
                 y << "in greenlist but not on filesystem: (#{ bx.a_ * ', ' })"
               end
             end

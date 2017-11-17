@@ -47,7 +47,7 @@ module Skylab::TMX
 
       def to_bound_call_of_operator
 
-        _ada = Operations_module_operator_branch___[]
+        _ada = Operations_module_feature_branch___[]
 
         item = @argument_scanner_narrator.match_branch(
           :business_item, :against_branch, _ada )
@@ -59,9 +59,9 @@ module Skylab::TMX
         end
       end
 
-      Operations_module_operator_branch___ = Lazy_.call do
+      Operations_module_feature_branch___ = Lazy_.call do
 
-        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |o|
+        Zerk_::ArgumentScanner::FeatureBranch_via_AutoloaderizedModule.define do |o|
 
           o.module = Home_::Operations_
 

@@ -106,7 +106,7 @@ module Skylab::TMX
 
       def __express_a_classic_help_screen
 
-        __init_is_multimode
+        __init_is_dig
         __init_didactics
 
         __help_screen_module.express_into __stderr do |o|
@@ -133,7 +133,7 @@ module Skylab::TMX
 
       def __items
         items = @_didactics.to_item_normal_tuple_stream
-        if @_is_multimode
+        if @_is_dig
           items = @_arg_scn.altered_normal_tuple_stream_via items
         end
         items
@@ -141,25 +141,25 @@ module Skylab::TMX
 
       def __description_reader
         rdr = @_didactics.description_proc_reader
-        if @_is_multimode
+        if @_is_dig
           rdr = @_arg_scn.altered_description_proc_reader_via rdr
         end
         rdr
       end
 
-      def __init_is_multimode
+      def __init_is_dig
 
         top = @CLI.selection_stack.last
 
         as = top.argument_scanner_narrator
 
         if as.respond_to? :add_primary_at_position
-          @_is_multimode = true
+          @_is_dig = true
           @_arg_scn = as
           HELP_RX =~ as.head_as_is || self._PARSING_MODEL
           as.advance_one
         else
-          @_is_multimode = false
+          @_is_dig = false
         end
         NIL
       end

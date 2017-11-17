@@ -1,6 +1,6 @@
 {
-  "after": "git",
-  "category": "toy",
+  "after": "myterm",
+  "category": "meta & macro",
   "framework": "[br]",
   "sigil": "sl"
 }

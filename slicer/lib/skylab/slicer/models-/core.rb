@@ -26,7 +26,7 @@ module Skylab::Slicer
 
       def produce_result
 
-        @on_event_selectively.call :info, :expression do | y |
+        @listener.call :info, :expression do | y |
           y << "hello from slicer."
         end
 

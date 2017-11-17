@@ -167,7 +167,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
         w = Worker___.new
         w.path = @_upstream_path
         w.do_rightmost_all_caps = @do_rightmost_all_caps
-        w.on_event_selectively = -> i_or_e, expr, _, & s_p do
+        w.listener = -> i_or_e, expr, _, & s_p do
 
           # (this is like a [#ca-046] but highly customized..)
 
@@ -218,7 +218,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
         attr_writer(
           :do_rightmost_all_caps,
-          :on_event_selectively,
+          :listener,
           :path,
         )
 
@@ -299,7 +299,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
         def __when_no_md
 
-          @on_event_selectively.call :error, :expression, :not_a_valid_word do | y |
+          @listener.call :error, :expression, :not_a_valid_word do | y |
             y << "not a valid word: #{ _etc }"
           end
 
@@ -318,7 +318,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
         def __when_no_content
 
-          @on_event_selectively.call :error, :expression, :single_word_line do | y |
+          @listener.call :error, :expression, :single_word_line do | y |
 
             y << "single word line?: #{ line.inspect } (line #{ io.lineno })"
           end
@@ -366,7 +366,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
         def __when_missing_files missing
 
-          @on_event_selectively.call :error, :expression, :noent do | y |
+          @listener.call :error, :expression, :noent do | y |
             missing.each do | s |
               y << "not a file: #{ s }"
             end
@@ -396,7 +396,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
             end
           end
 
-          @on_event_selectively.call :info, :expression, :summary do | y |
+          @listener.call :info, :expression, :summary do | y |
 
             y << "(done - wrote #{ d_ } bytes in #{ d } files)"
           end

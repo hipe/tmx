@@ -12,30 +12,30 @@ module Skylab::TMX::TestSupport
 
     it "get help of a mounted one-off (the hard way) (live)" do
       invoke '--help', 'snap'
-      _expect_this_same_help_screen
+      _want_this_same_help_screen
     end
 
     it "get help of a mounted one-off (the easy way) (live)" do
       invoke 'snap', '--help'
-      _expect_this_same_help_screen
+      _want_this_same_help_screen
     end
 
     it "no arg" do
       invoke 'snap'
-      expect_on_stderr %r(\bexpecting\b)
-      expect %r(\Ausage: tmz snap\b)
-      expect_fail
+      want_on_stderr %r(\bexpecting\b)
+      want %r(\Ausage: tmz snap\b)
+      want_fail
     end
 
     it "ambiguous between two categories of operator:" do
       invoke 'p'
       on_stream :serr
       md = nil
-      expect_line_by do |line|
+      want_line_by do |line|
         md = %r(\Aambiguous operator \"p\" - did you mean (?<list>.+)\?\z).match line
         md || fail
       end
-      expect_failed_normally_
+      want_failed_normally_
       these = md[ :list ].split %r(, | or )
       'ping' == these.first || fail
       # (assume there are no sidesystems mounted (but there might be 3 here))
@@ -48,11 +48,11 @@ module Skylab::TMX::TestSupport
 
     it "ping" do
       invoke 'snap', '--ping'
-      expect_on_stderr 'hello from tmz snap!'
-      expect_succeed
+      want_on_stderr 'hello from tmz snap!'
+      want_succeed
     end
 
-    def _expect_this_same_help_screen
+    def _want_this_same_help_screen
 
       a = [] ; line = nil
 
@@ -76,11 +76,11 @@ module Skylab::TMX::TestSupport
         end
         NIL  # for KEEP_PARSING_
       end
-      expect_each_on_stderr_by do |line_|
+      want_each_on_stderr_by do |line_|
         line = line_
         p[]
       end
-      expect_succeed
+      want_succeed
     end
 
     def prepare_subject_CLI_invocation cli

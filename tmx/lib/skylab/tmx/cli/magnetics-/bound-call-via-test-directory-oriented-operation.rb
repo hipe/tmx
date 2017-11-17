@@ -22,7 +22,7 @@ module Skylab::TMX
 
         __add_verbose_primary_maybe
 
-        if __parse_ALL_ARGUMENTS_using_the_compound_operator_branch
+        if __parse_ALL_ARGUMENTS_using_the_compound_feature_branch
           if __directories_were_named_explicitly
             if __map_related_primaries_were_used
               __when_both_map_options_are_used_AND_directories_are_named_explicitly
@@ -117,9 +117,9 @@ module Skylab::TMX
         @_test_directory_collection.has_explicitly_named_directories
       end
 
-      def __parse_ALL_ARGUMENTS_using_the_compound_operator_branch
+      def __parse_ALL_ARGUMENTS_using_the_compound_feature_branch
 
-        __init_map_operation_and_compound_operator_branch
+        __init_map_operation_and_compound_feature_branch
 
         _ok = @__MY_COMPOUNDED_BRANCH.parse_all_from @argument_scanner
 
@@ -142,7 +142,7 @@ module Skylab::TMX
 
       # -- initing the compounded primaries parser
 
-      def __init_map_operation_and_compound_operator_branch
+      def __init_map_operation_and_compound_feature_branch
 
         # this is perhaps close to the center of [#006] "feature injection":
         # of primaries that will appear to be under one operation, we
@@ -159,7 +159,7 @@ module Skylab::TMX
 
         lib = Zerk_::ArgumentScanner
 
-        _ob = lib::OperatorBranch_via_OtherBranch.define map_op.operator_branch do |o|
+        _fb = lib::FeatureBranch_via_OtherBranch.define map_op.feature_branch do |o|
             o.not(
               :attributes_module_by,  # only ever the one set below
               :json_file_stream,  # only ever the one set below
@@ -169,11 +169,11 @@ module Skylab::TMX
             )
         end
 
-        @__MY_COMPOUNDED_BRANCH = lib::OperatorBranch_via_MultipleEntities.define do |o|
+        @__MY_COMPOUNDED_BRANCH = lib::FeatureBranch_via_MultipleEntities.define do |o|
 
-          o.add_entity_and_operator_branch map_op, _ob
+          o.add_entity_and_feature_branch map_op, _fb
 
-          o.add_entity_and_operator_branch @_remote_operation, @_remote_operation.operator_branch
+          o.add_entity_and_feature_branch @_remote_operation, @_remote_operation.feature_branch
         end
 
         @_map_operation = map_op

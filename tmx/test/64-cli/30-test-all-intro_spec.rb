@@ -21,13 +21,13 @@ module Skylab::TMX::TestSupport
         same = '-test-directory'
         invoke( * _subject_operation, same, dir2, same, dir, '-verbose' )  # (exactly one v is necessary)
 
-        expect_on_stdout %r(\A[ ]+Test directory[ ][ ]Number of test files[ ]{3,}\z)
+        want_on_stdout %r(\A[ ]+Test directory[ ][ ]Number of test files[ ]{3,}\z)
 
         same = %r(\A[ ]*[^ ]+[ ]{2,}\d+[ ][ ][-*]+\z)
-        expect same
-        expect same
+        want same
+        want same
 
-        expect_succeed
+        want_succeed
       end
 
       def __this_big_string
@@ -75,14 +75,14 @@ module Skylab::TMX::TestSupport
 
           invoke_it
 
-          expect_on_stderr 'unknown primary "-strange"'
+          want_on_stderr 'unknown primary "-strange"'
 
           md = nil
-          expect_line_by do |line|
+          want_line_by do |line|
             md = %r(\Aexpecting \{ ([^\}]+) \}\z).match line
           end
 
-          expect_failed_normally_
+          want_failed_normally_
 
           seen = {}
           md[1].split(' | ').each { |s| seen[s] = true }
@@ -137,7 +137,7 @@ module Skylab::TMX::TestSupport
 
         it "you get the whole stream from `map`" do
 
-          _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10, 1
+          _want_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10, 1
         end
 
         def prepare_subject_CLI_invocation cli
@@ -153,7 +153,7 @@ module Skylab::TMX::TestSupport
 
         it "you get the modified stream from `map`" do
 
-          _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 1, 9, 10
+          _want_the_number_identifiers_of_the_test_files_to_be_in_this_order 1, 9, 10
         end
 
         def prepare_subject_CLI_invocation cli
@@ -172,8 +172,8 @@ module Skylab::TMX::TestSupport
         it "says noent (new in this edition - no raising exception)" do
 
           invoke_it
-          expect_on_stderr %r(\ANo such file or directory - .+\bfugazi\b)
-          expect "(no results.)"
+          want_on_stderr %r(\ANo such file or directory - .+\bfugazi\b)
+          want "(no results.)"
         end
       end
 
@@ -188,7 +188,7 @@ module Skylab::TMX::TestSupport
 
         it "cache money" do
 
-          _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10
+          _want_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10
         end
 
         def prepare_subject_CLI_invocation cli
@@ -209,7 +209,7 @@ module Skylab::TMX::TestSupport
       end
     end
 
-    def _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order * d_a
+    def _want_the_number_identifiers_of_the_test_files_to_be_in_this_order * d_a
 
       invoke_it
 
@@ -217,7 +217,7 @@ module Skylab::TMX::TestSupport
 
       scn = Common_::Scanner.via_array d_a
 
-      expect_each_on_stdout_by do |line|
+      want_each_on_stdout_by do |line|
 
         _md = rx.match line
         _actual_d = _md[0].to_i
@@ -228,7 +228,7 @@ module Skylab::TMX::TestSupport
         NOTHING_  # keep parsing
       end
 
-      expect_succeed
+      want_succeed
 
       scn.no_unparsed_exists || fail
     end
@@ -239,11 +239,11 @@ module Skylab::TMX::TestSupport
 
       survey = __surveyor_for( test_file ).to_survey
 
-      expect_each_on_stdout_by :puts do |line|
+      want_each_on_stdout_by :puts do |line|
         survey.see_line line
       end
 
-      expect_succeed
+      want_succeed
 
       survey.finish
     end

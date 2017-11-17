@@ -1,6 +1,6 @@
 {
-  "after": "tan_man",
-  "category": "synthesize everything",
+  "after": "slicer",
+  "category": "meta & macro",
   "framework": "[ze]",
   "sigil": "tmx"
 }

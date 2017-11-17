@@ -79,7 +79,7 @@ module Skylab::TMX
 
         include Home_::Model_::Common_Bound_Methods
 
-        def initialize bound_parent_action, nf, mani, & oes_p
+        def initialize bound_parent_action, nf, mani, & p
 
           @_mani = mani
           @nf_ = nf

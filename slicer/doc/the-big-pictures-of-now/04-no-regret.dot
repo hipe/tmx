@@ -37,9 +37,9 @@ digraph g {
   sea->ACS_CLI
   sea->zerk
   zerk [label="zerk - full rewrite\nto use ACS" style=filled fillcolor=grey]
-  zerk->expect_event
-  expect_event [label="rewrite\nexpect event" style=filled]
-  expect_event -> tally
+  zerk->want_event
+  want_event [label="rewrite\nexpect event" style=filled]
+  want_event -> tally
   tally [label="the \"tally\"\nvisualization" style=filled]
   tally -> rfm
   rfm [label="rebrand file-metrics\nas code-metrics" style=filled]

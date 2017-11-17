@@ -54,7 +54,7 @@ module Skylab::TMX::TestSupport
 
       # -- assertions
 
-      def expect_these_ * s_a
+      def want_these_ * s_a
         ExpectThese___.new( s_a, self ).execute
       end
 
@@ -188,7 +188,7 @@ module Skylab::TMX::TestSupport
     class ExpectThese___
 
       def initialize s_a, tc
-        @expect_string_array = s_a
+        @want_string_array = s_a
         @test_context = tc
       end
 
@@ -196,7 +196,7 @@ module Skylab::TMX::TestSupport
 
         tc = @test_context
 
-        exp_scn = Common_::Scanner.via_array @expect_string_array
+        exp_scn = Common_::Scanner.via_array @want_string_array
         tc.ignore_common_post_operation_emissions_
         _st = tc.send_subject_call
 

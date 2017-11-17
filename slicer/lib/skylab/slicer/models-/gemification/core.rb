@@ -20,7 +20,7 @@ module Skylab::Slicer
 
       def produce_result
 
-        task = Here_::Tasks_::Installed_Gem.new( & @on_event_selectively )
+        task = Here_::Tasks_::Installed_Gem.new( & @listener )
 
         task.add_parameter :sidesystem_path, @argument_box.fetch( :sidesystem_path )
         task.add_parameter :script_invocation, @argument_box[ :script_invocation ]

@@ -5,13 +5,13 @@ module Skylab::Slicer::TestSupport
   describe "[sli] CLI cannon" do
 
     TS_[ self ]
-    use :expect_CLI
+    use :want_CLI
 
     it "1.3" do
 
       invoke 'ping'
-      expect :e, "hello from slicer."
-      expect_no_more_lines
+      want :e, "hello from slicer."
+      want_no_more_lines
       @exitstatus.should eql :hello_from_slicer
     end
 
@@ -23,9 +23,9 @@ module Skylab::Slicer::TestSupport
 
       cli.invoke 'slicer', 'ping'
 
-      cli.expect_on_stderr "hello from slicer.\n"
+      cli.want_on_stderr "hello from slicer.\n"
 
-      cli.expect_succeed_under self
+      cli.want_succeed_under self
     end
   end
 end

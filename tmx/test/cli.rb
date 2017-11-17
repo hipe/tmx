@@ -49,8 +49,8 @@ module Skylab::TMX::TestSupport
 
       def finish_with_common_machine_
         mach = CommonMachine___.new
-        expect_each_on_stderr_by( & mach.method( :receive_line ) )
-        expect_fail
+        want_each_on_stderr_by( & mach.method( :receive_line ) )
+        want_fail
         mach.finish
       end
 
@@ -71,21 +71,21 @@ module Skylab::TMX::TestSupport
 
       # -- setup structures for assertion
 
-      def expect_common_help_screen_sections_by_
+      def want_common_help_screen_sections_by_
 
         sct = HelpScreenCommonFourSections___.new
 
-        o = Zerk_test_support_[]::CLI::Expect_Section_Fail_Early.define
+        o = Zerk_test_support_[]::CLI::Want_Section_Fail_Early.define
 
         yield sct, o
 
         spy = o.finish.to_spy_under self
         io = spy.spying_IO
-        expect_each_on_stderr_by do |line|
+        want_each_on_stderr_by do |line|
           io.puts line
           NIL  # keep parsing
         end
-        expect_succeed  # big money
+        want_succeed  # big money
 
         spy.finish
 
@@ -94,9 +94,9 @@ module Skylab::TMX::TestSupport
 
       # -- assert
 
-      def expect_failed_normally_
-        expect "try 'tmz -h'"
-        expect_fail
+      def want_failed_normally_
+        want "try 'tmz -h'"
+        want_fail
       end
 
       # --
@@ -123,7 +123,7 @@ module Skylab::TMX::TestSupport
       :secondary_items,
     ) do
       def diff_against other
-        Zerk_test_support_[]::CLI::ExpectSectionDiff_via_TwoScreens[ self, other ]
+        Zerk_test_support_[]::CLI::WantSectionDiff_via_TwoScreens[ self, other ]
       end
     end
 

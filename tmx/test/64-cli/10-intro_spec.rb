@@ -11,7 +11,7 @@ module Skylab::TMX::TestSupport
 
     it "ping the top" do
       invoke 'ping'
-      _expect_pinged
+      _want_pinged
     end
 
     it "no arg - intrinsics are listed" do
@@ -21,8 +21,8 @@ module Skylab::TMX::TestSupport
     it "strange looking operator" do
       invoke "ip_man"
       on_stream :serr
-      expect "unknown primary or operator: \"ip_man\" (did you mean ip-man?)"
-      expect_failed_normally_
+      want "unknown primary or operator: \"ip_man\" (did you mean ip-man?)"
+      want_failed_normally_
     end
 
     it "strange operator - whines" do
@@ -35,14 +35,14 @@ module Skylab::TMX::TestSupport
 
     it "through fuzzy reach an intrinsic" do
       invoke "pin"
-      _expect_pinged
+      _want_pinged
     end
 
     it "strange option - explain, splay, invite" do
       invoke '-x'
-      expect_on_stderr "unknown primary \"-x\""
-      expect_on_stderr "available primaries: -help and -verbose"
-      expect_failed_normally_  # #coverpoint-1-F
+      want_on_stderr "unknown primary \"-x\""
+      want_on_stderr "available primaries: -help and -verbose"
+      want_failed_normally_  # #coverpoint-1-F
     end
 
     context "help for root" do
@@ -90,7 +90,7 @@ module Skylab::TMX::TestSupport
 
       shared_subject :_usage do
         sect = _sections.usage
-        sect.expect_exactly_one_line
+        sect.want_exactly_one_line
         sect.to_index_of_common_branch_usage_line
       end
 
@@ -98,21 +98,21 @@ module Skylab::TMX::TestSupport
 
         invoke '-h'
 
-        expect_common_help_screen_sections_by_ do |sct, o|
+        want_common_help_screen_sections_by_ do |sct, o|
 
-          o.expect_section "usage" do |sect|
+          o.want_section "usage" do |sect|
             sct.usage = sect
           end
 
-          o.expect_section "description" do |sect|
+          o.want_section "description" do |sect|
             sct.description = sect
           end
 
-          o.expect_section "operations" do |sect|
+          o.want_section "operations" do |sect|
             sct.main_items = sect
           end
 
-          o.expect_section "primaries" do |sect|
+          o.want_section "primaries" do |sect|
             sct.secondary_items = sect
           end
         end
@@ -123,9 +123,9 @@ module Skylab::TMX::TestSupport
 
     # -- expectations
 
-    def _expect_pinged
-      expect_on_stderr "hello from tmx"
-      expect_succeed
+    def _want_pinged
+      want_on_stderr "hello from tmx"
+      want_succeed
     end
 
     # -- setup

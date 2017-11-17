@@ -14,7 +14,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "page size is X" do
-        expect_these_ "deka", "dora", "guld"
+        want_these_ "deka", "dora", "guld"
       end
     end
 
@@ -25,7 +25,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "page size is X+1" do
-        expect_these_ "stern", "tyris", "gilius", "trix"
+        want_these_ "stern", "tyris", "gilius", "trix"
       end
     end
 
@@ -40,7 +40,7 @@ module Skylab::TMX::TestSupport
         ignore_common_post_operation_emissions_
 
         lines = nil
-        expect :error, :expression, :page_content_ended_early do |y|
+        want :error, :expression, :page_content_ended_early do |y|
           lines = y
         end
 

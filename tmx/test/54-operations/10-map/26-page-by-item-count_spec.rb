@@ -14,7 +14,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        expect_these_ "deka", "dora", "guld"
+        want_these_ "deka", "dora", "guld"
       end
     end
 
@@ -25,7 +25,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        expect_these_ "damud", "goah", "adder"
+        want_these_ "damud", "goah", "adder"
       end
     end
 
@@ -36,7 +36,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        expect_these_ "trix"  # 1 is N modulo 3
+        want_these_ "trix"  # 1 is N modulo 3
       end
     end
 
@@ -51,7 +51,7 @@ module Skylab::TMX::TestSupport
         ignore_common_post_operation_emissions_
 
         ev = nil
-        expect :error, :invalid_property_value do |ev_|
+        want :error, :invalid_property_value do |ev_|
           ev = ev_
         end
 
@@ -77,7 +77,7 @@ module Skylab::TMX::TestSupport
         ignore_common_post_operation_emissions_
 
         lines = nil
-        expect :error, :expression, :page_content_ended_early do |y|
+        want :error, :expression, :page_content_ended_early do |y|
           lines = y
         end
 

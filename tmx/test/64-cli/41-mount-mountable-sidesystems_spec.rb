@@ -69,7 +69,7 @@ module Skylab::TMX::TestSupport
 
       shared_subject :_subject do
         invoke 'wabuncle'
-        expect_on_stderr 'unrecognized operator: "wabuncle"'
+        want_on_stderr 'unrecognized operator: "wabuncle"'
         # available operators: test-all, reports, map, ping, wolly-polly, mocking-jay and mapelthorpe
         parse_splay_ %r(\Aavailable operators: )
       end
@@ -77,25 +77,25 @@ module Skylab::TMX::TestSupport
 
     it "successfull call to mounted sidesystem (dummy)" do
       invoke 'wolly-polly'
-      expect_on_stderr "hello from dummy ZimZum::WollyPolly::CLI"
-      expect_succeed
+      want_on_stderr "hello from dummy ZimZum::WollyPolly::CLI"
+      want_succeed
     end
 
     context "help for mounted sidesystem (dummy)" do
 
       it "all lines from the easy way" do
         invoke 'mocking-jay', '-h'
-        _expect_same_help_for_mocking_jay
+        _want_same_help_for_mocking_jay
       end
 
       it "all lines from the hard way" do
         invoke '-h', 'mocking-jay'
-        _expect_same_help_for_mocking_jay
+        _want_same_help_for_mocking_jay
       end
 
-      def _expect_same_help_for_mocking_jay
-        expect_on_stderr "i am help for tmz mocking-jay"
-        expect_succeed
+      def _want_same_help_for_mocking_jay
+        want_on_stderr "i am help for tmz mocking-jay"
+        want_succeed
       end
     end
 
@@ -157,12 +157,12 @@ module Skylab::TMX::TestSupport
       on_stream :serr
 
       line = nil
-      expect_line_by do |lin|
+      want_line_by do |lin|
         line = lin
         NIL
       end
 
-      expect_failed_normally_
+      want_failed_normally_
 
       Zerk_test_support_[]::CLI::IndexOfSplay_via_Line.define do |o|
         o.head_regexp = rx

@@ -151,7 +151,7 @@ module Skylab::TMX
 
         fi.argument_scanner_narrator = @argument_scanner_narrator
 
-        fi.add_hash_based_operators_injection OPERATORS___, :_expect_no_, :tmx_intrinsic
+        fi.add_hash_based_operators_injection OPERATORS___, :_want_no_, :tmx_intrinsic
 
         fi.add_lazy_operators_injection_by do |o|
           __add_sidesystem_mounter_lazily o
@@ -170,7 +170,7 @@ module Skylab::TMX
 
         _inst = _installation
 
-        ssm = CLI::Magnetics_::OperatorBranch_via_InstalledSidesystems.define do |o|
+        ssm = CLI::Magnetics_::FeatureBranch_via_InstalledSidesystems.define do |o|
           o.CLI = self
           o.installation = _inst
         end
@@ -184,7 +184,7 @@ module Skylab::TMX
 
         _glob_entry = "#{ _installation.participating_exe_prefix }*"
 
-        ob = Home_.lib_.system_lib::Filesystem::Directory::OperatorBranch_via_Directory.define do |o|
+        ob = Home_.lib_.system_lib::Filesystem::Directory::FeatureBranch_via_Directory.define do |o|
 
           o.item_scanner_by = -> _ do
 
@@ -297,7 +297,7 @@ module Skylab::TMX
 
         @_on_find_command_do_this = :_no_op
 
-        arg_scn = _multimode_argument_scanner_by do |o|
+        arg_scn = _dig_scanner_by do |o|
 
           o.user_scanner _user_scanner
 
@@ -393,7 +393,7 @@ module Skylab::TMX
 
       def __argument_scanner_for_reports  # see [#ze-052]
 
-        _multimode_argument_scanner_by do |o|
+        _dig_scanner_by do |o|
 
           o.front_scanner_tokens :reports
 
@@ -446,7 +446,7 @@ module Skylab::TMX
 
       def __argument_scanner_for_map  # see [#ze-052]
 
-        as = _multimode_argument_scanner_by do |o|
+        as = _dig_scanner_by do |o|
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
@@ -632,8 +632,8 @@ module Skylab::TMX
 
       # -- preparing calls to the backend
 
-      def _multimode_argument_scanner_by & defn
-        Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
+      def _dig_scanner_by & defn
+        Zerk_lib_[]::NonInteractiveCLI::DigScanner.define( & defn )
       end
 
       def release_json_file_stream_by_

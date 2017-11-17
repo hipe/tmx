@@ -3,7 +3,7 @@ module Skylab::TMX::TestSupport
   module Operations
 
     def self.[] tcc
-      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+      Common_.test_support::Want_Emission_Fail_Early[ tcc ]
       tcc.extend ModuleMethods___
       tcc.include InstanceMethods__
     end
@@ -47,7 +47,7 @@ module Skylab::TMX::TestSupport
 
       # -- expectations & hook-outs
 
-      def expect_parse_error_emission_lines_ * sym_a
+      def want_parse_error_emission_lines_ * sym_a
 
         if sym_a.length.nonzero?
           _a = [ * GENERIC_PARSE_ERROR_CHANNEL___, * sym_a ]

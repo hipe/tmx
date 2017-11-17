@@ -24,7 +24,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_matchdata do
-        _lines = expect_parse_error_emission_lines_ :missing_required_argument
+        _lines = want_parse_error_emission_lines_ :missing_required_argument
         _rx = /\Aexpecting (:[a-z_]+(?:(?: or |, ):[a-z_]+)*)\z/
         _rx.match _lines.fetch 0
       end
@@ -49,7 +49,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_lines do
-        expect_parse_error_emission_lines_ :unknown_primary
+        want_parse_error_emission_lines_ :unknown_primary
       end
     end
 
