@@ -98,7 +98,7 @@ module Skylab::Git
 
       md = @_rx.match line
 
-      sp = Space_for___[ sym ]
+      sp = Space_for__[ sym ]
 
       _accept Line__.new(
         sym.id2name,
@@ -108,6 +108,28 @@ module Skylab::Git
         md[ :rest ],
         "#{ sym }#{ sp }#{ md[ :sha ] }#{ md[ :s1 ] }#{ md[ :rest ] }" )
     end
+
+    # ~( [sli]
+
+    def ADD sym, sha, msg
+      SANITY___.fetch sym
+      sp = Space_for__[ sym ]
+      oper_s = sym.id2name
+      _accept Line__.new(
+        oper_s,
+        sp,
+        sha,
+        SPACE_,
+        msg,
+        "#{ oper_s }#{ sp }#{ sha } #{ msg }" )
+    end
+
+    SANITY___ = {
+      fixup: nil,
+      pick: nil,
+    }
+
+    # )~
 
     def _init_rx_for_log
 
@@ -129,7 +151,7 @@ module Skylab::Git
     def _accept line
 
       @_line_box.add line.sha, line
-      ACHIEVED_
+      line
     end
 
     def __say_no_match line
@@ -196,10 +218,10 @@ module Skylab::Git
     # ~ support
 
     def _sha_rxs
-      SHORT_SHA_RXS___
+      SHORT_SHA_RXS_
     end
 
-    Space_for___ = -> do
+    Space_for__ = -> do
 
       # make it so that "pick  " and "fixup " line up, but all others meh
 
@@ -217,7 +239,5 @@ module Skylab::Git
     end.call
 
     Line__ = ::Struct.new( :verb, :s0, :sha, :s1, :rest, :string )
-
-    SHORT_SHA_RXS___ = '[0-9a-f]{7}'.freeze
   end
 end

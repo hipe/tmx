@@ -13,7 +13,7 @@ module Skylab::Slicer
   private
 
     def express_usage
-      _ = @program_name_string_array.join ' '  # SPACE_
+      _ = @program_name_string_array.join SPACE_
       @stderr.puts "usage: #{ _ }#{ usage_suffix_ }"
       0
     end

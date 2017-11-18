@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'skylab/common'
 
 module Skylab::Git
@@ -140,7 +142,7 @@ module Skylab::Git
   end
 
   Process_ = -> * five do
-    Home_.lib_.basic::Process.via_five( * five )
+    Home_.lib_.system_lib::Command::ThinlyWrappedProcess.via_five( * five )
   end
 
   Require_microservice_toolkit___ = Lazy_.call do
@@ -214,7 +216,9 @@ module Skylab::Git
   NIL = nil  # open [#sli-016.C]
   NOTHING_ = nil
   ProcLike_ = Common_::ProcLike
+  SHORT_SHA_RXS_ = '[0-9a-f]{7}'
   SPACE_ = ' '
+
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 end

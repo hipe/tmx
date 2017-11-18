@@ -1,0 +1,453 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/slicer'
+
+module Skylab::Slicer
+
+  class OneOffs__DISTRIBUTE
+
+    Describe_into_under___ = -> y, _ do
+
+      y << 'imagine you have a series of commits whose messages look like this:'
+      y << nil
+      y << '    commit 3: la la [j2l], [mno]'
+      y << '    commit 2: some stuff [ghi]'
+      y << '    commit 1: this was fun [abc], [def]'
+      y << '    some other commit'
+      y << nil
+      y << 'this insane one off looks at the presumably many changes in your'
+      y << 'tree, makes one commit per sidesystem that has changes'
+      y << 'for each of these commits, it then tries to find the right existing'
+      y << 'commit for each new commit, THEN FINALLY outputs the text for an'
+      y << 'interactive rebase that fixes up the existing commits with the'
+      y << 'new commits.'
+      y << nil
+      y << 'NOTE - this does not do all the work for you - you have to run'
+      y << 'the rebase yourself. so it is not atomic - it finishes the job'
+      y << 'halfway. there is room for improvement (for example to turn this'
+      y << 'in to two steps).'
+      y << nil
+      y << 'there is lots of room for failure here, but nothing is designed'
+      y << 'to fail silently.'
+
+      # and:
+      #   - no coverage sucka
+      #   - nominally we re-use some existing stuff
+    end
+
+    def initialize a, _i, o, e, pn_s_a
+      @ARGV = a
+      @stdout = o
+      @stderr = e
+      @program_name_string_array = pn_s_a
+    end
+
+    def execute
+      ok = __parse_args
+      ok && __init_system_processing
+      ok &&= __resolve_contiguous_commit_index_via_processer
+      ok &&= __resolve_bursts_via_processer
+      ok &&= __resolve_map_of_the_world_via_nothing
+      ok &&= __write_new_commits_via_everything
+      ok && __spit_out_the_suggested_rebase
+      remove_instance_variable :@_exitstatus
+    end
+
+    def __parse_args
+      early_exit = false
+      scn = Common_::Scanner.via_array remove_instance_variable :@ARGV  # Scanner_
+      until scn.no_unparsed_exists
+        md = /\A--?(.+)\z/.match scn.head_as_is
+        md || break
+        case md[1]
+        when %r(\Ah(?:e(?:lp?)?)?\z)
+          __express_help
+          @_exitstatus = ZERO__ ; early_exit = true ; break
+        when 'skip'
+          scn.advance_one
+          skip_d = %r(\A\d+\z).match( scn.gets_one )[0].to_i
+        else
+          cover_me
+        end
+      end
+      if early_exit
+        STOP__
+      elsif scn.no_unparsed_exists
+        cover_me
+      else
+        @__skip_number = skip_d
+        @__unsantized_argument_path = scn.gets_one
+        if scn.no_unparsed_exists
+          ACHIEVED_
+        else
+          cover_me
+        end
+      end
+    end
+
+    def __express_help
+      y = __build_stderr_yielder
+      y << "usage: #{ _program_name } [ -skip N ] path"
+      y << nil
+      p = -> s do
+        y << "description: #{ s }"
+        p = y.method :<< ; nil
+      end
+      Describe_into_under___[ ::Enumerator::Yielder.new { |s| p[ s ] }, nil ]
+      y << nil
+      y << 'options:'
+      y << "  -skip N    skip over this many commits from HEAD"
+      @_exitstatus = ZERO__ ; STOP__
+    end
+
+    def _program_name
+      @program_name_string_array.join SPACE_
+    end
+
+    # --
+
+    def __spit_out_the_suggested_rebase
+
+      rebase = @_Git::Models::Rebase.new  # (we use this mainly to make
+      # contact with it. all it really does for us is validate some things)
+
+      pool = {}
+      remove_instance_variable( :@__new_commits ).each do |ci|
+        pool[ ci.sigil_symbol ] = ci
+      end
+
+      _these = remove_instance_variable :@__existing_commits
+      _fwd = _these.reverse
+
+      count = 0
+      add = -> sym, ci do
+        count += 1
+        _line_o = rebase.ADD sym, ci.SHA, ci.message_string
+        @stdout.puts _line_o.string
+      end
+
+      _fwd.each do |ci|
+        add[ :pick, ci ]
+
+        ci.sigil_symbols.each do |sym|
+          ci_ = pool.delete sym
+          ci_ || next
+          add[ :fixup, ci_ ]
+        end
+      end
+
+      if pool.length.nonzero?
+        pool.each_pair do |sigil_sym, ci|
+          @stderr.puts "WARNING: no existing commit for [#{ sigil_sym }] #{ ci.SHA } - writing at end"
+          add[ :pick, ci ]
+        end
+      end
+
+      skippies = remove_instance_variable :@__skippies
+      if skippies
+        skippies.each do |ci|
+          add[ :pick, ci ]
+        end
+      end
+
+      @stderr.puts "(done writing #{ count } rebase lines.)"
+      @_exitstatus = ZERO__ ; ACHIEVED_
+    end
+
+    def __write_new_commits_via_everything
+
+      _bursts = remove_instance_variable :@__bursts
+      ok = true
+      ci_a = []
+      _bursts.each_pair do |dir, _files|
+        ci = __COMMIT dir, _files
+        if ! ci
+          ok = false
+          break
+        end
+        @stderr.puts "(committed: #{ ci.SHA } #{ ci.message_string })"
+        ci_a.push ci
+      end
+      if ok
+        @__new_commits = ci_a ; ACHIEVED_
+      end
+    end
+
+    def __COMMIT dir, files
+      _sigil_sym = @__sigil_via_sidesystem_entry_string.fetch dir
+      _ok = __git_add_update dir
+      _ok and __git_commit _sigil_sym, files
+    end
+
+    def __git_commit sigil_sym, files
+
+      _message = "(fixup for [#{ sigil_sym }])"
+
+      _cmd = _git_command(
+        'commit',
+        '--message',
+        _message,
+      )
+      pcs = @_processer.process_via_dir_and_command_tokens _DIR, _cmd
+
+      lines = []
+      begin
+        line = pcs.gets_one_stdout_line
+        line || break
+        lines.push line
+        redo
+      end while above
+
+      2 == lines.length || cover_me
+
+      _md = %r(\A[ ]*(\d+) files? changed\b).match lines[1]
+      _num = _md[1].to_i
+      _num == files.length || sanity
+
+      md = %r(\A\[[^ ]+[ ](?<sha>[a-z0-9]+)\] (?<msg>.+)\z).match lines[0]
+
+      NewCommit___.new sigil_sym, md[ :sha ].freeze, md[ :msg ].freeze
+    end
+
+    def __git_add_update dir
+      @_processer.procure_nothing_via_dir_and_command_tokens _DIR, _git_command(
+        'add',
+        '--update',
+        dir,
+      )
+    end
+
+    def __resolve_map_of_the_world_via_nothing
+      h = {}
+
+      _TMX = Autoloader_.require_sidesystem :TMX
+
+      expect = -> chan do
+        [ :data, :operator_resolved ] == chan || fail
+        expect = nil
+      end
+      emit = -> * chan do
+        expect[ chan ]
+      end
+
+      st = _TMX.TO_MAKE_LYFE_EASY_STREAM emit
+      begin
+        node = st.gets
+        node || break
+        _sig_s = node.box.fetch :sigil
+        _stem = node.filesystem_directory_entry_string
+        h[ _stem ] = _sig_s.intern
+        redo
+      end while above
+
+      @__sigil_via_sidesystem_entry_string = h.freeze
+      ACHIEVED_
+    end
+
+    def __resolve_contiguous_commit_index_via_processer
+
+      log = MyLog___.new(
+        _DIR,
+        @_processer,
+      )
+
+      d = remove_instance_variable :@__skip_number
+      if d
+        these = d.times.map do
+          log.gets_one_ordinary_commit
+        end
+      end
+
+      a = []
+      begin
+        ci = log.gets_existing_commit
+        ci || break
+        a.push ci
+        redo
+      end while above
+
+      log.CLOSE_EARLY
+
+      @__skippies = ( these && these.freeze )
+      @__existing_commits = a.freeze
+      ACHIEVED_
+    end
+
+    def __resolve_bursts_via_processer
+
+      bursts = {}
+      _cmd = _git_command 'ls-files', '--modified'
+      pcs = @_processer.process_via_dir_and_command_tokens _DIR, _cmd
+      begin
+        line = pcs.gets_one_stdout_line
+        line || break
+
+        d = line.index ::File::SEPARATOR
+        if ! d
+          @stderr.puts "(skipping file at root of project: #{ line })"
+          redo
+        end
+        dir = line[ 0, d ]
+        ( bursts[ dir ] ||= [] ).push line
+        redo
+      end while above
+
+      if pcs.was_OK
+        if bursts.length.zero?
+          cover_me
+        else
+          @__bursts = bursts ; ACHIEVED_
+        end
+      end
+    end
+
+    def __init_system_processing
+
+      @_processer = Home_.lib_.system_lib::Command::Processer.define do |o|
+        o.will_chop_all_stdout_lines
+        o.listener = -> * do
+          fail
+        end
+        o.USE_REAL_LIFE_RESOURCES
+      end
+
+      require 'skylab/git'
+      @_Git = ::Skylab::Git
+
+      NIL
+    end
+
+    def _git_command * s_a
+      # because one day we might etc
+      [ 'git', * s_a ]
+    end
+
+    def _DIR
+      @__unsantized_argument_path
+    end
+
+    # --
+
+    def __build_stderr_yielder
+      ::Enumerator::Yielder.new( & @stderr.method( :puts ) )
+    end
+
+    # ==
+
+    class MyLog___
+
+      # (make the business code easier to read)
+
+      def initialize dir, pscr
+
+        @_vendor_log = ::Skylab::Git::Models::Commit::LogStream.define do |o|
+          o.repository_directory = dir
+          o.processer = pscr
+        end
+
+        require 'strscan'  # Home_.lib_.string_scanner
+      end
+
+      def gets_existing_commit
+
+        # index the commit (as an ad-hoc structure) by the sigils it mentions
+
+        raw_ci = @_vendor_log.gets_one_commit
+        scn = ::StringScanner.new raw_ci.message_string
+        _yes = scn.skip SKIPPER_REGEXP___
+        if _yes
+          __money scn, raw_ci
+        end
+      end
+
+      def __money scn, raw_ci
+
+        sym_a = []
+        begin
+          sym_a.push scn.scan( SIGIL_REGEXP___ )[ INSIDE_RANGE___ ].intern
+        end while scn.skip %r(, ?)
+
+        ExistingCommit___.new(
+          sym_a.freeze, raw_ci.SHA_string, raw_ci.message_string
+        )
+      end
+
+      def gets_one_ordinary_commit
+        ci = @_vendor_log.gets_one_commit
+        OrdinaryCommit__.new ci.SHA_string, ci.message_string
+      end
+
+      def CLOSE_EARLY
+        remove_instance_variable( :@_vendor_log ).CLOSE_EARLY
+      end
+
+      sigil_rxs = '\[[a-z0-9]+\]'
+
+      SKIPPER_REGEXP___ = %r(     # skip the one or more chars that are not..
+        (?:(?!#{ sigil_rxs }).)+  #   ..followed by the thing.
+        . (?=#{ sigil_rxs })      # also skip the char that *is*
+      )x
+
+      SIGIL_REGEXP___ = ::Regexp.new sigil_rxs
+
+      INSIDE_RANGE___ = 1 ... -1
+    end
+
+    # ==
+
+    OrdinaryCommit__ = ::Class.new
+
+    class ExistingCommit___ < OrdinaryCommit__
+
+      def initialize sym_a, *rest
+        @sigil_symbols = sym_a
+        super( * rest )
+      end
+
+      attr_reader(
+        :sigil_symbols,
+      )
+    end
+
+    class NewCommit___ < OrdinaryCommit__
+
+      def initialize sym, *rest
+        @sigil_symbol = sym
+        super( * rest )
+      end
+
+      attr_reader(
+        :sigil_symbol,
+      )
+    end
+
+    class OrdinaryCommit__
+
+      def initialize sha, msg
+        @SHA = sha
+        @message_string = msg
+        freeze
+      end
+
+      attr_reader(
+        :message_string,
+        :SHA,
+      )
+    end
+
+    # ==
+
+    STOP__ = nil
+    ZERO__ = 0
+  end
+end
+
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
+  exit Skylab::Slicer::OneOffs__DISTRIBUTE.
+    new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
+else
+  ::Kernel._OKAY
+  # Skylab::Git_THING_THING = program  # while [#br-083]
+  # Skylab__Zerk__OneOffs::Git_uncommit = program  # #[#ze-063.1] mountable one-off
+end
+# #born.

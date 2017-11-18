@@ -53,10 +53,6 @@ module Skylab::TMX
         @__json_file_stream_by = p
       end
 
-      def json_file_stream_by__  # NOTE EXPERIMENT
-        @__json_file_stream_by
-      end
-
       def metadata_filename_by & p
         @__metadata_filename_by = p
       end

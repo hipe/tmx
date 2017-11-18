@@ -65,6 +65,9 @@ module Skylab::TMX
           # approach wouldn't fly, because this technique wouldn't be useful
           # for "normal" installations.
 
+          self._README__readme__   # as #history-A.1 we got rid of the below
+          # method because we were tired of reading it. #todo this whole thing
+
           st = @CLI.json_file_stream_by__.call( & @CLI.listener )
           if st
             _st_ = Home_::Models_::Node::Parsed::Unparsed::Stream_via_json_file_stream[ st ]
@@ -92,3 +95,4 @@ module Skylab::TMX
     end
   end
 end
+# :#history-A.1: as referenced (can be temporary)

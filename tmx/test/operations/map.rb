@@ -17,7 +17,7 @@ module Skylab::TMX::TestSupport
 
       # -
         def full_valid_json_file_stream_
-          _glob = ::File.join entities_dir_path_, '*', 'valid.json'
+          _glob = ::File.join entities_dir_path_, Home_::GLOB_STAR_, 'valid.json'
           _files = ::Dir.glob _glob
           Stream_[ _files ]
         end

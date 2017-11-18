@@ -8,7 +8,7 @@ use [sa] to convert etc to Stream_
 -2 the cost-driven divvy algorithm [#tmx-012]
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
-[#tmx-019] get fuzzy out of multimode scanner
+[#tmx-019] get fuzzy out of dig scanner
 (eventpoint event can go away to somewhere)
 [ze] Expresser needs slight cleanup, should be simple model
 (-4 cleanup the items between this one and -3)
@@ -41,7 +41,7 @@ unify emission class with the others..
 fold-in expect emission (oldschool)
 fold-in "fail early"
 make names modern ("emission.rb")
-(somewhere: multi-mode argument scanner away, for 2nd wave and [br] injection)
+(somewhere: dig scanner away, for 2nd wave and [br] injection)
 cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
 cull/test/54-operations/62-mutator/25-actions_spec.rb
 cull/test/54-operations/37-upstream/50-map/50-markdown-vertical_spec.rb
@@ -60,12 +60,8 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
-rename all operator branch to feature branch YIKES
 clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
-all known near-term practial applications of this (Z) (Z)->(W,Y)
+all known near-term practial applications of this (Z) (Z)->(W,Y,J)
 .to_symbolish_reference_scanner not .to_loadable_reference_stream (-1) (right?) (Y) (Y)
-convert every '.should' to `expect( ).to` 07-19 03:47:08 (W) (W)->(V)
-use this new tool to change all of your own `expect` to `anticipate` or whatever (V) (V)->(U,T,J)
-all definitions, universally (U) (U)
-all calls, universlly (T) (T)
+convert every '.should' to `expect( ).to` 07-19 03:47:08 (W) (W)
 many TODOs and COVER_ME (J) (J)

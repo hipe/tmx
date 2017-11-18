@@ -385,7 +385,7 @@ module Skylab::System
 
         @_use_page_size or self.page_size = 30
 
-        processer = Processer___.define do |o|
+        processer = Home_::Command::Processer.define do |o|
           o.will_chop_all_stdout_lines  # could weirdly be made optional for grep
           o.spawner = remove_instance_variable :@spawner
           o.piper = remove_instance_variable :@piper
@@ -505,82 +505,11 @@ module Skylab::System
       end
     end
 
-    class Processer___ < Common_::SimpleModel
-
-      # NOTE this is not a typo. a "widgeter" is something that makes
-      # widgets.  a "processER" is something that makes processes. sorry.
-
-      def initialize
-        @_is_abstract = false
-        @OK_error_code = nil
-        @_will_chop = false
-        @_will_peek_ahead_by_one = false
-        super
-      end
-
-      def redefine  # #abstraction-candidate to [co]
-        otr = dup
-        otr.__be_not_abstract
-        yield otr
-        otr.freeze
-      end
-
-      def freeze
-        if ! @_is_abstract
-          @__process_prototype = SystemProcess___.define do |o|
-            o.OK_error_code = remove_instance_variable :@OK_error_code
-            o.process_waiter = remove_instance_variable :@process_waiter
-            o.will_chop = remove_instance_variable :@_will_chop
-            o.will_peek = remove_instance_variable :@_will_peek_ahead_by_one
-            o.listener = @listener
-          end
-        end
-        super  # hi.
-      end
-
-      def will_chop_all_stdout_lines
-        @_will_chop = true
-      end
-
-      def will_peek_ahead_by_one
-        @_will_peek_ahead_by_one = true
-      end
-
-      def be_abstract
-        @_is_abstract = true
-      end
-
-      def __be_not_abstract
-        @_is_abstract = false
-      end
-
-      attr_writer(
-        :spawner,
-        :piper,
-        :OK_error_code,
-        :process_waiter,
-        :listener,
-      )
-
-      def process_via_command_tokens tox
-
-        out_read, out_write = @piper.pipe
-        err_read, err_write = @piper.pipe
-
-        pid = @spawner.spawn( * tox,
-          in: '/dev/null',  # avoid accidentally blocking on our own STDIN
-          out: out_write, err: err_write )
-
-        out_write.close
-        err_write.close
-
-        @__process_prototype.__dup_.__init_ out_read, err_read, pid
-      end
-    end
-
     # ==
 
     class FunctionalProcess___ < Common_::SimpleModel
+
+      # (implements public API [#sy-041.3])
 
       def gets_by & p
         @__gets_by = p ; nil
@@ -599,139 +528,6 @@ module Skylab::System
       end
     end
 
-    class SystemProcess___ < Common_::SimpleModel
-
-      alias_method :__dup_, :dup ; public :__dup_
-
-      def will_chop= yes
-        @_gets = if yes
-          :__gets_plus_chop
-        else
-          :_gets_normally
-        end ; yes
-      end
-
-      attr_writer(
-        :OK_error_code,
-        :process_waiter,
-        :will_peek,
-        :listener,
-      )
-
-      def __init_ out_read, err_read, pid
-
-        @_out_read = out_read ; @_err_read = err_read ; @__PID = pid
-        if remove_instance_variable :@will_peek
-          s = send @_gets
-          if s
-            @__string_on_deck = s
-            @__gets_on_deck = @_gets
-            @_gets = :__gets_via_payback
-            self
-          end
-        else
-          self
-        end
-      end
-
-      def gets_one_stdout_line
-        send @_gets
-      end
-
-      def was_OK
-        send @_was_OK
-      end
-
-      def __gets_via_payback
-        @_gets = remove_instance_variable :@__gets_on_deck
-        remove_instance_variable :@__string_on_deck
-      end
-
-      def __gets_plus_chop
-        s = _gets_normally
-        if s
-          s.chop! ; s
-        end
-      end
-
-      def _gets_normally
-        s = @_out_read.gets
-        if s
-          s
-        else
-          remove_instance_variable( :@_out_read ).close
-          __check_for_stderr_or_exitstatus
-        end
-      end
-
-      def __check_for_stderr_or_exitstatus
-        s = @_err_read.gets
-        if s
-          __when_stderr_message s
-        else
-          remove_instance_variable( :@_err_read ).close
-          __check_for_exitstatus
-        end
-      end
-
-      def __when_stderr_message line
-        io = remove_instance_variable :@_err_read
-        lines = []
-        countdown = 3  # ick/meh - we'd rather close the IO now.
-        begin
-          line.chop!
-          lines.push line
-          countdown -= 1
-          countdown.zero? && break
-          line = io.gets
-        end while line
-        io.close
-        d = _flush_unexpected_exitstatus
-        if d
-          lines.last << " (exitstatus: #{ d })"
-        end
-        @listener.call :error, :expression, :system_error do |y|
-          lines.each do |s|
-            y << s
-          end
-        end
-        @_was_OK = :__false ; nil
-      end
-
-      def __check_for_exitstatus
-        d = _flush_unexpected_exitstatus
-        if d
-          self._COVER_ME__nonzero_exitstatus__
-        else
-          @_gets = :_COVER_ME__nothing__
-          @_was_OK = :__true
-          remove_instance_variable :@listener
-          NOTHING_
-        end
-      end
-
-      def _flush_unexpected_exitstatus
-        _pid = remove_instance_variable :@__PID
-        remove_instance_variable( :@process_waiter ).wait _pid
-        d = $?.exitstatus  # yuck ..
-        if d.nonzero?
-          if @OK_error_code && @OK_error_code == d
-            NOTHING_  # covered in [bs]
-          else
-            d
-          end
-        end
-      end
-
-      def __false
-        false
-      end
-
-      def __true
-        true
-      end
-    end
-
     # ==
 
     GREP_ERROR_OK___ = 1  # when grep gives us this exitstatus (but it didn't
@@ -742,4 +538,5 @@ module Skylab::System
     # ==
   end
 end
+# #history-A.2: extract process stuff out to [sy]
 # #history-A.1: spike the pipe-find-to-grep experiment

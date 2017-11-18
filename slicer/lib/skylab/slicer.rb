@@ -52,14 +52,16 @@ module Skylab::Slicer
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
+    System_lib = sidesys[ :System ]
     Task = sidesys[ :Task ]
     TMX = sidesys[ :TMX ]
   end
 
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
+  Home_ = self
   NIL_ = nil
   NIL = nil  # #open [#sli-116.C]
-  Home_ = self
+  SPACE_ = ' '
   UNABLE_ = false
 end

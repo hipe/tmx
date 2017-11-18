@@ -2,7 +2,7 @@ module Skylab::Basic
 
   class StateMachine
 
-    class ActiveSession___ < SimpleModel_
+    class ActiveSession___ < Common_::SimpleModel
 
       # things to remember about grammars here:
       #   - to be a formal transition target, the state must have a barrier to entry

@@ -12,12 +12,25 @@ module Skylab::TMX
 
   class << self
 
-    def development_directory_json_file_stream__ & emit
+    def TO_MAKE_LYFE_EASY_STREAM emit
+      # (we need this somewhere. development only.)
+      Home_::API.call(
+        :map,
+        :attributes_module_by, -> { Home_::Attributes_ },
+        :select, :sigil,  # ..
+        :json_file_stream_by, -> & same_emit_ do
+          development_directory_json_file_stream_( & same_emit_ )
+        end,
+        & emit
+      )
+    end
+
+    def development_directory_json_file_stream_ & emit
 
       # (compare `installation_.to_sidesystem_reference_stream`)
 
       _dir = __development_directory
-      glob = ::File.join _dir, '*', METADATA_FILENAME
+      glob = ::File.join _dir, GLOB_STAR_, METADATA_FILENAME
       files = ::Dir.glob glob
       if files.length.zero?
         emit.call :error, :expression, :zero_nodes do |y|
@@ -209,6 +222,7 @@ module Skylab::TMX
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
+  GLOB_STAR_ = '*'
   Home_ = self
   KEEP_PARSING_ = true
   METADATA_FILENAME = '.for-tmx-map.json'

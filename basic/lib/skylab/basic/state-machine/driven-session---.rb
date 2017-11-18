@@ -2,7 +2,7 @@ module Skylab::Basic
 
   class StateMachine
 
-    class DrivenSession___ < SimpleModel_
+    class DrivenSession___ < Common_::SimpleModel
 
       # in contrast to an "active" session where the parsing algorithm
       # "drives" the parse and draws more tokens of input as fast as it

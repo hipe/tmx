@@ -116,12 +116,11 @@ module Skylab::System
         write_out.close
         write_err.close
 
-        _process = Basic_[]::Process.define do |o|
+        Home_::Command::ThinlyWrappedProcess.define do |o|
           o.out = read_out
           o.err = read_err
           o.pid = pid
         end
-        _process  # hi.
       end
 
       DIFF_COMMAND_HEAD__ = %w( diff --unified )  # ..
