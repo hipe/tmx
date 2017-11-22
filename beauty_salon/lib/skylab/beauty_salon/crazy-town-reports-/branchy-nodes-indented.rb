@@ -163,7 +163,7 @@ module Skylab::BeautySalon
 
           if _yes
             buff = m.id2name
-            buff << ': '  # COLON_ SPACE_
+            buff << COLON_ ; buff << SPACE_
             _str_sn = sn.zero_or_more_arg_expressions.dereference 0
             buff << _str_sn.as_string.inspect
           else

@@ -116,7 +116,12 @@ module Skylab::BeautySalon
 
       # -- literals
 
-      heredoc: nil,  # heredoc_body heredoc_end
+      heredoc: {
+        these: [
+          [ :custom_method, :__heredoc_MASSIVE_HACK ],
+          # [ :range, :heredoc_end ],
+        ],
+      },
 
       # -- (very generic)
 
@@ -145,18 +150,18 @@ module Skylab::BeautySalon
     class << self
       def call sn
         buff = ::String.new
-        _d = Recurse__.call_by do |o|
+        _d = Recurse.call_by do |o|
           o.structured_node = sn
-          o.byte_downstream = buff
+          o.downstream_buffer = buff
           o.__init_seed_values
         end
-        _d.nonzero? || sanity
+        _d.zero? && fail  # #here4
         buff
       end
       alias_method :[], :call
     end  # >>
 
-    class Recurse__ < Common_::MagneticBySimpleModel
+    class Recurse < Common_::MagneticBySimpleModel
 
       #
       # Assignment & initialization
@@ -179,18 +184,22 @@ module Skylab::BeautySalon
         # exactly [#026.D]: figure out the very first starting offset
 
         r = @structured_node._node_location_.expression
-        _be_at_offset r.begin_pos
-        @source_buffer_string = r.source_buffer.source
+
+        @buffers = Home_::CrazyTownUnparseMagnetics_::Buffers_via_Downstream_and_Upstream_Buffer.new(
+          r.begin_pos,
+          remove_instance_variable( :@downstream_buffer ),
+          r.source_buffer.source,
+        )
           # (the implicit assumption being that the whole tree is in one file)
-        @parent_node_type = nil
+
+        @context_by = nil
         NIL
       end
 
       attr_writer(
-        :byte_downstream,
-        :current_pending_start_offset_to_flush,
-        :source_buffer_string,
-        :parent_node_type,
+        :downstream_buffer,  # only at entrypoint call, not recursions
+        :context_by,
+        :buffers,
       )
 
       #
@@ -198,6 +207,8 @@ module Skylab::BeautySalon
       #
 
       def execute
+
+        orig_len = @buffers.downstream_buffer.length
 
         @_current_state_symbol = :start
 
@@ -217,7 +228,7 @@ module Skylab::BeautySalon
 
         _transition_to_state :end
 
-        remove_instance_variable :@current_pending_start_offset_to_flush
+        @buffers.downstream_buffer.length - orig_len  # #here4
       end
 
       #
@@ -268,7 +279,7 @@ module Skylab::BeautySalon
             ::Kernel._COVER_ME__etc__
           else
             expr_loc = @structured_node._node_location_.expression
-            _write_static_string_to_here expr_loc.begin_pos  # :#here3
+            _write_as_is_to_here expr_loc.begin_pos  # :#here3
             _write_terminal_value_of asc  # #coverpoint3.5
             _be_at_offset expr_loc.end_pos
           end
@@ -293,7 +304,7 @@ module Skylab::BeautySalon
       def __operator_operator
         r = @location.operator
         if r
-          _write_static_string_to_here r.end_pos  # #coverpoint3.4
+          _write_as_is_to_here r.end_pos  # #coverpoint3.4
         else
           NOTHING_  # #coverpoint3.5
         end
@@ -324,6 +335,7 @@ module Skylab::BeautySalon
           when :[]= ; __send_when_brackets_with_assign
           when :== ; _send_when_operator_infixed
           when :+, :-, :*, :/ ; _send_when_operator_infixed
+          when :| ; _send_when_operator_infixed
           else ;
             self._COVER__theres_an_operator_like_method_name_we_havent_covered_yet__
           end
@@ -334,7 +346,7 @@ module Skylab::BeautySalon
 
         _send_assert_arg_number 0
         _send_assert_selector_not_operator
-        _recurse_into_structured_node @structured_node.any_receiver_expression
+        @buffers.recurse_into_structured_node @structured_node.any_receiver_expression
         _send_end
       end
 
@@ -344,10 +356,10 @@ module Skylab::BeautySalon
         _send_assert_selector_and_operator
 
         # (write the '[ ' and) write the key expression
-        _recurse_into_structured_node key_sd
+        @buffers.recurse_into_structured_node key_sd
 
         # (write the ' ] = ' and) write the value expression
-        _recurse_into_structured_node value_sd
+        @buffers.recurse_into_structured_node value_sd
 
         _send_end
       end
@@ -357,7 +369,7 @@ module Skylab::BeautySalon
         _rhs, = _send_assert_arg_number 1
         _send_assert_selector_not_operator
         # (rely on the below to draw all of " == xxx")
-        _recurse_into_structured_node _rhs
+        @buffers.recurse_into_structured_node _rhs
         _send_end
       end
 
@@ -368,9 +380,9 @@ module Skylab::BeautySalon
         if listlike.length.zero?
           NOTHING_  # #coverpoint3.7
         else
-          _recurse_into_listlike listlike
+          @buffers.recurse_into_listlike listlike
         end
-        _write_static_string_to_here @location.selector.end_pos  # ' ]'
+        _write_as_is_to_here @location.selector.end_pos  # ' ]'
         _send_end
       end
 
@@ -426,8 +438,8 @@ module Skylab::BeautySalon
         sn = @structured_node.any_else_do_this_expression
         if r
           sn || fail
-          _write_static_string_to_here r.end_pos
-          _recurse_into_structured_node sn
+          _write_as_is_to_here r.end_pos
+          @buffers.recurse_into_structured_node sn
         else
           sn && fail
         end
@@ -504,289 +516,46 @@ module Skylab::BeautySalon
         sn = @structured_node.send m
         sn || self._COVER_ME__la_la__
 
-        # _write_static_string_to_here @location.operator.end_pos  # #here3 instead
+        # _write_as_is_to_here @location.operator.end_pos  # #here3 instead
 
-        _recurse_into_structured_node sn
+        @buffers.recurse_into_structured_node sn
         _be_in_state :did_custom  # or other
       end
 
       # -- Collection
 
       def __for_collection
-        if __has_one_child_association
-          if __child_association_is_truly_plural
-            _collection_when_plural
-          else
-            __collection_when_terminal
+        Home_::CrazyTownUnparseMagnetics_::String_via_Collection.call_by do |o|
+          o.context_by = @context_by
+          o.location = @location
+          o.structured_node = @structured_node
+          o.buffers = @buffers
+        end
+      end
+
+      def __heredoc_MASSIVE_HACK  # see #spot1.4
+
+        # (as covered, the vendor location mapping isn't to sufficient granularity)
+
+        _md = %r([ \t]*<<[-~][ \t]*[[:alnum:]_]+)i.match(
+          @buffers.upstream_buffer, _cursor )
+
+        _write_as_is_to_here _md.offset(0).last
+
+        @buffers.BIG_FLIP @location.heredoc_end do
+
+          _list = @structured_node.zero_or_more_dynamic_expressions
+
+          me = CrazyTownUnparseMagnetics_::Delimiter_via_String::ONE_FOR_HEREDOC
+
+          _delim_by = -> do
+            me  # hi.
           end
-        else
-          case _node_type
-          when :block ; __collection_when_block
-          when :regexp ; __collection_when_regexp
-          else ; cover_me
-          end
+
+          @buffers.recurse_into_listlike _delim_by, _list
+
+          # the end of the heredoc is done by the declaration
         end
-      end
-
-      def __collection_when_block
-
-        # BLOCKHEAD ARGS BEGIN ANY_BODY_EXPRESSION END
-
-        sn = @structured_node
-        bh_sn = sn.blockhead
-        args_sn = sn.args
-        body_sn = sn.any_body_expression
-        sn = nil
-
-        _recurse_into_structured_node bh_sn  # `->`, `frob`
-
-        _recurse_into_structured_node args_sn
-
-        if body_sn
-          _recurse_into_structured_node body_sn
-        end
-
-        _write_static_string_to_here @location.end.end_pos
-      end
-
-      def __collection_when_regexp  # begins #coverpoint4.4
-
-        @_child_association = @_association_index.dereference :zero_or_more_expressions
-
-        _collection_when_plural
-
-        remove_instance_variable :@_child_association
-
-        @_current_association = @_association_index.dereference :regexopt
-
-        # (even when there's no regexp opts theres a component and
-        #  a location map pointing to a zero-width range so meh..)
-
-        _common_transition_to_assoc
-      end
-
-      def _collection_when_plural
-
-        beg_r = @location.begin
-        if beg_r
-          has_begin = true  # e.g '%w('
-        end
-        end_r = @location.end
-        if end_r
-          has_end = true  # e.g ')'
-        end
-
-        exp_m, exp = FOR_COLLECTION_FOR_PLURALS___.fetch _node_type
-        case exp
-        when :it_varies
-          if has_begin
-            has_end || sanity
-            yes = true
-          else
-            has_end && sanity
-          end
-        when :nope
-          has_begin && sanity
-          has_end && sanity
-        when :yep
-          has_begin || sanity
-          has_end || sanity
-          yes = true
-        else ; no end
-
-        m = @_child_association.association_symbol
-        if exp_m != m
-          sanity
-        end
-
-        list_like = @structured_node.send m
-
-        # --
-
-        if yes
-          _write_static_string_to_here beg_r.end_pos
-        end
-
-        _recurse_into_listlike list_like
-
-        if yes
-          _write_static_string_to_here end_r.end_pos
-        end
-      end
-
-      FOR_COLLECTION_FOR_PLURALS___ = -> do
-        common = :zero_or_more_expressions
-        {
-          args: [ :zero_or_more_argfellows, :it_varies ],  #  the '|' uses as doo-hahs
-          array: [ common, :yep ],
-          begin: [ common, :it_varies ],
-          dstr: [ :zero_or_more_dynamic_expressions, :yep ],
-          mlhs: [ :one_or_more_assignableformlhss, :yep ],
-          regexp: [ :zero_or_more_expressions, :yep ],
-        }.freeze
-      end.call
-
-      def __collection_when_terminal
-
-        # (this string handling is dis-unified with #[#007.Q]
-
-        _m, _sub_asc_sym = FOR_COLLECTION_FOR_TERMINALS___.fetch _node_type
-
-        @_child_association.use_symbol_ == _sub_asc_sym || sanity
-
-        _x = @structured_node.send @_child_association.stem_symbol
-
-        # #coverpoint4.3 - in some lists you gotta write the static spaces between
-        _write_static_string_to_here @location.expression.begin_pos
-
-        send _m, _x
-      end
-
-      FOR_COLLECTION_FOR_TERMINALS___ = {
-        sym: [ :__when_sym, :as_symbol ],
-        str: [ :__when_str, :as_string ],
-      }
-
-      def __when_str s
-
-        # this is kinda nasty:
-        #
-        #   - for one thing, `begin` and `end` should be a package deal:
-        #     assert that either both are present or neither are present.
-        #
-        #   - when both present, hackishly assume it's one of the two kinds
-        #     of strings and proceed to there.
-        #
-        #   - otherwise, enter my dark chamber.
-
-        beg_r = @location.begin
-        end_r = @location.end
-
-        # (we assume the below inconsistency is unintentional)
-
-        if beg_r
-          end_r || fail
-          __with_optimistic_escaping_hack_write_string s, beg_r.end_pos, end_r
-        else
-          end_r && fail
-          case @parent_node_type
-          when :regexp
-            __with_optimistic_escaping_hack_write_regex s
-          when :dstr
-            # nothing special - it will barf if we're wrong [st]
-            _write_literal_string_fallibly s, _expression_end_pos
-          when :array  # #coverpoint4.3 (again?)
-            _write_literal_string_fallibly s, _expression_end_pos
-          else
-            byebug
-            self._COVER_ME__whole_for_kind_of_str_that_might_need_escaping__
-          end
-        end
-      end
-
-      def __with_optimistic_escaping_hack_write_regex s
-
-        open_s = @source_buffer_string[ @current_pending_start_offset_to_flush - 1, 1 ]
-        case open_s
-        when FORWARD_SLASH_
-          use_s = s.gsub FORWARD_SLASH_, '\\/'
-        when '('  # OPEN_PARENTHESIS_  # meh
-          use_s = s  # meh
-        when '}'  # #coverpoint4.8
-          use_s = s  # NOT OK
-        when '{'
-          use_s = s  # NOT OK - snag/test/64-cli/85-to-do_spec.rb:17
-        else
-          self._COVER_ME__as_yet_unencountered_string_delimiter__
-        end
-
-        _write_literal_string_fallibly use_s, _expression_end_pos
-      end
-
-      FORWARD_SLASH_ = '/'
-
-      def __with_optimistic_escaping_hack_write_string s, end_d, end_r  # beg_d = begin range end pos
-
-        # the vendor library (reasonably) hands us a real-life string that
-        # looks like the literal string begin represented. imagine this in
-        # the case of a single-quoted literal string `'ed\'s id'`:
-        #
-        #   - the string this literal expression represents ("ed's id") is
-        #     (um) 7 characters wide.
-        #
-        #   - the representation of this literal expression in the source
-        #     (file) (not counting the bounding single quotes) is *8*
-        #     characters wide. (the backslash takes up a character).
-        #
-        #   - so how many characters are in the string in the parse tree?
-        #
-        # the answer is 7 - so the string that the vendor lib hands us is
-        # like the real string being expressed, not the way it happens to
-        # be represented in the source file.
-
-        # this seems appropriate - but now to go backwards we have to yadda.
-        # this might not always be easy or possible..
-
-        # ~(  started from _write_static_string_to_here
-        beg_d = @current_pending_start_offset_to_flush
-        dist_d = end_d - beg_d
-        1 == dist_d || 2 == dist_d || see_me ; dist_d = nil
-        quot = @source_buffer_string[ beg_d ... end_d ]
-        @byte_downstream << quot
-        _be_at_offset end_d
-        # ~)
-
-        replace_with_s = VERY_ROUGH_INCOMPLETE___.fetch quot
-        if replace_with_s
-          use_s = s.gsub( quot ) { replace_with_s }  # (backslash has magic meaning in repl expr
-        else
-          use_s = s
-        end
-
-        _write_literal_string_fallibly use_s, end_r.begin_pos
-
-        _write_static_string_to_here end_r.end_pos  # #coverpoint3.5
-      end
-
-      VERY_ROUGH_INCOMPLETE___ = {
-        # (This is done correctly elsewhere.)
-        "'" => "\\'",  # SINGLE_QUOTE_  #coverpoint4.6
-        '"' => '\\"',  # DOUBLE_QUOTE_  #coverpoint4.5
-        '%(' => nil,  # #coverpoint4.7
-      }
-      def __when_sym sym
-        @location.end && no
-        _write_static_string_to_here @location.begin.end_pos  # '[ :', eg
-        _write_literal_string_fallibly sym.id2name, _expression_end_pos
-      end
-
-      def _write_literal_string_fallibly new_s, end_d
-
-        current_s = @source_buffer_string[ _cursor ... end_d ]
-
-        if current_s != new_s
-          self._COVER_ME__better_escaping_logic_might_be_necessary__
-        end
-
-        @byte_downstream << new_s
-
-        _be_at_offset end_d
-        _be_in_state :both  # equivalent
-      end
-
-      def _expression_end_pos
-        @location.expression.end_pos
-      end
-
-      def __child_association_is_truly_plural
-        asc = remove_instance_variable( :@_assocs ).fetch 0
-        @_child_association = asc
-        asc.has_truly_plural_arity
-      end
-
-      def __has_one_child_association
-        @_assocs = @_association_index.associations
-        1 == @_assocs.length
       end
 
       # -- Keyword
@@ -888,7 +657,7 @@ module Skylab::BeautySalon
 
       def _keyword_write_component ivar
         _sn = remove_instance_variable ivar
-        _recurse_into_structured_node _sn
+        @buffers.recurse_into_structured_node _sn
       end
 
       # -- Map (the base class)
@@ -909,7 +678,7 @@ module Skylab::BeautySalon
         sym_a = @structured_node.zero_or_more_symbol_terminals
         sym_a.each do |sym|
           ::Symbol === sym || oops
-          @byte_downstream << sym.id2name
+          @buffers << sym.id2name
         end
         _be_at_offset @location.expression.end_pos
         _be_in_state :did_custom
@@ -919,7 +688,7 @@ module Skylab::BeautySalon
 
         # (like `nil`, etc)
 
-        _write_static_string_to_here @location.expression.end_pos
+        _write_as_is_to_here @location.expression.end_pos
         _be_in_state :did_custom
       end
 
@@ -927,32 +696,10 @@ module Skylab::BeautySalon
       # Custom methods support
       #
 
-      def _recurse_into_listlike listlike
-        listlike.length.times do |d|
-          _sn = listlike.dereference d
-          _recurse_into_structured_node _sn
-        end
-        NIL
-      end
-
       def _recurse_via_nonterminal_association asc
         sn = @structured_node.send asc.association_symbol
         sn || self._COVER_ME__la_la__
-        _recurse_into_structured_node sn
-      end
-
-      def _recurse_into_structured_node sn
-
-        _d = self.class.call_by do |o|  # Recurse__
-          o.structured_node = sn
-          o.current_pending_start_offset_to_flush = @current_pending_start_offset_to_flush
-          o.byte_downstream = @byte_downstream
-          o.source_buffer_string = @source_buffer_string
-          o.parent_node_type = _node_type
-        end
-
-        _be_at_offset _d
-        NIL
+        @buffers.recurse_into_structured_node sn
       end
 
       def __if_operator_cover_me
@@ -1004,10 +751,7 @@ module Skylab::BeautySalon
 
       def _transition_to_state sym
         _h = METHOD_VIA_TRANSITION___.fetch @_current_state_symbol
-        _m = _h[ sym ]
-        if ! _m
-          self._COVER_ME__probably_easy__
-        end
+        _m = _h.fetch sym
         send _m
       end
 
@@ -1113,13 +857,16 @@ module Skylab::BeautySalon
 
       def _effect_both
 
+        vr = _current_vendor_range
+
+        _write_as_is_to_here vr.begin_pos  # #coverpoint5.1
+
         __write_terminal_value
 
         # now that you have output the possibly modified value, this is key:
         # advance the cursor to the character just past etc
 
-        _vr = _current_vendor_range
-        _be_at_offset _vr.end_pos
+        _be_at_offset vr.end_pos
 
         _be_in_state :both
       end
@@ -1130,9 +877,9 @@ module Skylab::BeautySalon
         x = @structured_node.send _m
 
         if @_current_association.has_truly_plural_arity
-          _recurse_into_listlike x
+          @buffers.recurse_into_listlike x
         elsif x
-          _recurse_into_structured_node x  # #coverpoint3.1
+          @buffers.recurse_into_structured_node x  # #coverpoint3.1
         else
           NOTHING_  # #coverpoint3.1
         end
@@ -1180,11 +927,11 @@ module Skylab::BeautySalon
 
         case tasc.type_symbol
         when :symbol
-          @byte_downstream << x.id2name
+          @buffers << x.id2name
         when :integer
-          @byte_downstream << ( '%d' % x )
+          @buffers << ( '%d' % x )
         when :float
-          @byte_downstream << x.to_s  # YIKES
+          @buffers << x.to_s  # YIKES
             # (stringifying a float is nontrivial - maybe look at `unparse`)
         else
           self._COVER_ME__trivially_easy_probably_but_readme__
@@ -1199,7 +946,7 @@ module Skylab::BeautySalon
         _vr = _current_vendor_range
         d = _vr.begin_pos
         if _cursor < d
-          _write_static_string_to_here d  # #coverpoint3.2
+          _write_as_is_to_here d  # #coverpoint3.2
         else
           NOTHING_  # #coverpoint3.2
         end
@@ -1209,24 +956,20 @@ module Skylab::BeautySalon
         vr = _current_vendor_range
         if vr
           _d = vr.end_pos
-          _write_static_string_to_here _d
+          _write_as_is_to_here _d
         end
       end
 
-      def _write_static_string_to_here end_d
-        beg_d = @current_pending_start_offset_to_flush
-        case beg_d <=> end_d
-        when -1
-          _r = beg_d ... end_d
-          @byte_downstream << @source_buffer_string[ _r ]
-          _be_at_offset end_d
-        when 0 ; NOTHING_
-        else ; oops
-        end
+      def _write_as_is_to_here end_d
+        @buffers.write_as_is_to_here end_d
       end
 
       def _be_at_offset d
-        @current_pending_start_offset_to_flush = d ; nil
+        @buffers.be_at_offset d
+      end
+
+      def _cursor
+        @buffers.pos
       end
 
       def _current_vendor_range  # assume etc
@@ -1246,22 +989,14 @@ module Skylab::BeautySalon
         @structured_node._node_type_
       end
 
-      def _cursor
-        @current_pending_start_offset_to_flush
-      end
-
       def __no_op
         NOTHING_
       end
 
-      def _buff
-        @byte_downstream
-      end
-
       # --TEMPORARY
 
-      def _AN
-        @structured_node.AST_node_
+      def _DS
+        @buffers.downstream_buffer
       end
 
       def _SN
@@ -1435,4 +1170,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-A.2: many fellows abstracted out
 # #born.

@@ -49,6 +49,7 @@ module Skylab::BeautySalon::TestSupport
           end
           h.delete 'op_asgn' or fail
           h.delete 'kwbegin'
+          h.delete 'lvar'
           if h.length.nonzero?
             fail
           end

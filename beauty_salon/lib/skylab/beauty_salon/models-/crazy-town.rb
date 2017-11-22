@@ -322,7 +322,7 @@ module Skylab::BeautySalon
       def _resolve_file_path_upstream_resources_via_file_path_upstream
         _ = Home_::CrazyTownReportMagnetics_::DocumentNodeStream_via_FilePathStream.call_by do |o|
           o.file_path_upstream = remove_instance_variable :@_file_path_upstream
-          o.filesystem = _filesystem
+          o.filesystem = @_user_resources.filesystem
           o.listener = _listener
         end
         _store :@__file_path_upstream_resources, _
@@ -341,10 +341,11 @@ module Skylab::BeautySalon
         fd = @_fetch_delete
         Home_::CrazyTownReportMagnetics_::FilePathUpstream_via_Arguments.call_by do |o|
           yield o if block_given?
+          o.whole_word_filter = fd[ :whole_word_filter ]
           o.batch_mode = fd[ :corpus_step ]
           o.files = fd[ :file ]
           o.files_file = fd[ :files_file ]
-          o.filesystem = _filesystem
+          o.user_resources = @_user_resources
           o.listener = _listener
         end
       end
@@ -359,10 +360,6 @@ module Skylab::BeautySalon
         # would have to change from being hard-coded as it is here:
 
         Home_::CrazyTownMagnetics_::StructuredNode_via_Node.structured_nodes_as_feature_branch
-      end
-
-      def _filesystem
-        @_user_resources.filesystem
       end
 
       def _listener
@@ -380,7 +377,7 @@ module Skylab::BeautySalon
 
         :property, :code_selector,
         :description, -> y do
-          y << "«description coming soon»"
+          y << %q(example: "send( method_name == 'cha_cha' )")
         end,
         :normalize_by, -> qkn, & p do
 
@@ -399,7 +396,8 @@ module Skylab::BeautySalon
         :property,
         :replacement_function,
         :description, -> y do
-          y << "«description coming soon»"
+          y << "for example 'file:my-func.rb'"
+          y << "in this file, define Skylab::BeautySalon::CrazyTownFunctions::MyFunc"
         end,
         :normalize_by, -> qkn, & p do
           wrap_thing.call qkn do
@@ -426,7 +424,7 @@ module Skylab::BeautySalon
         :glob,
         :property, :file,
         :description, -> y do
-          y << "a code file to make a diff against"
+          y << "a code file (or directory!) to make a diff against"
         end,
 
 
@@ -475,6 +473,35 @@ module Skylab::BeautySalon
           y << 'replacement operations that are streamlined so that they'
           y << 'require no code to be provided by the user.'
           y << 'at writing there is only one macro - that for method names.'
+        end,
+
+
+        :property, :whole_word_filter,
+        :description, -> y do
+          y << "the tree(s) of files represented by the one or more #{ prim :file }"
+          y << 'values will be narrowed down to only those files that contain'
+          y << 'the argument string under a fixed-string, whole-word match'
+          y << 'with `grep`.'
+          y << nil
+          y << 'this is a convenience optimization that allows you to run'
+          y << 'your replacement function against a "large" (more than one'
+          y << 'or two files) tree without requiring the system to expend'
+          y << 'the considerable effort of having to parse the whole file and'
+          y << 'crawl it only to find out it doesn\'t contain the target feature.'
+          y << nil
+          y << '  - do NOT use this unless this crude pattern would match'
+          y << '    all of your target files. (at writing we\'ve only covered'
+          y << '    selecting on method name, a category of selection that'
+          y << '    should always avail itself to this optimization.)'
+          y << nil
+          y << '  - it\'s OK if this crude pattern matches a set of files'
+          y << '    larger than your target set. (if your crude pattern always'
+          y << '    matched the set of features exactly, then you won\'t need'
+          y << '    this tool at all!)'
+          y << nil
+          y << "  - if you're using a #{ prim :macro } and this optimization"
+          y << '    could apply, the macro should already be written employing'
+          y << '    this optimization internally.'
         end,
 
         # REMINDER: doo-hahs you add to the above may need to be added to #spot1.1

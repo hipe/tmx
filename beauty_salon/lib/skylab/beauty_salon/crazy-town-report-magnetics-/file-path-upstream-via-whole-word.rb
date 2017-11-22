@@ -61,6 +61,13 @@ module Skylab::BeautySalon
         @whole_word_match_fixed_string = s ; nil
       end
 
+      def employ_common_defaults_ rsx
+        set_name_pattern "#{ GLOB_STAR_ }#{ Autoloader_::EXTNAME }"
+        @piper = rsx.piper
+        @spawner = rsx.spawner
+        @process_waiter = rsx.process_waiter ; nil
+      end
+
       def set_name_pattern s
         remove_instance_variable :@__mutex_for_name_pattern
         @name_pattern = s

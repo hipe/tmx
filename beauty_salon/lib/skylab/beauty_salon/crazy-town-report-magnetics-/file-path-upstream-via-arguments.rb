@@ -46,11 +46,16 @@ module Skylab::BeautySalon
         @_conditional_requirement = [ because_sym, require_sym ] ; nil
       end
 
+      def files= x
+        # (improve the name here. @paths makes more sense, etc.)
+        @paths = x
+      end
+
       attr_writer(
+        :whole_word_filter,
         :batch_mode,
-        :files,
         :files_file,
-        :filesystem,
+        :user_resources,
         :listener,
       )
 
@@ -64,93 +69,101 @@ module Skylab::BeautySalon
       end
 
       def __execute_when_conditional_requirement because_sym, require_sym
-        pa = _there_can_only_be_one
-        if pa
-          if require_sym == pa.name_symbol
-            if _curate_is_valid pa
-              pa.value
+        if _there_can_only_be_one
+          sym = @_mode.symbol
+          if require_sym == sym
+            if _curate_is_valid
+              instance_variable_get @_mode.ivar
             end
           else
             _error :argument_error do |y|
               y << "when you employ #{ prim because_sym }, #{
                }you must employ #{ prim require_sym }, #{
-                }not #{ prim pa.name_symbol }"
+                }not #{ prim sym }"
             end
           end
         end
       end
 
       def __execute_normally
-        pa = _there_can_only_be_one
-        if pa
-          if _curate_is_valid pa
-            _m = RESOLUTION_METHOD_NAME_VIA_MODE_SYMBOL___.fetch pa.name_symbol
-            send _m, pa.value
+        if _there_can_only_be_one
+          if _curate_is_valid
+            send @_mode.resolution_method_name
           end
         end
       end
 
       # -- validate value
 
-      def _curate_is_valid pa
-        k = pa.name_symbol
-        m = VALIDATION_METHOD_NAME_VIA_MODE_SYMBOL__.fetch k
+      def _curate_is_valid
+        if __curate_is_valid_generically
+          __curate_is_valid_specifically
+        end
+      end
+
+      def __curate_is_valid_specifically
+        m = @_mode.validation_method_name
         if m
-          send m, pa.value
+          send m
         else
           ACHIEVED_
         end
       end
 
-      VALIDATION_METHOD_NAME_VIA_MODE_SYMBOL__ = {
-        files: :__validate_files,
-        files_file: nil,
-        corpus_step: nil,
-      }
-
-      def __validate_files files
-        if files.length.zero?
+      def __validate_paths
+        if @paths.length.zero?
           self._README__xx__  # all our UI adapations make this impossible to happen at the moment..
         else
           ACHIEVED_
         end
       end
 
-      # -- there can only be one
+      def __curate_is_valid_generically  # for now, __curate_whole_word_filter_OK
+        if @whole_word_filter
+          if @_mode.whole_word_filter_is_allowed
+            ACHIEVED_
+          else
+            __whine_about_how_whole_word_filter_is_not_allowed
+          end
+        else
+          ACHIEVED_
+        end
+      end
 
-      RESOLUTION_METHOD_NAME_VIA_MODE_SYMBOL___ = {
-        files: :__resolve_file_path_upstream_via_files,
-        files_file: :__resolve_file_path_upstream_via_files_file,
-        corpus_step: :__resolve_file_path_upstream_via_corpus_step,
-      }
+      def __whine_about_how_whole_word_filter_is_not_allowed
+        mo = @_mode
+        _error :argument_error do |y|
+          y << "you cannot emply #{ prim :whole_word_filter } in #{
+           }conjunction with #{ prim mo.name_symbol }."
+          y << "it can only be used with one or more #{ prim :file } values."
+        end
+      end
+
+      # -- there can only be one
 
       def _there_can_only_be_one
 
-        batch_mode = remove_instance_variable :@batch_mode
-        files_file = remove_instance_variable :@files_file
-        files = remove_instance_variable :@files
+        sym_a = []
+        last_active_mode_functions = nil
+
+        visit = -> mf do
+          ivar = mf.ivar
+          if instance_variable_get ivar
+            sym_a.push mf.symbol
+            last_active_mode_functions = mf
+          else
+            remove_instance_variable ivar
+          end
+        end
+
+        visit[ MODE_FUNCTIONS_FOR_CORPUS_STEP___ ]
+        visit[ MODE_FUNCTIONS_FOR_FILES_FILE___ ]
+        visit[ MODE_FUNCTIONS_FOR_PATHS___ ]
 
         @_named_listeners = nil  # only one guy uses this
 
-        sym_a = []
-
-        if batch_mode
-          x = batch_mode
-          sym_a.push :corpus_step
-        end
-
-        if files_file
-          x = files_file
-          sym_a.push :files_file
-        end
-
-        if files
-          x = files
-          sym_a.push :files
-        end
-
         case 1 <=> sym_a.length
-        when  0 ; Common_::Pair.via_value_and_name_symbol x, sym_a.fetch( 0 )
+        when  0 ; @_mode = last_active_mode_functions ; true
         when -1 ; __when_too_many sym_a
         when  1 ; __when_none
         else    ; never
@@ -197,6 +210,7 @@ module Skylab::BeautySalon
       def __moniker_via_sym sym
 
         # (this is impure) (duplicates ##here1)
+        # #todo eventually a complete [ze] should obviate this
 
         case sym
         when :files_file ; "--files-file"
@@ -205,12 +219,12 @@ module Skylab::BeautySalon
         else ; never end
       end
 
-      def __resolve_file_path_upstream_via_corpus_step head_s
+      def __resolve_file_path_upstream_via_corpus_step
 
         sct = Home_::CrazyTownReportMagnetics_::FilePathUpstream_via_CorpusStep.call_by do |o|
 
-          o.head_string = head_s
-          o.filesystem = @filesystem
+          o.head_string = @corpus_step
+          o.filesystem = _filesystem
           o.listener = @listener
         end
 
@@ -232,17 +246,18 @@ module Skylab::BeautySalon
         :on_error_once,
       )
 
-      def __resolve_file_path_upstream_via_files_file files_file
+      def __resolve_file_path_upstream_via_files_file
+        files_file = remove_instance_variable :@files_file
         if DASH_ == files_file
           _etc_via_IO $stdin  # NOTE [br] is unusable. #todo
         else
-          _etc_via_IO @filesystem.open files_file  # ..
+          _etc_via_IO _filesystem.open files_file  # ..
         end
       end
 
-      def __resolve_file_path_upstream_via_files files  # #testpoint
+      def __resolve_file_path_upstream_via_paths
 
-        if files.length.zero?
+        if @paths.length.zero?
 
           # (currently (as far as we know) our UI adaptions don't even allow
           # the expression of a zero-length list. like, the way you engage
@@ -251,24 +266,49 @@ module Skylab::BeautySalon
 
           self._COVER_ME__readme__
 
+        elsif @whole_word_filter
+
+          __resolve_file_path_upstream_when_whole_word_filter
+
         else  # elsif @do_expand_directories_into_files  <- imagine this, per #here2
-          __resolve_file_path_upstream_via_files_while_expanding_directories files
+          __resolve_file_path_upstream_via_paths_while_expanding_directories
         end
       end
 
-      def __resolve_file_path_upstream_via_files_while_expanding_directories files
+      def __resolve_file_path_upstream_when_whole_word_filter
+
+        pcs = Home_::CrazyTownReportMagnetics_::FilePathUpstream_via_WholeWord.call_by do |o|
+
+          o.have_dirs remove_instance_variable :@paths
+
+          o.set_whole_word_match_fixed_string remove_instance_variable :@whole_word_filter
+
+          o.employ_common_defaults_ @user_resources
+
+          o.listener = @listener
+        end
+
+        if pcs
+          @_file_path_upstream = Common_.stream do
+            pcs.gets_one_stdout_line
+          end
+          _finish
+        end
+      end
+
+      def __resolve_file_path_upstream_via_paths_while_expanding_directories
 
         # hand-written flat-map
 
         descended = main = p = nil
         dir = nil
 
-        st = Stream_[ files ]
+        st = Stream_[ remove_instance_variable :@paths ]
 
         main = -> do
           path = st.gets
           path || break
-          if @filesystem.directory? path
+          if _filesystem.directory? path
             dir = path
             p = descended
             p[]
@@ -318,7 +358,79 @@ module Skylab::BeautySalon
         end
         _finish
       end
+
+      def _filesystem
+        @user_resources.filesystem
+      end
     # -
+
+    # ==
+
+    module MODE_FUNCTIONS_FOR_CORPUS_STEP___ ; class << self
+
+      def whole_word_filter_is_allowed ; false end
+
+      def resolution_method_name
+        :__resolve_file_path_upstream_via_corpus_step
+      end
+
+      def validation_method_name
+        NOTHING_
+      end
+
+      def ivar
+        :@batch_mode  # NOTE not @corpus_step
+      end
+
+      def symbol
+        :corpus_step
+      end
+    end ; end
+
+    module MODE_FUNCTIONS_FOR_FILES_FILE___ ; class << self
+
+      def whole_word_filter_is_allowed ; false end
+
+      def resolution_method_name
+        :__resolve_file_path_upstream_via_files_file
+      end
+
+      def validation_method_name
+        NOTHING_
+      end
+
+      def ivar
+        :@files_file
+      end
+
+      def symbol
+        :files_file
+      end
+    end ; end
+
+    module MODE_FUNCTIONS_FOR_PATHS___ ; class << self
+
+      def whole_word_filter_is_allowed ; true end
+
+      def resolution_method_name
+        :__resolve_file_path_upstream_via_paths
+      end
+
+      def validation_method_name
+        :__validate_paths
+      end
+
+      def ivar
+        :@paths
+      end
+
+      def symbol
+        :files  # NOTE - we use the UI name (files not paths)
+      end
+    end ; end
+
+    # ==
+    # ==
   end
 end
 # #broke-out at #History-1

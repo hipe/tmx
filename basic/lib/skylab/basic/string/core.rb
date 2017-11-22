@@ -1,3 +1,5 @@
+# frozen_string_literal = true
+
 module Skylab::Basic
 
   module String  # notes in [#029]
@@ -407,6 +409,103 @@ module Skylab::Basic
 
         self
       end
+    end
+
+    # ==
+
+    class CharacterEscapingPolicy < Common_::SimpleModel
+
+      #   - character escaping is often something we call a vendor function
+      #     for; where it "just works" and we don't have to think about it.
+      #
+      #   - but when implementing your own encoding policy (for whatever
+      #     reason), you *do* have to think about it.
+      #
+      #   - a shotgun approach won't work. we can't do a one-size fits most.
+      #     e.g `'\n'` and `"\n"` represent two different strings. failure
+      #     to model the policy correctly corrupts data.
+      #
+      #   - although a switch statement or similar is a reasonable approach
+      #     for a standalone use-case, it does not lend itself well to re-use
+      #     across different policies with only slight variation. copy-paste-
+      #     modify leads to logical redundancy.
+      #
+      #   - this arrangement allows us to dup-and-mutate policies, if desired.
+      #     (for while we typically want newline to be backslash-n, in one
+      #     place we want it to be backslash newline.)
+
+      def initialize  # (in effect, redefine `define`)
+        @default_by = nil
+        yield self, FUNCTION_FUNCTIONS__
+        freeze
+      end
+
+      def redefine
+        otr = dup
+        yield otr, FUNCTION_FUNCTIONS__
+        otr.freeze
+      end
+
+      def default_by & p
+        @default_by = p ; nil
+      end
+
+      attr_writer(
+        # (in order of common-ness)
+        :double_quote,
+        :single_quote,
+        :newline,
+        :backslash,
+        :carriage_return,
+        :tab,
+        :forward_slash,
+        :alert_bell,
+      )
+
+      def call single_char_s
+        # #todo benchmark etc
+        p = case single_char_s
+        when '"'   ; @double_quote
+        when %q(') ; @single_quote
+        when "\n"  ; @newline
+        when "\\"  ; @backslash
+        when "\r"  ; @carriage_return
+        when "\t"  ; @tab
+        when "\b"  ; @alert_bell
+        when '/'   ; @forward_slash
+        else
+          pp = @default_by
+          if pp
+            pp
+          else
+            fail Exception, "not (yet) policy-able: #{ single_char_s.inspect }"
+          end
+        end
+        ( p || Undefined_escaping_function___ )[ single_char_s ]
+      end
+
+      alias_method :[], :call
+    end
+
+    module FUNCTION_FUNCTIONS__ ; class << self
+
+      def use_this_string_instead s
+        -> _ do
+          s
+        end
+      end
+
+      def escape_it_with_a_backslash
+        Escape_it_with_a_backslash___
+      end
+    end ; end
+
+    Escape_it_with_a_backslash___ = -> s do
+      "\\#{ s }"
+    end
+
+    Undefined_escaping_function___ = -> s do
+      fail Exception, "no escaping policy is defined for #{ s.inspect }"
     end
 
     # ==

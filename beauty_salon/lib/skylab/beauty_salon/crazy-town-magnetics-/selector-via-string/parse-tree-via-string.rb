@@ -233,8 +233,7 @@ module Skylab::BeautySalon
           redo
         end while above
 
-        message_buffer << ':'  # COLON_
-
+        message_buffer << COLON_
 
         if leftmost_column == rightmost_column
           offset = leftmost_column

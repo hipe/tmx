@@ -110,7 +110,7 @@ module Skylab::Brazen::TestSupport
 
           want_these_lines_in_array_with_trailing_newlines_ _actual do |y|
             y << "[foo]"
-            y << %(hi = \\\\ \\" \\\n \\t \\b)
+            y << %(hi = \\\\ \\" \\n \\t \\b)
           end
         end
 

@@ -180,7 +180,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'literals 500 - double quote with a simple interpolation' do
+    context 'literals 500 - double quote with a simple interpolation' do  # #coverpoint5.4
 
       it 'builds' do
         structured_node_ || fail
@@ -242,6 +242,56 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    context 'literals 829 - double quotes with interpolation' do  # #coverpoint5.3
+
+      it 'builds' do
+        structured_node_ || fail
+      end
+
+      it 'unparses' do
+        want_these_lines_in_array_ _build_lines do |y|
+          y << "s = nil\n"
+          y << '"\"#{  s   }\""'
+        end
+      end
+
+      shared_subject :structured_node_ do
+
+        structured_node_via_string_ <<~O
+          s = nil
+          "\\"\#{  s   }\\""
+        O
+      end
+    end
+
+    context '844 - heredocs' do  # #coverpoint5.1
+
+      it 'builds' do
+        structured_node_ || fail
+      end
+
+      it 'unparses' do
+        want_these_lines_in_array_ _build_lines do |y|
+          y << "foo <<-HERE.length, 'ohai'\n"
+          y << "  one\n"
+          y << "  two\n"
+          y << "HERE\n"
+          y << "line_after"
+        end
+      end
+
+      shared_subject :structured_node_ do
+
+        structured_node_via_string_ <<~O
+          foo <<-HERE.length, 'ohai'
+            one
+            two
+          HERE
+          line_after
+        O
+      end
+    end
+
     context '875 - regexp' do  # #coverpoint4.4
 
       it 'builds' do
@@ -261,12 +311,38 @@ module Skylab::BeautySalon::TestSupport
         O
       end
 
-      it 'check this (confirm regression ok)' do
+      it 'check this (confirm regression ok)' do  # #coverpoint5.2
         same = '/\Achapo queepo\z/'
         _sn = structured_node_via_string_ same
         wat_s = _money_via _sn
         wat_s == same || fail
         wat_s.object_id == same.object_id && fail
+      end
+    end
+
+    context '907 - regexp (minimal challenge mode)' do  # #coverpoint5.5
+
+      # things to NOTE here. take for example the backslash newline
+      #   - once it gets thru this file, it's 2 chars
+      #   - in the xx
+
+      it 'builds' do
+        structured_node_ || fail
+      end
+
+      it 'unparses' do
+        want_these_lines_in_array_ _build_lines do |y|
+          y << "_ = nil\n"
+          y << '%r(\A#{ _ }\n)'
+        end
+      end
+
+      shared_subject :structured_node_ do
+
+        structured_node_via_string_ <<~O
+          _ = nil
+          %r(\\A\#{ _ }\\n)
+        O
       end
     end
 
@@ -292,7 +368,7 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'variables coverage 250 (a regression)' do
+    context 'variables coverage 250 (a regression)' do  # #coverpoint5.6
 
       it 'builds' do
         structured_node_ || fail

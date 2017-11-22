@@ -36,6 +36,7 @@ module Skylab::BeautySalon
         _add_formal_parameter :files_file
         _add_formal_parameter :corpus_step
         _add_formal_parameter :macro
+        _add_formal_parameter :whole_word_filter
       end
 
       def __add_the_code_selector_formal_parameter

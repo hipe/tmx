@@ -200,6 +200,8 @@ module Skylab::Basic  # introduction at [#020]
     Common_::Scanner.via_array a
   end
 
+  Exception = ::Class.new ::RuntimeError
+
   # --
 
   Autoloader_ = Common_::Autoloader

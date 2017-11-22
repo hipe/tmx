@@ -159,6 +159,7 @@ module Skylab::Basic
     Common_ = Home_::Common_
     EMPTY_A_ = Home_::EMPTY_A_
     EMPTY_S_ = Home_::EMPTY_S_
+    NEWLINE_ = Home_::NEWLINE_
     NIL_ = nil
     NIL = nil  # open [#sli-016.C]
       FALSE = false ; TRUE = true

@@ -274,10 +274,13 @@ module Skylab::BeautySalon
 
   ACHIEVED_ = true
   Home_ = self
+  COLON_ = ':'
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'
+  DOUBLE_QUOTE_ = '"'
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
+  FORWARD_SLASH_ = '/'
   GLOB_STAR_ = '*'
   IDENTITY_ = -> x { x }          # for fun we track this
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
@@ -286,6 +289,7 @@ module Skylab::BeautySalon
   NIL = nil  # #open [#sli-116.C]
   NOTHING_ = nil
   PROCEDE_ = true
+  SINGLE_QUOTE_ = %q(')
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
   THE_EMPTY_MODULE_ = ::Module.new.freeze

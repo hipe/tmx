@@ -74,7 +74,10 @@
 [#030]       [ N lines ]
              ( #was: struct )
              [#.A]  (ancient) "memberhood" means an instance of a member
+
 [#029]       #doc-node the string node
+             [#here.2] #track clients that write their own regexp for escaping
+
 [#028]       #parent-node: [#029] the string template narrative ..
 
 [#027]       [ roting buffer ]  (1x: [tm])

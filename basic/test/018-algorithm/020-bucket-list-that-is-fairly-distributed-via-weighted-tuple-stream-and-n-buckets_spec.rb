@@ -73,8 +73,6 @@ module Skylab::Basic::TestSupport
       _blankish = io.gets
       _blankish =~ /\A[ ]+[#]$/ || fail
 
-      NEWLINE_ = "\n"  # ..
-
       a = [] ; line = nil
 
       rx = /\A[ ]{4}#[ ]{3}(?<name>[.a-z]+(?: [.a-z]+)*)[ ]+(?<weight>\d+)$/

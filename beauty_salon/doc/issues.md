@@ -107,6 +107,10 @@
 
 [#007]       ( intra-subsystem issues )
 
+      #open [#here.S] literal string modification will be somewhat broken
+
+      #track [#here.R] regexp escaping
+
       #small #refactor [#here.Q] string handling and similar is dis-unified
 
       #small #wish [#here.P] a verbose mode
@@ -114,8 +118,7 @@
       #small #open [#here.O] when you're really close to the end, rename
              "callish identifier" as something like "grammar symbol name"
 
-             [#here.N] as long as the only entrypoint into whole-word
-             filtering is thru macros, #track it
+             #hole [#here.N]
 
       #small #open [#here.M] maybe one day unify association names
 

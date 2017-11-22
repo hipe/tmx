@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::Brazen
 
   module CollectionAdapters::GitConfig
@@ -474,8 +476,13 @@ module Skylab::Brazen
 
         _quotes_are_necessary = QUOTES_ARE_NECESSARY_RX__ =~ s
 
-        s.gsub! ESCAPE_THESE_SOMEOHOW_RX__ do
-          ESCAPE_STRATEGY_MAP__.fetch( $~[ 0 ].getbyte( 0 ) )[ $~[ 0 ] ]
+        s.gsub! ESCAPE_THESE_SOMEHOW_RX___ do |s_|
+
+          # (note we don't load the below lib unless there are special chars)
+
+          # (the spec says you can escape a newline character either of two
+          #  ways. we only support the one way.)
+          Escape_participating_character___[ s_ ]
         end
 
         if _quotes_are_necessary
@@ -492,19 +499,7 @@ module Skylab::Brazen
              [#;]            # if the variable contains comment characters
         )x
 
-        ESCAPE_THESE_SOMEOHOW_RX__ = /["\\\n\t\b]/
-
-        backslash = -> s do
-          "\\#{ s }"
-        end
-
-        ESCAPE_STRATEGY_MAP__ = {
-          '"'.getbyte( 0 ) => backslash,
-          '\\'.getbyte( 0 ) => backslash,
-          "\n".getbyte( 0 ) => backslash,  # spec offers 2 ways, we chose 1
-          "\t".getbyte( 0 ) => -> _ { '\t' },
-          "\b".getbyte( 0 ) => -> _ { '\b' }
-        }.freeze
+      ESCAPE_THESE_SOMEHOW_RX___ = /["\\\n\t\b]/
 
       Mutate_value_string_for_UNmarshal = -> string, & listener do
 
@@ -550,6 +545,25 @@ module Skylab::Brazen
         :assignment
       end
     end
+
+    # ==
+
+    Escape_participating_character___ = -> do
+      guy = Lazy_.call do
+        Home_.lib_.basic::String::CharacterEscapingPolicy.define do |o, so|
+          same = so.escape_it_with_a_backslash
+          o.double_quote = same
+          o.single_quote = same
+          o.newline = so.use_this_string_instead '\n'
+          o.backslash = same
+          o.tab = so.use_this_string_instead '\t'
+          o.alert_bell = so.use_this_string_instead '\b'
+        end
+      end
+      -> escape_me_s do
+        guy[][ escape_me_s ]
+      end
+    end.call
 
     # ==
 

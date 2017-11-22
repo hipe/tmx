@@ -7,9 +7,6 @@ module Skylab::BeautySalon
 
     # -
 
-      # (:[#007.N] the only entrypoint in to whole word filtering is
-      # currently thru macros
-
       # interface with the action to convert a macro string into the
       # necessary pieces implied by it ..
 
@@ -81,12 +78,8 @@ module Skylab::BeautySalon
 
           o.set_whole_word_match_fixed_string _x
 
-          o.set_name_pattern "#{ GLOB_STAR_ }#{ Autoloader_::EXTNAME }"
+          o.employ_common_defaults_ remove_instance_variable :@user_resources
 
-          rsx = remove_instance_variable :@user_resources
-          o.piper = rsx.piper
-          o.spawner = rsx.spawner
-          o.process_waiter = rsx.process_waiter
           o.listener = @listener
         end
         if pcs
