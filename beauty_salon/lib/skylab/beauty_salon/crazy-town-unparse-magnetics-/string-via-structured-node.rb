@@ -2,7 +2,7 @@
 
 module Skylab::BeautySalon
 
-  module CrazyTownReportMagnetics_::String_via_StructuredNode  # 1x.
+  module CrazyTownUnparseMagnetics_::String_via_StructuredNode  # 1x.
 
     # exactly [#026] unparsing losslessly.
 
@@ -185,7 +185,8 @@ module Skylab::BeautySalon
 
         r = @structured_node._node_location_.expression
 
-        @buffers = Home_::CrazyTownUnparseMagnetics_::Buffers_via_Downstream_and_Upstream_Buffer.new(
+        @buffers = Home_::CrazyTownUnparseMagnetics_::String_via_Heredoc::
+            Buffers_via_Downstream_and_Upstream_Buffer.new(
           r.begin_pos,
           remove_instance_variable( :@downstream_buffer ),
           r.source_buffer.source,

@@ -483,7 +483,7 @@ module Skylab::BeautySalon
       # -- special interests
 
       def to_code_LOSSLESS_EXPERIMENT__
-        Home_::CrazyTownReportMagnetics_::String_via_StructuredNode[ self ]
+        Home_::CrazyTownUnparseMagnetics_::String_via_StructuredNode[ self ]
       end
 
       def to_code

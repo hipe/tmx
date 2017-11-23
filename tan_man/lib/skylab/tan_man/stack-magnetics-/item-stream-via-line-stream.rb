@@ -77,18 +77,22 @@ module Skylab::TanMan
       y << %q{or "(A)->(B,C)" (where A, B and C are any capital letter A-Z)}
     end
 
+    -> do
+      rxs = '[A-Z][0-9]*'
+
     RX___ = /
       [ ]*
       \(
-        (?<sym>[A-Z])
+        (?<sym>#{ rxs })
       \)
       (?:
         ->
         \(
-          (?<these> [A-Z] (?:,[A-Z])*  )
+          (?<these> #{ rxs } (?:,#{ rxs })*  )
         \)
       )?
     \z/x
+    end.call
 
     # ==
 

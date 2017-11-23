@@ -4,6 +4,24 @@ module Skylab::BeautySalon::TestSupport
 
     CommonInstanceMethods__ = ::Module.new
 
+    module Unparsing
+
+      def self.[] tcc
+        Structured_Nodes[ tcc ]
+        tcc.include self
+      end
+
+      def build_lines_
+        _sn = structured_node_
+        _s = to_code_losslessly_ _sn
+        _s.split %r(^)
+      end
+
+      def to_code_losslessly_ sn
+        sn.to_code_LOSSLESS_EXPERIMENT__
+      end
+    end
+
     ASSOCIATION_LYFE = ::Object.new
 
     def ASSOCIATION_LYFE.[] tcc

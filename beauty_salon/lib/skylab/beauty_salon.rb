@@ -196,7 +196,9 @@ module Skylab::BeautySalon
     end
   end
 
-  class MyException_ < ::Exception  # #testpoint
+  COVER_ME = ::Class.new ::RuntimeError
+
+  class MyException_ < ::RuntimeError  # #testpoint
 
     def initialize sym
       @symbol = sym

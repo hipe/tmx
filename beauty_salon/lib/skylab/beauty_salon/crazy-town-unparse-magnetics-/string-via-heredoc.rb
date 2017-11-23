@@ -2,7 +2,7 @@
 
 module Skylab::BeautySalon
 
-  class CrazyTownUnparseMagnetics_::Buffers_via_Downstream_and_Upstream_Buffer
+  module CrazyTownUnparseMagnetics_::String_via_Heredoc
 
     # this would be very normal and straightforward were it not for the
     # massive hack we're attempting to write heredocs.
@@ -25,7 +25,8 @@ module Skylab::BeautySalon
     #
     # :#spot1.4
 
-    # -
+    class Buffers_via_Downstream_and_Upstream_Buffer
+
       def initialize d, down, up
         @pos = d
         @downstream_buffer = down
@@ -55,7 +56,7 @@ module Skylab::BeautySalon
 
       def recurse_into_structured_node context_by=nil, sn
 
-        d = Home_::CrazyTownReportMagnetics_::String_via_StructuredNode::Recurse.call_by do |o|
+        d = Home_::CrazyTownUnparseMagnetics_::String_via_StructuredNode::Recurse.call_by do |o|
           o.context_by = context_by
           o.structured_node = sn
           o.buffers = self
@@ -177,7 +178,12 @@ module Skylab::BeautySalon
       )
 
       alias_method :_DS, :downstream_buffer
-    # -
+    end
+
+    # ==
+
+    # ==
+    # ==
   end
 end
 # #abstracted.

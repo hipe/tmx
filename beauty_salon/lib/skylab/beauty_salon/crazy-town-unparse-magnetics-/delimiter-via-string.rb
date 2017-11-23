@@ -20,12 +20,13 @@ module Skylab::BeautySalon
       DO_ = 'do'
       OCTOTHORP_ = '#'
       OPEN_PARENTHESIS_ = '('
+      OPEN_SQUARE_BRACKET_ = '['
       PERCENT_ = '%'
       PIPE_ = '|'
 
       -> do
 
-        THIS_RX___ = %r@
+        THIS_RX___ = ::Regexp.new( <<-O, ::Regexp::EXTENDED )
           [#{
 
             # the cluster below this comment is for those opening delimiters
@@ -43,6 +44,7 @@ module Skylab::BeautySalon
           }#{ FORWARD_SLASH_ }#{
           }#{ OCTOTHORP_ }#{  # !
           }#{ OPEN_PARENTHESIS_ }#{  # !
+          }\\#{ OPEN_SQUARE_BRACKET_ }#{  # !
           }#{ PERCENT_ }#{
           }#{ PIPE_ }#{  # !
           }#{ SINGLE_QUOTE_ }#{
@@ -53,7 +55,7 @@ module Skylab::BeautySalon
           }
           |
           #{ DO_ }
-        @x
+        O
 
         THESE___ = {
 
@@ -77,6 +79,12 @@ module Skylab::BeautySalon
 
           PERCENT_ => {
             method_name: :__percent,
+          },
+
+          # -- literals: arrays (and..)
+
+          OPEN_SQUARE_BRACKET_ => {
+            simply: :OPEN_SQUARE_BRACKET_FOR_ARRAY_PROBABLY,
           },
 
           # -- litearals: ideal regexp
@@ -109,7 +117,9 @@ module Skylab::BeautySalon
 
       def execute
         key_s = @scn.scan THIS_RX___
-        key_s || cover_me
+        if ! key_s
+          raise COVER_ME, "do this: \"#{ @scn.peek 10 } [..]\""
+        end
         @_delimiter_head = key_s.freeze
         @_mode = THESE___.fetch key_s
         m = @_mode[ :method_name ]

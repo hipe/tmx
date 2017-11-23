@@ -200,8 +200,7 @@ module Skylab::BeautySalon
 
         sn = @structured_node.any_body_expression
         if sn
-          self._COVER_ME__no_problem_probably_fine__
-          @buffers.recurse_into_structured_node sn
+          @buffers.recurse_into_structured_node sn  # #coverpoint6.1
         end
 
         @buffers.write_as_is_to_here @location_end.begin_pos
