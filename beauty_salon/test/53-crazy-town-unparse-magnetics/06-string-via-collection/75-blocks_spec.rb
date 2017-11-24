@@ -10,6 +10,42 @@ module Skylab::BeautySalon::TestSupport
     use :memoizer_methods
     use :crazy_town_unparsing
 
+    it 'this (12)' do  # #coverpoint6.4
+
+      orig = '( 1 + 2 ).la_la'
+      _sn = structured_node_via_string_ orig
+      _have = to_code_losslessly_ _sn
+      _have == orig || fail
+    end
+
+    context 'single-line proc - no args (25)' do  # #coverpoint6.2
+
+      it 'ok' do
+        _hi = build_string_
+        _hi == '-> { :hi }' || fail
+      end
+
+      def structured_node_
+        structured_node_via_string_ <<~O
+          -> { :hi }
+        O
+      end
+    end
+
+    context 'single-line proc (50)' do
+
+      it 'ok' do
+        _hi = build_string_
+        _hi == '-> x { x }' || fail
+      end
+
+      def structured_node_
+        structured_node_via_string_ <<~O
+          -> x { x }
+        O
+      end
+    end
+
     context 'blocks - 100' do  # #coverpoint6.1
 
       it 'builds' do

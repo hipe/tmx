@@ -99,4 +99,7 @@ system (-35) (A23)->(A22)
 test_support (-36) (A22)->(A21)
 human (-37) (A21)->(A12)
 basic (-38) (A12)->(A11)
-common (-39) (A11)->(A01)
+it would be nice to simplify the remainder of the monolith. maybe get that one pattern out.
+maybe at the source of where you parse the delimiter, go with an injection model and get rid of that other file..
+lots of byebug_chillin
+maybe rename that fellow

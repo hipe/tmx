@@ -70,7 +70,15 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    context 'literals 750 - literal array of strings' do  # #coverpoint4.3
+    it 'symbol list (625)' do  # #coverpoint6.5
+
+      orig = '%i@  foo   bar    @'
+      _sn = structured_node_via_string_ orig
+      _have = to_code_losslessly_ _sn
+      _have == orig || fail
+    end
+
+    context 'literals 750 - literal array of strings ("word list")' do  # #coverpoint4.3
 
       it 'builds' do
         structured_node_ || fail
@@ -229,6 +237,15 @@ module Skylab::BeautySalon::TestSupport
         O
       end
     end
+
+    it 'hash - this one' do  # #coverpoint6.3 (see)
+
+      orig = 'frob a: :A, b: :B'
+      _sn = structured_node_via_string_ orig
+      _have = to_code_losslessly_ _sn
+      _have == orig || fail
+    end
+
   end
 end
 # #extracted.

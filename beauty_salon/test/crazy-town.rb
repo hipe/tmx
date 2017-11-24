@@ -12,9 +12,13 @@ module Skylab::BeautySalon::TestSupport
       end
 
       def build_lines_
-        _sn = structured_node_
-        _s = to_code_losslessly_ _sn
+        _s = build_string_
         _s.split %r(^)
+      end
+
+      def build_string_
+        _sn = structured_node_
+        to_code_losslessly_ _sn
       end
 
       def to_code_losslessly_ sn

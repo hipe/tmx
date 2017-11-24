@@ -700,7 +700,8 @@ module Skylab::BeautySalon
       def _recurse_via_nonterminal_association asc
         sn = @structured_node.send asc.association_symbol
         sn || self._COVER_ME__la_la__
-        @buffers.recurse_into_structured_node sn
+        # (send context for #coverpoint6.3)
+        @buffers.recurse_into_structured_node @context_by, sn
       end
 
       def __if_operator_cover_me

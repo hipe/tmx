@@ -20,7 +20,8 @@ module Skylab::BeautySalon
     # maybe some closing delimiter. to express the body either does or
     # doesn't require some escape-encoding. when it does, there is a
     # discrete, comprehensive set of characters that are escaped, depending.
-    # (more at #spot1.2)
+    # (more at #spot2.1 "optimisic escaping" and #spot2.2 "escaping theory",
+    # and #spot2.3 "why parsing delimiters is complicated")
 
     # *all* opening & closing delimiters are now expressed in a certain elsewhere
 
@@ -59,19 +60,27 @@ module Skylab::BeautySalon
             escaping_regexp: /[\\\t\b]/,  # LOOK you don't escape newlines
           },
 
-          percenty_custom_delimited_special: {
+          percenty_hugger: {
 
             word_list: {
               escaping_regexp_method: :__custom_escapey_regexp_for_word_list,
             },
 
+            symbol_list: {
+              escaping_regexp_method: :__custom_escapey_regexp_for_symbol_list,
+            },
+
             specially_delimited_regexp: {
               escaping_regexp_method: :_custom_escapey_regexp_for_regexp,
             },
+
+            string_fellow: {
+              escaping_regexp_method: :__custom_escapey_regexp_for_string,
+            },
           },
 
-          percenty_custom_delimited_string: {
-            escaping_regexp_method: :__custom_escapey_regexp_for_string,
+          hash_open_curly_bracket: {
+            escaping_regexp_method: :__custom_escapey_regexp_for_inside_hash,
           },
 
           ideal_literal_symbol: {
@@ -85,7 +94,7 @@ module Skylab::BeautySalon
         # using a regex appropriate for the kind of delimiter in use, search
         # the mixed string ("mixed" meaning it could contain any characters)
         # for any characters that need escaping. lazily only once you find
-        # any, fire up our escaping machinery. this is fallible; see #spot1.2.
+        # any, fire up our escaping machinery. this is fallible; see #spot2.1.
 
         x = remove_instance_variable :@terminal_value
 
@@ -104,7 +113,7 @@ module Skylab::BeautySalon
             Escaping_policy___[][ s ]
           end
         else
-          deep_s  # #coverpoint4.8
+          deep_s  # #coverpoint4.8 (and others)
         end
 
         __write_surface_form_of_literal_content _use_s, @content_end_pos
@@ -188,12 +197,19 @@ module Skylab::BeautySalon
       end
 
       def __custom_escapey_regexp_for_word_list
-        # same, fam. same.
         NOTHING_  # #coverpoint4.3
       end
 
+      def __custom_escapey_regexp_for_symbol_list
+        NOTHING_  # #coverpoint6.5
+      end
+
+      def __custom_escapey_regexp_for_inside_hash
+        NOTHING_  # #coverpoint6.3
+      end
+
       def __custom_escapey_regexp_for_ideal_literal_symbol
-        # an "ideal literal symbol" is one :like_this where you don't have
+        # an "ideal literal symbol" is one `:like_this` where you don't have
         # to do any escaping #coverpoint3.5
         NOTHING_
       end
@@ -222,7 +238,7 @@ module Skylab::BeautySalon
       def __resolve_mode
         delim = @opening_delimiter
         cat = THESE___.fetch delim.delimiter_category_symbol
-        x = delim.subcategory_value
+        x = delim.delimiter_subcategory_value
         @_mode = if x
           cat.fetch x
         else
@@ -260,7 +276,7 @@ module Skylab::BeautySalon
     # ==
     # ==
 
-    # "optimistic" escaping :#spot1.2:
+    # "optimistic" escaping :#spot2.1:
 
     # the vendor library (reasonably) hands us a real-life string that
     # looks like the literal string being represented. imagine this in
@@ -298,6 +314,8 @@ module Skylab::BeautySalon
     # this would be to change what kind of delmiters we use for the
     # generated in such cases, which while a fun exercise is currently way
     # out of scope.
+
+    # more at #spot2.2
   end
 end
 # #abstracted.
