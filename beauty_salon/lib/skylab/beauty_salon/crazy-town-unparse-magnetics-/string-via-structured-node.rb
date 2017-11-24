@@ -330,14 +330,27 @@ module Skylab::BeautySalon
 
       def __if_bracketed_method_name_then_etc
 
+        # NOTE - many of these symbols don't have dedicated coverage in
+        # tests because they are variations on the theme..
+
         if @_is
           case @_method_name_symbol
-          when :[] ; __send_when_brackets_simple
-          when :[]= ; __send_when_brackets_with_assign
-          when :== ; _send_when_operator_infixed
-          when :+, :-, :*, :/ ; _send_when_operator_infixed
-          when :| ; _send_when_operator_infixed
+          when :[]
+            __send_when_brackets_simple
+          when :[]=
+            __send_when_brackets_with_assign
+          when :==, :<, :>, :<=, :>=, :<=>, :===, :!=
+            _send_when_operator_infixed
+          when :+, :-, :*, :/
+            _send_when_operator_infixed
+          when :<<, :>>
+            _send_when_operator_infixed
+          when :|, :&
+            _send_when_operator_infixed
+          when :=~, :!~
+            _send_when_operator_infixed
           else ;
+            byebug_chillin
             self._COVER__theres_an_operator_like_method_name_we_havent_covered_yet__
           end
         end

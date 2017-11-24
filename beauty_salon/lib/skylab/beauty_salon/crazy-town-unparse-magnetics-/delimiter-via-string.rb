@@ -59,7 +59,7 @@ module Skylab::BeautySalon
         };
 
         same_percent = {
-          method_name: :__percent,
+          method: :__percent,
         };
         same_double_quot = same_singleton
 
@@ -98,7 +98,7 @@ module Skylab::BeautySalon
 
             mode_via_token: {
               OCTOTHORP_ => {  # (escaping within strings and regexps)
-                method_name: :__octothorp,
+                method: :__octothorp,
               },
               OPEN_PARENTHESIS_ => {
                 simply: :BEGIN_CHA_CHA,
@@ -261,7 +261,7 @@ module Skylab::BeautySalon
             mode_via_token: {
 
               COLON_ => {
-                simply: :ideal_literal_symbol,
+                method: :__symbol_craziness,
               },
             },
 
@@ -276,7 +276,7 @@ module Skylab::BeautySalon
 
         __init_mode_and_cetera
 
-        m = @_mode[ :method_name ]
+        m = @_mode[ :method ]
         if m
           send m
         else
@@ -321,6 +321,21 @@ module Skylab::BeautySalon
         else
           :str == @node_type || sanity  # for *NOW* allow an earmark
           _finish_as_percenty_hugger :string_fellow
+        end
+      end
+
+      def __symbol_craziness
+        # :foo, :'foo bar', :"foo bar"  REMAINING: %s(foo bar)
+        if @scn.eos?
+          _finish_simply :ideal_literal_symbol
+        else
+          char = @scn.getch
+          @scn.eos? || sanity
+          _ = case char
+          when SINGLE_QUOTE_ ; :symbol_looks_like_single_quoted_string
+          when DOUBLE_QUOTE_ ; :symbol_looks_like_double_quoted_string
+          else ; no end
+          _finish_simply _
         end
       end
 
@@ -393,7 +408,9 @@ module Skylab::BeautySalon
       end
 
       def _finish
-        @scn.eos? || sanity
+        if ! @scn.eos?
+          byebug_chillin ; exit 0
+        end
         remove_instance_variable :@_mode
         remove_instance_variable :@scn
         freeze

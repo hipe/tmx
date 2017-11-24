@@ -10,6 +10,13 @@ module Skylab::BeautySalon::TestSupport
     use :memoizer_methods
     use :crazy_town_unparsing
 
+    it 'symbols fancy (125)' do  # #covertpoint6.6
+      same = %q(:"foo_Bar baz 123")
+      _sn = structured_node_via_string_ same
+      _have = to_code_losslessly_ _sn
+      _have == same || fail
+    end
+
     context 'literals 250 - the escaping hack - cha cha' do  # #coverpoint4.5
 
       it 'builds' do
@@ -50,6 +57,15 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
+    it '(regression) SINGLE QUOTE ESCAPING GETS SMART (378)' do
+      # same = '"\"\n"'
+      same = %q('"\"\n"')
+
+      _sn = structured_node_via_string_ same
+      _have = to_code_losslessly_ _sn
+      _have == same || fail
+    end
+
     context 'literals 500 - double quote with a simple interpolation' do  # #coverpoint5.4
 
       it 'builds' do
@@ -72,10 +88,10 @@ module Skylab::BeautySalon::TestSupport
 
     it 'symbol list (625)' do  # #coverpoint6.5
 
-      orig = '%i@  foo   bar    @'
-      _sn = structured_node_via_string_ orig
+      same = '%i@  foo   bar    @'
+      _sn = structured_node_via_string_ same
       _have = to_code_losslessly_ _sn
-      _have == orig || fail
+      _have == same || fail
     end
 
     context 'literals 750 - literal array of strings ("word list")' do  # #coverpoint4.3
@@ -240,10 +256,10 @@ module Skylab::BeautySalon::TestSupport
 
     it 'hash - this one' do  # #coverpoint6.3 (see)
 
-      orig = 'frob a: :A, b: :B'
-      _sn = structured_node_via_string_ orig
+      same = 'frob a: :A, b: :B'
+      _sn = structured_node_via_string_ same
       _have = to_code_losslessly_ _sn
-      _have == orig || fail
+      _have == same || fail
     end
 
   end

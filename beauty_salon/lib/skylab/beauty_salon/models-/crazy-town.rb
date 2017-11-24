@@ -272,7 +272,12 @@ module Skylab::BeautySalon
           ACHIEVED_
         else
           _listener.call :error, :expression, :argument_error do |y|
-            y << "missing requiried #{ s 'parameter' } #{ _ }"
+            simple_inflection do
+              _ = oxford_join ::String.new, Scanner_[ miss ] do |sym|
+                prim sym
+              end
+              y << "missing requiried #{ n 'parameter' } #{ _ }"
+            end
           end
           UNABLE_
         end

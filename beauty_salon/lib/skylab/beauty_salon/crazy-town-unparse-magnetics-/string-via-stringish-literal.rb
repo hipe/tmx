@@ -39,22 +39,30 @@ module Skylab::BeautySalon
 
         # (regexen like below are tracked with #[#ba-029.2])
 
+        same_double_quote = {
+          escaping_regexp: /["\\\n\t\r\b]/,
+        }
+
+        same_single_quote = {
+          escape_method: :__for_single_quote_do_special_escaping_logic,  # (see)
+        }
+
         THESE___ = {
 
           singleton_delimiter: {
 
-            DOUBLE_QUOTE_ => {  # #coverpoint4.5
-              escaping_regexp: /["\\\n\t\r\b]/,
-            },
-
-            SINGLE_QUOTE_ => {  # #coverpoint4.6
-              escaping_regexp: /['\\]/,
-            },
-
             FORWARD_SLASH_ => {
               escaping_regexp_method: :_custom_escapey_regexp_for_regexp,
             },
+
+            DOUBLE_QUOTE_ => same_double_quote,  # #coverpoint4.5
+
+            SINGLE_QUOTE_ => same_single_quote,
+
           },
+          symbol_looks_like_double_quoted_string: same_double_quote,
+
+          symbol_looks_like_single_quoted_string: same_single_quote,  # #coverpoint.NOT_COVERED
 
           pretend_delimiter_for_heredoc: {  # #coverpoint5.1
             escaping_regexp: /[\\\t\b]/,  # LOOK you don't escape newlines
@@ -107,16 +115,26 @@ module Skylab::BeautySalon
 
         __resolve_mode
 
-        rx = __flush_regexp
-        _use_s = if rx
-          deep_s.gsub rx do |s|
-            Escaping_policy___[][ s ]
-          end
-        else
-          deep_s  # #coverpoint4.8 (and others)
-        end
+        _use_s = __optimistic_idiomatic_escaped_string_via__deep_string deep_s
 
         __write_surface_form_of_literal_content _use_s, @content_end_pos
+      end
+
+      def __optimistic_idiomatic_escaped_string_via__deep_string deep_s
+
+        m = @_mode[ :escape_method ]
+        if m
+          send m, deep_s
+        else
+          rx = __flush_regexp
+          if rx
+            deep_s.gsub rx do |s|
+              Escaping_policy___[][ s ]
+            end
+          else
+            deep_s  # #coverpoint4.8 (and others)
+          end
+        end
       end
 
       def __flush_regexp
@@ -208,6 +226,90 @@ module Skylab::BeautySalon
         NOTHING_  # #coverpoint6.3
       end
 
+      def __for_single_quote_do_special_escaping_logic deep_s  # #coverpoint4.6
+
+        # we used to use this regexp for our escape policy for single-
+        # quoted strings:
+        #
+        #     /['\\]/
+        #
+        # that is, for any single quote or backslash, when you're
+        # expressing it as "file bytes", escape it with a backslash.
+        #
+        # although the above works, it does not in produce idiomatic file
+        # bytes and so "corrupts" our files by normalizing our strings in a
+        # manner we do not want.
+        #
+        # to understand why takes a bit of explanation, and has to do with
+        # the ruby specification for interpreting literal strings:
+        #
+        #   puts "\d"  # => d
+        #   puts '\d'  # => \d
+        #
+        # imagine you're deciding on the the specification for ruby single-
+        # quoted strings. you say "well what if i want my single-quoted
+        # string to itself have a single quote?". the idiomatic solution
+        # (and the one employed) is to specify backslash-single-quote as
+        # an escape sequence for this.
+        #
+        # but then the question becomes "what if i want to have a literal
+        # backslash and then a single quote *in* my string?". this of course
+        # requires the use of a backslash-backslash. (if you want two literal
+        # backslashes in your string, your file bytes need to have four,
+        # and so on.)
+        #
+        # (presumably) because more than one slash or backslash in a row is
+        # sub-optimal for the human eye to read ("LTS - leaning toothpick
+        # syndrome"); matz or whoever decided to add a loophole to the rules
+        # so that writing strings could Just Work for many more cases
+        # without incurring LTS.
+        #
+        # the loophole is that if your would-be escape sequence is not a
+        # recognized escape sequence for *single* quoted strings; then your
+        # backslash will be passed thru as-is as a literal backslash:
+        #
+        #     '\n'.length  # => 2
+        #
+        # (note this loophole does *not* exist for *double*-quoted strings
+        # and related; probably because there are relatively many escape
+        # sequences supported there, so to have this loophole there would
+        # make those strings *less* readable because of how much a priori
+        # knowledge you would need to read strings and know whether or not
+        # something that looks like an escape sequence is one or not. whew!)
+        #
+        # if you're still following this, this means that in order to
+        # produce idiomatic literal single-quoted strings, what we actually
+        # want is something like this:
+        #
+        #   - single quote? escape it.
+        #   - backslash?
+        #     - is there a character after it?
+        #       - no? pass the backslash thru as is.
+        #       - yes: is the *following* character a backslash or a single quote?
+        #         - yes? escape *this* backslash with another backslash.
+        #         - no: PASS THE BACKSLASH THRU AS IS
+
+        # (this *could* be done with only a killer regexp but we want the
+        # logic to be more trackable..)
+
+        deep_s.gsub %r('|\\((?=.)?)) do
+          s = $~[1]
+          if s
+            _yes = case s
+            when BACKSLASH_ ; true
+            when SINGLE_QUOTE_ ; true
+            end
+            if _yes
+              '\\\\'
+            else
+              BACKSLASH_
+            end
+          else
+            %q(\')
+          end
+        end
+      end
+
       def __custom_escapey_regexp_for_ideal_literal_symbol
         # an "ideal literal symbol" is one `:like_this` where you don't have
         # to do any escaping #coverpoint3.5
@@ -229,6 +331,7 @@ module Skylab::BeautySalon
         current_s = @buffers[ @buffers.pos ... end_pos ]
 
         if current_s != encoded_s
+          byebug_chillin
           self._COVER_ME__better_escaping_logic_might_be_necessary__
         end
 
@@ -272,6 +375,10 @@ module Skylab::BeautySalon
 
       end
     end
+
+    # ==
+
+    BACKSLASH_ = '\\'
 
     # ==
     # ==

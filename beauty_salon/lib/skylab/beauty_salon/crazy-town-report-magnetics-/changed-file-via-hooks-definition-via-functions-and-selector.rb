@@ -44,13 +44,32 @@ module Skylab::BeautySalon
           NOTHING_  # hi.
         end
 
-        @code_selector.on_each_occurrence_in oo do |structured_node|
+        yikes_last_file = nil
+        @code_selector.on_each_occurrence_in oo do |sn|
 
-          s = user_function[ structured_node ]
+          s = user_function[ sn ]
 
-          ::String === s || self._COVER_ME__strange_result_from_user_function__
-
-          ( guy ||= Guy___.new @receive_changed_file ).__push_ s, structured_node
+          if s
+            ::String === s || self._COVER_ME__strange_result_from_user_function__
+            ( guy ||= Guy___.new @receive_changed_file ).__push_ s, sn
+          else
+            el = sn._node_location_.expression
+            file = el.source_buffer.name
+            line = el.line
+            if yikes_last_file == file
+              is_same_file = true
+            else
+              is_same_file = false
+              yikes_last_file = file
+            end
+            @listener.call :info, :expression, :falseish_replacement_skipped do |yy|
+              if is_same_file
+                yy << "  ..and line #{ line }"
+              else
+                yy << "falseish replacement value resulted, not changing feature at #{ file }:#{ line }"
+              end
+            end
+          end
 
           NIL
         end
