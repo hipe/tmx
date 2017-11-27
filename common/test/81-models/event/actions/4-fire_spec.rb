@@ -20,7 +20,7 @@ module Skylab::Common::TestSupport
 
       _em = want_event :event_event
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white( _em.cached_event_value ) ).to match(
         %r(\Aevent: #<Skylab::Common::TestSupport::.*\bMock_Old_Event) )
 
       want_succeed

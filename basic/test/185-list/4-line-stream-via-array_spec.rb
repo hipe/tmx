@@ -12,33 +12,33 @@ module Skylab::Basic::TestSupport
 
       scn = _subject_module[ [ "one B\n", "two B\n" ] ]
 
-      scn.lineno.should be_nil
+      expect( scn.lineno ).to be_nil
 
-      scn.gets.should eql "one B\n"
+      expect( scn.gets ).to eql "one B\n"
 
-      scn.lineno.should eql 1
+      expect( scn.lineno ).to eql 1
 
-      scn.gets.should eql "two B\n"
+      expect( scn.gets ).to eql "two B\n"
 
-      scn.lineno.should eql 2
+      expect( scn.lineno ).to eql 2
 
-      scn.gets.should be_nil
+      expect( scn.gets ).to be_nil
 
-      scn.lineno.should eql 2
+      expect( scn.lineno ).to eql 2
 
-      scn.gets.should be_nil
+      expect( scn.gets ).to be_nil
     end
 
 
     it "come in from the end" do
 
       scn = _subject_module[ %i( A B C D ) ]
-      scn.rgets.should eql :D
-      scn.gets.should eql :A
-      scn.rgets.should eql :C
-      scn.gets.should eql :B
-      scn.rgets.should be_nil
-      scn.gets.should be_nil
+      expect( scn.rgets ).to eql :D
+      expect( scn.gets ).to eql :A
+      expect( scn.rgets ).to eql :C
+      expect( scn.gets ).to eql :B
+      expect( scn.rgets ).to be_nil
+      expect( scn.gets ).to be_nil
 
     end
 

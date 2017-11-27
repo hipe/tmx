@@ -52,7 +52,7 @@ module Skylab::Basic
       qkn.is_qualified or fail ___say_not( qkn )
       kn.is_qualified and fail __say( kn )
 
-      qkn.value.should eql kn.value
+      expect( qkn.value ).to eql kn.value
 
       nil
     end
@@ -69,15 +69,15 @@ module Skylab::Basic
 
       want_output_value_was_not_written_
       want_no_events
-      @result_x.should be_nil
+      expect( @result_x ).to be_nil
     end
 
     def want_output_value_was_written_
-      @output_value_was_written.should eql true
+      expect( @output_value_was_written ).to eql true
     end
 
     def want_output_value_was_not_written_
-      @output_value_was_written.should eql false
+      expect( @output_value_was_written ).to eql false
     end
   end
 

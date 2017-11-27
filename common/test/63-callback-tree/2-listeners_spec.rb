@@ -13,8 +13,8 @@ module Skylab::Common::TestSupport
         seen = nil
         callbacks.add_listener :za_zang, -> x do seen = x end
         r = callbacks.call_listeners :za_zang do :ga_zoink end
-        seen.should eql :ga_zoink
-        r.should be_nil
+        expect( seen ).to eql :ga_zoink
+        expect( r ).to be_nil
       end
 
       it "try to add a listener for a nonexist channel" do
@@ -63,7 +63,7 @@ module Skylab::Common::TestSupport
         r = callbacks.call_listeners :error, :purple, :durple_error do
           self._never_see_
         end
-        r.should be_nil
+        expect( r ).to be_nil
       end
 
       it "when one listener subscribes to the money, the money gets it" do
@@ -73,8 +73,8 @@ module Skylab::Common::TestSupport
         end
         callbacks.add_listener :error, :purple, :durple_error, p
         r = callbacks.call_listeners :error, :purple, :durple_error do :ohai end
-        r.should be_nil
-        seen.should eql :ohai
+        expect( r ).to be_nil
+        expect( seen ).to eql :ohai
       end
 
       it "when a listener subscribes to two levels above, gets it too" do
@@ -86,8 +86,8 @@ module Skylab::Common::TestSupport
           seen_2 = x
         end
         callbacks.call_listeners :error, :purple, :durple_error do :yep end
-        seen_1.should eql :yep
-        seen_2.should eql :yep
+        expect( seen_1 ).to eql :yep
+        expect( seen_2 ).to eql :yep
       end
 
       let :callbacks do

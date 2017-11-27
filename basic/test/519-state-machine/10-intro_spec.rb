@@ -111,7 +111,7 @@ module Skylab::Basic::TestSupport
       st = _upstream '-foo', 'bar'
       _against st
       _want_failed_with 'expecting long switch at "-foo"'
-      st.current_index.should be_zero
+      expect( st.current_index ).to be_zero
     end
 
     it "one token of good input - complains about missing next token" do
@@ -119,7 +119,7 @@ module Skylab::Basic::TestSupport
       st = _upstream '--foo'
       _against st
       _want_failed_with "expecting value at end of input"
-      st.current_index.should eql 1
+      expect( st.current_index ).to eql 1
     end
 
     it "two good tokens of input" do
@@ -127,7 +127,7 @@ module Skylab::Basic::TestSupport
       st = _upstream '--foo', 'bar'
       _against st
       _want_same_result
-      st.current_index.should eql 2
+      expect( st.current_index ).to eql 2
     end
 
     it "any state transition can write N number of output nodes" do
@@ -137,7 +137,7 @@ module Skylab::Basic::TestSupport
       st = _upstream '--foo=bar'
       _against st
       _want_same_result
-      st.current_index.should eql 1
+      expect( st.current_index ).to eql 1
     end
 
     it "etc. pursuant to particular state machine it stops at unparasables" do
@@ -161,7 +161,7 @@ module Skylab::Basic::TestSupport
         %w( foo bar b baz b baz )
       ) || fail
 
-      st.current_index.should eql 4
+      expect( st.current_index ).to eql 4
     end
 
     def _upstream * s_a
@@ -181,7 +181,7 @@ module Skylab::Basic::TestSupport
 
       _em = want_not_OK_event :no_available_state_transition
 
-      black_and_white( _em.cached_event_value ).should eql s
+      expect( black_and_white( _em.cached_event_value ) ).to eql s
 
       want_fail
     end
@@ -192,13 +192,13 @@ module Skylab::Basic::TestSupport
 
       a = @result
 
-      a.length.should eql 2
+      expect( a.length ).to eql 2
 
-      a.first.name_symbol.should eql :long_switch
-      a.first.value.should eql 'foo'
+      expect( a.first.name_symbol ).to eql :long_switch
+      expect( a.first.value ).to eql 'foo'
 
-      a.last.name_symbol.should eql :value
-      a.last.value.should eql 'bar'
+      expect( a.last.name_symbol ).to eql :value
+      expect( a.last.value ).to eql 'bar'
     end
   end
 end

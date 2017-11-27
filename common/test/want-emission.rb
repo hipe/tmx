@@ -83,7 +83,7 @@ module Skylab::Common::TestSupport
 
         def want_one_event_and_neutral_result * x_a, & p
           em = _next_actual_expev_emission do | em_ |
-            em_.should _match_expev_em_via_TCS( * x_a, & p )
+            expect( em_ ).to _match_expev_em_via_TCS( * x_a, & p )
           end
           if em
             _want_no_next_actual_expev_emission
@@ -94,7 +94,7 @@ module Skylab::Common::TestSupport
 
         def want_one_event * x_a, & p
           em = _next_actual_expev_emission do | em_ |
-            em_.should _match_expev_em_via_TCS( * x_a, & p )
+            expect( em_ ).to _match_expev_em_via_TCS( * x_a, & p )
           end
           if em
             _want_no_next_actual_expev_emission
@@ -104,7 +104,7 @@ module Skylab::Common::TestSupport
 
         def want_not_OK_event * x_a, & p
           _next_actual_expev_emission do | em |
-            em.should _match_expev_em_via_3( false, * x_a, & p )
+            expect( em ).to _match_expev_em_via_3( false, * x_a, & p )
           end
         end
 
@@ -121,25 +121,25 @@ module Skylab::Common::TestSupport
               terminal_channel_symbol_of sym
             end
 
-            em.should _be_this
+            expect( em ).to _be_this
           end
         end
 
         def want_neutral_event * x_a, & p
           _next_actual_expev_emission do | em |
-            em.should _match_expev_em_via_3( nil, * x_a, & p )
+            expect( em ).to _match_expev_em_via_3( nil, * x_a, & p )
           end
         end
 
         def want_OK_event * x_a, & p
           _next_actual_expev_emission do | em |
-            em.should _match_expev_em_via_3( true, * x_a, & p )
+            expect( em ).to _match_expev_em_via_3( true, * x_a, & p )
           end
         end
 
         def want_event * x_a, & p
           _next_actual_expev_emission do | em |
-            em.should _match_expev_em_via_TCS_and_message( * x_a, & p )
+            expect( em ).to _match_expev_em_via_TCS_and_message( * x_a, & p )
           end
         end
 
@@ -156,7 +156,7 @@ module Skylab::Common::TestSupport
               end
 
             end
-            em.should _be_this
+            expect( em ).to _be_this
           end
         end
 
@@ -208,7 +208,7 @@ module Skylab::Common::TestSupport
               end
             end
           else
-            em.channel_symbol_array.should eql sym_a
+            expect( em.channel_symbol_array ).to eql sym_a
           end
         end
 
@@ -232,7 +232,7 @@ module Skylab::Common::TestSupport
             if 1 == x_a.length
               x_a.push nil
             end
-            em_.should _match_expev_em_via_3( false, * x_a, & x_p )
+            expect( em_ ).to _match_expev_em_via_3( false, * x_a, & x_p )
           end
           want_fail
           em
@@ -275,7 +275,7 @@ module Skylab::Common::TestSupport
         def want_freeform_event sym, & ev_p  # this is a retrofit -
           # a new method to make old code work in the old way [cm]
           _next_actual_expev_emission do | em |
-            em.should _match_expev_em_via_TCS( sym, & ev_p )
+            expect( em ).to _match_expev_em_via_TCS( sym, & ev_p )
           end
         end
       end
@@ -504,7 +504,7 @@ module Skylab::Common::TestSupport
         if 1 == a.length
           em
         else
-          a.length.should eql 1
+          expect( a.length ).to eql 1
         end
       end
 

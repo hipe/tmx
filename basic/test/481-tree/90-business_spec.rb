@@ -28,12 +28,12 @@ module Skylab::Basic::TestSupport
           cls.new :one, :two
         rescue Home_::ArgumentError => e
         end
-        e.message.should match %r(\bwrong number.+\(2 for 1\))
+        expect( e.message ).to match %r(\bwrong number.+\(2 for 1\))
       end
 
       it "trying to pass too few args - ok, you get nil (and reader)" do
         me = _class.new
-        me.foo.should eql( nil )
+        expect( me.foo ).to eql( nil )
       end
     end
 
@@ -45,15 +45,15 @@ module Skylab::Basic::TestSupport
 
         kls2 = T_B_3
 
-        kls2.const_get( :BX____ ).a_.should eql(
+        expect( kls2.const_get( :BX____ ).a_ ).to eql(
 
           [ :foo, :bar, :wing, :wang ] )
 
         o2 = kls2.new 'fOo', 'bAr', 'wIng', 'wAng'
 
-        o2.bar.should eql 'bAr'
+        expect( o2.bar ).to eql 'bAr'
 
-        o2.wang.should eql 'wAng'
+        expect( o2.wang ).to eql 'wAng'
       end
   end
 end

@@ -14,8 +14,8 @@ module Skylab::Basic::TestSupport
       op[ :foo ] = :biff
       op[ :boffo ] = :bingo
 
-      h.keys.should eql [ :foo, :bing, :boffo ]
-      op.aset_k_a.should eql [ :foo, :bing, :foo, :boffo ]
+      expect( h.keys ).to eql [ :foo, :bing, :boffo ]
+      expect( op.aset_k_a ).to eql [ :foo, :bing, :foo, :boffo ]
     end
   end
 end

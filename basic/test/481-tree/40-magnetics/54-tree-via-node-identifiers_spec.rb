@@ -10,16 +10,16 @@ module Skylab::Basic::TestSupport
     it "works" do
 
       hi = subject_module_.via :node_identifiers, [ path_node_one, path_node_two ]
-      hi.children_count.should eql 2
+      expect( hi.children_count ).to eql 2
       one, two = hi.to_child_stream.to_a
-      one.slug.should eql "hi_there"
-      one.node_payload.wazoozle.should eql 'HI_THERE'
+      expect( one.slug ).to eql "hi_there"
+      expect( one.node_payload.wazoozle ).to eql 'HI_THERE'
 
-      two.slug.should eql :hey
+      expect( two.slug ).to eql :hey
       x = two.fetch_first_child
-      x.slug.should eql :there
-      two.node_payload.should be_nil
-      x.node_payload.wazoozle.should eql 'HEY THERE'
+      expect( x.slug ).to eql :there
+      expect( two.node_payload ).to be_nil
+      expect( x.node_payload.wazoozle ).to eql 'HEY THERE'
     end
 
     def path_node_one

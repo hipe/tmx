@@ -17,9 +17,9 @@ module Skylab::Basic::TestSupport
       o = T_T_1.new
       o.slug = :x
       o.a = :a
-      o.a.should eql :a
-      o.b.should eql nil
-      o.slug.should eql :x
+      expect( o.a ).to eql :a
+      expect( o.b ).to eql nil
+      expect( o.slug ).to eql :x
 
     end
   end

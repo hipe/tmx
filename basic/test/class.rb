@@ -26,9 +26,9 @@ module Skylab::Basic::TestSupport
 
     def borks msg
       it "raises error with message - #{ msg }" do
-        -> do
+        expect( -> do
           subject.call
-        end.should raise_error( msg )
+        end ).to raise_error( msg )
       end
     end
 

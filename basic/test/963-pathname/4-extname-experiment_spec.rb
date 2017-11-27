@@ -19,8 +19,8 @@ module Skylab::Basic::TestSupport
         md = _RX.match input_s
         if md
           stem, extname = output_a
-          md[ :stem ].should eql stem
-          md[ :extname ].should eql extname
+          expect( md[ :stem ] ).to eql stem
+          expect( md[ :extname ] ).to eql extname
         else
           fail "did not match - #{ input_s.inspect }"
         end

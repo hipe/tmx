@@ -34,17 +34,17 @@ module Skylab::Common::TestSupport
 
       it "0 payload args - handler gets 0 args" do
         emitter.call_digraph_listeners :bar
-        canary[:args].should eql( [] )
+        expect( canary[:args] ).to eql( [] )
       end
 
       it "1 payload arg - handler gets 1 arg" do
         emitter.call_digraph_listeners :bar, 'foo'
-        canary[:args].should eql( ['foo'] )
+        expect( canary[:args] ).to eql( ['foo'] )
       end
 
       it "2 payload args - handler gets 2 args" do
         emitter.call_digraph_listeners :bar, 'one', 2
-        canary[:args].should eql( ['one', 2] )
+        expect( canary[:args] ).to eql( ['one', 2] )
       end
     end
 
@@ -60,17 +60,17 @@ module Skylab::Common::TestSupport
 
       it "0 payload args - handler gets 1 event object, with a nil payload" do
         emitter.call_digraph_listeners :bar
-        canary[:arg].payload_a.should eql( nil )
+        expect( canary[:arg].payload_a ).to eql( nil )
       end
 
       it "1 payload arg - handler gets 1 event object" do
         emitter.call_digraph_listeners :bar, 'foo'
-        canary[:arg].payload_a.first.should eql( 'foo' )
+        expect( canary[:arg].payload_a.first ).to eql( 'foo' )
       end
 
       it "2 payload args - handler gets 1 event obj with 2 args arr in p.l" do
         emitter.call_digraph_listeners :bar, 'foo', 'baz'
-        canary[:arg].payload_a.should eql( ['foo', 'baz'] )
+        expect( canary[:arg].payload_a ).to eql( ['foo', 'baz'] )
       end
     end
 
@@ -85,17 +85,17 @@ module Skylab::Common::TestSupport
 
       it "0 payload args - handler gets 2 nils" do
         emitter.call_digraph_listeners :bar
-        canary[:args].should eql( [nil, nil] )
+        expect( canary[:args] ).to eql( [nil, nil] )
       end
 
       it "1 payload arg - handler gets the 1 arg and 1 nil" do
         emitter.call_digraph_listeners :bar, 'foo'
-        canary[:args].should eql( ['foo', nil] )
+        expect( canary[:args] ).to eql( ['foo', nil] )
       end
 
       it "2 payload args - handler gets the two" do
         emitter.call_digraph_listeners :bar, 'one', 2
-        canary[:args].should eql( ['one', 2] )
+        expect( canary[:args] ).to eql( ['one', 2] )
       end
     end
   end

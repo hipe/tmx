@@ -7,10 +7,10 @@ module Skylab::Basic::TestSupport
     it "'node!' plain" do
       di = Home_::Digraph.new
       di.node! :waz
-      di.length.should eql 1
-      di._a.should eql %i( waz )
+      expect( di.length ).to eql 1
+      expect( di._a ).to eql %i( waz )
       di.node! :waz
-      di._a.should eql %i( waz )
+      expect( di._a ).to eql %i( waz )
     end
 
     it "'node!' with flavor" do
@@ -28,15 +28,15 @@ module Skylab::Basic::TestSupport
         waffle
         wengle -> waffle
       O
-      _act.should eql _exp
+      expect( _act ).to eql _exp
       waz = di.node! :waz
       wiff = di.node! :wiff
       weng = di.node! :wengle
       waff = di.node! :waffle
-      waz.is?( wiff ).should eql true
-      waz.is?( weng ).should eql true
-      waz.is?( waff ).should eql true
-      waff.is?( waz ).should eql false
+      expect( waz.is?( wiff ) ).to eql true
+      expect( waz.is?( weng ) ).to eql true
+      expect( waz.is?( waff ) ).to eql true
+      expect( waff.is?( waz ) ).to eql false
     end
   end
 end

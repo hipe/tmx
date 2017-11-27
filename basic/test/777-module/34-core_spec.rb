@@ -17,12 +17,12 @@ module Skylab::Basic::TestSupport
 
       it "ok" do
 
-        _subject( Home_::Module, '..' ).should eql Home_
+        expect( _subject( Home_::Module, '..' ) ).to eql Home_
       end
 
       it "when you dotdot above a toplevel path - nil" do
 
-        _subject( ::Skylab, '..' ).should be_nil
+        expect( _subject( ::Skylab, '..' ) ).to be_nil
       end
 
       def _subject mod, path
@@ -49,7 +49,7 @@ module Skylab::Basic::TestSupport
 
       Zinger.push :x
 
-      Zinger.a.should eql %i( _x_ )
+      expect( Zinger.a ).to eql %i( _x_ )
 
       _rx = /\bmodule mutex failure .+\bZinger\b/
 

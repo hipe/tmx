@@ -15,13 +15,13 @@ module Skylab::Basic::TestSupport
       tree.touch_node 'one/six'
 
       st = tree.to_stream_of :paths
-      st.gets.should eql "one/"
-      st.gets.should eql "one/two"
-      st.gets.should eql "one/six"
-      st.gets.should eql "three/"
-      st.gets.should eql "three/four/"
-      st.gets.should eql "three/four/five"
-      st.gets.should be_nil
+      expect( st.gets ).to eql "one/"
+      expect( st.gets ).to eql "one/two"
+      expect( st.gets ).to eql "one/six"
+      expect( st.gets ).to eql "three/"
+      expect( st.gets ).to eql "three/four/"
+      expect( st.gets ).to eql "three/four/five"
+      expect( st.gets ).to be_nil
     end
   end
 end

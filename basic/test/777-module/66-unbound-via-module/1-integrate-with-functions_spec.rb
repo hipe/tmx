@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport
 
         future_is_now
 
-        _x.should eql "(4 says: pong: xx)"
+        expect( _x ).to eql "(4 says: pong: xx)"
       end
 
       it "level 2 - call a function one level down" do
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport
 
         future_is_now
 
-        _x.should eql "(5 says: pong: zeep)"
+        expect( _x ).to eql "(5 says: pong: zeep)"
       end
 
       it "level 3 - modules within modules" do
@@ -47,7 +47,7 @@ module Skylab::Basic::TestSupport
 
         future_is_now
 
-        _x.should eql "(7 says: pong: wizzie)"
+        expect( _x ).to eql "(7 says: pong: wizzie)"
       end
     end
   end

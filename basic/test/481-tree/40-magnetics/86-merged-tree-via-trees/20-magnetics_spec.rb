@@ -14,27 +14,27 @@ module Skylab::Basic::TestSupport
 
     it "merge two ints" do
 
-      _subject.merge_atomic( 1, 2 ).should eql 3
+      expect( _subject.merge_atomic( 1, 2 ) ).to eql 3
     end
 
     it "merge to floats" do
 
-      _subject.merge_atomic( 1.2, 3.4 ).should eql 4.6
+      expect( _subject.merge_atomic( 1.2, 3.4 ) ).to eql 4.6
     end
 
     it "merging an int and a float upgrades" do
 
-      _subject.merge_atomic( 1, 2.0 ).should eql 3.0
+      expect( _subject.merge_atomic( 1, 2.0 ) ).to eql 3.0
     end
 
     it "merging a float and an int same" do
 
-      _subject.merge_atomic( 2.0, 1 ).should eql 3.0
+      expect( _subject.merge_atomic( 2.0, 1 ) ).to eql 3.0
     end
 
     it "int vs. nil - int wins" do
 
-      _subject.merge_atomic( nil, 1 ).should eql 1
+      expect( _subject.merge_atomic( nil, 1 ) ).to eql 1
     end
 
     it "int vs. strange object" do
@@ -44,7 +44,7 @@ module Skylab::Basic::TestSupport
         _subject.merge_atomic [], 1
       rescue Home_::ArgumentError => e
       end
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
 
     it "bool and int - no" do
@@ -54,13 +54,13 @@ module Skylab::Basic::TestSupport
         _subject.merge_atomic true, 1
       rescue Home_::ArgumentError => e
       end
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
 
     it "merge two arrays - wat" do
 
       _x = _subject.merge_one_dimensional ['a','b'], ['c','d']
-      _x.should eql %w| a b c d |
+      expect( _x ).to eql %w| a b c d |
     end
 
     def _subject

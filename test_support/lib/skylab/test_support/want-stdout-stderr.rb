@@ -271,11 +271,11 @@ module Skylab::TestSupport
       end
 
       def want_result_for_failure
-        exitstatus.should eql result_for_failure_for_want_stdout_stderr  # :+#hook-out
+        expect( exitstatus ).to eql result_for_failure_for_want_stdout_stderr  # :+#hook-out
       end
 
       def want_result_for_success
-        exitstatus.should be_zero
+        expect( exitstatus ).to be_zero
       end
 
       def exitstatus
@@ -424,14 +424,14 @@ module Skylab::TestSupport
 
       def sout_serr_want_given_regex  # [te]
         if _sout_serr_want_and_resolve_emission_line
-          @__sout_serr_line__.should match @__sout_serr_expectation__.pattern_x
+          expect( @__sout_serr_line__ ).to match @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end
 
       def sout_serr_want_given_string  # [te]
         if _sout_serr_want_and_resolve_emission_line
-          @__sout_serr_line__.should eql @__sout_serr_expectation__.pattern_x
+          expect( @__sout_serr_line__ ).to eql @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end

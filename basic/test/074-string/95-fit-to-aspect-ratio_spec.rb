@@ -17,7 +17,7 @@ module Skylab::Basic::TestSupport
       ww << 'cd ef'
       ww << 'gh'
 
-      ww.flush.should eql %w( ab cd ef gh )
+      expect( ww.flush ).to eql %w( ab cd ef gh )
     end
 
     it "target aspect ratio of 3:2 against 4 pairs" do
@@ -29,7 +29,7 @@ module Skylab::Basic::TestSupport
       ww << 'ab cd'
       ww << 'ef gh'
 
-      ww.flush.should eql [ 'ab cd', 'ef gh' ]
+      expect( ww.flush ).to eql [ 'ab cd', 'ef gh' ]
     end
 
 
@@ -47,7 +47,7 @@ module Skylab::Basic::TestSupport
       # the rectangle that bounds the above is exactly 8:3
       # yet the below more attractive delineation is chosen:
 
-      _a.should eql [ 'never re-', 'think it' ]
+      expect( _a ).to eql [ 'never re-', 'think it' ]
     end
 
     it "a more attractive fit wins over a closer aspect ratio (shrinken)" do
@@ -63,27 +63,27 @@ module Skylab::Basic::TestSupport
       # the above delineation fits perfectly into an 11:2 rectangle,
       # yet the below more attractive delineation is chosen:
 
-      _a.should eql [ 'i love', 'this city' ]
+      expect( _a ).to eql [ 'i love', 'this city' ]
     end
 
     it "reduction / lockdown (taller)" do
 
-      subject_via_(
+      expect( subject_via_(
         :aspect_ratio, [ 5, 1 ],
         :downstream_yielder, [],
         :input_words, %w( chaos computer collective )
 
-      ).should eql %w( chaos computer collective )
+      ) ).to eql %w( chaos computer collective )
     end
 
     it "reduction / lockdown (wider)" do
 
-      subject_via_(
+      expect( subject_via_(
         :aspect_ratio, [ 16, 3 ],
         :downstream_yielder, [],
         :input_words, %w( chaos computer collective )
 
-      ).should eql [ "chaos computer", "collective" ]
+      ) ).to eql [ "chaos computer", "collective" ]
     end
   end
 end

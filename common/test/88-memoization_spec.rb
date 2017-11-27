@@ -36,18 +36,18 @@ module Skylab::Common::TestSupport
         rescue NoMethodError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
 
       it "however you can access it during a session" do
 
         keep = nil
         X_m_Foo.instance_session do |o|
-        (   o.state ).should eql :money
+        expect( o.state ).to eql :money
           keep = o
         end
 
-        keep.state.should eql :cleared
+        expect( keep.state ).to eql :cleared
       end
     end
 

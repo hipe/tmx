@@ -26,14 +26,14 @@ module Skylab::Basic::TestSupport
       it "againt an integer-looking string" do
         normalize_against_ '123'
         want_output_value_was_written_
-        @output_x.should eql 123
+        expect( @output_x ).to eql 123
         want_no_events
       end
 
       it "against a non-integer looking string" do
         normalize_against_ 'A'
         want_output_value_was_not_written_
-        @result_x.should eql false
+        expect( @result_x ).to eql false
         want_not_OK_event_ expected_terminal_channel,
           '(par «your_value») must be (indefinite_noun "integer"), had (ick "A")'
         want_no_more_events
@@ -43,7 +43,7 @@ module Skylab::Basic::TestSupport
         normalize_against_ 1.23
         want_output_value_was_not_written_
         want_not_OK_event_ expected_terminal_channel
-        @result_x.should eql false
+        expect( @result_x ).to eql false
       end
     end
 
@@ -65,11 +65,11 @@ module Skylab::Basic::TestSupport
 
       def want_result_for_input_was_below_minimum
         want_output_value_was_not_written_
-        @result_x.should eql false
+        expect( @result_x ).to eql false
         want_not_OK_event_ :number_too_small,
           "(par «your_value») must be greater than or equal to (val -3), #{
             }had (ick -4)" do |ev|
-          ev.error_category.should eql :argument_error
+          expect( ev.error_category ).to eql :argument_error
         end
         want_no_more_events
       end
@@ -77,7 +77,7 @@ module Skylab::Basic::TestSupport
       it "when input is at minimum it is OK" do
         normalize_against_ '-3'
         want_output_value_was_written_
-        @output_x.should eql( -3 )
+        expect( @output_x ).to eql( -3 )
         want_no_events
       end
 
@@ -86,7 +86,7 @@ module Skylab::Basic::TestSupport
         normalize_against_( -2 )
         want_output_value_was_written_
         want_no_events
-        @output_x.should eql( -2 )
+        expect( @output_x ).to eql( -2 )
       end
     end
 

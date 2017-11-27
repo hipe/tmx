@@ -29,11 +29,11 @@ describe "[ba] sexp - auto" do
 
       _ = parser.parse 'mary'
 
-      _.should be_kind_of _Treetop::Runtime::SyntaxNode
+      expect( _ ).to be_kind_of _Treetop::Runtime::SyntaxNode
 
       _ = parser.parse 'joe bob'
 
-      _.should be_nil
+      expect( _ ).to be_nil
     end
 
     it "parse trees get a method called 'sexp'" do
@@ -44,7 +44,7 @@ describe "[ba] sexp - auto" do
 
     context "it does nothing interesting with a not complex grammar" do
 
-      context 'the sexp for the string \"mary\"' do
+      context 'the sexp for the string "mary"' do
 
         let :input do
           'mary'
@@ -82,13 +82,13 @@ describe "[ba] sexp - auto" do
       pa = parser
 
       _ = pa.parse 'mary'
-      _.should be_kind_of Home_::TestSupport::PersonName_02::Node
+      expect( _ ).to be_kind_of Home_::TestSupport::PersonName_02::Node
 
       _ = pa.parse 'joe bob'
-      _.should be_kind_of Home_::TestSupport::PersonName_02::Node
+      expect( _ ).to be_kind_of Home_::TestSupport::PersonName_02::Node
 
       _ = pa.parse 'joe bobo briggs'
-      _.should be_nil
+      expect( _ ).to be_nil
     end
 
     context "because the grammar is more complex, stuff starts to happen magically" do
@@ -162,7 +162,7 @@ describe "[ba] sexp - auto" do
       _ or fail
 
       _ = o.parse 'joe bob briggs'
-      _.should be_nil
+      expect( _ ).to be_nil
     end
 
     context "because the grammar is broken up more optimally" do
@@ -277,7 +277,7 @@ describe "[ba] sexp - auto" do
 
         _s = _raw_tree.sexp
 
-        _s.should eql expected
+        expect( _s ).to eql expected
       end
     end
 
@@ -295,7 +295,7 @@ describe "[ba] sexp - auto" do
         _sexp = _raw_tree.sexp
 
         _ts = _sexp.child :top_slice
-        _ts.class.should eql Home_::TestSupport::Bread
+        expect( _ts.class ).to eql Home_::TestSupport::Bread
       end
 
       context 'calling the custom method ("calories") on your custom sexp class' do

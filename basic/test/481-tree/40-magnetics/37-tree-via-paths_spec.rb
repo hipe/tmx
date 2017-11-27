@@ -18,33 +18,33 @@ module Skylab::Basic::TestSupport
 
       node = subject_module_.via :paths, paths
 
-      node.slug.should be_nil
+      expect( node.slug ).to be_nil
 
-      node.children_count.should eql 2
+      expect( node.children_count ).to eql 2
 
       st = node.to_child_stream
 
       node = st.gets
-      node.slug.should eql 'a'
-      node.children_count.should be_zero
+      expect( node.slug ).to eql 'a'
+      expect( node.children_count ).to be_zero
 
       node = st.gets
-      node.slug.should eql 'bb'
-      node.children_count.should eql 1
+      expect( node.slug ).to eql 'bb'
+      expect( node.children_count ).to eql 1
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
       node = node.fetch_first_child
-      node.slug.should eql 'cc'
+      expect( node.slug ).to eql 'cc'
 
-      node.children_count.should eql 1
+      expect( node.children_count ).to eql 1
       node = node.child_at_position 0
 
-      node.slug.should eql 'dd'
-      node.children_count.should eql 1
+      expect( node.slug ).to eql 'dd'
+      expect( node.children_count ).to eql 1
       node = node.fetch_first_child
 
-      node.slug.should eql 'ee'
+      expect( node.slug ).to eql 'ee'
     end
   end
 end

@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
     it "makes a listener that sends method calls downwards w suffix - o" do
       listener.maybe_receive_event :wazzozle, :x
       @listener.maybe_receive_event :wiff, :waff, :z
-      @a.should eql %i( wzzzl x wff wff z )
+      expect( @a ).to eql %i( wzzzl x wff wff z )
     end
 
     it "when an unsupported channel name is emitted - X" do

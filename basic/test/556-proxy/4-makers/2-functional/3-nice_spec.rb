@@ -19,10 +19,10 @@ module Skylab::Basic::TestSupport
 
       it "class / construct / inspect" do
         x = bingo_kls.new moo: 'x1', mar: 'x2'
-        x.class.should eql Pxy_Fnctnl_03_01
-        x.inspect.should eql(
+        expect( x.class ).to eql Pxy_Fnctnl_03_01
+        expect( x.inspect ).to eql(
           '#<Skylab::Basic::TestSupport::Pxy_Fnctnl_03_01 moo, mar>' )
-        x.two.should eql( [ 'x1', 'x2' ] )
+        expect( x.two ).to eql( [ 'x1', 'x2' ] )
       end
     end
 
@@ -40,10 +40,10 @@ module Skylab::Basic::TestSupport
       it "construct / class / inspect" do
 
         foo = fingo_kls.new loo: 'y'
-        foo.class.should eql Pxy_Fnctnl_03_02
-        foo.inspect.should eql(
+        expect( foo.class ).to eql Pxy_Fnctnl_03_02
+        expect( foo.inspect ).to eql(
           '#<Skylab::Basic::TestSupport::Pxy_Fnctnl_03_02 loo>' )
-        foo.liu.should eql( 'y' )
+        expect( foo.liu ).to eql( 'y' )
       end
     end
 

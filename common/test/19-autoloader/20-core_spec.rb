@@ -112,7 +112,7 @@ module Skylab::Common::TestSupport
 
       it "entry trees get hackishly built" do
         _TernMern = fixture_directories_::Frtrn_TM
-        _TernMern::Kernel_::YEP.should eql :yep
+        expect( _TernMern::Kernel_::YEP ).to eql :yep
       end
 
       it "at the boundary of an integration with old :+[#027]" do

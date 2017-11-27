@@ -25,8 +25,8 @@ module Skylab::Basic::TestSupport
 
     it "when one string is the head of another string - shorter becomes nil" do
       x = subject [ 'my', 'myopic' ]
-      x.first.should be_nil
-      x.last.hotstring.should eql 'myo'
+      expect( x.first ).to be_nil
+      expect( x.last.hotstring ).to eql 'myo'
     end
 
     it "with stream" do
@@ -40,7 +40,7 @@ module Skylab::Basic::TestSupport
     end
 
     def want * s_a
-      @result.map( & :hotstring ).should eql s_a
+      expect( @result.map( & :hotstring ) ).to eql s_a
     end
 
     def subject a

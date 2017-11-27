@@ -63,4 +63,21 @@ fix diff thing
 clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
 all known near-term practial applications of this (-1) (Z) (Z)->(W,Y,J)
 .to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
+Scanner_ for Scanner.via_array
 convert every '.should' to `expect( ).to` 07-19 03:47:08 (-3) (W) (W)->(J)
+possible bug in discrepancy between test count with quickie and not xx
+doc_test requires special work
+come back around to [sy] and use modern patterns
+tmx, slicer (meta & macro) (-4)
+myterm, doc_test (flagship experiments) (-5)
+treemap, git_viz, code_metrics (visualization experiments) (-6)
+beauty_salon, search_and_replace (code refactoring) (-7)
+tan_man, snag, task_examples, task (project management experiments) (-8)
+cull (aspirational experiments (-9)
+css_convert, bnf2treetop, yacc2treetop, flex2treetop (parsing utilities) (-10)
+permute, sub_tree (ancillary applications) (-11)
+git (vendor adapters) (-12)
+brazen, plugin, zerk (frameworky essentials) (-13)
+arc, fields (modeling essentials) (-14)
+tabular, parse (ancillary essentials) (-15)
+system, test_support, human (practical essentials) (-16)

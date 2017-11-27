@@ -73,21 +73,21 @@ module Skylab::Basic
       def want_errored_with_ sym, msg=nil
 
         em = want_errored_with nil, msg
-        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
         em
       end
 
       def want_not_OK_event_ sym, msg=nil
 
         em = want_not_OK_event nil, msg
-        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
         em
       end
 
       def want_event_ sym
 
         em = want_event
-        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
         em
       end
 

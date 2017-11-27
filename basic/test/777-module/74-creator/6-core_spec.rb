@@ -19,9 +19,9 @@ module Skylab::Basic::TestSupport
         it "works, is persistent, gives you a convenience accessor" do
 
           o = klass_.new
-          o.Hello_1.should be_kind_of ::Module
-          o.Hello_1.object_id.should eql o.Hello_1.object_id
-          o._Hello_1.should eql o.Hello_1
+          expect( o.Hello_1 ).to be_kind_of ::Module
+          expect( o.Hello_1.object_id ).to eql o.Hello_1.object_id
+          expect( o._Hello_1 ).to eql o.Hello_1
         end
       end
 
@@ -39,7 +39,7 @@ module Skylab::Basic::TestSupport
         it "works" do
 
           _o = klass_.new
-          _o.Hello_2.instance_methods.should eql [ :fizzo ]
+          expect( _o.Hello_2.instance_methods ).to eql [ :fizzo ]
         end
       end
     end
@@ -61,17 +61,17 @@ module Skylab::Basic::TestSupport
           m2 = mod::Familia
           m3 = o.Mi.const_get :Familia, false
 
-          [ m1, m2, m3 ].map( & :object_id ).uniq.length.should eql 1
+          expect( [ m1, m2, m3 ].map( & :object_id ).uniq.length ).to eql 1
 
-          mod.object_id.should eql o.Mi.object_id
+          expect( mod.object_id ).to eql o.Mi.object_id
         end
 
         it "lazy eval. vs. kicks" do
 
           o = klass_.new
-          o.Mi.constants.length.should eql(1)
+          expect( o.Mi.constants.length ).to eql(1)
           o.Mi__Familia
-          o.Mi.constants.length.should eql(1)
+          expect( o.Mi.constants.length ).to eql(1)
         end
       end
     end
@@ -85,7 +85,7 @@ module Skylab::Basic::TestSupport
 
       it "happens" do
 
-        klass_.new.American.constants.length.should eql 2
+        expect( klass_.new.American.constants.length ).to eql 2
       end
     end
 
@@ -121,8 +121,8 @@ module Skylab::Basic::TestSupport
       it "per module appears to follow the order it was defined in" do
 
         o = klass_.new
-        o.My__BaMi.instance_methods.should eql [ :zip, :zoop, :zorp ]
-        o.My__BaMi.instance_method( :zip ).parameters.should eql [ [:req, :a ] ]
+        expect( o.My__BaMi.instance_methods ).to eql [ :zip, :zoop, :zorp ]
+        expect( o.My__BaMi.instance_method( :zip ).parameters ).to eql [ [:req, :a ] ]
       end
 
       it "looks like it realizes the whole graph, but still lazily wtf!!" do
@@ -131,18 +131,18 @@ module Skylab::Basic::TestSupport
 
         m = o.meta_hell_anchor_module
 
-        m.constants.should eql EMPTY_A_
+        expect( m.constants ).to eql EMPTY_A_
 
         o.My__Pho
 
-        m.object_id.should eql o.meta_hell_anchor_module.object_id
-        m.constants.should eql [ :My, :His ]
+        expect( m.object_id ).to eql o.meta_hell_anchor_module.object_id
+        expect( m.constants ).to eql [ :My, :His ]
 
         _x = m.const_get( :My, false ).
           const_get( :Pho, false ).
             const_get( :Pas, false )
 
-        _x.instance_methods.should eql [ :zangeif ]
+        expect( _x.instance_methods ).to eql [ :zangeif ]
       end
     end
   end

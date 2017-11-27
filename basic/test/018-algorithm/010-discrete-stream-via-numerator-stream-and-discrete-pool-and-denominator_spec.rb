@@ -15,7 +15,7 @@ module Skylab::Basic::TestSupport
 
       it "so, half of six is three, right? so" do
 
-        ( me.shortcut( [0.5, 0.5], 6 ).to_a ).should eql [ 3, 3 ]
+        expect( ( me.shortcut( [0.5, 0.5], 6 ).to_a ) ).to eql [ 3, 3 ]
       end
 
       it "let's break up 12 (\"pixels\") with this stream of ratios" do
@@ -23,16 +23,16 @@ module Skylab::Basic::TestSupport
         st = me.shortcut [0.25, 0.334, 1.0/6], 12
 
           # one quarter of 12 is 3:
-        st.gets.should eql 3
+        expect( st.gets ).to eql 3
 
           # one third of 12 is 4:
-        st.gets.should eql 4
+        expect( st.gets ).to eql 4
 
           # one sixth of 12 is 2:
-        st.gets.should eql 2
+        expect( st.gets ).to eql 2
 
           # all done
-        st.gets.should eql nil
+        expect( st.gets ).to eql nil
       end
 
       it "accumulated amount of spillover reaches 1" do
@@ -42,13 +42,13 @@ module Skylab::Basic::TestSupport
         st = me.shortcut [one_seventh, one_seventh, one_seventh], 10
 
           # one seventh of 10 is about 1.4285..
-        st.gets.should eql 1
+        expect( st.gets ).to eql 1
 
           # again, there is 0.4285.. of "spillover"
-        st.gets.should eql 1
+        expect( st.gets ).to eql 1
 
           # because the total "spillover" has reached 1, pop!
-        st.gets.should eql 2
+        expect( st.gets ).to eql 2
       end
     end
   end

@@ -6,36 +6,34 @@ module Skylab::Basic::TestSupport
 
     it "here have an empty one" do
       digraph = Home_::Digraph.new
-      digraph.node_count.should eql( 0 )
+      expect( digraph.node_count ).to eql( 0 )
     end
 
     it "here have one with one node" do
       digraph = Home_::Digraph[ :solo ]
-      digraph.node_count.should eql( 1 )
+      expect( digraph.node_count ).to eql( 1 )
       node = digraph.fetch :solo
-      node.normalized_local_node_name.should eql( :solo )
+      expect( node.normalized_local_node_name ).to eql( :solo )
     end
 
     it "here have the minimal graph" do
       digraph = Home_::Digraph[ child: :parent ]
-      digraph.node_count.should eql( 2 )
-      digraph.fetch( :child ).normalized_local_node_name.should eql( :child )
-      digraph.fetch( :parent ).normalized_local_node_name.should eql( :parent )
-      digraph.fetch( :child ).direct_association_targets_include( :parent ).
-        should eql( true )
-      digraph.fetch( :child ).direct_association_targets_include( :foo ).
-        should eql( false )
+      expect( digraph.node_count ).to eql( 2 )
+      expect( digraph.fetch( :child ).normalized_local_node_name ).to eql( :child )
+      expect( digraph.fetch( :parent ).normalized_local_node_name ).to eql( :parent )
+      expect( digraph.fetch( :child ).direct_association_targets_include( :parent ) ).to eql( true )
+      expect( digraph.fetch( :child ).direct_association_targets_include( :foo ) ).to eql( false )
     end
 
     it "hay your nodes can point to multiple parents" do
       d = Home_::Digraph[ :fing, bing: :bong, bing_2: :bong,
                                      sing: [:song], wing: [:wrong, :dong] ]
-      d.node_count.should eql( 9 )  # it didn't somehow double on on 'bong'
-      d.fetch( :fing ).direct_association_target_names.should eql( nil )
-      d.fetch( :bing ).direct_association_target_names.should eql( [:bong] )
-      d.fetch( :bing_2 ).direct_association_target_names.should eql( [:bong] )
-      d.fetch( :sing ).direct_association_target_names.should eql( [:song] )
-      d.fetch( :wing ).direct_association_target_names.should eql( [:wrong, :dong] )
+      expect( d.node_count ).to eql( 9 )  # it didn't somehow double on on 'bong'
+      expect( d.fetch( :fing ).direct_association_target_names ).to eql( nil )
+      expect( d.fetch( :bing ).direct_association_target_names ).to eql( [:bong] )
+      expect( d.fetch( :bing_2 ).direct_association_target_names ).to eql( [:bong] )
+      expect( d.fetch( :sing ).direct_association_target_names ).to eql( [:song] )
+      expect( d.fetch( :wing ).direct_association_target_names ).to eql( [:wrong, :dong] )
     end
 
     plant = -> do
@@ -48,25 +46,24 @@ module Skylab::Basic::TestSupport
 
       it "did you know that you can use `has?`" do
         d = Home_::Digraph[ :mineral, dog: :animal ]
-        (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )).should(
-          eql( true ) )
-        d.has?( :aardvark ).should eql( false )
+        expect( (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )) ).to eql( true )
+        expect( d.has?( :aardvark ) ).to eql( false )
       end
 
 
       it "you can use `names` (is there even a flower called a `bedillia`?)" do
         d = plant[]
         names = d.names
-        names.should eql([:plant, :flower, :bedillia])
-        (d.names.object_id == names.object_id).should eql( false )
+        expect( names ).to eql([:plant, :flower, :bedillia])
+        expect( (d.names.object_id == names.object_id) ).to eql( false )
       end
 
       it "you can use `fetch` to fetch by name" do
         d = plant[]
         got = d.fetch :flower
-        got.normalized_local_node_name.should eql( :flower )
+        expect( got.normalized_local_node_name ).to eql( :flower )
         dont = d.fetch :animal do end
-        dont.should be_nil
+        expect( dont ).to be_nil
       end
     end
 
@@ -81,8 +78,7 @@ module Skylab::Basic::TestSupport
     context 'walk_pre_order' do
       it 'walk_pre_order min depth 1 - gets you all ancestors excluding self' do
         digraph = big_one[ ]
-        digraph.walk_pre_order( :my_tux_sticker, 1 ).to_a.
-          should( eql( [ :tux, :penguin, :animal, :thing, :icon, :symbol ] ) )
+        expect( digraph.walk_pre_order( :my_tux_sticker, 1 ).to_a ).to eql( [ :tux, :penguin, :animal, :thing, :icon, :symbol ] )
       end
     end
 
@@ -90,22 +86,21 @@ module Skylab::Basic::TestSupport
       it 'makes a deep copy of the whole graph' do
         d1 = Home_::Digraph[ :alpha, beta: :gamma, delta: [ :epsilon, :chi] ]
         d2 = d1.dupe
-        d2.node_count.should eql( 6 )
-        d2.fetch( :beta ).normalized_local_node_name.should eql( :beta )
-        (d2.fetch( :gamma ).object_id == d1.fetch( :gamma ).object_id).
-         should eql( false )
-        d2.fetch( :delta ).direct_association_target_names.should eql([:epsilon, :chi])
+        expect( d2.node_count ).to eql( 6 )
+        expect( d2.fetch( :beta ).normalized_local_node_name ).to eql( :beta )
+        expect( (d2.fetch( :gamma ).object_id == d1.fetch( :gamma ).object_id) ).to eql( false )
+        expect( d2.fetch( :delta ).direct_association_target_names ).to eql([:epsilon, :chi])
       end
     end
 
     context 'clearing a graph - ' do
       it 'flatly removes the nodes from the graph' do
         d = Home_::Digraph[ :one ]
-        d.names.should eql( [ :one ] )
-        d.node_count.should eql( 1 )
-        d.clear.should eql( nil )  # returns nothing
-        d.node_count.should eql( 0 )
-        d.names.should eql( [] )
+        expect( d.names ).to eql( [ :one ] )
+        expect( d.node_count ).to eql( 1 )
+        expect( d.clear ).to eql( nil )  # returns nothing
+        expect( d.node_count ).to eql( 0 )
+        expect( d.names ).to eql( [] )
       end
     end
 
@@ -116,7 +111,7 @@ module Skylab::Basic::TestSupport
           flower -> plant
           bedillia -> flower
         HERE
-        d.describe_digraph( :with_spaces ).should eql _exp
+        expect( d.describe_digraph( :with_spaces ) ).to eql _exp
       end
     end
 
@@ -124,14 +119,13 @@ module Skylab::Basic::TestSupport
       it "nerk" do
         d = big_one[ ]
         t = d.fetch :tux
-        t.direct_association_targets_include( :penguin ).should eql( true )
-        t.direct_association_targets_include( :animal ).should eql( false )
-        d.indirect_association_targets_include( :tux, :tux ).should eql( false )
-        d.indirect_association_targets_include( :tux, :penguin ).
-          should eql( false )
-        d.indirect_association_targets_include( :tux, :animal ).should eql(true)
-        d.indirect_association_targets_include( :tux, :symbol ).should eql(true)
-        d.indirect_association_targets_include( :tux, :mineral).should eql(false)
+        expect( t.direct_association_targets_include( :penguin ) ).to eql( true )
+        expect( t.direct_association_targets_include( :animal ) ).to eql( false )
+        expect( d.indirect_association_targets_include( :tux, :tux ) ).to eql( false )
+        expect( d.indirect_association_targets_include( :tux, :penguin ) ).to eql( false )
+        expect( d.indirect_association_targets_include( :tux, :animal ) ).to eql(true)
+        expect( d.indirect_association_targets_include( :tux, :symbol ) ).to eql(true)
+        expect( d.indirect_association_targets_include( :tux, :mineral) ).to eql(false)
       end
     end
 
@@ -141,22 +135,22 @@ module Skylab::Basic::TestSupport
 
         it "zero" do
 
-          _describe( :zero ).should eql '# (empty)'
+          expect( _describe( :zero ) ).to eql '# (empty)'
         end
 
         it "one" do
 
-          _describe( :one ).should eql 'one'
+          expect( _describe( :one ) ).to eql 'one'
         end
 
         it "b_a" do
 
-          _describe( :b_a ).should eql 'b->a'
+          expect( _describe( :b_a ) ).to eql 'b->a'
         end
 
         it "f_m_l" do
 
-          _describe( :f_m_l ).should eql <<-O.unindent.chop
+          expect( _describe( :f_m_l ) ).to eql <<-O.unindent.chop
             f->a
             l->a
             m->l
@@ -166,7 +160,7 @@ module Skylab::Basic::TestSupport
 
         it "orph" do
 
-          _describe( :orph ).should eql "c\nb->a"
+          expect( _describe( :orph ) ).to eql "c\nb->a"
         end
 
         def _describe sym
@@ -179,22 +173,22 @@ module Skylab::Basic::TestSupport
 
         it "zero" do
 
-          _invert( :zero ).should eql '# (empty)'
+          expect( _invert( :zero ) ).to eql '# (empty)'
         end
 
         it "one" do
 
-          _invert( :one ).should eql 'one'
+          expect( _invert( :one ) ).to eql 'one'
         end
 
         it "b_a" do
 
-          _invert( :b_a ).should eql 'a->b'
+          expect( _invert( :b_a ) ).to eql 'a->b'
         end
 
         it "f_m_l" do
 
-          _invert( :f_m_l ).should eql <<-O.unindent.chop
+          expect( _invert( :f_m_l ) ).to eql <<-O.unindent.chop
             a->f
             a->l
             l->m
@@ -203,7 +197,7 @@ module Skylab::Basic::TestSupport
         end
 
         it "orph" do
-          _invert( :orph ).should eql "c\na->b"
+          expect( _invert( :orph ) ).to eql "c\na->b"
         end
 
         def _invert sym
@@ -233,20 +227,19 @@ module Skylab::Basic::TestSupport
 
         it "subtract one target and one inner - you are left with partial subset" do
           d2 = real.minus( [:info, :data, :strange] )
-          d2.node_count.should eql( 2 )
-          d2.describe_digraph.should eql 'row->text'
+          expect( d2.node_count ).to eql( 2 )
+          expect( d2.describe_digraph ).to eql 'row->text'
         end
 
         it "subtract the minimum covering set - you are left with none" do
           d2 = real.minus( [:text, :data] )
-          d2.node_count.should eql( 0 )
+          expect( d2.node_count ).to eql( 0 )
         end
 
         it "just the two leaf nodes - the target node subset" do
           d2 = real.minus [ :empty, :row_count ]
-          d2.node_count.should eql( 4 )
-          d2.describe_digraph.split( "\n" ).join( ' ' ).
-            should eql "row->text info->text data"
+          expect( d2.node_count ).to eql( 4 )
+          expect( d2.describe_digraph.split( "\n" ).join( ' ' ) ).to eql "row->text info->text data"
         end
       end
     end

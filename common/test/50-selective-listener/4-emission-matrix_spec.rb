@@ -37,7 +37,7 @@ module Skylab::Common::TestSupport
         emit_inf_str :I_S
         emit_err_ln :E_L
       end
-      @a.should eql %i( inf str I_S err ln E_L )
+      expect( @a ).to eql %i( inf str I_S err ln E_L )
     end
 
     def build_listener

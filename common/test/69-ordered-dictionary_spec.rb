@@ -16,8 +16,8 @@ module Skylab::Common::TestSupport
         listener.receive_error_event :x
         listener.receive_info_event :y
         listener.receive_info_event :z
-        e_a.should eql [ :x ]
-        i_a.should eql [ :y, :z ]
+        expect( e_a ).to eql [ :x ]
+        expect( i_a ).to eql [ :y, :z ]
       end
 
       it "nil callbacks don't get called" do
@@ -25,13 +25,13 @@ module Skylab::Common::TestSupport
         listener = X_od_Listener.new -> x { one_a << x }
         listener.receive_error_event :a
         listener.receive_info_event :b
-        one_a.should eql [ :a ]
+        expect( one_a ).to eql [ :a ]
       end
 
       it "you can reflect on the listeners themselves" do
         listener = X_od_Listener.new :foo, :bar
-        listener.error_p.should eql :foo
-        listener.info_p.should eql :bar
+        expect( listener.error_p ).to eql :foo
+        expect( listener.info_p ).to eql :bar
       end
 
       context "\"static\" listener class with `via_iambic`" do
@@ -42,8 +42,8 @@ module Skylab::Common::TestSupport
             :on_info_event, -> x { i_a << x }
           @subject.receive_info_event :foo
           @subject.receive_error_event :bar
-          i_a.should eql [ :foo ]
-          e_a.should eql [ :bar ]
+          expect( i_a ).to eql [ :foo ]
+          expect( e_a ).to eql [ :bar ]
         end
 
         it "clobbering only takes the last one (for now)" do
@@ -53,14 +53,14 @@ module Skylab::Common::TestSupport
             :on_info_event, -> x { e_a << x }
           @subject.receive_info_event :foo
           @subject.receive_error_event :bar
-          e_a.should eql [ :foo, :bar ]
-          i_a.length.should be_zero
+          expect( e_a ).to eql [ :foo, :bar ]
+          expect( i_a.length ).to be_zero
         end
 
         it "when strange" do
-          -> do
+          expect( -> do
             subject :on_foo_zizzle
-          end.should raise_error ::ArgumentError,
+          end ).to raise_error ::ArgumentError,
             %r(\Adid not match against .+ - 'on_foo_zizzle'\z)
         end
 
@@ -78,7 +78,7 @@ module Skylab::Common::TestSupport
         listener.receive_foo_event :a
         listener.receive_bar_event
         listener.foo_p[ :c ]
-        a.should eql [:a, :b, :c]
+        expect( a ).to eql [:a, :b, :c]
       end
     end
 
@@ -86,28 +86,28 @@ module Skylab::Common::TestSupport
 
       it "when no intersect" do
         with inline :wizzle, :W, :wango, :A
-        foo_and_bar.should eql [ :F, :B ]
+        expect( foo_and_bar ).to eql [ :F, :B ]
       end
 
       it "when equal member sets, the argument listener wins" do
         with inline :foo, :F2, :bar, :B2
-        foo_and_bar.should eql [ :F2, :B2 ]
+        expect( foo_and_bar ).to eql [ :F2, :B2 ]
       end
 
       it "when argument listener has unheard of members, they are ignored." do
         with inline :foo, :F2, :bar, :B2, :baz, :Z2
-        foo_and_bar.should eql [ :F2, :B2 ]
+        expect( foo_and_bar ).to eql [ :F2, :B2 ]
       end
 
       it "when there are inside and outside differences, ok" do
         with inline :foo, :F2, :baz, :Z2
-        foo_and_bar.should eql [ :F2, :B ]
+        expect( foo_and_bar ).to eql [ :F2, :B ]
       end
 
       it "when there are inside & outside differences (classes reversed)" do
         @subject_listener = inline :foo, :F, :bar, :B
         merge_against Static_Guy_With_Three.new :B2, nil, :BOFFO
-        foo_and_bar.should eql [ :F, :B2 ]
+        expect( foo_and_bar ).to eql [ :F, :B2 ]
       end
 
       def inline * x_a

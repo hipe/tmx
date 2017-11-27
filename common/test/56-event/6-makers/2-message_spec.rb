@@ -33,7 +33,7 @@ module Skylab::Common::TestSupport
       _ev.express_into_under y=[],
         Home_.lib_.brazen::API.expression_agent_instance
 
-      y.should eql ["ermegerd '_Foo_' (:_Bar_)"]
+      expect( y ).to eql ["ermegerd '_Foo_' (:_Bar_)"]
     end
   end
 # ->

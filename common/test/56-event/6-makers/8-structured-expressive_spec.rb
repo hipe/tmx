@@ -13,7 +13,7 @@ module Skylab::Common::TestSupport
 
     it "makes a purely structured class" do
 
-      _structured_class.members.should eql [ :a, :b, :c ]
+      expect( _structured_class.members ).to eql [ :a, :b, :c ]
     end
 
     it "..which works (attr readers, `to_a`)" do
@@ -21,11 +21,11 @@ module Skylab::Common::TestSupport
       _cls = _structured_class
 
       o = _cls.new 'A', 'B'
-      o.a.should eql 'A'
-      o.b.should eql 'B'
-      o.c.should be_nil
+      expect( o.a ).to eql 'A'
+      expect( o.b ).to eql 'B'
+      expect( o.c ).to be_nil
 
-      o.to_a.should eql [ 'A', 'B',  nil ]
+      expect( o.to_a ).to eql [ 'A', 'B',  nil ]
     end
 
     shared_subject :_structured_class do
@@ -48,7 +48,7 @@ module Skylab::Common::TestSupport
 
       _y = o.express_into_under [], _expag
 
-      _y.should eql [ '"ONE", "TWO"' ]
+      expect( _y ).to eql [ '"ONE", "TWO"' ]
     end
 
     shared_subject :_expressive_class do

@@ -15,7 +15,7 @@ module Skylab::Basic::TestSupport
 
       buckets = _subject_module[ _presidents_as_stream, 3 ]
 
-      buckets.length.should eql 3
+      expect( buckets.length ).to eql 3
 
       # from partitioning the list by hand, we got:
       #   486    455    562
@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport
       #   jack  obam   bush
       #                madi
 
-      buckets.map( & :total ).should eql [ 486, 455, 562 ]
+      expect( buckets.map( & :total ) ).to eql [ 486, 455, 562 ]
     end
 
     it "what about zeros? zeros are distributed as well" do

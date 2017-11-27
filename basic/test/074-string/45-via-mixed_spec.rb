@@ -12,19 +12,19 @@ module Skylab::Basic::TestSupport
     end
 
     it "the quoting happens via 'inspect' so things get escaped too" do
-      subject( "\"\n" ).should eql '"\"\n"'
+      expect( subject( "\"\n" ) ).to eql '"\"\n"'
     end
 
     it "a string 16 chars wide becomes 15 chars wide and is ellipsified" do
-      subject( 'sixteen_chars_wd' ).should eql '"sixteen_cha[..]"'
+      expect( subject( 'sixteen_chars_wd' ) ).to eql '"sixteen_cha[..]"'
     end
 
     it "a typical symbol gets single quotes" do
-      subject( :"foo_Bar baz 123" ).should eql "'foo_Bar baz 123'"
+      expect( subject( :"foo_Bar baz 123" ) ).to eql "'foo_Bar baz 123'"
     end
 
     it "a crazy symbol is inspected as-is" do
-      subject( :"\thi" ).should eql ':"\thi"'
+      expect( subject( :"\thi" ) ).to eql ':"\thi"'
     end
 
     context "customization (through dup)" do
@@ -71,7 +71,7 @@ module Skylab::Basic::TestSupport
     end
 
     def __want_quotes s
-      subject( s ).should eql "\"#{ s }\""
+      expect( subject( s ) ).to eql "\"#{ s }\""
     end
 
     def subject s

@@ -67,7 +67,7 @@ module Skylab::Basic::TestSupport
 
       _act = y.join EMPTY_S_
 
-      _act.should eql _exp  # use this form with --diff option
+      expect( _act ).to eql _exp  # use this form with --diff option
     end
   end
 end

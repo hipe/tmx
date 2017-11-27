@@ -24,11 +24,11 @@ module Skylab::Basic::TestSupport
       end
 
       it "per the procs you passed, it can take arguments" do
-        pxy.foo( :wee ).should eql "bar: wee"
+        expect( pxy.foo( :wee ) ).to eql "bar: wee"
       end
 
       it "or not" do
-        pxy.bar.should eql :BAZ
+        expect( pxy.bar ).to eql :BAZ
       end
 
       shared_subject :pxy2 do
@@ -42,8 +42,8 @@ module Skylab::Basic::TestSupport
       end
 
       it "note the signatures of the methods have changed" do
-        pxy2.foo.should eql :A
-        ( pxy2.bar 'y' ).should eql "YAY"
+        expect( pxy2.foo ).to eql :A
+        expect( ( pxy2.bar 'y' ) ).to eql "YAY"
       end
     end
 
@@ -75,7 +75,7 @@ module Skylab::Basic::TestSupport
 
       it "you can add more stuff in an arbitrary definition block" do
         pxy = _class.new :zerpie, nil, :derkie, nil, :tata, nil
-        pxy.hi.should eql :__hej__
+        expect( pxy.hi ).to eql :__hej__
       end
 
       dangerous_memoize_ :_class do

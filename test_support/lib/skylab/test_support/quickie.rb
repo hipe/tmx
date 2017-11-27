@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::TestSupport
 
   module Quickie  # see [#004] the quickie narrative #intro
@@ -582,7 +584,7 @@ module Skylab::TestSupport
         UNABLE_
       end
 
-      def __receive_pass msg_p
+      def receive_pass_ msg_p
         @_client.receive_pass msg_p
         :_quickie_passed_
       end
@@ -1004,7 +1006,7 @@ module Skylab::TestSupport
 
         a = []
         say_line_body = -> h do
-          buffer = "{"
+          buffer = ::String.new '{'
           yes = false
           h.each_pair do |k, v|
             if yes
@@ -1178,7 +1180,7 @@ module Skylab::TestSupport
 
         _msg = stats.to_qualified_datapoint_stream.reduce_by do |o|
           o.is_known_known
-        end.join_into_with_by "", ", " do |o|
+        end.join_into_with_by ::String.new, ', ' do |o|
           o.to_string :EN
         end
 
@@ -1324,10 +1326,13 @@ module Skylab::TestSupport
         end
 
         def it * desc_s_a, & p
+          _d = caller_locations( 1, 1 ).first.lineno  # #spot1.1 (necessary redundancy)
+          self.ADD_EXAMPLE_TS_ _d, p, desc_s_a
+        end
 
-          _d = caller_locations( 1, 1 ).first.lineno
+        def ADD_EXAMPLE_TS_ lineno, p, desc_s_a
           _h = Tagset_hash_via__[ desc_s_a, @_tagset_hash ]  # pops array
-          _sea = Searchables___[ _d, _h ]
+          _sea = Searchables___[ lineno, _h ]
           _eg = Example__.new _sea, p, desc_s_a, self
           @_elements.push [ :leaf, _eg ]
           NIL
@@ -1511,12 +1516,16 @@ module Skylab::TestSupport
 
       def _pass_by & msg_p
 
-        @_statistics_aggregator.__receive_pass msg_p
+        @_statistics_aggregator.receive_pass_ msg_p
       end
 
       def _fail_by & msg_p
 
         @_statistics_aggregator._receive_fail msg_p
+      end
+
+      def _say_expected
+        @expected.inspect
       end
     end
 
@@ -1531,14 +1540,18 @@ module Skylab::TestSupport
         if @expected == actual
 
           _pass_by do
-            "equals #{ @expected.inspect }"
+            "equals #{ _say_expected }"
           end
         else
 
           _fail_by do
-            "expected #{ @expected.inspect }, got #{ actual.inspect }"
+            "expected #{ _say_expected }, got #{ actual.inspect }"
           end
         end
+      end
+
+      def to_uninflected_verb_phrase_
+        "equal #{ _say_expected }"
       end
     end
 
@@ -1732,6 +1745,11 @@ module Skylab::TestSupport
             No_Method___[ @context, self, actual ]
           end
         end
+
+        define_method.call :to_uninflected_verb_phrase_ do
+          "be #{ be_what.gsub UNDERSCORE_, SPACE_ } #{ _say_expected }"
+        end
+
         cls
       end
 
@@ -2403,8 +2421,8 @@ module Skylab::TestSupport
           end
         end
         def bfr_each p
-          const_defined?( :BEFORE_EACH_PROC_ ) and raise say_no_nested_before
-          const_set :BEFORE_EACH_PROC_, p ; nil
+          const_defined?( :BEFORE_EACH_PROC__ ) and raise say_no_nested_before
+          const_set :BEFORE_EACH_PROC__, p ; nil
         end
         def say_no_nested_before
           "sorry - in the intereset of simplicity there is not yet #{
@@ -2417,10 +2435,10 @@ module Skylab::TestSupport
 
     class Example__  # (1st re-open)
       def has_before_each
-        @context.const_defined? :BEFORE_EACH_PROC_
+        @context.const_defined? :BEFORE_EACH_PROC__
       end
       def run_before_each ctx  # assume `has_before_each`
-        ctx.instance_exec( & @context::BEFORE_EACH_PROC_ )
+        ctx.instance_exec( & @context::BEFORE_EACH_PROC__ )
         NIL_
       end
     end

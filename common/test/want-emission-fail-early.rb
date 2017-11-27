@@ -631,8 +631,10 @@ module Skylab::Common::TestSupport
 
       def __when_channel_unequal
 
-        @actual_emission.channel_symbol_array.should(
-          @test_context.eql @channel_symbol_array )
+        _ = @test_context
+
+        _.expect( @actual_emission.channel_symbol_array ).to _.eql(
+          @channel_symbol_array )
 
         if @test_context.respond_to? :see_unexpected_emission
           @test_context.see_unexpected_emission @actual_emission

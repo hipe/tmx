@@ -12,14 +12,14 @@ module Skylab::Basic::TestSupport
 
         tee = build_tee_instance
 
-        -> do
+        expect( -> do
           tee.class
-        end.should raise_error ::NoMethodError, /\Aundefined method `class'/
+        end ).to raise_error ::NoMethodError, /\Aundefined method `class'/
       end
 
       it "send it a message in the list (no upstreams), result is nil" do
 
-        build_tee_instance.push.should be_nil
+        expect( build_tee_instance.push ).to be_nil
 
       end
 
@@ -34,23 +34,23 @@ module Skylab::Basic::TestSupport
         a_.push :hi
 
         x = tee.push :one
-        x.object_id.should eql a.object_id
+        expect( x.object_id ).to eql a.object_id
 
-        a.should eql [ :one ]
-        a_.should eql [ :hi, :one ]
+        expect( a ).to eql [ :one ]
+        expect( a_ ).to eql [ :hi, :one ]
 
         x = tee.shift
-        x.should eql :one
+        expect( x ).to eql :one
 
-        a.should eql EMPTY_A_
-        a_.should eql [ :one ]
+        expect( a ).to eql EMPTY_A_
+        expect( a_ ).to eql [ :one ]
 
       end
 
       it "responds to respond_to?" do
         one = build_tee_instance
-        one.respond_to?( :not ).should eql false
-        one.respond_to?( :push ).should eql true
+        expect( one.respond_to?( :not ) ).to eql false
+        expect( one.respond_to?( :push ) ).to eql true
       end
 
       def build_tee_instance

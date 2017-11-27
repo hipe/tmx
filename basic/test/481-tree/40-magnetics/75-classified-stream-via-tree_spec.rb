@@ -15,24 +15,24 @@ module Skylab::Basic::TestSupport
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.slug.should eql 'a'
-      cx.depth.should eql 0
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'a'
+      expect( cx.depth ).to eql 0
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'b'
-      cx.depth.should eql 1
-      cx.is_first.should eql true
-      cx.is_last.should eql false
+      expect( cx.node.slug ).to eql 'b'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql false
 
       cx = st.gets
-      cx.node.slug.should eql 'c'
-      cx.depth.should eql 1
-      cx.is_first.should eql false
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'c'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql false
+      expect( cx.is_last ).to eql true
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
     end
 
@@ -44,24 +44,24 @@ module Skylab::Basic::TestSupport
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.slug.should eql 'a'
-      cx.depth.should be_zero
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'a'
+      expect( cx.depth ).to be_zero
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'b'
-      cx.depth.should eql 1
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'b'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'c'
-      cx.depth.should eql 2
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'c'
+      expect( cx.depth ).to eql 2
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
     it "5 point valley" do
@@ -70,42 +70,42 @@ module Skylab::Basic::TestSupport
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.slug.should be_nil
-      cx.depth.should eql 0
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to be_nil
+      expect( cx.depth ).to eql 0
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'a'
-      cx.depth.should eql 1
-      cx.is_first.should eql true
-      cx.is_last.should eql false
+      expect( cx.node.slug ).to eql 'a'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql false
 
       cx = st.gets
-      cx.node.slug.should eql 'b'
-      cx.depth.should eql 2
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'b'
+      expect( cx.depth ).to eql 2
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'c'
-      cx.depth.should eql 1
-      cx.is_first.should eql false
-      cx.is_last.should eql false
+      expect( cx.node.slug ).to eql 'c'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql false
+      expect( cx.is_last ).to eql false
 
       cx = st.gets
-      cx.node.slug.should eql 'd'
-      cx.depth.should eql 1
-      cx.is_first.should eql false
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'd'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql false
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'e'
-      cx.depth.should eql 2
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'e'
+      expect( cx.depth ).to eql 2
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
     end
 
@@ -115,34 +115,34 @@ module Skylab::Basic::TestSupport
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.slug.should be_nil
-      cx.depth.should eql 0
+      expect( cx.node.slug ).to be_nil
+      expect( cx.depth ).to eql 0
 
       cx = st.gets
-      cx.node.slug.should eql 'a'
-      cx.depth.should eql 1
-      cx.is_first.should eql true
-      cx.is_last.should eql false
+      expect( cx.node.slug ).to eql 'a'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql false
 
       cx = st.gets
-      cx.node.slug.should eql 'b'
-      cx.depth.should eql 1
-      cx.is_first.should eql false
-      cx.is_last.should eql false
+      expect( cx.node.slug ).to eql 'b'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql false
+      expect( cx.is_last ).to eql false
 
       cx = st.gets
-      cx.node.slug.should eql 'c'
-      cx.depth.should eql 2
-      cx.is_first.should eql true
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'c'
+      expect( cx.depth ).to eql 2
+      expect( cx.is_first ).to eql true
+      expect( cx.is_last ).to eql true
 
       cx = st.gets
-      cx.node.slug.should eql 'd'
-      cx.depth.should eql 1
-      cx.is_first.should eql false
-      cx.is_last.should eql true
+      expect( cx.node.slug ).to eql 'd'
+      expect( cx.depth ).to eql 1
+      expect( cx.is_first ).to eql false
+      expect( cx.is_last ).to eql true
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
   end
 end

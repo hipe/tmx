@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport
       @t1 = _tree_via_paths %w| sky |
       @t2 = _tree_via_paths %w| lab |
       _go
-      _paths_via_tree( @t1 ).should eql( %w| sky lab | )
+      expect( _paths_via_tree( @t1 ) ).to eql( %w| sky lab | )
     end
 
     it "merge monadic trees - same" do
@@ -20,7 +20,7 @@ module Skylab::Basic::TestSupport
       @t1 = _tree_via_paths %w| sky |
       @t2 = _tree_via_paths %w| sky |
       _go
-      _paths_via_tree( @t1 ).should eql( %w| sky | )
+      expect( _paths_via_tree( @t1 ) ).to eql( %w| sky | )
     end
 
     it "merge 2-deep stem-trees, totally different" do
@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport
       @t1 = _tree_via_paths %w| sky/lab |
       @t2 = _tree_via_paths %w| bot/noise |
       _go
-      _paths_via_tree( @t1 ).should eql( %w| sky/ sky/lab bot/ bot/noise | )
+      expect( _paths_via_tree( @t1 ) ).to eql( %w| sky/ sky/lab bot/ bot/noise | )
     end
 
     it "merge where lvl 1 is same, lvl2 is different" do
@@ -36,7 +36,7 @@ module Skylab::Basic::TestSupport
       @t1 = _tree_via_paths %w| sky/hl |
       @t2 = _tree_via_paths %w| sky/face |
       _go
-      _paths_via_tree( @t1 ).should eql( %w| sky/ sky/hl sky/face | )
+      expect( _paths_via_tree( @t1 ) ).to eql( %w| sky/ sky/hl sky/face | )
     end
 
     def _tree_via_paths a

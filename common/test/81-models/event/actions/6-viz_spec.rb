@@ -19,7 +19,7 @@ module Skylab::Common::TestSupport
         :const, "#{ TS_.name }::FixtureFiles::WhoHah",
       )
 
-      io.string.should eql <<-HERE.unindent
+      expect( io.string ).to eql <<-HERE.unindent
         digraph {
           node [shape="Mrecord"]
           label="event stream graph for ::Skylab::Common::TestSupport::FixtureFiles::WhoHah"

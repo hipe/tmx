@@ -16,27 +16,27 @@ module Skylab::Basic::TestSupport
       it "no such action" do
 
         future_expect_only :error, :no_such_action do | ev |
-          ev.action_name.should eql :waz_tangle
+          expect( ev.action_name ).to eql :waz_tangle
         end
 
         _x = _kernel.call :waz_tangle, & fut_p
 
         future_is_now
 
-        _x.should eql false
+        expect( _x ).to eql false
       end
 
       it "calls OK" do
 
         future_expect :ohai, :ohey do | ev |
-          ev.should eql [ :Two, :One ]
+          expect( ev ).to eql [ :Two, :One ]
         end
 
         _x = _kernel.call :some_func_one, :arg_a, :One, :arg_b, :Two, & fut_p
 
         future_is_now
 
-        _x.should eql :wahoo
+        expect( _x ).to eql :wahoo
       end
 
       dangerous_memoize_ :_kernel do

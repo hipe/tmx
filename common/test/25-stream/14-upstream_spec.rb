@@ -7,9 +7,9 @@ module Skylab::Common::TestSupport
     it "has it" do
 
       st = _build_subject
-      st.gets.should eql 3
-      st.gets.should eql 2
-      st.upstream.should eql :x
+      expect( st.gets ).to eql 3
+      expect( st.gets ).to eql 2
+      expect( st.upstream ).to eql :x
     end
 
     it "endures by a map" do
@@ -20,8 +20,8 @@ module Skylab::Common::TestSupport
         "(#{ d })"
       end
 
-      st.gets.should eql "(3)"
-      st.upstream.should eql :x
+      expect( st.gets ).to eql "(3)"
+      expect( st.upstream ).to eql :x
     end
 
     def _build_subject

@@ -91,7 +91,7 @@ describe "[ba] number en (and stowed-away essentials too)" do
 
   def _common s, d, m
 
-    Home_::Number::EN.send( m, d ).should eql s
+    expect( Home_::Number::EN.send( m, d ) ).to eql s
   end
 end
 # ->

@@ -19,20 +19,20 @@ module Skylab::Basic::TestSupport
 
         o = self.o
         klass = o.klass
-        klass.should be_kind_of(::Class)
-        o.klass.object_id.should eql(klass.object_id) # klass is memoized
+        expect( klass ).to be_kind_of(::Class)
+        expect( o.klass.object_id ).to eql(klass.object_id) # klass is memoized
 
         # o.object is memozed. but klass and object behave as expected
         object = o.object
-        object.should be_kind_of(klass)
+        expect( object ).to be_kind_of(klass)
         object2 = klass.new
-        ( object2.object_id == object.object_id ).should eql( false )
-        object2.class.should eql(object.class)
-        object.class.should eql(klass)
-        o.object.object_id.should eql(object.object_id)
+        expect( ( object2.object_id == object.object_id ) ).to eql( false )
+        expect( object2.class ).to eql(object.class)
+        expect( object.class ).to eql(klass)
+        expect( o.object.object_id ).to eql(object.object_id)
 
-        klass.to_s.should eql('Feeple')
-        object.class.to_s.should eql(klass.to_s)
+        expect( klass.to_s ).to eql('Feeple')
+        expect( object.class.to_s ).to eql(klass.to_s)
       end
     end
 
@@ -45,8 +45,8 @@ module Skylab::Basic::TestSupport
       it "is fine, the same as defining one with an empty body" do
 
         o = self.o
-        o.klass.to_s.should eql('Darymple')
-        o.klass.should be_kind_of(::Class)
+        expect( o.klass.to_s ).to eql('Darymple')
+        expect( o.klass ).to be_kind_of(::Class)
       end
     end
 
@@ -73,8 +73,8 @@ module Skylab::Basic::TestSupport
 
         it "the created class will subclass it" do
           o = self.o.object
-          o.class.to_s.should eql('MyEnumerator')
-          o.should be_kind_of(::Enumerator)
+          expect( o.class.to_s ).to eql('MyEnumerator')
+          expect( o ).to be_kind_of(::Enumerator)
         end
       end
 
@@ -115,8 +115,8 @@ module Skylab::Basic::TestSupport
 
           o = self.o.Darymple.new
           a = o.class.ancestors.map(&:to_s)
-          a.should be_include('Darymple')
-          a.should be_include('FunTimes::Pimple')
+          expect( a ).to be_include('Darymple')
+          expect( a ).to be_include('FunTimes::Pimple')
         end
       end
 
@@ -140,7 +140,7 @@ module Skylab::Basic::TestSupport
         doing { o.klass }
 
         it "ok" do
-          subject.call.to_s.should eql('A::B::C')
+          expect( subject.call.to_s ).to eql('A::B::C')
         end
       end
     end
@@ -168,8 +168,8 @@ module Skylab::Basic::TestSupport
 
         it "ok, as in ruby" do
 
-          o.klass.to_s.should eql('Foo')
-          o.klass.ancestors.should be_include(::Enumerator)
+          expect( o.klass.to_s ).to eql('Foo')
+          expect( o.klass.ancestors ).to be_include(::Enumerator)
         end
       end
 
@@ -194,7 +194,7 @@ module Skylab::Basic::TestSupport
 
         it "works" do
 
-          (o.klass.ancestors & [o.Foo, ::Enumerator]).length.should eql(2)
+          expect( (o.klass.ancestors & [o.Foo, ::Enumerator]).length ).to eql(2)
         end
       end
     end

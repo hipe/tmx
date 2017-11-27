@@ -52,7 +52,7 @@ module Skylab::Basic::TestSupport
 
         Once__[]
 
-        Class.new._Wank.instance_methods.should eql [ :worked ]
+        expect( Class.new._Wank.instance_methods ).to eql [ :worked ]
 
       end
     end
@@ -109,9 +109,9 @@ module Skylab::Basic::TestSupport
       it "amazingly works sort of under composition with some kicking" do
         o = SomeClass.new
         mod = o._Lawrence
-        mod.constants.should eql([:Fishburne])
+        expect( mod.constants ).to eql([:Fishburne])
         o._Lawrence__Arabia
-        mod.constants.should eql([:Fishburne, :Kasdan, :Arabia])
+        expect( mod.constants ).to eql([:Fishburne, :Kasdan, :Arabia])
       end
 
       it "I UNDERSTAND THIS RIGHT NOW BUT I NEVER WILL EVER AGAIN" do
@@ -119,18 +119,18 @@ module Skylab::Basic::TestSupport
         o2 = SomeClass.new
         o3 = SomeClass.new
         a = [o1, o2, o3]
-        a.map { |o| o.meta_hell_anchor_module.constants.length }.
-          uniq.should eql([0])
-        a.map { |o| o.meta_hell_anchor_module.object_id }.
-          uniq.length.should eql(a.length)
+        expect( a.map { |o| o.meta_hell_anchor_module.constants.length }.
+          uniq ).to eql([0])
+        expect( a.map { |o| o.meta_hell_anchor_module.object_id }.
+          uniq.length ).to eql(a.length)
         o1.modul! :Lawrence__Arabia__Flavia
         o2.modul! :Lawrence__Fishburne__Wishburne
-        o1.Lawrence.constants.should eql([:Fishburne, :Kasdan, :Arabia]) # b/c..
-        o2.Lawrence.constants.should eql([:Fishburne])
-        o1.Lawrence::Fishburne.constants.should eql([])
-        o2.Lawrence::Fishburne.constants.should eql([:Wishburne])
-        o2.Lawrence__Arabia.constants.should eql([])
-        o1.Lawrence::Arabia.constants.should eql([:Flavia])
+        expect( o1.Lawrence.constants ).to eql([:Fishburne, :Kasdan, :Arabia]) # b/c..
+        expect( o2.Lawrence.constants ).to eql([:Fishburne])
+        expect( o1.Lawrence::Fishburne.constants ).to eql([])
+        expect( o2.Lawrence::Fishburne.constants ).to eql([:Wishburne])
+        expect( o2.Lawrence__Arabia.constants ).to eql([])
+        expect( o1.Lawrence::Arabia.constants ).to eql([:Flavia])
       end
     end
   end

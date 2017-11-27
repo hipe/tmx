@@ -12,28 +12,27 @@ module Skylab::Basic::TestSupport
     end
 
     it 'empty string - no match' do
-      subject( '' ).should be_nil
+      expect( subject( '' ) ).to be_nil
     end
 
     it "empty parens - matches" do
-      subject( '()' ).should eql [ '(', nil, ')' ]
+      expect( subject( '()' ) ).to eql [ '(', nil, ')' ]
     end
 
     it "parenthesis pair with trailing paren - ok" do
-      subject( '()))' ).should eql [ '(', '))', ')' ]
+      expect( subject( '()))' ) ).to eql [ '(', '))', ')' ]
     end
 
     it "plain old word - doesn't parse (why bother?)" do
-      subject( 'foo' ).should be_nil
+      expect( subject( 'foo' ) ).to be_nil
     end
 
     it "word ending with one punctuation - parses" do
-      subject( 'foo!' ).should eql [ nil, 'foo', '!' ]
+      expect( subject( 'foo!' ) ).to eql [ nil, 'foo', '!' ]
     end
 
     it "stress test - ok" do
-      subject(  '<(foo, bar!?)!?:.!>' ).
-        should eql [ '<', '(foo, bar!?)', '!?:.!>' ]
+      expect( subject(  '<(foo, bar!?)!?:.!>' ) ).to eql [ '<', '(foo, bar!?)', '!?:.!>' ]
     end
 
     def subject s

@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport
       time_a = Home_.lib_.time.parse '2012-06-16 12:01 PM'
       time_b = ::Time.parse '2012-06-18 12:02 PM'
       unit, amt = _subject_against time_a - time_b
-      "#{ amt.to_i } #{ unit }s".should eql '2 days'
+      expect( "#{ amt.to_i } #{ unit }s" ).to eql '2 days'
     end
 
     def _subject_against x

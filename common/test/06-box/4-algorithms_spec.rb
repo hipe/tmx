@@ -19,49 +19,47 @@ module Skylab::Common::TestSupport
       end
 
       it "when you retrieve with |k, x| you get a [k, x] result" do
-        subject_.retrieve do | k, v |
+        expect( subject_.retrieve do | k, v |
           :three == k
-        end.should eql [ :three, :Three ]
+        end ).to eql [ :three, :Three ]
       end
 
       it "when you retrieve with | x \ you get x back" do
-        subject_.retrieve do | x |
+        expect( subject_.retrieve do | x |
           :Five == x
-        end.should eql :Five
+        end ).to eql :Five
       end
 
       it "can be used like a complicated fetch" do
 
         k, x = subject_.retrieve -> k_, v_ { :three == k_ }
 
-        k.should eql :three
-        x.should eql :Three
+        expect( k ).to eql :three
+        expect( x ).to eql :Three
       end
 
       it "the `else` proc works as proc" do
 
-        subject_.retrieve( -> x { :NotThere == x }, -> { :alternate } ).
-          should eql :alternate
+        expect( subject_.retrieve( -> x { :NotThere == x }, -> { :alternate } ) ).to eql :alternate
       end
 
       it "the `else` proc works as block" do
-        ( subject_.retrieve -> x { false } do :no end ).should eql :no
+        expect( ( subject_.retrieve -> x { false } do :no end ) ).to eql :no
       end
 
       it "errmsg" do
 
         _rx = /\bvalue not found matching #<Proc@#{ ::Regexp.escape __FILE__ }:\d+>\z/
-        -> do
+        expect( -> do
           subject_.retrieve -> x { false }
-        end.should raise_error ::KeyError, _rx
+        end ).to raise_error ::KeyError, _rx
       end
     end
 
     it "to_hash" do
 
-      subject_with_entries_( :a, :A, :b, :B ).
-        algorithms.to_hash.should(
-          eql a: :A, b: :B )
+      expect( subject_with_entries_( :a, :A, :b, :B ).
+        algorithms.to_hash ).to eql a: :A, b: :B
     end
 
     it "mutate_by_sorting_name_by" do
@@ -69,15 +67,15 @@ module Skylab::Common::TestSupport
       bx = subject_with_entries_ :z, :Z, :x, :X, :y, :Y
       desired_order = [ :x, :z, :y ]
       bx.algorithms.mutate_by_sorting_name_by( & desired_order.method( :index ) )
-      bx.instance_variable_get( :@a ).should eql desired_order
+      expect( bx.instance_variable_get( :@a ) ).to eql desired_order
     end
 
     it "clear" do
 
       bx = subject_with_entries_ :a, :b
-      bx.length.should eql 1
-      bx.algorithms.clear.should be_nil
-      bx.length.should be_zero
+      expect( bx.length ).to eql 1
+      expect( bx.algorithms.clear ).to be_nil
+      expect( bx.length ).to be_zero
     end
   end
 end

@@ -15,9 +15,9 @@ module Skylab::Common::TestSupport
 
       st = _col.to_entity_stream
 
-      st.gets.should eql :One
-      st.gets.should eql :Two
-      st.gets.should be_nil
+      expect( st.gets ).to eql :One
+      expect( st.gets ).to eql :Two
+      expect( st.gets ).to be_nil
     end
   end
 end

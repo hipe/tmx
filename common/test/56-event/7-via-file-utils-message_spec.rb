@@ -41,8 +41,8 @@ module Skylab::Common::TestSupport
       s = fu_output_message_for cmd, arg
       md = _subject.match s
       md or fail "did not match: #{ s.inspect }"
-      md[ :predicate ].should eql want_s
-      md[ :argument ].should eql arg
+      expect( md[ :predicate ] ).to eql want_s
+      expect( md[ :argument ] ).to eql arg
     end
 
     def fu_output_message_for i, s

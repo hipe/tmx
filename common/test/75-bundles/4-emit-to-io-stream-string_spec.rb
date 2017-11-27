@@ -34,8 +34,8 @@ module Skylab::Common::TestSupport
 
       it "emits to a good channel, result is nil, adds newline - o" do
         r = foo.emt :fun, "yeppers"
-        r.should be_nil
-        @foo.fun_IO.string.should eql "yeppers\n"
+        expect( r ).to be_nil
+        expect( @foo.fun_IO.string ).to eql "yeppers\n"
       end
 
       it "when bad channel - X" do

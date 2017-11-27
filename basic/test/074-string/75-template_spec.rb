@@ -17,7 +17,7 @@ module Skylab::Basic::TestSupport
       it "interpolates strings {{ like_this }} - minimal case" do
         o = subject.via_string "foo {{ bar_baz }} bif"
         s = o.call bar_baz: 'bongo'
-        s.should eql('foo bongo bif')
+        expect( s ).to eql('foo bongo bif')
       end
 
       context "left diff -- params that are in template but not in actuals" do
@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport
         it "are left as-is (for now) in the output (!)" do
           o = subject.with :string, ' {{foo}} {{bar}} {{baz}} '
           str = o.call bar: 'biff'
-          str.should eql(' {{foo}} biff {{baz}} ')
+          expect( str ).to eql(' {{foo}} biff {{baz}} ')
         end
       end
 
@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport
         it "do not trigger any errors" do
           o = subject.with :string, 'one{{two}}'
           str = o.call two: 'TWO', three: 'THREE'
-          str.should eql('oneTWO')
+          expect( str ).to eql('oneTWO')
         end
       end
     end
@@ -47,8 +47,8 @@ module Skylab::Basic::TestSupport
 
       it '`to_parameter_occurrence_stream`' do
 
-        subject.with( :string, template_string ).
-          to_parameter_occurrence_stream.map_by( & :name_symbol ).to_a.should eql(
+        expect( subject.with( :string, template_string ).
+          to_parameter_occurrence_stream.map_by( & :name_symbol ).to_a ).to eql(
             [ :bar_baz, :bongo ] )
       end
 
@@ -57,15 +57,15 @@ module Skylab::Basic::TestSupport
         o = subject.with :string, template_string
         a = o.to_parameter_occurrence_stream.to_a
 
-        a.length.should eql 2
+        expect( a.length ).to eql 2
 
-        a.first.surface_string.should eql '{{ bar_baz }}'
-        a.first.name_symbol.should eql :bar_baz
-        a.first.offset.should eql 4
+        expect( a.first.surface_string ).to eql '{{ bar_baz }}'
+        expect( a.first.name_symbol ).to eql :bar_baz
+        expect( a.first.offset ).to eql 4
 
-        a.last.surface_string.should eql '{{bongo}}'
-        a.last.name_symbol.should eql :bongo
-        a.last.offset.should eql 23
+        expect( a.last.surface_string ).to eql '{{bongo}}'
+        expect( a.last.name_symbol ).to eql :bongo
+        expect( a.last.offset ).to eql 23
       end
     end
 
@@ -82,10 +82,10 @@ module Skylab::Basic::TestSupport
         _template = subject.with :string, _doc_s
         p = _template.method :first_margin_for
 
-        p[ :day ].should eql 'so the other '
-        p[ :wow ].should eql 'i was like '
-        p[ :that ].should be_nil
-        p[ :dork ].should eql EMPTY_S_
+        expect( p[ :day ] ).to eql 'so the other '
+        expect( p[ :wow ] ).to eql 'i was like '
+        expect( p[ :that ] ).to be_nil
+        expect( p[ :dork ] ).to eql EMPTY_S_
       end
     end
 

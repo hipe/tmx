@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport
       y << "one"
       y << "two\nthr"
 
-      a.should eql [ "onetwo\n" ]
+      expect( a ).to eql [ "onetwo\n" ]
 
       y << "ee"
 

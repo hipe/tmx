@@ -10,7 +10,7 @@ module Skylab::Basic::TestSupport
 
         _a = _ea.enum_for( :each_pair ).to_a
 
-        ( ::Hash[ _a ] ).should eql ( { a: :b, c: :d } )
+        expect( ( ::Hash[ _a ] ) ).to eql ( { a: :b, c: :d } )
       end
 
       it "none (left)" do
@@ -30,22 +30,22 @@ module Skylab::Basic::TestSupport
 
       it "right full match 2 from end" do
         _a = _against %i( a b c ), %i( b c )
-        _a.should eql [ 1, 0 ]
+        expect( _a ).to eql [ 1, 0 ]
       end
 
       it "partial match 2 from end" do
         _a = _against %i( a b c d ), %i( x k c d )
-        _a.should eql [ 2, 2 ]
+        expect( _a ).to eql [ 2, 2 ]
       end
 
       it "full (1)" do
         _a = _against %i( a ), %i( a )
-        _a.should eql [ 0, 0 ]
+        expect( _a ).to eql [ 0, 0 ]
       end
 
       it "full (2)" do
         _a = _against %i( a, b ), %i( a b )
-        _a.should eql [ 1, 1 ]
+        expect( _a ).to eql [ 1, 1 ]
       end
 
       def _against a1, a2

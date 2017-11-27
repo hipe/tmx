@@ -16,7 +16,7 @@ module Skylab::Common::TestSupport
         Home_::Session::Ivars_with_Procs_as_Methods[ self, :bar ]
       end
 
-      X_s_Foo.new.bar.should eql :baz
+      expect( X_s_Foo.new.bar ).to eql :baz
     end
 
     it "you can indicate an ivar with a name other than the method name" do
@@ -28,7 +28,7 @@ module Skylab::Common::TestSupport
         Home_::Session::Ivars_with_Procs_as_Methods[ self, :@_secret, :wahoo ]
       end
 
-      X_s_Bar.new.wahoo.should eql :ting
+      expect( X_s_Bar.new.wahoo ).to eql :ting
     end
 
     context "you can use the DSL to control visibility" do
@@ -55,7 +55,7 @@ module Skylab::Common::TestSupport
       end
 
       it "calling this public method works" do
-        foo._hi( 'X' ).should eql "HI:X"
+        expect( foo._hi( 'X' ) ).to eql "HI:X"
       end
 
       it "calling this private method does not" do
@@ -67,11 +67,11 @@ module Skylab::Common::TestSupport
         rescue NoMethodError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
 
       it "but privately you can still call it" do
-        foo.send( :yep ).should eql :thats_right
+        expect( foo.send( :yep ) ).to eql :thats_right
       end
     end
 
@@ -83,7 +83,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      X_s_Wahoo.new.fief.should eql :zap
+      expect( X_s_Wahoo.new.fief ).to eql :zap
     end
   end
 end

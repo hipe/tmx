@@ -13,7 +13,7 @@ module Skylab::Basic::TestSupport
       invoke '-h'
 
       _s = flush_to_unstyled_string_contiguous_lines_on_stream :e
-      _s.should match %r(
+      expect( _s ).to match %r(
         \b
         node-one-which-is-module
         [[:space:]]+

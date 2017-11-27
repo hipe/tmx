@@ -16,7 +16,7 @@ module Skylab::Common::TestSupport
     end
 
     it "`members`" do
-      _class.members.should eql [ :win, :loss ]
+      expect( _class.members ).to eql [ :win, :loss ]
     end
 
     it "2 ways to set it ; MUTABLE" do
@@ -27,13 +27,13 @@ module Skylab::Common::TestSupport
         :hi
       end
 
-      o.win_p.call.should eql :hi
+      expect( o.win_p.call ).to eql :hi
 
       o.on_win do
         :hey
       end
 
-      o.win_p.call.should eql :hey
+      expect( o.win_p.call ).to eql :hey
 
     end
 

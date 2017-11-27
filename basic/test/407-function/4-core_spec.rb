@@ -32,19 +32,19 @@ module Skylab::Basic::TestSupport
       end
 
       it "result of the call is that second element of the tuple" do
-        ( func[ 'cilantro' ] ).should eql "i hate cilantro"
+        expect( ( func[ 'cilantro' ] ) ).to eql "i hate cilantro"
       end
 
       it "the chain call" do
-        ( func[ 'carrots' ] ).should eql "let's have carrots and potato"
+        expect( ( func[ 'carrots' ] ) ).to eql "let's have carrots and potato"
       end
 
       it "result (`X`) has been found" do
-        ( func[ 'red' ] ).should eql "nope i hate tomato"
+        expect( ( func[ 'red' ] ) ).to eql "nope i hate tomato"
       end
 
       it "going. for now, the result is just the tuple as-is" do
-        ( func[ 'blue' ] ).should eql %w( blue potato )
+        expect( ( func[ 'blue' ] ) ).to eql %w( blue potato )
       end
     end
   end

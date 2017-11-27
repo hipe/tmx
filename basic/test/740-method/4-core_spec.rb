@@ -26,7 +26,7 @@ module Skylab::Basic::TestSupport
 
       it "parts of a method call" do
         x = mc.receiver.send mc.method_name, * mc.arguments
-        x.should eql "ok:yessir"
+        expect( x ).to eql "ok:yessir"
       end
     end
 
@@ -59,19 +59,19 @@ module Skylab::Basic::TestSupport
       end
 
       it "too many arguments" do
-        ( p[ 1, 2, 3 ] ).should eql "no: 3 for 1..2"
+        expect( ( p[ 1, 2, 3 ] ) ).to eql "no: 3 for 1..2"
       end
 
       it "the max number of allowed args" do
-        ( p[ 1, 2 ] ).should eql [ 1, 2 ]
+        expect( ( p[ 1, 2 ] ) ).to eql [ 1, 2 ]
       end
 
       it "the min number of allowed args" do
-        ( p[ 1 ] ).should eql [ 1, nil ]
+        expect( ( p[ 1 ] ) ).to eql [ 1, nil ]
       end
 
       it "not enough arguments" do
-        ( p[ ] ).should eql "no: 0 for 1..2"
+        expect( ( p[ ] ) ).to eql "no: 0 for 1..2"
       end
     end
   end

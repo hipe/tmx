@@ -26,7 +26,7 @@ module Skylab::Basic::TestSupport
         end
       end
 
-      tree.flatten.to_a.should eql( %i|
+      expect( tree.flatten.to_a ).to eql( %i|
         node_1 node_2_1 node_3_1 node_3_2 node_2_3
       |)
     end

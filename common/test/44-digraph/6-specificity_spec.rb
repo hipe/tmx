@@ -56,7 +56,7 @@ module Skylab::Common::TestSupport
         if a.length < length
           a[ length - 1 ] = nil
         end
-        @a.should eql( a )
+        expect( @a ).to eql( a )
         @a.clear
         @a[ length - 1 ] = nil
         nil

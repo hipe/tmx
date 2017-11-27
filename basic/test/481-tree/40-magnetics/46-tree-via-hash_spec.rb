@@ -18,22 +18,22 @@ module Skylab::Basic::TestSupport
             { name: 'baz',
               children: [ { name: 'bizzo' } ] } ] }
 
-      tree.slug.should eql 'foo'
-      tree.children_count.should eql 2
+      expect( tree.slug ).to eql 'foo'
+      expect( tree.children_count ).to eql 2
       st = tree.to_child_stream
 
       node = st.gets
-      node.slug.should eql 'bar'
-      node.to_child_stream.gets.should be_nil
+      expect( node.slug ).to eql 'bar'
+      expect( node.to_child_stream.gets ).to be_nil
 
       node = st.gets
-      node.slug.should eql 'baz'
+      expect( node.slug ).to eql 'baz'
 
       node_a = node.to_child_stream.to_a
-      node_a.length.should eql 1
+      expect( node_a.length ).to eql 1
 
       node = node_a.first
-      node.slug.should eql 'bizzo'
+      expect( node.slug ).to eql 'bizzo'
     end
   end
 end

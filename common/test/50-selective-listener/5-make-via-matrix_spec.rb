@@ -23,7 +23,7 @@ module Skylab::Common::TestSupport
 
     it "when shape term is valid, it is simply ignored - o" do
       listener.maybe_receive_event :info, :line, :hi
-      @a.should eql %i( info hi )
+      expect( @a ).to eql %i( info hi )
     end
 
     -> do

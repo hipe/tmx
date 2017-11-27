@@ -11,21 +11,21 @@ module Skylab::Basic::TestSupport
     it "none" do
       _against_lines nil
       want_no_events
-      @tree.should be_nil
+      expect( @tree ).to be_nil
     end
 
     it "one" do
       _against_lines _dedent <<-HERE
         + beeble
       HERE
-      @tree.value.should be_nil
-      @tree.parent.should be_nil
-      @tree.children_count.should eql 1
+      expect( @tree.value ).to be_nil
+      expect( @tree.parent ).to be_nil
+      expect( @tree.children_count ).to eql 1
       tree = @tree.children.first
-      tree.value.should eql "beeble\n"
-      tree.parent.object_id.should eql @tree.object_id
-      tree.children_count.should be_zero
-      tree.children.should be_nil
+      expect( tree.value ).to eql "beeble\n"
+      expect( tree.parent.object_id ).to eql @tree.object_id
+      expect( tree.children_count ).to be_zero
+      expect( tree.children ).to be_nil
       want_no_events
     end
 
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport
         hi + no
       HERE
 
-      @tree.should eql false
+      expect( @tree ).to eql false
 
       want_not_OK_event_ :line_does_not_have_glyph
 
@@ -47,17 +47,17 @@ module Skylab::Basic::TestSupport
          + foo
          + bar
       HERE
-      @tree.children_count.should eql 2
-      @tree.children.length.should eql 2
+      expect( @tree.children_count ).to eql 2
+      expect( @tree.children.length ).to eql 2
       o, x = @tree.children
-      o.value.should eql "foo\n"
-      x.value.should eql "bar\n"
-      o.parent.object_id.should eql x.parent.object_id
-      o.parent.object_id.should eql @tree.object_id
-      o.children_count.should be_zero
-      x.children_count.should be_zero
-      o.children.should be_nil
-      x.children.should be_nil
+      expect( o.value ).to eql "foo\n"
+      expect( x.value ).to eql "bar\n"
+      expect( o.parent.object_id ).to eql x.parent.object_id
+      expect( o.parent.object_id ).to eql @tree.object_id
+      expect( o.children_count ).to be_zero
+      expect( x.children_count ).to be_zero
+      expect( o.children ).to be_nil
+      expect( x.children ).to be_nil
     end
 
     it "strange de-indent" do
@@ -65,7 +65,7 @@ module Skylab::Basic::TestSupport
           + foo
          + bar
       HERE
-      @tree.should eql false
+      expect( @tree ).to eql false
       want_not_OK_event :invalid_dedent
       want_no_more_events
     end
@@ -75,12 +75,12 @@ module Skylab::Basic::TestSupport
           + foo
               + bar
       HERE
-      @tree.children_count.should eql 1
+      expect( @tree.children_count ).to eql 1
       o = @tree.children.first
-      o.children_count.should eql 1
+      expect( o.children_count ).to eql 1
       x = o.children.first
-      x.children_count.should be_zero
-      x.value.should eql "bar\n"
+      expect( x.children_count ).to be_zero
+      expect( x.value ).to eql "bar\n"
     end
 
     it "step back two" do
@@ -90,7 +90,7 @@ module Skylab::Basic::TestSupport
               + baz
           + boffo
       HERE
-      _to_normal_string.should eql _dedent <<-O
+      expect( _to_normal_string ).to eql _dedent <<-O
         + foo
           + bar
             + baz
@@ -115,7 +115,7 @@ module Skylab::Basic::TestSupport
           + foot
       HERE
       _against_lines omg
-      _to_normal_string.should eql omg
+      expect( _to_normal_string ).to eql omg
       want_no_events
     end
 
@@ -132,9 +132,9 @@ module Skylab::Basic::TestSupport
           + bar
         + baz
       O
-      @tree.children.first.value.should eql :top_foo
-      @tree.children.first.children.first.value.should eql :top_foo_bar
-      @tree.children.last.value.should eql :top_baz
+      expect( @tree.children.first.value ).to eql :top_foo
+      expect( @tree.children.first.children.first.value ).to eql :top_foo_bar
+      expect( @tree.children.last.value ).to eql :top_baz
     end
 
     def _against_lines heredoc_string

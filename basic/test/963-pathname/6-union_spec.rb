@@ -10,12 +10,12 @@ module Skylab::Basic::TestSupport
     it "you can build up the union progressively, one path at at time" do
       require 'pathname'
       u = Home_::Pathname::Union.new
-      u.length.should eql 0
+      expect( u.length ).to eql 0
       u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
-      u.length.should eql 1
+      expect( u.length ).to eql 1
       u << '/foo'
       u << '/biff/baz'
-      u.length.should eql 3
+      expect( u.length ).to eql 3
     end
 
     context "you can build a union from a list of paths" do
@@ -25,28 +25,28 @@ module Skylab::Basic::TestSupport
       end
 
       it "`normalize` eliminates logical redundancies in the union" do
-        u.length.should eql 3
+        expect( u.length ).to eql 3
         e = u.normalize
-        e.message_proc[].should eql 'eliminating redundant entry /foo/bar which is covered by /foo'
-        u.length.should eql 2
+        expect( e.message_proc[] ).to eql 'eliminating redundant entry /foo/bar which is covered by /foo'
+        expect( u.length ).to eql 2
       end
 
       it "`match` will result in the first path in the union that 'matches'" do
         x = u.match '/no'
-        x.should eql nil
+        expect( x ).to eql nil
         x = u.match '/biff/baz'
-        x.to_s.should eql '/biff/baz'
+        expect( x.to_s ).to eql '/biff/baz'
       end
 
       it "result of `match` is the node that matched" do
         x = u.match '/biff/baz/other'
-        x.to_s.should eql '/biff/baz'
+        expect( x.to_s ).to eql '/biff/baz'
       end
     end
 
     it "like so" do
       u = Home_::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-      u.normalize.message_proc[].should eql "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo."
+      expect( u.normalize.message_proc[] ).to eql "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo."
     end
   end
 end

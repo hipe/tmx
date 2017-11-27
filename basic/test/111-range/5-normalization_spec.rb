@@ -55,9 +55,9 @@ module Skylab::Basic::TestSupport
       actual_s = black_and_white _em.cached_event_value
 
       if x.respond_to? :ascii_only?
-        actual_s.should eql x
+        expect( actual_s ).to eql x
       else
-        actual_s.should match x
+        expect( actual_s ).to match x
       end
     end
 

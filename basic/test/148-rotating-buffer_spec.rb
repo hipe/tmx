@@ -17,55 +17,55 @@ module Skylab::Basic::TestSupport
       end
 
       it "at that offset in the imaginary array" do
-        ( rotbuf[ 2 ] ).should eql  :d
+        expect( ( rotbuf[ 2 ] ) ).to eql  :d
       end
 
       it "the imaginary array" do
-        ( rotbuf[ -1 ] ).should eql  :e
-        ( rotbuf[ -4 ] ).should eql  :b
+        expect( ( rotbuf[ -1 ] ) ).to eql  :e
+        expect( ( rotbuf[ -4 ] ) ).to eql  :b
       end
 
       it "going off the \"left end\" of the imaginary array gets you" do
-        ( rotbuf[ -5 ] ).should eql  nil
+        expect( ( rotbuf[ -5 ] ) ).to eql  nil
       end
 
       it "on that topic, going off the \"right end\" of the imaginary array" do
-        ( rotbuf[ 4 ] ).should eql nil
+        expect( ( rotbuf[ 4 ] ) ).to eql nil
       end
 
       it "a range expressed as offset and size" do
-        ( rotbuf[ 0, 4 ] ).should eql  %i( b c d e )
+        expect( ( rotbuf[ 0, 4 ] ) ).to eql  %i( b c d e )
       end
 
       it "a range expressed as a range object referencing the end" do
-        ( rotbuf[ -2 .. -1 ] ).should eql  %i( d e )
+        expect( ( rotbuf[ -2 .. -1 ] ) ).to eql  %i( d e )
       end
 
       it "going off the left end with a range object gets you" do
-        ( rotbuf[ -10 .. -1 ] ).should eql  nil
+        expect( ( rotbuf[ -10 .. -1 ] ) ).to eql  nil
       end
 
       it "going off the right end with a range like this, however" do
-        ( rotbuf[ 2, 22 ] ).should eql  %i( d e )
+        expect( ( rotbuf[ 2, 22 ] ) ).to eql  %i( d e )
       end
     end
 
     it "accessing the last N items will work" do
       rotbuf = Home_::Rotating_Buffer.new 5
       rotbuf << :a << :b << :c
-      ( rotbuf[ -3 .. -1 ] ).should eql %i( a b c )
+      expect( ( rotbuf[ -3 .. -1 ] ) ).to eql %i( a b c )
     end
 
     it "works on not-yet-cycles buffers" do
       r = Home_::Rotating_Buffer.new 3
       r << :a << :b
-      r.to_a.should eql %i( a b )
+      expect( r.to_a ).to eql %i( a b )
     end
 
     it "on a buffer that has cycled, it gives you the last N items" do
       r = Home_::Rotating_Buffer.new 3
       r << :a << :b << :c << :d
-      r.to_a.should eql %i( b c d )
+      expect( r.to_a ).to eql %i( b c d )
     end
   end
 end

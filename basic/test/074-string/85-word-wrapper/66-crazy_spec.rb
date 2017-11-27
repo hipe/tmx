@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport
       ww << 'foo bar'
       ww.flush
 
-      y.should eql [ 'Xfoo bar' ]  # #t-odo meh
+      expect( y ).to eql [ 'Xfoo bar' ]  # #t-odo meh
     end
 
     def _subject

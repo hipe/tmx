@@ -31,12 +31,12 @@ module Skylab::Common::TestSupport
       end
 
       it "if we want we can read those member values with readers" do
-        expr.wing.should eql 'DING'
-        expr.wang.should eql 'DANG'
+        expect( expr.wing ).to eql 'DING'
+        expect( expr.wang ).to eql 'DANG'
       end
 
       it "expression object" do
-        expr.instance_exec( & expr.expression_proc ).should eql "wing is: DING, wang: DANG"
+        expect( expr.instance_exec( & expr.expression_proc ) ).to eql "wing is: DING, wang: DANG"
       end
     end
 
@@ -49,7 +49,7 @@ module Skylab::Common::TestSupport
       it "call `string_via_express` to produce an expression string" do
         _expr = X_e_e_ArgTaker[ "one", "two" ]  # same as `.new(..)`
 
-        _expr.string_via_express.should eql "one + two"
+        expect( _expr.string_via_express ).to eql "one + two"
       end
     end
 
@@ -62,12 +62,12 @@ module Skylab::Common::TestSupport
       end
 
       it "are. (we have used platform proc reflection to get those names)" do
-        X_e_e_EvenBetter.members.should eql [ :a, :b ]
+        expect( X_e_e_EvenBetter.members ).to eql [ :a, :b ]
       end
 
       it "and we can express like the \"arg taker\" form above" do
         _expr = X_e_e_EvenBetter.new "one", "two"
-        _expr.string_via_express.should eql "one + two"
+        expect( _expr.string_via_express ).to eql "one + two"
       end
     end
 
@@ -99,7 +99,7 @@ module Skylab::Common::TestSupport
 
         _s = _expag.instance_exec expr, & expr.expression_proc
 
-        _s.should eql "I had a __BAD__ issue - burnout"
+        expect( _s ).to eql "I had a __BAD__ issue - burnout"
       end
     end
 
@@ -113,7 +113,7 @@ module Skylab::Common::TestSupport
 
       it "..if for example you wanted to mimic `string_via_express`" do
         expr = X_e_e_Pair.new 'hi', 'lo'
-        ( expr.expression_proc[ * expr.to_a ] ).should eql 'hi and lo'
+        expect( ( expr.expression_proc[ * expr.to_a ] ) ).to eql 'hi and lo'
       end
     end
 
@@ -138,11 +138,11 @@ module Skylab::Common::TestSupport
         o = X_e_e_These
         vp = o::VP ; np = o::NP
 
-        ( np[ [ 'jack' ] ] | vp[ :present ] ).inflect.should eql "jack has"
+        expect( ( np[ [ 'jack' ] ] | vp[ :present ] ).inflect ).to eql "jack has"
 
-        ( np[ %w(Jack Jill) ] | vp[ :present ] ).inflect.should eql "Jack and Jill have"
+        expect( ( np[ %w(Jack Jill) ] | vp[ :present ] ).inflect ).to eql "Jack and Jill have"
 
-        ( np[ %w( Jack ) ] | vp[ :past ] ).inflect.should eql "Jack had"
+        expect( ( np[ %w( Jack ) ] | vp[ :past ] ).inflect ).to eql "Jack had"
       end
     end
 

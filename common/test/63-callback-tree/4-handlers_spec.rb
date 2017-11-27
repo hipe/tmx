@@ -29,9 +29,9 @@ module Skylab::Common::TestSupport
     context "some peripheries" do
 
       it "a misfire of no such channel - X" do
-        -> do
+        expect( -> do
           hndlrs.call_handler :error, :frobulation, :epi_tantric, :x
-        end.should raise_error ::KeyError, /\Athere is no 'epi_tantric' #{
+        end ).to raise_error ::KeyError, /\Athere is no 'epi_tantric' #{
          }channel at the 'error frobulation' node. known channels are #{
           }'trans_dermal' and 'sub_cutaneous' \(for the wazlo callbacks\)\z/
       end
@@ -51,9 +51,9 @@ module Skylab::Common::TestSupport
       end
 
       it "try to set_handler a nonnexistent channel - X" do
-        -> do
+        expect( -> do
           hndlrs.set_handler :error, :zoey_deschanel, :_no_see_
-        end.should raise_error KeyError, /\Athere is no 'zoey_deschanel' #{
+        end ).to raise_error KeyError, /\Athere is no 'zoey_deschanel' #{
           }channel at the 'error' node\. the only known channel is #{
            }'frobulation' \(for the wazlo callbacks\)\z/
       end
@@ -79,8 +79,8 @@ module Skylab::Common::TestSupport
     end
 
     def same_result
-      @x.should eql :y
-      @r.should eql :_hello_from_handle_it_
+      expect( @x ).to eql :y
+      expect( @r ).to eql :_hello_from_handle_it_
     end
   end
 end

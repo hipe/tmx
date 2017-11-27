@@ -30,12 +30,12 @@ module Skylab::Common::TestSupport
       end
 
       it "creates the thing" do
-        X_ct_hs_Mazlow.should be_const_defined :Common_Tree__
+        expect( X_ct_hs_Mazlow ).to be_const_defined :Common_Tree__
       end
 
       it "builds the thing" do
         maz = X_ct_hs_Mazlow.new
-        maz.should be_instance_variable_defined :@callbacks
+        expect( maz ).to be_instance_variable_defined :@callbacks
       end
 
       it "can get busy" do
@@ -43,8 +43,8 @@ module Skylab::Common::TestSupport
         maz.add_pow_listener -> x { y = x }
         maz.add_pow_listener -> x { z = x }
         r = maz.pow :hi
-        r.should be_nil
-        y.should eql :hi ; z.should eql :hi
+        expect( r ).to be_nil
+        expect( y ).to eql :hi ; expect( z ).to eql :hi
       end
     end
   end

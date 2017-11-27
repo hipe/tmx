@@ -56,8 +56,8 @@ module Skylab::Basic::TestSupport
       it "lets you override an entire node (definition) in a parent graph" do
 
         w = Weiner.new
-        w.Bravo.ancestors[1].to_s.should eql('Alpha')
-        w.Bravo.ancestors[1].instance_methods(false).should eql([:right])
+        expect( w.Bravo.ancestors[1].to_s ).to eql('Alpha')
+        expect( w.Bravo.ancestors[1].instance_methods(false) ).to eql([:right])
       end
     end
   end

@@ -15,18 +15,18 @@ module Skylab::Basic::TestSupport
 
         o = klass_.new
         m = o.meta_hell_anchor_module
-        o.meta_hell_anchor_module.object_id.should eql(m.object_id)
-        m.constants.length.should eql(0)
+        expect( o.meta_hell_anchor_module.object_id ).to eql(m.object_id)
+        expect( m.constants.length ).to eql(0)
         m1 = o.modul! :Nerpulous
-        m.constants.length.should eql(1)
+        expect( m.constants.length ).to eql(1)
         m2 = o.modul! :Nerpulous
         m3 = o.Nerpulous
         m4 = o._Nerpulous
         a = [m1, m2, m3, m4]
-        a.select{ |x| x }.length.should eql(a.length)
-        a.map(&:object_id).uniq.length.should eql(1)
-        a.first.should be_kind_of(::Module)
-        a.first.to_s.should eql('Nerpulous')
+        expect( a.select{ |x| x }.length ).to eql(a.length)
+        expect( a.map(&:object_id).uniq.length ).to eql(1)
+        expect( a.first ).to be_kind_of(::Module)
+        expect( a.first.to_s ).to eql('Nerpulous')
       end
     end
 
@@ -40,7 +40,7 @@ module Skylab::Basic::TestSupport
         o.modul! :Neeble do
           def xx ; end
         end
-        o._Neeble.instance_methods.should eql([:xx])
+        expect( o._Neeble.instance_methods ).to eql([:xx])
       end
 
       it "two defs" do
@@ -48,7 +48,7 @@ module Skylab::Basic::TestSupport
         o = klass_.new
         o.modul!( :Zip ) { def zang ; end }
         o.modul!( :Zip ) { def pang ; end }
-        o.modul!(:Zip).instance_methods.should eql([:zang, :pang])
+        expect( o.modul!(:Zip).instance_methods ).to eql([:zang, :pang])
       end
     end
 
@@ -61,8 +61,8 @@ module Skylab::Basic::TestSupport
         o = klass_.new
         m = o.meta_hell_anchor_module
         o.modul! :Nerp__Ferp
-        m.constants.should eql([:Nerp])
-        m::Nerp::Ferp.should be_kind_of(::Module)
+        expect( m.constants ).to eql([:Nerp])
+        expect( m::Nerp::Ferp ).to be_kind_of(::Module)
       end
     end
 
@@ -79,12 +79,12 @@ module Skylab::Basic::TestSupport
         o2 = klass_.new
         m1 = o1.meta_hell_anchor_module
         m2 = o2.meta_hell_anchor_module
-        m1.constants.should be_empty
-        ( m1.object_id == m2.object_id ).should eql( false )
+        expect( m1.constants ).to be_empty
+        expect( ( m1.object_id == m2.object_id ) ).to eql( false )
         o1.modul! :Home__Girl
-        m1.constants.length.should eql(1)
-        m2.constants.length.should eql(0)
-        m1::Home.constants.should eql([:Boy, :Girl])
+        expect( m1.constants.length ).to eql(1)
+        expect( m2.constants.length ).to eql(0)
+        expect( m1::Home.constants ).to eql([:Boy, :Girl])
       end
     end
   end

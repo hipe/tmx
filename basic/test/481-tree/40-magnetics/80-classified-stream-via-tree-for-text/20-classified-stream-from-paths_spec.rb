@@ -29,7 +29,7 @@ module Skylab::Basic::TestSupport
          └c
       HERE
 
-       y.join( EMPTY_S_ ).should eql _exp
+       expect( y.join( EMPTY_S_ ) ).to eql _exp
     end
 
     it "3 point beanstalk" do
@@ -52,7 +52,7 @@ module Skylab::Basic::TestSupport
            └c
       HERE
 
-      y.join( EMPTY_S_ ).should eql _exp
+      expect( y.join( EMPTY_S_ ) ).to eql _exp
     end
 
     it "vertical runs" do
@@ -90,7 +90,7 @@ module Skylab::Basic::TestSupport
          └jipsaw
        HERE
 
-       y.join( EMPTY_S_ ).should eql _exp
+       expect( y.join( EMPTY_S_ ) ).to eql _exp
     end
   end
 end

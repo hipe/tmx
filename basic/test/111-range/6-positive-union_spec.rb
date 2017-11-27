@@ -142,7 +142,7 @@ module Skylab::Basic::TestSupport
     end
 
     def want str
-      @unio.description.should eql( str )
+      expect( @unio.description ).to eql( str )
     end
   end
 end

@@ -14,16 +14,16 @@ module Skylab::Common::TestSupport
       context 'gives your class an "listeners_digraph" method which:' do
 
         it "your class responds to it" do
-          klass.singleton_class.should be_private_method_defined :listeners_digraph
+          expect( klass.singleton_class ).to be_private_method_defined :listeners_digraph
         end
 
         it "when called with an event graph, adds those types to the #{
             }types associated with the class" do
 
           cls = klass
-          cls.event_stream_graph.node_count.should be_zero
+          expect( cls.event_stream_graph.node_count ).to be_zero
           cls.send :listeners_digraph, scream: :sound, yell: :sound
-          cls.event_stream_graph.node_count.should eql 3
+          expect( cls.event_stream_graph.node_count ).to eql 3
         end
       end
     end
@@ -48,19 +48,19 @@ module Skylab::Common::TestSupport
           }the same proc you gave it, for chaining" do
         nerk = -> { }
         x = emitter.on_foo( & nerk )
-        x.object_id.should eql nerk.object_id
+        expect( x.object_id ).to eql nerk.object_id
       end
 
       it "the call to call_digraph_listeners( :foo ) - invokes the block." do
-        touch_me[:touched].should eql( :was_not_touched )
+        expect( touch_me[:touched] ).to eql( :was_not_touched )
         res = emitter.call_digraph_listeners :foo
-        touch_me[:touched].should eql( :it_was_touched )
-        res.should be_nil
+        expect( touch_me[:touched] ).to eql( :it_was_touched )
+        expect( res ).to be_nil
       end
 
       it "with `callback_digraph_has?` - you can see if it emits something" do
-        emitter.callback_digraph_has?( :baz ).should eql false
-        emitter.callback_digraph_has?( :foo ).should eql true
+        expect( emitter.callback_digraph_has?( :baz ) ).to eql false
+        expect( emitter.callback_digraph_has?( :foo ) ).to eql true
       end
     end
 
@@ -77,7 +77,7 @@ module Skylab::Common::TestSupport
           error -> informational
           info -> informational
         HERE
-        act.should eql exp
+        expect( act ).to eql exp
       end
 
       it "notifies subscribers of its child events" do
@@ -86,7 +86,7 @@ module Skylab::Common::TestSupport
           msg = event.payload_a.first
         end
         emitter.call_digraph_listeners :error, 'yes'
-        msg.should eql 'yes'
+        expect( msg ).to eql 'yes'
       end
 
       it "notifies subscribers of parent events about child events" do
@@ -95,7 +95,7 @@ module Skylab::Common::TestSupport
           msg = "#{ e.stream_symbol }: #{ e.payload_a.first }"
         end
         emitter.call_digraph_listeners :error, 'yes'
-        msg.should eql 'error: yes'
+        expect( msg ).to eql 'error: yes'
       end
 
       it "will double-notify a single subscriber if it subscribes #{
@@ -105,8 +105,8 @@ module Skylab::Common::TestSupport
         emitter.on_informational { |e| prnt = "#{e.stream_symbol}: #{e.payload_a.first}" }
         emitter.on_info          { |e| chld = "#{e.stream_symbol}: #{e.payload_a.first}" }
         emitter.call_digraph_listeners :info, 'foo'
-        chld.should eql 'info: foo'
-        prnt.should eql 'info: foo'
+        expect( chld ).to eql 'info: foo'
+        expect( prnt ).to eql 'info: foo'
       end
 
       it "but the listener can check the event-id of the event if it #{
@@ -115,9 +115,9 @@ module Skylab::Common::TestSupport
         emitter.on_informational { |e| id_one = e.event_id }
         emitter.on_info          { |e| id_two = e.event_id }
         emitter.call_digraph_listeners :info
-        ( !! id_one ).should eql true
-        id_one.should eql id_two
-        id_two.should be_kind_of ::Integer
+        expect( ( !! id_one ) ).to eql true
+        expect( id_one ).to eql id_two
+        expect( id_two ).to be_kind_of ::Integer
       end
     end
 
@@ -145,11 +145,11 @@ module Skylab::Common::TestSupport
           c.e += 1
         end
         o.call_digraph_listeners :informational
-        c.values.should eql [ 1, 0, 0 ]
+        expect( c.values ).to eql [ 1, 0, 0 ]
         o.call_digraph_listeners :info
-        c.values.should eql [ 1, 1, 0 ]
+        expect( c.values ).to eql [ 1, 1, 0 ]
         o.call_digraph_listeners :error
-        c.values.should eql [ 2, 1, 1 ]
+        expect( c.values ).to eql [ 2, 1, 1 ]
       end
 
       context "A touch will NOT happen automatically when payload is #{
@@ -162,7 +162,7 @@ module Skylab::Common::TestSupport
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }" }
           o.call_digraph_listeners :info, "A"
-          lines.should eql %w( info:A inform:A )
+          expect( lines ).to eql %w( info:A inform:A )
         end
 
         it 'with touch check' do
@@ -170,7 +170,7 @@ module Skylab::Common::TestSupport
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" unless e.touched? }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }"   unless e.touched? }
           o.call_digraph_listeners :info, "A"
-          lines.should eql %w( info:A inform:A )
+          expect( lines ).to eql %w( info:A inform:A )
         end
 
         it 'but with an explicit touch' do
@@ -182,7 +182,7 @@ module Skylab::Common::TestSupport
             lines << "info:#{ e.touch!.payload_a.first }" unless e.touched?
           end
           o.call_digraph_listeners :info, "A"
-          lines.should eql %w( info:A )
+          expect( lines ).to eql %w( info:A )
         end
       end
     end
@@ -211,7 +211,7 @@ module Skylab::Common::TestSupport
           touched = 0
           o.on_all { |e| touched += 1 }
           o.call_digraph_listeners :hello
-          touched.should eql 1
+          expect( touched ).to eql 1
         end
       end
 
@@ -233,8 +233,8 @@ module Skylab::Common::TestSupport
 
           emitter.call_digraph_listeners which
           s = @counts.keys.map( & :to_s ).sort.join ' '
-          s.should eql 'father ghost son'
-          @counts.values.count{ |v| 1 == v }.should eql 3
+          expect( s ).to eql 'father ghost son'
+          expect( @counts.values.count{ |v| 1 == v } ).to eql 3
         end
 
         it "an call_digraph_listeners to father emits to all three" do
@@ -268,11 +268,11 @@ module Skylab::Common::TestSupport
         s = nil
         o.on_one { |x| s = x.payload_a.first }
         o.call_digraph_listeners :one, 'sone'
-        s.should eql 'sone'
+        expect( s ).to eql 'sone'
         o = shorthand_class.new
         o.on_all { |e| s = e.payload_a.first.to_s }
         o.call_digraph_listeners :error, 'serr'
-        s.should eql 'serr'
+        expect( s ).to eql 'serr'
       end
     end
 
@@ -291,7 +291,7 @@ module Skylab::Common::TestSupport
         o = child_class.new
         o.on_informational { |e| ok = e }
         o.call_digraph_listeners :info, "wankers"
-        ok.payload_a.first.should eql 'wankers'
+        expect( ok.payload_a.first ).to eql 'wankers'
       end
     end
   end

@@ -15,7 +15,7 @@ module Skylab::Basic::TestSupport
 
     it "builds" do
       _norm = _new_subject :absolute
-      _norm.instance_variable_get( :@relative_is_OK ).should eql false
+      expect( _norm.instance_variable_get( :@relative_is_OK ) ).to eql false
     end
 
     context "the empty normalizer" do
@@ -34,14 +34,14 @@ module Skylab::Basic::TestSupport
         normalize_against_ false
         want_output_value_was_not_written_
         want_no_events
-        @result_x.should eql false
+        expect( @result_x ).to eql false
       end
 
       it 'against the empty string - "your value cannot be empty" (ever)' do
 
         normalize_against_ Home_::EMPTY_S_
         want_output_value_was_not_written_
-        @result_x.should eql false
+        expect( @result_x ).to eql false
         want_not_OK_event_ :path_cannot_be_empty,
           '(par «your_value») cannot be empty - (ick "")'
         want_no_more_events
@@ -179,7 +179,7 @@ module Skylab::Basic::TestSupport
 
     def want_errored_with * a, & p
       want_output_value_was_not_written_
-      @result_x.should eql false
+      expect( @result_x ).to eql false
       want_not_OK_event( * a, & p )
     end
 

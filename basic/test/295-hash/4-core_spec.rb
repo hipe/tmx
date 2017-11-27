@@ -15,15 +15,15 @@ module Skylab::Basic::TestSupport
       rescue KeyError => e
       end
 
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
 
     it "`unpack_equal` flattens a hash's values into an array" do
 
       h = { age: 2, name: "me" }
       name, age = Home_::Hash.unpack_equal h, :name, :age
-      name.should eql "me"
-      age.should eql 2
+      expect( name ).to eql "me"
+      expect( age ).to eql 2
     end
   end
 end

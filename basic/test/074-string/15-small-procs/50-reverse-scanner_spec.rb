@@ -11,15 +11,15 @@ module Skylab::Basic::TestSupport
 
       scn = _build "XoneXtwo", 'X'.getbyte( 0 )
       _ = scn.gets
-      _.should eql "two"
+      expect( _ ).to eql "two"
       _ = scn.gets
-      _.should eql "one"
+      expect( _ ).to eql "one"
       _ = scn.gets
-      _.should eql EMPTY_S_
+      expect( _ ).to eql EMPTY_S_
       _ = scn.gets
-      _.should be_nil
+      expect( _ ).to be_nil
       _ = scn.gets
-      _.should be_nil
+      expect( _ ).to be_nil
     end
 
     _DOT_BYTE = '.'.getbyte 0
@@ -28,46 +28,46 @@ module Skylab::Basic::TestSupport
 
       scn = _build 'hi', _DOT_BYTE
       _ = scn.gets
-      _.should eql 'hi'
+      expect( _ ).to eql 'hi'
       _ = scn.gets
-      _.should be_nil
-      scn.gets.should be_nil
+      expect( _ ).to be_nil
+      expect( scn.gets ).to be_nil
     end
 
     it "rel 2" do
 
       scn = _build 'a.b', _DOT_BYTE
-      scn.gets.should eql 'b'
-      scn.gets.should eql 'a'
-      scn.gets.should be_nil
-      scn.gets.should be_nil
+      expect( scn.gets ).to eql 'b'
+      expect( scn.gets ).to eql 'a'
+      expect( scn.gets ).to be_nil
+      expect( scn.gets ).to be_nil
     end
 
     it "rel 1 (trail)" do
 
       scn = _build 'a.b.', _DOT_BYTE
       _ = scn.gets
-      _.should eql EMPTY_S_
+      expect( _ ).to eql EMPTY_S_
       _ = scn.gets
-      _.should eql 'b'
-      scn.gets.should eql 'a'
-      scn.gets.should be_nil
-      scn.gets.should be_nil
+      expect( _ ).to eql 'b'
+      expect( scn.gets ).to eql 'a'
+      expect( scn.gets ).to be_nil
+      expect( scn.gets ).to be_nil
     end
 
     it "empty s" do
       _s_a = _split EMPTY_S_
-      _s_a.length.should be_zero
+      expect( _s_a.length ).to be_zero
     end
 
     it "only sep (acts like `String#split( s, -1 )`)" do
       _s_a = _split '.'
-      _s_a.should eql [ EMPTY_S_, EMPTY_S_ ]
+      expect( _s_a ).to eql [ EMPTY_S_, EMPTY_S_ ]
     end
 
     it "(etc)" do
       _s_a = _split '..'
-      _s_a.should eql [ EMPTY_S_, EMPTY_S_, EMPTY_S_ ]
+      expect( _s_a ).to eql [ EMPTY_S_, EMPTY_S_, EMPTY_S_ ]
     end
 
     define_method :_split do | str |

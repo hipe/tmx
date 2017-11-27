@@ -13,27 +13,27 @@ module Skylab::Basic::TestSupport
         :biz, -> { :baz },
       )
 
-      pxy.foo( :wee ).should eql "bar: wee"
+      expect( pxy.foo( :wee ) ).to eql "bar: wee"
 
-      pxy.biz.should eql :baz
+      expect( pxy.biz ).to eql :baz
     end
 
     it "2 equivalent ways to construct it" do
 
       p2 = _subject :bar, -> { :ba }
       p3 = _subject baz: -> { :bz }
-      [ p2.bar, p3.baz ].should eql( [:ba, :bz] )
+      expect( [ p2.bar, p3.baz ] ).to eql( [:ba, :bz] )
     end
 
     it "does the right thing, with respect to `self`" do
 
       pxy = _subject :bizzo, -> { :_one_ }
-      pxy.bizzo.should eql :_one_
+      expect( pxy.bizzo ).to eql :_one_
       @fipple = 'two'
       pxy = _subject :wankers, -> x { two x }
-      pxy.wankers( 'three' ).should eql( 'two - three' )
+      expect( pxy.wankers( 'three' ) ).to eql( 'two - three' )
       pxy = _subject :one, method( :two )
-      pxy.one( 'five' ).should eql( 'two - five' )
+      expect( pxy.one( 'five' ) ).to eql( 'two - five' )
     end
 
     def two x

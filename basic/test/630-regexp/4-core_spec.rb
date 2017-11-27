@@ -11,17 +11,17 @@ module Skylab::Basic::TestSupport
       st = subject "__BB__", rx
 
       md = st.gets
-      md.offset( 0 ).first.should eql 2
+      expect( md.offset( 0 ).first ).to eql 2
 
       md = st.gets
-      md.offset( 0 ).first.should eql 3
+      expect( md.offset( 0 ).first ).to eql 3
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
     it "no matches" do
 
-      subject( 'a', rx ).gets.should be_nil
+      expect( subject( 'a', rx ).gets ).to be_nil
     end
 
     def subject s, rx

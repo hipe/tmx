@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport
         end
 
         cli = X_xkcd_MyApp::CLI::Client.new
-        cli.API_client_module.should eql X_xkcd_MyApp::API::Client
+        expect( cli.API_client_module ).to eql X_xkcd_MyApp::API::Client
       end
     end
 
@@ -69,7 +69,7 @@ module Skylab::Basic::TestSupport
 
         foo = X_xkcd_Foo.new
         foo.touch
-        X_xkcd_Foo::Ohai_.instance_variable_get( :@counter ).should eql 1
+        expect( X_xkcd_Foo::Ohai_.instance_variable_get( :@counter ) ).to eql 1
       end
 
       it "if you create the thing before it is accessed, etc" do
@@ -88,7 +88,7 @@ module Skylab::Basic::TestSupport
 
         bar = Bar.new
         bar.run
-        Bar::Ohai_.instance_variable_get( :@counter ).should eql 11
+        expect( Bar::Ohai_.instance_variable_get( :@counter ) ).to eql 11
       end
     end
   end

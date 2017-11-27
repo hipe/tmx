@@ -11,11 +11,11 @@ module Skylab::Basic::TestSupport
       snip
       it "zeep" do
         k = o.klass! :Feep
-        k.should be_kind_of(::Class)
-        k.to_s.should eql('Feep')
-        k.instance_methods(false).should eql([])
-        k.object_id.should eql((o.klass! :Feep).object_id)
-        k.ancestors[1].should eql(::Object)
+        expect( k ).to be_kind_of(::Class)
+        expect( k.to_s ).to eql('Feep')
+        expect( k.instance_methods(false) ).to eql([])
+        expect( k.object_id ).to eql((o.klass! :Feep).object_id)
+        expect( k.ancestors[1] ).to eql(::Object)
       end
     end
 
@@ -36,8 +36,8 @@ module Skylab::Basic::TestSupport
       end
       it "is ok to do *for now*" do
         x = subject.call
-        x.to_s.should eql('Wonder')
-        x.class.should eql(::Class)
+        expect( x.to_s ).to eql('Wonder')
+        expect( x.class ).to eql(::Class)
       end
     end
 
@@ -59,7 +59,7 @@ module Skylab::Basic::TestSupport
         these.sort!
         these == %i( Fakon Jasper Mason ) || fail
 
-        m::Fakon.constants.should eql([:Bakon, :Jakon])
+        expect( m::Fakon.constants ).to eql([:Bakon, :Jakon])
       end
     end
   end

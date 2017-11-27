@@ -41,7 +41,7 @@ module Skylab::Common::TestSupport
 
         _nf = subject.via_const_symbol sym
         _s = _nf.as_variegated_symbol
-        _s.should eql s
+        expect( _s ).to eql s
       end
     end
 
@@ -51,7 +51,7 @@ module Skylab::Common::TestSupport
 
         _nf = subject.via_variegated_symbol :merk_FS_lala
         _sym = _nf.as_const
-        _sym.should eql :Merk_FS_Lala
+        expect( _sym ).to eql :Merk_FS_Lala
       end
     end
 
@@ -73,7 +73,7 @@ module Skylab::Common::TestSupport
 
       def _expect m, c
         _exp = _name.send m
-        _exp.should eql c
+        expect( _exp ).to eql c
       end
     end
 

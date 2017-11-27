@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
       define_singleton_method :o do |const, exp_path, desc, *a|
 
         it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
-          pathify[ const ].should eql( exp_path )
+          expect( pathify[ const ] ).to eql( exp_path )
         end
       end
 
@@ -56,7 +56,7 @@ module Skylab::Common::TestSupport
 
        define_singleton_method :o do |path, exp_const, desc, *a|
         it "#{ format % [ desc, path.inspect, exp_const.inspect ] }", *a do
-          constantize[ path ].should eql( exp_const )
+          expect( constantize[ path ] ).to eql( exp_const )
         end
       end
 
@@ -88,7 +88,7 @@ module Skylab::Common::TestSupport
 
       define_singleton_method :o do |in_str, out_str, desc, *tags|
         it "#{ format % [ desc, in_str, out_str ] }", *tags do
-          constantize[ in_str ].should eql( out_str )
+          expect( constantize[ in_str ] ).to eql( out_str )
         end
       end
 
@@ -106,7 +106,7 @@ module Skylab::Common::TestSupport
 
       define_singleton_method :o do |in_s, out_s, *t|
         it "#{ fmt % [ in_s.inspect, out_s.inspect ] }", *t do
-          methodize[ in_s ].should eql( out_s )
+          expect( methodize[ in_s ] ).to eql( out_s )
         end
       end
 

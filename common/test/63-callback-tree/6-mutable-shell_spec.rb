@@ -24,7 +24,7 @@ module Skylab::Common::TestSupport
         y = cb.build_yielder_for :waff ; z = nil
         cb.set_callback :waff, -> x { z = x }
         y << :neet
-        z.should eql :neet
+        expect( z ).to eql :neet
       end
 
       it "mutable shell builds" do
@@ -48,7 +48,7 @@ module Skylab::Common::TestSupport
         cond = cb.build_mutable_shell
         yield cond
         cb.call_callback :wiff, :merp
-        @y.should eql :merp
+        expect( @y ).to eql :merp
       end
     end
   end

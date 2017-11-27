@@ -20,7 +20,7 @@ module Skylab::Common::TestSupport
 
     it "simply dispatches simple channel emissions to an emitter - o" do
       listener.maybe_receive_event :info, :shazam
-      @a.should eql %i( info shazam )
+      expect( @a ).to eql %i( info shazam )
     end
 
     it "must have same arity - (a deep bug lurks behind this) - X" do
