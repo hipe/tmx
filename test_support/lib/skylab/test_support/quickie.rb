@@ -227,7 +227,7 @@ module Skylab::TestSupport
           @__quickie_has_reign = false
         else
           @__quickie_has_reign = true
-          @kernel_module.send :define_method, :should, DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
+          # @kernel_module.send :define_method, :should, DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
         end
         @_quickie_has_reign = :__quickie_has_reign
         send @_quickie_has_reign
@@ -243,10 +243,6 @@ module Skylab::TestSupport
     end
 
     # ==
-
-    DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___ = -> predicate do
-      predicate.matches? self  # allà r.s
-    end
 
     DEFINITION_FOR_THE_METHOD_CALLED_WHINE__ = -> tail_sym, & msg do
 
@@ -1350,6 +1346,10 @@ module Skylab::TestSupport
         @__quickie_mutable_statistics__ = o  # REMINDER: ivar must be used in this file only!
       end
 
+      def expect actual_x
+        ActualValueWrapped___.new actual_x
+      end
+
       def quickie_fail_with_message_by & msg_p
 
         # (experimental hack to allow custom matchers in both q & r.s)
@@ -1361,6 +1361,21 @@ module Skylab::TestSupport
       Searchables___ = ::Struct.new :lineno, :tagset_hash
 
       # Home_::Let[ self ]
+    end
+
+    # ==
+
+    class ActualValueWrapped___
+
+      def initialize x
+        @__actual_value = x ; freeze
+      end
+
+      def to pred
+        pred.matches? @__actual_value
+      end
+
+      # def not_to  # ..
     end
 
     # ==

@@ -88,7 +88,6 @@ module Skylab::TestSupport::TestSupport
         let :kernel_module_ do
           ke = begin_mock_module_
           ke.want_to_have_method_defined :describe
-          ke.want_to_have_method_defined :should
           ke
         end
 
@@ -218,7 +217,7 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           mod = begin_mock_module_
-          mod.want_to_have_method_defined :should
+          # mod.want_to_have_method_defined :should
           mod
         end
 
@@ -249,7 +248,7 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           mod = begin_mock_module_
-          mod.want_to_have_method_defined :should
+          # mod.want_to_have_method_defined :should
           mod
         end
 

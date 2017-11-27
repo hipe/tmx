@@ -5,7 +5,7 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] quickie - predicates intro" do
 
     TS_[ self ]
-    use :the_method_called_let
+    # use :the_method_called_let
     use :quickie
 
     context "`eql`" do
@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport
       it "when not equal" do
 
         given_this_example_ do
-          1.should_ eql 2
+          expect_( 1 ).to eql 2
         end
 
         want_example_fails_with_message_ 'expected 2, got 1'
@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport
       it "when equal" do
 
         given_this_example_ do
-          1.should_ eql 1
+          expect_( 1 ).to eql 1
         end
 
         want_example_passes_with_message_ 'equals 1'
@@ -34,7 +34,7 @@ module Skylab::TestSupport::TestSupport
       it "when does not match" do
 
         given_this_example_ do
-          'foo'.should_ match %r(bar)
+          expect_( 'foo' ).to match %r(bar)
         end
 
         want_example_fails_with_message_ 'expected /bar/, had "foo"'
@@ -43,7 +43,7 @@ module Skylab::TestSupport::TestSupport
       it "when matches" do
 
         given_this_example_ do
-          'BEEFUS BOQUEEFUS'.should_ match %r(\Abeef.+boqueef)i
+          expect_( 'BEEFUS BOQUEEFUS' ).to match %r(\Abeef.+boqueef)i
         end
 
         want_example_passes_with_message_ "matches /\\Abeef.+boqueef/i"
@@ -55,9 +55,10 @@ module Skylab::TestSupport::TestSupport
       it "when expect to match class and rx, doesn't match rx" do
 
         given_this_example_ do
-          -> do
+          _ = -> do
             raise 'helf'
-          end.should_ raise_error ::RuntimeError, /dinglebat/
+          end
+          expect( _ ).to raise_error ::RuntimeError, /dinglebat/
         end
 
         want_example_fails_with_message_(
@@ -67,9 +68,10 @@ module Skylab::TestSupport::TestSupport
       it "when expect to match class and rx, doesn't match class" do
 
         given_this_example_ do
-          -> do
+          _ = -> do
             raise 'helf'
-          end.should_ raise_error ::NoMemoryError, 'helf'
+          end
+          expect_( _ ).to raise_error ::NoMemoryError, 'helf'
         end
 
         want_example_fails_with_message_(
@@ -79,9 +81,10 @@ module Skylab::TestSupport::TestSupport
       it "when expect raise using rx, doesn't raise anything" do
 
         given_this_example_ do
-          -> do
+          _ = -> do
             NOTHING_
-          end.should_ raise_error %r(wondertard)
+          end
+          expect_( _ ).to raise_error %r(wondertard)
         end
 
         want_example_fails_with_message_(
@@ -91,9 +94,10 @@ module Skylab::TestSupport::TestSupport
       it "when expect raise using string, doesn't raise anything" do
 
         given_this_example_ do
-          -> do
+          _ = -> do
             NOTHING_
-          end.should_ raise_error 'wankerberries'
+          end
+          expect_( _ ).to raise_error 'wankerberries'
         end
 
         want_example_fails_with_message_(
@@ -103,9 +107,10 @@ module Skylab::TestSupport::TestSupport
       it "when expect to match class and rx and matches both" do
 
         given_this_example_ do
-          -> do
+          _ = -> do
             raise 'helf'
-          end.should_ raise_error ::RuntimeError, 'helf'
+          end
+          expect_( _ ).to raise_error ::RuntimeError, 'helf'
         end
 
         want_example_passes_with_message_(
@@ -123,7 +128,7 @@ module Skylab::TestSupport::TestSupport
 
         given_this_example_ do
 
-          2.should_ be_even
+          expect_( 2 ).to be_even
         end
 
         want_example_passes_with_message_ "is even"
@@ -133,7 +138,7 @@ module Skylab::TestSupport::TestSupport
 
         given_this_example_ do
 
-          3.should_ be_even
+          expect_( 3 ).to be_even
         end
 
         want_example_fails_with_message_ "expected 3 to be even"
@@ -148,7 +153,7 @@ module Skylab::TestSupport::TestSupport
 
         given_this_example_ do
 
-          [ :A ].should_ be_include :A
+          expect_( [ :A ] ).to be_include :A
         end
 
         want_example_passes_with_message_ "includes :A"
@@ -158,7 +163,7 @@ module Skylab::TestSupport::TestSupport
 
         given_this_example_ do
 
-          [ :A ].should_ be_include :B
+          expect_( [ :A ] ).to be_include :B
         end
 
         want_example_fails_with_message_ "expected [:A] to include :B"

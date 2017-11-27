@@ -238,12 +238,25 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
+    hack_thing_once = -> do
+      hack_thing_once = nil
+      Home_::Quickie::Context__.send :alias_method, :expect_, :expect
+
+      # this gives us an extra added assurance that even when we are running
+      # our tests using r.s, we are using the quickie version of `expect`
+      # and not r.s's.
+
+    end
+
     ExampleExecutionState_via_ExampleBody___ = -> p do
       # -
         rec = SingleExampleSingleAssertionRecordingClient___.new
         lib = Subject_module__[]
         stats = lib::StatisticsAggregator___.new rec
         _ctx = lib::Context__.new stats
+
+        hack_thing_once && hack_thing_once[]
+
         _result = _ctx.instance_exec( & p )
         rec.flush_via_result _result
       # -
@@ -388,25 +401,6 @@ module Skylab::TestSupport::TestSupport
 
     Subject_module__ = Lazy_.call do
       Home_::Quickie
-    end
-
-    # ==
-
-    ::Kernel.module_exec do
-
-      # we want these tests to run equally well under rspec or quickie.
-      # but whether rspec or quickie is driving the test, we want that the
-      # `should` method being tested is the implementation that belongs to
-      # quickie, not rspec.
-      #
-      # the only practical way to do this is to that for the purposes of
-      # these tests we use a name for this method that is outside of the
-      # rspec namespace:
-
-      def should_ predicate
-        _ = instance_exec predicate, & Home_::Quickie::DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
-        _  # false on fail `_quickie_passed_` on pass
-      end
     end
 
     # ==

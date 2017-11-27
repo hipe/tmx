@@ -55,13 +55,13 @@ module Skylab::TestSupport::TestSupport
 
               it "eg 1" do
                 a.push :eg_1_ran
-                1.should_ eql 1
+                expect( 1 ).to eql 1
               end
             end
 
             it "eg 2" do
               a.push :eg_2_ran
-              1.should_ eql 2
+              expect( 1 ).to eql 2
             end
           end
         end
