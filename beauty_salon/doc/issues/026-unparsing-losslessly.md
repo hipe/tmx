@@ -6,6 +6,8 @@
   - predicates of the algorithm (assumptions)
   - algorithm-ish
   - detail: seeding the recursion
+  - interaction and refinement 1 - xx :[#here.E]
+  - one of these :[#here.F]
 
 
 
@@ -109,7 +111,7 @@ language, the names themselves are exposed by the vendor. they are:
   - `name`
   - `end`
 
-we're going to ignore `operator` until TODO.
+we're going to ignore `operator` while #open [#007.N.2].
 
 let's first consider the spans of characters that are isomorphed directly
 in the "map" structure's terminal ranges. that is, of the child components
@@ -135,7 +137,7 @@ so `c1` is `method_name`, `c2` is `args`, and `c3` is `any_body_expression`.
 a few things to note about this one: 1) our method name is again
 represented in this structure as it was before in our map structure.
 2) we haven't shown any newlines as being under the domain of any range
-but that's TODO up for debate.
+because we *think* whitespace doesn't overlap with the ranges.
 
 finally, let's look at the isomorphism of the two structures together.
 
@@ -202,7 +204,7 @@ so finally, here's gonna be our general approach:
       - `s2b`: xx
 
       - `r2b`: flush the static string up to the beginning of the current
-               range (of this column). write the terminal value (TODO).
+               range (of this column). write the terminal value.
                make a note of the range (that points to the original string).
 
       - `b2a`: make a note of the end of the range you are leaving.
@@ -284,6 +286,21 @@ note two things that stand in contrast to what we expected:
 as such, we should be aware of issues near [#sa-011] "line termination
 sequences" (LTS) but hopefully we are mostly insulated from these issues
 here.
+
+
+
+
+## interation and refinement 1:  :[#here.E]
+
+ok, so it turns out things aren't so straightforward and we need tons
+of custom methods (or at least a more refined DSL) to pull this off..
+
+(EDIT this second and the next one get content from comments #open [#007.T])
+
+
+
+
+## an elite breed of warrior :[#here.F]
 
 
 

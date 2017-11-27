@@ -85,7 +85,7 @@ module Skylab::Zerk::TestSupport
 
       _against '"a'
       _error :unclosed_quote do | y |
-        y.should eql [ 'expecting "\\"".' ]
+        y.should eql [ 'expecting "\"".' ]
       end
     end
 

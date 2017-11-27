@@ -4,17 +4,16 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town unparse magnetics - ', ct: true do
+  describe '[bs] crazy-town unparse magnetics - SvC - literals', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
     use :crazy_town_unparsing
 
     it 'symbols fancy (125)' do  # #covertpoint6.6
-      same = %q(:"foo_Bar baz 123")
-      _sn = structured_node_via_string_ same
-      _have = to_code_losslessly_ _sn
-      _have == same || fail
+      orig = %q(:"foo_Bar baz 123")
+      _actual = string_via_string_losslessly_ orig
+      _actual == orig || fail
     end
 
     context 'literals 250 - the escaping hack - cha cha' do  # #coverpoint4.5
@@ -59,11 +58,9 @@ module Skylab::BeautySalon::TestSupport
 
     it '(regression) SINGLE QUOTE ESCAPING GETS SMART (378)' do
       # same = '"\"\n"'
-      same = %q('"\"\n"')
-
-      _sn = structured_node_via_string_ same
-      _have = to_code_losslessly_ _sn
-      _have == same || fail
+      orig = %q('"\"\n"')
+      _actual = string_via_string_losslessly_ orig
+      _actual == orig || fail
     end
 
     context 'literals 500 - double quote with a simple interpolation' do  # #coverpoint5.4
@@ -88,10 +85,9 @@ module Skylab::BeautySalon::TestSupport
 
     it 'symbol list (625)' do  # #coverpoint6.5
 
-      same = '%i@  foo   bar    @'
-      _sn = structured_node_via_string_ same
-      _have = to_code_losslessly_ _sn
-      _have == same || fail
+      orig = '%i@  foo   bar    @'
+      _actual = string_via_string_losslessly_ orig
+      _actual == orig || fail
     end
 
     context 'literals 750 - literal array of strings ("word list")' do  # #coverpoint4.3
@@ -178,11 +174,9 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it 'check this (confirm regression ok)' do  # #coverpoint5.2
-        same = '/\Achapo queepo\z/'
-        _sn = structured_node_via_string_ same
-        wat_s = to_code_losslessly_ _sn
-        wat_s == same || fail
-        wat_s.object_id == same.object_id && fail
+        orig = '/\Achapo queepo\z/'
+        _actual = string_via_string_losslessly_ orig
+        _actual == orig || fail
       end
     end
 
@@ -256,10 +250,9 @@ module Skylab::BeautySalon::TestSupport
 
     it 'hash - this one' do  # #coverpoint6.3 (see)
 
-      same = 'frob a: :A, b: :B'
-      _sn = structured_node_via_string_ same
-      _have = to_code_losslessly_ _sn
-      _have == same || fail
+      orig = 'frob a: :A, b: :B'
+      _actual = string_via_string_losslessly_ orig
+      _actual == orig || fail
     end
 
   end

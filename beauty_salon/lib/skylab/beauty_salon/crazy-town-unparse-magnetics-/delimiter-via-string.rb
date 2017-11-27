@@ -35,8 +35,10 @@ module Skylab::BeautySalon
     # knows its deep semantic associations.
     #
     # :#spot2.3
-    #
-    # NOTE - we are looking to turn this into a much richer injection point..
+
+    # #open [#007.U] is the idea that we could turn this into a much richer
+    # injection point that would free up some of the structural redundancy
+    # with the main consumer of the below symbolic taxonomy .. whew!
 
     # -
 
@@ -276,7 +278,7 @@ module Skylab::BeautySalon
 
         __init_mode_and_cetera
 
-        m = @_mode[ :method ]
+        m = @_behavior[ :method ]
         if m
           send m
         else
@@ -288,20 +290,20 @@ module Skylab::BeautySalon
 
         @_node_type = THESE___[ @node_type ]
         if ! @_node_type
-          byebug_chillin ; exit 0
+          investigate ; exit 0
         end
 
         key_s = @scn.scan @_node_type.fetch :regexp_for_scanning
 
         if ! key_s
-          byebug_chillin
+          investigate
           raise COVER_ME, "do this: \"#{ @scn.peek 10 } [..]\""
         end
         @_delimiter_head = key_s.freeze
-        @_mode = @_node_type.fetch( :mode_via_token ).fetch key_s
+        @_behavior = @_node_type.fetch( :mode_via_token ).fetch key_s
 
-        if @_mode[ :stop_here ]
-          byebug_chillin
+        if @_behavior[ :stop_here ]
+          investigate ; exit 0
         end
       end
 
@@ -384,10 +386,10 @@ module Skylab::BeautySalon
       end
 
       def __execute_normally
-        sym = @_mode[ :simply ]
+        sym = @_behavior[ :simply ]
         if sym
           _finish_simply sym
-        elsif @_mode[ :singleton ]
+        elsif @_behavior[ :singleton ]
           @delimiter_category_symbol = :singleton_delimiter
           @delimiter_subcategory_value = :_delimiter_head
           _finish
@@ -409,9 +411,9 @@ module Skylab::BeautySalon
 
       def _finish
         if ! @scn.eos?
-          byebug_chillin ; exit 0
+          investigate ; exit 0
         end
-        remove_instance_variable :@_mode
+        remove_instance_variable :@_behavior
         remove_instance_variable :@scn
         freeze
       end
@@ -438,7 +440,7 @@ module Skylab::BeautySalon
     Default_delimiter_for_hash = Lazy_.call do  # :#coverpoint6.3:
 
       # symbols that exist in `{ hashes: like, this: nil }` are (1) string-
-      # ish terminals as all symbols are. but image when the hash is
+      # ish terminals as all symbols are. but imagine when the hash is
       # `frob like: this` (like named arguments of a method call). still
       # in these cases we need an escaping policy to be (5) inherited down,
       # even though there are no actual delimiters present. yes this reveals

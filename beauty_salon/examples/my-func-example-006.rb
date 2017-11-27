@@ -20,7 +20,9 @@ module Skylab::BeautySalon
     #     with `specify` are still OK.)
     #
     #   - one way this could be improved is to break it up the replacement
-    #     *string* into multiple lines, but yikes eyeblood will cometh
+    #     *string* into multiple lines when it's "too long" (probably 80
+    #     chars minus some constant for average indent meh), but yikes
+    #     eyeblood will cometh
     #
     # when we run it, it happens as an alias calling an alias or somesuch,
     # but here is roughly the complete command we are using:
@@ -34,7 +36,11 @@ module Skylab::BeautySalon
     rcvr = sn.any_receiver_expression
     list = sn.zero_or_more_arg_expressions
 
-    1 == list.length || ok_fine_whatever
+    if 1 != list.length
+      investigate
+      ok_fine_whatever
+    end
+
     _arg1 = list.dereference 0
 
     _arg_code = _arg1.to_code_LOSSLESS_EXPERIMENT__

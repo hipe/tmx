@@ -42,6 +42,7 @@ module Skylab::BeautySalon
         @_then_do_this = p
         @_write_range = :__write_range_CRAZILY
         @_concat = :__concat_CRAZILY
+        ACHIEVED_  # #spot3.1
       end
 
       # ~
@@ -56,11 +57,11 @@ module Skylab::BeautySalon
 
       def recurse_into_structured_node context_by=nil, sn
 
-        d = Home_::CrazyTownUnparseMagnetics_::String_via_StructuredNode::Recurse.call_by do |o|
-          o.context_by = context_by
-          o.structured_node = sn
-          o.buffers = self
-        end
+        d = Home_::CrazyTownUnparseMagnetics_::String_via_StructuredNode::Recurse.recurse_(
+          context_by: context_by,
+          structured_node: sn,
+          buffers: self,
+        )
 
         if d.zero?  # #here4
           NOTHING_  # #coverpoint5.2

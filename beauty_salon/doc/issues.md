@@ -105,20 +105,45 @@
 
              ( #was: index all the vectors of `porcelain/test/porcelain_spec.rb` )
 
+             [#here.E] tracks future places to refactor-in (see document)
+
 [#007]       ( intra-subsystem issues )
+
+      #open [#here.V] generally, the monolith could still be cleaned up
+             and de-redundified with the new Writer class
+
+            [#here.U] as described, we could make the delimiters parser
+             be a strong injection point
+
+      #open [#here.T] track all holes in documentation #release
 
       #open [#here.S] literal string modification will be somewhat broken
 
       #track [#here.R] regexp escaping
 
-      #small #refactor [#here.Q] string handling and similar is dis-unified
+      #open #DRY [#here.Q] string handling and similar is dis-unified
 
       #small #wish [#here.P] a verbose mode
 
       #small #open [#here.O] when you're really close to the end, rename
              "callish identifier" as something like "grammar symbol name"
 
-             #hole [#here.N]
+      #open [#here.N]: yikes a sub-sub-division of one of these. for no good
+            reason, here we're putting lots of known holes of things we need
+            to cover for #unparse. (we didn't need them to be covered to get
+            our objective use case.)
+
+            :[#here.N.6]: known hole: string via string on this: `HI = 3..4`
+
+            [#here.N.5]: (see)
+
+            [#here.N.4]: another kind of definition
+
+            [#here.N.3]: one kind of definition
+
+            [#here.N.2]: methods with an `operator` instead of a `name`
+
+            [#here.N.1] (to avoid ambiguity, use this node to reference all of these)
 
       #small #open [#here.M] maybe one day unify association names
 

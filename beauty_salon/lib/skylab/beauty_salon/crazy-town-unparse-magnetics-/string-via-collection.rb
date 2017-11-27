@@ -4,6 +4,8 @@ module Skylab::BeautySalon
 
   class CrazyTownUnparseMagnetics_::String_via_Collection < Common_::MagneticBySimpleModel
 
+    # (this is #[#026.F] one of these.)
+
     # the "collection" location map structure covers a wide variety
     # of grammar symbols, from literal strings to literal arrays up to
     # code blocks. generally (but not always) these features have a
@@ -16,6 +18,7 @@ module Skylab::BeautySalon
     #      is those terminals that need knowledge of the correct "escaping
     #      policy" to use for "optimistic unparsing". this category includes
     #      every kind of literal string, symbol, regexp, and perhaps others.
+    #      ("optimising unparsing" is given full treatment at #spot2.1.)
     #
     #   2) there is only ever exactly one correct escaping policy for a
     #      given terminal component. corollary: even when escaping is not
@@ -139,14 +142,14 @@ module Skylab::BeautySalon
 
       def execute
         @node_type = @structured_node._node_type_
-        @_mode = THESE___.fetch @node_type
+        @_behavior = THESE___.fetch @node_type
         __init_escaping_responsibility
         @_opening_delimiter = nil
           __execute_normally
       end
 
       def __init_escaping_responsibility
-        sym = @_mode[ :escape_policy_reign ]
+        sym = @_behavior[ :escape_policy_reign ]
         if sym
           case sym
           when :send_down
@@ -271,7 +274,7 @@ module Skylab::BeautySalon
         #  a location map pointing to a zero-width range so meh..)
 
         @buffers.recurse_into_structured_node @structured_node.regexopt
-        NIL
+        ACHIEVED_  # #spot3.1
       end
 
       def __array_if_percenty_hugger_send_down_delimiter
@@ -303,7 +306,7 @@ module Skylab::BeautySalon
 
       def __execute_normally
 
-        case @_mode.fetch :delimiter_expectations
+        case @_behavior.fetch :delimiter_expectations
 
         when :assume_delimiters
           both_OK = true
@@ -366,14 +369,7 @@ module Skylab::BeautySalon
 
         @buffers.write quot, d
 
-        begin
         @_opening_delimiter = CrazyTownUnparseMagnetics_::Delimiter_via_String[ quot, @node_type ]
-        rescue COVER_ME => e
-        end
-
-        if e
-          byebug_chillin ; exit 0
-        end
 
         NIL
       end
@@ -383,7 +379,7 @@ module Skylab::BeautySalon
         # for example if a hash
         if @_do_send_down_delimiter
           @_opening_delimiter && sanity
-          @_opening_delimiter = send @_mode.fetch :default_delimiter
+          @_opening_delimiter = send @_behavior.fetch :default_delimiter
           NIL
         end
       end
@@ -396,10 +392,10 @@ module Skylab::BeautySalon
 
         __before_middle
 
-        m = @_mode[ :write_middle_by ]
+        m = @_behavior[ :write_middle_by ]
         if m
           send m
-        elsif @_mode[ :terminal_method_name ]
+        elsif @_behavior[ :terminal_method_name ]
           __write_the_middle_terminally
         else
           __write_the_middle_normally
@@ -407,7 +403,7 @@ module Skylab::BeautySalon
       end
 
       def __before_middle
-        m = @_mode[ :before_middle ]
+        m = @_behavior[ :before_middle ]
         if m
           send m
         end
@@ -420,7 +416,7 @@ module Skylab::BeautySalon
           context_by = -> { delim }
         end
 
-        _m = @_mode.fetch :plural_association
+        _m = @_behavior.fetch :plural_association
         _list_like = @structured_node.send _m
 
         @buffers.recurse_into_listlike context_by, _list_like
@@ -441,7 +437,7 @@ module Skylab::BeautySalon
           # #coverpoint5.1 #coverpoint5.4 #coverpoint6.3
           _p = remove_instance_variable :@context_by
           if ! _p
-            byebug_chillin ; exit 0
+            investigate ; exit 0
           end
           delim = _p[]
         end
@@ -453,12 +449,12 @@ module Skylab::BeautySalon
           @location_expression.end_pos  # #coverpoint5.4
         end
 
-        _m = @_mode.fetch :terminal_method_name
+        _m = @_behavior.fetch :terminal_method_name
         _x = @structured_node.send _m
 
         Home_::CrazyTownUnparseMagnetics_::String_via_StringishLiteral.call_by do |o|
           o.terminal_value = _x
-          o.terminal_shape = @_mode.fetch :terminal_shape
+          o.terminal_shape = @_behavior.fetch :terminal_shape
           o.opening_delimiter = delim
           o.content_end_pos = _d
           o.buffers = @buffers
@@ -474,29 +470,23 @@ module Skylab::BeautySalon
       end
 
       def __before_beginning
-        m = @_mode[ :before_beginning ]
+        m = @_behavior[ :before_beginning ]
         if m
           send m
         end
       end
 
       def __after_end
-        m = @_mode[ :after_end ]
+        m = @_behavior[ :after_end ]
         if m
           send m
+        else
+          ACHIEVED_  # #spot3.1
         end
       end
 
       def _nothing
         NOTHING_
-      end
-
-      def _DS
-        @buffers._DS
-      end
-
-      def _SN  # #TODO
-        @structured_node
       end
     # -
     # ==

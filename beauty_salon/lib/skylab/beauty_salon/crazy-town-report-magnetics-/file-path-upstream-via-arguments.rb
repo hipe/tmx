@@ -70,10 +70,10 @@ module Skylab::BeautySalon
 
       def __execute_when_conditional_requirement because_sym, require_sym
         if _there_can_only_be_one
-          sym = @_mode.symbol
+          sym = @_behavior.symbol
           if require_sym == sym
             if _curate_is_valid
-              instance_variable_get @_mode.ivar
+              instance_variable_get @_behavior.ivar
             end
           else
             _error :argument_error do |y|
@@ -88,7 +88,7 @@ module Skylab::BeautySalon
       def __execute_normally
         if _there_can_only_be_one
           if _curate_is_valid
-            send @_mode.resolution_method_name
+            send @_behavior.resolution_method_name
           end
         end
       end
@@ -102,7 +102,7 @@ module Skylab::BeautySalon
       end
 
       def __curate_is_valid_specifically
-        m = @_mode.validation_method_name
+        m = @_behavior.validation_method_name
         if m
           send m
         else
@@ -120,7 +120,7 @@ module Skylab::BeautySalon
 
       def __curate_is_valid_generically  # for now, __curate_whole_word_filter_OK
         if @whole_word_filter
-          if @_mode.whole_word_filter_is_allowed
+          if @_behavior.whole_word_filter_is_allowed
             ACHIEVED_
           else
             __whine_about_how_whole_word_filter_is_not_allowed
@@ -131,7 +131,7 @@ module Skylab::BeautySalon
       end
 
       def __whine_about_how_whole_word_filter_is_not_allowed
-        mo = @_mode
+        mo = @_behavior
         _error :argument_error do |y|
           y << "you cannot emply #{ prim :whole_word_filter } in #{
            }conjunction with #{ prim mo.name_symbol }."
@@ -163,7 +163,7 @@ module Skylab::BeautySalon
         @_named_listeners = nil  # only one guy uses this
 
         case 1 <=> sym_a.length
-        when  0 ; @_mode = last_active_mode_functions ; true
+        when  0 ; @_behavior = last_active_mode_functions ; true
         when -1 ; __when_too_many sym_a
         when  1 ; __when_none
         else    ; never

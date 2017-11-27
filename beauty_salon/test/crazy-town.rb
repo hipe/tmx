@@ -11,6 +11,11 @@ module Skylab::BeautySalon::TestSupport
         tcc.include self
       end
 
+      def string_via_string_losslessly_ orig
+        _sn = structured_node_via_string_ orig
+        _string_via_SN_losslessly_CT _sn
+      end
+
       def build_lines_
         _s = build_string_
         _s.split %r(^)
@@ -18,10 +23,10 @@ module Skylab::BeautySalon::TestSupport
 
       def build_string_
         _sn = structured_node_
-        to_code_losslessly_ _sn
+        _string_via_SN_losslessly_CT _sn
       end
 
-      def to_code_losslessly_ sn
+      def _string_via_SN_losslessly_CT sn
         sn.to_code_LOSSLESS_EXPERIMENT__
       end
     end

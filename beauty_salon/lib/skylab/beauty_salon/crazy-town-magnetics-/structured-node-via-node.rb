@@ -181,7 +181,7 @@ module Skylab::BeautySalon
 
         children(
           :zero_or_more_dynamic_expressions,
-            # (as zero, TODO not covered - zerk/test/610-CLI/20-want-section-magnetics_spec.rb:10)
+            # (as zero, #open [#007.N.5] not covered - zerk/test/610-CLI/20-want-section-magnetics_spec.rb:10)
         )
       end
 
@@ -529,11 +529,11 @@ module Skylab::BeautySalon
       class Class < GrammarSymbol__
 
         def to_description
-          "class: #{ todo_module_identifier_const._to_friendly_string }"
+          "class: #{ module_identifier_const._to_friendly_string }"
         end
 
         children(
-          :todo_module_identifier_const,
+          :module_identifier_const,
           :any_superclass_expression,  # used to be "expression of module" see #here6
           :any_body_expression,
         )
@@ -561,11 +561,11 @@ module Skylab::BeautySalon
       class Module < GrammarSymbol__
 
         def to_description
-          "module: #{ todo_module_identifier_const._to_friendly_string }"
+          "module: #{ module_identifier_const._to_friendly_string }"
         end
 
         children(
-          :todo_module_identifier_const,
+          :module_identifier_const,
           :any_body_expression,
         )
 

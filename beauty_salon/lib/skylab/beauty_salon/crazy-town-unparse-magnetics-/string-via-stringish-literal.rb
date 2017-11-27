@@ -40,7 +40,7 @@ module Skylab::BeautySalon
         # (regexen like below are tracked with #[#ba-029.2])
 
         same_double_quote = {
-          escaping_regexp: /["\\\n\t\r\b]/,
+          escaping_regexp: /["\\\n\t\r\e\b]/,
         }
 
         same_single_quote = {
@@ -65,7 +65,7 @@ module Skylab::BeautySalon
           symbol_looks_like_single_quoted_string: same_single_quote,  # #coverpoint.NOT_COVERED
 
           pretend_delimiter_for_heredoc: {  # #coverpoint5.1
-            escaping_regexp: /[\\\t\b]/,  # LOOK you don't escape newlines
+            escaping_regexp: /[\\\t\e\b]/,  # LOOK you don't escape newlines
           },
 
           percenty_hugger: {
@@ -122,7 +122,7 @@ module Skylab::BeautySalon
 
       def __optimistic_idiomatic_escaped_string_via__deep_string deep_s
 
-        m = @_mode[ :escape_method ]
+        m = @_behavior[ :escape_method ]
         if m
           send m, deep_s
         else
@@ -139,11 +139,11 @@ module Skylab::BeautySalon
 
       def __flush_regexp
 
-        rx = @_mode[ :escaping_regexp ]
+        rx = @_behavior[ :escaping_regexp ]
         if rx
           rx
         else
-          _m = @_mode.fetch :escaping_regexp_method
+          _m = @_behavior.fetch :escaping_regexp_method
           send _m
         end
       end
@@ -199,7 +199,8 @@ module Skylab::BeautySalon
         # track (probably with a stack) of whether these other sub-expressions
         # are opened or closed. SO if you're using (say) `()` as your hugging
         # delimiter and you want to have a `)` *in* your regexp, whether or
-        # not you escape it with a backslash depends on whether or not TODO..
+        # not you escape it with a backslash depends on whether or not
+        # (EDIT: #open [#007.T] documentation hole)
         #
         # what all of this musing leads us to is this one axiom: for now,
         # for better or worse we do NOT escape ANYHING when producing file
@@ -331,7 +332,7 @@ module Skylab::BeautySalon
         current_s = @buffers[ @buffers.pos ... end_pos ]
 
         if current_s != encoded_s
-          byebug_chillin
+          investigate ; exit 0
           self._COVER_ME__better_escaping_logic_might_be_necessary__
         end
 
@@ -342,7 +343,7 @@ module Skylab::BeautySalon
         delim = @opening_delimiter
         cat = THESE___.fetch delim.delimiter_category_symbol
         x = delim.delimiter_subcategory_value
-        @_mode = if x
+        @_behavior = if x
           cat.fetch x
         else
           cat  # meh..
@@ -368,6 +369,7 @@ module Skylab::BeautySalon
         o.backslash = same
         o.tab = so.use_this_string_instead '\t'
         o.forward_slash = same
+        o.ASCII_escape = so.use_this_string_instead '\e'
         o.alert_bell = nil  # contact. hi.
 
         o.default_by  # hi.

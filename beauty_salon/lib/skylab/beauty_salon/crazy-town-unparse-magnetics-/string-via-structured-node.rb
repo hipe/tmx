@@ -12,7 +12,7 @@ module Skylab::BeautySalon
     # but as it is we have no easy way of exploiting our declarative
     # approach *under* an imperative approach. #incubating
 
-    META_MAPPINGS___ = {
+    BEHAVIOR_VIA_SHAPE___ = {
 
       # for each type of location map, associate its range items with the
       # child components of AST nodes (actually structured nodes) in terms
@@ -22,27 +22,16 @@ module Skylab::BeautySalon
 
       # -- class and module definition
 
-      # -- method (un)definition
-
       definition: {
-        these: [
-          [ :range, :keyword ],
-          [ :custom_method, :__alternation_operator_or_name ],
-          [ :range, :operator ],
-          [ :both,  :range, :name, :assoc, :method_name ],
-          [ :assoc, :args ],
-          [ :assoc, :any_body_expression ],
-          [ :range, :end ],
-        ],
+        is_new_way: true,
       },
+
+      # -- method (un)definition
 
       # -- method calls
 
       operator: {  # #coverpoint3.4
-        these: [
-          # [ :range, :operator ],
-          [ :custom_method, :__operator ],
-        ],
+        method: :__operator,
       },
 
       send: {
@@ -117,18 +106,13 @@ module Skylab::BeautySalon
       # -- literals
 
       heredoc: {
-        these: [
-          [ :custom_method, :__heredoc_MASSIVE_HACK ],
-          # [ :range, :heredoc_end ],
-        ],
+        method: :__heredoc_MASSIVE_HACK,
       },
 
       # -- (very generic)
 
       collection: {
-        these: [
-          [ :custom_method, :__for_collection ],
-        ],
+        is_new_way: true,
       },
       keyword: {
         these: [
@@ -141,64 +125,98 @@ module Skylab::BeautySalon
         ],
       },
       map: {
-        these: [
-          [ :custom_method, :__for_map_expect_singleton_USUALLY ],
-        ],
+        method: :__for_map_expect_singleton_USUALLY,
       },
     }
 
     class << self
       def call sn
-        buff = ::String.new
-        _d = Recurse.call_by do |o|
-          o.structured_node = sn
-          o.downstream_buffer = buff
-          o.__init_seed_values
-        end
-        _d.zero? && fail  # #here4
-        buff
+        Recurse.call(
+          structured_node: sn,
+          downstream_buffer: ::String.new,
+        )
       end
       alias_method :[], :call
     end  # >>
 
     class Recurse < Common_::MagneticBySimpleModel
 
+      class << self
+
+        def call downstream_buffer: nil, structured_node: nil
+
+          _buffers = __build_buffers structured_node, downstream_buffer
+
+          _d = recurse_(
+            buffers: _buffers,
+            structured_node: structured_node,
+          )
+          _d.zero? && hello_fine_mark_my_coverpoint
+          downstream_buffer
+        end
+
+        def recurse_ buffers: nil, context_by: nil, structured_node: nil
+
+          orig_len = buffers.downstream_buffer.length
+
+          loc = structured_node._node_location_
+          beha = Behavior_via_location_class___[ loc.class ]
+
+          _ = if beha.is_new_way
+            _cls = Home_::CrazyTownUnparseMagnetics_.const_get beha.const, false
+            _cls.call_by do |o|
+              o.context_by = context_by
+              o.location = loc
+              o.structured_node = structured_node
+              o.buffers = buffers
+            end
+          else
+            call_by do |o|
+              o.__receive_these_two_ beha, structured_node
+              o.context_by = context_by
+              o.buffers = buffers
+            end
+          end
+
+          if _ != ACHIEVED_
+            investigate ; exit 0
+          end
+
+          buffers.downstream_buffer.length - orig_len
+        end
+
+        def __build_buffers structured_node, downstream_buffer
+
+          # exactly [#026.D]: figure out the very first starting offset
+          # (the implicit assumption being that the whole tree is in one file)
+
+          r = structured_node._node_location_.expression
+
+          Home_::CrazyTownUnparseMagnetics_::String_via_Heredoc::
+              Buffers_via_Downstream_and_Upstream_Buffer.new(
+            r.begin_pos,
+            downstream_buffer,
+            r.source_buffer.source,
+          )
+        end
+      end  # >>
+
       #
       # Assignment & initialization
       #
 
-      def structured_node= sn
+      def __receive_these_two_ beha, sn
 
-        loc = sn._node_location_
-        @_loc_map_index = LOC_MAP_INDEX_VIA_CLASS___[ loc.class ]
-        @location = loc
+        @_behavior = beha
 
-        cls = sn.class
-        @_association_index = cls.association_index
+        @location = sn._node_location_
+
+        @_association_index = sn.class.association_index
 
         @structured_node = sn
       end
 
-      def __init_seed_values  # assume some attributes are already set!
-
-        # exactly [#026.D]: figure out the very first starting offset
-
-        r = @structured_node._node_location_.expression
-
-        @buffers = Home_::CrazyTownUnparseMagnetics_::String_via_Heredoc::
-            Buffers_via_Downstream_and_Upstream_Buffer.new(
-          r.begin_pos,
-          remove_instance_variable( :@downstream_buffer ),
-          r.source_buffer.source,
-        )
-          # (the implicit assumption being that the whole tree is in one file)
-
-        @context_by = nil
-        NIL
-      end
-
       attr_writer(
-        :downstream_buffer,  # only at entrypoint call, not recursions
         :context_by,
         :buffers,
       )
@@ -209,11 +227,32 @@ module Skylab::BeautySalon
 
       def execute
 
-        orig_len = @buffers.downstream_buffer.length
+        _ = if @_behavior.is_custom_method_as_behavior
+          send @_behavior.method
+        else
+          __AWFUL_LEGACY_MOVE_ME
+        end
+        _ == ACHIEVED_ || no  # #spot3.1
+        _
+      end
+
+      def __AWFUL_LEGACY_MOVE_ME
+
+        # whatever comes of this should go to [#026.E].
+        # problems with this as-is:
+        #
+        #   - it should be extracted out of its current class; the class with
+        #     all the custom methods in it should not be the same class that
+        #     defines how traversals happen
+        #
+        #   - more broadly, we don't know if we even want to keep this DSL
+        #     (the amount of custom methods make it almost not worth it)
 
         @_current_state_symbol = :start
 
-        @_semantic_column_scanner = Scanner_[ @_loc_map_index.semantic_columns ]
+        _loc_map_index = remove_instance_variable :@_behavior
+
+        @_semantic_column_scanner = Scanner_[ _loc_map_index.semantic_columns ]
 
         begin
           col = _gets_one_semantic_column
@@ -228,8 +267,6 @@ module Skylab::BeautySalon
         end until @_semantic_column_scanner.no_unparsed_exists
 
         _transition_to_state :end
-
-        @buffers.downstream_buffer.length - orig_len  # #here4
       end
 
       #
@@ -237,20 +274,6 @@ module Skylab::BeautySalon
       #
 
       # -- Operator
-
-      def __alternation_operator_or_name  # for `Definition`  # AFTER __for_variable_write_right_hand_side
-        _op_col = _gets_one_semantic_column
-        _nm_col = _gets_one_semantic_column
-        _common_alternation _nm_col, _op_col
-      end
-
-      def _common_alternation nm_col, op_col
-        nm_col.range.range_attr_name == :name || fail
-        op_col.range_attr_name == :operator || fail
-        _no_operator
-        _effect_non_method_column nm_col
-        NIL
-      end
 
       def __operator
 
@@ -350,7 +373,6 @@ module Skylab::BeautySalon
           when :=~, :!~
             _send_when_operator_infixed
           else ;
-            byebug_chillin
             self._COVER__theres_an_operator_like_method_name_we_havent_covered_yet__
           end
         end
@@ -538,14 +560,9 @@ module Skylab::BeautySalon
 
       # -- Collection
 
-      def __for_collection
-        Home_::CrazyTownUnparseMagnetics_::String_via_Collection.call_by do |o|
-          o.context_by = @context_by
-          o.location = @location
-          o.structured_node = @structured_node
-          o.buffers = @buffers
-        end
-      end
+      # (gone)
+
+      # --
 
       def __heredoc_MASSIVE_HACK  # see #spot1.4
 
@@ -718,10 +735,6 @@ module Skylab::BeautySalon
       end
 
       def __if_operator_cover_me
-        _no_operator
-      end
-
-      def _no_operator
         if @location.operator
           self._COVER_ME__fun_la_la__
         end
@@ -847,7 +860,7 @@ module Skylab::BeautySalon
         # spans from the cursor to the end of the new current range. isn't
         # flushed until we leave the range
 
-        NOTHING_  # #coverpoint3.1
+        ACHIEVED_  # #spot3.1 #coverpoint3.1 (coincidental same number)
       end
 
       def __transition_from_range_to_end
@@ -905,7 +918,8 @@ module Skylab::BeautySalon
       end
 
       def _be_in_state sym
-        @_current_state_symbol = sym ; nil
+        @_current_state_symbol = sym
+        ACHIEVED_  # #spot3.1
       end
 
       #
@@ -1021,21 +1035,122 @@ module Skylab::BeautySalon
 
     # ==
 
-    LOC_MAP_INDEX_VIA_CLASS___ = ::Hash.new do |h, cls|
-      _nf = Common_::Name.via_module cls
-      _k = _nf.as_lowercase_with_underscores_symbol
-      _xx = META_MAPPINGS___.fetch _k
-      x = LocationMapIndex___.new _xx
-      h[ cls ] = x
-      x
+    Cache_ = -> & p do
+      ::Hash.new do |h, key_x|
+        x = p[ key_x ]
+        h[ key_x ] = x
+        x
+      end.method :[]
+    end
+
+    Behavior_via_location_class___ = Cache_.call do |cls|
+
+      # map the location map class to a "behavior" (one of three classes)
+
+      nf = Common_::Name.via_module cls
+
+      h = BEHAVIOR_VIA_SHAPE___.fetch nf.as_lowercase_with_underscores_symbol
+
+      m = h[ :method ]
+      if m
+        1 == h.length || fail  # #here2
+        BehaviorViaCustomMethod___.new m
+      elsif h[ :is_new_way ]
+        1 == h.length || fail  # #here2
+        _ = nf.as_camelcase_const_string
+        BehaviorViaNewWay___.new :"String_via_#{ _ }"
+      else
+        LocationMapIndex___.new h
+      end
+    end
+
+    class Writer
+
+      # this is meant to help us transition off the monolith.
+      # something about [#026.E]
+
+      def initialize structured_node: nil, buffers: nil
+        @association_index = structured_node.class.association_index
+        @location = structured_node._node_location_
+        @structured_node = structured_node
+        @buffers = buffers
+      end
+
+      def write_component asc_sym  # #open [#007.Q] not dry with the other
+        asc = _association asc_sym
+        x = __component asc
+        if asc.has_truly_plural_arity
+          @buffers.recurse_into_listlike x
+        elsif x
+          @buffers.recurse_into_structured_node x  # #coverpoint3.1
+        else
+          NOTHING_  # #coverpoint3.1
+        end
+        NIL
+      end
+
+      def write_terminal vr_sym, asc_sym
+
+        vr = _vendor_range vr_sym
+
+        _write_as_is_to_here vr.begin_pos  # #coverpoint5.1 (hypothetically)
+
+        # #open #[#007.Q] need to DRY this with the other
+
+        tasc = _association asc_sym
+
+        x = __terminal tasc
+
+        _s = case tasc.type_symbol
+        when :symbol ; x.id2name
+        else ; cover_me_easy
+        end
+
+        @buffers.write _s, vr.end_pos
+      end
+
+      def write_range vr_sym
+        _vr = _vendor_range vr_sym
+        _write_as_is_to_here _vr.end_pos
+      end
+
+      def _write_as_is_to_here d
+        @buffers.write_as_is_to_here d
+      end
+
+
+      def __terminal tasc
+
+        _m = if tasc.has_plural_arity
+          self._SEE_ME  # #coverpoint3.5
+        else
+          tasc.stem_symbol
+        end
+
+        @structured_node.send _m
+      end
+
+      def __component asc
+        _m = asc.association_symbol
+        @structured_node.send _m
+      end
+
+      def _association asc_sym
+        @association_index.dereference asc_sym
+      end
+
+      def _vendor_range m
+        @location.send m
+      end
     end
 
     # ==
 
     class LocationMapIndex___
 
-      def initialize x
-        _a = x.fetch :these
+      def initialize h
+        1 == h.length || fail  # #here2
+        _a = h.fetch :these
         @semantic_columns = _a.map do |row|
           scn = Common_::Scanner.via_array row
           _const = COLUMN_CONST_VIA_SYMBOL___.fetch scn.head_as_is
@@ -1050,6 +1165,12 @@ module Skylab::BeautySalon
       attr_reader(
         :semantic_columns,
       )
+      def is_custom_method_as_behavior
+        false
+      end
+      def is_new_way
+        false
+      end
     end
 
     COLUMN_CONST_VIA_SYMBOL___ = {
@@ -1182,8 +1303,36 @@ module Skylab::BeautySalon
     end
 
     # ==
+
+    class BehaviorViaNewWay___
+      def initialize c
+        @const = c ; freeze
+      end
+      attr_reader :const
+      def is_new_way
+        true
+      end
+    end
+
+    # ==
+
+    class BehaviorViaCustomMethod___
+      def initialize m
+        @method = m
+      end
+      attr_reader :method
+      def is_new_way
+        false
+      end
+      def is_custom_method_as_behavior
+        true
+      end
+    end
+
+    # ==
     # ==
   end
 end
+# #history-A.3: begin extracting existing monolithic "semantic column" support out
 # #history-A.2: many fellows abstracted out
 # #born.

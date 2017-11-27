@@ -4,7 +4,7 @@ require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe '[bs] crazy-town unparse magnetics - ', ct: true do
+  describe '[bs] crazy-town unparse magnetics - SvC - blocks', ct: true do
 
     TS_[ self ]
     use :memoizer_methods
@@ -13,9 +13,8 @@ module Skylab::BeautySalon::TestSupport
     it 'this (12)' do  # #coverpoint6.4
 
       orig = '( 1 + 2 ).la_la'
-      _sn = structured_node_via_string_ orig
-      _have = to_code_losslessly_ _sn
-      _have == orig || fail
+      _actual = string_via_string_losslessly_ orig
+      _actual == orig || fail
     end
 
     context 'single-line proc - no args (25)' do  # #coverpoint6.2

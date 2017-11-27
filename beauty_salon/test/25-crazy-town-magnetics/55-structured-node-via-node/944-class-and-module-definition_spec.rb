@@ -56,7 +56,7 @@ module Skylab::BeautySalon::TestSupport
     # --
 
     def _class_or_module_component_for_module_identifier
-      :todo_module_identifier_const
+      :module_identifier_const
     end
 
     def _class_component_for_superclass

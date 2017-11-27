@@ -459,6 +459,7 @@ module Skylab::Basic
         :carriage_return,
         :tab,
         :forward_slash,
+        :ASCII_escape,
         :alert_bell,
       )
 
@@ -471,6 +472,7 @@ module Skylab::Basic
         when "\\"  ; @backslash
         when "\r"  ; @carriage_return
         when "\t"  ; @tab
+        when "\e"  ; @ASCII_escape
         when "\b"  ; @alert_bell
         when '/'   ; @forward_slash
         else

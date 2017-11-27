@@ -64,13 +64,3 @@ clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normal
 all known near-term practial applications of this (-1) (Z) (Z)->(W,Y,J)
 .to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
 convert every '.should' to `expect( ).to` 07-19 03:47:08 (-3) (W) (W)->(J)
-many TODOs and COVER_ME and _SN and _DS (-4) (J) (J)->(S)
-it's a mess to create a structured node instance just to use the collection thing (-5) (S) (S)->(R)
-for each sidesystem (in ascending order of complexity) get the damn patch (R) (-6) (R)->(E9)
-snag (-18) (D3)->(D2)
-css_convert (-23) (C4)->(C3)
-zerk (-30) (B5)->(B4)
-fields (-32) (B3)->(B2)
-it would be nice to simplify the remainder of the monolith. maybe get that one pattern out.
-maybe at the source of where you parse the delimiter, go with an injection model and get rid of that other file..
-lots of byebug_chillin
