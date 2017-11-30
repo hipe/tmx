@@ -20,7 +20,7 @@ module Skylab::Zerk::TestSupport
 
         invoke
         want_no_more_lines
-        @exitstatus.should eql :_zoink_
+        expect( @exitstatus ).to eql :_zoink_
       end
 
       it "1 args - whines of unexpected, result is multi line" do

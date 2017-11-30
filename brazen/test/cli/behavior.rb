@@ -74,11 +74,11 @@ module Skylab::Brazen::TestSupport
     end
 
     def results_in_error_exitstatus_
-      state_.exitstatus.should match_common_error_code_
+      expect( state_.exitstatus ).to match_common_error_code_
     end
 
     def want_exitstatus_for sym
-      @exitstatus.should eql Home_::API.exit_statii.fetch sym
+      expect( @exitstatus ).to eql Home_::API.exit_statii.fetch sym
     end
 
     def want_errored
@@ -87,7 +87,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def want_generic_error_exitstatus
-      @exitstatus.should match_common_error_code_
+      expect( @exitstatus ).to match_common_error_code_
     end
 
     def match_common_error_code_
@@ -96,11 +96,11 @@ module Skylab::Brazen::TestSupport
 
     def want_succeed
       want_no_more_lines
-      @exitstatus.should match_successful_exitstatus
+      expect( @exitstatus ).to match_successful_exitstatus
     end
 
     def results_in_success_exitstatus_
-      state_.exitstatus.should match_successful_exitstatus
+      expect( state_.exitstatus ).to match_successful_exitstatus
     end
 
     def match_common_informational_stream_set_

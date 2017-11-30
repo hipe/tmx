@@ -25,19 +25,19 @@ module Skylab::Brazen::TestSupport
       end
 
       it "all lines should be emitted on the correct stream" do
-        state_.stream_set.should match_common_informational_stream_set_
+        expect( state_.stream_set ).to match_common_informational_stream_set_
       end
 
       it "first line talks about invalid option: -z" do
-        first_line.should match_ invalid_option '-z'
+        expect( first_line ).to match_ invalid_option '-z'
       end
 
       it "last line talks about invite for help on that action" do
-        last_line.should match_ action_invite_line_
+        expect( last_line ).to match_ action_invite_line_
       end
 
       it "there should be no other lines" do
-        state_.number_of_lines.should eql 2
+        expect( state_.number_of_lines ).to eql 2
       end
     end
 
@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
       end
 
       it "all lines should be emitted on the correct stream" do
-        state_.stream_set.should match_common_informational_stream_set_
+        expect( state_.stream_set ).to match_common_informational_stream_set_
       end
 
       it "description section is `tight`" do
@@ -99,15 +99,15 @@ module Skylab::Brazen::TestSupport
       end
 
       it "first line talking bout unexpected" do
-        first_line.should match_ unexpected_argument 'wang'
+        expect( first_line ).to match_ unexpected_argument 'wang'
       end
 
       it "last line invites" do
-        last_line.should match_ action_invite_line_
+        expect( last_line ).to match_ action_invite_line_
       end
 
       it "middle line is usage" do
-        second_line.should match_ action_usage_line_
+        expect( second_line ).to match_ action_usage_line_
       end
     end
 

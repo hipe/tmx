@@ -20,15 +20,15 @@ module Skylab::Zerk::TestSupport
       it "structure is right" do
         o = root_ACS
         vp = o.VP
-        vp.V.should eql 'like'
-        vp.O.should be_nil
-        o.SUBJ.should eql 'you'
+        expect( vp.V ).to eql 'like'
+        expect( vp.O ).to be_nil
+        expect( o.SUBJ ).to eql 'you'
       end
 
       it "result is last qk of thing - etc" do
         qk = root_ACS_result
-        qk.value.should eql 'you'
-        qk.association.name_symbol.should eql :subject
+        expect( qk.value ).to eql 'you'
+        expect( qk.association.name_symbol ).to eql :subject
       end
     end
 

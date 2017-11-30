@@ -28,23 +28,23 @@ module Skylab::Zerk::TestSupport
       end
 
       it "option" do
-        build_index_of_option_section.should have_option( '-f', '--foobizzle X' )
+        expect( build_index_of_option_section ).to have_option( '-f', '--foobizzle X' )
       end
     end
 
     context "singplur in opts - some calls" do
 
       it "call with none" do
-        argv( 'no-args' ).should output "(yasure: nil)"
+        expect( argv 'no-args' ).to output "(yasure: nil)"
       end
 
       it "call with one" do
-        argv( 'no-args', '-f', 'x1' ).should output '(yasure: ["x1"])'
+        expect( argv 'no-args', '-f', 'x1' ).to output '(yasure: ["x1"])'
       end
 
       it "call with two" do
         _output_this = output '(yasure: ["x1", "x2"])'
-        argv( 'no-a', '-f', 'x1', '-f', 'x2' ).should _output_this
+        expect( argv 'no-a', '-f', 'x1', '-f', 'x2' ).to _output_this
       end
     end
 
@@ -69,15 +69,15 @@ module Skylab::Zerk::TestSupport
       it "zero args - missing required argument!" do
         sta = argv 'plur-as-arg'
         sta.exitstatus.nonzero? or fail
-        sta.lines.first.should be_line( :styled, :e, /\Amissing required argument <foobizzle>/ )
+        expect( sta.lines.first ).to be_line( :styled, :e, /\Amissing required argument <foobizzle>/ )
       end
 
       it "one arg" do
-        argv( 'plur-as-arg', 'one' ).should output '(youbetcha: ["one"])'
+        expect( argv 'plur-as-arg', 'one' ).to output '(youbetcha: ["one"])'
       end
 
       it "two args" do
-        argv( 'plur-as-arg', 'one', 'two' ).should output '(youbetcha: ["one", "two"])'
+        expect( argv 'plur-as-arg', 'one', 'two' ).to output '(youbetcha: ["one", "two"])'
       end
     end
 

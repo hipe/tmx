@@ -27,7 +27,7 @@ module Skylab::Zerk::TestSupport
 
         _s = 'operation "flickerer" is not available'
 
-        root_ACS_state.message.should eql _s
+        expect( root_ACS_state.message ).to eql _s
       end
     end
 
@@ -49,7 +49,7 @@ module Skylab::Zerk::TestSupport
       it "says.." do
 
         _s = "'add' is missing required parameter 'right-number'."
-        root_ACS_state.message.should eql _s
+        expect( root_ACS_state.message ).to eql _s
       end
 
       def subject_root_ACS_class
@@ -68,7 +68,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "yay" do
-        root_ACS_result.should eql :_yep_
+        expect( root_ACS_result ).to eql :_yep_
       end
 
       it "no emissions" do

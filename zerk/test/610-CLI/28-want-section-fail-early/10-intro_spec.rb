@@ -26,26 +26,26 @@ module Skylab::Zerk::TestSupport
 
       it "this only child knows its own line (with newline)" do
 
-        _tree.only_child.x.string.should eql "aaa\n"
+        expect( _tree.only_child.x.string ).to eql "aaa\n"
       end
 
       it "both root and \"top\" know their children length" do
 
         root = _tree
-        root.children.length.should eql 1
+        expect( root.children.length ).to eql 1
 
         _top = root.only_child
-        _top.children.length.should eql 1
+        expect( _top.children.length ).to eql 1
       end
 
       it "`line_content` omits any newline" do
 
-        _some_node.x.line_content.should eql 'bbb'
+        expect( _some_node.x.line_content ).to eql 'bbb'
       end
 
       it "the internal line structure preserves channel" do
 
-        _some_node.x.stream_symbol.should eql :_no_stream_
+        expect( _some_node.x.stream_symbol ).to eql :_no_stream_
       end
 
       shared_subject :_some_node do
@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
     context "with a deeper but well formed tree" do
 
       it "ok." do
-        root.children.map { | cx | cx.x.line_content }.should eql(
+        expect( root.children.map { | cx | cx.x.line_content } ).to eql(
           [ 'head', 'torso', 'legs' ] )
       end
 

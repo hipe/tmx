@@ -46,8 +46,8 @@ module Skylab::Brazen::TestSupport
         ent = _subject_class.new do
           ok = process_and_normalize_for_test_
         end
-        ok.should eql true
-        ent.bx.fetch( :foo ).should eql :yay
+        expect( ok ).to eql true
+        expect( ent.bx.fetch :foo ).to eql :yay
       end
 
       it "(without defaulting)", f:true do
@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
         ent = _subject_class.new do
           ok = process_and_normalize_for_test_ :foo, :bar
         end
-        ent.bx.fetch( :foo ).should eql :bar
+        expect( ent.bx.fetch :foo ).to eql :bar
       end
     end
 
@@ -90,8 +90,8 @@ module Skylab::Brazen::TestSupport
         ent = _subject_class.new do
           ok = process_and_normalize_for_test_ :zoip, -2
         end
-        ent.bx.fetch( :zoip ).should eql( -2 )
-        ok.should eql true
+        expect( ent.bx.fetch :zoip ).to eql( -2 )
+        expect( ok ).to eql true
       end
 
       it "when no", f:true do
@@ -107,8 +107,8 @@ module Skylab::Brazen::TestSupport
           @listener = p
           ok = process_and_normalize_for_test_ :zoip, -3
         end
-        ok.should eql false
-        _i_a.should eql [ :error, :invalid_property_value ]
+        expect( ok ).to eql false
+        expect( _i_a ).to eql [ :error, :invalid_property_value ]
         ev.terminal_channel_symbol == :number_too_small || fail
       end
     end
@@ -139,8 +139,8 @@ module Skylab::Brazen::TestSupport
         ent = _subject_class.new do
           ok = process_and_normalize_for_test_ :foo, :a, :bar, :b, :baz, :c
         end
-        ok.should eql true
-        ent.bx.at( :foo, :bar, :baz ).should eql [ :a, :b, :c ]
+        expect( ok ).to eql true
+        expect( ent.bx.at :foo, :bar, :baz ).to eql [ :a, :b, :c ]
       end
 
       it "when required args are missing, throws exception with same msg as app" do
@@ -152,7 +152,7 @@ module Skylab::Brazen::TestSupport
         rescue Home_::Field_::MissingRequiredAttributes => e
         end
 
-        e.message.should eql "missing required attributes 'foo' and 'bar'"
+        expect( e.message ).to eql "missing required attributes 'foo' and 'bar'"
       end
     end
 

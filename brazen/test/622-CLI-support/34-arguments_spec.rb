@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport
         rescue _cls => e
         end
 
-        e.message.should eql _s
+        expect( e.message ).to eql _s
       end
     end
 

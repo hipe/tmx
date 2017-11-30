@@ -18,7 +18,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "splays" do
-        first_line.should be_line( :styled, :e,
+        expect( first_line ).to be_line( :styled, :e,
           %r(\Aexpecting [^{]+\{ 'compo3' \| 'ope2') )
       end
     end
@@ -38,15 +38,15 @@ module Skylab::Zerk::TestSupport
         _be_this = be_line :e,
           /\bcannot occur immediately after\b.+\(option: "--any-option"\)/
 
-        first_line.should _be_this
+        expect( first_line ).to _be_this
       end
 
       it "full splay" do
-        second_line.should look_like_full_splay_of_( 'compo3', 'ope2' )
+        expect( second_line ).to look_like_full_splay_of_( 'compo3', 'ope2' )
       end
 
       it "stacked argument-specific invite" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -61,7 +61,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "custom emission was expressed" do
-        first_line.should be_line( :styled, :e, %r(\Ahello from ope2 with no\b ))
+        expect( first_line ).to be_line( :styled, :e, %r(\Ahello from ope2 with no\b ))
       end
     end
 
@@ -76,7 +76,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "yay" do
-        first_line.should be_line( :e, "(p2: p2val, p3: p3val)" )
+        expect( first_line ).to be_line( :e, "(p2: p2val, p3: p3val)" )
       end
     end
 

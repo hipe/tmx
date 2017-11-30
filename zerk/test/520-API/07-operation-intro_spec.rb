@@ -16,17 +16,17 @@ module Skylab::Zerk::TestSupport
       it "result is qk" do
 
         qk = root_ACS_result
-        qk.association.name_symbol.should eql :left_number
-        qk.value.should eql 10
+        expect( qk.association.name_symbol ).to eql :left_number
+        expect( qk.value ).to eql 10
       end
 
       it "emits" do
 
         _be_this = be_emission_ending_with set_leaf_component_ do |ev|
-          black_and_white( ev ).should eql "set left number to 10"
+          expect( black_and_white ev ).to eql "set left number to 10"
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -37,13 +37,13 @@ module Skylab::Zerk::TestSupport
       end
 
       it "emits same" do
-        only_emission.should be_emission_ending_with set_leaf_component_
+        expect( only_emission ).to be_emission_ending_with set_leaf_component_
       end
 
       it "result is qk (unknown)" do
         qk = root_ACS_result
         qk.is_known_known and fail
-        qk.association.name_symbol.should eql :right_number
+        expect( qk.association.name_symbol ).to eql :right_number
       end
     end
 
@@ -58,9 +58,12 @@ module Skylab::Zerk::TestSupport
       end
 
       it "emits" do
-        only_emission.should( be_emission_ending_with( :invalid_number ) do |y|
-          y.first.should match %r(\Adidn't .+\(had: "--10"\))
-        end )
+
+        _be_this = be_emission_ending_with :invalid_number do |y|
+          expect( y.first ).to match %r(\Adidn't .+\(had: "--10"\))
+        end
+
+        expect( only_emission ).to _be_this
       end
 
       it "second not written" do
@@ -79,17 +82,20 @@ module Skylab::Zerk::TestSupport
       end
 
       it "emits wrote" do
-        first_emission.should be_emission_ending_with set_leaf_component_
+        expect( first_emission ).to be_emission_ending_with set_leaf_component_
       end
 
       it "emits error" do
-        last_emission.should( be_emission_ending_with( :invalid_number ) do |y|
-          y.first.should match %r(\Adidn't .+\(had: "--11"\))
-        end )
+
+        _be_this = be_emission_ending_with :invalid_number do |y|
+          expect( y.first ).to match %r(\Adidn't .+\(had: "--11"\))
+        end
+
+        expect( last_emission ).to _be_this
       end
 
       it "first REMAINS" do
-        root_ACS.read_left_number_.should eql 10
+        expect( root_ACS.read_left_number_ ).to eql 10
       end
     end
 
@@ -106,11 +112,11 @@ module Skylab::Zerk::TestSupport
       it "emits dedicated event" do
 
         _be_this = be_emission_ending_with past_end_of_phrase_ do |y|
-          y.should eql ["arguments continued passed end of phrase - #{
+          expect( y ).to eql ["arguments continued passed end of phrase - #{
             }unexpected argument: 'right_number'" ]
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
     end
 
@@ -123,7 +129,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "result" do
-        root_ACS_result.should eql 3
+        expect( root_ACS_result ).to eql 3
       end
 
       # (exemplar of [#ac-032]<->[#028] - needs one stream 3 times..)

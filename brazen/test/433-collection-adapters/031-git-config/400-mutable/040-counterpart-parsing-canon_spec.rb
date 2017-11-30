@@ -9,12 +9,12 @@ module Skylab::Brazen::TestSupport
 
     it "the empty string parses" do
       want_no_sections_from EMPTY_S_
-      unparse.should eql EMPTY_S_
+      expect( unparse ).to eql EMPTY_S_
     end
 
     it "one space parses" do
       want_no_sections_from SPACE_
-      unparse.should eql SPACE_
+      expect( unparse ).to eql SPACE_
     end
 
     it "a section parses" do
@@ -57,12 +57,12 @@ module Skylab::Brazen::TestSupport
 
       _x == false || fail
 
-      chan_i_a.should eql [ :error, :config_parse_error ]
+      expect( chan_i_a ).to eql [ :error, :config_parse_error ]
       ev.terminal_channel_symbol == :config_parse_error || fail
-      ev.parse_error_category_symbol.should eql :expected_open_square_bracket
-      ev.lineno.should eql 1
-      ev.column_number.should eql 1
-      ev.line.should eql 'moby'
+      expect( ev.parse_error_category_symbol ).to eql :expected_open_square_bracket
+      expect( ev.lineno ).to eql 1
+      expect( ev.column_number ).to eql 1
+      expect( ev.line ).to eql 'moby'
     end
 
     it "a simple assignment works" do
@@ -84,7 +84,7 @@ module Skylab::Brazen::TestSupport
 
     def want_unparses
       out_s = @document.unparse
-      out_s.should eql @input_string
+      expect( out_s ).to eql @input_string
     end
 
     def unparse

@@ -36,8 +36,8 @@ module Skylab::Brazen::TestSupport
           ev = _tuple.first
           :added_value == ev.terminal_channel_symbol or fail
           ast = ev.new_assignment
-          ast.external_normal_name_symbol.should eql :is_on
-          ast.value.should eql true
+          expect( ast.external_normal_name_symbol ).to eql :is_on
+          expect( ast.value ).to eql true
         end
 
         shared_subject :_tuple do

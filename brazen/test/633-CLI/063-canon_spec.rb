@@ -21,15 +21,15 @@ module Skylab::Brazen::TestSupport
       end
 
       it "line talking bout expecting action" do
-        first_line.should match_ expecting_action_line
+        expect( first_line ).to match_ expecting_action_line
       end
 
       it "usage line (for branch)" do
-        second_line.should match_ branch_usage_line_
+        expect( second_line ).to match_ branch_usage_line_
       end
 
       it "invite line" do
-        last_line.should match_ action_invite_line_
+        expect( last_line ).to match_ action_invite_line_
       end
     end
 
@@ -44,15 +44,15 @@ module Skylab::Brazen::TestSupport
       end
 
       it "unrec action" do
-        first_line.should match_ unrecognized_action :fiffle
+        expect( first_line ).to match_ unrecognized_action :fiffle
       end
 
       it "known actions are" do
-        second_line.should match_ known_actions_are_
+        expect( second_line ).to match_ known_actions_are_
       end
 
       it "invite line" do
-        last_line.should match_ action_invite_line_
+        expect( last_line ).to match_ action_invite_line_
       end
     end
 
@@ -67,15 +67,15 @@ module Skylab::Brazen::TestSupport
       end
 
       it "invalid option (straight from optparse)" do
-        first_line.should match_ invalid_option '-x'
+        expect( first_line ).to match_ invalid_option '-x'
       end
 
       it "invite line" do
-        last_line.should match_ action_invite_line_
+        expect( last_line ).to match_ action_invite_line_
       end
 
       it "only these two lines" do
-        state_.number_of_lines.should eql 2
+        expect( state_.number_of_lines ).to eql 2
       end
     end
 
@@ -91,11 +91,11 @@ module Skylab::Brazen::TestSupport
       end
 
       it "branch usage line" do
-        first_line_of_section( 0 ).should match_ branch_usage_line_
+        expect( first_line_of_section 0 ).to match_ branch_usage_line_
       end
 
       it "branch secondary syntax line" do
-        section_child( 0, 0 ).should match_ branch_secondary_syntax_line_
+        expect( section_child 0, 0 ).to match_ branch_secondary_syntax_line_
       end
 
       it "actions (eek!)" do
@@ -110,7 +110,7 @@ module Skylab::Brazen::TestSupport
       end
 
       it "branch invite line" do
-        only_line_of_section( -1 ).should match_ branch_invite_line_
+        expect( only_line_of_section( -1 ) ).to match_ branch_invite_line_
       end
     end
 

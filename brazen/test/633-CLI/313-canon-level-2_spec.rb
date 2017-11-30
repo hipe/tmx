@@ -118,7 +118,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _invite
-      only_line_of_section( -1 ).should match_ branch_invite_line_
+      expect( only_line_of_section( -1 ) ).to match_ branch_invite_line_
     end
 
     memoize :expected_action_name_string_array_ do

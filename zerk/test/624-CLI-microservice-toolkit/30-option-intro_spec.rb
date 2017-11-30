@@ -12,7 +12,7 @@ module Skylab::Zerk::TestSupport
       it "reflect (ok to remove)" do
 
         _cls = client_class_
-        _cls::Modalities::CLI::Actions.constants.should eql [ :Wen_Kel ]
+        expect( _cls::Modalities::CLI::Actions.constants ).to eql [ :Wen_Kel ]
       end
 
       # here we use [#108] the canonical numbers for CLI input permutations
@@ -22,7 +22,7 @@ module Skylab::Zerk::TestSupport
         invoke 'wen-kel', 'biz'
         want :e, "«biz with {}»"
         want_no_more_lines
-        @exitstatus.should eql :yerp
+        expect( @exitstatus ).to eql :yerp
       end
 
       it "3.4 invoke (good opt)" do
@@ -40,7 +40,7 @@ module Skylab::Zerk::TestSupport
       def _want_same_yuss
         want :e, '«biz with {:ex=>"yuss"}»'
         want_no_more_lines
-        @exitstatus.should eql :yerp
+        expect( @exitstatus ).to eql :yerp
       end
 
       it "3.2 invoke (bad opt)" do
@@ -97,7 +97,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _succeeded
-        state_.exitstatus.should be_zero
+        expect( state_.exitstatus ).to be_zero
       end
 
       def _usage_section

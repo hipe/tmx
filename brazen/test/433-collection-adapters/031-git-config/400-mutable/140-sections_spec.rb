@@ -51,7 +51,7 @@ module Skylab::Brazen::TestSupport
           /\Asubsection names can contain any characters except newline #{
            }\(\(ick "bar\\n"\)\)\z/
 
-        ok.should eql Home_::UNABLE_
+        expect( ok ).to eql Home_::UNABLE_
       end
     end
 
@@ -71,8 +71,8 @@ module Skylab::Brazen::TestSupport
         want_document_content "[foo]\n"
 
         secto_ = touch_section 'foo'
-        secto.should be_respond_to :subsection_string
-        secto_.object_id.should eql secto.object_id
+        expect( secto ).to be_respond_to :subsection_string
+        expect( secto_.object_id ).to eql secto.object_id
       end
 
       it "add a section that comes lexcially after" do

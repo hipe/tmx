@@ -99,7 +99,7 @@ module Skylab::Zerk::TestSupport
 
     def _opt sw, long_plus, unstyled_desc
 
-      ___option_section_index.should have_option( sw, long_plus, unstyled_desc )
+      expect( ___option_section_index ).to have_option( sw, long_plus, unstyled_desc )
     end
 
     shared_subject :___option_section_index do

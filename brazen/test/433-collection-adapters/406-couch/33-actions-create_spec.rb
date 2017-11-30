@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport
       rescue Home_::Field_::MissingRequiredAttributes => e
       end
 
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
 
     it "with no workspace path: mersing required attr: argument error" do
@@ -28,7 +28,7 @@ module Skylab::Brazen::TestSupport
       rescue Home_::Field_::MissingRequiredAttributes => e
       end
 
-      e.message.should match %r(\bmissing required attribute 'workspace-path')
+      expect( e.message ).to match %r(\bmissing required attribute 'workspace-path')
     end
 
     it "with a noent workspace path" do
@@ -60,7 +60,7 @@ module Skylab::Brazen::TestSupport
 
       :workspace_not_found == ev.terminal_channel_symbol or fail
 
-      _em.cached_event_value.to_event.invite_to_action.should eql [ :init ]
+      expect( _em.cached_event_value.to_event.invite_to_action ).to eql [ :init ]
 
       want_fail
     end

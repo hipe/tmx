@@ -44,7 +44,7 @@ module Skylab::Zerk::TestSupport
 
       def _shows_the_buttons_again
 
-        buttonesques.should be_in_any_order_the_buttons_(
+        expect( buttonesques ).to be_in_any_order_the_buttons_(
           'left-number', 'right-number', 'add' )
       end
 

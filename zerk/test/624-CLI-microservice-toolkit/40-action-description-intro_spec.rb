@@ -20,7 +20,7 @@ module Skylab::Zerk::TestSupport
         end
 
         it "succeeds" do
-          state_.exitstatus.should be_zero
+          expect( state_.exitstatus ).to be_zero
         end
 
         it "description section (NOT TIGHT)" do
@@ -29,7 +29,7 @@ module Skylab::Zerk::TestSupport
 
           _act = _.to_string :unstyled
 
-          _act.should eql <<-HERE.unindent
+          expect( _act ).to eql <<-HERE.unindent
             description
               line 1.
               line two.
@@ -43,16 +43,16 @@ module Skylab::Zerk::TestSupport
 
           _act = _.to_body_string :string
 
-          _act.should match %r(\A[ ]+-h, --help[ ]{2,}this screen\n\n\z)
+          expect( _act ).to match %r(\A[ ]+-h, --help[ ]{2,}this screen\n\n\z)
         end
 
         it "argument section" do
 
           t = state_.lookup "argument"
 
-          t.children.length.should eql 1
+          expect( t.children.length ).to eql 1
 
-          t.children.first.x.unstyled_header_content.should eql '<a>'
+          expect( t.children.first.x.unstyled_header_content ).to eql '<a>'
         end
       end
 

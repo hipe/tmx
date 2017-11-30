@@ -225,7 +225,7 @@ module Skylab::Zerk::TestSupport
       # -- exitstatus & derived
 
       def fails
-        exitstatus.should be_nonzero
+        expect( exitstatus ).to be_nonzero
       end
 
       def want_exitstatus_for_referent_not_found_
@@ -234,11 +234,11 @@ module Skylab::Zerk::TestSupport
 
       def want_exitstatus_for k
         _d = Home_::NonInteractiveCLI::Exit_status_for___[ k ]
-        exitstatus.should eql _d
+        expect( exitstatus ).to eql _d
       end
 
       def succeeds
-        exitstatus.should be_zero
+        expect( exitstatus ).to be_zero
       end
 
       def exitstatus

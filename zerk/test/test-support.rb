@@ -225,6 +225,7 @@ module Skylab::Zerk::TestSupport
       want_these_lines_in_array messages, & p
     end
 
+    # :#here3
     def want_these_lines_in_array actual_messages, & p
 
       TestSupport_::Want_these_lines_in_array[ actual_messages, p, self ]
@@ -246,6 +247,11 @@ module Skylab::Zerk::TestSupport
 #==END
 
   # - :#here2
+
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p  # like #here3 but meh
+      TestSupport_::Want_Line::
+          Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    end
 
     def expression_agent_for_CLI
       Expag_for_CLI___[]

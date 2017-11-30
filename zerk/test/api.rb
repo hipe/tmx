@@ -28,7 +28,7 @@ module Skylab::Zerk::TestSupport
       # -- assertions for result
 
       def fails
-        root_ACS_result.should eql Home_::UNABLE_
+        expect( root_ACS_result ).to eql Home_::UNABLE_
       end
 
       def want_trueish_result

@@ -25,7 +25,7 @@ module Skylab::Zerk::TestSupport
         qk = root_ACS_result
         qk.is_known_known or fail
         qk.association.model_classifications.looks_compound or fail
-        qk.value.hello.should eql :_hi_
+        expect( qk.value.hello ).to eql :_hi_
       end
     end
 
@@ -45,10 +45,10 @@ module Skylab::Zerk::TestSupport
           :error, :no_such_association,
         ) do |ev|
           _ = black_and_white ev
-          _.should eql "no such association 'wazoo', expecting 'file_name'"
+          expect( _ ).to eql "no such association 'wazoo', expecting 'file_name'"
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -68,8 +68,8 @@ module Skylab::Zerk::TestSupport
       it "result is a qk about the component" do
         qk = root_ACS_result
         qk.is_known_known or fail
-        qk.value.should eql :_xXx_
-        qk.association.name.as_variegated_symbol.should eql :file_name
+        expect( qk.value ).to eql :_xXx_
+        expect( qk.association.name.as_variegated_symbol ).to eql :file_name
       end
     end
 
@@ -85,11 +85,13 @@ module Skylab::Zerk::TestSupport
 
       it "emits" do
 
-        only_emission.should ( be_emission(
+        _be_this = be_emission(
           :error, :expression, :invalid_value
         ) do |y|
-          y.should eql [ "paths can't be absolute - \"/\"" ]
-        end )
+          expect( y ).to eql [ "paths can't be absolute - \"/\"" ]
+        end
+
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -101,16 +103,18 @@ module Skylab::Zerk::TestSupport
 
       it "value is written" do
         _o = root_ACS
-        _o.read_file_nerm.should eql 'hi'
+        expect( _o.read_file_nerm ).to eql 'hi'
       end
 
       it "event message is suitable for outputting to UI" do
 
-        only_emission.should ( be_emission(
+        _be_this = be_emission(
           :info, :set_leaf_component,
         ) do |ev|
-          black_and_white( ev ).should eql 'set file name to "hi"'
-        end )
+          expect( black_and_white ev ).to eql 'set file name to "hi"'
+        end
+
+        expect( only_emission ).to _be_this
       end
     end
 

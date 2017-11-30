@@ -54,7 +54,7 @@ module Skylab::Zerk::TestSupport
         act_line = act_st.gets
         if act_line
           if exp_line != act_line
-            act_line.should eql exp_line
+            expect( act_line ).to eql exp_line
           end
         else
           fail __say_missing exp_line

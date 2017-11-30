@@ -22,7 +22,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "second line says did you mean" do
-        second_line.should _match_did_you_mean_at_least_N_items 2
+        expect( second_line ).to _match_did_you_mean_at_least_N_items 2
       end
 
       it "no invitation for futher help" do
@@ -41,11 +41,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "first line says unrec *contextualized*" do
-        first_line_content.should eql %(unrecognized node name "x" in 'compo2')
+        expect( first_line_content ).to eql %(unrecognized node name "x" in 'compo2')
       end
 
       it "did you mean (options at that node)" do
-        second_line.should _match_did_you_mean_at_least_N_items 2
+        expect( second_line ).to _match_did_you_mean_at_least_N_items 2
       end
 
       it "no invitation for further help" do
@@ -180,41 +180,41 @@ module Skylab::Zerk::TestSupport
 
       sect = section :usage
       same = 'compo2'
-      sect.should _have_first_usage_line_of same
-      sect.should _have_second_usage_line_of same
+      expect( sect ).to _have_first_usage_line_of same
+      expect( sect ).to _have_second_usage_line_of same
     end
 
     def _jawn_2_upper_desc_is_2
 
-      section( :description ).should be_description_line_of( :styled, 'C2' )
+      expect( section :description ).to be_description_line_of( :styled, 'C2' )
     end
 
     def _jawn_2_lower_desc_is_3
 
-      section( :actions ).should have_item_pair_of( :styled, 'compo3', 'C3' )
+      expect( section :actions ).to have_item_pair_of( :styled, 'compo3', 'C3' )
     end
 
     def _jawn_2_invite_looks_right
 
-      section( :use ).should be_invite_line_of 'compo2'
+      expect( section :use ).to be_invite_line_of 'compo2'
     end
 
     def _jawn_3_usage_lines
 
       sect = section :usage
       same = 'compo2 compo3'
-      sect.should _have_first_usage_line_of same
-      sect.should _have_second_usage_line_of same
+      expect( sect ).to _have_first_usage_line_of same
+      expect( sect ).to _have_second_usage_line_of same
     end
 
     def _jawn_3_upper_desc_is_3
 
-      section( :description ).should be_description_line_of( :styled, 'C3' )
+      expect( section :description ).to be_description_line_of( :styled, 'C3' )
     end
 
     def _jawn_3_invite_looks_right
 
-      section( :use ).should be_invite_line_of 'compo2 compo3'
+      expect( section :use ).to be_invite_line_of 'compo2 compo3'
     end
 
     def _match_did_you_mean_at_least_N_items d

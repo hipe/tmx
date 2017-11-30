@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport
       want_event :ping, 'hello from (app_name_string)'
       want_no_more_events
 
-      @result.should eql :_hello_from_brazen_
+      expect( @result ).to eql :_hello_from_brazen_
     end
 
     it "when provide path=(empty dir) and maxdirs=1, workspace directory is empty" do
@@ -29,7 +29,7 @@ module Skylab::Brazen::TestSupport
 
       em = @result
 
-      em.category.should eql [ :info, :resource_not_found ]
+      expect( em.category ).to eql [ :info, :resource_not_found ]
 
       x = em.emission_value_proc.call
       x and fail
@@ -37,8 +37,8 @@ module Skylab::Brazen::TestSupport
       em = @event_log.gets
       ev = em.cached_event_value.to_event
 
-      ev.num_dirs_looked.should eql 1
-      ev.start_path.should eql @ws_tmpdir.to_path
+      expect( ev.num_dirs_looked ).to eql 1
+      expect( ev.start_path ).to eql @ws_tmpdir.to_path
 
       want_no_more_events
     end
@@ -60,13 +60,13 @@ module Skylab::Brazen::TestSupport
 
       em = @result
 
-      em.category.should eql [ :info, :resource_existed ]
+      expect( em.category ).to eql [ :info, :resource_existed ]
 
       ev = em.emission_value_proc.call
 
       _exp = ::File.join @ws_tmpdir.to_path, cfg_filename
 
-      ev.config_path.should eql _exp
+      expect( ev.config_path ).to eql _exp
 
       want_no_more_events
     end
@@ -97,7 +97,7 @@ module Skylab::Brazen::TestSupport
       want_no_events
 
       em = @result
-      em.category.should eql [ :info, :summary ]
+      expect( em.category ).to eql [ :info, :summary ]
       ev = em.emission_value_proc.call
 
       _expag = black_and_white_expression_agent_for_want_emission

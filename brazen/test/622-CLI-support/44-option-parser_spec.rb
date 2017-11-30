@@ -14,15 +14,15 @@ module Skylab::Brazen::TestSupport
       end
 
       it "if the argv doesn't include it, result is nil" do
-        ( p[ [ 'abc' ] ] ).should eql nil
+        expect( p[ [ 'abc' ] ] ).to eql nil
       end
 
       it "if the argv includes a token that matches it partially, result is index" do
-        ( p[ [ 'abc', '--fo', 'def' ] ] ).should eql 1
+        expect( p[ [ 'abc', '--fo', 'def' ] ] ).to eql 1
       end
 
       it "but it won't do this fuzzy matching in the other direction" do
-        ( p[ [ '--foomer', '-fap', '-f', '--foom' ] ] ).should eql 2
+        expect( p[ [ '--foomer', '-fap', '-f', '--foom' ] ] ).to eql 2
       end
     end
   end

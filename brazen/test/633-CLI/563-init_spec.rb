@@ -26,17 +26,17 @@ module Skylab::Brazen::TestSupport
       it "says inited (sic)" do
 
         _rx = %r(\Ainited workspace: created \./brazen\.conf .+bytes)
-        first_line.should match_ expectation _rx
+        expect( first_line ).to match_ expectation _rx
       end
 
       it "says config filename" do
 
-        second_line.should match_ expectation " config filename: brazen.conf"
+        expect( second_line ).to match_ expectation " config filename: brazen.conf"
       end
 
       it "says surrounding path" do
 
-        last_line.should match_ expectation "surrounding path: ."
+        expect( last_line ).to match_ expectation "surrounding path: ."
       end
     end
 
@@ -54,11 +54,11 @@ module Skylab::Brazen::TestSupport
 
       it "whines" do
         _rx = %r(<path> already has config file - \./#{ ::Regexp.escape cfg_filename })
-        first_line.should match_ expectation( :styled, _rx )
+        expect( first_line ).to match_ expectation( :styled, _rx )
       end
 
       it "not more than 2 lines about this" do
-        ( 1..2 ).should be_include state_.number_of_lines
+        expect( 1..2 ).to be_include state_.number_of_lines
       end
     end
   end

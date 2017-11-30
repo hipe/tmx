@@ -299,9 +299,8 @@ module Skylab::TestSupport
       def want_a_blank_line
 
         scn = stream_for_want_stdout_stderr
-        _x = scn.gets_one
-        self._FIX_NOW
-        _x.string.should eql NEWLINE_
+        _line_o = scn.gets_one
+        NEWLINE_ == _line_o.string || fail
       end
 
       def want_no_more_lines

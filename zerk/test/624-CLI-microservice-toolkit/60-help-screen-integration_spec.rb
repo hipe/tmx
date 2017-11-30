@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "works" do
-        state_.exitstatus.should be_zero
+        expect( state_.exitstatus ).to be_zero
       end
 
       it "usage lines are formatted as `tight`" do
@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
 
         HERE
 
-        state_.lookup( 'usage' ).to_string( :unstyled ).should eql _exp
+        expect( state_.lookup( 'usage' ).to_string :unstyled ).to eql _exp
       end
 
       it "options section header is *plural* (option*s*) and looks right" do
@@ -38,7 +38,7 @@ module Skylab::Zerk::TestSupport
         _t = state_.lookup 'options'
 
         cx = _t.children
-        cx.length.should eql 2
+        expect( cx.length ).to eql 2
 
         # ok so for "fun" and as an exercise we spike out a lot of silliness
         # here to assert that things line up as they should without asserting
@@ -80,8 +80,8 @@ module Skylab::Zerk::TestSupport
         #         --flim[=foo]                 flam.
         #     -h, --help                       this screen
 
-        smry1.col2_index.should eql smry2.col2_index
-        smry1.col3_index.should eql smry2.col3_index
+        expect( smry1.col2_index ).to eql smry2.col2_index
+        expect( smry1.col3_index ).to eql smry2.col3_index
       end
 
       shared_subject :client_class_ do

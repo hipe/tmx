@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
 
         _be_this_line = be_line( :styled, :e, "missing required argument <money>" )
 
-        first_line.should _be_this_line
+        expect( first_line ).to _be_this_line
       end
     end
 
@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "invites about arguments" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -85,7 +85,7 @@ module Skylab::Zerk::TestSupport
         _be_this_line = be_line :o, "(dinner: you have $500 (still!). #{
           }using '_subway_card_' you took subway here.)"
 
-        first_line.should _be_this_line
+        expect( first_line ).to _be_this_line
       end
     end
 

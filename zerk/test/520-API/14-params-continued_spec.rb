@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
 
       it "emits" do
         _be_this = be_emission :info, :expression, :too_low
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "ok" do
-        root_ACS_result.should eql :_yay_
+        expect( root_ACS_result ).to eql :_yay_
       end
     end
 
@@ -41,7 +41,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "the argument uses the glob parameter as it's supposed to" do
-        root_ACS_result.should eql [ :ONE, :TWO ]
+        expect( root_ACS_result ).to eql [ :ONE, :TWO ]
       end
     end
 
@@ -56,11 +56,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "lists the missing argument(s)" do
-        _msg.should match %r(\bmissing required parameter [^[:alnum:]]*action\b)
+        expect( _msg ).to match %r(\bmissing required parameter [^[:alnum:]]*action\b)
       end
 
       it "expresses the fully qualified name of the operation" do
-        _msg.should match %r(\bshoe[^[:alnum:]]+globbie[^[:alnum:]]complex\b)
+        expect( _msg ).to match %r(\bshoe[^[:alnum:]]+globbie[^[:alnum:]]complex\b)
       end
     end
 
@@ -72,7 +72,7 @@ module Skylab::Zerk::TestSupport
 
       it "ok" do
         _x = root_ACS_result
-        _x.should eql [ :_fun_, :A, false, false, EMPTY_A_ ]
+        expect( _x ).to eql [ :_fun_, :A, false, false, EMPTY_A_ ]
       end
     end
 
@@ -86,7 +86,7 @@ module Skylab::Zerk::TestSupport
       it "ok" do
 
         _x = root_ACS_result
-        _x.should eql [ :_fun_, :A, true, :false, [ :a, :b ] ]
+        expect( _x ).to eql [ :_fun_, :A, true, :false, [ :a, :b ] ]
       end
     end
 
@@ -99,7 +99,7 @@ module Skylab::Zerk::TestSupport
 
       it "ok" do
         _x = root_ACS_result
-        _x.should eql [ :_fun_, :A, false, false, [ :a, :b ] ]
+        expect( _x ).to eql [ :_fun_, :A, false, false, [ :a, :b ] ]
       end
     end
 

@@ -27,8 +27,8 @@ module Skylab::Zerk::TestSupport
       it "has button for the plural but not the singluar" do
 
         o = buttonesques
-        o.should have_button_for 'foobizzles'
-        o.should not_have_button_for 'foobizzle'
+        expect( o ).to have_button_for 'foobizzles'
+        expect( o ).to not_have_button_for 'foobizzle'
       end
 
       it "only 'foobizzles' appears in the entity-item table" do

@@ -19,11 +19,13 @@ module Skylab::Zerk::TestSupport
 
       it "message tail enumerates the available items (with glyphs)" do
 
-        only_emission.should ( be_emission_ending_with :no_such_association do |ev|
+        _be_this = be_emission_ending_with :no_such_association do |ev|
 
           _ = black_and_white ev
-          _.should look_like_did_you_mean_for_ %w( subject verb_phrase )
-        end )
+          expect( _ ).to look_like_did_you_mean_for_ %w( subject verb_phrase )
+        end
+
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -37,7 +39,7 @@ module Skylab::Zerk::TestSupport
 
         qk = root_ACS_result
         qk.is_known_known and fail
-        qk.name_symbol.should eql :verb_phrase
+        expect( qk.name_symbol ).to eql :verb_phrase
       end
 
       def event_log
@@ -59,8 +61,8 @@ module Skylab::Zerk::TestSupport
 
         qk = root_ACS_result
         qk.is_known_known or fail
-        qk.name_symbol.should eql :verb_phrase
-        qk.value.should eql :_xXx_
+        expect( qk.name_symbol ).to eql :verb_phrase
+        expect( qk.value ).to eql :_xXx_
       end
 
       def event_log
@@ -80,8 +82,8 @@ module Skylab::Zerk::TestSupport
 
       it "result is the last componet that was set - a primitivesque" do
         qk = root_ACS_result
-        qk.value.should eql 'like'
-        qk.association.name_symbol.should eql :verb
+        expect( qk.value ).to eql 'like'
+        expect( qk.association.name_symbol ).to eql :verb
       end
 
       it "(emits each time a leaf component was set)" do
@@ -91,7 +93,7 @@ module Skylab::Zerk::TestSupport
 
         3.times do
           _ = st.gets
-          _.should be_this_emission
+          expect( _ ).to be_this_emission
         end
         st.gets and fail
       end

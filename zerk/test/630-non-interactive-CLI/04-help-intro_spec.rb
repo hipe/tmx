@@ -11,7 +11,7 @@ module Skylab::Zerk::TestSupport
     it "1.4)   topmost help screen shows desc of op that is in frame 1" do
 
       _rx = %r(^ +wazoozie-foozie +have fun\n)
-      _top_help_screen.section( :actions ).should have_styled_line_matching _rx
+      expect( _top_help_screen.section :actions ).to have_styled_line_matching _rx
     end
 
     context "2.0)   missing a required argument" do
@@ -28,12 +28,12 @@ module Skylab::Zerk::TestSupport
 
         _s = "missing required argument <flim-flam>"
 
-        first_line.should be_line( :styled, :e, _s )
+        expect( first_line ).to be_line( :styled, :e, _s )
       end
 
       it "invite" do
 
-        second_line.should be_invite_with_argument_focus
+        expect( second_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -48,11 +48,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "one styled stderr line (1 req'd besoke, 1 req'd app'd)" do
-        first_line.should be_line( :styled, :e, "hello yiz (nn:ziz)" )
+        expect( first_line ).to be_line( :styled, :e, "hello yiz (nn:ziz)" )
       end
 
       it "the result is written to stdout (covers ints as results)" do
-        last_line.should be_line( :o, '12332' )
+        expect( last_line ).to be_line( :o, '12332' )
       end
     end
 
@@ -95,19 +95,19 @@ module Skylab::Zerk::TestSupport
 
       it "description section is styled, has content" do
 
-        section( :description ).should be_description_line_of( :styled, "have fun" )
+        expect( section :description ).to be_description_line_of( :styled, "have fun" )
       end
 
       it "the arguments section speaks of the bespoke parameter" do
 
         _li = section( :arguments ).line_at_offset 1
-        _li.should be_item_pair( :styled, 'flim-flam', "f.f" )
+        expect( _li ).to be_item_pair( :styled, 'flim-flam', "f.f" )
       end
 
       it "the arguments section speaks of the appropriated parameter" do
 
         _li = section( :arguments ).line_at_offset 2
-        _li.should be_item_pair( :styled, 'nim-nam', "n.n" )
+        expect( _li ).to be_item_pair( :styled, 'nim-nam', "n.n" )
       end
 
       dangerous_memoize :_usage_index do
@@ -119,7 +119,7 @@ module Skylab::Zerk::TestSupport
     it "1.4.B) first help screen shows classic desc of asc in frame 1" do
 
       _rx = %r(^[ ]{2,}fantazzle-dazzle[ ]{2,}yay$)
-      _top_help_screen.section( :actions ).should have_styled_line_matching _rx
+      expect( _top_help_screen.section :actions ).to have_styled_line_matching _rx
     end
 
     it "1.4.C) first help screen shows classic desc of frame 1 itself" do

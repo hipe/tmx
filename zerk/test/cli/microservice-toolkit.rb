@@ -69,7 +69,7 @@ module Skylab::Zerk::TestSupport
 
       _t = state_.lookup k
       _act = _t.to_string :unstyled
-      _act.should eql exp
+      expect( _act ).to eql exp
     end
 
     def want_common_failure_

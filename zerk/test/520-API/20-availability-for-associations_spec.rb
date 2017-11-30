@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
       it "ok" do
         kn = root_ACS_result
         kn.is_known_known and fail
-        kn.association.name_symbol.should eql :upper_color
+        expect( kn.association.name_symbol ).to eql :upper_color
       end
     end
 
@@ -28,7 +28,7 @@ module Skylab::Zerk::TestSupport
 
       it "ok" do
         _o = root_ACS
-        _o.upper_color.should eql :red
+        expect( _o.upper_color ).to eql :red
       end
     end
 
@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "says.." do
-        root_ACS_state.message.should eql _say_this
+        expect( root_ACS_state.message ).to eql _say_this
       end
     end
 
@@ -76,7 +76,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "says.." do
-        root_ACS_state.message.should eql _say_this
+        expect( root_ACS_state.message ).to eql _say_this
       end
     end
 

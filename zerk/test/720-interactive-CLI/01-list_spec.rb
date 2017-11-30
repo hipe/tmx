@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
 
       _against "'"
       _error :unclosed_quote do | y |
-        y.should eql [ 'expecting "\'".' ]
+        expect( y ).to eql [ 'expecting "\'".' ]
       end
     end
 
@@ -85,7 +85,7 @@ module Skylab::Zerk::TestSupport
 
       _against '"a'
       _error :unclosed_quote do | y |
-        y.should eql [ 'expecting "\"".' ]
+        expect( y ).to eql [ 'expecting "\"".' ]
       end
     end
 
@@ -100,7 +100,7 @@ module Skylab::Zerk::TestSupport
       _against input_s
       if @result
         want_no_emissions
-        @result.should eql output_a
+        expect( @result ).to eql output_a
       else
         ___when_had_no_result
       end
@@ -126,7 +126,7 @@ module Skylab::Zerk::TestSupport
       end
 
       if false == @result
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       else
         fail ___say_did_not_fail
       end

@@ -34,7 +34,7 @@ module Skylab::Zerk::TestSupport
            }CLI::NonInteractive::CustomEffecters::#{
             }Wittgenshtein::\( \~ nopeka \))
 
-        _ex.message.should match _rx
+        expect( _ex.message ).to match _rx
       end
     end
 
@@ -46,7 +46,7 @@ module Skylab::Zerk::TestSupport
 
       it "exitstatus is highest value (not last value)" do
 
-        exitstatus.should eql 7
+        expect( exitstatus ).to eql 7
       end
 
       it "the effecters outputted" do

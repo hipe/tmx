@@ -255,7 +255,7 @@ module Skylab::Brazen::TestSupport
       if node.children_count.zero?
         node.x
       else
-        node.children_count.should be_zero
+        expect( node.children_count ).to be_zero
       end
     end
 

@@ -16,14 +16,14 @@ module Skylab::Zerk::TestSupport
 
       it "shows the buttons at the bottom" do
 
-        last_line.should look_like_a_line_of_buttons_
+        expect( last_line ).to look_like_a_line_of_buttons_
       end
 
       it "the button \"hotstrings\" are the shortest they need to be to etc." do
 
-        hotstring_for( 'biz-nappe' ).should eql 'b'
-        hotstring_for( 'fozzer' ).should eql 'fo'
-        hotstring_for( 'fizzie-nizzie' ).should eql 'fi'
+        expect( hotstring_for 'biz-nappe' ).to eql 'b'
+        expect( hotstring_for 'fozzer' ).to eql 'fo'
+        expect( hotstring_for 'fizzie-nizzie' ).to eql 'fi'
       end
     end
 
@@ -34,11 +34,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "exits successfully" do
-        exitstatus_.should be_successful_exitstatus_
+        expect( exitstatus_ ).to be_successful_exitstatus_
       end
 
       it "says goodbye" do
-        last_line.should eql "goodbye."
+        expect( last_line ).to eql "goodbye."
       end
     end
 
@@ -50,23 +50,23 @@ module Skylab::Zerk::TestSupport
 
       it "expresses that it wasn't recognized" do
 
-        first_line.should match_line_for_unrecognized_argument_ 'montauk'
+        expect( first_line ).to match_line_for_unrecognized_argument_ 'montauk'
       end
 
       it "asks \"did you mean?\"" do
 
-        second_line.should eql(
+        expect( second_line ).to eql(
           %(did you mean "fozzer", "fizzie-nizzie" or "biz-nappe"?) )
       end
 
       it "displays the first screen again" do
 
-        buttonesques.should have_button_for 'fozzer'
+        expect( buttonesques ).to have_button_for 'fozzer'
       end
 
       it "ends at first frame" do
 
-        stack.should be_at_frame_number 1
+        expect( stack ).to be_at_frame_number 1
       end
     end
 
@@ -78,13 +78,13 @@ module Skylab::Zerk::TestSupport
 
       it "expresses" do
 
-        first_line.should eql(
+        expect( first_line ).to eql(
           'ambiguous argument "f" - did you mean "fozzer" or "fizzie-nizzie"?' )
       end
 
       it "waits at first frame" do
 
-        stack.should be_at_frame_number 1
+        expect( stack ).to be_at_frame_number 1
       end
     end
 
@@ -96,12 +96,12 @@ module Skylab::Zerk::TestSupport
 
       it "blocks waiting for input (does not end the line)" do
 
-        last_line_not_chomped_.should _be_this_prompt
+        expect( last_line_not_chomped_ ).to _be_this_prompt
       end
 
       it "waits at second frame" do
 
-        stack.should be_at_frame_number 2
+        expect( stack ).to be_at_frame_number 2
       end
     end
 
@@ -113,12 +113,12 @@ module Skylab::Zerk::TestSupport
 
       it "complains of invalid" do
 
-        first_line.should eql 'string must be in all caps (had: "w")'
+        expect( first_line ).to eql 'string must be in all caps (had: "w")'
       end
 
       it "goes back to the same prompt immediately after" do
 
-        last_line.should _be_this_prompt
+        expect( last_line ).to _be_this_prompt
       end
     end
 
@@ -134,7 +134,7 @@ module Skylab::Zerk::TestSupport
 
       it "leaves you at the first frame" do
 
-        stack.should be_at_frame_number 1
+        expect( stack ).to be_at_frame_number 1
       end
     end
 
@@ -146,12 +146,12 @@ module Skylab::Zerk::TestSupport
 
       it "first line confirms that it wrote" do
 
-        first_line.should eql 'set fozzer to "YXW"'
+        expect( first_line ).to eql 'set fozzer to "YXW"'
       end
 
       it "redisplays *all* buttons for first screen" do
 
-        buttonesques.should be_in_any_order_the_buttons_(
+        expect( buttonesques ).to be_in_any_order_the_buttons_(
           'fozzer', 'fizzie-nizzie', 'biz-nappe' )
       end
     end

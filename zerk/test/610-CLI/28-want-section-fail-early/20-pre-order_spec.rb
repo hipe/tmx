@@ -11,21 +11,16 @@ module Skylab::Zerk::TestSupport
 
       _tree = _subject.tree_via :string, _string
 
-      st = _tree.to_pre_order_stream
+      _st = _tree.to_pre_order_stream.map_by do |line_o|
+        line_o.x.string
+      end
 
-      _1 = st.gets
-      _2 = st.gets
-      _3 = st.gets
-      _4 = st.gets
-      _5 = st.gets
-      _6 = st.gets
-
-      _1.x.string.should eql "head\n"
-      _2.x.string.should eql "  mouth\n"
-      _3.x.string.should eql "body\n"
-      _4.x.string.should eql "  leg\n"
-      _5.should be_nil
-      _6.should be_nil
+      want_these_lines_in_array_with_trailing_newlines_ _st do |y|
+        y << 'head'
+        y << '  mouth'
+        y << 'body'
+        y << '  leg'
+      end
     end
 
     memoize :_string do

@@ -9,18 +9,18 @@ module Skylab::Zerk::TestSupport
     it "no lines" do
       _parse <<-O
       O
-      @sections.length.should be_zero
+      expect( @sections.length ).to be_zero
     end
 
     it "one normal line" do
       _parse <<-O  # note we leave the indent just for giggles
         one line to rule them all
       O
-      @sections.length.should eql( 1 )
+      expect( @sections.length ).to eql( 1 )
       sect = @sections[0]
-      sect.header.should eql( nil )
-      sect.lines.length.should eql( 1 )
-      sect.lines[0][1].should eql "        one line to rule them all"
+      expect( sect.header ).to eql( nil )
+      expect( sect.lines.length ).to eql( 1 )
+      expect( sect.lines[0][1] ).to eql "        one line to rule them all"
     end
 
     it "two normal lines" do
@@ -28,11 +28,11 @@ module Skylab::Zerk::TestSupport
         one  two
          three  four  five
       O
-      @sections.length.should eql( 1 )
+      expect( @sections.length ).to eql( 1 )
       sect = @sections[0]
-      sect.lines.length.should eql( 2 )
-      sect.lines.first[1].should eql( 'one  two' )
-      sect.lines.last[1].should eql( ' three  four  five' )
+      expect( sect.lines.length ).to eql( 2 )
+      expect( sect.lines.first[1] ).to eql( 'one  two' )
+      expect( sect.lines.last[1] ).to eql( ' three  four  five' )
     end
 
     it "normal / sect" do
@@ -40,14 +40,14 @@ module Skylab::Zerk::TestSupport
         beefus boqueefus
         nothing:
       O
-      @sections.length.should eql( 2 )
+      expect( @sections.length ).to eql( 2 )
       s1 = @sections[0]
-      s1.header.should eql( nil )
-      s1.lines.length.should eql( 1 )
-      s1.lines[0][1].should eql( 'beefus boqueefus' )
+      expect( s1.header ).to eql( nil )
+      expect( s1.lines.length ).to eql( 1 )
+      expect( s1.lines[0][1] ).to eql( 'beefus boqueefus' )
       s2 = @sections[1]
-      s2.header.should eql( 'nothing:' )
-      s2.lines.length.should eql( 0 )
+      expect( s2.header ).to eql( 'nothing:' )
+      expect( s2.lines.length ).to eql( 0 )
     end
 
     it "sect / normal" do
@@ -55,11 +55,11 @@ module Skylab::Zerk::TestSupport
         some thing:
         bojangles in shangles
       O
-      @sections.length.should eql( 1 )
+      expect( @sections.length ).to eql( 1 )
       sect = @sections[0]
-      sect.header.should eql( 'some thing:' )
-      sect.lines.length.should eql( 1 )
-      sect.lines[0][1].should eql( 'bojangles in shangles' )
+      expect( sect.header ).to eql( 'some thing:' )
+      expect( sect.lines.length ).to eql( 1 )
+      expect( sect.lines[0][1] ).to eql( 'bojangles in shangles' )
     end
 
     it "sect / normal / normal / sect" do
@@ -72,7 +72,7 @@ module Skylab::Zerk::TestSupport
       O
       str = @sections.map { |s| "[<#{ s.header }>(#{
         }#{ s.lines.map(&:last).join ',' })]" }.join
-      str.should eql( '[<s1:>(one,two)][<s2:>(three)]' )
+      expect( str ).to eql( '[<s1:>(one,two)][<s2:>(three)]' )
     end
 
     context "items" do
@@ -81,10 +81,10 @@ module Skylab::Zerk::TestSupport
           bliple:
            meep  beep
         O
-        @sections.length.should eql( 1 )
+        expect( @sections.length ).to eql( 1 )
         sect = @sections[0]
-        sect.lines.length.should eql( 1 )
-        sect.lines.first.should eql( [ :item, 'meep', 'beep' ] )
+        expect( sect.lines.length ).to eql( 1 )
+        expect( sect.lines.first ).to eql( [ :item, 'meep', 'beep' ] )
       end
     end
 
@@ -110,7 +110,7 @@ module Skylab::Zerk::TestSupport
           item |    nagle |
           line |   nimble |
         O
-        act.should eql( exp )
+        expect( act ).to eql( exp )
       end
     end
 

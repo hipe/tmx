@@ -19,10 +19,10 @@ module Skylab::Zerk::TestSupport
         end
 
         _act = hm % -5
-        _act.should eql "++--------"
+        expect( _act ).to eql "++--------"
 
         _act = hm % 5
-        _act.should eql "+++++++---"
+        expect( _act ).to eql "+++++++---"
       end
     end
 

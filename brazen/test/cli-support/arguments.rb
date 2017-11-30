@@ -49,9 +49,9 @@ module Skylab::Brazen::TestSupport
         if x
           x.terminal_channel_symbol == event_channel_sym || fail
           if :missing == event_channel_sym
-            x.property.name_symbol.should eql x_i
+            expect( x.property.name_symbol ).to eql x_i
           else
-            x.x.should eql x_i
+            expect( x.x ).to eql x_i
           end
         else
           fail "expected result, had none"
@@ -60,7 +60,7 @@ module Skylab::Brazen::TestSupport
 
       def want_success_ * x_a
         a = @__normalization.release_result_iambic
-        a.should eql x_a
+        expect( a ).to eql x_a
       end
     end
 

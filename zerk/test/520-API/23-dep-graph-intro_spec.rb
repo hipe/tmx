@@ -20,7 +20,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "message" do
-        message_.should eql "'get-card' is missing required parameter 'money'."
+        expect( message_ ).to eql "'get-card' is missing required parameter 'money'."
       end
     end
 
@@ -42,7 +42,7 @@ module Skylab::Zerk::TestSupport
           _this_message == y.first or fail
         end
 
-        only_emission.should _be_this_emission
+        expect( only_emission ).to _be_this_emission
       end
     end
 
@@ -63,7 +63,7 @@ module Skylab::Zerk::TestSupport
           "insufficient funds: need 5 had 4" == y.fetch( 0 ) or fail
         end
 
-        last_emission.should _be_this_emission
+        expect( last_emission ).to _be_this_emission
       end
     end
 
@@ -78,7 +78,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "(emits)" do
-        only_emission.should be_emission_ending_with :set_leaf_component
+        expect( only_emission ).to be_emission_ending_with :set_leaf_component
       end
     end
 

@@ -12,12 +12,12 @@ module Skylab::Zerk::TestSupport
 
       _be_this = output '(files: ["a1", "a2"])'
 
-      argv( 'as-opts', '-f', 'a1', '-f', 'a2' ).should _be_this
+      expect( argv 'as-opts', '-f', 'a1', '-f', 'a2' ).to _be_this
     end
 
     it "but it non specified, inborn default is there" do
 
-      argv( 'as-opts' ).should output '(files: ["~/defaulto"])'
+      expect( argv 'as-opts' ).to output '(files: ["~/defaulto"])'
     end
 
     # (originally we set out to try to achieve the optional glob argument,

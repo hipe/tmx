@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
       rescue Home_::ACS_::MissingRequiredParameters => e
       end
 
-      e.message.should eql _s
+      expect( e.message ).to eql _s
     end
 
     context "extra args" do
@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "emits (in contrast to counterpart in [ac])" do
-        only_emission.should be_emission_ending_with past_end_of_phrase_
+        expect( only_emission ).to be_emission_ending_with past_end_of_phrase_
       end
     end
 
@@ -43,15 +43,15 @@ module Skylab::Zerk::TestSupport
       it "emits business (cp)" do
 
         _be_this = be_emission_ending_with :k do |y|
-          y.should eql [ '** k. **' ]
+          expect( y ).to eql [ '** k. **' ]
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "results in business (cp)" do
         _x = root_ACS_result
-        _x.should eql [ :_hi_, :_yoohoo_, :_hey_ ]
+        expect( _x ).to eql [ :_hi_, :_yoohoo_, :_hey_ ]
       end
     end
 

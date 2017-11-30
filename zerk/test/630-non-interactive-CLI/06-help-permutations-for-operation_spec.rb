@@ -146,11 +146,11 @@ module Skylab::Zerk::TestSupport
     end
 
     def _jawn_1_first_usage_line
-      section( :usage ).should _have_first_usage_line 'ope1 [-p X]'
+      expect( section :usage ).to _have_first_usage_line 'ope1 [-p X]'
     end
 
     def _jawn_1_first_description_line
-      section( :description ).should be_description_line_of( :styled, 'OPE1' )
+      expect( section :description ).to be_description_line_of( :styled, 'OPE1' )
     end
 
     def _jawn_1_second_description_line
@@ -160,7 +160,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def _jawn_2_first_usage_line
-      section( :usage ).should _have_first_usage_line 'compo2 ope2 [-p X]'
+      expect( section :usage ).to _have_first_usage_line 'compo2 ope2 [-p X]'
     end
 
     def _jawn_1_options_section

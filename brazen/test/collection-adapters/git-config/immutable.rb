@@ -15,14 +15,14 @@ module Skylab::Brazen::TestSupport
         TS_._OOPS
       end
 
-      @document.sections.length.should be_zero
+      expect( @document.sections.length ).to be_zero
     end
 
     def a_section_parses
       with "[sectum]\n"
       want_config do |conf|
-        conf.sections.length.should eql 1
-        conf.sections.first.external_normal_name_symbol.should eql :sectum
+        expect( conf.sections.length ).to eql 1
+        expect( conf.sections.first.external_normal_name_symbol ).to eql :sectum
       end
     end
 
@@ -32,8 +32,8 @@ module Skylab::Brazen::TestSupport
          # commo
       HERE
       want_config do |conf|
-        conf.sections.length.should eql 1
-        conf.sections.first.external_normal_name_symbol.should eql :scto
+        expect( conf.sections.length ).to eql 1
+        expect( conf.sections.first.external_normal_name_symbol ).to eql :scto
       end
     end
 
@@ -46,8 +46,8 @@ module Skylab::Brazen::TestSupport
            ; wazoozle
       HERE
       want_config do |conf|
-        conf.sections.length.should eql 1
-        conf.sections.first.external_normal_name_symbol.should eql :scton
+        expect( conf.sections.length ).to eql 1
+        expect( conf.sections.first.external_normal_name_symbol ).to eql :scton
       end
     end
 
@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
       with '[ -.secto-2014.08 "foo \\" \\\\ " ]'
       want_config do |conf|
         sect = conf.sections.first
-        sect.internal_normal_name_string.should eql '-.secto-2014.08'
+        expect( sect.internal_normal_name_string ).to eql '-.secto-2014.08'
         sect.subsection_string == 'foo " \\ ' || fail
       end
     end
@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport
 
       want_config do |conf|
 
-        conf.sections.map { |x| x.external_normal_name_symbol }.should eql [ :wiz, :wiz ]
+        expect( conf.sections.map { |x| x.external_normal_name_symbol } ).to eql [ :wiz, :wiz ]
       end
     end
 
@@ -88,11 +88,11 @@ module Skylab::Brazen::TestSupport
 
       _x == false || fail
 
-      chan_i_a.should eql [ :error, :config_parse_error ]
-      ev.parse_error_category_symbol.should eql :section_expected
-      ev.lineno.should eql 1
-      ev.column_number.should eql 1
-      ev.line.should eql 'moby'
+      expect( chan_i_a ).to eql [ :error, :config_parse_error ]
+      expect( ev.parse_error_category_symbol ).to eql :section_expected
+      expect( ev.lineno ).to eql 1
+      expect( ev.column_number ).to eql 1
+      expect( ev.line ).to eql 'moby'
     end
 
     def a_simple_assignment_works
@@ -103,8 +103,8 @@ module Skylab::Brazen::TestSupport
       want_config do |conf|
         _sect = conf.sections.dereference :sect
         ast = _sect.assignments.first
-        ast.internal_normal_name_string.should eql 'foo'
-        ast.value.should eql 'bar'
+        expect( ast.internal_normal_name_string ).to eql 'foo'
+        expect( ast.value ).to eql 'bar'
       end
     end
 
@@ -125,11 +125,11 @@ module Skylab::Brazen::TestSupport
         _assmts = conf.sections.dereference( :secto ).assignments
         o = _assmts.method :dereference  # LOOK
 
-        o[ :foo_moMMy ].should eql true
-        o[ :int_not_bool ].should eql 1
-        o[ :multi_word ].should eql 'one two three'
-        o[ :multi_word_with_comment ].should eql 'one two three'
-        o[ :quotes_with_etc ].should eql 'so; you think you can "dance" ? '
+        expect( o[ :foo_moMMy ] ).to eql true
+        expect( o[ :int_not_bool ] ).to eql 1
+        expect( o[ :multi_word ] ).to eql 'one two three'
+        expect( o[ :multi_word_with_comment ] ).to eql 'one two three'
+        expect( o[ :quotes_with_etc ] ).to eql 'so; you think you can "dance" ? '
       end
     end
 

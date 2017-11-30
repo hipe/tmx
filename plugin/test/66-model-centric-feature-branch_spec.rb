@@ -140,7 +140,7 @@ module Skylab::Plugin::TestSupport
       it "reach simple action at level 1" do
 
         _lookup :node_1_action
-        _name_symbol.should eql :node_1_action
+        expect( _name_symbol ).to eql :node_1_action
       end
 
       it "index level one and see total of three nodes" do
@@ -158,19 +158,19 @@ module Skylab::Plugin::TestSupport
       it "reach promoted action at level 1" do
 
         _lookup :node_3_act_3
-        _name_symbol.should eql :node_3_act_3
+        expect( _name_symbol ).to eql :node_3_act_3
       end
 
       it "reach normal deep action at level 2" do
 
         _lookup :node_2_which_is_module, :node_3_act_2
-        _name_symbol.should eql :node_3_act_2
+        expect( _name_symbol ).to eql :node_3_act_2
       end
 
       it "reach branch node at level 1" do
 
         _lookup :node_2_which_is_module
-        _name_symbol.should eql :node_2_which_is_module
+        expect( _name_symbol ).to eql :node_2_which_is_module
       end
 
       dangerous_memoize :_kernel do
@@ -230,7 +230,7 @@ module Skylab::Plugin::TestSupport
         redo
       end while nil
 
-      a.should eql sym_a
+      expect( a ).to eql sym_a
     end
 
     def _lookup_via sym_a

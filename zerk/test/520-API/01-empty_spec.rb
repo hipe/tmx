@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
 
       it "results in a qualified knownness of the root ACS" do
         qk = root_ACS_result
-        qk.value.hello.should eql :_emtpy_guy_
+        expect( qk.value.hello ).to eql :_emtpy_guy_
       end
 
       it "(emits nothing)" do
@@ -41,10 +41,10 @@ module Skylab::Zerk::TestSupport
 
         _be_thing = be_emission_ending_with :no_such_association do |ev|
           _ = black_and_white ev
-          _.should eql "no such association 'something', expecting {}"
+          expect( _ ).to eql "no such association 'something', expecting {}"
         end
 
-        only_emission.should _be_thing
+        expect( only_emission ).to _be_thing
       end
     end
 

@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
         it "qk etc" do
           qk = root_ACS_result
           qk.is_known_known and fail
-          qk.association.name_symbol.should eql :shoestring_length
+          expect( qk.association.name_symbol ).to eql :shoestring_length
         end
       end
 
@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
         end
 
         it "ok" do
-          root_ACS_result.value.should eql 123
+          expect( root_ACS_result.value ).to eql 123
         end
       end
 
@@ -63,7 +63,7 @@ module Skylab::Zerk::TestSupport
             [ "doesn't look like integer: \"98 degrees\"" ]
           end
 
-          only_emission.should _be_this
+          expect( only_emission ).to _be_this
         end
       end
 
@@ -75,11 +75,11 @@ module Skylab::Zerk::TestSupport
 
         it "appears to work" do
           _qk = root_ACS_result
-          _qk.value.should eql 98
+          expect( _qk.value ).to eql 98
         end
 
         it "worked" do
-          root_ACS.get_shoestring_length_.should eql 98
+          expect( root_ACS.get_shoestring_length_ ).to eql 98
         end
       end
     end

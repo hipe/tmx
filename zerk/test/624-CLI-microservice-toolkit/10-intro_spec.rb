@@ -22,7 +22,7 @@ module Skylab::Zerk::TestSupport
         invoke 'yuan-jia', 'hua'
         want :e, "«hua»"
         want_no_more_lines
-        @exitstatus.should eql :wotchaa
+        expect( @exitstatus ).to eql :wotchaa
       end
 
       it "0. no args" do

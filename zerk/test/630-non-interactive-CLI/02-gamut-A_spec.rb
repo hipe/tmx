@@ -18,15 +18,15 @@ module Skylab::Zerk::TestSupport
       end
 
       it "first line" do
-        first_line.should be_line( :styled, :e, "expecting <compound-or-operation>" )
+        expect( first_line ).to be_line( :styled, :e, "expecting <compound-or-operation>" )
       end
 
       it "second line usage" do
-        second_line.should be_stack_sensitive_usage_line
+        expect( second_line ).to be_stack_sensitive_usage_line
       end
 
       it "last line invite" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -41,11 +41,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line_string.should match %r(\Arequest cannot start with optio)
+        expect( first_line_string ).to match %r(\Arequest cannot start with optio)
       end
 
       it "invite" do
-        second_line.should be_invite_with_argument_focus
+        expect( second_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -60,15 +60,15 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line.string.should eql "unrecognized node name \"fuugee\"\n"
+        expect( first_line.string ).to eql "unrecognized node name \"fuugee\"\n"
       end
 
       it "levenschtein (\"did you mean..\")" do
-        second_line.should be_line( :e, %r(\Adid you mean "add") )
+        expect( second_line ).to be_line( :e, %r(\Adid you mean "add") )
       end
 
       it "invite" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -83,12 +83,12 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line_string.should match(
+        expect( first_line_string ).to match(
           %r(\A'left-number' \(a primitivesque\) is not accessed wi) )
       end
 
       it "invite with argument focus" do
-        second_line.should be_invite_with_argument_focus
+        expect( second_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -103,11 +103,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line.should be_line "invalid option: --wotango"
+        expect( first_line ).to be_line "invalid option: --wotango"
       end
 
       it "invites" do
-        second_line.should be_invite_with_option_focus
+        expect( second_line ).to be_invite_with_option_focus
       end
     end
 
@@ -128,7 +128,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "invites" do
-        second_line.should be_invite_with_argument_focus
+        expect( second_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -143,11 +143,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line_string.should match %r(\Aunexpected argument: "three")
+        expect( first_line_string ).to match %r(\Aunexpected argument: "three")
       end
 
       it "invites specifically" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -167,12 +167,12 @@ module Skylab::Zerk::TestSupport
 
         _be_this = match_ expectation( :styled, :e, _msg )
 
-        first_line.should _be_this
+        expect( first_line ).to _be_this
       end
 
       it "invites with argument focus" do
 
-        second_line.should be_invite_with_argument_focus
+        expect( second_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -187,7 +187,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "the number resulted by the op written to STDOUT (*not* e.s)" do
-        only_line.should be_line( :o, "3" )
+        expect( only_line ).to be_line( :o, "3" )
       end
     end
 

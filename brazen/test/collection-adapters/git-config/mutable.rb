@@ -81,7 +81,7 @@ module Skylab::Brazen::TestSupport
 
     def want_document_content expected_string
       _actual_string = __document_content
-      _actual_string.should eql expected_string
+      expect( _actual_string ).to eql expected_string
     end
 
     def want_these_lines_in_array_with_trailing_newlines_ act_s_a, & p
@@ -103,7 +103,7 @@ module Skylab::Brazen::TestSupport
     def want_one_event_ sym
       em = want_event
       ev = em.cached_event_value.to_event
-      ev.terminal_channel_symbol.should eql sym
+      expect( ev.terminal_channel_symbol ).to eql sym
       if block_given?
         yield ev
       end

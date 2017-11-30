@@ -8,7 +8,7 @@ module Skylab::Zerk::TestSupport
     use :my_API
 
     it "shoe model loads" do
-      subject_root_ACS_class.hello.should eql :_omg_shoes_
+      expect( subject_root_ACS_class.hello ).to eql :_omg_shoes_
     end
 
     context "call a strange operation - enumerates avail. ops" do
@@ -26,10 +26,10 @@ module Skylab::Zerk::TestSupport
         _be_this = be_emission_ending_with no_such_association_ do |ev|
 
           _ = black_and_white ev
-          _.should look_like_did_you_mean_for_ %w( lace globbie_guy globbie_complex )
+          expect( _ ).to look_like_did_you_mean_for_ %w( lace globbie_guy globbie_complex )
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -42,7 +42,7 @@ module Skylab::Zerk::TestSupport
       it "results in a qk talkin bout known unknown" do
         qk = root_ACS_result
         qk.is_known_known and fail
-        qk.association.name_symbol.should eql :lace
+        expect( qk.association.name_symbol ).to eql :lace
       end
 
       it 'emits nothing' do
@@ -58,16 +58,16 @@ module Skylab::Zerk::TestSupport
 
       it "results in whatever business result" do
         _x = root_ACS_result
-        _x.should eql 'white'
+        expect( _x ).to eql 'white'
       end
 
       it "emits whatever business emission" do
 
         _be_this = be_emission :info, :expression, :working do |a|
-          a.should eql [ "retrieving ** color **" ]
+          expect( a ).to eql [ "retrieving ** color **" ]
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 

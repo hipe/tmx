@@ -36,8 +36,8 @@ module Skylab::Zerk::TestSupport
         exp_i = exp_i_a.fetch count
         _act_i = farg.name.as_variegated_symbol
         _fdata_i = formal_data_a.fetch( farg.syntax_index ).fetch( 1 )
-        _act_i.should eql exp_i
-        _fdata_i.should eql exp_i
+        expect( _act_i ).to eql exp_i
+        expect( _fdata_i ).to eql exp_i
       end
     end
 
@@ -45,7 +45,7 @@ module Skylab::Zerk::TestSupport
       execute
       @m and fail "had missing expected extra"
       @x or fail "expecting extra but no extra event was issued"
-      @x.s_a.should eql i_a ; nil
+      expect( @x.s_a ).to eql i_a ; nil
     end
 
     def execute
