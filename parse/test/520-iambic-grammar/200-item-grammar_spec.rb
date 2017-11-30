@@ -13,9 +13,9 @@ module Skylab::Parse::TestSupport
       st = _around :tea
 
       _x = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
-      _x.to_a.should eql [ nil, :tea, nil ]
+      expect( _x.to_a ).to eql [ nil, :tea, nil ]
     end
 
     it "plain kw then kw with 1 adj" do
@@ -24,14 +24,14 @@ module Skylab::Parse::TestSupport
 
       _x = st.gets
       sp = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
-      _x.to_a.should eql [ nil, :tea, nil ]
+      expect( _x.to_a ).to eql [ nil, :tea, nil ]
       adj = sp.adj
-      adj[ :hot ].should eql true
-      adj[ :cold ].should be_nil
+      expect( adj[ :hot ] ).to eql true
+      expect( adj[ :cold ] ).to be_nil
 
-      sp.keyword_value_x.should eql :tea
+      expect( sp.keyword_value_x ).to eql :tea
 
     end
 
@@ -40,11 +40,11 @@ module Skylab::Parse::TestSupport
       st = _around :tea, :with, :wazoozle
 
       sp = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
       pp = sp.pp
-      pp.with.should eql :wazoozle
-      pp.and.should be_nil
+      expect( pp.with ).to eql :wazoozle
+      expect( pp.and ).to be_nil
     end
 
     def _around * x_a

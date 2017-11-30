@@ -4,6 +4,8 @@ module Skylab::Tabular::TestSupport
 
   describe "[tab] magnetics - intro and simple" do
 
+    TS_[ self ]
+
     it "here's an example of making a pipeline and then using it" do
 
       pipe = Home_::Pipeline.define do |o|
@@ -15,11 +17,15 @@ module Skylab::Tabular::TestSupport
       _tu_st = Home_::Common_::Stream.via_nonsparse_array(
         [ %w( Food Drink ), %w( donuts coffee ) ] )
 
-      st = pipe.call _tu_st
+      _st = pipe.call _tu_st
 
-      st.gets.should eql "|   Food  |   Drink |"
-      st.gets.should eql "| donuts  |  coffee |"
-      st.gets.should eql nil
+      want_these_lines_in_array_ _st do |y|
+        y << '|   Food  |   Drink |'
+        y << '| donuts  |  coffee |'
+      end
     end
+
+    # ==
+    # ==
   end
 end

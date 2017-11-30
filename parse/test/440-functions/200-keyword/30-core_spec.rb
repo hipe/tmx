@@ -13,22 +13,22 @@ module Skylab::Parse::TestSupport
 
     it "won't match if number of chars is under the minimum" do
 
-      _subject[ 'f' ].should be_nil
+      expect( _subject[ 'f' ] ).to be_nil
     end
 
     it "will match if number of chars is at the minimum" do
 
-      _subject[ 'foo' ].should eql true
+      expect( _subject[ 'foo' ] ).to eql true
     end
 
     it "will match if number of characers is over the minimum" do
 
-      _subject[ 'foob' ].should eql true
+      expect( _subject[ 'foob' ] ).to eql true
     end
 
     it "won't match if whole string does not match" do
 
-      _subject[ 'foobie-doobie' ].should be_nil
+      expect( _subject[ 'foobie-doobie' ] ).to be_nil
     end
 
     alias_method :_subject, :subject_parse_function_

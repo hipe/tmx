@@ -20,11 +20,11 @@ module Skylab::Parse::TestSupport
       end
 
       it "the output node has the winning value" do
-        on.value.should eql :B
+        expect( on.value ).to eql :B
       end
 
       it "the output node reports the index of the winning node" do
-        on.constituent_index.should eql 1
+        expect( on.constituent_index ).to eql 1
       end
     end
 
@@ -41,18 +41,18 @@ module Skylab::Parse::TestSupport
       end
 
       it "and call it in another" do
-        ( p[ :a ].value ).should eql :A
+        expect( ( p[ :a ].value ) ).to eql :A
       end
 
       it "and another" do
-        ( p[ :b ].value ).should eql :B
-        ( p[ :c ] ).should eql nil
+        expect( ( p[ :b ].value ) ).to eql :B
+        expect( ( p[ :c ] ) ).to eql nil
       end
     end
 
     it "in the minimal case, the empty parser always results in nil" do
       g = Home_.function( :alternation ).with :functions
-      g.output_node_via_single_token_value( :bizzie ).should eql nil
+      expect( g.output_node_via_single_token_value( :bizzie ) ).to eql nil
     end
 
     context "maintaining parse state (artibrary extra arguments)" do
@@ -71,19 +71,19 @@ module Skylab::Parse::TestSupport
       end
 
       it "parses none" do
-        ( p[ :will, :not, :parse ] ).should eql nil
+        expect( ( p[ :will, :not, :parse ] ) ).to eql nil
       end
 
       it "parses one" do
-        ( p[ :one ].value ).should eql :is_one
+        expect( ( p[ :one ].value ) ).to eql :is_one
       end
 
       it "parses two" do
-        ( p[ :two ].constituent_index ).should eql 1
+        expect( ( p[ :two ].constituent_index ) ).to eql 1
       end
 
       it "but it won't parse two after one" do
-        ( p[ :one, :two ] ).should eql nil
+        expect( ( p[ :one, :two ] ) ).to eql nil
       end
     end
   end

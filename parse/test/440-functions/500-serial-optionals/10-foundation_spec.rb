@@ -23,7 +23,7 @@ describe "[pa] fuctions - serial optionals - foundation" do
     end
 
     it "built thing is a stream parser (_parse a full normal input)" do
-      against_( 'rando', '2' ).value.should eql [ :randomize, 2 ]
+      expect( against_( 'rando', '2' ).value ).to eql [ :randomize, 2 ]
     end
   end
 
@@ -33,8 +33,8 @@ describe "[pa] fuctions - serial optionals - foundation" do
       -> x { :A == x and :foo },
       -> x { :B == x and :bar }
 
-    is_A.should be_nil
-    is_B.should eql :B
+    expect( is_A ).to be_nil
+    expect( is_B ).to eql :B
 
   end
 
@@ -61,24 +61,24 @@ describe "[pa] fuctions - serial optionals - foundation" do
       _formal_symbols :sex
 
       it "against zero input tokens - is OK" do
-        _parse.should eql [ nil ]
+        expect( _parse ).to eql [ nil ]
       end
 
       it "against one valid input token" do
-        _parse( :m ).should eql [ :m ]
+        expect( _parse :m ).to eql [ :m ]
       end
 
       it "against one invalid input token - no" do
         _rx = /\bunrecognized argument "blah"/
-        -> do
+        expect( -> do
           _parse 'blah'
-        end.should raise_error( ::ArgumentError, _rx )
+        end ).to raise_error( ::ArgumentError, _rx )
       end
 
       it "if there is more than one (albeit valid) input tokens - no" do
-        -> do
+        expect( -> do
           _parse :m, :f
-        end.should raise_error( ::ArgumentError, /unrecognized argument 'f'/ )
+        end ).to raise_error( ::ArgumentError, /unrecognized argument 'f'/ )
       end
     end
 
@@ -87,25 +87,25 @@ describe "[pa] fuctions - serial optionals - foundation" do
       _formal_symbols :age, :sex
 
       it "against zero input tokens - is OK" do
-        _parse.should eql [ nil, nil ]
+        expect( _parse ).to eql [ nil, nil ]
       end
 
       it "against a valid input token (that is a production of the 1st formal symbol)" do
-        _parse( 12 ).should eql [ 12, nil ]
+        expect( _parse 12 ).to eql [ 12, nil ]
       end
 
       it "against a valid input token (that is a production of the 2nd formal symbol)" do
-        _parse( :m ).should eql [ nil, :m ]
+        expect( _parse :m ).to eql [ nil, :m ]
       end
 
       it "against two valid input tokens (of the first then second formal symbols)" do
-        _parse( 12, :m ).should eql [ 12, :m ]
+        expect( _parse 12, :m ).to eql [ 12, :m ]
       end
 
       it "if the \"valid\" input tokens are in the wrong order - no" do
-        -> do
+        expect( -> do
           _parse :m, 12
-        end.should raise_error( ::ArgumentError, /unrecognized argument 12/ )
+        end ).to raise_error( ::ArgumentError, /unrecognized argument 12/ )
       end
     end
   end

@@ -18,71 +18,71 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( bilbo baggins daggins waggins )
 
-        _go( in_st ).value.should eql :__bilbo_baggins__
+        expect( _go( in_st ).value ).to eql :__bilbo_baggins__
 
-        in_st.current_index.should eql 2
+        expect( in_st.current_index ).to eql 2
       end
 
       it "with no input, event that describes it as the end of the input" do
 
         in_st = the_empty_input_stream
 
-        _go( in_st, & handle_event_selectively_ ).should eql false
+        expect( _go in_st, & handle_event_selectively_ ).to eql false
 
         _ev = _want_common_event
-        black_and_white( _ev ).should eql( _at_end_expecting 'frodo', 'bilbo' )
+        expect( black_and_white _ev ).to eql( _at_end_expecting 'frodo', 'bilbo' )
       end
 
       it "with input whose head matches multiple items but only fully matches one" do
 
         in_st = input_stream_via_array %w( bilbo dazoink )
 
-        _go( in_st, & handle_event_selectively_ ).value.should eql :__bilbo__
+        expect( _go( in_st, & handle_event_selectively_ ).value ).to eql :__bilbo__
 
-        in_st.current_index.should eql 1
+        expect( in_st.current_index ).to eql 1
       end
 
       it "a partial match gets you nothing (strange token)" do
 
         in_st = input_stream_via_array %w( frodo nodo )
 
-        _go( in_st, & handle_event_selectively_ ).should eql false
+        expect( _go( in_st, & handle_event_selectively_ ) ).to eql false
 
         ev = _want_common_event
 
-        black_and_white( ev ).should eql(
+        expect( black_and_white( ev ) ).to eql(
           "#{ _uninterpretable 'nodo' }#{ _expecting 'baggins' }" )
 
-        ev.token.should eql 'nodo'
+        expect( ev.token ).to eql 'nodo'
         a = ev.item_stream_proc.call.to_a
-        a.length.should eql 1
-        a.first.value.should eql :__frodo_baggins__
+        expect( a.length ).to eql 1
+        expect( a.first.value ).to eql :__frodo_baggins__
 
-        in_st.current_index.should eql 0
+        expect( in_st.current_index ).to eql 0
       end
 
       it "a partial match gets you nothing (end of input)" do
 
         in_st = input_stream_via_array %w( frodo )
 
-        _go( in_st, & handle_event_selectively_ ).should eql false
+        expect( _go( in_st, & handle_event_selectively_ ) ).to eql false
 
-        black_and_white( _want_common_event ).should eql(
+        expect( black_and_white _want_common_event ).to eql(
           _at_end_expecting 'baggins' )
 
-        in_st.current_index.should be_zero
+        expect( in_st.current_index ).to be_zero
       end
 
       it "a strange token at the beginning" do
 
         in_st = input_stream_via_array %w( nodo )
 
-        _go( in_st, & handle_event_selectively_ ).should eql false
+        expect( _go( in_st, & handle_event_selectively_ ) ).to eql false
 
-        black_and_white( _want_common_event ).should eql(
+        expect( black_and_white( _want_common_event ) ).to eql(
           "#{ _uninterpretable 'nodo' }#{ _expecting 'frodo', 'bilbo' }" )
 
-        in_st.current_index.should be_zero
+        expect( in_st.current_index ).to be_zero
       end
 
       memoize_ :_subject_f do
@@ -105,9 +105,9 @@ module Skylab::Parse::TestSupport
 
         in_st.advance_one
 
-        _go( in_st ).value.should eql :__elizabeth_keen_tom_keen__
+        expect( _go( in_st ).value ).to eql :__elizabeth_keen_tom_keen__
 
-        in_st.current_index.should eql 5
+        expect( in_st.current_index ).to eql 5
       end
 
       memoize_ :_subject_f do
@@ -125,10 +125,9 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( xx yy )
 
-        _go( in_st, & handle_event_selectively_ ).value.should(
-          eql :__xx_yy__ )
+        expect( _go( in_st, & handle_event_selectively_ ).value ).to eql :__xx_yy__
 
-        in_st.current_index.should eql 2
+        expect( in_st.current_index ).to eql 2
       end
 
       memoize_ :_subject_f do
@@ -146,7 +145,7 @@ module Skylab::Parse::TestSupport
 
       _st = _o.instance_variable_get( :@item_stream_proc ).call
 
-      _st.gets.value.should eql :__a_b__
+      expect( _st.gets.value ).to eql :__a_b__
     end
 
     def _go in_st, & x_p

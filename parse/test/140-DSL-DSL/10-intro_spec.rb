@@ -25,7 +25,7 @@ module Skylab::Parse::TestSupport
       end
 
       it "you can read this value on the pertinent classes with `wiz_value`" do
-        X_dd_c_Foo::Bar.wiz_value.should eql :piz
+        expect( X_dd_c_Foo::Bar.wiz_value ).to eql :piz
       end
 
       it "these setter module methods are by default private" do
@@ -36,11 +36,11 @@ module Skylab::Parse::TestSupport
         rescue NoMethodError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
 
       it "you get a public instance getter of the same name (no `_value` suffix)" do
-        X_dd_c_Foo::Bar.new.wiz.should eql :piz
+        expect( X_dd_c_Foo::Bar.new.wiz ).to eql :piz
       end
     end
 
@@ -65,8 +65,8 @@ module Skylab::Parse::TestSupport
 
       it "you must use `zinger.call` on the instance" do
         bar = X_dd_c_Fob::Bar.new
-        bar.zinger.call.should eql 1
-        bar.zinger.call.should eql 2
+        expect( bar.zinger.call ).to eql 1
+        expect( bar.zinger.call ).to eql 2
       end
     end
 
@@ -83,7 +83,7 @@ module Skylab::Parse::TestSupport
       it "in the instance you can write to the field in the same DSL-y way" do
         foo = X_dd_c_Foc.new
         foo.with_name :x
-        foo.with_name.should eql :x
+        expect( foo.with_name ).to eql :x
       end
     end
 
@@ -106,8 +106,8 @@ module Skylab::Parse::TestSupport
       end
 
       it "then you can enhance a class with your module with the above two steps" do
-        X_dd_c_Fod::Bar.pik_value.should eql :nic
-        X_dd_c_Fod::Bar.new.pik.should eql :nic
+        expect( X_dd_c_Fod::Bar.pik_value ).to eql :nic
+        expect( X_dd_c_Fod::Bar.new.pik ).to eql :nic
       end
     end
   end

@@ -20,26 +20,26 @@ module Skylab::Parse::TestSupport
 
     it "strange token - nil argv is left alone" do
       argv = %w( strange )
-      _against( argv ).should be_nil
-      argv.length.should eql 1
+      expect( _against( argv ) ).to be_nil
+      expect( argv.length ).to eql 1
     end
 
     it "strange token blocks parsing of subsequent recognized tokens" do
       argv = [ 'strange', '-h' ]
-      _against( argv ).should be_nil
-      argv.length.should eql 2
+      expect( _against( argv ) ).to be_nil
+      expect( argv.length ).to eql 2
     end
 
     it "one recognized token then one strange - parses and consumes" do
       argv = [ '-h', 'strange' ]
-      _against( argv ).value.should eql :do_help
-      argv.should eql [ 'strange' ]
+      expect( _against( argv ).value ).to eql :do_help
+      expect( argv ).to eql [ 'strange' ]
     end
 
     it "two recognizables - only parses first b.c is a branch" do
       argv = [ 'server', '-h' ]
-      _against( argv ).value.should eql :server
-      argv.should eql [ '-h' ]
+      expect( _against( argv ).value ).to eql :server
+      expect( argv ).to eql [ '-h' ]
     end
 
     def _against argv

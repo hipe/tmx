@@ -16,9 +16,9 @@ module Skylab::Parse::TestSupport
         -> s { /\A[mf]\z/i =~ s },
         -> l { /./ =~ l }
 
-      age.should eql '30'
-      sex.should eql nil
-      loc.should eql 'brisbane'
+      expect( age ).to eql '30'
+      expect( sex ).to eql nil
+      expect( loc ).to eql 'brisbane'
     end
 
     context "currying can make your code more readable and may improve performance" do
@@ -40,19 +40,19 @@ module Skylab::Parse::TestSupport
       end
 
       it "full normal case (works to match each of the three terms)." do
-        ( p[ [ '30', 'male', "Mom's basement" ] ] ).should eql [ '30', 'male', "Mom's basement" ]
+        expect( p[ [ '30', 'male', "Mom's basement" ] ] ).to eql [ '30', 'male', "Mom's basement" ]
       end
 
       it "one valid input token will match any first matching formal symbol found" do
-        ( p[ [ '30' ] ] ).should eql [ '30', nil, nil ]
+        expect( p[ [ '30' ] ] ).to eql [ '30', nil, nil ]
       end
 
       it "successful result is always array as long as number of formal symbols" do
-        ( p[ [ "Mom's basement" ] ] ).should eql [ nil, nil, "Mom's basement" ]
+        expect( p[ [ "Mom's basement" ] ] ).to eql [ nil, nil, "Mom's basement" ]
       end
 
       it "ergo an earlier matching formal symbol will always win over a later one" do
-        ( p[ [ 'M' ] ] ).should eql [ nil, 'M', nil ]
+        expect( p[ [ 'M' ] ] ).to eql [ nil, 'M', nil ]
       end
 
       it "because we have that 'fully' suffix, we raise argument errors" do
@@ -65,7 +65,7 @@ module Skylab::Parse::TestSupport
         rescue ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
     end
 
@@ -97,15 +97,15 @@ module Skylab::Parse::TestSupport
       end
 
       it "if it's an integer, it matches the first pattern" do
-        ( p[ [ "8"   ] ] ).should eql [ 8,  nil  ]
+        expect( ( p[ [ "8"   ] ] ) ).to eql [ 8,  nil  ]
       end
 
       it "but if it's a float, it matches the second pattern" do
-        ( p[ [ "8.1" ] ] ).should eql [ nil, 8.1 ]
+        expect( ( p[ [ "8.1" ] ] ) ).to eql [ nil, 8.1 ]
       end
 
       it "still falls into the float \"slot\"" do
-        ( p[ [ "8", "9" ] ] ).should eql [ 8, 9.0 ]
+        expect( ( p[ [ "8", "9" ] ] ) ).to eql [ 8, 9.0 ]
       end
 
       it "but the converse is not true; i.e you can't have two floats" do
@@ -117,7 +117,7 @@ module Skylab::Parse::TestSupport
         rescue ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
     end
   end

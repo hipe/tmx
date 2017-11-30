@@ -47,6 +47,10 @@ module Skylab::Tabular::TestSupport
 
   module InstanceMethods___
 
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
+    end
+
     def ignore_emissions_whose_terminal_channel_is_in_this_hash
       NOTHING_
     end

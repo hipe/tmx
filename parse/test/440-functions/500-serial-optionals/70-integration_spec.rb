@@ -26,12 +26,12 @@ module Skylab::Parse::TestSupport
     end
 
     it "render the syntax string with the default design" do
-      G.express_all_segments_into_under( "" ).should eql "[INTEGER] [random]"
+      expect( G.express_all_segments_into_under "" ).to eql "[INTEGER] [random]"
     end
 
     it "render the syntax string with a custom design" do
 
-      G.express_all_segments_into_under( "",
+      _x = G.express_all_segments_into_under( "",
 
         :any_first_constituent_string, IDENTITY_,
 
@@ -51,55 +51,90 @@ module Skylab::Parse::TestSupport
             f.express_all_segments_into_under y, expag
           end
           nil
-        end ).should eql '[ <integer> ] [ random ]'
+        end,
+      )
+
+      expect( _x ).to eql '[ <integer> ] [ random ]'
     end
 
     it "against the empty array, does nothing" do
       _against
-      @int.should be_nil
-      @kw.should be_nil
-      @did_parse.should eql false
-      @is_complete.should eql true
+      _int_nil
+      _keyword_nil
+      _did_not_parse
+      _is_complete
     end
 
     it "against one strange string, does not against" do
       _against 'frinkle'
-      @int.should be_nil
-      @kw.should be_nil
-      @did_parse.should eql false
-      @is_complete.should eql false
+      _int_nil
+      _keyword_nil
+      _did_not_parse
+      _is_not_complete
     end
 
     it "good first token, strange second one" do
       _against '3', 'frinkle'
-      @int.should eql 3
-      @kw.should be_nil
-      @did_parse.should eql true
-      @is_complete.should eql false
+      _int 3
+      _keyword_nil
+      _did_parse
+      _is_not_complete
     end
 
     it "two good tokens" do
       _against '3', 'random'
-      @int.should eql 3
-      @kw.should eql :random
-      @did_parse.should eql true
-      @is_complete.should eql true
+      _int 3
+      _keyword_random
+      _did_parse
+      _is_complete
     end
 
     it "only one token - a production of the first formal symbol" do
       _against '3'
-      @int.should eql 3
-      @kw.should be_nil
-      @did_parse.should eql true
-      @is_complete.should eql true
+      _int 3
+      _keyword_nil
+      _did_parse
+      _is_complete
     end
 
     it "only one token - *the* production of the second formal symbol" do
       _against 'random'
-      @int.should be_nil
-      @kw.should eql :random
-      @did_parse.should eql true
-      @is_complete.should eql true
+      _int_nil
+      _keyword_random
+      _did_parse
+      _is_complete
+    end
+
+    def _did_not_parse
+      expect( @did_parse ).to eql false
+    end
+
+    def _did_parse
+      expect( @did_parse ).to eql true
+    end
+
+    def _is_not_complete
+      expect( @is_complete ).to eql false
+    end
+
+    def _is_complete
+      expect( @is_complete ).to eql true
+    end
+
+    def _int_nil
+      expect( @int ).to be_nil
+    end
+
+    def _int d
+      expect( @int ).to eql d
+    end
+
+    def _keyword_random
+      expect( @kw ).to eql :random
+    end
+
+    def _keyword_nil
+      expect( @kw ).to be_nil
     end
 
     def _against * s_a
@@ -123,3 +158,5 @@ module Skylab::Parse::TestSupport
   # ->
   end
 end
+# #history-A.1: when eradicating `should`, left old asserts as-is plus refactor
+#  (as opposed to doing what we do these days) for the big test

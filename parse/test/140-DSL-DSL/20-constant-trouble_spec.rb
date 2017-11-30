@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test-support'
 
 module Skylab::Parse::TestSupport
@@ -56,37 +58,35 @@ module Skylab::Parse::TestSupport
 
       it "first thing's first, with an object, access the values" do
         o = M1::Yours::Blammo_.new
-        o.hip_hop.should eql( :family_fun )
-        o.horay.should eql( 'HARAY.' )  # note it normalizes them - whether
+        expect( o.hip_hop ).to eql :family_fun
+        expect( o.horay ).to eql 'HARAY.'  # note it normalizes them - whether
         # you set it with a proc or a literal, you get the endvalue here.
       end
 
       it "also, access the underlying constants. note suffixes." do
-        ( ::Proc === M1::Yours::Blammo_::HIP_HOP_PROC_ ).should eql( true )
-        M1::Yours::Blammo_.const_defined?( :HIP_HIP_VALUE_, false ).
-          should eql( false )
-        M1::Yours::Blammo_::HORAY_VALUE_.should eql( 'HARAY.' )
-        M1::Yours::Blammo_.const_defined?( :HORAY_PROC_, false ).
-          should eql( false )
+        expect( ::Proc === M1::Yours::Blammo_::HIP_HOP_PROC_ ).to eql true
+        expect( M1::Yours::Blammo_.const_defined? :HIP_HIP_VALUE_, false ).to eql false
+        expect( M1::Yours::Blammo_::HORAY_VALUE_ ).to eql 'HARAY.'
+        expect( M1::Yours::Blammo_.const_defined? :HORAY_PROC_, false ).to eql false
       end
 
       it "you can change the values (either) in the instance with `foo=`" do
         foo = M1::Yours::Blammo_.new
         foo.hip_hop = :klezmer
-        foo.hip_hop.should eql( :klezmer )
+        expect( foo.hip_hop ).to eql :klezmer
         foo.hip_hop = :polka
-        foo.hip_hop.should eql( :polka )
+        expect( foo.hip_hop ).to eql :polka
         foo.horay = :x
-        foo.horay.should eql( :x )
+        expect( foo.horay ).to eql :x
         foo.horay = :y
-        foo.horay.should eql( :y )
+        expect( foo.horay ).to eql :y
       end
 
       it "you can change the value in the instance with `set_foo_proc`" do
         foo = M1::Yours::Blammo_.new
-        foo.horay.should eql( 'HARAY.' )
+        expect( foo.horay ).to eql 'HARAY.'
         foo.set_horay_proc -> { :zing }
-        foo.horay.should eql( :zing )
+        expect( foo.horay ).to eql :zing
       end
     end
 
@@ -114,15 +114,15 @@ module Skylab::Parse::TestSupport
 
       it "like so." do
         y = M2::Yours::Bongo_.new
-        y.wiptastik.call.should eql( :hi )
-        y.plastik.should eql( :hey )
+        expect( y.wiptastik.call ).to eql :hi
+        expect( y.plastik ).to eql :hey
       end
 
       it "and still you can set them (but you can't go back.)" do
         y = M2::Yours::Bongo_.new
-        y.plastik.should eql( :hey )
+        expect( y.plastik ).to eql :hey
         y.plastik = :sure
-        y.plastik.should eql( :sure )
+        expect( y.plastik ).to eql :sure
       end
     end
   end

@@ -11,11 +11,11 @@ module Skylab::Parse::TestSupport
       end
 
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
-        ( X_f_sp_None[ EMPTY_A_ ] ).should eql nil
+        expect( ( X_f_sp_None[ EMPTY_A_ ] ) ).to eql nil
       end
 
       it "even if the input is rando calrissian" do
-        ( X_f_sp_None[ :hi_mom ] ).should eql nil
+        expect( ( X_f_sp_None[ :hi_mom ] ) ).to eql nil
       end
     end
 
@@ -32,7 +32,7 @@ module Skylab::Parse::TestSupport
 
       it "is always the same output node" do
         on = X_f_sp_One[ :whatever ]
-        on.function_is_spent.should eql true
+        expect( on.function_is_spent ).to eql true
       end
     end
 
@@ -48,7 +48,7 @@ module Skylab::Parse::TestSupport
       end
 
       it "never parses" do
-        ( X_f_sp_Spendless[ :whatever ] ).should eql nil
+        expect( ( X_f_sp_Spendless[ :whatever ] ) ).to eql nil
       end
     end
 
@@ -74,55 +74,55 @@ module Skylab::Parse::TestSupport
       end
 
       it "does nothing with nothing" do
-        ( X_f_sp_Digits[ EMPTY_A_ ] ).should eql nil
+        expect( ( X_f_sp_Digits[ EMPTY_A_ ] ) ).to eql nil
       end
 
       it "parses one digit" do
         argv = [ '1' ]
         on = X_f_sp_Digits[ argv ]
-        argv.length.should eql 0
-        on.function_is_spent.should eql false
+        expect( argv.length ).to eql 0
+        expect( on.function_is_spent ).to eql false
         kw, k2, digits = on.value
-        ( kw || k2 ).should eql nil
-        digits.should eql [ 1 ]
+        expect( ( kw || k2 ) ).to eql nil
+        expect( digits ).to eql [ 1 ]
       end
 
       it "parses two digits" do
         argv = %w( 2 3 )
         on = X_f_sp_Digits[ argv ]
-        on.function_is_spent.should eql false
-        on.value.should eql [ nil, nil, [ 2, 3 ] ]
+        expect( on.function_is_spent ).to eql false
+        expect( on.value ).to eql [ nil, nil, [ 2, 3 ] ]
       end
 
       it "parses one keyword" do
         argv = [ 'bar' ]
         on = X_f_sp_Digits[ argv ]
-        on.function_is_spent.should eql false
-        on.value.should eql [ nil, [:bar], nil ]
+        expect( on.function_is_spent ).to eql false
+        expect( on.value ).to eql [ nil, [:bar], nil ]
       end
 
       it "parses two keywords (in reverse grammar order)" do
         argv = %w( bar foo )
         on = X_f_sp_Digits[ argv ]
-        argv.length.should eql 0
-        on.function_is_spent.should eql false
-        on.value.should eql [ [:foo], [:bar], nil ]
+        expect( argv.length ).to eql 0
+        expect( on.function_is_spent ).to eql false
+        expect( on.value ).to eql [ [:foo], [:bar], nil ]
       end
 
       it "will not parse multiple of same keyword" do
         argv = %w( foo foo )
         on = X_f_sp_Digits[ argv ]
-        argv.should eql %w( foo )
-        on.function_is_spent.should eql false
-        on.value.should eql [ [ :foo ], nil, nil ]
+        expect( argv ).to eql %w( foo )
+        expect( on.function_is_spent ).to eql false
+        expect( on.value ).to eql [ [ :foo ], nil, nil ]
       end
 
       it "will stop at first non-parsable" do
         argv = [ '1', 'foo', '2', 'biz', 'bar' ]
         on = X_f_sp_Digits[ argv ]
-        on.function_is_spent.should eql false
-        argv.should eql [ 'biz', 'bar' ]
-        on.value.should eql [ [ :foo ], nil, [ 1, 2 ] ]
+        expect( on.function_is_spent ).to eql false
+        expect( argv ).to eql [ 'biz', 'bar' ]
+        expect( on.value ).to eql [ [ :foo ], nil, [ 1, 2 ] ]
       end
     end
   end

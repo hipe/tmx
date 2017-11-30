@@ -26,23 +26,23 @@ module Skylab::Parse::TestSupport
       it "result array is in order of \"grammar\", not of elements in argv" do
         argv = [ :hi, 'BILLY', 'bob' ]
         one, two = X_f_sp_SP.parse_and_mutate_array argv
-        one.should eql 'BILLY'
-        two.should eql :hello
-        argv.should eql [ 'bob' ]
+        expect( one ).to eql 'BILLY'
+        expect( two ).to eql :hello
+        expect( argv ).to eql [ 'bob' ]
       end
 
       it "cannot fail (if arguments have the right shape)" do
         argv = [ :nope ]
         res = X_f_sp_SP.parse_and_mutate_array argv
-        res.should eql [ nil, nil ]
-        argv.should eql [ :nope ]
+        expect( res ).to eql [ nil, nil ]
+        expect( argv ).to eql [ :nope ]
       end
 
       it "an unparsable element will \"mask\" subsequent would-be parsables" do
         argv = [ :nope, 'BILLY', :hi ]
         res = X_f_sp_SP.parse_and_mutate_array argv
-        res.should eql [ nil, nil ]
-        argv.length.should eql 3
+        expect( res ).to eql [ nil, nil ]
+        expect( argv.length ).to eql 3
       end
     end
   end
