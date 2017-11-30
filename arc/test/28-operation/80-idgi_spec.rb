@@ -16,11 +16,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "fails" do
-        root_ACS_result.should be_common_result_for_failure
+        expect( root_ACS_result ).to be_common_result_for_failure
       end
 
       it "the plural validates with the singular" do
-        only_emission.should be_emission( :error, :expression, :cant_have_it )
+        expect( only_emission ).to be_emission( :error, :expression, :cant_have_it )
       end
     end
 
@@ -31,11 +31,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "succeeds" do
-        root_ACS_result.should eql :_yerf_
+        expect( root_ACS_result ).to eql :_yerf_
       end
 
       it "writes to plural ivar" do
-        root_ACS._the_ivar.should eql %w( ok yerp )
+        expect( root_ACS._the_ivar ).to eql %w( ok yerp )
       end
     end
 
@@ -46,11 +46,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "succeeds" do
-        root_ACS_result.should eql :_yerf_
+        expect( root_ACS_result ).to eql :_yerf_
       end
 
       it "writes to plural ivar" do
-        root_ACS._the_ivar.should eql %w( yay )
+        expect( root_ACS._the_ivar ).to eql %w( yay )
       end
     end
 

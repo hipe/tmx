@@ -27,7 +27,7 @@ module Skylab::Fields::TestSupport
 
       it "the default is applied when it should be" do
         o = entity_class_.with :other, :k
-        o.starts_as_true.should eql true
+        expect( o.starts_as_true ).to eql true
         :k == o.other or fail
       end
 
@@ -57,7 +57,7 @@ module Skylab::Fields::TestSupport
             want_missing_required_message_with_newline_ _, :other
           end
 
-          only_emission.should _be_this
+          expect( only_emission ).to _be_this
         end
       end
     # ==

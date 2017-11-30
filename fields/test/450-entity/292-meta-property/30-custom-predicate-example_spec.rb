@@ -54,8 +54,8 @@ module Skylab::Fields::TestSupport
       it "..can make property-based code arbitrarily more readable" do
 
         hi, hey = _subject_module.properties.each_value.to_a
-        hi.is_necessary.should eql true
-        hey.is_necessary.should eql false
+        expect( hi.is_necessary ).to eql true
+        expect( hey.is_necessary ).to eql false
       end
     end
   end

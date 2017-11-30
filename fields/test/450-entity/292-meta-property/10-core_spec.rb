@@ -22,9 +22,9 @@ module Skylab::Fields::TestSupport
           prp.requored
         end.to_a
 
-        _a.length.should eql 1
+        expect( _a.length ).to eql 1
         prp = _a.first
-        prp.name_symbol.should eql :wazoozle
+        expect( prp.name_symbol ).to eql :wazoozle
     end
 
     context "create arbitrary meta-properties and use them in the properties" do
@@ -82,11 +82,11 @@ module Skylab::Fields::TestSupport
 
     def want_works_as_property cls
       foo = cls.with :foo, :bar
-      foo.instance_variable_get( :@foo ).should eql :bar
+      expect( foo.instance_variable_get( :@foo ) ).to eql :bar
     end
 
     def want_reflects cls
-      cls.properties[ :foo ].fun_ness.should eql :really_fun
+      expect( cls.properties[ :foo ].fun_ness ).to eql :really_fun
     end
   end
 end

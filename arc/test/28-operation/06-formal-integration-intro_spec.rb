@@ -19,7 +19,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "the result was whatever we said it was" do
-        root_ACS_result.should eql :_yergen_
+        expect( root_ACS_result ).to eql :_yergen_
       end
 
       it "the 'entitesque' component was attached to the compound component" do
@@ -27,20 +27,25 @@ module Skylab::Arc::TestSupport
       end
 
       it "the primitive property was written to the entity" do
-        root_ACS.lace.color.string.should eql "red"
+        expect( root_ACS.lace.color.string ).to eql "red"
       end
 
       it "we see the event that was emitted from inside the operation" do
 
-        first_emission.should( be_emission( :info, :expression, :hi ) do |a|
-          a.should eql [ 'hi ** there **' ]
-        end )
+        _be_this = be_emission :info, :expression, :hi do |a|
+          expect( a ).to eql [ 'hi ** there **' ]
+        end
+
+        expect( first_emission ).to _be_this
       end
 
       it "sexy emission is produced automatically (FOR NOW)" do
-        last_emission.should( be_emission( :info, :component_added ) do |ev|
-          black_and_white( ev ).should eql "set lace color to \"red\""
-        end )
+
+        _be_this = be_emission :info, :component_added do |ev|
+          expect( black_and_white ev ).to eql 'set lace color to "red"'
+        end
+
+        expect( last_emission ).to _be_this
       end
     end
 
@@ -51,13 +56,13 @@ module Skylab::Arc::TestSupport
       end
 
       it "result" do
-        root_ACS_result.should eql :_yergen_
+        expect( root_ACS_result ).to eql :_yergen_
       end
 
       it "sets BOTH values" do
         shoe = root_ACS
-        shoe.size.should eql 11
-        shoe.special.should eql 'w'
+        expect( shoe.size ).to eql 11
+        expect( shoe.special ).to eql 'w'
       end
 
       it "no events" do
@@ -78,7 +83,7 @@ module Skylab::Arc::TestSupport
       rescue Home_::MissingRequiredParameters => e
       end
 
-      e.message.should _be_this_msg
+      expect( e.message ).to _be_this_msg
     end
 
     it "pass all requireds and one optional USES FORMAL DEFAULT" do
@@ -88,7 +93,7 @@ module Skylab::Arc::TestSupport
       _x = shoe.edit :set_color_of_upper,
         :red, :R, :green, :G, :blue, :B, :blink, :yes_blink
 
-      _x.should eql [ :R, :G, :B, :yes_alpha, :yes_blink ]
+      expect( _x ).to eql [ :R, :G, :B, :yes_alpha, :yes_blink ]
     end
 
     def _new_shoe

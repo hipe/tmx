@@ -27,12 +27,12 @@ module Skylab::Fields::TestSupport
 
         it "multi line form" do
 
-          _desc_lines_for( :wazlow ).should eql [ "line 1: _hello_", "line 2" ]
+          expect( _desc_lines_for( :wazlow ) ).to eql [ "line 1: _hello_", "line 2" ]
         end
 
         it "single line form" do
 
-          _desc_lines_for( :pazlow ).should eql [ "this way _hello_" ]
+          expect( _desc_lines_for( :pazlow ) ).to eql [ "this way _hello_" ]
         end
       end
 

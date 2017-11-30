@@ -19,17 +19,17 @@ module Skylab::Arc::TestSupport
 
         st.gets.association._is_pokemon or fail
         st.gets.association._is_pokemon or fail
-        st.gets.should be_nil
+        expect( st.gets ).to be_nil
       end
 
       it "meta-components can take arguments" do
 
-        _the_memoized_array.fetch( 1 ).association._color.should eql :red
+        expect( _the_memoized_array.fetch( 1 ).association._color ).to eql :red
       end
 
       it "even an association with no use of the special DSL gets the class" do
 
-        _the_memoized_array.last.association._color.should be_nil
+        expect( _the_memoized_array.last.association._color ).to be_nil
       end
 
       def _the_stream

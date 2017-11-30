@@ -21,36 +21,37 @@ module Skylab::Fields::TestSupport
       it "members - duped array of members" do
 
         a = _subject.members
-        a.should eql [ :zero_or_one, :one_or_more ]
+        expect( a ).to eql [ :zero_or_one, :one_or_more ]
         _subject.members.object_id == a.object_id && fail
       end
 
       it "aref ([]) - with ok name" do
-        _subject[ :zero_or_one ].should eql _subject::ZERO_OR_ONE
+        expect( _subject[ :zero_or_one ] ).to eql _subject::ZERO_OR_ONE
       end
 
       it "aref ([]) - with bad name - nil" do
-        _subject[ :not_there ].should be_nil
+        expect( _subject[ :not_there ] ).to be_nil
       end
 
       it "fetch - with good name" do
-        _subject.fetch( :one_or_more ).should eql _subject::ONE_OR_MORE
+        expect( _subject.fetch( :one_or_more ) ).to eql _subject::ONE_OR_MORE
       end
 
       it "fetch - bad name and default" do
-        _subject.fetch( :no ) { :x }.should eql :x
+        expect( _subject.fetch( :no ) { :x } ).to eql :x
       end
 
       it "fetch - with bad name and no default" do
-        -> do
+        _p = -> do
           _subject.fetch :nope
-        end.should raise_error ::KeyError, /key not found: :nope/
+        end
+        expect( _p ).to raise_error ::KeyError, /key not found: :nope/
       end
 
       context "the zero or one arity when sent" do
 
         it "name_symbol - ok" do
-          arity.name_symbol.should eql :zero_or_one
+          expect( arity.name_symbol ).to eql :zero_or_one
         end
 
         it "includes_zero - yes" do
@@ -62,11 +63,11 @@ module Skylab::Fields::TestSupport
         end
 
         it "include?( 0 ) - yes" do
-          arity.should be_include 0
+          expect( arity ).to be_include 0
         end
 
         it "include?( 1 ) - yes" do
-          arity.should be_include 1
+          expect( arity ).to be_include 1
         end
 
         it "include?( 2 ) - no" do
@@ -81,7 +82,7 @@ module Skylab::Fields::TestSupport
       context "the one or more arity when sent" do
 
         it "name_symbol - ok" do
-          arity.name_symbol.should eql :one_or_more
+          expect( arity.name_symbol ).to eql :one_or_more
         end
 
         it "includes_zero - no" do
@@ -97,11 +98,11 @@ module Skylab::Fields::TestSupport
         end
 
         it "include?( 1 ) - yes" do
-          arity.should be_include 1
+          expect( arity ).to be_include 1
         end
 
         it "include?( 2 ) - yes" do
-          arity.should be_include 2
+          expect( arity ).to be_include 2
         end
 
         def arity

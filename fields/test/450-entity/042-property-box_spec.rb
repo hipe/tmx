@@ -14,10 +14,10 @@ module Skylab::Fields::TestSupport
 
         prps = _subject_module.properties
         bx = prps.to_mutable_box_like_proxy
-        bx.a_.should eql [ :foo, :bar ]
+        expect( bx.a_ ).to eql [ :foo, :bar ]
         _foo = bx.remove :foo
-        _foo.name_symbol.should eql :foo
-        prps.get_keys.should eql [ :foo, :bar ]
+        expect( _foo.name_symbol ).to eql :foo
+        expect( prps.get_keys ).to eql [ :foo, :bar ]
       end
 
       def _subject

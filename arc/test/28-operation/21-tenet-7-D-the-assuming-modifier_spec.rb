@@ -16,18 +16,18 @@ module Skylab::Arc::TestSupport
 
       _ok = _same o
 
-      _ok.should eql :yep
-      o.jimmy_is_rattled.should eql true
-      @_ev_a.should be_nil
+      expect( _ok ).to eql :yep
+      expect( o.jimmy_is_rattled ).to eql true
+      expect( @_ev_a ).to be_nil
     end
 
     it "when both assumptions fail - operation is short circuited" do
 
       o = _new
       _ok = _same o
-      _ok.should eql false
-      o.jimmy_is_rattled.should eql false
-      @_ev_a.should eql [ :beep ]
+      expect( _ok ).to eql false
+      expect( o.jimmy_is_rattled ).to eql false
+      expect( @_ev_a ).to eql [ :beep ]
     end
 
     def _new

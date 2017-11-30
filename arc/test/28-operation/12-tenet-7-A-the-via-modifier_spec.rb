@@ -12,7 +12,7 @@ module Skylab::Arc::TestSupport
       _hi = _subject_class.edit_entity(
         :via, :regulo_expo, :set, :thingo, /Zaa/ )
 
-      _hi.thingo.sym.should eql :is_regex
+      expect( _hi.thingo.sym ).to eql :is_regex
     end
 
     it "on an edit" do
@@ -21,9 +21,9 @@ module Skylab::Arc::TestSupport
 
       ok = hi.edit_entity :via, :procky, :set, :thingo, -> x {-x}
 
-      ok.should eql true
+      expect( ok ).to eql true
 
-      hi.thingo.sym.should eql :is_prockie
+      expect( hi.thingo.sym ).to eql :is_prockie
     end
 
     shared_subject :_subject_class do

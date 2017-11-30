@@ -33,13 +33,13 @@ module Skylab::Fields::TestSupport
       end
 
       it "do parse one does work" do
-        _subject.with( :foo, :FOO ).foo_x.should eql :FOO
+        expect( _subject.with( :foo, :FOO ).foo_x ).to eql :FOO
       end
 
       it "do parse two does work" do
         foo = _subject.with( :foo, :FOO, :bar, :BAR )
-        foo.foo_x.should eql :FOO
-        foo.bar_x.should eql :BAR
+        expect( foo.foo_x ).to eql :FOO
+        expect( foo.bar_x ).to eql :BAR
       end
 
       it "do parse strange does not work" do
@@ -51,7 +51,7 @@ module Skylab::Fields::TestSupport
         rescue Home_::ArgumentError => e
         end
 
-        e.message.should _be_this_msg
+        expect( e.message ).to _be_this_msg
       end
 
       it "do parse none does work" do
@@ -70,7 +70,7 @@ module Skylab::Fields::TestSupport
       rescue Home_::ArgumentError => e
       end
 
-      e.message.should _be_this_msg
+      expect( e.message ).to _be_this_msg
     end
 
     it "DSL syntax fail - strange value" do
@@ -104,19 +104,19 @@ module Skylab::Fields::TestSupport
       end
 
       it "iambic writer is recognized (and the DSL is used in the '[]')" do
-        _subject.with( :some_writer, :foo ).x.should eql :foo
+        expect( _subject.with( :some_writer, :foo ).x ).to eql :foo
       end
 
       it "for now enforces that you use the suffix on every guy" do
         _rx = /\bdid not have expected suffix '_derp': 'ferp'/
-        -> do
+        expect( -> do
         class X_e_ptpu_Bad_Suffixer
           Entity.lib.call self, :argument_scanning_writer_method_name_suffix, :_derp do
             def ferp
             end
           end
         end
-        end.should raise_error ::NameError, _rx
+        end ).to raise_error ::NameError, _rx
       end
     end
 

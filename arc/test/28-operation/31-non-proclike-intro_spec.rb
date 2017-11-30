@@ -18,7 +18,7 @@ module Skylab::Arc::TestSupport
       rescue Home_::MissingRequiredParameters => e
       end
 
-      e.message.should eql _s
+      expect( e.message ).to eql _s
     end
 
     context "supply the required args" do
@@ -30,16 +30,16 @@ module Skylab::Arc::TestSupport
       it "emits business" do
 
         _be_this = be_emission_ending_with :k do |y|
-          y.should eql [ '(highlight "k.")' ]
+          expect( y ).to eql [ '(highlight "k.")' ]
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "results in business" do
 
         _x = root_ACS_result
-        _x.should eql [ :_hi_, :_yoohoo_, :_hey_ ]
+        expect( _x ).to eql [ :_hi_, :_yoohoo_, :_hey_ ]
       end
     end
 

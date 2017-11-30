@@ -33,25 +33,25 @@ module Skylab::Fields::TestSupport
       it "left writes" do
         _given :_left_class
         new_with_ :jiang, :J
-        @session_.jiang.should eql :J
+        expect( @session_.jiang ).to eql :J
       end
 
       it "i.m only writes" do
         _given :_instance_methods_only_class
         new_with_ :foo, :F
-        @session_.foo.should eql :F
+        expect( @session_.foo ).to eql :F
       end
 
       it "right writes" do
         _given :_right_class
         new_with_ :foo, :F
-        @session_.foo.should eql :F
+        expect( @session_.foo ).to eql :F
       end
 
       it "hybrid writes" do
         _given :_hybrid_class
         new_with_ :bar, :B, :qing, :Q
-        [ @session_.bar, @session_.qing ].should eql [ :B, :Q ]
+        expect( [ @session_.bar, @session_.qing ] ).to eql [ :B, :Q ]
       end
 
       it "unrec left" do  # :#coverpoint1.5
@@ -75,28 +75,28 @@ module Skylab::Fields::TestSupport
           process_argument_scanner_fully_via_ :zoik
         rescue Home_::ArgumentError => e
         end
-        e.message.should eql "unrecognized attribute 'zoik'"
+        expect( e.message ).to eql "unrecognized attribute 'zoik'"
       end
 
       it "im - `process_iambic_fully`" do
         sess = _hybrid_class.new
         sess.send :process_iambic_fully, [ :qing, :Q ]
-        sess.qing.should eql :Q
+        expect( sess.qing ).to eql :Q
       end
 
       it "mm - `with`, `via_iambic`" do
         _given :_hybrid_class
         @session_ = @class_.with :jiang, :J, :bar, :B
-        _this.should eql [ :J, :B ]
+        expect( _this ).to eql [ :J, :B ]
       end
 
       it "i.m - `new_with` (makes a dup)" do
 
         @session_ = _hybrid_class.with :jiang, :J, :bar, :B
         otr = @session_.send :new_with, :jiang, :K
-        _this.should eql [ :J, :B ]
+        expect( _this ).to eql [ :J, :B ]
         @session_ = otr
-        _this.should eql [ :K, :B ]
+        expect( _this ).to eql [ :K, :B ]
       end
 
       def _this
@@ -113,25 +113,25 @@ module Skylab::Fields::TestSupport
         end
 
         it "writes" do
-          _tuple[ 1, 2 ].should eql [ :J, :B ]
+          expect( _tuple[ 1, 2 ] ).to eql [ :J, :B ]
         end
 
         it "stream" do
-          _tuple[ 0 ].should eql :Z
+          expect( _tuple[ 0 ] ).to eql :Z
         end
       end
 
       it "mm - `via` calls the actor" do
         _given :_hybrid_class
         _ = @class_.via :jiang, :J, :bar, :B
-        _.should eql [ :JIANG, :J, :BAR, :B ]
+        expect( _ ).to eql [ :JIANG, :J, :BAR, :B ]
       end
 
       it "passive - none" do
 
         @session_ = _hybrid_class.new
         x = process_argument_scanner_passively_ the_empty_argument_scanner_
-        x.should eql true
+        expect( x ).to eql true
       end
 
       context "passive - some" do
@@ -144,15 +144,15 @@ module Skylab::Fields::TestSupport
         end
 
         it "writes" do
-          _tuple[ 2, 2 ].should eql [ :J, :B ]
+          expect( _tuple[ 2, 2 ] ).to eql [ :J, :B ]
         end
 
         it "result" do
-          _tuple.fetch( 0 ).should eql true
+          expect( _tuple.fetch( 0 ) ).to eql true
         end
 
         it "leaves parse at first unrec" do
-          _tuple.fetch( 1 ).should eql :Z
+          expect( _tuple.fetch( 1 ) ).to eql :Z
         end
       end
 

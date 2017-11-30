@@ -15,22 +15,22 @@ module Skylab::Arc::TestSupport
       it "non-sparse one-level structure" do
 
         sn = _from '{"first_name":"Foo", "last_name":"Bar"}'
-        sn.first_name.should eql 'Foo'
-        sn.last_name.should eql 'Bar'
+        expect( sn.first_name ).to eql 'Foo'
+        expect( sn.last_name ).to eql 'Bar'
       end
 
       it "when one is null - validation must allow for this TODO change this behavior" do
 
         sn = _from '{"first_name":"Foo", "last_name":null}'
-        sn.first_name.should eql 'Foo'
-        sn.last_name.should be_nil
+        expect( sn.first_name ).to eql 'Foo'
+        expect( sn.last_name ).to be_nil
       end
 
       it "when one is not present - validation is not invoked, ivar not set" do
 
         sn = _from '{"last_name":"x"}'
         sn.instance_variable_defined?( :@last_name ) or fail
-        sn.last_name.should eql "x"
+        expect( sn.last_name ).to eql "x"
       end
 
       context "when one is invalid - false" do
@@ -49,11 +49,11 @@ module Skylab::Arc::TestSupport
 
           _be_this = be_emission :error, :expression, :no do |y|
 
-            y.first.should be_include "can't be lowercase"
+            expect( y.first ).to be_include "can't be lowercase"
               # (the above sort of expr gets MUCH more attention in #23)
           end
 
-          only_emission.should _be_this
+          expect( only_emission ).to _be_this
         end
       end
 
@@ -74,10 +74,10 @@ module Skylab::Arc::TestSupport
           _ = be_emission :error, :unrecognized_argument do |ev|
 
             _s = black_and_white ev
-            _s.should eql 'unrecognized element \'middle_initial\' in "someplace"'
+            expect( _s ).to eql 'unrecognized element \'middle_initial\' in "someplace"'
           end
 
-          only_emission.should _
+          expect( only_emission ).to _
         end
       end
 
@@ -95,10 +95,10 @@ module Skylab::Arc::TestSupport
 
           _ = be_emission :error, :empty_object do |ev|
             _s = black_and_white ev
-            _s.should eql 'for now, will not parse empty JSON object for "someplace"'
+            expect( _s ).to eql 'for now, will not parse empty JSON object for "someplace"'
           end
 
-          only_emission.should _
+          expect( only_emission ).to _
         end
       end
 
@@ -114,9 +114,9 @@ module Skylab::Arc::TestSupport
         _s = '{"nickname":"NN","simple_name":{"first_name":"FN","last_name":"LN"}}'
 
         cn = _from _s
-        cn.nickname.should eql 'NN'
-        cn.simple_name.first_name.should eql 'FN'
-        cn.simple_name.last_name.should eql 'LN'
+        expect( cn.nickname ).to eql 'NN'
+        expect( cn.simple_name.first_name ).to eql 'FN'
+        expect( cn.simple_name.last_name ).to eql 'LN'
       end
 
       context "when strange shape in structure (at level 1)" do
@@ -137,11 +137,11 @@ module Skylab::Arc::TestSupport
 
             _s = black_and_white ev
 
-            _s.should eql "for \"simple_name\" expected hash,#{
+            expect( _s ).to eql "for \"simple_name\" expected hash,#{
               } had < a Array > (in \"someplace\")"
           end
 
-          only_emission.should _
+          expect( only_emission ).to _
         end
       end
 
@@ -150,9 +150,9 @@ module Skylab::Arc::TestSupport
         _s = '{"nickname":"NN", "simple_name":null}'
 
         cn = _from _s
-        cn.nickname.should eql 'NN'
-        cn.simple_name.first_name.should be_nil
-        cn.simple_name.instance_variables.should eql []
+        expect( cn.nickname ).to eql 'NN'
+        expect( cn.simple_name.first_name ).to be_nil
+        expect( cn.simple_name.instance_variables ).to eql []
       end
 
       def _which
@@ -198,7 +198,7 @@ module Skylab::Arc::TestSupport
     end
 
     def _fails
-      root_ACS_result.should be_common_result_for_failure
+      expect( root_ACS_result ).to be_common_result_for_failure
     end
 
     def expression_agent_for_want_emission

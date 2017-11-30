@@ -30,7 +30,7 @@ module Skylab::Arc::TestSupport
 
       it "ok." do
         _x = ___build_name_symbol_array
-        _x.should eql %i( red_floof red_flingle )
+        expect( _x ).to eql %i( red_floof red_flingle )
       end
     end
 

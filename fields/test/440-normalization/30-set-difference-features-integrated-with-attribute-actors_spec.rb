@@ -102,7 +102,7 @@ module Skylab::Fields::TestSupport
               want_missing_required_message_with_newline_ _msg, :last_name, :soc
             end
 
-            only_emission.should _be_this
+            expect( only_emission ).to _be_this
           end
         end
 
@@ -155,7 +155,7 @@ module Skylab::Fields::TestSupport
           o.a = :hello
           o.b = :howdy
 
-          o.instance_variable_defined?( :@c ).should eql false
+          expect( o.instance_variable_defined?( :@c ) ).to eql false
 
           _against_this_entity_expect_OK_normalization o
 
@@ -237,7 +237,7 @@ module Skylab::Fields::TestSupport
               want_missing_required_message_with_newline_ _msg, :b
             end
 
-            only_emission.should _be_this
+            expect( only_emission ).to _be_this
           end
 
           it "event has details" do
@@ -248,9 +248,9 @@ module Skylab::Fields::TestSupport
 
             a = _ev.reasons.to_a  # might be stream might be array
 
-            a.length.should eql 1
+            expect( a.length ).to eql 1
 
-            a.first.name_symbol.should eql :b
+            expect( a.first.name_symbol ).to eql :b
           end
 
           it "it DID write defaults" do  # (this changed at #tombstone-A)

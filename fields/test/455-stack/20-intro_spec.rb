@@ -13,7 +13,7 @@ module Skylab::Fields::TestSupport
 
     it "the empty stack will never find anything" do
       stack = _subject.new
-      stack.any_proprietor_of( :anything ).should be_nil
+      expect( stack.any_proprietor_of( :anything ) ).to be_nil
     end
 
     it "the stack with one frame produces the values it has" do
@@ -28,7 +28,7 @@ module Skylab::Fields::TestSupport
       stack = _subject.new( & handle_event_selectively_ )
       stack.push_frame_with :a, :X, :b, :Y
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
-      x.should eql false
+      expect( x ).to eql false
 
       want_not_OK_event :unrecognized_argument do |ev|
         ev.unrecognized_tokens == [ :derp, :nerp ] || fail
@@ -44,7 +44,7 @@ module Skylab::Fields::TestSupport
         stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       rescue Home_::ArgumentError => e
       end
-      e.message.should match %r(\Aunrecognized attributes 'derp' and 'nerp')
+      expect( e.message ).to match %r(\Aunrecognized attributes 'derp' and 'nerp')
     end
 
     it "topmost frame wins" do
@@ -69,7 +69,7 @@ module Skylab::Fields::TestSupport
       end
 
       want_no_more_events
-      x.should eql false
+      expect( x ).to eql false
     end
 
     def _subject

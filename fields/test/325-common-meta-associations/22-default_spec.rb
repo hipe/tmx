@@ -60,7 +60,7 @@ module Skylab::Fields::TestSupport
         def _against_expect a, x
 
           _ = build_by_init_via_sexp_ a
-          _.starts_as_true.should eql x
+          expect( _.starts_as_true ).to eql x
         end
       end
 

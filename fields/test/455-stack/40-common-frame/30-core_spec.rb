@@ -34,24 +34,24 @@ module Skylab::Fields::TestSupport
       end
 
       it "accessing a field's value when it is an ordinary proc" do
-        foo.foo.should eql 1
-        foo.foo.should eql 2
+        expect( foo.foo ).to eql 1
+        expect( foo.foo ).to eql 2
       end
 
       it "accessing a field's value when it is a memoized proc" do
-        foo.bar.should eql 1
-        foo.bar.should eql 1
+        expect( foo.bar ).to eql 1
+        expect( foo.bar ).to eql 1
       end
 
       it "accessing a field's value when it is an \"inline method\"" do
-        foo.bif.should eql "_3_"
-        foo.bif.should eql "_4_"
+        expect( foo.bif ).to eql "_3_"
+        expect( foo.bif ).to eql "_4_"
       end
 
       it "accessing a field's value when it is a memoized inline method" do
-        foo.baz.should eql "<5>"
-        foo.baz.should eql "<5>"
-        foo.baz.object_id.should eql foo.baz.object_id
+        expect( foo.baz ).to eql "<5>"
+        expect( foo.baz ).to eql "<5>"
+        expect( foo.baz.object_id ).to eql foo.baz.object_id
       end
     end
 
@@ -76,7 +76,7 @@ module Skylab::Fields::TestSupport
         rescue ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
 
       it "passing nil is considered the same as not passing an argument" do
@@ -88,15 +88,15 @@ module Skylab::Fields::TestSupport
         rescue ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
 
       it "passing false is not the same as passing nil, passing false is valid." do
-        ( X_cf_c_Bar.new( :foo, false ).foo ).should eql false
+        expect( ( X_cf_c_Bar.new( :foo, false ).foo ) ).to eql false
       end
 
       it "you can of course pass nil as the value for a non-required field" do
-        ( X_cf_c_Bar.new( :foo, :x, :bar, nil ).bar ).should eql nil
+        expect( ( X_cf_c_Bar.new( :foo, :x, :bar, nil ).bar ) ).to eql nil
       end
     end
   end

@@ -46,7 +46,7 @@ module Skylab::Fields::TestSupport
           _ = ca2.call_via( :very_volatile, :V, :a_medium_amount_of_volatile, :AM,
                    :almost_not_at_all_volatile, :ANVAA )
 
-          _.should eql [ :V, :SV, :AM, :NVV, :ANVAA, :s ]
+          expect( _ ).to eql [ :V, :SV, :AM, :NVV, :ANVAA, :s ]
         end
 
         it "bc., bc." do
@@ -59,7 +59,7 @@ module Skylab::Fields::TestSupport
 
           _wow = ca2.call :VV, :SV
 
-          _wow.should eql [:VV, :SV, :NVV, :AMV, :S, :ANVAA]
+          expect( _wow ).to eql [:VV, :SV, :NVV, :AMV, :S, :ANVAA]
 
         end
       end

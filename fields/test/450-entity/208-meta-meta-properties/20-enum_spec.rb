@@ -57,11 +57,11 @@ module Skylab::Fields::TestSupport
       it "the properties abstraction is useful here with `group_by`" do
         h = _subject_module.properties.group_by( & :color )
         a = h.keys
-        a.length.should eql 3
-        ( a - [ :red, :blue, nil ] ).length.should be_zero
-        h[ :red ].map( & :name_symbol ).should eql [ :red_thing ]
-        h[ :blue ].map( & :name_symbol ).should eql [ :blue_thing, :other_blue_thing ]
-        h[ nil ].map( & :name_symbol ).should eql [ :no_color ]
+        expect( a.length ).to eql 3
+        expect( ( a - [ :red, :blue, nil ] ).length ).to be_zero
+        expect( h[ :red ].map( & :name_symbol ) ).to eql [ :red_thing ]
+        expect( h[ :blue ].map( & :name_symbol ) ).to eql [ :blue_thing, :other_blue_thing ]
+        expect( h[ nil ].map( & :name_symbol ) ).to eql [ :no_color ]
       end
     end
 
@@ -86,7 +86,7 @@ module Skylab::Fields::TestSupport
       rescue Home_::ArgumentError => e
       end
 
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
   end
 end

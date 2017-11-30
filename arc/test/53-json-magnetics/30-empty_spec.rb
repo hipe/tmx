@@ -21,18 +21,20 @@ module Skylab::Arc::TestSupport
 
       it "looks as it does (an empty JSON object)" do
 
-        root_ACS_state.result.should eql _EMPTY_JSON_LINES
+        expect( root_ACS_state.result ).to eql _EMPTY_JSON_LINES
       end
 
       it "emits an event talking bout path and bytes" do
 
-        only_emission.should ( be_emission :info, :wrote do | ev |
+        _be_this = be_emission :info, :wrote do |ev|
 
           ev.path and fail
           ev.bytes or fail
 
-          black_and_white( ev ).should eql "wrote 3 bytes"
-        end )
+          expect( black_and_white ev ).to eql 'wrote 3 bytes'
+        end
+
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -50,16 +52,18 @@ module Skylab::Arc::TestSupport
       end
 
       it "cannot be done - fails" do
-        root_ACS_result.should be_common_result_for_failure
+        expect( root_ACS_result ).to be_common_result_for_failure
       end
 
       it "error explains this" do
 
-        only_emission.should ( be_emission :error, :empty_object do | ev |
+        _be_this = be_emission :error, :empty_object do |ev|
 
           _s = black_and_white ev
-          _s.should eql 'for now, will not parse empty JSON object for input JSON'
-        end )
+          expect( _s ).to eql 'for now, will not parse empty JSON object for input JSON'
+        end
+
+        expect( only_emission ).to _be_this
       end
     end
 

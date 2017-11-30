@@ -71,7 +71,7 @@ module Skylab::Fields::TestSupport
       expected_s = "missing required #{ noun_lemma }#{ 's' if 1 != sym_a.length } #{ _ }#{ yes_newline }"
 
       if msg != expected_s
-        msg.should tc.eql expected_s
+        expect( msg ).to tc.eql expected_s
       end
     end
   end

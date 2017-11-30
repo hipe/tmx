@@ -12,8 +12,8 @@ module Skylab::Fields::TestSupport
 
         it "ok." do
           o = _cls.with :foopie, :x, :foopie, :y, :harbinger, :j, :foopie, :z
-          o.foopie.should eql [ :x, :y, :z ]
-          o.harbinger.should eql :j
+          expect( o.foopie ).to eql [ :x, :y, :z ]
+          expect( o.harbinger ).to eql :j
         end
 
         shared_subject :_cls do

@@ -32,13 +32,13 @@ module Skylab::Arc::TestSupport
         end
 
         it "reaches a name" do
-          _node.name.as_variegated_symbol.should eql :assokie
+          expect( _node.name.as_variegated_symbol ).to eql :assokie
         end
 
         it "reaches its association" do
 
           _ = _node.association.model_classifications.category_symbol
-          _.should eql :primitivesque
+          expect( _ ).to eql :primitivesque
         end
 
         def _node
@@ -53,7 +53,7 @@ module Skylab::Arc::TestSupport
         end
 
         it "reaches a name" do
-          _node.name.as_variegated_symbol.should eql :opie
+          expect( _node.name.as_variegated_symbol ).to eql :opie
         end
 
         def _node

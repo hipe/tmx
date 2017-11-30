@@ -20,7 +20,7 @@ module Skylab::Fields::TestSupport
 
         it "hi." do
           against_ :shenkberger, :_hey_
-          @_wazoo.should eql :_hey_
+          expect( @_wazoo ).to eql :_hey_
         end
       end
 
@@ -57,7 +57,7 @@ module Skylab::Fields::TestSupport
           sess = _some_class_over_here.new
           _attrs = the_attributes_
           _attrs.init sess, [ :zizzie, :wiffie, :skiffie ]
-          sess.zizzie.should eql [ :_yes_, :wiffie, :skiffie ]
+          expect( sess.zizzie ).to eql [ :_yes_, :wiffie, :skiffie ]
         end
 
         it "if the session does not respond then you get no grace" do
@@ -70,7 +70,7 @@ module Skylab::Fields::TestSupport
           rescue ::NoMethodError => e
           end
 
-          e.message.should match %r(\Aundefined method `zozlow=')
+          expect( e.message ).to match %r(\Aundefined method `zozlow=')
         end
       end
 
@@ -103,7 +103,7 @@ module Skylab::Fields::TestSupport
         it "x." do
 
           _o = build_by_init_ :zing, :la, :lah
-          _o._hi.should eql [ :la, :lah ]
+          expect( _o._hi ).to eql [ :la, :lah ]
         end
       end
 
@@ -246,7 +246,7 @@ module Skylab::Fields::TestSupport
 
         _act = _event.express_into_under "", _expag
 
-        _act.should eql msg
+        expect( _act ).to eql msg
       end
 
       def _details_via_argument d, name_sym

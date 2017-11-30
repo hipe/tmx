@@ -55,7 +55,7 @@ module Skylab::Fields::TestSupport
 
         it "yep" do
           o = where_ :roland_808, :x, :y
-          o.result.roland_808.yep.should eql [ :roland_808, :x, :y ]
+          expect( o.result.roland_808.yep ).to eql [ :roland_808, :x, :y ]
         end
       end
 

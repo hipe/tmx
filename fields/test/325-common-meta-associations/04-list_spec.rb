@@ -30,7 +30,7 @@ module Skylab::Fields::TestSupport
 
         it "you don't get a reader - keep it orthoganal and simple" do
 
-          entity_class_.instance_method( :topping ).arity.should eql 1
+          expect( entity_class_.instance_method( :topping ).arity ).to eql 1
         end
 
         it "ok" do
@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
           o = build_empty_entity_
           o.topping :sprinkles
           o.topping :sparkles
-          o.instance_variable_get( :@topping ).should eql [ :sprinkles, :sparkles ]
+          expect( o.instance_variable_get( :@topping ) ).to eql [ :sprinkles, :sparkles ]
         end
       end
 

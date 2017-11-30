@@ -44,8 +44,8 @@ module Skylab::Fields::TestSupport
 
       it "ok" do
         hi, hey = _subject_module.properties.each_value.to_a
-        hi.wants_to_know.should eql true
-        hey.wants_to_know.should eql nil
+        expect( hi.wants_to_know ).to eql true
+        expect( hey.wants_to_know ).to eql nil
       end
     end
     # <-

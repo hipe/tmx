@@ -34,7 +34,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "fails" do
-        root_ACS_result.should be_common_result_for_failure
+        expect( root_ACS_result ).to be_common_result_for_failure
       end
 
       context "in an emission expression initiated by the component," do
@@ -52,37 +52,37 @@ module Skylab::Arc::TestSupport
 
         it "the channel that the component chose stays as-is" do
 
-          _em_tuple.last.channel_symbol_array.should eql [ :error, :expression, :nope ]
+          expect( _em_tuple.last.channel_symbol_array ).to eql [ :error, :expression, :nope ]
         end
 
         it "the predicate as expressed by the component is intact" do
 
           _s = _first_line
-          _s.should be_include 'must be a lowercase word (had: "CHOCOLATE")'
+          expect( _s ).to be_include 'must be a lowercase word (had: "CHOCOLATE")'
         end
 
         it "any subsequent lines are expressed as-is" do
 
-          __last_line.should eql "so i guess that's that.\n"
+          expect( __last_line ).to eql "so i guess that's that.\n"
         end
 
         it "we re-place any parenthesis and punctuation correctly (and add newlines)" do
 
           s = _first_line
-          s[ 0 ].should eql '('
-          s[ -3 .. -1 ].should eql ".)\n"
+          expect( s[ 0 ] ).to eql '('
+          expect( s[ -3 .. -1 ] ).to eql ".)\n"
         end
 
         it "we put the component name as the subject of the predicate" do
 
           _s = _first_line
-          _s.should match %r(\A[^a-z]*object\b)
+          expect( _s ).to match %r(\A[^a-z]*object\b)
         end
 
         it "we add the trailing context as a chain of prepositional phrases" do
 
           _s = _first_line
-          _s.should match %r( in "verb_phrase" in input JSON[^[:alpha:]]*\z)
+          expect( _s ).to match %r( in "verb_phrase" in input JSON[^[:alpha:]]*\z)
         end
 
         def _first_line
@@ -107,7 +107,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "emits" do
-        only_emission.should be_emission( :info, :wrote )
+        expect( only_emission ).to be_emission( :info, :wrote )
       end
 
       it "output" do
@@ -124,7 +124,7 @@ module Skylab::Arc::TestSupport
 
         _act = root_ACS_result
 
-        _act.should eql _exp
+        expect( _act ).to eql _exp
       end
     end
 

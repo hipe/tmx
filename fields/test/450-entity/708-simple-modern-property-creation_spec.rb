@@ -141,8 +141,8 @@ module Skylab::Fields::TestSupport
       def _expect cls
         subj = cls.new { }
         subj.process_fully_for_test_ :foo, :x, :bar, :y
-        subj.instance_variable_get( :@foo ).should eql :x
-        subj.instance_variable_get( :@bar ).should eql :y
+        expect( subj.instance_variable_get :@foo ).to eql :x
+        expect( subj.instance_variable_get :@bar ).to eql :y
       end
     end
 

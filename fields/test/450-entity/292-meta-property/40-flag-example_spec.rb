@@ -46,8 +46,8 @@ module Skylab::Fields::TestSupport
 
       it "add and write to fields to your property in the classic way" do
         hi, hey = _subject_module.properties.each_value.to_a
-        hi.is_florg.should eql true
-        hey.is_florg.should eql false
+        expect( hi.is_florg ).to eql true
+        expect( hey.is_florg ).to eql false
       end
 
       it "..and in this case set a custom 'argument_scanning_writer_method_proc'." do
@@ -58,9 +58,9 @@ module Skylab::Fields::TestSupport
           kp = process_fully_for_test_ :hi, :hey, :ho
         end
 
-        o.hi.should eql true
-        o.hey.should eql :ho
-        kp.should eql true
+        expect( o.hi ).to eql true
+        expect( o.hey ).to eql :ho
+        expect( kp ).to eql true
       end
     # <-
   end

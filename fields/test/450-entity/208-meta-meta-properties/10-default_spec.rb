@@ -49,8 +49,8 @@ module Skylab::Fields::TestSupport
 
       it "ok" do
         a = _subject_class.properties.each_value.to_a
-        a.map( & :name_symbol ).should eql [ :foo, :bar, :baz ]
-        a.map( & :importance ).should eql [ 10, 20, 22 ]
+        expect( a.map( & :name_symbol ) ).to eql [ :foo, :bar, :baz ]
+        expect( a.map( & :importance ) ).to eql [ 10, 20, 22 ]
       end
     end
 

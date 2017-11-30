@@ -43,9 +43,9 @@ module Skylab::Fields::TestSupport
 
             x = o.receive__error__ :_hi_
 
-            x.should eql "hi: _hi_"
+            expect( x ).to eql "hi: _hi_"
 
-            o._hello_.should eql :_hi_
+            expect( o._hello_ ).to eql :_hi_
           end
 
           it "read back the proc itself with `__x__handler`" do
@@ -56,9 +56,9 @@ module Skylab::Fields::TestSupport
 
             _x = p[ :_hey_ ]
 
-            _x.should eql "hi: _hey_"
+            expect( _x ).to eql "hi: _hey_"
 
-            o._hello_.should eql :_hey_
+            expect( o._hello_ ).to eql :_hey_
           end
 
           def _build_one_such_entity

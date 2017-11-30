@@ -28,7 +28,7 @@ module Skylab::Fields::TestSupport
     end
 
     it "property names look good" do
-      _subject_class.properties.get_keys.should eql [ :foo, :bar, :biz ]
+      expect( _subject_class.properties.get_keys ).to eql [ :foo, :bar, :biz ]
     end
 
     it "required fields still bork" do
@@ -43,12 +43,12 @@ module Skylab::Fields::TestSupport
 
     it "works with all" do
       foo = _subject_class.new :biz, :B, :foo, :F, :bar, :A
-      [ foo.foo, foo.bar, foo.biz_x ].should eql %i| F A B |
+      expect( [ foo.foo, foo.bar, foo.biz_x ] ).to eql %i| F A B |
     end
 
     it "works with one" do
       foo = _subject_class.new :bar, :A
-      [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
+      expect( [ foo.foo, foo.bar, foo.biz_x ] ).to eql [ nil, :A, nil ]
     end
 
     define_method :want_missing_required_message_without_newline_, Common_Frame.definition_for_etc

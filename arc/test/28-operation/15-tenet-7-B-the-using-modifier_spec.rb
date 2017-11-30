@@ -16,9 +16,9 @@ module Skylab::Arc::TestSupport
         :effect, :list_of_things, :wazoozle
       )
 
-      _ok.should eql :yep
+      expect( _ok ).to eql :yep
 
-      o.list_of_things.should eql [ :first, :second, :wazoozle ]
+      expect( o.list_of_things ).to eql [ :first, :second, :wazoozle ]
     end
 
     def _new

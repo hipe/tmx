@@ -41,7 +41,7 @@ module Skylab::Fields::TestSupport
       it "`edit_entity_class` effects an edit session" do
 
         _cls = _subject_class
-        _cls.properties.get_keys.should eql [ :foo, :bar, :baz ]
+        expect( _cls.properties.get_keys ).to eql [ :foo, :bar, :baz ]
       end
     # -
   end

@@ -26,7 +26,7 @@ module Skylab::Fields::TestSupport
         end
 
       obj = X_e_cm_Minimal.with :foo_bar, :xyz
-      obj.instance_variable_get( :@foo_bar ).should eql :xyz
+      expect( obj.instance_variable_get :@foo_bar ).to eql :xyz
     end
 
     it "with two (together)" do
@@ -61,7 +61,7 @@ module Skylab::Fields::TestSupport
           instance_variable_get :"@#{ i }"
         end
       end
-      a.should eql [ :F, :B, :Z ]
+      expect( a ).to eql [ :F, :B, :Z ]
     end
 
     # ==

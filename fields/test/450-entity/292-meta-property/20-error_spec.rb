@@ -32,7 +32,7 @@ module Skylab::Fields::TestSupport
           rescue Home_::ArgumentError => e
           end
 
-          e.message.should _be_same
+          expect( e.message ).to _be_same
         end
 
         it "in 'o'" do
@@ -48,7 +48,7 @@ module Skylab::Fields::TestSupport
           rescue Home_::ArgumentError => e
           end
 
-          e.message.should _be_same
+          expect( e.message ).to _be_same
         end
 
         def _be_same

@@ -20,11 +20,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "emits wrote" do
-        only_emission.should be_emission( :info, :wrote )
+        expect( only_emission ).to be_emission( :info, :wrote )
       end
 
       it "output OK" do
-        root_ACS_result.should eql _EMPTY_JSON_LINES
+        expect( root_ACS_result ).to eql _EMPTY_JSON_LINES
       end
     end
 
@@ -41,11 +41,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "emits wrote" do
-        only_emission.should be_emission( :info, :wrote )
+        expect( only_emission ).to be_emission( :info, :wrote )
       end
 
       it "output" do
-        root_ACS_result.should eql "{\"file_name\":\"xx\"}\n"
+        expect( root_ACS_result ).to eql "{\"file_name\":\"xx\"}\n"
       end
     end
 
@@ -62,11 +62,11 @@ module Skylab::Arc::TestSupport
       end
 
       it "fails" do
-        root_ACS_result.should be_common_result_for_failure
+        expect( root_ACS_result ).to be_common_result_for_failure
       end
 
       it "emits" do
-        only_emission.should be_emission( :error, :unrecognized_argument )
+        expect( only_emission ).to be_emission( :error, :unrecognized_argument )
       end
     end
 
@@ -87,7 +87,7 @@ module Skylab::Arc::TestSupport
       end
 
       it "unmarshalled OK" do
-        root_ACS.read_file_nerm.should eql 'bar'
+        expect( root_ACS.read_file_nerm ).to eql 'bar'
       end
     end
 

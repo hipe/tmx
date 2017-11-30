@@ -26,7 +26,7 @@ module Skylab::Fields::TestSupport
 
         it '"object.foo?" is a reader of the (presumably boolean) value' do
 
-          build_empty_entity_.finished?.should be_nil
+          expect( build_empty_entity_.finished? ).to be_nil
         end
 
         it '"object.foo!" is a DSL-y writer that sets the parameter ' <<
@@ -34,7 +34,7 @@ module Skylab::Fields::TestSupport
 
           object = build_empty_entity_
           object.finished!
-          object.finished?.should eql(true)
+          expect( object.finished? ).to eql true
         end
 
         it '"object.not_foo!" is a DSL-y writer that sets the parameter value ' <<
@@ -42,7 +42,7 @@ module Skylab::Fields::TestSupport
 
           object = build_empty_entity_
           object.not_finished!
-          object.finished?.should eql(false)
+          expect( object.finished? ).to eql false
         end
 
         it '"object.foo", however, (a reader) you do not get ' <<

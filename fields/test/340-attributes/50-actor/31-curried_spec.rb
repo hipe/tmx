@@ -50,7 +50,7 @@ module Skylab::Fields::TestSupport
 
           _ = ca.call_via :top_slice, :A, :bottom_slice, :B
 
-          _.should eql [ :A, :Pastrami, :B ]
+          expect( _ ).to eql [ :A, :Pastrami, :B ]
 
           ca._number_of_times.nil? or fail
         end
@@ -61,7 +61,7 @@ module Skylab::Fields::TestSupport
 
           _ = ca[ :A_, :B_ ]
 
-          _.should eql [ :A_, :Pastrami, :B_ ]
+          expect( _ ).to eql [ :A_, :Pastrami, :B_ ]
 
           ca._number_of_times.nil? or fail
         end
@@ -72,7 +72,7 @@ module Skylab::Fields::TestSupport
 
           _ = ca.call :sourdough, :tofu
 
-          _.should eql [ :sourdough, :tofu, :wheat ]
+          expect( _ ).to eql [ :sourdough, :tofu, :wheat ]
 
           ca._number_of_times.nil? or fail
         end

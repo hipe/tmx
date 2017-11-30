@@ -17,7 +17,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "with one argument (a proc), subject creates a new module" do
-        _subject_module.should be_respond_to :constants
+        expect( _subject_module ).to be_respond_to :constants
       end
     end
 
@@ -70,10 +70,10 @@ module Skylab::Fields::TestSupport
 
       it "extension module both gives properties and allows new to be added" do
         foo = _subject_module.with :foo, :F, :bar, :B, :baz, :Z
-        foo.has_bar.should eql true
-        foo.foo_x.should eql :F
-        foo.bar_x.should eql :B
-        foo.baz_x.should eql :Z
+        expect( foo.has_bar ).to eql true
+        expect( foo.foo_x ).to eql :F
+        expect( foo.bar_x ).to eql :B
+        expect( foo.baz_x ).to eql :Z
       end
     end
 
@@ -109,8 +109,8 @@ module Skylab::Fields::TestSupport
 
       it "ok" do
         foo = _subject_module.with :uh, :U, :ah, :A
-        foo.uh_x.should eql :U
-        foo.ah_x.should eql :A
+        expect( foo.uh_x ).to eql :U
+        expect( foo.ah_x ).to eql :A
       end
     end
 
@@ -154,9 +154,9 @@ module Skylab::Fields::TestSupport
 
       it "ok - overriding is order dependant" do
         foo = _subject_module.with :one, :_one_, :two, :_two_, :three, :_three_
-        foo.one_x.should eql :_one_
-        foo.two_x.should eql :_TWO_
-        foo.three_x.should eql :_three_
+        expect( foo.one_x ).to eql :_one_
+        expect( foo.two_x ).to eql :_TWO_
+        expect( foo.three_x ).to eql :_three_
       end
     end
 

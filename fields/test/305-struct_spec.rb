@@ -14,29 +14,29 @@ module Skylab::Fields::TestSupport
       end
 
       it "build an instance with `new`, by default the member is nil (like ::Struct)" do
-        X_sct_Foo.new.nerp.should eql nil
+        expect( X_sct_Foo.new.nerp ).to eql nil
       end
 
       it "arguments passed to `new` will become the member values" do
-        ( X_sct_Foo.new( :bleep ).nerp ).should eql :bleep
+        expect( ( X_sct_Foo.new( :bleep ).nerp ) ).to eql :bleep
       end
 
       it "`[]` is effectively an alias for `new`" do
-        ( X_sct_Foo[ :fazzle ].nerp ).should eql :fazzle
+        expect( ( X_sct_Foo[ :fazzle ].nerp ) ).to eql :fazzle
       end
 
       it "with an instance you can set (mutate) the value of a member with '='" do
         foo = X_sct_Foo.new
         foo.nerp = :dango
-        foo.nerp.should eql :dango
+        expect( foo.nerp ).to eql :dango
       end
 
       it "`members` as a class method works like in ::Struct" do
-        X_sct_Foo.members.should eql [ :nerp ]
+        expect( X_sct_Foo.members ).to eql [ :nerp ]
       end
 
       it "`members` as an instance method does the same" do
-        X_sct_Foo.new.members.should eql [ :nerp ]
+        expect( X_sct_Foo.new.members ).to eql [ :nerp ]
       end
     end
   end

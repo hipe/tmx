@@ -42,10 +42,10 @@ module Skylab::Fields::TestSupport
 
             _be_this = be_emission :error, :invalid_attribute_value do |ev|
               _ = black_and_white ev
-              _.should eql _msg
+              expect( _ ).to eql _msg
             end
 
-            only_emission.should _be_this
+            expect( only_emission ).to _be_this
           end
         end
 

@@ -17,19 +17,19 @@ module Skylab::Arc::TestSupport
         _subject_class.new
       rescue ::NoMethodError => e
       end
-      e.message.should match %r(^private method `new' called for )
+      expect( e.message ).to match %r(^private method `new' called for )
     end
 
     it "tenet 2 (`edit_entity` creates); tenet 4 (..) and tenet 5 (`[]`)" do
 
       guy = _subject_class.edit_entity :set, :mi_nombre, "DAVE"
-      guy.mi_nombre.should eql "DAVE"
+      expect( guy.mi_nombre ).to eql "DAVE"
     end
 
     it "sub-components can be `set` via their `[etc]` method (tenet 6)" do
 
       guy = _subject_class.edit_entity :set, :age, 26
-      guy.age.as_digit.should eql 26
+      expect( guy.age.as_digit ).to eql 26
     end
 
     it "sub-components can be `set` multiple at once" do
@@ -38,8 +38,8 @@ module Skylab::Arc::TestSupport
         :set, :mi_nombre, "DAVID",
         :set, :age, 27,
       )
-      guy.mi_nombre.should eql 'DAVID'
-      guy.age.as_digit.should eql 27
+      expect( guy.mi_nombre ).to eql 'DAVID'
+      expect( guy.age.as_digit ).to eql 27
     end
 
     it "if you give an invalid sub component argument, events & false" do
@@ -54,10 +54,10 @@ module Skylab::Arc::TestSupport
         msg_a.push ev_p[ [] ]
       end
 
-      i_a_a.should eql [ [ :error, :expression ] ]
-      msg_a.should eql [ [ "name must be in all caps" ] ]
+      expect( i_a_a ).to eql [ [ :error, :expression ] ]
+      expect( msg_a ).to eql [ [ "name must be in all caps" ] ]
 
-      guy.should eql false
+      expect( guy ).to eql false
     end
 
     memoize :_subject_class do

@@ -15,7 +15,7 @@ module Skylab::Arc::TestSupport
 
       _s = _to_json sn
       _h = ::JSON.parse _s, symbolize_names: true
-      _h.should eql( first_name: '"spike"', last_name: 'jonez' )
+      expect( _h ).to eql( first_name: '"spike"', last_name: 'jonez' )
     end
 
     it "with sparse structres it does NOT render nil" do
@@ -24,7 +24,7 @@ module Skylab::Arc::TestSupport
       sn.last_name = "gustav"
 
       _s = _to_json_not_pretty sn
-      _s.should eql '{"last_name":"gustav"}'
+      expect( _s ).to eql '{"last_name":"gustav"}'
     end
 
     it "two levels ..?" do
@@ -38,7 +38,7 @@ module Skylab::Arc::TestSupport
       cn.nickname = "NN"
 
       _s = _to_json_not_pretty cn
-      _s.should eql '{"nickname":"NN","simple_name":{"first_name":"FN","last_name":"LN"}}'
+      expect( _s ).to eql '{"nickname":"NN","simple_name":{"first_name":"FN","last_name":"LN"}}'
     end
 
     def _to_json sn

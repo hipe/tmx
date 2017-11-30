@@ -24,14 +24,14 @@ module Skylab::Fields::TestSupport
       it "you can request those of a custom symbol" do
 
         o = the_attributes_
-        o.symbols( :_foo ).should eql %i( two four )
-        o.symbols( :_zazzle ).should eql %i( five )
+        expect( o.symbols( :_foo ) ).to eql %i( two four )
+        expect( o.symbols( :_zazzle ) ).to eql %i( five )
       end
 
       it "you can request those fields of no symbol" do
 
         _ = the_attributes_.symbols
-        _.should eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
+        expect( _ ).to eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
       end
 
       it "you can request an individual formal attribute" do
@@ -64,16 +64,16 @@ module Skylab::Fields::TestSupport
 
         it "fields get set" do
           a = _state
-          a.fetch( 0 ).should eql :ONE
-          a.fetch( 3 ).should eql :FOUR
+          expect( a.fetch( 0 ) ).to eql :ONE
+          expect( a.fetch( 3 ) ).to eql :FOUR
         end
 
         it "flags get set" do
-          _state[ 1, 2 ].should eql [ true, true ]
+          expect( _state[ 1, 2 ] ).to eql [ true, true ]
         end
 
         it "ivars are nillified IFF `optional` meta-flag" do
-          _state.fetch( 4 ).should be_nil
+          expect( _state.fetch( 4 ) ).to be_nil
         end
       end
     end

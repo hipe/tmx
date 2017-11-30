@@ -14,12 +14,12 @@ module Skylab::Arc::TestSupport
     it "set when valid" do
 
       bike = _subject_class.new 'shinola'
-      bike.make.should eql 'shinola'
+      expect( bike.make ).to eql 'shinola'
       ok = bike.edit_entity :set, :make, 'schwinn'
-      ok.should eql true
-      bike.make.should eql 'schwinn'
+      expect( ok ).to eql true
+      expect( bike.make ).to eql 'schwinn'
 
-      bike._num_times_change_event_occurred.should eql 1
+      expect( bike._num_times_change_event_occurred ).to eql 1
     end
 
     it "set when invalid" do
@@ -32,14 +32,14 @@ module Skylab::Arc::TestSupport
         i_a_a.push i_a ; msg_a.push ev_p[ [] ]
       end
 
-      ok.should eql false
+      expect( ok ).to eql false
 
-      bike.make.should eql 'zeepie'
+      expect( bike.make ).to eql 'zeepie'
 
-      i_a_a.should eql [ [ :error, :expression ] ]
-      msg_a.should eql [ [ "all caps? \"SCHWINN\"" ] ]
+      expect( i_a_a ).to eql [ [ :error, :expression ] ]
+      expect( msg_a ).to eql [ [ "all caps? \"SCHWINN\"" ] ]
 
-      bike._num_times_change_event_occurred.should be_nil
+      expect( bike._num_times_change_event_occurred ).to be_nil
     end
 
     it "setting one valid and one invalid? ATOMIC!" do
@@ -47,23 +47,23 @@ module Skylab::Arc::TestSupport
       bike = _subject_class.new 'one', 2
 
       ok = bike.edit_entity :set, :year, 3, :set, :make, 'ohai'
-      ok.should eql true
-      bike.make.should eql 'ohai'
-      bike.year.should eql 3
+      expect( ok ).to eql true
+      expect( bike.make ).to eql 'ohai'
+      expect( bike.year ).to eql 3
 
-      bike._num_times_change_event_occurred.should eql 1
+      expect( bike._num_times_change_event_occurred ).to eql 1
 
       ev_i_a = []
       ok = bike.edit_entity :set, :year, 4, :set, :make, 'DOOHAH' do | * a |
         ev_i_a.push a ; :_no_see_
       end
-      ok.should eql false
-      bike.make.should eql 'ohai'
-      bike.year.should eql 3
+      expect( ok ).to eql false
+      expect( bike.make ).to eql 'ohai'
+      expect( bike.year ).to eql 3
 
-      ev_i_a.should eql [[ :error, :expression ]]
+      expect( ev_i_a ).to eql [[ :error, :expression ]]
 
-      bike._num_times_change_event_occurred.should eql 1
+      expect( bike._num_times_change_event_occurred ).to eql 1
     end
 
     shared_subject :_subject_class do

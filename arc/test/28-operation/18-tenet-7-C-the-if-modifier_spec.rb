@@ -16,8 +16,8 @@ module Skylab::Arc::TestSupport
         :add, :color, :green,
       )
 
-      _ok.should eql [ :last_delivery_result, :green ]
-      o._a.should eql [ :green ]
+      expect( _ok ).to eql [ :last_delivery_result, :green ]
+      expect( o._a ).to eql [ :green ]
     end
 
     it "does no when no" do
@@ -29,8 +29,8 @@ module Skylab::Arc::TestSupport
         :add, :color, :red,
       )
 
-      _ok.should eql :welff_nothing_happened
-      o._a.length.should be_zero
+      expect( _ok ).to eql :welff_nothing_happened
+      expect( o._a.length ).to be_zero
     end
 
     it "does the second of two" do
@@ -45,8 +45,8 @@ module Skylab::Arc::TestSupport
         :add, :color, :greena,
       )
 
-      _ok.should eql [ :last_delivery_result, :greena ]
-      o._a.should eql [ :greena ]
+      expect( _ok ).to eql [ :last_delivery_result, :greena ]
+      expect( o._a ).to eql [ :greena ]
     end
 
     def _new

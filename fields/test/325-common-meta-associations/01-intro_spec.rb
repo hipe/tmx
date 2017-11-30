@@ -23,14 +23,14 @@ module Skylab::Fields::TestSupport
 
       it "nothing" do
         against_ :paths, :hi
-        @paths.should eql :hi
+        expect( @paths ).to eql :hi
       end
 
       it "known known" do
         against_ :do_ignore_case, :momma
         kn = @do_ignore_case
         kn.is_known_known or fail
-        kn.value.should eql :momma
+        expect( kn.value ).to eql :momma
       end
 
       it "flag" do
@@ -49,7 +49,7 @@ module Skylab::Fields::TestSupport
       it "singular of" do
 
         against_ :path, :xx
-        @paths.should eql [ :xx ]
+        expect( @paths ).to eql [ :xx ]
       end
     end
 
@@ -64,13 +64,13 @@ module Skylab::Fields::TestSupport
 
       it "setting it works" do
         against_ :ruby_regexp, :hi
-        @ruby_regexp.should eql :hi
+        expect( @ruby_regexp ).to eql :hi
       end
 
       it "but when it is not set.." do
         against_
-        instance_variable_defined?( :@ruby_regexp ).should eql true
-        @ruby_regexp.should be_nil
+        expect( instance_variable_defined? :@ruby_regexp ).to eql true
+        expect( @ruby_regexp ).to be_nil
       end
     end
 

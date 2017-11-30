@@ -22,7 +22,7 @@ module Skylab::Fields::TestSupport
         _be_this_message = eql(
           "missing required attributes «prp: foo_bar» and «prp: quux_grault»\n" )
 
-        event_message_as_string_.should _be_this_message
+        expect( event_message_as_string_ ).to _be_this_message
       end
     end
 

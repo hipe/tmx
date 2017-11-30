@@ -19,7 +19,7 @@ module Skylab::Fields::TestSupport
       rescue Home_::ArgumentError => e
       end
 
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end
 
     context "a class with one property, a `method` macro" do
@@ -45,8 +45,8 @@ module Skylab::Fields::TestSupport
       it "we have full reflection on these properties" do
 
         prp = X_cf_Intro_B.properties.fetch :foo_diddle
-        prp.reader_classification.should eql :method
-        prp.parameter_arity.should eql :zero_or_one
+        expect( prp.reader_classification ).to eql :method
+        expect( prp.parameter_arity ).to eql :zero_or_one
 
       end
 
@@ -81,8 +81,8 @@ module Skylab::Fields::TestSupport
         entity = X_cf_Intro_C.new { }
         entity.dereference( :wiz_waz ) == "wiz waz: 1" || fail
         entity.dereference( :wiz_waz ) == "wiz waz: 2" || fail
-        entity.wiz_waz.should eql 'wiz waz: 3'
-        entity.wiz_waz.should eql 'wiz waz: 4'
+        expect( entity.wiz_waz ).to eql 'wiz waz: 3'
+        expect( entity.wiz_waz ).to eql 'wiz waz: 4'
       end
     end
 
@@ -127,7 +127,7 @@ module Skylab::Fields::TestSupport
         rescue Home_::ArgumentError => e
         end
 
-        e.message.should match _rx
+        expect( e.message ).to match _rx
       end
     end
 
@@ -154,7 +154,7 @@ module Skylab::Fields::TestSupport
 
       it "works (both ways)" do
         ent = X_cf_Intro_E.new { }
-        ent.dozer.should eql 'zack braff'
+        expect( ent.dozer ).to eql 'zack braff'
         ent.dereference( :dozer ) == 'zack braff' || fail
       end
     end
@@ -184,8 +184,8 @@ module Skylab::Fields::TestSupport
 
       it "works (both ways)" do
         ent = X_cf_Intro_F.new { }
-        ent.wowzaa.should eql "1 1"
-        ent.wowzaa.should eql "1 1"
+        expect( ent.wowzaa ).to eql "1 1"
+        expect( ent.wowzaa ).to eql "1 1"
         ent.dereference( :wowzaa ) == "1 1" || fail
         ent.dereference( :wowzaa ) == "1 1" || fail
       end
@@ -212,10 +212,10 @@ module Skylab::Fields::TestSupport
         entity = X_cf_Intro_G.new :dingle_woofer, :toofer
 
         x = entity.dingle_woofer
-        x.should eql :toofer
+        expect( x ).to eql :toofer
 
         x = entity.dereference :dingle_woofer
-        x.should eql :toofer
+        expect( x ).to eql :toofer
 
       end
     end
@@ -241,24 +241,24 @@ module Skylab::Fields::TestSupport
       it "when provide all properties" do
 
         entity = X_cf_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
-        entity.foo.should eql :FO
-        entity.baz.should eql :BZ
+        expect( entity.foo ).to eql :FO
+        expect( entity.baz ).to eql :BZ
         entity.dereference( :baz ) == :BZ || fail
 
-        entity.respond_to?( :bar ).should eql false
+        expect( entity.respond_to?( :bar ) ).to eql false
 
         begin
           entity.dereference :bar
         rescue ::NameError => e
         end
 
-        e.message.should match %r(\Aproperty is not readable - 'bar'\z)
+        expect( e.message ).to match %r(\Aproperty is not readable - 'bar'\z)
       end
 
       it "when non-required fields missing" do
         entity = X_cf_Intro_H.new :baz, :hi
-        entity.baz.should eql :hi
-        entity.foo.should be_nil
+        expect( entity.baz ).to eql :hi
+        expect( entity.foo ).to be_nil
       end
 
       it "when required field missing" do  # :#coverpoint1.8
@@ -286,7 +286,7 @@ module Skylab::Fields::TestSupport
 
       it "when yes" do
         x = X_cf_Intro_I.new :foo, :F
-        x.instance_variable_get( :@foo ).should eql :F
+        expect( x.instance_variable_get( :@foo ) ).to eql :F
       end
 
       it "when no" do

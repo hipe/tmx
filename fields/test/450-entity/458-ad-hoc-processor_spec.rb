@@ -58,14 +58,13 @@ module Skylab::Fields::TestSupport
       end
 
       it "reflects" do
-        _subject_module.properties.get_keys.
-          should eql [ :foo, :bar, :baz, :biff ]
+        expect( _subject_module.properties.get_keys ).to eql [ :foo, :bar, :baz, :biff ]
       end
 
       it "writes" do
         o = _subject_module.with :foo, :F, :baz, :B
-        o.foo.should eql :F
-        o.baz.should eql :B
+        expect( o.foo ).to eql :F
+        expect( o.baz ).to eql :B
       end
     end
 
