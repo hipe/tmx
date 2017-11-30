@@ -17,7 +17,7 @@ module Skylab::Git::TestSupport
       invoke 'ping', 'foo'
       want :o, '(out: foo)'
       want_no_more_lines
-      @exitstatus.should eql :pingback_from_API
+      expect( @exitstatus ).to eql :pingback_from_API
     end
 
     it "ping error channel (expect STDERR)" do

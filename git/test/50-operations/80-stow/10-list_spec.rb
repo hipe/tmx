@@ -23,7 +23,7 @@ module Skylab::Git::TestSupport
 
       want_no_more_events
 
-      @result.should eql :pingback_from_API
+      expect( @result ).to eql :pingback_from_API
     end
 
     it "list stows against bad directory" do
@@ -33,13 +33,13 @@ module Skylab::Git::TestSupport
       _st = @result
 
       _x = _st.gets
-      _x.should be_nil
+      expect( _x ).to be_nil
 
       _em = want_not_OK_event :enoent
 
       ev = _em.cached_event_value.to_event
 
-      ev.message_head.should eql "No such file or directory"
+      expect( ev.message_head ).to eql "No such file or directory"
 
       want_no_more_events
     end
@@ -50,7 +50,7 @@ module Skylab::Git::TestSupport
 
       _st = @result
       _x = _st.gets
-      _x.should be_nil
+      expect( _x ).to be_nil
 
       want_no_events
     end
@@ -63,14 +63,14 @@ module Skylab::Git::TestSupport
       stow = st.gets
       oid = stow.object_id
 
-      ::File.basename( stow.path ).should eql 'alpha'
+      expect( ::File.basename( stow.path ) ).to eql 'alpha'
 
       stow = st.gets
 
-      ::File.basename( stow.path ).should eql 'beta'
-      stow.object_id.should eql oid
+      expect( ::File.basename( stow.path ) ).to eql 'beta'
+      expect( stow.object_id ).to eql oid
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
       want_no_events
     end
 

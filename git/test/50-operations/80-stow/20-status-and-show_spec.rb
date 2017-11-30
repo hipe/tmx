@@ -20,7 +20,7 @@ module Skylab::Git::TestSupport
       rescue ::Errno::ENOENT => e
       end
 
-      e.message.should match %r(\ANo such file or dir)
+      expect( e.message ).to match %r(\ANo such file or dir)
     end
 
     it "status - dir not dir" do
@@ -35,7 +35,7 @@ module Skylab::Git::TestSupport
       rescue ::Errno::ENOTDIR => e
       end
 
-      e.message.should match %r(\ANot a directory )
+      expect( e.message ).to match %r(\ANot a directory )
     end
 
     it "status - OK - OK" do
@@ -56,10 +56,11 @@ module Skylab::Git::TestSupport
 
       want_neutral_event :command, /\Acommand: git ls-files /
 
-      st = @result
-      st.gets.should eql "diffy/derpus"
-      st.gets.should eql "diffy/nerpus/herpus"
-      st.gets.should be_nil
+      _st = @result
+      want_these_lines_in_array_ _st do |y|
+        y << 'diffy/derpus'
+        y << 'diffy/nerpus/herpus'
+      end
 
       want_no_more_events
     end
@@ -87,11 +88,11 @@ module Skylab::Git::TestSupport
 
       o = _to_line_scanner _st
 
-      o.want_styled_line.should eql "flip.txt      | 2 ++"
+      expect( o.want_styled_line ).to eql "flip.txt      | 2 ++"
 
-      o.want_styled_line.should eql "flop/floop.tx | 4 ++++"
+      expect( o.want_styled_line ).to eql "flop/floop.tx | 4 ++++"
 
-      o.next_line.should eql(
+      expect( o.next_line ).to eql(
         "2 files changed, 6 insertions(+), 0 deletions(-)" )
 
       o.want_no_more_lines
@@ -124,7 +125,7 @@ module Skylab::Git::TestSupport
 
       s = Zerk_lib_[]::CLI::Styling::Unstyle_styled[ _act ]
       s or fail
-      s.should eql _exp
+      expect( s ).to eql _exp
     end
 
     def _same_API_call

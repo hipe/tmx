@@ -79,7 +79,7 @@ module Skylab::Git::TestSupport
       def succeeds
         d = ooao_state_.exitstatus
         if d.nonzero?
-          d.should eql 0
+          expect( d ).to eql 0
         end
       end
 
@@ -90,7 +90,7 @@ module Skylab::Git::TestSupport
       def want_part_ part
         x = _ooao_part_stream.gets
         if part != x
-          x.should eql part
+          expect( x ).to eql part
         end
       end
 

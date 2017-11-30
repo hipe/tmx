@@ -71,8 +71,8 @@ module Skylab::Git::TestSupport
       want_succeed
 
       st = files_in_ tmpdir_path
-      st.gets.should eql './projo/zerf/ziff.txt'
-      st.gets.should be_nil
+      expect( st.gets ).to eql './projo/zerf/ziff.txt'
+      expect( st.gets ).to be_nil
     end
 
     def __setup

@@ -20,21 +20,23 @@ module Skylab::Git::TestSupport
         want_neutral_event_ :file_utils_mv_event
         want_neutral_event_ :file_utils_mv_event
 
-        st = dirs_in_ path
-        st.gets.should eql './calc'
-        st.gets.should eql './calc/.git'
-        st.gets.should eql './calc/dippy'
-        st.gets.should eql './Stoz'
-        st.gets.should eql './Stoz/foo'
-        st.gets.should eql './Stoz/foo/dippy'
-        st.gets.should be_nil
+        _st = dirs_in_ path
+        want_these_lines_in_array_ _st do |y|
+          y << './calc'
+          y << './calc/.git'
+          y << './calc/dippy'
+          y << './Stoz'
+          y << './Stoz/foo'
+          y << './Stoz/foo/dippy'
+        end
 
-        st = files_in_ path
-        st.gets.should eql './calc/some-versioned-file.txt'
-        st.gets.should eql './Stoz/foo/dippy/doopy.txt'
-        st.gets.should eql './Stoz/foo/dippy/floopy.txt'
-        st.gets.should eql './Stoz/foo/lippy.txt'
-        st.gets.should be_nil
+        _st = files_in_ path
+        want_these_lines_in_array_ _st do |y|
+          y << './calc/some-versioned-file.txt'
+          y << './Stoz/foo/dippy/doopy.txt'
+          y << './Stoz/foo/dippy/floopy.txt'
+          y << './Stoz/foo/lippy.txt'
+        end
       end
 
       def _my_mock_system_conduit directory
@@ -67,16 +69,17 @@ module Skylab::Git::TestSupport
 
         st = dirs_in_ ::File.join( path, 'calc' )
 
-        st.gets.should eql "./.git"
-        st.gets.should eql "./dippy"
-        st.gets.should be_nil
+        expect( st.gets ).to eql "./.git"
+        expect( st.gets ).to eql "./dippy"
+        expect( st.gets ).to be_nil
 
-        st = files_in_ path
-        st.gets.should eql "./calc/lippy.txt"
-        st.gets.should eql "./calc/some-versioned-file.txt"
-        st.gets.should eql "./Stoz/bar/dippy/doopy.txt"
-        st.gets.should eql "./Stoz/bar/dippy/floopy.txt"
-        st.gets.should be_nil
+        _st = files_in_ path
+        want_these_lines_in_array_ _st do |y|
+          y << "./calc/lippy.txt"
+          y << "./calc/some-versioned-file.txt"
+          y << "./Stoz/bar/dippy/doopy.txt"
+          y << "./Stoz/bar/dippy/floopy.txt"
+        end
       end
 
       def _my_mock_system_conduit directory

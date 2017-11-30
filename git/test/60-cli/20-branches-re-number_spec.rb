@@ -13,7 +13,7 @@ module Skylab::Git::TestSupport
 
       _em = want_not_OK_event :strange_items
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white( _em.cached_event_value ) ).to eql(
         "2 and 4 must be in the collection" )
 
       want_fail
@@ -23,10 +23,10 @@ module Skylab::Git::TestSupport
 
       _against [ 5,10,15,16,20,22,23 ], [ 15, 16, 4 ]
 
-      _gets.should eql %w( 23 27 )
-      _gets.should eql %w( 22 26 )
-      _gets.should eql %w( 20 24 )
-      _gets.should eql %w( 16 20 )
+      expect( _gets ).to eql %w( 23 27 )
+      expect( _gets ).to eql %w( 22 26 )
+      expect( _gets ).to eql %w( 20 24 )
+      expect( _gets ).to eql %w( 16 20 )
       _done
     end
 
@@ -34,9 +34,9 @@ module Skylab::Git::TestSupport
 
       _against [ 1,2,3,9,10,12 ], [ 3, 9, -5 ]
 
-      _gets.should eql %w( 9 4 )
-      _gets.should eql %w( 10 05 )
-      _gets.should eql %w( 12 07 )
+      expect( _gets ).to eql %w( 9 4 )
+      expect( _gets ).to eql %w( 10 05 )
+      expect( _gets ).to eql %w( 12 07 )
       _done
     end
 

@@ -42,6 +42,10 @@ module Skylab::Git::TestSupport
 
     # -- expectation support
 
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
+    end
+
     # -- set-up
 
     # ~ test-time configuration of the test-time environment

@@ -45,7 +45,7 @@ module Skylab::Git::TestSupport
             }(pth \"/tmp/unversioned-B.file\")" or fail
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "block, unversioned (in repo) - expresses file has not been added" do
@@ -59,7 +59,7 @@ module Skylab::Git::TestSupport
             }(pth \"/fake/repo/somedir/unversioned-A.file\")" or fail
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "block, modified - expresses \"file changed since index\"" do
@@ -74,7 +74,7 @@ module Skylab::Git::TestSupport
           y.first =~ _rx or fail
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "block, unchanged" do

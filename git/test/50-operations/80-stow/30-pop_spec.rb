@@ -17,7 +17,9 @@ module Skylab::Git::TestSupport
 
         _em = want_not_OK_event :component_not_found
 
-        black_and_white( _em.cached_event_value ).should match(
+        _em = black_and_white _em.cached_event_value
+
+        expect( _em ).to match(
           /\Athere is no stow "stow-wadoodle" in stows collection «[^»]+»\z/ )
 
         want_fail
@@ -35,17 +37,19 @@ module Skylab::Git::TestSupport
 
       def __want_these_paths td_path
 
-        st = dirs_in_ ::File.join td_path, 'stoz'
+        _st = dirs_in_ ::File.join td_path, 'stoz'
 
-        st.gets.should eql './beta'
-        st.gets.should be_nil
+        want_these_lines_in_array_ _st do |y|
+          y << './beta'
+        end
 
-        st = files_in_ td_path
-        st.gets.should eql './project/one-dir/one-file.txt'
-        st.gets.should eql './project/two-dir/three-dir/three-file.txt'
-        st.gets.should eql './project/two-file.txt'
-        st.gets.should eql './stoz/beta/whatever.txt'
-        st.gets.should be_nil
+        _st = files_in_ td_path
+        want_these_lines_in_array_ _st do |y|
+          y << './project/one-dir/one-file.txt'
+          y << './project/two-dir/three-dir/three-file.txt'
+          y << './project/two-file.txt'
+          y << './stoz/beta/whatever.txt'
+        end
       end
 
       def __want_these_events
@@ -84,18 +88,20 @@ module Skylab::Git::TestSupport
         want_neutral_event_ :file_utils_mv_event
         want_succeed
 
-        st = dirs_in_ path
-        st_ = files_in_ path
-        st.gets.should eql './proj-1'
-        st.gets.should eql './proj-1/.git'
-        st.gets.should eql './proj-1/dir-1'
-        st.gets.should eql './proj-1/dir-2'
-        st.gets.should eql './stoz'
-        st.gets.should be_nil
+        _dirs_st = dirs_in_ path
+        _files_st = files_in_ path
 
-        st = st_
-        st.gets.should eql './proj-1/dir-1/file-1.txt'
-        st.gets.should be_nil
+        want_these_lines_in_array_ _dirs_st do |y|
+          y << './proj-1'
+          y << './proj-1/.git'
+          y << './proj-1/dir-1'
+          y << './proj-1/dir-2'
+          y << './stoz'
+        end
+
+        want_these_lines_in_array_ _files_st do |y|
+          y << './proj-1/dir-1/file-1.txt'
+        end
       end
 
       def _prepared_tmpdir
