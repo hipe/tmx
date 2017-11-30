@@ -26,8 +26,8 @@ module Skylab::Human::TestSupport
       end
 
       it "message is OK" do
-        first_line_.should eql  "** ding **"
-        second_line_.should eql 'dong'
+        expect( first_line_ ).to eql  "** ding **"
+        expect( second_line_ ).to eql 'dong'
       end
 
       it "class is something default" do

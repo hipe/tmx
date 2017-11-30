@@ -13,17 +13,17 @@ module Skylab::Human::TestSupport
 
     it "neutral (EXPERIMENTAL DEFAULT IDIOM)" do
       _ = _lines :success, :ok, true, :is_completion, false  # #here
-      _.should eql [ "while frobing widgetszzz, updated «/some/file» (123 bytes)\n" ]
+      expect( _ ).to eql [ "while frobing widgetszzz, updated «/some/file» (123 bytes)\n" ]
     end
 
     it "success" do
       _ = _lines :error, :ok, true  # #here
-      _.should eql [ "frobed widgetszzz: updated «/some/file» (123 bytes)\n" ]
+      expect( _ ).to eql [ "frobed widgetszzz: updated «/some/file» (123 bytes)\n" ]
     end
 
     it "failure" do
       _ = _lines :info, :ok, false  # #here
-      _.should eql [ "couldn't frob widgetszzz because updated «/some/file» (123 bytes)\n" ]
+      expect( _ ).to eql [ "couldn't frob widgetszzz because updated «/some/file» (123 bytes)\n" ]
     end
 
     def _lines sym, * a

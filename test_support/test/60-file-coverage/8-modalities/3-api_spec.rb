@@ -83,7 +83,7 @@ module Skylab::TestSupport::TestSupport
       _against_path fixture_tree( :three, 'dir-with' )
 
       x = @result.tree.fetch_only_child
-      x.slug.should eql 'awnt2'
+      expect( x.slug ).to eql 'awnt2'
 
       want_assets_but_no_tests_ x
     end
@@ -94,7 +94,7 @@ module Skylab::TestSupport::TestSupport
 
       x = @result.tree
 
-      x.children_count.should eql 3
+      expect( x.children_count ).to eql 3
 
       want_assets_and_tests_ x[ 'from-another' ]
     end

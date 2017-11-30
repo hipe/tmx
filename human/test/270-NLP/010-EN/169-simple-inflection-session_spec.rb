@@ -230,7 +230,7 @@ module Skylab::Human::TestSupport
         sess = X_nlp_en_sis_SessionClass.new
         sess.write_count_for_inflection remove_instance_variable :@COUNT
         actual_s = _express_by sess
-        actual_s == want_s or actual_s.should eql want_s
+        actual_s == want_s or expect( actual_s ).to eql want_s
       end
     end
 
@@ -238,20 +238,20 @@ module Skylab::Human::TestSupport
 
       sc = _soliloquizing_client_for :an
 
-      sc.instance_exec{ an 'apple' }.should eql( 'an apple' )
-      sc.instance_exec{ an 'PEAR' }.should eql( 'A PEAR' )
-      sc.instance_exec{ an 'beef', 0 }.should eql( 'no beef' )
-      sc.instance_exec{ an 'wing', 2 }.should eql( 'wing' )
+      expect( sc.instance_exec{ an 'apple' } ).to eql( 'an apple' )
+      expect( sc.instance_exec{ an 'PEAR' } ).to eql( 'A PEAR' )
+      expect( sc.instance_exec{ an 'beef', 0 } ).to eql( 'no beef' )
+      expect( sc.instance_exec{ an 'wing', 2 } ).to eql( 'wing' )
     end
 
     it "`s` - memoizes last numeric" do
 
       sc = _soliloquizing_client_for :s
 
-     sc.instance_exec{ s 2 }.should eql( 's' )
-     sc.instance_exec{ s }.should eql( 's' )
-     sc.instance_exec{ s 1 }.should eql( nil )
-     sc.instance_exec{ s }.should eql( nil )
+     expect( sc.instance_exec{ s 2 } ).to eql( 's' )
+     expect( sc.instance_exec{ s } ).to eql( 's' )
+     expect( sc.instance_exec{ s 1 } ).to eql( nil )
+     expect( sc.instance_exec{ s } ).to eql( nil )
     end
 
     it "`and_` - memoizes last numeric" do
@@ -262,19 +262,19 @@ module Skylab::Human::TestSupport
         "#{ and_ ['foo', 'bar'] } #{ s :is } ready"
       end
 
-      x.should eql( "foo and bar are ready" )
+      expect( x ).to eql( "foo and bar are ready" )
 
       x = sc.instance_exec do
         "#{ or_ ['foo'] } #{ s :is } ready"
       end
 
-      x.should eql( 'foo is ready' )
+      expect( x ).to eql( 'foo is ready' )
 
       x = sc.instance_exec do
         "#{ and_( [] ) || 'none' } #{ s :is } ready"
       end
 
-      x.should eql( 'none are ready' )
+      expect( x ).to eql( 'none are ready' )
     end
 
     it "integration 0" do
@@ -316,7 +316,7 @@ module Skylab::Human::TestSupport
            } in #{ s :this }#{ _non_one } location#{ s }."
         end )
 
-        _s_.should eql exp_s
+        expect( _s_ ).to eql exp_s
       end
     end.call
 

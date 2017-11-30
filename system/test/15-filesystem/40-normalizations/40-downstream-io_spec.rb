@@ -121,7 +121,7 @@ module Skylab::System::TestSupport
       io.write 'hey'
       io.close
 
-      ::File.read( @_path ).should eql 'hey'
+      expect( ::File.read( @_path ) ).to eql 'hey'
     end
 
     def _not_here

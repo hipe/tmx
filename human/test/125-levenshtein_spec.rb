@@ -14,7 +14,7 @@ module Skylab::Human::TestSupport
         :stringify_by, :id2name.to_proc,
         :closest_N_items, 3 )
 
-      _a_.should eql [ :ernana, :onono, :banana ]
+      expect( _a_ ).to eql [ :ernana, :onono, :banana ]
     end
   end
 end

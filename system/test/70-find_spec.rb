@@ -38,7 +38,7 @@ module Skylab::System::TestSupport
           :_no_see_
         end
 
-      ev.find_command_args.should eql _cmd_o.args
+      expect( ev.find_command_args ).to eql _cmd_o.args
     end
 
     it "(experiment with EN)" do
@@ -53,7 +53,7 @@ module Skylab::System::TestSupport
 
       _s = Home_.lib_.human::PhraseAssembly::Sentence_string_head_via_words[ _s_a ]
 
-      _s.should eql 'whose name matched "*.code" in «x» and «y»'
+      expect( _s ).to eql 'whose name matched "*.code" in «x» and «y»'
     end
 
     define_method :_dangerously_memoized, -> do

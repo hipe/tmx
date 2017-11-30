@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::TestSupport
 
   module Want_Stdout_Stderr  # lots of "theory" in [#029]
@@ -286,27 +288,28 @@ module Skylab::TestSupport
 
       def want_maybe_a_blank_line
 
-        st = stream_for_want_stdout_stderr
+        scn = stream_for_want_stdout_stderr
 
-        if st.unparsed_exists and NEWLINE_ == st.head_as_is.string
-          st.advance_one
+        if scn.unparsed_exists and NEWLINE_ == scn.head_as_is.string
+          scn.advance_one
           nil
         end
       end
 
       def want_a_blank_line
 
-        st = stream_for_want_stdout_stderr
-        _x = st.gets_one
+        scn = stream_for_want_stdout_stderr
+        _x = scn.gets_one
+        self._FIX_NOW
         _x.string.should eql NEWLINE_
       end
 
       def want_no_more_lines
 
-        st = stream_for_want_stdout_stderr
+        scn = stream_for_want_stdout_stderr
 
-        if st.unparsed_exists
-          _x = st.head_as_is
+        if scn.unparsed_exists
+          _x = scn.head_as_is
           fail "expected no more lines, had #{ _x.to_a.inspect }"
         end
       end
@@ -316,8 +319,8 @@ module Skylab::TestSupport
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
         count = 0
-        st = _sout_serr_stream_for_contiguous_lines_on_stream sym
-        while st.gets
+        scn = _sout_serr_stream_for_contiguous_lines_on_stream sym
+        while scn.gets
           count += 1
         end
         count
@@ -339,11 +342,11 @@ module Skylab::TestSupport
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        s = ""
-        st = _sout_serr_stream_for_contiguous_lines_on_stream sym
+        s = ::String.new
+        scn = _sout_serr_stream_for_contiguous_lines_on_stream sym
 
         begin
-          em = st.gets
+          em = scn.gets
           em or break
           s.concat yield em.string
           redo
@@ -356,17 +359,17 @@ module Skylab::TestSupport
 
         # (it would be nice to use Enumerable.chunk but we have a reduce too)
 
-        st = stream_for_want_stdout_stderr
+        scn = stream_for_want_stdout_stderr
         y = []
 
         sym = nil
         begin
 
-          if st.no_unparsed_exists
+          if scn.no_unparsed_exists
             break
           end
 
-          em = st.gets_one
+          em = scn.gets_one
 
           if sym != em.stream_symbol
             a = []
@@ -406,10 +409,10 @@ module Skylab::TestSupport
       end
 
       def _sout_serr_chunk_for
-        st = @__sout_serr_actual_stream__
+        scn = @__sout_serr_actual_scanner__
         p = -> do
-          if st.unparsed_exists and yield( st.head_as_is )
-            st.gets_one
+          if scn.unparsed_exists and yield( scn.head_as_is )
+            scn.gets_one
           else
             p = EMPTY_P_
             nil
@@ -469,9 +472,9 @@ module Skylab::TestSupport
 
       def _sout_serr_want_and_resolve_emission
         exp = @__sout_serr_expectation__
-        st = @__sout_serr_actual_stream__
-        if st.unparsed_exists
-          em = st.gets_one
+        scn = @__sout_serr_actual_scanner__
+        if scn.unparsed_exists
+          em = scn.gets_one
           @__sout_serr_emission__ = em
           @__sout_serr_line__ = nil
           stream_sym = exp.stream_symbol
@@ -513,18 +516,18 @@ module Skylab::TestSupport
 
         @__sout_serr_is_baked__ = true
 
-        @__sout_serr_actual_stream__ = x
+        @__sout_serr_actual_scanner__ = x
       end
 
       def stream_for_want_stdout_stderr
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        @__sout_serr_actual_stream__
+        @__sout_serr_actual_scanner__
       end
 
       def _bake_sout_serr
-        @__sout_serr_actual_stream__ = Common_::Scanner.via_array(
+        @__sout_serr_actual_scanner__ = Common_::Scanner.via_array(
           flush_baked_emission_array )
 
         true
@@ -562,16 +565,16 @@ module Skylab::TestSupport
 
       include Home_.lib_.fields::Attributes::Actor::InstanceMethods
 
-      def initialize st, & p
+      def initialize scn, & p
 
         @want_is_styled = false
         @method_name = :_sout_serr_want_and_resolve_emission
         @stream_symbol = nil
 
-        process_argument_scanner_passively st
+        process_argument_scanner_passively scn
 
-        while st.unparsed_exists
-          __process_the_rest_using_shape_hack st
+        while scn.unparsed_exists
+          __process_the_rest_using_shape_hack scn
         end
 
         @receive_unstyled_string = p
@@ -584,26 +587,26 @@ module Skylab::TestSupport
         KEEP_PARSING_
       end
 
-      def __process_the_rest_using_shape_hack st
+      def __process_the_rest_using_shape_hack scn
         begin
-          send st.head_as_is.class.name, st
+          send scn.head_as_is.class.name, scn
         end
       end
 
-      def Regexp st
+      def Regexp scn
         @method_name = :sout_serr_want_given_regex
-        @pattern_x = st.gets_one
+        @pattern_x = scn.gets_one
         KEEP_PARSING_
       end
 
-      def String st
+      def String scn
         @method_name = :sout_serr_want_given_string
-        @pattern_x = st.gets_one
+        @pattern_x = scn.gets_one
         KEEP_PARSING_
       end
 
-      def Symbol st
-        @stream_symbol = st.gets_one
+      def Symbol scn
+        @stream_symbol = scn.gets_one
         KEEP_PARSING_
       end
 

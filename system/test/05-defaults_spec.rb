@@ -15,7 +15,7 @@ module Skylab::System::TestSupport
 
       p1 = _subject.dev_tmpdir_path
       p2 = _subject.dev_tmpdir_path
-      p1.object_id.should eql p2.object_id
+      expect( p1.object_id ).to eql p2.object_id
     end
 
     it "cache_path (#fragile)" do
@@ -30,7 +30,7 @@ module Skylab::System::TestSupport
       )
       _actual = ::File.join path, foo
 
-      _actual.should be_include _target
+      expect( _actual ).to be_include _target
     end
 
     def _subject

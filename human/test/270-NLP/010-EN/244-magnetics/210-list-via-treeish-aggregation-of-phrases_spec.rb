@@ -21,29 +21,29 @@ module Skylab::Human::TestSupport
       end
 
       it "the result expression's category symbol is the same" do
-        _expression.category_symbol_.should eql :predicateish
+        expect( _expression.category_symbol_ ).to eql :predicateish
       end
 
       it "the result expression's verb lemma is the same" do
-        _expression.lemma_symbol.should eql :be
+        expect( _expression.lemma_symbol ).to eql :be
       end
 
       it "the result expression's object noun phrase became the list" do
         x = _expression.object_noun_phrase
-        x.category_symbol_.should eql :list
+        expect( x.category_symbol_ ).to eql :list
 
         a = x._read_only_array
         _one = a.fetch 0
         _two = a.fetch 1
         ivar = :@__word  # eww / joist
-        _one.instance_variable_get( ivar ).should eql 'x'
-        _two.instance_variable_get( ivar ).should eql 'y'
+        expect( _one.instance_variable_get( ivar ) ).to eql 'x'
+        expect( _two.instance_variable_get( ivar ) ).to eql 'y'
       end
 
       it "wahoo expression one" do
 
         _a = _jimmy_is
-        _one_line( _a ).should match %r(\AJimmy is x and y\b)
+        expect( _one_line( _a ) ).to match %r(\AJimmy is x and y\b)
       end
     end
 
@@ -58,12 +58,12 @@ module Skylab::Human::TestSupport
       end
 
       it "these things are normal" do
-        _expression.lemma_symbol.should eql :be
+        expect( _expression.lemma_symbol ).to eql :be
         o = _expression.object_noun_phrase
-        o.verb_lemma.should eql :miss
+        expect( o.verb_lemma ).to eql :miss
         oo = o.object_noun_phrase
-        oo.lemma_symbol.should eql :property
-        oo.modifier_word_list.send( :_strings ).should eql [ 'required' ]
+        expect( oo.lemma_symbol ).to eql :property
+        expect( oo.modifier_word_list.send( :_strings ) ).to eql [ 'required' ]
       end
 
       it "but note the constituency" do
@@ -82,7 +82,7 @@ module Skylab::Human::TestSupport
       it "wahoo expression two" do
 
         _a = _jimmy_is
-        _one_line( _a ).should match(
+        expect( _one_line( _a ) ).to match(
           %r(\AJimmy is missing required properties 'par-1' and 'par-2') )
       end
     end
@@ -98,13 +98,13 @@ module Skylab::Human::TestSupport
       it "(express three)" do
 
         _a = _jimmy_is
-        _one_line( _a ).should match(
+        expect( _one_line( _a ) ).to match(
           %r(\AJimmy is missing required property 'par-1') )
       end
 
       it "(no subject three)" do
         _a = _when_wo_subject
-        _a.should eql [ "missing required property 'par-1'\n" ]
+        expect( _a ).to eql [ "missing required property 'par-1'\n" ]
       end
     end
 
@@ -121,12 +121,12 @@ module Skylab::Human::TestSupport
       it "these things are normal" do
 
         o = _expression
-        o.lemma_symbol.should eql :require
+        expect( o.lemma_symbol ).to eql :require
 
         oo = o.object_noun_phrase
 
         _wordlist = oo.suffixed_modifier_phrase
-        _wordlist.send( :_strings ).should eql %w( which failed to load )
+        expect( _wordlist.send( :_strings ) ).to eql %w( which failed to load )
       end
 
       it "but note the constituency" do
@@ -135,14 +135,14 @@ module Skylab::Human::TestSupport
 
         _a = _onp.suffixed_proper_constituency._read_only_array
 
-        _a.fetch( 0 ).send( :_mixed ).as_variegated_symbol.should eql :par_1
-        _a.fetch( 1 ).send( :_mixed ).as_variegated_symbol.should eql :par_2
+        expect( _a.fetch( 0 ).send( :_mixed ).as_variegated_symbol ).to eql :par_1
+        expect( _a.fetch( 1 ).send( :_mixed ).as_variegated_symbol ).to eql :par_2
       end
 
       it "express four!" do
 
         _a = _jimmy_is
-        _one_line( _a ).should match(
+        expect( _one_line( _a ) ).to match(
           %r(\AJimmy requires 'par-1' and 'par-2' which failed to load\b) )
       end
 
@@ -150,7 +150,7 @@ module Skylab::Human::TestSupport
 
         _a = _when_wo_subject
 
-        _one_line( _a ).should match(
+        expect( _one_line( _a ) ).to match(
           %r(\A'par-1' and 'par-2' which failed to load are required\b) )
       end
     end
@@ -172,12 +172,12 @@ module Skylab::Human::TestSupport
 
       it "first of two (rough)" do
         _ = _first_of_two
-        _.lemma_symbol.should eql :be
+        expect( _.lemma_symbol ).to eql :be
       end
 
       it "second of two (rough)" do
         _ = _second_of_two
-        _.lemma_symbol.should eql :require
+        expect( _.lemma_symbol ).to eql :require
       end
 
       def _first_of_two
@@ -197,7 +197,7 @@ module Skylab::Human::TestSupport
       end
 
       it "the second line starts with \"also\" (NOT capitalized for now)" do
-        _lines.fetch( 1 ).should match %r(\Aalso, )
+        expect( _lines.fetch( 1 ) ).to match %r(\Aalso, )
       end
 
       it "both lines end with periods" do
@@ -209,13 +209,13 @@ module Skylab::Human::TestSupport
       end
 
       it "content of first line looks good" do
-        _lines.fetch( 0 ).should be_include(
+        expect( _lines.fetch( 0 ) ).to be_include(
           "Jimmy is missing required properties 'par-1' and 'par-2'"
         )
       end
 
       it "content of second line looks good" do
-        _lines.fetch( 1 ).should be_include(
+        expect( _lines.fetch( 1 ) ).to be_include(
           "Jimmy requires 'par-1' which failed to load"
         )
       end

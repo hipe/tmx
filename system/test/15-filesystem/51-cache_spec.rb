@@ -36,7 +36,7 @@ module Skylab::System::TestSupport
       end
 
       it "the module now responds to `cache_path`" do
-        X_f_c_Foo10.should be_respond_to :cache_path
+        expect( X_f_c_Foo10 ).to be_respond_to :cache_path
       end
 
       it "but if you try to access this pn, it fails bc no parent complies #fragile-test" do
@@ -92,7 +92,7 @@ module Skylab::System::TestSupport
 
       it "the nested client module builds its `cache_path` isomoprhically" do
 
-        X_f_c_Foo20::BarBaz.cache_path.should eql ::File.join( Tmpdir_[], 'bar-baz' )
+        expect( X_f_c_Foo20::BarBaz.cache_path ).to eql ::File.join( Tmpdir_[], 'bar-baz' )
       end
     end
 
@@ -139,7 +139,7 @@ module Skylab::System::TestSupport
         :abbrev, 'some-other-filename',
       )
 
-      _p[].should eql ::File.join( Tmpdir_[], 'some-other-filename' )
+      expect( _p[] ).to eql ::File.join( Tmpdir_[], 'some-other-filename' )
     end
 
     context "- hopping modules" do
@@ -162,16 +162,16 @@ module Skylab::System::TestSupport
       end
 
       it "the (locally) topmost module knows its associated path" do
-        X_f_c_Foo3.cache_path.should eql Tmpdir_[]
+        expect( X_f_c_Foo3.cache_path ).to eql Tmpdir_[]
       end
 
       it "but this intermediate module has no associated path" do
-        X_f_c_Foo3::Bar.respond_to?( :cache_path ).should eql false
+        expect( X_f_c_Foo3::Bar.respond_to?( :cache_path ) ).to eql false
       end
 
       it "but yet this here, innermost module SKIPS OVER the intermediate step" do
 
-        X_f_c_Foo3::Bar::Baz.cache_path.should eql ::File.join( Tmpdir_[], 'baz' )
+        expect( X_f_c_Foo3::Bar::Baz.cache_path ).to eql ::File.join( Tmpdir_[], 'baz' )
       end
     end
 

@@ -18,7 +18,7 @@ module Skylab::Human::TestSupport
 
         1 == y.length or fail "expression frames produce strings not arrays"
 
-        y.fetch( 0 ).should eql expected_string
+        expect( y.fetch( 0 ) ).to eql expected_string
       end
 
       def __build_the_magnetic_expression_session

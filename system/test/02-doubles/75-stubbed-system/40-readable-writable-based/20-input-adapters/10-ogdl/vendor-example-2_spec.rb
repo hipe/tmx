@@ -50,18 +50,18 @@ module Skylab::System::TestSupport
 
       tree = @st.gets
 
-      tree.string.should eql 'libraries'
-      tree.children.length.should eql 2
+      expect( tree.string ).to eql 'libraries'
+      expect( tree.children.length ).to eql 2
 
       nd, nd_ = tree.children
 
-      nd.string.should eql 'foo.so'
-      nd_.string.should eql 'bar.so'
+      expect( nd.string ).to eql 'foo.so'
+      expect( nd_.string ).to eql 'bar.so'
 
       recurse = -> do
 
-        nd.children.length.should eql 1
-        nd_.children.length.should eql 1
+        expect( nd.children.length ).to eql 1
+        expect( nd_.children.length ).to eql 1
 
         nd = nd.children.fetch 0
         nd_ = nd_.children.fetch 0
@@ -69,18 +69,18 @@ module Skylab::System::TestSupport
 
       recurse[]
 
-      nd.string.should eql 'version'
-      nd_.string.should eql 'version'
+      expect( nd.string ).to eql 'version'
+      expect( nd_.string ).to eql 'version'
 
       recurse[]
 
-      nd.string.should eql '1.2'
-      nd_.string.should eql '2.3'
+      expect( nd.string ).to eql '1.2'
+      expect( nd_.string ).to eql '2.3'
 
-      nd.children.should be_nil
-      nd_.children.should be_nil
+      expect( nd.children ).to be_nil
+      expect( nd_.children ).to be_nil
 
-      @st.gets.should be_nil
+      expect( @st.gets ).to be_nil
     end
   end
 end

@@ -13,9 +13,9 @@ module Skylab::System::TestSupport
         downstream = ::StringIO.new
         stream = Home_::IO::Mappers::Filter[ downstream ]
         stream.write('a')
-        downstream.string.should eql('a')
+        expect( downstream.string ).to eql('a')
         stream.puts('b')
-        downstream.string.should eql("ab\n")
+        expect( downstream.string ).to eql("ab\n")
       end
     end
 
@@ -31,7 +31,7 @@ module Skylab::System::TestSupport
       def self.assert input, output, *tags
         it("#{input.inspect} becomes #{output.inspect}", *tags) do
           stream.write input
-          downstream.string.should eql(output)
+          expect( downstream.string ).to eql(output)
         end
       end
       assert '', ''
@@ -42,17 +42,17 @@ module Skylab::System::TestSupport
       assert "\nabc\ndef\n\nghi", "Z \nZ abc\nZ def\nZ \nZ ghi"
       it 'write("a") ; puts("b") ; puts("c") works' do
         stream.write('a')
-        downstream.string.should eql('Z a')
+        expect( downstream.string ).to eql('Z a')
         stream.puts('b')
-        downstream.string.should eql("Z ab\n")
+        expect( downstream.string ).to eql("Z ab\n")
         stream.puts('c')
-        downstream.string.should eql("Z ab\nZ c\n")
+        expect( downstream.string ).to eql("Z ab\nZ c\n")
       end
       it 'write("ab") ; write("cd\nef") works' do
         stream.write('ab')
-        downstream.string.should eql('Z ab')
+        expect( downstream.string ).to eql('Z ab')
         stream.write("cd\nef")
-        downstream.string.should eql("Z abcd\nZ ef")
+        expect( downstream.string ).to eql("Z abcd\nZ ef")
       end
     end
 
@@ -65,9 +65,9 @@ module Skylab::System::TestSupport
             "  << epic: #{ x } >>\n"
           end )
         stream.write 'a'
-        downstream.string.should eql( 'a' )
+        expect( downstream.string ).to eql( 'a' )
         stream.puts( 'bcd' )
-        downstream.string.should eql( "a  << epic: bcd >>\n" )
+        expect( downstream.string ).to eql( "a  << epic: bcd >>\n" )
       end
     end
 

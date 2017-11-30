@@ -17,7 +17,7 @@ module Skylab::Human::TestSupport
       o.add :drink, :lemonade
 
       _ = o.express_into_line_context []
-      _.should eql [ "drinking teas and lemonades and eatting tofus" ]
+      expect( _ ).to eql [ "drinking teas and lemonades and eatting tofus" ]
     end
   end
 end

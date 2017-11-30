@@ -9,14 +9,14 @@ module Skylab::System::TestSupport
     it "any_home_directory_path (#bad-test)" do
 
       actual_s = _subject.any_home_directory_path
-      actual_s.should eql _real_home
+      expect( actual_s ).to eql _real_home
 
     end
 
     it "any_home_directory_pathname (#bad-test)" do
 
       actual_s = _subject.any_home_directory_pathname.join( 'X' ).to_path
-      actual_s.should eql "#{ _real_home }/X"
+      expect( actual_s ).to eql "#{ _real_home }/X"
 
     end
 

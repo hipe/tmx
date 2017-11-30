@@ -13,8 +13,8 @@ module Skylab::System::TestSupport
         tee.write('a')
         tee.puts('b')
         tee << 'c'
-        tee[:foo].string.should eql("ab\nc")
-        tee[:bar].string.should eql( tee[:foo].string )
+        expect( tee[:foo].string ).to eql("ab\nc")
+        expect( tee[:bar].string ).to eql( tee[:foo].string )
       end
     end
 
@@ -27,8 +27,8 @@ module Skylab::System::TestSupport
 
     it "responds to respond_to? appropriately (based on the list)" do
       tee = Home_::IO::Mappers::Tee.new
-      tee.respond_to?( :foo ).should eql false
-      tee.respond_to?( :puts ).should eql true
+      expect( tee.respond_to?( :foo ) ).to eql false
+      expect( tee.respond_to?( :puts ) ).to eql true
     end
 
     before :all do

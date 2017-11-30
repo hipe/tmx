@@ -31,19 +31,19 @@ module Skylab::Human::TestSupport
       end
 
       it "the re-emitted channel is the same" do
-        channel_.should eql [ :error, :expression ]
+        expect( channel_ ).to eql [ :error, :expression ]
       end
 
       it "the second line has a newline added" do
-        second_line_.should eql "sho nuff\n"
+        expect( second_line_ ).to eql "sho nuff\n"
       end
 
       it "the first line gets inflected with \"couldn't frob knob because..\"" do
-        first_line_.should match %r(\Acouldn't add item because)
+        expect( first_line_ ).to match %r(\Acouldn't add item because)
       end
 
       it "the association is placed as the subject of the predicate" do
-        first_line_.should match %r(\bleft shark should have been\b)
+        expect( first_line_ ).to match %r(\bleft shark should have been\b)
       end
     end
 
@@ -66,11 +66,11 @@ module Skylab::Human::TestSupport
       end
 
       it "added newline at the very end" do
-        first_line_[ -1 ].should eql NEWLINE_
+        expect( first_line_[ -1 ] ).to eql NEWLINE_
       end
 
       it "for now, the `while` pattern is employed.." do
-        first_line_.should match(
+        expect( first_line_ ).to match(
           %r(\A\(while frobing, left shark was converted to \*\* this \*\*\)) )
       end
     end

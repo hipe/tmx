@@ -25,7 +25,7 @@ module Skylab::Human::TestSupport
         :syntactic_category, :noun_phrase,
         :subject, 3, :subject, 'amigo' )
 
-      _ef.noun_phrase.to_string.should eql '3 amigos'
+      expect( _ef.noun_phrase.to_string ).to eql '3 amigos'
     end
 
     it "y." do

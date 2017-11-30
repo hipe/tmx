@@ -39,31 +39,31 @@ module Skylab::Human::TestSupport
       it "\"pull\"-style: use `with` to get a dup, set `gets_under`, call `gets`" do
         scn = _subject.with :gets_under, Common_::Stream.via_nonsparse_array( [ :A ] )
         x = scn.gets
-        x.should eql "[#{ NEWLINE_ } A"
+        expect( x ).to eql "[#{ NEWLINE_ } A"
         x = scn.gets
-        x.should eql "#{ NEWLINE_ }]"
-        scn.gets.should be_nil
+        expect( x ).to eql "#{ NEWLINE_ }]"
+        expect( scn.gets ).to be_nil
       end
 
       it "when zero input items" do
         scn = _subject.with :gets_under, Common_::THE_EMPTY_STREAM
         x = scn.gets
-        x.should eql '[ ]'
-        scn.gets.should be_nil
+        expect( x ).to eql '[ ]'
+        expect( scn.gets ).to be_nil
       end
 
       it "will change to buffering mode with multiple `puts` and then `flush`" do
         scn = _subject.dup
         scn.puts 'hi'
         scn.puts 'hej'
-        scn.flush.should eql "[#{ NEWLINE_ } hi,#{ NEWLINE_ } hej#{ NEWLINE_ }]"
-        scn.flush.should eql '[ ]'
+        expect( scn.flush ).to eql "[#{ NEWLINE_ } hi,#{ NEWLINE_ } hej#{ NEWLINE_ }]"
+        expect( scn.flush ).to eql '[ ]'
       end
 
       it "when zero input items and buffering mode" do
         scn = _subject.dup
-        scn.flush.should eql "[ ]"
-        scn.flush.should eql '[ ]'
+        expect( scn.flush ).to eql "[ ]"
+        expect( scn.flush ).to eql '[ ]'
       end
     end
 

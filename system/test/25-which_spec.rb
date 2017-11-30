@@ -11,7 +11,7 @@ module Skylab::System::TestSupport
       expected_s = _THE_STANDARD_EDITOR
       full_path_s = __parent_subject.which expected_s
       actual_s = full_path_s[ - expected_s.length, expected_s.length ]
-      actual_s.should eql expected_s
+      expect( actual_s ).to eql expected_s
     end
 
     define_method :_THE_STANDARD_EDITOR, -> do

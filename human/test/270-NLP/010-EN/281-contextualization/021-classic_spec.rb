@@ -132,7 +132,7 @@ module Skylab::Human::TestSupport
 
       o = _prototype.dup
       o.selection_stack = s_a
-      o.build_string.should eql expected_s
+      expect( o.build_string ).to eql expected_s
     end
 
     dangerous_memoize :_beginning_prototype do

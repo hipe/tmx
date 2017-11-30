@@ -259,7 +259,7 @@ module Skylab::System::TestSupport
       while item=st.gets
         actual_sym_a.push item.normal_symbol
       end
-      actual_sym_a.should eql sym_a
+      expect( actual_sym_a ).to eql sym_a
     end
 
     def _flush_to_stream

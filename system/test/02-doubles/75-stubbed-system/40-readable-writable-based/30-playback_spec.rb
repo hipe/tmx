@@ -31,14 +31,14 @@ module Skylab::System::TestSupport
 
       i, o, e, w = cond.popen3 'echo', "it's", '"fun"'
 
-      i.should be_nil
+      expect( i ).to be_nil
 
-      o.gets.should eql "it's \"fun\"\n"
-      o.gets.should be_nil
+      expect( o.gets ).to eql "it's \"fun\"\n"
+      expect( o.gets ).to be_nil
 
-      e.should be_nil
+      expect( e ).to be_nil
 
-      w.value.exitstatus.should be_zero
+      expect( w.value.exitstatus ).to be_zero
     end
 
     # ==

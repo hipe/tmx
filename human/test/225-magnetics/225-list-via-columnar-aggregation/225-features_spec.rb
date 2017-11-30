@@ -200,7 +200,7 @@ module Skylab::Human::TestSupport
         if s_a
           output_s = s_a.join Home_::EMPTY_S_
         end
-        output_s.should eql expected_string
+        expect( output_s ).to eql expected_string
       end
     end
   end

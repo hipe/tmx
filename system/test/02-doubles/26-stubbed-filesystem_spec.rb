@@ -87,7 +87,7 @@ module Skylab::System::TestSupport
     it "`build_directory_object` when yes" do
 
       _x = _fs.build_directory_object '/compound'
-      _x.to_path.should eql '/compound'
+      expect( _x.to_path ).to eql '/compound'
     end
 
     it "[same] when no ent" do
@@ -97,7 +97,7 @@ module Skylab::System::TestSupport
       rescue ::Errno::ENOENT => e
       end
 
-      e.message.should eql(
+      expect( e.message ).to eql(
         "No such file or directory @ MOCKED_dir_initialize - /no-such-path" )
     end
 
@@ -108,7 +108,7 @@ module Skylab::System::TestSupport
       rescue ::Errno::ENOTDIR => e
       end
 
-      e.message.should eql(
+      expect( e.message ).to eql(
         "Not a directory @ MOCKED_dir_initialize - /compound/absolut" )
     end
 
@@ -130,7 +130,7 @@ module Skylab::System::TestSupport
       rescue ::NoMethodError => e
       end
 
-      e.name.should eql sym
+      expect( e.name ).to eql sym
     end
 
     dangerous_memoize_ :_incomplete_client_class do

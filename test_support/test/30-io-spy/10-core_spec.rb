@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport
       io.puts 'foo'
       io.write 'bar'
       io.puts ' baz'
-      io.string.should eql "foo\nbar baz\n"
+      expect( io.string ).to eql "foo\nbar baz\n"
     end
 
     it "a bunch of debugging options" do
@@ -30,7 +30,7 @@ module Skylab::TestSupport::TestSupport
       io.puts "one"
       io.puts "two"
       io.puts "three"
-      string_IO.string.should eql "•_one_\n•_three_\n"
+      expect( string_IO.string ).to eql "•_one_\n•_three_\n"
     end
 
     def _subject_module

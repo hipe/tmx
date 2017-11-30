@@ -16,7 +16,7 @@ module Skylab::Human::TestSupport
         y << "fire"
       end
 
-      _a.should eql [
+      expect( _a ).to eql [
         "Not in the ** mood ** for shenanigans\n",
         "nope\n", "fire\n" ]
     end
@@ -29,7 +29,7 @@ module Skylab::Human::TestSupport
         y << "such good"
       end
 
-      _a.should eql [ "Things look ** good **\n", "yep\n", "such good\n" ]
+      expect( _a ).to eql [ "Things look ** good **\n", "yep\n", "such good\n" ]
     end
 
     _Fake_lexeme = -> x do
@@ -65,7 +65,7 @@ module Skylab::Human::TestSupport
         end
       end
 
-      _a.should eql(
+      expect( _a ).to eql(
         [ "couldn't eat fish because rick snyder ** failed **\n",
           "too bad\n",
         ] )
@@ -108,7 +108,7 @@ module Skylab::Human::TestSupport
         end
       end
 
-      _a.should eql [ "eated fish: woop woop\n", "wee\n" ]
+      expect( _a ).to eql [ "eated fish: woop woop\n", "wee\n" ]
     end
 
     it "../ event / completion - one word - " do
@@ -126,7 +126,7 @@ module Skylab::Human::TestSupport
         end
       end
 
-      _a.should eql [ "(donezo eating fish.)\n", "wee\n" ]
+      expect( _a ).to eql [ "(donezo eating fish.)\n", "wee\n" ]
     end
 
     def _lines_via_emission * i_a, & ev_p

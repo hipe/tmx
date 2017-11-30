@@ -15,8 +15,8 @@ module Skylab::System::TestSupport
       rescue => e
       end
 
-      e.should be_kind_of ::Errno::ENOENT
-      e.message.should match %r(\ANo such file or directory - must exist )
+      expect( e ).to be_kind_of ::Errno::ENOENT
+      expect( e.message ).to match %r(\ANo such file or directory - must exist )
     end
 
     it "creates those directories since necessary" do
@@ -25,8 +25,8 @@ module Skylab::System::TestSupport
 
       path_a = o.__resolve_directory
 
-      ::File.basename( path_a.first ).should eql 'one'
-      ::File.basename( path_a.last ).should eql 'two'
+      expect( ::File.basename( path_a.first ) ).to eql 'one'
+      expect( ::File.basename( path_a.last ) ).to eql 'two'
     end
 
     it "get busy" do
@@ -56,7 +56,7 @@ module Skylab::System::TestSupport
           o.session
         rescue ::RuntimeError => e
         end
-        e.message.should match %r(\Areached max number of simultaneous\b)
+        expect( e.message ).to match %r(\Areached max number of simultaneous\b)
       end
     end
 
@@ -107,13 +107,13 @@ module Skylab::System::TestSupport
 
         fh.write 'x.'
         fh.flush
-        fh.stat.size.should eql 2
+        expect( fh.stat.size ).to eql 2
         hold_on_to_fh = fh
         :_hi_
       end
 
-      _x.should eql :_hi_
-      hold_on_to_fh.closed?.should eql true
+      expect( _x ).to eql :_hi_
+      expect( hold_on_to_fh.closed? ).to eql true
     end
 
     def _subject

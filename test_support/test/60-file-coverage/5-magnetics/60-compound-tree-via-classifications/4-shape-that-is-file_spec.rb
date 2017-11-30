@@ -30,21 +30,21 @@ module Skylab::TestSupport::TestSupport
     def _common_result
 
       nd = _common_first_level
-      nd.children_count.should be_zero
+      expect( nd.children_count ).to be_zero
 
       npl = nd.node_payload
-      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.kode )
-      npl.asset_file_entry_s_a.should eql %w( foo-bar--.kode )
+      expect( npl.test_file_entry_s_a ).to eql %w( foo-bar_spek.kode )
+      expect( npl.asset_file_entry_s_a ).to eql %w( foo-bar--.kode )
 
     end
 
     def _common_first_level
 
       nd = @tree.fetch_first_child
-      nd.children_count.should eql 1
+      expect( nd.children_count ).to eql 1
 
-      nd.slug.should eql 'dir-A'
-      nd.node_payload.asset_dir_entry_s_a.should eql %w( dir-A- )
+      expect( nd.slug ).to eql 'dir-A'
+      expect( nd.node_payload.asset_dir_entry_s_a ).to eql %w( dir-A- )
       nd.fetch_first_child
     end
 
@@ -54,16 +54,16 @@ module Skylab::TestSupport::TestSupport
 
       x = @tree.fetch_only_child
       npl = x.node_payload
-      npl.has_tests.should eql true
-      npl.has_assets.should be_nil
+      expect( npl.has_tests ).to eql true
+      expect( npl.has_assets ).to be_nil
 
       x = x.fetch_only_child
-      x.children_count.should be_zero
+      expect( x.children_count ).to be_zero
 
       npl = x.node_payload
-      npl.test_file_entry_s_a.should eql %w( wizzie_spek.kode )
+      expect( npl.test_file_entry_s_a ).to eql %w( wizzie_spek.kode )
 
-      npl.asset_dir_entry_s_a.should be_nil
+      expect( npl.asset_dir_entry_s_a ).to be_nil
 
     end
 
@@ -72,16 +72,16 @@ module Skylab::TestSupport::TestSupport
       against :asset, :file, "#{ fixture_tree :two }/dir-A-/mizzie--.kode"
 
       x = @tree.fetch_only_child
-      x.slug.should eql 'dir-A'
+      expect( x.slug ).to eql 'dir-A'
       npl = x.node_payload
-      npl.has_assets.should eql true
-      npl.has_tests.should be_nil
+      expect( npl.has_assets ).to eql true
+      expect( npl.has_tests ).to be_nil
 
       x = x.fetch_only_child
-      x.children_count.should be_zero
+      expect( x.children_count ).to be_zero
       npl = x.node_payload
 
-      npl.asset_file_entry_s_a.should eql %w( mizzie--.kode )
+      expect( npl.asset_file_entry_s_a ).to eql %w( mizzie--.kode )
     end
 
     it "of single test file in test directory with no counterpart" do
@@ -91,17 +91,17 @@ module Skylab::TestSupport::TestSupport
       x = @tree.fetch_only_child
 
       npl = x.node_payload
-      npl.has_tests.should eql true
-      npl.has_assets.should be_nil
+      expect( npl.has_tests ).to eql true
+      expect( npl.has_assets ).to be_nil
 
       x = x.fetch_only_child
 
       npl = x.node_payload
-      npl.has_tests.should eql true
-      npl.has_assets.should be_nil
-      npl.test_file_entry_s_a.should eql %w( hi_speg.kode )
+      expect( npl.has_tests ).to eql true
+      expect( npl.has_assets ).to be_nil
+      expect( npl.test_file_entry_s_a ).to eql %w( hi_speg.kode )
 
-      x.children_count.should be_zero
+      expect( x.children_count ).to be_zero
     end
 
     # complement test :+#skipped-because-boring

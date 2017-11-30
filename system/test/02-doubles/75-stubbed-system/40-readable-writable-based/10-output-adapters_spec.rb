@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
@@ -21,16 +23,17 @@ module Skylab::System::TestSupport
       io = new_string_IO_
       co.write_to io
 
-      st = Basic_[]::String::LineStream_via_String[ io.string ]
+      _st = Basic_[]::String::LineStream_via_String[ io.string ]
 
-      st.gets.should eql "command\n"
-      st.gets.should eql "  argv\n"
-      st.gets.should eql "    echo, \"it's\", \"\\\"fun\\\"\"\n"
-      st.gets.should eql "  stdout_string\n"
-      st.gets.should eql "    \"it's \\\"fun\\\"\n"
-      st.gets.should eql "    \"\n"
-      st.gets.should eql "  exitstatus 0\n"
-      st.gets.should be_nil
+      want_these_lines_in_array_ _st do |y|
+        y << "command\n"
+        y << "  argv\n"
+        y << "    echo, \"it's\", \"\\\"fun\\\"\"\n"
+        y << "  stdout_string\n"
+        y << "    \"it's \\\"fun\\\"\n"
+        y << "    \"\n"
+        y << "  exitstatus 0\n"
+      end
     end
 
     it "if options are provided, they get special treatment" do
@@ -41,7 +44,7 @@ module Skylab::System::TestSupport
       io = new_string_IO_
       co.write_to io
 
-      io.string.should eql <<-HERE.unindent
+      expect( io.string ).to eql <<~HERE
         command
           argv hi
           chdir etc

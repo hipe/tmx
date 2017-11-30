@@ -12,7 +12,7 @@ module Skylab::Human::TestSupport
 
       vp << :preterite
 
-      vp.to_string.should eql 'loved'
+      expect( vp.to_string ).to eql 'loved'
     end
 
     it "verb phrase stays attached, using real-time state (e.g: present)" do
@@ -23,7 +23,7 @@ module Skylab::Human::TestSupport
 
       np << :third
 
-      vp.to_string.should eql 'loves'
+      expect( vp.to_string ).to eql 'loves'
     end
 
     it "irregular (be, singular, first, present)" do
@@ -34,7 +34,7 @@ module Skylab::Human::TestSupport
 
       np << :third
 
-      vp.to_string.should eql 'is'
+      expect( vp.to_string ).to eql 'is'
 
     end
 
@@ -48,12 +48,12 @@ module Skylab::Human::TestSupport
 
       vp << :progressive
 
-      vp.to_string.should eql 'is loving'
+      expect( vp.to_string ).to eql 'is loving'
     end
 
     it "oneliner: preterite (\"do\")" do
 
-      _subject_module[ 'do' ].preterite.should eql 'did'
+      expect( _subject_module[ 'do' ].preterite ).to eql 'did'
     end
 
     it "oneliner: preterite (\"be\" - an edge case)" do
@@ -75,17 +75,17 @@ module Skylab::Human::TestSupport
       # leave the combinatorial expression, putting the onus on the
       # client to use a more adequate interface for its construction.
 
-      _subject_module[ 'be' ].preterite.should eql 'was or were'
+      expect( _subject_module[ 'be' ].preterite ).to eql 'was or were'
     end
 
     it "oneliner: progressive" do
 
-      _subject_module[ 'draw' ].progressive.should eql 'drawing'
+      expect( _subject_module[ 'draw' ].progressive ).to eql 'drawing'
     end
 
     it "oneliner: singular third present" do
 
-      _subject_module[ 'miss' ].singular_third_present.should eql 'misses'
+      expect( _subject_module[ 'miss' ].singular_third_present ).to eql 'misses'
     end
 
     it "(more granular interface)" do
@@ -96,7 +96,7 @@ module Skylab::Human::TestSupport
 
       _ = v_o.express_into ""
 
-      _.should eql "has"
+      expect( _ ).to eql "has"
     end
 
     def _subject_module

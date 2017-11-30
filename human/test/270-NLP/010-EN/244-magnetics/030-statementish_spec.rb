@@ -29,7 +29,7 @@ module Skylab::Human::TestSupport
         o.subject = _subject_phrase
         o.verb_phrase = _verb_phrase
 
-        _s_of( o ).should eql "vampire hunter D has fun.\n"
+        expect( _s_of( o ) ).to eql "vampire hunter D has fun.\n"
       end
 
       it "preterite oh boy" do
@@ -39,7 +39,7 @@ module Skylab::Human::TestSupport
         o.subject = _subject_phrase
         o.verb_phrase = _verb_phrase_as_preterite
 
-        _s_of( o ).should eql "vampire hunter D had fun.\n"
+        expect( _s_of( o ) ).to eql "vampire hunter D had fun.\n"
       end
 
       it "but when no subject, passive voice OMG" do
@@ -48,7 +48,7 @@ module Skylab::Human::TestSupport
 
         o.verb_phrase = _verb_phrase
 
-        _s_of( o ).should eql "fun is had.\n"
+        expect( _s_of( o ) ).to eql "fun is had.\n"
       end
 
       it "passive voice in preterite" do
@@ -57,7 +57,7 @@ module Skylab::Human::TestSupport
 
         o.verb_phrase = _verb_phrase_as_preterite
 
-        _s_of( o ).should eql "fun was had.\n"
+        expect( _s_of( o ) ).to eql "fun was had.\n"
       end
 
       it "the ivariant be form" do
@@ -72,7 +72,7 @@ module Skylab::Human::TestSupport
         o.verb_phrase = _vp
 
         _ = _s_of( o )
-        _.should eql "crazy\n"
+        expect( _ ).to eql "crazy\n"
       end
 
       shared_subject :_verb_phrase_as_preterite do

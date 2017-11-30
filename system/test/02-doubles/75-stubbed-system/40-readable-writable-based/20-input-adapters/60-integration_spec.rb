@@ -20,12 +20,12 @@ module Skylab::System::TestSupport
       HERE
 
       co = @st.gets
-      co.argv.should eql [ 'echo', "it's", "\"fun\"" ]
-      co.stdout_string.should eql "it's \"fun\"\n"
-      co.stderr_string.should be_nil
-      co.exitstatus.should be_zero
+      expect( co.argv ).to eql [ 'echo', "it's", "\"fun\"" ]
+      expect( co.stdout_string ).to eql "it's \"fun\"\n"
+      expect( co.stderr_string ).to be_nil
+      expect( co.exitstatus ).to be_zero
 
-      @st.gets.should be_nil
+      expect( @st.gets ).to be_nil
     end
 
     it "reads two commands" do
@@ -46,14 +46,14 @@ module Skylab::System::TestSupport
       HERE
 
       co = @st.gets
-      co.argv.should eql %w( one two )
-      co.stdout_string.should eql "\n"
+      expect( co.argv ).to eql %w( one two )
+      expect( co.stdout_string ).to eql "\n"
 
       co = @st.gets
-      co.argv.should eql [ 'three' ]
-      co.exitstatus.should eql 15
+      expect( co.argv ).to eql [ 'three' ]
+      expect( co.exitstatus ).to eql 15
 
-      @st.gets.should be_nil
+      expect( @st.gets ).to be_nil
     end
 
     def _against s

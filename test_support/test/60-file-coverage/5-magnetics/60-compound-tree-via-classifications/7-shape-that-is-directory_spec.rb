@@ -17,26 +17,26 @@ module Skylab::TestSupport::TestSupport
       against :test, :directory, :root, @test_dir
 
       x = @tree.fetch_only_child
-      x.slug.should eql 'dir-A'  # normal
+      expect( x.slug ).to eql 'dir-A'  # normal
       npl = x.node_payload
 
-      npl.has_assets.should eql true
-      npl.has_tests.should eql true
+      expect( npl.has_assets ).to eql true
+      expect( npl.has_tests ).to eql true
 
-      npl.asset_dir_entry_s_a.should eql %w( dir-A- )
-      npl.test_dir_entry_s_a.should eql %w( dir-A )
+      expect( npl.asset_dir_entry_s_a ).to eql %w( dir-A- )
+      expect( npl.test_dir_entry_s_a ).to eql %w( dir-A )
 
       x = x.fetch_only_child
-      x.is_leaf.should eql true
+      expect( x.is_leaf ).to eql true
 
-      x.slug.should eql 'foo-bar'  # normal
+      expect( x.slug ).to eql 'foo-bar'  # normal
 
       npl = x.node_payload
-      npl.has_assets.should eql true
-      npl.has_tests.should eql true
+      expect( npl.has_assets ).to eql true
+      expect( npl.has_tests ).to eql true
 
-      npl.asset_file_entry_s_a.should eql %w( foo-bar--.kode )
-      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.kode )
+      expect( npl.asset_file_entry_s_a ).to eql %w( foo-bar--.kode )
+      expect( npl.test_file_entry_s_a ).to eql %w( foo-bar_spek.kode )
 
     end
 
@@ -114,8 +114,8 @@ module Skylab::TestSupport::TestSupport
       want_assets_but_no_tests_ @node
 
       a = @node.node_payload.asset_file_entry_s_a
-      a.length.should eql 1
-      a.first.should eql file_entry_s
+      expect( a.length ).to eql 1
+      expect( a.first ).to eql file_entry_s
     end
 
     def _want_test_without_asset file_entry_s
@@ -123,8 +123,8 @@ module Skylab::TestSupport::TestSupport
       want_tests_but_no_assets_ @node
 
       a = @node.node_payload.test_file_entry_s_a
-      a.length.should eql 1
-      a.first.should eql file_entry_s
+      expect( a.length ).to eql 1
+      expect( a.first ).to eql file_entry_s
     end
   end
 end

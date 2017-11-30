@@ -10,13 +10,13 @@ module Skylab::System::TestSupport
 
       _g = _parent_subject.grep :ruby_regexp, /foo/
       _s = _g.to_command_string
-      _s.should eql "grep -E foo"
+      expect( _s ).to eql "grep -E foo"
     end
 
     it "unsupported options, no listener" do
 
       _g = _parent_subject.grep :ruby_regexp, /foo/imx
-      _g.should eql false
+      expect( _g ).to eql false
     end
 
     it "unsupported options, listener" do
@@ -34,13 +34,13 @@ module Skylab::System::TestSupport
         :_never_see
       end
 
-      _x.should eql false  # unreliable
+      expect( _x ).to eql false  # unreliable
 
-      a.last.should eql [ :error, :regexp_option_not_supported ]
+      expect( a.last ).to eql [ :error, :regexp_option_not_supported ]
 
       a.first.express_into_under y=[], expression_agent_of_API_classic_
 
-      y.should eql [ "non convertible regexp options - 'MULTILINE', 'EXTENDED'" ]
+      expect( y ).to eql [ "non convertible regexp options - 'MULTILINE', 'EXTENDED'" ]
     end
 
     it "a fully monty" do
@@ -54,13 +54,13 @@ module Skylab::System::TestSupport
 
       _, o, e, t = Home_.lib_.open3.popen3( * _toks )
 
-      e.gets.should be_nil
+      expect( e.gets ).to be_nil
       line = o.gets
-      o.gets.should be_nil
+      expect( o.gets ).to be_nil
 
-      line.should be_include "-->ZOINK<--"
+      expect( line ).to be_include "-->ZOINK<--"
 
-      t.value.exitstatus.should be_zero
+      expect( t.value.exitstatus ).to be_zero
     end
 
     it "hits the system if you want it to" do
@@ -79,10 +79,10 @@ module Skylab::System::TestSupport
 
       scan = _cmd.to_output_line_content_stream
 
-      a.length.should be_zero
-      scan.gets.should be_include 'foobie'
-      scan.gets.should be_include 'FOOBIE'
-      scan.gets.should be_nil
+      expect( a.length ).to be_zero
+      expect( scan.gets ).to be_include 'foobie'
+      expect( scan.gets ).to be_include 'FOOBIE'
+      expect( scan.gets ).to be_nil
     end
 
     memoize :_here_path do

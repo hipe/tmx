@@ -40,11 +40,11 @@ module Skylab::Human::TestSupport
       end
 
       it "the re-emitted channel is the same" do
-        channel_.should eql [ :error, :itemzie_not_foundie ] or fail
+        expect( channel_ ).to eql [ :error, :itemzie_not_foundie ] or fail
       end
 
       it "the last line is the same" do
-        second_line_.should eql "did you mean \"wezo\" or \"dezo\"?\n" or fail
+        expect( second_line_ ).to eql "did you mean \"wezo\" or \"dezo\"?\n" or fail
       end
 
       it "you still get the (an) event emitted omg!!" do
@@ -52,7 +52,7 @@ module Skylab::Human::TestSupport
       end
 
       it "the first item has been contextualized (sensically by chance)" do
-        first_line_.should eql "left shark failed to add item because unrecognized kershploink \"bezo\"\n" or fail
+        expect( first_line_ ).to eql "left shark failed to add item because unrecognized kershploink \"bezo\"\n" or fail
       end
     end
   end

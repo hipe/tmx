@@ -12,9 +12,9 @@ module Skylab::TestSupport::TestSupport
       red.puts "r1"
       blue.puts "b1\nb2"
       red.write "r2\nnever see"
-      g.lines.length.should eql(4)
-      g.lines.map( & :stream_symbol ).should eql( [ :red, :blue, :blue, :red ] )
-      g.lines.map(&:string).join( EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
+      expect( g.lines.length ).to eql(4)
+      expect( g.lines.map( & :stream_symbol ) ).to eql( [ :red, :blue, :blue, :red ] )
+      expect( g.lines.map(&:string).join( EMPTY_S_ ) ).to eql("r1\nb1\nb2\nr2\n")
     end
 
     def _subject_module

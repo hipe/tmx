@@ -52,7 +52,7 @@ module Skylab::System::TestSupport
           _actual = _ohai.call input
 
           if _actual != expected
-            _actual.should eql expected
+            expect( _actual ).to eql expected
           end
         end
       end

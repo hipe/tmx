@@ -13,7 +13,7 @@ module Skylab::Human::TestSupport
       np << :plural
       np << :neuter
       np << :subjective
-      np.to_string.should eql 'they'
+      expect( np.to_string ).to eql 'they'
     end
 
     it "adding exponents reduces it to a possibly non-one number of forms" do
@@ -23,7 +23,7 @@ module Skylab::Human::TestSupport
       np = _build_common_phrase
       np << :third << :subjective
 
-      np.to_string.should eql 'she, he or it'
+      expect( np.to_string ).to eql 'she, he or it'
     end
 
     it "a phrase that \"becomes\" a pronoun \"remembers\" its \"antecedent\"" do
@@ -31,12 +31,12 @@ module Skylab::Human::TestSupport
       np = _build_common_phrase
       np << :third << :subjective << :plural
 
-      np.to_string.should eql 'they'
+      expect( np.to_string ).to eql 'they'
 
       np.clear_grammatical_category :person
       np.clear_grammatical_category :case
 
-      np.to_string.should eql 'jeefises'
+      expect( np.to_string ).to eql 'jeefises'
     end
 
     def _build_common_phrase

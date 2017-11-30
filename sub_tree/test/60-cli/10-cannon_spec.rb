@@ -87,7 +87,7 @@ module Skylab::SubTree::TestSupport
 
       define_method :_want_known_actions do
 
-        _emmi = @__sout_serr_actual_stream__.gets_one
+        _emmi = @__sout_serr_actual_scanner__.gets_one
 
         _md = %r(\Aknown actions are \((.+)\)$).match _emmi.string
 

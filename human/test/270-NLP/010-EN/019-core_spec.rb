@@ -10,7 +10,7 @@ describe "[hu] NLP EN - core" do  # :#spot1.2
       it "#{ so }", *t do
         x = "#{ s a, :no }known person#{ s a } #{ s a, :exist }#{ _and a }#{
           } in #{ s n, :this }#{ " #{ n }" if 1 != n } location#{ s n }."
-        x.should eql( so )
+        expect( x ).to eql( so )
       end
     end
 

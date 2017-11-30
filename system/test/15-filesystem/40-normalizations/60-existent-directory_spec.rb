@@ -29,7 +29,7 @@ module Skylab::System::TestSupport
       want_neutral_event :creating_directory
       want_no_more_events
 
-      ::File.basename( @result.value ).should eql 'mambazo'
+      expect( ::File.basename( @result.value ) ).to eql 'mambazo'
     end
 
     it "against file - whines" do

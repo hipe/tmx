@@ -10,7 +10,7 @@ module Skylab::System::TestSupport
     it "with no pathname - you get ::Dir.tmpdir for your system" do
 
       _tmpdir = Home_::Filesystem::Tmpdir.with
-      _tmpdir.to_path.should eql ::Dir.tmpdir
+      expect( _tmpdir.to_path ).to eql ::Dir.tmpdir
     end
 
     it "relative path (don't!) - raises" do
@@ -22,7 +22,7 @@ module Skylab::System::TestSupport
       rescue ::SecurityError => e
       end
 
-      e.message.should match %r(\Aunsafe tmpdir name - \.\z)
+      expect( e.message ).to match %r(\Aunsafe tmpdir name - \.\z)
     end
 
     it "relative path (don't!), but in pwd tmp/ - raises" do
@@ -37,7 +37,7 @@ module Skylab::System::TestSupport
         end
       end
 
-      e.message.should match %r(\bunsafe tmpdir name - \.)
+      expect( e.message ).to match %r(\bunsafe tmpdir name - \.)
     end
 
     it "path that would exceed max_mkdirs - raises" do
@@ -50,7 +50,7 @@ module Skylab::System::TestSupport
       rescue ::SecurityError => e
       end
 
-      e.message.should match %r(\Awon't make more than 1 dirs .+ts-foo must exist)
+      expect( e.message ).to match %r(\Awon't make more than 1 dirs .+ts-foo must exist)
     end
 
     it "path 1 lvl down - works" do
@@ -63,9 +63,9 @@ module Skylab::System::TestSupport
 
       a = _tmpdir.prepare
 
-      a.length.should eql(1)
-      a.first.should eql current
-      ::File.exist?( current ).should eql true
+      expect( a.length ).to eql(1)
+      expect( a.first ).to eql current
+      expect( ::File.exist?( current ) ).to eql true
 
       fu_.rmdir current
     end
@@ -79,10 +79,10 @@ module Skylab::System::TestSupport
 
       a = _tmpdir.prepare
 
-      ::File.exist?( subject_dir ).should eql true
+      expect( ::File.exist?( subject_dir ) ).to eql true
 
-      a.length.should eql(1)
-      a.first.should eql subject_dir
+      expect( a.length ).to eql(1)
+      expect( a.first ).to eql subject_dir
 
       fu = fu_
       fu.rmdir subject_dir
@@ -99,8 +99,8 @@ module Skylab::System::TestSupport
       tmpdir = _new_with :path, subject_dir, :max_mkdirs, 2
 
       a = tmpdir.prepare
-      a.length.should eql(1)
-      a.first.should eql subject_dir
+      expect( a.length ).to eql(1)
+      expect( a.first ).to eql subject_dir
 
       fu = fu_
       fu.rmdir subject_dir
@@ -119,12 +119,12 @@ module Skylab::System::TestSupport
 
       tmpdir = _new_with :path, subject_dir
 
-      ::File.exist?( subject_file ).should eql true
+      expect( ::File.exist?( subject_file ) ).to eql true
 
       tmpdir.prepare
 
-      ::File.exist?( subject_dir ).should eql true
-      ::File.exist?( subject_file ).should eql false
+      expect( ::File.exist?( subject_dir ) ).to eql true
+      expect( ::File.exist?( subject_file ) ).to eql false
 
       fu.rmdir subject_dir
     end
@@ -141,7 +141,7 @@ module Skylab::System::TestSupport
       rescue ::Errno::ENOTDIR => e
       end
 
-      e.message.should match %r(\bNot a directory - .+ts-some-file)
+      expect( e.message ).to match %r(\bNot a directory - .+ts-some-file)
 
       fu.rm subject_path
     end
@@ -154,7 +154,7 @@ module Skylab::System::TestSupport
       rescue ::SecurityError => e
       end
 
-      e.message.should match %r{won't make more than 1.+some/unholy must ex}
+      expect( e.message ).to match %r{won't make more than 1.+some/unholy must ex}
     end
 
     it "same as above but you up the max_mkdirs - stops you b/c unsafe name" do
@@ -165,7 +165,7 @@ module Skylab::System::TestSupport
       rescue ::SecurityError => e
       end
 
-      e.message.should eql 'unsafe tmpdir name - /'
+      expect( e.message ).to eql 'unsafe tmpdir name - /'
     end
 
     it "a path at lvl 1 from root - unsafe name - stops you" do
@@ -176,7 +176,7 @@ module Skylab::System::TestSupport
       rescue ::SecurityError => e
       end
 
-      e.message.should match %r(\bunsafe tmpdir name - \/)
+      expect( e.message ).to match %r(\bunsafe tmpdir name - \/)
     end
 
     def _new_with * x_a

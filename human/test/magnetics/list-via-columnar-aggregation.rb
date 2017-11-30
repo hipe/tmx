@@ -53,7 +53,7 @@ module Skylab::Human::TestSupport
 
     def want_line s
       s_ = output_scn.gets
-      s_.should eql s
+      expect( s_ ).to eql s
     end
 
     def want_no_more_lines

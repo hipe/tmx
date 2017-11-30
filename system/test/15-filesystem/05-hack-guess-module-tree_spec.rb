@@ -33,22 +33,22 @@ module Skylab::System::TestSupport
       root = __subject :line_upstream, _lines
 
       o = root
-      o.children_count.should eql 1
+      expect( o.children_count ).to eql 1
       o = o.children.first
-      o.value.should eql [ :Jazzmatazz ]
-      o.children.length.should eql 3
-      o.children.first.value.should eql [ :Bizzo ]
+      expect( o.value ).to eql [ :Jazzmatazz ]
+      expect( o.children.length ).to eql 3
+      expect( o.children.first.value ).to eql [ :Bizzo ]
       x = o.children[ 1 ]
-        x.value.should eql [ :Bizzo, :Boffo ]
-        x.children.first.value.should eql [ :Stfu_OMG ]
-      o.children.last.value.should eql [ :Other_Module ]
+        expect( x.value ).to eql [ :Bizzo, :Boffo ]
+        expect( x.children.first.value ).to eql [ :Stfu_OMG ]
+      expect( o.children.last.value ).to eql [ :Other_Module ]
 
       count = 0
       root.children_depth_first do |_|
         count += 1
       end
 
-      count.should eql 5
+      expect( count ).to eql 5
     end
 
     # (currently this gets more coverage in [dt])

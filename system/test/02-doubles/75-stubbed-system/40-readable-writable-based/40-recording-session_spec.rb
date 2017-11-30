@@ -16,28 +16,28 @@ module Skylab::System::TestSupport
 
         i, o, e, t = sess.popen3 'echo', "it's", '"fun"'
 
-        i.should be_nil
-        o.gets.should eql "it's \"fun\"\n"
-        o.gets.should be_nil
+        expect( i ).to be_nil
+        expect( o.gets ).to eql "it's \"fun\"\n"
+        expect( o.gets ).to be_nil
 
-        e.gets.should be_nil
-        t.value.exitstatus.should be_zero
+        expect( e.gets ).to be_nil
+        expect( t.value.exitstatus ).to be_zero
 
         _, o, e, t = sess.popen3 'date'
 
-        ( 25 .. 35 ).should be_include o.gets.length
-        o.gets.should be_nil
+        expect( ( 25 .. 35 ) ).to be_include o.gets.length
+        expect( o.gets ).to be_nil
 
-        e.gets.should be_nil
-        t.value.exitstatus.should be_zero
+        expect( e.gets ).to be_nil
+        expect( t.value.exitstatus ).to be_zero
       end
 
-      x.should eql true
+      expect( x ).to eql true
       io.close
 
       @output_s = io.string
 
-      excerpt( 0..7 ).should eql <<-HERE.unindent
+      expect( excerpt( 0..7 ) ).to eql <<-HERE.unindent
         command
           argv
             echo, "it's", "\\"fun\\""
@@ -48,7 +48,7 @@ module Skylab::System::TestSupport
           exitstatus 0
       HERE
 
-      excerpt_lines( 10..10 ).first.should eql "  argv date\n"
+      expect( excerpt_lines( 10..10 ).first ).to eql "  argv date\n"
     end
   end
 end

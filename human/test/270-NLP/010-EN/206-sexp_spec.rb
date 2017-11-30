@@ -24,12 +24,12 @@ module Skylab::Human::TestSupport
 
       it "([co]'s Oxford_and - #{ s.inspect })" do
         _ = Common_::Oxford_and[ a ]
-        _.should eql s
+        expect( _ ).to eql s
       end
 
       it "but normally empty lists express as writing nothing" do
         _ = _sexp_node.express_sexp_into___ EMPTY_A_, [ :list, a ]
-        _.should eql EMPTY_A_
+        expect( _ ).to eql EMPTY_A_
       end
     end
 
@@ -86,12 +86,12 @@ module Skylab::Human::TestSupport
 
         _ = _o.express_words_into []
 
-        _.should eql [ "ada,", "grace,", "winifred", "or amy" ]
+        expect( _ ).to eql [ "ada,", "grace,", "winifred", "or amy" ]
       end
 
       it "\"#{ s }\"" do
         _ = Common_::Oxford_or[ a ]
-        _.should eql s
+        expect( _ ).to eql s
       end
     end
 
@@ -103,14 +103,14 @@ module Skylab::Human::TestSupport
 
       _ = o.express_words_into_under [], common_expag_
 
-      _.should eql [ "'foo'", "and 'bar'" ]
+      expect( _ ).to eql [ "'foo'", "and 'bar'" ]
     end
 
     it "say, separator attributes" do
       o = _sexp_node.expression_session_for :list, %w( foo bar baz )
       o.final_separator_sexp = [ :as_is, '--' ]
       o.separator_sexp = [ :as_is, '-' ]
-      o.say.should eql 'foo-bar--baz'
+      expect( o.say ).to eql 'foo-bar--baz'
     end
 
     context "curriable, stream for list, infer sexp from string.." do
@@ -145,7 +145,7 @@ module Skylab::Human::TestSupport
     def _flat a, s
 
       _ = _sexp_node.express_sexp_into___ "", [ :list, a ]
-      _.should eql s
+      expect( _ ).to eql s
     end
 
     def _words a, exp_a
@@ -154,7 +154,7 @@ module Skylab::Human::TestSupport
 
       _act_a = _o.express_words_into []
 
-      _act_a.should eql exp_a
+      expect( _act_a ).to eql exp_a
     end
 
     def _sexp_node

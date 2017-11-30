@@ -9,7 +9,7 @@ module Skylab::Human::TestSupport
     context "truncates strings" do
       def self.o maxlen, input, expected, *r
         it("summarize(#{maxlen}, #{input.inspect}) #=> #{expected.inspect}", *r) do
-          summarize(maxlen, input).should eql(expected)
+          expect( summarize(maxlen, input) ).to eql(expected)
         end
       end
       o(-1, '', '')
@@ -32,7 +32,7 @@ module Skylab::Human::TestSupport
       def self.o maxlen, expected, *r
         struct = self.struct
         it("summarize(#{maxlen}, #{struct.inspect}) #=> #{expected.inspect}", *r) do
-          summarize(maxlen, struct).should eql(expected)
+          expect( summarize(maxlen, struct) ).to eql(expected)
         end
       end
       def self.struct! struct

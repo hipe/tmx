@@ -49,24 +49,24 @@ module Skylab::System::TestSupport
       rescue ::NoMethodError => e
       end
 
-      e.name.should eql :_PARENS_NOT_IMPLEMENTED
+      expect( e.name ).to eql :_PARENS_NOT_IMPLEMENTED
     end
 
     def _want_this_same_tree_stream
 
       tree = @st.gets
-      tree.string.should eql 'libraries'
+      expect( tree.string ).to eql 'libraries'
 
-      tree.children.length.should eql 2
+      expect( tree.children.length ).to eql 2
       nd, nd_ = tree.children
 
-      nd.string.should eql 'foo.so'
-      nd_.string.should eql 'bar.so'
+      expect( nd.string ).to eql 'foo.so'
+      expect( nd_.string ).to eql 'bar.so'
 
-      nd.children.should be_nil
-      nd_.children.should be_nil
+      expect( nd.children ).to be_nil
+      expect( nd_.children ).to be_nil
 
-      @st.gets.should be_nil
+      expect( @st.gets ).to be_nil
     end
   end
 end

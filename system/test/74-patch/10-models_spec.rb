@@ -19,7 +19,7 @@ module Skylab::System::TestSupport
         pa.change_line 1, 'ONE'
         pa.change_line 3, 'THREE'
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           1c1
           < one
           ---
@@ -37,7 +37,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 2, [ 'TWO', 'THREE' ]
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           2c2,3
           < two
           ---
@@ -56,7 +56,7 @@ module Skylab::System::TestSupport
         pa.change_lines 2..4, EMPTY_A_
         pa.change_lines 6, EMPTY_A_
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           2,4d1
           < two
           < three
@@ -72,7 +72,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 1..2, EMPTY_A_
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           1,2d0
           < one
           < two
@@ -85,7 +85,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 3, EMPTY_A_
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           3d2
           < three
         O
@@ -100,7 +100,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 3...3, [ 'three', 'four' ]
 
-        _to_s( pa ).should eql <<-O.unindent
+        expect( _to_s( pa ) ).to eql <<-O.unindent
           2a3,4
           > three
           > four
@@ -113,7 +113,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 1...1, [ 'one' ]
 
-        _to_s( pa ).should eql "0a1\n> one\n"
+        expect( _to_s( pa ) ).to eql "0a1\n> one\n"
       end
 
       it "one at end" do
@@ -122,7 +122,7 @@ module Skylab::System::TestSupport
 
         pa.change_lines 3...3, [ 'three' ]
 
-        _to_s( pa ).should eql "2a3\n> three\n"
+        expect( _to_s( pa ) ).to eql "2a3\n> three\n"
       end
 
     end

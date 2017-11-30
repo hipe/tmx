@@ -16,7 +16,7 @@ module Skylab::System::TestSupport
 
       _want_common_event_pattern
 
-      ::File.read( path ).should eql "after\n"
+      expect( ::File.read( path ) ).to eql "after\n"
     end
 
     it "file against directory" do
@@ -28,7 +28,7 @@ module Skylab::System::TestSupport
 
       _want_common_event_pattern
 
-      ::File.read( _expected_path_that_will_be_created ).should eql "huzzah\n"
+      expect( ::File.read( _expected_path_that_will_be_created ) ).to eql "huzzah\n"
     end
 
     it "string against file" do
@@ -46,7 +46,7 @@ module Skylab::System::TestSupport
 
       _want_common_event_pattern
 
-      ::File.read( path ).should eql "after\n"
+      expect( ::File.read( path ) ).to eql "after\n"
     end
 
     it "string against directory" do
@@ -61,7 +61,7 @@ module Skylab::System::TestSupport
 
       _want_common_event_pattern
 
-      ::File.read( _expected_path_that_will_be_created ).should eql "hizzie\n"
+      expect( ::File.read( _expected_path_that_will_be_created ) ).to eql "hizzie\n"
     end
 
     # ~ starting files and directories & derivatives
@@ -121,7 +121,7 @@ module Skylab::System::TestSupport
 
       _em = want_neutral_event :process_line
       line = black_and_white _em.cached_event_value
-      line.should match _PATCHING_FILE_RX
+      expect( line ).to match _PATCHING_FILE_RX
       want_succeed
     end
 

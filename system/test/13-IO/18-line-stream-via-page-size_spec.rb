@@ -11,17 +11,17 @@ module Skylab::System::TestSupport
 
       it "when built with pathname - `gets` - works as expected" do  # mirror 2 others
         scn = subject_via_pathname pathname
-        scn.lineno.should be_nil
+        expect( scn.lineno ).to be_nil
         _ = scn.gets
-        _.should eql "one\n"
-        scn.lineno.should eql 1
-        scn.gets.should eql "two\n"
-        scn.lineno.should eql 2
-        scn.fh.closed?.should eql false
-        scn.gets.should be_nil
-        scn.lineno.should eql 2
-        scn.gets.should be_nil
-        scn.fh.should be_closed
+        expect( _ ).to eql "one\n"
+        expect( scn.lineno ).to eql 1
+        expect( scn.gets ).to eql "two\n"
+        expect( scn.lineno ).to eql 2
+        expect( scn.fh.closed? ).to eql false
+        expect( scn.gets ).to be_nil
+        expect( scn.lineno ).to eql 2
+        expect( scn.gets ).to be_nil
+        expect( scn.fh ).to be_closed
       end
 
       with 'foo-lsfr.txt' do |o|
@@ -37,17 +37,17 @@ module Skylab::System::TestSupport
       it "o" do
         fh = pathname.open 'r'
         scn = subject_via_filehandle fh, 5
-        scn.gets.should eql "abc\n"
-        scn.lineno.should eql 1
-        scn.gets.should eql "def\n"
-        scn.lineno.should eql 2
-        scn.gets.should eql "ghi\n"
-        scn.lineno.should eql 3
-        scn.gets.should eql nil
-        scn.lineno.should eql 3
-        scn.gets.should eql nil
-        scn.lineno.should eql 3
-        fh.should be_closed
+        expect( scn.gets ).to eql "abc\n"
+        expect( scn.lineno ).to eql 1
+        expect( scn.gets ).to eql "def\n"
+        expect( scn.lineno ).to eql 2
+        expect( scn.gets ).to eql "ghi\n"
+        expect( scn.lineno ).to eql 3
+        expect( scn.gets ).to eql nil
+        expect( scn.lineno ).to eql 3
+        expect( scn.gets ).to eql nil
+        expect( scn.lineno ).to eql 3
+        expect( fh ).to be_closed
       end
 
       with "bar-lsfr.txt" do |o|
@@ -83,14 +83,14 @@ module Skylab::System::TestSupport
       end
 
       define_method :shared_expectation do |scn|
-        scn.lineno.should be_nil
-        scn.count.should be_zero
+        expect( scn.lineno ).to be_nil
+        expect( scn.count ).to be_zero
         _ = scn.gets
-        _.should eql _STR
-        scn.count.should eql 0  # NOTE
-        scn.lineno.should be_nil
-        scn.gets.should be_nil
-        scn.lineno.should be_nil
+        expect( _ ).to eql _STR
+        expect( scn.count ).to eql 0  # NOTE
+        expect( scn.lineno ).to be_nil
+        expect( scn.gets ).to be_nil
+        expect( scn.lineno ).to be_nil
       end
     end
 
@@ -101,12 +101,12 @@ module Skylab::System::TestSupport
 
       it "hi" do
         scn = subject_via_pathname pathname
-        scn.fh.closed?.should eql false
-        scn.count.should be_zero
+        expect( scn.fh.closed? ).to eql false
+        expect( scn.count ).to be_zero
         _ = scn.gets
-        _.should be_nil
-        scn.fh.closed?.should eql true
-        scn.count.should be_zero
+        expect( _ ).to be_nil
+        expect( scn.fh.closed? ).to eql true
+        expect( scn.count ).to be_zero
       end
     end
   end

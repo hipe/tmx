@@ -35,7 +35,7 @@ module Skylab::System::TestSupport
     end
 
     def _expect act, *exp
-      act.should eql( exp )
+      expect( act ).to eql( exp )
       act.clear
       nil
     end

@@ -19,7 +19,7 @@ module Skylab::TestSupport::TestSupport
           y == ['ping from permute.'] || fail
         end
 
-        first_emission.should _be_this
+        expect( first_emission ).to _be_this
       end
     end
 
@@ -41,7 +41,7 @@ module Skylab::TestSupport::TestSupport
       _rx = /\b(?<num_added>\d+) case\(s\) added\b/
 
         _md = _rx.match _the_line
-        _md[ :num_added ].to_i.should eql 3
+        expect( _md[ :num_added ].to_i ).to eql 3
       end
 
     it "expresses that it skipped generating a test that existed already" do
@@ -55,9 +55,10 @@ module Skylab::TestSupport::TestSupport
       shared_subject :_the_line do
 
         lines = nil
-        first_emission.should( be_emission( :info, :expression, :summary ) do |y|
+        _be_this = be_emission :info, :expression, :summary do |y|
           lines = y
-        end )
+        end
+        expect( first_emission ).to _be_this
         lines.fetch 0
       end
 

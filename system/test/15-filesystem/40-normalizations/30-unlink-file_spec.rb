@@ -14,7 +14,7 @@ module Skylab::System::TestSupport
       rescue ::Errno::ENOENT => e
       end
 
-      e.message.should match %r(\ANo such file or directory )
+      expect( e.message ).to match %r(\ANo such file or directory )
     end
 
     it "`probably_exists`" do
@@ -37,7 +37,7 @@ module Skylab::System::TestSupport
       path = pn.to_path
 
       against_ path
-      @result.should eql true
+      expect( @result ).to eql true
       want_no_more_events
     end
 

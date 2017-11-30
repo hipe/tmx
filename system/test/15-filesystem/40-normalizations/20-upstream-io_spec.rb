@@ -17,7 +17,7 @@ module Skylab::System::TestSupport
 
       _em = want_not_OK_event :stat_error
 
-      black_and_white( _em.cached_event_value ).should match %r(\ANo such file or directory )
+      expect( black_and_white( _em.cached_event_value ) ).to match %r(\ANo such file or directory )
 
       want_fail
     end
@@ -33,7 +33,7 @@ module Skylab::System::TestSupport
 
       _em = want_not_OK_event :stat_error
 
-      black_and_white( _em.cached_event_value ).should match %r(\ANo such 'wazoozie' - )
+      expect( black_and_white( _em.cached_event_value ) ).to match %r(\ANo such 'wazoozie' - )
 
       want_fail
     end

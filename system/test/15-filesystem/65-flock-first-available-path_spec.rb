@@ -9,7 +9,7 @@ module Skylab::System::TestSupport
     it "simple - OK" do
       _init_tmppdir
       f = _same
-      ::File.basename( f.path ).should eql 'foo.yep'
+      expect( ::File.basename( f.path ) ).to eql 'foo.yep'
       _cleanup f
 
     end
@@ -18,7 +18,7 @@ module Skylab::System::TestSupport
       _init_tmppdir
       @td.touch 'foo.yep'  # (pn)
       f = _same
-      ::File.basename( f.path ).should eql 'foo-02.yep'
+      expect( ::File.basename( f.path ) ).to eql 'foo-02.yep'
       _cleanup f
     end
 
