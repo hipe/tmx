@@ -34,7 +34,7 @@ module Skylab::Cull::TestSupport
       invoke 'ping'
       want "hello from cull."
       want_no_more_lines
-      @exitstatus.should eql :hello_from_cull
+      expect( @exitstatus ).to eql :hello_from_cull
     end
 
 # (4/N)

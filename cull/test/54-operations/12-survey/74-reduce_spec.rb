@@ -29,11 +29,11 @@ module Skylab::Cull::TestSupport
       e = st.gets
       e_ = st.gets
       e__ = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
-      e[ :name ].should eql 'create'
-      e_[ :name ].should eql 'edit'
-      e__[ :name ].should eql 'reduce'
+      expect( e[ :name ] ).to eql 'create'
+      expect( e_[ :name ] ).to eql 'edit'
+      expect( e__[ :name ] ).to eql 'reduce'
 
     end
 
@@ -44,9 +44,9 @@ module Skylab::Cull::TestSupport
         :table_number, '1'
       want_no_events
       st = @result
-      st.gets.get_property_name_symbols.should eql [ :"prog lang name" ]
-      st.gets.get_property_name_symbols.should eql [ :"prog lang name", :"misc tags" ]
-      st.gets.should be_nil
+      expect( st.gets.get_property_name_symbols ).to eql [ :"prog lang name" ]
+      expect( st.gets.get_property_name_symbols ).to eql [ :"prog lang name", :"misc tags" ]
+      expect( st.gets ).to be_nil
     end
 
 # (4/N)
@@ -59,14 +59,14 @@ module Skylab::Cull::TestSupport
       st = @result
 
       e = st.gets
-      e[ :desc ].should eql "my favorite socks"
+      expect( e[ :desc ] ).to eql "my favorite socks"
 
       e = st.gets
-      e[ :"flat tags" ].should eql [ "foo", "bar", "biff-baz:boffo" ]
+      expect( e[ :"flat tags" ] ).to eql [ "foo", "bar", "biff-baz:boffo" ]
 
-      e[ :whatever ].should eql meh: "bleh"
+      expect( e[ :whatever ] ).to eql meh: "bleh"
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
 # (5/N)
@@ -80,7 +80,7 @@ module Skylab::Cull::TestSupport
 
       want_no_more_events
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white( _em.cached_event_value ) ).to match(
 
         %r(\bJSON files are always exactly one entity #{
          }collection.+table 3 was requested, but had only 1 table\b) )

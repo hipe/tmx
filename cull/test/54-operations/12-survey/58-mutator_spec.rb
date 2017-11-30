@@ -38,9 +38,9 @@ module Skylab::Cull::TestSupport
 
       sh.advance_to_next_rx %r(\A\[report\])
 
-      sh.next_line.should eql "function = mutator:remove-empty-actual-properties\n"
+      expect( sh.next_line ).to eql "function = mutator:remove-empty-actual-properties\n"
 
-      sh.next_line.should be_nil
+      expect( sh.next_line ).to be_nil
 
     end
 
@@ -60,10 +60,10 @@ module Skylab::Cull::TestSupport
       st = @result
       ent = st.gets
       ent_ = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
-      ent.to_even_iambic.should eql [ :"prog lang name", "ruby" ]
-      ent_.to_even_iambic.should eql [ :"prog lang name", "haskell", :monads, "yes" ]
+      expect( ent.to_even_iambic ).to eql [ :"prog lang name", "ruby" ]
+      expect( ent_.to_even_iambic ).to eql [ :"prog lang name", "haskell", :monads, "yes" ]
     end
 
 # (4/N)
@@ -81,13 +81,13 @@ module Skylab::Cull::TestSupport
       want_no_events
       st = @result
 
-      st.gets.to_even_iambic.should eql(  # empty cel is removed:
+      expect( st.gets.to_even_iambic ).to eql(  # empty cel is removed:
         [ :"prog lang name", "ruby" ] )
 
-      st.gets.to_even_iambic.should eql(  # property expansion:
+      expect( st.gets.to_even_iambic ).to eql(  # property expansion:
         [ :"prog lang name", "haskell", :functional, "yes", :difficult, "yes" ] )
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
     end
 
@@ -126,11 +126,11 @@ module Skylab::Cull::TestSupport
 
       sh = _want_remove_worked td
 
-      sh.next_line.should be_include 'empty-act( fuz bif, true, 1.3 )'
-      sh.next_line.should eql "# comment 1\n"
-      sh.next_line.should be_include 'stay'
-      sh.next_line.should eql "# comment 2\n"
-      sh.next_line.should be_nil
+      expect( sh.next_line ).to be_include 'empty-act( fuz bif, true, 1.3 )'
+      expect( sh.next_line ).to eql "# comment 1\n"
+      expect( sh.next_line ).to be_include 'stay'
+      expect( sh.next_line ).to eql "# comment 2\n"
+      expect( sh.next_line ).to be_nil
 
     end
 
@@ -145,11 +145,11 @@ module Skylab::Cull::TestSupport
 
       sh = _want_remove_worked td
 
-      sh.next_line.should be_include 'stay'
-      sh.next_line.should be_include 'comment 2'
-      sh.next_line.should be_include 'remove-empt( x, y )'
-      sh.next_line.should eql "# (from removed function) comment 1\n"
-      sh.next_line.should be_nil
+      expect( sh.next_line ).to be_include 'stay'
+      expect( sh.next_line ).to be_include 'comment 2'
+      expect( sh.next_line ).to be_include 'remove-empt( x, y )'
+      expect( sh.next_line ).to eql "# (from removed function) comment 1\n"
+      expect( sh.next_line ).to be_nil
 
     end
 

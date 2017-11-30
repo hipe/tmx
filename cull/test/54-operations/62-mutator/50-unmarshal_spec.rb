@@ -13,7 +13,7 @@ module Skylab::Cull::TestSupport
         'remove-empty-actua',
         common_box_module )
 
-      func.const_symbol.should eql(
+      expect( func.const_symbol ).to eql(
         :Remove_empty_actual_properties )
     end
 
@@ -22,29 +22,29 @@ module Skylab::Cull::TestSupport
 
       func = subject.unmarshal 'mutator:split-and-pr'
 
-      func.const_symbol.should eql :Split_and_promote_property
+      expect( func.const_symbol ).to eql :Split_and_promote_property
 
-      func.category_symbol.should eql :mutator
+      expect( func.category_symbol ).to eql :mutator
 
-      func.composition.args.should be_nil
+      expect( func.composition.args ).to be_nil
 
     end
 
 # (3/N)
     it "minimal one arg" do
 
-      subject.unmarshal_via_string_and_module(
+      expect( subject.unmarshal_via_string_and_module(
         'remove-em( -12.3 )',
-        common_box_module ).composition.args.should eql(
+        common_box_module ).composition.args ).to eql(
           [ -12.3 ] )
     end
 
 # (4/N)
     it "catalyst case" do
 
-      subject.unmarshal_via_string_and_module(
+      expect( subject.unmarshal_via_string_and_module(
        'remove-em( sophie\'s choice , dingo   , -8, , "," )',
-       common_box_module ).composition.args.should eql(
+       common_box_module ).composition.args ).to eql(
         [ "sophie's choice", "dingo", -8, nil, "," ] )
     end
 

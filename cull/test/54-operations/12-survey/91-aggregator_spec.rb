@@ -34,13 +34,14 @@ module Skylab::Cull::TestSupport
 
       want_OK_event_ :collection_resource_committed_changes
 
-      content_of_the_file( td ).scan( /(?<=^function = ).+/ ).should(
-        eql( [
+      _actual_a = content_of_the_file( td ).scan %r((?<=^function = ).+)
+
+      expect( _actual_a ).to eql( [
           'mutator:remove-empty-act( fuz bif, true, 1.3 )',
           '"mutator:split-and( \"stay\" )"',
           'mutator:remove-empt( x, y )',
           'aggregator:unique-features'
-        ] ) )
+      ] )
     end
 
 # (3/N)
@@ -57,11 +58,10 @@ module Skylab::Cull::TestSupport
 
       want_no_events
 
-      st = @result
-      st.gets.should eql "ruby"
-      st.gets.should eql "haskell"
-      st.gets.should be_nil
-
+      want_these_lines_in_array_ @result do |y|
+        y << "ruby"
+        y << "haskell"
+      end
     end
 
 # (4/N)
@@ -81,10 +81,10 @@ module Skylab::Cull::TestSupport
       st = @result
 
       a = [ :"entity name", :"feature name", :"feature value" ]
-      st.gets.at( * a ).should eql [ "bike", :"uses gas?", "no gas" ]
-      st.gets.at( * a ).should eql [ "bike", :"is it cheap?", "yes" ]
-      st.gets.at( * a ).should eql [ "car", :"can you live in it?", "yes" ]
-      st.gets.should be_nil
+      expect( st.gets.at( * a ) ).to eql [ "bike", :"uses gas?", "no gas" ]
+      expect( st.gets.at( * a ) ).to eql [ "bike", :"is it cheap?", "yes" ]
+      expect( st.gets.at( * a ) ).to eql [ "car", :"can you live in it?", "yes" ]
+      expect( st.gets ).to be_nil
 
     end
   end

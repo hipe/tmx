@@ -30,7 +30,7 @@ module Skylab::Cull::TestSupport
 
     def want_exitstatus_for_general_failure
 
-      @exitstatus.should eql(
+      expect( @exitstatus ).to eql(
         Home_::Brazen_::API.exit_statii.fetch :generic_error )
     end
   end

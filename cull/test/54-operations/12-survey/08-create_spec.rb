@@ -54,7 +54,7 @@ module Skylab::Cull::TestSupport
       call_API :survey, :ping
       want_OK_event :ping, 'cull says *hello*'
       want_no_more_events
-      @result.should eql :_hi_again_
+      expect( @result ).to eql :_hi_again_
     end
 
 # (3/N)
@@ -82,7 +82,7 @@ module Skylab::Cull::TestSupport
       want_neutral_event :creating_directory
       want_OK_event_ :collection_resource_committed_changes
 
-      em.category.should eql [ :info, :created_survey ]
+      expect( em.category ).to eql [ :info, :created_survey ]
 
       ev = em.emission_value_proc.call
       ev.ok or fail

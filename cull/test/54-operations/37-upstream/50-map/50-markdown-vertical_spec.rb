@@ -21,7 +21,7 @@ module Skylab::Cull::TestSupport
 
       _em = want_not_OK_event :early_end_of_stream
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white( _em.cached_event_value ) ).to match(
         /\Aearly end of stream - there were no markdown tables anywhere/ )
 
       want_fail
@@ -52,13 +52,13 @@ module Skylab::Cull::TestSupport
       e = st.gets
       e_ = st.gets
 
-      st.gets.should eql Home_::NIL_
+      expect( st.gets ).to eql Home_::NIL_
 
-      e.to_even_iambic.should eql(
+      expect( e.to_even_iambic ).to eql(
         [ :"First Header", "Content Cell",
             :"Second Header", "Content Cell" ] )
 
-      e_.to_even_iambic.should eql(
+      expect( e_.to_even_iambic ).to eql(
         [ :"First Header", "Content Cell",
             :"Second Header", "Content Cell" ] )
 
@@ -71,7 +71,7 @@ module Skylab::Cull::TestSupport
 
       _em = want_not_OK_event_ :number_too_small
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white( _em.cached_event_value ) ).to match(
         /\A'table-number' must be greater than or equal to 1, had 0/ )
 
       want_fail
@@ -84,7 +84,7 @@ module Skylab::Cull::TestSupport
 
       _em = want_not_OK_event :early_end_of_stream
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white( _em.cached_event_value ) ).to match(
         / - needed 6 but had only 5 markdown tables in the entirety of the\b/ )
 
       want_fail
@@ -104,9 +104,9 @@ module Skylab::Cull::TestSupport
 
       i_a = [ :"Left-Aligned", :"Center Aligned", :"Right Aligned" ]
 
-      e1.at_fields( i_a ).should eql [ 'col 3 is', 'some wordy text', '$1600' ]
-      e2.at_fields( i_a ).should eql [ 'col 2 is', 'centered', '$12' ]
-      e3.at_fields( i_a ).should eql [ 'zebra stripes', 'are neat', '$1' ]
+      expect( e1.at_fields( i_a ) ).to eql [ 'col 3 is', 'some wordy text', '$1600' ]
+      expect( e2.at_fields( i_a ) ).to eql [ 'col 2 is', 'centered', '$12' ]
+      expect( e3.at_fields( i_a ) ).to eql [ 'zebra stripes', 'are neat', '$1' ]
 
     end
 

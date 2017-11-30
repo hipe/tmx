@@ -15,7 +15,7 @@ module Skylab::Cull::TestSupport
 
       st = @result
       x = st.gets
-      x.as_slug.should match %r(\Aremove-empty)
+      expect( x.as_slug ).to match %r(\Aremove-empty)
 
     end
   end

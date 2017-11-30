@@ -34,7 +34,7 @@ module Skylab::Cull::TestSupport
       against fixture_directory_ :freshly_initted
       scn = @result
       x = scn.gets
-      x.should be_nil
+      expect( x ).to be_nil
     end
 
 #==(ADDENDUM
@@ -120,7 +120,7 @@ module Skylab::Cull::TestSupport
         o.express_into_under y, expag
         redo
       end while above
-      count.should eql 1
+      expect( count ).to eql 1
       y.first =~ /\Aupstream \(val "file:\.\./ || fail
     end
 

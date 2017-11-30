@@ -16,12 +16,12 @@ module Skylab::Cull::TestSupport
 
       e1 = st.gets
       e2 = st.gets
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
 
-      e1.to_even_iambic.should eql(
+      expect( e1.to_even_iambic ).to eql(
         [ :name, "haskell", :cost, "difficult for me to learn" ] )
 
-      e2.to_even_iambic.should eql(
+      expect( e2.to_even_iambic ).to eql(
         [ :name, "swift", :cost, "fun now" ] )
     end
 
