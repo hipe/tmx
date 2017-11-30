@@ -9,17 +9,30 @@ describe "[cssc] when parsing directives" do
 
     tree = parse_directives_in_file_ fixture_path_ '001-platonic-ideal.txt'
 
-    tree.first.should eql(:merge_statement)
+    expect( tree.first ).to eql(:merge_statement)
+
     itf, sif, su, ls = tree.children(
       :in_the_folder, :styles_in_files, :styles_under, :merge_list)
-    itf[:path].should eql("test/fixture-files/css")
-    sif[:left].should eql("documentation.css")
-    sif[:right].should eql("pygments.css")
-    su[:left].should eql(".highlight")
-    su[:right].should eql(".pre")
-    ls.size.should eql(4)
-    [['.keyword','.k'],['.default','.nc'],['.keyword','.p'],['.keyword', nil]].
-      should eql ls[0..3].map{ |x| [x[:left], x[:right]] }
+
+    expect( itf[:path] ).to eql "test/fixture-files/css"
+    expect( sif[:left] ).to eql "documentation.css"
+    expect( sif[:right] ).to eql "pygments.css"
+    expect( su[:left] ).to eql ".highlight"
+    expect( su[:right] ).to eql ".pre"
+    expect( ls.size ).to eql 4
+
+    _act = ls[ 0..3 ].map do |x|
+      [ x[ :left ], x[ :right ] ]
+    end
+
+    _exp = [
+      %w( .keyword .k ),
+      %w( .default .nc ),
+      %w( .keyword .p ),
+      [ '.keyword', nil ],
+    ]
+
+    expect( _act ).to eql _exp
   end
 
   it "should parse with a minimal set of directives" do
@@ -30,10 +43,10 @@ describe "[cssc] when parsing directives" do
 
     tree[ :styles_under ].nil? || fail
 
-    ["red.css", "blue.css"].should eql(
+    expect( ["red.css", "blue.css"] ).to eql(
       tree[:styles_in_files].children(:left, :right))
     md = tree[:merge_list]
-    md.length.should eql(1)
-    md.first.first.should eql(:catchall_pairing)
+    expect( md.length ).to eql 1
+    expect( md.first.first ).to eql :catchall_pairing
   end
 end

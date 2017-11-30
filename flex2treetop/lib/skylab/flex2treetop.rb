@@ -439,11 +439,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     cls_p = Common_::Memoize[ & p ]
 
-    -> * x_a, & p do
+    -> * x_a, & em_p do
 
       _cls = cls_p.call
 
-      sess = _cls.via_iambic x_a, & p
+      sess = _cls.via_iambic x_a, & em_p
 
       if sess
         sess.procede_until_endpoint_

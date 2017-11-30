@@ -9,7 +9,7 @@ describe "[bnf2tt] the translate operation - the `equals_terminal` option" do
 
     one = translate(string: 'foo ::= bar', equals_terminal: '::=')
     two = translate(string: 'foo : bar', equals_terminal: ':')
-    one.should eql(two)
-    (15..50).should be_include one.length
+    expect( one ).to eql two
+    expect( (15..50) ).to be_include one.length
   end
 end

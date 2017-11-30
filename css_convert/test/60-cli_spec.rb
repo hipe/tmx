@@ -37,7 +37,7 @@ module Skylab::CSS_Convert::TestSupport
 
       want_specific_invite_line_to :convert
       want_no_more_lines
-      @exitstatus.should eql Home_::Brazen_::API.exit_statii.fetch :resource_not_found
+      expect( @exitstatus ).to eql Home_::Brazen_::API.exit_statii.fetch :resource_not_found
     end
 
     it "[tmx] integration", TMX_CLI_integration: true do

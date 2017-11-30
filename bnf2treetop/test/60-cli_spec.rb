@@ -6,27 +6,28 @@ describe "[bnf2tt] CLI" do
   use :CLI
   use :the_method_called_let
 
-  def error msg_re
-    err.shift.should match(msg_re)
+  def error msg_rx
+    expect( err.shift ).to match msg_rx
   end
 
   def usage
-    unstyle(err.shift).should eql(
+    expect( unstyle err.shift ).to eql(
       'usage: bnf2treetop [options] { <bnf-file> | - }')
   end
 
   def invite
-    unstyle(err.shift).should eql('bnf2treetop -h for help')
+    expect( unstyle err.shift ).to eql 'bnf2treetop -h for help'
   end
 
   def no_payload
-    out.length.should eql(0)
+    expect( out.length ).to be_zero
   end
 
   def options_listing
-    unstyle(err.shift).should eql('options:')
-    ( 10..17 ).should be_include err.length
-    err.detect { |s| /\A[[:space:]]/ !~ s }.should eql(nil)
+
+    expect( unstyle err.shift ).to eql 'options:'
+    expect( 10..17 ).to be_include err.length
+    expect( err.detect { |s| /\A[[:space:]]/ !~ s } ).to be_nil
   end
 
   context 'doing nothing' do
@@ -75,10 +76,10 @@ describe "[bnf2tt] CLI" do
 
     it 'works!' do
 
-      err.length.should eql(0)
-      ( 10..30 ).should be_include out.length  # e.g. 19
-      out.first.should eql('  rule name_start_char')
-      out.last.should eql('  end')
+      expect( err.length ).to be_zero
+      expect( 10..30 ).to be_include out.length  # e.g. 19
+      expect( out.first ).to eql '  rule name_start_char'
+      expect( out.last ).to eql '  end'
     end
   end
 

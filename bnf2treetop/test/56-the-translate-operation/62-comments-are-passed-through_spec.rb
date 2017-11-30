@@ -16,7 +16,7 @@ describe "[bnf2tt] the translate operation - comments are passed through" do
       foo ::= bar
     HERE
     translate(string: here)
-    out.shift.should eql('# this grammar was generated')
-    out.shift.should be_include('rule foo')
+    expect( out.shift ).to eql '# this grammar was generated'
+    expect( out.shift ).to be_include 'rule foo'
   end
 end

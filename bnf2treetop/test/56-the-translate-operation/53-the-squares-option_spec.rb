@@ -8,7 +8,7 @@ describe "[bnf2tt] the translate operation - the `squares` option" do
   it 'the parameter "square" lets you use square brackets differently' do
     normal = translate(string: 'foo ::= [bar]')
     crazy  = translate(string: 'foo ::= [bar]', squares: true)
-    normal_of( normal ).should eql('rule foo [bar] end')
-    normal_of( crazy ).should  eql('rule foo bar? end')
+    expect( normal_of normal ).to eql 'rule foo [bar] end'
+    expect( normal_of crazy ).to eql 'rule foo bar? end'
   end
 end

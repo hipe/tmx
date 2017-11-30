@@ -32,6 +32,10 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     module InstanceMethods
 
+      def want_these_lines_in_array_ a, & p
+        TestSupport_::Want_these_lines_in_array[ a, p, self ]
+      end
+
       def fixture_flex_ sym
         Fixture_file__[ sym, :flex ]
       end
@@ -80,7 +84,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       def want_not_OK_event_ sym, msg=nil
 
         em = want_not_OK_event nil, msg
-        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
         em
       end
     end
