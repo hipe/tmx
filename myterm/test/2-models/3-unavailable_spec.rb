@@ -29,7 +29,7 @@ module Skylab::MyTerm::TestSupport
         _s = "can't produce an image without #{
           }\"background font\" and \"label\""
 
-        root_ACS_state.message.should eql _s
+        expect( root_ACS_state.message ).to eql _s
       end
     end
   end

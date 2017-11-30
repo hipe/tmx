@@ -35,7 +35,7 @@ module Skylab::GitViz::TestSupport
 
       _mbndl = @result
 
-      _mbndl.bundle.trails.length.should eql 3
+      expect( _mbndl.bundle.trails.length ).to eql 3
       # see tombstone below
     end
 

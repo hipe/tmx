@@ -25,20 +25,20 @@ module Skylab::CodeMetrics::TestSupport
 
       _ = _state.features
       _had = _.map( & :surface_string )
-      _had.should eql %w( THING_TWO THING_ONE THING_THREE )
+      expect( _had ).to eql %w( THING_TWO THING_ONE THING_THREE )
     end
 
     it "bucket tree - all the paths are there" do
 
       _act = _state.bucket_tree.to_stream_of( :paths ).to_a
 
-      _act.should eql %w( / /file-A /file-B )
+      expect( _act ).to eql %w( / /file-A /file-B )
     end
 
     it "occurrence groups" do
 
       _og_a = _state.occurrence_groups
-      _og_a.length.should eql 4
+      expect( _og_a.length ).to eql 4
     end
 
     shared_subject :_state do

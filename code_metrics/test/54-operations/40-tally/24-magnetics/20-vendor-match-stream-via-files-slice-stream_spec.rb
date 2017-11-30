@@ -18,7 +18,7 @@ module Skylab::CodeMetrics::TestSupport
       o = _begin_session
       o.pattern_strings = [ '[#foo-999]' ]
       _ok = o.execute
-      _ok.should eql false
+      expect( _ok ).to eql false
 
       _em = want_not_OK_event
 
@@ -43,11 +43,11 @@ module Skylab::CodeMetrics::TestSupport
 
       st.upstream[].exit  # this leaves the finish execution path uncovered but meh
 
-      x.lineno.should be_respond_to :bit_length
+      expect( x.lineno ).to be_respond_to :bit_length
       x_.path or fail
 
       [ x, x_ ].each do | x__ |
-        x__.line_content.should be_include this
+        expect( x__.line_content ).to be_include this
       end
     end
 

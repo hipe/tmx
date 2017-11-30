@@ -30,7 +30,7 @@ module Skylab::CodeMetrics::TestSupport
         act.chomp!
         act.chomp!  # only when run alone is this necessary (at writing)
 
-        act.should eql exp
+        expect( act ).to eql exp
       end
 
       me = 'tally'

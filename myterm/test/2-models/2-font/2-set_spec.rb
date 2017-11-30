@@ -20,7 +20,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "emits" do
-        last_emission.should be_emission_ending_with :no_such_association
+        expect( last_emission ).to be_emission_ending_with :no_such_association
       end
     end
 
@@ -44,10 +44,10 @@ module Skylab::MyTerm::TestSupport
           term = '"(?:\.[a-zA-Z0-9]+|)"=>[0-9]+'
           _rx = /\A\(skipped: \{#{ term }(?:, #{ term })*\}\)\z/
 
-          _s.should match _rx
+          expect( _s ).to match _rx
         end
 
-        second_emission.should _be_this  # EEW skip first emission (`set_leaf_component`)
+        expect( second_emission ).to _be_this  # EEW skip first emission (`set_leaf_component`)
       end
 
       shared_subject :_msg_a do
@@ -58,7 +58,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "says that your font wasn't recognized (NOTE contextualiztion removed)" do
-        _msg_a.fetch( 0 ).should eql 'unrecognized font path "menlaco"'
+        expect( _msg_a.fetch( 0 ) ).to eql 'unrecognized font path "menlaco"'
       end
 
       it "offers around 3 levenshtein-based suggestions" do
@@ -86,7 +86,7 @@ module Skylab::MyTerm::TestSupport
       it "because succeeds, results in qk about the path" do
 
         _qk = root_ACS_result
-        _qk.value.should match %r(\bMonaco\.dfont\z)
+        expect( _qk.value ).to match %r(\bMonaco\.dfont\z)
       end
 
       it "event sounds natural (but is not yet contextualized)" do
@@ -95,10 +95,10 @@ module Skylab::MyTerm::TestSupport
 
           _s = black_and_white ev
 
-          _s.should match %r(\Aset path to "/)
+          expect( _s ).to match %r(\Aset path to "/)
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
 
       it "IMPORTANT the new compound gets placed **under the adapter**" do

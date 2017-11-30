@@ -13,7 +13,7 @@ module Skylab::MyTerm::TestSupport
       i and fail
       o.gets and fail
       e.gets and fail
-      w.value.exitstatus.should be_zero
+      expect( w.value.exitstatus ).to be_zero
     end
 
     context "faked out kernel using etc" do
@@ -24,7 +24,7 @@ module Skylab::MyTerm::TestSupport
 
         _inst = _ke.silo :Installation
 
-        _inst.fonts_dir.should eql '/talisker'
+        expect( _inst.fonts_dir ).to eql '/talisker'
 
         _inst.system_conduit.is_fake_ or fail
       end
@@ -34,14 +34,14 @@ module Skylab::MyTerm::TestSupport
         x = _inst.fonts_dir
         x or fail
         _d = x.object_id
-        _inst.fonts_dir.object_id.should eql _d
+        expect( _inst.fonts_dir.object_id ).to eql _d
       end
 
       it "`replace_with_partially_stubbed_proxy`" do
 
         _a = _inst.filesystem.glob '/talisker/*'
 
-        _a.first.should eql '/talikser/wazoozle.dfont'
+        expect( _a.first ).to eql '/talikser/wazoozle.dfont'
       end
 
       def _inst

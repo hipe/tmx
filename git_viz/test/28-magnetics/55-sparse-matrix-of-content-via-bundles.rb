@@ -17,29 +17,29 @@ module Skylab::GitViz::TestSupport
 
       _table = _subject[ @bundle, @repository ]
 
-      _table.rows.length.should eql 3
+      expect( _table.rows.length ).to eql 3
 
       row = _table.rows.fetch 0
 
       a = row.to_a
 
-      a.length.should eql 5
+      expect( a.length ).to eql 5
 
-      a[ 0 ].should be_nil
+      expect( a[ 0 ] ).to be_nil
 
       mfc = a.fetch 1
-      mfc.is_first.should eql true
-      mfc.change_count.should eql 1
+      expect( mfc.is_first ).to eql true
+      expect( mfc.change_count ).to eql 1
 
       mfc = a.fetch 2
-      mfc.is_first.should eql false
-      mfc.change_count.should eql 2
+      expect( mfc.is_first ).to eql false
+      expect( mfc.change_count ).to eql 2
 
-      a[ 3 ].should be_nil
+      expect( a[ 3 ] ).to be_nil
 
       mfc = a.fetch 4
-      mfc.is_first.should eql false
-      mfc.change_count.should eql 2
+      expect( mfc.is_first ).to eql false
+      expect( mfc.change_count ).to eql 2
 
     end
 

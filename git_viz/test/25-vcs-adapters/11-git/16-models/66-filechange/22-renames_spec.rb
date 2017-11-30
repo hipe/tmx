@@ -10,28 +10,28 @@ module Skylab::GitViz::TestSupport
     it "simple change looks good" do
 
       fc = _h.fetch 'simple-after.txt'
-      fc.source_path.should eql 'simple-before.txt'
+      expect( fc.source_path ).to eql 'simple-before.txt'
     end
 
     it "head-anchored change looks good" do
 
       fc = _h.fetch 'same-name.txt'
-      fc.source_path.should eql 'from-here/same-name.txt'
-      ::File.dirname( fc.destination_path ).should eql 'to-here'
+      expect( fc.source_path ).to eql 'from-here/same-name.txt'
+      expect( ::File.dirname fc.destination_path ).to eql 'to-here'
     end
 
     it "tail-anchored change looks good" do
 
       fc = _h.fetch 'after-at-tail-of-path.txt'
-      fc.source_path.should eql 'some-dir/before-at-tail-of-path.txt'
-      ::File.dirname( fc.destination_path ).should eql 'some-dir'
+      expect( fc.source_path ).to eql 'some-dir/before-at-tail-of-path.txt'
+      expect( ::File.dirname fc.destination_path ).to eql 'some-dir'
     end
 
     it "infix change looks good" do
 
       fc = _h.fetch 'same-name-again.txt'
-      fc.source_path.should eql 'lvl-1/lvl-2/same-name-again.txt'
-      ::File.dirname( fc.destination_path ).should eql 'lvl-1/lvl-2-B'
+      expect( fc.source_path ).to eql 'lvl-1/lvl-2/same-name-again.txt'
+      expect( ::File.dirname fc.destination_path ).to eql 'lvl-1/lvl-2-B'
     end
 
     define_method :_h, -> do

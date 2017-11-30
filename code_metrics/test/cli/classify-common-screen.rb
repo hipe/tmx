@@ -172,7 +172,7 @@ module Skylab::CodeMetrics::TestSupport
 
           if md
             if want_f
-              md[ :num ].to_f.should eql want_f
+              expect( md[ :num ].to_f ).to eql want_f
             end
           else
             fail "expecting this to look like percent - #{ x.inspect }"
@@ -211,7 +211,8 @@ module Skylab::CodeMetrics::TestSupport
             [ :low, :medium, :high ],
           )
 
-          _act.should @test_context.eql @row_classifications
+          _ = @test_context
+          _.expect( _act ).to _.eql @row_classifications
         end
 
         def ___build_num_pluses

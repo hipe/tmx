@@ -17,7 +17,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "result is a stream of font entities." do
-        _tuple.length.should eql 2
+        expect( _tuple.length ).to eql 2
       end
 
       it "the fonts can express themselves textually (as items)" do
@@ -26,14 +26,14 @@ module Skylab::MyTerm::TestSupport
         s = ""
         oid = s.object_id
         _ = font.express_into_under s, expression_agent_for_want_emission
-        _.length.should be_nonzero
-        _.object_id.should eql oid
+        expect( _.length ).to be_nonzero
+        expect( _.object_id ).to eql oid
       end
 
       it "the fonts are flyweighted" do
 
         a = _tuple
-        a.fetch( 0 ).fetch( 0 ).should eql a.fetch( 1 ).fetch( 0 )
+        expect( a.fetch( 0 ).fetch( 0 ) ).to eql a.fetch( 1 ).fetch( 0 )
       end
 
       shared_subject :_tuple do

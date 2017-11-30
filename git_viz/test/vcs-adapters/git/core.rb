@@ -29,7 +29,7 @@ module Skylab::GitViz::TestSupport
       end
 
       def want_result_for_failure  # #hook-out
-        @result.should eql false
+        expect( @result ).to eql false
       end
 
       def at_ sym

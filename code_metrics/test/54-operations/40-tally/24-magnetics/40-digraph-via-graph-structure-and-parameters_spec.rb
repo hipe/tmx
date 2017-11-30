@@ -39,27 +39,27 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     it "document label on line 3" do
-      _state.lines.fetch( 2 ).should match %r(\A[ ]{2}label="wazoozle"$)
+      expect( _state.lines.fetch 2 ).to match %r(\A[ ]{2}label="wazoozle"$)
     end
 
     it "features label on line 6" do
-      _state.lines.fetch( 5 ).should match %r(\A[ ]{4}label="Wazoozle"$)
+      expect( _state.lines.fetch 5 ).to match %r(\A[ ]{4}label="Wazoozle"$)
     end
 
     it "label for feature tree" do
-      _state.big_string.should match %r(^[ ]{4}label="Wizzie feature tree"$)
+      expect( _state.big_string ).to match %r(^[ ]{4}label="Wizzie feature tree"$)
     end
 
     it "the last assocation" do
-      _state.lines.fetch( -2 ).should match %r(^[ ]{2}bucket2->feature3$)
+      expect( _state.lines.fetch( -2 ) ).to match %r(^[ ]{2}bucket2->feature3$)
     end
 
     it "one feature item" do
-      _state.big_string.should match %r(^[ ]{4}feature3 \[label="method 3"\]$)
+      expect( _state.big_string ).to match %r(^[ ]{4}feature3 \[label="method 3"\]$)
     end
 
     it "the last bucket item" do
-      _state.big_string.should match %r(^[ ]{8}bucket4 \[label="jimmy jam"\]$)
+      expect( _state.big_string ).to match %r(^[ ]{8}bucket4 \[label="jimmy jam"\]$)
     end
 
     def ___build_mock

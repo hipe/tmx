@@ -22,11 +22,11 @@ module Skylab::MyTerm::TestSupport
         _be_this = be_emission :error, :item_not_found do |ev|
 
           s_a = black_and_white_lines ev
-          s_a.first.should eql 'unrecognized adapter name "whonani"'
-          s_a.last.should match %r(\Adid you mean .*"imagemagick"\?\z)
+          expect( s_a.first ).to eql 'unrecognized adapter name "whonani"'
+          expect( s_a.last ).to match %r(\Adid you mean .*"imagemagick"\?\z)
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -39,19 +39,19 @@ module Skylab::MyTerm::TestSupport
       it "result is the qk of the newly created adapter" do
 
         qk = root_ACS_result
-        qk.association.name_symbol.should eql :adapter
+        expect( qk.association.name_symbol ).to eql :adapter
         ada = qk.value
-        ada.adapter_name_const.should eql COMMON_ADAPTER_CONST_
+        expect( ada.adapter_name_const ).to eql COMMON_ADAPTER_CONST_
       end
 
       it "emits" do
 
         _be_this = be_emission :info, :set_leaf_component do |ev|
           _s = black_and_white ev
-          _s.should eql "set adapter to 'imagemagick'"
+          expect( _s ).to eql "set adapter to 'imagemagick'"
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "the ACS reflects this change" do
@@ -83,7 +83,7 @@ module Skylab::MyTerm::TestSupport
 
         _bruh = selected.fetch 0
         1 == selected.length or fail
-        _bruh.adapter_name_const.should eql COMMON_ADAPTER_CONST_
+        expect( _bruh.adapter_name_const ).to eql COMMON_ADAPTER_CONST_
       end
     end
   end

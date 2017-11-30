@@ -23,9 +23,9 @@ module Skylab::GitViz::TestSupport
 
         want_not_OK_event :bad_revision do | ev |
 
-          ev.exitstatus.should eql GENERAL_ERROR___
+          expect( ev.exitstatus ).to eql GENERAL_ERROR___
 
-          black_and_white( ev ).should eql(
+          expect( black_and_white ev ).to eql(
             "unrecognized revision \"#{ sha_s }\"" )
         end
       end

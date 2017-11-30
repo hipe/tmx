@@ -14,7 +14,7 @@ module Skylab::GitViz::TestSupport
       _against_string 'no-such-commit'
 
       want_event_sequence_for_noent_SHA_ 'no-such-commit'
-      @ci.should eql false
+      expect( @ci ).to eql false
       want_no_more_events
     end
 
@@ -30,8 +30,8 @@ module Skylab::GitViz::TestSupport
       fc = @ci.fetch_filechange_via_end_path(
         "dirzo/everybody in the room is floating" )
 
-      fc.insertion_count.should eql 3
-      fc.deletion_count.should eql 2
+      expect( fc.insertion_count ).to eql 3
+      expect( fc.deletion_count ).to eql 2
     end
 
     def _against_string s

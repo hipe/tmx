@@ -35,7 +35,7 @@ module Skylab::CodeMetrics::TestSupport
         h = {}
         r = 1 .. 2
         _state.a.each do | chunk |
-          r.should be_include chunk.length
+          expect( r ).to be_include chunk.length
           chunk.each do | path |
             h[ ::File.basename( path ) ] = true
           end
@@ -48,11 +48,11 @@ module Skylab::CodeMetrics::TestSupport
 
         em_a = _state.emissions
 
-        em_a.length.should eql 1
+        expect( em_a.length ).to eql 1
 
         em = em_a.fetch 0
 
-        em.channel_symbol_array.last.should eql :from_find
+        expect( em.channel_symbol_array.last ).to eql :from_find
 
         _ = "find: -egads-not-a-path-nor-an-operator: No such file or directory\n"
 
@@ -77,13 +77,13 @@ module Skylab::CodeMetrics::TestSupport
 
       it "the expected files match" do
         a = _state.a
-        a.length.should eql 1
-        a.last.length.should eql 1
-        ::File.basename( a.last.last ).should eql 'hey.code'
+        expect( a.length ).to eql 1
+        expect( a.last.length ).to eql 1
+        expect( ::File.basename a.last.last ).to eql 'hey.code'
       end
 
       it "no events" do
-        _state.emissions.length.should be_zero
+        expect( _state.emissions.length ).to be_zero
       end
     end
 

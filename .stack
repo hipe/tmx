@@ -69,5 +69,3 @@ possible bug in discrepancy between test count with quickie and not xx
 doc_test requires special work
 come back around to [sy] and use modern patterns
 tmx, slicer (meta & macro) (-4)
-myterm, doc_test (flagship experiments) (-5)
-treemap, git_viz, code_metrics (visualization experiments) (-6)

@@ -31,8 +31,8 @@ module Skylab::GitViz::TestSupport
       bundle_against_ "/m03/repo/dirzo"
 
       bnch = @bundle
-      bnch.should be_respond_to :ci_box
-      bnch.trails.length.should eql 3
+      expect( bnch ).to be_respond_to :ci_box
+      expect( bnch.trails.length ).to eql 3
       @trail = bnch.trails.fetch 0
       __want_trail
     end
@@ -41,18 +41,18 @@ module Skylab::GitViz::TestSupport
 
       trl = @trail
       a = trl.filechanges
-      a.length.should eql 2
+      expect( a.length ).to eql 2
 
       bfc = a.fetch 0
 
-      bfc.SHA.string.should eql 'fafa002000000000000000000000000000000000'
-      bfc.fc.insertion_count.should eql 3
-      bfc.fc.deletion_count.should be_zero
+      expect( bfc.SHA.string ).to eql 'fafa002000000000000000000000000000000000'
+      expect( bfc.fc.insertion_count ).to eql 3
+      expect( bfc.fc.deletion_count ).to be_zero
 
       bfc = a.fetch 1
-      bfc.SHA.string.should eql 'fafa003000000000000000000000000000000000'
-      bfc.fc.insertion_count.should eql 3
-      bfc.fc.deletion_count.should eql 2
+      expect( bfc.SHA.string ).to eql 'fafa003000000000000000000000000000000000'
+      expect( bfc.fc.insertion_count ).to eql 3
+      expect( bfc.fc.deletion_count ).to eql 2
     end
 
     def manifest_path_for_stubbed_FS

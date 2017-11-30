@@ -48,17 +48,17 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     it "succeeds" do
-      _state.result.should eql true
+      expect( _state.result ).to eql true
     end
 
     it "does not include the file filtered out because extension" do
 
-      _state.big_string.include?( 'some.java' ).should eql false
+      expect( _state.big_string.include? 'some.java' ).to eql false
     end
 
     it "does not include the file filtered out b.c ignore path" do
 
-      _state.big_string.include?( 'Server.scala' ).should eql false
+      expect( _state.big_string.include? 'Server.scala' ).to eql false
     end
 
     it "the associations look right" do
@@ -73,7 +73,7 @@ module Skylab::CodeMetrics::TestSupport
         }
       HERE
 
-      _act.should eql _exp
+      expect( _act ).to eql _exp
     end
 
     dangerous_memoize :_State do

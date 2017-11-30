@@ -23,7 +23,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "succeeds" do
-        state_.exitstatus.should match_successful_exitstatus
+        expect( state_.exitstatus ).to match_successful_exitstatus
       end
 
       it "usage section" do
@@ -54,7 +54,7 @@ module Skylab::CodeMetrics::TestSupport
       it "invite line" do
 
         _ = state_.tree.children.last.x.unstyled_content
-        _.should eql  "use '[CoMe] -h <action>' for help on that action."
+        expect( _ ).to eql  "use '[CoMe] -h <action>' for help on that action."
       end
     end
 

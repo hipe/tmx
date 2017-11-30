@@ -79,7 +79,7 @@ module Skylab::MyTerm::TestSupport
             'set-background-image',
           )
 
-          buttonesques.should _this
+          expect( buttonesques ).to _this
         end
       end
 

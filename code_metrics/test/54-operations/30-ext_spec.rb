@@ -18,11 +18,11 @@ module Skylab::CodeMetrics::TestSupport
       2 == a.length or fail
       x = a.first
       o = a.last
-      x.slug.should eql '*.code'
-      x.count.should eql 2
+      expect( x.slug ).to eql '*.code'
+      expect( x.count ).to eql 2
 
-      o.slug.should eql '*.file'
-      o.count.should eql 1
+      expect( o.slug ).to eql '*.file'
+      expect( o.count ).to eql 1
 
     end
   end

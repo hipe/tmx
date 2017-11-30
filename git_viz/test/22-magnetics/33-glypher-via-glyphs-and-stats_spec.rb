@@ -9,42 +9,42 @@ module Skylab::GitViz::TestSupport
 
     it "outside range (low end) is nil" do
 
-      _against( -1 ).should be_nil
+      expect( _against( -1 ) ).to be_nil
     end
 
     it "outside range (high end) is nil" do
 
-      _against( 122 ).should be_nil
+      expect( _against 122 ).to be_nil
     end
 
     it "'begin' term is OK" do
 
-      _against( 0 ).should eql 0
+      expect( _against 0 ).to eql 0
     end
 
     it "'end' value is OK" do
 
-      _against( 121 ).should eql 2
+      expect( _against 121 ).to eql 2
     end
 
     it "near cutoff (A.1)" do
 
-      _against( 39 ).should eql 0
+      expect( _against 39 ).to eql 0
     end
 
     it "near cutoff (A.2)" do
 
-      _against( 40 ).should eql 1
+      expect( _against 40 ).to eql 1
     end
 
     it "near cutoff (B.1)" do
 
-      _against( 80 ).should eql 1
+      expect( _against 80 ).to eql 1
     end
 
     it "near cuttoff (B.2)" do
 
-      _against( 81 ).should eql 2
+      expect( _against 81 ).to eql 2
     end
 
     def _against d

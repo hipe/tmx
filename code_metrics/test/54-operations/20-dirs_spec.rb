@@ -16,15 +16,15 @@ module Skylab::CodeMetrics::TestSupport
       a = t.to_child_stream.to_a
       2 == a.length or fail
 
-      a.map( & :slug ).should eql %w( fixture-files-one fixture-files-two )
+      expect( a.map( & :slug ) ).to eql %w( fixture-files-one fixture-files-two )
       x = a.first
       o = a.last
 
-      x.num_files.should eql 3
-      x.num_lines.should eql 12
+      expect( x.num_files ).to eql 3
+      expect( x.num_lines ).to eql 12
 
-      o.num_files.should eql 2
-      o.num_lines.should eql 3
+      expect( o.num_files ).to eql 2
+      expect( o.num_lines ).to eql 3
 
       # (we are ignoring ~ 6 events)
     end

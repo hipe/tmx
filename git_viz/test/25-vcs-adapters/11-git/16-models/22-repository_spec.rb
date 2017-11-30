@@ -17,7 +17,7 @@ module Skylab::GitViz::TestSupport
 
       want_neutral_event :ping, "hello from front."
 
-      x.should eql :hello_from_front
+      expect( x ).to eql :hello_from_front
 
       want_no_more_events
     end
@@ -35,7 +35,7 @@ module Skylab::GitViz::TestSupport
         yield
       rescue Home_::ArgumentError => e
       end
-      e.message.should eql "relative paths are not honored here - anything"
+      expect( e.message ).to eql "relative paths are not honored here - anything"
     end
 
     it "resolve when provide a path that totally doesn't exist - x" do
@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport
 
       ev.exception or fail
       ev.prop or fail
-      ev.start_path.should eql '/totally/doesn-t-exist'
+      expect( ev.start_path ).to eql '/totally/doesn-t-exist'
     end
 
     it "give it a FILE in a dir that is a repo - WORKS" do
@@ -60,7 +60,7 @@ module Skylab::GitViz::TestSupport
 
       want_no_more_events
 
-      @repository.should be_respond_to :fetch_commit_via_identifier
+      expect( @repository ).to be_respond_to :fetch_commit_via_identifier
     end
 
     def manifest_path_for_stubbed_FS

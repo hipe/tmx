@@ -43,7 +43,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "no other matches" do
-        _state.length.should eql 6
+        expect( _state.length ).to eql 6
       end
     end
 
@@ -52,11 +52,11 @@ module Skylab::CodeMetrics::TestSupport
     define_method :_ do |match_index, path, lineno, pattern_string, range_begin|
 
       ma = _state.fetch match_index
-      ma.path.should eql path
-      ma.lineno.should eql lineno
-      ma.pattern_string.should eql pattern_string
+      expect( ma.path ).to eql path
+      expect( ma.lineno ).to eql lineno
+      expect( ma.pattern_string ).to eql pattern_string
       _r = range_begin ... ( range_begin + _WIDTH )
-      ma.range.should eql _r
+      expect( ma.range ).to eql _r
     end
 
     def _state_me st

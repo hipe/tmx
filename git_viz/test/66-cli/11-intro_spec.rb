@@ -32,21 +32,21 @@ module Skylab::GitViz::TestSupport
       invoke 'ping'
       want :e, _HELLO
       want_no_more_lines
-      @exitstatus.should eql :hello_from_git_viz
+      expect( @exitstatus ).to eql :hello_from_git_viz
     end
 
     it "1.4 helf" do
       invoke '-h'
-      ( 9 .. 9 ).should be_include count_contiguous_lines_on_stream( :e )
+      expect( 9 .. 9 ).to be_include count_contiguous_lines_on_stream( :e )
       want_no_more_lines
-      @exitstatus.should be_zero
+      expect( @exitstatus ).to be_zero
     end
 
     it "N   ping with an option to use the pay channel" do
       invoke 'ping', '--on-channel', 'payload'
       want :o, _HELLO
       want_no_more_lines
-      @exitstatus.should eql :hello_from_git_viz
+      expect( @exitstatus ).to eql :hello_from_git_viz
     end
   end
 end

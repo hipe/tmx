@@ -12,7 +12,7 @@ module Skylab::CodeMetrics::TestSupport
       call_API :ping
       want_neutral_event :ping, "hello from code metrics."
       want_no_more_events
-      @result.should eql :hello_from_code_metrics
+      expect( @result ).to eql :hello_from_code_metrics
     end
 
     it "noent" do
@@ -20,7 +20,7 @@ module Skylab::CodeMetrics::TestSupport
       call_API :line_count, :path, [ Fixture_file_[ "not-there.code" ] ]
       want_not_OK_event :enoent, /\ANo such file or directory - /
       want_no_more_events
-      @result.should eql nil
+      expect( @result ).to eql nil
     end
 
     it "against one directory with a name constraint" do
@@ -31,13 +31,13 @@ module Skylab::CodeMetrics::TestSupport
 
       y = _linecount_NLP_frame.express_into_line_context( [] )
 
-      y.should eql [ 'including blank lines and comment lines' ]
+      expect( y ).to eql [ 'including blank lines and comment lines' ]
 
       want_freeform_event :wc_command
       want_no_more_events
 
       totes = @result
-      totes.count.should eql 9
+      expect( totes.count ).to eql 9
       totes.finish
 
       a = totes.to_child_stream.to_a
@@ -45,15 +45,15 @@ module Skylab::CodeMetrics::TestSupport
       x = a.fetch 0
       o = a.fetch 1
 
-      x.count.should eql 6
+      expect( x.count ).to eql 6
 
-      ::File.basename( o.slug ).should eql 'some more.code'
+      expect( ::File.basename o.slug ).to eql 'some more.code'
 
-      ( 0.65 .. 0.67 ).should be_include x.total_share
-      ( 0.32 .. 0.34 ).should be_include o.total_share
+      expect( 0.65 .. 0.67 ).to be_include x.total_share
+      expect( 0.32 .. 0.34 ).to be_include o.total_share
 
-      ( 0.99 .. 1.01 ).should be_include x.normal_share
-      ( 0.49 .. 0.51 ).should be_include o.normal_share
+      expect( 0.99 .. 1.01 ).to be_include x.normal_share
+      expect( 0.49 .. 0.51 ).to be_include o.normal_share
 
     end
 
@@ -67,13 +67,13 @@ module Skylab::CodeMetrics::TestSupport
 
       y = _linecount_NLP_frame.express_into_line_context []
 
-      y.should eql [ 'excluding blank lines and comment lines' ]
+      expect( y ).to eql [ 'excluding blank lines and comment lines' ]
 
       want_freeform_event :wc_pipey_command_string
       want_freeform_event :wc_pipey_command_string
 
       totes = @result
-      totes.count.should eql 4
+      expect( totes.count ).to eql 4
     end
 
     def _same

@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
       end
 
       it "succeeds" do
-        state_.exitstatus.should match_successful_exitstatus
+        expect( state_.exitstatus ).to match_successful_exitstatus
       end
 
       it "these three sections (note singular)" do
@@ -27,7 +27,7 @@ module Skylab::GitViz::TestSupport
           m << node.x.unstyled_header_content
         end
 
-        _.should eql %w( usage option arguments )
+        expect( _ ).to eql %w( usage option arguments )
       end
 
       it "args should have these items" do
@@ -38,7 +38,7 @@ module Skylab::GitViz::TestSupport
           m << node.x.unstyled_header_content
         end
 
-        _.should eql %w( <width> <path> )
+        expect( _ ).to eql %w( <width> <path> )
       end
     end
 

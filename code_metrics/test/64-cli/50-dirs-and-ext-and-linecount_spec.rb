@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] CLI - dirs and ex and linecount" do
+  describe "[cm] CLI - dirs and ext and linecount" do
 
     # the number of pluses that will display is a function of these factors:
     #
@@ -27,7 +27,7 @@ module Skylab::CodeMetrics::TestSupport
       it "info" do  # :+#bad-test
 
         st = build_info_line_stream_
-        st.gets.should match %r(\Agenerated `find` command\b)
+        expect( st.gets ).to match %r(\Agenerated `find` command\b)
         d = ::File::SEPARATOR.getbyte 0
         path = -> do
           s = st.gets
@@ -36,14 +36,14 @@ module Skylab::CodeMetrics::TestSupport
         path[]
         path[]
         path[]
-        st.gets.should eql "(including blank lines and comment lines)\n"
-        st.gets.should match %r(\Awc -l \/)
-        st.gets.should be_nil
+        expect( st.gets ).to eql "(including blank lines and comment lines)\n"
+        expect( st.gets ).to match %r(\Awc -l \/)
+        expect( st.gets ).to be_nil
       end
 
       it "headers" do
 
-        headers_.should eql(
+        expect( headers_ ).to eql(
          [ :file, :lines, :total_share, :normal_share, :_blank_header_ ] )
       end
 
@@ -68,7 +68,7 @@ module Skylab::CodeMetrics::TestSupport
 
         _sm = string_matrix_
 
-        _sm.fetch( 3 ).should eql(
+        expect( _sm.fetch 3 ).to eql(
           [ "Total: 3", "12", EMPTY_S_, EMPTY_S_, EMPTY_S_ ] )
       end
 
@@ -85,14 +85,14 @@ module Skylab::CodeMetrics::TestSupport
       it "info" do
 
         st = build_info_line_stream_
-        st.gets.should eql "(verbosity level three is highest (had four).)\n"
-        st.gets.should match %r(\Agenerated `find` command\b)
-        st.gets.should be_nil
+        expect( st.gets ).to eql "(verbosity level three is highest (had four).)\n"
+        expect( st.gets ).to match %r(\Agenerated `find` command\b)
+        expect( st.gets ).to be_nil
       end
 
       it "headers" do
 
-        headers_.should eql(
+        expect( headers_ ).to eql(
           [ :extension, :num_files, :total_share, :normal_share, :_blank_header_ ] )
       end
 
@@ -105,8 +105,8 @@ module Skylab::CodeMetrics::TestSupport
         row1 = sm.fetch 0
         row2 = sm.fetch 1
 
-        row1.fetch( 0 ).should eql '*.code'
-        row2.fetch( 0 ).should eql '*.file'
+        expect( row1.fetch 0 ).to eql '*.code'
+        expect( row2.fetch 0 ).to eql '*.file'
 
         want_integer_ row1.fetch( 1 ), 2..2
         want_integer_ row2.fetch( 1 ), 1..1
@@ -121,7 +121,7 @@ module Skylab::CodeMetrics::TestSupport
 
         _sm = string_matrix_
 
-        _sm.last.should eql [ "Total: 2", "3", EMPTY_S_, EMPTY_S_, EMPTY_S_ ]
+        expect( _sm.last ).to eql [ "Total: 2", "3", EMPTY_S_, EMPTY_S_, EMPTY_S_ ]
       end
 
       memoize_output_lines_ do
@@ -149,7 +149,7 @@ module Skylab::CodeMetrics::TestSupport
 
       it "header" do
 
-        headers_.should eql(
+        expect( headers_ ).to eql(
           [ :directory, :num_files, :num_lines, :total_share, :normal_share, :_blank_header_ ] )
       end
 
@@ -168,12 +168,12 @@ module Skylab::CodeMetrics::TestSupport
           end
         end
 
-        column[ 0 ].should eql [
+        expect( column[ 0 ] ).to eql [
           "fixture-files-one", "fixture-files-two", "Total: 2" ]
 
-        column[ 1 ].should eql %w( 3 2 5 )
+        expect( column[ 1 ] ).to eql %w( 3 2 5 )
 
-        column[ 2 ].should eql %w( 12 3 15 )
+        expect( column[ 2 ] ).to eql %w( 12 3 15 )
 
         want_percent_ sm[ 0 ][ 3 ], 80.0
         want_percent_ sm[ 1 ][ 4 ], 25.0

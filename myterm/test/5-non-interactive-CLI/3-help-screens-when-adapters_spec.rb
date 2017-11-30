@@ -28,13 +28,13 @@ module Skylab::MyTerm::TestSupport
       it "first usage line has been customized" do
 
         _be_this = be_line :styled, "usage: xyzi [ -a{i} ] <action> [..]"
-        section( :usage ).raw_line( 0 ).should _be_this
+        expect( section( :usage ).raw_line( 0 ) ).to _be_this
       end
 
       it "second usage line too" do
 
         _be_this = be_line :styled, %r(\A {2,}xyzi \[ -a{i} \] -h <action>$)
-        section( :usage ).raw_line( 1 ).should _be_this
+        expect( section( :usage ).raw_line( 1 ) ).to _be_this
       end
 
       it "options screen is customized" do
@@ -53,13 +53,13 @@ module Skylab::MyTerm::TestSupport
       it "first usage line is like above but shows adapter being selected" do
 
         _be_this = be_line :styled, "usage: xyzi -ai <action> [..]"
-        section( :usage ).raw_line( 0 ).should _be_this
+        expect( section( :usage ).raw_line( 0 ) ).to _be_this
       end
 
       it "2nd usage is like above but (ditto)" do
 
         _be_this = be_line :styled, %r(\A {2,}xyzi -ai -h <action>$)
-        section( :usage ).raw_line( 1 ).should _be_this
+        expect( section( :usage ).raw_line( 1 ) ).to _be_this
       end
 
       it "there does NOT appear the special custom section" do
@@ -83,7 +83,7 @@ module Skylab::MyTerm::TestSupport
         _be_this = be_line :styled,
           "use 'xyzi -ai -h <action>' for help on that action."
 
-        section( :use ).raw_line( 0 ).should _be_this
+        expect( section( :use ).raw_line( 0 ) ).to _be_this
       end
     end
 
@@ -96,7 +96,7 @@ module Skylab::MyTerm::TestSupport
       it "the short hotstring of active adapter appears in usage line" do
 
         _be_this = be_line :styled, %r(\Ausage: xyzi -ai osa-script \[-)
-        section( :usage ).raw_line( 0 ).should _be_this
+        expect( section( :usage ).raw_line( 0 ) ).to _be_this
       end
 
       it "adapter specific components are in the o.p" do

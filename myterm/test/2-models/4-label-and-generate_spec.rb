@@ -21,10 +21,10 @@ module Skylab::MyTerm::TestSupport
       it "emits (NO CONTEXT)" do
 
         _be_this = be_emission_ending_with :is_not, :nonblank do |y|
-          y.should eql [ "cannot be blank" ]
+          expect( y ).to eql [ "cannot be blank" ]
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
     end
 
@@ -46,14 +46,14 @@ module Skylab::MyTerm::TestSupport
 
         _s_a = root_ACS_result.string_array
 
-        _s_a.fetch( -2 ).should eql 'label:welff'
+        expect( _s_a.fetch( -2 ) ).to eql 'label:welff'
       end
 
       it "resultant command structure will express under modality" do
 
         _ = root_ACS_result.express_into_under "", :_not_used_
 
-        _.should match %r(\Aconvert .+volatile-image\.png\z)
+        expect( _ ).to match %r(\Aconvert .+volatile-image\.png\z)
       end
     end
 
@@ -76,9 +76,9 @@ module Skylab::MyTerm::TestSupport
 
         a = _.express_into_under [], :_not_used_
 
-        a.first.should eql "tell application \"iTerm2\"\n"
+        expect( a.first ).to eql "tell application \"iTerm2\"\n"
 
-        a.last.should match %r(return "script result:)
+        expect( a.last ).to match %r(return "script result:)
       end
     end
 

@@ -28,14 +28,14 @@ module Skylab::GitViz::TestSupport
 
       call_API :ping
       want_neutral_event :ping
-      @result.should eql :hello_from_git_viz
+      expect( @result ).to eql :hello_from_git_viz
     end
 
     it "ping with parameters - the action receives the actual parameters" do
 
       call_API :ping, :secret_x, :k
 
-      @result.should eql "hi: k"
+      expect( @result ).to eql "hi: k"
       want_no_more_events
     end
   end

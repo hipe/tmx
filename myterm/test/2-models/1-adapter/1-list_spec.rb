@@ -17,8 +17,8 @@ module Skylab::MyTerm::TestSupport
 
         qk = root_ACS_result
         qk.is_known_known or fail
-        qk.name.as_variegated_symbol.should eql :adapter
-        qk.value.should be_nil
+        expect( qk.name.as_variegated_symbol ).to eql :adapter
+        expect( qk.value ).to be_nil
       end
 
       def event_log
@@ -43,7 +43,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "lists one adapter" do
-        _custom_state.count.should eql 1
+        expect( _custom_state.count ).to eql 1
       end
 
       def event_log
