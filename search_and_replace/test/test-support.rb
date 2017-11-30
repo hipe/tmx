@@ -36,6 +36,12 @@ module Skylab::SearchAndReplace::TestSupport
 
   # -
 
+    # -- expect
+
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
+    end
+
     # -- setup
 
     # ~ FS
@@ -206,7 +212,7 @@ module Skylab::SearchAndReplace::TestSupport
     # ~ assertion
 
     def is_on_frame_number_with_buttons_ d
-      stack.should be_at_frame_number d
+      expect( stack ).to be_at_frame_number d
       buttonesques
     end
 

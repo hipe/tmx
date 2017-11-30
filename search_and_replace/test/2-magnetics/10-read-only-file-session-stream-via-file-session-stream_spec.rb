@@ -73,9 +73,9 @@ module Skylab::SearchAndReplace::TestSupport
       it "each match knows what line number it came from" do
 
         o = _state
-        o.first_match.lineno.should eql 1
-        o.second_match.lineno.should eql 3
-        o.third_match.lineno.should eql 3
+        expect( o.first_match.lineno ).to eql 1
+        expect( o.second_match.lineno ).to eql 3
+        expect( o.third_match.lineno ).to eql 3
       end
 
       context "since matches can be multi-line (with `do_highlight`):" do
@@ -104,9 +104,9 @@ module Skylab::SearchAndReplace::TestSupport
         it "you can convert the match itself to a \"line\" stream" do
 
           a = _state
-          a.fetch( 0 ).length.should eql 1
-          a.fetch( 1 ).length.should eql 1
-          a.length.should eql 2
+          expect( a.fetch( 0 ).length ).to eql 1
+          expect( a.fetch( 1 ).length ).to eql 1
+          expect( a.length ).to eql 2
         end
 
         it "the match is highlighted within the full line" do
@@ -116,10 +116,10 @@ module Skylab::SearchAndReplace::TestSupport
           mid_strings = _treat a.fetch 0
           last_strings = _treat a.fetch 1
 
-          mid_strings.should eql(
+          expect( mid_strings ).to eql(
             [ "when i say \"", "wazoozle", "\" i mean WaZOOzle!\n" ] )
 
-          last_strings.should eql(
+          expect( last_strings ).to eql(
             [ "when i say \"wazoozle\" i mean ", "WaZOOzle", "!\n" ] )
         end
 

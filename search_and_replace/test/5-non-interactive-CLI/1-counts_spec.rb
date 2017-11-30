@@ -51,7 +51,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "description is there" do
         _ = %r(\bthe grep --count option\b)
-        section( :description ).raw_line( 0 ).should be_line( :styled, _ )
+        expect( section( :description ).raw_line( 0 ) ).to be_line( :styled, _ )
       end
 
       it "options - note plurals do not show" do
@@ -113,10 +113,10 @@ module Skylab::SearchAndReplace::TestSupport
         a = niCLI_state.lines
 
         _ = "to 'search' 'counts', must 'files-by-grep'"
-        a[ -3 ].should be_line( :e, _ )
+        expect( a[ -3 ] ).to be_line( :e, _ )
 
         _rx = %r('files-by-grep' is missing required parameter <ruby-regexp>)
-        a[ -2 ].should be_line( :styled, :e, _rx )
+        expect( a[ -2 ] ).to be_line( :styled, :e, _rx )
       end
     end
 
@@ -144,8 +144,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         2 == a.length or fail
         # (order is not guaranteed by the filesystem .. so .. that.)
-        a.first.should be_line( %r(\bsome-orange\.orange - 1 matching line\b) )
-        a.last.should be_line( %r(\bthree-lines\.txt - 2 matching lines\b) )
+        expect( a.first ).to be_line( %r(\bsome-orange\.orange - 1 matching line\b) )
+        expect( a.last ).to be_line( %r(\bthree-lines\.txt - 2 matching lines\b) )
       end
     end
 

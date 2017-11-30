@@ -27,15 +27,15 @@ module Skylab::SearchAndReplace::TestSupport
           end ]
         end
 
-        o = Common_::Stream.via_nonsparse_array s_a
+        _st = Common_::Stream.via_nonsparse_array s_a
 
-        o.gets.should eql "Jazzmatazz"
-        o.gets.should eql "Jazzmatazz::Bizzo"
-        o.gets.should eql "Jazzmatazz::Bizzo::Boffo"
-        o.gets.should eql "Jazzmatazz::Bizzo::Boffo::WAHOO_Awooga"
-        o.gets.should eql "Jazzmatazz::Other_Module"
-
-        s_a.length.should eql 5
+        want_these_lines_in_array_ _st do |y|
+          y << "Jazzmatazz"
+          y << "Jazzmatazz::Bizzo"
+          y << "Jazzmatazz::Bizzo::Boffo"
+          y << "Jazzmatazz::Bizzo::Boffo::WAHOO_Awooga"
+          y << "Jazzmatazz::Other_Module"
+        end
       end
 
       def __subject * x_a, & x_p

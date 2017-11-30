@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace::TestSupport
         screen 1
 
         it "there is NOT a buttonesque for (e.g) \"counts\"", wip: true do  # #[#004]
-          buttonesques.should not_have_button_for 'counts'
+          expect( buttonesques ).to not_have_button_for 'counts'
         end
 
         it "the custom hotstring is expressed" do
@@ -82,7 +82,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "shows find command" do
-        first_line.should match %r(\Agenerated `find` command: )
+        expect( first_line ).to match %r(\Agenerated `find` command: )
       end
 
       # (see tombstone about omitted test because of removed feature)
@@ -126,7 +126,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "it reports that it was set" do
 
-          first_line.should match %r(\Aset ruby regexp to /[^/]+/i\z)
+          expect( first_line ).to match %r(\Aset ruby regexp to /[^/]+/i\z)
         end
 
         it "includes line talkin bout grep rx" do
@@ -139,7 +139,7 @@ module Skylab::SearchAndReplace::TestSupport
         screen 3
 
         it "there IS a buttonesque for (e.g) counts" do
-          buttonesques.should have_button_for 'counts'
+          expect( buttonesques ).to have_button_for 'counts'
         end
       end
 

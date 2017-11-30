@@ -34,7 +34,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def want_ want_string
-      @output_string.should eql want_string
+      expect( @output_string ).to eql want_string
     end
   end
 end

@@ -31,10 +31,10 @@ module Skylab::SearchAndReplace::TestSupport
            }to help define #{
              }(code :well_well_well) and (code :nope)" ]
 
-          y.should eql _a
+          expect( y ).to eql _a
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
 
       def expression_agent_for_want_emission
@@ -61,9 +61,9 @@ module Skylab::SearchAndReplace::TestSupport
           msg = black_and_white ev
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
 
-        msg.should match(
+        expect( msg ).to match(
           %r('well_well_well' and 'nope' are missing the expected files «.+#{
               }well-well-well\.rb, nope\.rb\}»\z) )
       end

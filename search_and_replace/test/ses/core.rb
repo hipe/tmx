@@ -67,11 +67,11 @@ module Skylab::SearchAndReplace::TestSupport
       # --
 
       def want_no_matches_
-        number_of_match_controllers_.should be_zero
+        expect( number_of_match_controllers_ ).to be_zero
       end
 
       def want_one_match_
-        number_of_match_controllers_.should eql 1
+        expect( number_of_match_controllers_ ).to eql 1
       end
 
       def number_of_match_controllers_

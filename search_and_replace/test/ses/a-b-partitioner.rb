@@ -58,7 +58,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       def want_span match, beg, ending, sym
 
-        match._category_symbol_.should eql sym
+        expect( match._category_symbol_ ).to eql sym
         match._category_symbol_ == sym or fail
 
         match.charpos == beg or fail

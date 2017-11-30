@@ -95,7 +95,7 @@ module Skylab::BeautySalon::TestSupport
 
     def want_not_OK_event_ sym
       em = want_not_OK_event
-      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
       em
     end
 
@@ -103,7 +103,7 @@ module Skylab::BeautySalon::TestSupport
 
       em = want_OK_event nil, msg
       if sym
-        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        expect( em.cached_event_value.to_event.terminal_channel_symbol ).to eql sym
       end
       em
     end

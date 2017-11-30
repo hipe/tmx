@@ -23,11 +23,11 @@ module Skylab::SearchAndReplace::TestSupport
 
           _ = black_and_white ev
 
-          _.should include_alternation_for_(
+          expect( _ ).to include_alternation_for_(
             %w( paths path filename_patterns filename_pattern ) )
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -47,10 +47,10 @@ module Skylab::SearchAndReplace::TestSupport
 
         _be_this = be_emission_ending_with _ do |y|
 
-          y.last.should be_include ' end of phrase - unexpected argument: \'wa'
+          expect( y.last ).to be_include ' end of phrase - unexpected argument: \'wa'
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -90,7 +90,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "emits the find command" do
 
-        last_emission.should be_emission( :info, :event, :find_command_args )
+        expect( last_emission ).to be_emission( :info, :event, :find_command_args )
       end
 
       it "result is a stream of the matched files" do
@@ -98,10 +98,10 @@ module Skylab::SearchAndReplace::TestSupport
         st = root_ACS_result
         _ = st.gets
         __ = st.gets
-        st.gets.should be_nil
+        expect( st.gets ).to be_nil
 
-        basename_( _ ).should eql 'one-line.txt'
-        basename_( __ ).should eql _THREE_LINES_FILE
+        expect( basename_ _ ).to eql 'one-line.txt'
+        expect( basename_ __ ).to eql _THREE_LINES_FILE
       end
     end
 
@@ -157,13 +157,13 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "emits the grep command (sort of)" do
 
-        last_emission.should be_emission_ending_with :grep_command_head
+        expect( last_emission ).to be_emission_ending_with :grep_command_head
       end
 
       it "result is a stream of paths" do
 
         a = root_ACS_customized_result
-        basename_( a.fetch 0 ).should eql 'three-lines.txt'
+        expect( basename_( a.fetch 0 ) ).to eql 'three-lines.txt'
         a[ 1 ] and fail
       end
     end

@@ -61,14 +61,14 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "each structure has count (grep-style, number of matches per file)" do
 
-        _first.count.should eql 1
-        _second.count.should eql 3
+        expect( _first.count ).to eql 1
+        expect( _second.count ).to eql 3
       end
 
       it "each structure has path" do
 
-        basename_( _first.path ).should eql _ONE_LINE_FILE
-        basename_( _second.path ).should eql _THREE_LINES_FILE
+        expect( basename_( _first.path ) ).to eql _ONE_LINE_FILE
+        expect( basename_( _second.path ) ).to eql _THREE_LINES_FILE
       end
 
       it "none of the matches had zero or less" do

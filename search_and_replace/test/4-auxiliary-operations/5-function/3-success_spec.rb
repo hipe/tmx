@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "performance succeeds" do
 
-        _performance.should eql true
+        expect( _performance ).to eql true
       end
 
       it "content looks wowzaa" do

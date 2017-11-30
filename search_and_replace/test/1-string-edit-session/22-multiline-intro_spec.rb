@@ -74,7 +74,7 @@ module Skylab::SearchAndReplace::TestSupport
       it "two match controllers" do
         _es = _build_the_session
         _a = match_controller_array_for_ _es
-        _a.length.should eql 2
+        expect( _a.length ).to eql 2
       end
     end
 
@@ -109,15 +109,15 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "two blocks" do
-        _state.length.should eql 2
+        expect( _state.length ).to eql 2
       end
 
       it "first block has matches" do
-        _state.fetch( 0 ).should eql true
+        expect( _state.fetch( 0 ) ).to eql true
       end
 
       it "second block does not" do
-        _state.fetch( 1 ).should eql false
+        expect( _state.fetch( 1 ) ).to eql false
       end
     end
 
@@ -142,11 +142,11 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "three blocks" do
-        _state.length.should eql 3
+        expect( _state.length ).to eql 3
       end
 
       it "matches look right" do
-        _state.should eql [ true, false, true ]
+        expect( _state ).to eql [ true, false, true ]
       end
     end
 

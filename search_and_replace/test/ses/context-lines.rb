@@ -88,7 +88,7 @@ module Skylab::SearchAndReplace::TestSupport
           act_s = act_tl.to_unstyled_bytes_string_
           act_s.chomp!
           if act_s != s_content
-            act_s.should eql s_content
+            expect( act_s ).to eql s_content
           end
         else
           fail ___CL_say_etc s_content

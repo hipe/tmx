@@ -30,32 +30,32 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "each match knows its (starting) line number (starts at one)" do
-        _match.lineno.should eql 1
+        expect( _match.lineno ).to eql 1
       end
 
       it "each match knows its own path" do
-        basename_( _match.path ).should eql _ONE_LINE_FILE
+        expect( basename_( _match.path ) ).to eql _ONE_LINE_FILE
       end
 
       it "each match has a platform matchdata" do
 
         a = _matches
-        a.fetch( 0 ).md[ 0 ].should eql 'WAZOOZLE'
-        a.fetch( 1 ).md[ 1 ].should eql 'wazoozle'
+        expect( a.fetch( 0 ).md[ 0 ] ).to eql 'WAZOOZLE'
+        expect( a.fetch( 1 ).md[ 1 ] ).to eql 'wazoozle'
       end
 
       it "each match (because it might be multiline) can `to_line_stream`" do
 
         _ = _matches.fetch 0
         st = _.to_line_stream
-        st.gets.should eql "it's time for WAZOOZLE, see\n"
-        st.gets.should be_nil
+        expect( st.gets ).to eql "it's time for WAZOOZLE, see\n"
+        expect( st.gets ).to be_nil
       end
 
       it "multiple matches on one line will each reflect that same line" do
 
         lines1, lines2 = _lines_1_lines_2
-        lines1.should eql lines2
+        expect( lines1 ).to eql lines2
       end
 
       it "(but with each `to_line_stream` new lines are made (strscan))" do
@@ -133,15 +133,15 @@ module Skylab::SearchAndReplace::TestSupport
       _FILE = 'file-1.txt'
 
       it "2 matches in one file" do
-        _matches_box.a_.should eql [ _FILE ]
+        expect( _matches_box.a_ ).to eql [ _FILE ]
       end
 
       it "2 matches, one on lines 3 and one on 9" do
 
         a = _matches
-        a.length.should eql 2
-        a.fetch( 0 ).lineno.should eql 3
-        a.fetch( 1 ).lineno.should eql 9
+        expect( a.length ).to eql 2
+        expect( a.fetch( 0 ).lineno ).to eql 3
+        expect( a.fetch( 1 ).lineno ).to eql 9
       end
 
       it "the first match has multiple lines" do
@@ -150,10 +150,11 @@ module Skylab::SearchAndReplace::TestSupport
 
         _st = _match.to_line_stream
 
-        _st.to_a.should eql(
-          [ " foo(\n",
-            "   bar\n",
-            " ) # baz\n" ] )
+        want_these_lines_in_array_ _st do |y|
+          y << " foo(\n"
+          y << "   bar\n"
+          y << " ) # baz\n"
+        end
       end
 
       it "the second match has the other multiple lines" do
@@ -168,7 +169,7 @@ module Skylab::SearchAndReplace::TestSupport
           )
         HERE
 
-        _act.should eql _exp
+        expect( _act ).to eql _exp
       end
 
       dangerous_memoize :_matches do

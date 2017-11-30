@@ -25,13 +25,13 @@ module Skylab::SearchAndReplace::TestSupport
 
     it "this performer builds a stream of edit sessions, one per file" do
 
-      _edit_session_array.length.should eql 1
+      expect( _edit_session_array.length ).to eql 1
     end
 
     it "the one edit session of that stream has 3 match controllers.." do
 
       _d = _match_controller_array.length
-      _d.should eql 3
+      expect( _d ).to eql 3
     end
 
     it "let's see if we can change the file (join 2 lines)" do

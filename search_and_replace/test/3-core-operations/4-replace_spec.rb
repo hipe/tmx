@@ -37,7 +37,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "the match controller knows that the replacement is *not* engaged" do
 
-        _match_controller.replacement_is_engaged.should eql false
+        expect( _match_controller.replacement_is_engaged ).to eql false
       end
     end
 
@@ -73,12 +73,12 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "calling `engage_replacement` on the m.c results in true" do
 
-        __performance_result.should eql true
+        expect( __performance_result ).to eql true
       end
 
       it "the match controller in an engaged state knows it is engaged" do
 
-        _match_controller.replacement_is_engaged.should eql true
+        expect( _match_controller.replacement_is_engaged ).to eql true
       end
 
       context "this won't clobber the original file for you but you can.." do
@@ -106,16 +106,16 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "you can write the output lines to whatever context you want." do
 
-          __output_big_string.should eql "  ok oh my geez --> GOOD JERB <--\n"
+          expect( __output_big_string ).to eql "  ok oh my geez --> GOOD JERB <--\n"
         end
 
         it "it emits one emission, the number of bytes written" do
 
           em_a = __emissions
           1 == em_a.length or fail
-          _ = em_a.fetch( 0 ).should be_emission :info, :data, :number_of_bytes_written
+          _ = expect( em_a.fetch( 0 ) ).to be_emission :info, :data, :number_of_bytes_written
 
-          _.cached_event_value.should eql 34
+          expect( _.cached_event_value ).to eql 34
         end
       end
 
@@ -131,11 +131,11 @@ module Skylab::SearchAndReplace::TestSupport
         end
 
         it "the match controller knows it is not engaged after this" do
-          _tuple.fetch( 1 ).replacement_is_engaged.should eql false
+          expect( _tuple.fetch( 1 ).replacement_is_engaged ).to eql false
         end
 
         it "the successful result of the call is TRUE (parallels `engage[..]`)" do
-          _tuple.fetch( 0 ).should eql true
+          expect( _tuple.fetch( 0 ) ).to eql true
         end
       end
     end

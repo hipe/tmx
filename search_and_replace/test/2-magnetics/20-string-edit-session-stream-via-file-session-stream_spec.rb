@@ -34,7 +34,7 @@ module Skylab::SearchAndReplace::TestSupport
       string_edit_session_controllers_once_
 
       it "has three match controllers" do
-        number_of_match_controllers_.should eql 3
+        expect( number_of_match_controllers_ ).to eql 3
       end
     end
 
@@ -78,7 +78,7 @@ module Skylab::SearchAndReplace::TestSupport
       shared_string_edit_session_controllers_with_no_mutation_
 
       it "two matches" do
-        number_of_match_controllers_.should eql 2
+        expect( number_of_match_controllers_ ).to eql 2
       end
 
       it "first match controller has the right offsets" do
@@ -94,8 +94,8 @@ module Skylab::SearchAndReplace::TestSupport
       def _at_idx_expect d, beg, end_
 
         mc = match_controllers_.fetch d
-        mc.match_charpos.should eql beg
-        mc.match_end_charpos.should eql end_
+        expect( mc.match_charpos ).to eql beg
+        expect( mc.match_end_charpos ).to eql end_
       end
     end
 
@@ -110,7 +110,7 @@ module Skylab::SearchAndReplace::TestSupport
       d = -1
       expect = -> s do
         d += 1
-        a.fetch( d ).matchdata[ 0 ].should eql s
+        expect( a.fetch( d ).matchdata[ 0 ] ).to eql s
       end
 
       expect[ 'Fibble' ]
