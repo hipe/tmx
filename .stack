@@ -68,4 +68,3 @@ convert every '.should' to `expect( ).to` 07-19 03:47:08 (-3) (W) (W)->(J)
 possible bug in discrepancy between test count with quickie and not xx
 doc_test requires special work
 come back around to [sy] and use modern patterns
-tmx, slicer (meta & macro) (-4)

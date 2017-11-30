@@ -12,7 +12,7 @@ module Skylab::Slicer::TestSupport
       invoke 'ping'
       want :e, "hello from slicer."
       want_no_more_lines
-      @exitstatus.should eql :hello_from_slicer
+      expect( @exitstatus ).to eql :hello_from_slicer
     end
 
     it "[tmx] integration", TMX_CLI_integration: true do

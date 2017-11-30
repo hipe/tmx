@@ -66,7 +66,7 @@ module Skylab::TMX::TestSupport
           act.push node.get_filesystem_directory_entry_string
         end
         if act != exp_s_a
-          act.should eql exp_s_a
+          expect( act ).to eql exp_s_a
         end
       end
 
