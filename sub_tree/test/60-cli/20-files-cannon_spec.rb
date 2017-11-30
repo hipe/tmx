@@ -46,12 +46,12 @@ module Skylab::SubTree::TestSupport
         "#{ both( a ) }#{ and_ a } are ok."
       end
 
-      _s.should eql 'both «foo-bar» and «baz» are ok.'
+      expect( _s ).to eql 'both «foo-bar» and «baz» are ok.'
     end
 
     def _want_beautiful_help
 
-      ( 18 .. 20 ).should be_include(
+      expect( 18 .. 20 ).to be_include(
 
         @IO_spy_group_for_want_stdout_stderr.lines.length )
     end

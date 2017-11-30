@@ -11,7 +11,7 @@ module Skylab::SubTree::TestSupport
       invoke 'ping'
       want :styled, 'hello from sub tree.'
       want_no_more_lines
-      @exitstatus.should eql :hello_from_sub_tree
+      expect( @exitstatus ).to eql :hello_from_sub_tree
     end
 
     it "0   : no args        : expecting / usage / invite" do
@@ -42,11 +42,11 @@ module Skylab::SubTree::TestSupport
         ln.string
       end.join EMPTY_S_
 
-      big.should match %r(--help \[cmd\][ ]+this screen \(or help for action\))
+      expect( big ).to match %r(--help \[cmd\][ ]+this screen \(or help for action\))
 
-      big.should match %r(\bthe point of this\b)
+      expect( big ).to match %r(\bthe point of this\b)
 
-      big.should match %r(\binspired by unix\b)
+      expect( big ).to match %r(\binspired by unix\b)
 
       want_success_result
     end

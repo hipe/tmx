@@ -22,12 +22,14 @@ module Skylab::SubTree::TestSupport
           :output_stream, io
       end
 
-      scn = TestSupport_::Want_Line::Scanner.via_string io.string
-      scn.next_line.should eql ".\n"
-      scn.next_line.should match %r(\A├── foo.kode #{ _MTIME }$)
-      scn.next_line.should match %r(\A└── test$)
-      scn.next_line.should match %r(\A    └── foo_speg\.kode #{ _MTIME }$)
-      scn.next_line.should be_nil
+      _st = Home_.lib_.basic::String::LineStream_via_String.call io.string
+
+      want_these_lines_in_array_ _st do |y|
+        y << ".\n"
+        y << %r(\A├── foo.kode #{ _MTIME }$)
+        y << %r(\A└── test$)
+        y << %r(\A    └── foo_speg\.kode #{ _MTIME }$)
+      end
 
       want_succeed
     end
@@ -45,15 +47,16 @@ module Skylab::SubTree::TestSupport
 
       _want_only_informational_events
 
-      st = @result.to_line_stream
+      _st = @result.to_line_stream
 
-      io.string.should eql EMPTY_S_
+      expect( io.string ).to eql EMPTY_S_
 
-      st.gets.should eql ".                            \n"
-      st.gets.should eql "├── foo.kode           1 line\n"
-      st.gets.should eql "└── test                     \n"
-      st.gets.should eql "    └── foo_speg.kode  1 line\n"
-      st.gets.should be_nil
+      want_these_lines_in_array_with_trailing_newlines_ _st do |y|
+        y << '.                            '
+        y << '├── foo.kode           1 line'
+        y << '└── test                     '
+        y << '    └── foo_speg.kode  1 line'
+      end
     end
 
     it "a in-notify extension and a multi-buffer extension (results in t.r)" do
@@ -67,21 +70,22 @@ module Skylab::SubTree::TestSupport
           :output_stream, io
       end
 
-      io.string.should eql EMPTY_S_
+      expect( io.string ).to eql EMPTY_S_
 
       _want_only_informational_events
 
-      st = @result.to_line_stream
+      _st = @result.to_line_stream
 
-      st.gets.should match %r(\A\.[ ]+\n\z)
+      want_these_lines_in_array_ _st do |y|
 
-      st.gets.should match %r(\A├── foo\.kode[ ]+#{ _MTIME } 1 line[ ]*\n\z)
+        y << %r(\A\.[ ]+\n\z)
 
-      st.gets.should match %r(\A└── test[ ]+\n\z)
+        y << %r(\A├── foo\.kode[ ]+#{ _MTIME } 1 line[ ]*\n\z)
 
-      st.gets.should match %r(\A    └── foo_speg\.kode  #{ _MTIME } 1 line[ ]*\n\z)
+        y << %r(\A└── test[ ]+\n\z)
 
-      st.gets.should be_nil
+        y << %r(\A    └── foo_speg\.kode  #{ _MTIME } 1 line[ ]*\n\z)
+      end
     end
 
     def _want_only_informational_events

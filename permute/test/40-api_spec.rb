@@ -35,7 +35,7 @@ module Skylab::Permute::TestSupport
           y == [ "hello from permute." ] || fail
         end
 
-        only_emission.should _be_this_emission
+        expect( only_emission ).to _be_this_emission
       end
     end
 

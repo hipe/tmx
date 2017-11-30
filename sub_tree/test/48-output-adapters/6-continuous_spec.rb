@@ -32,7 +32,7 @@ module Skylab::SubTree::TestSupport
         debug_IO.puts "(ACT:#{ act })\n(EXP:#{ exp })"
       end
 
-      act.should eql exp
+      expect( act ).to eql exp
     end
 
     def __build_tree

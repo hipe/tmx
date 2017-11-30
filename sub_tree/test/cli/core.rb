@@ -60,7 +60,7 @@ module Skylab::SubTree::TestSupport
 
         define_method :want_errored_generically do
           want_no_more_lines
-          @exitstatus.should eql generic_exitstatus
+          expect( @exitstatus ).to eql generic_exitstatus
         end
 
       end.call  # etc
@@ -71,7 +71,7 @@ module Skylab::SubTree::TestSupport
       end
 
       def want_success_result
-        @exitstatus.should be_zero
+        expect( @exitstatus ).to be_zero
       end
     end
 

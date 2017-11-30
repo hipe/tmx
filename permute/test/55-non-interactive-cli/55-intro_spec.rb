@@ -15,15 +15,15 @@ module Skylab::Permute::TestSupport
       end
 
       it "expecting" do
-        first_line.should be_line_about_expecting_compound_or_operation
+        expect( first_line ).to be_line_about_expecting_compound_or_operation
       end
 
       it "usage" do
-        second_line.should be_stack_sensitive_usage_line
+        expect( second_line ).to be_stack_sensitive_usage_line
       end
 
       it "invite" do
-        last_line.should be_invite_with_argument_focus
+        expect( last_line ).to be_invite_with_argument_focus
       end
     end
 
@@ -84,7 +84,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "specific invite" do
-        last_line.should be_invite_with_option_focus
+        expect( last_line ).to be_invite_with_option_focus
       end
     end
 
@@ -118,7 +118,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "did you mean" do
-        second_line.should be_line( :e, %(did you mean "long"?) )
+        expect( second_line ).to be_line( :e, %(did you mean "long"?) )
       end
     end
 
@@ -133,7 +133,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "invite" do
-        last_line.should be_invite_with_option_focus
+        expect( last_line ).to be_invite_with_option_focus
       end
     end
 

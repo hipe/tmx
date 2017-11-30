@@ -26,7 +26,7 @@ module Skylab::SubTree::TestSupport
           }[^a-z]*input-stream[^a-z ]*#{
           } at the same time/i
 
-      _actual.should match _rx
+      expect( _actual ).to match _rx
 
       want_fail
     end
@@ -40,7 +40,7 @@ module Skylab::SubTree::TestSupport
 
       _em = want_not_OK_event
 
-      _em.cached_event_value.to_event.a.map( & :name_symbol ).should eql(
+      expect( _em.cached_event_value.to_event.a.map( & :name_symbol ) ).to eql(
         [ :file_of_input_paths, :path ] )
 
       want_fail
@@ -55,7 +55,7 @@ module Skylab::SubTree::TestSupport
 
       _em = want_not_OK_event
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white( _em.cached_event_value ) ).to eql(
         "can't read input from #{
         }«file-of-input-paths»#{
         }, #{
@@ -76,9 +76,9 @@ module Skylab::SubTree::TestSupport
 
       want_succeed
 
-      io.string.should eql _PRETTY_
+      expect( io.string ).to eql _PRETTY_
 
-      fh.should be_closed
+      expect( fh ).to be_closed
     end
 
     it "reads paths from the lines of a file" do
@@ -91,7 +91,7 @@ module Skylab::SubTree::TestSupport
 
       want_succeed
 
-      io.string.should eql _PRETTY_
+      expect( io.string ).to eql _PRETTY_
     end
 
     it "from path (using find) with funky path" do
@@ -125,7 +125,7 @@ module Skylab::SubTree::TestSupport
                 └── foo_speg.kode
       HERE
 
-      _act.should eql _exp
+      expect( _act ).to eql _exp
     end
   end
 end

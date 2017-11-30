@@ -26,7 +26,7 @@ module Skylab::SubTree::TestSupport
       local_invoke
 
       _unindent want_str
-      flush_to_string_contiguous_lines_on_stream( :o ).should eql want_str
+      expect( flush_to_string_contiguous_lines_on_stream :o ).to eql want_str
 
       want_succeed
     end

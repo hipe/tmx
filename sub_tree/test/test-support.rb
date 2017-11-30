@@ -35,6 +35,15 @@ module Skylab::SubTree::TestSupport
 
   module Instance_Methods___
 
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::
+          Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    end
+
+    def want_these_lines_in_array_ a, & p
+      TestSupport_::Want_these_lines_in_array[ a, p, self ]
+    end
+
     attr_reader :do_debug
 
     def debug!
