@@ -64,10 +64,10 @@ module Skylab::TaskExamples::TestSupport
 
         _be = be_emission :error, :path_too_deep do |ev|
           _ = black_and_white ev
-          _.should _be_msg
+          expect( _ ).to _be_msg
         end
 
-        only_emission.should _be
+        expect( only_emission ).to _be
       end
     end
 
@@ -93,10 +93,10 @@ module Skylab::TaskExamples::TestSupport
 
         _be_this = be_emission :info, :creating_directory do |ev|
           _ = black_and_white ev
-          _.should _be_msg
+          expect( _ ).to _be_msg
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
 
       it "side-effects are written to the task itself" do

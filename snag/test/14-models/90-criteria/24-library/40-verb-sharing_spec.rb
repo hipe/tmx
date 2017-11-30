@@ -13,25 +13,26 @@ module Skylab::Snag::TestSupport
 
     it "go" do
 
-      o = _the_first_domain.new_criteria_tree_via_word_array(
-        %w( things that are 6 feet wide or 10 feet tall ) )
+      o = _the_first_domain.new_criteria_tree_via_word_array %w(
+            things that are 6 feet wide or 10 feet tall
+      )
 
       o.association == %i( Thing ) || fail
 
       o = o.value
-      o.symbol.should eql :or
+      expect( o.symbol ).to eql :or
       a = o.a
-      a.length.should eql 2
+      expect( a.length ).to eql 2
 
       o = a.first
-      o.symbol.should eql :point
-      o.value.should eql [ 6, :foot_unit, :wide ]
-      o.associated_model_identifier.should eql %i( Width )
+      expect( o.symbol ).to eql :point
+      expect( o.value ).to eql [ 6, :foot_unit, :wide ]
+      expect( o.associated_model_identifier ).to eql %i( Width )
 
       o = a.last
-      o.symbol.should eql :point
-      o.value.should eql [ 10, :foot_unit, :tall ]
-      o.associated_model_identifier.should eql %i( Height )
+      expect( o.symbol ).to eql :point
+      expect( o.value ).to eql [ 10, :foot_unit, :tall ]
+      expect( o.associated_model_identifier ).to eql %i( Height )
 
     end
 

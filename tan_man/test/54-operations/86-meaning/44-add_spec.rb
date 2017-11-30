@@ -155,12 +155,12 @@ module Skylab::TanMan::TestSupport
 
       stmt = graph.to_node_statement_stream.gets.stmt
       alist = stmt.attr_list.content
-      alist.class.should eql Home_::Models_::DotFile::Sexps::AList  # meh
+      expect( alist.class ).to eql Home_::Models_::DotFile::Sexps::AList  # meh
       alist.prototype_ = graph.class.parse :a_list, 'a=b, c=d'
-      alist.unparse.should eql( 'label=barl' )
-      alist.prototype_.unparse.should eql( 'a=b, c=d' )
+      expect( alist.unparse ).to eql 'label=barl'
+      expect( alist.prototype_.unparse ).to eql 'a=b, c=d'
       alist._insert_assignment :fontname, 'Futura'
-      alist.unparse.should eql('fontname=Futura, label=barl')
+      expect( alist.unparse ).to eql 'fontname=Futura, label=barl'
     end
 
 # (8/N)
@@ -174,14 +174,14 @@ module Skylab::TanMan::TestSupport
 
       stmt = graph.to_node_statement_stream.gets.stmt
       alist = stmt.attr_list.content
-      alist.unparse.should eql( 'label=barl, fillcolor="too"' )
+      expect( alist.unparse ).to eql 'label=barl, fillcolor="too"'
       attrs = {
         fontname: "Futura",
         fillcolor: "#11c11",
       }  # before #history-A.1 the above was a 2-D array (2 element tuples)
       alist.update_attributes_ attrs
-      alist.unparse.should eql(
-        'fontname=Futura, label=barl, fillcolor="#11c11"'  )
+      expect( alist.unparse ).to eql(
+        'fontname=Futura, label=barl, fillcolor="#11c11"' )
     end
 
     def _parse_string s

@@ -41,12 +41,12 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
         it "knows own name symbol" do
 
-          _build_empty_task.name_symbol.should eql :X_Intro_1_Sandwich
+          expect( _build_empty_task.name_symbol ).to eql :X_Intro_1_Sandwich
         end
 
         it "knows own name" do
 
-          _build_empty_task.name.as_variegated_symbol.should eql :X_intro_1_sandwich
+          expect( _build_empty_task.name.as_variegated_symbol ).to eql :X_intro_1_sandwich
         end
 
         def _build_empty_task
@@ -77,10 +77,10 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
           _be_this = be_emission :error, :missing_required_attributes do |ev|
 
-            black_and_white( ev ).should eql _message_expected_for_emit
+            expect( black_and_white ev ).to eql _message_expected_for_emit
           end
 
-          only_emission.should _be_this
+          expect( only_emission ).to _be_this
         end
       end
 
@@ -107,7 +107,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
           s = _message_expected_for_emit
           s.chop!
-          exception_message_.should eql s
+          expect( exception_message_ ).to eql s
         end
       end
 
@@ -134,10 +134,10 @@ module Skylab::Task::TestSupport  # [#ts-010]
         it "emitted data" do
 
           _be_this = be_emission :payload, :data do |x|
-            x.should eql [ nil, :y, :x ]
+            expect( x ).to eql [ nil, :y, :x ]
           end
 
-          only_emission.should _be_this
+          expect( only_emission ).to _be_this
         end
       end
     end
@@ -157,9 +157,9 @@ if false
 
       it "it will run that badboy when it is invoked" do
         t = SomeTask.new
-        t.touched.should eql(nil)
+        expect( t.touched ).to be_nil
         t.invoke
-        t.touched.should eql(true)
+        expect( t.touched ).to eql true
       end
     end
     describe "When you call enhance() (per rake)" do
@@ -167,14 +167,14 @@ if false
         touched = false
         t = Home_::LegacyTask.new.enhance{ touched = true }
         t.invoke
-        touched.should eql(true)
+        expect( touched ).to eql true
       end
     end
     describe "When you set the action attribute to a lambda" do
       it "it works (provided you have the right arity)" do
         touched = false
         Home_::LegacyTask.new(:action => ->(t) { touched = true }).invoke
-        touched.should eql(true)
+        expect( touched ).to eql true
       end
     end
   end

@@ -18,9 +18,9 @@ module Skylab::Snag::TestSupport
             and greater than 1 )
 
         st = @result
-        st.gets.ID.to_i.should eql 3
-        st.gets.ID.to_i.should eql 2
-        st.gets.should be_nil
+        expect( st.gets.ID.to_i ).to eql 3
+        expect( st.gets.ID.to_i ).to eql 2
+        expect( st.gets ).to be_nil
       end
 
       it "has extended content (minimal)" do
@@ -30,8 +30,8 @@ module Skylab::Snag::TestSupport
           nodes that have extended content )
 
         st = @result
-        st.gets.ID.to_i.should eql 2
-        st.gets.should be_nil
+        expect( st.gets.ID.to_i ).to eql 2
+        expect( st.gets ).to be_nil
       end
 
       it "tags! (an -OR- tree, one level deep)" do
@@ -42,10 +42,10 @@ module Skylab::Snag::TestSupport
 
         st = @result
 
-        st.gets.ID.to_i.should eql 5
-        st.gets.ID.to_i.should eql 3
-        st.gets.ID.to_i.should eql 7  # proves the lesser 'OR' branch
-        st.gets.should be_nil
+        expect( st.gets.ID.to_i ).to eql 5
+        expect( st.gets.ID.to_i ).to eql 3
+        expect( st.gets.ID.to_i ).to eql 7  # proves the lesser 'OR' branch
+        expect( st.gets ).to be_nil
       end
 
       def _path_
@@ -102,7 +102,7 @@ module Skylab::Snag::TestSupport
       end
 
       def _expect * d_a
-        d_a.should eql @d_a
+        expect( d_a ).to eql @d_a
       end
 
       def _path_

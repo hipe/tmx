@@ -70,7 +70,7 @@ module Skylab::TanMan::TestSupport
         x = st.gets
         x.node_identifier_symbol_ == :bar || fail
 
-        st.gets.should be_nil
+        expect( st.gets ).to be_nil
     end
 
 # (3/N)

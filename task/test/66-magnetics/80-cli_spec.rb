@@ -18,12 +18,12 @@ module Skylab::Task::TestSupport
 
       it "invalid option" do
         _be_this = be_line "invalid option: -x"
-        first_line.should _be_this
+        expect( first_line ).to _be_this
       end
 
       it "invite" do
         _be_this = be_line :styled, /\Asee 'xyzi magnetics-viz -h' for more about options\z/
-        last_line.should _be_this
+        expect( last_line ).to _be_this
       end
     end
 
@@ -66,11 +66,11 @@ module Skylab::Task::TestSupport
       end
 
       it "label for 'one of these' is parenthesized" do
-        _label_for_one_of_these.should _have_parenthesis
+        expect( _label_for_one_of_these ).to _have_parenthesis
       end
 
       it "label for 'all of these' is parenthesized" do
-        _label_for_all_of_these.should _have_parenthesis
+        expect( _label_for_all_of_these ).to _have_parenthesis
       end
 
       def _have_parenthesis

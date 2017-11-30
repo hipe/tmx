@@ -110,17 +110,17 @@ module Skylab::Task::TestSupport
 
       it "first line explains that we can't do the front node" do
 
-        _lines.first.should eql "circular dependency detected while trying to 'x-g-circ-a':"
+        expect( _lines.first ).to eql "circular dependency detected while trying to 'x-g-circ-a':"
       end
 
       it "second and third line walk throug the \"normal\" arcs" do
         a = _lines
-        a.fetch( 1 ).should _be_this( 'a', 'b' )
-        a.fetch( 2 ).should _be_this( 'b', 'c' )
+        expect( a.fetch 1 ).to _be_this( 'a', 'b' )
+        expect( a.fetch 2 ).to _be_this( 'b', 'c' )
       end
 
       it "fourth line is like the other two but it says \"but\"" do
-        _lines.fetch( 3 ).should _be_this( 'but ', 'c', 'a' )
+        expect( _lines.fetch 3 ).to _be_this( 'but ', 'c', 'a' )
       end
 
       def _lines

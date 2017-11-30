@@ -24,10 +24,10 @@ module Skylab::Snag::TestSupport
 
       _em = want_OK_event :component_removed
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         'removed criteria "zap-tango" from persisted criteria collection' )
 
-      o.natural_key_string.should eql 'zap-tango'
+      expect( o.natural_key_string ).to eql 'zap-tango'
     end
 
     it "backend - no" do
@@ -38,12 +38,12 @@ module Skylab::Snag::TestSupport
 
       _em = want_not_OK_event :component_not_found
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         'persisted criteria collection does not have criteria "zap-tango"' )
 
       want_no_more_events
 
-      x.should eql false
+      expect( x ).to eql false
     end
 
     def _init_cc_via_path path

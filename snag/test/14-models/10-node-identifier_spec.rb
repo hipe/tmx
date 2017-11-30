@@ -14,10 +14,10 @@ module Skylab::Snag::TestSupport
 
       one = _one ; two = _two
 
-      two.between?( one, two ).should eql true
-      two.between?( one, one ).should eql false
-      one.between?( one, one ).should eql true
-      one.between?( two, two ).should eql false
+      expect( two.between? one, two ).to eql true
+      expect( two.between? one, one ).to eql false
+      expect( one.between? one, one ).to eql true
+      expect( one.between? two, two ).to eql false
     end
 
     _Subject = -> do
@@ -33,74 +33,74 @@ module Skylab::Snag::TestSupport
 
       it "nodes with suffixes retain the separators used" do
 
-        _subject.suffix_separator_at_index( 0 ).should eql '.'
+        expect( _subject.suffix_separator_at_index 0 ).to eql '.'
       end
 
       it "components that do not look like integers are strings" do
 
-        _subject.suffix_value_at_index( 0 ).should eql 'xyz'
+        expect( _subject.suffix_value_at_index 0 ).to eql 'xyz'
       end
 
       it "components that look like [negative] integers are integers" do
 
         o = _subject
-        o.suffix_separator_at_index( 1 ).should eql '-'
-        o.suffix_value_at_index( 1 ).should eql( -23 )
+        expect( o.suffix_separator_at_index 1 ).to eql '-'
+        expect( o.suffix_value_at_index 1 ).to eql( -23 )
       end
 
       it "etc" do
 
         o = _subject
-        o.suffix_separator_at_index( 2 ).should eql '/'
-        o.suffix_value_at_index( 2 ).should eql 'A'
+        expect( o.suffix_separator_at_index 2 ).to eql '/'
+        expect( o.suffix_value_at_index 2 ).to eql 'A'
       end
 
       it "requesting a separator off the end gives you nil" do
 
-        _subject.suffix_separator_at_index( 3 ).should be_nil
+        expect( _subject.suffix_separator_at_index 3 ).to be_nil
       end
 
       it "requiesting a component off the end gives you nil" do
 
-        _subject.suffix_value_at_index( 3 ).should be_nil
+        expect( _subject.suffix_value_at_index 3 ).to be_nil
       end
 
       it "suffix components cannot be the empty string, so" do
 
         o = _new_via_integer_and_suffix_string 1, '...'
-        o.suffix_separator_at_index( 0 ).should eql '.'
-        o.suffix_value_at_index( 0 ).should eql '..'
-        o.suffix_separator_at_index( 1 ).should be_nil
-        o.suffix_value_at_index( 1 ).should be_nil
+        expect( o.suffix_separator_at_index 0 ).to eql '.'
+        expect( o.suffix_value_at_index 0 ).to eql '..'
+        expect( o.suffix_separator_at_index 1 ).to be_nil
+        expect( o.suffix_value_at_index 1 ).to be_nil
       end
 
       it "ditto" do
 
         o = _new_via_integer_and_suffix_string 1, 'A'
-        o.suffix_separator_at_index( 0 ).should be_nil
-        o.suffix_value_at_index( 0 ).should eql 'A'
+        expect( o.suffix_separator_at_index 0 ).to be_nil
+        expect( o.suffix_value_at_index 0 ).to eql 'A'
       end
 
       it "comparison of integer component works" do
 
-        ( _( 3, 'A.-2.b' ) < _( 3, 'A.-1.a' ) ).should eql true
+        expect( ( _( 3, 'A.-2.b' ) < _( 3, 'A.-1.a' ) ) ).to eql true
       end
 
       it "comparison of string component uses platform <=>" do
 
-        ( _( 3, '-23d.10' ) < _( 3, '-24d.09' ) ).should eql true
+        expect( ( _( 3, '-23d.10' ) < _( 3, '-24d.09' ) ) ).to eql true
       end
 
       it "nodes who are same with same suffixes are same" do
 
-        ( _( 3, '.A-10/-10' ) <=> _( 3, '.A-10/-10' ) ).should be_zero
+        expect( ( _( 3, '.A-10/-10' ) <=> _( 3, '.A-10/-10' ) ) ).to be_zero
       end
 
       it "the string used for the separator is used in the comparison!" do
 
         _a = _ 3, '.A-B/C'
         _b = _ 3, '.A-B-C'
-        ( _a <=> _b ).should eql 1
+        expect( _a <=> _b ).to eql 1
       end
 
       def _ d, s

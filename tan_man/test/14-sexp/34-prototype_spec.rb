@@ -14,14 +14,14 @@ module Skylab::TanMan::TestSupport
     using_input_string EMPTY_S_, 'totally empty input string' do
 
       it 'has no list controller' do
-        result.node_list.should be_nil
+        expect( result.node_list ).to be_nil
       end
     end
 
     using_input_string "\n\t  ", 'whitespace only input string' do
 
       it 'has no list controller' do
-        result.node_list.should be_nil
+        expect( result.node_list ).to be_nil
       end
     end
 
@@ -29,7 +29,7 @@ module Skylab::TanMan::TestSupport
 
       it 'enumerates' do
         result.node_list.nodes
-        result.node_list.nodes.should eql(['fap', 'fip'])
+        expect( result.node_list.nodes ).to eql [ 'fap', 'fip' ]
       end
     end
 
@@ -55,31 +55,31 @@ module Skylab::TanMan::TestSupport
         o = result.node_list
 
         x = o.append_item_via_string_ 'faeioup'
-        x.object_id.should eql o.object_id
-        o.unparse.should eql 'faeioup'  # no separator here
+        expect( x.object_id ).to eql o.object_id
+        expect( o.unparse ).to eql 'faeioup'  # no separator here
         lines = result.unparse.split NEWLINE_
-        lines.length.should eql 2
-        lines.last.should eql 'faeioup'
+        expect( lines.length ).to eql 2
+        expect( lines.last ).to eql 'faeioup'
 
         x = o.append_item_via_string_ 'fooooop'
-        ( x.object_id == o.object_id ).should eql false
-        o.unparse.should eql 'faeioup ;  fooooop'  # exactly what u asked for
+        expect( ( x.object_id == o.object_id ) ).to eql false
+        expect( o.unparse ).to eql 'faeioup ;  fooooop'  # exactly what u asked for
 
         x = o.append_item_via_string_ 'fuuup'
-        ( x.object_id == o.object_id ).should eql false
+        expect( ( x.object_id == o.object_id ) ).to eql false
 
         exp = 'faeioup ;  fooooop ;  fuuup'
-        o.unparse.should eql exp
-        @result.unparse.split( NEWLINE_ ).last.should eql exp
+        expect( o.unparse ).to eql exp
+        expect( @result.unparse.split( NEWLINE_ ).last ).to eql exp
 
         o.insert_item_before_item_string_ 'faeup', 'fooooop'
-        o.unparse.should eql 'faeioup ;  faeup ;  fooooop ;  fuuup'
+        expect( o.unparse ).to eql 'faeioup ;  faeup ;  fooooop ;  fuuup'
       end
 
       it "append an invalid node - raises" do
-        -> do
+        expect( -> do
           result.node_list.append_item_via_string_ 'fzzzp'
-        end.should raise_error Home_::Sexp_::Auto::Parse_Failure
+        end ).to raise_error Home_::Sexp_::Auto::Parse_Failure
       end
     end
   end
@@ -89,21 +89,21 @@ module Skylab::TanMan::TestSupport
     using_input_string 'beginning ending', 'zero' do
 
       it 'has no list controller' do
-        result.node_list.should be_nil
+        expect( result.node_list ).to be_nil
       end
     end
 
     using_input_string 'beginning feep ending', 'one' do
 
       it 'enumerates' do
-        unparses.should eql [ 'feep' ]
+        expect( unparses ).to eql [ 'feep' ]
       end
     end
 
     using_input_string 'beginning fap;fep;fip ending', 'three' do
 
       it 'enumerates' do
-        unparses.should eql [ 'fap', 'fep', 'fip' ]
+        expect( unparses ).to eql [ 'fap', 'fep', 'fip' ]
       end
     end
 
@@ -112,21 +112,21 @@ module Skylab::TanMan::TestSupport
       it "append valid strings - separator semantics because prototype" do
 
         o = result.node_list
-        o.nodes.should eql EMPTY_A_
+        expect( o.nodes ).to eql EMPTY_A_
 
         x = o.append_item_via_string_ 'fiiiiip;'
-        x.object_id.should eql o.object_id
-        o.unparse.should eql "fiiiiip\n"
+        expect( x.object_id ).to eql o.object_id
+        expect( o.unparse ).to eql "fiiiiip\n"
 
         o.append_item_via_string_ 'fap;'
-        o.unparse.should eql "fiiiiip;\nfap\n"
+        expect( o.unparse ).to eql "fiiiiip;\nfap\n"
       end
 
       it 'raises an exception if you try to append an invalid string' do
 
-        -> do
+        expect( -> do
           result.node_list.append_item_via_string_ 'fzzzp'
-        end.should raise_error Home_::Sexp_::Auto::Parse_Failure
+        end ).to raise_error Home_::Sexp_::Auto::Parse_Failure
       end
     end
   end

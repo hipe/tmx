@@ -18,7 +18,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :expecting_number
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "'node-identifier-number-component' #{
            }must be a non-negative integer, had \"Xxx\"" )
 
@@ -35,12 +35,12 @@ module Skylab::Snag::TestSupport
 
         st = @result
         o = st.gets
-        o.intern.should eql :one
+        expect( o.intern ).to eql :one
 
         o = st.gets
-        o.intern.should eql :two
+        expect( o.intern ).to eql :two
 
-        st.gets.should be_nil
+        expect( st.gets ).to be_nil
       end
     end
 
@@ -61,17 +61,17 @@ module Skylab::Snag::TestSupport
 
         o = st.gets
 
-        o.get_string.should eql "( #fml: x\n y )"
-        o.get_name_string.should eql '#fml'
-        o.get_value_string.should eql " x\n y "
+        expect( o.get_string ).to eql "( #fml: x\n y )"
+        expect( o.get_name_string ).to eql '#fml'
+        expect( o.get_value_string ).to eql " x\n y "
 
         o = st.gets
 
-        o.get_string.should eql "( #fml: z )"
-        o.get_name_string.should eql '#fml'
-        o.get_value_string.should eql ' z '
+        expect( o.get_string ).to eql "( #fml: z )"
+        expect( o.get_name_string ).to eql '#fml'
+        expect( o.get_value_string ).to eql ' z '
 
-        st.gets.should be_nil
+        expect( st.gets ).to be_nil
       end
     end
   end

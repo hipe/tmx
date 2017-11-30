@@ -29,13 +29,13 @@ O
       ev.path or fail
 
       fh = ::File.open path
-      fh.gets.should eql "[#03] B\n"
-      fh.gets.should eql(
+      expect( fh.gets ).to eql "[#03] B\n"
+      expect( fh.gets ).to eql(
 "[#002] #open 1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___\n"
       )
-      fh.gets.should eql "             7b__ 8___ 8b__\n"
-      fh.gets.should eql "[#01] A\n"
-      fh.gets.should be_nil
+      expect( fh.gets ).to eql "             7b__ 8___ 8b__\n"
+      expect( fh.gets ).to eql "[#01] A\n"
+      expect( fh.gets ).to be_nil
     end
 
     memoize :_collection_one_string do
@@ -67,16 +67,16 @@ O
         :message, "so good",
       )
 
-      y[ 0 ].should eql(
+      expect( y[ 0 ] ).to eql(
 "[#002] #open so far so good ( #was: #done  item 2 line one item 2 line two\n"
       )
-      y[ 1 ].should eql "             xyzyz )\n"
-      y[ 2 ].should eql "[#03] B\n"
-      y[ 3 ].should eql "[#01] A\n"
-      y.length.should eql 4
+      expect( y[ 1 ] ).to eql "             xyzyz )\n"
+      expect( y[ 2 ] ).to eql "[#03] B\n"
+      expect( y[ 3 ] ).to eql "[#01] A\n"
+      expect( y.length ).to eql 4
 
       _node = @result
-      _node.ID.to_i.should eql 2
+      expect( _node.ID.to_i ).to eql 2
     end
 
     def _td

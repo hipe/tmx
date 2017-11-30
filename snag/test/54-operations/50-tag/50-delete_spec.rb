@@ -18,7 +18,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :component_not_found
 
-        black_and_white( _em.cached_event_value ).should match(
+        expect( black_and_white _em.cached_event_value ).to match(
           /\Athere is no node "\[#10\]" in [^ ]+sutherlands\./ )
 
         want_fail
@@ -30,7 +30,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :component_not_found
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "node [#1] does not have tag \"#three\"" )  # :+[#015]
 
         want_fail
@@ -42,14 +42,14 @@ module Skylab::Snag::TestSupport
           :downstream_reference, downstream_ID_for_output_string_ivar_
 
         scn = scanner_via_output_string_
-        scn.next_line.should eql "[#001]       keifer #one\n"
-        scn.next_line.should eql "[#2] sutherland\n"
-        scn.next_line.should eql "[#3]   donald #four\n"
-        scn.next_line.should be_nil
+        expect( scn.next_line ).to eql "[#001]       keifer #one\n"
+        expect( scn.next_line ).to eql "[#2] sutherland\n"
+        expect( scn.next_line ).to eql "[#3]   donald #four\n"
+        expect( scn.next_line ).to be_nil
 
         _em = want_OK_event :component_removed
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "removed tag #two from node [#1]" )
 
         want_noded_ 1
@@ -69,14 +69,14 @@ module Skylab::Snag::TestSupport
 
         ev = want_OK_event( :component_removed ).cached_event_value.to_event
 
-        ev.component.intern.should eql :one
+        expect( ev.component.intern ).to eql :one
 
-        black_and_white( ev ).should eql "removed tag #one from node [#1]"
+        expect( black_and_white ev ).to eql "removed tag #one from node [#1]"
 
-        @result.ID.to_i.should eql 1
+        expect( @result.ID.to_i ).to eql 1
 
         fh = ::File.open my_tmpfile_path
-        fh.gets.should eql "[#001]       keifer #two\n"
+        expect( fh.gets ).to eql "[#001]       keifer #two\n"
         fh.close  # (um you already know the number of bytes)
       end
 

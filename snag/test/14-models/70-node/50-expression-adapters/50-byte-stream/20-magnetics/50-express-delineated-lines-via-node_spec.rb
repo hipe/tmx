@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../../../test-support'
 
 module Skylab::Snag::TestSupport
@@ -19,10 +21,10 @@ module Skylab::Snag::TestSupport
 
         scn = _build_scanner
 
-        scn.next_line.should eql(
+        expect( scn.next_line ).to eql(
           "[#fake]   gary jules - mad word (manic focus remix)\n" )
 
-        scn.next_line.should be_nil
+        expect( scn.next_line ).to be_nil
       end
 
       it "with one line that is just a bunch of words longer than 73 chars" do
@@ -39,12 +41,12 @@ module Skylab::Snag::TestSupport
 
         scn = _build_scanner
 
-        scn.next_line.length.should eql 74  # exceeds b.c of newline
-        scn.line[ 0, 4 ].should eql 'Los '
-        scn.line[ -4 .. -1 ].should eql " by\n"
+        expect( scn.next_line.length ).to eql 74  # exceeds b.c of newline
+        expect( scn.line[ 0, 4 ] ).to eql 'Los '
+        expect( scn.line[ -4 .. -1 ] ).to eql " by\n"
 
-        scn.next_line[ 0, 7 ].should eql 'Zedd - '
-        scn.next_line.should be_nil
+        expect( scn.next_line[ 0, 7 ] ).to eql 'Zedd - '
+        expect( scn.next_line ).to be_nil
       end
 
       it "long lines will break on dashes, or exceed the limit baring dashes" do
@@ -56,12 +58,13 @@ module Skylab::Snag::TestSupport
         _fake_ID _zero_width_fake_ID
         _message "ABC_one_line_-two-line-_tre_line_"
 
-        scn = _build_scanner
+        _actual = _build_line_stream
 
-        scn.next_line.should eql "ABC_one_line_-\n"
-        scn.next_line.should eql "two-line-\n"
-        scn.next_line.should eql "_tre_line_\n"
-        scn.next_line.should be_nil
+        want_these_lines_in_array_ _actual do |y|
+          y << "ABC_one_line_-\n"
+          y << "two-line-\n"
+          y << "_tre_line_\n"
+        end
       end
 
       it "gold star" do
@@ -75,13 +78,13 @@ module Skylab::Snag::TestSupport
         O
 
         scn = _build_scanner
-        scn.next_line.should eql(
+        expect( scn.next_line ).to eql(
 "[#fake]       1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__\n" )
 
-        scn.next_line.should eql(
+        expect( scn.next_line ).to eql(
 "              7___ 7b__ 8___ 8b__\n" )
 
-        scn.next_line.should be_nil
+        expect( scn.next_line ).to be_nil
       end
 
       def _width d
@@ -114,6 +117,13 @@ module Skylab::Snag::TestSupport
 
       attr_reader :_do_prepend_open_tag_x, :_identifier_width_x
 
+      def _build_line_stream
+        scn = _build_scanner
+        Common_::MinimalStream.by do
+          scn.next_line
+        end
+      end
+
       def _build_scanner
 
         _expag = build_byte_stream_expag_ @_width_x, @_sub_margin_x ,
@@ -126,7 +136,7 @@ module Skylab::Snag::TestSupport
 
         node or fail
 
-        y = ""
+        y = ::String.new
 
         _yes = node.express_into_under y, _expag
         _yes or fail

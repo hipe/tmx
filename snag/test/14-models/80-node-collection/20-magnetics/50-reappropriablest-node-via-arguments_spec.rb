@@ -15,7 +15,7 @@ module Skylab::Snag::TestSupport
         [#5] (#was:) hi
       HERE
 
-      _gimme.should be_nil
+      expect( _gimme ).to be_nil
     end
 
     it "after criteria, the search space is reduced to lowest was's count" do
@@ -26,7 +26,7 @@ module Skylab::Snag::TestSupport
         [#2] #done #hole (#was) (#was)
       HERE
 
-      _gimme.ID.to_i.should eql 3
+      expect( _gimme.ID.to_i ).to eql 3
     end
 
     it "after above, the item with the lowest ID wins" do
@@ -37,7 +37,7 @@ module Skylab::Snag::TestSupport
         [#33] #done (#was:)
       HERE
 
-      _gimme.ID.to_i.should eql 22
+      expect( _gimme.ID.to_i ).to eql 22
     end
 
     it "having extended content also disqualifies the item" do
@@ -45,7 +45,7 @@ module Skylab::Snag::TestSupport
       _against_path ::File.join(
         Fixture_tree_[ :reappropriate_modest ], 'derk/ershues.mani' )
 
-      _gimme.ID.to_i.should eql 3
+      expect( _gimme.ID.to_i ).to eql 3
     end
 
     def _against_path path

@@ -56,6 +56,11 @@ module Skylab::Snag::TestSupport
 
     # -- assertions
 
+    def want_these_lines_in_array_with_trailing_newlines_ a, & p
+      TestSupport_::Want_Line::
+          Want_these_lines_in_array_with_trailing_newlines[ a, p, self ]
+    end
+
     def want_these_lines_in_array_ a, & p
       TestSupport_::Want_these_lines_in_array[ a, p, self ]
     end
@@ -186,8 +191,8 @@ module Skylab::Snag::TestSupport
 
       part = @piece_st.gets
       part or fail "expected more parts, had none"
-      part.category_symbol.should eql i
-      part.get_string.should eql x
+      expect( part.category_symbol ).to eql i
+      expect( part.get_string ).to eql x
       part
     end
 
@@ -202,7 +207,7 @@ module Skylab::Snag::TestSupport
 
     tcc.send :define_method, :want_noded_, -> node_id_d do
       want_no_more_events
-      @result.ID.to_i.should eql node_id_d
+      expect( @result.ID.to_i ).to eql node_id_d
     end
   end
 

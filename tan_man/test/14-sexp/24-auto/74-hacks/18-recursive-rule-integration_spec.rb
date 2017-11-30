@@ -19,8 +19,8 @@ module Skylab::TanMan::TestSupport
 
         it "any append - result has separator semantics, goes after comment" do
           insrt 'alpha'
-          @graph_sexp.unparse.should eql "digraph{\n#one comment\nalpha}"
-          @stmt_list_s.should eql "alpha"
+          expect( @graph_sexp.unparse ).to eql "digraph{\n#one comment\nalpha}"
+          expect( @stmt_list_s ).to eql "alpha"
         end
       end
 
@@ -31,12 +31,12 @@ module Skylab::TanMan::TestSupport
 
         it "position 1 - uses the prototype for the separator" do
           insrt 'barmalade'
-          @stmt_list_s.should eql "barmalade\nmarmalade;   "
+          expect( @stmt_list_s ).to eql "barmalade\nmarmalade;   "
         end
 
         it "position 2 - adds no space or addtnl sep (i.e does not use proto)" do
           insrt 'parmalade'
-          @stmt_list_s.should eql 'marmalade;   parmalade'
+          expect( @stmt_list_s ).to eql 'marmalade;   parmalade'
         end
       end
 
@@ -46,17 +46,17 @@ module Skylab::TanMan::TestSupport
 
         it "position 1 - use proximity styling (use first node)" do
           insrt 'aoo'
-          @stmt_list_s.should eql "aoo\n\nboo\n\nloo\n\n\n"
+          expect( @stmt_list_s ).to eql "aoo\n\nboo\n\nloo\n\n\n"
         end
 
         it "position 2 - use proximity styling (first node trumps second)" do
           insrt 'coo'
-          @stmt_list_s.should eql "boo\n\ncoo\n\nloo\n\n\n"
+          expect( @stmt_list_s ).to eql "boo\n\ncoo\n\nloo\n\n\n"
         end
 
         it "position 3 - per proximity styling use styling of item 2" do
           insrt 'moo'
-          @stmt_list_s.should eql "boo\n\nloo\n\n\nmoo\n\n\n"
+          expect( @stmt_list_s ).to eql "boo\n\nloo\n\n\nmoo\n\n\n"
         end
       end
 
@@ -66,7 +66,7 @@ module Skylab::TanMan::TestSupport
 
         it "position 3 - delimiter from item 1 is used, styled like item 2" do
           insrt 'ceebo'
-          @stmt_list_s.should eql "abo\n\nbeebo\n\nceebo"
+          expect( @stmt_list_s ).to eql "abo\n\nbeebo\n\nceebo"
         end
       end
     end
@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport
 
         it "any append (hacked) - surface expressions use separator semantics (i.e nothing)" do
           insrt 'nazir=zenith'
-          @a_list_s.should eql 'nazir=zenith'
+          expect( @a_list_s ).to eql 'nazir=zenith'
         end
       end
 
@@ -91,12 +91,12 @@ module Skylab::TanMan::TestSupport
 
         it "position 1 - uses (necessarily) prototype for styling" do
           insrt 'boo=b'
-          @a_list_s.should eql 'boo=b, koo=k'
+          expect( @a_list_s ).to eql 'boo=b, koo=k'
         end
 
         it "position 2 - uses (necessarily) prototype for styling" do
           insrt 'moo=m'
-          @a_list_s.should eql 'koo=k, moo=m'
+          expect( @a_list_s ).to eql 'koo=k, moo=m'
         end
       end
 
@@ -106,17 +106,17 @@ module Skylab::TanMan::TestSupport
 
         it "position 1 - use proximity styling" do
           insrt 'aiffo=a'
-          @a_list_s.should eql 'aiffo=a,  biffo=x,  kiffo=y'
+          expect( @a_list_s ).to eql 'aiffo=a,  biffo=x,  kiffo=y'
         end
 
         it "position 2 - use proximity styling" do
           insrt 'giffo=g'
-          @a_list_s.should eql 'biffo=x,  giffo=g,  kiffo=y'
+          expect( @a_list_s ).to eql 'biffo=x,  giffo=g,  kiffo=y'
         end
 
         it "position 3 - use proximity styling" do
           insrt 'liffo=l'
-          @a_list_s.should eql 'biffo=x,  kiffo=y,  liffo=l'
+          expect( @a_list_s ).to eql 'biffo=x,  kiffo=y,  liffo=l'
         end
       end
     end

@@ -24,18 +24,18 @@ module Skylab::Snag::TestSupport
 
         o = _nasty
 
-        o.category_symbol.should eql :tag
-        o.get_string.should eql '( #wiz: hey #other-tag hi )'
+        expect( o.category_symbol ).to eql :tag
+        expect( o.get_string ).to eql '( #wiz: hey #other-tag hi )'
       end
 
       it "the structured piece's `get_name_string` is the tag only (no colon)" do
 
-        _nasty.get_name_string.should eql '#wiz'
+        expect( _nasty.get_name_string ).to eql '#wiz'
       end
 
       it "the structured piece's `get_value_string`: between colon & parens" do
 
-        _nasty.get_value_string.should eql ' hey #other-tag hi '
+        expect( _nasty.get_value_string ).to eql ' hey #other-tag hi '
       end
 
       it "the N pieces after the structured tag look as normal" do

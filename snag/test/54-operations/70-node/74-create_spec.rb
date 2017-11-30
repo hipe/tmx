@@ -18,14 +18,14 @@ module Skylab::Snag::TestSupport
       # (was [#033] flickering test per setup tmpdir)
 
       scn = scanner_via_output_string_
-      scn.next_line.should eql "[#04] #open feep my deep\n"
-      scn.next_line.should eql "not business\n"
-      scn.next_line.should eql "[#003]       ziff dizzle\n"
-      scn.next_line.should eql "[#02]       #done wizzle bizzle 2013-11-11\n"
-      scn.next_line.should eql "               one more line\n"
-      scn.next_line.should eql NEWLINE_
-      scn.next_line.should eql "[#01]       #hi\n"
-      scn.next_line.should be_nil
+      expect( scn.next_line ).to eql "[#04] #open feep my deep\n"
+      expect( scn.next_line ).to eql "not business\n"
+      expect( scn.next_line ).to eql "[#003]       ziff dizzle\n"
+      expect( scn.next_line ).to eql "[#02]       #done wizzle bizzle 2013-11-11\n"
+      expect( scn.next_line ).to eql "               one more line\n"
+      expect( scn.next_line ).to eql NEWLINE_
+      expect( scn.next_line ).to eql "[#01]       #hi\n"
+      expect( scn.next_line ).to be_nil
 
       want_noded_ 3
     end

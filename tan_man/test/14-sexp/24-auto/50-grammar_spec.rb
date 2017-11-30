@@ -11,33 +11,33 @@ describe "[tm] sexp auto list pattern (grammar 50)", g: true do
       it_unparses_losslessly
       it "stmt_list is nil" do
         result = produce_result
-        result.stmt_list.should eql(nil)
+        expect( result.stmt_list ).to eql nil
       end
     end
 
     using_input '100-one-arc.dot' do
       it_unparses_losslessly
       it "should not hiccup on whitespace" do
-        a.length.should eql(1)
-        a.first.unparse.should eql('Hello->World')
+        expect( a.length ).to eql 1
+        expect( a.first.unparse ).to eql 'Hello->World'
       end
     end
 
     using_input '200-two-arcs.dot' do
       it_unparses_losslessly
       it "does the list automagic" do
-        a.length.should eql(2)
-        a.first.unparse.should eql('foo->bar')
-        a.last.unparse.should eql('biff->baz')
+        expect( a.length ).to eql 2
+        expect( a.first.unparse ).to eql 'foo->bar'
+        expect( a.last.unparse ).to eql 'biff->baz'
       end
     end
 
     using_input '300-three-arcs.dot' do
       it_unparses_losslessly
       it 'does the list automagic for three items' do
-        a[0].unparse.should eql('One -> Two')
-        a[1].unparse.should eql('Three -> Four')
-        a[2].unparse.should eql('Five -> Six')
+        expect( a[0].unparse ).to eql 'One -> Two'
+        expect( a[1].unparse ).to eql 'Three -> Four'
+        expect( a[2].unparse ).to eql 'Five -> Six'
       end
     end
   end

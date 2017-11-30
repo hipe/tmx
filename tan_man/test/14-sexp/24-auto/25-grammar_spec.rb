@@ -10,7 +10,7 @@ describe "[tm] sexp auto list pattern (grammar 25)", g: true do
       it_unparses_losslessly
       it "stmt_list is nil when you have zero items" do
         result = produce_result
-        result.stmt_list.should eql(nil)
+        expect( result.stmt_list ).to eql nil
       end
     end
 

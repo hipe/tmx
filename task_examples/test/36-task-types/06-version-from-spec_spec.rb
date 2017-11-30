@@ -72,7 +72,7 @@ module Skylab::TaskExamples::TestSupport
 
           it "explains that it can't parse" do
             _be_this = _be_couldnt_parse "ver A.B.foo\n"
-            error_expression_message_.should _be_this
+            expect( error_expression_message_ ).to _be_this
           end
 
           def _version_from
@@ -94,7 +94,7 @@ module Skylab::TaskExamples::TestSupport
 
           _rx = %r(\ABad range assertion)
 
-          _.should match _rx
+          expect( _ ).to match _rx
         end
 
         def _version_from
@@ -119,7 +119,7 @@ module Skylab::TaskExamples::TestSupport
           _rx = %r(\ADo not use "[^"]+" as a target #{
             }without a "must be in range" assertion\b)
 
-          error_expression_message_.should match _rx
+          expect( error_expression_message_ ).to match _rx
         end
 
         def _must_be_in_range
@@ -158,7 +158,7 @@ module Skylab::TaskExamples::TestSupport
           it "says that is doesn't match" do
 
             _be_this = _be_version_mismatch_against '0.0.1'
-            error_expression_message_.should _be_this
+            expect( error_expression_message_ ).to _be_this
           end
 
           def _version_from
@@ -183,7 +183,7 @@ module Skylab::TaskExamples::TestSupport
 
           _be_this_message = _be_couldnt_parse "version A.B.C\n"
 
-          error_expression_message_.should _be_this_message
+          expect( error_expression_message_ ).to _be_this_message
         end
 
         def _version_from
@@ -237,12 +237,12 @@ module Skylab::TaskExamples::TestSupport
 
     def _want_labelled_as_version s
 
-      payload_expression_message_.should eql "version: #{ s }"
+      expect( payload_expression_message_ ).to eql "version: #{ s }"
     end
 
     def __want_OK s
 
-      info_expression_message_.should eql "version ok: #{ s }"
+      expect( info_expression_message_ ).to eql "version ok: #{ s }"
     end
 
     def expression_agent_for_want_emission

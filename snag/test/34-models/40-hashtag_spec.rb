@@ -42,12 +42,12 @@ module Skylab::Snag::TestSupport
         st = _scan_with_values "#name: value\n"
         o = st.gets
 
-        o.value_is_known_is_known.should eql true
-        o.value_is_known.should eql true
+        expect( o.value_is_known_is_known ).to eql true
+        expect( o.value_is_known ).to eql true
 
-        o.get_name_string.should eql '#name'
-        o.get_value_string.should eql 'value'
-        o.get_string.should eql '#name: value'
+        expect( o.get_name_string ).to eql '#name'
+        expect( o.get_value_string ).to eql 'value'
+        expect( o.get_string ).to eql '#name: value'
 
       end
 
@@ -67,16 +67,16 @@ module Skylab::Snag::TestSupport
         _scan_with_values _normal_complexity
         want_piece_ :string, 'this is some code '
         o = want_piece_ :hashtag, '#public-API'
-        o.value_is_known_is_known.should be_nil
+        expect( o.value_is_known_is_known ).to be_nil
 
         want_piece_ :string, ', '
 
         o = want_piece_ :hashtag, '#bill-Deblazio:2014'
 
-        o.value_is_known.should eql true
+        expect( o.value_is_known ).to eql true
 
-        o.get_name_string.should eql '#bill-Deblazio'
-        o.get_value_string.should eql '2014'
+        expect( o.get_name_string ).to eql '#bill-Deblazio'
+        expect( o.get_value_string ).to eql '2014'
 
         want_piece_ :string ,' wee'
         want_no_more_pieces_
@@ -100,7 +100,7 @@ module Skylab::Snag::TestSupport
       it "you can 'get_stem_string' from a hash object" do
 
         _hashtag = __build_hashtag '#foo-bar'
-        _hashtag.get_stem_string.should eql 'foo-bar'
+        expect( _hashtag.get_stem_string ).to eql 'foo-bar'
       end
     end
 

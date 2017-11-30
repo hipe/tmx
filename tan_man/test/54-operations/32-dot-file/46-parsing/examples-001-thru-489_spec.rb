@@ -49,9 +49,9 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
       it 'should give the same statement object, 2 ways' do
         stmt = result.stmt_list.stmt
         a = result.stmt_list.stmts
-        a.length.should eql(1)
-        a.first.unparse.should eql("Hello->World")
-        a.first.object_id.should eql(stmt.object_id)
+        expect( a.length ).to eql 1
+        expect( a.first.unparse ).to eql "Hello->World"
+        expect( a.first.object_id ).to eql stmt.object_id
       end
     end
 
@@ -65,9 +65,9 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
 
       it 'can get 2 items' do
         a = result.stmt_list.stmts
-        a.length.should eql(2)
-        a.first.unparse.should eql('one->two')
-        a.last.unparse.should eql('three->four')
+        expect( a.length ).to eql 2
+        expect( a.first.unparse ).to eql 'one->two'
+        expect( a.last.unparse ).to eql 'three->four'
       end
     end
 
@@ -76,14 +76,14 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
       against_file '410-node-with-dbl-quotes.dot'
 
       it 'unparses losslessly (custom)' do
-        result.stmt_list.stmt.unparse.should eql '"node0"'
-        result.unparse.should eql some_input_string
+        expect( result.stmt_list.stmt.unparse ).to eql '"node0"'
+        expect( result.unparse ).to eql some_input_string
       end
 
       it 'parses double quoted node ID\'s correctly' do
         node_stmt = result.stmt_list.stmts.first
         node_stmt.class.rule_symbol == :node_stmt || fail
-        node_stmt[ :node_id ].id.content_text_value.should eql 'node0'
+        expect( node_stmt[ :node_id ].id.content_text_value ).to eql 'node0'
       end
     end
 
@@ -98,8 +98,8 @@ describe "[tm] operations - dot-file parsing - examples 001 to 489" do
       it 'works' do
         stmts = result.stmt_list.stmts
         a_list = stmts.last.attr_list.content
-        a_list.content.id.content_text_value.should eql('shape')
-        a_list.content.equals.id.content_text_value.should eql('record')
+        expect( a_list.content.id.content_text_value ).to eql 'shape'
+        expect( a_list.content.equals.id.content_text_value ).to eql 'record'
       end
     end
   end

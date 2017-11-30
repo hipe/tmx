@@ -18,11 +18,11 @@ module Skylab::Snag::TestSupport
 
       on = against_ input_stream_via_array %w( is 3 feet wide )
 
-      on.symbol.should eql :point
+      expect( on.symbol ).to eql :point
 
       a = on.value
-      a.first.should eql 3
-      a.fetch( 1 ).should eql :foot_unit
+      expect( a.first ).to eql 3
+      expect( a.fetch 1 ).to eql :foot_unit
     end
 
     it "use it for an OR-list" do
@@ -32,8 +32,8 @@ module Skylab::Snag::TestSupport
       on = against_ input_stream_via_array %w( is 6 or 7 feet wide )
 
       a = on.value
-      a.fetch( 1 ).should eql :foot_unit
-      a.first.map( & :value ).should eql [ 6, 7 ]
+      expect( a.fetch 1 ).to eql :foot_unit
+      expect( a.first.map( & :value ) ).to eql [ 6, 7 ]
     end
 
     it "you've gotta finish it - the 'wide' part is not optional" do
@@ -42,8 +42,8 @@ module Skylab::Snag::TestSupport
 
       st = input_stream_via_array %w( is 7 feet )
       on = against_ st
-      on.should be_nil
-      st.current_index.should be_zero
+      expect( on ).to be_nil
+      expect( st.current_index ).to be_zero
     end
 
     attr_reader :subject_object_

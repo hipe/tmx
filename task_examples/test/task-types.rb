@@ -69,7 +69,7 @@ module Skylab::TaskExamples::TestSupport
           y = y_
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
 
         y.fetch 0
       end
@@ -98,9 +98,9 @@ module Skylab::TaskExamples::TestSupport
           actual_sym_a = ev.reasons.map( & :name_symbol )
         end
 
-        _em.should _be_this
+        expect( _em ).to _be_this
 
-        actual_sym_a.should eql sym_a
+        expect( actual_sym_a ).to eql sym_a
       end
     end
 

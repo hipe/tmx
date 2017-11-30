@@ -23,21 +23,21 @@ module Skylab::Snag::TestSupport
 
     def __want_result_for_ambiguity x, st
 
-      x.should eql false
+      expect( x ).to eql false
 
       _em = want_not_OK_event :ambiguity
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         "\"or\" is ambiguous here because of a previous \"and\"" )
 
-      st.current_index.should eql 0
+      expect( st.current_index ).to eql 0
     end
 
     it "experimentally, ambiguity can be resolved by a context pop" do
 
       st = input_stream_via_array %w( is blue and pink or is green )
       _s = visual_tree_against_ st
-      _s.should eql __tree_viz_for_context_pop
+      expect( _s ).to eql __tree_viz_for_context_pop
     end
 
     def __tree_viz_for_context_pop
@@ -61,7 +61,7 @@ module Skylab::Snag::TestSupport
       _x = against_ st, & handle_event_selectively_
 
       want_not_OK_event :ambiguity
-      _x.should eql false
+      expect( _x ).to eql false
     end
 
     it "branches down" do
@@ -72,7 +72,7 @@ module Skylab::Snag::TestSupport
 
       _want_parsed_everything st
 
-      _s.should eql __tree_viz_for_branch_down
+      expect( _s ).to eql __tree_viz_for_branch_down
     end
 
     def __tree_viz_for_branch_down
@@ -95,7 +95,7 @@ module Skylab::Snag::TestSupport
       _x = against_ st
 
       _s = _x.to_ascii_visualization_string_
-      _s.should eql __tree_viz_for_up_down_up
+      expect( _s ).to eql __tree_viz_for_up_down_up
     end
 
     def __tree_viz_for_up_down_up
@@ -116,7 +116,7 @@ module Skylab::Snag::TestSupport
         is green or is lavender and pink or is blue )
 
       _s = visual_tree_against_ st
-      _s.should eql __tree_viz_for_down_up_down_up
+      expect( _s ).to eql __tree_viz_for_down_up_down_up
     end
 
     def __tree_viz_for_down_up_down_up

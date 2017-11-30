@@ -7,7 +7,7 @@ describe "[tm] sexp auto list pattern (grammar 12)", g: true do
 
   def self.it_trees_as arr, *tags
     it "it trees as #{arr.map{ |a| a.join(',') }.join(';')}", *tags do
-      result.content.stmts.map { |s| s.exprs }.should eql(arr)
+      expect( result.content.stmts.map { |s| s.exprs } ).to eql arr
     end
   end
 

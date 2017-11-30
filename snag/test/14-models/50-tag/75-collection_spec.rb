@@ -16,9 +16,9 @@ module Skylab::Snag::TestSupport
 
       o.append_tag :A, & handle_event_selectively_
 
-      o.to_tag_stream.map_by do | tag |
+      expect( o.to_tag_stream.map_by do | tag |
         tag.intern
-      end.to_a.should eql [ :A ]
+      end.to_a ).to eql [ :A ]
 
       want_no_events
     end
@@ -31,9 +31,9 @@ module Skylab::Snag::TestSupport
 
       _em = want_not_OK_event :invalid_tag_stem
 
-      _em.cached_event_value.tag_s.should eql '##A'
+      expect( _em.cached_event_value.tag_s ).to eql '##A'
 
-      ok.should eql false
+      expect( ok ).to eql false
     end
 
     it "create then express as byte stream" do
@@ -44,10 +44,11 @@ module Skylab::Snag::TestSupport
       o.append_string 'this'
       o.prepend_string 'we really '
 
-      o.express_into_under y=[], _expag( 23, 3, 2 )
-      y[ 0 ].should eql "[#03]   we really #love\n"
-      y[ 1 ].should eql "        this\n"
-      y[ 2 ].should be_nil
+      o.express_into_under a=[], _expag( 23, 3, 2 )
+      want_these_lines_in_array_ a do |y|
+        y << "[#03]   we really #love\n"
+        y << "        this\n"
+      end
     end
 
     it "read from byte-stream" do
@@ -56,16 +57,16 @@ module Skylab::Snag::TestSupport
       st = o.to_tag_stream
 
       tag = st.gets
-      tag.category_symbol.should eql :tag
-      tag.intern.should eql :foo
+      expect( tag.category_symbol ).to eql :tag
+      expect( tag.intern ).to eql :foo
 
       tag = st.gets
-      tag.intern.should eql :ha
+      expect( tag.intern ).to eql :ha
 
       tag = st.gets
-      tag.intern.should eql :ha
+      expect( tag.intern ).to eql :ha
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
     it "read from byte-stream then prepend" do
@@ -81,16 +82,16 @@ module Skylab::Snag::TestSupport
       __want_prepended y
     end
 
-    def __want_prepended y
+    def __want_prepended actual
 
-      y[ 0 ].should eql "not a business line\n"
-      y[ 1 ].should eql "[#004]       #boo #foo\n"
-      y[ 2 ].should eql "             goo hoo\n"
-      y[ 3 ].should eql "             just a\n"
-      y[ 4 ].should eql "again not business\n"  # NOTE currently the non-
+      want_these_lines_in_array_with_trailing_newlines_ actual do |y|
+        y << "not a business line"
+        y << "[#004]       #boo #foo"
+        y << "             goo hoo"
+        y << "             just a"
+        y << "again not business"  # NOTE currently the non-
         # business head and tail caps are unaware of requests for N units only
-      y[ 5 ].should be_nil
-
+      end
     end
 
     it "read from byte-stream then append (it only re-writes the necessary lines)" do
@@ -106,17 +107,17 @@ module Skylab::Snag::TestSupport
       __want_appended y
     end
 
-    def __want_appended y
+    def __want_appended actual
 
       a = _body.send :_sstr_a
-      y[ 0 ].should eql a[ 0 ].s
-      y[ 1 ].should eql a[ 1 ].s
-      y[ 2 ].should eql a[ 2 ].s
-      y[ 3 ].should eql "             #ha #ha\n"
-      y[ 4 ].should eql "             #zoo\n"
-      y[ 5 ].should eql "again not business\n"
-      y[ 6 ].should be_nil
-
+      want_these_lines_in_array_ actual do |y|
+        y << a[0].s
+        y << a[1].s
+        y << a[2].s
+        y << "             #ha #ha\n"
+        y << "             #zoo\n"
+        y << "again not business\n"
+      end
     end
 
     alias_method :_expag, :build_byte_stream_expag_

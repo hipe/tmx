@@ -45,8 +45,8 @@ module Skylab::TanMan::TestSupport
 # (2/N)
       it "the one meaning - you got it" do
         arr = graph.meaning_values_via_meaning_name 'red'
-        arr.length.should eql( 1 )
-        arr[0].should eql( 'color=#fa0schwartz' )
+        expect( arr.length ).to eql 1
+        expect( arr[0] ).to eql 'color=#fa0schwartz'
       end
 
 # (3/N)
@@ -77,8 +77,8 @@ module Skylab::TanMan::TestSupport
 
         arr == false || fail
         trail_a = ev.trail_a
-        trail_a.length.should eql( 2 )
-        trail_a.should eql( [ :'angry-color', :red ] )
+        expect( trail_a.length ).to eql 2
+        expect( trail_a ).to eql [ :'angry-color', :red ]
       end
     end
 
@@ -92,15 +92,15 @@ module Skylab::TanMan::TestSupport
 # (5/N)
       it "the NT meaning - T" do
         arr = graph.meaning_values_via_meaning_name 'happy'
-        arr.length.should eql( 1 )
-        arr[0].should eql( 'foo=bar' )
+        expect( arr.length ).to eql 1
+        expect( arr[0] ).to eql 'foo=bar'
       end
 
 # (6/N)
       it "the T meaning - T" do
         arr = graph.meaning_values_via_meaning_name 'happy-color'
-        arr.length.should eql( 1 )
-        arr[0].should eql( 'foo=bar' )
+        expect( arr.length ).to eql 1
+        expect( arr[0] ).to eql 'foo=bar'
       end
     end
 
@@ -118,7 +118,7 @@ module Skylab::TanMan::TestSupport
 
 # (7/N)
       it "resolves to the four terminal meanings along six arcs" do
-        graph.meaning_values_via_meaning_name( 'zero-day' ).should eql(
+        expect( graph.meaning_values_via_meaning_name( 'zero-day' ) ).to eql(
           [ "border=heavy", "icon=star", "color=red", "border=heavy" ]
         )
       end
@@ -138,8 +138,8 @@ module Skylab::TanMan::TestSupport
 # (8/N)
       it " - resolves to just the one nerk" do
         term_a = graph.meaning_values_via_meaning_name 'clock-radio'
-        term_a.length.should eql( 1 )
-        term_a[ 0 ].should eql( 'category=appliance' )
+        expect( term_a.length ).to eql 1
+        expect( term_a[ 0 ] ).to eql 'category=appliance'
       end
     end
 
@@ -176,7 +176,7 @@ module Skylab::TanMan::TestSupport
         msg = stack_a.reverse.join
         exp = "finished means done-color and done-color means green, #{
           }but green has no meaning."
-        msg.should eql( exp )
+        expect( msg ).to eql exp
       end
     end
 
@@ -203,8 +203,8 @@ module Skylab::TanMan::TestSupport
           end
 
           arr == false || fail
-          ev.reason.should eql :circular
-          ev.trail_a.join( ' -> ' ).should eql exp
+          expect( ev.reason ).to eql :circular
+          expect( ev.trail_a.join( ' -> ' ) ).to eql exp
         end
       end.call
     end

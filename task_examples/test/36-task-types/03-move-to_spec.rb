@@ -37,7 +37,7 @@ module Skylab::TaskExamples::TestSupport
 
         _rx = %r<\Afile not found - \(pth "/[^ ]+not-here\.file"\)\z>
 
-        error_expression_message_.should match _rx
+        expect( error_expression_message_ ).to match _rx
       end
     end
 
@@ -58,7 +58,7 @@ module Skylab::TaskExamples::TestSupport
 
         _rx = %r(\Afile exists - \(pth "/[^ ]+three-lines\.txt"\)\z)
 
-        error_expression_message_.should match _rx
+        expect( error_expression_message_ ).to match _rx
       end
     end
 
@@ -78,7 +78,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       it "emits" do
-        info_expression_message_.should match %r(\Amv )
+        expect( info_expression_message_ ).to match %r(\Amv )
       end
     end
 

@@ -13,22 +13,23 @@ module Skylab::Snag::TestSupport
 
     it "go" do
 
-      o = _ersatz_domain.new_criteria_tree_via_word_array(
-        %w( the thing is marked with "sale" or "clearance" and
-            has no particular shortcomings ) )
+      o = _ersatz_domain.new_criteria_tree_via_word_array %w(
+            the thing is marked with "sale" or "clearance" and
+            has no particular shortcomings
+      )
 
       o.association == %i( Thing ) || fail
 
       t = o.value
-      t.a.first.a.first.value[ :body ].should eql 'sale'
-      t.a.first.a.last.value[ :body ].should eql 'clearance'
+      expect( t.a.first.a.first.value[ :body ] ).to eql 'sale'
+      expect( t.a.first.a.last.value[ :body ] ).to eql 'clearance'
 
       o = t.a.last
-      o.associated_model_identifier.should eql [:Shortcomings]
-      o.value.first.should eql :no
+      expect( o.associated_model_identifier ).to eql [:Shortcomings]
+      expect( o.value.first ).to eql :no
 
       _s = t.to_ascii_visualization_string_
-      _s.should eql __this_tree
+      expect( _s ).to eql __this_tree
     end
 
     def __this_tree

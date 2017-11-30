@@ -59,7 +59,7 @@ module Skylab::Task::TestSupport
 
             if actual_line
               if actual_line != expected_line
-                actual_line.should eql expected_line
+                expect( actual_line ).to eql expected_line
               end
             else
               fail "had no more lines but expected #{ actual_line.inspect }"

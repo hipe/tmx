@@ -21,19 +21,19 @@ module Skylab::TanMan::TestSupport
         stmt.rhs.normal_content_string_ =~ /\ATangent with/ || fail
 
         stmt.rhs = "zeep"
-        stmt.unparse.should eql( 'label=zeep' )
+        expect( stmt.unparse ).to eql 'label=zeep'
 
         stmt.rhs = 'zeep zoop'
-        stmt.unparse.should eql( 'label="zeep zoop"' ) # look! smart quoting
+        expect( stmt.unparse ).to eql 'label="zeep zoop"' # look! smart quoting
 
         stmt.rhs = '<<b>bold</b>>'
-        stmt.unparse.should eql( 'label=<<b>bold</b>>' )
+        expect( stmt.unparse ).to eql 'label=<<b>bold</b>>'
 
         stmt.rhs = '"one"'
-        stmt.unparse.should eql( 'label="one"' )
+        expect( stmt.unparse ).to eql 'label="one"'
 
         stmt.rhs = ''
-        stmt.unparse.should eql( 'label=""' )
+        expect( stmt.unparse ).to eql 'label=""'
       end
 
       it 'can remove the label' do
@@ -44,12 +44,12 @@ module Skylab::TanMan::TestSupport
 
         _expected_s = read_file_ _path
 
-        @result.unparse.should eql _expected_s
+        expect( @result.unparse ).to eql _expected_s
 
-        removed.unparse.should eql(
+        expect( removed.unparse ).to eql(
           "label=\"Tangent with the C Programming Language\"")
 
-        _retrieve_label_statement.should be_nil
+        expect( _retrieve_label_statement ).to be_nil
       end
 
       _LABEL = 'label'
@@ -77,18 +77,18 @@ module Skylab::TanMan::TestSupport
 
     def _can_set_and_create_the_label
       o = result
-      o.get_label_.nil?.should eql( true )
+      expect( o.get_label_.nil? ).to eql true
       o.set_label 'Zeepadeep doobop'
-      o.get_label_.should eql('Zeepadeep doobop')
+      expect( o.get_label_ ).to eql 'Zeepadeep doobop'
       full = o.unparse
-      full.include?( 'label="Zeepadeep doobop"' ).should eql(true)
+      expect( full.include?( 'label="Zeepadeep doobop"' ) ).to eql true
       o.set_label 'bipbap'
       full = o.unparse
-      full.include?( 'Zeep' ).should eql(false)
+      expect( full.include?( 'Zeep' ) ).to eql false
       # the ending should not look like this: "foo}\n"
       (md = /(?<space>.)}[[:space:]]*\z/m.match(full))
-      ( !!md ).should eql( true ) # egads sorry rspec
-      md[:space].should match( /\A[[:space:]]\z/ )
+      expect( ( !!md ) ).to eql true # egads sorry rspec
+      expect( md[:space] ).to match( /\A[[:space:]]\z/ )
       nil
     end
   end

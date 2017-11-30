@@ -41,7 +41,7 @@ module Skylab::Snag::TestSupport
         invoke 'ping'
         want 'hello from snag.'
         want_no_more_lines
-        @exitstatus.should eql :hello_from_snag
+        expect( @exitstatus ).to eql :hello_from_snag
       end
 
       it "1.4  (good opt) - usage / invite" do
@@ -51,13 +51,13 @@ module Skylab::Snag::TestSupport
         on_stream :e
         o = flush_to_content_scanner
 
-        o.want_styled_line.should match usage_rx
+        expect( o.want_styled_line ).to match usage_rx
         o.want_nonblank_line
         o.want_blank_line
         o.want_header :actions
 
         o.advance_to_before_Nth_last_line 1
-        o.want_styled_line.should match deeper_invite_rx
+        expect( o.want_styled_line ).to match deeper_invite_rx
 
         want_succeed
       end
@@ -70,23 +70,23 @@ module Skylab::Snag::TestSupport
 
         cx = tree.children
 
-        cx.first.x.unstyled_header_content.should eql 'usage'
+        expect( cx.first.x.unstyled_header_content ).to eql 'usage'
 
-        cx.last.x.unstyled_content.should eql(
+        expect( cx.last.x.unstyled_content ).to eql(
           "use 'sn0g to-do -h <action>' for help on that action." )
 
-        cx[ 1 ].x.unstyled_header_content.should eql 'actions'
+        expect( cx[ 1 ].x.unstyled_header_content ).to eql 'actions'
 
         3 == cx.length or fail
 
         cx = cx[ 1 ].children
-        cx.first.x.line_content.should match(
+        expect( cx.first.x.line_content ).to match(
           /\A-h, --help \[cmd\] {2,}this screen \(or help for action\)\z/ )
 
-        cx[ 1 ].x.line_content.should match(
+        expect( cx[ 1 ].x.line_content ).to match(
           /\Ato-stream {2,}a report of the ##{}todo's/ )
 
-        cx[ 2 ].x.line_content.should match %r(\Amelt\b)
+        expect( cx[ 2 ].x.line_content ).to match %r(\Amelt\b)
       end
     end
 
@@ -103,7 +103,7 @@ module Skylab::Snag::TestSupport
 
       want_no_more_lines
 
-      @exitstatus.should be_zero
+      expect( @exitstatus ).to be_zero
     end
 
     it 'open - as report - suffix' do
@@ -125,7 +125,7 @@ module Skylab::Snag::TestSupport
 
       want_no_more_lines
 
-      @exitstatus.should be_zero
+      expect( @exitstatus ).to be_zero
     end
 
     it 'open - as muation' do
@@ -150,7 +150,7 @@ module Skylab::Snag::TestSupport
 
       want_no_more_lines
 
-      @exitstatus.should be_zero
+      expect( @exitstatus ).to be_zero
     end
 
     define_method :_want_separator, ( -> do

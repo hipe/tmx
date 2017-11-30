@@ -76,8 +76,8 @@ module Skylab::Task::TestSupport
 
         it "yay - higher task has two instances of lower task" do
           ta = state_.task
-          ta.chomber._VALUE_.should eql "compiled:(X, L)"
-          ta.frumpy._VALUE_.should eql "compiled:(X, F)"
+          expect( ta.chomber._VALUE_ ).to eql "compiled:(X, L)"
+          expect( ta.frumpy._VALUE_ ).to eql "compiled:(X, F)"
         end
 
         # #todo - break up into a separate test that shows samed-name param transferal
@@ -138,7 +138,7 @@ module Skylab::Task::TestSupport
         it "wahoo" do
 
           _ta = state_.task
-          _ta._VALUE_.should eql "(my value: (hi: BAR, baz_D))"
+          expect( _ta._VALUE_ ).to eql "(my value: (hi: BAR, baz_D))"
         end
       end
     end

@@ -23,15 +23,15 @@ module Skylab::Snag::TestSupport
 
       x1 = st.gets
       path = x1.path
-      ::File.basename( path ).should eql 'foo.txt'
+      expect( ::File.basename path ).to eql 'foo.txt'
 
       x2 = st.gets
-      x2.path.object_id.should eql path.object_id
+      expect( x2.path.object_id ).to eql path.object_id
 
       x3 = st.gets
-      x3.path.object_id.should eql path.object_id
+      expect( x3.path.object_id ).to eql path.object_id
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
     it "the name option" do
@@ -46,18 +46,18 @@ module Skylab::Snag::TestSupport
       st = @result
 
       o = st.gets
-      ::File.basename( o.path ).should eql 'ferbis.code'
-      o.lineno.should eql 2
+      expect( ::File.basename o.path ).to eql 'ferbis.code'
+      expect( o.lineno ).to eql 2
 
       o = st.gets
-      ::File.basename( o.path ).should eql 'one.code'
-      o.lineno.should eql 1
+      expect( ::File.basename o.path ).to eql 'one.code'
+      expect( o.lineno ).to eql 1
 
       o = st.gets
-      ::File.basename( o.path ).should eql 'one.code'
-      o.lineno.should eql 3
+      expect( ::File.basename o.path ).to eql 'one.code'
+      expect( o.lineno ).to eql 3
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
     end
 
     it "tries to avoid false matches" do  # but this is not language aware [#068]
@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
 
       _st = @result
 
-      _st.gets.should be_nil
+      expect( _st.gets ).to be_nil
 
       __want_event_about_did_not_match
     end
@@ -81,12 +81,12 @@ module Skylab::Snag::TestSupport
 
         ev = ev.to_event
 
-        black_and_white( ev ).should match(
+        expect( black_and_white ev ).to match(
           %r(\Askipping a line that matched via `grep`) )
 
-        ev.path[ -6 .. -1 ].should eql '.phase'
-        ev.lineno.should eql 2
-        ev.line[ -6 .. -1 ].should eql "a tag\n"
+        expect( ev.path[ -6 .. -1 ] ).to eql '.phase'
+        expect( ev.lineno ).to eql 2
+        expect( ev.line[ -6 .. -1 ] ).to eql "a tag\n"
       end
 
       want_no_more_events

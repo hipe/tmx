@@ -17,7 +17,7 @@ module Skylab::Snag::TestSupport
           :identifier, 2,
           :upstream_reference, _path, & EMPTY_P_
 
-        @result.has_extended_content.should eql true
+        expect( @result.has_extended_content ).to eql true
       end
 
       it "one that has not has not" do
@@ -26,7 +26,7 @@ module Skylab::Snag::TestSupport
           :identifier, 5,
           :upstream_reference, _path, & EMPTY_P_
 
-        @result.has_extended_content.should eql false
+        expect( @result.has_extended_content ).to eql false
       end
 
       def _path

@@ -49,9 +49,9 @@ module Skylab::TanMan::TestSupport
       it "(content, partial)" do
       scn = build_scanner_via_output_string_
       scn.advance_N_lines 3
-      scn.next_line.should eql "zip -> zip_work\n"
-      scn.next_line.should eql "}\n"
-      scn.next_line.should be_nil
+      expect( scn.next_line ).to eql "zip -> zip_work\n"
+      expect( scn.next_line ).to eql "}\n"
+      expect( scn.next_line ).to be_nil
       end
     end
 
@@ -74,8 +74,8 @@ module Skylab::TanMan::TestSupport
       it "(content, partial)" do
       scn = build_scanner_via_output_string_
       scn.advance_N_lines 1
-      scn.next_line.should eql "zip [label=\"zip win solidly\"]\n"
-      scn.next_line.should eql "zip_2 [label=\"zip work hard\"]\n"
+      expect( scn.next_line ).to eql "zip [label=\"zip win solidly\"]\n"
+      expect( scn.next_line ).to eql "zip_2 [label=\"zip work hard\"]\n"
 
       # #history-A.1:
       scn.gets == "zip -> zip_2\n" || fail
@@ -102,10 +102,10 @@ module Skylab::TanMan::TestSupport
       it "(content, partial)" do
       scn = build_scanner_via_output_string_
       scn.advance_N_lines 2
-      scn.next_line.should eql "zip_2 [label=\"zip win solidly\"]\n"
-      scn.next_line.should eql "zip_3 [label=\"zip work hard\"]\n"
-      scn.next_line.should eql "zip_2 -> zip_3}\n"
-      scn.next_line.should be_nil
+      expect( scn.next_line ).to eql "zip_2 [label=\"zip win solidly\"]\n"
+      expect( scn.next_line ).to eql "zip_3 [label=\"zip work hard\"]\n"
+      expect( scn.next_line ).to eql "zip_2 -> zip_3}\n"
+      expect( scn.next_line ).to be_nil
       end
     end
 
@@ -130,4 +130,3 @@ end
 #   structure of the expressed graph (to say nothing of the fact that this
 #   issue is well outside the scope of the subject silo), we are for now
 #   ignoring it, beyond writing this lengthy comment about it.
-

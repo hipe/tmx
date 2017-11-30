@@ -41,7 +41,7 @@ module Skylab::TanMan::TestSupport
         _d = Home_.lib_.basic::String.count_occurrences_in_string_of_string(
           _, ', ' )
 
-        (9..9).should be_include _d
+        expect( 9..9 ).to be_include _d
       end
 
       shared_subject :_lines do

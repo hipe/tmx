@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport
 
       st = @result
       _x = st.gets
-      _x.should  eql false
+      expect( _x ).to eql false
 
       want_not_OK_event :stat_error
     end
@@ -31,23 +31,23 @@ module Skylab::Snag::TestSupport
       x = x.dup
 
       x_ = st.gets
-      x_.object_id.should eql oid
+      expect( x_.object_id ).to eql oid
       x_ = x_.dup
 
-      st.gets.should be_nil
+      expect( st.gets ).to be_nil
       st.upstream.release_resource  # not necessary
 
-      x.ID.to_i.should eql 1
-      x_.ID.to_i.should eql 2
+      expect( x.ID.to_i ).to eql 1
+      expect( x_.ID.to_i ).to eql 2
 
       st = x.body.to_business_row_stream_
-      st.gets.s.should eql "[#01]  this line is in\n"
-      st.gets.s.should eql " part of the above\n"
-      st.gets.should be_nil
+      expect( st.gets.s ).to eql "[#01]  this line is in\n"
+      expect( st.gets.s ).to eql " part of the above\n"
+      expect( st.gets ).to be_nil
 
       st = x_.body.to_business_row_stream_
-      st.gets.s.should eql "[#02] hi\n"
-      st.gets.should be_nil
+      expect( st.gets.s ).to eql "[#02] hi\n"
+      expect( st.gets ).to be_nil
     end
 
     it "`number_limit`" do  # #lends-coverage to [#fi-008.3]
@@ -57,8 +57,8 @@ module Skylab::Snag::TestSupport
         :upstream_reference, _alpha_path
 
       st = @result
-      st.gets.ID.to_i.should eql 5
-      st.gets.should be_nil
+      expect( st.gets.ID.to_i ).to eql 5
+      expect( st.gets ).to be_nil
     end
 
     it "`identifier` where number is too low" do
@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_not_OK_event :expecting_number
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         "'node-identifier-number-component' #{
          }must be a non-negative integer, had \"-12\"" )
 
@@ -86,8 +86,8 @@ module Skylab::Snag::TestSupport
       want_no_events
       st = @result.body.to_business_row_stream_
 
-      st.gets.s.should eql "[#002]       #done wizzle bizzle 2013-11-11\n"
-      st.gets.s.should eql "               one more line\n"
+      expect( st.gets.s ).to eql "[#002]       #done wizzle bizzle 2013-11-11\n"
+      expect( st.gets.s ).to eql "               one more line\n"
     end
 
     it "`identifier` with suffix" do
@@ -97,8 +97,8 @@ module Skylab::Snag::TestSupport
         :upstream_reference, _second_manifest
 
       st = @result.body.to_business_row_stream_
-      st.gets.s.should eql "[#98.6]  don't use these\n"
-      st.gets.should be_nil
+      expect( st.gets.s ).to eql "[#98.6]  don't use these\n"
+      expect( st.gets ).to be_nil
     end
 
     memoize :_second_manifest do

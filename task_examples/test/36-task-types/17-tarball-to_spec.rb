@@ -68,10 +68,10 @@ module Skylab::TaskExamples::TestSupport
         _be_msg = match %r(\Amv [^ ]+tar\.gz [^ ]+/ohai\z)
 
         _be_this = be_emission_ending_with :fake_shell do |y|
-          y.fetch( 0 ).should _be_msg
+          expect( y.fetch 0 ).to _be_msg
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
     end
   end

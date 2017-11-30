@@ -16,14 +16,19 @@ module Skylab::Snag::TestSupport
 
       crit.unmarshal or fail
 
-      st = crit.to_reduced_entity_stream_via_collection_identifier(
+      _o_st = crit.to_reduced_entity_stream_via_collection_identifier(
         Fixture_file_[ :hot_rocket_mani ] )
 
-      st.gets.ID.to_i.should eql 2
-      st.gets.ID.to_i.should eql 4
-      st.gets.ID.to_i.should eql 5
-      st.gets.ID.to_i.should eql 7
-      st.gets.should be_nil
+      _actual = _o_st.map_by do |o|
+        o.ID.to_i
+      end
+
+      want_these_lines_in_array_ _actual do |y|
+        y << 2
+        y << 4
+        y << 5
+        y << 7
+      end
     end
   end
 end

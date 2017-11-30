@@ -29,9 +29,9 @@ module Skylab::Snag::TestSupport
       ev = _expect :string_has_extraordinary_features,
         'message cannot contain newlines: "x\n"'
 
-      ev.x.should eql "x\n"
+      expect( ev.x ).to eql "x\n"
       ev.string_proc
-      ev.error_category.should eql :argument_error
+      expect( ev.error_category ).to eql :argument_error
     end
 
     it "no escaped newlines" do
@@ -54,7 +54,7 @@ module Skylab::Snag::TestSupport
 
       ev = want_not_OK_event( sym ).cached_event_value
 
-      black_and_white( ev ).should eql s
+      expect( black_and_white ev ).to eql s
 
       want_fail
 

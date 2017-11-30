@@ -30,7 +30,7 @@ module Skylab::TaskExamples::TestSupport
 
       it "expresses" do
         _rx = /\Anot in PATH: not-an-executable\z/
-        error_expression_message_.should match _rx
+        expect( error_expression_message_ ).to match _rx
       end
 
       def _executable
@@ -49,7 +49,7 @@ module Skylab::TaskExamples::TestSupport
       it "expresses" do
 
         _rx = /\bruby\z/
-        info_expression_message_.should match _rx
+        expect( info_expression_message_ ).to match _rx
       end
 
       def _executable

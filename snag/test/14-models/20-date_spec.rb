@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
 
         subject '1234-56-78'
         want_no_more_events
-        @result.value.string.should eql '1234-56-78'
+        expect( @result.value.string ).to eql '1234-56-78'
       end
 
       def subject s

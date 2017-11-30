@@ -28,7 +28,7 @@ module Skylab::TanMan::TestSupport
       it "content (partial) looks OK" do
         _graph_sexp = _tuple.last
         unparsed = _graph_sexp.unparse
-        unparsed[ -24 .. -1 ].should eql "*/\n\ncyan [label=cyan]\n}\n"
+        expect( unparsed[ -24 .. -1 ] ).to eql "*/\n\ncyan [label=cyan]\n}\n"
       end
 
       shared_subject :_tuple do

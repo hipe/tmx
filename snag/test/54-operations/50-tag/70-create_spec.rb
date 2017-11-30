@@ -17,7 +17,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :expecting_number
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "'node-identifier-number-component' #{
             }must be a non-negative integer, had \"ziffy\"" )
 
@@ -30,7 +30,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :component_not_found
 
-        black_and_white( _em.cached_event_value ).should match(
+        expect( black_and_white _em.cached_event_value ).to match(
           %r(\Athere is no node "\[#2\]") )
 
         want_fail
@@ -42,7 +42,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_not_OK_event :invalid_tag_stem
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "tag must be alphanumeric separated with dashes - #{
             }invalid tag name: \"#foo bar\"" )
 
@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport
 
         _em = want_neutral_event :component_already_added
 
-        black_and_white( _em.cached_event_value ).should eql(
+        expect( black_and_white _em.cached_event_value ).to eql(
           "node [#1] already has tag #hi" )
 
         want_fail
@@ -68,12 +68,12 @@ module Skylab::Snag::TestSupport
 
         scn = scanner_via_output_string_
 
-        scn.next_line.should eql "[#03] this is three\n"
-        scn.next_line.should eql "        zygote\n"
-        scn.next_line.should eql "[#07] seven #hello in the middle #hi\n"  # NOTE untouched
-        scn.next_line.should eql "             bizmark wee #2014-ok\n"
-        scn.next_line.should eql "[#01] this is one #hi\n"
-        scn.next_line.should be_nil
+        expect( scn.next_line ).to eql "[#03] this is three\n"
+        expect( scn.next_line ).to eql "        zygote\n"
+        expect( scn.next_line ).to eql "[#07] seven #hello in the middle #hi\n"  # NOTE untouched
+        expect( scn.next_line ).to eql "             bizmark wee #2014-ok\n"
+        expect( scn.next_line ).to eql "[#01] this is one #hi\n"
+        expect( scn.next_line ).to be_nil
 
         want_noded_ 7
       end

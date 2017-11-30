@@ -66,17 +66,17 @@ module Skylab::Snag::TestSupport
         & handle_event_selectively_ )
 
       st = @result
-      st.gets.ID.to_i.should eql 2
-      st.gets.ID.to_i.should eql 4
-      st.gets.ID.to_i.should eql 5
-      st.gets.ID.to_i.should eql 7
+      expect( st.gets.ID.to_i ).to eql 2
+      expect( st.gets.ID.to_i ).to eql 4
+      expect( st.gets.ID.to_i ).to eql 5
+      expect( st.gets.ID.to_i ).to eql 7
 
       _em = want_OK_event :added_entity
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white _em.cached_event_value ).to match(
         %r(\Aadded \"#{ fn }\" to persi) )
 
-      ::File.read( path ).should eql "nodes that are tagged with #rocket\n"
+      expect( ::File.read path ).to eql "nodes that are tagged with #rocket\n"
 
       # cleanup ICK :
 

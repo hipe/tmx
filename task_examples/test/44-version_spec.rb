@@ -46,10 +46,10 @@ module Skylab::TaskExamples::TestSupport
         _be_msg = match %r(\Amultiple version strings matched)
 
         _be_this = be_emission :error, :expression, :ambiguous do |y|
-          y.fetch( 0 ).should _be_msg
+          expect( y.fetch 0 ).to _be_msg
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 

@@ -45,7 +45,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_not_OK_event :component_not_found
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         "node [#1] does not have tag \"#open\"" )
 
       want_noded_ 1
@@ -54,11 +54,11 @@ module Skylab::Snag::TestSupport
 
       s = scn.advance_N_lines 5
 
-      s.should eql(
+      expect( s ).to eql(
         "[#001]       #done this one has no markings and 6 spaces of ws\n" )
       # the above now has 7 spaces in the submargin where before it had 6
 
-      scn.next_line.should be_nil
+      expect( scn.next_line ).to be_nil
     end
 
     it "closing one that is open and has multiline - works, munges lines" do
@@ -68,7 +68,7 @@ module Skylab::Snag::TestSupport
 
       want_OK_event :component_removed, "removed tag #open from node [#3]"
 
-      @output_s.should eql <<-O
+      expect( @output_s ).to eql <<-O
 [#003]       #done biff bazz this 2nd will get flowed into the previous one
              because it was edited (this line too).
 [#002]       #done this one is finished
@@ -105,7 +105,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_neutral_event sym
 
-      black_and_white( _em.cached_event_value ).should eql s
+      expect( black_and_white _em.cached_event_value ).to eql s
 
       NIL_
     end

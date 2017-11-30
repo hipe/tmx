@@ -67,10 +67,10 @@ module Skylab::TaskExamples::TestSupport
         _be_this_message = match %r(\Acurl -o\b)
 
         _be_this = be_emission :info, :expression, :fake_shell do |y|
-          y.fetch( 0 ).should _be_this_message
+          expect( y.fetch 0 ).to _be_this_message
         end
 
-        first_emission.should _be_this
+        expect( first_emission ).to _be_this
       end
 
       it "expresses" do
@@ -78,10 +78,10 @@ module Skylab::TaskExamples::TestSupport
         _be_this_msg = _be_message_about_not_found 'not/there.txt'
 
         _be_this = be_emission :error, :expression, :"404" do |y|
-          y.fetch( 0 ).should _be_this_msg
+          expect( y.fetch 0 ).to _be_this_msg
         end
 
-        last_emission.should _be_this
+        expect( last_emission ).to _be_this
       end
     end
 
@@ -113,7 +113,7 @@ module Skylab::TaskExamples::TestSupport
         created_path = ::File.join BUILD_DIR, tail
 
         _d = ::File.stat( created_path ).size
-        _d.should be_nonzero
+        expect( _d ).to be_nonzero
 
         _source_path = ::File.join FIXTURES_DIR, tail
 
@@ -152,16 +152,16 @@ module Skylab::TaskExamples::TestSupport
         _be_this_msg = _be_message_about_not_found 'nope-not-there.txt'
 
         _be_this = be_emission :error, :expression, :"404" do |y|
-          y.fetch( 0 ).should _be_this_msg
+          expect( y.fetch 0 ).to _be_this_msg
         end
 
-        second_emission.should _be_this
+        expect( second_emission ).to _be_this
       end
 
       it "still gets the files that it got" do
 
         _hi = _dir_files
-        _hi.should eql [ 'another-file.txt' ]
+        expect( _hi ).to eql [ 'another-file.txt' ]
       end
     end
 
@@ -196,15 +196,15 @@ module Skylab::TaskExamples::TestSupport
           end
         end
 
-        no.should be_zero
-        yes.should be_nonzero
+        expect( no ).to be_zero
+        expect( yes ).to be_nonzero
       end
 
       it "puts all of the files in the basket" do
 
         state_
 
-        _dir_files.should eql %w( another-file.txt some-file.txt )
+        expect( _dir_files ).to eql %w( another-file.txt some-file.txt )
       end
     end
 

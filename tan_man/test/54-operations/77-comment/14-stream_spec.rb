@@ -95,7 +95,7 @@ module Skylab::TanMan::TestSupport
       while s = scn.gets
         a.push s
       end
-      a.should eql s_a ; nil
+      expect( a ).to eql s_a ; nil
     end
 
     # ==

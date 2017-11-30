@@ -61,7 +61,7 @@ module Skylab::TaskExamples::TestSupport
 
           _be_this = match %r(\bNo such file or directory - \(pth .+not-there\b)
 
-          error_expression_message_.should _be_this
+          expect( error_expression_message_ ).to _be_this
         end
       end
 
@@ -87,7 +87,7 @@ module Skylab::TaskExamples::TestSupport
 
           _be_this = match %r(\bexists, won't tar extract: .*mginy\b)
 
-          info_expression_message_.should _be_this
+          expect( info_expression_message_ ).to _be_this
         end
       end
 
@@ -112,7 +112,7 @@ module Skylab::TaskExamples::TestSupport
           _be_msg = match %r(\bfailed to unzip.*unrecognized archive format)i
 
           _be_this = be_emission :error, :expression do |y|
-            y.fetch( 0 ).should _be_msg
+            expect( y.fetch 0 ).to _be_msg
           end
         end
       end
@@ -138,10 +138,10 @@ module Skylab::TaskExamples::TestSupport
           _be_this_message = match %r(\bcd [^ ]+\\\[te\\\]; tar -xzvf /.+/mginy\b)
 
           _be_this = be_emission :info, :expression, :system_command do |y|
-            y.fetch( 0 ).should _be_this_message
+            expect( y.fetch 0 ).to _be_this_message
           end
 
-          first_emission.should _be_this
+          expect( first_emission ).to _be_this
         end
 
         it "errput lists etc" do
@@ -153,8 +153,8 @@ module Skylab::TaskExamples::TestSupport
             expag.calculate s_a, & em.expression_proc
           end
 
-          s_a.fetch( 0 ).should eql "x mginy/"
-          s_a.fetch( 1 ).should eql "\nx mginy/README\n"  # weird chunking
+          expect( s_a.fetch 0 ).to eql "x mginy/"
+          expect( s_a.fetch 1 ).to eql "\nx mginy/README\n"  # weird chunking
           2 == s_a.length or fail
         end
       end

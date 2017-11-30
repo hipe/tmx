@@ -12,14 +12,14 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
         a = produce_result
         b = produce_result
         a.class.rule_symbol == :nerks || fail
-        a.class.should eql(b.class)
-        ( a.object_id == b.object_id ).should eql( false )
+        expect( a.class ).to eql b.class
+        expect( a.object_id == b.object_id ).to eql false
       end
       it_unparses_losslessly
       it 'result lets you get the nerk' do
         o = result.nerk
-        o.class.respond_to?( :expression ).should eql( false )
-        o.should eql('aaaa')
+        expect( o.class.respond_to?( :expression ) ).to eql false
+        expect( o ).to eql 'aaaa'
       end
     end
 
@@ -32,7 +32,7 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
       it 'the second element is array-like' do
         o = rest
         o.respond_to? :each or fail
-        o.length.should eql(1)
+        expect( o.length ).to eql 1
       end
 
       it 'the first element of the above array looks like this' do
@@ -46,9 +46,9 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
       it_unparses_losslessly
       it 'lets you touch and see the final two members' do
         o = rest
-        o.length.should eql(2)
+        expect( o.length ).to eql 2
         _ = o.map(&:unparse)
-        [",bbb2", ",aa999"].should eql(_)
+        expect( [",bbb2", ",aa999"] ).to eql _
       end
     end
   end

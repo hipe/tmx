@@ -236,7 +236,7 @@ module Skylab::TanMan::TestSupport
 
       it "content" do
         _actual = string_of_excerpted_lines_of_output_( -2..-2 )
-        _actual.should eql(
+        expect( _actual ).to eql(
          "foo -> bar [ penwidth = 5 fontsize = 28 fontcolor = \"black\" label = \"e\" ]\n" )
       end
 

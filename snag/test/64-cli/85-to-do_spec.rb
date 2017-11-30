@@ -33,9 +33,9 @@ module Skylab::Snag::TestSupport
 
       on_stream :o
       o = flush_to_content_scanner
-      ::File.basename( o.next_line.chop! ).should eql 'some-todos'
-      o.next_line.should eql "├── ferbis.code\n"
-      o.finish.should eql 5
+      expect( ::File.basename( o.next_line.chop! ) ).to eql 'some-todos'
+      expect( o.next_line ).to eql "├── ferbis.code\n"
+      expect( o.finish ).to eql 5
 
       _want_common_finish
     end
@@ -55,8 +55,8 @@ module Skylab::Snag::TestSupport
       on_stream :o
       o = flush_to_content_scanner
       o.advance_N_lines 2
-      o.next_line[ 0, 15 ].should eql "│  └── \e[1;33m2"
-      o.finish.should eql 4
+      expect( o.next_line[ 0, 15 ] ).to eql "│  └── \e[1;33m2"
+      expect( o.finish ).to eql 4
 
       _want_common_finish
     end

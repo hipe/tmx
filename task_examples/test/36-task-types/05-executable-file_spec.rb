@@ -32,7 +32,7 @@ module Skylab::TaskExamples::TestSupport
       it "expresses" do
 
         _rx = /\Aok, executable - .*\/ruby/
-        info_expression_message_.should match  _rx
+        expect( info_expression_message_ ).to match  _rx
       end
 
       def _executable_file
@@ -52,7 +52,7 @@ module Skylab::TaskExamples::TestSupport
 
         _rx = /\ANo such file or directory - \(pth /
 
-        error_expression_message_.should match  _rx
+        expect( error_expression_message_ ).to match  _rx
       end
 
       def _executable_file
@@ -71,7 +71,7 @@ module Skylab::TaskExamples::TestSupport
       it "expresses" do
 
         _rx = /\Aexists but is not executable - \(pth [^ ]+some-file/
-        error_expression_message_.should match  _rx
+        expect( error_expression_message_ ).to match  _rx
       end
 
       def _executable_file

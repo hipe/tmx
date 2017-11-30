@@ -39,9 +39,9 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
         it 'the only (and hence last) item, yielding a stub' do
           removed_x = result.remove_item_via_string_ 'fip'
-          node_s_a.should eql o::EMPTY_A_
-          removed_x.should eql 'fip'
-          result.unparse.should eql o::EMPTY_S_
+          expect( node_s_a ).to eql o::EMPTY_A_
+          expect( removed_x ).to eql 'fip'
+          expect( result.unparse ).to eql o::EMPTY_S_
         end
       end
     end
@@ -52,23 +52,23 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
         it 'position 1 - use first as prototype' do
           inserted = result.insert_item_before_item_string_ 'faap', 'feep'
-          node_s_a.should eql [ 'faap', 'feep', 'forp' ]
-          @result.unparse.should eql "faap ; feep ; forp ; \n"
-          inserted.object_id.should eql @result.object_id  # yikes
+          expect( node_s_a ).to eql [ 'faap', 'feep', 'forp' ]
+          expect( @result.unparse ).to eql "faap ; feep ; forp ; \n"
+          expect( inserted.object_id ).to eql @result.object_id  # yikes
         end
 
         it 'position 2 - use ??? as prototype' do
           inserted = result.insert_item_before_item_string_ 'faap', 'forp'
-          node_s_a.should eql ['feep', 'faap', 'forp' ]
-          @result.unparse.should eql "feep ; faap ; forp ; \n"
-          inserted.content.should eql 'faap'
+          expect( node_s_a ).to eql ['feep', 'faap', 'forp' ]
+          expect( @result.unparse ).to eql "feep ; faap ; forp ; \n"
+          expect( inserted.content ).to eql 'faap'
         end
 
         it "position 3 - appending to [A B] node C; use B as proto, B gets A's separator" do
           inserted = result.append_item_via_string_ 'fuup;'
-          node_s_a.should eql [ 'feep', 'forp', 'fuup' ]
-          @result.unparse.should eql "feep ; forp ; fuup ; \n"
-          inserted.unparse.should eql "fuup ; \n"
+          expect( node_s_a ).to eql [ 'feep', 'forp', 'fuup' ]
+          expect( @result.unparse ).to eql "feep ; forp ; fuup ; \n"
+          expect( inserted.unparse ).to eql "fuup ; \n"
         end
       end
 
@@ -76,16 +76,16 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
         it 'item 1 - result is removed node, both unparse sanely' do
           removed_x = result.remove_item_via_string_ 'feep'
-          node_s_a.should eql ['forp']
-          result.unparse.should eql "forp ; \n"
-          removed_x.should eql 'feep'
+          expect( node_s_a ).to eql ['forp']
+          expect( result.unparse ).to eql "forp ; \n"
+          expect( removed_x ).to eql 'feep'
         end
 
         it 'item 2 - result is removed node, both unparse sanely' do
           removed_x = result.remove_item_via_string_ 'forp'
-          node_s_a.should eql [ 'feep' ]
-          result.unparse.should eql 'feep ; '
-          removed_x.should eql 'forp'
+          expect( node_s_a ).to eql [ 'feep' ]
+          expect( result.unparse ).to eql 'feep ; '
+          expect( removed_x ).to eql 'forp'
         end
       end
     end
@@ -96,22 +96,22 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
         it 'position 1 - uses item 1 as prototype' do
           result.insert_item_before_item_string_ 'faap', 'fap'
-          @result.unparse.should eql "faap;fap;fep ; fip ;\n "
+          expect( @result.unparse ).to eql "faap;fap;fep ; fip ;\n "
         end
 
         it 'position 2 - uses item 1 as prototype' do
           result.insert_item_before_item_string_ 'faap', 'fep'
-          @result.unparse.should eql "fap;faap;fep ; fip ;\n "
+          expect( @result.unparse ).to eql "fap;faap;fep ; fip ;\n "
         end
 
         it 'position 3 - use item 2 as prototype' do
           result.insert_item_before_item_string_ 'faap', 'fip'
-          @result.unparse.should eql "fap;fep ; faap ; fip ;\n "
+          expect( @result.unparse ).to eql "fap;fep ; faap ; fip ;\n "
         end
 
         it 'position 4 (append) - mutate the final two appropriately' do
           result.append_item_via_string_ 'faap  ;  '
-          @result.unparse.should eql "fap;fep ; fip ; faap ;\n "
+          expect( @result.unparse ).to eql "fap;fep ; fip ; faap ;\n "
         end
       end
 
@@ -119,16 +119,16 @@ describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
         it 'item 1 - result is removed node, both unparse sanely' do
           removed_x = result.remove_item_via_string_ 'fap'
-          node_s_a.should eql ['fep', 'fip']
-          result.unparse.should eql "fep ; fip ;\n "
-          removed_x.should eql 'fap'
+          expect( node_s_a ).to eql ['fep', 'fip']
+          expect( result.unparse ).to eql "fep ; fip ;\n "
+          expect( removed_x ).to eql 'fap'
         end
 
         it 'item 2 - result is removed node, both unparse sanely' do
           removed_x = result.remove_item_via_string_ 'fep'
-          node_s_a.should eql [ 'fap', 'fip' ]
-          result.unparse.should eql "fap;fip ;\n "
-          removed_x.should eql 'fep'
+          expect( node_s_a ).to eql [ 'fap', 'fip' ]
+          expect( result.unparse ).to eql "fap;fip ;\n "
+          expect( removed_x ).to eql 'fep'
         end
       end
     end

@@ -51,16 +51,15 @@ describe "[tm] operations - dot-file parsing - examples 490 to 699" do
 
       x = result
       stmts = x.stmt_list.stmts
-      stmts.length.should eql(26)
+      expect( stmts.length ).to eql 26
       stmt = stmts[4]
       a = stmt.attr_list.attrs.first.as.detect do |_a|
         'label' == _a.id.content_text_value
       end
       a_alt = stmt.attr_list.content.a_list.a_list.a_list.a_list.a_list.content
-      a.object_id.should eql(a_alt.object_id)
+      expect( a.object_id ).to eql a_alt.object_id
       a.equals.id.class.expression_symbol == :id_html || fail
-      a.equals.id.content_text_value.should(
-        match(%r{\A<table .+</table>\z}))
+      expect( a.equals.id.content_text_value ).to match(%r{\A<table .+</table>\z})
     end
   end
 end

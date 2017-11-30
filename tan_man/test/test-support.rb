@@ -205,7 +205,7 @@ module Skylab::TanMan::TestSupport
     # -- grammar testing support
 
     def unparse_losslessly
-      result.unparse.should eql some_input_string
+      expect( result.unparse ).to eql some_input_string
     end
 
     def result

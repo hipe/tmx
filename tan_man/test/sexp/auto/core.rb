@@ -29,10 +29,10 @@ module Skylab::TanMan::TestSupport
 
           a = result.stmt_list.stmts
 
-          a.length.should eql items.length
+          expect( a.length ).to eql items.length
 
           a.each_with_index do | x, d |
-            a.fetch( d ).to_s.should eql items.fetch( d )
+            expect( a.fetch( d ).to_s ).to eql items.fetch d
           end
         end
       end

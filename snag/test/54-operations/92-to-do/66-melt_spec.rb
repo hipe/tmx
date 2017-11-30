@@ -36,7 +36,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_neutral_event :no_matches
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white _em.cached_event_value ).to match(
         /\Athere are no found todos #{
          }in files whose name matched "\*\.[a-z]{2,4}" #{
           }in «[^»]+»\z/ )
@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_neutral_event :no_matches
 
-      black_and_white( _em.cached_event_value ).should match(
+      expect( black_and_white _em.cached_event_value ).to match(
         /\Aof the 3 found todos, #{
         }none of them have message content after them #{
         }in files whose name matched "\*\.code" #{
@@ -93,23 +93,23 @@ module Skylab::Snag::TestSupport
 
       ev = want_neutral_event( :process_line ).cached_event_value
 
-      black_and_white( ev ).should match %r(\Apatching file .+jeebis.sc$)
+      expect( black_and_white ev ).to match %r(\Apatching file .+jeebis.sc$)
 
       fh = ::File.open @_source_pn.to_path
-      fh.gets.should eql "aleph\n"
-      fh.gets.should eql "bet ##{}open [#001] we shou[..]\n"
-      fh.gets.should eql "gimmel\n"
-      fh.gets.should be_nil
+      expect( fh.gets ).to eql "aleph\n"
+      expect( fh.gets ).to eql "bet ##{}open [#001] we shou[..]\n"
+      expect( fh.gets ).to eql "gimmel\n"
+      expect( fh.gets ).to be_nil
 
       fh = ::File.open @_manifest_pn.to_path
-      fh.gets.should eql "[#02]       i started at two just to be cute\n"
-      fh.gets.should eql "[#001]       we should fix this\n"
-      fh.gets.should be_nil
+      expect( fh.gets ).to eql "[#02]       i started at two just to be cute\n"
+      expect( fh.gets ).to eql "[#001]       we should fix this\n"
+      expect( fh.gets ).to be_nil
 
       ev = want_OK_event( :summary ).cached_event_value.to_event
-      ev.number_of_files_seen_here.should eql 1
-      ev.number_of_qualified_matches.should eql 1
-      ev.number_of_seen_matches.should eql 1
+      expect( ev.number_of_files_seen_here ).to eql 1
+      expect( ev.number_of_qualified_matches ).to eql 1
+      expect( ev.number_of_seen_matches ).to eql 1
       want_no_more_events
     end
 
@@ -139,7 +139,7 @@ module Skylab::Snag::TestSupport
 
       _em = want_OK_event :summary
 
-      black_and_white( _em.cached_event_value ).should eql(
+      expect( black_and_white _em.cached_event_value ).to eql(
         '(dryly) changed the 3 qualified todos of 5 todos in 2 files' )
 
       want_succeed
