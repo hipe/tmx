@@ -64,7 +64,3 @@ clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normal
 all known near-term practial applications of this (-1) (Z) (Z)->(W,Y,J)
 .to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
 Scanner_ for Scanner.via_array
-convert every '.should' to `expect( ).to` 07-19 03:47:08 (-3) (W) (W)->(J)
-possible bug in discrepancy between test count with quickie and not xx
-doc_test requires special work
-come back around to [sy] and use modern patterns

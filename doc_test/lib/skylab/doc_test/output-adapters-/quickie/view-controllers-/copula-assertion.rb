@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::DocTest
 
   module OutputAdapters_::Quickie
@@ -87,13 +89,15 @@ module Skylab::DocTest
 
         def to_line_stream
 
+          _actual_code = Actual_cha_cha__[ @client.render_actual ]
+
           _source = ::Regexp.escape @matchdata[ :head ]
 
           _bytes = "%r(\\A#{ _source })"  # yeah?
 
-          _line = "#{ @client.render_actual }.should match #{ _bytes }#{ @LTS }"
+          _ = "expect#{ _actual_code }.to match #{ _bytes }#{ @LTS }"
 
-          Common_::Stream.via_item _line
+          Common_::Stream.via_item _
         end
       end
 
@@ -115,7 +119,13 @@ module Skylab::DocTest
 
           s_a = []
           y = ::Enumerator::Yielder.new do |s|
-            s_a.push ( s << @LTS )
+            buff = if s.frozen?  # #spot2.1
+              s.dup
+            else
+              s
+            end
+            buff << @LTS
+            s_a.push buff
           end
 
           y << "_rx = ::Regexp.new #{ _rx }"
@@ -125,7 +135,7 @@ module Skylab::DocTest
           y << "rescue #{ const } => e"
           y << "end"
           s_a.push @LTS
-          y << "e.message.should match _rx"
+          y << "expect( e.message ).to match _rx"
 
           Stream_[ s_a ]
         end
@@ -145,9 +155,70 @@ module Skylab::DocTest
         end
 
         def to_line_stream
-          __ = @client.render_actual
-          _ = "#{ __ }.should eql #{ @client.asset_bytes_for_expected }#{ @LTS }"
+
+          _actual_code = Actual_cha_cha__[ @client.render_actual ]
+
+          _expected_code = @client.asset_bytes_for_expected
+
+          _ = "expect#{ _actual_code }.to eql #{ _expected_code }#{ @LTS }"
+
           Common_::Stream.via_item _
+        end
+      end
+
+      # ==
+
+      class Actual_cha_cha__ < Common_::Monadic
+
+        # experimental hacky aesthetic improvement
+
+        def initialize code
+          @code = code
+        end
+
+        def execute
+          if CLOSE_PAREN_ == @code[-1]
+            if OPEN_PAREN_ == @code[0]
+              @code
+            else
+              __when_might_be_method_call
+            end
+          else
+            _as_normal
+          end
+        end
+
+        def __when_might_be_method_call
+
+          # super hacky aesthetic improvement:
+          # turn `foo( bar )` into `foo bar` so that
+          # we have `expect( foo bar )` not `expect( foo( bar ) )`
+
+          md = %r(\A
+            (?<method_name>
+              [a-z][A-Za-z0-9_]*
+            )
+            \(
+              (?<head_space>[ \t]+)?
+              (?<stuff>[^ \t].+[^ \t])
+              (?<tail_space>[ \t]+)?
+            \)
+          \z)x.match @code
+
+          if md
+            buff = ::String.new
+            buff << OPEN_PAREN_ << HEAD_SPACE_
+            buff << md[ :method_name ]
+            buff << ( md[ :head_space ] || SPACE_ )
+            buff << md[ :stuff ]
+            buff << TAIL_SPACE_ << CLOSE_PAREN_
+          else
+            _as_normal
+          end
+        end
+
+        def _as_normal
+          "#{ OPEN_PAREN_ }#{ HEAD_SPACE_ }#{ @code }#{ TAIL_SPACE_ }#{ CLOSE_PAREN_ }"
         end
       end
 
@@ -189,7 +260,18 @@ module Skylab::DocTest
       /x
 
       SIMPLY_THIS__ = /\A(?<head>.+)\.\.\z/
+
+      # ==
+
+      CLOSE_PAREN_ = ')'
+      HEAD_SPACE_ = SPACE_
+      OPEN_PAREN_ = '('
+      TAIL_SPACE_ = SPACE_
+
+      # ==
+      # ==
     end
   end
 end
+# #history-A.2: inject an aesthetic improvement
 # #history: rename-and-rewrite of "proto predicate"

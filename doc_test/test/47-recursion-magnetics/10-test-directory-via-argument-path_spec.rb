@@ -27,7 +27,7 @@ module Skylab::DocTest::TestSupport
 
     def _expect path
       if @_result != path
-        @_result.should eql path
+        expect( @_result ).to eql path
       end
     end
 

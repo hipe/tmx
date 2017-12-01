@@ -23,7 +23,7 @@ module Skylab::DocTest::TestSupport
       it "the result is an ordinary copula assertion" do
 
         _ = exactly_one_result_line_
-        _ == "( Table[ [] ] ).should eql \"x\\y\"\n" || fail
+        _ == "expect( Table[ [] ] ).to eql \"x\\y\"\n" || fail
       end
 
       it "emits an info (not error)"  do
@@ -49,8 +49,7 @@ module Skylab::DocTest::TestSupport
       it "the result still expression still has the encoded newline in it." do
 
         _ = exactly_one_result_line_
-        _.chop!
-        _ == 'ice_cream.should eql "yay.\n"' || fail
+        _ == %@expect( ice_cream ).to eql "yay.\\n"\n@ || fail
       end
 
       it "no emissions" do

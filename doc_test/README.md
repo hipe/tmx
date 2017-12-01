@@ -25,7 +25,7 @@ if your "asset document" (code file) contains a snippet like this:
 the subject sidesystem produces this:
 
     it "adding two positive integers produces their sum plus one" do
-      ( 1 + 2 ).should eql 4
+      expect( 1 + 2 ).to eql 4
     end
 
 

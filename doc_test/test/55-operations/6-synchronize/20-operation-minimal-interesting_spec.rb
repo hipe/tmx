@@ -28,7 +28,7 @@ module Skylab::DocTest::TestSupport
           black_and_white( ev ) =~ _rx or fail
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -162,8 +162,8 @@ module Skylab::DocTest::TestSupport
         :output_adapter, :quickie,
       )
 
-      st.gets.should match %r(\Arequire_relative\ )
-      st.gets  # blank line..
+      expect( st.gets ).to match %r(\Arequire_relative\ )
+      NEWLINE_ == st.gets || fail
       # ..
     end
   end

@@ -150,14 +150,14 @@ module Skylab::DocTest
 
       def __create_and_push_freeform_branch_frame_for no
 
-        # --  # eek see #spot-6
+        # --  # eek see #spot1.6
         d = @index.reference_index
         d || fail
         node = @original_nodes.fetch d
         if node.is_branch
           margin = node.nodes.first.get_margin
         elsif BLANK_RX_ =~ node.line_string
-          margin = node.line_string.dup
+          margin = node.line_string.dup  # #spot2.1
           margin.chop!
           @result_nodes.pop  # eek don't use the line meant to show indent
         else

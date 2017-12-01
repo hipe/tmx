@@ -39,13 +39,13 @@ module Skylab::DocTest::TestSupport
       it "first test" do
         o = _custom_tuple.fetch 1
         o.category_symbol == :example_node || fail
-        o.nodes[1].line_string == "        1.should eql 1\n" || fail
+        o.nodes[1].line_string == "        expect( 1 ).to eql 1\n" || fail
       end
 
       it "second test" do
         o = _custom_tuple.fetch 2
         o.category_symbol == :example_node || fail
-        o.nodes[1].line_string == "        2.should eql 2\n" || fail
+        o.nodes[1].line_string == "        expect( 2 ).to eql 2\n" || fail
       end
     end
   end

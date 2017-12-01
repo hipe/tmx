@@ -273,7 +273,7 @@ module Skylab::DocTest
             oid == a.fetch( d_ ).object_id
           end
 
-          a_ = a.dup  # was frozen
+          a_ = a.dup  # was frozen #spot2.1
           a_[ _d ] = child_
           a_.freeze
           @nodes = a_
@@ -300,7 +300,7 @@ module Skylab::DocTest
         end
 
         def replace__ a  # freezes
-          @nodes = a.frozen? ? a : a.dup.freeze ; nil
+          @nodes = a.frozen? ? a : a.dup.freeze ; nil  # #spot2.1
         end
 
         # -- readers

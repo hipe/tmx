@@ -75,7 +75,7 @@ three characters, is "#=>". we call this character sequence (actually
 a pattern, because you can use "# =>" too) "magic" (introduced briefly
 at [#018]). this main element of magic generally becomes the
 "equality assertion" on the test-side (the hopefully familiar pattern
-of `actual.should eql expected` in r.s and quickie).
+of `expect( actual ).to eql expected` in r.s and quickie).
 
 however, a pattern that is employed at writing only at the associated
 code-node's matcher-chain is that of "sub-magic", which is our label

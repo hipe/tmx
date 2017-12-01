@@ -14,7 +14,7 @@ module Skylab::DocTest
 
         actual_code_string, expected_code_string, lts = @_stem.to_three_pieces
 
-        "#{ actual_code_string }.must eql #{ expected_code_string }#{ lts }"
+        "this( #{ actual_code_string } ).must eql #{ expected_code_string }#{ lts }"
       end
     end
   end

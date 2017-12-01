@@ -22,7 +22,7 @@ module Skylab::DocTest
         a.push pa.release_line_and_advance_
       end
       @lines = a
-      self  # we don't freeze because of #spot-N
+      self  # we don't freeze because of #spot1.N
     end
 
     def to_line_stream  # might be #testpoint-only..

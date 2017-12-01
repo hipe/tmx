@@ -80,9 +80,11 @@ module Skylab::DocTest::TestSupport
       end
 
       it "invite" do
+
         _be_this = be_line :styled, :e,
           %r(\Asee 'xyzi synchronize -h' for more about options\b)
-        last_line.should _be_this
+
+        expect( last_line ).to _be_this
       end
 
       it "failed" do

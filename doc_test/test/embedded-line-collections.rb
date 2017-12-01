@@ -271,7 +271,7 @@ module Skylab::DocTest::TestSupport
                 indent_level_ = current_indent_level[]
                 if indent_level_ < indent_level
                   ::Kernel._RIDE_THIS
-                  cache.push NEWLINE_  # assumes #spot-2 (frozen)
+                  cache.push NEWLINE_  # assumes #spot1.2 (frozen)
                 else
                   ::Kernel._RIDE_THIS
                   accept_curent_line[]

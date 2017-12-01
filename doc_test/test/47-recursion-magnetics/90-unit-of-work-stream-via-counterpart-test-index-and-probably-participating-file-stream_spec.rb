@@ -119,7 +119,7 @@ module Skylab::DocTest::TestSupport
 
         it "the content of the created file looks right" do
           _line = find_line_with_ 'My_lib_', _test_file_21
-          _line == "      ( My_lib_[ 1 + 1 ] ).should eql 3\n" || fail
+          _line == "      expect( My_lib_[ 1 + 1 ] ).to eql 3\n" || fail
         end
       end
 
@@ -164,7 +164,7 @@ module Skylab::DocTest::TestSupport
             this old test content *is* versioned
 
               it "xx" do
-                3.should eql 4
+                expect( 3 ).to eql 4
               end
           HERE
 

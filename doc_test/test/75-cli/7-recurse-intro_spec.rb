@@ -58,7 +58,7 @@ module Skylab::DocTest::TestSupport
         'would-create' => :create,
         'would-update' => :update,
       }
-      _SPACE = ' '  # SPACE_
+      _SPACE = Home_::SPACE_
 
       o = Home_.lib_.basic::Pathname::Localizer
       localize_asset = o[ ::File.dirname( home_dir_path_ ) ]

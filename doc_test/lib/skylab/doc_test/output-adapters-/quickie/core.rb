@@ -103,7 +103,7 @@ module Skylab::DocTest
       def test_directory_entry
 
         # use "name conventions" to get this instead, if you've got it.
-        # this was exposed solely to support #spot-7.
+        # this was exposed solely to support #spot1.7.
 
         DEFAULT_TEST_DIRECTORY_ENTRY_
       end

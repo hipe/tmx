@@ -213,7 +213,7 @@ module Skylab::DocTest
           __when_neither unasser
         end
 
-        # (we're calling this :#spot-5 - similiar elsewhere, might abstract)
+        # (we're calling this :#spot1.5 - similiar elsewhere, might abstract)
         NIL
       end
 

@@ -35,7 +35,7 @@ module Skylab::DocTest::TestSupport
       o.index == 0 || fail
       o.num_trailing_lines == 1 || fail
       o.full_string.include?(
-        "\n#{ _THIS_MARGIN }( this( :will ).become ).should eql :the_first_example"
+        "\n#{ _THIS_MARGIN }expect( this( :will ).become ).to eql :the_first_example"
       ) || fail
     end
 
@@ -53,7 +53,7 @@ module Skylab::DocTest::TestSupport
       o.index == 2 || fail
       o.num_trailing_lines == 1 || fail
       o.full_string.include?(
-        "\n#{ _THIS_MARGIN }( this( :will ).replace ).should eql :what_was_in_test_B"
+        "\n#{ _THIS_MARGIN }expect( this( :will ).replace ).to eql :what_was_in_test_B"
       ) || fail
     end
 

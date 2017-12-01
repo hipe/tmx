@@ -110,11 +110,11 @@ it. remarkably (and #experimental'ly) the above makes this:
       end
 
       it "you can do this" do
-        foo.has_ring.should eql true
+        expect( foo.has_ring ).to eql true
       end
 
       it "or you can do this" do
-        foo.wear_cloak.should eql :invisible
+        expect( foo.wear_cloak ).to eql :invisible
       end
     end
 
@@ -151,11 +151,11 @@ each of which has an assertion:
 you'll get:
 
     it "jimmy" do
-      ( 1 + 1 ).should eql 3
+      expect( 1 + 1 ).to eql 3
     end
 
     it "jammy" do
-      ( 2 + 2 ).should eql 5
+      expect( 2 + 2 ).to eql 5
     end
 
 (the above is #coverpoint2-4.)

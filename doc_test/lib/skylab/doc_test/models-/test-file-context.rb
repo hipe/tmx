@@ -26,7 +26,7 @@ module Skylab::DocTest
     # and the many hits to the filesystem it needs to orient itself.
     # as such use a "simple" string calculation to localize the argument
     # path: we look for the first occurrence of a given test directory
-    # entry name (for now). :#spot-7
+    # entry name (for now). :#spot1.7
 
     class << self
 

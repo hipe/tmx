@@ -15,7 +15,7 @@ module Skylab::DocTest
   #     )
   #
   #     st.gets  # => "require_relative .."
-  #     st.gets  # blank line..
+  #     NEWLINE_ == st.gets || fail
   #     # ..
 
   module API
@@ -204,18 +204,18 @@ module Skylab::DocTest
   BEFORE_ALL_ = :before_all  # will move
   BLANK_RX_ = /\A[[:space:]]*\z/
   CONST_SEP_ = '::'.freeze
-  DocTest = :_fix_these_  # #todo
   DEFAULT_TEST_DIRECTORY_ENTRY_ = 'test'
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }
-  NEWLINE_ = "\n".freeze  # because #spot-2
+  NEWLINE_ = "\n".freeze  # because #spot1.2
   NIL_ = nil
   NIL = nil  # #open [#sli-116.C]
     FALSE = false ; TRUE = true
   NOTHING_ = nil
+  SPACE_ = ' '
   UNABLE_ = false
   ZERO_LENGTH_LINE_RX_ = /\A$/
 

@@ -128,7 +128,7 @@ module Skylab::DocTest::TestSupport
 
     def the_example_block_looks_OK_
       a = _the_custom_tuple.last.nodes
-      a[1].line_string == "        pxy.class.should eql X_xkcd_MyPerkser\n" || fail
+      a[1].line_string == "        expect( pxy.class ).to eql X_xkcd_MyPerkser\n" || fail
       3 == a.length || fail
     end
   end

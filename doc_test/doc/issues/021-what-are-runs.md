@@ -77,7 +77,7 @@ discussion run, the trade-off is that there is no way to express a comment
 block that starts off with its first line being a code line; the syntax
 simply does not support it. this is however a worthwhile tradeoff
 because as we may see later we never want a code run without a preceding
-discussion run. (:#spot-3)
+discussion run. (:#spot1.3)
 
 
 

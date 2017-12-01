@@ -95,7 +95,7 @@ module Skylab::DocTest
       # get a handle on it and assert the above assumption, in case we
       # want to do something with it.
       #
-      # (current we *do* leave intact because we *do* use it at #spot-6 eew)
+      # (current we *do* leave intact because we *do* use it at #spot1.6 eew)
 
       def __map_lines node
 

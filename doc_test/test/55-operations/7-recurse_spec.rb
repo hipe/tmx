@@ -203,7 +203,7 @@ module Skylab::DocTest::TestSupport
 
           s_a[ 2, 0 ] = [
             "  it \"xyzzytftt3glzdcr\" do\n",
-            "    1.should eql 5\n",
+            "    expect( 1 ).to eql 5\n",
             "  end\n",
           ]
           exp = s_a.join

@@ -18,10 +18,12 @@ module Skylab::DocTest::TestSupport
       end
 
       it "emits" do
+
         _be_this = be_emission_ending_with :expression, :ping do |y|
           y == [ "pong from doc-test** ! **" ] || fail
         end
-        only_emission.should _be_this
+
+        expect( only_emission ).to _be_this
       end
     end
 
@@ -43,7 +45,7 @@ module Skylab::DocTest::TestSupport
           _.include? "no such association 'strange'" or fail
         end
 
-        only_emission.should _be_this
+        expect( only_emission ).to _be_this
       end
     end
   end

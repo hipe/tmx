@@ -30,5 +30,5 @@ the above produces:
       rescue Home_::Your::CustomException => e
       end
 
-      e.message.should match _rx
+      expect( e.message ).to match _rx
     end

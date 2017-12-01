@@ -40,7 +40,7 @@ module Skylab::DocTest::TestSupport
       it "the example block looks right" do
         a = _custom_tuple.last.nodes
         a[1].line_string == "        o = Home_::Models_::TestFileContext.via_path X_ab_cd_PATH\n" || fail
-        a[2].line_string == "        o.short_hopefully_unique_stem.should eql \"ad_gj\"\n" || fail
+        a[2].line_string == "        expect( o.short_hopefully_unique_stem ).to eql \"ad_gj\"\n" || fail
         4 == a.length || fail
       end
     end

@@ -37,11 +37,11 @@ module Skylab::DocTest::TestSupport
       end
 
       it "test 1" do
-        _test "test one", "X_xkcd_Foo", _at( 0, 1 )
+        _test "test one", "X_xkcd_Foo.foo", _at( 0, 1 )
       end
 
       it "test 2" do
-        _test "test two", "X_xkcd_Bar", _at( 1, 1 )
+        _test "test two", "X_xkcd_Bar.bar", _at( 1, 1 )
       end
     end
 
@@ -91,7 +91,7 @@ module Skylab::DocTest::TestSupport
 
         want_unindented_at_ 2, <<-HERE
           it "description for the first test" do
-            ( p[ 1, 2, 3 ] ).should eql "no: 3 for 1..2"
+            expect( p[ 1, 2, 3 ] ).to eql "no: 3 for 1..2"
           end
         HERE
       end
@@ -109,7 +109,7 @@ module Skylab::DocTest::TestSupport
       _exp = "      it \"#{ dsc }\" do\n"
       nodes[0].line_string == _exp || fail
 
-      _exp = "        #{ const }."
+      _exp = "        expect( #{ const } ).to"
       _act = nodes[1].line_string[ 0, _exp.length ]
       _act == _exp || fail
     end

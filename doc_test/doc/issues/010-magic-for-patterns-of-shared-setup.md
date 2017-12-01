@@ -71,7 +71,7 @@ the above produces:
       end
 
       it "here's one test that tests side effects of the above" do
-        X_wd_sd_MyModule::MySecondModuleWhichIsInside.bazoink.should eql :_dr_seuss_
+        expect( X_wd_sd_MyModule::MySecondModuleWhichIsInside.bazoink ).to eql :_dr_seuss_
       end
     end
 

@@ -45,7 +45,7 @@ module Skylab::DocTest::TestSupport
         _want_big_string _widget_subject_instance, <<-HERE.unindent
           def test_case_smooth_mamma_jamma
             code line w/o ting ting
-            some( thing ).must eql :thang
+            this( some( thing ) ).must eql :thang
           end
         HERE
       end
@@ -55,7 +55,7 @@ module Skylab::DocTest::TestSupport
         _want_big_string _real_subject_instance, <<-HERE.unindent
           it "smooth mamma jamma" do
             code line w/o ting ting
-            some( thing ).should eql :thang
+            expect( some thing ).to eql :thang
           end
         HERE
       end

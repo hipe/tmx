@@ -86,7 +86,7 @@ module Skylab::DocTest
       path = @original_test_path
       if path
         if Home_.lib_.system.filesystem.path_looks_absolute path
-          path = path[ 1..-1 ]   # awful - see #spot-8
+          path = path[ 1..-1 ]   # awful - see #spot1.8
         end
         Home_::Models_::TestFileContext.via_path_and_choices__(
           path, @choices )

@@ -58,8 +58,13 @@ module Skylab::DocTest
 
         -> body_line_stream do
           body_line_stream.map_by do |line|
-            line.gsub! rx, repl  # #to-benchmark :[#ts-015] - is it faster?
-            line
+            # #to-benchmark :[#ts-015] - is it faster?
+            if line.frozen?  # #spot2.1
+              line.gsub rx, repl
+            else
+              line.gsub! rx, repl
+              line
+            end
           end
         end
       end

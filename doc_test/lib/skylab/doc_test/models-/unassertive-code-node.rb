@@ -47,7 +47,7 @@ module Skylab::DocTest
       else
         self._WHAT_DO_WE_DO_WITH_CODE_RUNS_WITH_NO_MAGIC
       end
-      # this is simlar to #spot-5 - we might abstract
+      # this is simlar to #spot1.5 - we might abstract
     end
 
     def starts_with_what_looks_like_a_constant_assignment

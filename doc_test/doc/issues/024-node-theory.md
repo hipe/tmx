@@ -39,7 +39,7 @@ synchronization.)
 
 first of all, let's assume we're cleanly pairing off discussion runs
 and code runs (for they should be cleanly alternating, and per
- #spot-3 they should always start with a discussion run).
+ #spot1.3 they should always start with a discussion run).
 
 there are code runs that look like examples (because they have one
 or more lines that look like tests because of the magic copula),

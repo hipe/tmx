@@ -90,7 +90,7 @@ module Skylab::DocTest
     def ___gets_from_cache_flatly
 
       pair = @_cache_stream.gets
-      if pair  # like #spot-4
+      if pair  # like #spot1.4
 
         code_run = pair.code_run
         _discu_run = pair.discussion_run

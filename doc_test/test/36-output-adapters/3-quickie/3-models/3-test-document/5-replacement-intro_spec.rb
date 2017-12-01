@@ -50,7 +50,7 @@ module Skylab::DocTest::TestSupport
         a = _product.nodes
         s = "#{ _margin }  "  # #indent eek
         a[ 2 ].line_string == "#{ s }some code la la\n" || fail
-        a[ 3 ].line_string == "#{ s }( fo.wobble bar ).should eql :baz\n" || fail
+        a[ 3 ].line_string == "#{ s }expect( fo.wobble bar ).to eql :baz\n" || fail
         7 == a.length || fail
       end
 
@@ -96,7 +96,7 @@ module Skylab::DocTest::TestSupport
 
       _exp = <<-HERE
         it 'zizzo' do
-          hi.should eql :hey
+          expect( hi ).to eql :hey
         end
       HERE
 

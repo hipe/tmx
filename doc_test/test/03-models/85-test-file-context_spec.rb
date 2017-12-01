@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
 
       it "and produce a stem like this" do
         o = Home_::Models_::TestFileContext.via_path X_xkcd_PATH
-        o.short_hopefully_unique_stem.should eql "ad_gj"
+        expect( o.short_hopefully_unique_stem ).to eql "ad_gj"
       end
     end
   end

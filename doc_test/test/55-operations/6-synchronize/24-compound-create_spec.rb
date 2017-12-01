@@ -65,7 +65,7 @@ module Skylab::DocTest::TestSupport
 
         a[1].nodes.first.line_string == "        module X_xkcd_MyApp\n" || fail
         a[1].nodes[1].line_string == "          def MyClient.xx\n" || fail
-        a[-2].line_string == "        cli.xx.should eql :yy\n" || fail
+        a[-2].line_string == "        expect( cli.xx ).to eql :yy\n" || fail
         a.length == 6 || fail
       end
     end

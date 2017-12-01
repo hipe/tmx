@@ -90,7 +90,13 @@ module Skylab::DocTest
       end
       alias_method :[], :call
 
-      def __when_some buffer, st, para
+      def __when_some first_line, st, para
+
+        buffer = if first_line.frozen?  # #spot2.1
+          first_line.dup
+        else
+          first_line  # awful..
+        end
 
         margin_s = para.margins.first  # or last or whatever..
 

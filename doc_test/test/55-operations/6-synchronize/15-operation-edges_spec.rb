@@ -31,11 +31,11 @@ module Skylab::DocTest::TestSupport
           describe "winzoorz" do
 
             it "money" do
-              :oney.should eql funny
+              expect( :oney ).to eql funny
             end
 
             it "wummy mummy" do
-              jimbo( :jambo ).should eql jamboree
+              expect( jimbo :jambo ).to eql jamboree
             end
           end
         HERE
