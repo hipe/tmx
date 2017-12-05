@@ -7,7 +7,7 @@ some dootilies can footilie
 
 
 
-## :#coverpoint5-3 - exceptamundo
+## :#coverpoint5.3 - exceptamundo
 
 here's a Gazpacho story:
 

@@ -26,7 +26,7 @@ module Skylab::Common::TestSupport
 
       yes or fail
 
-      _ = matcher.failure_message_for_should
+      _ = matcher.failure_message  # #[#ts-033.2]
 
       expect( _ ).to eql "had 'gamma', needed 'three' for the #{
         }third component of [:one, :two, :gamma, :potato]"

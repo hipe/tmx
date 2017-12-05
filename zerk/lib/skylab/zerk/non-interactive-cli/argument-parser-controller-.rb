@@ -179,7 +179,7 @@ module Skylab::Zerk
 
         def to_controller_against head_parsable_formal_bx  # per [#028]:#"Head parse"
 
-          # the ways in which this is terrible are elucidated at [#003] #note-1
+          # the ways in which this is terrible are elucidated at [#003.B]
 
           _EEK_KN = nil
 

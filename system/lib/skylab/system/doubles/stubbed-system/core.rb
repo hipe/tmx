@@ -261,7 +261,7 @@ module Skylab::System
 
           when 4
             # cheating a bit here - since we ourselves never need to specify
-            # all four components in a definition (because #note-1) then
+            # all four components in a definition (because [#here.B]) then
             # assume that when there *are* four components, it's #pass-thru
             a
 

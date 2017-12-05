@@ -4,7 +4,7 @@ module Skylab::Task::TestSupport
 
   describe "[ta] eventpoint - stationary transition intro" do
 
-    # :#coverpoint-1.1.1:
+    # :#coverpoint1.1.1:
     #
     # in a full rearchitecting of an older mechanism it replaces, we offer
     # that the agent profile can express a formal "stationary transition",

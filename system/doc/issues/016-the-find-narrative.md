@@ -54,7 +54,7 @@ then another renovation).
 
 
 
-## "amazing hax" (:#note-130) (now :+[#sl-106])
+## "amazing hax" (now #[#sl-106]) :[#here.B]
 
 so this is a fun weird experimental pattern: we don't want the command
 object itself to have to worry about the logical mechanics of building

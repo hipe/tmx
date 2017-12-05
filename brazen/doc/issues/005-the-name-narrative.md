@@ -1,6 +1,6 @@
 # the name narrative :[#005]
 
-## the contagious name function :[#.A]
+## the contagious name function :[#here.A]
 
 ### the reactive tree is a sparse subtree of the constant namespace
 

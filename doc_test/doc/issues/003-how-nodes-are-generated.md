@@ -118,7 +118,7 @@ it. remarkably (and #experimental'ly) the above makes this:
       end
     end
 
-(the above is #coverpoint2-3.)
+(the above is #coverpoint2.3.)
 
 here's some edges while we're here.
 
@@ -158,7 +158,7 @@ you'll get:
       expect( 2 + 2 ).to eql 5
     end
 
-(the above is #coverpoint2-4.)
+(the above is #coverpoint2.4.)
 
 see the above referenced [#024] and then [#010] after it to learn
 about patterns of shared setup that can be recognized and expressed.

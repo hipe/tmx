@@ -97,7 +97,7 @@ module Skylab::DocTest::TestSupport
         end
       end
 
-      def __tuple_array_via_stream st, event_log, fs  # eek [#029] #note-3
+      def __tuple_array_via_stream st, event_log, fs  # eek [#029.D]
 
         st.map_by do |uow|
 

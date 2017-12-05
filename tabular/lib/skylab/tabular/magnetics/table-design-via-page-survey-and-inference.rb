@@ -43,7 +43,7 @@ module Skylab::Tabular
 
         scn = @page_surveyish.field_survey_writer.to_field_survey_scanner
 
-        # #coverpoint-1-1: empty page
+        # #coverpoint1.1: empty page
 
         until scn.no_unparsed_exists
 

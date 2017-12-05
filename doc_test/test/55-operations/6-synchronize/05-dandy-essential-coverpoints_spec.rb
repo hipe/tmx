@@ -29,7 +29,7 @@ module Skylab::DocTest::TestSupport
     # A D B C E
     # 0 1 2 3 4
 
-    it "nonexistent, leading node is added at head" do  # #coverpoint3-1
+    it "nonexistent, leading node is added at head" do  # #coverpoint3.1
 
       o = _index.fetch "this is test A"
       o.index == 0 || fail
@@ -41,13 +41,13 @@ module Skylab::DocTest::TestSupport
 
     it "existed in target" do
 
-      # #coverpoint3-4:
+      # #coverpoint3.4:
 
       bx = _index
       o = bx.fetch "this is test D"
       o.index == 1 || fail
 
-      # #coverpoint3-2:
+      # #coverpoint3.2:
 
       o = bx.fetch "this is test B"
       o.index == 2 || fail
@@ -57,7 +57,7 @@ module Skylab::DocTest::TestSupport
       ) || fail
     end
 
-    it "did not exist in target, was not first to be inserted, goes after X" do  # #coverpoint3-3
+    it "did not exist in target, was not first to be inserted, goes after X" do  # #coverpoint3.3
 
       bx = _index
       o = bx.fetch "this is test C"

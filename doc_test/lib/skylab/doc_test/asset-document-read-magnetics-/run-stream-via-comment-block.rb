@@ -35,7 +35,7 @@ module Skylab::DocTest
         @_reached_end_of_input && break
       end
 
-      if @_reached_end_of_input  # edge case - all lines blank (#coverpoint1-9)
+      if @_reached_end_of_input  # edge case - all lines blank (#coverpoint1.9)
 
         _init_empty_discussion_run
         blanks.each do |o|
@@ -85,7 +85,7 @@ module Skylab::DocTest
           break
         end
 
-        if @_line_is_blank  # #coverpoint1-1
+        if @_line_is_blank  # #coverpoint1.1
           @_discussion_run.accept_line_object _release_blank_line
           redo
         end
@@ -105,9 +105,9 @@ module Skylab::DocTest
               break
             end
             # (when indentation increased but not by enough to reach
-            #  threshold, push indent level inwards #coverpoint1-2)
+            #  threshold, push indent level inwards #coverpoint1.2)
           else
-            INDENT_HAS_DECREASED__ == d || Home_._SANITY  # #coverpoint1-4
+            INDENT_HAS_DECREASED__ == d || Home_._SANITY  # #coverpoint1.4
           end
           _accept_new_indent_level
         end
@@ -141,7 +141,7 @@ module Skylab::DocTest
           break
         end
 
-        if @_line_is_blank  # #coverpoint1-6
+        if @_line_is_blank  # #coverpoint1.6
           cr.accept_line_object _release_blank_line
           redo
         end
@@ -156,7 +156,7 @@ module Skylab::DocTest
 
           if INDENT_HAS_INCREASED__ == d
 
-            if INDENT_THRESHOLD__ <= @_indent_delta  # #coverpoint1-5
+            if INDENT_THRESHOLD__ <= @_indent_delta  # #coverpoint1.5
               cr.accept_line_via_offsets( * _release_code_line_args )
               redo
             end

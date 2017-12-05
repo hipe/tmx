@@ -86,7 +86,7 @@ module Skylab::TestSupport
         @muxer.add BUFFER_I__, Home_::Library_::StringIO.new
       end
 
-      if @do_debug_p  # #note-030
+      if @do_debug_p  # see [#023.B]
         add_debugging_downstream
       end ; nil
     end

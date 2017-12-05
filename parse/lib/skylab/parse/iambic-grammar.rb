@@ -446,7 +446,7 @@ module Skylab::Parse
 
       def __do_parse_tail_leg o
 
-        # (#coverpoint-1-1: tail leg)
+        # (#coverpoint1.1: tail leg)
 
         leg = Leg__.new o, @scanner, self
         leg.extend @postfixed_modifiers

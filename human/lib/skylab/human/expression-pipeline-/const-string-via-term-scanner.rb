@@ -3,7 +3,7 @@ module Skylab::Human
   ExpressionPipeline_::ConstString_via_TermScanner = -> do  # 2x. [here] only.
 
     # in "classical" autoloading the transition from const to filename is
-    # "lossy" (described exactly at [#co-024.3]), i.e you cannot cleanly
+    # "lossy" (described exactly at [#co-024.4]), i.e you cannot cleanly
     # infer `NCSA_Spy` from "ncsa-spy.rb". however over here we can afford
     # to make some assumptions that we can't make with general autoloading,
     # assumptions that free us from relying on facilities with more moving

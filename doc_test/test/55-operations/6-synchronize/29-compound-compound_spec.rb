@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
 
       call_by do
 
-        _asset = fixture_file_ '25-compound-compound.kd'  # #coverpoint5-6
+        _asset = fixture_file_ '25-compound-compound.kd'  # #coverpoint5.6
 
         my_API_common_generate_(
           asset_line_stream: ::File.open( _asset ),

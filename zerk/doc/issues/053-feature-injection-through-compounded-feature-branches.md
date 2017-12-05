@@ -59,7 +59,7 @@ that will be complicit in the merge..
 
 
 
-## hash collisions between branches :#note-1
+## hash collisions between branches :[#here.B]
 
 what if two or more of the feature branches share the same key for
 their branch items?

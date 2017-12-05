@@ -111,7 +111,7 @@ encapsulates (and exposes):
 
 
 
-## node :[#.A]: a jargon glossary
+## node :[#here.A]: a jargon glossary
 
   + "head token": whatever token is at the front of the token stream at
     that moment; specifically when a parsing agent is not in the middle

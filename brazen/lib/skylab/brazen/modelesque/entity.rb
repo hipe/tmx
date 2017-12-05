@@ -355,7 +355,7 @@ module Skylab::Brazen
 
       # <-
 
-    def via_properties_init_ivars  # #note-360
+    def via_properties_init_ivars  # see [#047.B]
 
       formals = self.formal_properties
 

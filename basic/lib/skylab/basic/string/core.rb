@@ -59,7 +59,7 @@ module Skylab::Basic
 
       MUSTACHE_RX___ = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
 
-      define_method :mutate_by_unindenting, -> do  # see #note-01
+      define_method :mutate_by_unindenting, -> do  # see [#here.B]
 
         say = nil ; rx = nil
         p = -> s do
@@ -400,7 +400,7 @@ module Skylab::Basic
             ' (?<single_quoted_bytes> (?: [^\\\\'] | \\\\. )* ) '
           )
         >
-        # #coverpoint4-3 (in [dt]!): we need those four (or three :/) backslashes.)
+        # #coverpoint4.3 (in [dt]!): we need those four (or three :/) backslashes.)
 
         QUOTED_STRING_REGEX_PART = quoted_string_part
         SCANNER_MATCH_RX___ = /\G#{ quoted_string_part }/x
@@ -440,7 +440,7 @@ module Skylab::Basic
         freeze
       end
 
-      def redefine
+      def redefine  # compare Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
         otr = dup
         yield otr, FUNCTION_FUNCTIONS__
         otr.freeze

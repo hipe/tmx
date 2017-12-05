@@ -162,15 +162,15 @@ module Skylab::Zerk
 
         def __receive_semi_normal_string s
 
-          if s  # agent can puts nil to mean blank line #coverpoint-2-2
+          if s  # agent can puts nil to mean blank line #coverpoint2.2
 
-            use_s = if Styling__::SIMPLE_STYLE_RX =~ s  # 1/3 of agents (see #note-1)
+            use_s = if Styling__::SIMPLE_STYLE_RX =~ s  # [#here.B] 1/3 of agents
               Styling__::Unstyle_styled[ s ]
             else
               s
             end
 
-            if MULTIPLE_LINES___ =~ use_s  # #coverpoint-2-4
+            if MULTIPLE_LINES___ =~ use_s  # #coverpoint2.4
 
               line_stream = Basic_[]::String::LineStream_via_String[ use_s ]
               use_s = line_stream.gets
@@ -275,7 +275,7 @@ module Skylab::Zerk
 
         :on_entry, -> _sm do
 
-          :after_section  # not `beginning` per #coverpoint-2-6
+          :after_section  # not `beginning` per #coverpoint2.6
         end,
       )
 
@@ -286,7 +286,7 @@ module Skylab::Zerk
           # rather than map every line with this check, we just write this
           # particular node to be indifferent to whether the remote agent
           # did (for example) `serr.puts` or `serr puts ""`
-          # #coverpoint-2-2
+          # #coverpoint2.2
 
           if ! scn.no_unparsed_exists
             x = scn.head_as_is
@@ -302,7 +302,7 @@ module Skylab::Zerk
             stay = sm.downstream.__receive_notification_of_blank_line_
             sm.send_downstream
           else
-            # another part of #coverpoint-2-5
+            # another part of #coverpoint2.5
             stay = true
           end
 
@@ -331,7 +331,7 @@ module Skylab::Zerk
           if _stay
             :after_common_section_line
           else
-            sm.send_downstream  # #coverpoint-2-7
+            sm.send_downstream  # #coverpoint2.7
             :early_ending
           end
         end,
@@ -432,7 +432,7 @@ module Skylab::Zerk
         def receive_header content_s
           remove_instance_variable :@__header_mutex
           @header_symbol = content_s.downcase.intern
-            # downcasing above is #coverpoint-2-6
+            # downcasing above is #coverpoint2.6
           NIL
         end
 
@@ -480,7 +480,7 @@ module Skylab::Zerk
           # indeed this seems to be the least surprising behavior. a help
           # screen designer armed with this knowlege could phrase sections
           # knowing that such a cut-off would happen.
-          # :#coverpoint-2-3
+          # :#coverpoint2.3
 
           if _is_target_section_XX
             _stop_parsing_XX

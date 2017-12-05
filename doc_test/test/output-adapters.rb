@@ -44,7 +44,7 @@ module Skylab::DocTest::TestSupport
 
     # ==
 
-    class ForwardsSyncSession___  # why this exists: [#029] #note-6
+    class ForwardsSyncSession___  # why this exists: [#029.G]
 
       attr_writer(
         :asset_path,

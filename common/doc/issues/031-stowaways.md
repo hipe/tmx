@@ -1,6 +1,6 @@
 # notes about the "stowaway" subsystem :[#031]
 
-## how string-based stowaway specifiers are interpreted
+## how string-based stowaway specifiers are interpreted :[#here.B]
 
 for aesthetics and agility, stowaways expressed in this string form
 are interpreted as "node path tails" rather than just as filesystem
@@ -77,7 +77,7 @@ be loaded.
 
 
 
-## the autoloaderization "contract" for stowing away
+## the autoloaderization "contract" for stowing away :[#here.C]
 
 the "only" problem with stowaways is that it breaks the "normal" flow
 through which the particular host file would be loaded. normally when

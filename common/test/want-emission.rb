@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Want_Emission  # some notes in [#065]
+  module Want_Emission  # see [#065]
 
     # per name conventions, all method *and ivar* names with neither leading
     # nor trailing underscores are part of the [sub-]subject's public API.
@@ -53,7 +53,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    # -- oldschool retro-fitting (see [#]note-C)
+    # -- oldschool retro-fitting (see [#here.C])
 
       module Test_Context_Instance_Methods
 
@@ -404,7 +404,7 @@ module Skylab::Common::TestSupport
         "expected no more events, had #{ _want_event_description em }"
       end
 
-      def _gets_expev_emission  # a compound assumption.. (#note-B)
+      def _gets_expev_emission  # a [#here.B] compound assumption
         @event_log.gets
       end
 
@@ -621,7 +621,7 @@ module Skylab::Common::TestSupport
           send m
         end
 
-        # we conditionally skip the below checks because [#]note-A
+        # we conditionally skip the below checks because [#here.A]
 
         m = exp.message_method_name
         if m && ! @_failures
@@ -840,7 +840,7 @@ module Skylab::Common::TestSupport
       def __when_failed  # #c.p
 
         if @_test_context.respond_to? :quickie_fail_with_message_by
-          _p = method :failure_message_for_should
+          _p = method :failure_message  # #[#ts-033.2]
           @_test_context.quickie_fail_with_message_by( & _p )
         else
           UNABLE_
@@ -932,7 +932,7 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    class Log  # exactly #note-5 (see).
+    class Log  # exactly [#here.E]
 
       class << self
 
@@ -997,7 +997,7 @@ module Skylab::Common::TestSupport
 
       def release_to_mutable_array  # [dt]
 
-        if :option_time == @_state  # #note-6 - kept simple for now..
+        if :option_time == @_state  # [#here.F] - kept simple for now..
           _transition_to_record_time
         end
 
@@ -1111,7 +1111,7 @@ module Skylab::Common::TestSupport
 
     module Handler_via_options___ ; class << self
 
-      # see #note-7 "listener vs. handler"
+      # see [#here.G] "listener vs. handler"
       #
       # most of subject is concerned with the case of when debugging is
       # on and certain channels are being ignored: for each emission that

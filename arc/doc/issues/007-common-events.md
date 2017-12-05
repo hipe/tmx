@@ -30,7 +30,7 @@ conventions discovered since their inception.
 
 
 
-## :#note-on-point-of-reference
+## #todo DETACHED (was :#n-ote-on-point-of-reference
 
 with some event production expressions we're actually getting to the
 point where there's "too much" context (albeit well formed, unique).

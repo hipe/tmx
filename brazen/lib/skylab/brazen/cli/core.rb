@@ -112,7 +112,7 @@ module Skylab::Brazen
         @__filesystem = x
       end
 
-      def redefine
+      def redefine  # semantically like Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
         Resources_HOT_NEW_TAKE___.define do |o|
           yield o
           o.receive_error_channel_by = method :_receive_error_channel

@@ -297,7 +297,7 @@ module Skylab::TMX
 
           o.user_scanner _user_scanner
 
-          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint1.C OPEN
 
           o.emit_into _custom_listener
         end
@@ -399,7 +399,7 @@ module Skylab::TMX
 
           o.user_scanner _user_scanner
 
-          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint1.A OPEN
 
           o.emit_into @listener
         end
@@ -454,7 +454,7 @@ module Skylab::TMX
 
           o.subtract_primary :result_in_tree  # for now
 
-          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint1.B OPEN
 
           o.user_scanner _user_scanner
 
@@ -741,10 +741,10 @@ module Skylab::TMX
           _invite_to_general_help
 
         when :feature_parse_error, :primary_parse_error
-          # :#coverpoint-1-F: for now, on a primary parse error, we invite
+          # :#coverpoint1.F: for now, on a primary parse error, we invite
           # to a help IFF it presumably belongs to the root. in future etc.
           if 1 == @selection_stack.length
-            _invite_to_general_help  # #coverpoint-1-F
+            _invite_to_general_help  # #coverpoint1.F
           end
         end
 
@@ -823,7 +823,7 @@ module Skylab::TMX
         table_schema: :__receive_table_schema,
       }
 
-      def _push_frame  # exactly [#ze-055] #note-1, #note-2
+      def _push_frame  # exactly [#ze-055.2], [#ze-055.3]
 
         _frame = NonRootFrame___.define do |fr|
           fr.below_didactics_by = @selection_stack.last.didactics_by
@@ -905,7 +905,7 @@ module Skylab::TMX
           )
           ACHIEVED_
         else
-          NIL  # nil not false, #coverpoint-1-C
+          NIL  # nil not false, #coverpoint1.C
         end
       end
 

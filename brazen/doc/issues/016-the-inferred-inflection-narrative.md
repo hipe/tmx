@@ -91,7 +91,7 @@ to determine a noun: if there is a custom noun, use that. otherwise, if
 there is a parent node, use that (assuming the common convention).
 
 otherwise, if there is custom inflection with a verb (and since we have
-no parent), assume that the class name is a noun. use that.  :#note-170
+no parent), assume that the class name is a noun. use that. :[#here.B]
 
 
 

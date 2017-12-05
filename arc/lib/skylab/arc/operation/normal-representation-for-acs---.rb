@@ -273,7 +273,7 @@ module Skylab::Arc
 
         # --
 
-        # see #note-1 and #note-2 in [#026]
+        # see [#026.B] and [#026.C]
 
         def singplur_category_of_association
           _defined_association.singplur_category

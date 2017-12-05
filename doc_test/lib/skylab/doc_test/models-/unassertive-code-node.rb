@@ -73,7 +73,7 @@ module Skylab::DocTest
     end
 
     def to_particular_paraphernalia_under x
-      # educated guess.. sort of hacked for #coverpoint5-5
+      # educated guess.. sort of hacked for #coverpoint5.5
       @_choices.particular_paraphernalia_of_for_under :shared_subject, self, x
     end
 
@@ -196,13 +196,13 @@ module Skylab::DocTest
           (?<const> #{ const_rxs } )[ \t]*=[^=>]
         )
       /x
-      # #note-1
+      # #[#here.B]
 
       def __line_looks_like_assignment_line
         _match ASSIGNMENT_RX___
       end
 
-      ASSIGNMENT_RX___ = /\G(?<lvalue_string>[_a-z][_a-zA-Z0-9]*)[ \t]*=[^=>]/ # #note-1
+      ASSIGNMENT_RX___ = /\G(?<lvalue_string>[_a-z][_a-zA-Z0-9]*)[ \t]*=[^=>]/  # #[#here.B]
 
       def _match rx
         @_matchdata = rx.match @_line.string, @_line.content_begin

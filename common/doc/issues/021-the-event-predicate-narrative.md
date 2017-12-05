@@ -40,7 +40,7 @@ In theory the core lifecycle of one such nub should consist of:
   parallel in any way. It is just coincidence that they are both
   arrays.)
 
-  [3.] IFF the above was false you can call `failure_message_for_should`
+  [3.] IFF the above was false you can call #[#ts-033.3] `failure_message`
   and it will give you a lingual-ly clever string explaining the failure.
 
   [4] You should be able to call `descrption` any time after `match`

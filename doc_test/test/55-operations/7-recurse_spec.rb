@@ -139,7 +139,7 @@ module Skylab::DocTest::TestSupport
         want_no_emissions
       end
 
-      # tests that have portions of their names in all caps [#029] #note-5
+      # tests that have portions of their names in all caps [#029.F]
 
       it "third - test file does not exist at all - CREATE.." do
 

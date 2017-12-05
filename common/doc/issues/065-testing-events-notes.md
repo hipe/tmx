@@ -2,7 +2,7 @@
 
 
 
-## local idioms: "handler" vs "listener" :#note-7
+## local idioms: "handler" vs "listener" :[#here.7]
 
 reminder: as local idioms, "listener" and "handler" are almost the
 same: both receive a list of symbols (the "channel"), and both
@@ -25,7 +25,7 @@ and ergonomics).
 
 
 
-## :#note-5
+## :[#here.E]
 
 as well as being the underlying workhorse behind most of this library,
 the subject is also available to clients to be used as a standalone
@@ -58,16 +58,8 @@ this used to be function soup (see tombstone).
 
 
 
-### :#note-6
 
-we could do the thing with a hash that associates states with
-offsets and and array of transition methods, and call each
-necessary method but that's just barely overkill yet..
-
-
-
-
-## a hierarchy of checks  :note-A
+## a hierarchy of checks  :[#here.A]
 
 broadly we can categorize the checks we make here into two: there are
 those that relate to the taxonomy (classification) of the event (to the
@@ -111,7 +103,7 @@ failure message to a longer one for any given single failing test. whew!
 
 
 
-## we assume that this ivar is intialized because.. (:#note-B)
+## we assume that this ivar is intialized because.. :[#here.B]
 
 we assume that under typical oldschool usage the system-under-test API (or
 similar) was called with the event handler proc that came from the event
@@ -123,8 +115,7 @@ stream for the event log for more modern usage (experimentally).
 
 
 
-## about this legacy, oldschool section :note-C
-
+## about this legacy, oldschool section :[#here.C]
 
 the below block is what remains of the oldschool stream-oriented
 assertion methods. their bodies have been replaced with logic to bridge
@@ -180,7 +171,7 @@ we have overhauled "want event" so it is now fresher than this.
 
 
 
-## :#note-4 - about the newschool reification of expression emissions
+## about the newschool reification of expression emissions
 
 the earliest incarnation of this library had a bias towards events
 over emissions. as such the old way was that when an emission was

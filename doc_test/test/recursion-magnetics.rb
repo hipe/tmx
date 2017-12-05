@@ -28,7 +28,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def normalize_real_test_file_path__ path
-      # this craziness is explained in [#029] #note-1
+      # this craziness is explained in [#029.B]
       _omg = path.reverse
       scn = Home_::RecursionModels_::EntryScanner.via_path_ _omg
       egads = []

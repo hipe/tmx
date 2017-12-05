@@ -1,6 +1,6 @@
 # notes about our tests :[#029]
 
-## :#note-4
+## :[#here.E]
 
 to fit with the API for a generated [ze] client to "express" these,
 we use [#ze-025] whose semantics (`express_into_under yielder, expag`)
@@ -25,7 +25,7 @@ and API/functional tests.
 
 
 
-## :#note-1
+## :[#here.B]
 
 during development of a gem we often swap-out the gem in the gems
 directory with a symlink that points to the development version of
@@ -69,7 +69,7 @@ string is trivial enough, like we said we don't care :P
 
 
 
-## :#note-2
+## :[#here.C]
 
 the "resolve test directory" magnet given a search for "X" under
 "/a/b" will check for "/a/b/X", "/a/X" and "/X" *regardless* of
@@ -85,7 +85,7 @@ question.
 
 
 
-## :#note-3
+## :[#here.D]
 
 kinda fun but kinda scary - accepting that our units of work might
 be expressed in any arbitrary order separate form the order in which
@@ -98,7 +98,7 @@ tailor made "shave" (basically pop) method of the event log to
 
 
 
-## :#note-5
+## :[#here.F]
 
 these tests use a mocked system but a real filesystem, an arrangement
 that has particular justification and particular consequences. first,
@@ -148,7 +148,7 @@ the test can restore it.
 
 
 
-## :#note-6
+## :[#here.G]
 
 we get a few things from this:
 

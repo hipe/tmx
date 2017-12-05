@@ -243,7 +243,7 @@ _
 
 
 
-## :#note-1
+## :[#here.B]
 
 for typical use cases we load the stdlib option parser library (`optparse`
 and `::OptionParser`) and we use this module 2x: once to build the o.p and

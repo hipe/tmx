@@ -46,7 +46,7 @@ module Skylab::Common::TestSupport
 
     it "when had none and expect one" do
 
-      event_log.handle_event_selectively  # kick it (see [#065]#note-B)
+      event_log.handle_event_selectively  # kick it (see [#065.B])
 
       want_one_event :wazlow
 
@@ -64,7 +64,7 @@ module Skylab::Common::TestSupport
         true  # only to work under r.s
       end
 
-      it "doesn't match the trilean" do
+      it %(doesn't match the trilean) do  # :#coverpoint1.1
 
         _send_potential_OK_event_on_channel_x_y
 

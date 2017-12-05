@@ -73,7 +73,7 @@
 [#031] #open domain partitioning of scanners
 [#030]       [ N lines ]
              ( #was: struct )
-             [#.A]  (ancient) "memberhood" means an instance of a member
+             [#here.A]  (ancient) "memberhood" means an instance of a member
 
 [#029]       #doc-node the string node
              [#here.2] #track clients that write their own regexp for escaping

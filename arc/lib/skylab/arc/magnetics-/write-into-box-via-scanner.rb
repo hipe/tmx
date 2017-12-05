@@ -153,7 +153,7 @@ module Skylab::Arc
         :argument_arity,
       )
 
-      # -- see #note-1 and #note-2 in [#026]
+      # -- see [#026.B], [#026.C]
 
       def singplur_category_of_association
         NOTHING_

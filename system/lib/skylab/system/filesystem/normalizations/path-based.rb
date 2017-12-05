@@ -126,7 +126,7 @@ module Skylab::System
       end
 
       def recognize_common_string_patterns=
-        @do_recognize_common_string_patterns_ = true  # #note-01
+        @do_recognize_common_string_patterns_ = true  # [#here.B]
         KEEP_PARSING_
       end
 

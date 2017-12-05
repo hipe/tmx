@@ -163,9 +163,9 @@ the name we choose will assume different "inflection" based on whether,
 variously, it references
 
   • [#here.5] a non-class module,
-  • [#.F] a class,
+  • [#here.F] a class,
   • [#here.3] a proc or proc-like
-  • or [#.B] any other value not in the above list.
+  • or [#here.B] any other value not in the above list.
 
 we will present the conventions here in order from "smallest" to "biggest",
 idiomatically:
@@ -210,8 +210,8 @@ the exception is for acronyms. those must be in all uppercase:
 
 
 the justification for the utility of such a convention is as follows: if
-we just made such names follow [#.B] the convention for arbitrary
-values or [#.D] the convention for modules, then these names would carry
+we just made such names follow [#here.B] the convention for arbitrary
+values or [#here.D] the convention for modules, then these names would carry
 less information and the code would be less self-documenting.
 
 the rationale behind the general convention is that this makes the
@@ -316,7 +316,7 @@ interface or removing it altogether.
 
 
 
-## peripherally related style convention: the OCD of literals in consts :[#.H]
+## peripherally related style convention: the OCD of literals in consts :[#here.H]
 
 (this moved here from the sunsetting [m-h])
 

@@ -40,7 +40,7 @@ or perhaps strange new config modalities like sessions in datastorses etc.
 
 
 
-## :#note-040: why we do this here
+## why we do this here :[#here.B]
 
 the relevant formal property for the particular
 upstream action will typically want to express either that this field
@@ -56,7 +56,7 @@ do the above which has the desired outcome.
 
 
 
-## (was #note-120)
+## (#todo this is ancient and probably no longer relevant) :[#here.C]
 
 a general property of property names is that they have semantics and
 provide identity only within the context of the proprietor (entity or

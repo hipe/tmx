@@ -80,7 +80,7 @@ implementations of this proc "in the wild."
 
 
 
-## :#note-40
+## :[#here.B]
 
 this is an area of some experimentation: the 'persist to' identifiers
 hold both would-be "model identifiers" and "collection identifier" (e.g
@@ -99,7 +99,7 @@ idea behind them.
 
 
 
-## :#note-35
+## :[#here.C]
 
 at the time of this writing this issue comes up when you run the
 test-suite for [sg] before [br]. [sg] loads the walker node from the
@@ -126,7 +126,7 @@ represent the desired order).
 
 
 
-## :#note-265
+## :[#here.D]
 
 although it is a class of use cases by which this whole algorithm was
 inspired, currently this ambiguous state here only gets covered by

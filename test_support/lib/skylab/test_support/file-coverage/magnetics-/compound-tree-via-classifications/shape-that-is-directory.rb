@@ -24,7 +24,7 @@ module Skylab::TestSupport
 
           # the "big tree" is derived from the paths of the files. what files?
           # the files from the "business hub dir" ("BHD") that match the "big
-          # tree filename patterns". what patterns? see [#013]:#note-1.
+          # tree filename patterns". what patterns? see [#013.B].
 
           _big_tree_filename_patterns = @name_conventions.big_tree_filename_patterns__
 

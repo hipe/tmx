@@ -19,7 +19,7 @@
 
 
 
-## :#note-70
+## :[#here.B]
 
 if you override this method and result in a bound call from it you can
 effectively short-circuit further processing while resulting in any
@@ -30,7 +30,7 @@ modality.
 
 
 
-## :#note-100
+## :[#here.C]
 
 the selective listener proc that is our argument is from some outside
 agent (like a top client of some sort).
@@ -59,7 +59,6 @@ context in the block when called.
 
 
 
-
 ### :[#023.B]:
 
 `data` as similar to above, but what is assumed of the block is that it
@@ -68,7 +67,6 @@ produces some arbitrary `x` that the client must do something with
 
 
 
-
-#### :[#.C]
+#### :[#here.C]
 
 (this normalization point, does nothing out of the box)

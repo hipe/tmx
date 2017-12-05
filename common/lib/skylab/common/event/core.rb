@@ -114,7 +114,7 @@ module Skylab::Common
           Event_::Makers_::Structured_Expressive
         end
 
-        private :new  # #note-045
+        private :new  # [#here.B]
       end  # >>
 
       def initialize & p
@@ -170,7 +170,7 @@ module Skylab::Common
         new_with( & _p_ )
       end
 
-      def new_with * x_a, & msg_p  # #note-25
+      def new_with * x_a, & msg_p  # [#here.C]
         dup.init_copy_via_iambic_and_message_proc_ x_a, msg_p
       end
 
@@ -188,7 +188,7 @@ module Skylab::Common
           & ( msg_p || message_proc ) )
       end
 
-      def to_exception  # #note-85
+      def to_exception  # [#here.D]
         Event_::To_exception[ self ]
       end
 
@@ -216,7 +216,7 @@ module Skylab::Common
 
     protected
 
-      def init_copy_via_iambic_and_message_proc_ x_a, p  # #note-70
+      def init_copy_via_iambic_and_message_proc_ x_a, p  # [#here.D]
 
         bx = ivar_box
 

@@ -80,7 +80,7 @@ module Skylab::System
 
           # (hi.) dups are created when a client wants to modify a prototype
           # to create a new session, and also dups are created here for the
-          # dup-and-mutate pattern. as such we do not freeze the dup #note-130
+          # dup-and-mutate pattern. as such we do not freeze the dup [#016.B]
         end
 
         def __init_new x_a, & p
@@ -284,7 +284,7 @@ module Skylab::System
           end
         end
 
-        def __resolve_valid_command_args  # amazing hax #note-130
+        def __resolve_valid_command_args  # amazing hax #[#016.B]
           otr = dup
           otr.extend Command_Building_Methods__  # pattern #[#sl-003]
           x = otr.__args_via_flush

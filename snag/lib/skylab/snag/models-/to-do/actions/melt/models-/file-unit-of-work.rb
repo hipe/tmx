@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Actions::Melt
 
-      class Models_::FileUnitOfWork < Common_::SimpleModel  # see [#068]:#note-110
+      class Models_::FileUnitOfWork < Common_::SimpleModel  # see [#063.B]
 
         attr_writer(
           :is_dry,
@@ -25,7 +25,7 @@ module Skylab::Snag
           self
         end
 
-        def OMG_try  # #note-40
+        def OMG_try  # see [#063.B]
 
           _io = @filesystem_conduit.open @_path
 
@@ -78,7 +78,7 @@ module Skylab::Snag
           sess.against_collection_add_or_replace_subject_entity
         end
 
-        def __add_the_single_line_change_to_the_mutable_patch  # (was #note-170)
+        def __add_the_single_line_change_to_the_mutable_patch  # see [#063.C]
 
           match = @_match
           line = match.full_source_line.dup

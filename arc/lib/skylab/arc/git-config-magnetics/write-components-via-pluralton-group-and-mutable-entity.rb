@@ -24,7 +24,7 @@ module Skylab::Cull
         def __partition_existing
           @added_nodes = []
           @removed_nodes = []
-          @span_a_h = {}  # #note-25
+          @span_a_h = {}
           st = @section.to_stream_of_all_elements
           current_span = []
           main_node = nil
@@ -218,3 +218,4 @@ module Skylab::Cull
     end
   end
 end
+# #tombstone-A.1: sunsetted detached note reference

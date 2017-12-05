@@ -10,7 +10,7 @@ module Skylab::Zerk
       def initialize custom_op_p, oi
 
         @_operation_index = oi
-        @_stdlib_op_lib = Home_.lib_.stdlib_option_parser  # see #note-1
+        @_stdlib_op_lib = Home_.lib_.stdlib_option_parser  # see [#here.B]
 
         if custom_op_p
           @_op = custom_op_p[ oi.stack_frame_ ]

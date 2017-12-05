@@ -20,7 +20,7 @@ module Skylab::TestSupport
       super
     end
 
-    def dup  # for [#.A] "frame techinque"
+    def dup  # for [#here.A] "frame techinque"
       a = @line_a
       if ! a.frozen?
         a = a.dup

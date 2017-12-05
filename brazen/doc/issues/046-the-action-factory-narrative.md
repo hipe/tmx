@@ -1,7 +1,7 @@
 # the action factory narrative :[#046]
 
 
-:#note-135
+## :[#here.B]
 
 .. this makes three categories of "proprietor" that can define
 formal properties for us:

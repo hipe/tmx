@@ -54,19 +54,19 @@ runs:
   • although every comment block has at least one line, not
     all comment blocks have code runs. in such cases this
     sequence-pattern is the empty set [] and will produce no
-    nodes from this comment block. (#coverpoint2-1)
+    nodes from this comment block. (#coverpoint2.1)
 
   • otherwise (and the comment block produces one or more code runs),
     if it is the case that every code run is an O (and ergo no code
     run is an E) (we'll call this pattern "OO"): although we don't
     love this either way, for now comment blocks in this category
-    will produce no nodes. (#coverpoint2-2)
+    will produce no nodes. (#coverpoint2.2)
 
   • otherwise if it is the case that there was at least one code run
     from each category (we'll call this pattern "OE"), again only
     because of this big assuption (C), then this will be expressed
     as a context node, which each constituent item (O or E) in the
-    order it was received. (#coverpoint2-3)
+    order it was received. (#coverpoint2.3)
 
     (:axiom-1 is the assertion that above described conditions are
     necessary preconditions for a context node, and may be assumed
@@ -75,7 +75,7 @@ runs:
   • otherwise (and it is the case that every code run is an E
     (and ergo none are of category O)) (we'll call this one "EE"):
     (D) we're gonna try to produce those badboys *flatly*, not in
-    a context. (#coverpoint2-4)
+    a context. (#coverpoint2.4)
 
 we want to be ready to flip (D) around as an option (and for example
 make such cases exist in a context node if desired).

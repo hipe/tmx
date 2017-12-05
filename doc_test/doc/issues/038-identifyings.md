@@ -98,7 +98,7 @@ we find them again when they are referenced in this manner?
     only a string, regardless of what type of node it is, of
     these two types of nodes; given a single document.)
 
-  - shared subject node: we can assume a *branch*-unique identifier. (:#note-1)
+  - shared subject node: we can assume a *branch*-unique identifier. :[#here.B]
     that is, the same name cannot be used multiple times in the same
     branch, however the same name can be re-used in different branches
     in the same document. (when we say "branch" we mean context here,

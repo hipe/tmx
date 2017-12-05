@@ -159,7 +159,7 @@ module Skylab::Snag
 
             instance_variable_set ivar, -> begin_d__, len__ do
 
-              # the third time you build a piece, #note-125
+              # the third time you build a piece, see [#056.B]
 
               if first
                 first = false

@@ -203,7 +203,7 @@ module Skylab::DocTest
 
         if c_a
           if v_a
-            __holy_smokes_you_want_both unasser  # #coverpoint5-2
+            __holy_smokes_you_want_both unasser  # #coverpoint5.2
           else
             _on_const_definition unasser
           end

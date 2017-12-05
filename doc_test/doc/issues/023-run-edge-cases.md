@@ -3,7 +3,7 @@
 (edge cases)
 
 
-## indent can decrease in a discussion (#coverpoint1-4)
+## indent can decrease in a discussion (#coverpoint1.4)
 
 indent can decrease in a discussion like so:
 
@@ -16,7 +16,7 @@ note that the second line changed where the threshold margin was.
 
 
 
-## transition back to discussion (#coverpoint1-5)
+## transition back to discussion (#coverpoint1.5)
 
 transition back to discussion:
 
@@ -29,7 +29,7 @@ that.
 
 
 
-## blank lines in code get added to the code run (#coverpoint1-6)
+## blank lines in code get added to the code run (#coverpoint1.6)
 
 blank lines in a code run get added to that code run:
 
@@ -44,7 +44,7 @@ that.
 
 
 
-## transition back to discussion by reducing indent (#coverpoint1-7)
+## transition back to discussion by reducing indent (#coverpoint1.7)
 
 transition back to discussion while reducing margin:
 
@@ -57,7 +57,7 @@ that.
 
 
 
-## whatever this is (#coverpoint1-8)
+## whatever this is (#coverpoint1.8)
 
 whatever this is:
 
@@ -70,7 +70,7 @@ that.
 
 
 
-## when all comment lines are blank (#coverpoint1-9)
+## when all comment lines are blank (#coverpoint1.9)
 
 when all comment lines are blank:
 

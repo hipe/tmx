@@ -154,7 +154,7 @@ class Skylab::Task
         self.class.__formal_parameter_collection
       end
 
-      def name_symbol  # see #note-1 about these method names
+      def name_symbol  # see [#here.B] about these method names
         self.class._task_name.as_const
       end
 
@@ -190,7 +190,7 @@ class Skylab::Task
     def ___derive_name_function
       sym = @task.name_symbol_for_storage_
       nf = Common_::Name.via_variegated_symbol sym
-      nf.as_ivar = :"@#{ sym }"  # don't lowercase it, [#003]:#note-1
+      nf.as_ivar = :"@#{ sym }"  # don't lowercase it, [#003.B]
       nf
     end
 

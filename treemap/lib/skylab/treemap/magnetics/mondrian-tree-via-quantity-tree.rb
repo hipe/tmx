@@ -10,7 +10,7 @@ module Skylab::Treemap
     # party solutions.
 
     # reasons we don't use an existing algorithm or code from elsewhere
-    # are discussed at #note-1. suffice it to say there are several.
+    # are discussed [#here.B]. suffice it to say there are several.
 
     # the general idea is that you subdivide a rectangle recursively
     # in a manner that is proportional to your tree of data. the result
@@ -25,7 +25,7 @@ module Skylab::Treemap
 
     # (we'll mention now that there may be an optimization possible that
     # would change the "two" of the above and much of the algo below; but
-    # we're holding off on exploring this for now. see #note-4.)
+    # we're holding off on exploring this for now. see [#here.E].)
 
     # so then the focus becomes these two questions:
     # (1) what is the structure of this flat list of tuples? and
@@ -132,7 +132,7 @@ module Skylab::Treemap
     #     will chose whatever orientation "steers" the mesh towards an
     #     aesthetic objective per the "portrait-landscape-threshold"
     #
-    # but remember #note-4 which is about how all of this might change.
+    # but remember [#here.E] all of this might change.
 
       def initialize qt
         Init_these_consts_lazily___[]
@@ -160,7 +160,7 @@ module Skylab::Treemap
 
         :portrait_landscape_threshold_rational,
 
-        # :[#003.2]: :#note-3:
+        # :[#003.2]: :[#here.D]:
         #
         # this positive rational number determines when a rectangle is
         # considered "portrait" vs. "landscape", which in turn determines
@@ -287,7 +287,7 @@ module Skylab::Treemap
         _via_bucketser Two_bucketser__
       end
 
-      def __when_one_child  # #note-5 when one child
+      def __when_one_child  # [#here.F] when one child
         _via_bucketser One_bucketser___
       end
 
@@ -402,11 +402,11 @@ module Skylab::Treemap
       end
 
       Two_bucketser__ = proto.new_by do |o|
-        o.number_of_buckets = 2  # #note-4
+        o.number_of_buckets = 2  # [#here.E]
       end
 
       One_bucketser___ = proto.new_by do |o|
-        o.number_of_buckets = 1  # #note-5
+        o.number_of_buckets = 1  # [#here.F]
       end
 
       NIL

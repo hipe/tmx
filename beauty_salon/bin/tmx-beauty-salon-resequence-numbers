@@ -95,8 +95,7 @@ program = -> argv, sin, sout, serr, pn_s_a do
         y << "#{ lbl 'synopsis:' }"
         yy << "a particular near-one-off for rewriting number identifers"
         yy << "in a document so that they are in order of first occurrence."
-        yy << "(for [sg] probably, but could be for #note-100, #note-200,"
-        yy << "etc. hasn't been used in years."
+        yy << '(tombstone may have a trail to how this was used year ago.)'
         yy << nil
 
         y << "#{ lbl 'description:' }"
@@ -419,3 +418,5 @@ if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
 else
   Skylab__Zerk__OneOffs::Beauty_salon_resequence_numbers = program  # #[#ze-063.1] mountable one-off
 end
+
+# #tombstone-A.1: sunset some detached document references

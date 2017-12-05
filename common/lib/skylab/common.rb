@@ -1390,7 +1390,7 @@ module Skylab::Common
           end
 
           if do_boxxy
-            @boxxy_original_constants_method_ = method :constants  # [#030] #note=1
+            @boxxy_original_constants_method_ = method :constants  # [#030.B]
 
             if ! respond_to? NODE_PATH_METHOD_
               extend Methods__

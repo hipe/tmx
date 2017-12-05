@@ -168,7 +168,7 @@ interactivity.
 
 ## (notes from a child node)
 
-### #note-321  (disassociated, might use again)
+### (disassociated, might use again) #todo
 
 we describe the behavior behind three similar buttons and justify their
 individual constituency:
@@ -212,7 +212,7 @@ which is that these there buttons could be one.
 
 
 
-### #note-372 (disassociated, might use again)
+### (disassociated, might use again) #todo
 
 in interactive mode when you are "within" this node it can behave as
 though it has persistent state (that is, be "sticky"): the file being

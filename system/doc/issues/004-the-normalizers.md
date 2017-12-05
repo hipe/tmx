@@ -251,7 +251,7 @@ mutable. when (2) it is necessarily frozen.
 
 
 
-## :#note-01
+## :[#here.B]
 
 we opt to have this feature ivar (which is used in perhaps only two
 sub-classes) defined in this base class rather than the other

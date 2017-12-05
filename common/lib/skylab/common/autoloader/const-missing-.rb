@@ -110,7 +110,7 @@ module Skylab::Common
         end
       end
 
-      def __when_value_has_already_been_determined  # is #note-5
+      def __when_value_has_already_been_determined  # exactly [#here.E]
 
         _then = @_asset_reference.const_symbol
         _message = Here_::Say_::Scheme_change[ @const_symbol, _then, @module ]

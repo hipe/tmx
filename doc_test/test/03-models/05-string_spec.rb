@@ -22,7 +22,7 @@ module Skylab::DocTest::TestSupport
 
     it "in a single quote have a single quote" do
 
-      # this is #coverpoint4-3: the remarkable case of needing four
+      # this is #coverpoint4.3: the remarkable case of needing four
       # backslashes in our regex.
 
       _soft( " 'mom\\'s spaghetti' " ) == "mom's spaghetti" || fail

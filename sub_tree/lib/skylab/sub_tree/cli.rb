@@ -18,7 +18,7 @@ module Skylab::SubTree
 
         def init_properties
 
-          # :+[#br-021]:#the-first-case-study, #note-st-1 #BUMF
+          # :+[#br-021]:#the-first-case-study, [#br-041.3] #BUMF
 
           bbx = @bound.formal_properties.to_mutable_box_like_proxy
 

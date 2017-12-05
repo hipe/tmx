@@ -393,7 +393,7 @@ module Skylab::Fields
         NIL_
       end
 
-      def _process_remainder_of_upstream  # assume at least one. #note-185
+      def _process_remainder_of_upstream  # assume at least one. [#034.2]
 
         did = nil
         m = nil

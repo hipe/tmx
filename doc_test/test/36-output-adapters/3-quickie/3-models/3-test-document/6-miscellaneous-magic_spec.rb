@@ -14,7 +14,7 @@ module Skylab::DocTest::TestSupport
       full_path_ 'doc/issues/037-miscellaneous-magic.md'
     end
 
-    context "#coverpoint5-3" do
+    context "#coverpoint5.3" do
 
       shared_subject :_nodes do
         _st = first_fake_file_node_stream_corresponding_to_regex_(

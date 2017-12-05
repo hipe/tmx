@@ -48,7 +48,7 @@ these are some disparate algorithmic axiomatic and other points:
 
 
 
-## about unstyling :#note-1
+## about unstyling :[#here.B]
 
 it was once an option whether or not to unstylize (#tombstone-A)
 but in practice it is never prudent to have this off: the parser

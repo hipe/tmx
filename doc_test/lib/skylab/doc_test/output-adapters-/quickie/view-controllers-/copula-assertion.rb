@@ -58,7 +58,7 @@ module Skylab::DocTest
 
       class LooksLike__::Should_match_string_head < RegexpBased__
 
-        # explained at #note-1
+        # see [#here.B]
 
         class << self
 

@@ -1,4 +1,4 @@
-[#008]       #coverpoint-1-1 when you encounter a narrower page
+[#008]       #coverpoint1.1 when you encounter a narrower page
 
 [#007]       internal. (as soon as you want to publicize any of these,
              give them a toplevel number)

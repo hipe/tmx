@@ -28,7 +28,7 @@ module Skylab::Brazen
       y.freeze
     end
 
-    module Build_name_function  # see [#.A]
+    module Build_name_function  # see [#here.A]
 
       _NFM = -> do
         @name_function ||= Build_name_function[ self ]  # :+#public-API (ivar name)

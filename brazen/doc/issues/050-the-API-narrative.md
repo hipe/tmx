@@ -36,7 +36,7 @@ to here as supplemental [#079] the API API components narrative.
 
 
 
-## #note-015 :[#051]
+## :[#051] :[#here.B]
 
 an expression agent as a singleton (that is, effectively global) instance is
 certainly *not* something we will provide support for broadly. it exists

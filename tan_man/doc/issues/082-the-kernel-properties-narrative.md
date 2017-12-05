@@ -27,7 +27,7 @@ the point is it could be without too much pain.
 
 
 
-## :#note-1
+## :[#here.B]
 
 we do some weird hackery so that our constants sit in the right place:
 everything is under the 'Properties' module (namespace), but that module
@@ -43,7 +43,7 @@ defines methods all properties frames will be able to use as-is.
 
 
 
-## :#note-2
+## :[#here.C]
 
 this class (perhaps unfortunately named for now) is the second in the
 chain of three classe descending from one another. this class is a

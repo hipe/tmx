@@ -28,7 +28,7 @@ module Skylab::CodeMetrics
     #
     # as is our habit, we tend to place a strong correspondence between
     # an "asset file"'s name is what code it contains, in regards to the
-    # constant it defines, etc. (formalized at [#co-024.2].)
+    # constant it defines, etc. (formalized at [#co-024.3].)
     #
     # as such, when we schlurp the user-argument-derived paths into this
     # tree, we want to think of the resulting nodes not as representing

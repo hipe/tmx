@@ -697,7 +697,7 @@ module Skylab::BeautySalon
         # however if you do one of these `-> |(foo,bar)| {..}`, then the
         # AST is a wholly differently structured beast #coverpoint1.45
         #
-        # EXPERIMENTALLY (#note :[#007.F]) we're hacking thru an experiment with
+        # EXPERIMENTALLY :[#007.F]: we're hacking thru an experiment with
         # a factory pattern to accomodate this shenanigan. no dedicated
         # coverage unless this really becomes a thing, for now.
 

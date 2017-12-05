@@ -4,7 +4,7 @@
 ## foreward
 
 to have any hope of understanding what is going on here, it is strongly
-recommended that you at least read until section [#.A] below.
+recommended that you at least read until section [#here.A] below.
 
 
 
@@ -29,7 +29,7 @@ specification.
 
 
 
-## more about flex :[#.A]
+## more about flex :[#here.A]
 
 it *seems* that the "definitions" of flex translate smoothly to rules of
 a treetop grammar: they each use grammatical game mechanics that have
@@ -115,7 +115,7 @@ nasty: ... (EDIT)
 
 
 
-## why deferred actors? [#.B]
+## why deferred actors? [#here.B]
 
 this class-as-function facade does two things: one, it acts as it sounds, it
 lets us interface with our #tributary-agent classes as if they were procs -

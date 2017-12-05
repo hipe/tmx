@@ -100,8 +100,8 @@ module Skylab::DocTest::TestSupport
 
     context "(bytes of The Example)" do
 
-      # also #coverpoint4-1 - blank lines in code run
-      # also #coverpoint4-2 - match string head magic pattern
+      # also #coverpoint4.1 - blank lines in code run
+      # also #coverpoint4.2 - match string head magic pattern
 
       call_by do
 

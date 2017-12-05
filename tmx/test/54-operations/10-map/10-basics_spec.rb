@@ -55,7 +55,7 @@ module Skylab::TMX::TestSupport
 
     context "bad primary" do
 
-      # :#coverpoint-1-E
+      # :#coverpoint1.E
 
       call_by do
         ignore_common_post_operation_emissions_

@@ -51,7 +51,7 @@ this builds on [#017] our "essential operation" [about syncing] pseudocode.
 
 ## requirement -4: parse most such documents, do so losslessly
 
-(#coverpoint3-4)
+(#coverpoint3.4)
 
 
 
@@ -64,7 +64,7 @@ we change our minds?
 we don't know what we're going to do about unassertive nodes (tho they
 *can* be indexed by lvalue name, can't they?)
 
-(#coverpoint3-3)
+(#coverpoint3.3)
 
 
 
@@ -76,11 +76,11 @@ an interface).
 
 we likewise need the ability to add a node *after* another given node.
 
-(#coverpoint3-2)
+(#coverpoint3.2)
 
 
 
 
 ## requirement -1: replace item lines
 
-(#coverpoint3-1)
+(#coverpoint3.1)

@@ -25,7 +25,9 @@ priority on the chain, it won't overwrite the (IO adapter-based)
 `call_digraph_listeners` we get from [hl] which is good.
 
 
-## #note-70
+
+
+## :[#here.B]
 
 just a debugging tool (#overhead) that was several hours in the making
 (ok days). experimentally we will result in trueish if there *were* warnings,

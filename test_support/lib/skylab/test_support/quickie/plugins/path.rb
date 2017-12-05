@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
       def release_agent_profile
         if @_did_release
-          # #coverpoint-2-4 is about how a single plugin instance can
+          # #coverpoint2.4 is about how a single plugin instance can
           # process multiple expressions of its argument in this manner
           NOTHING_
         else
@@ -76,7 +76,7 @@ module Skylab::TestSupport
             big_list = ::Dir[ _glob ]
             if big_list.length.zero?
               __whine_about_no_ent path
-              # #coverpoint-2-3: no longer do we break the stream here
+              # #coverpoint2.3: no longer do we break the stream here
               Common_::THE_EMPTY_STREAM
             else
               Stream_[ big_list ]

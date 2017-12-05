@@ -10,7 +10,7 @@ the only reason.
 
 
 
-## #note-085
+## :[#here.B]
 
 whether or not the call to the couch server succeeds we always want to
 procede with the attempt at saving the collection as an entity (a

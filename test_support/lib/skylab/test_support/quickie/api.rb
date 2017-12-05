@@ -588,7 +588,7 @@ module Skylab::TestSupport
         def __begin_branch_node_initially d, ctx
           d.zero? || self._SANITY
           if ctx.description
-            NOTHING_  # #coverpoint-2-5
+            NOTHING_  # #coverpoint2.5
           end
           @_branch_stack = []
           @_expected_leaf_depth = 1

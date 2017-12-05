@@ -181,7 +181,7 @@ trailing optional.
 
 
 
-## method note about help screen rendering :#note-930
+## method note about help screen rendering :[#here.B]
 
 contrast with leaf implementation (covered). without this, this adpater
 renders exactly as a terminal action, which has slightly different styling

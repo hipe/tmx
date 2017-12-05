@@ -9,7 +9,7 @@ counterpart asset (code) node. we keep the main algo there for better
 
 
 
-## why didn't we reuse some existing thing? :#note-1
+## why didn't we reuse some existing thing? :[#here.B]
 
 reasons we don't use an existing algorithm or code from elsewhere
 are several.
@@ -40,7 +40,7 @@ so in summary:
 
 
 
-## normal rectangle units :#note-2, :[#here.1]
+## normal rectangle units :[#here.1] :[#here.C]  TODO
 
 assume we are given a rectangle. this rectangle can be of any
 dimensions; however internally we refer to sizes of rectangles
@@ -75,7 +75,7 @@ as far as we understand).
 
 
 
-## portrait vs landscape classification :[#here.2] :#note-3
+## portrait vs landscape classification :[#here.2] :[#here.D]  TODO
 
 in general it's very simple: a rectangle that is wider than it is tall is
 "landscape", otherwise it's portrait. note this classifies the square as
@@ -87,7 +87,7 @@ but under the surface it's more intersting: we make this boundary between
 
 
 
-## possible optimizations #note-4
+## possible optimizations :[#here.E]
 
 for a current rectangle that is for example 3 or more times wide (or high)
 than it is high (or wide),
@@ -108,7 +108,8 @@ now until we get good coverage for the simpler algorithm.
 
 
 
-## :#note-5
+
+## :[#here.F]
 
 for now we go thru the divvyer even when the user data branch node has
 only one child node..

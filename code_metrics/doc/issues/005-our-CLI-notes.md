@@ -4,7 +4,10 @@
 pertain to the modality-and-application-specific behaviors we implement
 here in this app.)
 
-## :#note-075
+
+
+
+## :[#here.B]
 
 for convenience most of our events are on the "data" channel
 and for those we must define the below. for #grease one of

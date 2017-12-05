@@ -9,12 +9,12 @@ talking about the "OE" pattern in a series of code runs; which expresses
 as a "context".
 
 all tests under this concern and only those tests under this concern will
-have a tag whose head is `#coverpoint5-`.
+have a tag whose head is `#coverpoint5.` (that's a literal period).
 
 
 
 
-## :#coverpoint5-1 - constants in setup (:A)
+## constants in setup :#coverpoint5.1 (:A)
 
 (this is all experimental, the main objective of which is to retrofit back
 to ancient doctests, while trying to implement their intent with means

@@ -6,7 +6,7 @@ module Skylab::Cull
 
       class EntityStream_via_EntityStream_and_FunctionCalls___ < Common_::Dyadic
 
-        # narrative in [#006]:#note-007
+        # narrative in [#006.H]
 
         def initialize es, a, & p
           @call_a = a

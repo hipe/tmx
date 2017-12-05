@@ -40,8 +40,8 @@ module Skylab::TMX
 
       def execute
 
-        # #coverpoint-1-D needs nil on help (because client)
-        # #coverpoint-1-E needs false on fails because API
+        # #coverpoint1.D needs nil on help (because client)
+        # #coverpoint1.E needs false on fails because API
 
         x = __parse_modifiers
         if x
@@ -179,7 +179,7 @@ module Skylab::TMX
           @argument_scanner.advance_one
           send m
         else
-          m  # #coverpoint-1-D/#coverpoint-1-E
+          m  # #coverpoint1.D/#coverpoint1.E
         end
       end
 

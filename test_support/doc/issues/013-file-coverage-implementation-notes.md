@@ -1,6 +1,6 @@
 # file coverage implementation notes :[#013]
 
-## :#note-1
+## :[#here.B]
 
 the "big tree" is what we start with in the main algorithm of our
 core operation. it is meant to contain every "file of interest"

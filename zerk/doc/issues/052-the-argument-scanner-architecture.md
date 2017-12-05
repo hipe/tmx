@@ -657,7 +657,7 @@ CLI you can assume all elements of ARGV are strings).
 
 
 
-## on the interface of the subject "faciliator" performer :#note-1 :[#here.SUNSETTING.d4]
+## on the interface of the subject "faciliator" performer :[#here.B] :[#here.SUNSETTING.d4]
 
 TL;DR: strange, session-heavy inteface for reasons
 

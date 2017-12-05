@@ -15,7 +15,7 @@ is creeping in.
 
 
 
-## :#note-85
+## #todo DISASSOCIATED (was #n-ote-85)
 
 else we write it back into the string (ick?) for possible future chaining in a
 template pipeline or whatever -- *or* optionally we could substitue empty
@@ -25,7 +25,7 @@ with template reflection.
 
 
 
-## :#note-110
+## #todo DISASSOCIATED (was tombstoned-note-110)
 
 result is an enumerator that yields one ad-hoc tuple with metadata for every
 first occurence of a parameter-looking string in the template string. (it is

@@ -81,9 +81,11 @@ test suite solutions and testing idioms pursuant to the user's choices.
     on in its implementation.
 
 
+
+
 ## notes
 
-### :#note-1
+### :[#here.B]
 
 we are hacking the parse of the assignment operator because to do it
 correctly with regex is difficult..

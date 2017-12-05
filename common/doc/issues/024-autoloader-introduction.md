@@ -16,7 +16,8 @@
 
 
 
-## the central algorithm (overview) (:#note-1)
+
+## the central algorithm (overview) :[#here.B]
 
 we reduce trips to the filesystem by taking "snapshots" of the filesystem
 one directory listing at a time as opposed to by checking for one file
@@ -28,7 +29,7 @@ next section.)
 
 
 
-## the isomorphism you must follow to use this autoloading (:#note-2) :[#here.2]
+## the isomorphism you must follow to use this autoloading :[#here.3]
 
 the general convention is this: code "assets" that you want autoloaded
 (often classes, but just as possibly non-class modules or any other value)
@@ -53,7 +54,7 @@ something like: `lib/your_gem/your-sub-module/your-class.kode`, such that:
 
 
 
-## the main design challenge of this convention :[#here.3]
+## the main design challenge of this convention :[#here.4]
 
 this convention is not a "lossless" "isomorphism", because filenames
 (for our purposes) never use uppercase letters in their names; however

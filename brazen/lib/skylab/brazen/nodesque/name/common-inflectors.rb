@@ -244,7 +244,7 @@ module Skylab::Brazen
         s or __infer_noun_stem_when_node_is_topmost_node
       end
 
-      def __infer_noun_stem_when_node_is_topmost_node  # #note-170
+      def __infer_noun_stem_when_node_is_topmost_node  # see [#016.D]
 
         ci = @_custom_action_inflection
 

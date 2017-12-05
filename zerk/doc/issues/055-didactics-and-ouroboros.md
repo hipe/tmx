@@ -107,7 +107,7 @@ in the membership, but we do no longer for two reasons:
 
 ## notes
 
-### :#note-1
+### :[#here.B]
 
 experimental, this is the remote service telling us that it
 succeeded in resolving a next opera*tor* from the head of the
@@ -118,7 +118,7 @@ now because the argument scanner is mutable and in motion..
 
 
 
-### :#note-2
+### :[#here.C]
 
 the structure of this selection stack was once simple and lazy.
 (it used to be a chain of zero or more symbols and alway as the
@@ -132,7 +132,7 @@ customizing expression.
 
 
 
-### :#note-3
+### :[#here.D]
 
 in opposition to [ac]'s whole "autonomous" "component" philosophy,
 we are wedging this in here to see how it feels: we see if the
@@ -256,7 +256,7 @@ and four of them are nested accross two namespaces. your graph might be:
 
 
 
-## boundaries :[#.A]
+## boundaries :[#here.A]
 
 in a "reactive tree", typically these sorts of resources are shared:
 

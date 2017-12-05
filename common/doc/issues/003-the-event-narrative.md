@@ -1,7 +1,6 @@
 # the event narrative :[#003]
 
-
-## :#note-045
+## :[#here.B]
 
 we have explicitly "disabled" the use of contructing events via `new`
 because we to make it explicit that events are constructed in weird
@@ -14,13 +13,13 @@ names" manifest as attr readers (the way we are used to with structs).
 
 the easiest way to do this is to hack the singleton class **for each
 event that is constructed in this way**. this accomplishes the short
-term goal stated above, but is not very elegant (see #note-70 in situ).
+term goal stated above, but is not very elegant (see [#here.D] in situ).
 
 
 
 
 
-## :#note-25
+## :[#here.C]
 
 events should be thought of as immutable. if you want to change the
 properties of an event for whatever weird reason, use this.
@@ -34,7 +33,7 @@ this array and build a new event from that.
 
 
 
-# :#note-85
+# :[#here.D]
 
 as available. your event's message proc must adhere to the set of
 methods provided by the hard-coded expression agent used.
@@ -42,7 +41,7 @@ methods provided by the hard-coded expression agent used.
 
 
 
-## :#note-70
+## :[#here.D]
 
 this is really ugly and awful to have to mutate the singleton class like
 this when you make a dup of an inline event. to support such an

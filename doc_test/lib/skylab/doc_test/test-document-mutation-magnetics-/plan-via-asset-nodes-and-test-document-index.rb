@@ -96,7 +96,7 @@ module Skylab::DocTest
             has_some = bi.child_node_indexes.length.nonzero?
             use_bi = bi
           else
-            NOTHING_  # #coverpoint5-4
+            NOTHING_  # #coverpoint5.4
           end
         end
 
@@ -254,8 +254,8 @@ module Skylab::DocTest
 
       def __when_create_example_node
 
-        # #coverpoint3-1 - prepend this node before the first node in the doc
-        # #coverpoint3-3 - place this node immediately after last inserted node
+        # #coverpoint3.1 - prepend this node before the first node in the doc
+        # #coverpoint3.3 - place this node immediately after last inserted node
 
         _plan = Plan__::Insert_example[ @_node_of_interest, @_previous_plan ]
 
@@ -268,7 +268,7 @@ module Skylab::DocTest
         _add_to_creation_branch plan
       end
 
-      def __when_replace_example  # #coverpoint3-2
+      def __when_replace_example  # #coverpoint3.2
         # simply add to clobber queue. it's the only answer and the only way
 
         plan = Plan__::Replace_example.call(

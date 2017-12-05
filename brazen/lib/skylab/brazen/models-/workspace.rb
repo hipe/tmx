@@ -72,7 +72,7 @@ module Skylab::Brazen
 
       p or raise ::ArgumentError  # just because we always do anyway
 
-      max_num_dirs ||= -1  # see #note-040 "why we do this here"
+      max_num_dirs ||= -1  # see [#055.B] "why we do this here"
       x_a.unshift :max_num_dirs_to_look, max_num_dirs
       bx = @property_box
       x_a.push :start_path, bx.fetch( :surrounding_path ),

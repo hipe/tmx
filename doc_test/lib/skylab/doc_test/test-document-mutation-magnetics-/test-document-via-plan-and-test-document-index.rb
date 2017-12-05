@@ -33,7 +33,7 @@ module Skylab::DocTest
       dq = @dandy_queue
       if dq
 
-        # exactly #note-1 - context nodes that exist on the right composed
+        # exactly [#here.B] - context nodes that exist on the right composed
         # of one or more nodes that don't yet exist on the right.
 
         dq.each do |plan|
@@ -81,7 +81,7 @@ module Skylab::DocTest
 
     def __clobber_upgrade plan
 
-      # #coverpoint5-4 - upgrading an item node (experiment)
+      # #coverpoint5.4 - upgrading an item node (experiment)
 
       _existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE(
         plan, & @_listener )

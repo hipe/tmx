@@ -49,13 +49,13 @@ longerm goal is (or isn't) to unify all table implementions:
 
     [#ze-050]    2013-03-13  ad-hoc for application. rewritten once.
                              now the root node for the [ze] CLI table lib.
-                             was once [#.D].
+                             was once [#here.D].
 
-    [#.C]  2012-03-16  the old functional experiment
+    [#here.C]  2012-03-16  the old functional experiment
 
     [#here.2]  2011-08-22  the "main" one
 
-    [#.A]  2011-08-22  a tiny, almost minimal one
+    [#here.A]  2011-08-22  a tiny, almost minimal one
 
 because we are not there yet, this document is divided by horizontal
 "lines" into sections corresponding to the respective implementations.
@@ -121,8 +121,7 @@ we *certainly* want to make a [cu]-like feature comparison meta-table
 
 
 
-
-## the general table proto-algorithm [#.K]
+## the general table proto-algorithm [#here.K]
 
 whether or not we'd like to admit it, the common thread behind all of
 these libraries is they implement the logic necessary to render tables
@@ -152,7 +151,7 @@ general principles and behavior intact.
 
 ----------------
 
-# the fourth table narrative :[#.D]
+# the fourth table narrative :[#here.D]
 
 ## justification
 
@@ -175,7 +174,7 @@ it is informed by all that came before it.
 
 
 
-## :#note-fm-315
+## #todo DETACHED (was :#n-ote-fm-315)
 
 although it may have "CLI" in the name, we don't want the subject node
 to have to concern itself too deeply with this modality. the subject
@@ -199,23 +198,23 @@ clients needing to deal with it on their own.
 
 # the CLI table ACTOR narrative :[#here.2]
 
-## introduction (leads to [#.G])
+## introduction (leads to [#here.G])
 
 during the "pre-unification" phase, we designated this implementation as
 "actor" based solely on how it was typically interfaced with: calling it
 in the "one-shot"/"inline" form had the appearance of calling a proc.
 
 furthermore; like a proc, this object can be "curried". this makes it
-superficially like the [#.D] "structured" table, but we take a tack that
+superficially like the [#here.D] "structured" table, but we take a tack that
 is more simple or more complicated, depending on whether or not you are
 using or implementing this facility (respectively):
 
-in contrast to [#.D], we make no distinction between a "declaration"
+in contrast to [#here.D], we make no distinction between a "declaration"
 phase and a "rendering" phase: any data that you would provide during
 the one you can also provide during the other, and vice-versa.
 
 below the surface, the salience of this implementation during the rewrite
-is this: whereas [#.D] ended up becoming an excercize in "visitor pattern",
+is this: whereas [#here.D] ended up becoming an excercize in "visitor pattern",
 this implementation will be a grand exercize in finding the "right" pattern
 to make this code more navigable (by way of having some formal
 modularization).
@@ -254,7 +253,7 @@ point:
 the last paragraph of the above excerpt makes our decision for us: we
 want the dependencies to be interchangeable throughout the lifetime of
 the object, so what we probably wants is closer to the strategy pattern.
-:[#.G]  (then we abstracted [#pl-007] from this.)
+:[#here.G]  (then we abstracted [#pl-007] from this.)
 
 
 
@@ -262,7 +261,7 @@ the object, so what we probably wants is closer to the strategy pattern.
 
 ## the rendering pipeline :[.#J]
 
-putting a finer point on [#.K] the general algorithm:
+putting a finer point on [#here.K] the general algorithm:
 
 we anticipate one day overhauling this to become based on a user-defined
 dependency graph (something like excel spreadsheets). also, our
@@ -295,7 +294,7 @@ becomes an individual rendered "cel" in the finished output:
 
 
 
-## (method documentation) :[#.H]
+## (method documentation) :[#here.H]
 
 an essential part of our implementation of the [#sl-023]: we send,
 `.dup` to a curry to create another curry from it or to create an
@@ -307,14 +306,14 @@ trivial manner implemented ad-hoc as appropriate for each node.
 
 
 
-## :[#.E]
+## :[#here.E]
 
 fields should be immutable.
 
 
 
 
-## :[#.F]
+## :[#here.F]
 
 the default is to align left.
 _

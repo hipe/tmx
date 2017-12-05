@@ -60,7 +60,7 @@ module Skylab::Common
         end
 
         def __come_downwards_from_the_parent_entry_tree
-          # the reason we do this is because [#058] #note-3
+          # the reason we do this is because [#058.D]
 
           _existed = @module.pedigree_
           _name = _existed.node_path_entry_name_

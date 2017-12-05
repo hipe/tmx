@@ -105,7 +105,7 @@ is the focus of our implementation here.
 
 
 
-## the general algorithm in pseudocode :[#.A]
+## the general algorithm in pseudocode :[#here.A]
 
 (for the first time ever, we are finding it useful to break our
 pseudocode algorithm up into two parts: once in more "general" way and
@@ -154,7 +154,7 @@ now is a (albeit useful) collection of definitions of terms.
 
 
 
-## the particluar algorithm in pseudocode :[#.B]
+## the particluar algorithm in pseudocode :[#here.B]
 
 this algorithm's design objectives are that its assumptions:
 
@@ -273,7 +273,7 @@ grammar for indentifers.
 
 
 
-## :#note-05
+## :[#here.F]
 
 having more to parse from here implies with certainty that what we just
 parsed is a branch node. using the received token with its particular

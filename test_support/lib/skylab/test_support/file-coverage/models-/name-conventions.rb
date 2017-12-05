@@ -20,7 +20,7 @@ module Skylab::TestSupport
 
       def __init_big_tree_filename_patterns_via test_file_name_pattern_a
 
-        # explained fully at [#013]:#note-1
+        # explained fully at [#013.B]
 
         a = [] ; seen = {}
         test_file_name_pattern_a.each do |pat|

@@ -83,7 +83,7 @@ module Skylab::Zerk
 
     class BranchItem_via_FeatureBranch
 
-      # this "facilitator" has a strange, session-heavy interface because [#052] #note-1
+      # this "facilitator" has a strange, session-heavy interface because [#052.B]
 
       class << self
         alias_method :begin, :new

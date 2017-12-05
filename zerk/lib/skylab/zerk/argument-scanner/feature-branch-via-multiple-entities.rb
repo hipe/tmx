@@ -50,8 +50,7 @@ module Skylab::Zerk
       #
       #
       #
-      # # #note-1 is about what happens with hash collisions between
-      # branches.
+      # see [#here.B] what happens with hash collisions between branches.
       #
       # (#a.s-coverpoint-1)
 

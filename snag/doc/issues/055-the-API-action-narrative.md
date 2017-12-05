@@ -54,7 +54,7 @@ own expression agents that effectively style and render the events.
 
 
 
-### bridging this gap: strings :#note-156
+### bridging this gap: strings :[#here.B]
 
 expression agents (as we've used them so far) provide a suite of methods
 typically used in conjunction with message procs associated with events
@@ -83,7 +83,7 @@ two string sender methods.
 
 
 
-### bridging this gap: events :#note-136
+### bridging this gap: events :[#here.C]
 
 in the new event model all of the callbacks ("channels") pertinent to a
 given e.g action are encapsulated within a single delegate object, whose
@@ -105,21 +105,21 @@ handlers.
 ## legacy comments
 
 
-### :#note-10
+### :[#here.D]
 
 put `call_digraph_listeners` nearer on the chain than s.c above
 
 
 
 
-### :#note-20
+### :[#here.E]
 
 we check for unhandled event streams, but this line tells the validation
 operation to ignore "tanonomic streams" like these.
 
 
 
-### :#note-25
+### :[#here.F]
 
 probably every API action subclass should have it in its graph that it
 `delegates_digraph` this (and so it does) because we
@@ -128,7 +128,7 @@ use (i think..)
 
 
 
-### :#note-195
+### :[#here.G]
 
 we override the one we get from [cb] to pass our factory 1 more parameter
 than usual (the API action). whether or not this fourth argument is used

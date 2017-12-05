@@ -48,7 +48,7 @@ purposes is a simple 2-layer wrapping around exitstatus integer).
 currently we do not mess with mocking any behavior against writes to a
 STDIN stream so we always result in a dummy value for this component,
 effectively leaving us with the mocking of the other three components
-as our objective here. (:#note-1)
+as our objective here. :[#here.B]
 
 as a rule we never use and so never detect the form of call to `open3`
 that passes a block; to support such a form would be trivial but if we
@@ -69,7 +69,7 @@ to assert set membership of the request against what is expected, so
     in what is probably the expected manner
 BUT
   - if at the end of the test there remain requests in the "pool" that
-    weren't accessed, this will NOT lead to an assertion failure. :#note-2
+    weren't accessed, this will NOT lead to an assertion failure. :[#here.C]
 
 also, the order of the requests is not asserted (although if the mocked
 cases are defined in the order they are called, lookup time will be
@@ -113,7 +113,7 @@ than once.
 
 (furthermore, at the end of some given process we can assert that the
 pool is fully "dried up" (that no elements are left) but we do not do
-that here, as discussed at #note-2.)
+that here, as discussed at [#here.C].)
 
 so this type of category allows us to define a diminishing pool of
 "cases" (responses), each of which is stored under a "key"..

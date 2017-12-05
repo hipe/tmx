@@ -2,7 +2,7 @@ module Skylab::Plugin
 
   class Bundle::Fancy_lookup  # exegesis at [#024], which has..
 
-    # incomplete pseudocde for a [#.A] general & [#.B] particular algorithm
+    # incomplete pseudocde for a [#here.A] general & [#here.B] particular algorithm
 
     Attributes_actor_ = -> cls, * a do
       Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -129,7 +129,7 @@ module Skylab::Plugin
 
         __parse_to_init_state_machine
 
-        at_the_end = @stream.no_unparsed_exists  # #note-05
+        at_the_end = @stream.no_unparsed_exists  # [#here.F]
 
         __init_const
 

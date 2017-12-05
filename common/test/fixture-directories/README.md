@@ -1,7 +1,7 @@
    1. [elsewhere]
    2. [elsewhere]
    3. [elsewhere]
-   4. two-level-deep narrow stem - no longer used at change [#058] #note-5
+   4. two-level-deep narrow stem - no longer used at change [#058.E]
    5. minimal eponymous dir with a corefile
    6. one-level-deep narrow stem terminating in an eponymous file
    7. a three-node tree with both kinds of parenthood

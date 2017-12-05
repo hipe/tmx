@@ -417,7 +417,7 @@ this pipeline by breaking the `find` stream of paths into chunks of
 paths each of which we pass into grep in its own process.
 
 A) although we accomplish this only crudely with a hard-coded limit
-(see #note-1 below), the general idea is there, and a scale-path is
+(see [#here.B] below), the general idea is there, and a scale-path is
 availble to perhaps make smart-chunking that perhaps calculates a
 real byte-length for the grep command as it is being built; but yeah, eew.
 
@@ -426,7 +426,8 @@ would solve this problem with concurrency. we won't explore that idea
 further here, other than to just say "go routines".
 
 
-### :#note-1
+
+### :[#here.B]
 
 currently the ultra-crude way we do "chunking" is to use a hard-coded
 chunk size. (although we say this is crude, for realistic use-cases it's

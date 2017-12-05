@@ -13,7 +13,7 @@ module Skylab::Brazen
         Exit_statii___[]
       end
 
-      def expression_agent_instance  # #note-015
+      def expression_agent_instance  # see [#050.B]
         @___expag ||= __expag
       end
 

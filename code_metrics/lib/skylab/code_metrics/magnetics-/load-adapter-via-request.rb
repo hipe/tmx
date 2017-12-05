@@ -99,7 +99,7 @@ module Skylab::CodeMetrics
           s_a = s_a[ 0 .. -2 ]
         end
 
-        # while #open [#co-024.1], can't const reduce on a zero length path
+        # while #open [#co-024.2], can't const reduce on a zero length path
         if s_a.length.zero?
           @_head_module && ACHIEVED_
         else

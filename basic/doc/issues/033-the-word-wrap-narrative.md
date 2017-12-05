@@ -113,7 +113,7 @@ hyphens.
 
 
 
-### "this formula" :#note-A
+### "this formula" :[#here.B]
 
 given the target aspect ratio and given the input content's
 total number of 2-D "cels" (characters, points, picas;

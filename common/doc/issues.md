@@ -59,7 +59,6 @@
              ( #was: aggregation .. moved to: [#hu-055] )
 
 [#049]       [ simple model ]  (`SimpleModel`)
-       #track :[#here.1]: if `redefine` becomes official, refactor these
 
 [#048] #open #minor is this a bug that this doesn't work? (name func. at [dt])
              ( #was parent node. #moved-to: [#hu-054] )

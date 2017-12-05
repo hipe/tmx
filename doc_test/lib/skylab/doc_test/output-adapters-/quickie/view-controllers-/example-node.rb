@@ -87,7 +87,7 @@ module Skylab::DocTest
 
         cbl = nil ; lo = nil ; main_p = nil ; p = nil
 
-        transition_to_cbl = -> do  # #coverpoint4-1
+        transition_to_cbl = -> do  # #coverpoint4.1
           st = Stream_[ cbl ] ; cbl = nil
           p = -> do
             lo_ = st.gets
@@ -106,7 +106,7 @@ module Skylab::DocTest
 
             _assertion_stem = lo.to_stem_paraphernalia_given @_choices
             st = _assertion_stem.to_line_stream( & @_listener )
-            # we assume the above never to fail per [#042] #note-2
+            # we assume the above never to fail per [#042.C]
 
           lo = nil
           p = -> do

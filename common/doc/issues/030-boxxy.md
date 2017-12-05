@@ -25,7 +25,7 @@ and there is now the "feature branch" underlying interface (and
 implementation) that is now exposed to access facility-specific features.
 
 there is, however, an inherent problem in the primary provision of the
-subject. this stems from what is described at [#024.3], that boxxy may infer
+subject. this stems from what is described at [#024.4], that boxxy may infer
 consts that are not accurate, based on things like (A) if any of the involved
 consts have runs of all uppercase letters and (B) your naming conventions
 more generally. (i.e we cannot know that "stay-out-my-mans-dms.rb" has
@@ -110,7 +110,7 @@ defines just by looking at the filename.
 our "solution" for this in the case of boxxy is this: the result you get
 from calling `constants` on a boxxy module *might* contain "inferences".
 you have no way of knowing if it does and if so, what those inferences are.
-all you know is that if your asset tree follows the "rules" of [#024] #note-2,
+all you know is that if your asset tree follows the "rules" of [#024.3],
 calling `const_get` on that module with any of the names in that array
 will produce a value.
 
@@ -152,7 +152,7 @@ between "constantspace" and filesystem: we allow that there can be arbitrary
 constants defined in the subject module that have no counterpart node in the
 filesystem. however, for the converse we *do* model as a strong
 isomorphism: any "nodes" that we discover through the mechanism of
-[#024] #note-1, we model an inference of the existence of an "approximated"
+[#024.B], we model an inference of the existence of an "approximated"
 const when a corresponding "concrete" const is not known.
 
 so the founding axioms are that we can (in one direction) go from a "const"
@@ -283,7 +283,7 @@ reminder: per [#030.D.3], we do not assume a static constantspace.
 
 ## code notes :[#here.G]
 
-### :#note-1
+### .
 
 this is not an idempotent operation - if we were to use an `alias_method`
 to grab the original (pre-boxxy) method implementation, it would expose us

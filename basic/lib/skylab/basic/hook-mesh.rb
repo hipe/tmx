@@ -16,7 +16,7 @@ module Skylab::Basic
 
         yield self
 
-        freeze  # #here
+        freeze  # #here1
       end
 
       # -- redefine
@@ -61,7 +61,7 @@ module Skylab::Basic
         @_hook_box = @_hook_box.dup
       end
 
-      def freeze  # :#here
+      def freeze  # :#here1
         @_hook_box.freeze
         super
       end

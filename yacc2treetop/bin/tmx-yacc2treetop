@@ -688,7 +688,7 @@ module Skylab::Yacc2Treetop
 
     def __init_parser
 
-      # :[#.A]: the only way we establish the *class* for this "my parser" is
+      # :[#here.A]: the only way we establish the *class* for this "my parser" is
       # by running the treetop code at the end of this file thru treetop, and
       # then subclassing and extending that generated parser class. the only
       # way that is ever done is thru a call to this subject method (and its
@@ -1070,7 +1070,7 @@ module Skylab::Yacc2Treetop
 
   Build_requirer_proc__ = -> & init_constants do
 
-    # as long as we are :[#.B] in a single file, we don't have autoloading
+    # as long as we are :[#here.B] in a single file, we don't have autoloading
     # to give us regressable parsimony. instead, we do this "late making".
 
     p = -> do

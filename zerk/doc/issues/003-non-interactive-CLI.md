@@ -28,7 +28,7 @@ a "node map". (EDIT)
 
 # disjoint notes
 
-## #note-1
+## :[#here.B]
 
 this took quite a long time to untangle, and it is still quite tangled.
 this is terrible and needs a rewrite it's so confusing #todo:

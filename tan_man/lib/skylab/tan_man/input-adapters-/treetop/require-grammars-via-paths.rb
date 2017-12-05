@@ -35,7 +35,7 @@ module Skylab::TanMan
 
       LOADED__ = Common_::Box.new
 
-      def execute  # see [#.A]
+      def execute  # see [#here.A]
 
         # to save "time", we don't even normalize the parameters yet.
 

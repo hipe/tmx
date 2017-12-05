@@ -173,7 +173,7 @@ module Skylab::TMX::TestSupport
 
     it "help about slice" do
 
-      # :#coverpoint-1-D
+      # :#coverpoint1.D
 
       invoke _subject_operation, '-slice', '-help'
 

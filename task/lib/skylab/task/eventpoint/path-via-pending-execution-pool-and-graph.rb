@@ -81,7 +81,7 @@ class Skylab::Task
       end
 
       def __maybe_mention_that_there_are_some_unemployed_pending_executions
-        #coverpoint-1.1.2 - this does not cause failure, is just a notice
+        #coverpoint1.1.2 - this does not cause failure, is just a notice
         h = remove_instance_variable :@pending_execution_pool_hash
         if h.length.nonzero?
           Eventpoint::When_::UnutilizedPendingExecution.call(
@@ -307,7 +307,7 @@ class Skylab::Task
         # must exist in the graph too.
         #
         # for all nodes, the transition may be declared that transitions
-        # from that node to itself; as discussed at #coverpoint-1.1.1.
+        # from that node to itself; as discussed at #coverpoint1.1.1.
 
         from_sym = ft.from_symbol
         dest_sym = ft.destination_symbol

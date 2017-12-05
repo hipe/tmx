@@ -26,8 +26,7 @@ definition of actor).
 
 
 
-
-## the "final" narrative (towards #note-007)
+## the "final" narrative (towards [#here.H])
 
 the invisible fine print of [#004] the criteria model is that a report
 is nothing more than a list of functions that take at one end an entity
@@ -133,7 +132,7 @@ different than we could have forseen when we set out to make this.
 
 
 
-## this algorithm in particular :#note-007
+## this algorithm in particular :[#here.H]
 
 so we have the list of functions that make up this report. this twisted
 but precise algorithm is based off of two premi:

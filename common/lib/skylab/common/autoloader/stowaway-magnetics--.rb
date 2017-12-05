@@ -43,8 +43,8 @@ module Skylab::Common
 
     class NameAndValue_via_PathBased___
 
-      # #note-1 - how string-based stowaway specifiers are interpreted
-      # #note-2 - the autoloaderization contract when stowing away
+      # see [#here.B] how string-based stowaway specifiers are interpreted
+      # see [#here.C] the autoloaderization contract when stowing away
 
       def initialize path_tail, cm
         @client = cm

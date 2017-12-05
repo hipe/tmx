@@ -8,7 +8,7 @@ module Skylab::DocTest::TestSupport
     use :fixture_files
     use :my_API
 
-    context "(context)" do  # #coverpoint5-4
+    context "(context)" do  # #coverpoint5.4
 
       call_by do
 

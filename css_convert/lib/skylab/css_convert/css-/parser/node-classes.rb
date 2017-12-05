@@ -1,5 +1,5 @@
 
-self._NOT_USED  # see sibing README file at section [#.A]
+self._NOT_USED  # see [#004.B]
 
 module Skylab::CSS_Convert::CSS_::Grammar
 

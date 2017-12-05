@@ -1,6 +1,6 @@
 # string core assets
 
-## unindent :#note-01
+## unindent :[#here.B]
 
 the purpose of `unindent` is to allow us to write those HEREDOC's that
 are part of tests (the 95% case of our HEREDOC's at least) to be

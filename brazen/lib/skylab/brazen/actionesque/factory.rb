@@ -137,7 +137,7 @@ module Skylab::Brazen
 
           # the first time during the lifetime of this action that our formals
           # are accessed, add in *all* model class formal next to our "adverb"
-          # formals (continued at #note-135..)
+          # formals (continued at [#046.B])
 
           super fp_bx  # any preconditions will add their properties here. maybe [#018] order sensitive
 

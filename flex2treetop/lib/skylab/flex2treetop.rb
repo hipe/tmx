@@ -435,7 +435,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
-  Deferred_actor__ = -> p do  # why deferred? [#.B]
+  Deferred_actor__ = -> p do  # why deferred? [#here.B]
 
     cls_p = Common_::Memoize[ & p ]
 
@@ -964,7 +964,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       end
 
 
-      define_method :suffixate, -> do  # read [#.A]
+      define_method :suffixate, -> do  # read [#here.A]
 
         suffix = "__of_lexer__"
 

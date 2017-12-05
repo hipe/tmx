@@ -230,7 +230,7 @@ so, for 1) (add a node by re-appropriating if possible)
 
 
 
-## on locking (:#note-35) and related concerns
+## on locking and related concerns :[#here.B]
 
 ### what do we mean by "mutating" the collection?
 
@@ -343,11 +343,11 @@ DURING the entire "muation session":
     both file-based and (as far as we can tell) the same file. leave
     open an upgrade path if we decide to make this an option. but as-is,
     this is a solution for the tmpfile-related issues raised in the
-    previous section. (:#note-80)
+    previous section. :[#here.C]
 
 
 
-### appendix A - how to do lockfiles (:#note-65)
+### appendix A - how to do lockfiles :[#here.D]
 
 because concurrency is something we want to build for but is not
 something we need on the ground floor, we request locks on filehandles

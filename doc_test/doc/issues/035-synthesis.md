@@ -197,7 +197,7 @@ formulate a plan that when finished consists of these three components:
 
   - "dandy queue" - context nodes that exist on the right (by name)
     composed of one or more nodes that don't yet exist on the right
-    (:#note-1)
+    :[#here.B]
 
   - "creation tree" - context nodes and example nodes that do not
     exist on the right.

@@ -8,7 +8,7 @@ code notes.
 
 
 
-## :#note-1
+## :[#here.B]
 
 this tracks the namespaces of ivars and method names variously.
 

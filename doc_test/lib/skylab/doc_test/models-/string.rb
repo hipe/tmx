@@ -29,7 +29,7 @@ module Skylab::DocTest
       Unescape_matchdata__[ SOFT_MATCH_RX___.match(s) ]
     end
 
-    # (#coverpoint4-3 moved to [ba]!)
+    # (#coverpoint4.3 moved to [ba]!)
 
     qsll = Home_.lib_.basic::String.quoted_string_literal_library
 

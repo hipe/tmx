@@ -26,7 +26,7 @@ module Skylab::Zerk::TestSupport
 
       _lines = _by do |io|
         io.puts "usage: xx"
-        io.puts  # #coverpoint-2-2 agent can puts nil for blank line
+        io.puts  # #coverpoint2.2 agent can puts nil for blank line
         io.puts "description: line 1"
         io.puts "line 2"
         io.puts "line 3"
@@ -35,14 +35,14 @@ module Skylab::Zerk::TestSupport
       _lines == [ "line 1", "line 2" ] || fail
     end
 
-    it "works when the header is on its own line" do  # #coverpoint-2-1
+    it "works when the header is on its own line" do  # #coverpoint2.1
 
       lines = _against 'test-support-quickie.output'
       1 == lines.length || fail
       lines.first =~ /\Aquickie \[-[a-z-]+\]/ || fail
     end
 
-    it "works when color, when um nasty throw" do  # #coverpoint-2-3
+    it "works when color, when um nasty throw" do  # #coverpoint2.3
 
       lines = _against 'git-citxt.output'
       1 == lines.length || fail
@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
     end
 
     it "the agent can put a newline in the string and it works as expected" do
-      # #coverpoint-2-4
+      # #coverpoint2.4
 
       _lines = _by do |io|
         io.puts "synopsis: syno line 1\n#{
@@ -62,7 +62,7 @@ module Skylab::Zerk::TestSupport
     end
 
     it "dangling indented lines (look like they aren't in a section)" do
-      # #coverpoint-2-5
+      # #coverpoint2.5
 
       lines = _against 'tan-man-stack.output'
       lines.length == 2 || fail
@@ -72,7 +72,7 @@ module Skylab::Zerk::TestSupport
 
     it "section names (\"headers\") in their on line in all caps (manpage style)" do
 
-      # #coverpoint-2-6 - be case insensitive to how we compare section names
+      # #coverpoint2.6 - be case insensitive to how we compare section names
       # against target section names (by coverting it to downcase for a key)
 
       lines = _against 'tmx-xargs-ish-i.output'
@@ -81,7 +81,7 @@ module Skylab::Zerk::TestSupport
     end
 
     it "(edge case coverage: one line)" do
-      # #coverpoint-2-7
+      # #coverpoint2.7
 
       _invo = _build_invocation_by do |o|
         o.number_of_synopsis_lines = 1

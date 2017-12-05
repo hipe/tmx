@@ -77,7 +77,7 @@ module Skylab::Snag
           end
         end
 
-        def _attempt_to_lock io  # :#note-65
+        def _attempt_to_lock io  # see :[#038.D]
 
           d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
           if d
@@ -125,7 +125,7 @@ module Skylab::Snag
             ds_id = @_BUs_ID.to_byte_downstream_reference
           end
 
-          if ds_id.is_same_waypoint_as @_BUs_ID  # #note-85
+          if ds_id.is_same_waypoint_as @_BUs_ID
 
             _ = @invocation_resources.node_collection_filesystem_adapter
 
@@ -481,3 +481,4 @@ module Skylab::Snag
     end
   end
 end
+# #tombstone-A.1: sunset a disassociated note reference

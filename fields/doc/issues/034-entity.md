@@ -129,7 +129,7 @@ collision first before defining them these complex reasons:
 
 
 
-## a "clever" parsing experiment  (#note-185, also was #note-330) :[#here.2]
+## a "clever" parsing experiment  (was tombstoned-note-185 AND tombstoned-note-330) :[#here.2]
 
 interestingly, this current form of the method (that may look like
 function soup) buries a previous form of the same thing that had

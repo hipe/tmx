@@ -10,7 +10,7 @@ re-write it, yes it kinda is. )
 
 
 
-## :#note-110
+## :[#here.B]
 
 Each time you want to change a line in source code, cache up all
 the changes you want to make to each line that is in the same file
@@ -23,7 +23,7 @@ to be sure you do it right.)
 
 
 
-## :#note-40
+## :[#here.B]
 
 below, we associate the steps with numbers because their order is
 important. we will explain why the order is the order it is in after
@@ -56,7 +56,7 @@ second so that if the other operation fails, no information is lost.
 
 
 
-## :#note-170  (DETACHED but hovering for now..)
+## TODO check for relevance :[#here.C]
 
 You are taking out the todo tag and message from the line, and replacing
 it with a node identifer (number). This operation may leave you with

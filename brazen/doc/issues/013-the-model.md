@@ -126,7 +126,7 @@ branch nodes for which every child is promoted (covered).
 
 
 
-## :#note-10
+## :[#here.B]
 
 copy-pasted from 'action'. models that do have any child actions may get
 'infected' by the child's name function function. but models that don't
@@ -135,9 +135,7 @@ wont.
 
 
 
-
-
-## :#note-180
+## :[#here.C]
 
 do not set error count in the contructor. error count is set only when
 it is guaranteed to be written to during an edit session. this way, an
@@ -148,7 +146,7 @@ in us mistakenly thinking that an entity is valid.
 
 
 
-## :#note-120 ("model ivars" #open :[#018])
+## ("model ivars" #open :[#018]) :[#here.D]
 
 we say "actual property" with the exact sense of "actual"
 from [#fi-002.2] formal attributes vs. actual attributes.

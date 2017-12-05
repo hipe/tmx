@@ -43,7 +43,8 @@ IO spy objects with such a configuration are so common that using the
 
 
 
-## debugging options (:#note-030)
+
+## debugging options :[#here.B]
 
 during development, debugging or building a test; having the ability to
 see what is being written to a stream in real-time is sometimes
@@ -84,7 +85,7 @@ based on whether debugging is on or off at that moment.
 
 
 
-## "frame technique" :[#.A]
+## "frame technique" :[#here.A]
 
 (EDIT: do we call these "states" now?)
 

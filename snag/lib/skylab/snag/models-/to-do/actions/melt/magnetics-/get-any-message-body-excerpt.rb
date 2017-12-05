@@ -73,7 +73,7 @@ self._THE_DEAL  # ..here is that we went ahead and re-wrote "melt" without
 
       ELLIPSIS__ = ' ..'.freeze
       LINE_WIDTH__ = Models::Manifest.line_width
-      MIN_WORDS__ = 3  # #note-210
+      MIN_WORDS__ = 3  # (used to be marked with note in first tombstone)
     end
 
 # :#tombstone MIN_WORDS__ = 3  # #note-210

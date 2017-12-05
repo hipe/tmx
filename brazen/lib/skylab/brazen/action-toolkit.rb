@@ -702,7 +702,7 @@ module Skylab::Brazen
       end
     end
 
-    def normalize  # :[#.C].
+    def normalize  # :[#here.C].
       ACHIEVED_  # OK is the default. override or use entity lib to go nuts..
     end
 
@@ -964,7 +964,7 @@ module Skylab::Brazen
 
   private
 
-    def receive_uncategorized_emission i_a, & x_p  # #note-100
+    def receive_uncategorized_emission i_a, & x_p  # see [#024.C]
 
       bc = Emission_interpreter___[][ i_a, & x_p ]
 

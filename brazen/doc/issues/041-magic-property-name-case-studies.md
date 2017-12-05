@@ -105,7 +105,7 @@ handling, which is exactly what we do here:
 
 
 
-### :#note-st-1
+### :[#here.3]
 
 on the back, change the defaults; which is a hack that accomplishes the
 effect of always populating the argument box with these values of our

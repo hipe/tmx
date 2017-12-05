@@ -148,7 +148,7 @@ module Skylab::System
         self
       end
 
-      def prepare  # #note-130, keep eye on :+[#sy-004]:directory
+      def prepare  # [#here.B], keep eye on #[#sy-004]:directory
 
         if exist?
           __prepare_when_exist
@@ -326,7 +326,7 @@ module Skylab::System
 
       SAFETY_RX__ = %r{ / (?: tmp | T ) (?: / | \z ) }x
 
-      Raise__ = -> *a do  # #note-210
+      Raise__ = -> *a do
         nil.send :raise, * a
         UNABLE_
       end

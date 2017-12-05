@@ -42,7 +42,7 @@ module Skylab::TMX::TestSupport
       invoke '-x'
       want_on_stderr "unknown primary \"-x\""
       want_on_stderr "available primaries: -help and -verbose"
-      want_failed_normally_  # #coverpoint-1-F
+      want_failed_normally_  # #coverpoint1.F
     end
 
     context "help for root" do

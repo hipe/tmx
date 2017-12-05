@@ -4,7 +4,7 @@ module Skylab::DocTest
 
     class DocumentWriteMagnetics_::Upgrade
 
-      # #exactly #coverpoint5-4
+      # #exactly #coverpoint5.4
 
       # "upgrade" an example node to be a context *document branch*.
       # (this will not carry over any of the body content of the former):

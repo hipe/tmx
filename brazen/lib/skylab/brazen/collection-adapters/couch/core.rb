@@ -116,7 +116,7 @@ module Skylab::Brazen
 
       p ||= handle_event_selectively
       Couch_::Magnetics::TouchCollection_via_Collection[ self, & p ]
-      ACHIEVED_  # #note-085
+      ACHIEVED_  # [#038.B]
     end
 
     def entity_via_intrinsic_key id, & p

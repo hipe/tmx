@@ -52,7 +52,7 @@ small case studies:
 
 ## what is "sub-magic" and what is our chain of matcher-expressers?
 
-the code-node near #note-1 is one of several "matcher-expressers" that
+the code-node near [#here.B] is one of several "matcher-expressers" that
 we traverse over in order, looking for the first one that matches.
 (the following will serve as the definition of "matcher-expresser",
 which we may refer to as simply "matcher" further down below.)
@@ -127,7 +127,7 @@ we have to decide what to do.
 
 
 
-## what happens when a matcher-expresser fails (:#note-2)
+## what happens when a matcher-expresser fails :[#here.C]
 
 towards a more general idea we will introduce #here-2 below, our
 pattern for what to do if one (or more) of our matcher-expressers
@@ -179,7 +179,7 @@ that we think of as having a certain designed "scope" and expression.
 
   - for the failure that is the catalyst subject of this document,
     this is a failure of a relatively small scope that we recover
-    from locally as we describe at #note-2.
+    from locally as we describe at [#here.C].
 
   - for a failure of the type referenced by [#043], at writing this is
     designed to be a document-level failure. that is, upon encountering

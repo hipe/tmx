@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport
 
     context "no args" do
 
-      # :#coverpoint-2-1: no args will always fail, right?
+      # :#coverpoint2.1: no args will always fail, right?
 
       # - API
 
@@ -107,7 +107,7 @@ module Skylab::TestSupport::TestSupport
 
         it "still results in stream (the empty stream)" do
 
-          # #coverpoint-2-3: no longer do we break the stream in these cases
+          # #coverpoint2.3: no longer do we break the stream in these cases
 
           binding_.local_variable_get( :_items ).length.zero? || fail
         end

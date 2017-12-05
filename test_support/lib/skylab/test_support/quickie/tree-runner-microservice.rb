@@ -186,7 +186,7 @@ module Skylab::TestSupport
               _plugin = @lazy_index.dereference_plugin d
               profile = _plugin.release_agent_profile
               if ! profile
-                # hi: #coverpoint-2-4 is about how a single plugin (instance)
+                # hi: #coverpoint2.4 is about how a single plugin (instance)
                 # can fulfill multiple argument expressions in one invocation
                 next
               end
@@ -310,7 +310,7 @@ module Skylab::TestSupport
 
           elsif nar.token_scanner.no_unparsed_exists
 
-            # (no args will always fail (right?) but ride along.. #coverpoint-2-1)
+            # (no args will always fail (right?) but ride along.. #coverpoint2.1)
             ACHIEVED_
 
           else

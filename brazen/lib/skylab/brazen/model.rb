@@ -186,7 +186,7 @@ module Skylab::Brazen
 
     # -- As instance --
 
-    def initialize kernel, & p  # #note-180 do not set error count here
+    def initialize kernel, & p  # [#013.C] do not set error count here
 
       @listener = p or self._WHY
       @kernel = kernel
@@ -328,7 +328,7 @@ module Skylab::Brazen
       _read_knownness_( prp ).value
     end
 
-    def dereference i  # ( was #note-120 )
+    def dereference i  # (was [#055.C])
       @property_box.fetch i
     end
 

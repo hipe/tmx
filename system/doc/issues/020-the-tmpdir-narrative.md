@@ -44,7 +44,7 @@ birth of this document and can be found in the history of the code-node.
 
 
 
-## :#note-130
+## :[#here.B]
 
 by this selfsame definition a "preapared" testing tmpdir
 is one that is guaranteed to start out as empty (empty even of

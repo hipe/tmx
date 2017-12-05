@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Function_
 
-    class Unmarshal__  # see #note-006 in [#006]
+    class Unmarshal__  # see [#006.G]
 
       def initialize & p
         @_emit = p

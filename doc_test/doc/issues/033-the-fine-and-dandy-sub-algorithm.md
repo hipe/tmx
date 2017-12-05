@@ -50,13 +50,13 @@ we can arrive at the above by these rules:
     content of that node what that of the source item. (we won't bother
     checking if the content is byte-for-byte the same, probably.)
     (in the example, item (B) exercises this rule.)
-    (#coverpoint3-2)
+    (#coverpoint3.2)
 
  4. if the item does *not* exist in the destination document (by name) and it
     *is* the first item in the source, *prepend* the item to the destination
     document. (that is, place it before any/all other items in the destination
     document.) (in the example, item (A) exercises this rule.)
-    (#coverpoint3-1)
+    (#coverpoint3.1)
 
  5. otherwise (and neither rule (3) nor rule (4) applies), this case applies.
     the following sentence is a mouthful to parse, but we dissect it
@@ -98,7 +98,7 @@ we can arrive at the above by these rules:
     *why* we do it this way is the subject of its own section below.
 
     (in the example, item (C) exercises this rule.)
-    (#coverpoint3-3)
+    (#coverpoint3.3)
 
  6. perhaps as a corollary of the all of the above rules but stated here
     explicitly, those items that exist (by name) in the destination but not
@@ -115,7 +115,7 @@ we can arrive at the above by these rules:
     locations.)
 
     ((D) and (E) demonstrate this.)
-    (#coverpoint3-4)
+    (#coverpoint3.4)
 
 
 

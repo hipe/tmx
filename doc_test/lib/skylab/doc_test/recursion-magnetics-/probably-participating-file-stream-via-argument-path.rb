@@ -62,7 +62,7 @@ module Skylab::DocTest
 
       asset_path_st = remove_instance_variable :@_find_stream
 
-      _CHUNK_SIZE = 30  # see #note-1 in doc if you dare
+      _CHUNK_SIZE = 30  # see [#here.B] if you dare
       next_chunk = -> do
         path = asset_path_st.gets
         if path

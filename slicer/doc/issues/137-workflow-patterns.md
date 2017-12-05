@@ -43,10 +43,10 @@ with perhaps a retrospective analysis.
 
 
 
-## a practical development order for CRUD [#.H]
+## a practical development order for CRUD [#here.H]
 
 this is a fun one because it flies in the face of intuition. and like
-[#.G] below, this one is *maybe* better documented in rough draft form
+[#here.G] below, this one is *maybe* better documented in rough draft form
 in commit messages (but we couldn't find any just yet).
 
 first, let's consider an intuitive order before we present our argument
@@ -185,7 +185,7 @@ yay!
 
 
 
-## the 5-phase (five-phase) action implementation sequence :[#.G]
+## the 5-phase (five-phase) action implementation sequence :[#here.G]
 
 consider the premise that the value of any application lies in the value
 of its "essential operation" (or operations). the extent to which this

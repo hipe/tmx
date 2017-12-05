@@ -39,7 +39,7 @@ for a while:
     • that blank comment line (the third comment line), that gets rolled
       into the discussion run too, because (as a rule) if you are in
       a discussion run and you hit a blank line, it's included in the
-      discussion run (and so on for each such blank line) (#coverpoint1-1).
+      discussion run (and so on for each such blank line) (#coverpoint1.1).
 
     • that last line is a "code" line (part of a "code run", which in
       this example is only one line long). again, how we determine this
@@ -57,10 +57,10 @@ of the above line. (indent is defined more formally soon below.)
 
 conversely, when you're in a code run the transition back to a
 discussion run is signalled (only) when the indent level goes back to
-what it was last was at the last discussion run (or less). (#coverpoint1-5)
+what it was last was at the last discussion run (or less). (#coverpoint1.5)
 
 as with discussion runs, in a code run any blank line encountered will be
-rolled into that code run. (#coverpoint1-6)
+rolled into that code run. (#coverpoint1.6)
 
 one small but essential missing piece is this: for each comment block,
 the parsing always categorizes the first "contented" line of that comment
@@ -70,7 +70,7 @@ nothing.
 
 (what we mean by "contented" and what happens when all N lines of a code
 block have no content, that is an edge case that is the subject of tests
-only and we won't give it further discussion here. (#coverpoint1-9))
+only and we won't give it further discussion here. (#coverpoint1.9))
 
 with this algorithmic step of always starting things off with a
 discussion run, the trade-off is that there is no way to express a comment
@@ -106,7 +106,7 @@ recall that a transition from "discussion" to "code" happens when a
 threshold amount of change in indent occurs between two *adjacent*
 lines. what we didn't state explicitly above is that we keep track of the
 "current indent" level, and that it can change from line to line,
-as it does in this example (#coverpoint1-2):
+as it does in this example (#coverpoint1.2):
 
     some actual code
 
@@ -127,5 +127,5 @@ going from code back to discussion is particular too, as in this example:
 while it wouldn't be clear given what we've said so far, the last line
 above is a discussion line, because its content begins before the
 imaginary threshold line established by the last discussion line.
-(it then moves this imaginary line inwards to that point.) (#coverpoint1-3)
+(it then moves this imaginary line inwards to that point.) (#coverpoint1.3)
 _

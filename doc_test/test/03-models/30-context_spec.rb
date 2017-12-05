@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
       full_path_ 'doc/issues/003-how-nodes-are-generated.md'
     end
 
-    context "OE #coverpoint2-3" do
+    context "OE #coverpoint2.3" do
 
       shared_subject :_a do
         _for %r(\bpatterns in the comment block\z)
@@ -33,12 +33,12 @@ module Skylab::DocTest::TestSupport
     end
 
     # -
-      it "OO #coverpoint2-2" do
+      it "OO #coverpoint2.2" do
         _for( %r(\bonly unassertive ones\z) ).length.zero? or fail
       end
     # -
 
-    context "EE (comes out flatly) #coverpoint2-4" do
+    context "EE (comes out flatly) #coverpoint2.4" do
 
       shared_subject :_a do
         _for %r(\beach of which has an assertion\z)
@@ -60,7 +60,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    # not yet covered: #coverpoint2-1: a comment block with no code run
+    # not yet covered: #coverpoint2.1: a comment block with no code run
 
     def _for rx
       first_node_stream_corresponding_to_regex_( rx ).to_a.freeze

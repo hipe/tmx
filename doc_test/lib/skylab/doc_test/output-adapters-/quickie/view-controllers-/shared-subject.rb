@@ -27,7 +27,7 @@ module Skylab::DocTest
         @_visible_shared = visible_shared
       end
 
-      def to_branch_local_document_node_matcher  # [#038] #note-1
+      def to_branch_local_document_node_matcher  # see [#038.B]
 
         lvalue_string = self.lvalue_string
         -> dn do

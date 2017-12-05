@@ -159,16 +159,6 @@ here is how it compares:
 
 
 
-## :#note-80
-
-this is all hugely experimental, but for now actors are assumed to be
-named like local procs, that is:
-
-    class Verb_noun_etc_etc__  # ..
-
-
-
-
 ## actor patterns
 
 sometimes only a name and some documentation makes the difference
@@ -236,3 +226,11 @@ and for a note about our suggested implementation,
 although [#bs-015] `ok` chains are arguably kind of ugly, the are still better than
 every other comparable alternative we have tried in the lengthy history
 of this universe.
+
+
+
+
+## document-meta
+
+  - #tombstone-A.1: bury a disassociated note about old verb-noun name
+    convention for actors. (the "magnetics" pattern has replaced this.)

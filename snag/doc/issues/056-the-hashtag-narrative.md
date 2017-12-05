@@ -18,7 +18,7 @@ much general applicability.
 
 
 
-## :#note-125
+## :[#here.B]
 
 the third and every subsequent time we re-build a piece, we re-use one
 of the first two pieces we built, alternating which one we use

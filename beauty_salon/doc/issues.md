@@ -97,7 +97,7 @@
 
 [#010]       sl/test-support/tmpdir is a great subject
              (this has become more generally a #tracking-tag for same.)
-             :[#.B] (in [pl])
+             :[#here.B] (in [pl])
 [#009]       #backburner unwrap -- terrible idea
 
 [#008]       ( lend & borrow dependency & coverage )

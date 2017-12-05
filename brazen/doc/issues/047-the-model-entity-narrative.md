@@ -13,7 +13,7 @@ actions in other applications.
 
 
 
-## :#note-360  "entities are not actors"
+## entities are not actors :[#here.B]
 
 setting property values to ivars is not recommended because 1) the ivar
 namespace is volatile as the framework changes, 2) it is unreasonable to

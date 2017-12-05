@@ -91,7 +91,7 @@ module Skylab::Basic
           NIL_
         end
 
-        def __determine_first_width_guess  # see "this formula" (#note-A)
+        def __determine_first_width_guess  # see [#033.B] "this formula"
 
           _sqrt_me = 1.0 * @total / @ratio_width / @ratio_height
 

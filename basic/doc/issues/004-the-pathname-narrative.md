@@ -15,7 +15,7 @@ or a child node of that node.
 
 
 
-## :#note-010 #TODO this is a detached comment node
+## #todo DETACHED (was #n-ote-010)
 
 (this is just a detached notion that we may or may not ever use)
 

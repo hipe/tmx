@@ -150,7 +150,7 @@ _SUPREME_HACK = -> do
 
         eek == path || TS_._SANITY
 
-        # #coverpoint-2-5: we won't see the description of the root element
+        # #coverpoint2.5: we won't see the description of the root element
         # (the describe) because that's how it is with the tree roots..
 
         _describer = TS_::Quickie::Plugins::DescribeProxy.new do |p, s_a|

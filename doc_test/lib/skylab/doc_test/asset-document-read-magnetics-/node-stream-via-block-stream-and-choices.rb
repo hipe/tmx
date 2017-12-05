@@ -63,7 +63,7 @@ module Skylab::DocTest
       x
     end
 
-    def __assemble_whole_node_because_OE  # #coverpoint2-3
+    def __assemble_whole_node_because_OE  # #coverpoint2.3
 
       Home_::Models_::Context.via_valid_pair_array_and_choices__(
 
@@ -133,10 +133,10 @@ module Skylab::DocTest
 
       if pairs
         if ! seen_example
-          disreagard_this_comment_block = true  # #coverpoint2-2 ("OO")
+          disreagard_this_comment_block = true  # #coverpoint2.2 ("OO")
         end
       else
-        disreagard_this_comment_block = true  # #coverpoint2-1 (empty set)
+        disreagard_this_comment_block = true  # #coverpoint2.1 (empty set)
       end
 
       @_disreagard_this_comment_block = disreagard_this_comment_block

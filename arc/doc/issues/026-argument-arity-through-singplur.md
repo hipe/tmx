@@ -76,7 +76,7 @@ another association,
     are following (A) above, and that the plural slot is being used
     for storage, and in effect there is no singular slot. as such, for
     normalization we will check if the parameter is the singular side of
-    a `singplur` pair, and skip it if it is.  (:#note-1)
+    a `singplur` pair, and skip it if it is. :[#here.B]
 
 
 

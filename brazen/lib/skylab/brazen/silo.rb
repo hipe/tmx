@@ -69,7 +69,7 @@ module Skylab::Brazen
         end
       end
 
-      def __via_unresolved_identifier id, & p  # #note-40, :+[#pa-002]
+      def __via_unresolved_identifier id, & p  # [#015.B], #[#pa-002]
 
         id = id.as_mutable_for_resolving
 
@@ -115,7 +115,7 @@ module Skylab::Brazen
             break
 
           when -1
-            # #note-265 - although it is a class of use cases for which this..
+            # [#016.D] although it is a class of use cases for which this..
             NIL_
           end
         end

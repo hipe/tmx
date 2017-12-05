@@ -123,7 +123,7 @@ module Skylab::DocTest
         ok && remove_instance_variable( :@unit_of_work_stream )
       end
 
-      def __check_that_path_exists  # because #note-2 in [#029]
+      def __check_that_path_exists  # because [#029.C]
 
         if @filesystem.exist? @path  # file or directory OK
           ACHIEVED_

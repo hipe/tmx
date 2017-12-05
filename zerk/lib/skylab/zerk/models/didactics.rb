@@ -24,7 +24,7 @@ module Skylab::Zerk
             oper.method :to_item_normal_tuple_stream_for_didactics  # #tombstone #temporary
 
           description_proc_reader =
-            oper.description_proc_reader_for_didactics  # #note-3 (curator can delegate)
+            oper.description_proc_reader_for_didactics  # [#here.D] curator can delegate
 
           is_branchy = oper.is_branchy
         end
@@ -34,7 +34,7 @@ module Skylab::Zerk
           _parent_dida = parent_by.call
           _k = @name.as_lowercase_with_underscores_symbol
           desc_p = _parent_dida.description_proc_for _k
-          # subject description is "curated" IFF parent is known #note-3
+          # subject description is "curated" IFF parent is known [#here.D]
         else
           desc_p = oper.method :describe_into  # balls
         end

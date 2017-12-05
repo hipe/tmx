@@ -95,7 +95,7 @@ module Skylab::Tabular::TestSupport
       end
     end
 
-    it "edge - empty second page" do  # #coverpoint-1-1 - an empty PAGE
+    it "edge - empty second page" do  # #coverpoint1.1 - an empty PAGE
 
       # (this happens in nature if you say `echo "a b\nc d\n" | [..]` -
       #  `echo` appends *another* newline to the end of the string so..)
@@ -108,7 +108,7 @@ module Skylab::Tabular::TestSupport
 
       call( :infer_table,
         :mixed_tuple_upstream, _mt_st,
-        :page_size, 2,  # for #coverpoint-1-1
+        :page_size, 2,  # for #coverpoint1.1
       )
 
       finish_by do |op|

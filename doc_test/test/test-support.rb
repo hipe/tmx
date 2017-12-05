@@ -49,7 +49,7 @@ module Skylab::DocTest::TestSupport
 
     # -- support for making assertions
 
-    def execute_unit_of_work_ uow  # explained in [#029] #note-4
+    def execute_unit_of_work_ uow  # explained in [#029.E]
       _hi = uow.express_into_under :___yielder_not_used, :____expag_not_used
       _hi == :___yielder_not_used || fail
       NIL

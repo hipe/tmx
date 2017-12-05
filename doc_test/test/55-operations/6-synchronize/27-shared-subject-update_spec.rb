@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
 
       call_by do
 
-        _test = fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5-5
+        _test = fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5.5
 
         my_API_common_generate_(
           asset_line_stream: _same_asset_line_stream,
