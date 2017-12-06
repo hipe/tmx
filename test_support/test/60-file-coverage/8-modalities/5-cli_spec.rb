@@ -43,8 +43,9 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :__coarse_parse do
         _invoke '-h', _ACTION
-        _lines = release_lines_for_want_stdout_stderr
-        Zerk_test_support_[]::CLI::Want_Section_Coarse_Parse.new _lines
+        _line_o_a = release_lines_for_want_stdout_stderr
+        Zerk_test_support_[]::CLI::Want_Section_Coarse_Parse.
+          via_line_object_array _line_o_a
       end
     end
 

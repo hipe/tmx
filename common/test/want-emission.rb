@@ -565,10 +565,7 @@ module Skylab::Common::TestSupport
       end
 
       def _expev_matcher_by & def_p
-
-        Expectation__.new do
-          instance_exec( & def_p )
-        end.to_matcher_bound_to self
+        Expectation___.new( def_p ).to_matcher_bound_to self
       end
 
       # -- internal support
@@ -600,12 +597,14 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    class Emission_Matcher___
+    class EmissionMatcher___
 
       def initialize expectation, tc
         @_expectation = expectation
         @_test_context = tc
       end
+
+      # ~( #open [#ts-033.3]
 
       def matches? em
 
@@ -640,6 +639,15 @@ module Skylab::Common::TestSupport
           @_emission
         end
       end
+
+      def failure_message  # #Coverpoint1.1
+        _st = Home_::Stream.via_nonsparse_array @_failures
+        _st.join_into_with_by ::String.new, NEWLINE_ do |p|
+          p[]
+        end
+      end
+
+      # ~)
 
       def ___check_trilean
 
@@ -838,22 +846,13 @@ module Skylab::Common::TestSupport
           UNABLE_
         end
       end
-
-      def failure_message_for_should  # #c.p
-
-        _s_a = @_failures.reduce [] do | m, p |
-          m << p[]
-        end
-
-        _s_a.join NEWLINE_
-      end
     end
 
     # ==
 
-    class Expectation__
+    class Expectation___
 
-      def initialize & def_p
+      def initialize def_p
         # (hi.)
         instance_exec( & def_p )
       end
@@ -908,7 +907,7 @@ module Skylab::Common::TestSupport
       # --
 
       def to_matcher_bound_to test_context
-        Emission_Matcher___.new self, test_context
+        EmissionMatcher___.new self, test_context
       end
 
       attr_reader(

@@ -251,8 +251,8 @@ module Skylab::Zerk::TestSupport
 
         using_want_stdout_stderr_invoke_via_argv argv
         # (result is nil. ivars are set.)
-        _lines = release_lines_for_want_stdout_stderr
-        TS_::CLI::Want_Section_Coarse_Parse.new _lines
+        _line_o_a = release_lines_for_want_stdout_stderr
+        TS_::CLI::Want_Section_Coarse_Parse.via_line_object_array _line_o_a
       end
 
       def argv * argv  # see DSL tombstone

@@ -310,11 +310,7 @@ module Skylab::Human
             end
           end
 
-          def redefine
-            otr = dup
-            yield otr
-            otr.freeze
-          end
+          define_method :redefine, Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
 
           def duplicate
             dup

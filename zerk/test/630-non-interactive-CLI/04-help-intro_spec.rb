@@ -8,7 +8,7 @@ module Skylab::Zerk::TestSupport
     use :memoizer_methods
     use :CLI_want_section_coarse_parse
 
-    it "1.4)   topmost help screen shows desc of op that is in frame 1" do
+    it "1.4)   topmost help screen shows desc of op that is in frame 1" do  # #coverpoint3.1
 
       _rx = %r(^ +wazoozie-foozie +have fun\n)
       expect( _top_help_screen.section :actions ).to have_styled_line_matching _rx
@@ -101,13 +101,13 @@ module Skylab::Zerk::TestSupport
       it "the arguments section speaks of the bespoke parameter" do
 
         _li = section( :arguments ).line_at_offset 1
-        expect( _li ).to be_item_pair( :styled, 'flim-flam', "f.f" )
+        expect( _li ).to be_item_pair :styled, 'flim-flam', 'f.f'
       end
 
       it "the arguments section speaks of the appropriated parameter" do
 
         _li = section( :arguments ).line_at_offset 2
-        expect( _li ).to be_item_pair( :styled, 'nim-nam', "n.n" )
+        expect( _li ).to be_item_pair :styled, 'nim-nam', 'n.n'
       end
 
       dangerous_memoize :_usage_index do

@@ -28,7 +28,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "option" do
-        expect( build_index_of_option_section ).to have_option( '-f', '--foobizzle X' )
+        expect( build_index_of_option_section ).to have_option '-f', '--foobizzle X'
       end
     end
 

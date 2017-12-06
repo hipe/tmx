@@ -511,8 +511,6 @@ module Skylab::Zerk
         end
       end
 
-      Scanner_ = ->( a ){ Common_::Scanner.via_array a }  # :[#bs-004.2]
-
       # ==
 
       COLON_ = ':'

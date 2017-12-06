@@ -88,7 +88,7 @@ module Skylab::Zerk
         finish
       end
 
-      def redefine
+      def redefine  # compare Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
         otr = dup
         yield Design_DSL__.new otr
         otr.finish

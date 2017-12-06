@@ -9,7 +9,7 @@ module Skylab::TestSupport
 
     module Test_Context_Instance_Methods
 
-      # -- freeze an invocation as a shared state [#.A]
+      # -- freeze an invocation as a shared state [#here.A]
 
       def flush_invocation_to_help_screen_oriented_state  # current favorite
 
@@ -239,25 +239,34 @@ module Skylab::TestSupport
         want_stdout_stderr_via Expectation.via_args( x_a, & p )
       end
 
-      def want_stdout_stderr_via exp
-
-        @__sout_serr_expectation__ = exp
+      def want_stdout_stderr_via exp  # underwent big changes at tombstone-A.2
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
-
-        p = exp.receive_unstyled_string
-
-        ok = __send__ exp.method_name
-
-        if ok && p
-          s =  @__sout_serr_line__
-          if ! s
-            s = @__sout_serr_emission__.string.gsub SIMPLE_STYLE_RX__, EMPTY_S_
-            s.chomp!
-          end
-          ok = p[ s ]
+        if @__sout_serr_actual_scanner__.no_unparsed_exists
+          msg = 'expected an emission, had none'
+          _fail_with_message_TS { msg }
+        else
+          __when_some_emissions_TS_SOUT_SERR exp
         end
-        ok
+      end
+
+      def __when_some_emissions_TS_SOUT_SERR exp
+        scn = @__sout_serr_actual_scanner__
+        _em = scn.head_as_is
+        matcher = exp.to_matcher_bound_to self
+        ok_x = matcher.matches? _em
+        p = exp.receive_unstyled_string
+        if ok_x && p
+          ok_x = p[ matcher._fully_normal_string ]
+        end
+        if ok_x
+          scn.advance_one
+          ok_x
+        elsif respond_to? :quickie_fail_with_message_by  # #here2
+          UNABLE_  # already emitted
+        else
+          ::Kernel._COVER_RSPEC_LYFE  # #todo - maybe never hits
+        end
       end
 
       # ~ for the end
@@ -284,6 +293,15 @@ module Skylab::TestSupport
         @exitstatus
       end
 
+      def _fail_with_message_TS & p
+        if respond_to? :quickie_fail_with_message_by  # #here2
+          quickie_fail_with_message_by( & p )
+        else
+          _msg = p[]
+          fail _msg
+        end
+      end
+
       # ~ support & other expectations
 
       def want_maybe_a_blank_line
@@ -308,8 +326,9 @@ module Skylab::TestSupport
         scn = stream_for_want_stdout_stderr
 
         if scn.unparsed_exists
-          _x = scn.head_as_is
-          fail "expected no more lines, had #{ _x.to_a.inspect }"
+          _em = scn.head_as_is
+          _msg = "expected no more lines, had #{ _em.to_a.inspect }"
+          _fail_with_message_TS { _msg }
         end
       end
 
@@ -379,7 +398,7 @@ module Skylab::TestSupport
           redo
         end while nil
 
-        Emissions_Element___.new y
+        EmissionsElement___.new y
       end
 
       def flush_to_content_scanner
@@ -422,77 +441,6 @@ module Skylab::TestSupport
         end
       end
 
-      # ~ support for the oldschool way
-
-      def sout_serr_want_given_regex  # [te]
-        if _sout_serr_want_and_resolve_emission_line
-          expect( @__sout_serr_line__ ).to match @__sout_serr_expectation__.pattern_x
-          @__sout_serr_emission__
-        end
-      end
-
-      def sout_serr_want_given_string  # [te]
-        if _sout_serr_want_and_resolve_emission_line
-          expect( @__sout_serr_line__ ).to eql @__sout_serr_expectation__.pattern_x
-          @__sout_serr_emission__
-        end
-      end
-
-      def _sout_serr_want_and_resolve_emission_line
-        if _sout_serr_want_and_resolve_emission
-          line = @__sout_serr_emission__.string
-          s = line.chomp!  # NOTE - we mutate it for now!
-          if s
-            __sout_serr_receive_chomped_emission_line s
-          else
-            fail ___say_not_newlined line
-          end
-        end
-      end
-
-      def ___say_not_newlined line
-        "for now expecting all lines to be newline terminated: #{ line.inspect }"
-      end
-
-      def __sout_serr_receive_chomped_emission_line line
-        if @__sout_serr_expectation__.want_is_styled
-          s = line.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
-          if s
-            @__sout_serr_line__ = s
-            ACHIEVED_
-          else
-            fail "expected styled, was not: #{ line.inspect }"
-          end
-        else
-          @__sout_serr_line__ = line
-          ACHIEVED_
-        end
-      end
-
-      def _sout_serr_want_and_resolve_emission
-        exp = @__sout_serr_expectation__
-        scn = @__sout_serr_actual_scanner__
-        if scn.unparsed_exists
-          em = scn.gets_one
-          @__sout_serr_emission__ = em
-          @__sout_serr_line__ = nil
-          stream_sym = exp.stream_symbol
-          stream_sym ||= __sout_serr_default_stream_symbol__
-          if stream_sym
-            if stream_sym == em.stream_symbol
-              ACHIEVED_
-            else
-              fail "expected emission on channel '#{ stream_sym }', #{
-                }but emission was on channel '#{ em.stream_symbol }'"
-            end
-          else
-            ACHIEVED_
-          end
-        else
-          fail "expected an emission, had none"
-        end
-      end
-
       # -- set a "nonstandard" (i.e "newschool") test subject
 
       def stdout_stderr_against_emission em
@@ -526,9 +474,8 @@ module Skylab::TestSupport
       end
 
       def _bake_sout_serr
-        @__sout_serr_actual_scanner__ = Common_::Scanner.via_array(
-          flush_baked_emission_array )
-
+        _em_a = flush_baked_emission_array
+        @__sout_serr_actual_scanner__ = Scanner_[ _em_a ]
         true
       end
 
@@ -567,7 +514,7 @@ module Skylab::TestSupport
       def initialize scn, & p
 
         @want_is_styled = false
-        @method_name = :_sout_serr_want_and_resolve_emission
+        @method_name = NOTHING_  # #coverpoint3.1
         @stream_symbol = nil
 
         process_argument_scanner_passively scn
@@ -593,13 +540,15 @@ module Skylab::TestSupport
       end
 
       def Regexp scn
-        @method_name = :sout_serr_want_given_regex
-        @pattern_x = scn.gets_one
-        KEEP_PARSING_
+        _same :_curate_content_when_regexp_, scn
       end
 
       def String scn
-        @method_name = :sout_serr_want_given_string
+        _same :_curate_content_when_string_, scn
+      end
+
+      def _same m, scn
+        @method_name_for_curate_content = m
         @pattern_x = scn.gets_one
         KEEP_PARSING_
       end
@@ -617,7 +566,7 @@ module Skylab::TestSupport
 
       attr_reader(
         :want_is_styled,
-        :method_name,
+        :method_name_for_curate_content,
         :pattern_x,
         :receive_unstyled_string,
         :stream_symbol,
@@ -628,115 +577,154 @@ module Skylab::TestSupport
 
     class Matcher___
 
-      # most of this is necessarily redundant (in spirit) with the above.
-      # see [#]oldschool-newschool-exegesis
+      # see [#here.C] oldschool/newschool exegesis
 
       def initialize exp, tc
+        @__mutex = nil
         @_expectation = exp
         @_test_context = tc
       end
 
+      # ~( #open #[#033.3]
+
       def matches? line_o
-
-        exp = @_expectation
-        @_matchdata = nil
-
-        @_failures = nil
-        sym = exp.stream_symbol
-        if sym
-          if sym != line_o.stream_symbol
-            _add_failure line_o.stream_symbol, sym, :stream_symbol
-          end
-        end
-
-        m = exp.method_name
-        if m
-          @_against_string = if exp.want_is_styled
-            __unstyle line_o.string
-          else
-            __chomp line_o.string
-          end
-
-          send m
-        elsif exp.want_is_styled
-          self._ETC
-        end
-
+        remove_instance_variable :@__mutex  # etc
+        @_matchdata = nil ; @_failures = nil
+        @_line_object = line_o
+        execute
         if @_failures
           ___when_failed
         else
-          @_matchdata || :_want_stdout_stderr_matched_
+          @_matchdata || ACHIEVED_
         end
       end
 
+      def failure_message  # #copy-paste of [#co.Coverpoint1.1] #coverpoint3.1
+        Stream_[ @_failures ].join_into_with_by ::String.new, NEWLINE_ do |p|
+          p[]
+        end
+      end
+
+      # ~)
+
       def ___when_failed
 
-        if @_test_context.respond_to? :quickie_fail_with_message_by
+        if @_test_context.respond_to? :quickie_fail_with_message_by  # #here2
           # (the crux of the hack for this to work in both test fw's)
-          _p = method :failure_message_for_should
+          _p = method :failure_message  # #[#033.3]
           @_test_context.quickie_fail_with_message_by( & _p )
         else
           UNABLE_
         end
       end
 
-      def __unstyle s
-        s_ = s.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
-        if s_
-          _yes = s_.chomp!
-          if ! _yes
-            _say_no_newline s_
+      def execute
+        if __cares_about_channel
+          if __curate_channel
+            _curate_content
+          else
+            _curate_content  # experimentally, enhance the failure with more detail
           end
-          s_
         else
-          _add_failure_by do
-            "expected styled, was not: #{ s.inspect }"
-          end
-          s
+          _curate_content
         end
       end
 
-      def __chomp s
-        s_ = s.chomp
-        if s_.length == s.length
-          _say_no_newline s
+      def _curate_content
+        __curate_newlined_ness
+        __curate_styled_ness
+        m = @_expectation.method_name_for_curate_content
+        if m
+          send m
         end
-        s_
       end
 
-      def _say_no_newline s
+      # ~( #testpoint (method names)
 
-        _add_failure_by do
-          "all lines must be newline terminated (had: #{ s.inspect })"
-        end
-        NIL_
-      end
-
-      def sout_serr_want_given_regex
-
-        md = @_expectation.pattern_x.match @_against_string
+      def _curate_content_when_regexp_
+        md = @_expectation.pattern_x.match _fully_normal_string
         if md
-          @_matchdata = md
+          @_matchdata = md ; nil
         else
           _add_failure_by do
             "string did not match #{ @_expectation.pattern_x } - #{
-              }#{ @_against_string.inspect }"
+              }#{ _fully_normal_string.inspect }"
           end
         end
-        NIL_
       end
 
-      def sout_serr_want_given_string
-
-        if @_expectation.pattern_x != @_against_string
-          _add_failure @_against_string, @_expectation.pattern_x, :string
+      def _curate_content_when_string_
+        if @_expectation.pattern_x != _fully_normal_string
+          _add_failure _fully_normal_string, @_expectation.pattern_x, :string
         end
-        NIL_
       end
 
-      def _add_failure * trio
+      # )
 
-        actual_x, expected_x, thing_sym = trio
+      def _fully_normal_string
+        send @_fully_normal_string
+      end
+
+      def __curate_styled_ness
+        if @_expectation.want_is_styled
+          s_ = _string_without_newline.gsub SIMPLE_STYLE_RX__, EMPTY_S_
+          if s_.length == _string_without_newline.length
+            __when_was_not_styled
+          end
+          @__unstyled_string = s_
+          @_fully_normal_string = :__unstyled_string ; nil
+        else
+          @_fully_normal_string = :_string_without_newline ; nil
+        end
+      end
+
+      def __when_was_not_styled
+        _add_failure_by do
+          "expected styled, was not: #{ _string_without_newline.inspect }"
+        end
+      end
+
+      def __unstyled_string
+        @__unstyled_string
+      end
+
+      def __curate_newlined_ness
+        longer = _actual_line_string
+        shorter = longer.chomp
+        if shorter.length == longer.length
+          _add_failure_by do
+            "all lines must be newline terminated (had: #{ _actual_line_string.inspect })"
+          end
+        end
+        @__string_without_newline = shorter ; nil
+      end
+
+      def _string_without_newline
+        @__string_without_newline
+      end
+
+      def _actual_line_string
+        @_line_object.string
+      end
+
+      def __curate_channel
+        if _expected_stream_symbol == _actual_stream_symbol
+          ACHIEVED_
+        else
+          _add_failure _actual_stream_symbol, _expected_stream_symbol, :stream_symbol
+        end
+      end
+
+      def _actual_stream_symbol
+        @_line_object.stream_symbol
+      end
+
+      def _expected_stream_symbol
+        @_expectation.stream_symbol
+      end
+      alias_method :__cares_about_channel, :_expected_stream_symbol
+
+      def _add_failure actual_x, expected_x, thing_sym
 
         _add_failure_by do
 
@@ -748,24 +736,13 @@ module Skylab::TestSupport
       end
 
       def _add_failure_by & p
-
-        ( @_failures ||= [] ).push p
-        NIL_
-      end
-
-      def failure_message_for_should
-
-        _s_a = @_failures.reduce [] do | m, p |
-          m << p[]
-        end
-
-        _s_a.join NEWLINE_
+        ( @_failures ||= [] ).push p ; nil
       end
     end
 
     # ~ for "summary"
 
-    class Emissions_Element___
+    class EmissionsElement___
 
       def initialize a
         @_a = a
@@ -819,4 +796,5 @@ module Skylab::TestSupport
     end
   end
 end
+# #tombstone-A.2: oldschool instance methods module monolith now depdends on matcher
 # :+#posterity: we replaced with "methodic" code that was its conceptual ancestor

@@ -69,6 +69,10 @@ module Skylab::Zerk  # intro in [#001] README
     Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
   end
 
+  Scanner_ = -> a do  # #[#bs-004.2]
+    Common_::Scanner.via_array a
+  end
+
   # == stowaways
 
   Autoloader_ = Common_::Autoloader

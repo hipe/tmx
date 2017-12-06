@@ -25,11 +25,7 @@ module Skylab::Fields
           end
         end )
 
-        def redefine  # experiment ([tm], [bs])
-          otr = dup
-          yield otr
-          otr.freeze
-        end
+        define_method :redefine, self::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
 
         def will_describe_by_this p
           send ( @_receive_description ||= :__receive_1st_description ), p

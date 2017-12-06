@@ -98,11 +98,8 @@ module Skylab::Tabular
   # == models & support
 
   class SimpleModel_ < Common_::SimpleModel
-    def redefine  # (will probably get pushed up) #[#co-049.1]
-      otr = dup
-      yield otr
-      otr.freeze
-    end
+
+    define_method :redefine, self::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
   end
 
   module Models

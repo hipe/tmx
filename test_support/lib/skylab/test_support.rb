@@ -187,6 +187,10 @@ module Skylab::TestSupport  # :[#021].
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   # --
 
   Autoloader_ = Common_::Autoloader

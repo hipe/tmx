@@ -40,14 +40,25 @@ module Skylab::Common
   # (experiments while we let some dust settle..)
 
   class SimpleModel
+
     class << self
       alias_method :define, :new
       undef_method :new
     end  # >>
+
     def initialize
       yield self
       freeze
     end
+
+    DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE = -> & p do
+      # (this method is opt-in because of how tricky it can be to implement
+      # dup-and-mutate correctly per your class.)
+      otr = dup
+      p[ otr ]
+      otr.freeze
+    end
+
     private :dup
   end
 

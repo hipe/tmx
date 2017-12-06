@@ -1,10 +1,10 @@
 module Skylab::Zerk::TestSupport
 
-  class CLI::Want_Section_Coarse_Parse
+  class CLI::Want_Section_Coarse_Parse  # (as class, re-opens #here3)
 
     # the fourth of #[#054], this is :[#054.4] (a blind rewrite)
     #
-    # the subject's philosophy is encapsulated succinctly #here-2.
+    # the subject's philosophy is encapsulated succinctly #here2.
     #
     # (although there is a fifth in this strain, subject is last ever file.)
     #
@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
       Use_::Memoizer_methods[ tcc ]
       TS_::Non_Interactive_CLI[ tcc ]
       tcc.send :define_singleton_method, :given_screen, Given_screen___
-      tcc.include Instance_Methods__
+      tcc.include InstanceMethods__
     end
 
     # -
@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
 
     Magnetics = ::Module.new  # for here and sibling (maybe not used there)
 
-    module Instance_Methods__
+    module InstanceMethods__
 
       # -- methods that produce subjects
 
@@ -55,7 +55,7 @@ module Skylab::Zerk::TestSupport
       def build_index_of_this_unstyled_usage_line mutable_s
         Magnetics::SlugIndexBox_via_MutableString[ mutable_s ]
       end
-    end
+    end  # (re-opens)
 
     module Magnetics
 
@@ -78,7 +78,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    module Instance_Methods__
+    module InstanceMethods__  # (re-open)
 
       # ~ options
 
@@ -119,7 +119,7 @@ module Skylab::Zerk::TestSupport
           md = OPTION_LINE_RX__.match s
 
           if md
-            ol = Option_Item___.new was_styled, * md.captures
+            ol = OptionItem___.new was_styled, * md.captures
             s = ol.short
             if s
               bx.add s, ol
@@ -149,7 +149,7 @@ module Skylab::Zerk::TestSupport
           (?:[ ]{2,}(?<rest>[^ ].+))?
         \n\z)x
 
-      class Option_Item___
+      class OptionItem___
 
         def initialize b, s, s_, s__
           @desc = s__
@@ -179,14 +179,15 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    module Instance_Methods__
+    module InstanceMethods__  # (re-open)
 
       def section sym
         niCLI_help_screen.section sym
       end
 
       def __build_hsz_screen
-        CoarseParse___.new niCLI_state.lines
+
+        CoarseParse___.via_line_object_scanner Home_::Scanner_[ niCLI_state.lines ]
       end
 
       # -- methods that produce predicates (matchers)
@@ -194,38 +195,50 @@ module Skylab::Zerk::TestSupport
       def be_description_line_of opt_sym=nil, exp_s
         o = Single_description_line___[].for exp_s, self
         if opt_sym
-          o.send opt_sym  # :#here, nasty
+          o.send opt_sym  # :#here1, nasty
         end
         o
       end
 
       Single_description_line___ = Lazy_.call do
-        o = Regex_Based_Matcher__.new %r(\Adescription: (.+)$)
+        RegexpBasedMatcher__.define do |o|
+          o.regexp = %r(\Adescription: (.+)$)
         o.line_offset = 0
         o.subject_noun_phrase = "single description line"
-        o
+        end
       end
 
       # ~ options
 
       def have_option sw, long_plus, desc=nil
-
-        oim = Option_Index_Matcher___.new sw, long_plus, self
-        if desc
-          oim.desc = desc
-          oim.want_desc_was_styled = true  # ..
+        OptionIndexMatcher___.define do |o|
+          if desc
+            o.desc = desc
+            o.want_desc_was_styled = true  # ..
+          end
+          o.short_switch = sw
+          o.long_switch_plus = long_plus
+          o.mixed_test_context = self
         end
-        oim
       end
 
       def have_item_pair_of opt_sym=nil, a, b
-        Item_Pair_Matcher__.new opt_sym, a, b, self
+        ItemPairMatcher__.define do |o|
+          o.option_symbol = opt_sym
+          o.left_column_cel_string = a
+          o.right_column_cel_string = b
+          o.mixed_test_context = self
+        end
       end
 
       def be_item_pair opt_sym=nil, a, b
-        ipm = Item_Pair_Matcher__.new opt_sym, a, b, self
-        ipm.match_line
-        ipm
+        ItemPairMatcher__.define do |o|
+          o.will_match_against_line_object
+          o.option_symbol = opt_sym
+          o.left_column_cel_string = a
+          o.right_column_cel_string = b
+          o.mixed_test_context = self
+        end
       end
 
       # ~
@@ -236,37 +249,50 @@ module Skylab::Zerk::TestSupport
 
       Invite_line___ = Lazy_.call do
 
-        o = Regex_Based_Matcher__.new(
-          %r(\Ause 'xyzi ([^-]+) -h <action>' for help on that action\.$) )
+        RegexpBasedMatcher__.define do |o|
+
+          o.regexp = %r(\Ause 'xyzi ([^-]+) -h <action>' for help on that action\.$)
 
         o.line_offset = 0
         o.styled
         o.subject_noun_phrase = "invite line"
-        o
+        end
       end
 
       # --
 
       def have_styled_line_matching rx
 
-        o = Regex_Based_Matcher__.new( rx ).for self
+        regexp_based_matcher_by_ do |o|
+          o.regexp = rx
         o.styled
         o.match_any_line  # must come after styled
-        o
+          o.__be_instance_not_prototype_
+        end
       end
 
-      def begin_regex_based_matcher rx
-        Regex_Based_Matcher__.new rx
+      def regexp_based_matcher_by_ & p
+        RegexpBasedMatcher__.define( & p )
       end
     end
 
     # ==
 
-    CoarseParse___ = self
-    class CoarseParse___  # also PUBLIC
+    CoarseParse___ = self  # #coverpoint
+    class CoarseParse___  # also PUBLIC (per #here3)
 
-      def initialize lines
-        bx = Coarse_pass___[ lines ]
+      class << self
+
+        def via_line_object_array a
+          via_line_object_scanner Home_::Scanner_[ a ]
+        end
+
+        alias_method :via_line_object_scanner, :new
+        undef_method :new
+      end  # >>
+
+      def initialize line_object_scn
+        bx = CoarsePass_via_LineObjectScanner___[ line_object_scn ]
         @_a = bx.a_
         @_h = bx.h_
         @_section_cache = {}
@@ -413,17 +439,25 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Regex_Based_Matcher__
+    class RegexpBasedMatcher__ < Common_::SimpleModel  # #testpoint
 
-      def initialize rx
-        @_prepare_matchee = :__prepare_matchee_as_is
-        @_rx = rx
+      def initialize
+        @_resolve_matchee = :__resolve_matchee_as_is
         @subject_noun_phrase = nil
         @styled = false
+        @_is_prototype = true
+        yield self
+        if remove_instance_variable :@_is_prototype
+          freeze
+        end
       end
 
-      def styled  # so :#here
-        @_prepare_matchee = :__prepare_matchee_by_expecting_styled
+      def __be_instance_not_prototype_  # #coverpoint3.1
+        @_is_prototype = false ; nil
+      end
+
+      def styled  # so :#here1
+        @_resolve_matchee = :__resolve_matchee_when_expecting_styled
         @styled = true
         NIL_
       end
@@ -437,8 +471,12 @@ module Skylab::Zerk::TestSupport
 
         @_match = :__match_any_line
         if @styled
-          @_prepare_matchee = :__prepare_matchee_by_unstyling_softly
+          @_resolve_matchee = :__resolve_matchee_by_unstyling_softly
         end
+      end
+
+      def regexp= rx
+        @_rx = rx  # legacy name, for now. makes lines shorter
       end
 
       attr_writer(
@@ -455,12 +493,20 @@ module Skylab::Zerk::TestSupport
         self
       end
 
+      # ~( #open #[#033.3]
+
       def matches? section
 
         # (this violates etc..)
         @_section = section
         send @_match
       end
+
+      def failure_message
+        send @_failure_message_method
+      end
+
+      # ~)
 
       def __match_any_line
         d = 0
@@ -469,10 +515,11 @@ module Skylab::Zerk::TestSupport
           @_li = st.gets
           @_li or break
           d += 1
-          _attempt_match
-          if @_md
+          ok = _resolve_matchee
+          ok &&= _resolve_matchdata_via_matchee
+          if ok
             found = true
-            x = _result_via_matchdata
+            x = _curate_finish_via_matchdata
             break
           end
           redo
@@ -481,47 +528,85 @@ module Skylab::Zerk::TestSupport
           x
         else
           @_line_count = d
-          @_failure_message_method = :__say_no_line_matching
-          _fail
+          _will_fail_with :__say_no_line_matching
         end
       end
 
       def __match_line_by_offset
         @_li = @_section.line_at_offset @line_offset
-        _attempt_match
-        if @_md
-          _result_via_matchdata
-        else
-          @_failure_message_method = :__say_string_didnt_match
-          _fail
-        end
+        ok = __curate_matchee
+        ok &&= __curate_matchdata_via_matchee
+        ok && _curate_finish_via_matchdata
       end
 
-      def _attempt_match
-        send @_prepare_matchee  # raises on failure
-        @_md = @_rx.match @_s ; nil
-      end
-
-      def _result_via_matchdata
+      def _curate_finish_via_matchdata
         if @_first_match_content
           _actual_s = @_md[ 1 ]
           if _actual_s == @_first_match_content
             ACHIEVED_
           else
-            @_failure_message_method = :__say_first_capture_didnt_match
-            _fail
+            _will_fail_with :__say_first_capture_didnt_match
           end
         else
           ACHIEVED_
         end
       end
 
-      def failure_message_for_should
-        send @_failure_message_method
+      def __curate_matchdata_via_matchee
+        if _resolve_matchdata_via_matchee
+          ACHIEVED_
+        else
+          _will_fail_with :__say_string_didnt_match
+        end
+      end
+
+      def _resolve_matchdata_via_matchee
+        _store :@_md, @_rx.match( @_s )
+      end
+
+      def __curate_matchee
+        if _resolve_matchee
+          ACHIEVED_
+        else
+          _will_fail_with :__say_was_not_styled  # assume #here3
+        end
+      end
+
+      def _resolve_matchee
+        send @_resolve_matchee
+      end
+
+      def __resolve_matchee_when_expecting_styled  # #here3
+        if @_li.is_styled
+          @_s = @_li.unstyled_styled  # raises
+          ACHIEVED_
+        end
+      end
+
+      def __resolve_matchee_by_unstyling_softly
+        @_s = @_li.unstyled
+        ACHIEVED_
+      end
+
+      def __resolve_matchee_as_is
+        @_s = @_li.string
+        ACHIEVED_
+      end
+
+      def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+        if x
+          instance_variable_set ivar, x ; ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
+      def __say_was_not_styled
+        @_li.say_was_not_styled
       end
 
       def __say_no_line_matching
-        "no lined matched /#{ @_rx.source }/ (of #{ @_line_count } line(s))"
+        "no lines matched /#{ @_rx.source }/ (of #{ @_line_count } line(s))"
       end
 
       def __say_string_didnt_match
@@ -537,46 +622,56 @@ module Skylab::Zerk::TestSupport
         @subject_noun_phrase || 'string'
       end
 
-      def __prepare_matchee_by_expecting_styled
-        @_s = @_li.unstyled_styled ; nil  # raises
-      end
-
-      def __prepare_matchee_by_unstyling_softly
-        @_s = @_li.unstyled ; nil
-      end
-
-      def __prepare_matchee_as_is
-        @_s = @_li.string ; nil
-      end
-
-      def _fail
-
+      def _will_fail_with m
         if @_context_x.respond_to? :quickie_fail_with_message_by
-          _p = method @_failure_message_method
+          _p = method m
           @_context_x.quickie_fail_with_message_by( & _p )
-          NIL_
         else
-          false
+          @_failure_message_method = m
         end
+        UNABLE_
       end
     end
 
     # ==
 
-    class Option_Index_Matcher___
+    class OptionIndexMatcher___ < Common_::SimpleModel  # #testpoint
 
-      def initialize sw, long, ctx
-        @ctx = ctx
+      # ~( ivars are legacy names
+
+      def initialize
         @desc = nil
         @want_desc_was_styled = nil
-        @sw = sw
-        @long = long
+        yield self
+        # can't freeze while #open [#ts-033.3]
       end
+
+      def new  # (compare self::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE)
+        otr = dup
+        yield otr
+        otr
+      end
+
+      def long_switch_plus= s
+        @long = s
+      end
+
+      def short_switch= s
+        @sw = s
+      end
+
+      def mixed_test_context= x
+        @ctx = x
+      end
+
+      # ~)
 
       attr_writer(
         :want_desc_was_styled,
         :desc,
       )
+
+      # ~( #open [#ts-033.3]
 
       def matches? idx
         @_index = idx  # eew/meh
@@ -585,6 +680,12 @@ module Skylab::Zerk::TestSupport
         ok &&= __desc
         ok && __styled
       end
+
+      def failure_message
+        send @__m
+      end
+
+      # ~)
 
       def __short
         @_ol = @_index[ @sw ]
@@ -636,7 +737,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def ___say_no_styled
-        "was not styled - #{ @_ol.desc.inspect }"
+        "item description was not styled - #{ @_ol.desc.inspect }"  # #here4
       end
 
       def _fail_by m
@@ -648,32 +749,45 @@ module Skylab::Zerk::TestSupport
           UNABLE_
         end
       end
-
-      def failure_message_for_should
-        send @__m
-      end
     end
 
     # ==
 
-    class Item_Pair_Matcher__
+    class ItemPairMatcher__ < Common_::SimpleModel  # #testpoint
 
-      def initialize opt_sym, a, b, x
-
-        @a_s = a
-        @b_s = b
-        @_context_x = x
+      def initialize
         @_match = :__match_section
+        yield self
+        # no freeze for now..
+      end
 
+      # ~( legacy ivar names
+
+      def option_symbol= opt_sym
         if opt_sym
           send opt_sym
         else
           @_styled = nil
           @_init_string = :__init_string_as_is
         end
+        opt_sym
       end
 
-      def match_line
+      def left_column_cel_string= s
+        @a_s = s
+      end
+
+      def right_column_cel_string= s
+        @b_s = s
+      end
+
+      def mixed_test_context= x
+        @_context_x = x
+      end
+
+      # ~)
+
+      def will_match_against_line_object
         @_match = :__match_line ; nil
       end
 
@@ -682,9 +796,17 @@ module Skylab::Zerk::TestSupport
         @_init_string = :__init_string_when_maybe_styled ; nil
       end
 
+      # ~( #open #[#ts-003.3]
+
       def matches? x
         send @_match, x
       end
+
+      def failure_message
+        send @_reason_m
+      end
+
+      # ~)
 
       def __match_section section
 
@@ -694,20 +816,22 @@ module Skylab::Zerk::TestSupport
 
         begin
           @_li = st.gets
-          if @_li
-            _init_matchdata
-            s = @_md[ 1 ]
-            if s
+          if ! @_li
+            @_d = content_line_count
+            @_reason_m = :__say_not_found
+            break
+          end
+
+          _init_matchdata
+          if ! @_md[ :right_cel ]
+            redo
+          end
+
               content_line_count += 1
               found = _evaluate_content
               found and break
               @_reason_m and break
-            end
             redo
-          end
-          @_d = content_line_count
-          @_reason_m = :__say_not_found
-          break
         end while nil
 
         if found
@@ -730,8 +854,19 @@ module Skylab::Zerk::TestSupport
       end
 
       def _init_matchdata
+
         send @_init_string
-        @_md = PAIR___.match @_s ;
+        @_md = %r(\A(?:
+          [ ]{2,}  # require that there be a margin of two (possibly more) spaces
+          (?<left_cel>
+            (?:(?![ ]{2}).)+  # one space does not break the first cel, 2 does
+          )
+          (?:
+            [ ]{2,}  # if there is a two (or more) space separator,
+            (?<right_cel> .+ )  # match whatever till the end of the line
+          )?  # but this whole right side is optional
+        )?  # also match on blank lines
+        $)x.match @_s
       end
 
       def _evaluate_content
@@ -770,8 +905,6 @@ module Skylab::Zerk::TestSupport
         @_s = @_li.unstyled ; nil
       end
 
-      PAIR___ = %r(\A(?:[ ]{2,}((?:(?!  ).)+)(?:[ ]{2,}(.+))?)?$)
-
       def _fail
         if @_context_x.respond_to? :quickie_fail_with_message_by
           _p = method @_reason_m
@@ -782,16 +915,16 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def failure_message_for_should
-        send @_reason_m
-      end
-
       def __say_second_one_didnt_match
-        "needed #{ @b_s.inspect }, had #{ @_md[ 2 ].inspect }"
+        "in second cel, #{ _say_wanted_had @_md[2], @b_s }"
       end
 
       def __say_first_one_didnt_match
-        "needed #{ @a_s.inspect }, had #{ @_md[ 1 ].inspect }"
+        "in first cel, #{ _say_wanted_had @_md[1], @a_s }"
+      end
+
+      def _say_wanted_had act_s, exp_s
+        "wanted #{ exp_s.inspect }, had #{ act_s.inspect }"
       end
 
       def __say_not_found
@@ -799,7 +932,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def __say_was_not_styled
-        "expected to be styled, was not - #{ @_li.string.inspect }"
+        @_li.say_was_not_styled
       end
     end
 
@@ -821,12 +954,12 @@ module Skylab::Zerk::TestSupport
         if is_styled
           @_unstyled_string
         else
-          fail ___say_was_not_styled
+          fail say_was_not_styled
         end
       end
 
-      def ___say_was_not_styled
-        "was not styled - #{ @_vendor_line.string.inspect }"
+      def say_was_not_styled
+        "line was not styled - #{ @_vendor_line.string.inspect }"  # #here4
       end
 
       def is_styled
@@ -868,9 +1001,9 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    Coarse_pass___ = -> lines do
+    CoarsePass_via_LineObjectScanner___ = -> line_object_scn do
 
-      # :#here-2:
+      # :#here2:
       #
       # this is a way dumbed-down, bespoke variant of aforementioned mentors:
       # the objective is global infallibility with local fallibility: we
@@ -901,12 +1034,11 @@ module Skylab::Zerk::TestSupport
       #   • this does not hold the test context, so all fails are hard..
       # -
         bx = Common_::Box.new
-        st = Common_::Scanner.via_array lines
 
         li = nil ; s = nil
 
         gets_one = -> do
-          li = st.gets_one
+          li = line_object_scn.gets_one
           s = li.string
           if E__ == s.getbyte( 0 )
             s = Unstyle_styled__[ s ]
@@ -928,7 +1060,7 @@ module Skylab::Zerk::TestSupport
 
         begin
           a.push li
-          if st.no_unparsed_exists
+          if line_object_scn.no_unparsed_exists
             finish_bucket[]
             break
           end
@@ -961,7 +1093,7 @@ module Skylab::Zerk::TestSupport
       begin
         line or break
 
-        sect = Sub_Section___.new line
+        sect = SubSection___.new line
         sections.push sect
 
         _md = %r(\A[ ]+(?=[^ ])).match line.string  # sanity..
@@ -1007,7 +1139,7 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Sub_Section___
+    class SubSection___
 
       def initialize o
         @head_line = o
@@ -1035,3 +1167,4 @@ module Skylab::Zerk::TestSupport
     WORD_RX__ = /\A[a-z]+/
   end
 end
+# #history-A.1: got coverage years later, some refactoring.

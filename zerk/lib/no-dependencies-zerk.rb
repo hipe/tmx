@@ -1806,7 +1806,7 @@ module NoDependenciesZerk
 
       private :dup
 
-      def redefine
+      def redefine  # exacty Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_STORE
         otr = dup
         yield otr
         otr.freeze

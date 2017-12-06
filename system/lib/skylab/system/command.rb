@@ -36,7 +36,7 @@ module Skylab::System
         super
       end
 
-      def redefine  # #abstraction-candidate to [co]
+      def redefine  # compare self::DEFINITION_FOR_THE_METHOD_CALLED_STORE
         otr = dup
         otr.__be_not_abstract
         yield otr

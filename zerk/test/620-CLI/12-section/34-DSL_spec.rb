@@ -53,9 +53,8 @@ module Skylab::Zerk::TestSupport
 
         _x = @subject.finish
 
-        _cls = TS_::CLI::Want_Section_Coarse_Parse
-
-        sta.screen = _cls.new sta.lines
+        sta.screen =  TS_::CLI::Want_Section_Coarse_Parse.
+          via_line_object_array sta.lines
 
         sta.result = _x
 

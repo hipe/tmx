@@ -193,11 +193,12 @@ module Skylab::Zerk::TestSupport
 
     dangerous_memoize :___be_first_usage_line do
 
-      o = begin_regex_based_matcher %r(\Ausage: xyzi (.+)$)
+      regexp_based_matcher_by_ do |o|
+        o.regexp = %r(\Ausage: xyzi (.+)$)
       o.line_offset = 0
       o.styled
       o.subject_noun_phrase = "first usage line"
-      o
+      end
     end
 
     def _have_second_usage_line_argless_of s
@@ -206,10 +207,11 @@ module Skylab::Zerk::TestSupport
 
     dangerous_memoize :___be_second_usage_line_argless do
 
-      o = begin_regex_based_matcher %r(\A[ ]{2,}xyzi ([^-]+) -h$)
+      regexp_based_matcher_by_ do |o|
+        o.regexp = %r(\A[ ]{2,}xyzi ([^-]+) -h$)
       o.line_offset = 1
       o.subject_noun_phrase = "second usage line"
-      o
+      end
     end
 
     def subject_root_ACS_class

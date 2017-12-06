@@ -907,10 +907,6 @@ module Skylab::TestSupport
       Home_.lib_.basic::String::LineStream_via_String[ s ]
     end
 
-    Scanner_ = -> a do  # this is certain to move up
-      Common_::Scanner.via_array a
-    end
-
     # ==
 
     Want_line::Want_Line_ = self

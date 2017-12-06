@@ -21,11 +21,8 @@ module Skylab::Basic
 
       # -- redefine
 
-      def redefine
-        otr = dup  # #here2
-        yield otr
-        otr.freeze  # #here
-      end
+      define_method :redefine, Common_::SimpleModel::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
+        # the above #here2 calls plain old dup, and #here1 freezes
 
       def replace sym, & p
         @_hook_box.replace sym, p

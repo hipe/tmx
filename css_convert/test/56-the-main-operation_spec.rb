@@ -13,12 +13,16 @@ describe "[cssc] with 'just-a-comment.css'" do
 
     sn = _pa.syntax_node_via_path _path
 
-    expect( sn.singleton_class.ancestors[ 1 ] ).to eql(
-      ::Skylab::CSS_Convert::CSS_::Grammar::CSS_Document::Stylesheet7 )
+    _actual_parent_module = sn.singleton_class.ancestors[1]
+
+    _expected_parent_module = Skylab::CSS_Convert::CSS_::Grammar::CSS_Document::Stylesheet7
+
+    expect( _actual_parent_module ).to eql _expected_parent_module
 
     expect( sn.elements[ 0 ].elements[ 1 ].elements[ 1 ].text_value ).to eql 'foo'
 
     if false  # in 2012 or before, maybe was:
+      # see [#004.B]
 
     expect( node.class ).to eql Home_::CssParsing::CssFile::CssFile
     tree = node._to_final_parse_tree_

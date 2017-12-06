@@ -1,5 +1,18 @@
 # the want omnibus :[#029]
 
+## preface
+
+EDIT: at #tombstone-A.1 we simplified things
+
+  - "newschool" techniques that are matcher-centric became auxiliary
+    to the older school techniques of an instance methods monolith.
+
+  - because it had never been covered, we may have lost insensitivity
+    (gained sensitivity) to the [#sar-011] line termination sequence.
+
+
+
+
 ## :scope (and about newschool v. oldschool near newlines)
 
 this node is for verifying content & style, but not "encoding" - at
@@ -26,7 +39,7 @@ them.
 
 
 
-## :oldchool-newschool-exegesis
+## oldchool/newschool exegesis :[#here.C]
 
 most of this node consists of logic that is redundant with parts of
 above; that logic that effects the expectations against the stream
@@ -175,3 +188,11 @@ one that might hope to become generally re-usable.
 the main thing here is to write just enough to tide us over until we get
 the branch to integrate that has a similiar (but now perhaps old) pass
 at this.
+
+
+
+
+## document-meta
+
+  - #tombstone-A.1: instance methods monolith becomes dependent on the
+    matchers instead of redundant with them, but doc needs to catch up..

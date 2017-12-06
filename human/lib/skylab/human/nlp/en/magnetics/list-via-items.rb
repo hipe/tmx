@@ -51,11 +51,7 @@ module Skylab::Human
         end
       end
 
-      def redefine
-        otr = dup
-        yield otr
-        otr.freeze
-      end
+      define_method :redefine, self::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
 
       def __init_as_component scn, asc
 

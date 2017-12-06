@@ -344,11 +344,7 @@ module Skylab::Parse
 
       # (meant to realize "entity killer", and be a broader replacement for legacy item grammar)
 
-      def redefine
-        otr = dup
-        yield otr
-        otr.freeze
-      end
+      define_method :redefine, self::DEFINITION_FOR_THE_METHOD_CALLED_REDEFINE
 
       attr_writer(
         :item_class,

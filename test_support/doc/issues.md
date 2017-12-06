@@ -41,8 +41,32 @@
 [#034] #open what is the r.s equivalent to this? [ canon ]
              ( #moved-to: [#dt-XXX] )
 
-[#033] #hole ( #was: #historical #done fix test globbing .. [#xx-009] )
+[#033] #open your subject is being tracked with this tag because it
+             implements an rspec interface for custom matchers A, and (very
+             likely also but not necessarily) B it does so in a manner that
+             munges namespace for rspec adaptation alongside our own personal
+             namespace.
+
+             at writing we are being bitten by rspec being a moving target,
+             and also its assumption at the mutability of custom matchers.
+             below is a salve for this issue, as well as the above.
+
+             the preferred, correct way (for this new definition of correct)
+             is to create/employ one object dedicated to interfacing with
+             rspec and another "controller"-like object for doing our
+             personal stuff. (that is, (A) and not (B); i.e adapter pattern.)
+             :[#here.2] is for tracking these.
+
+             those instances that do this the "wrong" way (for this new
+             definition of wrong; that is, (A) and (B)) are tracked with
+             :[#here.3].
+
+             (at writing, none of our instances are correct for this
+             definition of.)
+
+             ( #was: #historical #done fix test globbing .. [#xx-009] )
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
+
 [#032]       ( assorted plugin issues )
              ( #was: :[#here.A]: the "counts" report is not covered )
              ( #was: :[#here.B]: verbose mode is borked for counts )

@@ -25,11 +25,16 @@ module Skylab::CSS_Convert
 end
 
 RSpec::Matchers.define :match_the_structure_pattern do |expected|
+
   extend ::Skylab::CSS_Convert::TestSupport::CustomMatchers::Functions
+
   match do |actual|
     expected.inspect == distilled_structure(actual).inspect
   end
-  failure_message_for_should do |actual|
+
+  failure_message do |actual|  # #[#ts-033.2]
+
+    ::Kernel._NOT_COVERED  # see [#004.B]
     act = ::PP.pp(distilled_structure(actual), ::StringIO.new).string
     exp = ::PP.pp(expected, ::StringIO.new).string
     dif = ::Rspec::Expectations.differ.diff_as_string(act, exp)
