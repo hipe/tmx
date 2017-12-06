@@ -45,7 +45,7 @@ module Skylab::Zerk
             Common_::Name.via_variegated_symbol sym
           end
 
-          Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
+          Stream_[ @_loadable_references_for_UI ]
         else
 
           @_loadable_references_for_UI = nil
@@ -55,7 +55,7 @@ module Skylab::Zerk
     end
 
     def to_asset_reference_stream_for_UI
-      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
+      Stream_[ @_loadable_references_for_UI ]
     end
 
     # -- user input

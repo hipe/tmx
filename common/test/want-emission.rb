@@ -641,7 +641,7 @@ module Skylab::Common::TestSupport
       end
 
       def failure_message  # #Coverpoint1.1
-        _st = Home_::Stream.via_nonsparse_array @_failures
+        _st = Home_::Stream_[ @_failures ]
         _st.join_into_with_by ::String.new, NEWLINE_ do |p|
           p[]
         end
@@ -961,7 +961,7 @@ module Skylab::Common::TestSupport
 
       def __first_gets_call
         _em_a = release_to_mutable_array
-        @__stream = Common_::Stream.via_nonsparse_array _em_a
+        @__stream = Home_::Stream_[ _em_a ]
         @_gets = :__subsequent_gets_call
         _close
         send @_gets
@@ -986,7 +986,7 @@ module Skylab::Common::TestSupport
       def __close_as_scanner
         em_a = release_to_mutable_array
         _close
-        Common_::Scanner.via_array em_a
+        Home_::Scanner_[ em_a ]
       end
 
       def __close_as_array

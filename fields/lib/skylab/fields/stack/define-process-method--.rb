@@ -71,8 +71,7 @@ module Skylab::Fields
 
               define_method m do | * x_a |
 
-                _kp = process_argument_scanner_fully(
-                  Common_::Scanner.via_array x_a )
+                _kp = process_argument_scanner_fully Scanner_[ x_a ]
 
                 _kp && normalize
               end
@@ -81,8 +80,7 @@ module Skylab::Fields
 
               define_method m do | x_a |
 
-                _kp = process_argument_scanner_fully(
-                  Common_::Scanner.via_array x_a )
+                _kp = process_argument_scanner_fully Scanner_[ x_a ]
 
                 _kp && normalize
               end

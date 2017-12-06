@@ -151,7 +151,7 @@ module Skylab::Human
 
         def inflect_words_into_against_exponent_state_ y, and_a
 
-          _st = Common_::Stream.via_nonsparse_array @form_array
+          _st = Stream_[ @form_array ]
 
           Irregular_::InflectedWords_via_ExponentState___[ y, and_a, _st ]
         end

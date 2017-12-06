@@ -32,7 +32,7 @@ module Skylab::TMX
     def _do
       @_do = false
       _y = ::Enumerator::Yielder.new do |* sym_a |
-        @_scn = Common_::Scanner.via_array sym_a
+        @_scn = Scanner_[ sym_a ]
         begin
           send DSL___.fetch @_scn.head_as_is
         end until @_scn.no_unparsed_exists

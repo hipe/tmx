@@ -157,7 +157,7 @@ module Skylab::Parse
 
       def parse_one_item_via_iambic_fully x_a
 
-        scn = Common_::Scanner.via_array x_a
+        scn = Scanner_[ x_a ]
         scn_ = simple_stream_of_items_via_polymorpic_stream scn
         x = scn_.gets
         if x

@@ -190,7 +190,7 @@ module Skylab::Human
     end
 
     def _token_stream_via_finish
-      Common_::Scanner.via_array remove_instance_variable :@_tokens
+      Scanner_[ remove_instance_variable :@_tokens ]
     end
 
     Lazy_Space__ = Lazy_.call do
@@ -239,11 +239,11 @@ module Skylab::Human
 
       rx_ ||= /\A[:,]/  # etc  #open [#051]
 
-      st = Common_::Scanner.via_array s_a
+      scn = Scanner_[ s_a ]
 
-      s_a_ = [ st.gets_one ]
-      while st.unparsed_exists
-        s = st.gets_one
+      s_a_ = [ scn.gets_one ]
+      while scn.unparsed_exists
+        s = scn.gets_one
         if rx_ !~ s
           s_a_.push SPACE_
         end
@@ -324,7 +324,7 @@ module Skylab::Human
 
     string_via_nonempty_chunk = -> ch do
 
-      _st = Common_::Scanner.via_array ch
+      _st = Scanner_[ ch ]
 
       _ = Sexp_via_non_empty_token_stream__[ Head_token___[], _st ]
 

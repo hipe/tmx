@@ -65,7 +65,7 @@ module Skylab::SubTree
             o.add_field :left
           end
 
-          _mt_st = Common_::Stream.via_nonsparse_array string_matrix
+          _mt_st = Stream_[ string_matrix ]
 
           st = _design.line_stream_via_mixed_tuple_stream _mt_st
           y = @downstream_yielder

@@ -27,7 +27,7 @@ module Skylab::SearchAndReplace::TestSupport
           end ]
         end
 
-        _st = Common_::Stream.via_nonsparse_array s_a
+        _st = Home_::Stream_[ s_a ]
 
         want_these_lines_in_array_ _st do |y|
           y << "Jazzmatazz"

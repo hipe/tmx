@@ -44,7 +44,7 @@ module Skylab::Arc::TestSupport
 
         o = build_root_ACS
 
-        _io = Common_::Stream.via_nonsparse_array ['{}']
+        _io = Home_::Stream_[ ['{}'] ]
 
         _x = unmarshal_from_JSON o, _io
 

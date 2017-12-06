@@ -454,8 +454,7 @@ module Skylab::TestSupport
 
         # the subject of your tests will be this array of emissions.
 
-        _st = Common_::Scanner.via_array em_a
-        self.stream_for_want_stdout_stderr = _st
+        self.stream_for_want_stdout_stderr = Scanner_[ em_a ]
         NIL_
       end
 
@@ -503,7 +502,7 @@ module Skylab::TestSupport
         end
 
         def via_args x_a, & x_p
-          new Common_::Scanner.via_array( x_a ), & x_p
+          new Scanner_[ x_a ], & x_p
         end
 
         private :new
@@ -746,7 +745,7 @@ module Skylab::TestSupport
 
       def initialize a
         @_a = a
-        @_st = Common_::Stream.via_nonsparse_array a
+        @_st = Stream_[ a ]
       end
 
       def want_chunk num_x=nil, stream_symbol

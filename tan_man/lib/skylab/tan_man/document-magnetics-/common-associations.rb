@@ -18,7 +18,7 @@ module Skylab::TanMan
         # ..
         col = common_IO_parameters
 
-        Stream_.call sym_a do |sym|
+        Stream_[ sym_a ].map_by do |sym|
           col.dereference sym
         end
       end

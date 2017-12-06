@@ -133,7 +133,7 @@ module Skylab::Zerk
 
     def execute  # *always* result in an exitstatus
 
-      @_argument_scanner = Common_::Scanner.via_array remove_instance_variable :@argv
+      @_argument_scanner = Scanner_[ remove_instance_variable :@argv ]
 
       bc = ___bound_call
       if bc
@@ -428,7 +428,7 @@ module Skylab::Zerk
     # in shoutcase (:#here):
 
     def _ARGS_AS_STREAM
-      @_argument_scanner ||= Common_::Scanner.via_array( remove_instance_variable :@_argv )
+      @_argument_scanner ||= Scanner_[ remove_instance_variable :@_argv ]
     end
 
     def _ARGS_AS_ARGV

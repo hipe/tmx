@@ -18,7 +18,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def _stream_via _A_or_B_sym, matches
-        Common_::Stream.via_nonsparse_array matches do |pair|
+        Home_::Stream_[ matches ].map_by do |pair|
           Match___.new( * pair, _A_or_B_sym )
         end
       end

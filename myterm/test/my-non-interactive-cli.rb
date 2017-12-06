@@ -104,11 +104,11 @@ module Skylab::MyTerm::TestSupport
       def matches? sta
 
         @_state = sta
-        @_st = Common_::Scanner.via_array remove_instance_variable :@x_a
+        @_scn = Common_::Scanner.via_array remove_instance_variable :@x_a
 
         begin
-          send @_st.gets_one
-        end until @_st.no_unparsed_exists
+          send @_scn.gets_one
+        end until @_scn.no_unparsed_exists
 
         at_done_with_phrase_
 
@@ -130,7 +130,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       def number_of_lines
-        _number_of_lines @_st.gets_one
+        _number_of_lines @_scn.gets_one
       end
 
       def _number_of_lines d
@@ -171,7 +171,7 @@ module Skylab::MyTerm::TestSupport
 
       def exitstatus
 
-        sym = @_st.gets_one
+        sym = @_scn.gets_one
         d = Home_::Zerk_::NonInteractiveCLI::Exit_status_for___[ sym ]
         d or fail __say_bad_es sym
         _want_exitstatus d
@@ -225,7 +225,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       def from
-        @_from = @_st.gets_one ; nil
+        @_from = @_scn.gets_one ; nil
       end
 
       def about_options
@@ -298,15 +298,15 @@ module Skylab::MyTerm::TestSupport
 
       def _peek_for_matchee
 
-        x = @_st.head_as_is
+        x = @_scn.head_as_is
         if x.respond_to? :ascii_only?
           @_matchee_shape = :__match_against_string
           @_matchee_string = x
-          @_st.advance_one
+          @_scn.advance_one
         elsif x.respond_to? :named_captures
           @_matchee_shape = :__match_against_regexp
           @_matchee_regexp = x
-          @_st.advance_one
+          @_scn.advance_one
         end
       end
 

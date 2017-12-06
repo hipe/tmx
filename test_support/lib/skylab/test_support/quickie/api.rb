@@ -424,8 +424,7 @@ module Skylab::TestSupport
 
         def __read_arguments
 
-          @_scanner = Common_::Scanner.
-            via_array remove_instance_variable :@__arguments_array
+          @_scanner = Scanner_[ remove_instance_variable :@__arguments_array ]
 
           ok = true
           until @_scanner.no_unparsed_exists

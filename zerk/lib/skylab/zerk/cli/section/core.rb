@@ -71,7 +71,7 @@ module Skylab::Zerk
           _EMPTY_OPTS
         else
           opts = Opts__.new
-          st = Common_::Scanner.via_array x_a
+          st = Scanner_[ x_a ]
           begin
             k = st.gets_one
             _x = if _TAKES_ARG[ k ]

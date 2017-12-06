@@ -22,7 +22,7 @@ module Skylab::Zerk
 
     def initialize * x_a
 
-      st = Common_::Scanner.via_array x_a
+      st = Scanner_[ x_a ]
       while st.unparsed_exists
         send :"#{ st.gets_one }=", st
       end

@@ -26,10 +26,10 @@ module Skylab::CodeMetrics::TestSupport
 
       def __vendor_match_stream_stub_one
 
-        Common_::Stream.via_nonsparse_array ___data_for_stub_one
+        Home_::Stream_[ __data_for_stub_one ]
       end
 
-      define_method :___data_for_stub_one do
+      define_method :__data_for_stub_one do
 
         eek = magnetics_module_::Vendor_Match_Stream_via_Files_Slice_Stream::Vendor_Match___
 

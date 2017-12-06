@@ -60,7 +60,7 @@ module Skylab::System
       end
 
       def __to_chunk_stream
-        Common_::Stream.via_nonsparse_array @_chunks
+        Stream_[ @_chunks ]
       end
 
 

@@ -49,7 +49,7 @@ module Skylab::Task::TestSupport
 
           _actual_s_a = _ITvTS_failure_event.express_into_under []
 
-          actual_stream = Common_::Stream.via_nonsparse_array _actual_s_a
+          actual_stream = Home_::Stream_[ _actual_s_a ]
 
           _y = ::Enumerator::Yielder.new do |line_content|
 
@@ -208,7 +208,7 @@ module Skylab::Task::TestSupport
 
         def initialize a
           @ok = true
-          @_st = Common_::Stream.via_nonsparse_array a
+          @_st = Home_::Stream_[ a ]
           _advance
         end
 

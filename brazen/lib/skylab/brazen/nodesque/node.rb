@@ -95,7 +95,7 @@ module Skylab::Brazen
         sym_a = foz.get_keys
         sym_a.sort!
 
-        Common_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
+        Stream_[ sym_a ].map_by do |sym|
 
           qualified_knownness sym
         end

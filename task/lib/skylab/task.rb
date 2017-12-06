@@ -231,7 +231,7 @@ class Skylab::Task
     # --
 
     def to_stream
-      Common_::Stream.via_nonsparse_array @_a
+      Stream_[ @_a ]
     end
   end
 
@@ -371,6 +371,10 @@ class Skylab::Task
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
   end
 
   ArgumentError = ::Class.new ::ArgumentError

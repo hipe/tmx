@@ -244,7 +244,7 @@ module Skylab::Tabular
       end
 
       def to_field_survey_scanner  # CAREFUL - don't use this while it dups
-        Common_::Scanner.via_array @_array
+        Scanner_[ @_array ]
       end
 
       def dereference field_offset

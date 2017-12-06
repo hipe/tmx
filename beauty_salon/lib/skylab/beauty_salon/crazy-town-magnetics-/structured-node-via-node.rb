@@ -216,7 +216,7 @@ module Skylab::BeautySalon
         # #coverpoint1.2
         # #double-quoted-string-like
         children(
-          :zero_or_more_SEE_ME_expressions,
+          :zero_or_more_dynamic_expressions,
         )
       end
 

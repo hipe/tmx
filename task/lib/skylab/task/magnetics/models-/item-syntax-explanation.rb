@@ -158,7 +158,7 @@ class Skylab::Task
 
           # (for now we don't bother with loading [hu] EN..)
 
-          st = Common_::Stream.via_nonsparse_array s_a
+          st = Stream_[ s_a ]
           buffer = "expected #{ st.gets }"
           s = st.gets
           if s

@@ -34,7 +34,7 @@ module Skylab::Zerk
       end
 
       def to_argument_stream
-        Common_::Stream.via_nonsparse_array @farg_a
+        Stream_[ @farg_a ]
       end
 
       def fetch_argument_at_index i, &p

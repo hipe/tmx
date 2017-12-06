@@ -166,7 +166,7 @@ module Skylab::Basic::TestSupport
 
     def _upstream * s_a
 
-      Common_::Scanner.via_array s_a
+      Home_::Scanner_[ s_a ]
     end
 
     def _against st

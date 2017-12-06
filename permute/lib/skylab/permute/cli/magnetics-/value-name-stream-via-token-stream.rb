@@ -14,7 +14,7 @@ module Skylab::Permute
         st = remove_instance_variable :@token_stream
         if ::Array.try_convert st
           # while debugging it's easier to pass arrays around
-          st = Common_::Stream.via_nonsparse_array st
+          st = Stream_[ st ]
         end
 
         cat_bx = Common_::Box.new

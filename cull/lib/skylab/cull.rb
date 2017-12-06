@@ -261,6 +261,10 @@ module Skylab::Cull
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   # ==
 
   module Lib_

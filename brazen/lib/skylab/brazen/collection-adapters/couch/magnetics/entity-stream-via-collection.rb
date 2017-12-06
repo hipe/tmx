@@ -81,7 +81,7 @@ module Skylab::Brazen
       def get_property_hash_scan_via_payload_h h
         fly = @model_class.new_flyweight @kernel, & @listener
         box = fly.properties
-        Common_::Stream.via_nonsparse_array( h[ ROWS__ ] ).map_by do |x|
+        Stream_[ h[ ROWS__ ] ].map_by do |x|
           box.replace_hash x.fetch VALUE__
           fly
         end

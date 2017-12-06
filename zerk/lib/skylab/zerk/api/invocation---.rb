@@ -18,7 +18,7 @@ module Skylab::Zerk
         @_stack = []
         @_push_compound_qk[ _qk ]
 
-        @_scanner = Common_::Scanner.via_array args
+        @_scanner = Scanner_[ args ]
         @_pp = pp
       end
 

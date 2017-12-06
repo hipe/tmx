@@ -27,7 +27,7 @@ module Skylab::BeautySalon::TestSupport
       end
 
       def _string_via_SN_losslessly_CT sn
-        sn.to_code_LOSSLESS_EXPERIMENT__
+        sn.to_code_LOSSLESS_EXPERIMENT_
       end
     end
 

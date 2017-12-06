@@ -136,7 +136,7 @@ module Skylab::MyTerm
 
         _paths = _installation.filesystem.glob _glob_path
 
-        Common_::Stream.via_nonsparse_array _paths
+        Stream_[ _paths ]
       end
 
       def __build_pass_filter

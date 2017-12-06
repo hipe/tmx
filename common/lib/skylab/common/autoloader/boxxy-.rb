@@ -100,7 +100,7 @@ module Skylab::Common
 
           # (we assume that (in our index) there is one item per const)
 
-          Stream.via_nonsparse_array @index.items
+          Stream_[ @index.items ]
         end
 
         # ~)

@@ -150,7 +150,7 @@ module Skylab::Snag
 
         def to_row_stream_
 
-          Common_::Stream.via_nonsparse_array @_sstr_a
+          Stream_[ @_sstr_a ]
         end
 
         MONADIC_TRUTH_ = -> { true }

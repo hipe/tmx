@@ -55,7 +55,7 @@ module Skylab::Zerk
 
     def to_every_node_reference_stream_  # near c.p w/ #spot1.7
 
-      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI do |x|
+      Stream_[ @_loadable_references_for_UI ].map_by do |x|
         x.node_reference
       end
     end
@@ -108,11 +108,11 @@ module Skylab::Zerk
     end
 
     def to_asset_reference_stream_for_UI
-      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
+      Stream_[ @_loadable_references_for_UI ]
     end
 
     def to_stream_for_resolving_buttonesque_selection
-      Common_::Stream.via_nonsparse_array @button_frame
+      Stream_[ @button_frame ]
     end
 
     # -- user input

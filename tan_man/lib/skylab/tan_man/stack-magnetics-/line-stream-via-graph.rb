@@ -76,7 +76,7 @@ module Skylab::TanMan
       end
 
       if a
-        _st = Common_::Stream.via_nonsparse_array( a ).map_by do |pair|
+        _st = Stream_[ a ].map_by do |pair|
           ", #{ pair.first}=#{ pair.last }"  # meh
         end
         _ = _st.join_into ""

@@ -100,7 +100,9 @@ module Skylab::Task::TestSupport
 
       shared_subject :_reflection do
 
-        _st = Common_::Stream.via_nonsparse_array niCLI_state.lines, & :string
+        _st = Home_::Stream_[ niCLI_state.lines ].map_by do |o|
+          o.string
+        end
 
         TS_::Magnetics::Dotfile_Graph::Reflection.via_line_stream _st
       end

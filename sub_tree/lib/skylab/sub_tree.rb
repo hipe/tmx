@@ -44,6 +44,10 @@ module Skylab::SubTree
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   module Models_
 
     Autoloader_[ self, :boxxy ]

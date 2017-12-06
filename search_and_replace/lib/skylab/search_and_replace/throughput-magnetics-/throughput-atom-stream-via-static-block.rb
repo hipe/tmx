@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace
     def __initial_atom
 
       @_current_charpos = @charpos
-      @_LTS_st = Common_::Stream.via_nonsparse_array @LTSs
+      @_LTS_st = Stream_[ @LTSs ]
 
       _reinit_atom_cache @_LTS_st.gets
 
@@ -59,7 +59,7 @@ module Skylab::SearchAndReplace
 
       @_current_charpos = lts.end_charpos
 
-      @_atom_stream = Common_::Stream.via_nonsparse_array a
+      @_atom_stream = Stream_[ a ]
       NIL_
     end
   end

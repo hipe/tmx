@@ -196,7 +196,7 @@ module Skylab::Brazen::TestSupport
 
       private def process_and_normalize_for_test_ * x_a
 
-        _st = Common_::Scanner.via_array x_a
+        _st = Home_::Scanner_[ x_a ]
         _ok = process_argument_scanner_fully _st
         _ok && normalize
       end

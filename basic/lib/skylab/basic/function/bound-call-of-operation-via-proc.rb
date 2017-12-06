@@ -103,7 +103,7 @@ module Skylab::Basic
 
       def __procure_arguments_hash_by_normalizing
 
-        _fo_st = Stream_.call @_parameter_name_symbols do |name_sym|
+        _fo_st = Stream_[ @_parameter_name_symbols ].map_by do |name_sym|
           YuckStubbyFakeAssociation___[ name_sym ]
         end
 

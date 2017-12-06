@@ -244,7 +244,7 @@ module Skylab::Snag
 
       def __build_doc_child_node_stream
 
-        st = Common_::Stream.via_nonsparse_array @_d_a
+        st = Stream_[ @_d_a ]
 
         Common_.stream do
           begin

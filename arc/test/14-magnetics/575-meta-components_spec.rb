@@ -33,7 +33,7 @@ module Skylab::Arc::TestSupport
       end
 
       def _the_stream
-        Common_::Stream.via_nonsparse_array _the_memoized_array
+        Home_::Stream_[ _the_memoized_array ]
       end
 
       dangerous_memoize :_the_memoized_array do

@@ -560,7 +560,7 @@ module Skylab::Fields
 
           is_req ||= MONADIC_EMPTINESS_  # by default, "members" are not required
 
-          _st = Stream_.call remove_instance_variable :@member_array do |sym|
+          _st = Stream_[ remove_instance_variable :@member_array ].map_by do |sym|
 
             NormalAssociation___.new is_req[ sym ], sym
           end

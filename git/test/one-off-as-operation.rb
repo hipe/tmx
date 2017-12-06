@@ -106,7 +106,7 @@ module Skylab::Git::TestSupport
       end
 
       def __ooao_build_part_stream
-        Common_::Stream.via_nonsparse_array lines do |line|
+        Home_::Stream_[ lines ].map_by do |line|
           FOURTH_CEL_RX___.match( line.string )[ :cel ]
         end
       end

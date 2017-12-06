@@ -58,7 +58,7 @@ module Skylab::Brazen
       end
 
       if @_cached_promos
-        Common_::Stream.via_nonsparse_array @_cached_promos
+        Stream_[ @_cached_promos ]
       end
     end
 
@@ -102,7 +102,7 @@ module Skylab::Brazen
 
       if @_did_cache_UBS
 
-        Common_::Stream.via_nonsparse_array @_cached_UBS
+        Stream_[ @_cached_UBS ]
 
       else
 
@@ -120,7 +120,7 @@ module Skylab::Brazen
       # this caching of course assumes non-dynamic trees. and dynamic trees
       # will certainly become a thing..
 
-      _st = Common_::Stream.via_nonsparse_array @_source.constants
+      _st = Stream_[ @_source.constants ]
 
       _st = _st.map_reduce_by do | const |
 

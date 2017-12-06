@@ -116,7 +116,7 @@ module Skylab::TMX::TestSupport
       x = nil ; once = -> me do
         once = nil
         _long_list = me._this_one_long_list
-        _ = ::Skylab::Common::Stream.via_nonsparse_array( _long_list ).map_by do |s|
+        _ = Home_::Stream_[ _long_list ].map_by do |s|
           X_ms_EekWrap.new s
         end
         x = me._subject_module.via_stemish_stream( _ ) ; nil

@@ -38,7 +38,7 @@ module Skylab::Basic
         if a.length.zero?
           @node
         else
-          @_slug_scanner = Common_::Scanner.via_array a
+          @_slug_scanner = Scanner_[ a ]
           __main_loop_because_nonempty_slug_scanner
         end
       end

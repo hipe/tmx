@@ -89,7 +89,7 @@ module Skylab::Cull
           final_a.concat a
         end
 
-        Common_::Stream.via_nonsparse_array final_a
+        Stream_[ final_a ]
       end
     end
   end

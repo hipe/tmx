@@ -50,7 +50,7 @@ module Skylab::TestSupport
           # and ge to the stream of tuples here.
 
           if ::Array.try_convert vns  # see similar in [pe]
-            vns = Common_::Stream.via_nonsparse_array vns
+            vns = Stream_[ vns ]
           end
 
           _ts  = Permute_::Magnetics::TupleStream_via_ValueNameStream[ vns ]

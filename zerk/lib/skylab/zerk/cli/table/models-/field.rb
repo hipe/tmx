@@ -19,7 +19,7 @@ module Skylab::Zerk
           @_argument_proc = p
         end
 
-        @_scn = Common_::Scanner.via_array x_a
+        @_scn = Scanner_[ x_a ]
         begin
           send OPTIONS___.fetch @_scn.head_as_is
         end until @_scn.no_unparsed_exists

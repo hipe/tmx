@@ -74,7 +74,7 @@ module Skylab::Zerk::TestSupport
 
       def initialize tc, exp_a
 
-        @_expectation_scanner = Common_::Scanner.via_array exp_a
+        @_expectation_scanner = Scanner_[ exp_a ]
         @spying_IO = Spying_IO___.new self
         @test_context = tc
         _reinit_state
@@ -345,7 +345,7 @@ module Skylab::Zerk::TestSupport
 
         muta = nil
 
-        Stream_.call @emissions do |em|
+        Stream_[ @emissions ].map_by do |em|
           em.string || ( muta ||= '' )
         end
         # (because `chomp!` is used, string can't be the frozen EMPTY_S_)
@@ -565,7 +565,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def ___to_child_stream
-        Common_::Stream.via_nonsparse_array @children
+        Home_::Stream_[ @children ]
       end
     end
 
@@ -601,7 +601,7 @@ module Skylab::Zerk::TestSupport
 
       def process_iambic_fully x_a
 
-        st = Common_::Scanner.via_array x_a
+        st = Scanner_[ x_a ]
         @_argument_scanner_narrator_ = st
         begin
           _m = st.gets_one
@@ -709,7 +709,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def emission_array= a
-        _em_st = Common_::Stream.via_nonsparse_array a
+        _em_st = Home_::Stream_[ a ]
         _receive_upstream_emission_stream _em_st
         a
       end

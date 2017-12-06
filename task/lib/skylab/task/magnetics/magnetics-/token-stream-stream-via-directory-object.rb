@@ -38,7 +38,7 @@ class Skylab::Task
       def __init_prepared_entry_stream
 
         _ = remove_instance_variable :@_entries_array
-        st = Common_::Scanner.via_array _
+        st = Scanner_[ _ ]
         rx = /\A\.+\z/
         while rx =~ st.head_as_is
           st.advance_one

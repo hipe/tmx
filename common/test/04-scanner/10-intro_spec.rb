@@ -67,7 +67,7 @@ module Skylab::Common::TestSupport
     # -- setup
 
     def _build_scanner_with_these * sym_a
-      Home_::Scanner.via_array sym_a
+      Home_::Scanner_[ sym_a ]
     end
 
     def _subject_module

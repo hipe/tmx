@@ -74,7 +74,7 @@ class Skylab::Task
       queue, subscribers, cache = plan.to_a
 
       ok = ACHIEVED_
-      st = Common_::Stream.via_nonsparse_array queue
+      st = Stream_[ queue ]
       begin
         sym = st.gets
         sym or break

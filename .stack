@@ -42,6 +42,8 @@ fold-in expect emission (oldschool)
 fold-in "fail early"
 make names modern ("emission.rb")
 (somewhere: dig scanner away, for 2nd wave and [br] injection)
+BIG BORING REFACTOR: .to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
+boring refactor: clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
 cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
 cull/test/54-operations/62-mutator/25-actions_spec.rb
 cull/test/54-operations/37-upstream/50-map/50-markdown-vertical_spec.rb
@@ -60,7 +62,3 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
-clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
-all known near-term practial applications of this (-1) (Z) (Z)->(W,Y,J)
-.to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
-Scanner_ for Scanner.via_array

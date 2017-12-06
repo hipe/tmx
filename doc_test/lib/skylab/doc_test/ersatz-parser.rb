@@ -376,7 +376,7 @@ module Skylab::DocTest
         end
 
         def to_immediate_child_scanner
-          Common_::Scanner.via_array @nodes
+          Scanner_[ @nodes ]
         end
 
         def _insert

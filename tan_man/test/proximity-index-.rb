@@ -214,7 +214,7 @@ module Skylab::TanMan::TestSupport
       _local_path = _localizer[ client_path ]
       _entries = _local_path.split ::File::SEPARATOR
 
-      scn = Common_::Scanner.via_array _entries
+      scn = Home_::Scanner_[ _entries ]
 
       mod = @__from_module
       begin

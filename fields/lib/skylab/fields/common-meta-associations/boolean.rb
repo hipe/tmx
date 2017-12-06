@@ -31,7 +31,7 @@ module Skylab::Fields
 
         -> mod do
           mod.module_exec do
-            st = Common_::Stream.via_nonsparse_array a
+            st = Stream_[ a ]
             begin
               defn = st.gets
               defn or break
@@ -192,7 +192,7 @@ module Skylab::Fields
 
         def stream_for atr
 
-          Common_::Stream.via_nonsparse_array( @_a ).map_by do |p|
+          Stream_[ @_a ].map_by do |p|
             p[ atr ]
           end
         end

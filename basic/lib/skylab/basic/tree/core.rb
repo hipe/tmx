@@ -141,7 +141,7 @@ module Skylab::Basic
 
       def to_child_stream
         if has_children
-          Common_::Stream.via_nonsparse_array @children
+          Stream_[ @children ]
         else
           Common_::THE_EMPTY_STREAM
         end

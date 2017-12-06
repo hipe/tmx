@@ -99,7 +99,7 @@ module Skylab::DocTest
 
           def write_opening_node_and_any_blank_lines
 
-            st = Common_::Scanner.via_array @original_nodes
+            st = Scanner_[ @original_nodes ]
             @result_nodes.push st.gets_one
             begin
               st.no_unparsed_exists && break

@@ -159,7 +159,7 @@ module Skylab::Parse
       end
 
       def to_reflective_function_stream_  # for above
-        Common_::Stream.via_nonsparse_array @functions
+        Stream_[ @functions ]
       end
 
       def to_parse_array_fully_proc
@@ -237,7 +237,7 @@ module Skylab::Parse
       end
 
       def to_reflective_function_stream
-        Common_::Stream.via_nonsparse_array @_function_a
+        Stream_[ @_function_a ]
       end
     end
 

@@ -72,7 +72,7 @@ module Skylab::Snag
 
         _s_a = ::Dir.glob ::File.join( _sidesystems, "*/#{ @fn }" )
 
-        @_mani_st = Common_::Stream.via_nonsparse_array _s_a do | path |
+        @_mani_st = Stream_[ _s_a ].map_by do |path|
 
            Models_::NodeCollection.via_path path, & @_listener
         end

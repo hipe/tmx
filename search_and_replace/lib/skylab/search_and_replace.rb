@@ -342,6 +342,14 @@ module Skylab::SearchAndReplace
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   Autoloader_ = Common_::Autoloader
 
   module Lib_  # use this name per [sl] utilities

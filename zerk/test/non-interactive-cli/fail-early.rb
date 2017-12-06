@@ -525,7 +525,7 @@ module Skylab::Zerk::TestSupport
         @_is_using_multi_emission_assertion = false
         @_receive = :_receive_emission_normally
 
-        @_expectations_queue = Common_::Scanner.via_array a
+        @_expectations_queue = Scanner_[ a ]
 
         @test_context = tc
       end

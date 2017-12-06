@@ -146,7 +146,7 @@ module Skylab::CodeMetrics
           @_command.push OPEN_PAREN___
         end
 
-        st = Common_::Stream.via_nonsparse_array a
+        st = Stream_[ a ]
 
         _x = st.gets
 

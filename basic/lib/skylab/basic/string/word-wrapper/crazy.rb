@@ -151,7 +151,7 @@ module Skylab::Basic
       end
 
       word_stream_via_plain_string = -> str do
-        Stream_.call( str.split _WORD_SEPARATOR_RX ) do |s|
+        Stream_.call( str.split _WORD_SEPARATOR_RX ).map_by do |s|
           _Word.new nil, s
         end
       end

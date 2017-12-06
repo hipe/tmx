@@ -276,7 +276,7 @@ module Skylab::TMX
       def _etc_for ivar
         _d_a = remove_instance_variable ivar
         @_current_item_offset = nil
-        @_current_etc = Common_::Stream.via_nonsparse_array _d_a
+        @_current_etc = Stream_[ _d_a ]
         @_next = :__next_etc_normally
         send @_next
       end

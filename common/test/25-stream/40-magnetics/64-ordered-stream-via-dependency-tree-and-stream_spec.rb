@@ -30,7 +30,7 @@ module Skylab::Common::TestSupport
           X_s_m_osv_item[ :jelly, :bread ],
         ]
 
-        _st_ = _proto.execute_against Home_::Stream.via_nonsparse_array _a
+        _st_ = _proto.execute_against Home_::Stream_[ _a ]
 
         _st_.to_a
       end

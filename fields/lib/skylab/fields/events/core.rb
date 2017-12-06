@@ -172,7 +172,7 @@ module Skylab::Fields
         _.express_into_under @_downstream_yielder, @expression_agent_
 
         _ = remove_instance_variable :@_recurse_queue
-        st = Common_::Stream.via_nonsparse_array _
+        st = Stream_[ _ ]
         begin
           x = st.gets
           x or break

@@ -395,7 +395,7 @@ module Skylab::System
           freeze ; nil
         end
         def to_line_stream
-          Stream_.call @_matchdata_array do |md|
+          Stream_[ @_matchdata_array ].map_by do |md|
             md.string
           end
         end

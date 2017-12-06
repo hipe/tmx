@@ -85,7 +85,7 @@ module Skylab::Permute
 
       _x = remove_instance_variable :@value_name_pairs
 
-      _st = Common_::Stream.via_nonsparse_array _x
+      _st = Stream_[ _x ]
 
       Home_::Magnetics::TupleStream_via_ValueNameStream[ _st ]
     end
@@ -99,6 +99,10 @@ module Skylab::Permute
 
   Zerk_lib_ = Lazy_.call do
     Home_.lib_.zerk
+  end
+
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
   end
 
   Autoloader_ = Common_::Autoloader

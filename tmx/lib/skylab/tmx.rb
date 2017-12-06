@@ -185,6 +185,10 @@ module Skylab::TMX
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   Basic_ = Lazy_.call do
     lib_.basic
   end

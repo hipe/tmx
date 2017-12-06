@@ -71,7 +71,7 @@ module Skylab::Git
     end
 
     def to_stream
-      Common_::Stream.via_nonsparse_array @_o_a
+      Stream_[ @_o_a ]
     end
   end
 end

@@ -170,7 +170,7 @@ module Skylab::Parse
           # (but the same) on each successive call:
 
           p = -> do
-            Common_::Stream.via_nonsparse_array @_last_partial_matches
+            Stream_[ @_last_partial_matches ]
           end
 
           @_build_row_stream = -> do

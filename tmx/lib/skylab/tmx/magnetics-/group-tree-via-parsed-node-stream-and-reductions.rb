@@ -113,7 +113,7 @@ module Skylab::TMX
 
     def __init_several_things
 
-      @_reduction_scanner = Common_::Scanner.via_array @reductions
+      @_reduction_scanner = Scanner_[ @reductions ]
       @_current_reduction = @_reduction_scanner.gets_one
 
       _items = @parsed_node_stream.to_a

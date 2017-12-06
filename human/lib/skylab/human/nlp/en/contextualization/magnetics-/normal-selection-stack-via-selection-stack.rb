@@ -65,7 +65,7 @@ module Skylab::Human
 
         # secondly, the selection stack can be sparse so stream over it this way:
 
-        Common_::Scanner.via_array ss_a
+        Scanner_[ ss_a ]
       end
 
       # ==

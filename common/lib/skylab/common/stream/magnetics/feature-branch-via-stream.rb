@@ -135,7 +135,7 @@ module Skylab::Common
       end
 
       def _to_seen_key_scanner
-        Scanner.via_array @_order
+        Scanner_[ @_order ]
       end
 
       def __close

@@ -260,7 +260,7 @@ module Skylab::Basic
         end
 
         def __parse_tree_to_couplet_stream
-          Common_::Stream.via_nonsparse_array @_couplets
+          Stream_[ @_couplets ]
         end
 
         attr_reader(

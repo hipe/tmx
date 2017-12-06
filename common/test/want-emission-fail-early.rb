@@ -445,7 +445,7 @@ module Skylab::Common::TestSupport
         end
 
         exp_em_a.frozen? || self._NO
-        @expected_emission_scanner = Home_::Scanner.via_array exp_em_a
+        @expected_emission_scanner = Home_::Scanner_[ exp_em_a ]
 
         @do_ignore_terminal_channel = _use_ignore_h
         @expression_of_execution = expression_of_execution
@@ -811,7 +811,7 @@ module Skylab::Common::TestSupport
 
       a = _future_expect_queue
       if a
-        Home_::Scanner.via_array a
+        Home_::Scanner_[ a ]
       else
         Home_::THE_EMPTY_SCANNER
       end

@@ -56,11 +56,11 @@ module Skylab::TanMan
       end
 
       def to_association_stream
-        Common_::Stream.via_nonsparse_array @_associations
+        Stream_[ @_associations ]
       end
 
       def to_item_stream
-        Common_::Stream.via_nonsparse_array @_items
+        Stream_[ @_items ]
       end
     end
 

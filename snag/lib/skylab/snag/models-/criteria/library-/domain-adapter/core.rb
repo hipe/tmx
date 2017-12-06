@@ -206,12 +206,11 @@ module Skylab::Snag
           def __to_association_adapter_stream model_bx_
 
             h = model_bx_.h_
-            _st = Common_::Stream.via_nonsparse_array @associated_models_box.a_
+            _st = Stream_[ @associated_models_box.a_ ]
 
             _st.expand_by do | id |
 
-              Common_::Stream.via_nonsparse_array(
-                h.fetch( id ).__association_adapters || fail )
+              Stream_[ h.fetch( id ).__association_adapters || fail ]
             end
           end
 

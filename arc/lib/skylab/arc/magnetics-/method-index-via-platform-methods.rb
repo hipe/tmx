@@ -9,7 +9,7 @@ module Skylab::Arc
           @_entry_stream = -> do
 
             cache = []
-            st = Common_::Stream.via_nonsparse_array meth_a
+            st = Stream_[ meth_a ]
 
             Common_.stream do
 
@@ -31,7 +31,7 @@ module Skylab::Arc
                 # the end was reached.
 
                 @_entry_stream = -> do
-                  Common_::Stream.via_nonsparse_array cache
+                  Stream_[ cache ]
                 end
 
                 break

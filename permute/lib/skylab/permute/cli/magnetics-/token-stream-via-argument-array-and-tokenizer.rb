@@ -60,12 +60,12 @@ module Skylab::Permute
           end
         end
 
-        st = Common_::Scanner.via_array argv
-        @_st = st
+        scn = Common_::Scanner.via_array argv
+        @_scn = scn
 
-        if ! help_requested && st.unparsed_exists && is[ st.head_as_is ]
+        if ! help_requested && scn.unparsed_exists && is[ scn.head_as_is ]
           help_requested = true
-          st.advance_one
+          scn.advance_one
         end
 
         if help_requested
@@ -93,7 +93,7 @@ module Skylab::Permute
       def __resolve_pair_stream
 
         _sm = Magnetics_::Tokenizer[]
-        x = _sm.solve_against @_st, & @_on_event_selectively
+        x = _sm.solve_against @_scn, & @_on_event_selectively
         if x
           # (left as array for now #todo)
           _close_parsing
@@ -104,9 +104,9 @@ module Skylab::Permute
       end
 
       def _close_parsing
-        st = remove_instance_variable :@_st
+        scn = remove_instance_variable :@_scn
         if @do_mutate_argument_array
-          @argument_array[ 0, st.current_index ] = EMPTY_A_
+          @argument_array[ 0, scn.current_index ] = EMPTY_A_
         end
         NIL
       end

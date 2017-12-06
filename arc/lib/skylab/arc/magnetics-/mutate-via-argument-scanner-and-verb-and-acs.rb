@@ -31,7 +31,7 @@ module Skylab::Arc
       )
 
       def accept_argument_array x_a
-        @argument_scanner = Common_::Scanner.via_array x_a
+        @argument_scanner = Scanner_[ x_a ]
         NIL_
       end
 

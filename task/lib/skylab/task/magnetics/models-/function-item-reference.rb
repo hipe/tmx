@@ -27,7 +27,7 @@ class Skylab::Task
       end
 
       def to_prerequisite_term_symbol_stream_
-        Common_::Stream.via_nonsparse_array @prerequisite_term_symbols
+        Stream_[ @prerequisite_term_symbols ]
       end
 
       def const

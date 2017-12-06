@@ -113,7 +113,7 @@ module Skylab::Human
           end
 
           def to_stream
-            Common_::Stream.via_nonsparse_array @to_array
+            Stream_[ @to_array ]
           end
 
           attr_reader :to_array

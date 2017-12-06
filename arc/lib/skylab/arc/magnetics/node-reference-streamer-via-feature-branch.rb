@@ -115,7 +115,7 @@ module Skylab::Arc
           d
         end
 
-        Stream_.call _a_ do |(_, ref)|
+        Stream_[ _a_ ].map_by do |(_, ref)|
           ref
         end
       end

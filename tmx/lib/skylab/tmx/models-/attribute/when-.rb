@@ -65,7 +65,7 @@ module Skylab::TMX
 
         listener.call :error, :expression, :parse_error, :unknown_attribute do |y|
 
-          _scn = Stream_.call attrs do |attr|
+          _scn = Stream_[ attrs ].map_by do |attr|
             attr.name
           end.flush_to_scanner
 

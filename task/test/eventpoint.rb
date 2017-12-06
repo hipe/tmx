@@ -9,7 +9,7 @@ module Skylab::Task::TestSupport
     # -
 
       def against_path_expect_steps_ path
-        @STEP_SCANNER = Common_::Scanner.via_array path.steps
+        @STEP_SCANNER = Home_::Scanner_[ path.steps ]
         yield
         @STEP_SCANNER.no_unparsed_exists or fail __say_extra_step
         remove_instance_variable :@STEP_SCANNER

@@ -48,7 +48,7 @@ module Skylab::System
         a.push "> #{ s }"
       end
 
-      Common_::Stream.via_nonsparse_array a
+      Stream_[ a ]
     end
 
     etc_rx = /\r?\n\z/

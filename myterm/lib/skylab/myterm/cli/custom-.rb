@@ -267,7 +267,7 @@ module Skylab::MyTerm
         end
 
         def to_non_root_frame_stream
-          Common_::Stream.via_nonsparse_array @__non_root_frame_array
+          Stream_[ @__non_root_frame_array ]
         end
 
         def word_for_option_selecting_selected_adapter

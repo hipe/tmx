@@ -281,6 +281,14 @@ module Skylab::Snag
     x
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   class << self
 
     def lib_

@@ -197,8 +197,7 @@ module Skylab::SearchAndReplace
     def _transition_to_state_via_cache_stream
 
       @_state = :__via_cache_stream
-      @_cache_stream = Common_::Stream.via_nonsparse_array(
-        remove_instance_variable :@_a )
+      @_cache_stream = Stream_[ remove_instance_variable :@_a ]
       NIL_
     end
 

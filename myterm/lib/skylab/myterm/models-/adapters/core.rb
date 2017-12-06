@@ -98,7 +98,7 @@ module Skylab::MyTerm
           x
         end
 
-        Common_::Stream.via_nonsparse_array a
+        Stream_[ a ]
       end
     end
 

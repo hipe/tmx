@@ -101,7 +101,7 @@ module Skylab::Tabular
       def initialize args=nil
 
         if args
-          @_scn = Common_::Scanner.via_array args
+          @_scn = Scanner_[ args ]
           @normal_name_symbol = @_scn.gets_one
           until @_scn.no_unparsed_exists
             send OPTIONS___.fetch @_scn.gets_one

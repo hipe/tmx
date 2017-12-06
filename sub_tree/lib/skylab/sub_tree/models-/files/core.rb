@@ -309,7 +309,7 @@ module Skylab::SubTree
 
             _delimited_lines = _my_CLI::Render_table[ [], @node_array ]
 
-            Common_::Stream.via_nonsparse_array _delimited_lines
+            Stream_[ _delimited_lines ]
           end
 
           def _my_CLI

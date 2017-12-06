@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
 
     def _expect big_str
 
-      st = Common_::Stream.via_nonsparse_array remove_instance_variable :@_tuples
+      st = Home_::Stream_[ remove_instance_variable :@_tuples ]
       x = st.gets || TS_._SANITY
       @session ||= __common_beginning
       @session.first_tuple = x

@@ -29,7 +29,7 @@ module Skylab::Snag
             st_ = if :sequence == func_sym  # we change the syntax, experimentally
               _a = st.gets_one
               _a_= [ :functions, * _a ]
-              Common_::Scanner.via_array _a_
+              Scanner_[ _a_ ]
             else
               st
             end

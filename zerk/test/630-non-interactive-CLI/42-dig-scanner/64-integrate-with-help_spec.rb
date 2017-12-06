@@ -101,7 +101,7 @@ module Skylab::Zerk::TestSupport
 
       _subject_module::ScreenForEndpoint.express_into io do |o|
 
-        _raw_st = Stream_.call [ :remote_primary_one, :remote_primary_two ] do |sym|
+        _raw_st = Stream_[ [:remote_primary_one, :remote_primary_two] ].map_by do |sym|
           [ :primary, sym ]
         end
 

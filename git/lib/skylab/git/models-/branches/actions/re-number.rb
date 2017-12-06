@@ -292,11 +292,11 @@ y << "target distance must be at a minimum N-1."
           a.reverse!
         end
 
-        Common_::Stream.via_nonsparse_array( a ).expand_by do | (d, d_) |
+        Stream_[ a ].expand_by do |(d, d_)|
 
           _item_o_a = @_item_box.fetch d
 
-          Common_::Stream.via_nonsparse_array _item_o_a do | item_o |
+          Stream_[ _item_o_a ].map_by |item_o|
 
             Models_::Rename.new d_, item_o
           end

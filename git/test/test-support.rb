@@ -72,13 +72,11 @@ module Skylab::Git::TestSupport
     end
 
     def dirs_in_ path
-      Common_::Stream.via_nonsparse_array(
-        `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ )
+      Home_::Stream_[ `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ ]
     end
 
     def files_in_ path
-      Common_::Stream.via_nonsparse_array(
-        `cd #{ path } && find . -type f`.split NEWLINE_ )
+      Home_::Stream_[ `cd #{ path } && find . -type f`.split NEWLINE_ ]
     end
 
     def subject_API_value_of_failure

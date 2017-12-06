@@ -126,7 +126,7 @@ module Skylab::TestSupport
       def to_big_tree_filename_patterns__
         s_a = @big_tree_filename_extensions
         if s_a
-          Common_::Stream.via_nonsparse_array s_a
+          Stream_[ s_a ]
         end
       end
 

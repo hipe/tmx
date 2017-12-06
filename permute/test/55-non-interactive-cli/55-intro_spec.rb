@@ -186,7 +186,7 @@ module Skylab::Permute::TestSupport
 
       it "so much money" do
 
-        _st = Common_::Stream.via_nonsparse_array niCLI_state.lines
+        _st = Home_::Stream_[ niCLI_state.lines ]
 
         _st_ = _st.map_by do |o|
           :o == o.stream_symbol || fail

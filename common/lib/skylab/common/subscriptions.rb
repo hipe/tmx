@@ -150,7 +150,7 @@ module Skylab::Common
     end
 
     def chan_scan
-      Home_::Stream.via_nonsparse_array self.class::CHANNEL_A__
+      Stream_[ self.class::CHANNEL_A__ ]
     end
 
     class Event_Receiver___ < ::Proc

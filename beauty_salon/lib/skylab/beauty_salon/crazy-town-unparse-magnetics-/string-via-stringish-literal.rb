@@ -59,6 +59,9 @@ module Skylab::BeautySalon
 
             SINGLE_QUOTE_ => same_single_quote,
 
+            BACKTICK_ => {
+              escaping_regexp: /[`\\\n\t\r\e\b]/,
+            }
           },
           symbol_looks_like_double_quoted_string: same_double_quote,
 
@@ -341,6 +344,10 @@ module Skylab::BeautySalon
 
       def __resolve_mode
         delim = @opening_delimiter
+        if BACKTICK_ == delim.delimiter_category_symbol
+          $stderr.puts "NEEDS COVERAGE [bs]"
+        end
+
         cat = THESE___.fetch delim.delimiter_category_symbol
         x = delim.delimiter_subcategory_value
         @_behavior = if x

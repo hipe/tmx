@@ -115,7 +115,7 @@ module Skylab::Snag
         end while nil
 
         stack.reverse!
-        Common_::Stream.via_nonsparse_array stack
+        Stream_[ stack ]
       end
 
       def __item_via_match greater_neighbor=nil, md, my_line_o

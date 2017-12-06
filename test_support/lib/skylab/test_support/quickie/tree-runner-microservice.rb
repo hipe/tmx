@@ -75,8 +75,7 @@ module Skylab::TestSupport
 
         def __flush_execution
 
-          scn = Common_::Scanner.via_array(
-            remove_instance_variable( :@__path ).steps )
+          scn = Scanner_[ remove_instance_variable( :@__path ).steps ]
 
           ok = true
           begin

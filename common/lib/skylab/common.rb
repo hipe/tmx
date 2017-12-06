@@ -459,17 +459,12 @@ module Skylab::Common
         by() { p[] }
       end
 
-      def via_nonsparse_array a, & map
+      def via_nonsparse_array a
         d = -1 ; last = a.length - 1
-        st = by do
+        by do
           if d < last
             a.fetch d += 1
           end
-        end
-        if block_given?
-          st.map_reduce_by( & map )
-        else
-          st
         end
       end
     end  # >>
@@ -1317,7 +1312,7 @@ module Skylab::Common
 
       def __process_argument_array x_a
 
-        @argument_scanner = Scanner.via_array x_a
+        @argument_scanner = Scanner_[ x_a ]
 
         if @argument_scanner.head_as_is.respond_to? :ascii_only?
           __when_path
@@ -2137,6 +2132,14 @@ module Skylab::Common
 
   Oxford_or = -> a do
     oxford_or[ a ]
+  end
+
+  Stream_ = -> a, & p do
+    Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Scanner.via_array a
   end
 
   # --

@@ -107,7 +107,7 @@ module Skylab::Git
         p = nil
 
         p_ = -> do
-          p = Common_::Stream.via_nonsparse_array( @_dirs_fwd ).map_by do |s|
+          p = Stream_[ @_dirs_fwd ].map_by do |s|
             ::File.join path, s
           end
           path

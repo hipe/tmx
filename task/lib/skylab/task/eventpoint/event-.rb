@@ -48,7 +48,7 @@ class Skylab::Task
       end
 
       def scanner_ x_a
-        Common_::Scanner.via_array x_a
+        Scanner_[ x_a ]
       end
     end
 

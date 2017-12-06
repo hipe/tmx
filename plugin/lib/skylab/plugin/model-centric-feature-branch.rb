@@ -529,7 +529,7 @@ module Skylab::Plugin
           @listener = p
         end
 
-        @argument_scanner = Common_::Scanner.via_array x_a
+        @argument_scanner = Scanner_[ x_a ]
         NIL_
       end
 

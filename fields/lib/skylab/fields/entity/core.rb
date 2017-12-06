@@ -84,7 +84,7 @@ module Skylab::Fields
       end
 
       def arglist= x_a
-        @upstream = Common_::Scanner.via_array x_a
+        @upstream = Scanner_[ x_a ]
         x_a
       end
 
@@ -388,7 +388,7 @@ module Skylab::Fields
       def __receive_iambic x_a
 
         @upstream and self._SANITY
-        @upstream = Common_::Scanner.via_array x_a
+        @upstream = Scanner_[ x_a ]
         _process_remainder_of_upstream
         NIL_
       end

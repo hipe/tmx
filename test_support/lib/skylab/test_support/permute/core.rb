@@ -266,7 +266,7 @@ module Skylab::TestSupport
           end
 
           _lines = remove_instance_variable( :@_down )._a
-          Common_::Stream.via_nonsparse_array _lines
+          Stream_[ _lines ]
         end
 
         Counts___ = ::Struct.new :number_added, :number_already_done

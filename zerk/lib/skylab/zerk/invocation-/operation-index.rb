@@ -93,7 +93,7 @@ module Skylab::Zerk
       end
 
       def to_PVS_parameter_stream_
-        Common_::Stream.via_nonsparse_array @_bespoke_parameters
+        Stream_[ @_bespoke_parameters ]
       end
 
       def fetcher_proc_for_reception_set_symbol_via_name_symbol_

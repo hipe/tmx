@@ -156,7 +156,7 @@ module Skylab::SearchAndReplace
             set = ::Hash[ @custom_symbols.map { |i| [ i, true ] } ]
 
             _entries = ::Dir.entries @functions_directory  # meh on ENOENT
-            scn = Common_::Scanner.via_array _entries
+            scn = Scanner_[ _entries ]
             scn.gets_one == '.' || fail  # DOT_
             scn.gets_one == '..' || fail  # DOT_DOT_
 

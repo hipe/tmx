@@ -115,7 +115,7 @@ class Skylab::Task
       # but intentionally implemented separately
 
       def initialize x_a
-        @_scn = Common_::Scanner.via_array x_a
+        @_scn = Scanner_[ x_a ]
         @_has = false
         @_mutex = nil
       end

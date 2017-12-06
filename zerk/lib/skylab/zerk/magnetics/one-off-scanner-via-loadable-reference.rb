@@ -56,7 +56,7 @@ module Skylab::Zerk
 
         rx = @loadable_reference.regexp_for_path_head_of_conventional_one_off_
 
-        Stream_.call @paths do |path|
+        Stream_[ @paths ].map_by do |path|
           md = rx.match path
           if md
             _slug_tail = md.post_match

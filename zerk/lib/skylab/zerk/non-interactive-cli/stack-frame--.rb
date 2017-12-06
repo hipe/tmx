@@ -198,7 +198,7 @@ module Skylab::Zerk
         end
 
         def __to_defined_formal_parameter_stream_customly
-          Common_::Stream.via_nonsparse_array @_custom_parameters
+          Stream_[ @_custom_parameters ]
         end
 
         def has_stated_parameters__
@@ -364,14 +364,14 @@ module Skylab::Zerk
 
           @_did_big_index || _do_big_index
 
-          Common_::Stream.via_nonsparse_array @__navigational_NTs
+          Stream_[ @__navigational_NTs ]
         end
 
         def to_referenceable_node_reference_stream__
 
           @_did_big_index || _do_big_index
 
-          Common_::Stream.via_nonsparse_array @__referenceable_NTs
+          Stream_[ @__referenceable_NTs ]
         end
 
         def _do_big_index  # we avoid this #"heavy lift" when possible..
@@ -523,7 +523,7 @@ module Skylab::Zerk
         def to_frame_stream_from_bottom  # [my]
 
           _a = _build_frame_stack_from_bottom
-          Common_::Stream.via_nonsparse_array _a
+          Stream_[ _a ]
         end
 
         def _build_frame_stack_from_bottom

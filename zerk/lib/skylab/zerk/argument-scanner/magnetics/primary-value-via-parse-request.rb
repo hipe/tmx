@@ -41,7 +41,7 @@ module Skylab::Zerk
         def __via_normalization_chain a
 
           x = _head_as_is_or_should_be
-          scn = Common_::Scanner.via_array a
+          scn = Scanner_[ a ]
           begin
             _p = scn.head_as_is
             x = _p[ x, self ]

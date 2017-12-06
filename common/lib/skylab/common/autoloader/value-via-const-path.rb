@@ -149,8 +149,7 @@ module Skylab::Common
 
       def __init
 
-        @_token_scanner = Scanner.via_array(
-          remove_instance_variable :@__sanitized_const_path_mixed_array )
+        @_token_scanner = Scanner_[ remove_instance_variable :@__sanitized_const_path_mixed_array ]
 
         @_frame = @_frame_prototype.for_value @from_module
         @_error_eventer = nil

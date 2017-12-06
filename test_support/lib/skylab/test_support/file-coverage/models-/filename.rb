@@ -22,7 +22,7 @@ module Skylab::TestSupport
       end
 
       def to_dir_entry_stream
-        Common_::Stream.via_nonsparse_array @directory_entry_string_array
+        Stream_[ @directory_entry_string_array ]
       end
 
       attr_reader(

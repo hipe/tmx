@@ -46,7 +46,7 @@ module Skylab::System
       def __output_the_opening_moduleishes
 
         _a = remove_instance_variable :@_wrap_in_modules
-        st = Common_::Stream.via_nonsparse_array _a
+        st = Stream_[ _a ]
         s = st.gets
         begin
           indented_puts "module #{ s }"

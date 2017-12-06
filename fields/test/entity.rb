@@ -53,7 +53,7 @@ module Skylab::Fields::TestSupport
       ok = nil
       x = new do
         ok = process_argument_scanner_fully(
-          Common_::Scanner.via_array x_a )
+          Home_::Scanner_[ x_a ] )
       end
       ok && x
     end
@@ -70,7 +70,7 @@ module Skylab::Fields::TestSupport
 
       def process_fully_for_test_ * x_a
 
-        _scn = Common_::Scanner.via_array x_a
+        _scn = Home_::Scanner_[ x_a ]
 
         process_argument_scanner_fully _scn
       end

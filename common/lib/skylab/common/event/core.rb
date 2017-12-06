@@ -124,9 +124,9 @@ module Skylab::Common
     private
 
       def __init_via_iambic x_a, & msg_p
-        st = Home_::Scanner.via_array x_a
-        @terminal_channel_symbol = st.gets_one
-        _process_pairs st.flush_to_each_pairer, & msg_p
+        scn = Scanner_[ x_a ]
+        @terminal_channel_symbol = scn.gets_one
+        _process_pairs scn.flush_to_each_pairer, & msg_p
         NIL_
       end
 
@@ -307,7 +307,7 @@ module Skylab::Common
           s_a.push s
         end
         expag.calculate y, self, & message_proc
-        Home_::Stream.via_nonsparse_array s_a
+        Stream_[ s_a ]
       end
 
       attr_reader(

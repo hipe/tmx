@@ -13,7 +13,7 @@ module Skylab::Arc
 
           qkn = Common_::QualifiedKnownKnown[ cmp, asc ]
 
-          st = Common_::Scanner.via_array i_a
+          st = Scanner_[ i_a ]
 
           m = find_handler_method[ st, acs ]
 

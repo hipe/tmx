@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport
 
         fly = MockMeaning___.new
 
-        _st = Home_::Common_::Stream.via_nonsparse_array s_pair_a do | s, s_ |
+        _st = Home_::Stream_[ s_pair_a ].map_by do |s, s_|
           fly.__reinit_ s_, s
         end
 

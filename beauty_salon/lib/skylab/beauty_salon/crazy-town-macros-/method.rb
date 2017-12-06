@@ -64,7 +64,7 @@ module Skylab::BeautySalon
             o.method_name = new_method_name_sym
           end
 
-          _new_guy.to_code_LOSSLESS_EXPERIMENT__
+          _new_guy.to_code_LOSSLESS_EXPERIMENT_
         end
 
         Home_::ForMacros::HandMadeReplacementFunction_EXPERIMENTAL.new do |sn|

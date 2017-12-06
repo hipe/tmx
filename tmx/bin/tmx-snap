@@ -122,7 +122,7 @@ class TMX_snap
       end
 
       def __to_operation_slug_stream
-        Common_::Stream.via_nonsparse_array OPERATIONS__.keys do |sym|
+        Common_::Stream.via_nonsparse_array( OPERATIONS__.keys ).map_by do |sym|
           Common_::Name.via_lowercase_with_underscores_symbol( sym ).as_slug
         end
       end

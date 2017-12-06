@@ -66,7 +66,7 @@ module Skylab::System
 
         if s_a
           @lineno = 0
-          @_st = Common_::Stream.via_nonsparse_array( s_a ) do | s |
+          @_st = Home_::Stream_[ s_a ].map_by do |s|
             if s
               @lineno += 1
             end

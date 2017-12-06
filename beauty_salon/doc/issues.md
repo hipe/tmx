@@ -109,6 +109,11 @@
 
 [#007]       ( intra-subsystem issues )
 
+      #wish [#here.Y] maybe one day resources for replacement expressions
+
+      #wish [#here.W] we might want listy to itself have `to_code` to
+            clean up ad-hoc replacement functions
+
       #open [#here.V] generally, the monolith could still be cleaned up
              and de-redundified with the new Writer class
 

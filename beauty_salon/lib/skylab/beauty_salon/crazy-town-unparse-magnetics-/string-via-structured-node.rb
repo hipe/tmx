@@ -1152,7 +1152,7 @@ module Skylab::BeautySalon
         1 == h.length || fail  # #here2
         _a = h.fetch :these
         @semantic_columns = _a.map do |row|
-          scn = Common_::Scanner.via_array row
+          scn = Scanner_[ row ]
           _const = COLUMN_CONST_VIA_SYMBOL___.fetch scn.head_as_is
           _cls = SemanticColumns___.const_get _const, false
           x = _cls.new scn

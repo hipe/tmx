@@ -275,6 +275,7 @@ module Skylab::BeautySalon
   end
 
   ACHIEVED_ = true
+  BACKTICK_ = '`'
   Home_ = self
   COLON_ = ':'
   CONST_SEP_ = '::'.freeze
@@ -293,7 +294,7 @@ module Skylab::BeautySalon
   PROCEDE_ = true
   SINGLE_QUOTE_ = %q(')
   SPACE_ = ' '.freeze
-  STOP_PARSING_ = false
+  STOP_ = nil
   THE_EMPTY_MODULE_ = ::Module.new.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze

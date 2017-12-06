@@ -132,7 +132,7 @@ module Skylab::TanMan
 
       _consts = mod.constants
 
-      Stream_.call _consts do |const|
+      Stream_[ _consts ].map_by do |const|
 
         _cls = mod.const_get const, false
 

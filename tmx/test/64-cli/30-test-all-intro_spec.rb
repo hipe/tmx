@@ -215,7 +215,7 @@ module Skylab::TMX::TestSupport
 
       rx = _d_speg_rx
 
-      scn = Common_::Scanner.via_array d_a
+      scn = Home_::Scanner_[ d_a ]
 
       want_each_on_stdout_by do |line|
 

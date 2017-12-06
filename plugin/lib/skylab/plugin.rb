@@ -20,6 +20,10 @@ module Skylab::Plugin
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   Zerk_no_deps_ = Lazy_.call do
     require 'no-dependencies-zerk'
     ::NoDependenciesZerk

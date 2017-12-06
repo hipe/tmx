@@ -345,7 +345,7 @@ module Skylab::Zerk
 
         a = @__all_stateds
         if a
-          Common_::Stream.via_nonsparse_array a
+          Stream_[ a ]
         end
       end
 

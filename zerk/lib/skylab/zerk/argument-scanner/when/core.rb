@@ -41,7 +41,7 @@ module Skylab::Zerk
           @operation_path = nil
           @tuples = []
 
-          scn = Common_::Scanner.via_array x_a
+          scn = Scanner_[ x_a ]
           @_scn = scn
           begin
             send PRIMARIES___.fetch( @_scn.gets_one )

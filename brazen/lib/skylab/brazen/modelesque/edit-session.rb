@@ -90,7 +90,7 @@ module Skylab::Brazen
 
           bx = @_tree._mutable_delta_box
           fo = @_formals
-          st = Common_::Scanner.via_array x_a
+          st = Scanner_[ x_a ]
           while st.unparsed_exists
             prp = fo.fetch st.gets_one
             if Field_::Takes_argument[ prp ]

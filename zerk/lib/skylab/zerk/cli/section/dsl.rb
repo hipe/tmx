@@ -23,7 +23,7 @@ module Skylab::Zerk
 
       def receive x_a
 
-        st = Common_::Scanner.via_array x_a
+        st = Scanner_[ x_a ]
 
         if @_has_open_section
 
@@ -113,7 +113,7 @@ module Skylab::Zerk
 
           expag = @_invex.expression_agent
           invex = @_invex
-          item_st = Common_::Stream.via_nonsparse_array @_items
+          item_st = Stream_[ @_items ]
           num_lines = @_num_lines
           op = invex.option_parser
           section_name_function = remove_instance_variable :@_name

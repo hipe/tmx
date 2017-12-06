@@ -60,7 +60,7 @@ module Skylab::Basic  # introduction at [#020]
 
     def sparse_array= a
       _nonsparse_array = a.select( & IDENTITY_ ).to_a
-      @stream = Common_::Stream.via_nonsparse_array _nonsparse_array
+      @stream = Stream_[ _nonsparse_array ]
       a
     end
 

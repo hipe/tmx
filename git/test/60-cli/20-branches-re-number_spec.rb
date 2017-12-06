@@ -80,7 +80,7 @@ module Skylab::Git::TestSupport
 
     def _d_a_to_st d_a
 
-      Common_::Stream.via_nonsparse_array d_a do | d |
+      Home_::Stream_[ d_a ].map_by do |d|
         d.to_s
       end
     end

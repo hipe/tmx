@@ -177,7 +177,7 @@ module Skylab::Parse::TestSupport
 
       def _build_item_stream_via_string_matrix a_a
 
-        Common_::Stream.via_nonsparse_array a_a do | row |
+        Home_::Stream_[ a_a ].map_by do |row|
 
           Common_::QualifiedKnownKnown.via_value_and_association(
             :"__#{ row * UNDERSCORE_ }__",

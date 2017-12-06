@@ -7,7 +7,7 @@ module Skylab::Tabular
       def initialize p, x_a, dereference_common_implementation
 
         @_user_provided_block = p
-        @_scn = Common_::Scanner.via_array x_a
+        @_scn = Scanner_[ x_a ]
         @_dereference_common_implementation = dereference_common_implementation
 
         @name_symbol = @_scn.gets_one

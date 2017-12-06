@@ -14,8 +14,7 @@ module Skylab::Tabular::TestSupport
         o << :LineStream_via_JustifiedPage_and_Demo
       end
 
-      _tu_st = Home_::Common_::Stream.via_nonsparse_array(
-        [ %w( Food Drink ), %w( donuts coffee ) ] )
+      _tu_st = Home_::Stream_[ [ %w( Food Drink ), %w( donuts coffee ) ] ]
 
       _st = pipe.call _tu_st
 

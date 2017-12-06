@@ -79,7 +79,7 @@ module Skylab::Zerk::TestSupport
 
     rx = %r((?:\n|\r\n\?)\z)
     Line_stream_via_section__ = -> sect do
-      Stream_.call sect.emissions do |em|
+      Stream_[ sect.emissions ].map_by do |em|
         s = em.string
         rx =~ s ? s : "#{ s }#{ NEWLINE_ }"
       end

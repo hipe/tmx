@@ -293,7 +293,7 @@ module Skylab::System
       ranges = []
 
       d = 0
-      field_st = Common_::Stream.via_nonsparse_array fields
+      field_st = Stream_[ fields ]
       scn = Home_.lib_.string_scanner header
 
       sep = -> do

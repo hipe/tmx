@@ -406,7 +406,7 @@ module Skylab::Human
       end
 
       def __build_stream_via_array
-        Common_::Scanner.via_array @_top_secret_array
+        Scanner_[ @_top_secret_array ]
       end
 
       def __release_one_time_use_PST

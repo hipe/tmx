@@ -333,7 +333,7 @@ module Skylab::Fields
         end
 
         def scanner_via_array x_a
-          Common_::Scanner.via_array x_a
+          Scanner_[ x_a ]
         end
       end
 
@@ -376,7 +376,7 @@ module Skylab::Fields
         end
 
         def scanner_via_array x_a
-          Common_::Scanner.via_array x_a
+          Scanner_[ x_a ]
         end
 
         def process_argument_scanner_fully scn, & p
@@ -1131,12 +1131,12 @@ module Skylab::Fields
     :"#{ name_symbol }="
   end
 
-  Scanner_ = -> a do  # #todo with [sa] etc
-    Common_::Scanner.via_array a
-  end
-
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
   end
 
   # --

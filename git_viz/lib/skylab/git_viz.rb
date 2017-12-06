@@ -87,6 +87,10 @@ module Skylab::GitViz
     NIL
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   # --
 
   ArgumentError = ::Class.new ::ArgumentError

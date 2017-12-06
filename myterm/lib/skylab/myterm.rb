@@ -130,6 +130,10 @@ module Skylab::MyTerm
     NIL_
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   # --
 
   ArgumentError = ::Class.new ::ArgumentError

@@ -24,7 +24,7 @@ module Skylab::Cull
 
         def normal
 
-          rfstream = Common_::Scanner.via_array @call_a.reverse
+          rfstream = Scanner_[ @call_a.reverse ]
           jogs = []
 
           begin

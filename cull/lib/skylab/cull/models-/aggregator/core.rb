@@ -9,7 +9,7 @@ module Skylab::Cull
     class Actions::List < Action_
 
       def produce_result
-        Common_::Stream.via_nonsparse_array Items__.constants do | const_i |
+        Stream_[ Items__.constants ].map_by |const_i|
           Common_::Name.via_const_symbol const_i
         end
       end

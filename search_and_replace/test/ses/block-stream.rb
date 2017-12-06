@@ -96,33 +96,35 @@ module Skylab::SearchAndReplace::TestSupport
 
       def ___say_arrays_not_equal act_a, exp_a  # assume they are not equal.
 
-        act_st = Common_::Scanner.via_array act_a
-        exp_st = Common_::Scanner.via_array exp_a
+        # (you could probaly DRY this with that thing in [ts])
+
+        act_scn = Home_::Scanner_[ act_a ]
+        exp_scn = Home_::Scanner_[ exp_a ]
 
         begin
 
-          if exp_st.no_unparsed_exists
+          if exp_scn.no_unparsed_exists
             x = "array was longer than expected. expected no item at index #{
-             }#{ act_st.current_index }. (had #{
-              }#{ act_st.head_as_is.inspect }.)"
+             }#{ act_scn.current_index }. (had #{
+              }#{ act_scn.head_as_is.inspect }.)"
             break
           end
 
-          if exp_st.head_as_is == act_st.head_as_is
-            act_st.advance_one
-            exp_st.advance_one
-            if act_st.no_unparsed_exists
+          if exp_scn.head_as_is == act_scn.head_as_is
+            act_scn.advance_one
+            exp_scn.advance_one
+            if act_scn.no_unparsed_exists
               x = "array ended early. expected an item at index #{
-                } #{ exp_st.current_index }. (expected #{
-                 }#{ exp_st.head_as_is.inspect }.)"
+                } #{ exp_scn.current_index }. (expected #{
+                 }#{ exp_scn.head_as_is.inspect }.)"
               break
             end
             redo
           end
 
-          x = "at index #{ act_st.current_index } expected #{
-           }#{ exp_st.head_as_is.inspect }, had #{
-            }#{ act_st.head_as_is.inspect }."
+          x = "at index #{ act_scn.current_index } expected #{
+           }#{ exp_scn.head_as_is.inspect }, had #{
+            }#{ act_scn.head_as_is.inspect }."
           break
         end while nil
         x

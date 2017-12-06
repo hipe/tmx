@@ -77,7 +77,7 @@ module Skylab::Common
       def to_stream_of_lines_rendered_under expag  # :+[#ca-064] imagine threads
 
         _y = express_into_under [], expag
-        Home_::Stream.via_nonsparse_array _y
+        Stream_[ _y ]
       end
 
       def to_event

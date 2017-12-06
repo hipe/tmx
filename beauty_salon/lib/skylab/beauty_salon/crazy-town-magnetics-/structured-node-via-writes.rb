@@ -58,7 +58,7 @@ module Skylab::BeautySalon
       def __init_stack
 
         stack = []
-        scn = Common_::Scanner.via_array remove_instance_variable :@dig_symbols
+        scn = Scanner_[ remove_instance_variable :@dig_symbols ]
         sn = remove_instance_variable :@structured_node
 
         begin

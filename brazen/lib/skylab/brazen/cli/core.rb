@@ -392,7 +392,7 @@ module Skylab::Brazen
       def __to_item_normal_tuple_stream_when_operation
         # #open [#br-002.5] modality-targeted association classification
         h = @_operation_associations
-        Stream_.call h.keys do |k|
+        Stream_[ h.keys ].map_by do |k|
           [ :primary, k ]
         end
       end
@@ -1209,7 +1209,7 @@ module Skylab::Brazen
 
       def _bound_action_via_normal_name i_a
         _bound_action_via_normal_name_symbol_stream(
-          Common_::Scanner.via_array i_a )
+          Scanner_[ i_a ] )
       end
 
       def _bound_action_via_normal_name_symbol_stream sym_st
@@ -1510,7 +1510,7 @@ module Skylab::Brazen
       end
 
       def ___to_relevant_category_stream
-        Common_::Stream.via_nonsparse_array Relevant_categories___[]
+        Stream_[ Relevant_categories___[] ]
       end
 
       Relevant_categories___ = Lazy_.call do
@@ -1692,7 +1692,7 @@ module Skylab::Brazen
 
         bc = @bound.bound_call_against_argument_scanner(
 
-          Common_::Scanner.via_array @mutable_backbound_iambic )
+          Scanner_[ @mutable_backbound_iambic ] )
 
         bc and bound_call_via_bound_call_from_back bc
       end
@@ -2666,7 +2666,7 @@ module Skylab::Brazen
 
       Require_fields_lib_[]
 
-      st = Common_::Scanner.via_array mutable_backbound_iambic
+      st = Scanner_[ mutable_backbound_iambic ]
 
       Common_.stream do
 
@@ -2930,7 +2930,7 @@ module Skylab::Brazen
 
       def produce_result
 
-        st = Common_::Stream.via_nonsparse_array @a
+        st = Stream_[ @a ]
 
         begin
           bc = st.gets

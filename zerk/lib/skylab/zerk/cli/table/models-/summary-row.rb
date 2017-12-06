@@ -64,7 +64,7 @@ module Skylab::Zerk
             foc.close_all_observation
           end
 
-          @_definition_stream = Common_::Stream.via_nonsparse_array @definitions
+          @_definition_stream = Stream_[ @definitions ]
           @_gets = :__gets_normally
           send @_gets
         end

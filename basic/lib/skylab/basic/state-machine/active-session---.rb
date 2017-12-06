@@ -247,7 +247,7 @@ module Skylab::Basic
           if sta.has_exactly_one_formal_transition
             Common_::Stream.via_item h.fetch sta.formal_transition_state_symbol
           else
-            Stream_.call sta.formal_transition_symbol_array do |sym|
+            Stream_[ sta.formal_transition_symbol_array ].map_by do |sym|
               h.fetch sym
             end
           end

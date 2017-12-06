@@ -60,7 +60,7 @@ module Skylab::System
 
       def __do_render a
         @rendering.express_the_opening
-        st = Common_::Stream.via_nonsparse_array a
+        st = Stream_[ a ]
         rec = st.gets
         begin
           @rendering.express_blank_line

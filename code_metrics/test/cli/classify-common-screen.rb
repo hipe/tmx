@@ -16,7 +16,7 @@ module Skylab::CodeMetrics::TestSupport
       def build_info_line_stream_
 
         _s_a = _memoized_common_screen_classifications.__info_lines
-        Common_::Stream.via_nonsparse_array _s_a
+        Home_::Stream_[ _s_a ]
       end
 
       def headers_
@@ -47,8 +47,7 @@ module Skylab::CodeMetrics::TestSupport
 
       def execute
 
-        @_st = Common_::Stream.via_nonsparse_array(
-          @execution_snapshot.output_lines )
+        @_st = Home_::Stream_[ @execution_snapshot.output_lines ]
 
         __resolve_contiguous_info_lines
         __resolve_headers

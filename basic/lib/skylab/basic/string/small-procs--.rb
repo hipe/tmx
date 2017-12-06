@@ -81,7 +81,7 @@ module Skylab::Basic
         #     by a newline (added as necessary).
 
         def initialize s_a
-          @st = Common_::Scanner.via_array s_a
+          @st = Scanner_[ s_a ]
         end
 
         def execute

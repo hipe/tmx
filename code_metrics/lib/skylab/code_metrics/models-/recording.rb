@@ -57,7 +57,7 @@ module Skylab::CodeMetrics
 
       def to_event_tuple_stream
         path_cache = {}
-        Stream_.call @__array do |line|
+        Stream_[ @__array ].map_by do |line|
           Tuple_via_line__[ line, path_cache ]
         end
       end

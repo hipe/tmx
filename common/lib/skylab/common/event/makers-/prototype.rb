@@ -56,7 +56,7 @@ module Skylab::Common
 
           def work
 
-            st = Home_::Scanner.via_array @deflist
+            scn = Scanner_[ @deflist ]
 
             _base_class = @base_class || Here___
 
@@ -68,11 +68,11 @@ module Skylab::Common
 
               extend ModuleMethods___
 
-              const_set :TERMINAL_CHANNEL_SYMBOL___, st.gets_one
+              const_set :TERMINAL_CHANNEL_SYMBOL___, scn.gets_one
 
               Process_messge_proc___[ msg_p, self ]
 
-              Process_property_box___[ st, self ]
+              Process_property_box___[ scn, self ]
 
               self
             end
@@ -279,14 +279,14 @@ module Skylab::Common
           #  has a formal property, set the ivar; else call a custom
           #  iambic parsing method. also nil-out any not-set values.)
 
-          _write_members Home_::Scanner.via_array x_a
+          _write_members Scanner_[ x_a ]
         end
 
         def __hack_a_different_term_chan_sym x_a
 
-          st = Home_::Scanner.via_array x_a
-          _CUSTOM_TERM_CHAN_SYM = st.gets_one
-          _write_members st
+          scn = Scanner_[ x_a ]
+          _CUSTOM_TERM_CHAN_SYM = scn.gets_one
+          _write_members scn
           define_singleton_method :terminal_channel_symbol do
             _CUSTOM_TERM_CHAN_SYM
           end

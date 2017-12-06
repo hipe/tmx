@@ -74,7 +74,7 @@ module Skylab::SearchAndReplace
 
       def to_unstyled_bytes_string_  # #testpoint
         ThroughputMagnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
-          Common_::Stream.via_nonsparse_array @a ).execute
+          Stream_[ @a ] ).execute
       end
 
       attr_reader(

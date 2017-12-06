@@ -111,7 +111,7 @@ module Skylab::TestSupport::TestSupport
         a.push struct.new( :two, :three )
         a.push struct.new( :one, :four )
         a.push struct.new( :two, :four )
-        Common_::Stream.via_nonsparse_array a
+        Home_::Stream_[ a ]
       end
     end.call
     end

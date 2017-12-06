@@ -124,7 +124,7 @@ module Skylab::SearchAndReplace
 
     def _transition_to_cache a
 
-      @_atom_stream = Common_::Stream.via_nonsparse_array a
+      @_atom_stream = Stream_[ a ]
       @_state = :___gets_via_cache ; nil
     end
 

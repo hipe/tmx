@@ -49,7 +49,7 @@ module Skylab::Snag
       end
 
       def to_object_stream_
-        Common_::Stream.via_nonsparse_array @_o_a
+        Stream_[ @_o_a ]
       end
 
       def r_

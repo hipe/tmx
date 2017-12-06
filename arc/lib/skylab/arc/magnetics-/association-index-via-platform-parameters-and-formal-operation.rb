@@ -68,7 +68,7 @@ module Skylab::Arc
           MONADIC_EMPTINESS_
         end
 
-        _st = Stream_.call _a do |(cat, sym)|
+        _st = Stream_[_a ].map_by do |(cat, sym)|
 
           edit = PARAM_ARITY___.fetch cat
 

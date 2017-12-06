@@ -15,7 +15,7 @@ module Skylab::Zerk::TestSupport
         end
 
         def real_scanner_for_ * s_a
-          Common_::Scanner.via_array s_a
+          Scanner_[ s_a ]
         end
 
         def define_by_ & p

@@ -189,7 +189,6 @@ module Skylab::BeautySalon
 
           # -- literals: string-ish terminals
 
-
           regexp: {
 
             regexp_for_scanning: ::Regexp.new( <<-O, ::Regexp::EXTENDED ),
@@ -209,7 +208,12 @@ module Skylab::BeautySalon
             },
           },
 
-          xstr_NOT_YET_COVERED: {
+          xstr: {
+            regexp_for_scanning: /#{ BACKTICK_ }/,
+
+            mode_via_token: {
+              BACKTICK_ => same_double_quot,
+            },
             huggers_NOT_YET_COVERED: {
               'x' => nil,  # shell comm
             }

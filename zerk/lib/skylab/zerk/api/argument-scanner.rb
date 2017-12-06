@@ -24,7 +24,7 @@ module Skylab::Zerk
 
       def __initialize_normally x_a
 
-        @_scn = Common_::Scanner.via_array x_a
+        @_scn = Scanner_[ x_a ]
         @no_unparsed_exists = @_scn.no_unparsed_exists
         NIL
       end

@@ -31,7 +31,7 @@ class Skylab::Task
 
         def __first_body_line
           if @be_inverted
-            @_scn = Common_::Scanner.via_array @graph.sources_via_destination.keys
+            @_scn = Scanner_[ @graph.sources_via_destination.keys ]
             if @_scn.no_unparsed_exists
               _last_line
             else
@@ -39,7 +39,7 @@ class Skylab::Task
               _do @_main
             end
           else
-            @_scn = Common_::Scanner.via_array @graph.nodes_box.a_
+            @_scn = Scanner_[ @graph.nodes_box.a_ ]
             @_main = :__forwards_main
             _do @_main
           end
@@ -47,8 +47,7 @@ class Skylab::Task
 
         def __inverted_main
           @_sym = @_scn.gets_one
-          @_sub_scn = Common_::Scanner.via_array(
-            @graph.sources_via_destination.fetch( @_sym ) )
+          @_sub_scn = Scanner_[ @graph.sources_via_destination.fetch( @_sym ) ]
           if @_scn.no_unparsed_exists
             @_main = :_last_line
           end
@@ -64,7 +63,7 @@ class Skylab::Task
             @_sym = @_scn.gets_one
             a = @graph.nodes_box.fetch( @_sym ).can_transition_to
             a || redo  # island nodes don't get represented
-            @_sub_scn = Common_::Scanner.via_array a
+            @_sub_scn = Scanner_[ a ]
             x = _do :_details
             break
           end while above

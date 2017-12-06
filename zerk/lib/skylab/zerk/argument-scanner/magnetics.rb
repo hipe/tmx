@@ -26,7 +26,7 @@ module Skylab::Zerk
       class Request_via_Array
 
         def initialize arglist
-          st = Common_::Scanner.via_array arglist
+          st = Scanner_[ arglist ]
           h = self.class::HASH
           @_arglist_ = st
           begin

@@ -25,7 +25,7 @@ module Skylab::Brazen
         # treetop to the target node *taking into account promotion*
 
         __normal_stream(
-          Common_::Scanner.via_array( const_a ),
+          Scanner_[ const_a ],
           & x_p )
       end
 

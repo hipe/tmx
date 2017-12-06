@@ -78,7 +78,7 @@ module Skylab::TMX
 
           _items = __synopsis_lines_via_one_off one_off
 
-          scn = Common_::Scanner.via_array _items
+          scn = Scanner_[ _items ]
 
           if is_final
             my_final_head = "#{ head }#{ @_crook }"

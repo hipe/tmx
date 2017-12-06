@@ -398,7 +398,7 @@ module Skylab::BeautySalon
 
             __when_bad_range x, exp_a
 
-            STOP_PARSING_
+            STOP_
           end
 
           @rls = pa ; nil

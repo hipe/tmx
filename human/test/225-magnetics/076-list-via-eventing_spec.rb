@@ -37,7 +37,7 @@ module Skylab::Human::TestSupport
       end
 
       it "\"pull\"-style: use `with` to get a dup, set `gets_under`, call `gets`" do
-        scn = _subject.with :gets_under, Common_::Stream.via_nonsparse_array( [ :A ] )
+        scn = _subject.with :gets_under, Home_::Stream_[ [ :A ] ]
         x = scn.gets
         expect( x ).to eql "[#{ NEWLINE_ } A"
         x = scn.gets

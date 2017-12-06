@@ -49,7 +49,7 @@ module Skylab::GitViz
       end
 
       def to_filechange_stream
-        Common_::Stream.via_nonsparse_array @filechanges
+        Stream_[ @filechanges ]
       end
 
       BASE_CMD_ = %w( show --find-renames --numstat --pretty=tformat:%H%n%ai )

@@ -316,7 +316,7 @@ module Skylab::Arc
         #     "user", "super-user"        => "super-user"
         #   ~ "user", "superuser"
 
-        raw_st = Common_::Scanner.via_array s_a
+        raw_st = Scanner_[ s_a ]
 
         st = Common_.stream do  # ignore empties
 

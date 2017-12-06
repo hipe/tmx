@@ -104,7 +104,7 @@ class Skylab::Task
 
         def __to_thing_stream
           exe_a = @up.all_pending_executions
-          Common_::Stream.via_nonsparse_array( @offsets ).map_by do |exe_d|
+          Stream_[ @offsets ].map_by do |exe_d|
             exe_a.fetch exe_d
           end
         end

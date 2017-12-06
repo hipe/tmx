@@ -298,7 +298,7 @@ module Skylab::Zerk
         # -- write-on-receive (then read)
 
         def primary_symbols ks
-          _st = Stream_.call ks do |k|
+          _st = Stream_[ ks ].map_by do |k|
             [ :primary, k ]
           end
           item_normal_tuple_stream _st

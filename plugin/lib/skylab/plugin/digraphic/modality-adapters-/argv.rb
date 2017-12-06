@@ -162,7 +162,7 @@ module Skylab::Plugin
             @_short_d_a.last + 1  # etc
           end
 
-          Common_::Stream.via_nonsparse_array @args[ _d .. -1 ]  # empty OK
+          Stream_[ @args[ _d .. -1 ] ]  # empty OK
         end
 
         def barebones_arguments

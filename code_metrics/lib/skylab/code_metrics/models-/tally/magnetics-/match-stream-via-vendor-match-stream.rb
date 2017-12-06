@@ -80,7 +80,7 @@ module Skylab::CodeMetrics
 
         pieces = [ '\b(?:' ]
 
-        st = Common_::Stream.via_nonsparse_array @pattern_strings do | s |
+        st = Stream_[ @pattern_strings ].map_by do |s|
           ::Regexp.escape s  # ..
         end
 

@@ -102,16 +102,11 @@ module Skylab::TanMan
     Common_::Scanner.via_array a
   end
 
-  No_deps_ = Lazy_.call do
-    # Require_microservice_toolkit_[] when needed
-    MTk_::NoDependenciesZerk
-  end
+  # == require sidesystems
 
   Require_microservice_toolkit_ = Lazy_.call do
     MTk_ = Zerk_lib_[]::MicroserviceToolkit ; nil
   end
-
-  # == require sidesystems
 
   Zerk_lib_ = Lazy_.call do
     Autoloader_.require_sidesystem :Zerk
@@ -123,6 +118,11 @@ module Skylab::TanMan
 
   Fields_lib_ = Lazy_.call do
     Autoloader_.require_sidesystem :Fields
+  end
+
+  No_deps_ = Lazy_.call do
+    # Require_microservice_toolkit_[] when needed
+    MTk_::NoDependenciesZerk
   end
 
   # ==

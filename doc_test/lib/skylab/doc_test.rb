@@ -170,6 +170,10 @@ module Skylab::DocTest
     Common_::Stream.via_nonsparse_array nonsparse_a
   end
 
+  Scanner_ = -> a do
+    Common_::Scanner.via_array a
+  end
+
   # ==
 
   module Lib_  # # use this name per [sl] viz for now

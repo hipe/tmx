@@ -23,7 +23,7 @@ module Skylab::Fields
           #   property against a metaproperty is not hookable: it is supposed
           #   to fail loudly and early always.
 
-          _st = Common_::Stream.via_nonsparse_array @_mprp_a
+          _st = Stream_[ @_mprp_a ]
 
           Home_::Normalization.call_by do |o|
             o.entity_as_ivar_store = prp  # WOAH  (i will miss this)

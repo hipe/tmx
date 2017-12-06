@@ -94,7 +94,7 @@ class Skylab::Task
       # -- use functions
 
       def to_function_item_reference_stream__
-        Common_::Stream.via_nonsparse_array @_function_items
+        Stream_[ @_function_items ]
       end
 
       def const_for_A_atom_via_B_atom sym_A, sym_B

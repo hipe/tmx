@@ -81,7 +81,7 @@ module Skylab::Fields
 
           def call_via_arglist x_a
 
-            scn = Common_::Scanner.via_array x_a
+            scn = Scanner_[ x_a ]
 
             cls = scn.gets_one
 

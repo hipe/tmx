@@ -89,7 +89,7 @@ module Skylab::Zerk::TestSupport
       it "(emits each time a leaf component was set)" do
 
         be_this_emission = be_emission :info, :set_leaf_component
-        st = Common_::Stream.via_nonsparse_array root_ACS_state.emission_array
+        st = Home_::Stream_[ root_ACS_state.emission_array ]
 
         3.times do
           _ = st.gets

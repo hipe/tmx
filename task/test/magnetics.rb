@@ -28,7 +28,7 @@ module Skylab::Task::TestSupport
       end
 
       def token_stream_stream_via_ s_s_a
-        Common_::Stream.via_nonsparse_array s_s_a do |s_a|
+        Home_::Stream_[ s_s_a ].map_by do |s_a|
           Simple_Token_Stream_.new s_a
         end
       end

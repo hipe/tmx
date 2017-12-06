@@ -110,7 +110,7 @@ module Skylab::Tabular
 
         @listener = method :__receive_emission
 
-        _real_arg_scn = Common_::Scanner.via_array @ARGV
+        _real_arg_scn = Scanner_[ @ARGV ]
 
         _line_upstreamer = method :__procure_line_upstream
 
@@ -264,7 +264,7 @@ module Skylab::Tabular
 
       def __to_primary_description_stream_
         h = OPTION_DESCRIPTIONS___
-        Stream_.call h.keys do |k|
+        Stream_[ h.keys ].map_by do |k|
           Common_::QualifiedKnownKnown.via_value_and_symbol h.fetch(k), k
         end
       end

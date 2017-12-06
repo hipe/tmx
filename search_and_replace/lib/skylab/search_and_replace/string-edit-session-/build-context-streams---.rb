@@ -82,7 +82,7 @@ module Skylab::SearchAndReplace
         redo
       end while nil
 
-      @_during_stream = Common_::Stream.via_nonsparse_array a
+      @_during_stream = Stream_[ a ]
       NIL_
     end
 
@@ -111,7 +111,7 @@ module Skylab::SearchAndReplace
         end while nil
       end
 
-      @_after_stream = Common_::Stream.via_nonsparse_array a
+      @_after_stream = Stream_[ a ]
 
       NIL_
     end

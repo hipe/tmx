@@ -158,7 +158,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _expscr_last_screen_stream_lines_stream
-        Common_::Stream.via_nonsparse_array _expscr_last_screen_stream_lines 
+        Home_::Stream_[ _expscr_last_screen_stream_lines ]
       end
 
       def _expscr_last_screen_stream_lines
@@ -376,7 +376,12 @@ module Skylab::Zerk::TestSupport
       end
 
       def _to_stream_line_stream & p
-        Common_::Stream.via_nonsparse_array( @_stream_lines, & p )
+        st = Stream_[ @_stream_lines ]
+        if block_given?
+          st.map_by( & p )
+        else
+          st
+        end
       end
 
       def first_line_content
@@ -763,7 +768,7 @@ module Skylab::Zerk::TestSupport
 
         io = Fake_Readable_IO___.new
 
-        st = Common_::Scanner.via_array x_a
+        st = Scanner_[ x_a ]
 
         lineify = -> s do
 

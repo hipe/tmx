@@ -720,7 +720,7 @@ module Skylab::Zerk
         def initialize front_tokens, itemer
 
           @_itemer = itemer
-          @_real_scn = Common_::Scanner.via_array front_tokens
+          @_real_scn = Scanner_[ front_tokens ]
         end
 
         # --
@@ -787,7 +787,7 @@ module Skylab::Zerk
         def initialize pairs
 
           @_is_pointing_at_name = true
-          @_real_scn = Common_::Scanner.via_array pairs
+          @_real_scn = Scanner_[ pairs ]
         end
 
         def _primary_categorization_via_WFR_ wfr

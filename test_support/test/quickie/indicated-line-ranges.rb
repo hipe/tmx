@@ -38,7 +38,7 @@ module Skylab::TestSupport::TestSupport
 
           spy.want :error, :expression, :parse_error, tail_sym do |actual_lines|
 
-            actual_scanner = Common_::Scanner.via_array actual_lines
+            actual_scanner = Home_::Scanner_[ actual_lines ]
 
             _custom_yielder = ::Enumerator::Yielder.new do |expected_line|
 
@@ -59,7 +59,7 @@ module Skylab::TestSupport::TestSupport
 
             subject = cls.new( & spy.listener )
 
-            scn = Common_::Scanner.via_array these
+            scn = Home_::Scanner_[ these ]
 
             call = scn.gets_one
 

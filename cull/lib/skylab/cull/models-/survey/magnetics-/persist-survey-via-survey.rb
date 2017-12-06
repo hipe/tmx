@@ -157,7 +157,7 @@ module Skylab::Cull
           use_ary = ary
         end
 
-        Stream_.call use_ary do |asmt|
+        Stream_[ use_ary ].map_by do |asmt|
 
           Common_::QualifiedKnownKnown.via_value_and_symbol(
             asmt.value,

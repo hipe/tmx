@@ -34,7 +34,7 @@ module Skylab::Git
 
       def to_patch_item_stream
 
-        Common_::Stream.via_nonsparse_array @_item_a
+        Stream_[ @_item_a ]
       end
 
       def __to_OK

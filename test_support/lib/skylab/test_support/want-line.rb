@@ -562,7 +562,7 @@ module Skylab::TestSupport
           redo
         end while nil
 
-        st = Common_::Stream.via_nonsparse_array buff.to_a
+        st = Stream_[ buff.to_a ]
 
         @line = st.gets
         @up = st
@@ -876,7 +876,7 @@ module Skylab::TestSupport
         end
 
         def fake_open
-          Common_::Stream.via_nonsparse_array @a
+          Stream_[ @a ]
         end
       end
 

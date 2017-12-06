@@ -98,7 +98,7 @@ module Skylab::Arc
 
       def _accept_phrase x_a
 
-        scn = Common_::Scanner.via_array x_a
+        scn = Scanner_[ x_a ]
         begin
           x = send :"__accept__#{ scn.gets_one }__meta_component", scn
           scn.no_unparsed_exists ? break : redo

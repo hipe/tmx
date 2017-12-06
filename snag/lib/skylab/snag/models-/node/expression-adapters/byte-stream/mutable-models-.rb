@@ -171,7 +171,7 @@ module Skylab::Snag
           end
 
           def to_object_stream_ _
-            Common_::Stream.via_nonsparse_array @o_a_
+            Stream_[ @o_a_ ]
           end
         end
       end

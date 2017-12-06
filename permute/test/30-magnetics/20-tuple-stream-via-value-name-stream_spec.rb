@@ -67,7 +67,7 @@ module Skylab::Permute::TestSupport
 
     def _against * pairs
 
-      _st = Common_::Stream.via_nonsparse_array pairs
+      _st = Home_::Stream_[ pairs ]
 
       _st_ = Home_::Magnetics::TupleStream_via_ValueNameStream[ _st ]
 

@@ -187,7 +187,7 @@ module Skylab::Basic
         # because this object *will* be modified mid-scan,
         # we *must* use a duplicate array below.
 
-        Common_::Scanner.via_array @a.dup
+        Scanner_[ @a.dup ]
       end
 
       def touch_node path_x, * x_a, & node_payload_p

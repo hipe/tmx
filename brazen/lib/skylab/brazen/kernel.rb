@@ -112,7 +112,7 @@ class Kernel  # [#015]
 
   def silo_via_normal_identifier const_a
 
-    _silos.via_normal_stream Common_::Scanner.via_array const_a
+    _silos.via_normal_stream Scanner_[ const_a ]
   end
 
   def silo_via_normal_stream st

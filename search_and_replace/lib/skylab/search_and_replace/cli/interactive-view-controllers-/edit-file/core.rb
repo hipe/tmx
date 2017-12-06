@@ -487,7 +487,7 @@ module Skylab::SearchAndReplace
       end
 
       def to_stream_for_resolving_buttonesque_selection  # for above
-        Common_::Stream.via_nonsparse_array @_available_butz_a
+        Stream_[ @_available_butz_a ]
       end
 
       attr_reader(

@@ -153,7 +153,7 @@ module Skylab::Zerk
         end while nil
 
         @_in_use = remove_instance_variable :@_tuple_cache  # or not
-        @_tuple_cache_stream = Common_::Stream.via_nonsparse_array @_in_use
+        @_tuple_cache_stream = Stream_[ @_in_use ]
 
         __reinit_format_string
 

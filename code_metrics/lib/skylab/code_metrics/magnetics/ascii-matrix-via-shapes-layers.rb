@@ -71,7 +71,7 @@ module Skylab::CodeMetrics
 
       def __flush_to_stream
         _ = remove_instance_variable :@pixel_matrix
-        _st = Stream_.call _ do |row|
+        _st = Stream_[ _ ].map_by do |row|
           row.join EMPTY_S_
         end
         _st

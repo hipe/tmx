@@ -14,11 +14,11 @@ module Skylab::TestSupport
       @processes = nil
 
       if x_a.length.nonzero?
-        st = Common_::Scanner.via_array x_a
+        scn = Scanner_[ x_a ]
         begin
-          _m = :"#{ st.gets_one }="
-          send _m, st.gets_one
-        end while st.unparsed_exists
+          _m = :"#{ scn.gets_one }="
+          send _m, scn.gets_one
+        end while scn.unparsed_exists
       end
 
       if ! @filesystem

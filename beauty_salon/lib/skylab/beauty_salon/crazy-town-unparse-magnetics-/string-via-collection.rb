@@ -76,6 +76,12 @@ module Skylab::BeautySalon
             escape_policy_reign: :send_down,
           },
 
+          xstr: {
+            plural_association: :zero_or_more_dynamic_expressions,
+            delimiter_expectations: common_assume,
+            escape_policy_reign: :send_down,
+          },
+
           regexp: {
             plural_association: common_asc,
             delimiter_expectations: common_assume,
@@ -142,6 +148,9 @@ module Skylab::BeautySalon
 
       def execute
         @node_type = @structured_node._node_type_
+        if :xstr == @node_type
+          $stderr.puts "COVER ME IN [bs]"
+        end
         @_behavior = THESE___.fetch @node_type
         __init_escaping_responsibility
         @_opening_delimiter = nil

@@ -38,7 +38,7 @@ module Skylab::Human
       # --
 
       def express_into_under y, _expag
-        scn = Common_::Scanner.via_array @_strings
+        scn = Scanner_[ @_strings ]
         y << scn.gets_one
         until scn.no_unparsed_exists
           y << SPACE_

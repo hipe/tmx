@@ -301,7 +301,7 @@ module Skylab::Human
             o
           end
 
-          stmr.to_stream_around Common_::Stream.via_nonsparse_array @_a
+          stmr.to_stream_around Stream_[ @_a ]
         end
 
         def read_only_array___

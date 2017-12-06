@@ -222,7 +222,7 @@ module Skylab::Snag
 
           def _parse_one_predicate_tail
 
-            _f_st = Common_::Stream.via_nonsparse_array @assoc_ada_a
+            _f_st = Stream_[ @assoc_ada_a ]
 
             winner = Parse_highest_scoring_candidate_.call(
                 @in_st,

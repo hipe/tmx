@@ -540,7 +540,7 @@ module Skylab::TestSupport
 
         def __work_via_entries
 
-          target_scn = Common_::Scanner.via_array @lemmatics
+          target_scn = Scanner_[ @lemmatics ]
           actual_st = __actual_lemmatic_stream_via_entries
 
           begin

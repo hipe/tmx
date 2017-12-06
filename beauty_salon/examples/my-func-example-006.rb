@@ -36,18 +36,18 @@ module Skylab::BeautySalon
     rcvr = sn.any_receiver_expression
     list = sn.zero_or_more_arg_expressions
 
-    if 1 != list.length
+    if 1 != list.length  # #wish [#007.W]
       investigate
       ok_fine_whatever
     end
 
     _arg1 = list.dereference 0
 
-    _arg_code = _arg1.to_code_LOSSLESS_EXPERIMENT__
+    _arg_code = _arg1.to_code_LOSSLESS_EXPERIMENT_
 
     if rcvr
 
-      _rcvr_code = rcvr.to_code_LOSSLESS_EXPERIMENT__
+      _rcvr_code = rcvr.to_code_LOSSLESS_EXPERIMENT_
 
       "expect( #{ _rcvr_code } ).to #{ _arg_code }"  # yikes
     else

@@ -42,6 +42,10 @@ module Skylab::Human  # :[#001].
     "#{ s[ 0, 1 ].upcase }#{ s[ 1 .. -1 ] }"
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   Scanner_ = -> a do
     Common_::Scanner.via_array a
   end

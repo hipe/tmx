@@ -133,7 +133,10 @@ module Skylab::TMX::TestSupport
       end
 
       JSON_file_stream_via = -> s_a do
-        Stream_.call s_a, & Dir_01_path_lookup_function__[]
+        path_via_tail = Dir_01_path_lookup_function__[]
+        Stream_[ s_a ].map_by do |s|
+          path_via_tail[ s ]  # hi.
+        end
       end
     end
 
@@ -196,7 +199,7 @@ module Skylab::TMX::TestSupport
 
         tc = @test_context
 
-        exp_scn = Common_::Scanner.via_array @want_string_array
+        exp_scn = Home_::Scanner_[ @want_string_array ]
         tc.ignore_common_post_operation_emissions_
         _st = tc.send_subject_call
 

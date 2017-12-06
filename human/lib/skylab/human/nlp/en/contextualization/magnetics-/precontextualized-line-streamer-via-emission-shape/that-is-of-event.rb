@@ -19,7 +19,7 @@ module Skylab::Human
         ps.expression_agent.calculate _y, ev, & ev.message_proc
 
         -> do
-          Common_::Stream.via_nonsparse_array lines
+          Stream_[ lines ]
         end
       end
 

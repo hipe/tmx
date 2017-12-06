@@ -26,7 +26,7 @@ module Skylab::Zerk
             @successful_result_will_be_wrapped = true
             false
           else
-            @_scn = Common_::Scanner.via_array x_a
+            @_scn = Scanner_[ x_a ]
             @successful_result_will_be_wrapped = false
             true
           end

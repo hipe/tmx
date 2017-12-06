@@ -100,7 +100,7 @@ module Skylab::Common
       @_went_h[ my_name_x ] = true
       items_waiting_for_me = @_waiting_h.delete my_name_x
       if items_waiting_for_me
-        @_ready_buffer_queue.push Home_::Stream.via_nonsparse_array items_waiting_for_me
+        @_ready_buffer_queue.push Stream_[ items_waiting_for_me ]
         @_state = :__gets_from_buffer
       end
       NIL

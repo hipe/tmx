@@ -451,6 +451,7 @@ module Skylab::Zerk::TestSupport
   NIL = nil  # open [#sli-016.C]
     FALSE = false ; TRUE = true
   NOTHING_ = Home_::NOTHING_
+  Scanner_ = Home_::Scanner_
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNABLE_ = false

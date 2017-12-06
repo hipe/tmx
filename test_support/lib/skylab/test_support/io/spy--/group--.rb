@@ -59,7 +59,7 @@ module Skylab::TestSupport
 
       a = @line_a
       @line_a = nil
-      Common_::Stream.via_nonsparse_array( a ).map_reduce_by do | line_o |
+      Stream_[ a ].map_reduce_by do |line_o|
 
         if sym == line_o.stream_symbol
           line_o.string

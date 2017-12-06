@@ -261,7 +261,7 @@ module Skylab::Fields::TestSupport
       end
 
       def scanner_via_array_ x_a
-        Common_::Scanner.via_array x_a
+        Home_::Scanner_[ x_a ]
       end
 
       Here_ = self

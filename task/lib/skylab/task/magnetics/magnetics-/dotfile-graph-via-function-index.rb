@@ -65,7 +65,7 @@ class Skylab::Task
         d = ( @_OoT_counter ||= 0 ) + 1
         @_OoT_counter = d
 
-        @_fit_st = Common_::Stream.via_nonsparse_array fits
+        @_fit_st = Stream_[ fits ]
 
         @_m = :_express_remainder_of_function_stream
 

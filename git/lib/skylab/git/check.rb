@@ -5,12 +5,12 @@ module Skylab::Git
     class << self
 
       def line_oriented_via_arguments__ a
-        st = Common_::Scanner.via_array a
+        scn = Scanner_[ a ]
         o = As_Line_Oriented_Actor__.begin
-        o.y = st.gets_one
-        o.file_a = st.gets_one
-        unless st.no_unparsed_exists
-          o._process st
+        o.y = scn.gets_one
+        o.file_a = scn.gets_one
+        unless scn.no_unparsed_exists
+          o._process scn
         end
         o.execute
       end
@@ -27,7 +27,7 @@ module Skylab::Git
           o.file_a = file_a
           o.y = y
           if x_a.length.nonzero?
-            o._process Common_::Scanner.via_array x_a
+            o._process Scanner_[ x_a ]
           end
           o.execute
         end

@@ -153,6 +153,10 @@ module Skylab::Git
     Autoloader_.require_sidesystem :Zerk
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   # ==
 
   module Lib_

@@ -147,7 +147,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         test = Test_.new nil
 
-        Common_::Stream.via_nonsparse_array path_a do | path_ |
+        Common_::Stream.via_nonsparse_array( path_a ).map_by do |path_|  # Stream_
 
           test.new path_
         end

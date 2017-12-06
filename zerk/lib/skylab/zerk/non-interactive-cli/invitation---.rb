@@ -12,7 +12,7 @@ module Skylab::Zerk
         @method_name = :express_commonly
 
         if x_a.length.nonzero?
-          @_st = Common_::Scanner.via_array x_a
+          @_st = Scanner_[ x_a ]
           begin
             send @_st.gets_one
           end until @_st.no_unparsed_exists
