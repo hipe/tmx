@@ -169,6 +169,18 @@ module Skylab::Brazen
         end
       end
 
+      IS_SECTION_OR_SUBSECTION_ = {
+        _assignment_: false,
+        _section_or_subsection_: true,
+        NOTHING_ => false,  # blank line or similar
+      }
+
+      IS_ASSIGNMENT_ = {
+        _assignment_: true,
+        _section_or_subsection_: false,
+        NOTHING_ => false,  # blank line or similar
+      }
+
       # ==
 
       POLYADIC_EMPTINESS_ = -> * { NOTHING_ }

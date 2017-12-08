@@ -61,8 +61,8 @@ module Skylab::Brazen
           end
 
           def _to_stream
-            Stream_[ @_all_elements_ ].reduce_by do |el|
-              :_assignment_ == el._category_symbol_
+            Stream_[ @_all_elements_ ].filter_by do |el|
+              IS_ASSIGNMENT_.fetch el._category_symbol_
             end
           end
           alias_method :to_stream_of_assignments, :_to_stream

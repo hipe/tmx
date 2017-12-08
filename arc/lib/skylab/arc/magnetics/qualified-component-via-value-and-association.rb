@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::Arc
 
   class Magnetics::QualifiedComponent_via_Value_and_Association
@@ -139,7 +141,7 @@ module Skylab::Arc
       #   - try to be an upgrade path
       #   - originated to make test code obvious, look like simple models
       #   - in this file because it's anemic, otherwise related
-      #   - #cov2.1 gives a broader intro maybe..
+      #   - #coverpoint2.2 is the test (it might one day explain more)
 
       attr_writer(
         :listener,
@@ -639,10 +641,17 @@ module Skylab::Arc
       end
 
       def __when_extra
+
         sym = @name_symbol
-        @listener.call :error, :expression, :unrecognized_property do |y|
+
+        _use_listener = @listener || Listener_that_raises_exceptions_
+          # (for clients that weren't expecting an error here, as a courtesy
+          #  let's let them know what the issue is in the form of an exception)
+
+        _use_listener.call :error, :expression, :unrecognized_property do |y|
           y << "unrecognized property #{ ick_prim sym }"
         end
+
         UNABLE_
       end
 
@@ -665,8 +674,14 @@ module Skylab::Arc
       end
 
       def __explicitly_defined_type_initially name_sym
-        if @model_class.const_defined? :TYPES, false
-          h = @model_class.const_get :TYPES, false
+
+        if @model_class.const_defined? :TYPES
+
+          # :#history-A.2: new in this commit: allow the above to inherit
+          # so that you can subclass different implementation variants for
+          # models with the same constituency
+
+          h = @model_class.const_get :TYPES
         end
         if h
           @__type_via_name_symbol = h
@@ -736,13 +751,28 @@ module Skylab::Arc
 
     # ==
 
+    Listener_that_raises_exceptions_ = -> * chan, & em_p do  # #[#co-045]
+
+      if :error == chan[0]
+        if :expression == chan[1]
+          _expag = Autoloader_.require_sidesystem( :Zerk )::No_deps[]::API_InterfaceExpressionAgent.instance
+          _msg = _expag.calculate ::String.new, & em_p
+          raise _msg
+        else
+          raise em_p[].to_exception
+        end
+      end
+    end
+
+    # ==
+
     KEEP_PARSING_ = true
     STOP_PARSING_ = nil
     THIS_IVAR___ = :@_associations_index_for_ARC_
-    UNDERSCORE_ = '_'
 
     # ==
     # ==
   end
 end
+# :#history-A.2 (might be temporary): as referenced
 # #history-A.1: spike of injection of "by simplified" magnets

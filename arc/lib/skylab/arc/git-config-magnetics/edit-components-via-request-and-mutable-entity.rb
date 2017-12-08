@@ -4,7 +4,7 @@ module Skylab::Arc
 
     # -
 
-      # a lot of what happens here is explained in detail at [#024.XXX2].
+      # a lot of what happens here is explained in detail at [#024.O].
 
       def mutable_entity= ent
 
@@ -227,7 +227,7 @@ module Skylab::Arc
         end
       end
 
-      def __when_already_not_set  # #cov1.4 (has legacy behavior)
+      def __when_already_not_set  # #coverpoint1.4 (has legacy behavior)
 
         asc_sym = @_current_MODEL_symbol  # (association of entity not action)
 
@@ -241,7 +241,7 @@ module Skylab::Arc
         UNABLE_
       end
 
-      def __do_unset  # #cov1.5
+      def __do_unset  # #coverpoint1.5
 
         asc = @_current_association
 
@@ -381,7 +381,7 @@ module Skylab::Arc
 
     Build_index___ = -> parameters do
 
-      # a painful about of detail about indexing at [#011.D.6]
+      # a painful amount of detail about indexing at [#011.D.6]
 
       sings = []  # we know there are some
 

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[arc] magnetics - model index by simplicity - intro" do  # :#cov2.1
+  describe "[arc] magnetics - model index by simplicity - intro" do  # :#coverpoint2.2
 
     # (say something. #born has a commit message as draft. EDIT #todo)
 

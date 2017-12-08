@@ -155,7 +155,7 @@ module Skylab::Cull
     end
 
     def to_bound_call_of_operator
-      MTk_::BoundCall_of_Operation_via[ self, Operator_branch___[] ]
+      MTk_::BoundCall_of_Operation_via[ self, Feature_branch___[] ]
     end
 
     attr_reader(
@@ -173,7 +173,7 @@ module Skylab::Cull
 
   # ==
 
-  Operator_branch___ = Lazy_.call do
+  Feature_branch___ = Lazy_.call do
 
     MTk_::ModelCentricFeatureBranch.define do |o|  # (find the implementation in [pl])
 

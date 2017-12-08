@@ -26,10 +26,8 @@ module Skylab::Common
 
         def initialize mod
 
-          @module = mod
-
           _p = method :__value_of
-          @index = Index_via_Module___.new( _p, @module ).execute
+          @index = Index_via_Module___.new( _p, mod ).execute
 
           _these = @index.item_offset_via_const.keys
           @_pool = ::Hash[ _these.map { |k| [ k, true ] } ]
@@ -42,6 +40,9 @@ module Skylab::Common
           # assume it will always be present at subsequent reflections.
 
           @_augment = :__augment_while_active
+          @_reached_end_of_real_consts_once = false
+
+          @module = mod
         end
 
         # ~( exposition of a selection of [#ze-051.2] feature branch methods
@@ -50,24 +51,47 @@ module Skylab::Common
         #
         #    - index "items" are *the* items, *not* const values.
         #      if it is useful to develop this, see [#cu-010]
+        #
+        #    - to keep things simple, many of these methods only detect
+        #      those items that have already been indexed (so stowaways
+        #      and filesystem nodes) which in practice has been sufficient
+        #      so far.. :#theme-here
+
+        def procure name_sym, & p
+
+          # (has a yuck fix to overcome the coarse assumption of #theme-here.
+          # this fix does not belong in this method, but we are waiting to
+          # abstract it out until we have coverage demonstrating its necessity.
+          # in practice this issue crops up most often in tests, where nodes
+          # are small enough to define all in one file. the issue is exactly
+          # the referenced theme, where typically we assume all the items
+          # will either be filesystem-based, or registered as stowaways. here
+          # if we do not find it by that means then we trigger the indexing
+          # of any of those consts that have been defined in the
+          # plain-old-programming way
+
+          did = nil
+          begin
+            d_a = @index.item_offsets_via_name_symbol[ name_sym ]
+            d_a && break
+            did && break
+            did = true
+            @_reached_end_of_real_consts_once && break
+            _hi = boxxy_enhanced_constants_  # #todo
+            redo
+          end while above
+          if d_a
+            _via_item_offsets d_a
+          else
+            self._COVER_ME__procure_when_not_found__use_etc__
+          end
+        end
 
         def lookup_softly name_sym
           d_a = @index.item_offsets_via_name_symbol[ name_sym ]
           if d_a
             _via_item_offsets d_a
           end
-        end
-
-        def has_reference name_sym
-
-          # (this had an exlucsive client in [cu], but #tombstone-3.3 no longer)
-          self._NOT_USED__but_worked_once__
-
-          # (to keep things simple, this will only detect those that have
-          # already been indexed (so stowaways and filesystem nodes) which
-          # is fine #theme-here)
-
-          @index.item_offsets_via_name_symbol[ name_sym ] && true
         end
 
         def dereference name_sym
@@ -111,12 +135,18 @@ module Skylab::Common
             name_and_value_for_const_missing_ item.name.as_const
             ref.value_is_known || self._SANITY
             ref.value
-          else
-            # (probably a stowaway that is not yet loaded)
+
+          elsif item.is_stowaway
+
             _nv = _same_by do |o|
               o.wrong_name = item.name
             end
             _nv.const_value
+
+          else
+            item.__value_is_known_ || self._COVER_ME # per #here3
+            _c = item.name.as_const
+            @module.const_get _c, false
           end
         end
 
@@ -188,7 +218,7 @@ module Skylab::Common
             # filesystem node. any random const should be able to just "be
             # there" when we get here, having gotten there by plain old
             # programming (e.g having been written in code in the ordinary
-            # way) and we don't want to fall over on these cases.
+            # way) and we don't want to fall over on these cases. :#here3
             #
             # one place this happens in nature is when we don't have a
             # corresponding directory (and maybe stowaways, maybe not) and
@@ -198,6 +228,7 @@ module Skylab::Common
             # #cov1.3
 
             index.add_item_by do |o|
+              o.__value_is_known_ = true
               o.have_correct_const_symbol
               o.name = nm
             end
@@ -207,6 +238,7 @@ module Skylab::Common
             # once we have nothing left in our pool to add, skip all this next time
             remove_instance_variable :@_pool
             remove_instance_variable :@_seen
+            @_reached_end_of_real_consts_once = true
             @_augment = :__augment_with_nothing
           else
             a.concat pool.keys  # wee
@@ -738,6 +770,10 @@ module Skylab::Common
           @__value
         end
 
+        attr_accessor(
+          :__value_is_known_,
+        )
+
         attr_reader(
           :has_correct_const_symbol,
           :is_stowaway,
@@ -754,7 +790,6 @@ module Skylab::Common
     end  # :#bo
   end
 end
-# :#tombstone-3.3 (as referenced) (can be temporary)
 # #history-3.2: spike of initial code of boxxy reflection API that includes stowaways
 # #tombstone-3.1: full overhaul during "operator branch" era
 #   (tombstones 1 & 2 are in our main spec file - they occurred before this file existed)

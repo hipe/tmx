@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'skylab/common'
 
 module Skylab::Arc  # notes in [#002]
@@ -279,7 +281,7 @@ module Skylab::Arc  # notes in [#002]
         _ = @_association.model_module.define do |o|
           @entity_definition_block[ o ]
         end
-        _store :@_entity, _  # #cov1.1 when not
+        _store :@_entity, _  # #coverpoint1.1 when not
       end
 
       def __add_pluralton_entity
@@ -292,7 +294,7 @@ module Skylab::Arc  # notes in [#002]
       def __set_singleton_entity
 
         # ([#cu-007.B] (yikes) would get closed by following suit here)
-        # maybe clobber, maybe not. OK both. #cov1.2
+        # maybe clobber, maybe not. OK both. #coverpoint1.2
         @mutable_entity._write_via_association_ @_entity, @_association
         @_entity
       end
@@ -1053,11 +1055,13 @@ module Skylab::Arc  # notes in [#002]
       end
 
       Basic = sidesys[ :Basic ]
-      Brazen = sidesys[ :Brazen ]
+      Brazen_NOUVEAU = sidesys[ :Brazen ]
       Fields = sidesys[ :Fields ]
       Human = sidesys[ :Human ]
       JSON = stdlib[ :JSON ]
       System_lib = sidesys[ :System ]
+
+      # (if you are doing a soft survey, Zerk is used for expags in places too)
     end
 
     # --
@@ -1076,6 +1080,7 @@ module Skylab::Arc  # notes in [#002]
     NOTHING_ = nil
     SPACE_ = ' '.freeze
     UNABLE_ = false
+    UNDERSCORE_ = '_'
   # -
 
   def self.describe_into_under y, _

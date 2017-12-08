@@ -94,7 +94,11 @@ here's some of these:
 
 here's some more specialized possibilites:
 
+  - `procure`
+
   - `has_reference`
+
+  - `to_dereferenced_item_stream_with_offsets`
 
 experimental suggested names for mutation
 

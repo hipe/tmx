@@ -577,6 +577,7 @@ module Skylab::Common
         x
       end
     end
+    alias_method :filter_by, :reduce_by  # #open [#055]
 
     # ~ produce a new stream that is mapped. (doesn't reduce - falsish interrupts)
 

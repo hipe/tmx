@@ -63,7 +63,7 @@ module Skylab::Brazen
           norm_s = @_new_assignment.internal_normal_name_string
 
           _comparator = -> el do
-            if :_assignment_ == el._category_symbol_
+            if IS_ASSIGNMENT_.fetch el._category_symbol_
               el.internal_normal_name_string <=> norm_s
             else
               -1  # say "comes before" so you keep looking for one after

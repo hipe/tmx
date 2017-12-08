@@ -185,7 +185,7 @@ module Skylab::System
 
       # ~
 
-      def procure_by
+      def procure_by  # (near [#ze-051] `procure`)
 
         Home_.lib_.brazen_NOUVEAU::Magnetics::Item_via_FeatureBranch.call_by do |o|
 

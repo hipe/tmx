@@ -24,6 +24,7 @@ module Skylab::Cull
         def __partition_existing
           @added_nodes = []
           @removed_nodes = []
+          # NOTE - the below was associated with the LEGACY comment at [#024] "note-25", which will go away..
           @span_a_h = {}
           st = @section.to_stream_of_all_elements
           current_span = []

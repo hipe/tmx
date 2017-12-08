@@ -38,7 +38,8 @@
              [#here.1] track similar "try convert" for stream-likes (~3)
              ( #was: track similar things under number 050 )
 
-[#055] #hole ( #was: #parent-node: [#br-059]  the "pair" structure. )
+[#055] #open correct the names like "reduce by"
+             ( #was: #parent-node: [#br-059]  the "pair" structure. )
 
              having recently cleaned up [#004] knownnesses, we're now
              realizing that our class `Pair` is really exactly structurally

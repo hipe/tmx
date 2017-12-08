@@ -42,6 +42,10 @@ fold-in expect emission (oldschool)
 fold-in "fail early"
 make names modern ("emission.rb")
 (somewhere: dig scanner away, for 2nd wave and [br] injection)
+CHORE: replace all `reduce_by` with `filter_by`, (and `expand_by` with `flat_map_by` and `map_reduce_by` with `filter_map_by`)
+(CHORE: achieve those changes with the tool)
+(CHORE: add and cover at least that one node type `until_post`)
+(CHORE: (local commit) extract they keyword loction into its own file)
 BIG BORING REFACTOR: .to_symbolish_reference_scanner not .to_loadable_reference_stream (-2) (Y) (Y)
 boring refactor: clean up that crazy hack in an isolated commit - fields/lib/skylab/fields/normalization.rb
 cull/test/54-operations/62-mutator/50-unmarshal_spec.rb
@@ -62,3 +66,13 @@ you can get rid of "FunctionBasedAssociations_" move it to assoc/curried-functio
 finish one new magent
 finish other new magnet
 fix diff thing
+local objective: get the TWELVE added files added and integrated to [arc]
+(PATCH: the final integration is in a patch)
+(FILE: there is the most highest level thing numbered 20)
+(FILE: there is a fixuture for something high level)
+(FILE: there is a spec that covers something high level was numbered 09)
+MAGNET: document via reallocation schematic - capsulization (waypoint: -2)
+(FILE: include somewhere the graph-viz documentation that documents capsulization)
+MAGNET: reallocation schematic via two indexes (waypoint: -3)
+MAGNET: pluralton component index via existing document index (waypoint: -4)
+MAGNET: existing document index via entity profile indexer (waypoint: -5)

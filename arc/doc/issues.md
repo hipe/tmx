@@ -50,7 +50,7 @@
 
 [#025]       #after: [#010]
 
-[#024] #hole
+[#024]       (`NAME_ME`)
 
 [#023]       tracks places where the assumption is made that we are not
              long-running. if/when "long-running"-ness occurs for an

@@ -110,7 +110,7 @@ module Skylab::Arc::TestSupport
     end
 
     def expag_for_cleanliness_
-      Home_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen_NOUVEAU::API.expression_agent_instance
     end
 
     def expag_for_codifying__

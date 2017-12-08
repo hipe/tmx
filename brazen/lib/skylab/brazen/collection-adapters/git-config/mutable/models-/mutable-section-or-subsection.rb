@@ -14,6 +14,7 @@ module Skylab::Brazen
 
           def initialize a
             @_all_elements_ = a
+            freeze
           end
 
           # -- write
@@ -106,10 +107,38 @@ module Skylab::Brazen
 
           def _to_stream
             Stream_[ @_all_elements_ ].reduce_by do |el|
-              :_section_or_subsection_ == el._category_symbol_
+              IS_SECTION_OR_SUBSECTION_.fetch el._category_symbol_
             end
           end
           alias_method :to_stream_of_sections, :_to_stream
+            # (for [#ze-051.2] `to_dereferenced_item_stream`)
+
+          def TO_DEREFERENCED_ITEM_STREAM_WITH_OFFSETS  # [asc] #[#ze-051.2]
+
+            # produce a stream whose each item is a tuple (struct), each
+            # of which holds a `section` and the `offset` of the section
+            # into the array of all items. (items that are not sections are
+            # probably blank lines and/or comment lines.)
+
+            # (hand written filter map for clarity)
+
+            a = @_all_elements_
+            last = a.length - 1
+            d = -1
+            Common_.stream do
+              begin
+                d == last && break
+                d += 1
+                el = a.fetch d
+                if ! IS_SECTION_OR_SUBSECTION_.fetch el._category_symbol_
+                  redo
+                end
+                x = ItemWithOffset___.new d, el
+                break
+              end while above
+              x
+            end
+          end
         end
 
         # ==
@@ -436,6 +465,10 @@ module Skylab::Brazen
           :width_of_subsection_leader, :width_of_subsection_name,
           :frozen_line,
         )
+
+        # ==
+
+        ItemWithOffset___ = ::Struct.new :offset, :section
 
         # ==
         # ==

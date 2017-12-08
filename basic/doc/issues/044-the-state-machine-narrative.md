@@ -17,6 +17,6 @@ of the existing ones are:
   • we can go back and try to re-distribute this out to one or more of
     the existing such places, operating under the informed assumption
     that this will have a more positive net-effect than trying to retro-
-    fit existing solutions to fit our needs now:  if we start fresh and
+    fit existing solutions to fit our needs now: if we start fresh and
     write exactly what we need now (knowing what we needed then) we are
     informed by the past without being encumbered by it as well.

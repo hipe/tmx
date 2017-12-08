@@ -391,7 +391,7 @@ module Skylab::Cull
 
           :flag, :property, :unset_upstream,
 
-          # ("pluralton" defined at [#ac-024.XXX])
+          # ("pluralton" defined at [#ac-024.A.2])
 
           :property, :add_map, :pluralton_association, these,
           :property, :remove_map, :pluralton_association, these,
