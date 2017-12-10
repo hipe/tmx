@@ -31,9 +31,12 @@ existing comments and arbitrary formatting in the human-readable store.
   - synopsis, table of contents, prerequisites, intro, scope [#here.a]&[#here.A]
   - design factors #[#here.b]
   - provisions 1 thru N [#here.C]
+  - critical theory for approaching the algorithm: comparison [#here.D]
+  - M, N and C [#here.E]
   - "clusters" [#here.F]
   - necessary background: platform implementation of hash tables (dictionaries) [#here.G]
   - how can we determine "practical equivalence"? [#here.H]
+  - initial indexing of the components and the document [#here.J]
 
 
 
@@ -119,7 +122,6 @@ substitute if there was a reason to target that.
 
 
 
-
 ## design factor: structural requirements & constrains on both sides #[#here.b]
 
 although this was developed for a single client and a single one of its
@@ -195,7 +197,6 @@ while our current goal is to solve for persisting "documenty" entities
 serves as both an end it itself and also as a means for perhaps an even
 more general solution for entities of greater complexity than those that
 are "documenty".
-
 
 
 
@@ -304,10 +305,211 @@ satisifes a need..
 
 
 
+## critical theory for approaching the algorithm: comparison :[#here.D]
+
+for our purposes, the similarity that one "entity/section" can have to
+another (when they are (for the purposes of this discussion) "similar")
+will take the form of one of three discrete, mutually exclusive
+classifications (so, non-nesting categories). that is to say, two
+entity/sections can be similar to each other in one of four ways:
+either in one of the three categories of similary, or not at all.
+
+
+
+### "surface identical"
+
+one is "surface identical" (which, caveat: we don't expect to use this
+in a practical way but it's important conceptually) which means that
+every line of the section (i.e the surface representation) is identical
+byte-for-byte (including formatting, whitespace, comments, etc) to that
+of the section being compared to. the reason we may not ever utilize this
+category of similarity in practice is because this form of equivalence
+requires the comparison of "surface bytes" (e.g whitespace, formatting,
+comments) and to have those you have to have sections, not just entities;
+and as it works out we maybe don't ever compare one *section* to another,
+but rather only ever entities against sections..
+
+
+
+### "practical match" - introduction :[#here.D.3]
+
+another form of equivalence (and one we'll be relying on most heavily)
+is "practical match". two entities are a "practical match" if they are
+instances of of the same model (entity class) and their pertinent data
+members are a practical match too. (yes, that part of the definition
+is recursive, and we'll terminate it next.)
+
+their pertinent data members are a practical match if they have the
+same constituency (i.e set of names, insensitive to order (a case that
+will always be true for two instances of the same class)) and (perhaps
+recursively) that each corresponding value is a practical match too.
+
+(we will hold off on defining "pertinent" for a while.)
+
+(it's tempting to use the term "composition" somewhere in here but we're
+holding off on broadening our network of jargon.)
+
+the fact that we have defined this concept recursively may seem variously
+overcomplicated, a liability, or even erroneous; however indulge first the
+following provision, and then these several analogies as justification:
+
+we can simplify the imagining of this in our minds with the provision that
+a "practical match" is only applied between two "sectiony entities" (which
+only ever have primitive components formally), so perhaps we won't need to
+recurse anyway. but note that this concept of "practical match" could
+recurse and it won't be a problem:
+
+to understand this distinction: imagine that we accept as axiomatic that
+hotel suites are made of up rooms and rooms are made up of furniture and
+walls and that we can sub-divide furniture and walls into smaller and
+smaller components, and so on until we get down to the level of a
+"small thing" that we no longer care to subdivide (exactly the idea
+(and etymology) of the word "atom").
+
+we can then apply this recursive definition of equivalency by saying that
+two hotel suites are equivalent IFF they have rooms that are equivalent,
+and two rooms are equivalent IFF each of their corresponding walls/furniture
+are equivalent, etc etc on down to the design on the fabric of the drapes,
+the placement of the electrical outlets, etc.
+
+the point is this is a recursive definition of equivalence: that two things
+are equivalent if they are made up entirely of sub-components, and you can
+line up the each sub-component with a counterpart on the other side
+("destructively", i.e you "line up" any same component with more than one
+other component) and apply this same definition of equivalence to those two
+sub-components, etc on downards until you reach some kind of base case,
+where perhaps you are comparing two "primitive" datapoints (for example,
+comparing colors, or heights).
+
+contrast on the other hand comparing two "pockets" of "change" (currency).
+first, accept as axiomatic that any two nickels ($US 0.05) and two pennies
+($US 0.01) are practically equvialent (and so on) for the sake of this
+discussion. straining the metaphor somewhat, our conception of "equivalency"
+is concerned with *constituency* (or maybe call it composition here), and
+not simply with dollar amount. meaning: we consider two pockets of change
+as equivalent IFF you can line up (destructively) one coin from one pocket
+with an equivalent coin from the other pocket (for some definition of
+coin equivalency).
+
+note that here, the coin is seen as an indivisible "unit" so we do not
+recurse any lower than that the level of comparing two coins.
+
+the difference between hotel suites and pockets of coins is that with the
+coins we don't need to recurse, however note that the recursive definition
+of equivalence still works for the coins case.
+
+
+
+
+### "practical match" and identity
+
+repeating what may be at this point a familiar refrain, under the world
+of "pluraltons" two entities can be practical matches but have distinct
+identities.
+
+so for example the first and third items in the list might look the
+same; but that is not to say they are the same component. this
+phenomenon certainly occurs in the physical world: the ball bearings
+of a car's axle (or whatever) may be for practical purposes
+identical to each other; but they nonetheless have individual
+identity (and if one was missing things could go terribly wrong).
+maybe the red blood cels of our body are similarly "fungible" with
+each other but still have their own individual identity.
+
+(side note one: the fact that in this model two things may have
+discrete "identity" but be for all purposes interchangeable,
+it challenges the utility of our notion of identity. note for one thing
+that the "identical twins" analogy loses relevance in this discussion.
+(they for certain have individual identity and are not interchangeable.)
+the bottom line here is that we may want to sidestep the concept
+of identity entirely, and rely instead only on our model of categories
+of similarity alone :#here2.)
+
+(side note two: generally when we say "constituency" here we mean roughly
+the name-value pairs of an "entity" as an *unordered* set; so two entities
+have the same constituency if they have the same components (by association
+name) with the same values (against their respective counterparts); but the
+idea of an "order" of these components is some combination of irrelevant or
+non-appicable i.e meaningless.)
+
+
+
+### "can be changed component"
+
+this is a sketchy category of comparison. the idea here is that if
+when held up against the entity expressed by a section, the entity
+in hand is not a practical match (because the constituency of *its*
+components differs in some way; e.g by the set of all association
+names, or by the values of one or more of the components (note we
+didn't say "identity" because we're assuming here that these components
+are primitives)); yet nonetheless we "can" "re-use" this section
+(with modification) to represent the entity in hand.
+
+by design (but not necessarily through corollary) we'll say that
+a section qualifies as one such match for a component if A it's of
+the same component association and B is of the same model class.
+
+later we'll introduce the practical utility of this kind of comparison;
+but the TL;DR: of why we have it is so that we retain any whitespace,
+formatting, and (possibly not pertinent) commments in a section that
+would otherwise be discarded (along with its comments).
+
+probably we'll want to generate notices in such cases, to warn the
+user that the data content has changed within a section and so the
+comments (if any) should be reviewed to see if they still make sense.
+
+
+
+
+## M, N and C :[#here.E]
+
+  - let "M" be the list of *all* the [#here.b.3] sections of the old
+    document (in their order). (mnemonic: "M comes before N")
+
+  - let "N" be the imaginary list of *all* the sections of the document
+    that will exist (in their order) when our edit (i.e insertions,
+    deletions, re-ordering) is complete. (mnemonic: "New document")
+
+(side note: because it is an uninteresting problem, we are going to ignore
+the leading zero or more lines (necessarily comment-and-or-whitepace,
+per the git config document grammar) that exist before the first section
+line in this discussion, in the knowledge that they will always come out the
+other side as unchanged and in their same position as offset from the
+beginning of the document. this provision alongside M and N mean that
+our algorithm built by decomposing M and N will account for every line
+of the entire document (both before and after the edit).)
+
+thinking out loud: reaching N means we have succeeded are are finished.
+
+  - let "participating sections" be those sections in M that are part
+    of the pluraton group under operation. this is simply all sections
+    in M that have the relevant section (not sub-section) name as determined
+    by the relevant name of the association (which is a pluralton). (hint:
+    this corresponds to the name of the ivar in the entity that holds the
+    array of components in this pluralton group. it is probably a plural
+    noun.)
+
+so far, getting M is easy (it's every section in the document at first)
+and determining the list-subset M' of participating sections is also easy
+(it's trivial to reduce by section name). now,
+
+  - let "C" be the full, ordered *list* of components in the relevant
+    pluraton group in the entity which reflects the accurate, up-to-date
+    state we want to persist into the document to get from M to N.
+
+solving for N given M and C is the crux of our algorithm.
+
+(note: there may be other pluralton components within the entity that
+will undergo this same process so that they can be persisted; but we
+are going to keep things simple for now and limit our focus to one
+relevant pluralton association for the duration of this algorithm :#here1.)
+
+
+
 
 ## "clusters" :[#here.F]
 
-recall that some sections in [#here.e] M will be "participating", and others
+recall that some sections in [#here.E] M will be "participating", and others
 will not. it is a design objective that we accomodate any possible
 arrangement of interspersions of participating and non-participating
 sections. as such,
@@ -470,6 +672,110 @@ the significance of all of this will become clear in the next section.
 
 
 
+## initial indexing of the components and the document :[#here.J]
+
+a next big step in this pipeline is that between the components in the
+pluralton group and the sections in the existing document, we find those
+that associate with each other through practical equivalence. this section
+illustrates how we go about that in detail.
+
+we have demonstrated above how we may distill the "practical identity" of
+an item from either of these sides down to a plain old sequential integer,
+by using a hash as a cache to keep track of each new "profile" that is seen
+and assign it each next positive integer (starting at 1).
+
+because it feels like it makes more sense when we get near the end,
+
+  - we index the document first, and the components second. #theme-2
+
+so,
+
+
+
+### indexing the document
+
+  - for each entity implied by each section in each cluster in L,
+    "touch" its profile and add to this index the "locator" of this
+    section in this cluster in the document.
+
+note that multiple sections may each have the same practical identity,
+and in such cases there will only be one "profile" but it will have
+multiple "locators".
+
+for the duration of the following case explanation, we will use a notation
+convention where each next letter of the alphabet is used to represent
+each next signature, and each time there is another occurrence of the
+signature we say the "prime" of it:
+
+    A  A' | B  C  C'  C''  D | E  F
+
+this is a representation of a single "pluralton group" with 9 items
+(i.e. components, i.e entities).  there's 6 signatures, 3 clusters.
+some of the signatures are exhibited multiple times. in more detail:
+
+  - the pipe ("|") indicates boundaries between clusters
+
+  - "A'" is practically equivalent to "A", "C''" is practically
+    equivalent to "C'" and "C", and so on.
+
+  - in this example it just so happens that practically equivalent sections
+    fall next to each other (and always in the same cluster), but there is
+    no reason to see this as a trend, pattern or rule.
+
+  - (take care not to confuse the letters we use here with the special
+     meanings we have assigned to certain letters in the broader context
+     of the algorithm. they are unrelated.)
+
+remember above we said that we would index the document (L) first and
+components (C) second. so:
+
+
+
+### indexing the components
+
+crucially, during this explanation we are using the same notation
+conventions *and namespace* as above when we indexed the document.
+
+so let's look at our components in this case:
+
+    D Q C A A' E F
+
+the first component has a practical identity "D" that *is* the same
+practical identity of "D" from the above sub-section about indexing
+the document. the same for "C", "A", "A'" and so on. but note:
+
+  - "Q" is a random new profile that we hadn't seen already in L. as such,
+    we can consider this an "add" of a new component to the document,
+    rather than a possible repurposing and/or repositioning of an
+    existing entity.
+
+    adding components (as opposed to moving them) is a less difficult
+    problem and so it won't receive attention for a while. but we'll
+    pick back up with adding components along #theme-3.
+
+  - in other possible cases, there could be multiple components like Q.
+    one important edge case is where *all* components are like Q (that is,
+    none of them are in the existing document by practical equivalence).
+    another important edge case is when C is the empty list.
+
+  - the "heaviest" design objective of this algorithm comes from this
+    provision: the ordering of these components of C can be totally
+    arbitrary and new when compared to the ordering we had in L (as it
+    pertains to the items that are in both (in terms of practical
+    equivalency)). note that in the components, C (the item) comes before
+    A, and D comes at the front (whereas in the document D comes after C
+    and C comes after A).
+
+  - note too that not all items that are in the document are in the list
+    of components. (this is the complement to the point above about items
+    like Q, which are items that exist in the components but that don't
+    exist (by practical equivalence) in the document.)
+
+but this indexing is only the beginning..
+
+
+
+
 ## towards synthesis: how can we determine "practical equivalence"? :[#here.H]
 
 recall provision 1 which provides that every section must express
@@ -482,7 +788,7 @@ as such should fail (softly but unrecoverably) out of this algorithm;
 but it is otherwise uninteresting to us here.
 
 so for our purpose imagine that we somehow "have" an entity for every
-section in [#here.f.2] L (or every relevant section in [#here.e] M,
+section in [#here.f.2] L (or every relevant section in [#here.E] M,
 whichever you prefer to see it as). mind you we have just now done the
 opposite of what we are doing generally. what we are doing generally is
 "persisting" (i.e marshaling (serializing)); but what we have just
@@ -491,7 +797,7 @@ this is because at the crux of this algorithm is comparing the entities
 in C against the existing would-be entities implied by M, and we do this
 through comparing entities (not sections).
 
-recall too the idea of a [#here.d] "practical match". we think we present
+recall too the idea of a [#here.D.3] "practical match". we think we present
 here a conception of "practical matching" of entities to each other that
 is as simple as possible while still being as complicated as necessary:
 

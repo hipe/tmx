@@ -751,7 +751,7 @@ module Skylab::Arc
 
     # ==
 
-    Listener_that_raises_exceptions_ = -> * chan, & em_p do  # #[#co-045]
+    Listener_that_raises_exceptions_ = -> * chan, & em_p do  # #[#co-045]  # #testpoint
 
       if :error == chan[0]
         if :expression == chan[1]

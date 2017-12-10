@@ -10,7 +10,9 @@ module Skylab::Arc::TestSupport
 
     Lazy_ = Home_::Lazy_
 
-    define_method :mutable_config_A_, ( Lazy_.call do
+    define_singleton_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
+
+    define_method :mutable_config_for_story_A_, ( Lazy_.call do
 
       fixture_files_ = ::File.join TS_.dir_path, 'fixture-files'
 
@@ -68,8 +70,92 @@ module Skylab::Arc::TestSupport
       Common_::QualifiedKnownKnown.via_value_and_association a, _name
     end )
 
+    #
+    # magnet 200
+    #
+
+    dangerous_memoize :product_of_magnetic_200_for_story_A_ do
+
+      edi = product_of_magnetic_100_for_story_A_
+      qc = qualified_component_for_story_A_
+      epi = mutable_indexer_for_story_A_
+
+      # --
+
+      _ = magnet_200_.call_by do |o|
+
+        o.qualified_component = qc
+
+        o.existing_document_index = edi
+
+        o.entity_profile_indexer = epi
+
+        o.listener = _listener_helpful_for_development_GCM
+      end
+    end
+
+    def magnet_200_
+      _protected_magnetics_GFM::PluraltonComponentsIndex_via_ExistingDocumentIndex
+    end
+
+    #
+    # magnet 100
+    #
+
+    dangerous_memoize :product_of_magnetic_100_for_story_A_ do  # "product of magnetic 100" = existing document index
+
+      me = mutable_entity_for_story_A_
+      qc = qualified_component_for_story_A_
+      epi = mutable_indexer_for_story_A_
+
+      # --
+
+      _sym = qc.name_symbol
+
+      magnet_100_.call_by do |o|
+        o.mutable_entity = me
+        o.component_association_name_symbol = _sym
+        o.entity_profile_indexer = epi
+
+        o.listener = _listener_helpful_for_development_GCM  # (see)
+      end
+    end
+
+    dangerous_memoize :mutable_entity_for_story_A_ do
+      _mc = mutable_config_for_story_A_
+      build_mutable_entity_by_ do |o|
+        o._config_for_write_ = _mc
+      end
+    end
+
+    dangerous_memoize :mutable_indexer_for_story_A_ do
+      Home_::GitConfigMagnetics_::EntityProfileIndexer.new  # should be 1 of 2 when all is dnne
+    end
+
+    def magnet_100_
+      _protected_magnetics_GFM::ExistingDocumentIndex_via_EntityProfileIndexer
+    end
+
+    #
+    # support
+    #
+
     def build_mutable_entity_by_ & p
       MutableEntity.define( & p )
+    end
+
+    def _listener_helpful_for_development_GCM
+
+      # for many of the magnetics, if we don't set the listener to anyting
+      # it triggers quite a few warnings.
+      # although setting it to the below can be useful for development,
+      # is fail behavior is not covered per se
+
+      Home_::Magnetics::QualifiedComponent_via_Value_and_Association::Listener_that_raises_exceptions_
+    end
+
+    def _protected_magnetics_GFM
+      Home_::GitConfigMagnetics_
     end
 
     class MutableEntity < Common_::SimpleModel
