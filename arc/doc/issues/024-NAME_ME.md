@@ -36,7 +36,11 @@ existing comments and arbitrary formatting in the human-readable store.
   - "clusters" [#here.F]
   - necessary background: platform implementation of hash tables (dictionaries) [#here.G]
   - how can we determine "practical equivalence"? [#here.H]
+  - why do we go through the extra trouble? [#here.i]
   - initial indexing of the components and the document [#here.J]
+  - why the crazy diff thing [#here.K]
+  - the crazy diff thing [#here.L]
+  - the beginning of the final clusterization [#here.M]
 
 
 
@@ -885,6 +889,361 @@ in this way (finally) we can have a plain old integer (starting at 1,
 with new integers allocated sequentially) that represents the "essence"
 (we keep avoding the term "identity") of any participating entity for the
 purposes of finding other entities that match it (practically). whew!
+
+
+
+
+## towards synthesis: why do we go through the following extra trouble? [#here.i]
+
+recall we have L (which is 1 or more clusters of participating sections,
+each cluster being separated by runs of one or more non-participating
+sections), and we want to get to N, which is the list of sections that
+persists C (the list of components we want to persist).
+
+the general challenge here (and it was a true challenge) is that we
+want to reduce as much as possible unnecessary "strain" on the document:
+we want to change it as is necessary (for some given means of quantifying
+change).
+
+this is in its way an exercise in "aesthetic" refinement; that is,
+we could just say "forget this" and flip the table and just say
+"take the first (or last (or middle)) cluster and put all of the C
+into this cluster and delete all the other clusters", but if we do,
+then
+
+  - for one thing, we lose comments in L if we just blindly replace
+    them with the C without looking for matches
+
+  - for another thing, if we were to do this then the document would give
+    the appearance of way more change happening than it is.
+
+  - for a third thing, if the user had some reason for arranging the
+    "clusterization" (L) as it was, then we would like to retain that
+    arrangement as much as we can while still accomodating the edit.
+
+so now that we have the justification for the following out of the way:
+
+
+
+
+## why the crazy diff thing :[#here.K]
+
+building off of the "indexing" we've accomplished in the above
+sections, this is a visual statement of our fundamental problem:
+
+    (existing document)   (components)        (new document)
+
+     A                        D                     ?
+     A'                       Q                     ..
+    ---                       C                    ---
+     B           +            A         =           ?
+     C                        A'                    ..
+     C'                       E
+     C''                      F
+     D
+    ---                                            ---
+     E                                              ?
+     F                                              ..
+
+
+one thing we haven't stated yet explicitly is that we need to preserve
+the "---" jumps both in terms of their constituency and their order.
+what each of them represents is a run of one or more non-participating
+sections and it is an absolute requirement that we preserve them in (again)
+both constituency and order :#theme-1.
+
+to appreciate this problem with a focus on one aspect, we'll re-present the
+above but with an emphasis on whether and how much each item is "moving":
+
+
+    (existing document)   (components)        (new document)
+
+     A  -------+      +---->  D                     ?
+     A' -----+  \    /                              ?
+    ---       \  \  /   X-->  Q                    ---
+     B  --> X  \  \/                                ?
+     C  ------- \  \------->  C                     ?
+     C' --> X    \  \                               ?
+     C''--> X  /  \  +----->  A                     ?
+     D  ------+    +------->  A'                    ?
+    ---                                            ---
+     E  ------------------->  E                     ?
+     F  ------------------->  F                     ?
+
+
+if this looks like a mess, it is supposed to.
+
+having drawn arrows showing where each item moves to relative to the
+other items (and having come up with a notation demonstrating both
+removes and adds), it doesn't magically solve the problem of where
+to put the cluster "breaks" (the "---") that we need to carry over
+into the new document.
+
+when developing this algorithm, we actually got as far as considering
+taking into account the *slope* of each such conceptual arrow to determine
+which of the items to move. we realized then that what we in fact wanted
+was a plain old diff algorithm, and at that point we decided we should
+use an existing `diff` tool instead of writing one ourselves.
+
+so the centralest mechanic of this whole circus becomes this: conceptually
+we flatten the tree of sections so that they in their order can be compared
+to the list of components, and then get a "patch" (list of line-level
+instructions) from this and use that to inform our output document.
+(it's actually a bit simpler than that as we will see.)
+
+the value in this approach is that we have an external, known facility
+that manages determining a diff for us, rather than cobbling something
+together feebly ourselves. the payback, though, is that we have to
+re-assemble a clusterization in a way that hews close to the original
+document structurally (to some extent possible), while using this patch
+to inform the order of its leaves.
+
+
+
+
+## the crazy diff thing, at the center of it all :[#here.L]
+
+here we present in a manner a bit more like pseudocode the "lining up"
+that we did above with the drawing of the [#here.K] arrows. then we take
+this a step further by showing how we can leverage `diff` to make the
+decisions for us to decide which items are to be considered as "moving"
+vs. which are "stationary". so:
+
+we do something else when we index the components, beyond just determining
+their practical identity (integer): we see if such an item (by practical
+identity) exists in the document that can be "lined up" "destructively"
+with this one. we represent such a "lining up" as something we call an
+"associated locators", because we'll be associating one "locator" (think
+plain old offset) to a component with one "locator" (think 2-integer offset
+tuple) for a section in the document.
+
+(further on in this document we will refer to the above phenomenon as
+simply an "association".)
+
+so for each next component that we "index", we'll "line it up" with one
+from the document if we can, and it gets a new "associated locators"
+association. the items below that have associations with items in the
+document have an integer by them, and these integers are sequential
+starting from zero. the integer is the offset of the "association locators"
+structure in a list of every such structure ever made for this effort.
+
+    D  0
+    Q
+    C  1
+    A  2
+    A' 3
+    E  4
+    F  5
+
+so to restate somewhat, the above items with numbers next to them are
+items that have an associated counterpart section in the document.
+
+the number is not an offset into the document in any sense. it is only
+an offset uniquely identifying the association. when looked at from this
+perspective of a pluralton group, the numbers will always start at zero
+and increase by 1. this is by design:
+
+we index the document first and the components second (#theme-2), so we
+discover associations in an order that accords with the order of the
+components (but note there can be "holes" where there's a "new" component
+that is not associated with any existing section in the document).
+
+the above items with the same base letter but a different prime (here
+"A" and "A'") are practically equivalent to each other, but note that
+they get their own association to their own section in the document,
+because of the important fact that associations are "destructive".
+
+in groups of practically equivalent items such as this, note that there
+is no correlation between the number of such items on the component side
+and the number of equivalent sections on the document side. that is, it's
+possible to "run out" of available practically equivalent sections, or to
+have some practically equivalent sections "left over" after items are
+paired up.
+
+note that Q is (in this case) the only component without an association,
+because it's the only component that doesn't have a counterpart in the
+document.
+
+so now go back and look at these same offsets of associations when
+grafted over L:
+
+     A   2
+     A'  3
+    ---
+     B
+     C   1
+     C'
+     C''
+     D   0
+    ---
+     E   4
+     F   5
+
+of this visualization, note:
+
+  - the offsets don't appear to accord to the order of the sections
+    in the document. this is intentional, because this case is
+    designed to illustrate a significant re-ordering.
+
+  - note too that this is a more condensed representation of what we
+    illustrated above with all the arrows pointing every which way;
+    which is to say we haven't actually solved anything new yet.
+
+without explaining why we do this until we get there, we're going to
+do this: reduce these two illustrations to only the numbers in them,
+and imagine they are in these two files:
+
+    existing-document.txt        components.txt
+             2                         0
+             3                         1
+             1                         2
+             0                         3
+             4                         4
+             5                         5
+
+of this visualization, note:
+
+  - the numbers/lines in the right imaginary text file will always be
+    sequential starting from zero, because of #theme-2.
+
+  - again we could draw arrows matching number to number, and the
+    arrow mesh would look just like the arrow mesh we drew above
+    (but simplified because now we have disregarded adds and removes).
+
+so, what happens when we take a diff of these two files?
+
+    diff --unified existing-document.txt components.txt
+
+we get:
+
+    --- existing-document.txt xxx
+    +++ components.txt xxx
+    @@ -1,6 +1,6 @@
+    +0
+    +1
+     2
+     3
+    -1
+    -0
+     4
+     5
+
+(you can try this with:
+
+    diff --unified test/fixture-files/060-existing-document.txt \
+      test/fixture-files/060-components.txt
+)
+
+again, this might look like a mess, but it is a more useful mess.
+
+in effect what `diff` has done is decided for us which items we should
+"move", and which items can remain stationary. we don't really care by
+what rationale it came up with this series of operations; of this we can
+remain blissfully ignorant. it is just a black box that we trust has
+come up with a reasonable plan to get from L + C to N, part way.
+
+note that crucially, we had to strip the file on the left of any
+representation of the breaks between clusters, because we have no
+legitimate way of deciding (yet) where and how breaks should be
+representated on the right document (yet); we only know of the order
+of the items. (in fact, this is sort of the crux of the whole problem,
+is deciding where to put the breaks.)
+
+now, what to do with this information?
+
+
+
+
+## the beginning of the final clusterization [#here.M]
+
+at its essence, a diff is a list of line-level edits that get you
+from one file to another: add this line, remove these 2 lines, leave these
+3 lines alone, advance this many lines, and so on.
+
+but for a variety of reasons, all we are interested in this diff for is
+to answer this question: which are the lines that we leave alone?
+these lines indicate items that are "stationary", and all the other
+items will move.
+
+reviewing some of the lines of the diff:
+
+    +0
+    +1
+     2
+     3
+    -1
+    -0
+     4
+     5
+
+we see that '0' is added in one place and removed in another. we see the
+same for '1'. because in all cases the "before" and "after" files always
+have the same items (just presumably in a different order), every "add"
+line will always have a single counterpart "remove" line (somewhere) (and
+the converse: every "remove" line has a single counterpart "add" line).
+
+when you encounter items that "move" like this (and each such item
+should always have these two lines somewhere), add them to set "V"
+(for "moVe"):
+
+    0  1
+
+note too the items that remain stationary (set "S"):
+
+    2  3  4  5
+
+really, these two sets of numbers (er, items) is the only useful
+information that we will come away with from the use of `diff`.
+
+now, recall our annotated L (exactly as presented in a previous section):
+
+     A   2
+     A'  3
+    ---
+     B
+     C   1
+     C'
+     C''
+     D   0
+    ---
+     E   4
+     F   5
+
+we simplify the clusterization by seeing this as a list of clusters
+where each cluster is a list of elements where each element is either
+an association or an empty "hole" left behind by there being no
+association for that section:
+
+    [ 2 3 ] [ - 1 - - 0 ] [ 4 5 ]
+
+what we are leaving behind in this simplification is the identities of
+those sections that have no counterpart by practical identity in the
+components (a point that we may revisit sometime in the future).
+
+mind you, this clusterization still has something we don't want,
+which is those items that have moved (we want the items; we just don't
+know where we'll put them yet), so:
+
+we further pare down the clusterization by "knocking out" those items
+that are in V (that is, the items that moved) (or if you like you can
+see it as applying a pass-filter for only those items in S (that is,
+the items that remain stationary)):
+
+    [ 2 3 ] [ - - - - - ] [ 4 5 ]
+
+now, this clusterization is the first one we've seen so far in this
+discussion that can serve as a startingpoint for N. the items (numbers)
+that remain in this clusterization at this point are in the "correct"
+"place" for the final output clusterization; that is, they are in the
+correct order with respect to each other, and still clusterized.
+
+(the fact that in this case, all the holes are in one cluster, and
+that that cluster is composed of only holes; this is only chance!
+(honestly, it wasn't intended.))
+
+all that remains to do is to insert the remaining items in C into this
+clusterization in some kind of correct order with aesthetic placement.
+
 
 
 

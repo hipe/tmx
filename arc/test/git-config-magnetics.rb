@@ -71,8 +71,78 @@ module Skylab::Arc::TestSupport
     end )
 
     #
+    # magnet 300
+    #
+
+    dangerous_memoize :product_of_magnetic_300_for_story_A_MOCKED_ do
+      _these = [
+        [
+          [:_associated_, 2],
+          [:_associated_, 3],
+        ],
+        [
+          [:_non_associated_, 5],
+        ],
+        [
+          [:_associated_, 4],
+          [:_associated_, 5],
+        ]
+      ]
+      Freeze_recursive__[ 3, _these ]
+    end
+
+    def build_product_of_magnetic_300_for_story_A_OF_PARTIALLY_MOCKED_SOURCES___
+
+      #   - a call to real system diff is not mocked
+      #   - the two indexes are mocked, but "guaranteed" to be OK at writing
+
+      _existing_document_index = product_of_magnetic_100_for_story_A_MOCKED_
+
+      _pluralton_component_index = product_of_magnetic_200_for_story_A_MOCKED_
+
+      magnet_300_.call_by do |o|
+        o.pluralton_components_index = _pluralton_component_index
+        o.existing_document_index = _existing_document_index
+      end
+    end
+
+    def magnet_300_
+      _protected_magnetics_GFM::ReallocationSchematic_via_TwoIndexes
+    end
+
+    #
     # magnet 200
     #
+
+    dangerous_memoize :product_of_magnetic_200_for_story_A_MOCKED_ do
+
+      # don't go thru the liability of all that other undertaking, but
+      # NOTE incur a different liabiliity
+
+      # _real = product_of_magnetic_200_for_story_A_
+
+      mag = magnet_200_
+      yikes = mag.allocate
+
+      _these = _same_freeze_ARC_GCM [[2, 3], [nil, 1, nil, nil, 0], [4, 5]]
+
+      yikes.instance_variable_set :@associated_locator_offsets_schematic, _these
+
+      o = -> d, * these_two do
+        mag::AssociatedLocators___.new d, these_two.freeze
+      end
+
+      yikes.instance_variable_set :@associated_locators, [
+        o[ 0, 1, 4 ],
+        o[ 2, 1, 1 ],
+        o[ 3, 0, 0 ],
+        o[ 4, 0, 1 ],
+        o[ 5, 2, 0 ],
+        o[ 6, 2, 1 ],
+      ].freeze
+
+      yikes.freeze
+    end
 
     dangerous_memoize :product_of_magnetic_200_for_story_A_ do
 
@@ -101,6 +171,19 @@ module Skylab::Arc::TestSupport
     #
     # magnet 100
     #
+
+    dangerous_memoize :product_of_magnetic_100_for_story_A_MOCKED_ do
+
+      # don't go thru the liability of all that other undertaking, but
+      # NOTE incur a different liabiliity
+
+      # _real = product_of_magnetic_100_for_story_A_
+
+      yikes = magnet_100_.allocate
+      _these = _same_freeze_ARC_GCM [[1, 1], [2, 3, 3, 3, 4], [5, 6]]
+      yikes.instance_variable_set :@profile_schematic, _these
+      yikes.freeze
+    end
 
     dangerous_memoize :product_of_magnetic_100_for_story_A_ do  # "product of magnetic 100" = existing document index
 
@@ -152,6 +235,10 @@ module Skylab::Arc::TestSupport
       # is fail behavior is not covered per se
 
       Home_::Magnetics::QualifiedComponent_via_Value_and_Association::Listener_that_raises_exceptions_
+    end
+
+    def _same_freeze_ARC_GCM these
+      Freeze_recursive__[ 2, these ]
     end
 
     def _protected_magnetics_GFM
@@ -283,6 +370,21 @@ module Skylab::Arc::TestSupport
     end
 
     # ==
+
+    Freeze_recursive__ = -> do
+      base_case = :freeze.to_proc
+      -> d, these do
+        visit = if 2 == d
+          base_case
+        else
+          Freeze_recursive__.curry[ d - 1 ]
+        end
+        these.each do |x|
+          visit[ x ]
+        end
+        these.freeze
+      end
+    end.call
 
     # ==
     # ==

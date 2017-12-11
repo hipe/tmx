@@ -182,7 +182,14 @@ module Skylab::System
           :can_transition_to, :first_ever_hunk_header,
         )
 
-        hunk_rx = %r(\A@@ -\d+,\d+ \+\d+,\d+ @@$)
+        hunk_rx = %r(\A@@[ ]
+          -(?<old_begin>\d+),
+           (?<old_length>\d+)
+           [ ]
+         \+(?<new_begin>\d+),
+          (?<new_length>\d+)
+        [ ]@@$)x
+
         hunk_transitions = [
           :context_line,
           :minus_line,
@@ -290,7 +297,7 @@ module Skylab::System
         def finish_when_paginated
           self
         end
-        def category_symbol___
+        def category_symbol  # [cu]
           :diff_header
         end
       end
@@ -351,17 +358,35 @@ module Skylab::System
       Run__ = ::Class.new
 
       class Header___
+
         def initialize md
-          @_md = md
+
+          @old_begin = md[ :old_begin ].to_i
+          @old_length = md[ :old_length ].to_i
+          @new_begin = md[ :new_begin ].to_i
+          @new_length = md[ :new_length ].to_i
+
+          @__string = md.string
+          freeze
         end
-        def category_symbol
-          :header
-        end
+
         def close
           NOTHING_
         end
+
         def to_line_stream
-          Common_::Stream.via_item @_md.string
+          Common_::Stream.via_item @__string
+        end
+
+        attr_reader(
+          :old_begin,
+          :old_length,
+          :new_begin,
+          :new_length,
+        )
+
+        def category_symbol
+          :header
         end
       end
 
@@ -384,16 +409,26 @@ module Skylab::System
       end
 
       class Run__
+
         def initialize
           @_matchdata_array = []
         end
+
         def accept md
           @_matchdata_array.push md ; nil
         end
+
         def close
           @_matchdata_array.freeze
           freeze ; nil
         end
+
+        def TO_LINE_CONTENT_STREAM  # [cu]
+          Stream_[ @_matchdata_array ].map_by do |md|
+            md.post_match
+          end
+        end
+
         def to_line_stream
           Stream_[ @_matchdata_array ].map_by do |md|
             md.string

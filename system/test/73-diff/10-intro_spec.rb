@@ -39,7 +39,7 @@ module Skylab::System::TestSupport
         _h4 = st.gets
         _h4 && fail
 
-        _h1.category_symbol___ == :diff_header || fail
+        _h1.category_symbol == :diff_header || fail
         _h2.category_symbol___ == :hunk || fail
         _h3.category_symbol___ == :hunk || fail
 
