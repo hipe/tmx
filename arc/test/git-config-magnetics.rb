@@ -71,6 +71,71 @@ module Skylab::Arc::TestSupport
     end )
 
     #
+    # magnet 400
+    #
+
+    def get_big_array_for_story_B__  # #coverpoint2.5
+
+      # NOTE - hard to read at first: the first level of elements corresponds
+      # to clusters. (2 elements so 2 clusters.)
+      #
+      # for the second level of elements, if the element is an `_associated_`,
+      # the number next to it is an offset to an association (as described at
+      # [#024.N] "why?"). if it's `_non_associated_` then the number is
+      # simply a count of holes (i.e sections that are not associated, i.e
+      # will be deleted).
+
+      [
+        [
+          [ :_associated_, 0 ],
+          [ :_non_associated_, 2 ],
+          [ :_associated_, 2 ],
+          [ :_non_associated_, 1 ],
+        ],
+        [
+          [ :_non_associated_, 1 ],
+          [ :_associated_, 8 ],
+          [ :_non_associated_, 1 ],
+          [ :_associated_, 12 ],
+          [ :_non_associated_, 1 ],
+        ],
+      ]
+    end
+
+    def get_big_array_for_story_C__  # #coverpoint2.6
+      [
+        [
+          [ :_associated_, 66 ],
+          [ :_non_associated_, 1 ],
+        ],
+        [
+          [ :_non_associated_, 2 ],
+        ],
+        [
+          [ :_non_associated_, 3 ],
+        ],
+        [
+          [ :_non_associated_, 2 ],
+        ],
+        [
+          [ :_non_associated_, 1 ],
+          [ :_associated_, 99 ],
+        ],
+      ]
+    end
+
+    def call_magnetic_400_HACKED_ big_a
+
+      magnet_400_.call_by do |o|
+        o.reallocation_schematic = big_a
+      end
+    end
+
+    def magnet_400_
+      _protected_magnetics_GFM::Capsulization_via_ReallocationSchematic
+    end
+
+    #
     # magnet 300
     #
 

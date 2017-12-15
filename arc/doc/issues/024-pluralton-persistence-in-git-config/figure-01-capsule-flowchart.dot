@@ -1,0 +1,73 @@
+digraph g {
+
+label="
+fig 1. yikes a state machine to create capsules while        
+traversing a clusterization. this guides where each           
+capsule should start and stop while asserting (implicitly) 
+the structure of the clusterization.                                     
+
+
+b = beginning of cluster
+e = end of cluster          
+E = end of clusters        
+X = associated item       
+0 = unassociated item    
+"
+
+begin [label="start/\ngap" shape=ellipse]
+
+begin->E_of_begin [label="E"]
+
+E_of_begin [label="(done)" shape=rect style=filled]
+
+begin->state1_1 [label="b"]
+
+state1_1->state1_1 [label="X"]
+
+state1_1->begin [label="e"]
+
+state1_1 [label="head\nlistening\n(state 1)" shape=ellipse]
+
+state1_1->open [label="0"]
+
+open->state1_2
+
+open [label="(open\ncapsule)" shape=rect style=filled]
+
+state1_2 [label="begun\n(state 2)" shape=ellipse]
+
+state1_2->close [label="X"]
+
+close->state1_3
+
+state1_3 [label="mid\nlistening\n(state 3)" shape=ellipse]
+
+state1_3->state1_3 [label="X"]
+
+state1_3->begin [label="e"]
+
+state1_3->open [label="0"]
+
+
+
+state1_2->state1_4 [label="e"]
+
+state1_4 [label="gap while\nin progress\n(state 4)" shape=ellipse]
+
+state1_4->state1_5 [label="b"]
+
+state1_4->E_of_mid [label="E"]
+
+E_of_mid [label="(close\n& done)" shape=rect style=filled]
+
+state1_5 [label="begin while\nin progress\n(state 5)" shape=ellipse]
+
+state1_5->state1_2 [label="0"]
+
+state1_5->close [label="X" shape=rect style=filled]
+
+close [label="(close\ncapsule)" shape=rect style=filled]
+
+}
+
+/* #born: ~6 months after stash */

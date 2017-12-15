@@ -796,6 +796,7 @@ module Skylab::Common
     def current_index
       @d
     end
+    alias_method :CURRENT_OFFSET, :current_index  # [arc]
 
     def advance_one
       @d += 1 ; nil

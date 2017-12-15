@@ -90,6 +90,9 @@
 
 [#008]       (small internal tracking)
 
+       #open [#here.E] this tracks a related network of code & documentation
+             to get rid of at some nearby point in the future (see)
+
              this is a broad snapshot of general "strain" [ac]
              is showing in its age -
                - it's pre-magentics :[#here.B] #open

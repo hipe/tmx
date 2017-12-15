@@ -13,6 +13,8 @@ we introduce sections that depend on them, the narrative won't truly be
 smoth until the reassembly is complete. (EDIT: remove this whole section
 when etc.)
 
+(EDIT remove this section to close #open [#008.E])
+
 
 
 
@@ -41,6 +43,8 @@ existing comments and arbitrary formatting in the human-readable store.
   - why the crazy diff thing [#here.K]
   - the crazy diff thing [#here.L]
   - the beginning of the final clusterization [#here.M]
+  - finishing the final clusterization with capsules [#here.N]
+
 
 
 
@@ -467,6 +471,10 @@ comments (if any) should be reviewed to see if they still make sense.
 
 ## M, N and C :[#here.E]
 
+we're gonna use these letters (and later, some others) to stand for
+bespoke sets (or lists) of things in this document. NOTE these special
+letters will *not* be used *anywhere* outside this document.
+
   - let "M" be the list of *all* the [#here.b.3] sections of the old
     document (in their order). (mnemonic: "M comes before N")
 
@@ -646,8 +654,8 @@ first of all, the basics of hash codes:
     key `"foo"`!
 
   - how this number is achieved for such instances is uninteresting to
-    us, but we think this is called the "hashing algorithm". more on this
-    later.
+    us now, but we think this is called the "hashing algorithm". we'll
+    revisit this later.
 
   - note (as an aside) that if you end the `irb` session and start it
     up again and evaluate `"foo".hash`, you will very likely see a different
@@ -755,7 +763,7 @@ the document. the same for "C", "A", "A'" and so on. but note:
 
     adding components (as opposed to moving them) is a less difficult
     problem and so it won't receive attention for a while. but we'll
-    pick back up with adding components along #theme-3.
+    mention adding components ([#here.N] set A) throughout.
 
   - in other possible cases, there could be multiple components like Q.
     one important edge case is where *all* components are like Q (that is,
@@ -772,8 +780,9 @@ the document. the same for "C", "A", "A'" and so on. but note:
 
   - note too that not all items that are in the document are in the list
     of components. (this is the complement to the point above about items
-    like Q, which are items that exist in the components but that don't
-    exist (by practical equivalence) in the document.)
+    like Q, which is of that category of the items that exist in the
+    components but that don't exist (by practical equivalence) in the
+    document.)
 
 but this indexing is only the beginning..
 
@@ -1035,7 +1044,7 @@ structure in a list of every such structure ever made for this effort.
     E  4
     F  5
 
-so to restate somewhat, the above items with numbers next to them are
+so to restate somewhat, the above items with offsets next to them are
 items that have an associated counterpart section in the document.
 
 the number is not an offset into the document in any sense. it is only
@@ -1045,7 +1054,7 @@ and increase by 1. this is by design:
 
 we index the document first and the components second (#theme-2), so we
 discover associations in an order that accords with the order of the
-components (but note there can be "holes" where there's a "new" component
+components (but note there can be :[#here.L.3] "holes" where there's a "new" component
 that is not associated with any existing section in the document).
 
 the above items with the same base letter but a different prime (here
@@ -1195,7 +1204,7 @@ note too the items that remain stationary (set "S"):
 really, these two sets of numbers (er, items) is the only useful
 information that we will come away with from the use of `diff`.
 
-now, recall our annotated L (exactly as presented in a previous section):
+now, recall our annotated L (exactly as presented in [#here.L]):
 
      A   2
      A'  3
@@ -1211,8 +1220,9 @@ now, recall our annotated L (exactly as presented in a previous section):
 
 we simplify the clusterization by seeing this as a list of clusters
 where each cluster is a list of elements where each element is either
-an association or an empty "hole" left behind by there being no
-association for that section:
+an association or an empty :[#here.M.2] "hole" (not to be confused with
+a [#here.L.3] hole) left behind by there being no association for that
+section:
 
     [ 2 3 ] [ - 1 - - 0 ] [ 4 5 ]
 
@@ -1221,11 +1231,11 @@ those sections that have no counterpart by practical identity in the
 components (a point that we may revisit sometime in the future).
 
 mind you, this clusterization still has something we don't want,
-which is those items that have moved (we want the items; we just don't
+which is those items that must move (we want the items; we just don't
 know where we'll put them yet), so:
 
 we further pare down the clusterization by "knocking out" those items
-that are in V (that is, the items that moved) (or if you like you can
+that are in V (that is, the items that move) (or if you like you can
 see it as applying a pass-filter for only those items in S (that is,
 the items that remain stationary)):
 
@@ -1247,8 +1257,250 @@ clusterization in some kind of correct order with aesthetic placement.
 
 
 
+## finishing the final clusterization with spongy capsules :[#here.N]
+
+we have two kinds of items waiting to be placed into our clusterization
+before we can be finished with this most challenging leg of this effort:
+
+  1) items that moved ([#here.M] set V)
+  2) components that are unassociated, i.e "added", which we'll call set "A".
+
+the only hard requirement here is that we place the items in the correct
+order with respect to each other, and with respect to the items that are
+already in the clusterization.
+
+but, so that we can try to avoid a machine-based distribution of items
+that "feels" "lopsided" or "arbitrary", we do something kind of crazy when
+deciding exactly where to place the items. we call this crazy something
+"capsulization":
+
+recall that we have a clusterization whose clusters are lists of
+elements that are either [#here.M.2] holes or associated items:
+
+    +----------------+   +----------------+
+    | X |  |  | X |  |   |  | X |  | X |  |
+    +----------------+   +----------------+
+
+for this discussion "X" indicates an associated item and " " indicates a
+hole. the above depicts two clusters, each five elements long. (this
+clusterization is wholly separate from any we have discussed above; its
+particular form is designed to demonstrate the subject principle.
+we'll refer to this story in tests as #coverpoint2.5 "story B".)
+
+note you could see this as runs of holes separated by runs of items.
+
+  - we define a "capsule" as a contiguous run of one or more *holes*,
+    that can *jump over* hops between clusters
+
+so
+         +-^-+      +--^--+      +^+     +-..
+        /     \    /       \    /   \   /
+    +----------------+   +----------------+
+    | X |  |  | X |  |   |  | X |  | X |  |
+    +----------------+   +----------------+
+
+in the above visualization, consider:
+  - each curly top-hat bracket (` /+-^-+\ `) indicates one capsule
+  - a capsule will "hop" over a gap between clusters whenever possible
+  - a capsule can be as short as one element wide (but not less)
+  - a capsule can be many elements (any positive integer) wide
+
+as such, keep in mind too that an individual capsule can overlap
+multiple clusters (which we'll call #coverpoint2.6 "story C"):
+
+           +------------------^-----------------+
+          /                                      \
+    ..-------+   +-----+  +--------+  +--+--+  +--+--..
+      | X |  |   |  |  |  |  |  |  |  |  |  |  |  | X
+    ..-------+   +-----+  +--------+  +--+--+  +--+--..
+
+this is all to say, there's really no relationship between the
+"clusterization" and the "capsulization" of the "document schematic":
+each cluster starts and stops independent of each capsule, and
+vice-versa.
+
+if you like, this is because clusterization is determined by where
+non-participating sections happen in the document; and capsulization
+has to do with which participating sections associate with components
+in the new component list and which don't. the two are not really
+related to each other, spatially or otherwise.
+
+here's one more example, which is derived from our main story ("story A"):
+
+                 +-----^------+
+                /              \
+    +-------+   +--+--+--+--+--+   +---+---+
+    | X | X |   |  |  |  |  |  |   | X | X |
+    +-------+   +--+--+--+--+--+   +---+---+
+
+now that we understand *what* capsules are, we must also consider *why*
+we capsualize and *how* we capsulize, before we can get back to doing
+something with set V (our associated items that moved) and set A, our
+new items that need to be added.
+
+we'll answer these questions of "what" and "how" in reverse order:
+
+for the task of realizing "capsulizations" like all of these, we
+have created a state-machine-as-directed-graph at fig. 1 (a dotfile
+in another file). this is pretty straightforward and not very interesting.
+
+
+
+### sidebar: parsing ("how?")
+
+to understand how we "parse" a clusterization to get a capsulization,
+hold one "finger" (i.e a pen, a cursor, an imaginary marker) at the left
+side of the diagram above (previous section), before the first cluster.
+hold another "finger" at the "start/gap" state of the attached figure 1
+flowchart.
+
+now move the first finger from left to right until you hit something.
+what you hit is the beginning of a cluster. there is a corresponding
+type of "transition" for this: "b". and as you will see on the diagram,
+there is a corresponding *actual* transition for this type of transition.
+
+so with your *other* finger, follow this indicated transition to the next
+state ("head listening"). now, continue to slide your *first* finger to
+the right. the next significant thing that happens is you hit an "X".
+there is a corresponding available transtion for this (conveniently
+eponymous). note this "moves" you to the same state you were already in.
+
+drag your finger to hit the next "X" and see that again, nothing actually
+happens in the state machine. but the next significant thing that happens
+is when we *leave* the cluster: there is a transition for this. etc.
+
+
+
+### so what do we do with these capsules ("why?")?
+
+recall that in a graphic like this (a re-depiction of "story B"),
+
+         +-^-+      +--^--+      +^+     +-..
+        /     \    /       \    /   \   /
+    +----------------+   +----------------+
+    | X |  |  | X |  |   |  | X |  | X |  |
+    +----------------+   +----------------+
+
+the X's signify associated items that didn't move. that is, they were
+in the right place when we started and they are still in the right place
+now.
+
+recall #theme-2 which holds that we number "associations" in component
+order (but not every document section is associated, and not every
+component is necessarily associated).
+
+so let's add some numbers to our visual schema that indicate the offsets
+of these associations, in a list of all associations:
+
+         +-^-+      +--^--+      +^+     +-..
+        /     \    /       \    /   \   /
+    +----------------+   +----------------+
+    | X |  |  | X |  |   |  | X |  | X |  |
+    +----------------+   +----------------+
+      0         2             8      12
+
+about this sequence of numbers we just added:
+
+  - this series of numbers is just one of an infinity
+    of possible *capsulizations* that this schema could signify.
+
+  - each number represents an offset into a list of *associations*
+    between a component item and a document section. (the list represents
+    *all* associations between [#here.E] "M" and [#here.f.2] "L".)
+
+  - each next number (from left to right) must be greater than the
+    previous, because what you are seeing (the X's) is the associations that
+    didn't move; and if they were in the correct order to begin with (with
+    respect to each other) then their numerical order will reflect that
+    (because these numbers track (but not isomorph) the component order).
+    (#theme-2).
+
+  - here they must start at zero because this capsulization happens
+    to have an association (and not a hole) as its leftmost thing; and
+    an association that is leftmost in the clusterization will always
+    be leftmost in the list of all associations.
+
+  - the amount that each number jumps from one to the next is an arbitrary
+    amount that we selected at didactic-random.
+
+let's look more closely at just how far the jumps are between numbers:
+
+         +-^-+      +--^--+      +^+     +-..
+        /     \    /       \    /   \   /
+    +----------------+   +----------------+
+    | X |  |  | X |  |   |  | X |  | X |  |
+    +----------------+   +----------------+
+      0         2             8      12
+       \       / \           / \     / \
+        +1 ct.+   +---5 ct.-+   +-3ct.  +--..
+
+
+spoiler: the "count" is the second offset minus the first minus one.
+
+look at that first jump from `0` to `2`. because of #theme-2
+we know that between the `0` and `2` we've got an association called `1`
+to deal with (because associations are numbered sequentially).
+
+that's (coincidentally) a "1-count" of items we've got place somewhere
+between the static `0` section and `2` section.
+
+looking at the number of holes in that capsule (the empty squares), we
+see that there happen to be two. (it could be way more and it could be
+less, but the number of holes in every capsule must be at least one.)
+
+so we've got one association to move (really this is to say "move an
+existing section to a new place) and two "holes" across which to spread
+it over.
+
+let's look at the second capsule. in this case, there's 5 associations
+we will have to place somewhere in the capsule; and to make things more
+interesting there is also one hop in the capsule.
+
+in this manner we'll progress along every capsule, taking these notes.
+fore each capsule, we want to note:
+
+  - how many associations (the second offset minus the first minus one)
+
+  - how many holes, but also how these runs of holes relate to different
+    clusters (i.e represent the hops)
+
+so finally, for the above graphic, the "notes" are conceptually like:
+
+  - 1 association. holes: { 2 }
+  - 5 associations. holes: { 1 | 1 }
+  - 3 associations. holes: { 1 }
+
+we can FINALLY call each of these the beginnings of a "unit of work".
+
+something something proportional distribution.
+
+possibly disjoint, dangling notes (EDIT):
+
+  - the associations we will distribute into the capsule satisfy
+    the need to distribute [#here.M] set V somewhere.
+
+  - before we do that, tho, we've got to take all the new items from
+    [#here.N] set A and splice them into the right places so that we
+    have a full list of items to distribute within the capsule.
+
+  - in this manner each capsule will distribute "proportionally" its
+    items into its holes. all you know is it has at least one hole and
+    possibly as few as zero items. remember capsules can span cluters.
+
+  - more items than holes is a "squeeze". less items than holes is
+    a "stretch". otherwise "perfect fit".
+
+  - finally, each cluster will need to "be told" that list of zero or
+    more items it needs to put into its each "cel."
+
+    (EDIT a "cel" is that piece of a capsule that overlaps with a cluster.)
+
+
+
 
 ## the algorithm
+
+(EDIT: this is the ancient one from [cu]. remove this to close #open [#008.E])
 
 partition the existing config file's "report" section into a
 grouping we impose here: the section is composed of nodes. each
@@ -1268,6 +1520,8 @@ undefined place within the section.
 
 
 ### defining terms near "function"
+
+(EDIT: maybe move this content to [cu] to close #open [#008.E])
 
 identity is not composition. the report may contain multiple instances
 of the same function with the same curried args. although we may think
@@ -1291,6 +1545,8 @@ the file.
 
 ## note-25
 
+(EDIT: remove this section to close #open [#008.E])
+
 each span (consisting of a function and N number of non-function nodes)
 is partitioned into a list of other spans whose function has that same
 composition.
@@ -1309,9 +1565,9 @@ end of this process we do something crazy with.)
 
 ## document-meta
 
-  - EDIT: get rid of every metion of "survey"
+  - EDIT: get rid of every mention of "survey"
 
-  - EDIT: get rid of "note 25" and its referrent
+  - EDIT: get rid of "note 25" and its referrent to close #open [#008.E]
 
   - #history-A.1: begin mostly a full rewrite for
     pluralton-in-git-config persistence
