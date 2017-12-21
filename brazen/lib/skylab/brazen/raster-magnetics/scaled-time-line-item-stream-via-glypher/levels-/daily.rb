@@ -1,8 +1,10 @@
-module Skylab::GitViz
+# frozen_string_literal: true
 
-  class ScaleTime_
+module Skylab::Brazen
 
-    class Scale_Adapters_::Daily < Here_::CommonScaleAdapter_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
+
+    class Levels_::Daily < Here_::CommonLevel_
 
           class << self
 
@@ -114,7 +116,7 @@ module Skylab::GitViz
               end
             else
 
-              Scale_Adapters_::Annual.within_ sumzn
+              Levels_::Annual.within_ sumzn
             end
             NIL_
           end
@@ -137,7 +139,7 @@ module Skylab::GitViz
 
           def _month_string_within sumzn
 
-            s = Scale_Adapters_::Monthly.string_within_ sumzn
+            s = Levels_::Monthly.string_within_ sumzn
             orig_len = s.length
             s.strip!
             d = orig_len - s.length

@@ -37,4 +37,4 @@ this proably sent us on our flex2tt and yacc2tt tangents
 
 ## document-meta
 
-  - #pending-rename: to a proper document (or not)
+  - #hisotry-A.1: removed pending rename.

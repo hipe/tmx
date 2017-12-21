@@ -1,17 +1,14 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    module TimeUnitAdapters_::Year
-
-          extend Common_Time_Unit_Adapter_Module_Methods_
+    module Units_::Year
 
           class << self
 
             def nearest_previous_bucket_begin_datetime_ dt
 
               dt.class.new dt.year, 1, 1, 0, 0, 0, dt.zone
-
             end
 
             def next_bucket_begin_datetime_after_ dt

@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    class Magnetics_::Expression_of_Headers_via_Arguments
+    class SubMagnetics_::ExpressHeaders_via_Arguments
 
           def initialize *a
 
@@ -101,7 +101,7 @@ module Skylab::GitViz
 
             # the first line is always the year.
 
-            Scale_Adapters_::Annual.within__ @lines, o, FOUR_
+            Levels_::Annual.within__ @lines, o, FOUR_
 
             NIL_
           end
@@ -112,9 +112,9 @@ module Skylab::GitViz
 
             s = SPACE_ * @lines.length
 
-            FOUR_.times do | d |
+            FOUR_.times do |d|
 
-              @lines.each_with_index do | line, idx |
+              @lines.each_with_index do |line, idx|
 
                 s[ idx ] = if line
                   line[ d, 1 ] || SPACE_

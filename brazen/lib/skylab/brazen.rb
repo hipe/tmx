@@ -188,6 +188,11 @@ module Skylab::Brazen
 
     define_singleton_method :_memoize, Common_::Lazy
 
+    Date_time = _memoize do
+      require 'date'
+      ::DateTime
+    end
+
     Module_lib = -> do
       Basic[]::Module
     end

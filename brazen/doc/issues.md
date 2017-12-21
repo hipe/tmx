@@ -96,10 +96,10 @@
 
 [#082] #hole ( #was: #track meta-meta-property candidates (list, enum etc) )
 
-[#081] #hole
+[#081]       glyph allocation ..
              ( #was: #track experimental extensions to Actor (1x) )
 
-[#080] #hole
+[#080]       visual time scaling ..
              ( #moved-to: [#ze-030.2] "unified language for performers" )
              ( #was: #parent-node:[#013] actors, agents and models .. )
 

@@ -1,10 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    module TimeUnitAdapters_::Quarter
-
-          extend Common_Time_Unit_Adapter_Module_Methods_
+    module Units_::Quarter
 
           class << self
 
@@ -36,7 +34,6 @@ module Skylab::GitViz
             def particular_offset_within_annual_cycle_of_datetime_ dt
 
               ( dt.month - 1 ) / MONTHS_PER_UNIT
-
             end
           end  # >>
 

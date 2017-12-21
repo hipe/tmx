@@ -169,6 +169,7 @@ module Skylab::GitViz
     end
 
     Brazen = sidesys[ :Brazen ]
+    Brazen_NOUVEAU = Brazen
     Basic = sidesys[ :Basic ]  # was wall
     Fields = sidesys[ :Fields ]
     JSON = stdlib[ :JSON ]

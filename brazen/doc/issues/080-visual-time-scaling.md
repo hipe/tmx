@@ -1,4 +1,4 @@
-# the scale time algorithm :[#027]
+# the scale time algorithm :[#080]
 
 ## introduction
 

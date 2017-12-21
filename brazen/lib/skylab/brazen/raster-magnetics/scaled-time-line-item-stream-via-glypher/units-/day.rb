@@ -1,18 +1,15 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    module TimeUnitAdapters_::Day
-
-          extend Common_Time_Unit_Adapter_Module_Methods_
+    module Units_::Day
 
           class << self
 
             def nearest_previous_bucket_begin_datetime_ dt
 
-              _normal_via_day_offset_and_datetime(
-                particular_offset_within_annual_cycle_of_datetime_( dt ),
-                dt )
+              _d = particular_offset_within_annual_cycle_of_datetime_ dt
+              _normal_via_day_offset_and_datetime _d, dt
             end
 
             def next_bucket_begin_datetime_after_ dt

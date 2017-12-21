@@ -45,33 +45,8 @@ module Skylab::GitViz::TestSupport
       end.call
     end
 
-    Mocks = -> do
-
-      mock = -> do
-
-        Mock_Filechange = ::Struct.new :author_datetime, :change_count
-
-        Mock_Row = ::Struct.new :to_a
-
-        mock = -> do
-          This_Guy_
-        end
-        This_Guy_
-      end
-
-      -> tcc do
-
-        tcc.send :define_method, :_Mock_Filechange_ do
-          mock[]::Mock_Filechange
-        end
-
-        tcc.send :define_method, :_Mock_Row_ do
-          mock[]::Mock_Row
-        end
-
-      end
-    end.call
-
-    This_Guy_ = self
+    # ==
+    # ==
   end
 end
+# #history-A.1: de-abstracted facilities. moved stub classes to test file

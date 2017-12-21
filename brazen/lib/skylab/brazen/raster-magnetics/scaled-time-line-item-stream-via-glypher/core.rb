@@ -1,6 +1,8 @@
-module Skylab::GitViz
+# frozen_string_literal: true
 
-  class ScaleTime_  # algorithm in [#029]
+module Skylab::Brazen
+
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher  # algorithm in [#080]
     # -
       # -
         Attributes_actor_.call( self,
@@ -13,7 +15,6 @@ module Skylab::GitViz
         )
 
         def execute
-
           ok = __resolve_available_width
           ok &&= __resolve_first_and_last_datetime
           ok &&= __resolve_best_fit_scale_adapter
@@ -72,9 +73,7 @@ module Skylab::GitViz
           if @first_datetime.object_id == @last_datetime.object_id
 
             self.__RESOLVE_best_fit_scale_adapter_when_one_column
-
           else
-
             __resolve_best_fit_scale_adapter_when_multiple_columns
           end
         end
@@ -86,7 +85,7 @@ module Skylab::GitViz
             @last_datetime - @first_datetime,
             @first_datetime, @last_datetime )
 
-          cls = Scale_Adapters_::Hourly  # put whatever has the smallest buckets here
+        cls = Levels_::Hourly  # put whatever has the smallest buckets here
 
           begin
 
@@ -95,7 +94,7 @@ module Skylab::GitViz
               break
             end
 
-            cls = Scale_Adapters_.const_get cls.next, false
+          cls = Levels_.const_get cls.next, false
             redo
 
           end while nil
@@ -121,29 +120,28 @@ module Skylab::GitViz
           o.render
         end
 
-        module TimeUnitAdapters_
+    module Units_
           class << self
             def [] sym
-              @h.fetch sym do
-                @h[ sym ] = const_get(
-                  Common_::Name.via_variegated_symbol( sym ).as_const,
-                  false )
+          @_child_via_name_symbol.fetch sym do
+            _c = Common_::Name.via_variegated_symbol( sym ).as_const
+            x = const_get _c, false
+            @_child_via_name_symbol[ sym ] = x
+            x
               end
             end
           end  # >>
-          @h = {}
+      @_child_via_name_symbol = {}
           Autoloader_[ self ]
-        end
+    end
 
-        module Common_Time_Unit_Adapter_Module_Methods_
-
-          # etc
-
-        end
+    # ==
 
         FOUR_ = 4
         Here_ = self
-      # -
-    # -
+
+    # ==
+    # ==
   end
 end
+# #history-A.1: re-housed from application to library sidesystem

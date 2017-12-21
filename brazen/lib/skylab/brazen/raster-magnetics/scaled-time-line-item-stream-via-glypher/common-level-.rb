@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-        class CommonScaleAdapter_  # algorithm in [#029]
+        class CommonLevel_  # algorithm in [#029]
 
           class << self
 
@@ -25,7 +25,7 @@ module Skylab::GitViz
             end
 
             def _time_unit_adapter_
-              Here_::TimeUnitAdapters_[ self::INTERNAL_UNIT ]
+              Here_::Units_[ self::INTERNAL_UNIT ]
             end
 
           end  # >>
@@ -133,7 +133,7 @@ module Skylab::GitViz
 
           def __render_headers
 
-            Here_::Magnetics_::Expression_of_Headers_via_Arguments.new(
+            Here_::SubMagnetics_::ExpressHeaders_via_Arguments.new(
               @text_downstream,
               @row_bucket_boxes,
               @first_bucket_begin_datetime,
@@ -167,7 +167,7 @@ module Skylab::GitViz
 
             else
 
-              Scale_Adapters_::Annual.within_ sumzn
+              Levels_::Annual.within_ sumzn
             end
             NIL_
           end
@@ -184,7 +184,7 @@ module Skylab::GitViz
                 # whenever this is the first bucket in an annual cycle always
                 # display this new year instaad of any particular unit amount
 
-                Scale_Adapters_::Annual.within_ sumzn
+                Levels_::Annual.within_ sumzn
 
               else
 
@@ -202,12 +202,12 @@ module Skylab::GitViz
 
           def initial_state_ sumzn
             @p = method :__mday
-            Scale_Adapters_::Monthly.within_ sumzn
+            Levels_::Monthly.within_ sumzn
           end
 
           def __mday sumzn
             @p = method :significant_change_or_etc_
-            Scale_Adapters_::Daily.mday_within_ sumzn
+            Levels_::Daily.mday_within_ sumzn
           end
 
           def significant_change_or_etc_ sumzn
@@ -246,22 +246,22 @@ module Skylab::GitViz
 
           def __year__within sumzn
 
-            Scale_Adapters_::Annual.within_ sumzn
+            Levels_::Annual.within_ sumzn
           end
 
           def __month__within sumzn
 
-            Scale_Adapters_::Monthly.within_ sumzn
+            Levels_::Monthly.within_ sumzn
           end
 
           def __day__within sumzn
 
             if sumzn.subject.normal_datetime.wday.zero?
 
-              Scale_Adapters_::Daily.mday_within_ sumzn
+              Levels_::Daily.mday_within_ sumzn
             else
 
-              Scale_Adapters_::Daily.day_of_week_within_ sumzn
+              Levels_::Daily.day_of_week_within_ sumzn
             end
           end
 

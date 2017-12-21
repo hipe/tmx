@@ -72,3 +72,10 @@ local objective: get the TWELVE added files added and integrated to [arc]
 (FILE: there is a fixuture for something high level)
 (FILE: there is a spec that covers something high level was numbered 09)
 MAGNET: document via reallocation schematic - capsulization (waypoint: -2)
+redshift looks good for names file
+redshift looks good for an arbitray issues file
+two column scale time looks good for any file
+cover frontend portion of this new report
+give the scaled time thing a better interface
+cover backend portion of this new report
+re-house the scale-time guy somewhere else while flushing renames

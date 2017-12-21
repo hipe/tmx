@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    class Scale_Adapters_::Three_Shift < Here_::CommonScaleAdapter_
+    class Levels_::Three_Shift < Here_::CommonLevel_
 
           class << self
 
@@ -56,7 +56,7 @@ module Skylab::GitViz
 
           def particular_ sumzn  # assume has content
 
-            Scale_Adapters_::Hourly.within_ sumzn
+            Levels_::Hourly.within_ sumzn
 
             NIL_
           end

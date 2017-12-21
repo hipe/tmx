@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Skylab::GitViz
 
   # [#006] is the CLI client narrative
@@ -184,10 +186,12 @@ module Skylab::GitViz
 
           def __via_column_A_render
 
-            _glypher = Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.start(
+            lib = Home_.lib_.brazen_NOUVEAU::RasterMagnetics
+
+            _glypher = lib::Glypher_via_Glyphs_and_Stats.start(
               * GLYPHS___ )
 
-            Home_::ScaleTime_.call(
+            lib::ScaledTimeLineItemStream_via_Glypher.call(
               @column_B_rows,
               @column_A_max_width,
               @column_A,
@@ -198,6 +202,9 @@ module Skylab::GitViz
           end
         end
       end
+
+      # ==
+      # ==
     end
   end
 end

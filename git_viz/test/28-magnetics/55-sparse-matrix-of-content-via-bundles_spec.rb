@@ -1,8 +1,10 @@
-require_relative '../../../../../test-support'
+# frozen_string_literal: true
+
+require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - models - sparse matrix of content" do
+  describe '[gv] magnetics - sparse matrix of content via bundles' do
 
     TS_[ self ]
     use :VCS_adapters_git_bundles
@@ -44,7 +46,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def _subject
-      Home_::Models_::HistTree::Modalities::CLI::Models_::Sparse_Matrix_of_Content
+      Home_::Magnetics_::SparseMatrix_of_Content_via_Bundles
     end
 
     def manifest_path_for_stubbed_FS

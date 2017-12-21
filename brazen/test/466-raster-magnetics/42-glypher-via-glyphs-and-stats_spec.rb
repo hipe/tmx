@@ -1,11 +1,15 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport
+module Skylab::Brazen::TestSupport
 
-  describe "[gv] magnetics - glyphver via [..]" do
+  describe "[br] raster magnetics - glyphver via [..]" do
 
     TS_[ self ]
-    use :double_decker_memoize
+    use :memoizer_methods
+
+    it 'loads' do
+      _subject_module || fail
+    end
 
     it "outside range (low end) is nil" do
 
@@ -48,26 +52,27 @@ module Skylab::GitViz::TestSupport
     end
 
     def _against d
-
       _baked.B_tree.category_for d
     end
 
-    memoize_ :_baked do
-
+    shared_subject :_baked do
       _mapper.bake_for _statistics
     end
 
-    memoize_ :_mapper do
-
-      Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.
+    shared_subject :_mapper do
+      _subject_module.
         start 'Cr', 'A', 'B', 'C'
     end
 
-    memoize_ :_statistics do
+    memoize :_statistics do
 
       [0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,4,4,4,4,
        5,6,6,6,7,8,9,10,13,13,16,23,23,25,30,31,31,34,36,40,42,44,44,45,45,
-       51,52,57,59,66,68,78,79,82,121]
+       51,52,57,59,66,68,78,79,82,121].freeze
+    end
+
+    def _subject_module
+      Home_::RasterMagnetics::Glypher_via_Glyphs_and_Stats
     end
   end
 end

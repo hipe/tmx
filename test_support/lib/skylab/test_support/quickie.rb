@@ -2447,7 +2447,7 @@ module Skylab::TestSupport
 
     class << self
       def apply_experimental_specify_hack test_context_class
-        Here_::Models_::Specify.apply_if_not_defined test_context_class
+        Here_::Experiments_::Specify.apply_if_not_defined test_context_class
       end
     end  # >>
 

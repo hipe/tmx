@@ -1,6 +1,6 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class Magnetics_::Glypher_via_Glyphs_and_Stats  # exactly [#026]
+  class RasterMagnetics::Glypher_via_Glyphs_and_Stats  # exactly [#081]
 
         class << self
 

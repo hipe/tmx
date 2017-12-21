@@ -88,25 +88,6 @@ module Skylab::GitViz::TestSupport
 
   # ~ bundles (used with `use`)
 
-  Double_Decker_Memoize = -> do
-
-    memoize = -> sym, & p do
-
-      define_singleton_method sym, & Common_.memoize( & p )
-
-      define_method sym do
-
-        self.class.send sym
-      end
-
-      NIL_
-    end
-
-    -> tcc do
-      tcc.send :define_singleton_method, :memoize_, memoize
-    end
-  end.call
-
   module My_CLI
 
     class << self

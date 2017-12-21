@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    class Scale_Adapters_::Weekly < Here_::CommonScaleAdapter_
+    class Levels_::Weekly < Here_::CommonLevel_
 
           class << self
 

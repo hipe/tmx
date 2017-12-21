@@ -1,10 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-    module TimeUnitAdapters_::Hour
-
-          extend Common_Time_Unit_Adapter_Module_Methods_
+    module Units_::Hour
 
           class << self
 

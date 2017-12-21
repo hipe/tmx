@@ -1,12 +1,17 @@
-require_relative 'test-support'
+# frozen_string_literal: true
 
-module Skylab::GitViz::TestSupport
+require_relative '../test-support'
 
-  describe "[gv] scale time" do
+module Skylab::Brazen::TestSupport
+
+  describe '[hu] raster magnetics - scaled time line item stream via glypher' do
 
     TS_[ self ]
-    use :operations_mocks
-    use :double_decker_memoize
+    use :memoizer_methods
+
+    it 'loads' do
+      _subject_module || fail
+    end
 
     it "annual - near minimal - one event" do
 
@@ -208,7 +213,6 @@ module Skylab::GitViz::TestSupport
 
       _go
       _want_headers '2001', ' Feb', ' 6th', ' Wed', ' 8AM', ' 4PM'
-
     end
 
     it "three shift - sunday" do
@@ -255,34 +259,38 @@ module Skylab::GitViz::TestSupport
 
     def _go
 
+      cls = @CLASS
+      datetimes = @DATETIMES
+
       # ~ begin re-write a bidding process that always wins
 
-      first_dt = @datetimes.fetch 0
+      first_dt = datetimes.fetch 0
 
-      bucket_begin_dt = @cls._time_unit_adapter_.
+      bucket_begin_dt = cls._time_unit_adapter_.
         nearest_previous_bucket_begin_datetime_ first_dt
 
       _offset_rational = first_dt - bucket_begin_dt
 
-      _distance_in_days_rational = @datetimes.fetch( -1 ) - first_dt
+      _distance_in_days_rational = datetimes.fetch( -1 ) - first_dt
 
       _bucket_count = (
         ( _offset_rational + _distance_in_days_rational ) /
-        @cls::DAYS_PER_BUCKET
+        cls::DAYS_PER_BUCKET
       ).ceil
 
       # ~ end
 
-      o = @cls.new bucket_begin_dt, _bucket_count
+      o = cls.new bucket_begin_dt, _bucket_count
 
-      o.column_A = __column_A
+      o.column_A = _column_A
       o.column_A_max_width = __column_A_max_width
 
       o.column_B_rows = __build_column_B_rows
       o.glyph_mapper = __glyph_mapper
 
-      @io = __build_IO_spy
-      o.text_downstream = @io
+      io = __build_IO_spy
+      o.text_downstream = io
+      @IO = io
 
       o.render
       NIL_
@@ -293,30 +301,27 @@ module Skylab::GitViz::TestSupport
       TestSupport_::IO.spy :debug_IO, debug_IO, :do_debug, do_debug
     end
 
-    memoize_ :__column_A_max_width do
-
-      __column_A.last.length
+    shared_subject :__column_A_max_width do
+      _column_A.last.length
     end
 
-    memoize_ :__column_A do
-
+    shared_subject :_column_A do
       [ 'a.txt', '+b.dir', '  b.txt' ]
     end
 
-    memoize_ :__glyph_mapper do
-
-      Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.start(
+    shared_subject :__glyph_mapper do
+      _magnetics_module::Glypher_via_Glyphs_and_Stats.start(
         nil, 'c', 'b', 'a' )
     end
 
     def using_scale_adapter sym
-      @cls = __subject::Scale_Adapters_.const_get sym, false
+      @CLASS = _subject_module::Levels_.const_get sym, false
       NIL_
     end
 
     def at_times * s_a
       _DT = Home_.lib_.date_time
-      @datetimes = s_a.map do | s |
+      @DATETIMES = s_a.map do |s|
         _DT.parse s
       end
       NIL_
@@ -324,27 +329,27 @@ module Skylab::GitViz::TestSupport
 
     def __build_column_B_rows
 
-      _Mock_Row = _Mock_Row_
-      _Mock_Filechange = _Mock_Filechange_
+      _Mock_Row = X_fmest_Row
+      _Mock_Filechange = X_fmest_Filechange
 
-      @sparse_matrix_inputs.map do | a |
+      @SPARSE_MATRIX_INPUTS.map do |a|
         if a
           _a = a.each_with_index.map do | d, idx |
             if d
 
-              _Mock_Filechange_.new(
-                @datetimes.fetch( idx ),
+              _Mock_Filechange.new(
+                @DATETIMES.fetch( idx ),
                 d )
             end
           end
 
-          _Mock_Row_.new _a
+          _Mock_Row.new _a
         end
       end
     end
 
     def sparse_matrix * d_a_a
-      @sparse_matrix_inputs = d_a_a
+      @SPARSE_MATRIX_INPUTS = d_a_a
       NIL_
     end
 
@@ -354,7 +359,7 @@ module Skylab::GitViz::TestSupport
 
     def _want_headers * s_a
 
-      st = Home_.lib_.basic::String::LineStream_via_String[ @io.string ]
+      st = Home_.lib_.basic::String::LineStream_via_String[ @IO.string ]
       s_a_ = ::Array.new 4
       4.times do | d |
         s_a_[ d ] = st.gets
@@ -362,15 +367,37 @@ module Skylab::GitViz::TestSupport
 
       margin = 9
 
-      s = "    "
+      buff = ::String.new '    '
 
-      s_a.each_with_index do | exp_s, d |
+      s_a.each_with_index do |exp_s, d|
 
         4.times do | d_ |
-          s[ d_ ] = s_a_[  d_ ][ d + margin ]
+          buff[ d_ ] = s_a_[  d_ ][ d + margin ]
         end
-        exp_s == s or fail "expected #{ exp_s.inspect }, had #{ s.inspect } (at [#{ d }]))"
+
+        if exp_s != buff
+          fail "expected #{ exp_s.inspect }, had #{ buff.inspect } (at [#{ d }]))"
+        end
       end
     end
+
+    def _subject_module
+      _magnetics_module::ScaledTimeLineItemStream_via_Glypher
+    end
+
+    def _magnetics_module
+      Home_::RasterMagnetics
+    end
+
+    X_fmest_Filechange = ::Struct.new(
+      :author_datetime,
+      :change_count,
+    )
+
+    X_fmest_Row = ::Struct.new(
+      :to_a,
+    )
+
   end
 end
+# #history-A.1: de-abstracted stub classes from another sidesystem into here

@@ -1,4 +1,4 @@
-# the glyph allocation narrative :[#026]
+# the glyph allocation narrative :[#081]
 
 ## pre-introduction
 

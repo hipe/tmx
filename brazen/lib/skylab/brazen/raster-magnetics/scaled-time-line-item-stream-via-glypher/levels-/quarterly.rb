@@ -1,8 +1,10 @@
-module Skylab::GitViz
+# frozen_string_literal: true
 
-  class ScaleTime_
+module Skylab::Brazen
 
-    class Scale_Adapters_::Quarterly < Here_::CommonScaleAdapter_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
+
+    class Levels_::Quarterly < Here_::CommonLevel_
 
           class << self
 
@@ -17,7 +19,7 @@ module Skylab::GitViz
 
           def within__4__ sumzn
 
-            _d = TimeUnitAdapters_[ INTERNAL_UNIT ].
+            _d = Units_[ INTERNAL_UNIT ].
               particular_offset_within_annual_cycle_of_datetime_(
                 sumzn.subject.normal_datetime )
 

@@ -1,9 +1,7 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
-
-    module Magnetics_::SparseMatrix_of_Content_via_Bundles
-
+  module Magnetics_::SparseMatrix_of_Content_via_Bundles
+    # -
       class << self
 
         def call bu, re
@@ -121,6 +119,6 @@ module Skylab::GitViz
       Row___ = ::Struct.new :to_a, :to_tree_path
 
       # ==
-    end
+    # -
   end
 end

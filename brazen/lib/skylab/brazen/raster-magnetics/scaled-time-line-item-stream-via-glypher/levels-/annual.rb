@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab::Brazen
 
-  class ScaleTime_
+  class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-        class Scale_Adapters_::Annual < Here_::CommonScaleAdapter_
+    class Levels_::Annual < Here_::CommonLevel_
 
           class << self
 
@@ -33,6 +33,6 @@ module Skylab::GitViz
           DAYS_PER_BUCKET = 365  # :+#what-about-leap-year
 
           INTERNAL_UNIT = :year
-        end
+    end
   end
 end

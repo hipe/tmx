@@ -16,11 +16,13 @@
 [#030]       #historical - document moved to [#ze-029].
              (was this a #[#fi-001]? did it sunset or did it assimilate?)
 
-[#029]       the scale time algorithm ..
+[#029] #hole
+             ( #was: the scale time algorithm #moved-to: [#br-080] )
              ( #was: shutdown/fail more gracefully when manifest parse errors )
 [#028]       #parent-node:[#017] fixtures scripts in detail ..
 [#027]       #to-archive #parent-node:[#018] the idea for the "free-tags" feature
-[#026]       the glyph assignment algorithm ..
+[#026] #hole
+             ( #was: the glyph assignment algorithm #moved-to: [#br-081] )
              ( #was: #done use 'listen' gem to listen to filesystem for manifest changes )
 [#025] #hole ( #was: omg concurrency )
 [#024]       #parent-node:[#023] the manifest client narrative ..

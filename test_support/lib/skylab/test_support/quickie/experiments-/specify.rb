@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    module Models_::Specify
+    module Experiments_::Specify
 
       # this is an EXPERIMENTAL extension to look more like r.s for the
       # construct that falls under the "keyword" `specify`
@@ -72,4 +72,3 @@ module Skylab::TestSupport
   end
 end
 # #history-A.1: rewrote to freshen up during purging of `should`
-# #pending-rename: this is weird here..
