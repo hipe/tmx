@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe '[hu] raster magnetics - scaled time line item stream via glypher' do
+  describe '[br] raster magnetics - scaled time line item stream via glypher' do
 
     TS_[ self ]
     use :memoizer_methods
@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport
       _want_headers '2001'
     end
 
-    it "annual - three events into two adjacent buckets" do
+    it "annual - three events into two adjacent blocks" do
 
       using_scale_adapter :Annual
 
@@ -39,7 +39,7 @@ module Skylab::Brazen::TestSupport
       _want_headers '2001', '2002'
     end
 
-    it "annual - three events into two non-adjacent buckets" do
+    it "annual - three events into two non-adjacent blocks" do
 
       using_scale_adapter :Annual
 
@@ -266,34 +266,38 @@ module Skylab::Brazen::TestSupport
 
       first_dt = datetimes.fetch 0
 
-      bucket_begin_dt = cls._time_unit_adapter_.
-        nearest_previous_bucket_begin_datetime_ first_dt
+      block_begin_dt = cls.time_unit_adapter_.
+        nearest_previous_block_begin_datetime_ first_dt
 
-      _offset_rational = first_dt - bucket_begin_dt
+      _offset_rational = first_dt - block_begin_dt
 
       _distance_in_days_rational = datetimes.fetch( -1 ) - first_dt
 
-      _bucket_count = (
+      _block_count = (
         ( _offset_rational + _distance_in_days_rational ) /
-        cls::DAYS_PER_BUCKET
+        cls::DAYS_PER_BLOCK
       ).ceil
 
       # ~ end
 
-      o = cls.new bucket_begin_dt, _bucket_count
-
-      o.column_A = _column_A
-      o.column_A_max_width = __column_A_max_width
-
-      o.column_B_rows = __build_column_B_rows
-      o.glyph_mapper = __glyph_mapper
-
+      _vcr = __build_viz_column_rows
+      _w = __business_column_max_width
+      _bcr = _business_column
+      _grr = __glyph_mapper
       io = __build_IO_spy
-      o.text_downstream = io
       @IO = io
 
-      o.render
-      NIL_
+      _inst = cls.new block_begin_dt, _block_count
+
+      _x = _inst.RENDER_OR_TO_STREAM_(
+        text_downstream: io,
+        viz_column_rows: _vcr,
+        business_column_max_width: _w,
+        business_column_rows: _bcr,
+        glypherer: _grr,
+        column_order: X_rm_stlis_COLUMN_ORDER,
+      )
+      true == _x || yadda
     end
 
     def __build_IO_spy
@@ -301,11 +305,11 @@ module Skylab::Brazen::TestSupport
       TestSupport_::IO.spy :debug_IO, debug_IO, :do_debug, do_debug
     end
 
-    shared_subject :__column_A_max_width do
-      _column_A.last.length
+    shared_subject :__business_column_max_width do
+      _business_column.last.length
     end
 
-    shared_subject :_column_A do
+    shared_subject :_business_column do
       [ 'a.txt', '+b.dir', '  b.txt' ]
     end
 
@@ -327,7 +331,7 @@ module Skylab::Brazen::TestSupport
       NIL_
     end
 
-    def __build_column_B_rows
+    def __build_viz_column_rows
 
       _Mock_Row = X_fmest_Row
       _Mock_Filechange = X_fmest_Filechange
@@ -389,15 +393,32 @@ module Skylab::Brazen::TestSupport
       Home_::RasterMagnetics
     end
 
-    X_fmest_Filechange = ::Struct.new(
-      :author_datetime,
-      :change_count,
-    )
+    # ==
 
-    X_fmest_Row = ::Struct.new(
-      :to_a,
-    )
+    class X_fmest_Filechange
+      def initialize dt, d
+        @date_time_for_rasterized_visualization = dt
+        @count_towards_weight_for_rasterized_visualization = d
+      end
+      attr_reader(
+        :count_towards_weight_for_rasterized_visualization,
+        :date_time_for_rasterized_visualization,
+      )
+    end
 
+    class X_fmest_Row
+      def initialize a
+        @a = a
+      end
+      def each_business_item_for_rasterized_visualization & p
+        @a.each( & p )
+      end
+    end
+
+    X_rm_stlis_COLUMN_ORDER = %i( biz_column viz_column )
+
+    # ==
+    # ==
   end
 end
 # #history-A.1: de-abstracted stub classes from another sidesystem into here

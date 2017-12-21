@@ -56,10 +56,10 @@ module Skylab::Brazen::TestSupport
     end
 
     shared_subject :_baked do
-      _mapper.bake_for _statistics
+      __glypherer.glypher_via_statistics _statistics
     end
 
-    shared_subject :_mapper do
+    shared_subject :__glypherer do
       _subject_module.
         start 'Cr', 'A', 'B', 'C'
     end

@@ -23,7 +23,7 @@ module Skylab::Brazen
             end
           end  # >>
 
-          DAYS_PER_BUCKET = Rational 1, 24
+          DAYS_PER_BLOCK = Rational 1, 24
 
           FORMAT_FOR_WIDTH_4___ = '%l%p'
 

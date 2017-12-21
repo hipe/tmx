@@ -42,7 +42,7 @@ module Skylab::Brazen
 
           end  # >>
 
-          DAYS_PER_BUCKET = 1
+          DAYS_PER_BLOCK = 1
 
           DOW_FORMAT___ = ' %a'
 

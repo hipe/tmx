@@ -6,7 +6,7 @@ module Skylab::Brazen
 
           class << self
 
-            def nearest_previous_bucket_begin_datetime_ dt
+            def nearest_previous_block_begin_datetime_ dt
 
               _d = particular_offset_within_annual_cycle_of_datetime_ dt
 
@@ -16,7 +16,7 @@ module Skylab::Brazen
             end
 
 
-            def next_bucket_begin_datetime_after_ dt
+            def next_block_begin_datetime_after_ dt
 
               if 7 < dt.month
 

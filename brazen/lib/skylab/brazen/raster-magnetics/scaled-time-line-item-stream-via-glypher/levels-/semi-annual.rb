@@ -11,7 +11,7 @@ module Skylab::Brazen
             end
           end  # >>
 
-          DAYS_PER_BUCKET = Rational 365, 2  # :+#what-about-leap-year
+          DAYS_PER_BLOCK = Rational 365, 2  # :+#what-about-leap-year
 
           INTERNAL_UNIT = :half
 

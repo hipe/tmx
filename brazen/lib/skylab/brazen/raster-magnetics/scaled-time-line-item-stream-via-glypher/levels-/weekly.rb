@@ -11,7 +11,7 @@ module Skylab::Brazen
             end
           end  # >>
 
-          DAYS_PER_BUCKET = 7
+          DAYS_PER_BLOCK = 7
 
           INTERNAL_UNIT = :week
 

@@ -2,148 +2,163 @@ module Skylab::Brazen
 
   class RasterMagnetics::ScaledTimeLineItemStream_via_Glypher
 
-        class CommonLevel_  # algorithm in [#029]
+    class CommonLevel_  # algorithm in [#080]
 
-          class << self
+      class << self
 
-            def bid rfq
+        def bid rfq  # request for quote
 
-              bucket_begin_dt = _time_unit_adapter_.
-                nearest_previous_bucket_begin_datetime_(
-                  rfq.first_datetime )
+          # you MUST read [#080.G] or you WILL NOT understand this!
 
-              _offset_rational = rfq.first_datetime - bucket_begin_dt
+          _tua = time_unit_adapter_
+          block_begin_dt = _tua.nearest_previous_block_begin_datetime_ rfq.first_datetime
 
-              bucket_count = (
-                ( _offset_rational + rfq.distance_in_days_rational ) /
-                self::DAYS_PER_BUCKET
-              ).ceil
+          _margin_days_rational = rfq.first_datetime - block_begin_dt
+            # the extra 'head margin' of time we have to pay for
 
-              if rfq.width >= bucket_count
-                new bucket_begin_dt, bucket_count
-              end
+          _block_days_rational = _margin_days_rational + rfq.distance_in_days_rational
+            # the span of time we have to pay for (not including a tail margin)
+
+          _block_count_rational = _block_days_rational / self::DAYS_PER_BLOCK
+            # the number of blocks we have to pay for (as rational)
+
+          block_count = _block_count_rational.ceil
+            # round it up to get the real number of blocks we need
+
+          # NOW, how does the number of blocks we would need compare to the
+          # number of screen tiles we have at our disposal? whether or not
+          # we fit determines whether or not the current level is appropriate.
+
+          if rfq.width >= block_count
+            new block_begin_dt, block_count
+          end
+        end
+
+        def time_unit_adapter_
+          Here_::Units_[ self::INTERNAL_UNIT ]
+        end
+      end  # >>
+
+          def initialize block_begin_dt, block_count
+
+            @block_count = block_count
+            @days_per_block = self.class::DAYS_PER_BLOCK
+            @first_block_begin_datetime = block_begin_dt
+            @time_unit_adapter = self.class.time_unit_adapter_
+            @zone_for_comparison = block_begin_dt.zone
+
+          @__mutex = nil  # see
+          end
+
+        def RENDER_OR_TO_STREAM_(
+          text_downstream: nil,
+          viz_column_rows: nil,
+          business_column_max_width: nil,
+          business_column_rows: nil,
+          glypherer: nil,
+          column_order: nil
+        )
+
+          remove_instance_variable :@__mutex  # if this fails, dup and mutate
+
+          @normal_column_order = ColumnOrder___.new column_order
+
+          @text_downstream = text_downstream
+          @viz_column_rows = viz_column_rows
+          @business_column_max_width = business_column_max_width
+          @business_column_rows = business_column_rows
+          @glypherer = glypherer
+
+          __init_row_block_boxes  # (B)
+          __bake_glyph_mapper  # (C)
+          __flush  # (D)
+        end
+
+        # -- D.
+
+        def __flush
+
+          # hackishly protofit this to work for stream idiom from expression idiom
+
+          if @text_downstream
+            __express_for_flush
+          else
+            __express_for_money_cray
+          end
+        end
+
+        def __express_for_flush
+
+          io = remove_instance_variable :@text_downstream
+
+          _express_headers_into io
+
+          st = _flush_slats_stream
+          begin
+            o = st.gets
+            o || break
+            s = o.to_mutable_string
+            s << NEWLINE_
+            io << s
+            redo
+          end while above
+          ACHIEVED_  # oldschool [br] compat
+        end
+
+        def __express_for_money_cray
+
+          # for modalities other than CLI we wouldn't want to do the
+          # headers like so, but sheah right
+
+          _s_a = _express_headers_into( [] ).freeze
+
+          _st = _flush_slats_stream
+
+          HeaderLinesAndSlatsRowStream___.new(
+            _s_a,
+            _st,
+          )
+        end
+
+        def _express_headers_into io
+
+          if @normal_column_order.do_express_business_column_first
+            _use_business_column_max_width = @business_column_max_width
+          end
+
+          Here_::SubMagnetics_::ExpressHeaders_via_Arguments.call_by(
+            text_downstream: io,
+            hook_outs: self,
+            row_block_boxes: @row_block_boxes,
+            first_block_begin_datetime: @first_block_begin_datetime,
+            days_per_block: @days_per_block,
+            block_count: @block_count,
+            time_unit_adapter: @time_unit_adapter,
+            business_column_max_width: _use_business_column_max_width,
+          )
+        end
+
+        def _flush_slats_stream
+
+          slats_rowser = Here_::SubMagnetics_::SlatsRowser_via_Level.new(
+            business_column_max_width: @business_column_max_width,
+            block_count: @block_count,
+            row_block_boxes: @row_block_boxes,
+            normal_column_order: @normal_column_order,
+            glypher: @glypher,
+          )
+
+          scn = Scanner_[ @business_column_rows ]
+          row_offset = -1
+
+          Common_.stream do
+            unless scn.no_unparsed_exists
+              row_offset += 1
+              _s = scn.gets_one
+              slats_rowser.slats_row_via _s, row_offset
             end
-
-            def _time_unit_adapter_
-              Here_::Units_[ self::INTERNAL_UNIT ]
-            end
-
-          end  # >>
-
-          def initialize bucket_begin_dt, bucket_count
-
-            @bucket_count = bucket_count
-            @days_per_bucket = self.class::DAYS_PER_BUCKET
-            @first_bucket_begin_datetime = bucket_begin_dt
-            @tua = self.class._time_unit_adapter_
-            @zone_for_comparison = bucket_begin_dt.zone
           end
-
-          attr_writer :column_B_rows, :column_A_max_width, :column_A,
-            :glyph_mapper, :text_downstream
-
-          def render
-
-            __resolve_row_bucket_boxes
-            __resolve_baked_glyph_mapper
-            __post_render
-          end
-
-          # ~
-
-          def __resolve_row_bucket_boxes
-
-            a_ = ::Array.new @column_B_rows.length
-
-            @column_B_rows.each_with_index do | row_o, row_d |
-              row_o or next
-
-              bucket_box = Common_::Box.new
-
-              row_o.to_a.each do | filechange |
-                filechange or next
-
-                _bucket_index = _determine_bucket_index_for_datetime(
-                  filechange.author_datetime )
-
-                bucket_box.touch _bucket_index do
-
-                  Aggregated_Cel___.new
-
-                end.see_filechange filechange
-              end
-
-              a_[ row_d ] = bucket_box
-
-            end
-
-            @row_bucket_boxes = a_
-
-            NIL_
-          end
-
-          def _determine_bucket_index_for_datetime dt
-
-            if @zone_for_comparison != dt.zone
-              dt = dt.new_offset @zone_for_comparison
-            end
-
-            _days_distance_rational = dt - @first_bucket_begin_datetime
-
-            _number_of_buckets_rational =
-              _days_distance_rational / @days_per_bucket
-
-            _number_of_buckets_rational.floor
-          end
-
-          class Aggregated_Cel___
-            def initialize
-              @constituent_count = 0
-              @sum = 0
-            end
-            attr_reader :constituent_count, :sum
-            def see_filechange fc
-              @constituent_count += 1
-              @sum += fc.change_count
-              NIL_
-            end
-          end
-
-          def __resolve_baked_glyph_mapper
-
-            stats = []
-            @row_bucket_boxes.each do | box |
-              box or next
-              box.each_value do | agd_cel |
-                stats.push agd_cel.sum
-              end
-            end
-            stats.sort!.freeze
-            @baked_glyph_mapper = @glyph_mapper.bake_for stats
-            NIL_
-          end
-
-          # ~
-
-          def __post_render
-
-            __render_headers
-            __render_data_rows
-          end
-
-          def __render_headers
-
-            Here_::SubMagnetics_::ExpressHeaders_via_Arguments.new(
-              @text_downstream,
-              @row_bucket_boxes,
-              @first_bucket_begin_datetime,
-              @bucket_count,
-              @column_A_max_width,
-              @days_per_bucket,
-              @tua,
-              self ).execute
-            NIL_
-          end
+        end
 
           def within sumzn
 
@@ -175,13 +190,13 @@ module Skylab::Brazen
           def within_when_content_ sumzn
 
             dt = sumzn.subject.normal_datetime
-            d = @tua.particular_offset_within_annual_cycle_of_datetime_ dt
+            d = @time_unit_adapter.particular_offset_within_annual_cycle_of_datetime_ dt
 
             if d
 
               if d.zero?
 
-                # whenever this is the first bucket in an annual cycle always
+                # whenever this is the first block in an annual cycle always
                 # display this new year instaad of any particular unit amount
 
                 Levels_::Annual.within_ sumzn
@@ -265,37 +280,135 @@ module Skylab::Brazen
             end
           end
 
-          def __render_data_rows
+        # -- C. bake glyph mapper
 
-            b_tree = @baked_glyph_mapper.B_tree
-            box_a = @row_bucket_boxes
-            bucket_count = @bucket_count
-            fmt = "%-#{ @column_A_max_width }s#{ A_B_SEPARATOR_ }"
-            io = @text_downstream
-            s_a = @glyph_mapper.glyphs
+        def __bake_glyph_mapper
 
-            @column_A.each_with_index do | s, d |
-
-              io << fmt % s
-
-              bx = box_a[ d ]
-              if bx
-                h = bx.h_
-
-                bucket_count.times do | d_ |
-
-                  ag_cel = h[ d_ ]
-                  if ag_cel
-                    io << s_a.fetch( b_tree.category_for ag_cel.sum )
-                  else
-                    io << SPACE_
-                  end
-                end
-              end
-              io << NEWLINE_
+          stats = []
+          @row_block_boxes.each do |bx|
+            bx || next
+            bx.each_value do |viz_tile|
+              stats.push viz_tile.visual_weight_count
             end
-            ACHIEVED_
           end
+          stats.sort!.freeze
+          @glypher = @glypherer.glypher_via_statistics stats
+          NIL
         end
+
+        # -- B. row block boxes
+
+        def __init_row_block_boxes
+
+          boxes = ::Array.new @viz_column_rows.length
+
+          @viz_column_rows.each_with_index do |row_o, row_d|
+
+            row_o || next
+
+            block_box = Common_::Box.new
+
+            row_o.each_business_item_for_rasterized_visualization do |bi|
+
+              bi || next
+
+              _block_offset = __block_offset_via_datetime bi.date_time_for_rasterized_visualization
+
+              _ac = block_box.touch _block_offset do
+                VisualizationTile___.begin
+              end
+
+              _ac.__see_business_item_ bi
+            end
+
+            boxes[ row_d ] = block_box
+          end
+
+          @row_block_boxes = boxes ; nil
+        end
+
+        def __block_offset_via_datetime dt
+
+          if @zone_for_comparison != dt.zone
+            dt = dt.new_offset @zone_for_comparison
+          end
+
+          _days_distance_rational = dt - @first_block_begin_datetime
+
+          _number_of_blocks_rational = _days_distance_rational / @days_per_block
+
+          _number_of_blocks_rational.floor
+        end
+
+        # -- A. support
+      # -
+
+      # ==
+
+      class ColumnOrder___
+
+        # normalize an incoming specification of column order - represeent
+        # it in exactly the way we want to know about it internally
+
+        def initialize sym_a
+          sym_a || fail
+          2 == sym_a.length || fail
+          if :biz_column == sym_a.first
+            if :viz_column == sym_a.last
+              @do_express_business_column_first = true
+            else
+              fail
+            end
+          elsif :viz_column == sym_a.first
+            if :biz_column == sym_a.last
+              @do_express_business_column_first = false
+            else
+              fail
+            end
+          else
+            fail
+          end
+          freeze
+        end
+
+        attr_reader(
+          :do_express_business_column_first,
+        )
+      end
+
+      # ==
+
+      class VisualizationTile___
+
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
+
+        def initialize
+          @visual_weight_count = 0
+        end
+
+        def __see_business_item_ bi
+          @visual_weight_count += bi.count_towards_weight_for_rasterized_visualization
+          NIL
+        end
+
+        attr_reader(
+          :visual_weight_count,
+        )
+      end
+
+      # ==
+
+      HeaderLinesAndSlatsRowStream___ = ::Struct.new(
+        :header_lines,
+        :slats_row_stream,
+      )
+
+      # ==
+      # ==
+    end
   end
 end
+# #history-A.1: mostly rewritten to work for visual blame

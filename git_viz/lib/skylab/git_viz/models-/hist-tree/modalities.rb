@@ -115,8 +115,8 @@ module Skylab::GitViz
 
             ok = __via_bound_call_from_back_resolve_bundle
             ok &&= __via_bundle_resolve_sparse_matrix_of_content
-            ok &&= __via_sparse_matrix_of_content_resolve_column_A
-            ok && __via_column_A_render
+            ok &&= __via_sparse_matrix_of_content_resolve_business_column
+            ok && __via_business_column_render
           end
 
           def __via_bound_call_from_back_resolve_bundle
@@ -141,7 +141,7 @@ module Skylab::GitViz
             end
           end
 
-          def __via_sparse_matrix_of_content_resolve_column_A
+          def __via_sparse_matrix_of_content_resolve_business_column
 
             st = Home_.lib_.basic::Tree.via(
               :node_identifiers,
@@ -153,55 +153,63 @@ module Skylab::GitViz
               # which never has any visual representation
 
             max = 0
-            column_A_content = []
-            column_B_rows = []
+            business_column_rows = []
+            viz_column_rows = []
 
             begin
               o = st.gets
               o or break
               node, prefix_string = o.to_a
               s = "#{ prefix_string }#{ node.slug }"
-              column_A_content.push s
+              business_column_rows.push s
 
               if node.is_leaf
 
-                column_B_rows.push node.node_payload
+                viz_column_rows.push node.node_payload
 
                 d = s.length  # or include the branch nodes. it's a design choice
                 if max < d
                   max = d
                 end
               else
-                column_B_rows.push nil
+                viz_column_rows.push nil
               end
               redo
             end while nil
 
-            @column_A = column_A_content
-            @column_A_max_width = max
-            @column_B_rows = column_B_rows
+            @business_column_rows = business_column_rows
+            @business_column_max_width = max
+            @viz_column_rows = viz_column_rows
 
             ACHIEVED_
           end
 
-          def __via_column_A_render
+          def __via_business_column_render
 
             lib = Home_.lib_.brazen_NOUVEAU::RasterMagnetics
 
-            _glypher = lib::Glypher_via_Glyphs_and_Stats.start(
-              * GLYPHS___ )
+            _glypherer = lib::Glypher_via_Glyphs_and_Stats.start( * GLYPHS___ )
 
-            lib::ScaledTimeLineItemStream_via_Glypher.call(
-              @column_B_rows,
-              @column_A_max_width,
-              @column_A,
-              @width,
-              _glypher,
-              @resources.sout,
+            lib::ScaledTimeLineItemStream_via_Glypher.call_by(
+
+              text_downstream: @resources.sout,
+
+              viz_column_rows: @viz_column_rows,
+
+              business_column_max_width: @business_column_max_width,
+              business_column_rows: @business_column_rows,
+
+              width: @width,
+              glypherer: _glypherer,
+              column_order: COLUMN_ORDER___,
             )
           end
         end
       end
+
+      # ==
+
+      COLUMN_ORDER___ = %i( biz_column viz_column ).freeze
 
       # ==
       # ==

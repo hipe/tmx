@@ -18,7 +18,7 @@ module Skylab::Brazen
 
         attr_reader :create_glyph, :glyphs
 
-        def bake_for statistics
+        def glypher_via_statistics statistics
           Bake___.new( statistics, @glyphs, @create_glyph ).execute
         end
 
@@ -30,7 +30,6 @@ module Skylab::Brazen
           end
 
           attr_reader :B_tree
-
         end
 
         class Bake___
@@ -127,5 +126,49 @@ module Skylab::Brazen
             end
           end
         end
+
+    #
+    # when you only use one glyph
+    #
+
+    class SimpleGlypherer
+
+      def initialize char
+        @__simple_glypherer = SimpleGlypherer___.new char
+        freeze
+      end
+
+      def glypher_via_statistics _stats_d_a
+        # stats are e.g [0, 0, 0]
+        _stats_d_a.index { |x| x.nonzero? } && fail  # #todo
+        @__simple_glypherer
+      end
+    end
+
+    class SimpleGlypherer___
+
+      def initialize char
+        @glyphs = [char].freeze
+        freeze
+      end
+
+      attr_reader(
+        :glyphs,
+      )
+
+      def B_tree
+        SIMPLE_B_TREE___
+      end
+    end
+
+    module SIMPLE_B_TREE___ ; class << self
+      def category_for weight_count
+        weight_count.zero? || sanity
+        0  # always use the glyph at offset zero
+      end
+    end ; end
+
+    # ==
+    # ==
   end
 end

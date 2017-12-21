@@ -20,11 +20,11 @@ module Skylab::GitViz
             @is_first = is_first
           end
 
-          def author_datetime
+          def date_time_for_rasterized_visualization
             @bundle_filechange_.ci.author_datetime
           end
 
-          def change_count
+          def count_towards_weight_for_rasterized_visualization
             @bundle_filechange_.fc.change_count
           end
 
@@ -76,7 +76,7 @@ module Skylab::GitViz
 
           _row_a = @matrix_.bundle.trails.map do |trail|
             _row_a_ = __row_array_via_trail trail
-            Row___[ _row_a_, trail.path ]
+            Row___.new _row_a_, trail.path
           end
 
           SparseMatrix___.new _row_a
@@ -114,9 +114,25 @@ module Skylab::GitViz
 
       # ==
 
-      SparseMatrix___ = ::Struct.new :rows
+      class Row___
 
-      Row___ = ::Struct.new :to_a, :to_tree_path
+        def initialize a, s
+          @business_items = a
+          @to_tree_path = s
+          freeze
+        end
+
+        def each_business_item_for_rasterized_visualization & p
+          @business_items.each( & p )
+        end
+
+        attr_reader(
+          :business_items,
+          :to_tree_path,
+        )
+      end
+
+      SparseMatrix___ = ::Struct.new :rows
 
       # ==
     # -

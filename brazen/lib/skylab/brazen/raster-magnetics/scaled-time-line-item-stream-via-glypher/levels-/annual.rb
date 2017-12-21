@@ -30,7 +30,7 @@ module Skylab::Brazen
 
           end  # >>
 
-          DAYS_PER_BUCKET = 365  # :+#what-about-leap-year
+          DAYS_PER_BLOCK = 365  # :+#what-about-leap-year
 
           INTERNAL_UNIT = :year
     end

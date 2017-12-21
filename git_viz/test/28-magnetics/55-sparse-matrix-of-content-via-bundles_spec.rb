@@ -23,26 +23,27 @@ module Skylab::GitViz::TestSupport
 
       row = _table.rows.fetch 0
 
-      a = row.to_a
+      a = row.business_items
 
       expect( a.length ).to eql 5
 
       expect( a[ 0 ] ).to be_nil
 
+      this = :count_towards_weight_for_rasterized_visualization.to_proc
+
       mfc = a.fetch 1
       expect( mfc.is_first ).to eql true
-      expect( mfc.change_count ).to eql 1
+      this[ mfc ] == 1 || fail
 
       mfc = a.fetch 2
       expect( mfc.is_first ).to eql false
-      expect( mfc.change_count ).to eql 2
+      this[ mfc ] == 2 || fail
 
       expect( a[ 3 ] ).to be_nil
 
       mfc = a.fetch 4
       expect( mfc.is_first ).to eql false
-      expect( mfc.change_count ).to eql 2
-
+      this[ mfc ] == 2 || fail
     end
 
     def _subject

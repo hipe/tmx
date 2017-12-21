@@ -76,6 +76,4 @@ redshift looks good for names file
 redshift looks good for an arbitray issues file
 two column scale time looks good for any file
 cover frontend portion of this new report
-give the scaled time thing a better interface
 cover backend portion of this new report
-re-house the scale-time guy somewhere else while flushing renames

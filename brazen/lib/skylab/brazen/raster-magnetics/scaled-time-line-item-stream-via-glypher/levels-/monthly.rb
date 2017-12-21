@@ -28,7 +28,7 @@ module Skylab::Brazen
             end
           end  # >>
 
-          DAYS_PER_BUCKET = 28  # :+#bids-are-lossy-pessimistic-estimates
+          DAYS_PER_BLOCK = 28  # :+#bids-are-lossy-pessimistic-estimates
 
           FORMAT_FOR_WIDTH_4___ = ' %b'
 

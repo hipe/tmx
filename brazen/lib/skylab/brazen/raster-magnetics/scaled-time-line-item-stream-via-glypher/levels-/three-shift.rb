@@ -10,17 +10,17 @@ module Skylab::Brazen
               :Daily
             end
 
-            def _time_unit_adapter_
+            def time_unit_adapter_
               self
             end
 
-            def nearest_previous_bucket_begin_datetime_ dt
+            def nearest_previous_block_begin_datetime_ dt
 
               _normal_via_particular_offset_and_datetime(
                 particular_offset_within_daily_cycle_of_datetime_( dt ), dt )
             end
 
-            def next_bucket_begin_datetime_after_ dt
+            def next_block_begin_datetime_after_ dt
 
               d = particular_offset_within_daily_cycle_of_datetime_ dt
 
@@ -45,7 +45,7 @@ module Skylab::Brazen
 
           end  # >>
 
-          DAYS_PER_BUCKET = Rational 1, 3
+          DAYS_PER_BLOCK = Rational 1, 3
 
           def initialize( * )
             super

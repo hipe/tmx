@@ -40,6 +40,10 @@ module Skylab::GitViz::TestSupport
 
   module InstanceMethods___
 
+    def want_these_lines_in_array_ actual_messages, & p
+      TestSupport_::Want_these_lines_in_array[ actual_messages, p, self ]
+    end
+
     def debug!
       @do_debug = true ; nil
     end
