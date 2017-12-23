@@ -34,8 +34,7 @@ module Skylab::Git
           listener: listener,
         )
 
-        Home_.lib_.string_scanner
-        require 'date'
+        Home_.lib_.string_scanner  # for use #here1
 
         @__commit_pool = Home_::Models::Commit::StatistitcatingPool.new
 
@@ -71,11 +70,10 @@ module Skylab::Git
 
       def initialize line, cx
         @_caches = cx
-        @_scn = ::StringScanner.new line
+        @_scn = ::StringScanner.new line  #here1
         __parse_SHA
         _skip_space
-        __parse_path
-        _skip_multiple_spaces
+        __maybe_parse_path
         _skip %r(\()
         __parse_author
         _skip_space
@@ -111,6 +109,16 @@ module Skylab::Git
         s = _scan %r( (?: (?![ ]\d{4}). ) + )x
         s.strip!  # meh
         @__author_name = s ; nil
+      end
+
+      def __maybe_parse_path
+        if @_scn.peek( 1 ) == '('
+          # (then this file has no renames, probably #cover-me)
+          @path = nil
+        else
+          __parse_path
+          _skip_multiple_spaces
+        end
       end
 
       def __parse_path

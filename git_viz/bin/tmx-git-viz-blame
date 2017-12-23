@@ -1,0 +1,273 @@
+#!/usr/bin/env ruby -w
+# frozen_string_literal: true
+
+require 'skylab/git_viz'
+
+module Skylab::GitViz
+
+  module OneOffs
+  end
+
+  class OneOffs::Blame___ # :[#029] and #coverpoint1.1
+
+    # this is a dusting together of two big magnets: one is a besoke,
+    # covered magnet for producing structures results of a `git blame`;
+    # and the other is the visualization toolkit used it "git viz",
+    # re-purposed  to show a git blame "headmap.."
+
+    GLYPH___ = '•'
+    VISUALIZATION_WIDTH___ = 80
+
+    def initialize argv, sin, sout, serr, pn_s_a
+      @ARGV = argv
+      @program_name_string_array = pn_s_a
+      @stdout = sout
+      @stderr = serr
+    end
+
+    def execute
+
+      # OCD-ically, don't optparse unless we need to
+
+      @_provided_width = nil
+
+      len = @ARGV.length
+      if len.zero?
+        __when_empty_argv
+      elsif 1 == len && DASH_ != @ARGV[0][0]
+        @path = remove_instance_variable( :@ARGV ).first
+        _money
+      else
+        __do_optparse
+      end
+    end
+
+    def __do_optparse
+
+      require 'optparse'
+      yes_help = nil
+      w_s = nil
+
+      op = ::OptionParser.new do |o|
+        o.on '-h', '--help', 'this screen' do
+          yes_help = true
+        end
+        o.on '-w', '--width INT', 'maxium width of the visualization column' do |s|
+          w_s = s
+        end
+      end
+
+      argv = remove_instance_variable :@ARGV
+
+      begin
+        op.parse! argv
+      rescue ::OptionParser::ParseError => e
+      end
+
+      if e
+        _fail e.message
+      elsif yes_help
+        __express_help op
+      elsif w_s
+        if /\A\d+\z/ =~ w_s
+          @_provided_width = w_s.to_i
+          _via_argv argv
+        else
+          _fail "must have integer for width (had #{ w_s.inspect })"
+        end
+      else
+        _via_argv argv
+      end
+    end
+
+    def _via_argv argv
+      if 1 == argv.length
+        @path = argv[0]
+        _money
+      else
+        _usage "expecting 1 had #{ argv.length } args for <FILE>"
+      end
+    end
+
+    def _usage msg
+      y = _build_stderr_yielder
+      y << msg
+      _express_usage_into y
+      NOT_OK_
+    end
+
+    def _fail msg
+      y = _build_stderr_yielder
+      y << msg
+      y << "try '#{ _get_program_name } -h' for help."
+      NOT_OK_
+    end
+
+    def __express_help op
+
+      y = _build_stderr_yielder
+      _express_usage_into y
+      y << nil
+      y << 'description: EXPERIMENT to render a `git blame` as a sort of heatmap..'
+      y << nil
+      y << 'options:'
+      op.summarize y
+      OK_
+    end
+
+    def _express_usage_into y
+      y << "usage: #{ _get_program_name } [opts] <FILE>"
+    end
+
+    def _get_program_name
+      s_a = @program_name_string_array.dup
+      s_a[ 0 ] = ::File.basename s_a.first
+      s_a * SPACE_
+    end
+
+    def _money
+      __init_scanner
+      if __resolve_struct
+        __express_struct
+      end
+      remove_instance_variable :@_exitstatus
+    end
+
+    def __express_struct
+
+      sct = remove_instance_variable :@__struct
+
+      sout = @stdout
+      sout.puts sct.header_lines
+
+      # (just as #coverpoint1.2)
+      st = sct.slats_row_stream
+      begin
+        slats = st.gets
+        slats || break
+        _s = slats.to_mutable_string
+        sout.puts _s
+        # slats.visualization_slat.to_string
+        # slats.business_slat.to_string
+        redo
+      end while above
+      @_exitstatus = OK_
+      NIL
+    end
+
+    def __resolve_struct
+
+      yikes = []
+
+      scn = @_scanner
+
+      _advanced_training_and_tactics = Common_.stream do
+        blame_line = scn.gets_one_git_blame_line
+        if blame_line
+          yikes.push blame_line.line
+          ThisWrapper___.new blame_line
+        else
+          NOTHING_
+        end
+      end
+
+      v_w = remove_instance_variable :@_provided_width
+      if ! v_w
+        v_w = VISUALIZATION_WIDTH___
+      end
+
+      _whole_width = v_w + 1  # sadly you gotta count the pipe separator
+
+      _bcmw = 0  # if you tell it that your widest business slat is zero
+                 # wide, then in effect the width it allocates to the viz
+                 # is determine by the whole width you pass it. ie:
+                 #
+                 #     whole width = viz width + one + biz width
+
+      _ = Home_.lib_.brazen_NOUVEAU
+      sct = _::RasterMagnetics::ScaledTimeLineItemStream_via_Glypher.call_by(
+
+        semimixed_item_stream: _advanced_training_and_tactics,
+
+        width: _whole_width,
+        business_column_max_width: _bcmw,
+
+        business_column_strings: yikes,  # zero at first..
+
+        glyph: GLYPH___,
+
+        column_order: %i( viz_column biz_column ),
+      )
+      if sct
+        @__struct = sct ; ACHIEVED_
+      else
+        @_scanner.was_OK && oops
+        @_exitstatus = @_scanner.nonzero_exitstatus
+        UNABLE_
+      end
+    end
+
+    def __init_scanner
+
+      y = nil
+
+      _listener = -> * chan, & p do
+        y ||= _build_stderr_yielder
+        :expression == chan[1] || fail
+        nil.instance_exec y, & p
+        nil
+      end
+
+      _ = Home_.lib_.git
+
+      @_scanner = _::Magnetics::BlameLineStream_via_Path.statisticator_by(
+        path: remove_instance_variable( :@path ),
+        piper: ::IO,
+        spawner: ::Kernel,
+        waiter: ::Process,
+        listener: _listener,
+      )
+    end
+
+    def _build_stderr_yielder
+      io = @stderr
+      ::Enumerator::Yielder.new { |s| io.puts s }
+    end
+
+    class ThisWrapper___
+      # (can't flyweight)
+
+      def initialize x
+        @blame_line = x
+      end
+
+      def date_time_for_rasterized_visualization
+        @blame_line.commit.date_time
+      end
+
+      def count_towards_weight_for_rasterized_visualization
+        # (when we only have one glyph we don't do weights)
+        0
+      end
+    end
+
+    # ==
+
+    NOT_OK_ = 5
+    NOTHING_ = nil
+    OK_ = 0
+
+    # ==
+  end
+end
+
+call = -> * five do
+  Skylab::GitViz::OneOffs::Blame___.new( * five ).execute
+end
+
+if File.basename( __FILE__ ) == File.basename( $PROGRAM_NAME )  # #[#tmx-020.5]
+
+  exit call[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
+else
+  Skylab__Zerk__OneOffs::Git_viz_blame = call  # #[#ze-063.1] mountable one-off
+end

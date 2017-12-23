@@ -82,9 +82,16 @@ module Skylab::Brazen
 
         def to_mutable_string
 
-          buff = ::String.new
-          _ = __left_slat.to_string
-          buff << _
+          s = __left_slat.to_string
+          if s
+            if s.frozen?
+              buff = s.dup
+            else
+              buff = s
+            end
+          else
+            buff = ::String.new
+          end
           buff << A_B_SEPARATOR_
           s = __right_slat.to_string
           if s

@@ -122,6 +122,7 @@ module Skylab::Git
         author_name: nil
       )
 
+        Home_.lib_.date_time
         @date_time = ::DateTime.strptime date_string, DATE_TIME_FORMAT__
         @SHA_string = sha
         @author_name = author_name

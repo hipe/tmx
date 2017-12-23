@@ -165,6 +165,10 @@ module Skylab::Git
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
+    Date_time = Lazy_.call do
+      require 'date' ; ::DateTime
+    end
+
     FUC = -> do
       System[].filesystem.file_utils_controller
     end

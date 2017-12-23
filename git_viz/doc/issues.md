@@ -16,7 +16,7 @@
 [#030]       #historical - document moved to [#ze-029].
              (was this a #[#fi-001]? did it sunset or did it assimilate?)
 
-[#029] #hole
+[#029]       [ my scale time git blame report etc ]
              ( #was: the scale time algorithm #moved-to: [#br-080] )
              ( #was: shutdown/fail more gracefully when manifest parse errors )
 [#028]       #parent-node:[#017] fixtures scripts in detail ..

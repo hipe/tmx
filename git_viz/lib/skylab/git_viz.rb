@@ -172,8 +172,11 @@ module Skylab::GitViz
     Brazen_NOUVEAU = Brazen
     Basic = sidesys[ :Basic ]  # was wall
     Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
     JSON = stdlib[ :JSON ]
+    if false  # i don't remember the below is but it ain't used #todo
     Listen = gem[ :Listen ]
+    end
     _Hu = sidesys[ :Human ]
     Open3 = stdlib[ :Open3 ]
     Plugin = sidesys[ :Plugin ]

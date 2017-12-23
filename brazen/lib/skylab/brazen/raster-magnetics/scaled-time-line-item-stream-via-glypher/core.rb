@@ -194,7 +194,8 @@ module Skylab::Brazen
         if dt
           __the_rest_of_this_money cache, dt, st
         else
-          self._COVER_ME__empty_items_stream__
+          # #coverpoint1.3 - if you are given an empty stream, assume elsewhere will complain
+          NOTHING_
         end
       end
 

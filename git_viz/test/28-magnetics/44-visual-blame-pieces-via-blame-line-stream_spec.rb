@@ -13,8 +13,21 @@ module Skylab::GitViz::TestSupport
     # so we eliminated the magnet itself but left this test intact as a
     # contact point and demonstration of the requirements for our wrappers, etc.
 
+    # #coverpoint1.1
+
     TS_[ self ]
     use :memoizer_methods
+
+    it 'empty upstream - results in nothing, EMITS NOTHING' do  # #coverpoint1.3
+
+      # (we assume that if the client upstream was empty, it did its own emission)
+
+      _x = _go do
+        _also width: 100
+      end
+
+      _x.nil? || fail
+    end
 
     context 'span 4 HOUR blocks (mocked)' do
 
@@ -141,10 +154,18 @@ module Skylab::GitViz::TestSupport
       yield
 
       sct = __call_thing
+      if sct
+        __testable_result_via_struct sct
+      end
+    end
+
+    def __testable_result_via_struct sct
 
       _s_a = sct.header_lines
       viz_s_a = []
       biz_s_a = []
+
+      # ~( #coverpoint1.2
 
       st = sct.slats_row_stream
       begin
@@ -157,6 +178,8 @@ module Skylab::GitViz::TestSupport
         viz_s_a.push _
         redo
       end while above
+
+      # ~)
 
       X_mvbp_ThisOneResult.new(
         _s_a,
