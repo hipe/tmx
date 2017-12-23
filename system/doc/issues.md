@@ -1,5 +1,7 @@
 [#041]       track all the external guys that do a "manual" `popen3` (this
              is perhaps preferred now)
+             [#here.4]: our mock support for this
+             [#here.3]: our would-be facility for this
              [#041.2] - our central pipe-find-to-grep
 
 [#040]       feature branch via directory ..

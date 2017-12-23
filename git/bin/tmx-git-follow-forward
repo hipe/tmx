@@ -201,8 +201,12 @@ class Skylab_Git__follow_forward__one_off
     end
 
     def __last_commit
-      @_magnetics::Commit_via_Path.call(
-        @_current_path, @command_prototype, @system, & @listener )
+      @_magnetics::Commit_via_Path.call_by(
+        path: @_current_path,
+        command_prototype: @command_prototype,
+        system: @system,
+        listener: @listener,
+      )
     end
 
     # -- command support

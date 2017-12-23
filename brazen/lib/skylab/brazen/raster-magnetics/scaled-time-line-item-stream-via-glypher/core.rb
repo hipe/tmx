@@ -20,7 +20,7 @@ module Skylab::Brazen
         viz_column_rows: nil,
 
         business_column_max_width: nil,
-        business_column_rows: nil,
+        business_column_strings: nil,
 
         width: nil,
         glyph: nil,
@@ -34,7 +34,7 @@ module Skylab::Brazen
         @text_downstream = text_downstream
 
         @business_column_max_width = business_column_max_width
-        @business_column_rows = business_column_rows
+        @business_column_strings = business_column_strings
 
         @width = width
         @column_order = column_order
@@ -82,7 +82,7 @@ module Skylab::Brazen
           viz_column_rows: @viz_column_rows,
 
           business_column_max_width: @business_column_max_width,
-          business_column_rows: @business_column_rows,
+          business_column_strings: @business_column_strings,
 
           glypherer: @glypherer,
           column_order: @column_order,

@@ -79,6 +79,10 @@ module Skylab::Git::TestSupport
       Home_::Stream_[ `cd #{ path } && find . -type f`.split NEWLINE_ ]
     end
 
+    def no_ent_path_
+      TestSupport_::Fixtures.file :not_here
+    end
+
     def subject_API_value_of_failure
       FALSE
     end

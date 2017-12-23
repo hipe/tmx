@@ -188,7 +188,7 @@ module Skylab::GitViz::TestSupport
         semimixed_item_stream: _st,
 
         business_column_max_width: _this,
-        business_column_rows: _these,
+        business_column_strings: _these,
       )
     end
 

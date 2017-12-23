@@ -153,7 +153,7 @@ module Skylab::GitViz
               # which never has any visual representation
 
             max = 0
-            business_column_rows = []
+            biz_column_strings = []
             viz_column_rows = []
 
             begin
@@ -161,7 +161,7 @@ module Skylab::GitViz
               o or break
               node, prefix_string = o.to_a
               s = "#{ prefix_string }#{ node.slug }"
-              business_column_rows.push s
+              biz_column_strings.push s
 
               if node.is_leaf
 
@@ -177,7 +177,7 @@ module Skylab::GitViz
               redo
             end while nil
 
-            @business_column_rows = business_column_rows
+            @business_column_strings = biz_column_strings
             @business_column_max_width = max
             @viz_column_rows = viz_column_rows
 
@@ -197,7 +197,7 @@ module Skylab::GitViz
               viz_column_rows: @viz_column_rows,
 
               business_column_max_width: @business_column_max_width,
-              business_column_rows: @business_column_rows,
+              business_column_strings: @business_column_strings,
 
               width: @width,
               glypherer: _glypherer,

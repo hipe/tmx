@@ -282,7 +282,7 @@ module Skylab::Brazen::TestSupport
 
       _vcr = __build_viz_column_rows
       _w = __business_column_max_width
-      _bcr = _business_column
+      _bcss = _business_column
       _grr = __glyph_mapper
       io = __build_IO_spy
       @IO = io
@@ -293,7 +293,7 @@ module Skylab::Brazen::TestSupport
         text_downstream: io,
         viz_column_rows: _vcr,
         business_column_max_width: _w,
-        business_column_rows: _bcr,
+        business_column_strings: _bcss,
         glypherer: _grr,
         column_order: X_rm_stlis_COLUMN_ORDER,
       )

@@ -54,7 +54,7 @@ module Skylab::Brazen
           text_downstream: nil,
           viz_column_rows: nil,
           business_column_max_width: nil,
-          business_column_rows: nil,
+          business_column_strings: nil,
           glypherer: nil,
           column_order: nil
         )
@@ -66,7 +66,7 @@ module Skylab::Brazen
           @text_downstream = text_downstream
           @viz_column_rows = viz_column_rows
           @business_column_max_width = business_column_max_width
-          @business_column_rows = business_column_rows
+          @business_column_strings = business_column_strings
           @glypherer = glypherer
 
           __init_row_block_boxes  # (B)
@@ -148,7 +148,7 @@ module Skylab::Brazen
             glypher: @glypher,
           )
 
-          scn = Scanner_[ @business_column_rows ]
+          scn = Scanner_[ @business_column_strings ]
           row_offset = -1
 
           Common_.stream do

@@ -9,6 +9,361 @@ module Skylab::System
       end
     end  # >>
 
+    class MockedThree  # :[#041.4]
+
+      # (yes this is the seventh.)
+
+      # we must keep up with the times - now we don't like usen popen3
+
+      class << self
+        def hash_via_definition ** hh
+          new( ** hh ).execute
+        end
+        private :new
+      end  # >>
+
+      def initialize(
+        given_command: nil,
+        do_this: nil
+      )
+        @__given_command = given_command
+        @__do_this = do_this
+      end
+
+      def execute
+
+        _mocked_piper = MockedPiper___.new self
+        _mocked_spawner = MockedSpawner___.new self
+        _mocked_waiter = MockedWaiter___.new self
+
+        o = BuildExpectationScanner___.new
+
+        # ~( NOTE we must track closely with assumption [#041.D.2]
+
+        o.then :_pipe_, :__pipe_for_stdout
+        o.then :_pipe_, :__pipe_for_stderr
+        o.then :_spawn_, :__spawn
+
+        # (reads from the stdout and stderr pipe happen off script #here2)
+
+        o.then :_close_write_stdout_
+        o.then :_close_write_stderr_
+
+        o.then :_wait_, :__wait
+
+        # ~)
+
+        @_expectation_scanner = o.__flush_to_scanner
+
+        {
+          piper: _mocked_piper,
+          spawner: _mocked_spawner,
+          waiter: _mocked_waiter,
+        }
+      end  # >>
+
+      # -
+        #
+        # these correspond to real methods that get called
+        #
+
+        def __pipe_
+          _step :_pipe_
+        end
+
+        def __spawn_ args, opts
+          _step :_spawn_, args, opts
+        end
+
+        def __wait_ d
+          _step :_wait_, d
+        end
+
+        #
+        #
+        #
+
+        def __pipe_for_stdout
+
+          _reader = MockedReader__.new :__gets_stdout, :__close_stdout, self
+          _writer = MockedWriter__.new :__close_write_stdout, self
+
+          [ _reader, _writer ]
+        end
+
+        def __pipe_for_stderr
+
+          _reader = MockedReader__.new :__gets_stderr, :__close_stderr, self
+          _writer = MockedWriter__.new :__close_write_stderr, self
+
+          [ _reader, _writer ]
+        end
+
+        def __spawn cmd_s_a, opt_h
+
+          # our job is to parse the incoming actual command for whatever
+          # it is the expectation is trying to parse out from it
+
+          h = __parse_cha_cha cmd_s_a
+          def h.[] k  # #experiment
+            fetch k  # hi.
+          end
+
+          sout_s_a = []
+          serr_s_a = []
+          _es = remove_instance_variable( :@__do_this )[ sout_s_a, serr_s_a, h ]
+
+          @_sout_and_serr = SoutAndSerr___.new(
+            Stream_[ sout_s_a ],
+            Stream_[ serr_s_a ],
+          )
+
+          @__mocked_exitstatus = _es
+
+          :fake_PID_SY
+        end
+
+        def __parse_cha_cha cmd_s_a
+
+          md_box = Common_::Box.new
+
+          exp_scn = Scanner_[ remove_instance_variable( :@__given_command ) ]
+          act_scn = Scanner_[ cmd_s_a ]
+
+          offset = 0
+          begin
+            exp_x = exp_scn.gets_one
+            act_x = act_scn.gets_one
+
+            if exp_x.respond_to? :ascii_only?
+              if exp_x != act_x
+                fail %[needed "#{ exp_x }", had "#{ act_x }" (at offset #{ offset })]  # #cover-me
+              end
+            else
+              md = exp_x.match act_x
+              if ! md
+                fail %[needed to match #{ exp_x.inspect }, had "#{ act_x }" (at offset #{ offset })]  # #cover-me
+              end
+              md.named_captures.each_pair do |key_s, s|
+                md_box.add key_s.intern, s
+              end
+            end
+
+            if exp_scn.no_unparsed_exists
+              if act_scn.no_unparsed_exists
+                break
+              end
+              fail %[unexpected extra actual doo-hah "#{ act_scn.head_as_is.inspect }"]  # #cover-me
+            elsif act_scn.no_unparsed_exists
+              fail %[command ended early. expected #{ exp_scn.head_as_is }]  # #cover-me
+            end
+            offset += 1
+            redo
+          end while above
+
+          md_box.h_
+        end
+
+        def __close_write_stdout
+          _step :_close_write_stdout_
+        end
+
+        def __close_write_stderr
+          _step :_close_write_stderr_
+        end
+
+        def __gets_stdout
+          _gets :_stdout_
+        end
+
+        def __gets_stderr
+          _gets :_stderr_
+        end
+
+        def __close_stdout
+          _close :_stdout_
+        end
+
+        def __close_stderr
+          _close :_stderr_
+        end
+
+        def _gets sym
+
+          # (:#here2: reads to stdout and stderr pipe happen off-script)
+
+          s = @_sout_and_serr[ sym ].gets
+          # above fails per #here2
+          if s
+            s
+          else
+            @_sout_and_serr[ sym ] = CLOSED_NATURALLY___ ; nil
+          end
+        end
+
+        def _close sym
+
+          # (these happen off-script. we somewhat ensure state transitions)
+
+          @_sout_and_serr[ sym ]._hello_active
+          @_sout_and_serr[ sym ] = CLOSED_MANALLY___ ; nil
+        end
+
+        def __wait pid
+
+          # because ultimately we're reading a global variable (per platform)
+          # and A) we cannot just write to it and B) if we could it would
+          # be super scary, we set up some ridiculous wrapping in our lib
+          # code so that we can hack things here without the lib code needing
+          # to have excessive knowledge of our mocking.
+
+          :fake_PID_SY == pid || oops
+          _es = remove_instance_variable :@__mocked_exitstatus
+
+          yikes = Home_::Command::LAST_PROCESS_STATUS
+
+          stv = StubbedThreadValue__.new _es
+          once = -> do
+            once = nil ; stv
+          end
+
+          restore_me_YIKES = yikes.read
+          yikes.read = -> do
+            yikes.read = restore_me_YIKES
+            once[]
+          end
+
+          NIL
+        end
+
+        #
+        # we corral all actual calls through here
+        #
+
+        def _step m_ref, * args
+          if @_expectation_scanner.no_unparsed_exists
+            # #cover-me
+            fail "had no more expected method calls, encountered: `#{ m_ref }`"
+          else
+            exp = @_expectation_scanner.gets_one
+            if exp.method_reference == m_ref
+              m = exp.my_method_name
+              if m
+                send m, * args
+              end
+            else
+              fail "expected `#{ exp.method_reference }` had `#{ m_ref }`"
+            end
+          end
+        end
+      # -
+
+      # ===
+
+      class MockedPiper___
+        def initialize _
+          @_ = _
+        end
+        def pipe
+          @_.__pipe_
+        end
+      end
+
+      class MockedSpawner___
+        def initialize _
+          @_ = _
+        end
+        def spawn * args, opts
+          @_.__spawn_ args, opts
+        end
+      end
+
+      class MockedReader__
+
+        def initialize m, m2, _
+          @__gets_method = m
+          @__close_method = m2
+          @_ = _
+        end
+
+        def gets
+          @_.send @__gets_method
+        end
+
+        def close
+          @_.send @__close_method
+        end
+
+        def _hello_active
+          NOTHING_
+        end
+      end
+
+      class MockedWriter__
+        def initialize close_m, _
+          @__close_method = close_m
+          @_ = _
+        end
+        def close
+          @_.send remove_instance_variable :@__close_method
+        end
+      end
+
+      class MockedWaiter___
+        def initialize _
+          @_ = _
+        end
+        def wait d
+          @_.__wait_ d
+        end
+      end
+
+      class BuildExpectationScanner___
+        def initialize
+          @_a = []
+        end
+        def then m, m_=nil
+          @_a.push ExpectedCall___.new( m, m_ ) ; nil
+        end
+        def __flush_to_scanner
+          Scanner_[ remove_instance_variable :@_a ]
+        end
+      end
+
+      # ===
+
+      class ExpectedCall___
+        def initialize m_sym, m
+          @method_reference = m_sym
+          @my_method_name = m
+          freeze
+        end
+        attr_reader(
+          :method_reference,
+          :my_method_name,
+        )
+      end
+
+      module CLOSED_NATURALLY___ ; class << self
+        def gets
+          fail  # ..
+        end
+        def _hello_active
+          NOTHING_
+        end
+      end ; end
+      module CLOSED_MANALLY___ ; class << self
+        def gets
+          fail
+        end
+      end ; end
+
+      SoutAndSerr___ = ::Struct.new(
+        :_stdout_,
+        :_stderr_,
+      )
+    end
+
     class MockSystem  # the sixth system double - fully documented at [#035].
 
       class << self
@@ -449,7 +804,7 @@ module Skylab::System
     class Stubbed_Thread
 
       def initialize es
-        @value = Stubbed_Thread_Value___.new es
+        @value = StubbedThreadValue__.new es
       end
 
       attr_reader(
@@ -463,11 +818,16 @@ module Skylab::System
 
     # ==
 
-    Stubbed_Thread_Value___ = ::Struct.new :exitstatus
+    StubbedThreadValue__ = ::Struct.new(
+      :exitstatus,
+    )
 
     # ==
 
     Here_ = self
+    Home_::Doubles::StubbedSystem = self  # ..
+
   end
 end
+# #history-A.2: spike the seventh thing
 # #history: nabbed simplified rewrite from [gv]

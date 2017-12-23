@@ -7,6 +7,8 @@ module Skylab::Git
     # error lines, and a nonzero exitstatus, any of which are treated as
     # abnormal.
 
+    # if you are refactoring, consider replacing/refactoring this with [#sy-041.3]
+
     extend ProcLike_
 
     def initialize prcs, & p

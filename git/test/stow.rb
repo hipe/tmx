@@ -22,10 +22,6 @@ module Skylab::Git::TestSupport
         ::File.join Fixture_trees_[], 'stashiz'
       end )
 
-      def no_ent_path_
-        TestSupport_::Fixtures.file( :not_here )
-      end
-
       def empty_dir_
         TestSupport_::Fixtures.directory :empty_esque_directory
       end

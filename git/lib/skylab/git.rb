@@ -174,6 +174,11 @@ module Skylab::Git
       ::Shellwords
     end
 
+    String_scanner = -> do
+      require 'strscan'
+      ::StringScanner
+    end
+
     System = -> do
       System_lib[].services
     end

@@ -46,6 +46,50 @@ module Skylab::Git
 
     # ==
 
+    class StatistitcatingPool
+
+      # for a case like producing commit objects from every line of a file
+      # which you `git blame` on, it makes sense to avoid allocating tons of
+      # wasted memory that would otherwise be allocated for the many
+      # redundant data values (consider repeated commit SHA's, author names,
+      # dates, paths). #coverpoint1.1
+
+      # (this is so named becuase it *could* (but does not yet) tell you
+      # the statistics of all the commits created for it.)
+
+      def initialize
+        @_author_pool = {}
+        @_commit_via_sha = {}
+      end
+
+      def commit_via_three sha, date, author
+
+        o = @_commit_via_sha[ sha ]
+
+        if o
+          o.date_string == date || sanity
+          o.author_name == author || sanity
+        else
+
+          _use_author_s = @_author_pool.fetch author do
+            s = author.frozen? ? author : author.dup.freeze
+            @_author_pool[ s ] = s
+            s
+          end
+
+          o = Minimal___.new(
+            sha: sha.freeze,
+            date_string: date,
+            author_name: _use_author_s,
+          )
+          @_commit_via_sha[ o.SHA_string ] = o
+        end
+        o
+      end
+    end
+
+    # ==
+
     class Simple
 
       # (we were expecting maybe to cram some shared string view logic in here)
@@ -68,11 +112,42 @@ module Skylab::Git
       )
     end
 
+    # ==
+
+    class Minimal___
+
+      def initialize(
+        sha: nil,
+        date_string: nil,
+        author_name: nil
+      )
+
+        @date_time = ::DateTime.strptime date_string, DATE_TIME_FORMAT__
+        @SHA_string = sha
+        @author_name = author_name
+        freeze
+      end
+
+      def date_string
+        @date_time.strftime DATE_TIME_FORMAT__
+      end
+
+      attr_reader(
+        :author_name,
+        :date_time,
+        :SHA_string,
+      )
+    end
+
+    # ==
+
+    DATE_TIME_FORMAT__ = '%Y-%m-%d %H:%M:%S %z'
     THIS_RX___ = /\A(#{ SHORT_SHA_RXS_ })[ ](.+)\z/
 
     # ==
     # ==
   end
 end
+# #history-A.3: clean add of statisticating pool and minimal commit
 # #history-A.2: injected some stuff
 # #history: abstracted from one-off

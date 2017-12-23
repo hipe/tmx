@@ -1,20 +1,24 @@
 module Skylab::Git
 
-  class Magnetics::Commit_via_Path
+  class Magnetics::Commit_via_Path  # 1x in one-off - #not-covered!
 
     class << self
-      def call * a, & p
-        new( * a, & p ).execute
+      def call_by ** h
+        new( ** h ).execute
       end
-      alias_method :[], :call
       private :new
-    end
+    end  # >>
 
-    def initialize path, cmd_proto, sys, & p
-      @command_prototype = cmd_proto
+    def initialize(
+      path: nil,
+      command_prototype: nil,
+      system: nil,
+      listener: nil
+    )
       @path = path
-      @system = sys
-      @listener = p
+      @command_prototype = command_prototype
+      @system = system
+      @listener = listener
     end
 
     def execute

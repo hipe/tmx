@@ -364,7 +364,7 @@ module Skylab::Git
     private
       def produce_sexp
         @sexp = []
-        @scn = begin require 'strscan' ; ::StringScanner end.new @pattern_s
+        @scn = Home_.lib_.string_scanner.new @pattern_s
         while ! @scn.eos?
           len = @sexp.length
           pln = @scn.scan( PLAIN_RX__ ) and @sexp << Sexp__[ :plain, pln ]

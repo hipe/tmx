@@ -1,19 +1,24 @@
 module Skylab::Git
 
-  class Magnetics::CommitStream_via_Path
+  class Magnetics::CommitStream_via_Path  # 1x in one-off - #not-covered!
 
     class << self
-      def for rsx
-        new( rsx.path, rsx.command_prototype, rsx.system, & rsx.listener ).execute
+      def call_by ** hh
+        new( ** hh ).execute
       end
       private :new
     end  # >>
 
-    def initialize path, cmd_proto, system, & p
-      @command_prototype = cmd_proto
+    def initialize(
+      path: nil,
+      command_prototype: nil,
+      system: nil,
+      listener: nil
+    )
       @path = path
+      @command_prototype = command_prototype
       @system = system
-      @_on_event_selectively = p
+      @listener = listener
     end
 
     def execute
@@ -21,7 +26,7 @@ module Skylab::Git
       cmd.concat COMMAND_BODY___
       cmd.push @path
 
-      @_on_event_selectively.call( :info, :command ) { cmd }
+      @listener.call( :info, :command ) { cmd }
 
       _a = * remove_instance_variable( :@system ).popen3( * cmd )
       @_process = Process_[ * _a, cmd ]
@@ -51,7 +56,7 @@ module Skylab::Git
 
     def __when_no_err_line
       path = @path
-      @_on_event_selectively.call :error, :expression do |y|
+      @listener.call :error, :expression do |y|
         y << "found no commits for `#{ path }` - does the file exist?"
       end
       UNABLE_
@@ -74,7 +79,7 @@ module Skylab::Git
 
     def _when_err_line line
       _o = Magnetics::Expression_via_Process_that_ProbablyFailed.new(
-        @_process, & @_on_event_selectively )
+        @_process, & @listener )
       _o.when_stderr_line line
       UNABLE_
     end
@@ -86,3 +91,4 @@ module Skylab::Git
     end
   end
 end
+# #history-A.1: converted to use named arguments in construction

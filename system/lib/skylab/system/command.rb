@@ -2,7 +2,7 @@
 
 module Skylab::System
 
-  module Command
+  module Command  # :[#041.3]
 
     # this node is a melting pot of a variety of related concerns (whose
     # work spans years):
@@ -27,6 +27,28 @@ module Skylab::System
       # NOTE - our name is not a typo. this is a "processER", not a
       # processOR. a "widgeter" is something that makes widgets. a
       # "processER" is something that makes processes. sorry.
+
+      class << self
+
+        def getser_by(
+          command_string_array: nil,
+          piper: nil,
+          spawner: nil,
+          waiter: nil,
+          listener: nil
+        )
+          # (experiment - normally subject is used as a prototype)
+
+          _pcr = define do |o|
+            o.piper = piper
+            o.spawner = spawner
+            o.process_waiter = waiter
+            o.listener = listener
+          end
+
+          _pcr.process_via_command_tokens command_string_array
+        end
+      end  # >>
 
       def initialize
         @_is_abstract = false
@@ -114,6 +136,8 @@ module Skylab::System
 
       def _process_via tox
 
+        # (if you change the orders of things it will break :[#041.D.2] YIKES)
+
         out_read, out_write = @piper.pipe
         err_read, err_write = @piper.pipe
 
@@ -179,6 +203,14 @@ module Skylab::System
         send @_was_OK
       end
 
+      def nonzero_exitstatus
+        send @nonzero_exitstatus
+      end
+
+      def __nonzero_exitstatus
+        @__nonzero_exitstatus
+      end
+
       def __gets_via_payback
         @_gets = remove_instance_variable :@__gets_on_deck
         remove_instance_variable :@__string_on_deck
@@ -225,12 +257,15 @@ module Skylab::System
         io.close
         d = _flush_unexpected_exitstatus
         if d
+          @nonzero_exitstatus = :__nonzero_exitstatus
+          @__nonzero_exitstatus = d
           lines.last << " (exitstatus: #{ d })"
         end
         @listener.call :error, :expression, :system_error do |y|
           lines.each do |s|
             y << s
           end
+          y
         end
         @_was_OK = :__false ; nil
       end
@@ -269,7 +304,7 @@ module Skylab::System
       def _flush_exitstatus
         _pid = remove_instance_variable :@__PID
         remove_instance_variable( :@process_waiter ).wait _pid
-        $?.exitstatus  # yuck ..
+        LAST_PROCESS_STATUS.read[].exitstatus
       end
 
       def _close_err_read
@@ -506,6 +541,17 @@ module Skylab::System
       attr_reader(
         :command_tokens,
       )
+    end
+
+    # ==
+
+    module LAST_PROCESS_STATUS  # [sy] only
+      class << self
+        attr_accessor :read
+      end  # >>
+      @read = -> do
+        $?  # yuck
+      end
     end
 
     # ==

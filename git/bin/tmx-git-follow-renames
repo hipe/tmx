@@ -115,7 +115,12 @@ class Skylab_Git__follow_renames__one_off
 
       # (a hand-written map-expand and then map-reduce..)
 
-      ci_st = @_magnetics::CommitStream_via_Path.for self
+      ci_st = @_magnetics::CommitStream_via_Path.call_by(
+        path: @path,
+        command_prototype: @command_prototype,
+        system: @system,
+        listener: @listener,
+      )
 
       @_current_path = @path
       @_next_current_path = @_current_path
@@ -271,13 +276,6 @@ class Skylab_Git__follow_renames__one_off
     def _program_name
       ::File.basename @program_name_string_array.fetch(-1)
     end
-
-    attr_reader(
-      :path,
-      :command_prototype,
-      :system,
-      :listener,
-    )
 
     # ==
 
