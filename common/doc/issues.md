@@ -1,3 +1,7 @@
+[#071]       renames like these ..
+       #open (use the more appropriate names for these, especially reduce)
+             [#here.2] `flat_map_by` not `expand_by`
+
 [#070]       #track #short-lived constructing events with positional args
              with `new` not just `[]`
 

@@ -20,6 +20,11 @@
 
 [#038]       want line
 
+             :[#here.3]: track similar. asserting an expected list against
+             an actual list in this manner is definitely a thing. sometimes
+             we consdider abstracting it. finding all these might be hard, tho..
+
+
 [#037]       fixtures
 
              [#here.1] (not referenced) [#sy-008.1] expects the two files in

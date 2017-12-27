@@ -12,11 +12,19 @@ module Skylab::Arc::TestSupport
 
     define_singleton_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
 
-    define_method :mutable_config_for_story_A_, ( Lazy_.call do
+    dangerous_memoize :mutable_config_for_story_A_ do
 
-      fixture_files_ = ::File.join TS_.dir_path, 'fixture-files'
+      _MC_CGM '050-whiteboard-story-A.cfg'
+    end
 
-      _path = ::File.join fixture_files_, '050-whiteboard-story-A.cfg'
+    dangerous_memoize :mutable_config_for_story_B_ do
+
+      _MC_CGM '070-story-B-before.cfg'
+    end
+
+    def _MC_CGM tail
+
+      _path = ::File.join fixture_files_, tail
 
       _cfg = Home_.lib_.brazen_NOUVEAU::CollectionAdapters::GitConfig::Mutable.parse_document_by do |o|
         o.upstream_path = _path
@@ -24,6 +32,10 @@ module Skylab::Arc::TestSupport
       end
 
       _cfg  # hi. #todo
+    end
+
+    define_method :fixture_files_, ( Lazy_.call do
+      ::File.join TS_.dir_path, 'fixture-files'
     end )
 
     define_method :qualified_component_for_story_A_, ( Lazy_.call do
@@ -71,60 +83,89 @@ module Skylab::Arc::TestSupport
     end )
 
     #
-    # magnet 400
+    # magnet 500: unit of work stream
     #
 
-    def get_big_array_for_story_B__  # #coverpoint2.5
+    def want_squential_component_offsets_are_represented_ uow_st, exp_component_num
+      Here_::Unit_of_Work_Stream_via_Spoof::VISITING_this_guy[ uow_st, exp_component_num ]
+    end
+
+    def unit_of_work_stream_via_spoof_ ** hh
+
+      _five = Here_::Unit_of_Work_Stream_via_Spoof.call_by( ** hh, lib: self )
+      product_of_magnetic_500_via_five_( * _five )
+    end
+
+    def product_of_magnetic_500_via_five_ d, _100, _200, _300, _400
+
+      magnet_500_.call_by(
+        capsulization: _400,
+        one_two_three: [ _100, _200, _300 ],
+        number_of_components: d,
+      )
+    end
+
+    def magnet_500_
+      _protected_magnetics_GFM::UnitOfWorkStream_via_Capsulization
+    end
+
+    #
+    # magnet 400: capsulization
+    #
+
+    dangerous_memoize :product_of_magnetic_400_for_story_B_ do  # #coverpoint2.5
 
       # NOTE - hard to read at first: the first level of elements corresponds
       # to clusters. (2 elements so 2 clusters.)
       #
-      # for the second level of elements, if the element is an `_associated_`,
+      # for the second level of elements, if the element is an `_static_associated__associated_offset_`,
       # the number next to it is an offset to an association (as described at
-      # [#024.N] "why?"). if it's `_non_associated_` then the number is
+      # [#024.N] "why?"). if it's `_non_associated__number_of_fellows_` then the number is
       # simply a count of holes (i.e sections that are not associated, i.e
       # will be deleted).
 
-      [
+      _ = product_of_magnetic_300_SPOOFED_(
         [
-          [ :_associated_, 0 ],
-          [ :_non_associated_, 2 ],
-          [ :_associated_, 2 ],
-          [ :_non_associated_, 1 ],
+          [ :_static_associated__associated_offset_, 0 ],
+          [ :_non_associated__number_of_fellows_, 2 ],
+          [ :_static_associated__associated_offset_, 2 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
         ],
         [
-          [ :_non_associated_, 1 ],
-          [ :_associated_, 8 ],
-          [ :_non_associated_, 1 ],
-          [ :_associated_, 12 ],
-          [ :_non_associated_, 1 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
+          [ :_static_associated__associated_offset_, 8 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
+          [ :_static_associated__associated_offset_, 12 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
         ],
-      ]
+      )
+      call_magnetic_400_ _
     end
 
-    def get_big_array_for_story_C__  # #coverpoint2.6
-      [
+    dangerous_memoize :product_of_magnetic_400_for_story_C_ do  # #coverpoint2.6
+      _ = product_of_magnetic_300_SPOOFED_(
         [
-          [ :_associated_, 66 ],
-          [ :_non_associated_, 1 ],
+          [ :_static_associated__associated_offset_, 66 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
         ],
         [
-          [ :_non_associated_, 2 ],
+          [ :_non_associated__number_of_fellows_, 2 ],
         ],
         [
-          [ :_non_associated_, 3 ],
+          [ :_non_associated__number_of_fellows_, 3 ],
         ],
         [
-          [ :_non_associated_, 2 ],
+          [ :_non_associated__number_of_fellows_, 2 ],
         ],
         [
-          [ :_non_associated_, 1 ],
-          [ :_associated_, 99 ],
+          [ :_non_associated__number_of_fellows_, 1 ],
+          [ :_static_associated__associated_offset_, 99 ],
         ],
-      ]
+      )
+      call_magnetic_400_ _
     end
 
-    def call_magnetic_400_HACKED_ big_a
+    def call_magnetic_400_ big_a
 
       magnet_400_.call_by do |o|
         o.reallocation_schematic = big_a
@@ -136,24 +177,32 @@ module Skylab::Arc::TestSupport
     end
 
     #
-    # magnet 300
+    # magnet 300: reallocation schematic
     #
 
     dangerous_memoize :product_of_magnetic_300_for_story_A_MOCKED_ do
-      _these = [
+      product_of_magnetic_300_SPOOFED_(
         [
-          [:_associated_, 2],
-          [:_associated_, 3],
+          [ :_static_associated__associated_offset_, 2 ],
+          [ :_static_associated__associated_offset_, 3 ],
         ],
         [
-          [:_non_associated_, 5],
+          [ :_non_associated__number_of_fellows_, 5 ],
         ],
         [
-          [:_associated_, 4],
-          [:_associated_, 5],
+          [ :_static_associated__associated_offset_, 4 ],
+          [ :_static_associated__associated_offset_, 5 ],
         ]
-      ]
-      Freeze_recursive__[ 3, _these ]
+      )
+    end
+
+    dangerous_memoize :product_of_magnetic_300_for_story_B_ do
+
+      _edi = product_of_magnetic_100_for_story_B_
+
+      _pci = product_of_magnetic_200_for_story_B_  # pluralton component index (associated locator offset schematic)
+
+      build_product_of_magnetic_300_ _pci, _edi
     end
 
     def build_product_of_magnetic_300_for_story_A_OF_PARTIALLY_MOCKED_SOURCES___
@@ -161,14 +210,31 @@ module Skylab::Arc::TestSupport
       #   - a call to real system diff is not mocked
       #   - the two indexes are mocked, but "guaranteed" to be OK at writing
 
-      _existing_document_index = product_of_magnetic_100_for_story_A_MOCKED_
+      _100 = product_of_magnetic_100_for_story_A_MOCKED_
 
-      _pluralton_component_index = product_of_magnetic_200_for_story_A_MOCKED_
+      _200 = product_of_magnetic_200_for_story_A_MOCKED_
 
+      build_product_of_magnetic_300_ _200, _100
+    end
+
+    def build_product_of_magnetic_300_for_story_B__
+
+      _100 = product_of_magnetic_100_for_story_B_
+
+      _200 = product_of_magnetic_200_for_story_B_
+
+      build_product_of_magnetic_300_ _200, _100
+    end
+
+    def build_product_of_magnetic_300_ pci, edi
       magnet_300_.call_by do |o|
-        o.pluralton_components_index = _pluralton_component_index
-        o.existing_document_index = _existing_document_index
+        o.pluralton_components_index = pci
+        o.existing_document_index = edi
       end
+    end
+
+    def product_of_magnetic_300_SPOOFED_ * clust_a
+      magnet_300_.VIA_CONDENSED clust_a
     end
 
     def magnet_300_
@@ -176,7 +242,7 @@ module Skylab::Arc::TestSupport
     end
 
     #
-    # magnet 200
+    # magnet 200: pluralton components index
     #
 
     dangerous_memoize :product_of_magnetic_200_for_story_A_MOCKED_ do
@@ -184,38 +250,53 @@ module Skylab::Arc::TestSupport
       # don't go thru the liability of all that other undertaking, but
       # NOTE incur a different liabiliity
 
+      _spoofed = product_of_magnetic_200_SPOOFED_HACKISHLY_(
+        associated_schema: [[2, 3], [nil, 1, nil, nil, 0], [4, 5]],
+        # the above integers are offsets of the below *line items*. they
+        # are *not* component offsets. so they must be 0-N.
+
+        associations_YUCK: -> o do
+          # component offset, cluster offset, offset in cluster
+          o[ 0, 1, 4 ]
+          o[ 2, 1, 1 ]
+          o[ 3, 0, 0 ]
+          o[ 4, 0, 1 ]
+          o[ 5, 2, 0 ]
+          o[ 6, 2, 1 ]
+        end,
+        # YUCK: first column: component offsets. can be any positive integer
+        # but must be in order. 2nd and 3rd column: cluster offset and offset
+        # in cluster.
+      )
+
       # _real = product_of_magnetic_200_for_story_A_
 
-      mag = magnet_200_
-      yikes = mag.allocate
+      _spoofed
+    end
 
-      _these = _same_freeze_ARC_GCM [[2, 3], [nil, 1, nil, nil, 0], [4, 5]]
+    def product_of_magnetic_200_SPOOFED_HACKISHLY_ ** hh
 
-      yikes.instance_variable_set :@associated_locator_offsets_schematic, _these
-
-      o = -> d, * these_two do
-        mag::AssociatedLocators___.new d, these_two.freeze
-      end
-
-      yikes.instance_variable_set :@associated_locators, [
-        o[ 0, 1, 4 ],
-        o[ 2, 1, 1 ],
-        o[ 3, 0, 0 ],
-        o[ 4, 0, 1 ],
-        o[ 5, 2, 0 ],
-        o[ 6, 2, 1 ],
-      ].freeze
-
-      yikes.freeze
+      _mod = magnet_200_
+      _mod.VIA_CONDENSED( ** hh )
     end
 
     dangerous_memoize :product_of_magnetic_200_for_story_A_ do
 
-      edi = product_of_magnetic_100_for_story_A_
-      qc = qualified_component_for_story_A_
-      epi = mutable_indexer_for_story_A_
+      _edi = product_of_magnetic_100_for_story_A_
+      _qc = qualified_component_for_story_A_
+      _epi = mutable_indexer_for_story_A_
+      _200_GCM _edi, _qc, _epi
+    end
 
-      # --
+    dangerous_memoize :product_of_magnetic_200_for_story_B_ do
+
+      _edi = product_of_magnetic_100_for_story_B_
+      _qc = qualified_component_for_story_B_
+      _epi = mutable_indexer_for_story_B_
+      _200_GCM _edi, _qc, _epi
+    end
+
+    def _200_GCM edi, qc, epi
 
       _ = magnet_200_.call_by do |o|
 
@@ -234,31 +315,53 @@ module Skylab::Arc::TestSupport
     end
 
     #
-    # magnet 100
+    # magnet 100: existing document index
     #
 
     dangerous_memoize :product_of_magnetic_100_for_story_A_MOCKED_ do
 
+      # this saves us on the huge code liability of
+      # maintaining a big document BUT
+
       # don't go thru the liability of all that other undertaking, but
       # NOTE incur a different liabiliity
 
-      # _real = product_of_magnetic_100_for_story_A_
+      _mod = magnet_100_
 
-      yikes = magnet_100_.allocate
-      _these = _same_freeze_ARC_GCM [[1, 1], [2, 3, 3, 3, 4], [5, 6]]
-      yikes.instance_variable_set :@profile_schematic, _these
-      yikes.freeze
+      _these = [[1, 1], [2, 3, 3, 3, 4], [5, 6]]
+
+      _spoofed = _mod.VIA_CONDENSED _these
+
+      # _real = product_of_magnetic_100_for_story_A_
+      # be sure to check that real equals spoofed whenever appropriate
+
+      _spoofed
     end
 
     dangerous_memoize :product_of_magnetic_100_for_story_A_ do  # "product of magnetic 100" = existing document index
 
-      me = mutable_entity_for_story_A_
-      qc = qualified_component_for_story_A_
-      epi = mutable_indexer_for_story_A_
+      _me = mutable_entity_for_story_A_
+      _qc = qualified_component_for_story_A_
+      _epi = mutable_indexer_for_story_A_
 
-      # --
+      _mag_100_GCM _me, _qc, _epi
+    end
 
-      _sym = qc.name_symbol
+    dangerous_memoize :product_of_magnetic_100_for_story_B_ do
+
+      _me = mutable_entity_for_story_B_
+      _qc = qualified_component_for_story_B_
+      _epi = mutable_indexer_for_story_B_
+
+      _mag_100_GCM _me, _qc, _epi
+    end
+
+    def _mag_100_GCM me, qc, epi
+
+      ugh = qc.name.as_lowercase_with_underscores_string
+      # #todo - something's not right when your association has all caps..
+
+      _sym = ugh.downcase.intern
 
       magnet_100_.call_by do |o|
         o.mutable_entity = me
@@ -270,13 +373,29 @@ module Skylab::Arc::TestSupport
     end
 
     dangerous_memoize :mutable_entity_for_story_A_ do
-      _mc = mutable_config_for_story_A_
+      _ME_CGM :mutable_config_for_story_A_
+    end
+
+    dangerous_memoize :mutable_entity_for_story_B_ do
+      _ME_CGM :mutable_config_for_story_B_
+    end
+
+    def _ME_CGM m
+      _mc = send m
       build_mutable_entity_by_ do |o|
         o._config_for_write_ = _mc
       end
     end
 
     dangerous_memoize :mutable_indexer_for_story_A_ do
+      _EPI_GCM
+    end
+
+    dangerous_memoize :mutable_indexer_for_story_B_ do
+      _EPI_GCM
+    end
+
+    def _EPI_GCM
       Home_::GitConfigMagnetics_::EntityProfileIndexer.new  # should be 1 of 2 when all is dnne
     end
 
@@ -302,11 +421,11 @@ module Skylab::Arc::TestSupport
       Home_::Magnetics::QualifiedComponent_via_Value_and_Association::Listener_that_raises_exceptions_
     end
 
-    def _same_freeze_ARC_GCM these
-      Freeze_recursive__[ 2, these ]
+    def _protected_magnetics_GFM
+      These_magnetics__[]
     end
 
-    def _protected_magnetics_GFM
+    These_magnetics__ = -> do
       Home_::GitConfigMagnetics_
     end
 
@@ -329,14 +448,10 @@ module Skylab::Arc::TestSupport
 
       class PerishableFoodItem < Same_
 
-        def _xx_
-        end
       end
 
       class PhysicalObject < Same_
 
-        def _xx_
-        end
       end
 
       Autoloader_[ self, :boxxy ]  # because #here2
@@ -434,25 +549,11 @@ module Skylab::Arc::TestSupport
       )
     end
 
-    # ==
-
-    Freeze_recursive__ = -> do
-      base_case = :freeze.to_proc
-      -> d, these do
-        visit = if 2 == d
-          base_case
-        else
-          Freeze_recursive__.curry[ d - 1 ]
-        end
-        these.each do |x|
-          visit[ x ]
-        end
-        these.freeze
-      end
-    end.call
+    Here_ = self
 
     # ==
     # ==
   end
 end
+# #pending-rename: branch down, probably
 # #born (was stashed for ~6 months)

@@ -35,19 +35,19 @@ module Skylab::Arc::TestSupport
       end
 
       it %q(then there's this guy) do
-        number_of_nils, number_of_not_nils = _build_this_other_index  # SEE
+        number_of_nils, number_of_not_nils = _count_nils_and_not_nils  # SEE
         number_of_nils == 3 || fail
         number_of_not_nils == 6 || fail
       end
 
       shared_subject :_this_one_index do
-        _build_this_one_index
+        __calculate_these_two_numbers
       end
 
       alias_method :_subject, :product_of_magnetic_200_for_story_A_
     end
 
-    def _build_this_other_index  # #coverpoint2.4
+    def _count_nils_and_not_nils  # #coverpoint2.4
 
       # the index "member" that we're testing traces the "schematic"
       # structure of the document by relating the sections within clusters
@@ -66,13 +66,15 @@ module Skylab::Arc::TestSupport
       number_of_nils = 0
       number_of_not_nils = 0
 
-      locators = _first_member_of_the_index
+      associations = _first_member_of_the_index
 
-      _d_a_a = _second_member_of_the_index
-      _d_a_a.each_with_index do |d_a, clust_d|
-        d_a.each_with_index do |d, offset_in_clust_d|
+      _associated_clusters = _second_member_of_the_index
+
+      _associated_clusters.clusters.each_with_index do |ac, clust_d|
+
+        ac.sparse_associated_offsets.each_with_index do |d, offset_in_clust_d|
           if d
-            _assocd_locs = locators.fetch d
+            _assocd_locs = associations.fetch d
             act_clust_d, act_offset_in_clust_d = _assocd_locs.document_locator
             act_clust_d == clust_d || fail
             act_offset_in_clust_d == offset_in_clust_d || fail
@@ -86,7 +88,7 @@ module Skylab::Arc::TestSupport
       [ number_of_nils, number_of_not_nils ]
     end
 
-    def _build_this_one_index  # #coverpoint2.3
+    def __calculate_these_two_numbers  # #coverpoint2.3
 
       # obnoxiously, we won't build any of the assumptions deeply into
       # how we build the index ..
@@ -110,9 +112,9 @@ module Skylab::Arc::TestSupport
       these = %i( D Q C A A_prime E F )
         # these must corresond to the component list there in our coverpoint
 
-      _locs = _first_member_of_the_index
-      _locs.each do |locators|
-        _d = locators.component_locator
+      _assocs = _first_member_of_the_index
+      _assocs.each do |association|
+        _d = association.COMPONENT_OFFSET
         k = these.fetch _d
         candidate_max = ( counts[k] || 0 ) + 1
         counts[k] = candidate_max
@@ -127,7 +129,7 @@ module Skylab::Arc::TestSupport
     end
 
     def _second_member_of_the_index
-      _subject.associated_locator_offsets_schematic
+      _subject.associated_clusters
     end
 
     # ==

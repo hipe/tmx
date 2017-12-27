@@ -2,7 +2,7 @@ module Skylab::Basic
 
   class Algorithm::BucketList_that_is_FairlyDistributed_via_WeightedTupleStream_and_N_Buckets  # [#ba-059]
 
-    # this is what we generally call the "divvy algorithm". in synopsis:
+    # this is what we generally call the :[#059] "divvy algorithm". in synopsis:
     #
     #   - partition the argument list (as a stream) into argument N
     #     (two or more) buckets in such a way that the weight of the
@@ -267,10 +267,10 @@ module Skylab::Basic
           num = tuple.send m
           case 0 <=> num
           when -1
-            a.push Record___[ num, tuple ]
+            a.push Record__[ num, tuple ]
           when 0
             # hi.
-            a.push Record___[ num, tuple ]
+            a.push Record__[ num, tuple ]
           else
             self._DESIGN_ME_COVER_ME__main_quantity_is_below_zero__  # #here-1
           end
@@ -285,7 +285,10 @@ module Skylab::Basic
 
     # ==
 
-    Record___ = ::Struct.new :number, :tuple
+    Record__ = ::Struct.new(
+      :number,
+      :tuple,
+    )
 
     # ==
 
@@ -331,7 +334,6 @@ module Skylab::Basic
     end ; end
 
     # ==
-
     # ==
   end
 end

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe "[ac] git config magnetics - capsulization stream via reallocation schema" do
+  describe "[ac] git config magnetics - capsulization via reallocation schema" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -93,14 +93,12 @@ module Skylab::Arc::TestSupport
       end
     end
 
-    shared_subject :_story_B_result do
-      _arr = get_big_array_for_story_B__
-      call_magnetic_400_HACKED_ _arr
+    def _story_B_result
+      product_of_magnetic_400_for_story_B_
     end
 
-    shared_subject :_story_C_result do
-      _arr = get_big_array_for_story_C__
-      call_magnetic_400_HACKED_ _arr
+    def _story_C_result
+      product_of_magnetic_400_for_story_C_
     end
 
     # --

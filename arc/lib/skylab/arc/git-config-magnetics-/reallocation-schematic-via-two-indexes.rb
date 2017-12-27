@@ -45,22 +45,22 @@ module Skylab::Arc
         yes_h = remove_instance_variable :@__yes_hash
         no_h = remove_instance_variable :@__no_hash
 
-        @pluralton_components_index.associated_locator_offsets_schematic.each do |cluster|
+        @pluralton_components_index.associated_clusters.clusters.each do |ac|
           count = 0
           a = []
 
           maybe_flush_count = -> do
             if count.nonzero?
-              a.push [ :_non_associated_, count ].freeze
+              a.push NonAssociatedClusterSegment___.new count
               count = 0
             end
           end
 
-          cluster.each do |d|
+          ac.sparse_associated_offsets.each do |d|
             if d
               if yes_h[ d ]
                 maybe_flush_count[]
-                a.push [ :_associated_, d ]
+                a.push StaticAssociatedClusterSegment___.new d
               else
                 no_h.fetch d  # sanity
                 count += 1
@@ -233,14 +233,15 @@ module Skylab::Arc
       def __diff
 
         a = []
-        @pluralton_components_index.associated_locator_offsets_schematic.each do |sparse|
-          sparse.each do |d|
+        @pluralton_components_index.associated_clusters.clusters.each do |ac|
+          ac.sparse_associated_offsets.each do |d|
             d || next
             a.push d
           end
         end
 
         _put_these_in_file_CURRENT = a
+
         _put_these_in_file_GOAL = @pluralton_components_index.associated_locators.length.times.to_a
 
         _current_st = Stream_.call _put_these_in_file_CURRENT do |d|
@@ -300,6 +301,74 @@ module Skylab::Arc
       attr_reader(
         :is_stationary,
       )
+    end
+
+    # ==
+
+    def self.VIA_CONDENSED clusters
+      clusters.map do |cluster|
+        cluster.map do |sym, d|
+          case sym
+          when :_static_associated__associated_offset_
+            StaticAssociatedClusterSegment___.new d
+          when :_non_associated__number_of_fellows_
+            NonAssociatedClusterSegment___.new d
+          else ; no
+          end
+        end.freeze
+      end.freeze
+    end
+
+    WrapperOfInteger__ = ::Class.new
+
+    class StaticAssociatedClusterSegment___ < WrapperOfInteger__  # #testpoint
+      def initialize d
+        @associated_offset = d
+        freeze
+      end
+      attr_reader(
+        :associated_offset,
+      )
+      alias_method :_integer, :associated_offset
+      protected :_integer
+      def is_static_associated
+        true
+      end
+      def segment_category_symbol
+        :_static_associated__associated_offset_
+      end
+      def HELLO_ASSOCIATED
+        NOTHING_
+      end
+    end
+
+    class NonAssociatedClusterSegment___ < WrapperOfInteger__  # #testpoint
+      def initialize d
+        @number_of_non_associated_fellows = d
+        freeze
+      end
+      attr_reader(
+        :number_of_non_associated_fellows,
+      )
+      alias_method :_integer, :number_of_non_associated_fellows
+      protected :_integer
+      def is_static_associated
+        false
+      end
+      def segment_category_symbol
+        :_non_associated__number_of_fellows_
+      end
+      def HELLO_NON_ASSOCIATED
+        NOTHING_
+      end
+    end
+
+    class WrapperOfInteger__
+      def == otr
+        if otr.class == self.class
+          _integer == otr._integer
+        end
+      end
     end
 
     # ==

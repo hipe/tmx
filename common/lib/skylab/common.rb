@@ -552,6 +552,7 @@ module Skylab::Common
         p[]
       end
     end
+    alias_method :flat_map_by, :expand_by  # #open [#071.2]
 
     # ~ produce a new stream that is mapped and reduced
 

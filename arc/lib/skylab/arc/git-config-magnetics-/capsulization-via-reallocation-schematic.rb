@@ -22,10 +22,10 @@ module Skylab::Arc
           @_current_cluster = cluster
           __on_begin_cluster
 
-          @_current_cluster.each_with_index do |(sym, x), dd|
+          @_current_cluster.each_with_index do |segment, dd|
 
             @_current_cluster_element_offset = dd
-            send THESE___.fetch( sym ), x
+            send THESE___.fetch segment.segment_category_symbol
           end
 
           __on_end_cluster
@@ -39,8 +39,8 @@ module Skylab::Arc
       end
 
       THESE___ = {
-        _associated_: :__on_associated,
-        _non_associated_: :__on_unassociated,
+        _static_associated__associated_offset_: :__on_static_associated,
+        _non_associated__number_of_fellows_: :__on_unassociated,
       }
 
       # -- D. the interesting parts of the state transitions
@@ -81,12 +81,12 @@ module Skylab::Arc
 
       # -- C. simple things that drive the state machine
 
-      def __on_unassociated d
+      def __on_unassociated
         _receive_state_transition :unassociated
         NIL
       end
 
-      def __on_associated d
+      def __on_static_associated
         _receive_state_transition :associated
         NIL
       end

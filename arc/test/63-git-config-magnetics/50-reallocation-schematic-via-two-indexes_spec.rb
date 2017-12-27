@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Arc::TestSupport
 
-  describe '[ac] git config magnetics - existing document index via entity profile indexer' do
+  describe '[ac] git config magnetics - reallocation schematic via two indexes' do
 
     TS_[ self ]
     use :memoizer_methods
@@ -17,6 +17,7 @@ module Skylab::Arc::TestSupport
     it '(story A)', slow: true do  # slow because uses real diff
 
       _exp = product_of_magnetic_300_for_story_A_MOCKED_
+
       _act = build_product_of_magnetic_300_for_story_A_OF_PARTIALLY_MOCKED_SOURCES___
 
       _act == _exp || fail  # recursive equals would be nice

@@ -44,7 +44,7 @@ module Skylab::Arc
 
       def execute
 
-        @profile_schematic = []
+        @_clusters = []
 
         ok = __resolve_clusters
         ok &&= __resolve_profile_schematic
@@ -52,12 +52,7 @@ module Skylab::Arc
       end
 
       def __finish
-        remove_instance_variable :@__models_feature_branch
-        remove_instance_variable :@entity_profile_indexer
-        remove_instance_variable :@listener
-        @profile_schematic.map( & :freeze )
-        @profile_schematic.freeze
-        freeze  # (at writing, leaves only @profile_schematic)
+        ExistingDocumentIndex___.new remove_instance_variable( :@_clusters ).freeze
       end
 
       # -- E: index every relevant entity in the document
@@ -69,15 +64,31 @@ module Skylab::Arc
         _clusters = remove_instance_variable :@__clusters
 
         _clusters.each_with_index do |cluster, cluster_d|
+
           @__current_cluster_offset = cluster_d
-          @profile_schematic.push []
+          @_mutable_a = []
+
           cluster.each_with_index do |os, os_d|  # os = offset/section
+
             @_current_relevant_section = os.section
-            ok = __resolve_entity_via_section
+
+            if ! __resolve_model
+              # skip sections that don't look like they are participating
+              break
+            end
+
+            # if a section looks like it's participating but doesn't
+            # unserialize, probably whine
+
+            ok = __resolve_entity_via_model
             ok || break
+
             @__current_section_in_cluster_offset = os_d
             __index_current_entity_which_is_in_document
           end
+          ok || break
+
+          @_clusters.push ProfiledCluster___.new remove_instance_variable( :@_mutable_a ).freeze
           remove_instance_variable :@__current_cluster_offset
         end
 
@@ -97,7 +108,9 @@ module Skylab::Arc
           @__current_cluster_offset,
         )
 
-        @profile_schematic.last[ csico ] = sct.profile_integer
+        mutable_a = @_mutable_a
+        mutable_a.length == csico || oops
+        mutable_a[ csico ] = sct.profile_integer
 
         NIL
       end
@@ -105,10 +118,6 @@ module Skylab::Arc
       # -- C: resolve entity via section
 
       def __resolve_entity_via_section
-
-        if __resolve_model
-          __resolve_entity_via_model
-        end
       end
 
       def __resolve_entity_via_model
@@ -207,9 +216,42 @@ module Skylab::Arc
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     # -
 
+    # ==
+
+    def self.VIA_CONDENSED d_a_a
+      _o_a = d_a_a.map do |d_a|
+        ProfiledCluster___.new d_a.freeze
+      end
+      ExistingDocumentIndex___.new _o_a.freeze
+    end
+
+    class ExistingDocumentIndex___
+      def initialize c_a
+        @profiled_clusters = c_a
+        freeze
+      end
+      def TO_CONDENSED
+        @profiled_clusters.map( & :TO_CONDENSED ).freeze
+      end
       attr_reader(
-        :profile_schematic,
+        :profiled_clusters,
       )
+    end
+
+    # ==
+
+    class ProfiledCluster___
+      def initialize d_a
+        @profile_offsets = d_a
+        freeze
+      end
+      def TO_CONDENSED
+        @profile_offsets
+      end
+      attr_reader(
+        :profile_offsets,
+      )
+    end
 
     # ==
     # ==

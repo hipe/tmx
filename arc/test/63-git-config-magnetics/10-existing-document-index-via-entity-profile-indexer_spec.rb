@@ -36,19 +36,16 @@ module Skylab::Arc::TestSupport
         _subject || fail
       end
 
-      it 'profile schematic looks write per the story' do  # (as seen in a document at coverpoint)
-        _ = _profile_schematic
+      it 'profiled clusters looks right per the story' do  # (as seen in a document at coverpoint)
+
+        _ = _subject.TO_CONDENSED
         _ == [[1, 1], [2, 3, 3, 3, 4], [5, 6]] || fail
       end
 
-      it 'profile schematic is frozen' do
-        x = _profile_schematic
+      it 'profiled clusters array is frozen, as is each item probably' do
+        x = _subject.profiled_clusters
         x.frozen? || fail
         x.first.frozen? || fail
-      end
-
-      def _profile_schematic
-        _subject.profile_schematic
       end
 
       alias_method :_subject, :product_of_magnetic_100_for_story_A_

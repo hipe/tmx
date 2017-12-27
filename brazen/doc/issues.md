@@ -225,6 +225,11 @@
 [#029] #open in git-config, in read-only, try making an assignment with an
              underscore `foo_bar = xx` then reading the assigment as a parsed
              structure
+
+       #open :[#here.2]: this tracks the desire that assignments look like
+             a qualified known known (expose a `name` method) so we don't
+             have to convert them ([arc])
+
              ( #moved-to: [#028.B] )
 
 [#028]       entity collection via git config ..

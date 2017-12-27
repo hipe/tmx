@@ -41,20 +41,15 @@ module Skylab::Arc
       )
 
       def execute
-        @associated_locators = []
-        __work
-        __finish
-      end
 
-      def __finish
-        remove_instance_variable :@entity_profile_indexer
-        remove_instance_variable :@existing_document_index
-        remove_instance_variable :@listener
-        remove_instance_variable :@qualified_component
-        @associated_locator_offsets_schematic.map( & :freeze )
-        @associated_locator_offsets_schematic.freeze
-        @associated_locators.freeze
-        freeze
+        @associated_locators = []
+
+        __work
+
+        PluraltonComponentsIndex___.new(
+          remove_instance_variable( :@_mutable_schema ),
+          remove_instance_variable( :@associated_locators ),
+        )
       end
 
       def __work
@@ -62,8 +57,8 @@ module Skylab::Arc
         # NOTE - change arrays to hashes, maybe change identities to offset
         # into one or the other structure
 
-        @associated_locator_offsets_schematic = @existing_document_index.profile_schematic.map do |d_a|
-          ::Array.new d_a.length
+        @_mutable_schema = @existing_document_index.profiled_clusters.map do |pc|
+          ::Array.new pc.profile_offsets.length
         end
 
         # for each entity in the new list of components [#024.E] "N"..
@@ -116,21 +111,75 @@ module Skylab::Arc
           d = @associated_locators.length
           @associated_locators.push AssociatedLocators___.new( ent_locator, doc_locator )
 
-          @associated_locator_offsets_schematic[ doc_locator.first ][ doc_locator.last ] = d
+          @_mutable_schema[ doc_locator.first ][ doc_locator.last ] = d
         end
 
         NIL
       end
-
-      attr_reader(
-        :associated_locators,
-        :associated_locator_offsets_schematic,  # discussed at #coverpoint2.4
-      )
     # -
 
     # ==
 
-    AssociatedLocators___ = ::Struct.new :component_locator, :document_locator
+    def self.VIA_CONDENSED(
+      associated_schema: nil,
+      associations_YUCK: nil
+    )
+      al_a = []
+      _o = -> comp_d, * doc_locator do
+        _al = AssociatedLocators___.new comp_d, doc_locator.freeze
+        al_a.push _al ; nil
+      end
+      associations_YUCK[ _o ]
+      al_a.freeze
+
+      PluraltonComponentsIndex___.new associated_schema, al_a
+    end
+
+    class PluraltonComponentsIndex___
+      def initialize mutable_schema, al
+        @associated_clusters = AssociatedClusters___.new mutable_schema
+        @associated_locators = al
+        freeze
+      end
+      attr_reader(
+        :associated_clusters,
+        :associated_locators,
+      )
+    end
+
+    class AssociatedClusters___
+      def initialize mutable_schema
+        @clusters = mutable_schema.map do |cluster|
+          AssociatedCluster___.new cluster.freeze
+        end
+        freeze
+      end
+      attr_reader(
+        :clusters,
+      )
+    end
+
+    class AssociatedCluster___
+      def initialize mutable_sparse_d_a
+        @sparse_associated_offsets = mutable_sparse_d_a.freeze
+        freeze
+      end
+      attr_reader(
+        :sparse_associated_offsets,
+      )
+    end
+
+    class AssociatedLocators___
+      def initialize x, xx
+        @COMPONENT_OFFSET = x
+        @document_locator = xx
+        freeze
+      end
+      attr_reader(
+        :COMPONENT_OFFSET,
+        :document_locator,
+      )
+    end
 
     # ==
     # ==

@@ -44,6 +44,9 @@ existing comments and arbitrary formatting in the human-readable store.
   - the crazy diff thing [#here.L]
   - the beginning of the final clusterization [#here.M]
   - finishing the final clusterization with capsules [#here.N]
+  - EDIT sponge expanding and contracting, units of work [#here.O]
+  - appendix: indexing a definition of "pluralton"-participating parameters :[#here.p]
+  - appendix 2: too many kinds of offsets :[#here.q]
 
 
 
@@ -313,6 +316,50 @@ satisifes a need..
 
 
 
+## provision 4 (experimental) - isomorphic ordering #[#here.C.4]
+
+  - it is an essential requirement of pluralton groups that we represent
+    faithfully the order of their items. how we proscribe this here is
+    experimental, but the end is not. so:
+
+  - the sections that represent these items do not have to occur
+    contiguously in the document, however,
+
+  - the order in which these sections occur with respect to each
+    other corresponds to the order of the items in the pluralton group.
+
+an alternative being considered is to represent an offset (or ordinal)
+as an integer somewhere in the representation. advantages to this approach:
+
+  - when items are re-ordered, this will be less "taxing" on the document
+    from the perspective of a VCS (i.e. the change to the document will
+    require less information to represent).
+
+  - re-orderings would be easier to implement, probably.
+
+however we opt against it for now for these reasons:
+
+  - it "feels" more intuitive to exploit the in-document ordering:
+    documents (as well as memory storage in computing generally)
+    have an inherent one-dimensionality which isomorphs with order
+    in an obvious way, and not to exploit this would seem to be
+    contrary to the principle of least surprise (which is to say,
+    we want to do it the way we want to do it because it's probably
+    what is expected).
+
+  - to put the ordinal (offset) in the sub-section name would feel
+    like a hack
+
+  - to "take up" an assignment for such a purpose would cut into
+    a cordoned-off namespace for business attribute names.
+
+  - to have such an assignment attribute start with an underscore
+    in the avoidance of above (think couchdb) feels like a hack and
+    looks like an eyesore.
+
+
+
+
 ## critical theory for approaching the algorithm: comparison :[#here.D]
 
 for our purposes, the similarity that one "entity/section" can have to
@@ -385,7 +432,7 @@ are equivalent if they are made up entirely of sub-components, and you can
 line up the each sub-component with a counterpart on the other side
 ("destructively", i.e you "line up" any same component with more than one
 other component) and apply this same definition of equivalence to those two
-sub-components, etc on downards until you reach some kind of base case,
+sub-components, etc on downwards until you reach some kind of base case,
 where perhaps you are comparing two "primitive" datapoints (for example,
 comparing colors, or heights).
 
@@ -475,10 +522,10 @@ we're gonna use these letters (and later, some others) to stand for
 bespoke sets (or lists) of things in this document. NOTE these special
 letters will *not* be used *anywhere* outside this document.
 
-  - let "M" be the list of *all* the [#here.b.3] sections of the old
+  - let list "M" be the list of *all* the [#here.b.3] sections of the old
     document (in their order). (mnemonic: "M comes before N")
 
-  - let "N" be the imaginary list of *all* the sections of the document
+  - let list "N" be the imaginary list of *all* the sections of the document
     that will exist (in their order) when our edit (i.e insertions,
     deletions, re-ordering) is complete. (mnemonic: "New document")
 
@@ -487,29 +534,29 @@ the leading zero or more lines (necessarily comment-and-or-whitepace,
 per the git config document grammar) that exist before the first section
 line in this discussion, in the knowledge that they will always come out the
 other side as unchanged and in their same position as offset from the
-beginning of the document. this provision alongside M and N mean that
-our algorithm built by decomposing M and N will account for every line
+beginning of the document. this provision alongside list M and list N mean that
+our algorithm built by decomposing list M and list N will account for every line
 of the entire document (both before and after the edit).)
 
-thinking out loud: reaching N means we have succeeded are are finished.
+thinking out loud: reaching list N means we have succeeded are are finished.
 
-  - let "participating sections" be those sections in M that are part
+  - let "participating sections" be those sections in list M that are part
     of the pluraton group under operation. this is simply all sections
-    in M that have the relevant section (not sub-section) name as determined
+    in list M that have the relevant section (not sub-section) name as determined
     by the relevant name of the association (which is a pluralton). (hint:
     this corresponds to the name of the ivar in the entity that holds the
     array of components in this pluralton group. it is probably a plural
     noun.)
 
-so far, getting M is easy (it's every section in the document at first)
+so far, getting list M is easy (it's every section in the document at first)
 and determining the list-subset M' of participating sections is also easy
 (it's trivial to reduce by section name). now,
 
-  - let "C" be the full, ordered *list* of components in the relevant
+  - let list "C" be the full, ordered *list* of components in the relevant
     pluraton group in the entity which reflects the accurate, up-to-date
-    state we want to persist into the document to get from M to N.
+    state we want to persist into the document to get from list M to list N.
 
-solving for N given M and C is the crux of our algorithm.
+solving for list N given list M and list C is the crux of our algorithm.
 
 (note: there may be other pluralton components within the entity that
 will undergo this same process so that they can be persisted; but we
@@ -521,22 +568,22 @@ relevant pluralton association for the duration of this algorithm :#here1.)
 
 ## "clusters" :[#here.F]
 
-recall that some sections in [#here.E] M will be "participating", and others
+recall that some sections in [#here.E] list M will be "participating", and others
 will not. it is a design objective that we accomodate any possible
 arrangement of interspersions of participating and non-participating
 sections. as such,
 
   - let a "cluster" be an uninterrupted "run" of *zero* or more
-    participating sections in M.
+    participating sections in list M.
 
-  - when M does not begin (or end) with a participating section,
+  - when list M does not begin (or end) with a participating section,
     we will model a cluster of length 0 there.
 
-  - clusters (for M) must otherwise be of length 1 or more.
+  - clusters (for list M) must otherwise be of length 1 or more.
 
   - no cluster may abut another cluster.
 
-given all of the above, for any M there is exactly 1 "clusterization".
+given all of the above, for any item in list M there is exactly 1 "clusterization".
 for example, a run of only non-participating sections ("n") is
 "clusterized" into a zero length cluster, a run of non-participating
 sections, and then capped by a zero length cluster:
@@ -548,11 +595,11 @@ sections, and then capped by a zero length cluster:
 ("components"), and "N" to stand for "non-participating run" instead
 of what it normally stands for ("new document", maybe).)
 
-when M is the empty list ("[]"), it becomes just one zero-length cluster:
+when list M is the empty list ("[]"), it becomes just one zero-length cluster:
 
     []     =>    C
 
-if M consists only of participating sections ("p"):
+if list M consists only of participating sections ("p"):
 
     ppp    =>    C
 
@@ -588,7 +635,7 @@ conceive of the pattern as, but this is an irrelevant detail.
 (EDIT: maybe away this whole section. cluster-level operations aren't
 really a thing, are they?)
 
-we will define the operations necesary to get from M to N (or we won't,
+we will define the operations necesary to get from list M to list N (or we won't,
 see the following sections) in terms of the "operations" necessary to do
 on each cluster (one (possibly "compound" operation per cluster) such that
 every cluster will either be:
@@ -599,7 +646,7 @@ every cluster will either be:
 
 firstly (and as somewhat of an aside), building off of only what we
 have presented thus far, this "cluster-centric" approach for producing
-an N from M and C will *not* be able to produce all possible N that could
+an list N from list M and C will *not* be able to produce all possible items in N that could
 exist that solve for this. this is because our approach "locks" the
 non-participating sections to where the are *relative to each other*,
 and no where did we specify this as a requirement. well now, we are:
@@ -610,12 +657,12 @@ might be other pluralton groups represented in those sections and we
 must not corrupt them by re-ordering them.
 
 so to restate what we have established so far, it will be trivial
-to derive a single, deterministic "clusterization" "L" for any M.
+to derive a single, deterministic "clusterization" list "L" for any item in list M.
 (we can do so deterministically with an algorithm that while not
 presented anywhere here would be straightforward.)
 
 the trick, then, is to solve exactly *one* operation for each of
-the *one* or more clusters in L..
+the *one* or more clusters in list L..
 
 
 
@@ -706,7 +753,7 @@ so,
 
 ### indexing the document
 
-  - for each entity implied by each section in each cluster in L,
+  - for each entity implied by each section in each cluster in list L,
     "touch" its profile and add to this index the "locator" of this
     section in this cluster in the document.
 
@@ -738,8 +785,8 @@ some of the signatures are exhibited multiple times. in more detail:
      meanings we have assigned to certain letters in the broader context
      of the algorithm. they are unrelated.)
 
-remember above we said that we would index the document (L) first and
-components (C) second. so:
+remember above we said that we would index the document (list L) first and
+components (list C) second. so:
 
 
 
@@ -756,7 +803,7 @@ the first component has a practical identity "D" that *is* the same
 practical identity of "D" from the above sub-section about indexing
 the document. the same for "C", "A", "A'" and so on. but note:
 
-  - "Q" is a random new profile that we hadn't seen already in L. as such,
+  - "Q" is a random new profile that we hadn't seen already in list L. as such,
     we can consider this an "add" of a new component to the document,
     rather than a possible repurposing and/or repositioning of an
     existing entity.
@@ -768,11 +815,11 @@ the document. the same for "C", "A", "A'" and so on. but note:
   - in other possible cases, there could be multiple components like Q.
     one important edge case is where *all* components are like Q (that is,
     none of them are in the existing document by practical equivalence).
-    another important edge case is when C is the empty list.
+    another important edge case is when list C is the empty list.
 
   - the "heaviest" design objective of this algorithm comes from this
-    provision: the ordering of these components of C can be totally
-    arbitrary and new when compared to the ordering we had in L (as it
+    provision: the ordering of these components of list C can be totally
+    arbitrary and new when compared to the ordering we had in list L (as it
     pertains to the items that are in both (in terms of practical
     equivalency)). note that in the components, C (the item) comes before
     A, and D comes at the front (whereas in the document D comes after C
@@ -801,13 +848,13 @@ as such should fail (softly but unrecoverably) out of this algorithm;
 but it is otherwise uninteresting to us here.
 
 so for our purpose imagine that we somehow "have" an entity for every
-section in [#here.f.2] L (or every relevant section in [#here.E] M,
+section in [#here.f.2] list L (or every relevant section in [#here.E] list M,
 whichever you prefer to see it as). mind you we have just now done the
 opposite of what we are doing generally. what we are doing generally is
 "persisting" (i.e marshaling (serializing)); but what we have just
 done (getting an entity from a section) is unmarshaling (unserializing).
 this is because at the crux of this algorithm is comparing the entities
-in C against the existing would-be entities implied by M, and we do this
+in list C against the existing would-be entities implied by list M, and we do this
 through comparing entities (not sections).
 
 recall too the idea of a [#here.D.3] "practical match". we think we present
@@ -844,7 +891,7 @@ itself as the hash key?
     are now anyway.
 
 so, if we want to determine which of a set of entities (say from list C)
-have practical equivalents in the list of entities in L, the least bonkers
+have practical equivalents in the list of entities in list L, the least bonkers
 (but still kind of bonkers) way we have come up with to do so is:
 
   - the entity will expose the "essence" of itself (for the purpose
@@ -904,10 +951,10 @@ purposes of finding other entities that match it (practically). whew!
 
 ## towards synthesis: why do we go through the following extra trouble? [#here.i]
 
-recall we have L (which is 1 or more clusters of participating sections,
+recall we have list L (which is 1 or more clusters of participating sections,
 each cluster being separated by runs of one or more non-participating
-sections), and we want to get to N, which is the list of sections that
-persists C (the list of components we want to persist).
+sections), and we want to get to list N, which is the list of sections that
+persists list C (the list of components we want to persist).
 
 the general challenge here (and it was a true challenge) is that we
 want to reduce as much as possible unnecessary "strain" on the document:
@@ -916,18 +963,19 @@ change).
 
 this is in its way an exercise in "aesthetic" refinement; that is,
 we could just say "forget this" and flip the table and just say
-"take the first (or last (or middle)) cluster and put all of the C
+"take the first (or last (or middle)) cluster and put all of the
+items from list C
 into this cluster and delete all the other clusters", but if we do,
 then
 
-  - for one thing, we lose comments in L if we just blindly replace
-    them with the C without looking for matches
+  - for one thing, we lose comments in list L if we just blindly replace
+    them with the items in list C without looking for matches
 
   - for another thing, if we were to do this then the document would give
     the appearance of way more change happening than it is.
 
   - for a third thing, if the user had some reason for arranging the
-    "clusterization" (L) as it was, then we would like to retain that
+    "clusterization" (list L) as it was, then we would like to retain that
     arrangement as much as we can while still accomodating the edit.
 
 so now that we have the justification for the following out of the way:
@@ -1074,7 +1122,7 @@ because it's the only component that doesn't have a counterpart in the
 document.
 
 so now go back and look at these same offsets of associations when
-grafted over L:
+grafted over list L:
 
      A   2
      A'  3
@@ -1149,7 +1197,7 @@ in effect what `diff` has done is decided for us which items we should
 "move", and which items can remain stationary. we don't really care by
 what rationale it came up with this series of operations; of this we can
 remain blissfully ignorant. it is just a black box that we trust has
-come up with a reasonable plan to get from L + C to N, part way.
+come up with a reasonable plan to get from list L and list C to list N, part way.
 
 note that crucially, we had to strip the file on the left of any
 representation of the breaks between clusters, because we have no
@@ -1204,7 +1252,7 @@ note too the items that remain stationary (set "S"):
 really, these two sets of numbers (er, items) is the only useful
 information that we will come away with from the use of `diff`.
 
-now, recall our annotated L (exactly as presented in [#here.L]):
+now, recall our annotated list L (exactly as presented in [#here.L]):
 
      A   2
      A'  3
@@ -1242,7 +1290,7 @@ the items that remain stationary)):
     [ 2 3 ] [ - - - - - ] [ 4 5 ]
 
 now, this clusterization is the first one we've seen so far in this
-discussion that can serve as a startingpoint for N. the items (numbers)
+discussion that can serve as a startingpoint for list N. the items (numbers)
 that remain in this clusterization at this point are in the "correct"
 "place" for the final output clusterization; that is, they are in the
 correct order with respect to each other, and still clusterized.
@@ -1251,7 +1299,7 @@ correct order with respect to each other, and still clusterized.
 that that cluster is composed of only holes; this is only chance!
 (honestly, it wasn't intended.))
 
-all that remains to do is to insert the remaining items in C into this
+all that remains to do is to insert the remaining items in list C into this
 clusterization in some kind of correct order with aesthetic placement.
 
 
@@ -1285,7 +1333,7 @@ for this discussion "X" indicates an associated item and " " indicates a
 hole. the above depicts two clusters, each five elements long. (this
 clusterization is wholly separate from any we have discussed above; its
 particular form is designed to demonstrate the subject principle.
-we'll refer to this story in tests as #coverpoint2.5 "story B".)
+we'll refer to this story in tests as #coverpoint2.5 story "B".)
 
 note you could see this as runs of holes separated by runs of items.
 
@@ -1373,7 +1421,7 @@ is when we *leave* the cluster: there is a transition for this. etc.
 
 ### so what do we do with these capsules ("why?")?
 
-recall that in a graphic like this (a re-depiction of "story B"),
+recall that in a graphic like this (a re-depiction of story B),
 
          +-^-+      +--^--+      +^+     +-..
         /     \    /       \    /   \   /
@@ -1406,7 +1454,7 @@ about this sequence of numbers we just added:
 
   - each number represents an offset into a list of *associations*
     between a component item and a document section. (the list represents
-    *all* associations between [#here.E] "M" and [#here.f.2] "L".)
+    *all* associations between [#here.E] list M and [#here.f.2] list L.)
 
   - each next number (from left to right) must be greater than the
     previous, because what you are seeing (the X's) is the associations that
@@ -1563,11 +1611,134 @@ end of this process we do something crazy with.)
 
 
 
+### appendix: indexing a definition of "pluralton"-participating parameters :[#here.p]
+
+the formal parameters of a definition suggest an order with
+respect to each other *both* in the context of the whole definition
+broadly *and* more narrowly within the context of the (any)
+"pluralton" group that each formal parameter aligns. huh?
+
+as such, you could arrange the parameters of the full definition
+into N+1 *flat* arrays of formal parameters, where the "first"
+(if you like) array is a list of those parameters that have no
+"pluralton" affiliation; and the remaining N lists are one list
+for each pluralton group, where each group can be held up as a
+list of parameters that are in order with respect to each other
+as suggested by the order in which all parameters occur in the
+defintion. huh?
+
+it's like how the pages of a book have order with respect to each
+other, but also they can be grouped in to chapters, and the
+chapters have order with respect to each other and also the pages
+within a chapter have order with respect to each other. (it's so
+understood that it's perhaps confusing to read in these terms.)
+
+in the book analogy, "chapters" are like pluralton groups, and
+each page is like each formal parameter.
+
+however, by this selfsame definition we are stating explicitly
+that these orders do *not* generally matter. the only way in
+which order has significance in the discussion of "pluraltons"
+is this:
+
+the order in which *actual* parameters occur determines the order
+in which the actual values (normalized) will exist in storage (or
+other meaningful representation) but *only* with respect to each
+other within each pluralton group (as relevant). huh?
+
+so let's say you have one pluralton group "red" (or "R") and
+another pluralton group "blue" (or "B"). let's say we define
+a few formal parameters with pluralton affiliations, and we don't
+(in our definition) group these parameters close to each other
+in regards to their affiliation:
+
+    R1 B1 B2 R2 R3 B3
+
+so (formally) there are three blue's, three red's, and they are
+defined in no special order (so the group the parameter belongs
+to flickers back and forth "randomly").
+
+now, let's say we receive the following actual parameters
+(for whose values we'll just use serial lowercase letters):
+
+    R3:a B2:b R1:c B3:d
+
+that is, we have a value "a" that is an actual value associated
+with the formal parameter "R3" (which is in the "red" group),
+and so on.
+
+the main point of all this is that in meaningful representation
+(i.e "storage", e.g as an action instance or entity), the above
+request would be represented like this:
+
+    B: ( B2:b, B3:d )
+    R: ( R3:a, R1:c )
+
+that is: within each group, each actual value is A) represented
+in the order it occurred in the request and B) associated with
+its formal parameter. however, the group lists have no order with
+respect to each other. (i.e the fact that we showed the blue's
+above the red's is not significant.) huh?
+
+imagine we are buying 7 grocery items: 3 that are frozen and 4
+that are not. we will put the frozen items in one plastic bag, and
+the non-frozen items in one paper bag. as each item comes one-by-one
+off the conveyor belt, we put in in the appropriate bag.
+
+in this story, there are different "orders" (lists of things)
+that could be remembered: there's the order that the items came
+off the conveyor belt; there's the order that we put each item
+into one of the bags (from the perspective of either particular
+bag); there's even the order that we first used each bag (which
+in this story depends entirely on what is the category of the first
+item off the conveyor belt).
+
+well in this analogy, the only order that we "remember" is the
+order in which we put each item into each bag. that is, we
+"forget" the order the items came off the conveyor belt and
+all the rest. also it is not the case that one bag "comes before"
+or after the other bag, only that the items have an order within
+each bag.
+
+finally, note that it is acceptable for the user to convey multiple
+actual values of the same formal parameter:
+
+    R3:a R3:b R3:c
+
+(which would then be modeled in the entity as:)
+
+    R: (R3:a, R3:b, R3:c)
+
+for any combination of actual values for "pluralton" parameters.
+
+
+
+
+## appendix 2: too many kinds of offsets
+
+  - component offset: an index into the list of components in list C.
+
+  - profile offset: an index into the list of every identity profile
+    ever created in this invocation. (an entity with the same [#here.H]
+    practical equivalence will have the same profile offset whether it's
+    in the document or in list C.)
+
+  - associated offset: xx
+
+
+
+
+
+
+
 ## document-meta
 
   - EDIT: get rid of every mention of "survey"
 
   - EDIT: get rid of "note 25" and its referrent to close #open [#008.E]
+
+  - #history-A.2: 2 historic sections were spliced in
+    that were ~6 month old stashes and may somewhat interrupt flow.
 
   - #history-A.1: begin mostly a full rewrite for
     pluralton-in-git-config persistence
