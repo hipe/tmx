@@ -50,7 +50,7 @@ module Skylab::Arc
       end
 
       def __the_very_beginning
-        _at_next_cluster
+        _be_at_next_cluster
         if _cluster_segment_is_static
           if __there_are_pending_moves_before_this_cluster
             __step_for_headmost_moves_then_static
@@ -58,7 +58,45 @@ module Skylab::Arc
             _static_then_whatever
           end
         else
-          ::Kernel._OKAY
+          __when_begin_capsule
+        end
+      end
+
+      def __when_begin_capsule_EXPERIMENT
+        __when_begin_capsule
+      end
+
+      def __when_begin_capsule
+
+        #     v
+        # --+---+  +---+--
+        # ? |   |  | ? |     you could be at the end of a cluster
+        # --+---+  +---+--
+
+        #     v
+        # --+---+  +---+  +---+---+--  you could be at the end of a cluster
+        # ? |   |  |   |  |   | X |    but at the beginning of a multi-
+        # --+---+  +---+  +---+---+--  segment capsule
+
+        #     v
+        # --+---+---+---+--  you could be not at the end of a cluster (in
+        # ? |   | X | ? |    which case assume it's a static piece after
+        # --+---+---+---+--  you and you're just a lone segment capsule) ..
+
+        _be_at_next_capsule
+        seg = _capsule_segment
+        _advance_one_capsule_segment
+        _advance_one_cluster_segment  # keep synced with above. we can read it again
+
+        if _at_end_of_cluster
+          if _at_end_of_capsule
+            _step_for_simple_capsule_then_whatever seg
+          else
+           ::Kernel._OKAY__life_is_hard__see_stash__
+          end
+        else
+          _cluster_segment_is_static || sanity
+          _step_for_simple_capsule_then_whatever seg
         end
       end
 
@@ -77,6 +115,39 @@ module Skylab::Arc
       #
       # step-flushers
       #
+
+      def _step_for_simple_capsule_then_whatever seg_NOT_USED_YET
+
+        if _at_end_of_cluster
+          # #coverpoint3.5 #here2
+          _close_cluster
+          if _no_more_clusters
+            # then capsule at the end of everything
+            _close_capsule
+            _close  # we're certain we're dealing with it all here
+            next_d = @number_of_components
+          else
+            ::Kernel._OKAY__advance_to_next_custer_and_call_at_next_cluster
+            next_d = self._SOMETHING
+          end
+        else
+          next_d = _static_component_offset
+          _next_do :_static_then_whatever_CONFIRM
+        end
+
+        if @_pending_component_offset == next_d
+          # WEEEE skip #coverpoint3.4
+          send @_gets
+        else
+          ::Kernel._OKAY
+          _r = _advance_pending_offset next_d
+          [ :_DING_DONG_, _r.to_a.freeze ]
+        end
+      end
+
+      def _static_then_whatever_CONFIRM
+        _static_then_whatever
+      end
 
       def _static_then_whatever
 
@@ -97,16 +168,18 @@ module Skylab::Arc
           @_pending_component_offset = co + 1
 
           _advance_one_cluster_segment
-          if _no_more_cluster_segments
+          if _at_end_of_cluster
             did_reach_end_of_cluster = true
             break
           end
         end while _cluster_segment_is_static
 
         if did_reach_end_of_cluster
-          _at_end_of_cluster
+          _be_at_end_of_cluster
         else
-          ::Kernel._OKAY__must_be_capsule__
+          # #coverpoint3.5
+          _cluster_segment_is_static && sanity
+          _next_do :__when_begin_capsule_EXPERIMENT
         end
 
         [ :_STATIC_PASSTHRU_AND_MAYBE_MORE_, d_a.freeze ]
@@ -130,18 +203,26 @@ module Skylab::Arc
       # higher level mutate
       #
 
-      def _at_end_of_cluster  # determine next step
-
-        remove_instance_variable :@_cluseg_scanner
-        _advance_one_cluster
+      def _be_at_end_of_cluster  # determine next step, contrast #here2
+        _close_cluster
         if _no_more_clusters
-          __at_end_of_clusters
+          __be_at_end_of_clusters
         else
           ::Kernel._OKAY__advance_to_next_custer_and_call_at_next_cluster
         end
       end
 
-      def __at_end_of_clusters  # determine next step
+      def _close_capsule
+        remove_instance_variable :@_capseg_scanner
+        _advance_one_capsule
+      end
+
+      def _close_cluster
+        remove_instance_variable :@_cluseg_scanner
+        _advance_one_cluster
+      end
+
+      def __be_at_end_of_clusters  # determine next step
 
         remove_instance_variable :@cluster_scanner
 
@@ -157,8 +238,16 @@ module Skylab::Arc
       # middle-level mutate (advancers)
       #
 
+      def _advance_one_capsule_segment
+        @_capseg_scanner.advance_one
+      end
+
       def _advance_one_cluster_segment
         @_cluseg_scanner.advance_one
+      end
+
+      def _advance_one_capsule
+        @capsule_scanner.advance_one
       end
 
       def _advance_one_cluster
@@ -169,7 +258,12 @@ module Skylab::Arc
       # lower-level mutate
       #
 
-      def _at_next_cluster
+      def _be_at_next_capsule
+        _capsule = @capsule_scanner.head_as_is
+        @_capseg_scanner = Scanner_[ _capsule.cluster_locators ] ; nil
+      end
+
+      def _be_at_next_cluster
         _cluster = @cluster_scanner.head_as_is
         @_cluseg_scanner = Scanner_[ _cluster ] ; nil
       end
@@ -202,11 +296,19 @@ module Skylab::Arc
         _cluster_segment.is_static_associated
       end
 
+      def _capsule_segment
+        @_capseg_scanner.head_as_is
+      end
+
       def _cluster_segment
         @_cluseg_scanner.head_as_is
       end
 
-      def _no_more_cluster_segments
+      def _at_end_of_capsule
+        @_capseg_scanner.no_unparsed_exists
+      end
+
+      def _at_end_of_cluster
         @_cluseg_scanner.no_unparsed_exists
       end
 

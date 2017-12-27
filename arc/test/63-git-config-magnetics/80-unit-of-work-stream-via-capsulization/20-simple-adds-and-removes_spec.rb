@@ -71,6 +71,69 @@ module Skylab::Arc::TestSupport
       _quick_and_dirty 4, _1, _2, _3, _4
     end
 
+    it 'delete component off head' do  # #coverpoint3.4
+
+      st = _UoW_stream(
+        number_of_components: 1,
+        associated_component_offsets: [ 0 ],
+        reallocation_schematic: [
+          [
+            [ :_non_associated__number_of_fellows_, 1 ],
+            [ :_static_associated__associated_offset_, 0 ],
+          ]
+        ],
+      )
+
+      _1 = st.gets
+      _2 = st.gets
+      _3 = st.gets
+      _4 = st.gets
+      _quick_and_dirty 1, _1, _2, _3, _4
+    end
+
+    it 'delete component off tail' do  # #coverpoint3.5
+
+      st = _UoW_stream(
+        number_of_components: 2,
+        associated_component_offsets: [ 0, 1 ],
+        reallocation_schematic: [
+          [
+            [ :_static_associated__associated_offset_, 0 ],
+            [ :_static_associated__associated_offset_, 1 ],
+            [ :_non_associated__number_of_fellows_, 1 ],
+          ]
+        ],
+      )
+
+      _1 = st.gets
+      _2 = st.gets
+      _3 = st.gets
+      _4 = st.gets
+      _quick_and_dirty 2, _1, _2, _3, _4
+    end
+
+    it 'delete component from middle' do  # #coverpoint3.NONE
+
+      st = _UoW_stream(
+        number_of_components: 3,
+        associated_component_offsets: [ 0, 1, 2 ],
+        reallocation_schematic: [
+          [
+            [ :_static_associated__associated_offset_, 0 ],
+            [ :_static_associated__associated_offset_, 1 ],
+            [ :_non_associated__number_of_fellows_, 77 ],  # count shouldn't matter
+            [ :_static_associated__associated_offset_, 2 ],
+          ]
+        ],
+      )
+
+      _1 = st.gets
+      _2 = st.gets
+      _3 = st.gets
+      _4 = st.gets
+      _quick_and_dirty 3, _1, _2, _3, _4
+    end
+
     def _quick_and_dirty exp_num_components, * uow_a
       _stream_again = Home_::Stream_[ uow_a ]
       want_squential_component_offsets_are_represented_ _stream_again, exp_num_components
