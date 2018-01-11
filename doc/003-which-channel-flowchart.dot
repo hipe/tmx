@@ -1,25 +1,48 @@
 digraph g {
+  label="\n\nthis is a guide to help you decide where in  
+the DTF (\"botnoise\") landscape you should
+post your message. whew!                           
+
+also: \"kiki\" and \"bouba\" you should probaly
+just google :P. familiarity is assumed here    "
+
+
   t_start [label="start" shape=rect]
 
-  t_start->q_oc
+  t_start->q_sfw
 
-  q_oc->t_oc [label=yes]
+  q_sfw->t_aotd [label="NO!"]
+  q_sfw->q_oc [label=yes]
+
+  q_oc->q_oc2 [label=yes]
   q_oc->q_kiki [label=no]
+
+  q_oc2->t_motd [label=yes]
+  q_oc2->t_oc [label=no]
 
   q_kiki->t_kiki [label=yes]
   q_kiki->q_memes [label=no]
 
-  q_memes->t_memes [label=yes]
+  q_memes->q_memes2 [label=yes]
   q_memes->q_vobes [label=no]
 
-  q_vobes->t_vobes [label=yes]
+  q_memes2->t_austiesgunnit [label=yes]
+  q_memes2->t_memes [label=no]
+
+  q_vobes->t_vobes [label="yes\n(to either)"]
   q_vobes->q_vidya [label=no]
 
   q_vidya->t_vidya [label=yes]
-  q_vidya->q_autists [label=no]
+  q_vidya->q_autistes [label=no]
 
-  q_autists->t_autists [label=yes]
-  q_autists->q_tech [label=no]
+  q_autistes->q_autistes2 [label=yes]
+  q_autistes->q_modern_love [label=no]
+
+  q_modern_love->t_modern_love [label=yes]
+  q_modern_love->q_tech [label=no]
+
+  q_autistes2->t_autistes2[label=maybe]
+  q_autistes2->t_autistes [label=otherwise]
 
   q_tech->t_tech [label=yes]
   q_tech->q_bouba [label=no]
@@ -29,22 +52,44 @@ digraph g {
 
 /* */
 
-  q_autists [label="is it\nabout creative\ntechnique?" shape=diamond]
-  q_bouba [label="is it\nfriendly/\nhappy?" shape=diamond]
-  q_kiki [label="is it\nkiki?" shape=diamond]
-  q_memes [label="is it\na meme?" shape=diamond]
-  q_oc [label="is it\nyour own\nO.C.?" shape=diamond]
-  q_tech [label="is it related\nto tech?" shape=diamond]
-  q_vidya [label="is it\nrelated to\nvideo games?" shape=diamond]
-  q_vobes [label="is it\n\"vobey\"?" shape=diamond]
 
-  t_autists [label="#autists" shape=rect]
+
+  q_sfw [label="is it\nsafe for\nwork?" shape=diamond]
+  q_autistes [label="is it about\nphotography, music, movies\nart or similar?" shape=diamond]
+
+q_autistes2 [label="is it about a popular
+movie or netflix show
+(think spoilers).." shape=diamond]
+
+  q_bouba [label="is it\nfriendly/\nhappy?" shape=diamond]
+  q_kiki [label="is it likely\nto start a long\nargument?" shape=diamond]
+  q_memes [label="is it\na meme?" shape=diamond]
+  q_memes2 [label="is it far-left or\nfar-right shitposting?\n(usu. mike/nima/mark)" shape=diamond]
+  q_modern_love [label="is it about\nyour tinder/dating/\nrelationships?" shape=diamond]
+  q_oc [label="is it\nyour own\nO.C.?" shape=diamond]
+  q_oc2 [label="mike: is it\none of your\nselfies?" shape=diamond]
+  q_tech [label="is it related\nto tech?" shape=diamond]
+  q_vidya [label="is it about\nvideo games?" shape=diamond]
+  q_vobes [label="is it pixel art\n(or similar)? is it related\nto natural languages?" shape=diamond]
+
+  t_autistes [label="#autistes" shape=rect]
+
+t_autistes2 [label="join any existing one or
+create it, invite appropriate ppl &
+announce it in #autistes. (currently
+there's one for black mirror
+and one for the last star war.)"
+shape=rect]
+
+  t_austiesgunnit [label="#austiesgunnit" shape=rect]
+  t_aotd [label="#aotd\n(attractive\nor titillating\ndistraction)" shape=rect]
   t_bouba [label="#bouba" shape=rect]
   t_kiki [label="#kiki" shape=rect]
   t_memes [label="#memes" shape=rect]
+  t_modern_love [label="#modern-love" shape=rect]
+  t_motd [label="#motd\n(mike of\nthe day)" shape=rect]
   t_oc [label="#oc" shape=rect]
   t_tech [label="#tech" shape=rect]
   t_vidya [label="#gaming" shape=rect]
   t_vobes [label="#vobes" shape=rect]
-
 }
