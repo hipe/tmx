@@ -1,0 +1,7 @@
+# this is a config file for the tmx micro-app called "stack"
+
+# this file tells the app that this file (".stack") is not the
+# file that contains the TODO items, but rather that it should
+# use this other file:
+
+file = TODO.stack
