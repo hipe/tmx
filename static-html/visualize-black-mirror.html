@@ -11,17 +11,26 @@
         data.addColumn('string', 'To');
         data.addColumn('number', 'Weight');
         data.addRows([
-          [ 'A', 'X', 5 ],
-          [ 'A', 'Y', 7 ],
-          [ 'A', 'Z', 6 ],
-          [ 'B', 'X', 2 ],
-          [ 'B', 'Y', 9 ],
-          [ 'B', 'Z', 4 ]
+          // erin hipe matt pokes rob
+          [ 'erin', 'hipe', 1.23 ],
+          [ 'erin', 'matt', 0.17 ],
+          [ 'erin', 'pokes', 0.27 ],
+          [ 'erin', 'rob', 0.18 ],
+          [ 'hipe', 'pokes', 0.77 ],
+          [ 'hipe', 'pokes', 0.22 ],
+          [ 'hipe', 'matt', 0.77 ],
+          [ 'matt', 'pokes', 0.22 ],
+          [ 'matt', 'rob', 0.99 ],
+          [ 'rob', 'pokes', 0.97 ],
         ]);
 
         // Sets chart options.
         var options = {
           width: 600,
+          sankey: {
+            link: { color: { stroke: 'black', strokeWidth: 1 } },
+            node: { nodePadding: 80 },
+          }
         };
 
         // Instantiates and draws our chart, passing in some options.
