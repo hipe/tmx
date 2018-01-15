@@ -2,27 +2,62 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+
+      var url = "https://docs.google.com/spreadsheets/d/1SoBeePDh52kgv07sAxIfYsEcv-0Gf9s2aCRgGzhDizw/edit#gid=0"
+
+      var log;  // forward declaration of function
+
+      // forward declare shared would-be frozen doo-hahs
+      var emptyString = '',
+        success = true;
+
+      //
+
       google.charts.load('current', {'packages':['sankey']});
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
+        var query = new google.visualization.Query(url);
+        query.send(handleQueryResponse);
+      }
+
+      function handleQueryResponse(response) {
+        if (response.isError()) {
+          alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+        } else {
+          doHandleQueryResponse(response);
+        }
+      }
+
+      function doHandleQueryResponse(response) {
+        var data, model;
+        data = response.getDataTable();
+        model = procureModelViaData(data);
+        if (model) return expressModel(model);
+      }
+
+      function expressModel(model) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'From');
         data.addColumn('string', 'To');
         data.addColumn('number', 'Weight');
-        data.addRows([
-          // erin hipe matt pokes rob
-          [ 'erin', 'hipe', 1.23 ],
-          [ 'erin', 'matt', 0.17 ],
-          [ 'erin', 'pokes', 0.27 ],
-          [ 'erin', 'rob', 0.18 ],
-          [ 'hipe', 'pokes', 0.77 ],
-          [ 'hipe', 'pokes', 0.22 ],
-          [ 'hipe', 'matt', 0.77 ],
-          [ 'matt', 'pokes', 0.22 ],
-          [ 'matt', 'rob', 0.99 ],
-          [ 'rob', 'pokes', 0.97 ],
-        ]);
+        if (false) {  // flip to true if you wanna regress to these hardcoded numbers
+          data.addRows([
+            // erin hipe matt pokes rob
+            ["rob", "steve", 0.27608211590478543],
+            ["rob", "hipe", 0.738367594530916],
+            ["steve", "hipe", 0.15823281035355863],
+            ["rob", "erin", 0.21580608817851488],
+            ["hipe", "erin", 0.20876255206117184],
+            ["steve", "erin", 0.43342379974609596],
+            ["matt", "rob", 0.8218454267668895],
+            ["matt", "steve", 0.3609216687676314],
+            ["matt", "hipe", 0.7932922340511898],
+            ["matt", "erin", 0.29284919200692516],
+          ]);
+        } else {
+          data.addRows(model.dataTableRows);
+        }
 
         // Sets chart options.
         var options = {
@@ -37,6 +72,167 @@
         var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
         chart.draw(data, options);
       }
+
+      function procureModelViaData(data) {
+        /*
+         * boy wouldn't it be great if we could edit the document
+         * willy nilly and induce tons of stuff here..
+         */
+
+        var model = {};
+        var ok = true
+        ok && ( ok = resolveNames(model, data) );
+        ok && ( ok = resolveSingleLettersForNames(model) );
+        ok && ( ok = resolveDataTableRows(model, data) );
+        if (ok) return model;
+      }
+
+      function resolveDataTableRows(model, data) {
+        /*
+         * from the current column label, hop along each column label
+         * (jumping at some fixed distance), for each of these remaining
+         * column lables (which look like "r x s").
+         *
+         * get the corresponding payload number (the "weight").
+         *
+         * convert letters like "r" to names like "rob".
+         # make a bunch of rows like this:
+         *     [ "rob", "steve", 0.1324 ],
+         */
+
+        var leftLetter, leftName, md, moneyNumber, numRows, numCols,
+          dataTableRows = [],
+          rightLetter, rightName,
+          rx = /^([a-z]) x ([a-z])$/,
+          s,
+          thisOneRowOffset;
+
+        thisOneRowOffset = data.getNumberOfRows() - 2;  // second to last has the thing we want
+        numCols = data.getNumberOfColumns();
+
+        d = model.currentColumnOffset;
+        model.currentColumnOffset = null;
+        d += 1;  // move over the blank cel that was special YIKES
+
+        var procureNameViaLetter = makeTheFunctionCalledProcureNameViaLetter(model);
+
+        do {
+
+          s = data.getColumnLabel(d);
+
+          md = rx.exec(s);
+
+          if (!md) {
+            whine("failed to match: '"+s+"'");
+            return;
+          }
+
+          leftLetter = md[1];
+          rightLetter = md[2];
+
+          leftName = procureNameViaLetter(leftLetter);
+          rightName = procureNameViaLetter(rightLetter);
+          if ( ! (leftName && rightName ) ) return;
+
+          moneyNumber = data.getValue(thisOneRowOffset, d);
+
+          dataTableRows.push([leftName, rightName, moneyNumber]);
+
+          d += 2
+        } while (d != numCols);
+        model.dataTableRows = dataTableRows;
+        return success;
+      }
+
+      function makeTheFunctionCalledProcureNameViaLetter(model) {
+        var h = model.longNameViaSingleLetter;
+        return function (letter) {
+          var s = h[ letter ];
+          if (s)
+            return s;
+          else {
+            whine("can't find long name for short name '"+letter+"'");
+          }
+        };
+      }
+
+      function resolveSingleLettersForNames(model) {
+        /*
+         * relate the person names with their initial single letter,
+         * whining if there's a collision.
+         */
+        var char, chars=[], existing, i, key, len,
+          longNameViaSingleLetter = {},
+          names = model.names,
+          s,
+          seen = {};
+
+        for ( i=0, len=names.length; i<len; i++ ) {
+          s = names[i];
+          char = s[0];
+          key = char;  // YUCK - this only works because etc
+
+          existing = seen[key];
+
+          if (existing) {
+            whine( "collision: '"+s+"' and '"+existing+"' start with the same letter" );
+            return;
+          }
+          longNameViaSingleLetter[char] = s;
+          chars[i] = char;
+          seen[key] = s;
+        }
+
+        model.longNameViaSingleLetter = longNameViaSingleLetter;
+        model.singleLetters = chars;
+        return success;
+      }
+
+      function resolveNames(model, data) {
+        /*
+         * assume that the column label at offset 0 is is for the episodes
+         * column. advance the 'cel' one cel to the right.
+         *
+         * assume the current column label is SOME person's "name".
+         * assert that the *next three* column labels are blank.
+         *
+         * peek the next column label. if it's not blank, repeat this loop.
+         *
+         * now that the column label is blank, make note of this offset..
+         *
+         */
+
+        var d = 1,
+          end,
+          names = [];
+          s = data.getColumnLabel(d);
+
+        do {
+          names.push(s);
+          log( "name at column: "+d+": '" + s +"'");
+          d ++;
+          end = d + 3;
+          for (; d < end; d++) {
+            s = data.getColumnLabel(d);
+            if (s != emptyString) {
+              whine("strange times at s at d "+d+": had '"+s+"'");
+              return;
+            }
+          }
+          s = data.getColumnLabel(d)
+        } while (s != emptyString);
+
+        model.names = names;
+        model.currentColumnOffset = d;
+        return success;
+      }
+
+      function whine(msg) {
+        console.log(msg);
+      }
+
+      log = whine;
+
     </script>
   </head>
   <body>
