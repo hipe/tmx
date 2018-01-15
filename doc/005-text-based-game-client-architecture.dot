@@ -1,0 +1,49 @@
+digraph g {
+
+ rankdir=LR
+
+ subgraph cluster_players {
+
+   player_1 [label="player\none"]
+   player_2 [label="player\ntwo"]
+   player_3 [label="player\nthree"]
+
+   label=players
+ }
+
+ subgraph cluster_the_server {
+
+   subgraph cluster_client {
+
+     client_slack  [label="slack\nclient" shape=rect]
+     client_IRC    [label="IRC\nclient" shape=rect]
+     client_telnet [label="telnet\ncliet" shape=rect]
+
+     label=clients
+   }
+
+   game_engine [label="game engine/\ngame state" shape=rect]
+
+   label="the server\n(\"the cloud\")"
+ }
+
+ player_1->client_slack
+ client_slack->player_1
+
+ player_2->client_IRC
+ client_IRC->player_2
+
+ client_telnet->player_3
+ player_3->client_telnet
+
+ client_slack->game_engine [label="API calls"]
+ game_engine->client_slack
+
+ client_IRC->game_engine
+ game_engine->client_IRC
+
+ client_telnet->game_engine
+ game_engine->client_telnet
+
+ label="fig.1 possible topology\nfor text-based games"
+}
