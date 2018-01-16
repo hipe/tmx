@@ -1,1 +1,21 @@
-sankey of black mirror with live values
+basic game (as a separate module)
+structure viz (ASCII)
+something about config files parsing like commmand line arguments
+game model
+(explode "basic game" into milestones for a new phase)
+(below is the end of the phase)
+sessions
+slack
+IRC
+telnet
+scheduler
+look at JSON parsing
+look at pack/unpack
+start kicker
+is inotify a thing
+basic IPC between processes in python
+cover: the behavior when an operation name isn't found
+cover: the ping operation
+look at unit testing - a hello work unit test
+broken into different files (look at youtube-dl)
+-15 hello world

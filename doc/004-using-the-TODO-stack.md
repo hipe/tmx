@@ -24,11 +24,11 @@ stupid simple issue tracking:
     the last line of the file.
 
   - add items when you think of them.
-    - you can `echo "do this thing" >> doc/todo.list`
+    - you can `echo "do this thing" >> TODO.stack`
     - clean up the ordering/wording whenever before your next commit
 
   - remove items when they're finished
-    - it's find to add and remove items without commiting them as desired.
+    - it's fine to add and remove items without committing them as desired.
 
   - if you want to get silly, you can in effect track author and creation
     date with version control just by using version control alone, provided

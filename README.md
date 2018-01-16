@@ -1,5 +1,27 @@
 # down town fun readme
 
+## objective & scope
+
+for now, this can be any and everything we would like to version
+for DTF: software, data, visualizations, whatever.
+
+so at current, the scope is unbounded. but see the next section.
+
+
+
+
+## development
+
+for now, this project may host several disparate sub-projects.
+
+as necessary, the sub-project (in the eyes of version control) may fork
+into its own versioned project, after the fact. this is just to say: not
+every project needs to start out with its own versioned repository. work
+on it may start within this project at first.
+
+
+
+
 ## contents of this project:
 
   - "TODO.stack"

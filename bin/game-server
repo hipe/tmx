@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+# #todo: i know i want python3 but i don't know if it is conventional
+# to specify it in the above manner..
+
+print("hello, i am the game server.")
