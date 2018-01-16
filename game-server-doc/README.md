@@ -30,3 +30,33 @@
 
    - what would be *really* cool is if the plugins (modules/adapters)
      could each be written in their own language (developer's choice)
+
+
+
+
+## contributing - running tests
+
+run one test file
+
+    python3 game_server_test/test_10_basics.py
+
+
+run the whole test suite
+
+    python3 -m unittest discover game_server_test
+
+
+
+
+## contributing - writing tests
+
+when lots of things break all at once (for example, during a massive
+re-architecting), it's useful to be able to narrow the search space
+quickly, to determine at what layer of abstraction you should focus on
+first to narrow down what is causing the ostensible problem.
+
+it burns up time trying to figure out why a very detailed, high-level
+test is broken if it's something fundamental and lowlevel that's the issue.
+this is why the author feels strongly about "regression order".
+
+(#todo this is documented in [tmx] yikes)

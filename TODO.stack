@@ -16,4 +16,3 @@ is inotify a thing
 basic IPC between processes in python
 cover: the behavior when an operation name isn't found
 cover: the ping operation
-look at unit testing - a hello work unit test
