@@ -1,0 +1,207 @@
+#!/usr/bin/env ruby -w
+# frozen_string_literal: true
+
+module DTF
+  # (hypothetical macro-project-wideknamespace)
+end
+
+class DTF::HtmlViaMarkdown
+
+  DESCRIPTION___ = -> y do
+    y << "draw me like one of your french girls, i.e github-flavored markdown."
+  end
+
+  # -
+    def initialize i, o, e, argv, pn_s_a
+      @ARGV = argv
+      @stdin = i
+      @stdout = o
+      @stderr = e
+      @program_name_string_array = pn_s_a
+    end
+
+    def execute
+      ok = __parse_arguments
+      ok &&= __load_dependencies
+      ok && __money
+      remove_instance_variable :@_exitstatus
+    end
+
+    def __parse_arguments
+      if __no_arguments
+        if _STDIN_is_interactive
+          _whine_about_no_input
+        else
+          __init_upstream_IO_via_STDIN
+        end
+      elsif _STDIN_is_interactive
+        if __argument_on_periphery_looks_like_help
+          __express_help
+        elsif __one_argument
+          if __first_argument_leads_with_dash
+            __whine_about_unrecognized_option
+          else
+            __init_upstream_IO_via_path_argument
+          end
+        else
+          __whine_about_too_many_arguments
+        end
+      else
+        __whine_about_ambiguous_arguments
+      end
+    end
+
+    # --
+
+    def __init_upstream_IO_via_path_argument
+      _file = remove_instance_variable( :@ARGV )[ 0 ]
+      io = ::File.open _file
+      _init_upstream_IO io, io.path
+    end
+
+    def __init_upstream_IO_via_STDIN
+      # tell the markdown parser the format
+      _init_upstream_IO remove_instance_variable( :@stdin ), 'from-stdin.md'
+    end
+
+    def _init_upstream_IO io, path
+      @_use_path = path
+      @_upstream_IO = io ; PROCEDE_
+    end
+
+    # --
+
+    def __whine_about_unrecognized_option
+      _invite "unrecognized option '#{ @ARGV[0] }'"
+    end
+
+    def __whine_about_too_many_arguments
+      _invite "unexpected argument '#{ @ARGV[1] }'"
+    end
+
+    def __whine_about_ambiguous_arguments
+      _invite "can't both read from STDIN and have arguments"
+    end
+
+    def _whine_about_no_input
+      _invite "expecting either STDIN or #{ _file_moniker }"
+    end
+
+    def __argument_on_periphery_looks_like_help
+      rx = /\A--?h(?:e(?:lp?)?)?\z/
+      rx =~ @ARGV[0] or 1 < @ARGV.length && rx =~ @ARGV.last
+    end
+
+    def __first_argument_leads_with_dash
+      '-'.getbyte(0) == @ARGV[0].getbyte(0)  # DASH_BYTE_
+    end
+
+    def _STDIN_is_interactive
+      @stdin.tty?
+    end
+
+    def __one_argument
+      _ARGV_length_is 1
+    end
+
+    def __no_arguments
+      _ARGV_length_is 0
+    end
+
+    def _ARGV_length_is d
+      d == @ARGV.length
+    end
+
+    def __express_help
+      _stderr do |y|
+        y << "usage: #{ _program_name } #{ _file_moniker }"
+        y << "       #{ _program_name }    (read from STDIN)"
+        y << nil
+        y << 'description:'
+        DESCRIPTION___[ y ]
+      end
+      @_exitstatus = 0 ; STOP_
+    end
+
+    def _file_moniker
+      '<markdown-file>'
+    end
+
+    # --
+
+    def __money
+
+      io = remove_instance_variable :@_upstream_IO
+      _big_upstream_s = io.read
+      io.close
+
+      _use_path = remove_instance_variable :@_use_path
+
+      @stderr.puts "(la la: '#{ _use_path }')"
+
+      _big_downstream_s = ::GitHub::Markup.render _use_path, _big_upstream_s
+
+      @stdout.write _big_downstream_s
+
+      @_exitstatus = 0 ; nil
+    end
+
+    def __load_dependencies
+      # (yes we should be using bundler instead)
+      ok = true
+      ok &&= _whiny_require 'github/markup', '1.6.2'
+      ok &&= _whiny_require 'commonmarker', '0.17.7.1'
+      ok
+    end
+
+    def _whiny_require gem_name, ver_s
+      require gem_name
+      PROCEDE_
+    rescue ::LoadError => e
+      _stderr do |y|
+        y << "LoadError: #{ e.message }"
+        y << 'maybe try this:'
+        y << "    gem install #{ gem_name }"
+        y << "(we used #{ gem_name.gsub(::File::SEPARATOR, '-') } #{ ver_s })"  # DASH_
+      end
+      _unable
+    end
+
+    # --
+
+    def _invite msg
+      _stderr do |y|
+        y << msg
+        y << "see '#{ _program_name } -h' for usage."
+      end
+      _unable
+    end
+
+    def _unable
+      @_exitstatus = 2 ; UNABLE_
+    end
+
+    def _stderr
+      io = @stderr
+      yield ::Enumerator::Yielder.new { |s| io.puts s }
+    end
+
+    def _program_name
+      @___program_name ||= "#{ @program_name_string_array * ' ' }"
+    end
+  # -
+
+  # ==
+
+  PROCEDE_ = true ; STOP_ = nil ; UNABLE_ = false
+
+  # ==
+end
+
+
+if true  # etc
+  exit DTF::HtmlViaMarkdown.new(
+    $stdin, $stdout, $stderr, ::ARGV, [ $PROGRAM_NAME ]
+  ).execute
+end
+# #born.

@@ -16,39 +16,47 @@ for now, this project may host several disparate sub-projects.
 
 as necessary, the sub-project (in the eyes of version control) may fork
 into its own versioned project, after the fact. this is just to say: not
-every project needs to start out with its own versioned repository. work
-on it may start within this project at first.
+every project needs to start out with its own versioned repository.
+
+that is, work on any given DTF-related may start within this project at
+first. (it is assumed that generally many of these sub-projects will be
+small in scale and small in code-side, so there is probably no reason to
+create a large diaspora of small versioned projects, when one large
+macro-project would suffice.)
 
 
 
 
 ## contents of this project:
 
-  - "TODO.stack"
+  - [`TODO.stack`](TODO.stack)
     - one line per item
-    - see "doc/004-using-the-TODO-stack.md"
+    - see [[#004]](#004) using the todo stack
 
-  - "doc/"
-    - about this directory:
+  - `bin/`
+      - of course don't actually put binary files in here. this is for
+        executable files written in scripting languages.
+
+  - `doc/`
       - typically this is for *static*, semi-human readable documents
         (like markdown, graph-viz)
 
-    - contents:
+      - you will need GraphViz to see the dotfiles (`*.dot`)
 
-      - "003-which-channel-flowchart.dot"
-        - you will need graph viz to see it
+      - the numbered documents in this directory appear in the
+        [node table](#e) below.
 
-      - [other numbered markdown documents not listed here]
+  - `script/`
+      - this is like `bin/` but for little _development_ utilities and one-offs.
 
-
-  - "static-html/"
-    - about this directory:
-      - these should be for *static* html and similar
-
-
+  - `static-html/`
+      - as the name implies, this is for the rare _static_
+        (i.e versioned, probably not generated) html
 
 
-## guidelines vaguely or wholly related to version control
+
+
+## guidelines vaguely- or wholly-related to version control
 
   - please make sure you don't leave trailing whitespace on
     to the lines of any files unless you mean to.
@@ -61,6 +69,33 @@ on it may start within this project at first.
 
 
 
+## the node table <a name="node-table"></a>
+
+(this table is explained at [\[#002\]] using the node table.)
+
+|Id                         | Main Tag | Content
+|---------------------------|:-----:|-
+|                           |       |
+|[\[#005\]]                 |       | text-based game client architecture
+|[\[#004\]]<a name=004></a> |       | using the TODO stack
+|[\[#003\]]                 |       | graph viz flowchart for which channel to use
+|[\[#002\]]                 |       | using the node table
+|[#001]                     |       | (this README file)
+
+
+
+[\[#005\]]: doc/005-text-based-game-client-architecture.dot
+[\[#004\]]: doc/004-using-the-TODO-stack.md
+[\[#003\]]: doc/003-which-channel-flowchart.dot
+[\[#002\]]: doc/002-using-the-node-table.md
+
+
+
+
+
+
+
 ## document-meta
 
+  - spike node table
   - #born.

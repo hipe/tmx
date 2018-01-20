@@ -20,4 +20,5 @@ cover: the behavior when an operation name isn't found
   cover: the magnet on the failure path
 cover: the ping operation
   cover: the magnet on the success path
-  cover: modeling commands
+  cover: test thing: tees, debugging output
+  cover: test thing: expectation success, expectation failure
