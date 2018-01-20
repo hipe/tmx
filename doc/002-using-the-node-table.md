@@ -59,6 +59,8 @@ this document describes how the [node table](../README.md#node-table) is used.
     related issues that need fixing.
 
   - [#001.a], [#001.b] etc for sub-identifiers that don't leave the document.
+    (when we want to refer to one point within a document from another point
+    within the *same* document we sometimes use `#here1`, `#here2` etc.)
 
   - [#001.A], [#001.B] etc for sub-identifiers that don't leave the project.
 

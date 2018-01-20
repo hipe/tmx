@@ -75,7 +75,7 @@ macro-project would suffice.)
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
-|                           |       |
+|[\[#006\]]                 |       | the README for the game server
 |[\[#005\]]                 |       | text-based game client architecture
 |[\[#004\]]<a name=004></a> |       | using the TODO stack
 |[\[#003\]]                 |       | graph viz flowchart for which channel to use
@@ -84,6 +84,7 @@ macro-project would suffice.)
 
 
 
+[\[#006\]]: game-server-doc/README.md
 [\[#005\]]: doc/005-text-based-game-client-architecture.dot
 [\[#004\]]: doc/004-using-the-TODO-stack.md
 [\[#003\]]: doc/003-which-channel-flowchart.dot
