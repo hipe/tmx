@@ -34,7 +34,33 @@ possible issues:
     we model expected *writes* or expected *lines*. the truth may be that
     we model neither; that in fact we model the expectation of one *or more*
     lines per write..
+
+:[#009]
 """
+
+from game_server_test.helper import(
+  lazy,
+)
+
+
+@lazy
+def expect_lines():
+    """a higher-level interface for reaching the other two methods
+
+    reach either `expect_stdout_lines` or `expect_stderr_lines`
+    """
+
+    dict = {
+        STDOUT: expect_stdout_lines,
+        STDERR: expect_stderr_lines,
+    }
+
+    def f(line_expectation_iter_f, which_s):
+        _d = _which_via_string(which_s)
+        return dict[_d](line_expectation_iter_f)
+
+    return f
+
 
 def expect_stderr_lines(f):
     return _Expectation((STDERR, x) for x in f())
@@ -67,10 +93,20 @@ class _Performance:
             return self._receive_anticipated_line(which, line)
 
     def _receive_anticipated_line(self, which, line):
+        """knowing you've anticipated this line, check expectation vs. reality
+
+        life is easier if `write()`s always end with newlines (FOR NOW).
+        a corollary (but *NOT* the design objective) of this is that
+        reporting facilities may assume that the string ends in a newline
+        elsewhere. (this assuption can impact reporting efforts both
+        positively and negatively. if this provision changes, we MUST check
+        each :[#here.B], which represents a subscription to this assumption.)
+        """
 
         if not _ends_in_newline(line):
-            raise Exception('life is easier if we always end with newlines (FOR NOW)')  # #todo
-            # (if we lose this assumption, refactor (at least) all #here1)
+            _docstring = self.__class__._receive_anticipated_line.__doc__
+            _msg = _docstring.split(NEWLINE)[2].strip()
+            raise Exception(_msg)
 
         exp_line = self._deque.popleft()
 
@@ -140,14 +176,16 @@ class _Expectation:
     def __init__(self, gen):
          self._these = [ _line_expectation(which, x) for (which, x) in gen ]
 
-    def to_perfomance_under(self, test_case):
+    def to_performance_under(self, test_case):
         return _Performance(test_case, self._these)
 
 
 def _line_expectation(which, x):
 
     if x:
-        if str == type(x):
+        if hasattr(x, '__call__'):  # if function == type(x)
+            return _FunctionBasedLineExpectation(x, which)
+        elif str == type(x):
             return _StringBasedLineExpectation(x, which)
         else:
             # assume hasattr(x, 'match')
@@ -178,7 +216,7 @@ class _StringBasedLineExpectation(_LineExpectation):
 
     def failure_tuple_against(self, line):
         if self._string != line:
-            fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume #here1
+            fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume [#here.B]
             dic = { 'had': line, 'exp': self._string }
             return (dic, fmt)
 
@@ -207,6 +245,25 @@ class _RegexpBasedLineExpectation(_LineExpectation):
         return (dic, fmt)
 
 
+def _to_tuple_about_expecting_any_line(self):
+    fmt = 'expecting any line on {which}'
+    dic = { 'which': self._which_as_string() }
+    return (dic, fmt)
+
+
+class _FunctionBasedLineExpectation(_LineExpectation):
+    """like the "any line expectation" but call a function on each line"""
+
+    def __init__(self, f, which):
+        self._f = f
+        super(_FunctionBasedLineExpectation, self).__init__(which)
+
+    def failure_tuple_against(self, line):
+        """no-op - always pass - call the function too"""
+        self._f(line)
+
+    to_tuple_about_expecting = _to_tuple_about_expecting_any_line
+
 
 class _AnyLineExpectation(_LineExpectation):
 
@@ -218,10 +275,8 @@ class _AnyLineExpectation(_LineExpectation):
         """
         pass
 
-    def to_tuple_about_expecting(self):
-        fmt = 'expecting any line on {which}'
-        dic = { 'which': self._which_as_string() }
-        return (dic, fmt)
+    to_tuple_about_expecting = _to_tuple_about_expecting_any_line
+
 
 
 
@@ -233,6 +288,20 @@ def _string_via_which(d):  # #todo
     if   2 == d: return 'STDOUT'
     elif 3 == d: return 'STDERR'
     elif 1 == d: return 'STDIN'
+
+
+@lazy
+def _which_via_string():
+    # #todo - there has to be a better way
+    these = {
+      'STDOUT' : STDOUT,
+      'STDERR' : STDERR,
+      'STDIN'  : STDIN,
+    }
+    def f(s):
+        return these[s]
+    return f
+
 
 
 _NEWLINE = "\n"

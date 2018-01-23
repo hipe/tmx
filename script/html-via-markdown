@@ -137,7 +137,7 @@ class DTF::HtmlViaMarkdown
 
       _use_path = remove_instance_variable :@_use_path
 
-      @stderr.puts "(la la: '#{ _use_path }')"
+      @stderr.puts "(generating #{ _use_path })"
 
       _big_downstream_s = ::GitHub::Markup.render _use_path, _big_upstream_s
 

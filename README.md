@@ -5,12 +5,12 @@
 for now, this can be any and everything we would like to version
 for DTF: software, data, visualizations, whatever.
 
-so at current, the scope is unbounded. but see the next section.
+so at current, the scope is unbounded. but see the [next section](#b).
 
 
 
 
-## development
+## <a name=b></a>development overview
 
 for now, this project may host several disparate sub-projects.
 
@@ -24,10 +24,13 @@ small in scale and small in code-side, so there is probably no reason to
 create a large diaspora of small versioned projects, when one large
 macro-project would suffice.)
 
+as for contributing to this project, see the below comments on
+[version control](#d) and our [\[#010\]] extra-conventional conventions.
 
 
 
-## contents of this project:
+
+## overview of contents of this project
 
   - [`TODO.stack`](TODO.stack)
     - one line per item
@@ -56,7 +59,7 @@ macro-project would suffice.)
 
 
 
-## guidelines vaguely- or wholly-related to version control
+## <a name=d></a>guidelines vaguely- or wholly-related to version control
 
   - please make sure you don't leave trailing whitespace on
     to the lines of any files unless you mean to.
@@ -69,12 +72,18 @@ macro-project would suffice.)
 
 
 
-## the node table <a name="node-table"></a>
+## <a name="node-table"></a>the node table
 
 (this table is explained at [\[#002\]] using the node table.)
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#011]                     |       | commands/parameters API (placeheld)
+|[\[#010\]]                 |       | extra-conventional conventions
+|[#009]                     |       | [ expect STD's ]
+|[#008]                     |       | (placeheld for small internal tracking)
+|[#007.B]                   | #open | refactor helper.py memoizers to use doctest
+|[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server
 |[\[#005\]]                 |       | text-based game client architecture
 |[\[#004\]]<a name=004></a> |       | using the TODO stack
@@ -84,6 +93,7 @@ macro-project would suffice.)
 
 
 
+[\[#010\]]: doc/010-extra-conventional-conventions.md
 [\[#006\]]: game-server-doc/README.md
 [\[#005\]]: doc/005-text-based-game-client-architecture.dot
 [\[#004\]]: doc/004-using-the-TODO-stack.md

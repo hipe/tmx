@@ -87,7 +87,7 @@ class _CaseMethods:
         return expect_STDs
 
 
-class Case_01_success_path(_CaseMethods, unittest.TestCase):
+class Case01_success_path(_CaseMethods, unittest.TestCase):
 
     def test_050_subject_module_loads(self):
         self.assertIsNotNone(self._subject_module())
@@ -101,7 +101,7 @@ class Case_01_success_path(_CaseMethods, unittest.TestCase):
     @shared_subject
     def _performance(self):
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(None)
+        perf = _exp.to_performance_under(None)
         perf.stderr.write(newline)
         perf.stderr.write(newline)
         perf.finish()
@@ -110,7 +110,7 @@ class Case_01_success_path(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case_02_one_too_many(_CaseMethods, unittest.TestCase):
+class Case02_one_too_many(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -124,7 +124,7 @@ class Case_02_one_too_many(_CaseMethods, unittest.TestCase):
     def _performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(exp)
+        perf = _exp.to_performance_under(exp)
         io = perf.stderr
         io.write(newline)
         io.write(newline)
@@ -136,7 +136,7 @@ class Case_02_one_too_many(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case_03_one_too_few(_CaseMethods, unittest.TestCase):
+class Case03_one_too_few(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -150,7 +150,7 @@ class Case_03_one_too_few(_CaseMethods, unittest.TestCase):
     def _performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(exp)
+        perf = _exp.to_performance_under(exp)
         io = perf.stderr
         io.write(newline)
         perf.finish()
@@ -160,7 +160,7 @@ class Case_03_one_too_few(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case_04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
+class Case04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -174,7 +174,7 @@ class Case_04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
     def _performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(exp)
+        perf = _exp.to_performance_under(exp)
         perf.stderr.write(newline)
         perf.stdout.write("cha cha\n")
         return exp.finish()
@@ -183,7 +183,7 @@ class Case_04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case_05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
+class Case05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self.assertIsNotNone(self._performance())
@@ -197,7 +197,7 @@ class Case_05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
     def _performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(exp)
+        perf = _exp.to_performance_under(exp)
         io = perf.stderr
         io.write("foo\n")
         io.write("biz\n")
@@ -207,7 +207,7 @@ class Case_05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_certain_string_expectation()
 
 
-class Case_06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
+class Case06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -221,7 +221,7 @@ class Case_06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
     def _performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
-        perf = _exp.to_perfomance_under(exp)
+        perf = _exp.to_performance_under(exp)
         io = perf.stderr
         io.write("bif\n")
         io.write(" baz\n")

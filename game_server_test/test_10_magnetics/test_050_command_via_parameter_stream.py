@@ -14,7 +14,7 @@ shared_subject = helper.shared_subject
 
 
 
-class Main(unittest.TestCase):
+class Case010(unittest.TestCase):
 
     def test_050_subject_module_loads(self):
         self.assertIsNotNone(_subject_module())  # ..

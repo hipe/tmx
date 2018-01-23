@@ -48,7 +48,7 @@ this document describes how the [node table](../README.md#node-table) is used.
 
 
 
-## sub-identifiers <a name="sub-identifiers"></a>
+## <a name="sub-identifiers"></a>sub-identifiers
 
   - they look like this: [#001.A]
 
