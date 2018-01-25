@@ -22,3 +22,4 @@ cover: the ping operation
   cover: the magnet on the success path
   cover: test thing: tees, debugging output
   cover: the remaining memoizers in helper.py
+  soon: make a fake app with a ping

@@ -90,8 +90,16 @@ def memoize(f):
     return g
 
 
+def fixture_directory_(s):
+    import os
+    _test_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(_test_dir, 'fixture-directories', s)
+
+
+
 @memoize
 def empty_iterator():
+    # "THE_EMPTY_STREAM"
     return iter(())
 
 

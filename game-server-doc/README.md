@@ -1,4 +1,4 @@
-# game server :[#006]
+# game server
 
 ## objective & scope
 
@@ -60,3 +60,19 @@ test is broken if it's something fundamental and lowlevel that's the issue.
 this is why the author feels strongly about "regression order".
 
 (#todo this is documented in [tmx] yikes)
+
+
+
+
+## sub-node table (experiment)
+
+|Id                         | Main Tag | Content
+|---------------------------|:-----:|-
+|[#006.B]                   |       | (in code, track gripes about `argparse`)
+
+
+
+
+## (document-meta)
+
+  - this document is identified by `:[#006]` (without the colon)

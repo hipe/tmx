@@ -44,6 +44,7 @@ if a[0] != path:
 
 from game_server_test.generic_CLI_helper import(
   CLI_CaseMethods,
+  the_empty_ARGV,
   ARGV,
   PROGRAM_NAME,
   NEWLINE,
@@ -53,6 +54,7 @@ from game_server_test.generic_CLI_helper import(
 import game_server_test.helper as helper
 
 shared_subject = helper.shared_subject
+memoize = helper.memoize
 
 
 class _CommonCase(CLI_CaseMethods, unittest.TestCase):
@@ -64,10 +66,11 @@ class _CommonCase(CLI_CaseMethods, unittest.TestCase):
 
         that currently the usage line WEIRDLY shows up before the main line
         """
+        self._this_line_says_usage('first_line')
 
-        _full_line = self.magnetic_call_().first_line
-        _expected_line = 'usage: %s [-h] {foo_bar,biff_baz} ...%s' % (PROGRAM_NAME, NEWLINE)
-        self.assertEqual(_expected_line, _full_line)
+    def _this_line_says_usage(self, attr):
+        _actual_line = getattr(self.magnetic_call_, attr)
+        self.assertEqual(_foo_bar_usage_line(), _actual_line)
 
     # -- setup hook-outs common to all/most cases in this file
 
@@ -79,20 +82,25 @@ class _CommonCase(CLI_CaseMethods, unittest.TestCase):
     def _invocation_when_two_stderr_lines_expected(self):
         return self.invocation_when_expected_(2, STDERR)
 
-    _subject_module = CLI_CaseMethods.main_magnetic_
-
 
 class Case0_no_args(_CommonCase):
 
     def test_010_subject_module_loads(self):
-        self.assertIsNotNone(self._subject_module())
+        self.assertIsNotNone(self.main_magnetic_())
 
     def test_020_magnetic_call_happens(self):
         self.magnetic_call_happens_()
 
+    def test_050_second_line_says_usage(self):
+        self._this_line_says_usage('second_line');
+
+    def test_060_first_line_says_this(self):
+        _actual_line = self.magnetic_call_.first_line
+        self.assertEqual(_actual_line, 'expecting sub-command.'+NEWLINE)
+
+    @property
     @shared_subject
     def magnetic_call_(self):
-        return "wip"
         return self._invocation_when_two_stderr_lines_expected()
 
     def ARGV_(self):
@@ -115,8 +123,9 @@ class Case1_1_strange_subparser_name(_CommonCase):
 
     def test_060_main_line_says_this(self):
         self.main_line_says_this_(
-          "invalid choice: 'fhqwhgads' (choose from 'foo_bar', 'biff_baz')")
+          "invalid choice: 'fhqwhgads' (choose from 'foo-bar', 'biff-baz')")
 
+    @property
     @shared_subject
     def magnetic_call_(self):
         return self._invocation_when_two_stderr_lines_expected()
@@ -138,11 +147,12 @@ class Case1_2_strange_option(_CommonCase):
         self.magnetic_call_has_exitstatus_of_common_error_()
 
     def test_050_one_line_says_usage(self):
-        self.one_line_says_usage_();
+        self.one_line_says_usage_()
 
     def test_060_main_line_says_this(self):
         self.main_line_says_this_('unrecognized arguments: -x --another --etc')
 
+    @property
     @shared_subject
     def magnetic_call_(self):
         return self._invocation_when_two_stderr_lines_expected()
@@ -152,7 +162,31 @@ class Case1_2_strange_option(_CommonCase):
         return [ '-x', '--another', '--etc' ]
 
 
-NEWLINE = "\n"
+class Case1_3_good_sub_command(_CommonCase):
+
+    def test_020_magnetic_call_happens(self):
+        self.magnetic_call_happens_()
+
+    def test_050_has_command(self):
+        self.assertIsNotNone(self.magnetic_call_.WIP_COMMAND)
+
+    def test_050_has_namespace(self):
+        self.assertIsNotNone(self.magnetic_call_.WIP_NAMESPACE)
+
+    @property
+    @shared_subject
+    def magnetic_call_(self):
+        return self.result_when_expecting_no_output_or_errput_()
+
+    @ARGV
+    def ARGV_(self):
+        return [ 'foo-bar' ]
+
+@memoize
+def _foo_bar_usage_line():
+  return 'usage: %s [-h] {foo-bar,biff-baz} ...%s' % (PROGRAM_NAME, NEWLINE)
+
+
 STDERR = 'STDERR'
 
 

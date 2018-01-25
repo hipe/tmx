@@ -78,17 +78,20 @@ as for contributing to this project, see the below comments on
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#012]                     |       | generic microservice arch (placeheld)
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
 |[#008]                     |       | (placeheld for small internal tracking)
+|[#007.D]                   | #wish | bump python version
+|[#007.C]                   | #wish | virtualenv
 |[#007.B]                   | #open | refactor helper.py memoizers to use doctest
 |[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server
 |[\[#005\]]                 |       | text-based game client architecture
-|[\[#004\]]<a name=004></a> |       | using the TODO stack
+|<a name=004></a>[\[#004\]] |       | using the TODO stack
 |[\[#003\]]                 |       | graph viz flowchart for which channel to use
-|[\[#002\]]                 |       | using the node table
+|<a name=002></a>[\[#002\]] |       | using the node table
 |[#001]                     |       | (this README file)
 
 

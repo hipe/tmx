@@ -4,7 +4,7 @@ stupid simple issue tracking:
 
   - we are describing the "TODO.stack" file.
 
-  - one TOOD item per line. (need more lines? see #here1)
+  - one TODO item per line. (need more lines? see [below](#b))
 
   - generally your final-most goal is the first line
 
@@ -37,7 +37,12 @@ stupid simple issue tracking:
 
 
 
-## more details
+## <a name=b></a>more details
 
-    - if you want to describe your item in more than one line, your
-      descripton belongs elsewhere. maybe break out a dedicated file. :#here1
+  - if you want to describe your item in more than one line, your
+    descripton belongs elsewhere. maybe break out a dedicated file.
+
+  - this whole system could theoretically be superceded by
+    [\[#002\]](../README.md#002) the node table (eventually): but that
+    is unlikely to happen anytime soon because of how reliable and
+    resilient and portable this system is..

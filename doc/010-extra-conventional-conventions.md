@@ -120,12 +120,12 @@ names its private methods `_like_this`, that class has no guarantee that
 this name won't collide with a same-named method in a parent [class] that
 it does not intend to override.
 
-this potential conflict could cause errors that might be hard to track down.
+this potential conflict could cause bugs that are hard to track down.
 not only does this hold for the present, but it holds indefinitely into the
 future, which is to say your code is not as future-proof as it could be.
 
 our antidote to this is to say that for practical purposes we should know
-whether or not we intend for a class to serve as a base for other clasees
+whether or not we intend for a class to serve as a base for other classes
 outside of our module (file), and when it does we must give the client
 the full reign to the namespace of methods named `_like_this`. (java solves
 this problem by giving each class (and similar) its own private method
@@ -221,7 +221,7 @@ this perhaps weird-looking convention exists mainly as an optimization
 for refactoring. the qualifications necessary to employ this convention
 are all of:
 
-  1. this method is *not* part of the public API of the project (in a
+  1. this method is *not* part of the public API of the project (in the
      [semver] sense).
 
   1. this method *is* tied to various points within the project. (more
@@ -232,7 +232,7 @@ the purpose of conventions like this is so that at a glance one can get
 a sense for the relative cost of changing the method (variously in terms
 of name, signature, behavior, deleting the method; etc).
 
-because the method is not part of your public API (in a [semver] sense),
+because the method is not part of your public API (in the [semver] sense),
 you do not have to bump your version number when you change the method.
 
 however, to change the method *will* impact your "whole" project (for

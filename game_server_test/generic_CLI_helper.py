@@ -39,18 +39,18 @@ class CLI_CaseMethods:
 
         ..whether the "main" line is the first or second line
         """
-        _full_line = self.magnetic_call_().second_line
+        _full_line = self.magnetic_call_.second_line
         _expected_line = '%s: error: %s%s' % (PROGRAM_NAME, wat, NEWLINE)
         self.assertEqual(_expected_line, _full_line)
 
     def magnetic_call_has_exitstatus_of_common_error_(self):
-        self.assertEqual(2, self.magnetic_call_().exitstatus)
+        self.assertEqual(2, self.magnetic_call_.exitstatus)
 
     def magnetic_call_results_in_failure_(self):
-        self.assertFalse(self.magnetic_call_().OK)
+        self.assertFalse(self.magnetic_call_.OK)
 
     def magnetic_call_happens_(self):
-        self.assertIsNotNone(self.magnetic_call_())
+        self.assertIsNotNone(self.magnetic_call_)
 
     # -- these
 
@@ -62,19 +62,29 @@ class CLI_CaseMethods:
         _expectation = expect_STDs.expect_lines( (lambda: f_a), which )
         perf = _expectation.to_performance_under(self)
 
+        _two = self._appropriate_stdout_and_stderr__CLI(perf)
+
+        inter_res = self._interpretation__CLI(*_two)
+
+        perf.finish()
+        return _Invocation(inter_res, s_a)
+
+
+    def result_when_expecting_no_output_or_errput_(self):
+
+        return self._interpretation__CLI(None, None)
+
+
+    def _interpretation__CLI(self, stdout, stderr):
         _argv = self.ARGV_()
         _command_st = self.command_stream_()
-        stdout, stderr = self._appropriate_stdout_and_stderr__CLI(perf)
 
         _bldr = self.main_magnetic_().interpretation_builder_via_modality_resources(
           ARGV = _argv,
           stdout = stdout,
           stderr = stderr,
         )
-
-        inter_res = _bldr.interpretation_via_command_stream(_command_st)
-        perf.finish()
-        return _Invocation(inter_res, s_a)
+        return _bldr.interpretation_via_command_stream(_command_st)
 
 
     def _appropriate_stdout_and_stderr__CLI(self, perf):
@@ -90,7 +100,7 @@ class CLI_CaseMethods:
 
 
     def _debugging_IO__CLI(self, upstream_IO, format):
-
+        import sys
         return _MinimalIOTee(
           upstream_IO = upstream_IO,
           IO_for_debugging = sys.stderr,
@@ -131,11 +141,11 @@ class CLI_CaseMethods:
 
     @shared_subject
     def _command_one__CLI(self):
-        return _command_named('foo_bar')
+        return _command_named('foo-bar')
 
     @shared_subject
     def _command_two__CLI(self):
-        return _command_named('biff_baz')
+        return _command_named('biff-baz')
 
     @property
     def do_debug(self):

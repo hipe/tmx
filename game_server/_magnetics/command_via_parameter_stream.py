@@ -16,4 +16,8 @@ class SELF:  # :[#011]
         self.name = name
         self.has_parameters = False
 
+    @property
+    def is_branch_node(self):
+        return False
+
 # #born. (minimal)
