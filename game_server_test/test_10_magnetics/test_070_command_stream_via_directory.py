@@ -18,7 +18,7 @@ memoize = helper.memoize
 
 _CommonCase = unittest.TestCase
 
-class Case1_main(_CommonCase):
+class Case010_main(_CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_magnetic())
@@ -36,9 +36,13 @@ class Case1_main(_CommonCase):
     @property
     @shared_subject
     def _items(self):
-        from game_server_test.fixture_directories import _010_cha_cha as arg
-        _gen = _subject_magnetic()(arg)
+        _gen = _subject_magnetic()(_this_one_module())
         return [ x for x in _gen ]
+
+
+def _this_one_module():
+    from game_server_test.fixture_directories import _010_cha_cha as mod
+    return mod
 
 
 def _subject_magnetic():

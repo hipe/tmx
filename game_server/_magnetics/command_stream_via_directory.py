@@ -33,15 +33,10 @@ def _final_stream_via_generator(gen, collection_module):
     return( _money(x) for x in gen )
 
 def _command_via_module(mod, stem):
-    x = mod.PARAMETERS
-    if x:
-        param_st = iter(x)
-    else:
-        param_st = iter(())  # THE_EMPTY_STREAM
     from game_server._magnetics.command_via_parameter_stream import SELF as cmd
     return cmd(
       name = stem,
-      parameter_stream = param_st,
+      command_module = mod,
     )
 
 def _generator_via_dir_path(dir_path):

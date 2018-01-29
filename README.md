@@ -82,9 +82,10 @@ as for contributing to this project, see the below comments on
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.C]                   | #wish | function-based commands
+|[#008.B]                   | #open | remove array abuse
 |[#008]                     |       | (placeheld for small internal tracking)
-|[#007.D]                   | #wish | bump python version
-|[#007.C]                   | #wish | virtualenv
+|[#007.C]                   | #open | lock current stable (python 3.6.4) w/ virtualenv/VCS
 |[#007.B]                   | #open | refactor helper.py memoizers to use doctest
 |[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server

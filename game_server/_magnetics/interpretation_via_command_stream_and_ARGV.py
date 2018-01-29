@@ -127,7 +127,7 @@ class _AdaptedMicroserviceTreeBranchNode:
             return _when_argument_parser_threw_interruption(rsx, e)
         else:
             if ns.chosen_sub_command:
-                return _when_oh_snap(ns, ci)
+                return _when_oh_snap(ns, ci, rsx)
             else:
                 return _when_no_sub_command(rsx, ap)
 
@@ -143,12 +143,12 @@ class _AdaptedMicroserviceTreeBranchNode:
 # argument parsing case behaviors, experimentally as functions
 #
 
-def _when_oh_snap(ns, ci):
+def _when_oh_snap(ns, ci, rsx):
     cmd = ci[ns.chosen_sub_command]
     if cmd.is_branch_node:
         cover_me('deep microservice trees')
     else:
-      return _OhSnapStepResolution(ns, cmd)
+      return _OhSnapStepResolution(ns, cmd, rsx)
 
 def _when_no_sub_command(rsx, ap):
     io = rsx.stderr
@@ -170,7 +170,7 @@ def __ugh_string_yadda_from_message(message):
     # #[#006.B] get it together `argparse`
 
     import re
-    m = re.search('^([^:]+: error: )argument '+_THIS_NAME+': (.+)\Z', message, re.DOTALL)
+    m = re.search('^([^:]+: error: )argument '+_THIS_NAME+': (.+)\\Z', message, re.DOTALL)
     if m:
         return ''.join(m.groups())  # EMPTY_S
     else:
@@ -182,9 +182,23 @@ def __ugh_string_yadda_from_message(message):
 
 class _OhSnapStepResolution:
 
-    def __init__(self, namespace, cmd):
-        self.WIP_NAMESPACE = namespace
-        self.WIP_COMMAND = cmd
+    def __init__(self, namespace, cmd, rsx):
+        self.__modality_resources = rsx
+        self._namespace = namespace  # #testpoint (property name)
+        self._command = cmd  # #testpoint (property name)
+
+    def FLUSH_TO_EXECUTABLE(self):  # non-idempotent
+        rsx = self.__modality_resources ; del self.__modality_resources
+        self.__listener_builder = _build_listener_builder(rsx)
+        cmd = self._command ; del self._command
+        return cmd.EXECUTABLE_VIA_RESOURCER(self)
+
+    def flush_modality_agnostic_listener_builder(self):
+        f = self.__listener_builder ; del self.__listener_builder ; return f
+
+    @property
+    def OK(self):
+        return True
 
     @property
     def is_terminal(self):
@@ -199,14 +213,11 @@ class _FailureStepResolution:
 
     @property
     def OK(self):
-        return False  # #never OK
+        return False
 
     @property
     def is_terminal(self):
         return True
-
-
-
 
 #
 # support classes (magnetic-like) to build argument parser
@@ -267,6 +278,86 @@ def _start_argument_parser(program_name_up_to_node):
 _THIS_NAME = 'chosen_sub_command'
 
 #
+# listener builder
+#
+
+def _build_listener_builder(rsx):
+    """(placeholder for the deeper idea)
+
+    the idea here is that commands can emit "expressions" (and maybe one
+    day "events", known together with expressions as as "emissions") in a
+    modality-agnostic way and a listener can express them in a modality-
+    appropriate way.
+
+    you emit your expression by telling it a 'channel' in terms of
+    several strings:
+
+        self._listener('info', 'expression', f)
+
+    (currently, the above pictured channel ('info', 'expression') is the
+    only channel supported.)
+
+    the function that is passed as the last argument (above `f`) is a
+    callback that will receive two things:
+
+      - a function to receive strings
+      - a "styler"
+
+    so the function might look like:
+        def f(o, styler):
+            o('hello ' + o.em('world') + '!')
+
+    this convoluted interface (HIGHLY EXERIMENTAL) allows the listener to
+    decide whether it wants the command to bother executing the emission
+    just based on seeing the channel alone. also it allows the listener
+    (modality client) to inject a modality-appropriate styler.
+
+    we want the interface to improve while not losing the above provisions.
+    """
+
+    def call_once():
+        # (we jump thru tiny hoops to ensure you set up the listener max once.)
+
+        nonlocal call_once
+        call_once = None  # hm..
+
+        def g(*x_a):  # currently: (channel string, channel string, callback)
+            d = deque(x_a) ; del x_a
+            expression_f = d.pop()
+            error_or_info = d.popleft()
+            if 'error' == error_or_info:
+                pass
+            elif 'info' == error_or_info:
+                pass
+            else:
+                cover_me('bad first channel component: ' + error_or_info)
+            exp = d.popleft()
+            if 'expression' == exp:
+                pass
+            else:
+                cover_me('bad second channel component: ' + exp)
+            if 0 == len(d):
+                del d
+            else:
+                cover_me('unexpected third channel component: '+d[0])
+            expression_f(write_unterminated_line, _STYLER)
+        from collections import deque
+
+        def write_unterminated_line(s):
+            if s:
+                s += NEWLINE
+            else:
+                s = NEWLINE
+            stderr.write(s)
+        stderr = rsx.stderr  # ..
+
+        return g
+
+    def f():
+        return call_once()
+    return f
+
+#
 # small support classes
 #
 
@@ -279,9 +370,21 @@ class _MyInterruption(Exception):
         self.exitstatus = exitstatus
         self.message = message
 
+#
+# this little guy
+#
+
+class _STYLER:  # #todo
+    """experiment"""
+    def em(s):
+      return "\u001B[1;32m%s\u001B[0m" % s
+
+# --
 
 _GENERIC_ERROR = 2
 NEWLINE = "\n"
 
 # #history-A.1: as referenced (can be temporary)
 # #born.
+
+# https://www.instagram.com/p/BI45jshglIv/?taken-by=shirogane_sama

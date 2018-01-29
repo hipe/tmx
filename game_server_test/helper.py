@@ -1,3 +1,5 @@
+import game_server
+
 def stream_via_memoized_array(f):
     """EXPERIMENTAL decorator"""
 
@@ -69,38 +71,22 @@ def lazy(f_f):
     return g
 
 
-def memoize(f):
-    """decorator for lazy memoization of functions.
-
-    compare to the more complicated `lazy`
-    #not-threadsafe
-    """
-
-    def f_initially():
-        def f_subsequently():
-            return x
-        x = f()
-        f_pointer[0] = f_subsequently
-        return g()
-
-    def g():
-        return f_pointer[0]()
-
-    f_pointer = [f_initially]
-    return g
+memoize = game_server.memoize
+@memoize
+def empty_command_module():
+    import types
+    ns = types.SimpleNamespace()
+    setattr(ns, 'PARAMETERS', None)
+    class DoYouSeeMe:
+        pass
+    setattr(ns, 'Command', DoYouSeeMe)
+    return ns
 
 
 def fixture_directory_(s):
     import os
     _test_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(_test_dir, 'fixture-directories', s)
-
-
-
-@memoize
-def empty_iterator():
-    # "THE_EMPTY_STREAM"
-    return iter(())
 
 
 def iterator_via_times(num):

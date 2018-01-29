@@ -79,8 +79,8 @@ class _CommonCase(CLI_CaseMethods, unittest.TestCase):
 
     # -- setup support
 
-    def _invocation_when_two_stderr_lines_expected(self):
-        return self.invocation_when_expected_(2, STDERR)
+    def _interpretation_when_two_stderr_lines_expected(self):
+        return self.interpretation_when_expected_(2, STDERR)
 
 
 class Case0_no_args(_CommonCase):
@@ -101,7 +101,7 @@ class Case0_no_args(_CommonCase):
     @property
     @shared_subject
     def magnetic_call_(self):
-        return self._invocation_when_two_stderr_lines_expected()
+        return self._interpretation_when_two_stderr_lines_expected()
 
     def ARGV_(self):
         return the_empty_ARGV()
@@ -128,7 +128,7 @@ class Case1_1_strange_subparser_name(_CommonCase):
     @property
     @shared_subject
     def magnetic_call_(self):
-        return self._invocation_when_two_stderr_lines_expected()
+        return self._interpretation_when_two_stderr_lines_expected()
 
     @ARGV
     def ARGV_(self):
@@ -155,7 +155,7 @@ class Case1_2_strange_option(_CommonCase):
     @property
     @shared_subject
     def magnetic_call_(self):
-        return self._invocation_when_two_stderr_lines_expected()
+        return self._interpretation_when_two_stderr_lines_expected()
 
     @ARGV
     def ARGV_(self):
@@ -168,10 +168,10 @@ class Case1_3_good_sub_command(_CommonCase):
         self.magnetic_call_happens_()
 
     def test_050_has_command(self):
-        self.assertIsNotNone(self.magnetic_call_.WIP_COMMAND)
+        self.assertIsNotNone(self.magnetic_call_._command)
 
     def test_050_has_namespace(self):
-        self.assertIsNotNone(self.magnetic_call_.WIP_NAMESPACE)
+        self.assertIsNotNone(self.magnetic_call_._namespace)
 
     @property
     @shared_subject

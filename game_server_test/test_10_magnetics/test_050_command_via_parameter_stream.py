@@ -30,7 +30,7 @@ class Case010(unittest.TestCase):
     def _subject(self):
         return _subject_module()(
           name = 'hello_there',
-          parameter_stream = helper.empty_iterator(),
+          command_module = helper.empty_command_module(),
         )
 
 

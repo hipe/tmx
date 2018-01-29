@@ -49,6 +49,8 @@ class CLI_CaseMethods:
     def magnetic_call_results_in_failure_(self):
         self.assertFalse(self.magnetic_call_.OK)
 
+    # magnetic_call_succeeds_ (track subscribers)
+
     def magnetic_call_happens_(self):
         self.assertIsNotNone(self.magnetic_call_)
 
@@ -56,18 +58,39 @@ class CLI_CaseMethods:
 
     def invocation_when_expected_(self, num_lines, which):
 
+        def f(sout, serr):
+            interpretation_result = self._interpretation__CLI(sout, serr)
+            self.assertTrue(interpretation_result.OK)
+            _exe = interpretation_result.FLUSH_TO_EXECUTABLE()
+            mixed_x = _exe()
+            if mixed_x is None:
+                return _OK_interpretation_result()
+            else:
+                cover_me('when execute results in a value')
+
+        return self._same_when_expected(f, num_lines, which)
+
+    def interpretation_when_expected_(self, num_lines, which):
+
+        def f(sout, serr):
+          return self._interpretation__CLI(sout, serr)
+
+        return self._same_when_expected(f, num_lines, which)
+
+    def _same_when_expected(self, f, num_lines, which):
+
         s_a, f_a = self._build_recording_list_and_expectation_list__CLI(num_lines)
         from game_server_test import expect_STDs
 
         _expectation = expect_STDs.expect_lines( (lambda: f_a), which )
         perf = _expectation.to_performance_under(self)
 
-        _two = self._appropriate_stdout_and_stderr__CLI(perf)
+        _sout, _serr = self._appropriate_stdout_and_stderr__CLI(perf)
 
-        inter_res = self._interpretation__CLI(*_two)
+        interpretation_result = f(_sout, _serr)
 
         perf.finish()
-        return _Invocation(inter_res, s_a)
+        return _Invocation(interpretation_result, s_a)
 
 
     def result_when_expecting_no_output_or_errput_(self):
@@ -86,9 +109,7 @@ class CLI_CaseMethods:
         )
         return _bldr.interpretation_via_command_stream(_command_st)
 
-
     def _appropriate_stdout_and_stderr__CLI(self, perf):
-
         if self.do_debug:
             # (below we assume the [#009.B] provision 2x)
             stdout = self._debugging_IO__CLI(perf.stdout, '%sohai stdout: %s')
@@ -97,7 +118,6 @@ class CLI_CaseMethods:
             stdout = perf.stdout
             stderr = perf.stderr
         return stdout, stderr
-
 
     def _debugging_IO__CLI(self, upstream_IO, format):
         import sys
@@ -168,13 +188,11 @@ class CLI_CaseMethods:
         self.__dict__['do_debug'] = x
 
 
-
-
 def _command_named(name):
     from game_server._magnetics import command_via_parameter_stream
     return command_via_parameter_stream.SELF(
       name = name,
-      parameter_stream = helper.empty_iterator(),
+      command_module = helper.empty_command_module(),
     )
 
 
@@ -197,6 +215,10 @@ class _Invocation:
         return self._lines[offset]
 
     @property
+    def number_of_lines(self):
+        return len(self._lines)
+
+    @property
     def exitstatus(self):  # assume failure result
         return self._interpretation_result.exitstatus
 
@@ -216,6 +238,14 @@ class _MinimalIOTee:  # TODO move this
     def write(self, s):
         self._IO_for_debugging.write(self._format % (NEWLINE, s))
         return self._upstream_IO.write(s)
+
+
+@memoize
+def _OK_interpretation_result():
+    class _OK_Result:
+        def __init__(self):
+          self.OK = True
+    return _OK_Result()
 
 
 @memoize

@@ -14,12 +14,12 @@ look at pack/unpack
 start kicker
 is inotify a thing
 basic IPC between processes in python
+cover: parameters integrated into a hello world
+  wish: consts not strings (or enum type)
+  refactor: dashes in ARGV, underscores in names
   cover: the behavior when a parameter isn't found
   cover: modeling parameters
-cover: the behavior when an operation name isn't found
   cover: the magnet on the failure path
-cover: the ping operation
   cover: the magnet on the success path
   cover: test thing: tees, debugging output
   cover: the remaining memoizers in helper.py
-  soon: make a fake app with a ping
