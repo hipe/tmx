@@ -23,28 +23,7 @@ def stream_via_memoized_array(f):
     return permanent_f
 
 
-def shared_subject(f):
-    """decorator for lazy memoization of MONADIC method result
-
-    #todo - we are borrowing an idiom from a different ecosystem. this is
-    *certainly* not the way to implement it here, but it's a stand in.
-
-    #not-threadsafe
-    """
-
-    def g(some_self):
-        return f_pointer[0](some_self)
-
-    def initially(orig_self):
-        def subsequently(_):
-            return x
-        f_pointer[0] = None
-        x = f(orig_self)
-        f_pointer[0] = subsequently
-        return g(None)
-
-    f_pointer = [initially]
-    return g
+shared_subject = game_server.dangerous_memoize
 
 
 def lazy(f_f):
