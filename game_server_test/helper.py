@@ -62,6 +62,25 @@ def empty_command_module():
     return ns
 
 
+class magnetics:
+    """much shorter names, insulate from name change"""
+
+    @memoize
+    def ARGV():
+        from game_server._magnetics import interpretation_via_command_stream_and_ARGV as mag
+        return mag
+
+    @memoize
+    def command():
+        from game_server._magnetics import command_via_parameter_stream as mag
+        return mag
+
+    @memoize
+    def parameter():
+        from game_server._magnetics import parameter_via_definition as mag
+        return mag
+
+
 def fixture_directory_(s):
     import os
     _test_dir = os.path.dirname(os.path.abspath(__file__))

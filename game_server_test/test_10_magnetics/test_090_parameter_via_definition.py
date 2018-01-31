@@ -182,7 +182,7 @@ def _build_parameter_with_this_description(f):
     )
 
 def _build_parameter_via_argument_arity_string(s):
-    _r = getattr(_subject_magnetic_file().ARITIES, s)
+    _r = getattr(_subject_magnetic_file().arities, s)
     return _subject_magnetic()(
         argument_arity = _r,
     )

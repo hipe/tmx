@@ -23,3 +23,6 @@ cover: parameters integrated into a hello world
   cover: the magnet on the success path
   cover: test thing: tees, debugging output
   cover: the remaining memoizers in helper.py
+  cover: help screens for parameters canon
+  cover: build parameters canon
+get rid of has_parameters

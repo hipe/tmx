@@ -50,5 +50,10 @@ def hello_game_server():
 def main():
   print("hello from the game server.")
 
+
+class Exception(Exception):
+    pass
+
+
 # #history-A.2: a memoizer method moved here from elsewhere
 # #history-A.1: a memoizer method moved here from elsewhere

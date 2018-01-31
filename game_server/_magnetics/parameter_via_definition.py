@@ -10,7 +10,7 @@ class SELF:
         argument_arity = None,
     ):
         if argument_arity is None:
-            argument_arity = _ARITIES.COMMON
+            argument_arity = _arities.COMMON
         self._argument_arity_range = argument_arity
 
         self.description = description
@@ -35,8 +35,8 @@ class _CommonArityKinds:
         return range(1, 1)
 
 
-_ARITIES = _CommonArityKinds()
-ARITIES = _ARITIES
+_arities = _CommonArityKinds()
+arities = _arities
 
 
 class _MyArity:
