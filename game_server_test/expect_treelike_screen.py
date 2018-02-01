@@ -1,4 +1,4 @@
-class _line_stream_via_big_string:  # #testpoint
+def _line_stream_via_big_string(big_s):  # #testpoint
     """convert any string into a stream of "lines" (isomorphically)..
 
     ## objective & scope
@@ -19,17 +19,11 @@ class _line_stream_via_big_string:  # #testpoint
     though it does not cause the kind of problems they are trying to prevent.
     this sounds like it's getting some attention there.)
 
-    regardless, the iterator approach we take here is more memory efficient,
-    scaling to larger strings if necessary.
-
-    amusingly, it appears that perhaps all our work here can be achieved
-    with the python oneliner
-
-        (match[0] for match in re.finditer('[^\n]*\n|[^\n]+', big_s)
-
-    .. which is something we didn't discover until the completion of this
-    work, and something we'll explore in a near future refactoring of this
-    work after we commit all this hullabaloo for posterity.
+    fortunately python's `re.finditer()` does not have the same limitation
+    as `re.split()` (weirdly), and produces a function that is as
+    elegant and more memory efficient, scaling to "large" strings more
+    reasonably. (we didn't always use a generator expression for this.
+    see #history-A.1 for its clunkier predecessor.)
 
 
     ## theory & details
@@ -64,37 +58,8 @@ class _line_stream_via_big_string:  # #testpoint
     is (i.e without an LTS). (tests cover this).
     """
 
-    def __init__(self, big_s):
-        if len(big_s) is 0:
-            self._next = '_close_and_stop_iteration'
-        else:
-            import re
-            self._iter = re.finditer('[^\n]*\n|[^\n]+', big_s)  # NEWLINE
-            self.__big_string_length = len(big_s)
-            self._next = '_main'
+    import re
+    return( match[0] for match in re.finditer('[^\n]*\n|[^\n]+', big_s) )
 
-        self.__life_is_easier_if_you_only_need_to_iterate_once = None
-
-    def __iter__(self):
-        del self.__life_is_easier_if_you_only_need_to_iterate_once
-        return self
-
-    def __next__(self):
-        return getattr(self.__class__, self._next)(self)
-
-    def _main(self):
-        # assume you have a nonempty iter
-
-        match = next(self._iter)
-        _end = match.span()[1]
-
-        if _end is self.__big_string_length:
-            del self._iter
-            self._next = '_close_and_stop_iteration'
-        return match[0]
-
-    def _close_and_stop_iteration(self):
-        del self._next
-        raise StopIteration
-
+# #history-A.1: refactor line streamer to use generator expression
 # born.
