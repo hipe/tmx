@@ -229,7 +229,7 @@ def _sanity_check_function_parameter(param):
         raise _my_exception(_msg.format(n=param.name, k=str(param.kind)))
 
 
-def _my_exception(msg):
+def _my_exception(msg):  # #copy-pasted
     from game_server import Exception as MyException
     return MyException(msg)
 

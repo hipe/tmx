@@ -27,5 +27,3 @@ cover: parameters integrated into a hello world
   cover: build parameters canon
 get rid of has_parameters
   help screen parser (specialized)
-  help screen parser (generalized)
-  line stream normalizer
