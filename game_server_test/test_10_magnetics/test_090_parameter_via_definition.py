@@ -22,7 +22,7 @@ class _CommonCase(unittest.TestCase):
 
     @property
     def argument_arity_range_(self):
-        return self.parameter_._argument_arity_range
+        return self.parameter_.argument_arity_range
 
 
 class Case010_default_argument_arity(_CommonCase):
@@ -163,7 +163,7 @@ def _styler():
 
 @memoize
 def _parameter_with_list_argument_arity():
-    return _build_parameter_via_argument_arity_string('LIST')
+    return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
 
 @memoize
 def _parameter_with_flag_argument_arity():

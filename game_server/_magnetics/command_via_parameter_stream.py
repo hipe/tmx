@@ -24,6 +24,12 @@ class SELF:  # :[#011]
 
         self.name = name
 
+    @property
+    def description(self):
+        # #todo
+        def f(o, style):
+            o("«hello i am desc for '%s'»" % self.name)
+        return f
 
     def EXECUTABLE_VIA_RESOURCER(self, resourcer):  # mutates resourcer
         idx = self._parameters_index
@@ -39,17 +45,12 @@ class SELF:  # :[#011]
         _builder = resourcer.flush_modality_agnostic_listener_builder()
         return _builder()
 
-
     @property
     def formal_parameter_dictionary(self):
         return self._parameters_index.formal_parameter_dictionary
 
     @property
     def is_branch_node(self):
-        return False
-
-    @property
-    def has_parameters(self):  # #todo away very soon
         return False
 
 
@@ -176,7 +177,7 @@ def _default_formal_parameter():  # #testpoint
     return mag.SELF(
         description = None,  # hi.
         default_value = None,  # hi.
-        argument_arity = mag.arities.COMMON,
+        argument_arity = mag.arities.REQUIRED_FIELD,
     )
 
 

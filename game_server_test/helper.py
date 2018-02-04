@@ -26,28 +26,7 @@ def stream_via_memoized_array(f):
 shared_subject = game_server.dangerous_memoize
 
 
-def lazy(f_f):
-    """EXPERIMENTAL decorator to evaluate lazily the definition of a function.
-
-    this can be useful if the function wants to draw on complicated setup
-    that it's not practical to evaluate when file loads. the subject allows
-    you to evaluate your setup only once the first call to the function
-    happens.
-
-    compare to the simpler `memoize`.
-    #not-threadsafe
-    """
-
-    def g(*a):
-        return f_pointer[0](*a)
-
-    def f_initially(*a):
-        f = f_f();
-        f_pointer[0] = f
-        return f(*a)
-
-    f_pointer = [f_initially]
-    return g
+lazy = game_server.lazy
 
 
 memoize = game_server.memoize

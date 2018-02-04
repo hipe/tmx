@@ -161,11 +161,11 @@ class CLI_CaseMethods:
 
     @shared_subject
     def _command_one__CLI(self):
-        return _command_named('foo-bar')
+        return _command_named('foo_bar')
 
     @shared_subject
     def _command_two__CLI(self):
-        return _command_named('biff-baz')
+        return _command_named('biff_baz')
 
     @property
     def do_debug(self):

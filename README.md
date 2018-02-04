@@ -78,10 +78,14 @@ as for contributing to this project, see the below comments on
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[\[#015\]]                 |       | [ticker numberspace]
+|[#014]                     |       | [expect tree-like screen]
+|[#013]                     |       | modality-agnostic parameter expression
 |[#012]                     |       | generic microservice arch (placeheld)
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.E]                   | #wish | gettext uber alles
 |[#008.D]                   | #wish | strongly typed python yikes
 |[#008.C]                   | #wish | function-based commands
 |[#008.B]                   | #open | remove array abuse
@@ -98,6 +102,7 @@ as for contributing to this project, see the below comments on
 
 
 
+[\[#015\]]: game-server-doc/015-tickler-file.md
 [\[#010\]]: doc/010-extra-conventional-conventions.md
 [\[#006\]]: game-server-doc/README.md
 [\[#005\]]: doc/005-text-based-game-client-architecture.dot

@@ -41,7 +41,7 @@ class Case010_ohai(CLI_CaseMethods, unittest.TestCase):
     def ARGV_(self):
         print("\n\n\nDON't FORGET - do DASHES to UNDERSCORES\n\n\n")
         self.do_debug = True
-        return ['oh_hello']
+        return ['oh-hello']
 
     def command_stream_(self):
         from game_server_test.fixture_directories import _010_cha_cha as mod

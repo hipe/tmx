@@ -31,7 +31,7 @@ class _NormalLinerCase(unittest.TestCase):
         self.assertEqual(num, len(_s_a))
 
     def _lines_via_big_string(self, big_s):
-        _iter = _subject_module()._line_stream_via_big_string(big_s)
+        _iter = _subject_module().line_stream_via_big_string(big_s)
         return [ x for x in _iter ]
 
 

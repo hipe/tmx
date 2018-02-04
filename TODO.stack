@@ -16,14 +16,11 @@ is inotify a thing
 basic IPC between processes in python
 cover: parameters integrated into a hello world
   wish: consts not strings (or enum type)
-  refactor: dashes in ARGV, underscores in names
   cover: the behavior when a parameter isn't found
   cover: modeling parameters
   cover: the magnet on the failure path
   cover: the magnet on the success path
   cover: test thing: tees, debugging output
   cover: the remaining memoizers in helper.py
-  cover: help screens for parameters canon
-  cover: build parameters canon
-get rid of has_parameters
-  help screen parser (specialized)
+  look into re efficiency
+  look up doc string conventions again to figure out if that extra line is right

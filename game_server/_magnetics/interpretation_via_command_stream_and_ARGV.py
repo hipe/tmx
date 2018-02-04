@@ -17,6 +17,8 @@ flattens this order out of it (in part in case we want to change it, the
 rename won't be drastic.)
 """
 
+from game_server import lazy
+
 def interpretation_builder_via_modality_resources(
       ARGV,
       stdout,
@@ -136,7 +138,7 @@ class _AdaptedMicroserviceTreeBranchNode:
         ap = _start_argument_parser(s)
         _hack_argument_parser(ap, rsx)
         st = self.command_stream ; del self.command_stream
-        ci = _FlushAndIndexCommands(ap, st).execute()
+        ci = _command_index_via_these(ap, st, rsx)
         return ap, ci
 
 #
@@ -144,7 +146,7 @@ class _AdaptedMicroserviceTreeBranchNode:
 #
 
 def _when_oh_snap(ns, ci, rsx):
-    cmd = ci[ns.chosen_sub_command]
+    cmd = ci[_name_via_slug(ns.chosen_sub_command)]
     if cmd.is_branch_node:
         cover_me('deep microservice trees')
     else:
@@ -159,8 +161,9 @@ def _when_no_sub_command(rsx, ap):
 def _when_argument_parser_threw_interruption(rsx, e):
 
     message = e.message
-    message = __ugh_string_yadda_from_message(message)
-    rsx.stderr.write(message)  # assume NEWLINE
+    if message is not None:
+        message = __ugh_string_yadda_from_message(message)
+        rsx.stderr.write(message)  # assume NEWLINE
     return _FailureStepResolution(e.exitstatus)
 
 def __ugh_string_yadda_from_message(message):
@@ -177,7 +180,7 @@ def __ugh_string_yadda_from_message(message):
         return message
 
 #
-# these
+# step resolution classes
 #
 
 class _OhSnapStepResolution:
@@ -220,39 +223,204 @@ class _FailureStepResolution:
         return True
 
 #
-# support classes (magnetic-like) to build argument parser
+# build argument parser
 #
 
-class _FlushAndIndexCommands:
+def _command_index_via_these(ap, command_stream, rsx):
+    """BOTH mutates argument parser AND results in an index of commands added."""
 
-    def __init__(self, ap, command_stream):
+    d = {}
+    subparsers = ap.add_subparsers(dest = _THIS_NAME)
+    for cmd in command_stream:
+        k = cmd.name
+        if k in d:
+            _msg = "name collision - multiple commands named '%s'"
+            cover_me(_msg % k)
+        d[k] = cmd
+        _add_command_to_argument_parser(subparsers, cmd, rsx)
+    return d
+
+
+class _add_command_to_argument_parser:
+    """the bulk of the work of our modality-specific adapatation of parameters"""
+
+    def __init__(self, subparsers, cmd, rsx):
+
+        f = cmd.description
+        if f is not None:
+            desc_s = _string_via_description_function(f)
+        else:
+            desc_s = ( "«desc for subparser (place 2) '%s'»\nline 2" % cmd.name )
+
+        self._count_of_positional_args_added = 0
+
+        ap = subparsers.add_parser(
+            _slug_via_name(cmd.name),
+            help='«help for command»',
+            description=desc_s,
+            add_help=False,
+        )
+        _hack_argument_parser(ap, rsx)
+        self._parser = ap
+        d = cmd.formal_parameter_dictionary
+        for name in d:
+            self.__add_parameter(d[name], name)
+
+    def __add_parameter(self, param, name):
+        """[#013] discusses different ways to conceive of parameters ..
+
+        in terms of ther argument arity. here we could either follow the
+        "lexicon" (`is_required`, `is_flag`, `is_list`) or the numbers. we
+        follow the numbers for no good reason..
+        """
+
+        r = param.argument_arity_range
+        min = r.start ; max = r.stop
+        if min is 0:
+            if max is 0:
+                self.__add_flag(param, name)
+            elif max is 1:
+                self.__add_optional_field(param, name)
+            else:
+                if max is not None: sanity()
+                self.__add_optional_list(param, name)
+        else:
+            if min is not 1: sanity()
+            if max is 1:
+                self.__add_required_field(param, name)
+            else:
+                if max is not None: sanity()
+                self.__add_required_list(param, name)
+
+    def __add_required_field(self, param, name):
+        """purely from an interpretive standpoint, we could express any number..
+
+        of required fields as positional arguments when as a CLI command.
+        HOWEVER from a usability standpoint, as an #aesthetic-heuristic
+        we'll say experimentally that THREE is the max number of positional
+        arguments a command should have.
+        """
+        if 3 > self._count_of_positional_args_added:
+            self._count_of_positional_args_added += 1
+            self.__do_add_required_field(param, name)
+        else:
+            cover_me('many required fields')
+
+    def __add_required_list(self, param, name):  # category 5
+        self._parser.add_argument(
+            _slug_via_name(name),
+            ** self._common_kwargs(param, name),
+            nargs='+',
+            # action = 'append', ??
+        )
+
+    def __do_add_required_field(self, param, name):  # category 4
+        self._parser.add_argument(
+            _slug_via_name(name),
+            ** self._common_kwargs(param, name),
+        )
+
+    def __add_optional_list(self, param, name):  # category 3
+        self._parser.add_argument(
+            _slug_via_name(name),
+            ** self._common_kwargs(param, name),
+            nargs='*',
+            # action = 'append', ??
+        )
+
+    def __add_optional_field(self, param, name):  # category 2
+        self._parser.add_argument(
+            ( _DASH_DASH + _slug_via_name(name) ),
+            ** self._common_kwargs(param, name),
+            metavar = _infer_metavar_via_name(name),
+        )
+
+    def __add_flag(self, param, name):  # category 1
+        self._parser.add_argument(
+            ( _DASH_DASH + _slug_via_name(name) ),
+            ** self._common_kwargs(param, name),
+            action = 'store_true',  # this is what makes it a flag
+        )
+
+    def _common_kwargs(self, param, name):
+
+        s = param.generic_universal_type
+        if s is not None:
+            implement_me()
 
         d = {}
-        self._subparsers = ap.add_subparsers(dest = _THIS_NAME)
-        for cmd in command_stream:
-            k = cmd.name
-            if k in d: sanity()
-            d[k] = cmd
-            self.__add_command_to_argument_parser(cmd)
-        self.__dict = d
+        f = param.description
+        if f is not None:
+            d['help'] = _string_via_description_function(f)
+        else:
+            d['help'] = ("«the '%s' parameter»" % name)  # ..
+        return d
 
-    def __add_command_to_argument_parser(self, cmd):
-        parser = self._subparsers.add_parser(
-          cmd.name,
-          help = '«help for command»',
-        )
-        if cmd.has_parameters:
-            cover_me()
-
-    def execute(self):
-        d = self.__dict ; del self.__dict ; return d
 
 #
 # argument parser (build with functions not methods, expermentally)
 #
 
+def _string_via_description_function(f):
+    s_a = []
+    def write_f(s):
+        s_a.append(s + NEWLINE)
+    f(write_f, _STYLER)
+    return _EMPTY_STRING.join(s_a)
+
+
 def _hack_argument_parser(ap, rsx):
+    """(see constituent functions for explanation)"""
+
+    __add_my_help(ap, rsx)
+    __hack_custom_error_function(ap, rsx)
+
+
+def __add_my_help(ap, rsx):
+    """the help they add is not helpful. calling `exit` is really bad style for us
+    """
+
+    ap.register('action', 'my_help', __yikes_ONE(rsx))  # register before next
+
+    ap.add_argument('-h', '--help',
+        action='my_help',
+        help=_('show therse help message and exit'),
+    )
+
+def __yikes_ONE(rsx):
+
+    def f(**three_kwargs):
+        return _MyHelpAction( my_rsx=rsx, ** three_kwargs )
+    return f
+
+class _MyHelpAction:
+
+    def __init__(self,
+        option_strings,
+        dest,
+        help,
+        my_rsx,
+    ):
+
+        self.choices = None
+        self.default = None
+        self.dest = dest
+        self.help = help
+        self.nargs = 0
+        self.metavar = None
+        self._my_rsx = my_rsx
+        self.option_strings = option_strings
+        self.required = False
+        self.type = None
+
+    def __call__(self, parser, namespace, values, option_string):
+        parser.print_help(self._my_rsx.stderr)
+        raise _MyInterruption(_SUCCESS, None)
+
+
+def __hack_custom_error_function(ap, rsx):
     """the *recently rewritten* stdlib option parsing library is not
+
     testing-friendly, nor is it sufficiently flexible for some novel
     uses. it writes to system stderr and exits, which might be rather
     violent depending on what you're trying to do.
@@ -261,21 +429,55 @@ def _hack_argument_parser(ap, rsx):
     """
 
     def f(message):
-        from gettext import gettext as _
         ap.print_usage(rsx.stderr)
         args = {'prog': ap.prog, 'message': message}
         msg = _('%(prog)s: error: %(message)s\n') % args  # NEWLINE
         raise _MyInterruption(_GENERIC_ERROR, msg)
     ap.error = f
 
+
 def _start_argument_parser(program_name_up_to_node):
     import argparse
     return argparse.ArgumentParser(
       prog = program_name_up_to_node,
-      description = '«description for branch node»',
+      description = '«description for root node»',
+      add_help=False,
     )
 
+
+@lazy
+def _infer_metavar_via_name():
+    """given an optional field named eg. "--important-file", name its
+
+    argument moniker 'FILE' rather than'IMPORTANT_FILE'
+    """
+
+    import re
+    regex = re.compile('[^_]+$')
+    def f(name):
+        return regex.search(name)[0].upper()
+    return f
+
+
+def _slug_via_name(name):
+    return name.replace(_UNDERSCORE, _DASH)
+
+
+def _name_via_slug(name):
+    return name.replace(_DASH, _UNDERSCORE)
+
+
+@lazy
+def _():
+    # #wish [#008.E] gettext uber alles
+    from gettext import gettext as g
+    def f(s):
+        return g(s)
+    return f
+
+
 _THIS_NAME = 'chosen_sub_command'
+
 
 #
 # listener builder
@@ -325,18 +527,18 @@ def _build_listener_builder(rsx):
             d = deque(x_a) ; del x_a
             expression_f = d.pop()
             error_or_info = d.popleft()
-            if 'error' == error_or_info:
+            if error_or_info is 'error':
                 pass
-            elif 'info' == error_or_info:
+            elif error_or_info is 'info':
                 pass
             else:
                 cover_me('bad first channel component: ' + error_or_info)
             exp = d.popleft()
-            if 'expression' == exp:
+            if exp is 'expression':
                 pass
             else:
                 cover_me('bad second channel component: ' + exp)
-            if 0 == len(d):
+            if len(d) is 0:
                 del d
             else:
                 cover_me('unexpected third channel component: '+d[0])
@@ -376,15 +578,19 @@ class _MyInterruption(Exception):
 
 class _STYLER:  # #todo
     """experiment"""
+
     def em(s):
       return "\u001B[1;32m%s\u001B[0m" % s
 
 # --
 
+_DASH = '-'
+_DASH_DASH = '--'
+_EMPTY_STRING = ''
 _GENERIC_ERROR = 2
 NEWLINE = "\n"
+_SUCCESS = 0
+_UNDERSCORE = '_'
 
 # #history-A.1: as referenced (can be temporary)
 # #born.
-
-# https://www.instagram.com/p/BI45jshglIv/?taken-by=shirogane_sama

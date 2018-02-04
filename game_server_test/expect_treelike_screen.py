@@ -5,11 +5,39 @@
     head
       eyes
       mouth
+        tongue
     torso
       arms
         left arm
         right arm
       legs
+
+
+
+## experimental provision/issue :[#here.A]
+
+with the goal of reducing complexity ("") of the parse tree, the grammar
+minimizes the number of branch nodes created by created one only when it
+is deemed necessary by there being a plural (two or more) number of children
+to be placed into the tree at that point.
+
+(this is perhaps akin to the way you might use folders to organize your
+iPhone apps - if you have a folder with only one app in it, you may
+eliminate the folder (branch node) altogether and promote the app up one
+level (i.e move it out of the folder))
+
+another sub-provision near (perhaps as a corollary of )the above one is that
+a deepening of the indent level does not necessarily confer the creation of
+a branch node, when it might be intuitive to assume so.
+
+so for in the above example, `mouth` and `arms` do not have the same
+structure. they are each branch nodes with two children, but `arms`'s
+second child is a branch node, whereas `mouth`'s is a terminal node.
+
+this provision is subject to change so that parse trees are more consistent,
+but we are letting this issue incubate for now.
+
+:[#014]
 """
 
 from game_server import memoize
@@ -218,7 +246,6 @@ class _StateMachine:
             this_num = frame.the_effective_margin_length
             if this_num > target_num:
                 # it is normal to see a depth that is deeper than your tareget depth
-                # cover_me('you may already be a winner')
                 pass  # #coverpoint1.1
             elif this_num == target_num:
                 # if the depth of this item we just popped off the stack
@@ -442,7 +469,7 @@ class _ScannedLine:
     )
 
 
-def _line_stream_via_big_string(big_s):  # #testpoint
+def line_stream_via_big_string(big_s):
     """convert any string into a stream of "lines" (isomorphically)..
 
     ## objective & scope
