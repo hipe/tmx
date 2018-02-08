@@ -2,18 +2,30 @@
 
 import socket
 
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind(('0.0.0.0', 50007))
     s.listen(1)  # ..
-    print('about to block waiting for connection')
-    con, adr = s.accept()
-    with con:
-        print('connected by', adr)
-        while True:
-            msg = con.recv(1024)
-            if not msg:
-                print('no data. breaking.')
-                break
-            con.sendall(msg)
+    while True:
+        print('waiting for connection')
+        con, adr = s.accept()
+        with con:
+            print('connected by', repr(adr))
+            while True:
+                print('recv..')
+                recvd_bytes = con.recv(8)
+                if len(recvd_bytes) is 0:
+                    print('no data - break.')
+                    break
+
+                recvd_str = str(recvd_bytes, 'utf-8')
+                print('    received: ', repr(recvd_str))
+
+                send_str = recvd_str.upper()
+                print('     sending: ', repr(send_str))
+
+                send_bytes = bytes(send_str, 'utf-8')
+
+                con.sendall(send_bytes)
 
 # #born

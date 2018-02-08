@@ -1,14 +1,69 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-import socket
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+def __invoke_CLI():
+    import sys
+    argv = sys.argv
+    if len(argv) > 1:
+        print('usage: {}'.format(argv[0]))
+    else:
+        __get_busy(* argv[1:])
 
-    s.connect(('0.0.0.0', 50007))
+def __get_busy():
 
-    s.sendall(b'Hello world')
-    msg = s.recv(1024)
+    import socket
 
-print('received: ', repr(msg))
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+
+        timeout_foat = 0.5
+
+        sock.connect(('0.0.0.0', 50007))
+
+        import select
+        rlist = (sock.fileno(),)
+
+        import re
+        rx = re.compile('^\\d+\\.\\d+$')
+
+        while True:
+            print('(timeout is currently {})'.format(timeout_foat))
+            s = input('any string: ("done" for done): ')
+
+            if len(s) is 0:
+                print('sending the empty string causes problems. try anonther')
+                continue
+
+            md = rx.search(s)
+            if md is not None:
+                was = timeout_foat
+                timeout_foat = float(s)
+                print('changed sleep time from {was} to {now}'.format(
+                    was = was, now = timeout_foat ) )
+                continue
+
+            if s == 'done':
+                print('quitting loop.')
+                break
+
+            send_bytes = bytes(s, 'utf-8')
+            print('sending: ', repr(send_bytes))
+            sock.sendall(send_bytes)
+            print('blocking for FIRST read')
+            while True:
+                recvd_bytes = sock.recv(1024)
+                if len(recvd_bytes) is 0:
+                    print('received zero length')
+                    break
+                print('received: ', repr(recvd_bytes))
+                avail, _, _ = select.select(rlist, (), (), timeout_foat)
+                if len(avail) is 0:
+                    print('nothing was ready')
+                    break
+                print('something should be ready now')
+
+    print('done.')
+
+if __name__ == '__main__':
+    __invoke_CLI()
 
 # #born
