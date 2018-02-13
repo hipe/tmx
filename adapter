@@ -7,61 +7,107 @@ def __invoke_CLI():
     if len(argv) > 1:
         print('usage: {}'.format(argv[0]))
     else:
-        __get_busy(* argv[1:])
+        __run_adapter_forever(* argv[1:])
 
-def __get_busy():
 
-    import socket
+def __run_adapter_forever():
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    def __main():
+        while True:
+            _print('(timeout is currently {})'.format(timeout_float))
+            inp = __parse_input()
+            if inp.is_redo:
+                continue
+            if inp.is_quit:
+                break
+            __money(inp.send_this_string)
 
-        timeout_foat = 0.5
+        _print('done.')
 
-        sock.connect(('0.0.0.0', 50007))
+
+    def __money(s):
 
         import select
         rlist = (sock.fileno(),)
 
-        import re
-        rx = re.compile('^\\d+\\.\\d+$')
-
+        send_bytes = bytes(s, 'utf-8')
+        _print('sending: ', repr(send_bytes))
+        sock.sendall(send_bytes)
+        _print('blocking for FIRST read')
         while True:
-            print('(timeout is currently {})'.format(timeout_foat))
-            s = input('any string: ("done" for done): ')
-
-            if len(s) is 0:
-                print('sending the empty string causes problems. try anonther')
-                continue
-
-            md = rx.search(s)
-            if md is not None:
-                was = timeout_foat
-                timeout_foat = float(s)
-                print('changed sleep time from {was} to {now}'.format(
-                    was = was, now = timeout_foat ) )
-                continue
-
-            if s == 'done':
-                print('quitting loop.')
+            recvd_bytes = sock.recv(1024)
+            if len(recvd_bytes) is 0:
+                _print('received zero length')
                 break
+            _print('received: ', repr(recvd_bytes))
+            avail, _, _ = select.select(rlist, (), (), timeout_float)
+            if len(avail) is 0:
+                _print('nothing was ready')
+                break
+            _print('something should be ready now')
 
-            send_bytes = bytes(s, 'utf-8')
-            print('sending: ', repr(send_bytes))
-            sock.sendall(send_bytes)
-            print('blocking for FIRST read')
-            while True:
-                recvd_bytes = sock.recv(1024)
-                if len(recvd_bytes) is 0:
-                    print('received zero length')
-                    break
-                print('received: ', repr(recvd_bytes))
-                avail, _, _ = select.select(rlist, (), (), timeout_foat)
-                if len(avail) is 0:
-                    print('nothing was ready')
-                    break
-                print('something should be ready now')
 
-    print('done.')
+    def __parse_input():
+        s = input('any string (float to change timeout, "done" for done): ')
+        if len(s) is 0:
+            _print('sending the empty string causes problems. try another')
+            return _REDO
+        else:
+            import re
+            md = re.search('^\\d+\\.\\d+$', s)
+            if md is None:
+                if s == 'done':
+                    _print('quitting loop.')
+                    return _QUIT
+                else:
+                    return _NormalInput(s)
+            else:
+                return __when_change_timeout(md[0])
+
+
+    def __when_change_timeout(float_s):
+        nonlocal timeout_float
+        was_float = timeout_float
+        timeout_float = float(float_s)
+        _fmt = 'changed sleep time from {} to {}'
+        _print(_fmt.format(was_float, timeout_float))
+        return _REDO
+
+
+    timeout_float = 0.5
+    sock = None
+
+    _print = print
+    port = 50007
+
+
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
+        sck.connect(('0.0.0.0', port))
+        sock = sck  # ick/meh
+        __main()
+
+
+class _NormalInput:
+    def __init__(self, s):
+        self.send_this_string = s
+        self.is_quit = False
+        self.is_redo = False
+
+class _Redo:
+    def __init__(self):
+        self.is_quit = False
+        self.is_redo = True
+
+class _Quit:
+    def __init__(self):
+        self.is_quit = True
+        self.is_redo = False
+
+
+_REDO = _Redo()
+_QUIT = _Quit()
+
 
 if __name__ == '__main__':
     __invoke_CLI()

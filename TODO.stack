@@ -14,6 +14,9 @@ look at pack/unpack
 start kicker
 is inotify a thing
 basic IPC between processes in python
+  many lessons
+  commit the markdown that is a snapshot of the TOC
+  that one-off
 cover: parameters integrated into a hello world
   wish: consts not strings (or enum type)
   cover: the behavior when a parameter isn't found

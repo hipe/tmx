@@ -1,19 +1,10 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-import socket
+def _do_work_for_client_socket(client_sock):
 
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind(('0.0.0.0', 50007))
-    s.listen(1)  # ..
-    while True:
-        print('waiting for connection')
-        con, adr = s.accept()
-        with con:
-            print('connected by', repr(adr))
             while True:
                 print('recv..')
-                recvd_bytes = con.recv(8)
+                recvd_bytes = client_sock.recv(8)
                 if len(recvd_bytes) is 0:
                     print('no data - break.')
                     break
@@ -26,6 +17,47 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 send_bytes = bytes(send_str, 'utf-8')
 
-                con.sendall(send_bytes)
+                client_sock.sendall(send_bytes)
+
+
+def _run_my_server_forever(
+    bind_port,
+    max_backlog_of_connections = 5,
+):
+    def __main():
+        with __create_socket() as s:
+            __bind_and_listen(s)
+            __main_loop_forever(s)
+
+    def __main_loop_forever(local_socket):
+        while True:
+            _print('waiting for connection')
+            client_sock, adr = local_socket.accept()
+            _print('connected by', repr(adr))
+            with client_sock:
+                _do_work_for_client_socket(client_sock)
+
+    def __bind_and_listen(s):
+        s.bind((bind_ip, bind_port))
+        s.listen(max_backlog_of_connections)
+        _print('listening on {}:{}'.format(bind_ip, bind_port))
+
+    def __create_socket():
+        import socket
+        return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    _print = print
+
+
+    bind_ip = '0.0.0.0'
+    __main()
+
+
+
+if __name__ == '__main__':
+    _run_my_server_forever(
+        bind_port = 50007,
+    )
+
 
 # #born
