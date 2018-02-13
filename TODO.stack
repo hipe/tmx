@@ -20,6 +20,7 @@ basic IPC between processes in python
 cover: parameters integrated into a hello world
   wish: consts not strings (or enum type)
   cover: the behavior when a parameter isn't found
+  refactor: use `yield` in description functions
   cover: modeling parameters
   cover: the magnet on the failure path
   cover: the magnet on the success path
@@ -27,3 +28,10 @@ cover: parameters integrated into a hello world
   cover: the remaining memoizers in helper.py
   look into re efficiency
   look up doc string conventions again to figure out if that extra line is right
+sub-project: proof-of-concept search tool "JSON grep"
+  [reserved for whatever is left] (-1)
+  cover a fixture that is a subslice of a real dump (-2)
+  dummy interface for your three criteria (-3)
+  flask unit test cover same (-4)
+  interface for search a plaintext file (one line is one item) (-5)
+  flask hello world (-6)
