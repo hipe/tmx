@@ -78,6 +78,7 @@ as for contributing to this project, see the below comments on
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [ticker numberspace]
 |[#014]                     |       | [expect tree-like screen]
 |[#013]                     |       | modality-agnostic parameter expression
@@ -102,6 +103,7 @@ as for contributing to this project, see the below comments on
 
 
 
+[\[#016\]]: game-server-doc/016-K-hong-reading-notes.md
 [\[#015\]]: game-server-doc/015-tickler-file.md
 [\[#010\]]: doc/010-extra-conventional-conventions.md
 [\[#006\]]: game-server-doc/README.md
