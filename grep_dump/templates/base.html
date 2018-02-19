@@ -1,0 +1,26 @@
+<html>
+  <head>
+    {% if title %}
+      <title>{{ title }} - wahoo</title>
+    {% else %}
+      <title></title>
+    {% endif %}
+  </head>
+  <body>
+    <div>
+      <a href='{{ url_for('index') }}'>Home</a>
+      <a href='{{ url_for('search') }}'>Search</a>
+    </div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block main_content %}{% endblock %}
+  </body>
+</html>

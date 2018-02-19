@@ -29,9 +29,12 @@ cover: parameters integrated into a hello world
   look into re efficiency
   look up doc string conventions again to figure out if that extra line is right
 sub-project: proof-of-concept search tool "JSON grep"
-  [reserved for whatever is left] (-1)
-  cover a fixture that is a subslice of a real dump (-2)
-  dummy interface for your three criteria (-3)
-  flask unit test cover same (-4)
-  interface for search a plaintext file (one line is one item) (-5)
-  flask hello world (-6)
+  [reserved for final cleanup & overflow]
+  integrate real search
+  implement & cover real backend for search
+  integrate dummy story - ajax-pagination YIKES
+  [reserved for unforseen milestones]
+  integrate dummy story - no pagination, hard-coded limit
+  integrate (& redesign as necessary) full integration for indexing
+  implement & cover real backend for "indexing"
+  dummy ajax interface for "indexing"

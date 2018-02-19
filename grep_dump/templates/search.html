@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+
+  <style type='text/css'>
+  <!--
+  table th {
+    text-align: right;
+    padding-right: 1em;
+  }
+  .cb-label {
+    color: grey;
+    font-size: 0.90em;
+  }
+  .note {
+    color: grey;
+    font-size: smaller;
+    font-style: italic;
+  }
+  .last-note {
+    padding-bottom: 0.65em;
+  }
+
+  -->
+  </style>
+
+  <form action='' method='post'>
+      {{ form.hidden_tag() }}
+
+    <table>
+
+    <tr>
+      <th>
+        {{ form.search_string.label }}
+      </th>
+      <td>
+        {{ form.search_string(size=32) }}
+      </td>
+      <td>
+        {% for error in form.search_string.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        &nbsp;
+      </td>
+      <td class='last-note'>
+        {{ form.is_egrep() }} <span class='cb-label'>{{ form.is_egrep.label }}</span>
+      </td>
+      <td>
+        {% for error in form.is_egrep.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        {{ form.add_in.label }}
+      </th>
+      <td>
+        {{ form.add_in() }}
+      </td>
+      <td>
+        {% for error in form.add_in.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        {{ form.add_from.label }}
+      </th>
+      <td>
+        {{ form.add_from() }}
+      </td>
+      <td>
+        {% for error in form.add_from.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        &nbsp;
+      </th>
+      <td colspan=2 class='note last-note'>
+        select multiple with Ctrl (windows), Command (mac)..
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        {{ form.since.label }} </th>
+      <td>
+        {{ form.since(size=16) }}
+        <span class='note'>YYYY-MM-DD HH:MM</div>
+      </td>
+      <td>
+        {% for error in form.since.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        {{ form.thru.label }}
+      </th>
+      <td>
+        {{ form.thru(size=16) }}
+        <span class='note'>YYYY-MM-DD HH:MM</div>
+      </td>
+      <td>
+        {% for error in form.thru.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        &nbsp;
+      </th>
+      <td colspan=2 class='note last-note'>
+        <ul style='padding-left: 1.5em; margin-bottom:0'>
+          <li>YYYY, YYYY-MM, etc.</li>
+          <li>HH:MM alone implies today</li>
+          <li>PST (GMT-8)</li>
+          <li>"last 3 days" etc {year|month|day|hour|minute}</li>
+        </ul>
+      </td>
+    <tr>
+      <th>
+        Has..
+      </th>
+      <td colspan=2>
+        <ul style='list-style-type: none; padding-left:0;'>
+          <li>{{ form.has_star() }} <span class='cb-label'>{{ form.has_star.label }}</span></li>
+          <li>{{ form.has_pin() }} <span class='cb-label'>{{ form.has_pin.label }}</span></li>
+          <li>{{ form.has_link() }} <span class='cb-label'>{{ form.has_link.label }}</span></li>
+          <li>{{ form.has_reaction() }} <span class='cb-label'>{{ form.has_reaction.label }}</span></li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan=2 style='text-align: right; padding-top: 0.75em;'>
+        {{ form.submit() }}
+      </td>
+    </tr>
+    </table>
+  </form>
+{% endblock %}
