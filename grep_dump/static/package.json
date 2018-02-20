@@ -1,0 +1,11 @@
+{
+  "name": "my-grep-dump-static-lyfe",
+  "version": "0.0.0",
+  "description": "static assets for the grep-dump experiment",
+  "main": "index.js",
+  "scripts": {
+    "test": "this-is-the-test-command"
+  },
+  "author": "DTF developers united, wordwide",
+  "license": "SEE LICENSE IN license-pending.txt"
+}
