@@ -4,8 +4,15 @@
   "description": "static assets for the grep-dump experiment",
   "main": "index.js",
   "scripts": {
-    "test": "this-is-the-test-command"
+    "test": "this-is-the-test-command",
+    "build": "webpack"
   },
   "author": "DTF developers united, wordwide",
-  "license": "SEE LICENSE IN license-pending.txt"
+  "license": "SEE LICENSE IN license-pending.txt",
+  "devDependencies": {
+    "webpack": "^3.11.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.5"
+  }
 }
