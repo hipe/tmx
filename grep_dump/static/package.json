@@ -4,15 +4,31 @@
   "description": "static assets for the grep-dump experiment",
   "main": "index.js",
   "scripts": {
-    "test": "this-is-the-test-command",
-    "build": "webpack"
+    "test": "echo \"Error: no tests yet\" && exit 1",
+    "watch": "webpack --progress -d --watch",
+    "dev-build": "webpack --progress -d",
+    "build": "webpack -p --progress"
   },
   "author": "DTF developers united, wordwide",
   "license": "SEE LICENSE IN license-pending.txt",
+  "repository": "github.com/hipe/downtownfun",
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
     "webpack": "^3.11.0"
   },
   "dependencies": {
     "lodash": "^4.17.5"
-  }
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ]
+  },
+  "keywors": [
+    "python"
+  ]
 }
