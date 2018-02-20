@@ -67,7 +67,14 @@ def search():
 
 @app.route('/reindex-dump')
 def reindex_dump():
-    return render_template('reindex-dump.html')
+    import time
+    return render_template('reindex-dump.html', time_s=str(time.time()))
+
+
+@app.route('/reindex-dump-job-progress')
+def reindex_dump_job_progress():
+    import time
+    return '{"one_zing":"two zing ' + str(time.time()) + '"}';
 
 
 @app.route('/index')
