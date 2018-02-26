@@ -1,0 +1,13 @@
+#   - this .gitignore file is not meant to contain any conent -
+#
+#   - this file exists so that there is a file in this directory, so that
+#     (in turn) its directory is ceated when you check out the repository.
+#
+#   - the directory is a temporary scratch space for use by tests.
+#
+#   - normally this directory will remain empty (except for this file).
+#
+#   - but this directory gets written to during the course of certain tests.
+#
+#   - when something in the test fails, it may be useful to inspect the
+#     contents of this directory (when it is useful to do so).

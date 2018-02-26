@@ -78,6 +78,9 @@ as for contributing to this project, see the below comments on
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#201]-[#299]              |       | (for grep dump)
+|[#101]-[#199]              |       | (for game server)
+[[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [ticker numberspace]
 |[#014]                     |       | [expect tree-like screen]

@@ -33,7 +33,7 @@ this document describes how the [node table](../README.md#node-table) is used.
     conjunction with the node table.)
 
   - nodes can have arbitary tags associated with them, exactly as tweets
-    have hastags (but experimentally a tag name can use single dashes as
+    have hashtags (but experimentally a tag name can use single dashes as
     word separators `#like-this`). nodes that track open issues will have the tag `#open`
     associated with them, typically in the "Main Tag" column of the table.
 
@@ -123,6 +123,7 @@ points.
   - like numbers in the NBA
   - philosophy
   - we've never surpassed 200
+  - vaguely like python's PEP, and vaguely the opposite too
 
 
 

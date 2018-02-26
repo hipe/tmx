@@ -1,10 +1,12 @@
 <html>
   <head>
+    {% block head_content %}{% endblock %}
     {% if title %}
       <title>{{ title }} - wahoo</title>
     {% else %}
-      <title></title>
+      <title>wheezy</title>
     {% endif %}
+    <meta charset="utf-8">
   </head>
   <body>
     <div>

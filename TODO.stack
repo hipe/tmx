@@ -38,3 +38,6 @@ sub-project: proof-of-concept search tool "JSON grep"
   integrate (& redesign as necessary) full integration for indexing
   implement & cover real backend for "indexing"
   dummy ajax interface for "indexing"
+  upload any file at all
+  cover this jobs thing
+  cover rm -rf magnet
