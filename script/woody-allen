@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+
+"""
+plot the dates of woody allen movies in a one-dimensional scatterplot
+
+broadly there are 3 steps to this:
+
+    - download the html (write it to a tmp file)
+
+    - scrape the html for the year of the movies (write it to a json file)
+
+    - turn the list of years into a MINIMALLY simple visualization
+      (a "one dimensional scatterplot")
+"""
+
+# TODO (we don't yet want these in a versionsed Pipfile because it would
+# be a very weak development dependency, and we want to hold off on any
+# dependencies for now..)
+
+"""
+dependencies (TODO):
+    - beautifulsoup4   4.6.0
+    - matplotlib       2.1.2
+    - numpy            1.14.1
+    - requests         2.18.4
+"""
+
+url = 'https://en.wikipedia.org/wiki/Woody_Allen_filmography'
+
+tmp_numbers_file = 'tmp.woody-allen.numbers.list'
+tmp_html_file = 'tmp.woody-allen.page.html'
+
+
+def _execute_into(client, argv):
+
+    def __main():
+        ok = __parse_argv()
+        if not ok:
+            return exitstatus
+
+        ok = __resolve_html_file()
+        if not ok:
+            return exitstatus
+
+        ok = __resolve_numbers()
+        if not ok:
+            return exitstatus
+
+        return _display_thing(client)
+
+    def __resolve_numbers():
+        if client.path_exists(tmp_numbers_file):
+            client.info('(using {})', tmp_numbers_file)
+            return True
+        else:
+            return _write_numbers_file(client)
+
+    def __resolve_html_file():
+        if client.path_exists(tmp_html_file):
+            client.info('(using {})', tmp_html_file)
+            return True
+        else:
+            return _write_html_file(client)
+
+    def __parse_argv():
+        if 1 is not len(argv):
+            raise Exception('cover me')
+        return True
+
+    exitstatus = 5
+
+    return __main()
+
+
+def _display_thing(client):
+    """(adapted from K.-Michael Aye's work stack overflow)"""
+
+    import numpy as np
+    import matplotlib.pyplot as pp
+
+    import json
+
+    float_a = []
+
+    with open(tmp_numbers_file) as fp:
+        for line in fp:
+            _row = json.loads(line)
+            float_a.append(float(_row['year']))
+
+    val = 0.  # this is the value where you want
+    # the data to appear on the y-axis.
+
+    ar = [float_a]
+    pp.plot(ar, np.zeros_like(ar) + val, 'x')
+    client.info('(showing. close window there to return.)')
+    pp.show()
+
+
+def _write_numbers_file(client):
+    from bs4 import BeautifulSoup
+    with open(tmp_html_file) as fp:
+        soup = BeautifulSoup(fp, 'html.parser')
+
+    tables = soup.find_all(None, 'wikitable')
+    ln = len(tables)
+    exp = 4
+    if ln is not exp:
+        client.error('expected {} had {} tables', exp, ln)
+        return False
+
+    table = tables[0]
+    del tables
+
+    itr = iter(table.find_all('tr'))
+    next(itr)  # skip header row (1 of 2)
+    next(itr)  # skip header row (2 of 2)
+
+    def f():
+        """there's always only ever one movie per table row. however, when
+
+        there's multiple movies in a year, this little dance happens:
+        there's one row whose year cel has a greater-than-one `rowspan`.
+        then, the N-1 subsequent rows will each have a number of cels that
+        is *one less* than normal number (because they each don't-need-and-
+        must-not-have their own year cel).
+
+        the way we handle this below is rough with redundancy because it's
+        a one-off, but note there are three `yields` below for the three
+        kinds of rows we will encounter (1: easy rows, 2: the first row in
+        group, and 3: the subsequent rows in a group.)
+        """
+
+        for tr in itr:
+            tds = tr.find_all('td')
+            year_td = tds[0]
+            year = int(year_td.text)
+            rowspan_s = year_td.get('rowspan')
+            if rowspan_s is None:
+                yield(0.5 + year, tds[1].text)
+            else:
+                num_rows = float(rowspan_s)
+                numerator_int = 1
+                denom_float = num_rows + 1   # ick: 3 rows: 1/4 2/4 3/4
+
+                yield((1.0*numerator_int/denom_float)+year, tds[1].text)
+                while True:
+                    numerator_int += 1
+                    tr = next(itr)
+                    tds = tr.find_all('td')
+                    yield((1.0*numerator_int/denom_float)+year, tds[0].text)
+
+                    if numerator_int == num_rows:
+                        break
+
+    import json
+    count = 0
+    with open(tmp_numbers_file, 'w') as fp:
+        for (year_f, movie_name) in f():
+            _json = json.dumps({'year': year_f, 'movie_title': movie_name})
+            fp.write(_json + '\n')
+            count += 1
+
+    client.info("wrote {} lines to {}", count, tmp_numbers_file)
+    return True
+
+
+def _write_html_file(client):
+    import requests
+    with open(tmp_html_file, 'w') as fh:
+        r = requests.get(url)
+        status_code = r.status_code
+        if status_code is 200:
+            _bytes = fh.write(r.text)
+            client.info('wrote {} ({} bytes)', tmp_html_file, _bytes)
+            ok = True
+        else:
+            client.error('bad status code: {}', status_code)
+            ok = False
+    if not ok:
+        client.remove_file(tmp_html_file)
+    return ok
+
+
+class _Client:
+    """("modality" "injection")"""
+
+    def __init__(self, sin, sout, serr):
+        self.stdin = sin
+        self.stdout = sout
+        self.stderr = serr
+
+    def remove_file(self, path):
+        import os
+        os.remove(path)
+
+    def path_exists(self, path):
+        import os
+        return os.path.exists(path)
+
+    def error(self, fmt, *args):
+        self._same(fmt, args)
+
+    def info(self, fmt, *args):
+        self._same(fmt, args)
+
+    def _same(self, fmt, args):
+        self.stderr.write(fmt.format(*args)+'\n')
+
+
+if __name__ == '__main__':
+    import sys
+    _client = _Client(sys.stdin, sys.stdout, sys.stderr)
+    exit(_execute_into(_client, sys.argv))
+
+# #born.
