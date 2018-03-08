@@ -1,4 +1,4 @@
 /.ackrc
 *.pyc
 __pycache__
-/venv
+/my-venv

@@ -5,27 +5,20 @@
 for now, this can be any and everything we would like to version
 for DTF: software, data, visualizations, whatever.
 
-so at current, the scope is unbounded. but see the [next section](#b).
+at the moment our scope is unbounded. but see ideas related to
+project scoping [below](#sub-projects).
 
 
 
 
 ## <a name=b></a>development overview
 
-for now, this project may host several disparate sub-projects.
-
-as necessary, the sub-project (in the eyes of version control) may fork
-into its own versioned project, after the fact. this is just to say: not
-every project needs to start out with its own versioned repository.
-
-that is, work on any given DTF-related may start within this project at
-first. (it is assumed that generally many of these sub-projects will be
-small in scale and small in code-side, so there is probably no reason to
-create a large diaspora of small versioned projects, when one large
-macro-project would suffice.)
+this “project” consists of [“sub-projects”](#sub-projects).
 
 as for contributing to this project, see the below comments on
 [version control](#d) and our [\[#010\]] extra-conventional conventions.
+
+see [installing and deploying python](#018) if your sub-project requires it.
 
 
 
@@ -37,7 +30,7 @@ as for contributing to this project, see the below comments on
     - see [[#004]](#004) using the todo stack
 
   - `bin/`
-      - of course don't actually put binary files in here. this is for
+      - of course don't put actual binary files here. this is for
         executable files written in scripting languages.
 
   - `doc/`
@@ -55,6 +48,36 @@ as for contributing to this project, see the below comments on
   - `static-html/`
       - as the name implies, this is for the rare _static_
         (i.e versioned, probably not generated) html
+
+  - `«sub-project»`
+
+  - `«sub-project» (etc)`
+
+
+
+
+
+
+## <a name="sub-projects"></a> what's a “sub-project”?
+
+we offer no formal definition for “sub-project” but:
+
+  - mainly we use the term to avoid confusion with the term “project” which
+    we use to mean _this_ directory tree we keep in version control (at the
+    top of which this README file sits).
+
+  - a sub-project can be as small as a single-file one-off, or as large as
+    a full-stack application. to place sub-projects into the same project
+    indicates the aspiration to share a significant portion of code (or
+    documention, etc) across those sub-projects (code or documention that
+    itself is under active development).
+
+  - if a sub-project gets obnoxiously huge: it can fork from this project,
+    we can prune its excess and (back in this project) we can sunset it.
+
+  - our only real provision for sub-projects is that if they contain more
+    than one file that they live at the _top_ of this directory tree.
+    (i.e., there are no sub-sub-projects, etc.)
 
 
 
@@ -80,6 +103,7 @@ as for contributing to this project, see the below comments on
 |---------------------------|:-----:|-
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+|<a name=018></a>[\[#018\]] |       | installing and deploying python
 [[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [ticker numberspace]
@@ -106,6 +130,7 @@ as for contributing to this project, see the below comments on
 
 
 
+[\[#018\]]: doc/018-installing-and-deploying-python.md
 [\[#016\]]: game-server-doc/016-K-hong-reading-notes.md
 [\[#015\]]: game-server-doc/015-tickler-file.md
 [\[#010\]]: doc/010-extra-conventional-conventions.md

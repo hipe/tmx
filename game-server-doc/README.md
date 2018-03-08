@@ -41,17 +41,7 @@ in [the next section](#running-tests). (the tests take less than a second
 to run on my 5 years old laptop.) there are no requirements other than
 a specific version of python.
 
-at first we did not use virtualenv, we just installed some python 3 from
-our package manager. at writing we just started using virtualenv. also we
-don't remember what version we had had but we are now using (again at
-writing) latest stable which is:
-
-    $ source ./venv/bin/activate
-    $ python --version
-    Python 3.6.4
-
-eventually we want to formalize this in some versioned way but we don't
-yet know what that way is. (#open [#007.C])
+see [installing and deploying python](../README.md#018) (#open [#007.C]).
 
 
 
