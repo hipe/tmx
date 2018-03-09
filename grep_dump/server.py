@@ -2,7 +2,6 @@
 #
 #     Flask            0.12.2
 #     Flask-WTF        0.14.2
-#     requests         2.18.4
 #     WTForms          2.1
 
 

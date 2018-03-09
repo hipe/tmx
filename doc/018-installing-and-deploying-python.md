@@ -278,6 +278,14 @@ already a `Pipfile.lock` file or not..
 
 
 
+## (adding a package)
+
+(here is how we add a new package to the Pipfile)
+
+    pipenv install foo-fah
+
+
+
 
 [thoughtbot_1]: https://robots.thoughtbot.com/how-to-manage-your-python-projects-with-pipenv
 [venvs]: https://docs.python.org/3/library/venv.html
