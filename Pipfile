@@ -10,6 +10,7 @@ name = "pypi"
 requests = "*"
 flask = "*"
 wtforms = "*"
+flask-wtf = "*"
 
 
 [dev-packages]

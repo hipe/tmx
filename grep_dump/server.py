@@ -1,8 +1,3 @@
-# NOTE - #todo - nowhere is it reflected that we used `pip install` to get:
-#
-#     Flask-WTF        0.14.2
-
-
 from flask import (
         Flask,
         flash,
