@@ -65,7 +65,7 @@ machine or a production server).
 ## meta-roadmap and roadmap
 
 our sequence of steps can be modeled by starting from our final objective,
-then working backward from there. at each step we ask, “what does it
+then working backward from there, at each step asking: “what does it
 depend on?”. we repeat this recursively until we reach the base case of a
 step that itself has no prerequisite steps:
 
@@ -101,7 +101,7 @@ outline for the remaining sections of this document.
     [document meta](#document-meta) section below.)
 
   - terminology: for discussing version numbers we use
-    [semver.org](http://semver.org)'s lexicon and semantics:
+    the lexicon and semantics of [semver.org](http://semver.org):
     we call the components of a typical three-part version number
     `MAJOR.MINOR.PATCH`. so version `1.2.3` has a major version of `1`,
     a minor version of `2`, and a patchlevel of `3`.
@@ -111,7 +111,7 @@ outline for the remaining sections of this document.
     `Pipfile` and `Pipfile.lock` files (introduced [below](#f)).
     generally this redundancy would be a bad thing: it would be best (per
     don't-repeat-yourself (DRY)) to have exactly one authoritative place
-    where this value “lives”. however, we maintain the redundancy for now
+    where this value “lives”. however, we maintain this redundancy for now
     because we want to track changes in the _patch_ number, something that
     the `Pipfile` seems disinterested in. this is all subject to change.
     (that is, we might stop keeping the version number in this document.))
@@ -121,9 +121,10 @@ outline for the remaining sections of this document.
 
       - e.g. at writing, python's highest major version is `3`. the
         highest stable version of _that_ seems to be `3.6` right now.
-        if there's a `python4`, we haven't heard of it and don't think
-        it has a stable release so we don't target it. so we target
-        `3.6` right now. (this is just an example.)
+        if there's a `python4`, we haven't heard of it and/or assume it
+        has no stable release yet so we don't target it. so we target
+        `3.6` right now. (again, we're using this target version only
+        as an example.)
 
       - (at writing we don’t exactly know what python’s version numbering
         conventions are vis-à-vis stabile releases..)
@@ -232,7 +233,7 @@ outline for the remaining sections of this document.
 
 ## <a name='f'></a>pipenv frop pip
 
-(this is culled from the thoughtbot blog [here][thoughtbot_1].)
+(everything in this section is culled from the thoughtbot blog [here][thoughtbot_1].)
 
 in the [section above](#e), we created our virtual environment (a directory
 tree) but we didn’t activate it. activate it now:
@@ -249,8 +250,7 @@ project, information about these packages (if not the packages themselves)
 will go into our (project-specific) `my-venv` directory.
 
 to install `pipenv` we will use `pip`. (explaining either of these is
-outside of our scope and in fact outside of our current understanding
-at writing.)
+outside of our scope and in fact outside of our current understanding.)
 
 `pip`, it seems, is now a part of the python standard distribution, so
 we already have it.
