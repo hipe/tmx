@@ -42,5 +42,3 @@ sub-project: proof-of-concept search tool "JSON grep"
   integrate with front - fudge time maybe
   real backend for indexing
   mocked frontend for indexing
-  mocked backend for indexing
-  be able to stop the server cleanly

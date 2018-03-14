@@ -15,6 +15,7 @@ flask-wtf = "*"
 
 [dev-packages]
 
+"flake8" = "*"
 
 
 [requires]
