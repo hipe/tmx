@@ -1,20 +1,6 @@
 from contextlib import contextmanager
-
+import __init__
 import unittest
-import sys
-import os
-
-# boilerplate
-p = os.path
-d = p.dirname
-my_test_dir = d(d(p.abspath(__file__)))
-omni_project_path = d(my_test_dir)
-a = sys.path
-if a[0] != omni_project_path:
-    a.insert(0, omni_project_path)
-del omni_project_path
-del d
-# end boilerplate
 
 from game_server import (  # noqa: E402
         dangerous_memoize as shared_subject,
@@ -287,7 +273,7 @@ def _call_subject_commonly(num, lines):
 
 @memoize
 def _subject_module():
-    import grep_dump._magnetics.progress_via_job as x
+    import grep_dump._magnetics.progress_via_job as x  # #[#204]
     return x
 
 

@@ -49,6 +49,7 @@ virtualenv), and i set up these aliases:)
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
+|                [#204]     |       | this one import issue is ugly for now
 |<a name=202></a>[\[#202\]] | #open | enzyme/mocha tests for web front like [bedjango1]
 
 

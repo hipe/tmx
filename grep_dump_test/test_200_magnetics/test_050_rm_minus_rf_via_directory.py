@@ -1,23 +1,13 @@
-import unittest
-import sys
-import os
-
-# boilerplate
-p = os.path
-d = p.dirname
-my_test_dir = d(d(p.abspath(__file__)))
-omni_project_path = d(my_test_dir)
-a = sys.path
-if a[0] != omni_project_path:
-    a.insert(0, omni_project_path)
-del omni_project_path
-del d
-# end boilerplate
+from __init__ import writable_tmpdir
 
 from game_server import (  # noqa: E402
         dangerous_memoize as shared_subject,
         memoize,
         )
+
+import unittest
+import os
+p = os.path
 
 
 class Case010_Main(unittest.TestCase):
@@ -96,8 +86,7 @@ def _build_this_one_tree():
             file-3.txt
           dir-two/
     """
-
-    work_dir = p.join(my_test_dir, 'writable-tmpdir', 'wazoo')
+    work_dir = p.join(writable_tmpdir, 'wazoo')
     os.mkdir(work_dir)
     _touch(p.join(work_dir, 'file-1.txt'))
     dir_one = p.join(work_dir, 'dir-one')
@@ -114,7 +103,7 @@ def _touch(path):  # #todo how
 
 @memoize
 def _subject_function():
-    from grep_dump._magnetics.rm_minus_rf_via_directory import (
+    from grep_dump._magnetics.rm_minus_rf_via_directory import (  # #[#204]
        rm_minus_rf_via_directory as x,
        )
     return x

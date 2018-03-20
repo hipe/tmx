@@ -42,3 +42,6 @@ sub-project: proof-of-concept search tool "JSON grep"
   integrate with front - fudge time maybe
   real backend for indexing
   mocked frontend for indexing
+  on file upload, to basic validation and get a job number (upload any file)
+  orchestrate the jobser with the server
+  somewhat fix `sys.path` so that importing isn't ridiculous

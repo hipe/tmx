@@ -1,18 +1,5 @@
+import __init__
 import unittest
-import sys
-import os
-
-# boilerplate
-p = os.path
-d = p.dirname
-my_test_dir = d(d(p.abspath(__file__)))
-omni_project_path = d(my_test_dir)
-a = sys.path
-if a[0] != omni_project_path:
-    a.insert(0, omni_project_path)
-del omni_project_path
-del d
-# end boilerplate
 
 from game_server import (  # noqa: E402
         memoize,
@@ -27,7 +14,7 @@ class Case010_XXX(unittest.TestCase):
 
 @memoize
 def _subject_module():
-    import grep_dump._magnetics.indexed_tree_via_dump_and_job as x
+    import grep_dump._magnetics.indexed_tree_via_dump_and_job as x  # #[#204]
     return x
 
 

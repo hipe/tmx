@@ -1,20 +1,10 @@
+from __init__ import(
+        writable_tmpdir
+        )
 from contextlib import contextmanager
-
 import unittest
-import sys
 import os
-
-# boilerplate
 p = os.path
-d = p.dirname
-my_test_dir = d(d(p.abspath(__file__)))
-omni_project_path = d(my_test_dir)
-a = sys.path
-if a[0] != omni_project_path:
-    a.insert(0, omni_project_path)
-del omni_project_path
-del d
-# end boilerplate
 
 from game_server import (  # noqa: E402
         dangerous_memoize as shared_subject,
@@ -152,7 +142,7 @@ class Case020_Locking(unittest.TestCase):
 
 @contextmanager
 def _clean_jobs_dir():
-    jobs_dir = p.join(my_test_dir, 'writable-tmpdir', 'jobs')
+    jobs_dir = p.join(writable_tmpdir, 'jobs')
     os.mkdir(jobs_dir)
     lock_me = p.join(jobs_dir, 'lock-me')
     _touch(lock_me)
