@@ -11,6 +11,8 @@ requests = "*"
 flask = "*"
 wtforms = "*"
 flask-wtf = "*"
+werkzeug = "*"
+watchdog = "*"
 
 
 [dev-packages]

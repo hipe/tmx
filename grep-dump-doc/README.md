@@ -28,9 +28,17 @@ webserver but also one other process as well: the below process that
 watches for changes in certain files and runs the web-pack build chain
 as necessary.
 
-so in any order:
-
 (we use these [aliases](#aliases))
+
+
+typically you always want to do this:
+
+    cd «the root of the project (the git repo)»
+    source ./my-venv/bin/activate
+
+(this table is explained at [\[#018\]] developing under python.)
+then in any order:
+
 
 so that you can see the web application, run the webserver:
 
@@ -96,6 +104,7 @@ virtualenv), and i set up these <a name='aliases'>aliases</a>:)
 
 
 
+[\[#018\]]: ../README.md#018
 [\[#002\]]: ../README.md#002
 [bedjango1]: http://www.bedjango.com/blog/how-to-build-web-app-react-redux-and-flask/
 

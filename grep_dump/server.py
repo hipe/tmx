@@ -1,4 +1,3 @@
-# -- BEGIN (very closely related to [#024]) get `sys.path` right
 from flask import (
         Flask,
         flash,
@@ -6,11 +5,13 @@ from flask import (
         render_template,
         url_for,
 )
-
 import werkzeug.serving as ws
 import sys
 
+_ws_log = ws._log  # fail early if this non-API function disappears
 
+
+# -- BEGIN (very closely related to [#024]) get `sys.path` right
 def _():
     """normalize `sys.path`
 
@@ -69,7 +70,7 @@ import grep_dump.forms as forms  # noqa: E402
 # -- BEGIN this is a thing to move to a separate file one day maybe
 
 
-class Config:
+class _Config:  # :#here1
 
     SECRET_KEY = 'one_day_make_this_more_secure'  # #todo
     """the secret key is supposed to be secret, as the strength of the
@@ -101,7 +102,7 @@ app = Flask(
         root_path=sub_project_dir,  # #here2
         )
 
-app.config.from_object(Config)
+app.config.from_object(_Config)
 
 
 def __build_jobser():  # (next to where we build app above)
@@ -112,7 +113,7 @@ def __build_jobser():  # (next to where we build app above)
         if 'info' != chan[0]:
             raise Exception('no')
         for line in msg(None):
-            ws._log('info', line)
+            _ws_log('info', line)
 
     def _build_job(x):  # IDENTITY_
         import grep_dump._magnetics.indexed_tree_via_dump_and_job as mag
@@ -178,189 +179,205 @@ def index():
 
 
 def _run_server_forever_custom(app):
-    """
-    firstly, note that this is ALL likely to be temporary.
-    (we mean this WHOLE function :#here1.)
+    """closed scope just for splaying & preparing our parameters to werkzeug
 
-    that said, this undifferentiated chunky mass of code is towards 2
-    problems. our description of the problems:
-
-        1) we need to manage the allocation and cleanup of our "jobs"
-           directory tree (basically just a tempdir with arbitrary depth).
-
-        2) when we used to just run the app with this 👇 (#history-A.1),
-
-               app.run(debug=True)
-
-           we would get warnings that the socket wasn't closed down
-           when we stopped the server with Ctrl-C.
-
-    analysis of the problem: if (2) is already not happening as it should,
-    (1) will be even more annoying and cludgy to address. also:
-
-    (1) is primary, but if (2) is actually substantive and we can address
-    that too, then maybe we can offer a patch to the lib one day..
-    (in the time between when we started working on this with python 3.5
-    to 3.6 (now), this may have been fixed. we're not sure yet.)
-
-    so, our objectives:
-
-        1) orchestrate the cleanup of our own facilities in concert
-           with server start and stop.
-
-        2) do what you have to do to get the the server to close that
-           socket on normal server shutdown (and maybe even abnormal
-           server shutdown too.) when you narrow down the problem,
-           get rid of the cruft (in a latter commit).
-
-    more analysis of the problem: the canonic call to `app.run` we replace
-    (shown above) leads to a mostly "straight" "stack" of calls to wrapper-
-    ish functions and methods. each line below represents one "frame" of
-    this stack, where each line represents a call that calls each next line:
-
-        (flask app) app.run [1]
-        (werkzeug.serving) run_simple [2]
-        (") make_server [3]
-        (") serve_forever [4]
-        [http.server.HTTPServer.serve_forever] [5]
-        socketserver.TCPServer.serve_forever [6]
-
-    notes about each frame of the stack (numbers in brackets are "pieces"):
-
-    [1]: flask app.run: (host, port, debug, werkzeug_options). flask choses
-         expected defaults for host and port and use_reloader and use_debugger
-
-    [2]: werkzeug.serving.run_simple: (recognizes 15 parameters). this does
-         a lot, including binding and listening. unfortunately this is also
-         the problem area that we want to address XXX
-
-    [3]: (") make_server: this is exactly factory pattern. we can probably
-         un-abstract it, as long as we are using one process and one
-         thread.. (but when not, we can probably call this function?)
-
-    [4]: (") serve_forever: a thin wrapper that ensures `server_close`
-         (which is an empty hook-in)
-
-    [5]: serve_forever: super().
-
-    [6]: socketserver.TCPServer.serve_forever: read the note here
-         (near their XXX). it .. gives pause..
+    so:
+      - splay out *all* the available parameters so they are visible.
+      - better than app.run() (or maybe about the same)
+      - the obvious ones of these should be moved to config when appropriate
     """
 
-    # === PROLOGUE A (this stuff)
+    host = '127.0.0.1'  # the default from there
+    port = 5000  # the default from there
+    debug = True  # the defatult is False. note here its corollaries
+    app.debug = debug  # look how awful this is (as done in source)
 
+    use_reloader = app.debug  # should the server automatically restart etc?
+    use_reloader = False   # reloader cant't work with jobser (#here4)
+    use_debugger = app.debug  # should the werkzeug debugging system be used?
+
+    use_evalex = True  # enable exception evaluation feature (interactive
+    extra_files = None  # a list of files the reloader should watch (after..)
+    reloader_interval = 5  # how frequently does reloader check (seconds)
+    reloader_type = 'watchdog'  # {watchdog|stat} (stat is horrible)
+    threaded = False  # should the process handle each req in sep thread?
+    processes = 1  # if > 1, use new process for each req. up to this count
+    request_handler = None  # you can inject one other than the default
+    static_files = None  # (later for this.. NOTE)
+    passthrough_errors = True  # true means barf on errors (raise thru server)
+    ssl_context = None  # a (sic) for the connection. meh NOTE
+
+    # ws.run_simple(  # :#here3
+    _my_run_simple(
+            hostname=host,
+            port=port,
+            application=app,
+            use_reloader=use_reloader,
+            use_debugger=use_debugger,
+            use_evalex=use_evalex,
+            extra_files=extra_files,
+            reloader_interval=reloader_interval,
+            reloader_type=reloader_type,
+            threaded=threaded,
+            processes=processes,
+            request_handler=request_handler,
+            static_files=static_files,
+            passthrough_errors=passthrough_errors,
+            ssl_context=ssl_context,
+            )
+
+
+def _my_run_simple(
+        hostname, port, application, use_reloader,
+        use_debugger, use_evalex,
+        extra_files, reloader_interval,
+        reloader_type, threaded,
+        processes, request_handler, static_files,
+        passthrough_errors, ssl_context,
+        ):
+
+    """copy-paste-modify of werkzeug with a wishlist feature hack-added
+
+    mainly this exists because the whole http server stack (an inheritance
+    hierarchy four classes deep!) does not have a listener/hook interface.
+
+    so the only thing this function accomplishes is to copy-paste what we
+    need from `werkzeug.serving.run_simple()` *plus* we hold on to the
+    server so we can hack it #here4. details:
+
+      - this is a refactoring of `werkzeug.serving.run_simple`
+
+      - if you want to see what the server would be like without this mostly
+        redundant hackery, comment-in #here3 (NOTE you will be WITHOUT jobser).
+
+      - we follow the structure there as much as is practical to do (while
+        pruning some unnecesary stuff out
+
+      - spiked at #history-A.1 (the first one, oops)
+
+    """
+
+    if use_debugger:
+        from werkzeug.debug import DebuggedApplication
+        application = DebuggedApplication(application, use_evalex)
+    if static_files:
+        from werkzeug.wsgi import SharedDataMiddleware
+        application = SharedDataMiddleware(application, static_files)
+
+    def _log_startup(sock):
+        _ssl = (lambda: ssl_context is None and 'http' or 'https')()
+        _hn = hostname
+        _prt = sock.getsockname()[1]
+        _msg = '(Press CTRL+C to quit)'
+        _ws_log('info', ' * Running on %s://%s:%d/ %s', _ssl, _hn, _prt, _msg)
+
+    def _inner():
+        fd = None
+        s = os.environ.get('WERKZEUG_SERVER_FD')
+        if s is not None:
+            fd = int(s)
+
+        srv = ws.make_server(hostname, port, application, threaded,
+                             processes, request_handler,
+                             passthrough_errors, ssl_context,
+                             fd)
+        # :#here4:
+        if use_reloader:
+            _ = ' * WARNING: reloader is on so jobser will not be used!'
+            _ws_log('warn', _)
+        else:
+            # _try_to_capture_that_lyfe(srv)  # doesn't add much
+            _hackishly_start_jobser_at_server_start(srv)
+            _hackishly_stop_jobser_at_server_stop(srv)
+
+        if fd is None:
+            _log_startup(srv.socket)
+
+        srv.serve_forever()
+
+    import os
+    if use_reloader:
+        if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
+            import socket
+            addr_fam = socket.AF_INET
+            s = socket.socket(addr_fam, socket.SOCK_STREAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            _ai = socket.getaddrinfo(hostname, port, addr_fam,
+                                     socket.SOCK_STREAM, socket.SOL_TCP)
+            _sock_addr = _ai[0][4]  # all this is is (host, port)
+            s.bind(_sock_addr)
+            s.set_inheritable(True)
+
+            os.environ['WERKZEUG_SERVER_FD'] = str(s.fileno())
+            s.listen(ws.LISTEN_QUEUE)
+            _log_startup(s)
+
+        from werkzeug._reloader import run_with_reloader
+        run_with_reloader(_inner, extra_files, reloader_interval,
+                          reloader_type)
+    else:
+        _inner()
+
+
+def USE_ME(srv):
+    orig_f = srv.server_close
+
+    def f():
+        print("LIFE IS WHAT YOU MAKE OF IT")
+        orig_f()
+
+    srv.server_close = f
+
+
+def hack_hook(method_name):
+    def real_decorator(new_behavior):
+        def hack_instance(inst):
+            orig_f = getattr(inst, method_name)
+
+            def new_f():
+                new_behavior()
+                orig_f()
+            setattr(inst, method_name, new_f)
+        return hack_instance
+    return real_decorator
+
+
+def _try_to_capture_that_lyfe(srv):
     def on_ctrl_c(signal, frame):
 
         print('You pressed Ctrl+C!')
         print(r"For now, we're JUST EXITING THIS RAW")
-
-        # real_sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
-        # real_sock.close()
 
         sys.exit(0)
 
     import signal
     signal.signal(signal.SIGINT, on_ctrl_c)
 
-    # === PIECE 1
 
-    host = '127.0.0.1'  # the default from there
-    port = 5000  # the default from there
-    debug = True  # NOT the default
-    app.debug = debug  # look how awful this is (as done in source)
-
-    use_reloader = app.debug  # should the server automatically restart etc?
-    use_debugger = app.debug  # should the werkzeug debugging system be used?
-    use_reloader = False  # NOTE - override above. see where it is used below
-
-    # NOTE skipping some details
-
-    # === PIECE 2  (reminder: this is the big one)
-
-    use_evalex = True  # enable exception evaluation feature (interactive
-    # debugging). requires a non-forking server.
-    # extra_files = None  # meh
-    # reloader_interval = 3  # how frequently check reloader in secs (deflt 1)
-    # reloader_type = 'auto'  # {stat|watchdog}
-    threaded = False  # should the process handle each req in sep thread?
-    processes = 1  # if > 1, use new process for each req. up to this count
-    request_handler = None  # you can inject one other than the default
-    static_files = None  # (later for this.. NOTE)
-    passthru_errors = True  # true means barf on errors (raise thru server)
-    ssl_context = None  # a (sic) for the connection. meh NOTE
-
-    if use_debugger:
-        from werkzeug.debug import DebuggedApplication
-        app = DebuggedApplication(app, use_evalex)
-
-    if static_files:
-        from werkzeug.wsgi import SharedDataMiddleware
-        app = SharedDataMiddleware(app, static_files)
-
-    # NOTE we're gonna skip bringing in reloader stuff for now
-    if use_reloader:
-        raise Exception('we did not bring this over yet. avoiding it for now.')
-
-    fd = None  # because we're not using reloader, this is always nothing
-
-    # === PIECE 3 (we explode werkzeug.make_server)
-    # (deconstructing it does not gain us much but it's thin)
-    # (the source should be refactored to pass args in only 1 place)
-
-    if threaded:
-        raise Exception('see source')
-
-    if processes > 1:
-        raise Exception('see source')
-
-    srv = ws.BaseWSGIServer(host, port, app, request_handler,
-                            passthru_errors, ssl_context, fd)
-
-    # ~begin copy-paste-ish of `log_startup`
-    if fd is None:
-        _sock = srv.socket
-        _prt = _sock.getsockname()[1]
-        _ssl = (lambda: ssl_context is None and 'http' or 'https')()
-        _hn = host
-        _msg = '(Press CTRL+C to quit)'
-        ws._log('info', ' * Running on %s://%s:%d/ %s', _ssl, _hn, _prt, _msg)
-    # ~end
-
-    # === PIECE 4 (werkzeug.serving.BaseWSGIServer.serve_forever)
-
-    # for now, we're exploding this to say hello to it.  also, could use
-    # refactor: catching KeyboardInterrupt is confusing, adds nothing.
-
-    # srv.serve_forever()  # OR:
-
-    from http.server import HTTPServer
-
-    srv.shutdown_signal = False
+@hack_hook('serve_forever')
+def _hackishly_start_jobser_at_server_start():
     jobser.enter()
-    try:
-        HTTPServer.serve_forever(srv)  # (this is piece 5)
-    finally:
-        jobser.exit()
-        print('closing that one socket')
-        srv.server_close()
 
-    # === PIECE 5
 
-    # (super())
+@hack_hook('server_close')
+def _hackishly_stop_jobser_at_server_stop():
+    """..
 
-    # === PIECE 6
+    (reminder:)
+      - werkzeug.serving.BaseWSGIServer ->
+      - http.server.HTTPServer ->
+      - socketserver.TCPServer.server_close()  # closes socket
+      - socketserver.BaseServer.server_close()  # does nothing
+    """
 
-    # from socketserver import TCPServer
-    # tcp_server = TCPServer.xxx()
-    # tcp_server.serve_forever()
-
-    # === END (reminder: the above WHOLE function will probably go. #here1)
+    jobser.exit()
 
 
 if __name__ == '__main__':
     _run_server_forever_custom(app)
 
 
+# #history-A.3 learned we can't use jobser with reloader
 # #history-A.1 (can be temporary) when we injected "jobser"
 # #history-A.1 (as referenced)
 # #born.
