@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.5",
-    "npm": "^5.7.1"
+    "npm": "^5.7.1",
+    "react-progress-bar.js": "^0.2.0-dev"
   },
   "babel": {
     "presets": [
