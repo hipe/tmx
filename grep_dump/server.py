@@ -1,3 +1,56 @@
+# -- BEGIN (very closely related to [#024]) get `sys.path` right
+def _():
+    """normalize `sys.path`
+
+    python makes the assumption that you want the parent directory of your
+    entrypoint file prepended to your `sys.path`. in our case that is not
+    what we want. in our case:
+
+      - do *not* prepend the dirname of our entrypoint file to `sys.path`.
+        (to do so would encourage a smell - module names should be fully
+        qualified from the top of our project, not the top of our sub-project.)
+
+      - we are in the entrypoint file (for now) for running the server.
+
+      - we want `sys.path` to be not our own entrypoint directory, but dirname
+
+      - (in a function so lvars don't get confused with "local" exports)
+    """
+
+    from os import path
+    dirname = path.dirname
+
+    sub_project_dir = dirname(path.abspath(__file__))
+    project_dir = dirname(sub_project_dir)
+
+    a = sys.path
+    current_head_path = a[0]
+
+    if sub_project_dir == current_head_path:
+        """the parent directory of *this file* is at the head of `sys.path`.
+        assume this file is the entrypoint file, ergo we are not in some
+        kind of test suite. normalize the `sys.path` to follow the guidelines
+        set out at [#204].
+        """
+        a[0] = project_dir
+    else:
+        raise Exception("we've never loaded this file under tests before")
+
+    _writable_tmpdir = path.join(project_dir, 'writable-tmpdir')
+
+    return (
+            _writable_tmpdir,
+            sub_project_dir,
+            project_dir,
+            )
+
+import sys
+(writable_tmpdir,
+sub_project_dir,
+project_dir,
+) = _()
+# -- END
+
 from flask import (
         Flask,
         flash,
@@ -7,7 +60,7 @@ from flask import (
 )
 
 
-import forms
+import grep_dump.forms as forms
 
 # -- BEGIN this is a thing to move to a separate file one day maybe
 
@@ -22,7 +75,7 @@ class Config:
 
 # -- END
 
-def __build_root_path():
+
     """flask will behave wierd (silently) only for the serving of
 
     static files UNLESS you have the root path be an absolute path
@@ -32,15 +85,14 @@ def __build_root_path():
     the root path (again) and tries to send 'foo-bar/foo-bar/static/file',
     and so always 404's on it). life would be nicer if flask complained that
     the root path is not absolute..)
+
+    :#here2
     """
 
-    from os import path as p
-    return p.dirname(p.abspath(__file__))
-
-_root_path = __build_root_path()
-
-app = Flask('grep_dump',
-        root_path = _root_path,
+app = Flask(
+        'grep_dump',
+        instance_path=sub_project_dir,
+        root_path=sub_project_dir,  # #here2
         )
 
 app.config.from_object(Config)
@@ -66,7 +118,7 @@ def reindex_dump():
 @app.route('/reindex-dump-job-progress')
 def reindex_dump_job_progress():
     import time
-    return '{"one_zing":"two zing ' + str(time.time()) + '"}';
+    return '{"one_zing":"two zing ' + str(time.time()) + '"}'
 
 
 @app.route('/index')
@@ -156,7 +208,6 @@ def _run_server_forever_custom(app):
         # real_sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
         # real_sock.close()
 
-        import sys
         sys.exit(0)
 
     import signal
@@ -226,9 +277,28 @@ def _run_server_forever_custom(app):
         _ssl = (lambda: ssl_context is None and 'http' or 'https')()
         _hn = host
         _msg = '(Press CTRL+C to quit)'
-        import werkzeug.serving as _sg
         ws._log('info', ' * Running on %s://%s:%d/ %s', _ssl, _hn, _prt, _msg)
     # ~end
+
+    # === (INJECTED)
+
+    def _listener(*a):
+        chan = a[0:-1]
+        msg = a[-1]
+        if 'info' != chan[0]:
+            raise Exception('no')
+        for line in msg(None):
+            ws._log('info', line)
+
+    def _identity(x):  # IDENTITY_
+        return x
+
+    import grep_dump._magnetics.jobs_via_directory as mod  # near [#204]
+    jobser = mod.Jobser(
+            dir_path=writable_tmpdir,
+            wrapper_class=_identity,
+            listener=_listener,
+            )
 
     # === PIECE 4 (werkzeug.serving.BaseWSGIServer.serve_forever)
 
@@ -237,13 +307,14 @@ def _run_server_forever_custom(app):
 
     # srv.serve_forever()  # OR:
 
-    import socketserver
     from http.server import HTTPServer
 
     srv.shutdown_signal = False
+    jobser.enter()
     try:
         HTTPServer.serve_forever(srv)  # (this is piece 5)
     finally:
+        jobser.exit()
         print('closing that one socket')
         srv.server_close()
 
@@ -264,5 +335,6 @@ if __name__ == '__main__':
     _run_server_forever_custom(app)
 
 
+# #history-A.1 (can be temporary) when we injected "jobser"
 # #history-A.1 (as referenced)
 # #born.

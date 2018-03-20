@@ -7,7 +7,7 @@ def SELF(
 
     """result in a hash (suitable to be JSON-ified) describing the progress.
 
-    our [#202] sibling magnet specifies the structure and meaning of
+    our [#203] sibling magnet specifies the structure and meaning of
     "the logfile". the subject magnet is for processing requests inquiring
     as to the status of the job. here we specify the details of *that*
     interaction.

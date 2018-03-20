@@ -1,0 +1,41 @@
+# what is the deal with this file?
+
+## why it exists
+
+we do not want multiple server (or other) processes trying to read from
+job trees as they are in progress (unless we mean to); or having other
+processes trying to write to, delete, or move job trees while they are
+in progress.
+
+our sort of quick-and-dirty solution to this is to have a single file
+that we use to indicate that a process (the server) is using this entire
+directory. (no, it appears that you cannot lock an entire directory
+reliably.)
+
+as such,
+
+  - this file exists so that the server can vie for a read-only lock on
+    it (and most importantly, will fail if we forget that another server
+    process is already using it).
+
+  - this file is opened for reading but it is never read from.
+
+  - this read-only lock trick will only work with participating processes,
+    so do not consider it reliable. (it might be the case that this we
+    are only safeguarded from running multiple instanes of our own server,
+    but that is OK.)
+
+
+
+
+## why is it in version control
+
+both so:
+
+  - it makes installation straightforward (so that users don't have to
+    create this file.)
+
+  - so that its parent directory is creates as part of a project checkout.
+
+  - (permissions might be an issue down the road..)
+

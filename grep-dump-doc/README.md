@@ -8,6 +8,47 @@
 
 
 
+## development on the full stack
+
+the stack breaks (logically if not physically) into the two parts of
+frontend and backend. ([front-vs-back]).
+
+currently the back is in python's flask and the front is in React.
+
+to run the web app it is required (of course) to run the webserver.
+
+whether or not you need to be running the server when you are working
+on the backend depends on what you are doing: generaly you won't need
+to - the backend is mostly implemented thru pure-python [#017]
+"magnetics" (plain old functions) which generally won't interact
+with the webserver in a highly coupled way.
+
+when working on the frontend, you will often want to be running the
+webserver but also one other process as well: the below process that
+watches for changes in certain files and runs the web-pack build chain
+as necessary.
+
+so in any order:
+
+(we use these [aliases](#aliases))
+
+so that you can see the web application, run the webserver:
+
+    py grep_dump/server.py
+
+if the server is running OK you should be able to go to
+`http://localhost:5000` in your browser to see the app.
+
+when developing javascript etc, run the watch on the frontend files:
+
+    cd grep_dump/static
+    npm run watch
+
+[front-vs-back]: https://twitter.com/PainPoint/status/966749439963508736
+
+
+
+
 ## the function of the test suite
 
   - the full test suite must pass at every commit to master (every "pull request").
@@ -35,7 +76,7 @@ run the whole test suite
 
 
 (what i actually do now is say `python` not `python3` (and use
-virtualenv), and i set up these aliases:)
+virtualenv), and i set up these <a name='aliases'>aliases</a>:)
 
     alias py='python -W error::Warning::0'
     alias pud='py -m unittest discover'
@@ -50,7 +91,8 @@ virtualenv), and i set up these aliases:)
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
 |                [#204]     |       | this one import issue is ugly for now
-|<a name=202></a>[\[#202\]] | #open | enzyme/mocha tests for web front like [bedjango1]
+|                [#203]     |       | [code node]
+|<a name=202></a>[#202]     | #open | enzyme/mocha tests for web front like [bedjango1]
 
 
 
