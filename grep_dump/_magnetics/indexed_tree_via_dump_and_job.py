@@ -1,3 +1,49 @@
+def JOB_VIA_WEB_FIELD(field, jobser):
+    """(this function is web-only but because it's so small it's..
+
+    .. a stowaway here
+    """
+
+    def __main():
+        ok and __check_content_type()
+        ok and __save_file()
+        if ok:
+            return job
+
+    def __save_file():
+        nonlocal job
+        job = jobser.begin_job()
+        file_storage.save(job.big_json_dump_path)
+
+    def __check_content_type():
+        cs = file_storage.content_type
+        need = 'application/json'
+        if cs != need:
+            _fail_because('needed {} had {}', need, cs)
+            _fail_because('(is file extension ".json"?')
+
+    def _fail_because(msg, *a):
+        _tmpl = field.gettext(msg)
+        _msg = _tmpl.format(*a)
+        field.errors.append(_msg)
+        nonlocal ok
+        ok = False
+
+    file_storage = field.data
+    job = None
+    ok = True
+
+    return __main()
+
+
+class IndexingJob:
+    """(injected into the jobser, makes it more task-specific by one member)"""
+
+    def __init__(self, o):
+        import os
+        self.big_json_dump_path = os.path.join(o.path, 'BIG_JSON_DUMP.json')
+        self.path = o.path
+        self.job_number = o.job_number
 
 
 def SELF(
@@ -213,4 +259,6 @@ if __name__ == '__main__':
 
     print("done!")
 
+
+# #history-A.1: inject visitor for web only
 # #born.

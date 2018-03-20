@@ -2,12 +2,15 @@ from flask_wtf import FlaskForm
 
 from wtforms import (
         BooleanField,
+        FileField,
         PasswordField,
         SelectField,
         SelectMultipleField,
         StringField,
         SubmitField,
         )
+
+import wtforms.validators as validators  # ..
 
 from wtforms.validators import (
         DataRequired,
@@ -39,5 +42,19 @@ class SearchForm(FlaskForm):
     has_link = BooleanField('Has Pin')
     has_reaction = BooleanField('Has Reaction')
     submit = SubmitField('Search')
+
+
+class FileUploadForm(FlaskForm):
+
+    validators.regexp  # say hello to this early ..
+
+    def _vali(form, field):
+        x = field.data
+        if x == '' or x is None:
+            field.errors.append(field.gettext('file is required'))
+
+    json_file_path = FileField('JSON File', [_vali])
+
+    submit = SubmitField('Submit')
 
 # #born.

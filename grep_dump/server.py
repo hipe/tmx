@@ -1,4 +1,16 @@
 # -- BEGIN (very closely related to [#024]) get `sys.path` right
+from flask import (
+        Flask,
+        flash,
+        redirect,
+        render_template,
+        url_for,
+)
+
+import werkzeug.serving as ws
+import sys
+
+
 def _():
     """normalize `sys.path`
 
@@ -44,27 +56,21 @@ def _():
             project_dir,
             )
 
-import sys
-(writable_tmpdir,
-sub_project_dir,
-project_dir,
+
+(
+        writable_tmpdir,
+        sub_project_dir,
+        project_dir,
 ) = _()
 # -- END
 
-from flask import (
-        Flask,
-        flash,
-        redirect,
-        render_template,
-        url_for,
-)
-
-
-import grep_dump.forms as forms
+import grep_dump.forms as forms  # noqa: E402
 
 # -- BEGIN this is a thing to move to a separate file one day maybe
 
+
 class Config:
+
     SECRET_KEY = 'one_day_make_this_more_secure'  # #todo
     """the secret key is supposed to be secret, as the strength of the
     tokens and signatures generated with it depends on no person outside
@@ -74,7 +80,6 @@ class Config:
     pass
 
 # -- END
-
 
     """flask will behave wierd (silently) only for the serving of
 
@@ -89,6 +94,7 @@ class Config:
     :#here2
     """
 
+
 app = Flask(
         'grep_dump',
         instance_path=sub_project_dir,
@@ -96,6 +102,50 @@ app = Flask(
         )
 
 app.config.from_object(Config)
+
+
+def __build_jobser():  # (next to where we build app above)
+
+    def _listener(*a):
+        chan = a[0:-1]
+        msg = a[-1]
+        if 'info' != chan[0]:
+            raise Exception('no')
+        for line in msg(None):
+            ws._log('info', line)
+
+    def _build_job(x):  # IDENTITY_
+        import grep_dump._magnetics.indexed_tree_via_dump_and_job as mag
+        return mag.IndexingJob(x)
+
+    import grep_dump._magnetics.jobs_via_directory as mag  # near [#204]
+
+    return mag.Jobser(
+            dir_path=writable_tmpdir,
+            wrapper_class=_build_job,
+            listener=_listener,
+        )
+
+
+jobser = __build_jobser()
+
+
+@app.route('/upload-dump', methods=['GET', 'POST'])
+def upload_dump():
+    form = forms.FileUploadForm()
+    job_num = None
+    if form.validate_on_submit():
+        import grep_dump._magnetics.indexed_tree_via_dump_and_job as mag
+        job = mag.JOB_VIA_WEB_FIELD(form.json_file_path, jobser)
+        if job is not None:
+            job_num = job.job_number
+
+    return render_template(
+            'upload-dump.html',
+            job_number=job_num,
+            form=form,
+            title='Upload Time',
+            )
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -125,7 +175,6 @@ def reindex_dump_job_progress():
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 
 def _run_server_forever_custom(app):
@@ -230,9 +279,9 @@ def _run_server_forever_custom(app):
 
     use_evalex = True  # enable exception evaluation feature (interactive
     # debugging). requires a non-forking server.
-    extra_files = None  # meh
-    reloader_interval = 3  # how frequently check reloader in seconds (dflt 1)
-    reloader_type = 'auto'  # {stat|watchdog}
+    # extra_files = None  # meh
+    # reloader_interval = 3  # how frequently check reloader in secs (deflt 1)
+    # reloader_type = 'auto'  # {stat|watchdog}
     threaded = False  # should the process handle each req in sep thread?
     processes = 1  # if > 1, use new process for each req. up to this count
     request_handler = None  # you can inject one other than the default
@@ -240,7 +289,6 @@ def _run_server_forever_custom(app):
     passthru_errors = True  # true means barf on errors (raise thru server)
     ssl_context = None  # a (sic) for the connection. meh NOTE
 
-    import werkzeug
     if use_debugger:
         from werkzeug.debug import DebuggedApplication
         app = DebuggedApplication(app, use_evalex)
@@ -265,10 +313,8 @@ def _run_server_forever_custom(app):
     if processes > 1:
         raise Exception('see source')
 
-    import werkzeug.serving as ws
-
     srv = ws.BaseWSGIServer(host, port, app, request_handler,
-            passthru_errors, ssl_context, fd)
+                            passthru_errors, ssl_context, fd)
 
     # ~begin copy-paste-ish of `log_startup`
     if fd is None:
@@ -279,26 +325,6 @@ def _run_server_forever_custom(app):
         _msg = '(Press CTRL+C to quit)'
         ws._log('info', ' * Running on %s://%s:%d/ %s', _ssl, _hn, _prt, _msg)
     # ~end
-
-    # === (INJECTED)
-
-    def _listener(*a):
-        chan = a[0:-1]
-        msg = a[-1]
-        if 'info' != chan[0]:
-            raise Exception('no')
-        for line in msg(None):
-            ws._log('info', line)
-
-    def _identity(x):  # IDENTITY_
-        return x
-
-    import grep_dump._magnetics.jobs_via_directory as mod  # near [#204]
-    jobser = mod.Jobser(
-            dir_path=writable_tmpdir,
-            wrapper_class=_identity,
-            listener=_listener,
-            )
 
     # === PIECE 4 (werkzeug.serving.BaseWSGIServer.serve_forever)
 

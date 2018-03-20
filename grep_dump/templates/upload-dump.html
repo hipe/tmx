@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+
+  <style type='text/css'>
+  <!--
+  -->
+  </style>
+
+  {% if job_number %}
+    (WAHOO JOB NUMBER: {{ job_number }})
+  {% else %}
+    (no job number yet)
+  {% endif %}
+
+
+  <form action='' method='post' enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+    <table>
+    <tr>
+      <th>
+        {{ form.json_file_path.label }}
+      </th>
+      <td>
+        {{ form.json_file_path(size=32) }}
+      </td>
+      <td>
+        {% for error in form.json_file_path.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan=2 style='text-align: right; padding-top: 0.75em;'>
+        {{ form.submit() }}
+      </td>
+    </tr>
+    </table>
+  </form>
+{% endblock %}
