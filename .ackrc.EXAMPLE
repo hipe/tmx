@@ -1,1 +1,2 @@
---ignore-directory=venv
+--ignore-directory=my-venv
+--ignore-directory=node_modules

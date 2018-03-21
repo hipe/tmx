@@ -13,9 +13,23 @@
 the stack breaks (logically if not physically) into the two parts of
 frontend and backend. ([front-vs-back]).
 
+although the boundary between where the backend ends and frontend begins
+can seem artificial at times, these concepts serve to compartmentalize the
+kinds of work we find ourselves doing in terms of what technologies we use
+and how we develop under them.
+
 currently the back is in python's flask and the front is in React.
 
 to run the web app it is required (of course) to run the webserver.
+
+details for under what circumstances and how you will want to work on these
+two ends (variously) appear in the next two below sections; one for
+[backend](#c) and one for [frontend](#d).
+
+
+
+
+## <a name=c></a>developing on the backend
 
 whether or not you need to be running the server when you are working
 on the backend depends on what you are doing: generaly you won't need
@@ -23,22 +37,32 @@ to - the backend is mostly implemented thru pure-python [#017]
 "magnetics" (plain old functions) which generally won't interact
 with the webserver in a highly coupled way.
 
-when working on the frontend, you will often want to be running the
-webserver but also one other process as well: the below process that
-watches for changes in certain files and runs the web-pack build chain
-as necessary.
-
-(we use these [aliases](#aliases))
-
-
 typically you always want to do this:
 
     cd «the root of the project (the git repo)»
     source ./my-venv/bin/activate
 
-(this table is explained at [\[#018\]] developing under python.)
-then in any order:
+(this action is explained at [\[#018\]] developing under python.)
 
+if you're just working on magnetics then typically all you will do
+is write tests and asset code and [run those tests](#running-backend-tests)
+as described below.
+
+if you're (for example) integrating your backend work with the web
+appliation then see the [next section](#d) about starting the web server.
+
+
+
+
+## <a name=d></a>developing on the frontend
+
+when working on the frontend, you will often want to be running the
+webserver but also one other process as well: the below process that
+watches for changes in certain files and runs the web-pack build chain
+as necessary.
+
+we will be using [these aliases](#aliases) described below. also we'll
+assume you [activated the virtuan environment](#c) as described above.
 
 so that you can see the web application, run the webserver:
 
@@ -52,7 +76,17 @@ when developing javascript etc, run the watch on the frontend files:
     cd grep_dump/static
     npm run watch
 
-[front-vs-back]: https://twitter.com/PainPoint/status/966749439963508736
+
+xx xx xx
+
+
+
+
+## <a name=e></a>(notes about installing new react components)
+
+xxx
+
+    npm install --save react-progressbar.js
 
 
 
@@ -72,22 +106,25 @@ when developing javascript etc, run the watch on the frontend files:
 
 ## <a name='running-backend-tests'></a>running backend tests
 
+have [the particular version][018_D] of python installed.
 
-run one test file
+have [activated our virtualenv](#c) as described above.
 
-    python3 grep_dump_test/ohai_010/test_010_ohai.py
+we use these <a name='aliases'>aliases</a>
+(these lines are in our `~/.zshrc`, basically):
 
-
-run the whole test suite
-
-    python3 -m unittest discover grep_dump_test
-
-
-(what i actually do now is say `python` not `python3` (and use
-virtualenv), and i set up these <a name='aliases'>aliases</a>:)
-
-    alias py='python -W error::Warning::0'
+    alias py='python3 -W error::Warning::0'
     alias pud='py -m unittest discover'
+
+to run one test file:
+
+    py grep_dump_test/ohai_010/test_010_ohai.py -vvvf
+
+(the options are optional)
+
+to run the whole test suite:
+
+    pud grep_dump_test -vvvf
 
 
 
@@ -104,9 +141,12 @@ virtualenv), and i set up these <a name='aliases'>aliases</a>:)
 
 
 
+[018_D]: ../doc/118-installing-and-deploying-python.md#D
 [\[#018\]]: ../README.md#018
 [\[#002\]]: ../README.md#002
 [bedjango1]: http://www.bedjango.com/blog/how-to-build-web-app-react-redux-and-flask/
+
+[front-vs-back]: https://twitter.com/PainPoint/status/966749439963508736
 
 
 

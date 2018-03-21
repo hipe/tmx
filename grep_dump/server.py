@@ -131,6 +131,15 @@ def __build_jobser():  # (next to where we build app above)
 jobser = __build_jobser()
 
 
+@app.route('/chimi-churri')
+def chiminius_churrious():
+    import time
+    return render_template(
+            'blue-ranger-template.html',
+            time_s=str(time.time()),
+            )
+
+
 @app.route('/upload-dump', methods=['GET', 'POST'])
 def upload_dump():
     form = forms.FileUploadForm()
@@ -172,7 +181,6 @@ def reindex_dump_job_progress():
     return '{"one_zing":"two zing ' + str(time.time()) + '"}'
 
 
-@app.route('/index')
 @app.route('/')
 def index():
     return render_template('index.html')

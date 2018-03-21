@@ -157,7 +157,7 @@ outline for the remaining sections of this document.
 
 
 
-## <a name='d'></a>getting the necessary version of python installed
+## <a name='D'></a>getting the necessary version of python installed
 
   - this is a thing you have to do probably once per development machine,
     and once again each time the python version experiences a bump.
@@ -193,7 +193,7 @@ outline for the remaining sections of this document.
 
   - our virtual environment will “know” what particular version of python
     it was created with. so when we say `python3` below we mean for it to
-    point to the correct version of python per the [above section](#d).
+    point to the correct version of python per the [above section](#D).
 
     so from the root of this project:
 
