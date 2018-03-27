@@ -45,6 +45,31 @@ then simply run the bot:
 
 
 
+## <a name='running-backend-tests'></a>running backend tests
+
+have [the particular version][018_pyver] of python installed.
+
+have activated our virtualenv as described in a [cousin document][here2].
+
+we use these <a name='aliases'>aliases</a>
+(these lines are in our `~/.zshrc`, basically):
+
+    alias py='python3 -W error::Warning::0'
+    alias pud='py -m unittest discover'
+
+to run one test file:
+
+    py upload_bot_test/test_200_magnetics/test_100_etc.py -vvvf
+
+(the options are optional)
+
+to run the whole test suite:
+
+    pud upload_bot_test -vvvf
+
+
+
+
 ## appendix: our general setup
 
 we use these <a name='aliases'>aliases</a>
@@ -55,7 +80,9 @@ we use these <a name='aliases'>aliases</a>
 
 
 
+[018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
 [here]: https://www.fullstackpython.com/blog/build-first-slack-bot-python.html
+[here2]: ../grep-dump-doc.md#venv-etc
 
 
 

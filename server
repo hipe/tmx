@@ -60,4 +60,5 @@ if __name__ == '__main__':
     )
 
 
+# #pending-rename (move this to game server with entrypoint in bin/ or something)
 # #born

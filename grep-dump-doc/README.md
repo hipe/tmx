@@ -1,4 +1,4 @@
-# grep dump
+# grep dump :[#201]
 
 ## objective & scope
 
@@ -24,12 +24,12 @@ to run the web app it is required (of course) to run the webserver.
 
 details for under what circumstances and how you will want to work on these
 two ends (variously) appear in the next two below sections; one for
-[backend](#c) and one for [frontend](#d).
+[backend](#venv-etc) and one for [frontend](#d).
 
 
 
 
-## <a name=c></a>developing on the backend
+## <a name='venv-etc'></a>developing on the backend
 
 whether or not you need to be running the server when you are working
 on the backend depends on what you are doing: generaly you won't need
@@ -62,7 +62,7 @@ watches for changes in certain files and runs the web-pack build chain
 as necessary.
 
 we will be using [these aliases](#aliases) described below. also we'll
-assume you [activated the virtuan environment](#c) as described above.
+assume you [activated the virtual environment](#venv-etc) as described above.
 
 so that you can see the web application, run the webserver:
 
@@ -106,9 +106,9 @@ xxx
 
 ## <a name='running-backend-tests'></a>running backend tests
 
-have [the particular version][018_D] of python installed.
+have [the particular version][018_pyver] of python installed.
 
-have [activated our virtualenv](#c) as described above.
+have [activated our virtualenv](#venv-etc) as described above.
 
 we use these <a name='aliases'>aliases</a>
 (these lines are in our `~/.zshrc`, basically):
@@ -135,15 +135,16 @@ to run the whole test suite:
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
-|                [#204]     |       | this one import issue is ugly for now
+|                [#204]     | #open | this one import issue is ugly for now - see [here1]
 |                [#203]     |       | [code node]
 |<a name=202></a>[#202]     | #open | enzyme/mocha tests for web front like [bedjango1]
 
 
 
-[018_D]: ../doc/118-installing-and-deploying-python.md#D
+[018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
 [\[#018\]]: ../README.md#018
 [\[#002\]]: ../README.md#002
+[here1]: https://docs.python.org/3/tutorial/modules.html#intra-package-references
 [bedjango1]: http://www.bedjango.com/blog/how-to-build-web-app-react-redux-and-flask/
 
 [front-vs-back]: https://twitter.com/PainPoint/status/966749439963508736

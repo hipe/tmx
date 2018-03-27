@@ -1,2 +1,3 @@
+--ignore-directory=dist
 --ignore-directory=my-venv
 --ignore-directory=node_modules

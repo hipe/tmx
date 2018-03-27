@@ -1,6 +1,6 @@
 from __init__ import writable_tmpdir
 
-from game_server import (  # noqa: E402
+from game_server import (
         dangerous_memoize as shared_subject,
         memoize,
         )

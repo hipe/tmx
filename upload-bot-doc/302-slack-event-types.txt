@@ -1,0 +1,126 @@
+# this file is meant to serve as an auxiliary reference (augmenting the
+# existing (ample) slack documentation documenting the slack app API)
+# to the slack event types.
+#
+#   - it is *not* authoritative. it is guaranteed current only at writing.
+#   - it is semi-machine generated. (copy-paste of web page, formatted)
+#   - the only value it adds is the categories, which are in a certain order
+#   - it is ordered big-to-little, with more static/general stuff at top, etc
+#   - it is desigend to be machine-readable (fixed width yikes)
+#   - ..so that hypothetically we could keep it current semi-automatedly
+
+
+                  Event     Required Scope  Description
+
+WHOLE LYFE (WORKSPACE)
+
+          emoji_changed         emoji:read  A custom emoji has been added or changed
+   email_domain_changed          team:read  The workspace email domain has changed
+grid_migration_finished               None  An enterprise grid migration has finished on this workspace.
+ grid_migration_started               None  An enterprise grid migration has started on this workspace.
+
+
+# WORKSPACE STUFF
+
+     team_domain_change          team:read  The workspace domain has changed
+            team_rename          team:read  The workspace name has changed
+
+
+# APP STUFF
+
+            link_shared         links:read  A message was posted containing one or more links relevant to your application
+            app_mention               None  Subscribe to only the message events that mention your app or bot
+       app_rate_limited               None  Indicates your app's event subscriptions are being rate limited
+        app_uninstalled               None  Your Slack app was uninstalled.
+
+        resources_added               None  Access to a set of resources was granted for your app
+      resources_removed               None  Access to a set of resources was removed for your app
+
+           scope_denied               None  OAuth scopes were denied to your app
+          scope_granted               None  OAuth scopes were granted to your app
+
+         tokens_revoked               None  API tokens for your app were revoked.
+       url_verification               None  Verifies ownership of an Events API Request URL
+
+
+# USER GROUP STUFF
+
+        subteam_created    usergroups:read  A User Group has been added to the workspace
+subteam_members_changed    usergroups:read  The membership of an existing User Group has changed
+     subteam_self_added    usergroups:read  You have been added to a User Group
+   subteam_self_removed    usergroups:read  You have been removed from a User Group
+
+        subteam_updated    usergroups:read  An existing User Group has been updated or its members changed
+
+
+# CHANNEL STUFF
+
+        channel_archive      channels:read  A channel was archived
+        channel_created      channels:read  A channel was created
+        channel_deleted      channels:read  A channel was deleted
+channel_history_changed   channels:history  Bulk updates were made to a channel's history
+         channel_rename      channels:read  A channel was renamed
+      channel_unarchive      channels:read  A channel was unarchived
+  member_joined_channel      channels:read  A user joined a public or private channel
+    member_left_channel      channels:read  A user left a public or private channel
+
+
+# PRIVATE CHANNNEL STUFF
+
+          group_archive        groups:read  A private channel was archived
+            group_close        groups:read  You closed a private channel
+
+  group_history_changed     groups:history  Bulk updates were made to a private channel's history
+             group_open        groups:read  You created a group DM
+           group_rename        groups:read  A private channel was renamed
+        group_unarchive        groups:read  A private channel was unarchived
+
+
+# CHANNEL: DM STUFF
+
+               im_close            im:read  You closed a DM
+             im_created            im:read  A DM was created
+     im_history_changed         im:history  Bulk updates were made to a DM's history
+                im_open            im:read  You opened a DM
+
+
+# USER STUFF
+              team_join         users:read  A new member has joined
+            user_change         users:read  A member's data has changed
+
+
+CURRENT USER
+
+            dnd_updated           dnd:read  Do not Disturb settings changed for the current user
+       dnd_updated_user           dnd:read  Do not Disturb settings changed for a member
+
+
+# MESSAGE STUFF
+
+                message   channels:history  A message was sent to a channel
+       message.channels   channels:history  A message was posted to a channel
+         message.groups     groups:history  A message was posted to a private channel
+             message.im         im:history  A message was posted in a direct message channel
+           message.mpim       mpim:history  A message was posted in a multiparty direct message channel
+
+
+              pin_added          pins:read  A pin was added to a channel
+            pin_removed          pins:read  A pin was removed from a channel
+
+         reaction_added     reactions:read  A member has added an emoji reaction to an item
+       reaction_removed     reactions:read  A member removed an emoji reaction
+
+             star_added         stars:read  A member has starred an item
+           star_removed         stars:read  A member removed a star
+
+
+FILE
+            file_change         files:read  A file was changed
+     file_comment_added         files:read  A file comment was added
+   file_comment_deleted         files:read  A file comment was deleted
+    file_comment_edited         files:read  A file comment was edited
+           file_created         files:read  A file was created
+           file_deleted         files:read  A file was deleted
+            file_public         files:read  A file was made public
+            file_shared         files:read  A file was shared
+          file_unshared         files:read  A file was unshared

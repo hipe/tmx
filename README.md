@@ -101,6 +101,7 @@ we offer no formal definition for “sub-project” but:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
 |<a name=018></a>[\[#018\]] |       | installing and deploying python

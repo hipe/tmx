@@ -54,4 +54,5 @@ sub-project: upload files to s3
   do the yes/no dialog (when no)
   detect any time anyone uploads a file (in any channel)
   detect any time anyone uploads a file (in one channel)
-  bot hello world
+  accept and meet a challenge
+  secrets via environment variables
