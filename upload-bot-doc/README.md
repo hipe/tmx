@@ -1,5 +1,14 @@
 # the 'upload' bot
 
+## synopsis
+
+    py upload_bot/run.py
+
+(we use [these aliases](#aliases) as described below.)
+
+
+
+
 ## objective & scope:
 
 when someone uploads a file to any channel, give them the option of
@@ -51,11 +60,7 @@ have [the particular version][018_pyver] of python installed.
 
 have activated our virtualenv as described in a [cousin document][here2].
 
-we use these <a name='aliases'>aliases</a>
-(these lines are in our `~/.zshrc`, basically):
-
-    alias py='python3 -W error::Warning::0'
-    alias pud='py -m unittest discover'
+we use the aliases described [below](#aliases).
 
 to run one test file:
 
@@ -70,16 +75,40 @@ to run the whole test suite:
 
 
 
-## appendix: our general setup
+## running tests for our app API webserver
+
+this is an area heavily in flux whose concern is
+[\[#303\]][\[#303\]] this document.
+
+
+
+
+## our general setup
 
 we use these <a name='aliases'>aliases</a>
 (these lines are in our `~/.zshrc`, basically):
 
     alias py='python3 -W error::Warning::0'
+    alias pud='py -m unittest discover'
 
 
 
 
+## <a name="node-table"></a>the node table
+
+(this table is explained at [\[#002\]] using the node table.)
+
+| Id                        | Main Tag | Content
+|---------------------------|:-----:|-
+|              [\[#303\]]   |       | testing our webserver
+|              [\[#302\]]   |       | reading notes: slack event types
+
+
+
+
+[\[#303\]]: 303-testing-our-webserver.md
+[\[#302\]]: 302-slack-event-types.txt
+[\[#002\]]: ../README.md#002
 [018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
 [here]: https://www.fullstackpython.com/blog/build-first-slack-bot-python.html
 [here2]: ../grep-dump-doc.md#venv-etc

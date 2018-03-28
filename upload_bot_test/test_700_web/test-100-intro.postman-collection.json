@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "f4402787-b303-4e92-9031-7a43e8907fbb",
+		"name": "my intro collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "minimal failure",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "43e054ed-a911-4c0b-ac39-5edc7f0ac222",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"the response body explains the status in plain languge\", function(){",
+							"    pm.expect(pm.response.text()).to.include(\"The requested URL was not found on the server\");    ",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5000/i-dont-exist",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"i-dont-exist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "minimal success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a0943b54-6ee4-44be-a9af-bba7e99e0a70",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body says hello\", function(){",
+							"    pm.expect(pm.response.text()).to.include(\"hello from upload_bot 🙂!\");    ",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5000/ping",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ping"
+					]
+				},
+				"description": "«desc line 1» this is *bold*, this is _italic_\n«desc line 2» this is `some code`"
+			},
+			"response": []
+		}
+	]
+}

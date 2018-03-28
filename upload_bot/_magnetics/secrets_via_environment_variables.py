@@ -1,6 +1,11 @@
-"""(this module is a more specific thing implemented as a more general thing:)
+"""a more specific thing implemented as a more general thing:
 
-sepcifically it exists only to:
+in terms of its objectives (the more specific thing), it exists to:
+
+    - verify early whether all the environment variables it expects to
+      be set are set, and whether they "look right". do this before
+      the webserver starts, so we aren't throwing such errors while
+      responding to web requests.
 
     - serve as an abstraction layer (separation of concerns) between
       the part that reads environment variables and the rest of the system
@@ -10,10 +15,7 @@ sepcifically it exists only to:
       formalized config solution that did some combination of reading from
       files and from the environment.
 
-    - provide an early warning if we did not set some required value,
-      which is preferable to more happenstance, later warnings
-
-more generally:
+in terms of its tactics (the more general thing):
 
     - since all elements are required for now, at its essence all this is
       is a collection of name-value pairs, whose values are regexes. this
@@ -26,17 +28,19 @@ more generally:
       hard-wiring test specifics to business specifics.
 """
 
+import sys
 
-def SELF(unsanitized_collection):
+
+def _SELF(unsanitized_collection):
     """the only public entrypoint to this module...
 
     raises exception if something's missing, otherwise results in
     a collection struct with properties named after the requisite names.
     """
 
-    global SELF  # redefine selfsame function on first call!
+    global _SELF  # redefine selfsame function on first call!
 
-    def SELF(unsanitized_collection):
+    def _SELF(unsanitized_collection):
         return collectioner(unsanitized_collection)  # #hi.
 
     o = regex_based_validator
@@ -46,11 +50,10 @@ def SELF(unsanitized_collection):
         items_plural='environment variables',
         )
 
-    return SELF(unsanitized_collection)
+    return _SELF(unsanitized_collection)
 
 
 def _collectioner_via_collection_model(collection_model, **kwargs):
-    # #testpoint
     def f(unsanitized_collection):
         return _work(unsanitized_collection, collection_model, **kwargs)
     return f
@@ -136,12 +139,31 @@ class _SanitizedCollection:
 
 
 def _my_exception(msg, *items):
-    from upload_bot import Exception as _MyException
+    from upload_bot.run import Exception as _MyException
     return _MyException(msg, *items)
 
 
 _NOT_OK = False
 _OK = True
+
+
+# == EXPERIMENT
+class _SelfAsCallableModule:
+
+    def __call__(self, x):
+        return _SELF(x)
+
+    @property
+    def regex_based_validator(self):
+        return regex_based_validator
+
+    @property
+    def _collectioner_via_collection_model(self):  # #testpoint (yuck!)
+        return _collectioner_via_collection_model
+
+
+sys.modules[__name__] = _SelfAsCallableModule()
+# == END EXPERIMENT
 
 
 if '__main__' == __name__:
@@ -158,7 +180,7 @@ if '__main__' == __name__:
     a[0] = project_dir
     # == END
 
-    col = SELF(os.environ)
+    col = _SELF(os.environ)
     o = print
     o('# (DO NOT PUT THIS INFORMATION INTO VERSION CONTROL)')
     o('# (OR OTHERWISE INSECURE LOCATION)')

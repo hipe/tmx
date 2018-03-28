@@ -28,7 +28,7 @@ class _TestCase(unittest.TestCase):
 def exception_tuple(f):  # (abstraction candidate)
 
     def g(self):
-        from upload_bot import Exception as _MyException
+        from upload_bot.run import Exception as _MyException
         try:
             f(self)
         except _MyException as e_:
