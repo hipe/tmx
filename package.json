@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/hipe/downtownfun/issues"
   },
-  "homepage": "https://github.com/hipe/downtownfun#readme"
+  "homepage": "https://github.com/hipe/downtownfun#readme",
+  "dependencies": {
+    "newman": "^3.9.3"
+  }
 }

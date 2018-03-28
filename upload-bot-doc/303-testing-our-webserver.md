@@ -7,6 +7,10 @@ node module:
 
     npm init .
 
+then:
+
+    npm install --local newman
+
 
 
 
