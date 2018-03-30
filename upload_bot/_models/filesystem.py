@@ -44,45 +44,79 @@ class _RealFilesystem:
         self.file_exists = os.path.exists
         self.open = open
 
+    def open_if_exists(self, path, f):
+        x = None
+        try:
+            with open(path, 'r') as fh:
+                x = f(fh)
+        except FileNotFoundError:
+            pass
+        return x
+
 
 class FakeFilesystem:
     """cha cha.
 
     """
 
-    def __init__(self, *paths):
-        self._paths = [path for path in paths]
+    def __init__(self):
+        self._order = []
+        self._string_via_path = {}
+
+    def open_if_exists(self, path, f):
+        content = self._string_via_path.get(path)
+        if content is not None:
+            return f(_FakeReadOnlyIO(content))
+
+    def _receive_writes(self, writes, path):
+        if path not in self._order:
+            self._order.append(path)
+        self._string_via_path[path] = ''.join(writes)
 
     def open(self, path, mode):
-        if 'w' != mode:
+        if 'x' == mode:
+            return _FakeWriteSession(path, self)
+        else:
             raise Exception('cover me: {}'.format(repr(mode)))
 
-        if path not in self._paths:
-            self._paths.append(path)
-
-        return _MOCK_FILEHANDLE
-
     def file_exists(self, path):
-        return (path in self._paths)
+        return (path in self._string_via_path)
 
     @memoize
     def the_empty_filesystem():
         return FakeFilesystem()
 
 
-class _MockFilehandle:
+class _FakeWriteSession:
+
+    def __init__(self, path, parent):
+        self._writes = []
+        self._path = path
+        self._parent = parent
 
     def __enter__(self):
-        return self  # cheating
+        return self
 
-    def __exit__(self, *_):
-        pass
+    def __exit__(self, xa, xb, xd):
+        if xa is None:
+            a = self._writes
+            del self._writes
+            self._parent._receive_writes(a, self._path)
+        else:
+            raise Exception('cover me')
 
     def write(self, s):
+        self._writes.append(s)
         return len(s)
 
 
-_MOCK_FILEHANDLE = _MockFilehandle()
+class _FakeReadOnlyIO:
+
+    def __init__(self, content):
+        self._content = content
+
+    def read(self):
+        return self._content
 
 
 # #born.

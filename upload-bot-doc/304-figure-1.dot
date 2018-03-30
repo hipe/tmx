@@ -1,0 +1,43 @@
+digraph g {
+
+label="
+figure 304. dah dah"
+
+/* -- associations -- */
+
+q100->a200[label=no]
+q100->q400[label=yes]
+a200->a500[label=then]
+q400->a600[label=no]
+q400->a500[label=yes]
+a600->a200[label=then]
+
+/* -- questions -- */
+
+q100[shape=diamond label="is there
+a PID file?"]
+
+q400[shape=diamond label="is the
+process
+running?"]
+
+/* -- actions -- */
+
+a200[shape=block label="start the server,
+write the file,
+emit a courtesy
+message that you
+started the server"]
+
+a500[shape=block label="emit a courtesy
+message that the
+server is running"]
+
+a600[shape=block label="emit a message
+that the process
+is stale"]
+
+}
+/*
+#born.
+*/

@@ -4,6 +4,8 @@
 """
 
 from _init import (
+        file_with_content_path,
+        no_ent_path,
         writable_tmpdir,
         )
 
@@ -80,9 +82,11 @@ class Case100_not_exists_not_exists(_TestCase):
 class Case200_yes_exists_yes_exists(_TestCase):
 
     def test_010_mock(self):
-        _fs = filesystem.FakeFilesystem('/aa/bb')
-        _path = '/aa/bb'
-        self._same_test(_path, _fs)
+        fs = filesystem.FakeFilesystem()
+        path = '/aa/bb'
+        with fs.open(path, 'x') as fh:
+            fh.write("content\n")
+        self._same_test(path, fs)
 
     def test_020_real(self):
         _fs = _real_filesystem()
@@ -92,6 +96,87 @@ class Case200_yes_exists_yes_exists(_TestCase):
     def _same_test(self, path, fs):
         _yes = fs.file_exists(path)
         self.assertTrue(_yes)
+
+
+class Case350_new_way_not_exists_not_exist(_TestCase):
+
+    @same_test_for_mock('_not_exists')
+    def test_010_not_exists_mock():
+        pass
+
+    @same_test_for_real('_not_exists')
+    def test_020_not_exists_real():
+        pass
+
+    def _not_exists(self, details):
+        self.assertFalse(details.did_exist)
+
+    @shared_subject
+    def _mock_subject(self):
+        _fs = _this_same_fake_filesystem()
+        return _same_details('/cc/dd', _fs)
+
+    @shared_subject
+    def _real_subject(self):
+        _fs = _real_filesystem()
+        _path = no_ent_path()
+        return _same_details(_path, _fs)
+
+
+class Case375_new_way_yes_exist_yes_exists(_TestCase):
+
+    @same_test_for_mock('_yes_exists')
+    def test_010_yes_exists_mock():
+        pass
+
+    @same_test_for_real('_yes_exists')
+    def test_020_yes_exists_real():
+        pass
+
+    @same_test_for_mock('_read_that_content')
+    def test_030_yes_exists_mock():
+        pass
+
+    @same_test_for_real('_read_that_content')
+    def test_040_yes_exists_real():
+        pass
+
+    def _yes_exists(self, details):
+        self.assertTrue(details.did_exist)
+
+    def _read_that_content(self, details):
+        self.assertEqual(details.content, 'ohai i am content\n')
+
+    @shared_subject
+    def _mock_subject(self):
+        _fs = _this_same_fake_filesystem()
+        return _same_details('/aa/bb', _fs)
+
+    @shared_subject
+    def _real_subject(self):
+        _fs = _real_filesystem()
+        _path = file_with_content_path()
+        return _same_details(_path, _fs)
+
+
+def _same_details(path, fs):
+    def recv(fh):
+        return fh.read()
+    content = fs.open_if_exists(path, recv)
+    if content is None:
+        did_exist = False
+    else:
+        did_exist = True
+
+    return _DetailsTwo(did_exist, content)
+
+
+@memoize
+def _this_same_fake_filesystem():
+    fs = filesystem.FakeFilesystem()
+    with fs.open('/aa/bb', 'x') as fh:
+        fh.write("ohai i am content\n")
+    return fs
 
 
 class Case300_write_file(_TestCase):
@@ -131,13 +216,15 @@ class Case300_write_file(_TestCase):
 
     @shared_subject
     def _mock_subject(self):
-        _fs = filesystem.FakeFilesystem('/aa/xx', '/bb/qq')
-        return _this_same_story('/zz/mm', _fs)
+        fs = filesystem.FakeFilesystem()
+        _touch('/aa/xx', fs)
+        _touch('/bb/qq', fs)
+        return _this_same_story('/zz/mm', fs)
 
     @shared_subject
     def _real_subject(self):
         _fs = _real_filesystem()
-        path = os.path.join(writable_tmpdir, 'some.file')
+        path = os.path.join(writable_tmpdir(), 'some.file')
         x = _this_same_story(path, _fs)
 
         # ==
@@ -153,20 +240,32 @@ def _this_same_story(path, fs):
 
     did_exist_before = fs.file_exists(path)
 
-    with fs.open(path, 'w') as fh:
+    with fs.open(path, 'x') as fh:
         byte_count = fh.write('xx\nyy\n')
 
     did_exist_after = fs.file_exists(path)
 
-    return _Details(did_exist_before, byte_count, did_exist_after)
+    return _DetailsOne(did_exist_before, byte_count, did_exist_after)
 
 
-class _Details:
+class _DetailsOne:
 
     def __init__(self, did_exist_before, byte_count, did_exist_after):
         self.did_exist_before = did_exist_before
         self.number_of_bytes_wrote = byte_count
         self.did_exist_after = did_exist_after
+
+
+class _DetailsTwo:
+
+    def __init__(self, did_exist, content):
+        self.did_exist = did_exist
+        self.content = content
+
+
+def _touch(path, fs):
+    with fs.open(path, 'x'):
+        pass
 
 
 def _real_filesystem():

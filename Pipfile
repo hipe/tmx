@@ -14,6 +14,7 @@ flask-wtf = "*"
 werkzeug = "*"
 watchdog = "*"
 slackclient = "*"
+psutil = "*"
 
 
 [dev-packages]

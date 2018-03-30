@@ -59,5 +59,3 @@ sub-project: upload files to s3
   now your tests run on the mocked test server
   change the port number to 5001
   inject webserver with mocked environment
-  master process management
-  filesystem abstraction

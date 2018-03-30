@@ -100,6 +100,7 @@ we use these <a name='aliases'>aliases</a>
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
+|              [\[#304\]]   |       | "kicker"
 |              [\[#303\]]   |       | testing our webserver
 |              [\[#302\]]   |       | reading notes: slack event types
 

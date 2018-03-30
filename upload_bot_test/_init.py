@@ -36,7 +36,31 @@ def _():
     return test_sub_dir
 
 
-_test_sub_dir = _()
-writable_tmpdir = path.join(_test_sub_dir, 'writable-tmpdir')
+test_sub_dir = _()
+
+from game_server import (  # noqa: E402
+        memoize,
+        )
+
+
+@memoize
+def writable_tmpdir():
+    return path.join(test_sub_dir, 'writable-tmpdir')
+
+
+@memoize
+def file_with_content_path():
+    return path.join(_fixture_files_directory(), '001-file-with-content.txt')
+
+
+@memoize
+def no_ent_path():
+    return path.join(_fixture_files_directory(), 'the-no-ent-path.file')
+
+
+@memoize
+def _fixture_files_directory():
+    return path.join(test_sub_dir, 'fixture-files')
+
 
 # #born.

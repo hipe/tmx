@@ -115,6 +115,7 @@ we offer no formal definition for “sub-project” but:
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.F]                   | #vape | machine-generated tests
 |[#008.E]                   | #wish | gettext uber alles
 |[#008.D]                   | #wish | strongly typed python yikes
 |[#008.C]                   | #wish | function-based commands
