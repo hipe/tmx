@@ -56,4 +56,8 @@ sub-project: upload files to s3
   detect any time anyone uploads a file (in one channel)
   accept and meet a challenge
   cover (what we think is) accept and meet challenge with postman
-  cover ping with postman
+  now your tests run on the mocked test server
+  change the port number to 5001
+  inject webserver with mocked environment
+  master process management
+  filesystem abstraction

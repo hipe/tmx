@@ -90,6 +90,7 @@ a single file.
 
 """
 
+
 def _():  # (keep lvars in a scope - do not "accidentally" export them)
 
     import os
@@ -112,6 +113,7 @@ def _():  # (keep lvars in a scope - do not "accidentally" export them)
     writable_tmpdir = path.join(top_test_dir, 'writable-tmpdir')
 
     return (writable_tmpdir,)
+
 
 writable_tmpdir, = _()
 

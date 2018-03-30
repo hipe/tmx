@@ -1,3 +1,6 @@
+"""(mainly, synthesize all our magnets to run our API web client.)
+"""
+
 # from slackclient import SlackClient
 import time
 import re
@@ -113,13 +116,11 @@ def _normalize_sys_path():
     current_head_path = a[0]
 
     if sub_project_dir == current_head_path:
-        """CLOBBER the path that python automatically added - we don't want
-        it to be there (lest we make unstable assumptions). #[#204]
-        """
-        print('thing one')
+        # we are entrypoint file. do exactly as [#029.file-type-A] (see).
+        raise Exception('no problem but when (A)')
         a[0] = project_dir
     elif project_dir == current_head_path:
-        print('thing two - HELLO already did this')
+        raise Exception('no problem but when (B)')
     else:
         raise Exception('strange - what is up with sys.path')
 

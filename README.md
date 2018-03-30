@@ -104,6 +104,7 @@ we offer no formal definition for “sub-project” but:
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+[[\[#019\]]                 |       | normalizing `sys.path`
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
 [[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes
@@ -131,6 +132,7 @@ we offer no formal definition for “sub-project” but:
 
 
 
+[\[#019\]]: doc/019-normalizing-sys-path.md
 [\[#018\]]: doc/018-installing-and-deploying-python.md
 [\[#016\]]: game-server-doc/016-K-hong-reading-notes.md
 [\[#015\]]: game-server-doc/015-tickler-file.md

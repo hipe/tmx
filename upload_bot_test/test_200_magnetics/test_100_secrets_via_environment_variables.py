@@ -3,7 +3,7 @@
 ..that explains everything.
 """
 
-import __init__  # noqa: F401
+import _init  # noqa: F401  (just normalize `sys.path` so we can import things)
 
 from game_server import (
         dangerous_memoize,
