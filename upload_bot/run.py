@@ -7,7 +7,7 @@ import re
 import os
 
 
-def _run_forever_newschool(environ, **kwargs):
+def run_forever_newschool_(environ, **kwargs):
 
     _normalize_sys_path()
 
@@ -120,7 +120,8 @@ def _normalize_sys_path():
         raise Exception('no problem but when (A)')
         a[0] = project_dir
     elif project_dir == current_head_path:
-        raise Exception('no problem but when (B)')
+        # assume this is not the entrypoint file, server being run for tests.
+        pass
     else:
         raise Exception('strange - what is up with sys.path')
 
@@ -136,7 +137,7 @@ class Exception(Exception):
 
 
 if __name__ == "__main__":
-    _run_forever_newschool(
+    run_forever_newschool_(
             os.environ,
             use_reloader=False,  # reloader is annoying a.f
             )

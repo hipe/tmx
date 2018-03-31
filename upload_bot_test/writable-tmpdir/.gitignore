@@ -11,3 +11,5 @@
 #
 #   - when something in the test fails, it may be useful to inspect the
 #     contents of this directory (when it is useful to do so).
+
+/test-server.pid

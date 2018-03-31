@@ -63,4 +63,13 @@ def _fixture_files_directory():
     return path.join(test_sub_dir, 'fixture-files')
 
 
+"""NOTE - this is NOT for REAL values!
+
+this is a VERSIONED file. it is *not* secure.
+put PHONY values in here and refer to those values in the tests.
+"""
+
+BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_ = 'xoxb-987-exampleEXAMPLEexample987'
+
+
 # #born.

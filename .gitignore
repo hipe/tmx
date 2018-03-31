@@ -1,6 +1,6 @@
 /.ackrc
+/my-venv
 node_modules
 *.pyc
 __pycache__
-/my-venv
 /Z

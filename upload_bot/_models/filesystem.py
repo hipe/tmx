@@ -75,6 +75,10 @@ class FakeFilesystem:
 
     def open(self, path, mode):
         if 'x' == mode:
+            ok = True
+        elif 'w' == mode:
+            ok = True
+        if ok:
             return _FakeWriteSession(path, self)
         else:
             raise Exception('cover me: {}'.format(repr(mode)))

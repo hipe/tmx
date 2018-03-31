@@ -29,7 +29,7 @@ class _TestCase(unittest.TestCase):
         self._um(-2, 'starting server ohai')
 
     def _says_server_is_running(self, num):
-        _exp = 'server is running (PID: {})'.format(num)
+        _exp = '(server PID: {})'.format(num)
         self._um(-1, _exp)
 
     def _um(self, i, msg):
@@ -111,7 +111,7 @@ def _against(
 
     _subject_magnetic()(
             pid_file_path=_path,
-            server_start=_my_server_start,
+            start_server=_my_start_server,
             psutil=_use_psutil,
             filesystem=_fs,
             listener=listener,
@@ -120,11 +120,11 @@ def _against(
     return _Tuple(msgs)
 
 
-def _my_server_start(listener):
+def _my_start_server(recv_pid, listener):
     def f(o):
         o('starting server ohai')
     listener('info', 'expression', f)
-    return 4567
+    recv_pid(4567)
 
 
 class _Tuple:

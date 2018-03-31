@@ -1,0 +1,115 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+"""experiement - kick the server as it needs to be running for tests.
+
+we do this here so that we don't have to muck with the real `os.environ`
+to get the server running to run tests. think of this as a fixture that
+has hard-coded, dummy versions of the environment variables we need..
+"""
+
+
+import psutil
+import os
+import sys
+
+
+path = os.path
+
+
+def _():
+
+    dn = path.dirname
+
+    a = sys.path
+    head = a[0]
+
+    script_dir = dn(path.abspath(__file__))
+    project_dir = dn(dn(script_dir))
+
+    if script_dir == head:
+        a[0] = project_dir  # clobber. see [#019]
+    else:
+        raise Exception('assumption failed')
+
+
+_()
+
+
+from upload_bot._magnetics import (  # noqa: E402
+        webserver_via_pid_file_path,
+        )
+
+from upload_bot._models import (  # noqa: E402
+        filesystem,
+        )
+
+from upload_bot_test import (  # noqa: E402
+        _init as test_support,
+        )
+
+
+def _main():
+
+    _listener = _build_listener()
+
+    _filesystem = filesystem.real_filesystem()
+
+    _pid_path = path.join(test_support.writable_tmpdir(), 'test-server.pid')
+
+    webserver_via_pid_file_path(
+        start_server=start_server,
+        pid_file_path=_pid_path,
+        psutil=psutil,
+        filesystem=_filesystem,
+        listener=_listener
+        )
+
+
+def start_server(pid_func, listener):
+
+    info = _infoer_via_listener(listener)
+
+    pid_func(os.getpid())
+
+    info('about to try and run server')
+
+    import upload_bot.run as run
+
+    _environ = _build_environment()
+
+    run.run_forever_newschool_(
+            _environ,
+            port=5001,
+            use_reloader=False,
+            )
+
+
+def _build_environment():
+
+    x = test_support
+    o = {}
+    o['BOT_USER_OATH_ACCESS_TOKEN'] = x.BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_
+    return o
+
+
+def _infoer_via_listener(listener):
+    def f(s):
+        def msg(recv_msg):
+            recv_msg(s)
+        listener('info', 'expression', msg)
+    return f
+
+
+def _build_listener():
+
+    def listener(*a):
+        def f(s):
+            info_IO.write('{}\n'.format(s))
+        a[-1](f)
+    info_IO = sys.stderr
+    return listener
+
+
+_main()
+
+# #born.

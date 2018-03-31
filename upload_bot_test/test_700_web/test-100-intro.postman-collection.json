@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f4402787-b303-4e92-9031-7a43e8907fbb",
+		"_postman_id": "ffd0baf0-a397-40d3-815f-cb4128308978",
 		"name": "my intro collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -28,13 +28,16 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "localhost:5000/i-dont-exist",
+					"raw": "localhost:5001/i-dont-exist",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5001",
 					"path": [
 						"i-dont-exist"
 					]
@@ -65,13 +68,16 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "localhost:5000/ping",
+					"raw": "localhost:5001/ping",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5001",
 					"path": [
 						"ping"
 					]
