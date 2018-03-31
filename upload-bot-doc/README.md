@@ -1,10 +1,13 @@
 # the 'upload' bot
 
-## synopsis
+## <a name=synopsis></a>synopsis
 
     py upload_bot/run.py
 
-(we use [these aliases](#aliases) as described below.)
+given:
+
+  - [\[#306\]] the necessary environment variables
+  - the [below](#aliases) aliases.
 
 
 
@@ -16,40 +19,6 @@ deleting the file off slack's storage and instead uploading it to an
 s3 instance.
 
 (a more detailed user story will be provided.)
-
-
-
-
-## what we did:
-
-what we did to get to a "hello world" state (at the `#born` state) was
-we followed the example code [here][here].
-
-(hereafter we'll refer to these as "the instructions".)
-
-we ended up with a NON VERSIONED, SECRET file with these values:
-
-    Client ID: [24 chars]
-    Client Secret: [32 chars]
-    Verification Token: [24 chars]
-    OAuth Access Token: [74 chars]
-    Bot User OAuth Access Token: [42 chars]
-
-(ask someone for the file. these values MUST NOT be distributed with
-this code.)
-
-it turns out, we only need the last one to get our bot to Just Work.
-
-as suggested in the instructions: from your terminal, export the thing
-like so (replace `[42 chars]` with the actual OAuth access token):
-
-    export SLACK_BOT_TOKEN='[42 chars]'
-
-then simply run the bot:
-
-    py upload_bot/run
-
-(we use [these aliases](#aliases) as described below.)
 
 
 
@@ -77,8 +46,7 @@ to run the whole test suite:
 
 ## running tests for our app API webserver
 
-this is an area heavily in flux whose concern is
-[\[#303\]][\[#303\]] this document.
+this is an area heavily in flux that belongs to [\[#306\]] this document.
 
 
 
@@ -100,18 +68,21 @@ we use these <a name='aliases'>aliases</a>
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
-|              [\[#304\]]   |       | "kicker"
+|              [\[#306\]]   |       | environment variables TMI
+|              [\[#305\]]   |       | tunneling thru ngrok
+|                [#304]     |       | "kicker"
 |              [\[#303\]]   |       | testing our webserver
 |              [\[#302\]]   |       | reading notes: slack event types
 
 
 
 
+[\[#306\]]: 306-environment-variable-TMI.md
+[\[#305\]]: 305-tunneling-thru-ngrok.md
 [\[#303\]]: 303-testing-our-webserver.md
 [\[#302\]]: 302-slack-event-types.txt
 [\[#002\]]: ../README.md#002
 [018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
-[here]: https://www.fullstackpython.com/blog/build-first-slack-bot-python.html
 [here2]: ../grep-dump-doc.md#venv-etc
 
 

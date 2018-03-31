@@ -46,6 +46,7 @@ def _SELF(unsanitized_collection):
     o = regex_based_validator
     collectioner = _collectioner_via_collection_model({
         'BOT_USER_OATH_ACCESS_TOKEN': o('^xoxb-[0-9]+-[A-Za-z0-9]+$'),
+        'VERIFICATION_TOKEN': o('^[A-Za-z0-9]{5,30}$'),  # 24 length prob
         },
         items_plural='environment variables',
         )

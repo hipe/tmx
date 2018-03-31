@@ -54,5 +54,3 @@ sub-project: upload files to s3
   do the yes/no dialog (when no)
   detect any time anyone uploads a file (in any channel)
   detect any time anyone uploads a file (in one channel)
-  accept and meet a challenge
-  cover (what we think is) accept and meet challenge with postman

@@ -117,7 +117,6 @@ def _normalize_sys_path():
 
     if sub_project_dir == current_head_path:
         # we are entrypoint file. do exactly as [#029.file-type-A] (see).
-        raise Exception('no problem but when (A)')
         a[0] = project_dir
     elif project_dir == current_head_path:
         # assume this is not the entrypoint file, server being run for tests.

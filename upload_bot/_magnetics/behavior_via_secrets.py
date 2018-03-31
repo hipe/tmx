@@ -31,6 +31,16 @@ class _Behaviorer:
 
 def _build_all_responder_functions(secrets):
 
+    app_tok = secrets.VERIFICATION_TOKEN
+
+    def responder_that_verifies_application_token(f):
+
+        def g(response, slack_event):
+            return _verify_application_token(response, slack_event, f, app_tok)
+
+        responder_via_name[f.__name__] = g
+        return sanity
+
     def responder(f):
         responder_via_name[f.__name__] = f
         return sanity
@@ -41,6 +51,13 @@ def _build_all_responder_functions(secrets):
         raise Exception('never actually called')
 
     # ==
+
+    @responder_that_verifies_application_token
+    def respond_to_url_verification(response, slack_event):
+        # #coverpoint1.2
+        return response.respond_in_JSON_via_simple_dictionary(
+                challenge=slack_event['challenge'],
+                )
 
     @responder
     def respond_to_ping(response, slack_event):
@@ -63,12 +80,16 @@ def _verify_application_token(response, slack_event, f, expected):
 
         # NOTE - security bad - don't send our verification token to
         # arbitrary clients
+        # #coverpoint1.1
 
         _msg = (
           'I AM NOT FOR PRODUCTION\n' +
           'Invalid Slack verification token:\n' +
           'received: {} expected: {}\n\n'.format(actual, expected)
           )
+
+        response.log('\nyikes:\n{}'.format(_msg))
+
         # tell slack not to retry (during development)
         x = response.respond_customly(_msg, 403, {'X-Slack-No-Retry': 1})
         return x

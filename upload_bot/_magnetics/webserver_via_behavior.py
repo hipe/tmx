@@ -34,7 +34,9 @@ experimental:
 from flask import (
         Flask,
         make_response,
+        request,
         )
+import json
 import sys
 
 
@@ -53,6 +55,22 @@ def _SELF(behaviors, **kwargs):
 
 
 app = Flask(__name__)
+
+
+@app.route('/slack-action-endpoint', methods=[
+    'POST',  # for url_verification
+    ])
+def slack_action_endpoint():
+    """(was called 'listener' over there)"""
+
+    slack_event = json.loads(request.data)
+
+    type_s = slack_event['type']
+
+    if 'url_verification' == type_s:
+        return _respond_to_url_verification(slack_event)
+    else:
+        raise Exception('cover me')
 
 
 @app.route('/ping')
@@ -74,9 +92,18 @@ _mutex = None
 _responder_names = []
 
 
+# == BEGIN experimental DSL-ish - these are forward declarations of functions
+
+@responder
+def _respond_to_url_verification():
+    pass
+
+
 @responder
 def _respond_to_ping():
     pass
+
+# ==
 
 
 def destructive(f):
@@ -93,6 +120,13 @@ class _Response:
         self._mutex = None
 
     @destructive
+    def respond_in_JSON_via_simple_dictionary(self, **kwargs):
+        _big_s = json.dumps(kwargs)
+        return make_response(_big_s, 200, {
+            'content_type': 'application/json',
+            })
+
+    @destructive
     def respond_via_string(self, big_string):
         return make_response(big_string, 200, {
             'content_type': 'text/html',
@@ -101,6 +135,10 @@ class _Response:
     @destructive
     def respond_customly(self, s, num, dct):  # ..
         return make_response(s, num, dct)
+
+    def log(self, s):
+        """(placeholder for the idea)"""
+        print(s)
 
     def _touch(self):
         del self._mutex

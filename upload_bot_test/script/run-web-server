@@ -89,6 +89,7 @@ def _build_environment():
     x = test_support
     o = {}
     o['BOT_USER_OATH_ACCESS_TOKEN'] = x.BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_
+    o['VERIFICATION_TOKEN'] = x.VERIFICATION_TOKEN_EXAMPLE_
     return o
 
 

@@ -67,9 +67,13 @@ def _fixture_files_directory():
 
 this is a VERSIONED file. it is *not* secure.
 put PHONY values in here and refer to those values in the tests.
+
+(values that look like they might be real are probably copy-pasted from
+postman docs here: https://api.slack.com/events/url_verification)
 """
 
 BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_ = 'xoxb-987-exampleEXAMPLEexample987'
+VERIFICATION_TOKEN_EXAMPLE_ = 'Jhj5dZrVaK7ZwHHjRyZWjbDl'
 
 
 # #born.
