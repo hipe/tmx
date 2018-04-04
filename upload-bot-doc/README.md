@@ -2,7 +2,11 @@
 
 ## <a name=synopsis></a>synopsis
 
-    py upload_bot/run.py
+
+    python3 -W 'default::::' upload_bot/run.py
+
+(NOTE: at the commit of #history-A.1 we explain why this is currently
+a moutful above. work in progress to make this not as ugly..)
 
 given:
 
@@ -68,6 +72,9 @@ we use these <a name='aliases'>aliases</a>
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
+|              [\[#309\]]   |       | rabbitmq
+|              [\[#308\]]   |       | redis
+|              [\[#307\]]   |       | celery
 |              [\[#306\]]   |       | environment variables TMI
 |              [\[#305\]]   |       | tunneling thru ngrok
 |                [#304]     |       | "kicker"
@@ -77,6 +84,9 @@ we use these <a name='aliases'>aliases</a>
 
 
 
+[\[#309\]]: 309-rabbitmq.md
+[\[#308\]]: 308-redis.md
+[\[#307\]]: 307-celery.md
 [\[#306\]]: 306-environment-variable-TMI.md
 [\[#305\]]: 305-tunneling-thru-ngrok.md
 [\[#303\]]: 303-testing-our-webserver.md
@@ -90,4 +100,5 @@ we use these <a name='aliases'>aliases</a>
 
 ## (document-meta)
 
+  - #history-A.1 (as referenced)
   - #born.

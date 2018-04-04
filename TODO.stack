@@ -54,3 +54,15 @@ sub-project: upload files to s3
   do the yes/no dialog (when no)
   detect any time anyone uploads a file (in any channel)
   detect any time anyone uploads a file (in one channel)
+====
+  commit: do fake work ASYNCHRONOUSLY
+  (the below might could knock out the above buttons-related branch)
+  commit: now, instead of sending a message, present buttons ASYNCHRONOUSLY (or not)
+  commit: now, instead of sending a message, present buttons SYNCHRONOUSLY
+  commit: get the bot to send a message to slack in response to the minmal event ASYNCHRONOUSLY
+  commit: get the bot to send a message to slack in response to the minmal event SYNCHRONOUSLY
+  visual: get the bot to send a message to slack in a REPL
+  commit: visual demo with tasks in own file
+  grind-down: visual demo with templates broken up
+  commit: visual demo as-is
+  commit: document commit and pipfile: add celery etc to pipfile

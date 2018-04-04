@@ -15,6 +15,7 @@ werkzeug = "*"
 watchdog = "*"
 slackclient = "*"
 psutil = "*"
+celery = {extras = ["redis"]}
 
 
 [dev-packages]
