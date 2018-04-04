@@ -64,3 +64,13 @@ sub-project: upload files to s3
   visual: get the bot to send a message to slack in a REPL
   commit: visual demo with tasks in own file
   grind-down: visual demo with templates broken up
+==
+  integrate
+  generate thumbs
+  tag-based query
+  show/hide commentary
+  design (nonworking static layout)
+  react tutorial
+  sftp a static tree to heroku
+  static page on heroku
+  heroku
