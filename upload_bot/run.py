@@ -19,7 +19,7 @@ def run_forever_newschool_(environ, **kwargs):
 
     _secrets = secrets_via_environment_variables(environ)
     _behavior = behavior_via_secrets(_secrets)
-    webserver_via_behavior(_behavior, **kwargs)
+    webserver_via_behavior.CALL_ME(_behavior, **kwargs)
 
 
 # instantiate Slack client

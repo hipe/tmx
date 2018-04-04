@@ -33,14 +33,18 @@ experimental:
 
 from flask import (
         Flask,
+        jsonify,
         make_response,
+        render_template,
         request,
+        url_for,
         )
 import json
-import sys
+import time
+import random
 
 
-def _SELF(behaviors, **kwargs):
+def CALL_ME(behaviors, **kwargs):
 
     global _mutex
     del _mutex  # if this fails, something is wrong
@@ -54,7 +58,99 @@ def _SELF(behaviors, **kwargs):
     app.run(debug=True, **kwargs)
 
 
-app = Flask(__name__)
+def __templates_dir():
+
+    from os import path
+    dn = path.dirname
+
+    _sub_project_dir = dn(dn(__file__))
+    _templates = path.join(_sub_project_dir, 'templates')
+    return _templates
+
+
+_templates_dir = __templates_dir()
+
+app = Flask(
+        __name__,
+        template_folder=_templates_dir,
+        )
+
+
+class _Config:
+    """(this is not a class for making instances. only used as a namespace.)
+
+    one day schlurp in some of this from file, probably.
+    """
+
+    same = 'redis://localhost:6379/0'  # (that's the redis default port)
+    CELERY_BROKER_URL = same
+    CELERY_RESULT_BACKEND = same
+    del same
+
+
+app.config.from_object(_Config)
+
+
+do_celery = True  # for now allow us to regress back from celery easily
+if do_celery:
+
+    from celery import (
+            Celery,
+            )
+
+    celery = Celery(
+            app.import_name,
+            broker=app.config['CELERY_BROKER_URL']
+            )
+    celery.conf.update(app.config)
+
+
+@app.route('/wahoo')
+def ___wahooo():
+    return render_template('index.html', some_message='ohai')
+
+
+if do_celery:
+
+    @app.route('/wahoo')
+    def ___wahooo_TWO():
+        return render_template('index.html', some_message='ohai')
+
+    @app.route('/longtask', methods=['POST'])
+    def longtask():
+        task = long_task.apply_async()  # NOTE CHANGE THIS XXX TODO
+        return jsonify({}), 202, {
+                'Location': url_for('taskstatus', task_id=task.id),
+                }
+
+    @app.route('/status/<task_id>')
+    def taskstatus(task_id):
+        task = long_task.AsyncResult(task_id)
+        if task.state == 'PENDING':
+            response = {
+                'state': task.state,
+                'current': 0,
+                'total': 1,
+                'status': 'Pending...'
+            }
+        elif task.state != 'FAILURE':
+            response = {
+                'state': task.state,
+                'current': task.info.get('current', 0),
+                'total': task.info.get('total', 1),
+                'status': task.info.get('status', '')
+            }
+            if 'result' in task.info:
+                response['result'] = task.info['result']
+        else:
+            # something went wrong in the background job
+            response = {
+                'state': task.state,
+                'current': 1,
+                'total': 1,
+                'status': str(task.info),  # this is the exception raised
+            }
+        return jsonify(response)
 
 
 @app.route('/slack-action-endpoint', methods=[
@@ -76,6 +172,49 @@ def slack_action_endpoint():
 @app.route('/ping')
 def ping():
     return _respond_to_ping(None)
+
+
+# == END WEB ROUTES
+
+# == CELERY TASKS
+
+if do_celery:
+
+    @celery.task(bind=True)
+    def long_task(self):
+        """Background task that runs a long function with progress reports."""
+
+        verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
+        adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
+        noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter',
+                'bit']
+
+        message = ''
+        total = random.randint(10, 50)
+        for i in range(total):
+            if not message or random.random() < 0.25:
+                message = '{0} {1} {2}...'.format(random.choice(verb),
+                                                  random.choice(adjective),
+                                                  random.choice(noun))
+            self.update_state(
+                    state='PROGRESS',
+                    meta={
+                        'current': i,
+                        'total': total,
+                        'status': message,
+                        },
+                    )
+
+            time.sleep(1)
+
+        return {
+                'current': 100,
+                'total': 100,
+                'status': 'Task completed!',
+                'result': 42,
+                }
+
+# == END CELERY TASKS
 
 
 def responder(f):
@@ -103,7 +242,7 @@ def _respond_to_url_verification():
 def _respond_to_ping():
     pass
 
-# ==
+# == END experimental DSL-ish
 
 
 def destructive(f):
@@ -144,13 +283,5 @@ class _Response:
         del self._mutex
 
 
-# == EXPERIMENT
-class _SelfAsCallableModule:
-    def __call__(self, behaviors, **kwargs):
-        return _SELF(behaviors, **kwargs)
-
-
-sys.modules[__name__] = _SelfAsCallableModule()
-# == END EXPERIMENT
-
+# #history-A.1: begin to play with celery
 # #born.
