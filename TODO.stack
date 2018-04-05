@@ -73,4 +73,3 @@ sub-project: upload files to s3
   react tutorial
   sftp a static tree to heroku
   static page on heroku
-  heroku
