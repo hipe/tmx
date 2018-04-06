@@ -57,7 +57,6 @@ see [installing and deploying python](#018) if your sub-project requires it.
 
 
 
-
 ## <a name="sub-projects"></a> what's a “sub-project”?
 
 we offer no formal definition for “sub-project” but:
@@ -71,6 +70,15 @@ we offer no formal definition for “sub-project” but:
     indicates the aspiration to share a significant portion of code (or
     documention, etc) across those sub-projects (code or documention that
     itself is under active development).
+
+  - (it is also our belief that keeping projects "near" to each other
+    will encourage them to share dependency, architecture and testing
+    decisions and thereby help combat "software erosion" (mentioned
+    in [12 factor][heroku3], explained well in [this old heroku blog][heroku4],
+    and defined more formally in a wikipedia page). that is: if a project
+    is off in its own little corner, we forget it exists for a few years and
+    then when we re-discover it, the cost of getting it to work again is
+    higher than if we had just done progressive upkeep of it.)
 
   - if a sub-project gets obnoxiously huge: it can fork from this project,
     we can prune its excess and (back in this project) we can sunset it.
@@ -144,6 +152,13 @@ we offer no formal definition for “sub-project” but:
 [\[#004\]]: doc/004-using-the-TODO-stack.md
 [\[#003\]]: doc/003-which-channel-flowchart.dot
 [\[#002\]]: doc/002-using-the-node-table.md
+
+
+
+
+
+[heroku4]: https://blog.heroku.com/the_new_heroku_4_erosion_resistance_explicit_contracts
+[heroku3]: https://12factor.net/
 
 
 

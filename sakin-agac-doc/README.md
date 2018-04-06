@@ -13,6 +13,13 @@ mainly:
   - do that one static thing with tables
   - do that one static pipeline with webpack
 
+now, these ideas are expanded in [their own document][ours1].
+
+
+
+
+[ours1]: 403-broad-objectives.md
+
 
 
 

@@ -73,3 +73,7 @@ sub-project: upload files to s3
   react tutorial
   sftp a static tree to heroku
   static page on heroku
+  bleeding edge on heroku
+  bleeding edge locally
+  see if you can get it working on heroku
+  get wiki.js working locally following the instructions
