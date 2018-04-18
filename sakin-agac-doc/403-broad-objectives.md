@@ -2,6 +2,16 @@
 
 currently, this must start out as a hodgepodge scratch space.
 
+broadly in terms of user experience "philosopy":
+
+  - whenever relevant, we want the UX to be "familar" ("intuitive"). I am
+    reminded of what _ruby_ creator Yukihiro "Matz" Matsumoto said of ruby
+    and "the element of least surprise" - he said something like, "it's
+    about _my_ surpise, not your surprise". here we would want users of
+    wikis, users of jekyll etc to have things "just work" they way they
+    expect (but for at first a pared down subset of their features).
+
+
 in terms of content (and the user experience, sort of):
 
   - imagine a plain old tree of documents in readable text, (that are for
@@ -18,6 +28,7 @@ in terms of content (and the user experience, sort of):
     not, based on a cookie.
   - imagine if github-flavored markdown was truly available to the
     enduser being not on github (for example, locally).
+
 
 in terms of technology:
 

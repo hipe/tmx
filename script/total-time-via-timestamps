@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby -w
+
+# NOTE - this is just a one-off to help burn down the TODO stack at this commit
+
+
+sout = $stdout
+serr = $stderr
+
+
+if ! ARGV.length.zero?
+  serr.puts "usage: tail [..] #{ PROGRAM_NAME }"
+  serr.puts "description: sum up a total of timestamps"
+  exit(0)
+end
+
+
+rx = /\A(\d\d):(\d\d)/
+total_sec = 0
+
+while s = gets
+  md = rx.match s
+  min_s, sec_s = md.captures
+  min = min_s.to_i
+  sec = sec_s.to_i
+  sout.write "from #{ min_s }:#{ sec_s } "
+  sout.write " yup:#{ min } #{ sec }\n"
+
+  total_sec += sec
+  total_sec += (60 * min)
+end
+
+tot_min, tot_sec = total_sec.divmod(60)
+
+tot_hour, tot_min = tot_min.divmod(60)
+
+sout.puts "win: #{ tot_hour }:#{ tot_min }:#{ tot_sec }"
+
+# #born.

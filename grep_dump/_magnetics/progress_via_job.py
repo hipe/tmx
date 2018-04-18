@@ -91,7 +91,7 @@ def SELF(
             # #coverpoint1.2
             share_complete_float = 1.0
         elif item_count > last_known_number_of_line_items:
-            # #coverpoint 1.3
+            # #coverpoint1.3
             share_complete_float = float(md['share'])
         elif item_count == 0:
             # #coverpoint1.1
