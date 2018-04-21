@@ -6,6 +6,28 @@ sections go in reverse narrative order. if this is your first time
 reading this, start from the last section.
 
 
+## Tutorial #11 - xx
+
+
+  - 3:16 - good lesson about precedence in routes
+
+
+
+
+
+## Tutorial #10 - xx
+
+  - controllers can go anywhere, but put it in controllers package.
+
+
+
+## Tutorial #09 - [Views]
+
+TO CREATE A VIEW - x
+
+
+
+
 ## Tutorial #08 - How Routing Works in Play Framework
 
 CORRECTION: no dash

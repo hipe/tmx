@@ -17,6 +17,30 @@
 
 
 
+## (NOTE the remaining sections go from last to first)
+
+_(this way, the most interesting are usually at the top)_
+
+
+
+
+## RANDOM "tickler"
+
+look into these great things from [heroku7]
+
+  - dropbox sync
+  - heroku API
+
+
+
+
+### scala play markdown extension
+
+is [here][rando1].
+
+
+
+
 ## then, pray:
 
 (in one terminal (on the right):)
@@ -70,10 +94,12 @@ so we have to remember to think about it.
 
 
 
+```
 heroku1	https://git.heroku.com/botnoise.git (fetch)
 heroku1	https://git.heroku.com/botnoise.git (push)
 heroku2	https://git.heroku.com/botnoise2.git (fetch)
 heroku2	https://git.heroku.com/botnoise2.git (push)
+```
 
 
 
@@ -180,7 +206,9 @@ echo "(done.)"
 
 
 
+[heroku7]: https://devcenter.heroku.com/articles/how-heroku-works
 [heroku1]: https://devcenter.heroku.com/articles/heroku-cli
+[rando1]: https://github.com/orefalo/play-markdown
 [scala1]: https://www.scala-sbt.org/
 [up1]: ../README.md#sub-projects
 

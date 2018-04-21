@@ -1,0 +1,48 @@
+digraph g {
+
+/* associations */
+
+
+heroku_plus_ruby->radix_tuts
+heroku_plus_doc->radix_tuts
+these->heroku_plus_doc
+these->heroku_plus_ruby
+ui_rev_hist_1->these
+assets_2->these
+assets_pl_1->assets_2
+slicer->auth1
+cull->slicer
+DTF->cull
+nassim->DTF
+
+/* nodes */
+
+radix_tuts [label="radix\ntuts"]
+heroku_plus_doc [label="heroku-\nable doc\nstore"]
+heroku_plus_ruby [label="ruby +\njvm on\nheroku?"]
+ui_rev_hist_1 [label="view\nrevision\nhistory -\nrough"]
+these [label="(these)"]
+assets_2 [label="raw\ndocument\nassets\n(versioned)"]
+assets_pl_1 [label="asset\npipelines\nalla jekyll\nmaybe bower"]
+auth1 [label="modular\nauth - hard\ncoded dummy"]
+slicer;
+cull;
+DTF;
+nassim;
+
+
+label="
+document 406. this is NOT AT ALL complete.
+mostly this is just a constituency (set) of items.
+dependencies are guaranteed to evolve. as well
+the nodes are guaranteed to rename, to grow in
+number and to splinter.
+"
+}
+
+
+
+
+/*
+#born.
+*/
