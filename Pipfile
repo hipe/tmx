@@ -16,6 +16,7 @@ watchdog = "*"
 slackclient = "*"
 psutil = "*"
 celery = {extras = ["redis"]}
+"bs4" = "*"
 
 
 [dev-packages]
