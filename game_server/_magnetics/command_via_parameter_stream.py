@@ -2,7 +2,10 @@
 :[#503]
 """
 
-from game_server import memoize
+from modality_agnostic.memoization import (
+        memoize,
+        )
+
 
 class SELF:  # :[#011]
 

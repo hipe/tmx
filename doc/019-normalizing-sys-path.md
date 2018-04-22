@@ -291,6 +291,16 @@ glaring sore thumb that makes this feel like a workaround:
 
 
 this gave us an idea..
+(EDIT: now i have no idea what the idea was)
+
+
+
+
+### <a name='why-this-in-the-second-position'></a>code note
+
+now, the project dir is at the front like it always is, and we have
+moved the test sub dir from head to the second position so when other
+test files require this file, it's still in the `sys.path`.
 
 
 

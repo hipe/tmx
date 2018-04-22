@@ -12,7 +12,11 @@ if a[0] != path:
 
 
 import game_server
-memoize = game_server.memoize
+
+
+from helper import (
+        memoize,
+        )
 
 
 class _CommonCase(unittest.TestCase):

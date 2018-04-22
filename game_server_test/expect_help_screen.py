@@ -1,9 +1,11 @@
 """functions (mostly) to help asssert over help screeen content at a high level
 """
 
-import re
+from modality_agnostic.memoization import (
+        memoize,
+        )
 
-from game_server import memoize
+import re
 
 
 def optional_args_index_via_section_index(si):

@@ -19,7 +19,10 @@ rename won't be drastic.)
 
 import script_lib.magnetics.fixed_argument_parser_via_argument_parser as ap_lib
 import script_lib as sl
-from game_server import lazy
+from modality_agnostic.memoization import (
+        lazy,
+        )
+
 # #todo - you could eliminate (at writing) all `lazy` here (look)
 
 

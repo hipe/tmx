@@ -1,6 +1,8 @@
-from game_server import memoize
-
 from game_server_test.helper import magnetics
+
+from modality_agnostic.memoization import (
+        memoize,
+        )
 
 class command_modules:  # used as namespace yikes
 

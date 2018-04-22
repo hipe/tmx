@@ -24,7 +24,7 @@ def _():
 
 _()
 
-import upload_bot_test._init as yikes  # noqa: E402
+import modality_agnostic_test._init as yikes  # noqa: E402
 
 sys.modules[__name__] = yikes
 

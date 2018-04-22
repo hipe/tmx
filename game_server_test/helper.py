@@ -1,4 +1,9 @@
-import game_server
+from modality_agnostic.memoization import (
+        dangerous_memoize as _shared_subject,
+        lazy as _lazy,
+        memoize,
+        )
+
 
 def stream_via_memoized_array(f):
     """EXPERIMENTAL decorator"""
@@ -6,35 +11,29 @@ def stream_via_memoized_array(f):
     # #todo yuck - using arrays as function pointers
 
     def permanent_f(some_self):
-        return current_f_a[0](some_self)
+        return mutable_function(some_self)
 
     def at_first_call_only(self_FROM_FIRST_CALL):
 
         a = f(self_FROM_FIRST_CALL)  # imagine frozen. a long-running
+
         def at_subsequent_calls(_):
             return iter(a)
 
-        current_f_a[0] = at_subsequent_calls
+        nonlocal mutable_function
+        mutable_function = at_subsequent_calls
         return at_subsequent_calls(None)
 
-
-    current_f_a = [at_first_call_only]
-
+    mutable_function = at_first_call_only
     return permanent_f
 
 
-shared_subject = game_server.dangerous_memoize
-
-
-lazy = game_server.lazy
-
-
-memoize = game_server.memoize
 @memoize
 def empty_command_module():
     import types
     ns = types.SimpleNamespace()
     setattr(ns, 'PARAMETERS', None)
+
     class DoYouSeeMe:
         pass
     setattr(ns, 'Command', DoYouSeeMe)
@@ -46,7 +45,9 @@ class magnetics:
 
     @memoize
     def ARGV():
-        from game_server._magnetics import interpretation_via_command_stream_and_ARGV as mag
+        from game_server._magnetics import (
+            interpretation_via_command_stream_and_ARGV as mag,
+            )
         return mag
 
     @memoize
@@ -68,9 +69,14 @@ def fixture_directory_(s):
 
 def iterator_via_times(num):
     # #todo
-    for i in range(0, num): yield i
+    for i in range(0, num):
+        yield i
 
 
 def hello():
     # for a very low-level (early) regression test.
     0
+
+
+lazy = _lazy
+shared_subject = _shared_subject

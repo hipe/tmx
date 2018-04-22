@@ -103,3 +103,13 @@ sub-project: upload files to s3
   sakin syncing (many magnetics, injection interface)
   massive abstraction of "modality_agnostic" as the new "game_server"
   bring game server code up to PEP8
+  maybe re-house CLI specific things into etc
+  re-house and PEP8 command modeling
+  re-house and PEP8 parameter modeling
+  IMPROVE how memoizers work (use nonlocal)
+# PEP8 these
+game_server/_magnetics/command_via_parameter_stream.py
+game_server_test/expect_help_screen.py
+game_server_test/expect_treelike_screen.py
+game_server_test/parameters_canon.py
+game_server_test/test_10_magnetics/test_110_parameters_canon_help_screens.py

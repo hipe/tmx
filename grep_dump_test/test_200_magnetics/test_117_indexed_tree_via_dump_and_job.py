@@ -1,7 +1,7 @@
-import __init__
+import _init  # noqa: F401
 import unittest
 
-from game_server import (  # noqa: E402
+from modality_agnostic.memoization import (  # noqa: E402
         memoize,
         )
 

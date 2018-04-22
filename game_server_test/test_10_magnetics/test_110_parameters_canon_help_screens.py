@@ -8,8 +8,9 @@ if a[0] != path:
     a.insert(0, path)
 # end boilerplate
 
-
-from game_server import memoize
+from modality_agnostic.memoization import (
+        memoize,
+        )
 
 from game_server_test.helper import shared_subject
 

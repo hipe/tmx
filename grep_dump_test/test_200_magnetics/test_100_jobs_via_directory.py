@@ -1,15 +1,15 @@
-from __init__ import(
+from _init import (
         writable_tmpdir
         )
-from contextlib import contextmanager
 import unittest
 import os
 p = os.path
 
-from game_server import (  # noqa: E402
+from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
         memoize,
         )
+
 
 class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
         unittest.TestCase):
@@ -69,7 +69,6 @@ class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
         # cleanup section is not run. this is contrary to what is expected
         # (subjectively)
 
-
     def test_020_class_based_context_manager_DOES_ensure_cleanup(self):
 
         did_before = False
@@ -90,7 +89,6 @@ class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
 
         self.assertTrue(did_after)  # 👈 LOOK! it's opposite of the above
 
-
     def _same(self, context_manager):
 
         did_during = False
@@ -105,9 +103,9 @@ class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
 
         return (did_during, caught_this_exception)
 
+
 class _ThisException(Exception):  # (only used above)
     pass
-
 
 
 class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):

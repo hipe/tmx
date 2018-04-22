@@ -17,7 +17,7 @@
 ## experimental provision/issue :[#here.A]
 
 with the goal of reducing complexity ("") of the parse tree, the grammar
-minimizes the number of branch nodes created by created one only when it
+minimizes the number of branch nodes created by creating one only when it
 is deemed necessary by there being a plural (two or more) number of children
 to be placed into the tree at that point.
 
@@ -40,7 +40,9 @@ but we are letting this issue incubate for now.
 :[#014]
 """
 
-from game_server import memoize
+from modality_agnostic.memoization import (
+        memoize,
+        )
 
 def tree_via_line_stream(line_st):
 

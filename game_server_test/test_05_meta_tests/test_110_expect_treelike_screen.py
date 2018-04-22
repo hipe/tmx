@@ -13,13 +13,13 @@ if a[0] != path:
     a.insert(0, path)
 # end boilerplate
 
+import game_server
 
 from game_server_test import helper
 shared_subject = helper.shared_subject
 
 
-import game_server
-memoize = game_server.memoize
+memoize = helper.memoize
 
 
 class _NormalLinerCase(unittest.TestCase):

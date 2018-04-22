@@ -1,8 +1,8 @@
+import _init  # noqa: F401
 from contextlib import contextmanager
-import __init__
 import unittest
 
-from game_server import (  # noqa: E402
+from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
         memoize,
         )

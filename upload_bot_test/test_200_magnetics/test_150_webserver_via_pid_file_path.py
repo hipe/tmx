@@ -10,7 +10,7 @@ from upload_bot._models import (
         filesystem,
         )
 
-from game_server import (
+from modality_agnostic.memoization import (
         dangerous_memoize,
         memoize,
         )

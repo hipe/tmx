@@ -1,18 +1,6 @@
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-import game_server_test.helper as helper
-
-import game_server
-
-helper.hello()
+import _init  # noqa: F401
+import modality_agnostic.memoization as helper
+import unittest
 
 
 def _shared_subject(f):
@@ -21,17 +9,19 @@ def _shared_subject(f):
     # and when we run tests, breakages to the other one will be detected)
 
     def g(some_self):
-        return f_pointer[0](some_self)
+        return mutable_function(some_self)
 
     def initially(orig_self):
         def subsequently(_):
             return x
-        f_pointer[0] = None
+
+        nonlocal mutable_function
+        mutable_function = None
         x = f(orig_self)
-        f_pointer[0] = subsequently
+        mutable_function = subsequently
         return g(None)
 
-    f_pointer = [initially]
+    mutable_function = initially
     return g
 
 
@@ -41,14 +31,6 @@ class _CommonYikes(unittest.TestCase):
     def namedtuple(self):
         from collections import namedtuple
         return namedtuple
-
-
-
-class Case010_basics(unittest.TestCase):
-
-    def test_010_hello_game_server(self):
-        x = game_server.hello_game_server()
-        self.assertEqual(0, x)
 
 
 class Case020_memoize(_CommonYikes):
@@ -66,18 +48,20 @@ class Case020_memoize(_CommonYikes):
     @_shared_subject
     def end_state(self):
         memoize = helper.memoize
+
         @memoize
         def f():
-            d = times_pointer[0] + 1
-            times_pointer[0] = d
+            nonlocal count
+            d = count + 1
+            count = d
             return d
 
-        times_pointer = [0]
-        _d_a = [ f(), f(), f() ]
+        count = 0
+        _d_a = [f(), f(), f()]
 
         return self.namedtuple('_CustTpl01', ['num_times', 'number_array'])(
-          num_times = times_pointer[0],
-          number_array = _d_a,
+                num_times=count,
+                number_array=_d_a,
         )
 
 
@@ -96,20 +80,23 @@ class Case030_lazy(_CommonYikes):
     @_shared_subject
     def end_state(self):
         lazy = helper.lazy
+
         @lazy
         def f():
-            times_pointer[0] += 1
+            nonlocal count
+            count += 1
             d = {
                 0: 'even: %d',
                 1: 'odd:  %d',
             }
+
             def g(left_num, right_num):
                 sum = left_num + right_num
-                fmt = d[ sum % 2 ]
+                fmt = d[sum % 2]
                 return fmt % sum
             return g
 
-        times_pointer = [0]
+        count = 0
 
         _s_a = [
           f(2, 4),
@@ -117,11 +104,13 @@ class Case030_lazy(_CommonYikes):
           f(1, 7),
         ]
         return self.namedtuple('_CustTpl02', ['num_times', 'string_array'])(
-          num_times = times_pointer[0],
-          string_array = _s_a,
+                num_times=count,
+                string_array=_s_a,
         )
 
 
 if __name__ == '__main__':
     unittest.main()
+
+# #history-A.1: re-housed
 # #open [#007.B] - when we use docutest, um..

@@ -11,11 +11,10 @@ if a[0] != path:
 # end boilerplate
 
 
-import game_server
-memoize = game_server.memoize
-
-import game_server_test.helper as helper
-shared_subject = helper.shared_subject
+from helper import (
+        memoize,
+        shared_subject,
+        )
 
 
 class _CommonCase(unittest.TestCase):

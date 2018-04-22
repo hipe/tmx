@@ -22,7 +22,7 @@ portion of our sub-project tree would a smell, but in this case the test-
 friendly ("fake") counterpart of Filesystem
 """
 
-from game_server import (
+from modality_agnostic.memoization import (
         memoize,
         )
 

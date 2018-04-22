@@ -12,14 +12,14 @@ def _():
     a = sys.path
     head = a[0]
 
-    test_sub_sub_dir = dn(__file__)
-    test_sub_dir = dn(test_sub_sub_dir)
-    project_dir = dn(test_sub_dir)
+    test_sub_dir = dn(__file__)
+    top_test_dir = dn(test_sub_dir)
+    project_dir = dn(top_test_dir)
 
-    if test_sub_sub_dir == head:
-        a[0] = project_dir
-    else:
-        raise Exception('assumption failed')
+    if test_sub_dir != head:
+        raise Exception('sanity')
+
+    a[0] = project_dir
 
 
 _()

@@ -1,6 +1,8 @@
-from __init__ import writable_tmpdir
+from _init import (
+        writable_tmpdir,
+        )
 
-from game_server import (
+from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
         )

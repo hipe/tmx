@@ -108,8 +108,9 @@ parameter); but don't do that.
 this is now also :[#502], a node that will be re-housed in [mam]
 """
 
-import game_server
-dangerous_memoize = game_server.dangerous_memoize
+from modality_agnostic.memoization import (
+        dangerous_memoize,
+        )
 
 
 class SELF:

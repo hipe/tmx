@@ -8,44 +8,42 @@ def _():
     import sys
 
     dn = path.dirname
-
     a = sys.path
     head = a[0]
 
-    test_sub_dir = dn(__file__)
-    project_dir = dn(test_sub_dir)
+    top_test_dir = dn(__file__)
+    project_dir = dn(top_test_dir)
 
     if project_dir == head:
 
         pass  # assume low entrypoint loaded us to use for resources
 
-    elif test_sub_dir == head:
-        if '' != a[1]:
-            raise Exception('assumption failed')
+    elif top_test_dir == head:
+        None if '' == a[1] else sanity()
         a[0] = project_dir
-        a[1] = test_sub_dir
-        # the above is likely to change soon to keep '' in there
+        a[1] = top_test_dir  # [#019.why-this-in-the-second-position]
 
-        """now, project dir is at the front like it always is, and we have
-        moved the test sub dir from head to the second position so when other
-        test files require this file, it's still in the `sys.path`
-        """
     else:
-        raise Exception('assumption failed')
+        sanity()
 
-    return test_sub_dir
+    return top_test_dir
 
 
-test_sub_dir = _()
+def sanity():
+    raise Exception('assumption failed')
 
-from game_server import (  # noqa: E402
+
+top_test_dir = _()
+
+
+from modality_agnostic.memoization import (  # noqa: E402
         memoize,
         )
 
 
 @memoize
 def writable_tmpdir():
-    return path.join(test_sub_dir, 'writable-tmpdir')
+    return path.join(top_test_dir, 'writable-tmpdir')
 
 
 @memoize
@@ -60,7 +58,7 @@ def no_ent_path():
 
 @memoize
 def _fixture_files_directory():
-    return path.join(test_sub_dir, 'fixture-files')
+    return path.join(top_test_dir, 'fixture-files')
 
 
 """NOTE - this is NOT for REAL values!

@@ -39,7 +39,7 @@ def lazy(f_f):
         return f_pointer[0](*a)
 
     def f_initially(*a):
-        f = f_f();
+        f = f_f()
         f_pointer[0] = f
         return f(*a)
 
@@ -67,17 +67,6 @@ def memoize(f):
 
     f_pointer = [f_initially]
     return g
-
-
-def hello_game_server():
-    return 0
-
-def main():
-  print("hello from the game server.")
-
-
-class Exception(Exception):
-    pass
 
 
 # #history-A.3: a memoizer method moved here from elsewhere
