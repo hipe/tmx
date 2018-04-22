@@ -2,7 +2,7 @@ import os, sys, unittest
 
 # boilerplate
 _ = os.path
-path = _.dirname(_.dirname(_.abspath(__file__)))
+path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
 a = sys.path
 if a[0] != path:
     a.insert(0, path)
@@ -125,4 +125,3 @@ class Case030_lazy(_CommonYikes):
 if __name__ == '__main__':
     unittest.main()
 # #open [#007.B] - when we use docutest, um..
-# #pending-rename: move to the meta-tests, make it the first test. scrap `hello_game_server`

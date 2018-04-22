@@ -48,20 +48,26 @@ see [installing and deploying python](../README.md#018) (#open [#007.C]).
 
 ## <a name='running-tests'></a>contributing - running tests
 
+
+using [these aliases](#aliases),
 run one test file
 
-    python3 game_server_test/test_10_basics.py
+    py game_server_test/test_05_meta_tests/test_090_fundamentals.py
 
 
 run the whole test suite
 
-    python3 -m unittest discover game_server_test
+    pud game_server_test
 
 
-(what i actually do now is say `python` not `python3` (and use
-virtualenv), and i set up these aliases:)
 
-    alias py='python -W error::Warning::0'
+
+## <a name=aliases></a>these aliases
+
+(we use virtualenv and), we use these aliases. (note there is a dependency
+in the aliases but it is not circular.)
+
+    alias py='python3 -W error::Warning::0'
     alias pud='py -m unittest discover'
 
 

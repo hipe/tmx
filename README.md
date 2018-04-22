@@ -2,23 +2,32 @@
 
 ## objective & scope
 
-for now, this can be any and everything we would like to version
-for DTF: software, data, visualizations, whatever.
+this “project” consists of several “sub-projects” whose only unifying
+theme is that they are somehow of interest (maybe) to the DTF group chat.
 
-at the moment our scope is unbounded. but see ideas related to
-project scoping [below](#sub-projects).
+although the sub-projects are thematically disparate from one aonther, we
+keep them here in one repository for [reasons](#sub-projects).
 
 
 
 
 ## <a name=b></a>development overview
 
-this “project” consists of [“sub-projects”](#sub-projects).
+the specifics of development will be determined by the technologies
+employed by the particular [sub-project](#sub-projects).
 
-as for contributing to this project, see the below comments on
-[version control](#d) and our [\[#010\]] extra-conventional conventions.
+however, these principles apply across the sub-projects:
 
-see [installing and deploying python](#018) if your sub-project requires it.
+  - see the [below](#d) guidelines on version control.
+
+  - see [installing and deploying python](#018) if yours is one of the
+    several sub-projects that uses python.
+
+  - also for python, see our [\[#010\]] extra-conventional conventions.
+
+  - [passing all the tests](#running-all-the-tests)
+    MUST generally be considered a prerequisit for pushing to the master
+    branch. (we may explore allowable exceptons later.)
 
 
 
@@ -56,10 +65,7 @@ see [installing and deploying python](#018) if your sub-project requires it.
 
 
 
-
-## <a name="sub-projects"></a> what's a “sub-project”?
-
-we offer no formal definition for “sub-project” but:
+## <a name="sub-projects"></a> what's a “sub-project” (and why sub-projects)?
 
   - mainly we use the term to avoid confusion with the term “project” which
     we use to mean _this_ directory tree we keep in version control (at the
@@ -71,21 +77,88 @@ we offer no formal definition for “sub-project” but:
     documention, etc) across those sub-projects (code or documention that
     itself is under active development).
 
-  - (it is also our belief that keeping projects "near" to each other
-    will encourage them to share dependency, architecture and testing
-    decisions and thereby help combat "software erosion" (mentioned
-    in [12 factor][heroku3], explained well in [this old heroku blog][heroku4],
-    and defined more formally in a wikipedia page). that is: if a project
-    is off in its own little corner, we forget it exists for a few years and
-    then when we re-discover it, the cost of getting it to work again is
-    higher than if we had just done progressive upkeep of it.)
+  - as for why in the world we maintain this one big repository and not
+    several smaller ones, here is the rationale: we want the sub-projects
+    to "feel" like part of a greater whole in the hopes that this will
+    encourge them to share dependency, architecture and testing decisions
+    whenever it's prudent to do so; in an arrangement where both the
+    "library" and "application" codebases are moving targets under active
+    development. also:
 
-  - if a sub-project gets obnoxiously huge: it can fork from this project,
-    we can prune its excess and (back in this project) we can sunset it.
+  - it is our experimental belief that in its way, maintaining a project of
+    sub-projects can help combat "software erosion" (an idea mentioned in
+    [12 factor][heroku3], explained well in [this old heroku blog][heroku4],
+    and defined more formally in a wikipedia page.)
+    the fear (wrought from experience) is thaat if a smaller project is off
+    in its own little corner, it's easy to forget it exists for a few years.
+    then when it's re-discovered and dusted off, the cost of getting it to
+    work again is high; sometimes prohibitively so. keeping small projects
+    close together in a larger repository keeps them all at the fore, so
+    that the decision of whether or not to continue to maintain a small
+    project is one made intentionally, rather than as a circumstantial
+    afterthought. but all of this comes with this next provision:
+
+  - _certainly_ if a sub-project grows to any degree of usefulness and
+    maturity (or just sheer size in terms of SLOC), it should fork from
+    this project (repository), be sunsetted here, and `git-filter-branch`
+    (or similar) used to prune its extraneous history there.
 
   - our only real provision for sub-projects is that if they contain more
     than one file that they live at the _top_ of this directory tree.
     (i.e., there are no sub-sub-projects, etc.)
+
+
+
+
+## <a name='running-all-the-tests'></a>overview of running the tests
+
+
+we "shouldn't" be specifying all these sub-project-specific instructions
+redundantly here, but the desire to have this in one centralized easy
+reference outweighs this concern.
+
+at the moment our tests fall into two categories:
+
+  1. the easy, unit-test-like tests in python
+
+  1. the more involved tests that require a server to be running.
+
+
+
+### the easy tests
+
+(using [these aliases](#aliases)):
+
+    pud game_server_test && pud grep_dump_test && pud upload_bot_test
+
+
+
+### the more invovled tests
+
+testing the API server of the "upload bot" is more involved. it its own
+terminal:
+
+    upload_bot_test/script/run-web-server
+
+(if the server is already running, the PID of the process is displayed;
+otherwise the server starts in that terminal.
+stopping and starting the server is necessary whenever relevant code
+changes, like when you're jumping version.
+(`Ctrl-c` stops the server.))
+
+then in your 'main' terminal:
+
+    node_modules/newman/bin/newman.js run upload_bot_test/test_700_web/test_100_intro.postman_collection.json
+
+(this presupposes that `npm install` was run at some point.)
+
+
+
+
+## <a name=aliases></a>(these aliases)
+
+    alias py='python3 -W error::Warning::0'
+    alias pud='py -m unittest discover'
 
 
 
@@ -130,6 +203,7 @@ we offer no formal definition for “sub-project” but:
 |[#008.C]                   | #wish | function-based commands
 |[#008.B]                   | #open | remove array abuse
 |[#008]                     |       | (placeheld for small internal tracking)
+|[#007.D]                   | #open | PEP8 (now that we know how to activate it)
 |[#007.C]                   | #open | lock current stable (python 3.6.4) w/ virtualenv/VCS
 |[#007.B]                   | #open | refactor helper.py memoizers to use doctest
 |[#007]                     |       | (placeheld for small wishlist items)
@@ -139,6 +213,7 @@ we offer no formal definition for “sub-project” but:
 |[\[#003\]]                 |       | graph viz flowchart for which channel to use
 |<a name=002></a>[\[#002\]] |       | using the node table
 |[#001]                     |       | (this README file)
+
 
 
 
@@ -156,12 +231,8 @@ we offer no formal definition for “sub-project” but:
 
 
 
-
 [heroku4]: https://blog.heroku.com/the_new_heroku_4_erosion_resistance_explicit_contracts
 [heroku3]: https://12factor.net/
-
-
-
 
 
 

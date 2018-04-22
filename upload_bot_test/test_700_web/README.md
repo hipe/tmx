@@ -32,7 +32,7 @@ this design consequence is only as certain as [#303] postman is.
 
 
 
-## :#here1:
+## about the name of postman dumps
 
 when we first versioned this one JSON dump we sort of arbitrarily named
 it "whatever-and-ever.postman-collection.json". as it would turn out, we
@@ -70,5 +70,4 @@ the tests, of having to select the correct name.
 
 ## (document-meta)
 
-  - #pending-rename: not this file but this other one. see #here1
   - #born.

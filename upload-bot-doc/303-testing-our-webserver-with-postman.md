@@ -19,12 +19,26 @@ some [installation](#c) may be necessary.
 
 now:
 
-    ./node_modules/newman/bin/newman.js run upload_bot_test/test_700_web/test-100-intro.postman-collection.json
+    node_modules/newman/bin/newman.js run upload_bot_test/test_700_web/test_100_intro.postman_collection.json
 
 
 
 
 ## <a name=installation></a>installation: postman requires newman requires npm
+
+on a fresh checkout of The Project (or if you're jumping around to different
+versions), this will be necessary once:
+
+    npm install
+
+as a result, we see (now)
+
+    added 193 packages in 5.589s
+
+
+
+
+## posterity - how we first made the whole project a node module
 
 in order to get newman in a versioned way, we made our whole project a
 node module:
@@ -48,5 +62,4 @@ to confirm, remarkably:
 
 ## (document-meta)
 
-  - #pending-rename: maybe mention postman in the name now for consistency with sibling files
   - #born.

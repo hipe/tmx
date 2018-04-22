@@ -4,7 +4,7 @@
 module.exports = {
 
   entry: {
-    pagePurpleRanger: './src/index.jsx',  // #pending-rename
+    pagePurpleRanger: './src/purple-ranger.jsx',
     pageBlueRanger: './src/blue-ranger.jsx',
   },
 

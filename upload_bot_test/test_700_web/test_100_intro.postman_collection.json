@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "104a79a2-1b1b-4d00-856a-51c9905c4a01",
-		"name": "test-100-intro",
+		"name": "test_100_intro",
 		"description": "test things like pinging the server (the minimal thing), and the `url_verification` event..",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},

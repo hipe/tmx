@@ -112,5 +112,4 @@ _QUIT = _Quit()
 if __name__ == '__main__':
     __invoke_CLI()
 
-# #pending-rename (move this to game server with entrypoint in bin or something)
 # #born

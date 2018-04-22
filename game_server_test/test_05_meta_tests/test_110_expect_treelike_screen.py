@@ -416,5 +416,4 @@ if __name__ == '__main__':
     unittest.main()
 
 # #history-A.1 (as referenced)
-# #pending-rename: move to 'meta-tests'
 # #born.

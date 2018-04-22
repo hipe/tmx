@@ -2,7 +2,6 @@
 
 ## <a name=synopsis></a>synopsis
 
-
     python3 -W 'default::::' upload_bot/run.py
 
 (NOTE: at the commit of #history-A.1 we explain why this is currently
@@ -89,7 +88,7 @@ we use these <a name='aliases'>aliases</a>
 [\[#307\]]: 307-celery.md
 [\[#306\]]: 306-environment-variable-TMI.md
 [\[#305\]]: 305-tunneling-thru-ngrok.md
-[\[#303\]]: 303-testing-our-webserver.md
+[\[#303\]]: 303-testing-our-webserver-with-postman.md
 [\[#302\]]: 302-slack-event-types.txt
 [\[#002\]]: ../README.md#002
 [018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
