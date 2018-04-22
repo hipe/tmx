@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/hipe/downtownfun#readme",
   "dependencies": {
-    "newman": "^3.9.3"
+    "newman": "^3.9.3",
+    "npm": "^5.8.0"
   }
 }
