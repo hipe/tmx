@@ -96,6 +96,10 @@ sub-project: upload files to s3
 10:08 Tutorial #14 - Implement Create Method Of BookStore Application
 05:06 Tutorial #13 - Index Method of BookStore Application
 07:43 Tutorial #12 - Implement Book Model in Play Framework
-  something about syncing
-  add the new other thing (just a JSON stream)
-  refactor this one thing (granulated into JSON stream as currency)
+  acceptance: a markdown document of the 177
+  syncing for your new use case
+  acceptance: delete the versioned-data for k hong
+  syncing for k hong
+  sakin syncing (many magnetics, injection interface)
+  massive abstraction of "modality_agnostic" as the new "game_server"
+  bring game server code up to PEP8

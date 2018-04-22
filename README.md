@@ -182,7 +182,8 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
-|[#401]-[#499]              |       | (for etc)
+|[#501]-[#599]              |       | (for modality agnostic)
+|[#401]-[#499]              |       | (for sakin agac)
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)

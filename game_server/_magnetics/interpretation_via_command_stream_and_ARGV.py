@@ -17,13 +17,18 @@ flattens this order out of it (in part in case we want to change it, the
 rename won't be drastic.)
 """
 
+import script_lib.magnetics.fixed_argument_parser_via_argument_parser as ap_lib
+import script_lib as sl
 from game_server import lazy
+# #todo - you could eliminate (at writing) all `lazy` here (look)
+
 
 def interpretation_builder_via_modality_resources(
       ARGV,
       stdout,
       stderr,
-    ):
+      ):
+
     """currently the only entrypoint into this module (file)"""
     return _InterpretationBuilder(ARGV, stdout, stderr)
 
@@ -54,7 +59,7 @@ class _InterpretationBuilder:
         begin do-while loop:
             resolve a step-resolution given current branch node
             if resolution is terminal (viz fail or command), break.
-            since result is non terminal, assume it is (or wraps) a branch node.
+            since result is non terminal, assume it is (or wraps) branch node.
             let current branch node be that branch node and repeat loop.
         return current resolution
 
@@ -67,7 +72,7 @@ class _InterpretationBuilder:
 
         current endpoint tree node = application root
         begin do-while loop:
-            resolution = ( current endpoint tree node ).( step against upstream )
+            resolution = (current endpoint tree node).(step against upstream)
             if resolution is terminal, break
             current endpoint tree node = resolution
             repeat
@@ -80,40 +85,47 @@ class _InterpretationBuilder:
     :[#012]
     """
 
-    def __init__(self,
-      ARGV,
-      stdout,
-      stderr,
-    ):
+    def __init__(
+            self,
+            ARGV,
+            stdout,
+            stderr,
+            ):
+
         from collections import deque
         self.ARGV_stream = deque(ARGV)
-        self.stdout = stdout ; self.stderr = stderr
+        self.stdout = stdout
+        self.stderr = stderr
 
     def interpretation_via_command_stream(self, command_stream):
 
         current_tree_node = self.__flush_root_tree_node(command_stream)
         # --
         while True:  # PEP 315 (rejected) - there is no `do while` loop
-            resolution = current_tree_node.step_against_modality_resources(self)
-            if resolution.is_terminal: break
-            current_tree_node = resolution.microservice_tree_branch_node
+            reso = current_tree_node.step_against_modality_resources(self)
+            if reso.is_terminal:
+                break
+            current_tree_node = reso.microservice_tree_branch_node
 
-        return resolution
+        return reso
 
     def __flush_root_tree_node(self, command_stream):
         return _AdaptedMicroserviceTreeBranchNode(
-          command_stream = command_stream,
-          program_name_up_to_node = self.ARGV_stream.popleft(),
-            # `sys.argv` has program name as first element. argparse does not.
-        )
+                command_stream=command_stream,
+                program_name_up_to_node=self.ARGV_stream.popleft(),
+                )
+        # `sys.argv` has program name as first element. argparse does not.
+
 
 class _AdaptedMicroserviceTreeBranchNode:
     """(could allow this to be immutable if it was necessary)"""
 
-    def __init__(self,
-      command_stream,
-      program_name_up_to_node,
-    ):
+    def __init__(
+            self,
+            command_stream,
+            program_name_up_to_node,
+            ):
+
         self.command_stream = command_stream
         self.program_name_up_to_node = program_name_up_to_node
 
@@ -122,7 +134,7 @@ class _AdaptedMicroserviceTreeBranchNode:
         e = None
         try:
             ns = ap.parse_args(rsx.ARGV_stream)
-        except _MyInterruption as e_:
+        except ap_lib.Interruption as e_:
             e = e_
 
         if e:
@@ -134,12 +146,15 @@ class _AdaptedMicroserviceTreeBranchNode:
                 return _when_no_sub_command(rsx, ap)
 
     def __flush_argument_parser_and_command_index(self, rsx):
-        s = self.program_name_up_to_node ; del self.program_name_up_to_node
-        ap = _start_argument_parser(s)
+        s = self.program_name_up_to_node
+        del self.program_name_up_to_node
+        ap = _begin_argument_parser(s)
         _hack_argument_parser(ap, rsx)
-        st = self.command_stream ; del self.command_stream
+        st = self.command_stream
+        del self.command_stream
         ci = _command_index_via_these(ap, st, rsx)
-        return ap, ci
+        return (ap, ci)
+
 
 #
 # argument parsing case behaviors, experimentally as functions
@@ -150,13 +165,15 @@ def _when_oh_snap(ns, ci, rsx):
     if cmd.is_branch_node:
         cover_me('deep microservice trees')
     else:
-      return _OhSnapStepResolution(ns, cmd, rsx)
+        return _OhSnapStepResolution(ns, cmd, rsx)
+
 
 def _when_no_sub_command(rsx, ap):
     io = rsx.stderr
     io.write('expecting sub-command.'+NEWLINE)
     ap.print_usage(io)
-    return _FailureStepResolution(_GENERIC_ERROR)
+    return _FailureStepResolution(sl.GENERIC_ERROR)
+
 
 def _when_argument_parser_threw_interruption(rsx, e):
 
@@ -166,6 +183,7 @@ def _when_argument_parser_threw_interruption(rsx, e):
         rsx.stderr.write(message)  # assume NEWLINE
     return _FailureStepResolution(e.exitstatus)
 
+
 def __ugh_string_yadda_from_message(message):
     # ugh - at #history-A.1 when we added the name to the `add_subparsers`
     # it screwed up the way messages are created. why would you want an
@@ -173,11 +191,14 @@ def __ugh_string_yadda_from_message(message):
     # #[#006.B] get it together `argparse`
 
     import re
-    m = re.search('^([^:]+: error: )argument '+_THIS_NAME+': (.+)\\Z', message, re.DOTALL)
+    m = re.search(
+            '^([^:]+: error: )argument '+_THIS_NAME+': (.+)\\Z',
+            message, re.DOTALL)
     if m:
         return ''.join(m.groups())  # EMPTY_S
     else:
         return message
+
 
 #
 # step resolution classes
@@ -191,13 +212,17 @@ class _OhSnapStepResolution:
         self._command = cmd  # #testpoint (property name)
 
     def FLUSH_TO_EXECUTABLE(self):  # non-idempotent
-        rsx = self.__modality_resources ; del self.__modality_resources
+        rsx = self.__modality_resources
+        del self.__modality_resources
         self.__listener_builder = _build_listener_builder(rsx)
-        cmd = self._command ; del self._command
+        cmd = self._command
+        del self._command
         return cmd.EXECUTABLE_VIA_RESOURCER(self)
 
     def flush_modality_agnostic_listener_builder(self):
-        f = self.__listener_builder ; del self.__listener_builder ; return f
+        f = self.__listener_builder
+        del self.__listener_builder
+        return f
 
     @property
     def OK(self):
@@ -209,7 +234,9 @@ class _OhSnapStepResolution:
 
 
 class _FailureStepResolution:
-    """when we fail to procure an interpretation, this is the result structure"""
+    """when we fail to procure an interpretation, this is the result structure
+
+    """
 
     def __init__(self, es):
         self.exitstatus = es
@@ -222,27 +249,32 @@ class _FailureStepResolution:
     def is_terminal(self):
         return True
 
+
 #
 # build argument parser
 #
 
 def _command_index_via_these(ap, command_stream, rsx):
-    """BOTH mutates argument parser AND results in an index of commands added."""
+    """BOTH mutates argument parser AND results in an index of commands added.
+
+    """
 
     d = {}
-    subparsers = ap.add_subparsers(dest = _THIS_NAME)
+    subparsers = ap.add_subparsers(dest=_THIS_NAME)
     for cmd in command_stream:
         k = cmd.name
         if k in d:
             _msg = "name collision - multiple commands named '%s'"
             cover_me(_msg % k)
         d[k] = cmd
-        _add_command_to_argument_parser(subparsers, cmd, rsx)
+        __add_command_to_argument_parser(subparsers, cmd, rsx)
     return d
 
 
-class _add_command_to_argument_parser:
-    """the bulk of the work of our modality-specific adapatation of parameters"""
+class __add_command_to_argument_parser:
+    """the bulk of the work of our modality-specific adapatation of parameters
+
+    """
 
     def __init__(self, subparsers, cmd, rsx):
 
@@ -250,7 +282,7 @@ class _add_command_to_argument_parser:
         if f is not None:
             desc_s = _string_via_description_function(f)
         else:
-            desc_s = ( "«desc for subparser (place 2) '%s'»\nline 2" % cmd.name )
+            desc_s = "«desc for subparser (place 2) '%s'»\nline 2" % cmd.name
 
         self._count_of_positional_args_added = 0
 
@@ -275,21 +307,23 @@ class _add_command_to_argument_parser:
         """
 
         r = param.argument_arity_range
-        min = r.start ; max = r.stop
+        min = r.start
+        max = r.stop
         if min is 0:
             if max is 0:
                 self.__add_flag(param, name)
             elif max is 1:
                 self.__add_optional_field(param, name)
             else:
-                if max is not None: sanity()
+                None if max is None else sanity()
                 self.__add_optional_list(param, name)
         else:
-            if min is not 1: sanity()
+            None if min is 1 else sanity()
+            sanity() if min is not 1 else None
             if max is 1:
                 self.__add_required_field(param, name)
             else:
-                if max is not None: sanity()
+                None if max is None else sanity()
                 self.__add_required_list(param, name)
 
     def __add_required_field(self, param, name):
@@ -330,16 +364,16 @@ class _add_command_to_argument_parser:
 
     def __add_optional_field(self, param, name):  # category 2
         self._parser.add_argument(
-            ( _DASH_DASH + _slug_via_name(name) ),
+            (_DASH_DASH + _slug_via_name(name)),
             ** self._common_kwargs(param, name),
-            metavar = _infer_metavar_via_name(name),
+            metavar=_infer_metavar_via_name(name),
         )
 
     def __add_flag(self, param, name):  # category 1
         self._parser.add_argument(
-            ( _DASH_DASH + _slug_via_name(name) ),
+            (_DASH_DASH + _slug_via_name(name)),
             ** self._common_kwargs(param, name),
-            action = 'store_true',  # this is what makes it a flag
+            action='store_true',  # this is what makes it a flag
         )
 
     def _common_kwargs(self, param, name):
@@ -363,6 +397,7 @@ class _add_command_to_argument_parser:
 
 def _string_via_description_function(f):
     s_a = []
+
     def write_f(s):
         s_a.append(s + NEWLINE)
     f(write_f, _STYLER)
@@ -370,79 +405,16 @@ def _string_via_description_function(f):
 
 
 def _hack_argument_parser(ap, rsx):
-    """(see constituent functions for explanation)"""
 
-    __add_my_help(ap, rsx)
-    __hack_custom_error_function(ap, rsx)
+    ap_lib.fix_argument_parser(ap, rsx.stderr)
 
 
-def __add_my_help(ap, rsx):
-    """the help they add is not helpful. calling `exit` is really bad style for us
-    """
+def _begin_argument_parser(program_name_up_to_node):
 
-    ap.register('action', 'my_help', __yikes_ONE(rsx))  # register before next
-
-    ap.add_argument('-h', '--help',
-        action='my_help',
-        help=_('show therse help message and exit'),
-    )
-
-def __yikes_ONE(rsx):
-
-    def f(**three_kwargs):
-        return _MyHelpAction( my_rsx=rsx, ** three_kwargs )
-    return f
-
-class _MyHelpAction:
-
-    def __init__(self,
-        option_strings,
-        dest,
-        help,
-        my_rsx,
-    ):
-
-        self.choices = None
-        self.default = None
-        self.dest = dest
-        self.help = help
-        self.nargs = 0
-        self.metavar = None
-        self._my_rsx = my_rsx
-        self.option_strings = option_strings
-        self.required = False
-        self.type = None
-
-    def __call__(self, parser, namespace, values, option_string):
-        parser.print_help(self._my_rsx.stderr)
-        raise _MyInterruption(_SUCCESS, None)
-
-
-def __hack_custom_error_function(ap, rsx):
-    """the *recently rewritten* stdlib option parsing library is not
-
-    testing-friendly, nor is it sufficiently flexible for some novel
-    uses. it writes to system stderr and exits, which might be rather
-    violent depending on what you're trying to do.
-
-    here, rather than subclass it, we experiment with this:
-    """
-
-    def f(message):
-        ap.print_usage(rsx.stderr)
-        args = {'prog': ap.prog, 'message': message}
-        msg = _('%(prog)s: error: %(message)s\n') % args  # NEWLINE
-        raise _MyInterruption(_GENERIC_ERROR, msg)
-    ap.error = f
-
-
-def _start_argument_parser(program_name_up_to_node):
-    import argparse
-    return argparse.ArgumentParser(
-      prog = program_name_up_to_node,
-      description = '«description for root node»',
-      add_help=False,
-    )
+    return ap_lib.begin_native_argument_parser_to_fix(
+            prog=program_name_up_to_node,
+            description='«description for root node»',
+            )
 
 
 @lazy
@@ -454,6 +426,7 @@ def _infer_metavar_via_name():
 
     import re
     regex = re.compile('[^_]+$')
+
     def f(name):
         return regex.search(name)[0].upper()
     return f
@@ -471,6 +444,7 @@ def _name_via_slug(name):
 def _():
     # #wish [#008.E] gettext uber alles
     from gettext import gettext as g
+
     def f(s):
         return g(s)
     return f
@@ -524,7 +498,8 @@ def _build_listener_builder(rsx):
         call_once = None  # hm..
 
         def g(*x_a):  # currently: (channel string, channel string, callback)
-            d = deque(x_a) ; del x_a
+            d = deque(x_a)
+            del x_a
             expression_f = d.pop()
             error_or_info = d.popleft()
             if error_or_info is 'error':
@@ -559,18 +534,6 @@ def _build_listener_builder(rsx):
         return call_once()
     return f
 
-#
-# small support classes
-#
-
-class _MyInterruption(Exception):
-    """we are forced to throw exception to interrupt control flow there :("""
-
-    # (#[#006.B] this is seen as a painpoint of argparse)
-
-    def __init__(self, exitstatus, message):
-        self.exitstatus = exitstatus
-        self.message = message
 
 #
 # this little guy
@@ -580,16 +543,27 @@ class _STYLER:  # #todo
     """experiment"""
 
     def em(s):
-      return "\u001B[1;32m%s\u001B[0m" % s
+        return "\u001B[1;32m%s\u001B[0m" % s
+
 
 # --
+
+def implement_me():
+    raise(Exception('implement me'))
+
+
+def cover_me(s):
+    raise(Exception(s))
+
+
+def sanity():
+    raise(Exception('sanity'))
+
 
 _DASH = '-'
 _DASH_DASH = '--'
 _EMPTY_STRING = ''
-_GENERIC_ERROR = 2
 NEWLINE = "\n"
-_SUCCESS = 0
 _UNDERSCORE = '_'
 
 # #history-A.1: as referenced (can be temporary)

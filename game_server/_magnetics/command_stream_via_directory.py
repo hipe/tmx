@@ -12,7 +12,7 @@ the name of this magnetic is more nominal/aspirational than it is actual:
     the magnet.
 
   - "aspirational": whether or not command files are loaded eagerly or
-    lazily is something we want to be bureid deep within the system..
+    lazily is something we want to be buried deep within the system..
 """
 
 def SELF(collection_module):

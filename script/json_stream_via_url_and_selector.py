@@ -7,6 +7,8 @@ so:
   - cache the HTTP result body for sane development
   - EXPERIMENT with beautiful soup stuff..
   - (reminder: the commit message of the birth commit of the document)
+
+NOTE - this is NOT yet useful as a standalone CLI script..
 """
 
 
@@ -123,7 +125,7 @@ def _cached_url(url, listener):
     import re
     sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', url)
     from os import path as p
-    path = p.join(_TEMPORARY_DIR, sanitized_name)
+    path = p.join(sl.TEMPORARY_DIR, sanitized_name)
     if p.exists(path):
         info('(using cached web page (remove file to clear cache) - {})', path)
         return _CachedURL(path)
@@ -164,11 +166,6 @@ class _CachedURL:
 
 def okay():
     raise('foo')
-
-
-# -- CONSTANTS
-
-_TEMPORARY_DIR = 'z'  # ick/meh
 
 
 # --

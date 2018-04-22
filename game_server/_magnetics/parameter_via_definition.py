@@ -82,7 +82,7 @@ in surface representation. you can get from one to the other losslessly.
 
 somewhat arbitrarily we have decided to go with a number-based system
 (perhaps out of an assumed familiarity platform developers with have
-with python's `range` construc and the close kinship argument arity has
+with python's `range` construct and the close kinship argument arity has
 there).
 
 
@@ -105,6 +105,7 @@ mean "this represents a blacklisted parameter" (or even an unrecognized
 parameter); but don't do that.
 
 :[#013]
+this is now also :[#502], a node that will be re-housed in [mam]
 """
 
 import game_server

@@ -123,4 +123,11 @@ def putser_via_IO(io):
     return o
 
 
+# -- CONSTANTS
+
+GENERIC_ERROR = 2
+SUCCESS = 0
+TEMPORARY_DIR = 'z'  # ick/meh
+
+
 # #born: abstracted

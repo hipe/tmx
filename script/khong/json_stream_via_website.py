@@ -28,14 +28,14 @@ def procure_object_stream(listener):
 
     import script.json_stream_via_url_and_selector as o
 
-    def hello(these):
-        for el in these[0].find_all('a'):
+    def my_generator(these):
+        for el in these[0].find_all('a', recursive=False):
             yield {'href': el['href'], 'text': el.text}
 
     _itr = o.EXPERIMENT(
         url=_url,
         first_selector=_first_selector,
-        second_selector=hello,
+        second_selector=my_generator,
         listener=listener,
         )
 

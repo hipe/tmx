@@ -1,3 +1,7 @@
+"""
+:[#503]
+"""
+
 from game_server import memoize
 
 class SELF:  # :[#011]
