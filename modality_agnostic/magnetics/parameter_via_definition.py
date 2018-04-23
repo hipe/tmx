@@ -104,8 +104,7 @@ fields.
 mean "this represents a blacklisted parameter" (or even an unrecognized
 parameter); but don't do that.
 
-:[#013]
-this is now also :[#502], a node that will be re-housed in [mam]
+:[#502]
 """
 
 from modality_agnostic.memoization import (
@@ -115,10 +114,11 @@ from modality_agnostic.memoization import (
 
 class SELF:
 
-    def __init__(self,
-        description = None,
-        default_value = None,
-        argument_arity = None,
+    def __init__(
+            self,
+            description=None,
+            default_value=None,
+            argument_arity=None,
     ):
         if argument_arity is None:
             argument_arity = _arities.REQUIRED_FIELD
@@ -133,7 +133,7 @@ class SELF:
 
 
 class _CommonArityKinds:
-    """(per the list in [#013])"""
+    """(per the list in [#502])"""
 
     @property
     @dangerous_memoize
@@ -164,7 +164,6 @@ class _CommonArityKinds:
     def FLAG(self):
         """(category 1)"""
         return range(0, 0)
-
 
 
 _arities = _CommonArityKinds()

@@ -1,19 +1,11 @@
 """this tests only the raw meta-parameters, no integration"""
 
-import os, sys, unittest
+import _init  # noqa: F401
+import unittest
 
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-
-from helper import (
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
         memoize,
-        shared_subject,
         )
 
 
@@ -92,8 +84,9 @@ class Case110_default_value_everything(_CommonCase):
     @shared_subject
     def parameter_(self):
         return _subject_magnetic()(
-            default_value = 123,
+                default_value=123,
         )
+
 
 def _default_value_of_this(para):
     return para.default_value
@@ -136,10 +129,12 @@ class Case220_desc_yes_style(_CommonCase):
             o('line '+style.em('2'))
         return _build_parameter_with_this_description(f)
 
+
 def _lines_of_description(param):
     """NOTE - this is a proof of concept for how you should implement this"""
 
     f = param.description
+
     def o(line):
         arr.append(line)
     arr = []
@@ -149,6 +144,7 @@ def _lines_of_description(param):
     else:
         f(o)
     return arr
+
 
 @memoize
 def _styler():
@@ -164,9 +160,11 @@ def _styler():
 def _parameter_with_list_argument_arity():
     return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
 
+
 @memoize
 def _parameter_with_flag_argument_arity():
     return _build_parameter_via_argument_arity_string('FLAG')
+
 
 @memoize
 def _the_totally_empty_parameter():
@@ -177,24 +175,28 @@ def _the_totally_empty_parameter():
 
 def _build_parameter_with_this_description(f):
     return _subject_magnetic()(
-        description = f,
+            description=f,
     )
+
 
 def _build_parameter_via_argument_arity_string(s):
     _r = getattr(_subject_magnetic_file().arities, s)
     return _subject_magnetic()(
-        argument_arity = _r,
+        argument_arity=_r,
     )
+
 
 # --
 
 def _subject_magnetic():
     return _subject_magnetic_file().SELF
 
+
 @memoize
 def _subject_magnetic_file():
-    from game_server._magnetics import parameter_via_definition
-    return parameter_via_definition
+    import modality_agnostic.magnetics.parameter_via_definition as x
+    return x
+
 
 if __name__ == '__main__':
     unittest.main()

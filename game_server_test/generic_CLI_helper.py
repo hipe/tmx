@@ -148,8 +148,8 @@ class CLI_CaseMethods:
 
 
     def main_magnetic_(self):
-        from game_server._magnetics import interpretation_via_command_stream_and_ARGV
-        return interpretation_via_command_stream_and_ARGV
+        import game_server._magnetics.interpretation_via_command_stream_and_ARGV as x  # noqa: E501
+        return x
 
     # --
 
@@ -189,10 +189,12 @@ class CLI_CaseMethods:
 
 
 def _command_named(name):
-    from game_server._magnetics import command_via_parameter_stream
-    return command_via_parameter_stream.SELF(
-      name = name,
-      command_module = helper.empty_command_module(),
+
+    from modality_agnostic_test.public_support import empty_command_module as ecm  # noqa: E501
+    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    return x.SELF(
+            name=name,
+            command_module=ecm(),
     )
 
 

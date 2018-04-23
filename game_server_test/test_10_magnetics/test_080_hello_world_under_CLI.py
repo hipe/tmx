@@ -44,9 +44,11 @@ class Case010_ohai(CLI_CaseMethods, unittest.TestCase):
         return ['oh-hello']
 
     def command_stream_(self):
-        from game_server_test.fixture_directories import _010_cha_cha as mod
-        from game_server._magnetics import command_stream_via_directory as func
-        return func.SELF(mod)
+        from modality_agnostic_test.fixture_directories import (
+                _010_cha_cha as mod,
+                )
+        import modality_agnostic.magnetics.command_stream_via_directory as x
+        return x.SELF(mod)
 
 
 if __name__ == '__main__':

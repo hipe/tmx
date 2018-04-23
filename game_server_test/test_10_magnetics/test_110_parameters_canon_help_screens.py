@@ -75,7 +75,7 @@ class _CommonCase(unittest.TestCase):
         return _lib().help_screen_chunks_via_test_case(self)
 
 
-# (each "category N" below is from the list at [#013])
+# (each "category N" below is from the list at [#502])
 
 class Case010_category_4_required_field(_CommonCase):
 

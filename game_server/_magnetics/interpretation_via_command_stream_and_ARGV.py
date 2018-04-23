@@ -302,7 +302,7 @@ class __add_command_to_argument_parser:
             self.__add_parameter(d[name], name)
 
     def __add_parameter(self, param, name):
-        """[#013] discusses different ways to conceive of parameters ..
+        """[#502] discusses different ways to conceive of parameters ..
 
         in terms of ther argument arity. here we could either follow the
         "lexicon" (`is_required`, `is_flag`, `is_list`) or the numbers. we

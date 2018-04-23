@@ -28,18 +28,6 @@ def stream_via_memoized_array(f):
     return permanent_f
 
 
-@memoize
-def empty_command_module():
-    import types
-    ns = types.SimpleNamespace()
-    setattr(ns, 'PARAMETERS', None)
-
-    class DoYouSeeMe:
-        pass
-    setattr(ns, 'Command', DoYouSeeMe)
-    return ns
-
-
 class magnetics:
     """much shorter names, insulate from name change"""
 
@@ -52,19 +40,13 @@ class magnetics:
 
     @memoize
     def command():
-        from game_server._magnetics import command_via_parameter_stream as mag
-        return mag
+        import modality_agnostic.magnetics.command_via_parameter_stream as x
+        return x
 
     @memoize
     def parameter():
-        from game_server._magnetics import parameter_via_definition as mag
-        return mag
-
-
-def fixture_directory_(s):
-    import os
-    _test_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(_test_dir, 'fixture-directories', s)
+        import modality_agnostic.magnetics.parameter_via_definition as x
+        return x
 
 
 def iterator_via_times(num):

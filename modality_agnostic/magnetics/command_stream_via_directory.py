@@ -15,6 +15,7 @@ the name of this magnetic is more nominal/aspirational than it is actual:
     lazily is something we want to be buried deep within the system..
 """
 
+
 def SELF(collection_module):
     # (indented 2x anticipating possible upgrade to a class-based magnetic)
 
@@ -22,31 +23,37 @@ def SELF(collection_module):
         _gen = _generator_via_dir_path(_dir_path)
         return _final_stream_via_generator(_gen, collection_module)
 
+
 def _final_stream_via_generator(gen, collection_module):
     import importlib
     head_s = collection_module.__name__ + '.'  # DOT
+
     def _money(posix_path):
         stem = posix_path.stem
         _import_this = head_s + stem
         _mod = importlib.import_module(_import_this)
         return _command_via_module(_mod, stem)
-    return( _money(x) for x in gen )
+    return(_money(x) for x in gen)
+
 
 def _command_via_module(mod, stem):
-    from game_server._magnetics.command_via_parameter_stream import SELF as cmd
-    return cmd(
-      name = stem,
-      command_module = mod,
-    )
+    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    return x.SELF(
+            name=stem,
+            command_module=mod,
+            )
+
 
 def _generator_via_dir_path(dir_path):
     from pathlib import Path
     p = Path(dir_path)
     return p.glob('*.py')
 
+
 def _dir_path_via_module(collection_module):
     s_a = collection_module.__path__._path  # #todo
-    if 1 != len(s_a): cover_me('more than one path element')
+    if 1 != len(s_a):
+        raise Exception('cover me - more than one path element')
     return s_a[0]
 
 # #born.

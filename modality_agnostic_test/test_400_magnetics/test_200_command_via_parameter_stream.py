@@ -1,17 +1,11 @@
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-import game_server_test.helper as helper
-
-shared_subject = helper.shared_subject
-
+import _init  # noqa: F401
+from modality_agnostic_test.test_400_magnetics._init import (
+        empty_command_module,
+        )
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        )
+import unittest
 
 
 class Case010(unittest.TestCase):
@@ -29,15 +23,14 @@ class Case010(unittest.TestCase):
     @shared_subject
     def _subject(self):
         return _subject_module()(
-          name = 'hello_there',
-          command_module = helper.empty_command_module(),
+                name='hello_there',
+                command_module=empty_command_module(),
         )
 
 
-
 def _subject_module():
-    from game_server._magnetics import command_via_parameter_stream
-    return command_via_parameter_stream.SELF
+    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    return x.SELF
 
 
 if __name__ == '__main__':

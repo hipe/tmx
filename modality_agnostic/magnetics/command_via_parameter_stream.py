@@ -9,15 +9,16 @@ from modality_agnostic.memoization import (
 
 class SELF:  # :[#011]
 
-    def __init__(self,
-      name,
-      command_module,
+    def __init__(
+            self,
+            name,
+            command_module,
     ):
         command_mixed = command_module.Command
 
         self._parameters_index = _index_parameters(
-          detailed_parameters = command_module.PARAMETERS,
-          crude_parameters_callable = command_mixed,
+          detailed_parameters=command_module.PARAMETERS,
+          crude_parameters_callable=command_mixed,
         )
 
         if hasattr(command_mixed.__class__, '__init__'):  # #todo
@@ -26,7 +27,7 @@ class SELF:  # :[#011]
             fellow = _ViaFunction
 
         self._implementation_adapter = fellow(
-          mixed_command = command_mixed,
+          mixed_command=command_mixed,
         )
 
         self.name = name
@@ -45,8 +46,8 @@ class SELF:  # :[#011]
             _m = _METHOD_NAME_VIA_RESOURCE_PARAMETER_NAME[name]
             _x = getattr(self.__class__, _m)(self, resourcer)
             actual_params_d[name] = _x
-        return self._implementation_adapter.executable_via_named_arguments_(actual_params_d)
-
+        return self._implementation_adapter.executable_via_named_arguments_(
+                actual_params_d)
 
     def _listener_argument_value(self, resourcer):
         _builder = resourcer.flush_modality_agnostic_listener_builder()
@@ -62,10 +63,11 @@ class SELF:  # :[#011]
 
 
 _METHOD_NAME_VIA_RESOURCE_PARAMETER_NAME = {
-    '_listener' : '_listener_argument_value',
+    '_listener': '_listener_argument_value',
 }
 
 _ViaCommon = object
+
 
 class _ViaClass(_ViaCommon):
 
@@ -74,7 +76,7 @@ class _ViaClass(_ViaCommon):
 
     def executable_via_named_arguments_(self, d):
         def f():
-            _command_invocation = self._class( ** d )
+            _command_invocation = self._class(**d)
             return _command_invocation.execute()
         return f
 
@@ -90,9 +92,10 @@ class _ViaFunction(_ViaCommon):
 
 class _ParameterIndex:
 
-    def __init__(self,
-        formal_parameter_dictionary,
-        resource_name_string_list,
+    def __init__(
+            self,
+            formal_parameter_dictionary,
+            resource_name_string_list,
     ):
         self.formal_parameter_dictionary = formal_parameter_dictionary
         self.resource_name_string_list = resource_name_string_list
@@ -102,6 +105,10 @@ class _ParameterIndex:
         if len(self.formal_parameter_dictionary) is not 0:
             cover_me('have fun')
         return actual_params_d
+
+
+def cover_me(s):
+    raise Exception('cover me: '+s)
 
 
 def _index_parameters(
@@ -173,18 +180,18 @@ def _index_parameters(
         raise dim_pool.to_exception()
 
     return _ParameterIndex(
-        formal_parameter_dictionary = formal_parameter_dictionary,
-        resource_name_string_list = resource_name_string_list,
+        formal_parameter_dictionary=formal_parameter_dictionary,
+        resource_name_string_list=resource_name_string_list,
     )
 
 
 @memoize
 def _default_formal_parameter():  # #testpoint
-    from game_server._magnetics import parameter_via_definition as mag
+    import modality_agnostic.magnetics.parameter_via_definition as mag
     return mag.SELF(
-        description = None,  # hi.
-        default_value = None,  # hi.
-        argument_arity = mag.arities.REQUIRED_FIELD,
+            description=None,  # hi.
+            default_value=None,  # hi.
+            argument_arity=mag.arities.REQUIRED_FIELD,
     )
 
 
@@ -202,8 +209,9 @@ class _DefinedParametersDiminishingPool:
 
     def to_exception(self):
         _s_a = self._my_params_d.keys()
-        _message = ('this/these parameter detail(s) must have ' +
-            'corresponding function parameters: (%s)' ) % ', '.join(_s_a)
+        _message = (
+                'this/these parameter detail(s) must have ' +
+                'corresponding function parameters: (%s)') % ', '.join(_s_a)
         return _my_exception(_message)
 
     def my_pop(self, name):
@@ -222,6 +230,7 @@ def _the_empty_diminishing_pool():
     class _TheEmptyDiminishingPool:
         def my_pop(self, _):
             return None
+
         def __len__(self):
             return 0
     return _TheEmptyDiminishingPool()
@@ -244,5 +253,6 @@ def _my_exception(msg):  # #copy-pasted
 
 _UNDERSCORE = '_'
 """magic - parameters with leading underscores are special"""
+
 
 # #born. (minimal)
