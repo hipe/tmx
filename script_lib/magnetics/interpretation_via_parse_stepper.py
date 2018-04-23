@@ -53,7 +53,7 @@ def _MAIN_AGORITHM(rsx, top_stepper):
 
     current_stepper = top_stepper
     while True:  # PEP 315 (rejected) - there is no `do while` loop
-        reso = current_stepper.step_against_modality_resources(rsx)
+        reso = current_stepper.step_for_branch_against_modality_resources(rsx)
         if reso.is_terminal:
             break
         current_stepper = reso.microservice_tree_branch_node
@@ -90,14 +90,18 @@ class interpretationer_via_resources:
             argument_parser_index_via_stderr_and_command_stream,
             )
 
-        _ap_idx = argument_parser_index_via_stderr_and_command_stream(
+        ap_idx = argument_parser_index_via_stderr_and_command_stream(
                 stderr=rsx.stderr,
-                description=desc,
+                description_string=desc,
                 command_stream=command_stream,
                 prog=rsx.ARGV_stream.popleft(),
                 )
 
-        _top_stepper = parse_stepper_via_argument_parser_index(_ap_idx)
+        _top_stepper = parse_stepper_via_argument_parser_index(
+                element_dictionary=ap_idx.command_dictionary,
+                moniker=ap_idx.this_one_name__,
+                argument_parser=ap_idx.argument_parser,
+                )
 
         return _MAIN_AGORITHM(rsx, _top_stepper)
 

@@ -11,59 +11,129 @@ from script_lib import (
         )
 
 
-class _Me:
+class _SELF:
     """(the conceit is that you could override particular behaviors)"""
 
-    def __init__(self, argument_parser_index):
-        self._argument_parser = argument_parser_index.argument_parser
-        self._dictionary = argument_parser_index.command_dictionary
-        self._moniker = argument_parser_index.this_one_name__
+    def __init__(
+            self,
+            argument_parser,
+            moniker,
+            element_dictionary,
+            ):
 
-    def step_against_modality_resources(self, rsx):
+        self._element_dictionary = element_dictionary
+        self._argument_parser = argument_parser
+        self._moniker = moniker
+
+    def step_for_branch_against_modality_resources(self, rsx):
+
+        e, ns = self._error_or_namespace(rsx)
+        if e is not None:
+            return self._when_argument_parser_threw_interruption(rsx, e)
+        elif ns.chosen_sub_command:
+            return self.__when_sub_command_chosen(rsx, ns)
+        else:
+            return self.__when_no_sub_command(rsx)
+
+    def _step_against_modality_resources(self, rsx):
+
+        e, ns = self._error_or_namespace(rsx)
+        if e is not None:
+            return self._when_argument_parser_threw_interruption(rsx, e)
+        else:
+            return _NamespaceStepResolution(ns)
+
+    def _error_or_namespace(self, rsx):
 
         import script_lib.magnetics.fixed_argument_parser_via_argument_parser as ap_lib  # noqa: E501
-
         e = None
+        ns = None
         try:
             ns = self._argument_parser.parse_args(rsx.ARGV_stream)
         except ap_lib.Interruption as e_:
             e = e_
-
-        if e:
-            return self.__when_argument_parser_threw_interruption(rsx, e)
-        elif ns.chosen_sub_command:
-            return self.__when_success(rsx, ns)
-        else:
-            return self.__when_no_sub_command(rsx)
+        return e, ns
 
     def __when_no_sub_command(self, rsx):
         import script_lib as sl
         io = rsx.stderr
         io.write('expecting sub-command.\n')  # NEWLINE
         self._argument_parser.print_usage(io)
-        return _FailureStepResolution(sl.GENERIC_ERROR)
+        return _InterruptedStepResolution(sl.GENERIC_ERROR)
 
-    def __when_argument_parser_threw_interruption(self, rsx, e):
+    def _when_argument_parser_threw_interruption(self, rsx, e):
 
         msg = e.message
         if msg is not None:
             _use_message = _ugh_string_yadda_from_message(msg, self._moniker)
             rsx.stderr.write(_use_message)  # assume NEWLINE
-        return _FailureStepResolution(e.exitstatus)
+        return _InterruptedStepResolution(e.exitstatus)
 
-    def __when_success(self, rsx, ns):
-        cmd = self._dictionary[_name_via_slug(ns.chosen_sub_command)]
+    def __when_sub_command_chosen(self, rsx, ns):
+        cmd = self._element_dictionary[_name_via_slug(ns.chosen_sub_command)]
         if cmd.is_branch_node:
             cover_me('deep microservice trees')
         else:
-            return _OhSnapStepResolution(ns, cmd, rsx)
+            return _ExecutableTerminalStepResolution(ns, cmd, rsx)
+
+
+# == BEGIN
+def _SIMPLE_STEP(serr, argv, parameters_definition, description):
+    """#NOT_COVERED experiment (at #history-A.2)"""
+
+    from script_lib.magnetics import (
+            argument_parser_index_via_stderr_and_command_stream as mag,
+            deque_via_ARGV as argv_stream_f,
+            resources_via_ARGV_stream_and_stderr_and_stdout as rsx_f,
+            )
+
+    from modality_agnostic.magnetics import (
+            parameter_via_definition as param_f,
+            )
+
+    params_d = {}
+    parameters_definition(params_d, param_f)
+    argv_stream = argv_stream_f(argv)
+    _prog = argv_stream.popleft()
+
+    _ap = mag.argument_parser_via_parameter_dictionary(
+            stderr=serr,
+            prog=_prog,
+            description=description,
+            parameter_dictionary=params_d,
+            )
+
+    _stepper = _SELF(_ap, 'i am moniker', params_d)
+
+    _rsx = rsx_f(argv_stream, serr, None)
+
+    _reso = _stepper._step_against_modality_resources(_rsx)
+    return _reso
+
+
+_SELF.SIMPLE_STEP = _SIMPLE_STEP
+# == END
 
 
 #
 # step resolution classes
 #
 
-class _OhSnapStepResolution:
+class _NamespaceStepResolution:
+
+    def __init__(self, namespace):
+        self.namespace = namespace
+
+    @property
+    def OK(self):
+        return True
+
+    @property
+    def is_terminal(self):
+        return True
+
+
+class _ExecutableTerminalStepResolution:
 
     def __init__(self, namespace, cmd, rsx):
         self.__modality_resources = rsx
@@ -96,7 +166,7 @@ class _OhSnapStepResolution:
         return True
 
 
-class _FailureStepResolution:
+class _InterruptedStepResolution:
     """when we fail to procure an interpretation, this is the result structure
 
     """
@@ -118,7 +188,7 @@ class _FailureStepResolution:
 #
 
 def _ugh_string_yadda_from_message(message, this_one_name):
-    """ugh - at #history-A.1 elswhere, when we added the name to the
+    """ugh - at #history-A.1 elsewhere, when we added the name to the
 
     `add_subparsers` it screwed up the way messages are created.
     why would you want an internal data member name to show up in a
@@ -141,12 +211,10 @@ def _name_via_slug(name):
 
 # == BEGIN #callable-module-hack
 
-class _MeAsCallable:
-    def __call__(self, x):
-        return _Me(x)
-
 import sys  # noqa E402
-sys.modules[__name__] = _MeAsCallable()
+sys.modules[__name__] = _SELF
 
 # == END
+
+# #history-A.2 (as referenced, can be temporary)
 # #abstracted.

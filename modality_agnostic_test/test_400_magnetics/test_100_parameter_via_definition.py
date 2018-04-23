@@ -189,7 +189,7 @@ def _build_parameter_via_argument_arity_string(s):
 # --
 
 def _subject_magnetic():
-    return _subject_magnetic_file().SELF
+    return _subject_magnetic_file()
 
 
 @memoize

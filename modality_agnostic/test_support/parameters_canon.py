@@ -20,10 +20,10 @@ class command_modules:  # used as namespace yikes
             def desc_f(o, style):
                 o('howdy ho')
 
-            mag = _parameter()
+            param = _parameter()
             PARAMETERS = {
-                'reqo_listo': mag.SELF(
-                    argument_arity=mag.arities.REQUIRED_LIST,
+                'reqo_listo': param(
+                    argument_arity=param.arities.REQUIRED_LIST,
                     description=desc_f,
                  ),
             }
@@ -40,14 +40,14 @@ class command_modules:  # used as namespace yikes
                     o("«desc for parm '%s'»" % name)
                 return f
 
-            mag = _parameter()
+            param = _parameter()
             PARAMETERS = {
-                'listo_boyo': mag.SELF(
-                    argument_arity=mag.arities.OPTIONAL_LIST,
+                'listo_boyo': param(
+                    argument_arity=param.arities.OPTIONAL_LIST,
                     description=fake_desc('boyo'),
                  ),
-                'wingo_wanno': mag.SELF(
-                    argument_arity=mag.arities.REQUIRED_FIELD,
+                'wingo_wanno': param(
+                    argument_arity=param.arities.REQUIRED_FIELD,
                     description=fake_desc('wanno'),
                  ),
             }
@@ -65,7 +65,7 @@ class command_modules:  # used as namespace yikes
 
             mag = _parameter()
             PARAMETERS = {
-                'opto_fieldo': mag.SELF(
+                'opto_fieldo': mag(
                     argument_arity=mag.arities.OPTIONAL_FIELD,
                     description=desc_f,
                  ),
@@ -83,7 +83,7 @@ class command_modules:  # used as namespace yikes
 
             mag = _parameter()
             PARAMETERS = {
-                'this_flag': mag.SELF(
+                'this_flag': mag(
                     argument_arity=mag.arities.FLAG,
                     description=desc_f,
                  ),

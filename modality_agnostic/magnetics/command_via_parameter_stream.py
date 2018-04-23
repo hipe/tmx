@@ -188,7 +188,7 @@ def _index_parameters(
 @memoize
 def _default_formal_parameter():  # #testpoint
     import modality_agnostic.magnetics.parameter_via_definition as mag
-    return mag.SELF(
+    return mag(
             description=None,  # hi.
             default_value=None,  # hi.
             argument_arity=mag.arities.REQUIRED_FIELD,

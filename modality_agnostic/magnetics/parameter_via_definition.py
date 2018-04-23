@@ -112,7 +112,7 @@ from modality_agnostic.memoization import (
         )
 
 
-class SELF:
+class _SELF:
 
     def __init__(
             self,
@@ -122,6 +122,10 @@ class SELF:
     ):
         if argument_arity is None:
             argument_arity = _arities.REQUIRED_FIELD
+        elif type(argument_arity) is str:
+            # #NOT_COVERED #history-A.2
+            argument_arity = getattr(_arities, argument_arity)
+
         self.argument_arity_range = argument_arity
 
         self.description = description
@@ -167,7 +171,6 @@ class _CommonArityKinds:
 
 
 _arities = _CommonArityKinds()
-arities = _arities
 
 
 class _MyArity:
@@ -178,5 +181,14 @@ class _MyArity:
         self.stop = stop
 
 
+# == BEGIN #callable-module-hack
+
+_SELF.arities = _arities
+import sys  # noqa E402
+sys.modules[__name__] = _SELF
+
+# == END
+
+# #history-A.2: (can be temporary) for not covered
 # #history-A.1: large doc spike of parameter modeling theory
 # #born.

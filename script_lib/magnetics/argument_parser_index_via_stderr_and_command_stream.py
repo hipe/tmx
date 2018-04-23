@@ -16,7 +16,7 @@ from script_lib import (
 # #todo - you could eliminate (at writing) all `lazy` here (look)
 
 
-class _Me:
+class _SELF:
     """a collection of commands is passed over the transation boundary
 
     as a stream (actually iterator), streams being the lingua franca for
@@ -25,17 +25,11 @@ class _Me:
     is done of building the argument parser..
     """
 
-    def __init__(self, stderr, prog, description, command_stream):
+    def __init__(self, stderr, prog, command_stream, description_string):
 
-        ap_lib = _ap_lib()
+        ap = _argument_parser_via(stderr, prog, description_string)
 
-        ap = ap_lib.begin_native_argument_parser_to_fix(
-            prog=prog,
-            description=description,
-            )
-        _hack_argument_parser(ap, stderr)
-
-        self.command_dictionary = _populate_argument_parser_while_indexing(
+        self.command_dictionary = _populate_via_command_stream(
                 stderr, ap, command_stream)
         self.argument_parser = ap
 
@@ -44,7 +38,7 @@ class _Me:
         return _THIS_NAME
 
 
-def _populate_argument_parser_while_indexing(stderr, ap, command_stream):
+def _populate_via_command_stream(stderr, ap, command_stream):
 
     d = {}
     subparsers = ap.add_subparsers(dest=_THIS_NAME)
@@ -54,36 +48,54 @@ def _populate_argument_parser_while_indexing(stderr, ap, command_stream):
             _msg = "name collision - multiple commands named '%s'"
             cover_me(_msg % k)
         d[k] = cmd
-        __add_command_to_argument_parser(subparsers, cmd, stderr)
+        __populate_via_command(subparsers, stderr, cmd)
     return d
 
 
-class __add_command_to_argument_parser:
-    """the bulk of the work of our modality-specific adapatation of parameters
+def __populate_via_command(subparsers, stderr, cmd):
 
-    """
+    desc_s = _element_description_string_via_mixed(cmd.description)
+    if desc_s is None:
+        _tmpl = "«desc for subparser (place 2) '{}'»\nline 2"
+        desc_s = _tmpl.format(cmd.name)
 
-    def __init__(self, subparsers, cmd, stderr):
+    ap = subparsers.add_parser(
+        _slug_via_name(cmd.name),
+        description=desc_s,
+        add_help=False,
+        help='«help for command»',  # `add_help = False` 🤔
+    )
+    _hack_argument_parser(ap, stderr)
 
-        f = cmd.description
-        if f is not None:
-            desc_s = _string_via_description_function(f)
-        else:
-            desc_s = "«desc for subparser (place 2) '%s'»\nline 2" % cmd.name
+    _populate_via_parameter_dictionary(
+        parser=ap,
+        parameter_dictionary=cmd.formal_parameter_dictionary,
+        )
 
+
+def _NEW_THING(stderr, prog, parameter_dictionary, description):  # NOT_COVERED
+
+    desc_s = _element_description_string_via_mixed(description)
+    if desc_s is None:
+        desc_s = '«DUMMY DESC FOR NEW THING»'
+
+    ap = _argument_parser_via(stderr, prog, desc_s)
+    _populate_via_parameter_dictionary(ap, parameter_dictionary)
+    return ap
+
+
+_SELF.argument_parser_via_parameter_dictionary = _NEW_THING
+
+
+class _populate_via_parameter_dictionary:
+
+    def __init__(self, parser, parameter_dictionary):
+
+        self._parser = parser
         self._count_of_positional_args_added = 0
 
-        ap = subparsers.add_parser(
-            _slug_via_name(cmd.name),
-            help='«help for command»',
-            description=desc_s,
-            add_help=False,
-        )
-        _hack_argument_parser(ap, stderr)
-        self._parser = ap
-        d = cmd.formal_parameter_dictionary
-        for name in d:
-            self.__add_parameter(d[name], name)
+        for name in parameter_dictionary:
+            self.__add_parameter(parameter_dictionary[name], name)
 
     def __add_parameter(self, param, name):
         """[#502] discusses different ways to conceive of parameters ..
@@ -171,17 +183,42 @@ class __add_command_to_argument_parser:
             implement_me()
 
         d = {}
-        f = param.description
-        if f is not None:
-            d['help'] = _string_via_description_function(f)
-        else:
-            d['help'] = ("«the '%s' parameter»" % name)  # ..
+        s = _element_description_string_via_mixed(param.description)
+        if s is None:
+            s = "«the '{}' parameter»".format(name)
+
+        d['help'] = s
         return d
 
 
 #
 # argument parser (build with functions not methods, expermentally)
 #
+
+
+def _argument_parser_via(stderr, prog, description_string):
+
+    ap_lib = _ap_lib()
+    ap = ap_lib.begin_native_argument_parser_to_fix(
+        prog=prog,
+        description=description_string,
+        )
+    _hack_argument_parser(ap, stderr)
+    return ap
+
+
+def _element_description_string_via_mixed(x):
+
+    if callable(x):
+        desc_s = _string_via_description_function(x)
+    elif type(x) is str:
+        desc_s = x
+    elif x is None:
+        desc_s = None
+    else:
+        cover_me('command desc as {}'.format(type(x)))
+    return desc_s
+
 
 def _string_via_description_function(f):
 
@@ -252,12 +289,8 @@ _THIS_NAME = 'chosen_sub_command'
 
 # == BEGIN #callable-module-hack
 
-class _MeAsCallable:
-    def __call__(self, *a, **kwargs):
-        return _Me(*a, **kwargs)
-
 import sys  # noqa E402
-sys.modules[__name__] = _MeAsCallable()
+sys.modules[__name__] = _SELF
 
 # == END
 
