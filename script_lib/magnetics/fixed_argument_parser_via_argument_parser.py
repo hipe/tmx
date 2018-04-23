@@ -1,5 +1,10 @@
-"""the central conceit of this module is that the native argument parser is..
+"""this is the lowest-level magnetic exposed.
 
+this is for you if you want to create and run your own argument parser
+directly, and only want the barest minimum of hacks we do to the native
+argument parser.
+
+the central conceit of this module is that the native argument parser is
 "broken" in a few key ways and needs to be "fixed"...
 """
 

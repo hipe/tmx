@@ -185,7 +185,7 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
 
     _cmd = tc.command_module_()
 
-    import script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream as _mag  # noqa: E501
+    import script_lib.magnetics.interpretation_via_parse_stepper as _mag
 
     def _do_debug():
         return tc.do_debug
@@ -196,7 +196,7 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
 
     mock_IO = _QuickDirty_IO_Mock(_do_debug, _debug_IO)
 
-    _oo = _mag.interpretation_builder_via_modality_resources(
+    _oo = _mag.interpretationer_via_individual_resources(
         ARGV=['ohai', 'my-command', '--help'],
         stdout=None,
         stderr=mock_IO,

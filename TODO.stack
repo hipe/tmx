@@ -104,3 +104,5 @@ sub-project: upload files to s3
   splinter CLI stuff so it's not so obtuse and monolithic
   IMPROVE how memoizers work (use nonlocal)
 unify cover me and sanity
+[#012] rename this
+reconcile two listeners

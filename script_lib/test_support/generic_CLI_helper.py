@@ -120,10 +120,10 @@ class CLI_CaseMethods:
         _argv = self.ARGV_()
         _command_st = self.command_stream_()
 
-        _bldr = self.main_magnetic_().interpretation_builder_via_modality_resources(  # noqa: E501
-          ARGV=_argv,
-          stdout=stdout,
-          stderr=stderr,
+        _bldr = self.main_magnetic_().interpretationer_via_individual_resources(  # noqa: E501
+            ARGV=_argv,
+            stdout=stdout,
+            stderr=stderr,
         )
         return _bldr.interpretation_via_command_stream(_command_st)
 
@@ -165,7 +165,7 @@ class CLI_CaseMethods:
         return s_a, _f_a
 
     def main_magnetic_(self):
-        import script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream as x  # noqa: E501
+        import script_lib.magnetics.interpretation_via_parse_stepper as x
         return x
 
     # --

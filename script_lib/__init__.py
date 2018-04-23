@@ -123,6 +123,13 @@ def putser_via_IO(io):
     return o
 
 
+def cover_me(s):
+    raise _exe('cover me: {}'.format(s))
+
+
+_exe = Exception
+
+
 class Exception(Exception):
     pass
 
