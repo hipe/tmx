@@ -3,23 +3,13 @@
 this is #meta-testing
 """
 
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-import game_server
-
-from game_server_test import helper
-shared_subject = helper.shared_subject
-
-
-memoize = helper.memoize
+import _init  # noqa: F401
+import script_lib
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
+import unittest
 
 
 class _NormalLinerCase(unittest.TestCase):
@@ -32,7 +22,7 @@ class _NormalLinerCase(unittest.TestCase):
 
     def _lines_via_big_string(self, big_s):
         _iter = _subject_module().line_stream_via_big_string(big_s)
-        return [ x for x in _iter ]
+        return [x for x in _iter]
 
 
 class Case010_empty_string(_NormalLinerCase):
@@ -113,12 +103,14 @@ class Case110_scanner_via_iterator(_CommonCase):
         self.assertFalse(_scn.has_current_token)
 
     def test_030_do_not_ask_for_current_token_on_empty_scanner(self):
-        _scn = self._build_empty() ; e = None
+        _scn = self._build_empty()
+        e = None
         try:
             _scn.current_token
         except AttributeError as _e:
             e = _e
-        self.assertEqual("'_scanner_via_iterator' object has no attribute 'current_token'", str(e))
+        _ = "'_scanner_via_iterator' object has no attribute 'current_token'"
+        self.assertEqual(_, str(e))
 
     def test_040_one_item(self):
         self._same_fam(123)
@@ -184,7 +176,7 @@ class Case220_these_errors(_CommonCase):
         e = None
         try:
             _tree_via_line_stream(iter([input_s]))
-        except game_server.Exception as _e:
+        except script_lib.Exception as _e:
             e = _e
         self.assertEqual(exp_s, str(e))
 
@@ -194,12 +186,12 @@ class Case230_cover_edge__end_of_input_during_branch(_CommonCase):
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
 
-    def test_020_this_is_NOT_seen_as_two_toplevel_items_but_multiple_lines_of_a_section(self):
+    def test_020_this_is_NOT_seen_as_two_toplevel_items_but_multiple_lines_of_a_section(self):  # noqa: E501
         t = self._tree
         self._assertThisManyChildren(1, t)
         t, = self._children_of(t)
-        _act = [ self._styled_content_string(x) for x in self._children_of(t) ]
-        _exp = [ 'one', 'two' ]
+        _act = [self._styled_content_string(x) for x in self._children_of(t)]
+        _exp = ['one', 'two']
         self.assertEqual(_exp, _act)
 
     @property
@@ -256,14 +248,16 @@ class Case250_first_target_case(_CommonCase):  # #coverpoint1.1
 
     def test_030_section_four_EXPERIMENTAL_FLATNESS(self):
         _section_four = self._nth_child(3, self._tree)
-        self._assert_all_terminals(_section_four,
+        self._assert_all_terminals(
+            _section_four,
             'header of this other section',
             'one fellow',
         )
 
     def test_040_section_two_consists_of_three_terminals(self):
         _section_two = self._nth_child(1, self._tree)
-        self._assert_all_terminals(_section_two,
+        self._assert_all_terminals(
+            _section_two,
             'desc line one',
             'desc line two',
             'desc line three',
@@ -283,7 +277,8 @@ class Case250_first_target_case(_CommonCase):  # #coverpoint1.1
         # the trick seems to be that there must be at least 2 items
         # to justify making a branch node.
 
-        self._assert_all_terminals(_4,
+        self._assert_all_terminals(
+            _4,
             'item three',
             'subdesc line 3.two',
         )
@@ -291,7 +286,8 @@ class Case250_first_target_case(_CommonCase):  # #coverpoint1.1
         self._assertThisManyChildren(2, _2)
         one, the_rest = self._children_of(_2)
         self._assertStyledContentString('item one', one)
-        self._assert_all_terminals(the_rest,
+        self._assert_all_terminals(
+            the_rest,
             'subdesc line 1.two',
             'subdesc line 1.three',
         )
@@ -332,7 +328,7 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
         return _scanner_via_iterator(iter(branch.children))
     _scanner_via_iterator = _subject_module()._scanner_via_iterator
 
-    stack = [ _scanner_via_branch(tree) ]
+    stack = [_scanner_via_branch(tree)]
 
     def f():
         return g()
@@ -353,8 +349,10 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
                 break
             stack.pop()
             if len(stack) is 0:
+                def new_g():
+                    None
                 nonlocal g
-                g = lambda: None
+                g = new_g
                 break
             frm = stack[-1]
 
@@ -408,7 +406,7 @@ def _empty_iterator():
 
 
 def _subject_module():
-    import game_server_test.expect_treelike_screen as x
+    import script_lib.test_support.expect_treelike_screen as x
     return x
 
 

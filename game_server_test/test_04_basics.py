@@ -1,4 +1,4 @@
-import _init_SKETCH  # noqa: F401
+import _init  # noqa: F401
 import game_server
 import unittest
 

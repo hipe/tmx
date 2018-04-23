@@ -123,6 +123,10 @@ def putser_via_IO(io):
     return o
 
 
+class Exception(Exception):
+    pass
+
+
 # -- CONSTANTS
 
 GENERIC_ERROR = 2

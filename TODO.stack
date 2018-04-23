@@ -101,12 +101,6 @@ sub-project: upload files to s3
   acceptance: delete the versioned-data for k hong
   syncing for k hong
   sakin syncing (many magnetics, injection interface)
-  massive abstraction of "modality_agnostic" as the new "game_server"
-  bring game server code up to PEP8
-  maybe re-house CLI specific things into etc
+  splinter CLI stuff so it's not so obtuse and monolithic
   IMPROVE how memoizers work (use nonlocal)
-# PEP8 these
-game_server_test/expect_help_screen.py
-game_server_test/expect_treelike_screen.py
-game_server_test/parameters_canon.py
-game_server_test/test_10_magnetics/test_110_parameters_canon_help_screens.py
+unify cover me and sanity

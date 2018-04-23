@@ -129,7 +129,7 @@ at the moment our tests fall into two categories:
 
 (using [these aliases](#aliases)):
 
-    pud modality_agnostic_test && pud game_server_test && pud grep_dump_test && pud upload_bot_test
+    pud modality_agnostic_test && pud script_lib_test && pud game_server_test && pud grep_dump_test && pud upload_bot_test
 
 
 

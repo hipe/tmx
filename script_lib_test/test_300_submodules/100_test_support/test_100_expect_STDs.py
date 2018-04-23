@@ -38,21 +38,13 @@ system-under-test is itself a testing library. (but see more N-meta antics
 #here2.)
 """
 
-import os, sys, unittest
+import _init  # noqa: F401
 
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        )
 
-import game_server_test
-
-import game_server_test.helper as helper
-shared_subject = helper.shared_subject
-
+import unittest
 
 
 class _CaseMethods:
@@ -62,6 +54,7 @@ class _CaseMethods:
 
     def _two_stderr_line_certain_regexp_expectation(self):
         import re
+
         def f():
             yield re.compile('^bif$')
             yield re.compile('^baz$')
@@ -83,8 +76,8 @@ class _CaseMethods:
         return self._subject_module().expect_stderr_lines(f)
 
     def _subject_module(self):
-        from game_server_test import expect_STDs
-        return expect_STDs
+        import script_lib.test_support.expect_STDs as x
+        return x
 
 
 class Case01_success_path(_CaseMethods, unittest.TestCase):
@@ -117,8 +110,9 @@ class Case02_one_too_many(_CaseMethods, unittest.TestCase):
 
     def test_080_message_looks_good(self):
         _actual = self._performance()
-        self.assertEqual(_actual.message,
-          "expecting no more lines but this line was outputted on STDERR - ohai\n")
+        self.assertEqual(
+         _actual.message,
+         "expecting no more lines but this line was outputted on STDERR - ohai\n")  # noqa E501
 
     @shared_subject
     def _performance(self):
@@ -143,8 +137,9 @@ class Case03_one_too_few(_CaseMethods, unittest.TestCase):
 
     def test_080_message_looks_good(self):
         _actual = self._performance()
-        self.assertEqual(_actual.message,
-          'at end of input, expecting any line on STDERR')
+        self.assertEqual(
+            _actual.message,
+            'at end of input, expecting any line on STDERR')
 
     @shared_subject
     def _performance(self):
@@ -167,8 +162,9 @@ class Case04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
 
     def test_080_message_looks_good(self):
         _actual = self._performance()
-        self.assertEqual(_actual.message,
-          "expected line on STDERR, had STDOUT: cha cha\n")
+        self.assertEqual(
+            _actual.message,
+            "expected line on STDERR, had STDOUT: cha cha\n")
 
     @shared_subject
     def _performance(self):
@@ -190,8 +186,9 @@ class Case05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
 
     def test_080_message_looks_good(self):
         _actual = self._performance()
-        self.assertEqual(_actual.message,
-          "expected (+), had (-):\n+ bar\n- biz\n" )
+        self.assertEqual(
+            _actual.message,
+            "expected (+), had (-):\n+ bar\n- biz\n")
 
     @shared_subject
     def _performance(self):
@@ -214,8 +211,9 @@ class Case06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
 
     def test_080_message_looks_good(self):
         _actual = self._performance()
-        self.assertEqual(_actual.message,
-          "expected to match regexp (+), had (-):\n+ /^baz$/\n-  baz\n")
+        self.assertEqual(
+            _actual.message,
+            "expected to match regexp (+), had (-):\n+ /^baz$/\n-  baz\n")
 
     @shared_subject
     def _performance(self):
@@ -229,7 +227,6 @@ class Case06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
 
     def _expectation(self):
         return self._two_stderr_line_certain_regexp_expectation()
-
 
 
 class _SingleFailExpecter:  # :#here2
@@ -286,7 +283,6 @@ class _SingleFailExpecter:  # :#here2
         if not self.did:
             raise Exception('did not fail')
         return self
-
 
 
 newline = "\n"

@@ -31,30 +31,19 @@ tokens start with dashes.)
 we follow [#006.regression-order] in naming the test cases and test methods
 """
 
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-
-from game_server_test.generic_CLI_helper import(
-  CLI_CaseMethods,
-  the_empty_ARGV,
-  ARGV,
-  PROGRAM_NAME,
-  NEWLINE,
-)
-
-
-import game_server_test.helper as helper
-
-shared_subject = helper.shared_subject
-memoize = helper.memoize
+import _init  # noqa: F401
+from script_lib.test_support.generic_CLI_helper import (
+        CLI_CaseMethods,
+        the_empty_ARGV,
+        ARGV,
+        PROGRAM_NAME,
+        NEWLINE,
+        )
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
+import unittest
 
 
 class _CommonCase(CLI_CaseMethods, unittest.TestCase):
@@ -92,7 +81,7 @@ class Case0_no_args(_CommonCase):
         self.magnetic_call_happens_()
 
     def test_050_second_line_says_usage(self):
-        self._this_line_says_usage('second_line');
+        self._this_line_says_usage('second_line')
 
     def test_060_first_line_says_this(self):
         _actual_line = self.magnetic_call_.first_line
@@ -119,7 +108,7 @@ class Case1_1_strange_subparser_name(_CommonCase):
         self.magnetic_call_has_exitstatus_of_common_error_()
 
     def test_050_one_line_says_usage(self):
-        self.one_line_says_usage_();
+        self.one_line_says_usage_()
 
     def test_060_main_line_says_this(self):
         self.main_line_says_this_(
@@ -132,7 +121,7 @@ class Case1_1_strange_subparser_name(_CommonCase):
 
     @ARGV
     def ARGV_(self):
-        return [ 'fhqwhgads' ]
+        return ['fhqwhgads']
 
 
 class Case1_2_strange_option(_CommonCase):
@@ -159,7 +148,7 @@ class Case1_2_strange_option(_CommonCase):
 
     @ARGV
     def ARGV_(self):
-        return [ '-x', '--another', '--etc' ]
+        return ['-x', '--another', '--etc']
 
 
 class Case1_3_good_sub_command(_CommonCase):
@@ -180,11 +169,12 @@ class Case1_3_good_sub_command(_CommonCase):
 
     @ARGV
     def ARGV_(self):
-        return [ 'foo-bar' ]
+        return ['foo-bar']
+
 
 @memoize
 def _foo_bar_usage_line():
-  return 'usage: %s [-h] {foo-bar,biff-baz} ...%s' % (PROGRAM_NAME, NEWLINE)
+    return 'usage: %s [-h] {foo-bar,biff-baz} ...%s' % (PROGRAM_NAME, NEWLINE)
 
 
 STDERR = 'STDERR'

@@ -247,7 +247,7 @@ def _sanity_check_function_parameter(param):
 
 
 def _my_exception(msg):  # #copy-pasted
-    from game_server import Exception as MyException
+    from modality_agnostic import Exception as MyException
     return MyException(msg)
 
 

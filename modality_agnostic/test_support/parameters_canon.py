@@ -1,8 +1,13 @@
-from game_server_test.helper import magnetics
+"""the "parameters cannon" is a collection of formal parameters
+
+representing the most common use-cases, useful in testing.
+"""
+
 
 from modality_agnostic.memoization import (
         memoize,
         )
+
 
 class command_modules:  # used as namespace yikes
 
@@ -15,11 +20,11 @@ class command_modules:  # used as namespace yikes
             def desc_f(o, style):
                 o('howdy ho')
 
-            mag = magnetics.parameter()
+            mag = _parameter()
             PARAMETERS = {
                 'reqo_listo': mag.SELF(
-                    argument_arity = mag.arities.REQUIRED_LIST,
-                    description = desc_f,
+                    argument_arity=mag.arities.REQUIRED_LIST,
+                    description=desc_f,
                  ),
             }
         return _command_via_fake_module(MyModule)
@@ -35,15 +40,15 @@ class command_modules:  # used as namespace yikes
                     o("«desc for parm '%s'»" % name)
                 return f
 
-            mag = magnetics.parameter()
+            mag = _parameter()
             PARAMETERS = {
                 'listo_boyo': mag.SELF(
-                    argument_arity = mag.arities.OPTIONAL_LIST,
-                    description = fake_desc('boyo'),
+                    argument_arity=mag.arities.OPTIONAL_LIST,
+                    description=fake_desc('boyo'),
                  ),
                 'wingo_wanno': mag.SELF(
-                    argument_arity = mag.arities.REQUIRED_FIELD,
-                    description = fake_desc('wanno'),
+                    argument_arity=mag.arities.REQUIRED_FIELD,
+                    description=fake_desc('wanno'),
                  ),
             }
         return _command_via_fake_module(MyModule)
@@ -58,11 +63,11 @@ class command_modules:  # used as namespace yikes
                 o('i am opto fieldo')
                 o('line 2 '+style.em('hello'))
 
-            mag = magnetics.parameter()
+            mag = _parameter()
             PARAMETERS = {
                 'opto_fieldo': mag.SELF(
-                    argument_arity = mag.arities.OPTIONAL_FIELD,
-                    description = desc_f,
+                    argument_arity=mag.arities.OPTIONAL_FIELD,
+                    description=desc_f,
                  ),
             }
         return _command_via_fake_module(MyModule)
@@ -76,11 +81,11 @@ class command_modules:  # used as namespace yikes
             def desc_f(o, style):
                 o('ohai mami')
 
-            mag = magnetics.parameter()
+            mag = _parameter()
             PARAMETERS = {
                 'this_flag': mag.SELF(
-                    argument_arity = mag.arities.FLAG,
-                    description = desc_f,
+                    argument_arity=mag.arities.FLAG,
+                    description=desc_f,
                  ),
             }
         return _command_via_fake_module(MyModule)
@@ -129,13 +134,23 @@ class command_modules:  # used as namespace yikes
 
 
 def _command_via_fake_module(cls):
-    return magnetics.command().SELF(
-        command_module = cls,
-        name = 'my_command',
+    return _command().SELF(
+        command_module=cls,
+        name='my_command',
     )
 
 
 def _generic_parameter():
-  return magnetics.command()._default_formal_parameter()
+    return _command()._default_formal_parameter()
+
+
+def _command():
+    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    return x
+
+
+def _parameter():
+    import modality_agnostic.magnetics.parameter_via_definition as x
+    return x
 
 # #born.

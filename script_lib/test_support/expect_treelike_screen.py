@@ -40,9 +40,11 @@ but we are letting this issue incubate for now.
 :[#014]
 """
 
+
 from modality_agnostic.memoization import (
         memoize,
         )
+
 
 def tree_via_line_stream(line_st):
 
@@ -51,6 +53,7 @@ def tree_via_line_stream(line_st):
 
     if scn.has_current_token:
         return __tree_when_one_or_more_lines(scn)
+
 
 def __tree_when_one_or_more_lines(scn):
 
@@ -124,11 +127,13 @@ def __tree_when_one_or_more_lines(scn):
             if not scn.has_current_token:
                 break
 
-    _l = lambda: scn.current_token
+    def _l():
+        return scn.current_token
     state = _StateMachine(_l, _this_one_state_machine_definition())
     __main_loop()
     _tree = state.end_of_input()
     return _tree
+
 
 @memoize
 def _this_one_state_machine_definition():
@@ -167,6 +172,7 @@ def _this_one_state_machine_definition():
         },
     }
 
+
 class _StateMachine:
     """(the more abstract parts of this could certainly be abstracted out..)
 
@@ -177,7 +183,7 @@ class _StateMachine:
 
         self._current_line_function = curr_tok_f
         self._use_the_special_reference_line_for_nothingness()
-        self._stack = [ _StackFrame() ]
+        self._stack = [_StackFrame()]
 
         self._current_state_name = 'nothingness'
         self._states = states_d
@@ -194,11 +200,11 @@ class _StateMachine:
         # self._add_indeterminate_line_to_branch_node()
         self._use_current_line_as_indeterminate_line_and_reference_line()
 
-    def from__indeterminate_line__to__indeterminate_line__because__more_indent(self):
+    def from__indeterminate_line__to__indeterminate_line__because__more_indent(self):  # noqa: E501
         self._begin_branch_node_with_indeterminate_line_as_header_line()
         self._use_current_line_as_indeterminate_line_and_reference_line()
 
-    def from__indeterminate_line__to__indeterminate_line__because__less_indent(self):
+    def from__indeterminate_line__to__indeterminate_line__because__less_indent(self):  # noqa: E501
         self._common_pop()
 
     def from__branch_node__to__nothingness__because__blank_line(self):
@@ -222,13 +228,11 @@ class _StateMachine:
     def from__indeterminate_line__to__closed__because__end_of_input(self):
         return self._common_close()
 
-
     # --
 
     def _common_pop(self):
-        self.__add_indeterminate_line_to_branch_node_and_pop_stack_appropriately()
+        self.__add_indeterminate_line_to_branch_node_and_pop_stack_appropriately()  # noqa: E501
         self._use_current_line_as_indeterminate_line_and_reference_line()
-
 
     def _common_close(self):
         self._add_indeterminate_line_to_branch_node()
@@ -236,18 +240,22 @@ class _StateMachine:
 
     # --
 
-    def __add_indeterminate_line_to_branch_node_and_pop_stack_appropriately(self):
+    def __add_indeterminate_line_to_branch_node_and_pop_stack_appropriately(self):  # noqa: E501
         self._add_indeterminate_line_to_branch_node()
         target_num = self._current_line_function().effective_margin_length
 
-        if _D: print("POPPING STACK down to a guy with an indent of %d HACKING STATE CHANGE" % target_num)
+        if _D:
+            _tmpl = (
+                "POPPING STACK down to a guy with an indent of {}" +
+                "HACKING STATE CHANGE")
+            print(_tmpl.format(target_num))
 
         stack = self._stack
         while True:
             frame = stack.pop()
             this_num = frame.the_effective_margin_length
             if this_num > target_num:
-                # it is normal to see a depth that is deeper than your tareget depth
+                # it is normal to see a depth deeper than your taregt depth
                 pass  # #coverpoint1.1
             elif this_num == target_num:
                 # if the depth of this item we just popped off the stack
@@ -262,7 +270,7 @@ class _StateMachine:
 
     def _common_after_blank_line(self):
 
-        if _D: print("POP STACK down to first frame because blank line")
+        _D and print("POP STACK down to first frame because blank line")
 
         stack = self._stack
         while len(stack) is not 1:
@@ -274,7 +282,9 @@ class _StateMachine:
 
         _line = self._release_indeterminate_line()
 
-        if _D: print("creating and PUSHing branch node with header line: "+_line._match[0])
+        if _D:
+            _tmpl = 'creating and PUSHing branch node with header line: {}'
+            print(_tmpl.format(_line._match[0]))
 
         former_top = self._top_frame()
         next_frame = former_top.__class__()
@@ -284,10 +294,11 @@ class _StateMachine:
 
         self._stack.append(next_frame)
 
-
     def _add_indeterminate_line_to_branch_node(self):
         _line = self._release_indeterminate_line()
-        if _D: print("ACTUALLY adding this line to existing branch node: "+_line._match[0])
+        if _D:
+            _tmpl = 'ACTUALLY adding this line to existing branch node: {}'
+            print(_tmpl.format(_line._match[0]))
         self._top_frame().append_terminal_item(_line)
 
     def _release_indeterminate_line(self):
@@ -313,7 +324,8 @@ class _StateMachine:
         del self.use_this_line_as_reference
         stack = self._stack
         del self._stack
-        if len(self.__dict__) is not 0: OCD()
+
+        None if len(self.__dict__) == 0 else sanity('OCD')
         return stack[0].close_stack()
 
     # --
@@ -322,11 +334,14 @@ class _StateMachine:
         """(decorator)"""
 
         transition_name = f.__name__
+
         def g(self):
             state_name = self._current_state_name
             state_d = self._states[state_name]
             if transition_name in state_d:
-                return self._do_transition(state_d[transition_name], transition_name)
+                return self._do_transition(
+                        state_d[transition_name],
+                        transition_name)
             else:
                 _fmt = "cannot have '{t}' from '{s}'"
                 _msg = _fmt.format(s=state_name, t=transition_name)
@@ -365,6 +380,7 @@ class _ThisDummy:
         self.effective_margin_length = 0
         self.is_blank_line = False
 
+
 _IMAGINARY_LINE_BEFORE_FIRST_LINE = _ThisDummy()
 
 
@@ -378,21 +394,22 @@ class _StackFrame:
         self.children.append(x)
 
     def append_terminal_item(self, x):
-        if not x.is_terminal: sanity()
+        None if x.is_terminal else sanity()
         self.children.append(x)
 
     def close_stack(self):
         lis = self.children
         del self.children
+
         def f(x):
             if x.is_terminal:
                 return x
             else:
                 return x.close_stack()
-        return _BranchNode( [ f(x) for x in lis ] )
+        return _BranchNode([f(x) for x in lis])
 
     @property
-    def the_effective_margin_length(self):  # assume first child is terminal yikes
+    def the_effective_margin_length(self):  # assume 1st child is terminal eek
         return self.children[0].effective_margin_length
 
     @property
@@ -417,7 +434,8 @@ class _ScannedLine:
 
     def __init__(self, line_s):
         match = self.__class__._THIS_ONE_RE.search(line_s)
-        if match is None: outside_of_spec('assume newline terminated for now')
+        if match is None:
+            raise Exception('assumption failed: was not newline terminated')
         self._match = match
 
         margin_s = self.margin_string
@@ -430,7 +448,8 @@ class _ScannedLine:
             else:
                 self.effective_margin_length = 0
         elif content_s is None:
-            raise _my_exception('blank line with trailing whitespace is frowned upon: '+repr(line_s))
+            _tmpl = 'blank line with trailing whitespace is frowned upon: {}'
+            raise _my_exception(_tmpl.format(repr(line_s)))
         elif _TAB in margin_s:
             raise _my_exception('tabs are gonna be annoying because math')
         else:
@@ -438,11 +457,11 @@ class _ScannedLine:
 
         self.is_blank_line = is_blank_line
 
-
     def reader_for_named_group(m):
         """(ad-hoc single-purpose decorator for this classs only)"""
 
         name = m.__name__
+
         def f(self):
             return self._match.group(name)
         return f
@@ -465,8 +484,8 @@ class _ScannedLine:
 
     import re
     _THIS_ONE_RE = re.compile(
-        '^(?P<margin_string>[ \t]+)?'+  # there need not be any, but if there is, etc.
-        '(?P<styled_content_string>[^\n\r]+)?'+  # there need not .. ibid.
+        '^(?P<margin_string>[ \t]+)?' +  # there need not be any
+        '(?P<styled_content_string>[^\n\r]+)?' +  # there need not .. ibid.
         '(?:\n|\r\n?)'
     )
 
@@ -515,7 +534,8 @@ def line_stream_via_big_string(big_s):
     fortunately there's a strong convention, as is suggested by the manpage
     for the unix utility `wc`:
 
-      > A line is defined as a string of characters delimited by a <newline> character
+    > A line is defined as a string of characters
+    > delimited by a <newline> character
 
     this is to say, it appears that terminator (not separator) semantics
     are considered the norm.
@@ -532,8 +552,8 @@ def line_stream_via_big_string(big_s):
     """
 
     import re
-    return( match[0] for match in re.finditer('[^\n]*\n|[^\n]+', big_s) )
-        # (note we aren't even messing with non-unix line-ending formats for now)
+    return (match[0] for match in re.finditer('[^\n]*\n|[^\n]+', big_s))
+    # (note we aren't even messing with non-unix line-ending formats for now)
 
 
 class _scanner_via_iterator:  # #testpoint
@@ -566,8 +586,21 @@ class _scanner_via_iterator:  # #testpoint
 
 
 def _my_exception(msg):  # #copy-pasted
-    from game_server import Exception as MyException
+    from script_lib import Exception as MyException
     return MyException(msg)
+
+
+def cover_me(s):
+    raise _exe('cover me: {}'.format(s))
+
+
+def sanity(s=None):
+    _use_s = 'sanity' if s is None else 'sanity: {}'.format(s)
+    raise _exe(_use_s)
+
+
+def _exe(s):
+    return Exception(s)
 
 
 _EMPTY_S = ''  # ..

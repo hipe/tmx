@@ -38,7 +38,8 @@ possible issues:
 :[#009]
 """
 
-from game_server_test.helper import(
+
+from modality_agnostic.memoization import (
   lazy,
 )
 
@@ -65,16 +66,18 @@ def expect_lines():
 def expect_stderr_lines(f):
     return _Expectation((STDERR, x) for x in f())
 
+
 def expect_stdout_lines(f):
     return _Expectation((STDOUT, x) for x in f())
+
 
 class _Performance:
     """the moneyshot. mainly, expose the proxies for `stdout` and `stderr`."""
 
     def __init__(self, test_case, line_expectations):
 
-        self.stdout = _WriteOnly_IO_Proxy(self._receive_stdout_line);
-        self.stderr = _WriteOnly_IO_Proxy(self._receive_stderr_line);
+        self.stdout = _WriteOnly_IO_Proxy(self._receive_stdout_line)
+        self.stderr = _WriteOnly_IO_Proxy(self._receive_stderr_line)
 
         from collections import deque
         self._deque = deque(line_expectations)
@@ -105,25 +108,23 @@ class _Performance:
 
         if not _ends_in_newline(line):
             _docstring = self.__class__._receive_anticipated_line.__doc__
-            _msg = _docstring.split(NEWLINE)[2].strip()
+            _msg = _docstring.split(_NEWLINE)[2].strip()
             raise Exception(_msg)
 
         exp_line = self._deque.popleft()
 
         if exp_line.which == which:
 
-          tup = exp_line.failure_tuple_against(line)
-          if tup:
-              return self._test_case_fail( * tup )
-          else:
-              pass
+            tup = exp_line.failure_tuple_against(line)
+            if tup is not None:
+                return self._test_case_fail(* tup)
 
         else:
             return self._when_wrong_which(which, line, exp_line)
 
     def finish(self):
         if 0 == len(self._deque):
-            del self._deque  # ensure loud failure if lines written after finish
+            del self._deque  # loud fail if lines written after finish
         else:
             self._when_missing_expected_line()
 
@@ -132,14 +133,14 @@ class _Performance:
         exp_s = _string_via_which(exp_line.which)
 
         fmt = 'expected line on {exp}, had {had}: {line}'
-        dic = { 'had': act_s, 'exp': exp_s, 'line': line }
+        dic = {'had': act_s, 'exp': exp_s, 'line': line}
 
         self._test_case_fail(dic, fmt)
 
     def _when_unexpected_line(self, which, line):
 
-        fmt = 'expecting no more lines but this line was outputted on {which} - {line}'
-        dic = { 'which': _string_via_which(which), 'line': line }
+        fmt = 'expecting no more lines but this line was outputted on {which} - {line}'  # noqa: E501
+        dic = {'which': _string_via_which(which), 'line': line}
 
         self._test_case_fail(dic, fmt)
 
@@ -147,10 +148,10 @@ class _Performance:
 
         exp = self._deque[0]
 
-        _msg = self._flatten_message( * exp.to_tuple_about_expecting())
+        _msg = self._flatten_message(* exp.to_tuple_about_expecting())
 
         fmt = 'at end of input, {expecting_etc}'
-        dic = { 'expecting_etc': _msg }
+        dic = {'expecting_etc': _msg}
 
         self._test_case_fail(dic, fmt)
 
@@ -159,7 +160,7 @@ class _Performance:
 
     def _flatten_message(self, dic, fmt):
         # TODO - here is where we would do i18n with that one function
-        return fmt.format( ** dic )
+        return fmt.format(** dic)
 
 
 class _WriteOnly_IO_Proxy:
@@ -174,7 +175,7 @@ class _Expectation:
     """
 
     def __init__(self, gen):
-         self._these = [ _line_expectation(which, x) for (which, x) in gen ]
+        self._these = [_line_expectation(which, x) for (which, x) in gen]
 
     def to_performance_under(self, test_case):
         return _Performance(test_case, self._these)
@@ -192,7 +193,6 @@ def _line_expectation(which, x):
             return _RegexpBasedLineExpectation(x, which)
     else:
         return _AnyLineExpectation(which)
-
 
 
 class _LineExpectation:
@@ -217,14 +217,13 @@ class _StringBasedLineExpectation(_LineExpectation):
     def failure_tuple_against(self, line):
         if self._string != line:
             fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume [#here.B]
-            dic = { 'had': line, 'exp': self._string }
+            dic = {'had': line, 'exp': self._string}
             return (dic, fmt)
 
     def to_tuple_about_expecting(self):
         fmt = 'expecting on {which} - {expected_line}'
-        dic = { 'which': self._which_as_string(), 'expected_line': self._string }
+        dic = {'which': self._which_as_string(), 'expected_line': self._string}
         return (dic, fmt)
-
 
 
 class _RegexpBasedLineExpectation(_LineExpectation):
@@ -236,18 +235,18 @@ class _RegexpBasedLineExpectation(_LineExpectation):
     def failure_tuple_against(self, line):
         if not self._re.search(line):
             fmt = "expected to match regexp (+), had (-):\n+ /{pat}/\n- {had}"
-            dic = { 'had': line, 'pat': self._re.pattern }
+            dic = {'had': line, 'pat': self._re.pattern}
             return (dic, fmt)
 
     def to_tuple_about_expecting(self):
         fmt = 'expecting on {which} a string matching /{pat}/'
-        dic = { 'which': self._which_as_string(), 'pat': self._re.pattern }
+        dic = {'which': self._which_as_string(), 'pat': self._re.pattern}
         return (dic, fmt)
 
 
 def _to_tuple_about_expecting_any_line(self):
     fmt = 'expecting any line on {which}'
-    dic = { 'which': self._which_as_string() }
+    dic = {'which': self._which_as_string()}
     return (dic, fmt)
 
 
@@ -278,30 +277,33 @@ class _AnyLineExpectation(_LineExpectation):
     to_tuple_about_expecting = _to_tuple_about_expecting_any_line
 
 
-
-
 def _ends_in_newline(line):
-  return _NEWLINE == line[-1]
+    return _NEWLINE == line[-1]
 
 
 def _string_via_which(d):  # #todo
-    if   2 == d: return 'STDOUT'
-    elif 3 == d: return 'STDERR'
-    elif 1 == d: return 'STDIN'
+    return _string_via_which_hash[d]
+
+
+_string_via_which_hash = {
+        1: 'STDIN',
+        2: 'STDOUT',
+        3: 'STDERR',
+        }
 
 
 @lazy
 def _which_via_string():
     # #todo - there has to be a better way
     these = {
-      'STDOUT' : STDOUT,
-      'STDERR' : STDERR,
-      'STDIN'  : STDIN,
+      'STDOUT': STDOUT,
+      'STDERR': STDERR,
+      'STDIN': STDIN,
     }
+
     def f(s):
         return these[s]
     return f
-
 
 
 _NEWLINE = "\n"

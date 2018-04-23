@@ -1,18 +1,9 @@
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
+import _init  # noqa: F401
 from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
         memoize,
         )
-
-from game_server_test.helper import shared_subject
+import unittest
 
 
 class _CommonCase(unittest.TestCase):
@@ -49,7 +40,8 @@ class _CommonCase(unittest.TestCase):
         self._same_expect(oai, s_a)
 
     def _in_details_expect_positionals(self, *s_a):
-        _pai = _lib().positional_args_index_via_section_index(self._section_index())
+        _act = self._section_index()
+        _pai = _lib().positional_args_index_via_section_index(_act)
         self._same_expect(_pai, s_a)
 
     def _same_expect(self, xai, s_a):
@@ -64,8 +56,9 @@ class _CommonCase(unittest.TestCase):
     # -- builders
 
     def _build_optional_args_index(self):
-        oai = _lib().optional_args_index_via_section_index(self._section_index())
-        del oai['--help']  # tacit assertion that it exists
+        _act = self._section_index()
+        oai = _lib().optional_args_index_via_section_index(_act)
+        del oai['--help']  # tacit assertion that it exists, as well as norm
         return oai
 
     def _section_index_via_chunks(self):
@@ -143,11 +136,11 @@ class Case030_category_2_optional_field_NOTE(_CommonCase):
     def test_020_in_details_appears_as_OPTIONAL(self):
         self.assertIsNotNone(self._this_one_parsed_option_detail)
 
-    def test_025_in_details_the_optional_field_names_its_parameter_sensically(self):
+    def test_025_in_details_the_optional_field_names_its_parameter_sensically(self):  # noqa: E501
         _guy = self._this_one_parsed_option_detail
         self.assertEqual('FIELDO', _guy.args_tail_of_long)
 
-    def test_027_in_details_the_optional_does_not_automatically_get_a_short_switch(self):
+    def test_027_in_details_the_optional_does_not_automatically_get_a_short_switch(self):  # noqa: E501
         _guy = self._this_one_parsed_option_detail
         self.assertIsNone(_guy.main_short_switch)
 
@@ -163,8 +156,9 @@ class Case030_category_2_optional_field_NOTE(_CommonCase):
     @shared_subject
     def _optional_args_index(self):
         return self._build_optional_args_index()
-        oai = _lib().optional_args_index_via_section_index(self._section_index())
-        del oai['--help']  # tacit assertion that it exists
+        _act = self._section_index()
+        oai = _lib().optional_args_index_via_section_index(_act)
+        del oai['--help']  # tacit assertion that it exists, as well as norm
 
     @shared_subject
     def _section_index(self):
@@ -187,7 +181,8 @@ class Case040_category_3_optional_list(_CommonCase):
         self._in_details_expect_positionals('listo-boyo', 'wingo-wanno')
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('[listo-boyo [listo-boyo ...]] wingo-wanno')
+        _exp = '[listo-boyo [listo-boyo ...]] wingo-wanno'
+        self._in_usage_expect_interesting_tail(_exp)
 
     @shared_subject
     def _section_index(self):
@@ -223,15 +218,18 @@ class Case050_category_5_required_list(_CommonCase):
     def command_module_(self):
         return _command_modules().category_5_required_list_minimal()
 
+
 @memoize
 def _lib():
-    from game_server_test import expect_help_screen as x
+    import script_lib.test_support.expect_help_screen as x
     return x
 
 
 @memoize
 def _command_modules():
-    from game_server_test.parameters_canon import command_modules as x
+    from modality_agnostic.test_support.parameters_canon import (
+            command_modules as x,
+            )
     return x
 
 

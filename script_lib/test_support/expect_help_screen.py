@@ -10,11 +10,11 @@ import re
 
 def optional_args_index_via_section_index(si):
     cx = si['optional arguments'].children
-    if len(cx) is not 2 : needs_work()
+    None if len(cx) == 2 else cover_me('needs work')
     cx = cx[1].children
     d = {}
     for ch in cx:
-        if not ch.is_terminal: fine_but_cover()
+        None if ch.is_terminal else cover_me('fine but cover')
         _use_s = ch.styled_content_string
         o = __option_line_challenge_mode(_use_s)
         d[o.main_long_switch] = o
@@ -23,17 +23,17 @@ def optional_args_index_via_section_index(si):
 
 def positional_args_index_via_section_index(si):
     cx = si['positional arguments'].children
-    if len(cx) is not 2 : needs_work()
+    None if len(cx) == 2 else cover_me('needs work')
     xch = cx[1]
-    # we can't know the structure of the above beforehand so we normalize
-    # it here by promoting terminals to branch node-ishes (#provision #[#014.A])
+    # we can't know the structure of the above beforehand so we normalize it
+    # here by promoting terminals to branch node-ishes (#provision #[#014.A])
     if xch.is_terminal:
         cx = [xch]
     else:
         cx = cx[1].children
     d = {}
     for ch in cx:
-        if not ch.is_terminal: fine_but_cover()
+        None if ch.is_terminal else cover_me('fine but cover')
         _use_s = ch.styled_content_string
         _match = re.search('^([^ ]+)[ ]{2,}', _use_s)  # ..
         d[_match[1]] = ch
@@ -78,7 +78,7 @@ def __option_line_challenge_mode(line_s):
                 _msg = __build_assertion_failure_message(f, rx_s)
                 raise _my_exception(_msg)
             else:
-               return x
+                return x
         return g
 
     @assertify
@@ -100,7 +100,9 @@ def __option_line_challenge_mode(line_s):
             elif num is 1:
                 return s_a[0]
             else:
-                cover_me('if you use groups in your scan regex, you can only have one group')
+                cover_me(
+                      'if you use groups in your scan regex, ' +
+                      'you can only have one group')
 
     def _skip(rx_s):
         match = _match(rx_s)
@@ -129,12 +131,15 @@ def __option_line_challenge_mode(line_s):
         return _fmt.format(verb=verb, rx_s=rx_s, excerpt=excerpt)
 
     def _advance_cursor_to(num):
-        nonlocal cursor ; cursor = num
+        nonlocal cursor
+        cursor = num
 
     _match_obj = re.search('^((?:[^ ]|[ ](?![ ]))+)(?:[ ]{2,}(.+))?$', line_s)
     haystack_s, desc_first_line = _match_obj.groups()
 
-    out = {} ; cursor = 0
+    out = {}
+    cursor = 0
+
     return __main()
 
 
@@ -151,10 +156,10 @@ def __my_named_tuple_for_above():
 
 def section_index_via_chunks(s_a):
 
-    if len(s_a) is not 1: see_me()
-        # the above would require a flat map; read: lowlevel stream tooling & testing
+    None if len(s_a) == 1 else cover_me('see me')
+    # ☝️ would require a flat map; read: lowlevel stream tooling & testing
 
-    import game_server_test.expect_treelike_screen as mod
+    import script_lib.test_support.expect_treelike_screen as mod
     _line_st = mod.line_stream_via_big_string(s_a[0])
     tree = mod.tree_via_line_stream(_line_st)
     cx = tree.children
@@ -178,13 +183,12 @@ def __header_line_via_node(node):
 
 def help_screen_chunks_via_test_case(tc):  # tc=test case
 
-    from game_server_test.helper import magnetics
-
     _cmd = tc.command_module_()
 
-    _mag = magnetics.ARGV()
+    import script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream as _mag  # noqa: E501
 
-    _do_debug = lambda: tc.do_debug
+    def _do_debug():
+        return tc.do_debug
 
     def _debug_IO():
         import sys
@@ -193,9 +197,9 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
     mock_IO = _QuickDirty_IO_Mock(_do_debug, _debug_IO)
 
     _oo = _mag.interpretation_builder_via_modality_resources(
-        ARGV = ['ohai', 'my-command', '--help'],
-        stdout = None,
-        stderr = mock_IO,
+        ARGV=['ohai', 'my-command', '--help'],
+        stdout=None,
+        stderr=mock_IO,
     )
 
     rslt = _oo.interpretation_via_command_stream([_cmd])
@@ -232,7 +236,11 @@ class _QuickDirty_IO_Mock():
 
 
 def _my_exception(msg):  # #copy-pasted
-    from game_server import Exception as MyException
+    from script_lib import Exception as MyException
     return MyException(msg)
+
+
+def cover_me(s):
+    raise Exception('cover me - {}'.format(s))
 
 # #born.

@@ -1,12 +1,11 @@
 """helper for testing CLI in a generic, magnetic-agnostic way
 """
 
-import game_server_test.helper as helper
 
-
-stream_via_memoized_array = helper.stream_via_memoized_array
-shared_subject = helper.shared_subject
-memoize = helper.memoize
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
 
 
 def ARGV(f):
@@ -28,6 +27,27 @@ def ARGV(f):
         a.insert(0, PROGRAM_NAME)
         return a
     return g
+
+
+def stream_via_memoized_array(f):
+    """EXPERIMENTAL decorator"""
+
+    def permanent_f(some_self):
+        return mutable_function(some_self)
+
+    def at_first_call_only(self_FROM_FIRST_CALL):
+
+        a = f(self_FROM_FIRST_CALL)  # imagine frozen. a long-running
+
+        def at_subsequent_calls(_):
+            return iter(a)
+
+        nonlocal mutable_function
+        mutable_function = at_subsequent_calls
+        return at_subsequent_calls(None)
+
+    mutable_function = at_first_call_only
+    return permanent_f
 
 
 class CLI_CaseMethods:
@@ -73,16 +93,16 @@ class CLI_CaseMethods:
     def interpretation_when_expected_(self, num_lines, which):
 
         def f(sout, serr):
-          return self._interpretation__CLI(sout, serr)
+            return self._interpretation__CLI(sout, serr)
 
         return self._same_when_expected(f, num_lines, which)
 
     def _same_when_expected(self, f, num_lines, which):
 
-        s_a, f_a = self._build_recording_list_and_expectation_list__CLI(num_lines)
-        from game_server_test import expect_STDs
+        s_a, f_a = self._build_recording_list_and_expectation_list__CLI(num_lines)  # noqa: E501
+        from script_lib.test_support import expect_STDs
 
-        _expectation = expect_STDs.expect_lines( (lambda: f_a), which )
+        _expectation = expect_STDs.expect_lines((lambda: f_a), which)
         perf = _expectation.to_performance_under(self)
 
         _sout, _serr = self._appropriate_stdout_and_stderr__CLI(perf)
@@ -92,20 +112,18 @@ class CLI_CaseMethods:
         perf.finish()
         return _Invocation(interpretation_result, s_a)
 
-
     def result_when_expecting_no_output_or_errput_(self):
 
         return self._interpretation__CLI(None, None)
-
 
     def _interpretation__CLI(self, stdout, stderr):
         _argv = self.ARGV_()
         _command_st = self.command_stream_()
 
-        _bldr = self.main_magnetic_().interpretation_builder_via_modality_resources(
-          ARGV = _argv,
-          stdout = stdout,
-          stderr = stderr,
+        _bldr = self.main_magnetic_().interpretation_builder_via_modality_resources(  # noqa: E501
+          ARGV=_argv,
+          stdout=stdout,
+          stderr=stderr,
         )
         return _bldr.interpretation_via_command_stream(_command_st)
 
@@ -122,11 +140,10 @@ class CLI_CaseMethods:
     def _debugging_IO__CLI(self, upstream_IO, format):
         import sys
         return _MinimalIOTee(
-          upstream_IO = upstream_IO,
-          IO_for_debugging = sys.stderr,
-          format = format,
+          upstream_IO=upstream_IO,
+          IO_for_debugging=sys.stderr,
+          format=format,
         )
-
 
     def _build_recording_list_and_expectation_list__CLI(self, num_lines):
         """given an expected number of lines, result in two components:
@@ -138,24 +155,24 @@ class CLI_CaseMethods:
         the "expectation list" models each expectation for each line..
         """
         s_a = []
+
         def f(line):
             s_a.append(line)
 
-        _f_a = [ f for _ in helper.iterator_via_times(num_lines) ]
-          # the above could just as soon be a generator expression (right?)
+        _f_a = [f for _ in _iterator_via_times(num_lines)]
+        # the above could just as soon be a generator expression (right?)
 
         return s_a, _f_a
 
-
     def main_magnetic_(self):
-        import game_server._magnetics.interpretation_via_command_stream_and_ARGV as x  # noqa: E501
+        import script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream as x  # noqa: E501
         return x
 
     # --
 
     @stream_via_memoized_array
     def stream_with_two_commands_(self):
-      return [self._command_one__CLI(), self._command_two__CLI()]
+        return [self._command_one__CLI(), self._command_two__CLI()]
 
     # --
 
@@ -246,8 +263,14 @@ class _MinimalIOTee:  # TODO move this
 def _OK_interpretation_result():
     class _OK_Result:
         def __init__(self):
-          self.OK = True
+            self.OK = True
     return _OK_Result()
+
+
+def _iterator_via_times(num):
+    # #todo
+    for i in range(0, num):
+        yield i
 
 
 @memoize
@@ -256,8 +279,11 @@ def the_empty_ARGV():
     return []  # EMPTY_A
 
 
-NEWLINE = "\n"  #: it's not about saving memory, it's about tracking patterns
+def cover_me(s):
+    raise Exception(s)
 
+
+NEWLINE = "\n"  #: it's not about saving memory, it's about tracking patterns
 PROGRAM_NAME = 'DTF-app'
 
 

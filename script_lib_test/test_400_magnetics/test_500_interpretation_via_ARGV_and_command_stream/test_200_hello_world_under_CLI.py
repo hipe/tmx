@@ -1,23 +1,12 @@
-import os, sys, unittest
-
-# boilerplate
-_ = os.path
-path = _.dirname(_.dirname(_.dirname(_.abspath(__file__))))
-a = sys.path
-if a[0] != path:
-    a.insert(0, path)
-# end boilerplate
-
-
-from game_server_test.generic_CLI_helper import(
-  CLI_CaseMethods,
-  ARGV,
+import _init  # noqa: F401
+from script_lib.test_support.generic_CLI_helper import (
+        CLI_CaseMethods,
+        ARGV,
 )
-
-
-import game_server_test.helper as helper
-
-shared_subject = helper.shared_subject
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        )
+import unittest
 
 
 class Case010_ohai(CLI_CaseMethods, unittest.TestCase):
