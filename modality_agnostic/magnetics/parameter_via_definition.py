@@ -181,13 +181,9 @@ class _MyArity:
         self.stop = stop
 
 
-# == BEGIN #callable-module-hack
-
 _SELF.arities = _arities
 import sys  # noqa E402
-sys.modules[__name__] = _SELF
-
-# == END
+sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
 # #history-A.2: (can be temporary) for not covered
 # #history-A.1: large doc spike of parameter modeling theory

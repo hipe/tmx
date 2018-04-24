@@ -209,12 +209,8 @@ def _name_via_slug(name):
     return name.replace('-', '_')  # DASH, UNDERSCORE
 
 
-# == BEGIN #callable-module-hack
-
 import sys  # noqa E402
-sys.modules[__name__] = _SELF
-
-# == END
+sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
 # #history-A.2 (as referenced, can be temporary)
 # #abstracted.

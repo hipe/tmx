@@ -8,17 +8,18 @@ def dangerous_memoize(f):
     """
 
     def g(some_self):
-        return f_pointer[0](some_self)
+        return mutable_f(some_self)
 
     def initially(orig_self):
         def subsequently(_):
             return x
-        f_pointer[0] = None
+        nonlocal mutable_f
+        mutable_f = None
         x = f(orig_self)
-        f_pointer[0] = subsequently
+        mutable_f = subsequently
         return g(None)
 
-    f_pointer = [initially]
+    mutable_f = initially
     return g
 
 
@@ -36,14 +37,15 @@ def lazy(f_f):
     """
 
     def g(*a):
-        return f_pointer[0](*a)
+        return mutable_f(*a)
 
     def f_initially(*a):
         f = f_f()
-        f_pointer[0] = f
+        nonlocal mutable_f
+        mutable_f = f
         return f(*a)
 
-    f_pointer = [f_initially]
+    mutable_f = f_initially
     return g
 
 
@@ -59,16 +61,18 @@ def memoize(f):
         def f_subsequently():
             return x
         x = f()
-        f_pointer[0] = f_subsequently
+        nonlocal mutable_f
+        mutable_f = f_subsequently
         return g()
 
     def g():
-        return f_pointer[0]()
+        return mutable_f()
 
-    f_pointer = [f_initially]
+    mutable_f = f_initially
     return g
 
 
+# #history-A.4: fun bit of trivia, things were even uglier before nonlocal
 # #history-A.3: a memoizer method moved here from elsewhere
 # #history-A.2: a memoizer method moved here from elsewhere
 # #history-A.1: a memoizer method moved here from elsewhere

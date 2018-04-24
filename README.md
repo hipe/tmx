@@ -129,7 +129,7 @@ at the moment our tests fall into two categories:
 
 (using [these aliases](#aliases)):
 
-    pud modality_agnostic_test && pud script_lib_test && pud game_server_test && pud grep_dump_test && pud upload_bot_test
+    pud modality_agnostic_test && pud script_lib_test && pud sakin_agac_test && pud game_server_test && pud grep_dump_test && pud upload_bot_test
 
 
 
@@ -198,6 +198,7 @@ then in your 'main' terminal:
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.G]                   |       | track callable modules
 |[#008.F]                   | #vape | machine-generated tests
 |[#008.E]                   | #wish | gettext uber alles
 |[#008.D]                   | #wish | strongly typed python yikes

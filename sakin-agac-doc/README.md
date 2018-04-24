@@ -23,6 +23,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|<a name=408></a>[\[#408\]] |       | decompose the algorithm
 |<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
 |<a name=406></a>[\[#406\]] |       | strategic dependency graph
 |<a name=405></a>[\[#405\]] |       | play
@@ -33,6 +34,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 
 
+[\[#408\]]: 408-decompose-the-synchronization-algorithm.md
 [\[#407\]]: 407-collection-synchronization-algorithm.md
 [\[#406\]]: 406-strategic-dependency-graph.dot
 [\[#405\]]: 405-play.md

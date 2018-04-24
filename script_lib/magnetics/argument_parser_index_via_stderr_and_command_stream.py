@@ -287,12 +287,8 @@ _NEWLINE = '\n'
 _THIS_NAME = 'chosen_sub_command'
 
 
-# == BEGIN #callable-module-hack
-
 import sys  # noqa E402
-sys.modules[__name__] = _SELF
-
-# == END
+sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
 # #history-A.2: MASSIVE exodus
 # #history-A.1: as referenced (can be temporary)

@@ -102,7 +102,6 @@ sub-project: upload files to s3
   syncing for k hong
   sakin syncing (many magnetics, injection interface)
   splinter CLI stuff so it's not so obtuse and monolithic
-  IMPROVE how memoizers work (use nonlocal)
 unify cover me and sanity
 [#012] rename this
 reconcile two listeners
@@ -110,5 +109,3 @@ dashes to underscores is starting to be annoying
 integrate modalically
 integrate agnostically
 implement each part (with tests)
-decompose algorithm into magnetic parts
-write algorithm in pseudocode
