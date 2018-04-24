@@ -23,6 +23,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
 |<a name=406></a>[\[#406\]] |       | strategic dependency graph
 |<a name=405></a>[\[#405\]] |       | play
 |<a name=404></a>[\[#404\]] |       | wiki app dim sum
@@ -32,6 +33,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 
 
+[\[#407\]]: 407-collection-synchronization-algorithm.md
 [\[#406\]]: 406-strategic-dependency-graph.dot
 [\[#405\]]: 405-play.md
 [\[#404\]]: 404-wiki-app-dim-sum.md
