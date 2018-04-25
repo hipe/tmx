@@ -19,8 +19,9 @@ from sakin_agac.magnetics import (
 
 
 _SELF = format_adapter_via_definition(
+        item_via_collision=None,  # doing this in tests too
         item_stream_via_native_stream=None,  # will use default
-        thing_two='hey',
+        natural_key_via_object=None,  # this changes per test suite
         )
 
 

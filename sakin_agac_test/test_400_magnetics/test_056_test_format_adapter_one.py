@@ -30,11 +30,12 @@ def _snapshot_one():
             {'first name': 'jack', 'last name': 'johnson'},
             ]
     # == == ==
-    _format_adapter = _subject_module()
-    _item_stream = _format_adapter.item_stream_via_native_stream(
-            stream=iter(_this),
+
+    _format_adapter_base = _subject_module()
+    _format_adapter = _format_adapter_base.copy_and_edit(
             natural_key_via_object=_natural_key_via_object,
             )
+    _item_stream = _format_adapter.item_stream_via_native_stream(_this)
     return battery.SOME_SNAPSHOT(_item_stream)
 
 

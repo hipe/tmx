@@ -173,7 +173,7 @@ real-world use of this:
 
 
 
-## the innner (main) algorithm (an overview)
+## the inner (main) algorithm (an overview)
 
 we are going to start with targeting a original-centric-ordering.
 

@@ -31,8 +31,9 @@ class Case010_hello(_CommonCase):
 @memoize
 def subject_one():
     return _subject_module()(
+            item_via_collision=None,
             item_stream_via_native_stream=None,
-            thing_two=None,
+            natural_key_via_object=None,
             )
 
 
