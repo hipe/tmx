@@ -13,6 +13,10 @@
    with a format adapter that is totally made up). (requirements for a
    format adapter are many.)
 
+1. magnet: semi-editable DOM-like rows
+
+1. magnet: traverse all lines of the document, but parsed
+
 1. collection-level synchronization as document over a variety of cases
    (that only outputs the new document as a stream of lines! use generator!)
 

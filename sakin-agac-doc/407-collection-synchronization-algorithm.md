@@ -99,7 +99,7 @@ imagined real-world use case this will probbaly suffice for the near term.
 
 
 
-## the outer (document-centric) algorithm (overview)
+## <a name=G></a>the outer (document-centric) algorithm (overview)
 
 in its purest terms, synchronization must not be thought of as always
 having a "document" as the substrate. but in practical terms it may very

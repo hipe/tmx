@@ -1,5 +1,9 @@
 """(algorithm documented (first) exhaustively at [#407])"""
 
+from sakin_agac import (
+        cover_me,
+        )
+
 
 def _SELF(new_item_stream, original_item_stream, item_via_collision):
 
@@ -35,13 +39,6 @@ def __index_the_new_collection(new_item_stream):
             cover_me('[#407.e1]')
         d[k] = item
     return d
-
-
-def cover_me(s):
-    raise _exe('cover me: {}'.format(s))
-
-
-_exe = Exception
 
 
 import sys  # noqa: E402

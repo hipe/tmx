@@ -1,8 +1,10 @@
 """this is *the* [#019.file-type-D]. see."""
 
+import os.path as os_path
+
 
 def _():
-    from os.path import dirname as dn
+    dn = os_path.dirname
     import sys
 
     a = sys.path
@@ -23,11 +25,19 @@ def _():
     else:
         sanity()
 
+    return (top_test_dir,)
+
 
 def sanity(s='assumption failed'):
     raise Exception(s)
 
 
-_()
+def fixture_file_path(stem):
+    return os_path.join(_top_test_dir, 'fixture-files', stem)
+
+
+(
+    _top_test_dir,
+) = _()
 
 # #born.

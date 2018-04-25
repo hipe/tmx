@@ -9,8 +9,9 @@ class _SELF:
     def __init__(
             self,
             item_via_collision,
-            item_stream_via_native_stream,
             natural_key_via_object,
+            item_stream_via_native_stream=None,
+            MODULE_NAME=None,
             ):
 
         if item_via_collision is not None:
@@ -20,6 +21,8 @@ class _SELF:
 
         if natural_key_via_object is not None:
             self._natural_key_via_object = natural_key_via_object
+
+        self.MODULE_NAME = MODULE_NAME
 
     # == BEGIN experiment
 
