@@ -28,6 +28,21 @@ def _():
     return (top_test_dir,)
 
 
+def minimal_listener_spy():
+    """similar elsewhere. this one is minimal."""
+
+    def listener(*a):
+        None if 'error' == a[0] else sanity(a[0])
+        None if 'expression' == a[1] else sanity(a[1])
+        a[2](o)
+
+    def o(s):
+        mutable_message_array.append(s)
+
+    mutable_message_array = []
+    return (mutable_message_array, listener)
+
+
 def sanity(s='assumption failed'):
     raise Exception(s)
 
