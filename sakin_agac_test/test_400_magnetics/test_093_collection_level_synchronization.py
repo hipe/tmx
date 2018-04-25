@@ -1,9 +1,11 @@
 # covers: sakin_agac/magnetics/synchronized_stream_via_new_stream_and_original_stream  # noqa: E501
 
-import _init  # noqa: F401
+from _init import (
+        sanity,
+        )
 from modality_agnostic.memoization import (
-       memoize,
-       )
+        memoize,
+        )
 import unittest
 
 
@@ -107,8 +109,7 @@ def format_adapter():
 def _item_via_collision(new_item, orig_item):
 
     k = orig_item.natural_key
-    if new_item.natural_key != k:
-        raise Exception('sanity')
+    None if new_item.natural_key == k else sanity()
 
     return orig_item.__class__(
             natural_key=k.upper(),
