@@ -90,6 +90,10 @@ class _RowDOM(_BranchDOM):
         self.children = tuple(a)
         self.cels_count = num_cels
 
+    def to_line(self):
+        _s_a = [ch.to_string() for ch in self.children]
+        return ''.join(_s_a)
+
     def cel_at_offset(self, offset):
         if offset < 0 or offset >= self.cels_count:
             cover_me('out of range')

@@ -1,3 +1,9 @@
+def release(self, var):
+    x = getattr(self, var)
+    delattr(self, var)
+    return x
+
+
 def cover_me(s):
     raise _exe('cover me: {}'.format(s))
 

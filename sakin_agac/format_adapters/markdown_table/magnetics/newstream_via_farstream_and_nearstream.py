@@ -3,6 +3,7 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
+        release,
         )
 from modality_agnostic import (
         streamlib as _streamlib,
@@ -151,20 +152,7 @@ class _CustomProcessor:
 
     def _TRANSITION_TO_CRAZY_TOWN(self):
 
-        def my_item_generator():
-            hit_the_end = True
-            for tup in self._tagged_stream:
-                if 'business_object_row' == tup[0]:
-                    _item = _Item(tup[1])
-                    yield _item
-                    continue
-                hit_the_end = False
-                self._TUP_ON_DECK = tup
-                break
-            if hit_the_end:
-                self._close()
-
-        _near_item_stream = my_item_generator()
+        _near_item_stream = self.__build_near_item_stream()
 
         _this_etc = self._will_break_this_up()
 
@@ -177,6 +165,39 @@ class _CustomProcessor:
 
         self._state = 'OBJECT_ROWS'
         return self.gets()
+
+
+    def __build_near_item_stream(self):
+
+        _Item = self.__build_near_item_class()
+
+        hit_the_end = True
+        for tup in self._tagged_stream:
+            typ, x = tup
+            if 'business_object_row' == typ:
+                _item = _Item(x)
+                yield _item
+            else:
+                hit_the_end = False
+                self._TUP_ON_DECK = tup
+                break
+        if hit_the_end:
+            self._close()
+
+    def __build_near_item_class(self1):
+
+        class _NearItem:
+            """
+            #[#401.B] track item classes
+            """
+
+            def __init__(self2, row_DOM):
+                self2.ROW_DOM_ = row_DOM
+
+            def to_line(self2):
+                return self2.ROW_DOM_.to_line()
+
+        return _NearItem
 
     def _will_break_this_up(self):
         schema_row = self._release('_schema_row')
@@ -191,7 +212,7 @@ class _CustomProcessor:
             self._state = 'TAIL_LINES'
             return self._release('_TUP_ON_DECK')
         else:
-            return ('takashi', ('pretending i am a row, look closeley {}'.format(x)))  # noqa: ES501
+            return ('takashi', x)
 
     @_could_end_at_any_time
     def TAIL_LINES(self, tup):
@@ -201,20 +222,7 @@ class _CustomProcessor:
         del(self._tagged_stream)
         del(self._state)
 
-    def _release(self, var):
-        x = getattr(self, var)
-        delattr(self, var)
-        return x
-
-
-class _Item:
-    """welp
-
-    #[#401.B] track item classes
-    """
-
-    def __init__(self, row_DOM):
-        self.ROW_DOM_ = row_DOM
+    _release = release
 
 
 def _item_via_collision(far_item, near_item):
