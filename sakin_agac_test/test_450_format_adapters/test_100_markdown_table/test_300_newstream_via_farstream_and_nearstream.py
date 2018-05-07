@@ -2,6 +2,7 @@
 
 from _init import (
         fixture_file_path,
+        release,
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -106,34 +107,57 @@ def _THIS_THING(native_objects, markdown_file):
             farstream_format_adapter=far_format_adapter,
             )
 
-    TEMPORARY = []
-    current_typ = None
-    current_count = 0
+    import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib
 
-    def step(typ):
-        set_(typ)
-        nonlocal step
-        step = step_normally
+    _wat = lib(_HOLY_SHNAPPS, _MyCustomProcessor())
+    return _wat
 
-    def step_normally(typ):
-        TEMPORARY.append((current_typ, current_count))
-        set_(typ)
 
-    def set_(typ):
-        nonlocal current_typ
-        current_typ = typ
-        nonlocal current_count
-        current_count = 1
+class _MyCustomProcessor:
 
-    for x in _HOLY_SHNAPPS:
-        typ = x[0]
-        if current_typ == typ:
-            current_count += 1
-        else:
-            step(typ)
+    def __init__(self):
+        self._this_list = []
 
-    step('none 2')  # not None, and not an already seen type
-    return tuple(TEMPORARY)
+    def move_from__BEGIN__to__head_line(self):
+        self._current_count = 0
+
+    def head_line(self, x):
+        self._same()
+
+    def move_from__head_line__to__table_schema_line_one_of_two(self):
+        self._move('head_line')
+
+    def table_schema_line_one_of_two(self, x):
+        self._same()
+
+    def move_from__table_schema_line_one_of_two__to__table_schema_line_two_of_two(self):  # noqa: E501
+        self._move('table_schema_line_one_of_two')
+
+    def table_schema_line_two_of_two(self, x):
+        self._same()
+
+    def move_from__table_schema_line_two_of_two__to__takashi(self):
+        self._move('table_schema_line_two_of_two')
+
+    def takashi(self, x):
+        self._same()
+
+    def move_from__takashi__to__tail_line(self):
+        self._move('takashi')
+
+    def tail_line(self, x):
+        self._same()
+
+    def move_from__tail_line__to__END(self):
+        self._move('tail_line')
+        return release(self, '_this_list')
+
+    def _move(self, typ):
+        self._this_list.append((typ, self._current_count))
+        self._current_count = 0
+
+    def _same(self):
+        self._current_count += 1
 
 
 def _natural_key_via_object(x):

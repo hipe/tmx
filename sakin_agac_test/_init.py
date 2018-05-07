@@ -43,12 +43,18 @@ def minimal_listener_spy():
     return (mutable_message_array, listener)
 
 
-def sanity(s='assumption failed'):
-    raise Exception(s)
-
-
 def fixture_file_path(stem):
     return os_path.join(_top_test_dir, 'fixture-files', stem)
+
+
+def release(self, prop):
+    x = getattr(self, prop)
+    delattr(self, prop)
+    return x
+
+
+def sanity(s='assumption failed'):
+    raise Exception(s)
 
 
 (
