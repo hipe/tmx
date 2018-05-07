@@ -19,21 +19,17 @@ class Case010_hello(_CommonCase):
             _subject_module()()
         except TypeError as e_:
             e = e_
-        _yes = 'required positional arguments' in str(e)
+        _yes = 'required positional argument' in str(e)
         self.assertTrue(_yes)
 
     def test_030_the_subject_is_built_with_particular_functions(self):
-        subject_one()
-        subject_one()
         self.assertIsNotNone(subject_one())
 
 
 @memoize
 def subject_one():
     return _subject_module()(
-            item_via_collision=None,
-            item_stream_via_native_stream=None,
-            natural_key_via_object=None,
+            THIS_PRETEND_THING_IS_REQUIRED=None,
             )
 
 

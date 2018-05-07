@@ -93,7 +93,7 @@ class _RowDOM(_BranchDOM):
     def cel_at_offset(self, offset):
         if offset < 0 or offset >= self.cels_count:
             cover_me('out of range')
-        return self.children[0]
+        return self.children[offset]
 
 
 class _CelDOM(_BranchDOM):

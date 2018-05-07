@@ -18,7 +18,11 @@ def _():
     project_dir = dn(top_test_dir)
 
     if test_sub_sub_dir == head:
-        a[0] = project_dir
+        # at #history-A.1: we realized we do not actually want to clobber
+        # the sub-sub dir. if we "pud" the dir (see [#001.aliases]), that
+        # dir must be in the sys path list.
+        # so not this: `a[0] = project_dir` but this:
+        a.insert(0, project_dir)
     elif project_dir == head:
         pass
     else:
@@ -32,4 +36,5 @@ import sakin_agac_test._init as x  # noqa: E402
 sys.modules[__name__] = x
 
 
+# #history-A.1 (can be temporary) as referenced
 # #copy-pasted.

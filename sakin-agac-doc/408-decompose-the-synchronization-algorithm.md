@@ -1,6 +1,23 @@
-# decompose the synchronization algorithm
+# markdown table-targeted synchronization
 
-## overview (regression friendly order)
+## document objective
+
+this document serves dual purposes, one more general and one more specific:
+
+generally, we decompose our [#407] high-level synchronization algorithm
+into code-level modules ("magnetics", usually) that we write one by one.
+
+more specifically, begin to tilt the work towards our target use case:
+markdown-table-targeted synchronization.
+
+
+
+
+## overview: decompose the synchronization algorithm
+
+as an overview, we decompose the synchronization algorithm in a regression
+friendly order. (we may use these points as checklist to correspond to test
+files we write.)
 
 1. get the synchronizer to work with a list of names over an exhaustive
    set of cases. this could require as many as three format adapters:
@@ -27,10 +44,58 @@
    trivial. (will still involve parsing hacks).
 
 
-iterate and come back to here!
+
+
+## freeform discussion: xx xx xx
+
+what we're working up to is _modules_ (in the purest sense)
+that take as input "resource strings" (or something), CHA CHA
+
+LET'S THINK ABOUT CAPABILITIES:
+
+BUT FIRST:
+
+synchronization
+
+  - a collection of new items (let's call it the "far" collection)
+  - a collection of original items (let's call it the "near" collection)
+
+we're gonna just talk about things knowing in advance what we're gonna
+need to do without coming from how to science
+
+so let's look at our COARSE ALGORITHM and try to think of its
+requirements in terms of what it says about the CAPABILITIES we
+might require of the collections.
+
+first, we'll do this of the FAR COLLECTION:
+
+  - ORDERED: we expect the items in the far collection etc
+
+  - NATURAL KEY: each item must be able to produce one
+
+  - (as a detail, any natural key that is not unique in that collection: fail)
+
+  - NAME-VALUE PAIRS: each item, we must be able to model it as such
+    an ordered collection (with any name occuring no more than once)
+
+as far as we know, that's it for the far side.
+
+but note that things get more interesting with the NEAR COLLECTION:
+
+  - HEAD LINES and TAIL LINES: (boring but essential)
+
+  - (we are currently side-stepping the issue of multiple tables in one
+    document.)
+
+  - SCHEMA-ROW: this establishes the ALLOWABLE SET
+
+  - AT LEAST ONE HEURISTIC TEMPLATABLE ROW
+
+x XX xx XX xx
 
 
 
 ## (document-meta)
 
+  - #pending-rename: NNN-markdown-table-targeted-synchronization.md
   - #born.

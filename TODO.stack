@@ -107,5 +107,11 @@ unify cover me and sanity
 reconcile two listeners
 dashes to underscores is starting to be annoying
 integrate modalically
+make the file extensions thing be part of the etc
 integrate agnostically
 implement each part (with tests)
+step: diff lyfe
+step: have the lines of the new file
+step: cover and design and implement item-level synchronization (in practice)
+step: cover and design and implement re-composing new lines
+re-compose existing lines (some custom processer for this and all)

@@ -7,10 +7,6 @@ be useful in production.
 
   - for one thing, if this *is* useful, don't be afraid to move it and
     its test node into the asset tree
-
-  - for another thing, we are currently making this over-broad to work
-    with arbitrary different "schema" (more on this later) so it is quite
-    anemic at this point.
 """
 
 from sakin_agac.magnetics import (
@@ -18,14 +14,31 @@ from sakin_agac.magnetics import (
         )
 
 
-_SELF = format_adapter_via_definition(
-        item_via_collision=None,  # doing this in tests too
-        item_stream_via_native_stream=None,  # will use default
-        natural_key_via_object=None,  # this changes per test suite
+def _sync_request_via_etc(native_stream, format_adapter):
+    """for this format, converting our native stream to the target is..
+
+    straightforward because we already are a dictionary stream.
+    """
+
+    _WEE = format_adapter.sync_lib.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
+            native_stream,
+            format_adapter,
+            )
+    return _WEE  # #todo
+
+
+def _value_readers_via_field_names(*names):
+    def reader_for(name):
+        def read(native_object):
+            return native_object[name]  # [#410.B] death of item class imagine  # noqa: E501
+        return read
+    return [reader_for(name) for name in names]
+
+
+FORMAT_ADAPTER = format_adapter_via_definition(
+        THIS_PRETEND_THING_IS_REQUIRED=True,
+        sync_request_via_native_stream=_sync_request_via_etc,
+        value_readers_via_field_names=_value_readers_via_field_names,
         )
-
-
-import sys  # noqa: E402
-sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
 # #born.

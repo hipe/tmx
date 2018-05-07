@@ -68,12 +68,16 @@ class Case010_hello(_CommonCase):
 
 def _my_sync(orig, new):  # #here1
 
+    import sakin_agac.magnetics.synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
     f = _MyBusinessObject.name_value_pairs_via_doohah
-    fa = _format_adapter()
-    orig_st = fa.item_stream_via_native_stream(f(orig))
-    new_st = fa.item_stream_via_native_stream(f(new))
-    sync_st = fa.synchronized_stream_via_these_two(new_st, orig_st)
-    _these = [x.NATIVE_OBJECT for x in sync_st]
+    sync_st = x.SELF(
+        natural_key_via_far_item=_natty_key_via_object,
+        far_item_stream=f(new),
+        natural_key_via_near_item=_natty_key_via_object,
+        near_item_stream=f(orig),
+        item_via_collision=_item_via_collision,
+        )
+    _these = [x for x in sync_st]
     return _MyBusinessObject(**{k: v for (k, v) in _these})
 
 
@@ -87,19 +91,21 @@ def _format_adapter():
             )
 
 
-def _item_via_collision(new_item, orig_item):  # #here1
+def _item_via_collision(far_item, near_item):  # #here1
 
-    k = new_item.natural_key
-    f = getattr(_resolve_collision, k)
-    new_x = new_item.NATIVE_OBJECT[1]  # #here2
-    orig_x = orig_item.NATIVE_OBJECT[1]
+    far_key, far_value = far_item
+    near_key, near_value = near_item
 
-    use_x = f(new_x, orig_x)
-    if use_x is new_x:
-        use_item = new_item
-    else:
-        use_item = orig_item.__class__(k, (k, use_x))  # #here2
-    return use_item
+    None if far_key == near_key else sanity()
+
+    f = getattr(_resolve_collision, near_key)
+
+    _merged_value = f(far_value, near_value)  # #here2
+    # merged value is often the same as one or the other, so there are times
+    # we could re-use the existing tuples instead if we wanted to save memory.
+    # (did something like this before #history-A.1.))
+
+    return (near_key, _merged_value)
 
 
 class _resolve_collision:  # :#here3
@@ -141,4 +147,5 @@ class _MyBusinessObject:
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: got rid of use of format adapter for this test
 # #born.

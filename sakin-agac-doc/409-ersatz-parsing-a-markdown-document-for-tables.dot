@@ -1,0 +1,37 @@
+digraph g {
+
+  state_100 [label="beginning,\nbefore anything" shape=rect]
+  state_200 [label="head\nlines" shape=rect]
+  state_300 [label="(process it as\nschema and)\nexpecting 2nd\ntable line" shape=rect]
+  state_400 [label="object\nrows" shape=rect]
+  state_500 [label="error: etc\n(cover me)" shape=rect]
+  state_600 [label="tail\nlines" shape=rect]
+  state_900 [label="done." shape=rect]
+
+  state_100->state_200 [label="other\nline"]  // transition 100200
+  state_100->state_300 [label="table\nline"]  // transition 100300
+  state_100->state_900 [label="θ"]            // transition 100900
+  state_200->state_200 [label="other\nline"]  // transition 200200
+  state_200->state_300 [label="table\nline"]  // transision 200300
+  state_200->state_900 [label="θ"]            // transition 200900
+  state_300->state_400 [label="such\na table\nline"]  // transition 300400
+  state_300->state_500 [label="other\nline"]  // transition 300500
+  state_300->state_900 [label="θ"]            // transition 300900
+  state_400->state_400 [label="table\nline"]  // transition 400400
+  state_400->state_600 [label="other\nline"]  // transition 400600
+  state_600->state_300 [label="table line\n(cover me)"]  // transition 600300
+  state_600->state_600 [label="other\nline"]  // transition 600600
+  state_600->state_900 [label="θ"]            // transition 600900
+  state_400->state_900 [label="θ"]            // transition 400900
+
+label="
+
+fig. 409: how we parse markdown documents for tables
+there are three kinds of transitions (arrows): one for table-looking        
+lines, one for not-table-looking lines, and one for \"end\" (of stream).     
+every state node (rectangle) should have one of each kind of transition.
+"
+}
+/*
+#born.
+*/

@@ -14,6 +14,15 @@ class listening:  # (as namespace only)
         return log
 
 
+class streamlib:  # (as namespace only)
+
+    def next_or_none(itr):
+        try:
+            return next(itr)
+        except StopIteration:
+            pass
+
+
 class Exception(Exception):
     pass
 

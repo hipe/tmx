@@ -23,6 +23,10 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #410.C  | #open | format adapter hasn't yet realized its true purpose
+|                   #410.B  |       | "item" wrapper classes - exploratory
+|                   #410    |       | (internal tracking)
+|<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents
 |<a name=408></a>[\[#408\]] |       | decompose the algorithm
 |<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
 |<a name=406></a>[\[#406\]] |       | strategic dependency graph
@@ -34,6 +38,8 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 
 
+
+[\[#409\]]: 409-ersatz-parsing-a-markdown-document-for-tables.dot
 [\[#408\]]: 408-decompose-the-synchronization-algorithm.md
 [\[#407\]]: 407-collection-synchronization-algorithm.md
 [\[#406\]]: 406-strategic-dependency-graph.dot

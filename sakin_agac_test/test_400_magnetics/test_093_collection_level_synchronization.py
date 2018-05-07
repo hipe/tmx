@@ -3,9 +3,6 @@
 from _init import (
         sanity,
         )
-from modality_agnostic.memoization import (
-        memoize,
-        )
 import unittest
 
 
@@ -86,35 +83,24 @@ class Case060_some_down_on_to_some_yes_collisions(_CommonCase):
 class _build_snapshot:
 
     def __init__(self, orig, new):
-        fa = format_adapter()
-        orig_st = fa.item_stream_via_native_stream(orig)
-        new_st = fa.item_stream_via_native_stream(new)
-        sync_st = fa.synchronized_stream_via_these_two(new_st, orig_st)
-        result = []
-        for x in sync_st:
-            result.append(x.natural_key)
-        self.result = tuple(result)
 
+        def identity(s):
+            return s
 
-@memoize
-def format_adapter():
-    import sakin_agac.magnetics.format_adapter_via_definition as x
-    return x(
+        _st = _subject_module().SELF(
+            natural_key_via_far_item=identity,
+            far_item_stream=new,
+            natural_key_via_near_item=identity,
+            near_item_stream=orig,
             item_via_collision=_item_via_collision,
-            item_stream_via_native_stream=None,
-            natural_key_via_object=lambda x: x,
             )
 
+        self.result = tuple(x for x in _st)
 
-def _item_via_collision(new_item, orig_item):
 
-    k = orig_item.natural_key
-    None if new_item.natural_key == k else sanity()
-
-    return orig_item.__class__(
-            natural_key=k.upper(),
-            NATIVE_OBJECT='«nada»',
-            )
+def _item_via_collision(far_s, near_s):
+    None if far_s == near_s else sanity()
+    return near_s.upper()
 
 
 def _subject_module():
@@ -125,4 +111,5 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: removed use of format adapter from this test
 # #born.

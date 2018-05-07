@@ -38,7 +38,10 @@ def _SELF(upstream_path, listener=None):
 
 
 class _Parse:
-    """stay light on your feet. this is not the right way"""
+    """stay light on your feet. this is not the right way
+
+    (after the fact, we documented this in [#407])
+    """
 
     def __init__(self, listener):
         self._state = self.HEAD
@@ -129,6 +132,10 @@ class _MarkdownTableSchemaAsLine_:
         error = listening.leveler_via_listener('error', self._listener)  # ..
         _fmt = 'cel count mismatch (had {} needed {})'
         error(_fmt.format(act, self.cels_count))
+
+    def build_field_readerer__(self):
+        from . import schema_index_via_schema_row as x
+        return x.field_reader_via_schema_row(self.cels_count, self._schema_row)
 
 
 _looks_like_table_line = re.compile(r'^\|').search
