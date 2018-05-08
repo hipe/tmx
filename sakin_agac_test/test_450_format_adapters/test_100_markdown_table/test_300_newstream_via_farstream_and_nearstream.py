@@ -1,4 +1,5 @@
 # #covers: sakin_agac.format_adapters.markdown_table.magnetics.newstream_via_farstream_and_nearstream  # noqa: E501
+# #covers: sakin_agac.format_adapters.markdown_table.magnetics.prototype_row_via_example_row_and_schema_index  # noqa: E501
 
 from _init import (
         fixture_file_path,
@@ -38,30 +39,19 @@ class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase)
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
 
-    # NOTE - THIS WILL ALL CHANGE WHEN SYNC IS REAL (look at the case name)
+    def test_020_it_just_throws_a_key_error(self):  # #coverpoint1.1
+        e = None
+        try:
+            _case_010_first_index()
+        except KeyError as e_:
+            e = e_
+        self.assertEqual(str(e), "'chalupa fupa'")
 
-    def test_THE_EASY_TWO_CAN_to_line(self):
 
-        items = _interesting_section().items
+class Case100_adds_only(_CommonCase):
 
-        item = items[0]
-        result = item.to_line()
-        print("ONE: %s" % (result))
-
-        item = items[1]
-        result = item.to_line()
-        print("TWO: %s" % (result))
-
-    def test_THE_HARD_TWO(self):
-
-        print("\n\n\nTHIS ONE TEST IS WIPPED\n\n")
-        return
-
-        items = _interesting_section().items
-
-        item = items[2]
-        result = item.to_line()
-        print("YOU'RE GOOD: %s" % (result))
+    def test_002_does_not_fail(self):
+        self.assertIsNotNone(self._first_index())
 
     def test_020_head_lines_count(self):
         self._head_lines_this_many(3)
@@ -69,33 +59,55 @@ class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase)
     def test_030_schema(self):
         self._schema_lines_OK()
 
-    def test_040_main_lines(self):
+    def test_040_main_lines_count(self):
         self._main_lines_this_many(3)
 
-    def test_050_tail_lines_count(self):
+    def test_050_the_original_two_occur_first(self):
+
+        items = self._interesting_section().items
+
+        _line_one = items[0].to_line()
+        _line_two = items[1].to_line()
+
+        self.assertEqual(_line_one, "|one|two|three\n")
+        self.assertEqual(_line_two, "| four | five | six\n")
+
+    def test_060_the_new_one_was_added(self):
+        """
+        TODO: this test (although small in codesize) is overloaded. if you
+        refactor this test, consider breaking it up to test these separately:
+
+          - that original widths are respected when possible #coverpoint1.2
+          - that blank cels also get padded appropriately #coverpoint1.3
+          - what happens with content overflow #coverpoint1.4
+          - align left #coverpoint1.5
+          - align center #coverpoint1.6 (not actually covered in this test)
+          - align right #coverpoint1.7
+        """
+
+        items = self._interesting_section().items
+
+        _line_three = items[2].to_line()
+
+        self.assertEqual(_line_three, "|3A |   |choo choo\n")
+
+    def test_070_tail_lines_count(self):
         self._tail_lines_this_many(4)
+
+    def _interesting_section(self):
+        return self._second_index()['takashi']
 
     @shared_subject
     def _second_index(self):
-        return _second_index()
+        return _build_second_index(self._first_index())
+
+    def _first_index(self):
+        return _case_100_first_index()
 
 
-def _interesting_section():
-    return _second_index()['takashi']
-
-
-@memoize
-def _second_index():
-    return _build_second_index(_first_index())
-
-
-@memoize
-def _first_index():
+def _case_010_first_index():
         _native_objects = (
-                {
-                    '_is_sync_meta_data': True,
-                    'natural_key_field_name': 'field_name_one',
-                },
+                _same_schema_row,
                 {
                     'field_name_one': 'adonga zebronga',
                     'chalupa fupa': 'zack braff',
@@ -103,8 +115,28 @@ def _first_index():
                 },
                 )
 
-        _markdown_file = '0100-hello.md'
-        return _build_first_index(_native_objects, _markdown_file)
+        return _build_first_index(_native_objects, _same_markdown_file)
+
+
+@memoize
+def _case_100_first_index():
+        _native_objects = (
+                _same_schema_row,
+                {
+                    'field_name_one': '3A',
+                    'cha_cha': 'choo choo',
+                },
+                )
+
+        return _build_first_index(_native_objects, _same_markdown_file)
+
+
+_same_schema_row = {
+        '_is_sync_meta_data': True,
+        'natural_key_field_name': 'field_name_one',
+        }
+
+_same_markdown_file = '0100-hello.md'
 
 
 def _build_second_index(first_index):

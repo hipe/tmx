@@ -27,6 +27,10 @@ def _sync_request_via_etc(native_stream, format_adapter):
     return _WEE  # #todo
 
 
+def _name_value_pairs_via_native_object(dct):
+    return ((k, dct[k]) for k in dct)
+
+
 def _value_readers_via_field_names(*names):
     def reader_for(name):
         def read(native_object):
@@ -38,6 +42,7 @@ def _value_readers_via_field_names(*names):
 FORMAT_ADAPTER = format_adapter_via_definition(
         THIS_PRETEND_THING_IS_REQUIRED=True,
         sync_request_via_native_stream=_sync_request_via_etc,
+        name_value_pairs_via_native_object=_name_value_pairs_via_native_object,
         value_readers_via_field_names=_value_readers_via_field_names,
         )
 

@@ -3,7 +3,7 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
-        release,
+        pop_property,
         )
 from modality_agnostic import (
         streamlib as _streamlib,
@@ -55,10 +55,12 @@ def _NEWSTREAM_VIA_ETC(
 
     def __prepare_sync_args():
 
+        _etc_f = farstream_format_adapter.name_value_pairs_via_native_object
         _far_f, = farstream_format_adapter.value_readers_via_field_names(natural_key_field_name)  # noqa: E501
 
         nonlocal sync_args
         sync_args = {
+            'name_value_pairs_via_far_native_object': _etc_f,
             'far_item_stream': farstream_items,
             'natural_key_via_far_item': _far_f,
 
@@ -66,6 +68,7 @@ def _NEWSTREAM_VIA_ETC(
             # 'natural_key_via_near_item': provided #here2
 
             'item_via_collision': _item_via_collision,
+            'listener': listener,
             }
 
     sync_args = None
@@ -134,7 +137,7 @@ class _CustomProcessor:
         if 'head_line' == typ:
             pass
         elif 'table_schema_line_one_of_two' == typ:
-            self._schema_row = tup[1]
+            self._schema_row_one = tup[1]
             self._state = 'SECOND_TABLE_LINE'
             pass
         else:
@@ -145,6 +148,7 @@ class _CustomProcessor:
     def SECOND_TABLE_LINE(self, tup):
         typ = tup[0]
         if 'table_schema_line_two_of_two' == typ:
+            self._schema_row_two = tup[1]
             self._state = '_TRANSITION_TO_CRAZY_TOWN'
         else:
             cover_me('unexpected tagged item')
@@ -152,22 +156,64 @@ class _CustomProcessor:
 
     def _TRANSITION_TO_CRAZY_TOWN(self):
 
+        self.__init_schema_index()
+
+        _nat_key_via = self.__flush_natural_key_via_etc()
+
+        _far_item_wrapperer = self.__build_far_item_wrapperer()
+
         _near_item_stream = self.__build_near_item_stream()
 
-        _this_etc = self._will_break_this_up()
-
-        _sync_args = self._release('_sync_args')
+        _sync_args = pop_property(self, '_sync_args')
 
         self._big_deal_stream = _sync.SELF(
                 near_item_stream=_near_item_stream,  # :#here1
-                natural_key_via_near_item=_this_etc,  # :#here2
+                natural_key_via_near_item=_nat_key_via,  # :#here2
+                far_item_wrapperer=_far_item_wrapperer,
                 ** _sync_args)
 
         self._state = 'OBJECT_ROWS'
         return self.gets()
 
+    def __build_far_item_wrapperer(self):
+
+        name_value_pairs_via_far_native_object = self._sync_args.pop(
+                'name_value_pairs_via_far_native_object')
+
+        def build_wrapper(result_categories, listener):
+
+            # make a prototype row from a real, encountered row.
+            # do this only once you've acutally seen such a row in the near doc
+            prototype_row = self.__build_prototype_row()
+
+            def wrap(native_object):
+                _pairs = name_value_pairs_via_far_native_object(native_object)
+                _wrapped = prototype_row.new_via_name_value_pairs(_pairs)
+                return (result_categories.OK, _wrapped)
+            return wrap
+        return build_wrapper
+
+    def __build_prototype_row(self):
+
+        _row = pop_property(self, '_first_business_object_row')
+        _sch2 = pop_property(self, '_schema_row_two')
+
+        from . import prototype_row_via_example_row_and_schema_index as x
+        return x(
+                example_row=_row,
+                schema_index=self._SCHEMA_INDEX,
+                row_schema_for_alignment=_sch2,
+                )
 
     def __build_near_item_stream(self):
+
+        def item_via_native_object(x):
+            # only for the first row we encounter,
+            # do this thing (per [#408.E])
+            self._first_business_object_row = x
+            nonlocal item_via_native_object
+            item_via_native_object = _Item
+            return item_via_native_object(x)
 
         _Item = self.__build_near_item_class()
 
@@ -175,7 +221,7 @@ class _CustomProcessor:
         for tup in self._tagged_stream:
             typ, x = tup
             if 'business_object_row' == typ:
-                _item = _Item(x)
+                _item = item_via_native_object(x)
                 yield _item
             else:
                 hit_the_end = False
@@ -189,6 +235,7 @@ class _CustomProcessor:
         class _NearItem:
             """
             #[#401.B] track item classes
+            #todo we want to get rid of this - it does nothing at writing
             """
 
             def __init__(self2, row_DOM):
@@ -199,18 +246,20 @@ class _CustomProcessor:
 
         return _NearItem
 
-    def _will_break_this_up(self):
-        schema_row = self._release('_schema_row')
-        natural_key_field_name = self._release('_natural_key_field_name')
-        # == == ==
-        _field_readerer = schema_row.build_field_readerer__()
-        return _field_readerer(natural_key_field_name)
+    def __flush_natural_key_via_etc(self):  # assumes ..
+        _natural_key_field_name = pop_property(self, '_natural_key_field_name')
+        return self._SCHEMA_INDEX.field_reader(_natural_key_field_name)
+
+    def __init_schema_index(self):
+        _schema_row = pop_property(self, '_schema_row_one')
+        from . import schema_index_via_schema_row as x
+        self._SCHEMA_INDEX = x.SELF(_schema_row)
 
     def OBJECT_ROWS(self):
         x = next_or_none(self._big_deal_stream)
         if x is None:
             self._state = 'TAIL_LINES'
-            return self._release('_TUP_ON_DECK')
+            return pop_property(self, '_TUP_ON_DECK')
         else:
             return ('takashi', x)
 
@@ -221,8 +270,6 @@ class _CustomProcessor:
     def _close(self):
         del(self._tagged_stream)
         del(self._state)
-
-    _release = release
 
 
 def _item_via_collision(far_item, near_item):

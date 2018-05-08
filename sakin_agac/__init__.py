@@ -1,4 +1,4 @@
-def release(self, var):
+def pop_property(self, var):
     x = getattr(self, var)
     delattr(self, var)
     return x

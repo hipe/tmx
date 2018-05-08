@@ -4,7 +4,19 @@ from sakin_agac import (
 import re
 
 
-def field_reader_via_schema_row(cels_count, schema_row):
+class SELF:
+
+    def __init__(self, schema_as_line):
+        (
+            self.__field_readerer,
+            self.offset_via_field_name__,
+        ) = _these_two(schema_as_line)
+
+    def field_reader(self, field_name):
+        return self.__field_readerer(field_name)
+
+
+def _these_two(schema_as_line):
     """given a table with a header row like this, make a dictionary like this
 
     like this:
@@ -15,6 +27,9 @@ def field_reader_via_schema_row(cels_count, schema_row):
 
     this way, given a "normal field name" you can know the offset of the field
     """
+
+    cels_count = schema_as_line.cels_count
+    schema_row = schema_as_line.row_DOM
 
     def normal_field_name_via_offset(offset):
         _cel_DOM = schema_row.cel_at_offset(offset)
@@ -36,7 +51,7 @@ def field_reader_via_schema_row(cels_count, schema_row):
             _val_s = _cel.content_string()
             return _val_s  # #todo
         return g
-    return f
+    return (f, offset_via_normal_field_name)
 
 
 def _normal_field_via_whatever_this_is(big_s):  # #testpoint

@@ -134,6 +134,7 @@ class _MyBusinessObject:
         self.tags = tags
 
     def name_value_pairs_via_doohah(bo):
+        # very close to [#408.E] a normal `name_value_pairs_via_nat..` function
         for k in [
                 'first_name',
                 'user_ID',

@@ -21,8 +21,8 @@ keep in mind:
 from sakin_agac import (
         cover_me,
         )
-import sys
 import re
+import sys
 
 
 def _SELF(upstream_path, listener=None):
@@ -105,15 +105,15 @@ def _markdown_table_schema_as_line_via_line(line, listener):
 
     row = row_via_line(line)
     if row is not None:
-        return _MarkdownTableSchemaAsLine_(row, row_via_line, listener)
+        return _MarkdownTableSchemaAsLine(row, row_via_line, listener)
 
 
-class _MarkdownTableSchemaAsLine_:
+class _MarkdownTableSchemaAsLine:
 
     def __init__(self, row, row_via_line, listener):
 
         self.cels_count = row.cels_count
-        self._schema_row = row
+        self.row_DOM = row
         self._row_via_line = row_via_line
         self._listener = listener
 
@@ -132,10 +132,6 @@ class _MarkdownTableSchemaAsLine_:
         error = listening.leveler_via_listener('error', self._listener)  # ..
         _fmt = 'cel count mismatch (had {} needed {})'
         error(_fmt.format(act, self.cels_count))
-
-    def build_field_readerer__(self):
-        from . import schema_index_via_schema_row as x
-        return x.field_reader_via_schema_row(self.cels_count, self._schema_row)
 
 
 _looks_like_table_line = re.compile(r'^\|').search

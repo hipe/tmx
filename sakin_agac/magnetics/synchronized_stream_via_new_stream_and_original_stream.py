@@ -59,13 +59,31 @@ class _SyncParameters:
         self.natural_key_field_name = natural_key_field_name
 
 
+def _result_in_identity(result_categories, listener):
+
+    def _identity(item):
+        return (ok, item)
+
+    ok = result_categories.OK
+    return _identity
+
+
 def SELF(
         natural_key_via_far_item,
         far_item_stream,
         natural_key_via_near_item,
         near_item_stream,
         item_via_collision,
+        far_item_wrapperer=_result_in_identity,
+        listener=None,
         ):
+
+    # --
+    def wrap_far_item(item):
+        nonlocal wrap_far_item
+        wrap_far_item = far_item_wrapperer(_result_categories, listener)
+        return wrap_far_item(item)
+    # --
 
     far_collection = _collection(far_item_stream, natural_key_via_far_item)
     near_collection = _collection(near_item_stream, natural_key_via_near_item)
@@ -90,7 +108,11 @@ def SELF(
     # flush the diminishing pool
 
     for item in diminishing_pool.values():
-        yield item
+        result_category, wrapped_item = wrap_far_item(item)
+        if 'OK' == result_category:
+            yield wrapped_item
+        else:
+            cover_me(result_category)  # probably { 'failed' | 'skip' }
 
 
 def __index_the_far_collection(far_collection):
@@ -103,10 +125,16 @@ def __index_the_far_collection(far_collection):
     return d
 
 
-def _collection(stream, keyer):
+class _result_categories:  # as namespace
+    # skip = 'skip' maybe one day
+    failed = 'failed'
+    OK = 'OK'
 
+
+def _collection(stream, keyer):
     return ((keyer(x), x) for x in stream)
 
 
+# #history-A.1 (can be temporary): "inject" wrapper function
 # #pending-rename: we might name every "new stream" as "far stream" ibid near
 # #born.

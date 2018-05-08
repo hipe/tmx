@@ -42,7 +42,7 @@ class _Experiment:
             return self._DOM
 
     def __resolve_DOM(self):
-        self._DOM = _RowDOM(self._offsets, self._line)
+        self._DOM = _RowDOM()._init_via_line(self._offsets, self._line)
 
     def __resolve_offsets(self):
         _x = _do_resolve_offsets(self._line, self._listener)
@@ -79,16 +79,25 @@ class _BranchDOM:
 
 class _RowDOM(_BranchDOM):
 
-    def __init__(self, offsets, line):
+    def __init__(self):
+        pass  # hi.
+
+    def _init_via_line(self, offsets, line):
         a = []
         num_cels = 0
         for (begin, end) in offsets:
             num_cels += 1
-            a.append(_CelDOM(begin, end, line))
+            a.append(_CelDOM()._init_via_begin_and_end(begin, end, line))
         None if '\n' == line[end] else sanity()
         a.append(_NEWLINE_LEAF)
         self.children = tuple(a)
         self.cels_count = num_cels
+        return self
+
+    def init_via_children_tuple__(self, children):
+        self.cels_count = len(children) - 1  # ick/meh NOTE
+        self.children = children
+        return self
 
     def to_line(self):
         _s_a = [ch.to_string() for ch in self.children]
@@ -102,25 +111,37 @@ class _RowDOM(_BranchDOM):
 
 class _CelDOM(_BranchDOM):
 
-    def __init__(self, begin, end, line):
-
+    def _init_via_begin_and_end(self, begin, end, line):
         _ = _LeafDOM(line[(begin+1):end])
         self.children = (_PIPE_LEAF, _)
         self._content_string = '_content_string_initially'
+        return self
+
+    def init_via_children__(self, children):
+        self.children = children
+        self._content_string = '_content_string_subsequently'
+        return self
 
     def content_string(self):
         return getattr(self, self._content_string)()
 
     def _content_string_initially(self):
         self._content_string = None
-        a = [self.children[0]]
-        _further_parse_cel(a, self.children[1]._string)
+        a = [self._pipe_child]
+        _further_parse_cel(a, self._child_at(1).string_)
         self.children = tuple(a)
         self._content_string = '_content_string_subsequently'
         return self.content_string()
 
     def _content_string_subsequently(self):
-        return self.children[2]._string  # risky
+        return self._child_at(2).string_
+
+    @property
+    def _pipe_child(self):
+        return self._child_at(0)
+
+    def _child_at(self, offset):
+        return self.children[offset]
 
 
 def _further_parse_cel(a, outer_s):
@@ -141,10 +162,10 @@ def _further_parse_cel(a, outer_s):
 
 class _LeafDOM:
     def __init__(self, s):
-        self._string = s
+        self.string_ = s
 
     def to_string(self):
-        return self._string
+        return self.string_
 
     @property
     def is_branch(self):

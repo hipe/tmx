@@ -113,5 +113,4 @@ implement each part (with tests)
 step: diff lyfe
 step: have the lines of the new file
 step: cover and design and implement item-level synchronization (in practice)
-step: cover and design and implement re-composing new lines
 get rid of placeholder 'takashi'

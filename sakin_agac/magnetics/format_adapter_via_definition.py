@@ -37,12 +37,20 @@ class _FormatAdapter:
             sync_request_via_native_stream=None,
             # for far collections not near
 
+            name_value_pairs_via_native_object=None,
+            # for far collection, it must provide this per [#408.E]
+
             value_readers_via_field_names=None,
             # for target near collection, calculate field readers dynamically
 
             item_via_collision=None,
             MODULE_NAME=None,
             ):
+
+        x = name_value_pairs_via_native_object
+        if x is not None:
+            # (so we can know right away that the problem wasit wasn't set)
+            self._name_value_pairs_via_native_object = x
 
         self._sync_request_via_native_stream = sync_request_via_native_stream
         self._value_readers_via_field_names = value_readers_via_field_names
@@ -54,6 +62,10 @@ class _FormatAdapter:
 
         _f = self._use_sync_request_via_native_stream()
         return _f(native_stream, self)  # @#here1
+
+    @property
+    def name_value_pairs_via_native_object(self):
+        return self._name_value_pairs_via_native_object
 
     def value_readers_via_field_names(self, x):
         return self._value_readers_via_field_names(x)

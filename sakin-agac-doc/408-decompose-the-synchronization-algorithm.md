@@ -95,6 +95,69 @@ x XX xx XX xx
 
 
 
+
+## categorized wrapping of far items (freeform discussion)
+
+as we write this we are dismantling our original conception of "item class".
+the idea is that for a synchronization, the client can optionally pass a
+function with a name something like `far_item_wrapperer` (sic).
+
+this function (if provided) will (at the first (if any) occurrence of a far
+item) be passed a namespace/struct with "consts" (strings) and a listener.
+
+the struct's purpose is to tell the client what available "categories" are
+of result (think HTTP status). (currently we will just have `OK` and `failed`
+but we might later add `skip`, hence we don't want to limit ourselves to
+binary to start with.)
+
+this function must result in a function who takes as one argument a native
+object. the result will be a tuple: the first item in the tuple will always
+be the result "category" (think "status"), and the second one will be the
+item to use, IFF the first element of the tuple to use is `OK`.
+
+    def _far_item_wrapperer(result_categories, listener):
+
+        def wrap(native_object):
+
+            wrapped_item = # ..
+            # (if you will fail or skip, emit to listener)
+
+            if # ..
+                return (result_categories.failed)
+            elsif # ..
+                return (result_categories.skip)
+            else
+                return (result_categories.OK, wrapped_item)
+
+        return wrap
+
+    _new_stream = sync(
+        # ..
+        far_item_wrapperer=_far_item_wrapperer,
+        # ..
+    )
+
+
+
+
+## <a name=E></a> name value pairs via item
+
+in order for a practical synchronization to make a remote object fit in with
+our local presentation (document), we have to be able to read the remote
+objects at a component level (as name-value pairs).
+
+we cannot simply have the far format adapter provide a wrapper class: the
+far format adapter cannot know anything about the required behavior for the
+target collection (document).
+
+so the near format adapter in effect picks how the wrapper class (function)
+looks, and it relies on the far format adapter to provide a function that
+converts far native objects to a shape it can recognize and use (a stream
+of name-value pairs).
+
+
+
+
 ## (document-meta)
 
   - #pending-rename: NNN-markdown-table-targeted-synchronization.md
