@@ -51,6 +51,7 @@ class _SELF:
 
     def __init__(
             self,
+            natural_key_field_name,
             example_row,
             row_schema_for_alignment,
             schema_index,
@@ -70,37 +71,61 @@ class _SELF:
         _celer_via = _celer_via_via(
                 childreners, row_schema_for_alignment, _CelDOM)
 
-        self.__celers = [f(i) for i in range(0, example_row.cels_count)]
-        self.__offset_via_field_name = schema_index.offset_via_field_name__
+        self._celers = [f(i) for i in range(0, example_row.cels_count)]
+        self._offset_via_field_name = schema_index.offset_via_field_name__
         self.__reuse_newline = orig_children[-1]
         self._RowDOM = example_row.__class__
         self.__cels_count = example_row.cels_count
+        self._natural_key_field_name = natural_key_field_name
+
+    def MERGE(self, pairs, near_row_DOM):
+        """for each key-value in the far pairs, make the new cel.
+
+        for all the rest, use the doo-hah that was there already!
+        """
+
+        def near_f(i):
+            return _near_children[i]
+
+        _near_children = near_row_DOM.children
+
+        d = {k: v for k, v in pairs}
+        d.pop(self._natural_key_field_name)
+        offset = self._offset_via_field_name
+        _nvvo = {offset[k]: d[k] for k in d}  # KeyError #coverpoint1.1 (1/2)
+
+        return self._build_new_row(near_f, _nvvo)
 
     def new_via_name_value_pairs(self, pairs):
+        """for each key-value in the far pairs, make the new cel.
 
-        new_value_via_offset = self.__new_value_via_offset_via_pairs(pairs)
+        for all the rest, make them blank cels.
+        """
 
-        def f(i):
-            if i in new_value_via_offset:
-                return _value_cel(i)
-            else:
-                return _spaces_cel(i)
-
-        def _value_cel(i):
-            _new_value = new_value_via_offset[i]
-            _new_STRING = str(_new_value)  # ..
-            _new_cel = _celers[i](_new_STRING)
-            return _new_cel
-
-        def _spaces_cel(i):  # #coverpoint1.3
+        def spaces_cel(i):  # #coverpoint1.3
             d = _spaces_cel_cache
             if i not in d:
                 d[i] = _celers[i]('')
             return d[i]
 
+        _celers = self._celers
+
         _spaces_cel_cache = {}
 
-        _celers = self.__celers
+        offset = self._offset_via_field_name
+        _nvvo = {offset[k]: v for k, v in pairs}  # KeyError #coverpoint1.1
+
+        return self._build_new_row(spaces_cel, _nvvo)
+
+    def _build_new_row(self, user_f, new_value_via_offset):
+
+        def f(i):
+            if i in new_value_via_offset:
+                return value_cel(i)
+            else:
+                return user_f(i)
+
+        value_cel = self.__value_celer(new_value_via_offset)
 
         new_cels = [f(i) for i in range(0, self.__cels_count)]
 
@@ -110,9 +135,17 @@ class _SELF:
 
         return _new_row  # #todo
 
-    def __new_value_via_offset_via_pairs(self, pairs):
-        d = self.__offset_via_field_name
-        return {d[k]: v for k, v in pairs}  # KeyError #coverpoint1.1
+    def __value_celer(self, new_value_via_offset):
+
+        def _value_cel(i):
+            _new_value = new_value_via_offset[i]
+            _new_STRING = str(_new_value)  # ..
+            _new_cel = _celers[i](_new_STRING)
+            return _new_cel
+
+        _celers = self._celers
+
+        return _value_cel
 
 
 def _celer_via_via(childreners, cel_schema, _CelDOM):
@@ -233,4 +266,5 @@ class _cel_schemas:  # namespace only
 
 sys.modules[__name__] = _SELF
 
+# #history-A.1: sneak merge into here to be alongside create new
 # #born.

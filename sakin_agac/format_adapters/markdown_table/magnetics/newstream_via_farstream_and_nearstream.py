@@ -67,7 +67,7 @@ def _NEWSTREAM_VIA_ETC(
             # 'near_item_stream': provided #here1,
             # 'natural_key_via_near_item': provided #here2
 
-            'item_via_collision': _item_via_collision,
+            # 'item_via_collision': provided #here3
             'listener': listener,
             }
 
@@ -126,6 +126,7 @@ class _CustomProcessor:
         self._sync_args = sync_args
         self._natural_key_field_name = natural_key_field_name
         self._state = 'HEAD_LINES'
+        self._proto_row = '_proto_row_initially'
         self._listener = listener
 
     def gets(self):
@@ -156,13 +157,18 @@ class _CustomProcessor:
 
     def _TRANSITION_TO_CRAZY_TOWN(self):
 
+        self._name_value_pairs_via_far_native_object = self._sync_args.pop(
+                'name_value_pairs_via_far_native_object')
+
         self.__init_schema_index()
 
-        _nat_key_via = self.__flush_natural_key_via_etc()
+        _item_via_collision = self.__build_item_via_collision()
 
         _far_item_wrapperer = self.__build_far_item_wrapperer()
 
         _near_item_stream = self.__build_near_item_stream()
+
+        _nat_key_via = self._SCHEMA_INDEX.field_reader(self._natural_key_field_name)  # noqa: E501
 
         _sync_args = pop_property(self, '_sync_args')
 
@@ -170,21 +176,37 @@ class _CustomProcessor:
                 near_item_stream=_near_item_stream,  # :#here1
                 natural_key_via_near_item=_nat_key_via,  # :#here2
                 far_item_wrapperer=_far_item_wrapperer,
+                item_via_collision=_item_via_collision,  # :#here3
                 ** _sync_args)
 
         self._state = 'OBJECT_ROWS'
         return self.gets()
 
+    def __build_item_via_collision(self):
+
+        def _item_via_collision(far_native_object, near_item):
+
+            _prototype_row = self._prototype_row_as_late_as_possible()
+
+            _far_pairs = self._name_value_pairs_via_far_native_object(
+                    far_native_object)
+
+            _near_row_DOM = near_item.ROW_DOM_
+
+            _amazeballs_row = _prototype_row.MERGE(_far_pairs, _near_row_DOM)
+
+            return _amazeballs_row  # #todo
+        return _item_via_collision
+
     def __build_far_item_wrapperer(self):
 
-        name_value_pairs_via_far_native_object = self._sync_args.pop(
-                'name_value_pairs_via_far_native_object')
+        name_value_pairs_via_far_native_object = self._name_value_pairs_via_far_native_object  # noqa: E501
 
         def build_wrapper(result_categories, listener):
 
             # make a prototype row from a real, encountered row.
             # do this only once you've acutally seen such a row in the near doc
-            prototype_row = self.__build_prototype_row()
+            prototype_row = self._prototype_row_as_late_as_possible()
 
             def wrap(native_object):
                 _pairs = name_value_pairs_via_far_native_object(native_object)
@@ -193,13 +215,26 @@ class _CustomProcessor:
             return wrap
         return build_wrapper
 
-    def __build_prototype_row(self):
+    def _prototype_row_as_late_as_possible(self):
+        return getattr(self, self._proto_row)()
+
+    def _proto_row_initially(self):
+        del(self._proto_row)
+        self.__actual_proto_row = self.__build_proto_row()
+        self._proto_row = '_proto_row_subsequently'
+        return self._proto_row_subsequently()
+
+    def _proto_row_subsequently(self):
+        return self.__actual_proto_row
+
+    def __build_proto_row(self):
 
         _row = pop_property(self, '_first_business_object_row')
         _sch2 = pop_property(self, '_schema_row_two')
 
         from . import prototype_row_via_example_row_and_schema_index as x
         return x(
+                natural_key_field_name=self._natural_key_field_name,
                 example_row=_row,
                 schema_index=self._SCHEMA_INDEX,
                 row_schema_for_alignment=_sch2,
@@ -246,10 +281,6 @@ class _CustomProcessor:
 
         return _NearItem
 
-    def __flush_natural_key_via_etc(self):  # assumes ..
-        _natural_key_field_name = pop_property(self, '_natural_key_field_name')
-        return self._SCHEMA_INDEX.field_reader(_natural_key_field_name)
-
     def __init_schema_index(self):
         _schema_row = pop_property(self, '_schema_row_one')
         from . import schema_index_via_schema_row as x
@@ -261,7 +292,7 @@ class _CustomProcessor:
             self._state = 'TAIL_LINES'
             return pop_property(self, '_TUP_ON_DECK')
         else:
-            return ('takashi', x)
+            return ('business_object_row', x)
 
     @_could_end_at_any_time
     def TAIL_LINES(self, tup):
@@ -270,10 +301,6 @@ class _CustomProcessor:
     def _close(self):
         del(self._tagged_stream)
         del(self._state)
-
-
-def _item_via_collision(far_item, near_item):
-    cover_me('wahoo')
 
 
 sys.modules[__name__] = _NEWSTREAM_VIA_ETC

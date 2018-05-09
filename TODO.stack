@@ -112,5 +112,3 @@ integrate agnostically
 implement each part (with tests)
 step: diff lyfe
 step: have the lines of the new file
-step: cover and design and implement item-level synchronization (in practice)
-get rid of placeholder 'takashi'

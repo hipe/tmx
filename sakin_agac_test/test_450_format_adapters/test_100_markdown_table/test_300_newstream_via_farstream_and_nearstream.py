@@ -26,12 +26,15 @@ class _CommonCase(unittest.TestCase):
         self._etc('tail_line', num)
 
     def _main_lines_this_many(self, num):
-        self._etc('takashi', num)
+        self._etc('business_object_row', num)
 
     def _etc(self, typ, num):
         _d = self._second_index()
         _act = _d[typ].count
         self.assertEqual(_act, num)
+
+    def _interesting_section(self):
+        return self._second_index()['business_object_row']
 
 
 class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase):  # noqa: E501
@@ -94,15 +97,31 @@ class Case100_adds_only(_CommonCase):
     def test_070_tail_lines_count(self):
         self._tail_lines_this_many(4)
 
-    def _interesting_section(self):
-        return self._second_index()['takashi']
-
     @shared_subject
     def _second_index(self):
         return _build_second_index(self._first_index())
 
     def _first_index(self):
         return _case_100_first_index()
+
+
+class Case200_MERGE(_CommonCase):
+
+    def test_010_does_not_fail(self):
+        self.assertIsNotNone(self._first_index())
+
+    def test_020_wee(self):
+        items = self._interesting_section().items
+        self.assertEqual(len(items), 2)
+        _OMG_WOW = items[1].to_line()
+        self.assertEqual(_OMG_WOW, '| four |  5| six\n')
+
+    @shared_subject
+    def _second_index(self):
+        return _build_second_index(self._first_index())
+
+    def _first_index(self):
+        return _case_200_first_index()
 
 
 def _case_010_first_index():
@@ -114,7 +133,6 @@ def _case_010_first_index():
                     'propecia alameda': 'ohai kauaii',
                 },
                 )
-
         return _build_first_index(_native_objects, _same_markdown_file)
 
 
@@ -127,7 +145,18 @@ def _case_100_first_index():
                     'cha_cha': 'choo choo',
                 },
                 )
+        return _build_first_index(_native_objects, _same_markdown_file)
 
+
+@memoize
+def _case_200_first_index():
+        _native_objects = (
+                _same_schema_row,
+                {
+                    'field_name_one': 'four',
+                    'field_2': '5',
+                },
+                )
         return _build_first_index(_native_objects, _same_markdown_file)
 
 
@@ -202,14 +231,14 @@ class _MyCustomProcessor:
     def table_schema_line_two_of_two(self, x):
         self._same(x)
 
-    def move_from__table_schema_line_two_of_two__to__takashi(self):
+    def move_from__table_schema_line_two_of_two__to__business_object_row(self):
         self._move('table_schema_line_two_of_two')
 
-    def takashi(self, x):
+    def business_object_row(self, x):
         self._same(x)
 
-    def move_from__takashi__to__tail_line(self):
-        self._move('takashi')
+    def move_from__business_object_row__to__tail_line(self):
+        self._move('business_object_row')
 
     def tail_line(self, x):
         self._same(x)
