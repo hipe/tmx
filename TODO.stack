@@ -112,3 +112,7 @@ integrate agnostically
 implement each part (with tests)
 step: diff lyfe
 step: have the lines of the new file
+(integrate procure rumsakalla)
+cover: magnet: canon for procure
+add: new format adapter (the thing with importlib)
+refactor: use execution context for far collections for sync sessions

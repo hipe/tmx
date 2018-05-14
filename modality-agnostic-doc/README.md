@@ -22,6 +22,7 @@ only in modeling interfaces for this purpose.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#505]                     |       | [feature branch]
 |[#504]                     | #open | magnetics/command-via-command-stream
 |[#503]                     | #open | magnetics/command-via-parameter-stream
 |[#502]                     | #open | magnetics/parameter-via-definition

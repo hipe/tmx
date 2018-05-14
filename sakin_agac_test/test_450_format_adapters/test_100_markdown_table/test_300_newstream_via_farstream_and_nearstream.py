@@ -184,7 +184,19 @@ def _build_first_index(native_objects, markdown_file):
 
     far_format_adapter = _this_one_format_adapter().FORMAT_ADAPTER
 
-    sync_request = far_format_adapter.sync_request_via_native_stream(iter(native_objects))  # noqa: E501
+    _sess = far_format_adapter.session_for_sync_request_(
+            mixed_collection_identifier=native_objects,
+            modality_resources=None,
+            listener=None,
+            )
+
+    with _sess as sync_request:
+        x = __build_first_index_via_these(sync_request, far_format_adapter, markdown_file)  # noqa: E501
+
+    return x
+
+
+def __build_first_index_via_these(sync_request, far_format_adapter, markdown_file):  # noqa: E501
 
     _sync_params = sync_request.release_sync_parameters()
 
@@ -205,7 +217,7 @@ def _build_first_index(native_objects, markdown_file):
     import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib
 
     _wat = lib(_HOLY_SHNAPPS, _MyCustomProcessor())
-    return _wat
+    return _wat  # #todo
 
 
 class _MyCustomProcessor:

@@ -29,7 +29,7 @@ class Case010_hello(_CommonCase):
 @memoize
 def subject_one():
     return _subject_module()(
-            THIS_PRETEND_THING_IS_REQUIRED=None,
+            format_adapter_module_name=None,
             )
 
 

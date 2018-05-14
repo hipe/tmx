@@ -1,7 +1,7 @@
 def sub_magnetic(stem):
     import importlib
     _fa = subject_format_adapter().FORMAT_ADAPTER
-    pieces = [_fa.MODULE_NAME]
+    pieces = [_fa.format_adapter_module_name]
     pieces.append('magnetics')
     pieces.append(stem)
     _full_name = '.'.join(pieces)

@@ -97,7 +97,7 @@ class Case005_ASSORTED_STOWAWAYS(_CommonCase):
         count = 0
         import sakin_agac.format_adapters as x
         for mod in x.EVERY_MODULE():
-            mod.associated_filename_globs  # it's OK if None
+            mod.FORMAT_ADAPTER.associated_filename_globs  # it's OK if None
             count += 1
         self.assertNotEqual(0, count)
 

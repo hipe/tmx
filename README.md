@@ -187,7 +187,7 @@ then in your 'main' terminal:
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
-[[\[#019\]]                 |       | normalizing `sys.path`
+|[#019]                     | #open | proof-of-concept strict typing for one sub-project ([#412])
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
 [[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes
