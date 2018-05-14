@@ -74,6 +74,9 @@ class _FormatAdapter:
         self.associated_filename_globs = associated_filename_globs
         self.format_adapter_module_name = format_adapter_module_name
 
+    def collection_reference_via_string(self, coll_id):
+        return _CollectionReference(coll_id, self)
+
     def session_for_sync_request_(
             self,
             mixed_collection_identifier,
@@ -100,6 +103,17 @@ class _FormatAdapter:
     def sync_lib(self):  # #here1
         from . import synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
         return x
+
+
+class _CollectionReference:
+
+    def __init__(self, s, fa):
+        self._collection_identifier_string = s
+        self._format_adapter = fa
+
+    def session_for_sync_request(self, resources, listener):
+        return self._format_adapter.session_for_sync_request_(
+                self._collection_identifier_string, resources, listener)
 
 
 import sys  # noqa: E402

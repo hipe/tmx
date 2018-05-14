@@ -24,6 +24,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |---------------------------|:-----:|-
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.C  | #wish | we want regex escape
 |                   #410.B  |       | "item" wrapper classes - exploratory
 |                   #410    |       | (internal tracking)
 |<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents

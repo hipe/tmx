@@ -43,6 +43,10 @@ def minimal_listener_spy():
     return (mutable_message_array, listener)
 
 
+def fixture_executable_path(stem):
+    return os_path.join(_top_test_dir, 'fixture_executables', stem)
+
+
 def fixture_file_path(stem):
     return os_path.join(_top_test_dir, 'fixture-files', stem)
 
