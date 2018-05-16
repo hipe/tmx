@@ -16,6 +16,11 @@ class listening:  # (as namespace only)
 
 class streamlib:  # (as namespace only)
 
+    def next_or_noner(itr):
+        def f():
+            return streamlib.next_or_none(itr)
+        return f
+
     def next_or_none(itr):
         try:
             return next(itr)

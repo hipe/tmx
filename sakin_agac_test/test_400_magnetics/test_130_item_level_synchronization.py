@@ -32,7 +32,6 @@ SO, this is a rough sketch, but here is the uptake:
     confusingly so at times
 """
 
-
 from _init import (
         sanity
         )
@@ -42,8 +41,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+_CommonCase = unittest.TestCase
 
 
 class Case010_hello(_CommonCase):
