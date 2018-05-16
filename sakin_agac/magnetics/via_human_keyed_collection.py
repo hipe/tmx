@@ -1,56 +1,21 @@
 # support for hackish EN expression
 
 
-def _strings_from_stream(the_iterator_function):  # local decorator
-    def receive_outer_function(f):
-        def g(*args, **kwargs):
-            buffer = []
-            _strings = the_iterator_function(*args, **kwargs)
-            for s in _strings:
-                buffer.append(s)
-            return ''.join(buffer)
-        g.__doc__ = f.__doc__
-        return g
-    return receive_outer_function
+class _StreamStepper:
+
+    def __init__(self, items):
+        from modality_agnostic import streamlib
+        self._next_or_none = streamlib.next_or_noner(iter(items))
+        self.done = False
+
+    def step(self):
+        self.item = self._next_or_none()
+        if self.item is None:
+            del(self._next_or_none)
+            self.done = True
 
 
-def __strings_for_oxford_join(itr, interesting_sep=' and ', boring_sep=', '):
-    """(stream-centric implementation for client)"""
-
-    def step():
-        nonlocal item
-        item = next_or_none()
-        if item is None:
-            nonlocal done
-            done = True
-
-    from modality_agnostic import streamlib
-    next_or_none = streamlib.next_or_noner(iter(itr))
-
-    item = None
-    done = False
-
-    step()
-    if done:
-        yield 'nothing'  # ..
-        return
-    yield item
-    step()
-    if done:
-        return
-    while True:
-        item_on_deck = item
-        step()
-        if done:
-            yield interesting_sep
-            yield item_on_deck
-            break
-        yield boring_sep
-        yield item_on_deck
-
-
-@_strings_from_stream(__strings_for_oxford_join)
-def _oxford_join():
+def _oxford_join(itr, interesting_sep=' and ', boring_sep=', '):
     """given an iterable that produces 0-N strings, result in a string that
 
     expresses the list of strings in the typically english way. this is
@@ -104,7 +69,7 @@ def _oxford_join():
     song.
     """
 
-    pass
+    return _str_via(_OxfordJoin(itr, interesting_sep, boring_sep).execute())
 
 
 oxford_join = _oxford_join
@@ -114,36 +79,35 @@ nonetheless we want the doctest tests to read as if it is. :#here2)
 """
 
 
-def __strings_for_ellipsis_join(itr, ellipsis='…', sep=', '):
+class _OxfordJoin(_StreamStepper):
     """(stream-centric implementation for client)"""
 
-    def step():
-        nonlocal item
-        item = next_or_none()
-        if item is None:
-            nonlocal done
-            done = True
+    def __init__(self, itr, interesting_sep, boring_sep):
+        self.interesting_sep = interesting_sep
+        self.boring_sep = boring_sep
+        super().__init__(itr)
 
-    from modality_agnostic import streamlib
-    next_or_none = streamlib.next_or_noner(iter(itr))
+    def execute(self):
+        self.step()
+        if self.done:
+            yield 'nothing'  # ..
+            return
+        yield self.item
+        self.step()
+        if self.done:
+            return
+        while True:
+            item_on_deck = self.item
+            self.step()
+            if self.done:
+                yield self.interesting_sep
+                yield item_on_deck
+                break
+            yield self.boring_sep
+            yield item_on_deck
 
-    item = None
-    done = False
 
-    step()
-    if not done:
-        yield item
-        step()
-        while not done:
-            yield sep
-            yield item
-            step()
-
-    yield ellipsis
-
-
-@_strings_from_stream(__strings_for_ellipsis_join)
-def _ellipsis_join():
+def _ellipsis_join(itr, ellipsis='…', sep=', '):
     """this is the un-sexy counterpart to "oxford join" above.
 
     simply join the zero or more items with the separator, and append the
@@ -165,10 +129,39 @@ def _ellipsis_join():
 
     """
 
-    pass
+    return _str_via(_EllipsisJoin(itr, ellipsis, sep).execute())
 
 
 ellipsis_join = _ellipsis_join  # #here2 again
 
+
+class _EllipsisJoin(_StreamStepper):
+    """(stream-centric implementation. access t)"""
+
+    def __init__(self, itr, ellipsis, sep):
+        self.ellipsis = ellipsis
+        self.sep = sep
+        super().__init__(itr)
+
+    def execute(self):
+        self.step()
+        if not self.done:
+            yield self.item
+            self.step()
+            while not self.done:
+                yield self.sep
+                yield self.item
+                self.step()
+        yield self.ellipsis
+
+
+def _str_via(strings):
+    buffer = []
+    for s in strings:
+        buffer.append(s)
+    return ''.join(buffer)
+
+
 # #pending-rename: this was born wanting to be abstracted
+# #history-A.1
 # #born
