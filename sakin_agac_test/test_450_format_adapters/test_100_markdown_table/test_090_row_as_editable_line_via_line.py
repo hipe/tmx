@@ -61,6 +61,11 @@ class _CommonCase(unittest.TestCase):
         _row = self.case().row
         self.assertEqual(_row.cels_count, d)
 
+    def _has_endcap_yes_or_no(self, yn):
+        _row = self.case().row
+        _yn = _row.has_endcap
+        self.assertEqual(_yn, yn)
+
     def _recomposes(self):
         case = self.case()
         _expected = case.original_string
@@ -107,16 +112,16 @@ class Case010_some_failures(_CommonCase):
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
 
-    def test_020_pipe_at_beginnig_is_essential(self):
+    def test_020_pipe_at_beginning_is_required(self):
         _msg = _failure_message_via_line('😂')
         self.assertEqual("expecting '|' had '😂' at beginning of line", _msg)
 
-    def test_030_newline_at_ending_is_essential(self):
+    def test_030_newline_at_ending_is_required(self):
         _msg = _failure_message_via_line('|')
         self.assertEqual(r"expecting '\n' at end of line", _msg)
 
 
-class Case020_one_cel_with_nothing(_CommonCase):
+class Case020_one_cel_with_nothing_YES_ENDCAP(_CommonCase):
 
     def test_010_number_of_cels_looks_right(self):
         self._number_of_cels_is(1)
@@ -124,12 +129,50 @@ class Case020_one_cel_with_nothing(_CommonCase):
     def test_020_recomposes_good(self):
         self._recomposes()
 
-    def first_content_fellow_says_out(self):
+    def test_030_first_content_fellow_says_out(self):
         self.assertEqual(self._cel(0).content_string(), '')
+
+    def test_040_row_says_YES_endcap(self):
+        self._has_endcap_yes_or_no(True)
+
+    @given_input_string
+    def case(self):
+        return '||\n'
+
+
+class Case022_only_one_pipe(_CommonCase):
+
+    def test_010_number_of_cels_IS_ZERO(self):
+        self._number_of_cels_is(0)
+
+    def test_020_recomposes_good(self):
+        self._recomposes()
+
+    def test_040_row_says_YES_endcap(self):
+        self._has_endcap_yes_or_no(True)
 
     @given_input_string
     def case(self):
         return '|\n'
+
+
+class Case024_minimal_no_endcap(_CommonCase):
+
+    def test_010_number_of_cels_looks_right(self):
+        self._number_of_cels_is(1)
+
+    def test_020_recomposes_good(self):
+        self._recomposes()
+
+    def test_030_first_content_fellow_says_out(self):
+        self.assertEqual(self._cel(0).content_string(), 'x')
+
+    def test_040_row_says_NO_endcap(self):
+        self._has_endcap_yes_or_no(False)
+
+    @given_input_string
+    def case(self):
+        return '|x\n'
 
 
 class Case030_typical_guy(_CommonCase):
@@ -142,6 +185,9 @@ class Case030_typical_guy(_CommonCase):
 
     def test_030_a_content_fellow(self):
         self.assertEqual(self._cel(0).content_string(), r'<a name=123></a>[\[#123\]]')  # noqa: E501
+
+    def test_040_row_says_NO_endcap(self):
+        self._has_endcap_yes_or_no(False)
 
     @given_input_string
     def case(self):

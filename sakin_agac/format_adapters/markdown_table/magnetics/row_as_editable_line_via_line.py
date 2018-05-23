@@ -12,6 +12,9 @@ having said that,
   - also, we experiment with crazy DOM tomfoolery
 
   - also, see note on "efficiency" over in the test
+
+  - also (new at #history-A.1) a trailing pipe at the end of the line
+
 """
 
 from sakin_agac import (
@@ -24,35 +27,7 @@ import re
 
 
 def _SELF(upstream_line, listener):
-    return _Experiment(upstream_line, listener).execute()
-
-
-class _Experiment:
-
-    def __init__(self, s, l):
-        self._ok = True
-        self._result = None
-        self._line = s
-        self._listener = l
-
-    def execute(self):
-        self.__resolve_offsets()
-        self._ok and self.__resolve_DOM()
-        if self._ok:
-            return self._DOM
-
-    def __resolve_DOM(self):
-        self._DOM = _RowDOM()._init_via_line(self._offsets, self._line)
-
-    def __resolve_offsets(self):
-        _x = _do_resolve_offsets(self._line, self._listener)
-        return self._assign('_offsets', _x)
-
-    def _assign(self, var, x):
-        if x is None:
-            self._ok = False
-        else:
-            setattr(self, var, x)
+    return _RowDOM()._init_via_line(upstream_line, listener)
 
 
 class _BranchDOM:
@@ -82,21 +57,132 @@ class _RowDOM(_BranchDOM):
     def __init__(self):
         pass  # hi.
 
-    def _init_via_line(self, offsets, line):
+    def _init_via_line(self, line, listener):
+
         a = []
-        num_cels = 0
-        for (begin, end) in offsets:
-            num_cels += 1
-            a.append(_CelDOM()._init_via_begin_and_end(begin, end, line))
+        has_endcap = False
+        last_end = 0
+        ok = True
+
+        class symbols:  # namespace only
+
+            def cel(begin, end):
+                _cel = _CelDOM()._init_via_begin_and_end(begin, end, line)
+                a.append(_cel)
+                nonlocal last_end
+                last_end = end
+
+            def endcap():
+                nonlocal has_endcap
+                has_endcap = True
+
+            def failed():
+                nonlocal ok
+                ok = False
+
+        for (symbol, beg_end) in self.__tokens_via(line, listener):
+            getattr(symbols, symbol)(*beg_end)
+
+        if ok:
+            return self.__finish(a, has_endcap, last_end, line)
+
+    def __finish(self, a, has_endcap, last_end, line):
+
+        cels_count = len(a)
+
+        if has_endcap:
+            a.append(_PIPE_LEAF)
+            end = last_end + 1
+        else:
+            end = last_end
+
         None if '\n' == line[end] else sanity()
+
         a.append(_NEWLINE_LEAF)
+
+        # --
+
         self.children = tuple(a)
-        self.cels_count = num_cels
+        self.cels_count = cels_count
+        self.has_endcap = has_endcap
         return self
 
-    def init_via_children_tuple__(self, children):
-        self.cels_count = len(children) - 1  # ick/meh NOTE
+    def init_via_children_tuple__(self, cx):
+        print('\n\nthis stays for only one commit\n\n')
+        self.cels_count = len(cx)
+        self.children = cx
+        self.has_endcap = False
+        return self
+
+    def __tokens_via(self, line, listener):
+
+        # (only the first pipe is required. this makes the loop less pretty)
+
+        def early_end_of_string():
+            if scn.is_end_of_string():
+                nonlocal ok
+                ok = False
+                scn.expecting('\n')
+                return True
+
+        scn = _CustomScanner(line, listener)
+        ok = True
+
+        scn.mark_the_spot()
+        if scn.fails_to_match_expected(_pipe, '|'):
+            ok = False
+
+        while ok:  # sneaky
+            if early_end_of_string():
+                break
+
+            if scn.match(_newline):  # "endcap" IFF pipe then newline
+                yield 'endcap', ()
+                break
+
+            scn.match_assertively(_zero_or_more_not_newline_not_pipes)
+
+            _hi = scn.release_tuple()
+            yield 'cel', _hi
+
+            if early_end_of_string():
+                break
+
+            if scn.match(_newline):
+                break
+
+            """ok, challenge mode in logic: look at the last 3 matchy things
+            we did. what do we know at this point?
+
+              - there is some remainder in the string. (we checked for EOS)
+
+              - whatever is at the head of the string, it's not a newline
+
+              - it's not a not-newline-not-pipe either, because we matched
+                all of those above. since there is more string, its head
+                must be either a newline or a pipe. right?
+
+              - since it's not a newline, it must be a pipe, right?
+            """
+
+            scn.mark_the_spot()
+            scn.match_assertively(_pipe)
+
+        if ok:
+            if not scn.is_end_of_string():
+                sanity('super weird - stuff after newline')
+        else:
+            yield 'failed', ()
+
+    def init_via_all_memberdata__(
+            self,
+            cels_count,
+            children,
+            has_endcap,
+            ):
+        self.cels_count = cels_count
         self.children = children
+        self.has_endcap = has_endcap
         return self
 
     def to_line(self):
@@ -107,6 +193,10 @@ class _RowDOM(_BranchDOM):
         if offset < 0 or offset >= self.cels_count:
             cover_me('out of range')
         return self.children[offset]
+
+    def any_endcap_(self):
+        if self.has_endcap:
+            return self.children[-2]  # yikes
 
 
 class _CelDOM(_BranchDOM):
@@ -177,27 +267,6 @@ _NEWLINE_LEAF = _LeafDOM('\n')
 _PIPE_LEAF = _LeafDOM('|')
 
 
-def _do_resolve_offsets(upstream_line, listener):
-    result = None
-    a = []
-    scn = _CustomScanner(upstream_line, listener)
-    while True:
-        scn.mark_the_spot()
-        if scn.match(_pipe):
-            scn.match_assertively(_zero_or_more_not_newline_not_pipes)
-            a.append(scn.release_tuple())
-            continue
-        if scn.match(_newline):
-            if scn.is_end_of_string():
-                result = a
-                del a
-                break
-            cover_me('stuff after newline')
-        scn.expecting('\n' if scn.is_end_of_string() else '|')
-        break
-    return result
-
-
 o = re.compile
 _newline = o(r'\n')
 _pipe = o(r'\|')
@@ -225,6 +294,14 @@ class _CustomScanner:  # #abstraction candidate
         del self._THE_SPOT
         self._mark_OK = True
         return (x, self._offset)
+
+    def fails_to_match_expected(self, rx, label):
+        _yes = self.match(rx)
+        if _yes:
+            return False
+        else:
+            self.expecting(label)
+            return True
 
     def match_assertively(self, rx):
         _yes = self.match(rx)
@@ -257,4 +334,5 @@ class _CustomScanner:  # #abstraction candidate
 
 sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
+# #history-A.1
 # #born.
