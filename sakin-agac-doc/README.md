@@ -22,12 +22,15 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.D  | #trak | spots to change if we add this feature (see)
 |                   #410.C  | #wish | we want regex escape
 |                   #410.B  |       | "item" wrapper classes - exploratory
 |                   #410    |       | (internal tracking)
 |<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents
+|                   #409.A  |       | central conceit: markdown table as datastore
 |<a name=408></a>[\[#408\]] |       | decompose the algorithm
 |<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
 |<a name=406></a>[\[#406\]] |       | strategic dependency graph

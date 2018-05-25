@@ -1,4 +1,4 @@
-|FieldName One | Field 2 | ChaCha
+|FieldName One | Field 2 | ChaCha |
 |--|:--:|-
 |one|two|three
 |one|two|three|four|five

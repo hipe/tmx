@@ -15,17 +15,50 @@ keep in mind:
       carried away; this is just proof-of-concept..
 
     - also keep in mind we should use a parser like ragel etc
+
+
+this:
+
+:[#410.D]: the idea is there is a cost to parsing a markdown table robustly
+(you're counting cels, you're parsing escaping to allow for escaped pipes)
+versus parsing markdown tables coarsely (you're just perhaps hopping over all
+contiguous lines that start with a pipe.)
+
+(also there is a cost to making the name-to-offset mapping.)
+
+would that we had a single document with several markdown tables and we are
+in fact riding on our [#409.A] central conceit of using MDT's as datastores;
+we might want to parse the document *without* the assumption built-in to it
+that we are parsing every markdown table we encounter robustly.
+
+however, to implement this we would have to add a parameter representing the
+desired MTD (probably by offset, maybe (gulp) by some kind of label).
+
+furthermore such an arrangement would break consuemrs that expect documents
+to have only these discrete N sectiosn (header, table, and so on.) so this
+marker tracks relevant code spots that would be effected by expanding our
+featureset to such a full realization..
 """
 
 
 from sakin_agac import (
         cover_me,
+        pop_property,
+        sanity,
         )
 import re
 import sys
 
 
-def _SELF(upstream_path, listener=None):
+def _SELF(upstream_path, listener):
+
+    if listener is None:
+        sanity("you're gonna want a listener")  # #[#412]
+
+    return __generator_sanitized(upstream_path, listener)
+
+
+def __generator_sanitized(upstream_path, listener):
 
     parse = _Parse(listener)
 
@@ -58,21 +91,33 @@ class _Parse:
             return ('head_line', line)
 
     def TABLE_SCHEMA_LINE_ONE(self, line):
-        schema = _markdown_table_schema_as_line_via_line(line, self._listener)
+
+        from .schema_index_via_schema_row import (
+                row_two_function_and_liner_via_row_one_line as f,
+                )
+
+        two = f(line, self._listener)
+        if two is None:
+            self._stop_early()
+        else:
+            self._row_two_function, liner = two
+            self._state = self.TABLE_SCHEMA_LINE_TWO
+            return ('table_schema_line_one_of_two', liner)
+
+    def TABLE_SCHEMA_LINE_TWO(self, line):
+
+        f = pop_property(self, '_row_two_function')
+
+        schema_f, liner = f(line)  # ..
+        schema = schema_f()  # #[#410.D] just build the index now, always
+
         if schema is None:
             self._stop_early()
         else:
-            self._state = self.TABLE_SCHEMA_LINE_TWO
             self._schema = schema
-            return ('table_schema_line_one_of_two', schema)
-
-    def TABLE_SCHEMA_LINE_TWO(self, line):
-        row = self._schema.row_as_line_via_line(line)
-        if row is None:
-            self._stop_early()
-        else:
             self._state = self.ANOTHER_ROW_OR_NO_MORE_TABLE
-            return ('table_schema_line_two_of_two', row)
+            _ = _CustomHybrid(schema, liner)
+            return ('table_schema_line_two_of_two', _)
 
     def ANOTHER_ROW_OR_NO_MORE_TABLE(self, line):
         if _looks_like_table_line(line):
@@ -93,45 +138,19 @@ class _Parse:
     def _stop_early(self):
         del self._state
 
-
-def _markdown_table_schema_as_line_via_line(line, listener):
-
-    from sakin_agac.format_adapters.markdown_table.magnetics import (
-            row_as_editable_line_via_line as row_via_line_and_listener,
-            )
-
-    def row_via_line(line_):
-        return row_via_line_and_listener(line_, listener)
-
-    row = row_via_line(line)
-    if row is not None:
-        return _MarkdownTableSchemaAsLine(row, row_via_line, listener)
+    def to_line(self):
+        return self.row_DOM.to_line()
 
 
-class _MarkdownTableSchemaAsLine:
+class _CustomHybrid:
+    """currently clients will have to know that we are *not* doing #[#410.D]"""
 
-    def __init__(self, row, row_via_line, listener):
+    def __init__(self, schema, liner):
+        self.complete_schema = schema
+        self._liner = liner
 
-        self.cels_count = row.cels_count
-        self.row_DOM = row
-        self._row_via_line = row_via_line
-        self._listener = listener
-
-    def row_as_line_via_line(self, line):
-
-        row = self._row_via_line(line)
-        if row is not None:
-            act = row.cels_count
-            if act == self.cels_count:
-                return row
-            else:
-                self.__when_cel_count_mismatch(act)
-
-    def __when_cel_count_mismatch(self, act):
-        from modality_agnostic import listening
-        error = listening.leveler_via_listener('error', self._listener)  # ..
-        _fmt = 'cel count mismatch (had {} needed {})'
-        error(_fmt.format(act, self.cels_count))
+    def to_line(self):
+        return self._liner.to_line()
 
 
 _looks_like_table_line = re.compile(r'^\|').search

@@ -73,7 +73,7 @@ def success_snapshot(f):  # local decorator
 
     def mutable_f():
         fixture_file = f(None)
-        tuples = _common_execute(fixture_file)
+        tuples = _common_execute(fixture_file, 'listener03')
 
         def final_f():
             return x
@@ -85,7 +85,7 @@ def success_snapshot(f):  # local decorator
     return g
 
 
-class Case010_fail_too_few_rows(_CommonCase):
+class Case020_fail_too_many_rows(_CommonCase):  # #coverpoint3.1
 
     def test_005_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -94,26 +94,15 @@ class Case010_fail_too_few_rows(_CommonCase):
         self._fails()
 
     def test_020_talkin_bout_etc(self):
-        _exp = 'cel count mismatch (had 2 needed 3)'
-        self._failed_talking_bout(_exp)
-
-    @failure_snapshot
-    def snapshot(self):
-        return '0080-too-few-rows.md'
-
-
-class Case020_fail_too_many_rows(_CommonCase):
-
-    def test_010_fails(self):
-        self._fails()
-
-    def test_020_talkin_bout_etc(self):
-        _exp = 'cel count mismatch (had 5 needed 3)'
+        # #overloaded-test
+        _exp = 'row cannot have more cels than the schema row has. (had 5, needed 3.)'  # noqa: E501
         self._failed_talking_bout(_exp)
 
     @failure_snapshot
     def snapshot(self):
         return '0090-too-many-rows.md'
+        # #here1: the above filename should be renamed: cels not rows, less not too few  # noqa: E501
+        # #here2: the other one should be renamed: cels not rows, more not too many  # noqa: E501
 
 
 class Case030_minimal_working(_CommonCase):
@@ -135,7 +124,7 @@ class Case030_minimal_working(_CommonCase):
         return '0100-hello.md'
 
 
-def _common_execute(fixture_file, listener=None):
+def _common_execute(fixture_file, listener):
 
     _magnetic = _subject_module()
     _path = fixture_file_path(fixture_file)
@@ -227,4 +216,7 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: not this file but #here2
+# #pending-rename: not this file but #here1
+# #history-A.1: remove "too few cels"
 # #born.

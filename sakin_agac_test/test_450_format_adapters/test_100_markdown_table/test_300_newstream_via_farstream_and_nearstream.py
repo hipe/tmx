@@ -212,6 +212,8 @@ def __build_first_index_via_these(sync_request, far_format_adapter, markdown_fil
             # the sync parameters:
             natural_key_field_name=_nkfn,
             farstream_format_adapter=far_format_adapter,
+
+            listener='listener1',
             )
 
     import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib

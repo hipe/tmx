@@ -1,3 +1,23 @@
+"""the [#409.A] central conceit of this whole lyfe happens in this module:
+
+this is where we read the lines of a markdown document, and pass a certain
+subslice of those lines over to our synchronization algorithm. the output
+of the main function in this module is the new lines of the markdown document
+(sort of) after the synchronization has been applied.
+
+by "sort of" we mean this: the result of the function is actually a stream
+of tuples, where each first element of each tuple is a "category" (type) of
+element (roughly corresponding to the names of the states in our [#409]
+parser state machine), and each second element is mixed (but either a line
+or a `to_string()`-able).
+
+we intend for this to be "modality agnostic" - this module does not "know"
+whether it's running under a CLI or elsewhere.
+
+we thought that you would want a [#411] tagged stream processor to produce
+your result; but in fact we do something simpler.
+"""
+
 from sakin_agac.magnetics import (
         synchronized_stream_via_new_stream_and_original_stream as _sync,
         )
@@ -18,7 +38,6 @@ next_or_none = _streamlib.next_or_none
 
 
 def _NEWSTREAM_VIA_ETC(
-        # NOTE - INTERFACE CONSTANTLY CHANGING AND THAT'S OK
         # the streams:
         farstream_items,
         nearstream_path,
@@ -27,8 +46,7 @@ def _NEWSTREAM_VIA_ETC(
         natural_key_field_name,
         farstream_format_adapter,
 
-        # only if you're ballsy:
-        listener=None,
+        listener,
         ):
 
     def __main():
@@ -127,6 +145,7 @@ class _CustomProcessor:
         self._natural_key_field_name = natural_key_field_name
         self._state = 'HEAD_LINES'
         self._proto_row = '_proto_row_initially'
+        self._did_see_first_business_object_row = False
         self._listener = listener
 
     def gets(self):
@@ -138,7 +157,7 @@ class _CustomProcessor:
         if 'head_line' == typ:
             pass
         elif 'table_schema_line_one_of_two' == typ:
-            self._schema_row_one = tup[1]
+            # NOTE we don't even take the liner, we don't care
             self._state = 'SECOND_TABLE_LINE'
             pass
         else:
@@ -147,9 +166,11 @@ class _CustomProcessor:
 
     @_could_end_at_any_time
     def SECOND_TABLE_LINE(self, tup):
+
         typ = tup[0]
         if 'table_schema_line_two_of_two' == typ:
-            self._schema_row_two = tup[1]
+            _custom_hybrid = tup[1]
+            self._complete_schema = _custom_hybrid.complete_schema
             self._state = '_TRANSITION_TO_CRAZY_TOWN'
         else:
             cover_me('unexpected tagged item')
@@ -160,24 +181,30 @@ class _CustomProcessor:
         self._name_value_pairs_via_far_native_object = self._sync_args.pop(
                 'name_value_pairs_via_far_native_object')
 
-        self.__init_schema_index()
-
         _item_via_collision = self.__build_item_via_collision()
 
         _far_item_wrapperer = self.__build_far_item_wrapperer()
 
         _near_item_stream = self.__build_near_item_stream()
 
-        _nat_key_via = self._SCHEMA_INDEX.field_reader(self._natural_key_field_name)  # noqa: E501
+        _nat_key_via = self._complete_schema.field_reader(self._natural_key_field_name)  # noqa: E501
 
-        _sync_args = pop_property(self, '_sync_args')
+        sync_args = pop_property(self, '_sync_args')
+        orig_listener = sync_args['listener']
+
+        def f(typ, *a):
+            if 'error' == typ:
+                self._OK = False
+            orig_listener(typ, *a)
+        self._OK = True
+        sync_args['listener'] = f
 
         self._big_deal_stream = _sync.SELF(
                 near_item_stream=_near_item_stream,  # :#here1
                 natural_key_via_near_item=_nat_key_via,  # :#here2
                 far_item_wrapperer=_far_item_wrapperer,
                 item_via_collision=_item_via_collision,  # :#here3
-                ** _sync_args)
+                ** sync_args)
 
         self._state = 'OBJECT_ROWS'
         return self.gets()
@@ -208,6 +235,9 @@ class _CustomProcessor:
             # do this only once you've acutally seen such a row in the near doc
             prototype_row = self._prototype_row_as_late_as_possible()
 
+            if prototype_row is None:
+                return
+
             def wrap(native_object):
                 _pairs = name_value_pairs_via_far_native_object(native_object)
                 _wrapped = prototype_row.new_via_name_value_pairs(_pairs)
@@ -228,16 +258,20 @@ class _CustomProcessor:
         return self.__actual_proto_row
 
     def __build_proto_row(self):
+        if self._did_see_first_business_object_row:
+            return self.__build_proto_row_when_seen()
+        else:
+            self._error("can't sync because no first business object row")
+
+    def __build_proto_row_when_seen(self):
 
         _row = pop_property(self, '_first_business_object_row')
-        _sch2 = pop_property(self, '_schema_row_two')
 
         from . import prototype_row_via_example_row_and_schema_index as x
         return x(
                 natural_key_field_name=self._natural_key_field_name,
                 example_row=_row,
-                schema_index=self._SCHEMA_INDEX,
-                row_schema_for_alignment=_sch2,
+                complete_schema=self._complete_schema,
                 )
 
     def __build_near_item_stream(self):
@@ -245,6 +279,7 @@ class _CustomProcessor:
         def item_via_native_object(x):
             # only for the first row we encounter,
             # do this thing (per [#408.E])
+            self._did_see_first_business_object_row = True
             self._first_business_object_row = x
             nonlocal item_via_native_object
             item_via_native_object = _Item
@@ -281,16 +316,14 @@ class _CustomProcessor:
 
         return _NearItem
 
-    def __init_schema_index(self):
-        _schema_row = pop_property(self, '_schema_row_one')
-        from . import schema_index_via_schema_row as x
-        self._SCHEMA_INDEX = x.SELF(_schema_row)
-
     def OBJECT_ROWS(self):
         x = next_or_none(self._big_deal_stream)
         if x is None:
-            self._state = 'TAIL_LINES'
-            return pop_property(self, '_TUP_ON_DECK')
+            if self._OK:
+                self._state = 'TAIL_LINES'
+                return pop_property(self, '_TUP_ON_DECK')
+            else:
+                return ('markdown_table_unable_to_be_synced_against_', None)
         else:
             return ('business_object_row', x)
 
@@ -301,6 +334,11 @@ class _CustomProcessor:
     def _close(self):
         del(self._tagged_stream)
         del(self._state)
+
+    def _error(self, message):
+        from modality_agnostic import listening as li
+        error = li.leveler_via_listener('error', self._listener)
+        error(message)
 
 
 sys.modules[__name__] = _NEWSTREAM_VIA_ETC

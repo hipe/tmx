@@ -53,15 +53,17 @@ class _SELF:
             self,
             natural_key_field_name,
             example_row,
-            row_schema_for_alignment,
-            schema_index,
+            complete_schema,
             ):
 
         orig_children = example_row.children
+        self._eg_endcap = example_row.any_endcap_()
 
         def f(i):
-            _cel_schema = _CelSchema(row_schema_for_alignment.children[i])
+            _cel_schema = _cel_schema_via(row_schema_for_alignment.children[i])
             return _celer_via(orig_children[i], _cel_schema)
+
+        row_schema_for_alignment = complete_schema.row_for_alignment__
 
         tained_example_cel_DOM = orig_children[0]
         tained_example_cel_DOM.content_string()  # be sure it's decomposed
@@ -72,10 +74,10 @@ class _SELF:
                 childreners, row_schema_for_alignment, _CelDOM)
 
         self._celers = [f(i) for i in range(0, example_row.cels_count)]
-        self._offset_via_field_name = schema_index.offset_via_field_name__
+        self._offset_via_field_name = complete_schema.offset_via_field_name__
         self.__reuse_newline = orig_children[-1]
         self._RowDOM = example_row.__class__
-        self.__cels_count = example_row.cels_count
+        self._cels_count = example_row.cels_count
         self._natural_key_field_name = natural_key_field_name
 
     def MERGE(self, pairs, near_row_DOM):
@@ -94,7 +96,9 @@ class _SELF:
         offset = self._offset_via_field_name
         _nvvo = {offset[k]: d[k] for k in d}  # KeyError #coverpoint1.1 (1/2)
 
-        return self._build_new_row(near_f, _nvvo)
+        _endcap = near_row_DOM.any_endcap_()
+
+        return self._build_new_row(near_f, _nvvo, _endcap)
 
     def new_via_name_value_pairs(self, pairs):
         """for each key-value in the far pairs, make the new cel.
@@ -115,9 +119,9 @@ class _SELF:
         offset = self._offset_via_field_name
         _nvvo = {offset[k]: v for k, v in pairs}  # KeyError #coverpoint1.1
 
-        return self._build_new_row(spaces_cel, _nvvo)
+        return self._build_new_row(spaces_cel, _nvvo, self._eg_endcap)
 
-    def _build_new_row(self, user_f, new_value_via_offset):
+    def _build_new_row(self, user_f, new_value_via_offset, endcap):
 
         def f(i):
             if i in new_value_via_offset:
@@ -127,11 +131,21 @@ class _SELF:
 
         value_cel = self.__value_celer(new_value_via_offset)
 
-        new_cels = [f(i) for i in range(0, self.__cels_count)]
+        new_cels = [f(i) for i in range(0, self._cels_count)]
+
+        if endcap is None:
+            has = False
+        else:
+            new_cels.append(endcap)
+            has = True
 
         new_cels.append(self.__reuse_newline)
 
-        _new_row = self._RowDOM().init_via_children_tuple__(tuple(new_cels))
+        _new_row = self._RowDOM().init_via_all_memberdata__(
+            cels_count=self._cels_count,
+            children=tuple(new_cels),
+            has_endcap=has,
+            )
 
         return _new_row  # #todo
 
@@ -223,7 +237,7 @@ def _childreners_via(tainted_example_cel_DOM):
     return _childreners
 
 
-def _CelSchema(cel_DOM):
+def _cel_schema_via(cel_DOM):
     """so,
 
     these:
@@ -244,24 +258,27 @@ def _CelSchema(cel_DOM):
         if md[3] is None:
             return _cel_schemas.no_alignment_specified
         else:
-            cover_me('no colon - yes colon')
+            # #coverpoint4.1 - no colon - yes colon
+            return _cel_schemas.right_aligned
     elif md[3] is None:
-        cover_me('yes colon - no colon')
+        # #coverpoint4.2 - yes colon - no colon
+        return _cel_schemas.left_aligned
     else:
         None if md[2] is None else sanity()
         None if md[4] is None else sanity()
         return _cel_schemas.right_aligned
 
 
-class _CelSchema_:
+class _CelSchema:
     def __init__(self, s):
         self.alignment = s
 
 
 class _cel_schemas:  # namespace only
 
-    right_aligned = _CelSchema_('align_right')
-    no_alignment_specified = _CelSchema_('no_alignment_specified')
+    left_aligned = _CelSchema('align_left')
+    right_aligned = _CelSchema('align_right')
+    no_alignment_specified = _CelSchema('no_alignment_specified')
 
 
 sys.modules[__name__] = _SELF

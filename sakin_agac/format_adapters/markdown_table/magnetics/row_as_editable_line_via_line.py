@@ -107,13 +107,6 @@ class _RowDOM(_BranchDOM):
         self.has_endcap = has_endcap
         return self
 
-    def init_via_children_tuple__(self, cx):
-        print('\n\nthis stays for only one commit\n\n')
-        self.cels_count = len(cx)
-        self.children = cx
-        self.has_endcap = False
-        return self
-
     def __tokens_via(self, line, listener):
 
         # (only the first pipe is required. this makes the loop less pretty)
