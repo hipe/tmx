@@ -163,9 +163,12 @@ class _Performance:
         return fmt.format(** dic)
 
 
-class _WriteOnly_IO_Proxy:
+class WriteOnly_IO_Proxy:
     def __init__(self, f):
         self.write = f
+
+
+_WriteOnly_IO_Proxy = WriteOnly_IO_Proxy
 
 
 class _Expectation:

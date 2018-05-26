@@ -125,5 +125,3 @@ goal: get a snapshot of our one known remaining syncing issue for khong
   - strange format adapter name (3 -8)
   - help screen small (1 -4)
   - put a wall up between CLI and your rumskalla not CLI code (incorproate this to nearby item)
-  - help screen top #CLI (1 -5)
-  - whine when not in interactive mode #CLI (1 -6)

@@ -1,37 +1,56 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-_description_of_sync = """the sync utility
-is a bold and important experiment
-EDIT
+_description_of_sync = """
+description: for a given particular natural key field name, for each item
+
+in the "near collection", see if you can pair it up with an item in the
+"far collection" based on that natural key field name.
+
+(the natural key field name is "declared" by the far collection.)
+
+for each given near item, when a corresponding far item exists by the above
+criteria, the values of those components in the near item that exist in the
+far item are clobbered with the far values.
+
+(the near item can have field names not in the far item, but if the far item
+has field names not in the near item, we express this as an error and halt
+further processing.)
+
+(after this item-level merge, the far item is removed from a pool).
+
+at the end of all this, each far item that had no corresponding near item
+(i.e. that did not "pair up") is simply appended to the near collection.
+
+(this is a synopsis of an algorithm that is described [#407] more formally.)
 """
 
 
-def __my_parameters(o, param):
+def _my_parameters(o, param):
 
-    o['from_thing'] = param(
-            description='«help for from_thing»',
+    o['near_collection'] = param(
+            description='«help for near_collection»',
             )
 
     def __thing_two_desc(o, style):
-        o('«help for {}'.format(style.em('to_thing')))
+        o('«help for {}'.format(style.em('far_collection')))
         o('2nd line')
 
-    o['to_thing'] = param(
-            description=__thing_two_desc,
-            )
+    o['far_collection'] = param(
+             description=__thing_two_desc,
+             )
 
     def _plus_etc(s):
         def f(o, style):
             o("{} (try 'help')".format(s))
         return f
 
-    o['from_format'] = param(
-            description=_plus_etc('«the from_format»'),
+    o['near_format'] = param(
+            description=_plus_etc('«the near_format»'),
             argument_arity='OPTIONAL_FIELD',
             )
 
-    o['to_format'] = param(
-            description=_plus_etc('«the to_format»'),
+    o['far_format'] = param(
+            description=_plus_etc('«the far_format»'),
             argument_arity='OPTIONAL_FIELD',
             )
 
@@ -48,8 +67,22 @@ class _CLI:  # #coverpoint
         self._exitstatus = 5
         self._OK = True
         self._OK and self.__be_sure_interactive()
+        self._OK and self.__resolve_namespace_via_parse_args()
         self._OK and self.__NEXT_THING()
         return self._pop_property('_exitstatus')
+
+    def __resolve_namespace_via_parse_args(self):
+
+        from script_lib.magnetics import (
+                parse_stepper_via_argument_parser_index as stepperer,
+                )
+
+        reso = stepperer.SIMPLE_STEP(
+                self._serr, self._argv, _my_parameters, _description_of_sync)
+        if reso.OK:
+            self._namespace = reso.namespace
+        else:
+            self._stop(reso.exitstatus)  # #coverpoint6.1.2
 
     def __be_sure_interactive(self):
         if not self._sin.isatty():
@@ -71,20 +104,6 @@ class _CLI:  # #coverpoint
     def _pop_property(self, prop):
         from sakin_agac import pop_property
         return pop_property(self, prop)
-
-
-def _resolve_namespace_via_parse_args_USE_ME(serr, argv, __my_parameters):
-
-    from script_lib.magnetics import (
-            parse_stepper_via_argument_parser_index as stepperer,
-            )
-    reso = stepperer.SIMPLE_STEP(
-            serr, argv, __my_parameters, _description_of_sync)
-    if reso.OK:
-        print("OK! : {}".format(reso.namespace))
-        return 0
-    else:
-        return reso.exitstatus
 
 
 if __name__ == '__main__':

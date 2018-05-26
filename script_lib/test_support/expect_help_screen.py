@@ -159,9 +159,12 @@ def section_index_via_chunks(s_a):
     None if len(s_a) == 1 else cover_me('see me')
     # ☝️ would require a flat map; read: lowlevel stream tooling & testing
 
-    import script_lib.test_support.expect_treelike_screen as mod
-    _line_st = mod.line_stream_via_big_string(s_a[0])
-    tree = mod.tree_via_line_stream(_line_st)
+    _line_st = _this_lib().line_stream_via_big_string(s_a[0])
+    return _section_index_via_line_stream(_line_st)
+
+
+def _section_index_via_line_stream(line_st):
+    tree = _this_lib().tree_via_line_stream(line_st)
     cx = tree.children
     node_d = {}
     for node in cx:
@@ -233,6 +236,11 @@ class _QuickDirty_IO_Mock():
         s_a = self._chunks
         del self._chunks
         return s_a
+
+
+def _this_lib():
+    import script_lib.test_support.expect_treelike_screen as mod
+    return mod
 
 
 def _my_exception(msg):  # #copy-pasted
