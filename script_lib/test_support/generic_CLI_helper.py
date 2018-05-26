@@ -102,7 +102,7 @@ class CLI_CaseMethods:
         s_a, f_a = self._build_recording_list_and_expectation_list__CLI(num_lines)  # noqa: E501
         from script_lib.test_support import expect_STDs
 
-        _expectation = expect_STDs.expect_lines((lambda: f_a), which)
+        _expectation = expect_STDs.expect_lines(f_a, which)
         perf = _expectation.to_performance_under(self)
 
         _sout, _serr = self._appropriate_stdout_and_stderr__CLI(perf)

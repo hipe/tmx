@@ -56,19 +56,19 @@ def expect_lines():
         STDERR: expect_stderr_lines,
     }
 
-    def f(line_expectation_iter_f, which_s):
+    def f(line_expectation_iter, which_s):
         _d = _which_via_string(which_s)
-        return dict[_d](line_expectation_iter_f)
+        return dict[_d](line_expectation_iter)
 
     return f
 
 
-def expect_stderr_lines(f):
-    return _Expectation((STDERR, x) for x in f())
+def expect_stderr_lines(itr):
+    return _Expectation((STDERR, x) for x in itr)
 
 
-def expect_stdout_lines(f):
-    return _Expectation((STDOUT, x) for x in f())
+def expect_stdout_lines(itr):
+    return _Expectation((STDOUT, x) for x in itr)
 
 
 class _Performance:

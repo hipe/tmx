@@ -73,7 +73,7 @@ class _CaseMethods:
         return self._build_expectation(f)
 
     def _build_expectation(self, f):
-        return self._subject_module().expect_stderr_lines(f)
+        return self._subject_module().expect_stderr_lines(f())
 
     def _subject_module(self):
         import script_lib.test_support.expect_STDs as x
