@@ -40,7 +40,7 @@ possible issues:
 
 
 from modality_agnostic.memoization import (
-  lazy,
+        lazy,
 )
 
 

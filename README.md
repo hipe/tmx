@@ -182,6 +182,7 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#601]-[#699]              |       | (for script lib)
 |[#501]-[#599]              |       | (for modality agnostic)
 |[#401]-[#499]              |       | (for sakin agac)
 |[#301]-[#399]              |       | (for upload bot)

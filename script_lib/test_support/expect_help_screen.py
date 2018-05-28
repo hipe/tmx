@@ -1,4 +1,6 @@
-"""functions (mostly) to help asssert over help screeen content at a high level
+"""functions (mostly) to help assert over help screeen content at a high level
+
+:[603]
 """
 
 from modality_agnostic.memoization import (

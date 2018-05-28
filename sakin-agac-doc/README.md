@@ -25,6 +25,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.E  | #open | dashes to underscores is getting annoying
 |                   #410.D  | #trak | spots to change if we add this feature (see)
 |                   #410.C  | #wish | we want regex escape
 |                   #410.B  |       | "item" wrapper classes - exploratory

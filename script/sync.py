@@ -68,8 +68,46 @@ class _CLI:  # #coverpoint
         self._OK = True
         self._OK and self.__be_sure_interactive()
         self._OK and self.__resolve_namespace_via_parse_args()
+        self._OK and self.__resolve_normal_args_via_namespace()
+        self._OK and self.__maybe_express_help_for_format()
         self._OK and self.__NEXT_THING()
         return self._pop_property('_exitstatus')
+
+    def __maybe_express_help_for_format(self):
+
+        import sakin_agac.format_adapters as mod  # you're going to use..
+        self._format_adapters_module = mod  # ..this here or there
+
+        arg = self._normal_args
+        if 'help' in (arg['near_format'], arg['far_format']):
+            self._serr.write(
+                 "(just FYI, 'help' does the same thing "
+                 "whether it is passed to '--near-format' or '--far-format')\n"
+                 )
+            self.__express_help_for_format()
+
+    def __express_help_for_format(self):
+        sout = self._sout
+        serr = self._serr
+        serr.write('the filename extension can imply a format adapter.\n')
+        serr.write('(or you can specify an adapter explicitly by name.)\n')
+        serr.write('known format adapters (and associated extensions):\n')
+        count = 0
+        for (k, mod) in self._format_adapters_module.to_name_value_pairs():
+            _these = ', '.join(mod.FORMAT_ADAPTER.associated_filename_globs)
+            sout.write('    {} ({})\n'.format(k, _these))
+            count += 1
+        serr.write('({} total.)\n'.format(count))
+        self._stop_successfully()
+
+    def __resolve_normal_args_via_namespace(self):
+        ns = self._pop_property('_namespace')
+        self._normal_args = {
+                'near_coll': getattr(ns, 'near-collection'),
+                'far_coll': getattr(ns, 'far-collection'),
+                'near_format': ns.near_format,
+                'far_format': ns.far_format,
+                }
 
     def __resolve_namespace_via_parse_args(self):
 
@@ -96,6 +134,9 @@ class _CLI:  # #coverpoint
 
     def _fail_generically(self):
         self._stop(5)
+
+    def _stop_successfully(self):
+        self._stop(0)
 
     def _stop(self, exitstatus):
         self._exitstatus = exitstatus

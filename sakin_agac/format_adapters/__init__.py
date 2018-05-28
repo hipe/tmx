@@ -3,6 +3,17 @@ from modality_agnostic.memoization import (
         )
 
 
+def to_name_value_pairs():
+
+    def natural_key_of(mod):
+        return rx.search(mod.FORMAT_ADAPTER.format_adapter_module_name)[0]
+
+    import re
+    rx = re.compile(r'(?<=\.)[^.]+$')
+
+    return ((natural_key_of(x), x) for x in EVERY_MODULE())
+
+
 @lazy
 def EVERY_MODULE():
     """result is an iterator over every such module.
