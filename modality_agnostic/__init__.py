@@ -7,8 +7,13 @@ class listening:  # (as namespace only)
         return o
 
     def logger_via_listener(listener):
+        if listener is None:  # #[#507.2] we want strong typing
+            raise Exception('sanity - you want a listener')
+
+        # #open [#508] below where we pass `o` we should instead etc
+
         def log(category, tmpl, *args, **kwargs):
-            def write_this(o):
+            def write_this(o, styler=None):
                 _msg = tmpl.format(*args, **kwargs)
                 o(_msg)
             listener(category, 'expression', write_this)
@@ -27,6 +32,13 @@ class streamlib:  # (as namespace only)
             return next(itr)
         except StopIteration:
             pass
+
+
+def cover_me(s):
+    raise _PlatformException('cover me: {}'.format(s))
+
+
+_PlatformException = Exception
 
 
 class Exception(Exception):

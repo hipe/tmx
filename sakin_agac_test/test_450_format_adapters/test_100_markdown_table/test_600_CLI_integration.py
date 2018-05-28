@@ -226,6 +226,38 @@ class Case050_FA_help_screen(_CommonCase):
         return ('me', '--near-format', 'help', 'xx', 'yy')
 
 
+class Case060_strange_format_adapter_name(_CommonCase):
+    """(this is to get us "over the wall - there is another test just like
+
+    it that is modality-agnostic. (but this one came first! yikes)
+    """
+
+    def test_100_fails(self):
+        self._CLI_client_results_in_failure_exitstatus()
+
+    def test_200_says_not_found(self):
+        _ = self._two_sentences()[0]
+        self.assertEqual(_, "no format adapter for 'zig-zag'")
+
+    def test_300_says_did_you_mean(self):
+        _ = self._two_sentences()[1]
+        self.assertRegex(_, r"\bthere's '[a-z_]+' and '")
+
+    @shared_subject
+    def _two_sentences(self):
+        return self._first_line().split('. ')
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def _sout_and_serr_and_end_stater(self):
+        return self._expect_this_many_on_stderr(1)
+
+    def _argv(self):
+        return ('me', '--far-format', 'zig-zag', 'xx', 'yy')
+
+
 class _non_interactive_IO:  # as namespace only
 
     def isatty():

@@ -22,6 +22,9 @@ only in modeling interfaces for this purpose.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#508]                     | #open | worldwide, change this to be this (see)
+|[#507.2]                   |       | where we want strong typing
+|[#507]                     |       | (internal tracking/small issues)
 |[#505]                     |       | [feature branch]
 |[#504]                     | #open | magnetics/command-via-command-stream
 |[#503]                     | #open | magnetics/command-via-parameter-stream

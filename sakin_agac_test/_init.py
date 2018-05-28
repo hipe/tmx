@@ -57,6 +57,13 @@ def release(self, prop):
     return x
 
 
+def cover_me(s=None):
+    msg = 'cover me'
+    if s is not None:
+        msg = '{}: {}'.format(msg, s)
+    raise Exception(msg)
+
+
 def sanity(s='assumption failed'):
     raise Exception(s)
 

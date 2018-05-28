@@ -1,6 +1,83 @@
 from modality_agnostic.memoization import (
         lazy,
         )
+from sakin_agac import (
+        cover_me,
+        )
+
+
+class custom_procure__:
+    """"procure" is an essential part of [#505] our collections API.
+
+    this is a specialization of it: given a filesystem path (a filename)
+    and possibly a format name, we result in a name-value pair for a format
+    adapter (where the name is a string like 'markdown_table' and the value
+    is the platform module, loaded).
+    """
+
+    def __init__(
+            self,
+            collection_identifier,
+            format_identifier,
+            listener,
+            ):
+
+        self._collection_identifier = collection_identifier
+        self._format_identifier = format_identifier
+        self._listener = listener
+        self.__these = None
+
+    def execute(self):
+
+        if self._format_identifier is None:
+            cover_me('soon')
+        else:
+            x = self.__when_via_format_identifier()
+        return x
+
+    def __when_via_format_identifier(self):
+
+        def _needle_function(human_key):
+            return needle == human_key  # ..  we have to learn about rx esc for
+
+        needle = self._format_identifier
+
+        return self._procure(
+            needle_function=_needle_function,
+            say_needle=lambda: repr(needle),
+            item_noun_phrase='format adapter',
+            )
+
+    def _procure(
+            self,
+            needle_function,
+            say_needle,
+            item_noun_phrase,
+            subfeatures_via_item=None,
+            ):
+
+        kwargs = {}
+        if subfeatures_via_item is not None:
+            kwargs['subfeatures_via_item'] = subfeatures_via_item
+
+        return _collection_lib().procure(
+            human_keyed_collection=self._these(),
+            needle_function=needle_function,
+            say_needle=say_needle,
+            item_noun_phrase=item_noun_phrase,
+            listener=self._listener,
+            **kwargs,
+            )
+
+    def _these(self):
+        if self.__these is None:
+            self.__these = self.__build_this_thing()
+        return self.__these
+
+    def __build_this_thing(self):
+        _pairs = to_name_value_pairs()
+        _ = _collection_lib()
+        return _.human_keyed_collection_via_pairs_cached(_pairs)
 
 
 def to_name_value_pairs():
@@ -78,6 +155,12 @@ def EVERY_MODULE():
     import importlib
     from glob import glob as glob_glob
     return f
+
+
+def _collection_lib():
+    import sakin_agac.magnetics.via_human_keyed_collection as x
+    return x
+
 
 # #history-A.1: as referenced
 # #born.

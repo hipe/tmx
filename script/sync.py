@@ -55,6 +55,11 @@ def _my_parameters(o, param):
             )
 
 
+def _pop_property(self, prop):
+    from sakin_agac import pop_property
+    return pop_property(self, prop)
+
+
 class _CLI:  # #coverpoint
 
     def __init__(self, sin, sout, serr, argv):
@@ -70,13 +75,38 @@ class _CLI:  # #coverpoint
         self._OK and self.__resolve_namespace_via_parse_args()
         self._OK and self.__resolve_normal_args_via_namespace()
         self._OK and self.__maybe_express_help_for_format()
-        self._OK and self.__NEXT_THING()
+        self._OK and self.__init_listener()
+        self._OK and self.__call_over_the_wall()
         return self._pop_property('_exitstatus')
+
+    def __call_over_the_wall(self):
+
+        self._exitstatus = 0  # now that u made it this far innocent til guilty
+
+        _d = self._pop_property('_normal_args')
+        _guy = _OpenNewLines_via_Sync(
+                **_d,
+                listener=self._listener,
+                )
+        with _guy as lines:
+            for line in lines:
+                raise Exception('cover me - wahoo: %s' % line)
+
+    def __init_listener(self):
+        # sadly we have to make another one of these
+        from script_lib.magnetics import listener_via_resources as lib
+
+        def f(head_channel, *a):
+            if 'error' == head_channel:
+                # (there can be multiple such emissions)
+                self._stop(6)  # meh
+            express(head_channel, *a)
+        express = lib.listener_via_stderr(self._serr)
+        self._listener = f
 
     def __maybe_express_help_for_format(self):
 
-        import sakin_agac.format_adapters as mod  # you're going to use..
-        self._format_adapters_module = mod  # ..this here or there
+        self._format_adapters_module = _format_adapters_module()
 
         arg = self._normal_args
         if 'help' in (arg['near_format'], arg['far_format']):
@@ -103,8 +133,9 @@ class _CLI:  # #coverpoint
     def __resolve_normal_args_via_namespace(self):
         ns = self._pop_property('_namespace')
         self._normal_args = {
-                'near_coll': getattr(ns, 'near-collection'),
-                'far_coll': getattr(ns, 'far-collection'),
+                # (#open [#410.E] below)
+                'near_collection': getattr(ns, 'near-collection'),
+                'far_collection': getattr(ns, 'far-collection'),
                 'near_format': ns.near_format,
                 'far_format': ns.far_format,
                 }
@@ -142,9 +173,79 @@ class _CLI:  # #coverpoint
         self._exitstatus = exitstatus
         self._OK = False
 
-    def _pop_property(self, prop):
-        from sakin_agac import pop_property
-        return pop_property(self, prop)
+    _pop_property = _pop_property
+
+
+class _OpenNewLines_via_Sync:  # #testpoint
+
+    def __init__(
+        self,
+        near_collection,
+        far_collection,
+        listener,
+        near_format=None,
+        far_format=None,
+    ):
+        self.near_collection = near_collection
+        self.far_collection = far_collection
+        self.near_format = near_format
+        self.far_format = far_format
+        self._listener = listener
+        self._format_adapters_module = _format_adapters_module()
+        self._OK = True
+        self._OK and self.__resolve_far_collection_reference()
+        self._OK and self.__NEXT_THING()
+
+    def __resolve_far_collection_reference(self):
+        self._resolve_collection_reference(
+                '_far_collection_reference', 'far_collection', 'far_format')
+
+    def _resolve_collection_reference(self, dest_prop, coll_k, format_k):
+        tup = self.__tuple_for_reference(coll_k, format_k)
+        if tup is None:
+            self._stop()
+        else:
+            coll_id, FA_NAME, format_adapter_module = tup
+            _fa = format_adapter_module.FORMAT_ADAPTER
+            _ref = _fa.collection_reference_via_string(coll_id)
+            setattr(self, dest_prop, _ref)
+
+    def __tuple_for_reference(self, coll_k, format_k):
+        format_identifier = self._pop_property(format_k)
+        collection_identifier = self._pop_property(coll_k)
+
+        pair = self._format_adapters_module.custom_procure__(
+                collection_identifier=collection_identifier,
+                format_identifier=format_identifier,
+                listener=self._listener,
+                ).execute()
+        if pair:
+            return (collection_identifier, *pair)
+
+    def __enter__(self):
+        return iter(())  # ..
+
+    def __exit__(self, *_):
+        pass  # ..
+
+    def _stop(self):
+        self._OK = False
+
+    _pop_property = _pop_property
+
+
+def _format_adapters_module():
+    """by putting this in a function that is called 2x in this file..
+
+    (virtually a singleton object), we free ourselves from passing it from
+    the higher-level modality- to the lower-level API-endpiont; so that
+    callers to the latter need not concern themselves with it as a
+    parameter. (but note it's a challenge to OCD that this is called 2x
+    per typical invocation.)
+    """
+
+    import sakin_agac.format_adapters as mod
+    return mod
 
 
 if __name__ == '__main__':
