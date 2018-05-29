@@ -30,10 +30,34 @@ class custom_procure__:
     def execute(self):
 
         if self._format_identifier is None:
-            cover_me('soon')
+            x = self.__when_via_collection_identifier()
         else:
             x = self.__when_via_format_identifier()
         return x
+
+    def __when_via_collection_identifier(self):
+        import os
+        _stem, ext = os.path.splitext(self._collection_identifier)
+        if ext == '':
+            cover_me("can't infer filename type from a file with no extension")
+        else:
+            return self.__do_when_via_collection_identifier(ext)
+
+    def __do_when_via_collection_identifier(self, ext):
+
+        import fnmatch
+        path = self._collection_identifier
+
+        def _subfeatures_via_item(_human_key, mod):
+            return mod.FORMAT_ADAPTER.associated_filename_globs
+
+        return self._procure(
+            needle_function=lambda glob: fnmatch.fnmatch(path, glob),
+            say_needle=lambda: repr(ext),
+            subfeatures_via_item=_subfeatures_via_item,
+            item_noun_phrase='format adapter that recognizes filename extension',  # noqa: E501
+            channel_tail_component_on_not_found='file_extension_not_matched',
+            )
 
     def __when_via_format_identifier(self):
 
@@ -46,6 +70,7 @@ class custom_procure__:
             needle_function=_needle_function,
             say_needle=lambda: repr(needle),
             item_noun_phrase='format adapter',
+            channel_tail_component_on_not_found='format_adapter_not_found',
             )
 
     def _procure(
@@ -53,6 +78,7 @@ class custom_procure__:
             needle_function,
             say_needle,
             item_noun_phrase,
+            channel_tail_component_on_not_found,
             subfeatures_via_item=None,
             ):
 
@@ -65,6 +91,7 @@ class custom_procure__:
             needle_function=needle_function,
             say_needle=say_needle,
             item_noun_phrase=item_noun_phrase,
+            channel_tail_component_on_not_found=channel_tail_component_on_not_found,  # noqa: E501
             listener=self._listener,
             **kwargs,
             )

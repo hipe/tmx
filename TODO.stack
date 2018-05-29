@@ -120,5 +120,3 @@ goal: get a snapshot of our one known remaining syncing issue for khong
   - how does #CLI act when far source has e.g badly named human key (1 -2)
   - how does #CLI act when far source doesn't have metadata (1 -3)
   - file not found (near and/or far) (3 -6)
-  - strange file extension (3 -7)
-  - better tailored channel tail component

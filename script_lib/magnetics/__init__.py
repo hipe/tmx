@@ -24,8 +24,8 @@ def _listener_via_stderr(stderr):
         s = d.popleft()
         if s != 'expression':
             cover_me("need 'expression' had {}".format(s))
-        if len(d) is not 0:
-            cover_me('unexpected third channel component: {}'.format(d[0]))
+        if 1 < len(d):
+            cover_me('do you really want a fourth component?: {}'.format(d[1]))
         expression_f(write_unterminated_line, STYLER_)
 
     def write_unterminated_line(s):

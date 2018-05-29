@@ -19,6 +19,7 @@ def procure(
             item_noun_phrase=None,
             do_splay=True,
             subfeatures_via_item=_subfeatures_via_item_default_function,
+            channel_tail_component_on_not_found=None,
             say_needle=None,
             say_collection=None,
             ):
@@ -31,7 +32,12 @@ def procure(
     an essential function of [#505]. currently an ad-hoc spike.
     """
 
-    _ui_tuple = (say_needle, item_noun_phrase, say_collection, listener)
+    _ui_tuple = (
+            channel_tail_component_on_not_found,
+            say_needle,
+            item_noun_phrase,
+            say_collection,
+            listener)
 
     _use_this = _procure_when_splay if do_splay else _procure_when_no_splay
     return _use_this(
@@ -97,13 +103,29 @@ def _ui_thing(f):
 
     def g(needle_x, ui_tuple, *one_extra):
 
-        say_needle, item_NP, say_coll, listener = ui_tuple
+        (
+            channel_tail_component_on_not_found,
+            say_needle,
+            item_NP,
+            say_coll,
+            listener,
+        ) = ui_tuple
 
         if say_needle is None:
             say_needle = __needle_sayer_via(needle_x)
 
-        from modality_agnostic import listening as li
-        err = li.leveler_via_listener('error', listener)
+        def err(msg, *params):
+            def expresser(o, styler=None):  # #open [#508]
+                if 0 == len(params):
+                    use_msg = msg
+                else:
+                    use_msg = msg.format(*params)
+                o(use_msg)
+            listener(*these, expresser)
+
+        these = ['error', 'expression']
+        if channel_tail_component_on_not_found is not None:
+            these.append(channel_tail_component_on_not_found)
 
         return f(say_needle, item_NP, say_coll, err, * one_extra)
     return g
