@@ -111,7 +111,7 @@ class _EmissionModel:
         while True:
             if 0 == len(model_deq):
                 if 0 == len(actual_deq):
-                    cover_me('reached the end of a literal model')
+                    break  # if no more in either, you win
                 else:
                     cover_me('extra actual past end of literal model')
             else:
@@ -131,7 +131,10 @@ def _crazy_parse(s_a):
     name = None
 
     def f(s):
-        if _name_rx.search(s) is None:
+        if 'as' == s:
+            move(parse_as)
+            f(s)
+        elif _name_rx.search(s) is None:
             move(parse_wildcard_globs_or_as)
             f(s)
         else:

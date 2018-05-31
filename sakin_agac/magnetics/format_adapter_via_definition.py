@@ -7,23 +7,8 @@ reminder:
 """
 
 from sakin_agac import (
-        cover_me,
         sanity,
         )
-
-
-def this_one_pattern(s):
-
-    def g(f):
-        attr = "_%s" % s
-
-        def h(self):
-            x = getattr(self, attr)
-            if x is None:
-                cover_me('create a defaults namespace')
-            return x
-        return h
-    return g
 
 
 class _FormatAdapter:
@@ -36,9 +21,6 @@ class _FormatAdapter:
 
             functions_via_modality=None,
             # if this format can be used as a "near" collection for syncing
-
-            session_for_sync_request=None,
-            # for far collections not near
 
             name_value_pairs_via_native_object=None,
             # for far collection, it must provide this per [#408.E]
@@ -65,8 +47,9 @@ class _FormatAdapter:
 
         # properties that are stored as private because we get fancy:
 
-        self._session_for_sync_request = session_for_sync_request
         self._value_readers_via_field_names = value_readers_via_field_names
+
+        self._format_name = None
 
         # KISS properties:
 
@@ -77,16 +60,78 @@ class _FormatAdapter:
     def collection_reference_via_string(self, coll_id):
         return _CollectionReference(coll_id, self)
 
-    def session_for_sync_request_(
+    def _session_for_sync_request(  # #testpoint
             self,
             mixed_collection_identifier,
             modality_resources,
             listener,
             ):
 
-        _f = self._use_session_for_sync_request()
+        """at #history-A.2 we changed this to be accessed like other
+
+        hoi-polloi functions that can be associated with the doo-hah adapter
+        """
+
+        def dig_f():
+            yield ('modality_agnostic', 'sub-section')
+            yield ('session_for_sync_request', 'thing ding two')
+
+        _f = self.DIG_HOI_POLLOI(dig_f(), listener)
+        if _f is None:
+            return  # #coverpoint5.1
         _ = _f(mixed_collection_identifier, modality_resources, self, listener)
         return _  # #todo
+
+    def DIG_HOI_POLLOI(self, step_tuples, listener):
+        """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
+
+        see provisos of the callee function too..
+        """
+
+        def use_step_tuples():
+            # cleverly (or not) we DRY into this function this first
+            # step-component that we always use (for now) etc
+
+            # the FA might not have defined any such functions at all
+            yield ('functions_via_modality', 'property', {'do_splay': False})
+
+            for step_tuple in step_tuples:
+                yield step_tuple
+
+        return self._dig_anything(use_step_tuples(), listener)
+
+    def _dig_anything(self, step_tuples, listener):
+        """NOTE - no caching - we should be caching maybe
+        """
+
+        import sakin_agac.magnetics.via_human_keyed_collection as lib
+
+        def say_collection():
+            return 'the %s format adapter' % repr(self.format_name)
+
+        current_node = lib.human_keyed_collection_via_object(self)
+
+        for step_tuple in step_tuples:
+
+            if 2 < len(step_tuple):
+                (kwargs,) = step_tuple[2:]
+            else:
+                kwargs = _empty_hash
+
+            tup = lib.procure(
+                human_keyed_collection=current_node,
+                needle_function=step_tuple[0],
+                listener=listener,
+                item_noun_phrase=step_tuple[1],
+                say_collection=say_collection,  # ..
+                **kwargs,
+                )
+
+            if tup is None:
+                current_node = None
+                break
+            current_node = tup[1]  # diregard particular name
+        return current_node
 
     @property
     def name_value_pairs_via_native_object(self):
@@ -95,29 +140,41 @@ class _FormatAdapter:
     def value_readers_via_field_names(self, x):
         return self._value_readers_via_field_names(x)
 
-    @this_one_pattern('session_for_sync_request')
-    def _use_session_for_sync_request(self):
-        pass
-
     @property
     def sync_lib(self):  # #here1
         from . import synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
         return x
 
+    @property
+    def format_name(self):
+        if self._format_name is None:
+            import re
+            _ = re.search(r'(?<=\.)[^.]+$', self.format_adapter_module_name)[0]
+            self._format_name = _
+        return self._format_name
+
 
 class _CollectionReference:
 
     def __init__(self, s, fa):
-        self._collection_identifier_string = s
-        self._format_adapter = fa
+        self.collection_identifier_string = s
+        self.format_adapter = fa
 
     def session_for_sync_request(self, resources, listener):
-        return self._format_adapter.session_for_sync_request_(
-                self._collection_identifier_string, resources, listener)
+        return self.format_adapter._session_for_sync_request(
+                self.collection_identifier_string, resources, listener)
+
+    @property
+    def format_name(self):
+        return self.format_adapter.format_name
+
+
+_empty_hash = {}
 
 
 import sys  # noqa: E402
 sys.modules[__name__] = _FormatAdapter  # #[#008.G] so module is callable  # noqa: E501
 
+# #history-A.2: as referenced
 # #history-A.1: removed item class ("wrapper")
 # #born.

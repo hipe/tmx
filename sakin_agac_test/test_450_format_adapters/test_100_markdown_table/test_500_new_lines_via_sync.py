@@ -1,7 +1,9 @@
 # #covers: script.sync
 
 from _init import (
-        cover_me,
+        build_end_state_commonly,
+        fixture_executable_path,
+        fixture_file_path,
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -29,26 +31,7 @@ class _CommonCase(unittest.TestCase):
 
     # --
 
-    def _build_end_state(self):
-
-        import modality_agnostic.test_support.listener_via_expectations as lib
-
-        exp = lib(self._emissions())
-
-        _d = self._given()
-
-        import script.sync as lib
-        _guy = lib._OpenNewLines_via_Sync(
-                ** _d,
-                listener=exp.listener,
-                )
-        with _guy as lines:
-            for line in lines:
-                print('wahoo: %s' % line)
-                cover_me('wahoo')
-
-        _ = exp.actual_emission_index_via_finish()
-        return _EndState((), _)
+    _build_end_state = build_end_state_commonly
 
 
 class Case010_strange_format_adapter_name(_CommonCase):
@@ -80,10 +63,10 @@ class Case010_strange_format_adapter_name(_CommonCase):
     def _end_state(self):
         return self._build_end_state()
 
-    def _emissions(self):
+    def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
 
-    def _given(self):
+    def given(self):
         return {
                 'near_collection': None,
                 'far_collection': None,
@@ -115,23 +98,84 @@ class Case020_strange_file_extension(_CommonCase):
     def _end_state(self):
         return self._build_end_state()
 
-    def _emissions(self):
+    def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
 
-    def _given(self):
+    def given(self):
         return {
                 'near_collection': None,
                 'far_collection': 'ziffy-zaffy.zongo',
                 }
 
 
-class _EndState:
-    def __init__(self, outputted_lines, aei):
-        self.outputted_lines = outputted_lines
-        self.actual_emission_index = aei
+class Case030_no_functions(_CommonCase):  # #coverpoint5.1
+    """discussion - the point here (new in #history-A.1) is that whether
+
+    you're posing it as a far collection or near for the syncrhonization,
+    it uses the same machinery (and language production) to complain about
+    how it's can't do a thing.
+    """
+
+    def test_100_outputs_no_lines(self):
+        self._outputs_no_lines()
+
+    def test_200_says_not_found(self):
+        _ = self._two_sentences()[0]
+        self.assertEqual(_, "the 'markdown_table' format adapter has no sub-section for 'modality_agnostic'")  # noqa: E501
+
+    def test_300_says_did_you_mean(self):
+        _ = self._two_sentences()[1]
+        self.assertIn("there's 'CLI'", _)
+
+    @shared_subject
+    def _two_sentences(self):
+        _ = self._emission('first_error').to_string()
+        return _.split('. ')
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def expect_emissions(self):
+        yield 'error', 'expression', 'as', 'first_error'
+
+    def given(self):
+        return {
+                'near_collection': _same_existent_markdown_file(),
+                'far_collection': fixture_file_path('chimi-churry.md'),
+                }
+
+
+class Case040_near_file_not_found(_CommonCase):
+
+    # #coverpoint5.2 - this is the first code to rustle up a lot of stuff
+
+    def test_100_raises_this_one_exception(self):
+        def f():
+            self._build_end_state()
+        _rx = r"\bNo such file or directory: '.+\.md'$"
+        self.assertRaisesRegex(FileNotFoundError, _rx, f)
+
+    def expect_emissions(self):
+        return iter(())
+
+    def given(self):
+        return {
+                'near_collection': fixture_file_path('0075-no-such-file.md'),
+                'far_collection': _far_script_exists(),
+                }
+
+
+def _far_script_exists():
+    return fixture_executable_path('100_chimi_churri.py')
+
+
+def _same_existent_markdown_file():
+    return fixture_file_path('0080-too-few-rows.md')
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1
 # #born.

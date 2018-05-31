@@ -184,7 +184,7 @@ def _build_first_index(native_objects, markdown_file):
 
     far_format_adapter = _this_one_format_adapter().FORMAT_ADAPTER
 
-    _sess = far_format_adapter.session_for_sync_request_(
+    _sess = far_format_adapter._session_for_sync_request(
             mixed_collection_identifier=native_objects,
             modality_resources=None,
             listener=None,

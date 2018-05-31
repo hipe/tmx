@@ -28,6 +28,34 @@ def _():
     return (top_test_dir,)
 
 
+def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
+
+    import modality_agnostic.test_support.listener_via_expectations as lib
+
+    exp = lib(self.expect_emissions())
+
+    _d = self.given()
+
+    import script.sync as lib
+    _thing1 = lib._OpenNewLines_via_Sync(
+            ** _d,
+            listener=exp.listener,
+            )
+
+    # #open [#410.F] below is placeholder mess
+    with _thing1 as thing2:
+        pass
+
+    _ = exp.actual_emission_index_via_finish()
+    return _EndState((), _)
+
+
+class _EndState:
+    def __init__(self, outputted_lines, aei):
+        self.outputted_lines = outputted_lines
+        self.actual_emission_index = aei
+
+
 def minimal_listener_spy():
     """similar elsewhere. this one is minimal."""
 

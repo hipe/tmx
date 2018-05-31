@@ -210,7 +210,9 @@ class _session_for_sync_request:
         if md is None:
             self._normal_stem = s
         else:
-            self._err("character we don't like: {}", repr(md[0]))
+            _tmpl = "character we don't like ({}) in path stem: {}"
+            _msg = _tmpl.format(repr(md[0]), s)
+            self._err(_msg)
 
     def __resolve_path_stem_via_path(self):
         """the path has to end in .py.
@@ -239,9 +241,7 @@ def _name_value_pairs_via_native_object(dct):
     return ((k, dct[k]) for k in dct)
 
 
-def _value_readers_via_field_names(*names):
-    cover_me('hi')
-
+def _value_readers_via_field_names(*names):  # #coverpoint5.2
     def reader_for(name):
         def read(native_object):
             return native_object[name]  # [#410.B] death of item class imagine  # noqa: E501
@@ -249,8 +249,16 @@ def _value_readers_via_field_names(*names):
     return [reader_for(name) for name in names]
 
 
+# --
+
+_functions = {
+        'modality_agnostic': {
+            'session_for_sync_request': _session_for_sync_request,
+            }
+        }
+
 FORMAT_ADAPTER = format_adapter_via_definition(
-        session_for_sync_request=_session_for_sync_request,
+        functions_via_modality=_functions,
         name_value_pairs_via_native_object=_name_value_pairs_via_native_object,
         value_readers_via_field_names=_value_readers_via_field_names,
         associated_filename_globs=('*.py',),  # :+#here1

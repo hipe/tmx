@@ -194,7 +194,52 @@ class _OpenNewLines_via_Sync:  # #testpoint
         self._format_adapters_module = _format_adapters_module()
         self._OK = True
         self._OK and self.__resolve_far_collection_reference()
-        self._OK and self.__NEXT_THING()
+        self._OK and self.__resolve_near_collection_reference()
+        self._OK and self.__resolve_function()
+        self._OK and self.__resolve_new_document_line_stream()
+
+    def __resolve_new_document_line_stream(self):
+
+        _sync = self._pop_property('__new_lines_via_sync')
+
+        far_cr = self._pop_property('_far_collection_reference')
+        near_cr = self._pop_property('_near_collection_reference')
+
+        # (it's significant that we inject the real filesystem at the top)
+        from script_lib import (
+                filesystem_functions as fsf,
+                )
+
+        _x = _sync(
+                far_collection_reference=far_cr,
+                near_collection_reference=near_cr,
+                filesystem_functions=fsf,
+                listener=self._listener,
+                )
+
+        if _x is not None:
+            _x.TEMPORARY_THING()
+
+        self._required('_new_document_line_stream', _x)
+
+    def __resolve_function(self):
+
+        def dig_f():
+
+            # the FA might not have defined any such functions for the modality
+            yield ('CLI', 'modality functions')
+
+            # the FA might not have defined this particular function
+            yield ('new_lines_via_sync', 'CLI modality function')
+
+        _x = self._near_collection_reference.format_adapter.DIG_HOI_POLLOI(
+                dig_f(), self._listener)
+
+        self._required('__new_lines_via_sync', _x)
+
+    def __resolve_near_collection_reference(self):
+        self._resolve_collection_reference(
+                '_near_collection_reference', 'near_collection', 'near_format')
 
     def __resolve_far_collection_reference(self):
         self._resolve_collection_reference(
@@ -222,8 +267,28 @@ class _OpenNewLines_via_Sync:  # #testpoint
         if pair:
             return (collection_identifier, *pair)
 
+    def _required_what(f):
+        def g(self, prop, x):
+            if x is None:
+                self._stop()
+            else:
+                setattr(self, prop, f(x))
+        return g
+
+    @_required_what
+    def _required_value(x):
+        return x[1]
+
+    @_required_what
+    def _required(x):
+        return x
+
     def __enter__(self):
-        return iter(())  # ..
+        if self._OK:
+            # #open [#410.F]
+            return self._new_document_line_stream
+        else:
+            return iter(())
 
     def __exit__(self, *_):
         pass  # ..

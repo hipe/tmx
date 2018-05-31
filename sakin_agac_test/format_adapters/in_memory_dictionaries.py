@@ -84,8 +84,16 @@ def _value_readers_via_field_names(*names):
     return [reader_for(name) for name in names]
 
 
+# --
+
+_functions = {
+        'modality_agnostic': {
+            'session_for_sync_request': _session_for_sync_request,
+            }
+        }
+
 FORMAT_ADAPTER = format_adapter_via_definition(
-        session_for_sync_request=_session_for_sync_request,
+        functions_via_modality=_functions,
         name_value_pairs_via_native_object=_name_value_pairs_via_native_object,
         value_readers_via_field_names=_value_readers_via_field_names,
         format_adapter_module_name=__name__,

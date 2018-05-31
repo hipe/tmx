@@ -110,10 +110,7 @@ class custom_procure__:
 def to_name_value_pairs():
 
     def natural_key_of(mod):
-        return rx.search(mod.FORMAT_ADAPTER.format_adapter_module_name)[0]
-
-    import re
-    rx = re.compile(r'(?<=\.)[^.]+$')
+        return mod.FORMAT_ADAPTER.format_name
 
     return ((natural_key_of(x), x) for x in EVERY_MODULE())
 
