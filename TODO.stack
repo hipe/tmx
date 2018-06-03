@@ -112,11 +112,7 @@ implement each part (with tests)
 step: diff lyfe
 step: have the lines of the new file
 fix the syncing issue for khong (extra endcap) (same as above)
-  - maybe with above: refactor for [#410.F]
 goal: get a snapshot of our one known remaining syncing issue for khong
   - the problem that there's a duplicate row - improve this error (3 -3)
   - cover khong markdown script fix (involves that caching thing yikes) (3 -4)
   - cover khong JSON script fix (3 -5)
-  - how does #CLI act when far source has e.g extra rows in object row (1 -1)
-  - how does #CLI act when far source has e.g badly named human key (1 -2)
-  - how does #CLI act when far source doesn't have metadata (1 -3)

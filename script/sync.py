@@ -84,11 +84,11 @@ class _CLI:  # #coverpoint
         self._exitstatus = 0  # now that u made it this far innocent til guilty
 
         _d = self._pop_property('_normal_args')
-        _guy = _OpenNewLines_via_Sync(
+        _context_manager = _OpenNewLines_via_Sync(
                 **_d,
                 listener=self._listener,
                 )
-        with _guy as lines:
+        with _context_manager as lines:
             for line in lines:
                 raise Exception('cover me - wahoo: %s' % line)
 
@@ -196,11 +196,28 @@ class _OpenNewLines_via_Sync:  # #testpoint
         self._OK and self.__resolve_far_collection_reference()
         self._OK and self.__resolve_near_collection_reference()
         self._OK and self.__resolve_function()
-        self._OK and self.__resolve_new_document_line_stream()
 
-    def __resolve_new_document_line_stream(self):
+    def __enter__(self):
+        """(reminder: on failure, just use the empty iterator)"""
 
-        _sync = self._pop_property('__new_lines_via_sync')
+        if self._OK:
+            self.__resolve_runtime_manager_for_new_document_line_stream()
+            # (the fact that the above is called on enter is a bit arb..)
+        if self._OK:
+            _wat = self._context_manager.__enter__()
+            return _wat  # #todo
+        else:
+            return iter(())
+
+    def __exit__(self, *_):
+        if self._OK:
+            return self._context_manager.__exit__(*_)  # #[#410.G] track nested
+        else:
+            return False  # we do not trap exceptions
+
+    def __resolve_runtime_manager_for_new_document_line_stream(self):
+
+        _cm_via = self._pop_property('__open_new_lines_via_sync')
 
         far_cr = self._pop_property('_far_collection_reference')
         near_cr = self._pop_property('_near_collection_reference')
@@ -210,17 +227,14 @@ class _OpenNewLines_via_Sync:  # #testpoint
                 filesystem_functions as fsf,
                 )
 
-        _x = _sync(
+        _cm = _cm_via(
                 far_collection_reference=far_cr,
                 near_collection_reference=near_cr,
                 filesystem_functions=fsf,
                 listener=self._listener,
                 )
 
-        if _x is not None:
-            _x.TEMPORARY_THING()
-
-        self._required('_new_document_line_stream', _x)
+        self._required('_context_manager', _cm)
 
     def __resolve_function(self):
 
@@ -230,12 +244,12 @@ class _OpenNewLines_via_Sync:  # #testpoint
             yield ('CLI', 'modality functions')
 
             # the FA might not have defined this particular function
-            yield ('new_lines_via_sync', 'CLI modality function')
+            yield ('open_new_lines_via_sync', 'CLI modality function')
 
         _x = self._near_collection_reference.format_adapter.DIG_HOI_POLLOI(
                 dig_f(), self._listener)
 
-        self._required('__new_lines_via_sync', _x)
+        self._required('__open_new_lines_via_sync', _x)
 
     def __resolve_near_collection_reference(self):
         self._resolve_collection_reference(
@@ -267,31 +281,11 @@ class _OpenNewLines_via_Sync:  # #testpoint
         if pair:
             return (collection_identifier, *pair)
 
-    def _required_what(f):
-        def g(self, prop, x):
-            if x is None:
-                self._stop()
-            else:
-                setattr(self, prop, f(x))
-        return g
-
-    @_required_what
-    def _required_value(x):
-        return x[1]
-
-    @_required_what
-    def _required(x):
-        return x
-
-    def __enter__(self):
-        if self._OK:
-            # #open [#410.F]
-            return self._new_document_line_stream
+    def _required(self, prop, x):
+        if x is None:
+            self._stop()
         else:
-            return iter(())
-
-    def __exit__(self, *_):
-        pass  # ..
+            setattr(self, prop, x)
 
     def _stop(self):
         self._OK = False

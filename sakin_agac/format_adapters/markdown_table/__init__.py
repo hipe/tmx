@@ -3,15 +3,11 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
-        sanity,
+        pop_property,
         )
 
 
-def _new_lines_via_sync(**kwargs):
-    return _Thing(**kwargs).execute()
-
-
-class _Thing:
+class _My_OpenNewLines_via_Sync:
 
     def __init__(
             self,
@@ -20,6 +16,7 @@ class _Thing:
             filesystem_functions,
             listener,
             ):
+        self._close_me_stack = []
         self._OK = True
         self._mutex = None
         self._near_collection_reference = near_collection_reference
@@ -27,60 +24,41 @@ class _Thing:
         self._filesystem_functions = filesystem_functions
         self._listener = listener
 
-    def execute(self):
-        self._OK and self.__resolve_sessioner()
-        if self._OK:
-            return self  # #coverpoint5.2. (return self or another thing)
+    def __enter__(self):
+        # (experimentally we do all work on enter, none on construction)
 
-    def __resolve_sessioner(self):
-        sessioner = self._far_collection_reference.session_for_sync_request(
-                self._filesystem_functions, self._listener)
-        if sessioner is None:
-            self._OK = False  # #coverpoint5.1
-        else:
-            self._sessioner = sessioner
-
-    def TEMPORARY_THING(self):
-        """we want to trip the error without having good design, just to
-
-        get these cases covered and the rumskalla code out"""
-
-        self._OK or sanity()
         del(self._mutex)
-        eek = _new_lines_via_sync_session(self)
-        for line in eek:
-            cover_me('x2')
-            return iter(())
-        return None  # #coverpoint7.3
+        self._OK and self.__resolve_sessioner()
+        self._OK and self.__resolve_sync_request()
+        if self._OK:
+            _ = self.__iterate_via_sync_request()
+            return _  # #todo
+        else:
+            return iter(())  # #provision [#410.F]
+        # (was #coverpoint5.2 - now gone)
 
+    def __iterate_via_sync_request(self):
 
-def _new_lines_via_sync_session(self):
+        sync_request = pop_property(self, '_sync_request')
 
-    from .magnetics import newstream_via_farstream_and_nearstream as mag
+        _far_format_adapter = self._far_collection_reference.format_adapter
 
-    _far_format_adapter = self._far_collection_reference.format_adapter
+        _nearstrem_path = self._near_collection_reference.collection_identifier_string  # noqa: E501
 
-    _nearstrem_path = self._near_collection_reference.collection_identifier_string  # noqa: E501
-
-    yikes = [
+        yikes = [
             ('tail_line', True),
             ('business_object_row', False),
             ('table_schema_line_two_of_two', False),
             ('table_schema_line_one_of_two', False),
             ('head_line', True),
-            ]
-
-    # #open [#410.F] a lot will change here - this is impure as it is
-
-    with self._sessioner as sync_request:
-        if sync_request is None:
-            return   # #coverpoint7.1 WE HATE THIS
+        ]
 
         _sync_params = sync_request.release_sync_parameters()
         _item_stream = sync_request.release_item_stream()
         _nkfn = _sync_params.natural_key_field_name
 
-        _tagged_items = mag(
+        from .magnetics import newstream_via_farstream_and_nearstream as mag
+        tagged_items = mag(
                 # the streams:
                 farstream_items=_item_stream,
                 nearstream_path=_nearstrem_path,
@@ -92,10 +70,12 @@ def _new_lines_via_sync_session(self):
                 listener=self._listener,
                 )
 
-        for tag, item in _tagged_items:
+        for tag, item in tagged_items:
             top = yikes[-1]
             if top[0] != tag:
                 if 'markdown_table_unable_to_be_synced_against_' == tag:
+                    wat = next(tagged_items)
+                    cover_me('HMM: %s' % type(wat))
                     break
                 yikes.pop()
                 top = yikes[-1]
@@ -106,12 +86,44 @@ def _new_lines_via_sync_session(self):
             else:
                 yield item.to_line()
 
+    def __resolve_sync_request(self):
+        # (#coverpoint7.1 is failure)
+
+        cm = pop_property(self, '_sessioner')
+        self._close_me_stack.append(cm)
+        _ = cm.__enter__()
+        self._required('_sync_request', _)
+
+    def __resolve_sessioner(self):
+        _ = self._far_collection_reference.session_for_sync_request(
+                self._filesystem_functions, self._listener)
+
+        # (sessioner false is #coverpoint5.10
+        self._required('_sessioner', _)
+
+    def __exit__(self, *_):
+        while 0 != len(self._close_me_stack):
+            _cm = self._close_me_stack.pop()
+            _cm.__exit__()
+            """don't pass exception (for now) because confusing.
+            result is ignored because confusing.
+            #[#410.G] (track nested context managers closing each other)
+            #coverpoint7.3
+            """
+        return False  # never trap exceptions
+
+    def _required(self, prop, x):  # ..
+        if x is None:
+            self._OK = False
+        else:
+            setattr(self, prop, x)
+
 
 # --
 
 _functions = {
         'CLI': {
-            'new_lines_via_sync': _new_lines_via_sync,
+            'open_new_lines_via_sync': _My_OpenNewLines_via_Sync,
             },
         }
 

@@ -44,7 +44,7 @@ class _SyncParameters:
 
     how we conceive of it in fact is that it is not an intrinsic part of
     either collection, but rather we are conceiving of it as a property
-    (a parameter) of the synchorniation itself...
+    (a parameter) of the synchronization itself...
     """
 
     def __init__(
@@ -52,6 +52,7 @@ class _SyncParameters:
             _is_sync_meta_data,
             natural_key_field_name,
             ):
+        # (#coverpoint7.2 is simply the names of the above arguments)
 
         if _is_sync_meta_data is not True:
             cover_me('hi')

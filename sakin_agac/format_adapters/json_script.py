@@ -137,7 +137,8 @@ class _session_for_sync_request:
         """(we have no open resources to close but you might)"""
 
         if self._OK:
-            pop_property(self, '_exit_me').__exit__(*error_info)
+            _exit_me = pop_property(self, '_exit_me')
+            return _exit_me.__exit__(*error_info)  # #[#410.G]
 
     def __flush_sync_request(self):
         """(by 'flush' we mean "build it the one time we build it")"""
@@ -237,7 +238,8 @@ class _session_for_sync_request:
 
 
 def _name_value_pairs_via_native_object(dct):
-    cover_me('hi')
+    # #coverpoint7.4
+    # (you could probably do `pairs()`)
     return ((k, dct[k]) for k in dct)
 
 

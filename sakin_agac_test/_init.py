@@ -37,17 +37,19 @@ def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
     _d = self.given()
 
     import script.sync as lib
-    _thing1 = lib._OpenNewLines_via_Sync(
+    _lines_opener = lib._OpenNewLines_via_Sync(
             ** _d,
             listener=exp.listener,
             )
 
-    # #open [#410.F] below is placeholder mess
-    with _thing1 as thing2:
-        pass
+    line_a = []
+
+    with _lines_opener as lines:
+        for line in lines:
+            line_a.append(line)
 
     _ = exp.actual_emission_index_via_finish()
-    return _EndState((), _)
+    return _EndState(tuple(line_a), _)
 
 
 class _EndState:

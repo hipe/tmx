@@ -10,6 +10,7 @@ from modality_agnostic.memoization import (
         )
 import unittest
 
+fixture_executable_path = ts.fixture_executable_path
 fixture_file_path = ts.fixture_file_path
 
 
@@ -58,7 +59,7 @@ class Case100(_CommonCase):
 
     def test_500_RUMSKALLA(self):
 
-        _path = ts.fixture_executable_path('100_chimi_churri.py')
+        _path = _chimi_churri_far_path()
         _cref = _build_collection_reference(_path)
         # from script_lib import filesystem_functions as rsx
         rsx = "you don't need filesystem resources yet"
@@ -66,7 +67,7 @@ class Case100(_CommonCase):
         with _sess as sync_request:
             sync_params = sync_request.release_sync_parameters()
             dict_stream = sync_request.release_item_stream()
-        self.assertEqual(sync_params.natural_key_field_name, 'xx yy')
+        self.assertEqual(sync_params.natural_key_field_name, 'xyzz 01')
         these = [x for x in dict_stream]
         self.assertEqual(len(these), 1)
         self.assertEqual(these[0], {'choo cha': 'foo fa'})
@@ -97,7 +98,7 @@ class Case250_filenames_must_look_a_way(_CommonCase):  # #coverpoint7.1
 
 class Case260_file_not_found(_CommonCase):
 
-    def test_100_raises_this_one_exception(self):
+    def test_100_raises_this_happenstance_exception(self):
         def f():
             self._build_end_state()
         _rx = r"^No module named 'script.no_such_script_one'"
@@ -111,6 +112,65 @@ class Case260_file_not_found(_CommonCase):
                 'near_collection': _same_near_collection(),
                 'far_collection': 'script/no_such_script_one.py',
                 }
+
+
+class Case270_no_metadata_row(_CommonCase):  # #coverpoint7.2
+
+    def test_100_raises_this_happenstance_exception(self):
+        def f():
+            self._build_end_state()
+        _rx = r"\bunexpected keyword argument 'choovo chavo'"
+        self.assertRaisesRegex(TypeError, _rx, f)
+
+    def expect_emissions(self):
+        return iter(())
+
+    def given(self):
+        return {
+                'near_collection': _same_near_collection(),
+                'far_collection': fixture_executable_path('080_no_metadata.py'),  # noqa: E501
+                }
+
+
+class Case280_bad_human_key(_CommonCase):  # #coverpoint7.3
+
+    def test_100_raises_this_happenstance_exception(self):
+        def f():
+            self._build_end_state()
+        _rx = r"^'xyzz 01'$"
+        self.assertRaisesRegex(KeyError, _rx, f)
+
+    def expect_emissions(self):
+        return iter(())
+
+    def given(self):
+        return {
+                'near_collection': _same_near_collection(),
+                'far_collection': _chimi_churri_far_path()
+                }
+
+
+class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
+    """(may be partially or wholly redundant with #coverpoint1.1)"""
+
+    def test_100_raises_this_happenstance_exception(self):
+        def f():
+            self._build_end_state()
+        _rx = r"'ziff_davis'"
+        self.assertRaisesRegex(KeyError, _rx, f)
+
+    def expect_emissions(self):
+        return iter(())
+
+    def given(self):
+        return {
+                'near_collection': _same_near_collection(),
+                'far_collection': fixture_executable_path('110_extra_cel.py'),
+                }
+
+
+def _chimi_churri_far_path():
+    return fixture_executable_path('100_chimi_churri.py')
 
 
 def _same_near_collection():
