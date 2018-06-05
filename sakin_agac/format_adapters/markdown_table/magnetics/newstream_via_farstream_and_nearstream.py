@@ -158,8 +158,7 @@ class _CustomProcessor:
             pass
         elif 'table_schema_line_one_of_two' == typ:
             # NOTE we don't even take the liner, we don't care
-            self._state = 'SECOND_TABLE_LINE'
-            pass
+            self._move_to('SECOND_TABLE_LINE')
         else:
             cover_me('unexpected tagged item')
         return tup
@@ -171,7 +170,7 @@ class _CustomProcessor:
         if 'table_schema_line_two_of_two' == typ:
             _custom_hybrid = tup[1]
             self._complete_schema = _custom_hybrid.complete_schema
-            self._state = '_TRANSITION_TO_CRAZY_TOWN'
+            self._move_to('_TRANSITION_TO_CRAZY_TOWN')
         else:
             cover_me('unexpected tagged item')
         return tup
@@ -206,7 +205,7 @@ class _CustomProcessor:
                 item_via_collision=_item_via_collision,  # :#here3
                 ** sync_args)
 
-        self._state = 'OBJECT_ROWS'
+        self._move_to('OBJECT_ROWS')
         return self.gets()
 
     def __build_item_via_collision(self):
@@ -297,8 +296,11 @@ class _CustomProcessor:
                 hit_the_end = False
                 self._TUP_ON_DECK = tup
                 break
+
         if hit_the_end:
             self._close()
+
+        self._did_hit_the_end_here = hit_the_end
 
     def __build_near_item_class(self1):
 
@@ -320,8 +322,11 @@ class _CustomProcessor:
         x = next_or_none(self._big_deal_stream)
         if x is None:
             if self._OK:
-                self._state = 'TAIL_LINES'
-                return pop_property(self, '_TUP_ON_DECK')
+                if self._did_hit_the_end_here:
+                    pass  # #coverpoint7.5
+                else:
+                    self._move_to('TAIL_LINES')
+                    return pop_property(self, '_TUP_ON_DECK')
             else:
                 return ('markdown_table_unable_to_be_synced_against_', None)
         else:
@@ -334,6 +339,9 @@ class _CustomProcessor:
     def _close(self):
         del(self._tagged_stream)
         del(self._state)
+
+    def _move_to(self, s):
+        self._state = s
 
     def _error(self, message):
         from modality_agnostic import listening as li

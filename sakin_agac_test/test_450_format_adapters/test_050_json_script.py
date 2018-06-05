@@ -169,6 +169,25 @@ class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
                 }
 
 
+class Case300_RUM(_CommonCase):  # #coverpoint7.5
+    """(RUM)"""
+
+    def test_100_RUM(self):
+        _ = self._build_end_state()
+        act = _.outputted_lines
+        self.assertEqual(len(act), 4)
+        self.assertEqual(act[-1], '|thing B|y|\n')
+
+    def expect_emissions(self):
+        return iter(())
+
+    def given(self):
+        return {
+                'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+                'far_collection': fixture_executable_path('120_endcap_yes_no.py'),  # noqa: E501
+                }
+
+
 def _chimi_churri_far_path():
     return fixture_executable_path('100_chimi_churri.py')
 
