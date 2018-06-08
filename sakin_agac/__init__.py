@@ -4,8 +4,9 @@ def pop_property(self, var):
     return x
 
 
-def cover_me(s):
-    raise _exe('cover me: {}'.format(s))
+def cover_me(msg=None):
+    _use_msg = 'cover me' if msg is None else ('cover me - %s' % msg)
+    raise _exe(_use_msg)
 
 
 def sanity(s=None):

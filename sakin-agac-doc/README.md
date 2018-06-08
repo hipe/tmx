@@ -25,6 +25,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.I  | #open | remove this redundancy
 |                   #410.H  | #trak | fixture executables aren't actuall exe.. (see)
 |                   #410.G  | #trak | nested context managers closing each other
 |                   #410.F  |       | provision: context managers (see)

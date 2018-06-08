@@ -59,7 +59,10 @@ class _EndState:
 
 
 def minimal_listener_spy():
-    """similar elsewhere. this one is minimal."""
+    """similar elsewhere. this one is minimal.
+
+    #open [#410.I] the soul of this has been stolen and moved to [#509]
+    """
 
     def listener(*a):
         None if 'error' == a[0] else sanity(a[0])

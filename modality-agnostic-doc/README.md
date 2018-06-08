@@ -22,6 +22,8 @@ only in modeling interfaces for this purpose.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#509.2]                   |       | [one thing in it]
+|[#509]                     |       | [listener via expectations]
 |[#508]                     | #open | worldwide, change this to be this (see)
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)

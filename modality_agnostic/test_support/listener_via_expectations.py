@@ -1,10 +1,39 @@
-"""ahem.."""
+"""ahem..
+
+:[#509]
+"""
 
 from modality_agnostic import (
         cover_me,
         )
 import re
 from collections import deque as deque
+
+
+# --
+
+def for_DEBUGGING(*a):
+    import sys
+    io = sys.stderr
+    chan_a = list(a)
+    thing = chan_a.pop()
+
+    def f(msg):
+        msg_a.append(msg)
+    msg_a = []
+    thing(f, '«no expression agent yet»')
+    io.write("channel: {}\n".format(repr(chan_a)))
+    io.write("messages: {}\n".format(repr(msg_a)))
+    io.flush()
+
+
+def listener_via_emission_receiver(receive_emission):  # :[#509.B]
+    def listener(*a):
+        stack = list(a)
+        receive_emission(_ActualEmission(stack.pop(), tuple(stack)))
+    return listener
+
+# -- (☝️ don't forget to also put these #here)
 
 
 class _EmissionsModel:
@@ -62,6 +91,10 @@ class _EmissionsModel:
 
     def _some_emission_models_remain(self):
         return 0 != len(self._emission_models)
+
+    # :#here:
+    listener_via_emission_receiver = listener_via_emission_receiver
+    for_DEBUGGING = for_DEBUGGING
 
 
 class _ActualEmissionIndex:
