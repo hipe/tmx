@@ -1,6 +1,8 @@
 """EXPERIMENT
 
 (stowaway:)
+[#607.B]: as referenced
+[#604]: wish for strong type
 [#603]: [the help screen parser]
 :[#602]: #open track that one issue with argparse (should patch)
 """
@@ -66,9 +68,11 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
         ui_puts('usage: {}{}', _program_name, _args)
 
     def ui_puts(*a):
-        if len(a) is not 0:
-            serr.write(a[0].format(*a[1:]))
-        serr.write('\n')
+        if len(a) is 0:
+            return serr.write('\n')
+        else:
+            _line_head = a[0].format(*a[1:])
+            return serr.write(_line_head + '\n')
 
     def _succeeded():
         nonlocal exitstatus
@@ -134,14 +138,20 @@ class filesystem_functions:  # as namespace
 
 def putser_via_IO(io):
     def o(s):
-        d = io.write(s)
-        d += io.write('\n')
-        return d
+        _line = '%s\n' % s
+        _len = io.write(_line)  # :[#607.B]
+        None if int == type(_len) else sanity('type assertion failed')  # #track [#604]  # noqa: E501
+        return _len
     return o
 
 
 def cover_me(s):
     raise _exe('cover me: {}'.format(s))
+
+
+def sanity(s=None):
+    _msg = 'sanity' if s is None else 'sanity: %s' % s
+    raise _exe(_msg)
 
 
 _exe = Exception

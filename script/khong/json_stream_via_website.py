@@ -14,10 +14,12 @@ _url = _domain + '/python/pytut.php'  # ..
 
 def _my_CLI(listener, sin, sout, serr):
 
-    with open_dictionary_stream(listener) as itr:
-        if itr is None:
-            result = 5
-        else:
+    _rc = open_dictionary_stream(
+            html_document_path=None,
+            listener=listener,
+            )
+
+    with _rc as itr:
             result = _ad_hoc_lib().flush_JSON_stream_into(sout, serr, itr)
     return result
 
@@ -303,11 +305,15 @@ def _all_these_functions(emit):
                 uni = these & {*el['class']}
                 if 0 is len(uni):
                     cover_me('maybe check out this strange div')
+            elif s in ignore_these:
+                # oops there was lots of stuff #cover-me
+                pass
             else:
                 cover_me("page structured changed - wasn't expecting '%s'" % s)
 
         emit.info("(number of <br>'s: {})".format(count))
 
+    ignore_these = {'form', 'i', 'img', 'ins', 'input', 'p', 'script'}
     these = {'skyscraper', 'bogo-paypal'}
 
     def elements_recursive(bs_el):

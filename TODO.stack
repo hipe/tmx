@@ -99,6 +99,7 @@ sub-project: upload files to s3
   acceptance: a markdown document of the 177
   syncing for your new use case
   acceptance: delete the versioned-data for k hong
+    (above is #open [#410.J])
   syncing for k hong
   sakin syncing (many magnetics, injection interface)
   splinter CLI stuff so it's not so obtuse and monolithic
@@ -114,4 +115,3 @@ step: have the lines of the new file
 fix the syncing issue for khong (extra endcap) (same as above)
 goal: get a snapshot of our one known remaining syncing issue for khong
   - the problem that there's a duplicate row - improve this error (3 -3)
-  - cover khong markdown script fix (involves that caching thing yikes) (3 -4)

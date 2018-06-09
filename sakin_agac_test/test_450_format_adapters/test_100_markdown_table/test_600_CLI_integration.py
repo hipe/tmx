@@ -9,7 +9,10 @@ import unittest
 
 
 class _CommonCase(unittest.TestCase):
-    """NOTE - many of these is abstraction candidates"""
+    """NOTE - many of these are abstraction candidates
+
+    #track #[#410.K]
+    """
 
     # -- assertions
 
@@ -73,7 +76,7 @@ class _CommonCase(unittest.TestCase):
         return _these().for_expect_on_which_this_many_under(which, num, self)
 
     def _stdin(self):
-        return _interactive_IO
+        return _these().MINIMAL_INTERACTIVE_IO
 
 
 class Case010_basics(_CommonCase):
@@ -95,7 +98,7 @@ class Case020_must_be_interactive(_CommonCase):
         return self._build_end_state()
 
     def _stdin(self):
-        return _non_interactive_IO
+        return _these().MINIMAL_NON_INTERACTIVE_IO
 
     def _argv(self):
         return ()
@@ -201,18 +204,18 @@ class Case050_FA_help_screen(_CommonCase):
     def test_200_stdout_lines_look_like_items__at_least_two(self):
         import re
         rx = re.compile(r'^ +[_a-z]+ \(\*\.[a-z]{2,3}\)$')  # ..
-        s_a = self._end_state().first('stdout').lines
+        s_a = self._end_state().first_section('stdout').lines
         self.assertGreaterEqual(len(s_a), 2)
         for s in s_a:
             self.assertRegex(s, rx)
 
     def test_300_total_number_of_format_adapters_at_end(self):
-        s_a = self._end_state().last('stderr').lines
+        s_a = self._end_state().last_section('stderr').lines
         self.assertEqual(len(s_a), 1)
         self.assertRegex(s_a[0], r'^\(\d+ total\.\)$')
 
     def test_400_reminder_at_begnning_about_help(self):
-        _s_a = self._end_state().first('stderr').lines
+        _s_a = self._end_state().first_section('stderr').lines
         self.assertIn('FYI', _s_a[0])
 
     @shared_subject
@@ -256,18 +259,6 @@ class Case060_strange_format_adapter_name(_CommonCase):
 
     def _argv(self):
         return ('me', '--far-format', 'zig-zag', 'xx', 'yy')
-
-
-class _non_interactive_IO:  # as namespace only
-
-    def isatty():
-        return False
-
-
-class _interactive_IO:  # as namespace only
-
-    def isatty():
-        return True
 
 
 def _help_screen_lib():

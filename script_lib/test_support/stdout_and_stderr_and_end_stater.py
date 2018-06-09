@@ -39,15 +39,15 @@ def for_DEBUGGING():
     """
 
     def sout_f(s):
-        same('O', s)
+        return same('O', s)
 
     def serr_f(s):
-        same('E', s)
+        return same('E', s)
 
     def same(which, s):
         s2 = s.strip()
         _thing = ' (no newline)' if s2 is s else ''
-        serr.write('({}: {}{})\n'.format(which, s2, _thing))
+        return serr.write('({}: {}{})\n'.format(which, s2, _thing))
 
     def finish(exitstatus):
         _ = 'remember - debugging mode on (exitstatus: {}).\n'.format(
@@ -86,14 +86,15 @@ def for_flip_flopping_sectioner():
             self._sections = []
 
         def receive_stdout_write(self, s):
-            self._receive_write('stdout', s)
+            return self._receive_write('stdout', s)
 
         def receive_stderr_write(self, s):
-            self._receive_write('stderr', s)
+            return self._receive_write('stderr', s)
 
         def _receive_write(self, which, s):
             self._maybe_close_current_section(which)
             self._current_lines.append(s)
+            return len(s)  # you have to be like write, e.g [#607.B]
 
         def finish(self, actual_exitstatus):
             self._maybe_close_current_section('closed')
@@ -189,10 +190,10 @@ class _SectionedEndState:
         self.exitstatus = d
         self.sections = sections
 
-    def first(self, which):
+    def first_section(self, which):
         return self._first(False, which)
 
-    def last(self, which):
+    def last_section(self, which):
         return self._first(True, which)
 
     def _first(self, do_reverse, which):
@@ -218,6 +219,30 @@ class _EndState:
 class _ExitstatusOnly:
     def __init__(self, d):
         self.exitstatus = d
+
+
+class STDERR_CRAZYTOWN:
+
+    def __init__(self, *lines):
+        self._lines = lines
+
+    def isatty(self):
+        return False
+
+    def __iter__(self):
+        return iter(self._lines)
+
+
+class MINIMAL_NON_INTERACTIVE_IO:  # as namespace only
+
+    def isatty():
+        return False
+
+
+class MINIMAL_INTERACTIVE_IO:  # as namespace only
+
+    def isatty():
+        return True
 
 
 # #abstracted
