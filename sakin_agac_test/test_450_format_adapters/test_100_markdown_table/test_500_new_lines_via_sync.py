@@ -199,6 +199,33 @@ class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
         }
 
 
+class Case060_UPDATE(_CommonCase):  # #coverpoint5.4
+
+    def test_100_HI(self):
+        _act = self._end_state().outputted_lines[2:]
+        _exp = ('|thing A|x|\n', '|thing B|win|\n')  # NOTE - 
+        self.assertSequenceEqual(_act, _exp)
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def expect_emissions(self):
+        return iter(())
+        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
+
+    def given(self):
+
+        _these = (
+            {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'},
+            {'col_a': 'thing B', 'col_b': 'win'},
+        )
+        return {
+            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'far_collection': _these,
+        }
+
+
 def _far_script_exists():
     return fixture_executable_path('100_chimi_churri.py')
 

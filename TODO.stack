@@ -113,4 +113,3 @@ implement each part (with tests)
 step: diff lyfe
 step: have the lines of the new file
 fix the syncing issue for khong (extra endcap) (same as above)
-goal: get a snapshot of our one known remaining syncing issue for khong
