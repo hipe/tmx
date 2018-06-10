@@ -166,6 +166,39 @@ class Case040_near_file_not_found(_CommonCase):
                 }
 
 
+class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
+
+    def test_100_gets_two_lines_in(self):
+        _act = self._end_state().outputted_lines
+        _exp = ('|col A|col B|\n', '|:--|--:|\n')
+        self.assertSequenceEqual(_act, _exp)
+
+    def test_200_said_this_thing(self):
+        _act = self._emission('erx').to_string()
+        _exp = "duplicate human key value in far collection ('qux')"
+        self.assertEqual(_act, _exp)
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def expect_emissions(self):
+        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
+
+    def given(self):
+
+        _these = (
+            {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'},
+            {'col_a': 'qux'},
+            {'col_a': 'xx'},
+            {'col_a': 'qux'},
+        )
+        return {
+            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'far_collection': _these,
+        }
+
+
 def _far_script_exists():
     return fixture_executable_path('100_chimi_churri.py')
 

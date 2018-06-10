@@ -25,6 +25,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.L  | #trak | whether in-memory should be official format
 |                   #410.K  | #trak | CLI integration tests have redundant setup
 |                   #410.J  | #open | get rid of big versioned khong table
 |                   #410.I  | #open | remove this redundancy

@@ -93,7 +93,9 @@ def SELF(
 
     # index the new collection (which traverses it)
 
-    diminishing_pool = __index_the_far_collection(far_collection)
+    diminishing_pool = __index_the_far_collection(far_collection, listener)
+    if diminishing_pool is None:
+        return
     seen = {k: None for k in diminishing_pool.keys()}
 
     # traverse the original collection, while doing a thing
@@ -116,14 +118,22 @@ def SELF(
             cover_me(result_category)  # probably { 'failed' | 'skip' }
 
 
-def __index_the_far_collection(far_collection):
-
+def __index_the_far_collection(far_collection, listener):
     d = {}
     for (k, item) in far_collection:
         if k in d:
-            cover_me('[#407.e1]')
+            __when_duplicate_etc(k, listener)
+            d = None
+            break
         d[k] = item
     return d
+
+
+def __when_duplicate_etc(k, listener):  # #coverpoint5.3
+    def f(o, _):
+        _ = "duplicate human key value in far collection ('%s')"
+        o(_ % k)
+    listener('error', 'expression', 'duplicate_human_key_value', f)
 
 
 class _result_categories:  # as namespace

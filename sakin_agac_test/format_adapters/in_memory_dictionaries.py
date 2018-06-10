@@ -3,6 +3,8 @@
 ..adapters with a trivially simple case, one that should probably never
 be useful in production.
 
+(the question of whether the above provision is the case is #track [#410.L])
+
 (specifically it makes a format adapter for an array of dictionaries.)
 
   - for one thing, if this *is* useful, don't be afraid to move it and

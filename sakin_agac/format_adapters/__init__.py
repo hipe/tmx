@@ -36,6 +36,17 @@ class custom_procure__:
         return x
 
     def __when_via_collection_identifier(self):
+        if isinstance(self._collection_identifier, str):
+            return self.__when_via_collection_identifier_as_string()
+        else:
+            return self.__when_in_memory()
+
+    def __when_in_memory(self):
+        # arrived in #history-A.2. begin #track [#410.L]. #coverpoint5.3
+        import sakin_agac_test.format_adapters.in_memory_dictionaries as lib
+        return ('in_memory_dictionaries', lib)
+
+    def __when_via_collection_identifier_as_string(self):
         import os
         _stem, ext = os.path.splitext(self._collection_identifier)
         if ext == '':
@@ -186,5 +197,6 @@ def _collection_lib():
     return x
 
 
+# #history-A.2: as referenced
 # #history-A.1: as referenced
 # #born.

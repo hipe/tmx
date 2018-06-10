@@ -74,8 +74,7 @@ class _My_OpenNewLines_via_Sync:
             top = yikes[-1]
             if top[0] != tag:
                 if 'markdown_table_unable_to_be_synced_against_' == tag:
-                    wat = next(tagged_items)
-                    cover_me('HMM: %s' % type(wat))
+                    # #coverpoint5.3
                     break
                 yikes.pop()
                 top = yikes[-1]
@@ -104,7 +103,7 @@ class _My_OpenNewLines_via_Sync:
     def __exit__(self, *_):
         while 0 != len(self._close_me_stack):
             _cm = self._close_me_stack.pop()
-            _cm.__exit__()
+            _cm.__exit__(*_)
             """don't pass exception (for now) because confusing.
             result is ignored because confusing.
             #[#410.G] (track nested context managers closing each other)
