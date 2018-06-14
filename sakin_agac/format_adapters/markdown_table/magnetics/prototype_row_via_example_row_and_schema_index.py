@@ -65,9 +65,9 @@ class _SELF:
 
         row_schema_for_alignment = complete_schema.row_for_alignment__
 
-        tained_example_cel_DOM = orig_children[0]
-        tained_example_cel_DOM.content_string()  # be sure it's decomposed
-        childreners = _childreners_via(tained_example_cel_DOM)
+        tainted_example_cel_DOM = orig_children[0]
+        tainted_example_cel_DOM.content_string()  # be sure it's decomposed
+        childreners = _childreners_via(tainted_example_cel_DOM)
 
         _CelDOM = orig_children[0].__class__  # use any child
         _celer_via = _celer_via_via(
@@ -86,19 +86,50 @@ class _SELF:
         for all the rest, use the doo-hah that was there already!
         """
 
+        """assume the human key in the far pairs has the same effective
+        value as that in the near row. no reason to incur the "cost"
+        of updating this value, so delete that item from the dictionary.
+        """
+
+        value_via_name = {k: v for k, v in pairs}
+        value_via_name.pop(self._natural_key_field_name)
+
+        # instead of value via key, we want value via offset.
+
+        offset_via_name = self._offset_via_field_name
+        new_value_via_offset = {offset_via_name[k]: value_via_name[k] for k in value_via_name}  # KeyError #coverpoint1.1 (1/2)  # noqa: E501
+
+        if 0 == len(new_value_via_offset):
+            # #coverpoint4.1
+            # if there's no actual values you want to sync, it's a no-op
+            return near_row_DOM  # (#not-SESE) you can't max below.
+
+        # make a reader function for producing near cels from offsets
+
         def near_f(i):
-            return _near_children[i]
+            return near_children[i]
+        near_children = near_row_DOM.children
 
-        _near_children = near_row_DOM.children
+        """the rub: the goal is to have the "correct" end-cappiness.
+        what we mean by "correct" depends:
+        is the near row's length being "pushed outwards" by having new
+        right-anchored cels being added to it that it didn't have before?
+        then you use the end-cappiness of the prototype.
+        otherwise (and its number of cels is staying the same),
+        preserve the existing end-cappiness.
+        """
 
-        d = {k: v for k, v in pairs}
-        d.pop(self._natural_key_field_name)
-        offset = self._offset_via_field_name
-        _nvvo = {offset[k]: d[k] for k in d}  # KeyError #coverpoint1.1 (1/2)
+        far_max_offset = max(new_value_via_offset.keys())
+        near_max_offset = near_row_DOM.cels_count - 1
 
-        _endcap = near_row_DOM.any_endcap_()
+        near_row_any_endcap = near_row_DOM.any_endcap_()
 
-        return self._build_new_row(near_f, _nvvo, _endcap)
+        if near_max_offset < far_max_offset:
+            use_endcap = self._eg_endcap  # #coverpoint5.5
+        else:
+            use_endcap = near_row_any_endcap  # #coverpoint5.4
+
+        return self._build_new_row(near_f, new_value_via_offset, use_endcap)
 
     def new_via_name_value_pairs(self, pairs):
         """for each key-value in the far pairs, make the new cel.
@@ -121,25 +152,13 @@ class _SELF:
 
         return self._build_new_row(spaces_cel, _nvvo, self._eg_endcap)
 
-    def _build_new_row(self, user_f, new_value_via_offset, endcap):
+    def _build_new_row(self, user_f, new_value_via_offset, near_row_endcap):
 
-        def f(i):
-            if i in new_value_via_offset:
-                return value_cel(i)
-            else:
-                return user_f(i)
+        new_cels = self.__build_new_cels(user_f, new_value_via_offset)
 
-        value_cel = self.__value_celer(new_value_via_offset)
+        has = self.__write_any_endcap(new_cels, near_row_endcap)
 
-        new_cels = [f(i) for i in range(0, self._cels_count)]
-
-        if endcap is None:
-            has = False
-        else:
-            new_cels.append(endcap)
-            has = True
-
-        new_cels.append(self.__reuse_newline)
+        new_cels.append(self.__reuse_newline)  # always add a newline
 
         _new_row = self._RowDOM().init_via_all_memberdata__(
             cels_count=self._cels_count,
@@ -148,6 +167,19 @@ class _SELF:
             )
 
         return _new_row  # #todo
+
+    def __build_new_cels(self, user_f, new_value_via_offset):
+
+        def new_cel_for(i):
+            if i in new_value_via_offset:
+                return value_cel(i)
+            else:
+                return user_f(i)
+
+        value_cel = self.__value_celer(new_value_via_offset)
+
+        _new_cels = [new_cel_for(i) for i in range(0, self._cels_count)]
+        return _new_cels  # #todo
 
     def __value_celer(self, new_value_via_offset):
 
@@ -161,10 +193,20 @@ class _SELF:
 
         return _value_cel
 
+    def __write_any_endcap(self, new_cels, near_row_endcap):
+
+        if near_row_endcap is None:
+            has = False
+        else:
+            new_cels.append(near_row_endcap)
+            has = True
+        return has
+
+
 
 def _celer_via_via(childreners, cel_schema, _CelDOM):
 
-    def _celer_via(tained_example_cel_DOM, cel_schema):
+    def _celer_via(tainted_example_cel_DOM, cel_schema):
 
         """a "celer" is a function that makes cels
         """
@@ -183,8 +225,8 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
                 cx.append(x)
             return _CelDOM().init_via_children__(cx)
 
-        tained_example_cel_DOM.content_string()  # ensure decomposed
-        tainted_cx = tained_example_cel_DOM.children
+        tainted_example_cel_DOM.content_string()  # ensure decomposed
+        tainted_cx = tainted_example_cel_DOM.children
         reuse_pipe = tainted_cx[0]
 
         def w(offset):

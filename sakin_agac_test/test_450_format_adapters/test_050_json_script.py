@@ -175,8 +175,8 @@ class Case300_RUM(_CommonCase):  # #coverpoint7.5
     def test_100_RUM(self):
         _ = self._build_end_state()
         act = _.outputted_lines
-        self.assertEqual(len(act), 4)
-        self.assertEqual(act[-1], '|thing B|y|\n')
+        self.assertEqual(len(act), 5)
+        self.assertEqual(act[-2], '|thing B|y\n')
 
     def expect_emissions(self):
         return iter(())

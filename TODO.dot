@@ -1,0 +1,51 @@
+digraph g {
+
+game_server[label="
+game server|
+difficulty: med|
+workload: hi|
+cho cha\nfoo fa
+" shape=record]
+
+grep_dump[label="
+grep dump|
+difficulty: hi|
+workload: hi|
+zub\n
+zub
+" shape=record]
+
+upload_bot[label="
+upload bot|
+difficulty: v hi|
+workload: med|
+ziff zaff
+" shape=record]
+
+sakin_agac[label="
+sakin agac|
+difficulty: med|
+workload: hi|
+cho cha\n
+foo
+" shape=record]
+
+bots[label="bots"]
+
+upload_bot->bots
+game_server->bots
+
+heroku[label="heroku"]
+
+grep_dump->heroku
+sakin_agac->heroku
+
+label="
+these are the
+major sub-projects
+"
+rankdir=RL
+}
+/*
+#born.
+*/

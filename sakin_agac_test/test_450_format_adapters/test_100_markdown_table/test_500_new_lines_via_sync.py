@@ -7,6 +7,7 @@ from _init import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
+        memoize,
         )
 import unittest
 
@@ -199,11 +200,28 @@ class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
         }
 
 
-class Case060_UPDATE(_CommonCase):  # #coverpoint5.4
+class Case060_preserve_endcappiness_here(_CommonCase):  # #coverpoint5.4
+    """this is the proof of bugfix - we want that a row that didn't
+    have an endcap before, DOESN'T have an endcap after (even though
+    the last cel's value changed.
 
-    def test_100_HI(self):
+    (ACTUALLY we WOULD want the endcap to be added here but, as long
+    as we don't detect ineffective updates; that is, as long as we go
+    through with no-effect updates, we want them to be truly no-effect...)
+
+    NOTE the original has stochastic whitespace. the updated cel loses
+    this whitespace. we presume it is that the new is using the whitespacing
+    of the example row. but at this point, we don't know nore care.
+    that is a bridge to cross when we get to it.
+    """
+
+    def test_100_win(self):
         _act = self._end_state().outputted_lines[2:]
-        _exp = ('|thing A|x|\n', '|thing B|win|\n')  # NOTE - 
+        _exp = (
+                _same_row_1,
+                '|thing B|thing two\n',  # NOTE still no endcap
+                '|thing C|\n',  # exactly as in file
+                )
         self.assertSequenceEqual(_act, _exp)
 
     @shared_subject
@@ -216,14 +234,60 @@ class Case060_UPDATE(_CommonCase):  # #coverpoint5.4
 
     def given(self):
 
-        _these = (
-            {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'},
-            {'col_a': 'thing B', 'col_b': 'win'},
-        )
+        _far = (
+                _same_this(),
+                {'col_a': 'thing B', 'col_b': 'thing two'},
+                )
         return {
             'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
-            'far_collection': _these,
+            'far_collection': _far,
         }
+
+
+class Case070_ADD_end_cappiness_here(_CommonCase):  # #coverpoint5.5
+    """this is kind of an edge case as a corollary of the above thing,
+    and it reveals something about the idea of "endcap" - here, the
+    endcap gets added because we are lengthening the number of cels.
+
+    broadly, endcaps are what we want, and we support their absense
+    for historic reasons.
+    """
+
+    def test_100_win(self):
+        _act = self._end_state().outputted_lines[2:]
+        _exp = (
+                _same_row_1,
+                '|thing B| thing one\n',  # exactly as in file
+                '|thing C|yerp|\n',  # note yes encap
+                )
+        self.assertSequenceEqual(_act, _exp)
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def expect_emissions(self):
+        return iter(())
+        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
+
+    def given(self):
+
+        _far = (
+                _same_this(),
+                {'col_a': 'thing C', 'col_b': 'yerp'},
+                )
+        return {
+            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'far_collection': _far,
+        }
+
+
+_same_row_1 = '|thing A|x|\n'
+
+
+@memoize
+def _same_this():
+    return {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'}
 
 
 def _far_script_exists():
