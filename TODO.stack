@@ -101,9 +101,3 @@ sub-project: upload files to s3
   acceptance: delete the versioned-data for k hong
     (above is #open [#410.J])
   syncing for k hong
-  sakin syncing (many magnetics, injection interface)
-  splinter CLI stuff so it's not so obtuse and monolithic
-unify cover me and sanity
-integrate modalically
-step: diff lyfe
-step: have the lines of the new file

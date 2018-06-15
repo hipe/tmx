@@ -172,6 +172,20 @@ def for_recording_all_stderr_lines():
     return None, _serr, finish
 
 
+def for_recording_all_stdout_lines():
+    """will barf crudely if anything is written to STDERR. every line that
+
+    is written to STDOUT will be available in the end state under
+    `stdout_lines`.
+    """
+
+    def finish(actual_exitstatus):
+        return _EndState(actual_exitstatus, tuple(lines), None)
+    lines = []
+    _sout = lib.WriteOnly_IO_Proxy(lines.append)
+    return _sout, None, finish
+
+
 def __recording_list_and_expectation_functions_via_count(num):
 
     actual_lines = []
@@ -212,7 +226,7 @@ class _EndState:
 
     def __init__(self, d, sout_line_tup, serr_line_tup):
         self.exitstatus = d
-        self.STDOUT_LINES = sout_line_tup
+        self.stdout_lines = sout_line_tup
         self.stderr_lines = serr_line_tup
 
 

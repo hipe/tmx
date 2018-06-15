@@ -79,8 +79,8 @@ class open_dictionary_stream:
 
     def __init__(
             self,
-            listener,
             html_document_path,
+            listener,
             ):
 
         self._html_document_path = html_document_path

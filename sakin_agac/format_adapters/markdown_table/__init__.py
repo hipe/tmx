@@ -57,10 +57,15 @@ class _My_OpenNewLines_via_Sync:
         _item_stream = sync_request.release_item_stream()
         _nkfn = _sync_params.natural_key_field_name
 
+        # --
+        # #coverpoint6.2 (overloaded):
+        _use_far_item_stream = (x for x in _item_stream if 'header_level' not in x)  # noqa: E501
+        # --
+
         from .magnetics import newstream_via_farstream_and_nearstream as mag
         tagged_items = mag(
                 # the streams:
-                farstream_items=_item_stream,
+                farstream_items=_use_far_item_stream,
                 nearstream_path=_nearstrem_path,
 
                 # the sync parameters:

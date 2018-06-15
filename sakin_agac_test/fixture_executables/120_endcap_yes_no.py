@@ -1,7 +1,7 @@
 class open_dictionary_stream:
     """(RUM)"""
 
-    def __init__(self, listener):
+    def __init__(self, cache_path, listener):
         pass
 
     def __enter__(self):

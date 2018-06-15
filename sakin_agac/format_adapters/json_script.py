@@ -160,7 +160,7 @@ class _session_for_sync_request:
         _stem = pop_property(self, '_normal_stem')
         _name = _stem.replace('/', '.')
         _mod = importlib.import_module(_name)  # ..
-        _sess = _mod.open_dictionary_stream(self._listener)  # ..
+        _sess = _mod.open_dictionary_stream(None, self._listener)  # ..
         self._dictionary_stream_session = _sess
 
     def __resolve_normal_stem_via_path_stem(self):

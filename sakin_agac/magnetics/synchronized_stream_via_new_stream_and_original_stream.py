@@ -27,6 +27,7 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
         itr = self._dict_stream
         del(self._dict_stream)
         _hi = next(itr)
+        # #cover-me (above) - when user gives empty stream, this is confusing
         self._dict_stream_part_two = itr
         return _SyncParameters(**_hi)
 
@@ -81,9 +82,23 @@ def SELF(
 
     # --
     def wrap_far_item(item):
+        # only once you've had a chance to see the near items, ask for the ..
         nonlocal wrap_far_item
-        wrap_far_item = far_item_wrapperer(_result_categories, listener)
-        return wrap_far_item(item)
+        x = far_item_wrapperer(_result_categories, listener)
+        if x is None:
+            cover_me('you saw this work once but meh - #history-A.2')
+            # assume something failed
+            _error("couldn't make far item wrapper. stopping early.")
+            wrap_far_item = None  # sanity
+            return ('_stop_now', None)
+        else:
+            wrap_far_item = x
+            return wrap_far_item(item)
+
+    def _error(msg):
+        from modality_agnostic import listening as li
+        error = li.leveler_via_listener('error', listener)
+        error(msg)
     # --
 
     far_collection = _collection(far_item_stream, natural_key_via_far_item)
@@ -114,6 +129,8 @@ def SELF(
         result_category, wrapped_item = wrap_far_item(item)
         if 'OK' == result_category:
             yield wrapped_item
+        elif '_stop_now' == result_category:
+            break
         else:
             cover_me(result_category)  # probably { 'failed' | 'skip' }
 
@@ -146,6 +163,7 @@ def _collection(stream, keyer):
     return ((keyer(x), x) for x in stream)
 
 
+# #history-A.2: when wrapper fails (sketch)
 # #history-A.1 (can be temporary): "inject" wrapper function
 # #pending-rename: we might name every "new stream" as "far stream" ibid near
 # #born.

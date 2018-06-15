@@ -1,51 +1,123 @@
 digraph g {
 
-game_server[label="
-game server|
+/* waypoints and smaller projects (alphabetical) */
+
+thing100[label="• the sync script\n• md table datastore"]
+thing150[label="..so you can\n survey heroku\noptions for.."]
+thing175[label="grok\nheroku\nproperly"]
+
+thing200[label=
+"isomorphic
+jekyll-like
+heroku-enabled
+stupid simple
+publishing"
+]
+
+thing250[label="..which lets you\npublish small\nsubdomain surveys.."]
+thing275[label="..like React.."]
+thing277[label="(the grand slice)"]
+thing282[label="(sakin agac etc)"]
+thing290[label="s3 for static files\ninteg with heroku"]
+thing300[label="competency\nwith heroku"]
+thing350[label="s3 for\nvideo hosting"]
+thing400[label="grok\nbots"]
+
+thing525[label="re-grok\nresponsive\nCSS"]
+thing530[label="ability\nto design"]
+thing550[label="HSR\ndesign\ndynamism"]
+thing555[label="of these"]
+thing560[label="an academic\ndesign"]
+thing565[label="a travers\ndesign"]
+thing575[label="a glitch\ndesign"]
+
+
+thing600[label=
+"samhara: a place to hold dreams
+music, movies, videogames, dance..."
+shape=rect]
+
+
+
+/* relationships */
+
+thing150->thing100
+thing200->thing150
+thing200->thing175
+sakin_agac->thing200
+sakin_agac->thing290
+sakin_agac->thing350
+thing300->thing200
+thing250->thing200
+thing275->thing250
+thing282->thing275
+thing282->thing277
+grep_dump->thing300
+thing400->thing300
+game_server->thing400
+upload_bot->thing400
+
+
+thing530->thing525
+thing550->thing555[label="any 2"]
+thing560->thing530
+thing555->thing560
+thing565->thing530
+thing555->thing565
+thing575->thing530
+thing555->thing575
+
+sakin_agac->thing525
+
+
+thing600->thing550
+
+
+/* core projects (not alphabetical) */
+
+
+game_server[label=
+"game server|
 difficulty: med|
 workload: hi|
-cho cha\nfoo fa
-" shape=record]
+"
+shape=rect
+]
 
-grep_dump[label="
-grep dump|
-difficulty: hi|
-workload: hi|
-zub\n
-zub
-" shape=record]
+grep_dump[label=
+"grep dump
+difficulty: hi
+workload: hi
+"
+shape=rect
+]
 
-upload_bot[label="
-upload bot|
-difficulty: v hi|
-workload: med|
-ziff zaff
-" shape=record]
+upload_bot[label=
+"upload bot
+difficulty: v hi
+workload: med
+"
+shape=rect
+]
 
-sakin_agac[label="
-sakin agac|
-difficulty: med|
-workload: hi|
-cho cha\n
-foo
-" shape=record]
+sakin_agac[label=
+"sakin agac
+difficulty: med
+workload: hi
+acceptance: nasim
+"
+shape=rect
+]
 
-bots[label="bots"]
 
-upload_bot->bots
-game_server->bots
-
-heroku[label="heroku"]
-
-grep_dump->heroku
-sakin_agac->heroku
+rankdir=BT
 
 label="
 these are the
 major sub-projects
 "
-rankdir=RL
 }
 /*
+#historyA.1: big spike
 #born.
 */

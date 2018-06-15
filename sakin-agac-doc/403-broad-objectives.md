@@ -1,3 +1,13 @@
+## (things that maybe didn't get added, to splice in later);
+
+  - the main essential function of the blog has no backend - is static assets
+  - should "run" just as well locally as remotely
+  - contributors should be able to contribute using a github model;
+    that is, all thru terminal and all with git (for etc..)
+
+
+
+
 # the broad objectives of [the project codenamed "sakin agac"]
 
 currently, this must start out as a hodgepodge scratch space.

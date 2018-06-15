@@ -54,6 +54,14 @@ def _my_parameters(o, param):
             argument_arity='OPTIONAL_FIELD',
             )
 
+    def diff_desc(o, _):
+        o("show only the changed lines as a diff")
+
+    o['diff'] = param(
+            description=diff_desc,
+            argument_arity='FLAG',
+            )
+
 
 def _pop_property(self, prop):
     from sakin_agac import pop_property
@@ -88,9 +96,23 @@ class _CLI:  # #coverpoint
                 **_d,
                 listener=self._listener,
                 )
+
+        if self._do_diff:
+            line_consumer = self.__build_line_consumer_for_dyff_lyfe()
+        else:
+            line_consumer = _LineConsumer_via_STDOUT(self._sout)
+
         with _context_manager as lines:
-            for line in lines:
-                raise Exception('cover me - wahoo: %s' % line)
+            with line_consumer as receive_line:
+                for line in lines:
+                    receive_line(line)
+
+    def __build_line_consumer_for_dyff_lyfe(self):
+        return _FancyDiffLineConsumer(
+                stdout=self._sout,
+                near_collection_path=self._near_collection,
+                tmp_file_path='z/tmp',  # #todo
+                )
 
     def __init_listener(self):
         # sadly we have to make another one of these
@@ -132,9 +154,14 @@ class _CLI:  # #coverpoint
 
     def __resolve_normal_args_via_namespace(self):
         ns = self._pop_property('_namespace')
+
+        near_collection = getattr(ns, 'near-collection')
+        self._near_collection = near_collection
+
+        self._do_diff = ns.diff
         self._normal_args = {
                 # (#open [#410.E] below)
-                'near_collection': getattr(ns, 'near-collection'),
+                'near_collection': near_collection,
                 'far_collection': getattr(ns, 'far-collection'),
                 'near_format': ns.near_format,
                 'far_format': ns.far_format,
@@ -291,6 +318,74 @@ class _OpenNewLines_via_Sync:  # #testpoint
         self._OK = False
 
     _pop_property = _pop_property
+
+
+class _FancyDiffLineConsumer:
+
+    def __init__(self, stdout, near_collection_path, tmp_file_path):
+        self._tmp_file = open(tmp_file_path, 'w+')
+        self._sout = stdout
+        self._near_collection_path = near_collection_path
+
+    def __enter__(self):
+        return self._receive_line
+
+    def _receive_line(self, line):  # #coverpoint6.2
+        self._tmp_file.write(line)
+
+    def __exit__(self, ex, *_):
+
+        if ex is None:
+            self._close_normally()
+        return False
+
+    def _close_normally(self):
+        from difflib import unified_diff
+
+        from_path = self._near_collection_path
+
+        _use_fromfile = 'a/%s' % from_path
+        _use_tofile = 'b/%s' % from_path
+
+        to_IO = _pop_property(self, '_tmp_file')
+        to_IO.seek(0)
+
+        YUCK_to_lines = [x for x in to_IO]
+        to_IO.close()
+
+        with open(from_path) as lines:
+            YUCK_from_lines = [x for x in lines]
+
+        sout = self._sout
+
+        _lines = unified_diff(
+                YUCK_from_lines,
+                YUCK_to_lines,
+                fromfile=_use_fromfile,
+                tofile=_use_tofile,
+                )
+
+        for line in _lines:
+            sout.write(line)
+
+        # #todo - rm to_IO.name (currently kept for debugging)
+
+        return False
+
+
+class _LineConsumer_via_STDOUT:
+
+    def __init__(self, sout):
+        self._sout = sout
+
+    def __enter__(self):
+        return self._receive_line
+
+    def _receive_line(self, line):
+        self._sout.write(line)
+
+    def __exit__(self, *_):
+        return False
 
 
 def _format_adapters_module():

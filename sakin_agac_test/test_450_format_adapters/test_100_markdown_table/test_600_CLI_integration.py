@@ -1,6 +1,9 @@
 # #covers: script.sync
 
-import _init  # noqa: F401
+from _init import (
+        fixture_executable_path,
+        fixture_file_path,
+        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -38,7 +41,7 @@ class _CommonCase(unittest.TestCase):
         self.assertRegex(
                 _lines[0],
                 r'^usage: me \[-h\] \[--near-format FORMAT\] '
-                r'\[--far-format FORMAT\]\n'
+                r'\[--far-format FORMAT\] \[--diff\]\n'
                 r' +near-collection far-collection$')
 
     def _first_line(self):
@@ -62,6 +65,7 @@ class _CommonCase(unittest.TestCase):
         _stdin = self._stdin()
 
         stdout, stderr, end_stater = self._sout_and_serr_and_end_stater()
+        # stdout, stderr, end_stater = _these().for_DEBUGGING()
 
         _cli = _subject_script()._CLI(_stdin, stdout, stderr, _argv)
 
@@ -169,7 +173,7 @@ class Case040_top_help_screen(_CommonCase):
         self._num_children(self._section('positional arguments'), 2)
 
     def test_500_something_about_options(self):
-        self._num_children(self._section('optional arguments'), 3)  # -h + 1
+        self._num_children(self._section('optional arguments'), 4)  # -h + 1
 
     def _num_children(self, sect, num):
         cx = sect.children
@@ -259,6 +263,174 @@ class Case060_strange_format_adapter_name(_CommonCase):
 
     def _argv(self):
         return ('me', '--far-format', 'zig-zag', 'xx', 'yy')
+
+
+class Case070_money_and_diff(_CommonCase):  # #coverpoint6.2
+
+    def test_100_succeeds(self):
+        self._CLI_client_results_in_success_exitstatus()
+
+    def test_200_entire_output_is_just_the_diff(self):
+        self.assertIsNotNone(self._crazy_parse_tree())
+
+    def test_300_these_exactly(self):
+        _act = [x.string for x in self._of_tree('edits')]
+        _exp = (
+                '-| four | five | six\n',
+                '+| four | five |SIX  \n',
+                '+|seven|EIGHT|     |\n',
+                )
+        self.assertSequenceEqual(_act, _exp)
+
+    def test_400_these_paths_look_like_git_paths(self):
+        t = self._crazy_parse_tree()
+        md0 = t.before_path.group
+        md1 = t.after_path.group
+        self.assertEqual(md0(1), 'a')
+        self.assertEqual(md1(1), 'b')
+        self.assertIsNotNone(md0(2))
+        self.assertEqual(md0(2), md1(2))
+
+    def _of_tree(self, name):
+        return getattr(self._crazy_parse_tree(), name)
+
+    @shared_subject
+    def _crazy_parse_tree(self):
+        _lines = self._end_state().stdout_lines
+        return _CrazyDiffParse(_lines).execute()
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def _sout_and_serr_and_end_stater(self):
+        return _these().for_recording_all_stdout_lines()
+
+    def _argv(self):
+        return ('me', '--diff', _markdown_0100(), _far_130())
+
+
+# #cover-me #todo - no diff
+
+
+def _far_130():
+    return fixture_executable_path('130_edit_add.py')
+
+
+def _markdown_0100():
+    return fixture_file_path('0100-hello.md')
+
+
+class _CrazyDiffParse:
+
+    def __init__(self, lines):
+        self._stack = [
+            (range(3, 5), r'^ [^ ]'),
+            (range(1, 99), r'^[-+]', 'edits'),
+            (range(3, 5), r'^ [^ ]'),
+            (1, r'^@@ -\d+,\d+ \+\d+,\d+ @@$'),
+            (1, r'^\+\+\+ (.)(.+)', 'after_path'),
+            (1, r'^--- (.)(.+)', 'before_path'),
+        ]
+        self._current_memo_is_plural = None
+        self._current_memo_matches = None
+        self._mutex = None
+        self._lines = lines
+
+    def execute(self):
+        del(self._mutex)
+        self._custom_object = _CustomObject()
+        self._advance()
+        f = self._receive
+        for line in self._lines:
+            f(line)
+        self._close_any_current_memo_matches()
+        return self._custom_object
+
+    def _receive(self, s):
+        return self._do_receive(True, s)
+
+    def _do_receive(self, can_advance, s):
+        import re
+        sym = self._current_symbol
+        md = re.search(sym.regex_string, s)
+        num = self._current_count_of_matched_items
+        if md is None:
+            if sym.this_satisfies_the_minimum(num):
+                if can_advance:
+                    self._advance()
+                    return self._do_receive(False, s)
+                else:
+                    cover_me()
+            else:
+                cover_me()
+        else:
+            num += 1
+            self._current_count_of_matched_items = num
+
+            name = sym.name
+            if name is not None:
+                if 1 == sym._range.stop:
+                    self._current_memo_is_plural = False
+                    self._current_memo_match = md
+                else:
+                    if self._current_memo_matches is None:
+                        self._current_memo_matches = []
+                        self._current_memo_is_plural = True
+                    self._current_memo_matches.append(md)
+
+            if sym.this_is_the_end(num):
+                if 0 == len(self._stack):
+                    cover_me()
+                    del(self._current_symbol)
+                else:
+                    self._advance()
+
+    def _advance(self):
+        self._close_any_current_memo_matches()
+        self._current_count_of_matched_items = 0
+        self._current_symbol = _Symbol(*self._stack.pop())
+
+    def _close_any_current_memo_matches(self):
+        if self._current_memo_is_plural is not None:
+            self._close_current_memo()
+
+    def _close_current_memo(self):
+        if self._current_memo_is_plural:
+            x = tuple(self._current_memo_matches)
+            self._current_memo_matches = None
+        else:
+            x = self._current_memo_match
+            self._current_memo_match = None
+        self._current_memo_is_plural = None
+        name = self._current_symbol.name
+        setattr(self._custom_object, name, x)
+
+
+class _CustomObject:
+    pass
+
+
+class _Symbol:
+
+    def __init__(self, arity, regexp, name=None):
+        if isinstance(arity, int):
+            use_range = range(arity, arity)
+        else:
+            use_range = arity
+        self._range = use_range
+        self.regex_string = regexp
+        self.name = name
+
+    def this_satisfies_the_minimum(self, num):
+        return self._range.start <= num
+
+    def this_is_the_end(self, num):
+        return self._range.stop == num
+
+
+def cover_me():
+    raise Exception('cover me')
 
 
 def _help_screen_lib():

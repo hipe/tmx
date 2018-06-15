@@ -72,7 +72,7 @@ class Case100_adds_only(_CommonCase):
         _line_one = items[0].to_line()
         _line_two = items[1].to_line()
 
-        self.assertEqual(_line_one, "|one|two|three\n")
+        self.assertEqual(_line_one, "|one|two|three|\n")
         self.assertEqual(_line_two, "| four | five | six\n")
 
     def test_060_the_new_one_was_added(self):
@@ -92,7 +92,7 @@ class Case100_adds_only(_CommonCase):
 
         _line_three = items[2].to_line()
 
-        self.assertEqual(_line_three, "|3A |   |choo choo\n")
+        self.assertEqual(_line_three, "|3A |   |choo choo|\n")
 
     def test_070_tail_lines_count(self):
         self._tail_lines_this_many(4)
