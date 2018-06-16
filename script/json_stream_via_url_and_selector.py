@@ -56,6 +56,9 @@ def _my_CLI(url, selector_string, listener, sin, sout, serr):
     return __main()
 
 
+_my_CLI.__doc__ = __doc__
+
+
 def flush_JSON_stream_into(sout, serr, itr):
     """convenience guy for this pattern ETC"""
 
@@ -203,6 +206,10 @@ def okay():
 
 
 # -- ..
+
+def markdown_link_via(label, url):
+    return '[{}]({})'.format(label, url)
+
 
 def label_via_string_via_max_width(max_width):  # #coverpoint8.1
     def f(s):

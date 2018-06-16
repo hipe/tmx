@@ -116,7 +116,6 @@ began playin w/ servers Mon Feb  5 08:57:54 EST 2018. this document is for notes
 |[OpenCV 3 with Python](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3.php)|◻️|⍻||
 |[Image - OpenCV BGR : Matplotlib RGB](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_matplotlib_rgb_brg_image_load_display_save.php)|◻️|⍻||
 |[Basic image operations - pixel access](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_basic_image_operations_pixel_access_image_load.php)|◻️|⍻||
-|[iPython - Signal Processing with NumPy](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_NumPy_Arrays_Signal_Processing_iPython.php)|◻️|⍻||
 |[Signal Processing with NumPy I - FFT and DFT for sine, square waves...](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_Signal_Processing_with_NumPy_Fourier_Transform_FFT_DFT.php)|◻️|⍻||
 |[Signal Processing with NumPy II - Image Fourier Transform : FFT & DFT](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_Signal_Processing_with_NumPy_Fourier_Transform_FFT_DFT_2.php)|◻️|⍻||
 |[Inverse Fourier Transform of an Image with low pass filter: cv2.idf...](http://www.bogotobogo.com/python/OpenCV_Python/python_opencv3_Image_Fourier_Transform_FFT_DFT.php)|◻️|⍻||

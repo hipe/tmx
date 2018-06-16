@@ -18,7 +18,7 @@ thing250[label="..which lets you\npublish small\nsubdomain surveys.."]
 thing275[label="..like React.."]
 thing277[label="(the grand slice)"]
 thing282[label="(sakin agac etc)"]
-thing290[label="s3 for static files\ninteg with heroku"]
+thing290[label="(s3 for?) static files\ninteg with heroku"]
 thing300[label="competency\nwith heroku"]
 thing350[label="s3 for\nvideo hosting"]
 thing400[label="grok\nbots"]
@@ -44,7 +44,9 @@ shape=rect]
 thing150->thing100
 thing200->thing150
 thing200->thing175
-sakin_agac->thing200
+sakin_agac->gfm_rumskalla
+gfm_rumskalla->thing200
+gfm_rumskalla->thing290
 sakin_agac->thing290
 sakin_agac->thing350
 thing300->thing200
@@ -96,6 +98,16 @@ upload_bot[label=
 "upload bot
 difficulty: v hi
 workload: med
+"
+shape=rect
+]
+
+gfm_rumskalla[label="github-flavored markdown rumskalla
+difficulty: low
+workload: med
+acceptance: docs of sakin agac lib,
+looking like github docs,
+regen not painful. can runlocal
 "
 shape=rect
 ]
