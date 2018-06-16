@@ -2,8 +2,8 @@ digraph g {
 
 /* waypoints and smaller projects (alphabetical) */
 
-thing100[label="• the sync script\n• md table datastore"]
-thing150[label="..so you can\n survey heroku\noptions for.."]
+thing100[label="• the sync script\n• md table datastore" style=filled]
+thing150[label="..so you can\n survey heroku\noptions for.." style=filled]
 thing175[label="grok\nheroku\nproperly"]
 
 thing200[label=
