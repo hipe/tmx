@@ -297,8 +297,10 @@ class _CustomProcessor:
                 self._TUP_ON_DECK = tup
                 break
 
-        if hit_the_end:
-            self._close()
+        """(we don't know why but you don't need to and must not close
+        yourself even when you hit the end of the whole document here.
+        #coverpoint9.1.1)
+        """
 
         self._did_hit_the_end_here = hit_the_end
 

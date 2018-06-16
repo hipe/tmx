@@ -50,7 +50,7 @@ class _session_for_sync_request:
         """
 
         # for this format adapter the identifier *is* the collection
-        self._dictionary_array = mixed_collection_identifier
+        self._mixed_collection_identifier = mixed_collection_identifier
         self._format_adapter = format_adapter
 
     def __enter__(self):  # how to be an execution context
@@ -59,19 +59,32 @@ class _session_for_sync_request:
         stream shape is trivial because we are already in that item shape
         """
 
-        from sakin_agac import pop_property
-        dict_a = pop_property(self, '_dictionary_array')
-        format_adapter = pop_property(self, '_format_adapter')
+        x = _pop_property(self, '_mixed_collection_identifier')
+
+        if isinstance(x, tuple):
+            use_stream = iter(x)
+            self._exit_me = None
+        elif hasattr(x, '__enter__'):
+            use_stream = x.__enter__()
+            self._exit_me = x
+        else:
+            raise Exception("can we keep this simple? had %s" % type(x))
+
+        format_adapter = _pop_property(self, '_format_adapter')
 
         return format_adapter.sync_lib.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
-                iter(dict_a),
+                use_stream,
                 format_adapter,
                 )
 
     def __exit__(self, exception_class, exception, traceback):
         """(we have no open resources to close but you might)"""
 
-        pass
+        em = _pop_property(self, '_exit_me')
+        if em is not None:
+            return em.__exit__(exception_class, exception, traceback)
+        else:
+            return False
 
 
 def _name_value_pairs_via_native_object(dct):
@@ -84,6 +97,11 @@ def _value_readers_via_field_names(*names):
             return native_object[name]  # [#410.B] death of item class imagine  # noqa: E501
         return read
     return [reader_for(name) for name in names]
+
+
+def _pop_property(x, name):
+    from sakin_agac import pop_property
+    return pop_property(x, name)
 
 
 # --

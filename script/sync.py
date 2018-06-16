@@ -92,7 +92,7 @@ class _CLI:  # #coverpoint
         self._exitstatus = 0  # now that u made it this far innocent til guilty
 
         _d = self._pop_property('_normal_args')
-        _context_manager = _OpenNewLines_via_Sync(
+        _context_manager = OpenNewLines_via_Sync_(
                 **_d,
                 listener=self._listener,
                 )
@@ -203,7 +203,7 @@ class _CLI:  # #coverpoint
     _pop_property = _pop_property
 
 
-class _OpenNewLines_via_Sync:  # #testpoint
+class OpenNewLines_via_Sync_:  # #testpoint
 
     def __init__(
         self,
@@ -212,11 +212,13 @@ class _OpenNewLines_via_Sync:  # #testpoint
         listener,
         near_format=None,
         far_format=None,
+        sneak_this_in=None,
     ):
         self.near_collection = near_collection
         self.far_collection = far_collection
         self.near_format = near_format
         self.far_format = far_format
+        self._sneak_this_in = sneak_this_in
         self._listener = listener
         self._format_adapters_module = _format_adapters_module()
         self._OK = True
@@ -257,6 +259,7 @@ class _OpenNewLines_via_Sync:  # #testpoint
         _cm = _cm_via(
                 far_collection_reference=far_cr,
                 near_collection_reference=near_cr,
+                sneak_this_in=self._sneak_this_in,
                 filesystem_functions=fsf,
                 listener=self._listener,
                 )

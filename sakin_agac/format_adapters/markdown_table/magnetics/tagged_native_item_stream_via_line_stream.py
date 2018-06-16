@@ -62,8 +62,16 @@ def __generator_sanitized(upstream_path, listener):
 
     parse = _Parse(listener)
 
-    with open(upstream_path) as fh:
-        for line in fh:
+    if isinstance(upstream_path, str):
+        cm = open(upstream_path)
+    elif isinstance(upstream_path,  tuple):
+        from sakin_agac import context_manager_via_iterator_ as f
+        cm = f(upstream_path)
+    else:
+        raise Exception("can we keep this simple? had %s" % type(upstream_path))  # noqa: E501
+
+    with cm as lines:
+        for line in lines:
             x = parse(line)
             if x is None:
                 break

@@ -394,5 +394,6 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A.2: sunsetted file of origin
 # #history-A.1
 # #born: abstracted from sibling

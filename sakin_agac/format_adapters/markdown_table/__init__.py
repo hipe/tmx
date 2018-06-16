@@ -15,12 +15,14 @@ class _My_OpenNewLines_via_Sync:
             near_collection_reference,
             filesystem_functions,
             listener,
+            sneak_this_in=None,
             ):
         self._close_me_stack = []
         self._OK = True
         self._mutex = None
         self._near_collection_reference = near_collection_reference
         self._far_collection_reference = far_collection_reference
+        self._sneak_this_in = sneak_this_in
         self._filesystem_functions = filesystem_functions
         self._listener = listener
 
@@ -59,13 +61,19 @@ class _My_OpenNewLines_via_Sync:
 
         # --
         # #coverpoint6.2 (overloaded):
-        _use_far_item_stream = (x for x in _item_stream if 'header_level' not in x)  # noqa: E501
+
+        use_far_item_stream = (x for x in _item_stream if 'header_level' not in x)  # noqa: E501
+
+        # #coverpoint9.2.2
+        f = self._sneak_this_in
+        if f is not None:
+            use_far_item_stream = (f(x) for x in use_far_item_stream)
         # --
 
         from .magnetics import newstream_via_farstream_and_nearstream as mag
         tagged_items = mag(
                 # the streams:
-                farstream_items=_use_far_item_stream,
+                farstream_items=use_far_item_stream,
                 nearstream_path=_nearstrem_path,
 
                 # the sync parameters:

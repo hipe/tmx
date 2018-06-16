@@ -1,3 +1,14 @@
+def context_manager_via_iterator_(itr):
+
+    import contextlib
+
+    @contextlib.contextmanager
+    def f():
+        yield itr
+
+    return f()
+
+
 def pop_property(self, var):
     x = getattr(self, var)
     delattr(self, var)

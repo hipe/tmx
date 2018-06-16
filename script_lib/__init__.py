@@ -1,6 +1,7 @@
 """EXPERIMENT
 
 (stowaway:)
+[#608.2]: external tracking
 [#607.B]: as referenced
 [#604]: wish for strong type
 [#603]: [the help screen parser]
@@ -48,10 +49,9 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
         _express_usage()
         ui_puts()
         io.write('description: ')  # ..
-        _big_string = cli_function.__doc__.format(**help_values)
-        _reg = re.compile('^(.*\n)', re.MULTILINE)
-        _itr = _reg.finditer(_big_string)
-        itr = (__deinident(md) for md in _itr)
+        itr = line_stream_via_doc_string_(
+                doc_string=cli_function.__doc__,
+                help_values=help_values)
         io.write(next(itr))
         for line in itr:
             io.write(line)
@@ -86,6 +86,14 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
     exitstatus = 678
 
     return __main()
+
+
+def line_stream_via_doc_string_(doc_string, help_values):
+    if True:
+        big_string = doc_string.format(**help_values)
+    _reg = re.compile('^(.*\n)', re.MULTILINE)
+    _itr = _reg.finditer(big_string)
+    return (__deinident(md) for md in _itr)
 
 
 def __deinident(md):

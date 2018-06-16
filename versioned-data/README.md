@@ -1,8 +1,11 @@
 ## index
 
-  - 016-K-hong-reading-notes.fragment.md: see `script/markdown-via-html -h`
+  - (nothing)
+
+
 
 
 ## document-meta
 
+  - #history-A.1: removed only file
   - #born.

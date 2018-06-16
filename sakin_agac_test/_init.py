@@ -37,7 +37,7 @@ def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
     _d = self.given()
 
     import script.sync as lib
-    _lines_opener = lib._OpenNewLines_via_Sync(
+    _lines_opener = lib.OpenNewLines_via_Sync_(
             ** _d,
             listener=exp.listener,
             )

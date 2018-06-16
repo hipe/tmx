@@ -98,6 +98,3 @@ sub-project: upload files to s3
 07:43 Tutorial #12 - Implement Book Model in Play Framework
   acceptance: a markdown document of the 177
   syncing for your new use case
-  acceptance: delete the versioned-data for k hong
-    (above is #open [#410.J])
-  syncing for k hong

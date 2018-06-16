@@ -1,6 +1,12 @@
-# #covers: [isomorphic asset file]
+"""
+#covers: script/khong/markdown_via_json_stream
+(also provides coverage for [#608.2] :[#414.2])
+"""
 
-import _init  # noqa: F401
+
+from _init import (
+        fixture_executable_path,
+        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         )
@@ -24,7 +30,7 @@ class _CommonCase(unittest.TestCase):  # #[#410.K]
         return es
 
     def invites(self):
-        _exp = 'usage: ohai-mami\n'
+        _exp = "'ohai-mami -h' for help\n"
         self.assertEqual(self.last_stderr_line(), _exp)
 
     def first_stderr_line(self):
@@ -59,7 +65,7 @@ class _CommonCase(unittest.TestCase):  # #[#410.K]
         return _this_one_lib().MINIMAL_INTERACTIVE_IO
 
 
-class Case110_help(_CommonCase):
+class Case110_help(_CommonCase):  # #coverpoint9.1.4 - one arg, help
 
     def test_100_succeeds(self):
         self.succeeds()
@@ -82,13 +88,13 @@ class Case110_help(_CommonCase):
         return ('--hel',)
 
 
-class Case120_no_args_allowed(_CommonCase):
+class Case120_no_args(_CommonCase):  # #coverpoint9.0  - no args
 
     def test_100_fails(self):
         self.fails()
 
     def test_200_whines(self):
-        _exp = 'had 1 needed 0 arguments\n'
+        _exp = 'provide STDIN or <script>\n'
         self.assertEqual(self.first_stderr_line(), _exp)
 
     def test_300_invites(self):
@@ -102,23 +108,43 @@ class Case120_no_args_allowed(_CommonCase):
         return self.stdin_that_IS_interactive()  # be jerks
 
     def argv_tail(self):
-        return ('jerp',)
+        return ()
 
 
-class Case130_must_be_stdin(_CommonCase):
+class Case130_both(_CommonCase):  # #coverpoint9.2 - two args
 
     def test_100_fails(self):
         self.fails()
 
     def test_200_content(self):
-        self.end_state().first_section('stderr')
-
-        _exp = 'currently, non-interactive from STDIN only\n'
+        _exp = "can't have both STDIN and argument(s)\n"
         self.assertEqual(self.first_stderr_line(), _exp)
 
-    def test_300_example(self):
-        _exp = 'e.g: blab_blah | ohai-mami\n'
-        self.assertEqual(self.last_stderr_line(), _exp)
+    def test_300_invites(self):
+        self.invites()
+
+    @shared_subject
+    def end_state(self):
+        return self.build_end_state()
+
+    def stdin(self):
+        return self.stdin_that_is_NOT_interactive()
+
+    def argv_tail(self):
+        return ('no-see',)
+
+
+class Case170_too_many_args(_CommonCase):  # #coverpoint9.3 - two args
+
+    def test_100_fails(self):
+        self.fails()
+
+    def test_200_content(self):
+        _exp = 'too many args (had 3 need 1)\n'
+        self.assertEqual(self.first_stderr_line(), _exp)
+
+    def test_300_invites(self):
+        self.invites()
 
     @shared_subject
     def end_state(self):
@@ -128,29 +154,24 @@ class Case130_must_be_stdin(_CommonCase):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
-        return ()
+        return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case200_wee(_CommonCase):
+class Case200_stdin(_CommonCase):  # #coverpoint9.1.1  - one arg: stdin
 
     def test_100_succeeds(self):
         self.succeeds()
 
     def test_200_header_row_and_second_one(self):
-        act = self.table_lines()[0:2]
+        act = self.table_lines()
         self.assertRegex(act[0], r'^\| [A-Z][a-z]+ .+ \|$')
         self.assertRegex(act[1], r'^(?:\|[-:]-+:?)+\|$')
 
     def test_220_business_object_rows(self):
-        act = self.table_lines()[2:]
-        self.assertIn('choo chah', act[0])
-        self.assertIn('boo bah', act[1])
-        self.assertEqual(len(act), 2)
-
-    def test_300_info(self):
-        act = self.end_state().first_section('stderr').lines
-        self.assertRegex(act[0], r'^emitted \d+ row-items, \d+ bytes$')
-        self.assertEqual(len(act), 1)
+        act = self.table_lines()
+        self.assertIn('choo chah', act[-2])
+        self.assertIn('boo bah', act[-1])
+        self.assertEqual(len(act), 5)
 
     @shared_subject
     def table_lines(self):
@@ -162,7 +183,7 @@ class Case200_wee(_CommonCase):
 
     def stdin(self):
         return _this_one_lib().STDERR_CRAZYTOWN(
-                '{ "_is_sync_meta_data": true }\n',
+                '{ "_is_sync_meta_data": true, "natural_key_field_name": "lesson" }\n',  # noqa: E501
                 '{ "header_level": 1 }\n',
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n',
@@ -170,6 +191,32 @@ class Case200_wee(_CommonCase):
 
     def argv_tail(self):
         return ()
+
+
+class Case220_arg(_CommonCase):  # #coverpoint9.1.2  - one arg: arg
+
+    def test_100_succeeds(self):
+        self.succeeds()
+
+    def test_200_big_same(self):
+        act = self.table_lines()
+        self.assertIn('choo chah', act[-2])
+        self.assertIn('boo bah', act[-1])
+        self.assertEqual(len(act), 5)
+
+    @shared_subject
+    def table_lines(self):
+        return self.end_state().first_section('stdout').lines
+
+    @shared_subject
+    def end_state(self):
+        return self.build_end_state()
+
+    def stdin(self):
+        return self.stdin_that_IS_interactive()
+
+    def argv_tail(self):
+        return (fixture_executable_path('140_khong_micro.py'),)
 
 
 def _this_one_lib():
