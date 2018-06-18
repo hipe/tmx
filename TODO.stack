@@ -96,3 +96,23 @@ sub-project: upload files to s3
 10:08 Tutorial #14 - Implement Create Method Of BookStore Application
 05:06 Tutorial #13 - Index Method of BookStore Application
 07:43 Tutorial #12 - Implement Book Model in Play Framework
+(-1) try to install every CMS
+(-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
+(-3) filter_by built with tag lyfe
+(-4) dictionary stream via markdown table, #coverpoint5.10
+(-5) tag lyfe parse tag treee: compound (deep) values
+(-6) tag lyfe parse tag trees with atom values (collision)
+(-7) tag lyfe parse tag trees with atom values (no collision)
+(-8) tag lyfe parse tag tree tags only
+(-9) tag lyfe query: recurse (be strict so this is only when necessary ({and|or})
+(-10) tag lyfe query: create and (for all `in` construct) ingtegrate deep selector
+(-11) tag lyfe query: the `in` regex construct
+(-12) tag lyfe query: the `in` range construct
+(-13) tag lyfe query: the `in` list (`#foo in (bar1, bar2, 22)`), integrate
+(-14) tag lyfe query: `#foo {with|without} value` construct, integrate (consider `#foo:*`)
+(-15) tag lyfe query: the `not` modifier (integrate with everything so far)
+(-16) tag lyfe query: {and|or} (no recursion yet) (enforce all one or the other)
+(-17) tag lyfe query: tag with value (atomic) (integers and non)
+(-18) tag lyfe query: tag without value
+(-19) find a parser generator that satisfies that one requirement
+(-20) tag lyfe readme, statement of scope
