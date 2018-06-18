@@ -17,6 +17,8 @@
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
+|                   #708.2  |       | (this one script, cross-sub-project coverage)
+|                   #708    |       | (external tracking)
 |                   #707.B  | #open | clean up these placeholders
 |                   #707    |       | (internal tracking)
 |                   #701    |       | (this readme)

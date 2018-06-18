@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+<title>LanguageParsing - Python Wiki</title>
+
+</head>
+
+<body  lang="en" dir="ltr">
+
+<div id="header">
+
+<div id="locationline">
+
+
+<ul id="pagelocation">
+<li><a href="/moin/LanguageParsing">LanguageParsing</a></li>
+</ul>
+
+</div>
+
+<ul id="pagetrail">
+<li><a href="/moin/LanguageParsing">LanguageParsing</a></li>
+</ul>
+</div>
+
+<div id="sidebar">
+<div id="star">
+
+</div>
+<div class="sidepanel">
+
+<ul id="navibar">
+<li class="wikilink"><a href="/moin/FrontPage">FrontPage</a></li><li class="wikilink"><a href="/moin/RecentChanges">RecentChanges</a></li><li class="wikilink"><a href="/moin/FindPage">FindPage</a></li><li class="wikilink"><a href="/moin/HelpContents">HelpContents</a></li><li class="current"><a href="/moin/LanguageParsing">LanguageParsing</a></li>
+</ul>
+
+</div>
+<div class="sidepanel">
+<h1>Page</h1>
+<ul class="editbar"><li><span class="disabled">Immutable Page</span></li><li class="toggleCommentsButton" style="display:none;"><a href="#" class="nbcomment" onClick="toggleComments();return false;">Comments</a></li><li><a class="nbinfo" href="/moin/LanguageParsing?action=info" rel="nofollow">Info</a></li><li><a class="nbattachments" href="/moin/LanguageParsing?action=AttachFile" rel="nofollow">Attachments</a></li><li>
+</li></ul>
+
+</div>
+<div class="sidepanel">
+<h1>User</h1>
+<ul id="username"><li><a href="/moin/LanguageParsing?action=login" id="login" rel="nofollow">Login</a></li></ul>
+</div>
+</div>
+
+<div id="page" lang="en" dir="ltr">
+<div dir="ltr" id="content" lang="en"><span class="anchor" id="top"></span>
+<span class="anchor" id="line-1"></span><p class="line874">Small discussion and evaluation of different parsers. <span class="anchor" id="line-2"></span><span class="anchor" id="line-3"></span><p class="line867"><img alt="(!)" height="16" src="/wiki/europython/img/idea.png" title="(!)" width="16" /> Please keep wiki links as wiki links, use external links only if there is no existing page for the tool. <span class="anchor" id="line-4"></span><div><table><tbody><tr>  <td><p class="line862">Name </td>
+  <td><p class="line862">Grammar </td>
+  <td><p class="line862">Module </td>
+  <td><p class="line862">Python </td>
+  <td><p class="line862">Comment </td>
+</tr>
+<tr>  <td><span class="anchor" id="line-5"></span><p class="line891"><a class="http" href="http://docs.python.org/lib/module-shlex.html">shlex</a></td>
+  <td><p class="line862"> </td>
+  <td><p class="line862"> C </td>
+  <td><p class="line862"> </td>
+  <td><p class="line862">included in the main Python distribution </td>
+</tr>
+<tr>  <td><span class="anchor" id="line-6"></span><p class="line891"><a href="/moin/Grako">Grako</a> </td>
+  <td><p class="line891"><a class="http" href="http://en.wikipedia.org/wiki/Parsing_expression_grammar">PEG</a> </td>
+  <td><p class="line862">Python </td>
+  <td><p class="line862">2.7+, 3.3+, <a href="/moin/PyPy">PyPy</a> </td>
+  <td><p class="line862">Tool that takes grammars in EBNF variant &amp; and outputs memoizing (Packrat) PEG parsers in Python.  Grako is different from other PEG parser generators in that the generated parsers use Python's very efficient exception-handling system to backtrack. </td>
+</tr>
+</tbody></table></div><span class="anchor" id="line-43"></span><span class="anchor" id="line-44"></span><span class="anchor" id="line-45"></span><span class="anchor" id="line-46"></span><p class="line874">For faster performance, one may use other parser generator systems and plug them in as modules. <span class="anchor" id="line-47"></span><span class="anchor" id="line-48"></span><p class="line874">For example: <span class="anchor" id="line-49"></span><span class="anchor" id="line-50"></span><ul><li><p class="line891"><a class="nonexistent" href="/moin/Spirit">Spirit</a> (<a class="http" href="http://spirit.sourceforge.net/">http://spirit.sourceforge.net/</a>) framework for writing EBNF as C++ code <span class="anchor" id="line-51"></span></li><li><p class="line891"><a class="nonexistent" href="/moin/FlexBisonModule">FlexBisonModule</a> (<a class="http" href="http://www.crsr.net/Software/FBModule.html">http://www.crsr.net/Software/FBModule.html</a>) <span class="anchor" id="line-52"></span></li><li><p class="line891"><a class="http" href="http://groups.google.com/groups?hl=en&amp;amp;lr=&amp;amp;ie=UTF-8&amp;amp;selm=61g0ff$39g$1@vishnu.jussieu.fr">cocktail compiler tools</a> approach <span class="anchor" id="line-53"></span><span class="anchor" id="line-54"></span></li></ul><p class="line862">Example of such usage is <a href="/moin/SeeGramWrap">SeeGramWrap</a> available from Edward C. Jones <a class="http" href="http://members.tripod.com/~edcjones/pycode.html">Python page</a>, which is a heavily revised and upgraded version of the ANTLR C parser that is in <a class="http" href="http://members.tripod.com/~edcjones/cgram.tar.gz">cgram</a> (broken link). The lastest verson has been refactored to move some of the complexity from ANTLR to Python. <span class="anchor" id="line-55"></span><span class="anchor" id="line-56"></span><p class="line862">Martin von Loewis presented a paper at Python10, titled <a class="http" href="http://www.python.org/sigs/parser-sig/towards-standard.html">&quot;Towards a Standard Parser Generator&quot;</a> that surveyed the available parser generators for Python. <span class="anchor" id="line-57"></span><span class="anchor" id="line-58"></span><p class="line862">Ned Batchelder maintains additional information on these and other parsers at <a class="http" href="http://nedbatchelder.com/text/python-parsers.html">Python Parsing Tools</a>. <span class="anchor" id="line-59"></span><span class="anchor" id="line-60"></span><p class="line867">
+</div>
+</div>
+</html>

@@ -24,7 +24,7 @@ def _split_like_so(self, orig_s, * expect_these_s_a):
     self.assertEqual(_actual_these, expect_these_s_a)
 
 
-class Case010_camel_case(_CommonCase):
+class Case010_camel_case(_CommonCase):  # #coverpoint11.1
 
     def test_005_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -44,11 +44,11 @@ class Case010_camel_case(_CommonCase):
     _this = _split_like_so
 
     def _go_subject(self, big_s):
-        _f = _subject_module()._split_on_camel_case
+        _f = _stowaway_subject_module()._split_on_camel_case
         return tuple(s for s in _f(big_s))
 
 
-class Case100_normalize_freeform_strings(_CommonCase):
+class Case100_normalize_freeform_strings(_CommonCase):  # #coverpoint11.2
 
     def test_010(self):
         self._this('FooBar  biffo-bazzo', 'foo_bar_biffo_bazzo')
@@ -59,8 +59,7 @@ class Case100_normalize_freeform_strings(_CommonCase):
     _this = _be_like_so
 
     def _go_subject(self, big_s):
-        _f = _subject_module()._normal_field_via_whatever_this_is
-        return _f(big_s)
+        return _stowaway_subject_module()(big_s)
 
 
 class Case200_encap_is_required(_CommonCase):
@@ -74,6 +73,12 @@ class Case200_encap_is_required(_CommonCase):
         self.assertEqual(x, None)
         _ = 'header row 1 must have "encap" (trailing pipe)'
         self.assertEqual(msgs, [_])
+
+
+@memoize
+def _stowaway_subject_module():
+    import sakin_agac.magnetics.normal_field_name_via_string as x
+    return x
 
 
 @memoize

@@ -150,12 +150,6 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F]
         del(self._exit_mutex)
 
 
-# -- X
-
-def selector_via_string(s):
-    okay()
-
-
 # -- CACHED URL
 
 def _cached_url(url, emit):

@@ -158,9 +158,10 @@ def _field_readerer_and_offset_via_field_name_via(cels_count, header_row1_DOM):
     """
 
     def normal_field_name_via_offset(offset):
+        import sakin_agac.magnetics.normal_field_name_via_string as name_via
         _cel_DOM = header_row1_DOM.cel_at_offset(offset)
         _s = _cel_DOM.content_string()
-        return _normal_field_via_whatever_this_is(_s)
+        return name_via(_s)
 
     _f = normal_field_name_via_offset
     name_and_offsets = ((_f(i), i) for i in range(cels_count))
@@ -178,40 +179,6 @@ def _field_readerer_and_offset_via_field_name_via(cels_count, header_row1_DOM):
             return _val_s  # #todo
         return g
     return (f, offset_via_normal_field_name)
-
-
-def _normal_field_via_whatever_this_is(big_s):  # #testpoint
-
-    # first, in one pass get rid of characters we know we don't allow
-    # (note we keep characters we will use to split on)
-
-    _sanitized_s = _lowlevel_blacklist_rx.sub('', big_s)
-
-    # then, all this
-
-    return '_'.join(s.lower() for s in _split_on_everything(_sanitized_s))
-
-
-def _split_on_everything(big_s):
-
-    for mid_s in _split_on_camel_case(big_s):
-        for s in _split_on_whitespace(mid_s):
-            yield s
-
-
-def _split_on_whitespace(s):
-    return _whitespace_rx.split(s)
-
-
-def _split_on_camel_case(s):  # #testpoint
-    """ruby has to be better at something"""
-
-    offset = 0
-    for m in _camelcase_rx.finditer(s):
-        offset_ = m.start()
-        yield s[offset:offset_]
-        offset = offset_
-    yield s[offset:]
 
 
 def _make_row_num_validator(model_row, listener, *ok_via_which):
@@ -273,12 +240,5 @@ def _make_my_compare(model_count):
         else:
             sanity()
     return f
-
-
-_camelcase_rx = re.compile('(?<=[a-z])(?=[A-Z])')
-
-_whitespace_rx = re.compile(r'[- \t]+')
-
-_lowlevel_blacklist_rx = re.compile('[^-a-zA-Z0-9_ \t]+')
 
 # #born.

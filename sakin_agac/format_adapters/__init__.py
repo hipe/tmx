@@ -119,11 +119,10 @@ class custom_procure__:
 
 
 def to_name_value_pairs():
-
-    def natural_key_of(mod):
-        return mod.FORMAT_ADAPTER.format_name
-
-    return ((natural_key_of(x), x) for x in EVERY_MODULE())
+    for mod in EVERY_MODULE():  # (was gen ex before #historyA.3)
+        fa = mod.FORMAT_ADAPTER
+        if fa is not None:
+            yield fa.format_name, mod
 
 
 @lazy
@@ -197,6 +196,7 @@ def _collection_lib():
     return x
 
 
+# #history-A.3: as referenced
 # #history-A.2: as referenced
 # #history-A.1: as referenced
 # #born.
