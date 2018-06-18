@@ -50,6 +50,7 @@ def open_dictionary_stream(html_document_path, listener):
                 '_is_sync_meta_data': True,
                 'natural_key_field_name': field_names[0],
                 'field_names': field_names,  # coverpoint [#708.2.2]
+                'traversal_will_be_alphabetized_by_human_key': False,
                 }
 
         for dct in table_o:

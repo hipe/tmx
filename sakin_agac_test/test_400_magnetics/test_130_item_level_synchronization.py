@@ -68,7 +68,7 @@ def _my_sync(orig, new):  # #here1
 
     import sakin_agac.magnetics.synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
     f = _MyBusinessObject.name_value_pairs_via_doohah
-    sync_st = x.SELF(
+    sync_st = x.stream_of_mixed_via_sync(
         natural_key_via_far_item=_natty_key_via_object,
         far_item_stream=f(new),
         natural_key_via_near_item=_natty_key_via_object,

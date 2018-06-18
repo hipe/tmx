@@ -87,7 +87,7 @@ class _build_snapshot:
         def identity(s):
             return s
 
-        _st = _subject_module().SELF(
+        _st = _subject_module().stream_of_mixed_via_sync(
             natural_key_via_far_item=identity,
             far_item_stream=new,
             natural_key_via_near_item=identity,

@@ -21,7 +21,13 @@
 |                   #708    |       | (external tracking)
 |                   #707.B  | #open | clean up these placeholders
 |                   #707    |       | (internal tracking)
+|                [\[#702\]] |       | due dilligence on parser generators
 |                   #701    |       | (this readme)
+
+
+
+
+[\[#702\]]: 002-parser-generators-dilligence.md
 
 
 

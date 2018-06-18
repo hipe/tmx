@@ -117,5 +117,3 @@ sub-project: upload files to s3
 (-19) find a parser generator that satisfies that one requirement
 (-19.1) yikes do deep survey against all the options
 (-19.2) create other producer, see if you can fold it in
-(-19.3) add lexicalization to s.a sync, first markdown document
-(-19.4) cover new producer (one of two) as it pertains to s.a

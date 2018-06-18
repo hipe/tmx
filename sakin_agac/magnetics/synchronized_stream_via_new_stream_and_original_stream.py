@@ -52,13 +52,21 @@ class _SyncParameters:
             self,
             _is_sync_meta_data,
             natural_key_field_name,
+            # (#coverpoint7.2 is simply the names of the above arguments)
+            field_names=None,
+            traversal_will_be_alphabetized_by_human_key=None,
             ):
-        # (#coverpoint7.2 is simply the names of the above arguments)
 
         if _is_sync_meta_data is not True:
             cover_me('hi')
 
         self.natural_key_field_name = natural_key_field_name
+        # self.field_names = field_names  not needed yet
+        self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
+
+    @property
+    def sync_parameters_version(self):
+        return 2  # bump this WHEN you add to constituency
 
 
 def _result_in_identity(result_categories, listener):
@@ -70,13 +78,14 @@ def _result_in_identity(result_categories, listener):
     return _identity
 
 
-def SELF(
+def stream_of_mixed_via_sync(
         natural_key_via_far_item,
         far_item_stream,
         natural_key_via_near_item,
         near_item_stream,
         item_via_collision,
         far_item_wrapperer=_result_in_identity,
+        far_traversal_is_ordered=None,
         listener=None,
         ):
 
@@ -111,7 +120,13 @@ def SELF(
     diminishing_pool = __index_the_far_collection(far_collection, listener)
     if diminishing_pool is None:
         return
+
     seen = {k: None for k in diminishing_pool.keys()}
+
+    # sort if desired
+
+    if far_traversal_is_ordered is False:
+        diminishing_pool = _COVER_ME(diminishing_pool)
 
     # traverse the original collection, while doing a thing
 
@@ -153,6 +168,31 @@ def __when_duplicate_etc(k, listener):  # #coverpoint5.3
     listener('error', 'expression', 'duplicate_human_key_value', f)
 
 
+def _COVER_ME(diminishing_pool):
+    """
+    currently,
+      - #cover-me. drafted at #history-A.3 for small real generation.
+
+      - this behavior is triggered by an associated option (parameter).
+
+      - the only interesting value for that option to have is `False`. all
+        other values (including (quite importantly) None) will make things
+        behave as they did before this feature existed.
+
+      - False is an indication that the far collection traversal will occur in
+        a sequence that is *not* in any meaningful order.
+
+      - furthermore, this is an indication that the synchronization *could*
+        order the far collection by the natural key if the client desires.
+        (although this particular provision should be always true, given
+        what "natural key" is supposed to mean.)
+    """
+
+    mutable_list = [k for k in diminishing_pool]
+    mutable_list.sort(key=lambda hk: hk.lower())
+    return {k: diminishing_pool[k] for k in mutable_list}
+
+
 class _result_categories:  # as namespace
     # skip = 'skip' maybe one day
     failed = 'failed'
@@ -163,6 +203,7 @@ def _collection(stream, keyer):
     return ((keyer(x), x) for x in stream)
 
 
+# #history-A.3 (can be temporary): as referenced
 # #history-A.2: when wrapper fails (sketch)
 # #history-A.1 (can be temporary): "inject" wrapper function
 # #pending-rename: we might name every "new stream" as "far stream" ibid near

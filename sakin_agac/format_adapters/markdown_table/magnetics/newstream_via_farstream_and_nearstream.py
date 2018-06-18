@@ -47,6 +47,8 @@ def _NEWSTREAM_VIA_ETC(
         farstream_format_adapter,
 
         listener,
+
+        far_traversal_is_ordered=None,
         ):
 
     def __main():
@@ -84,6 +86,7 @@ def _NEWSTREAM_VIA_ETC(
 
             # 'near_item_stream': provided #here1,
             # 'natural_key_via_near_item': provided #here2
+            'far_traversal_is_ordered': far_traversal_is_ordered,
 
             # 'item_via_collision': provided #here3
             'listener': listener,
@@ -198,7 +201,7 @@ class _CustomProcessor:
         self._OK = True
         sync_args['listener'] = f
 
-        self._big_deal_stream = _sync.SELF(
+        self._big_deal_stream = _sync.stream_of_mixed_via_sync(
                 near_item_stream=_near_item_stream,  # :#here1
                 natural_key_via_near_item=_nat_key_via,  # :#here2
                 far_item_wrapperer=_far_item_wrapperer,

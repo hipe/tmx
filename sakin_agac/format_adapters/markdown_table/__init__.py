@@ -55,9 +55,13 @@ class _My_OpenNewLines_via_Sync:
             ('head_line', True),
         ]
 
-        _sync_params = sync_request.release_sync_parameters()
+        sp = sync_request.release_sync_parameters()
         _item_stream = sync_request.release_item_stream()
-        _nkfn = _sync_params.natural_key_field_name
+
+        None if 2 == sp.sync_parameters_version else cover_me('refa')
+        _nkfn = sp.natural_key_field_name
+        _trav_is_ordered = sp.traversal_will_be_alphabetized_by_human_key
+        del(sp)
 
         # --
         # #coverpoint6.2 (overloaded):
@@ -79,6 +83,7 @@ class _My_OpenNewLines_via_Sync:
                 # the sync parameters:
                 natural_key_field_name=_nkfn,
                 farstream_format_adapter=_far_format_adapter,
+                far_traversal_is_ordered=_trav_is_ordered,
 
                 listener=self._listener,
                 )
