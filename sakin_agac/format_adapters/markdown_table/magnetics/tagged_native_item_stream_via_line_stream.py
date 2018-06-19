@@ -50,15 +50,10 @@ import re
 import sys
 
 
-def _SELF(upstream_path, listener):
+def _TAGGED_ITEM_STREAM(upstream_path, listener):
 
     if listener is None:
         sanity("you're gonna want a listener")  # #[#412]
-
-    return __generator_sanitized(upstream_path, listener)
-
-
-def __generator_sanitized(upstream_path, listener):
 
     parse = _Parse(listener)
 
@@ -163,6 +158,6 @@ class _CustomHybrid:
 
 _looks_like_table_line = re.compile(r'^\|').search
 
-sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
+sys.modules[__name__] = _TAGGED_ITEM_STREAM  # #[#008.G] so module is callable
 
 # #born.

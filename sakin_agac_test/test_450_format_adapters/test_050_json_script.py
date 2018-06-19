@@ -29,7 +29,7 @@ class _CommonCase(unittest.TestCase):
         msgs, listener = ts.minimal_listener_spy()
 
         _cr = _build_collection_reference(s)
-        _sess = _cr.session_for_sync_request(None, listener)
+        _sess = _cr.open_sync_request(None, listener)
         with _sess as doo_hah:
             None if doo_hah is None else sanity()
 
@@ -63,10 +63,10 @@ class Case100(_CommonCase):
         _cref = _build_collection_reference(_path)
         # from script_lib import filesystem_functions as rsx
         rsx = "you don't need filesystem resources yet"
-        _sess = _cref.session_for_sync_request(rsx, 'listener')
+        _sess = _cref.open_sync_request(rsx, 'listener')
         with _sess as sync_request:
             sync_params = sync_request.release_sync_parameters()
-            dict_stream = sync_request.release_item_stream()
+            dict_stream = sync_request.release_dictionary_stream()
         self.assertEqual(sync_params.natural_key_field_name, 'xyzz 01')
         these = [x for x in dict_stream]
         self.assertEqual(len(these), 1)

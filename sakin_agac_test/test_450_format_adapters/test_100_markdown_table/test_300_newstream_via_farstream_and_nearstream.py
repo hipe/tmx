@@ -184,7 +184,7 @@ def _build_first_index(native_objects, markdown_file):
 
     far_format_adapter = _this_one_format_adapter().FORMAT_ADAPTER
 
-    _sess = far_format_adapter._session_for_sync_request(
+    _sess = far_format_adapter._open_sync_request(
             mixed_collection_identifier=native_objects,
             modality_resources=None,
             listener=None,
@@ -198,22 +198,31 @@ def _build_first_index(native_objects, markdown_file):
 
 def __build_first_index_via_these(sync_request, far_format_adapter, markdown_file):  # noqa: E501
 
+    my_sync = _subject_module()
+
+    listener = 'listener1'
+
     _sync_params = sync_request.release_sync_parameters()
 
-    _item_stream = sync_request.release_item_stream()
+    _far_dict_stream = sync_request.release_dictionary_stream()
 
     _nkfn = _sync_params.natural_key_field_name
 
-    _HOLY_SHNAPPS = _subject_module()(
+    _md_file = fixture_file_path(markdown_file)
+
+    _f = my_sync.sibling_('tagged_native_item_stream_via_line_stream')
+    _near_tagged_items = _f(_md_file, listener)
+
+    _HOLY_SHNAPPS = my_sync(
             # the streams:
-            farstream_items=_item_stream,
-            nearstream_path=fixture_file_path(markdown_file),
+            far_dictionary_stream=_far_dict_stream,
+            near_tagged_items=_near_tagged_items,
 
             # the sync parameters:
             natural_key_field_name=_nkfn,
             farstream_format_adapter=far_format_adapter,
 
-            listener='listener1',
+            listener=listener,
             )
 
     import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib

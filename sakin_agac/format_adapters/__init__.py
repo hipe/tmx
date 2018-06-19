@@ -6,7 +6,11 @@ from sakin_agac import (
         )
 
 
-class custom_procure__:
+def procure_format_adapter(**kwargs):
+    return _ProcureFormatAdapter(**kwargs).execute()
+
+
+class _ProcureFormatAdapter:
     """"procure" is an essential part of [#505] our collections API.
 
     this is a specialization of it: given a filesystem path (a filename)
@@ -50,7 +54,10 @@ class custom_procure__:
         import os
         _stem, ext = os.path.splitext(self._collection_identifier)
         if ext == '':
-            cover_me("can't infer filename type from a file with no extension")
+            # #coverpoint13.1
+            def f(o, _=None):  # #open #[#508]
+                o("can't infer filename type from a file with no extension - %s" % self._collection_identifier)  # noqa: E501
+            self._listener('error', 'expression', 'file_extension_required', f)
         else:
             return self.__do_when_via_collection_identifier(ext)
 

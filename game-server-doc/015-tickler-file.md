@@ -16,6 +16,7 @@
 |---------------------------|:-----:|-
 |[#002]                     |       | blog document the secret python `re.Scanner`
 |[#001]                     |       | (placeheld for document meta)
+[[#000]                     |       | REMINDER - numberspace placeheld with ../README.md
 
 
 

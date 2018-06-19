@@ -115,7 +115,7 @@ def __fix_error_function(ap, stderr):
 class Interruption(Exception):
     """we are forced to throw exception to interrupt control flow there :("""
 
-    # (#[#006.B] this is seen as a painpoint of argparse)
+    # (#[#020.2] this is seen as a painpoint of argparse)
 
     def __init__(self, exitstatus, message):
         self.exitstatus = exitstatus

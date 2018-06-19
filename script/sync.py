@@ -174,7 +174,8 @@ class _CLI:  # #coverpoint
                 )
 
         reso = stepperer.SIMPLE_STEP(
-                self._serr, self._argv, _my_parameters, _description_of_sync)
+                self._sin, self._serr, self._argv,
+                _my_parameters, _description_of_sync)
         if reso.OK:
             self._namespace = reso.namespace
         else:
@@ -303,11 +304,11 @@ class OpenNewLines_via_Sync_:  # #testpoint
         format_identifier = self._pop_property(format_k)
         collection_identifier = self._pop_property(coll_k)
 
-        pair = self._format_adapters_module.custom_procure__(
+        pair = self._format_adapters_module.procure_format_adapter(
                 collection_identifier=collection_identifier,
                 format_identifier=format_identifier,
                 listener=self._listener,
-                ).execute()
+                )
         if pair:
             return (collection_identifier, *pair)
 

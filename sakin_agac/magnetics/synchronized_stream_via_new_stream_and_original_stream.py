@@ -2,6 +2,7 @@
 
 from sakin_agac import (
         cover_me,
+        pop_property,
         )
 
 
@@ -24,17 +25,39 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
         self._format_adapter = format_adapter
 
     def release_sync_parameters(self):
-        itr = self._dict_stream
-        del(self._dict_stream)
+        itr = pop_property(self, '_dict_stream')
         _hi = next(itr)
         # #cover-me (above) - when user gives empty stream, this is confusing
         self._dict_stream_part_two = itr
         return _SyncParameters(**_hi)
 
-    def release_item_stream(self):
-        x = self._dict_stream_part_two
-        del(self._dict_stream_part_two)
-        return x
+    def release_dictionary_stream(self):
+        return pop_property(self, '_dict_stream_part_two')
+
+
+class SYNC_REQUEST_VIA_TWO_FUNCTIONS:
+
+    def __init__(
+            self,
+            release_sync_parameters,
+            release_dictionary_stream,
+            ):
+
+        self._order = [
+                ('two', release_dictionary_stream),
+                ('one', release_sync_parameters),
+                ]
+
+    def release_sync_parameters(self):
+        return self._same('one')
+
+    def release_dictionary_stream(self):
+        return self._same('two')
+
+    def _same(self, k):
+        have, f = self._order.pop()
+        None if have == k else cover_me('no')
+        return f()
 
 
 class _SyncParameters:
@@ -79,10 +102,10 @@ def _result_in_identity(result_categories, listener):
 
 
 def stream_of_mixed_via_sync(
-        natural_key_via_far_item,
-        far_item_stream,
-        natural_key_via_near_item,
-        near_item_stream,
+        natural_key_via_far_user_item,
+        far_stream,
+        natural_key_via_near_user_item,
+        near_stream,
         item_via_collision,
         far_item_wrapperer=_result_in_identity,
         far_traversal_is_ordered=None,
@@ -110,8 +133,8 @@ def stream_of_mixed_via_sync(
         error(msg)
     # --
 
-    far_collection = _collection(far_item_stream, natural_key_via_far_item)
-    near_collection = _collection(near_item_stream, natural_key_via_near_item)
+    far_collection = _collection(far_stream, natural_key_via_far_user_item)
+    near_collection = _collection(near_stream, natural_key_via_near_user_item)
 
     # the below comments are copy-pasted directly from algorithm
 

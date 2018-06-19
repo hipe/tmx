@@ -60,7 +60,7 @@ class _FormatAdapter:
     def collection_reference_via_string(self, coll_id):
         return _CollectionReference(coll_id, self)
 
-    def _session_for_sync_request(  # #testpoint
+    def _open_sync_request(  # #testpoint
             self,
             mixed_collection_identifier,
             modality_resources,
@@ -74,11 +74,11 @@ class _FormatAdapter:
 
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
-            yield ('session_for_sync_request', 'thing ding two')
+            yield ('open_sync_request', 'thing ding two')
 
         _f = self.DIG_HOI_POLLOI(dig_f(), listener)
         if _f is None:
-            return  # #coverpoint5.1
+            return  # #coverpoint5.1 GONE at #history-A.1 (see c.p tombstone)
         _ = _f(mixed_collection_identifier, modality_resources, self, listener)
         return _  # #todo
 
@@ -160,8 +160,8 @@ class _CollectionReference:
         self.collection_identifier_string = s
         self.format_adapter = fa
 
-    def session_for_sync_request(self, resources, listener):
-        return self.format_adapter._session_for_sync_request(
+    def open_sync_request(self, resources, listener):
+        return self.format_adapter._open_sync_request(
                 self.collection_identifier_string, resources, listener)
 
     @property
@@ -175,6 +175,7 @@ _empty_hash = {}
 import sys  # noqa: E402
 sys.modules[__name__] = _FormatAdapter  # #[#008.G] so module is callable  # noqa: E501
 
+# #history-A.3: as referenced
 # #history-A.2: as referenced
 # #history-A.1: removed item class ("wrapper")
 # #born.

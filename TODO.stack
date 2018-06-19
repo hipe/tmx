@@ -99,7 +99,7 @@ sub-project: upload files to s3
 (-1) try to install every CMS
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
 (-3) filter_by built with tag lyfe
-(-4) dictionary stream via markdown table, #coverpoint5.10
+(-4) clean up producers - make these scripts more DRY, "elegant"
 (-5) tag lyfe parse tag treee: compound (deep) values
 (-6) tag lyfe parse tag trees with atom values (collision)
 (-7) tag lyfe parse tag trees with atom values (no collision)
@@ -114,10 +114,9 @@ sub-project: upload files to s3
 (-16) tag lyfe query: {and|or} (no recursion yet) (enforce all one or the other)
 (-17) tag lyfe query: tag with value (atomic) (integers and non)
 (-18) tag lyfe query: tag without value
+(-18.2) worldwide refactor: [#508] (the emissions thing)
 (-19) find a parser generator that satisfies that one requirement
 (-19.1) yikes do deep survey against all the options
 (-19.2) create other producer, see if you can fold it in
 (-19.2.2) either write markdown via html or re-arch table craziness to work with md
 (-19.2.3) crazy human key normal key thing
-(-19.2.4) flush that (-4) stash, replace that item with "clean up producers"
-(-19.2.5) cover what you have right here

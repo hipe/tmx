@@ -19,7 +19,7 @@ your result; but in fact we do something simpler.
 """
 
 from sakin_agac.magnetics import (
-        synchronized_stream_via_new_stream_and_original_stream as _sync,
+        synchronized_stream_via_new_stream_and_original_stream as _top_sync,
         )
 from sakin_agac import (
         cover_me,
@@ -28,19 +28,16 @@ from sakin_agac import (
 from modality_agnostic import (
         streamlib as _streamlib,
         )
-from . import (
-        tagged_native_item_stream_via_line_stream as _tagged_streamer,
-        )
 import sys
 
 
 next_or_none = _streamlib.next_or_none
 
 
-def _NEWSTREAM_VIA_ETC(
+def _NEWSTREAM_VIA(
         # the streams:
-        farstream_items,
-        nearstream_path,
+        far_dictionary_stream,
+        near_tagged_items,
 
         # the sync parameters:
         natural_key_field_name,
@@ -58,10 +55,8 @@ def _NEWSTREAM_VIA_ETC(
 
     def __build_generator():
 
-        _tagged_st = _tagged_streamer(nearstream_path, listener)
-
         processor = _CustomProcessor(
-                tagged_stream=_tagged_st,
+                tagged_stream=near_tagged_items,
                 sync_args=sync_args,
                 natural_key_field_name=natural_key_field_name,
                 listener=listener,
@@ -81,11 +76,11 @@ def _NEWSTREAM_VIA_ETC(
         nonlocal sync_args
         sync_args = {
             'name_value_pairs_via_far_native_object': _etc_f,
-            'far_item_stream': farstream_items,
-            'natural_key_via_far_item': _far_f,
+            'far_stream': far_dictionary_stream,
+            'natural_key_via_far_user_item': _far_f,
 
-            # 'near_item_stream': provided #here1,
-            # 'natural_key_via_near_item': provided #here2
+            # 'near_stream': provided #here1,
+            # 'natural_key_via_near_user_item': provided #here2
             'far_traversal_is_ordered': far_traversal_is_ordered,
 
             # 'item_via_collision': provided #here3
@@ -96,6 +91,14 @@ def _NEWSTREAM_VIA_ETC(
     ok = True
 
     return __main()
+
+
+def _import_sibling_module(s):  # #experiment #track [#020.4]
+    from importlib import import_module
+    return import_module('..%s' % s, __name__)
+
+
+_NEWSTREAM_VIA.sibling_ = _import_sibling_module
 
 
 def _could_end_at_any_time(f):
@@ -187,7 +190,7 @@ class _CustomProcessor:
 
         _far_item_wrapperer = self.__build_far_item_wrapperer()
 
-        _near_item_stream = self.__build_near_item_stream()
+        _near_ad_hoc_item_stream = self.__build_near_ad_hoc_item_stream()
 
         _nat_key_via = self._complete_schema.field_reader(self._natural_key_field_name)  # noqa: E501
 
@@ -201,9 +204,9 @@ class _CustomProcessor:
         self._OK = True
         sync_args['listener'] = f
 
-        self._big_deal_stream = _sync.stream_of_mixed_via_sync(
-                near_item_stream=_near_item_stream,  # :#here1
-                natural_key_via_near_item=_nat_key_via,  # :#here2
+        self._big_deal_stream = _top_sync.stream_of_mixed_via_sync(
+                near_stream=_near_ad_hoc_item_stream,  # :#here1
+                natural_key_via_near_user_item=_nat_key_via,  # :#here2
                 far_item_wrapperer=_far_item_wrapperer,
                 item_via_collision=_item_via_collision,  # :#here3
                 ** sync_args)
@@ -276,7 +279,7 @@ class _CustomProcessor:
                 complete_schema=self._complete_schema,
                 )
 
-    def __build_near_item_stream(self):
+    def __build_near_ad_hoc_item_stream(self):
 
         def item_via_native_object(x):
             # only for the first row we encounter,
@@ -354,6 +357,6 @@ class _CustomProcessor:
         error(message)
 
 
-sys.modules[__name__] = _NEWSTREAM_VIA_ETC
+sys.modules[__name__] = _NEWSTREAM_VIA
 
 # #born.

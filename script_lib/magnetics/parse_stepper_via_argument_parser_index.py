@@ -78,7 +78,11 @@ class _SELF:
 
 
 # == BEGIN
-def _SIMPLE_STEP(serr, argv, parameters_definition, description):
+def _SIMPLE_STEP(
+        sin, serr, argv,
+        parameters_definition, description,
+        stdin_OK=None):
+
     """#NOT_COVERED experiment (at #history-A.2)"""
 
     from script_lib.magnetics import (
@@ -91,14 +95,26 @@ def _SIMPLE_STEP(serr, argv, parameters_definition, description):
             parameter_via_definition as param_f,
             )
 
+    argv_stream = argv_stream_f(argv)
+    prog = argv_stream.popleft()
+
+    if stdin_OK is None:
+        pass
+    elif stdin_OK:
+        cover_me()
+    elif sin.isatty():
+        pass
+    else:
+        serr.write('this fellow does not read from STDIN.\n')
+        serr.write("try '{} -h'\n".format(prog))
+        return _InterruptedStepResolution(5)
+
     params_d = {}
     parameters_definition(params_d, param_f)
-    argv_stream = argv_stream_f(argv)
-    _prog = argv_stream.popleft()
 
     _ap = mag.argument_parser_via_parameter_dictionary(
             stderr=serr,
-            prog=_prog,
+            prog=prog,
             description=description,
             parameter_dictionary=params_d,
             )
@@ -192,7 +208,7 @@ def _ugh_string_yadda_from_message(message, this_one_name):
 
     `add_subparsers` it screwed up the way messages are created.
     why would you want an internal data member name to show up in a
-    user-facing message?  #[#006.B] get it together `argparse`
+    user-facing message?  #[#020.2] get it together `argparse`
     """
 
     import re

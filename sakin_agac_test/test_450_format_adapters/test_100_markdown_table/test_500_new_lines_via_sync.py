@@ -115,6 +115,8 @@ class Case030_no_functions(_CommonCase):  # #coverpoint5.1
     you're posing it as a far collection or near for the syncrhonization,
     it uses the same machinery (and language production) to complain about
     how it's can't do a thing.
+
+    this test is #fragile - it fails to fail when we add features to the f.a
     """
 
     def test_100_outputs_no_lines(self):
@@ -122,11 +124,12 @@ class Case030_no_functions(_CommonCase):  # #coverpoint5.1
 
     def test_200_says_not_found(self):
         _ = self._two_sentences()[0]
-        self.assertEqual(_, "the 'markdown_table' format adapter has no sub-section for 'modality_agnostic'")  # noqa: E501
+        _exp = "the 'json_script' format adapter has no modality functions for 'CLI'"  # noqa: E501
+        self.assertEqual(_, _exp)
 
     def test_300_says_did_you_mean(self):
         _ = self._two_sentences()[1]
-        self.assertIn("there's 'CLI'", _)
+        self.assertIn("there's 'modality_agnostic'", _)
 
     @shared_subject
     def _two_sentences(self):
@@ -142,8 +145,8 @@ class Case030_no_functions(_CommonCase):  # #coverpoint5.1
 
     def given(self):
         return {
-                'near_collection': _same_existent_markdown_file(),
-                'far_collection': fixture_file_path('chimi-churry.md'),
+                'near_collection': _far_script_exists(),
+                'far_collection': _same_existent_markdown_file(),
                 }
 
 

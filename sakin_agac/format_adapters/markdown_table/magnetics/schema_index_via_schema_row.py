@@ -122,7 +122,8 @@ class _SchemaIndex:
         (
             self.__field_readerer,
             self.offset_via_field_name__,
-        ) = _field_readerer_and_offset_via_field_name_via(cels_count, row1)
+            self.field_names__,
+        ) = _the_index_components_via(cels_count, row1)
 
         self._validate_row_cel_count = _make_row_num_validator(
                 row1, listener, True, True, False)
@@ -145,7 +146,7 @@ class _SchemaIndex:
         return self.__field_readerer(field_name)
 
 
-def _field_readerer_and_offset_via_field_name_via(cels_count, header_row1_DOM):
+def _the_index_components_via(cels_count, header_row1_DOM):
     """given a table with a header row like this, make a dictionary like this
 
     like this:
@@ -163,11 +164,11 @@ def _field_readerer_and_offset_via_field_name_via(cels_count, header_row1_DOM):
         _s = _cel_DOM.content_string()
         return name_via(_s)
 
-    _f = normal_field_name_via_offset
-    name_and_offsets = ((_f(i), i) for i in range(cels_count))
-    name_and_offsets = [x for x in name_and_offsets]  # ..
-    offset_via_normal_field_name = {k: v for (k, v) in name_and_offsets}
-    if len(name_and_offsets) != len(offset_via_normal_field_name):
+    r = range(cels_count)
+    field_names = tuple(normal_field_name_via_offset(i) for i in r)
+    offset_via_normal_field_name = {field_names[i]: i for i in r}
+
+    if cels_count != len(offset_via_normal_field_name):
         cover_me('duplicate field name? (when normalized)')
 
     def f(s):
@@ -178,7 +179,7 @@ def _field_readerer_and_offset_via_field_name_via(cels_count, header_row1_DOM):
             _val_s = _cel.content_string()
             return _val_s  # #todo
         return g
-    return (f, offset_via_normal_field_name)
+    return (f, offset_via_normal_field_name, field_names)
 
 
 def _make_row_num_validator(model_row, listener, *ok_via_which):

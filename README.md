@@ -188,6 +188,10 @@ then in your 'main' terminal:
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+|[#020.4]                   | #trak | track attempts at importing sibling modules
+|[#020.3]                   | #trak | track this one gripe about contextlib
+|[#020.2]                   | #hm   | track this one gripe about argparse
+|[#020]                     | #trak | track all issues with python itself
 |[#019]                     | #open | track wishlist for strongly typed ([#412], [#604])
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
 [[#017]                     |       | [placeholder to explain our listener pattern]

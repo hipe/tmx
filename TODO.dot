@@ -3,7 +3,12 @@ digraph g {
 /* waypoints and smaller projects (alphabetical) */
 
 thing100[label="• the sync script\n• md table datastore" style=filled]
-thing150[label="..so you can\n survey heroku\noptions for.." style=filled]
+thing106[label="merge two\ndata producers"]
+thing110[label="find a dilligenced\nparser generator"]
+thing122[label="parsed tagged strings"]
+thing126[label="parse tag queries"]
+thing128[label="filter by tags"]
+thing150[label="..so you can\n survey heroku\noptions for.."]
 thing175[label="grok\nheroku\nproperly"]
 
 thing200[label=
@@ -40,8 +45,13 @@ shape=rect]
 
 
 /* relationships */
-
-thing150->thing100
+thing106->thing100
+thing110->thing106
+thing122->thing110
+thing126->thing110
+thing128->thing122
+thing128->thing126
+thing150->thing128
 thing200->thing150
 thing200->thing175
 sakin_agac->gfm_rumskalla

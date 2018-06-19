@@ -11,6 +11,12 @@
   - we can search for all items that have one particular 
 
 
+(oblique snippet that will be moved to somewhere like `filter_by_tags.py`:
+this is for making informed decisions, and then later being able to
+justifying how you made those deicisions in a straightforward, reproducible,
+machine-readble way.)
+
+
 
 
 ## sub-node table (experiment)

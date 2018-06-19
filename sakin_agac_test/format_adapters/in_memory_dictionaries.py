@@ -16,7 +16,7 @@ from sakin_agac.magnetics import (
         )
 
 
-class _session_for_sync_request:
+class _open_sync_request:
     """a minimal, didactic example of an implementation for this API hookout.
 
     so:
@@ -108,7 +108,7 @@ def _pop_property(x, name):
 
 _functions = {
         'modality_agnostic': {
-            'session_for_sync_request': _session_for_sync_request,
+            'open_sync_request': _open_sync_request,
             }
         }
 

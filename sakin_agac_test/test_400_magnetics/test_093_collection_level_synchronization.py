@@ -88,10 +88,10 @@ class _build_snapshot:
             return s
 
         _st = _subject_module().stream_of_mixed_via_sync(
-            natural_key_via_far_item=identity,
-            far_item_stream=new,
-            natural_key_via_near_item=identity,
-            near_item_stream=orig,
+            natural_key_via_far_user_item=identity,
+            far_stream=new,
+            natural_key_via_near_user_item=identity,
+            near_stream=orig,
             item_via_collision=_item_via_collision,
             )
 

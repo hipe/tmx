@@ -98,7 +98,7 @@ import re
 from os import path as os_path
 
 
-class _session_for_sync_request:
+class _open_sync_request:
     """this is based entirely off of the (at writing (at birth)) example
 
     of a format adapter used as a "far" collection in the tests.
@@ -255,7 +255,7 @@ def _value_readers_via_field_names(*names):  # #coverpoint5.2
 
 _functions = {
         'modality_agnostic': {
-            'session_for_sync_request': _session_for_sync_request,
+            'open_sync_request': _open_sync_request,
             }
         }
 
