@@ -117,3 +117,7 @@ sub-project: upload files to s3
 (-19) find a parser generator that satisfies that one requirement
 (-19.1) yikes do deep survey against all the options
 (-19.2) create other producer, see if you can fold it in
+(-19.2.2) either write markdown via html or re-arch table craziness to work with md
+(-19.2.3) crazy human key normal key thing
+(-19.2.4) flush that (-4) stash, replace that item with "clean up producers"
+(-19.2.5) cover what you have right here

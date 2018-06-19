@@ -36,10 +36,10 @@ def open_dictionary_stream(html_document_path, listener):
                 )
 
         table_o = dictionary_stream_via_table(
-                value_via_td_for_header_row=_string_via_td_STRICT,
-                default_function_for_value_via_td=_string_via_td_LOOSE,
-                value_via_td_via_field_name={
-                    'name': _this_more_complicated_string_via_td(),
+                string_via_td_for_header_row=_string_via_td_STRICT,
+                string_via_td_for_body_row=_string_via_td_LOOSE,
+                special_field_instructions={
+                    'name': ('string_via_td', _this_more_complicated_string_via_td()),  # noqa: E501
                     },
                 table=table,
                 )

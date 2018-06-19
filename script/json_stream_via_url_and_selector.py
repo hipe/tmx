@@ -157,7 +157,7 @@ def _cached_url(url, emit):
     import re
     sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', url)
     from os import path as p
-    path = p.join(sl.TEMPORARY_DIR, sanitized_name)
+    path = p.join(sl.TEMPORARY_DIR, '%s.html' % sanitized_name)
     if p.exists(path):
         _tmpl = '(using cached web page (remove file to clear cache) - {})'
         emit.info(_tmpl, path)
