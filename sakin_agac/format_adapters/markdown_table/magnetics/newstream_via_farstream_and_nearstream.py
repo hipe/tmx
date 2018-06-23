@@ -26,79 +26,12 @@ from sakin_agac import (
         pop_property,
         )
 from modality_agnostic import (
-        streamlib as _streamlib,
+        streamlib as _sl,
         )
 import sys
 
 
-next_or_none = _streamlib.next_or_none
-
-
-def _NEWSTREAM_VIA(
-        # the streams:
-        far_dictionary_stream,
-        near_tagged_items,
-
-        # the sync parameters:
-        natural_key_field_name,
-        farstream_format_adapter,
-
-        listener,
-
-        far_traversal_is_ordered=None,
-        ):
-
-    def __main():
-        ok and __prepare_sync_args()
-        if ok:
-            return __build_generator()
-
-    def __build_generator():
-
-        processor = _CustomProcessor(
-                tagged_stream=near_tagged_items,
-                sync_args=sync_args,
-                natural_key_field_name=natural_key_field_name,
-                listener=listener,
-                )
-
-        while ok:
-            x = processor.gets()
-            if x is None:
-                break
-            yield x
-
-    def __prepare_sync_args():
-
-        _etc_f = farstream_format_adapter.name_value_pairs_via_native_object
-        _far_f, = farstream_format_adapter.value_readers_via_field_names(natural_key_field_name)  # noqa: E501
-
-        nonlocal sync_args
-        sync_args = {
-            'name_value_pairs_via_far_native_object': _etc_f,
-            'far_stream': far_dictionary_stream,
-            'natural_key_via_far_user_item': _far_f,
-
-            # 'near_stream': provided #here1,
-            # 'natural_key_via_near_user_item': provided #here2
-            'far_traversal_is_ordered': far_traversal_is_ordered,
-
-            # 'item_via_collision': provided #here3
-            'listener': listener,
-            }
-
-    sync_args = None
-    ok = True
-
-    return __main()
-
-
-def _import_sibling_module(s):  # #experiment #track [#020.4]
-    from importlib import import_module
-    return import_module('..%s' % s, __name__)
-
-
-_NEWSTREAM_VIA.sibling_ = _import_sibling_module
+next_or_none = _sl.next_or_none
 
 
 def _could_end_at_any_time(f):
@@ -116,9 +49,14 @@ def _could_end_at_any_time(f):
     return g
 
 
-class _CustomProcessor:
-    """be a stream instance (through use of gets) whose elements are..
+def _NEWSTREAM_VIA(**kwargs):
+    return _Newstream_via(**kwargs).execute()
 
+
+class _Newstream_via:
+    """be LIKE #[#410.N] a context manager class in the typical pattern,
+
+    whose element are..
     our (tagged maybe) output lines (in some whatever parse tree format)
 
     whereby:
@@ -140,22 +78,43 @@ class _CustomProcessor:
 
     def __init__(
             self,
-            tagged_stream,
-            sync_args,
+
+            # the streams:
+            far_dictionary_stream,
+            near_tagged_items,
+
+            # the required sync parameters:
             natural_key_field_name,
+            farstream_format_adapter,
+
+            # pseudo-optional sync parrameters (not optional because bugsource)
+            far_traversal_is_ordered,
+            sync_keyerser,
+
             listener,
             ):
 
-        self._tagged_stream = tagged_stream
-        self._sync_args = sync_args
+        self._far_dictionary_stream = far_dictionary_stream
+        self._tagged_stream = near_tagged_items
         self._natural_key_field_name = natural_key_field_name
+        self._listener = self.__build_attached_listener(listener)
+        self._far_traversal_is_ordered = far_traversal_is_ordered
+        self._sync_keyerser = sync_keyerser
+        # --
+        self._natural_key_via_far_user_item_unsanitized, = farstream_format_adapter.value_readers_via_field_names(natural_key_field_name)  # noqa: E501
+        self._name_value_pairs_via_far_native_object = farstream_format_adapter.name_value_pairs_via_native_object  # noqa: E501
         self._state = 'HEAD_LINES'
         self._proto_row = '_proto_row_initially'
         self._did_see_first_business_object_row = False
-        self._listener = listener
+        self._mutex = None
 
-    def gets(self):
-        return getattr(self, self._state)()
+    def execute(self):  # (would be __enter__())
+        del(self._mutex)
+        while self._OK:
+            x = self._next_or_none()
+            if x is None:
+                break
+            yield x
 
     @_could_end_at_any_time
     def HEAD_LINES(self, tup):
@@ -176,15 +135,16 @@ class _CustomProcessor:
         if 'table_schema_line_two_of_two' == typ:
             _custom_hybrid = tup[1]
             self._complete_schema = _custom_hybrid.complete_schema
-            self._move_to('_TRANSITION_TO_CRAZY_TOWN')
+            self.__init_these_two_mappers_which_could_fail()
+            if self._OK:
+                self._move_to('_TRANSITION_TO_CRAZY_TOWN')
+            else:
+                self._close()
         else:
             cover_me('unexpected tagged item')
         return tup
 
     def _TRANSITION_TO_CRAZY_TOWN(self):
-
-        self._name_value_pairs_via_far_native_object = self._sync_args.pop(
-                'name_value_pairs_via_far_native_object')
 
         _item_via_collision = self.__build_item_via_collision()
 
@@ -192,43 +152,76 @@ class _CustomProcessor:
 
         _near_ad_hoc_item_stream = self.__build_near_ad_hoc_item_stream()
 
-        _nat_key_via = self._complete_schema.field_reader(self._natural_key_field_name)  # noqa: E501
-
-        sync_args = pop_property(self, '_sync_args')
-        orig_listener = sync_args['listener']
-
-        def f(typ, *a):
-            if 'error' == typ:
-                self._OK = False
-            orig_listener(typ, *a)
-        self._OK = True
-        sync_args['listener'] = f
-
         self._big_deal_stream = _top_sync.stream_of_mixed_via_sync(
-                near_stream=_near_ad_hoc_item_stream,  # :#here1
-                natural_key_via_near_user_item=_nat_key_via,  # :#here2
+
+                # far
+                far_stream=pop_property(self, '_far_dictionary_stream'),
+                natural_key_via_far_user_item=pop_property(self, '_nat_key_via_far_item'),  # noqa: E501
                 far_item_wrapperer=_far_item_wrapperer,
-                item_via_collision=_item_via_collision,  # :#here3
-                ** sync_args)
+                far_traversal_is_ordered=pop_property(self, '_far_traversal_is_ordered'),  # noqa: E501
+
+                # near
+                near_stream=_near_ad_hoc_item_stream,
+                natural_key_via_near_user_item=pop_property(self, '_nat_key_via_near_item'),  # noqa: E501
+
+                # the rest
+                item_via_collision=_item_via_collision,
+                listener=self._listener)
 
         self._move_to('OBJECT_ROWS')
-        return self.gets()
+        return self._next_or_none()
 
     def __build_item_via_collision(self):
+        """
+        we get here when the near and far item have the "same" human key.
 
-        def _item_via_collision(far_native_object, near_item):
+        .#coverpoint1.6 provisions a way to provide a function so that we
+        have a "derived" human key value (for use in fuzzy matching).
+        (this feature is #experimental.) this means that the near and far
+        records that "match" by human key need not actually have the same
+        human key value ("content string").
+
+        but a #coverpoint1.5 holds that we won't invoke the machinery
+        of a record merge if the far record has no fields other than the
+        human key (because why bother, right?)
+
+        so the combination of these two together raises the question:
+        if you're fuzzy matching (deriving human keys) and also the above
+        condition is met, what do? answer: yes do the merge.
+
+        (this is a heuristic behavior decision born out of convenience:
+        see its origin story in the asset file added at #history-A.1.)
+
+        this is perhaps a bit of a feature creep; as it serves a behavior
+        that is perhaps more minimally implemented by the data producers,
+        so: experimental for now.
+        """
+
+        def item_via_collision(far_native_object, near_item):
+
+            near_row_DOM = near_item.ROW_DOM_
+
+            far_pairs = self._name_value_pairs_via_far_native_object(
+                    far_native_object)
+
+            far_pairs = list(far_pairs)  # flatten it if it's a generator
+
+            length = len(far_pairs)
+
+            if 0 == length:
+                cover_me('completely empty far record?')
+            elif 1 == length:
+                if self._sync_keyerser is None:
+                    # #coverpoint1.5: short circuit the work
+                    return near_row_DOM
+                else:
+                    pass  # #coverpoint1.7: let the single-field record thru
 
             _prototype_row = self._prototype_row_as_late_as_possible()
 
-            _far_pairs = self._name_value_pairs_via_far_native_object(
-                    far_native_object)
-
-            _near_row_DOM = near_item.ROW_DOM_
-
-            _amazeballs_row = _prototype_row.MERGE(_far_pairs, _near_row_DOM)
-
-            return _amazeballs_row  # #todo
-        return _item_via_collision
+            return _prototype_row.new_row_via_far_pairs_and_near_row_DOM__(
+                    far_pairs, near_row_DOM)
+        return item_via_collision
 
     def __build_far_item_wrapperer(self):
 
@@ -344,6 +337,9 @@ class _CustomProcessor:
     def TAIL_LINES(self, tup):
         return tup
 
+    def _next_or_none(self):
+        return getattr(self, self._state)()
+
     def _close(self):
         del(self._tagged_stream)
         del(self._state)
@@ -351,12 +347,53 @@ class _CustomProcessor:
     def _move_to(self, s):
         self._state = s
 
+    def __init_these_two_mappers_which_could_fail(self):
+
+        use_keyer_far = pop_property(self, '_natural_key_via_far_user_item_unsanitized')  # noqa: E501
+        use_keyer_near = self._complete_schema.field_reader(self._natural_key_field_name)  # noqa: E501
+
+        identifier = self._sync_keyerser
+        if identifier is not None:
+            # #coverpoint1.6
+            near_f = use_keyer_near
+            far_f = use_keyer_far
+            use_keyer_near = None
+            use_keyer_far = None
+            from sakin_agac.magnetics import (
+                    function_via_function_identifier as f_f
+                    )
+            sync_keyers = f_f(identifier, self._listener)
+            if sync_keyers is None:
+                self._OK = False  # in case no error was emitted (seen #here1)
+            else:
+                use_keyer_near, use_keyer_far = sync_keyers(near_f, far_f)
+
+        if self._OK:
+            self._nat_key_via_far_item = use_keyer_far
+            self._nat_key_via_near_item = use_keyer_near
+
     def _error(self, message):
         from modality_agnostic import listening as li
         error = li.leveler_via_listener('error', self._listener)
         error(message)
 
+    def __build_attached_listener(self, orig_listener):
+        def f(typ, *a):
+            if 'error' == typ:
+                self._OK = False  # #here1
+            orig_listener(typ, *a)
+        self._OK = True
+        return f
+
+
+def _import_sibling_module(s):  # #experiment #track [#020.4]
+    from importlib import import_module
+    return import_module('..%s' % s, __name__)
+
+
+_NEWSTREAM_VIA.sibling_ = _import_sibling_module
 
 sys.modules[__name__] = _NEWSTREAM_VIA
 
+# #history-A.1: add experimental feature "sync keyerser"
 # #born.

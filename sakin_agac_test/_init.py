@@ -84,7 +84,7 @@ def fixture_file_path(stem):
     return os_path.join(_top_test_dir, 'fixture-files', stem)
 
 
-def release(self, prop):
+def pop_property(self, prop):
     x = getattr(self, prop)
     delattr(self, prop)
     return x

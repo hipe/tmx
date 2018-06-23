@@ -1,5 +1,4 @@
 # #covers: script.sync
-
 from _init import (
         build_end_state_commonly,
         fixture_executable_path,
@@ -30,9 +29,13 @@ class _CommonCase(unittest.TestCase):
     def _emission(self, name):
         return self._end_state().actual_emission_index.actual_emission_via_name(name)  # noqa: E501
 
-    # --
+    # -- build state hook-ins & other support
 
     _build_end_state = build_end_state_commonly
+
+    def expect_emissions(self):
+        # (by default, we expect no emissions)
+        return iter(())
 
 
 class Case010_strange_format_adapter_name(_CommonCase):
@@ -160,9 +163,6 @@ class Case040_near_file_not_found(_CommonCase):
         _rx = r"\bNo such file or directory: '.+\.md'$"
         self.assertRaisesRegex(FileNotFoundError, _rx, f)
 
-    def expect_emissions(self):
-        return iter(())
-
     def given(self):
         return {
                 'near_collection': fixture_file_path('0075-no-such-file.md'),
@@ -231,10 +231,6 @@ class Case060_preserve_endcappiness_here(_CommonCase):  # #coverpoint5.4
     def _end_state(self):
         return self._build_end_state()
 
-    def expect_emissions(self):
-        return iter(())
-        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
-
     def given(self):
 
         _far = (
@@ -268,10 +264,6 @@ class Case070_ADD_end_cappiness_here(_CommonCase):  # #coverpoint5.5
     @shared_subject
     def _end_state(self):
         return self._build_end_state()
-
-    def expect_emissions(self):
-        return iter(())
-        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
 
     def given(self):
 

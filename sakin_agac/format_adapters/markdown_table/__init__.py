@@ -55,6 +55,8 @@ class _open_new_lines_via_sync:
         None if 2 == sp.sync_parameters_version else cover_me('refa')
         _nkfn = sp.natural_key_field_name
         _trav_is_ordered = sp.traversal_will_be_alphabetized_by_human_key
+
+        _sync_keyerser = sp.sync_keyerser
         del(sp)
 
         # --
@@ -62,7 +64,7 @@ class _open_new_lines_via_sync:
 
         use_far_dict_stream = (x for x in _dict_stream if 'header_level' not in x)  # noqa: E501
 
-        # #coverpoint9.2.2
+        # #coverpoint9.1.2
         f = self._sneak_this_in
         if f is not None:
             use_far_dict_stream = (f(x) for x in use_far_dict_stream)
@@ -80,6 +82,7 @@ class _open_new_lines_via_sync:
                 far_traversal_is_ordered=_trav_is_ordered,
 
                 listener=self._listener,
+                sync_keyerser=_sync_keyerser,
                 )
 
         o = _ExpectedTagOrder()

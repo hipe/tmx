@@ -89,9 +89,9 @@ thing600->thing550
 
 
 game_server[label=
-"game server|
-difficulty: med|
-workload: hi|
+"game server
+difficulty: med
+workload: hi
 "
 shape=rect
 ]

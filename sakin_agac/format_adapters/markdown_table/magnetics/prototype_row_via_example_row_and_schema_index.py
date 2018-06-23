@@ -15,10 +15,36 @@ it because:
 
 ## about alignment
 
-note: we weirdly align the content sub-strings of the cels of the the ASCII
-test matrix (table) with the alignment as indicated in the markdown table,
+(the below is covered near #coverpoint4.1 and #coverpoint4.2)
+
+our policy on alignment is guided by one central design objective: when
+bringing in new data (through a sync), format things the way the user wants.
+as it turns out, this is not as straightforward as it may sound:
+
+when the new content string is of a different width than the old one (and
+even when it is the same width as the old one),
+
+  - do we simply re-use the padding characters ("coddling") from before?
+  - do we try to keep the width of the cel the same?
+  - or do we try to make the width of the cel match the example row?
+  - wat do when the new content string makes the resulting cel so wide
+    that it violates any of the above provisions that you might have?
+
+we assume users may want to "normalize" their formatting to some latest and
+greatest conventional formatting so that the rows generally line up prettily.
+(we arrived at this heuristically.) as such we follow the third option above,
+and when (4) we just let the content push the cel outwards infinitely. (data
+producers can of course always trim their own value strings, too.)
+
+but then that's not all. whenever the content string changes width, or the
+target width of the cel changes; we're typically adding or removing
+"coddling" spaces (padding).
+
+(this is where the right description of our wrong behavior begins.)
+
+currently we weirdly align the content strings within the cels by align
+left, center ("") or right as indicated in the markdown table header,
 which is all of:
-  - out-of-spec
   - purely cosmetic (has no effect on the e.g HTML that is generated)
   - of not-yet-proven cosmetic value at that
 
@@ -41,7 +67,6 @@ have it not change how subsequent machine-generated rows are aligned. meh
 """
 
 from sakin_agac import (
-        cover_me,
         sanity,
         )
 import sys
@@ -80,7 +105,7 @@ class _SELF:
         self._cels_count = example_row.cels_count
         self._natural_key_field_name = natural_key_field_name
 
-    def MERGE(self, pairs, near_row_DOM):
+    def new_row_via_far_pairs_and_near_row_DOM__(self, pairs, near_row_DOM):
         """for each key-value in the far pairs, make the new cel.
 
         for all the rest, use the doo-hah that was there already!
@@ -92,17 +117,13 @@ class _SELF:
         """
 
         value_via_name = {k: v for k, v in pairs}
-        value_via_name.pop(self._natural_key_field_name)
+
+        # (before #history-A.2 we use to do #coverpoint1.5 here)
 
         # instead of value via key, we want value via offset.
 
         offset_via_name = self._offset_via_field_name
         new_value_via_offset = {offset_via_name[k]: value_via_name[k] for k in value_via_name}  # KeyError #coverpoint1.1 (1/2)  # noqa: E501
-
-        if 0 == len(new_value_via_offset):
-            # #coverpoint4.1
-            # if there's no actual values you want to sync, it's a no-op
-            return near_row_DOM  # (#not-SESE) you can't max below.
 
         # make a reader function for producing near cels from offsets
 
@@ -203,7 +224,6 @@ class _SELF:
         return has
 
 
-
 def _celer_via_via(childreners, cel_schema, _CelDOM):
 
     def _celer_via(tainted_example_cel_DOM, cel_schema):
@@ -244,24 +264,23 @@ def _childreners_via(tainted_example_cel_DOM):
 
     class _childreners:  # namespace only
 
-        def align_left(total_margin_w, new_content_s):  # #coverpoint1.5
+        def align_left(total_margin_w, new_content_s):  # #coverpoint4.1
             yield _spaces(0)
             yield _fellow(new_content_s)
             yield _spaces(total_margin_w)
 
-        def align_center(total_margin_w, new_content_s):  # #coverpoint1.6
-            cover_me('center')
+        def align_center(total_margin_w, new_content_s):  # #coverpoint4.3
             each_side, was_odd = divmod(total_margin_w, 2)
             yield _spaces(each_side)
             yield _fellow(new_content_s)
             yield _spaces(each_side + was_odd)  # hard coded: prefer left by 1
 
-        def align_right(total_margin_w, new_content_s):  # #coverpoint1.7
+        def align_right(total_margin_w, new_content_s):  # #coverpoint4.2
             yield _spaces(total_margin_w)
             yield _fellow(new_content_s)
             yield _spaces(0)
 
-        no_alignment_specified = align_left
+        no_alignment_specified = align_left  # #coverpoint4.4
 
     def _fellow(new_content_s):
         return _LeafDOM(new_content_s)
@@ -298,6 +317,7 @@ def _cel_schema_via(cel_DOM):
 
     if md[1] is None:
         if md[3] is None:
+            # #coverpoint4.4 - no alignment specified
             return _cel_schemas.no_alignment_specified
         else:
             # #coverpoint4.1 - no colon - yes colon
@@ -308,7 +328,8 @@ def _cel_schema_via(cel_DOM):
     else:
         None if md[2] is None else sanity()
         None if md[4] is None else sanity()
-        return _cel_schemas.right_aligned
+        # #coverpoint4.3: yes colon/yes colon: center aligned
+        return _cel_schemas.center_aligned
 
 
 class _CelSchema:
@@ -319,11 +340,13 @@ class _CelSchema:
 class _cel_schemas:  # namespace only
 
     left_aligned = _CelSchema('align_left')
+    center_aligned = _CelSchema('align_center')
     right_aligned = _CelSchema('align_right')
     no_alignment_specified = _CelSchema('no_alignment_specified')
 
 
 sys.modules[__name__] = _SELF
 
+# #history-A.2: short-circuiting out of updating single-field records moved up
 # #history-A.1: sneak merge into here to be alongside create new
 # #born.

@@ -277,7 +277,7 @@ class Case070_money_and_diff(_CommonCase):  # #coverpoint6.2
         _act = [x.string for x in self._of_tree('edits')]
         _exp = (
                 '-| four | five | six\n',
-                '+| four | five |SIX  \n',
+                '+|four| five |SIX  \n',
                 '+|seven|EIGHT|     |\n',
                 )
         self.assertSequenceEqual(_act, _exp)

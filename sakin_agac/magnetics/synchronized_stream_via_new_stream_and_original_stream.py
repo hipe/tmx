@@ -78,6 +78,7 @@ class _SyncParameters:
             # (#coverpoint7.2 is simply the names of the above arguments)
             field_names=None,
             traversal_will_be_alphabetized_by_human_key=None,
+            sync_keyerser=None,
             ):
 
         if _is_sync_meta_data is not True:
@@ -86,6 +87,7 @@ class _SyncParameters:
         self.natural_key_field_name = natural_key_field_name
         # self.field_names = field_names  not needed yet
         self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
+        self.sync_keyerser = sync_keyerser
 
     @property
     def sync_parameters_version(self):
