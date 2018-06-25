@@ -65,6 +65,7 @@ sub-project: upload files to s3
   commit: visual demo with tasks in own file
   grind-down: visual demo with templates broken up
 ==
+  after "sakin agac" acceptance, take a swing at #wish [#021] coverage testing
   integrate
   generate thumbs
   tag-based query
@@ -118,4 +119,3 @@ sub-project: upload files to s3
 (-19) find a parser generator that satisfies that one requirement
 (-19.1) yikes do deep survey against all the options
 (-19.2) create other producer, see if you can fold it in
-(-19.2.2) either write markdown via html or re-arch table craziness to work with md

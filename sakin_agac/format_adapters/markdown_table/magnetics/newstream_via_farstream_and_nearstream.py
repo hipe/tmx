@@ -54,7 +54,7 @@ def _NEWSTREAM_VIA(**kwargs):
 
 
 class _Newstream_via:
-    """be LIKE #[#410.N] a context manager class in the typical pattern,
+    """be LIKE #[#410.F] a context manager class in the typical pattern,
 
     whose element are..
     our (tagged maybe) output lines (in some whatever parse tree format)
@@ -307,7 +307,7 @@ class _Newstream_via:
 
         class _NearItem:
             """
-            #[#401.B] track item classes
+            #[#410.B] track item classes
             #todo we want to get rid of this - it does nothing at writing
             """
 

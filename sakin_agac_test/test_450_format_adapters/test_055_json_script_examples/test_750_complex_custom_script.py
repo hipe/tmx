@@ -12,7 +12,7 @@ class _CommonCase(unittest.TestCase):
     pass
 
 
-class Case200_RUM(_CommonCase):
+class Case200(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())

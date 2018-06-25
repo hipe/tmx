@@ -1,4 +1,38 @@
-# #coverpoint12
+"""
+.:#coverpoint12: multi-axis coverage from this script-test:
+
+  - cover the particular producer script (used for business) and
+  - provide limited coverage to the HTML format adapter's particular
+    adaption of [#410.J] record mapping.
+
+we say "limited" because this particular exercise of record mapping is a
+simpler case. we don't use typical inspiration features like field splitting
+or field renaming. yet still our use of record mapping is justifed:
+
+  - we have a means of stringifying content from cels that is different
+    whether we're doing table header cels or table body cels.
+
+  - we have a means of stringifying content from the cels in the `name`
+    column that is different than our means for stringifying other cels.
+
+a possible issue (and a #wish :[#410.P]):
+
+the producer script under test may suffer from the #html2markdown problem.
+we solved that same problem in #history-A.1 this commit for another producer
+script by instead sourcing raw markdown, but from a moin moin wiki (our
+source) we probably don't have that same luxury (i.e we don't expect that
+moin moin magically uses github-flavored markdown for its markup format for
+expressing tables). this all leans into a wish (not literally a wish) of a
+moin moin format adapter, but we simply don't know/care at moment how
+strongly we want to explore that avenue, or whether (alternately) to pursue
+a heuristic sub-slice of #html2markdown or (finally) to just simply lose the
+links..
+
+(fortunately because of "field sovereignty" we may be able to defer finding
+a solution to this possible problem (first mentioned in commit comment
+at #history-A.1 minus three weeee).)
+"""
+
 
 from _init import (
         fixture_file_path,
@@ -52,7 +86,8 @@ class Case100_hello(_CommonCase):
         """emits one thing - #fragile"""
 
         one, = self._shared_state().emissions
-        self.assertSequenceEqual(one.channel, ('info', 'expression'))
+        _exp = ('info', 'expression', 'reading_from_filesystem')
+        self.assertSequenceEqual(one.channel, _exp)
 
     @shared_subject
     def _shared_state(self):
@@ -91,4 +126,6 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: the birth of our expression "field sovereignty" in comments
+# #history-A.1: when we first started sourcing "raw" (remote, native) markdown
 # #born.

@@ -1,7 +1,46 @@
-# #coverpoint13
+"""
+.#coverpoint13: this script-test has a particularly nifty origin story:
+
+we felt reasonably certain when reaching the end of developing the
+counterpart asset of this of what we had suspected by around the middle:
+that it's weird and awkward that we're taking data that "starts as"
+markdown, taking its expression in HTML, and parsing that only to convert it
+back to markdown (in effort to get back to what it started as).
+
+like, although it can be done it doesn't future-proof well: we can, for
+example, try to recognize and convert links (anchor tags), but this isn't
+out-of-the-box future-proof against any future features we might want
+to carry over from source to destination. since an imagined #html2markdown
+is a nontrivial undertaking that certainly wouldn't "write itself" in a
+very straightforward way, it's a potential future problem we want to
+sidestep now if we can.
+
+ok but having said that, the development of this producer script was what
+pioneered the creation of [#410.J] the record mapper thing. we then exercised
+all of its available directives in the coverage for this producer script.
+(of course we did, because the abstract thing was abstracted entirely from
+the concrete thing).
+
+as such, we have since refactored the producer script to pioneer our direct-
+from-markdown scraping (still *thru* our new record mapping facility, but
+with a newly built adaptation of it *for* markdown); but we keep this
+script-test and its underlying support infrastructure in place:
+
+  - for any extent that it alone covers features of the record mapper
+
+  - because it's the only thing that covers the html adaptaton of same
+    (a thing we certainly want to keep around for later, and because it's
+    still used in the producer script that came before this (whose source
+    content "lives in" (#wish [#410.P]) moin moin.
+
+(this whole big change discussed above happened at #history-A.1.)
+"""
 
 from _init import (
         fixture_file_path,
+        )
+from sakin_agac_test.format_adapter.disjoint_smalls import (
+        build_state_the_bernstein_way,
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -13,10 +52,10 @@ import unittest
 class _CommonCase(unittest.TestCase):
 
     def _field_names(self):
-        return self._shared_state().head_dictionary['field_names']
+        return self._end_state().head_dictionary['field_names']
 
     def _record(self, k):
-        return self._shared_state().business_object_dictionary[k]
+        return self._end_state().business_object_dictionary[k]
 
 
 class Case100_hello(_CommonCase):
@@ -25,7 +64,7 @@ class Case100_hello(_CommonCase):
         self.assertIsNotNone(_subject_module())
 
     def test_200_runs(self):
-        self._shared_state()
+        self._end_state()
 
     def test_300_the_rename_is_reflected_in_the_field_names(self):
         act = self._field_names()
@@ -64,50 +103,23 @@ class Case100_hello(_CommonCase):
         self.assertEqual(dct['used_by'], 'twill')
 
     @shared_subject
-    def _shared_state(self):
-
-        emissions = []
-
-        import modality_agnostic.test_support.listener_via_expectations as lib
-
-        # use_listener = lib.for_DEBUGGING (works)
-        use_listener = lib.listener_via_emission_receiver(emissions.append)
-
-        _eek = _subject_module().open_dictionary_stream(
-                html_document_path=fixture_file_path('0140-bernstein-subtree.html'),  # noqa: E501
-                listener=use_listener,
+    def _end_state(self):
+        return build_state_the_bernstein_way(
+                fixture_document_path=fixture_file_path('0140-bernstein-subtree.html'),  # noqa: E501
+                producer_module=_subject_module(),
                 )
-
-        def fuzzy_key(dct):
-            # #abstraction-candidate (for business)
-            _md = rx.search(dct['name'])
-            return fn(_md.group(1))
-        import re
-        rx = re.compile(r'^\[([A-Za-z][a-zA-Z0-9 ]+)\]\(')
-        import sakin_agac.magnetics.normal_field_name_via_string as fn
-
-        with _eek as dcts:
-            head_dct = next(dcts)
-            objs = {fuzzy_key(dct): dct for dct in dcts}
-
-        self.assertEqual(1, len(emissions))
-
-        class _State:
-            def __init__(self, _1, _2, _3):
-                self.head_dictionary = _1
-                self.business_object_dictionary = _2
-                self.emissions = _3
-
-        return _State(head_dct, objs, tuple(emissions))
 
 
 @memoize
 def _subject_module():
-        import script.tag_lyfe.json_stream_via_bernstein as x
-        return x
+    from sakin_agac_test.fixture_executables import (
+            exe_150_json_stream_via_bernstein_html as x,
+            )
+    return x
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: as referenced
 # #born.

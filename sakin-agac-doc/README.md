@@ -26,15 +26,17 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
-|                   #410.N  | #trak | this broad pattern: class as context manager
+|                   #410.Q  | #prov | provision: natural key field name always leftmost (things will break)
+|                   #410.P  | #wish | would we really want a moin moin adaption?
 |                   #410.M  | #trak | where sparseness is implemented
 |                   #410.L  | #trak | whether in-memory should be official format
 |                   #410.K  | #trak | CLI integration tests have redundant setup
-|                   #410.J  | #hole |
+|                   #410.J  | #trak | [record mapper]
 |                   #410.I  | #open | remove this redundancy
 |                   #410.H  | #trak | fixture executables aren't actuall exe.. (see)
 |                   #410.G  | #trak | nested context managers closing each other
-|                   #410.F  |       | provision: context managers (see)
+|                 #410.F.2  |       | provision: on failure, you must still result in an iterator
+|                   #410.F  | #trak | this broad pattern: class as context manager
 |                   #410.E  | #open | dashes to underscores is getting annoying
 |                   #410.D  | #trak | spots to change if we add this feature (see)
 |                   #410.C  | #wish | we want regex escape

@@ -37,7 +37,7 @@ class _open_new_lines_via_sync:
             _ = self.__iterate_via_sync_request()
             return _  # #todo
         else:
-            return iter(())  # #provision [#410.F]
+            return iter(())  # #provision [#410.F.2]
         # (was #coverpoint5.2 - now gone)
 
     def __iterate_via_sync_request(self):

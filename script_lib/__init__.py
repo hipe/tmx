@@ -103,15 +103,24 @@ def __deinident(md):
 
 
 def __build_common_listener(serr):
+    """(approaching #open [#508])
+    """
+
     def listener(*these):
-        chan = these[0:-1]
-        if 'expression' == chan[1]:
-            these[-1](serr_puts)
-        else:
+        (*chan), emitter = these
+        if 'expression' != chan[1]:
             raise('cover me')
-
+        import inspect
+        length = len(inspect.signature(emitter).parameters)
+        if 0 == length:
+            for line in emitter():
+                serr_puts(line)
+        elif 1 == length:
+            # (deprecated but still widespread at writing)
+            emitter(serr_puts)
+        else:
+            cover_me('two args? very oldschool - probably refactor')
     serr_puts = putser_via_IO(serr)
-
     return listener
 
 

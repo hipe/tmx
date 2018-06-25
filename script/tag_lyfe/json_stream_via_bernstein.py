@@ -1,74 +1,131 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 """
-generate a stream of JSON from {url}
+generate a stream of JSON from {raw_url}
 
 (this is the content-producer of the producer/consumer pair)
+"""
 
-this one is kind of triggersome 
+"""
+orginally this scraped HTML but more conveniently the raw markdown is
+available to us, exposed by github over plain old HTTP. so at #history-A.1
+this refactored quite smoothly into pioneering the idea of scraping
+markdown instead (sidestepping the #html2markdown problem).
 """
 
 
-_url = 'https://github.com/webmaven/python-parsing-tools'
-
-_first_selector = ('div', {'id': 'readme'})
+_raw_url = (
+        'https://raw.githubusercontent.com'
+        '/webmaven/python-parsing-tools/master/README.md'
+        )
 
 
 def _my_CLI(listener, sin, sout, serr):
 
     _cm = open_dictionary_stream(None, listener)
     with _cm as lines:
-        exitstatus = _html_lib().flush_JSON_stream_into(sout, serr, lines)
+        exitstatus = _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
     return exitstatus
 
 
 _my_CLI.__doc__ = __doc__
 
 
-def open_dictionary_stream(html_document_path, listener):
+class open_dictionary_stream:  # #[#410.F]
 
-    def my_generator(el, _emit):
+    def __init__(self, markdown_path, listener):
+        self.raw_url = _raw_url
+        self._markdown_path = markdown_path
+        self.__init_emitter(listener)
+        self._listener = listener
 
-        table, = el.select('table')
+    def __enter__(self):
+        self._OK = True
+        self._OK and self.__resolve_cached_doc()
+        if not self._OK:
+            return
+        with self.__unsanitized_dictionaries() as dcts:
+            schema_record = next(dcts)  # ..
+            far_field_names = tuple(schema_record['field_names'])
+            dic_via_cels = self.__build_dict_via_cels(far_field_names)
 
-        from sakin_agac.format_adapters.html.magnetics import (
-                dictionary_stream_via_table
-                )
+            yield self.__meta_record_via(dic_via_cels, schema_record)
 
-        table_o = dictionary_stream_via_table(
+            for dct in dcts:
+                def _custom_generator():  # risky. no closure scope
+                    for k in far_field_names:
+                        if k in dct:
+                            yield dct[k]
+                        else:
+                            yield ''  # #[#410.M] how sparseness (holes) must
+                yield dic_via_cels(_custom_generator())
+
+    def __exit__(self, *_3):
+        return False  # never swallow an exception
+
+    def __meta_record_via(self, dic_via_cels, schema_record):
+        """whatever "collection meta record" is emitted by our upstream,
+
+        we emit a meta record based off that one BUT with the field names
+        changed to reflect etc.
+
+          - assume #provision [#410.Q] that the natural key field name
+            is leftmost (here in the near field names (which are derived))
+
+        #abstraction-candidate: the format adaptation of [#410.J] the record
+        mapper should probably be the one doing this (maybe?)
+        """
+
+        near_field_names = dic_via_cels.near_field_names
+        mutable_dict = {k: v for k, v in schema_record.items()}
+        mutable_dict['natural_key_field_name'] = near_field_names[0]  # YIKES
+        mutable_dict['field_names'] = near_field_names
+        return mutable_dict
+
+    def __build_dict_via_cels(self, far_field_names):
+        import sakin_agac.magnetics.dictionary_via_cels_via_definition as _
+        return _(
+                unsanitized_far_field_names=far_field_names,
                 special_field_instructions={
-                    'name': ('string_via_td', _this_typical_humkey_via_td()),
+                    'name': ('string_via_cel', _string_via_cel_one),
                     'parses': ('rename_to', 'grammar'),
                     'updated': ('split_to', ('updated', 'version'), _via_upda),
                     },
-                table=table,
+                string_via_cel=_string_via_cel_two,
                 )
 
-        field_names = table_o.field_names
+    def __unsanitized_dictionaries(self):
+        from script.stream import open_dictionary_stream as dicts_via
+        return dicts_via(self._cached_doc.cache_path, self._listener)
 
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': field_names[0],
-                'field_names': field_names,
-                'traversal_will_be_alphabetized_by_human_key': False,
-                }
+    def __resolve_cached_doc(self):
+        markdown_path = self._markdown_path
+        from sakin_agac.format_adapters.html.magnetics import (
+                cached_doc_via_url_via_temporary_directory as cachelib,
+                )
+        if markdown_path is None:
+            from script_lib import TEMPORARY_DIR
+            _cached_doc_via = cachelib(TEMPORARY_DIR)
+            self._cached_doc = _cached_doc_via(self.raw_url, self._emit)
+        else:
+            _tmpl = '(reading markdown from filesystem - {})'
+            self._emit(
+                    'info', 'expression', 'reading_from_filesystem',
+                    _tmpl, markdown_path)
+            self._cached_doc = cachelib.Cached_HTTP_Document(markdown_path)
+        if self._cached_doc is None:
+            self._OK = False
 
-        for dct in table_o:
-            yield dct
-
-    _cm = _html_lib().OPEN_DICTIONARY_STREAM_VIA(
-        url=_url,
-        first_selector=_first_selector,
-        second_selector=my_generator,
-        html_document_path=html_document_path,
-        listener=listener,
-        )
-
-    return _cm
+    def __init_emitter(self, listener):
+        from modality_agnostic import listening
+        self._emit = listening.emitter_via_listener(listener)
 
 
-def _via_upda(s):
+def updated_and_version_via_string(s):  # #testpoint (sort of)
     """
+    given a string that has (usually) two pieces of information in it,
+    break it up into the two pieces (defaultng to None for max one of them).
+
     we try not to be overly sentimental re: ourobouros center-of-the-universe
     spots, but if there was one it would be the part where we try to write a
     regex to parse all the various version expressions and date strings of a
@@ -124,36 +181,18 @@ def _via_upda(s):
     return (final_date, final_version)
 
 
-def _this_typical_humkey_via_td():
-    """
-
-    """
-
-    o = _html_lib()
-    markdown_link_via = o.markdown_link_via
-    # url_via_href = o.url_via_href_via_domain(_domain)
-    # label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
-
-    def f(td):
-        a_tag, = td.select('> a')
-        url = a_tag['href']
-        # ..
-        return markdown_link_via(_string_via_el(a_tag), url)
-
-    return f
+_via_upda = updated_and_version_via_string
 
 
-def _string_via_el(el):  # td.text() would be same, but this gives sanity
-    navigable_string, = el.children
-    return navigable_string.strip()
+def _string_via_cel_two(some_value_string):
+    return some_value_string  # #hi.
 
 
-def cover_me(s):
-    raise Exception('cover me: %s' % s)
+def _string_via_cel_one(human_key):
+    return human_key  # #hi.
 
 
-def _html_lib():
+def _top_html_lib():
     import script.json_stream_via_url_and_selector as lib
     return lib
 
@@ -165,8 +204,10 @@ if __name__ == '__main__':
     _exitstatus = _.CHEAP_ARG_PARSE(
         cli_function=_my_CLI,
         std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        help_values={'url': _url},
+        help_values={'raw_url': _raw_url},
         )
     exit(_exitstatus)
 
+# #history-A.1: birth of the expression "collection meta-record"
+# #history-A.1: wow rewrite half so it scrapes markdown not HTML
 # #born

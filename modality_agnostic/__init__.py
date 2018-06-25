@@ -1,5 +1,18 @@
 class listening:  # (as namespace only)
 
+    def emitter_via_listener(listener):
+        def emit(*chan_args_tmpl):
+            def emit_lines():
+                if args is None:
+                    msg = tmpl
+                else:
+                    _use_args = args if isinstance(args, tuple) else (args,)
+                    msg = tmpl.format(*_use_args)
+                yield msg
+            (*chan), tmpl, args = chan_args_tmpl
+            listener(*chan, emit_lines)
+        return emit
+
     def leveler_via_listener(level_s, listener):
         def o(tmpl, *args, **kwargs):
             log(level_s, tmpl, *args, **kwargs)

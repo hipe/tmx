@@ -48,8 +48,8 @@ class _EmissionsModel:
         """NOTE - you won't typically call this directly"""
 
         chan = list(chan)
-        expresser = chan.pop()
-        ae = _ActualEmission(expresser, tuple(chan))
+        emission_payload_expresser = chan.pop()
+        ae = _ActualEmission(emission_payload_expresser, tuple(chan))
         if self._some_emission_models_remain():
             self.__when_expecting_emission(ae)
         else:
@@ -110,24 +110,37 @@ class _ActualEmissionIndex:
 
 class _ActualEmission:
 
-    def __init__(self, expresser, chan):
-        self.expresser = expresser
+    def __init__(self, emission_payload_function, chan):
+        self.emission_payload_function = emission_payload_function
         self.channel = chan
 
     def to_string(self):
-        """NOTE - xxx
+        """NOTE:
 
         for one thing, this has been done elsewhere
         for another thing, this totally ignores expression agents
         for a third thing, this work isn't memoized here.
+
+        finally, #open #[#058]: transitional solution (redundant)
         """
 
-        def WILL_DEPRECATE_message_receiver(msg):
-            # #open [#508]
-            msgs.append(msg)
-
         msgs = []
-        self.expresser(WILL_DEPRECATE_message_receiver, 'no expag')
+        user_f = self.emission_payload_function
+        import inspect
+        length = len(inspect.signature(user_f).parameters)
+        if 0 == length:
+            for line in user_f():
+                msgs.append(line)
+        else:
+            # (deprecated but still widespread emission signature at writing)
+            def receive_nonterminated_message_string(message):
+                msgs.append(message)
+            if 1 == length:
+                user_f(receive_nonterminated_message_string)
+            elif 2 == length:
+                user_f(receive_nonterminated_message_string, 'no expag [ma]')
+            else:
+                raise TypeError('no')
         return '\n'.join(msgs)
 
 

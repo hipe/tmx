@@ -7,11 +7,26 @@ generate a stream of JSON from {url}
 """
 
 
-_domain = 'https://wiki.python.org'
+"""
+origin story:
 
-_url = _domain + '/moin/LanguageParsing'
+when we were just about finished writing this it occurred to us how cludgy
+it was that we were scraping HTML to in effect generate markdown from content
+that "started" as markdown in the first place.
 
-_first_selector = ('div', {'id': 'content'})
+(at a high level this works fine, but when it comes to trying to do
+.#html2markdown on links it starts to feel kind of silly.)
+
+but A) by the time we realized this the script was done and covered and
+B) this script is the only guy that gives coverage to the html adaptation
+of the [#410.J] record mapper; a something that seems useful to have in the
+toolkit..
+"""
+
+
+_url = 'https://github.com/webmaven/python-parsing-tools'
+
+_first_selector = ('div', {'id': 'readme'})
 
 
 def _my_CLI(listener, sin, sout, serr):
@@ -36,10 +51,10 @@ def open_dictionary_stream(html_document_path, listener):
                 )
 
         table_o = dictionary_stream_via_table(
-                string_via_td_for_header_row=_string_via_td_STRICT,
-                string_via_td_for_body_row=_string_via_td_LOOSE,
                 special_field_instructions={
-                    'name': ('string_via_cel', _this_more_complicated_string_via_td()),  # noqa: E501
+                    'name': ('string_via_cel', _this_typical_humkey_via_td()),
+                    'parses': ('rename_to', 'grammar'),
+                    'updated': ('split_to', ('updated', 'version'), _via_upda),
                     },
                 table=table,
                 )
@@ -49,7 +64,7 @@ def open_dictionary_stream(html_document_path, listener):
         yield {
                 '_is_sync_meta_data': True,
                 'natural_key_field_name': field_names[0],
-                'field_names': field_names,  # coverpoint [#708.2.2]
+                'field_names': field_names,
                 'traversal_will_be_alphabetized_by_human_key': False,
                 }
 
@@ -67,32 +82,21 @@ def open_dictionary_stream(html_document_path, listener):
     return _cm
 
 
-def _this_more_complicated_string_via_td():
+def _via_upda(s):
+    global _via_upda  # ick/meh
+    import script.tag_lyfe.json_stream_via_bernstein as _
+    _via_upda = _.updated_and_version_via_string
+    return _via_upda(s)
 
-    o = _top_html_lib()
-    markdown_link_via = o.markdown_link_via
-    url_via_href = o.url_via_href_via_domain(_domain)
-    # label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
 
+def _this_typical_humkey_via_td():
     def f(td):
-        a_tag, = td.select('> p > a')
+        a_tag, = td.select('> a')
         url = a_tag['href']
-        if '/' == url[0]:  # ick/meh coverpoint [#708.2.3]
-            url = url_via_href(url)
+        # ..
         return markdown_link_via(_string_via_el(a_tag), url)
-
+    markdown_link_via = _top_html_lib().markdown_link_via
     return f
-
-
-def _string_via_td_LOOSE(td):
-    p, = td.select('> p')
-    return p.text.strip()
-
-
-def _string_via_td_STRICT(td):
-    p, = td.select('> p')
-    return _string_via_el(p)
 
 
 def _string_via_el(el):  # td.text() would be same, but this gives sanity
@@ -116,4 +120,6 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
-# #born
+
+# #pending-rename: all the other exe's, consider giving them `exe_` prefix also
+# #DNA-fissure

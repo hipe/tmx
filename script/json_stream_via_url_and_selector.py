@@ -20,6 +20,8 @@ dependencies (TODO):
 
 def _my_CLI(url, selector_string, listener, sin, sout, serr):
 
+    cover_me('not used')
+
     def __main():
         ok and __resolve_selector()
         ok and __get_busy()
@@ -56,6 +58,10 @@ def _my_CLI(url, selector_string, listener, sin, sout, serr):
     return __main()
 
 
+def selector_via_string(*_):
+    cover_me('gone a long time ago')
+
+
 _my_CLI.__doc__ = __doc__
 
 
@@ -89,14 +95,15 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F]
         self.second_selector = second_selector
         self.html_document_path = html_document_path
 
-        self._emit = _emitters_via_listener(listener)
+        from modality_agnostic import listening
+        self._emit = listening.emitter_via_listener(listener)
 
         self._enter_mutex = None
         self._exit_mutex = None
         self._ok = True
 
     def __enter__(self):
-        self._ok and self.__resolve_cached_url()
+        self._ok and self.__resolve_cached_doc()
         self._ok and self.__resolve_soup()
         self._ok and self.__maybe_use_first_selector()
         if self._ok:
@@ -118,27 +125,34 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F]
                 arg_to_2nd_selector = rs[0]
             else:
                 _tmpl = 'needed 1 had {}: {}'
-                self._emit.error(_tmpl, le, repr(first_selector))
+                self._emit(
+                        'error', 'expression', 'selection_arity_mismatch',
+                        _tmpl, (le, repr(first_selector)))
         self._required('_arg_to_2nd_selector', arg_to_2nd_selector)
 
     def __resolve_soup(self):
         from bs4 import BeautifulSoup
-        cached_url = pop_property(self, '_cached_url')
-        with open(cached_url.cache_path) as fh:
+        cached_doc = pop_property(self, '_cached_doc')
+        with open(cached_doc.cache_path) as fh:
             soup = BeautifulSoup(fh, 'html.parser')  # ..
         self._required('_soup', soup)
 
-    def __resolve_cached_url(self):
-        if self.html_document_path is None:
-            self.__resolve_cached_url_normally()
+    def __resolve_cached_doc(self):
+        from sakin_agac.format_adapters.html.magnetics import (
+                cached_doc_via_url_via_temporary_directory as cachelib,
+                )
+        path = self.html_document_path
+        if path is None:
+            from script_lib import TEMPORARY_DIR
+            _cached_doc_via = cachelib(TEMPORARY_DIR)
+            _x = _cached_doc_via(self.url, self._emit)
+            self._required('_cached_doc', _x)
         else:
             _tmpl = '(reading HTML from filesystem - {})'
-            self._emit.info(_tmpl, self.html_document_path)
-            self._cached_url = _CachedURL(self.html_document_path)
-
-    def __resolve_cached_url_normally(self):
-        _x = _cached_url(self.url, self._emit)
-        self._required('_cached_url', _x)
+            self._emit(
+                    'info', 'expression', 'reading_from_filesystem',
+                    _tmpl, self.html_document_path)
+            self._cached_doc = cachelib.Cached_HTTP_Document(path)
 
     def _required(self, s, x):
         if x is None:
@@ -148,55 +162,6 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F]
 
     def __exit__(self, *_):
         del(self._exit_mutex)
-
-
-# -- CACHED URL
-
-def _cached_url(url, emit):
-    import script_lib as sl
-    import re
-    sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', url)
-    from os import path as p
-    path = p.join(sl.TEMPORARY_DIR, '%s.html' % sanitized_name)
-    if p.exists(path):
-        _tmpl = '(using cached web page (remove file to clear cache) - {})'
-        emit.info(_tmpl, path)
-        return _CachedURL(path)
-    else:
-        emit.info('(nothing cached for this url, caching - {})', path)
-        return __make_cached_url(path, url, emit)
-
-
-def __make_cached_url(cache_path, url, emit):
-
-    import requests
-
-    with open(cache_path, 'w') as fh:
-        r = requests.get(url)
-        status_code = r.status_code
-        if status_code == 200:
-            x = fh.write(r.text)
-            emit.info('wrote {} ({} bytes)', cache_path, x)
-            ok = True
-        else:
-            _tmpl = 'failed - got HTTP status {} from {}'
-            emit.error(_tmpl, status_code, url)
-            ok = False
-    if ok:
-        return _CachedURL(cache_path)
-    else:
-        import os
-        os.remove(cache_path)
-
-
-class _CachedURL:
-
-    def __init__(self, path):
-        self.cache_path = path
-
-
-def okay():
-    raise('foo')
 
 
 # -- ..
@@ -223,18 +188,6 @@ def url_via_href_via_domain(domain):  # #coverpoint8.1
     return f
 
 
-def _emitters_via_listener(listener):
-
-    from modality_agnostic import listening as li
-
-    class emitters:  # namespace only
-        error = li.leveler_via_listener('error', listener)
-        info = li.leveler_via_listener('info', listener)
-        # log = li.logger_via_listener(listener) # at #historyA.1
-
-    return emitters
-
-
 def _this_lazy(f):  # experiment (copy-paste)
 
     def g(*a):
@@ -255,6 +208,11 @@ def pop_property(o, s):
     pass
 
 
+@_this_lazy
+def cover_me(s):
+    pass
+
+
 # --
 
 if __name__ == '__main__':
@@ -267,5 +225,6 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #pending-rename: at (-4) maybe put this in format_adapters/html
 # #historyA.1: got rid of use of `log`
 # #born: abstracted from sibling

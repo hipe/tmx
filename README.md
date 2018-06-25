@@ -182,12 +182,14 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#701]-[#799]              |       | (for tag lyfe)
 |[#601]-[#699]              |       | (for script lib)
 |[#501]-[#599]              |       | (for modality agnostic)
 |[#401]-[#499]              |       | (for sakin agac)
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+|[#021]                     | #wish | the desire for coverage testing (for particular reasons)
 |[#020.4]                   | #trak | track attempts at importing sibling modules
 |[#020.3]                   | #trak | track this one gripe about contextlib
 |[#020.2]                   | #hm   | track this one gripe about argparse

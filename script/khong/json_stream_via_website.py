@@ -235,7 +235,8 @@ def _second_selector(soup, emit):
         else:
             cover_me('yikes - div one was not a subset')
 
-    emit.info('(first was subset of second (%s were same))' % count)
+    _tmpl = '(first was subset of second ({:d} were same))'
+    emit('info', 'expression', 'subset', _tmpl, count)
 
 
 def _all_these_functions(emit):
@@ -311,7 +312,8 @@ def _all_these_functions(emit):
             else:
                 cover_me("page structured changed - wasn't expecting '%s'" % s)
 
-        emit.info("(number of <br>'s: {})".format(count))
+        _tmpl = "(number of <br>'s: {})"
+        emit('info', 'expression', 'brs_count', _tmpl, count)
 
     ignore_these = {'form', 'i', 'img', 'ins', 'input', 'p', 'script'}
     these = {'skyscraper', 'bogo-paypal'}
