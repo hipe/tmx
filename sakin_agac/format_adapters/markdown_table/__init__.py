@@ -62,18 +62,18 @@ class _open_new_lines_via_sync:
         # --
         # #coverpoint6.2 (overloaded):
 
-        use_far_dict_stream = (x for x in _dict_stream if 'header_level' not in x)  # noqa: E501
+        use_far_stream = (x for x in _dict_stream if 'header_level' not in x)  # noqa: E501
 
         # #coverpoint9.1.2
         f = self._sneak_this_in
         if f is not None:
-            use_far_dict_stream = (f(x) for x in use_far_dict_stream)
+            use_far_stream = (f(x) for x in use_far_stream)
         # --
 
         from .magnetics import newstream_via_farstream_and_nearstream as mag
         tagged_items = mag(
                 # the streams:
-                far_dictionary_stream=use_far_dict_stream,
+                far_native_stream=use_far_stream,
                 near_tagged_items=_near_tagged_items,
 
                 # the sync parameters:

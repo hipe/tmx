@@ -27,7 +27,7 @@ def for_DEBUGGING(*a):
     io.flush()
 
 
-def listener_via_emission_receiver(receive_emission):  # :[#509.B]
+def listener_via_emission_receiver(receive_emission):  # :[#509.2]
     def listener(*a):
         stack = list(a)
         receive_emission(_ActualEmission(stack.pop(), tuple(stack)))

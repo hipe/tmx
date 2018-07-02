@@ -115,7 +115,7 @@ class Case020_strange_file_extension(_CommonCase):
 class Case030_no_functions(_CommonCase):  # #coverpoint5.1
     """discussion - the point here (new in #history-A.1) is that whether
 
-    you're posing it as a far collection or near for the syncrhonization,
+    you're posing it as a far collection or near for the synchronization,
     it uses the same machinery (and language production) to complain about
     how it's can't do a thing.
 
@@ -172,14 +172,19 @@ class Case040_near_file_not_found(_CommonCase):
 
 class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
 
-    def test_100_gets_two_lines_in(self):
+    def test_100_gets_as_far_as_the_schema_lines_and_a_couple_recs_WHY(self):
         _act = self._end_state().outputted_lines
-        _exp = ('|col A|col B|\n', '|:--|--:|\n')
+        _exp = (
+                '|col A|col B|\n',
+                '|:--|--:|\n',
+                '|thing A|x|\n',
+                '|qux    | |\n',
+                )
         self.assertSequenceEqual(_act, _exp)
 
     def test_200_said_this_thing(self):
         _act = self._emission('erx').to_string()
-        _exp = "duplicate human key value in far collection ('qux')"
+        _exp = "duplicate key in far traversal: 'qux'"
         self.assertEqual(_act, _exp)
 
     @shared_subject
@@ -187,7 +192,7 @@ class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
         return self._build_end_state()
 
     def expect_emissions(self):
-        yield ('error', 'expression', 'duplicate_human_key_value', 'as', 'erx')
+        yield ('error', 'expression', 'duplicate_key', 'as', 'erx')
 
     def given(self):
 

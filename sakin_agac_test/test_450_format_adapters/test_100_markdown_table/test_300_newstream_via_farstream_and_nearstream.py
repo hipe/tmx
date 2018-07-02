@@ -43,7 +43,6 @@ class _CommonCase(unittest.TestCase):
         return self._sections_index()['business_object_row']
 
 
-
 class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase):  # noqa: E501
 
     def test_010_loads(self):
@@ -72,12 +71,12 @@ class Case100_adds_only(_CommonCase):
     def test_040_main_lines_count(self):
         self._main_lines_this_many(3)
 
-    def test_050_the_original_two_occur_first(self):
+    def test_050_the_first_and_last_items_are_as_in_the_original(self):
 
         items = self._items()
 
         _line_one = items[0].to_line()
-        _line_two = items[1].to_line()
+        _line_two = items[-1].to_line()
 
         self.assertEqual(_line_one, "|one|two|three|\n")
         self.assertEqual(_line_two, "| four | five | six\n")
@@ -93,7 +92,7 @@ class Case100_adds_only(_CommonCase):
         """
 
         items = self._items()
-        row = items[2]
+        row = items[1]
         cel0 = row.cel_at_offset(0)
         cel1 = row.cel_at_offset(1)
         cel2 = row.cel_at_offset(2)
@@ -343,7 +342,7 @@ def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):
 
     sp = sync_request.release_sync_parameters()
 
-    _far_dict_stream = sync_request.release_dictionary_stream()
+    _far_stream = sync_request.release_dictionary_stream()
 
     _nkfn = sp.natural_key_field_name
 
@@ -361,7 +360,7 @@ def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):
 
     _HOLY_SHNAPPS = my_sync(
             # the streams:
-            far_dictionary_stream=_far_dict_stream,
+            far_native_stream=_far_stream,
             near_tagged_items=_near_tagged_items,
 
             # the sync parameters:
@@ -369,7 +368,7 @@ def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):
             farstream_format_adapter=far_format_adapter,
 
             # pseudo-optional stuff:
-            far_traversal_is_ordered=False,
+            far_traversal_is_ordered=None,  # not until #coverpoint99
             sync_keyerser=_sync_keyerser,
 
             listener=listener,
@@ -503,5 +502,6 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.2: default algorithm changed to interfolding and row order changed
 # #history-A.1: as referenced
 # #born.

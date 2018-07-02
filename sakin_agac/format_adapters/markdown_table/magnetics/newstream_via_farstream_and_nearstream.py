@@ -80,7 +80,7 @@ class _Newstream_via:
             self,
 
             # the streams:
-            far_dictionary_stream,
+            far_native_stream,
             near_tagged_items,
 
             # the required sync parameters:
@@ -94,7 +94,7 @@ class _Newstream_via:
             listener,
             ):
 
-        self._far_dictionary_stream = far_dictionary_stream
+        self._far_native_stream = far_native_stream
         self._tagged_stream = near_tagged_items
         self._natural_key_field_name = natural_key_field_name
         self._listener = self.__build_attached_listener(listener)
@@ -104,17 +104,15 @@ class _Newstream_via:
         self._natural_key_via_far_user_item_unsanitized, = farstream_format_adapter.value_readers_via_field_names(natural_key_field_name)  # noqa: E501
         self._name_value_pairs_via_far_native_object = farstream_format_adapter.name_value_pairs_via_native_object  # noqa: E501
         self._state = 'HEAD_LINES'
-        self._proto_row = '_proto_row_initially'
-        self._did_see_first_business_object_row = False
         self._mutex = None
 
     def execute(self):  # (would be __enter__())
         del(self._mutex)
         while self._OK:
-            x = self._next_or_none()
-            if x is None:
+            tup = self._next_or_none()
+            if tup is None:
                 break
-            yield x
+            yield tup
 
     @_could_end_at_any_time
     def HEAD_LINES(self, tup):
@@ -146,30 +144,47 @@ class _Newstream_via:
 
     def _TRANSITION_TO_CRAZY_TOWN(self):
 
+        near_stream = self.__build_near_ad_hoc_item_stream()
+
+        from . import ordered_nativized_far_stream_via_far_stream_and_near_stream as _  # noqa: E501
+        o = _(
+                far_native_stream=pop_property(self, '_far_native_stream'),
+                far_map=self._name_value_pairs_via_far_native_object,
+                far_is_ordered=pop_property(self, '_far_traversal_is_ordered'),
+                near_stream=near_stream,
+                complete_schema=self._complete_schema,
+                listener=self._listener,
+                )
+        if o is None:
+            cover_me('wee something failed')
+        _nativizer = o.near_item_via_far_item
+        _ordered_native_far_stream = o.ordered_native_far_stream
+        self.__proto_row = o.prototype_row
+        _example_row = o.example_row
+        del(o)
+
+        _nk_via_far = pop_property(self, '_nat_key_via_far_item')
+        _nk_via_near = pop_property(self, '_nat_key_via_near_item')
+
         _item_via_collision = self.__build_item_via_collision()
-
-        _far_item_wrapperer = self.__build_far_item_wrapperer()
-
-        _near_ad_hoc_item_stream = self.__build_near_ad_hoc_item_stream()
 
         self._big_deal_stream = _top_sync.stream_of_mixed_via_sync(
 
                 # far
-                far_stream=pop_property(self, '_far_dictionary_stream'),
-                natural_key_via_far_user_item=pop_property(self, '_nat_key_via_far_item'),  # noqa: E501
-                far_item_wrapperer=_far_item_wrapperer,
-                far_traversal_is_ordered=pop_property(self, '_far_traversal_is_ordered'),  # noqa: E501
+                far_stream=_ordered_native_far_stream,
+                natural_key_via_far_user_item=_nk_via_far,
+                nativizer=_nativizer,
 
                 # near
-                near_stream=_near_ad_hoc_item_stream,
-                natural_key_via_near_user_item=pop_property(self, '_nat_key_via_near_item'),  # noqa: E501
+                near_stream=near_stream,
+                natural_key_via_near_user_item=_nk_via_near,
 
                 # the rest
                 item_via_collision=_item_via_collision,
                 listener=self._listener)
 
         self._move_to('OBJECT_ROWS')
-        return self._next_or_none()
+        return ('business_object_row', _example_row)
 
     def __build_item_via_collision(self):
         """
@@ -217,71 +232,11 @@ class _Newstream_via:
                 else:
                     pass  # #coverpoint1.7: let the single-field record thru
 
-            _prototype_row = self._prototype_row_as_late_as_possible()
-
-            return _prototype_row.new_row_via_far_pairs_and_near_row_DOM__(
+            return self.__proto_row.new_row_via_far_pairs_and_near_row_DOM__(
                     far_pairs, near_row_DOM)
         return item_via_collision
 
-    def __build_far_item_wrapperer(self):
-
-        name_value_pairs_via_far_native_object = self._name_value_pairs_via_far_native_object  # noqa: E501
-
-        def build_wrapper(result_categories, listener):
-
-            # make a prototype row from a real, encountered row.
-            # do this only once you've acutally seen such a row in the near doc
-            prototype_row = self._prototype_row_as_late_as_possible()
-
-            if prototype_row is None:
-                return
-
-            def wrap(native_object):
-                _pairs = name_value_pairs_via_far_native_object(native_object)
-                _wrapped = prototype_row.new_via_name_value_pairs(_pairs)
-                return (result_categories.OK, _wrapped)
-            return wrap
-        return build_wrapper
-
-    def _prototype_row_as_late_as_possible(self):
-        return getattr(self, self._proto_row)()
-
-    def _proto_row_initially(self):
-        del(self._proto_row)
-        self.__actual_proto_row = self.__build_proto_row()
-        self._proto_row = '_proto_row_subsequently'
-        return self._proto_row_subsequently()
-
-    def _proto_row_subsequently(self):
-        return self.__actual_proto_row
-
-    def __build_proto_row(self):
-        if self._did_see_first_business_object_row:
-            return self.__build_proto_row_when_seen()
-        else:
-            self._error("can't sync because no first business object row")
-
-    def __build_proto_row_when_seen(self):
-
-        _row = pop_property(self, '_first_business_object_row')
-
-        from . import prototype_row_via_example_row_and_schema_index as x
-        return x(
-                natural_key_field_name=self._natural_key_field_name,
-                example_row=_row,
-                complete_schema=self._complete_schema,
-                )
-
     def __build_near_ad_hoc_item_stream(self):
-
-        def item_via_native_object(x):
-            # only for the first row we encounter,
-            # do this thing (per [#408.E])
-            self._did_see_first_business_object_row = True
-            self._first_business_object_row = x
-            nonlocal item_via_native_object
-            item_via_native_object = _Item
-            return item_via_native_object(x)
 
         _Item = self.__build_near_item_class()
 
@@ -289,8 +244,7 @@ class _Newstream_via:
         for tup in self._tagged_stream:
             typ, x = tup
             if 'business_object_row' == typ:
-                _item = item_via_native_object(x)
-                yield _item
+                yield _Item(x)  # away this class soon..
             else:
                 hit_the_end = False
                 self._TUP_ON_DECK = tup
@@ -316,6 +270,9 @@ class _Newstream_via:
 
             def to_line(self2):
                 return self2.ROW_DOM_.to_line()
+
+            def HELLO_POINTLESS_ITEM_WRAPPER_CLASS(self):
+                pass
 
         return _NearItem
 
@@ -372,11 +329,6 @@ class _Newstream_via:
             self._nat_key_via_far_item = use_keyer_far
             self._nat_key_via_near_item = use_keyer_near
 
-    def _error(self, message):
-        from modality_agnostic import listening as li
-        error = li.leveler_via_listener('error', self._listener)
-        error(message)
-
     def __build_attached_listener(self, orig_listener):
         def f(typ, *a):
             if 'error' == typ:
@@ -387,6 +339,13 @@ class _Newstream_via:
 
 
 def _import_sibling_module(s):  # #experiment #track [#020.4]
+    """
+    you know how we can do `from . import foo_faa` to reach a module relative
+
+    to the module the code appears in? we want the same kind of thing, but
+    not have to be "inside" the module the code appears in.
+    """
+
     from importlib import import_module
     return import_module('..%s' % s, __name__)
 
@@ -395,5 +354,6 @@ _NEWSTREAM_VIA.sibling_ = _import_sibling_module
 
 sys.modules[__name__] = _NEWSTREAM_VIA
 
+# #pending-rename: far_stream not farstream etc (maybe)
 # #history-A.1: add experimental feature "sync keyerser"
 # #born.

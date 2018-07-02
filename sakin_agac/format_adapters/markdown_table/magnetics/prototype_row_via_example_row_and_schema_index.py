@@ -58,6 +58,7 @@ right-align the ASCII art for right-aligned columns, and follow suit
 accordingbly.)
 
 and come to think of it, center-aligning ASCII art seems like a misfeature.
+(#track [#410.S])
 
 indeed it's a poor separation of content from presentation. the human should
 be able to change the alignment of a column (e.g from `:---` to `---:`) and

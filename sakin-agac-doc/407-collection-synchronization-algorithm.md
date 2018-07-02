@@ -1,13 +1,5 @@
 # a collection synchronization algorithm
 
-## status of this document
-
-we are eager to explore this in some tests to see how painful the
-recursive approach is.
-
-
-
-
 ## objective & scope
 
 "synchronize" "collections".
@@ -15,19 +7,41 @@ recursive approach is.
 
 
 
+## status of this document
+
+- at #history-A.1:
+introduce the "interleaving" algorithm.
+
+## history
+
+- before #history-A.1:
+this is used successfully at the collection level and within items
+(the "recursion" discussed below).
+- at birth:
+we are eager to explore this in some tests to see how painful the
+recursive approach is.
+
+
+
+
 ## brief definition of "collection"
 
-  - consists of nothing more than 'items'.
-  - ordered.
-  - for now, item must have a "natural key" that identifies it uniquely
-    in the collection. (<a name='provision-3'>:provision 3</a>)
-  - items can be seen as a flat, ordered list of name-value pairs.
-  - the item can (but not must) have a "surface representation"
-  - an item, in turn, is defined somewhat recursively using more or less
-    this same definition for "collection". (however: currently we do not
-    want these formal structures to recurse more than one level deep.
-    rather than using the same terminology, we say that items consist of
-    name-value pairs.)
+  - an *ordered* list of *items* (for meanings of "item" discussed here
+    and "ordered" throughout this document).
+  - for each item it must be possible to derive from it a key that
+    identifies the item uniquely in the collection. (:"provision 1")
+  - not a requirement, but note that the item will typically have a
+    "surface representation" (e.g how the item would appear in a file).
+  - in our inspiration-case application of this algorithm, it has in fact
+    proven useful to allow this algorithm to recurse into itself once.
+    (this is the subject of a section below.)
+
+
+
+
+## "near" vs. "far"
+
+we used to say "local" vs. "remote", "original" vs. "new".
 
 
 
@@ -35,9 +49,40 @@ recursive approach is.
 
 ## define "synchronize"
 
-it can mean a variety of things. EDIT
+for our intended application, to "synchronize" means to "import" (or maybe
+we will prefer "merge") data from a "far" "collection" "into" our "near"
+one. we require that each item have a "natural key". places this gets
+interesting is where it bumps into issues of
+  - collision: what do we do when a far item has the same natural key as a
+    near one?
+  - possible pruning: if an item exists in the near collection but not
+    far collection (in terms of natural key), do we omit that item from
+    the result collection?
+  - sorting/order: ...
 
 
+
+
+## how these algorithms can recurse on themselves, definitionally
+
+in our inspiration-case application of this algorithm, it has proven useful
+to allow this algorithm to recurse into itself once. (this was applied
+usefully before #history-A.1).
+
+in more detail, this algorithm has been used at the collection-level merge
+and also at item-level merges (a.k.a a "sub-item-level" merge). in so doing,
+our formal definition for "collection" is applied to our practical
+collections but also to the individual item as well, which we can model as
+nothing more than a collection of name-value pairs:
+
+| application of this algorithm | what acts as the collection? | what acts as the item? | the human key? |||
+|--|--|--|--|--|--|
+| at the collection level | the collection | each item            | user-defined function against item |
+| at the sub-item level   | the item       | each name-value pair | each name of same |
+
+this won't really make sense at this early stage; but just know that we
+use this algorithm to merge one collection into another and also this same
+algorithm to merge one item into another.
 
 
 
@@ -81,11 +126,53 @@ this all here now so we can give thought to it as we write the algorithm.)
 
 
 
+## behavioral facet (option): ordering (theory)
+
+we can imagine an uninteresting number of permutations of different ordering
+policies to be exhibited by the output sequence, contingent on ther requisite
+options being implemented.
+
+(although the below list makes no effort to communicate this, it should be
+inferable that some choices are mutually exclusive with others, whereas
+others can combine.)
+
+for example:
+  - hew to the found sequence of the far collection (inserts at end)
+  - hew to the found sequence of the near collection (inserts at end)
+  - insert at beginning instead of end
+  - apply some sort of sort to the far collection first
+  - apply some sort of sort to the near collection first
+  - insert e.g lexically, but retain found ordering of near
+
+the first two alternatives suggest one interesting axis: the ordering can
+be near-centric or far-centric. from a practical design standpoint each
+may have its own strengths based on the use case:
+
+advantages to far-order-centric might be if you think of the remote
+datasource as authoritative in regards to the order. in such cases you
+might want the synchronization to "correct" your order (so your (for
+example) document "looks more right" in this regard).
+
+on the other hand, a near-order-centric synchronization might have these
+advantages: imagine that you make discretionary decisions about
+the ordering of the items in your local datastore; for example, it's a
+document and you place the most significant (or most recent) items near
+the top of the list. in such a system you would want synchronization to
+try to preserve this meaningful ordering that you already have to whatever
+extent is possible appropriate to the other parameters of the synchorniation.
+
+or perhaps the remote data source does not express any significant
+meaningingful order in the first place, and so you simply want to minimize
+the impact of meaningless change to your (for example) document.
+
+
+
+
 ## behavioral facet (option): pruning
 
 this imagined option would be for whether or not you would want the
-synchronization to remove from your local collection those items that
-were not also in the remote collection (in terms of their natural key).
+synchronization to remove from your near collection those items that
+are not also in the far collection (in terms of their natural key).
 
 EDIT at present we are not going to implement this, but we should
 consider how such a requirement would manifest in our algorithm nonetheless.
@@ -173,7 +260,15 @@ real-world use of this:
 
 
 
-## the inner (main) algorithm (an overview)
+## the diminishing pool algorithm
+
+in overview,
+  - gather up a "diminishing pool" by traversing the far collection to index it
+  - traverse the near collection while consuming matches from the diminshing pool
+  - flush any left over in the diminishing pool.
+also:
+  - if you swap "near" and "far" above, you get ordering that is
+    far-centric rather than near.
 
 we are going to start with targeting a original-centric-ordering.
 
@@ -199,23 +294,7 @@ also there is the essential matter of what to do when you've reached the
 end of your "driving traversal". what we do here is something we call
 "flushing the diminishing pool".
 
-
-
-
-## the inner (main) algorithm (in more detail)
-
-again we are targeting a original-centric-ordering, but keep in mind that
-hopeufully the parts of this will be interchangeble in a modular way if you
-were to target the other order-centricism. (but for the purposes of
-visualizing and understanding the algorithm, it may help to convey it
-in these more concrete terms at first.)
-
-so, at a high level:
-  - index the new collection (which traverses it)
-  - traverse the original collection, while doing a thing
-  - flush the diminishing pool
-
-so, the pieces:
+so, the pieces in more detail:
 
 
 
@@ -348,6 +427,76 @@ behavioral provision will be fine.
 
 
 
+## algorithm: interleaving
+
+this algorithm was introduced as a counterpoint to the "diminishing pool"
+algorithm above because the above presented a few issues when we were using
+it for our at the (#history-A.1) time current inspiration use case:
+
+when doing a true data merge with multiple sources, the diminishing pool
+algorithm has drawbacks: the output order can feel happenstance, and so it
+it doesn't help us detect near-misses for desired collisions (item-level
+merges) because it doesn't put like-keys near each other. the pattern became
+us editing the outputted table by hand to have the rows be in alphabetical
+order by key, something we anticipated being no big deal but in fact grew
+untenably cumbersome-feeling after about two iterations.
+
+in effect, what we wanted was a synchronization that alphabetized the result.
+it felt cludgy not to have the synchronization be stream-y as well. the buy-
+in to accomplish this is that the input traversals themselves already be
+ordered.
+
+so, quick pro's and con's. pro's:
+
+  - items with like-names (for definitions of) are near each other.
+
+  - the outputted markdown table has a deterministic ordering, regardless
+    of the order that the sources are input.
+
+con's
+
+  - you will lose any meaningful ordering that the source collection exhibits,
+    something that hurts us for more typical cases of using a web page as a
+    datasource, where the order of items is often somehow significant
+    (narratively or otherwise).
+
+here's how it works in a normal case, coarsely:
+
+    far_item, far_key = next_far_item()
+    near_item, near_key = next_near_item()
+
+    while far_item is not None and near_item is not None:
+
+        if near_key < far_key
+            yield near_item
+            near_item, near_key = next_near_item()
+        elif near_key == far_key
+            yield merge_the_two_items(far_key, near_key)
+        else
+            yield far_item
+            far_item, far_key = next_far_item()
+
+the idea is that you pop off the head of each stream and whichever one should
+go out first goes out first and then is replaced with the next head of that
+stream, all the while checking if each new pairing is a match. as this repeats,
+whichever stream should be drawn from is drawn from until one or both of them
+finds its end.
+
+note that:
+  - we are using the "lexical" values of the (string) keys *as* the sorting
+    criteria. this is crude, but it's a move to keep the number of moving
+    parts low until there's good reason not to. :"provision 2"
+
+  - unlike the previous algorithm, we are not looking up keys against
+    a hash of other keys. we rely on the matching keys "just ending up"
+    beside each other, something that requires that the source streams be
+    already ordered.
+
+  - one part that we don't illustrate above is the "run down" leg of the
+    algorithm. this part is more straighforward, documented in the code.
+
+
+
 ## internal API requirements for format adapters
 
   - re-output the surface representation of an original item.
@@ -376,4 +525,5 @@ behavioral provision will be fine.
 
 ## (document-meta)
 
+  - #history-A.1: spike the new interleaving algorithm
   - #born.

@@ -57,7 +57,7 @@ class Case100(_CommonCase):
         _msg = self._fail_against(_path)
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
-    def test_500_RUMSKALLA(self):
+    def test_500_RUMSKALLA(self):  # :#coverpoint7.6
 
         _path = _chimi_churri_far_path()
         _cref = _build_collection_reference(_path)
@@ -151,7 +151,9 @@ class Case280_bad_human_key(_CommonCase):  # #coverpoint7.3
 
 
 class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
-    """(may be partially or wholly redundant with #coverpoint1.1)"""
+    """(may be partially or wholly redundant with #coverpoint1.1)
+    (may be #overloaded. is first coverage of an oblique thing.)
+    """
 
     def test_100_raises_this_happenstance_exception(self):
         def f():

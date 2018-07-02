@@ -26,6 +26,8 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.S  | #trak | markdown row spacing might be a misfeature
+|                   #410.R  | #trak | would redis etc
 |                   #410.Q  | #prov | provision: natural key field name always leftmost (things will break)
 |                   #410.P  | #wish | would we really want a moin moin adaption?
 |                   #410.M  | #trak | where sparseness is implemented

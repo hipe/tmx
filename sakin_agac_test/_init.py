@@ -59,7 +59,7 @@ class _EndState:
 
 
 def minimal_listener_spy():
-    """similar elsewhere. this one is minimal.
+    """similar elsewhere. this one is minimal. DEPRECATED. use [#509.2]
 
     #open [#410.I] the soul of this has been stolen and moved to [#509]
     """

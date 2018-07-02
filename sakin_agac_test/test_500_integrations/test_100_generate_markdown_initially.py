@@ -17,6 +17,12 @@ class _CommonCase(unittest.TestCase):  # #[#410.K]
 
     # -- assertions & assistance
 
+    def _same_business_lines(self):
+        act = self.table_lines()
+        self.assertIn('boo bah', act[-2])
+        self.assertIn('choo chah', act[-1])
+        self.assertEqual(len(act), 5)
+
     def fails(self):
         self.assertNotEqual(self._validated_exitstatus(), 0)
 
@@ -167,11 +173,8 @@ class Case200_stdin(_CommonCase):  # #coverpoint9.1.1  - one arg: stdin
         self.assertRegex(act[0], r'^\| [A-Z][a-z]+ .+ \|$')
         self.assertRegex(act[1], r'^(?:\|[-:]-+:?)+\|$')
 
-    def test_220_business_object_rows(self):
-        act = self.table_lines()
-        self.assertIn('choo chah', act[-2])
-        self.assertIn('boo bah', act[-1])
-        self.assertEqual(len(act), 5)
+    def test_220_business_object_rows_got_alphabetized(self):
+        self._same_business_lines()
 
     @shared_subject
     def table_lines(self):
@@ -198,11 +201,8 @@ class Case220_arg(_CommonCase):  # #coverpoint9.1.2  - one arg: arg
     def test_100_succeeds(self):
         self.succeeds()
 
-    def test_200_big_same(self):
-        act = self.table_lines()
-        self.assertIn('choo chah', act[-2])
-        self.assertIn('boo bah', act[-1])
-        self.assertEqual(len(act), 5)
+    def test_200_same_business_lines(self):
+        self._same_business_lines()
 
     @shared_subject
     def table_lines(self):
@@ -227,4 +227,5 @@ def _this_one_lib():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: when interfolding became the main algorithm, order changed
 # #born.

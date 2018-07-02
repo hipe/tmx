@@ -2,28 +2,22 @@
 
 """discussion
 
-we want this to hew closer to our catalyst use case without actually
-starting to implement it yet, because there's certainly broadly applicable
-theory yet to be gained from this, the descent into recursion with
-synchronization.
-
-the big open question is whether this collection-centric algorithm for
+the birth of this test suite (file) was for exploring the big question
+of whether this collection-centric algorithm for
 synchronization can be used at the sub-item level. that is, if collections
 are an ordered list of items (each one of which has a natural key), can
 we see an item as a collection (that is, an ordered list) of name-value
 pairs, where each name-value pair acts as "the item", and the name is
-itself the natural key?
+itself the natural key? (more at [#407].)
 
-this is where policy will really start to matter.
-
-SO, this is a rough sketch, but here is the uptake:
-
-  - yes we *can* use the synchronizer on arbirary business objects
-
-  - yes it is perhaps worth it
+sometime before #history-A.2 we established that yes, our synchronization
+facility can be applied usefully to this use case. the cost:
 
   - it should be no surprise that you have to write your own per-property
     policy as #here3. but also:
+
+  - new in this edition (#history-A.2) you gotta present the keys
+    in alphabetical order #here4
 
   - for now you have to write your own collision resolver like this @#here1,
     complete with the little dispatcher thing
@@ -34,9 +28,6 @@ SO, this is a rough sketch, but here is the uptake:
 
 from _init import (
         sanity
-        )
-from modality_agnostic.memoization import (
-        memoize,
         )
 import unittest
 
@@ -122,11 +113,17 @@ class _MyBusinessObject:
         self.tags = tags
 
     def name_value_pairs_via_doohah(bo):
-        # very close to [#408.E] a normal `name_value_pairs_via_nat..` function
+        """so:
+        - very close to [#408.E] a normal
+          `name_value_pairs_via_native_object` function.
+        - new at #history-A.2, :#here4 you must present the below in
+          alphabetical order (or an error is emitted)
+        """
+
         for k in [
                 'first_name',
-                'user_ID',
                 'tags',
+                'user_ID',
                 ]:
             x = getattr(bo, k)
             if x is not None:
@@ -136,5 +133,6 @@ class _MyBusinessObject:
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.2: default algorithm changed to interfolding. now order must be az
 # #history-A.1: got rid of use of format adapter for this test
 # #born.

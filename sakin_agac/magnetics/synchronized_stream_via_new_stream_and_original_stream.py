@@ -3,7 +3,14 @@
 from sakin_agac import (
         cover_me,
         pop_property,
+        sanity,
         )
+from modality_agnostic import (
+        streamlib as _,
+        )
+
+
+next_or_none = _.next_or_none
 
 
 class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
@@ -21,6 +28,7 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
     """
 
     def __init__(self, dict_stream, format_adapter):
+        # #coverpoint7.6
         self._dict_stream = dict_stream
         self._format_adapter = format_adapter
 
@@ -94,142 +102,328 @@ class _SyncParameters:
         return 2  # bump this WHEN you add to constituency
 
 
-def _result_in_identity(result_categories, listener):
-
-    def _identity(item):
-        return (ok, item)
-
-    ok = result_categories.OK
-    return _identity
-
-
 def stream_of_mixed_via_sync(
-        natural_key_via_far_user_item,
+        preserve_freeform_order_and_insert_at_end=False,
+        **kwargs):
+
+    if preserve_freeform_order_and_insert_at_end:
+        return _WorkerWhenDiminishingPool(**kwargs).execute()
+    else:
+        return _WorkerWhenInterleaving(**kwargs).execute()
+
+
+class _Worker:
+
+    def _unable_because_duplicate_key(self, key, which):
+        self._emit(
+                ('error', 'expression', 'duplicate_key'),
+                'duplicate key in {} traversal: {!r}',
+                (_adj_for[which], key),
+                )
+
+    def _emit(self, channel, template, values=()):
+        if 'error' == channel[0]:
+            self._when_error_emission()  # #hook-out
+
+        def msgs_f():
+            yield template.format(*values)
+        self._listener(*channel, msgs_f)
+
+
+class _WorkerWhenInterleaving(_Worker):
+    """
+    the interleaving algorithm. spiked at #history-A.4
+    """
+
+    def __init__(
+        self,
         far_stream,
-        natural_key_via_near_user_item,
+        natural_key_via_far_user_item,
         near_stream,
+        natural_key_via_near_user_item,
         item_via_collision,
-        far_item_wrapperer=_result_in_identity,
-        far_traversal_is_ordered=None,
+        nativizer=None,
         listener=None,
-        ):
+            ):
 
-    # --
-    def wrap_far_item(item):
-        # only once you've had a chance to see the near items, ask for the ..
-        nonlocal wrap_far_item
-        x = far_item_wrapperer(_result_categories, listener)
-        if x is None:
-            cover_me('you saw this work once but meh - #history-A.2')
-            # assume something failed
-            _error("couldn't make far item wrapper. stopping early.")
-            wrap_far_item = None  # sanity
-            return ('_stop_now', None)
+        if nativizer is None:
+            def f():
+                return self._far_item
         else:
-            wrap_far_item = x
-            return wrap_far_item(item)
+            def f():
+                return nativizer(self._far_item)  # #coverpoint7.4 (obliquely)
+        self._nativized_far_item = f
 
-    def _error(msg):
-        from modality_agnostic import listening as li
-        error = li.leveler_via_listener('error', listener)
-        error(msg)
-    # --
+        self._init_traversers(_FAR, far_stream, natural_key_via_far_user_item)
+        self._init_traversers(_NEAR, near_stream, natural_key_via_near_user_item)  # noqa: E501
+        self._merge = item_via_collision
+        self._nativizer = nativizer
+        self._listener = listener
+        self._both_open = True
+        self._far_is_open = True
+        self._near_is_open = True
+        self._OK = True
 
-    far_collection = _collection(far_stream, natural_key_via_far_user_item)
-    near_collection = _collection(near_stream, natural_key_via_near_user_item)
+    def execute(self):
 
-    # the below comments are copy-pasted directly from algorithm
-
-    # index the new collection (which traverses it)
-
-    diminishing_pool = __index_the_far_collection(far_collection, listener)
-    if diminishing_pool is None:
-        return
-
-    seen = {k: None for k in diminishing_pool.keys()}
-
-    # sort if desired
-
-    if far_traversal_is_ordered is False:
-        diminishing_pool = _COVER_ME(diminishing_pool)
-
-    # traverse the original collection, while doing a thing
-
-    for (k, item) in near_collection:
-        if k in seen:
-            _new_item = diminishing_pool.pop(k)
-            _use_item = item_via_collision(_new_item, item)
-            yield _use_item  # might change this to be yield if not None
-        else:
+        self._step_far()
+        self._step_near()
+        while self._both_open:  # ##here3
+            if self._near_key < self._far_key:
+                yield self._near_item
+                self._step_near()
+            elif self._near_key == self._far_key:
+                item = self._merge(self._far_item, self._near_item)
+                if item is None:
+                    cover_me("we've imagined supporting this - error at merge")
+                yield item
+                self._step_far()
+                self._step_near()
+            else:
+                yield self._nativized_far_item()
+                self._step_far()
+        for item in self.__run_down_the_rest():
             yield item
 
-    # flush the diminishing pool
+    def __run_down_the_rest(self):
+        """we know we have reached the end of at least one of the streams.
 
-    for item in diminishing_pool.values():
-        result_category, wrapped_item = wrap_far_item(item)
-        if 'OK' == result_category:
-            yield wrapped_item
-        elif '_stop_now' == result_category:
-            break
+        we know this because we are after the while loop, and the while loop
+        doesn't exit until its exit condition is met, and that condition is
+        tripped only when one or both of the streams reached its end. (see
+        all #here3.)
+
+        see in the above code how the two streams sometimes step side-by-
+        side. it's possible that both streams reached their end at the same
+        step-pair. in such cases, you are done.
+
+        otherwise, you have one more stream to "run down". (note it's
+        impossible to have both streams still open, given the exit condition.)
+
+        in such a phase you no longer have to look for collisions (merges)
+        between items in the near and far collections. however, it is
+        imperative that we still check that 1) the remaining stream is itself
+        sorted and that 2) it does not have any collisions with itself. (2)
+        is in the interest of not having a corrupt dataset but (1) is because
+        without it as a provision, item merges can be missed; i.e. the whole
+        algorithm breaks down.
+
+        the asymmetry introduced by the possible use of a "nativizer" is
+        a can we are kicking down the road for now.
+        """
+
+        if not self._OK:  # (putting this here makes main func read nicer)
+            return _empty_iterator()
+
+        # == do we run down far stream, near stream or no stream?
+
+        if self._far_is_open:
+            if self._near_is_open:
+                sanity('how is it that both sides are still active?')
+            else:
+                which = _FAR
+                yes = True
+        elif self._near_is_open:
+            which = _NEAR
+            yes = True
         else:
-            cover_me(result_category)  # probably { 'failed' | 'skip' }
+            # #coverpoint14.1: both hit the end at the same step
+            yes = False
+
+        if not yes:
+            return _empty_iterator()
+
+        # == yuck more special handling for nativization
+
+        if _FAR == which:
+            current_item = self._nativized_far_item
+        elif _NEAR == which:
+            def current_item():
+                return self._near_item
+        # ==
+
+        step = getattr(self, _step_attribute_for[which])
+        is_open = _is_open_attribute_for[which]
+
+        yield current_item()
+        step()
+        while self._OK and getattr(self, is_open):
+            yield current_item()
+            step()
+
+    def _init_traversers(self, which, stream, key_via_item):
+
+        itr = iter(stream)  # stream is any iterable, like tuple, list etc
+        iter_attr = _iter_attribute_for[which]
+        setattr(self, iter_attr, itr)
+        item_attr = _item_attribute_for[which]
+        key_attr = _key_attribute_for[which]
+
+        def step():
+            item = next_or_none(itr)
+            if item is None:
+                setattr(self, _is_open_attribute_for[which], False)
+                self._both_open = False  # might be the 2nd time. ##here3
+                clear_props()
+            else:
+                recv_item(item)
+
+        def recv_item(item):
+            setattr(self, item_attr, item)
+            key = key_via_item(item)
+            if key is None:
+                cover_me('when key is none')
+            else:
+                recv_key(key)
+
+        def recv_key(first_key):
+            store_key(first_key)
+            nonlocal prev_key
+            prev_key = first_key
+            nonlocal recv_key
+            recv_key = recv_key_subsequently
+
+        def recv_key_subsequently(key):
+            nonlocal prev_key
+            if prev_key < key:
+                store_key(key)
+                prev_key = key
+            elif prev_key == key:
+                self._unable_because_duplicate_key(key, which)
+            else:
+                self._emit(
+                        ('error', 'expression', 'disorder'),
+                        '{} traversal is not in order ({!r} then {!r})',
+                        (_adj_for[which], prev_key, key),
+                        )
+
+        prev_key = None
+
+        def store_key(key):
+            setattr(self, key_attr, key)
+
+        def clear_props():
+            # (had never been set IFF empty streams)
+            setattr(self, item_attr, None)
+            setattr(self, key_attr, None)
+            # --
+            delattr(self, iter_attr)
+            delattr(self, item_attr)
+            delattr(self, key_attr)
+
+        setattr(self, _step_attribute_for[which], step)
+
+    def _when_error_emission(self):
+        self._both_open = False
+        self._OK = False
 
 
-def __index_the_far_collection(far_collection, listener):
-    d = {}
-    for (k, item) in far_collection:
-        if k in d:
-            __when_duplicate_etc(k, listener)
-            d = None
-            break
-        d[k] = item
-    return d
+class _WorkerWhenDiminishingPool(_Worker):
+
+    def __init__(
+        self,
+        far_stream,
+        natural_key_via_far_user_item,
+        near_stream,
+        natural_key_via_near_user_item,
+        item_via_collision,
+        nativizer=None,
+        listener=None,
+            ):
+
+        self._far_stream = far_stream
+        self._key_via_far_item = natural_key_via_far_user_item
+        self._near_stream = near_stream
+        self._key_via_near_item = natural_key_via_near_user_item
+        self._merge = item_via_collision
+        self._nativizer = nativizer
+        self._listener = listener
+        self._OK = True
+
+    def execute(self):
+        self._OK and self.__resolve_diminishing_pool_via_big_flush()
+        if self._OK:
+            return self.__work()
+        else:
+            return _empty_iterator()
+
+    def __work(self):
+        seen = {}
+        dim_pool = pop_property(self, '_diminishing_pool')
+        merge = pop_property(self, '_merge')
+        key_via = pop_property(self, '_key_via_near_item')
+        for item in pop_property(self, '_near_stream'):
+            key = key_via(item)
+            if key in seen:
+                self._unable_because_duplicate_key(key, _NEAR)
+                break
+            seen[key] = None
+            if key in dim_pool:
+                _far_native_item = dim_pool.pop(key)
+                merged_item = merge(_far_native_item, item)
+                if merged_item is None:
+                    cover_me('never been seen - merge failure')
+                yield merged_item
+            else:
+                yield item
+
+        nativizer = pop_property(self, '_nativizer')
+        if nativizer is None:
+            def nativizer(x):  # _identity
+                return x
+        for far_item in dim_pool.values():
+            nativized_item = nativizer(far_item)
+            if nativized_item is None:
+                cover_me('never seen before - nativizer failure')
+            yield nativized_item
+
+    def __resolve_diminishing_pool_via_big_flush(self):
+        pool = {}
+        sanity = 200  # ##[#401.R]
+        count = 0
+        far_st = pop_property(self, '_far_stream')
+        key_via_item = pop_property(self, '_key_via_far_item')
+        for item in far_st:
+            count += 1
+            if sanity == count:
+                cover_me('redis etc')
+            key = key_via_item(item)
+            if key in pool:
+                self._unable_because_duplicate_key(key, _FAR)
+                break
+            pool[key] = item
+        if self._OK:  # just for sanity
+            self._diminishing_pool = pool
+
+    def _when_error_emission(self):
+        self._OK = False
 
 
-def __when_duplicate_etc(k, listener):  # #coverpoint5.3
-    def f(o, _):
-        _ = "duplicate human key value in far collection ('%s')"
-        o(_ % k)
-    listener('error', 'expression', 'duplicate_human_key_value', f)
+# --
+_FAR = 0
+_NEAR = 1
+_step_attribute_for = ('_step_far', '_step_near')
+_is_open_attribute_for = ('_far_is_open', '_near_is_open')
+_iter_attribute_for = ('_far_iterator', '_near_iterator')
+_item_attribute_for = ('_far_item', '_near_item')
+_key_attribute_for = ('_far_key', '_near_key')
+_adj_for = ('far', 'near')
+# ---
 
 
-def _COVER_ME(diminishing_pool):
-    """
-    currently,
-      - #cover-me. drafted at #history-A.3 for small real generation.
-
-      - this behavior is triggered by an associated option (parameter).
-
-      - the only interesting value for that option to have is `False`. all
-        other values (including (quite importantly) None) will make things
-        behave as they did before this feature existed.
-
-      - False is an indication that the far collection traversal will occur in
-        a sequence that is *not* in any meaningful order.
-
-      - furthermore, this is an indication that the synchronization *could*
-        order the far collection by the natural key if the client desires.
-        (although this particular provision should be always true, given
-        what "natural key" is supposed to mean.)
-    """
-
-    mutable_list = [k for k in diminishing_pool]
-    mutable_list.sort(key=lambda hk: hk.lower())
-    return {k: diminishing_pool[k] for k in mutable_list}
-
-
-class _result_categories:  # as namespace
+class result_categories:  # as namespace
     # skip = 'skip' maybe one day
     failed = 'failed'
     OK = 'OK'
 
 
-def _collection(stream, keyer):
-    return ((keyer(x), x) for x in stream)
+def _empty_iterator():
+    return iter(())
 
 
-# #history-A.3 (can be temporary): as referenced
+# #history-A.4: sunset diminishing pool algorithm while spike interleaving
 # #history-A.2: when wrapper fails (sketch)
 # #history-A.1 (can be temporary): "inject" wrapper function
 # #pending-rename: we might name every "new stream" as "far stream" ibid near
+#     NOTE: search replace the filename in code too. also in [#407]
 # #born.

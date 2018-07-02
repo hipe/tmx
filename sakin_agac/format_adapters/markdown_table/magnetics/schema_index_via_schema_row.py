@@ -145,6 +145,9 @@ class _SchemaIndex:
 
         return self.__field_readerer(field_name)
 
+    def natural_key_field_name__(self):
+        return self.field_names__[0]  # assume [#410.Q] first is it
+
 
 def _the_index_components_via(cels_count, header_row1_DOM):
     """given a table with a header row like this, make a dictionary like this
