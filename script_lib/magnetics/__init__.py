@@ -17,7 +17,7 @@ def _listener_via_stderr(stderr):
 
     def listener(*a):
         d = _deque_via_array(a)
-        expression_f = d.pop()
+        emission_payload_f = d.pop()
         s = d.popleft()
         if s not in _approved_toplevel_channels:
             cover_me('bad first channel component: {}'.format(s))
@@ -26,9 +26,18 @@ def _listener_via_stderr(stderr):
             cover_me("need 'expression' had {}".format(s))
         if 1 < len(d):
             cover_me('do you really want a fourth component?: {}'.format(d[1]))
-        expression_f(write_unterminated_line, STYLER_)
 
-    def write_unterminated_line(s):
+        # #open #[#508] (partially redundant)
+        import inspect
+        length = len(inspect.signature(emission_payload_f).parameters)
+        if 0 == length:
+            # #cover-me
+            for msg in emission_payload_f():
+                receive_nonterminated_message_string(msg)
+        else:
+            emission_payload_f(receive_nonterminated_message_string, STYLER_)
+
+    def receive_nonterminated_message_string(s):
         if s:
             s += _NEWLINE
         else:

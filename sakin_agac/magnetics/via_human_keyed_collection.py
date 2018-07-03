@@ -324,6 +324,7 @@ class human_keyed_collection_via_pairs_cached:
       - the internal cache/dictionary is in-memory so there are practical
         considersations against using this against large collections for some
         definition of. (redis would be neat here, but holy scope creep.)
+        ([#410.R] (perhaps first mention)
 
       - just as a curious corollary, it's worth noting that if your
         retrievals always use existant keys and never do a full traversal,

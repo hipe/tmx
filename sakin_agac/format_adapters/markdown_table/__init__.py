@@ -273,6 +273,37 @@ def _near_tagged_items_via_mixed(mixed, listener):
 
 # --
 
+def simplified_key_via_markdown_link_er():
+    """the only reason this is a function that builds a function (instead
+
+    of just a function) is so we lazy-(ish)-load the dependency modules.
+    one place this is covered is *as* test support under #coverpoint13.
+    which makes this also a #testpoint.
+    this is nowhere near #html2markdown except that it crudely parses
+    a tiny sub-slice of markdown.
+    """
+
+    def simplified_key_via_markdown_link(markdown_link_string):
+        """my hands look like this "[Foo Fa 123](bloo blah)"
+
+        so hers can look like this "foo_fa_123"
+        """
+
+        md = first_pass_rx.search(markdown_link_string)
+        if md is None:
+            _tmpl = 'failed to parse as markdown link - %s'
+            cover_me(_tmpl % markdown_link_string)
+
+        return normal_via_str(md.group(1))
+
+    import re
+    first_pass_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
+    import sakin_agac.magnetics.normal_field_name_via_string as normal_via_str
+    return simplified_key_via_markdown_link
+
+
+# --
+
 _functions = {
         'CLI': {
             'open_new_lines_via_sync': _open_new_lines_via_sync,

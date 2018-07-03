@@ -146,38 +146,45 @@ class _Newstream_via:
 
         near_stream = self.__build_near_ad_hoc_item_stream()
 
+        _key_via_far = pop_property(self, '_key_via_far_item')
+        _key_via_near = pop_property(self, '_key_via_near_item')
+
         from . import ordered_nativized_far_stream_via_far_stream_and_near_stream as _  # noqa: E501
         o = _(
                 far_native_stream=pop_property(self, '_far_native_stream'),
                 far_map=self._name_value_pairs_via_far_native_object,
                 far_is_ordered=pop_property(self, '_far_traversal_is_ordered'),
+                far_keyer=_key_via_far,
                 near_stream=near_stream,
                 complete_schema=self._complete_schema,
                 listener=self._listener,
                 )
         if o is None:
             cover_me('wee something failed')
-        _nativizer = o.near_item_via_far_item
-        _ordered_native_far_stream = o.ordered_native_far_stream
+        nativizer = o.near_item_via_far_item
+        _ordered_far_KV_pairs = o.ordered_far_key_value_pairs
         self.__proto_row = o.prototype_row
         _example_row = o.example_row
         del(o)
 
-        _nk_via_far = pop_property(self, '_nat_key_via_far_item')
-        _nk_via_near = pop_property(self, '_nat_key_via_near_item')
+        def use_nativizer(far_KV_pair):
+            return nativizer(far_KV_pair[1])
+
+        def use_key_via_far(far_KV_pair):
+            return far_KV_pair[0]
 
         _item_via_collision = self.__build_item_via_collision()
 
         self._big_deal_stream = _top_sync.stream_of_mixed_via_sync(
 
                 # far
-                far_stream=_ordered_native_far_stream,
-                natural_key_via_far_user_item=_nk_via_far,
-                nativizer=_nativizer,
+                far_stream=_ordered_far_KV_pairs,
+                natural_key_via_far_user_item=use_key_via_far,
+                nativizer=use_nativizer,
 
                 # near
                 near_stream=near_stream,
-                natural_key_via_near_user_item=_nk_via_near,
+                natural_key_via_near_user_item=_key_via_near,
 
                 # the rest
                 item_via_collision=_item_via_collision,
@@ -212,12 +219,12 @@ class _Newstream_via:
         so: experimental for now.
         """
 
-        def item_via_collision(far_native_object, near_item):
+        def item_via_collision(far_KV_pair, near_item):
 
             near_row_DOM = near_item.ROW_DOM_
 
             far_pairs = self._name_value_pairs_via_far_native_object(
-                    far_native_object)
+                    far_KV_pair[1])
 
             far_pairs = list(far_pairs)  # flatten it if it's a generator
 
@@ -326,8 +333,8 @@ class _Newstream_via:
                 use_keyer_near, use_keyer_far = sync_keyers(near_f, far_f)
 
         if self._OK:
-            self._nat_key_via_far_item = use_keyer_far
-            self._nat_key_via_near_item = use_keyer_near
+            self._key_via_far_item = use_keyer_far
+            self._key_via_near_item = use_keyer_near
 
     def __build_attached_listener(self, orig_listener):
         def f(typ, *a):

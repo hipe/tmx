@@ -344,12 +344,16 @@ class _FancyDiffLineConsumer:
         return False
 
     def _close_normally(self):
-        from difflib import unified_diff
+
+        sout = self._sout
 
         from_path = self._near_collection_path
 
-        _use_fromfile = 'a/%s' % from_path
-        _use_tofile = 'b/%s' % from_path
+        use_fromfile = 'a/%s' % from_path
+        use_tofile = 'b/%s' % from_path
+
+        # (the thing doesn't output this line but we need it to use gitx)
+        sout.write("diff %s %s\n" % (use_fromfile, use_tofile))
 
         to_IO = _pop_property(self, '_tmp_file')
         to_IO.seek(0)
@@ -360,13 +364,13 @@ class _FancyDiffLineConsumer:
         with open(from_path) as lines:
             YUCK_from_lines = [x for x in lines]
 
-        sout = self._sout
+        from difflib import unified_diff
 
         _lines = unified_diff(
                 YUCK_from_lines,
                 YUCK_to_lines,
-                fromfile=_use_fromfile,
-                tofile=_use_tofile,
+                fromfile=use_fromfile,
+                tofile=use_tofile,
                 )
 
         for line in _lines:

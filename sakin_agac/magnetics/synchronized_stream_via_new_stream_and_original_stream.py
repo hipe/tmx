@@ -379,7 +379,7 @@ class _WorkerWhenDiminishingPool(_Worker):
 
     def __resolve_diminishing_pool_via_big_flush(self):
         pool = {}
-        sanity = 200  # ##[#401.R]
+        sanity = 200  # ##[#410.R]
         count = 0
         far_st = pop_property(self, '_far_stream')
         key_via_item = pop_property(self, '_key_via_far_item')

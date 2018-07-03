@@ -331,6 +331,7 @@ class _CrazyDiffParse:
             (1, r'^@@ -\d+,\d+ \+\d+,\d+ @@$'),
             (1, r'^\+\+\+ (.)(.+)', 'after_path'),
             (1, r'^--- (.)(.+)', 'before_path'),
+            (1, r'^diff '),
         ]
         self._current_memo_is_plural = None
         self._current_memo_matches = None

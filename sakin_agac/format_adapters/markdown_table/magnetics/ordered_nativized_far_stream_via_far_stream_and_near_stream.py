@@ -74,6 +74,7 @@ class _Worker:
             self,
             far_native_stream,
             far_map,
+            far_keyer,
             far_is_ordered,
             near_stream,
             complete_schema,
@@ -82,6 +83,7 @@ class _Worker:
 
         self._far_native_stream = far_native_stream
         self._far_map = far_map
+        self._far_keyer = far_keyer
         self._far_is_ordered = far_is_ordered
 
         self._near_stream = near_stream
@@ -96,7 +98,8 @@ class _Worker:
         del(self._mutex)
         self._OK and self.__resolve_example_row()
         self._OK and self.__resolve_prototype_row_via_example_row()
-        self._OK and self.__resolve_ordered_native_far_stream()
+        self._OK and self.__init_far_KV_pairs()
+        self._OK and self.__resolve_ordered_far_key_value_pairs()
         self._OK and self.__resolve_nativizer()
         if self._OK:
             return self
@@ -117,7 +120,7 @@ class _Worker:
 
         self.near_item_via_far_item = near_item_via_far_item
 
-    def __resolve_ordered_native_far_stream(self):
+    def __resolve_ordered_far_key_value_pairs(self):
         """
         - when the ordered-ness of the far stream is either declared to be
           not ordered or no declaration is made, assume it's not ordered.
@@ -136,27 +139,45 @@ class _Worker:
         if self._far_is_ordered is True:
             cover_me("OK if you say so")
         else:
-            self.__resolve_ordered_native_far_stream_via_big_flush()
+            self.__resolve_ordered_far_key_value_pairs_via_big_flush()
 
-    def __resolve_ordered_native_far_stream_via_big_flush(self):
+    def __resolve_ordered_far_key_value_pairs_via_big_flush(self):
         """yikes
         """
 
         big_list = []
-        sanity = 200  # ##[#401.R]
+        sanity = 200  # ##[#410.R]
         count = 0
-        native_st = pop_property(self, '_far_native_stream')
-        for dct in native_st:  # type violation
+        for kv_pair in pop_property(self, '_far_KV_pairs'):
             count += 1
             if sanity == count:
                 cover_me('redis etc')
-            big_list.append(dct)
+            big_list.append(kv_pair)
 
-        def f(dct):
-            return dct[nkfn]
-        nkfn = self._nkfn
-        big_list.sort(key=f)
-        self.ordered_native_far_stream = big_list
+        big_list.sort(key=lambda kv_pair: kv_pair[0])
+        self.ordered_far_key_value_pairs = big_list
+
+    def __init_far_KV_pairs(self):
+        """
+        this should be the only place in the universe that we apply the far
+        keyer.
+
+        this is cached because it can take work to make keys
+
+        this is in its own step because maybe 
+        """
+
+        _native_st = pop_property(self, '_far_native_stream')
+
+        key_via_far = pop_property(self, '_far_keyer')
+
+        def f(item):
+            key = key_via_far(item)
+            if key is None:
+                cover_me("nil key")
+            return (key, item)
+
+        self._far_KV_pairs = (f(item) for item in _native_st)
 
     def __resolve_prototype_row_via_example_row(self):
         from . import prototype_row_via_example_row_and_schema_index as _

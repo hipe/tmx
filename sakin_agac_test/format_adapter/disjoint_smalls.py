@@ -44,16 +44,11 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
             )
 
     def fuzzy_key(dct):
-        """my hands look like this "[Foo Fa 123](bloo blah)"
-
-        so hers can look like this "foo_fa_123"
-        #abstraction-candidate (for business)
-        """
-        _md = rx.search(dct['name'])
-        return normal_key(_md.group(1))
-    import re
-    rx = re.compile(r'^\[([A-Za-z][a-zA-Z0-9 ]+)\]\(')
-    import sakin_agac.magnetics.normal_field_name_via_string as normal_key
+        return simplified_key_via_markdown_link(dct['name'])
+    from sakin_agac.format_adapters.markdown_table import (
+            simplified_key_via_markdown_link_er as _,
+            )
+    simplified_key_via_markdown_link = _()
 
     with _open_dictionary_stream as dcts:
         head_dct = next(dcts)
