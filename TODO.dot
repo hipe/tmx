@@ -3,7 +3,7 @@ digraph g {
 /* waypoints and smaller projects (alphabetical) */
 
 thing100[label="• the sync script\n• md table datastore" style=filled]
-thing106[label="merge two\ndata producers"]
+thing106[label="merge two\ndata producers" style=filled]
 thing110[label="find a dilligenced\nparser generator"]
 thing122[label="parsed tagged strings"]
 thing126[label="parse tag queries"]

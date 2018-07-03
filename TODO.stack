@@ -118,4 +118,3 @@ sub-project: upload files to s3
 (-18.2) worldwide refactor: [#508] (the emissions thing)
 (-19) find a parser generator that satisfies that one requirement
 (-19.1) yikes do deep survey against all the options
-(-19.2) create other producer, see if you can fold it in
