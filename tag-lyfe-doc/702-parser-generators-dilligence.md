@@ -3,7 +3,7 @@
 ## the list
 
 |Name|Description|Comment|License|Updated|Version|Python|Module|Grammar|Used By|Notes|Tags|
-|:--:|-----------|:-----:|:------|:------|:------|------|------|-------|-------|-----|----|
+|:--:|:----------|:------|:------|:------|:------|------|------|-------|-------|-----|----|
 |x|||q||||mm|||2wr3||
 |[ANTLR](http://www.antlr.org/)|Parser and lexical analyzer generator in Java. Generates parsing code in Python (as well as Java, C++, C#, Ruby, etc).|stand-alone tool in Java. Latest version can produce Python code|BSD|2014-07|v4.4||Python|LL(*)||    ||
 |[Aperiot](https://sites.google.com/site/aperiotparsergenerator/)||uses separate grammar files|Apache 2.0|2012-01|v0.1.12||Python|LL(1)||    ||
