@@ -118,5 +118,3 @@ sub-project: upload files to s3
 (-15) tag lyfe query: the `not` modifier (integrate with everything so far)
 (-16) tag lyfe query: tag with value (atomic) (integers and non)
 (-17) tag lyfe query: query execution: tag without value single, AND list & OR list
-(-18) tag lyfe query: {and|or} (no recursion yet) (enforce all one or the other)
-(-tag-lyfe.18.2 upgrade to python 3.7.0, add some modules)

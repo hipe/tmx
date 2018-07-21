@@ -16,12 +16,21 @@ def for_DEBUGGING(*a):
     import sys
     io = sys.stderr
     chan_a = list(a)
-    thing = chan_a.pop()
+    express = chan_a.pop()
 
     def f(msg):
         msg_a.append(msg)
     msg_a = []
-    thing(f, '«no expression agent yet»')
+
+    # while #open [#508]
+
+    length = _num_params(express)
+    if 0 == length:
+        for msg in express():
+            f(msg)
+    else:
+        express(f, '«no expression agent yet»')
+
     io.write("channel: {}\n".format(repr(chan_a)))
     io.write("messages: {}\n".format(repr(msg_a)))
     io.flush()
@@ -115,19 +124,21 @@ class _ActualEmission:
         self.channel = chan
 
     def to_string(self):
+        return '\n'.join(self.to_strings())
+
+    def to_strings(self):
         """NOTE:
 
         for one thing, this has been done elsewhere
         for another thing, this totally ignores expression agents
         for a third thing, this work isn't memoized here.
 
-        finally, #open #[#058]: transitional solution (redundant)
+        finally, #open #[#508]: transitional solution (redundant)
         """
 
         msgs = []
         user_f = self.emission_payload_function
-        import inspect
-        length = len(inspect.signature(user_f).parameters)
+        length = _num_params(user_f)
         if 0 == length:
             for line in user_f():
                 msgs.append(line)
@@ -141,7 +152,8 @@ class _ActualEmission:
                 user_f(receive_nonterminated_message_string, 'no expag [ma]')
             else:
                 raise TypeError('no')
-        return '\n'.join(msgs)
+
+        return msgs
 
 
 class _EmissionModel:
@@ -280,6 +292,11 @@ class _Literal:
     @property
     def does_get_consumed(self):
         return True
+
+
+def _num_params(f):
+    import inspect
+    return len(inspect.signature(f).parameters)
 
 
 _name_rx = re.compile('^[a-z_]+$')

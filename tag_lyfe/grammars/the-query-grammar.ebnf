@@ -1,0 +1,40 @@
+@@grammar::ZIPP_ZAPP_BADOOZA
+
+start::TopThing
+    =
+    payload:atom_or_branch
+    ( s | $ )
+    ;
+
+atom_or_branch::AtomOrBranch
+    =
+    left:atom right:[more]
+    ;
+
+more::Continuing
+    =
+    s
+    and_or_or:( 'and' | 'or' )
+    s ~
+    atom_or_branch:atom_or_branch
+    ;
+
+atom
+    =
+    surface_tag
+    ;
+
+surface_tag::SurfaceTag
+    =
+    '#' ~ tag_stem:tag_stem
+    ;
+
+tag_stem
+    =
+    /[a-z]+/ ~
+    # (the above is a very temporary, over-simplified placeholder)
+    ;
+
+s = '\0' ;
+
+# #born.

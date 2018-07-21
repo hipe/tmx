@@ -45,5 +45,94 @@ def sanity(s='assumption failed'):
 
 _()
 
+
+from modality_agnostic.memoization import (  # noqa: E402
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
+
+import modality_agnostic.test_support.listener_via_expectations as l_via_e  # noqa: E402 E501
+
+
+class _Watcher(type):
+
+    def __init__(cls, name, bases, clsdict):
+        if len(cls.mro()) > 2:
+            _add_memoizing_methods(cls)
+        super().__init__(name, bases, clsdict)
+
+
+class ScaryCommonCase(metaclass=_Watcher):
+
+    def point_at(self, w):
+        _1, _2 = self.end_state().first_emission_messages[1:3]
+        offset_of_where_arrow_is_pointing_to = len(_2) - 1
+        md = _word_regex().search(_1, offset_of_where_arrow_is_pointing_to)
+        _act = md[0]  # ..
+        self.assertEqual(_act, w)
+
+    def says(self, s):
+        _act = self.end_state().first_emission_messages[0]
+        self.assertEqual(_act, s)
+
+    def fails(self):
+        self.assertIsNone(self.end_state().result)
+
+    def query_compiles(self):
+        sta = self.end_state()
+        self.assertIsNotNone(sta.result)
+        self.assertIsNone(sta.first_emission_messages)
+
+
+def _add_memoizing_methods(cls):
+    @shared_subject
+    def end_state(self):
+        return _EndState(self)
+    cls.end_state = end_state
+
+
+class _EndState:
+
+    def __init__(self, tc):
+
+        em_a = []
+        tox = tc.given_tokens()
+        listener = l_via_e.listener_via_emission_receiver(em_a.append)
+        # listener = l_via_e.for_DEBUGGING
+
+        from tag_lyfe.magnetics import (
+                query_via_token_stream as mag,
+                )
+
+        from tag_lyfe import NULL_BYTE_
+
+        query_s = NULL_BYTE_.join(tox)
+
+        itr = mag.MAKE_CRAZY_ITERATOR_THING(query_s)
+
+        next(itr)  # ignore the model
+
+        unsani = next(itr)
+
+        x = unsani.sanitize(listener)
+
+        if len(em_a):
+            em, = em_a  # ..
+            self.first_emission_messages = em.to_strings()
+        else:
+            self.first_emission_messages = None
+
+        if x is None:
+            self.result = None
+        else:
+            self.result = x
+
+
+@memoize
+def _word_regex():
+    import re
+    return re.compile(r'\w+')
+
+
 # #history-A.1: things changed at upgrade to python 3.7
 # #born.

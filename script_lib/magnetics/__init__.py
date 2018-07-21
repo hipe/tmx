@@ -25,7 +25,9 @@ def _listener_via_stderr(stderr):
         if s != 'expression':
             cover_me("need 'expression' had {}".format(s))
         if 1 < len(d):
-            cover_me('do you really want a fourth component?: {}'.format(d[1]))
+            # cover_me(f'do you really want a fourth component?: {d[1]!r}')
+            # longer channels used in e.g tag_lyfe [#708.3]. now preferred.
+            pass
 
         # #open #[#508] (partially redundant)
         import inspect

@@ -212,6 +212,7 @@ then in your 'main' terminal:
 |[#008.C]                   | #wish | function-based commands
 |[#008.B]                   | #open | remove array abuse
 |[#008]                     |       | (placeheld for small internal tracking)
+|[#007.E]                   | #open | probably refactor all `format` and (probably) `%` to use f-strings
 |[#007.D]                   | #open | PEP8 (now that we know how to activate it)
 |[#007.C]                   | #open | lock current stable (python 3.6.4) w/ virtualenv/VCS
 |[#007.B]                   | #open | refactor helper.py memoizers to use doctest

@@ -23,10 +23,12 @@ machine-readble way.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
+|                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
-|                   #707.B  | #open | clean up these placeholders
 |                   #707    |       | (internal tracking)
+|                   #704    |       | experimental conventions
+|                   #703    |       | soft notes
 |                [\[#702\]] |       | due dilligence on parser generators
 |                   #701    |       | (this readme)
 

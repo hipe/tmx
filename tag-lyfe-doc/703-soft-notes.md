@@ -250,6 +250,8 @@ note about this list:
 ### PLY
 
 - interesting
+- on-shoulders-of: SPARK
+- see David Beazley's PyCon 2018 talk "Reinventing the Parser Generator"
 
 
 
@@ -429,6 +431,16 @@ note about this list:
 - now: changed to https://pypi.org/project/ZestyParser/
   (from https://pypi.python.org/pypi/ZestyParser)
   (old URL redirects to new URL anyway).
+
+
+
+## video watching notes (just before zz)
+
+(almost ZZ: 5:23) david beazly is great. PLY might win
+
+(at 31:20 in the video and 5:35AM here, there's SLY)
+
+SLY, (EDIT: we discovered TaTsu shortly after and it won via discretion)
 
 
 

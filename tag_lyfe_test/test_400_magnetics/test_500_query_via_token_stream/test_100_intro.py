@@ -1,5 +1,28 @@
+"""
+## objectives, requirements and provisions (all subject to change)
+
+broadly, our high-level objectives are to suss-out our main big unknowns:
+
+  - can we stop at garbage? like, can we have greedy parsing with no
+    '$' endpoint marker in the grammar? and then..
+
+  - if yes above, after this parse can we reliably see "the rest" of the
+    input stream (ARGV tokens) for our more traditional argv parsing?
+
+  - how are we going to integrate error expressions with column traces with
+    exceptions thrown from the generated parser etc?
+
+  - is this null byte hack really going to work? (more below at #here1)
+
+
+experimental new provisions:
+
+  - stack countdown number as testpoint identifier (see [#704.B])
+"""
+
+
 from _init import (
-        hello_you,
+        ScaryCommonCase,
         )
 from modality_agnostic.memoization import (
         memoize,
@@ -7,16 +30,70 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class _CommonCase(unittest.TestCase):
+
+    def _la_la(self, left, right):
+        return f"can't change from '{left}' to '{right}' at the same level (use parens)"  # noqa: E501
 
 
-hello_you()
+class Case100_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
 
-
-class Case100_hello(_CommonCase):
-
-    def test_100_hi(self):
+    def test_050_hi(self):
         self.assertIsNotNone(_subject_magnetic())
+
+    def given_tokens(self):
+        return ('#one', 'and', '#two', 'or', '#three', 'xx')
+
+    def test_100_fails(self):
+        self.fails()
+
+    def test_200_says_this(self):
+        return self.says(self._la_la('and', 'or'))
+
+    def test_300_points_at_this_word(self):
+        return self.point_at('or')
+
+
+class Case200_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
+
+    def given_tokens(self):
+        return ('#one', 'or', '#two', 'and', '#three', 'xx')
+
+    def test_100_fails(self):
+        self.fails()
+
+    def test_200_says_this(self):
+        return self.says(self._la_la('or', 'and'))
+
+    def test_300_points_at_this_word(self):
+        return self.point_at('and')
+
+
+class Case300_minimal_OR(_CommonCase, ScaryCommonCase):
+
+    def given_tokens(self):
+        return ('#one', 'or', '#two')
+
+    def test_100_query_compiles(self):
+        self.query_compiles()
+
+
+class Case400_minimal_AND(_CommonCase, ScaryCommonCase):
+
+    def given_tokens(self):
+        return ('#one', 'and', '#two')
+
+    def test_100_query_compiles(self):
+        self.query_compiles()
+
+
+class Case500_lone_tag(_CommonCase, ScaryCommonCase):
+
+    def given_tokens(self):
+        return ('#one',)
+
+    def test_100_query_compiles(self):
+        self.query_compiles()
 
 
 @memoize
