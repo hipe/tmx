@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 requests = "*"
 flask = "*"
 wtforms = "*"
@@ -17,13 +14,13 @@ slackclient = "*"
 psutil = "*"
 celery = {extras = ["redis"]}
 "bs4" = "*"
+tatsu = "*"
 
 
 [dev-packages]
-
 "flake8" = "*"
+pycodestyle = "*"
 
 
 [requires]
-
-python_version = "3.6"
+python_version = "3.7"

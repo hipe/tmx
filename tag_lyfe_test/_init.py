@@ -18,14 +18,21 @@ def _():
         pass  # assume low entrypoint loaded us to use for resources
 
     elif top_test_dir == head:
-        None if '' == a[1] else sanity()
+
+        # we get here when running `pud tag_lyfe_test`
+        None if project_dir == a[1] else sanity()
+        # at #history-A.1 the above changed from being '' to being the
+        # project dir.
+
+        # for some weird reason we want the one thing to be first and the
+        # other thing to be second. but this might change
+        # changed at #history-A.1
+
         a[0] = project_dir
         a[1] = top_test_dir  # [#019.why-this-in-the-second-position]
 
     else:
         sanity()
-
-    return (top_test_dir,)
 
 
 def hello_you():  # #open #[#707.B]
@@ -36,8 +43,7 @@ def sanity(s='assumption failed'):
     raise Exception(s)
 
 
-(
-    _top_test_dir,
-) = _()
+_()
 
+# #history-A.1: things changed at upgrade to python 3.7
 # #born.

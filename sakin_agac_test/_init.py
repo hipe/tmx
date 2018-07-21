@@ -10,22 +10,26 @@ def _():
     a = sys.path
     head = a[0]
 
-    top_test_dir = dn(__file__)
-    project_dir = dn(top_test_dir)
+    sub_project_test_dir = dn(__file__)
+    mono_repo_dir = dn(sub_project_test_dir)
 
-    if project_dir == head:
+    # when we are running all the tests for the whole sub-project,
+    # it looks like this: `<sub_proj_TD>, <mono_repo_dir>, stdlib1, ..`
 
-        pass  # assume low entrypoint loaded us to use for resources
+    if sub_project_test_dir == head:
+        None if mono_repo_dir == a[1] else sanity()
 
-    elif top_test_dir == head:
-        None if '' == a[1] else sanity()
-        a[0] = project_dir
-        a[1] = top_test_dir  # [#019.why-this-in-the-second-position]
+    # when we are running a single test file, that file's init thing
+    # put the mono repo dir at the head, and we'll ignore whatever else
+    # is there:
+
+    elif mono_repo_dir == head:
+        pass  # as above. the 2nd path component might be a deep test dir
 
     else:
         sanity()
 
-    return (top_test_dir,)
+    return (sub_project_test_dir,)
 
 
 def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
@@ -105,4 +109,5 @@ def sanity(s='assumption failed'):
     _top_test_dir,
 ) = _()
 
+# #history-A.1: upgraded to python 3.7, things changed
 # #born.
