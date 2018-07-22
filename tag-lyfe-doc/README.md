@@ -26,6 +26,7 @@ machine-readble way.)
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.B  |       | for now no 'tag subtree' class
 |                   #707    |       | (internal tracking)
 |                   #704    |       | experimental conventions
 |                   #703    |       | soft notes

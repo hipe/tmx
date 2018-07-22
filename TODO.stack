@@ -117,4 +117,3 @@ sub-project: upload files to s3
 (-14) tag lyfe query: `#foo {with|without} value` construct, integrate (consider `#foo:*`)
 (-15) tag lyfe query: the `not` modifier (integrate with everything so far)
 (-16) tag lyfe query: tag with value (atomic) (integers and non)
-(-17) tag lyfe query: query execution: tag without value single, AND list & OR list

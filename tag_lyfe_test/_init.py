@@ -64,6 +64,28 @@ class _Watcher(type):
 
 class ScaryCommonCase(metaclass=_Watcher):
 
+    def does_not_match_against(self, tup):
+        _did = self._yes_no_match(tup)
+        self.assertFalse(_did)
+
+    def matches_against(self, tup):
+        _did = self._yes_no_match(tup)
+        self.assertTrue(_did)
+
+    def _yes_no_match(self, tup):
+
+        cache = _yikes_cache_of_tag_subtrees
+        if tup in cache:
+            subtree = cache[tup]
+        else:
+            subtree = _build_tag_subtree(tup)
+            cache[tup] = subtree
+
+        _query = self.end_state().result
+
+        _yn = _query.yes_no_match_via_tag_subtree(subtree)
+        return _yn  # #todo
+
     def point_at(self, w):
         _1, _2 = self.end_state().first_emission_messages[1:3]
         offset_of_where_arrow_is_pointing_to = len(_2) - 1
@@ -89,6 +111,24 @@ def _add_memoizing_methods(cls):
     def end_state(self):
         return _EndState(self)
     cls.end_state = end_state
+
+
+def _build_tag_subtree(tag_emblems):
+    import tag_lyfe.the_tag_model as lib
+    import re
+
+    cache = _yikes_cache_of_tags
+    rx = re.compile('^#([a-z]+)$')
+
+    def f(tag_emblem):
+        if tag_emblem in cache:
+            return cache[tag_emblem]
+        else:
+            tag = lib.tag_via_sanitized_tag_stem(rx.search(tag_emblem)[1])
+            cache[tag_emblem] = tag
+            return tag
+
+    return lib.tag_subtree_via_tags(f(x) for x in tag_emblems)
 
 
 class _EndState:
@@ -132,6 +172,10 @@ class _EndState:
 def _word_regex():
     import re
     return re.compile(r'\w+')
+
+
+_yikes_cache_of_tag_subtrees = {}
+_yikes_cache_of_tags = {}
 
 
 # #history-A.1: things changed at upgrade to python 3.7

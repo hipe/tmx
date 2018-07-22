@@ -140,12 +140,30 @@ class _AND_or_OR_List:
 
 
 class AND_List(_AND_or_OR_List):
+
+    def yes_no_match_via_tag_subtree(self, subtree):
+        yes = True
+        for child in self.children:
+            _yes_ = child.yes_no_match_via_tag_subtree(subtree)
+            if not _yes_:
+                yes = False
+                break
+        return yes
+
     @property
     def conjunction(self):
         return AND
 
 
 class OR_List(_AND_or_OR_List):
+
+    def yes_no_match_via_tag_subtree(self, subtree):
+        for child in self.children:
+            yes = child.yes_no_match_via_tag_subtree(subtree)
+            if yes:
+                break
+        return yes
+
     @property
     def conjunction(self):
         return OR
@@ -188,8 +206,6 @@ _AND_list_or_OR_list_via_conjunction_string = {
         }
 
 
-
-
 class UNSANITIZED_TAG:
 
     def __init__(self, unsanitized_tag_stem):
@@ -203,6 +219,15 @@ class ALL_PURPOSE_TAG:
 
     def __init__(self, tag_stem):
         self.tag_stem = tag_stem
+
+    def yes_no_match_via_tag_subtree(self, subtree):
+        yes = False
+        target = self.tag_stem
+        for tag in subtree:  # ..
+            if tag.tag_stem == target:
+                yes = True
+                break
+        return yes
 
     def to_string(self):  # BUILDS STRING ANEW AT EACH CALL
         return f'#{self.tag_stem}'

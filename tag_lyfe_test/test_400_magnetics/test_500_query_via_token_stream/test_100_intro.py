@@ -77,6 +77,12 @@ class Case300_minimal_OR(_CommonCase, ScaryCommonCase):
     def test_100_query_compiles(self):
         self.query_compiles()
 
+    def test_200_against_other_tag_does_not_match(self):
+        self.does_not_match_against(('#tres',))
+
+    def test_300_against_one_tag_matches(self):
+        self.matches_against(('#two',))
+
 
 class Case400_minimal_AND(_CommonCase, ScaryCommonCase):
 
@@ -86,6 +92,15 @@ class Case400_minimal_AND(_CommonCase, ScaryCommonCase):
     def test_100_query_compiles(self):
         self.query_compiles()
 
+    def test_200_against_one_tag_does_not_match(self):
+        self.does_not_match_against(('#one',))
+
+    def test_200_against_both_tags_matches(self):
+        self.matches_against(('#one', '#two'))
+
+    def test_300_against_both_tags_and_another_matches(self):
+        self.matches_against(('#one', '#tres', '#two'))
+
 
 class Case500_lone_tag(_CommonCase, ScaryCommonCase):
 
@@ -94,6 +109,15 @@ class Case500_lone_tag(_CommonCase, ScaryCommonCase):
 
     def test_100_query_compiles(self):
         self.query_compiles()
+
+    def test_100_against_not_this_does_not_match(self):
+        self.does_not_match_against(('#tres',))
+
+    def test_200_against_yes_this_does_match(self):
+        self.matches_against(('#one',))
+
+    def test_300_against_this_and_others_mathes(self):
+        self.matches_against(('#tres', '#one'))
 
 
 @memoize
