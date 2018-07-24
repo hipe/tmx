@@ -100,6 +100,7 @@ sub-project: upload files to s3
 (-1) try to install every CMS
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
 ? worldwide refactor: [#508] (the emissions thing)
+? worldwide refactor: you did lots of `@property` you did not need
 ☑️ find a parser generator that satisfies that one requirement
 ☑️ yikes do deep survey against all the options
 ? turn soft notes into tags (for no real reason except posterity))
@@ -116,4 +117,4 @@ sub-project: upload files to s3
 (-13) tag lyfe query: the `in` list (`#foo in (bar1, bar2, 22)`), integrate
 (-14) tag lyfe query: `#foo {with|without} value` construct, integrate (consider `#foo:*`)
 (-15) tag lyfe query: the `not` modifier (integrate with everything so far)
-(-16) tag lyfe query: tag with value (atomic) (integers and non)
+cover "unparsed_to" in lots of places

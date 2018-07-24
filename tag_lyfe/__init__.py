@@ -1,5 +1,6 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
+NULL_BYTE_ = '\0'  # (used in next block)
 
 if __name__ == '__main__':
 
@@ -68,9 +69,6 @@ def cover_me(s):
 
 
 _PlatformException = Exception
-
-
-NULL_BYTE_ = '\0'
 
 
 # #born.

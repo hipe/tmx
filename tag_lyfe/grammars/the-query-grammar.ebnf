@@ -2,13 +2,13 @@
 
 start::TopThing
     =
-    payload:atom_or_branch
+    payload:item_or_list
     ( s | $ )
     ;
 
-atom_or_branch::AtomOrBranch
+item_or_list::ItemOrList
     =
-    left:atom right:[more]
+    left:item right:[more]
     ;
 
 more::Continuing
@@ -16,12 +16,32 @@ more::Continuing
     s
     and_or_or:( 'and' | 'or' )
     s ~
-    atom_or_branch:atom_or_branch
+    item_or_list:item_or_list
     ;
 
-atom
+item::Item
     =
-    surface_tag
+    surface_tag:surface_tag
+    deep_selector:[deep_selector]
+    ;
+
+deep_selector::DeepSelector
+    =
+    left:deep_selector_component right:[deep_selector]
+    ;
+
+deep_selector_component::DeepSelectorComponent
+    =
+    ':' ~
+    deep_selector_rough_stem:deep_selector_rough_stem
+    ;
+
+deep_selector_rough_stem
+    =
+    /[-a-zA-Z0-9_]+/ ~
+    # the experimental idea is in the soft pass we'll determine whether
+    # it's a value or a sub-tag (we may not distinguish).
+    # expert mode will be quoted strings #wish [#707.E]
     ;
 
 surface_tag::SurfaceTag
@@ -36,5 +56,8 @@ tag_stem
     ;
 
 s = '\0' ;
+# (above is NULL_BYTE_)
 
+
+# #history-A.1: add deep selectors (exact match)
 # #born.

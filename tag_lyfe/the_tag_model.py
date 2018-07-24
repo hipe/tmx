@@ -15,6 +15,7 @@ query execution; but we can't parse tag subtrees from strings until we have
 the parsing of the queries done (by our own design). fortunately we
 shouldn't be parsing for tag subtrees for this purpose anyway..
 
+:[#707.D]
 """
 
 
@@ -28,12 +29,43 @@ def tag_subtree_via_tags(tags):
     return tuple(tags)  # accord to [#707.B]: use tuples here for now
 
 
+def deep_tag_via_sanitized_pieces(pcs):
+    last = len(pcs) - 1
+
+    def f(cursor):
+        if cursor == last:
+            return _TailTag(pcs[cursor])
+        else:
+            return _DeepTag(pcs[cursor], f(cursor + 1))
+    return f(0)
+
+
 def tag_via_sanitized_tag_stem(sanitized_tag_stem):
     return _SimpleTag(sanitized_tag_stem)
 
 
-class _SimpleTag:
+class _DeepTag:
+
+    def __init__(self, sanitized_tag_stem, child):
+        self.tag_stem = sanitized_tag_stem
+        self.child = child
+
+    is_deep = True
+
+
+class _TailTag:
+
     def __init__(self, sanitized_tag_stem):
         self.tag_stem = sanitized_tag_stem
+
+    is_deep = False
+
+
+class _SimpleTag:
+
+    def __init__(self, sanitized_tag_stem):
+        self.tag_stem = sanitized_tag_stem
+
+    is_deep = False
 
 # #born.

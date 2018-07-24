@@ -26,6 +26,9 @@ machine-readble way.)
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.E  | #trak | quoted string terminal nodes in taggings & queries
+|                   #707.D  | #trak | the catch-22 of development order (see)
+|                   #707.C  | #trak | when we formalize allowable tag names
 |                   #707.B  |       | for now no 'tag subtree' class
 |                   #707    |       | (internal tracking)
 |                   #704    |       | experimental conventions

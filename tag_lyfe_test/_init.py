@@ -100,6 +100,11 @@ class ScaryCommonCase(metaclass=_Watcher):
     def fails(self):
         self.assertIsNone(self.end_state().result)
 
+    def unparses_to(self, s):
+        _wat = self.end_state().result
+        _actual = _wat.to_string()
+        self.assertEqual(_actual, s)
+
     def query_compiles(self):
         sta = self.end_state()
         self.assertIsNotNone(sta.result)
@@ -118,15 +123,27 @@ def _build_tag_subtree(tag_emblems):
     import re
 
     cache = _yikes_cache_of_tags
-    rx = re.compile('^#([a-z]+)$')
 
     def f(tag_emblem):
         if tag_emblem in cache:
             return cache[tag_emblem]
         else:
-            tag = lib.tag_via_sanitized_tag_stem(rx.search(tag_emblem)[1])
+            tag = build(tag_emblem)
             cache[tag_emblem] = tag
             return tag
+
+    def build(tag_emblem):
+        """due to [#707.D] the catch-22 of our development, we can't yet
+        robustly parse such taggings. so, this rough work instead.
+        """
+
+        post_hashtag = pass_1_rx.search(tag_emblem)[1]  # ..
+        if ':' in post_hashtag:
+            return lib.deep_tag_via_sanitized_pieces(post_hashtag.split(':'))
+        else:
+            return lib.tag_via_sanitized_tag_stem(post_hashtag)
+
+    pass_1_rx = re.compile('^#([a-z:]+)$')
 
     return lib.tag_subtree_via_tags(f(x) for x in tag_emblems)
 

@@ -72,7 +72,36 @@ def _make_walker():
             child_EEK_stack.reverse()
             return native_models.UNSANITIZED_LIST(tuple(child_EEK_stack))
 
-        def walk__atom_or_branch(self, node):
+        def walk__continuing(self, node):
+            a_o_o = node.and_or_or
+            child_EEK_stack = self.walk(node.item_or_list)
+            child_EEK_stack.append(a_o_o)
+            return child_EEK_stack
+
+        def walk__item_or_list(self, node):
+            return self._same_buckstop(node)
+
+        def walk__item(self, node):
+            ut = self.walk(node.surface_tag)  # unsanitized tag
+            ds = node.deep_selector
+            if ds is None:
+                return ut
+            else:
+                EEK_stack = self.walk(ds)
+                EEK_stack.reverse()
+                return ut.become_deep__(tuple(EEK_stack))
+
+        def walk__deep_selector(self, node):
+            return self._same_buckstop(node)
+
+        def walk__deep_selector_component(self, node):
+            return native_models.UnsanitizedDeepSelectorComponent(
+                    node.deep_selector_rough_stem)
+
+        def walk__surface_tag(self, node):
+            return native_models.UNSANITIZED_TAG(node.tag_stem)
+
+        def _same_buckstop(self, node):
             left = node.left
             right = node.right
             left_native_AST = self.walk(left)
@@ -82,15 +111,6 @@ def _make_walker():
                 child_EEK_stack = self.walk(right)
                 child_EEK_stack.append(left_native_AST)
                 return child_EEK_stack
-
-        def walk__continuing(self, node):
-            a_o_o = node.and_or_or
-            child_EEK_stack = self.walk(node.atom_or_branch)
-            child_EEK_stack.append(a_o_o)
-            return child_EEK_stack
-
-        def walk__surface_tag(self, node):
-            return native_models.UNSANITIZED_TAG(node.tag_stem)
 
     return MyWalker()
 

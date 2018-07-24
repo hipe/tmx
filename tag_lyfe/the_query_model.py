@@ -206,13 +206,117 @@ _AND_list_or_OR_list_via_conjunction_string = {
         }
 
 
+# == deep tag components (unsanitized then sanitized)
+
+class _UnsanitizedDeepSelector:
+
+    def __init__(self, tup, ut):
+
+        def to_pieces():
+            yield ut.unsanitized_tag_stem
+            for x in tup:
+                yield x.unsanitized_component_stem
+
+        self._unsanitized_pieces = tuple(to_pieces())
+        pass
+
+    def sanitize(self, listener):
+        pieces = pop_property(self, '_unsanitized_pieces')
+        last = len(pieces) - 1
+
+        def f(cursor, deep_class):
+            s = pieces[cursor]
+            if last == cursor:
+                # near [#707.C]: for now allow any string for value expression
+                return _ValueBasedTailSelector(s)
+            else:
+                if not _validate_tag_stem_name(listener, s):
+                    return None
+                child = f(cursor + 1, _NonHeadDeepSelector)
+                if child is None:
+                    return None
+                return deep_class(s, child)
+
+        return f(0, _DeepSelector)
+
+
+class UnsanitizedDeepSelectorComponent:
+
+    def __init__(self, unsanitized_component_stem):
+        self.unsanitized_component_stem = unsanitized_component_stem
+
+
+class _DeepSelNode:
+
+    def _to_string_shallow(self):
+        return f"{self._this_one_char}{self._component_stem}"
+
+
+class _DeepSelDeepNode(_DeepSelNode):
+
+    def __init__(self, sanitized_tag_stem, child):
+        self._this_test = _build_this_test(sanitized_tag_stem, child)
+        self._component_stem = sanitized_tag_stem
+        self._child = child
+
+    def _walk(self):
+        yield self
+        for x in self._child._walk():
+            yield x
+
+
+class _DeepSelector(_DeepSelDeepNode):
+
+    def to_string(self):
+        _wee = [node._to_string_shallow() for node in self._walk()]
+        return ''.join(_wee)
+
+    def yes_no_match_via_tag_subtree(self, subtree):
+        return _in_subtree_match_any_one(subtree, self._this_test)
+
+    _this_one_char = '#'
+
+
+class _NonHeadDeepSelector(_DeepSelDeepNode):
+
+    def _yes_no_match_via_tagging(self, tagging):
+        return self._this_test(tagging)  # #hi.
+
+    _this_one_char = ':'
+
+
+class _ValueBasedTailSelector(_DeepSelNode):
+
+    def __init__(self, any_string):
+        self._component_stem = any_string
+
+    def _yes_no_match_via_tagging(self, tagging):
+        if tagging.is_deep:
+            # #coverpoint1.16.3: deeper tag matches shallower query
+            return self._component_stem == tagging.tag_stem
+        else:
+            return self._component_stem == tagging.tag_stem
+
+    def _walk(self):
+        yield self
+
+    _this_one_char = ':'
+
+
+# == the head tag component (unsanitized then sanitized)
+
 class UNSANITIZED_TAG:
 
     def __init__(self, unsanitized_tag_stem):
         self.unsanitized_tag_stem = unsanitized_tag_stem
 
+    def become_deep__(self, tup):
+        return _UnsanitizedDeepSelector(tup, self)
+
     def sanitize(self, listener):
-        return ALL_PURPOSE_TAG(self.unsanitized_tag_stem)
+        s = pop_property(self, 'unsanitized_tag_stem')
+        if _validate_tag_stem_name(listener, s):
+            return ALL_PURPOSE_TAG(s)
 
 
 class ALL_PURPOSE_TAG:
@@ -221,16 +325,48 @@ class ALL_PURPOSE_TAG:
         self.tag_stem = tag_stem
 
     def yes_no_match_via_tag_subtree(self, subtree):
-        yes = False
         target = self.tag_stem
-        for tag in subtree:  # ..
-            if tag.tag_stem == target:
-                yes = True
-                break
-        return yes
 
-    def to_string(self):  # BUILDS STRING ANEW AT EACH CALL
+        def yes_no_via_tag(tag):
+            return tag.tag_stem == target
+
+        return _in_subtree_match_any_one(subtree, yes_no_via_tag)
+
+    def to_string(self):  # BUILDS STRING ANEW AT EACH CALL. ##here2
         return f'#{self.tag_stem}'
+
+
+# == support
+
+
+def _in_subtree_match_any_one(subtree, yes_no_via_tag):
+    yes = False
+    for tag in subtree:  # ..
+        if yes_no_via_tag(tag):
+            yes = True
+            break
+    return yes
+
+
+def _build_this_test(query_component_stem, query_child):
+
+    def yes_no_via_tag(tagging):
+        # you know that your query (from this node) is deep..
+
+        if tagging.is_deep:
+            if query_component_stem == tagging.tag_stem:
+                return query_child._yes_no_match_via_tagging(tagging.child)
+            else:
+                return False  # covered
+        else:
+            # #coverpoint1.16.2 deeper query won't match shallower tagging
+            return False
+
+    return yes_no_via_tag
+
+
+def _validate_tag_stem_name(listener, s):  # #track [#707.C] when we formalize
+    return True
 
 
 # #born.
