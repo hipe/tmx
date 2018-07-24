@@ -8,10 +8,10 @@ start::TopThing
 
 item_or_list::ItemOrList
     =
-    left:item right:[more]
+    left:item right:[conjuncted]
     ;
 
-more::Continuing
+conjuncted::Conjuncted
     =
     s
     and_or_or:( 'and' | 'or' )
@@ -19,7 +19,21 @@ more::Continuing
     item_or_list:item_or_list
     ;
 
-item::Item
+item
+    =
+    | negated_function
+    | tagging_matcher
+    ;
+
+negated_function::NegatedFunction
+    =
+    'not' s ~
+    function_that_is_negated:(
+        tagging_matcher
+    )
+    ;
+
+tagging_matcher::TaggingMatcher
     =
     surface_tag:surface_tag
     deep_selector:[deep_selector]
@@ -59,5 +73,6 @@ s = '\0' ;
 # (above is NULL_BYTE_)
 
 
+# #history-A.2: introduce negation
 # #history-A.1: add deep selectors (exact match)
 # #born.

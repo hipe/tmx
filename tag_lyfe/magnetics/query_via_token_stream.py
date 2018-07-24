@@ -72,7 +72,7 @@ def _make_walker():
             child_EEK_stack.reverse()
             return native_models.UNSANITIZED_LIST(tuple(child_EEK_stack))
 
-        def walk__continuing(self, node):
+        def walk__conjuncted(self, node):
             a_o_o = node.and_or_or
             child_EEK_stack = self.walk(node.item_or_list)
             child_EEK_stack.append(a_o_o)
@@ -81,7 +81,11 @@ def _make_walker():
         def walk__item_or_list(self, node):
             return self._same_buckstop(node)
 
-        def walk__item(self, node):
+        def walk__negated_function(self, node):
+            _ohai = self.walk(node.function_that_is_negated)
+            return native_models.UnsanitizedNegation(_ohai)
+
+        def walk__tagging_matcher(self, node):
             ut = self.walk(node.surface_tag)  # unsanitized tag
             ds = node.deep_selector
             if ds is None:
@@ -99,7 +103,7 @@ def _make_walker():
                     node.deep_selector_rough_stem)
 
         def walk__surface_tag(self, node):
-            return native_models.UNSANITIZED_TAG(node.tag_stem)
+            return native_models.UnsanitizedShallowOrDeepTag(node.tag_stem)
 
         def _same_buckstop(self, node):
             left = node.left

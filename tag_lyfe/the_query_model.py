@@ -50,6 +50,17 @@ from tag_lyfe import (
         )
 
 
+# == support (early because etc)
+
+
+def _to_string_using_wordables(self):
+    """we don't use NULL_BYTE_ we use space! just like, a convention man"""
+
+    return ' '.join(x.to_string() for x in self._wordables())
+
+
+# == AND lists and OR lists
+
 class UNSANITIZED_LIST:
     """
     get a thing in something like the form:
@@ -77,7 +88,7 @@ class UNSANITIZED_LIST:
 
         sani_node = sanitized_node_via_stack_pop()
         if sani_node is None:
-            return None
+            return
 
         elif 0 == len(stack):
             return sani_node  # CHANGE STRUCTURE (native ASTs: no 1-len lists)
@@ -88,7 +99,7 @@ class UNSANITIZED_LIST:
 
                 sani_node = sanitized_node_via_stack_pop()
                 if sani_node is None:
-                    return None
+                    return
 
                 sani_nodes.append(sani_node)
                 if 0 == len(stack):
@@ -99,7 +110,7 @@ class UNSANITIZED_LIST:
 
                     self._whine(listener, sani_nodes, next_and_or_or, current_and_or_or)  # noqa: E501
 
-                    return None
+                    return
 
         return self._build_thing(tuple(sani_nodes), current_and_or_or)
 
@@ -169,11 +180,6 @@ class OR_List(_AND_or_OR_List):
         return OR
 
 
-# (these have to be defined here because they are used #here1 below)
-AND = 1
-OR = 2
-
-
 def _build_sep_via_conj():  # silly fun..
 
     def same(s, which):
@@ -197,6 +203,10 @@ def _build_sep_via_conj():  # silly fun..
     return _seperator_via_conjunction
 
 
+AND = 1  # (define these here because they are used in the next call #here1)
+OR = 2
+
+
 _seperator_via_conjunction = _build_sep_via_conj()
 
 
@@ -204,6 +214,44 @@ _AND_list_or_OR_list_via_conjunction_string = {
         'and': AND_List,
         'or': OR_List,
         }
+
+
+# == negation
+
+class UnsanitizedNegation:
+
+    def __init__(self, function):
+        self._function = function
+
+    def sanitize(self, listener):
+        _unsani = pop_property(self, '_function')
+        sani = _unsani.sanitize(listener)
+        if sani is None:
+            return
+        return _Negation(sani)
+
+
+class _Negation:
+
+    def __init__(self, function):
+        self._function = function
+
+    def yes_no_match_via_tag_subtree(self, subtree):
+        _yes = self._function.yes_no_match_via_tag_subtree(subtree)
+        return not _yes
+
+    to_string = _to_string_using_wordables
+
+    def _wordables(self):
+        yield _NOT_AS_WORDABLE
+        for x in self._function._wordables():
+            yield x
+
+
+class _NOT_AS_WORDABLE:  # #class-as-namespace
+
+    def to_string():
+        return 'not'
 
 
 # == deep tag components (unsanitized then sanitized)
@@ -231,10 +279,10 @@ class _UnsanitizedDeepSelector:
                 return _ValueBasedTailSelector(s)
             else:
                 if not _validate_tag_stem_name(listener, s):
-                    return None
+                    return
                 child = f(cursor + 1, _NonHeadDeepSelector)
                 if child is None:
-                    return None
+                    return
                 return deep_class(s, child)
 
         return f(0, _DeepSelector)
@@ -259,20 +307,23 @@ class _DeepSelDeepNode(_DeepSelNode):
         self._component_stem = sanitized_tag_stem
         self._child = child
 
-    def _walk(self):
+    def _components(self):
         yield self
-        for x in self._child._walk():
+        for x in self._child._components():
             yield x
 
 
 class _DeepSelector(_DeepSelDeepNode):
 
-    def to_string(self):
-        _wee = [node._to_string_shallow() for node in self._walk()]
-        return ''.join(_wee)
-
     def yes_no_match_via_tag_subtree(self, subtree):
         return _in_subtree_match_any_one(subtree, self._this_test)
+
+    def to_string(self):
+        _wee = [node._to_string_shallow() for node in self._components()]
+        return ''.join(_wee)
+
+    def _wordables(self):
+        yield self
 
     _this_one_char = '#'
 
@@ -297,7 +348,7 @@ class _ValueBasedTailSelector(_DeepSelNode):
         else:
             return self._component_stem == tagging.tag_stem
 
-    def _walk(self):
+    def _components(self):
         yield self
 
     _this_one_char = ':'
@@ -305,7 +356,7 @@ class _ValueBasedTailSelector(_DeepSelNode):
 
 # == the head tag component (unsanitized then sanitized)
 
-class UNSANITIZED_TAG:
+class UnsanitizedShallowOrDeepTag:
 
     def __init__(self, unsanitized_tag_stem):
         self.unsanitized_tag_stem = unsanitized_tag_stem
@@ -316,10 +367,10 @@ class UNSANITIZED_TAG:
     def sanitize(self, listener):
         s = pop_property(self, 'unsanitized_tag_stem')
         if _validate_tag_stem_name(listener, s):
-            return ALL_PURPOSE_TAG(s)
+            return _ShallowTag(s)
 
 
-class ALL_PURPOSE_TAG:
+class _ShallowTag:
 
     def __init__(self, tag_stem):
         self.tag_stem = tag_stem
@@ -331,6 +382,9 @@ class ALL_PURPOSE_TAG:
             return tag.tag_stem == target
 
         return _in_subtree_match_any_one(subtree, yes_no_via_tag)
+
+    def _wordables(self):
+        yield self
 
     def to_string(self):  # BUILDS STRING ANEW AT EACH CALL. ##here2
         return f'#{self.tag_stem}'
