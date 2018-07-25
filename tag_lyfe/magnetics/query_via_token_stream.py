@@ -86,6 +86,15 @@ def _make_walker():
             return native_models.UnsanitizedNegation(_ohai)
 
         def walk__tagging_matcher(self, node):
+            tp = self.walk(node.tagging_path)
+            mf = node.modifying_suffix
+            if mf is None:
+                return tp
+            else:
+                mf = self.walk(mf[1])
+                return mf.unsanitized_via_finish(tp)
+
+        def walk__tagging_path(self, node):
             ut = self.walk(node.surface_tag)  # unsanitized tag
             ds = node.deep_selector
             if ds is None:
@@ -105,6 +114,10 @@ def _make_walker():
         def walk__surface_tag(self, node):
             return native_models.UnsanitizedShallowOrDeepTag(node.tag_stem)
 
+        def walk__with_or_without_value(self, node):
+            _yes = true_false_via_with_or_without[node.with_or_without]
+            return native_models.UnsanitizedWithOrWithoutFirstStep(_yes)
+
         def _same_buckstop(self, node):
             left = node.left
             right = node.right
@@ -115,6 +128,11 @@ def _make_walker():
                 child_EEK_stack = self.walk(right)
                 child_EEK_stack.append(left_native_AST)
                 return child_EEK_stack
+
+    true_false_via_with_or_without = {
+            'with': True,
+            'without': False,
+            }
 
     return MyWalker()
 

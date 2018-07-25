@@ -35,6 +35,12 @@ negated_function::NegatedFunction
 
 tagging_matcher::TaggingMatcher
     =
+    tagging_path:tagging_path
+    modifying_suffix:[s modifying_suffix]
+    ;
+
+tagging_path::TaggingPath
+    =
     surface_tag:surface_tag
     deep_selector:[deep_selector]
     ;
@@ -69,10 +75,24 @@ tag_stem
     # (the above is a very temporary, over-simplified placeholder)
     ;
 
+modifying_suffix
+    =
+    with_or_without_value
+    ;
+
+with_or_without_value::WithOrWithoutValue
+    =
+    with_or_without:( 'without' | 'with' )
+    # (the above isn't pretty on the AST side if you do it the way you want)
+    s ~
+    'value'
+    ;
+
 s = '\0' ;
 # (above is NULL_BYTE_)
 
 
+# #history-A.3: introduce `with value`, `without value`
 # #history-A.2: introduce negation
 # #history-A.1: add deep selectors (exact match)
 # #born.

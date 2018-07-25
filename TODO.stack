@@ -115,4 +115,3 @@ sub-project: upload files to s3
 (-11) tag lyfe query: the `in` regex construct
 (-12) tag lyfe query: the `in` range construct
 (-13) tag lyfe query: the `in` list (`#foo in (bar1, bar2, 22)`), integrate
-(-14) tag lyfe query: `#foo {with|without} value` construct, integrate (consider `#foo:*`)

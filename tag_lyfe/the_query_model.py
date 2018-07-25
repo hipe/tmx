@@ -483,6 +483,74 @@ class _TagNameChainNonHeadNode(_NameChainNode):
     _glyph_thing = ':'
 
 
+# == suffixed modifier: with or without value
+
+class UnsanitizedWithOrWithoutFirstStep:
+
+    def __init__(self, yes):
+        self._yes = yes
+
+    def unsanitized_via_finish(self, x):
+        return _UnsanitizedWithOrWithoutValue(x, pop_property(self, '_yes'))
+
+
+class _UnsanitizedWithOrWithoutValue:
+
+    def __init__(self, child, yes):
+        self._child = child
+        self._yes = yes
+
+    def sanitize(self, listener):
+        x = pop_property(self, '_child').sanitize(listener)
+        if x is None:
+            return
+        return (_WithValue if self._yes else _WithoutValue)(x)
+
+
+class _WithOrWithoutValue:
+
+    def __init__(self, child):
+        my_test = self.__class__._my_test
+
+        def f(tagging):
+            found = child._dig_recursive(tagging)
+            if found is not None:
+                return my_test(found)
+
+        self._this_test = f
+        self._child = child
+
+    def yes_no_match_via_tag_subtree(self, subtree):  # ##here2
+        return _in_subtree_match_any_one(subtree, self._this_test)
+
+    to_string = _to_string_using_wordables
+
+    def _wordables(self):  # for #here3
+        for w in self._child._wordables():
+            yield w
+        yield self._keyword_wordable
+        yield _VALUE_AS_WORDABLE
+
+
+class _WithValue(_WithOrWithoutValue):
+
+    def _my_test(tagging):
+        return tagging.is_deep
+
+    _keyword_wordable = _wordable('with')
+
+
+class _WithoutValue(_WithOrWithoutValue):
+
+    def _my_test(tagging):
+        return not tagging.is_deep
+
+    _keyword_wordable = _wordable('without')
+
+
+_VALUE_AS_WORDABLE = _wordable('value')
+
+
 # == support
 
 def _in_subtree_match_any_one(subtree, yes_no_via_tag):
