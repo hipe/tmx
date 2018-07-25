@@ -52,11 +52,33 @@ from tag_lyfe import (
 
 # == support (early because etc)
 
+""".:#here3: "wordables" is an experimental local micro-API.
+
+a "wordable" is a component-ish that:
+  - exposes `to_string()` which produces a string that
+  - can be joined with other such strings meaningfully with a space and
+  - probably dosn't contain any such separator spaces itself
+
+this micro-API is useful because it:
+  - trivializes the implementation of `to_string` for macro-components (that
+    is, components that consist of only other components).
+"""
+
 
 def _to_string_using_wordables(self):
-    """we don't use NULL_BYTE_ we use space! just like, a convention man"""
+    """
+    (see #here3 the "wordables" API of which we are perhaps the sole client)
+    here we don't use NULL_BYTE_ we use space because we can and it's prettier
+    """
 
     return ' '.join(x.to_string() for x in self._wordables())
+
+
+def _wordable(s):
+    class x:  # #class-as-namespace
+        def to_string():
+            return s
+    return x
 
 
 # == AND lists and OR lists
@@ -242,119 +264,62 @@ class _Negation:
 
     to_string = _to_string_using_wordables
 
-    def _wordables(self):
+    def _wordables(self):  # for #here3
         yield _NOT_AS_WORDABLE
         for x in self._function._wordables():
             yield x
 
 
-class _NOT_AS_WORDABLE:  # #class-as-namespace
-
-    def to_string():
-        return 'not'
+_NOT_AS_WORDABLE = _wordable('not')
 
 
-# == deep tag components (unsanitized then sanitized)
+# == tag as name chain (unsanitized then sanitized)
 
-class _UnsanitizedDeepSelector:
+"""the "name chain" model :#here5:
 
-    def __init__(self, tup, ut):
+categories of surface representation for (what we call) "taggings" include:
+    - a simple, one-component tagging like `#foo`. (a "shallow tag".)
+    - the tagging that looks like a name-value pair: `#foo:bar`
+    - and taggings of arbitrary, deeper depth `#foo:bar:baz`
 
-        def to_pieces():
-            yield ut.unsanitized_tag_stem
-            for x in tup:
-                yield x.unsanitized_component_stem
+queries for matching tags have as a subset of their surface phenomena
+expressions that look identical to taggings. that is, `#foo:bar` is a query
+that matches taggings of `#foo:bar` (sort of).
 
-        self._unsanitized_pieces = tuple(to_pieces())
-        pass
+for now we'll describe our current (simplified) model for queries for
+taggings in the context of the older (more complicated) model it replaces:
 
-    def sanitize(self, listener):
-        pieces = pop_property(self, '_unsanitized_pieces')
-        last = len(pieces) - 1
+it got too complicated to keep track of all the different classes: we had
+sanitized and unsanitized for both "deep selectors" and shallow, and of deep
+selectors we had head and non-head components. our answer to this is the
+"name chain model":
 
-        def f(cursor, deep_class):
-            s = pieces[cursor]
-            if last == cursor:
-                # near [#707.C]: for now allow any string for value expression
-                return _ValueBasedTailSelector(s)
-            else:
-                if not _validate_tag_stem_name(listener, s):
-                    return
-                child = f(cursor + 1, _NonHeadDeepSelector)
-                if child is None:
-                    return
-                return deep_class(s, child)
+what we used to call "deep selectors" we just call "name chains" now, and
+what we used to call a "shallow tag" is just the 1-length case of a name chain.
 
-        return f(0, _DeepSelector)
+every name chain has the following conceptual structure:
+
+    head_node [ non_head_node [ non_head_node [..]]]
+
+whereby:
+  - every "link" in the chain is a _node_. (the terms are _somewhat_
+    interchangeable but we prefer "node" to emphasize the recursive aspect..)
+  - implementation-wise, we're doing the recursive thing for reasons (whereby:)
+  - every node either has a child or doesn't have a child.
+  - every node is either a "head" node or a non-head node. (only for rendering)
+  - (corollary): all chains have exactly one "tail node" (which might also be
+    the head node). the "tail node"-ness of a node is exactly one-to-one with
+    whether or not the node has a child; that is, these are two features of
+    the same category of node.
+"""
 
 
 class UnsanitizedDeepSelectorComponent:
+    """(built only to be consumed by the next class)"""
 
     def __init__(self, unsanitized_component_stem):
         self.unsanitized_component_stem = unsanitized_component_stem
 
-
-class _DeepSelNode:
-
-    def _to_string_shallow(self):
-        return f"{self._this_one_char}{self._component_stem}"
-
-
-class _DeepSelDeepNode(_DeepSelNode):
-
-    def __init__(self, sanitized_tag_stem, child):
-        self._this_test = _build_this_test(sanitized_tag_stem, child)
-        self._component_stem = sanitized_tag_stem
-        self._child = child
-
-    def _components(self):
-        yield self
-        for x in self._child._components():
-            yield x
-
-
-class _DeepSelector(_DeepSelDeepNode):
-
-    def yes_no_match_via_tag_subtree(self, subtree):
-        return _in_subtree_match_any_one(subtree, self._this_test)
-
-    def to_string(self):
-        _wee = [node._to_string_shallow() for node in self._components()]
-        return ''.join(_wee)
-
-    def _wordables(self):
-        yield self
-
-    _this_one_char = '#'
-
-
-class _NonHeadDeepSelector(_DeepSelDeepNode):
-
-    def _yes_no_match_via_tagging(self, tagging):
-        return self._this_test(tagging)  # #hi.
-
-    _this_one_char = ':'
-
-
-class _ValueBasedTailSelector(_DeepSelNode):
-
-    def __init__(self, any_string):
-        self._component_stem = any_string
-
-    def _yes_no_match_via_tagging(self, tagging):
-        if tagging.is_deep:
-            # #coverpoint1.16.3: deeper tag matches shallower query
-            return self._component_stem == tagging.tag_stem
-        else:
-            return self._component_stem == tagging.tag_stem
-
-    def _components(self):
-        yield self
-
-    _this_one_char = ':'
-
-
-# == the head tag component (unsanitized then sanitized)
 
 class UnsanitizedShallowOrDeepTag:
 
@@ -362,36 +327,163 @@ class UnsanitizedShallowOrDeepTag:
         self.unsanitized_tag_stem = unsanitized_tag_stem
 
     def become_deep__(self, tup):
-        return _UnsanitizedDeepSelector(tup, self)
+
+        def to_pieces():
+            yield self._release_head_name()
+            for x in tup:
+                yield x.unsanitized_component_stem
+
+        return _UnsanitizedNameChain(tuple(to_pieces()))
+
+    def sanitize(self, listener):  # i.e, stay shallow
+
+        _s = self._release_head_name()
+        _unc = _UnsanitizedNameChain((_s,))
+        return _unc.sanitize(listener)
+
+    def _release_head_name(self):
+        return pop_property(self, 'unsanitized_tag_stem')
+
+
+"""
+about validating tag names :#here4:
+
+- the broad idea is that the grammar itself does a coarse-pass de-facto
+  validation of tag names (because the grammar describes a pattern for tag
+  names, to the extent that it does)
+- then in a second, fine-grained pass we can do a more detailed validation.
+  (this is [#707.C] not yet fully implemented because we haven't decided
+  what the exact spec should be and we don't really care yet.)
+- but curve-ball: there are pieces that "seem like" the "value" part of a
+  name-value pair. for example, we want to allow such an construction:
+      #author:"Ta Nehisi Coates"
+  but we don't want to allow spaces for elements that "feel like" tags:
+      #"Ta Nahesi Coates"
+  so not this either:
+      #author:"Ta Nahesi Coates":awesome
+
+so we want to validate as a tag name all those pieces of the name chain
+that are not to be considered a possible "value piece". let's consider
+where the "value piece" falls based on how many pieces total there are:
+
+    1 piece:          tag_stem
+    2 pieces:         tag_stem value_piece
+    3 pieces:         tag_stem tag_stem value_piece
+    4 pieces, etc:    tag_stem tag_stem tag_stem value_piece
+
+- so note the first piece is always treated as a tag name and never a value
+  piece, but otherwise the last piece is always treated as a value piece.
+- [#707.E] tracks do not want the usual restrictions
+  on tag names.
+"""
+
+
+class _UnsanitizedNameChain:
+
+    def __init__(self, pcs):
+        self._unsanitized_pieces = pcs
 
     def sanitize(self, listener):
-        s = pop_property(self, 'unsanitized_tag_stem')
-        if _validate_tag_stem_name(listener, s):
-            return _ShallowTag(s)
+
+        unsanitized_pieces = pop_property(self, '_unsanitized_pieces')
+        length = len(unsanitized_pieces)
+
+        # validate as a tag name those components from offset 0 to offset
+        # length - 2 (or as appropriate). exactly #here4
+
+        if 1 < length:
+            # treat tail as a value-esque IFF 2 or or more components
+            use_length = length - 1
+        else:
+            use_length = 1
+
+        for i in range(0, use_length):
+            if not _validate_tag_stem_name(listener, unsanitized_pieces[i]):
+                return
+
+        sanitized_pieces = unsanitized_pieces
+        del(unsanitized_pieces)
+
+        # now, build the chain from the inside out #here5
+
+        current_node = None
+        if 1 < length:
+            for i in reversed(range(1, length)):
+                current_node = _TagNameChainNonHeadNode(
+                        sanitized_pieces[i], current_node)
+
+        return _TagNameChainHeadNode(sanitized_pieces[0], current_node)
 
 
-class _ShallowTag:
+class _NameChainNode:
 
-    def __init__(self, tag_stem):
-        self.tag_stem = tag_stem
+    def __init__(self, name_stem, child=None):
+        if child is None:
+            self._has_child = False
+        else:
+            self._child = child
+            self._has_child = True
+        self._stem = name_stem
+        self._init_dig_recursive()
 
-    def yes_no_match_via_tag_subtree(self, subtree):
-        target = self.tag_stem
+    def yes_no_match_via_tag_subtree(self, subtree):  # ##here2
+        return _in_subtree_match_any_one(subtree, self._simple_match)
 
-        def yes_no_via_tag(tag):
-            return tag.tag_stem == target
+    def _simple_match(self, tagging):
+        _inner_tagging = self._dig_recursive(tagging)
+        return _inner_tagging is not None
 
-        return _in_subtree_match_any_one(subtree, yes_no_via_tag)
+    def _init_dig_recursive(self):
 
-    def _wordables(self):
+        name_stem = self._stem
+
+        def name_matches(tagging):
+            return name_stem == tagging.tag_stem
+
+        if self._has_child:
+            child = self._child
+
+            def f(tagging):
+                if not tagging.is_deep:
+                    # #coverpoint1.16.2 deeper query won't match shallower tag
+                    return
+                if name_matches(tagging):
+                    return child._dig_recursive(tagging.child)
+        else:
+            def f(tagging):
+                if name_matches(tagging):
+                    if tagging.is_deep:
+                        # #coverpoint1.16.3: deeper tag matches shallower query
+                        return tagging
+                    else:
+                        return tagging
+        self._dig_recursive = f
+
+    def _wordables(self):  # for #here3
         yield self
 
-    def to_string(self):  # BUILDS STRING ANEW AT EACH CALL. ##here2
-        return f'#{self.tag_stem}'
+    def to_string(self):  # BUILDS STRING ANEW AT EACH CALL.
+        return ''.join(self._piece_strings())
+
+    def _piece_strings(self):
+        yield self._glyph_thing
+        yield self._stem
+        if self._has_child:
+            for s in self._child._piece_strings():
+                yield s
+
+
+class _TagNameChainHeadNode(_NameChainNode):
+
+    _glyph_thing = '#'
+
+
+class _TagNameChainNonHeadNode(_NameChainNode):
+
+    _glyph_thing = ':'
 
 
 # == support
-
 
 def _in_subtree_match_any_one(subtree, yes_no_via_tag):
     yes = False
@@ -402,25 +494,9 @@ def _in_subtree_match_any_one(subtree, yes_no_via_tag):
     return yes
 
 
-def _build_this_test(query_component_stem, query_child):
-
-    def yes_no_via_tag(tagging):
-        # you know that your query (from this node) is deep..
-
-        if tagging.is_deep:
-            if query_component_stem == tagging.tag_stem:
-                return query_child._yes_no_match_via_tagging(tagging.child)
-            else:
-                return False  # covered
-        else:
-            # #coverpoint1.16.2 deeper query won't match shallower tagging
-            return False
-
-    return yes_no_via_tag
-
-
 def _validate_tag_stem_name(listener, s):  # #track [#707.C] when we formalize
     return True
 
 
+# #history-A.1: deep vs shallow distinction out. simplified name-chain model in
 # #born.
