@@ -52,12 +52,18 @@ from tag_lyfe import (
 
 # == support (early because etc)
 
-""".:#here3: "wordables" is an experimental local micro-API.
+""".:#here3: :[#707.F]: "wordables" is an experimental local micro-API:
 
 a "wordable" is a component-ish that:
   - exposes `to_string()` which produces a string that
   - can be joined with other such strings meaningfully with a space and
   - probably dosn't contain any such separator spaces itself
+
+for example, the name "Ta Nahesi Coates" would constist of three wordable
+objects. one object's `to_string()` method would produce "Ta"; another
+object would produce "Nahesi", etc. (we would prefer that a wordable not
+output a string like "Ta Nahesi" because we would prefer that the client
+(not the wordable) chose the separator character.)
 
 this micro-API is useful because it:
   - trivializes the implementation of `to_string` for macro-components (that
@@ -65,16 +71,16 @@ this micro-API is useful because it:
 """
 
 
-def _to_string_using_wordables(self):
+def to_string_using_wordables_(self):
     """
     (see #here3 the "wordables" API of which we are perhaps the sole client)
     here we don't use NULL_BYTE_ we use space because we can and it's prettier
     """
 
-    return ' '.join(x.to_string() for x in self._wordables())
+    return ' '.join(x.to_string() for x in self.wordables_())
 
 
-def _wordable(s):
+def wordable_via_string_(s):
     class x:  # #class-as-namespace
         def to_string():
             return s
@@ -262,15 +268,15 @@ class _Negation:
         _yes = self._function.yes_no_match_via_tag_subtree(subtree)
         return not _yes
 
-    to_string = _to_string_using_wordables
+    to_string = to_string_using_wordables_
 
-    def _wordables(self):  # for #here3
+    def wordables_(self):  # for #here3
         yield _NOT_AS_WORDABLE
-        for x in self._function._wordables():
+        for x in self._function.wordables_():
             yield x
 
 
-_NOT_AS_WORDABLE = _wordable('not')
+_NOT_AS_WORDABLE = wordable_via_string_('not')
 
 
 # == tag as name chain (unsanitized then sanitized)
@@ -427,10 +433,10 @@ class _NameChainNode:
         self._init_dig_recursive()
 
     def yes_no_match_via_tag_subtree(self, subtree):  # ##here2
-        return _in_subtree_match_any_one(subtree, self._simple_match)
+        return in_subtree_match_any_one_(subtree, self._simple_match)
 
     def _simple_match(self, tagging):
-        _inner_tagging = self._dig_recursive(tagging)
+        _inner_tagging = self.dig_recursive_(tagging)
         return _inner_tagging is not None
 
     def _init_dig_recursive(self):
@@ -448,7 +454,7 @@ class _NameChainNode:
                     # #coverpoint1.16.2 deeper query won't match shallower tag
                     return
                 if name_matches(tagging):
-                    return child._dig_recursive(tagging.child)
+                    return child.dig_recursive_(tagging.child)
         else:
             def f(tagging):
                 if name_matches(tagging):
@@ -457,9 +463,9 @@ class _NameChainNode:
                         return tagging
                     else:
                         return tagging
-        self._dig_recursive = f
+        self.dig_recursive_ = f
 
-    def _wordables(self):  # for #here3
+    def wordables_(self):  # for #here3
         yield self
 
     def to_string(self):  # BUILDS STRING ANEW AT EACH CALL.
@@ -513,7 +519,7 @@ class _WithOrWithoutValue:
         my_test = self.__class__._my_test
 
         def f(tagging):
-            found = child._dig_recursive(tagging)
+            found = child.dig_recursive_(tagging)
             if found is not None:
                 return my_test(found)
 
@@ -521,15 +527,15 @@ class _WithOrWithoutValue:
         self._child = child
 
     def yes_no_match_via_tag_subtree(self, subtree):  # ##here2
-        return _in_subtree_match_any_one(subtree, self._this_test)
+        return in_subtree_match_any_one_(subtree, self._this_test)
 
-    to_string = _to_string_using_wordables
+    to_string = to_string_using_wordables_
 
-    def _wordables(self):  # for #here3
-        for w in self._child._wordables():
+    def wordables_(self):  # for #here3
+        for w in self._child.wordables_():
             yield w
         yield self._keyword_wordable
-        yield _VALUE_AS_WORDABLE
+        yield _value_as_wordable
 
 
 class _WithValue(_WithOrWithoutValue):
@@ -537,7 +543,7 @@ class _WithValue(_WithOrWithoutValue):
     def _my_test(tagging):
         return tagging.is_deep
 
-    _keyword_wordable = _wordable('with')
+    _keyword_wordable = wordable_via_string_('with')
 
 
 class _WithoutValue(_WithOrWithoutValue):
@@ -545,15 +551,15 @@ class _WithoutValue(_WithOrWithoutValue):
     def _my_test(tagging):
         return not tagging.is_deep
 
-    _keyword_wordable = _wordable('without')
+    _keyword_wordable = wordable_via_string_('without')
 
 
-_VALUE_AS_WORDABLE = _wordable('value')
+_value_as_wordable = wordable_via_string_('value')
 
 
 # == support
 
-def _in_subtree_match_any_one(subtree, yes_no_via_tag):
+def in_subtree_match_any_one_(subtree, yes_no_via_tag):
     yes = False
     for tag in subtree:  # ..
         if yes_no_via_tag(tag):

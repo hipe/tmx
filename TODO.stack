@@ -114,4 +114,3 @@ sub-project: upload files to s3
 (-10) tag lyfe query: create and (for all `in` construct) ingtegrate deep selector
 (-11) tag lyfe query: the `in` regex construct
 (-12) tag lyfe query: the `in` range construct
-(-13) tag lyfe query: the `in` list (`#foo in (bar1, bar2, 22)`), integrate

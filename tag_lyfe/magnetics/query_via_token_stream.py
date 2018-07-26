@@ -114,20 +114,40 @@ def _make_walker():
         def walk__surface_tag(self, node):
             return native_models.UnsanitizedShallowOrDeepTag(node.tag_stem)
 
+        def walk__in_suffix(self, node):
+            _strings = self.walk(node.in_suffix_payload)
+            from tag_lyfe.the_query_model_plugins import in_list_of_values as o
+            return o.UnsanitizedInSuffix(_strings)
+
+        def walk__list_of_values_for_in_suffix(self, node):
+            x_a = self._SIMPLE_buckstop(node.values_for_in_suffix)
+            x_a.reverse()
+            return tuple(x_a)
+
         def walk__with_or_without_value(self, node):
             _yes = true_false_via_with_or_without[node.with_or_without]
             return native_models.UnsanitizedWithOrWithoutFirstStep(_yes)
 
         def _same_buckstop(self, node):
+            return self._reversed_list_from_common_right_recursion(
+                    node, self.walk, self.walk)
+
+        def _SIMPLE_buckstop(self, node):
+            return self._reversed_list_from_common_right_recursion(
+                    node, lambda x: x, self._SIMPLE_buckstop)
+
+        def _reversed_list_from_common_right_recursion(
+                self, node, walk_left, walk_right):
+
             left = node.left
             right = node.right
-            left_native_AST = self.walk(left)
+            left_native_AST = walk_left(left)
             if right is None:
                 return [left_native_AST]  # the buck starts :#here1
             else:
-                child_EEK_stack = self.walk(right)
-                child_EEK_stack.append(left_native_AST)
-                return child_EEK_stack
+                mutable_reversed_list = walk_right(right)
+                mutable_reversed_list.append(left_native_AST)
+                return mutable_reversed_list
 
     true_false_via_with_or_without = {
             'with': True,

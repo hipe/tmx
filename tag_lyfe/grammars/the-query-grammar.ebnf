@@ -77,8 +77,46 @@ tag_stem
 
 modifying_suffix
     =
-    with_or_without_value
+    | in_suffix
+    | with_or_without_value
     ;
+
+in_suffix::InSuffix
+    =
+    'in' s ~ in_suffix_payload:in_suffix_payload
+    ;
+
+in_suffix_payload
+    =
+    list_of_values_for_in_suffix
+    ;
+
+list_of_values_for_in_suffix::ListOfValuesForInSuffix
+    =
+    '(' ~
+    values_for_in_suffix:values_for_in_suffix
+    s
+    ')' ~
+    ;
+
+values_for_in_suffix
+    =
+    s
+    left:atomic_value
+    ~
+    right:[values_for_in_suffix]
+    ;
+
+atomic_value
+    =
+    /[-a-zA-Z0-9_.]+/ ~
+    ;
+    # for one thing, compare to `tag_stem` above .. unify these near [#703.C].
+    # for another thing, at writing we realized [#707.E] string quoting is a
+    # modality concern and so something we should not want here. (consider,
+    # for example, that we don't generally need it from the shell, right?)
+    # but we still have to detect the ')' and we don't want our own escaping
+    # rules so we're sidestepping this for a while longerr ..
 
 with_or_without_value::WithOrWithoutValue
     =
@@ -92,6 +130,7 @@ s = '\0' ;
 # (above is NULL_BYTE_)
 
 
+# #history-A.4: introduce the `in` keyword for value lists
 # #history-A.3: introduce `with value`, `without value`
 # #history-A.2: introduce negation
 # #history-A.1: add deep selectors (exact match)
