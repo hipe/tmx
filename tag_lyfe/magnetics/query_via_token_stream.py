@@ -118,6 +118,8 @@ def _make_walker():
             _unsani_in_suffix_payload = self.walk(node.in_suffix_payload)
             return native_models.UnsanitizedInSuffix(_unsani_in_suffix_payload)
 
+        # -- begin would-be plugins
+
         def walk__list_of_values_for_in_suffix(self, node):
             from tag_lyfe.the_query_model_plugins import in_list_of_values as o
             x_a = self._SIMPLE_buckstop(node.values_for_in_suffix)
@@ -141,6 +143,12 @@ def _make_walker():
                 use_number = float(use_string)
             from tag_lyfe.the_query_model_plugins import in_numeric_range as o
             return o.EasyNumber(use_number, use_string)
+
+        def walk__hacky_regex_friendo(self, node):
+            from tag_lyfe.the_query_model_plugins import in_regex as o
+            return o.UnsanitizedInRegex(node.hacky_regex_payload)
+
+        # -- end would-be plugins
 
         def walk__with_or_without_value(self, node):
             _yes = true_false_via_with_or_without[node.with_or_without]

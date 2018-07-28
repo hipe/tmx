@@ -86,13 +86,13 @@ class ScaryCommonCase(metaclass=_Watcher):
         _yn = _query.yes_no_match_via_tag_subtree(subtree)
         return _yn  # #todo
 
-    def point_at(self, w):
+    def point_at_word(self, w):
         offset_of_where_arrow_is_pointing_to, _1 = self._yikes_these()
         md = _word_regex().search(_1, offset_of_where_arrow_is_pointing_to)
         _act = md[0]  # ..
         self.assertEqual(_act, w)
 
-    def point_at_offset_NOT_USED(self, i):  # #todo
+    def point_at_offset(self, i):
         offset_of_where_arrow_is_pointing_to, _1 = self._yikes_these()
         self.assertEqual(offset_of_where_arrow_is_pointing_to, i)
 

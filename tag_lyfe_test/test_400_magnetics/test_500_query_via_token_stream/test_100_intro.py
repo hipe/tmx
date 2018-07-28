@@ -51,7 +51,7 @@ class Case100_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
         return self.says(self._la_la('and', 'or'))
 
     def test_300_points_at_this_word(self):
-        return self.point_at('or')
+        return self.point_at_word('or')
 
 
 class Case200_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
@@ -66,7 +66,7 @@ class Case200_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
         return self.says(self._la_la('or', 'and'))
 
     def test_300_points_at_this_word(self):
-        return self.point_at('and')
+        return self.point_at_word('and')
 
 
 class Case300_minimal_OR(_CommonCase, ScaryCommonCase):

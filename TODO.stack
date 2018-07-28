@@ -112,4 +112,3 @@ sub-project: upload files to s3
 (-8) tag lyfe parse tag tree tags only
 (-9) tag lyfe query: recurse (be strict so this is only when necessary ({and|or})
 (-10) tag lyfe query: create and (for all `in` construct) ingtegrate deep selector
-(-11) tag lyfe query: the `in` regex construct

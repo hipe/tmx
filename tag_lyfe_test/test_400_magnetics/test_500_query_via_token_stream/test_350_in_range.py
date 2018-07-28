@@ -33,7 +33,7 @@ class Case050_bad_range(_CommonCase, ScaryCommonCase):
         self.says('end must be greater than beginning (13 is not less than 12)')  # noqa: E501
 
     def test_300_points_at_the_one_place(self):
-        return self.point_at('13..12')
+        return self.point_at_word('13..12')
 
 
 class Case100_good_range(_CommonCase, ScaryCommonCase):

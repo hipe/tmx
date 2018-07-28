@@ -89,6 +89,7 @@ in_suffix::InSuffix
 in_suffix_payload
     =
     | list_of_values_for_in_suffix
+    | hacky_regex_friendo
     | numeric_range
     ;
 
@@ -122,6 +123,14 @@ easy_number::EasyNumber
     float_part: [ '.' /[0-9]+/ ~ ]
     ;
 
+hacky_regex_friendo::HackyRegexFriendo
+    =
+    '/' ~
+    hacky_regex_payload: /[^\0]+/
+    # yikes - match one or more characters that is not the null byte! (this
+    # includes matching the ending delimiter that is expected to be there!)
+    ;
+
 atomic_value
     =
     /[-a-zA-Z0-9_.]+/ ~
@@ -145,6 +154,7 @@ s = '\0' ;
 # (above is NULL_BYTE_)
 
 
+# #history-A.6: introduce the "in regex" hacky construct
 # #history-A.5: introduce the "in numeric range" construct
 # #history-A.4: introduce the `in` keyword for value lists
 # #history-A.3: introduce `with value`, `without value`
