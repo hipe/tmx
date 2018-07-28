@@ -67,10 +67,17 @@ def _make_walker():
             return node
 
         def walk__top_thing(self, node):
-            # say something about #here1
-            child_EEK_stack = self.walk(node.payload)
+            return self._unsanitized_list(node)
+
+        def walk__parenthesized_group(self, node):
+            _unsani_list = self._unsanitized_list(node)
+            return native_models.UnsanitizedParenthesizedGroup(_unsani_list)
+
+        def _unsanitized_list(self, node):
+            # the buck (array) starts at #here1
+            child_EEK_stack = self.walk(node.item_or_list_as_local_top)
             child_EEK_stack.reverse()
-            return native_models.UNSANITIZED_LIST(tuple(child_EEK_stack))
+            return native_models.UnsanitizedList(tuple(child_EEK_stack))
 
         def walk__conjuncted(self, node):
             a_o_o = node.and_or_or
@@ -82,7 +89,7 @@ def _make_walker():
             return self._same_buckstop(node)
 
         def walk__negated_function(self, node):
-            _ohai = self.walk(node.function_that_is_negated)
+            _ohai = self.walk(node.negatable)
             return native_models.UnsanitizedNegation(_ohai)
 
         def walk__tagging_matcher(self, node):

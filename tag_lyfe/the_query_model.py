@@ -87,9 +87,44 @@ def wordable_via_string_(s):
     return x
 
 
+# == parenthesized group
+
+class UnsanitizedParenthesizedGroup:
+
+    def __init__(self, ul):
+        self._ul = ul
+
+    def sanitize(self, listener):
+        lis = pop_property(self, '_ul').sanitize(listener)
+        if lis is None:
+            return
+        return _ParenthesizedGroup(lis)
+
+
+class _ParenthesizedGroup:
+
+    def __init__(self, lis):
+        self._list = lis
+
+    def yes_no_match_via_tag_subtree(self, subtree):  # just simple passthru
+        return self._list.yes_no_match_via_tag_subtree(subtree)
+
+    to_string = to_string_using_wordables_
+
+    def wordables_(self):  # for #here3
+        yield _open_paren_as_wordable
+        for w in self._list.wordables_():
+            yield w
+        yield _close_paren_as_wordable
+
+
+_open_paren_as_wordable = wordable_via_string_('(')
+_close_paren_as_wordable = wordable_via_string_(')')
+
+
 # == AND lists and OR lists
 
-class UNSANITIZED_LIST:
+class UnsanitizedList:
     """
     get a thing in something like the form:
 
@@ -168,14 +203,19 @@ class _AND_or_OR_List:
     def __init__(self, nodes_tup):
         self.children = nodes_tup
 
-    def to_string(self):
-        itr = iter(self.children)
-        pieces = [next(itr).to_string()]
-        sep = _seperator_via_conjunction(self.conjunction)
-        for node in itr:
-            pieces.append(sep)
-            pieces.append(node.to_string())
-        return ''.join(pieces)
+    to_string = to_string_using_wordables_
+
+    def wordables_(self):  # for #here3
+
+        conj_wordable = _wordable_via_conjunction[self.conjunction]
+
+        childs = iter(self.children)
+        for w in next(childs).wordables_():
+            yield w
+        for child in childs:
+            yield conj_wordable
+            for w in child.wordables_():
+                yield w
 
 
 class AND_List(_AND_or_OR_List):
@@ -208,34 +248,14 @@ class OR_List(_AND_or_OR_List):
         return OR
 
 
-def _build_sep_via_conj():  # silly fun..
-
-    def same(s, which):
-        def f():
-            surface = f' {s} '  # #space-for-null-byte
-
-            def g():
-                return surface
-            cache[which] = g
-            return _seperator_via_conjunction(which)
-        return f
-
-    cache = {  # :#here1
-            AND: same('and', AND),
-            OR: same('or', OR),
-            }
-
-    def _seperator_via_conjunction(which):
-        return cache[which]()
-
-    return _seperator_via_conjunction
-
-
-AND = 1  # (define these here because they are used in the next call #here1)
+AND = 1
 OR = 2
 
 
-_seperator_via_conjunction = _build_sep_via_conj()
+_wordable_via_conjunction = {
+        AND: wordable_via_string_('and'),
+        OR: wordable_via_string_('or'),
+        }
 
 
 _AND_list_or_OR_list_via_conjunction_string = {

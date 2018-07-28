@@ -110,5 +110,3 @@ sub-project: upload files to s3
 (-6) tag lyfe parse tag trees with atom values (collision)
 (-7) tag lyfe parse tag trees with atom values (no collision)
 (-8) tag lyfe parse tag tree tags only
-(-9) tag lyfe query: recurse (be strict so this is only when necessary ({and|or})
-(-10) tag lyfe query: create and (for all `in` construct) ingtegrate deep selector

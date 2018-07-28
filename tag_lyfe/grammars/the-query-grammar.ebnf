@@ -2,8 +2,20 @@
 
 start::TopThing
     =
-    payload:item_or_list
+    item_or_list_as_local_top:item_or_list
     ( s | $ )
+    ;
+
+parenthesized_group::ParenthesizedGroup
+    =
+    '(' ~ s ~
+    item_or_list_as_local_top:item_or_list_but_strict
+    s ')' ~
+    ;
+
+item_or_list_but_strict::ItemOrList
+    =
+    left:item right:conjuncted
     ;
 
 item_or_list::ItemOrList
@@ -22,15 +34,19 @@ conjuncted::Conjuncted
 item
     =
     | negated_function
-    | tagging_matcher
+    | negatable
     ;
 
 negated_function::NegatedFunction
     =
     'not' s ~
-    function_that_is_negated:(
-        tagging_matcher
-    )
+    negatable:negatable
+    ;
+
+negatable
+    =
+    | tagging_matcher
+    | parenthesized_group
     ;
 
 tagging_matcher::TaggingMatcher

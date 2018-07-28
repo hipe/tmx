@@ -4,9 +4,9 @@ digraph g {
 
 thing100[label="• the sync script\n• md table datastore" style=filled]
 thing106[label="merge two\ndata producers" style=filled]
-thing110[label="find a dilligenced\nparser generator"]
+thing110[label="find a dilligenced\nparser generator" style=filled]
 thing122[label="parsed tagged strings"]
-thing126[label="parse tag queries"]
+thing126[label="parse tag queries" style=filled]
 thing128[label="filter by tags"]
 thing150[label="..so you can\n survey heroku\noptions for.."]
 thing175[label="grok\nheroku\nproperly"]
