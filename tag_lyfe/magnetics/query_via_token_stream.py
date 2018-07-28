@@ -115,14 +115,32 @@ def _make_walker():
             return native_models.UnsanitizedShallowOrDeepTag(node.tag_stem)
 
         def walk__in_suffix(self, node):
-            _strings = self.walk(node.in_suffix_payload)
-            from tag_lyfe.the_query_model_plugins import in_list_of_values as o
-            return o.UnsanitizedInSuffix(_strings)
+            _unsani_in_suffix_payload = self.walk(node.in_suffix_payload)
+            return native_models.UnsanitizedInSuffix(_unsani_in_suffix_payload)
 
         def walk__list_of_values_for_in_suffix(self, node):
+            from tag_lyfe.the_query_model_plugins import in_list_of_values as o
             x_a = self._SIMPLE_buckstop(node.values_for_in_suffix)
             x_a.reverse()
-            return tuple(x_a)
+            return o.UnsanitizedInValuesFunction(tuple(x_a))
+
+        def walk__numeric_range(self, node):
+            from tag_lyfe.the_query_model_plugins import in_numeric_range as o
+            begin_AST = self.walk(node.begin_number)
+            end_AST = self.walk(node.end_number)
+            return o.UnsanitizedInRange(begin_AST, end_AST)
+
+        def walk__easy_number(self, node):
+            use_string = node.integer_part
+            float_strings = node.float_part
+            if float_strings is None:
+                use_number = int(use_string)
+            else:
+                # #coverpoint1.12.5
+                use_string = f"{use_string}{float_strings[0]}{float_strings[1]}"  # noqa: E501
+                use_number = float(use_string)
+            from tag_lyfe.the_query_model_plugins import in_numeric_range as o
+            return o.EasyNumber(use_number, use_string)
 
         def walk__with_or_without_value(self, node):
             _yes = true_false_via_with_or_without[node.with_or_without]

@@ -88,7 +88,8 @@ in_suffix::InSuffix
 
 in_suffix_payload
     =
-    list_of_values_for_in_suffix
+    | list_of_values_for_in_suffix
+    | numeric_range
     ;
 
 list_of_values_for_in_suffix::ListOfValuesForInSuffix
@@ -105,6 +106,20 @@ values_for_in_suffix
     left:atomic_value
     ~
     right:[values_for_in_suffix]
+    ;
+
+numeric_range::NumericRange
+    =
+    begin_number:easy_number
+    '..' ~
+    # (above we might expand to allow '...' too alla ruby exclusive range)
+    end_number:easy_number
+    ;
+
+easy_number::EasyNumber
+    =
+    integer_part: /-?[0-9]+/
+    float_part: [ '.' /[0-9]+/ ~ ]
     ;
 
 atomic_value
@@ -130,6 +145,7 @@ s = '\0' ;
 # (above is NULL_BYTE_)
 
 
+# #history-A.5: introduce the "in numeric range" construct
 # #history-A.4: introduce the `in` keyword for value lists
 # #history-A.3: introduce `with value`, `without value`
 # #history-A.2: introduce negation

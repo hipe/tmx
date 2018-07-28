@@ -489,6 +489,62 @@ class _TagNameChainNonHeadNode(_NameChainNode):
     _glyph_thing = ':'
 
 
+# == the in suffix
+
+class UnsanitizedInSuffix:
+
+    def __init__(self, unsanitized):
+        self._unsanitized = unsanitized
+
+    def unsanitized_via_finish(self, unsanitized_tagging):
+        _ = pop_property(self, '_unsanitized')
+        return _UnsanitizedInSuffixedTagging(unsanitized_tagging, _)
+
+
+class _UnsanitizedInSuffixedTagging:
+
+    def __init__(self, ut, uisp):
+        self._unsanitized_tagging = ut
+        self._unsanitized_in_suffix_payload = uisp
+
+    def sanitize(self, listener):
+        # (note the asymmetry: we pass `tagging` twice)
+        tagging = pop_property(self, '_unsanitized_tagging').sanitize(listener)
+        if tagging is None:
+            return
+        isp = pop_property(self, '_unsanitized_in_suffix_payload').sanitize_plus(  # noqa: E501
+                listener, tagging)
+        if isp is None:
+            return
+        return _InSuffixedTagging(tagging, isp)
+
+
+class _InSuffixedTagging:
+    """this fellow holds that the (at writing) 3 known grammatical features
+
+    of the category "in suffix" all have the same surface form at the head:
+
+        <tagging> in <xx>
+    """
+
+    def __init__(self, tagging_query, in_suffix_payload):
+        self.yes_no_match_via_tag_subtree = in_suffix_payload.yes_no_match_via_tag_subtree  # wow  # noqa: E501
+        self._in_suffix_payload = in_suffix_payload
+        self._tagging_query = tagging_query
+
+    to_string = to_string_using_wordables_
+
+    def wordables_(self):  # hook-in for [#707.F] wordables
+        for w in self._tagging_query.wordables_():
+            yield w
+        yield _in_wordable
+        for w in self._in_suffix_payload.wordables_():
+            yield w
+
+
+_in_wordable = wordable_via_string_('in')
+
+
 # == suffixed modifier: with or without value
 
 class UnsanitizedWithOrWithoutFirstStep:

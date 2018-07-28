@@ -87,11 +87,18 @@ class ScaryCommonCase(metaclass=_Watcher):
         return _yn  # #todo
 
     def point_at(self, w):
-        _1, _2 = self.end_state().first_emission_messages[1:3]
-        offset_of_where_arrow_is_pointing_to = len(_2) - 1
+        offset_of_where_arrow_is_pointing_to, _1 = self._yikes_these()
         md = _word_regex().search(_1, offset_of_where_arrow_is_pointing_to)
         _act = md[0]  # ..
         self.assertEqual(_act, w)
+
+    def point_at_offset_NOT_USED(self, i):  # #todo
+        offset_of_where_arrow_is_pointing_to, _1 = self._yikes_these()
+        self.assertEqual(offset_of_where_arrow_is_pointing_to, i)
+
+    def _yikes_these(self):
+        _1, _2 = self.end_state().first_emission_messages[1:3]
+        return len(_2) - 1, _1
 
     def says(self, s):
         _act = self.end_state().first_emission_messages[0]
@@ -143,7 +150,7 @@ def _build_tag_subtree(tag_emblems):
         else:
             return lib.tag_via_sanitized_tag_stem(post_hashtag)
 
-    pass_1_rx = re.compile('^#([a-z:]+)$')
+    pass_1_rx = re.compile(r'^#([a-z:0-9.]+)$')
 
     return lib.tag_subtree_via_tags(f(x) for x in tag_emblems)
 
@@ -188,7 +195,7 @@ class _EndState:
 @memoize
 def _word_regex():
     import re
-    return re.compile(r'\w+')
+    return re.compile(r'[^ ]+')
 
 
 _yikes_cache_of_tag_subtrees = {}
