@@ -1,0 +1,48 @@
+@@grammar::DERFOUS_NERFOUS_BERFOUS
+
+start
+    =
+    (
+    | document_with_taggings
+    | document_without_taggings
+    )
+    $
+    ;
+
+document_with_taggings::TopThing
+    =
+    head_sep:[tagging_separator]
+    first_tagging:tagging
+    more_taggings:{ tagging_separator tagging }
+    tail_garbage: { /./ }
+    ;
+
+document_without_taggings::TopThing
+    =
+    head_sep:()
+    first_tagging:()
+    more_taggings:()
+    tail_garbage: { /./ }
+    ;
+
+tagging_separator::TaggingSeparator
+    =
+    { potential_separator }+
+    ;
+
+potential_separator::PotentialSeparator
+    =
+    { !(potential_boundary | tagging) /./ } potential_boundary
+    ;
+
+potential_boundary
+    =
+    /[ ]+/
+    ;
+
+tagging::WahooTagging
+     =
+    '#' /[a-z]+/ ~
+    ;
+
+# #born.

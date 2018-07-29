@@ -15,8 +15,7 @@ from _init import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+_CommonCase = unittest.TestCase
 
 
 class Case050_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):

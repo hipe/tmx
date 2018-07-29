@@ -110,3 +110,5 @@ sub-project: upload files to s3
 (-6) tag lyfe parse tag trees with atom values (collision)
 (-7) tag lyfe parse tag trees with atom values (no collision)
 (-8) tag lyfe parse tag tree tags only
+check #todo in new code
+make space in between more efficient

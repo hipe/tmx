@@ -54,15 +54,15 @@ from modality_agnostic.memoization import (  # noqa: E402
 import modality_agnostic.test_support.listener_via_expectations as l_via_e  # noqa: E402 E501
 
 
-class _Watcher(type):
+class _ScaryCommonCaseWatcher(type):
 
     def __init__(cls, name, bases, clsdict):
         if len(cls.mro()) > 2:
-            _add_memoizing_methods(cls)
+            _add_scary_common_case_memoizing_methods(cls)
         super().__init__(name, bases, clsdict)
 
 
-class ScaryCommonCase(metaclass=_Watcher):
+class ScaryCommonCase(metaclass=_ScaryCommonCaseWatcher):
 
     def does_not_match_against(self, tup):
         _did = self._yes_no_match(tup)
@@ -118,7 +118,7 @@ class ScaryCommonCase(metaclass=_Watcher):
         self.assertIsNone(sta.first_emission_messages)
 
 
-def _add_memoizing_methods(cls):
+def _add_scary_common_case_memoizing_methods(cls):
     @shared_subject
     def end_state(self):
         return _EndState(self)
@@ -202,5 +202,6 @@ _yikes_cache_of_tag_subtrees = {}
 _yikes_cache_of_tags = {}
 
 
+# #pending-rename: the bulk of this should be 'query' to be next to 'tagging'
 # #history-A.1: things changed at upgrade to python 3.7
 # #born.

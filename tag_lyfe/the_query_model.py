@@ -7,7 +7,7 @@ the query model:
   - is practical to be used as an end-of-the-line business object, e.g
     for real queries (but put workers in magnets. this is a cold model.)
 
-the idea is that:
+the idea is that :[#707.G]:
   - the model we use in our business code can avoid the peculiaries and
     particularities of whatever class of grammars happens to be supported by
     whatever parser generator we happen to be using. so for example, in our

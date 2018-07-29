@@ -11,8 +11,7 @@ from _init import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+_CommonCase = unittest.TestCase
 
 
 class Case100(_CommonCase, ScaryCommonCase):

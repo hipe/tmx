@@ -26,6 +26,7 @@ machine-readble way.)
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.G  |       | #provision: isolate parser-generator specifics
 |                   #707.F  | #trak | the "wordables" micro API
 |                   #707.E  | #trak | quoted string terminal nodes in taggings & queries
 |                   #707.D  | #trak | the catch-22 of development order (see)

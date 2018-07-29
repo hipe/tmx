@@ -19,6 +19,34 @@ shouldn't be parsing for tag subtrees for this purpose anyway..
 """
 
 
+"""
+the document object model for all strings as it pertains to taggings:
+
+    [ document_pair [ document_pair [..]]] end_piece
+
+    document_pair = separator_string tagging
+
+this "structure grammar" is intended to work for all strings.
+"""
+
+
+class DocumentPair:
+
+    def __init__(self, sep_s, tagging):
+            self.separator_string = sep_s
+            self.tagging = tagging
+
+    is_end_piece = False
+
+
+class EndPiece:
+
+    def __init__(self, sep_s):
+            self.separator_string = sep_s
+
+    is_end_piece = True
+
+
 def tag_subtree_via_tags(tags):
     """ :[#707.B]: is that for now we don't want a dedicated tag subtree class.
 
@@ -66,6 +94,12 @@ class _SimpleTag:
     def __init__(self, sanitized_tag_stem):
         self.tag_stem = sanitized_tag_stem
 
+    def to_string(self):
+        return f'#{self.tag_stem}'
+
     is_deep = False
 
+
+# #pending-rename: MAYBE to 'the tagging model'
+# #history-A.1: begin actually using this to build native structures from AST's
 # #born.

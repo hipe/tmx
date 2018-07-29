@@ -1,5 +1,11 @@
 """
-this file has a "discussion" at #here1 #todo
+:[#707.G]: parser-generator isolation:
+
+this module (file) intends to be the only code that touches or has to
+realy know about the specifics of the parser generator (in the scope of
+this one grammar - there can be other such modules for other grammars).
+
+also, see #here2 which explains how we isolate w/ re: to AST.
 """
 
 
@@ -40,13 +46,16 @@ def MAKE_CRAZY_ITERATOR_THING(query_s):
     model = query_model_via_big_string(query_s)
     yield model
 
-    _walker = _make_walker()
+    _walker = _memoized_walker()
     unsani = _walker.walk(model)
     yield unsani
 
 
-def _make_walker():
-    """so:
+@memoize
+def _memoized_walker():
+    """isolate parser-generator specifics w/ re: to AST :#here2:
+
+    so:
 
     - ideally this scope will be the only place where we "wire up" all this
       parser-generator-specific stuff (including grammar) with our native,
@@ -64,6 +73,7 @@ def _make_walker():
 
         def walk_object(self, node):
             print(f'(reminder: {type(node)})')
+            # #todo
             return node
 
         def walk__top_thing(self, node):
