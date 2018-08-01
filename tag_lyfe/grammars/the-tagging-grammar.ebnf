@@ -2,22 +2,28 @@
 
 start
     =
-    (
-    | document_with_taggings
-    | document_without_taggings
-    )
+    document
     $
     ;
 
-document_with_taggings::TopThing
+document
+    =
+    | document_with_one_or_more_taggings
+    | document_with_no_taggings
+    ;
+
+document_with_one_or_more_taggings::TopThing
     =
     head_sep:[tagging_separator]
-    first_tagging:tagging
-    more_taggings:{ tagging_separator tagging }
+    first_tagging:tagging ~
+    more_taggings: {
+      tagging_separator
+      tagging ~
+    }
     tail_garbage: { /./ }
     ;
 
-document_without_taggings::TopThing
+document_with_no_taggings::TopThing
     =
     head_sep:()
     first_tagging:()
@@ -26,23 +32,35 @@ document_without_taggings::TopThing
     ;
 
 tagging_separator::TaggingSeparator
+    # imagine 'dark' characters and 'light' characters. lights are separators
+    # (like the space character) and dark are all the rest.
     =
-    { potential_separator }+
+    {
+      [
+        # if you're going to match a run of dark characters, they cannot
+        # *from this begnning point* be a tagging
+        !tagging
+        { ! sep_chars /./ }+
+        # (but note that tagging-looking runs of characters *can* occur in
+        #  the *middle* of a dark run.)
+      ]
+      sep_chars
+    }+
+    # you can't escape out of the above "loop" until you find one of the
+    # above phrases (iterations) that is followed by a tagging
+    &tagging
     ;
 
-potential_separator::PotentialSeparator
-    =
-    { !(potential_boundary | tagging) /./ } potential_boundary
-    ;
-
-potential_boundary
+sep_chars
     =
     /[ ]+/
     ;
 
 tagging::WahooTagging
      =
-    '#' /[a-z]+/ ~
+    '#' /[a-z0-9]+/
+    # (the above is just a placeholder for one day something more)
     ;
 
+# #history-A.1: refactored to get edge cases. had to get rid of cuts
 # #born.

@@ -14,7 +14,7 @@ and:
 """
 
 
-import _init  # noqa F401
+import _init  # noqa: F401
 from tag_lyfe_test.tagging import (
         TaggingCommonCase as _ThisCase,
         )

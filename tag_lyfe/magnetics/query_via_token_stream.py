@@ -206,7 +206,7 @@ def query_model_via_big_string(big_string):
 
     model = parser.parse(
             text=big_string,
-            # semantics=JimFlim(),
+            whitespace='',  # see [#707.H] how we do our own whitespace
             )
 
     return model

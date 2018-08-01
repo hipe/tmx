@@ -17,7 +17,6 @@ def doc_pairs_via_string(input_string):
 
     _model = _query_parser().parse(
             text=input_string,
-            # semantics=JimFlim(),
             whitespace='',  # we do our own whitespace. see #here2
             )
 
@@ -39,26 +38,27 @@ def _memoized_walker():
             raise Exception(f'hello: {type(node)}')
 
         def walk__top_thing(self, node):
+            """
+            NOTE we are a GENERATOR which is NEAT HERE
+
+            (make a little mess so we accomodate the document (string) both
+            with and without taggings using the same function..
+            """
 
             ft = node.first_tagging
             if ft is not None:
 
-                o = node.head_sep
-                if o is None:
-                    use_sep = ''
-                else:
-                    use_sep = self.walk(o)  # #TODO
-
+                _ts = self._my_walk_tagging_sep(node.head_sep)
                 _ta = self.walk(ft)  # #TODO
 
-                yield native_models.DocumentPair(use_sep, _ta)
+                yield native_models.DocumentPair(_ts, _ta)
 
                 for (tagging_sep, tagging) in node.more_taggings:
 
-                    _se = self.walk(tagging_sep)
+                    _ts = self.walk(tagging_sep)
                     _ta = self.walk(tagging)
 
-                    yield native_models.DocumentPair(_se, _ta)
+                    yield native_models.DocumentPair(_ts, _ta)
 
             a = node.tail_garbage
             if len(a):
@@ -68,24 +68,30 @@ def _memoized_walker():
 
             yield native_models.EndPiece(use_tail)
 
+        def _my_walk_tagging_sep(self, node):
+            if node is None:
+                return ''
+            else:
+                return self.walk(node)  # #TODO
+
+        def walk__tagging_separator(self, node):
+            """
+            MEMORY
+            """
+            flat_pieces = []
+
+            def recurse(ast):
+                for x in ast:
+                    if isinstance(x, str):
+                        flat_pieces.append(x)
+                    else:
+                        recurse(x)
+            recurse(node.ast)
+            return ''.join(flat_pieces)
+
         def walk__wahoo_tagging(self, node):
             return native_models.tag_via_sanitized_tag_stem(node.ast[1])
             # native_models.deep_tag_via_sanitized_pieces
-
-        def walk__tagging_separator(self, node):
-            accum = []
-            for x in node.ast:
-                _s_a = self.walk(x)
-                for s in _s_a:
-                    accum.append(s)
-            return ''.join(accum)  # MEMORY
-
-        def walk__potential_separator(self, node):
-
-            # MEMORY
-            many, one = node.ast
-            many.append(one)
-            return many  # :#here3
 
     return MyWalker()
 
@@ -104,7 +110,7 @@ def _query_parser():
     return _
 
 
-""".:#here2:
+""".:[#707.H]: :#here2:
 
 as it says in the TatSu documentation (in the "Grammar Syntax" section),
 
