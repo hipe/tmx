@@ -146,9 +146,9 @@ def _build_tag_subtree(tag_emblems):
 
         post_hashtag = pass_1_rx.search(tag_emblem)[1]  # ..
         if ':' in post_hashtag:
-            return lib.deep_tag_via_sanitized_pieces(post_hashtag.split(':'))
+            return lib.tagging_via_sanitized_pieces(post_hashtag.split(':'))
         else:
-            return lib.tag_via_sanitized_tag_stem(post_hashtag)
+            return lib.tagging_via_sanitized_tag_stem(post_hashtag)
 
     pass_1_rx = re.compile(r'^#([a-z:0-9.]+)$')
 

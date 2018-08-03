@@ -57,49 +57,139 @@ def tag_subtree_via_tags(tags):
     return tuple(tags)  # accord to [#707.B]: use tuples here for now
 
 
-def deep_tag_via_sanitized_pieces(pcs):
-    last = len(pcs) - 1
-
-    def f(cursor):
-        if cursor == last:
-            return _TailTag(pcs[cursor])
-        else:
-            return _DeepTag(pcs[cursor], f(cursor + 1))
-    return f(0)
+"""
+BEGIN: new in this edition: consult [#705] the tagging model (digraph)
+"""
 
 
-def tag_via_sanitized_tag_stem(sanitized_tag_stem):
-    return _SimpleTag(sanitized_tag_stem)
+def tagging_via_sanitized_tag_stem(stem):
+    _name_component = BareNameComponent(stem)
+    return deep_tagging_via_name_components((_name_component,))
 
 
-class _DeepTag:
+def tagging_via_sanitized_pieces(pcs):
+    """NOTE - this will go away #todo after we unify the grammars
+    this is here for conveninece as a legacy way to build the thing
+    """
 
-    def __init__(self, sanitized_tag_stem, child):
-        self.tag_stem = sanitized_tag_stem
+    _ = [BareNameComponent(s) for s in pcs]
+    return deep_tagging_via_name_components(_)
+
+
+def deep_tagging_via_name_components(ncs):
+    """ new in this edition: consult [#705] the tagging model (digraph)"""
+
+    itr = iter(reversed(ncs))
+    curr = _TailNode(next(itr))
+    for name_component in itr:
+        curr = _BranchNode(curr, name_component)
+    return _Tagging(curr)
+
+
+class _Tagging:
+
+    def __init__(self, node):
+        self.root_node = node
+
+    def to_string(self):
+        itr = self.root_node._each_name_component()
+        pieces = ['#', next(itr)._surface_string()]
+        for nc in itr:
+            pieces.append(':')
+            pieces.append(nc._surface_string())
+        return ''.join(pieces)
+
+
+class _Node:
+
+    def __init__(self, name_component):
+        self._name_component = name_component
+
+    @property
+    def tag_stem(self):
+        return self._name_component._deep_string()
+
+
+class _BranchNode(_Node):
+
+    def __init__(self, child, name_component):
+        super().__init__(name_component)
         self.child = child
+
+    def _each_name_component(self):
+        yield self._name_component
+        for nc in self.child._each_name_component():
+            yield nc
 
     is_deep = True
 
 
-class _TailTag:
+class _TailNode(_Node):
 
-    def __init__(self, sanitized_tag_stem):
-        self.tag_stem = sanitized_tag_stem
-
-    is_deep = False
-
-
-class _SimpleTag:
-
-    def __init__(self, sanitized_tag_stem):
-        self.tag_stem = sanitized_tag_stem
-
-    def to_string(self):
-        return f'#{self.tag_stem}'
+    def _each_name_component(self):
+        yield self._name_component
 
     is_deep = False
 
 
+class DoubleQuotedStringNameComponent:
+
+    def __init__(self, sexps):
+
+        def surface_string_initially():
+            s = build_surface_string()
+            self._surface_string = lambda: s
+            return self._surface_string()
+
+        def build_surface_string():
+            pieces = ['"']
+            for typ, s in sexps:
+                if 'raw_string' == typ:
+                    pieces.append(s)
+                elif 'escaped_character' == typ:
+                    # ##coverpoint1.8.4
+                    pieces.append('\\')
+                    pieces.append(s)
+                else:
+                    self.sanity()
+            pieces.append('"')
+            return ''.join(pieces)
+
+        def deep_string_ininitially():
+            s = build_deep_string()
+            self._deep_string = lambda: s
+            return self._deep_string()
+
+        def build_deep_string():
+            pieces = []
+            for typ, s in sexps:
+                if 'raw_string' == typ:
+                    pieces.append(s)
+                elif 'escaped_character' == typ:
+                    # ##coverpoint1.8.4
+                    pieces.append(s)
+                else:
+                    self.sanity()
+
+            return ''.join(pieces)
+
+        self._surface_string = surface_string_initially
+        self._deep_string = deep_string_ininitially
+
+
+class BareNameComponent:
+
+    def __init__(self, s):
+        def same():
+            return s
+        self._surface_string = same
+        self._deep_string = same
+
+
+# END
+
+
+# #history-A.2: yet another new and improved model to accomodate quotes
 # #pending-rename: MAYBE to 'the tagging model'
 # #history-A.1: begin actually using this to build native structures from AST's
 # #born.

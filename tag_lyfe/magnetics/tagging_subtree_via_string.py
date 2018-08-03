@@ -90,8 +90,54 @@ def _memoized_walker():
             return ''.join(flat_pieces)
 
         def walk__wahoo_tagging(self, node):
-            return native_models.tag_via_sanitized_tag_stem(node.ast[1])
-            # native_models.deep_tag_via_sanitized_pieces
+            head_stem = node.head_stem
+            x = node.any_tail
+            if x is None:
+                return native_models.tagging_via_sanitized_tag_stem(head_stem)
+            else:
+                pcs = [native_models.BareNameComponent(head_stem)]
+                for _colon, mixed_name in x:
+                    pcs.append(self.walk(mixed_name))
+                return native_models.deep_tagging_via_name_components(pcs)
+
+        def walk__non_head_tag_surface_name_as_is(self, node):
+            # #coverpoint1.8.2: plain doo-hah
+            return native_models.BareNameComponent(node.ast)
+
+        def walk__double_quoted_string(self, node):
+            """
+            #coverpoint1.8.3: neet
+            make a sexp-like list structure that alternates between
+            "raw_string" and "escaped_character"; this structure can be
+            rendered in a surface or deep way depending on the client.
+            """
+
+            final_pieces = []
+            chars = []
+
+            def swallow_string():
+                if len(chars):
+                    final_pieces.append(('raw_string', ''.join(chars)))
+                    chars.clear()
+
+            for x in node.inside:
+                is_escaped, s = self.walk(x)
+                if is_escaped:  # #here2
+                    # ##coverpoint1.8.4
+                    swallow_string()
+                    final_pieces.append(('escaped_character', s))
+                else:
+                    chars.append(s)
+
+            swallow_string()
+
+            return native_models.DoubleQuotedStringNameComponent(tuple(final_pieces))  # noqa: E501
+
+        def walk__escaped_double_quote(self, node):  # ##coverpoint1.8.4
+            return (True, '"')  # or (ick/meh) node.ast[1]
+
+        def walk__not_double_quote(self, node):
+            return (False, node.ast)  # #here2
 
     return MyWalker()
 

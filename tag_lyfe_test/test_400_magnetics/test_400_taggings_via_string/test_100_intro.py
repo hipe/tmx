@@ -1,24 +1,22 @@
 """
-## objectives, requirements and provisions (all subject to change)
+the salient features of the grammar demonstrated here:
 
-so:
-  - we write this *after* the bulk of the query model is finished
-
-  - let's have fun
-
-and:
-
-  - hopscotch
-
-  - warnings
+  - "hopscotch" between "taggings" and "garbage"
 """
 
 
 import _init  # noqa: F401
 from tag_lyfe_test.tagging import (
-        TaggingCommonCase as _ThisCase,
+        TaggingCommonCase as _ThisCaseHere,
         )
 import unittest
+
+
+class _ThisCase(_ThisCaseHere):
+
+    def test_100_shadow(self):
+        _exp = self.expect_shadow()
+        super().expect_shadow(_exp)  # the worst..
 
 
 _CommonCase = unittest.TestCase

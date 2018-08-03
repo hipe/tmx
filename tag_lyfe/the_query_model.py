@@ -303,6 +303,8 @@ _NOT_AS_WORDABLE = wordable_via_string_('not')
 
 """the "name chain" model :#here5:
 
+(#todo reconcile this with the newer [#705] digraph of the latest model)
+
 categories of surface representation for (what we call) "taggings" include:
     - a simple, one-component tagging like `#foo`. (a "shallow tag".)
     - the tagging that looks like a name-value pair: `#foo:bar`
@@ -456,33 +458,33 @@ class _NameChainNode:
         return in_subtree_match_any_one_(subtree, self._simple_match)
 
     def _simple_match(self, tagging):
-        _inner_tagging = self.dig_recursive_(tagging)
+        _inner_tagging = self.dig_recursive_(tagging.root_node)
         return _inner_tagging is not None
 
     def _init_dig_recursive(self):
 
         name_stem = self._stem
 
-        def name_matches(tagging):
-            return name_stem == tagging.tag_stem
+        def name_matches(tagging_node):
+            return name_stem == tagging_node.tag_stem
 
         if self._has_child:
             child = self._child
 
-            def f(tagging):
-                if not tagging.is_deep:
+            def f(tagging_node):
+                if not tagging_node.is_deep:
                     # #coverpoint1.16.2 deeper query won't match shallower tag
                     return
-                if name_matches(tagging):
-                    return child.dig_recursive_(tagging.child)
+                if name_matches(tagging_node):
+                    return child.dig_recursive_(tagging_node.child)
         else:
-            def f(tagging):
-                if name_matches(tagging):
-                    if tagging.is_deep:
+            def f(tagging_node):
+                if name_matches(tagging_node):
+                    if tagging_node.is_deep:
                         # #coverpoint1.16.3: deeper tag matches shallower query
-                        return tagging
+                        return tagging_node
                     else:
-                        return tagging
+                        return tagging_node
         self.dig_recursive_ = f
 
     def wordables_(self):  # for #here3
@@ -595,7 +597,7 @@ class _WithOrWithoutValue:
         my_test = self.__class__._my_test
 
         def f(tagging):
-            found = child.dig_recursive_(tagging)
+            found = child.dig_recursive_(tagging.root_node)
             if found is not None:
                 return my_test(found)
 
@@ -616,16 +618,16 @@ class _WithOrWithoutValue:
 
 class _WithValue(_WithOrWithoutValue):
 
-    def _my_test(tagging):
-        return tagging.is_deep
+    def _my_test(tagging_node):
+        return tagging_node.is_deep
 
     _keyword_wordable = wordable_via_string_('with')
 
 
 class _WithoutValue(_WithOrWithoutValue):
 
-    def _my_test(tagging):
-        return not tagging.is_deep
+    def _my_test(tagging_node):
+        return not tagging_node.is_deep
 
     _keyword_wordable = wordable_via_string_('without')
 

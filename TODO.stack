@@ -101,13 +101,10 @@ sub-project: upload files to s3
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
 ? worldwide refactor: [#508] (the emissions thing)
 ? worldwide refactor: you did lots of `@property` you did not need
-☑️ find a parser generator that satisfies that one requirement
-☑️ yikes do deep survey against all the options
-? turn soft notes into tags (for no real reason except posterity))
-(-3) filter_by built with tag lyfe
-(-4) clean up producers - make these scripts more DRY, "elegant"
-(-5) tag lyfe parse tag treee: compound (deep) values
-(-6) tag lyfe parse tag trees with atom values (collision)
-(-7) tag lyfe parse tag trees with atom values (no collision)
-we have accumulated several #todo's
-refactor/feature idea: don't rebuild separator runs into strings - it willl be inefficient for the intended use case
+? re parser generators: turn soft notes into tags (for no real reason except posterity))
+? clean up producers - make these scripts more DRY, "elegant"
+? we have accumulated several #todo's
+? refactor: integrate queries and tagging to use same grammar
+(-6) filter_by built with tag lyfe
+(-7) integrate: real query (parsed from tokens) against real tagging set (from string)
+  - refactor: alternate, more efficient walker that doesn't build separator strings

@@ -43,7 +43,7 @@ class _InRangeFunction:
         end_num = end._number
 
         def f(tagging):
-            sub_tagging = tagging_query.dig_recursive_(tagging)
+            sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
             if sub_tagging is None:
                 cover_me('no such sub tagging')
             elif sub_tagging.is_deep:  # then it has a value (child)

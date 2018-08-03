@@ -1,0 +1,34 @@
+digraph g {
+  label="
+fig 705 the tagging model. note:
+• every \"has a\" is mandatory
+• concrete classes are rendered as rectangles
+• abstract classes are rendered as ellipses
+• or not
+"
+
+  tagging[shape=rect label="tagging\n(can render\nself - starts\nwith \"#\")"]
+
+  my_node[label="node"]
+
+  tagging->my_node[label="has a"]
+
+  tail_node[shape=rect label="tail\nnode"]
+  tail_node->my_node[label="is a"]
+
+  branch_node[shape=rect label="branch\nnode"]
+  branch_node->my_node[label="is a"]
+  branch_node->my_node[label="(as \"child\")\nhas a"]
+
+  name_component[label="name component\n(knows both surface\nand deep strings)"]
+  my_node->name_component[label="has a"]
+
+  nc_1[shape=rect label="bare name\ncomponent"]
+  nc_1->name_component[label="is a"]
+
+  nc_2[shape=rect label="quoted string\nname component"]
+  nc_2->name_component[label="is a"]
+}
+/*
+#born.
+*/

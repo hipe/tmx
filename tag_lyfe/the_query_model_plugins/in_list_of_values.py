@@ -21,7 +21,7 @@ class _InValuesFunction:
     def __init__(self, strings, tagging_query):
 
         def f(tagging):
-            sub_tagging = tagging_query.dig_recursive_(tagging)
+            sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
             if sub_tagging is None:
                 return  # #coverpoint1.13.2
             elif sub_tagging.is_deep:  # then it has a value (child)

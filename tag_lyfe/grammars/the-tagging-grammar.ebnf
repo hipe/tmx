@@ -53,14 +53,48 @@ tagging_separator::TaggingSeparator
 
 sep_chars
     =
-    /[ ]+/
+    /[ (]+/
     ;
 
 tagging::WahooTagging
      =
-    '#' /[a-z0-9]+/
-    # (the above is just a placeholder for one day something more)
+    '#'
+    head_stem: /[a-zA-Z0-9_][-a-zA-Z0-9_]*/
+    any_tail: { ':' non_head_tag_surface_name }
     ;
 
+non_head_tag_surface_name
+    =
+    | non_head_tag_surface_name_as_is
+    | double_quoted_string
+    ;
+
+non_head_tag_surface_name_as_is::NonHeadTagSurfaceNameAsIs
+    =
+    /[a-zA-Z0-9_][-a-zA-Z0-9_']*/  # NOTE like head_stem but PLUS "'"
+    ;
+
+double_quoted_string::DoubleQuotedString
+    =
+    '"' inside:{ double_quoted_piece } '"'
+    ;
+
+double_quoted_piece
+    =
+    | escaped_double_quote
+    | not_a_double_quote
+    ;
+
+escaped_double_quote::EscapedDoubleQuote
+    =
+    '\\"'
+    ;
+
+not_a_double_quote::NotDoubleQuote
+    =
+    /[^"]/
+    ;
+
+# #history-A.2: introduce double-quoted tag name components
 # #history-A.1: refactored to get edge cases. had to get rid of cuts
 # #born.
