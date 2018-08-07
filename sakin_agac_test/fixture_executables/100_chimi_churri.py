@@ -1,3 +1,6 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+
 class open_dictionary_stream:
     """(minimal example exhibiting bad human key)"""
 
@@ -13,7 +16,8 @@ class open_dictionary_stream:
 
 
 if __name__ == '__main__':
-    raise Exception('(see [#410.H])')
+    import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
+    exit(_.execute_as_CLI_(open_dictionary_stream))
 
 # #pending-rename: probably bad_human_key_ETC now that it has a purpose
 # #born.

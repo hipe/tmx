@@ -1,3 +1,6 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+
 class open_dictionary_stream:
     """(RUM)"""
 
@@ -13,6 +16,7 @@ class open_dictionary_stream:
 
 
 if __name__ == '__main__':
-    raise Exception('(see [#410.H])')
+    import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
+    exit(_.execute_as_CLI_(open_dictionary_stream))
 
 # #born.

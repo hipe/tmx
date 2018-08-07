@@ -48,12 +48,12 @@ but more generally, it would be reasonable to ask: why so complicated?
 
 since the overarching goal of our `sys.path` hacking it to make it _one_
 _normalized list of paths_ that's consisent throughout all our sub-projects,
-it would make sense that you would want to DRY this hacking by certralizing
+it would make sense that you would want to DRY this hacking by centralizing
 the code in one file that other files import.
 
 but this presents a catch-22:
 
-without hacking `sys.path`, we cannot from a given entrypoint file
+without hacking `sys.path`, we cannot (from one given entrypoint file)
 "reach up" to another file (module). (try it.) another way of saying it
 is that if you're entrypoint file is not at the top of your [sub-]project,
 you're gonna have a bad time.
@@ -181,7 +181,7 @@ the following sections:
 ## <a name='file-type-A'></a>"file type A": a normal, production, entrypoint file
 
 there is ideally only one "asset entrypoint" per sub-project. it is the file
-that ETC. for our purposed ETC are usually servers.
+that ETC. for our purposes ETC are usually servers.
 
 as offered [above](#b), python prepends the dirname of the entrypoint file
 to `sys.path`.
@@ -293,6 +293,26 @@ glaring sore thumb that makes this feel like a workaround:
 this gave us an idea..
 (EDIT: now i have no idea what the idea was)
 
+
+
+
+## <a name='file-type-E'></a>this one pattern of `sys.path` normalization
+
+this pattern of `sys.path` normalization emerged after the fact.
+it leverages two conditions:
+
+1. [the provision of python](#b) whereby the directory of the entrypoint
+file is prepended to sys.path and
+
+1. the fact that executable files often live as siblings next to each other.
+
+as it works out, one one the N sibling executable files becomes the
+"leader", and the others the "followers". (really, it would be better
+to think of one as the library-module and the others the clients.)
+
+the advantage to this topology is that it DRY's up `sys.path` hacking.
+the main disadvantage is that it creates (N-1) dependencies where before
+there were none.
 
 
 

@@ -87,7 +87,7 @@ surface_tag::SurfaceTag
 
 tag_stem
     =
-    /[a-z]+/ ~
+    /[a-z][-a-z]*/ ~
     # (the above is a very temporary, over-simplified placeholder)
     ;
 

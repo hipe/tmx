@@ -11,27 +11,21 @@ the central conceit of this module is that the native argument parser is
 import script_lib as sl  # (our parent module, 2 levels up)
 
 
-def begin_native_argument_parser_to_fix(prog, description):
+def begin_native_argument_parser_to_fix__(prog, **platform_kwargs):
     """just a tiny wrapper to keep a leash on how and where we build it"""
 
     import argparse
     return argparse.ArgumentParser(
             prog=prog,
-            description=description,
             add_help=False,
+            **platform_kwargs
             )
 
 
-def fix_argument_parser(ap, stderr):
+def fix_argument_parser__(ap, stderr):
 
     __fix_help(ap, stderr)
     __fix_error_function(ap, stderr)
-
-
-def hello():
-    """for development, maybe for testing, just to make contact with the lib"""
-
-    pass
 
 
 #
@@ -39,7 +33,7 @@ def hello():
 #
 
 def __fix_help(ap, stderr):
-    """ "__fix_help" how help is displayed
+    """"fix" how help is displayed
 
     the help they add is not helpful.
     calling `exit` is really bad style for us

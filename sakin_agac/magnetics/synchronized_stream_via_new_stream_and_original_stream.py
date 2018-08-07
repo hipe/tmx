@@ -85,6 +85,7 @@ class _SyncParameters:
             natural_key_field_name,
             # (#coverpoint7.2 is simply the names of the above arguments)
             field_names=None,
+            tag_lyfe_field_names=None,  # yuck, experiement
             traversal_will_be_alphabetized_by_human_key=None,
             sync_keyerser=None,
             ):
@@ -93,13 +94,32 @@ class _SyncParameters:
             cover_me('hi')
 
         self.natural_key_field_name = natural_key_field_name
-        # self.field_names = field_names  not needed yet
+        self.field_names = field_names
+        self.tag_lyfe_field_names = tag_lyfe_field_names
         self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
         self.sync_keyerser = sync_keyerser
 
     @property
     def sync_parameters_version(self):
         return 2  # bump this WHEN you add to constituency
+
+    def to_dictionary(self):  # (just for debugging)
+        dct = {'_is_sync_meta_data': True}
+        o = _specialty_thing(dct, self)
+        o('natural_key_field_name')
+        o('field_names')
+        o('tag_lyfe_field_names')
+        o('traversal_will_be_alphabetized_by_human_key')
+        o('sync_keyerser')
+        return dct
+
+
+def _specialty_thing(dct, self):
+    def f(attr):
+        x = getattr(self, attr)
+        if x is not None:
+            dct[attr] = x
+    return f
 
 
 def stream_of_mixed_via_sync(

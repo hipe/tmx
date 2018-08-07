@@ -10,9 +10,10 @@ or for debugging collections for example in syncing.
 
 the collection is resolved from <collection-identifer>.
 """
+# NOTE above is expressed in helpscreen :[#415]
 
 
-def _my_parameters(o, param):
+def parameters_for_the_script_called_stream_(o, param):
 
     def __desc(o, style):
         o('the collection is resolved from this')
@@ -27,38 +28,37 @@ def _CLI(sin, sout, serr, argv):
 
     # parse args
 
-    from script_lib.magnetics import parse_stepper_via_argument_parser_index as stepperer  # noqa: E501
-    reso = stepperer.SIMPLE_STEP(
-            sin, serr, argv,
-            _my_parameters, _desc, stdin_OK=False)
+    reso = _parse_args(sin, serr, argv)
     if not reso.OK:
         return reso.exitstatus
-    ci = getattr(reso.namespace, 'collection-identifier')  # #open [#601]
+    coll_id = getattr(reso.namespace, 'collection-identifier')  # #open [#601]
 
-    # -- BEGIN should be abstracted somehow
+    # work
 
-    def listener(head_channel, *a):
-        if 'error' == head_channel:
-            nonlocal exitstatus
-            exitstatus = 5
-        express(head_channel, *a)
+    import script.json_stream_via_url_and_selector as siblib
 
-    from script_lib.magnetics import listener_via_resources as _
-    express = _.listener_via_stderr(serr)
-    exitstatus = 0  # innocent until
+    listener, exitstatuser = siblib.listener_and_exitstatuser_for_CLI(serr)
 
-    # --
+    visit = siblib.JSON_object_writer_via_IO_downstream(sout)
 
-    from json import dumps as json_dumps
+    with open_dictionary_stream(coll_id, listener) as dcts:
 
-    with open_dictionary_stream(ci, listener) as dicts:
-        # next(dicts)['_is_sync_meta_data']  # shear off
-        for dct in dicts:
-            sout.write(json_dumps(dct))
-            sout.write('\n')
-            sout.flush()
+        _sync_params = next(dcts)
+        _dct = _sync_params.to_dictionary()  # yuck
+        visit(_dct)
+        for dct in dcts:
+            visit(dct)
 
-    return exitstatus
+    return exitstatuser()
+
+
+def _parse_args(sin, serr, argv):
+    from script_lib.magnetics import parse_stepper_via_argument_parser_index as _  # noqa: E501
+    return _.SIMPLE_STEP(
+            sin, serr, argv, parameters_for_the_script_called_stream_,
+            stdin_OK=False,
+            description=_desc,
+            )
 
 
 class open_dictionary_stream:
@@ -117,8 +117,9 @@ _desc = __doc__
 
 
 if __name__ == '__main__':
+    from json_stream_via_url_and_selector import normalize_sys_path_
+    normalize_sys_path_()
     import sys as o
-    o.path.insert(0, '')
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv)
     exit(_exitstatus)
 

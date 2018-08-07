@@ -1,3 +1,6 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+
 class open_dictionary_stream:
     """(example with no metadata)"""
 
@@ -12,16 +15,8 @@ class open_dictionary_stream:
 
 
 if __name__ == '__main__':
-    raise Exception('(see [#410.H])')
-    """
-    about exceptions tagged :[#410.H]:
-      - these fixture executables are not actually executable
-      - but they could be made executable trivially.
-      - we haven't done so only for lack of need, and to keep them DRY KISS
+    import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
+    exit(_.execute_as_CLI_(open_dictionary_stream))
 
-    we have nonethelss flipped the executable bit to true:
-      - so there is an upgrade path laid down in case we decide to yes do this.
-      - so that the files more accurately resemble real life such files.
-    """
 
 # #born.

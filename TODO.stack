@@ -105,6 +105,7 @@ sub-project: upload files to s3
 ? clean up producers - make these scripts more DRY, "elegant"
 ? we have accumulated several #todo's
 ? refactor: integrate queries and tagging to use same grammar
-(-6) filter_by built with tag lyfe
-(-7) integrate: real query (parsed from tokens) against real tagging set (from string)
+? integrate with markdown tables (pretend it is [sg])
   - refactor: alternate, more efficient walker that doesn't build separator strings
+  - refactor: (see note in test support file about abstraction layer to introduce)
+  - refactor: flush renames (YIKES)

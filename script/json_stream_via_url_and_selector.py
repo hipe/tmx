@@ -68,13 +68,20 @@ _my_CLI.__doc__ = __doc__
 def flush_JSON_stream_into(sout, serr, itr):
     """convenience guy for this pattern ETC"""
 
-    import json
+    visit = JSON_object_writer_via_IO_downstream(sout)
     count = 0
     for obj in itr:
         count += 1
-        _line = json.dumps(obj)
-        sout.write(_line + '\n')
+        visit(obj)
+
     serr.write('({} items(s))\n'.format(count))
+
+
+def JSON_object_writer_via_IO_downstream(io):
+    def f(obj):
+        io.write(f'{json.dumps(obj)}\n')
+    import json
+    return f
 
 
 # -- EXPERIMENT..
@@ -188,6 +195,25 @@ def url_via_href_via_domain(domain):  # #coverpoint8.1
     return f
 
 
+def listener_and_exitstatuser_for_CLI(io):
+
+    from script_lib.magnetics import listener_via_resources as _
+    downstream_listener = _.listener_via_stderr(io)
+
+    exitstatus = 0  # innocent until proven guilty
+
+    def listener(head_channel, *a):
+        if 'error' == head_channel:
+            nonlocal exitstatus
+            exitstatus = 5
+        downstream_listener(head_channel, *a)
+
+    def exitstatuser():
+        return exitstatus
+
+    return listener, exitstatuser
+
+
 def _this_lazy(f):  # experiment (copy-paste)
 
     def g(*a):
@@ -203,6 +229,23 @@ def _this_lazy(f):  # experiment (copy-paste)
     return g
 
 
+def normalize_sys_path_():
+    """we want the `sys.path` to start with the universal monoproject
+
+    directory, nod the dirname of the entrypoint file (which we assert).
+    this is the first formal implementation of what is now recognized
+    as the pattern :[#019.E].
+    """
+
+    import os.path as os_path
+    from sys import path as sys_path
+    dn = os_path.dirname
+    here = os_path.abspath(dn(__file__))
+    if here != sys_path[0]:
+        sanity('sanity - in the future, default sys.path may change')
+    sys_path[0] = dn(here)
+
+
 @_this_lazy
 def pop_property(o, s):
     pass
@@ -210,6 +253,11 @@ def pop_property(o, s):
 
 @_this_lazy
 def cover_me(s):
+    pass
+
+
+@_this_lazy
+def sanity(s=None):
     pass
 
 

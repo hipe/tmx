@@ -27,7 +27,7 @@ class _SELF:
 
     def __init__(self, stderr, prog, command_stream, description_string):
 
-        ap = _argument_parser_via(stderr, prog, description_string)
+        ap = _argument_parser_via(stderr, prog, description=description_string)
 
         self.command_dictionary = _populate_via_command_stream(
                 stderr, ap, command_stream)
@@ -73,18 +73,22 @@ def __populate_via_command(subparsers, stderr, cmd):
         )
 
 
-def _NEW_THING(stderr, prog, parameter_dictionary, description):  # NOT_COVERED
+def _NEW_THING(stderr, prog, parameter_dictionary, **platform_kwargs):
+
+    description = platform_kwargs['description']  # no prisoners
 
     desc_s = _element_description_string_via_mixed(description)
     if desc_s is None:
         desc_s = '«DUMMY DESC FOR NEW THING»'
 
-    ap = _argument_parser_via(stderr, prog, desc_s)
+    platform_kwargs['description'] = desc_s
+
+    ap = _argument_parser_via(stderr, prog, **platform_kwargs)
     _populate_via_parameter_dictionary(ap, parameter_dictionary)
     return ap
 
 
-_SELF.argument_parser_via_parameter_dictionary = _NEW_THING
+_SELF.argument_parser_via_parameter_dictionary__ = _NEW_THING
 
 
 class _populate_via_parameter_dictionary:
@@ -196,12 +200,12 @@ class _populate_via_parameter_dictionary:
 #
 
 
-def _argument_parser_via(stderr, prog, description_string):
+def _argument_parser_via(stderr, prog, **platform_kwargs):
 
     ap_lib = _ap_lib()
-    ap = ap_lib.begin_native_argument_parser_to_fix(
+    ap = ap_lib.begin_native_argument_parser_to_fix__(
         prog=prog,
-        description=description_string,
+        **platform_kwargs
         )
     _hack_argument_parser(ap, stderr)
     return ap
@@ -234,7 +238,7 @@ def _string_via_description_function(f):
 def _hack_argument_parser(ap, stderr):
 
     ap_lib = _ap_lib()
-    ap_lib.fix_argument_parser(ap, stderr)
+    ap_lib.fix_argument_parser__(ap, stderr)
 
 
 @lazy

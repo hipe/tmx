@@ -22,6 +22,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #415    |       | the "stream" script (see `/script`)
 |                   #414.2  |       | (external tracking)
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)

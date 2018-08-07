@@ -174,8 +174,9 @@ class _CLI:  # #coverpoint
                 )
 
         reso = stepperer.SIMPLE_STEP(
-                self._sin, self._serr, self._argv,
-                _my_parameters, _description_of_sync)
+                self._sin, self._serr, self._argv, _my_parameters,
+                description=_description_of_sync,
+                )
         if reso.OK:
             self._namespace = reso.namespace
         else:
@@ -411,8 +412,9 @@ def _format_adapters_module():
 
 
 if __name__ == '__main__':
+    from json_stream_via_url_and_selector import normalize_sys_path_
+    normalize_sys_path_()
     import sys as o
-    o.path.insert(0, '')
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 

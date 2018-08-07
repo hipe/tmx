@@ -3,15 +3,16 @@
 as something of an overly reductive mnemonic, our modeling of
 parameters can employ a two-component tuple (a couple) of integer-ishes:
 
-we can model any formal parameter (in part) in terms of what is its
+we can model any formal parameter (in part) in terms of its
 *minimum* and *maximum* number of allowable arguments, a concept we
 hereafter refer to as "argument arity" (or sometimes just "arity").
 
-in fact every formal parameter has this property. (if you like, it's
-something of a required parameter *for* modeling a parameter, that is,
-a required meta-parameter!) Either tacitly or explicitly, one *must*
-conceive of every formal parameter in terms of what is its *minimum*
-and *maxium* number of allowable arguments.
+under this model, these are something of required fields *for* modeling
+parameters. (that is, they are required meta-parameters.)
+
+what we mean by this is simply that for every formal parameter, the designer
+must express (either tacitly or implicitly) a *minimum* and *maxium* *number*
+of allowable arguments for the parameter.
 
 if there's a central thesis to this module, it's that there exist 5
 or so interesting sets that we can model in this notation, each of which

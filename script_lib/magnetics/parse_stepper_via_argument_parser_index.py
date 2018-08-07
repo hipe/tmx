@@ -79,9 +79,10 @@ class _SELF:
 
 # == BEGIN
 def _SIMPLE_STEP(
-        sin, serr, argv,
-        parameters_definition, description,
-        stdin_OK=None):
+        sin, serr, argv, parameters_definition,
+        stdin_OK=None,
+        **platform_kwargs
+        ):
 
     """#NOT_COVERED experiment (at #history-A.2)"""
 
@@ -112,11 +113,11 @@ def _SIMPLE_STEP(
     params_d = {}
     parameters_definition(params_d, param_f)
 
-    _ap = mag.argument_parser_via_parameter_dictionary(
+    _ap = mag.argument_parser_via_parameter_dictionary__(
             stderr=serr,
             prog=prog,
-            description=description,
             parameter_dictionary=params_d,
+            **platform_kwargs
             )
 
     _stepper = _SELF(_ap, 'i am moniker', params_d)
