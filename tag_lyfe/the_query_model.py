@@ -146,8 +146,7 @@ class UnsanitizedList:
 
         def sanitized_node_via_stack_pop():
             _unsani_node = stack.pop()
-            _sani_node = _unsani_node.sanitize(listener)
-            return _sani_node  # #todo
+            return _unsani_node.sanitize(listener)
 
         sani_node = sanitized_node_via_stack_pop()
         if sani_node is None:
@@ -218,6 +217,10 @@ class _AND_or_OR_List:
                 yield w
 
 
+AND = 1
+OR = 2
+
+
 class AND_List(_AND_or_OR_List):
 
     def yes_no_match_via_tag_subtree(self, subtree):
@@ -229,9 +232,7 @@ class AND_List(_AND_or_OR_List):
                 break
         return yes
 
-    @property
-    def conjunction(self):
-        return AND
+    conjunction = AND
 
 
 class OR_List(_AND_or_OR_List):
@@ -243,13 +244,7 @@ class OR_List(_AND_or_OR_List):
                 break
         return yes
 
-    @property
-    def conjunction(self):
-        return OR
-
-
-AND = 1
-OR = 2
+    conjunction = OR
 
 
 _wordable_via_conjunction = {
@@ -303,7 +298,7 @@ _NOT_AS_WORDABLE = wordable_via_string_('not')
 
 """the "name chain" model :#here5:
 
-(#todo reconcile this with the newer [#705] digraph of the latest model)
+(EDIT reconcile this with the newer [#705] digraph of the latest model)
 
 categories of surface representation for (what we call) "taggings" include:
     - a simple, one-component tagging like `#foo`. (a "shallow tag".)

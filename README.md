@@ -67,9 +67,12 @@ however, these principles apply across the sub-projects:
 
 ## <a name="sub-projects"></a> what's a “sub-project” (and why sub-projects)?
 
-  - mainly we use the term to avoid confusion with the term “project” which
+if you are familiar with the term "mono-repo", that's what's going on here.
+
+  - mainly we use the term "sub-project" to avoid confusion with the term “project” which
     we use to mean _this_ directory tree we keep in version control (at the
-    top of which this README file sits).
+    top of which this README file sits). (we may now prefer to use the term
+    "mono-repo" instead of "project".)
 
   - a sub-project can be as small as a single-file one-off, or as large as
     a full-stack application. to place sub-projects into the same project

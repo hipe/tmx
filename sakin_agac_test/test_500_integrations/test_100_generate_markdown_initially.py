@@ -216,7 +216,7 @@ class Case220_arg(_CommonCase):  # #coverpoint9.1.2  - one arg: arg
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
-        return (fixture_executable_path('140_khong_micro.py'),)
+        return (fixture_executable_path('exe_140_khong_micro.py'),)
 
 
 def _this_one_lib():

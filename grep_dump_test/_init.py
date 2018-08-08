@@ -12,15 +12,15 @@ def _():
     head = a[0]
 
     top_test_dir = dn(__file__)
-    project_dir = dn(top_test_dir)
+    mono_repo_dir = dn(top_test_dir)
 
-    if project_dir == head:
+    if mono_repo_dir == head:
 
         pass  # assume low entrypoint loaded us to use for resources
 
     elif top_test_dir == head:
-        None if '' == a[1] else sanity()
-        a[0] = project_dir
+        None if mono_repo_dir == a[1] else sanity()
+        a[0] = mono_repo_dir
         a[1] = top_test_dir  # [#019.why-this-in-the-second-position]
 
     else:

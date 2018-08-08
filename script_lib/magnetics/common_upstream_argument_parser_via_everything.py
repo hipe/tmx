@@ -141,21 +141,19 @@ class common_upstream_argument_parser_via_everything:
 
 
 class _STDIN_As_Argument:
+
     def __init__(self, stdin):
         self.stdin = stdin
 
-    @property
-    def argument_type(self):
-        return 'stdin_as_argument'
+    argument_type = 'stdin_as_argument'
 
 
 class _FilesystemPathAsArgument:
+
     def __init__(self, path):
         self.path = path
 
-    @property
-    def argument_type(self):
-        return 'path_as_argument'
+    argument_type = 'path_as_argument'
 
 
 import sys  # noqa: E402

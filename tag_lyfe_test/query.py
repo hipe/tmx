@@ -1,51 +1,3 @@
-# #[#019.file-type-D]
-
-import os.path as os_path
-
-
-def _():
-    dn = os_path.dirname
-    import sys
-
-    a = sys.path
-    head = a[0]
-
-    top_test_dir = dn(__file__)
-    project_dir = dn(top_test_dir)
-
-    if project_dir == head:
-
-        pass  # assume low entrypoint loaded us to use for resources
-
-    elif top_test_dir == head:
-
-        # we get here when running `pud tag_lyfe_test`
-        None if project_dir == a[1] else sanity()
-        # at #history-A.1 the above changed from being '' to being the
-        # project dir.
-
-        # for some weird reason we want the one thing to be first and the
-        # other thing to be second. but this might change
-        # changed at #history-A.1
-
-        a[0] = project_dir
-        a[1] = top_test_dir  # [#019.why-this-in-the-second-position]
-
-    else:
-        sanity()
-
-
-def hello_you():  # #open #[#707.B]
-    pass
-
-
-def sanity(s='assumption failed'):
-    raise Exception(s)
-
-
-_()
-
-
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
         memoize,
@@ -83,8 +35,7 @@ class ScaryCommonCase(metaclass=_ScaryCommonCaseWatcher):
 
         _query = self.end_state().result
 
-        _yn = _query.yes_no_match_via_tag_subtree(subtree)
-        return _yn  # #todo
+        return _query.yes_no_match_via_tag_subtree(subtree)
 
     def point_at_word(self, w):
         offset_of_where_arrow_is_pointing_to, _1 = self._yikes_these()
@@ -126,7 +77,7 @@ def _add_scary_common_case_memoizing_methods(cls):
 
 
 def _build_tag_subtree(tag_emblems):
-    import tag_lyfe.the_tag_model as lib
+    import tag_lyfe.the_tagging_model as lib
     import re
 
     cache = _yikes_cache_of_tags
@@ -202,6 +153,6 @@ _yikes_cache_of_tag_subtrees = {}
 _yikes_cache_of_tags = {}
 
 
-# #pending-rename: the bulk of this should be 'query' to be next to 'tagging'
+# #history-A.2: this used to be the _init file but took the history DNA
 # #history-A.1: things changed at upgrade to python 3.7
 # #born.

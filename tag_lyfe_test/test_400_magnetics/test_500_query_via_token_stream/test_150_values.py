@@ -37,7 +37,8 @@ querying for "values":
 """
 
 
-from _init import (
+import _init  # noqa: F401
+from tag_lyfe_test.query import (
         ScaryCommonCase,
         )
 import unittest

@@ -141,13 +141,8 @@ class _NamespaceStepResolution:
     def __init__(self, namespace):
         self.namespace = namespace
 
-    @property
-    def OK(self):
-        return True
-
-    @property
-    def is_terminal(self):
-        return True
+    OK = True
+    is_terminal = True
 
 
 class _ExecutableTerminalStepResolution:
@@ -174,13 +169,8 @@ class _ExecutableTerminalStepResolution:
             return _listener
         return extraneous_f
 
-    @property
-    def OK(self):
-        return True
-
-    @property
-    def is_terminal(self):
-        return True
+    OK = True
+    is_terminal = True
 
 
 class _InterruptedStepResolution:
@@ -191,13 +181,8 @@ class _InterruptedStepResolution:
     def __init__(self, es):
         self.exitstatus = es
 
-    @property
-    def OK(self):
-        return False
-
-    @property
-    def is_terminal(self):
-        return True
+    OK = False
+    is_terminal = True
 
 
 #

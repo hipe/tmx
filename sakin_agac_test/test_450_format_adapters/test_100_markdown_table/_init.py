@@ -15,15 +15,15 @@ def _():
     test_sub_sub_dir = dn(__file__)
     test_sub_dir = dn(test_sub_sub_dir)
     top_test_dir = dn(test_sub_dir)
-    project_dir = dn(top_test_dir)
+    mono_repo_dir = dn(top_test_dir)
 
     if test_sub_sub_dir == head:
         # at #history-A.1: we realized we do not actually want to clobber
         # the sub-sub dir. if we "pud" the dir (see [#001.aliases]), that
         # dir must be in the sys path list.
-        # so not this: `a[0] = project_dir` but this:
-        a.insert(0, project_dir)
-    elif project_dir == head:
+        # so not this: `a[0] = mono_repo_dir` but this:
+        a.insert(0, mono_repo_dir)
+    elif mono_repo_dir == head:
         pass
     else:
         raise Exception('sanity')

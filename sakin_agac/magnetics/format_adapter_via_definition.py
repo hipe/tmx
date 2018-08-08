@@ -79,8 +79,7 @@ class _FormatAdapter:
         _f = self.DIG_HOI_POLLOI(dig_f(), listener)
         if _f is None:
             return  # #coverpoint5.1 GONE at #history-A.1 (see c.p tombstone)
-        _ = _f(mixed_collection_identifier, modality_resources, self, listener)
-        return _  # #todo
+        return _f(mixed_collection_identifier, modality_resources, self, listener)  # noqa: E501
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
         """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
@@ -142,7 +141,7 @@ class _FormatAdapter:
 
     @property
     def sync_lib(self):  # #here1
-        from . import synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
+        from . import synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
         return x
 
     @property

@@ -2,7 +2,6 @@ from sakin_agac import (
         cover_me,
         sanity,
         )
-import re
 
 
 def row_two_function_and_liner_via_row_one_line(line, listener):
@@ -51,8 +50,7 @@ def row_two_function_and_liner_via_row_one_line(line, listener):
             cover_me("we don't know if this is possible")
 
     def row_via_line(line_):
-        x = f(line_, listener)
-        return x  # #todo
+        return f(line_, listener)
 
     from sakin_agac.format_adapters.markdown_table.magnetics import (
             row_as_editable_line_via_line as f,
@@ -179,8 +177,7 @@ def _the_index_components_via(cels_count, header_row1_DOM):
 
         def g(item):
             _cel = item.ROW_DOM_.cel_at_offset(offset)
-            _val_s = _cel.content_string()
-            return _val_s  # #todo
+            return _cel.content_string()
         return g
     return (f, offset_via_normal_field_name, field_names)
 

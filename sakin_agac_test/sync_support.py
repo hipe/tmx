@@ -79,7 +79,7 @@ def _identity(x):
 
 
 def subject_module_():
-    import sakin_agac.magnetics.synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
+    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
     return x
 
 

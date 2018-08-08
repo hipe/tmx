@@ -273,6 +273,5 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
-# #pending-rename: at (-4) maybe put this in format_adapters/html
 # #historyA.1: got rid of use of `log`
 # #born: abstracted from sibling

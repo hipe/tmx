@@ -22,11 +22,18 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #416.D  |       | CMS's
+|                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
+|                   #416.B  |       | (nasim!)
+|                   #416    |       | (numberspace for publishing wishlist)
 |                   #415    |       | the "stream" script (see `/script`)
 |                   #414.2  |       | (external tracking)
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.V  | #open | #of:[#410.U] clean up, unify producer scripts to be more elegant
+|                   #410.U  | #open | visible seams to clean up when things are stable
+|                   #410.T  | #open | tests we haven't written but still want
 |                   #410.S  | #trak | markdown row spacing might be a misfeature
 |                   #410.R  | #trak | would redis etc
 |                   #410.Q  | #prov | provision: natural key field name always leftmost (things will break)
@@ -43,7 +50,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #410.E  | #open | dashes to underscores is getting annoying
 |                   #410.D  | #trak | spots to change if we add this feature (see)
 |                   #410.C  | #wish | we want regex escape
-|                   #410.B  |       | "item" wrapper classes - exploratory
+|                   #410.B  | #open | #refactor: "item" wrapper class does nothing
 |                   #410    |       | (internal tracking)
 |<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents
 |                   #409.A  |       | central conceit: markdown table as datastore
@@ -60,7 +67,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 
 [\[#409\]]: 409-ersatz-parsing-a-markdown-document-for-tables.dot
-[\[#408\]]: 408-decompose-the-synchronization-algorithm.md
+[\[#408\]]: 408-markdown-table-targeted-synchronization.md
 [\[#407\]]: 407-collection-synchronization-algorithm.md
 [\[#406\]]: 406-strategic-dependency-graph.dot
 [\[#405\]]: 405-play.md

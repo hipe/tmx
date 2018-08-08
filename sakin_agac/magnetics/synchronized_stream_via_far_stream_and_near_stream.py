@@ -99,9 +99,8 @@ class _SyncParameters:
         self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
         self.sync_keyerser = sync_keyerser
 
-    @property
-    def sync_parameters_version(self):
-        return 2  # bump this WHEN you add to constituency
+    sync_parameters_version = 2
+    # bump this WHEN you add to constituency
 
     def to_dictionary(self):  # (just for debugging)
         dct = {'_is_sync_meta_data': True}
@@ -444,6 +443,4 @@ def _empty_iterator():
 # #history-A.4: sunset diminishing pool algorithm while spike interleaving
 # #history-A.2: when wrapper fails (sketch)
 # #history-A.1 (can be temporary): "inject" wrapper function
-# #pending-rename: we might name every "new stream" as "far stream" ibid near
-#     NOTE: search replace the filename in code too. also in [#407]
 # #born.

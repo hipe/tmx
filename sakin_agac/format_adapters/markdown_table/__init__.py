@@ -34,10 +34,10 @@ class _open_new_lines_via_sync:
         self._OK and self.__resolve_sync_request()
         self._OK and self.__resolve_near_tagged_items()
         if self._OK:
-            _ = self.__iterate_via_sync_request()
-            return _  # #todo
+            result = self.__iterate_via_sync_request()
         else:
-            return iter(())  # #provision [#410.F.2]
+            result = iter(())  # #provision [#410.F.2]
+        return result
         # (was #coverpoint5.2 - now gone)
 
     def __iterate_via_sync_request(self):
@@ -70,7 +70,7 @@ class _open_new_lines_via_sync:
             use_far_stream = (f(x) for x in use_far_stream)
         # --
 
-        from .magnetics import newstream_via_farstream_and_nearstream as mag
+        from .magnetics import synchronized_stream_via_far_stream_and_near_stream as mag  # noqa: E501
         tagged_items = mag(
                 # the streams:
                 far_native_stream=use_far_stream,

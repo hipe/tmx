@@ -19,5 +19,4 @@ if __name__ == '__main__':
     import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
     exit(_.execute_as_CLI_(open_dictionary_stream))
 
-# #pending-rename: probably bad_human_key_ETC now that it has a purpose
 # #born.

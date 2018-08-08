@@ -29,7 +29,7 @@ def _memoized_walker():
     file), things regress more nicely when we load this lazily
     """
 
-    import tag_lyfe.the_tag_model as native_models
+    import tag_lyfe.the_tagging_model as native_models
     from tatsu.walkers import NodeWalker
 
     class MyWalker(NodeWalker):
@@ -49,7 +49,7 @@ def _memoized_walker():
             if ft is not None:
 
                 _ts = self._my_walk_tagging_sep(node.head_sep)
-                _ta = self.walk(ft)  # #TODO
+                _ta = self.walk(ft)  # #here3
 
                 yield native_models.DocumentPair(_ts, _ta)
 
@@ -72,7 +72,7 @@ def _memoized_walker():
             if node is None:
                 return ''
             else:
-                return self.walk(node)  # #TODO
+                return self.walk(node)  # #here3
 
         def walk__tagging_separator(self, node):
             """
@@ -140,6 +140,11 @@ def _memoized_walker():
             return (False, node.ast)  # #here2
 
     return MyWalker()
+
+
+""".:#here3: one day we might not want to bother calling walk if we know
+exactly what kind of (grammatical) node this is #open [#707.J])
+"""
 
 
 @memoize

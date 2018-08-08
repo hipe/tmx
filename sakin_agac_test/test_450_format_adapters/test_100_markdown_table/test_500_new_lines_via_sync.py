@@ -291,11 +291,11 @@ def _same_this():
 
 
 def _far_script_exists():
-    return fixture_executable_path('100_chimi_churri.py')
+    return fixture_executable_path('exe_100_bad_natural_key.py')
 
 
 def _same_existent_markdown_file():
-    return fixture_file_path('0080-too-few-rows.md')
+    return fixture_file_path('0080-cel-underflow.md')
 
 
 if __name__ == '__main__':

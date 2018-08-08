@@ -412,12 +412,10 @@ class _StackFrame:
     def the_effective_margin_length(self):  # assume 1st child is terminal eek
         return self.children[0].effective_margin_length
 
-    @property
-    def is_terminal(self):
-        return False
-
     def hello_stack_frame(self):
         pass  # #wish [#008.D]
+
+    is_terminal = False
 
 
 class _BranchNode:
@@ -425,9 +423,7 @@ class _BranchNode:
     def __init__(self, cx):
         self.children = cx
 
-    @property
-    def is_terminal(self):
-        return False
+    is_terminal = False
 
 
 class _ScannedLine:
@@ -476,9 +472,7 @@ class _ScannedLine:
     def margin_string():
         pass
 
-    @property
-    def is_terminal(self):
-        return True
+    is_terminal = True
 
     # #todo - can you employ decorators without a starting method :#here1
 

@@ -100,9 +100,7 @@ class Case020_fail_too_many_rows(_CommonCase):  # #coverpoint3.1
 
     @failure_snapshot
     def snapshot(self):
-        return '0090-too-many-rows.md'
-        # #here1: the above filename should be renamed: cels not rows, less not too few  # noqa: E501
-        # #here2: the other one should be renamed: cels not rows, more not too many  # noqa: E501
+        return '0090-cel-overflow.md'
 
 
 class Case030_minimal_working(_CommonCase):
@@ -216,7 +214,5 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: not this file but #here2
-# #pending-rename: not this file but #here1
 # #history-A.1: remove "too few cels"
 # #born.

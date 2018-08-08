@@ -160,5 +160,4 @@ of name-value pairs).
 
 ## (document-meta)
 
-  - #pending-rename: NNN-markdown-table-targeted-synchronization.md
   - #born.

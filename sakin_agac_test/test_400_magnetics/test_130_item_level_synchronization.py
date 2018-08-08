@@ -1,4 +1,4 @@
-# covers: sakin_agac/magnetics/synchronized_stream_via_new_stream_and_original_stream  # noqa: E501
+# covers: sakin_agac/magnetics/synchronized_stream_via_far_stream_and_near_stream  # noqa: E501
 
 """discussion
 
@@ -57,7 +57,7 @@ class Case010_hello(_CommonCase):
 
 def _my_sync(orig, new):  # #here1
 
-    import sakin_agac.magnetics.synchronized_stream_via_new_stream_and_original_stream as x  # noqa: E501
+    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
     f = _MyBusinessObject.name_value_pairs_via_doohah
     sync_st = x.stream_of_mixed_via_sync(
         natural_key_via_far_user_item=_natty_key_via_object,

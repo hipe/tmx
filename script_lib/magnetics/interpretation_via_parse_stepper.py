@@ -127,5 +127,4 @@ flattens this order out of it (in part in case we want to change it, the
 rename won't be drastic.)
 """
 
-# #pending-rename: to whatever better name, if you can think of one
 # #abstracted.

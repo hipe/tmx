@@ -26,6 +26,8 @@ machine-readble way.)
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.J  | #open | small visible seams to remove when stable
+|                   #707.I  | #open | #refactor: queries and tagging should use same grammar (for tagging)
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics
 |                   #707.F  | #trak | the "wordables" micro API

@@ -37,9 +37,10 @@ class _open_sync_request:
 
         """[constructor..]
 
-        mixed_collection_identifier -- [..] #todo
+        mixed_collection_identifier -- (#open [#410.U] explain this)
 
-        modality_resources -- #todo how do we know we're getting the right 1?
+        modality_resources -- (#open: how do we know we're getting the right 1?
+                    this is #open [#410.U].)
 
         format_adapter -- although typically you are here sitting in the
                     same module that builds this selfsame format adapter,

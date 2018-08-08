@@ -310,11 +310,11 @@ class Case070_money_and_diff(_CommonCase):  # #coverpoint6.2
         return ('me', '--diff', _markdown_0100(), _far_130())
 
 
-# #cover-me #todo - no diff
+# #open [#410.T] cover case: no diff
 
 
 def _far_130():
-    return fixture_executable_path('130_edit_add.py')
+    return fixture_executable_path('exe_130_edit_add.py')
 
 
 def _markdown_0100():

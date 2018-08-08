@@ -153,6 +153,4 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
-
-# #pending-rename: all the other exe's, consider giving them `exe_` prefix also
 # #DNA-fissure

@@ -58,13 +58,12 @@ right-align the ASCII art for right-aligned columns, and follow suit
 accordingbly.)
 
 and come to think of it, center-aligning ASCII art seems like a misfeature.
-(#track [#410.S])
 
 indeed it's a poor separation of content from presentation. the human should
 be able to change the alignment of a column (e.g from `:---` to `---:`) and
 have it not change how subsequent machine-generated rows are aligned. meh
 
-#todo the above should be an #open issue
+(#open [#410.S])
 """
 
 from sakin_agac import (
@@ -182,13 +181,11 @@ class _SELF:
 
         new_cels.append(self.__reuse_newline)  # always add a newline
 
-        _new_row = self._RowDOM().init_via_all_memberdata__(
+        return self._RowDOM().init_via_all_memberdata__(
             cels_count=self._cels_count,
             children=tuple(new_cels),
             has_endcap=has,
             )
-
-        return _new_row  # #todo
 
     def __build_new_cels(self, user_f, new_value_via_offset):
 
@@ -200,8 +197,7 @@ class _SELF:
 
         value_cel = self.__value_celer(new_value_via_offset)
 
-        _new_cels = [new_cel_for(i) for i in range(0, self._cels_count)]
-        return _new_cels  # #todo
+        return [new_cel_for(i) for i in range(0, self._cels_count)]
 
     def __value_celer(self, new_value_via_offset):
 

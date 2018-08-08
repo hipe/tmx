@@ -99,13 +99,7 @@ sub-project: upload files to s3
 07:43 Tutorial #12 - Implement Book Model in Play Framework
 (-1) try to install every CMS
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
-? worldwide refactor: [#508] (the emissions thing)
-? worldwide refactor: you did lots of `@property` you did not need
-? re parser generators: turn soft notes into tags (for no real reason except posterity))
-? clean up producers - make these scripts more DRY, "elegant"
-? we have accumulated several #todo's
-? refactor: integrate queries and tagging to use same grammar
-? integrate with markdown tables (pretend it is [sg])
+(-tag-lyfe.5 integrate with markdown tables (pretend it is [sg]))
+  - integrate queries and tagging to use same grammar
   - refactor: alternate, more efficient walker that doesn't build separator strings
   - refactor: (see note in test support file about abstraction layer to introduce)
-  - refactor: flush renames (YIKES)

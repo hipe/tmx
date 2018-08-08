@@ -1,4 +1,3 @@
-# #covers: sakin_agac.format_adapters.markdown_table.magnetics.newstream_via_farstream_and_nearstream  # noqa: E501
 # #covers: sakin_agac.format_adapters.markdown_table.magnetics.prototype_row_via_example_row_and_schema_index  # noqa: E501
 
 from _init import (
@@ -83,7 +82,8 @@ class Case100_adds_only(_CommonCase):
 
     def test_060_the_new_one_was_added(self):
         """
-        TODO: this test (although small in codesize) is overloaded. if you
+        .#open [#410.U]:
+        this test (although small in codesize) is overloaded. if you
         refactor this test, consider breaking it up to test these separately:
 
           - that original widths are respected when possible #coverpoint1.2
@@ -376,8 +376,7 @@ def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):
 
     import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib
 
-    _wat = lib(_HOLY_SHNAPPS, _MyCustomProcessor())
-    return _wat  # #todo
+    return lib(_HOLY_SHNAPPS, _MyCustomProcessor())
 
 
 class _MyCustomProcessor:
@@ -453,7 +452,7 @@ def _same_sync_keyerser():
     return (
         'sakin_agac_test.test_450_format_adapters.'
         'test_100_markdown_table.'
-        'test_300_newstream_via_farstream_and_nearstream.'
+        'test_300_synchronized_stream_via_far_stream_and_near_stream.'
         'Chimmy_Chamosa_001'
         )
 
@@ -496,7 +495,7 @@ class _Section:
 
 @memoize
 def _subject_module():
-    return co.sub_magnetic('newstream_via_farstream_and_nearstream')
+    return co.sub_magnetic('synchronized_stream_via_far_stream_and_near_stream')  # noqa: E501
 
 
 if __name__ == '__main__':

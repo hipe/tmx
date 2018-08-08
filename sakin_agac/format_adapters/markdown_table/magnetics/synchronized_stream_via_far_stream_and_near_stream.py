@@ -19,7 +19,7 @@ your result; but in fact we do something simpler.
 """
 
 from sakin_agac.magnetics import (
-        synchronized_stream_via_new_stream_and_original_stream as _top_sync,
+        synchronized_stream_via_far_stream_and_near_stream as _top_sync,
         )
 from sakin_agac import (
         cover_me,
@@ -269,7 +269,7 @@ class _Newstream_via:
         class _NearItem:
             """
             #[#410.B] track item classes
-            #todo we want to get rid of this - it does nothing at writing
+            #open [#410.B]: this does nothing and will be removed
             """
 
             def __init__(self2, row_DOM):
@@ -361,6 +361,5 @@ _NEWSTREAM_VIA.sibling_ = _import_sibling_module
 
 sys.modules[__name__] = _NEWSTREAM_VIA
 
-# #pending-rename: far_stream not farstream etc (maybe)
 # #history-A.1: add experimental feature "sync keyerser"
 # #born.

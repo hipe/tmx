@@ -671,7 +671,6 @@ def _str_via(strings):
     return ''.join(buffer)
 
 
-# #pending-rename: this was born wanting to be abstracted
 # #history-A.2
 # #history-A.1
 # #born

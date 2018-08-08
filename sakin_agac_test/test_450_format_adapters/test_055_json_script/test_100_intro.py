@@ -128,7 +128,7 @@ class Case270_no_metadata_row(_CommonCase):  # #coverpoint7.2
     def given(self):
         return {
                 'near_collection': _same_near_collection(),
-                'far_collection': fixture_executable_path('080_no_metadata.py'),  # noqa: E501
+                'far_collection': fixture_executable_path('exe_080_no_metadata.py'),  # noqa: E501
                 }
 
 
@@ -167,7 +167,7 @@ class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
     def given(self):
         return {
                 'near_collection': _same_near_collection(),
-                'far_collection': fixture_executable_path('110_extra_cel.py'),
+                'far_collection': fixture_executable_path('exe_110_extra_cel.py'),
                 }
 
 
@@ -186,12 +186,13 @@ class Case300_RUM(_CommonCase):  # #coverpoint7.5
     def given(self):
         return {
                 'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
-                'far_collection': fixture_executable_path('120_endcap_yes_no.py'),  # noqa: E501
+                'far_collection': fixture_executable_path('exe_120_endcap_yes_no.py'),  # noqa: E501
+
                 }
 
 
 def _chimi_churri_far_path():
-    return fixture_executable_path('100_chimi_churri.py')
+    return fixture_executable_path('exe_100_bad_natural_key.py')
 
 
 def _same_near_collection():
@@ -200,7 +201,7 @@ def _same_near_collection():
     to test our own. but meh.
     """
 
-    return fixture_file_path('0080-too-few-rows.md')
+    return fixture_file_path('0080-cel-underflow.md')
 
 
 def _build_collection_reference(string):
@@ -216,5 +217,4 @@ def _subject_format_adapter():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: push down
 # #born.

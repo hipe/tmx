@@ -1,5 +1,5 @@
 """
-.#covers: sakin_agac/magnetics/synchronized_stream_via_new_stream_and_original_stream  # noqa: E501
+"collection-level synchronization"
 
 at #history-A.2 when we spiked the new "interleaving" algorithm, we
 preserved this one (for practical reasons) .. see [#407]
@@ -161,7 +161,6 @@ class Case060_some_down_on_to_some_yes_collisions(_CommonCase):
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: you probably want to just name this after the magnetic
 # #history-A.2: when we spiked the interleaving algorithm
 # #history-A.1: removed use of format adapter from this test
 # #born.

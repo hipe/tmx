@@ -68,7 +68,7 @@ def tagging_via_sanitized_tag_stem(stem):
 
 
 def tagging_via_sanitized_pieces(pcs):
-    """NOTE - this will go away #todo after we unify the grammars
+    """NOTE - this will go away #open [#707.I] after we unify the grammars
     this is here for conveninece as a legacy way to build the thing
     """
 
@@ -190,6 +190,5 @@ class BareNameComponent:
 
 
 # #history-A.2: yet another new and improved model to accomodate quotes
-# #pending-rename: MAYBE to 'the tagging model'
 # #history-A.1: begin actually using this to build native structures from AST's
 # #born.

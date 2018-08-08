@@ -270,9 +270,7 @@ class _WildcardGlob:
         if 1 == self.begin:
             self.is_satisfied = True  # might be multiple times
 
-    @property
-    def does_get_consumed(self):
-        return False
+    does_get_consumed = False
 
 
 class _Literal:
@@ -289,9 +287,7 @@ class _Literal:
             cover_me('mismatch: expecting {}, had {}'.format(
                 self.string, s))
 
-    @property
-    def does_get_consumed(self):
-        return True
+    does_get_consumed = True
 
 
 def _num_params(f):

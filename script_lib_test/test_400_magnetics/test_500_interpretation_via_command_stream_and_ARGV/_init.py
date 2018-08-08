@@ -15,12 +15,12 @@ def _():
     test_sub_sub_dir = dn(__file__)
     _test_sub_dir = dn(test_sub_sub_dir)
     top_test_dir = dn(_test_sub_dir)
-    project_dir = dn(top_test_dir)
+    mono_repo_dir = dn(top_test_dir)
 
     if test_sub_sub_dir != head:
         raise Exception('sanity')
 
-    a[0] = project_dir
+    a[0] = mono_repo_dir
 
 
 _()

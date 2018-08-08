@@ -14,11 +14,11 @@ def _():
 
     test_sub_dir = dn(__file__)
     top_test_dir = dn(test_sub_dir)
-    project_dir = dn(top_test_dir)
+    mono_repo_dir = dn(top_test_dir)
 
     if test_sub_dir == head:
-        a[0] = project_dir
-    elif project_dir == head:
+        a[0] = mono_repo_dir
+    elif mono_repo_dir == head:
         # one of two possibilities:
         #
         # 1. unittest is running the whole tree. the specific test files

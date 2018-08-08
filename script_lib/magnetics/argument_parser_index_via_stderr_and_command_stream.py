@@ -13,8 +13,11 @@ from script_lib import (
         cover_me,
         )
 
-# #todo - you could eliminate (at writing) all `lazy` here (look)
 
+_THIS_NAME = 'chosen_sub_command'
+
+
+# #todo - you could eliminate (at writing) all `lazy` here (look)
 
 class _SELF:
     """a collection of commands is passed over the transation boundary
@@ -33,9 +36,7 @@ class _SELF:
                 stderr, ap, command_stream)
         self.argument_parser = ap
 
-    @property
-    def this_one_name__(self):
-        return _THIS_NAME
+    this_one_name__ = _THIS_NAME
 
 
 def _populate_via_command_stream(stderr, ap, command_stream):
@@ -288,7 +289,6 @@ _exe = Exception
 _DASH_DASH = '--'
 _EMPTY_STRING = ''
 _NEWLINE = '\n'
-_THIS_NAME = 'chosen_sub_command'
 
 
 import sys  # noqa E402

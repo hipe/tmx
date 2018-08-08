@@ -3,11 +3,12 @@
 """
 
 
-from _init import (
-        memoize,
-        )
+import _init  # noqa: F401
 from tag_lyfe_test.CLI_integration import (
         MemoizyCommonCase as _ThisCase,
+        )
+from modality_agnostic.memoization import (
+        memoize,
         )
 import unittest
 

@@ -47,9 +47,7 @@ class _BranchDOM:
             else:
                 buff.write(ch.to_string())
 
-    @property
-    def is_branch(self):
-        return True
+    is_branch = True
 
 
 class _RowDOM(_BranchDOM):
@@ -244,15 +242,14 @@ def _further_parse_cel(a, outer_s):
 
 
 class _LeafDOM:
+
     def __init__(self, s):
         self.string_ = s
 
     def to_string(self):
         return self.string_
 
-    @property
-    def is_branch(self):
-        return False
+    is_branch = False
 
 
 _EMPTY_LEAF = _LeafDOM('')
