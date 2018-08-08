@@ -100,5 +100,3 @@ sub-project: upload files to s3
 (-1) try to install every CMS
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
 (-tag-lyfe.5 integrate with markdown tables (pretend it is [sg]))
-  - integrate queries and tagging to use same grammar
-  - refactor: alternate, more efficient walker that doesn't build separator strings

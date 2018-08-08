@@ -23,10 +23,13 @@ machine-readble way.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
+|                   #709.D  | #open | integrate queries and tagging to use same grammar (#when)
+|                   #709.C  | #open | maybe don't walk (#when)
+|                   #709.B  | #open | generic small seams (#when)
+|                   #709    |       | (seams to revisit when stable)
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
-|                   #707.J  | #open | small visible seams to remove when stable
 |                   #707.I  | #open | #refactor: queries and tagging should use same grammar (for tagging)
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics

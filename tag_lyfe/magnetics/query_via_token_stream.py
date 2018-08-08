@@ -71,7 +71,7 @@ def _memoized_walker():
 
     class MyWalker(NodeWalker):
 
-        def walk_object(self, node):  # #open [#707.J] temporary for dev
+        def walk_object(self, node):  # #open #[#709.B] temporary for dev
             _msg = f'write me: walker for: {type(node)}'
             raise Exception(_msg)
             print(_msg)

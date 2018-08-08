@@ -13,18 +13,26 @@ from modality_agnostic import memoization as _
 memoize = _.memoize
 
 
+def doc_pairs_via_string_LIGHTWEIGHT(input_string):
+    return _doc_pairs_via_walker(_walkers().Light, input_string)
+
+
 def doc_pairs_via_string(input_string):
+    return _doc_pairs_via_walker(_walkers().Heavy, input_string)
+
+
+def _doc_pairs_via_walker(walker, input_string):
 
     _model = _query_parser().parse(
             text=input_string,
             whitespace='',  # we do our own whitespace. see #here2
             )
 
-    return _memoized_walker().walk(_model)
+    return walker.walk(_model)
 
 
 @memoize
-def _memoized_walker():
+def _walkers():
     """as explained in the counterpart file (referenced in a tag at top of
     file), things regress more nicely when we load this lazily
     """
@@ -48,7 +56,7 @@ def _memoized_walker():
             ft = node.first_tagging
             if ft is not None:
 
-                _ts = self._my_walk_tagging_sep(node.head_sep)
+                _ts = self._MY_walk_tagging_sep(node.head_sep)
                 _ta = self.walk(ft)  # #here3
 
                 yield native_models.DocumentPair(_ts, _ta)
@@ -67,12 +75,6 @@ def _memoized_walker():
                 use_tail = ''
 
             yield native_models.EndPiece(use_tail)
-
-        def _my_walk_tagging_sep(self, node):
-            if node is None:
-                return ''
-            else:
-                return self.walk(node)  # #here3
 
         def walk__tagging_separator(self, node):
             """
@@ -139,11 +141,29 @@ def _memoized_walker():
         def walk__not_double_quote(self, node):
             return (False, node.ast)  # #here2
 
-    return MyWalker()
+    class LightWalker(MyWalker):
+        def _MY_walk_tagging_sep(self, node):
+            return NOT_REAL_SEPARATOR
+
+    class NOT_REAL_SEPARATOR:
+        pass
+
+    class HeavyWalker(MyWalker):
+        def _MY_walk_tagging_sep(self, node):
+            if node is None:
+                return ''
+            else:
+                return self.walk(node)  # #here3
+
+    class walkers:  # #as-namespace-only
+        Light = LightWalker()
+        Heavy = HeavyWalker()
+
+    return walkers
 
 
 """.:#here3: one day we might not want to bother calling walk if we know
-exactly what kind of (grammatical) node this is #open [#707.J])
+exactly what kind of (grammatical) node this is #open [#709.C])
 """
 
 

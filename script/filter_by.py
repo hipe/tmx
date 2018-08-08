@@ -399,7 +399,7 @@ class _tallying_filter:
         from tag_lyfe.magnetics import (
                 tagging_subtree_via_string as _
                 )
-        self._tagging_subtree_via_string = _.doc_pairs_via_string
+        self._tagging_subtree_via_string = _.doc_pairs_via_string_LIGHTWEIGHT
 
         self.count_of_items_that_did_not_match = 0
         self.count_of_items_that_matched = 0
@@ -413,8 +413,6 @@ class _tallying_filter:
         taggings = None
 
         for k in self._tag_lyfe_keys:
-
-            print('\n\n\nclean me up\n\n')
             pairs = self._tagging_subtree_via_string(dct[k])
             pairs = tuple(pairs)
             length = len(pairs)
