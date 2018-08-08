@@ -46,7 +46,8 @@ important usage notes:
 
 """(this description does not appear in the help screen)
 
-.#covered-by: tag_lyfe #coverpoint1.8
+.#covered-by: tag_lyfe #coverpoint1.8 (for CLI-integration-related)
+.#covered-by: tag_lyfe #coverpoint1.5 (for lower-level, API-endpoint-like)
 """
 
 
@@ -65,7 +66,7 @@ def _my_parameters(o, param):
 
 def _the_function_called_required(self, prp, x):
     if x is None:
-        self.OK = False
+        self._become_not_OK()
     else:
         setattr(self, prp, x)
 
@@ -76,39 +77,68 @@ def _CLI(sin, sout, serr, argv):  # #testpoint
 
     listener, exitstatuser = siblib.listener_and_exitstatuser_for_CLI(serr)
 
+    res = _query_and_collection_id_via_ARGV(sin, serr, argv, listener)
+    if not res.OK:
+        return res.exitstatus
+    query = res.query
+    coll_id = res.collection_identifier
+    del(res)
+
+    visit = siblib.JSON_object_writer_via_IO_downstream(sout)
+
+    _ = _filtered_items_via_query_and_collection_id(query, coll_id, listener)
+
+    for dct in _:
+        visit(dct)
+
+    return exitstatuser()
+
+
+def _query_and_collection_id_via_ARGV(sin, serr, argv, listener):
+
     hack_after = _hack_before(argv)
 
     program_name, *args = argv
 
     rs1 = _parse_query(args, listener).execute()
     if not rs1.OK:
-        return rs1.exitstatus
+        return rs1
+    query = rs1.query
+    args_after_query = rs1.args_after_query
+    del(rs1)
 
-    rs2 = _parse_args(sin, serr, [program_name, *rs1.args_after_query])
+    rs2 = _parse_args(sin, serr, [program_name, *args_after_query])
     if not rs2.OK:
-        return rs2.exitstatus
-
+        return rs2
     coll_id = getattr(rs2.namespace, 'collection-identifier')  # #open [#601]
     del(rs2)
+
     if hack_after is not None:
         coll_id = hack_after(coll_id)
 
-    visit = siblib.JSON_object_writer_via_IO_downstream(sout)
+    return _TheseTwo(query, coll_id)
 
+
+class _TheseTwo:
+    def __init__(self, query, coll_id):
+        self.query = query
+        self.collection_identifier = coll_id
+    OK = True
+
+
+def _filtered_items_via_query_and_collection_id(query, coll_id, listener):  # noqa: E501 #testpoint
     import script.stream as siblib2
     with siblib2.open_dictionary_stream(coll_id, listener) as dcts:
 
         ks = _tag_lyfe_field_names_via(dcts, listener)
         if ks is not None:
-            tf = _tallying_filter(rs1.query, ks)
+            tf = _tallying_filter(query, ks)
             for dct in dcts:
                 _yes = tf.yes_no(dct)
                 if _yes:
-                    visit(dct)
+                    yield dct
 
             _express_summary_at_finish_into(listener, tf)
-
-    return exitstatuser()
 
 
 def _hack_before(argv):
@@ -271,7 +301,7 @@ def _tag_lyfe_field_names_via(dcts, listener):
     return tuple(tup)  # ..
 
 
-class _parse_query:
+class _parse_query:  # #testpoint
     """
     do the hacky heavy lifting of separating out the query part of ARGV
 
@@ -323,6 +353,11 @@ class _parse_query:
 
     def __resolve_query(self, args):
 
+        # #coverpoint1.7.2 - it's strange and ugly if you pass an empty string
+        if 0 == len(args):
+            self.__when_about_no_query()
+            return
+
         self._big_string = _NULL_BYTE.join(args)
 
         from tag_lyfe.magnetics import (
@@ -335,7 +370,16 @@ class _parse_query:
         _query = _unsani.sanitize(self._listener)
         self._required('query', _query)
 
+    def __when_about_no_query(self):
+        def f():
+            yield 'expecting query or <collection-identifier>'
+        self._listener('error', 'expression', 'empty_query', f)
+        self._become_not_OK()
+
     _required = _the_function_called_required
+
+    def _become_not_OK(self):
+        self.OK = False
 
 
 class _THE_PASSTHRU_QUERY:  # #class-as-namespace

@@ -22,6 +22,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #417    |       | #central-concetit: the JSON wall (lingua franca) (see ASCII art here)
 |                   #416.D  |       | CMS's
 |                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
 |                   #416.B  |       | (nasim!)
@@ -53,7 +54,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #410.B  | #open | #refactor: "item" wrapper class does nothing
 |                   #410    |       | (internal tracking)
 |<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents
-|                   #409.A  |       | central conceit: markdown table as datastore
+|                   #409.A  |       | #central-conceit: markdown table as datastore
 |<a name=408></a>[\[#408\]] |       | decompose the algorithm
 |<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
 |<a name=406></a>[\[#406\]] |       | strategic dependency graph

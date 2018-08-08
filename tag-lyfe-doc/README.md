@@ -36,6 +36,8 @@ machine-readble way.)
 |                   #707.C  | #trak | when we formalize allowable tag names
 |                   #707.B  |       | for now no 'tag subtree' class
 |                   #707    |       | (internal tracking)
+|                   #706    | #trak | #central-conceit: queries then other arguments in ARGV ([#706.B] is note)
+|                   #705    |       | the tagging model (graph viz file)
 |                   #704    |       | experimental conventions
 |                   #703    |       | soft notes
 |                [\[#702\]] |       | due dilligence on parser generators

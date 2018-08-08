@@ -102,4 +102,3 @@ sub-project: upload files to s3
 (-tag-lyfe.5 integrate with markdown tables (pretend it is [sg]))
   - integrate queries and tagging to use same grammar
   - refactor: alternate, more efficient walker that doesn't build separator strings
-  - refactor: (see note in test support file about abstraction layer to introduce)

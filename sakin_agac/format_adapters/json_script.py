@@ -84,6 +84,7 @@ for now. (:#here1).
 as either "python" or "other" (based on the extension, maybe) and we use
 either figure 1 or figure 2 based on that. but suffice it to say, there is
 some figure 1 work we would have to do that is not yet implemented.)
+.:[#417]
 """
 
 from sakin_agac.magnetics import (
