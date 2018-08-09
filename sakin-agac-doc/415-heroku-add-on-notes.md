@@ -51,8 +51,7 @@
 |[Duperset](https://devcenter.heroku.com/articles/duperset)|#analytics||
 |[Edge](https://devcenter.heroku.com/articles/edge)|#CDN||
 |[Einstein Platform Services](https://devcenter.heroku.com/articles/einstein-platform-services)|#interesting||
-|[Einstein Vision](https://devcenter.heroku.com/articles/einstein-vision)|#interesting||
-|[Einstein Vision and Language](https://devcenter.heroku.com/articles/einstein-vision)|           |           |
+|[Einstein Vision and Language](https://devcenter.heroku.com/articles/einstein-vision)|#interesting||
 |[Elasticsearch](https://devcenter.heroku.com/articles/foundelasticsearch)|#search||
 |[Elegant CMS](https://devcenter.heroku.com/articles/elegant-cms)|#CMS #interesting||
 |[Exceptiontrap](https://devcenter.heroku.com/articles/exceptiontrap)|#monitoring||
@@ -87,7 +86,6 @@
 |[JawsDB Maria](https://devcenter.heroku.com/articles/jawsdb-maria)|#storage:mariadb||
 |[JawsDB MySQL](https://devcenter.heroku.com/articles/jawsdb)|#storage:mysql||
 |[Keen IO](https://devcenter.heroku.com/articles/keen)|#analytics||
-|[Kronus](https://devcenter.heroku.com/articles/kronus)|#scheduling||
 |[Librato](https://devcenter.heroku.com/articles/librato)|#analytics||
 |[loader.io](https://devcenter.heroku.com/articles/loaderio)|#load-testing #interesting||
 |[LogDNA](https://devcenter.heroku.com/articles/logdna)|#logs||
@@ -132,8 +130,7 @@
 |[RedisGreen](https://devcenter.heroku.com/articles/redisgreen)|#storage:redis||
 |[RedisMonitor](https://devcenter.heroku.com/articles/redismonitor)|#storage:redis|(monitoring for storage)|
 |[Redis To Go](https://devcenter.heroku.com/articles/redistogo)|#storage:redis||
-|[Remora Backup](https://devcenter.heroku.com/articles/remora-backup)|#storage:postgres #backup||
-|[Remora Offsite Backup](https://devcenter.heroku.com/articles/remora-backup)|           |           |
+|[Remora Offsite Backup](https://devcenter.heroku.com/articles/remora-backup)|#storage:postgres #backup||
 |[Resizer](https://devcenter.heroku.com/articles/resizer)|#beta #images||
 |[Rollbar](https://devcenter.heroku.com/articles/rollbar)|#monitoring||
 |[RuntimeError](https://devcenter.heroku.com/articles/runtimeerror)|#monitoring||
