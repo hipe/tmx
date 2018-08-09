@@ -52,6 +52,7 @@
 |[Edge](https://devcenter.heroku.com/articles/edge)|#CDN||
 |[Einstein Platform Services](https://devcenter.heroku.com/articles/einstein-platform-services)|#interesting||
 |[Einstein Vision](https://devcenter.heroku.com/articles/einstein-vision)|#interesting||
+|[Einstein Vision and Language](https://devcenter.heroku.com/articles/einstein-vision)|           |           |
 |[Elasticsearch](https://devcenter.heroku.com/articles/foundelasticsearch)|#search||
 |[Elegant CMS](https://devcenter.heroku.com/articles/elegant-cms)|#CMS #interesting||
 |[Exceptiontrap](https://devcenter.heroku.com/articles/exceptiontrap)|#monitoring||
@@ -94,6 +95,7 @@
 |[Logz.io](https://devcenter.heroku.com/articles/logzio)|#analytics #logs||
 |[Mail2Webhook](https://devcenter.heroku.com/articles/mail2webhook)|#mail||
 |[Mailgun](https://devcenter.heroku.com/articles/mailgun)|#mail||
+|[Mailgun Email Validation](https://devcenter.heroku.com/articles/mailgun-validations)|           |           |
 |[Mailtrap by Railsware](https://devcenter.heroku.com/articles/mailtrap)|#email #interesting||
 |[Marketing Connector](https://devcenter.heroku.com/articles/mcconnect)|#salesforce||
 |[Memcached Cloud](https://devcenter.heroku.com/articles/memcachedcloud)|#storage:memcache||
@@ -131,6 +133,7 @@
 |[RedisMonitor](https://devcenter.heroku.com/articles/redismonitor)|#storage:redis|(monitoring for storage)|
 |[Redis To Go](https://devcenter.heroku.com/articles/redistogo)|#storage:redis||
 |[Remora Backup](https://devcenter.heroku.com/articles/remora-backup)|#storage:postgres #backup||
+|[Remora Offsite Backup](https://devcenter.heroku.com/articles/remora-backup)|           |           |
 |[Resizer](https://devcenter.heroku.com/articles/resizer)|#beta #images||
 |[Rollbar](https://devcenter.heroku.com/articles/rollbar)|#monitoring||
 |[RuntimeError](https://devcenter.heroku.com/articles/runtimeerror)|#monitoring||
