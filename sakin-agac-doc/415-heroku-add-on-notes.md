@@ -10,8 +10,8 @@
 |[Algolia Realtime Search](https://devcenter.heroku.com/articles/algoliasearch)|#search||
 |[AppDynamics](https://devcenter.heroku.com/articles/appdynamics)|#nodejs #analytics||
 |[AppSignal](https://devcenter.heroku.com/articles/appsignal)|#ruby #monitoring||
-|[AT&T M2X](https://devcenter.heroku.com/articles/m2x)|#IoT||
 |[Attachment Scanner](https://devcenter.heroku.com/articles/attachment-scanner)|#security||
+|[AT&T M2X](https://devcenter.heroku.com/articles/m2x)|#IoT||
 |[Auth0](https://devcenter.heroku.com/articles/auth0)|#auth #intersting||
 |[Autobus](https://devcenter.heroku.com/articles/autobus)|#storage|backup|
 |[binnacle](https://devcenter.heroku.com/articles/binnacle)|#interesting|sounds like if-this then-that|
@@ -127,9 +127,9 @@
 |[Raygun](https://devcenter.heroku.com/articles/raygun)|#monitoring||
 |[Real Email](https://devcenter.heroku.com/articles/realemail)|#email|validation|
 |[Redis Cloud](https://devcenter.heroku.com/articles/rediscloud)|#storage:redis||
-|[Redis To Go](https://devcenter.heroku.com/articles/redistogo)|#storage:redis||
 |[RedisGreen](https://devcenter.heroku.com/articles/redisgreen)|#storage:redis||
 |[RedisMonitor](https://devcenter.heroku.com/articles/redismonitor)|#storage:redis|(monitoring for storage)|
+|[Redis To Go](https://devcenter.heroku.com/articles/redistogo)|#storage:redis||
 |[Remora Backup](https://devcenter.heroku.com/articles/remora-backup)|#storage:postgres #backup||
 |[Resizer](https://devcenter.heroku.com/articles/resizer)|#beta #images||
 |[Rollbar](https://devcenter.heroku.com/articles/rollbar)|#monitoring||
@@ -172,8 +172,8 @@
 |[User Agent Identifier](https://devcenter.heroku.com/articles/useragentidentifier)|#old #beta #analytics|simplifies user agent detection|
 |[Vigil Monitoring Service](https://devcenter.heroku.com/articles/vigil)|#old #monitoring #notification||
 |[Watermarker](https://devcenter.heroku.com/articles/watermarker)|#old #beta #image|watermark images|
-|[Web to PDF](https://devcenter.heroku.com/articles/webtopdf)|#old #beta #PDF|generate PDF from any web page|
 |[Websolr](https://devcenter.heroku.com/articles/websolr)|#old #costs-money #search|meh|
+|[Web to PDF](https://devcenter.heroku.com/articles/webtopdf)|#old #beta #PDF|generate PDF from any web page|
 |[Wrenchmode](https://devcenter.heroku.com/articles/wrenchmode)|#beta #status-page|displays a maintenence page|
 |[WSO2 API Cloud](https://devcenter.heroku.com/articles/wso2apicloud)|#beta #interesting|fully managed API's|
 |[wwwhisper](https://devcenter.heroku.com/articles/wwwhisper)|#auth #ACL|ACL for Ruby Rack-based applications|

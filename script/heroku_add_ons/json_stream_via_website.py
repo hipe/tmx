@@ -33,7 +33,13 @@ _my_CLI.__doc__ = __doc__
 def open_dictionary_stream(html_document_path, listener):
 
     def my_generator(el, _emit):
-        yield {'_is_sync_meta_data': True, 'natural_key_field_name': 'add_on'}
+
+        yield {
+                '_is_sync_meta_data': True,
+                'natural_key_field_name': 'add_on',
+                'sync_keyerser': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+                }
+
         for el in el.find_all('li', recursive=False):
             a_el = el.findChild('a')
             _href = a_el['href']

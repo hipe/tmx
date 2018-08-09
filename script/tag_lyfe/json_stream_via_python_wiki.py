@@ -51,7 +51,7 @@ def open_dictionary_stream(html_document_path, listener):
                 'natural_key_field_name': field_names[0],
                 'field_names': field_names,  # coverpoint [#708.2.2]
                 'traversal_will_be_alphabetized_by_human_key': False,
-                'sync_keyerser': 'script.tag_lyfe.json_stream_via_python_wiki.OHAI',  # noqa: E501
+                'sync_keyerser': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
                 }
 
         for dct in table_o:
@@ -66,26 +66,6 @@ def open_dictionary_stream(html_document_path, listener):
         )
 
     return _cm
-
-
-def OHAI(near_string_via_dict, far_string_via_dict):
-
-    def use_far_string_via_dict(dct):
-        return ultra_simplified_key_via_MD_link(far_string_via_dict(dct))
-
-    def use_near_string_via_dict(dct):
-        return ultra_simplified_key_via_MD_link(near_string_via_dict(dct))
-
-    def ultra_simplified_key_via_MD_link(md_link):
-        _simp_key = simplified_key_via_markdown_link(md_link)
-        return _simp_key.replace('_', '')
-
-    from sakin_agac.format_adapters.markdown_table import (
-            simplified_key_via_markdown_link_er as _,
-            )
-    simplified_key_via_markdown_link = _()
-
-    return use_near_string_via_dict, use_far_string_via_dict
 
 
 def _this_more_complicated_string_via_td():
@@ -137,4 +117,5 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A.1: key simplifier gets extracted
 # #born

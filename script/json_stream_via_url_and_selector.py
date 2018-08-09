@@ -173,6 +173,27 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
 
 # -- ..
 
+def simplify_keys_(near_string_via_dict, far_string_via_dict):
+    # (transplanted from elsewhere at #history-A.1)
+
+    def use_far_string_via_dict(dct):
+        return ultra_simplified_key_via_MD_link(far_string_via_dict(dct))
+
+    def use_near_string_via_dict(dct):
+        return ultra_simplified_key_via_MD_link(near_string_via_dict(dct))
+
+    def ultra_simplified_key_via_MD_link(md_link):
+        _simp_key = simplified_key_via_markdown_link(md_link)
+        return _simp_key.replace('_', '')
+
+    from sakin_agac.format_adapters.markdown_table import (
+            simplified_key_via_markdown_link_er as _,
+            )
+    simplified_key_via_markdown_link = _()
+
+    return use_near_string_via_dict, use_far_string_via_dict
+
+
 def markdown_link_via(label, url):
     return '[{}]({})'.format(label, url)
 
@@ -273,5 +294,6 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A.2: function transplanted to here
 # #historyA.1: got rid of use of `log`
 # #born: abstracted from sibling

@@ -81,7 +81,7 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         mutable_dict = {k: v for k, v in schema_record.items()}
         mutable_dict['natural_key_field_name'] = near_field_names[0]  # YIKES
         mutable_dict['field_names'] = near_field_names
-        mutable_dict['sync_keyerser'] = 'script.tag_lyfe.json_stream_via_python_wiki.OHAI'  # noqa: E501
+        mutable_dict['sync_keyerser'] = 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
         mutable_dict['traversal_will_be_alphabetized_by_human_key'] = False
         return mutable_dict
 
