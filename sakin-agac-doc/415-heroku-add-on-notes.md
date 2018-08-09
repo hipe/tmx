@@ -68,7 +68,6 @@
 |[Geocody](https://devcenter.heroku.com/articles/geocody)|#geo-location|from earth addresses|
 |[GrapheneDB](https://devcenter.heroku.com/articles/graphenedb)|#storage:neo4j||
 |[GRAX by Harding Point](https://devcenter.heroku.com/articles/engagementgraph)|#salesforce||
-|[Greta](https://devcenter.heroku.com/articles/greta)|#GONE||
 |[Guru301](https://devcenter.heroku.com/articles/guru301)|#IP-stuff||
 |[Helpjuice](https://devcenter.heroku.com/articles/helpjuice)|#beta #looks-awful #knowledge-base||
 |[Heroku Scheduler](https://devcenter.heroku.com/articles/scheduler)|#scheduler||
@@ -106,7 +105,6 @@
 |[ObjectRocket for MongoDB](https://devcenter.heroku.com/articles/ormongo)|#storage:mongodb|fully managed|
 |[OCRestful](https://devcenter.heroku.com/articles/ocrestful)|#beta #old #OCR||
 |[OFS Blockchain](https://devcenter.heroku.com/articles/blockchain)|#interesting||
-|[Opbeat APM](https://devcenter.heroku.com/articles/opbeat)|#GONE||
 |[openredis](https://devcenter.heroku.com/articles/openredis)|#storage:redis||
 |[Papertrail](https://devcenter.heroku.com/articles/papertrail)|#monitoring #logs||
 |[PhraseApp](https://devcenter.heroku.com/articles/phrase)|#translation||
@@ -173,7 +171,6 @@
 |[Vigil Monitoring Service](https://devcenter.heroku.com/articles/vigil)|#old #monitoring #notification||
 |[Watermarker](https://devcenter.heroku.com/articles/watermarker)|#old #beta #image|watermark images|
 |[Websolr](https://devcenter.heroku.com/articles/websolr)|#old #costs-money #search|meh|
-|[Web to PDF](https://devcenter.heroku.com/articles/webtopdf)|#old #beta #PDF|generate PDF from any web page|
 |[Wrenchmode](https://devcenter.heroku.com/articles/wrenchmode)|#beta #status-page|displays a maintenence page|
 |[WSO2 API Cloud](https://devcenter.heroku.com/articles/wso2apicloud)|#beta #interesting|fully managed API's|
 |[wwwhisper](https://devcenter.heroku.com/articles/wwwhisper)|#auth #ACL|ACL for Ruby Rack-based applications|

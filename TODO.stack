@@ -105,6 +105,3 @@ sub-project: upload files to s3
   - make a criteria/requirements document.
   - enter into your markdown table whether it worked and what it was like AND:
   - go thru every add-on in heroku, trying to install it if it is a CMS and AND:
-(-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
-  - sync in new data
-  - review existing tags and consider adding new tags (near deep taggings)
