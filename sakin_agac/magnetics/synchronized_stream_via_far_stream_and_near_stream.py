@@ -32,10 +32,11 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
         self._dict_stream = dict_stream
         self._format_adapter = format_adapter
 
-    def release_sync_parameters(self):
+    def release_traversal_parameters(self):
         itr = pop_property(self, '_dict_stream')
         _hi = next(itr)
         # #cover-me (above) - when user gives empty stream, this is confusing
+        # :#here4
         self._dict_stream_part_two = itr
         return _SyncParameters(**_hi)
 
@@ -47,17 +48,23 @@ class SYNC_REQUEST_VIA_TWO_FUNCTIONS:
 
     def __init__(
             self,
-            release_sync_parameters,
+            release_sync_parameters_dictionary,
             release_dictionary_stream,
             ):
 
         self._order = [
                 ('two', release_dictionary_stream),
-                ('one', release_sync_parameters),
+                ('one', release_sync_parameters_dictionary),
                 ]
 
-    def release_sync_parameters(self):
-        return self._same('one')
+    def release_traversal_parameters(self):
+        dct = self._same('one')
+        if dct is None:
+            # for example when you need tag lyfe field names
+            # (same *type* of thing as #here4 above)
+            return None  # #coverpointTL.1.5.1.1
+        else:
+            return _SyncParameters(**dct)
 
     def release_dictionary_stream(self):
         return self._same('two')
@@ -77,6 +84,8 @@ class _SyncParameters:
     how we conceive of it in fact is that it is not an intrinsic part of
     either collection, but rather we are conceiving of it as a property
     (a parameter) of the synchronization itself...
+
+    [#418.E] is dedicated to thoughts on this class and its future
     """
 
     def __init__(
@@ -151,7 +160,7 @@ class _Worker:
 
 class _WorkerWhenInterleaving(_Worker):
     """
-    the interleaving algorithm. spiked at #history-A.4
+    the [#407] interleaving algorithm. spiked at #history-A.4
     """
 
     def __init__(

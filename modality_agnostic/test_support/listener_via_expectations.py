@@ -123,6 +123,13 @@ class _ActualEmission:
         self.emission_payload_function = emission_payload_function
         self.channel = chan
 
+    def to_first_string(self):  # #[#508] assumes simple new way strictly
+        result = None
+        for line in self.emission_payload_function():
+            result = line
+            break
+        return result
+
     def to_string(self):
         return '\n'.join(self.to_strings())
 

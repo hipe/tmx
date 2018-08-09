@@ -219,7 +219,7 @@ class Case060_preserve_endcappiness_here(_CommonCase):  # #coverpoint5.4
 
     NOTE the original has stochastic whitespace. the updated cel loses
     this whitespace. we presume it is that the new is using the whitespacing
-    of the example row. but at this point, we don't know nore care.
+    of the [#418.D] example row. but at this point, we don't know nore care.
     that is a bridge to cross when we get to it.
     """
 

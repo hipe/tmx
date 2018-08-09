@@ -3,7 +3,7 @@
 really it's just a function that produces new rows, but we have so-named
 it because:
 
-  - it does the "heuristic templating" as touched on in [#408], so the
+  - it does the [#418.3] "heuristic templating", so the
     name is a better semantic fit, because it "feels" like it's coming
     from a true prototype object (if you're into that sort of thing).
 
@@ -52,7 +52,8 @@ but we accidentally mostly implemented it before realizing this (A) and B)
 it actually does probably make sense to right-align your ASCII "art" for
 right-aligned tables (think numbers).
 
-however, this does not do the "heuristic templating" that it could do here.
+however, this does not do the [#418.3] "heuristic templating" that it could
+do here.
 (that is, it could try to detect whether the human does in fact (e.g)
 right-align the ASCII art for right-aligned columns, and follow suit
 accordingbly.)

@@ -96,6 +96,15 @@ x XX xx XX xx
 
 
 
+## <a name="C.2"></a>provision: leftmost column is always natural key field name
+
+the above suggests we need to know the natural key field name. this tag
+tracks the for now hard-coded assumption that the leftmost field of the
+table is this.
+
+
+
+
 ## categorized wrapping of far items (freeform discussion)
 
 as we write this we are dismantling our original conception of "item class".

@@ -38,7 +38,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
     producer scripts that serve both these associated format adapters.
     """
 
-    _open_dictionary_stream = producer_module.open_dictionary_stream(
+    _open_traversal_stream = producer_module.open_traversal_stream(
             fixture_document_path,  # {html_document_path|markdown_path}, e.g
             listener=use_listener,
             )
@@ -50,7 +50,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
             )
     simplified_key_via_markdown_link = _()
 
-    with _open_dictionary_stream as dcts:
+    with _open_traversal_stream as dcts:
         head_dct = next(dcts)
         objs = {fuzzy_key(dct): dct for dct in dcts}
 

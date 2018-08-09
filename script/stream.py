@@ -41,11 +41,11 @@ def _CLI(sin, sout, serr, argv):
 
     visit = siblib.JSON_object_writer_via_IO_downstream(sout)
 
-    with open_dictionary_stream(coll_id, listener) as dcts:
+    with open_traversal_stream(coll_id, listener) as dcts:
 
-        _sync_params = next(dcts)
-        _dct = _sync_params.to_dictionary()  # yuck
-        visit(_dct)
+        trav_params = next(dcts)  # ..
+        metadata_row_dict = trav_params.to_dictionary()
+        visit(metadata_row_dict)
         for dct in dcts:
             visit(dct)
 
@@ -61,34 +61,45 @@ def _parse_args(sin, serr, argv):
             )
 
 
-class open_dictionary_stream:
+class open_traversal_stream:
     """ #[#020.3]. just glue.
     """
 
-    def __init__(self, collection_identifier, listener):
+    def __init__(self, collection_identifier, listener, intention=None):
+        self._intention = intention
         self._collection_identifier = collection_identifier
         self._listener = listener
         self._OK = True
 
     def __enter__(self):
         self._OK and self.__resolve_format_adapter()
-        self._OK and self.__resolve_sync_request()
+        self._OK and self.__resolve_traversal_request()
         if self._OK:
-            with self._opened_sync_request as sync_request:
-                yield sync_request.release_sync_parameters()
-                for dct in sync_request.release_dictionary_stream():
+            with self._opened_traversal_request as trav_request:
+                yield trav_request.release_traversal_parameters()
+                for dct in trav_request.release_dictionary_stream():
                     yield dct
 
     def __exit__(self, *_3):
         return False  # we did not consume the exception
 
-    def __resolve_sync_request(self):
+    def __resolve_traversal_request(self):
 
-        from script_lib import filesystem_functions as _fsf
-        _cref = self._format_adapter.collection_reference_via_string(
+        from script_lib import filesystem_functions as fsf
+        coll_ref = self._format_adapter.collection_reference_via_string(
                 self._collection_identifier)
-        _ = _cref.open_sync_request(_fsf, self._listener)
-        self._required('_opened_sync_request', _)
+
+        typ = self._intention  # pop_property
+        if typ is None:
+            typ = 'sakin_agac_synchronization'  # universally implicit default
+        if 'sakin_agac_synchronization' == typ:
+            trav_req = coll_ref.open_sync_request(fsf, self._listener)
+        elif 'tag_lyfe_filter' == typ:
+            trav_req = coll_ref.open_filter_request(fsf, self._listener)
+        else:
+            raise Exception('sanity')
+
+        self._required('_opened_traversal_request', trav_req)
 
     def __resolve_format_adapter(self):
 

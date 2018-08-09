@@ -2,7 +2,7 @@
 when we say a record is "nativized", we mean that it appears as a markdown
 
 row, and that it takes on the formatting of the particular document (per the
-example row). this magnetic is mostly concerned with facilitating the
+[#418.D] example row). this magnetic is mostly concerned with facilitating the
 creation of the "nativizer". what follows is a deeper explanation of all that.
 
 (as an aside, not the name of this magnetic is figurative. it does not in
@@ -44,8 +44,8 @@ item by item in their order with no large-scale caching, so that
 synchronization can scale linearly to very large datasets (both near and far).
 
 but note you can't output a "nativized" far item until you've seen the
-example row, which is why the example row must be a non-participating row
-that always appears first.
+[#418.D] example row, which is why the example row must be a non-participating
+row that always appears first.
 
 so this magnetic tries to thread the needle: it uses a "random access"
 paradigm for the first record, then expects the rest is used streamily.

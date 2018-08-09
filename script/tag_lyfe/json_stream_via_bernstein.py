@@ -22,7 +22,7 @@ _raw_url = (
 
 def _my_CLI(listener, sin, sout, serr):
 
-    _cm = open_dictionary_stream(None, listener)
+    _cm = open_traversal_stream(None, listener)
     with _cm as lines:
         exitstatus = _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
     return exitstatus
@@ -31,7 +31,7 @@ def _my_CLI(listener, sin, sout, serr):
 _my_CLI.__doc__ = __doc__
 
 
-class open_dictionary_stream:  # #[#410.F]
+class open_traversal_stream:  # #[#410.F] class as context manager
 
     def __init__(self, markdown_path, listener):
         self.raw_url = _raw_url
@@ -44,12 +44,13 @@ class open_dictionary_stream:  # #[#410.F]
         self._OK and self.__resolve_cached_doc()
         if not self._OK:
             return
-        with self.__unsanitized_dictionaries() as dcts:
-            schema_record = next(dcts)  # ..
-            far_field_names = tuple(schema_record['field_names'])
+        with self.__open_traversal_stream() as dcts:
+            coll_metadata = next(dcts)  # ..
+            far_field_names = coll_metadata.field_names
             dic_via_cels = self.__build_dict_via_cels(far_field_names)
+            schema = coll_metadata.to_dictionary()
 
-            yield self.__meta_record_via(dic_via_cels, schema_record)
+            yield self.__meta_record_via(dic_via_cels, schema)
 
             for dct in dcts:
                 def _custom_generator():  # risky. no closure scope
@@ -96,9 +97,9 @@ class open_dictionary_stream:  # #[#410.F]
                 string_via_cel=_string_via_cel_two,
                 )
 
-    def __unsanitized_dictionaries(self):
-        from script.stream import open_dictionary_stream as dicts_via
-        return dicts_via(self._cached_doc.cache_path, self._listener)
+    def __open_traversal_stream(self):
+        from script.stream import open_traversal_stream as _
+        return _(self._cached_doc.cache_path, self._listener)
 
     def __resolve_cached_doc(self):
         markdown_path = self._markdown_path

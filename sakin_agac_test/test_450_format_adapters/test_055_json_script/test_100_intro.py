@@ -65,7 +65,7 @@ class Case100(_CommonCase):
         rsx = "you don't need filesystem resources yet"
         _sess = _cref.open_sync_request(rsx, 'listener')
         with _sess as sync_request:
-            sync_params = sync_request.release_sync_parameters()
+            sync_params = sync_request.release_traversal_parameters()
             dict_stream = sync_request.release_dictionary_stream()
         self.assertEqual(sync_params.natural_key_field_name, 'xyzz 01')
         these = [x for x in dict_stream]

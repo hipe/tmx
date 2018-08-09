@@ -22,6 +22,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|                   #418    |       | thoughts on expressing metadata about a collection ..
 |                   #417    |       | #central-concetit: the JSON wall (lingua franca) (see ASCII art here)
 |                   #416.D  |       | CMS's
 |                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
@@ -35,18 +36,18 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #410.V  | #open | #of:[#410.U] clean up, unify producer scripts to be more elegant
 |                   #410.U  | #open | visible seams to clean up when things are stable
 |                   #410.T  | #open | tests we haven't written but still want
-|                   #410.S  | #trak | markdown row spacing might be a misfeature
+|                   #410.S  | #open | markdown row spacing might be a misfeature
 |                   #410.R  | #trak | would redis etc
-|                   #410.Q  | #prov | provision: natural key field name always leftmost (things will break)
+|                   #410.Q  | #prov | #provision: natural key field name always leftmost (things will break)
 |                   #410.P  | #wish | would we really want a moin moin adaption?
-|                   #410.M  | #trak | where sparseness is implemented
+|                   #410.13 | #trak | #provsion: where sparseness is implemented - prune "empty" cels
 |                   #410.L  | #trak | whether in-memory should be official format
 |                   #410.K  | #trak | CLI integration tests have redundant setup
 |                   #410.J  | #trak | [record mapper]
 |                   #410.I  | #open | remove this redundancy
 |                   #410.H  | #trak | fixture executables aren't actuall exe.. (see)
 |                   #410.G  | #trak | nested context managers closing each other
-|                 #410.F.2  |       | provision: on failure, you must still result in an iterator
+|                 #410.F.2  |       | #provision: on failure, you must still result in an iterator
 |                   #410.F  | #trak | this broad pattern: class as context manager
 |                   #410.E  | #open | dashes to underscores is getting annoying
 |                   #410.D  | #trak | spots to change if we add this feature (see)
@@ -57,7 +58,7 @@ now, these ideas are expanded in [their own document][\[#403\]].
 |                   #409.A  |       | #central-conceit: markdown table as datastore
 |<a name=408></a>[\[#408\]] |       | decompose the algorithm
 |<a name=407></a>[\[#407\]] |       | collection synchorniation algorithm
-|<a name=406></a>[\[#406\]] |       | strategic dependency graph
+|<a name=406></a>[\[#406\]] | #open | this document might be obviated by "/TODO.dot" (of the mono-repo)
 |<a name=405></a>[\[#405\]] |       | play
 |<a name=404></a>[\[#404\]] |       | wiki app dim sum
 |<a name=403></a>[\[#403\]] |       | broad objectives

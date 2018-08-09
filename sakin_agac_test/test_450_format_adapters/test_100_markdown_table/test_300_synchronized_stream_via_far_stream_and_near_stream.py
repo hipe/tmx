@@ -321,7 +321,7 @@ def _section_list_via(dicts, mixed_far):
 
     far_format_adapter = _this_one_format_adapter().FORMAT_ADAPTER
 
-    _sess = far_format_adapter._open_sync_request(
+    _sess = far_format_adapter.open_sync_request_(
             mixed_collection_identifier=dicts,
             modality_resources=None,
             listener=None,
@@ -340,15 +340,15 @@ def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):
 
     listener = 'listener1'
 
-    sp = sync_request.release_sync_parameters()
+    tp = sync_request.release_traversal_parameters()
 
     _far_stream = sync_request.release_dictionary_stream()
 
-    _nkfn = sp.natural_key_field_name
+    _nkfn = tp.natural_key_field_name
 
-    _sync_keyerser = sp.sync_keyerser
+    _sync_keyerser = tp.sync_keyerser
 
-    del(sp)
+    del(tp)
 
     if isinstance(mixed_far, str):
         use_mixed_far = fixture_file_path(mixed_far)

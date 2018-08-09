@@ -31,7 +31,7 @@ _first_selector = ('div', {'id': 'readme'})
 
 def _my_CLI(listener, sin, sout, serr):
 
-    _cm = open_dictionary_stream(None, listener)
+    _cm = open_traversal_stream(None, listener)
     with _cm as lines:
         exitstatus = _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
     return exitstatus
@@ -40,7 +40,7 @@ def _my_CLI(listener, sin, sout, serr):
 _my_CLI.__doc__ = __doc__
 
 
-def open_dictionary_stream(html_document_path, listener):
+def open_traversal_stream(html_document_path, listener):
 
     def my_generator(el, _emit):
 

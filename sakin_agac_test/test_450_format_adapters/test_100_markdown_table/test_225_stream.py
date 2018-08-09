@@ -20,7 +20,7 @@ class _CommonCase(unittest.TestCase):
         return _State(business_objects, first)
 
     def _run(self, path, listener):
-        _cm = _subject_module().open_dictionary_stream(path, listener)
+        _cm = _subject_module().open_traversal_stream(path, listener)
         with _cm as dcts:
             first = None
             try:

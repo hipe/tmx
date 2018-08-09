@@ -35,12 +35,18 @@ def _():
     else:
         sanity()
 
+    return top_test_dir
+
+
+def fixture_file_path(stem):
+    return os_path.join(_top_test_dir, 'fixture-files', stem)
+
 
 def sanity(s='assumption failed'):
     raise Exception(s)
 
 
-_()
+_top_test_dir = _()
 
 
 # #extracted from sibling

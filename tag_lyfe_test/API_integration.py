@@ -1,5 +1,6 @@
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
+        memoize,
         )
 
 
@@ -12,6 +13,12 @@ class _MetaClass(type):  # #cp
 
 
 def _add_common_case_memoizing_methods(cls):
+
+    @shared_subject
+    def _lines_AI(self):  # "AI" = API_integration (module-private method)
+        return self.assume_exactly_one_emission().to_strings()
+    cls._lines_AI = _lines_AI
+
     @shared_subject
     def end_state(self):
         return self._build_end_state()
@@ -34,16 +41,28 @@ class MemoizyCommonCase(
         self._says_this_one_line(self.assertEqual, line)
 
     def _says_only_this(self, f, matcher):
-        em, = self.end_state().emissions
-        self._says_this_one_line_via_emission(em, f, matcher)
+        _ = self.assume_exactly_one_emission_and_of_that_exactly_one_line()
+        f(_, matcher)
 
     def _says_this_one_line(self, f, matcher):
-        em, = self.end_state().emissions  # ..
-        self._says_this_one_line_via_emission(em, f, matcher)
+        em = self.assume_exactly_one_emission()
+        _ = em.to_first_string()
+        f(_, matcher)
 
-    def _says_this_one_line_via_emission(self, em, f, matcher):
-        only_line, = em.to_strings()
-        f(only_line, matcher)
+    def first_line(self):
+        return self._lines_AI()[0]
+
+    def second_line(self):
+        return self._lines_AI()[1]
+
+    def assume_exactly_one_emission_and_of_that_exactly_one_line(self):
+        em = self.assume_exactly_one_emission()
+        _, = em.to_strings()
+        return _
+
+    def assume_exactly_one_emission(self):
+        em, = self.end_state().emissions  # ..
+        return em
 
     def expect_matches_items(self, * item_names):
 
@@ -113,7 +132,37 @@ class MemoizyCommonCase(
         memoizing..
         """
 
-        return query_via_tokens(self.given_query_tokens())
+        return query_via_tokens(* self.given_query_tokens())
+
+
+class _LazyExperiment:
+
+    def __init__(self):
+        self._call = self._call_initially
+
+    def __call__(self, line):
+        return self._call(line)
+
+    def _call_initially(self, line):
+        import re
+        rx = re.compile(r'[().]')
+
+        def f(line_):
+            return rx.sub('', line_)
+        self._call = f
+        return self(line)
+
+
+simplify_emission_line = _LazyExperiment()
+simplify_emission_line.__doc__ = """hacky fellow:
+    given this:
+        "(1 match(es) of 2 item(s) seen.)"
+
+    as this:
+        "1 matches of 2 items seen"
+
+    (#[#007.2] wish doctest)
+"""
 
 
 class _EndState:
@@ -123,7 +172,12 @@ class _EndState:
         self.result_items = dcts
 
 
-def query_via_tokens(tokens):
+@memoize
+def query_which_is_no_see():
+    return query_via_tokens('#x-no-see')
+
+
+def query_via_tokens(*tokens):
     """we aren't here to test parse failures of queries (altho CLI test yes)
     """
     import script.filter_by as exe

@@ -140,7 +140,7 @@ class _FormalManifold:
         # (this would need to change for aggregate fields)
 
         s = self._string_via_cel(cel)
-        if 0 != len(s):  # coverpoint [#708.2.4] #[#410.M] where sparseness
+        if 0 != len(s):  # coverpoint [#708.2.4] #[#410.13] where sparseness
             self._RECEIVE_STRING(dct, s)
 
     def _RECEIVE_STRING(self, dct, s):

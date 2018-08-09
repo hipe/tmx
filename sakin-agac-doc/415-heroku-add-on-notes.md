@@ -1,6 +1,6 @@
 |Add-on  |Tags  |Freeform Notes  |
 |:--|:--|:--|
-||||
+| (example) | #example  | #example  |
 |[Ably](https://devcenter.heroku.com/articles/ably)||data delivery. see|
 |[ACK Foundry](https://devcenter.heroku.com/articles/ackfoundry)|#queueing||
 |[Adding In-app Notifications with Pusher](https://devcenter.heroku.com/articles/pusher-in-app-notifications)|#skip||

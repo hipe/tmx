@@ -1,5 +1,5 @@
 """
-.:#coverpoint1.5
+.:#coverpoint1.5.3 (not used but nonetheless reserved)
 
 (see discussion at [#706.B] about what belongs here and what belongs elsewhere)
 """
@@ -8,7 +8,7 @@
 import _init  # noqa: F401
 from tag_lyfe_test.API_integration import (
         MemoizyCommonCase as _ThisCase,
-        query_via_tokens,
+        query_which_is_no_see,
         )
 from modality_agnostic.memoization import (
         memoize,
@@ -28,7 +28,7 @@ class Case050_schema_row_missing_this_one_thing(_CommonCase, _ThisCase):
         self.says_only_this_regex(r'\bmust have `tag_lyfe_field_names`')
 
     def given_query(self):
-        return _query_which_is_no_see()
+        return query_which_is_no_see()
 
     def given_collection_identifier(self):
         return (
@@ -49,7 +49,7 @@ class Case075_no_rows_at_all(_CommonCase, _ThisCase):
         self.says_only_this(_exp)
 
     def given_query(self):
-        return _query_which_is_no_see()
+        return query_which_is_no_see()
 
     def given_collection_identifier(self):
         return (
@@ -116,11 +116,6 @@ def _collection_with_one_participating_column():
                 'bb': 'this is #blue.',
                 },
     )
-
-
-@memoize
-def _query_which_is_no_see():
-    return query_via_tokens(('#x-no-see',))
 
 
 if __name__ == '__main__':

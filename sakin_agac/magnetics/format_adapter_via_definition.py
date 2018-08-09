@@ -60,26 +60,38 @@ class _FormatAdapter:
     def collection_reference_via_string(self, coll_id):
         return _CollectionReference(coll_id, self)
 
-    def _open_sync_request(  # #testpoint
+    def open_filter_request_(self, coll_id, rsx, listener):
+        def dig_f():
+            yield ('modality_agnostic', 'sub-section')
+            yield ('open_filter_request', 'thing ding NUMERO DOS')
+        return self._open_traversal_request(dig_f, coll_id, rsx, listener)
+
+    def open_sync_request_(
             self,
             mixed_collection_identifier,
             modality_resources,
             listener,
-            ):
+            ):  # #testpoint
+        """
+        note:
 
-        """at #history-A.2 we changed this to be accessed like other
-
+          - names may be used as keyword arguments
+          - at #history-A.2 we changed this to be accessed like other
         hoi-polloi functions that can be associated with the doo-hah adapter
         """
-
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
             yield ('open_sync_request', 'thing ding two')
+        return self._open_traversal_request(
+                dig_f, mixed_collection_identifier, modality_resources,
+                listener)
 
-        _f = self.DIG_HOI_POLLOI(dig_f(), listener)
-        if _f is None:
+    def _open_traversal_request(self, dig_f, coll_id, rsx, listener):
+
+        f = self.DIG_HOI_POLLOI(dig_f(), listener)
+        if f is None:
             return  # #coverpoint5.1 GONE at #history-A.1 (see c.p tombstone)
-        return _f(mixed_collection_identifier, modality_resources, self, listener)  # noqa: E501
+        return f(coll_id, rsx, self, listener)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
         """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
@@ -159,8 +171,14 @@ class _CollectionReference:
         self.collection_identifier_string = s
         self.format_adapter = fa
 
+    def open_filter_request(self, resources, listener):
+        return self._same('open_filter_request_', resources, listener)
+
     def open_sync_request(self, resources, listener):
-        return self.format_adapter._open_sync_request(
+        return self._same('open_sync_request_', resources, listener)
+
+    def _same(self, meth, resources, listener):
+        return getattr(self.format_adapter, meth)(
                 self.collection_identifier_string, resources, listener)
 
     @property

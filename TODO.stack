@@ -98,5 +98,13 @@ sub-project: upload files to s3
 05:06 Tutorial #13 - Index Method of BookStore Application
 07:43 Tutorial #12 - Implement Book Model in Play Framework
 (-1) try to install every CMS
+  - possibly in the near or distant future use rough blog to help find better blog
+  - finally have a CMS
+  - consider possibly making a minimal (ish) roll-your own that meets the
+    criteria (yes this would blow up into many points)
+  - make a criteria/requirements document.
+  - enter into your markdown table whether it worked and what it was like AND:
+  - go thru every add-on in heroku, trying to install it if it is a CMS and AND:
 (-2) notes on every CMS (read their each webpage etc) (dedicated MD table)
-(-tag-lyfe.5 integrate with markdown tables (pretend it is [sg]))
+  - sync in new data
+  - review existing tags and consider adding new tags (near deep taggings)

@@ -218,7 +218,7 @@ then in your 'main' terminal:
 |[#007.E]                   | #open | probably refactor all `format` and (probably) `%` to use f-strings
 |[#007.D]                   | #open | PEP8 (now that we know how to activate it)
 |[#007.C]                   | #open | lock current stable (python 3.6.4) w/ virtualenv/VCS
-|[#007.B]                   | #open | refactor helper.py memoizers to use doctest
+|[#007.2]                   | #open | refactor helper.py memoizers to use doctest (now, general doctest wishers)
 |[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server
 |[\[#005\]]                 |       | text-based game client architecture

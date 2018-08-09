@@ -16,7 +16,7 @@ from sakin_agac.magnetics import (
         )
 
 
-class _open_sync_request:
+class _open_traversal_request:
     """a minimal, didactic example of an implementation for this API hookout.
 
     so:
@@ -109,7 +109,8 @@ def _pop_property(x, name):
 
 _functions = {
         'modality_agnostic': {
-            'open_sync_request': _open_sync_request,
+            'open_filter_request': _open_traversal_request,
+            'open_sync_request': _open_traversal_request,
             }
         }
 

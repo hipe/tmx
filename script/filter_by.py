@@ -128,7 +128,11 @@ class _TheseTwo:
 
 def _filtered_items_via_query_and_collection_id(query, coll_id, listener):  # noqa: E501 #testpoint
     import script.stream as siblib2
-    with siblib2.open_dictionary_stream(coll_id, listener) as dcts:
+    _ = siblib2.open_traversal_stream(
+            coll_id, listener,
+            intention='tag_lyfe_filter',
+            )
+    with _ as dcts:
 
         ks = _tag_lyfe_field_names_via(dcts, listener)
         if ks is not None:
@@ -282,18 +286,23 @@ def _do_express_summary(tf):
         yield o(f'all {total} item(s) matched')
     else:
         yield o(f'{matched} match(es) of {total} item(s) seen')
+        # #coverpointTL.1.5.1.2
 
 
 _noma = 'nothing matched'
 
 
 def _tag_lyfe_field_names_via(dcts, listener):
+    from modality_agnostic import streamlib as sl
 
-    sync_params = next(dcts)  # ..
-    tup = sync_params.tag_lyfe_field_names
+    trav_params = sl.next_or_none(dcts)
+    if trav_params is None:
+        return None  # #coverpointTL.1.5.1.1
+
+    tup = trav_params.tag_lyfe_field_names
     if tup is None:
         def f():
-            _s_a = [x for x in sync_params.to_dictionary().keys()]
+            _s_a = [x for x in trav_params.to_dictionary().keys()]
             _had = ', '.join(_s_a)
             yield f'schema row must have `tag_lyfe_field_names` (had: {_had})'
         listener('error', 'expression', 'schema_error', f)
@@ -413,11 +422,18 @@ class _tallying_filter:
         taggings = None
 
         for k in self._tag_lyfe_keys:
+
+            if k not in dct:
+                # #coverpointTL.1.5.1.3:
+                # provision [#408.13] empty cels get pruned
+                continue
+
             pairs = self._tagging_subtree_via_string(dct[k])
             pairs = tuple(pairs)
             length = len(pairs)
             if 1 == length:
-                cover_me('no taggings there')
+                # #coverpointTL.1.5.1.3: no taggings there
+                pass
             elif 1 < length:
                 for i in range(0, length-1):
                     if taggings is None:
@@ -454,7 +470,6 @@ if _is_entrypoint_file:
     normalize_sys_path_()
 
 from modality_agnostic import (  # noqa: E402
-        cover_me,
         pop_property,
         sanity,
         )

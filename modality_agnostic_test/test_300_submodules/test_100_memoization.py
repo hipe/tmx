@@ -113,4 +113,5 @@ if __name__ == '__main__':
     unittest.main()
 
 # #history-A.1: re-housed
+# (the below should read #open [#007.2] but is kept intact for trackability)
 # #open [#007.B] - when we use docutest, um..

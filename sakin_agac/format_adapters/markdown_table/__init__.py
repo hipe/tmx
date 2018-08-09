@@ -4,7 +4,15 @@ from sakin_agac.magnetics import (
 from sakin_agac import (
         cover_me,
         pop_property,
+        sanity,
         )
+
+
+def _required(self, prop, x):  # ..
+    if x is None:
+        self._become_not_OK()
+    else:
+        setattr(self, prop, x)
 
 
 class _open_new_lines_via_sync:
@@ -48,16 +56,16 @@ class _open_new_lines_via_sync:
 
         _near_tagged_items = pop_property(self, '_near_tagged_items')
 
-        sp = sync_request.release_sync_parameters()
+        o = sync_request.release_traversal_parameters()
         _dict_stream = sync_request.release_dictionary_stream()
-        _nkfn = sp.natural_key_field_name
+        _nkfn = o.natural_key_field_name
 
-        None if 2 == sp.sync_parameters_version else cover_me('refa')
-        _nkfn = sp.natural_key_field_name
-        _trav_is_ordered = sp.traversal_will_be_alphabetized_by_human_key
+        None if 2 == o.sync_parameters_version else cover_me('refa')
+        _nkfn = o.natural_key_field_name
+        _trav_is_ordered = o.traversal_will_be_alphabetized_by_human_key
 
-        _sync_keyerser = sp.sync_keyerser
-        del(sp)
+        _sync_keyerser = o.sync_keyerser
+        del(o)
 
         # --
         # #coverpoint6.2 (overloaded):
@@ -105,7 +113,7 @@ class _open_new_lines_via_sync:
 
     def __resolve_near_tagged_items(self):
         _nearstream_path = self._near_collection_reference.collection_identifier_string  # noqa: E501
-        _x = _near_tagged_items_via_mixed(_nearstream_path, self._listener)
+        _x = _near_tuples_via_mixed(_nearstream_path, self._listener)
         self._required('_near_tagged_items', _x)
 
     def __resolve_sync_request(self):
@@ -134,101 +142,208 @@ class _open_new_lines_via_sync:
             """
         return False  # never trap exceptions
 
-    def _required(self, prop, x):  # ..
-        if x is None:
-            self._OK = False
-        else:
-            setattr(self, prop, x)
+    _required = _required
+
+    def _become_not_OK(self):
+        self._OK = False
 
 
-class _open_sync_request:
-    """.#[#020.3]."""
+class _open_trav_request:
+    """
+    firstly:
+      - when a markdown table serves as the "far collection" of a
+        synchronization, things "should be" easier than when it's the "near
+        collection" because we don't need to emit the before and after lines
+        of the table, we just emit the lines of the table itself (actually
+        rows (actually items)) sort of..
+
+      - BUT, in order to serve as a producer for a "filter by" operation, we
+        do some crazy flips to get the .. see #here2
+
+      - (we were #[#020.3] at one point distrungtled that simple function-
+        based context manager wouldn't suffice here.)
+
+    this ended up blowing up into [#418] thoughts on collection metadata..
+    """
 
     def __init__(
             self,
+            intention,
             mixed_collection_identifier,
             modality_resources,
             format_adapter,
             listener,
             ):
+        self._intention = intention
         self._mixed_collection_identifier = mixed_collection_identifier
         self._format_adapter = format_adapter
         self._listener = listener
+        self._OK = True
 
     def __enter__(self):
-        """reading from a markdown table when it's serving as a producer
-
-        is simpler than when it's the "near" side of a synchronization;
-        because here we only care about emitting the lines of the markdown
-        table themselves, not the lines before and after..
-        """
-
-        tagged_items = _near_tagged_items_via_mixed(
-                self._mixed_collection_identifier, self._listener)
-
-        o = _ExpectedTagOrder()
-
-        # advance past the head cruft
-
-        for tag, item in tagged_items:
-            if not o.matches_top(tag):
-                o.pop_and_assert_matches_top(tag)
-                break
-
-        # (item is now (normally) head line one of two. here we ignore it.)
-
-        tag, head_line_two_of_two = next(tagged_items)  # ..
-        o.pop_and_assert_matches_top(tag)
-
-        field_names = head_line_two_of_two.complete_schema.field_names__
-
-        def sync_params():
-            # for now, this is not configurable. your first column must be it
-            return {
-                    '_is_sync_meta_data': True,
-                    'natural_key_field_name': field_names[0],
-                    'field_names': field_names,
-                    }
-
-        def dict_stream():
-            # now, you normally have TWO state transitions to go through
-            # (so, three states): state: at second header line.
-            # state: business row lines. state: tail lines
-
-            def f():
-                o.pop_and_assert_matches_top(tag)
-                nonlocal f
-                f = main
-                return f()
-
-            def main():
-                if o.matches_top(tag):
-                    return (True, item)
-                else:
-                    nonlocal f
-                    f = None
-                    return (False, None)
-
-            for tag, item in tagged_items:
-                yes, x = f()
-                if yes:
-                    yield dict_via_row_dom(x)
-                else:
-                    break
-
-        def dict_via_row_dom(dom):
-            _r = range(0, dom.cels_count)
-            _pairs = ((i, dom.cel_at_offset(i).content_string()) for i in _r)
-            # #[#410.M] where sparseness is implemented #coverpont13.2:
-            return {field_names[t[0]]: t[1] for t in _pairs if len(t[1])}
-
         return self._format_adapter.sync_lib.SYNC_REQUEST_VIA_TWO_FUNCTIONS(
-                release_sync_parameters=sync_params,
-                release_dictionary_stream=dict_stream,
+                release_sync_parameters_dictionary=self.__procure_schema_dict,
+                release_dictionary_stream=self._release_dictionary_stream,
                 )
 
     def __exit__(self, *_3):
         return False  # we did not consume the exception
+
+    # ===
+
+    def _release_dictionary_stream(self):
+        """neat: python generators gives us a more expressive way to finish
+
+        this peek-and-backtrack trick we usually use function pointers for.
+        """
+
+        dct = pop_property(self, '_example_row_dictionary')
+        next_dict = pop_property(self, '_next_item_dictionary')
+        # ..
+        yield dct
+        while True:
+            dct = next_dict()
+            if dct is None:
+                break
+            yield dct
+
+    def __procure_schema_dict(self):
+        self.__resolve_tuple_iterator()
+        self._OK and self.__init_via_tuple_iterator()
+        self._OK and self.__advance_over_head_lines()
+        self._OK and self.__advance_over_the_schema_row_resolve_field_names()
+        if self._OK:
+            return self.__advance_past_the_example_row_procure_schema_item()
+
+    def __advance_past_the_example_row_procure_schema_item(self):
+        self._next_item_dictionary = self.__flush_main_stepper()
+        dct = self._next_item_dictionary()
+        if dct is None:
+            cover_me("no example row (so empty table) - that's OK but etc")
+
+        field_names = pop_property(self, '_field_names')
+        ok, tlfn = _tag_lyfe_field_names_hack(
+                dct, self._intention, self._listener)
+        if not ok:
+            return
+        _nkfn = field_names[0]  # for now, hardcoded as this [#408.C.2]
+        self._example_row_dictionary = dct
+        return {
+                '_is_sync_meta_data': True,
+                'natural_key_field_name': _nkfn,
+                'field_names': field_names,
+                'tag_lyfe_field_names': tlfn,
+                }
+
+    def __advance_over_the_schema_row_resolve_field_names(self):
+        tup = self._next_tuple()
+        if tup is None:
+            cover_me('table with header row but not schema row')
+        tag, head_line_two_of_two = tup
+        self._ETO.pop_and_assert_matches_top(tag)
+        self._field_names = head_line_two_of_two.complete_schema.field_names__
+
+        # nasty: if you do this here, it advances the state of the sanity
+        # checker thing now and we don't have to mess with state changes in
+        # our main loop
+        self._ETO.pop_and_assert_matches_top('business_object_row')
+
+    def __advance_over_head_lines(self):
+        # traverse along each line of the md file till you find table line 1
+        self._OK = False  # nonstandard trick ..
+        o = self._ETO
+        for tag, item in self._tuple_iterator:
+            if not o.matches_top(tag):
+                o.pop_and_assert_matches_top(tag)
+                # tag is 'table_schema_line_one_of_two' can toss because #here3
+                self._OK = True
+                break
+        if not self._OK:
+            cover_me('beginning of markdown table never found')
+
+    def __flush_main_stepper(self):
+
+        dict_via_row_dom = _dict_via_row_dom(self._field_names)
+        next_tuple = pop_property(self, '_next_tuple')
+        eto = pop_property(self, '_ETO')
+
+        def f():
+            nonlocal next_tuple
+            tup = next_tuple()
+            if tup is None:
+                # #coverpointTL.1.5.1.2:
+                # table was last thing in file and that's OK
+                next_tuple = None  # sanity
+            else:
+                tag, row_dom = tup
+                if eto.matches_top(tag):
+                    return dict_via_row_dom(row_dom)
+                else:
+                    next_tuple = None  # sanity
+        return f
+
+    def __init_via_tuple_iterator(self):
+        self._ETO = _ExpectedTagOrder()
+        from modality_agnostic import streamlib as _
+        self._next_tuple = _.next_or_noner(self._tuple_iterator)
+
+    def __resolve_tuple_iterator(self):
+        _id = pop_property(self, '_mixed_collection_identifier')
+        _ = _near_tuples_via_mixed(_id, self._listener)
+        self._required('_tuple_iterator', _)
+
+    _required = _required
+
+    def _become_not_OK(self):
+        self._OK = False
+
+
+def _tag_lyfe_field_names_hack(dct, intention, listener):
+    """as an answer to the problem introduced in [#418.2] ("whether to be a
+
+    jack of all trades"), we introduced the idea of "intention" as a soft
+    hint for what this traversal is for.
+
+    for the sake of consistency and failing early and at a cost of a
+    negligible amount of extra work, we do this hack whether or not we are
+    doing a filter by, a sync or whatever..
+
+    .:#here2:
+    """
+
+    these = tuple(k for k in dct.keys() if '#' in dct[k])
+    result = these if len(these) else None
+
+    if 'filter' == intention:
+        if result is None:
+            __whine_about_no_whatever(dct, listener)
+            return False, None
+        else:
+            return True, result
+    elif 'sync' == intention:
+        return True, result
+    else:
+        sanity()
+
+
+def __whine_about_no_whatever(dct, listener):  # #coverpointTL.1.5.1.1
+
+    import script_lib.magnetics.ellipsified_string_via as _
+    ellipsis_join = _.complicated_join
+
+    def msg_f():
+        yield "your example row needs at least one cel with a hashtag in it."
+        yield ellipsis_join('(had: ', ', ', ')', dct.values(), 80, repr)
+    listener('error', 'expression', 'no_tag_lyfe_field_names', msg_f)
+
+
+def _dict_via_row_dom(field_names):
+    def f(dom):
+        _r = range(0, dom.cels_count)
+        _pairs = ((i, dom.cel_at_offset(i).content_string()) for i in _r)
+        # #[#410.13] where sparseness is implemented #coverpoint13.2:
+        return {field_names[t[0]]: t[1] for t in _pairs if len(t[1])}
+    return f
 
 
 class _ExpectedTagOrder:
@@ -266,7 +381,7 @@ class _ExpectedTagOrder:
         return self._stack[-1][0] == tag
 
 
-def _near_tagged_items_via_mixed(mixed, listener):
+def _near_tuples_via_mixed(mixed, listener):
     from .magnetics import tagged_native_item_stream_via_line_stream as f
     return f(mixed, listener)
 
@@ -309,7 +424,8 @@ _functions = {
             'open_new_lines_via_sync': _open_new_lines_via_sync,
             },
         'modality_agnostic': {
-            'open_sync_request': _open_sync_request,
+            'open_filter_request': lambda *a: _open_trav_request('filter', *a),
+            'open_sync_request': lambda *a: _open_trav_request('sync', *a),
             },
         }
 

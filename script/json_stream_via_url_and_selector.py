@@ -86,7 +86,7 @@ def JSON_object_writer_via_IO_downstream(io):
 
 # -- EXPERIMENT..
 
-class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F]
+class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
 
     def __init__(
             self,
