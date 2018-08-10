@@ -92,7 +92,7 @@ if you are familiar with the term "mono-repo", that's what's going on here.
     sub-projects can help combat "software erosion" (an idea mentioned in
     [12 factor][heroku3], explained well in [this old heroku blog][heroku4],
     and defined more formally in a wikipedia page.)
-    the fear (wrought from experience) is thaat if a smaller project is off
+    the fear (wrought from experience) is that if a smaller project is off
     in its own little corner, it's easy to forget it exists for a few years.
     then when it's re-discovered and dusted off, the cost of getting it to
     work again is high; sometimes prohibitively so. keeping small projects
@@ -199,9 +199,9 @@ then in your 'main' terminal:
 |[#020]                     | #trak | track all issues with python itself
 |[#019]                     | #open | track wishlist for strongly typed ([#412], [#604])
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
-[[#017]                     |       | [placeholder to explain our listener pattern]
+|[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes
-|[\[#015\]]                 |       | [ticker numberspace]
+|[\[#015\]]                 |       | [tickler numberspace]
 |[#014]                     |       | [expect tree-like screen]
 |[#013]                     |       | modality-agnostic parameter expression
 |[#012]                     |       | generic microservice arch (placeheld)

@@ -20,7 +20,7 @@
 |[Blitline](https://devcenter.heroku.com/articles/blitline)|#image||
 |[Blower.io SMS](https://devcenter.heroku.com/articles/blowerio)|#SMS||
 |[Bonsai Elasticsearch](https://devcenter.heroku.com/articles/bonsai)|#search||
-|[Boxcab](https://devcenter.heroku.com/articles/boxcab)|#INTERESTING||
+|[Boxcab](https://devcenter.heroku.com/articles/boxcab)|#INTERESTING #CMS||
 |[Bucketeer](https://devcenter.heroku.com/articles/bucketeer)|#S3||
 |[Bugsnag](https://devcenter.heroku.com/articles/bugsnag)|#monitoring||
 |[Building a Unified Dashboard as an Ecosystem Partner](https://devcenter.heroku.com/articles/building-a-unified-dashboard-as-an-ecosystem-partner)|||
@@ -69,7 +69,7 @@
 |[GrapheneDB](https://devcenter.heroku.com/articles/graphenedb)|#storage:neo4j||
 |[GRAX by Harding Point](https://devcenter.heroku.com/articles/engagementgraph)|#salesforce||
 |[Guru301](https://devcenter.heroku.com/articles/guru301)|#IP-stuff||
-|[Helpjuice](https://devcenter.heroku.com/articles/helpjuice)|#beta #looks-awful #knowledge-base||
+|[Helpjuice](https://devcenter.heroku.com/articles/helpjuice)|#beta #looks-awful #knowledge-base #CMS||
 |[Heroku Scheduler](https://devcenter.heroku.com/articles/scheduler)|#scheduler||
 |[Honeybadger](https://devcenter.heroku.com/articles/honeybadger)|#monitoring #interesting||
 |[Hosted Graphite](https://devcenter.heroku.com/articles/hostedgraphite)|#analytics||

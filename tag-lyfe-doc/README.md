@@ -8,8 +8,9 @@
     1. `what a great game #fifa2018`
     1. `rose mcgowan #metoo autobiagraphy 😭✊ #fierce`
 
-  - we can search for all items that have one particular 
-
+  - we can search for all items that have one particular tag, but also
+    we can make more complicated boolean queries based on the taggings.
+    a minimal example is in the [next section](#status).
 
 (oblique snippet that will be moved to somewhere like `filter_by_tags.py`:
 this is for making informed decisions, and then later being able to
@@ -19,10 +20,42 @@ machine-readble way.)
 
 
 
-## sub-node table (experiment)
+## <a name=status></a>status
+
+this subproject currently works and is useful. combined with the power of
+[\[#400\]] sakin-agac, this thing can take collections of items we're
+tentatively calling "dim sum" tables (like in [\[#404\]], sort of) and pare
+them down to match criteria (your "query").
+
+
+for example:
+
+
+    ./script/filter_by.py '#open' and not '#boring' tag-lyfe-doc/README.md
+
+
+the above pares down the below [node table][#nt] (in this same document)
+and ouputs (at writing):
+
+    {"id": "#709.D", "main_tag": "#open", "content": "integrate queries and .."}
+    {"id": "#709.C", "main_tag": "#open", "content": "maybe don't walk (#when)"}
+    ..
+
+i.e, it pares down the below collecton to filter it down to only those items
+that are tagged with `#open` and not tagged with `#boring`.
+
+the output is expressed as a stream (in the UNIX sense) of JSON objects
+(where each line is one object) making it suitable to be piped into or
+consumed by arbitrary other processes.
+
+
+
+
+## <a name=nt></a>the node table
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
+|                 (example) | #eg   | #example blah blah
 |                   #709.D  | #open | integrate queries and tagging to use same grammar (#when)
 |                   #709.C  | #open | maybe don't walk (#when)
 |                   #709.B  | #open | generic small seams (#when)
@@ -50,6 +83,8 @@ machine-readble way.)
 
 
 [\[#702\]]: 002-parser-generators-dilligence.md
+[\[#404\]]: ../sakin-agac-doc/404-wiki-app-dim-sum.md
+[\[#400\]]: ../sakin-agac-doc/README.md
 
 
 

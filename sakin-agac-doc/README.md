@@ -7,21 +7,23 @@
 
 ## objective & scope
 
-mainly:
+our current [broad objectives][\[#403\]] are discussed in their own document.
+
+these were the original stated objectives, here (in part) for posterity:
   - learn react.
   - experiment with unobtrusive static pages
   - do that one static thing with tables
   - do that one static pipeline with webpack
-
-now, these ideas are expanded in [their own document][\[#403\]].
 
 
 
 
 ## sub-node table (experiment)
 
-|Id                         | Main Tag | Content
+|Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
+|                 (example) | #this | #this-cel-too
+|                   #419    |       | heroku CMS add-on dim sum ..
 |                   #418    |       | thoughts on expressing metadata about a collection ..
 |                   #417    |       | #central-concetit: the JSON wall (lingua franca) (see ASCII art here)
 |                   #416.D  |       | CMS's

@@ -1,20 +1,42 @@
-## (things that maybe didn't get added, to splice in later);
+# "sakin agac"
 
-  - the main essential function of the blog has no backend - is static assets
-  - should "run" just as well locally as remotely
-  - contributors should be able to contribute using a github model;
-    that is, all thru terminal and all with git (for etc..)
+## overview: broad objectives
+
+the broad objective of this subproject (codenamed "sakin agac" and badly
+in need of a real name) is to accomplish "publishing" on these terms:
+
+  - the main essential function of the blog is accomplished without a
+    "backend" — it's just static assets.
+
+  - must run just as well locally as remotely (i.e it must look the same
+    when being served on your laptop as it does on the internet).
+
+  - no application server to worry about (other than e.g. nginx).
+    even after phase 1 when we might get complicated with CMS-like
+    authentication to (for example) manage view privileges on certain
+    pages, we always want to be able to fall back on this provision that
+    static, publicly viewable assets are always served simply with no
+    "moving parts".
+
+  - in phase 1, "writes" to the "blog" happen exclusively on the
+    contributor's workstation (no web-based editing in phase 1).
+    (and imagine a pandoc-like pipeline here, or just a jekyll/
+    github-flavored markdown thing..)
+
+  - VCS-based history: the content of the single "static website" can be
+    sourced from _multiple_ collections of documents, where each such
+    collection is its _own_ SCM/VCS-managed tree (imagine git but assume
+    hg, darcs etc; a plug-in architecture — don't hard-code for git).
+    possibly post phase-1 we want to integrate a sort of "view change
+    hisory" into the UI whose backend leans _soley_ on the VCS.
 
 
 
 
-# the broad objectives of [the project codenamed "sakin agac"]
+## ramblings about "philosophy" and goals for the user experience
 
-currently, this must start out as a hodgepodge scratch space.
-
-broadly in terms of user experience "philosopy":
-
-  - whenever relevant, we want the UX to be "familar" ("intuitive"). I am
+  - whenever relevant, we want the UX to be "familar" ("intuitive") for
+    a particular target audience. I am
     reminded of what _ruby_ creator Yukihiro "Matz" Matsumoto said of ruby
     and "the element of least surprise" - he said something like, "it's
     about _my_ surpise, not your surprise". here we would want users of
@@ -66,10 +88,15 @@ in terms of technology:
     consideration to leveraging this approach to some degree that's
     not overly absurd..
 
-other notes
+
+
+
+## competitive analysis
 
   - this is similar in spirit (but not content) to the
     [counterpart feature tree][wikijs2] of wiki.js.
+    we do a "dim sum"-like assesment of similar-space alternatives
+    in this dedicated [sibling document][sibling1].
 
 
 
@@ -98,6 +125,7 @@ other notes
 [wikijs2]: https://github.com/Requarks/wiki
 [heroku5]: https://devcenter.heroku.com/articles/architecting-apps
 [heroku3]: https://12factor.net/
+[sibling1]: 404-wiki-app-dim-sum.md
 
 
 

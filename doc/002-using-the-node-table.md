@@ -69,10 +69,12 @@ this document describes how the [node table](../README.md#node-table) is used.
   - `[#001.a]`, `[#001.b]` etc for sub-identifiers that don't leave the
      document (but see [the next section](#d)).
 
-  - `[#001.A]`, `[#001.B]` etc for sub-identifiers that don't leave the project.
+  - `[#001.A]`, `[#001.B]` etc for sub-identifiers that don't leave the
+     subproject.
 
-  - `[#001.1]`, `[#001.2]` etc for sub-identifiers that do. (think "public API"
-    from [semver.org](http://semver.org)).
+  - `[#001.1]`, `[#001.2]` etc for sub-identifiers that _do_ leave the
+     subproject (i.e. are referenced by other subprojects).
+     (think "public API" from [semver.org](http://semver.org).)
 
   - more than 26 is too many sub-identifiers for a document anyway.
 
@@ -97,7 +99,7 @@ points.
     we might be trending away from the number/single-letter sub-identifiers.
     instead we may be trending towards utilizing github-flavored markdown
     more fully by using html anchor tags with name attributes (more
-    semantically named)
+    semantically named).
 
   - for now we will continue using a combination of both. for example,
     at writing the section we are in now has a single-letter name for
@@ -109,8 +111,9 @@ points.
     promote the reference to a level of visibility outside the file), we
     use `#here1`, `#here2`, etc.
 
-  - if you see `:#here1` (with the leading colon), that means that is where
-    the thing is defined, as opposed to it just being referred to.
+  - if you see `:#here1` (with the leading colon), that means that that is
+    where the thing is _defined_ (or if you prefer, the _referrent_) as
+    opposed to it just being referred to.
     (you can sometimes find where toplevel identifiers are defined in
     this way too, by searching for (e.g) `:[#001]`, etc.)
 
