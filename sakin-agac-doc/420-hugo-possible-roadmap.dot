@@ -1,0 +1,50 @@
+digraph {
+
+01[shape=rect label="you are
+re-familiarized
+with heroku."]
+
+02[shape=rect label="you have
+generated a
+static site
+with hugo
+(so you have
+the stack locally)"]
+
+03[shape=rect label="you have
+achieved good
+enough publishing
+for now to
+get started."]
+
+04[shape=rect label="you have
+a stupid simple
+hello world article
+published on the internet
+from hugo that is
+part of your
+mono repo"]
+
+05[shape=rect label="you have
+figured out how
+to integrate hugo
+into your mono repo
+to leverage existing
+documents in a way
+that doesn't suck"]
+
+06[shape=rect label="you have
+a standalone repo that
+used the hugo buildpack
+to publish a hello world
+blog entry to the internet
+on heroku"]
+
+07[shape=rect label="you have
+re-familiarized yourself with
+heroku and re-documented it
+for yourself as necessary."]
+}
+/*
+  - #born.
+*/

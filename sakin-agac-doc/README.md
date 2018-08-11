@@ -23,6 +23,7 @@ these were the original stated objectives, here (in part) for posterity:
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |                 (example) | #this | #this-cel-too
+|                   #420    |       | hugo-related roadmap (graphviz)
 |                   #419    |       | heroku CMS add-on dim sum ..
 |                   #418    |       | thoughts on expressing metadata about a collection ..
 |                   #417    |       | #central-concetit: the JSON wall (lingua franca) (see ASCII art here)
