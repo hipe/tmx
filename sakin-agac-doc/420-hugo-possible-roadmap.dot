@@ -32,9 +32,11 @@ mono repo"]
 04->06
 
 
-a04[label="Integrate this
-(maybe)"]
+a04[label="Integrate minimal
+hello world into
+your mono-repo"]
 a04->04
+02->a04
 
 
 05[shape=rect label="you have
@@ -60,6 +62,7 @@ to fit into your
 mono repo
 architecture"]
 a05->d05
+04->a05
 
 
 a05B[label="consider tyrna
@@ -106,6 +109,7 @@ for yourself as necessary."]
 
 a07[label="Write this"]
 a07->07
+01->a07
 
 
 08[shape=rect label="you have
@@ -117,6 +121,7 @@ and working from zero"]
 
 a08[label="Write this"]
 a08->08
+02->a08
 
 
 label="
@@ -125,14 +130,13 @@ the rectangular nodes are states.
 an arrow pointing from one
 state to another mean \"implies\".
 
-for now, elliptical nodes are
-actions as opposed to states.
+elliptical nodes are actions.
 
 an arrow from an action to a
-state also means \"implies\".
+state means \"produces\".
 
-
-
+an arrow from a state to an
+action means \"is a precursor to\".
 "
 }
 /*

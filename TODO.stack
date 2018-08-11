@@ -106,5 +106,8 @@ sub-project: upload files to s3
   - enter into your markdown table whether it worked and what it was like AND:
   - go thru every add-on in heroku, trying to install it if it is a CMS and AND:
 don't forget to checkout github pages
+  - actually what you're thinking is like [etc]
 (-tag-lyfe.2 [good enough publishing with hugo])
-(-tag-lyfe.3.1 xx)
+(-tag-lyfe.2.1 See how hard it is to get hugo to play nice with exiting docs (BIG UNKNOWN)
+(-tag-lyfe.2.2 Integrate hugo hello world into monorepo while documenting two things
+(-tag-lyfe.2.3 Get hugo hello world pushed to heroku (bespoke, throwaway branch) while taking notes
