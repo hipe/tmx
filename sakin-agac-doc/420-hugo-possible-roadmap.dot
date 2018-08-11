@@ -32,6 +32,11 @@ mono repo"]
 04->06
 
 
+a04[label="Integrate this
+(maybe)"]
+a04->04
+
+
 05[shape=rect label="you have
 figured out how
 to integrate hugo
@@ -41,6 +46,31 @@ documents in a way
 that doesn't suck"]
 05->04
 05->03
+
+
+d05[shape=diamond label="if it
+is easy"]
+d05->05[label=yes]
+d05->a05B[label=no]
+
+
+a05[label="iterate on
+getting hugo as-is
+to fit into your
+mono repo
+architecture"]
+a05->d05
+
+
+a05B[label="consider tyrna
+hack hugo etc
+(out of scope
+for now)"]
+a05B->d05B
+
+
+d05B[shape=diamond label="worked?"]
+d05B->05[label=yes]
 
 
 06[shape=rect label="you have
@@ -53,11 +83,29 @@ on heroku"]
 06->02
 
 
+d06[shape=diamond label="if you
+can get it
+to work"]
+d06->06
+
+
+a06[label="Read that blog article
+whatever about using the hugo
+heroku buildpack to publish with
+hugo on heroku
+"]
+a06->d06
+
+
 07[shape=rect label="you have
 re-familiarized yourself with
 heroku and re-documented it
 for yourself as necessary."]
 07->01
+
+
+a07[label="Write this"]
+a07->07
 
 
 08[shape=rect label="you have
@@ -67,9 +115,24 @@ and working from zero"]
 08->02
 
 
+a08[label="Write this"]
+a08->08
+
+
 label="
+the rectangular nodes are states.
+
 an arrow pointing from one
 state to another mean \"implies\".
+
+for now, elliptical nodes are
+actions as opposed to states.
+
+an arrow from an action to a
+state also means \"implies\".
+
+
+
 "
 }
 /*
