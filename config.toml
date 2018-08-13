@@ -1,0 +1,8 @@
+baseurl = "http://botnoise.herokuapp.com/"
+# yuck TODO above
+
+languageCode = "en-us"
+title = "ohai i am the botnoise title"
+theme = "ananke"
+
+# #born.

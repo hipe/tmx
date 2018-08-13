@@ -73,41 +73,8 @@ sub-project: upload files to s3
   design (nonworking static layout)
   react tutorial
   sftp a static tree to heroku
-  static page on heroku
-  bleeding edge on heroku
-  bleeding edge locally
-  see if you can get it working on heroku
-  get wiki.js working locally following the instructions
-04:15 Tutorial #30 - Create Custom Error Pages
-06:50 Tutorial #29 - Make PUT Request using jQuery in Play Framework
-08:52 Tutorial #28 - Make Delete Request using jQuery in Play Framework
-13:27 Tutorial #27 - Form Validations in Play
-10:15 Tutorial #26 - Update Views Part 2
-08:37 Tutorial #25 - Update Views Part 1
-03:43 Tutorial #24 - Include Bootstrap and jQuery in Play Framework
-07:28 Tutorial #23 - Add Support For MySQL Database in Play Framework
-08:50 Tutorial #22 - Update Book Model And Perform CRUD Operations in H2 Database
-08:34 Tutorial #21 - Enable Ebean ORM & JDBC Support
-07:12 Tutorial #20 - Refactoring Views Of BookStore Application
-04:31 Tutorial #19 - in Java: Implement Delete Method of BookStore Application
-04:46 Tutorial #18 - Implement Show Method of BookStore Application
-04:19 Tutorial #17 - Implement Update Method of BookStore Application
-05:32 Tutorial #16 - Implement Edit Method Of BookStore Application
-05:30 Tutorial #15 - Implement Save Method Of BookStore Application
-10:08 Tutorial #14 - Implement Create Method Of BookStore Application
-05:06 Tutorial #13 - Index Method of BookStore Application
-07:43 Tutorial #12 - Implement Book Model in Play Framework
-(-1) try to install every CMS
-  - possibly in the near or distant future use rough blog to help find better blog
-  - finally have a CMS
+(-tag-lyfe.1 See how hard it is to get hugo to play nice with monorepo (BIG UNKNOWN)
   - consider possibly making a minimal (ish) roll-your own that meets the
     criteria (yes this would blow up into many points)
-  - make a criteria/requirements document.
-  - enter into your markdown table whether it worked and what it was like AND:
-  - go thru every add-on in heroku, trying to install it if it is a CMS and AND:
 don't forget to checkout github pages
   - actually what you're thinking is like [etc]
-(-tag-lyfe.2 [good enough publishing with hugo])
-(-tag-lyfe.2.1 See how hard it is to get hugo to play nice with exiting docs (BIG UNKNOWN)
-(-tag-lyfe.2.2 Integrate hugo hello world into monorepo while documenting two things
-(-tag-lyfe.2.3 Get hugo hello world pushed to heroku (bespoke, throwaway branch) while taking notes

@@ -5,7 +5,7 @@
 this “project” consists of several “sub-projects” whose only unifying
 theme is that they are somehow of interest (maybe) to the DTF group chat.
 
-although the sub-projects are thematically disparate from one aonther, we
+although the sub-projects are thematically disparate from one another, we
 keep them here in one repository for [reasons](#sub-projects).
 
 

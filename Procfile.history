@@ -1,0 +1,26 @@
+about this file
+
+  - this file is named as it is so you find it when you are looking for
+    the Procfile
+
+  - this file is not parsed as markdown anywhere, but we may use markdown
+    formatting in it nonetheless, just for the sake of expressiveness.
+
+  - more broadly, this file is not read by machine or "published". its
+    intended audience is only developers.
+
+  - the purpose of this file is to mark _in verision control_,
+    _in one dedicated place_ where significant changes happened to the
+    Procfile.
+
+  - more specifically, this file exists to act as a "tombstone" for
+    when we delete the Profile out of necessity, but we want to keep
+    some trackable notes in version control about why it was deleted..
+
+  - and can also serve as a log (cross referencing to version history)
+    as we flip-flop through such days in the future.
+
+these are those notes:
+
+.#history.A.1: removed profile scala (play), because it was preventing us from
+  etc

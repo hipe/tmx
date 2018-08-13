@@ -169,8 +169,10 @@ exactly what kind of (grammatical) node this is #open [#709.C])
 
 @memoize
 def _query_parser():
+    from tag_lyfe import grammar_path_
+    _grammar_path = grammar_path_('the-tagging-grammar.ebnf')
 
-    with open('tag_lyfe/grammars/the-tagging-grammar.ebnf') as fh:
+    with open(_grammar_path) as fh:
         ebnf_grammar_big_string = fh.read()
 
     import tatsu

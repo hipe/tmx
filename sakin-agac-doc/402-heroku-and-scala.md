@@ -206,6 +206,35 @@ echo "(done.)"
 
 
 
+## (appendix - these)
+
+(these had been on the work stack; now we're archiving them #history-A.1)
+
+|duration|title|
+|--|--|
+|04:15|Tutorial #30 - Create Custom Error Pages|
+|06:50|Tutorial #29 - Make PUT Request using jQuery in Play Framework|
+|08:52|Tutorial #28 - Make Delete Request using jQuery in Play Framework|
+|13:27|Tutorial #27 - Form Validations in Play|
+|10:15|Tutorial #26 - Update Views Part 2|
+|08:37|Tutorial #25 - Update Views Part 1|
+|03:43|Tutorial #24 - Include Bootstrap and jQuery in Play Framework|
+|07:28|Tutorial #23 - Add Support For MySQL Database in Play Framework|
+|08:50|Tutorial #22 - Update Book Model And Perform CRUD Operations in H2 Database|
+|08:34|Tutorial #21 - Enable Ebean ORM & JDBC Support|
+|07:12|Tutorial #20 - Refactoring Views Of BookStore Application|
+|04:31|Tutorial #19 - in Java: Implement Delete Method of BookStore Application|
+|04:46|Tutorial #18 - Implement Show Method of BookStore Application|
+|04:19|Tutorial #17 - Implement Update Method of BookStore Application|
+|05:32|Tutorial #16 - Implement Edit Method Of BookStore Application|
+|05:30|Tutorial #15 - Implement Save Method Of BookStore Application|
+|10:08|Tutorial #14 - Implement Create Method Of BookStore Application|
+|05:06|Tutorial #13 - Index Method of BookStore Application|
+|07:43|Tutorial #12 - Implement Book Model in Play Framework|
+
+
+
+
 [heroku7]: https://devcenter.heroku.com/articles/how-heroku-works
 [heroku1]: https://devcenter.heroku.com/articles/heroku-cli
 [rando1]: https://github.com/orefalo/play-markdown
@@ -217,4 +246,6 @@ echo "(done.)"
 
 ## (document-meta)
 
+  - #pending-rename: scala on heroku
+  - #history-A.1: archive scala/play for now
   - #born.

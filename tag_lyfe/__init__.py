@@ -1,5 +1,16 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
+
+from os import path as os_path
+
+
+def grammar_path_(tail):
+    return os_path.join(_grammars_dir, tail)
+
+
+_grammars_dir = os_path.join(os_path.dirname(__file__), 'grammars')
+
+
 NULL_BYTE_ = '\0'  # (used in next block)
 
 if __name__ == '__main__':

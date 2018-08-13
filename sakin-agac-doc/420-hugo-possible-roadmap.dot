@@ -2,7 +2,7 @@ digraph {
 
 rankdir=BT
 
-01[shape=rect label="you are
+01[shape=rect style=filled label="you are
 re-familiarized
 with heroku."]
 
@@ -12,7 +12,8 @@ generated a
 static site
 with hugo
 (so you have
-the stack locally)"]
+the stack locally)"
+style=filled]
 
 
 03[shape=rect label="you have
@@ -28,13 +29,17 @@ hello world article
 published on the internet
 from hugo that is
 part of your
-mono repo"]
+mono repo
+"
+style=filled
+]
 04->06
 
 
 a04[label="Integrate minimal
 hello world into
-your mono-repo"]
+your mono-repo"
+style=filled]
 a04->04
 02->a04
 
@@ -50,10 +55,14 @@ that doesn't suck"]
 05->03
 
 
-d05[shape=diamond label="if it
-is easy"]
+d05[label="is it
+good enough?
+"
+shape=diamond
+]
 d05->05[label=yes]
-d05->a05B[label=no]
+d05->a09[label=no]
+a09->d05[label=then]
 
 
 a05[label="iterate on
@@ -65,30 +74,21 @@ a05->d05
 04->a05
 
 
-a05B[label="consider tyrna
-hack hugo etc
-(out of scope
-for now)"]
-a05B->d05B
-
-
-d05B[shape=diamond label="worked?"]
-d05B->05[label=yes]
-
-
 06[shape=rect label="you have
 a standalone repo that
 uses the hugo buildpack
 to publish a hello world
 blog entry to the internet
-on heroku"]
+on heroku"
+style=filled]
 06->01
 06->02
 
 
 d06[shape=diamond label="if you
 can get it
-to work"]
+to work"
+style=filled]
 d06->06
 
 
@@ -96,18 +96,20 @@ a06[label="Read that blog article
 whatever about using the hugo
 heroku buildpack to publish with
 hugo on heroku
-"]
+"
+style=filled]
 a06->d06
 
 
 07[shape=rect label="you have
 re-familiarized yourself with
 heroku and re-documented it
-for yourself as necessary."]
+for yourself as necessary."
+style=filled]
 07->01
 
 
-a07[label="Write this"]
+a07[label="Write this" style=filled]
 a07->07
 01->a07
 
@@ -115,13 +117,78 @@ a07->07
 08[shape=rect label="you have
 documented exactly what you
 did you get hugo installed
-and working from zero"]
+and working from zero
+"
+style=filled
+]
 08->02
 
 
-a08[label="Write this"]
+a08[label="Write this" style=filled]
 a08->08
 02->a08
+a09[label="try one
+of these"
+]
+a09->a09_1
+a09_1[label="consider
+symlinks hack
+(directories)
+"
+]
+a09->a09_2
+a09_2[label="consider
+symlinks hack
+(files)
+"]
+a09->a09_3
+a09_3[label="'travers'"
+]
+a09->a09_4
+a09_4[label="isomorphicism
+between
+first header
+and title
+"
+]
+a09_4->a09_5
+a09_6->a09_5
+a09_5[label="abstract
+front-matter out
+of files
+"
+]
+a09_3->a09_6
+a09_6[label="github-style
+styling either
+the easy way or
+the hard way
+"
+]
+a09_3->a09_7
+a09_7[label="lozenge
+grid
+"
+]
+03->a10
+a10[label="look at
+some of these
+too
+"
+]
+a10->a10_1
+a10_1[label="nginx not
+python
+"
+]
+a10->a10_2
+a10_2[label="logging
+"
+]
+a10->a10_3
+a10_3[label="SEO
+"
+]
 
 
 label="
