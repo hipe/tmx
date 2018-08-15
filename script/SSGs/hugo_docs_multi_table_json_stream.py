@@ -1,0 +1,131 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+"""here we experiment with "multi-table"
+
+produces a JSON dump from the outline of documentation
+that can be found here: {hugo_docs_url}
+
+NOTE this could also be accomplished by doing a git checkout
+of the whole hugo documentation repository and looking at the
+filesystem tree or whatever but we see the way we do it here
+as better because it uses the presentation structure which is
+presumably the most representative of yadda..
+"""
+
+_domain = 'https://gohugo.io'  # no trailing slash because #here1
+_url = _domain + '/documentation/'
+
+_my_doc_string = __doc__
+
+
+def _required(self, attr, x):
+    if x is None:
+        self._OK = False  # often `_become_not_OK`
+    else:
+        setattr(self, attr, x)
+
+
+class open_traversal_stream:
+
+    def __init__(self, cached_document_path, listener):
+        import script.json_stream_via_url_and_selector as _
+        self._cached_document_path = cached_document_path
+        self._listener = listener
+        self._lib = _
+        self._OK = True
+
+    def __enter__(self, *_3):
+        self._OK and self.__resolve_soup()
+        self._OK and self.__find_the_root_UL()
+        if not self._OK:
+            return
+        for level_one_node in _direct_children(self._the_root_UL):
+            if 'li' != level_one_node.name:
+                cover_me()
+            for level_two_node in _direct_children(level_one_node):
+                name = level_two_node.name
+                if 'a' == name:
+                    dct = {'_is_branch_node': True}
+                    _write_anchor_tag(dct, level_two_node)
+                    yield dct
+                elif 'ul' == name:
+                    for item_li in _direct_children(level_two_node):
+                        a, = tuple(_direct_children(item_li))
+                        None if 'a' == a.name else sanity()
+                        dct = {}
+                        _write_anchor_tag(dct, a)
+                        yield dct
+                else:
+                    sanity()
+
+    def __exit__(self, *_3):
+        return False  # do not swallow exceptions
+
+    def __find_the_root_UL(self):
+
+        # find all tags of this one name that have this one attribute
+        # with this one value
+
+        def has_this_one_attr_value(tag):
+
+            if 'nav' != tag.name:
+                return False  # #hi (so we can say below)
+
+            # (at the time of writing, all tags that get this far also
+            # match the below criteria, but it is here for expressiveness
+            # and future-protecting it)
+
+            return tag.has_attr('role') and 'navigation' == tag['role']
+
+        _neet = self._soup.find_all(has_this_one_attr_value)
+        del(self._soup)
+        _, nav = _neet  # assert 2 navs, we want only 2nd (compare nth-of-type)
+
+        ul, = tuple(_direct_children(nav))  # assert
+        None if 'ul' == ul.name else sanity()
+        self._the_root_UL = ul
+
+    def __resolve_soup(self):
+        _soup = self._lib.soup_via_locators_(
+                url=_url,
+                html_document_path=self._cached_document_path,
+                listener=self._listener,
+                )
+        self._required('_soup', _soup)
+
+    _required = _required
+
+
+def _write_anchor_tag(dct, a):
+    dct['label'] = a.string.strip()  # :#here1
+    s = a['href']
+    if 'javascript:void(0)' == s:
+        pass  # ..
+    else:
+        dct['url'] = _domain + s
+
+
+def _direct_children(node):
+    return node.select('> *')  # not sure if this is idiomatic
+
+
+def cover_me():
+    raise Exception('cover me')
+
+
+def sanity():
+    raise Exception('sanity')
+
+
+if __name__ == '__main__':
+    import sys as _
+    _.path.insert(0, '')
+    import script.json_stream_via_url_and_selector as _
+    _exitstatus = _.common_CLI_for_json_stream_(
+            traversal_function=open_traversal_stream,
+            doc_string=_my_doc_string,
+            help_values={'hugo_docs_url': _url},
+            )
+    exit(_exitstatus)
+
+# #born.

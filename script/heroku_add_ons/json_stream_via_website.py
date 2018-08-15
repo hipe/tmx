@@ -18,21 +18,12 @@ _url = _domain + '/categories/add-on-documentation'
 
 _first_selector = ('ul', {'class': 'list-icons'})
 
-
-def _my_CLI(listener, sin, sout, serr):
-
-    _cm = open_dictionary_stream(None, listener)
-    with _cm as lines:
-        exitstatus = _lib().flush_JSON_stream_into(sout, serr, lines)
-    return exitstatus
-
-
-_my_CLI.__doc__ = __doc__
+_my_doc_string = __doc__
 
 
 def open_dictionary_stream(html_document_path, listener):
 
-    def my_generator(el, _emit):
+    def my_generator(el, _listener):
 
         yield {
                 '_is_sync_meta_data': True,
@@ -56,16 +47,14 @@ def open_dictionary_stream(html_document_path, listener):
     markdown_link_via = o.markdown_link_via
     url_via_href = o.url_via_href_via_domain(_domain)
     label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
 
-    _cm = _lib().OPEN_DICTIONARY_STREAM_VIA(
+    _cm = o.OPEN_DICTIONARY_STREAM_VIA(
         url=_url,
         first_selector=_first_selector,
         second_selector=my_generator,
         html_document_path=html_document_path,
         listener=listener,
         )
-
     return _cm
 
 
@@ -75,14 +64,14 @@ def _lib():
 
 
 if __name__ == '__main__':
-    import sys as o
-    o.path.insert(0, '')
-    import script_lib as sl
-    _exitstatus = sl.CHEAP_ARG_PARSE(
-        cli_function=_my_CLI,
-        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        help_values={'url': _url},
-        )
+    import sys as _
+    _.path.insert(0, '')
+    import script.json_stream_via_url_and_selector as _
+    _exitstatus = _.common_CLI_for_json_stream_(
+            traversal_function=open_dictionary_stream,
+            doc_string=_my_doc_string,
+            help_values={'url': _url},
+            )
     exit(_exitstatus)
 
 # #born

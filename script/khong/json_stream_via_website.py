@@ -10,21 +10,7 @@
 _domain = 'http://www.bogotobogo.com'
 domain = _domain  # expose it
 _url = _domain + '/python/pytut.php'  # ..
-
-
-def _my_CLI(listener, sin, sout, serr):
-
-    _rc = open_dictionary_stream(
-            html_document_path=None,
-            listener=listener,
-            )
-
-    with _rc as itr:
-            result = _ad_hoc_lib().flush_JSON_stream_into(sout, serr, itr)
-    return result
-
-
-_my_CLI.__doc__ = __doc__
+_my_doc_string = __doc__
 
 
 class open_dictionary_stream:
@@ -120,7 +106,7 @@ class open_dictionary_stream:
         del(self._exit_mutex)
 
 
-def _second_selector(soup, emit):
+def _second_selector(soup, listener):
     """
     in the purest form of using this scraper script, one doo-hah serves as
     a straightforward selector and another doo-hah takes the element from
@@ -195,6 +181,8 @@ def _second_selector(soup, emit):
         unexpected elements.
    """
 
+    from modality_agnostic import listening
+    emit = listening.emitter_via_listener(listener)
     o = _all_these_functions(emit)
 
     # first, populate `seen_set` while traversing the SECOND collection
@@ -386,14 +374,14 @@ def _ad_hoc_lib():
 
 
 if __name__ == '__main__':
-    import sys as o
-    o.path.insert(0, '')
-    import script_lib as sl
-    _exitstatus = sl.CHEAP_ARG_PARSE(
-        cli_function=_my_CLI,
-        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        help_values={'domain': _domain},
-        )
+    import sys as _
+    _.path.insert(0, '')
+    import script.json_stream_via_url_and_selector as _
+    _exitstatus = _.common_CLI_for_json_stream_(
+            traversal_function=open_dictionary_stream,
+            doc_string=_my_doc_string,
+            help_values={'domain': _domain},
+            )
     exit(_exitstatus)
 
 # #history-A.2: sunsetted file of origin

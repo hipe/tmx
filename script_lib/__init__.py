@@ -89,7 +89,9 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
 
 
 def line_stream_via_doc_string_(doc_string, help_values):
-    if True:
+    if help_values is None:
+        big_string = doc_string
+    else:
         big_string = doc_string.format(**help_values)
     _reg = re.compile('^(.*\n)', re.MULTILINE)
     _itr = _reg.finditer(big_string)

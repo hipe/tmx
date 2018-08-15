@@ -18,6 +18,13 @@ dependencies (TODO):
 """
 
 
+def _required(self, s, x):
+    if x is None:
+        self._become_not_OK()
+    else:
+        setattr(self, s, x)
+
+
 def _my_CLI(url, selector_string, listener, sin, sout, serr):
 
     cover_me('not used')
@@ -65,6 +72,34 @@ def selector_via_string(*_):
 _my_CLI.__doc__ = __doc__
 
 
+def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
+        traversal_function,
+        doc_string,
+        help_values,
+        ):
+
+    def my_CLI(listener, sin, sout, serr):
+
+        _rc = traversal_function(None, listener=listener)
+
+        with _rc as itr:
+                result = flush_JSON_stream_into(sout, serr, itr)
+        return result
+
+    my_CLI.__doc__ = doc_string
+
+    import script_lib as _
+    import sys as o
+
+    _exitstatus = _.CHEAP_ARG_PARSE(
+        cli_function=my_CLI,
+        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
+        help_values=help_values,
+        )
+
+    return _exitstatus
+
+
 def flush_JSON_stream_into(sout, serr, itr):
     """convenience guy for this pattern ETC"""
 
@@ -100,25 +135,26 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
         self.url = url
         self.first_selector = first_selector
         self.second_selector = second_selector
+        self._listener = listener
         self.html_document_path = html_document_path
-
-        from modality_agnostic import listening
-        self._emit = listening.emitter_via_listener(listener)
 
         self._enter_mutex = None
         self._exit_mutex = None
         self._ok = True
 
     def __enter__(self):
-        self._ok and self.__resolve_cached_doc()
         self._ok and self.__resolve_soup()
         self._ok and self.__maybe_use_first_selector()
         if self._ok:
             x = pop_property(self, '_arg_to_2nd_selector')
-            _itr = self.second_selector(x, self._emit)
+            _itr = self.second_selector(x, self._listener)
             return _itr
         else:
             return iter(())  # [#412]
+
+    def __exit__(self, *_):
+        del(self._exit_mutex)
+        return False  # don't absorb exceptions
 
     def __maybe_use_first_selector(self):
         soup = pop_property(self, '_soup')
@@ -131,11 +167,44 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
             if le is 1:
                 arg_to_2nd_selector = rs[0]
             else:
-                _tmpl = 'needed 1 had {}: {}'
-                self._emit(
-                        'error', 'expression', 'selection_arity_mismatch',
-                        _tmpl, (le, repr(first_selector)))
+                def msg():
+                    yield f'needed 1 had {le}: {first_selector!r}'
+                self._listener(
+                        'error', 'expression', 'selection_arity_mismatch', msg)
         self._required('_arg_to_2nd_selector', arg_to_2nd_selector)
+
+    def __resolve_soup(self):
+        _soup = soup_via_locators_(
+                url=self.url,
+                html_document_path=self.html_document_path,
+                listener=self._listener,
+                )
+        self._required('_soup', _soup)
+
+    _required = _required
+
+    def _become_not_OK(self):
+        self._ok = False
+
+
+def soup_via_locators_(**kwargs):
+    return _soup_via_things(**kwargs).execute()
+
+
+class _soup_via_things:
+    # abstracted from above thing at #history-A.3
+
+    def __init__(self, url, html_document_path, listener):
+        self.url = url
+        self.html_document_path = html_document_path
+        self._listener = listener
+        self._OK = True
+
+    def execute(self):
+        self._OK and self.__resolve_cached_doc()
+        self._OK and self.__resolve_soup()
+        if self._OK:
+            return self._soup
 
     def __resolve_soup(self):
         from bs4 import BeautifulSoup
@@ -145,30 +214,37 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
         self._required('_soup', soup)
 
     def __resolve_cached_doc(self):
-        from sakin_agac.format_adapters.html.magnetics import (
-                cached_doc_via_url_via_temporary_directory as cachelib,
-                )
-        path = self.html_document_path
-        if path is None:
-            from script_lib import TEMPORARY_DIR
-            _cached_doc_via = cachelib(TEMPORARY_DIR)
-            _x = _cached_doc_via(self.url, self._emit)
-            self._required('_cached_doc', _x)
-        else:
-            _tmpl = '(reading HTML from filesystem - {})'
-            self._emit(
-                    'info', 'expression', 'reading_from_filesystem',
-                    _tmpl, self.html_document_path)
-            self._cached_doc = cachelib.Cached_HTTP_Document(path)
+        _cached_doc = _cached_doc_via_url_or_local_path(
+                self.url, self.html_document_path, self._listener)
+        self._required('_cached_doc', _cached_doc)
 
-    def _required(self, s, x):
-        if x is None:
-            self._ok = False
-        else:
-            setattr(self, s, x)
+    _required = _required
 
-    def __exit__(self, *_):
-        del(self._exit_mutex)
+    def _become_not_OK(self):
+        self._OK = False
+
+
+def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
+    # we anticipate wanting to make this public.
+    # if you do, consider instead turning this into a parameter
+    # used by the called.
+    # abstracted from above thing at #history-A.3
+
+    from sakin_agac.format_adapters.html.magnetics import (
+            cached_doc_via_url_via_temporary_directory as cachelib,
+            )
+    if filesystem_path is None:
+        from script_lib import TEMPORARY_DIR
+        _cached_doc_via = cachelib(TEMPORARY_DIR)
+        from modality_agnostic import listening as _
+        _emit = _.emitter_via_listener(listener)
+        cached_doc = _cached_doc_via(url, _emit)
+    else:
+        def f():
+            yield f'(reading HTML from filesystem - {filesystem_path})'
+        listener('info', 'expression', 'reading_from_filesystem', f)
+        cached_doc = cachelib.Cached_HTTP_Document(filesystem_path)
+    return cached_doc
 
 
 # -- ..
@@ -285,6 +361,8 @@ def sanity(s=None):
 # --
 
 if __name__ == '__main__':
+    cover_me('if this ever worked as an endpoint it was a long time ago')
+
     import sys as o
     o.path.insert(0, '')
     import script_lib
@@ -294,6 +372,7 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A.3: abstracted common CLI for producers
 # #history-A.2: function transplanted to here
 # #historyA.1: got rid of use of `log`
 # #born: abstracted from sibling

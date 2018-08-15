@@ -73,8 +73,7 @@ sub-project: upload files to s3
   design (nonworking static layout)
   react tutorial
   sftp a static tree to heroku
-(-tag-lyfe.1 See how hard it is to get hugo to play nice with monorepo (BIG UNKNOWN)
-  - consider possibly making a minimal (ish) roll-your own that meets the
-    criteria (yes this would blow up into many points)
-don't forget to checkout github pages
-  - actually what you're thinking is like [etc]
+(-tag-lyfe.1.1 read or skim every section, presumably while taking notes)
+(-tag-lyfe.1.2 commit the new docage, get this published)
+(-tag-lyfe.1.3 make script to hack multi-table from json dump)
+(-tag-lyfe.1.4 make script to hack multi-table as json dump)

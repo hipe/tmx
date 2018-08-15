@@ -23,6 +23,7 @@ these were the original stated objectives, here (in part) for posterity:
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |                 (example) | #this | #this-cel-too
+|                   #421    |       | hugo vs jekyll vs whatever
 |                   #420    |       | hugo-related roadmap (graphviz)
 |                   #419    |       | heroku CMS add-on dim sum ..
 |                   #418    |       | thoughts on expressing metadata about a collection ..
@@ -36,7 +37,6 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
-|                   #410.V  | #open | #of:[#410.U] clean up, unify producer scripts to be more elegant
 |                   #410.U  | #open | visible seams to clean up when things are stable
 |                   #410.T  | #open | tests we haven't written but still want
 |                   #410.S  | #open | markdown row spacing might be a misfeature

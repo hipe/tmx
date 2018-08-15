@@ -112,7 +112,7 @@ hugo not found
 do:
 
 ```bash
-brew install hugo
+$ brew install hugo
 ```
 
 [get lots of output]
@@ -121,7 +121,7 @@ brew install hugo
 do:
 
 ```bash
-hugo version
+$ hugo version
 ```
 
 get:
@@ -133,18 +133,18 @@ Hugo Static Site Generator v0.46/extended darwin/amd64 BuildDate: unknown
 
 do:
 ```bash
-git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke
+$ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke
 ```
 
 
 do:
 ```bash
-hugo new posts/my-first-post.md
+$ hugo new posts/my-first-post.md
 ```
 
 do:
 ```bash
-hudo server -D
+$ hugo server -D
 ```
 
 
@@ -161,5 +161,5 @@ hudo server -D
 
 
 ## (document-meta)
-  - #pending-rename: hugo on heroku
+  - #pending-rename: hugo everyday usage
   - #born.
