@@ -25,7 +25,7 @@ def _required(self, attr, x):
         setattr(self, attr, x)
 
 
-class open_traversal_stream:
+class open_dictionary_stream:
 
     def __init__(self, cached_document_path, listener):
         import script.json_stream_via_url_and_selector as _
@@ -39,6 +39,12 @@ class open_traversal_stream:
         self._OK and self.__find_the_root_UL()
         if not self._OK:
             return
+
+        yield {
+                '_is_sync_meta_data': True,
+                'natural_key_field_name': 'la_la',
+                }
+
         for level_one_node in _direct_children(self._the_root_UL):
             if 'li' != level_one_node.name:
                 cover_me()
@@ -122,7 +128,7 @@ if __name__ == '__main__':
     _.path.insert(0, '')
     import script.json_stream_via_url_and_selector as _
     _exitstatus = _.common_CLI_for_json_stream_(
-            traversal_function=open_traversal_stream,
+            traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'hugo_docs_url': _url},
             )

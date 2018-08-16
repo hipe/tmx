@@ -30,7 +30,6 @@ class common_upstream_argument_parser_via_everything:
         _exitstatus = self._CLI_function(
                 self._NORMALIZED_ARGUMENT,
                 self._program_name(),
-                self._stdin,
                 self._stdout,
                 self._stderr,
                 )
@@ -83,9 +82,13 @@ class common_upstream_argument_parser_via_everything:
             yield '       {} --help'.format(pn)
 
             big_s = self._CLI_function.__doc__
+
             if True:
-                itr = line_stream_via(big_s, {})
-                itr = (s[:-1] for s in itr)  # meh
+                if '\n' in big_s:
+                    itr = line_stream_via(big_s, {})
+                    itr = (s[:-1] for s in itr)  # meh
+                else:
+                    itr = iter([big_s])
                 yield ''
                 yield 'description: %s' % next(itr)
                 for line in itr:

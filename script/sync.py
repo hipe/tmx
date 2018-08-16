@@ -291,38 +291,40 @@ class OpenNewLines_via_Sync_:  # #testpoint
         self._resolve_collection_reference(
                 '_far_collection_reference', 'far_collection', 'far_format')
 
-    def _resolve_collection_reference(self, dest_prop, coll_k, format_k):
-        tup = self.__tuple_for_reference(coll_k, format_k)
-        if tup is None:
-            self._stop()
-        else:
-            coll_id, FA_NAME, format_adapter_module = tup
-            _fa = format_adapter_module.FORMAT_ADAPTER
-            _ref = _fa.collection_reference_via_string(coll_id)
-            setattr(self, dest_prop, _ref)
+    def _resolve_collection_reference(self, dest_attr, coll_k, format_k):
+        _format_id = self._pop_property(format_k)
+        _coll_id = self._pop_property(coll_k)
+        _ = collection_reference_via_(_coll_id, self._listener, _format_id)
+        self._required(dest_attr, _)
 
-    def __tuple_for_reference(self, coll_k, format_k):
-        format_identifier = self._pop_property(format_k)
-        collection_identifier = self._pop_property(coll_k)
-
-        pair = self._format_adapters_module.procure_format_adapter(
-                collection_identifier=collection_identifier,
-                format_identifier=format_identifier,
-                listener=self._listener,
-                )
-        if pair:
-            return (collection_identifier, *pair)
-
-    def _required(self, prop, x):
+    def _required(self, attr, x):
         if x is None:
             self._stop()
         else:
-            setattr(self, prop, x)
+            setattr(self, attr, x)
 
     def _stop(self):
         self._OK = False
 
     _pop_property = _pop_property
+
+
+def collection_reference_via_(
+        collection_identifier,
+        listener,
+        format_identifier=None,
+        ):
+    pair = _format_adapters_module().procure_format_adapter(
+            collection_identifier=collection_identifier,
+            format_identifier=format_identifier,
+            listener=listener,
+            )
+    if not pair:
+        return
+    FA_NAME, format_adapter_module = pair
+    _fa = format_adapter_module.FORMAT_ADAPTER
+    _ref = _fa.collection_reference_via_string(collection_identifier)
+    return _ref  # #todo
 
 
 class _FancyDiffLineConsumer:
@@ -398,7 +400,7 @@ class _LineConsumer_via_STDOUT:
 
 
 def _format_adapters_module():
-    """by putting this in a function that is called 2x in this file..
+    """by putting this in a function that is called 3x in this file..
 
     (virtually a singleton object), we free ourselves from passing it from
     the higher-level modality- to the lower-level API-endpiont; so that

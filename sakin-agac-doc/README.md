@@ -43,6 +43,7 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #410.R  | #trak | would redis etc
 |                   #410.Q  | #prov | #provision: natural key field name always leftmost (things will break)
 |                   #410.P  | #wish | would we really want a moin moin adaption?
+|                   #410.N  | #trak | [html via markdown that isn't sync]
 |                   #410.13 | #trak | #provsion: where sparseness is implemented - prune "empty" cels
 |                   #410.L  | #trak | whether in-memory should be official format
 |                   #410.K  | #trak | CLI integration tests have redundant setup
@@ -50,7 +51,7 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #410.I  | #open | remove this redundancy
 |                   #410.H  | #trak | fixture executables aren't actuall exe.. (see)
 |                   #410.G  | #trak | nested context managers closing each other
-|                 #410.F.2  |       | #provision: on failure, you must still result in an iterator
+|                   #410.F.2|       | #provision: on failure, you must still result in an iterator
 |                   #410.F  | #trak | this broad pattern: class as context manager
 |                   #410.E  | #open | dashes to underscores is getting annoying
 |                   #410.D  | #trak | spots to change if we add this feature (see)

@@ -34,6 +34,8 @@ so although this script isn't in theory necessary an longer, we still
 keep it around because while refactoring out its 'old-way' code we ended
 up pioneering a new facility for resolving input from a CLI, one that
 could undergird our data plumbing generally..
+
+.#[#410.N]
 """
 
 
@@ -47,12 +49,16 @@ def _these():
     return tuple(a)
 
 
-def _my_CLI(parsed_arg, program_name, sin, sout, serr):
+def _my_CLI(parsed_arg, program_name, sout, serr):
 
     from script_lib.magnetics import listener_via_resources as o
     listener = o.listener_via_stderr(serr)
 
-    _far_collection = _far_collection_via_parsed_arg(parsed_arg)
+    from script.markdown_document_via_json_stream import (
+            collection_identifier_via_parsed_arg_ as _,
+            )
+
+    _far_collection = _(parsed_arg)
 
     _near_collection = _these()
 
@@ -78,25 +84,6 @@ def _my_CLI(parsed_arg, program_name, sin, sout, serr):
 
 
 _my_CLI.__doc__ = __doc__
-
-
-def _far_collection_via_parsed_arg(parsed_arg):  # #abstraction-candidate
-    typ = parsed_arg.argument_type
-    if 'stdin_as_argument' == typ:
-        return __context_manager_via_stdin(parsed_arg.stdin)
-    elif 'path_as_argument' == typ:
-        return parsed_arg.path
-    else:
-        raise Exception('cover me: %s' % typ)
-
-
-def __context_manager_via_stdin(stdin):
-
-    import json
-    _ = (json.loads(s) for s in stdin)
-
-    from sakin_agac import context_manager_via_iterator_ as f
-    return f(_)
 
 
 def _CLI(sin, sout, serr, argv):  # #testpoint
