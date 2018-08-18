@@ -24,7 +24,7 @@ these were the original stated objectives, here (in part) for posterity:
 |---------------------------|:-----:|-
 |                 (example) | #this | #this-cel-too
 |                   #421    |       | hugo vs jekyll vs whatever
-|                   #420    | #hole |
+|                   #420    |       | adventures in CSS ..
 |                   #419    |       | heroku CMS add-on dim sum ..
 |                   #418    |       | thoughts on expressing metadata about a collection ..
 |                   #417    |       | #central-concetit: the JSON wall (lingua franca) (see ASCII art here)
