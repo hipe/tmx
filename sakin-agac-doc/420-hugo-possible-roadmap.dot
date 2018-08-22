@@ -2,12 +2,12 @@ digraph {
 
 rankdir=BT
 
-01[shape=rect style=filled label="you are
+n_heroku_competency_2[shape=rect style=filled label="you are
 re-familiarized
 with heroku."]
 
 
-02[shape=rect label="you have
+n_hugo_made[shape=rect label="you have
 generated a
 static site
 with hugo
@@ -16,14 +16,14 @@ the stack locally)"
 style=filled]
 
 
-03[shape=rect label="you have
+n_hugo_published[shape=rect label="you have
 achieved good
 enough publishing
 for now to
 get started."]
 
 
-04[shape=rect label="you have
+n_hugo_hello[shape=rect label="you have
 a stupid simple
 hello world article
 published on the internet
@@ -33,160 +33,160 @@ mono repo
 "
 style=filled
 ]
-04->06
+n_hugo_hello->n_hugo_buildpack
 
 
-a04[label="Integrate minimal
+a_hugo_hello[label="Integrate minimal
 hello world into
 your mono-repo"
 style=filled]
-a04->04
-02->a04
+a_hugo_hello->n_hugo_hello
+n_hugo_made->a_hugo_hello
 
 
-05[shape=rect label="you have
+n_hugo_integrate[shape=rect label="you have
 figured out how
 to integrate hugo
 into your mono repo
 to leverage existing
 documents in a way
 that doesn't suck"]
-05->04
-05->03
+n_hugo_integrate->n_hugo_hello
+n_hugo_integrate->n_hugo_published
 
 
-d05[label="is it
+yn_publishing_ok[label="is it
 good enough?
 "
 shape=diamond
 ]
-d05->05[label=yes]
-d05->a09[label=no]
-a09->d05[label=then]
+yn_publishing_ok->n_hugo_integrate[label=yes]
+yn_publishing_ok->n_hugo_get_gud[label=no]
+n_hugo_get_gud->yn_publishing_ok[label=then]
 
 
-a05[label="iterate on
+n_heroku_monorepo_integrate[label="iterate on
 getting hugo as-is
 to fit into your
 mono repo
 architecture"]
-a05->d05
-04->a05
+n_heroku_monorepo_integrate->yn_publishing_ok
+n_hugo_hello->n_heroku_monorepo_integrate
 
 
-06[shape=rect label="you have
+n_hugo_buildpack[shape=rect label="you have
 a standalone repo that
 uses the hugo buildpack
 to publish a hello world
 blog entry to the internet
 on heroku"
 style=filled]
-06->01
-06->02
+n_hugo_buildpack->n_heroku_competency_2
+n_hugo_buildpack->n_hugo_made
 
 
-d06[shape=diamond label="if you
+yn_hugo_buildpack[shape=diamond label="if you
 can get it
 to work"
 style=filled]
-d06->06
+yn_hugo_buildpack->n_hugo_buildpack
 
 
-a06[label="Read that blog article
+n_hugo_buildpack_read[label="Read that blog article
 whatever about using the hugo
 heroku buildpack to publish with
 hugo on heroku
 "
 style=filled]
-a06->d06
+n_hugo_buildpack_read->yn_hugo_buildpack
 
 
-07[shape=rect label="you have
+n_heroku_doc_2[shape=rect label="you have
 re-familiarized yourself with
 heroku and re-documented it
 for yourself as necessary."
 style=filled]
-07->01
+n_heroku_doc_2->n_heroku_competency_2
 
 
-a07[label="Write this" style=filled]
-a07->07
-01->a07
+a_heorku_doc_2[label="Write this" style=filled]
+a_heorku_doc_2->n_heroku_doc_2
+n_heroku_competency_2->a_heorku_doc_2
 
 
-08[shape=rect label="you have
+n_hugo_document[shape=rect label="you have
 documented exactly what you
 did you get hugo installed
 and working from zero
 "
 style=filled
 ]
-08->02
+n_hugo_document->n_hugo_made
 
 
-a08[label="Write this" style=filled]
-a08->08
-02->a08
-a09[label="try one
+a_hugo_document[label="Write this" style=filled]
+a_hugo_document->n_hugo_document
+n_hugo_made->a_hugo_document
+n_hugo_get_gud[label="try one
 of these"
 ]
-a09->a09_1
-a09_1[label="consider
+n_hugo_get_gud->n_hugo_symlinks_dirs
+n_hugo_symlinks_dirs[label="consider
 symlinks hack
 (directories)
 "
 ]
-a09->a09_2
-a09_2[label="consider
+n_hugo_get_gud->n_hugo_symlinks_files
+n_hugo_symlinks_files[label="consider
 symlinks hack
 (files)
 "]
-a09->a09_3
-a09_3[label="'travers'"
+n_hugo_get_gud->n_css_travers_2
+n_css_travers_2[label="'travers'"
 ]
-a09->a09_4
-a09_4[label="isomorphicism
+n_hugo_get_gud->n_frontmatter_magic
+n_frontmatter_magic[label="isomorphicism
 between
 first header
 and title
 "
 ]
-a09_4->a09_5
-a09_6->a09_5
+n_frontmatter_magic->a09_5
+n_css_github->a09_5
 a09_5[label="abstract
 front-matter out
 of files
 "
 ]
-a09_3->a09_6
-a09_6[label="github-style
+n_css_travers_2->n_css_github
+n_css_github[label="github-style
 styling either
 the easy way or
 the hard way
 "
 ]
-a09_3->a09_7
-a09_7[label="lozenge
+n_css_travers_2->n_lozenge_have
+n_lozenge_have[label="lozenge
 grid
 "
 ]
-03->a10
-a10[label="look at
+n_hugo_published->b_hugo_extras
+b_hugo_extras[label="look at
 some of these
 too
 "
 ]
-a10->a10_1
-a10_1[label="nginx not
+b_hugo_extras->n_nginx
+n_nginx[label="nginx not
 python
 "
 ]
-a10->a10_2
-a10_2[label="logging
+b_hugo_extras->n_logging
+n_logging[label="logging
 "
 ]
-a10->a10_3
-a10_3[label="SEO
+b_hugo_extras->n_SEO
+n_SEO[label="SEO
 "
 ]
 
@@ -207,5 +207,6 @@ action means \"is a precursor to\".
 "
 }
 /*
+  - #history-A.1: gave new names in preparation for merge
   - #born.
 */
