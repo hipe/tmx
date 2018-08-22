@@ -1,117 +1,59 @@
 digraph g {
 
-/* waypoints and smaller projects (alphabetical) */
 
-n_sync[label="• the sync script\n• md table datastore" style=filled]
-n_use_sync[label="merge two\ndata producers" style=filled]
-n_chose_pg[label="find a dilligenced\nparser generator" style=filled]
-n_parse_taggings[label="parsed tagged strings" style=filled]
-n_parse_queries[label="parse tag queries" style=filled]
-n_filter_by[label="filter by tags" style=filled]
-n_dim_sum_heroku_plug_ins[label="..so you can\n survey heroku\noptions for.."]
-n_heroku_grok[label="grok\nheroku\nproperly"]
+/* nodes in alphabetical order (disregarding first component) */
 
-n_publishing_simple[label=
-"isomorphic
-jekyll-like
-heroku-enabled
-stupid simple
-publishing"
+n_css_academic[label="an academic
+design
+"
 ]
-
-n_publish_dim_sum[label="..which lets you\npublish small\nsubdomain surveys.."]
-n_react_xxx[label="..like React.."]
-n_mystery_one[label="(the grand slice)"]
-g_mystery_two[label="(sakin agac etc)"]
-n_hosting_static_files[label="(s3 for?) static files\ninteg with heroku"]
-n_heroku_competency[label="competency\nwith heroku"]
-n_hosting_videos[label="s3 for\nvideo hosting"]
-n_bots_learn[label="grok\nbots"]
-
-n_css_learn_responsive[label="re-grok\nresponsive\nCSS"]
-n_css_aux_1[label="ability\nto design"]
-n_css_woah[label="HSR\ndesign\ndynamism"]
-n_css_woah_aux_1[label="of these"]
-n_css_academic[label="an academic\ndesign"]
-g_css_travers[label="a travers\ndesign"]
-n_css_glitch[label="a glitch\ndesign"]
-
-
-objective_samhara[label=
-"samhara: a place to hold dreams
-music, movies, videogames, dance..."
-shape=rect]
-
-
-
-/* relationships */
-n_use_sync->n_sync
-n_chose_pg->n_use_sync
-n_parse_taggings->n_chose_pg
-n_parse_queries->n_chose_pg
-n_filter_by->n_parse_taggings
-n_filter_by->n_parse_queries
-n_dim_sum_heroku_plug_ins->n_filter_by
-n_publishing_simple->n_dim_sum_heroku_plug_ins
-n_publishing_simple->n_heroku_grok
-objective_sakin_agac->gfm_rumskalla
-gfm_rumskalla->n_publishing_simple
-gfm_rumskalla->n_hosting_static_files
-objective_sakin_agac->n_hosting_static_files
-objective_sakin_agac->n_hosting_videos
-n_heroku_competency->n_publishing_simple
-n_publish_dim_sum->n_publishing_simple
-n_react_xxx->n_publish_dim_sum
-g_mystery_two->n_react_xxx
-g_mystery_two->n_mystery_one
-objective_grep_dump->n_heroku_competency
-n_bots_learn->n_heroku_competency
-objective_game_server->n_bots_learn
-objective_upload_bot->n_bots_learn
-
-
-n_css_aux_1->n_css_learn_responsive
-n_css_woah->n_css_woah_aux_1[label="any 2"]
-n_css_academic->n_css_aux_1
-n_css_woah_aux_1->n_css_academic
-g_css_travers->n_css_aux_1
-n_css_woah_aux_1->g_css_travers
-n_css_glitch->n_css_aux_1
-n_css_woah_aux_1->n_css_glitch
-
-objective_sakin_agac->n_css_learn_responsive
-
-
-objective_samhara->n_css_woah
-
-
-/* core projects (not alphabetical) */
-
-
-objective_game_server[label=
-"game server
+n_css_glitch[label="a glitch
+design
+"
+]
+g_css_travers[label="a travers
+design
+"
+]
+n_chose_pg[label="find a dilligenced
+parser generator"
+style=filled
+]
+n_css_aux_1[label="ability
+to design
+"
+]
+n_css_learn_responsive[label="re-grok
+responsive
+CSS
+"
+]
+n_css_woah[label="HSR
+design
+dynamism
+"
+]
+n_css_woah_aux_1[label="of these
+"
+]
+n_bots_learn[label="grok
+bots
+"
+]
+n_dim_sum_heroku_plug_ins[label="..so you can
+ survey heroku
+options for..
+"
+]
+n_filter_by[label="filter by tags"
+style=filled
+]
+objective_game_server[label="game server
 difficulty: med
 workload: hi
 "
 shape=rect
 ]
-
-objective_grep_dump[label=
-"grep dump
-difficulty: hi
-workload: hi
-"
-shape=rect
-]
-
-objective_upload_bot[label=
-"upload bot
-difficulty: v hi
-workload: med
-"
-shape=rect
-]
-
 gfm_rumskalla[label="github-flavored markdown rumskalla
 difficulty: low
 workload: med
@@ -121,15 +63,118 @@ regen not painful. can runlocal
 "
 shape=rect
 ]
-
-objective_sakin_agac[label=
-"sakin agac
+objective_grep_dump[label="grep dump
+difficulty: hi
+workload: hi
+"
+shape=rect
+]
+n_heroku_competency[label="competency
+with heroku
+"
+]
+n_heroku_grok[label="grok
+heroku
+properly
+"
+]
+n_hosting_static_files[label="(s3 for?) static files
+integ with heroku
+"
+]
+n_hosting_videos[label="s3 for
+video hosting
+"
+]
+n_parse_taggings[label="parsed tagged strings"
+style=filled
+]
+n_parse_queries[label="parse tag queries"
+style=filled
+]
+n_publish_dim_sum[label="..which lets you
+publish small
+subdomain surveys..
+"
+]
+n_publishing_simple[label=
+"isomorphic
+jekyll-like
+heroku-enabled
+stupid simple
+publishing
+"
+]
+n_react_xxx[label="..like React.."
+]
+n_mystery_one[label="(the grand slice)"
+]
+g_mystery_two[label="(sakin agac etc)"
+]
+objective_sakin_agac[label="sakin agac
 difficulty: med
 workload: hi
 acceptance: nasim
 "
 shape=rect
 ]
+objective_samhara[label="samhara: a place to hold dreams
+music, movies, videogames, dance..."
+shape=rect
+]
+n_sync[label="• the sync script
+• md table datastore
+"
+style=filled
+]
+objective_upload_bot[label="upload bot
+difficulty: v hi
+workload: med
+"
+shape=rect
+]
+n_use_sync[label="merge two
+data producers
+"
+style=filled
+]
+
+
+/* relationships in ordered by head node (then tail node) */
+
+objective_game_server->n_bots_learn
+objective_upload_bot->n_bots_learn
+n_parse_queries->n_chose_pg
+n_parse_taggings->n_chose_pg
+n_css_woah_aux_1->n_css_academic
+n_css_academic->n_css_aux_1
+n_css_glitch->n_css_aux_1
+g_css_travers->n_css_aux_1
+n_css_aux_1->n_css_learn_responsive
+objective_sakin_agac->n_css_learn_responsive
+n_css_woah_aux_1->n_css_glitch
+n_css_woah_aux_1->g_css_travers
+objective_samhara->n_css_woah
+n_css_woah->n_css_woah_aux_1[label="any 2"]
+n_publishing_simple->n_dim_sum_heroku_plug_ins
+n_dim_sum_heroku_plug_ins->n_filter_by
+objective_sakin_agac->gfm_rumskalla
+n_bots_learn->n_heroku_competency
+n_publishing_simple->n_heroku_grok
+objective_grep_dump->n_heroku_competency
+gfm_rumskalla->n_hosting_static_files
+objective_sakin_agac->n_hosting_static_files
+objective_sakin_agac->n_hosting_videos
+g_mystery_two->n_mystery_one
+n_filter_by->n_parse_queries
+n_filter_by->n_parse_taggings
+n_react_xxx->n_publish_dim_sum
+gfm_rumskalla->n_publishing_simple
+n_heroku_competency->n_publishing_simple
+n_publish_dim_sum->n_publishing_simple
+g_mystery_two->n_react_xxx
+n_use_sync->n_sync
+n_chose_pg->n_use_sync
 
 
 rankdir=BT
@@ -140,6 +185,7 @@ major sub-projects
 "
 }
 /*
+#history-B.2: normalize node layout, alphabetize assocs (sort of) ONLY
 #history-B.1: rename every node ONLY
 #historyA.1: big spike
 #born.
