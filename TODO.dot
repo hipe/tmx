@@ -142,39 +142,39 @@ style=filled
 
 /* relationships in ordered by head node (then tail node) */
 
-objective_game_server->n_bots_learn
-objective_upload_bot->n_bots_learn
-n_parse_queries->n_chose_pg
-n_parse_taggings->n_chose_pg
-n_css_woah_aux_1->n_css_academic
-n_css_academic->n_css_aux_1
-n_css_glitch->n_css_aux_1
-g_css_travers->n_css_aux_1
-n_css_aux_1->n_css_learn_responsive
-objective_sakin_agac->n_css_learn_responsive
-n_css_woah_aux_1->n_css_glitch
-n_css_woah_aux_1->g_css_travers
-objective_samhara->n_css_woah
-n_css_woah->n_css_woah_aux_1[label="any 2"]
-n_publishing_simple->n_dim_sum_heroku_plug_ins
-n_dim_sum_heroku_plug_ins->n_filter_by
-objective_sakin_agac->gfm_rumskalla
-n_bots_learn->n_heroku_competency
-n_publishing_simple->n_heroku_grok
-objective_grep_dump->n_heroku_competency
-gfm_rumskalla->n_hosting_static_files
-objective_sakin_agac->n_hosting_static_files
-objective_sakin_agac->n_hosting_videos
-g_mystery_two->n_mystery_one
-n_filter_by->n_parse_queries
-n_filter_by->n_parse_taggings
-n_react_xxx->n_publish_dim_sum
-gfm_rumskalla->n_publishing_simple
-n_heroku_competency->n_publishing_simple
-n_publish_dim_sum->n_publishing_simple
-g_mystery_two->n_react_xxx
-n_use_sync->n_sync
-n_chose_pg->n_use_sync
+n_bots_learn->objective_game_server
+n_bots_learn->objective_upload_bot
+n_chose_pg->n_parse_queries
+n_chose_pg->n_parse_taggings
+n_css_academic->n_css_woah_aux_1
+n_css_aux_1->n_css_academic
+n_css_aux_1->n_css_glitch
+n_css_aux_1->g_css_travers
+n_css_learn_responsive->n_css_aux_1
+n_css_learn_responsive->objective_sakin_agac
+n_css_glitch->n_css_woah_aux_1
+g_css_travers->n_css_woah_aux_1
+n_css_woah->objective_samhara
+n_css_woah_aux_1->n_css_woah[label="any 2"]
+n_dim_sum_heroku_plug_ins->n_publishing_simple
+n_filter_by->n_dim_sum_heroku_plug_ins
+gfm_rumskalla->objective_sakin_agac
+n_heroku_competency->n_bots_learn
+n_heroku_grok->n_publishing_simple
+n_heroku_competency->objective_grep_dump
+n_hosting_static_files->gfm_rumskalla
+n_hosting_static_files->objective_sakin_agac
+n_hosting_videos->objective_sakin_agac
+n_mystery_one->g_mystery_two
+n_parse_queries->n_filter_by
+n_parse_taggings->n_filter_by
+n_publish_dim_sum->n_react_xxx
+n_publishing_simple->gfm_rumskalla
+n_publishing_simple->n_heroku_competency
+n_publishing_simple->n_publish_dim_sum
+n_react_xxx->g_mystery_two
+n_sync->n_use_sync
+n_use_sync->n_chose_pg
 
 
 rankdir=BT
@@ -185,6 +185,7 @@ major sub-projects
 "
 }
 /*
+#history-B.3: reverse the order of every arrow ONLY
 #history-B.2: normalize node layout, alphabetize assocs (sort of) ONLY
 #history-B.1: rename every node ONLY
 #historyA.1: big spike
