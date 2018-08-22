@@ -3,33 +3,57 @@ digraph g {
 
 /* nodes in alphabetical order (disregarding first component) */
 
+n_articles_for[label="(articles for)"
+]
+n_bots_learn[label="grok
+bots
+"
+]
+n_channel_game_dev[label="start a dedicated channel
+for game dev in DTF
+"
+shape=rect
+]
 n_css_academic[label="an academic
 design
 "
+shape=rect
+]
+n_css_dream[label="have your first
+self-made theme
+"
+shape=rect
 ]
 n_css_github[label="github-style
 styling either
 the easy way or
 the hard way
 "
+shape=rect
 ]
 n_css_glitch[label="a glitch
 design
 "
+shape=rect
 ]
-n_css_travers_2[label="'travers'"
+n_css_parallax[label="CSS for
+parallax
+"
+shape=rect
 ]
-g_css_travers[label="a travers
+n_css_travers[label="a travers
 design
 "
+shape=rect
 ]
 n_chose_pg[label="find a dilligenced
 parser generator"
 style=filled
 ]
-n_css_aux_1[label="ability
-to design
+n_make_css[label="design one
+of these
 "
+shape=diamond
 ]
 n_css_learn_responsive[label="re-grok
 responsive
@@ -40,18 +64,23 @@ n_css_woah[label="HSR
 design
 dynamism
 "
+shape=rect
 ]
-n_css_woah_aux_1[label="of these
+n_dim_sum_ec[label="DIM SUM for the youtube
+channel Extra Credits
 "
+shape=rect
 ]
-n_bots_learn[label="grok
-bots
+n_dim_sum_heroku_plug_ins[label="DIM SUM of
+heroku plug-ins
 "
+style=filled
+shape=rect
 ]
-n_dim_sum_heroku_plug_ins[label="..so you can
- survey heroku
-options for..
+n_dim_sum_themes[label="DIM SUM for
+every hugo theme
 "
+shape=rect
 ]
 n_filter_by[label="filter by tags"
 style=filled
@@ -73,12 +102,21 @@ workload: hi
 "
 shape=rect
 ]
+n_gather_css[label="of these"
+]
 gfm_rumskalla[label="github-flavored markdown rumskalla
 difficulty: low
 workload: med
 acceptance: docs of sakin agac lib,
 looking like github docs,
 regen not painful. can runlocal
+"
+style=filled
+shape=rect
+]
+n_gimp_intro[label="learn enough
+GIMP, document it
+(mabye DIM SUM)
 "
 shape=rect
 ]
@@ -88,12 +126,9 @@ workload: hi
 "
 shape=rect
 ]
-n_heroku_competency[label="competency
-with heroku
-"
-]
-n_heroku_competency_2[label="you are
+n_heroku_competency[label="you are
 re-familiarized
+(competent)
 with heroku."
 shape=rect
 style=filled
@@ -112,20 +147,24 @@ n_heroku_grok[label="grok
 heroku
 properly
 "
+style=filled
 ]
 n_heroku_monorepo_integrate[label="iterate on
 getting hugo as-is
 to fit into your
 mono repo
 architecture"
+style=filled
 ]
 n_hosting_static_files[label="(s3 for?) static files
 integ with heroku
 "
+style=filled
 ]
 n_hosting_videos[label="s3 for
 video hosting
 "
+shape=rect
 ]
 n_hugo_buildpack[
 label="you have
@@ -172,6 +211,7 @@ too
 n_hugo_get_gud[label="try one
 of these
 "
+style=filled
 ]
 n_hugo_hello[
 label="you have
@@ -199,6 +239,7 @@ to leverage existing
 documents in a way
 that doesn't suck"
 shape=rect
+style=filled
 ]
 n_hugo_made[label="you have
 generated a
@@ -215,26 +256,37 @@ enough publishing
 for now to
 get started."
 shape=rect
+style=filled
 ]
 n_hugo_symlinks_dirs[label="consider
 symlinks hack
 (directories)
 "
+style=filled  /* we didn't technically do it.. */
 ]
 n_hugo_symlinks_files[label="consider
 symlinks hack
 (files)
 "
+style=filled
+]
+n_js_dim[label="javascript frontend
+for DIM SUM
+"
+shape=rect
 ]
 n_logging[label="logging"
+shape=rect
 ]
 n_lozenge_have[label="lozenge
 grid
 "
+shape=rect
 ]
 n_nginx[label="nginx not
 python
 "
+shape=rect
 ]
 n_parse_taggings[label="parsed tagged strings"
 style=filled
@@ -246,10 +298,11 @@ n_publish_dim_sum[label="..which lets you
 publish small
 subdomain surveys..
 "
+style=filled
+shape=rect
 ]
-yn_publishing_ok[label="is it
-good enough?
-"
+yn_publishing_ok[label="good enough?"
+style=filled
 shape=diamond
 ]
 n_publishing_simple[label=
@@ -259,12 +312,9 @@ heroku-enabled
 stupid simple
 publishing
 "
+style=filled
 ]
-n_react_xxx[label="..like React.."
-]
-n_mystery_one[label="(the grand slice)"
-]
-g_mystery_two[label="(sakin agac etc)"
+n_react_enough[label="learn enough react"
 ]
 objective_sakin_agac[label="sakin agac
 difficulty: med
@@ -273,16 +323,27 @@ acceptance: nasim
 "
 shape=rect
 ]
-objective_samhara[label="samhara: a place to hold dreams
+n_samhara[label="samhara: a place to hold dreams
 music, movies, videogames, dance..."
 shape=rect
 ]
 n_SEO[label="SEO"
+shape=rect
 ]
 n_sync[label="• the sync script
 • md table datastore
 "
 style=filled
+]
+n_theme_choose[label="choose a
+theme
+"
+]
+n_theme_integrate[label="integrate,
+you could do DIM SUM
+of SSG features..
+"
+shape=rect
 ]
 objective_upload_bot[label="upload bot
 difficulty: v hi
@@ -292,43 +353,52 @@ shape=rect
 ]
 n_use_sync[label="merge two
 data producers
+(is DIM SUM)
 "
 style=filled
+shape=rect
 ]
 
 
 /* relationships in ordered by head node (then tail node) */
 
+n_articles_for->n_samhara
 n_bots_learn->objective_game_server
 n_bots_learn->objective_upload_bot
 n_chose_pg->n_parse_queries
 n_chose_pg->n_parse_taggings
-n_css_academic->n_css_woah_aux_1
-n_css_aux_1->n_css_academic
-n_css_aux_1->n_css_glitch
-n_css_aux_1->g_css_travers
-n_css_github->a_frontmatter_yikes
-n_css_learn_responsive->n_css_aux_1
+n_css_academic->n_gather_css
+n_css_dream->n_gather_css
+n_css_dream->n_lozenge_have
+n_css_github->n_gather_css
+n_css_learn_responsive->n_make_css
 n_css_learn_responsive->objective_sakin_agac
-n_css_glitch->n_css_woah_aux_1
-g_css_travers->n_css_woah_aux_1
-n_css_travers_2->n_css_github
-n_css_travers_2->n_lozenge_have
-n_css_woah->objective_samhara
-n_css_woah_aux_1->n_css_woah[label="any 2"]
+n_css_glitch->n_gather_css
+n_css_parallax->n_dim_sum_themes
+n_css_travers->n_gather_css
+n_css_woah->n_samhara
+n_dim_sum_ec->n_articles_for
+n_dim_sum_ec->n_channel_game_dev
+n_dim_sum_heroku_plug_ins->n_articles_for
 n_dim_sum_heroku_plug_ins->n_publishing_simple
+n_dim_sum_themes->n_articles_for
+n_dim_sum_themes->n_theme_choose
+n_css_dream->n_gimp_intro
 n_filter_by->n_dim_sum_heroku_plug_ins
 n_frontmatter_magic->a_frontmatter_yikes
+n_gather_css->n_css_woah[label="any 2"]
+n_gimp_intro->n_articles_for
+n_gimp_intro->n_react_enough
 gfm_rumskalla->objective_sakin_agac
 n_heroku_competency->n_bots_learn
 n_heroku_competency->objective_grep_dump
-n_heroku_competency_2->a_heorku_doc_2
-n_heroku_doc_2->n_heroku_competency_2
+n_heroku_competency->a_heorku_doc_2
+n_heroku_doc_2->n_heroku_competency
 a_heorku_doc_2->n_heroku_doc_2
 n_heroku_grok->n_publishing_simple
 n_heroku_monorepo_integrate->yn_publishing_ok
 n_hugo_get_gud->yn_publishing_ok[label=then]
-n_hugo_buildpack->n_heroku_competency_2
+n_hugo_buildpack->n_heroku_competency
 yn_hugo_buildpack->n_hugo_buildpack
 n_hugo_buildpack->n_hugo_made
 n_hugo_buildpack_read->yn_hugo_buildpack
@@ -337,7 +407,7 @@ n_hugo_document->n_hugo_made
 b_hugo_extras->n_logging
 b_hugo_extras->n_nginx
 b_hugo_extras->n_SEO
-n_hugo_get_gud->n_css_travers_2
+n_hugo_get_gud->n_make_css
 n_hugo_get_gud->n_frontmatter_magic
 n_hugo_get_gud->n_hugo_symlinks_dirs
 n_hugo_get_gud->n_hugo_symlinks_files
@@ -352,17 +422,27 @@ n_hugo_published->b_hugo_extras
 n_hosting_static_files->gfm_rumskalla
 n_hosting_static_files->objective_sakin_agac
 n_hosting_videos->objective_sakin_agac
-n_mystery_one->g_mystery_two
+n_js_dim->n_dim_sum_ec
+n_lozenge_have->n_samhara
+n_make_css->n_css_academic
+n_make_css->n_css_github
+n_make_css->n_css_glitch
+n_make_css->n_css_parallax
+n_make_css->n_css_travers
 n_parse_queries->n_filter_by
 n_parse_taggings->n_filter_by
-n_publish_dim_sum->n_react_xxx
+n_publish_dim_sum->n_css_parallax
 yn_publishing_ok->n_hugo_get_gud[label=no]
 yn_publishing_ok->n_hugo_integrate[label=yes]
 n_publishing_simple->gfm_rumskalla
 n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
-n_react_xxx->g_mystery_two
+n_react_enough->n_js_dim
 n_sync->n_use_sync
+n_theme_choose->n_theme_integrate
+n_theme_integrate->n_css_dream
+n_theme_integrate->n_articles_for
+n_use_sync->n_articles_for
 n_use_sync->n_chose_pg
 
 

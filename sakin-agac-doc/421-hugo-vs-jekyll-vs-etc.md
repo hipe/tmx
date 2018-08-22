@@ -2,28 +2,28 @@
 |document node|about|
 |---|---|
 |(example)|#example|
-|[Overview](https://gohugo.io/about/)||
-|[Hugo and GDPR](https://gohugo.io/about/hugo-and-gdpr/)||
-|[Hugo 0.32 HOWTO](https://gohugo.io/about/new-in-032/)||
-|[What is Hugo](https://gohugo.io/about/what-is-hugo/)||
-|[Hugo Features](https://gohugo.io/about/features/)||
-|[The Benefits of Static](https://gohugo.io/about/benefits/)||
-|[License](https://gohugo.io/about/license/)||
+|[Overview](https://gohugo.io/about/)|#overview-page|
+|[Hugo and GDPR](https://gohugo.io/about/hugo-and-gdpr/)|#not-currently-interesting|
+|[Hugo 0.32 HOWTO](https://gohugo.io/about/new-in-032/)|#deferred because #is-summary|
+|[What is Hugo](https://gohugo.io/about/what-is-hugo/)|#informational|
+|[Hugo Features](https://gohugo.io/about/features/)|#TODO come back to this. be sure we hit all of these|
+|[The Benefits of Static](https://gohugo.io/about/benefits/)|#informational. 10 external links.|
+|[License](https://gohugo.io/about/license/)|#not-currently-interesting|
 
 ### Getting Started
 |document node|about|
 |---|---|
-|[Get Started Overview](https://gohugo.io/getting-started/)||
-|[Quick Start](https://gohugo.io/getting-started/quick-start/)||
-|[Install Hugo](https://gohugo.io/getting-started/installing/)||
-|[Basic Usage](https://gohugo.io/getting-started/usage/)||
-|[Directory Structure](https://gohugo.io/getting-started/directory-structure/)||
-|[Configuration](https://gohugo.io/getting-started/configuration/)||
+|[Get Started Overview](https://gohugo.io/getting-started/)|#overview-page|
+|[Quick Start](https://gohugo.io/getting-started/quick-start/)|#UDI-maybe|
+|[Install Hugo](https://gohugo.io/getting-started/installing/)|#UDI-maybe|
+|[Basic Usage](https://gohugo.io/getting-started/usage/)|#TODO publishdate draft expirydate|
+|[Directory Structure](https://gohugo.io/getting-started/directory-structure/)|#overview-page #TODO: re-read all of this after reach end|
+|[Configuration](https://gohugo.io/getting-started/configuration/)|#lowlevel-reference #TODO: GitInfo is what's up|
 
 ### Themes
 |document node|about|
 |---|---|
-|[Themes Overview](https://gohugo.io/themes/)||
+|[Themes Overview](https://gohugo.io/themes/)|#overview-page|
 |[Install and Use Themes](https://gohugo.io/themes/installing-and-using-themes/)||
 |[Theme Components](https://gohugo.io/themes/theme-components/)||
 |[Create a Theme](https://gohugo.io/themes/creating/)||

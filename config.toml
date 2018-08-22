@@ -1,4 +1,4 @@
-baseurl = "http://botnoise.herokuapp.com/"
+baseUrl = "http://botnoise.herokuapp.com/"
 # yuck TODO above
 
 languageCode = "en-us"

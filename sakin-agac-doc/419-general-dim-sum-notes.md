@@ -13,6 +13,8 @@ with things like [static sites ruby][thing01] build pack or the
 
 GitHub pages
 
+(to add somewhere else later: Pelican (discovered when reading gimp docs)
+
 nginx
 
 oh what's this? jekyll _on_ heroku is a thing (how?
