@@ -7,9 +7,17 @@ n_css_academic[label="an academic
 design
 "
 ]
+n_css_github[label="github-style
+styling either
+the easy way or
+the hard way
+"
+]
 n_css_glitch[label="a glitch
 design
 "
+]
+n_css_travers_2[label="'travers'"
 ]
 g_css_travers[label="a travers
 design
@@ -48,6 +56,17 @@ options for..
 n_filter_by[label="filter by tags"
 style=filled
 ]
+n_frontmatter_magic[label="isomorphicism
+between
+first header
+and title
+"
+]
+a_frontmatter_yikes[label="abstract
+front-matter out
+of files
+"
+]
 objective_game_server[label="game server
 difficulty: med
 workload: hi
@@ -73,10 +92,32 @@ n_heroku_competency[label="competency
 with heroku
 "
 ]
+n_heroku_competency_2[label="you are
+re-familiarized
+with heroku."
+shape=rect
+style=filled
+]
+n_heroku_doc_2[label="you have
+re-familiarized yourself with
+heroku and re-documented it
+for yourself as necessary."
+style=filled
+shape=rect
+]
+a_heorku_doc_2[label="Write this"
+style=filled
+]
 n_heroku_grok[label="grok
 heroku
 properly
 "
+]
+n_heroku_monorepo_integrate[label="iterate on
+getting hugo as-is
+to fit into your
+mono repo
+architecture"
 ]
 n_hosting_static_files[label="(s3 for?) static files
 integ with heroku
@@ -84,6 +125,115 @@ integ with heroku
 ]
 n_hosting_videos[label="s3 for
 video hosting
+"
+]
+n_hugo_buildpack[
+label="you have
+a standalone repo that
+uses the hugo buildpack
+to publish a hello world
+blog entry to the internet
+on heroku"
+style=filled
+shape=rect
+]
+yn_hugo_buildpack[
+label="if you
+can get it
+to work"
+style=filled
+shape=diamond
+]
+n_hugo_buildpack_read[label="Read that blog article
+whatever about using the hugo
+heroku buildpack to publish with
+hugo on heroku
+"
+style=filled
+]
+n_hugo_document[
+label="you have
+documented exactly what you
+did you get hugo installed
+and working from zero
+"
+style=filled
+shape=rect
+]
+a_hugo_document[label="Write this
+"
+style=filled
+]
+b_hugo_extras[label="look at
+some of these
+too
+"
+]
+n_hugo_get_gud[label="try one
+of these
+"
+]
+n_hugo_hello[
+label="you have
+a stupid simple
+hello world article
+published on the internet
+from hugo that is
+part of your
+mono repo
+"
+style=filled
+shape=rect
+]
+a_hugo_hello[label="Integrate minimal
+hello world into
+your mono-repo"
+style=filled
+]
+n_hugo_integrate[
+label="you have
+figured out how
+to integrate hugo
+into your mono repo
+to leverage existing
+documents in a way
+that doesn't suck"
+shape=rect
+]
+n_hugo_made[label="you have
+generated a
+static site
+with hugo
+(so you have
+the stack locally)"
+style=filled
+shape=rect
+]
+n_hugo_published[label="you have
+achieved good
+enough publishing
+for now to
+get started."
+shape=rect
+]
+n_hugo_symlinks_dirs[label="consider
+symlinks hack
+(directories)
+"
+]
+n_hugo_symlinks_files[label="consider
+symlinks hack
+(files)
+"
+]
+n_logging[label="logging"
+]
+n_lozenge_have[label="lozenge
+grid
+"
+]
+n_nginx[label="nginx not
+python
 "
 ]
 n_parse_taggings[label="parsed tagged strings"
@@ -96,6 +246,11 @@ n_publish_dim_sum[label="..which lets you
 publish small
 subdomain surveys..
 "
+]
+yn_publishing_ok[label="is it
+good enough?
+"
+shape=diamond
 ]
 n_publishing_simple[label=
 "isomorphic
@@ -121,6 +276,8 @@ shape=rect
 objective_samhara[label="samhara: a place to hold dreams
 music, movies, videogames, dance..."
 shape=rect
+]
+n_SEO[label="SEO"
 ]
 n_sync[label="• the sync script
 • md table datastore
@@ -150,18 +307,48 @@ n_css_academic->n_css_woah_aux_1
 n_css_aux_1->n_css_academic
 n_css_aux_1->n_css_glitch
 n_css_aux_1->g_css_travers
+n_css_github->a_frontmatter_yikes
 n_css_learn_responsive->n_css_aux_1
 n_css_learn_responsive->objective_sakin_agac
 n_css_glitch->n_css_woah_aux_1
 g_css_travers->n_css_woah_aux_1
+n_css_travers_2->n_css_github
+n_css_travers_2->n_lozenge_have
 n_css_woah->objective_samhara
 n_css_woah_aux_1->n_css_woah[label="any 2"]
 n_dim_sum_heroku_plug_ins->n_publishing_simple
 n_filter_by->n_dim_sum_heroku_plug_ins
+n_frontmatter_magic->a_frontmatter_yikes
 gfm_rumskalla->objective_sakin_agac
 n_heroku_competency->n_bots_learn
-n_heroku_grok->n_publishing_simple
 n_heroku_competency->objective_grep_dump
+n_heroku_competency_2->a_heorku_doc_2
+n_heroku_doc_2->n_heroku_competency_2
+a_heorku_doc_2->n_heroku_doc_2
+n_heroku_grok->n_publishing_simple
+n_heroku_monorepo_integrate->yn_publishing_ok
+n_hugo_get_gud->yn_publishing_ok[label=then]
+n_hugo_buildpack->n_heroku_competency_2
+yn_hugo_buildpack->n_hugo_buildpack
+n_hugo_buildpack->n_hugo_made
+n_hugo_buildpack_read->yn_hugo_buildpack
+a_hugo_document->n_hugo_document
+n_hugo_document->n_hugo_made
+b_hugo_extras->n_logging
+b_hugo_extras->n_nginx
+b_hugo_extras->n_SEO
+n_hugo_get_gud->n_css_travers_2
+n_hugo_get_gud->n_frontmatter_magic
+n_hugo_get_gud->n_hugo_symlinks_dirs
+n_hugo_get_gud->n_hugo_symlinks_files
+n_hugo_hello->n_hugo_buildpack
+a_hugo_hello->n_hugo_hello
+n_hugo_hello->n_heroku_monorepo_integrate
+n_hugo_integrate->n_hugo_hello
+n_hugo_integrate->n_hugo_published
+n_hugo_made->a_hugo_document
+n_hugo_made->a_hugo_hello
+n_hugo_published->b_hugo_extras
 n_hosting_static_files->gfm_rumskalla
 n_hosting_static_files->objective_sakin_agac
 n_hosting_videos->objective_sakin_agac
@@ -169,6 +356,8 @@ n_mystery_one->g_mystery_two
 n_parse_queries->n_filter_by
 n_parse_taggings->n_filter_by
 n_publish_dim_sum->n_react_xxx
+yn_publishing_ok->n_hugo_get_gud[label=no]
+yn_publishing_ok->n_hugo_integrate[label=yes]
 n_publishing_simple->gfm_rumskalla
 n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
@@ -180,11 +369,22 @@ n_use_sync->n_chose_pg
 rankdir=BT
 
 label="
-these are the
-major sub-projects
+the rectangular nodes are states.
+
+an arrow pointing from one
+state to another mean \"implies\".
+
+elliptical nodes are actions.
+
+an arrow from an action to a
+state means \"produces\".
+
+an arrow from a state to an
+action means \"is a precursor to\".
 "
 }
 /*
+#history-B.4: splice in another graph (not yet merged)
 #history-B.3: reverse the order of every arrow ONLY
 #history-B.2: normalize node layout, alphabetize assocs (sort of) ONLY
 #history-B.1: rename every node ONLY
