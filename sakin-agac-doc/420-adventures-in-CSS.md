@@ -6,8 +6,8 @@
 the pure-CSS parallax effect.
 
 but then this [one by Karl Danninger][source2] had the advantage of
-not needing an image to prove its proof of concept and also kind of
-"feeling" cleaner (but we might jump back)..
+feeling cleaner because of its use of simple background images (but
+we might jump back)..
 
 
 
@@ -35,11 +35,11 @@ normally, in its purest form this effect involves two layers:
       /________/ /      "above" the content at first)
       |________|/
 
-        /  ^            as you drag, it moves "wth" your drags
+        /  ^            as you drag, it moves "with" your drags
        v  /             but less distance (slower, if you like)
 
 when you drag the "page" upwards (to try to see more content that's
-downwards), the "parallax" effect has the image moving "more slowly".
+downwards), the "parallax" effect is where the image moves "more slowly".
 
 now, our *intended* effect wants to take this one step further, with
 a *third* layer as an experimental exagerration of this effect:
@@ -48,14 +48,14 @@ a *third* layer as an experimental exagerration of this effect:
       /  s      /|     david bowie
      /    S    / /     ziggy stardust
     /_________/ /      makeup lol
-    |_________|/
+    |_________|/       (moves more)
          /  ^
         /  /
        /  /
       v  /
        _____________
       / x X x X x  /|   text
-     / X x X x X  / /
+     / X x X x X  / /   (the one you drag)
     /____________/ /
     |____________|/
         /  ^
@@ -63,7 +63,7 @@ a *third* layer as an experimental exagerration of this effect:
       v  /
          _________
         /  . .   /|     picture
-       /  \_.   / /
+       /  \_.   / /     (moves less)
       /________/ /
       |________|/
         /  ^
@@ -75,7 +75,8 @@ moves _more_ (woah!).
 
 (although we're referencing the famous david bowie makeup above,
 you'll see an effect suggestive of this in the some of the works of
-patrick nagel, for example his duran duran album cover).
+patrick nagel (for example his duran duran album cover) where it looks
+like there's wisps of color floating "above" the subject's face.
 
 finally (and this is very subject to change), here's some more
 design criteria for us:
@@ -92,22 +93,22 @@ so, experimentally:
        _____________
       /      X x X /|    a "clear" overlay
      /     x X x  / /    with the writing
-    /____________/ /
+    /____________/ /     (the one you drag)
     |____________|/
        ______
       / s   /|
      /   S / /    a "clear" david bowie overlay
     /_____/ /     (that we'll call the "parallax container near")
-    |_____|/
+    |_____|/      (moves the most)
        _____________
       / _____      /|    a "matte" with a "cutout"
-     / /|___/     / /
+     / /|___/     / /    (moves exactly with the one you drag)
     /____________/ /
     |____________|/
        _________
       /  . .   /|    the "parallax container far"
      /  \_.   / /    with the picture.
-    /________/ /
+    /________/ /     (moves the least)
     |________|/
 
 
@@ -117,7 +118,14 @@ can simplify this later..
 
 
 
+## and so..
 
+read [this about clipping][source3].
+
+
+
+
+[source3]: https://getflywheel.com/layout/css-svg-clipping-and-masking-techniques/
 [source2]: https://www.okgrow.com/posts/css-only-parallax
 [source1]: https://medium.com/@johnearle/all-in-perspective-2996ee463509
 

@@ -26,11 +26,11 @@ h1 {
   overflow-y: scroll;
 }
 
-.ContentContainer {
+.ContentContainer {  /* layer 4 */
   position: absolute;
   top: 0;
   background-color: none;
-  z-index: 1;
+  z-index: -125;
 }
 
 .Content {
@@ -43,11 +43,11 @@ p {
   margin: 10px 0 35px 5px;
 }
 
-.parallax-container-far {
+.parallax-container-far {  /* layer 1 */
   display: flex;
   flex: 1 0 auto;
   position: relative;
-  z-index: -100;
+  z-index: -875;
   height: 100vh;
   justify-content: center;
   align-items: center;
@@ -56,11 +56,11 @@ p {
   background-color: rgb(250, 228, 216);
 }
 
-.parallax-container-near {
+.parallax-container-near {  /* layer 3: "ziggy stardust" */
   display: flex;
   flex: 1 0 auto;
   position: absolute;
-  z-index: -100;
+  z-index: -375;
   top: 100px;
   left: 100px;
   width: 120px;
@@ -69,6 +69,32 @@ p {
   align-items: center;
   transform: translateZ(45px) scale(1.50);
   background: url(https://www.toptal.com/designers/subtlepatterns/patterns/gravel.png);
+  background-color: skyblue;
+}
+
+.the-matte {  /* layer 2 */
+  clip-path: polygon(
+    /* draw the inner rectangle clockwise */
+    25px 35px, /* top left */
+    175px 35px, /* top right */
+    175px 250px, /* bottom right */
+    25px 250px, /* bottom left */
+    25px 35px, /* return to top left */
+
+    0 35px, /* go out to the left */
+    0 100%, /* go down to the bottom left */
+    100% 100%, /* go over to the bottom right */
+    100% 0, /* go up to the top right */
+    0 0, /* go over to the top left */
+    0 35px, /* go back to the start of this outer rect */
+    25px 35px /* go back to the very start of the first rect */
+  );
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 100%;
+  height: 100%;
+  z-index: -625;
   background-color: skyblue;
 }
 
@@ -94,9 +120,13 @@ p {
     </h1>
   </div>
 
+  <div class='the-matte'>
+    &nbsp;
+  </div>
+
   <div class='parallax-container-near'>
-    i am parallax near</br>
-    i am parallax near
+    ziggy stardust big S</br>
+    ziggy startud little S
   </div>
 
   <div class="ContentContainer">

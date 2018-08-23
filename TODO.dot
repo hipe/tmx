@@ -19,11 +19,6 @@ design
 "
 shape=rect
 ]
-n_css_dream[label="have your first
-self-made theme
-"
-shape=rect
-]
 n_css_github[label="github-style
 styling either
 the easy way or
@@ -39,6 +34,7 @@ shape=rect
 n_css_parallax[label="CSS for
 parallax
 "
+style=filled
 shape=rect
 ]
 n_css_travers[label="a travers
@@ -102,7 +98,11 @@ workload: hi
 "
 shape=rect
 ]
-n_gather_css[label="of these"
+n_gather_css[label="(once you
+have two
+of these)
+"
+shape=diamond
 ]
 gfm_rumskalla[label="github-flavored markdown rumskalla
 difficulty: low
@@ -114,7 +114,7 @@ regen not painful. can runlocal
 style=filled
 shape=rect
 ]
-n_gimp_intro[label="learn enough
+n_gimp_enough[label="learn enough
 GIMP, document it
 (mabye DIM SUM)
 "
@@ -123,6 +123,11 @@ shape=rect
 objective_grep_dump[label="grep dump
 difficulty: hi
 workload: hi
+"
+shape=rect
+]
+n_have_css[label="have your first
+self-made theme
 "
 shape=rect
 ]
@@ -270,6 +275,11 @@ symlinks hack
 "
 style=filled
 ]
+n_integrate_nagel_with_first_css[label="integrate nagel
+with first
+custom theme"
+shape=rect
+]
 n_js_dim[label="javascript frontend
 for DIM SUM
 "
@@ -335,15 +345,20 @@ n_sync[label="• the sync script
 "
 style=filled
 ]
-n_theme_choose[label="choose a
-theme
+n_temporary_waypoint[label="(your
+choice)
+"
+shape=diamond
+]
+n_theme_choose[label="choose a theme
+or themes
 "
 ]
-n_theme_integrate[label="integrate,
+n_theme_integrate[label="synthesize aspects of favorite
+themes/customize theme (trivially)
 you could do DIM SUM
 of SSG features..
 "
-shape=rect
 ]
 objective_upload_bot[label="upload bot
 difficulty: v hi
@@ -368,8 +383,6 @@ n_bots_learn->objective_upload_bot
 n_chose_pg->n_parse_queries
 n_chose_pg->n_parse_taggings
 n_css_academic->n_gather_css
-n_css_dream->n_gather_css
-n_css_dream->n_lozenge_have
 n_css_github->n_gather_css
 n_css_learn_responsive->n_make_css
 n_css_learn_responsive->objective_sakin_agac
@@ -383,13 +396,14 @@ n_dim_sum_heroku_plug_ins->n_articles_for
 n_dim_sum_heroku_plug_ins->n_publishing_simple
 n_dim_sum_themes->n_articles_for
 n_dim_sum_themes->n_theme_choose
-n_css_dream->n_gimp_intro
 n_filter_by->n_dim_sum_heroku_plug_ins
 n_frontmatter_magic->a_frontmatter_yikes
-n_gather_css->n_css_woah[label="any 2"]
-n_gimp_intro->n_articles_for
-n_gimp_intro->n_react_enough
+n_gather_css->n_css_woah
+n_gimp_enough->n_articles_for
+n_gimp_enough->n_integrate_nagel_with_first_css
 gfm_rumskalla->objective_sakin_agac
+n_have_css->n_gather_css
+n_have_css->n_temporary_waypoint
 n_heroku_competency->n_bots_learn
 n_heroku_competency->objective_grep_dump
 n_heroku_competency->a_heorku_doc_2
@@ -397,13 +411,16 @@ n_heroku_doc_2->n_heroku_competency
 a_heorku_doc_2->n_heroku_doc_2
 n_heroku_grok->n_publishing_simple
 n_heroku_monorepo_integrate->yn_publishing_ok
+n_hosting_static_files->gfm_rumskalla
+n_hosting_static_files->objective_sakin_agac
+n_hosting_videos->objective_sakin_agac
 n_hugo_get_gud->yn_publishing_ok[label=then]
 n_hugo_buildpack->n_heroku_competency
+n_hugo_published->n_heroku_monorepo_integrate
 yn_hugo_buildpack->n_hugo_buildpack
 n_hugo_buildpack->n_hugo_made
 n_hugo_buildpack_read->yn_hugo_buildpack
 a_hugo_document->n_hugo_document
-n_hugo_document->n_hugo_made
 b_hugo_extras->n_logging
 b_hugo_extras->n_nginx
 b_hugo_extras->n_SEO
@@ -411,17 +428,12 @@ n_hugo_get_gud->n_make_css
 n_hugo_get_gud->n_frontmatter_magic
 n_hugo_get_gud->n_hugo_symlinks_dirs
 n_hugo_get_gud->n_hugo_symlinks_files
-n_hugo_hello->n_hugo_buildpack
-a_hugo_hello->n_hugo_hello
-n_hugo_hello->n_heroku_monorepo_integrate
+a_hugo_hello->n_hugo_published
 n_hugo_integrate->n_hugo_hello
-n_hugo_integrate->n_hugo_published
 n_hugo_made->a_hugo_document
 n_hugo_made->a_hugo_hello
 n_hugo_published->b_hugo_extras
-n_hosting_static_files->gfm_rumskalla
-n_hosting_static_files->objective_sakin_agac
-n_hosting_videos->objective_sakin_agac
+n_integrate_nagel_with_first_css->n_samhara
 n_js_dim->n_dim_sum_ec
 n_lozenge_have->n_samhara
 n_make_css->n_css_academic
@@ -439,28 +451,39 @@ n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
 n_react_enough->n_js_dim
 n_sync->n_use_sync
+n_temporary_waypoint->n_gimp_enough
+n_temporary_waypoint->n_lozenge_have
+n_temporary_waypoint->n_react_enough
 n_theme_choose->n_theme_integrate
-n_theme_integrate->n_css_dream
 n_theme_integrate->n_articles_for
+n_theme_integrate->n_have_css
 n_use_sync->n_articles_for
 n_use_sync->n_chose_pg
+
 
 
 rankdir=BT
 
 label="
-the rectangular nodes are states.
+rectangular nodes are usually states,
+representing something like \"objectives\".
 
-an arrow pointing from one
-state to another mean \"implies\".
+elliptical nodes are usually actions.
 
-elliptical nodes are actions.
+an arrow from an action to a state
+means something lke \"produces\".
 
-an arrow from an action to a
-state means \"produces\".
+an arrow from a state to an action
+means something like \"is a precursor to\".
 
-an arrow from a state to an
-action means \"is a precursor to\".
+diamonds are typically something like threshold
+gates or simple conditionals. (they don't require
+their own work; rather they make a decision based
+on straightforward inputs.)
+
+(a conditional with no ELSE branch is incomplete
+formally; but stands to represent that our workflow
+has this known unknown.)
 "
 }
 /*
