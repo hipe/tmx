@@ -86,5 +86,3 @@ sub-project: upload files to s3
 (-tag-lyfe.1.1.11 gimp just enough to get transparent fello (research bowie, nagel))
 (-tag-lyfe.1.1.12 figure out punchout (mask) hack & integrate)
 (-tag-lyfe.1.1.13 figure out how you're gonna have the alpha layer (placeholder alpha image))
-(-tag-lyfe.1.1.14 commit a snapshot of the second source you got working. attribute it.)
-(-tag-lyfe.1.1.15 commit the first thing you got working. attribute it)
