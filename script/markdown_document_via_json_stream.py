@@ -94,8 +94,8 @@ def collection_identifier_via_parsed_arg_(arg):
 def __collection_identifier_via_stdin(stdin):
     import json
     _itr = (json.loads(s) for s in stdin)
-    from sakin_agac import context_manager_via_iterator_ as _
-    return _(_itr)
+    from sakin_agac import my_contextlib as _
+    return _.context_manager_via_iterator__(_itr)
 
 
 def cover_me(s=None):

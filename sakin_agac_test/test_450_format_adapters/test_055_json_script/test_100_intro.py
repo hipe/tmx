@@ -19,7 +19,8 @@ class _CommonCase(unittest.TestCase):
     # -- assertion support
 
     def _outputs_no_lines(self):
-        self.assertEqual(len(self._end_state().outputted_lines), 0)
+        _lines = self._end_state().outputted_lines
+        self.assertEqual(len(_lines), 0)
 
     def _emission(self, name):
         return self._end_state().actual_emission_index.actual_emission_via_name(name)  # noqa: E501
@@ -29,9 +30,8 @@ class _CommonCase(unittest.TestCase):
         msgs, listener = ts.minimal_listener_spy()
 
         _cr = _build_collection_reference(s)
-        _sess = _cr.open_sync_request(None, listener)
-        with _sess as doo_hah:
-            None if doo_hah is None else sanity()
+        cm = _cr.open_sync_request(None, listener)
+        None if cm is None else sanity()
 
         None if 1 == len(msgs) else sanity()
         return msgs[0]
@@ -132,7 +132,7 @@ class Case270_no_metadata_row(_CommonCase):  # #coverpoint7.2
                 }
 
 
-class Case280_bad_human_key(_CommonCase):  # #coverpoint7.3
+class Case280_bad_human_key(_CommonCase):  # :#coverpoint7.3
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
@@ -165,9 +165,10 @@ class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
         return iter(())
 
     def given(self):
+        _ = fixture_executable_path('exe_110_extra_cel.py')
         return {
                 'near_collection': _same_near_collection(),
-                'far_collection': fixture_executable_path('exe_110_extra_cel.py'),
+                'far_collection': _,
                 }
 
 
@@ -187,7 +188,6 @@ class Case300_RUM(_CommonCase):  # #coverpoint7.5
         return {
                 'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
                 'far_collection': fixture_executable_path('exe_120_endcap_yes_no.py'),  # noqa: E501
-
                 }
 
 

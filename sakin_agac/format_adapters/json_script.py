@@ -84,7 +84,8 @@ for now. (:#here1).
 as either "python" or "other" (based on the extension, maybe) and we use
 either figure 1 or figure 2 based on that. but suffice it to say, there is
 some figure 1 work we would have to do that is not yet implemented.)
-.:[#417]
+
+.:[#417.A]
 """
 
 from sakin_agac.magnetics import (
@@ -99,16 +100,15 @@ import re
 from os import path as os_path
 
 
-class _open_trav_request:
-    """this is based entirely off of the (at writing (at birth)) example
+def _open_trav_request(*a):
+    return _OpenTravRequest(*a).execute()
 
-    of a format adapter used as a "far" collection in the tests.
-    but note this gets splendidly more complicated because (in part)
-    of our clever game mechanic:
 
+class _OpenTravRequest:
+    """
     if such a script ends in *.py (which for now, all of them do :+#here1),
     then don't incur the overhead and annoyance (debugging/development wise)
-    of going thru another processs. rather, MOUNT THAT BADBOY
+    of going thru another processs. rather, load it as a module.
     """
 
     def __init__(
@@ -119,41 +119,25 @@ class _open_trav_request:
             listener,
             ):
 
-        self._OK = True
-
         self._filesystem_path = mixed_collection_identifier
         self._fiesystem_functions = modality_resources
         self._format_adapter = format_adapter
         self._listener = listener
+        self._OK = True
 
-    def __enter__(self):
-
+    def execute(self):
         self._OK and self.__resolve_path_stem_via_path()
         self._OK and self.__resolve_normal_stem_via_path_stem()
         self._OK and self.__resolve_dictionary_stream_session_via_normal_stem()
         if self._OK:
-            return self.__flush_sync_request()
+            return self.__flush_context_manager()
 
-    def __exit__(self, *error_info):
-        """(we have no open resources to close but you might)"""
-
-        if self._OK:
-            _exit_me = pop_property(self, '_exit_me')
-            return _exit_me.__exit__(*error_info)  # #[#410.G]
-
-    def __flush_sync_request(self):
+    def __flush_context_manager(self):
         """(by 'flush' we mean "build it the one time we build it")"""
 
-        sess = pop_property(self, '_dictionary_stream_session')
-        self._exit_me = sess  # we simply rename the attrbute for self-doc
-        _dictionary_stream = sess.__enter__()
-
-        format_adapter = pop_property(self, '_format_adapter')
-
-        return format_adapter.sync_lib.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
-                _dictionary_stream,
-                format_adapter,
-                )
+        _sess = pop_property(self, '_dictionary_stream_session')
+        _fa = pop_property(self, '_format_adapter')
+        return _MyContextManager(_sess, _fa)
 
     def __resolve_dictionary_stream_session_via_normal_stem(self):
 
@@ -194,7 +178,7 @@ class _open_trav_request:
 
         dn = os_path.dirname
         import sakin_agac as x
-        root = dn(dn(x.__file__))  # not __int__.py, not sakin_agac
+        root = dn(dn(x.__file__))  # not __init__.py, not sakin_agac
         path_len = len(path_stem)
         head_len = len(root) + 1  # include a trailing '/' sep yuck
 
@@ -212,8 +196,7 @@ class _open_trav_request:
         if md is None:
             self._normal_stem = s
         else:
-            _tmpl = "character we don't like ({}) in path stem: {}"
-            _msg = _tmpl.format(repr(md[0]), s)
+            _msg = f"character we don't like ({md[0]!r}) in path stem: {s}"
             self._err(_msg)
 
     def __resolve_path_stem_via_path(self):
@@ -238,16 +221,36 @@ class _open_trav_request:
         self._OK = False
 
 
-def _name_value_pairs_via_native_object(dct):
+class _MyContextManager:
+
+    def __init__(self, sess, fa):
+        self._the_worst = sess
+        self._format_adapter = fa
+
+    def __enter__(self):
+
+        _dictionary_stream = self._the_worst.__enter__()
+
+        import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+        return _.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
+                _dictionary_stream,
+                self._format_adapter,
+                )
+
+    def __exit__(self, *_):
+        _exit_me = pop_property(self, '_the_worst')
+        return _exit_me.__exit__(*_)  # #[#410.G]
+
+
+def _native_item_normalizer(dct):
     # #coverpoint7.4
-    # (you could probably do `pairs()`)
-    return ((k, dct[k]) for k in dct)
+    return dct  # provision [#418.E.2] dictionary is the standard item
 
 
 def _value_readers_via_field_names(*names):  # #coverpoint5.2
     def reader_for(name):
-        def read(native_object):
-            return native_object[name]  # [#410.B] death of item class imagine  # noqa: E501
+        def read(normal_dict):
+            return normal_dict[name]
         return read
     return [reader_for(name) for name in names]
 
@@ -263,7 +266,7 @@ _functions = {
 
 FORMAT_ADAPTER = format_adapter_via_definition(
         functions_via_modality=_functions,
-        name_value_pairs_via_native_object=_name_value_pairs_via_native_object,
+        native_item_normalizer=_native_item_normalizer,
         value_readers_via_field_names=_value_readers_via_field_names,
         associated_filename_globs=('*.py',),  # :+#here1
         format_adapter_module_name=__name__,

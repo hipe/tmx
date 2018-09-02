@@ -73,7 +73,7 @@ class _open_traversal_request:
 
         format_adapter = _pop_property(self, '_format_adapter')
 
-        return format_adapter.sync_lib.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
+        return _sync_lib().SYNC_REQUEST_VIA_DICTIONARY_STREAM(
                 use_stream,
                 format_adapter,
                 )
@@ -88,14 +88,14 @@ class _open_traversal_request:
             return False
 
 
-def _name_value_pairs_via_native_object(dct):
-    return ((k, dct[k]) for k in dct)
+def _native_item_normalizer(dct):
+    return dct  # [#418.E.2] for now dictionary is the standard
 
 
 def _value_readers_via_field_names(*names):
     def reader_for(name):
-        def read(native_object):
-            return native_object[name]  # [#410.B] death of item class imagine  # noqa: E501
+        def read(normal_dict):
+            return normal_dict[name]
         return read
     return [reader_for(name) for name in names]
 
@@ -116,9 +116,14 @@ _functions = {
 
 FORMAT_ADAPTER = format_adapter_via_definition(
         functions_via_modality=_functions,
-        name_value_pairs_via_native_object=_name_value_pairs_via_native_object,
+        native_item_normalizer=_native_item_normalizer,
         value_readers_via_field_names=_value_readers_via_field_names,
         format_adapter_module_name=__name__,
         )
+
+
+def _sync_lib():
+    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    return _
 
 # #born.

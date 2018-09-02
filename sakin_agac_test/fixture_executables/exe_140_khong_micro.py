@@ -12,7 +12,11 @@ class open_dictionary_stream:
         pass
 
     def __enter__(self):
-        yield {'_is_sync_meta_data': True, 'natural_key_field_name': 'lesson'}  # noqa: E501
+        yield {
+                '_is_sync_meta_data': True,
+                'natural_key_field_name': 'lesson',
+                'custom_pass_filter_for_syncing': 'sakin_agac.YIKES_SKIP_HEADERS',  # noqa: E501
+                }
         yield {'header_level': 99, 'no_see': 'no_see'}
         yield {'lesson': '[choo chah](foo fa)'}
         yield {'lesson': '[boo bah](loo la)'}

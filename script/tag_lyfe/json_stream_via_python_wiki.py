@@ -42,7 +42,7 @@ def open_dictionary_stream(html_document_path, listener):
                 'natural_key_field_name': field_names[0],
                 'field_names': field_names,  # coverpoint [#708.2.2]
                 'traversal_will_be_alphabetized_by_human_key': False,
-                'sync_keyerser': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+                'custom_keyer_for_syncing': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
                 }
 
         for dct in table_o:

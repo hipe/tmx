@@ -160,13 +160,13 @@ class Case040_near_file_not_found(_CommonCase):
     def test_100_raises_this_one_exception(self):
         def f():
             self._build_end_state()
-        _rx = r"\bNo such file or directory: '.+\.md'$"
+        _rx = r"\bNo such file or directory: '.+\bno-such-file\.md'$"
         self.assertRaisesRegex(FileNotFoundError, _rx, f)
 
     def given(self):
         return {
                 'near_collection': fixture_file_path('0075-no-such-file.md'),
-                'far_collection': _far_script_exists(),
+                'far_collection': fixture_executable_path('exe_110_extra_cel.py'),  # noqa: E501
                 }
 
 

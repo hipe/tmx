@@ -103,12 +103,12 @@ class open_dictionary_stream:
 
 
 def _write_anchor_tag(dct, a):
-    dct['label'] = a.string.strip()  # :#here1
+    dct['label'] = a.string.strip()
     s = a['href']
     if 'javascript:void(0)' == s:
         pass  # ..
     else:
-        dct['url'] = _domain + s
+        dct['url'] = _domain + s  # :#here1
 
 
 def _direct_children(node):

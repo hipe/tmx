@@ -38,7 +38,7 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
         # #cover-me (above) - when user gives empty stream, this is confusing
         # :#here4
         self._dict_stream_part_two = itr
-        return _SyncParameters(**_hi)
+        return _TraversalParameters(**_hi)
 
     def release_dictionary_stream(self):
         return pop_property(self, '_dict_stream_part_two')
@@ -64,7 +64,7 @@ class SYNC_REQUEST_VIA_TWO_FUNCTIONS:
             # (same *type* of thing as #here4 above)
             return None  # #coverpointTL.1.5.1.1
         else:
-            return _SyncParameters(**dct)
+            return _TraversalParameters(**dct)
 
     def release_dictionary_stream(self):
         return self._same('two')
@@ -75,7 +75,7 @@ class SYNC_REQUEST_VIA_TWO_FUNCTIONS:
         return f()
 
 
-class _SyncParameters:
+class _TraversalParameters:
     """consider the role of 'natural key' in a sync:
 
     what is the natural key of the near collection? of the far collection?
@@ -96,7 +96,10 @@ class _SyncParameters:
             field_names=None,
             tag_lyfe_field_names=None,  # yuck, experiement
             traversal_will_be_alphabetized_by_human_key=None,
-            sync_keyerser=None,
+            custom_mapper_for_syncing=None,
+            custom_far_keyer_for_syncing=None,
+            custom_near_keyer_for_syncing=None,
+            custom_pass_filter_for_syncing=None,
             ):
 
         if _is_sync_meta_data is not True:
@@ -106,10 +109,15 @@ class _SyncParameters:
         self.field_names = field_names
         self.tag_lyfe_field_names = tag_lyfe_field_names
         self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
-        self.sync_keyerser = sync_keyerser
+        self.custom_mapper_for_syncing = custom_mapper_for_syncing
+        self.custom_far_keyer_for_syncing = custom_far_keyer_for_syncing
+        self.custom_near_keyer_for_syncing = custom_near_keyer_for_syncing
+        self.custom_pass_filter_for_syncing = custom_pass_filter_for_syncing
 
-    sync_parameters_version = 2
-    # bump this WHEN you add to constituency
+    traversal_parameters_version = 3
+
+    # bump this WHEN you add to constituency (#provision [#418.J])
+    # bumped from 2 to 3 at #history-A.5
 
     def to_dictionary(self):  # (just for debugging)
         dct = {'_is_sync_meta_data': True}
@@ -118,7 +126,10 @@ class _SyncParameters:
         o('field_names')
         o('tag_lyfe_field_names')
         o('traversal_will_be_alphabetized_by_human_key')
-        o('sync_keyerser')
+        o('custom_mapper_for_syncing')
+        o('custom_far_keyer_for_syncing')
+        o('custom_near_keyer_for_syncing')
+        o('custom_pass_filter_for_syncing')
         return dct
 
 
@@ -165,10 +176,8 @@ class _WorkerWhenInterleaving(_Worker):
 
     def __init__(
         self,
-        far_stream,
-        natural_key_via_far_user_item,
-        near_stream,
-        natural_key_via_near_user_item,
+        normal_far_stream,
+        normal_near_stream,
         item_via_collision,
         nativizer=None,
         listener=None,
@@ -179,11 +188,12 @@ class _WorkerWhenInterleaving(_Worker):
                 return self._far_item
         else:
             def f():
-                return nativizer(self._far_item)  # #coverpoint7.4 (obliquely)
+                # #coverpoint7.4 (obliquely)
+                return nativizer(self._far_key, self._far_item)
         self._nativized_far_item = f
 
-        self._init_traversers(_FAR, far_stream, natural_key_via_far_user_item)
-        self._init_traversers(_NEAR, near_stream, natural_key_via_near_user_item)  # noqa: E501
+        self._init_traversers(_FAR, normal_far_stream)
+        self._init_traversers(_NEAR, normal_near_stream)
         self._merge = item_via_collision
         self._nativizer = nativizer
         self._listener = listener
@@ -201,10 +211,11 @@ class _WorkerWhenInterleaving(_Worker):
                 yield self._near_item
                 self._step_near()
             elif self._near_key == self._far_key:
-                item = self._merge(self._far_item, self._near_item)
-                if item is None:
+                pair = self._merge(self._far_key, self._far_item,
+                                   self._near_key, self._near_item)  # ##here1
+                if pair is None:
                     cover_me("we've imagined supporting this - error at merge")
-                yield item
+                yield pair
                 self._step_far()
                 self._step_near()
             else:
@@ -279,26 +290,24 @@ class _WorkerWhenInterleaving(_Worker):
             yield current_item()
             step()
 
-    def _init_traversers(self, which, stream, key_via_item):
+    def _init_traversers(self, which, normal_stream):
 
-        itr = iter(stream)  # stream is any iterable, like tuple, list etc
         iter_attr = _iter_attribute_for[which]
-        setattr(self, iter_attr, itr)
+        setattr(self, iter_attr, normal_stream)
         item_attr = _item_attribute_for[which]
         key_attr = _key_attribute_for[which]
 
         def step():
-            item = next_or_none(itr)
-            if item is None:
+            pair = next_or_none(normal_stream)
+            if pair is None:
                 setattr(self, _is_open_attribute_for[which], False)
                 self._both_open = False  # might be the 2nd time. ##here3
                 clear_props()
             else:
-                recv_item(item)
+                recv_item(*pair)
 
-        def recv_item(item):
+        def recv_item(key, item):
             setattr(self, item_attr, item)
-            key = key_via_item(item)
             if key is None:
                 cover_me('when key is none')
             else:
@@ -350,19 +359,15 @@ class _WorkerWhenDiminishingPool(_Worker):
 
     def __init__(
         self,
-        far_stream,
-        natural_key_via_far_user_item,
-        near_stream,
-        natural_key_via_near_user_item,
+        normal_far_stream,
+        normal_near_stream,
         item_via_collision,
         nativizer=None,
         listener=None,
             ):
 
-        self._far_stream = far_stream
-        self._key_via_far_item = natural_key_via_far_user_item
-        self._near_stream = near_stream
-        self._key_via_near_item = natural_key_via_near_user_item
+        self._normal_far_stream = normal_far_stream
+        self._normal_near_stream = normal_near_stream
         self._merge = item_via_collision
         self._nativizer = nativizer
         self._listener = listener
@@ -379,19 +384,19 @@ class _WorkerWhenDiminishingPool(_Worker):
         seen = {}
         dim_pool = pop_property(self, '_diminishing_pool')
         merge = pop_property(self, '_merge')
-        key_via = pop_property(self, '_key_via_near_item')
-        for item in pop_property(self, '_near_stream'):
-            key = key_via(item)
+
+        _ = pop_property(self, '_normal_near_stream')
+        for key, item in _:
             if key in seen:
                 self._unable_because_duplicate_key(key, _NEAR)
                 break
             seen[key] = None
             if key in dim_pool:
                 _far_native_item = dim_pool.pop(key)
-                merged_item = merge(_far_native_item, item)
-                if merged_item is None:
+                hm = merge(key, _far_native_item, key, item)  # ##here1
+                if hm is None:
                     cover_me('never been seen - merge failure')
-                yield merged_item
+                yield hm  # not a pair, but maybe should be
             else:
                 yield item
 
@@ -409,13 +414,12 @@ class _WorkerWhenDiminishingPool(_Worker):
         pool = {}
         sanity = 200  # ##[#410.R]
         count = 0
-        far_st = pop_property(self, '_far_stream')
-        key_via_item = pop_property(self, '_key_via_far_item')
-        for item in far_st:
+
+        _ = pop_property(self, '_normal_far_stream')
+        for key, item in _:
             count += 1
             if sanity == count:
                 cover_me('redis etc')
-            key = key_via_item(item)
             if key in pool:
                 self._unable_because_duplicate_key(key, _FAR)
                 break
@@ -425,6 +429,9 @@ class _WorkerWhenDiminishingPool(_Worker):
 
     def _when_error_emission(self):
         self._OK = False
+
+
+# :#here1: realize #provision [#418.F] four args for collision callback
 
 
 # --
@@ -449,6 +456,7 @@ def _empty_iterator():
     return iter(())
 
 
+# #history-A.5: bumped version because added several components
 # #history-A.4: sunset diminishing pool algorithm while spike interleaving
 # #history-A.2: when wrapper fails (sketch)
 # #history-A.1 (can be temporary): "inject" wrapper function

@@ -215,11 +215,16 @@ class _SectionedEndState:
         r = range(0, len(a))
         if do_reverse:
             r = reversed(r)
+        did_find = False
         for offset in r:
             if which == a[offset].which:
+                did_find = True
                 found_offset = offset
                 break
-        return a[found_offset]
+        if did_find:
+            return a[found_offset]
+        else:
+            raise Exception(f'no {which} output ({len(a)} sections of output)')
 
 
 class _EndState:

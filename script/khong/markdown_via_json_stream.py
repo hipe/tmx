@@ -73,7 +73,7 @@ def _my_CLI(parsed_arg, program_name, sout, serr):
             near_collection=_near_collection,
             far_format=None,
             near_format='markdown_table',
-            sneak_this_in=map_far_objects,
+            custom_mapper_OLDSCHOOL=map_far_objects,
             listener=listener,
             )
     f = sout.write

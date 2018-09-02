@@ -124,12 +124,13 @@ class Case030_minimal_working(_CommonCase):
 
 def _common_execute(fixture_file, listener):
 
-    _magnetic = _subject_module()
+    _magnetic = _subject_module().OPEN_TAGGED_DOC_LINE_ITEM_STREAM
     _path = fixture_file_path(fixture_file)
-    _iter = _magnetic(upstream_path=_path, listener=listener)
+    _cm = _magnetic(upstream_path=_path, listener=listener)
     tuples = []
-    for tup in _iter:
-        tuples.append(tup)
+    with _cm as itr:
+        for tup in itr:
+            tuples.append(tup)
     return tuple(tuples)
 
 

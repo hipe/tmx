@@ -10,7 +10,6 @@ some of the numbers of test cases line up with test cases in a sibling.
 
 import _init  # noqa: F401
 from sakin_agac_test.sync_support import (
-        subject_module_,
         SyncCase_,
         )
 from modality_agnostic.memoization import (
@@ -29,7 +28,7 @@ class Case020_none_down_on_to_none_produces_none(_CommonCase):
     """
 
     def test_010_magnetic_loads(self):
-        self.assertIsNotNone(subject_module_())
+        self.assertIsNotNone(_subject_module())
 
     def test_020_this_case(self):
         self.expect_these_()
@@ -277,9 +276,13 @@ class Case055_bigger_example_of_disorder(_CommonCase):
                 )
 
 
+def _subject_module():
+    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    return _
+
+
 if __name__ == '__main__':
     unittest.main()
-
 
 """
 :#here1: markdown documents

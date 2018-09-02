@@ -22,8 +22,8 @@ class _FormatAdapter:
             functions_via_modality=None,
             # if this format can be used as a "near" collection for syncing
 
-            name_value_pairs_via_native_object=None,
-            # for far collection, it must provide this per [#408.E]
+            native_item_normalizer=None,
+            # for far collection, it must provide this per provision [#418.E.2]
 
             value_readers_via_field_names=None,
             # for target near collection, calculate field readers dynamically
@@ -40,10 +40,10 @@ class _FormatAdapter:
 
         # # this should be abstracted if pattern
 
-        x = name_value_pairs_via_native_object
+        x = native_item_normalizer
         if x is not None:
             # (so we can know right away that the problem was it wasn't set)
-            self._name_value_pairs_via_native_object = x
+            self._native_item_normalizer = x
 
         # properties that are stored as private because we get fancy:
 
@@ -145,16 +145,11 @@ class _FormatAdapter:
         return current_node
 
     @property
-    def name_value_pairs_via_native_object(self):
-        return self._name_value_pairs_via_native_object
+    def native_item_normalizer(self):
+        return self._native_item_normalizer
 
     def value_readers_via_field_names(self, x):
         return self._value_readers_via_field_names(x)
-
-    @property
-    def sync_lib(self):  # #here1
-        from . import synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
-        return x
 
     @property
     def format_name(self):

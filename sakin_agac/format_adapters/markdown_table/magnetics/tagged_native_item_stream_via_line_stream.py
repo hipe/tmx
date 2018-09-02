@@ -27,7 +27,7 @@ contiguous lines that start with a pipe.)
 (also there is a cost to making the name-to-offset mapping.)
 
 would that we had a single document with several markdown tables and we are
-in fact riding on our [#409.A] central conceit of using MDT's as datastores;
+in fact riding on our [#417.B] central conceit of using MDT's as datastores;
 we might want to parse the document *without* the assumption built-in to it
 that we are parsing every markdown table we encounter robustly.
 
@@ -46,31 +46,40 @@ from sakin_agac import (
         pop_property,
         sanity,
         )
+import contextlib
 import re
-import sys
 
 
-def _TAGGED_ITEM_STREAM(upstream_path, listener):
+@contextlib.contextmanager
+def OPEN_TAGGED_DOC_LINE_ITEM_STREAM(upstream_path, listener):
+    """at #history-A.1 we were gung-ho on context managers. we may have erred
+
+    on the side of over-doing it for now."""
 
     if listener is None:
         sanity("you're gonna want a listener")  # #[#412]
 
     parse = _Parse(listener)
 
+    def f():
+        with __open_upstream_path(upstream_path) as lines:
+            for line in lines:
+                pair = parse(line)
+                if pair is None:
+                    break
+                yield pair
+    yield f()
+
+
+def __open_upstream_path(upstream_path):
     if isinstance(upstream_path, str):
-        cm = open(upstream_path)
-    elif isinstance(upstream_path,  tuple):
-        from sakin_agac import context_manager_via_iterator_ as f
-        cm = f(upstream_path)
+        result = open(upstream_path)
+    elif isinstance(upstream_path, tuple):
+        from sakin_agac import my_contextlib as _
+        result = _.context_manager_via_iterator__(upstream_path)
     else:
         raise Exception("can we keep this simple? had %s" % type(upstream_path))  # noqa: E501
-
-    with cm as lines:
-        for line in lines:
-            x = parse(line)
-            if x is None:
-                break
-            yield x
+    return result
 
 
 class _Parse:
@@ -158,6 +167,5 @@ class _CustomHybrid:
 
 _looks_like_table_line = re.compile(r'^\|').search
 
-sys.modules[__name__] = _TAGGED_ITEM_STREAM  # #[#008.G] so module is callable
-
+# #history-A.1: gung-ho on context managers
 # #born.

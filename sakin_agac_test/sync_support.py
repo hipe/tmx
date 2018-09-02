@@ -1,4 +1,5 @@
 from sakin_agac import sanity
+from modality_agnostic.memoization import memoize
 import unittest
 
 
@@ -55,11 +56,12 @@ class _build_snapshot:
         if preserve_freeform_order:
             add_these['preserve_freeform_order_and_insert_at_end'] = True
 
-        _st = subject_module_().stream_of_mixed_via_sync(
-            natural_key_via_far_user_item=_identity,
-            far_stream=far,
-            natural_key_via_near_user_item=_identity,
-            near_stream=near,
+        _normal_far_st = ((x, x) for x in far)
+        _normal_near_st = ((x, x) for x in near)
+
+        _st = _subject_module().stream_of_mixed_via_sync(
+            normal_far_stream=_normal_far_st,
+            normal_near_stream=_normal_near_st,
             item_via_collision=_item_via_collision,
             **add_these
             )
@@ -69,18 +71,88 @@ class _build_snapshot:
             self.emissions = tuple(emissions)
 
 
-def _item_via_collision(far_s, near_s):
+def _item_via_collision(far_key, far_s, near_key, near_s):
+    # (#provision #[#418.F] four args)
     None if far_s == near_s else sanity()
     return near_s.upper()
+
+
+def NORMALIZE_NEAR_ETC_AND_FAR(far_dicts):
+
+    import sakin_agac_test.format_adapters.in_memory_dictionaries as _
+    _far_FA = _.FORMAT_ADAPTER
+
+    _far_col_ref = _far_FA.collection_reference_via_string(far_dicts)
+
+    _ = _mag_wee().OPEN_FAR_SESSION(_far_col_ref, None, None)
+
+    with _ as far_session:
+        None if far_session.OK else sanity()
+        _normal_far_st = far_session.release_normal_far_stream()
+        dct = far_session.TO_NRTP__()
+        ary = [x for x in _normal_far_st]
+
+    _nkr = __unpack_these(dct)
+
+    return _nkr, ary
+
+
+def NORMALIZE_FAR(callback, far_path):
+
+    _far_col_ref = collection_reference_via_(far_path, __file__)
+
+    _ = _mag_wee().OPEN_FAR_SESSION(_far_col_ref, None, __file__)
+
+    with _ as far_session:
+        None if far_session.OK else sanity()
+        _normal_far_st = far_session.release_normal_far_stream()
+        result = callback(_normal_far_st)
+    return result
+
+
+def __unpack_these(dct):
+    if dct is None:
+        result = None
+    else:
+        def yuck(custom_near_keyer_for_syncing=None):
+            return custom_near_keyer_for_syncing
+        result = yuck(**dct)
+    return result
+
+
+def open_tagged_doc_line_items__(mixed_near):
+    _ = _mag_sync().OPEN_NEWSTREAM_VIA
+    _ = _.sibling_('tagged_native_item_stream_via_line_stream')
+    return _.OPEN_TAGGED_DOC_LINE_ITEM_STREAM(mixed_near, __file__)
+
+
+def collection_reference_via_(collection_identifier, listener):
+    import script.stream as _  # #[#410.Q] this script as lib only
+    return _.collection_reference_via_(collection_identifier, listener)
+
+
+@memoize
+def _mag_wee():
+    return _sub_mag('.ordered_nativized_far_stream_via_far_stream_and_near_stream')  # noqa: E501
+
+
+@memoize
+def _mag_sync():
+    return _sub_mag('.synchronized_stream_via_far_stream_and_near_stream')
+
+
+def _sub_mag(which):
+    import importlib
+    import sakin_agac.format_adapters.markdown_table.magnetics as _
+    return importlib.import_module(which, _.__name__)
 
 
 def _identity(x):
     return x
 
 
-def subject_module_():
+def _subject_module():
     import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
     return x
-
 
 # #abstracted.

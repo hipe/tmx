@@ -46,12 +46,12 @@ class Case100_fail(_CommonCase):  # #coverpoin13.1
         return self._build_state_expecting_some_emssions(_md)
 
 
-class Case150_work(_CommonCase):
+class Case150_work(_CommonCase):  # :#coverpoint13.2
 
     def test_200_runs(self):
         self.assertIsNotNone(self._state())
 
-    def test_300_sparse_is_sparse(self):  # #coverpoint13.2
+    def test_300_sparse_is_sparse(self):
         t = self._state().business_objects
         self.assertIn('stamina', t[0])
         self.assertNotIn('stamina', t[1])

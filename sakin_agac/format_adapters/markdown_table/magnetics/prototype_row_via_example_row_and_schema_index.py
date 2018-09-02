@@ -106,7 +106,7 @@ class _SELF:
         self._cels_count = example_row.cels_count
         self._natural_key_field_name = natural_key_field_name
 
-    def new_row_via_far_pairs_and_near_row_DOM__(self, pairs, near_row_DOM):
+    def new_row_via_far_pairs_and_near_row_DOM__(self, far_pairs, near_row_DOM):  # noqa: E501 #testpoint
         """for each key-value in the far pairs, make the new cel.
 
         for all the rest, use the doo-hah that was there already!
@@ -117,14 +117,13 @@ class _SELF:
         of updating this value, so delete that item from the dictionary.
         """
 
-        value_via_name = {k: v for k, v in pairs}
-
         # (before #history-A.2 we use to do #coverpoint1.5 here)
 
         # instead of value via key, we want value via offset.
 
         offset_via_name = self._offset_via_field_name
-        new_value_via_offset = {offset_via_name[k]: value_via_name[k] for k in value_via_name}  # KeyError #coverpoint1.1 (1/2)  # noqa: E501
+        new_value_via_offset = {offset_via_name[k]: v for k, v in far_pairs}
+        # KeyError #coverpoint1.1 (1/2)
 
         # make a reader function for producing near cels from offsets
 
@@ -153,7 +152,7 @@ class _SELF:
 
         return self._build_new_row(near_f, new_value_via_offset, use_endcap)
 
-    def new_via_name_value_pairs(self, pairs):
+    def new_via_normal_dictionary(self, far_dict):
         """for each key-value in the far pairs, make the new cel.
 
         for all the rest, make them blank cels.
@@ -170,7 +169,8 @@ class _SELF:
         _spaces_cel_cache = {}
 
         offset = self._offset_via_field_name
-        _nvvo = {offset[k]: v for k, v in pairs}  # KeyError #coverpoint1.1
+        _nvvo = {offset[k]: v for k, v in far_dict.items()}
+        # KeyError #coverpoint1.1 (2/2)
 
         return self._build_new_row(spaces_cel, _nvvo, self._eg_endcap)
 

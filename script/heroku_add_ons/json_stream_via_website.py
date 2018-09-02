@@ -28,7 +28,7 @@ def open_dictionary_stream(html_document_path, listener):
         yield {
                 '_is_sync_meta_data': True,
                 'natural_key_field_name': 'add_on',
-                'sync_keyerser': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+                'custom_keyer_for_syncing': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
                 }
 
         for el in el.find_all('li', recursive=False):

@@ -57,23 +57,21 @@ class Case010_hello(_CommonCase):
 
 def _my_sync(orig, new):  # #here1
 
-    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
-    f = _MyBusinessObject.name_value_pairs_via_doohah
-    sync_st = x.stream_of_mixed_via_sync(
-        natural_key_via_far_user_item=_natty_key_via_object,
-        far_stream=f(new),
-        natural_key_via_near_user_item=_natty_key_via_object,
-        near_stream=f(orig),
+    _normal_far_st = new._to_normal_stream()
+    _normal_near_st = orig._to_normal_stream()
+
+    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    sync_st = _.stream_of_mixed_via_sync(
+        normal_far_stream=_normal_far_st,
+        normal_near_stream=_normal_near_st,
         item_via_collision=_item_via_collision,
         )
     _these = [x for x in sync_st]
     return _MyBusinessObject(**{k: v for (k, v) in _these})
 
 
-def _item_via_collision(far_item, near_item):  # #here1
-
-    far_key, far_value = far_item
-    near_key, near_value = near_item
+def _item_via_collision(far_key, far_value, near_key, near_value):
+    # (#provision [#418.F] four args)
 
     None if far_key == near_key else sanity()
 
@@ -101,10 +99,6 @@ class _resolve_collision:  # :#here3
         return orig_x + new_x  # naive
 
 
-def _natty_key_via_object(kv):
-    return kv[0]  # #here2
-
-
 class _MyBusinessObject:
 
     def __init__(self, first_name, user_ID, tags):
@@ -112,10 +106,9 @@ class _MyBusinessObject:
         self.user_ID = user_ID
         self.tags = tags
 
-    def name_value_pairs_via_doohah(bo):
+    def _to_normal_stream(bo):
         """so:
-        - very close to [#408.E] a normal
-          `name_value_pairs_via_native_object` function.
+        - this feels similar to [#418.E.2] a "native item normalizer"
         - new at #history-A.2, :#here4 you must present the below in
           alphabetical order (or an error is emitted)
         """

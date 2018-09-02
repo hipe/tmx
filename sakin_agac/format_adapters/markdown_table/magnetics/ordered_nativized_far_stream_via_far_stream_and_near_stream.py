@@ -1,185 +1,67 @@
 """
-when we say a record is "nativized", we mean that it appears as a markdown
+the name of this magnetic is more figurative than actual:
 
-row, and that it takes on the formatting of the particular document (per the
-[#418.D] example row). this magnetic is mostly concerned with facilitating the
-creation of the "nativizer". what follows is a deeper explanation of all that.
+figuratively, we imagine the two streams coming together (near and far)
+and from those, we skim off from the head of the near stream one example
+item and then, using that item we output a stream of far items that get
+"nativized" to be near items, a stream which (finally) we order when
+necessary.
 
-(as an aside, not the name of this magnetic is figurative. it does not in
-fact produce an ordered, nativized far stream on its own; rather the
-client *may* produce something similar using the components produced by
-this magnetic.)
+in fact this module does not accomplish this feat on its own in one
+unified magnetic, but rather it has *all* (?) the constituent magnetics
+that do this (with a bit of coordination required).
 
-the "central conceit" of our client is that it takes a stream of normal
-records (dictionaries) and in effect turns them into markdown table rows,
-sort of.
-
-for markdown table rows as they sometimes (but not always) occur as
-surface phenomena, they can carry some "information" in them that is not
-present in a normal record; namely the particular use of spacing (if any).
-
-generaly our design guidelines are:
-
-  - it's better to try to infer this kind of thing from the peculiarities
-    of the existing document rather than making heuristic decisions.
-
-  - it's better to [same] rather than adding configuration options for it.
-
-(but note:)
-
-  - the idea of supporting ASCII formatting is now flagged as a possible
-    [#415.S] misfeature, but we aren't yet sure so the behavior is intact.
-
-given the above design guidelines, we pull off :[#408.E]: a particularly
-dastardly bit of hackery that we try to centralize here: the "prototype row":
-
-our nascent, experimental convention is that the first row of the markdown
-table is used *only* as an example, to show how to format other rows.
-(again we may either eliminate this a misfeature, or fold it in so that the
-first row is seen as a business record too (isn't it?))
-
-what makes this tricky is the stream-centric nature of the synchronization:
-in ideal cases our synchronization algorithms work by processing both streams
-item by item in their order with no large-scale caching, so that
-synchronization can scale linearly to very large datasets (both near and far).
-
-but note you can't output a "nativized" far item until you've seen the
-[#418.D] example row, which is why the example row must be a non-participating
-row that always appears first.
-
-so this magnetic tries to thread the needle: it uses a "random access"
-paradigm for the first record, then expects the rest is used streamily.
+[#417.C.2] discusses this challenge in more depth.
 """
-
 
 from sakin_agac import (
         cover_me,
         pop_property,
         )
-from modality_agnostic import (
-        streamlib as _,
-        )
-import sys
-
-next_or_none = _.next_or_none
 
 
-class _Worker:
-    """discussion: there is some confusion over whether we should take
+def NATIVIZER_ETC_VIA(**kwargs):
+    return _NativizerVia(**kwargs).execute()
 
-    normal dictionaries or native objects.
-    """
+
+class _NativizerVia:
 
     def __init__(
             self,
-            far_native_stream,
-            far_map,
-            far_keyer,
-            far_is_ordered,
             near_stream,
             complete_schema,
-            listener
+            listener,
             ):
 
-        self._far_native_stream = far_native_stream
-        self._far_map = far_map
-        self._far_keyer = far_keyer
-        self._far_is_ordered = far_is_ordered
-
-        self._near_stream = near_stream
+        from modality_agnostic import streamlib as _
+        self._next_near_item = _.next_or_noner(near_stream)
 
         self._nkfn = complete_schema.natural_key_field_name__()
         self._complete_schema = complete_schema
         self._listener = listener
-        self._mutex = None
         self._OK = True
 
     def execute(self):
-        del(self._mutex)
         self._OK and self.__resolve_example_row()
-        self._OK and self.__resolve_prototype_row_via_example_row()
-        self._OK and self.__init_far_KV_pairs()
-        self._OK and self.__resolve_ordered_far_key_value_pairs()
+        self._OK and self.__init_prototype_row_via_example_row()
         self._OK and self.__resolve_nativizer()
         if self._OK:
             return self
 
     def __resolve_nativizer(self):
         """
-        finally, for whichever particular ordering algorithm is being used,
         it's going to need to be able to make new rows out of new far items.
         (inserts).
         """
 
-        nv_pairs_via_native_item = pop_property(self, '_far_map')
-        near_item_via_NV_pairs = self.prototype_row.new_via_name_value_pairs
+        use_f = self.prototype_row.new_via_normal_dictionary
 
-        def near_item_via_far_item(native_far_item):
-            _NV_pairs = nv_pairs_via_native_item(native_far_item)
-            return near_item_via_NV_pairs(_NV_pairs)
+        def f(normal_dict):
+            return use_f(normal_dict)  # #hi.
 
-        self.near_item_via_far_item = near_item_via_far_item
+        self.near_item_via_normal_item_dictionary = f
 
-    def __resolve_ordered_far_key_value_pairs(self):
-        """
-        - when the ordered-ness of the far stream is either declared to be
-          not ordered or no declaration is made, assume it's not ordered.
-
-        - (if it's declared to be ordered but in actuality the traversal
-          comes out not ordered, it's GIGO #cover-me)
-
-        - new at the birth of this file, all traversals used in
-          synchronizations must be ordered.
-
-        - therefor, for all effective declaration of orderedness other than
-          True, we've got to do a #big-flush (a redis-like scenario) and
-          read the whole doo-hah into memory.
-        """
-
-        if self._far_is_ordered is True:
-            cover_me("OK if you say so")
-        else:
-            self.__resolve_ordered_far_key_value_pairs_via_big_flush()
-
-    def __resolve_ordered_far_key_value_pairs_via_big_flush(self):
-        """yikes
-        """
-
-        big_list = []
-        sanity = 200  # ##[#410.R]
-        count = 0
-        for kv_pair in pop_property(self, '_far_KV_pairs'):
-            count += 1
-            if sanity == count:
-                cover_me('redis etc')
-            big_list.append(kv_pair)
-
-        big_list.sort(key=lambda kv_pair: kv_pair[0])
-        self.ordered_far_key_value_pairs = big_list
-
-    def __init_far_KV_pairs(self):
-        """
-        this should be the only place in the universe that we apply the far
-        keyer.
-
-        this is cached because it can take work to make keys
-
-        this is in its own step because maybe 
-        """
-
-        _native_st = pop_property(self, '_far_native_stream')
-
-        key_via_far = pop_property(self, '_far_keyer')
-
-        def f(item):
-            key = key_via_far(item)
-            if key is None:
-                cover_me("nil key")
-            return (key, item)
-
-        self._far_KV_pairs = (f(item) for item in _native_st)
-
-    def __resolve_prototype_row_via_example_row(self):
+    def __init_prototype_row_via_example_row(self):
         from . import prototype_row_via_example_row_and_schema_index as _
         self.prototype_row = _(
                 natural_key_field_name=self._nkfn,
@@ -188,14 +70,13 @@ class _Worker:
                 )
 
     def __resolve_example_row(self):
-        item = next_or_none(self._near_stream)
-        if item is None:
+        row_DOM = self._next_near_item()
+        if row_DOM is None:
             cover_me("apparently you never covered this - no example row")
             _tmpl = "can't sync because no first business object row"
             self._emit('error', 'expression', 'no_prototype_row', _tmpl, ())
         else:
-            item.HELLO_POINTLESS_ITEM_WRAPPER_CLASS()
-            self.example_row = item.ROW_DOM_
+            self.example_row = row_DOM
 
     def _emit(self, *chan, tmpl, tup):
         def msg_f():
@@ -205,10 +86,277 @@ class _Worker:
         self._listener(*chan, msg_f)
 
 
-def _worker_wrapper(**kwargs):
-    return _Worker(**kwargs).execute()
+def OPEN_NEAR_SESSION(
+        near_relevant_traversal_parameters,
+        near_collection_path,
+        listener,
+        ):
+
+    tup = __process_near_opts(listener, **near_relevant_traversal_parameters)
+    if tup is None:
+        cover_me('probably OK')
+        return _not_OK_when_CM_expected()
+    keyerer, = tup
+
+    from . import tagged_native_item_stream_via_line_stream as _
+    cm = _.OPEN_TAGGED_DOC_LINE_ITEM_STREAM(near_collection_path, listener)
+
+    class _OpenNearSessionContextManager:
+
+        def __enter__(self):
+            return _OpenNearSession(cm.__enter__(), keyerer)
+
+        def __exit__(self, *_):
+            cm.__exit__(*_)
+            return False
+
+    class _OpenNearSession:
+
+        def __init__(self, line_items, keyerer):
+            self._tagged_line_items = line_items
+            self.keyerer = keyerer
+
+        def release_tagged_doc_line_item_stream(self):
+            return pop_property(self, '_tagged_line_items')
+
+        OK = True
+
+    return _OpenNearSessionContextManager()
 
 
-sys.modules[__name__] = _worker_wrapper
+def __process_near_opts(
+        listener,
+        custom_near_keyer_for_syncing=None,
+        ):
 
+    keyerer = None
+    if custom_near_keyer_for_syncing is not None:
+        keyerer = _procure_func_via_func_identifier(
+                custom_near_keyer_for_syncing, listener)
+        if keyerer is None:
+            return None
+
+    return (keyerer,)
+
+
+def OPEN_FAR_SESSION(
+        far_collection_reference,
+        filesystem_functions,
+        listener,
+        custom_mapper_OLDSCHOOL=None,
+        ):
+
+    sr_cm = far_collection_reference.open_sync_request(
+            filesystem_functions, listener)
+    if sr_cm is None:
+        return _not_OK_when_CM_expected()  # #coverpoint5.10
+
+    class _OpenFarSessionContextManager:
+
+        def __enter__(self):
+
+            sync_request = sr_cm.__enter__()
+
+            tup = _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener)  # noqa: E501
+            if tup is None:
+                cover_me('wee')
+
+            return _OpenFarSession(*tup)
+            # --
+
+        def __exit__(self, *_):
+            return sr_cm.__exit__(*_)
+
+    class _OpenFarSession:
+
+        def __init__(self, normal_far_st, tp):
+            self._normal_far_stream = normal_far_st
+            self._traversal_parameters = tp
+
+        def release_normal_far_stream(self):
+            return pop_property(self, '_normal_far_stream')
+
+        def TO_NRTP__(self):  # #testpoint
+            # NRTP = "near relevant traversal parameters"
+
+            o = {}
+            _ = self._traversal_parameters.custom_near_keyer_for_syncing
+            o['custom_near_keyer_for_syncing'] = _
+            return o
+
+        OK = True
+
+    return _OpenFarSessionContextManager()
+
+
+def _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener):
+    """
+    so:
+        - here we implement exactly [#423] (a graph-viz graph)
+
+        - here is where we first thought of #wish [#410.Y] customizable
+          functional pipelines (so you could map before or after filter
+          as you desire, for example). but needs to be specified and that
+          definitely needs to incubate..
+    """
+
+    # -- order matters
+    tp = sync_request.release_traversal_parameters()
+    if tp is None:
+        cover_me('wee')
+
+    far_dict_st = sync_request.release_dictionary_stream()
+    del(sync_request)
+    # --
+
+    if 3 != tp.traversal_parameters_version:
+        raise Exception('woot - #provision [#418.J] - parameters added')
+
+    is_ordered = tp.traversal_will_be_alphabetized_by_human_key
+
+    ok, use_map = __procure_any_map(tp, custom_mapper_OLDSCHOOL, listener)
+    if not ok:
+        return
+
+    ok, pass_filter = __procure_any_pass_filter(tp, listener)
+    if not ok:
+        return
+
+    far_keyer = __procure_some_far_keyer(tp, listener)
+    if far_keyer is None:
+        cover_me('failed to load function referenced in schema')
+        return
+
+    normal_pair = __synthesize_normal_pair_function(far_keyer, use_map)
+
+    if pass_filter is None:
+        raw_order = (normal_pair(far_dct) for far_dct in far_dict_st)
+    else:
+        raw_order = (normal_pair(d) for d in far_dict_st if pass_filter(d))
+
+    if is_ordered:
+        cover_me('almost certainly fine but not covered')
+        normal_far_st = raw_order
+    else:
+        normal_far_st = _yikes_sort(raw_order)
+
+    return (normal_far_st, tp)
+
+
+def _yikes_sort(raw_order):
+    """simply "flatten" the iterator into one big list and sort it by
+
+    the human key. result in the big list as an iterator.
+      - whine when we reach a sanity limit. we lose linear scaling
+    """
+
+    big_pairs_list = []
+    sanity = 300  # ##[#410.R]
+
+    # (at #history-A.1 the above got +100 for hugo themes lol)
+    count = 0
+    for kv_pair in raw_order:
+        count += 1
+        if sanity == count:
+            cover_me('redis etc')
+        big_pairs_list.append(kv_pair)
+
+    big_pairs_list.sort(key=lambda kv_pair: kv_pair[0])
+    # (we could expose a sophistication our sorting mechanics but
+    # we'd rather not)
+
+    return iter(big_pairs_list)
+
+
+def __synthesize_normal_pair_function(far_keyer, use_map):
+
+    def normal_pair_via_normal_dict(far_dct):
+        key = far_keyer(far_dct)
+        if key is None:
+            cover_me("nil key")
+        return (key, far_dct)
+
+    if use_map is None:
+        normal_pair = normal_pair_via_normal_dict
+    else:
+        def normal_pair(far_dict):
+            normal_dict = use_map(far_dict)
+            if normal_dict is None:
+                cover_me('map resulted in none')
+            return normal_pair_via_normal_dict(normal_dict)
+
+    return normal_pair
+
+
+def __procure_some_far_keyer(o, listener):
+
+    cust_far_keyer_id = o.custom_far_keyer_for_syncing
+    nkfn = o.natural_key_field_name
+    if nkfn is None:
+        cover_me('when is this ever not set')
+
+    if cust_far_keyer_id is None:
+
+        def result(far_dct):
+            return far_dct[nkfn]  # #coverpoint7.3
+    else:
+        # #coverpoint1.6
+        f_f = _procure_func_via_func_identifier(cust_far_keyer_id, listener)
+        if f_f is None:
+            cover_me('failed to load function from function identifier')
+
+        result = f_f(o, listener)
+        if result is None:
+            cover_me('user defined function-function failed to produce function')  # noqa: E501
+
+    return result
+
+
+def __procure_any_pass_filter(tp, listener):
+
+    f_id = tp.custom_pass_filter_for_syncing
+    if f_id is None:
+        result = (True, None)
+    else:
+        # #coverpoint13.3
+        pass_filter = _procure_func_via_func_identifier(f_id, listener)
+        if pass_filter is None:
+            result = (False, None)  # meh, not covered
+        else:
+            result = (True, pass_filter)
+    return result
+
+
+def __procure_any_map(tp, custom_mapper_OLDSCHOOL, listener):
+    # we would rather not support both these map techniques, but how? ..
+
+    map_id = tp.custom_mapper_for_syncing
+    has_map_specified_in_schema = map_id is not None
+    has_map_passed_directly = custom_mapper_OLDSCHOOL is not None
+
+    if has_map_specified_in_schema:
+        if has_map_passed_directly:
+            cover_me('we would rather not end up with two maps here..')
+        else:
+            cover_me('far mapper specified in schema needs to be covered')
+    elif has_map_passed_directly:
+        use_map = custom_mapper_OLDSCHOOL  # #coverpoint9.1.1
+    else:
+        use_map = None
+
+    return (True, use_map)
+
+
+def _not_OK_when_CM_expected():
+    from sakin_agac import my_contextlib
+    return my_contextlib.not_OK_context_manager()
+
+
+def _procure_func_via_func_identifier(identifier, listener):
+    from sakin_agac.magnetics import function_via_function_identifier as _
+    return _(identifier, listener)
+
+
+# #pending-rename: perhaps to "normal far stream via SOMETHING"
+# #history-A.1: change when we apply the map function on the far stream
 # #abstracted.

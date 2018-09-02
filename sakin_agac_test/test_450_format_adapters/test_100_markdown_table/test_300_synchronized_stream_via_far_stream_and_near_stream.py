@@ -8,7 +8,7 @@ from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
         )
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
+import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as mag_lib  # noqa: E501
 import unittest
 
 
@@ -182,7 +182,7 @@ class Case317_in_this_case_mono_value_does_NOT_update(_CommonCase):
         return _sections_index_via(_section_list_via(_far, _near))
 
 
-class Case350_sync_keyerser(_CommonCase):  # #coverpoint1.6
+class Case350_custom_keyer_for_syncing(_CommonCase):  # #coverpoint1.6
 
     def test_100_the_NOT_updated_business_cel_stays_as_is(self):
         self.assertEqual(self._cel_strings()[2], '| six')
@@ -203,7 +203,9 @@ class Case350_sync_keyerser(_CommonCase):  # #coverpoint1.6
     def _sections_index(self):
 
         schema_row = {x: k for x, k in _same_schema_row.items()}
-        schema_row['sync_keyerser'] = _same_sync_keyerser()
+        o = schema_row
+        o['custom_far_keyer_for_syncing'] = _same_far_keyer()
+        o['custom_near_keyer_for_syncing'] = _same_near_keyer()
 
         _far = (
                 schema_row,
@@ -222,7 +224,7 @@ class Case383_in_this_case_mono_value_does_YES_update(_CommonCase):
     .#coverpoint1.7: (integration of the last 2 coverpoints) IF all of:
       - the far record only has one field (name-value pair)
         (assume it's a human-key field)
-      - the sync_keyerser doo-hah exists
+      - the custom_keyer_for_syncing doo-hah exists
 
     THEN: yes do the record-level sync (update)
     """
@@ -246,7 +248,8 @@ class Case383_in_this_case_mono_value_does_YES_update(_CommonCase):
                 {
                     '_is_sync_meta_data': True,
                     'natural_key_field_name': 'col_a',
-                    'sync_keyerser': _same_sync_keyerser(),
+                    'custom_far_keyer_for_syncing': _same_far_keyer(),
+                    'custom_near_keyer_for_syncing': _same_near_keyer(),
                     },
                 {
                     'col_a': 'ZUB',
@@ -317,66 +320,35 @@ def _sections_index_via(section_list):
     return dct
 
 
-def _section_list_via(dicts, mixed_far):
+def _section_list_via(far_dicts, mixed_near):
 
-    far_format_adapter = _this_one_format_adapter().FORMAT_ADAPTER
+    # #pattern [#418.Z.1] - nested context managers
 
-    _sess = far_format_adapter.open_sync_request_(
-            mixed_collection_identifier=dicts,
-            modality_resources=None,
-            listener=None,
-            )
+    import sakin_agac_test.sync_support as sync_lib
 
-    with _sess as sync_request:
-        x = __build_section_list_via_these(
-                sync_request, far_format_adapter, mixed_far)  # noqa: E501
+    near_keyer, normal_far_dicts = sync_lib.NORMALIZE_NEAR_ETC_AND_FAR(far_dicts)  # noqa: E501
 
-    return x
+    def open_out(near_tagged_items):
+        _ = _subject_module()
+        return _.OPEN_NEWSTREAM_VIA(
+                normal_far_stream=iter(normal_far_dicts),
+                near_tagged_items=near_tagged_items,
+                near_keyerer=near_keyer,
+                listener=__file__,
+                )
 
+    def open_near():
+        if isinstance(mixed_near, str):
+            use_near = fixture_file_path(mixed_near)
+        else:
+            use_near = mixed_near
 
-def __build_section_list_via_these(sync_request, far_format_adapter, mixed_far):  # noqa: E501
+        return sync_lib.open_tagged_doc_line_items__(use_near)
 
-    my_sync = _subject_module()
-
-    listener = 'listener1'
-
-    tp = sync_request.release_traversal_parameters()
-
-    _far_stream = sync_request.release_dictionary_stream()
-
-    _nkfn = tp.natural_key_field_name
-
-    _sync_keyerser = tp.sync_keyerser
-
-    del(tp)
-
-    if isinstance(mixed_far, str):
-        use_mixed_far = fixture_file_path(mixed_far)
-    else:
-        use_mixed_far = mixed_far
-
-    _f = my_sync.sibling_('tagged_native_item_stream_via_line_stream')
-    _near_tagged_items = _f(use_mixed_far, listener)
-
-    _HOLY_SHNAPPS = my_sync(
-            # the streams:
-            far_native_stream=_far_stream,
-            near_tagged_items=_near_tagged_items,
-
-            # the sync parameters:
-            natural_key_field_name=_nkfn,
-            farstream_format_adapter=far_format_adapter,
-
-            # pseudo-optional stuff:
-            far_traversal_is_ordered=None,  # not until #coverpoint99
-            sync_keyerser=_sync_keyerser,
-
-            listener=listener,
-            )
-
-    import sakin_agac.magnetics.result_via_tagged_stream_and_processor as lib
-
-    return lib(_HOLY_SHNAPPS, _MyCustomProcessor())
+    import sakin_agac.magnetics.result_via_tagged_stream_and_processor as _
+    with open_near() as near, open_out(near) as sess:
+        result = _(sess, _MyCustomProcessor())
+    return result
 
 
 class _MyCustomProcessor:
@@ -448,42 +420,51 @@ class _MyCustomProcessor:
 
 
 @memoize
-def _same_sync_keyerser():
+def _same_far_keyer():
+    return _here() + 'Chimmy_Chamosa_001_far'  # (in this file)
+
+
+@memoize
+def _same_near_keyer():
+    return _here() + 'Chimmy_Chamosa_001_near'  # (in this file)
+
+
+@memoize
+def _here():
     return (
         'sakin_agac_test.test_450_format_adapters.'
         'test_100_markdown_table.'
         'test_300_synchronized_stream_via_far_stream_and_near_stream.'
-        'Chimmy_Chamosa_001'
         )
 
 
-def Chimmy_Chamosa_001(near_f, far_f):
-    """
-    the file added at #history-A.1 explains our excitement and misgivings
-    about the facility that employs this function as an example.
-    """
+# == BEGIN [#410.W] explains our excitement and misgivings about these
 
-    def use_near(felo):
-        k = near_f(felo)
-        return same(k)
+def Chimmy_Chamosa_001_far(traversal_params, listener):
 
-    def use_far(felo):
-        k = far_f(felo)
-        return same(k)
+    nkfn = traversal_params.natural_key_field_name
 
-    def same(k):
-        return '«%s»' % k.strip().upper()
+    def key_via_normal_dict(normal_dct):
+        k = normal_dct[nkfn]  # ..
+        return _simplify_and_add_guillemets(k)
 
-    return use_near, use_far
+    return key_via_normal_dict
 
 
-def _natural_key_via_object(x):
-    raise Exception('where')
+def Chimmy_Chamosa_001_near(complete_schema, key_via_row_DOM_normally, listen):
+    """at #history-A.3 this changed, symmetry broke"""
+
+    def key_via_row_DOM(row_DOM):
+        _k = key_via_row_DOM_normally(row_DOM)
+        return _simplify_and_add_guillemets(_k)
+
+    return key_via_row_DOM
 
 
-def _this_one_format_adapter():
-    import sakin_agac_test.format_adapters.in_memory_dictionaries as x
-    return x
+def _simplify_and_add_guillemets(k):
+    return f'«{k.strip().upper()}»'
+
+# ==
 
 
 class _Section:
@@ -495,12 +476,12 @@ class _Section:
 
 @memoize
 def _subject_module():
-    return co.sub_magnetic('synchronized_stream_via_far_stream_and_near_stream')  # noqa: E501
+    return mag_lib.sub_magnetic('synchronized_stream_via_far_stream_and_near_stream')  # noqa: E501
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.3: broke symmetry between near and far keyerer
 # #history-A.2: default algorithm changed to interfolding and row order changed
-# #history-A.1: as referenced
 # #born.

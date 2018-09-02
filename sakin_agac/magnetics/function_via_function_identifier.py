@@ -1,5 +1,5 @@
 """
-# #coverpoint1.6: the sync keyerser
+.:[#410.W]: custom keyers for syncing (#coverpoint1.6)
 
 in pure theory, the human keys of the near and far collections are "normal"
 (meaning two keys represent the same thing IFF they have the same value)
@@ -21,7 +21,7 @@ or the label changes?
 
     [SomeThing](http://xyx.eg/foo)
 
-without taking extra measures, such as arrangement will lead to (what amounts
+without taking extra measures, such an arrangement leads to (what amounts
 to) duplication; that is, a new record is added to the near collection when
 what we wanted was the new record to be used to update an existing record.
 
@@ -43,6 +43,7 @@ user-provided functions can be specified to be used to map *unsanitized*
 human keys to *normal* human keys. (we won't "see" the normal keys, they'll
 just be used internally. in fact, we might even drop the qualifier "human".)
 there will be one function for near keys and one for far.
+(#open [#410.F] will change this.)
 
 the thing we're trying to get is a key (one key for one record). we may
 name a function that makes keys (from unsanitized keys) a "keyer". but
@@ -106,6 +107,5 @@ _rx = re.compile(r'^(%s(?:\.%s)*)\.([a-zA-Z][a-zA-Z0-9_]*)$' % (_word, _word))
 
 
 sys.modules[__name__] = function_via_function_identifier
-
 
 # #born.

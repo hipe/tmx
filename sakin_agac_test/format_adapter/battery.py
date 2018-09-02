@@ -15,8 +15,6 @@ class SOME_SNAPSHOT:
         but that is not quite the idea. at this point we are only trying to
         "flush"/"flatten" the collection into a big, immutable, in-memory
         snapshot.
-
-        NOTE - this imagines [#410.B] death of item class
         """
 
         read, = format_adapter.value_readers_via_field_names('field_one')

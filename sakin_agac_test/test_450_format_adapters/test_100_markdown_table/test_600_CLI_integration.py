@@ -111,7 +111,7 @@ class Case020_must_be_interactive(_CommonCase):
         return self._expect_this_many_on_stderr(2)
 
 
-class Case030_strange_option(_CommonCase):  # #coverpoint6.1.2
+class Case030_strange_option(_CommonCase):  # #coverpoint6.1
 
     def test_100_fails(self):
         self._CLI_client_results_in_failure_exitstatus()
@@ -200,7 +200,7 @@ class Case040_top_help_screen(_CommonCase):
         return ('me', '-h')
 
 
-class Case050_FA_help_screen(_CommonCase):
+class Case050_FA_help_screen(_CommonCase):  # #coverpoint6.3
 
     def test_100_succeeds(self):
         self._CLI_client_results_in_success_exitstatus()
@@ -218,9 +218,11 @@ class Case050_FA_help_screen(_CommonCase):
         self.assertEqual(len(s_a), 1)
         self.assertRegex(s_a[0], r'^\(\d+ total\.\)$')
 
-    def test_400_reminder_at_begnning_about_help(self):
+    def test_400_something_about_content(self):
+        # (this was a more pointed message before #history-A.1)
         _s_a = self._end_state().first_section('stderr').lines
-        self.assertIn('FYI', _s_a[0])
+        _ = 'the filename extension can imply a format adapter.\n'
+        self.assertEqual(_s_a[0], _)
 
     @shared_subject
     def _end_state(self):
@@ -458,4 +460,5 @@ def _subject_script():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1 (as referenced)
 # #born.

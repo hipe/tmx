@@ -39,6 +39,8 @@ particular application of this theory that has yielded mis-behaviors.
 but the "theory" of heruistic templating is that we look at the existing
 formatting of the document to determine how we format new expression.
 
+more at [#417.C], which segues into this (among other corollaries).
+
 
 
 
@@ -74,6 +76,134 @@ but this is seen as overwrought for now.
 
 
 
+## <a name='E.2'></a> provision: dictionary is the standard item
+
+(explained in a context at [#408.E].)
+
+
+
+
+## <a name=F></a> provision: the collision handler takes four arguments.
+
+(this is up from the previous two it used to take before #history-A.1)
+we made this change because we were gung-ho about etc but it seems it might
+be redundant, because isn't a collision by definition when there is the same
+natural key?
+
+
+
+
+## <a name=G></a> provision: short circuit out of a merge operation
+
+this provision holds that we short-circuit out of calling the merge callback
+if the far "record" has no components other than the human key (because why
+bother, right?).
+
+there are, however, some caveates discussed in code.
+
+.#coverpoint1.5
+
+
+
+
+## <a name=H></a> provision: custom keyers
+
+this provision holds that you can provide a function that "derives" a human
+key per each item through arbitrary means. [#423] is dedicated to tracking
+a more detailed look at this (as "pipeline"). #coverpoint1.6
+
+
+
+
+## <a name=I> provision: the leftmost column in the markdown table is..
+
+..by default the "human key" field.. we don't want to be fully
+married to this but it's a cost-saving shortcut.
+
+
+
+
+
+## <a name=J> provision: there is a version integer for sync parameters.
+
+this contrivance exists so there is a discrete, hard-coded assertion
+somewhere about what constituency of names we can assume; both from
+the defining side and the consuming side separately.
+
+
+
+
+## <a name=K> provision: traversal params come from far stream (& synthesis)
+
+for a synchronization:
+  - you can't have a normal near stream without the traversal parameters
+    (because you may have a custom keyer).
+  - you can't have traversal parameters without a far stream. (EDIT: explain
+    the thinking by importing a comment to here.)
+  - you can't do the central syncing algorithm without the two streams.
+  - finally, per the next point [#418.L], these streams gonna be in context
+    managers..
+
+so, in pseudocode:
+
+    with open_far() as far:
+        with open_near(far) as near:
+            for output_line in sync(far, near):
+                yield output_line
+
+note the significant point here is that the order of the nesting is not
+interchangeable. syncing depends on both far and near; near depends on far.
+so the order must be:
+  1. far
+  1. near
+  1. sync
+
+in turn, the above is now considered #pattern [#418.Z.1].
+
+
+
+
+## <a name=L></a> provision: the two streams should be in context managers
+you can
+
+.:[#418.L.2]: on failure you must sill result in an iterator
+
+
+
+
+## <a name='Z.1'></a> pattern: nested context managers
+
+(just tracking this for now)
+
+
+
+
+## <a name='Z.2'></a> pattern: separate context managers from work
+
+there should be a layer of abstraction that divides context-manager concerns
+from the business work. if your work needs to access a resource that is
+"emphemeral" (like an open filehandle, database connection etc), then perhaps
+a context manager should be involved but it should not disrupt your code flow:
+
+how this manifests typically is that we don't want our context manager class
+to become a "god class" monolith that also holds a lot of busines work.
+
+ideally such context manager classes will only define `__init__`,
+`__enter__` and `__exit__` and pass off the business work to code that is
+ignorant of the implementation details of context managers.
+
+
+
+
+## <a name='Z.3'></a> pattern: this broad pattern: class as context manager
+
+(..)
+
+
+
+
 ## (document-meta)
 
+  - #pending-rename: something like "provisions and patterns"
+  - #history-A.1: normal far stream became a thing
   - #born.

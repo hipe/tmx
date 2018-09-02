@@ -61,7 +61,7 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         we emit a meta record based off that one BUT with the field names
         changed to reflect etc.
 
-          - assume #provision [#410.Q] that the natural key field name
+          - assume #provision [#418.I] that the natural key field name
             is leftmost (here in the near field names (which are derived))
 
         #abstraction-candidate: the format adaptation of [#410.J] the record
@@ -69,12 +69,12 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         """
 
         near_field_names = dic_via_cels.near_field_names
-        mutable_dict = {k: v for k, v in schema_record.items()}
-        mutable_dict['natural_key_field_name'] = near_field_names[0]  # YIKES
-        mutable_dict['field_names'] = near_field_names
-        mutable_dict['sync_keyerser'] = 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
-        mutable_dict['traversal_will_be_alphabetized_by_human_key'] = False
-        return mutable_dict
+        o = {k: v for k, v in schema_record.items()}
+        o['natural_key_field_name'] = near_field_names[0]  # (per above provis)
+        o['field_names'] = near_field_names
+        o['custom_keyer_for_syncing'] = 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+        o['traversal_will_be_alphabetized_by_human_key'] = False
+        return o
 
     def __build_dict_via_cels(self, far_field_names):
         import sakin_agac.magnetics.dictionary_via_cels_via_definition as _

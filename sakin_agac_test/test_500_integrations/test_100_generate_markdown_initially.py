@@ -163,7 +163,7 @@ class Case170_too_many_args(_CommonCase):  # #coverpoint9.3 - two args
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case200_stdin(_CommonCase):  # #coverpoint9.1.1  - one arg: stdin
+class Case200_stdin(_CommonCase):  # :#coverpoint9.1.1  - one arg: stdin
 
     def test_100_succeeds(self):
         self.succeeds()
@@ -185,8 +185,14 @@ class Case200_stdin(_CommonCase):  # #coverpoint9.1.1  - one arg: stdin
         return self.build_end_state()
 
     def stdin(self):
+        import json
+        _first_line = json.dumps({
+            '_is_sync_meta_data': True,
+            'natural_key_field_name': 'lesson',
+            'custom_pass_filter_for_syncing': 'sakin_agac.YIKES_SKIP_HEADERS',
+            })
         return _this_one_lib().STDERR_CRAZYTOWN(
-                '{ "_is_sync_meta_data": true, "natural_key_field_name": "lesson" }\n',  # noqa: E501
+                _first_line,
                 '{ "header_level": 1 }\n',
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n',

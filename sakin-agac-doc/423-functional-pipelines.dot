@@ -1,0 +1,100 @@
+digraph g {
+
+
+/* nodes */
+
+subgraph cluster_1 {
+
+label="the new way"
+
+n_dvn[label="dict via name
+value pairs
+"
+]
+n_key[label="key"
+style=filled
+shape=rect
+]
+n_keyer[label="keyer"
+]
+n_dict[label="dict"
+style=filled
+shape=rect
+]
+n_far_map[label="far
+map"
+]
+n_far_native_object[label="far native
+object
+"
+shape=rect
+]
+}
+
+subgraph cluster_0 {
+
+label="the old way"
+
+n_o_dvn[label="dict via name
+value pairs
+"
+]
+n_o_key[label="key"
+style=filled
+shape=rect
+]
+n_o_keyer[label="keyer"
+]
+n_o_dict[label="dict"
+style=filled
+shape=rect
+]
+n_o_far_map[label="far
+map
+"
+]
+n_o_far_native_object[label="far native
+object
+"
+shape=rect
+]
+}
+
+
+/* associations */
+
+n_dict->n_keyer
+n_dvn->n_dict
+n_far_map->n_dvn
+n_far_native_object->n_far_map
+n_keyer->n_key
+
+
+n_o_keyer->n_o_key
+n_o_dvn->n_o_dict
+n_o_far_native_object->n_o_far_map->n_o_dvn
+n_o_far_native_object->n_o_keyer
+
+
+label="
+fig. 423:
+
+(movement is right-to-left because in CLI far is a further out arg.)
+
+in the old way the keyer's argument was
+a native object, in the new way a dict.
+
+the old way has the \"advantage\" that the keyer can leverage
+weird native things (like a method) to make the key. the new
+way has the advantage that the keyer can see derived fields.
+
+(elliptical nodes are like \"functions\".
+rectangular nodes are like \"objects\".
+grey rectangular nodes are like \"objective objects\".)
+"
+
+rankdir=RL
+}
+/*
+#born.
+*/

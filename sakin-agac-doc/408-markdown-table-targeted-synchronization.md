@@ -96,15 +96,6 @@ x XX xx XX xx
 
 
 
-## <a name="C.2"></a>provision: leftmost column is always natural key field name
-
-the above suggests we need to know the natural key field name. this tag
-tracks the for now hard-coded assumption that the leftmost field of the
-table is this.
-
-
-
-
 ## categorized wrapping of far items (freeform discussion)
 
 as we write this we are dismantling our original conception of "item class".
@@ -149,24 +140,43 @@ item to use, IFF the first element of the tuple to use is `OK`.
 
 
 
-## <a name=E></a> name value pairs via item
+## <a name=E></a> provision: the item normalizer
+
+(when referencing this point as a provision (or otherwise), use [#418.E.2])
 
 in order for a practical synchronization to make a remote object fit in with
 our local presentation (document), we have to be able to read the remote
-objects at a component level (as name-value pairs).
+objects at a component level; that is, we will have to traverse each item's
+each name-value pair one-by-one.
 
 we cannot simply have the far format adapter provide a wrapper class: the
 far format adapter cannot know anything about the required behavior for the
 target collection (document).
 
-so the near format adapter in effect picks how the wrapper class (function)
-looks, and it relies on the far format adapter to provide a function that
-converts far native objects to a shape it can recognize and use (a stream
-of name-value pairs).
+so the near format adapter relies on the far format adapter to provide a
+function that converts far native objects to a shape it can recognize and
+use.
+
+this "lingua franca" format was once a stream (iterator) of name-value pairs,
+but at #history-A.1 this changed to be a dictionary. ALTHOUGH to provision
+it as a dictionary "feels less pure" and breaks streaminess (so it could be
+less efficient for some contrived scenarios);
+
+  - once you need random access to particular components, this choses
+    dictionaries or similar (yes you could do a "read" function instead,
+    but this lacks reflection ability on its own; and these idioms are
+    in-built when we use something as familiar as dictionaries)
+
+  - in practice in our imagined ideal scenario we are getting [#417.A]
+    streams of JSON objects anyway. to first run each item thru a normalizer
+    that presented it as an iterator of name-value pairs, and then go and
+    derive again a dictionary from such a function, was far too triggering
+    of our OCD.
 
 
 
 
 ## (document-meta)
 
+  - #history-A.1 pipeline change
   - #born.
