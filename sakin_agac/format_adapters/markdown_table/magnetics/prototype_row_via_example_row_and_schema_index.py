@@ -63,14 +63,40 @@ and come to think of it, center-aligning ASCII art seems like a misfeature.
 indeed it's a poor separation of content from presentation. the human should
 be able to change the alignment of a column (e.g from `:---` to `---:`) and
 have it not change how subsequent machine-generated rows are aligned. meh
-
-(#open [#410.S])
 """
 
 from sakin_agac import (
+        cover_me,
         sanity,
         )
 import sys
+
+
+_do_shrink_to_fit_hack = False
+"""
+these are temporary notes towars a possible solution to #open [#418.S]:
+  - the above turns on an experimental behavior that seems likely to become
+    default. it's towards a possible answer to [#410.S].
+  - at #history-A.3 we turned this on and used it to commit the generated
+    document (accompanied in the commit).
+  - (if you're going to try to use it again hackily you will have to comment
+    out a cover.me added below, too.)
+  - but this is far from integrated. we need dedicated design time to consider
+    what the ideal alignment policy should be.
+  - we are imagining a policy like this: `#eg`, `#eg `, ` #eg `, and ` #eg`
+    would express the four possible options for fixed-width policy (with the
+    leftmost being "shrink to fit" and the other 3 expressing the 3 kinds of
+    fixed-width alignment that existed when we got here). (the fact that
+    we chose tag-looking strings here is not meaningful.)
+  - note the above stands in contrast to the current way where we using
+    `---`, `:---`, `:---:` and `---:` to determine a fixed-width policy.
+    this is now deemed squarely a smell because the way you want your HTML
+    rendered should be orthogonal to whether you want to follow fixed-
+    widthisms in your ASCII art.
+  - (note too it would never make sense to have fixed-width columns unless
+    they are head-anchored and contiguous, in terms of their left-to-right
+    order as columns in the markdown table.)
+"""
 
 
 class _SELF:
@@ -233,7 +259,7 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
             new_content_w = len(new_content_string)
             total_margin_w = max_content_w - new_content_w
             if total_margin_w < 0:
-                # #coverpoint1.4 - content overlflow
+                # #coverpoint1.4 - content overflow
                 _gen = aligned_children(0, new_content_string)
             else:
                 _gen = aligned_children(total_margin_w, new_content_string)
@@ -251,7 +277,12 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
             return len(tainted_cx[offset].string_)
 
         max_content_w = w(1) + w(2) + w(3)  # for #coverpoint.2
-        aligned_children = getattr(childreners, cel_schema.alignment)
+
+        if _do_shrink_to_fit_hack:
+            use_alignment = 'align_always_shrink_to_fit'
+        else:
+            use_alignment = cel_schema.alignment
+        aligned_children = getattr(childreners, use_alignment)
 
         return f
 
@@ -260,7 +291,24 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
 
 def _childreners_via(tainted_example_cel_DOM):
 
-    class _childreners:  # namespace only
+    class _childreners:  # #class-as-namespace
+
+        """
+        each function follows the pattern:
+          1. yield a leaf DOM with the left margin spaces
+          1. yield a leaf DOM with the content string
+          1. yield a leaf DOM with the right margin spaces
+
+        the only difference is whether which functions put the zero-width
+        space as the margin at the (variously) left and/or right margin;
+        and when not, how the nonzero width of that margin is calculated
+        """
+
+        def align_always_shrink_to_fit(total_margin_w, new_content_s):
+            cover_me('this shrink-to-fit alignment worked once visually')
+            yield _spaces(0)
+            yield _fellow(new_content_s)
+            yield _spaces(0)
 
         def align_left(total_margin_w, new_content_s):  # #coverpoint4.1
             yield _spaces(0)
@@ -335,7 +383,7 @@ class _CelSchema:
         self.alignment = s
 
 
-class _cel_schemas:  # namespace only
+class _cel_schemas:  # #class-as-namespace
 
     left_aligned = _CelSchema('align_left')
     center_aligned = _CelSchema('align_center')
@@ -345,6 +393,7 @@ class _cel_schemas:  # namespace only
 
 sys.modules[__name__] = _SELF
 
+# #history-A.3 (can be temporary): dog-eared specific code
 # #history-A.2: short-circuiting out of updating single-field records moved up
 # #history-A.1: sneak merge into here to be alongside create new
 # #born.

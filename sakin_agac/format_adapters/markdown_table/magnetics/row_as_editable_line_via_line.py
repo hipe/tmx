@@ -62,7 +62,7 @@ class _RowDOM(_BranchDOM):
         last_end = 0
         ok = True
 
-        class symbols:  # namespace only
+        class symbols:  # #class-as-namespace
 
             def cel(begin, end):
                 _cel = _CelDOM()._init_via_begin_and_end(begin, end, line)

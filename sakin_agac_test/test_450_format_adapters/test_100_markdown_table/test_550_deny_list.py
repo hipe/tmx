@@ -1,5 +1,6 @@
 """
 .#covers script.heroku_add_ons.json_stream_via_website #[#410.A.1]
+.#covers script.SSGs.hugo_themes #[#410.A.1]
 
 objectives are severalfold:
     - cover scraping of this one page format
@@ -90,6 +91,43 @@ class Case250_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
 
     def far_collection_identifier(self):
         return _these_dictionaries()
+
+
+class Case270_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
+
+    def test_100_produces_something(self):
+        self.assertEqual(len(self._pairs()), 2)
+
+    def test_200_each_key_looks_fuzzy(self):
+        def f(pair):
+            return pair[0]
+        self.assertSequenceEqual(self._map(f), ('minimo', 'navigatorhugo'))
+
+    def test_300_each_business_item_has_the_things(self):
+        def f(pair):
+            dct = pair[1]
+            link = dct['hugo_theme']
+            self.assertIn(dct['label'], link)
+            self.assertIn(dct['url'], link)
+        self._walk(f)
+
+    def _walk(self, f):  # experiment
+        for x in self._pairs():
+            f(x)
+
+    def _map(self, f):  # experiment
+        return [f(x) for x in self._pairs()]
+        # we can't leave it as generator and use `assertSequenceEqual`
+
+    @shared_subject
+    def _pairs(self):
+        return self.build_pair_list_for_inspect_()
+
+    def far_collection_identifier(self):
+        return 'script/SSGs/hugo_themes.py'
+
+    def cached_document_path(self):
+        return fixture_file_path('0180-hugo-themes.html')
 
 
 class Case300_omg_syncing(ProducerCaseMethods, _CommonCase):
