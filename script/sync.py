@@ -50,9 +50,16 @@ def _my_parameters(o, param):
             argument_arity='OPTIONAL_FIELD',
             )
 
-    biz_lib.my_parameters_(o, param)
+    biz_lib.common_parameters_from_the_script_called_stream_(o, param)
 
-    def diff_desc(o, _):
+    # (the following option *should* come from the above function call but it
+    # is rarely used and probably not covered in scripts other than this one)
+    o['far_format'] = param(
+            description=biz_lib.try_help_('«the far_format»'),
+            argument_arity='OPTIONAL_FIELD',
+            )
+
+    def diff_desc(o, _):  # #open [#410.X] yield(msg) not o(msg)
         o("show only the changed lines as a diff")
 
     o['diff'] = param(

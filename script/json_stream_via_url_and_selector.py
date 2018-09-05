@@ -247,51 +247,6 @@ def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
     return cached_doc
 
 
-# -- ..
-
-def simplify_keys_(near_string_via_dict, far_string_via_dict):
-    # (transplanted from elsewhere at #history-A.1)
-
-    def use_far_string_via_dict(dct):
-        return ultra_simplified_key_via_MD_link(far_string_via_dict(dct))
-
-    def use_near_string_via_dict(dct):
-        return ultra_simplified_key_via_MD_link(near_string_via_dict(dct))
-
-    def ultra_simplified_key_via_MD_link(md_link):
-        _simp_key = simplified_key_via_markdown_link(md_link)
-        return _simp_key.replace('_', '')
-
-    from sakin_agac.format_adapters.markdown_table import (
-            simplified_key_via_markdown_link_er as _,
-            )
-    simplified_key_via_markdown_link = _()
-
-    return use_near_string_via_dict, use_far_string_via_dict
-
-
-def markdown_link_via(label, url):
-    return '[{}]({})'.format(label, url)
-
-
-def label_via_string_via_max_width(max_width):  # #coverpoint8.1
-    def f(s):
-        use_s = s[:(max_width-1)] + '…' if max_width < len(s) else s
-        # (could also be accomplished by that one regex thing maybe)
-        use_s = use_s.replace('*', '\\*')
-        use_s = use_s.replace('_', '\\_')
-        return use_s
-    return f
-
-
-def url_via_href_via_domain(domain):  # #coverpoint8.1
-    def f(href):
-        _escaped_href = href.replace(' ', '%20')
-        return url_head_format.format(_escaped_href)
-    url_head_format = '{}{}'.format(domain, '{}')  # or just ''.join((a,b))
-    return f
-
-
 def listener_and_exitstatuser_for_CLI(io):
 
     from script_lib.magnetics import listener_via_resources as _
@@ -372,6 +327,7 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A-4: key simplifier (reads markdown links) left to be with friends
 # #history-A.3: abstracted common CLI for producers
 # #history-A.2: function transplanted to here
 # #historyA.1: got rid of use of `log`

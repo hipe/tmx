@@ -28,8 +28,8 @@ class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # #coverpoint13.2
             self,
             intention,
             mixed_collection_identifier,
-            modality_resources,
             format_adapter,
+            modality_resources,
             listener
             ):
 
@@ -42,7 +42,7 @@ class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # #coverpoint13.2
             arg1, arg2 = _normalize_final_args(tup)
 
             import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
-            return _.SYNC_REQUEST_VIA_TWO_FUNCTIONS(
+            return _.SYNC_RESPONSE_VIA_TWO_FUNCTIONS(
                 release_sync_parameters_dictionary=arg1,
                 release_dictionary_stream=arg2,
                 )
@@ -137,7 +137,7 @@ def _main_work(doc_line_items, intention, listener):
 
 def __build_schema_dictionary(tlfn, field_names):
 
-    _nkfn = field_names[0]  # for now, hardcoded as this [#418.I]
+    _nkfn = field_names[0]  # for now, hardcoded as this [#418.I.2]
     return {
             '_is_sync_meta_data': True,
             'natural_key_field_name': _nkfn,

@@ -2,6 +2,21 @@
 
 this is scratching a surface. this article is stub. i can help expand it.
 
+  - currently "functional pipeline" can refer to the broad idea which begins
+    to get introduced semi-formally at document birth (months after project
+    birth); but it can also refer to several specific ideas that can be at
+    odds with each other; the subject of the next two bullets.
+
+  - NOTE :[#423.B] refers to the pipeline workflow we use at document birth,
+    which is what is depicted in our sibling digraph document.
+
+  - in contrast, we will use :[#423.C] to be a hazy placeholder for this
+    future vaporwae idea of configurable, functional pipelines.
+
+  - often the distinction isn't important except for complicated
+    synchronizations; but since there is nonetheless potential for ambiguity,
+    we must always distinguish which we mean when we use this node tag.
+
   - we are familiar with the idea of [#417.A] JSON being the lingua franca.
 
   - we can extend this idea further when we are syncing. the schema of the
@@ -51,6 +66,50 @@ ideally:
 
 
 
+## <a name=D></a> case study: how "deny list" came about
+
+this tricky pipeline came about as a balance of several requirements:
+
+  - the consumer needs its producer to have yes the custom field (that
+    combines our two idealized "raw" fields of label and url)
+
+  - the consumer needs to have a custom key that comes from a function that
+    takes as argument random access to any (so all) raw fields.
+
+  - as always the consumer can't have "strange" fields
+
+  - at #history-A.1 we no longer want any markdown coming out from the
+    "raw" producer scripts directly.
+
+so:
+  - the below "map" (far custom mapper) adds the custom field
+    (but does not, like we do in other places, remove fields)
+
+  - "inspect" gets to "see" everything that will have ever existed
+
+  - the new "deny list" strips out a known set of fields so the consumer
+    won't complain.
+                                                           (start)
+                                                              V
+                 +--------+                            +------------+
+    (done)  key, | widget | <--(deny list)             | url, label |
+                 +--------+         ^                  +------------+
+                                    |                        |
+                                (inspect)                  (map)
+                                    |                        V
+                 +--------------------+               +--------------------+
+            key, | widget, url, label |<-- (keyer) <--| widget, url, label |
+                 +--------------------+               +--------------------+
+
+
+ideally, with [#423.C] custom functional pipelines, we could accomplish
+the above with a series of maps only; with no need for special implementation
+of a deny list.
+
+
+
+
 ## (document-meta)
 
+  - #history-A.1
   - #abstracted

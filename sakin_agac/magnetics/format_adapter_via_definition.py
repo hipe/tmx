@@ -60,18 +60,13 @@ class _FormatAdapter:
     def collection_reference_via_string(self, coll_id):
         return _CollectionReference(coll_id, self)
 
-    def open_filter_request_(self, coll_id, rsx, listener):
+    def _open_filter_request(self, trav_req):
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
             yield ('open_filter_request', 'thing ding NUMERO DOS')
-        return self._open_traversal_request(dig_f, coll_id, rsx, listener)
+        return self._open_traversal_request(dig_f, trav_req)
 
-    def open_sync_request_(
-            self,
-            mixed_collection_identifier,
-            modality_resources,
-            listener,
-            ):  # #testpoint
+    def _open_sync_request(self, trav_req):  # #testpoint
         """
         note:
 
@@ -82,16 +77,14 @@ class _FormatAdapter:
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
             yield ('open_sync_request', 'thing ding two')
-        return self._open_traversal_request(
-                dig_f, mixed_collection_identifier, modality_resources,
-                listener)
+        return self._open_traversal_request(dig_f, trav_req)
 
-    def _open_traversal_request(self, dig_f, coll_id, rsx, listener):
+    def _open_traversal_request(self, dig_f, trav_req):
 
-        f = self.DIG_HOI_POLLOI(dig_f(), listener)
+        f = self.DIG_HOI_POLLOI(dig_f(), trav_req.listener)
         if f is None:
             return  # #coverpoint5.1 GONE at #history-A.1 (see c.p tombstone)
-        return f(coll_id, rsx, self, listener)
+        return f(trav_req)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
         """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
@@ -166,19 +159,48 @@ class _CollectionReference:
         self.collection_identifier_string = s
         self.format_adapter = fa
 
-    def open_filter_request(self, resources, listener):
-        return self._same('open_filter_request_', resources, listener)
+    def open_filter_request(self, **kwargs):
+        _ = self._build_traversal_request(**kwargs)
+        return self.format_adapter._open_filter_request(_)
 
-    def open_sync_request(self, resources, listener):
-        return self._same('open_sync_request_', resources, listener)
+    def open_sync_request(self, **kwargs):
+        _ = self._build_traversal_request(**kwargs)
+        return self.format_adapter._open_sync_request(_)
 
-    def _same(self, meth, resources, listener):
-        return getattr(self.format_adapter, meth)(
-                self.collection_identifier_string, resources, listener)
+    def _build_traversal_request(self, **kwargs):
+        return _TravRequest(
+                collection_identifier=self.collection_identifier_string,
+                format_adapter=self.format_adapter,
+                **kwargs)
 
     @property
     def format_name(self):
         return self.format_adapter.format_name
+
+
+class _TravRequest:
+    # (sprung of necessity from param list growing too long at #history-A.4)
+
+    def __init__(
+            self, cached_document_path, collection_identifier,
+            format_adapter, datastore_resources, listener):
+        self.cached_document_path = cached_document_path
+        self.collection_identifier = collection_identifier
+        self.format_adapter = format_adapter
+        self.datastore_resources = datastore_resources
+        self.listener = listener
+
+    def to_dictionary(self):
+        def f():
+            yield 'cached_document_path'
+            yield 'collection_identifier'
+            yield 'format_adapter'
+            yield 'datastore_resources'
+            yield 'listener'
+        o = {}
+        for attr in f():
+            o[attr] = getattr(self, attr)
+        return o
 
 
 _empty_hash = {}
@@ -187,6 +209,7 @@ _empty_hash = {}
 import sys  # noqa: E402
 sys.modules[__name__] = _FormatAdapter  # #[#008.G] so module is callable  # noqa: E501
 
+# #history-A-4: as referenced
 # #history-A.3: as referenced
 # #history-A.2: as referenced
 # #history-A.1: removed item class ("wrapper")

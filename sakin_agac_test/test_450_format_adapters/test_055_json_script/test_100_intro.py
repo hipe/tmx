@@ -30,7 +30,11 @@ class _CommonCase(unittest.TestCase):
         msgs, listener = ts.minimal_listener_spy()
 
         _cr = _build_collection_reference(s)
-        cm = _cr.open_sync_request(None, listener)
+
+        cm = _cr.open_sync_request(
+                cached_document_path=None,
+                datastore_resources=None,
+                listener=listener)
         None if cm is None else sanity()
 
         None if 1 == len(msgs) else sanity()
@@ -63,10 +67,13 @@ class Case100(_CommonCase):
         _cref = _build_collection_reference(_path)
         # from script_lib import filesystem_functions as rsx
         rsx = "you don't need filesystem resources yet"
-        _sess = _cref.open_sync_request(rsx, 'listener')
-        with _sess as sync_request:
-            sync_params = sync_request.release_traversal_parameters()
-            dict_stream = sync_request.release_dictionary_stream()
+        _cm = _cref.open_sync_request(
+                cached_document_path=None,
+                datastore_resources=rsx,
+                listener=__file__)
+        with _cm as sync_response:
+            sync_params = sync_response.release_traversal_parameters()
+            dict_stream = sync_response.release_dictionary_stream()
         self.assertEqual(sync_params.natural_key_field_name, 'xyzz 01')
         these = [x for x in dict_stream]
         self.assertEqual(len(these), 1)

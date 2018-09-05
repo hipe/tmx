@@ -20,7 +20,11 @@ class _CommonCase(unittest.TestCase):
         return _State(business_objects, first)
 
     def _run(self, path, listener):
-        _cm = _subject_module().open_traversal_stream(path, listener)
+        _cm = _subject_module().open_traversal_stream(
+                intention=None,
+                cached_document_path=None,
+                collection_identifier=path,
+                listener=listener)
         with _cm as dcts:
             first = None
             try:

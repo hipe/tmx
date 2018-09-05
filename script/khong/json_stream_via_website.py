@@ -5,6 +5,7 @@
 (this is the content-producer of the producer/consumer pair)
 (the first row (line) is metadata about syncing)
 """
+# #[#410.1.2] this is a producer script.
 
 
 _domain = 'http://www.bogotobogo.com'
@@ -324,7 +325,7 @@ def _all_these_functions(emit):
         _lesson = markdown_link_via(_use_label, _url)
         return {'lesson': _lesson}
 
-    o = _ad_hoc_lib()
+    o = _md_lib()
     markdown_link_via = o.markdown_link_via
     url_via_href = o.url_via_href_via_domain(_domain)
     label_via_string = o.label_via_string_via_max_width(70)
@@ -366,6 +367,11 @@ def cover_me(msg=None):
 @_this_lazy
 def sanity(msg=None):
     pass
+
+
+def _md_lib():
+    import script.markdown_document_via_json_stream as _
+    return _
 
 
 def _ad_hoc_lib():

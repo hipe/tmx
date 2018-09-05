@@ -1,5 +1,5 @@
 """
-#covers: script.tag_lyfe.json_stream_via_bernstein
+.#covers: script.tag_lyfe.json_stream_via_bernstein #[#410.A.1]
 
 at the birth commit of this file there are several comments explaning the
 origin story of the counterpart asset in its particular current implementation.

@@ -61,7 +61,7 @@ def _my_parameters(o, param):
         o['zub_zub'] = _
 
     import script.stream as siblib2
-    siblib2.parameters_for_the_script_called_stream_(o, param)
+    siblib2.common_parameters_from_the_script_called_stream_(o, param)
 
 
 def _the_function_called_required(self, prp, x):
@@ -110,7 +110,7 @@ def _query_and_collection_id_via_ARGV(sin, serr, argv, listener):
     rs2 = _parse_args(sin, serr, [program_name, *args_after_query])
     if not rs2.OK:
         return rs2
-    coll_id = getattr(rs2.namespace, 'collection-identifier')  # #open [#601]
+    coll_id = getattr(rs2.namespace, 'far-collection')  # #open [#601]
     del(rs2)
 
     if hack_after is not None:
@@ -129,9 +129,10 @@ class _TheseTwo:
 def _filtered_items_via_query_and_collection_id(query, coll_id, listener):  # noqa: E501 #testpoint
     import script.stream as siblib2
     _ = siblib2.open_traversal_stream(
-            coll_id, listener,
             intention='tag_lyfe_filter',
-            )
+            cached_document_path=None,
+            collection_identifier=coll_id,
+            listener=listener)
     with _ as dcts:
 
         ks = _tag_lyfe_field_names_via(dcts, listener)

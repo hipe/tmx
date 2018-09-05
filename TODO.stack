@@ -87,7 +87,3 @@ sub-project: upload files to s3
 (-tag-lyfe.1.1.11.1 Index manually every theme with notes, resolve a set of zero to N themes you want to synthesize from.
 (-tag-lyfe.1.1.11.2 holy god how are you doing to do deep scrap. parse the TOML.
 (-tag-lyfe.1.1.11.3 Add new producer that is a shallow scrape of the themes..
-(-tag-lyfe.1.1.11.4 Add map-for-sync script (commit empty markdown table file (have notes field))
-  - see mention of [#410.F] map for sync in comment
-  - custom_mapper_OLDSCHOOL needs some kind of love
-(-tag-lyfe.1.1.11.5 Refactor towards map for sync

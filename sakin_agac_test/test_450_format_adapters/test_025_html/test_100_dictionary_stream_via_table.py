@@ -1,4 +1,6 @@
 """
+.#covers script.tag_lyfe.json_stream_via_python_wiki #[#410.A.1]
+
 .:#coverpoint12: multi-axis coverage from this script-test:
 
   - cover the particular producer script (used for business) and
@@ -99,12 +101,12 @@ class Case100_hello(_CommonCase):
         # use_listener = lib.for_DEBUGGING (works)
         use_listener = lib.listener_via_emission_receiver(emissions.append)
 
-        _eek = _subject_module().open_dictionary_stream(
+        _ = _subject_module().open_dictionary_stream(
                 html_document_path=fixture_file_path('0130-tag-subtree.html'),
                 listener=use_listener,
                 )
 
-        with _eek as dcts:
+        with _ as dcts:
             head_dct = next(dcts)
             objs = [dct for dct in dcts]
 

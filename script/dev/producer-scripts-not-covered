@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ ! -e mono-repo.test-these.list ] ; then
+  echo "run this from root of mono-repo"
+  exit 3
+fi
+
+if [ "$#" -ne 0 ] ; then
+  echo "usage: $0"
+  echo ""
+  echo "description: shows which producer scripts still need coverage."
+  exit 3
+fi
+
+dot () {
+  >&2 echo -n '.'
+}
+
+tmp1="z/tmp.covered.list"
+tmp2="z/tmp.scripts.list"
+
+dot
+ack -h '\[\#410\.A\.1' sakin_agac_test | awk '{print $2}' | sort | uniq > "$tmp1"
+dot
+ack -l '\[\#410\.1\.2' script | ruby -lne 'puts $_.gsub("/", ".")[0..-4]' | sort | uniq > "$tmp2"
+dot
+>&2 echo ''
+diff "$tmp1" "$tmp2"
+
+rm "$tmp1" "$tmp2"
+
+# #born.

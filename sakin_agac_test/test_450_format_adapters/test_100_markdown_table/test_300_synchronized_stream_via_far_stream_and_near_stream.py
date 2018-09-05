@@ -224,7 +224,7 @@ class Case383_in_this_case_mono_value_does_YES_update(_CommonCase):
     .#coverpoint1.7: (integration of the last 2 coverpoints) IF all of:
       - the far record only has one field (name-value pair)
         (assume it's a human-key field)
-      - the custom_keyer_for_syncing doo-hah exists
+      - there's a custom keyer for syncing
 
     THEN: yes do the record-level sync (update)
     """
@@ -334,6 +334,7 @@ def _section_list_via(far_dicts, mixed_near):
                 normal_far_stream=iter(normal_far_dicts),
                 near_tagged_items=near_tagged_items,
                 near_keyerer=near_keyer,
+                far_deny_list=None,
                 listener=__file__,
                 )
 
@@ -422,11 +423,13 @@ class _MyCustomProcessor:
 @memoize
 def _same_far_keyer():
     return _here() + 'Chimmy_Chamosa_001_far'  # (in this file)
+    # return Chimmy_Chamosa_001_far
 
 
 @memoize
 def _same_near_keyer():
-    return _here() + 'Chimmy_Chamosa_001_near'  # (in this file)
+    # return _here() + 'Chimmy_Chamosa_001_near'  # (in this file)
+    return Chimmy_Chamosa_001_near
 
 
 @memoize
@@ -451,7 +454,7 @@ def Chimmy_Chamosa_001_far(traversal_params, listener):
     return key_via_normal_dict
 
 
-def Chimmy_Chamosa_001_near(complete_schema, key_via_row_DOM_normally, listen):
+def Chimmy_Chamosa_001_near(key_via_row_DOM_normally, complete_schema, listen):
     """at #history-A.3 this changed, symmetry broke"""
 
     def key_via_row_DOM(row_DOM):

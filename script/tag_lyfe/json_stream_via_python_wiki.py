@@ -5,6 +5,7 @@ generate a stream of JSON from {url}
 
 (this is the content-producer of the producer/consumer pair)
 """
+# #[#410.1.2] this is a producer script.
 
 
 _domain = 'https://wiki.python.org'
@@ -43,6 +44,8 @@ def open_dictionary_stream(html_document_path, listener):
                 'field_names': field_names,  # coverpoint [#708.2.2]
                 'traversal_will_be_alphabetized_by_human_key': False,
                 'custom_keyer_for_syncing': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+                # above is broken for syncing,
+                # #not-covered since #history-A.2 or before
                 }
 
         for dct in table_o:
@@ -61,7 +64,7 @@ def open_dictionary_stream(html_document_path, listener):
 
 def _this_more_complicated_string_via_td():
 
-    o = _top_html_lib()
+    o = _md_lib()
     markdown_link_via = o.markdown_link_via
     url_via_href = o.url_via_href_via_domain(_domain)
     # label_via_string = o.label_via_string_via_max_width(70)
@@ -92,6 +95,11 @@ def _string_via_el(el):  # td.text() would be same, but this gives sanity
     return navigable_string.strip()
 
 
+def _md_lib():
+    import script.markdown_document_via_json_stream as _
+    return _
+
+
 def _top_html_lib():
     import script.json_stream_via_url_and_selector as lib
     return lib
@@ -108,5 +116,6 @@ if __name__ == '__main__':
             )
     exit(_exitstatus)
 
+# #history-A.2: key simplifier found to be not covered and left broken
 # #history-A.1: key simplifier gets extracted
 # #born

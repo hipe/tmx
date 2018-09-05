@@ -44,7 +44,7 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
 |                   #410.Y  | #wish | customizable functional pipelines (map, filter in any order etc)
-|                   #410.X  | #hole |
+|                   #410.X  | #open | change `o(msg)` to `yield msg`
 |                   #410.W  |       | [the magnetic that loads a function via a string]
 |                   #410.V  | #open | (no taggings) sync on a markdown file with no table should complain
 |                   #410.U  | #open | visible seams to clean up when things are stable
@@ -66,6 +66,8 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #410.D  | #trak | spots to change if we add this feature (see)
 |                   #410.C  | #wish | we want regex escape
 |                   #410.B  | #open | absorb small graph into big graph
+|                   #410.1.2| #trak | track producer scripts
+|                   #410.A.1| #trak | track where we cover specific producer scripts
 |                   #410    |       | (internal tracking)
 |<a name=409></a>[\[#409\]] |       | parsing markdown tables in documents
 |<a name=408></a>[\[#408\]] |       | decompose the algorithm

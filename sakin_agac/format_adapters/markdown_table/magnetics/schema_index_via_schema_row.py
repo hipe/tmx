@@ -144,7 +144,7 @@ class _SchemaIndex:
         return self.__field_readerer(field_name)
 
     def natural_key_field_name__(self):
-        return self.field_names__[0]  # assume [#418.I] first is it
+        return self.field_names__[0]  # assume [#418.I.2] first is it
 
 
 def _the_index_components_via(cels_count, header_row1_DOM):

@@ -93,8 +93,17 @@ class _Newstream_via:
             normal_far_stream,
             near_tagged_items,
             near_keyerer,
+            far_deny_list,  # may be temporary. see [#418.I.3.2]
             listener,
             ):
+
+        if far_deny_list is not None:
+            def f(pair):
+                dct = pair[1]
+                for key in far_deny_list:
+                    dct.pop(key)  # ..
+                return pair
+            normal_far_stream = (f(x) for x in normal_far_stream)
 
         # --
         self._normal_far_stream = normal_far_stream
@@ -252,22 +261,18 @@ class _Newstream_via:
     def __procure_pair_via_near(self):
 
         def key_via_row_DOM_normally(row_DOM):
-            # for now KISS and #provision [#418.I] (leftmost is guy)
+            # for now KISS and #provision [#418.I.2] (leftmost is guy)
             return row_DOM.cel_at_offset(0).content_string()
 
-        func_id = pop_property(self, '_near_keyerer')
-        if func_id is None:
+        f_f = pop_property(self, '_near_keyerer')
+        if f_f is None:
             use_key_via_row_DOM = key_via_row_DOM_normally
         else:
-            import sakin_agac.magnetics.function_via_function_identifier as _
-            f_f = _(func_id, self._listener)
-            if f_f is None:
-                return
-
             # #coverpoint1.6
             use_key_via_row_DOM = f_f(
+                    key_via_row_DOM_normally,
                     self._complete_schema,
-                    key_via_row_DOM_normally, self._listener)
+                    self._listener)
 
             if use_key_via_row_DOM is None:
                 return  # bruh

@@ -11,6 +11,8 @@ orginally this scraped HTML but more conveniently the raw markdown is
 available to us, exposed by github over plain old HTTP. so at #history-A.1
 this refactored quite smoothly into pioneering the idea of scraping
 markdown instead (sidestepping the #html2markdown problem).
+
+.#[#410.1.2] this is a producer script.
 """
 
 
@@ -61,7 +63,7 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         we emit a meta record based off that one BUT with the field names
         changed to reflect etc.
 
-          - assume #provision [#418.I] that the natural key field name
+          - assume #provision [#418.I.2] that the natural key field name
             is leftmost (here in the near field names (which are derived))
 
         #abstraction-candidate: the format adaptation of [#410.J] the record
@@ -73,6 +75,8 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         o['natural_key_field_name'] = near_field_names[0]  # (per above provis)
         o['field_names'] = near_field_names
         o['custom_keyer_for_syncing'] = 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+        # above is broken for syncing,
+        # #not-covered since #history-A.3 or before
         o['traversal_will_be_alphabetized_by_human_key'] = False
         return o
 
@@ -90,7 +94,11 @@ class open_traversal_stream:  # #[#410.F] class as context manager
 
     def __open_traversal_stream(self):
         from script.stream import open_traversal_stream as _
-        return _(self._cached_doc.cache_path, self._listener)
+        return _(
+                cached_document_path=None,
+                collection_identifier=self._cached_doc.cache_path,
+                intention=None,
+                listener=self._listener)
 
     def __resolve_cached_doc(self):
         markdown_path = self._markdown_path
@@ -197,6 +205,7 @@ if __name__ == '__main__':
             )
     exit(_exitstatus)
 
+# #history-A.3: key simplifier found to be not covered and left broken
 # #history-A.1: birth of the expression "collection meta-record"
 # #history-A.1: wow rewrite half so it scrapes markdown not HTML
 # #born

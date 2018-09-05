@@ -3,6 +3,7 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
+        sanity,
         )
 
 
@@ -35,11 +36,13 @@ def _new_doc_lines_via_sync(
 
         _normal_far_st = far.release_normal_far_stream()
         _tagged_line_items = near.release_tagged_doc_line_item_stream()
+        _far_deny_list = far.far_deny_list
         from .magnetics import synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
         return _.OPEN_NEWSTREAM_VIA(
                 normal_far_stream=_normal_far_st,
                 near_tagged_items=_tagged_line_items,
                 near_keyerer=near.keyerer,
+                far_deny_list=_far_deny_list,
                 listener=listener,
                 )
 
@@ -55,9 +58,10 @@ def _new_doc_lines_via_sync(
 
     def open_far():
         return lib.OPEN_FAR_SESSION(
+                cached_document_path=None,  # for testing only
                 far_collection_reference=far_collection_reference,
                 custom_mapper_OLDSCHOOL=custom_mapper_OLDSCHOOL,
-                filesystem_functions=filesystem_functions,
+                datastore_resources=filesystem_functions,
                 listener=listener,
                 )
 
@@ -107,9 +111,32 @@ def _liner():
     return _Liner()
 
 
-def _open_trav_request(*_):
-    from .magnetics import open_traversal_request_via_path
-    return open_traversal_request_via_path.OPEN_TRAVERSAL_REQUEST_VIA_PATH(*_)
+def _open_fiter_request(trav_req):
+    return _open_trav_request('filter', **trav_req.to_dictionary())
+
+
+def _open_sync_request(trav_req):
+    return _open_trav_request('sync', **trav_req.to_dictionary())
+
+
+def _open_trav_request(
+        intention,
+        cached_document_path,
+        collection_identifier,
+        format_adapter,
+        datastore_resources,
+        listener):
+
+    if cached_document_path is not None:
+        sanity("markdown tables are always how you say 'cached'")
+
+    from .magnetics import open_traversal_request_via_path as _
+    return _.OPEN_TRAVERSAL_REQUEST_VIA_PATH(
+            mixed_collection_identifier=collection_identifier,
+            format_adapter=format_adapter,
+            intention=intention,
+            modality_resources=datastore_resources,
+            listener=listener)
 
 
 class ExpectedTagOrder_:
@@ -147,46 +174,13 @@ class ExpectedTagOrder_:
         return self._stack[-1][0] == tag
 
 
-# --
-
-def simplified_key_via_markdown_link_er():
-    """the only reason this is a function that builds a function (instead
-
-    of just a function) is so we lazy-(ish)-load the dependency modules.
-    one place this is covered is *as* test support under #coverpoint13.
-    which makes this also a #testpoint.
-    this is nowhere near #html2markdown except that it crudely parses
-    a tiny sub-slice of markdown.
-    """
-
-    def simplified_key_via_markdown_link(markdown_link_string):
-        """my hands look like this "[Foo Fa 123](bloo blah)"
-
-        so hers can look like this "foo_fa_123"
-        """
-
-        md = first_pass_rx.search(markdown_link_string)
-        if md is None:
-            _tmpl = 'failed to parse as markdown link - %s'
-            cover_me(_tmpl % markdown_link_string)
-
-        return normal_via_str(md.group(1))
-
-    import re
-    first_pass_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
-    import sakin_agac.magnetics.normal_field_name_via_string as normal_via_str
-    return simplified_key_via_markdown_link
-
-
-# --
-
 _functions = {
         'CLI': {
             'new_document_lines_via_sync': _new_doc_lines_via_sync,
             },
         'modality_agnostic': {
-            'open_filter_request': lambda *a: _open_trav_request('filter', *a),
-            'open_sync_request': lambda *a: _open_trav_request('sync', *a),
+            'open_filter_request': _open_fiter_request,
+            'open_sync_request': _open_sync_request,
             },
         }
 

@@ -91,7 +91,7 @@ class Case100_hello(_CommonCase):
         self.assertEqual('v5.1.3', dct['version'])
 
     def test_440_version_that_is_just_integer_no_dot(self):
-        dct = self._record('berkeley_yacc')
+        dct = self._record('berkeleyyacc')
         self.assertEqual(dct['version'], 'v20141128')
 
     def test_450_complicated_version_with_spaces(self):

@@ -13,7 +13,7 @@ from modality_agnostic import (
 next_or_none = _.next_or_none
 
 
-class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
+class SYNC_RESPONSE_VIA_DICTIONARY_STREAM:
     """experiment...
 
     a sync request is:
@@ -44,7 +44,7 @@ class SYNC_REQUEST_VIA_DICTIONARY_STREAM:
         return pop_property(self, '_dict_stream_part_two')
 
 
-class SYNC_REQUEST_VIA_TWO_FUNCTIONS:
+class SYNC_RESPONSE_VIA_TWO_FUNCTIONS:
 
     def __init__(
             self,
@@ -100,6 +100,7 @@ class _TraversalParameters:
             custom_far_keyer_for_syncing=None,
             custom_near_keyer_for_syncing=None,
             custom_pass_filter_for_syncing=None,
+            far_deny_list=None,
             ):
 
         if _is_sync_meta_data is not True:
@@ -113,13 +114,15 @@ class _TraversalParameters:
         self.custom_far_keyer_for_syncing = custom_far_keyer_for_syncing
         self.custom_near_keyer_for_syncing = custom_near_keyer_for_syncing
         self.custom_pass_filter_for_syncing = custom_pass_filter_for_syncing
+        self.far_deny_list = far_deny_list
 
-    traversal_parameters_version = 3
+    traversal_parameters_version = 4
 
     # bump this WHEN you add to constituency (#provision [#418.J])
+    # bumped from 3 to 4 at #history-A.6
     # bumped from 2 to 3 at #history-A.5
 
-    def to_dictionary(self):  # (just for debugging)
+    def to_dictionary(self):
         dct = {'_is_sync_meta_data': True}
         o = _specialty_thing(dct, self)
         o('natural_key_field_name')
@@ -130,6 +133,7 @@ class _TraversalParameters:
         o('custom_far_keyer_for_syncing')
         o('custom_near_keyer_for_syncing')
         o('custom_pass_filter_for_syncing')
+        o('far_deny_list')
         return dct
 
 
@@ -456,6 +460,7 @@ def _empty_iterator():
     return iter(())
 
 
+# #history-A.6: bumped version because added deny list
 # #history-A.5: bumped version because added several components
 # #history-A.4: sunset diminishing pool algorithm while spike interleaving
 # #history-A.2: when wrapper fails (sketch)

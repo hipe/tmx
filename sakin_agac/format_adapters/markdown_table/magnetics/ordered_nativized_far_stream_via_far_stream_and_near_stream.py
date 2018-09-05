@@ -140,14 +140,18 @@ def __process_near_opts(
 
 
 def OPEN_FAR_SESSION(
+        cached_document_path,
         far_collection_reference,
-        filesystem_functions,
+        datastore_resources,
         listener,
-        custom_mapper_OLDSCHOOL=None,
+        custom_mapper_OLDSCHOOL=None,  # see [#418.I.4]
         ):
 
     sr_cm = far_collection_reference.open_sync_request(
-            filesystem_functions, listener)
+            cached_document_path=cached_document_path,
+            datastore_resources=datastore_resources,
+            listener=listener)
+
     if sr_cm is None:
         return _not_OK_when_CM_expected()  # #coverpoint5.10
 
@@ -162,7 +166,6 @@ def OPEN_FAR_SESSION(
                 cover_me('wee')
 
             return _OpenFarSession(*tup)
-            # --
 
         def __exit__(self, *_):
             return sr_cm.__exit__(*_)
@@ -184,6 +187,10 @@ def OPEN_FAR_SESSION(
             o['custom_near_keyer_for_syncing'] = _
             return o
 
+        @property
+        def far_deny_list(self):
+            return self._traversal_parameters.far_deny_list
+
         OK = True
 
     return _OpenFarSessionContextManager()
@@ -192,7 +199,7 @@ def OPEN_FAR_SESSION(
 def _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener):
     """
     so:
-        - here we implement exactly [#423] (a graph-viz graph)
+        - here we implement exactly [#423.B] (a graph-viz graph)
 
         - here is where we first thought of #wish [#410.Y] customizable
           functional pipelines (so you could map before or after filter
@@ -209,7 +216,7 @@ def _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener):
     del(sync_request)
     # --
 
-    if 3 != tp.traversal_parameters_version:
+    if 4 != tp.traversal_parameters_version:
         raise Exception('woot - #provision [#418.J] - parameters added')
 
     is_ordered = tp.traversal_will_be_alphabetized_by_human_key
@@ -338,13 +345,41 @@ def __procure_any_map(tp, custom_mapper_OLDSCHOOL, listener):
         if has_map_passed_directly:
             cover_me('we would rather not end up with two maps here..')
         else:
-            cover_me('far mapper specified in schema needs to be covered')
+            use_map = _CRAZY_TIME(map_id, listener)
+            ok = False if use_map is None else True
     elif has_map_passed_directly:
+        ok = True
         use_map = custom_mapper_OLDSCHOOL  # #coverpoint9.1.1
     else:
+        ok = True
         use_map = None
 
-    return (True, use_map)
+    return (ok, use_map)
+
+
+def _CRAZY_TIME(map_id, listener):
+    """(static arguments in function identifiers #stub [#418.I.5]"""
+
+    import re
+    md = re.match(r'^(.+)\(([^)]+)\)$', map_id)
+    if md is None:
+        cover_me('xx')
+
+    func_id, arg = md.groups()
+
+    f_f = _procure_func_via_func_identifier(func_id, listener)
+    if f_f is None:
+        return
+
+    md = re.match(r'^"([^"]+)"$', arg)
+    if md is None:
+        cover_me('currently hardcoded to take one string-looking argument')
+
+    f = f_f(md[1], listener)
+    if f is None:
+        cover_me('client function function did not return function')
+
+    return f  # #coverpoint15.1
 
 
 def _not_OK_when_CM_expected():

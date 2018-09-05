@@ -100,8 +100,8 @@ import re
 from os import path as os_path
 
 
-def _open_trav_request(*a):
-    return _OpenTravRequest(*a).execute()
+def _open_trav_request(trav_req):
+    return _OpenTravRequest(** trav_req.to_dictionary()).execute()
 
 
 class _OpenTravRequest:
@@ -113,14 +113,16 @@ class _OpenTravRequest:
 
     def __init__(
             self,
-            mixed_collection_identifier,
-            modality_resources,
+            cached_document_path,
+            collection_identifier,
+            datastore_resources,
             format_adapter,
             listener,
             ):
 
-        self._filesystem_path = mixed_collection_identifier
-        self._fiesystem_functions = modality_resources
+        self._cached_document_path = cached_document_path
+        self._filesystem_path = collection_identifier
+        self._fiesystem_functions = datastore_resources
         self._format_adapter = format_adapter
         self._listener = listener
         self._OK = True
@@ -145,7 +147,8 @@ class _OpenTravRequest:
         _stem = pop_property(self, '_normal_stem')
         _name = _stem.replace('/', '.')
         _mod = importlib.import_module(_name)  # ..
-        _sess = _mod.open_dictionary_stream(None, self._listener)  # ..
+        _sess = _mod.open_dictionary_stream(
+                self._cached_document_path, self._listener)
         self._dictionary_stream_session = _sess
 
     def __resolve_normal_stem_via_path_stem(self):
@@ -232,7 +235,7 @@ class _MyContextManager:
         _dictionary_stream = self._the_worst.__enter__()
 
         import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
-        return _.SYNC_REQUEST_VIA_DICTIONARY_STREAM(
+        return _.SYNC_RESPONSE_VIA_DICTIONARY_STREAM(
                 _dictionary_stream,
                 self._format_adapter,
                 )

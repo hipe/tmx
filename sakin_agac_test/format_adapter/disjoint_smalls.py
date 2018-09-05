@@ -45,7 +45,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
 
     def fuzzy_key(dct):
         return simplified_key_via_markdown_link(dct['name'])
-    from sakin_agac.format_adapters.markdown_table import (
+    from script.markdown_document_via_json_stream import (
             simplified_key_via_markdown_link_er as _,
             )
     simplified_key_via_markdown_link = _()

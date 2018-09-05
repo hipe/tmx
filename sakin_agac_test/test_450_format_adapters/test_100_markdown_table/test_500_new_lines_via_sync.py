@@ -1,4 +1,5 @@
 # #covers: script.sync
+
 from _init import (
         build_end_state_commonly,
         fixture_executable_path,

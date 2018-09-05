@@ -73,13 +73,25 @@ def OPEN_TAGGED_DOC_LINE_ITEM_STREAM(upstream_path, listener):
 
 def __open_upstream_path(upstream_path):
     if isinstance(upstream_path, str):
-        result = open(upstream_path)
-    elif isinstance(upstream_path, tuple):
-        from sakin_agac import my_contextlib as _
-        result = _.context_manager_via_iterator__(upstream_path)
+        return open(upstream_path)
     else:
-        raise Exception("can we keep this simple? had %s" % type(upstream_path))  # noqa: E501
-    return result
+        return __open_upstream_path_challenge_mode(upstream_path)
+
+
+def __open_upstream_path_challenge_mode(x):
+    if isinstance(x, tuple):
+        yes = True
+    else:
+        import collections.abc
+        if isinstance(x, collections.abc.Iterable):
+            yes = True  # like a generator, #coverpoint16
+        else:
+            yes = False
+    if yes:
+        from sakin_agac import my_contextlib as my_clib
+        return my_clib.context_manager_via_iterator__(x)
+    else:
+        raise Exception(f'can we keep this simple? had {type(x)}')
 
 
 class _Parse:

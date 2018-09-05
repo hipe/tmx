@@ -27,31 +27,19 @@ class _open_traversal_request:
         or even (maybe?) database connections (or whatever)
     """
 
-    def __init__(
+    def __init__(self, trav_req):
+        self._init(** trav_req.to_dictionary())
+
+    def _init(
             self,
-            mixed_collection_identifier,
-            modality_resources,
+            cached_document_path,
+            collection_identifier,
             format_adapter,
-            listener,
-            ):
-
-        """[constructor..]
-
-        mixed_collection_identifier -- (#open [#410.U] explain this)
-
-        modality_resources -- (#open: how do we know we're getting the right 1?
-                    this is #open [#410.U].)
-
-        format_adapter -- although typically you are here sitting in the
-                    same module that builds this selfsame format adapter,
-                    we don't want to rely on that assumption.
-
-        listener -- a callback following our [#017] listener pattern.
-                    can be used as a logger. can be used for more, too.
-        """
+            datastore_resources,
+            listener):
 
         # for this format adapter the identifier *is* the collection
-        self._mixed_collection_identifier = mixed_collection_identifier
+        self._mixed_collection_identifier = collection_identifier
         self._format_adapter = format_adapter
 
     def __enter__(self):  # how to be an execution context
@@ -73,7 +61,7 @@ class _open_traversal_request:
 
         format_adapter = _pop_property(self, '_format_adapter')
 
-        return _sync_lib().SYNC_REQUEST_VIA_DICTIONARY_STREAM(
+        return _sync_lib().SYNC_RESPONSE_VIA_DICTIONARY_STREAM(
                 use_stream,
                 format_adapter,
                 )

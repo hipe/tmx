@@ -84,7 +84,11 @@ def NORMALIZE_NEAR_ETC_AND_FAR(far_dicts):
 
     _far_col_ref = _far_FA.collection_reference_via_string(far_dicts)
 
-    _ = _mag_wee().OPEN_FAR_SESSION(_far_col_ref, None, None)
+    _ = _mag_wee().OPEN_FAR_SESSION(
+            cached_document_path=None,
+            far_collection_reference=_far_col_ref,
+            datastore_resources=None,
+            listener=__file__)
 
     with _ as far_session:
         None if far_session.OK else sanity()
@@ -101,7 +105,11 @@ def NORMALIZE_FAR(callback, far_path):
 
     _far_col_ref = collection_reference_via_(far_path, __file__)
 
-    _ = _mag_wee().OPEN_FAR_SESSION(_far_col_ref, None, __file__)
+    _ = _mag_wee().OPEN_FAR_SESSION(
+            cached_document_path=None,
+            far_collection_reference=_far_col_ref,
+            datastore_resources=None,
+            listener=__file__)
 
     with _ as far_session:
         None if far_session.OK else sanity()

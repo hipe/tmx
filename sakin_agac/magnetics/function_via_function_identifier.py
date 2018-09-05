@@ -43,7 +43,8 @@ user-provided functions can be specified to be used to map *unsanitized*
 human keys to *normal* human keys. (we won't "see" the normal keys, they'll
 just be used internally. in fact, we might even drop the qualifier "human".)
 there will be one function for near keys and one for far.
-(#open [#410.F] will change this.)
+
+(now you can use [#418.I.3.1] the "map for sync" inspection to see it.)
 
 the thing we're trying to get is a key (one key for one record). we may
 name a function that makes keys (from unsanitized keys) a "keyer". but

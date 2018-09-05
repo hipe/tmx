@@ -1,5 +1,5 @@
 """
-#covers: script/khong/markdown_via_json_stream
+.#covers: script.khong.markdown_via_json_stream
 (also provides coverage for [#608.2] :[#414.2])
 """
 

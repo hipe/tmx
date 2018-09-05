@@ -1,3 +1,8 @@
+"""
+.#covers script.khong.json_stream_via_website #[#410.A.1]
+"""
+
+
 from _init import (
         fixture_file_path,
         )
@@ -42,7 +47,7 @@ class Case200(_CommonCase):
         # use_listener = lib.for_DEBUGGING (works)
         use_listener = lib.listener_via_emission_receiver(emissions.append)
 
-        _eek = _subject_module().open_dictionary_stream(
+        _cm = _subject_module().open_dictionary_stream(
                 html_document_path=fixture_file_path('0120-real-subtree.html'),
                 listener=use_listener,
                 )
@@ -59,7 +64,7 @@ class Case200(_CommonCase):
                 self.item_strings = []
                 self.header_content = s
 
-        with _eek as json_objs:
+        with _cm as json_objs:
             json_obj = next(json_objs)
             json_obj['_is_sync_meta_data']  # assert
             for json_obj in json_objs:

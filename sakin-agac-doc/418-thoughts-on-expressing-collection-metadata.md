@@ -33,7 +33,7 @@ error reporting geared towards your .. intention.
 
 ## <a name=3></a>heuristic templating
 
-this relates to #open [#410.S] which (discussed there) pertains to a
+this relates to #open [#410.S]  (see, discussed there at length) which pertains to a
 particular application of this theory that has yielded mis-behaviors.
 
 but the "theory" of heruistic templating is that we look at the existing
@@ -109,17 +109,54 @@ there are, however, some caveates discussed in code.
 ## <a name=H></a> provision: custom keyers
 
 this provision holds that you can provide a function that "derives" a human
-key per each item through arbitrary means. [#423] is dedicated to tracking
-a more detailed look at this (as "pipeline"). #coverpoint1.6
+key per each item through arbitrary means. [#423.B] shows how a keyer can
+work in conjunction with a mapper, in our "pipeline workflow".
+(#coverpoint1.6)
 
 
 
 
-## <a name=I> provision: the leftmost column in the markdown table is..
+## <a name=I.2> provision: the leftmost column in the markdown table is..
 
 ..by default the "human key" field.. we don't want to be fully
 married to this but it's a cost-saving shortcut.
 
+
+
+
+
+## <a name="I.3.1"></a> feature-ish: map for sync
+
+(first read the description in the UI referenced with this tag then return
+to here.) having not yet fully realized [#423.C] full, arbitray functional
+pipelines to the extent that we would like, we for now have this more
+hard-coded action for inspecting a producer stream after its various mappings,
+filters etc are applied.
+
+
+
+
+
+## <a name="I.3.2"></a> feature: far deny list
+
+this "feature" is an outcropping of feature [#418.I.3.1] "map for sync"
+(immediately above); that is it is a necessary byproduct of the wish to
+inspect data in our pipeline and still meet the various requirements of
+the consuming script. longer explanation at [#423.D].
+
+
+
+
+## <a name="I.4"></a> feature: custom mapper oldschool
+
+away at [#423.C] custom pipes, probably.
+
+
+
+
+## <a name="I.5"></a> feature: static arguments to map makers
+
+(this article is a stub)
 
 
 
@@ -129,6 +166,8 @@ married to this but it's a cost-saving shortcut.
 this contrivance exists so there is a discrete, hard-coded assertion
 somewhere about what constituency of names we can assume; both from
 the defining side and the consuming side separately.
+
+(probably we will get rid of this)
 
 
 
@@ -167,6 +206,15 @@ in turn, the above is now considered #pattern [#418.Z.1].
 you can
 
 .:[#418.L.2]: on failure you must sill result in an iterator
+
+
+
+
+## <a name='M'></a> feature-family: multi-tablism
+
+(this is a stub. it vaguely exists in one generator script but to get it
+to work with syncing will be an undertaking.)
+
 
 
 

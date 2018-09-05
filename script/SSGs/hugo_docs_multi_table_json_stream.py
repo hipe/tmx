@@ -11,6 +11,9 @@ filesystem tree or whatever but we see the way we do it here
 as better because it uses the presentation structure which is
 presumably the most representative of yadda..
 """
+# #[#410.1.2] this is a producer script.
+# #[#418.M] tracks multi-tablism
+
 
 _domain = 'https://gohugo.io'  # no trailing slash because #here1
 _url = _domain + '/documentation/'

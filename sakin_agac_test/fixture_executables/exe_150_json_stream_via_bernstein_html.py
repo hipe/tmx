@@ -95,7 +95,7 @@ def _this_typical_humkey_via_td():
         url = a_tag['href']
         # ..
         return markdown_link_via(_string_via_el(a_tag), url)
-    markdown_link_via = _top_html_lib().markdown_link_via
+    markdown_link_via = _md_lib().markdown_link_via
     return f
 
 
@@ -107,6 +107,11 @@ def _string_via_el(el):  # td.text() would be same, but this gives sanity
 def _top_html_lib():
     import script.json_stream_via_url_and_selector as lib
     return lib
+
+
+def _md_lib():
+    import script.markdown_document_via_json_stream as _
+    return _
 
 
 def execute_as_CLI_(open_dictionary_stream):
