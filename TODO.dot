@@ -76,6 +76,7 @@ shape=rect
 n_dim_sum_themes[label="DIM SUM for
 every hugo theme
 "
+style=filled
 shape=rect
 ]
 n_filter_by[label="filter by tags"

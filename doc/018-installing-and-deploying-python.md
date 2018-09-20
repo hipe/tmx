@@ -12,6 +12,7 @@ XXX does this close #open [#007.C]?
     python3 -m venv my-venv
     source my-venv/bin/activate
     pip install pipenv
+    pip install --upgrade pip  # if suggested
     pipenv install
 
 the below will describe (in painful detail) how we arrive at the above

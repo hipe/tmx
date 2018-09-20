@@ -48,13 +48,18 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
         io = serr
         _express_usage()
         ui_puts()
-        io.write('description: ')  # ..
-        itr = line_stream_via_doc_string_(
-                doc_string=cli_function.__doc__,
-                help_values=help_values)
-        io.write(next(itr))
-        for line in itr:
-            io.write(line)
+        doc_s = cli_function.__doc__
+        if doc_s is not None:
+            io.write('description: ')  # ..
+            if '\n' in doc_s:
+                use_doc_s = doc_s
+            else:
+                use_doc_s = f'{doc_s}\n'
+            _ = line_stream_via_doc_string_(
+                    doc_string=use_doc_s,
+                    help_values=help_values)
+            for line in _:
+                io.write(line)
         _succeeded()
 
     def _express_usage():

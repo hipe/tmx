@@ -15,12 +15,11 @@ psutil = "*"
 celery = {extras = ["redis"]}
 "bs4" = "*"
 tatsu = "*"
-
+toml = "*"
 
 [dev-packages]
 "flake8" = "*"
 pycodestyle = "*"
-
 
 [requires]
 python_version = "3.7"

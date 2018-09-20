@@ -1,6 +1,9 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-"""ohai themes
+"""produce a list of hugo themes by scraping {_this_one_url}
+
+this is a "shallow scrape", in contrast to a "deep scrape"
+available in a sibling script.
 """
 # #[#410.1.2] this is a producer script.
 
@@ -92,14 +95,27 @@ def cover_me():
     raise Exception('cover me')
 
 
+def normalize_sys_path_():  # #cp from one level up
+    import os.path as os_path
+    from sys import path as sys_path
+    dn = os_path.dirname
+    here = os_path.abspath(dn(__file__))
+    if here != sys_path[0]:
+        sanity('sanity - in the future, default sys.path may change')
+    sys_path[0] = dn(dn(here))
+
+
+def sanity(s):
+    raise Exception(f'sanity - {s}')
+
+
 if __name__ == '__main__':
-    import sys as _
-    _.path.insert(0, '')
+    normalize_sys_path_()
     import script.json_stream_via_url_and_selector as _
     _exitstatus = _.common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
-            help_values={'hugo_docs_url': _url},
+            help_values={'_this_one_url': _url},
             )
     exit(_exitstatus)
 

@@ -250,6 +250,22 @@ ignorant of the implementation details of context managers.
 
 
 
+## <a name='Z.4'></a> pattern: the "Mad Parse" pattern.
+
+this tracks a pattern where we make parsers that are:
+
+  - small (~30-60 SLOC at writing)
+  - self-contained (no external dependendencies (modules))
+  - implemented with a class
+  - does this one weird trick where a "state" member variable points to a method
+
+we track this pattern like so because despite all its excellent PROs above,
+we might weirdly decide against all odds one day that it's a smell, that
+there's some better alterantive, etc.
+
+
+
+
 ## (document-meta)
 
   - #pending-rename: something like "provisions and patterns"

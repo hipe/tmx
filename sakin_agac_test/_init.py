@@ -167,6 +167,10 @@ def fixture_executable_path(stem):
     return os_path.join(_top_test_dir, 'fixture_executables', stem)
 
 
+def fixture_directory_path(stem):
+    return os_path.join(_top_test_dir, 'fixture-directories', stem)
+
+
 def fixture_file_path(stem):
     return os_path.join(_top_test_dir, 'fixture-files', stem)
 

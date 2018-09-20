@@ -75,7 +75,7 @@ _my_CLI.__doc__ = __doc__
 def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
         traversal_function,
         doc_string,
-        help_values,
+        help_values=None,
         ):
 
     def my_CLI(listener, sin, sout, serr):
@@ -284,7 +284,7 @@ def _this_lazy(f):  # experiment (copy-paste)
 def normalize_sys_path_():
     """we want the `sys.path` to start with the universal monoproject
 
-    directory, nod the dirname of the entrypoint file (which we assert).
+    directory, not the dirname of the entrypoint file (which we assert).
     this is the first formal implementation of what is now recognized
     as the pattern :[#019.E].
     """
