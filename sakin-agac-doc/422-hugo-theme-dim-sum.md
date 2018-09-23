@@ -53,7 +53,7 @@ hello
 |[Crisp](https://themes.gohugo.io/crisp/)||#ghost #minimal|
 |[cState](https://themes.gohugo.io/cstate/)||#clean #fast #github #google-analytics #hugo #light #minimal #minimalist #mobile #netlify #no-javascript #onepage #product #products #responsive #single-page #technical #widgets|
 |[Darkdoc](https://themes.gohugo.io/hugo-darkdoc-theme/)||#bootstrap #documentation #responsive|
-|[Dark Simplicity](https://themes.gohugo.io/darksimplicity/)||#blog #dark #minimalist|
+|[Dark Simplicity](https://themes.gohugo.io/darksimplicity/)|#number:50|#blog #dark #minimalist|
 |[Den](https://themes.gohugo.io/hugo-theme-den/)||#blog #clean #multilingual #responsive|
 |[Detox](https://themes.gohugo.io/detox/)||#blog #disqus #ghost #google-analytics #minimal #pagination #rss #sharing-options #white|
 |[Dgraph](https://themes.gohugo.io/hugo-dgraph-theme/)||#blog #company #github|
@@ -103,7 +103,7 @@ hello
 |[hugo-dusk](https://themes.gohugo.io/hugo-dusk/)||#blog #clean #custom-themes #dark #disqus #google-analytics #minimal #minimalist #responsive #syntax-highlighting|
 |[Hugof](https://themes.gohugo.io/foundation-theme/)||#foundation #hugo #mobile|
 |[Hugo Fabric](https://themes.gohugo.io/hugo-fabric/)||#archives #blog #tags|
-|[Hugo FAQ Theme](https://themes.gohugo.io/hugo-faq-theme/)||        |
+|[Hugo FAQ Theme](https://themes.gohugo.io/hugo-faq-theme/)|#number:100|        |
 |[Hugo frais](https://themes.gohugo.io/hugo-frais/)||#blog #minimal #responsive #social|
 |[Hugo Fresh](https://themes.gohugo.io/hugo-fresh/)||#clean #company #landing-page #light #one-page #onepage #responsive|
 |[Hugo Future Imperfect](https://themes.gohugo.io/future-imperfect/)||#blog #css3 #font-awesome #highlight.js #html5 #netlify #responsive #staticman|
@@ -153,7 +153,7 @@ hello
 |[Lanyon](https://themes.gohugo.io/lanyon/)||#blog   |
 |[Lean Launch Page](https://themes.gohugo.io/hugo-theme-lean-launch-page/)||#simple #single-page|
 |[Learn](https://themes.gohugo.io/hugo-theme-learn/)||#documentation #menu #nested-sections #search|
-|[light-hugo](https://themes.gohugo.io/light-hugo/)||#blog #light #minimal #pages #responsive #white|
+|[light-hugo](https://themes.gohugo.io/light-hugo/)|#number:150|#blog #light #minimal #pages #responsive #white|
 |[liquorice](https://themes.gohugo.io/liquorice/)||        |
 |[Lithium](https://themes.gohugo.io/hugo-lithium-theme/)||#blog #google-analytics|
 |[Mainroad](https://themes.gohugo.io/mainroad/)||#blog #disqus #google-analytics #responsive #rss #widgets #wordpress|
@@ -203,58 +203,58 @@ hello
 |[Remark Twemoji](https://themes.gohugo.io/hugo-remark-twemoji/)||#custom-themes #google-analytics #pre-made-templates #presentation #remark #remark.js #shortcodes #slide|
 |[Resume](https://themes.gohugo.io/hugo-resume/)||#mobile #portfolio #projects #responsive #resume #social|
 |[Retroful Hugo](https://themes.gohugo.io/retrofulhugo/)||#blog #company #disqus #minimal #portfolio #projects #responsive #themes|
-|[reveal-hugo](https://themes.gohugo.io/reveal-hugo/)||#presentation #revealjs|
-|[revealjs](https://themes.gohugo.io/hugo-theme-revealjs/)||#presentation #revealjs|
-|[Robust](https://themes.gohugo.io/robust/)||#blog #grid #ogp #responsive #structured-data #syntax-highlight #thumbnail #twitter-cards|
-|[rocktopus](https://themes.gohugo.io/rocktopus/)||#blog   |
-|[Seminyak](https://themes.gohugo.io/seminyak/)||#landing-page #minimal #one-page #simple|
-|[Shapez Theme](https://themes.gohugo.io/Shapez-Theme/)||#blog #hugo #svg|
-|[Shiori](https://themes.gohugo.io/shiori/)||#blog #personal|
-|[Shopping Product Catalogue - Simple](https://themes.gohugo.io/hugo-shopping-product-catalogue-simple/)||#bootstrap #minimal #responsive|
-|[simple-a](https://themes.gohugo.io/simple-a/)||#blog   |
-|[simple-hugo](https://themes.gohugo.io/simple-hugo/)||#blog #dev|
-|[SimpleIT](https://themes.gohugo.io/simpleit-hugo-theme/)||#bootstrap #font-awesome #mobile-first-design #responsive|
-|[Simplicity](https://themes.gohugo.io/simplicity/)||#blog #disqus #lightbox #minimal #responsive|
-|[Slate](https://themes.gohugo.io/slate/)||#single-page #speed-dial|
-|[Slim](https://themes.gohugo.io/slim/)||#black-white #blog #clean #minimal #neat|
-|[SMPL](https://themes.gohugo.io/hugo-smpl-theme/)||#minimal #one-page #onepage #personal #responsive|
-|[Sodium](https://themes.gohugo.io/hugo-sodium-theme/)||#blog #clean #contact #features #minimal #modern #portfolio #responsive #services #team|
-|[sofya](https://themes.gohugo.io/sofya/)|        |#blog #icons #menu #minimal|
-|[Solit](https://themes.gohugo.io/hugo_theme_solit/)||#amp #blog #ogp #responsive #seo #share-button #structured-data #thumbnail #twitter-cards|
-|[Split](https://themes.gohugo.io/hugo-split-theme/)||#minimal #one-page #onepage #personal #responsive|
-|[SP-Minimal](https://themes.gohugo.io/hugo-sp-minimal/)||#blog #custom-themes #disqus #google-analytics #minimal #single-page|
-|[Startbootstrap Clean Blog](https://themes.gohugo.io/startbootstrap-clean-blog/)||#blog #bootstrap|
-|[Startpage](https://themes.gohugo.io/hugo-startpage-theme/)||#material-design #one-page #responsive #single-page #speed-dial|
-|[Steam](https://themes.gohugo.io/steam/)||#blog #disqus #google-analytics #minimal|
-|[Stellar](https://themes.gohugo.io/hugo-stellar-theme/)||#contact-form #portfolio #responsive #substitutable-strings|
-|[Strange Case](https://themes.gohugo.io/strange-case/)||        |
-|[Strata](https://themes.gohugo.io/strata/)||#blog #contact-form #customizable #google-analytics #image-gallery #single-page|
-|[Sublime Hugo](https://themes.gohugo.io/sublime-hugo-theme/)||#blog #dev #minimal #syntax-highlighting|
-|[Sustain](https://themes.gohugo.io/hugo-sustain/)||#blog #minimal #responsive #syntax-highlighting|
-|[tachyons](https://themes.gohugo.io/tachyons/)||#blog #personal|
-|[Tale](https://themes.gohugo.io/tale-hugo/)||#blog #clean #light #minimal #pagination #personal #responsive #simple #starter #typography|
-|[temple](https://themes.gohugo.io/temple/)||#black-and-white #blog #highlightjs #minimal #personal #responsive|
-|[Theer](https://themes.gohugo.io/theer/)||#blog #simple|
-|[Theme - Hugo Foundation6](https://themes.gohugo.io/hugo-theme-foundation6/)||#blog #foundation #responsive|
-|[tinyce](https://themes.gohugo.io/tinyce/)||#blog #flat #mobile #responsive|
-|[TRACKS](https://themes.gohugo.io/hugo-tracks-theme/)||#bootstrap #disqus #google-analytics #minimal #projects #responsive|
-|[Tranquilpeak](https://themes.gohugo.io/hugo-tranquilpeak-theme/)||#blog #creative #customizable #disqus #font-awesome #fontawesome #highlight.js #minimal #personal #responsive #themes|
-|[Travelify](https://themes.gohugo.io/hugo-travelify-theme/)||#carousel #google-analytics #responsive #rss #syntax-highlighting #widgets|
-|[Twenty Fourteen](https://themes.gohugo.io/twentyfourteen/)||#blog #wordpress|
-|[Type](https://themes.gohugo.io/type/)||#blog #disqus #google-analytics #minimalistic|
-|[Universal](https://themes.gohugo.io/hugo-universal-theme/)||#blog #company #disqus #minimal #portfolio #projects #responsive #themes|
-|[Vec](https://themes.gohugo.io/hugo-theme-vec/)||#black-white #blog #clean #minimal #neat|
-|[Vex](https://themes.gohugo.io/vex-hugo/)||#bootstrap #onepage #product #themefisher|
-|[vienna](https://themes.gohugo.io/vienna/)||#blog #bootstrap #tags|
-|[W3.CSS Basic](https://themes.gohugo.io/hugo-theme-w3css-basic/)||#attachments #blog #carousel #clients #company #contact-form #custom-themes #debug #disqus #features #font-awesome #gallery #google-analytics #i18n #landing-page #menu #mobile #monochromatic #pages #pagination #personal #portfolio #privacy #products #projects #responsive #search #syntax-highlighting|
-|[Wave](https://themes.gohugo.io/hugo-theme-wave/)||#blog #bootstrap #font-awesome #lunr.js #talaria|
-|[Whiteplain](https://themes.gohugo.io/whiteplain/)||#blog #simple #white|
-|[Winning](https://themes.gohugo.io/hugo-theme-winning/)||#cv #one-page #simple|
-|[Would have been cool in the 80s](https://themes.gohugo.io/would-have-been-cool-in-the-80s/)||#about-link #blog #blog-post-or-standard-content-driven-by-frontmatter #feature-light-for-easy-customisation #minimal #personal #product #responsive #starter|
-|[XMag](https://themes.gohugo.io/hugo-xmag/)||#blog #clean #google-analytics #minimal #minimalist #responsive #simple #syntax-highlighting|
-|[XMin](https://themes.gohugo.io/hugo-xmin/)||#blog #clean #minimal #minimalist #personal #simple #starter|
-|[Yourfolio](https://themes.gohugo.io/yourfolio/)||#minimal #personal #portfolio #responsive #simple|
-|[Zen](https://themes.gohugo.io/hugo-theme-zen/)||#blog #grid #multilingual #responsive #search|
+|[reveal-hugo](https://themes.gohugo.io/reveal-hugo/)|#same #number:200 reveal is a thing|#presentation #revealjs|
+|[revealjs](https://themes.gohugo.io/hugo-theme-revealjs/)|#mobile:no #designy #interesting|#presentation #revealjs|
+|[Robust](https://themes.gohugo.io/robust/)|#NO-DEMO #interesting|#blog #grid #ogp #responsive #structured-data #syntax-highlight #thumbnail #twitter-cards|
+|[rocktopus](https://themes.gohugo.io/rocktopus/)|broken image, jagged left margin|#blog   |
+|[Seminyak](https://themes.gohugo.io/seminyak/)|#mobile:NA just a splash page. why is this a hugo theme.|#landing-page #minimal #one-page #simple|
+|[Shapez Theme](https://themes.gohugo.io/Shapez-Theme/)|#mobile:borked #interesting|#blog #hugo #svg|
+|[Shiori](https://themes.gohugo.io/shiori/)|#mobile:yes #hamburger:yes #tier:C another blog|#blog #personal|
+|[Shopping Product Catalogue - Simple](https://themes.gohugo.io/hugo-shopping-product-catalogue-simple/)|#mobile:yes #hamburger:no no images, nav doesn't respond|#bootstrap #minimal #responsive|
+|[simple-a](https://themes.gohugo.io/simple-a/)|#NO-DEMO|#blog|
+|[simple-hugo](https://themes.gohugo.io/simple-hugo/)|#mobile:yes #hamburger:yes #tier:D looks like several others. hamburger is borked|#blog #dev|
+|[SimpleIT](https://themes.gohugo.io/simpleit-hugo-theme/)|#mobile:no #fonting:ok the nav doesn't respond|#bootstrap #font-awesome #mobile-first-design #responsive|
+|[Simplicity](https://themes.gohugo.io/simplicity/)|#hamburger:no #mobile:yes meh #tier:D|#blog #disqus #lightbox #minimal #responsive|
+|[Slate](https://themes.gohugo.io/slate/)|#mobile:no #interesting|#single-page #speed-dial|
+|[Slim](https://themes.gohugo.io/slim/)|#mobile:no looks like sh\*t on mobile|#black-white #blog #clean #minimal #neat|
+|[SMPL](https://themes.gohugo.io/hugo-smpl-theme/)|#NO-DEMO|#minimal #one-page #onepage #personal #responsive|
+|[Sodium](https://themes.gohugo.io/hugo-sodium-theme/)|#mobile:yes #hamburger:yes #tier:A geared towards selling a thing, but i like the look|#blog #clean #contact #features #minimal #modern #portfolio #responsive #services #team|
+|[sofya](https://themes.gohugo.io/sofya/)|#GONE|#blog #icons #menu #minimal|
+|[Solit](https://themes.gohugo.io/hugo_theme_solit/)|#mobile:yes #hamburger:no #tier:D has that annoying "to the top" thing|#amp #blog #ogp #responsive #seo #share-button #structured-data #thumbnail #twitter-cards|
+|[Split](https://themes.gohugo.io/hugo-split-theme/)|#mobile:yes #hamburger:no #interesting #tier:D there is a problem in the animation|#minimal #one-page #onepage #personal #responsive|
+|[SP-Minimal](https://themes.gohugo.io/hugo-sp-minimal/)|#mobile:yes meh|#blog #custom-themes #disqus #google-analytics #minimal #single-page|
+|[Startbootstrap Clean Blog](https://themes.gohugo.io/startbootstrap-clean-blog/)|#mobile:yes #hamburger:yes #tier:B|#blog #bootstrap|
+|[Startpage](https://themes.gohugo.io/hugo-startpage-theme/)|#mobile:yes #tier:D #interesting|#material-design #one-page #responsive #single-page #speed-dial|
+|[Steam](https://themes.gohugo.io/steam/)|#mobile:yes #hamburger:no #fonting|#blog #disqus #google-analytics #minimal|
+|[Stellar](https://themes.gohugo.io/hugo-stellar-theme/)|#mobile:yes #hamburger:NO #tier:C|#contact-form #portfolio #responsive #substitutable-strings|
+|[Strange Case](https://themes.gohugo.io/strange-case/)|#mobile:NA boring blog. disqualified because poor use of tags/features||
+|[Strata](https://themes.gohugo.io/strata/)|#mobile:NA #tier:C #hamburger:no good fonting, design|#blog #contact-form #customizable #google-analytics #image-gallery #single-page|
+|[Sublime Hugo](https://themes.gohugo.io/sublime-hugo-theme/)|#mobile:OK #hamburger:cheat is an art style|#blog #dev #minimal #syntax-highlighting|
+|[Sustain](https://themes.gohugo.io/hugo-sustain/)|#mobile:yes #hamburger:yes is blog. good as portfolio. front page doesn't splash content (blog items) #tier:C|#blog #minimal #responsive #syntax-highlighting|
+|[tachyons](https://themes.gohugo.io/tachyons/)|#mobile:no TERRIBLE FONT|#blog #personal|
+|[Tale](https://themes.gohugo.io/tale-hugo/)|#moble:NA #tier:C #hamburger:no but i like the fonting|#blog #clean #light #minimal #pagination #personal #responsive #simple #starter #typography|
+|[temple](https://themes.gohugo.io/temple/)|#mobile:yes bad demo but ok #tier:C|#black-and-white #blog #highlightjs #minimal #personal #responsive|
+|[Theer](https://themes.gohugo.io/theer/)|#mobile:no top nav doesn't respond well|#blog #simple|
+|[Theme - Hugo Foundation6](https://themes.gohugo.io/hugo-theme-foundation6/)|#mobile:no the top nav doesn't respond well|#blog #foundation #responsive|
+|[tinyce](https://themes.gohugo.io/tinyce/)|#mobile:NA too minimal. nonstandard demo location.|#blog #flat #mobile #responsive|
+|[TRACKS](https://themes.gohugo.io/hugo-tracks-theme/)|#mobile:OK interesting for blog|#bootstrap #disqus #google-analytics #minimal #projects #responsive|
+|[Tranquilpeak](https://themes.gohugo.io/hugo-tranquilpeak-theme/)|#mobile:yes #tier:B i don't love how it looks on desktop but mobile yes|#blog #creative #customizable #disqus #font-awesome #fontawesome #highlight.js #minimal #personal #responsive #themes|
+|[Travelify](https://themes.gohugo.io/hugo-travelify-theme/)|#mobile:YUCK|#carousel #google-analytics #responsive #rss #syntax-highlighting #widgets|
+|[Twenty Fourteen](https://themes.gohugo.io/twentyfourteen/)|#mobile:yes not bad #tier:C|#blog #wordpress|
+|[Type](https://themes.gohugo.io/type/)|#mobile:NA not well styled for mobile|#blog #disqus #google-analytics #minimalistic|
+|[Universal](https://themes.gohugo.io/hugo-universal-theme/)|#mobile:yes #hamburger:yes #tier:A|#blog #company #disqus #minimal #portfolio #projects #responsive #themes|
+|[Vec](https://themes.gohugo.io/hugo-theme-vec/)|#mobile:NA comment: blog. broken image a bad look|#black-white #blog #clean #minimal #neat|
+|[Vex](https://themes.gohugo.io/vex-hugo/)|#mobile:no case study: looks GREAT on desktop, looks LIKE CRAP on mobile (broken!)|#bootstrap #onepage #product #themefisher|
+|[vienna](https://themes.gohugo.io/vienna/)|#mobile:NA it's oh-kay as a blog|#blog #bootstrap #tags|
+|[W3.CSS Basic](https://themes.gohugo.io/hugo-theme-w3css-basic/)|#mobile:yes #ranking:"C-class" color theme horrible and feels too dated with rounded corners and drop shadows. but icons are nice.|#attachments #blog #carousel #clients #company #contact-form #custom-themes #debug #disqus #features #font-awesome #gallery #google-analytics #i18n #landing-page #menu #mobile #monochromatic #pages #pagination #personal #portfolio #privacy #products #projects #responsive #search #syntax-highlighting|
+|[Wave](https://themes.gohugo.io/hugo-theme-wave/)|#mobile:yes #ranking:"next under yourfolio"|#blog #bootstrap #font-awesome #lunr.js #talaria|
+|[Whiteplain](https://themes.gohugo.io/whiteplain/)|#no-because:"looks too busy in mobile"|#blog #simple #white|
+|[Winning](https://themes.gohugo.io/hugo-theme-winning/)|#mobile:no dude what the f\*ck|#cv #one-page #simple|
+|[Would have been cool in the 80s](https://themes.gohugo.io/would-have-been-cool-in-the-80s/)|#mobile:no #no-because:"Looks like sh\*t"|#about-link #blog #blog-post-or-standard-content-driven-by-frontmatter #feature-light-for-easy-customisation #minimal #personal #product #responsive #starter|
+|[XMag](https://themes.gohugo.io/hugo-xmag/)|#mobile:yes #no-because:"responsive but looks like sh\*t"|#blog #clean #google-analytics #minimal #minimalist #responsive #simple #syntax-highlighting|
+|[XMin](https://themes.gohugo.io/hugo-xmin/)|#mobile:no #no-because:"didactic only"|#blog #clean #minimal #minimalist #personal #simple #starter|
+|[Yourfolio](https://themes.gohugo.io/yourfolio/)|#mobile:yes:"looks good" #like #ranking:"first"|#minimal #personal #portfolio #responsive #simple|
+|[Zen](https://themes.gohugo.io/hugo-theme-zen/)|#mobile:no:"menu bumps into header"|#blog #grid #multilingual #responsive #search|
 
 
 

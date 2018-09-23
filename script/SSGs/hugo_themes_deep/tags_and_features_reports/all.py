@@ -102,7 +102,7 @@ def _parse_args(cli):
     if 1 == length:
         return True
     io = cli.stderr
-    rx = re.compile('^--?h(?:e(?:lp?)?)?$')  # --help
+    rx = re.compile('^--?h(?:e(?:lp?)?)?$')  # --help  ##[608.4]
     _ = next((True for i in range(1, length) if rx.match(argv[i])), False)
     if _:
         io.write(f"usage: {argv[0]}\n")

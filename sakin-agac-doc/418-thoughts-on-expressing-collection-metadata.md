@@ -254,7 +254,7 @@ ignorant of the implementation details of context managers.
 
 this tracks a pattern where we make parsers that are:
 
-  - small (~30-60 SLOC at writing)
+  - small (at writing ~30-60 SLOC)
   - self-contained (no external dependendencies (modules))
   - implemented with a class
   - does this one weird trick where a "state" member variable points to a method

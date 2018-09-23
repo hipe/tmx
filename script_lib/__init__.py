@@ -1,14 +1,110 @@
-"""EXPERIMENT
-
-(stowaway:)
-[#608.2]: external tracking
-[#607.B]: as referenced
-[#604]: wish for strong type
-[#603]: [the help screen parser]
-:[#602]: #open track that one issue with argparse (should patch)
-"""
-
 import re
+
+
+def RESOLVE_UPSTREAM_EXPERIMENT(cli):
+    """
+    so:
+      - this is [#608.3] an early abstraction
+      - this is the first thing to use [#608.6] our new simplified API
+    """
+
+    def __main():
+        if cli.stdin.isatty():
+            __resolve_upstream_when_interactive()
+        else:
+            __resolve_upstream_when_non_interactive()
+
+    def __resolve_upstream_when_interactive():
+        if _an_argument_was_passed():
+            if _help_was_requested():
+                _express_help()
+            elif __more_than_one_argument_was_passed():
+                __THEN_complain_about_too_many_arguments()
+            else:
+                __THEN_use_that_one_arguent()
+        else:
+            __THEN_complain_about_no_arguments()
+
+    def __resolve_upstream_when_non_interactive():
+        if _an_argument_was_passed():
+            if _help_was_requested():
+                _express_help()
+            else:
+                __THEN_complain_about_cant_have_both()
+        else:
+            __THEN_use_stdin_as_upstream()
+
+    def _an_argument_was_passed():
+        return 1 < _number_of_arguments()
+
+    def __more_than_one_argument_was_passed():
+        return 2 < _number_of_arguments()
+
+    def _help_was_requested():
+        import re
+        rx = re.compile('^--?h(?:e(?:lp?)?)?$')  # #[#608.4] DRY one day
+        a = cli.ARGV
+        return next((i for i in range(1, len(a)) if rx.match(a[i])), None)
+
+    def _express_help():
+
+        _ = ' '.join(cli.description_raw_lines_for_resolve_upstream())  # ..
+
+        o = _liner_for(cli.stderr)
+        program_name = _program_name()
+        o(f'usage: {program_name} {_lone_argument_moniker()}')
+        o(f'       some-stream | {program_name}')
+        o()
+        o(f'description: {_}')
+
+        cli.OK = False
+
+    def __THEN_complain_about_cant_have_both():
+        _arg_error("can't have both STDIN and arguments")
+
+    def __THEN_complain_about_no_arguments():
+        _complain(f'expecting {_lone_argument_moniker()} or STDIN')
+
+    def __THEN_complain_about_too_many_arguments():
+        _arg_error(f'had {_number_of_arguments()} arguments, '
+                   'needed one.')
+
+    def _arg_error(msg):
+        _complain(f'argument error: {msg}')
+
+    def _complain(msg):
+        o = _liner_for(cli.stderr)
+        o(msg)
+        o(f"see '{_program_name()} -h' for help.")
+        cli.OK = False
+        cli.exitstatus = 444
+
+    def _program_name():
+        return cli.ARGV[0]
+
+    def _liner_for(io):
+        def o(s=None):
+            write('\n' if s is None else f'{s}\n')
+        write = io.write
+        return o
+
+    def _number_of_arguments():
+        return len(cli.ARGV)  # ..
+
+    def __THEN_use_stdin_as_upstream():
+        cli.upstream = cli.stdin
+
+    def __THEN_use_that_one_arguent():
+        cli.upstream = open(cli.ARGV[1])
+
+    # --
+
+    def _lone_argument_moniker():
+        return cli.lone_argument_moniker_for_resolve_upstream()
+
+    return __main()
+
+    # == END
 
 
 def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
@@ -36,7 +132,7 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
             return False
 
     def __help_was_requested_in_ANY_argument():
-        rx = re.compile('^--?h(?:e(:?lp?)?)?$')
+        rx = re.compile('^--?h(?:e(:?lp?)?)?$')  # #[#608.4] DRY one day
         _gen = (None for i in range(1, act_num_args) if rx.search(argv[i]))
         help_was_requested = None
         for _ in _gen:

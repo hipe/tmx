@@ -48,7 +48,7 @@ class common_upstream_argument_parser_via_everything:
 
     def __when_ARGV(self):
         import re
-        rx = re.compile(r'^--?h(?:e(?:lp?)?)?$')
+        rx = re.compile(r'^--?h(?:e(?:lp?)?)?$')  # #[#608.4] DRY one day
         argv = self._ARGV
         length = len(argv)
         yes = False

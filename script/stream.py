@@ -251,6 +251,9 @@ easy provisions:
 fun provisions:
 
   - will have a `result.result_values` that is either None or a dictionary
+
+
+all this is now labelled as :[#608.5]. (compare to [#608.6]).
 """
 
 

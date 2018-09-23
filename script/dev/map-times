@@ -1,0 +1,171 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+
+class _CLI:
+
+    def __init__(self, *_CLI_4):
+        self.stdin, self.stdout, self.stderr, self.ARGV = _CLI_4
+        self.OK = True
+
+    def execute(self):
+        self.exitstatus = 0
+        from script_lib import RESOLVE_UPSTREAM_EXPERIMENT as _
+        _(self)
+        self.OK and self.__do_next_thing()
+        return self.exitstatus
+
+    def __do_next_thing(self):
+
+        w = self.stderr.write
+
+        def receive_parsed_line(o):
+
+            tot_secs = o.pretend_epoch_seconds
+            tot_mins, secs = divmod(tot_secs, 60)
+            hours, mins = divmod(tot_mins, 60)
+
+            _ = '+%02d:%02d:%02d' % (hours, mins, secs)
+
+            w(f'{o.left_margin}{_}{o.the_rest}')
+
+        def receive_other_line(line):
+            w(line)
+
+        mp = _MadParse(
+                receive_parsed_line=receive_parsed_line,
+                receive_other_line=receive_other_line,
+                )
+        with self.upstream as lines:
+            for line in lines:
+                mp.receive_line(line)
+
+        self.stderr.write('done!\n')
+
+    # -- hook-out's
+
+    def description_raw_lines_for_resolve_upstream(self):
+        yield 'parse timestamps in the first "cel" of lines to do a thing'
+
+    def lone_argument_moniker_for_resolve_upstream(self):
+        return '<file>'
+
+
+# #[#418.Z.4] "mad parse"
+
+class _MadParse:
+    """look for lines that have timestamps and also follow (immediately)
+
+    another line that has a timestamp. when this "pattern" is matched,
+    do a thing.
+    """
+
+    def __init__(self, receive_parsed_line, receive_other_line):
+        import re
+        self._regex = re.compile(
+                r'^([ ]*)'      # left margin
+                r'(\d\d):'      # hours
+                r'(\d\d):'      # minutes
+                r'(\d\d)'       # seconds
+                r'([ ]+.+\n)',  # the rest
+                )
+
+        self.receive_parsed_line = receive_parsed_line
+        self.receive_other_line = receive_other_line
+        self._state = '_receive_line_when_looking'
+
+    def receive_line(self, line):
+        getattr(self, self._state)(line)
+
+    def _receive_line_when_looking(self, line):
+        md = self._regex.match(line)
+        if md is None:
+            self.receive_other_line(line)
+        else:
+            self.__receive_first_matching_line(md)
+
+    def __receive_first_matching_line(self, md):
+        self._record_of_reference = _record_via_matchdata(md)
+        self._state = '_receive_line_after_matching_line'
+        self.receive_other_line(md.string)
+
+    def _receive_line_after_matching_line(self, line):
+        md = self._regex.match(line)
+        if md is None:
+            del(self._record_of_reference)
+            self._state = '_receive_line_when_looking'
+            self.receive_other_line(line)
+        else:
+            prev = self._record_of_reference
+            curr = _record_via_matchdata(md)
+            self._record_of_reference = curr
+            secs = prev.distance_in_seconds_to(curr)
+            self.receive_parsed_line(_record_as_distance(secs, curr))
+
+
+class _record_as_distance:
+
+    def __init__(self, secs, formatting):
+        self.pretend_epoch_seconds = secs
+        self.left_margin = formatting._left_margin
+        self.the_rest = formatting._the_rest
+
+
+class _record_via_matchdata:
+
+    def __init__(self, md):
+        (self._left_margin,
+         hours,
+         minutes,
+         seconds,
+         self._the_rest) = md.groups()
+
+        self._hours = int(hours)
+        self._minutes = int(minutes)
+        self._seconds = int(seconds)
+
+        pretend_epoch_minutes = 60 * self._hours + self._minutes
+        self._pretend_epoc_seconds = 60 * pretend_epoch_minutes + self._seconds
+
+    def distance_in_seconds_to(self, other):
+        return other._pretend_epoc_seconds - self._pretend_epoc_seconds
+
+
+# --
+
+def _normalize_sys_path():  # #cp
+    """we want the `sys.path` to start with the universal monoproject
+
+    directory, not the dirname of the entrypoint file (which we assert).
+    this is one of quite many implementations of #[#019.E].
+    """
+
+    import os.path as os_path
+    from sys import path as sys_path
+    dn = os_path.dirname
+    here = os_path.abspath(dn(__file__))
+    if here != sys_path[0]:
+        sanity('sanity - in the future, default sys.path may change')
+    sys_path[0] = dn(dn(here))
+
+
+def cover_me(msg=None):
+    raise Exception(_msg(msg, 'cover me'))
+
+
+def sanity(msg=None):
+    raise Exception(_msg(msg, 'sanity'))
+
+
+def _msg(body, header):
+    return header if body is None else f'{header}: {body}'
+
+
+if '__main__' == __name__:
+
+    _normalize_sys_path()
+
+    import sys as o
+    _es = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
+    exit(_es)
+
+# #born.

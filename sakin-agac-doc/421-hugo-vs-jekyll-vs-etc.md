@@ -1,3 +1,12 @@
+## (about some of the tags used)
+
+  - "UDI": this stands for "universal document ??". we *think* we meant
+     it to stand for "identifier". this is part of the rosetta project
+     which is all undocumented vaporware at this point.
+
+
+
+
 ### About Hugo
 |document node|about|
 |---|---|
