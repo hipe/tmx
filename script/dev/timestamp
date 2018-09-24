@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+num_args=$#
+file='z/times'
+
+do_help=''
+do_invite=''
+
+if [[ num_args -eq 0 ]] ; then
+  echo "expecting <msg1> .." >&2
+  do_invite=1
+else
+  char=$(echo "$1" | cut -c1)
+  if [[ $char == "-" ]] ; then
+    if [[ "$1" == '-h' ]] ; then
+      do_help=1
+    elif [[ "$1" == '--help' ]] ; then
+      do_help=1
+    else
+      echo "unrecognized option: \"${1}\"" >&2
+      do_invite=1
+    fi
+  fi
+fi
+
+if [[ ! -z "$do_invite" ]] ; then
+  echo "use \"$0 -h\" for help" >&2
+  exit 5
+fi
+
+if [[ ! -z "$do_help" ]] ; then
+  echo "usage: $0 msg1 msg2 .." >&2
+  echo "" >&2
+  echo "description: appends a timestamp line to ${file}"
+  exit 5
+fi
+
+if [ ! -f "$file" ] ; then
+  echo "for now, file must exist: $file" >&2
+  exit 5
+fi
+
+da=$(date '+%H:%M:%S')
+line="  ${da}  $@"
+
+echo "(did: echo \"$line\" >> $file)" >&2
+
+echo "$line" >> "$file"
