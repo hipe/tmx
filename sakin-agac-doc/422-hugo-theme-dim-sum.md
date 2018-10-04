@@ -44,66 +44,66 @@ hello
 |[classless](https://themes.gohugo.io/classless-hugo/)||#blog #personal|
 |[Clean White](https://themes.gohugo.io/hugo-theme-cleanwhite/)||#blog #clean #disqus #google-analytics #light #minimal #responsive #search|
 |[Cocoa](https://themes.gohugo.io/cocoa/)||#404 #blog #clean #comments #disqus #icons #minimal #responsive #svg|
-|[Cocoa-EH](https://themes.gohugo.io/cocoa-eh-hugo-theme/)||#clean #disqus #fast #responsive #typography|
-|[Code Editor](https://themes.gohugo.io/hugo-code-editor-theme/)||#atom   |
-|[Coder](https://themes.gohugo.io/hugo-coder/)||#analytics #blog #clean #favicon #minimal #minimalist #pagination #personal #responsive #simple #single-column #syntax-highlighting|
-|[Crab](https://themes.gohugo.io/crab/)||#404 #blog #clean #responsive #tags|
-|[Creative](https://themes.gohugo.io/creative/)||#creative #portfolio #responsive #substitutable-strings|
-|[Creative portfolio](https://themes.gohugo.io/hugo-creative-portfolio-theme/)||#bootstrap #creative #disqus #google-analytics #minimal #portfolio #projects #responsive|
-|[Crisp](https://themes.gohugo.io/crisp/)||#ghost #minimal|
-|[cState](https://themes.gohugo.io/cstate/)||#clean #fast #github #google-analytics #hugo #light #minimal #minimalist #mobile #netlify #no-javascript #onepage #product #products #responsive #single-page #technical #widgets|
-|[Darkdoc](https://themes.gohugo.io/hugo-darkdoc-theme/)||#bootstrap #documentation #responsive|
-|[Dark Simplicity](https://themes.gohugo.io/darksimplicity/)|#number:50|#blog #dark #minimalist|
-|[Den](https://themes.gohugo.io/hugo-theme-den/)||#blog #clean #multilingual #responsive|
-|[Detox](https://themes.gohugo.io/detox/)||#blog #disqus #ghost #google-analytics #minimal #pagination #rss #sharing-options #white|
-|[Dgraph](https://themes.gohugo.io/hugo-dgraph-theme/)||#blog #company #github|
-|[Dimension](https://themes.gohugo.io/dimension/)||#multilingual #personal #portfolio #responsive|
-|[docDock](https://themes.gohugo.io/docdock/)||#attachments #documentation #menu #nested-sections #search #slide|
-|[DocuAPI](https://themes.gohugo.io/docuapi/)||#docs #documentation #multilingual #responsive|
-|[Dopetrope](https://themes.gohugo.io/hugo-theme-dopetrope/)||#blog #html5up|
-|[Dream](https://themes.gohugo.io/hugo-theme-dream/)||#blog #colorful #copyright #creative #disqus #flip #google-analytics #i18n #motto #personal #responsive|
-|[Dream Plus](https://themes.gohugo.io/hugo-dream-plus/)||#blog #clean #colorful #copyright #disqus #favicon #flip #google-analytics #i18n #landing-page #material-design #motto #personal #responsive #single-page #syntax-highlighting|
-|[edyo](https://themes.gohugo.io/bleak/)||#ghost #minimal|
-|[eiio](https://themes.gohugo.io/hugo_eiio/)||#blog #project|
-|[Elate](https://themes.gohugo.io/hugo-elate-theme/)||#hugo   |
-|[Elephants](https://themes.gohugo.io/elephants/)||#blog   |
-|[Engimo](https://themes.gohugo.io/engimo/)||#accessibility #algolia #analytics #blog #comments #cover-image #disqus #entry-navigation #favicon #fuse.js #lunr.js #minimal #minimalist #multi-author #multilingual #opengraph #pagination #responsive #search #shortcodes #sidebar #single-column #social-menu #staticman #syntax-highlighting #table-of-contents #utterances #widgets|
-|[Er](https://themes.gohugo.io/er/)||#blog #responsive #white|
-|[Even](https://themes.gohugo.io/hugo-theme-even/)||#blog #clean #highlight.js #responsive #simple #syntax-highlighting|
-|[Finite](https://themes.gohugo.io/hugo-finite/)||#academic #posts #social|
-|[Forty](https://themes.gohugo.io/forty/)||#blog #company #contact-form #google-analytics #portfolio|
-|[Freelancer](https://themes.gohugo.io/freelancer/)||#contact-form #portfolio #responsive #substitutable-strings|
-|[Geppaku](https://themes.gohugo.io/hugo-theme-geppaku/)||#blog #personal|
-|[ghostwriter](https://themes.gohugo.io/ghostwriter/)||#blog #personal #technical|
-|[gindoro](https://themes.gohugo.io/gindoro/)||#hugo #minimal|
-|[Github project Page](https://themes.gohugo.io/github-project-landing-page/)||#company #github #images #landing-page #products|
-|[Goa](https://themes.gohugo.io/hugo-goa/)||#404 #blog #bootstrap #clean #disqus #font-awesome #icons #minimal #pages #responsive|
-|[gohugo-amp](https://themes.gohugo.io/gohugo-amp/)||#amp #blog #seo #shortcodes #starter #structured-data|
-|[Greyshade](https://themes.gohugo.io/greyshade/)||#blog #octopress|
-|[GridSide](https://themes.gohugo.io/grid-side/)||#blog #gallery #portfolio #projects|
-|[Heather Hugo](https://themes.gohugo.io/heather-hugo/)||#blog   |
-|[hello-friend](https://themes.gohugo.io/hugo-theme-hello-friend/)||#blog #clean #dark #light #minimal #monochromatic #responsive #shortcode #simple|
-|[Hello Programmer](https://themes.gohugo.io/hugo-hello-programmer-theme/)||#blog #hugo #simple|
-|[Hemingway](https://themes.gohugo.io/hemingway/)||#blog #css3 #font-awesome #highlight.js #html5|
-|[Hemingway2](https://themes.gohugo.io/hemingway2/)||#blog #css3 #font-awesome #highlight.js #html5 #tags|
-|[Herring Cove](https://themes.gohugo.io/herring-cove/)||#blog #company|
-|[Hestia Pure](https://themes.gohugo.io/hestia-pure/)||        |
-|[Highlights](https://themes.gohugo.io/highlights/)||#contact-form #google-analytics #one-page #onepage #portfolio|
-|[Hikari](https://themes.gohugo.io/hikari/)||#blog #disqus #google-analytics #minimal #syntax-highlighting|
-|[Hpstr](https://themes.gohugo.io/hpstr-hugo-theme/)||#blog #comments #menu #responsive|
-|[HUCORE](https://themes.gohugo.io/hucore/)||#blog #css3 #font-awesome #highlight.js #html5 #tags|
-|[Hugo Base](https://themes.gohugo.io/hugo-base-theme/)||#blog #hugo #landing-page|
-|[Hugo Bootstrap](https://themes.gohugo.io/hugo-bootstrap/)||#blog #bootstrap #google-analytics #i18n #multilingual #responsive|
-|[Hugo Bootstrap4](https://themes.gohugo.io/bootstrap/)||#blog #personal #technical|
-|[Hugo Bootstrap Premium](https://themes.gohugo.io/hugo-bootstrap-premium/)||#blog #bootstrap #bootswatch #disqus #font-awesome #google-analytics #i18n #multilingual #personal #responsive #technical|
-|[Hugo Bootstrap v4 Blog](https://themes.gohugo.io/hugo-theme-bootstrap4-blog/)||#blog #bootstrap #font-awesome #responsive|
-|[Hugo Bootswatch](https://themes.gohugo.io/hugo-bootswatch/)||#bootstrap #bootswatch|
-|[Hugo - Classic](https://themes.gohugo.io/hugo-classic/)||#blog #clean #minimal #minimalist #personal #simple #starter|
-|[Hugo Conference](https://themes.gohugo.io/hugo-conference/)||#google-analytics #l10n #responsive|
-|[hugo-dusk](https://themes.gohugo.io/hugo-dusk/)||#blog #clean #custom-themes #dark #disqus #google-analytics #minimal #minimalist #responsive #syntax-highlighting|
-|[Hugof](https://themes.gohugo.io/foundation-theme/)||#foundation #hugo #mobile|
-|[Hugo Fabric](https://themes.gohugo.io/hugo-fabric/)||#archives #blog #tags|
-|[Hugo FAQ Theme](https://themes.gohugo.io/hugo-faq-theme/)|#number:100|        |
+|[Cocoa-EH](https://themes.gohugo.io/cocoa-eh-hugo-theme/)|#mobile:yes #hamburger:no meh. some smart fonts but a strange mix.|#clean #disqus #fast #responsive #typography|
+|[Code Editor](https://themes.gohugo.io/hugo-code-editor-theme/)|#mobile:yes #hamburger:no eek tryna be matrix|#atom|
+|[Coder](https://themes.gohugo.io/hugo-coder/)|#mobile:yes #hamburger:yes:vertical #top-nav:NOT-sticky #tier:A #fonting|#analytics #blog #clean #favicon #minimal #minimalist #pagination #personal #responsive #simple #single-column #syntax-highlighting|
+|[Crab](https://themes.gohugo.io/crab/)|#mobile:yes #hamburger:no meh. justified?|#404 #blog #clean #responsive #tags|
+|[Creative](https://themes.gohugo.io/creative/)|#mobile:yes #hamburger:yes:vertical:animated #top-nav:sticky animated icons #tier:B #interesting|#creative #portfolio #responsive #substitutable-strings|
+|[Creative portfolio](https://themes.gohugo.io/hugo-creative-portfolio-theme/)|#mobile:yes #hamburger:yes #tier:A #top-nav:NOT-sticky #sans|#bootstrap #creative #disqus #google-analytics #minimal #portfolio #projects #responsive|
+|[Crisp](https://themes.gohugo.io/crisp/)|missing stylesheet?|#ghost #minimal|
+|[cState](https://themes.gohugo.io/cstate/)|#mobile:yes #hamburger:no #interesting #specialty|#clean #fast #github #google-analytics #hugo #light #minimal #minimalist #mobile #netlify #no-javascript #onepage #product #products #responsive #single-page #technical #widgets|
+|[Darkdoc](https://themes.gohugo.io/hugo-darkdoc-theme/)|#mobile:borked #hamburger:borked|#bootstrap #documentation #responsive|
+|[Dark Simplicity](https://themes.gohugo.io/darksimplicity/)|#number:50 #mobile:no|#blog #dark #minimalist|
+|[Den](https://themes.gohugo.io/hugo-theme-den/)|#mobile:yes #hamburger:yes:vertical #top-nav:sticky meh|#blog #clean #multilingual #responsive|
+|[Detox](https://themes.gohugo.io/detox/)|#mobile:yes #hamburger:no #fonting #margins:perfect |#blog #disqus #ghost #google-analytics #minimal #pagination #rss #sharing-options #white|
+|[Dgraph](https://themes.gohugo.io/hugo-dgraph-theme/)|#mobile:no  too bad. looks nice.|#blog #company #github|
+|[Dimension](https://themes.gohugo.io/dimension/)|#mobile:yes #interesting #tier:A use this for something|#multilingual #personal #portfolio #responsive|
+|[docDock](https://themes.gohugo.io/docdock/)|#mobile:borked #hamburger:no|#attachments #documentation #menu #nested-sections #search #slide|
+|[DocuAPI](https://themes.gohugo.io/docuapi/)|#mobile:yes #hamburger:yes:horizontal yikes #tier:C|#docs #documentation #multilingual #responsive|
+|[Dopetrope](https://themes.gohugo.io/hugo-theme-dopetrope/)|#mobile:yes #hamburger:yes:hierarchical:cut #sans #tier:C #interesting annoying sticky hamburger|#blog #html5up|
+|[Dream](https://themes.gohugo.io/hugo-theme-dream/)|#mobile:yes #hamburger:no you tried but ugly. choppy interface|#blog #colorful #copyright #creative #disqus #flip #google-analytics #i18n #motto #personal #responsive|
+|[Dream Plus](https://themes.gohugo.io/hugo-dream-plus/)|#NO-DEMO|#blog #clean #colorful #copyright #disqus #favicon #flip #google-analytics #i18n #landing-page #material-design #motto #personal #responsive #single-page #syntax-highlighting|
+|[edyo](https://themes.gohugo.io/bleak/)|#NO-DEMO|#ghost #minimal|
+|[eiio](https://themes.gohugo.io/hugo_eiio/)|#mobile:yes #hamburger:yes:vertical:animated #margins:kinda-big #top-nav:sticky #tier:C|#blog #project|
+|[Elate](https://themes.gohugo.io/hugo-elate-theme/)|#mobile:borked #hamburger:NA missing stylesheet?|#hugo|
+|[Elephants](https://themes.gohugo.io/elephants/)|fsking awful #mobile:NA #hamburger:no|#blog|
+|[Engimo](https://themes.gohugo.io/engimo/)|#mobile:yes #hamburger:yes:horizontal:modal NOT sticky #tier:C #sans well rounded|#accessibility #algolia #analytics #blog #comments #cover-image #disqus #entry-navigation #favicon #fuse.js #lunr.js #minimal #minimalist #multi-author #multilingual #opengraph #pagination #responsive #search #shortcodes #sidebar #single-column #social-menu #staticman #syntax-highlighting #table-of-contents #utterances #widgets|
+|[Er](https://themes.gohugo.io/er/)|#mobile:yes #hamburger:no #fonting reminds me of platelette. poor demo|#blog #responsive #white|
+|[Even](https://themes.gohugo.io/hugo-theme-even/)|#mobile:yes #hamburger:yes:horizontal nav:sticky #tier:C|#blog #clean #highlight.js #responsive #simple #syntax-highlighting|
+|[Finite](https://themes.gohugo.io/hugo-finite/)|#NO-DEMO|#academic #posts #social|
+|[Forty](https://themes.gohugo.io/forty/)|OOOO FANCY  #mobile:yes #hamburger:yes:modal nice colors #tier:A #sans|#blog #company #contact-form #google-analytics #portfolio|
+|[Freelancer](https://themes.gohugo.io/freelancer/)|#mobile:yes #hamburger:yes:vertical top-nav:sticky meh #tier:D #sans something is borked|#contact-form #portfolio #responsive #substitutable-strings|
+|[Geppaku](https://themes.gohugo.io/hugo-theme-geppaku/)|#NO-DEMO japanese|#blog #personal|
+|[ghostwriter](https://themes.gohugo.io/ghostwriter/)|#mobile:borked:you-tried #hamburger:no|#blog #personal #technical|
+|[gindoro](https://themes.gohugo.io/gindoro/)|#mobile:no #hamburger:no (or stylesheet missing)|#hugo #minimal|
+|[Github project Page](https://themes.gohugo.io/github-project-landing-page/)|#mobile:yes #hamburger:BORKED too bad. looked good for a project page.|#company #github #images #landing-page #products|
+|[Goa](https://themes.gohugo.io/hugo-goa/)|#hamburger:no looks ok for a portfolio page but not a good demo|#404 #blog #bootstrap #clean #disqus #font-awesome #icons #minimal #pages #responsive|
+|[gohugo-amp](https://themes.gohugo.io/gohugo-amp/)|#mobile:yes #hamburger:no i don't yet know what AMP is|#amp #blog #seo #shortcodes #starter #structured-data|
+|[Greyshade](https://themes.gohugo.io/greyshade/)|#NO-DEMO|#blog #octopress|
+|[GridSide](https://themes.gohugo.io/grid-side/)|looks like sh\*t BUT #interesting does your parallax thing|#blog #gallery #portfolio #projects|
+|[Heather Hugo](https://themes.gohugo.io/heather-hugo/)|#serif #mobile:yes #hamburger:no too basic|#blog|
+|[hello-friend](https://themes.gohugo.io/hugo-theme-hello-friend/)|#mobile:yes #hamburger:yes #tier:A WOAH:dark theme #hamburger:yes:simple #interesting|#blog #clean #dark #light #minimal #monochromatic #responsive #shortcode #simple|
+|[Hello Programmer](https://themes.gohugo.io/hugo-hello-programmer-theme/)|#mobile:NO|#blog #hugo #simple|
+|[Hemingway](https://themes.gohugo.io/hemingway/)|#fonting:sans #mobile:yes #hamburger:no meh|#blog #css3 #font-awesome #highlight.js #html5|
+|[Hemingway2](https://themes.gohugo.io/hemingway2/)|#NO-DEMO|#blog #css3 #font-awesome #highlight.js #html5 #tags|
+|[Herring Cove](https://themes.gohugo.io/herring-cove/)|#NO-DEMO|#blog #company|
+|[Hestia Pure](https://themes.gohugo.io/hestia-pure/)|#mobile:yes #hamburger:no #interesting #fonting:japanese||
+|[Highlights](https://themes.gohugo.io/highlights/)|#hamburger:no #fonting #interesting nice icons|#contact-form #google-analytics #one-page #onepage #portfolio|
+|[Hikari](https://themes.gohugo.io/hikari/)|#mobile:yes #hamburger:yes:jittery|#blog #disqus #google-analytics #minimal #syntax-highlighting|
+|[Hpstr](https://themes.gohugo.io/hpstr-hugo-theme/)|#mobile:yes #hamburger:yes:animated #tier:B #interesting|#blog #comments #menu #responsive|
+|[HUCORE](https://themes.gohugo.io/hucore/)|#NO-DEMO|#blog #css3 #font-awesome #highlight.js #html5 #tags|
+|[Hugo Base](https://themes.gohugo.io/hugo-base-theme/)|#mobile:yes #hamburger:no #interesting #tier:B one of these flashy nonsenses - is the excerpting thing broken?|#blog #hugo #landing-page|
+|[Hugo Bootstrap](https://themes.gohugo.io/hugo-bootstrap/)|#hamburger:yes:hierarchical #mobile:yes #tier:B good margins. all #sans|#blog #bootstrap #google-analytics #i18n #multilingual #responsive|
+|[Hugo Bootstrap4](https://themes.gohugo.io/bootstrap/)|#NO-DEMO|#blog #personal #technical|
+|[Hugo Bootstrap Premium](https://themes.gohugo.io/hugo-bootstrap-premium/)|#mobile:borked missing stylesheet?|#blog #bootstrap #bootswatch #disqus #font-awesome #google-analytics #i18n #multilingual #personal #responsive #technical|
+|[Hugo Bootstrap v4 Blog](https://themes.gohugo.io/hugo-theme-bootstrap4-blog/)|#hamburger:no ugly #mobile:u-tried|#blog #bootstrap #font-awesome #responsive|
+|[Hugo Bootswatch](https://themes.gohugo.io/hugo-bootswatch/)|#hamburger:yes:hierarchical #mobile:yes #tier:C #sans it doesn't excite me but it's okay top-nav:sticky|#bootstrap #bootswatch|
+|[Hugo - Classic](https://themes.gohugo.io/hugo-classic/)|#hamburger:no #mobile:meh is this a joke|#blog #clean #minimal #minimalist #personal #simple #starter|
+|[Hugo Conference](https://themes.gohugo.io/hugo-conference/)|#mobile:yes #hamburger:no specialty. kind of ugly|#google-analytics #l10n #responsive|
+|[hugo-dusk](https://themes.gohugo.io/hugo-dusk/)|#hamburger:no ugly|#blog #clean #custom-themes #dark #disqus #google-analytics #minimal #minimalist #responsive #syntax-highlighting|
+|[Hugof](https://themes.gohugo.io/foundation-theme/)|#mobile:yes #hamburger:yes:horizontal #tier:C it doesn't excite me but it's ok. #sans-serif|#foundation #hugo #mobile|
+|[Hugo Fabric](https://themes.gohugo.io/hugo-fabric/)|#interesting #tier:D #hamburger:no #mobile:meh black & white wtf that font so bad it's good|#archives #blog #tags|
+|[Hugo FAQ Theme](https://themes.gohugo.io/hugo-faq-theme/)|#number:100 #hamburger:no #mobile:meh i don't like the fundamental underpinnings||
 |[Hugo frais](https://themes.gohugo.io/hugo-frais/)|#mobile:borked #hamburger:yes|#blog #minimal #responsive #social|
 |[Hugo Fresh](https://themes.gohugo.io/hugo-fresh/)|WHY ARE THRE TWO HAMBURGERS #mobile:yes #hamburger:yes #interesting but somewhat borked #tier:C |#clean #company #landing-page #light #one-page #onepage #responsive|
 |[Hugo Future Imperfect](https://themes.gohugo.io/future-imperfect/)|attractive #mobile:yes #hamburger:yes:horizontal #top-nav:sticky #tier:B|#blog #css3 #font-awesome #highlight.js #html5 #netlify #responsive #staticman|
