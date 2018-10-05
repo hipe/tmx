@@ -4,46 +4,46 @@ hello
 |Hugo theme|notes|tags (generated)|
 |---|---|---|
 |example|#example|#example|
-|[Academic](https://themes.gohugo.io/academic/)||#academic #blog #contact #minimal #personal #portfolio #projects #responsive|
-|[Adam & Eve](https://themes.gohugo.io/hugo_theme_adam_eve/)||#clean #documentation #i18n #minimal #responsive #shortcode|
-|[Aerial](https://themes.gohugo.io/aerial/)||#personal #responsive|
-|[Agency](https://themes.gohugo.io/agency/)||#company #contact-form #google-analytics #portfolio #timeline|
-|[Aglaus](https://themes.gohugo.io/aglaus/)||#amp #blog #ogp #responsive #seo #share-button #structured-data #thumbnail #twitter-cards|
-|[Air](https://themes.gohugo.io/air/)||#blog #disqus #google-analytics #share|
-|[Airspace Hugo](https://themes.gohugo.io/airspace-hugo/)||#blog #bootstrap #company #portfolio #projects #responsive #themefisher|
-|[Alabaster](https://themes.gohugo.io/hugo-alabaster-theme/)||#documentation|
-|[allegiant](https://themes.gohugo.io/allegiant/)||#blog #hugo|
-|[Alpha Church](https://themes.gohugo.io/alpha-church/)||#fontawesome #podcast|
-|[AMP](https://themes.gohugo.io/amp/)||#amp #blog #categories #google-analytics #material-design #menu #portfolio #social-links #tags|
-|[Ananke Gohugo Theme](https://themes.gohugo.io/gohugo-theme-ananke/)||#blog #comments #disqus #posts #responsive #shortcodes #starter|
-|[Angel's Ladder](https://themes.gohugo.io/angels-ladder/)||#blog   |
-|[Anybody Home](https://themes.gohugo.io/anybodyhome/)||#clean #highlightjs #simple|
-|[Apricot Hugo Theme](https://themes.gohugo.io/apricot-hugo-theme/)||#blog #responsive|
-|[Arch](https://themes.gohugo.io/hugo-theme-arch/)|        |#blog #bootstrap #talaria|
-|[Artists](https://themes.gohugo.io/artists/)||#clients #contact-form #portfolio|
-|[Aurora](https://themes.gohugo.io/aurora/)|        |#blog #minimal #single-column|
-|[Bare Min](https://themes.gohugo.io/hugo-bare-min-theme/)||#debug #minimal|
-|[Base16](https://themes.gohugo.io/base16/)||#blog #syntax-highlighting|
-|[Beautiful Hugo](https://themes.gohugo.io/beautifulhugo/)||#blog #company #disqus #minimal #portfolio #projects #responsive #staticman #themes|
-|[Beg](https://themes.gohugo.io/beg/)||#blog #ogp #responsive #structured-data #syntax-highlight #thumbnail #twitter-cards|
-|[BeyondNothing](https://themes.gohugo.io/BeyondNothing/)||#blog #clean #minimalist|
-|[Bilberry Hugo Theme](https://themes.gohugo.io/bilberry-hugo-theme/)||#algolia #blog #comments #disqus #font-awesome #google-analytics #highlight.js #i18n #multilingual #pages #personal #posts #responsive #search #syntax-highlighting|
-|[Bingo](https://themes.gohugo.io/hugo-bingo/)||#blog #clean #minimalist #responsive #simple #starter|
-|[Blackburn](https://themes.gohugo.io/blackburn/)||#blog #personal #purecss #responsive|
-|[Black & Light](https://themes.gohugo.io/black-and-light/)||#minimal #personal #responsive #simple #white|
-|[Blank](https://themes.gohugo.io/blank/)||#blog #starter|
-|[BluestNight](https://themes.gohugo.io/BluestNight/)||#blog #clean #contact-form #creative #dark #flexbox #font-awesome #mobile-friendly #netlify #responsive #search #syntax-highlighting #widgets|
-|[Bulma](https://themes.gohugo.io/bulma/)||#block-templates #blog #bulma #disqus-commenting #flexbox #google-analytics #landing #last-modified-time #mobile-first-design #modern #open-graph-support #paginated-lists #reading-time #related-posts #responsive #responsive-design #schema-structured-data #seo-site-verification #table-of-contents #themes #word-count|
-|[Cactus](https://themes.gohugo.io/cactus/)||#blog #disqus #google-analytics #pagination #rss #sharing-options #syntax-highlighting|
-|[Cactus Plus](https://themes.gohugo.io/hugo-theme-cactus-plus/)||#blog #disqus #rss #syntax-highlighting #tags|
-|[Call me Sam.](https://themes.gohugo.io/hugo-theme-sam/)||#blog #clean #flexbox #gallery #minimalist #portfolio #responsive #simple #starter #syntax-highlighting|
-|[capsule](https://themes.gohugo.io/capsule/)||#bulma #font-awesome #hugo #no-javascript #responsive|
-|[Casper](https://themes.gohugo.io/casper/)||#blog #disqus #google-analytics #share|
-|[Casper Two](https://themes.gohugo.io/hugo-casper-two/)||#blog #disqus #google-analytics #pages|
-|[Castanet](https://themes.gohugo.io/castanet/)||#podcast #responsive|
-|[classless](https://themes.gohugo.io/classless-hugo/)||#blog #personal|
-|[Clean White](https://themes.gohugo.io/hugo-theme-cleanwhite/)||#blog #clean #disqus #google-analytics #light #minimal #responsive #search|
-|[Cocoa](https://themes.gohugo.io/cocoa/)||#404 #blog #clean #comments #disqus #icons #minimal #responsive #svg|
+|[Academic](https://themes.gohugo.io/academic/)|#mobile:yes #hamburger:yes:vertical:animated #top-nav:sticky #sans #interesting what is this plugin stuff|#academic #blog #contact #minimal #personal #portfolio #projects #responsive|
+|[Adam & Eve](https://themes.gohugo.io/hugo_theme_adam_eve/)|#mobile:no #hamburger:no looks like kindergarten or ..|#clean #documentation #i18n #minimal #responsive #shortcode|
+|[Aerial](https://themes.gohugo.io/aerial/)|missing stylesheets?|#personal #responsive|
+|[Agency](https://themes.gohugo.io/agency/)|#mobile:yes #hamburger:yes:vertical:animated #icons it's fine #tier:B|#company #contact-form #google-analytics #portfolio #timeline|
+|[Aglaus](https://themes.gohugo.io/aglaus/)|#mobile:yes #hamburger:no #sans #fonting:passe meh|#amp #blog #ogp #responsive #seo #share-button #structured-data #thumbnail #twitter-cards|
+|[Air](https://themes.gohugo.io/air/)|#mobile:yes #hamburger:no #interesting cutesey animation #fonting|#blog #disqus #google-analytics #share|
+|[Airspace Hugo](https://themes.gohugo.io/airspace-hugo/)|#mobile:yes #hamburger:yes:vertical:animated #icons #top-nav:NOT-sticky #tier:B image as logo looks kind of unprofessional. spacing is weird (top margin)|#blog #bootstrap #company #portfolio #projects #responsive #themefisher|
+|[Alabaster](https://themes.gohugo.io/hugo-alabaster-theme/)|#mobile:yes #hamburger:no #fonting #serif|#documentation|
+|[allegiant](https://themes.gohugo.io/allegiant/)|#mobile:yes #hamburger:no meh|#blog #hugo|
+|[Alpha Church](https://themes.gohugo.io/alpha-church/)|#mobile:yes #hamburger:yes:horizontal:animated and vaguely hierarchical meh #tier:B #icons|#fontawesome #podcast|
+|[AMP](https://themes.gohugo.io/amp/)|#mobile:yes #hamburger:yes:horizontal:animated #fonting #tier:A revisit|#amp #blog #categories #google-analytics #material-design #menu #portfolio #social-links #tags|
+|[Ananke Gohugo Theme](https://themes.gohugo.io/gohugo-theme-ananke/)|#mobile:yes #hamburger:no it's a theme|#blog #comments #disqus #posts #responsive #shortcodes #starter|
+|[Angel's Ladder](https://themes.gohugo.io/angels-ladder/)|#mobile:yes #hamburger:no it doesn't excite me|#blog|
+|[Anybody Home](https://themes.gohugo.io/anybodyhome/)|#mobile:yes #hamburger:no novelty #fonting:passe|#clean #highlightjs #simple|
+|[Apricot Hugo Theme](https://themes.gohugo.io/apricot-hugo-theme/)|#GONE|#blog #responsive|
+|[Arch](https://themes.gohugo.io/hugo-theme-arch/)|#GONE|#blog #bootstrap #talaria|
+|[Artists](https://themes.gohugo.io/artists/)|#mobile:yes #hamburger:no #interesting #fonting #icons #tier:A come back to this|#clients #contact-form #portfolio|
+|[Aurora](https://themes.gohugo.io/aurora/)|#GONE|#blog #minimal #single-column|
+|[Bare Min](https://themes.gohugo.io/hugo-bare-min-theme/)|#NO-DEMO|#debug #minimal|
+|[Base16](https://themes.gohugo.io/base16/)|#mobile:ok #hamburger:no u tried|#blog #syntax-highlighting|
+|[Beautiful Hugo](https://themes.gohugo.io/beautifulhugo/)|#interesting #mobile:yes #hamburger:yes:vertical:animated AND hierarchical #top-nav:sticky #tier:A|#blog #company #disqus #minimal #portfolio #projects #responsive #staticman #themes|
+|[Beg](https://themes.gohugo.io/beg/)|#mobile:yes #hamburger:yes:vertical:animated AND #hamburger:hierarchical #top-nav:NOT-sticky everything's great except #fonting is a little small #tier:A|#blog #ogp #responsive #structured-data #syntax-highlight #thumbnail #twitter-cards|
+|[BeyondNothing](https://themes.gohugo.io/BeyondNothing/)|#mobile:yes #hamburger:no meh|#blog #clean #minimalist|
+|[Bilberry Hugo Theme](https://themes.gohugo.io/bilberry-hugo-theme/)|missing css? #hamburger:no should no be here|#algolia #blog #comments #disqus #font-awesome #google-analytics #highlight.js #i18n #multilingual #pages #personal #posts #responsive #search #syntax-highlighting|
+|[Bingo](https://themes.gohugo.io/hugo-bingo/)|#mobile:yes #hamburger:no boring|#blog #clean #minimalist #responsive #simple #starter|
+|[Blackburn](https://themes.gohugo.io/blackburn/)|#mobile:yes #hamburger:yes:horizontal:animated #top-nav:sticky-overlay #tier:C hamburger nav items are too small for mobile|#blog #personal #purecss #responsive|
+|[Black & Light](https://themes.gohugo.io/black-and-light/)|#interesting #mobile:yes #hamburger:no #fonting|#minimal #personal #responsive #simple #white|
+|[Blank](https://themes.gohugo.io/blank/)|#mobile:NA #hamburger:NO|#blog #starter|
+|[BluestNight](https://themes.gohugo.io/BluestNight/)|#NO-DEMO|#blog #clean #contact-form #creative #dark #flexbox #font-awesome #mobile-friendly #netlify #responsive #search #syntax-highlighting #widgets|
+|[Bulma](https://themes.gohugo.io/bulma/)|#mobile:yes #hamburger:BORKED|#block-templates #blog #bulma #disqus-commenting #flexbox #google-analytics #landing #last-modified-time #mobile-first-design #modern #open-graph-support #paginated-lists #reading-time #related-posts #responsive #responsive-design #schema-structured-data #seo-site-verification #table-of-contents #themes #word-count|
+|[Cactus](https://themes.gohugo.io/cactus/)|#mobile:yes #hamburger:no meh.|#blog #disqus #google-analytics #pagination #rss #sharing-options #syntax-highlighting|
+|[Cactus Plus](https://themes.gohugo.io/hugo-theme-cactus-plus/)|#mobile:yes #hamburger:no margins are ugly|#blog #disqus #rss #syntax-highlighting #tags|
+|[Call me Sam.](https://themes.gohugo.io/hugo-theme-sam/)|#mobile:yes #hamburger:no novelty. no nav|#blog #clean #flexbox #gallery #minimalist #portfolio #responsive #simple #starter #syntax-highlighting|
+|[capsule](https://themes.gohugo.io/capsule/)|#mobile:yes #hamburger:yes:vertical:flickers #top-nav:NOT-sticky does not excite me #tier:C|#bulma #font-awesome #hugo #no-javascript #responsive|
+|[Casper](https://themes.gohugo.io/casper/)|#mobile:meh #hamburger:yes:horizontal:animated #fonting #tier:C doesn't excite. no responsing|#blog #disqus #google-analytics #share|
+|[Casper Two](https://themes.gohugo.io/hugo-casper-two/)|#mobile:BORKED #hamburger:no you tried #fonting|#blog #disqus #google-analytics #pages|
+|[Castanet](https://themes.gohugo.io/castanet/)|#mobile:yes #hamburger:yes:vertical:animated personal "podcast" #top-nav:sticky #tier:B|#podcast #responsive|
+|[classless](https://themes.gohugo.io/classless-hugo/)|WTF #interesting #tier:A read this later|#blog #personal|
+|[Clean White](https://themes.gohugo.io/hugo-theme-cleanwhite/)|#mobile:yes #hamburger:yes:popup #sans #tier:C|#blog #clean #disqus #google-analytics #light #minimal #responsive #search|
+|[Cocoa](https://themes.gohugo.io/cocoa/)|#mobile:yes #hamburger:no oh-kay personal|#404 #blog #clean #comments #disqus #icons #minimal #responsive #svg|
 |[Cocoa-EH](https://themes.gohugo.io/cocoa-eh-hugo-theme/)|#mobile:yes #hamburger:no meh. some smart fonts but a strange mix.|#clean #disqus #fast #responsive #typography|
 |[Code Editor](https://themes.gohugo.io/hugo-code-editor-theme/)|#mobile:yes #hamburger:no eek tryna be matrix|#atom|
 |[Coder](https://themes.gohugo.io/hugo-coder/)|#mobile:yes #hamburger:yes:vertical #top-nav:NOT-sticky #tier:A #fonting|#analytics #blog #clean #favicon #minimal #minimalist #pagination #personal #responsive #simple #single-column #syntax-highlighting|
