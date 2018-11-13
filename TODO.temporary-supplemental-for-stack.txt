@@ -1,0 +1,96 @@
+this is a temporary file with notes about this particular cluster
+of items on our TODO stack. some entries here may contain text that
+we'll use in the corresponding commits for the milestones.
+
+the whole existence of this is a bit of sell or strain showing a
+shortcoming of our project management approach .. food for thought
+for much later.
+
+after this paragraph it is written "upside down" to correspond with
+its counterpart stack file.
+
+
+
+👇DONE!👈
+
+NEW 1: publish one or more dim sum, integrated with lozenge grid
+(WAS: -tag-lyfe.1.1.01)
+
+
+
+
+👇THEN👆
+
+NEW 2: design & build out reactive losenge grid (not dynamic at first))
+(WAS: -tag-lyfe.1.1.03)
+
+
+
+
+👇THEN👆
+
+NEW 3: integrate all work thus far into nagel-halftone theme
+integrate the nagelized nassim with your own custom theme
+publish DUMMY articles (blog)!
+(WAS: -tag-lyfe.1.1.04)
+
+
+
+
+👇THEN👆
+
+NEW 4: learn enough gimp to make the ziggy stardust strokes. (possibly
+but certainly not necessarily look into algorithmic creation). all while
+documenting.
+(WAS: -tag-lyfe.1.1.02)
+(WAS: -tag-lyfe.1.1.11)
+
+
+
+
+👇THEN👆
+
+NEW 5: learn enough gimp to posterize nassim, while documenting it.
+(WAS: -tag-lyfe.1.1.10 gimp just enough to halftone the subject)
+
+
+
+
+👇THEN👆
+
+NEW 6: reactive version of full 3-layer parallax, as PoC
+(WAS: -tag-lyfe.1.1.05)
+
+
+
+
+👇THEN👆
+
+NEW 7: reactive version forked from punchout verion PoC
+(WAS: -tag-lyfe.1.1.06)
+
+
+
+
+👇THEN👆
+
+NEW 8: reactive version of oldschool style float left image PoC
+(WAS: -tag-lyfe.1.1.07)
+
+
+
+
+👇THEN👆
+
+NEW 9: chose theme or that themes you will use as your starting point(s)
+  for your own custom theme, which you will make by
+  synthesizing elements from existing themes to make your own perfect
+  theme. take into account:
+    - the fonting you like
+    - the hamburger you want
+    - responsive of course
+    - whatever blog like whatever for now (we have to learn what this means)
+(WAS: -tag-lyfe.1.1.08 dim sum on every hugo theme haha. chose theme)
+AND:
+(-tag-lyfe.1.1.11.1 Index manually every theme with notes, resolve a set of zero to N themes you want to synthesize from.
+(-tag-lyfe.1.1.11.1.1 Resolve a set of zero to N themes you want to synthesize from.

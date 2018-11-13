@@ -28,7 +28,7 @@ class _CLI:
     def execute(self):
         import script.stream as cl  # cl = "CLI lib"
         o = self._accept_visitor
-        self._OK and o(cl.must_be_interactive_)
+        cl.must_be_interactive_(self)
         self._OK and o(cl.parse_args_, {'namespace': '_namespace'},
                        self._argv, _my_parameters, _my_desc)
         self._OK and setattr(self, '_listener', cl.listener_for_(self))
@@ -45,6 +45,22 @@ class _CLI:
         with _ as dirs:
             for dir_path in dirs:
                 visit(dir_path)
+
+    # == BEGIN temp retrofitting from old way [#608.5] to new way [#608.6]
+
+    def _write_exitstatus(self, x):
+        self._exitstatus = x
+
+    exitstatus = property(None, _write_exitstatus)
+
+    def _write_OK(self, x):
+        self._OK = x
+
+    OK = property(None, _write_OK)
+
+    use_new_way_for_must_be_interactive = True
+
+    # == END
 
     def _accept_visitor(self, f, settables=None, *args):
         reso = f(self, *args)
@@ -140,15 +156,13 @@ class _open_theme_directory_stream_via_these:  # #testpoint
         with cm as proc:
             sout = proc.stdout
 
-            # == BEGIN yuck
-            wat = next(sout)
-            from os import path as os_path
-            if '.github' != os_path.basename(wat[0:-1]):
-                cover_me("expecting thing but didn't have thing")
-            # == END yuck
+            def chop(line):
+                return line[0:-1]  # chop not strip just to be gigo
+
+            # at #history-A.1 removed thing that removed '.github' from listing
 
             for line in sout:
-                yield line[0:-1]  # chop not strip just to be gigo
+                yield chop(line)
 
             es = proc.returncode
             if es is not None:
@@ -228,4 +242,5 @@ if __name__ == '__main__':
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 
+# #history-A.1 (as referenced)
 # #born.

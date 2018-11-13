@@ -6,4 +6,5 @@ node_modules
 *.pyc
 __pycache__
 /target
+/themes/hyde
 /Z

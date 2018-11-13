@@ -23,8 +23,7 @@ these were the original stated objectives, here (in part) for posterity:
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |                 (example) | #this | #this-cel-too
-|                   #425    |
-|                   #424    |       | how we hacked the themes into here
+|                   #424    |       | [theme notes]
 |                   #423    |       | dot
 |                   #422    |       | [hugo theme dim sum]
 |                   #421    |       | hugo vs jekyll vs whatever

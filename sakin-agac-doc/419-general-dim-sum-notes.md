@@ -151,6 +151,14 @@ $ hugo server -D
 
 
 
+later we upgraded hugo
+do:
+```bash
+$ brew upgraded hugo
+```
+
+
+
 
 [thing01]: https://devcenter.heroku.com/articles/static-sites-ruby
 [thing02]: https://github.com/heroku/heroku-buildpack-static.git

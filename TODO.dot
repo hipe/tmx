@@ -115,11 +115,20 @@ regen not painful. can runlocal
 style=filled
 shape=rect
 ]
-n_gimp_enough[label="learn enough
-GIMP, document it
-(mabye DIM SUM)
-"
+n_gimp_enough[label="have DIM SUM
+(and documentation)
+of GIMP"
 shape=rect
+]
+n_gimp_enough_050[label="while documenting
+(and maybe feature DIM SUM),
+learn enough GIMP to posterize nassim
+"
+]
+n_gimp_enough_100[label="while [same],
+david bowie (with
+possible algorithmic detour)
+"
 ]
 objective_grep_dump[label="grep dump
 difficulty: hi
@@ -327,6 +336,12 @@ style=filled
 ]
 n_react_enough[label="learn enough react"
 ]
+n_read_up_on_themes[label="read up on themes
+while adding to DIM SUM
+of SSG features..
+"
+style=filled
+]
 objective_sakin_agac[label="sakin agac
 difficulty: med
 workload: hi
@@ -351,16 +366,26 @@ choice)
 "
 shape=diamond
 ]
-n_theme_choose[label="choose a theme
-or themes
+n_theme_choose[label="choose a theme or themes to
+serve as your synthesized startingpoint
+theme. if multiple, synthesize.
+OK on your web and mobile.
 "
 ]
-n_theme_integrate[label="synthesize aspects of favorite
-themes/customize theme (trivially)
-you could do DIM SUM
-of SSG features..
-"
-]
+n_theme_mine_050[label="get your theme to do
+float left (and maybe float right)
+of an image inline in an article,
+OK on your web and mobile.
+"]
+n_theme_mine_100[label="get that float left
+(and maybe float right)
+images to be punched out,
+OK on your web and mobile.
+"]
+n_theme_mine_150[label="get the bowie
+layer to work on both
+your web and mobile.
+"]
 objective_upload_bot[label="upload bot
 difficulty: v hi
 workload: med
@@ -396,12 +421,13 @@ n_dim_sum_ec->n_channel_game_dev
 n_dim_sum_heroku_plug_ins->n_articles_for
 n_dim_sum_heroku_plug_ins->n_publishing_simple
 n_dim_sum_themes->n_articles_for
-n_dim_sum_themes->n_theme_choose
+n_dim_sum_themes->n_read_up_on_themes
 n_filter_by->n_dim_sum_heroku_plug_ins
 n_frontmatter_magic->a_frontmatter_yikes
 n_gather_css->n_css_woah
 n_gimp_enough->n_articles_for
-n_gimp_enough->n_integrate_nagel_with_first_css
+n_gimp_enough_050->n_gimp_enough_100
+n_gimp_enough_100->n_integrate_nagel_with_first_css
 gfm_rumskalla->objective_sakin_agac
 n_have_css->n_gather_css
 n_have_css->n_temporary_waypoint
@@ -451,16 +477,18 @@ n_publishing_simple->gfm_rumskalla
 n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
 n_react_enough->n_js_dim
+n_read_up_on_themes->n_theme_choose
+n_read_up_on_themes->n_articles_for
 n_sync->n_use_sync
-n_temporary_waypoint->n_gimp_enough
+n_temporary_waypoint->n_gimp_enough_050
 n_temporary_waypoint->n_lozenge_have
 n_temporary_waypoint->n_react_enough
-n_theme_choose->n_theme_integrate
-n_theme_integrate->n_articles_for
-n_theme_integrate->n_have_css
+n_theme_choose->n_theme_mine_050
+n_theme_mine_050->n_theme_mine_100
+n_theme_mine_100->n_theme_mine_150
+n_theme_mine_150->n_have_css
 n_use_sync->n_articles_for
 n_use_sync->n_chose_pg
-
 
 
 rankdir=BT
@@ -472,7 +500,7 @@ representing something like \"objectives\".
 elliptical nodes are usually actions.
 
 an arrow from an action to a state
-means something lke \"produces\".
+means something like \"produces\".
 
 an arrow from a state to an action
 means something like \"is a precursor to\".

@@ -257,17 +257,33 @@ all this is now labelled as :[#608.5]. (compare to [#608.6]).
 """
 
 
-class parse_args_:
+def parse_args_(cli, *args):
+
+    # handle either old way [#608.5] to new way [#608.6] (temporary)
+
+    if hasattr(cli, _new_way_B) and getattr(cli, _new_way_B):
+        return _parse_args_new_way(cli, *args)
+    else:
+        return _parse_args_old_way(cli, *args)
+
+
+def _parse_args_new_way(cli, write_attr, params, desc):
+    reso = _parse_args(cli, cli.ARGV, params, desc)
+    ok = reso.OK
+    cli.OK = ok  # make extra unnecessary contact for now..
+    if ok:
+        setattr(cli, write_attr, reso.namespace)
+    else:
+        cli.exitstatus = reso.exitstatus
+
+
+_new_way_B = 'use_new_way_for_parse_args'
+
+
+class _parse_args_old_way:
 
     def __init__(self, cli, argv, define_params, desc):
-        from script_lib.magnetics import (
-                parse_stepper_via_argument_parser_index as stepperer,
-                )
-        reso = stepperer.SIMPLE_STEP(
-                cli.stdin, cli.stderr, argv, define_params,
-                stdin_OK=False,  # ..
-                description=desc,
-                )
+        reso = _parse_args(cli, argv, define_params, desc)
         ok = reso.OK
         self.OK = ok
         if ok:
@@ -276,7 +292,36 @@ class parse_args_:
             self.exitstatus = reso.exitstatus
 
 
+def _parse_args(cli, argv, define_params, desc):
+
+        from script_lib.magnetics import (
+                parse_stepper_via_argument_parser_index as stepperer,
+                )
+        reso = stepperer.SIMPLE_STEP(
+                cli.stdin, cli.stderr, argv, define_params,
+                stdin_OK=False,  # ..
+                description=desc,
+                )
+        return reso
+
+
 def must_be_interactive_(cli):
+
+    # retrofit old way [#608.5] to new way [#608.6] (one day rid all old way):
+
+    res = _must_be_interactive(cli)
+    if not (hasattr(cli, _new_way_C) and getattr(cli, _new_way_C)):
+        return res
+    ok = res.OK
+    cli.OK = ok  # make extra unnecessary contact for now..
+    if not ok:
+        cli.exitstatus = res.exitstatus
+
+
+_new_way_C = 'use_new_way_for_must_be_interactive'
+
+
+def _must_be_interactive(cli):
 
     if cli.stdin.isatty():
         return _OK_simply

@@ -73,6 +73,8 @@ sub-project: upload files to s3
   design (nonworking static layout)
   react tutorial
   sftp a static tree to heroku
+
+# end old for posterity
 (-tag-lyfe.1.1.01 publish one or more dim sum, integrated with lozenge grid)
 (-tag-lyfe.1.1.02 read or skim every section, enter metadata into DIM SUM)
 (-tag-lyfe.1.1.03 design & build out reactive losenge grid (not dynamic at first))
@@ -81,8 +83,19 @@ sub-project: upload files to s3
 (-tag-lyfe.1.1.06 reactive version forked from punchout verion PoC)
 (-tag-lyfe.1.1.07 reactive version of oldschool style float left image PoC)
 (-tag-lyfe.1.1.08 dim sum on every hugo theme haha. chose theme)
-(-tag-lyfe.1.1.09 continue reading hugo docs up to making own theme, while DIM SUMing it)
 (-tag-lyfe.1.1.10 gimp just enough to halftone the subject)
 (-tag-lyfe.1.1.11 gimp just enough to get transparent fello (research bowie, nagel))
 (-tag-lyfe.1.1.11.1 Index manually every theme with notes, resolve a set of zero to N themes you want to synthesize from.
 (-tag-lyfe.1.1.11.1.1 Resolve a set of zero to N themes you want to synthesize from.
+# these old guys are kept for posterity. delete the lines as you finish their new counterparts
+
+(-tag-lyfe.1.1.1 Publish one DIM-SUM, integrated with lozenge grid)
+(-tag-lyfe.1.1.2 Specialize theme for reactive losenge grid (static))
+(-tag-lyfe.1.1.3 Integrate real image assembly into theme)
+(-tag-lyfe.1.1.4 Index documentation for GIMP ziggy stardust)
+(-tag-lyfe.1.1.5 Index documentation for GIMP posterization)
+(-tag-lyfe.1.1.6 Specialize theme for ziggy layer (placeholder))
+(-tag-lyfe.1.1.7 Specialize theme for image punchout effect)
+(-tag-lyfe.1.1.8 Specialize theme for float image left)
+(-tag-lyfe.1.1.9 Model criteria that selects N base themes)
+(-tag-lyfe.1.1.10 Index documentation for creating hugo theme)

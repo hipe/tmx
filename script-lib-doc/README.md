@@ -56,6 +56,8 @@ instead of a tightly defined but somewhat obtuse use of a response object
 with a `result_values` dictionary and so on; under this newer API, library
 functions can simply write to `OK` and `exitstatus` attributes directly..
 
+(the client can use `@property` ..)
+
 
 
 ### PRO's and CON's against the [#608.5] older way

@@ -44,7 +44,7 @@ def sanity(s):
     raise Exception(f'sanity - {s}')
 
 
-def _my_parameters(o, param):
+def _my_params(o, param):
 
     o['themes_dir'] = param(  # ..
             description='«help for themes_dir»',
@@ -62,8 +62,7 @@ class _CLI:
         import script.stream as cl  # cl = "CLI lib"
         o = self._accept_visitor
         self._OK and o(cl.must_be_interactive_)
-        self._OK and o(cl.parse_args_, {'namespace': '_namespace'},
-                       self._argv, _my_parameters, _my_desc)
+        self.OK and cl.parse_args_(self, '_namespace', _my_params, _my_desc)
         self._OK and setattr(self, '_listener', cl.listener_for_(self))
         self._OK and self._work()
         return self._exitstatus
@@ -87,6 +86,24 @@ class _CLI:
                     )
             self.stderr.write(_big_s)
             self.stderr.write('\n')
+
+    # == BEGIN temp retrofitting from old way [#608.5] to new way [#608.6]
+
+    @property
+    def ARGV(self):
+        return self._argv
+
+    @property
+    def OK(self):
+        return self._OK
+
+    @OK.setter
+    def OK(self, x):
+        self._OK = x
+
+    use_new_way_for_parse_args = True
+
+    # == END
 
     def _accept_visitor(self, f, settables=None, *args):
         reso = f(self, *args)
