@@ -28,19 +28,17 @@ def _my_parameters(o, param):
 class _CLI:
 
     def __init__(self, *_four):
-        self.stdin, self.stdout, self.stderr, self._argv = _four
-        self._exitstatus = 1
-        self._OK = True
+        self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]
+        self.exitstatus = 1
+        self.OK = True
 
     def execute(self):
         import script.stream as cl  # cl = "CLI lib"
-        o = self._accept_visitor
-        self._OK and o(cl.must_be_interactive_)
-        self._OK and o(cl.parse_args_, {'namespace': '_namespace'},
-                       self._argv, _my_parameters, _my_desc)
-        self._OK and setattr(self, '_listener', cl.listener_for_(self))
-        self._OK and self._work()
-        return self._exitstatus
+        cl.must_be_interactive_(self)
+        cl.parse_args_(self, '_namespace', _my_parameters, _my_desc)
+        self.OK and setattr(self, '_listener', cl.listener_for_(self))
+        self.OK and self._work()
+        return self.exitstatus
 
     def _work(self):
 
@@ -54,28 +52,12 @@ class _CLI:
         sout = self.stdout
         import pprint
         pp = pprint.PrettyPrinter(indent=2, stream=sout).pprint
-        self._exitstatus = 0
+        self.exitstatus = 0
         except_first_time = _ExceptFirstTime(write_newline)
         _ = getattr(self._namespace, 'themes-dir')
         for path, dct in theme_toml_stream_via_themes_dir(_, self._listener):
             except_first_time()
             visit(path, dct)
-
-    def _accept_visitor(self, f, settables=None, *args):
-        reso = f(self, *args)
-        if reso.OK:
-            if settables is not None:
-                self.__set_settables(reso.result_values, settables)
-        else:
-            self.stop_via_exitstatus_(reso.exitstatus)
-
-    def __set_settables(self, actuals, settables):
-        for (far_name, near_attr) in settables.items():
-            setattr(self, near_attr, actuals[far_name])
-
-    def stop_via_exitstatus_(self, es):
-        self._exitstatus = es
-        self._OK = False
 
 
 def theme_toml_stream_via_themes_dir(themes_dir, listener):  # glue

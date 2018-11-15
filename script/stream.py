@@ -54,23 +54,21 @@ class _CLI:
         self.stdin = sin
         self._sout = sout
         self.stderr = serr
-        self._argv = argv
-        self._OK = True
+        self.ARGV = argv
+        self.OK = True
+        self.exitstatus = 0
 
     def execute(self):
-        o = self._accept_visitor
-        self._exitstatus = 5
-        self._OK and o(must_be_interactive_)
-        self._OK and o(parse_args_, {'namespace': '_namespace'},
-                       self._argv, _my_parameters, _desc)
-        self._OK and self.__init_attributes_via_namespace()
-        self._OK and o(maybe_express_help_for_format_, None, self._coll_id)
-        self._OK and setattr(self, '_listener', listener_for_(self))
-        self._OK and self.__work()
-        return self._exitstatus
+        # (stopping early is #coverpoint6.1)
+        must_be_interactive_(self)
+        self.OK and parse_args_(self, '_namespace', _my_parameters, _desc)
+        self.OK and self.__init_attributes_via_namespace()
+        self.OK and maybe_express_help_for_format_(self, self._coll_id)
+        self.OK and setattr(self, '_listener', listener_for_(self))
+        self.OK and self.__work()
+        return self.exitstatus
 
     def __work(self):
-        self._exitstatus = 0  # innocent until an 'error' is emitted
         if self._yes_apply_sync_related_funcs:
             self.__work_complicated()
         else:
@@ -112,20 +110,6 @@ class _CLI:
         ns = _pop_property(self, '_namespace')
         self._yes_apply_sync_related_funcs = ns.apply_sync_related_functions
         self._coll_id = getattr(ns, 'far-collection')  # #open [#601]
-
-    def _accept_visitor(self, f, settables=None, *args):  # #cp
-        reso = f(self, *args)
-        if reso.OK:
-            if settables is not None:
-                actuals = reso.result_values
-                for (far_name, near_attr) in settables.items():
-                    setattr(self, near_attr, actuals[far_name])
-        else:
-            self.stop_via_exitstatus_(reso.exitstatus)
-
-    def stop_via_exitstatus_(self, exitstatus):
-        self._exitstatus = exitstatus
-        self._OK = False
 
 
 def _traversal_stream_for_sync(  # #testpoint
@@ -169,7 +153,7 @@ class open_traversal_stream:
         self._collection_identifier = collection_identifier
         self._cached_document_path = cached_document_path
         self._listener = listener
-        self._OK = True
+        self.OK = True
 
     def __enter__(self):
 
@@ -207,11 +191,13 @@ _desc = __doc__
 
 
 def maybe_express_help_for_format_(cli, arg):
+    """if the user passes the string "help" for the argument, display
+
+    help for that format and terminate early. otherwise, do nothing.
+    """
 
     if 'help' == arg:
         return _do_express_help_for_formats(cli)
-    else:
-        return _OK_simply
 
 
 def _do_express_help_for_formats(cli):
@@ -258,17 +244,10 @@ all this is now labelled as :[#608.5]. (compare to [#608.6]).
 """
 
 
-def parse_args_(cli, *args):
+def parse_args_(cli, write_attr, params, desc):
 
-    # handle either old way [#608.5] to new way [#608.6] (temporary)
+    # (at #history-A.2 archived [#608.5] old way)
 
-    if hasattr(cli, _new_way_B) and getattr(cli, _new_way_B):
-        return _parse_args_new_way(cli, *args)
-    else:
-        return _parse_args_old_way(cli, *args)
-
-
-def _parse_args_new_way(cli, write_attr, params, desc):
     reso = _parse_args(cli, cli.ARGV, params, desc)
     ok = reso.OK
     cli.OK = ok  # make extra unnecessary contact for now..
@@ -276,21 +255,6 @@ def _parse_args_new_way(cli, write_attr, params, desc):
         setattr(cli, write_attr, reso.namespace)
     else:
         cli.exitstatus = reso.exitstatus
-
-
-_new_way_B = 'use_new_way_for_parse_args'
-
-
-class _parse_args_old_way:
-
-    def __init__(self, cli, argv, define_params, desc):
-        reso = _parse_args(cli, argv, define_params, desc)
-        ok = reso.OK
-        self.OK = ok
-        if ok:
-            self.result_values = {'namespace': reso.namespace}
-        else:
-            self.exitstatus = reso.exitstatus
 
 
 def _parse_args(cli, argv, define_params, desc):
@@ -308,29 +272,16 @@ def _parse_args(cli, argv, define_params, desc):
 
 def must_be_interactive_(cli):
 
-    # retrofit old way [#608.5] to new way [#608.6] (one day rid all old way):
-
-    res = _must_be_interactive(cli)
-    if not (hasattr(cli, _new_way_C) and getattr(cli, _new_way_C)):
-        return res
-    ok = res.OK
-    cli.OK = ok  # make extra unnecessary contact for now..
-    if not ok:
-        cli.exitstatus = res.exitstatus
-
-
-_new_way_C = 'use_new_way_for_must_be_interactive'
-
-
-def _must_be_interactive(cli):
+    # (at #history-A.2 removed [#608.5] as old way)
 
     if cli.stdin.isatty():
-        return _OK_simply
+        pass  # OK
     else:
         o = cli.stderr.write
         o('cannot yet read from STDIN.\n')
         o('(but maybe one day if there\'s interest.)\n')
-        return _not_OK_generically
+        cli.exitstatus = 5  # generic_failure_exitstatus
+        cli.OK = False
 
 
 def listener_for_(cli):
@@ -346,24 +297,11 @@ def listener_for_(cli):
     def f(head_channel, *a):
         if 'error' == head_channel:
             # (there can be multiple such emissions)
-            cli.stop_via_exitstatus_(6)  # meh
+            # at #history-A.2 we changed this to be the direct way
+            cli.exitstatus = 6  # meh
+            cli.OK = False
         express(head_channel, *a)
     return f
-
-
-class _stop_early:  # #class-as-namespace
-    OK = False
-    exitstatus = 0
-
-
-class _not_OK_generically:  # #class-as-namespace
-    OK = False
-    exitstatus = 5
-
-
-class _OK_simply:  # #class-as-namespace
-    OK = True
-    result_values = None
 
 
 def try_help_(s):
@@ -429,5 +367,6 @@ if _is_entrypoint_file:
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 
+# #history-A.2 can be temporary. as referenced.
 # #history-A.1: begin become library, will eventually support "map for sync"
 # #born.

@@ -8,22 +8,11 @@ design.
 
 
 
-
-## a fun dilemma: two competing approaches for a library interface
-
-at writing (at #born) we have two competing categories of API for how CLI
-clients interact with this library. there's:
-
-  - [#608.5] this one experimental boy (see currently in a `script/`), and
-  - [#608.6] our newer, more straightforward "holy 6" (below).
-
-here we introduce the newer way and then compare/contrast PRO's and CON's after.
-
-
-
-### the newer way: the "holy 6" :[#608.6]
+### our :[#608.6] "holy 6" internal API for CLI components
 
 #### _(don't get attached to the number "6" - it might increase)_
+
+(there used to be an [#608.5] older way but at #history-A.1 it was sunsetted.)
 
 the "holy 6" are 6 attributes typical CLI clients are expected to have:
   - stdin
@@ -60,14 +49,6 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 
 
 
-### PRO's and CON's against the [#608.5] older way
-
-(this section is a stub and I can help expand it.)
-(write this when you do #open [#607.c] or just demolish all trace of the
-old way.)
-
-
-
 
 ## <a name="node-table"></a>the node table
 
@@ -75,12 +56,12 @@ old way.)
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#608.7]                   | #trak | track fellows whose CLI exitstatus is "guilty til proven innocent"
 |[#608.6]                   | #trak | this other approach to a library interface (see)
 |[#608.5]                   | #trak | this one approach to a library interface (see)
 |[#608.4]                   | #trak | all the places you write this same `--help` regex |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#608.2]                   |       | external tracking |
-|[#607.c]                   | #open | probably refactor all [#608.5] into [#608.6] |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
 |[#604]                     | #wish | for strong type |
@@ -92,4 +73,5 @@ old way.)
 
 ## (document-meta)
 
+  - #history-A.1 (as referenced)
   - #broke-out & expanded

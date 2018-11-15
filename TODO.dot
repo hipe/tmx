@@ -384,7 +384,7 @@ n_make_fontmatterizer[label="make\nfrontmatterizer"]
 n_do_a_test_publish[label="do a test\npublish"]
 n_theme_choose
 n_renames[label="flush renames"]
-n_refactor[label="refactor out older\ntechniques in producer\nscripts"]
+n_refactor[label="refactor out older\ntechniques in producer\nscripts" style=filled]
 n_theme_choose_begin[label="bisect (maybe\ncould be combined\nwith cleanup" style=filled]
 }
 n_theme_mine_050[label="get your theme to do

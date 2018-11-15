@@ -24,7 +24,7 @@ at the end of all this, each far item that had no corresponding near item
 (this is a synopsis of an algorithm that is described [#407] more formally.)
 """
 
-_description_of_sync = __doc__
+_desc = __doc__
 
 
 if __name__ == '__main__':
@@ -75,31 +75,27 @@ def _pop_property(self, prop):
 
 class _CLI:  # #coverpoint
 
-    def __init__(self, sin, sout, serr, argv):
-        self.stdin = sin
-        self.stdout = sout
-        self.stderr = serr
-        self._argv = argv
+    def __init__(self, *_four):
+        self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]
+        self.exitstatus = 5  # starts as guilty til proven innocent
+        self.OK = True
 
     def execute(self):
-        o = self._accept_visitor
-        self._exitstatus = 5
-        self._OK = True
-        self._OK and o(cli_lib.must_be_interactive_)
-        self._OK and o(cli_lib.parse_args_, {'namespace': '_namespace'},
-                       self._argv, _my_parameters, _description_of_sync)
-        self._OK and self.__init_normal_args_via_namespace()
-        self._OK and o(biz_lib.maybe_express_help_for_format_, None,
-                       self._normal_args['near_format'])
-        self._OK and o(biz_lib.maybe_express_help_for_format_, None,
-                       self._normal_args['far_format'])
-        self._OK and setattr(self, '_listener', cli_lib.listener_for_(self))
-        self._OK and self.__call_over_the_wall()
-        return self._pop_property('_exitstatus')
+        cl = cli_lib
+        cl.must_be_interactive_(self)
+        self.OK and cl.parse_args_(self, '_namespace', _my_parameters, _desc)
+        self.OK and self.__init_normal_args_via_namespace()
+        self.OK and biz_lib.maybe_express_help_for_format_(
+                self, self._normal_args['near_format'])
+        self.OK and biz_lib.maybe_express_help_for_format_(
+                self, self._normal_args['far_format'])
+        self.OK and setattr(self, '_listener', cl.listener_for_(self))
+        self.OK and self.__call_over_the_wall()
+        return self._pop_property('exitstatus')
 
     def __call_over_the_wall(self):
 
-        self._exitstatus = 0  # now that u made it this far innocent til guilty
+        self.exitstatus = 0  # now that u made it this far innocent til guilty
 
         _d = self._pop_property('_normal_args')
         _context_manager = OpenNewLines_via_Sync_(
@@ -138,20 +134,6 @@ class _CLI:  # #coverpoint
                 'far_format': ns.far_format,
                 }
 
-    def _accept_visitor(self, f, settables=None, *args):
-        reso = f(self, *args)
-        if reso.OK:
-            if settables is not None:
-                actuals = reso.result_values
-                for (far_name, near_attr) in settables.items():
-                    setattr(self, near_attr, actuals[far_name])
-        else:
-            self.stop_via_exitstatus_(reso.exitstatus)  # #coverpoint6.1
-
-    def stop_via_exitstatus_(self, exitstatus):
-        self._exitstatus = exitstatus
-        self._OK = False
-
     _pop_property = _pop_property
 
 
@@ -172,13 +154,13 @@ class OpenNewLines_via_Sync_:  # #testpoint
         self.far_format = far_format
         self._custom_mapper_OLDSCHOOL = custom_mapper_OLDSCHOOL
         self._listener = listener
-        self._OK = True
+        self.OK = True
 
     def __enter__(self):
-        self._OK and self.__resolve_far_collection_reference()
-        self._OK and self.__resolve_near_collection_reference()
-        self._OK and self.__resolve_function()
-        if not self._OK:
+        self.OK and self.__resolve_far_collection_reference()
+        self.OK and self.__resolve_near_collection_reference()
+        self.OK and self.__resolve_function()
+        if not self.OK:
             return
         lines = self.__do_new_doc_lines_via_sync()
         if True:  # ..
@@ -234,7 +216,7 @@ class OpenNewLines_via_Sync_:  # #testpoint
 
     def _required(self, attr, x):
         if x is None:
-            self._OK = False
+            self.OK = False
         else:
             setattr(self, attr, x)
 

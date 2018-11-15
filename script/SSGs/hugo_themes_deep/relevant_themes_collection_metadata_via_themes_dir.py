@@ -54,17 +54,16 @@ def _my_params(o, param):
 class _CLI:
 
     def __init__(self, *_):
-        self.stdin, self.stdout, self.stderr, self._argv = _
+        self.stdin, self.stdout, self.stderr, self.ARGV = _
         self._exitstatus = 1
         self._OK = True
 
     def execute(self):
         import script.stream as cl  # cl = "CLI lib"
-        o = self._accept_visitor
-        self._OK and o(cl.must_be_interactive_)
-        self.OK and cl.parse_args_(self, '_namespace', _my_params, _my_desc)
-        self._OK and setattr(self, '_listener', cl.listener_for_(self))
-        self._OK and self._work()
+        cl.must_be_interactive_(self)
+        cl.parse_args_(self, '_namespace', _my_params, _my_desc)
+        self.OK and setattr(self, '_listener', cl.listener_for_(self))
+        self.OK and self._work()
         return self._exitstatus
 
     def _work(self):
@@ -86,40 +85,6 @@ class _CLI:
                     )
             self.stderr.write(_big_s)
             self.stderr.write('\n')
-
-    # == BEGIN temp retrofitting from old way [#608.5] to new way [#608.6]
-
-    @property
-    def ARGV(self):
-        return self._argv
-
-    @property
-    def OK(self):
-        return self._OK
-
-    @OK.setter
-    def OK(self, x):
-        self._OK = x
-
-    use_new_way_for_parse_args = True
-
-    # == END
-
-    def _accept_visitor(self, f, settables=None, *args):
-        reso = f(self, *args)
-        if reso.OK:
-            if settables is not None:
-                self.__set_settables(reso.result_values, settables)
-        else:
-            self.stop_via_exitstatus_(reso.exitstatus)
-
-    def __set_settables(self, actuals, settables):
-        for (far_name, near_attr) in settables.items():
-            setattr(self, near_attr, actuals[far_name])
-
-    def stop_via_exitstatus_(self, es):
-        self._exitstatus = es
-        self._OK = False
 
 
 def relevant_themes_collection_metadata_via_themes_dir(themes_dir, listener):
