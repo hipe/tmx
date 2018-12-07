@@ -1,3 +1,7 @@
+---
+title: "central conceits"
+date: "2018-09-02T19:10:48-04:00"
+---
 # central conceits
 
 ## <a name=A></a> central conceit: the JSON wall (lingua franca)
@@ -67,7 +71,7 @@ the above introduced ideas of heuristic templating and example row).)
 
 
 
-## <a name="C.2"</a>(specific challenges with nativization here)
+## <a name="C.2"></a>(specific challenges with nativization here)
 
 what makes this tricky is the stream-centric nature of the synchronization:
 in ideal cases our synchronization algorithms work by processing both streams

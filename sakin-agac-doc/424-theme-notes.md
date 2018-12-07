@@ -1,3 +1,7 @@
+---
+title: "theme notes"
+date: "2018-11-13T16:07:32-05:00"
+---
 # theme notes
 
 ## main learning points ("content management" section of documentation tree):
@@ -8,8 +12,8 @@
   - the section called "formats" is a confusing misnomer: this is actually lowlevel
     markdown directives (as in "Configure Blackfriday Markdown Rendering")
   - the "page resources" document is written like a reference with absolutely NO context
-  - the document about shortcodes says use `{{% sc-foo param-bar %}}`,
-    but in the giraffeacademy youtube it says use `{{< sc-foo param-bar >}}`.
+  - the document about shortcodes says use `{ {% sc-foo param-bar %} }`,
+    but in the giraffeacademy youtube it says use `{ {< sc-foo param-bar >} }`.
     which is it!?? ok they explain it further on down but it would be nice etc.
   - builtin shortcodes:
     - figure - like img

@@ -1,4 +1,16 @@
+---
+title: 'wiki app "dim sum"'
+date: "2018-04-06T18:11:58-04:00"
+---
 # wiki app "dim sum"
+
+## status of this document
+
+we decided that we don't want a wiki we want an SGG.
+you migth be looking for [#421] hugo vs. jekyll vs etc.
+
+
+
 
 ## objective & scope
 
@@ -17,7 +29,7 @@
 ## the challenger table
 
 | Challenger                |[git?]|[markdown?]|[heroku?]|discussion
-|---------------------------|:----:|:---------:|:-------:|-
+|---------------------------|:----:|:---------:|:-------:|---|
 | [ikiwiki][ikiwiki1]       | yes  | yes       | yes     | [discussion](#ikiwiki-discussion)
 | [wiki.js][wikijs1]        | yes  | yes       | no      | [discussion](#wikijs-discussion)
 | [XWiki][xwiki1]           |  no  | yes       | no      | [discussion](#xwiki-discussion)

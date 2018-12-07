@@ -1,3 +1,7 @@
+---
+title: "to use `git bisect`"
+date: "2018-12-07T03:10:42-05:00"
+---
 # to use `git bisect`
 
 this is basically a condensed subset of what is explained in the excellent

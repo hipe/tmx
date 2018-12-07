@@ -1,8 +1,9 @@
 baseUrl = "http://botnoise.herokuapp.com/"
 # yuck TODO above
 
+title = "samhara"
+
 languageCode = "en-us"
-title = "ohai i am the botnoise title"
 
 # playing around with theme change at #history-A.2
 # theme = "ananke"
@@ -18,7 +19,7 @@ paginate = 20
 theme = "newsprint"
 
 [params]
-subtitle = "ohai i am the subtitle"
+subtitle = "a place for dreams"
 
 
 # #history-A.2 (as referenced, can be temporary)

@@ -1,3 +1,7 @@
+---
+title: "sakin agac README"
+date: "2018-04-04T13:55:22-04:00"
+---
 # sakin agac
 
 (bastardized for the nonsensical turkish "calm tree")
@@ -21,7 +25,7 @@ these were the original stated objectives, here (in part) for posterity:
 ## sub-node table (experiment)
 
 |Id                         | Main Tag | Content |
-|---------------------------|:-----:|-
+|---------------------------|:-----:|---
 |                 (example) | #this | #this-cel-too
 |                   #425    |       | dev workflow notes like git bisect
 |                   #424    |       | [theme notes]

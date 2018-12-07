@@ -382,7 +382,7 @@ n_theme_choose->n_do_a_test_publish
 n_renames->n_theme_choose
 n_refactor->n_renames
 n_theme_choose_begin->n_refactor
-n_theme_choose_end[label="clerical edits to other scripts"]
+n_theme_choose_end[label="clerical edits to other scripts" style=filled]
 n_make_fontmatterizer[label="make\nfrontmatterizer" style=filled]
 n_do_a_test_publish[label="do a test\npublish" style=filled]
 n_theme_choose

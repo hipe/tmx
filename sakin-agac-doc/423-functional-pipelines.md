@@ -1,3 +1,7 @@
+---
+title: "functional pipelines"
+date: "2018-09-02T19:10:48-04:00"
+---
 # functional pipelines
 
 this is scratching a surface. this article is stub. i can help expand it.
@@ -21,7 +25,7 @@ this is scratching a surface. this article is stub. i can help expand it.
 
   - we can extend this idea further when we are syncing. the schema of the
     near collection sort of serves as a lingua franca of its own for the
-    various far collections (producers, actualy) that want to feed into it.
+    various far collections (producers, actually) that want to feed into it.
 
   - when in a sync we target a "markdown table" format (which, at writing
     we always do); we usually (always?) do a thing where we combine something
@@ -47,6 +51,7 @@ this is scratching a surface. this article is stub. i can help expand it.
 ## dream not yet realized
 
 currently:
+
     +--------------------+              +--------------------------+
     | near collection    |              | far collection           |
     | (a markdown table) |     <---     | (w/ special funcs for MD)|
@@ -89,17 +94,20 @@ so:
 
   - the new "deny list" strips out a known set of fields so the consumer
     won't complain.
-                                                           (start)
+
+(comme ça:)
+
+    .                                                      (start)
                                                               V
-                 +--------+                            +------------+
-    (done)  key, | widget | <--(deny list)             | url, label |
-                 +--------+         ^                  +------------+
-                                    |                        |
-                                (inspect)                  (map)
-                                    |                        V
-                 +--------------------+               +--------------------+
-            key, | widget, url, label |<-- (keyer) <--| widget, url, label |
-                 +--------------------+               +--------------------+
+                +--------+                            +------------+
+    (done) key, | widget | <--(deny list)             | url, label |
+                +--------+         ^                  +------------+
+                                   |                        |
+                               (inspect)                  (map)
+                                   |                        V
+                +--------------------+              +--------------------+
+           key, | widget, url, label |<-- (keyer) <-| widget, url, label |
+                +--------------------+              +--------------------+
 
 
 ideally, with [#423.C] custom functional pipelines, we could accomplish

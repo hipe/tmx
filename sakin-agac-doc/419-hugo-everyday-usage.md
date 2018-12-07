@@ -1,3 +1,9 @@
+---
+title: "hugo everyday usage"
+date: "2018-08-10T04:19:18-04:00"
+---
+# hugo everyday usage
+
 ## current status
 
 looking at hugo. hoping for hugo on heroku
@@ -22,6 +28,7 @@ oh what's this? jekyll _on_ heroku is a thing (how?
 then we learned of [hugo][thing03] and it of course tickled our fancy.
 
 uptakes of this (15 month old) blog post is that
+
   - hugo sounds more compelling generally but doesn't have a plugin
     architecture (oh?)
   - was sad to discover how hard-coded markdown sounds like it is
@@ -45,6 +52,7 @@ worry about why hugo won't work for our needs later..
 ## look it works on heroku
 
 in a separate tab off to the right, do:
+
     $ heroku logs --tail -a botnoise
 
 note: you won't see anything.

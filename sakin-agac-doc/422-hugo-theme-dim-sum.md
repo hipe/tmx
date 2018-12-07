@@ -1,4 +1,8 @@
-hello
+---
+title: "hugo theme dim sum"
+date: "2018-09-05T10:42:43-04:00"
+---
+# hugo theme dim sum
 
 
 |Hugo theme|notes|tags (generated)|
@@ -246,14 +250,14 @@ hello
 |[Vec](https://themes.gohugo.io/hugo-theme-vec/)|#mobile:NA comment: blog. broken image a bad look|#black-white #blog #clean #minimal #neat|
 |[Vex](https://themes.gohugo.io/vex-hugo/)|#mobile:no case study: looks GREAT on desktop, looks LIKE CRAP on mobile (broken!)|#bootstrap #onepage #product #themefisher|
 |[vienna](https://themes.gohugo.io/vienna/)|#mobile:NA it's oh-kay as a blog|#blog #bootstrap #tags|
-|[W3.CSS Basic](https://themes.gohugo.io/hugo-theme-w3css-basic/)|#mobile:yes #ranking:"C-class" color theme horrible and feels too dated with rounded corners and drop shadows. but icons are nice.|#attachments #blog #carousel #clients #company #contact-form #custom-themes #debug #disqus #features #font-awesome #gallery #google-analytics #i18n #landing-page #menu #mobile #monochromatic #pages #pagination #personal #portfolio #privacy #products #projects #responsive #search #syntax-highlighting|
-|[Wave](https://themes.gohugo.io/hugo-theme-wave/)|#mobile:yes #ranking:"next under yourfolio"|#blog #bootstrap #font-awesome #lunr.js #talaria|
+|[W3.CSS Basic](https://themes.gohugo.io/hugo-theme-w3css-basic/)|#mobile:yes #tier:C color theme horrible and feels too dated with rounded corners and drop shadows. but icons are nice.|#attachments #blog #carousel #clients #company #contact-form #custom-themes #debug #disqus #features #font-awesome #gallery #google-analytics #i18n #landing-page #menu #mobile #monochromatic #pages #pagination #personal #portfolio #privacy #products #projects #responsive #search #syntax-highlighting|
+|[Wave](https://themes.gohugo.io/hugo-theme-wave/)|#mobile:yes #tier:B|#blog #bootstrap #font-awesome #lunr.js #talaria|
 |[Whiteplain](https://themes.gohugo.io/whiteplain/)|#no-because:"looks too busy in mobile"|#blog #simple #white|
 |[Winning](https://themes.gohugo.io/hugo-theme-winning/)|#mobile:no dude what the f\*ck|#cv #one-page #simple|
 |[Would have been cool in the 80s](https://themes.gohugo.io/would-have-been-cool-in-the-80s/)|#mobile:no #no-because:"Looks like sh\*t"|#about-link #blog #blog-post-or-standard-content-driven-by-frontmatter #feature-light-for-easy-customisation #minimal #personal #product #responsive #starter|
 |[XMag](https://themes.gohugo.io/hugo-xmag/)|#mobile:yes #no-because:"responsive but looks like sh\*t"|#blog #clean #google-analytics #minimal #minimalist #responsive #simple #syntax-highlighting|
 |[XMin](https://themes.gohugo.io/hugo-xmin/)|#mobile:no #no-because:"didactic only"|#blog #clean #minimal #minimalist #personal #simple #starter|
-|[Yourfolio](https://themes.gohugo.io/yourfolio/)|#mobile:yes:"looks good" #like #ranking:"first"|#minimal #personal #portfolio #responsive #simple|
+|[Yourfolio](https://themes.gohugo.io/yourfolio/)|#mobile:yes:"looks good" #like #tier:A|#minimal #personal #portfolio #responsive #simple|
 |[Zen](https://themes.gohugo.io/hugo-theme-zen/)|#mobile:no:"menu bumps into header"|#blog #grid #multilingual #responsive #search|
 
 

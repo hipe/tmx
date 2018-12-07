@@ -1,3 +1,7 @@
+---
+title: "thoughts on expressing collection metadata"
+date: "2018-08-09T06:28:38-04:00"
+---
 # thoughts on expressing collection metadata
 
 ## background/intro
@@ -47,6 +51,7 @@ more at [#417.C], which segues into this (among other corollaries).
 ## <a name=D></a>example row synthesis
 
 uh..
+
   - how many cels (characters) wide the cel is
 
 
@@ -55,6 +60,7 @@ uh..
 ## <a name=E></a>name change
 
 um..
+
   - one thrust is to push the class up and rename it from "sync parameters"
     to "collection metadata". but this brings up the new smell of the
     dependency injection thrust introduced at the intro
@@ -116,7 +122,7 @@ work in conjunction with a mapper, in our "pipeline workflow".
 
 
 
-## <a name=I.2> provision: the leftmost column in the markdown table is..
+## <a name=I.2></a> provision: the leftmost column in the markdown table is..
 
 ..by default the "human key" field.. we don't want to be fully
 married to this but it's a cost-saving shortcut.
@@ -161,7 +167,7 @@ away at [#423.C] custom pipes, probably.
 
 
 
-## <a name=J> provision: there is a version integer for sync parameters.
+## <a name=J></a> provision: there is a version integer for sync parameters.
 
 this contrivance exists so there is a discrete, hard-coded assertion
 somewhere about what constituency of names we can assume; both from
@@ -172,9 +178,10 @@ the defining side and the consuming side separately.
 
 
 
-## <a name=K> provision: traversal params come from far stream (& synthesis)
+## <a name=K></a> provision: traversal params come from far stream (& synthesis)
 
 for a synchronization:
+
   - you can't have a normal near stream without the traversal parameters
     (because you may have a custom keyer).
   - you can't have traversal parameters without a far stream. (EDIT: explain
@@ -193,6 +200,7 @@ so, in pseudocode:
 note the significant point here is that the order of the nesting is not
 interchangeable. syncing depends on both far and near; near depends on far.
 so the order must be:
+
   1. far
   1. near
   1. sync
@@ -261,7 +269,7 @@ this tracks a pattern where we make parsers that are:
 
 we track this pattern like so because despite all its excellent PROs above,
 we might weirdly decide against all odds one day that it's a smell, that
-there's some better alterantive, etc.
+there's some better alternative, etc.
 
 
 

@@ -1,3 +1,20 @@
+---
+title: "heroku add-on notes"
+date: 2018-06-16T05:19:22-04:00
+---
+# heroku add-on notes
+
+this is a machine-generated constituency of the heroku add-ons that
+existed at at the moment it was generated, as a sort snapshot.
+
+we use this collection to help guide our decisions about what technologies
+are available from which to compose our architecture.
+
+_a quick note on structure:_ we have tags in a separate column from
+freeform notes, probably because this document predates the tag-parsing
+library by more than a month..
+
+
 |Add-on  |Tags  |Freeform Notes  |
 |:--|:--|:--|
 | (example) | #example  | #example  |

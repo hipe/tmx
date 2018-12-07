@@ -1,3 +1,22 @@
+---
+title: "hugo vs jekyll vs etc"
+date: "2018-08-15T19:33:10-04:00"
+---
+
+## intro
+
+document [#419] "hugo everyday usage" talks about how we discovered hugo.
+this document uses the documentation of hugo to form a doo-hah.
+
+
+## outstanding issues with hugo vs jekyll
+
+  - no frontmatter in jekyll?
+  - that one kind of link
+
+
+
+
 ## (about some of the tags used)
 
   - "UDI": this stands for "universal document ??". we *think* we meant

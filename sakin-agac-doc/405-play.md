@@ -1,3 +1,7 @@
+---
+title: "play."
+date: "2018-04-18T03:22:59-04:00"
+---
 # play.
 
 mostly, auxiliary notes to accompany the YouTube tutorials by Radix Code.

@@ -1,3 +1,7 @@
+---
+title: "sakin agac - broad objectives"
+date: 2018-04-06T18:11:58-04:00
+---
 # "sakin agac"
 
 ## overview: broad objectives

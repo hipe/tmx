@@ -1,3 +1,7 @@
+---
+title: "heroku & scala notes"
+date: 2018-04-05T02:36:29-04:00
+---
 # heroku & scala notes
 
 ## objective & scope of this document
@@ -211,7 +215,7 @@ echo "(done.)"
 (these had been on the work stack; now we're archiving them #history-A.1)
 
 |duration|title|
-|--|--|
+|---|---|
 |04:15|Tutorial #30 - Create Custom Error Pages|
 |06:50|Tutorial #29 - Make PUT Request using jQuery in Play Framework|
 |08:52|Tutorial #28 - Make Delete Request using jQuery in Play Framework|

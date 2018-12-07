@@ -1,3 +1,7 @@
+---
+title: "markdown table-targeted synchronization"
+date: "2018-04-24T16:01:17-04:00"
+---
 # markdown table-targeted synchronization
 
 ## document objective

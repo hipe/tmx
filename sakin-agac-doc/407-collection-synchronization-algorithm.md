@@ -1,3 +1,7 @@
+---
+title: "a collection synchronization algorithm"
+date: "2018-04-24T05:27:25-04:00"
+---
 # a collection synchronization algorithm
 
 ## objective & scope
@@ -56,6 +60,7 @@ for our intended application, to "synchronize" means to "import" (or maybe
 we will prefer "merge") data from a "far" "collection" "into" our "near"
 one. we require that each item have a "natural key". places this gets
 interesting is where it bumps into issues of
+
   - collision: what do we do when a far item has the same natural key as a
     near one?
   - possible pruning: if an item exists in the near collection but not
@@ -78,8 +83,8 @@ our formal definition for "collection" is applied to our practical
 collections but also to the individual item as well, which we can model as
 nothing more than a collection of name-value pairs:
 
-| application of this algorithm | what acts as the collection? | what acts as the item? | the human key? |||
-|--|--|--|--|--|--|
+| application of this algorithm | what acts as the collection? | what acts as the item? | the human key? |
+|---|---|---|---|
 | at the collection level | the collection | each item            | user-defined function against item |
 | at the sub-item level   | the item       | each name-value pair | each name of same |
 
@@ -123,7 +128,8 @@ we are going to make it original-order-centric by default (specifically
 because the example reasons we just cited are in fact based on real-world
 use cases are are compelling to us).
 
-(EDIT order centricity is probably not an option at this point, but we state
+(EDIT at writing we have not yet exposed an option for "order centricity"
+(i.e near-centric vs. far-centric, introduced next), but we state
 this all here now so we can give thought to it as we write the algorithm.)
 
 
@@ -140,6 +146,7 @@ inferable that some choices are mutually exclusive with others, whereas
 others can combine.)
 
 for example:
+
   - hew to the found sequence of the far collection (inserts at end)
   - hew to the found sequence of the near collection (inserts at end)
   - insert at beginning instead of end
@@ -197,7 +204,7 @@ well be so we'll approach our algoirthm from the outside-in assuming the
 synchronization target is a document (but knowing that a document-centric
 approach will down-grade well enough to formats that are not
 document-centric (like if you're just manipulating rows in a database
-that have an `order` integer column).
+that have an `order` integer column)).
 
 anyway, in approaching this from the standpoint of practical considerations
 for documents, this lays down a higher-level algorithmic framing into which
@@ -226,8 +233,10 @@ endpoints: an _upstream_, a _downstream_ and a _herestream_. basically
 the idea was: pull in new data from the upstream, merge it in with existing
 data in the herestream, and write the new collection (document, e.g) to the
 downstream. an edit-in-place behavior (like the `-i` option for `sed`)
-could be achieved by having the herestream and the downstream point to the
-same resource (e.g file on the filesystem).
+could be achieved by getting the output of the downstream ultimately into
+the the storage resource (e.g file on the filesystem) whence came the
+herestream. (this can take some work - just like how on the shell you can't
+redirect the output of a thing into a file that you use for input.)
 
 but now (and to get _very_ practical for a moment), we have simplified this
 distinction away. now we _always_ write output to a temporary file (called
@@ -266,6 +275,7 @@ real-world use of this:
 ## the diminishing pool algorithm
 
 in overview,
+
   - gather up a "diminishing pool" by traversing the far collection to index it
   - traverse the near collection while consuming matches from the diminshing pool
   - flush any left over in the diminishing pool.
@@ -445,8 +455,8 @@ order by key, something we anticipated being no big deal but in fact grew
 untenably cumbersome-feeling after about two iterations.
 
 in effect, what we wanted was a synchronization that alphabetized the result.
-it felt cludgy not to have the synchronization be stream-y as well. the buy-
-in to accomplish this is that the input traversals themselves already be
+it felt cludgy not to have the synchronization be stream-y as well. the
+buy-in to accomplish this is that the input traversals themselves already be
 ordered.
 
 so, quick pro's and con's. pro's:
@@ -486,6 +496,7 @@ whichever stream should be drawn from is drawn from until one or both of them
 finds its end.
 
 note that:
+
   - we are using the "lexical" values of the (string) keys *as* the sorting
     criteria. this is crude, but it's a move to keep the number of moving
     parts low until there's good reason not to. :"provision 2"

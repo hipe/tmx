@@ -1,3 +1,7 @@
+---
+title: "adventures in CSS"
+date: "2018-08-18T03:49:55-04:00"
+---
 # adventures in CSS
 
 (this article is a stub. i can help expand it.)
