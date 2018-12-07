@@ -122,7 +122,7 @@ def _traversal_stream_for_sync(  # #testpoint
         return
 
     _fsf = _filesystem_functions()
-    import sakin_agac.format_adapters.markdown_table.magnetics.ordered_nativized_far_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    import sakin_agac.format_adapters.markdown_table.magnetics.normal_far_stream_via_collection_reference as _  # noqa: E501
 
     far_sess_cm = _.OPEN_FAR_SESSION(
         far_collection_reference=coll_ref,

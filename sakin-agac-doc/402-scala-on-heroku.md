@@ -246,6 +246,5 @@ echo "(done.)"
 
 ## (document-meta)
 
-  - #pending-rename: scala on heroku
   - #history-A.1: archive scala/play for now
   - #born.

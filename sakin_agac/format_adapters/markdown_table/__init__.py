@@ -26,7 +26,7 @@ def _new_doc_lines_via_sync(
     in [#418.K].
     """
 
-    from .magnetics import ordered_nativized_far_stream_via_far_stream_and_near_stream as lib  # noqa: E501
+    from .magnetics import normal_far_stream_via_collection_reference as lib
     from sakin_agac import my_contextlib
 
     def open_out(far, near):

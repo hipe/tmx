@@ -268,6 +268,5 @@ there's some better alterantive, etc.
 
 ## (document-meta)
 
-  - #pending-rename: something like "provisions and patterns"
   - #history-A.1: normal far stream became a thing
   - #born.

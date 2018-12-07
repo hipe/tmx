@@ -171,5 +171,4 @@ $ brew upgraded hugo
 
 
 ## (document-meta)
-  - #pending-rename: hugo everyday usage
   - #born.

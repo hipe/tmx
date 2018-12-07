@@ -35,5 +35,4 @@ tot_hour, tot_min = tot_min.divmod(60)
 
 sout.puts "win: #{ tot_hour }:#{ tot_min }:#{ tot_sec }"
 
-# #pending-rename: move to script/dev/
 # #born.

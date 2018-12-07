@@ -32,7 +32,7 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #419    |       | heroku CMS add-on dim sum ..
 |                   #418.D  |       | example row
 |                   #418.3  |       | herusitic templating
-|                   #418    |       | thoughts on expressing metadata about a collection ..
+|                   #418    |       | patterns and provisions ..
 |                   #417    |       | central conceits ..
 |                   #416.D  |       | CMS's
 |                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
@@ -77,7 +77,7 @@ these were the original stated objectives, here (in part) for posterity:
 |<a name=405></a>[\[#405\]] |       | play
 |<a name=404></a>[\[#404\]] |       | wiki app dim sum
 |<a name=403></a>[\[#403\]] |       | broad objectives
-|<a name=402></a>[\[#402\]] |       | heroku and scala
+|<a name=402></a>[\[#402\]] |       | scala on heroku
 
 
 

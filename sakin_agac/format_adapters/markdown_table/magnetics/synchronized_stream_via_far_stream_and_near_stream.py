@@ -153,7 +153,7 @@ class _Newstream_via:
 
         near_st = self.__build_near_ad_hoc_item_stream()
 
-        from . import ordered_nativized_far_stream_via_far_stream_and_near_stream as _  # noqa: E501
+        from . import normal_far_stream_via_collection_reference as _
         o = _.NATIVIZER_ETC_VIA(  # see
                 near_stream=near_st,
                 complete_schema=self._complete_schema,

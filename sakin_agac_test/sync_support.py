@@ -141,7 +141,7 @@ def collection_reference_via_(collection_identifier, listener):
 
 @memoize
 def _mag_wee():
-    return _sub_mag('.ordered_nativized_far_stream_via_far_stream_and_near_stream')  # noqa: E501
+    return _sub_mag('.normal_far_stream_via_collection_reference')
 
 
 @memoize
