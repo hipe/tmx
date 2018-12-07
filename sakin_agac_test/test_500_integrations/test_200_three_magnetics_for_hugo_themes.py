@@ -62,7 +62,24 @@ class Case200_magenetic_two(_CommonCase):
     def test_110_content(self):
         paths = self._subject()
         from os import path as os_path
-        self.assertEqual(os_path.basename(paths[0]), 'acka-dormic')
+
+        f = os_path.basename
+        sorted_basenames = sorted(f(x) for x in paths)
+        # #[#410.Z] it is not specified that the result list is sorted.
+        # so the order of the list is indeterminate. but we need it to
+        # be determinate to test it (or use sets or something crazy).)
+
+        def o(target_basename):
+            nonlocal idx
+            _actual_basename = sorted_basenames[idx]
+            self.assertEqual(_actual_basename, target_basename)
+            idx += 1
+        idx = 0
+
+        # (you should not see a '.github' directory here, per [#410.Z.2])
+        o('acka-dormic')
+        o('facka-formic')
+        self.assertEqual(len(sorted_basenames), 2)
 
     def _subject(self):
         return _product_of_magnet_two()
@@ -78,8 +95,16 @@ class Case300_magnetic_three(_CommonCase):
 
     def test_110_content(self):
         dcts = self._subject()
-        dct = dcts[0]
-        self.assertEqual(dct['name'], 'Academic')
+        # near [#410.Z] order is indeterminate
+        names = [x['name'] for x in dcts]
+        names.sort()
+
+        def o(expected_name):
+            nonlocal idx
+            self.assertEqual(names[idx], expected_name)
+            idx += 1
+        idx = 0
+        dct = dcts[0]  # pick any one MAYBE ..
         isinstance(dct['features'], list)
         isinstance(dct['tags'], list)
 

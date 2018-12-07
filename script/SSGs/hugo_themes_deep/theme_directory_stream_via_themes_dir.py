@@ -126,6 +126,30 @@ class _open_theme_directory_stream_via_these:  # #testpoint
 
         cmd = self.__build_find_command()
         None if isinstance(cmd, tuple) else sanity()  # change #here1
+        # == BEGIN hotfix for issue :[#410.Z.2]:
+        """
+        the .github entry is a doozer:
+          - this entry occurs (last we checked) if you check out the whole
+            (~10 minute) checkout of every theme.
+
+          - our list of themes comes from a find command.
+
+          - the find command is scraped directly from a hugo thing.
+
+          - the find command as coded by the vendor is coded to skip
+            `.git` but not any other names.
+
+        the effect of all this is that if a `.github` entry is in the list,
+        it gets through and appears as though it is a theme. below we veryify
+        that it still is that way, and then "fix" it for our needs.
+        """
+
+        a = list(cmd)
+        idx = -4
+        None if '*.git' == a[idx] else cover_me('vendor code changed')
+        a[idx] = '*.git*'
+        cmd = a
+        # == END
 
         import subprocess
         cm = subprocess.Popen(
@@ -160,6 +184,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
                 return line[0:-1]  # chop not strip just to be gigo
 
             # at #history-A.1 removed thing that removed '.github' from listing
+            # (at #history-A.3 we re-addressed the above better for [#410.Z.2])
 
             for line in sout:
                 yield chop(line)
@@ -242,5 +267,7 @@ if __name__ == '__main__':
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 
+# #history-A.3 can be temporary. as referenced.
+# #history-A.2 can be temporary. as referenced.
 # #history-A.1 (as referenced)
 # #born.

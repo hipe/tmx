@@ -26,8 +26,13 @@ class Case100_HI(_CommonCase):
         these[0]['_is_sync_meta_data']
         tags_k = 'tags_generated'
         label_k = 'label'
-        one = these[1]
-        two = these[2]
+
+        # == BEGIN fix near [#410.Z] order is indeterminate
+        order_me = these[1:]
+        order_me.sort(key=lambda dct: dct[label_k])
+        one, two = order_me
+        # ==
+
         tags_one = one[tags_k]
         tags_two = two[tags_k]
 

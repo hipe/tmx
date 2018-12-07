@@ -372,6 +372,21 @@ theme. if multiple, synthesize.
 OK on your web and mobile.
 "
 ]
+subgraph cluster_sg1 {
+n_make_fontmatterizer->n_theme_choose_end
+n_do_a_test_publish->n_make_fontmatterizer
+n_theme_choose->n_do_a_test_publish
+n_renames->n_theme_choose
+n_refactor->n_renames
+n_theme_choose_begin->n_refactor
+n_theme_choose_end[label="clerical edits to other scripts"]
+n_make_fontmatterizer[label="make\nfrontmatterizer"]
+n_do_a_test_publish[label="do a test\npublish"]
+n_theme_choose
+n_renames[label="flush renames"]
+n_refactor[label="refactor out older\ntechniques in producer\nscripts"]
+n_theme_choose_begin[label="bisect (maybe\ncould be combined\nwith cleanup" style=filled]
+}
 n_theme_mine_050[label="get your theme to do
 float left (and maybe float right)
 of an image inline in an article,
@@ -477,13 +492,13 @@ n_publishing_simple->gfm_rumskalla
 n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
 n_react_enough->n_js_dim
-n_read_up_on_themes->n_theme_choose
+n_read_up_on_themes->n_theme_choose_begin
 n_read_up_on_themes->n_articles_for
 n_sync->n_use_sync
 n_temporary_waypoint->n_gimp_enough_050
 n_temporary_waypoint->n_lozenge_have
 n_temporary_waypoint->n_react_enough
-n_theme_choose->n_theme_mine_050
+n_theme_choose_end->n_theme_mine_050
 n_theme_mine_050->n_theme_mine_100
 n_theme_mine_100->n_theme_mine_150
 n_theme_mine_150->n_have_css

@@ -23,6 +23,7 @@ these were the original stated objectives, here (in part) for posterity:
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |                 (example) | #this | #this-cel-too
+|                   #425    |       | dev workflow notes like git bisect
 |                   #424    |       | [theme notes]
 |                   #423    |       | dot
 |                   #422    |       | [hugo theme dim sum]
@@ -42,6 +43,7 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
+|                   #410.Z  | #trak | the order that files are listed from the filesystem (even find) is indeterminate
 |                   #410.Y  | #wish | customizable functional pipelines (map, filter in any order etc)
 |                   #410.X  | #open | change `o(msg)` to `yield msg`
 |                   #410.W  |       | [the magnetic that loads a function via a string]

@@ -229,7 +229,8 @@ def _do_express_help_for_formats(cli):
         out(f'    {k} ({_these})\n')
         count += 1
     o(f'({count} total.)\n')
-    return _stop_early
+    cli.exitstatus = 0  # because [#608.7] it was "guilty till proven innocent"
+    cli.OK = False  # this is "stop early" in [#608.6] speak
 
 
 """
