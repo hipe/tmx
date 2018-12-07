@@ -1,5 +1,7 @@
-+++
-+++
+---
+title: "post numero dos"
+
+---
 # welcome to botnoise
 
 ## section uno

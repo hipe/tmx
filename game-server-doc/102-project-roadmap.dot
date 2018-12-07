@@ -82,11 +82,8 @@ sub-project: upload files to s3
 (-tag-lyfe.1.1.05 reactive version of full 3-layer parallax, as PoC)
 (-tag-lyfe.1.1.06 reactive version forked from punchout verion PoC)
 (-tag-lyfe.1.1.07 reactive version of oldschool style float left image PoC)
-(-tag-lyfe.1.1.08 dim sum on every hugo theme haha. chose theme)
 (-tag-lyfe.1.1.10 gimp just enough to halftone the subject)
 (-tag-lyfe.1.1.11 gimp just enough to get transparent fello (research bowie, nagel))
-(-tag-lyfe.1.1.11.1 Index manually every theme with notes, resolve a set of zero to N themes you want to synthesize from.
-(-tag-lyfe.1.1.11.1.1 Resolve a set of zero to N themes you want to synthesize from.
 # these old guys are kept for posterity. delete the lines as you finish their new counterparts
 
 (-tag-lyfe.1.1.1 Publish one DIM-SUM, integrated with lozenge grid)
@@ -99,6 +96,3 @@ sub-project: upload files to s3
 (-tag-lyfe.1.1.8 Specialize theme for float image left)
 (-tag-lyfe.1.1.8.2 Do dirty trick for image hosting in submodule)
 (-tag-lyfe.1.1.9 Model criteria that selects N base themes)
-(-tag-lyfe.1.1.9.1 Do clerical edits to the many documents plust frontmatter)
-(-tag-lyfe.1.1.9.2 Write the script to frontmatterize legacy scripts)
-(-tag-lyfe.1.1.9.3 Do a test publish)

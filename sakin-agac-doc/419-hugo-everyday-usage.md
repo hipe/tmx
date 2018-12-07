@@ -45,7 +45,7 @@ worry about why hugo won't work for our needs later..
 ## look it works on heroku
 
 in a separate tab off to the right, do:
-    $ h logs --tail -a botnoise
+    $ heroku logs --tail -a botnoise
 
 note: you won't see anything.
 
@@ -81,14 +81,14 @@ Buildpack set. Next release on botnoise will use https://github.com/roperzh/hero
 do:
 
 ```bash
-$ heroku config:set -a botnoise HUGO_VERSION=0.46
+$ heroku config:set -a botnoise HUGO_VERSION=0.49
 ```
 
 get:
 
 ```
-Setting HUGO_VERSION and restarting ⬢ botnoise... done, v3
-HUGO_VERSION: 0.46
+Setting HUGO_VERSION and restarting ⬢ botnoise... done, v13
+HUGO_VERSION: 0.49
 ```
 
 

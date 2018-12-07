@@ -3,11 +3,24 @@ baseUrl = "http://botnoise.herokuapp.com/"
 
 languageCode = "en-us"
 title = "ohai i am the botnoise title"
+
+# playing around with theme change at #history-A.2
 # theme = "ananke"
 
 # we did the below at #history-A.1 just to use the theme thats in the main docs
 # cd layouts ; git clone https://github.com/spf13/hyde
-theme = "hyde"
+# theme = "hyde"
 
+author = "ohai i am author"
+# canonifyurls = true
+copyright = "ohai i am the copyright"
+paginate = 20
+theme = "newsprint"
+
+[params]
+subtitle = "ohai i am the subtitle"
+
+
+# #history-A.2 (as referenced, can be temporary)
 # #history-A.1 (as referenced, can be temporary)
 # #born.

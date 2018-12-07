@@ -371,6 +371,7 @@ serve as your synthesized startingpoint
 theme. if multiple, synthesize.
 OK on your web and mobile.
 "
+style=filled
 ]
 subgraph cluster_sg1 {
 n_make_fontmatterizer->n_theme_choose_end
@@ -381,7 +382,7 @@ n_refactor->n_renames
 n_theme_choose_begin->n_refactor
 n_theme_choose_end[label="clerical edits to other scripts"]
 n_make_fontmatterizer[label="make\nfrontmatterizer"]
-n_do_a_test_publish[label="do a test\npublish"]
+n_do_a_test_publish[label="do a test\npublish" style=filled]
 n_theme_choose
 n_renames[label="flush renames" style=filled]
 n_refactor[label="refactor out older\ntechniques in producer\nscripts" style=filled]
