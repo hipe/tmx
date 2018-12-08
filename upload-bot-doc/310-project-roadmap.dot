@@ -1,0 +1,37 @@
+digraph g {
+
+/* below nodes born  2018-03-24 22:15:31 -0400 */
+
+/*
+sub-project: upload files to s3
+  integrate everything
+  some kind of coverage of these five cases integrated
+  cover: backend s3 put (when succeed)
+  cover: backend s3 put (when fail)
+  do the yes/no dialog (when yes (mock response))
+  do the yes/no dialog (when not understood)
+  do the yes/no dialog (when no)
+  detect any time anyone uploads a file (in any channel)
+  detect any time anyone uploads a file (in one channel)
+*/
+
+/* below nodes born  2018-04-04 06:32:04 -0400 */
+
+/*
+  commit: do fake work ASYNCHRONOUSLY
+  (the below might could knock out the above buttons-related branch)
+  commit: now, instead of sending a message, present buttons ASYNCHRONOUSLY (or not)
+  commit: now, instead of sending a message, present buttons SYNCHRONOUSLY
+  commit: get the bot to send a message to slack in response to the minmal event ASYNCHRONOUSLY
+  commit: get the bot to send a message to slack in response to the minmal event SYNCHRONOUSLY
+  visual: get the bot to send a message to slack in a REPL
+  commit: visual demo with tasks in own file
+  grind-down: visual demo with templates broken up
+*/
+
+
+label="(see the code for this file)"
+}
+/*
+#abstracted.
+*/

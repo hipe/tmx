@@ -1,0 +1,31 @@
+digraph g {
+
+n10[
+label="javascript fontend
+for DIM SUM"]
+
+n50->n10
+n50[
+label="be comfortable
+writing react"]
+
+n51->n50
+n51[
+label="do each piece"]
+
+n52->n51
+n52[
+label="chop up
+the learning
+resource"]
+
+n53->n53
+n53[
+label="find good
+learning resource"]
+
+
+}
+/*
+#abstracted.
+*/

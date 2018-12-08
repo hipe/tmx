@@ -3,69 +3,9 @@ digraph g {
 
 /* nodes in alphabetical order (disregarding first component) */
 
-n_articles_for[label="(articles for)"
-]
-n_bots_learn[label="grok
-bots
-"
-]
-n_channel_game_dev[label="start a dedicated channel
-for game dev in DTF
-"
-shape=rect
-]
-n_css_academic[label="an academic
-design
-"
-shape=rect
-]
-n_css_github[label="github-style
-styling either
-the easy way or
-the hard way
-"
-shape=rect
-]
-n_css_glitch[label="a glitch
-design
-"
-shape=rect
-]
-n_css_parallax[label="CSS for
-parallax
-"
-style=filled
-shape=rect
-]
-n_css_travers[label="a travers
-design
-"
-shape=rect
-]
 n_chose_pg[label="find a dilligenced
 parser generator"
 style=filled
-]
-n_make_css[label="design one
-of these
-"
-shape=diamond
-]
-n_css_learn_responsive[label="re-grok
-responsive
-CSS
-"
-]
-n_css_woah[label="HSR
-design
-dynamism
-"
-shape=rect
-]
-n_dim_sum_ec[label="DIM SUM for the youtube
-channel Extra Credits
-"
-shape=rect
 ]
 n_dim_sum_heroku_plug_ins[label="DIM SUM of
 heroku plug-ins
@@ -95,18 +35,6 @@ of files
 "
 style=filled
 ]
-objective_game_server[label="game server
-difficulty: med
-workload: hi
-"
-shape=rect
-]
-n_gather_css[label="(once you
-have two
-of these)
-"
-shape=diamond
-]
 gfm_rumskalla[label="github-flavored markdown rumskalla
 difficulty: low
 workload: med
@@ -115,32 +43,6 @@ looking like github docs,
 regen not painful. can runlocal
 "
 style=filled
-shape=rect
-]
-n_gimp_enough[label="have DIM SUM
-(and documentation)
-of GIMP"
-shape=rect
-]
-n_gimp_enough_050[label="while documenting
-(and maybe feature DIM SUM),
-learn enough GIMP to posterize nassim
-"
-]
-n_gimp_enough_100[label="while [same],
-david bowie (with
-possible algorithmic detour)
-"
-]
-objective_grep_dump[label="grep dump
-difficulty: hi
-workload: hi
-"
-shape=rect
-]
-n_have_css[label="have your first
-self-made theme
-"
 shape=rect
 ]
 n_heroku_competency[label="you are
@@ -287,22 +189,7 @@ symlinks hack
 "
 style=filled
 ]
-n_integrate_nagel_with_first_css[label="integrate nagel
-with first
-custom theme"
-shape=rect
-]
-n_js_dim[label="javascript frontend
-for DIM SUM
-"
-shape=rect
-]
 n_logging[label="logging"
-shape=rect
-]
-n_lozenge_have[label="lozenge
-grid
-"
 shape=rect
 ]
 n_nginx[label="nginx not
@@ -336,8 +223,6 @@ publishing
 "
 style=filled
 ]
-n_react_enough[label="learn enough react"
-]
 n_read_up_on_themes[label="read up on themes
 while adding to DIM SUM
 of SSG features..
@@ -351,10 +236,7 @@ acceptance: nasim
 "
 shape=rect
 ]
-n_samhara[label="samhara: a place to hold dreams
-music, movies, videogames, dance..."
-shape=rect
-]
+
 n_SEO[label="SEO"
 shape=rect
 ]
@@ -363,10 +245,10 @@ n_sync[label="• the sync script
 "
 style=filled
 ]
-n_temporary_waypoint[label="(your
-choice)
+n_temporary_waypoint[label="(see these projects:)
+• design
 "
-shape=diamond
+shape=rect
 ]
 n_theme_choose[label="choose a theme or themes to
 serve as your synthesized startingpoint
@@ -390,26 +272,6 @@ n_renames[label="flush renames" style=filled]
 n_refactor[label="refactor out older\ntechniques in producer\nscripts" style=filled]
 n_theme_choose_begin[label="bisect (maybe\ncould be combined\nwith cleanup" style=filled]
 }
-n_theme_mine_050[label="get your theme to do
-float left (and maybe float right)
-of an image inline in an article,
-OK on your web and mobile.
-"]
-n_theme_mine_100[label="get that float left
-(and maybe float right)
-images to be punched out,
-OK on your web and mobile.
-"]
-n_theme_mine_150[label="get the bowie
-layer to work on both
-your web and mobile.
-"]
-objective_upload_bot[label="upload bot
-difficulty: v hi
-workload: med
-"
-shape=rect
-]
 n_use_sync[label="merge two
 data producers
 (is DIM SUM)
@@ -421,36 +283,15 @@ shape=rect
 
 /* relationships in ordered by head node (then tail node) */
 
-n_articles_for->n_samhara
-n_bots_learn->objective_game_server
-n_bots_learn->objective_upload_bot
 n_chose_pg->n_parse_queries
 n_chose_pg->n_parse_taggings
-n_css_academic->n_gather_css
-n_css_github->n_gather_css
-n_css_learn_responsive->n_make_css
-n_css_learn_responsive->objective_sakin_agac
-n_css_glitch->n_gather_css
-n_css_parallax->n_dim_sum_themes
-n_css_travers->n_gather_css
-n_css_woah->n_samhara
-n_dim_sum_ec->n_articles_for
-n_dim_sum_ec->n_channel_game_dev
-n_dim_sum_heroku_plug_ins->n_articles_for
+n_publish_dim_sum->n_dim_sum_themes
 n_dim_sum_heroku_plug_ins->n_publishing_simple
-n_dim_sum_themes->n_articles_for
 n_dim_sum_themes->n_read_up_on_themes
 n_filter_by->n_dim_sum_heroku_plug_ins
 n_frontmatter_magic->a_frontmatter_yikes
-n_gather_css->n_css_woah
-n_gimp_enough->n_articles_for
-n_gimp_enough_050->n_gimp_enough_100
-n_gimp_enough_100->n_integrate_nagel_with_first_css
 gfm_rumskalla->objective_sakin_agac
-n_have_css->n_gather_css
-n_have_css->n_temporary_waypoint
-n_heroku_competency->n_bots_learn
-n_heroku_competency->objective_grep_dump
+n_theme_choose_end->n_temporary_waypoint
 n_heroku_competency->a_heorku_doc_2
 n_heroku_doc_2->n_heroku_competency
 a_heorku_doc_2->n_heroku_doc_2
@@ -469,7 +310,6 @@ a_hugo_document->n_hugo_document
 b_hugo_extras->n_logging
 b_hugo_extras->n_nginx
 b_hugo_extras->n_SEO
-n_hugo_get_gud->n_make_css
 n_hugo_get_gud->n_frontmatter_magic
 n_hugo_get_gud->n_hugo_symlinks_dirs
 n_hugo_get_gud->n_hugo_symlinks_files
@@ -478,34 +318,15 @@ n_hugo_integrate->n_hugo_hello
 n_hugo_made->a_hugo_document
 n_hugo_made->a_hugo_hello
 n_hugo_published->b_hugo_extras
-n_integrate_nagel_with_first_css->n_samhara
-n_js_dim->n_dim_sum_ec
-n_lozenge_have->n_samhara
-n_make_css->n_css_academic
-n_make_css->n_css_github
-n_make_css->n_css_glitch
-n_make_css->n_css_parallax
-n_make_css->n_css_travers
 n_parse_queries->n_filter_by
 n_parse_taggings->n_filter_by
-n_publish_dim_sum->n_css_parallax
 yn_publishing_ok->n_hugo_get_gud[label=no]
 yn_publishing_ok->n_hugo_integrate[label=yes]
 n_publishing_simple->gfm_rumskalla
 n_publishing_simple->n_heroku_competency
 n_publishing_simple->n_publish_dim_sum
-n_react_enough->n_js_dim
 n_read_up_on_themes->n_theme_choose_begin
-n_read_up_on_themes->n_articles_for
 n_sync->n_use_sync
-n_temporary_waypoint->n_gimp_enough_050
-n_temporary_waypoint->n_lozenge_have
-n_temporary_waypoint->n_react_enough
-n_theme_choose_end->n_theme_mine_050
-n_theme_mine_050->n_theme_mine_100
-n_theme_mine_100->n_theme_mine_150
-n_theme_mine_150->n_have_css
-n_use_sync->n_articles_for
 n_use_sync->n_chose_pg
 
 
@@ -534,6 +355,7 @@ has this known unknown.)
 "
 }
 /*
+#history-C.1: broken up into several smaller documents
 #history-B.4: splice in another graph (not yet merged)
 #history-B.3: reverse the order of every arrow ONLY
 #history-B.2: normalize node layout, alphabetize assocs (sort of) ONLY
