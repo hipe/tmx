@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+false && "
+see the lengthy documentation of our accomplice script for an overview
+of the approach implemented here.
+
+the idea is: infer the frontmatter lines from the file if you can.
+(if we can't we exit with an error exitstatus).
+
+if we succeed in the above, we output those frontmatter lines and then the
+lines of the argument file as-is, all to STDOUT.
+
+IFF everything goes well, these output lines should be suitable to replace
+the lines of the argument file; but this heavy lift is left up to the client ^_^.
+
+here's how we actually used it (changing comment style yikes):
+"
+# find sakin-agac-doc -type f -name '*.md' > _LIST_
+# cat _LIST_ | while read line ; do script/SSGs/frontmatterized_document_lines_via_uncontacted_document "$line" > _ ; if [ "$?" = 0 ] ; then ; echo 'was ok' ; else ; echo "failed: $line" ; fi ; done
+# # just where it says `echo "was ok"` substitute `mv _ "$line"` and PRAY!
+
+input_file="$1"
+
+if [[ -z "$input_file" ]] ; then
+  >&2 echo "no"
+  exit 5
+fi
+
+./script/SSGs/frontmatter_lines_via_uncontacted_document.py "$input_file" || exit "$?"
+
+cat "$input_file"
+
+# #born.

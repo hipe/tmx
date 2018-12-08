@@ -87,11 +87,13 @@ between
 first header
 and title
 "
+style=filled
 ]
 a_frontmatter_yikes[label="abstract
 front-matter out
 of files
 "
+style=filled
 ]
 objective_game_server[label="game server
 difficulty: med
@@ -381,7 +383,7 @@ n_renames->n_theme_choose
 n_refactor->n_renames
 n_theme_choose_begin->n_refactor
 n_theme_choose_end[label="clerical edits to other scripts"]
-n_make_fontmatterizer[label="make\nfrontmatterizer"]
+n_make_fontmatterizer[label="make\nfrontmatterizer" style=filled]
 n_do_a_test_publish[label="do a test\npublish" style=filled]
 n_theme_choose
 n_renames[label="flush renames" style=filled]

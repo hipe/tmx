@@ -102,7 +102,11 @@ def _SIMPLE_STEP(
     if stdin_OK is None:
         pass
     elif stdin_OK:
-        cover_me()
+        # a script that says that "STDIN is OK" signals that it is OK to run
+        # the script NON-interactively; however here we do no special handling
+        # or passing-on of the STDIN resource. (not covered, develpoped
+        # visually at #history-A.3)
+        pass
     elif sin.isatty():
         pass
     else:
@@ -214,5 +218,6 @@ def _name_via_slug(name):
 import sys  # noqa E402
 sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
+# #history-A.3 (as referenced, can be temporary)
 # #history-A.2 (as referenced, can be temporary)
 # #abstracted.
