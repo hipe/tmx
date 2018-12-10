@@ -8,9 +8,15 @@ heroku_plus_doc [label="heroku-\nable doc\nstore"]
 
 ui_rev_hist_1 [label="view\nrevision\nhistory -\nrough"]
 
+n95->heroku_plus_doc
+n95[
+label="[this whole thing DECIDEDLY
+depends on [#431] storage roadmap]"
+shape=rect
+]
+
 label="
-document 406. now a stub.
-"
+406. the CMS app roadmap."
 }
 
 /*

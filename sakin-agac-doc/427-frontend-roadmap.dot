@@ -1,5 +1,7 @@
 digraph g {
 
+rankdir=BT
+
 n10[
 label="javascript fontend
 for DIM SUM"]
@@ -19,13 +21,14 @@ label="chop up
 the learning
 resource"]
 
-n53->n53
+n53->n52
 n53[
 label="find good
 learning resource"]
 
-
+label="\n427. the frontend roadmap (stub)"
 }
+
 /*
 #abstracted.
 */

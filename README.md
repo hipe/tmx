@@ -185,6 +185,8 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#851]-[#899]              |       | (for casle of dust, for now)
+|[#802]-[#850]              |       | (reserved for [#406] CMS app for now)
 |[#701]-[#799]              |       | (for tag lyfe)
 |[#601]-[#699]              |       | (for script lib)
 |[#501]-[#599]              |       | (for modality agnostic)

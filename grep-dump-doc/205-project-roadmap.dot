@@ -1,5 +1,7 @@
 digraph g {
 
+rankdir=BT
+
 /* below nodes born 2018-02-13 15:46:42 -0500 */
 
 /*
@@ -36,8 +38,21 @@ get main out of the bundle names
 get purple ranger etc out
 */
 
-label="(see code)"
+n92[
+label="[the rest - all of the legacy nodes are
+commented out and just need editing.]
+"]
 
+n95->n92
+n95[
+label="this whole thing
+depends on (let's just say)
+[#431] the storage roadmap.
+"
+shape=rect
+]
+
+label="\n\n205. the grep dump roadmap"
 }
 
 /* revision history

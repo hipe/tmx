@@ -1,0 +1,94 @@
+digraph g {
+
+rankdir="BT"
+
+/*
+sexier / more complex ☝️
+easier / less complex 👇
+*/
+subgraph cluster_01 {
+
+tmp39223942[
+label="(the DANCE\napp!!)" shape=rect]
+tmp293239293->tmp39223942
+
+tmp293239293[
+label="(LANGUAGE\napp!!)" shape=rect]
+n10->tmp293239293
+tmp4923932509823->tmp293239293
+
+n10
+[label="(n10.as)" shape=rect]
+tmp23320923092->n10
+
+tmp4923932509823[
+label="(tagging app)" shape=rect]
+tmp23320923092->tmp4923932509823
+
+tmp23320923092[
+label="(castle\nof dust)" shape=rect] /* [#851] */
+tmp039329->tmp23320923092
+
+tmp039329[
+label="(CMS\nthing (rough))" shape=rect] /* [#406] */
+n12->tmp039329
+
+}
+
+n12
+[label="(these)"]
+n21->n12
+n08->n12
+
+tmp9323342[
+label="(grep\ndump!!)" shape=rect] /* [#205] */
+n25->tmp9323342
+n08->tmp9323342
+
+n08[
+label="(react\nroadmap)"]
+
+n11[
+label="(upload bot)" shape=rect] /* [#310] */
+tmp9323342->n11
+
+n13[
+label="(game\nserver)" shape=rect] /* [#012] */
+n25->n13
+
+n21[
+label="CRAZY\nGIT THING"]
+n22->n21
+
+n22[
+label="talk to git\non cloud"]
+n23->n22
+
+n23[
+label="talk to\ngit local"]
+n25->n23
+
+n25[
+label="now that you\nhave storage"]
+n87->n25
+
+n87[
+label="write file\non cloud"]
+n89->n87
+
+n89[
+label="write file\nlocal"]
+n91->n89
+
+n91[
+label="read file\non cloud"]
+n93->n91
+
+n93[
+label="read file\noff local\nfilesystem\nwith docker"]
+
+label="\n\n431. storage roadmap"
+}
+/*
+#born.
+*/

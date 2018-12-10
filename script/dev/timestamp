@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
-num_args=$#
 file='z/times'
 
+is_supplemental=''
 do_help=''
 do_invite=''
 
-if [[ num_args -eq 0 ]] ; then
+
+if [[ "$1" == '-s' ]] ; then
+  is_supplemental=1
+  shift
+fi
+
+if [[ "$#" -eq 0 ]] ; then
   echo "expecting <msg1> .." >&2
   do_invite=1
 else
@@ -29,10 +35,13 @@ if [[ ! -z "$do_invite" ]] ; then
 fi
 
 if [[ ! -z "$do_help" ]] ; then
-  echo "usage: $0 msg1 msg2 .." >&2
+  echo "usage: $0 [-s] msg1 msg2 .." >&2
   echo "" >&2
-  echo "description: appends a timestamp line to ${file}"
-  exit 5
+  echo "description: appends a timestamp line to ${file}" >&2
+  echo "" >&2
+  echo "options:" >&2
+  echo "    -s    supplemental. only appends message, no timestamp" >&2
+  exit 0
 fi
 
 if [ ! -f "$file" ] ; then
@@ -40,8 +49,12 @@ if [ ! -f "$file" ] ; then
   exit 5
 fi
 
-da=$(date '+%H:%M:%S')
-line="  ${da}  $@"
+if [[ -z "$is_supplemental" ]] ; then
+  da=$(date '+%H:%M:%S')
+  line="  ${da}  $@"
+else
+  line="            $@"
+fi
 
 echo "(did: echo \"$line\" >> $file)" >&2
 
