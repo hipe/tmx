@@ -1,0 +1,74 @@
+digraph g {
+
+rankdir=LR
+
+subgraph cluster_100_thru_199 {
+
+node [shape=record]
+
+
+n310[
+label="core thing idk"]
+n110->n310
+n310->n110
+
+
+subgraph cluster_100_thru_199 {
+
+n110[
+label="table schema\ndispatcher"]
+
+n110->n120
+n120->n110
+n120[
+label="CSV adapter\n(written in python)|injected\nVCS adapter"]
+
+n110->n130
+n130->n110
+n130[
+label="markdown adapter\n(written in go)|injected\nVCS adapter"]
+
+n110->n140
+n140->n110
+n140[
+label="native adapter\n(written in whatever)|injected\nVCS adapter"]
+
+
+
+n120->n151
+n151->n120
+n151[
+label="CSV\ntable-ish 1"]
+
+
+n120->n152
+n152->n120
+n152[
+label="CSV\ntable-ish 2"]
+
+
+n130->n153
+n153->n130
+n153[
+label="markdown\ntable-ish"]
+
+
+n140->n154
+n154->n140
+n154[
+label="native\ntable-ish"]
+
+
+}
+
+
+label="polyglot plugin\narchitecture"
+}
+
+
+label="
+idk man"
+}
+/*
+#born.
+*/
