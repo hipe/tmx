@@ -1,0 +1,116 @@
+digraph g {
+rankdir=LR
+node[
+shape=record]
+
+
+subgraph cluster_400_thru_499 {
+label="IG datamodel"
+n405[
+label="the n10.as\ninstagram"]
+n405->n410[
+label="is nothing more than"
+arrowhead=crow
+]
+n410[
+label="image\n(series)"]
+n410->n425[label="kind"]
+n425[
+label="selfie/other"]
+n410->n475[label="kind"]
+n475[
+label="day\nschedule"]
+n405->n485[arrowhead=crow]
+n485[
+label="(stories)"]
+n490[
+label="visual block|screen area"]
+n475->n490[
+label="has many"
+arrowhead=crow]
+}
+
+subgraph cluster_500_thru_599 {
+label="programming datamodel"
+
+n525[
+label="show-brand|name"
+]
+
+n525->n535[
+label="always has - might have"
+arrowhead=odot]
+n535[
+label="show-profile|
+square image|
+description paragraphs|
+schedule description"
+]
+
+n525->n550[
+label="has many"
+arrowhead=crow]
+n550[
+label="episode|duration|url (soundcloud/mixcloud)"
+]
+
+n550->n575[
+label="has many"
+arrowhead=crow]
+n575[
+label="airing|date|start time"]
+n575->n490[
+label="always has - might have"
+arrowhead=odot]
+
+}
+
+
+subgraph cluster_700_thru_799 {
+label="the n10.as broadcast IMAGINARY datamodel"
+n705[
+label="the n10.as\nbroadcast"
+]
+n705->n710[
+label="is nothing more than a series of"
+arrowhead=crow]
+n710[
+label="block"]
+n710->n720[label="kind"]
+n720[
+label="n10.as\nat night"]
+n710->n730[label="kind"]
+n730[
+label="airing"]
+n730->n735[label="kind"]
+n735[
+label="Re-Run\n(from invisible\nreplayables shelf)"]
+n730->n740[label="kind"]
+n740[
+label="a live\nepisode airs\n(gets recorded)"]
+}
+
+
+subgraph cluster_825_thru_875 {
+label="the episode state machine"
+n825[
+label="a live\nepisode airs\n(gets recorded)"]
+n825->n830[label="then goes to"]
+n830[
+label="invisible\n\"replayables\"\nshelf"]
+n830->n835[label="then goes to"]
+n835[
+label="is in\narchive\nlist"]
+n835->n840[label="?"]
+n840[
+label="mixcloud /\nsoundcloud"]
+n835->n845[label="?"]
+n845[
+label="CD icon\nlistings"]
+}
+label="
+(pretending we might make this)"
+}
+/*
+#born.
+*/
