@@ -1,0 +1,125 @@
+digraph g {
+
+rankdir=BT
+subgraph cluster_200_thru_299 {
+
+n_legend_225[label="net (225)"]
+n_legend_250[label="IPC (250)"]
+n_legend_275[label="I/O (275)"]
+n_legend_285[label="hello\nworld (285)"]
+
+n_legend_250->n_legend_225
+n_legend_275->n_legend_250
+n_legend_285->n_legend_275
+
+n_G_250->n_G_225
+n_G_275->n_G_250
+n_G_285->n_G_275
+
+n_G_225[label="go doing\nsockets/http"]
+n_G_250[label="go doing\ngit/system"]
+n_G_275[label="go doing\nfile I/O"]
+n_G_285[label="go\nhello world"]
+
+n_K_250->n_K_225
+n_K_275->n_K_250
+n_K_285->n_K_275
+
+n_K_225[label="kotlin doing\nsockets/http"]
+n_K_250[label="kotlin doing\ngit/system"]
+n_K_275[label="kotlin doing\nfile I/O"]
+n_K_285[label="kotlin\nhello world"]
+
+n_P_250->n_P_225
+n_P_275->n_P_250
+n_P_285->n_P_275
+
+n_P_225[label="python doing\nsockets/http"]
+n_P_250[label="python doing\ngit/system"]
+n_P_275[label="python doing\nfile I/O"]
+n_P_285[label="python\nhello world"]
+
+label="
+PERFORMANCE: possible? performance? (profile/cost?)
+VERBS: file I/O? git/system calls? hg not git?
+CLOUD PLATFORM: mk, gke, aws
+LANG: P, N, K, G
+(node.js not included for now but it should be, perhaps at the end.)
+"
+}
+
+n_legend_415->n_legend_285
+
+subgraph cluster_400_thru_499 {
+
+n_legend_415[label="push changes\nto a remote (415)"]
+n_legend_425[label="pull changes\nfrom a remote (425)"]
+n_legend_450[label="write a git commit\nto one file (450)"]
+n_legend_475[label="read git log\nor git show (475)"]
+
+n_legend_425->n_legend_415
+n_legend_450->n_legend_425
+n_legend_475->n_legend_450
+
+n_gke_425->n_gke_415
+n_gke_450->n_gke_425
+n_gke_475->n_gke_450
+
+n_gke_415[label="push\non gke"]
+n_gke_425[label="pull\non gke"]
+n_gke_450[label="write\non gke"]
+n_gke_475[label="read\non gke"]
+
+
+n_aws_425->n_aws_415
+n_aws_450->n_aws_425
+n_aws_475->n_aws_450
+
+n_aws_415[label="push\non aws"]
+n_aws_425[label="pull\non aws"]
+n_aws_450[label="write\non aws"]
+n_aws_475[label="read\non aws"]
+
+
+n_mk_425->n_mk_415
+n_mk_450->n_mk_425
+n_mk_475->n_mk_450
+
+n_mk_415[label="push\non mk"]
+n_mk_425[label="pull\non mk"]
+n_mk_450[label="write\non mk"]
+n_mk_475[label="read\non mk"]
+
+label="git verbs (later e.g hg)"
+}
+
+n_legend_625->n_legend_475
+
+subgraph cluster_600_thru_699 {
+
+n_legend_625[label="write a file (new\nor existing) (625)"]
+n_legend_650[label="read lines\nof a file\nin a loop (650)"]
+
+n_legend_650->n_legend_625
+
+n_gke_650->n_gke_625
+n_aws_650->n_aws_625
+n_mk_650->n_mk_625
+
+n_gke_625[label="write file\non gke"]
+n_gke_650[label="read file\non gke"]
+
+n_aws_625[label="write file\non aws"]
+n_aws_650[label="read file\non aws"]
+
+n_mk_625[label="write file\non minikube"]
+n_mk_650[label="read file\non minikube"]
+
+label="basic filesystem-ish verbs\nand cloud-platforms"
+}
+
+label="
+857. backend roadmap"
+}
+
+
