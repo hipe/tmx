@@ -225,45 +225,8 @@ class _soup_via_things:
 
 
 def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
-    # we anticipate wanting to make this public.
-    # if you do, consider instead turning this into a parameter
-    # used by the called.
-    # abstracted from above thing at #history-A.3
-
-    from sakin_agac.format_adapters.html.magnetics import (
-            cached_doc_via_url_via_temporary_directory as cachelib,
-            )
-    if filesystem_path is None:
-        from script_lib import TEMPORARY_DIR
-        _cached_doc_via = cachelib(TEMPORARY_DIR)
-        from modality_agnostic import listening as _
-        _emit = _.emitter_via_listener(listener)
-        cached_doc = _cached_doc_via(url, _emit)
-    else:
-        def f():
-            yield f'(reading HTML from filesystem - {filesystem_path})'
-        listener('info', 'expression', 'reading_from_filesystem', f)
-        cached_doc = cachelib.Cached_HTTP_Document(filesystem_path)
-    return cached_doc
-
-
-def listener_and_exitstatuser_for_CLI(io):
-
-    from script_lib.magnetics import listener_via_resources as _
-    downstream_listener = _.listener_via_stderr(io)
-
-    exitstatus = 0  # innocent until proven guilty
-
-    def listener(head_channel, *a):
-        if 'error' == head_channel:
-            nonlocal exitstatus
-            exitstatus = 5
-        downstream_listener(head_channel, *a)
-
-    def exitstatuser():
-        return exitstatus
-
-    return listener, exitstatuser
+    from script_lib import CACHED_DOCUMENT_VIA_TWO as _
+    return _(filesystem_path, url, 'HTML', listener)
 
 
 def _this_lazy(f):  # experiment (copy-paste)

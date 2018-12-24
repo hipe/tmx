@@ -28,6 +28,8 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#859]                     |       | kubernetes documentation roadmap
+|[#858]                     |       | aws journal
 |[#857]                     |       | backend roadmap
 |[#856]                     |       | example data model
 |[#855]                     |       | not really SQL

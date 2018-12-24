@@ -3,7 +3,7 @@
 
 objectives are severalfold:
     - cover scraping of this one page format
-    - cover the beginnings of #[#418.M] multi-tablism
+    - cover the beginnings of #[#432] multi-tablism
 
 we first assert several structural details of the scraping, including whether
 the branch boundaries are being detected and emitted.

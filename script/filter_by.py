@@ -74,8 +74,14 @@ def _the_function_called_required(self, prp, x):
 def _CLI(sin, sout, serr, argv):  # #testpoint
 
     import script.json_stream_via_url_and_selector as siblib
+    import script_lib as scriptlib
 
-    listener, exitstatuser = siblib.listener_and_exitstatuser_for_CLI(serr)
+    def when_error():
+        nonlocal exitstatus
+        exitstatus = 5
+    exitstatus = 0
+
+    listener = scriptlib.listener_via_error_listener_and_IO(when_error, serr)
 
     res = _query_and_collection_id_via_ARGV(sin, serr, argv, listener)
     if not res.OK:
@@ -91,7 +97,7 @@ def _CLI(sin, sout, serr, argv):  # #testpoint
     for dct in _:
         visit(dct)
 
-    return exitstatuser()
+    return exitstatus
 
 
 def _query_and_collection_id_via_ARGV(sin, serr, argv, listener):

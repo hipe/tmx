@@ -218,11 +218,7 @@ you can
 
 
 
-## <a name='M'></a> feature-family: multi-tablism
-
-(this is a stub. it vaguely exists in one generator script but to get it
-to work with syncing will be an undertaking.)
-
+## <a name='M'></a>
 
 
 

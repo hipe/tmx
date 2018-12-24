@@ -27,6 +27,13 @@ these were the original stated objectives, here (in part) for posterity:
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---
 |                 (example) | #this | #this-cel-too
+|                   #432    |       | multi-tablism ..
+|                   #431    |       | storage roadmap ..
+|                   #430    | #hole |
+|                   #429    |       | content roadmap ..
+|                   #428    |       | design roadmap ..
+|                   #427    |       | frontend roadmap ..
+|                   #426    |       | publishing roadmap ..
 |                   #425    |       | dev workflow notes like git bisect
 |                   #424    |       | [theme notes]
 |                   #423    |       | dot

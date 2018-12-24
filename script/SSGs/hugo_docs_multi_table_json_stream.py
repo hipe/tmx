@@ -12,7 +12,7 @@ as better because it uses the presentation structure which is
 presumably the most representative of yadda..
 """
 # #[#410.1.2] this is a producer script.
-# #[#418.M] tracks multi-tablism
+# #[#432] tracks multi-tablism
 
 
 _domain = 'https://gohugo.io'  # no trailing slash because #here1

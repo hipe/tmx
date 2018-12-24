@@ -182,9 +182,7 @@ def _second_selector(soup, listener):
         unexpected elements.
    """
 
-    from modality_agnostic import listening
-    emit = listening.emitter_via_listener(listener)
-    o = _all_these_functions(emit)
+    o = _all_these_functions(listener)
 
     # first, populate `seen_set` while traversing the SECOND collection
 
@@ -224,11 +222,12 @@ def _second_selector(soup, listener):
         else:
             cover_me('yikes - div one was not a subset')
 
-    _tmpl = '(first was subset of second ({:d} were same))'
-    emit('info', 'expression', 'subset', _tmpl, count)
+    def f():
+        yield f'(first was subset of second ({count:d} were same))'
+    listener('info', 'expression', 'subset', f)
 
 
-def _all_these_functions(emit):
+def _all_these_functions(listener):
     """
     the end product functions that come of this, we expose them in this
 
@@ -301,8 +300,9 @@ def _all_these_functions(emit):
             else:
                 cover_me("page structured changed - wasn't expecting '%s'" % s)
 
-        _tmpl = "(number of <br>'s: {})"
-        emit('info', 'expression', 'brs_count', _tmpl, count)
+        def f():
+            yield f"(number of <br>'s: {count})"
+        listener('info', 'expression', 'brs_count', f)
 
     ignore_these = {'form', 'i', 'img', 'ins', 'input', 'p', 'script'}
     these = {'skyscraper', 'bogo-paypal'}

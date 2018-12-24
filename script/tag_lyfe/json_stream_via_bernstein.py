@@ -29,7 +29,6 @@ class open_traversal_stream:  # #[#410.F] class as context manager
     def __init__(self, markdown_path, listener):
         self.raw_url = _raw_url
         self._markdown_path = markdown_path
-        self.__init_emitter(listener)
         self._listener = listener
 
     def __enter__(self):
@@ -101,26 +100,12 @@ class open_traversal_stream:  # #[#410.F] class as context manager
                 listener=self._listener)
 
     def __resolve_cached_doc(self):
-        markdown_path = self._markdown_path
-        from sakin_agac.format_adapters.html.magnetics import (
-                cached_doc_via_url_via_temporary_directory as cachelib,
-                )
-        if markdown_path is None:
-            from script_lib import TEMPORARY_DIR
-            _cached_doc_via = cachelib(TEMPORARY_DIR)
-            self._cached_doc = _cached_doc_via(self.raw_url, self._emit)
-        else:
-            _tmpl = '(reading markdown from filesystem - {})'
-            self._emit(
-                    'info', 'expression', 'reading_from_filesystem',
-                    _tmpl, markdown_path)
-            self._cached_doc = cachelib.Cached_HTTP_Document(markdown_path)
-        if self._cached_doc is None:
+        from script_lib import CACHED_DOCUMENT_VIA_TWO as _
+        doc = _(self._markdown_path, self.raw_url, 'markdown', self._listener)
+        if doc is None:
             self._OK = False
-
-    def __init_emitter(self, listener):
-        from modality_agnostic import listening
-        self._emit = listening.emitter_via_listener(listener)
+        else:
+            self._cached_doc = doc
 
 
 def updated_and_version_via_string(s):  # #testpoint (sort of)

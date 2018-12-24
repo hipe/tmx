@@ -1,6 +1,7 @@
 class listening:  # (as namespace only)
 
     def emitter_via_listener(listener):
+        # at #history-B.1 removed all but one client
         def emit(*chan_args_tmpl):
             def emit_lines():
                 if args is None:
@@ -69,5 +70,6 @@ class Exception(Exception):
     pass
 
 
+# #history-B.1: as referenced, can be temporary
 # #history-A.1: listener-related methods are spliced in from elsewhere
 # #born.

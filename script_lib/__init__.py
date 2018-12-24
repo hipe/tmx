@@ -189,6 +189,35 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
     return __main()
 
 
+# -- abstracted at #history-A.1 - scream case because kludge, reach-down
+
+def CACHED_DOCUMENT_VIA_TWO(cached_path, url, noun_phrase, listener):
+    # ugly to reach down but that hard coded doo-hah is here & convenient
+    if cached_path is None:
+        return _cached_doc_via_url(url, listener)
+    else:
+        return _cached_doc_via_filesystem(cached_path, noun_phrase, listener)
+
+
+def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
+    from sakin_agac.format_adapters.html.magnetics import (
+            cached_doc_via_url_via_temporary_directory as cachelib,
+            )
+
+    def f():
+        yield f'(reading {noun_phrase} from filesystem - {cached_path})'
+    listener('info', 'expression', 'reading_from_filesystem', f)
+    return cachelib.Cached_HTTP_Document(cached_path)
+
+
+def _cached_doc_via_url(url, listener):
+    from sakin_agac.format_adapters.html.magnetics import (
+            cached_doc_via_url_via_temporary_directory as cachelib,
+            )
+    return cachelib(TEMPORARY_DIR)(url, listener)
+# --
+
+
 def line_stream_via_doc_string_(doc_string, help_values):
     if help_values is None:
         big_string = doc_string
@@ -203,6 +232,18 @@ def __deinident(md):
     line = md[1]
     md2 = re.search('^[ ]{8}(.*\n)', line)
     return line if md2 is None else md2[1]
+
+
+def listener_via_error_listener_and_IO(when_error, serr):
+
+    from script_lib.magnetics import listener_via_resources as _
+    downstream_listener = _.listener_via_stderr(serr)
+
+    def listener(head_channel, *a):
+        if 'error' == head_channel:
+            when_error()
+        downstream_listener(head_channel, *a)
+    return listener
 
 
 def __build_common_listener(serr):
@@ -288,4 +329,5 @@ SUCCESS = 0
 TEMPORARY_DIR = 'z'  # ick/meh
 
 
+# #history-A.1: as referenced
 # #born: abstracted

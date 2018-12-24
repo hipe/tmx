@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# this serves as a record of which sections (pages) of documentation we
+# surveyed. (we skipped "reference" and "contribute").
+# it's a script and not a plain old data file (for now) just because it's
+# shorter and easier to read on the command line this way
+
+
+echo "https://kubernetes.io/docs/setup/"
+echo "https://kubernetes.io/docs/concepts/"
+echo "https://kubernetes.io/docs/tasks/"
+echo "https://kubernetes.io/docs/tutorials/"
+
+# #born.
