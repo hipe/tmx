@@ -8,6 +8,21 @@ date: "2018-08-10T04:19:18-04:00"
 
 looking at hugo. hoping for hugo on heroku
 
+SYNOPSIS: all of this worked for publishing a hugo-based static site on heroku.
+see [#402] near "then, pray" to see how to publish. hint: something like:
+
+in one terminal:
+```bash
+heroku logs --tail --remote heroku1
+```
+then in another terminal:
+```bash
+git push heroku1 main:master
+```
+then after it looks like it's done:
+```bash
+heroku open --remote heroku1
+```
 
 
 

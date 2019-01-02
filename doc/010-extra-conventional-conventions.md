@@ -1,5 +1,7 @@
-# extra-conventional conventions
-
+---
+title: extra conventional conventions
+date: 2018-01-22T23:45:57-05:00
+---
 ## objective & scope
 
 for any given programming language we will encounter, there will exist
@@ -12,7 +14,7 @@ for any given language that we employ in this project (the "platform
 language"), we will draw first from that existing ecosystem of conventions
 before we effect our own.
 
-(EDIT #open [#007.D] it is a known issue that our older python violates PEP8)
+(EDIT #open [#007.D] it is a known issue that our older python violates PEP8.)
 
 this document, then, is for those conventions that we employ *beyond*
 what is proscribed by the existing culture(s).
@@ -31,6 +33,7 @@ those in the existing culture, we should probably correct them here.)
 ## brief overview/TOC
 
 we've got:
+
   - [paranoiacally-private method names](#c)
   - [broadly utilized class-name conventions refined](#d)
   - [project-private method names](#e)

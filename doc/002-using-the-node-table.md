@@ -1,5 +1,7 @@
-# using the node table
-
+---
+title: using the node table
+date: 2018-01-20T02:33:51-05:00
+---
 ## objective
 
 this document describes how the [node table](../README.md#node-table) is used.

@@ -5,14 +5,30 @@ date: 2018-12-09T02:02:14-05:00
 
 ## objective & scope of this document
 
-before we knew what kubernetes was and that we wanted it, we knew we wanted
-docker and we thought it was a safe bet to start with aws for compute and storage.
+the undercurrent objective is to be able to make a backend with storage
+covering all the (vertical) steps outlined in
+our [#857] backend roadmap.
 
-this document tracks our first foray into aws (which is scary and
-overwhelming, with how many services there are).
+the more specific objective of this document is to (er) document exactly
+what we did to get our aws "stuff" up and running, to any extent that we
+did to serve our "undercurrent" objective.
 
-also it tracks things up to the point where we decided to put all chips
-on kubernetes for now (which itself is out of the scope of this document).
+to paint the picture in somewhat more detail:
+in approaching this broad problem (of "hosting", say),
+we're constantly vacillating between
+
+  - aws (amazon) and its many services
+  - google cloud (many acronyms) and same
+  - heroku and its many add-ons
+  - something crazy like openstack
+
+furthermore, we're vacillating between
+
+  - kubernetes (google) along with docker
+  - just plain old docker
+
+as such, we try to keep this document focused on "journaling" what we do
+with aws, but it will bleed into kubernetes-related things we do _on_ aws.
 
 
 
@@ -20,6 +36,7 @@ on kubernetes for now (which itself is out of the scope of this document).
 ## sign up for aws
 
 we had to give them our CC and a phone number.
+we wanted to do this without a CC if possible, but it was not possible.
 
 
 
@@ -54,7 +71,7 @@ put it in your notes.
 ## install the CLI
 
 
-follow this [aws doc about installign the CLI][doc2].
+follow this [aws doc about installing the CLI][doc2].
 we needed at least version 1.9.15 for ECR.
 
 1. get the lastest [CLI](http://aws.amazon.com/cli/).
@@ -138,14 +155,132 @@ a comprehensive "full sweep" approach..
 
 
 
+## "log in" (attempt 1)
+
+somehow figured out it is by doing this:
+```bash
+aws configure
+```
+
+and to do that we needed to get an access key.
+did that by figuring things out on the web based console.
+got a key and secret.
+
+
+
+
+## region
+
+now, there's regions and there's availability zones.
+
+see both described here:
+
+```bash
+aws ec2 describe-regions
+```
+the information returned by the above is interesting, but
+it doesn't answer our question (which to use?).
+
+so instead, we read [the aws doc about availability zones][doc8].
+here we look at the name of the states in the US (virginia, ohio,
+california, oregon) and pick the one that's geographically closest
+to our physical working location at the moment:
+
+  - `us-east-2` (ohio)
+
+because that rationale seems to make as much sense as any
+(but we aren't sure and should probably read the above document in full).
+
+with `aws configure` again, we enter to accept the defaults of the
+first two choices (key and secret), and type the above for the third.
+
+
+
+
+## availability zone
+
+[this explainer from rackspace][doc9] was the first explanation that made
+any sense to us about what availability zones are distinct from regions.
+
+but despite having this deeper understanding, it seems we are _not_
+expected to pick one (given a region) based on geography: it seems
+they are given random mappings per account.
+
+
+do:
+```bash
+aws ec2 describe-availability-zones
+```
+
+and we see we have to pick one of these:
+
+  - `us-east-2a`, `us-east-2b` or `us-east-2c`
+
+we're gonna pick the first one, because we don't know any better.
+
+
+
+
+## THEN
+
+THEN, WITH THIS COMMAND:
+```bash
+aws ec2 create-volume \
+  --availability-zone us-east-2a \
+  --size 1 \
+  --volume-type gp2 \
+  --dry-run
+```
+
+as a startingpoint, the above is based off of an example in
+[k8s doc about volumes][doc7]. but we change and enhance the received example
+in the following ways:
+
+  - `availability-zone` we changed from `eu-west-1a` to `us-east-2a`
+    based partly on randomness and partly on our rambling effors as
+    described above.
+  - `size` is in GiB (gibibytes (a GiB is ~1.07 billion bytes)).
+    we changed it from `10` down to the minimium (`1`), because
+    for our initial purposes we expect to need only about
+    _3 (three) megabytes_
+    (which is about three thousandths of the minimum we can specify).
+  - we're sticking with a `volume-type` of `gp2` (as "general purpose" (2 ?))
+    as was exampled
+    because our use case certainly seems general
+    and we don't know any better.
+  - (we want to KISS and have no encryption, which we expect is default.)
+  - (IOPS (I/O operations per second) shouldn't pertain to us)
+  - we indicate `--dry-run` so that you yourself (me, myself) can easily
+    do the dry run by copy-pasting all the text of the command as-is.
+    (to run it for real, either omit this or change it to `--no-dry-run`.)
+
+HOT!!!
+```bash
+An error occurred (DryRunOperation) when calling the CreateVolume operation: \
+Request would have succeeded, but DryRun flag is set.
+```
+
+
+*_NOTE_* return to [here][doc7] when SOMETHING
+
+
+
+
 [doc1]: https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/
 [doc2]: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 [doc3]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/get-set-up-for-amazon-ecr.html
 [doc4]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_GetStarted.html
 [doc5]: https://docs.docker.com/docker-for-aws/persistent-data-volumes/
 [doc6]: https://www.stratoscale.com/blog/kubernetes/ec2-container-service-vs-kubernetes/ (near) 'For microservice architectures, this creates an additional overhead every service you deploy.'
+[doc7]: https://kubernetes.io/docs/concepts/storage/volumes/
+[doc8]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+[doc9]: https://blog.rackspace.com/aws-101-regions-availability-zones
+[doc10_USE_ME]: https://portworx.com/basic-guide-kubernetes-storage/
+
+
 
 
 ## (document-meta)
 
+  - #history-A.1: came back to this after a while
   - #born.

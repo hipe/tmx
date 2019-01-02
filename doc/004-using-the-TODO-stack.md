@@ -1,6 +1,30 @@
-# using the TODO stack
+---
+title: using the TODO stack
+date: 2018-01-25T10:19:38-05:00
+---
+## foreword
 
-stupid simple issue tracking:
+on 2018-12-08 we "exploded" our monstrous TODO stack into very many
+graph viz files and effectively deprecated its use to the extent detailed
+in this document.
+
+however, we persist in using the TODO stack facility
+(currently a file with one line)
+for the purpose of keeping short-term
+reminders within the working time of one commit.
+
+longerm what would be nice is the same user experience of using the
+TODO stack (because after all, we still experience time linearly and have
+to chose tasks to do one after the other); but having it be somethng like
+a view produced by our new way.
+
+what follows is the body of this document as it existed before we
+deprecated the practice such as it was.
+
+
+
+
+## stupid simple issue tracking:
 
   - we are describing the "TODO.stack" file.
 

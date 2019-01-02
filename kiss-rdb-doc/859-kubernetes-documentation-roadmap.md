@@ -7,14 +7,22 @@ date: 2018-12-23T23:02:13-05:00
 # <a href="https://kubernetes.io/docs/setup/">Setup</a>
 
 ## Picking the Right Solution
+  - local-machine: minikube, minishift, microk8s, 4 multi-node options
+  - hosted: (lol all sound the same). familiar: gke, aws, azure, oracle
+  - turnkey cloud: (20 options, like Alibaba, AWS, Azure, GCE, IBM, Oracle
+  - on-prem turnkey cloud: meh
+  - custom: snooze
+
 
 ## Downloading Kubernetes
 |section|notes|
 |---|---|
-|Building from Source|
-|v1.13 Release Notes|
+|Building from Source|look how easy, but don't do this unless dev'ing k8s itself
+|v1.13 Release Notes|HEAVY READING
 
 ## Bootstrapping Clusters with kubeadm
+_(NOTE: this whole table is N/A as we're not tryna be operators rn.)_
+
 |section|notes|
 |---|---|
 |Installing kubeadm|
@@ -27,9 +35,11 @@ date: 2018-12-23T23:02:13-05:00
 |Troubleshooting kubeadm|
 
 ## Turnkey Cloud Solutions
+_(NOTE: we'll skip all but the AWS one and the GCE one for now.)_
+
 |section|notes|
 |---|---|
-|Running Kubernetes on AWS EC2|
+|Running Kubernetes on AWS EC2|you like this "guestbook" example #come-back
 |Running Kubernetes on Alibaba Cloud|
 |Running Kubernetes on Azure|
 |Running Kubernetes on CenturyLink Cloud|
@@ -37,6 +47,8 @@ date: 2018-12-23T23:02:13-05:00
 |Running Kubernetes on Multiple Clouds with Stackpoint.io|
 
 ## Custom Cloud Solutions
+_(skimmed)_
+
 |section|notes|
 |---|---|
 |CoreOS on AWS or GCE|
@@ -44,6 +56,8 @@ date: 2018-12-23T23:02:13-05:00
 |Installing Kubernetes on AWS with kops|
 
 ## On-Premises VMs
+_(skimmed each page. no idea what anything meant.)_
+
 |section|notes|
 |---|---|
 |Cloudstack|
@@ -52,21 +66,42 @@ date: 2018-12-23T23:02:13-05:00
 
 ## Kubernetes Version and Version Skew Support Policy
 
+  - _(out of scope to us for now)_
+
 ## Building Large Clusters
+
+  - _(N/A to us)_
 
 ## Running in Multiple Zones
 
+  - _(skip)_
+
 ## CRI installation
+
+  - _(I don't think I need to know what this is yet.)_
 
 ## Creating a Custom Cluster from Scratch
 
+  - _(HEAVY READING. skip for now as likely N/A)_
+
 ## Installing Kubernetes with Digital Rebar Provision (DRP) via KRIB
+
+  - _(skip)_
 
 ## PKI Certificates and Requirements
 
+  - _(skip)_
+
 ## Running Kubernetes Locally via Minikube
 
+  - alternative container runtimes (really?)
+  - thing about "which speeds up local experiments"
+  - #TYPO: says "`docker-env command`" should be "`docker-env` command"
+  - summary: #come-back we want to understand `#use-local-images-by-re-using-the-docker-daemon`
+
 ## Validate Node Setup
+
+  - skimmed. #come-back to this later
 
 
 # <a href="https://kubernetes.io/docs/concepts/">Concepts</a>

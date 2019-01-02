@@ -29,8 +29,6 @@ class _CLI:
         for obj in object_stream_via_url_(None, url, self._listener):
             write(obj)
 
-        pass
-
 
 def object_stream_via_url_(cached_path, url, listener):
 

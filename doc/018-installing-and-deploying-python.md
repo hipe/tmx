@@ -1,5 +1,7 @@
-# installing and deploying python
-
+---
+title: installing and deploying python
+date: 2018-03-08T13:22:09-05:00
+---
 ## XXX
 
 XXX does this close #open [#007.C]?

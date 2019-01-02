@@ -199,7 +199,7 @@ then in your 'main' terminal:
 |[#020.3]                   | #trak | track this one gripe about contextlib
 |[#020.2]                   | #hm   | track this one gripe about argparse
 |[#020]                     | #trak | track all issues with python itself
-|[#019]                     | #open | track wishlist for strongly typed ([#412], [#604])
+|[#019]                     | #open | normalizing sys path ..
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
 |[#017]                     |       | [placeholder to explain our listener pattern]
 |[\[#016\]]                 |       | K hong reading notes

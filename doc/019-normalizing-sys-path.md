@@ -1,3 +1,8 @@
+---
+title: normalizing sys path
+date: 2018-03-30T05:58:28-04:00
+---
+
 # our inelegant `sys.path` hacking
 
 ## overview
