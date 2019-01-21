@@ -183,6 +183,20 @@ the following sections:
 
 
 
+## cheat sheet:
+
+(this is referenced elsewhere)
+
+  - "test-run-type-A" is when you just run a test file
+  - "test-run-type-B" is when you run a SUB directory of test files
+  - "test-run-type-C" is when you run the topmost directory of test files
+
+
+(EDIT we might re-write the below to be friendlier with the above.)
+
+
+
+
 ## <a name='file-type-A'></a>"file type A": a normal, production, entrypoint file
 
 there is ideally only one "asset entrypoint" per sub-project. it is the file

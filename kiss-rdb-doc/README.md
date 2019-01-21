@@ -28,6 +28,10 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#863]                     |       | coarse parse toml state diagram
+|[#862]                     |       | aws ec2
+|[#861]                     |       | aws eks
+|[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
 |[#857]                     |       | backend roadmap

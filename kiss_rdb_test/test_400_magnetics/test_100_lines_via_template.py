@@ -1,27 +1,5 @@
+import _common_state
 import unittest
-
-
-def _yuck_normalize_sys_path():  # in denial about [#019]
-    from sys import path as a
-    from os import path
-
-    dn = path.dirname
-    head = a[0]
-
-    test_sub_dir = dn(path.abspath(__file__))
-    mono_repo_dir = dn(dn(test_sub_dir))
-
-    if test_sub_dir == head:
-        # test file or its directory entrypoint
-        a[0] = mono_repo_dir
-    elif mono_repo_dir == head:
-        # topmost test dir was entrypoint
-        pass
-    else:
-        raise Exception('sanity')
-
-
-_yuck_normalize_sys_path()
 
 
 from modality_agnostic.memoization import (  # noqa: E402

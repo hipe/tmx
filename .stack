@@ -1,1 +1,13 @@
 creative self actualization
+maybe a CLI (explode me)
+function for create (random allocation of new ID)
+be able to map (index) ID's for a whole collection
+update: update attributes
+update: add attributes
+update: remove attributes
+integrate w/ lock & rewrite file
+[change lines of an item, a reusable doo-hah]
+add item before a particular item
+add item to end and add item to empty file
+use the toml lib to parse the lines of an entity
+read a toml file, coarse parse state machine of the lines

@@ -1,21 +1,13 @@
-"""experiment: be a #[#019.file-type-C] but simpler
-
-below, when we say "pud" we mean `python -m unittest discover`
 """
+when running the whole sub-project test suite ("from the top")
+(with "unittest discover"), it is NECESSARY that this file exist
+so that its directory is recognized as a module (that has tests).
 
-from sys import path as a
-from os import path
+furthermore this is the ONLY circumstance where this file is loaded.
+(i.e. it is NOT loaded if you run its directory as the test suite.)
 
-dn = path.dirname
-head = a[0]
+it is therefor NEVER prudent for this file to contain any code.
 
-top_test_dir = dn(dn(__file__))
-mono_repo_dir = dn(top_test_dir)
-
-if top_test_dir == head:
-    # top test dir is entrypoint
-    a[0] = mono_repo_dir
-else:
-    raise Exception('sanity')
-
+in other words, #[#018.file-type-B].
+"""
 # #born.

@@ -1,0 +1,79 @@
+digraph g {
+
+s0000[label="start" shape="rect"]
+
+s0000->a0100[label="blank or\ncomment"]
+
+a0100[label="(usually\nno-op)"]
+
+a0100->s0000
+
+s0000->a0200[label="section"]
+
+a0200[label="(maybe do something\nfor beginning of section)"]
+
+a0200->s0300
+
+s0300[label="inside\nentity" shape=rect]
+
+s0300->a0300[label="blank or\ncomment"]
+s0300->a0400[label="one-line\nkey-value"]
+
+a0300[label="(usually\nno-op)"]
+
+a0300->s0300
+
+a0400[label="(maybe do something\nfor key-value)"]
+
+a0400->s0300
+
+s0300->a0500[label="section"]
+
+a0500[label="(maybe do something\nfor end of section)"]
+
+a0500->a0200
+
+s0300->a0600[label="(eos)"]
+
+a0600[label="(maybe do something\nfor end of file)"]
+
+a0600->s0600
+
+s0600[label=done shape=rect]
+
+label="
+this is a state transition diagram for a 'coarse parse' pass of a stream-
+based toml file parser; one that can scale up to very large files because
+(for example) it need not keep more than one entity (section) in memory
+at once.
+
+(the actual efficiency depends on what you do at the various actions; but
+the point is this is a resource-efficient approach that obviates the need
+to read the whole file into memory at once as one giant dictionary.)
+
+  • rectangles are states
+  • arrows with labels are transitions
+  • arrows without labels are a thing you do immediately
+  • ellipses are typical example actions
+  • this is a coarse, line-based parser.
+    here, \"input tokens\" are always lines.
+  • for each next input token find a suitable transition
+    from the state you are in and folllow the arrow.
+  • (because all tokens are lines, the labels of the transitions
+    are shorthand for \"[that kind of line]\" so for example
+    \"section\" means \"section line\" and so on.)
+  • if given your current state and current token (or the end token)
+    there is no matching transtion, this is an input error.
+  • as implied by the diagram, you must reach the end state given
+    the end token. if you do not, this is an input error.
+  • currently we don't see empty-ish files as valid but
+    this may have to change down the road.
+
+a big caveat is that this is a hack. this is not guaranteed to
+parse all toml, only our subset.
+"
+
+}
+/*
+#born.
+*/
