@@ -1,105 +1,146 @@
+from kiss_rdb.magnetics_ import (
+        string_scanner_via_definition as scn_lib,
+        state_machine_via_definition as sm_lib,
+        )
+
+
 def items_via_toml_path(toml_path):
 
     raise Exception('integrate me with below (easy)')  # #todo
 
 
-def _coarse_items_via_all_lines(all_lines, listener):
+def _coarse_items_via_all_lines(all_lines, listener):  # #testpoint
 
-    state_name = 'start'
-    allowed_state_transitions = _state_transitions[state_name]
-    lineno = 0
+    def actionser(ps):  # might push this in to lib
+        def f(name):
+            return getattr(pa, name)
+        pa = _MyParseActions(ps)
+        return f
 
-    for line in all_lines:
-        lineno += 1
-        did_find = False
-        for transition_tuple in allowed_state_transitions:
-            _yes = transition_tuple[0](line)
-            if _yes:
-                did_find = True
-                break
+    return sm_lib.parse(all_lines, actionser, _state_machine, listener)
 
-        if not did_find:
-            _when_transition_not_found(lineno, line, state_name, listener)
-            state_name = 'end'
-            break
 
-        action_name = transition_tuple[1]
-        next_state_name = transition_tuple[2]
+class _MyParseActions:
 
-        if action_name is not None:
+    def __init__(self, parse_state):
+        self._ps = parse_state
+
+    def on_section_start(self):
+        o = self._ps
+        tup = _strict_hacky_section_line_via_line(o.line, o.listener)
+        if tup is None:
+            return _stop
+        else:
             cover_me()
 
-        if next_state_name != state_name:
-            allowed_state_transitions = _state_transitions[next_state_name]
-            state_name = next_state_name
-
-    if state_name != 'end':
-        # (reminder: we set the state to "end" in some error states above!)
-        _when_did_not_reach_end(lineno, state_name, listener)
-
-
-def _when_transition_not_found(lineno, line, curr_state_name, listener):
-
-    def msg():
-        f = _nonterminal_symbol_noun_phrase_via_matcher_function.__getitem__
-        _ = _state_transitions[curr_state_name]
-        _ = tuple(f(tup[0]) for tup in _)
-        _head = f'expecting {_oxford_or(_)}'
-        return _contextualize_error_message(_head, lineno, line)
-
-    listener('error', 'expression', 'input_error', msg)
-
-
-def _when_did_not_reach_end(lineno, current_state_name, listener):
-
-    if 'start' == current_state_name:
-        if 0 == lineno:
-            def msg():
-                yield 'no lines in input'
-        else:
-            def msg():
-                yield 'file has no sections (so no entities)'
-    else:
+    def at_end_of_input(self):
         cover_me()
 
-        def msg():
-            yield f'at end of input, was in "{current_state_name}" state.'
 
-    listener('error', 'expression', 'input_error', msg)
+def _strict_hacky_section_line_via_line(line, listener):
+
+    nc = _name_components_via_line(line, listener)
+    if nc is None:
+        return
+
+    if 'item' != nc[0]:
+        return _input_error(listener, expecting='keyword "item"', position=1)
+
+    length = len(nc)
+    if 1 == length:
+        _ = 1 + len(nc[0])  # eew
+        return _input_error(listener, expecting='dot', position=_)
+
+    identifier = nc[1]
+    if 2 == length:
+        _ = 1 + len(nc[0]) + 1 + len(identifier)  # the worst
+        return _input_error(listener, expecting='dot', position=_)
+
+    keyword = nc[2]
+    if 'attributes' == keyword:
+        which = 'attributes'
+    elif 'meta' == keyword:
+        which = 'meta'
+    else:
+        _ = 1 + len(nc[0]) + 1 + len(identifier) + 1  # SO BAD
+        __ = 'keyword "attributes" or "meta"'
+        return _input_error(listener, expecting=__, position=_)
+
+    if 3 < length:
+        _ = 1 + len(nc[0]) + 1 + len(identifier) + 1 + len(which)  # NOOOOOO
+        return _input_error(listener, expecting="']'", position=_)
+
+    return (identifier, which)
 
 
-def _contextualize_error_message(head, lineno, line):
+def _name_components_via_line(line, listener):
+    """
+    parses toml "section" lines crudely.
 
-    _line = f'{head} at line {lineno}: {repr(line)}'
-    return (_line,)
+    given a line like this:
+        "[foo.bar.baz123]\n"
+    result in an array like this:
+        ["foo", "bar", "baz123"]
+    """
+
+    scn = scn_lib.Scanner(line, listener)
+
+    if not scn.skip_required(_open_brace):
+        return
+
+    name_components = []  # necessarily separated by dots. no fancy whitespace
+
+    keep_parsing = True
+    while keep_parsing:
+        s = scn.scan_required(_loosey_goosey_identifier)
+        if s is None:
+            return
+        name_components.append(s)
+
+        # whether or not there's a dot determines if we stay in the loop
+
+        keep_parsing = scn.skip(_dot)
+        pass  # hello.
+
+    if not scn.skip_required(_close_brace_and_end_of_line):
+        return
+
+    return name_components
 
 
-# (below is derived directly from the [#863] state transition graph)
-
-# tests (actually very local)
-
-def blank(line):
-    return '\n' == line
-
-
-def comment(line):
-    return '#' == line[0]  # per #todo
+o = scn_lib.pattern_via_description_and_regex_string
+_open_brace = o('open brace ("[")', r'\[')
+_loosey_goosey_identifier = o('identifier ([a-zA-Z0-9]+)', r'[a-zA-Z0-9]+')
+_dot = o('dot (".")', r'\.')
+_close_brace_and_end_of_line = o('close brace and end of line', r'\]\n$')
+del(o)
 
 
-def section(line):
-    return '[' == line[0]  # per #todo
+def _input_error(listener, **kwargs):
+    listener('error', 'structure', 'input_error', lambda: kwargs)
 
 
-def key_value(line):
-    cover_me()
+# -- below is derived directly from the [#863] state transition graph
 
+def _define_state_machine(o):  # interface here is VERY experimental!
 
-def end_of_input(line):
-    cover_me()
-    return line is None
+    def blank(line):
+        return '\n' == line
 
+    def comment(line):
+        return '#' == line[0]  # per #todo
 
-_nonterminal_symbol_noun_phrase_via_matcher_function = {  # ick/meh
+    def section(line):
+        return '[' == line[0]  # per #todo
+
+    def key_value(line):
+        cover_me()
+
+    def end_of_input(line):
+        cover_me()
+        return line is None
+
+    _noun_phrase_via_matcher_function = {  # ick/meh
         blank: 'blank line',
         comment: 'comment line',
         section: 'section line',
@@ -107,47 +148,36 @@ _nonterminal_symbol_noun_phrase_via_matcher_function = {  # ick/meh
         end_of_input: 'end of input',
         }
 
-
-def _the_worst(func):
-    if blank == func:
-        return
-
-
-_state_transitions = {
+    _transitions_via_state_name = {
         'start': (
-            (blank, None, 'start'),
-            (comment, None, 'start'),
-            (section, 'xx', 'inside entity'),
+            o(blank),
+            o(comment),
+            o(section, call='on_section_start', transition_to='inside entity'),
             ),
         'inside entity': (
-            (key_value, 'xx', 'yy'),
-            (blank, None, 'xx'),
-            (comment, None, 'xx'),
-            (end_of_input, 'xx', 'yy'),
+            o(key_value),  # ..
+            o(blank),
+            o(comment),
+            o(end_of_input, call='at_end_of_input')
             ),
-        'done': (
-            )
+        'done': (),
         }
 
-# --
+    _ = _noun_phrase_via_matcher_function.__getitem__
+    return {
+            'transitions_via_state_name': _transitions_via_state_name,
+            'nonterminal_symbol_noun_phrase_via_matcher_function': _,
+            }
 
 
-def _oxford_or(these):
-    length = len(these)
-    if 0 == length:
-        return 'nothing'
-    elif 1 == length:
-        return these[0]
-    else:
-        *head, penult, ult = these
-        tail = f'{penult} or {ult}'
-        if len(head):
-            return ', '.join((*head, tail))
-        else:
-            return tail
+_state_machine = sm_lib.StateMachine(_define_state_machine)
 
 
-def cover_me():
+def cover_me():  # #todo
     raise(Exception('cover me'))
+
+
+_not_ok = False
+_stop = (_not_ok, None)
 
 # #born.

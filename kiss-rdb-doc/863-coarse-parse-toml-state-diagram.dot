@@ -53,7 +53,7 @@ to read the whole file into memory at once as one giant dictionary.)
 
   • rectangles are states
   • arrows with labels are transitions
-  • arrows without labels are a thing you do immediately
+  • arrows without labels are a transition made immediately
   • ellipses are typical example actions
   • this is a coarse, line-based parser.
     here, \"input tokens\" are always lines.
@@ -64,8 +64,9 @@ to read the whole file into memory at once as one giant dictionary.)
     \"section\" means \"section line\" and so on.)
   • if given your current state and current token (or the end token)
     there is no matching transtion, this is an input error.
-  • as implied by the diagram, you must reach the end state given
-    the end token. if you do not, this is an input error.
+  • if by the end of input the end state is not reached, this is
+    an input error. (in fact this is implied by the graph if you
+    conceive of the end of input as a kind of token.)
   • currently we don't see empty-ish files as valid but
     this may have to change down the road.
 
