@@ -61,27 +61,26 @@ class Scanner:
     def _required(self, pattern):
         m = self._match(pattern)
         if m is None:
-            _express_into(pattern, self)
+            self.__emit_input_error_for_single_pattern(pattern)
         else:
             return m
+
+    def __emit_input_error_for_single_pattern(self, pattern):
+        def struct():
+            return {
+                    'expecting': pattern.description,
+                    'position': self._position,
+                    }
+        self._listener('error', 'structure', 'input_error', struct)
 
     def _match(self, pattern):
         return pattern.regex.match(self._line, self._position)
 
 
-def _express_into(pattern, scanner):
-    listener = scanner._listener
-
-    def msg():
-        _desc = pattern.description
-        yield f'expected {_desc}'
-        for line in _contextualize_position_into_ascii_art(scanner):
-            yield line
-
-    listener('error', 'expression', 'input_error', msg)
-
-
-def _contextualize_position_into_ascii_art(scanner):
+def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #todo: coverage isl
+        position, line, lineno=None, expecting=None, expecting_any_of=None,
+        did_reach_end_of_stream=None,
+        ):
     """given a possibly long line and a position, render it in 2 lines.
 
     something like this:
@@ -93,11 +92,12 @@ def _contextualize_position_into_ascii_art(scanner):
     in effect, "zoom the camera in" to the area of interest in the string,
     possibly cutting of some left portion and some right portion of the
     string. use ellipsis to show cut-off as necessary.
+
+    although this ONLY uses those first two arguments, for convenience this
+    accepts the known superset of components of structured input errorrs.
     """
 
-    pos = scanner._position
-    line = scanner._line
-    del(scanner)
+    pos = position
     left_side_max_context_characters = 8
     right_side_max_context_characters = 5
     indent = '    '  # 4x
@@ -151,9 +151,5 @@ class pattern_via_description_and_regex_string:
     def __init__(self, desc, rx_string):
         self.description = desc
         self.regex = re.compile(rx_string)
-
-
-def cover_me():  # #todo
-    raise(Exception('cover me'))
 
 # #born.

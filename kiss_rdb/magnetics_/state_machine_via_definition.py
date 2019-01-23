@@ -1,44 +1,65 @@
 def parse(all_lines, parse_actionser, sm, listener):
 
     ps = _ParseState(listener)
+    ps._be_in_state('start', sm)
     actions = _normal_actions_via(ps, parse_actionser, sm)
 
-    # --
+    def execute():
+        ok = True  # if no lines, whine using state machine, not by us
+        for line in all_lines:
+            ps._receive_line(line)
+            ok, x = receive_next_token(line)
+            if not ok:
+                break  # NOTE be sure all break coincides with a not OK
+            if x is not None:  # see #here1
+                yield x
+        if not ok:
+            return
+        ok, x = receive_end_of_stream()
+        if ok:
+            if x is not None:  # see #here1
+                yield x
 
-    available_transitions = sm.transitions_via_state_name(ps.state_name)
+    # :#here1: A) it's sad that we can't DRY this. B) when x is None it is the
+    # callback's way of saying "everything's OK but i have nothign to yield"
 
-    for line in all_lines:
+    def receive_end_of_stream():
+        ps._receive_end_of_stream()
+        o = ps.state_body
+        if o.can_match_end_of_stream:
+            return call_any_action(o.transition_for_end_of_stream)
+        else:
+            return when_transition_not_found()
 
-        ps._receive_line(line)
-        did_match = False
-        for trans in available_transitions:
-            did_match = trans.matcher(line)
-            if did_match:
-                break
-
-        if not did_match:
-            _when_transition_not_found(ps, sm)
-            ps._be_in_state('end')
-            break
-
-        call = trans.call
-        trans_to = trans.transition_to
-
-        if call is not None:
-            ok, x = actions[call]()
+    def receive_next_token(line):
+        ok = False
+        for trans in ps.state_body.available_transitions_for_during_stream:
+            ok = trans.matcher(line)
             if ok:
-                cover_me()
-            else:
-                ps._be_in_state('end')
                 break
+        if not ok:
+            return when_transition_not_found()
 
-        if trans_to is not None and trans_to != ps.state_name:
-            available_transitions = sm.transitions_via_state_name(trans_to)
-            ps._be_in_state(trans_to)
+        two = call_any_action(trans)
 
-    if 'end' != ps.state_name:
-        # (reminder: we set the state to "end" in some error states above!)
-        _when_did_not_reach_end(ps)
+        trans_to = trans.transition_to
+        if two[0] and trans_to is not None and trans_to != ps.state_name:
+            ps._be_in_state(trans_to, sm)
+
+        return two
+
+    def call_any_action(trans):
+        call = trans.call
+        if call is None:
+            return _nothing
+        else:
+            return actions[call]()
+
+    def when_transition_not_found():
+        _when_transition_not_found(ps, sm)
+        return _stop
+
+    return execute()
 
 
 def _normal_actions_via(ps, parse_actionser, sm):
@@ -55,11 +76,20 @@ class _ParseState:
     def __init__(self, listener):
 
         def enhanced_listener(*a):
+
+            # our listener peaks at every emission that comes through it, and
+            # for those emissions that look a certain way, it adds to their
+            # components more context about the parse state, like line number.
+
             if 'error' == a[0] and 'structure' == a[1] and 'input_error' == a[2]:  # noqa: E501
                 def use_struct():
                     dct = a[-1]()  # mutating this? yikes
-                    dct['lineno'] = self.lineno
-                    dct['line'] = self.line
+                    dct['did_reach_end_of_stream'] = self._did_reach_EOS
+                    lineno = self.lineno
+                    dct['lineno'] = lineno
+                    if lineno:
+                        # (empty files stay on line number 0 and have no line)
+                        dct['line'] = self.line
                     return dct
                 listener(*a[0:-1], use_struct)
             else:
@@ -67,8 +97,8 @@ class _ParseState:
         self.listener = enhanced_listener
 
         self._on_line = None
+        self._did_reach_EOS = False
         self.lineno = 0
-        self.state_name = 'start'
 
     def _receive_line(self, line):
         self.lineno += 1
@@ -76,8 +106,12 @@ class _ParseState:
         if self._on_line is not None:
             self._on_line()
 
-    def _be_in_state(self, state_name):
+    def _be_in_state(self, state_name, sm):
+        self.state_body = sm.state_bodies[state_name]
         self.state_name = state_name
+
+    def _receive_end_of_stream(self):
+        self._did_reach_EOS = True
 
 
 class StateMachine:
@@ -99,13 +133,35 @@ class StateMachine:
     def __receive_these(
             self,
             transitions_via_state_name,
-            nonterminal_symbol_noun_phrase_via_matcher_function,
             ):
-        self._transitions_via_state_name = transitions_via_state_name
-        self.nonterminal_symbol_noun_phrase_via_matcher_function = nonterminal_symbol_noun_phrase_via_matcher_function  # noqa: E501
 
-    def transitions_via_state_name(self, state_name):
-        return self._transitions_via_state_name[state_name]
+        self.state_bodies = {k: _StateBody(v) for (k, v) in transitions_via_state_name.items()}  # noqa: E501
+
+
+class _StateBody:
+
+    def __init__(self, transitions):
+        """super hacky - the way a transition signifies that it can match
+        on the end of the input stream is currently by having `None` as the
+        matcher function..
+
+        internally we need to give this kind of transiton special handling.
+        externally it is definitionally different than the others because
+        it cannot be defined with a matcher function (which takes a line).
+        """
+
+        last_transition = transitions[-1]
+
+        if last_transition.matcher is None:
+            use_transes = tuple(transitions[0:-1])
+            has = True
+            self.transition_for_end_of_stream = last_transition
+        else:
+            use_transes = transitions
+            has = False
+
+        self.available_transitions_for_during_stream = use_transes
+        self.can_match_end_of_stream = has
 
 
 class _Transition:
@@ -120,42 +176,26 @@ class _Transition:
 
 def _when_transition_not_found(ps, sm):
 
-    s_via_f = sm.nonterminal_symbol_noun_phrase_via_matcher_function
-    transes = sm.transitions_via_state_name(ps.state_name)
+    def struct():
 
-    def msg():
-        _ = tuple(s_via_f(trans.matcher) for trans in transes)
-        _ = f'expecting {_oxford_or(_)}'
-        return _contextualize_error_message(_, ps)
+        # (this is ugly here but so far not needed elsewhere)
+        o = ps.state_body
+        use_transes = o.available_transitions_for_during_stream
+        if o.can_match_end_of_stream:
+            use_transes = (*use_transes, o.transition_for_end_of_stream)
 
-    ps.listener('error', 'expression', 'input_error', msg)
+        s_a = tuple(trans.matcher.noun_phrase for trans in use_transes)
 
+        return {
+                'expecting_any_of': s_a,
+                # do not add 'position' as an element at all -
+                # we don't know here whether or not we even have a line (token)
+                }
 
-def _when_did_not_reach_end(ps):
-
-    if 'start' == ps.state_name:
-        if 0 == ps.lineno:
-            def msg():
-                yield 'no lines in input'
-        else:
-            def msg():
-                yield 'file has no sections (so no entities)'
-    else:
-        cover_me()
-
-        def msg():
-            yield f'at end of input, was in "{ps.state_name}" state.'
-
-    ps.listener('error', 'expression', 'input_error', msg)
+    ps.listener('error', 'structure', 'input_error', struct)
 
 
-def _contextualize_error_message(head, ps):
-
-    _line = f'{head} at line {ps.lineno}: {repr(ps.line)}'
-    return (_line,)
-
-
-def _oxford_or(these):
+def oxford_or_USE_ME(these):  # #todo this became a coverage island at commit
     length = len(these)
     if 0 == length:
         return 'nothing'
@@ -170,7 +210,9 @@ def _oxford_or(these):
             return tail
 
 
-def cover_me():
-    raise(Exception('cover me'))
+_not_ok = False
+_stop = (_not_ok, None)
+_ok = True
+_nothing = (_ok, None)
 
 # #born.

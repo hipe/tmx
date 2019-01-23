@@ -10,4 +10,3 @@ integrate w/ lock & rewrite file
 add item before a particular item
 add item to end and add item to empty file
 use the toml lib to parse the lines of an entity
-read a toml file, coarse parse state machine of the lines
