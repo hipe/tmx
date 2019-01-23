@@ -34,6 +34,31 @@ determine what kind of line it is..
 
 
 
+## broad provision 3
+
+there's a time and a place for the many layers of validation that can be
+done. for certain functions we're going to err on the side of doing things
+the optimistic way unless strict validation is the objective of the
+operation..
+
+
+
+
+## provision 3.1
+
+for a simple retrieval of the in-file attributes of an entity, we will
+stop at the first matching section we find.
+
+
+
+
+## future feature 1
+
+the meta section
+
+
+
+
 ## (document-meta)
 
   - #born.

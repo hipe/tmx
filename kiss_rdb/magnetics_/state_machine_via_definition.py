@@ -96,14 +96,19 @@ class _ParseState:
                 listener(*a)
         self.listener = enhanced_listener
 
-        self._on_line = None
+        self._has_line_callback = False
         self._did_reach_EOS = False
         self.lineno = 0
+
+    def on_line_do_this(self, f):
+        sanity() if self._has_line_callback else None
+        self._has_line_callback = True
+        self._on_line = f
 
     def _receive_line(self, line):
         self.lineno += 1
         self.line = line
-        if self._on_line is not None:
+        if self._has_line_callback:
             self._on_line()
 
     def _be_in_state(self, state_name, sm):
@@ -208,6 +213,10 @@ def oxford_or_USE_ME(these):  # #todo this became a coverage island at commit
             return ', '.join((*head, tail))
         else:
             return tail
+
+
+def sanity():
+    raise Exception('sanity')
 
 
 _not_ok = False

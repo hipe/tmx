@@ -9,7 +9,11 @@ def items_via_toml_path(toml_path):
 
 
 def _traverse_IDs_without_validating(all_lines, listener):  # #testpoint, #todo
-    actionser = _actionser_via_class(_Actions_for_ID_Traversal_Non_Validating)
+    _actionser = _actionser_via_class(_Actions_for_ID_Traversal_Non_Validating)
+    return parse_(all_lines, _actionser, listener)
+
+
+def parse_(all_lines, actionser, listener):
     return sm_lib.parse(all_lines, actionser, _state_machine, listener)
 
 
@@ -55,28 +59,28 @@ class _Actions_for_ID_Traversal_Non_Validating:
 
     def on_section_start(self):
         o = self._ps
-        tup = _strict_hacky_section_line_via_line(o.line, o.listener)
+        tup = item_section_line_via_line_(o.line, o.listener)
         if tup is None:
-            return _stop
+            return stop
         return self._on_section_start(tup)
 
     def _on_section_start_at_beginning(self, tup):
         self._cover_me_semaphore = True
         self._previous_section = tup
         self._on_section_start = self._on_section_start_subsequently
-        return _nothing
+        return nothing
 
     def _on_section_start_subsequently(self, tup):
         previous_section = self._previous_section
         self._previous_section = tup
-        return (_ok, previous_section)
+        return (okay, previous_section)
 
     def at_end_of_input(self):
         del self._cover_me_semaphore
-        return (_ok, self._previous_section)
+        return (okay, self._previous_section)
 
 
-def _strict_hacky_section_line_via_line(line, listener):
+def item_section_line_via_line_(line, listener):
 
     nc = _name_components_via_line(line, listener)
     if nc is None:
@@ -205,9 +209,9 @@ def _define_state_machine(o):  # interface here is VERY experimental!
 _state_machine = sm_lib.StateMachine(_define_state_machine)
 
 
-_not_ok = False
-_stop = (_not_ok, None)
-_ok = True
-_nothing = (_ok, None)
+not_ok = False
+stop = (not_ok, None)
+okay = True
+nothing = (okay, None)
 
 # #born.

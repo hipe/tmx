@@ -9,4 +9,3 @@ integrate w/ lock & rewrite file
 [change lines of an item, a reusable doo-hah]
 add item before a particular item
 add item to end and add item to empty file
-use the toml lib to parse the lines of an entity

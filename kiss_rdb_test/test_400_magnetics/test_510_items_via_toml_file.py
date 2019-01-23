@@ -1,4 +1,5 @@
 import _common_state  # noqa: F401
+from kiss_rdb_test import structured_emission
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -65,17 +66,9 @@ class _CommonCase(unittest.TestCase):
 
     def run_non_validating_ID_traversal_expecting_success(self):
 
-        # ==
-        if False:  # if it's failing and trying to emit, turn this on to debug
-            from modality_agnostic.test_support import (
-                    listener_via_expectations as _,
-                    )
-            use_listener = _.for_DEBUGGING
-        else:
-            use_listener = None
-        # ==
-
-        itr = self._run_non_validating_ID_traversal(use_listener)
+        listener = structured_emission.debugging_listener() if False else None
+        # set the above to true if it's failing and trying to emit, to debug
+        itr = self._run_non_validating_ID_traversal(listener)
         x_a = []
         for x in itr:
             x_a.append(x)
