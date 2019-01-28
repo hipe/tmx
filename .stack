@@ -6,6 +6,3 @@ update: update attributes
 update: add attributes
 update: remove attributes
 integrate w/ lock & rewrite file
-[change lines of an item, a reusable doo-hah]
-add item before a particular item
-add item to end and add item to empty file

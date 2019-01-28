@@ -14,7 +14,7 @@ def _traverse_IDs_without_validating(all_lines, listener):  # #testpoint, #todo
 
 
 def parse_(all_lines, actionser, listener):
-    return sm_lib.parse(all_lines, actionser, _state_machine, listener)
+    return state_machine_.parse(all_lines, actionser, listener)
 
 
 def _actionser_via_class(cls):
@@ -206,7 +206,7 @@ def _define_state_machine(o):  # interface here is VERY experimental!
             }
 
 
-_state_machine = sm_lib.StateMachine(_define_state_machine)
+state_machine_ = sm_lib.StateMachine(_define_state_machine)
 
 
 not_ok = False

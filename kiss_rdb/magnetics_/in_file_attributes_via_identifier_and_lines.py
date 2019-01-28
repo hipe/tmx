@@ -1,5 +1,5 @@
 import kiss_rdb.magnetics_.items_via_toml_file as trav_lib
-from kiss_rdb.magnetics_.items_via_toml_file import (
+from .items_via_toml_file import (
         stop, okay, nothing,
         )
 
@@ -9,7 +9,7 @@ def in_file_attributes_via(id_s, all_lines, listener):
     def actionser(ps):
         def f(name):
             return getattr(actions, name)
-        actions = _ActionsforRetrievewithInFileAttributes(id_s, ps)
+        actions = _ActionsforRetrieveWithInFileAttributes(id_s, ps)
         return f
 
     _ = trav_lib.parse_(all_lines, actionser, listener)
@@ -25,7 +25,7 @@ def in_file_attributes_via(id_s, all_lines, listener):
         cover_me()
 
 
-class _ActionsforRetrievewithInFileAttributes:
+class _ActionsforRetrieveWithInFileAttributes:
 
     def __init__(self, id_s, parse_state):
         self._on_section_start = self._on_section_start_while_searching

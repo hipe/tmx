@@ -1,13 +1,15 @@
+import re
+
+
 def unindent(big_string):
-    import re
 
     s = big_string
 
-    md = re.match(r'^(\n)([ ]+)', s)
+    md = _the_first_run_of_whitespace_rx.match(s)
+
     margin = md[2]
 
     margin_rx = re.compile(margin)  # yikes
-    line_rx = re.compile('([^\n]*\n)')
 
     length = len(s)
     cursor = md.end(1)
@@ -20,15 +22,19 @@ def unindent(big_string):
             cursor = md.end()
         if length == cursor:
             break
-        md = line_rx.match(s, cursor)
+        md = _line_rx.match(s, cursor)
         yield md[1]
         cursor = md.end()
+
+
+_the_first_run_of_whitespace_rx = re.compile(r'^(\n)([ ]+)')
+_line_rx = re.compile('([^\n]*\n)')
 
 
 def debugging_listener():
     from modality_agnostic.test_support import (
             listener_via_expectations as _,
             )
-    return _
+    return _.for_DEBUGGING
 
 # #abstracted.

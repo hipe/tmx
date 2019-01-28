@@ -1,4 +1,4 @@
-def parse(all_lines, parse_actionser, sm, listener):
+def _parse(all_lines, parse_actionser, sm, listener):
 
     ps = _ParseState(listener)
     ps._be_in_state('start', sm)
@@ -100,6 +100,12 @@ class _ParseState:
         self._did_reach_EOS = False
         self.lineno = 0
 
+    def replace_line_handler(self, f):
+        None if self._has_line_callback else None
+        f0 = self._on_line
+        self._on_line = f
+        return f0
+
     def on_line_do_this(self, f):
         sanity() if self._has_line_callback else None
         self._has_line_callback = True
@@ -121,7 +127,10 @@ class _ParseState:
 
 class StateMachine:
 
-    def __init__(self, define_state_transitions):
+    def __init__(self, define_state_transitions=None):
+
+        if define_state_transitions is None:  # for __init_duplicate
+            return
 
         def peek_transition(f, **kwargs):
             trans = _Transition(f, **kwargs)
@@ -141,6 +150,22 @@ class StateMachine:
             ):
 
         self.state_bodies = {k: _StateBody(v) for (k, v) in transitions_via_state_name.items()}  # noqa: E501
+
+    def modified(self, modify_states):
+        dct = {k: v for (k, v) in self.state_bodies.items()}
+        for state_name, f in modify_states:
+            dct[state_name] = f(dct[state_name])
+
+        otr = self.__class__()
+        otr.__init_duplicate(self.callback_names, dct)  # ..
+        return otr
+
+    def __init_duplicate(self, tup, dct):
+        self.callback_names = tup
+        self.state_bodies = dct
+
+    def parse(self, all_lines, parse_actionser, listener):
+        return _parse(all_lines, parse_actionser, self, listener)
 
 
 class _StateBody:
@@ -167,6 +192,12 @@ class _StateBody:
 
         self.available_transitions_for_during_stream = use_transes
         self.can_match_end_of_stream = has
+
+    def modified(self, append_transitions):
+        sanity() if self.can_match_end_of_stream else None
+        _ = (*self.available_transitions_for_during_stream,
+             *append_transitions)
+        return self.__class__(_)
 
 
 class _Transition:
@@ -224,4 +255,5 @@ _stop = (_not_ok, None)
 _ok = True
 _nothing = (_ok, None)
 
+# #history-A.1: introduced experimental dup-and-mutate behavior
 # #born.

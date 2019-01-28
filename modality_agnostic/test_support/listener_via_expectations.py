@@ -13,26 +13,24 @@ from collections import deque as deque
 # --
 
 def for_DEBUGGING(*a):
-    import sys
-    io = sys.stderr
-    chan_a = list(a)
-    express = chan_a.pop()
 
-    def f(msg):
-        msg_a.append(msg)
-    msg_a = []
+    *chan, emit = a
+    shape = chan[1]
 
-    # while #open [#508]
+    from sys import stderr as io
 
-    length = _num_params(express)
-    if 0 == length:
-        for msg in express():
-            f(msg)
+    io.write(f'channel: {repr(chan)}\n')
+    io.flush()
+
+    if 'message' == shape:
+        if 0 != _num_params(emit):
+            raise Exception('«no expression agent yet»')  # near #open [#508]
+        _s_a = tuple(emit())
+        io.write(f'messages: {repr(_s_a)}')
+    elif 'structure' == shape:
+        io.write(f'meta-doh-dah: {repr(emit())}')
     else:
-        express(f, '«no expression agent yet»')
-
-    io.write("channel: {}\n".format(repr(chan_a)))
-    io.write("messages: {}\n".format(repr(msg_a)))
+        raise Exception(f'strange shape: {repr(shape)}')
     io.flush()
 
 
