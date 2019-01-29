@@ -8,4 +8,3 @@ create attributes (including into empty entity)
 delete attributes
 maybe a request structure (abstract gist from previous)
 just for the model thing (true unit test)
-the algorithm document for attribute CUD
