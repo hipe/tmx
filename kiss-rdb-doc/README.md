@@ -28,6 +28,8 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#865]                     |       | the toml adaptation for attributes
+|[#864]                     |       | the toml adaptation
 |[#863]                     |       | coarse parse toml state diagram
 |[#862]                     |       | aws ec2
 |[#861]                     |       | aws eks

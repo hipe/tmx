@@ -298,6 +298,21 @@ the meta section
 
 
 
+## future feature 2
+
+dotted keys (non-flat)
+
+
+
+
+## future feature 3
+
+maybe some kind of schema representation for the purpose of
+valid key sets, possibly type, and attribute ordering.
+
+
+
+
 ## (document-meta)
 
   - #born.
