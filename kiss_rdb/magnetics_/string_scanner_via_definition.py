@@ -56,6 +56,14 @@ class Scanner:
             self._position = m.end()
             return m.group(0)  # ..
 
+    # == READ ONLY things
+
+    def rest(self):  # name from ruby thing
+        return self._line[self._position:]
+
+    def eos(self):
+        return self._length == self._position
+
     # ==
 
     def _required(self, pattern):
@@ -67,11 +75,14 @@ class Scanner:
 
     def __emit_input_error_for_single_pattern(self, pattern):
         def struct():
-            return {
-                    'expecting': pattern.description,
-                    'position': self._position,
-                    }
+            dct = {'expecting': pattern.description}
+            self.MUTATE_ERROR_STRUCTURE(dct)
+            return dct
         self._listener('error', 'structure', 'input_error', struct)
+
+    def MUTATE_ERROR_STRUCTURE(self, dct):  # todo
+        dct['position'] = self._position
+        dct['line'] = self._line  # #todo
 
     def _match(self, pattern):
         return pattern.regex.match(self._line, self._position)

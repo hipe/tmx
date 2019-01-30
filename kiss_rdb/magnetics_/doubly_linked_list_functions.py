@@ -11,10 +11,10 @@ class _DoublyLinkedList:
 
     def to_item_stream(self):
         item_via_IID = self.item_via_IID
-        for iid in self.__TO_IID_STREAM():
+        for iid in self.TO_IID_STREAM():
             yield item_via_IID(iid)
 
-    def __TO_IID_STREAM(self):
+    def TO_IID_STREAM(self):
         next_IID_via_IID = self.next_IID_via_IID
         iid = self._head_IID
         while iid is not None:
