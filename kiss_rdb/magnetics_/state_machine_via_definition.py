@@ -231,7 +231,15 @@ def _when_transition_not_found(ps, sm):
     ps.listener('error', 'structure', 'input_error', struct)
 
 
-def oxford_or_USE_ME(these):  # #todo this became a coverage island at commit
+def oxford_AND(these):
+    return _oxford_join(' and ', these)
+
+
+def oxford_OR(these):
+    return _oxford_join(' or ', these)
+
+
+def _oxford_join(sep, these):
     length = len(these)
     if 0 == length:
         return 'nothing'
@@ -239,7 +247,7 @@ def oxford_or_USE_ME(these):  # #todo this became a coverage island at commit
         return these[0]
     else:
         *head, penult, ult = these
-        tail = f'{penult} or {ult}'
+        tail = f'{penult}{ sep }{ult}'
         if len(head):
             return ', '.join((*head, tail))
         else:

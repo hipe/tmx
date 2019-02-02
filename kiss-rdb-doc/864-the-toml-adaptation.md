@@ -28,7 +28,7 @@ applicable to exactly our use case and perhaps a few outside of it.
 
 to make "crude" (fast) parsing easier on us, we are going to be very
 line-centric. this means that for now multi-line doo-has may be out
-but later for that.
+but later for that. (this is now "future feature 4".)
 
 
 
@@ -309,6 +309,17 @@ dotted keys (non-flat)
 
 maybe some kind of schema representation for the purpose of
 valid key sets, possibly type, and attribute ordering.
+
+(3.2 is inline tables, 3.3 is arrays.)
+
+
+
+
+## future feature 4
+
+multiline strings. we know we want it, but we can't guarantee that we will
+be able to support it and still stick to our broad provisions.. we're totally
+not thinking about it too deeply for now.
 
 
 

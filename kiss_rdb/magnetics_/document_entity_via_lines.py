@@ -124,8 +124,11 @@ class _MutableDocumentEntity:
 
     def TO_LINES(self):
         yield self._open_table_line_object.line
-        for lo in self._LL.to_item_stream():
+        for lo in self.TO_BODY_LINE_OBJECT_STREAM():
             yield lo.line
+
+    def TO_BODY_LINE_OBJECT_STREAM(self):
+        return self._LL.to_item_stream()
 
 
 # -- parsey things used in parsing attribute lines
@@ -185,8 +188,15 @@ class _AttributeLine:
 
     def __init__(self, attribute_name, remainder_of_line, line):
         # #todo - currently we are ignoring things we will need later
+        # NOTE FOR DURING MERGE CONFLICT - we used to think we wanted that
+        # remainder of the line - actually we want its position in the line!
+        self._CHANGE_THIS_HERE = None
         self.name_object = attribute_name
         self.line = line
+
+    @property                    # erase this
+    def attribute_name(self):    # one during
+        return self.name_object  # merge conflict
 
     def to_name_gist(self):
         return self.name_object.name_gist

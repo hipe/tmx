@@ -28,6 +28,7 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#866]                     |       | the hack for detecting in-line comments
 |[#865]                     |       | the toml adaptation for attributes
 |[#864]                     |       | the toml adaptation
 |[#863]                     |       | coarse parse toml state diagram

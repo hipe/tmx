@@ -33,7 +33,7 @@ class _Actions_for_ID_Traversal_Non_Validating:
 
     for now we exercise many of the kinds of things that supposedly make
     kiss-rdb great by fast-parsing the big files and only parsing out the
-    part we care about (the section lines).
+    part we care about (the table-opening ("section") lines).
 
     FOR NOW no validation. like:
       - it does NOT check that any `meta` sect comes before any `attributes'
@@ -214,4 +214,5 @@ stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
+# #pending-rename: can we call "items" "entities" here? or not..
 # #born.

@@ -148,7 +148,7 @@ class Case115_sneak_oxford_join_coverage_into_here(_CommonCase):
 
     def expect(self, given_tuple, expected_string):
         from kiss_rdb.magnetics_.state_machine_via_definition import (
-                oxford_or_USE_ME as subject,
+                oxford_OR as subject,
                 )
 
         _actual = subject(given_tuple)

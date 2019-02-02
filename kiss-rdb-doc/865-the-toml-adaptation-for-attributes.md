@@ -110,6 +110,9 @@ translate into a stream of lines.
     in-line comment appended to it. there is no workaround. this fails with
     an explanation.
 
+  - (relatedly, how we determine whether an attribute line has a comment
+    on it is a whole thing we get into in [#866] a dedicated document on it.)
+
 
 
 
