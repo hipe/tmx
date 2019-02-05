@@ -11,7 +11,7 @@ def new_lines_via_delete_and_existing_lines(
         listener,
         ):
 
-    None if incoming_lines is None else sanity()
+    assert(incoming_lines is None)
 
     _ = _ActionsForUpdateOrDelete('delete')
     return _new_lines_via_chunky_actionser(
@@ -246,7 +246,7 @@ class _ActionsForCUD:
                 return
             a_1, a_2 = tup
         else:
-            sanity() if o.just_left_start_state else None
+            assert(not o.just_left_start_state)
             ok, a_1 = o.client.subchunk_one_at_end_when_not_searching(o)
             if not ok:
                 return
@@ -262,48 +262,48 @@ class _ActionsForCUD:
         id_s, which = tup
 
         # (we aren't validating. here we are indifferent.)
-        None if ('attributes' == which or 'meta' == which) else sanity()
+        assert('attributes' == which or 'meta' == which)
         return id_s
 
     def be_no_longer_searching(self):
-        None if self.still_searching else sanity()
+        assert(self.still_searching)
         self.still_searching = False  # this effectuates the "mode change"
 
     def _receive_line(self):
         self._cached_lines.append(self.parse_state.line)
 
     def clear_the_one_line_and_disengage_cache(self):
-        None if 1 == len(self._cached_lines) else sanity()
+        assert(1 == len(self._cached_lines))
         self._cached_lines = None
 
     def reengage_the_cache(self, lis):
-        None if self._cached_lines is None else sanity()
+        assert(self._cached_lines is None)
         self._cached_lines = lis
 
     def step_the_cache(self):
-        None if self.has_more_than_one_cached_line else sanity()
+        assert(self.has_more_than_one_cached_line)
         a = self._cached_lines
         self._cached_lines = [a.pop()]
         return a
 
     def release_cache(self):
-        None if self.has_more_than_zero_cached_lines else sanity()  # (Case448)
+        assert(self.has_more_than_zero_cached_lines)  # (Case448)
         a = self._cached_lines
         del self._cached_lines
         return a
 
     def release_empty_cache(self):
-        None if self._cached_lines is None else sanity()
+        assert(self._cached_lines is None)
         del self._cached_lines
 
     def release_new_lines(self):
         a = list(self._new_lines)
-        None if 0 < len(a) else sanity()
+        assert(0 < len(a))
         del self._new_lines
         return a
 
     def release_NO_lines(self):  # just to assert this
-        None if self._new_lines is None else sanity()
+        assert(self._new_lines is None)
         del self._new_lines
 
     @property
@@ -325,7 +325,7 @@ class _ActionsForUpdateOrDelete:
             self._is_update = False
             self._is_delete = True
         else:
-            sanity()
+            assert(False)
 
         self._is_normal_mode = True
 
@@ -514,10 +514,5 @@ def known_error_case_yet_to_cover():
 
 def cover_me():
     raise Exception('cover me')
-
-
-def sanity():
-    raise Exception('sanity')
-
 
 # #born.

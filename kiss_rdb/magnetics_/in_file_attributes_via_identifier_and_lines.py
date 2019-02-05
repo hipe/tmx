@@ -59,7 +59,7 @@ class _ActionsforRetrieveWithInFileAttributes:
         elif 'meta' == which:
             return nothing
         else:
-            sanity()
+            assert(False)
 
     def _wahoo_change_modes(self):
         self._on_section_start = self._on_section_start_while_consuming
@@ -156,9 +156,9 @@ def COMMENT_TESTER_VIA_MDE(mde, listener):
         elif hasattr(x, 'items'):  # don't reach deep into. (Case275)
             return _toml_type_not_supported('inline table', listener)  # (Case)
         else:
-            sanity()  # that's all the types there is, right? according to etc
+            assert(False)  # that's all the types there is according to the doc
 
-    line_object_via_ANS = {lo.attribute_name.to_name_string(): lo for lo in line_objects if lo.is_attribute_line}  # noqa: E501
+    line_object_via_ANS = {lo.attribute_name.name_string: lo for lo in line_objects if lo.is_attribute_line}  # noqa: E501
     import datetime
 
     return yes_no_attribute_line_has_comment
@@ -169,10 +169,7 @@ def __zomg_parse_the_string(line_object, listener):
     # all of this is a hack and should go away after etc.
 
     line = line_object.line
-
-    # we wish we had the position of the start of the value instead of etc
-    line_object._CHANGE_THIS_HERE
-    position = re.match('[a-zA-Z0-9-]+ = ', line).end()
+    position = line_object.position_of_start_of_value
 
     md = _open_quote.match(line, position)
     multi_basic, basic, multi_literal, literal = md.groups()  # #here2
@@ -227,12 +224,10 @@ def __zomg_parse_the_string(line_object, listener):
         # we advanced over any ordinary characters above. therefor (right?)
         # the only thing this could possibly be is an escape sequence:
 
-        None if '\\' == c else sanity()  # (Case975)
+        assert('\\' == c)  # (Case975)
         position += 1
 
         md = _escape_tail.match(line, position)
-
-        sanity() if md is None else None
 
         # we don't care what the escape sequence was actually about! woot
         position = md.end()
@@ -305,7 +300,7 @@ _there_is_a_comment = (okay, True)
 def __check_name_sets(dct, line_objects, listener):
     """per [#866], ensure that the two sets of names are the same"""
 
-    by_coarse = set(o.attribute_name.to_name_string() for o in line_objects if o.is_attribute_line)  # noqa: E501
+    by_coarse = set(o.attribute_name.name_string for o in line_objects if o.is_attribute_line)  # noqa: E501
     by_vendor = set(dct.keys())
     extra_by_coarse = by_coarse - by_vendor
     extra_by_vendor = by_vendor - by_coarse
@@ -337,12 +332,12 @@ def _entity_dict_via_entity_big_string(big_string, listener):
         return
 
     item_key, = dct.keys()
-    None if 'item' == item_key else sanity()
+    assert('item' == item_key)
     item = dct[item_key]
     id_string, = item.keys()
     item_partitions = item[id_string]
     attrs_key, = item_partitions.keys()
-    None if 'attributes' == attrs_key else sanity()
+    assert('attributes' == attrs_key)
 
     return {
             'identifier_string': id_string,
@@ -394,10 +389,6 @@ def _emit_input_error_via_structurer(f, listener):
 
 def cover_me():
     raise Exception('cover me')
-
-
-def sanity():
-    raise Exception('sanity')
 
 # #pending-rename: come up with something more .. idiomatic, like "document entity attributes via identifier" or somesuch  # noqa: E501
 # #history-A.1: spike hand-written surface-string string parser

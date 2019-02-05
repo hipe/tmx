@@ -21,7 +21,10 @@ class _DoublyLinkedList:
             yield iid
             iid = next_IID_via_IID(iid)
 
-    def tail_IDD(self):
+    def head_IID(self):
+        return self._head_IID
+
+    def tail_IID(self):
         return self._tail_IID
 
 
@@ -55,7 +58,7 @@ def _write_lower_level_methods(attrs):
         return iid
 
     def insert_item_before_item(item, right_idd):
-        sanity() if right_idd is None else None  # #[008.D]
+        assert(right_idd)  # #[008.D]
 
         idd = provision_IID()
         items[idd] = item
@@ -116,9 +119,5 @@ def _write_lower_level_methods(attrs):
     o.prev_IID_via_IID = prev_dct.__getitem__
     o.delete_item = delete_item
     o.replace_item = replace_item
-
-
-def sanity():
-    raise Exception('sanity')
 
 # #born.

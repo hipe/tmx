@@ -12,10 +12,10 @@ def mutable_document_entity_via_lines(
 
     mde = _MutableDocumentEntity(otl)
     for line in lines:
-        lo = mde.PROCURE_LINE_OBJECT(line, listener)
+        lo = mde.procure_line_object__(line, listener)
         if lo is None:
             return
-        mde.APPEND_LINE_OBJECT(lo)
+        mde.append_line_object(lo)
     return mde
 
 
@@ -39,76 +39,44 @@ class _MutableDocumentEntity:
         self._open_table_line_object = open_table_line_object
         self._IID_via_gist = {}
 
-    def INSERT_LINE_OBJECT(self, lo, iid):
+    def insert_line_object(self, lo, iid):
         new_iid = self._LL.insert_item_before_item(lo, iid)
         self._accept(new_iid, lo)
         return new_iid
 
-    def APPEND_LINE_OBJECT(self, lo):
+    def append_line_object(self, lo):
         iid = self._LL.append_item(lo)
         self._accept(iid, lo)
         return iid
 
-    def PROCURE_LINE_OBJECT(self, line, listener):
+    def replace_line_object__(self, lo):
+        _iid = self._IID_via_gist[lo.attribute_name.name_gist]
+        return self._LL.replace_item(_iid, lo)
+
+    def procure_line_object__(self, line, listener):  # #testpoint
         """DUPLICATES LOGIC IN SIBLING"""
 
         if '\n' == line:
-            return _newline_line_object_singleton
+            return newline_line_object_singleton
         elif '#' == line[0]:
             return _CommentLine(line)
         else:
-            return self.__attribute_line_with_avalable_name(line, listener)
+            return attribute_line_via_line(
+                    line,
+                    listener,
+                    self.__error_structure_for_validate_attribute_name)
 
-    def __attribute_line_with_avalable_name(self, line, listener):
-        """implement attribute line parsing in close concert with the
-
-        document entity so we can check for gist collision at the exact
-        "moment" we have the whole identifier string so that if there's a
-        collision (signifying a corrupted datastore) we can give
-        up-to-the-character context in an error report..
-        """
-
-        scn = scn_lib.Scanner(line, listener)
-
-        pieces = []
-        stay = True
-        while stay:
-            s = scn.scan_required(_all_LC_or_UC)
-            if s is None:
-                return
-            pieces.append(s)
-            stay = scn.skip(_stacey_dash)
-
-        # mid-parsing of the line we check this so we can get cutesey context
-        # this is not thread safe lol
-        an = _AttributeName(pieces)
-        err = self.__error_structure_for_validate_attribute_name(an, listener)
-        if err is not None:
-            scn.MUTATE_ERROR_STRUCTURE(err)
-            listener('error', 'structure', 'input_error', lambda: err)
-            return
-
-        if not scn.skip_required(_exactly_one_space):
-            return
-        if not scn.skip_required(_equals_sign):
-            return
-        if not scn.skip_required(_exactly_one_space):
-            return
-        if scn.eos():
-            cover_me()
-
-        _the_rest = scn.rest()
-        return _AttributeLine(an, _the_rest, line)
-
-    def __error_structure_for_validate_attribute_name(self, an, listener):
+    def __error_structure_for_validate_attribute_name(self, an):
         # not thread safe lol
-        gist = an.name_gist
-        if gist in self._IID_via_gist:
-            _iid = self._IID_via_gist[gist]
-            _attribute_line = self._LL.item_via_IID(_iid)
-            return _build_this_one_error_structure(an, _attribute_line)
 
-    def DELETE_LINE_OBJECT(self, iid):
+        al = self.any_attribute_line_via_gist(an.name_gist)
+        if al is not None:
+            return _build_this_one_error_structure(an, al)
+
+    def delete_attribute_line_object_via_gist__(self, gist):
+        return self._delete_line_object_via_iid(self._IID_via_gist[gist])
+
+    def _delete_line_object_via_iid(self, iid):  # #testpoint
         lo = self._LL.delete_item(iid)
         if lo.is_attribute_line:
             self._IID_via_gist.pop(lo.to_name_gist())
@@ -117,7 +85,7 @@ class _MutableDocumentEntity:
     def _accept(self, iid, lo):
         if lo.is_attribute_line:
             gist = lo.to_name_gist()
-            sanity() if gist in self._IID_via_gist else None
+            assert(gist not in self._IID_via_gist)
             self._IID_via_gist[gist] = iid
 
     # == READ
@@ -127,11 +95,81 @@ class _MutableDocumentEntity:
         for lo in self.TO_BODY_LINE_OBJECT_STREAM():
             yield lo.line
 
+    def any_attribute_line_via_gist(self, gist):
+        if gist in self._IID_via_gist:
+            return self._LL.item_via_IID(self._IID_via_gist[gist])
+
     def TO_BODY_LINE_OBJECT_STREAM(self):
         return self._LL.to_item_stream()
 
 
 # -- parsey things used in parsing attribute lines
+
+
+def _nah(_):
+    pass
+
+
+def attribute_line_via_line(line, listener, input_error_structure_via_AN=_nah):
+    """with the optional argument the client can for example check for gist
+
+    collision and emit an error at the exact "moment" when it happened
+    so that the UI can point to the exact character in the input string
+    where it happened.
+    """
+
+    scn = scn_lib.Scanner(line, listener)
+    an = _parse_attribute_name_passively(scn)
+    if an is None:
+        return
+
+    # mid-parsing of the line we check this so we can get cutesey context
+    # this is not thread safe lol
+    err = input_error_structure_via_AN(an)
+    if err is not None:
+        scn.MUTATE_ERROR_STRUCTURE(err)
+        listener('error', 'structure', 'input_error', lambda: err)
+        return
+
+    if not scn.skip_required(_exactly_one_space):
+        return
+    if not scn.skip_required(_equals_sign):
+        return
+    if not scn.skip_required(_exactly_one_space):
+        return
+    if scn.eos():
+        cover_me()
+
+    return _AttributeLine(an, scn.pos(), line)
+
+
+def attribute_name_via_string(attr_name, listener):
+    # this pains us
+    scn = scn_lib.Scanner(attr_name, listener)
+    pieces = []
+    while True:
+        s = scn.scan_required(_all_LC_or_UC)
+        if s is None:
+            return
+        pieces.append(s)
+        if scn.eos():
+            break
+        if not scn.skip_required(_stacey_dash):
+            return
+    return _AttributeName(pieces)
+
+
+def _parse_attribute_name_passively(scn):
+    pieces = []
+    stay = True
+    while stay:
+        s = scn.scan_required(_all_LC_or_UC)
+        if s is None:
+            return
+        pieces.append(s)
+        stay = scn.skip(_stacey_dash)
+    return _AttributeName(pieces)
+
 
 o = scn_lib.pattern_via_description_and_regex_string
 _all_LC_or_UC = o(
@@ -147,8 +185,8 @@ del(o)
 
 
 def _build_this_one_error_structure(attr_name, attribute_line):
-    name0 = attr_name.to_name_string()
-    name1 = attribute_line.name_object.to_name_string()
+    name0 = attr_name.name_string
+    name1 = attribute_line.attribute_name.name_string
     return {
             'reason': (
                 f'new name {repr(name1)} too similar to '
@@ -184,35 +222,25 @@ class _OpenTableLine:
         # ..
 
 
-class _AttributeLine:
+class _AttributeLine:  # #testpoint
 
-    def __init__(self, attribute_name, remainder_of_line, line):
-        # #todo - currently we are ignoring things we will need later
-        # NOTE FOR DURING MERGE CONFLICT - we used to think we wanted that
-        # remainder of the line - actually we want its position in the line!
-        self._CHANGE_THIS_HERE = None
-        self.name_object = attribute_name
+    def __init__(self, attribute_name, value_position, line):
+        self.position_of_start_of_value = value_position
+        self.attribute_name = attribute_name
         self.line = line
 
-    @property                    # erase this
-    def attribute_name(self):    # one during
-        return self.name_object  # merge conflict
-
     def to_name_gist(self):
-        return self.name_object.name_gist
+        return self.attribute_name.name_gist
 
     is_attribute_line = True
+    is_comment_line = False
 
 
 class _AttributeName:
 
     def __init__(self, pieces):
-        pieces = tuple(pieces)  # from array [#008.D]
         self.name_gist = ''.join(s.lower() for s in pieces)
-        self._pieces = pieces
-
-    def to_name_string(self):
-        return '-'.join(self._pieces)
+        self.name_string = '-'.join(pieces)
 
 
 class _CommentLine:
@@ -221,21 +249,19 @@ class _CommentLine:
         self.line = line
 
     is_attribute_line = False
+    is_comment_line = True
 
 
 class _NewlineLineObjectSingletonImplementation:
     line = '\n'  # ..
     is_attribute_line = False
+    is_comment_line = False
 
 
-_newline_line_object_singleton = _NewlineLineObjectSingletonImplementation()
+newline_line_object_singleton = _NewlineLineObjectSingletonImplementation()
 
 
 def cover_me():
     raise Exception('cover me')
-
-
-def sanity():
-    raise Exception('sanity')
 
 # #born.

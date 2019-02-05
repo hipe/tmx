@@ -13,6 +13,30 @@ translate into a stream of lines.
 
 
 
+## introduction to the problem
+
+CUD'ing the attributes of a document entity introduces new problems not
+present in the equivalent operations in a relational database or even a
+document-based/"schema-less"/"nosql" database because not only do we have
+the linear composition of the existing document entity to preserve
+(including existing comments and blank lines) and not only do we have a
+new composition (order) to determine deterministically, but we have
+all the craziness of our comments provision to worry about.
+
+the provision is something like this: when machine-editing a document,
+we never want to break an existing association between a comment line an
+attribute (key-value) line; and as far as the machine is concerned, this
+association exists (or might exist) if the comment line and the attribute
+line are touching (in either order).
+
+most of the algorithmic work, then, in this docuement (and its counterpart
+asset) is concerned with checking this comment provision, working around it
+where possible, and the deterministic determination (eek) of groupings and
+insertion points for CREATE (explored below).
+
+
+
+
 ## summary of relevant excerpts from the TOML spec
 
   - source: [the TOML github page][link1].
@@ -332,7 +356,7 @@ contiguous span of them _anchored to the end_ of the entity body that
 are in lexical order (when reading the file in the normal way).
 
 so like, if all the attributes are ordered with respect to each other,
-then this:
+then this (Case443):
 
      <--here
     A
@@ -349,7 +373,7 @@ then this:
      <--here
     C
 
-if some of them are, then this:
+if some of them are, then this (Case404):
 
     A
     B
@@ -438,6 +462,57 @@ of a whole entity. yeah that's a requirement too!
 
 or even when it's the first entity in a file, using it to create the
 file!
+
+
+
+
+## in-depth code explanation
+
+assume the attribute name of each request component is unique and that
+the necessary in-document presence/absence of each key-value is checked.
+
+derive an array of the line objects and for those that are attributes,
+create a dictionary that produces a line offset given a gist.
+
+with this "index", for each attribute that we are going to UPDATE or
+DELETE, we can immediately get its line offset and from that, retrieve
+the any line above and below it and see if those lines are comments.
+
+whenever you change the tentative composition of the document entity you
+should stale this index (rebuilding it when still needed) unless you
+*really* know what you're doing! (more below.)
+
+UPDATEs are distinct in that they never change the "comment signature"
+of the document entity.
+
+UPDATEs and DELETEs have identical validation here: no touching a comment
+line above or below, and no in-line comment on the attribute line itself.
+
+CREATEs are similar but not the same: similar to above, CREATEd lines
+can't end up touching a comment line above or below; but here there is no
+checking for in-line comments because there is no existing line.
+
+also, for CREATEs it hurts the brain less to group contiguous CREATEs
+together by insertion point and then only check the insertion points
+one-by-one for comment contact, rather than validating each CREATE,
+inserting it, then re-indexing the document entity after each such
+tentative insertion.
+
+we haven't verified that this is necessary, but it "feels like" it makes
+sense that we should apply the would-be DELETEs first (provided they
+pass their check) and then evaluate the any remaining UPDATEs and CREATEs
+against the imagined document entity without those lines we would delete.
+
+we suspect that in fact this is not a necessary precaution because a
+DELETE will never create a new attribute-line/comment-line contact where
+there was not one already (like, as part of the stated objectives of this
+validation);
+
+but regardless, it's hard to prove this suspicion and it makes the head
+hurt less to err on the side of caution and follow this intuitive (if
+wrong) assumption that we should partition the request components by verb
+and do them in their own discete passes, in the order derived from this
+analysis.
 
 
 

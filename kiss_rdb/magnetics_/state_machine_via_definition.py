@@ -107,7 +107,7 @@ class _ParseState:
         return f0
 
     def on_line_do_this(self, f):
-        sanity() if self._has_line_callback else None
+        assert(not self._has_line_callback)
         self._has_line_callback = True
         self._on_line = f
 
@@ -194,7 +194,7 @@ class _StateBody:
         self.can_match_end_of_stream = has
 
     def modified(self, append_transitions):
-        sanity() if self.can_match_end_of_stream else None
+        assert(not self.can_match_end_of_stream)
         _ = (*self.available_transitions_for_during_stream,
              *append_transitions)
         return self.__class__(_)
@@ -232,14 +232,14 @@ def _when_transition_not_found(ps, sm):
 
 
 def oxford_AND(these):
-    return _oxford_join(' and ', these)
+    return oxford_join(these, ' and ')
 
 
 def oxford_OR(these):
-    return _oxford_join(' or ', these)
+    return oxford_join(these, ' or ')
 
 
-def _oxford_join(sep, these):
+def oxford_join(these, ult_sep):
     length = len(these)
     if 0 == length:
         return 'nothing'
@@ -247,15 +247,11 @@ def _oxford_join(sep, these):
         return these[0]
     else:
         *head, penult, ult = these
-        tail = f'{penult}{ sep }{ult}'
+        tail = f'{ penult }{ ult_sep }{ ult }'
         if len(head):
             return ', '.join((*head, tail))
         else:
             return tail
-
-
-def sanity():
-    raise Exception('sanity')
 
 
 _not_ok = False

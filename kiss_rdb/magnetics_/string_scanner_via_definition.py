@@ -58,11 +58,11 @@ class Scanner:
 
     # == READ ONLY things
 
-    def rest(self):  # name from ruby thing
-        return self._line[self._position:]
-
     def eos(self):
         return self._length == self._position
+
+    def pos(self):
+        return self._position
 
     # ==
 

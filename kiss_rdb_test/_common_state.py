@@ -25,8 +25,7 @@ def _normalize_sys_path():  # see [#019]
         # that wants its resources
         pass
 
-    if mono_repo_dir != a[0]:
-        raise Exception('sanity')
+    assert(mono_repo_dir == a[0])
 
 
 _normalize_sys_path()

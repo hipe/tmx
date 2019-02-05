@@ -3,7 +3,3 @@ maybe a CLI (explode me)
 function for create (random allocation of new ID)
 be able to map (index) ID's for a whole collection
 integrate w/ lock & rewrite file
-update attributes
-create attributes (including into empty entity)
-delete attributes
-maybe a request structure (abstract gist from previous)

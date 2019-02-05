@@ -36,23 +36,23 @@ class _CommonCase(unittest.TestCase):
 
     def given_run_inserting_before_offset(self, line, offset, listener):
         mde = self._build_doc_ent(listener)
-        lo = mde.PROCURE_LINE_OBJECT(line, listener)
+        lo = mde.procure_line_object__(line, listener)
         self.fail() if lo is None else None
-        _idd = _internal_identifer_via_body_line_offset(offset, mde)
-        mde.INSERT_LINE_OBJECT(lo, _idd)
+        _iid = _internal_identifer_via_body_line_offset(offset, mde)
+        mde.insert_line_object(lo, _iid)
         return mde
 
     def given_run_appending(self, line, listener):
         mde = self._build_doc_ent(listener)
-        lo = mde.PROCURE_LINE_OBJECT(line, listener)
+        lo = mde.procure_line_object__(line, listener)
         self.fail() if lo is None else None
-        mde.APPEND_LINE_OBJECT(lo)
+        mde.append_line_object(lo)
         return mde
 
     def given_run_deleting_at_offset(self, offset, listener):
         mde = self._build_doc_ent(listener)
-        _idd = _internal_identifer_via_body_line_offset(offset, mde)
-        x = mde.DELETE_LINE_OBJECT(_idd)
+        _iid = _internal_identifer_via_body_line_offset(offset, mde)
+        x = mde._delete_line_object_via_iid(_iid)
         x.line  # eek / meh
         return mde
 

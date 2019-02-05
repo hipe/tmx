@@ -53,7 +53,6 @@ we used to say "local" vs. "remote", "original" vs. "new".
 
 
 
-
 ## define "synchronize"
 
 for our intended application, to "synchronize" means to "import" (or maybe

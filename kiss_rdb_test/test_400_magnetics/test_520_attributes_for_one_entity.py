@@ -345,18 +345,18 @@ def _MDE_via_body_lines_string_using_hack(big_s):
             _AttributeName, _CommentLine)
 
     def attribute_name_via_line(line):
-        _md = re.match('^(?:(#)|([a-z0-9]+(?:-[a-z0-9]+)*) = (.+))', line)
-        octothorp, an_s, rest = _md.groups()
-        if octothorp is None:
+        md = re.match('^(?:(#)|([a-z0-9]+(?:-[a-z0-9]+)*) = (.))', line)
+        an_s = md[2]
+        if an_s is not None:
             _an = _AttributeName(an_s.split('-'))
-            return _AttributeLine(_an, rest, line)
+            return _AttributeLine(_an, md.start(3), line)
         else:
             return _CommentLine(line)
 
     mde = _MutableDocumentEntity('no open table line object')
     for line in selib.unindent(big_s):
         _line_object = attribute_name_via_line(line)
-        mde.APPEND_LINE_OBJECT(_line_object)
+        mde.append_line_object(_line_object)
     return mde
 
 

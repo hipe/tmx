@@ -19,7 +19,7 @@ class _CommonCase(unittest.TestCase):
         dll = self.given_edit()
         item_via = dll.item_via_IID
         prev_via = dll.prev_IID_via_IID
-        iid = dll.tail_IDD()
+        iid = dll.tail_IID()
         while iid is not None:
             a.append(item_via(iid))
             iid = prev_via(iid)
