@@ -1,5 +1,5 @@
-import kiss_rdb.magnetics_.items_via_toml_file as trav_lib
-from .items_via_toml_file import (
+import kiss_rdb.magnetics_.identifiers_via_file_lines as trav_lib
+from .identifiers_via_file_lines import (
         stop, okay, nothing,
         )
 
@@ -133,13 +133,13 @@ def _parse_action(two_sub_chunks):
         # (doing this a cute, OCD, verbose way for now)
         if a_1 is None:
             if a_2 is None:
-                return nothing  # (Case208)
+                return nothing  # (Case483)
             else:
-                return (okay, a_2)  # (Case041)
+                return (okay, a_2)  # (Case417)
         elif a_2 is None:
-            return (okay, a_1)  # (Case292)
+            return (okay, a_1)  # (Case517)
         else:
-            return (okay, a_1 + a_2)  # (Case125)
+            return (okay, a_1 + a_2)  # (Case450)
 
     return f
 
@@ -179,10 +179,10 @@ class _ActionsForCUD:
 
         if o.just_left_start_state:
             if o.has_more_than_one_cached_line:
-                # head fluff in non-empty file (Case292)
+                # head fluff in non-empty file (Case517)
                 a_1 = o.step_the_cache()
             else:
-                # hi. no head fluff. no pass-thru to flush now (Case208)
+                # hi. no head fluff. no pass-thru to flush now (Case483)
                 a_1 = None
         else:
             # most often, flush lines of the previous section :#here1
@@ -197,7 +197,7 @@ class _ActionsForCUD:
             if id_s < o.argument_identifier_string:
                 # the section we are stepping in to should be output before
                 # the argument section. just cache lines like this like normal
-                # and in the next step they'll be flushed #here1 (Case208)
+                # and in the next step they'll be flushed #here1 (Case483)
                 a_2 = None
             elif o.argument_identifier_string < id_s:
                 # for a CREATE this is probably a "mode-change". for a
@@ -287,7 +287,7 @@ class _ActionsForCUD:
         return a
 
     def release_cache(self):
-        assert(self.has_more_than_zero_cached_lines)  # (Case448)
+        assert(self.has_more_than_zero_cached_lines)  # (Case875)
         a = self._cached_lines
         del self._cached_lines
         return a
@@ -333,9 +333,9 @@ class _ActionsForUpdateOrDelete:
         """normally be normal, but on the section we are replacing, rien."""
 
         if self._is_normal_mode:
-            return (okay, o.step_the_cache())  # (Case458)
+            return (okay, o.step_the_cache())  # (Case925)
         else:
-            return nothing  # also (Case458)
+            return nothing  # also (Case925)
 
     def subchunk_two_when_equal(self, o):
         """when doing a UPDATE this is the condition you've been waiting to
@@ -393,7 +393,7 @@ class _ActionsForUpdateOrDelete:
             lines_or_none = o.release_cache()
         else:
             o.release_empty_cache()
-            lines_or_none = None  # (Case478)
+            lines_or_none = None  # (Case975)
 
         return (okay, lines_or_none)
 
@@ -426,7 +426,7 @@ class _ActionsForCreate:
     def subchunk_one_on_nonfirst_section(self, o):
         """it must be the case that there are lines of a previous section
 
-        to flush. (this is common.) (:#here1) (Case375)
+        to flush. (this is common.) (:#here1) (Case550)
         """
 
         return (okay, o.step_the_cache())
@@ -445,7 +445,7 @@ class _ActionsForCreate:
         document will be processed from here on out: in a well-formed & valid
         document (ergo ordered) there is no longer a need to search for where
         to insert the new entity. the remainder of the document can simply
-        be passed thru without the need to parse section lines. (Case292)
+        be passed thru without the need to parse section lines. (Case517)
         """
 
         o.be_no_longer_searching()  # effectuate the "mode change"
@@ -459,14 +459,14 @@ class _ActionsForCreate:
     def subchunks_at_end_when_still_searching(self, o):
         if o.just_left_start_state:
             if o.has_more_than_zero_cached_lines:
-                # append after head fluff (effectively empty) (Case125)
+                # append after head fluff (effectively empty) (Case450)
                 a_1 = o.release_cache()
             else:
-                # "append" into literally empty file (Case041)
+                # "append" into literally empty file (Case417)
                 a_1 = None
         else:
             # output the one or more lines of cached entity then the
-            # lines of the argument entity (Case208). (note this is
+            # lines of the argument entity (Case483). (note this is
             # the same as an above but different semantics
             a_1 = o.release_cache()
         a_2 = o.release_new_lines()
@@ -479,7 +479,7 @@ class _ActionsForCreate:
         you must have seen one or more sections. this means there must be some
         lines in the cache yet to flush (the last section you've seen, waiting
         to find its last line). this means there's one or more lines in the
-        cache to flush. (Case292) :#here2
+        cache to flush. (Case517) :#here2
         """
 
         return (okay, o.release_cache())
@@ -493,7 +493,7 @@ def _():
     such transition because we can. EEK
     """
 
-    from kiss_rdb.magnetics_.items_via_toml_file import (
+    from kiss_rdb.magnetics_.identifiers_via_file_lines import (
             state_machine_ as sm,
             )
 

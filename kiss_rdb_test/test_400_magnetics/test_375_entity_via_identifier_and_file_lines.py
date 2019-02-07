@@ -55,7 +55,7 @@ class _CommonCase(unittest.TestCase):
         # set the above to true if it's failing and trying to emit, to debug
 
         _all_lines = self.given_lines()
-        return _subject_module().in_file_attributes_via(
+        return _subject_module().attributes_via_identifier_and_file_lines(
                 id_s, _all_lines, listener)  # noqa: E501
 
     def expect_reason(self, reason):
@@ -340,7 +340,7 @@ def _MDE_via_body_lines_string_using_hack(big_s):
     """
 
     import re
-    from kiss_rdb.magnetics_.document_entity_via_lines import (
+    from kiss_rdb.magnetics_.entity_via_open_table_line_and_body_lines import (
             _MutableDocumentEntity, _AttributeLine,
             _AttributeName, _CommentLine)
 
@@ -365,7 +365,7 @@ def _vendor_parse(body_string, listener):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import in_file_attributes_via_identifier_and_lines as _  # noqa: E501
+    from kiss_rdb.magnetics_ import entity_via_identifier_and_file_lines as _
     return _
 
 

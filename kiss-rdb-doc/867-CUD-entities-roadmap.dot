@@ -1,0 +1,83 @@
+digraph g {
+rankdir=BT
+
+n042[label="update • exactly like delete,
+• but note you can't come up with the
+  new entity lines till you have the existing.
+• remainder lines same as below
+"]
+
+
+n125->n042
+n125[label="delete • similar to create, but criteria is
+  equality not greater than.
+• before found, most lines are raw pass-thru
+• after found and entity consumed,
+  (output none of its lines)
+• and subsequent lines are truly
+  no-parse raw pass-thru (like below)
+"]
+
+
+n208->n125
+n208[label="create • starts out as pass-thru,
+  but with a parse action
+  checking each open-table line.
+• when the first greater is
+  encountered, mode change!
+• output new entity (lines)
+• then pure, no-parse pass-thru
+  for the rest!
+"]
+
+
+n292->n208
+n292[label="retrieve one entity
+• combine the below two, so
+  there's a mode-change
+• then a short-circuit
+"]
+
+
+n375->n292
+n375[label="traverse entities in document
+• result in stream of *coarse parsed*
+  open-table line objects
+• from this, stream of *same* lines
+• show how you can parse one
+"]
+
+
+n458->n375
+n458[label="traverse entity ID's in document
+• result in stream of open-table line objects
+• write parse actions naively:
+  yield the line as soon as you encounter it
+"]
+
+
+nAAA->n042
+nAAA->n125
+nAAA[label="[same line\nreplacement function]"]
+
+
+nBBB->nAAA
+nBBB->n208
+nBBB[label="mutates lines\n• result is document lines"]
+
+
+label="
+
+
+fig 867. entity CUD breakdown
+
+this is actually CRUD+T, not just CUD ;)
+
+*every* operation takes as one of its
+arguments the document line stream
+(simply an iterator of strings).
+"
+}
+/*
+#born.
+*/

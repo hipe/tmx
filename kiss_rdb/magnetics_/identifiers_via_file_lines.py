@@ -214,5 +214,4 @@ stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
-# #pending-rename: can we call "items" "entities" here? or not..
 # #born.

@@ -325,13 +325,12 @@ class Case320_non_validated_ID_traversal_two(_CommonCase):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import items_via_toml_file as _
+    from kiss_rdb.magnetics_ import identifiers_via_file_lines as _
     return _
 
 
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: maybe to something like unvalidated ID's..
 # #tombstone-A.1: as referenced
 # #born.

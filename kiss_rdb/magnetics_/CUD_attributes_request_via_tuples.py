@@ -1,5 +1,5 @@
 from . import (
-        document_entity_via_lines as ent_lib,
+        entity_via_open_table_line_and_body_lines as ent_lib,
         )
 
 

@@ -1,7 +1,7 @@
-from .items_via_toml_file import (
+from .identifiers_via_file_lines import (
         not_ok, okay, stop, nothing,
         )
-from . import items_via_toml_file as trav_lib
+from . import identifiers_via_file_lines as trav_lib
 import re
 
 """mainly, be the soul point of contact with the vendor parsing library"""
@@ -9,7 +9,7 @@ import re
 """secondarily, a hack for parsing strings to detect in-line comments."""
 
 
-def in_file_attributes_via(id_s, all_lines, listener):
+def attributes_via_identifier_and_file_lines(id_s, all_lines, listener):
 
     def actionser(ps):
         def f(name):
@@ -390,6 +390,5 @@ def _emit_input_error_via_structurer(f, listener):
 def cover_me():
     raise Exception('cover me')
 
-# #pending-rename: come up with something more .. idiomatic, like "document entity attributes via identifier" or somesuch  # noqa: E501
 # #history-A.1: spike hand-written surface-string string parser
 # #born.

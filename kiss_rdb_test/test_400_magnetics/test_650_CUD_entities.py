@@ -55,7 +55,7 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(actual, expect_lines)
 
 
-class Case041_create_against_truly_empty_file(_CommonCase):
+class Case417_create_against_truly_empty_file(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -77,7 +77,7 @@ class Case041_create_against_truly_empty_file(_CommonCase):
         """
 
 
-class Case125_create_against_effectively_empty_file_with_comments(_CommonCase):
+class Case450_create_against_effectively_empty_file_with_comments(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -103,7 +103,7 @@ class Case125_create_against_effectively_empty_file_with_comments(_CommonCase):
         """
 
 
-class Case208_create_that_appends_entity_to_the_very_end(_CommonCase):
+class Case483_create_that_appends_entity_to_the_very_end(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -130,7 +130,7 @@ class Case208_create_that_appends_entity_to_the_very_end(_CommonCase):
         """
 
 
-class Case292_create_that_inserts_at_the_front(_CommonCase):
+class Case517_create_that_inserts_at_the_front(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -160,7 +160,7 @@ class Case292_create_that_inserts_at_the_front(_CommonCase):
         """
 
 
-class Case375_create_that_inserts_in_between(_CommonCase):
+class Case550_create_that_inserts_in_between(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -190,7 +190,7 @@ class Case375_create_that_inserts_in_between(_CommonCase):
         """
 
 
-class Case411_create_that_inserts_in_between_no_props(_CommonCase):
+class Case583_create_that_inserts_in_between_no_props(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -214,7 +214,120 @@ class Case411_create_that_inserts_in_between_no_props(_CommonCase):
         """
 
 
-class Case438_update_at_beginning(_CommonCase):
+class Case620_delete_at_head_no_fluff(_CommonCase):
+
+    def test_300_expect_these_lines(self):
+        self._expect_everything_for_delete()
+
+    def expect_these_lines(self):
+        return """
+        [item.BB.attributes]
+        prop-b = val-b
+        """
+
+    def given_identifer_for_entity_to_delete(self):
+        return 'AA'
+
+    def given_big_string(self):
+        return """
+        [item.AA.meta]
+        prop-a = val-a
+        [item.BB.attributes]
+        prop-b = val-b
+        """
+
+
+class Case660_delete_at_head_yes_fluff(_CommonCase):
+
+    def test_300_expect_these_lines(self):
+        self._expect_everything_for_delete()
+
+    def expect_these_lines(self):
+        return """
+        # this file is blah blah
+
+        [item.BB.attributes]
+        prop-b = val-b
+        """
+
+    def given_identifer_for_entity_to_delete(self):
+        return 'AA'
+
+    def given_big_string(self):
+        return """
+        # this file is blah blah
+
+        [item.AA.meta]
+        prop-a = val-a
+        [item.BB.attributes]
+        prop-b = val-b
+        """
+
+
+class Case700_delete_in_middle(_CommonCase):
+
+    def test_300_expect_these_lines(self):
+        self._expect_everything_for_delete()
+
+    def expect_these_lines(self):
+        return """
+        [item.050.meta]
+        [item.150.meta]
+        """
+
+    def given_identifer_for_entity_to_delete(self):
+        return '100'
+
+    def given_big_string(self):
+        return """
+        [item.050.meta]
+        [item.100.attributes]
+        [item.150.meta]
+        """
+
+
+class Case740_delete_at_end(_CommonCase):
+
+    def test_300_expect_these_lines(self):
+        self._expect_everything_for_delete()
+
+    def expect_these_lines(self):
+        return """
+        [item.A.meta]
+        prop-a = val-a
+        """
+
+    def given_identifer_for_entity_to_delete(self):
+        return 'B'
+
+    def given_big_string(self):
+        return """
+        [item.A.meta]
+        prop-a = val-a
+        [item.B.meta]
+        prop-b = val-b
+        """
+
+
+class Case780_delete_leaving_effectively_empty_file(_CommonCase):  # 875 OLD
+
+    def test_300_expect_these_lines(self):
+        self._expect_everything_for_delete()
+
+    def expect_these_lines(self):
+        return None  # :#here1
+
+    def given_identifer_for_entity_to_delete(self):
+        return 'TheOnlyFellow'
+
+    def given_big_string(self):
+        return """
+        [item.TheOnlyFellow.attributes]
+        attr-one = value 1
+        """
+
+
+class Case825_update_at_beginning(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -242,7 +355,7 @@ class Case438_update_at_beginning(_CommonCase):
         """
 
 
-class Case448_update_beginning_no_props(_CommonCase):
+class Case875_update_beginning_no_props(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -265,7 +378,7 @@ class Case448_update_beginning_no_props(_CommonCase):
         """
 
 
-class Case458_update_in_middle(_CommonCase):
+class Case925_update_in_middle(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -297,7 +410,7 @@ class Case458_update_in_middle(_CommonCase):
         """
 
 
-class Case478_update_at_end(_CommonCase):
+class Case975_update_at_end(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -322,124 +435,11 @@ class Case478_update_at_end(_CommonCase):
         prop-a = val-a
         [item.B.meta]
         prop-b = val-b
-        """
-
-
-class Case542_delete_at_head_no_fluff(_CommonCase):
-
-    def test_300_expect_these_lines(self):
-        self._expect_everything_for_delete()
-
-    def expect_these_lines(self):
-        return """
-        [item.BB.attributes]
-        prop-b = val-b
-        """
-
-    def given_identifer_for_entity_to_delete(self):
-        return 'AA'
-
-    def given_big_string(self):
-        return """
-        [item.AA.meta]
-        prop-a = val-a
-        [item.BB.attributes]
-        prop-b = val-b
-        """
-
-
-class Case645_delete_at_head_yes_fluff(_CommonCase):
-
-    def test_300_expect_these_lines(self):
-        self._expect_everything_for_delete()
-
-    def expect_these_lines(self):
-        return """
-        # this file is blah blah
-
-        [item.BB.attributes]
-        prop-b = val-b
-        """
-
-    def given_identifer_for_entity_to_delete(self):
-        return 'AA'
-
-    def given_big_string(self):
-        return """
-        # this file is blah blah
-
-        [item.AA.meta]
-        prop-a = val-a
-        [item.BB.attributes]
-        prop-b = val-b
-        """
-
-
-class Case708_delete_in_middle(_CommonCase):
-
-    def test_300_expect_these_lines(self):
-        self._expect_everything_for_delete()
-
-    def expect_these_lines(self):
-        return """
-        [item.050.meta]
-        [item.150.meta]
-        """
-
-    def given_identifer_for_entity_to_delete(self):
-        return '100'
-
-    def given_big_string(self):
-        return """
-        [item.050.meta]
-        [item.100.attributes]
-        [item.150.meta]
-        """
-
-
-class Case792_delete_at_end(_CommonCase):
-
-    def test_300_expect_these_lines(self):
-        self._expect_everything_for_delete()
-
-    def expect_these_lines(self):
-        return """
-        [item.A.meta]
-        prop-a = val-a
-        """
-
-    def given_identifer_for_entity_to_delete(self):
-        return 'B'
-
-    def given_big_string(self):
-        return """
-        [item.A.meta]
-        prop-a = val-a
-        [item.B.meta]
-        prop-b = val-b
-        """
-
-
-class Case875_delete_leaving_effectively_empty_file(_CommonCase):
-
-    def test_300_expect_these_lines(self):
-        self._expect_everything_for_delete()
-
-    def expect_these_lines(self):
-        return None  # :#here1
-
-    def given_identifer_for_entity_to_delete(self):
-        return 'TheOnlyFellow'
-
-    def given_big_string(self):
-        return """
-        [item.TheOnlyFellow.attributes]
-        attr-one = value 1
         """
 
 
 def _subj_mod():
-    from kiss_rdb.magnetics_ import new_lines_via_CUD_and_existing_lines as _  # noqa: E501
+    from kiss_rdb.magnetics_ import file_lines_via_CUD_entity_and_file_lines as _  # noqa: E501
     return _
 
 
@@ -450,5 +450,4 @@ def cover_me():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: something more specific like entity-CUD, also give it 530
 # #born.

@@ -1,0 +1,62 @@
+digraph g {
+
+rankdir=LR
+
+node[ fontsize="16" shape=record ]
+
+nodeLeft[label="
+<417>Case417_create_against_truly_empty_file|
+<450>Case450_create_against_effectively_empty_file_with_comments|
+<483>Case483_create_that_appends_entity_to_the_very_end|
+<517>Case517_create_that_inserts_at_the_front|
+<550>Case550_create_that_inserts_in_between|
+<583>Case583_create_that_inserts_in_between_no_props|
+<620>Case620_delete_at_head_no_fluff|
+<660>Case660_delete_at_head_yes_fluff|
+<700>Case700_delete_in_middle|
+<742>Case742_delete_at_end|
+<780>Case780_delete_leaving_effectively_empty_file|
+<825>Case825_update_at_beginning|
+<875>Case875_update_beginning_no_props|
+<925>Case925_update_in_middle|
+<975>class Case975_update_at_end
+"
+]
+
+
+nodeRight[label="
+<100>(100) traverse entity ID's in document|
+<200>(200) traverse entities in document|
+<300>(300) retrieve one entity|
+<500>(500) create|
+<700>(700) delete|
+<900>(900) update
+"
+]
+
+nodeLeft:417->nodeRight:500
+nodeLeft:450->nodeRight:500
+nodeLeft:483->nodeRight:500
+nodeLeft:517->nodeRight:500
+nodeLeft:550->nodeRight:500
+nodeLeft:583->nodeRight:500
+nodeLeft:620->nodeRight:700
+nodeLeft:660->nodeRight:700
+nodeLeft:700->nodeRight:700
+nodeLeft:742->nodeRight:700
+nodeLeft:780->nodeRight:900
+nodeLeft:825->nodeRight:900
+nodeLeft:875->nodeRight:900
+nodeLeft:925->nodeRight:900
+nodeLeft:975->nodeRight:900
+
+
+label="
+
+which old test go with which new tests?
+"
+
+}
+/*
+#born.
+*/

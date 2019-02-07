@@ -13,6 +13,7 @@ we think yaml looks nicer.
 we aren't totally sold on toml.
 
 we want to support different format adapters in a plugin way, etc.
+(see [#854] plugin architecture (visualization).)
 
 
 ## broad provision 1
@@ -82,13 +83,13 @@ of interest to us are:
   - update
   - delete
 
-(you may find this set of verbs acronymized as "CUD" in the code, out of
-deference to its forebear.)
+(you will see this set of verbs acronymized as "CUD" in the code and
+in some document titles, out of deference to its forebear.)
 
 our approach from here forward will be to apply the _idiom_ we have chosen
-for how we edit files; namely, as a stream of lines (and not, say, as a
+for how we edit files; namely, as a stream of lines and not, say, as a
 matrix of bytes; a distinction that from one level may seem arbitrary but
-at our level is everything).
+at our level is everything.
 
 for better or worse (and this is VERY likely to change) we can perhaps
 distill all of our sub-categories of mutation into two categories of
@@ -200,15 +201,15 @@ let's return again to our top level ontology (the "CUD"):
 but this time, we'll imagine how we would attempt the rewrite of the file
 using parse actions in our state machine.
 
-  - CREATE: we'll assume that the entities are placed in the file in order
+  - CREATE: we'll assume that the entities are placed in the file
     by the identifier of the entity, in lexographic order ascending. (if
     the existing entities are out of order this algorithm won't totally bork
     but it should be seen as GIGO.
-    it just won't sort the file for you when it's not already sorted
+    it just won't sort the file for you when it's not already sorted.)
     traverse the zero or more existing entities in the file, doing this:
 
       - take care that any leading whitespace/comments in the file are
-        emitted as if it's its own entity, always first.
+        emitted as if it's its own "block" (not defined yet), always first.
 
       - if the existing identifer is less than the argument identifer
         (lexographically or numerically as appropriate (watch for letter
