@@ -674,7 +674,8 @@ def _request_via_tuples(tuples, listener):
 def _MDE(entity_body_lines_big_string, lstn):
     from kiss_rdb.magnetics_ import entity_via_open_table_line_and_body_lines as _  # noqa: E501
     _line_gen = _unindent(entity_body_lines_big_string)
-    return _.mutable_document_entity_via_lines(_line_gen, 'A', 'meta', lstn)
+    return _.mutable_document_entity_via_identifer_and_body_lines(
+            _line_gen, 'A', 'meta', lstn)
 
 
 def _unindent(big_s):

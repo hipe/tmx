@@ -58,7 +58,6 @@ def CUD_ATTRIBUTES_IN_MUTABLE_DOCUMENT_ENTITY(mde, req, listener):
         i, groups, apnds, qits = tup
     elif has_updates:  # ick/meh
         i, groups, apnds, qits = (None, (), (), None)  # (Case352)
-        # .. #todo maybe use empty tuples instead
 
     if has_creates or has_updates:
         if not __apply_C_and_U(i, mde, groups, apnds, qits, updates, listener):
@@ -261,7 +260,7 @@ def __longest_tail_anchored_run_of_line_objects_with_attrs_in_order(mde):
     def add_to_cache(iid, lo):  # lo = line object
         cache.append(_QualifiedItem(iid, lo))
 
-    ll = mde._LL  # #todo
+    ll = mde._LL
     item_via_IID = ll.item_via_IID
 
     # -- iterator to traverse each IID from back to front

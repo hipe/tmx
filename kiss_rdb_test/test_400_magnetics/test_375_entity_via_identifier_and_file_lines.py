@@ -9,6 +9,8 @@ import unittest
 
 class _CommonCase(unittest.TestCase):
 
+    # -- comment yes/no
+
     def expect_no_comment(self, an_s):
         return self._expect_yes_no_comment(False, an_s)
 
@@ -20,7 +22,7 @@ class _CommonCase(unittest.TestCase):
     expect_yes_comment_easy = expect_yes_comment
 
     def _expect_yes_no_comment(self, comment_expected_yes_no, an_s):
-        listener = selib.debugging_listener() if False else None
+        listener = selib.debugging_listener() if False else _no_listener
         ok, actual_yes_or_no = self._run_comment_test(an_s, listener)
         self.assertEqual(ok, True)
         self.assertEqual(actual_yes_or_no, comment_expected_yes_no)
@@ -40,6 +42,9 @@ class _CommonCase(unittest.TestCase):
         ok, x = _tester(an_s, listener)
         return (ok, x)
 
+    def vendor_parse_expecting_failure(self):
+        return self._expecting_failure(self.run_vendor_parse)
+
     def run_build_vendor_value_index(self, listener):
         _ = self.given_entity_body_lines()
         _mde = _MDE_via_body_lines_string_using_hack(_)
@@ -49,14 +54,44 @@ class _CommonCase(unittest.TestCase):
         _body_string = self.given_entity_body_lines()
         return _vendor_parse(_body_string, listener)
 
-    def partitions_via_identifier(self, id_s):
+    # -- retrieve
 
-        listener = selib.debugging_listener() if False else None
-        # set the above to true if it's failing and trying to emit, to debug
+    def expect_entity_has_this_identifier(self, id_s):
+        otl = self.open_table_line_object()
+        self.assertEqual(otl.identifier_string, id_s)
+        self.assertEqual(otl.table_type, 'attributes')
 
+    def expect_attribute_line_has_name(self, al, nm):
+        self.assertEqual(al.attribute_name.name_string, nm)
+
+    def expect_is_blank_line_object(self, lo):
+        self.assertFalse(lo.is_attribute_line or lo.is_comment_line)
+        self.assertEqual(lo.line, '\n')
+
+    def open_table_line_object(self):
+        return self.entity()._open_table_line_object
+
+    def body_component_at(self, idx):
+        return self.body_block_index()[idx]
+
+    def build_body_block_index(self):
+        return tuple(self.entity().TO_BODY_LINE_OBJECT_STREAM())
+
+    def retrieve_expecting_failure(self):
+        return self._expecting_failure(self.run_retrieve)
+
+    def retrieve_expecting_success(self):
+        listener = selib.debugging_listener() if False else _no_listener
+        return self.run_retrieve(listener)
+
+    def run_retrieve(self, listener):
+        _id_s = self.given_identifier()
         _all_lines = self.given_lines()
-        return _subject_module().attributes_via_identifier_and_file_lines(
-                id_s, _all_lines, listener)  # noqa: E501
+
+        return _subject_module().entity_via_identifier_and_file_lines(
+                _id_s, _all_lines, listener)
+
+    # -- general negative
 
     def expect_reason(self, reason):
         _actual_reason = self.reason_via_expect_input_error()
@@ -65,12 +100,20 @@ class _CommonCase(unittest.TestCase):
     def reason_via_expect_input_error(self):
         return self.structure_via_expect_input_error()['reason']
 
+    def error_structure_at(self, nm):
+        return self.error_structure()[nm]
+
     def structure_via_expect_input_error(self):
-        chan, structurer = self._expect_one_emisson_given_run()
+        return self._expecting_failure(self.given_run)
+
+    def _expecting_failure(self, run):
+        chan, structurer = self._expect_one_emisson_given_run(run)
         self.assertEqual(chan, ('error', 'structure', 'input_error'))
         return structurer()
 
-    def _expect_one_emisson_given_run(self):
+    # -- possibly shared support
+
+    def _expect_one_emisson_given_run(self, run):
         def listener(*a):
             nonlocal count
             nonlocal last_emission
@@ -80,7 +123,7 @@ class _CommonCase(unittest.TestCase):
             last_emission = a
         count = 0
         last_emission = None
-        x = self.given_run(listener)
+        x = run(listener)
         if not count:
             self.fail('expected one emission, had none')
         self.assertIsNone(x)
@@ -89,21 +132,187 @@ class _CommonCase(unittest.TestCase):
         return (chan, payloader)
 
 
-class Case100_not_at_end_of_file(_CommonCase):
+class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
 
-    def test_010_the_identifier_is_in_there(self):
-        self.assertEqual(self.entity_partitions()['identifier_string'], 'B')
+    def test_100_runs(self):
+        self.assertIsNotNone(self.entity())
 
-    def test_020_the_attributes_are_in_there(self):
-        self.assertTrue(_in_file_attributes in self.entity_partitions())
+    def test_233_open_table_line_components_look_good(self):
+        self.expect_entity_has_this_identifier('BB')
 
-    def test_030_the_first_one_is_the_one_that_was_resulted(self):
-        o = self.entity_partitions()[_in_file_attributes]
-        self.assertEqual(o['see-me'], 'do see me')
+    def test_266_open_table_line_LINE_looks_good(self):
+        _expected = '[item.BB.attributes]\n'
+        self.assertEqual(self.open_table_line_object().line, _expected)
+
+    def test_300_yeah_i_got_attributes(self):
+        al = self.body_component_at(0)
+        self.expect_attribute_line_has_name(al, 'prop-1')
+        al = self.body_component_at(1)
+        self.expect_attribute_line_has_name(al, 'prop-2')
+
+    def test_400_trailing_blank_lines(self):
+        self.expect_is_blank_line_object(self.body_component_at(2))
 
     @shared_subject
-    def entity_partitions(self):
-        return self.partitions_via_identifier('B')
+    def body_block_index(self):
+        return self.build_body_block_index()
+
+    @shared_subject
+    def entity(self):
+        return self.retrieve_expecting_success()
+
+    def given_identifier(self):
+        return 'BB'
+
+    def given_lines(self):
+        return _given_ABC_lines()
+
+
+class Case259_not_found(_CommonCase):
+
+    def test_100_input_error_type(self):
+        _actual = self.error_structure_at('input_error_type')
+        self.assertEqual(_actual, 'not_found')
+
+    def test_200_ID_string_alone(self):
+        _actual = self.error_structure_at('identifier_string')
+        self.assertEqual(_actual, 'BBCC')
+
+    def test_300_tells_you_if_it_might_be_because_out_of_order(self):
+        self.assertTrue(self.error_structure_at('might_be_out_of_order'))
+
+    def test_400_reason_is_straightforward(self):
+        _actual = self.error_structure_at('reason')
+        self.assertEqual(_actual, "'BBCC' not found")
+
+    @shared_subject
+    def error_structure(self):
+        return self.retrieve_expecting_failure()
+
+    def given_identifier(self):
+        return 'BBCC'
+
+    def given_lines(self):
+        return _given_ABC_lines()
+
+
+class Case263_not_found_anywhere(_CommonCase):
+
+    def test_300_tells_you_it_traversed_the_whole_thing(self):
+        self.assertFalse(self.error_structure_at('might_be_out_of_order'))
+
+    def test_400_reason_is_worded_slightly_differently(self):
+        _actual = self.error_structure_at('reason')
+        self.assertEqual(_actual, "'DD' not in file")
+
+    @shared_subject
+    def error_structure(self):
+        return self.retrieve_expecting_failure()
+
+    def given_identifier(self):
+        return 'DD'
+
+    def given_lines(self):
+        return _given_ABC_lines()
+
+
+class Case266_at_head(_CommonCase):
+
+    def test_300_attributes(self):
+        a = self.body_block_index()
+        self.assertEqual(a[0].line, "prop-1 = 123\n")
+        self.assertEqual(a[1].line, 'prop-2 = "value aa"\n')
+
+    def test_400_trailing_blank_lines(self):
+        a = self.body_block_index()
+        self.expect_is_blank_line_object(a[2])
+        self.assertEqual(len(a), 3)
+
+    @shared_subject
+    def body_block_index(self):
+        return self.build_body_block_index()
+
+    def entity(self):
+        return self.retrieve_expecting_success()
+
+    def given_identifier(self):
+        return 'AA'
+
+    def given_lines(self):
+        return _given_ABC_lines()
+
+
+class Case272_at_tail(_CommonCase):
+
+    def test_300_attributes(self):
+        a = self.body_block_index()
+        self.assertEqual(a[0].line, "prop-1 = 345\n")
+        self.assertEqual(a[1].line, 'prop-2 = "value cc"\n')
+
+    def test_400_notrailing_blank_lines(self):
+        a = self.body_block_index()
+        self.assertEqual(len(a), 2)
+
+    @shared_subject
+    def body_block_index(self):
+        return self.build_body_block_index()
+
+    def entity(self):
+        return self.retrieve_expecting_success()
+
+    def given_identifier(self):
+        return 'CC'
+
+    def given_lines(self):
+        return _given_ABC_lines()
+
+
+@memoize
+def _given_ABC_lines():
+    return tuple(selib.unindent("""
+    [item.AA.attributes]
+    prop-1 = 123
+    prop-2 = "value aa"
+
+    [item.BB.attributes]
+    prop-1 = 234
+    prop-2 = "value bb"
+
+    [item.CC.attributes]
+    prop-1 = 345
+    prop-2 = "value cc"
+    """))
+
+
+class Case278_against_empty(_CommonCase):  # future feature 5: blank files
+
+    def test_100_currently_failure_is_parse_failure(self):
+        es = self.error_structure()
+        es['expecting_any_of']
+        self.assertTrue(es['did_reach_end_of_stream'])
+
+    def error_structure(self):
+        return self.structure_via_expect_input_error()
+
+    def given_run(self, listener):
+        return self.run_retrieve(listener)
+
+    def given_identifier(self):
+        return 'FF'
+
+    def given_lines(self):
+        return ()
+
+
+class Case282_too_many_adjacent_same_identifiers(_CommonCase):
+
+    def test_100_message(self):
+        es = self.retrieve_expecting_failure()
+        _expected = "item 'B' has 3 adjacent tables (2 is max)"
+        self.assertEqual(es['reason'], _expected)
+
+    def given_identifier(self):
+        return 'B'
 
     def given_lines(self):
         return selib.unindent("""
@@ -119,10 +328,43 @@ class Case100_not_at_end_of_file(_CommonCase):
         """)
 
 
-# #todo: cover at end of file
+class Case284_duplicate_identifiers_can_get_shadowed(_CommonCase):
+
+    # [#864.provision-3.1]: stop at the first one
+
+    def test_200_open_table_line(self):
+        self.expect_entity_has_this_identifier('B')
+
+    def test_300_attributes(self):
+        al = self.body_component_at(0)
+        self.assertEqual(al.line, 'see-me = "do see me"\n')
+
+    @shared_subject
+    def body_block_index(self):
+        return self.build_body_block_index()
+
+    @shared_subject
+    def entity(self):
+        return self.retrieve_expecting_success()
+
+    def given_identifier(self):
+        return 'B'
+
+    def given_lines(self):
+        return selib.unindent("""
+        # comment
+        [item.A.attributes]
+        [item.B.attributes]
+        see-me = "do see me"
+
+        [item.C.meta]
+        [item.B.attributes]
+        see-me = "don't see me"
+
+        """)
 
 
-class Case125_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
+class Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
 
     """(note we don't actually run this thru a coarse parse)"""
 
@@ -139,10 +381,7 @@ class Case125_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
 
     @shared_subject
     def _structure(self):
-        return self.structure_via_expect_input_error()
-
-    def given_run(self, listener):
-        return self.run_vendor_parse(listener)
+        return self.vendor_parse_expecting_failure()
 
     def given_entity_body_lines(self):
         return """
@@ -150,13 +389,13 @@ class Case125_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
         """
 
 
-class Case175_trick_the_coarse_parse_with_valid_toml(_CommonCase):
+class Case297_trick_the_coarse_parse_with_valid_toml(_CommonCase):
 
     def test_100_in_general_say_toml_not_simple_enough(self):
         _expect = 'toml not simple enough'
         self.assertEqual(self._general_and_specific()[0], _expect)
 
-    def test_100_in_specific_say_this_thing_snuck_through(self):
+    def test_200_in_specific_say_this_thing_snuck_through(self):
         _expect = "'number-nine' attribute snuck through"
         self.assertEqual(self._general_and_specific()[1], _expect)
 
@@ -185,7 +424,7 @@ to detect multiline strings we need to get as far as firing up our ad-hoc
 value-expression parser..."""
 
 
-class Case225_array_not_suported_yet(_CommonCase):
+class Case303_array_not_suported_yet(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('array')
@@ -197,7 +436,7 @@ class Case225_array_not_suported_yet(_CommonCase):
         return 'array'
 
 
-class Case275_inline_tables_not_suported_yet(_CommonCase):
+class Case309_inline_tables_not_suported_yet(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('inline table')
@@ -209,34 +448,34 @@ class Case275_inline_tables_not_suported_yet(_CommonCase):
         return 'inline-table'
 
 
-class Case325_the_easy_cases(_CommonCase):
+class Case316_the_easy_cases(_CommonCase):
 
-    def test_325_bool_no_comment(self):
+    def test_316_bool_no_comment(self):  # Case316
         self.expect_no_comment_easy('bool-no-comment')
 
-    def test_375_bool_yes_comment(self):
+    def test_322_bool_yes_comment(self):  # Case322
         self.expect_yes_comment_easy('bool-yes-comment')
 
-    def test_425_int_no_comment(self):
+    def test_328_int_no_comment(self):  # Case328
         self.expect_no_comment_easy('int-no-comment')
 
-    def test_475_int_yes_comment(self):
+    def test_334_int_yes_comment(self):  # Case334
         self.expect_yes_comment_easy('int-yes-comment')
 
-    def test_525_float_no_comment(self):
+    def test_341_float_no_comment(self):  # Case341
         self.expect_no_comment_easy('float-no-comment')
 
-    def test_575_float_yes_comment(self):
+    def test_347_float_yes_comment(self):  # Case347
         self.expect_yes_comment_easy('float-yes-comment')
 
-    def test_625_datetime_no_comment(self):
+    def test_353_datetime_no_comment(self):  # Case353
         self.expect_no_comment_easy('datetime-no-comment')
 
-    def test_675_datetime_yes_comment(self):
+    def test_359_datetime_yes_comment(self):  # Case359
         self.expect_yes_comment_easy('datetime-yes-comment')
 
 
-class Case725_literal_string_not_yet_supported(_CommonCase):
+class Case366_literal_string_not_yet_supported(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('literal string')
@@ -248,7 +487,7 @@ class Case725_literal_string_not_yet_supported(_CommonCase):
         return 'single-line-literal-string'
 
 
-class Case775_multi_line_literal_string_not_yet_supported(_CommonCase):
+class Case372_multi_line_literal_string_not_yet_supported(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('multi-line literal string')
@@ -260,7 +499,7 @@ class Case775_multi_line_literal_string_not_yet_supported(_CommonCase):
         return 'multi-line-literal-string'
 
 
-class Case825_multi_line_basic_not_yet_supported(_CommonCase):
+class Case378_multi_line_basic_not_yet_supported(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('multi-line basic string')
@@ -272,17 +511,17 @@ class Case825_multi_line_basic_not_yet_supported(_CommonCase):
         return 'multi-line-basic-string'
 
 
-class Case875_the_hard_but_money_cases(_CommonCase):
+class Case384_the_hard_but_money_cases(_CommonCase):
 
     # these are ones where we parse the string by hand and it works
 
-    def test_875_NAME_ME(self):
+    def test_384_basic_string_simple(self):  # Case384
         self.expect_no_comment('basic-string-050-simple')
 
-    def test_925_NAME_ME(self):
+    def test_391_basic_string_empty(self):  # Case391
         self.expect_yes_comment('basic-string-000-empty')
 
-    def test_975_escape(self):
+    def test_397_escape(self):  # Case397
         self.expect_yes_comment('basic-string-100-escape')
 
 
@@ -318,7 +557,7 @@ def _comment_tester_one():
         """
     )
 
-    # #todo: these forms broke in python
+    # #open [#861.D] these datetime forms not supported in python toml
     # datetime-no-comment = 07:32:00
     # datetime-yes-comment = 1979-05-27  # HBD TPW
 
@@ -374,7 +613,6 @@ def cover_me(msg=None):
     raise Exception(f'cover me{_}')
 
 
-_in_file_attributes = 'in_file_attributes'
 _no_listener = None
 
 

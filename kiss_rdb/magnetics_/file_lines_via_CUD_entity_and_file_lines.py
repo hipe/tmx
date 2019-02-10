@@ -255,11 +255,11 @@ class _ActionsForCUD:
 
     def section_identifier_via_section_line(self):
         o = self.parse_state
-        tup = trav_lib.item_section_line_via_line_(o.line, o.listener)
-        if tup is None:
+        otl = trav_lib.open_table_line_via_line_(o.line, o.listener)
+        if otl is None:
             return
-
-        id_s, which = tup
+        id_s = otl.identifier_string
+        which = otl.table_type
 
         # (we aren't validating. here we are indifferent.)
         assert('attributes' == which or 'meta' == which)
@@ -362,7 +362,7 @@ class _ActionsForUpdateOrDelete:
         one greater, and you should have mode-changed then.
         """
 
-        known_error_case_yet_to_cover()  # #todo
+        known_error_case_yet_to_cover()  # #open #[#867.C]
 
     def subchunks_at_end_when_still_searching(self, o):
         """if you get to the end of the document and you are still searching,
@@ -371,7 +371,7 @@ class _ActionsForUpdateOrDelete:
         not be performed.
         """
 
-        known_error_case_yet_to_cover()  # #todo
+        known_error_case_yet_to_cover()  # #open #[#867.C]
 
     def subchunk_two_when_done_searching(self, o):
 
@@ -454,7 +454,7 @@ class _ActionsForCreate:
     def subchunk_two_when_equal(self, o):
         # when doing a CREATE, finding a section that is equal
         # is an error condition..
-        known_error_case_yet_to_cover()  # #todo
+        known_error_case_yet_to_cover()  # #open #[#867.C]
 
     def subchunks_at_end_when_still_searching(self, o):
         if o.just_left_start_state:

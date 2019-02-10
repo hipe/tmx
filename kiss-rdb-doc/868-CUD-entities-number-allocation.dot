@@ -2,9 +2,64 @@ digraph g {
 
 rankdir=LR
 
-node[ fontsize="16" shape=record ]
+node[shape=record]
+
+
+/*
+test file 100 and 650 were the "goal posts". here's the one-off:
+ruby -e 'base=100;span=550; (1..5).each{|i| puts base + (1.0 * i / 6 * span)}'
+*/
+
+
+
+nl050[label="
+test file 192: ID's via file lines|
+<055>Case055_truly_blank_file|
+<065>Case065_sneak_oxford_join_coverage_into_here|
+<075>Case075_early_end_of_non_empty_file|
+<085>Case085_an_ordinary_looking_line|
+<095>Case095_not_quite_section_line|
+<105>Case105_section_but_no_dots|
+<115>Case115_wrong_keyword_for_third_component|
+<125>Case125_too_many_components|
+<135>Case135_non_validated_ID_traversal_one|
+<145>Case145_non_validated_ID_traversal_two
+"
+]
+
+nl075[label="
+test file 375: entity via identifier and file lines|
+<253>Case253_simplified_typical_retrieve_in_mid|
+<259>Case259_not_found|
+<263>Case263_not_found_anywhere|
+<266>Case266_at_head|
+<272>Case272_at_tail|
+<278>Case278_against_empty|
+<282>Case282_too_many_adjacent_same_identifiers|
+<284>Case284_duplicate_identifiers_can_get_shadowed|
+<290>Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail|
+<297>Case297_trick_the_coarse_parse_with_valid_toml|
+<303>Case303_array_not_suported_yet|
+<309>Case309_inline_tables_not_suported_yet|
+<316>test_316_bool_no_comment  # Case316|
+<322>test_322_bool_yes_comment  # Case322|
+<328>test_328_int_no_comment  # Case328|
+<334>test_334_int_yes_comment  # Case334|
+<341>test_341_float_no_comment  # Case341|
+<347>test_347_float_yes_comment  # Case347|
+<353>test_353_datetime_no_comment  # Case353|
+<359>test_359_datetime_yes_comment  # Case359|
+<366>Case366_literal_string_not_yet_supported|
+<372>Case372_multi_line_literal_string_not_yet_supported|
+<378>Case378_multi_line_basic_not_yet_supported|
+<381>test_381_basic_string_simple  # Case381|
+<391>test_391_basic_string_empty  # Case391|
+<397>test_397_escape  # Case397
+"
+]
 
 nodeLeft[label="
+test file 650: CUD entities|
 <417>Case417_create_against_truly_empty_file|
 <450>Case450_create_against_effectively_empty_file_with_comments|
 <483>Case483_create_that_appends_entity_to_the_very_end|
@@ -19,20 +74,61 @@ nodeLeft[label="
 <825>Case825_update_at_beginning|
 <875>Case875_update_beginning_no_props|
 <925>Case925_update_in_middle|
-<975>class Case975_update_at_end
+<975>Case975_update_at_end
 "
 ]
 
 
 nodeRight[label="
-<100>(100) traverse entity ID's in document|
-<200>(200) traverse entities in document|
-<300>(300) retrieve one entity|
-<500>(500) create|
-<700>(700) delete|
-<900>(900) update
+<100>\n\n\n\n(100) traverse entity ID's in document\n\n\n\n\n\n|
+<200>\n\n\n\n(200) traverse entities in document\n\n\n\n|
+<300>\n\n\n\n(300) retrieve one entity\n\n\n\n|
+<500>\n\n\n\n(500) create\n\n\n\n|
+<700>\n\n\n(700) delete\n\n\n\n|
+<900>\n\n\n(900) update\n\n\n\n
 "
+fontsize=22
 ]
+
+nl050:055->nodeRight:100
+nl050:065->nodeRight:100
+nl050:075->nodeRight:100
+nl050:085->nodeRight:100
+nl050:095->nodeRight:100
+nl050:105->nodeRight:100
+nl050:115->nodeRight:100
+nl050:125->nodeRight:100
+nl050:135->nodeRight:100
+nl050:145->nodeRight:100
+
+
+nl075:253->nodeRight:300
+nl075:259->nodeRight:300
+nl075:263->nodeRight:300
+nl075:266->nodeRight:300
+nl075:272->nodeRight:300
+nl075:278->nodeRight:300
+nl075:282->nodeRight:300
+nl075:284->nodeRight:300
+nl075:290->nodeRight:300
+nl075:297->nodeRight:300
+nl075:303->nodeRight:300
+nl075:309->nodeRight:300
+nl075:316->nodeRight:300
+nl075:322->nodeRight:300
+nl075:328->nodeRight:300
+nl075:334->nodeRight:300
+nl075:341->nodeRight:300
+nl075:347->nodeRight:300
+nl075:353->nodeRight:300
+nl075:359->nodeRight:300
+nl075:366->nodeRight:300
+nl075:372->nodeRight:300
+nl075:378->nodeRight:300
+nl075:384->nodeRight:300
+nl075:391->nodeRight:300
+nl075:397->nodeRight:300
+
 
 nodeLeft:417->nodeRight:500
 nodeLeft:450->nodeRight:500
@@ -53,7 +149,7 @@ nodeLeft:975->nodeRight:900
 
 label="
 
-which old test go with which new tests?
+almost universal \"regression-friendly\" test number allocation guide.
 "
 
 }

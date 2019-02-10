@@ -28,6 +28,11 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#867.E]                   | #open | non-integrated testpoint island
+|[#867.D]                   | #open | these datetime forms not supported in python toml
+|[#867.C]                   | #open | known error cases yet to cover (not comprehensive)
+|[#867.B]                   | #open | coverage island, expected to iteg w/ CLI
+|[#867]                     |       | (internal tracking, small issues)
 |[#866]                     |       | the hack for detecting in-line comments
 |[#865]                     |       | the toml adaptation for attributes
 |[#864]                     |       | the toml adaptation

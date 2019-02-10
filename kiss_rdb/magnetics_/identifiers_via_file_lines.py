@@ -4,12 +4,9 @@ from kiss_rdb.magnetics_ import (
         )
 
 
-def items_via_toml_path(toml_path):
-    raise Exception('integrate me with below (easy)')  # #todo
-
-
-def _traverse_IDs_without_validating(all_lines, listener):  # #testpoint, #todo
-    _actionser = _actionser_via_class(_Actions_for_ID_Traversal_Non_Validating)
+def traverse_IDs_without_validating__(all_lines, listener):
+    # #open [#867.E] #testpoint island
+    _actionser = _actionser_via_class(Actions_for_ID_Traversal_Non_Validating_)
     return parse_(all_lines, _actionser, listener)
 
 
@@ -26,7 +23,7 @@ def _actionser_via_class(cls):
     return actionser
 
 
-class _Actions_for_ID_Traversal_Non_Validating:
+class Actions_for_ID_Traversal_Non_Validating_:
     """the imagined, intended purpose of this is for traversing every ID
 
     (for example for something like generating an index, we'll see..)
@@ -46,41 +43,33 @@ class _Actions_for_ID_Traversal_Non_Validating:
         or are in ascending order. (probably this will be forthcoming, and
         somehow abstracted out of this so it is somehow a layer or something)
 
-    BUT as an exercise, for now we're structuring this in logically the same
-    way we want to for when we will vendor-parse an entity: you can't emit
+    before #history-A.1 we structured these parse actions to be logically
+    similar for how we will want to do things for something like RETRIEVE
+    or deep search (true traversal): you can't emit
     the entity until you've found its last line and you don't know you've
     reached its last line until either you hit the next line of the next
     section OR the end of the file.
+
+    but now that we know that works, we're simplifying this so we can see
+    if we can make this parse action somehow composable for the eventual
+    new implementation of RETRIEVE
     """
 
     def __init__(self, parse_state):
-        self._on_section_start = self._on_section_start_at_beginning
         self._ps = parse_state
+        self._listener = parse_state.listener
 
     def on_section_start(self):
-        o = self._ps
-        tup = item_section_line_via_line_(o.line, o.listener)
-        if tup is None:
+        otl = open_table_line_via_line_(self._ps.line, self._listener)
+        if otl is None:
             return stop
-        return self._on_section_start(tup)
-
-    def _on_section_start_at_beginning(self, tup):
-        self._cover_me_semaphore = True
-        self._previous_section = tup
-        self._on_section_start = self._on_section_start_subsequently
-        return nothing
-
-    def _on_section_start_subsequently(self, tup):
-        previous_section = self._previous_section
-        self._previous_section = tup
-        return (okay, previous_section)
+        return (okay, otl)
 
     def at_end_of_input(self):
-        del self._cover_me_semaphore
-        return (okay, self._previous_section)
+        return nothing
 
 
-def item_section_line_via_line_(line, listener):
+def open_table_line_via_line_(line, listener):
 
     nc = _name_components_via_line(line, listener)
     if nc is None:
@@ -113,7 +102,8 @@ def item_section_line_via_line_(line, listener):
         _ = 1 + len(nc[0]) + 1 + len(identifier) + 1 + len(which)  # NOOOOOO
         return _input_error(listener, expecting="']'", position=_)
 
-    return (identifier, which)
+    from .entity_via_open_table_line_and_body_lines import OpenTableLine_ as _
+    return _(identifier, which, line)
 
 
 def _name_components_via_line(line, listener):
@@ -214,4 +204,5 @@ stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
+# #history-A.1: simplify open-table line finding to be eager
 # #born.

@@ -5,11 +5,39 @@ import unittest
 
 unindent = selib.unindent
 
-# (subject under test explained exhaustively in [#865] CUD for attributes)
+"""
+(subject under test explained exhaustively in [#865] CUD for attributes)
 
-# (in the middle of writing this we decided we needed to abstract doubly
-# linked list out into its own module & tests, so see thematic redundancy
-# and a long note below.)
+the objective & scope of this test file is actually focused well enough, but
+it can seem muddled until you get through this backstory:
+
+  - based on the name of the counterpart asset this tries to cover (its
+    subject module, something like "entity_via_identifier_and_file_lines"),
+    one might expect this test to cover entity RETRIEVE;
+
+  - but the main asset provided by that magnet is actually the all-important
+    "mutable document entity" itself. so how do you cover that? well:
+
+  - we set out to cover the line-level CUD operations exposed by that mutable
+    model, an API that for a time we thought would speak in terms of line
+    offsets (when relevant) (e.g insert this line before this other line,
+    delete this line at offset X, etc.), before we realized that using IID's
+    was a preferable way to refer to existing body blocks. although this
+    line-offset-centric view is no longer in the asset, it endures in some of
+    the tests here.
+
+  - during implementation, we realized that what we were really doing was
+    just developing our chosen implementation: the doubly-linked list. this,
+    then, abstracted out into its own module & tests. so when we returned to
+    this test file, it became mostly an integration test between the mutable
+    document entity and its underlying doubly-linked list. (this is
+    reflected in how short the asset file is at writing: 267 LOC)
+
+see also a long note below about the test case ordering locally.
+
+also, during renames we renamed this with a hint toward the future
+(undocumented).
+"""
 
 
 class _CommonCase(unittest.TestCase):
@@ -305,6 +333,10 @@ class Case130_insert_into_mid(_CommonCase):
 
 """a compuctionary note on test case ordering:
 
+  - (the below is now superseded by [#867] in terms of theoretical rigor,
+    however our order here (append, insert, delete) actually concurs with the
+    order proferred there (that is, same conclusion for different reasons).)
+
   - "regression-friendly ordering" offers that all things being equal you
     should put simpler cases before more complex ones (for reasons).
 
@@ -433,7 +465,7 @@ def _internal_identifer_via_body_line_offset(offset, mde):
 
 
 def _doc_entity_via_lines(given, listener=None):
-    return _subject_module().mutable_document_entity_via_lines(
+    return _subject_module().mutable_document_entity_via_identifer_and_body_lines(  # noqa: E501
             given, 'A', 'meta', listener)
 
 

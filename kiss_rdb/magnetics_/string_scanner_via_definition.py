@@ -76,19 +76,19 @@ class Scanner:
     def __emit_input_error_for_single_pattern(self, pattern):
         def struct():
             dct = {'expecting': pattern.description}
-            self.MUTATE_ERROR_STRUCTURE(dct)
+            self.mutate_error_structure(dct)
             return dct
         self._listener('error', 'structure', 'input_error', struct)
 
-    def MUTATE_ERROR_STRUCTURE(self, dct):  # todo
+    def mutate_error_structure(self, dct):
         dct['position'] = self._position
-        dct['line'] = self._line  # #todo
+        dct['line'] = self._line
 
     def _match(self, pattern):
         return pattern.regex.match(self._line, self._position)
 
 
-def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #todo: coverage isl
+def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
         position, line, lineno=None, expecting=None, expecting_any_of=None,
         did_reach_end_of_stream=None,
         ):

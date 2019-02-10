@@ -3,12 +3,19 @@ from . import (
         )
 
 
-def mutable_document_entity_via_lines(
+def mutable_document_entity_via_identifer_and_body_lines(
         lines, identifier_string, table_type, listener):
 
     otl = _open_table_line_via(identifier_string, table_type, listener)
     if otl is None:
         return
+
+    return mutable_document_entity_via_open_table_line_and_body_lines(
+            otl, lines, listener)
+
+
+def mutable_document_entity_via_open_table_line_and_body_lines(
+        otl, lines, listener):
 
     mde = _MutableDocumentEntity(otl)
     for line in lines:
@@ -28,15 +35,15 @@ class _MutableDocumentEntity:
     adjacent to edited lines are not comments. we do not effectuate such
     assurances here but we make them possible with the API we expose.
 
-    2) gist API. help prevent gist collisions, with procurement. in flux. #todo
+    2) gist API. help prevent gist collisions, with procurement.
     """
 
     def __init__(self, open_table_line_object):
 
         from . import doubly_linked_list_functions as _
-        self._LL = _.build_new_doubly_linked_list()
+        self._LL = _.build_new_doubly_linked_list()  # #testpoint (attr name)
 
-        self._open_table_line_object = open_table_line_object
+        self._open_table_line_object = open_table_line_object  # #testpoint
         self._IID_via_gist = {}
 
     def insert_line_object(self, lo, iid):
@@ -127,7 +134,7 @@ def attribute_line_via_line(line, listener, input_error_structure_via_AN=_nah):
     # this is not thread safe lol
     err = input_error_structure_via_AN(an)
     if err is not None:
-        scn.MUTATE_ERROR_STRUCTURE(err)
+        scn.mutate_error_structure(err)
         listener('error', 'structure', 'input_error', lambda: err)
         return
 
@@ -197,6 +204,7 @@ def _build_this_one_error_structure(attr_name, attribute_line):
 
 # == LINE OBJECT CLASSES
 
+# (see also `open_table_line_via_line_` in sibling)
 
 def _open_table_line_via(identifier_string, table_type, listener):
 
@@ -212,14 +220,15 @@ def _open_table_line_via(identifier_string, table_type, listener):
 
     _line = f'[item.{identifier_string}.{table_type}]\n'
 
-    return _OpenTableLine(identifier_string, table_type, _line)
+    return OpenTableLine_(identifier_string, table_type, _line)
 
 
-class _OpenTableLine:
+class OpenTableLine_:
 
     def __init__(self, id_s, typ, line):
+        self.identifier_string = id_s
+        self.table_type = typ
         self.line = line
-        # ..
 
 
 class _AttributeLine:  # #testpoint

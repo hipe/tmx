@@ -70,19 +70,19 @@ class _CommonCase(unittest.TestCase):
         # set the above to true if it's failing and trying to emit, to debug
         itr = self._run_non_validating_ID_traversal(listener)
         x_a = []
-        for x in itr:
-            x_a.append(x)
+        for otl in itr:
+            x_a.append((otl.identifier_string, otl.table_type))
         return tuple(x_a)
 
     def _run_non_validating_ID_traversal(self, listener):
         _all_lines = self.given_lines()
-        return _subject_module()._traverse_IDs_without_validating(_all_lines, listener)  # noqa: E501
+        return _subject_module().traverse_IDs_without_validating__(_all_lines, listener)  # noqa: E501
 
     def given_lines(self):
         raise Exception('ha ha')
 
 
-class Case100_truly_blank_file(_CommonCase):
+class Case055_truly_blank_file(_CommonCase):
     """
     necessary discussion:
 
@@ -95,7 +95,7 @@ class Case100_truly_blank_file(_CommonCase):
     "start" state and the special "end of stream" token is received. there is
     no state transition out that state for that token.
 
-    this is a better way to implement the behavior because it's more general
+    this is a better way to implement the behavior because it's a more
     general implementation that can still effect the target behavior (+ or -).
 
     so for example you can more easily design a grammar that accomodates
@@ -127,7 +127,7 @@ class Case100_truly_blank_file(_CommonCase):
         return ()
 
 
-class Case115_sneak_oxford_join_coverage_into_here(_CommonCase):
+class Case065_sneak_oxford_join_coverage_into_here(_CommonCase):
 
     # (at #tombstone-A.1 we severed this production but still want it)
 
@@ -155,7 +155,7 @@ class Case115_sneak_oxford_join_coverage_into_here(_CommonCase):
         self.assertEqual(_actual, expected_string)
 
 
-class Case120_early_end_of_non_empty_file(_CommonCase):
+class Case075_early_end_of_non_empty_file(_CommonCase):
 
     # lost a message production at #tombstone-A.1:
     # 'file has no sections (so no entities)'
@@ -177,7 +177,7 @@ class Case120_early_end_of_non_empty_file(_CommonCase):
         return ('# comment line\n', '# comment line 2\n')
 
 
-class Case130_an_ordinary_looking_line(_CommonCase):
+class Case085_an_ordinary_looking_line(_CommonCase):
 
     def test_100_you_can_see_that_EOS_was_NOT_reached(self):
         self.you_can_see_that_EOS_was_NOT_reached()
@@ -197,7 +197,7 @@ class Case130_an_ordinary_looking_line(_CommonCase):
         return ('# comment line\n', '\n', 'Huh ZAH!\n')
 
 
-class Case210_not_quite_section_line(_CommonCase):
+class Case095_not_quite_section_line(_CommonCase):
 
     def test_100_says_this_one_ad_hoc_description_of_expecting(self):
         o = self.emitted_elements()
@@ -232,7 +232,7 @@ class Case210_not_quite_section_line(_CommonCase):
         return ('# comment line\n', '\n', '[fun time]\n')
 
 
-class Case220_section_but_no_dots(_CommonCase):
+class Case105_section_but_no_dots(_CommonCase):
 
     def test_100_our_first_structured_emisson(self):
         o = self.emitted_elements()
@@ -255,7 +255,7 @@ class Case220_section_but_no_dots(_CommonCase):
         return ('[woot]\n',)
 
 
-class Case240_wrong_keyword_for_third_component(_CommonCase):
+class Case115_wrong_keyword_for_third_component(_CommonCase):
 
     def test_100_expecting(self):
         o = self.emitted_elements()
@@ -278,7 +278,7 @@ class Case240_wrong_keyword_for_third_component(_CommonCase):
         return ('[item.0O1L.attribute]\n',)
 
 
-class Case250_too_many_components(_CommonCase):
+class Case125_too_many_components(_CommonCase):
 
     def test_100_structured_emission(self):
         o = self.emitted_elements()
@@ -301,7 +301,7 @@ class Case250_too_many_components(_CommonCase):
         return ('[item.0O1L.attributes.huzzah]\n',)
 
 
-class Case310_non_validated_ID_traversal_one(_CommonCase):
+class Case135_non_validated_ID_traversal_one(_CommonCase):
 
     def test_100_everything(self):
         _ = self.run_non_validating_ID_traversal_expecting_success()
@@ -311,7 +311,7 @@ class Case310_non_validated_ID_traversal_one(_CommonCase):
         return ('[item.0O1L.attributes]\n',)
 
 
-class Case320_non_validated_ID_traversal_two(_CommonCase):
+class Case145_non_validated_ID_traversal_two(_CommonCase):
 
     # this is invalid (meta must come before attributes for the same thing)
     # but the point is we aren't validating that at this level.
