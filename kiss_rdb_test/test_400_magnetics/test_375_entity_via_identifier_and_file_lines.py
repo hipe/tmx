@@ -56,6 +56,23 @@ class _CommonCase(unittest.TestCase):
 
     # -- retrieve
 
+    def error_structure_has_identifier_string(self, id_s):
+        _actual = self.error_structure_at('identifier_string')
+        self.assertEqual(_actual, id_s)
+
+    def tells_you_it_might_be_out_of_order(self):
+        self.assertTrue(self._might_be_out_of_order_yes_no())
+
+    def tells_you_it_was_NOT_out_of_order(self):
+        self.assertFalse(self._might_be_out_of_order_yes_no())
+
+    def _might_be_out_of_order_yes_no(self):
+        return self.error_structure_at('might_be_out_of_order')
+
+    def expect_not_found_input_error_type(self):
+        _actual = self.error_structure_at('input_error_type')
+        self.assertEqual(_actual, 'not_found')
+
     def expect_entity_has_this_identifier(self, id_s):
         otl = self.open_table_line_object()
         self.assertEqual(otl.identifier_string, id_s)
@@ -170,16 +187,14 @@ class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
 
 class Case259_not_found(_CommonCase):
 
-    def test_100_input_error_type(self):
-        _actual = self.error_structure_at('input_error_type')
-        self.assertEqual(_actual, 'not_found')
+    def test_100_input_error_type_is_not_found(self):
+        self.expect_not_found_input_error_type()
 
-    def test_200_ID_string_alone(self):
-        _actual = self.error_structure_at('identifier_string')
-        self.assertEqual(_actual, 'BBCC')
+    def test_200_the_error_structure_has_the_ID_string(self):
+        self.error_structure_has_identifier_string('BBCC')
 
     def test_300_tells_you_if_it_might_be_because_out_of_order(self):
-        self.assertTrue(self.error_structure_at('might_be_out_of_order'))
+        self.tells_you_it_might_be_out_of_order()
 
     def test_400_reason_is_straightforward(self):
         _actual = self.error_structure_at('reason')
@@ -284,18 +299,22 @@ def _given_ABC_lines():
     """))
 
 
-class Case278_against_empty(_CommonCase):  # future feature 5: blank files
+class Case278_against_empty(_CommonCase):
 
-    def test_100_currently_failure_is_parse_failure(self):
-        es = self.error_structure()
-        es['expecting_any_of']
-        self.assertTrue(es['did_reach_end_of_stream'])
+    # #wish [#867.G] empty files would tell you they're empty in this case
 
+    def test_100_input_error_type_is_not_found(self):
+        self.expect_not_found_input_error_type()
+
+    def test_200_the_error_structure_has_the_ID_string(self):
+        self.error_structure_has_identifier_string('FF')
+
+    def test_300_tells_you_it_was_NOT_out_of_order(self):
+        self.tells_you_it_was_NOT_out_of_order()
+
+    @shared_subject
     def error_structure(self):
-        return self.structure_via_expect_input_error()
-
-    def given_run(self, listener):
-        return self.run_retrieve(listener)
+        return self.retrieve_expecting_failure()
 
     def given_identifier(self):
         return 'FF'

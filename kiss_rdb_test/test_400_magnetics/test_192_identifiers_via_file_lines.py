@@ -10,7 +10,7 @@ class _CommonCase(unittest.TestCase):
 
     def expecting_any_of_these_common_things(self):
         o = self.emitted_elements()
-        _ = ('blank line', 'comment line', 'section line')
+        _ = ('blank line', 'comment line', 'section line', 'end of input')
         self.assertEqual(o['expecting_any_of'], _)
 
     def line_number_but_not_position(self, lineno):
@@ -82,46 +82,14 @@ class _CommonCase(unittest.TestCase):
         raise Exception('ha ha')
 
 
-class Case055_truly_blank_file(_CommonCase):
+class Case055_truly_blank_file_produces_empty_stream(_CommonCase):
     """
-    necessary discussion:
-
-    rather than have an ad-hoc hard-coded check for the various circumstances
-    of state that are true for when a file with no lines is what "caused" the
-    input error, we can generalize the expression so we have less code but the
-    code is more powerful.
-
-    a file with no lines now triggers the error in this way: we are in the
-    "start" state and the special "end of stream" token is received. there is
-    no state transition out that state for that token.
-
-    this is a better way to implement the behavior because it's a more
-    general implementation that can still effect the target behavior (+ or -).
-
-    so for example you can more easily design a grammar that accomodates
-    empty input simply by rearranging your state machine.
-
-      - the changes discussed here happened in #tombstone-A.1
-      - this tombstone buried the production "no lines in input", which
-        is very CLI-ready production but had to go for reasons
-      - now this is more structured but more opaque: to determine that
-        there were no lines in file, you have to detect both:
-          - that the end was reached AND
-          - that the current line is 0 (not a line)
+    (language production for "no lines in input" in #tombstone-A.1)
     """
 
-    def test_100_it_says_that_you_DID_reach_EOS(self):
-        self.you_can_see_that_EOS_was_reached()
-
-    def test_200_IFF_a_first_line_is_never_parsed__these_two_things(self):
-        self.line_number_but_not_position(0)
-
-    def test_300_new_in_this_case__expecting_any_of__an_array(self):
-        self.expecting_any_of_these_common_things()
-
-    @shared_subject
-    def emitted_elements(self):
-        return self.run_expecting_structured_input_error()
+    def test_100_all(self):
+        _ = self.run_non_validating_ID_traversal_expecting_success()
+        self.assertSequenceEqual(_, ())
 
     def given_lines(self):
         return ()
@@ -155,23 +123,14 @@ class Case065_sneak_oxford_join_coverage_into_here(_CommonCase):
         self.assertEqual(_actual, expected_string)
 
 
-class Case075_early_end_of_non_empty_file(_CommonCase):
+class Case075_effectively_empty_file_produces_empty_stream(_CommonCase):
 
     # lost a message production at #tombstone-A.1:
     # 'file has no sections (so no entities)'
 
-    def test_100_you_can_see_that_EOS_was_reached(self):
-        self.you_can_see_that_EOS_was_reached()
-
-    def test_200_parse_state_still_holds_the_LAST_line_parsed(self):
-        self.line_number_but_not_position(2)
-
-    def test_300_the_expecting_message_hints_at_syntax__whats_required(self):
-        self.expecting_any_of_these_common_things()
-
-    @shared_subject
-    def emitted_elements(self):
-        return self.run_expecting_structured_input_error()
+    def test_100_all(self):
+        _ = self.run_non_validating_ID_traversal_expecting_success()
+        self.assertSequenceEqual(_, ())
 
     def given_lines(self):
         return ('# comment line\n', '# comment line 2\n')
@@ -332,5 +291,6 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #tombstone-A.2: blank files become OK,remove discussion of how great SM's are
 # #tombstone-A.1: as referenced
 # #born.

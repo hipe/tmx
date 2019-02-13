@@ -325,15 +325,7 @@ not thinking about it too deeply for now.
 
 
 
-## future feature 5
-
-blank files. originally we thought we wanted forced parsimony of saying
-blank files were not ok but we will probably reverse this (because VCS
-history)..
-
-
-
-
 ## (document-meta)
 
+  - #history-A.1: remove discussion of why we want blank files
   - #born.

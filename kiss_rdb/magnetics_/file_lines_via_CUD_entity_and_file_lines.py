@@ -44,6 +44,10 @@ def new_lines_via_create_and_existing_lines(
 
 def _new_lines_via_chunky_actionser(client, id_s, new_s_a, big_s_a, listener):
 
+    from kiss_rdb.magnetics_.identifiers_via_file_lines import (
+            state_machine_ as _my_state,  # before #tombstone-A.1 we used to et
+            )
+
     def actionser(parse_state):
         actions = _ActionsForCUD(client, id_s, new_s_a, parse_state)
 
@@ -214,7 +218,7 @@ class _ActionsForCUD:
                 if not ok:
                     return
         else:
-            # perhaps passthru which happened above (CaseXXX)
+            # perhaps passthru which happened above
             ok, a_2 = o.client.subchunk_two_when_done_searching(o)
             if not ok:
                 return
@@ -436,7 +440,7 @@ class _ActionsForCreate:
 
         argument entity, we call this the "mode-change".
 
-        we are only just now stepping into the section;; we haven't found its
+        we are only just now stepping into the section; we haven't found its
         end yet. the lines of our argument entity are released below, and the
         lines of the document entity we are stepping in to will be cached as
         normal and released in the next chunk #here1.
@@ -485,29 +489,6 @@ class _ActionsForCreate:
         return (okay, o.release_cache())
 
 
-def _():
-    """this is a TOTALLY EXPERIMENTAL trip: make a duplicate of the state
-
-    machine that is modified in this way: add a transition from the start
-    state to the done state. to accomplish this we re-use the existing
-    such transition because we can. EEK
-    """
-
-    from kiss_rdb.magnetics_.identifiers_via_file_lines import (
-            state_machine_ as sm,
-            )
-
-    _tr = sm.state_bodies['inside entity'].transition_for_end_of_stream
-    return sm.modified(
-            modify_states=(
-                ('start', lambda sb: sb.modified(append_transitions=(_tr,))),
-                )
-            )
-
-
-_my_state = _()
-
-
 def known_error_case_yet_to_cover():
     raise Exception('known error case yet to cover')
 
@@ -515,4 +496,5 @@ def known_error_case_yet_to_cover():
 def cover_me():
     raise Exception('cover me')
 
+# #tombstone-A.1: got rid of mutate state machine,now empty files OK everywhere
 # #born.

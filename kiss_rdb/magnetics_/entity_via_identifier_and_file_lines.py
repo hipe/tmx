@@ -126,7 +126,7 @@ def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
         # open-table lines OR because (more likely) we found an open table
         # line that didn't match exactly the ID for which we are scooping
         # adjacent tables. whether or not we have to do one extra trailing
-        # wallow depends on which.
+        # swallow depends on which.
 
         if do_swallow:
             do_exclude_last_line = False  # (Case272)

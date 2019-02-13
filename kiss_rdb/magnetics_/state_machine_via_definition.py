@@ -151,19 +151,6 @@ class StateMachine:
 
         self.state_bodies = {k: _StateBody(v) for (k, v) in transitions_via_state_name.items()}  # noqa: E501
 
-    def modified(self, modify_states):
-        dct = {k: v for (k, v) in self.state_bodies.items()}
-        for state_name, f in modify_states:
-            dct[state_name] = f(dct[state_name])
-
-        otr = self.__class__()
-        otr.__init_duplicate(self.callback_names, dct)  # ..
-        return otr
-
-    def __init_duplicate(self, tup, dct):
-        self.callback_names = tup
-        self.state_bodies = dct
-
     def parse(self, all_lines, parse_actionser, listener):
         return _parse(all_lines, parse_actionser, self, listener)
 
@@ -193,12 +180,6 @@ class _StateBody:
         self.available_transitions_for_during_stream = use_transes
         self.can_match_end_of_stream = has
 
-    def modified(self, append_transitions):
-        assert(not self.can_match_end_of_stream)
-        _ = (*self.available_transitions_for_during_stream,
-             *append_transitions)
-        return self.__class__(_)
-
 
 class _Transition:
 
@@ -220,7 +201,13 @@ def _when_transition_not_found(ps, sm):
         if o.can_match_end_of_stream:
             use_transes = (*use_transes, o.transition_for_end_of_stream)
 
-        s_a = tuple(trans.matcher.noun_phrase for trans in use_transes)
+        def f(matcher):
+            if matcher is None:
+                return 'end of input'
+            else:
+                return matcher.noun_phrase
+
+        s_a = tuple(f(trans.matcher) for trans in use_transes)
 
         return {
                 'expecting_any_of': s_a,
@@ -259,5 +246,6 @@ _stop = (_not_ok, None)
 _ok = True
 _nothing = (_ok, None)
 
+# #tombstone-A.2: archive ability to mutate state machines (no longer needed)
 # #history-A.1: introduced experimental dup-and-mutate behavior
 # #born.

@@ -14,9 +14,9 @@ ruby -e 'base=100;span=550; (1..5).each{|i| puts base + (1.0 * i / 6 * span)}'
 
 nl050[label="
 test file 192: ID's via file lines|
-<055>Case055_truly_blank_file|
+<055>Case055_truly_blank_file_produces_empty_stream|
 <065>Case065_sneak_oxford_join_coverage_into_here|
-<075>Case075_early_end_of_non_empty_file|
+<075>Case075_effectively_empty_file_produces_empty_stream|
 <085>Case085_an_ordinary_looking_line|
 <095>Case095_not_quite_section_line|
 <105>Case105_section_but_no_dots|
@@ -24,6 +24,18 @@ test file 192: ID's via file lines|
 <125>Case125_too_many_components|
 <135>Case135_non_validated_ID_traversal_one|
 <145>Case145_non_validated_ID_traversal_two
+"
+]
+
+nl063[label="
+test file 329: block stream (\"coarse parse\")|
+<157>Case157_simplified_typical|
+<171>Case171_effectively_empty_file_of_course_has_head_block|
+<186>Case186_truly_empty_file_has_no_head_block|
+<200>Case200_error_in_open_table_line|
+<215>Case215_error_in_attribute_value_passes_thru_for_now|
+<229>Case229_one_no_head|
+<243>Case243_two_yes_head
 "
 ]
 
@@ -52,7 +64,7 @@ test file 375: entity via identifier and file lines|
 <366>Case366_literal_string_not_yet_supported|
 <372>Case372_multi_line_literal_string_not_yet_supported|
 <378>Case378_multi_line_basic_not_yet_supported|
-<381>test_381_basic_string_simple  # Case381|
+<384>test_384_basic_string_simple  # Case384|
 <391>test_391_basic_string_empty  # Case391|
 <397>test_397_escape  # Case397
 "
@@ -80,12 +92,12 @@ test file 650: CUD entities|
 
 
 nodeRight[label="
-<100>\n\n\n\n(100) traverse entity ID's in document\n\n\n\n\n\n|
-<200>\n\n\n\n(200) traverse entities in document\n\n\n\n|
-<300>\n\n\n\n(300) retrieve one entity\n\n\n\n|
-<500>\n\n\n\n(500) create\n\n\n\n|
-<700>\n\n\n(700) delete\n\n\n\n|
-<900>\n\n\n(900) update\n\n\n\n
+<100>\n\n\n\n(100) traverse entity ID's in document\n\n\n\n\n|
+<200>\n\n\n\n(200) traverse entities in document\n\n\n\n\n|
+<300>\n\n\n\n\n\n\n\n\n\n(300) retrieve one entity\n\n\n\n\n\n\n\n\n\n\n\n|
+<500>\n\n(500) create\n\n\n|
+<700>\n\n(700) delete\n\n\n|
+<900>\n\n(900) update\n\n\n
 "
 fontsize=22
 ]
@@ -100,6 +112,15 @@ nl050:115->nodeRight:100
 nl050:125->nodeRight:100
 nl050:135->nodeRight:100
 nl050:145->nodeRight:100
+
+
+nl063:157->nodeRight:200
+nl063:171->nodeRight:200
+nl063:186->nodeRight:200
+nl063:200->nodeRight:200
+nl063:215->nodeRight:200
+nl063:229->nodeRight:200
+nl063:243->nodeRight:200
 
 
 nl075:253->nodeRight:300

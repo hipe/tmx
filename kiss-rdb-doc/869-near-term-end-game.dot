@@ -1,0 +1,33 @@
+digraph g {
+rankdir=BT
+node[shape=rect]
+
+833->944
+722->944
+944[label="CLI"]
+611->833
+833[label="true\ndelete"]
+611->722
+722[label="true\ncreate"]
+500->611
+611[label="then"]
+389->611
+389[label="F"]
+278->500
+500[label="index"]
+278->389
+389[label="file\nlock"]
+167->278
+278[label="add new\ncases to\nCUD"]
+056->167
+167[label="rewrite\nCUD"]
+056[label="coarse\nblock\nstream" style=filled]
+
+
+label="
+
+fig 869."
+}
+/*
+#born.
+*/

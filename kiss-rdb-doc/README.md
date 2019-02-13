@@ -28,6 +28,8 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#867.G]                   | #wish | empty files would tell you they're empty
+|[#867.F]                   | #open | found a bug
 |[#867.E]                   | #open | non-integrated testpoint island
 |[#867.D]                   | #open | these datetime forms not supported in python toml
 |[#867.C]                   | #open | known error cases yet to cover (not comprehensive)

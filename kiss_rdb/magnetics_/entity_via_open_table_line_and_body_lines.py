@@ -109,6 +109,13 @@ class _MutableDocumentEntity:
     def TO_BODY_LINE_OBJECT_STREAM(self):
         return self._LL.to_item_stream()
 
+    @property
+    def identifier_string(self):
+        return self._open_table_line_object.identifier_string
+
+    @property
+    def table_type(self):
+        return self._open_table_line_object.table_type
 
 # -- parsey things used in parsing attribute lines
 

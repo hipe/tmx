@@ -4,14 +4,19 @@ from kiss_rdb.magnetics_ import (
         )
 
 
-def traverse_IDs_without_validating__(all_lines, listener):
+def block_stream_via_file_lines(file_lines, listener):
+    _actionser = _actionser_via_class(_ActionsForCoarseParse)
+    return parse_(file_lines, _actionser, listener)
+
+
+def traverse_IDs_without_validating__(file_lines, listener):
     # #open [#867.E] #testpoint island
     _actionser = _actionser_via_class(Actions_for_ID_Traversal_Non_Validating_)
-    return parse_(all_lines, _actionser, listener)
+    return parse_(file_lines, _actionser, listener)
 
 
-def parse_(all_lines, actionser, listener):
-    return state_machine_.parse(all_lines, actionser, listener)
+def parse_(file_lines, actionser, listener):
+    return state_machine_.parse(file_lines, actionser, listener)
 
 
 def _actionser_via_class(cls):
@@ -21,6 +26,88 @@ def _actionser_via_class(cls):
         pa = cls(ps)
         return f
     return actionser
+
+
+class _ActionsForCoarseParse:
+
+    def __init__(self, parse_state):
+
+        # cache every line (including head lines)
+
+        def f():
+            self._line_cache.append(parse_state.line)
+        parse_state.on_line_do_this(f)
+        self._line_cache = []
+
+        # for now we realize this dependency late (when we are constructed)
+        from .entity_via_open_table_line_and_body_lines import (
+                mutable_document_entity_via_open_table_line_and_body_lines as _
+                )
+        self._entity_via = _
+
+        # do something different between first table and the rest
+        self._on_section_start = self._on_first_section_start
+        self._at_end_of_input = self._at_end_of_input_in_empty_file
+
+        self._listener = parse_state.listener
+
+    def on_section_start(self):
+        return self._on_section_start()
+
+    def at_end_of_input(self):
+        return self._at_end_of_input()
+
+    def _on_first_section_start(self):
+        # whether empty or not, we guarantee exactly one head block
+
+        self._on_section_start = self._on_subsequent_section_start
+        self._at_end_of_input = self._at_end_of_input_normally
+        return (okay, _HeadBlock(tuple(self._turn_over_lines())))
+
+    def _on_subsequent_section_start(self):
+        _lines = self._turn_over_lines()
+        return self._MDE_via(_lines)
+
+    def _at_end_of_input_in_empty_file(self):
+
+        lines = self._release_all_lines()
+        if len(lines):
+            return (okay, _HeadBlock(tuple(lines)))  # (Case171)
+        else:
+            return stop  # (Case186)
+
+    def _at_end_of_input_normally(self):
+        # this is different from the other place where we make an MDE in
+        # that here we must *not* backtrack over the line cache by one line
+
+        return self._MDE_via(self._release_all_lines())
+
+    def _MDE_via(self, lines):
+        open_table_line, *body_lines = lines
+        otl = open_table_line_via_line_(open_table_line, self._listener)
+        if otl is None:
+            return stop  # (Case200)
+
+        mde = self._entity_via(otl, body_lines, self._listener)
+        if mde is None:
+            cover_me()  # ..
+            return stop
+
+        return (okay, mde)
+
+    # -- these two
+
+    def _turn_over_lines(self):
+        # assume this is happening at section start
+        # backtrack over the line that ended up being an open table line
+        lc = self._line_cache
+        self._line_cache = [lc.pop()]
+        return lc
+
+    def _release_all_lines(self):
+        lines = self._line_cache
+        del(self._line_cache)
+        return lines
 
 
 class Actions_for_ID_Traversal_Non_Validating_:
@@ -181,6 +268,7 @@ def _define_state_machine(o):  # interface here is VERY experimental!
             o(blank),
             o(comment),
             o(section, call='on_section_start', transition_to='inside entity'),
+            o(None, call='at_end_of_input')  # this must be the last rule
             ),
         'inside entity': (
             o(key_value),  # ..
@@ -199,10 +287,24 @@ def _define_state_machine(o):  # interface here is VERY experimental!
 state_machine_ = sm_lib.StateMachine(_define_state_machine)
 
 
+# ==
+
+class _HeadBlock:
+    def __init__(self, lines):
+        self.LINES = lines
+
+# ==
+
+
+def cover_me():
+    raise Exception('cover me')
+
+
 not_ok = False
 stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
+# #history-A.2: becomes stowaway location for "coarse parse"
 # #history-A.1: simplify open-table line finding to be eager
 # #born.
