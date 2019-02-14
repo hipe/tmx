@@ -111,7 +111,7 @@ class _CommonCase(unittest.TestCase):
         self._expect_doc_ent_lines(self.subject(), _expected_lines_gen)
 
     def _expect_doc_ent_lines(self, mde, exp_lines_gen):
-        _actual_lines_gen = mde.TO_LINES()
+        _actual_lines_gen = mde.to_line_stream()
         self._expect_lines(_actual_lines_gen, exp_lines_gen)
 
     def _expect_doc_ent_body_lines(self, mde, exp_lines_gen):

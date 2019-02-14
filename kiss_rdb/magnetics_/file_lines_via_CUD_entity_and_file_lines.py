@@ -37,9 +37,15 @@ def new_lines_via_create_and_existing_lines(
         listener,
         ):
 
-    _ = _ActionsForCreate()
-    return _new_lines_via_chunky_actionser(
-            _, identifier_string, incoming_lines, existing_lines, listener)
+    _args_for_CUD_function = (identifier_string, incoming_lines)
+
+    return LINE_STREAM_THE_NEW_WAY(
+            _args_for_CUD_function,
+            CREATE_THE_NEW_WAY,
+            incoming_lines,
+            existing_lines,
+            listener,
+            )
 
 
 def _new_lines_via_chunky_actionser(client, id_s, new_s_a, big_s_a, listener):
@@ -63,6 +69,9 @@ def _new_lines_via_chunky_actionser(client, id_s, new_s_a, big_s_a, listener):
 
 
 """overview:
+
+#todo: this whole comment block will hopefully go away soon...
+
 the implementation of our parse actions occurs at the confluence of many
 considerations. throughout this implementation we'll observe that the
 manner in which these considerations fit together is not entirely self-
@@ -422,79 +431,143 @@ class _ActionsForUpdateOrDelete:
         o.reengage_the_cache([ps.line])
 
 
-class _ActionsForCreate:
+def LINE_STREAM_THE_NEW_WAY(
+        args_for_CUD_function,
+        CUD_function,
+        incoming_lines,
+        existing_lines,
+        listener):
 
-    def __init__(self):
-        pass  # hi.
+    from .identifiers_via_file_lines import (
+            block_stream_via_file_lines,
+            ErrorMonitor_)
 
-    def subchunk_one_on_nonfirst_section(self, o):
-        """it must be the case that there are lines of a previous section
+    monitor = ErrorMonitor_(listener)
 
-        to flush. (this is common.) (:#here1) (Case550)
-        """
+    _block_itr = block_stream_via_file_lines(existing_lines, monitor.listener)
 
-        return (okay, o.step_the_cache())
+    _block_itr = BLOCK_STREAM_THE_NEW_WAY(
+            args_for_CUD_function,
+            CUD_function,
+            _block_itr,
+            monitor)
 
-    def subchunk_two_when_greater_than(self, o):
-        """when we find the first section in the document that goes after the
+    for block in _block_itr:
+        for line in block.to_line_stream():
+            yield line
 
-        argument entity, we call this the "mode-change".
 
-        we are only just now stepping into the section; we haven't found its
-        end yet. the lines of our argument entity are released below, and the
-        lines of the document entity we are stepping in to will be cached as
-        normal and released in the next chunk #here1.
+def BLOCK_STREAM_THE_NEW_WAY(args, CUD_function, block_itr, monitor):
 
-        we call it a "mode change" because it's a major change in how the
-        document will be processed from here on out: in a well-formed & valid
-        document (ergo ordered) there is no longer a need to search for where
-        to insert the new entity. the remainder of the document can simply
-        be passed thru without the need to parse section lines. (Case517)
-        """
+    # == always same for head block
 
-        o.be_no_longer_searching()  # effectuate the "mode change"
-        return (okay, o.release_new_lines())
+    head_block = None
+    for head_block in block_itr:
+        break
 
-    def subchunk_two_when_equal(self, o):
-        # when doing a CREATE, finding a section that is equal
-        # is an error condition..
-        known_error_case_yet_to_cover()  # #open #[#867.C]
+    if not monitor.ok:
+        return
 
-    def subchunks_at_end_when_still_searching(self, o):
-        if o.just_left_start_state:
-            if o.has_more_than_zero_cached_lines:
-                # append after head fluff (effectively empty) (Case450)
-                a_1 = o.release_cache()
-            else:
-                # "append" into literally empty file (Case417)
-                a_1 = None
+    if head_block is None:
+        # the only OK way there can be head block None is when the file is
+        # truly empty (or non-existent) (Case417). our hope is that for all
+        # of C, U and D the CUD_function can implement itself indifferently.
+        pass
+    else:
+        yield head_block
+
+    # ==
+
+    _block_itr = __block_stream_check_order(block_itr, monitor.listener)
+
+    _block_itr = CUD_function(*args, _block_itr, monitor)
+
+    for block in _block_itr:
+        yield block
+
+
+# ==
+
+def CREATE_THE_NEW_WAY(id_s, new_entity_lines, block_itr, monitor):
+
+    # find the first item that is greater. output those that are lesser.
+
+    first_greater = None
+    for de in block_itr:
+        if de.identifier_string < id_s:
+            yield de
+        elif de.identifier_string == id_s:
+            cover_me('erroneous monk - this has a case')
         else:
-            # output the one or more lines of cached entity then the
-            # lines of the argument entity (Case483). (note this is
-            # the same as an above but different semantics
-            a_1 = o.release_cache()
-        a_2 = o.release_new_lines()
-        return (okay, (a_1, a_2))
+            # NOTE this means we have found a first document entity that
+            # has an identifier string that is greater. we use this below!
+            first_greater = de
+            break
 
-    def subchunk_one_at_end_when_not_searching(self, o):
-        """you're at the end of input and you're no longer searching. no
+    if not monitor.ok:
+        return
 
-        longer searching means you found the mode-changing section. this means
-        you must have seen one or more sections. this means there must be some
-        lines in the cache yet to flush (the last section you've seen, waiting
-        to find its last line). this means there's one or more lines in the
-        cache to flush. (Case517) :#here2
-        """
+    # output the new lines
 
-        return (okay, o.release_cache())
+    yield _LinesAsBlock(new_entity_lines)
+
+    # output that first (any) one we found that was greater.
+
+    if first_greater is not None:
+        yield first_greater
+
+    # output any of the remainder (this could fail at any step in traversal)
+
+    for de in block_itr:
+        yield de
+
+
+# ==
+
+
+def __block_stream_check_order(block_itr, listener):
+
+    # new in #history-A.2, for each of CUD, ensure this
+
+    none = True
+    for de in block_itr:
+        none = False
+        break
+
+    if none:
+        return
+
+    yield de
+
+    curr_id_s = de.identifier_string
+
+    for de in block_itr:
+        next_id_s = de.identifier_string
+
+        if curr_id_s < next_id_s:  # this is how it is supposed to be
+            curr_id_s = next_id_s
+            yield de
+            continue
+
+        cover_me('original doohah out of order')  # #todo
+
+
+class _LinesAsBlock:
+
+    def __init__(self, lines):
+        self._lines = lines
+
+    def to_line_stream(self):
+        return self._lines  # while it works :P
 
 
 def known_error_case_yet_to_cover():
     raise Exception('known error case yet to cover')
 
 
-def cover_me():
-    raise Exception('cover me')
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.2: begin rewrite of CUD using block stream not parse actions
 # #tombstone-A.1: got rid of mutate state machine,now empty files OK everywhere
 # #born.

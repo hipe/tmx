@@ -97,7 +97,7 @@ class _MutableDocumentEntity:
 
     # == READ
 
-    def TO_LINES(self):
+    def to_line_stream(self):
         yield self._open_table_line_object.line
         for lo in self.TO_BODY_LINE_OBJECT_STREAM():
             yield lo.line

@@ -7,7 +7,7 @@ import unittest
 class _CommonCase(unittest.TestCase):
 
     def is_head_block_with_this_many_lines(self, x, num):
-        self.assertEqual(len(x.LINES), num)
+        self.assertEqual(len(x._lines), num)
 
     def is_attributes_table_with_this_name(self, mde, id_s):
         self.assertEqual(mde.table_type, 'attributes')
@@ -101,7 +101,7 @@ class Case171_effectively_empty_file_of_course_has_head_block(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         hb = self.head_block()
-        lines = hb.LINES
+        lines = hb._lines
         self.assertEqual(lines[0], "# hi hunger i'm dad. blank line next.\n")
         self.assertEqual(lines[1], '\n')
         self.assertEqual(len(lines), 2)

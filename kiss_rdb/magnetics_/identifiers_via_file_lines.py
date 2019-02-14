@@ -290,10 +290,47 @@ state_machine_ = sm_lib.StateMachine(_define_state_machine)
 # ==
 
 class _HeadBlock:
+
     def __init__(self, lines):
-        self.LINES = lines
+        self._lines = lines  # #testpoint
+
+    def to_line_stream(self):
+        return self._lines  # hwile it works
 
 # ==
+
+
+class ErrorMonitor_:
+    """wrap a listener in another listener that monitors for failure.
+
+    this is a band-aide as a response to the audacious suggestion that
+    iterators can be something of a leaky abstraction:
+
+    they make everything look clean for normal cases, but if something
+    "soft fails" while traversing the "stream", we have no way of knowing
+    that our exit from the loop is premature (that is, that the last item
+    yielded was not actually the _last_ item), because we are trapped behind
+    and limited by the iterator interface.
+
+    consider the case of replacing the lines of a file with a list of
+    modified lines. an iterator (of the new lines) is the compelling choice
+    for lots of reasons. however, for such a case it is absolutely essential
+    that we know that nothing failed by the time the iteration has ended.
+
+    using exceptions as the band-aide would be even worse.
+    """
+
+    def __init__(self, listener):
+        self.ok = True
+        self.experimental_mutex = None  # go this away if it's annoying
+
+        def my_listener(*chan):
+            if 'error' == chan[0]:
+                del self.experimental_mutex
+                self.ok = False
+                listener(*chan)
+
+        self.listener = my_listener
 
 
 def cover_me():
@@ -305,6 +342,7 @@ stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
+# #history-A.3: "error monitor" moved to here from elsewhere
 # #history-A.2: becomes stowaway location for "coarse parse"
 # #history-A.1: simplify open-table line finding to be eager
 # #born.

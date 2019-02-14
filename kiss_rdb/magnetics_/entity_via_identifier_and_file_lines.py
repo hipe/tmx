@@ -1,4 +1,5 @@
 from .identifiers_via_file_lines import (
+        ErrorMonitor_,
         not_ok, okay, stop,
         )
 import re
@@ -134,7 +135,7 @@ def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
 
         return gulps
 
-    monitor = _Monitor(listener)  # see
+    monitor = ErrorMonitor_(listener)  # see
 
     # -- begin gross hack to be able to reach in and get parse state
 
@@ -476,39 +477,6 @@ def _emit_input_error_via_reason(reason, listener):
 
 def _emit_input_error_via_structurer(f, listener):
     listener('error', 'structure', 'input_error', f)
-
-
-class _Monitor:  # might abstract
-    """wrap a listener in another listener that monitors for failure.
-
-    this is a band-aide as a response to the audacious suggestion that
-    iterators can be something of a leaky abstraction:
-
-    they make everything look clean for normal cases, but if something
-    "soft fails" while traversing the "stream", we have no way of knowing
-    that our exit from the loop is premature (that is, that the last item
-    yielded was not actually the _last_ item), because we are trapped behind
-    and limited by the iterator interface.
-
-    consider the case of replacing the lines of a file with a list of
-    modified lines. an iterator (of the new lines) is the compelling choice
-    for lots of reasons. however, for such a case it is absolutely essential
-    that we know that nothing failed by the time the iteration has ended.
-
-    using exceptions as the band-aide would be even worse.
-    """
-
-    def __init__(self, listener):
-        self.ok = True
-        self.experimental_mutex = None  # go this away if it's annoying
-
-        def my_listener(*chan):
-            if 'error' == chan[0]:
-                del self.experimental_mutex
-                self.ok = False
-                listener(*chan)
-
-        self.listener = my_listener
 
 
 class _Pointer:
