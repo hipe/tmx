@@ -20,7 +20,7 @@ node[shape=rect]
 167->278
 278[label="add new\ncases to\nCUD"]
 056->167
-167[label="rewrite\nCUD"]
+167[label="rewrite\nCUD" style=filled]
 056[label="coarse\nblock\nstream" style=filled]
 
 

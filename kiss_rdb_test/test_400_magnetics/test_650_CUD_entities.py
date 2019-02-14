@@ -309,7 +309,7 @@ class Case740_delete_at_end(_CommonCase):
         """
 
 
-class Case780_delete_leaving_effectively_empty_file(_CommonCase):  # 875 OLD
+class Case780_delete_leaving_effectively_empty_file(_CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()

@@ -5,4 +5,3 @@ true delete
 be able to map (index) ID's for a whole collection
 integrate w/ lock & rewrite file
 add new cases to CUD
-refactor existing CUD tests. out w/ parse actions, in w/ coarse stream
