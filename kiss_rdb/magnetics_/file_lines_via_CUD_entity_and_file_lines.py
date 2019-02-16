@@ -2,19 +2,16 @@
 
 def new_lines_via_delete_and_existing_lines(
         identifier_string,
-        incoming_lines,
         existing_lines,
         listener,
         ):
-
-    assert(incoming_lines is None)
 
     _args_for_CUD_function = (identifier_string,)
 
     return LINE_STREAM_THE_NEW_WAY(
             _args_for_CUD_function,
             DELETE_THE_NEW_WAY,
-            incoming_lines,
+            None,  # nothing for incoming lines
             existing_lines,
             listener,
             )
@@ -95,7 +92,7 @@ def BLOCK_STREAM_THE_NEW_WAY(args, CUD_function, block_itr, monitor):
 
     if head_block is None:
         # the only OK way there can be head block None is when the file is
-        # truly empty (or non-existent) (Case417). our hope is that for all
+        # truly empty (or non-existent) (Case408). our hope is that for all
         # of C, U and D the CUD_function can implement itself indifferently.
         pass
     else:
@@ -144,7 +141,7 @@ def UPDATE_THE_NEW_WAY(id_s, new_entity_lines, block_itr, monitor):
 
 def DELETE_THE_NEW_WAY(id_s, block_itr, monitor):
 
-    # this is a copy-paste-modify of DELETE that's unabstracted for clarity.
+    # this is a copy-paste-modify of UPDATE that's unabstracted for clarity.
 
     # output entities that are lesser while searching for one that is equal.
 
@@ -161,7 +158,8 @@ def DELETE_THE_NEW_WAY(id_s, block_itr, monitor):
         return
 
     if not did_find:
-        cover_me('hi woot 1')  # #open #[#867.C]
+        _whine_about_entity_not_found(id_s, monitor.listener)  # (Case707)
+        return
 
     # output any remaining entities in the file (this might fail at any point)
 
@@ -241,6 +239,17 @@ class _LinesAsBlock:
     def to_line_stream(self):
         return self._lines  # while it works :P
 
+
+# == whiners
+
+def _whine_about_entity_not_found(id_s, listener):
+    def structurer():
+        _reason = f'entity {repr(id_s)} is not in file'
+        return {'reason': _reason}
+    listener('error', 'structure', 'input_error', structurer)
+
+
+# ==
 
 def known_error_case_yet_to_cover():
     raise Exception('known error case yet to cover')

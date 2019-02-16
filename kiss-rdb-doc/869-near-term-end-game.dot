@@ -2,25 +2,41 @@ digraph g {
 rankdir=BT
 node[shape=rect]
 
-833->944
-722->944
 944[label="CLI"]
-611->833
-833[label="true\ndelete"]
-611->722
-722[label="true\ncreate"]
-500->611
-611[label="then"]
-389->611
-389[label="F"]
-278->500
-500[label="index"]
-278->389
-389[label="file\nlock"]
-167->278
-278[label="add new\ncases to\nCUD"]
-056->167
+844->944
+
+
+844[label="typed values\nvia CLI values"]
+389->844
+
+
+389[label="locking: thru schema\nintegrate CUD with\nfile (semaphore) locking"]
+633->389
+187->389
+
+
+633[label="create thru schema\nintegrated w/\nattributes & provision"]
+500->633
+167->633
+500[label="re-create new\nindex file"]
+480->500
+480[label="provision new\nID pseduo-\nrandomly"]
+722->480
+722[label="create index file thru\nschema's traversal"]
+460->722
+460[label="full tree\ntraversal\nthru schema"]
+
+
+187[label="update thru schema\nintegated with\nattributes"]
+833->187
+
+
+833[label="delete\nthru schema" style=filled]
+167->833
+
+
 167[label="rewrite\nCUD" style=filled]
+056->167
 056[label="coarse\nblock\nstream" style=filled]
 
 

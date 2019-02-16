@@ -1,7 +1,11 @@
 creative self actualization
 maybe a CLI (explode me)
-function for create (random allocation of new ID)
-true delete
-be able to map (index) ID's for a whole collection
-integrate w/ lock & rewrite file
-add new cases to CUD
+typed values via CLI values
+integrate CUD thru schema with file (semaphore) locking
+create thru schema integrated with attributes & allocation
+re-create the new index file after provisioning
+provision new ID pseudo-randomly
+create the index file thru schema
+full tree traversal thru schema
+update thru schema integrated with attributes
+delete thru schema

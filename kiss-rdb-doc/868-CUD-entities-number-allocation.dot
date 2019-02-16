@@ -70,34 +70,48 @@ test file 375: entity via identifier and file lines|
 "
 ]
 
-nodeLeft[label="
+nl085[label="
 test file 650: CUD entities|
-<417>Case417_create_against_truly_empty_file|
-<450>Case450_create_against_effectively_empty_file_with_comments|
-<483>Case483_create_that_appends_entity_to_the_very_end|
-<517>Case517_create_that_inserts_at_the_front|
-<550>Case550_create_that_inserts_in_between|
-<583>Case583_create_that_inserts_in_between_no_props|
-<620>Case620_delete_at_head_no_fluff|
-<660>Case660_delete_at_head_yes_fluff|
-<700>Case700_delete_in_middle|
-<742>Case742_delete_at_end|
-<780>Case780_delete_leaving_effectively_empty_file|
-<825>Case825_update_at_beginning|
-<875>Case875_update_beginning_no_props|
-<925>Case925_update_in_middle|
-<975>Case975_update_at_end
+<408>Case408_create_against_truly_empty_file|
+<425>Case425_create_against_effectively_empty_file_with_comments|
+<441>Case441_create_that_appends_entity_to_the_very_end|
+<458>Case458_create_that_inserts_at_the_front|
+<475>Case475_create_that_inserts_in_between|
+<492>Case492_create_that_inserts_in_between_no_props|
+<510>Case510_delete_at_head_no_fluff|
+<530>Case530_delete_at_head_yes_fluff|
+<550>Case550_delete_in_middle|
+<570>Case570_delete_at_end|
+<590>Case590_delete_leaving_effectively_empty_file|
+<613>Case613_update_at_beginning|
+<638>Case638_update_beginning_no_props|
+<663>Case663_update_in_middle|
+<688>Case688_update_at_end
 "
 ]
 
+nl100[label="
+test file 680: file rewrite request via collection (test cases 700-799)|
+<705>0-9: delete thru schema|
+<715>10-19: update integ w attributes|
+<725>20-29: full trav thru schema|
+<735>30-39: create initial index file|
+<745>40-49: provision new ID pseudo-randomly|
+<755>50-59: re-ceate new index file|
+<765>60-69: create thru schema integ w attrs & provision|
+<775>70-79: file locking!|
+<785>80-89: typed values via CLI values|
+<795>90-99: CLI lol
+"]
 
 nodeRight[label="
 <100>\n\n\n\n(100) traverse entity ID's in document\n\n\n\n\n|
 <200>\n\n\n\n(200) traverse entities in document\n\n\n\n\n|
 <300>\n\n\n\n\n\n\n\n\n\n(300) retrieve one entity\n\n\n\n\n\n\n\n\n\n\n\n|
-<500>\n\n(500) create\n\n\n|
-<700>\n\n(700) delete\n\n\n|
-<900>\n\n(900) update\n\n\n
+<400>\n\n(400) create\n\n\n|
+<500>\n\n(500) delete\n\n\n|
+<600>\n\n(600) update\n\n\n|
+<700>\n\n\n\n(700) rumspringa\n\n\n\n\n
 "
 fontsize=22
 ]
@@ -151,21 +165,33 @@ nl075:391->nodeRight:300
 nl075:397->nodeRight:300
 
 
-nodeLeft:417->nodeRight:500
-nodeLeft:450->nodeRight:500
-nodeLeft:483->nodeRight:500
-nodeLeft:517->nodeRight:500
-nodeLeft:550->nodeRight:500
-nodeLeft:583->nodeRight:500
-nodeLeft:620->nodeRight:700
-nodeLeft:660->nodeRight:700
-nodeLeft:700->nodeRight:700
-nodeLeft:742->nodeRight:700
-nodeLeft:780->nodeRight:900
-nodeLeft:825->nodeRight:900
-nodeLeft:875->nodeRight:900
-nodeLeft:925->nodeRight:900
-nodeLeft:975->nodeRight:900
+nl085:408->nodeRight:400
+nl085:425->nodeRight:400
+nl085:441->nodeRight:400
+nl085:458->nodeRight:400
+nl085:475->nodeRight:400
+nl085:492->nodeRight:400
+nl085:510->nodeRight:500
+nl085:530->nodeRight:500
+nl085:550->nodeRight:500
+nl085:570->nodeRight:500
+nl085:590->nodeRight:500
+nl085:613->nodeRight:600
+nl085:638->nodeRight:600
+nl085:663->nodeRight:600
+nl085:688->nodeRight:600
+
+
+nl100:705->nodeRight:700
+nl100:715->nodeRight:700
+nl100:725->nodeRight:700
+nl100:735->nodeRight:700
+nl100:745->nodeRight:700
+nl100:755->nodeRight:700
+nl100:765->nodeRight:700
+nl100:775->nodeRight:700
+nl100:785->nodeRight:700
+nl100:795->nodeRight:700
 
 
 label="

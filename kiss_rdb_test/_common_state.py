@@ -27,8 +27,14 @@ def _normalize_sys_path():  # see [#019]
 
     assert(mono_repo_dir == a[0])
 
+    return test_dir
 
-_normalize_sys_path()
 
+_top_test_dir = _normalize_sys_path()
+
+
+def fixture_directory_path(stem):
+    import os.path as os_path
+    return os_path.join(_top_test_dir, 'fixture-directories', stem)
 
 # #born.

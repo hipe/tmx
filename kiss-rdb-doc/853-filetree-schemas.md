@@ -36,16 +36,17 @@ even if the underlying filesystem can accomodate very large files;
 if the human has to scroll over "many" lines to get to a particular item,
 we consider that to be in conflict with principle.
 
-indeed this can be a practical matter too.
-certain text editors can hit resources limits and
+this can also be a practical matter too.
+certain text editors can hit resource limits and
 fall over or start behaving weirdly
 (depending on things like syntax highlighting, or not).
 
 without knowing anything about "format adapters" yet, nor defining what
 "items" are, assume that files hold items and that each item takes
-up one or more lines in the file. now, recall that from [#852] we like
-our item identifiers to be made up of 5-bit (32 count) digits, which
-we'll call "native digits".
+up one or more lines in the file. now, recall from [#852] that
+although our entity identifiers can be of any hypothetical length,
+each of its digits has a capacity of 5-bits (32 count).
+we might call these "native digits".
 
 skipping over some detail for now, we'll synthesize everything by saying
 that we want to limit the number of items per file to some number that is
@@ -58,7 +59,7 @@ so we want our item-limit-per-file to be something like:
   - 32^2 or 1024 items
   - 32^3 or 32,768 items and so on..
 
-as a purely axiomatic hack, accept that 32 items sounds like too few to
+as a purely axiomatic hack, imagine that 32 items sounds like too few to
 have in one file. (we'll challenge this later.)
 
 we'll say that
@@ -222,6 +223,148 @@ our target use-cases will be.
   - if (as we expect) we'll try something clever with VCS's,
     and furthermore we lean on it at runtime,
     there may be a sweetspot length of file we want to shoot for.
+
+
+
+
+## so what the heck?
+
+  - "types" are: bool, int, float, string etc.
+  - an actual attribute is a name and a value (where the value has a type).
+  - (attribute names have formal restrictions uninteresting here.)
+  - we don't have formal attributes yet (that's "future feature 3").
+  - an entity is:
+    - an entity identifier
+    - an ordered list of actual attributes (with unique names)
+    - (and maybe forget the "ordered" part..)
+  - about entity identifiers:
+    - think of it as a positive nonzero integer <= some schema-determined max.
+    - for practical purposes, think of the entity identifiers as always
+      existing in their "encoded" form as lists of native digits, or better
+      yet "identifier strings".
+  - in their persisted state, entities live in files.
+    very likely these files have a capacity of more than one entity per file.
+  - "collections" are (er) collections of entities.
+  - we may think of collections as being .. collections of entities of the
+    same real-world "kind", or we may not.
+    (maybe think of it like a typical RDBMS table. maybe not)
+  - each collection has its own "filetree schema".
+
+
+
+
+## what's a filetree-schema?
+
+for the simplest practical schema ("32 cubed", introduced here) the idea
+of a filetree-schema is one that would probably "click" for most people
+simply by seeing a short example.
+
+but here we give it a more theoretical treatment to provide a foundation
+suitable for the imagined future timeline with experiments in particular
+scale-ups and optimizations.
+
+as we said above, entities are stored in files. put simply, one of the main
+jobs of the filetree-schema is: given an entity identifier (string),
+determine what is the file (path) the entity must live in.
+
+for our first filetree schema, we are probably going to hard-code one
+that is austere and consistent while still managing to have a capacity
+suitable for an intended real-world use-case. (read from bottom to top):
+
+    "B7F"
+     |||
+     ||\---> look for the entity with identifier "B7F" in that file
+     |\---> in a file called "7.toml"
+     \---> in a directory called "B"
+
+for short we call this the "32 cubed" schema:
+
+  - up to 32 directories (with names like "4" or "Q").
+  - each with up to 32 files in it (with names like "5.toml" or "R.toml").
+  - each with up to 32 entities in it (with names like "45B" or "QRX").
+
+the 32 cubed filetree schema has a capactity of 32^3 or 32,768 entites.
+(we might subtract one from this to avoid identifiers with an integer
+value of zero just for superstition.)
+
+if you run out of capactity, in theory it would be sort of trivial to
+recurse a level of depth and for example become "32 quad", and get
+a capacity of a over a million more entities. and cetera. but probably
+even "32 cubed" will be impractically slow when run "raw" for most
+queries, and "32 quad" exponentionally more so, etc.
+
+
+again:
+
+    "B7F"
+     |||
+     ||\---> look for the entity with identifier "B7F" in that file
+     |\---> in a file called "7.toml"
+     \---> in a directory called "B"
+
+and then here's an imagined filetree (view):
+
+    my-database
+     |
+     + database-meta.toml  # (don't know what would go here)
+     |
+     +- collections
+         |
+         +- artists/
+         |
+         +- songs
+             |
+             +- schema.toml  # (not specified (anywhere) what this is yet)
+             |
+             +- entities
+                 |
+                 +- 4/
+                 |
+                 +- B
+                 |  |
+                 |  +- 7.toml
+                 |
+                 +- Q/
+
+
+
+
+## implementation decisions (all tentative)
+
+  - in one imagined production release future timeline, each
+    "mutable collection" will be a long-running resident of one daemonized
+    service (perhaps each collection loaded lazily) but near term it would
+    probably be unwise to implement towards this in our prototype phase.
+    (but just keep this thought in mind as we implement things.)
+
+  - but absolutely no caching yet! that's going to be a very last step,
+    if ever. (should be compile-time plug-in, maybe)
+
+  - because reads will be mostly uninteresting, we might just always say
+    "mutable collection" when we mean “the collection [manager]”.
+
+  - whether and when to break these different facets into their own modules
+    will be an ongoing thing: filetree schema, mutable collection..
+
+
+
+
+## freeform discussion
+
+absolutely positively the implementation of "CUD+RT" at the collection-level
+should have no knowledge of filetree schema hard-coded in to it. we won't
+know the particular form this abstraction/separation/dependency injection
+will take until we write it, perhaps.
+
+we suspect that the filetree schema's main responsibility will be mapping
+to-and-fro identifiers and file (paths).
+
+somebody's gotta do locking eventually and that's absolutely gotta be write once.
+
+then, while weighing all these things above, we also don't want to
+over-abstract along the wrong dimensions at first (early abstraction)..
+
+let's find the layers..
 
 
 
