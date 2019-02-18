@@ -16,6 +16,15 @@ class collection_via_directory_and_filesystem:
         self._dir_path = dir_path
         self._filesystem = fs
 
+    def update_entity(self, id_s, cuds, listener):
+        return _RequestInvolvingIdentifier(
+                (cuds,),
+                _update_entity,
+                id_s,
+                self._dir_path,
+                self._filesystem,
+                listener).execute()
+
     def delete_entity(self, id_s, listener):
         return _RequestInvolvingIdentifier(
                 (),
@@ -28,6 +37,38 @@ class collection_via_directory_and_filesystem:
 
 # ==
 
+def _update_entity(cuds, identifier, file_path, filesystem, listener):
+    # (see `_delete_entity` below for high-level explanation of interface)
+
+    def new_lines_via_entity(mde, my_listener):
+        # unlike both CREATE and DELETE, UPDATE determines its modified entity
+        # lines *as a function of* the existing entity, so more complicated.
+
+        from .CUD_attributes_request_via_tuples import request_via_tuples as _
+        req = _(cuds, my_listener)
+        if req is None:
+            return  # not covered - blind faith
+
+        _ok = req.edit_mutable_document_entity__(mde, my_listener)
+
+        if not _ok:
+            return  # not covered - blind faith
+
+        return tuple(mde.to_line_stream())
+
+    def rewrite(orig_lines, my_listener):
+        return _sib_lib().new_lines_via_update_and_existing_lines(
+                identifier.to_string(),
+                new_lines_via_entity,
+                orig_lines,
+                my_listener)
+
+    return filesystem.rewrite_file(rewrite, file_path, listener)
+
+
+_update_entity.file_must_already_exist = True
+
+
 def _delete_entity(identifier, file_path, filesystem, listener):
     """NOTES: EXPERIMENTALLY:
 
@@ -39,10 +80,10 @@ def _delete_entity(identifier, file_path, filesystem, listener):
       - (i.e the function *cannot* result in e.g None to indicate e.g failure).
       - (we expect most functions will want to use the `yield` construct
         (becoming an iterator function) but this is user's choice.)
-      - if the iterator yields no lines (and again, no errors are emitted),
-        this amounts to a request to truncate the file to zero bytes.
       - the function may signal failure at any point during its execution
         by emitting one (or maybe more) `error` into *the provided* listener.
+      - if the iterator yields no lines (and no errors are emitted),
+        this amounts to a request to truncate the file to zero bytes.
       - the result of the call to the filesystem is True/None indicating
         whether or not the request was fulfilled (determined by inputs
         including but not limited to whether there were any user-generated

@@ -8,7 +8,26 @@ import unittest
 
 class _CommonCase(unittest.TestCase):
 
-    # == delete PRE-ABSTRACTION of recording
+    # -- CUD expecting succeess
+
+    def update_expecting_success(self, id_s, cuds):
+        def f(col, listener):
+            return col.update_entity(id_s, cuds, listener)
+
+        x, rec = self.CUD_expecting_success(f)
+        self.assertEqual(x, True)
+        return rec
+
+    def delete_expecting_success(self, id_s):
+
+        def f(col, listener):
+            return col.delete_entity(id_s, listener)
+
+        x, rec = self.CUD_expecting_success(f)
+        self.assertEqual(x, True)
+        return rec
+
+    # -- CUD expecting failure and recording
 
     def delete_expecting_failure_and_recordings(self, id_s):
 
@@ -24,22 +43,7 @@ class _CommonCase(unittest.TestCase):
 
         return (sct, rec)
 
-    def delete_expecting_success(self, id_s):
-
-        col = self.subject_collection()
-        fs = col._filesystem
-
-        listener = None
-        if True:
-            from kiss_rdb_test import structured_emission as selib
-            listener = selib.debugging_listener()
-
-        x = col.delete_entity(id_s, listener)
-        self.assertEqual(x, True)
-
-        recs = fs.finish_vis_a_vis_script()
-        rec, = recs
-        return rec
+    # -- CUD expecting failure
 
     def delete_expecting_failure(self, id_s):
         def f(listener):
@@ -80,8 +84,23 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(chan, ('error', 'structure', 'input_error'))
         return payloader()
 
+    def CUD_expecting_success(self, f):
+
+        col = self.subject_collection()
+        fs = col._filesystem
+
+        x = f(col, self.listener())
+
+        recs = fs.finish_vis_a_vis_script()
+        rec, = recs
+        return x, rec
+
     def subject_collection(self):
         return _default_subject()
+
+    def listener(self):
+        if False:
+            return _selib().debugging_listener()
 
 
 class Case700_collection_can_be_built_with_noent_dir(_CommonCase):
@@ -148,9 +167,7 @@ class Case706_file_not_found(_CommonCase):
         self.assertEqual(_actual, 'no such file')
 
     def test_200_reason(self):
-        import re
-        actual = self.right_half
-        _tail = re.search(r'[^/]+(?:/[^/]+){2}$', actual)[0]
+        _tail = _last_three_path_parts(self.right_half)
         self.assertEqual(_tail, 'entities/B/4.toml')
 
     @shared_subject
@@ -247,6 +264,48 @@ class Case709_delete_that_leaves_file_empty(_CommonCase):
                 _this_one_collection_path(), _filesystem)
 
 
+class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
+    """
+    .#open [#867.H] it "thinks of" {whitespace|comments} as being
+
+    associated with the attribute not the entity block so the behavior
+    here in terms of where blank lines end up is not what would probably
+    be expected..
+
+    wait till after multilines maybe, because this is ugly but only cosmetic
+    """
+
+    def test_100_everything(self):
+        ok, path, lines = self.update_expecting_success('B9H', (
+            ('delete', 'thing-A'),
+            ('update', 'thing-B', 'modified hey'),
+            ('create', 'thing-C', 'woot'),
+            ))
+
+        self.assertTrue(ok)
+        self.assertEqual(_last_three_path_parts(path), 'entities/B/9.toml')
+        _expected = tuple(_selib().unindent(self._expecting_these()))
+        self.assertSequenceEqual(lines, _expected)
+
+    def _expecting_these(self):
+        return """
+        [item.B9G.attributes]
+        hi-G = "hey G"
+
+        [item.B9H.attributes]
+        thing-B = "modified hey"
+
+        thing-C = "woot"
+        [item.B9J.attributes]
+        hi-J = "hey J"
+        """
+
+    def subject_collection(self):
+        _filesystem = _FilesystemSpy(_one_call_to_rewrite, self)
+        return _build_collection_via_directory_and_filesystem(
+                _this_one_collection_path(), _filesystem)
+
+
 @memoize
 def _this_one_collection_path():
     return fixture_directory_path('050-rumspringa')
@@ -304,6 +363,11 @@ class _FilesystemSpy:
         return x
 
 
+def _last_three_path_parts(path):
+    import re
+    return re.search(r'[^/]+(?:/[^/]+){2}$', path)[0]
+
+
 class _RecordOfCall:
 
     def __init__(self, did_succeed, path, lines):
@@ -319,6 +383,11 @@ def _build_collection_via_directory_and_filesystem(dir_path, fs):
 
 def _subject_module():
     from kiss_rdb.magnetics_ import collection_via_directory as _
+    return _
+
+
+def _selib():
+    from kiss_rdb_test import structured_emission as _
     return _
 
 

@@ -1,4 +1,4 @@
-def CUD_ATTRIBUTES_IN_MUTABLE_DOCUMENT_ENTITY(mde, req, listener):
+def apply_CUD_attributes_request_to_MDE___(mde, req, listener):
 
     # (long explanation extracted into [#865] "in-depth code explanation")
 

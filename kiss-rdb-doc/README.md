@@ -28,6 +28,8 @@ woah boy.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#867.J]                   | #wish | future feature 4: multiline strings
+|[#867.H]                   | #open | blank lines during update move weirdly. depend maybe on #wish [#867.J].
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #open | found a bug
 |[#867.E]                   | #open | non-integrated testpoint island

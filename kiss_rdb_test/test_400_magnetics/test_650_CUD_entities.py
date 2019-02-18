@@ -7,55 +7,58 @@ unindent = selib.unindent
 # (subject under test explained exhaustively in [#864] the toml adaptation)
 
 
-class _CommonCase(unittest.TestCase):
-
-    def _expect_everything_for_create(self):
-        id_s, new_s = self.given_identifer_and_lines_for_new_entity()
-
-        _f = _subj_mod().new_lines_via_create_and_existing_lines
-
-        self._expect_everything(id_s, _f, new_s)
-
-    def _expect_everything_for_update(self):
-        id_s, new_s = self.given_identifer_and_new_lines_for_existing_entity()
-
-        _f = _subj_mod().new_lines_via_update_and_existing_lines
-
-        self._expect_everything(id_s, _f, new_s)
-
-    def _expect_everything_for_delete(self):
-        _id_s = self.given_identifer_for_entity_to_delete()
-
-        _f = _subj_mod().new_lines_via_delete_and_existing_lines
-
-        self._expect_everything(_id_s, _f)
-
-    def _expect_everything(self, id_s, cud_function, new_s=None):
-
-        if new_s is None:
-            xtra_kwargs = _empty_dict_OCD
-        else:
-            xtra_kwargs = {'incoming_lines': unindent(new_s)}
+def expect_everything(orig_f):
+    def new_f(self):
 
         x = self.expect_these_lines()
-        if x is None:  # #here1
-            expect_lines = ()
-        else:
-            expect_lines = tuple(unindent(x))
+        _expect_lines = () if x is None else tuple(unindent(x))  # #here1
 
-        existing_lines = unindent(self.given_big_string())
+        _existing_lines = unindent(self.given_big_string())
 
-        listener = selib.debugging_listener() if False else None
+        _listener = selib.debugging_listener() if True else None
 
-        _out = cud_function(
+        _out_lines_itr = orig_f(self, {
+            'existing_lines': _existing_lines,
+            'listener': _listener,
+            })
+
+        _actual = tuple(_out_lines_itr)
+
+        self.assertEqual(_actual, _expect_lines)
+    return new_f
+
+
+class _CommonCase(unittest.TestCase):
+
+    @expect_everything
+    def _expect_everything_for_update(self, kwargs):
+
+        def new_lines_via_entity(_mde_, _listener_):
+            return tuple(unindent(new_s))
+
+        id_s, new_s = self.given_identifer_and_new_lines_for_existing_entity()
+
+        return _subj_mod().new_lines_via_update_and_existing_lines(
+                new_lines_via_entity=new_lines_via_entity,
                 identifier_string=id_s,
-                existing_lines=existing_lines,
-                listener=listener,
-                **xtra_kwargs)
+                **kwargs,
+                )
 
-        actual = tuple(_out)
+    @expect_everything
+    def _expect_everything_for_create(self, kwargs):
+        id_s, new_s = self.given_identifer_and_lines_for_new_entity()
+        _incoming_lines = unindent(new_s)
+        return _subj_mod().new_lines_via_create_and_existing_lines(
+                new_entity_lines=_incoming_lines,
+                identifier_string=id_s,
+                **kwargs)
 
-        self.assertEqual(actual, expect_lines)
+    @expect_everything
+    def _expect_everything_for_delete(self, kwargs):
+        return _subj_mod().new_lines_via_delete_and_existing_lines(
+                identifier_string=self.given_identifer_for_entity_to_delete(),
+                **kwargs
+                )
 
 
 _empty_dict_OCD = {}
@@ -321,7 +324,7 @@ class Case590_delete_leaving_effectively_empty_file(_CommonCase):
         self._expect_everything_for_delete()
 
     def expect_these_lines(self):
-        return None  # :#here1
+        return None
 
     def given_identifer_for_entity_to_delete(self):
         return 'TheOnlyFellow'

@@ -1,3 +1,5 @@
+"""(everything in this module is explained by everything
+in [#864] the toml adaptation for entities)"""
 
 
 def new_lines_via_delete_and_existing_lines(
@@ -8,10 +10,9 @@ def new_lines_via_delete_and_existing_lines(
 
     _args_for_CUD_function = (identifier_string,)
 
-    return LINE_STREAM_THE_NEW_WAY(
+    return _line_stream_via_CUD_function(
             _args_for_CUD_function,
-            DELETE_THE_NEW_WAY,
-            None,  # nothing for incoming lines
+            __blocks_for_DELETE,
             existing_lines,
             listener,
             )
@@ -19,17 +20,16 @@ def new_lines_via_delete_and_existing_lines(
 
 def new_lines_via_update_and_existing_lines(
         identifier_string,
-        incoming_lines,
+        new_lines_via_entity,
         existing_lines,
         listener,
         ):
 
-    _args_for_CUD_function = (identifier_string, incoming_lines)
+    _args_for_CUD_function = (identifier_string, new_lines_via_entity)
 
-    return LINE_STREAM_THE_NEW_WAY(
+    return _line_stream_via_CUD_function(
             _args_for_CUD_function,
-            UPDATE_THE_NEW_WAY,
-            incoming_lines,
+            __blocks_for_UPDATE,
             existing_lines,
             listener,
             )
@@ -37,26 +37,24 @@ def new_lines_via_update_and_existing_lines(
 
 def new_lines_via_create_and_existing_lines(
         identifier_string,
-        incoming_lines,
+        new_entity_lines,
         existing_lines,
         listener,
         ):
 
-    _args_for_CUD_function = (identifier_string, incoming_lines)
+    _args_for_CUD_function = (identifier_string, new_entity_lines)
 
-    return LINE_STREAM_THE_NEW_WAY(
+    return _line_stream_via_CUD_function(
             _args_for_CUD_function,
-            CREATE_THE_NEW_WAY,
-            incoming_lines,
+            __blocks_for_CREATE,
             existing_lines,
             listener,
             )
 
 
-def LINE_STREAM_THE_NEW_WAY(
+def _line_stream_via_CUD_function(
         args_for_CUD_function,
         CUD_function,
-        incoming_lines,
         existing_lines,
         listener):
 
@@ -68,7 +66,7 @@ def LINE_STREAM_THE_NEW_WAY(
 
     _block_itr = block_stream_via_file_lines(existing_lines, monitor.listener)
 
-    _block_itr = BLOCK_STREAM_THE_NEW_WAY(
+    _block_itr = __block_stream_via(
             args_for_CUD_function,
             CUD_function,
             _block_itr,
@@ -79,7 +77,7 @@ def LINE_STREAM_THE_NEW_WAY(
             yield line
 
 
-def BLOCK_STREAM_THE_NEW_WAY(args, CUD_function, block_itr, monitor):
+def __block_stream_via(args, CUD_function, block_itr, monitor):
 
     # == always same for head block
 
@@ -110,26 +108,31 @@ def BLOCK_STREAM_THE_NEW_WAY(args, CUD_function, block_itr, monitor):
 
 # ==
 
-def UPDATE_THE_NEW_WAY(id_s, new_entity_lines, block_itr, monitor):
+def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
 
     # this is a copy-paste-modify of DELETE that's unabstracted for clarity.
 
     # output entities that are lesser while searching for one that is equal.
 
     did_find = False
-    for de in block_itr:
-        if id_s == de.identifier_string:
+    for mde in block_itr:
+        if id_s == mde.identifier_string:
             # do NOT yield the one we are updating. break.
             did_find = True
             break
 
-        yield de
+        yield mde
 
     if not monitor.ok:  # there's a lot that could have been wrong in the file
         return
 
     if not did_find:
-        cover_me('hi woot 2')  # #open #[#867.C]
+        _whine_about_entity_not_found(id_s, monitor.listener)
+        return  # not covered - blind faith
+
+    new_entity_lines = new_lines_via_entity(mde, monitor.listener)
+    if new_entity_lines is None:
+        return
 
     yield _LinesAsBlock(new_entity_lines)
 
@@ -139,7 +142,7 @@ def UPDATE_THE_NEW_WAY(id_s, new_entity_lines, block_itr, monitor):
         yield de
 
 
-def DELETE_THE_NEW_WAY(id_s, block_itr, monitor):
+def __blocks_for_DELETE(id_s, block_itr, monitor):
 
     # this is a copy-paste-modify of UPDATE that's unabstracted for clarity.
 
@@ -167,7 +170,7 @@ def DELETE_THE_NEW_WAY(id_s, block_itr, monitor):
         yield de
 
 
-def CREATE_THE_NEW_WAY(id_s, new_entity_lines, block_itr, monitor):
+def __blocks_for_CREATE(id_s, new_entity_lines, block_itr, monitor):
 
     # find the first item that is greater. output those that are lesser.
 
@@ -250,10 +253,6 @@ def _whine_about_entity_not_found(id_s, listener):
 
 
 # ==
-
-def known_error_case_yet_to_cover():
-    raise Exception('known error case yet to cover')
-
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')

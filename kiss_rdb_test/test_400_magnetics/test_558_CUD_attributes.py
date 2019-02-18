@@ -74,7 +74,7 @@ class _CommonCase(unittest.TestCase):
         req = _request_via_tuples(self.given_request_tuples(), this_listener)
         assert(req)
 
-        x = req.CUD_ATTRIBUTES_IN_MUTABLE_DOCUMENT_ENTITY(mde, listener)
+        x = req.edit_mutable_document_entity__(mde, listener)
         if x is not None:
             self.assertEqual(x, True)
             return mde

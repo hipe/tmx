@@ -27,7 +27,7 @@ node[shape=rect]
 460[label="full tree\ntraversal\nthru schema"]
 
 
-187[label="update thru schema\nintegated with\nattributes"]
+187[label="update thru schema\nintegated with\nattributes" style=filled]
 833->187
 
 

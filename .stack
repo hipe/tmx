@@ -7,5 +7,3 @@ re-create the new index file after provisioning
 provision new ID pseudo-randomly
 create the index file thru schema
 full tree traversal thru schema
-update thru schema integrated with attributes
-delete thru schema
