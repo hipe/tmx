@@ -13,26 +13,55 @@ several different *separate* responsibilities:
 class collection_via_directory_and_filesystem:
 
     def __init__(self, dir_path, fs):
+        identifier_depth = 3  # #open #[#867.K]
+
+        def f(id_s, listener):
+            id_obj = _identifier_via_string(id_s, listener)
+            if id_obj is None:
+                return
+            length = len(id_obj.native_digits)
+            if identifier_depth != length:
+                _whine_about_ID_depth(id_obj, identifier_depth, listener)
+                return
+            return id_obj
+        self._depthly_valid_identifier_via_string = f
         self._dir_path = dir_path
         self._filesystem = fs
 
     def update_entity(self, id_s, cuds, listener):
-        return _RequestInvolvingIdentifier(
+        return self._CUD(
                 (cuds,),
                 _update_entity,
                 id_s,
-                self._dir_path,
-                self._filesystem,
-                listener).execute()
+                listener)
 
     def delete_entity(self, id_s, listener):
-        return _RequestInvolvingIdentifier(
+        return self._CUD(
                 (),
                 _delete_entity,
                 id_s,
-                self._dir_path,
-                self._filesystem,
-                listener).execute()
+                listener)
+
+    def _CUD(self, args, func, id_s, listener):
+
+        id_obj = self._depthly_valid_identifier_via_string(id_s, listener)
+        if id_obj is None:
+            return
+
+        file_path = _valid_path_for(id_obj, func, self._dir_path, listener)
+        if file_path is None:
+            return
+
+        return func(
+                *args,
+                identifier=id_obj,
+                file_path=file_path,
+                filesystem=self._filesystem,
+                listener=listener)
+
+    def to_identifier_stream(self, listener):
+        from .entities_via_collection import identifiers_via_collection as _
+        return _(self._dir_path, self._depthly_valid_identifier_via_string, listener)  # noqa: E501
 
 
 # ==
@@ -102,70 +131,22 @@ def _delete_entity(identifier, file_path, filesystem, listener):
 _delete_entity.file_must_already_exist = True
 
 
-# ==
+# == individual identifier stuff
 
-class _RequestInvolvingIdentifier:
-    """NOTES: create. retrieve. update. delete.
-
-    imagine this as a decorator..
-    """
-
-    def __init__(self, args, func, id_s, dir_path, fs, listener):
-        self._args = args
-        self._function = func
-        self._identifier_string = id_s
-        self._dir_path = dir_path
-        self._filesystem = fs  # #testpoint
-        self._listener = listener
-        self._identifier_depth = 3  # ..; assumed greater than zero!
-
-    def execute(self):
-        if not self.__resolve_identifier_via_identifier_string():
-            return
-        if not self.__check_identifier_depth():
-            return
-        if not self.__check_for_any_necessary_presence_of_file():
-            return
-        return self._function(
-                *self._args,
-                identifier=self._identifier,
-                file_path=self._file_path,
-                filesystem=self._filesystem,
-                listener=self._listener)
-
-    def __check_for_any_necessary_presence_of_file(self):
-        pieces = _file_path_pieces_via_identifier(
-                self._identifier, self._dir_path)
-        self._file_path = os_path.join(*pieces)
-        if self._function.file_must_already_exist:
-            if os_path.exists(self._file_path):
-                return _okay
-            else:
-                _whine_about_no_path(pieces, self._listener)
-                return
+def _valid_path_for(identifier, func, dir_path, listener):
+    pieces = __file_path_pieces_via_identifier(identifier, dir_path)
+    file_path = os_path.join(*pieces)
+    if func.file_must_already_exist:
+        if os_path.exists(file_path):
+            return file_path
         else:
-            cover_me('create is the only one')
-
-    def __check_identifier_depth(self):
-        length = len(self._identifier.native_digits)
-        if self._identifier_depth == length:
-            return _okay
-        _whine_about_identifier_depth(
-                self._identifier, self._identifier_depth, self._listener)
-
-    def __resolve_identifier_via_identifier_string(self):
-        tup = _normalize_identifier_in_general(
-                self._identifier_string, self._listener)
-        if tup is None:
+            __whine_about_no_path(pieces, listener)
             return
-        del(self._identifier_string)
-        self._identifier = _Identifier(tup)
-        return _okay
+    else:
+        cover_me('create is the only one')
 
 
-# ==
-
-def _file_path_pieces_via_identifier(identifier, dir_path):
+def __file_path_pieces_via_identifier(identifier, dir_path):
 
     # this will absolutely change when we abstract schema-ism out
 
@@ -181,7 +162,7 @@ def _file_path_pieces_via_identifier(identifier, dir_path):
     return (dir_path, 'entities', *these)
 
 
-def _normalize_identifier_in_general(id_s, listener):
+def _identifier_via_string(id_s, listener):
 
     digits = []
 
@@ -199,7 +180,7 @@ def _normalize_identifier_in_general(id_s, listener):
             _ID_digit_cache[s] = digit
         digits.append(digit)
 
-    return tuple(digits)
+    return _Identifier(tuple(digits))
 
 
 _ID_digit_cache = {}  # cache native digits (the mapping btwn char & number)
@@ -246,7 +227,7 @@ class _NativeDigit:
 
 # == whiners
 
-def _whine_about_no_path(pieces, listener):
+def __whine_about_no_path(pieces, listener):
     """given a filesystem path that does not exist, determine the longest
 
     head of the path that *does*.
@@ -276,7 +257,7 @@ def _whine_about_no_path(pieces, listener):
     _emit_input_error_structure(lambda: {'reason': reason}, listener)
 
 
-def _whine_about_identifier_depth(identifier, expected_length, listener):
+def _whine_about_ID_depth(identifier, expected_length, listener):
     def f():  # (Case704)
         act = len(identifier.native_digits)
         if act < expected_length:

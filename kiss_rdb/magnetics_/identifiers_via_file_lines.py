@@ -9,7 +9,7 @@ def block_stream_via_file_lines(file_lines, listener):
     return parse_(file_lines, _actionser, listener)
 
 
-def traverse_IDs_without_validating__(file_lines, listener):
+def open_table_line_stream_via_file_lines_(file_lines, listener):
     # #open [#867.E] #testpoint island
     _actionser = _actionser_via_class(Actions_for_ID_Traversal_Non_Validating_)
     return parse_(file_lines, _actionser, listener)

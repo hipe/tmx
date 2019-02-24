@@ -76,7 +76,7 @@ class _CommonCase(unittest.TestCase):
 
     def _run_non_validating_ID_traversal(self, listener):
         _all_lines = self.given_lines()
-        return _subject_module().traverse_IDs_without_validating__(_all_lines, listener)  # noqa: E501
+        return _subject_module().open_table_line_stream_via_file_lines_(_all_lines, listener)  # noqa: E501
 
     def given_lines(self):
         raise Exception('ha ha')

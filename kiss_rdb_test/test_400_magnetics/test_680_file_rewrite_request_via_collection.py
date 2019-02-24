@@ -306,6 +306,40 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
                 _this_one_collection_path(), _filesystem)
 
 
+class Case725_simplified_typical_traversal(_CommonCase):
+
+    def test_100_everything(self):
+
+        def f(id_obj):
+            return id_obj.to_string()  # ..
+
+        _these = self.subject_collection().to_identifier_stream(None)
+        _actual = (f(o) for o in _these)
+
+        _these = [
+                '2HJ',
+                'B7E',
+                'B7F',
+                'B7G',
+                'B8H',
+                'B9G',
+                'B9H',
+                'B9J',
+                ]
+
+        _expected = (x for x in _these)
+
+        _actual = tuple(_actual)
+        _expected = tuple(_expected)
+
+        self.assertSequenceEqual(_actual, _expected)
+
+    def subject_collection(self):
+        _filesystem = None
+        return _build_collection_via_directory_and_filesystem(
+                _this_one_collection_path(), _filesystem)
+
+
 @memoize
 def _this_one_collection_path():
     return fixture_directory_path('050-rumspringa')

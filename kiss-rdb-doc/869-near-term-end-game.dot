@@ -24,7 +24,7 @@ node[shape=rect]
 722->480
 722[label="create index file thru\nschema's traversal"]
 460->722
-460[label="full tree\ntraversal\nthru schema"]
+460[label="full tree\ntraversal\nthru schema" style=filled]
 
 
 187[label="update thru schema\nintegated with\nattributes" style=filled]
