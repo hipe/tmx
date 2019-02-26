@@ -5,4 +5,3 @@ integrate CUD thru schema with file (semaphore) locking
 create thru schema integrated with attributes & allocation
 re-create the new index file after provisioning
 provision new ID pseudo-randomly
-create the index file thru schema

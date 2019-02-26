@@ -22,7 +22,7 @@ node[shape=rect]
 480->500
 480[label="provision new\nID pseduo-\nrandomly"]
 722->480
-722[label="create index file thru\nschema's traversal"]
+722[label="create index file thru\nschema's traversal" style=filled]
 460->722
 460[label="full tree\ntraversal\nthru schema" style=filled]
 
