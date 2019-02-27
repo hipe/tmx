@@ -171,22 +171,31 @@ def _identifier_via_string(id_s, listener):
         cover_me('might let this slip thru - needs coverage tho')
 
     for s in s_a:
-        if s in _ID_digit_cache:
-            digit = _ID_digit_cache[s]
-        else:
-            digit = _native_digit_via_character(s, listener)
-            if digit is None:
-                return  # (Case703)
-            _ID_digit_cache[s] = digit
-        digits.append(digit)
+        nd = native_digit_via_character_(s, listener)
+        if nd is None:
+            return  # (Case703)
+        digits.append(nd)
 
-    return _Identifier(tuple(digits))
+    return Identifier_(tuple(digits))
+
+
+def native_digit_via_character_(s, listener):
+
+    if s in _ID_digit_cache:
+        return _ID_digit_cache[s]
+
+    nd = __build_native_digit_via_character(s, listener)
+    if nd is None:
+        # (don't cache failure, meh)
+        return
+    _ID_digit_cache[s] = nd
+    return nd
 
 
 _ID_digit_cache = {}  # cache native digits (the mapping btwn char & number)
 
 
-def _native_digit_via_character(s, listener):
+def __build_native_digit_via_character(s, listener):
     if s not in _int_via_digit_char:
         __whine_about_bad_digit(s, listener)
         return
@@ -209,7 +218,7 @@ _int_via_digit_char = {_digits[i]: i for i in range(0, _num_digits)}
 
 # ==
 
-class _Identifier:
+class Identifier_:
 
     def __init__(self, native_digits):
         self.native_digits = native_digits  # assume tuple #wish #[#008.D]
@@ -221,7 +230,7 @@ class _Identifier:
 class _NativeDigit:
 
     def __init__(self, as_int, char):
-        self.AS_INTEGER = as_int
+        self.integer = as_int
         self.character = char
 
 

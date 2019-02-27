@@ -50,7 +50,7 @@ and also the semantics of "indenting" are *negative* depth:
     (not like this:)
     +-----------------
     |A
-    | +B (C D)
+    | B (C D)
 
 
     (like this:)
@@ -131,7 +131,7 @@ our current specification is optimized for these design objectives:
 
     - version control austertity: if you push or pop levels of depth in your
       identifier (provisioning more space with a schema change), change to
-      the file is minimized because of the mirror-image-im of indenting.
+      the file is minimized because of the mirror-image-ing of indenting.
       (this one is some real OCD fanservice.)
 
     - whitespace austertity: the "negative indenting" also reduces how wide
@@ -197,7 +197,7 @@ def lines_of_index_via_identifiers(identifiers, depth):
 
     def insert_in_rack():
         nd = nd_tup[offset_of_final_digit]
-        rack[nd.AS_INTEGER] = nd
+        rack[nd.integer] = nd
 
     itr = iter(identifiers)
 
@@ -225,7 +225,7 @@ def lines_of_index_via_identifiers(identifiers, depth):
 
         found = False
         for i in range(0, offset_of_final_digit):
-            if head[i].AS_INTEGER != nd_tup[i].AS_INTEGER:
+            if head[i].integer != nd_tup[i].integer:
                 found = True
                 break
 
