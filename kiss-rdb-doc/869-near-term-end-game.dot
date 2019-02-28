@@ -20,7 +20,7 @@ node[shape=rect]
 167->633
 500[label="re-create new\nindex file"]
 480->500
-480[label="provision new\nID pseduo-\nrandomly"]
+480[label="provision new\nID pseduo-\nrandomly" style=filled]
 722->480
 722[label="create index file thru\nschema's traversal" style=filled]
 460->722
