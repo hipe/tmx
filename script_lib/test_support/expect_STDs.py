@@ -163,7 +163,7 @@ class _Performance:
         return fmt.format(** dic)
 
 
-class WriteOnly_IO_Proxy:
+class WriteOnly_IO_Proxy:  # #[#609]
     def __init__(self, f):
         self.write = f
 
@@ -282,6 +282,125 @@ class _AnyLineExpectation(_LineExpectation):
 
 def _ends_in_newline(line):
     return _NEWLINE == line[-1]
+
+
+# == BEGIN NEW
+''':[#817] EXPERIMENTAL:
+
+as an alternative take on a lot of the above, we offer these modular
+components. There is one "Write Only IO Facade" that dispatches messages
+to its receiver:
+
+    +----------------+
+    |  IO Facade     |
+    | +----------+   |
+    | |          | <-|<- write
+    | | receiver |   |
+    | |          | <-|<- flush
+    | +----------+   |
+    +----------------+
+
+the receiver is "injected" and here we offer a variety of receivers.
+at writing theres's four, but we expect them only to be assembled in
+the following two ways
+
+
+either:
+
+    +-----------------+
+    |   IO Facade     |
+    | +-----------+   |
+    | | recording | <-|<- write
+    | | receiver  | <-|<- flush
+    | +-----------+   |
+    +-----------------+
+
+or:
+    +--------------------------------+
+    |             IO Facade          |
+    | +-----------+                  |
+    | | debugging |<+                |
+    | | receiver  |  | +----------+  |
+    | +-----------+   || muxing   |<-|<- write
+    |                  | receiver |<-|<- flush
+    | +-----------+   /+----------+  |
+    | | recording |  /               |
+    | | receiver  |<+                |
+    | +-----------+                  |
+    +--------------------------------+
+
+the effect of the latter assembly is that byte strings written to the IO
+are "echoed" to stderr for debugging and also stored in the recording
+structure.
+
+more broadly the the overall effect of the composable parts is a sort of
+"pure" injection where more complex behavior is accomplished through smaller
+modular parts, rather than needing to code for a (for example) debugging
+feature in the main body of all this.
+
+at writing it is our only client that does this composing.
+see topic identifier.
+'''
+
+
+class Write_Only_IO_Facade:  # #[#609]
+
+    def __init__(self, wr):
+        self._write_receiver = wr
+
+    def write(self, s):
+        self._write_receiver.receive_write(s)
+        return len(s)
+
+    def flush(self):
+        self._write_receiver.receive_flush()
+
+
+class DebuggingWriteReceiver:
+
+    def __init__(self, label, do_debug_function, debug_IO_function):
+        self._label = label
+        self._do_debug_function = do_debug_function
+        self._debug_IO_function = debug_IO_function
+
+    def receive_write(self, s):
+        if not self._do_debug_function():
+            return
+        io = self._debug_IO_function()
+        io.write(f'>> {self._label}: >> ')
+        io.write(s)
+        io.flush()
+
+    def receive_flush(self):
+        pass
+
+
+class MuxingWriteReceiver:
+
+    def __init__(self, children):
+        self._children = children
+
+    def receive_write(self, s):
+        for o in self._children:
+            o.receive_write(s)
+
+    def receive_flush(self):
+        for o in self._children:
+            o.receive_flush()
+
+
+class ProxyingWriteReceiver:
+
+    def __init__(self, f):
+        self._function = f
+
+    def receive_write(self, s):
+        self._function(s)
+
+    def receive_flush(self):
+        pass
+
+# == END NEW
 
 
 def _string_via_which(d):  # #todo

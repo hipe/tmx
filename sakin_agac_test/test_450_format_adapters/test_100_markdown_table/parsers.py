@@ -9,7 +9,8 @@ input is first parsed in a coarse pass, and then in subsequent passes
 the results from the coarser passes are fed into it, progressively producing
 structures with more granularity (and more stringent requirements).
 
-such an approach aids in "regression-friendly" testing, a philosophy where
+such an approach aids in
+[#010.6] "regression-friendly" testing, a philosophy where
 you want coarser, more fundamental failures to trigger before more detailed
 failures, so that the debugging search space grows or shrinks to match the
 sope of the failure.

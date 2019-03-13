@@ -62,7 +62,7 @@ def _memoized_walker():
       insulated AST model (see)
 
     - for now we enclose this whole doo-hah in this function call to
-      load its dependency modules late for regression-friendliness and
+      load its dependency modules late for [#010.6] regression-friendliness and
       maybe efficiency for some cases. (no)
     """
 

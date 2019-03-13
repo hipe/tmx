@@ -1,0 +1,44 @@
+digraph g {
+
+rankdir=BT
+node[shape=rect]
+
+
+_94[label="complete self actualization"]
+_81->_94
+_56->_94
+
+
+_81[label="a go version"]
+_69->_81
+_69 [label="learn go"]
+_66->_69
+_63->_69
+_60->_69
+
+
+_66[label="the language\nitself"]
+_63[label="how larger\nprojects are\nstructured"]
+_60[label="how to\ntest"]
+
+
+_56[label="an app-ish\nbacked by a service\nbacked by this store\n(remote)"]
+_44->_56
+_44[label="an app-ish\nbacked by a service\nbacked by this store\n(local)"]
+
+_31->_44
+_31[label="all the CLI\nstuff"]
+
+
+label="
+
+fig 870. where
+your head is
+right now
+"
+
+}
+
+/*
+#born
+*/

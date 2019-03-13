@@ -10,4 +10,6 @@ it is therefor NEVER prudent for this file to contain any code.
 
 in other words, #[#018.file-type-B].
 """
+
+# #pending-rename: to 318, if you're feeling really ambitious. see ../README.md
 # #born.

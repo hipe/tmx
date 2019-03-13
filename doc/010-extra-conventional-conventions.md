@@ -37,6 +37,7 @@ we've got:
   - [paranoiacally-private method names](#c)
   - [broadly utilized class-name conventions refined](#d)
   - [project-private method names](#e)
+  - [regression-friendly test ordering][#6]
 
 
 
@@ -263,6 +264,13 @@ helpers. the kinship between test *files* and test *support* files is often
 tighter than kinships between files elsewhere; and the use of this
 convention aims to highlight that kinship where it holds.
 
+
+
+
+## <a name="6"></a>regression-friendly ordering (testing)
+
+this article is a stub and you can help expand it. probably what we
+will do is refer to articles in #[#008.10] that-other-project. (EDIT)
 
 
 

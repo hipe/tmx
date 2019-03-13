@@ -337,7 +337,8 @@ class Case130_insert_into_mid(_CommonCase):
     however our order here (append, insert, delete) actually concurs with the
     order proferred there (that is, same conclusion for different reasons).)
 
-  - "regression-friendly ordering" offers that all things being equal you
+  - [#010.6] "regression-friendly ordering" offers that
+    all things being equal you
     should put simpler cases before more complex ones (for reasons).
 
   - DELETEs feel simpler than APPEND/INSERTs: for a DELETE you need only

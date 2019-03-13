@@ -246,7 +246,7 @@ class _Invocation:
         return self._interpretation_result.OK
 
 
-class _MinimalIOTee:  # TODO move this
+class _MinimalIOTee:  # TODO move this. #[#609]
     """a minimally simple multiplexer (muxer) for debug-tracing writes to IO"""
 
     def __init__(self, upstream_IO, IO_for_debugging, format):

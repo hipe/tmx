@@ -210,6 +210,7 @@ then in your 'main' terminal:
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.10]                  | #trak | places where you refer to that-other-project
 |[#008.H]                   | #wish | come back when you understand data science better
 |[#008.G]                   |       | track callable modules
 |[#008.F]                   | #vape | machine-generated tests

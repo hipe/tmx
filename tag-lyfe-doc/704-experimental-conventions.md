@@ -5,7 +5,7 @@
 our rough roadmap stack file thing (TODO.stack) consists of a stack of items
 where:
   - each item generally represents a task and/or goals and
-  - the items are placed in a designed, "regression-friendly" order.
+  - the items are placed in a designed, [#010.6] "regression-friendly" order.
 
 of this stack, certain of its items near the top (actually the bottom of the
 file) may have an "identifier integer" next to it. (we might start calling

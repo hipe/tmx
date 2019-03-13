@@ -1,4 +1,5 @@
 /.ackrc
+/*.egg-info
 /my-venv
 node_modules
 /project/project

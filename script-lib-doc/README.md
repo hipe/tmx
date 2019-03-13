@@ -56,6 +56,7 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#609]                     | #trak | track mock file IO's in our universe
 |[#608.7]                   | #trak | track fellows whose CLI exitstatus is "guilty til proven innocent"
 |[#608.6]                   | #trak | this other approach to a library interface (see)
 |[#608.5]                   | #trak | this one approach to a library interface (see)

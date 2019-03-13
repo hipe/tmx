@@ -213,7 +213,7 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
     return mock_IO.flush_chunks()
 
 
-class _QuickDirty_IO_Mock():
+class _QuickDirty_IO_Mock():  # #[#609]
     """this is an IO mock for a single use-case. there are others like it..
 
     but this one is ours. (we can of course abstract this as necessary, but

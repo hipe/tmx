@@ -4,6 +4,18 @@ node[shape=rect]
 
 944[label="CLI"]
 844->944
+552->944
+
+
+552[label="one-by-one integrate\nCUD-RT into CLI\n(explode this)"]
+/* 617 682 747 812 */
+
+487->552
+487[label="sane unit tests\nof CLI" style=filled]
+422->487
+422[label="mishmash of several\nmocked CLI endpoints" style=filled]
+410->422
+410[label="screen lines\nchunker\n(CLI testing lib)" style=filled]
 
 
 844[label="typed values\nvia CLI values"]

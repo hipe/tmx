@@ -438,7 +438,8 @@ yet supported" comes first, then the easy cases come second, then the
 "multiline strings not yet supported" come third. it may feel like a
 narrative disjoint having a break in the "not yet supported" cases; but
 the ordering is intentional and reflects the expected relative complexities
-of their respective implementations (regression-friendly ordering) because
+of their respective implementations
+([#010.6] regression-friendly ordering) because
 to detect multiline strings we need to get as far as firing up our ad-hoc
 value-expression parser..."""
 

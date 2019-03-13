@@ -199,6 +199,8 @@ label="
 almost universal \"regression-friendly\" test number allocation guide.
 "
 
+/* (reference to [#010.6] regression-friendly test ordering) */
+
 }
 /*
 #born.
