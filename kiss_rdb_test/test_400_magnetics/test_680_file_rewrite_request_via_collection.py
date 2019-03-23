@@ -306,6 +306,56 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
                 _this_one_collection_path(), _filesystem)
 
 
+class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
+
+    def test_100_channel(self):
+        _channel = self._these_two()[0]
+        _expect = (
+                'error',
+                'expression',
+                'argument_error',
+                'no_such_directory')
+        self.assertSequenceEqual(_channel, _expect)
+
+    def test_200_message(self):
+        _payloader = self._these_two()[1]
+        message, = tuple(_payloader())  # assert only one line
+        head, path = message.split(' - ')  # assert has a dash in it
+        _expect = 'collection does not exist because no such directory'
+        self.assertEqual(head, _expect)
+
+        # regexp schmegex
+        expect = '000-no-ent/entities'
+        _actual = path[-len(expect):]
+        self.assertEqual(_actual, expect)
+
+    @shared_subject
+    def _these_two(self):
+        count = 0
+        channel = None
+        payloader = None
+
+        def listener(*args):
+            nonlocal count, channel, payloader
+            count += 1
+            assert(count < 2)
+            *channel, payloader = args
+            channel = tuple(channel)
+
+        _itr = self.subject_collection().to_identifier_stream(listener)
+        for x in _itr:
+            self.fail()
+
+        assert(1 == count)
+        return channel, payloader
+
+    def subject_collection(self):
+        _collection_path = fixture_directory_path('000-no-ent')
+        _filesystem = None
+        return _build_collection_via_directory_and_filesystem(
+                _collection_path, _filesystem)
+
+
 class Case725_simplified_typical_traversal(_CommonCase):
 
     def test_100_everything(self):

@@ -26,11 +26,56 @@ def _normalize_sys_path():
 _normalize_sys_path()
 import click  # noqa: E402
 
+# == HERE WE DEFINE OUR OWN DECORATORS (mostly)
+
+
+def require_hub(orig_f):
+    """decorator for ALL endpoints that need the "collectons hub" (so, most).
+
+    DISCUSSION: although DRY, it feels under-abstracted (i.e. cluttered).
+    """
+
+    def f(ctx, **kwargs):
+
+        cf = ctx.obj  # common functions
+        if cf.unsanitized_collections_hub is not None:
+            return orig_f(ctx, **kwargs)
+
+        _ = (f"'{ctx.info_name}' requires this option "
+             "(under the top-level command) "
+             f"(or set the {_coll_hub_env_var} environment variable).")
+
+        raise click.MissingParameter(
+                _,
+                param_hint=(_coll_hub_opt,),
+                param_type='option',
+                )
+
+    f.__name__ = orig_f.__name__  # click needs the name to be "right"
+    f.__doc__ = orig_f.__doc__  # same! (covered)
+    return f
+
+
+class _CommonFunctions:
+
+    def __init__(self, collections_hub):
+        self.unsanitized_collections_hub = collections_hub
+
+
+_coll_hub_opt = '--collections-hub'
+_coll_hub_env_var = 'KSS_HUB'
+
+
+# == BELOW
 
 @click.group()
-def cli():
-    # (you could output lines here and it will break help screens)
-    pass
+@click.option(
+        _coll_hub_opt, metavar='PATH',
+        envvar=_coll_hub_env_var,
+        help=f'The doo-hah with the foo-fah (env: {_coll_hub_env_var}).')
+@click.pass_context
+def cli(ctx, collections_hub):
+    ctx.obj = _CommonFunctions(collections_hub)
 
 
 @cli.command()
@@ -85,7 +130,9 @@ def delete():
 
 @cli.command()
 @click.argument('collection')
-def traverse():
+@click.pass_context
+@require_hub
+def traverse(cf, collection):
     """traverse the collection of entities in "storage order" and for every
     entity output exactly one line to STDOUT consisting of only the entity's
     internal identifier.
@@ -94,7 +141,49 @@ def traverse():
     we don't even know if we want this
     """
 
-    click.echo('#open [#867.M] traverse')
+    """NOTE NOW #todo
+    WE WILL ABSOLUTELY break these things up into functions
+    """
+
+    # make the thing
+
+    import os.path as os_path
+    col_path = os_path.join(cf.obj.unsanitized_collections_hub, collection)
+
+    # make this other thind (unrelated)
+
+    from kiss_rdb.magnetics_ import collection_via_directory as lib
+
+    coll = lib.collection_via_directory_and_filesystem(col_path, 'xxx')
+
+    # try this third thing
+
+    error_categories_seen = set()
+    error_categories = []
+
+    def listener(*args):
+        # (Case799_200)
+        *chan, payloader = args
+        assert('error' == chan[0])  # KIS for now
+        error_category = chan[2]
+        if error_category not in error_categories_seen:
+            error_categories_seen.add(error_category)
+            error_categories.append(error_category)
+        for line in payloader():
+            _echo_error(line)
+
+    # get busy with this fourth thing
+
+    xx = coll.to_identifier_stream(listener)
+
+    for qq in xx:
+        cover_me('heyo an item')
+
+    if len(error_categories_seen):
+        only_error_catetory, = error_categories  # ..
+        from click.exceptions import UsageError as _ClickUsageError
+        assert('argument_error' == only_error_catetory)
+        raise _ClickUsageError('argument error (as explained above)')
 
 
 @cli.command()
@@ -113,6 +202,10 @@ def search():
     """
 
     click.echo('#open [#867.M] search')
+
+
+def _echo_error(line):
+    click.echo(line, err=True)
 
 
 def cover_me(msg=None):
