@@ -13,6 +13,7 @@ several different *separate* responsibilities:
 class collection_via_directory_and_filesystem:
 
     def __init__(self, dir_path, fs):
+
         identifier_depth = 3  # #open #[#867.K]
 
         def f(id_s, listener):
@@ -41,6 +42,21 @@ class collection_via_directory_and_filesystem:
                 _delete_entity,
                 id_s,
                 listener)
+
+    def retrieve_entity(self, id_s, listener):
+        """NOTICE
+
+        to retrieve one entity; this opens a file, reads some or all of the
+        file line-by-line, and then closes it (ALL just for that one entity.)
+        o not use this as written if you need to retrieve multiple entities
+        in one invocation.. :#here2
+        """
+
+        return self._CUD(
+            (),
+            _retrieve_entity,
+            id_s,
+            listener)
 
     def _CUD(self, args, func, id_s, listener):
 
@@ -131,13 +147,52 @@ def _delete_entity(identifier, file_path, filesystem, listener):
 _delete_entity.file_must_already_exist = True
 
 
+def _retrieve_entity(identifier, file_path, filesystem, listener):
+    """DISCUSSION
+
+    - the founding purpose of the "collection" idiom was to centralize
+      operations that mutate the file (CUD).
+    - but it seems to make sense to expose also the read-only verb (R in CRUD)
+    - the "filesystem" argument is only for injecting a spy. we do not bother
+      with the extra complexity of injecting spies when doing read-only on FS.
+    - point [#867.P] (in tests) is where in tests we also open the file..
+    - see #here2 about gross inefficiency in calling this multiple times.
+    - (Case708_450)
+    """
+
+    from .entity_via_identifier_and_file_lines import (
+            entity_via_identifier_and_file_lines as MDE_via,
+            entity_dict_via_entity_big_string__ as dict_via,
+            )
+
+    id_s = identifier.to_string()
+
+    with open(file_path) as lines:  # file existed last we checked #here1
+        mde = MDE_via(id_s, lines, listener)
+
+    if mde is None:
+        return  # (Case708_350)
+
+    # (Case708_450):
+
+    assert(mde.table_type == 'attributes')
+    assert(mde.identifier_string == id_s)
+
+    _big_string = ''.join(mde.to_line_stream())
+
+    return dict_via(_big_string, listener)
+
+
+_retrieve_entity.file_must_already_exist = True
+
+
 # == individual identifier stuff
 
 def _valid_path_for(identifier, func, dir_path, listener):
     pieces = __file_path_pieces_via_identifier(identifier, dir_path)
     file_path = os_path.join(*pieces)
     if func.file_must_already_exist:
-        if os_path.exists(file_path):
+        if os_path.exists(file_path):  # :#here1
             return file_path
         else:
             __whine_about_no_path(pieces, listener)

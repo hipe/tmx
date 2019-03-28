@@ -201,7 +201,47 @@ class Case707_entity_not_found(_CommonCase):
                 _this_one_collection_path(), _filesystem)
 
 
-class Case708_delete_simplified_typical(_CommonCase):
+# 050 - not found because bad ID
+# 150 - not found because no dir
+# 250 - not found because no file
+# 350 - not found because no ent in file
+# 450 - win
+
+
+class Case708_350_retrieve_no_ent_in_file(_CommonCase):
+
+    def test_100_emits_error_structure(self):
+        col = _this_one_collection_no_spy()
+
+        def f(listener):
+            return col.retrieve_entity('B9F', listener)
+        sct = self.run_this_expecting_failure(f)
+
+        # ~(Case253-Case384) cover the detailed components from this.
+        # this is just sort of a "curb-check" contact point integration check
+
+        self.assertEqual(sct['input_error_type'], 'not_found')
+        self.assertEqual(sct['identifier_string'], 'B9F')
+
+
+class Case708_450_retrieve(_CommonCase):
+
+    def test_100_identifier_is_in_result_dictionary(self):
+        _actual = self._this_dict()['identifier_string']
+        self.assertEqual(_actual, 'B9H')
+
+    def test_200_simple_immediate_values_are_there(self):
+        dct = self._this_dict()['SIMPLE_AND_IMMEDIATE_ATTRIBUTES']
+        self.assertEqual(dct['thing-A'], 'hi H')
+        self.assertEqual(dct['thing-B'], 'hey H')
+
+    @shared_subject
+    def _this_dict(self):
+        _col = _this_one_collection_no_spy()
+        return _col.retrieve_entity('B9H', _no_listener)
+
+
+class Case708_750_delete_simplified_typical(_CommonCase):
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
         self.assertTrue(self.record_of_call.did_succeed)
@@ -391,6 +431,13 @@ class Case725_simplified_typical_traversal(_CommonCase):
 
 
 @memoize
+def _this_one_collection_no_spy():
+    _fs = "no filesystem xyz123"
+    _path = _this_one_collection_path()
+    return _build_collection_via_directory_and_filesystem(_path, _fs)
+
+
+@memoize
 def _this_one_collection_path():
     return fixture_directory_path('050-rumspringa')
 
@@ -428,7 +475,7 @@ class _FilesystemSpy:
 
         monitor = ErrorMonitor_(listener)
 
-        with open(file_path) as fh:
+        with open(file_path) as fh:  # :[#867.P] (as referenced)
             new_lines = tuple(f(fh, monitor.listener))
 
         self.recordings.append((monitor.ok, file_path, new_lines))
@@ -468,6 +515,10 @@ def _build_collection_via_directory_and_filesystem(dir_path, fs):
 def _subject_module():
     from kiss_rdb.magnetics_ import collection_via_directory as _
     return _
+
+
+def _no_listener(*chan, payloader):
+    assert(False)  # when this trips, use _selib().debugging_listener()
 
 
 def _selib():

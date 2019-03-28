@@ -39,7 +39,13 @@ def require_hub(orig_f):
 
         cf = ctx.obj  # common functions
         if cf.unsanitized_collections_hub is not None:
-            return orig_f(ctx, **kwargs)
+
+            # (this handling of ec should be in its own decorator..)
+            ec = orig_f(ctx, **kwargs)
+            assert(isinstance(ec, int))
+            if ec:
+                __crazy_time(ec)
+            return
 
         _ = (f"'{ctx.info_name}' requires this option "
              "(under the top-level command) "
@@ -56,10 +62,91 @@ def require_hub(orig_f):
     return f
 
 
+def __crazy_time(ec):
+    """track complaints about click #[#867.L]:
+
+    - we shouldn't have to raise an exception to control the exit code
+    - whe shouldn't have to provide a message alongside an exit code
+    """
+
+    from click.exceptions import ClickException as e_class
+    e = e_class(f'(as explained above) (exit status: {ec})')
+    e.exit_code = ec  # thank goodness this works
+    raise e
+
+
 class _CommonFunctions:
 
     def __init__(self, collections_hub):
         self.unsanitized_collections_hub = collections_hub
+
+    def collection_via_unsanitized_argument(self, collection_argument):
+        import os.path as os_path
+        _coll_path = os_path.join(
+                self.unsanitized_collections_hub, collection_argument)
+
+        from kiss_rdb.magnetics_ import collection_via_directory as lib
+        return lib.collection_via_directory_and_filesystem(
+                _coll_path, 'no fs yet')
+
+    def three_for_listener(self):  # UGLY AS HELL
+
+        error_categories_seen = set()
+        error_categories = []
+
+        def listener(*args):
+            # (Case799_200)
+            mood, shape, error_category, *chan_tail, payloader = args
+
+            # for mood, for now there's only one mood
+            assert('error' == mood)  # KIS for now
+
+            # for error category, we simply check-off a box
+            if error_category not in error_categories_seen:
+                error_categories_seen.add(error_category)
+                error_categories.append(error_category)
+
+            # if there's business-level channel info, ok but cover it
+            if len(chan_tail):
+                business, = chan_tail
+                if 'no_such_directory' == business:
+                    pass
+                else:
+                    cover_me('ok fine but cover it - probably ignore it')
+
+            # express the emission appropriately for the shape
+            if 'expression' == shape:
+                for line in payloader():
+                    _echo_error(line)
+            elif 'structure' == shape:
+                _struct = payloader()
+                _express_error_structure(error_category, _struct)
+            else:
+                assert(False)
+
+        return error_categories_seen, error_categories, listener
+
+
+def _express_error_structure(error_category, struct):  # (Case810)
+    """messy for now..."""
+
+    dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
+
+    reason = dim_pool.pop('reason')  # assert
+
+    if len(dim_pool):
+
+        # for now, just making a bunch of overly attentive contact, as a
+        # sort of specification assertion of what metadata is available
+
+        assert('input_error' == error_category)  # hi.
+        typ = dim_pool.pop('input_error_type')
+        assert('not_found' == typ)  # hi.
+        dim_pool.pop('identifier_string')
+        dim_pool.pop('might_be_out_of_order')
+        assert(0 == len(dim_pool))
+
+    _echo_error(reason)
 
 
 _coll_hub_opt = '--collections-hub'
@@ -103,7 +190,9 @@ def update():
 @cli.command()
 @click.argument('collection')
 @click.argument('internal-identifier')
-def get():
+@click.pass_context
+@require_hub
+def get(ctx, collection, internal_identifier):
     """retrieve the entity from the collection
     given the entity's internal identifier.
 
@@ -114,7 +203,25 @@ def get():
     with a where clause mebbe
     """
 
-    click.echo('#open [#867.M] get')
+    cf = ctx.obj
+    error_categories_seen, error_categories, listener = cf.three_for_listener()
+
+    col = cf.collection_via_unsanitized_argument(collection)
+
+    dct = col.retrieve_entity(internal_identifier, listener)
+    if dct is None:
+        return 404  # (Case812)
+
+    # (Case813):
+    # don't get overly attached to the use of JSON here.
+    # it's done out of the convenience of implementation here..
+
+    import json
+    fp = click.utils._default_text_stdout()  # oh my
+    json.dump(dct, fp=fp, indent=2)
+    fp.write('\n')  # (the above doesn't)
+
+    return _success_exitstatus
 
 
 @cli.command()
@@ -132,7 +239,7 @@ def delete():
 @click.argument('collection')
 @click.pass_context
 @require_hub
-def traverse(cf, collection):
+def traverse(ctx, collection):
     """traverse the collection of entities in "storage order" and for every
     entity output exactly one line to STDOUT consisting of only the entity's
     internal identifier.
@@ -141,49 +248,24 @@ def traverse(cf, collection):
     we don't even know if we want this
     """
 
-    """NOTE NOW #todo
-    WE WILL ABSOLUTELY break these things up into functions
-    """
+    cf = ctx.obj
+    error_categories_seen, error_categories, listener = cf.three_for_listener()
 
-    # make the thing
+    col = cf.collection_via_unsanitized_argument(collection)
 
-    import os.path as os_path
-    col_path = os_path.join(cf.obj.unsanitized_collections_hub, collection)
+    _iids = col.to_identifier_stream(listener)
 
-    # make this other thind (unrelated)
-
-    from kiss_rdb.magnetics_ import collection_via_directory as lib
-
-    coll = lib.collection_via_directory_and_filesystem(col_path, 'xxx')
-
-    # try this third thing
-
-    error_categories_seen = set()
-    error_categories = []
-
-    def listener(*args):
+    echo = click.echo
+    for iid in _iids:
         # (Case799_200)
-        *chan, payloader = args
-        assert('error' == chan[0])  # KIS for now
-        error_category = chan[2]
-        if error_category not in error_categories_seen:
-            error_categories_seen.add(error_category)
-            error_categories.append(error_category)
-        for line in payloader():
-            _echo_error(line)
-
-    # get busy with this fourth thing
-
-    xx = coll.to_identifier_stream(listener)
-
-    for qq in xx:
-        cover_me('heyo an item')
+        echo(iid.to_string())
 
     if len(error_categories_seen):
         only_error_catetory, = error_categories  # ..
-        from click.exceptions import UsageError as _ClickUsageError
         assert('argument_error' == only_error_catetory)
-        raise _ClickUsageError('argument error (as explained above)')
+        return 400  # 400 - Bad Request lol
+
+    return _success_exitstatus
 
 
 @cli.command()
@@ -210,5 +292,9 @@ def _echo_error(line):
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
+
+
+_success_exitstatus = 0
+
 
 # #born.

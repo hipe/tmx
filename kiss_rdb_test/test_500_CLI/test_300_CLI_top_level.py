@@ -1,4 +1,6 @@
-import _common_state  # noqa: F401
+from _common_state import (
+        fixture_directories_path,
+        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -63,7 +65,7 @@ class _CommonCase(unittest.TestCase):
         lines, e = self._expect_common('stdout', 'system exit')
         self.assertEqual(e.code, 0)
         assert('\n' == lines[1])  # meh
-        return _These_Two_B(lines[0], lines[2])
+        return _StructUsageLineAndFirstDescLine(lines[0], lines[2])
 
     def apparently_just_prints_entire_help_screen(self):
 
@@ -101,7 +103,7 @@ class _CommonCase(unittest.TestCase):
                 allow_stderr_lines=yes_stderr,
                 mandatory_exception_category=which_e,
                 )
-        lines = list(lines)  # would be tuple but for all #here3
+        lines = tuple(lines)  # it's a generator. flatten it now before etc
         return lines, e
 
     def EXPECT_STDERR_LINES_ONLY(self):
@@ -180,9 +182,9 @@ class Case792_strange_arg(_CommonCase):
 
     @shared_subject
     def _exe(self):
-        lines, ex = self._expect_common('stdout', 'usage error')
+        lines, e = self._expect_common('stdout', 'usage error')
         self.assertEqual(len(lines), 0)
-        return ex
+        return e
 
     def given_args(self):
         return ('foo-fah-fee',)
@@ -269,24 +271,45 @@ class Case799_100_help_screen_for_traverse(_CommonCase):
 
 class Case799_200_touch_error_message_integration(_CommonCase):
 
-    def test_100_first_line_explains(self):
-        _actual = self._lines()[0]
+    def test_100_generic_failure_exit_status(self):
+        _actual = self._end_state().exception.exit_code
+        self.assertEqual(_actual, 400)
+
+    def test_200_message_lines(self):
+        _actual, = self._end_state().lines
         reason, path = _actual.split(' - ')
         self.assertEqual(reason, 'collection does not exist because no such directory')  # noqa: E501
         self.assertEqual(path, 'qq/pp/entities\n')
 
-    def test_200_second_line_doesnt_care_about_your_feelings(self):
-        _actual = self._lines()[1]
-        self.assertEqual(_actual, 'argument error (as explained above)')
-
     @shared_subject
-    def _lines(self):
-        lines, e = self._expect_common('stderr', 'usage error')
-        only_line, = lines  # was gonna use #here3 but meh
-        return (only_line, str(e))
+    def _end_state(self):
+        lines, e = self._expect_common('stderr', 'click exception')
+        return _StructLinesAndException(lines, e)
 
     def given_args(self):
         return ('--collections-hub', 'qq', 'traverse', 'pp')
+
+
+class Case799_200_traverse(_CommonCase):
+
+    def test_100_exit_code_is_zero(self):
+        self.assertEqual(self._end_state().exit_code, None)
+
+    def test_200_lines_look_like_internal_identifiers(self):
+        lines = self._end_state().lines
+        self.assertIn(len(lines), range(7, 10))
+        import re
+        rx = re.compile('^[A-Z0-9]{3}\n$')
+        for line in lines:
+            assert(rx.match(line))
+
+    @shared_subject
+    def _end_state(self):
+        lines, ec = self._expect_common('stdout', None)
+        return _StructLinesAndExitCode(lines, ec)
+
+    def given_args(self):
+        return (*_common_head(), 'traverse', _common_collection)
 
 
 class Case800_help_screen_for_select(_CommonCase):
@@ -321,6 +344,61 @@ class Case808_help_screen_for_get(_CommonCase):
 
     def given_args(self):
         return ('get', '--help')
+
+
+# Case809_get_no_ent_bad_identifier - says so
+# Case810_get_no_ent_no_dir - hopefully says no such file
+# Case811_get_no_ent_no_file - says no such directory
+
+
+class Case812_get_no_ent_in_file(_CommonCase):
+
+    def test_100_exit_code_is_404_lol(self):
+        self.assertEqual(self._end_state().exception.exit_code, 404)
+
+    def test_200_says_only_not_found__with_ID(self):
+        line, = self._end_state().lines
+        self.assertEqual(line, "'B9F' not found\n")
+
+    @shared_subject
+    def _end_state(self):
+        lines, e = self._expect_common('stderr', 'click exception')
+        return _StructLinesAndException(lines, e)
+
+    def given_args(self):
+        return (*_common_head(), 'get', _common_collection, 'B9F')
+
+
+class Case813_get(_CommonCase):
+
+    def test_100_exit_code_is_NONE_idk_why(self):
+        self.assertIsNone(self._end_state().exit_code)
+
+    def test_200_lines_wow(self):
+        lines = self._end_state().lines
+        _actual_big_string = ''.join(lines)  # correct an issue todo
+        _actual_lines = tuple(_lines_via_big_string_as_is(_actual_big_string))
+
+        _expect_big_s = """
+        {
+          "identifier_string": "B9H",
+          "SIMPLE_AND_IMMEDIATE_ATTRIBUTES": {
+            "thing-A": "hi H",
+            "thing-B": "hey H"
+          }
+        }
+        """
+
+        _expect_lines = tuple(_lines_via_big_string_unindent(_expect_big_s))
+        self.assertSequenceEqual(_actual_lines, _expect_lines)
+
+    @shared_subject
+    def _end_state(self):
+        lines, ec = self._expect_common('stdout', None)
+        return _StructLinesAndExitCode(lines, ec)
+
+    def given_args(self):
+        return (*_common_head(), 'get', _common_collection, 'B9H')
 
 
 class Case815_help_screen_for_create(_CommonCase):
@@ -403,19 +481,27 @@ def _CASE_A():  # usually it's one invocation
             debug_IO_f=lambda: _sys().stderr,
             )
     ec = ex.code
-    return _These_Two_A(_tree_via_lines(lines), ec)
+    return _StructTreeAndExitCode(_tree_via_lines(lines), ec)
 
 
-class _These_Two_A:
-    def __init__(self, aa, bb):
-        self.tree = aa
-        self.exit_code = bb
+class _StructUsageLineAndFirstDescLine:
+    def __init__(self, *two):
+        self.usage_line, self.first_description_line = two
 
 
-class _These_Two_B:
-    def __init__(self, aa, bb):
-        self.usage_line = aa
-        self.first_description_line = bb
+class _StructTreeAndExitCode:
+    def __init__(self, *two):
+        self.tree, self.exit_code = two
+
+
+class _StructLinesAndException:
+    def __init__(self, *two):
+        self.lines, self.exception = two
+
+
+class _StructLinesAndExitCode:
+    def __init__(self, *two):
+        self.lines, self.exit_code = two
 
 
 # == BEGIN stdout capture and support #here2
@@ -462,33 +548,42 @@ def BIG_FLEX(
         err_WR = es.MuxingWriteReceiver((_edwr, err_WR))
 
     def invoke_CLI():
-        _invoke_CLI(given_args)  # ..
+        return _invoke_CLI(given_args)  # ..
 
     def clean_up_writes():
         if is_complicated:
-            return __clean_up_writed_complicatedly(mixed_writes)
+            return __clean_up_writes_complicatedly(mixed_writes)
         return __lines_via_writes(mixed_writes)
 
     if mandatory_exception_category is None:
-        cover_me('never used this one')
         with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
-            invoke_CLI()
-        return clean_up_writes()
+            exit_code = invoke_CLI()
+        return clean_up_writes(), exit_code  # NOTE this messes up your game
 
-    if 'system exit' == mandatory_exception_category:
-        exception_class = SystemExit
-    elif 'usage error' == mandatory_exception_category:
-        from click.exceptions import UsageError as exception_class
-    elif 'anything experiment':
-        from click.exceptions import UsageError as _
-        exception_class = (_, SystemExit)
-    else:
-        cover_me(f'uncoded for exception category: {mandatory_exception_category}')  # noqa: E501
+    def these(s):
+        if 'click exception' == s:
+            yield ce('ClickException')
+        elif 'system exit' == s:
+            yield SystemExit
+        elif 'usage error' == s:
+            yield ce('UsageError')
+        elif 'anything experiment' == s:
+            yield ce('ClickException')
+            yield ce('UsageError')
+            yield SystemExit
+        else:
+            cover_me(f'uncoded for exception category: {s}')
+
+    def ce(s):  # ce="click exception"
+        import click.exceptions as _
+        return getattr(_, s)
+
+    _exception_class_expression = tuple(these(mandatory_exception_category))
 
     try:
         with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
             invoke_CLI()
-    except exception_class as e_:
+    except _exception_class_expression as e_:
         e = e_
 
     _ = clean_up_writes()
@@ -499,22 +594,22 @@ def _write_receiver_via_function(receive_write):
     return es.ProxyingWriteReceiver(receive_write)
 
 
-def _i_said_no(x):
+def _expecting_no_emissions(x):
     assert(False)
 
 
-_no_WR = _write_receiver_via_function(_i_said_no)
+_no_WR = _write_receiver_via_function(_expecting_no_emissions)
 
 
 def _invoke_CLI(given_args):
         from kiss_rdb.cli import cli
-        _ = cli.main(
+        _exit_status = cli.main(
                 args=given_args,
                 prog_name='ohai-mami',
                 standalone_mode=False,  # see.
                 complete_var='___hope_this_env_var_is_never_set',
                 )
-        cover_me(f'neve been this far {type(_)}')
+        return _exit_status  # (Case799_200)
 
 
 def OPEN_HORRIBLE_VENDOR_HACK(sout_write_receiver, serr_write_receiver):
@@ -570,7 +665,9 @@ def _tree_via_lines(lines):
     return _(lines)
 
 
-def __clean_up_writed_complicatedly(writes):
+def __clean_up_writes_complicatedly(writes):
+    if not len(writes):
+        return ()
     cover_me('enjoy')
 
 
@@ -581,11 +678,8 @@ def __lines_via_writes(writes):
     that adds a trailing *empty* string
     """
 
-    from script_lib.test_support.expect_treelike_screen import (
-            line_stream_via_big_string as lines_via_big)
-
     for write in writes:
-        for line in lines_via_big(write):
+        for line in _lines_via_big_string_as_is(write):
             yield line
 
 
@@ -597,6 +691,21 @@ def _sys():
 # == END support for stdout capture
 
 
+def _lines_via_big_string_unindent(big_string):
+    from kiss_rdb_test.structured_emission import unindent as _  # "selib"
+    return _(big_string)
+
+
+def _lines_via_big_string_as_is(big_string):
+    from script_lib.test_support.expect_treelike_screen import (
+            line_stream_via_big_string as _)
+    return _(big_string)
+
+
+def _common_head():
+    return '--collections-hub', fixture_directories_path()
+
+
 def _usage_error():
     from click.exceptions import UsageError as _
     return _
@@ -606,6 +715,7 @@ def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
+_common_collection = '050-rumspringa'
 _IID = 'INTERNAL_IDENTIFIER'
 
 if __name__ == '__main__':

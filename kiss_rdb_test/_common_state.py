@@ -1,9 +1,11 @@
+import os.path as os_path
+
+
 def _normalize_sys_path():  # see [#019]
     from sys import path as a
-    from os import path
 
-    dn = path.dirname
-    test_dir = dn(path.abspath(__file__))
+    dn = os_path.dirname
+    test_dir = dn(os_path.abspath(__file__))
     mono_repo_dir = dn(test_dir)
 
     if test_dir == a[0]:
@@ -33,8 +35,27 @@ def _normalize_sys_path():  # see [#019]
 _top_test_dir = _normalize_sys_path()
 
 
+def lazy(f):  # #meh
+    def redefined_f():
+        return use_f()
+
+    def use_f():
+        x = f()
+        nonlocal use_f
+
+        def use_f():
+            return x
+        return x
+
+    return redefined_f
+
+
 def fixture_directory_path(stem):
-    import os.path as os_path
-    return os_path.join(_top_test_dir, 'fixture-directories', stem)
+    return os_path.join(fixture_directories_path(), stem)
+
+
+@lazy
+def fixture_directories_path():
+    return os_path.join(_top_test_dir, 'fixture-directories')
 
 # #born.

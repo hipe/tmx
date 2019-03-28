@@ -4,5 +4,3 @@ typed values via CLI values
 integrate CUD thru schema with file (semaphore) locking
 create thru schema integrated with attributes & allocation
 re-create the new index file after provisioning
-no hub (CLI)
-#todo

@@ -333,7 +333,7 @@ _ordinary_run = re.compile(r'[^"\\\u0000-\u001F\u007F]+')
 
 
 r"""
-excerpted verbatim from the tom doc:
+excerpted verbatim from the toml doc:
 
     For convenience, some popular characters have a compact escape sequence.
 
@@ -389,10 +389,12 @@ def __check_name_sets(dct, line_objects, listener):
     return okay
 
 
-def _entity_dict_via_entity_big_string(big_string, listener):
+def entity_dict_via_entity_big_string__(big_string, listener):
     """most of this is validating etc.
 
     this will expand when we get to [#864.future-feature-1] meta
+
+    at writing, covered by (Case708_450)
     """
 
     dct = _vendor_parse(big_string, listener)
@@ -409,7 +411,7 @@ def _entity_dict_via_entity_big_string(big_string, listener):
 
     return {
             'identifier_string': id_string,
-            'in_file_attributes': item_partitions[attrs_key],
+            'SIMPLE_AND_IMMEDIATE_ATTRIBUTES': item_partitions[attrs_key],
             }
 
 
