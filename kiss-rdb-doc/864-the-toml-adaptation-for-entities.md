@@ -45,9 +45,8 @@ determine what kind of line it is..
 ## broad provision 3
 
 there's a time and a place for the many layers of validation that can be
-done. for certain functions we're going to err on the side of doing things
-the optimistic way unless strict validation is the objective of the
-operation..
+done. we're going to err on the side of being optimistic
+unless strict validation is the objective of the particular operation..
 
 
 
@@ -80,13 +79,58 @@ of interest to us are:
   - update
   - delete
 
-(you will see this set of verbs acronymized as "CUD" in the code and
-in some document titles, out of deference to its forebear.)
+we acronimize this set of verbs as "CUD" in the code and perhaps document
+titles, in deference to its forebear.
+
+
+
+
+## CUD+RT breakneck breakdown
+
+- this table splays out (on two dimensions) a condensed oveview of
+  implementation considerations across our five fundamental operations:
+- **CUD+RT**: CREATE, UPDATE, DELETE, RETRIEVE, TRAVERSE
+- both axes include mechanics etc not yet introduced
+- generally when an operation has more X's it is more complicated
+
+**columns legend**
+
+- **file?** whether the entities file must first exist ("-" means _yes_)
+- **ID?** whether you must pass an existing identifier to the function
+- **attrs?** whether you must pass name-value pairs to the function
+- **Mx File?** whether the entities file is mutated
+- **Mx Index?** whether the index file is mutated
+
+
+|CUD+RT|file?|ID?|attrs?|Mx File?|Mx Index?|
+|---|---|---|---|---|---|
+|traverse|-|-|-|-|-|
+|read    |-|X|-|-|-|
+|update  |-|X|X|X|-|
+|delete  |-|X|-|X|X|
+|create  |X|-|X|X|X|
+
+**mini-conclusion**
+
+- the operations towards the top are indeed generally easier to implement.
+- DELETE and CREATE are the only two that mutate the index file.
+- (they are probably the only two that read it, too.)
+- we infer from looking at the table (but also we know empirically)
+  that CREATE is the most complicated: not pictured is that CREATE must
+  provision a new ID.
+- not pictured is the more complicated edge cases of creating the first
+  and deleting the last entity in a collection.
 
 
 
 
 ## file edit theory
+
+the previous section presented a breakneck-pace, super-condensed, high-level
+summary of considerations for implementing our five operations.
+
+here we come from the other end and think about the fundamental properties
+of the space we're exploring, and then we build back up from there. okay:
 
 we'll say for now that the persisted state of a collection _is_ its
 representation in its one or more files, axiomatically. ([#853] "filetree

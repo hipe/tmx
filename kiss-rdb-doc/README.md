@@ -32,7 +32,9 @@ woah boy.
 |[#870]                     |       | "backend roadmap again"
 |[#869]                     |       | near term end game
 |[#868]                     |       | test number allocation
-|[#867.P]                   |       | track a codepoint referenced multiple places
+|[#867.R]                   | #prov | provision: failure is None not False
+|[#867.Q]                   | #prov | provision: do index file second
+|[#867.P]                   | #trak | possible issue on windows
 |[#867.N]                   | #open | (OUTSIDE OF SUB-PROJECT) how to setup.py
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click

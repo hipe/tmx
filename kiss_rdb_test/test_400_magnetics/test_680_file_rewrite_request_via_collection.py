@@ -8,50 +8,13 @@ import unittest
 
 class _CommonCase(unittest.TestCase):
 
-    # -- CUD expecting succeess
+    # == DSL-ish for test assertions
 
-    def update_expecting_success(self, id_s, cuds):
-        def f(col, listener):
-            return col.update_entity(id_s, cuds, listener)
+    def entity_file_rewrite(self):
+        return self.recorded_file_rewrites()[0]  # (per [#867.Q], is first)
 
-        x, rec = self.CUD_expecting_success(f)
-        self.assertEqual(x, True)
-        return rec
-
-    def delete_expecting_success(self, id_s):
-
-        def f(col, listener):
-            return col.delete_entity(id_s, listener)
-
-        x, rec = self.CUD_expecting_success(f)
-        self.assertEqual(x, True)
-        return rec
-
-    # -- CUD expecting failure and recording
-
-    def delete_expecting_failure_and_recordings(self, id_s):
-
-        col = self.subject_collection()
-        fs = col._filesystem
-
-        def f(listener):
-            return col.delete_entity(id_s, listener)
-
-        sct = self.run_this_expecting_failure(f)
-
-        rec = fs.finish_vis_a_vis_script()
-
-        return (sct, rec)
-
-    # -- CUD expecting failure
-
-    def delete_expecting_failure(self, id_s):
-        def f(listener):
-            return self.subject_collection().delete_entity(id_s, listener)
-
-        return self.run_this_expecting_failure(f)
-
-    # == general
+    def index_file_rewrite(self):
+        return self.recorded_file_rewrites()[1]  # (per [#867.Q], is second)
 
     @property
     def left_half(self):
@@ -60,6 +23,54 @@ class _CommonCase(unittest.TestCase):
     @property
     def right_half(self):
         return self.two_halves()[1]
+
+    # == for creating result state under test
+
+    # -- CUD expecting success
+
+    def update_expecting_success(self, id_s, cuds):
+        return self._recording_of_success(_function_for_update(id_s, cuds))
+
+    def create_expecting_success(self, id_s, wats):
+        raise Exception('cover me')  # #todo
+        return self._recording_of_success(_function_for_create(id_s, wats))
+
+    def delete_expecting_success(self, id_s):
+        return self._recording_of_success(_function_for_delete(id_s))
+
+    # -- CUD expecting failure and recording
+
+    def delete_expecting_failure_and_recordings(self, id_s):
+        return self._struct_and_recording_of_fail(_function_for_delete(id_s))
+
+    # -- CUD expecting failure
+
+    def create_expecting_failure(self, wats):
+        return self._payload_of_failure(_function_for_create(wats))
+
+    def delete_expecting_failure(self, id_s):
+        return self._payload_of_failure(_function_for_delete(id_s))
+
+    # == THESE
+
+    def _payload_of_failure(self, f):
+        col = self.subject_collection()
+
+        def use_f(listener):
+            return f(col, listener)
+        return self.run_this_expecting_failure(use_f)
+
+    def _struct_and_recording_of_fail(self, f):
+
+        col = self.subject_collection()
+        fs = col._filesystem
+
+        def use_f(listener):
+            return f(col, listener)
+
+        sct = self.run_this_expecting_failure(use_f)
+        recs = fs._recorded_file_rewrites_from_finish()
+        return (sct, recs)
 
     def run_this_expecting_failure(self, f):  # #open #[867.H] DRY these
         count = 0
@@ -73,8 +84,8 @@ class _CommonCase(unittest.TestCase):
                 self.fail('too many emissions')
             only_emission = a
 
-        x = f(listener)
-        self.assertIsNone(x)
+        res = f(listener)
+        self.assertIsNone(res)  # [#867.R] provision: None not False :#here2
         self.assertEqual(count, 1)
 
         *chan, payloader = only_emission
@@ -84,32 +95,49 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(chan, ('error', 'structure', 'input_error'))
         return payloader()
 
-    def CUD_expecting_success(self, f):
+    def _recording_of_success(self, f):
 
         col = self.subject_collection()
         fs = col._filesystem
+        listener = self.listener
 
-        x = f(col, self.listener())
+        # --
 
-        recs = fs.finish_vis_a_vis_script()
-        rec, = recs
-        return x, rec
+        res = f(col, listener)
+        self.assertTrue(res)  # :#here1
 
-    def subject_collection(self):
-        return _default_subject()
+        return fs._recorded_file_rewrites_from_finish()
 
     def listener(self):
         if False:
             return _selib().debugging_listener()
 
 
-class Case700_collection_can_be_built_with_noent_dir(_CommonCase):
+def _function_for_update(id_s, cuds):
+    def f(col, listener):
+        return col.update_entity(id_s, cuds, listener)
+    return f
+
+
+def _function_for_create(wats):
+    def f(col, listener):
+        return col.create_entity(wats, listener)
+    return f
+
+
+def _function_for_delete(id_s):
+    def f(col, listener):
+        return col.delete_entity(id_s, listener)
+    return f
+
+
+class Case701_collection_can_be_built_with_noent_dir(_CommonCase):
 
     def test_100(self):
-        self.assertIsNotNone(_subject_from_noent_dir())
+        self.assertIsNotNone(_collection_with_noent_dir())
 
 
-class Case703_identifier_with_invalid_chars(_CommonCase):
+class Case702_identifier_with_invalid_chars(_CommonCase):
 
     def test_100_reason(self):
         _actual = self.left_half
@@ -125,8 +153,11 @@ class Case703_identifier_with_invalid_chars(_CommonCase):
         _ = self.delete_expecting_failure('AbC')
         return _['reason'].split(' - ')
 
+    def subject_collection(self):
+        return _collection_with_NO_filesystem()
 
-class Case704_identifier_too_short_or_long(_CommonCase):
+
+class Case703_identifier_too_short_or_long(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -141,8 +172,11 @@ class Case704_identifier_too_short_or_long(_CommonCase):
         _ = self.delete_expecting_failure('ABCD')
         return _['reason'].split(' - ')
 
+    def subject_collection(self):
+        return _collection_with_NO_filesystem()
 
-class Case705_some_top_directory_not_found(_CommonCase):
+
+class Case704_some_top_directory_not_found(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -159,8 +193,11 @@ class Case705_some_top_directory_not_found(_CommonCase):
         _ = self.delete_expecting_failure('ABC')
         return _['reason'].split(' - ')
 
+    def subject_collection(self):
+        return _collection_with_noent_dir()
 
-class Case706_file_not_found(_CommonCase):
+
+class Case705_file_not_found(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -176,19 +213,23 @@ class Case706_file_not_found(_CommonCase):
         return _['reason'].split(' - ')
 
     def subject_collection(self):
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), None)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=None)
 
 
-class Case707_entity_not_found(_CommonCase):
+class Case706_entity_not_found(_CommonCase):
 
     def test_100_failed_to_rewrite(self):
-        rec = self._structure_and_recordings()[1]
-        self.assertEqual(rec[0][0], False)  # ick
+        self._structure_and_recordings()  # because #here2
 
     def test_200_message_sadly_has_no_context_yet(self):
         sct = self._structure_and_recordings()[0]
         self.assertEqual(sct['reason'], "entity 'B7D' is not in file")
+
+    def test_300_no_files_rewritten(self):
+        recs = self._structure_and_recordings()[1]
+        self.assertEqual(recs, 'hi there were no file rewrites')
 
     @shared_subject
     def _structure_and_recordings(self):
@@ -196,22 +237,22 @@ class Case707_entity_not_found(_CommonCase):
         return sct, recs
 
     def subject_collection(self):
-        _filesystem = _FilesystemSpy(_one_call_to_rewrite, self)
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=_filesystem_expecting_no_rewrites())
 
 
-# 050 - not found because bad ID
-# 150 - not found because no dir
-# 250 - not found because no file
-# 350 - not found because no ent in file
-# 450 - win
+# Case707 - not found because bad ID
+# Case708 - not found because no dir
+# Case709 - not found because no file
+# Case710 - not found because no ent in file
+# Case711 - win
 
 
-class Case708_350_retrieve_no_ent_in_file(_CommonCase):
+class Case710_retrieve_no_ent_in_file(_CommonCase):
 
     def test_100_emits_error_structure(self):
-        col = _this_one_collection_no_spy()
+        col = _collection_with_NO_filesystem()
 
         def f(listener):
             return col.retrieve_entity('B9F', listener)
@@ -224,7 +265,7 @@ class Case708_350_retrieve_no_ent_in_file(_CommonCase):
         self.assertEqual(sct['identifier_string'], 'B9F')
 
 
-class Case708_450_retrieve(_CommonCase):
+class Case711_retrieve(_CommonCase):
 
     def test_100_identifier_is_in_result_dictionary(self):
         _actual = self._this_dict()['identifier_string']
@@ -237,24 +278,23 @@ class Case708_450_retrieve(_CommonCase):
 
     @shared_subject
     def _this_dict(self):
-        _col = _this_one_collection_no_spy()
+        _col = _collection_with_NO_filesystem()
         return _col.retrieve_entity('B9H', _no_listener)
 
 
-class Case708_750_delete_simplified_typical(_CommonCase):
+class Case712_delete_simplified_typical(_CommonCase):
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
-        self.assertTrue(self.record_of_call.did_succeed)
+        self.recorded_file_rewrites()  # because #here1
 
     def test_200_path_is_path(self):
-        path = self.record_of_call.path
+        path = self.entity_file_rewrite().path
         import re
         tail = re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
         self.assertEqual(tail, 'entities/B/7.toml')
 
-    def test_300_LINES(self):
-        from kiss_rdb_test.structured_emission import unindent
-        expect = tuple(unindent("""
+    def test_300_entities_file_lines_look_good(self):
+        expect = tuple(_unindent("""
         [item.B7E.attributes]
         thing-1 = "hi E"
         thing-2 = "hey E"
@@ -264,44 +304,57 @@ class Case708_750_delete_simplified_typical(_CommonCase):
         thing-2 = "hey G"
         """))
 
-        self.assertSequenceEqual(self.record_of_call.lines, expect)
+        self.assertSequenceEqual(self.entity_file_rewrite().lines, expect)
 
-    @property
+    def test_400_index_was_rewritten(self):
+        _1, _2, _3, _4, _5, _6 = self.index_file_rewrite().lines  # yuck #here3
+        self.assertEqual(_4, '7 (                        E   G)\n')
+        # NOTE there is no 'F' here -----------------------^
+
     @shared_subject
-    def record_of_call(self):
-        _ = self.delete_expecting_success('B7F')
-        return _RecordOfCall(*_)
+    def recorded_file_rewrites(self):
+        return self.delete_expecting_success('B7F')
 
     def subject_collection(self):
-        _filesystem = _FilesystemSpy(_one_call_to_rewrite, self)
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
 
 
-class Case709_delete_that_leaves_file_empty(_CommonCase):
+class Case713_delete_that_leaves_file_empty(_CommonCase):
 
     def test_100_would_have_succeeded(self):
-        self.assertTrue(self.record_of_call.did_succeed)
+        self.recorded_file_rewrites()  # because #here1
 
     def test_200_path_is_path(self):
-        path = self.record_of_call.path
+        path = self.entity_file_rewrite().path
         import re
         tail = re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
         self.assertEqual(tail, 'entities/B/8.toml')
 
-    def test_300_LINES(self):
-        self.assertSequenceEqual(self.record_of_call.lines, ())
+    def test_300_entities_file_IS_TRUCATED_TO_ZERO(self):
+        self.assertSequenceEqual(self.entity_file_rewrite().lines, ())
 
-    @property
+    def test_400_index_was_rewritten(self):
+        _1, _2, _3, _4, _5 = self.index_file_rewrite().lines  # yuck #here3
+
+        # we're gonna look at the fourth line and the fifth line:
+
+        self.assertEqual(_4[0:3], '7 (')
+        # (this "spot" here used to be 8)
+        self.assertEqual(_5[0:3], '9 (')
+
     @shared_subject
-    def record_of_call(self):
-        _ = self.delete_expecting_success('B8H')
-        return _RecordOfCall(*_)
+    def recorded_file_rewrites(self):
+        return self.delete_expecting_success('B8H')
 
     def subject_collection(self):
-        _filesystem = _FilesystemSpy(_one_call_to_rewrite, self)
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+
+
+# Case714: delete when index file is left empty! (delete the last entity)
 
 
 class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
@@ -316,15 +369,21 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     """
 
     def test_100_everything(self):
-        ok, path, lines = self.update_expecting_success('B9H', (
+
+        recs = self.update_expecting_success('B9H', (
             ('delete', 'thing-A'),
             ('update', 'thing-B', 'modified hey'),
             ('create', 'thing-C', 'woot'),
             ))
 
-        self.assertTrue(ok)
+        rec, = recs  # onyl one file rewrite
+        path = rec.path
+        lines = rec.lines
+
+        # --
+
         self.assertEqual(_last_three_path_parts(path), 'entities/B/9.toml')
-        _expected = tuple(_selib().unindent(self._expecting_these()))
+        _expected = tuple(_unindent(self._expecting_these()))
         self.assertSequenceEqual(lines, _expected)
 
     def _expecting_these(self):
@@ -341,9 +400,9 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
         """
 
     def subject_collection(self):
-        _filesystem = _FilesystemSpy(_one_call_to_rewrite, self)
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=_build_filesystem_expecting_num_file_rewrites(1))
 
 
 class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
@@ -390,10 +449,9 @@ class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
         return channel, payloader
 
     def subject_collection(self):
-        _collection_path = fixture_directory_path('000-no-ent')
-        _filesystem = None
-        return _build_collection_via_directory_and_filesystem(
-                _collection_path, _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_of_no_ent(),
+                filesystem=None)
 
 
 class Case725_simplified_typical_traversal(_CommonCase):
@@ -425,73 +483,91 @@ class Case725_simplified_typical_traversal(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def subject_collection(self):
-        _filesystem = None
-        return _build_collection_via_directory_and_filesystem(
-                _this_one_collection_path(), _filesystem)
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=None)
 
 
 @memoize
-def _this_one_collection_no_spy():
-    _fs = "no filesystem xyz123"
-    _path = _this_one_collection_path()
-    return _build_collection_via_directory_and_filesystem(_path, _fs)
+def _collection_with_expecting_no_rewrites():
+    return _build_collection(
+            dir_path=_dir_path_most_common(),
+            filesystem=_filesystem_expecting_no_rewrites())
 
 
 @memoize
-def _this_one_collection_path():
+def _collection_with_noent_dir():
+    return _build_collection(
+            dir_path=_dir_path_of_no_ent(),
+            filesystem='no filesystem xyz121')
+
+
+@memoize
+def _collection_with_NO_filesystem():
+    return _build_collection(
+            dir_path=_dir_path_most_common(),
+            filesystem='no filesystem xyz122')
+
+
+@memoize
+def _dir_path_most_common():
     return fixture_directory_path('050-rumspringa')
 
 
 @memoize
-def _subject_from_noent_dir():
-    _ = fixture_directory_path('000-no-ent')
-    return _build_collection_via_directory_and_filesystem(_, None)
+def _dir_path_of_no_ent():
+    return fixture_directory_path('000-no-ent')
 
 
-_default_subject = _subject_from_noent_dir
+@memoize
+def _filesystem_expecting_no_rewrites():
+
+    def inj(*_):
+        assert(False)
+
+    def finish():
+        return 'hi there were no file rewrites'
+
+    return _build_filesystem_via_two_funcs(inj, finish)
 
 
-class _FilesystemSpy:
-    """NOTE
+def _build_filesystem_expecting_num_file_rewrites(expected_num):
 
-    our objective here is to be light & easy & to the point. however we
-    duplicate the very thinnest of responsibility from a real filesystem
-    façade..
-    """
+    recs = []
 
-    def __init__(self, expected_calls, test_context):
-        self._expected_calls_stack = list(reversed(expected_calls))
-        self._test_context = test_context
-        self.recordings = []
+    def INJECTED_FELLOW(from_fh, to_fh):
 
-    def rewrite_file(self, f, file_path, listener):
+        if len(recs) == expected_num:
+            raise Exception('too many doo-hahs')
 
-        fname, = self._expected_calls_stack.pop()
-        self._test_context.assertEqual(fname, 'rewrite')
+        from_fh.seek(0)  # necessary
+        _new_lines = tuple(iter(from_fh))
 
-        from kiss_rdb.magnetics_.identifiers_via_file_lines import (
-                ErrorMonitor_,
-                )
+        recs.append(_RecordOfFileRewrite(
+            path=to_fh.name,
+            lines=_new_lines,))
 
-        monitor = ErrorMonitor_(listener)
+    def finish():
 
-        with open(file_path) as fh:  # :[#867.P] (as referenced)
-            new_lines = tuple(f(fh, monitor.listener))
+        nonlocal recs
+        if len(recs) != expected_num:
+            raise Exception('still had unexpected yadda')
 
-        self.recordings.append((monitor.ok, file_path, new_lines))
+        res = tuple(recs)
+        del(recs)  # works! (as a safety measure)
+        return res
 
-        if monitor.ok:
-            return True
-        else:
-            return None  # (Case707) - not False for now..
+    return _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish)
 
-    def finish_vis_a_vis_script(self):
-        if len(self._expected_calls_stack):
-            self._test_context.fail("still had unexpected yadda")
 
-        x = tuple(self.recordings)
-        del(self.recordings)
-        return x
+def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):
+    from kiss_rdb.magnetics_ import filesystem as _
+
+    fs = _._Filesystem(INJECTED_FELLOW)
+
+    fs._recorded_file_rewrites_from_finish = finish
+
+    return fs
 
 
 def _last_three_path_parts(path):
@@ -499,17 +575,20 @@ def _last_three_path_parts(path):
     return re.search(r'[^/]+(?:/[^/]+){2}$', path)[0]
 
 
-class _RecordOfCall:
+class _RecordOfFileRewrite:
 
-    def __init__(self, did_succeed, path, lines):
-        self.did_succeed = did_succeed
+    def __init__(self, path, lines):
         self.path = path
         self.lines = lines
 
 
-def _build_collection_via_directory_and_filesystem(dir_path, fs):
+def _build_collection(dir_path, filesystem):
     return _subject_module().collection_via_directory_and_filesystem(
-            dir_path, fs)
+            dir_path, filesystem)
+
+
+def _unindent(big_string):
+    return _selib().unindent(big_string)
 
 
 def _subject_module():
@@ -525,8 +604,6 @@ def _selib():
     from kiss_rdb_test import structured_emission as _
     return _
 
-
-_one_call_to_rewrite = (('rewrite',),)
 
 if __name__ == '__main__':
     unittest.main()
