@@ -45,7 +45,7 @@ class _CUD_Attributes_Request:
         assert(components)
         self.components = tuple(components)
 
-    def edit_mutable_document_entity__(self, mde, listener):
+    def edit_mutable_document_entity_(self, mde, listener):
         from .CUD_attributes_via_request import (
                 apply_CUD_attributes_request_to_MDE___ as _)
         return _(mde, self, listener)

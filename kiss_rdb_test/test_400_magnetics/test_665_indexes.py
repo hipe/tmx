@@ -1,8 +1,5 @@
-import _common_state  # noqa: F401
-from kiss_rdb_test import structured_emission as selib
+from _common_state import unindent_with_dot_hack
 import unittest
-
-unindent = selib.unindent
 
 
 """NOTE tiny note about case numbers here:
@@ -61,17 +58,12 @@ class _CommonCase(unittest.TestCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def _build_expect_file_lines(self):
+
         # our unindent trick won't work for file formats whose first
         # char is not in column 1. our format is this way.
 
         big_s = self.expect_file_lines()
-        if '' == big_s:
-            return iter(())
-        itr = unindent(big_s)
-        for line in itr:  # once
-            assert('.\n' == line)
-            break
-        return itr
+        return unindent_with_dot_hack(big_s)
 
     def _depth_and_identifiers(self):
 
@@ -91,10 +83,11 @@ class _CommonCase(unittest.TestCase):
             for s in itr:
                 yield s
 
-        from kiss_rdb.magnetics_ import collection_via_directory as this_lib
+        from kiss_rdb.magnetics_.identifier_via_string import (
+                identifier_via_string__ as id_via_s)
 
         def identifier_via_string(s):
-            id_o = this_lib._identifier_via_string(s, None)
+            id_o = id_via_s(s, None)
             assert(depth == len(id_o.native_digits))
             return id_o
 

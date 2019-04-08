@@ -1,8 +1,6 @@
-import _common_state  # noqa: F401
-from kiss_rdb_test import structured_emission as selib
+from _common_state import unindent
 import unittest
 
-unindent = selib.unindent
 
 # (subject under test explained exhaustively in [#864] the toml adaptation)
 
@@ -15,7 +13,7 @@ def expect_everything(orig_f):
 
         _existing_lines = unindent(self.given_big_string())
 
-        _listener = selib.debugging_listener() if True else None
+        _listener = None  # _debugging_listener
 
         _out_lines_itr = orig_f(self, {
             'existing_lines': _existing_lines,

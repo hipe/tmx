@@ -17,7 +17,7 @@ class _StateMachineIsh():
 
     def __init__(self, x):
 
-        from .collection_via_directory import native_digit_via_character_ as _
+        from .identifier_via_string import native_digit_via_character_ as _
         self.native_digit_via_character = _
 
         self.is_at_stopping_point = True
@@ -199,7 +199,7 @@ class _StateMachineIsh():
 
 
 def _identifier_via_ND_tuple_er():
-    from .collection_via_directory import Identifier_
+    from .identifier_via_string import Identifier_
 
     def f(*tup):
         return Identifier_(tup)

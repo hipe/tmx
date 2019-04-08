@@ -1,4 +1,7 @@
-import _common_state  # noqa: F401
+from _common_state import (
+        debugging_listener as _debugging_listener,
+        unindent as _unindent,
+        )
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -74,14 +77,13 @@ class _CommonCase(unittest.TestCase):
         req = _request_via_tuples(self.given_request_tuples(), this_listener)
         assert(req)
 
-        x = req.edit_mutable_document_entity__(mde, listener)
+        x = req.edit_mutable_document_entity_(mde, listener)
         if x is not None:
             self.assertEqual(x, True)
             return mde
 
     def _DEBUGGING_LISTENER(self):
-        from kiss_rdb_test import structured_emission as selib
-        return selib.debugging_listener()
+        return _debugging_listener()
 
 
 class Case011_when_request_empty(_CommonCase):
@@ -676,11 +678,6 @@ def _MDE(entity_body_lines_big_string, lstn):
     _line_gen = _unindent(entity_body_lines_big_string)
     return _.mutable_document_entity_via_identifer_and_body_lines(
             _line_gen, 'A', 'meta', lstn)
-
-
-def _unindent(big_s):
-    from kiss_rdb_test.structured_emission import unindent
-    return unindent(big_s)
 
 
 def _subject_module():

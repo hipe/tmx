@@ -1,5 +1,6 @@
 from _common_state import (
         fixture_directories_path,
+        unindent as _lines_via_big_string_unindent,
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -689,11 +690,6 @@ def _sys():
 
 
 # == END support for stdout capture
-
-
-def _lines_via_big_string_unindent(big_string):
-    from kiss_rdb_test.structured_emission import unindent as _  # "selib"
-    return _(big_string)
 
 
 def _lines_via_big_string_as_is(big_string):

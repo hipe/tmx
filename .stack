@@ -1,8 +1,6 @@
 creative self actualization
 maybe a CLI (explode me)
 typed values via CLI values
-integrate CUD thru schema with file (semaphore) locking
-create thru schema integrated with attributes & allocation
-re-create the new index file after provisioning
 #todo: one for a cover-me
 #todo: one for documentation
+you should really probably solve the problem of creating entities files now

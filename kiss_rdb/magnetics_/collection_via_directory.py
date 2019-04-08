@@ -17,9 +17,12 @@ class collection_via_directory_and_filesystem:
         identifier_depth = 3  # #open #[#867.K]
 
         def f(id_s, listener):
-            id_obj = _identifier_via_string(id_s, listener)
+
+            from . import identifier_via_string as _
+            id_obj = _.identifier_via_string__(id_s, listener)
             if id_obj is None:
                 return
+
             length = len(id_obj.native_digits)
             if identifier_depth != length:
                 _whine_about_ID_depth(id_obj, identifier_depth, listener)
@@ -62,6 +65,46 @@ class collection_via_directory_and_filesystem:
                         lmef, lmif, iid, self._filesystem, listener)
         return res
 
+    def create_entity(self, cuds, random_number_generator, listener):
+        """
+        create is the most complicated per [#864.C] this table.
+
+        obtain a mutex lock the of the index file for writing
+        read the index file
+        provision a new id
+        get the path of the entities file from the new id
+        obtain a mutex lock for mutating the index (it may not have existed)
+        determine the new lines of the entity given the provisioned id
+        determine the new lines of the entities file given above
+        determine the new lines of the index file given the above
+        (probably write both the above to temp files)
+        ATOMICALLY, flush the new lines to both files
+        release both locks
+        """
+
+        req = _request_via_cuds(cuds, listener)
+        if req is None:
+            cover_me('like what')
+            return
+
+        with self._open_locked_mutable_index() as lmif:
+
+            tup = _provision_new_IID(random_number_generator, lmif, listener)
+            if tup is None:
+                cover_me('maybe numberspace is full for current schema')
+                return
+            iid, iids = tup
+
+            path = self._path_via_ID(
+                    iid, _file_need_not_already_exist, listener)
+            if path is None:
+                cover_me('idk')
+                return
+            with self._open_locked_mutable_entities_file(path) as lmef:
+                res = _create_entity(
+                        lmef, lmif, iid, iids, req, self._filesystem, listener)
+        return res
+
     # == END
 
     def retrieve_entity(self, id_s, listener):
@@ -84,13 +127,14 @@ class collection_via_directory_and_filesystem:
         id_obj = self._depthly_valid_identifier_via_string(id_s, listener)
         if id_obj is None:
             return
-
-        file_path = _valid_path_for(
-                id_obj, file_must_already_exist, self._dir_path, listener)
-        if file_path is None:
+        path = self._path_via_ID(id_obj, file_must_already_exist, listener)
+        if path is None:
             return
+        return id_obj, path
 
-        return id_obj, file_path
+    def _path_via_ID(self, iid, file_must_already_exist, listener):
+        return _valid_path_for(
+                iid, file_must_already_exist, self._dir_path, listener)
 
     def _open_locked_mutable_index(self):
         _ = os_path.join(self._dir_path, '.entity-index.txt')
@@ -113,12 +157,11 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
         # unlike both CREATE and DELETE, UPDATE determines its modified entity
         # lines *as a function of* the existing entity, so more complicated.
 
-        from .CUD_attributes_request_via_tuples import request_via_tuples as _
-        req = _(cuds, my_listener)
+        req = _request_via_cuds(cuds, my_listener)
         if req is None:
             return  # not covered - blind faith
 
-        _ok = req.edit_mutable_document_entity__(mde, my_listener)
+        _ok = req.edit_mutable_document_entity_(mde, my_listener)
 
         if not _ok:
             return  # not covered - blind faith
@@ -148,43 +191,9 @@ def _delete_entity(locked_ents_file, locked_index_file, identifier, fs, listener
                 my_listener)
 
     def rewrite_index_file(orig_lines, my_listener):
-
-        # (although the index file is written tree-like, we search for
-        # the guy to delete in an inefficient way, because we don't care
-        # about the efficiency of deletes right now.)
-
-        from .identifiers_via_index import (
-                identifiers_via_lines_of_index as _)
-        itr = _(orig_lines)
-        keep_iids = []
-        did_find = False
-        count_for_debug = 0
-
-        # find the IID you want to delete (traversal search yikes!)
-
-        for this_iid in itr:
-            if identifier == this_iid:  # #here4
-                did_find = True
-                break
-            count_for_debug += 1
-            keep_iids.append(this_iid)
-
-        if not did_find:
-            cover_me(_say_integrity_error(identifier, count_for_debug))
-
-        # pass-thru any remaining IID's after the one you found
-
-        for this_iid in itr:
-            keep_iids.append(this_iid)
-
-        # death if there wasn't at least one :(
-
-        _depth = len(this_iid.native_digits)
-
-        from .index_via_identifiers import (
-            lines_of_index_via_identifiers as _)
-
-        return _(keep_iids, _depth)
+        from . import index_via_identifiers as _
+        return _.new_lines_via_delete_identifier_from_index__(
+                orig_lines, identifier, my_listener)
 
     with fs.FILE_REWRITE_TRANSACTION(listener) as trans:
         # (per [#867.Q] do index file second)
@@ -193,6 +202,67 @@ def _delete_entity(locked_ents_file, locked_index_file, identifier, fs, listener
         res = trans.finish()
 
     return res
+
+
+def _create_entity(
+        locked_ents_file, locked_index_file,
+        identifier, iids, req, filesystem, listener):
+
+    id_s = identifier.to_string()
+
+    mde = __create_MDE_via_ID_and_request(id_s, req, listener)
+    if mde is None:
+        return
+
+    _new_entity_lines = mde.to_line_stream()
+
+    def rewrite_ents_file(orig_lines, my_listener):
+        return _sib_lib().new_lines_via_create_and_existing_lines(
+                id_s,
+                _new_entity_lines,
+                orig_lines,
+                my_listener)
+
+    def rewrite_index_file(orig_lines, my_listener):
+        from . import index_via_identifiers as _
+        return _.new_lines_via_add_identifier_into_index__(
+                identifier, iids, my_listener)
+
+    with filesystem.FILE_REWRITE_TRANSACTION(listener) as trans:
+        # (per [#867.Q] do index file second)
+        trans.rewrite_file(locked_ents_file, rewrite_ents_file)
+        trans.rewrite_file(locked_index_file, rewrite_index_file)
+        res = trans.finish()
+
+    return res
+
+
+def __create_MDE_via_ID_and_request(identifier_string, req, listener):
+
+    from .entity_via_open_table_line_and_body_lines import (
+        mutable_document_entity_via_identifer_and_body_lines as _,
+        )
+
+    mde = _((), identifier_string, 'attributes', listener)
+    assert(mde)
+
+    _ok = req.edit_mutable_document_entity_(mde, listener)
+
+    if not _ok:
+        cover_me('like when?')
+        return
+
+    return mde
+
+
+def _provision_new_IID(random_number_generator, lmif, listener):
+    from . import provision_ID_randomly_via_identifiers as _
+    return _.NEW_THING(random_number_generator, lmif, listener)
+
+
+def _request_via_cuds(cuds, listener):
+    from .CUD_attributes_request_via_tuples import request_via_tuples as _
+    return _(cuds, listener)
 
 
 def _retrieve_entity(identifier, file_path, filesystem, listener):
@@ -241,7 +311,13 @@ def _valid_path_for(identifier, file_must_already_exist, dir_path, listener):
             __whine_about_no_path(pieces, listener)
             return
     else:
-        cover_me('create is the only one')
+        # == BEGIN temporary
+        if os_path.exists(file_path):
+            pass  # hi. (Case764)
+        else:
+            cover_me('have fun creating a file')
+        # == END
+        return file_path
 
 
 def __file_path_pieces_via_identifier(identifier, dir_path):
@@ -258,84 +334,6 @@ def __file_path_pieces_via_identifier(identifier, dir_path):
     these[-1] = f'{these[-1]}.toml'
 
     return (dir_path, 'entities', *these)
-
-
-def _identifier_via_string(id_s, listener):
-
-    digits = []
-
-    s_a = tuple(id_s)
-    if not len(s_a):
-        cover_me('might let this slip thru - needs coverage tho')
-
-    for s in s_a:
-        nd = native_digit_via_character_(s, listener)
-        if nd is None:
-            return  # (Case702)
-        digits.append(nd)
-
-    return Identifier_(tuple(digits))
-
-
-def native_digit_via_character_(s, listener):
-
-    if s in _ID_digit_cache:
-        return _ID_digit_cache[s]
-
-    nd = __build_native_digit_via_character(s, listener)
-    if nd is None:
-        # (don't cache failure, meh)
-        return
-    _ID_digit_cache[s] = nd
-    return nd
-
-
-_ID_digit_cache = {}  # cache native digits (the mapping btwn char & number)
-
-
-def __build_native_digit_via_character(s, listener):
-    if s not in _int_via_digit_char:
-        __whine_about_bad_digit(s, listener)
-        return
-
-    _as_int = _int_via_digit_char[s]
-
-    return _NativeDigit(_as_int, s)
-
-
-# FOR NOW every time this file is loaded, we're gonna build our thing here
-
-_digits = tuple('23456789ABCDEFGHJKLMNPQRSTUVWXYZ')  # NO: 0, 1, O, I
-
-_num_digits = len(_digits)
-
-assert(32 == _num_digits)
-
-_int_via_digit_char = {_digits[i]: i for i in range(0, _num_digits)}
-
-
-# ==
-
-class Identifier_:
-
-    def __init__(self, native_digits):
-        self.native_digits = native_digits  # assume tuple #wish #[#008.D]
-
-    def __eq__(self, other):  # :#here4
-        return self.native_digits == other.native_digits  # (Case712)
-
-    def to_string(self):
-        return ''.join(nd.character for nd in self.native_digits)
-
-
-class _NativeDigit:
-
-    def __init__(self, as_int, char):
-        self.integer = as_int
-        self.character = char
-
-    def __eq__(self, other):
-        return self.integer == other.integer  # (Case712)
 
 
 # == whiners
@@ -386,22 +384,6 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
     _emit_input_error_structure(f, listener)
 
 
-def __whine_about_bad_digit(s, listener):
-    def f():  # (Case702)
-        _reason = (
-                f'invalid character {repr(s)} in identifier - '
-                'identifier digits must be [0-9A-Z] minus 0, 1, O and I.'
-                )
-        return {'reason': _reason}
-    _emit_input_error_structure(f, listener)
-
-
-def _say_integrity_error(identifier, count_for_debug):
-    return (
-        f'integrity error: did not find {identifier.to_string()}'
-        f' in {count_for_debug}')
-
-
 def _emit_input_error_structure(f, listener):
     listener('error', 'structure', 'input_error', f)
 
@@ -415,6 +397,7 @@ def _sib_lib():
     return _
 
 
+_file_need_not_already_exist = False
 _file_must_already_exist = True
 
 _okay = True

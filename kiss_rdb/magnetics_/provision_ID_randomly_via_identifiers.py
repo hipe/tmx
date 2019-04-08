@@ -27,7 +27,7 @@ this second time you do *not* use *that* number as the new identifier..
 rather, you use that number (N) and say "the Nth open slot is the new
 identifier".
 
-in this ASCII visualization X'es are already occupied integers and
+in this ASCII visualization, X'es are already occupied integers and
 "|"s are open slots:
 
                   -      -      -      -      -      -      -
@@ -63,6 +63,43 @@ there's a variety of ways we considered implementing this, with things
 like B-trees or custom data structures so that we don't have to traverse
 the whole collection of identifiers twice. but MEH:
 """
+
+# == BEGIN GLUE
+
+
+def NEW_THING(random_number_generator, lmif, listener):
+
+    # convert the identifiers file into a big flat tuple of identifier objects
+    # (we may be able to avoid this, but for now we don't care..)
+
+    from . import identifiers_via_index as _
+    ALL_iids = tuple(_.identifiers_via_lines_of_index(lmif))
+
+    # depth is squarely in the domain of the vaporous "schema" #[#867.K],
+    # but for now we hackishly determine it from the 1st identifier
+
+    if not len(ALL_iids):
+        cover_me("it's time to refactor to use schema")
+
+    depth = len(ALL_iids[0].native_digits)
+
+    # get the decoder function from the depth
+
+    from . import identifier_via_string as _
+    iid_via_int, int_via_iid, cap = _.three_via_depth__(depth)
+
+    # run the function against the list of things
+
+    _ints = tuple(int_via_iid(iid) for iid in ALL_iids)
+
+    _prov_int = provision_integer(_ints, cap, random_number_generator)
+
+    _prov_IID = iid_via_int(_prov_int)
+
+    return _prov_IID, ALL_iids
+
+
+# == END GLUE
 
 
 def provision_integer(provisioned_integers, capacity, random_number_generator):

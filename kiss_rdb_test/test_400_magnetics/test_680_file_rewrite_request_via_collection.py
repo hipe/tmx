@@ -1,4 +1,9 @@
-from _common_state import fixture_directory_path
+from _common_state import (
+        debugging_listener as _debugging_listener,
+        fixture_directory_path,
+        unindent_with_dot_hack,
+        unindent as _unindent,
+        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -31,9 +36,8 @@ class _CommonCase(unittest.TestCase):
     def update_expecting_success(self, id_s, cuds):
         return self._recording_of_success(_function_for_update(id_s, cuds))
 
-    def create_expecting_success(self, id_s, wats):
-        raise Exception('cover me')  # #todo
-        return self._recording_of_success(_function_for_create(id_s, wats))
+    def create_expecting_success(self, cuds, rng):
+        return self._recording_of_success(_function_for_create(cuds, rng))
 
     def delete_expecting_success(self, id_s):
         return self._recording_of_success(_function_for_delete(id_s))
@@ -110,7 +114,7 @@ class _CommonCase(unittest.TestCase):
 
     def listener(self):
         if False:
-            return _selib().debugging_listener()
+            return _debugging_listener()
 
 
 def _function_for_update(id_s, cuds):
@@ -119,9 +123,10 @@ def _function_for_update(id_s, cuds):
     return f
 
 
-def _function_for_create(wats):
+def _function_for_create(cuds, random_number_generator):
+
     def f(col, listener):
-        return col.create_entity(wats, listener)
+        return col.create_entity(cuds, random_number_generator, listener)
     return f
 
 
@@ -289,8 +294,7 @@ class Case712_delete_simplified_typical(_CommonCase):
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
-        import re
-        tail = re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
+        tail = _last_3_of_path(path)
         self.assertEqual(tail, 'entities/B/7.toml')
 
     def test_300_entities_file_lines_look_good(self):
@@ -488,6 +492,66 @@ class Case725_simplified_typical_traversal(_CommonCase):
                 filesystem=None)
 
 
+# === FROM HERE
+
+class Case764_create_into_non_empty_file(_CommonCase):  # #todo
+
+    def test_100_succeeds(self):
+        self.recorded_file_rewrites()  # because #here1
+
+    def test_250_entities_file_rewrite_OK(self):
+        efr = self.entity_file_rewrite()
+        self.assertEqual(_last_3_of_path(efr.path), 'entities/2/H.toml')
+
+        expect = tuple(_unindent("""
+        [item.2HG.attributes]
+        abc = "123"
+        de-fg = "true"
+        [item.2HJ.attributes]
+        """))
+
+        # no blank line to separate, huh?
+
+        self.assertSequenceEqual(efr.lines, expect)
+
+    def test_400_index_rewrite_OK(self):
+        ifr = self.index_file_rewrite()
+        actual = ifr.lines[0:2]
+
+        expect = tuple(unindent_with_dot_hack("""
+        .
+         2
+        H (                            G   J)
+        """))
+
+        self.assertSequenceEqual(actual, expect)
+
+    @shared_subject
+    def recorded_file_rewrites(self):
+        cuds = (
+            ('create', 'abc', '123'),
+            ('create', 'de-fg', 'true'),
+            )
+
+        def random_number_generator(pool_size):
+            assert(32760 == pool_size)
+            return 494  # "2HG" as int per [#867.S] CLI
+
+        return self.create_expecting_success(cuds, random_number_generator)
+
+    def subject_collection(self):
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+
+# === TO HERE
+
+
+def _last_3_of_path(path):
+    import re
+    return re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
+
+
 @memoize
 def _collection_with_expecting_no_rewrites():
     return _build_collection(
@@ -587,22 +651,13 @@ def _build_collection(dir_path, filesystem):
             dir_path, filesystem)
 
 
-def _unindent(big_string):
-    return _selib().unindent(big_string)
-
-
 def _subject_module():
     from kiss_rdb.magnetics_ import collection_via_directory as _
     return _
 
 
 def _no_listener(*chan, payloader):
-    assert(False)  # when this trips, use _selib().debugging_listener()
-
-
-def _selib():
-    from kiss_rdb_test import structured_emission as _
-    return _
+    assert(False)  # when this trips, use _debugging_listener()
 
 
 if __name__ == '__main__':

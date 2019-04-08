@@ -1,5 +1,7 @@
-import _common_state  # noqa: F401
-from kiss_rdb_test import structured_emission as selib
+from _common_state import (
+        debugging_listener as _debugging_listener,
+        unindent as _unindent,
+        )
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -52,7 +54,7 @@ class _CommonCase(unittest.TestCase):
         return (next(itr), itr)
 
     def when_expecting_success_iterator(self):
-        _listener = selib.debugging_listener() if False else _no_listener
+        _listener = _debugging_listener() if False else _no_listener
         return self._iterator_via_run(_listener)
 
     def _iterator_via_run(self, lstn):
@@ -81,7 +83,7 @@ class Case157_simplified_typical(_CommonCase):
         return self.when_expecting_success_head_block_and_rest()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # hi hungry i'm dad
 
         [item.AA.attributes]
@@ -116,7 +118,7 @@ class Case171_effectively_empty_file_of_course_has_head_block(_CommonCase):
         return self.when_expecting_success_head_block_and_rest()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # hi hunger i'm dad. blank line next.
 
         """)
@@ -149,7 +151,7 @@ class Case200_error_in_open_table_line(_CommonCase):
         return self.when_expecting_failure_count_and_structure()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # hi dad
         [items.QQ]
         no = "see"
@@ -171,7 +173,7 @@ class Case215_error_in_attribute_value_passes_thru_for_now(_CommonCase):
         return self.when_expecting_success_head_block_and_rest()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # hi dad
         [item.QQ.attributes]
         yes = see
@@ -192,7 +194,7 @@ class Case229_one_no_head(_CommonCase):
         return self.when_expecting_success_head_block_and_rest()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         [item.QQ.attributes]
         no = "see"
         """)
@@ -218,7 +220,7 @@ class Case243_two_yes_head(_CommonCase):
         return self.when_expecting_success_head_block_and_rest()
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # hi dad
         [item.AA.meta]
         [item.BB.attributes]

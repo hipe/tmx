@@ -50,6 +50,38 @@ def lazy(f):  # #meh
     return redefined_f
 
 
+# ==
+
+
+def unindent_with_dot_hack(big_s):
+    """preserve meaningful leading space in a big string with this dot hack.
+
+    in nature, the file-likes we typically test around begin with a non-space
+    character, which enables our unindent function to infer how much to
+    unindent the big string to "decode" it (from pretty to correct).
+
+    however, in this project typical index files have meaningful indent
+    on the first line (reasons). this hack enables us to have best of both.
+    """
+
+    if '' == big_s:
+        return iter(())
+
+    itr = unindent(big_s)
+    for line in itr:  # once
+        assert('.\n' == line)
+        break
+    return itr
+
+
+def unindent(big_s):
+    return _selib().unindent(big_s)
+
+
+def debugging_listener():
+    return _selib().debugging_listener()
+
+
 def fixture_directory_path(stem):
     return os_path.join(fixture_directories_path(), stem)
 
@@ -57,5 +89,12 @@ def fixture_directory_path(stem):
 @lazy
 def fixture_directories_path():
     return os_path.join(_top_test_dir, 'fixture-directories')
+
+
+def _selib():
+    # from . import structured_emission as _  # breaks on pud why?
+    from kiss_rdb_test import structured_emission as _
+    return _
+
 
 # #born.

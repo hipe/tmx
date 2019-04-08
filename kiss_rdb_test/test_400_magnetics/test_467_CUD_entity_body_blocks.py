@@ -1,9 +1,7 @@
-import _common_state  # noqa: F401
-from kiss_rdb_test import structured_emission as selib
+from _common_state import unindent
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
-unindent = selib.unindent
 
 """
 (subject under test explained exhaustively in [#865] CUD for attributes)

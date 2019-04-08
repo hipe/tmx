@@ -144,6 +144,62 @@ our current specification is optimized for these design objectives:
 """
 
 
+def new_lines_via_delete_identifier_from_index__(
+        orig_lines, identifier, listener):
+
+    """(although the index file is written tree-like, we search for
+    the item to delete in an inefficient way, because we don't care
+    about the efficiency of deletes right now.)
+
+    (this function is in this file because it was light.)
+    """
+
+    from . import identifiers_via_index as _
+    itr = _.identifiers_via_lines_of_index(orig_lines)
+    keep_iids = []
+    did_find = False
+    count_for_debug = 0
+
+    # find the IID you want to delete (traversal search yikes!)
+
+    for this_iid in itr:
+        if identifier == this_iid:  # #here4
+            did_find = True
+            break
+        count_for_debug += 1
+        keep_iids.append(this_iid)
+
+    if not did_find:
+        cover_me(_say_integrity_error(identifier, count_for_debug))
+
+    # pass-thru any remaining IID's after the one you found
+
+    for this_iid in itr:
+        keep_iids.append(this_iid)
+
+    # death if there wasn't at least one :(
+
+    _depth = len(this_iid.native_digits)
+
+    from . import index_via_identifiers as _
+
+    return _.lines_of_index_via_identifiers(keep_iids, _depth)
+
+
+def new_lines_via_add_identifier_into_index__(identifier, iids, listener):
+    # (we could save on compute by making this more tightly coupled with the
+    # provisioning mechanism but yuck.)
+
+    def unsorted():
+        for iid in iids:
+            yield iid
+        yield identifier
+
+    _depth = len(identifier.native_digits)  # ..
+
+    return lines_of_index_via_identifiers(sorted(unsorted()), _depth)
+
+
 def lines_of_index_via_identifiers(identifiers, depth):
 
     assert(2 < depth)  # really shallow schemas are out of scope for now..
@@ -244,10 +300,17 @@ def lines_of_index_via_identifiers(identifiers, depth):
         yield flush_rack()
 
 
+def _say_integrity_error(identifier, count_for_debug):
+    return (
+        f'integrity error: did not find {identifier.to_string()}'
+        f' in {count_for_debug}')
+
+
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
-_num_digits = 32
+_num_digits = 32  # copy paste! from sibling
 
+# #history: received transplant
 # #born.

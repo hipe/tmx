@@ -1,5 +1,7 @@
-import _common_state  # noqa: F401
-from kiss_rdb_test import structured_emission as selib
+from _common_state import (
+        debugging_listener as _debugging_listener,
+        unindent as _unindent,
+        )
 from modality_agnostic.memoization import (
     dangerous_memoize as shared_subject,
     memoize,
@@ -22,7 +24,7 @@ class _CommonCase(unittest.TestCase):
     expect_yes_comment_easy = expect_yes_comment
 
     def _expect_yes_no_comment(self, comment_expected_yes_no, an_s):
-        listener = selib.debugging_listener() if False else _no_listener
+        listener = _debugging_listener() if False else _no_listener
         ok, actual_yes_or_no = self._run_comment_test(an_s, listener)
         self.assertEqual(ok, True)
         self.assertEqual(actual_yes_or_no, comment_expected_yes_no)
@@ -98,7 +100,7 @@ class _CommonCase(unittest.TestCase):
         return self._expecting_failure(self.run_retrieve)
 
     def retrieve_expecting_success(self):
-        listener = selib.debugging_listener() if False else _no_listener
+        listener = _debugging_listener() if False else _no_listener
         return self.run_retrieve(listener)
 
     def run_retrieve(self, listener):
@@ -284,7 +286,7 @@ class Case272_at_tail(_CommonCase):
 
 @memoize
 def _given_ABC_lines():
-    return tuple(selib.unindent("""
+    return tuple(_unindent("""
     [item.AA.attributes]
     prop-1 = 123
     prop-2 = "value aa"
@@ -334,7 +336,7 @@ class Case282_too_many_adjacent_same_identifiers(_CommonCase):
         return 'B'
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # comment
         [item.A.attributes]
         [item.B.meta]
@@ -370,7 +372,7 @@ class Case284_duplicate_identifiers_can_get_shadowed(_CommonCase):
         return 'B'
 
     def given_lines(self):
-        return selib.unindent("""
+        return _unindent("""
         # comment
         [item.A.attributes]
         [item.B.attributes]
@@ -583,7 +585,7 @@ def _comment_tester_one():
 
 
 def _comment_tester_via_big_string_using_hack(big_s):
-    listener = selib.debugging_listener() if True else _no_listener
+    listener = _debugging_listener() if True else _no_listener
     mde = _MDE_via_body_lines_string_using_hack(big_s)
     return _comment_tester_via(mde, listener)
 
@@ -613,7 +615,7 @@ def _MDE_via_body_lines_string_using_hack(big_s):
             return _CommentLine(line)
 
     mde = _MutableDocumentEntity('no open table line object')
-    for line in selib.unindent(big_s):
+    for line in _unindent(big_s):
         _line_object = attribute_name_via_line(line)
         mde.append_line_object(_line_object)
     return mde
