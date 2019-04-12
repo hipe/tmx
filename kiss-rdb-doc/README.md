@@ -32,6 +32,7 @@ woah boy.
 |[#870]                     |       | "backend roadmap again"
 |[#869]                     |       | near term end game
 |[#868]                     |       | test number allocation
+|[#867.T]                   |       | top secret crazy plan
 |[#867.S]                   |       | reference internal CLI somewhere else
 |[#867.R]                   | #prov | provision: failure is None not False
 |[#867.Q]                   | #prov | provision: do index file second

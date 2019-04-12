@@ -49,8 +49,8 @@ class _CommonCase(unittest.TestCase):
 
     # -- CUD expecting failure
 
-    def create_expecting_failure(self, wats):
-        return self._payload_of_failure(_function_for_create(wats))
+    def create_expecting_failure(self, wats, rng):
+        return self._payload_of_failure(_function_for_create(wats, rng))
 
     def delete_expecting_failure(self, id_s):
         return self._payload_of_failure(_function_for_delete(id_s))
@@ -96,7 +96,11 @@ class _CommonCase(unittest.TestCase):
         chan = tuple(chan)
         # ..
 
-        self.assertEqual(chan, ('error', 'structure', 'input_error'))
+        mood, shape, error_type = chan
+        self.assertEqual(mood, 'error')
+        self.assertEqual(shape, 'structure')
+        self.assertIn(error_type, ('input_error', 'request_error'))
+
         return payloader()
 
     def _recording_of_success(self, f):
@@ -320,9 +324,7 @@ class Case712_delete_simplified_typical(_CommonCase):
         return self.delete_expecting_success('B7F')
 
     def subject_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+        return _build_collection_expecting_common_number_of_rewrites()
 
 
 class Case713_delete_that_leaves_file_empty(_CommonCase):
@@ -353,9 +355,7 @@ class Case713_delete_that_leaves_file_empty(_CommonCase):
         return self.delete_expecting_success('B8H')
 
     def subject_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+        return _build_collection_expecting_common_number_of_rewrites()
 
 
 # Case714: delete when index file is left empty! (delete the last entity)
@@ -492,9 +492,7 @@ class Case725_simplified_typical_traversal(_CommonCase):
                 filesystem=None)
 
 
-# === FROM HERE
-
-class Case764_create_into_non_empty_file(_CommonCase):  # #todo
+class Case764_create_into_existing_file(_CommonCase):
 
     def test_100_succeeds(self):
         self.recorded_file_rewrites()  # because #here1
@@ -533,23 +531,87 @@ class Case764_create_into_non_empty_file(_CommonCase):  # #todo
             ('create', 'de-fg', 'true'),
             )
 
-        def random_number_generator(pool_size):
-            assert(32760 == pool_size)
-            return 494  # "2HG" as int per [#867.S] CLI
+        random_number_generator = _random_number_generator_for(494)
+        # "2HG" as int per [#867.S] CLI
 
         return self.create_expecting_success(cuds, random_number_generator)
 
     def subject_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+        return _build_collection_expecting_common_number_of_rewrites()
 
-# === TO HERE
+
+# class Case765_create_failure_cleans_up_created_file(_CommonCase):
+
+"""(Case765): the whole purpose of "cleanup functions" is to enable us to
+handle the case of when we have created a new entities file and the
+transaction fails. as it turns out, this case is perhaps logically impossible
+for us to trigger except under exceedingly contrived circumstances:
+
+- you want to start with a "corrupt" entities file? that means the file will
+be seen as existing and won't hit this point.
+
+- start with corrupt index file? A) that throws an exception and B) it doesn't
+get us far enough.
+
+- try to make an invalid "edit (create) entity" request? then it doesn't get
+as far as creating the new entities file.
+"""
+
+
+class Case766_create_into_noent_file(_CommonCase):
+
+    def test_100_succeeds(self):
+        self.recorded_file_rewrites()  # because #here1
+
+    def test_250_entities_file_rewrite_OK(self):
+        efr = self.entity_file_rewrite()
+        self.assertEqual(_last_3_of_path(efr.path), 'entities/2/J.toml')
+
+        expect = tuple(_unindent("""
+        [item.2J3.attributes]
+        abc = "456"
+        de-fg = "false"
+        """))
+
+        self.assertSequenceEqual(efr.lines, expect)
+
+    def test_400_index_rewrite_OK(self):
+        ifr = self.index_file_rewrite()
+        actual = ifr.lines[2]
+        self.assertEqual(actual, 'J (  3)\n')
+
+    @shared_subject
+    def recorded_file_rewrites(self):
+        cuds = (
+            ('create', 'abc', '456'),
+            ('create', 'de-fg', 'false'),
+            )
+
+        random_number_generator = _random_number_generator_for(512)
+        entities_path = _entities_file_path_for_2J()
+
+        res = self.create_expecting_success(cuds, random_number_generator)
+
+        # == BEGIN NASTY - don't actually leave that new file in the fixture
+        import os
+        os.unlink(entities_path)  # results in none. raises on failure. NASTY
+        # == END
+
+        return res
+
+    def subject_collection(self):
+        return _build_collection_expecting_common_number_of_rewrites()
 
 
 def _last_3_of_path(path):
     import re
     return re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
+
+
+def _build_collection_expecting_common_number_of_rewrites():
+    return _build_collection(
+            dir_path=_dir_path_most_common(),
+            filesystem=_build_filesystem_expecting_num_file_rewrites(2))
 
 
 @memoize
@@ -571,6 +633,12 @@ def _collection_with_NO_filesystem():
     return _build_collection(
             dir_path=_dir_path_most_common(),
             filesystem='no filesystem xyz122')
+
+
+@memoize
+def _entities_file_path_for_2J():
+    import os.path as os_path
+    return os_path.join(_dir_path_most_common(), 'entities', '2', 'J.toml')
 
 
 @memoize
@@ -644,6 +712,18 @@ class _RecordOfFileRewrite:
     def __init__(self, path, lines):
         self.path = path
         self.lines = lines
+
+
+def _random_number_generator_for(random_number):
+    count = 0
+
+    def random_number_generator(pool_size):
+        assert(32760 == pool_size)
+        nonlocal count
+        count += 1
+        assert(1 == count)
+        return random_number
+    return random_number_generator
 
 
 def _build_collection(dir_path, filesystem):

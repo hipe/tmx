@@ -84,8 +84,11 @@ class _Filesystem:  # #testpoint
     def FILE_REWRITE_TRANSACTION(self, listener):
         return _FILE_REWRITE_TRANSACTION(self._inj, listener)
 
+    def CREATE_AND_OPEN_LOCKED_FILE(self, path):
+        return _LockedFile(path, 'a+')  # create file (since not exist)..
+
     def open_locked_file(self, path):
-        return _LockedFile(path)
+        return _LockedFile(path, 'r+')  # not create if doesn't exist
 
 
 class _FILE_REWRITE_TRANSACTION:
@@ -106,8 +109,15 @@ class _FILE_REWRITE_TRANSACTION:
         tc = _FileRewriteTransactionController(
                 receive_rewrite_file=self._receive_rewrite_file,
                 receive_finish=self._receive_finish,
+                register_cleanup_function=self._register_cleanup_function,
+                receive_ask_OK=lambda: self._OK,
                 )
         return tc
+
+    def _register_cleanup_function(self, f):
+        def use_f(_1, _2, _3):
+            f(self)  # pass it the filesystem (maybe the rest if needed)
+        self._exit_me.append(use_f)
 
     def _receive_rewrite_file(self, filehandle, lines_function):
         """flush the new lines of the file to a temporary file"""
@@ -131,7 +141,7 @@ class _FILE_REWRITE_TRANSACTION:
         .#[#867.P]
         """
 
-        self._exit_me.append(tmp_cm)
+        self._exit_me.append(tmp_cm.__exit__)
 
         tmp_fh = tmp_cm.__enter__()
 
@@ -180,22 +190,36 @@ class _FILE_REWRITE_TRANSACTION:
     def __exit__(self, *_3):
         a = self._exit_me
         del(self._exit_me)
-        for o in a:
-            o.__exit__(*_3)
+        for f in a:
+            f(*_3)
         return False  # ignore responses from cx?
 
 
 class _FileRewriteTransactionController:
 
-    def __init__(self, receive_rewrite_file, receive_finish):
+    def __init__(
+            self, receive_rewrite_file,
+            receive_finish, register_cleanup_function,
+            receive_ask_OK,
+            ):
+
         self._receive_rewrite_file = receive_rewrite_file
         self._receive_finish = receive_finish
+        self._register_cleanup_function = register_cleanup_function
+        self._receive_ask_OK = receive_ask_OK
+
+    def REGISTER_CLEANUP_FUNCTION(self, f):
+        return self._register_cleanup_function(f)
 
     def rewrite_file(self, filehandle, lines_function):
         return self._receive_rewrite_file(filehandle, lines_function)
 
     def finish(self):  # #here2
         return self._receive_finish()
+
+    @property
+    def OK(self):
+        return self._receive_ask_OK()
 
 
 class _UnitOfWork:
@@ -206,15 +230,40 @@ class _UnitOfWork:
 
 
 class _LockedFile:
-    """.#todo
+    """EXPERIMENTAL:
 
-    - we would like file locking to be a transparent abstraction, ultimately.
-    - VERY experimental for now
+    it's certainly possible that multiple processes try to write to the same
+    file at the same time. at best this could lead to data loss. worse, it
+    could mean arbitrarily corrupted files or something else unimagined.
+
+    for the time being, our answer to this problem is filesystem file locking.
+
+    depending on the operating system's filesystem, locking will behave to
+    varying degrees of strictness in terms of what other processes it actually
+    locks out.
+
+    so this won't prevent all imaginable scenarios. a human could, for example,
+    "press save" on their text editor just as a non-human process is also
+    writing (maybe, depending on the system).
+
+    this seems unlikely that it will endure in its current form all the way
+    out to some kind of production (BUT MAYBE!)
+
+    to do something more robust that this would seem out of scope of our whole
+    mandate; but we may have to some how dumb it down, and who knows what we
+    will do when we [#867.T] "top secret crazy plan"..
+
+    ideally we would like this to be more abstract than it is now; integrated
+    in to some rewrite file idiom (BUT LATER!)
+
+    this may be related to the idea of "eventual consistency" etc
+
     :#here4
     """
 
-    def __init__(self, path):
+    def __init__(self, path, mode):
         self._path = path
+        self._mode = mode
         import fcntl as _
         self._fcntl = _
 
@@ -222,7 +271,9 @@ class _LockedFile:
         fcntl = self._fcntl
         path = self._path
         del(self._path)
-        self._child = open(path, 'r+')
+        mode = self._mode
+        del(self._mode)
+        self._child = open(path, mode)
         fh = self._child.__enter__()
         self._filehandle = fh
         fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)

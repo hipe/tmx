@@ -33,7 +33,7 @@ class collection_via_directory_and_filesystem:
         self._filesystem = fs
 
     def update_entity(self, id_s, cuds, listener):
-        tup = self._ID_and_path(_file_must_already_exist, id_s, listener)
+        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
         if tup is None:
             return
         iid, path = tup
@@ -52,7 +52,7 @@ class collection_via_directory_and_filesystem:
         # before attempting to lock the index file, see if we can resolve the
         # valid path for the entities file (so we get nicer error message)
 
-        tup = self._ID_and_path(_file_must_already_exist, id_s, listener)
+        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
         if tup is None:
             return
         iid, path = tup
@@ -80,12 +80,16 @@ class collection_via_directory_and_filesystem:
         (probably write both the above to temp files)
         ATOMICALLY, flush the new lines to both files
         release both locks
+
+        and the above is only for if the entities file already exists
         """
 
-        req = _request_via_cuds(cuds, listener)
-        if req is None:
-            cover_me('like what')
+        cuds_request = _request_via_cuds(cuds, listener)
+        if cuds_request is None:
+            # #not-covered, but attribute names are too similar will hit this
             return
+
+        # with the index file locked, provision a new identifier
 
         with self._open_locked_mutable_index() as lmif:
 
@@ -95,14 +99,53 @@ class collection_via_directory_and_filesystem:
                 return
             iid, iids = tup
 
-            path = self._path_via_ID(
-                    iid, _file_need_not_already_exist, listener)
-            if path is None:
+            # from identifier and cuds request build mutable document entity
+
+            id_s = iid.to_string()
+
+            mde = _create_MDE_via_ID_and_request(id_s, cuds_request, listener)
+            if mde is None:
                 cover_me('idk')
                 return
-            with self._open_locked_mutable_entities_file(path) as lmef:
-                res = _create_entity(
-                        lmef, lmif, iid, iids, req, self._filesystem, listener)
+
+            # from the identifier derive the entities path
+
+            _pieces = _file_path_pieces_via_identifier(iid, self._dir_path)
+            path = os_path.join(*_pieces)
+
+            # to avoid the bad thing, obtain a lock before mutating the file.
+            # in cases where the file doesn't yet exist and so will be created,
+            # the locking idiom requires that the file already exist, so in
+            # those cases we create an empty file first. doing so incurs a
+            # cleanup responsibility: if something fails, don't leave behind
+            # the empty file. es muss sein. more at (Case765) (ghost)
+
+            if os_path.exists(path):  # :#here3
+                locked_file = self._open_locked_mutable_entities_file(path)
+                yes_do_cleanup = False
+            else:  # :#here4:
+                locked_file = self._create_and_open_mutable_entit_etc(path)
+                yes_do_cleanup = True
+
+            with self._filesystem.FILE_REWRITE_TRANSACTION(listener) as tr:
+
+                with locked_file as lmef:
+
+                    res = _create_entity(
+                        locked_ents_file=lmef,
+                        locked_index_file=lmif,
+
+                        identifier_string=id_s,
+                        identifier=iid,
+
+                        mutable_document_entity=mde,
+                        iids=iids,
+
+                        yes_do_cleanup=yes_do_cleanup,
+                        files_rewrite_transaction=tr,
+
+                        listener=listener,
+                        )
         return res
 
     # == END
@@ -116,29 +159,33 @@ class collection_via_directory_and_filesystem:
         in one invocation.. :#here2
         """
 
-        tup = self._ID_and_path(_file_must_already_exist, id_s, listener)
+        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
         if tup is None:
             return
         iid, path = tup
         return _retrieve_entity(iid, path, self._filesystem, listener)
 
-    def _ID_and_path(self, file_must_already_exist, id_s, listener):
+    def _ID_and_path_that_must_already_exist(self, id_s, listener):
 
-        id_obj = self._depthly_valid_identifier_via_string(id_s, listener)
-        if id_obj is None:
+        iid = self._depthly_valid_identifier_via_string(id_s, listener)
+        if iid is None:
             return
-        path = self._path_via_ID(id_obj, file_must_already_exist, listener)
-        if path is None:
-            return
-        return id_obj, path
 
-    def _path_via_ID(self, iid, file_must_already_exist, listener):
-        return _valid_path_for(
-                iid, file_must_already_exist, self._dir_path, listener)
+        pieces = _file_path_pieces_via_identifier(iid, self._dir_path)
+        path = os_path.join(*pieces)
+
+        if not os_path.exists(path):  # :##here1
+            _whine_about_no_path(pieces, listener)
+            return
+
+        return iid, path
 
     def _open_locked_mutable_index(self):
         _ = os_path.join(self._dir_path, '.entity-index.txt')
         return self._filesystem.open_locked_file(_)
+
+    def _create_and_open_mutable_entit_etc(self, path):
+        return self._filesystem.CREATE_AND_OPEN_LOCKED_FILE(path)
 
     def _open_locked_mutable_entities_file(self, path):
         return self._filesystem.open_locked_file(path)
@@ -206,19 +253,47 @@ def _delete_entity(locked_ents_file, locked_index_file, identifier, fs, listener
 
 def _create_entity(
         locked_ents_file, locked_index_file,
-        identifier, iids, req, filesystem, listener):
+        identifier_string, identifier,
+        mutable_document_entity, iids,
+        yes_do_cleanup, files_rewrite_transaction,
+        listener):
 
-    id_s = identifier.to_string()
+    trans = files_rewrite_transaction  # (shorter name)
 
-    mde = __create_MDE_via_ID_and_request(id_s, req, listener)
-    if mde is None:
-        return
+    transaction_almost_completed = False
 
-    _new_entity_lines = mde.to_line_stream()
+    def f(filesystem):
+        # this is called when exiting every such files rewrite transaction,
+        # even when an exception was thrown (we think)..
+
+        if yes_do_cleanup:  # the file did not exist #here4
+            if transaction_almost_completed:
+                pass  # because transaction OK, no cleanup to do (Case766)
+            else:
+                # ==
+                cover_me('NEVER BEEN COVERED - LEAVING BLANK FILE! (readme)')
+                """(Case765): the whole purpose of "cleanup functions" is to
+                enable us to handle the case of when we have created a new
+                entities file and the transaction fails. as it turns out, this
+                case is perhaps logically impossible for us to trigger except
+                under exceedingly contrived circumstances. see test
+                """
+                # something like this:
+                # ==
+                import os
+                os.unlink(locked_ents_file.name)  # can u do this when locked?
+        else:  # if the file already existed, no cleanup (#here)
+            pass  # hi. (Case764)
+
+    trans.REGISTER_CLEANUP_FUNCTION(f)
+
+    # --
+
+    _new_entity_lines = mutable_document_entity.to_line_stream()
 
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_create_and_existing_lines(
-                id_s,
+                identifier_string,
                 _new_entity_lines,
                 orig_lines,
                 my_listener)
@@ -228,16 +303,15 @@ def _create_entity(
         return _.new_lines_via_add_identifier_into_index__(
                 identifier, iids, my_listener)
 
-    with filesystem.FILE_REWRITE_TRANSACTION(listener) as trans:
-        # (per [#867.Q] do index file second)
-        trans.rewrite_file(locked_ents_file, rewrite_ents_file)
-        trans.rewrite_file(locked_index_file, rewrite_index_file)
-        res = trans.finish()
+    # (per [#867.Q] do index file second)
+    trans.rewrite_file(locked_ents_file, rewrite_ents_file)
+    trans.rewrite_file(locked_index_file, rewrite_index_file)
+    if trans.OK:
+        transaction_almost_completed = True
+    return trans.finish()
 
-    return res
 
-
-def __create_MDE_via_ID_and_request(identifier_string, req, listener):
+def _create_MDE_via_ID_and_request(identifier_string, req, listener):
 
     from .entity_via_open_table_line_and_body_lines import (
         mutable_document_entity_via_identifer_and_body_lines as _,
@@ -301,28 +375,9 @@ def _retrieve_entity(identifier, file_path, filesystem, listener):
 
 # == individual identifier stuff
 
-def _valid_path_for(identifier, file_must_already_exist, dir_path, listener):
-    pieces = __file_path_pieces_via_identifier(identifier, dir_path)
-    file_path = os_path.join(*pieces)
-    if file_must_already_exist:
-        if os_path.exists(file_path):  # :#here1
-            return file_path
-        else:
-            __whine_about_no_path(pieces, listener)
-            return
-    else:
-        # == BEGIN temporary
-        if os_path.exists(file_path):
-            pass  # hi. (Case764)
-        else:
-            cover_me('have fun creating a file')
-        # == END
-        return file_path
+def _file_path_pieces_via_identifier(identifier, dir_path):
 
-
-def __file_path_pieces_via_identifier(identifier, dir_path):
-
-    # this will absolutely change when we abstract schema-ism out
+    # this will absolutely change when we abstract schema-ism out #[#867.K]
 
     nds = identifier.native_digits
     length = len(nds)
@@ -338,7 +393,7 @@ def __file_path_pieces_via_identifier(identifier, dir_path):
 
 # == whiners
 
-def __whine_about_no_path(pieces, listener):
+def _whine_about_no_path(pieces, listener):
     """given a filesystem path that does not exist, determine the longest
 
     head of the path that *does*.
@@ -396,9 +451,6 @@ def _sib_lib():
     from . import file_lines_via_CUD_entity_and_file_lines as _
     return _
 
-
-_file_need_not_already_exist = False
-_file_must_already_exist = True
 
 _okay = True
 
