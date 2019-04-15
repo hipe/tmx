@@ -43,9 +43,10 @@ def require_hub(orig_f):
             # (this handling of ec should be in its own decorator..)
             ec = orig_f(ctx, **kwargs)
             assert(isinstance(ec, int))
-            if ec:
-                __crazy_time(ec)
-            return
+            if ec is 0:
+                return 0  # (Case819) (test_100)
+            else:
+                return __crazy_time(ec)  # should throw an exception
 
         _ = (f"'{ctx.info_name}' requires this option "
              "(under the top-level command) "
@@ -66,7 +67,7 @@ def __crazy_time(ec):
     """track complaints about click #[#867.L]:
 
     - we shouldn't have to raise an exception to control the exit code
-    - whe shouldn't have to provide a message alongside an exit code
+    - we shouldn't have to provide a message alongside an exit code
     """
 
     from click.exceptions import ClickException as e_class
@@ -75,19 +76,40 @@ def __crazy_time(ec):
     raise e
 
 
+_empty_mapping = {}  # OCD
+
+
 class _CommonFunctions:
 
-    def __init__(self, collections_hub):
+    def __init__(self, collections_hub, injections):
         self.unsanitized_collections_hub = collections_hub
+        self._injections = injections
 
-    def collection_via_unsanitized_argument(self, collection_argument):
+    def release_these_injections(self, *names):
+        o = self._injections
+        del(self._injections)
+        if o is None:
+            return _empty_mapping
+        else:
+            return o.RELEASE_THESE(names)
+
+    def collection_via_unsanitized_argument(
+            self, collection_argument, injections_dictionary=_empty_mapping):
+
+        # derive collection path
         import os.path as os_path
         _coll_path = os_path.join(
-                self.unsanitized_collections_hub, collection_argument)
+                self.unsanitized_collections_hub,
+                collection_argument)
 
+        # money
         from kiss_rdb.magnetics_ import collection_via_directory as lib
-        return lib.collection_via_directory_and_filesystem(
-                _coll_path, 'no fs yet')
+        return lib.collection_via_directory_and_injections(
+                collection_directory_path=_coll_path, **injections_dictionary)
+
+    def build_listener(self):
+        _, _, listener = self.three_for_listener()
+        return listener
 
     def three_for_listener(self):  # UGLY AS HELL
 
@@ -95,7 +117,7 @@ class _CommonFunctions:
         error_categories = []
 
         def listener(*args):
-            # (Case799_200)
+            # (Case802)
             mood, shape, error_category, *chan_tail, payloader = args
 
             # for mood, for now there's only one mood
@@ -162,17 +184,52 @@ _coll_hub_env_var = 'KSS_HUB'
         help=f'The doo-hah with the foo-fah (env: {_coll_hub_env_var}).')
 @click.pass_context
 def cli(ctx, collections_hub):
-    ctx.obj = _CommonFunctions(collections_hub)
+    ctx.obj = _CommonFunctions(collections_hub, ctx.obj)  # NASTY see below
+
+    """DISCUSSION #[#867.U]
+
+    our only way to inject anything into our CLI is thru this cryptic 'obj'
+    attribute. the semantics of this get overloaded, because we need to
+    exploit it for two purposes: one, it's how we get arbitrary config into
+    our CLI at all, and two, it's how our specific actions can access this
+    and the rest. more at the INJECTIONS class elsewhere.
+    """
 
 
 @cli.command()
+@click.option('-val', '--value', nargs=2, multiple=True)
 @click.argument('collection')
-def create():
+@click.pass_context
+@require_hub
+def create(ctx, collection, value):
     """create a new entity in the collection
     given THIS STUFF pray this will be easy
     """
 
-    click.echo('#open [#867.M] create')
+    # boilerplate-esque setup
+
+    cf = ctx.obj  # "cf" = common functions
+    listener = cf.build_listener()
+    _inj = cf.release_these_injections('random_number_generator', 'filesystem')
+    col = cf.collection_via_unsanitized_argument(collection, _inj)
+
+    # derive cuds
+
+    _cuds = tuple(('create', name_s, val_s) for name_s, val_s in value)
+
+    mde = col.create_entity(_cuds, listener)
+    if mde is None:
+        return _failure_exit_code_bad_request
+
+    sout = click.utils._default_text_stdout()
+    serr = click.utils._default_text_stderr()
+
+    serr.write('created:\n')
+
+    for line in mde.to_line_stream():
+        sout.write(line)
+
+    return _success_exit_code
 
 
 @cli.command()
@@ -204,13 +261,12 @@ def get(ctx, collection, internal_identifier):
     """
 
     cf = ctx.obj
-    error_categories_seen, error_categories, listener = cf.three_for_listener()
-
+    listener = cf.build_listener()
     col = cf.collection_via_unsanitized_argument(collection)
 
     dct = col.retrieve_entity(internal_identifier, listener)
     if dct is None:
-        return 404  # (Case812)
+        return 404  # (Case812)  ##here1
 
     # (Case813):
     # don't get overly attached to the use of JSON here.
@@ -221,7 +277,7 @@ def get(ctx, collection, internal_identifier):
     json.dump(dct, fp=fp, indent=2)
     fp.write('\n')  # (the above doesn't)
 
-    return _success_exitstatus
+    return _success_exit_code
 
 
 @cli.command()
@@ -257,15 +313,15 @@ def traverse(ctx, collection):
 
     echo = click.echo
     for iid in _iids:
-        # (Case799_200)
+        # (Case804)
         echo(iid.to_string())
 
     if len(error_categories_seen):
         only_error_catetory, = error_categories  # ..
         assert('argument_error' == only_error_catetory)
-        return 400  # 400 - Bad Request lol
+        return _failure_exit_code_bad_request
 
-    return _success_exitstatus
+    return _success_exit_code
 
 
 @cli.command()
@@ -294,7 +350,8 @@ def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
-_success_exitstatus = 0
+_failure_exit_code_bad_request = 400  # Bad Request lol ##here1
+_success_exit_code = 0
 
 
 # #born.

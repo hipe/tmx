@@ -36,8 +36,8 @@ class _CommonCase(unittest.TestCase):
     def update_expecting_success(self, id_s, cuds):
         return self._recording_of_success(_function_for_update(id_s, cuds))
 
-    def create_expecting_success(self, cuds, rng):
-        return self._recording_of_success(_function_for_create(cuds, rng))
+    def create_expecting_success(self, cuds):
+        return self._recording_of_success(_function_for_create(cuds))
 
     def delete_expecting_success(self, id_s):
         return self._recording_of_success(_function_for_delete(id_s))
@@ -73,7 +73,7 @@ class _CommonCase(unittest.TestCase):
             return f(col, listener)
 
         sct = self.run_this_expecting_failure(use_f)
-        recs = fs._recorded_file_rewrites_from_finish()
+        recs = fs.FINISH_AS_HACKY_SPY()
         return (sct, recs)
 
     def run_this_expecting_failure(self, f):  # #open #[867.H] DRY these
@@ -114,7 +114,7 @@ class _CommonCase(unittest.TestCase):
         res = f(col, listener)
         self.assertTrue(res)  # :#here1
 
-        return fs._recorded_file_rewrites_from_finish()
+        return fs.FINISH_AS_HACKY_SPY()
 
     def listener(self):
         if False:
@@ -127,10 +127,10 @@ def _function_for_update(id_s, cuds):
     return f
 
 
-def _function_for_create(cuds, random_number_generator):
+def _function_for_create(cuds):
 
     def f(col, listener):
-        return col.create_entity(cuds, random_number_generator, listener)
+        return col.create_entity(cuds, listener)
     return f
 
 
@@ -531,13 +531,17 @@ class Case764_create_into_existing_file(_CommonCase):
             ('create', 'de-fg', 'true'),
             )
 
+        return self.create_expecting_success(cuds)
+
+    def subject_collection(self):
+
         random_number_generator = _random_number_generator_for(494)
         # "2HG" as int per [#867.S] CLI
 
-        return self.create_expecting_success(cuds, random_number_generator)
-
-    def subject_collection(self):
-        return _build_collection_expecting_common_number_of_rewrites()
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                random_number_generator=random_number_generator,
+                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
 
 
 # class Case765_create_failure_cleans_up_created_file(_CommonCase):
@@ -587,10 +591,9 @@ class Case766_create_into_noent_file(_CommonCase):
             ('create', 'de-fg', 'false'),
             )
 
-        random_number_generator = _random_number_generator_for(512)
         entities_path = _entities_file_path_for_2J()
 
-        res = self.create_expecting_success(cuds, random_number_generator)
+        res = self.create_expecting_success(cuds)
 
         # == BEGIN NASTY - don't actually leave that new file in the fixture
         import os
@@ -600,18 +603,17 @@ class Case766_create_into_noent_file(_CommonCase):
         return res
 
     def subject_collection(self):
-        return _build_collection_expecting_common_number_of_rewrites()
+        random_number_generator = _random_number_generator_for(512)  # 2J2 but
+
+        return _build_collection(
+                dir_path=_dir_path_most_common(),
+                random_number_generator=random_number_generator,
+                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
 
 
 def _last_3_of_path(path):
     import re
     return re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
-
-
-def _build_collection_expecting_common_number_of_rewrites():
-    return _build_collection(
-            dir_path=_dir_path_most_common(),
-            filesystem=_build_filesystem_expecting_num_file_rewrites(2))
 
 
 @memoize
@@ -651,67 +653,22 @@ def _dir_path_of_no_ent():
     return fixture_directory_path('000-no-ent')
 
 
-@memoize
 def _filesystem_expecting_no_rewrites():
-
-    def inj(*_):
-        assert(False)
-
-    def finish():
-        return 'hi there were no file rewrites'
-
-    return _build_filesystem_via_two_funcs(inj, finish)
+    return _fs_lib().filesystem_expecting_no_rewrites()
 
 
 def _build_filesystem_expecting_num_file_rewrites(expected_num):
-
-    recs = []
-
-    def INJECTED_FELLOW(from_fh, to_fh):
-
-        if len(recs) == expected_num:
-            raise Exception('too many doo-hahs')
-
-        from_fh.seek(0)  # necessary
-        _new_lines = tuple(iter(from_fh))
-
-        recs.append(_RecordOfFileRewrite(
-            path=to_fh.name,
-            lines=_new_lines,))
-
-    def finish():
-
-        nonlocal recs
-        if len(recs) != expected_num:
-            raise Exception('still had unexpected yadda')
-
-        res = tuple(recs)
-        del(recs)  # works! (as a safety measure)
-        return res
-
-    return _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish)
+    return _fs_lib().build_filesystem_expecting_num_file_rewrites(expected_num)
 
 
-def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):
-    from kiss_rdb.magnetics_ import filesystem as _
-
-    fs = _._Filesystem(INJECTED_FELLOW)
-
-    fs._recorded_file_rewrites_from_finish = finish
-
-    return fs
+def _fs_lib():
+    from kiss_rdb_test import filesystem_spy as _
+    return _
 
 
 def _last_three_path_parts(path):
     import re
     return re.search(r'[^/]+(?:/[^/]+){2}$', path)[0]
-
-
-class _RecordOfFileRewrite:
-
-    def __init__(self, path, lines):
-        self.path = path
-        self.lines = lines
 
 
 def _random_number_generator_for(random_number):
@@ -726,9 +683,17 @@ def _random_number_generator_for(random_number):
     return random_number_generator
 
 
-def _build_collection(dir_path, filesystem):
-    return _subject_module().collection_via_directory_and_filesystem(
-            dir_path, filesystem)
+def _build_collection_expecting_common_number_of_rewrites():
+    return _build_collection(
+            dir_path=_dir_path_most_common(),
+            filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+
+
+def _build_collection(dir_path, filesystem, random_number_generator=None):
+    return _subject_module().collection_via_directory_and_injections(
+            collection_directory_path=dir_path,
+            random_number_generator=random_number_generator,
+            filesystem=filesystem)
 
 
 def _subject_module():

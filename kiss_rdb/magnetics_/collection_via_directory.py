@@ -10,9 +10,49 @@ several different *separate* responsibilities:
 """
 
 
-class collection_via_directory_and_filesystem:
+class INJECTIONS:
+    """for several reasons, certain facilities are injected as dependencies.
 
-    def __init__(self, dir_path, fs):
+    not every operation uses every facility. if you know before you build
+    the collection that you will be doing only certain operation(s), you can
+    avoid some unnecessary coupling and overhead.. #[#867.U]
+    """
+
+    def __init__(
+            self,
+            random_number_generator,
+            filesystemer):
+
+        o = {}
+
+        def fs():
+            nonlocal filesystemer
+            res = filesystemer()
+            del(filesystemer)
+            return res
+        o['filesystem'] = fs
+
+        def rng():
+            nonlocal random_number_generator
+            res = random_number_generator
+            del(random_number_generator)
+            return res
+        o['random_number_generator'] = rng
+
+        def release(names):
+            return {k: o[k]() for k in names}
+
+        self.RELEASE_THESE = release
+
+
+class collection_via_directory_and_injections:
+
+    def __init__(
+            self, collection_directory_path,
+            random_number_generator=None,
+            filesystem=None):
+
+        # -- depthly valid identifier string
 
         identifier_depth = 3  # #open #[#867.K]
 
@@ -29,8 +69,16 @@ class collection_via_directory_and_filesystem:
                 return
             return id_obj
         self._depthly_valid_identifier_via_string = f
-        self._dir_path = dir_path
-        self._filesystem = fs
+
+        # --
+
+        if random_number_generator is not None:
+            self._random_number_generator = random_number_generator
+
+        if filesystem is not None:
+            self._filesystem = filesystem
+
+        self._dir_path = collection_directory_path
 
     def update_entity(self, id_s, cuds, listener):
         tup = self._ID_and_path_that_must_already_exist(id_s, listener)
@@ -65,7 +113,7 @@ class collection_via_directory_and_filesystem:
                         lmef, lmif, iid, self._filesystem, listener)
         return res
 
-    def create_entity(self, cuds, random_number_generator, listener):
+    def create_entity(self, cuds, listener):
         """
         create is the most complicated per [#864.C] this table.
 
@@ -93,7 +141,8 @@ class collection_via_directory_and_filesystem:
 
         with self._open_locked_mutable_index() as lmif:
 
-            tup = _provision_new_IID(random_number_generator, lmif, listener)
+            tup = _provision_new_IID(
+                    self._random_number_generator, lmif, listener)
             if tup is None:
                 cover_me('maybe numberspace is full for current schema')
                 return
@@ -146,6 +195,11 @@ class collection_via_directory_and_filesystem:
 
                         listener=listener,
                         )
+
+            if res is not None:
+                assert(res is True)
+                res = mde  # (Case819)
+
         return res
 
     # == END
@@ -163,7 +217,7 @@ class collection_via_directory_and_filesystem:
         if tup is None:
             return
         iid, path = tup
-        return _retrieve_entity(iid, path, self._filesystem, listener)
+        return _retrieve_entity(iid, path, listener)
 
     def _ID_and_path_that_must_already_exist(self, id_s, listener):
 
@@ -339,14 +393,12 @@ def _request_via_cuds(cuds, listener):
     return _(cuds, listener)
 
 
-def _retrieve_entity(identifier, file_path, filesystem, listener):
+def _retrieve_entity(identifier, file_path, listener):
     """DISCUSSION
 
     - the founding purpose of the "collection" idiom was to centralize
       operations that mutate the file (CUD).
     - but it seems to make sense to expose also the read-only verb (R in CRUD)
-    - the "filesystem" argument is only for injecting a spy. we do not bother
-      with the extra complexity of injecting spies when doing read-only on FS.
     - see #here2 about gross inefficiency in calling this multiple times.
     """
 

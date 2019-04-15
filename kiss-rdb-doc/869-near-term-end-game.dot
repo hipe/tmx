@@ -3,8 +3,12 @@ rankdir=BT
 node[shape=rect]
 
 944[label="CLI"]
+852->944
 844->944
 552->944
+
+
+852[label="multiline\nstrings"]
 
 
 552[label="one-by-one integrate\nCUD-RT into CLI\n(explode this)"]
@@ -19,18 +23,24 @@ node[shape=rect]
 
 
 844[label="typed values\nvia CLI values"]
-389->844
+756->844
+
+756[label="single-file storage schema"]
+752->756
+
+752[label="abstract existing depth\nstuff to use storage schema"]
+389->752
 
 
-389[label="locking: thru schema\nintegrate CUD with\nfile (semaphore) locking"]
+389[label="locking: thru schema\nintegrate CUD with\nfile (semaphore) locking" style=filled]
 633->389
 187->389
 
 
-633[label="create thru schema\nintegrated w/\nattributes & provision"]
+633[label="create thru schema\nintegrated w/\nattributes & provision" style=filled]
 500->633
 167->633
-500[label="re-create new\nindex file"]
+500[label="re-create new\nindex file" style=filled]
 480->500
 480[label="provision new\nID pseduo-\nrandomly" style=filled]
 722->480

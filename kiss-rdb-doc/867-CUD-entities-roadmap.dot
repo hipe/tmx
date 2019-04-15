@@ -29,7 +29,7 @@ n208[label="create • as with retrieve,
 • output new entity (lines)
 • pass-thru the rest while
   validate unique & order
-"]
+" style=filled]
 
 
 n292->n208

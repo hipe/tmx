@@ -394,7 +394,7 @@ def entity_dict_via_entity_big_string__(big_string, listener):
 
     this will expand when we get to [#864.future-feature-1] meta
 
-    at writing, covered by (Case708_450)
+    (Case711) (retrieve)
     """
 
     dct = _vendor_parse(big_string, listener)
