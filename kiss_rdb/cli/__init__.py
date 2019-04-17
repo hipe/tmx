@@ -94,79 +94,66 @@ class _CommonFunctions:
             return o.RELEASE_THESE(names)
 
     def collection_via_unsanitized_argument(
-            self, collection_argument, injections_dictionary=_empty_mapping):
+            self, collection_argument,
+            listener,
+            injections_dictionary=_empty_mapping,
+            ):
+
+        from kiss_rdb.magnetics_ import schema_via_file_lines as lib
+        import os.path as os_path
+
+        hub = self.unsanitized_collections_hub
 
         # derive collection path
-        import os.path as os_path
-        _coll_path = os_path.join(
-                self.unsanitized_collections_hub,
-                collection_argument)
+        coll_path = os_path.join(hub, collection_argument)
+
+        # derive the schema
+        schema = lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
+        if schema is None:
+            return  # (Case802)
 
         # money
         from kiss_rdb.magnetics_ import collection_via_directory as lib
-        return lib.collection_via_directory_and_injections(
-                collection_directory_path=_coll_path, **injections_dictionary)
+        return lib.collection_via_directory_and_schema(
+                collection_directory_path=coll_path,
+                collection_schema=schema,
+                **injections_dictionary)
 
-    def build_listener(self):
-        _, _, listener = self.three_for_listener()
-        return listener
-
-    def three_for_listener(self):  # UGLY AS HELL
-
-        error_categories_seen = set()
-        error_categories = []
-
-        def listener(*args):
-            # (Case802)
-            mood, shape, error_category, *chan_tail, payloader = args
-
-            # for mood, for now there's only one mood
-            assert('error' == mood)  # KIS for now
-
-            # for error category, we simply check-off a box
-            if error_category not in error_categories_seen:
-                error_categories_seen.add(error_category)
-                error_categories.append(error_category)
-
-            # if there's business-level channel info, ok but cover it
-            if len(chan_tail):
-                business, = chan_tail
-                if 'no_such_directory' == business:
-                    pass
-                else:
-                    cover_me('ok fine but cover it - probably ignore it')
-
-            # express the emission appropriately for the shape
-            if 'expression' == shape:
-                for line in payloader():
-                    _echo_error(line)
-            elif 'structure' == shape:
-                _struct = payloader()
-                _express_error_structure(error_category, _struct)
-            else:
-                assert(False)
-
-        return error_categories_seen, error_categories, listener
+    def build_monitor(self):
+        return _Monitor(_express_error_structure, _echo_error)
 
 
 def _express_error_structure(error_category, struct):  # (Case810)
-    """messy for now..."""
+    """FOR NOW, this is just a messy attempt at making contact with all the
+
+    components we expect to see for different cases..
+
+    eventually we will want per-action handlers to be integrated somehow
+    """
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 
     reason = dim_pool.pop('reason')  # assert
+
+    dim_pool.pop('errno', None)  # get rid of it, if any. was handled #here2
 
     if len(dim_pool):
 
         # for now, just making a bunch of overly attentive contact, as a
         # sort of specification assertion of what metadata is available
 
-        assert('input_error' == error_category)  # hi.
-        typ = dim_pool.pop('input_error_type')
-        assert('not_found' == typ)  # hi.
-        dim_pool.pop('identifier_string')
-        dim_pool.pop('might_be_out_of_order')
-        assert(0 == len(dim_pool))
+        if 'input_error' == error_category:
+            typ = dim_pool.pop('input_error_type')
+            if 'not_found' == typ:
+                dim_pool.pop('identifier_string')
+                dim_pool.pop('might_be_out_of_order')
+                assert(0 == len(dim_pool))
+            elif 'collection_not_found' == typ:
+                assert(0 == len(dim_pool))  # (Case802)
+            else:
+                cover_me(f'hi, new kind of input error subtype: {typ}')
+        else:
+            cover_me(f'hi, new error category: {error_category}')
 
     _echo_error(reason)
 
@@ -206,20 +193,21 @@ def create(ctx, collection, value):
     given THIS STUFF pray this will be easy
     """
 
-    # boilerplate-esque setup
-
+    # begin boilerplate-esque
     cf = ctx.obj  # "cf" = common functions
-    listener = cf.build_listener()
+    mon = cf.build_monitor()
+    listener = mon.listener
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, _inj)
-
-    # derive cuds
+    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    if col is None:
+        mon.some_error_code()
+    # end
 
     _cuds = tuple(('create', name_s, val_s) for name_s, val_s in value)
 
     mde = col.create_entity(_cuds, listener)
     if mde is None:
-        return _failure_exit_code_bad_request
+        return mon.some_error_code()
 
     sout = click.utils._default_text_stdout()
     serr = click.utils._default_text_stderr()
@@ -260,13 +248,18 @@ def get(ctx, collection, internal_identifier):
     with a where clause mebbe
     """
 
-    cf = ctx.obj
-    listener = cf.build_listener()
-    col = cf.collection_via_unsanitized_argument(collection)
+    # begin boilerplate-esque
+    cf = ctx.obj  # "cf" = common functions
+    mon = cf.build_monitor()
+    listener = mon.listener
+    col = cf.collection_via_unsanitized_argument(collection, listener)
+    if col is None:
+        return mon.some_error_code()
+    # end
 
     dct = col.retrieve_entity(internal_identifier, listener)
     if dct is None:
-        return 404  # (Case812)  ##here1
+        return mon.max_errno or 404  # (Case812)  ##here1
 
     # (Case813):
     # don't get overly attached to the use of JSON here.
@@ -304,10 +297,14 @@ def traverse(ctx, collection):
     we don't even know if we want this
     """
 
-    cf = ctx.obj
-    error_categories_seen, error_categories, listener = cf.three_for_listener()
-
-    col = cf.collection_via_unsanitized_argument(collection)
+    # begin boilerplate-esque
+    cf = ctx.obj  # "cf" = common functions
+    mon = cf.build_monitor()
+    listener = mon.listener
+    col = cf.collection_via_unsanitized_argument(collection, listener)
+    if col is None:
+        return mon.some_error_code()
+    # end
 
     _iids = col.to_identifier_stream(listener)
 
@@ -316,12 +313,12 @@ def traverse(ctx, collection):
         # (Case804)
         echo(iid.to_string())
 
-    if len(error_categories_seen):
-        only_error_catetory, = error_categories  # ..
-        assert('argument_error' == only_error_catetory)
-        return _failure_exit_code_bad_request
-
-    return _success_exit_code
+    # (make contact with what went wrong..)
+    if len(mon.error_categories_box.set):
+        assert(mon.error_categories_box.list == ['argument_error'])
+        return mon.some_error_code()
+    else:
+        return _success_exit_code
 
 
 @cli.command()
@@ -340,6 +337,87 @@ def search():
     """
 
     click.echo('#open [#867.M] search')
+
+
+# ==
+
+class _Monitor:
+    """this is an experimental example of a "modality-specific" adaptation
+
+    of a listener. this is used similarly to the (at writing) only other
+    class with "Monitor" in the name.
+
+    for this monitor, we care about gathering simple "statistics" about all
+    the emissions; like whether a certain kind of error was emitted, or what
+    the highest level of "errno" was..
+    """
+
+    def __init__(self, express_error_structure, echo_error_line):
+
+        self._init_errno_stuff()
+
+        error_categories_box = _Box()
+
+        def listener(mood, *rest):
+            # (Case802)
+            if 'error' == mood:
+                when_error(rest)
+            else:
+                assert(False)
+
+        def when_error(rest):
+            shape, error_category, payloader = rest
+
+            error_categories_box.see(error_category)
+
+            # express the emission appropriately for the shape
+            if 'expression' == shape:
+
+                # (error category & detail is disregarded here - meh for now)
+                for line in payloader():
+                    echo_error_line(line)
+            elif 'structure' == shape:
+                dct = payloader()
+                if 'errno' in dct:
+                    self._see_errno(dct['errno'])  # #here2
+                express_error_structure(error_category, dct)
+            else:
+                assert(False)
+
+        self.listener = listener
+        self.error_categories_box = error_categories_box
+
+    def _init_errno_stuff(self):
+
+        self.max_errno = None
+
+        def see_errno_initially(errno):
+            self.max_errno = errno
+            self._see_errno = see_errono_subsequently
+
+        self._see_errno = see_errno_initially
+
+        def see_errono_subsequently(errno):
+            if self.max_errno < errno:
+                self.max_errno = errno
+
+    def some_error_code(self):
+        if self.max_errno is None:
+            return _failure_exit_code_bad_request
+        else:
+            return self.max_errno
+
+
+class _Box:  # OCD..
+
+    def __init__(self):
+        self.set = set()
+        self.list = []
+
+    def see(self, item):
+        if item not in self.set:
+            self.set.add(item)
+        self.list.append(item)
 
 
 def _echo_error(line):

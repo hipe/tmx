@@ -5,7 +5,9 @@ from .identifiers_via_file_lines import (
 import re
 
 
-"""mainly, be the soul point of contact with the vendor parsing library"""
+"""mainly, be the soul point of contact with the vendor parsing library
+   (but this moved at #history-A.3)
+"""
 
 """secondarily, a hack for parsing strings to detect in-line comments."""
 
@@ -416,12 +418,10 @@ def entity_dict_via_entity_big_string__(big_string, listener):
 
 
 def _vendor_parse(big_string, listener):  # #testpoint
-    import toml
-    e = None
-    try:
-        res = toml.loads(big_string)
-    except toml.TomlDecodeError as e_:
-        e = e_
+
+    from . import schema_via_file_lines as _
+    e, res = _.vendor_parse_toml_or_catch_exception__(big_string)
+
     # (when the emission throws an exception, it's a bad look unless frame pop)
     if e is None:
         return res
@@ -507,6 +507,7 @@ def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
+# #history-A.3: the integration for parsing toml with vendor lib is moved
 # #history-A.2: house RETRIEVE
 # #history-A.1: spike hand-written surface-string string parser
 # #born.

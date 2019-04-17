@@ -690,10 +690,17 @@ def _build_collection_expecting_common_number_of_rewrites():
 
 
 def _build_collection(dir_path, filesystem, random_number_generator=None):
-    return _subject_module().collection_via_directory_and_injections(
+    return _subject_module().collection_via_directory_and_schema(
             collection_directory_path=dir_path,
+            collection_schema=_always_same_schema(),
             random_number_generator=random_number_generator,
             filesystem=filesystem)
+
+
+@memoize
+def _always_same_schema():
+    from kiss_rdb.magnetics_ import schema_via_file_lines as _
+    return _._Schema(storage_schema='32x32x32')
 
 
 def _subject_module():

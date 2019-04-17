@@ -67,26 +67,26 @@ the whole collection of identifiers twice. but MEH:
 # == BEGIN GLUE
 
 
-def NEW_THING(random_number_generator, lmif, listener):
+def PROVISION_NEW_IDENTIFIER(
+        random_number_generator,
+        locked_mutable_index_file,
+        identifier_depth,
+        listener):
 
     # convert the identifiers file into a big flat tuple of identifier objects
     # (we may be able to avoid this, but for now we don't care..)
 
     from . import identifiers_via_index as _
-    ALL_iids = tuple(_.identifiers_via_lines_of_index(lmif))
-
-    # depth is squarely in the domain of the vaporous "schema" #[#867.K],
-    # but for now we hackishly determine it from the 1st identifier
+    _itr = _.identifiers_via_lines_of_index(locked_mutable_index_file)
+    ALL_iids = tuple(_itr)
 
     if not len(ALL_iids):
-        cover_me("it's time to refactor to use schema")
-
-    depth = len(ALL_iids[0].native_digits)
+        cover_me('cover the case of provisioning into an empty collection')
 
     # get the decoder function from the depth
 
     from . import identifier_via_string as _
-    iid_via_int, int_via_iid, cap = _.three_via_depth__(depth)
+    iid_via_int, int_via_iid, cap = _.three_via_depth__(identifier_depth)
 
     # run the function against the list of things
 

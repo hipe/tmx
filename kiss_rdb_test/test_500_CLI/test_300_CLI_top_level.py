@@ -81,7 +81,10 @@ class _CommonCase(unittest.TestCase):
         self.assertTrue(3 < len(lines))
 
     def _expect_exit_code_for_bad_request(self):
-        self.assertEqual(self._end_state().exception.exit_code, 400)
+        self.expect_exit_code(400)
+
+    def expect_exit_code(self, which):
+        self.assertEqual(self._end_state().exception.exit_code, which)
 
     def expect_exit_code_is_the_success_exit_code(self):
         self.assertEqual(self._end_state().exit_code, _success_exit_code)
@@ -302,13 +305,13 @@ class Case799_help_screen_for_traverse(_CommonCase):
 class Case802_touch_error_message_integration(_CommonCase):
 
     def test_100_generic_failure_exit_status(self):
-        self._expect_exit_code_for_bad_request()
+        self.expect_exit_code(2)  # FileNotFoundError.errno
 
     def test_200_message_lines(self):
         _actual, = self._end_state().lines
         reason, path = _actual.split(' - ')
-        self.assertEqual(reason, 'collection does not exist because no such directory')  # noqa: E501
-        self.assertEqual(path, 'qq/pp/entities\n')
+        self.assertEqual(reason, 'collection does not exist because no schema file')  # noqa: E501
+        self.assertEqual(path, 'qq/pp/schema.toml\n')
 
     @shared_subject
     def _end_state(self):
@@ -735,6 +738,8 @@ def _invoke_CLI(given_args, injections_dictionary):
 
     from kiss_rdb.cli import cli
 
+    _NASTY_HACK_once()
+
     if injections_dictionary is None:
         injections_obj = None
         filesystem_finish = None
@@ -756,6 +761,31 @@ def _invoke_CLI(given_args, injections_dictionary):
             )
 
     return filesystem_finish, _exit_code
+
+
+@memoize
+def _NASTY_HACK_once():
+    # OCD for tests (this is a common OCD we run into when testing CLI):
+    # don't ever parse the same schema file more than once
+
+    from kiss_rdb.magnetics_ import schema_via_file_lines as mod
+
+    real_function = mod.SCHEMA_VIA_COLLECTION_PATH
+
+    cache = {}
+
+    def use_function(path, listener):
+
+        if path in cache:
+            print(f'USING cached fellow for {path}')
+            return cache[path]
+
+        print(f'MAKING cached fellow for {path}')
+        res = real_function(path, listener)
+        cache[path] = res
+        return res
+
+    mod.SCHEMA_VIA_COLLECTION_PATH = use_function
 
 
 def __rng_via(random_number):

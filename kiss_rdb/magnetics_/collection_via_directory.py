@@ -45,16 +45,16 @@ class INJECTIONS:
         self.RELEASE_THESE = release
 
 
-class collection_via_directory_and_injections:
+class collection_via_directory_and_schema:
 
     def __init__(
-            self, collection_directory_path,
+            self, collection_directory_path, collection_schema,
             random_number_generator=None,
             filesystem=None):
 
         # -- depthly valid identifier string
 
-        identifier_depth = 3  # #open #[#867.K]
+        identifier_depth = collection_schema.identifier_depth
 
         def f(id_s, listener):
 
@@ -79,6 +79,7 @@ class collection_via_directory_and_injections:
             self._filesystem = filesystem
 
         self._dir_path = collection_directory_path
+        self._schema = collection_schema
 
     def update_entity(self, id_s, cuds, listener):
         tup = self._ID_and_path_that_must_already_exist(id_s, listener)
@@ -141,8 +142,14 @@ class collection_via_directory_and_injections:
 
         with self._open_locked_mutable_index() as lmif:
 
-            tup = _provision_new_IID(
-                    self._random_number_generator, lmif, listener)
+            from . import provision_ID_randomly_via_identifiers as _
+
+            tup = _.PROVISION_NEW_IDENTIFIER(
+                    random_number_generator=self._random_number_generator,
+                    locked_mutable_index_file=lmif,
+                    identifier_depth=self._schema.identifier_depth,
+                    listener=listener)
+
             if tup is None:
                 cover_me('maybe numberspace is full for current schema')
                 return
@@ -159,7 +166,7 @@ class collection_via_directory_and_injections:
 
             # from the identifier derive the entities path
 
-            _pieces = _file_path_pieces_via_identifier(iid, self._dir_path)
+            _pieces = self._file_path_pieces_via_identifier(iid)
             path = os_path.join(*_pieces)
 
             # to avoid the bad thing, obtain a lock before mutating the file.
@@ -225,7 +232,7 @@ class collection_via_directory_and_injections:
         if iid is None:
             return
 
-        pieces = _file_path_pieces_via_identifier(iid, self._dir_path)
+        pieces = self._file_path_pieces_via_identifier(iid)
         path = os_path.join(*pieces)
 
         if not os_path.exists(path):  # :##here1
@@ -245,8 +252,15 @@ class collection_via_directory_and_injections:
         return self._filesystem.open_locked_file(path)
 
     def to_identifier_stream(self, listener):
-        from .entities_via_collection import identifiers_via_collection as _
-        return _(self._dir_path, self._depthly_valid_identifier_via_string, listener)  # noqa: E501
+        from . import entities_via_collection as _
+        return _.identifiers_via_collection(
+                directory_path=self._dir_path,
+                id_via_string=self._depthly_valid_identifier_via_string,
+                schema=self._schema,
+                listener=listener)
+
+    def _file_path_pieces_via_identifier(self, iid):
+        return self._schema.FILE_PATH_PIECES_VIA(iid, self._dir_path)  # noqa: E501
 
 
 # ==
@@ -383,11 +397,6 @@ def _create_MDE_via_ID_and_request(identifier_string, req, listener):
     return mde
 
 
-def _provision_new_IID(random_number_generator, lmif, listener):
-    from . import provision_ID_randomly_via_identifiers as _
-    return _.NEW_THING(random_number_generator, lmif, listener)
-
-
 def _request_via_cuds(cuds, listener):
     from .CUD_attributes_request_via_tuples import request_via_tuples as _
     return _(cuds, listener)
@@ -423,24 +432,6 @@ def _retrieve_entity(identifier, file_path, listener):
     _big_string = ''.join(mde.to_line_stream())
 
     return dict_via(_big_string, listener)
-
-
-# == individual identifier stuff
-
-def _file_path_pieces_via_identifier(identifier, dir_path):
-
-    # this will absolutely change when we abstract schema-ism out #[#867.K]
-
-    nds = identifier.native_digits
-    length = len(nds)
-    assert(1 < length)
-
-    # get all but the last component. "ABC" -> "A/B.toml"
-    these = [nds[i].character for i in range(0, (length - 1))]
-
-    these[-1] = f'{these[-1]}.toml'
-
-    return (dir_path, 'entities', *these)
 
 
 # == whiners

@@ -5,14 +5,20 @@ node[shape=rect]
 944[label="CLI"]
 852->944
 844->944
-552->944
+617->944
 
 
 852[label="multiline\nstrings"]
 
 
-552[label="one-by-one integrate\nCUD-RT into CLI\n(explode this)"]
-/* 617 682 747 812 */
+/*
+812[label=" for CLI"]
+747[label=" for CLI"]
+682[label=" for CLI"]
+*/
+617[label="update for CLI"]
+552->617
+552[label="delete for CLI"]
 
 487->552
 487[label="sane unit tests\nof CLI" style=filled]
@@ -28,7 +34,7 @@ node[shape=rect]
 756[label="single-file storage schema"]
 752->756
 
-752[label="abstract existing depth\nstuff to use storage schema"]
+752[label="abstract existing depth\nstuff to use storage schema" style=filled]
 389->752
 
 

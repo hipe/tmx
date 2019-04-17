@@ -41,7 +41,7 @@ woah boy.
 |[#867.N]                   | #open | (OUTSIDE OF SUB-PROJECT) how to setup.py
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
-|[#867.K]                   | #trak | places where you need schema injection
+|[#867.K]                   | #hole |
 |[#867.J]                   | #wish | future feature 4: multiline strings
 |[#867.H]                   | #open | blank lines during update move weirdly. depend maybe on #wish [#867.J].
 |[#867.G]                   | #wish | empty files would tell you they're empty
