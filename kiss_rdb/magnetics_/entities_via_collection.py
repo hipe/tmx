@@ -7,17 +7,14 @@ DISCUSSION about roughness here:
 """
 
 
-def identifiers_via_collection(
-        directory_path, id_via_string,
-        schema, listener):
+def identifiers_via__(paths_function, id_via_string, listener):
 
     from .identifiers_via_file_lines import ErrorMonitor_
 
     monitor = ErrorMonitor_(listener)
     my_listener = monitor.listener
 
-    _otl_itr = _open_table_line_stream_via_dir_path(
-            directory_path, schema, monitor)
+    _otl_itr = _open_table_line_stream_via_dir_path(paths_function, monitor)
 
     def _():
         for otl in _otl_itr:
@@ -60,7 +57,7 @@ def identifiers_via_collection(
             cover_me('out of order')
 
 
-def _open_table_line_stream_via_dir_path(dir_path, schema, monitor):
+def _open_table_line_stream_via_dir_path(paths_function, monitor):
 
     from .identifiers_via_file_lines import (
             open_table_line_stream_via_file_lines_)
@@ -74,7 +71,7 @@ def _open_table_line_stream_via_dir_path(dir_path, schema, monitor):
         if not entities_dir_pp.exists():
             __whine_about_not_exists(monitor.listener, entities_dir_pp)
 
-    _ = schema.ENTITIES_FILE_PATHS_VIA(dir_path, when_entities_dir_empty)
+    _ = paths_function(when_entities_dir_empty)
 
     for path_pp in _:
             with open(path_pp) as file_lines:

@@ -52,33 +52,15 @@ class collection_via_directory_and_schema:
             random_number_generator=None,
             filesystem=None):
 
-        # -- depthly valid identifier string
-
-        identifier_depth = collection_schema.identifier_depth
-
-        def f(id_s, listener):
-
-            from . import identifier_via_string as _
-            id_obj = _.identifier_via_string__(id_s, listener)
-            if id_obj is None:
-                return
-
-            length = len(id_obj.native_digits)
-            if identifier_depth != length:
-                _whine_about_ID_depth(id_obj, identifier_depth, listener)
-                return
-            return id_obj
-        self._depthly_valid_identifier_via_string = f
-
-        # --
-
         if random_number_generator is not None:
             self._random_number_generator = random_number_generator
 
         if filesystem is not None:
             self._filesystem = filesystem
 
-        self._dir_path = collection_directory_path
+        self._schema_pather = collection_schema.build_pather_(
+                collection_directory_path)
+
         self._schema = collection_schema
 
     def update_entity(self, id_s, cuds, listener):
@@ -108,10 +90,16 @@ class collection_via_directory_and_schema:
 
         # then after the above, try to get the two locks:
 
-        with self._open_locked_mutable_index() as lmif:
-            with self._open_locked_mutable_entities_file(path) as lmef:
+        with self._open_locked_mutable_indexy_file() as indexy_file:
+
+            if indexy_file.is_of_single_file_schema:  # as #here5
+                locked_file = _PassthruContextManager(indexy_file.handle)
+            else:
+                locked_file = self._open_locked_mutable_entities_file(path)
+
+            with locked_file as lmef:
                 res = _delete_entity(
-                        lmef, lmif, iid, self._filesystem, listener)
+                        lmef, indexy_file, iid, self._filesystem, listener)
         return res
 
     def create_entity(self, cuds, listener):
@@ -140,13 +128,13 @@ class collection_via_directory_and_schema:
 
         # with the index file locked, provision a new identifier
 
-        with self._open_locked_mutable_index() as lmif:
+        with self._open_locked_mutable_indexy_file() as indexy_file:
 
             from . import provision_ID_randomly_via_identifiers as _
 
             tup = _.PROVISION_NEW_IDENTIFIER(
                     random_number_generator=self._random_number_generator,
-                    locked_mutable_index_file=lmif,
+                    indexy_file=indexy_file,
                     identifier_depth=self._schema.identifier_depth,
                     listener=listener)
 
@@ -176,9 +164,21 @@ class collection_via_directory_and_schema:
             # cleanup responsibility: if something fails, don't leave behind
             # the empty file. es muss sein. more at (Case765) (ghost)
 
-            if os_path.exists(path):  # :#here3
+            if indexy_file.is_of_single_file_schema:
+
+                # in single file mode, the index file *is* the entities file.
+                # we are already in a locked session for that file. we should
+                # not want (and can not obtain) a second lock for that same
+                # file below. here we "back hack" it so the 2nd lock session
+                # below can remain unaware of this. :#here5
+
+                locked_file = _PassthruContextManager(indexy_file.handle)
+                yes_do_cleanup = False
+
+            elif os_path.exists(path):  # :#here3
                 locked_file = self._open_locked_mutable_entities_file(path)
                 yes_do_cleanup = False
+
             else:  # :#here4:
                 locked_file = self._create_and_open_mutable_entit_etc(path)
                 yes_do_cleanup = True
@@ -189,7 +189,7 @@ class collection_via_directory_and_schema:
 
                     res = _create_entity(
                         locked_ents_file=lmef,
-                        locked_index_file=lmif,
+                        indexy_file=indexy_file,
 
                         identifier_string=id_s,
                         identifier=iid,
@@ -228,7 +228,7 @@ class collection_via_directory_and_schema:
 
     def _ID_and_path_that_must_already_exist(self, id_s, listener):
 
-        iid = self._depthly_valid_identifier_via_string(id_s, listener)
+        iid = self._schema.identifier_via_string(id_s, listener)
         if iid is None:
             return
 
@@ -241,9 +241,10 @@ class collection_via_directory_and_schema:
 
         return iid, path
 
-    def _open_locked_mutable_index(self):
-        _ = os_path.join(self._dir_path, '.entity-index.txt')
-        return self._filesystem.open_locked_file(_)
+    def _open_locked_mutable_indexy_file(self):
+
+        path, wrapper = self._schema_pather.to_indexy_path_and_wrapper__()
+        return self._filesystem.open_locked_file_in_wrapper(path, wrapper)
 
     def _create_and_open_mutable_entit_etc(self, path):
         return self._filesystem.CREATE_AND_OPEN_LOCKED_FILE(path)
@@ -252,16 +253,22 @@ class collection_via_directory_and_schema:
         return self._filesystem.open_locked_file(path)
 
     def to_identifier_stream(self, listener):
-        from . import entities_via_collection as _
-        return _.identifiers_via_collection(
-                directory_path=self._dir_path,
-                id_via_string=self._depthly_valid_identifier_via_string,
-                schema=self._schema,
-                listener=listener)
+        return self._schema_pather.to_identifier_stream(listener)
 
     def _file_path_pieces_via_identifier(self, iid):
-        return self._schema.FILE_PATH_PIECES_VIA(iid, self._dir_path)  # noqa: E501
+        return self._schema_pather.file_path_pieces_via__(iid)
 
+
+class _PassthruContextManager:
+
+    def __init__(self, x):
+        self._mixed = x
+
+    def __enter__(self):
+        return self._mixed
+
+    def __exit__(self, *_3):
+        return False
 
 # ==
 
@@ -297,7 +304,7 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
     return res
 
 
-def _delete_entity(locked_ents_file, locked_index_file, identifier, fs, listener):  # noqa: E501
+def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
 
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_delete_and_existing_lines(
@@ -312,15 +319,21 @@ def _delete_entity(locked_ents_file, locked_index_file, identifier, fs, listener
 
     with fs.FILE_REWRITE_TRANSACTION(listener) as trans:
         # (per [#867.Q] do index file second)
+
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
-        trans.rewrite_file(locked_index_file, rewrite_index_file)
+
+        if indexy_file.is_of_single_file_schema:
+            pass  # hi. in single-file mode, no no index to update (Case775)
+        else:
+            trans.rewrite_file(indexy_file.handle, rewrite_index_file)
+
         res = trans.finish()
 
     return res
 
 
 def _create_entity(
-        locked_ents_file, locked_index_file,
+        locked_ents_file, indexy_file,
         identifier_string, identifier,
         mutable_document_entity, iids,
         yes_do_cleanup, files_rewrite_transaction,
@@ -344,7 +357,7 @@ def _create_entity(
                 enable us to handle the case of when we have created a new
                 entities file and the transaction fails. as it turns out, this
                 case is perhaps logically impossible for us to trigger except
-                under exceedingly contrived circumstances. see test
+                under exceedingly contrived circumstances. see ghost test case
                 """
                 # something like this:
                 # ==
@@ -371,9 +384,17 @@ def _create_entity(
         return _.new_lines_via_add_identifier_into_index__(
                 identifier, iids, my_listener)
 
+    if indexy_file.is_of_single_file_schema:
+        # it was at the end because we read it to provision the id.
+        # re-read the whole file. meh. (Case779)
+        locked_ents_file.seek(0)
+
     # (per [#867.Q] do index file second)
     trans.rewrite_file(locked_ents_file, rewrite_ents_file)
-    trans.rewrite_file(locked_index_file, rewrite_index_file)
+
+    if not indexy_file.is_of_single_file_schema:
+        trans.rewrite_file(indexy_file.handle, rewrite_index_file)
+
     if trans.OK:
         transaction_almost_completed = True
     return trans.finish()
@@ -464,22 +485,6 @@ def _whine_about_no_path(pieces, listener):
         reason = f'for {repr(_)}, no such directory - {no_ent}'  # (Case703)
 
     _emit_input_error_structure(lambda: {'reason': reason}, listener)
-
-
-def _whine_about_ID_depth(identifier, expected_length, listener):
-    def f():  # (Case703)
-        act = len(identifier.native_digits)
-        if act < expected_length:
-            head = 'not enough'
-        elif act > expected_length:
-            head = 'too many'
-        _id_s = identifier.to_string()
-        _reason = (
-                f'{head} digits in identifier {repr(_id_s)} - '
-                f'need {expected_length}, had {act}'
-                )
-        return {'reason': _reason}  # ..
-    _emit_input_error_structure(f, listener)
 
 
 def _emit_input_error_structure(f, listener):

@@ -33,7 +33,9 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
 
         nonlocal recs
         if len(recs) != expected_num:
-            raise Exception('still had unexpected yadda')
+            _msg = ('expected there to be more file rewrites '
+                    f'(needed {expected_num}, had {len(recs)})')
+            raise Exception(_msg)
 
         res = tuple(recs)
         del(recs)  # works! (as a safety measure)

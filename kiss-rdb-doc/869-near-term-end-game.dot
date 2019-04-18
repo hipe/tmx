@@ -31,7 +31,7 @@ node[shape=rect]
 844[label="typed values\nvia CLI values"]
 756->844
 
-756[label="single-file storage schema"]
+756[label="single-file storage schema" style=filled]
 752->756
 
 752[label="abstract existing depth\nstuff to use storage schema" style=filled]

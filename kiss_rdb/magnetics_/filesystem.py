@@ -87,6 +87,9 @@ class _Filesystem:  # #testpoint
     def CREATE_AND_OPEN_LOCKED_FILE(self, path):
         return _LockedFile(path, 'a+')  # create file (since not exist)..
 
+    def open_locked_file_in_wrapper(self, path, wrp):
+        return _LockedFile(path, 'r+', wrp)  # not create if doesn't exist
+
     def open_locked_file(self, path):
         return _LockedFile(path, 'r+')  # not create if doesn't exist
 
@@ -261,9 +264,10 @@ class _LockedFile:
     :#here4
     """
 
-    def __init__(self, path, mode):
+    def __init__(self, path, mode, wrapper=None):
         self._path = path
         self._mode = mode
+        self._wrapper = wrapper
         import fcntl as _
         self._fcntl = _
 
@@ -277,7 +281,11 @@ class _LockedFile:
         fh = self._child.__enter__()
         self._filehandle = fh
         fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return fh
+
+        if self._wrapper is None:
+            return fh
+        else:
+            return self._wrapper(fh)
 
     def __exit__(self, *_):
         fcntl = self._fcntl

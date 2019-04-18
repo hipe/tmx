@@ -4,6 +4,11 @@ from _common_state import (
         unindent_with_dot_hack,
         unindent as _unindent,
         )
+from kiss_rdb_test.CUD import (
+        CUD_Methods,
+        filesystem_expecting_no_rewrites,
+        build_filesystem_expecting_num_file_rewrites,
+        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -11,15 +16,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-
-    # == DSL-ish for test assertions
-
-    def entity_file_rewrite(self):
-        return self.recorded_file_rewrites()[0]  # (per [#867.Q], is first)
-
-    def index_file_rewrite(self):
-        return self.recorded_file_rewrites()[1]  # (per [#867.Q], is second)
+class _CommonCase(CUD_Methods, unittest.TestCase):
 
     @property
     def left_half(self):
@@ -29,115 +26,11 @@ class _CommonCase(unittest.TestCase):
     def right_half(self):
         return self.two_halves()[1]
 
-    # == for creating result state under test
-
-    # -- CUD expecting success
-
-    def update_expecting_success(self, id_s, cuds):
-        return self._recording_of_success(_function_for_update(id_s, cuds))
-
-    def create_expecting_success(self, cuds):
-        return self._recording_of_success(_function_for_create(cuds))
-
-    def delete_expecting_success(self, id_s):
-        return self._recording_of_success(_function_for_delete(id_s))
-
-    # -- CUD expecting failure and recording
-
-    def delete_expecting_failure_and_recordings(self, id_s):
-        return self._struct_and_recording_of_fail(_function_for_delete(id_s))
-
-    # -- CUD expecting failure
-
-    def create_expecting_failure(self, wats, rng):
-        return self._payload_of_failure(_function_for_create(wats, rng))
-
-    def delete_expecting_failure(self, id_s):
-        return self._payload_of_failure(_function_for_delete(id_s))
-
     # == THESE
-
-    def _payload_of_failure(self, f):
-        col = self.subject_collection()
-
-        def use_f(listener):
-            return f(col, listener)
-        return self.run_this_expecting_failure(use_f)
-
-    def _struct_and_recording_of_fail(self, f):
-
-        col = self.subject_collection()
-        fs = col._filesystem
-
-        def use_f(listener):
-            return f(col, listener)
-
-        sct = self.run_this_expecting_failure(use_f)
-        recs = fs.FINISH_AS_HACKY_SPY()
-        return (sct, recs)
-
-    def run_this_expecting_failure(self, f):  # #open #[867.H] DRY these
-        count = 0
-        only_emission = None
-
-        def listener(*a):
-            nonlocal count
-            nonlocal only_emission
-            count += 1
-            if 1 < count:
-                self.fail('too many emissions')
-            only_emission = a
-
-        res = f(listener)
-        self.assertIsNone(res)  # [#867.R] provision: None not False :#here2
-        self.assertEqual(count, 1)
-
-        *chan, payloader = only_emission
-        chan = tuple(chan)
-        # ..
-
-        mood, shape, error_type = chan
-        self.assertEqual(mood, 'error')
-        self.assertEqual(shape, 'structure')
-        self.assertIn(error_type, ('input_error', 'request_error'))
-
-        return payloader()
-
-    def _recording_of_success(self, f):
-
-        col = self.subject_collection()
-        fs = col._filesystem
-        listener = self.listener
-
-        # --
-
-        res = f(col, listener)
-        self.assertTrue(res)  # :#here1
-
-        return fs.FINISH_AS_HACKY_SPY()
 
     def listener(self):
         if False:
             return _debugging_listener()
-
-
-def _function_for_update(id_s, cuds):
-    def f(col, listener):
-        return col.update_entity(id_s, cuds, listener)
-    return f
-
-
-def _function_for_create(cuds):
-
-    def f(col, listener):
-        return col.create_entity(cuds, listener)
-    return f
-
-
-def _function_for_delete(id_s):
-    def f(col, listener):
-        return col.delete_entity(id_s, listener)
-    return f
 
 
 class Case701_collection_can_be_built_with_noent_dir(_CommonCase):
@@ -248,7 +141,7 @@ class Case706_entity_not_found(_CommonCase):
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
-                filesystem=_filesystem_expecting_no_rewrites())
+                filesystem=filesystem_expecting_no_rewrites())
 
 
 # Case707 - not found because bad ID
@@ -294,7 +187,7 @@ class Case711_retrieve(_CommonCase):
 class Case712_delete_simplified_typical(_CommonCase):
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
-        self.recorded_file_rewrites()  # because #here1
+        self.recorded_file_rewrites()
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
@@ -330,7 +223,7 @@ class Case712_delete_simplified_typical(_CommonCase):
 class Case713_delete_that_leaves_file_empty(_CommonCase):
 
     def test_100_would_have_succeeded(self):
-        self.recorded_file_rewrites()  # because #here1
+        self.recorded_file_rewrites()
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
@@ -406,7 +299,7 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
-                filesystem=_build_filesystem_expecting_num_file_rewrites(1))
+                filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
 class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
@@ -468,7 +361,7 @@ class Case725_simplified_typical_traversal(_CommonCase):
         _these = self.subject_collection().to_identifier_stream(None)
         _actual = (f(o) for o in _these)
 
-        _these = [
+        _expected = (
                 '2HJ',
                 'B7E',
                 'B7F',
@@ -477,12 +370,9 @@ class Case725_simplified_typical_traversal(_CommonCase):
                 'B9G',
                 'B9H',
                 'B9J',
-                ]
-
-        _expected = (x for x in _these)
+                )
 
         _actual = tuple(_actual)
-        _expected = tuple(_expected)
 
         self.assertSequenceEqual(_actual, _expected)
 
@@ -495,7 +385,7 @@ class Case725_simplified_typical_traversal(_CommonCase):
 class Case764_create_into_existing_file(_CommonCase):
 
     def test_100_succeeds(self):
-        self.recorded_file_rewrites()  # because #here1
+        self.recorded_file_rewrites()
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
@@ -541,7 +431,7 @@ class Case764_create_into_existing_file(_CommonCase):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 random_number_generator=random_number_generator,
-                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+                filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
 # class Case765_create_failure_cleans_up_created_file(_CommonCase):
@@ -565,7 +455,7 @@ as far as creating the new entities file.
 class Case766_create_into_noent_file(_CommonCase):
 
     def test_100_succeeds(self):
-        self.recorded_file_rewrites()  # because #here1
+        self.recorded_file_rewrites()
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
@@ -608,7 +498,7 @@ class Case766_create_into_noent_file(_CommonCase):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 random_number_generator=random_number_generator,
-                filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+                filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
 def _last_3_of_path(path):
@@ -620,7 +510,7 @@ def _last_3_of_path(path):
 def _collection_with_expecting_no_rewrites():
     return _build_collection(
             dir_path=_dir_path_most_common(),
-            filesystem=_filesystem_expecting_no_rewrites())
+            filesystem=filesystem_expecting_no_rewrites())
 
 
 @memoize
@@ -653,19 +543,6 @@ def _dir_path_of_no_ent():
     return fixture_directory_path('000-no-ent')
 
 
-def _filesystem_expecting_no_rewrites():
-    return _fs_lib().filesystem_expecting_no_rewrites()
-
-
-def _build_filesystem_expecting_num_file_rewrites(expected_num):
-    return _fs_lib().build_filesystem_expecting_num_file_rewrites(expected_num)
-
-
-def _fs_lib():
-    from kiss_rdb_test import filesystem_spy as _
-    return _
-
-
 def _last_three_path_parts(path):
     import re
     return re.search(r'[^/]+(?:/[^/]+){2}$', path)[0]
@@ -686,7 +563,7 @@ def _random_number_generator_for(random_number):
 def _build_collection_expecting_common_number_of_rewrites():
     return _build_collection(
             dir_path=_dir_path_most_common(),
-            filesystem=_build_filesystem_expecting_num_file_rewrites(2))
+            filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
 def _build_collection(dir_path, filesystem, random_number_generator=None):

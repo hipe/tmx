@@ -144,6 +144,117 @@ our current specification is optimized for these design objectives:
 """
 
 
+class _CLI:
+    """quick and dirty aid in re-generating index files FOR NOW..
+
+    at #history-A-1 this works for our 32x32x32 collection but it borks
+    with an assertion failure for our 32^2 collection perhaps because single
+    file schemas have no index..
+    """
+
+    def __init__(self, sin, sout, serr, argv):
+        self._arg_stack = list(reversed(argv))
+        self._long_program_name = self._arg_stack.pop()
+        self._pn = None
+        self.stdout, self.stderr = sout, serr
+        from os import path as os_path
+        self.os_path = os_path
+
+    def execute(self):
+        errno = self._parse_args()
+        if errno is not None:
+            return errno
+
+        self.normalize_sys_path()
+        listener = self.build_listener()
+
+        coll_path = self._argument
+        del(self._argument)
+        # coll_path = self.os_path.abspath(coll_path)
+
+        from kiss_rdb.magnetics_ import (
+                index_via_identifiers as index_lib,
+                schema_via_file_lines as schema_lib)
+
+        schm = schema_lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
+        if schm is None:
+            return 3333
+
+        _pather = schm.build_pather_(coll_path)
+
+        _ids = _pather.to_identifier_stream(listener)
+
+        _lines = index_lib.lines_of_index_via_identifiers(
+                _ids, schm.identifier_depth)
+
+        for line in _lines:
+            self.stdout.write(line)
+
+        return 0
+
+    def _parse_args(self):
+        length = len(self._arg_stack)
+
+        if 0 == length:
+            self.stderr.write('missing argument.\n')
+            return self.express_usage_and_invite()
+
+        last_tok = self._arg_stack[-1]
+        if '-' == last_tok[0]:
+            import re
+            if re.match('^--?h(?:e(?:lp?)?)?$', last_tok):
+                self.stderr.write(f'description: {(_CLI.__doc__)}\n\n')
+                self.express_usage()
+                return 0
+
+            self.stderr.write(f'unrecognized option: {last_tok}\n')
+            return self.express_usage_and_invite()
+
+        if 1 < length:
+            self.stderr.write(f'too many args (need 1 had {length}).\n')
+            return self.express_usage_and_invite()
+
+        self._argument, = self._arg_stack
+        del(self._arg_stack)
+
+    def build_listener(self):
+        def listener(*args):
+            mood, shape, typ, payloader = args
+            if 'expression' == shape:
+                for line in payloader():
+                    self.stderr.write(f'{line}\n')
+            elif 'structure' == shape:
+                _line = payloader()['reason']
+                self.stderr.write(f'{_line}\n')
+        return listener
+
+    def express_usage_and_invite(self):
+        self.express_usage()
+        self.stderr.write(f"see '{self.program_name()} -h'\n")
+        return 400  # generic "application error"
+
+    def express_usage(self):
+        self.stderr.write(f'usage: {self.program_name()} COLLECTION_PATH\n')
+
+    def program_name(self):
+        if self._pn is None:
+            s = self._long_program_name
+            self._pn = self.os_path.basename(s)
+        return self._pn
+
+    def normalize_sys_path(self):
+
+        from sys import path as a
+
+        os_path = self.os_path
+        dn = os_path.dirname
+        mag_dir = dn(os_path.abspath(__file__))
+        mono_repo_dir = dn(dn(mag_dir))
+
+        assert(a[0] == mag_dir)
+        a[0] = mono_repo_dir
+
+
 def new_lines_via_delete_identifier_from_index__(
         orig_lines, identifier, listener):
 
@@ -181,9 +292,7 @@ def new_lines_via_delete_identifier_from_index__(
 
     _depth = len(this_iid.native_digits)
 
-    from . import index_via_identifiers as _
-
-    return _.lines_of_index_via_identifiers(keep_iids, _depth)
+    return lines_of_index_via_identifiers(keep_iids, _depth)
 
 
 def new_lines_via_add_identifier_into_index__(identifier, iids, listener):
@@ -312,5 +421,12 @@ def cover_me(msg=None):
 
 _num_digits = 32  # copy paste! from sibling
 
+
+if __name__ == '__main__':
+    from sys import argv, stdout, stderr
+    exit(_CLI(None, stdout, stderr, argv).execute())
+
+
+# #history-A-1: add CLI
 # #history: received transplant
 # #born.

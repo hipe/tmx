@@ -767,6 +767,7 @@ def _invoke_CLI(given_args, injections_dictionary):
 def _NASTY_HACK_once():
     # OCD for tests (this is a common OCD we run into when testing CLI):
     # don't ever parse the same schema file more than once
+    # (at writing it saves from 4 extranous constructons)
 
     from kiss_rdb.magnetics_ import schema_via_file_lines as mod
 
@@ -777,12 +778,10 @@ def _NASTY_HACK_once():
     def use_function(path, listener):
 
         if path in cache:
-            print(f'USING cached fellow for {path}')
             return cache[path]
-
-        print(f'MAKING cached fellow for {path}')
         res = real_function(path, listener)
-        cache[path] = res
+        if res is not None:
+            cache[path] = res
         return res
 
     mod.SCHEMA_VIA_COLLECTION_PATH = use_function

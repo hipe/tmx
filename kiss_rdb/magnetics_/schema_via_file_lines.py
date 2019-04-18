@@ -27,28 +27,121 @@ def SCHEMA_VIA_COLLECTION_PATH(collection_path, listener):
     return _Schema(storage_schema)
 
 
-class _Schema:  # #testpoint
-    """EXPERIMENTAL. at #birth this was a pure abstraction"""
+# == injection for locking and mutating index
 
-    def __init__(self, storage_schema):
-        self._storage_schema = _storage_schemas[storage_schema]()
+# we do plain old injection for this simplest of stuff, but a
+# lot of it is hard-coded inline because yikes and meh
 
-    def ENTITIES_FILE_PATHS_VIA(self, dir_path, when_no_entries):
+
+class _IndexyFileWhenDeepTree:
+
+    def __init__(self, fh):
+        self.handle = fh
+
+    def to_identifier_stream(self, listener_NOT_USED):
+        # if there's an error in your index file it's considered corruption
+        # and we just raise the exception
+        from . import identifiers_via_index as _
+        return _.identifiers_via_lines_of_index(self.handle)
+
+    is_of_single_file_schema = False
+
+
+class _IndexyFileWhenSingleFile:
+
+    def __init__(self, fh, to_identifier_stream):
+        self.handle = fh
+        self._to_id_stream = to_identifier_stream
+
+    def to_identifier_stream(self, listener):
+        return self._to_id_stream(listener)  # hi.
+
+    is_of_single_file_schema = True
+
+
+# ==
+
+class _SchemaPather:
+    """schemas aren't associated with a particular directory. this is.
+    """
+
+    def __init__(self, coll_path, schema):
+
+        import os.path as os_path
+
+        storage_schema = schema._storage_schema
+
+        if 1 == storage_schema.filetree_depth:
+            is_single_file_schema = True
+            self._entities_file = os_path.join(coll_path, 'entities.toml')
+            # #here4
+        else:
+            is_single_file_schema = False
+            self._entities_directory_path = os_path.join(coll_path, 'entities')
+            # #here3
+
+            self._index_file = os_path.join(coll_path, '.entity-index.txt')
+
+        self._is_single_file_schema = is_single_file_schema
+
+        self._identifier_via_string = schema.identifier_via_string
+        self._dir_path = coll_path
+        self._storage_schema = storage_schema
+
+    def to_indexy_path_and_wrapper__(self):
+
+        if self._is_single_file_schema:
+            def wrapper(filehandle):
+                return _IndexyFileWhenSingleFile(
+                        filehandle, self.to_identifier_stream)
+            path = self._entities_file
+        else:
+            wrapper = _IndexyFileWhenDeepTree
+            path = self._index_file
+
+        return path, wrapper
+
+    def to_identifier_stream(self, listener):
+
+        from . import entities_via_collection as _
+        return _.identifiers_via__(
+                paths_function=self._to_entities_file_paths,
+                id_via_string=self._identifier_via_string,
+                listener=listener)
+
+    def _to_entities_file_paths(self, when_no_entries):
         _name = self._storage_schema.name_of_paths_function
-        return _paths_functions()[_name](dir_path, when_no_entries)  # #here1
+        _func = _paths_functions()[_name]
+        return _func(self, when_no_entries)  # #here1
 
-    def FILE_PATH_PIECES_VIA(self, identifier, dir_path):
+    def file_path_pieces_via__(self, identifier):
 
         nds = identifier.native_digits
         length = len(nds)
         assert(1 < length)
+
+        if self._is_single_file_schema:  # (Case775)
+            # single file path doesn't derive from iid, but we play along
+            return (self._dir_path, 'entities.toml')  # #here4
 
         # get all but the last component. "ABC" -> "A/B.toml"
         these = [nds[i].character for i in range(0, (length - 1))]
 
         these[-1] = f'{these[-1]}.toml'
 
-        return (dir_path, 'entities', *these)
+        return (self._dir_path, 'entities', *these)  # #here3
+
+
+class _Schema:  # #testpoint
+    """EXPERIMENTAL. at #birth this was a pure abstraction"""
+
+    def __init__(self, storage_schema):
+        o = _storage_schemas[storage_schema]()
+        self.identifier_via_string = o._build_identifier_via_string()
+        self._storage_schema = o
+
+    def build_pather_(self, coll_path):
+        return _SchemaPather(coll_path, self)
 
     @property
     def identifier_depth(self):
@@ -64,11 +157,24 @@ o = {}
 def _32_32_32():
     return _StorageSchema(
             identifier_depth=3,
+            filetree_depth=3,
             paths_function='paths_when_three_deep',
             )
 
 
 o['32x32x32'] = _32_32_32
+
+
+@memoize
+def _32up2():
+    return _StorageSchema(
+            identifier_depth=2,
+            filetree_depth=1,
+            paths_function='paths_when_single_file',
+            )
+
+
+o['32^2'] = _32up2
 
 
 _storage_schemas = o
@@ -82,10 +188,34 @@ class _StorageSchema:
     def __init__(
             self,
             identifier_depth,
+            filetree_depth,
             paths_function,
             ):
         self.name_of_paths_function = paths_function
         self.identifier_depth = identifier_depth
+        self.filetree_depth = filetree_depth
+
+    def _build_identifier_via_string(self):
+
+        from .identifier_via_string import (
+            identifier_via_string__ as unsanitized_iid_via_string,
+            )
+
+        identifier_depth = self.identifier_depth
+
+        def identifier_via_string(id_s, listener):
+
+            id_obj = unsanitized_iid_via_string(id_s, listener)
+            if id_obj is None:
+                return
+
+            length = len(id_obj.native_digits)
+            if identifier_depth != length:
+                _whine_about_ID_depth(id_obj, identifier_depth, listener)
+                return
+            return id_obj
+
+        return identifier_via_string
 
 
 # ==
@@ -94,7 +224,6 @@ class _StorageSchema:
 def _paths_functions():
     """DISCUSSION:
 
-    at writing there is only one schema, however, hopefully:
     these functions all have in common that they are short and similar and
     we don't want to have to load at load time if we don't have to
 
@@ -102,11 +231,10 @@ def _paths_functions():
     """
 
     from pathlib import Path
-    import os.path as os_path
 
-    def paths_when_three_deep(dir_path, when_no_entries):  # :#here1
+    def paths_when_three_deep(pather, when_no_entries):  # #here1
 
-        entities_dir_pp = Path(os_path.join(dir_path, 'entities'))
+        entities_dir_pp = Path(pather._entities_directory_path)
         dirs = sorted_entries_of(entities_dir_pp)
 
         if not len(dirs):
@@ -116,6 +244,25 @@ def _paths_functions():
         for dir_pp in dirs:
             for posix_path in sorted_entries_of(dir_pp):
                 yield posix_path
+
+    def paths_when_single_file(pather, when_no_entries):  # #here1
+
+        entities_file_pp = Path(pather._entities_file)
+
+        """we follow suit here with how this is written for the deeper
+        (more common) storage schemas: the deeper schemas yield out only
+        posix paths derives from entires the filesystem reported as existing.
+        a disadvantage here is that it may mean hitting the filesystem 2x for
+        the same question of "does this path exist?" but meh
+        ...
+        """
+
+        if not entities_file_pp.exists():
+            cover_me('the language will need to change a little for this')
+            when_no_entries(entities_file_pp)
+            return
+
+        yield entities_file_pp  # lovely
 
     def sorted_entries_of(posix_path):
         """DISCUSSION
@@ -130,6 +277,7 @@ def _paths_functions():
 
     return {
             'paths_when_three_deep': paths_when_three_deep,
+            'paths_when_single_file': paths_when_single_file,
             }
 
 
@@ -150,6 +298,22 @@ def vendor_parse_toml_or_catch_exception__(big_string):
 
 # == whiners
 
+def _whine_about_ID_depth(identifier, expected_length, listener):
+    def f():  # (Case703)
+        act = len(identifier.native_digits)
+        if act < expected_length:
+            head = 'not enough'
+        elif act > expected_length:
+            head = 'too many'
+        _id_s = identifier.to_string()
+        _reason = (
+                f'{head} digits in identifier {repr(_id_s)} - '
+                f'need {expected_length}, had {act}'
+                )
+        return {'reason': _reason}  # ..
+    _emit_input_error_structure(f, listener)
+
+
 def __whine_about_schema_file_not_found(listener, e):
     def structer():
         assert(e.strerror == 'No such file or directory')
@@ -161,6 +325,14 @@ def __whine_about_schema_file_not_found(listener, e):
                 'input_error_type': 'collection_not_found',
                 }
 
-    listener('error', 'structure', 'input_error', structer)
+    _emit_input_error_structure(structer, listener)
+
+
+def _emit_input_error_structure(f, listener):
+    listener('error', 'structure', 'input_error', f)
+
+
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #birth: abstracted

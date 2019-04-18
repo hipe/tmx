@@ -92,16 +92,13 @@ test file 650: CUD entities|
 
 nl100[label="
 test file 680: file rewrite request via collection (test cases 700-799)|
-<705>0-9: delete thru schema|
-<715>10-19: update integ w attributes|
-<725>20-29: full trav thru schema|
-<735>30-39: create initial index file|
-<745>40-49: provision new ID pseudo-randomly|
-<755>50-59: re-ceate new index file|
-<765>60-69: create thru schema integ w attrs & provision|
-<775>70-79: file locking!|
-<785>80-89: typed values via CLI values|
-<795>90-99: CLI lol
+<705>700-725: collection intro, RDUT|
+<735>730-739: create initial index file|
+<745>740-749: provision new ID pseudo-randomly|
+<765>764-766: create entity|
+<775>770-779: single-file schema CUD+RT|
+<785>780-789: RESERVED typed values via CLI values|
+<795>790-799: CLI lol
 "]
 
 nodeRight[label="
@@ -183,8 +180,6 @@ nl085:688->nodeRight:600
 
 
 nl100:705->nodeRight:700
-nl100:715->nodeRight:700
-nl100:725->nodeRight:700
 nl100:735->nodeRight:700
 nl100:745->nodeRight:700
 nl100:755->nodeRight:700
