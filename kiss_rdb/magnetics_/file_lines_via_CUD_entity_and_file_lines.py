@@ -25,9 +25,12 @@ def new_lines_via_update_and_existing_lines(
         new_lines_via_entity,
         existing_lines,
         listener,
+        receive_updated_document_entity=None,
         ):
 
-    _args_for_CUD_function = (identifier_string, new_lines_via_entity)
+    _args_for_CUD_function = (
+            identifier_string, new_lines_via_entity,
+            receive_updated_document_entity)
 
     return _line_stream_via_CUD_function(
             _args_for_CUD_function,
@@ -110,7 +113,7 @@ def __block_stream_via(args, CUD_function, block_itr, monitor):
 
 # ==
 
-def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
+def __blocks_for_UPDATE(id_s, new_lines_via_entity, recv, block_itr, monitor):
 
     # this is a copy-paste-modify of DELETE that's unabstracted for clarity.
 
@@ -121,6 +124,8 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
         if id_s == mde.identifier_string:
             # do NOT yield the one we are updating. break.
             did_find = True
+            if recv is not None:
+                recv(mde)
             break
 
         yield mde

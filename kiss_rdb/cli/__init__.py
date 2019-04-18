@@ -207,7 +207,7 @@ def create(ctx, collection, value):
 
     doc_ent = col.create_entity(_cuds, listener)
 
-    # exact same thing as delete #here3
+    # exact same thing as 2 others #here3
 
     if doc_ent is None:
         return mon.some_error_code()
@@ -224,15 +224,61 @@ def create(ctx, collection, value):
 
 
 @cli.command()
+@click.option(
+        '-add', nargs=2, multiple=True, metavar='<name>, <val>',
+        help='the name/value to add. must not already be set.')
+@click.option(
+        '-change', nargs=2, multiple=True, metavar='<name>, <val>',
+        help='the attribute to change. must already be set.')
+@click.option(
+        '-delete', multiple=True, metavar='<name>',
+        help='the attribute to delete. must already be set.')
+# #[#867.L] can't name the above "-del" if you wanted to
 @click.argument('collection')
 @click.argument('internal-identifier')
-def update():
+@click.pass_context
+@require_hub
+def update(ctx, collection, internal_identifier, add, change, delete):
     """update the entity in the collection
     given the entity's internal identifier
-    and name-value pairs indicating the new this requires some design
+    and one or more directives describing how to modify the entity's existing
+    set of attributes. (is currently quite strict and particular :P)
     """
 
-    click.echo('#open [#867.M] update')
+    # begin boilerplate-esque
+    cf = ctx.obj  # "cf" = common functions
+    mon = cf.build_monitor()
+    listener = mon.listener
+    _inj = cf.release_these_injections('filesystem')
+    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    if col is None:
+        mon.some_error_code()
+    # end
+
+    cuds = []
+    for n, v in add:
+        cuds.append(('create', n, v))
+    for n, v in change:
+        cuds.append(('update', n, v))
+    for n in delete:
+        cuds.append(('delete', n))
+
+    doc_ent = col.update_entity(internal_identifier, cuds, listener)
+
+    # exact same thing as 2 others #here3:
+
+    if doc_ent is None:
+        return mon.some_error_code()
+
+    sout = click.utils._default_text_stdout()
+    serr = click.utils._default_text_stderr()
+
+    serr.write('updated. new entity:\n')
+
+    for line in doc_ent.to_line_stream():
+        sout.write(line)
+
+    return _success_exit_code
 
 
 @cli.command()
@@ -298,7 +344,7 @@ def delete(ctx, collection, internal_identifier):
 
     doc_ent = col.delete_entity(internal_identifier, listener)
 
-    # exact same thing as create #here3:
+    # exact same thing as 2 others #here3:
 
     if doc_ent is None:
         return mon.some_error_code()

@@ -275,6 +275,12 @@ class _PassthruContextManager:
 
 def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
 
+    doc_ent = None
+
+    def recv_new_doc_ent(de):
+        nonlocal doc_ent  # oops
+        doc_ent = de
+
     def new_lines_via_entity(mde, my_listener):
         # unlike both CREATE and DELETE, UPDATE determines its modified entity
         # lines *as a function of* the existing entity, so more complicated.
@@ -295,11 +301,17 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
                 identifier.to_string(),
                 new_lines_via_entity,
                 orig_lines,
-                my_listener)
+                my_listener,
+                recv_new_doc_ent,
+                )
 
     with fs.FILE_REWRITE_TRANSACTION(listener) as trans:
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
         res = trans.finish()
+
+    if res is not None:
+        assert(res is True)
+        res = doc_ent
 
     return res
 

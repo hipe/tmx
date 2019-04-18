@@ -509,7 +509,7 @@ class Case819_create(_CommonCase):
 
         self.assertSequenceEqual(_actual, _expected)
 
-    def test_300_serr_line_is_decorative(self):
+    def test_300_stderr_line_is_decorative(self):
         which, line = self._qualified_lines()[0]
         self.assertEqual(which, 'serr')
         self.assertEqual(line, 'created:\n')
@@ -575,7 +575,7 @@ class Case826_delete(_CommonCase):
 
         self.assertSequenceEqual(_actual, _expected)
 
-    def test_300_serr_line_is_decorative(self):
+    def test_300_stderr_line_is_decorative(self):
         which, line = self._qualified_lines()[0]
         self.assertEqual(which, 'serr')
         self.assertEqual(line, 'deleted:\n')
@@ -611,6 +611,56 @@ class Case829_help_screen_for_update(_CommonCase):
 
     def given_args(self):
         return ('update', '--help')
+
+
+class Case831_update(_CommonCase):
+
+    def test_100_succeeds(self):
+        self.expect_exit_code_is_the_success_exit_code()
+
+    def test_200_stdout_is_updated_lines_CAPTURE_WS_ISSUE(self):  # #here3
+
+        def assert_stdout(which, line):
+            self.assertEqual(which, 'sout')
+            return line
+
+        _ql = self._qualified_lines()
+        _actual = tuple(assert_stdout(which, line) for which, line in _ql[1:])
+
+        _expected = tuple(unindent("""
+        [item.B7F.attributes]
+        thing-2 = "hey F updated"
+
+        thing-3 = "T3"
+        thing-4 = "T4"
+        """))
+
+        self.assertSequenceEqual(_actual, _expected)
+
+    def test_300_stderr_line_is_decorative(self):
+        which, line = self._qualified_lines()[0]
+        self.assertEqual(which, 'serr')
+        self.assertEqual(line, 'updated. new entity:\n')
+
+    @shared_subject
+    def _qualified_lines(self):
+        return tuple(self._end_state().lines)
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state('stdout and stderr', None)
+
+    def given_args(self):
+        return (*_common_head(), 'update', _common_collection,
+                'B7F',
+                '-delete', 'thing-1',
+                '-change', 'thing-2', 'hey F updated',
+                '-add', 'thing-3', 'T3',
+                '-add', 'thing-4', 'T4',
+                )
+
+    def filesystem(self):
+        return _build_filesystem_expecting_num_file_rewrites(1)
 
 
 class Case836_help_screen_for_search(_CommonCase):
