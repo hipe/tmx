@@ -18,7 +18,7 @@ node[shape=rect]
 */
 617[label="update for CLI"]
 552->617
-552[label="delete for CLI"]
+552[label="delete for CLI" style=filled]
 
 487->552
 487[label="sane unit tests\nof CLI" style=filled]

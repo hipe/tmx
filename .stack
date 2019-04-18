@@ -5,4 +5,3 @@ cover yes schema file but no ent entites dir
 multiline strings
 "business schema" that has a primitive types section
 integrate update
-integrate delete

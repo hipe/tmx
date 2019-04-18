@@ -306,11 +306,19 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
 
 def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
 
+    deleted_doc_ent = None
+
+    def rec_deleted_doc_ent(de):
+        nonlocal deleted_doc_ent  # oops
+        deleted_doc_ent = de
+
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_delete_and_existing_lines(
                 identifier.to_string(),
                 orig_lines,
-                my_listener)
+                my_listener,
+                rec_deleted_doc_ent,
+                )
 
     def rewrite_index_file(orig_lines, my_listener):
         from . import index_via_identifiers as _
@@ -328,6 +336,10 @@ def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
             trans.rewrite_file(indexy_file.handle, rewrite_index_file)
 
         res = trans.finish()
+
+    if res is not None:
+        assert(res is True)
+        res = deleted_doc_ent
 
     return res
 

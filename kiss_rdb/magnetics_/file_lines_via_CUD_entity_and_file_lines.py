@@ -6,9 +6,11 @@ def new_lines_via_delete_and_existing_lines(
         identifier_string,
         existing_lines,
         listener,
+        receive_deleted_document_entity=None,
         ):
 
-    _args_for_CUD_function = (identifier_string,)
+    _args_for_CUD_function = (
+            identifier_string, receive_deleted_document_entity)
 
     return _line_stream_via_CUD_function(
             _args_for_CUD_function,
@@ -142,7 +144,7 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
         yield de
 
 
-def __blocks_for_DELETE(id_s, block_itr, monitor):
+def __blocks_for_DELETE(id_s, recv_doc_ent, block_itr, monitor):
 
     # this is a copy-paste-modify of UPDATE that's unabstracted for clarity.
 
@@ -152,6 +154,10 @@ def __blocks_for_DELETE(id_s, block_itr, monitor):
     for de in block_itr:
         if id_s == de.identifier_string:
             # do NOT yield the one we are deleting. break.
+
+            if recv_doc_ent is not None:
+                recv_doc_ent(de)
+
             did_find = True
             break
 

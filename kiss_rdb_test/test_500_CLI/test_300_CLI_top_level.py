@@ -1,6 +1,6 @@
 from _common_state import (
         fixture_directories_path,
-        unindent as _unindent,
+        unindent,
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -418,7 +418,7 @@ class Case813_get(_CommonCase):
         }
         """
 
-        _expect_lines = tuple(_unindent(_expect_big_s))
+        _expect_lines = tuple(unindent(_expect_big_s))
         self.assertSequenceEqual(_actual_lines, _expect_lines)
 
     @shared_subject
@@ -498,9 +498,10 @@ class Case819_create(_CommonCase):
           as opposed to retrieving, the user wants visual confirmation that
           nothing strange happened in encoding their "deep" data into a
           surface representation for this particular datastore.
+        :#here3
         """
 
-        _expected = tuple(_unindent("""
+        _expected = tuple(unindent("""
         [item.2H3.attributes]
         aa = "AA"
         bb = "BB"
@@ -547,6 +548,52 @@ class Case822_help_screen_for_delete(_CommonCase):
 
     def given_args(self):
         return ('delete', '--help')
+
+
+# Case824 - delete fail
+
+
+class Case826_delete(_CommonCase):
+
+    def test_100_succeeds(self):
+        self.expect_exit_code_is_the_success_exit_code()
+
+    def test_200_stdout_is_deleted_lines(self):  # same as #here3
+
+        def assert_stdout(which, line):
+            self.assertEqual(which, 'sout')
+            return line
+
+        _ql = self._qualified_lines()
+        _actual = tuple(assert_stdout(which, line) for which, line in _ql[1:])
+
+        _expected = tuple(unindent("""
+        [item.B7G.attributes]
+        thing-1 = "hi G"
+        thing-2 = "hey G"
+        """))
+
+        self.assertSequenceEqual(_actual, _expected)
+
+    def test_300_serr_line_is_decorative(self):
+        which, line = self._qualified_lines()[0]
+        self.assertEqual(which, 'serr')
+        self.assertEqual(line, 'deleted:\n')
+
+    @shared_subject
+    def _qualified_lines(self):
+        return tuple(self._end_state().lines)
+
+    @shared_subject
+    def _end_state(self):
+        # return self._build_end_state_FOR_DEBUGGING()
+        return self._build_end_state('stdout and stderr', None)
+
+    def given_args(self):
+        return (*_common_head(), 'delete', _common_collection, 'B7G')
+
+    def filesystem(self):
+        return _build_filesystem_expecting_num_file_rewrites(2)
 
 
 class Case829_help_screen_for_update(_CommonCase):

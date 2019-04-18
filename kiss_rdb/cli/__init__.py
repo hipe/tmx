@@ -190,7 +190,7 @@ def cli(ctx, collections_hub):
 @require_hub
 def create(ctx, collection, value):
     """create a new entity in the collection
-    given THIS STUFF pray this will be easy
+    given name-value pairs expressed by the --value option.
     """
 
     # begin boilerplate-esque
@@ -205,8 +205,11 @@ def create(ctx, collection, value):
 
     _cuds = tuple(('create', name_s, val_s) for name_s, val_s in value)
 
-    mde = col.create_entity(_cuds, listener)
-    if mde is None:
+    doc_ent = col.create_entity(_cuds, listener)
+
+    # exact same thing as delete #here3
+
+    if doc_ent is None:
         return mon.some_error_code()
 
     sout = click.utils._default_text_stdout()
@@ -214,7 +217,7 @@ def create(ctx, collection, value):
 
     serr.write('created:\n')
 
-    for line in mde.to_line_stream():
+    for line in doc_ent.to_line_stream():
         sout.write(line)
 
     return _success_exit_code
@@ -276,12 +279,39 @@ def get(ctx, collection, internal_identifier):
 @cli.command()
 @click.argument('collection')
 @click.argument('internal-identifier')
-def delete():
+@click.pass_context
+@require_hub
+def delete(ctx, collection, internal_identifier):
     """delete the entity from the collection
     given the entity's internal identifier
     """
 
-    click.echo('#open [#867.M] delete')
+    # begin boilerplate-esque
+    cf = ctx.obj  # "cf" = common functions
+    mon = cf.build_monitor()
+    listener = mon.listener
+    _inj = cf.release_these_injections('random_number_generator', 'filesystem')
+    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    if col is None:
+        return mon.some_error_code()
+    # end
+
+    doc_ent = col.delete_entity(internal_identifier, listener)
+
+    # exact same thing as create #here3:
+
+    if doc_ent is None:
+        return mon.some_error_code()
+
+    sout = click.utils._default_text_stdout()
+    serr = click.utils._default_text_stderr()
+
+    serr.write('deleted:\n')
+
+    for line in doc_ent.to_line_stream():
+        sout.write(line)
+
+    return _success_exit_code
 
 
 @cli.command()
