@@ -195,7 +195,7 @@ class _CommonCase(unittest.TestCase):
     """
 
 
-class Case791_no_args(_CommonCase):
+class Case800_no_args(_CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -204,7 +204,7 @@ class Case791_no_args(_CommonCase):
         return ()
 
 
-class Case792_strange_arg(_CommonCase):
+class Case801_strange_arg(_CommonCase):
 
     def test_100_throws_a_usage_error(self):
         self.assertEqual(self._exe().exit_code, 2)  # meh
@@ -223,7 +223,7 @@ class Case792_strange_arg(_CommonCase):
         return ('foo-fah-fee',)
 
 
-class Case794_strange_option(_CommonCase):
+class Case802_strange_option(_CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -232,7 +232,7 @@ class Case794_strange_option(_CommonCase):
         return ('--cho-monculous')
 
 
-class Case795_toplevel_help_in_general(_CommonCase):
+class Case803_toplevel_help_in_general(_CommonCase):
 
     def test_100_exit_code_is_whatever(self):
         self.assertEqual(_CASE_A().exit_code, _success_exit_code)
@@ -264,7 +264,7 @@ class Case795_toplevel_help_in_general(_CommonCase):
         self.assertEqual(len(rest), 1)
 
 
-class Case796_toplevel_help_plus_argument(_CommonCase):
+class Case804_toplevel_help_plus_argument(_CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -273,12 +273,12 @@ class Case796_toplevel_help_plus_argument(_CommonCase):
         return ('--help', 'fah-foo')
 
 
-# Case797_help_screen_for_use_hub_or_something
+# Case805_use_hub_help
 
-# Case798_help_screen_for_create_hub_or_something
+# Case808_create_hub_help
 
 
-class Case799_help_screen_for_traverse(_CommonCase):
+class Case811_traverse_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -302,7 +302,7 @@ class Case799_help_screen_for_traverse(_CommonCase):
 """
 
 
-class Case802_touch_error_message_integration(_CommonCase):
+class Case812_traverse_fail(_CommonCase):
 
     def test_100_generic_failure_exit_status(self):
         self.expect_exit_code(2)  # FileNotFoundError.errno
@@ -321,7 +321,7 @@ class Case802_touch_error_message_integration(_CommonCase):
         return ('--collections-hub', 'qq', 'traverse', 'pp')
 
 
-class Case804_traverse(_CommonCase):
+class Case813_traverse(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -342,7 +342,7 @@ class Case804_traverse(_CommonCase):
         return (*_common_head(), 'traverse', _common_collection)
 
 
-class Case807_help_screen_for_select(_CommonCase):
+class Case814_select_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -359,7 +359,7 @@ class Case807_help_screen_for_select(_CommonCase):
         return ('select', '--help')
 
 
-class Case808_help_screen_for_get(_CommonCase):
+class Case817_get_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -376,12 +376,7 @@ class Case808_help_screen_for_get(_CommonCase):
         return ('get', '--help')
 
 
-# Case809_get_no_ent_bad_identifier - says so
-# Case810_get_no_ent_no_dir - hopefully says no such file
-# Case811_get_no_ent_no_file - says no such directory
-
-
-class Case812_get_no_ent_in_file(_CommonCase):
+class Case818_get_fail(_CommonCase):
 
     def test_100_exit_code_is_404_lol(self):
         self.assertEqual(self._end_state().exception.exit_code, 404)
@@ -398,7 +393,7 @@ class Case812_get_no_ent_in_file(_CommonCase):
         return (*_common_head(), 'get', _common_collection, 'B9F')
 
 
-class Case813_get(_CommonCase):
+class Case819_get(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -429,7 +424,7 @@ class Case813_get(_CommonCase):
         return (*_common_head(), 'get', _common_collection, 'B9H')
 
 
-class Case815_help_screen_for_create(_CommonCase):
+class Case820_create_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -446,7 +441,7 @@ class Case815_help_screen_for_create(_CommonCase):
         return ('create', '--help')
 
 
-class Case816_create_without_attrs(_CommonCase):
+class Case821_create_fail(_CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
         self._expect_exit_code_for_bad_request()
@@ -466,7 +461,7 @@ class Case816_create_without_attrs(_CommonCase):
         return None
 
 
-class Case819_create(_CommonCase):
+class Case822_create(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -533,7 +528,7 @@ class Case819_create(_CommonCase):
         return 481  # kiss ID 2H3 is base 10 481
 
 
-class Case822_help_screen_for_delete(_CommonCase):
+class Case823_delete_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -553,7 +548,7 @@ class Case822_help_screen_for_delete(_CommonCase):
 # Case824 - delete fail
 
 
-class Case826_delete(_CommonCase):
+class Case825_delete(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -596,7 +591,7 @@ class Case826_delete(_CommonCase):
         return _build_filesystem_expecting_num_file_rewrites(2)
 
 
-class Case829_help_screen_for_update(_CommonCase):
+class Case226_update_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -613,7 +608,7 @@ class Case829_help_screen_for_update(_CommonCase):
         return ('update', '--help')
 
 
-class Case831_update(_CommonCase):
+class Case828_update(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -663,7 +658,7 @@ class Case831_update(_CommonCase):
         return _build_filesystem_expecting_num_file_rewrites(1)
 
 
-class Case836_help_screen_for_search(_CommonCase):
+class Case829_search_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()

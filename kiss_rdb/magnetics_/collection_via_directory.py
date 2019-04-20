@@ -180,6 +180,13 @@ class collection_via_directory_and_schema:
                 yes_do_cleanup = False
 
             else:  # :#here4:
+
+                # == BEGIN production only eek. no rollback eek but meh
+                parent_dir = os_path.dirname(path)
+                if not os_path.exists(parent_dir):
+                    self.__CREATE_DIRECTORIES(parent_dir)
+                # == end
+
                 locked_file = self._create_and_open_mutable_entit_etc(path)
                 yes_do_cleanup = True
 
@@ -205,11 +212,27 @@ class collection_via_directory_and_schema:
 
             if res is not None:
                 assert(res is True)
-                res = mde  # (Case819)
+                res = mde  # (Case822)
 
         return res
 
     # == END
+
+    def __CREATE_DIRECTORIES(self, parent_dir):
+        import os
+        ents_dir = self._schema_pather._entities_directory_path
+        ft_depth = self._schema._storage_schema.filetree_depth
+        if ft_depth < 2:
+            cover_me('you madman')
+        elif ft_depth == 2:
+            assert(ents_dir == parent_dir)
+            os.mkdir(parent_dir)
+        elif ft_depth == 3:
+            if not os_path.exists(ents_dir):
+                os.mkdir(ents_dir)  # madman #cover-me
+            os.mkdir(parent_dir)
+        else:
+            cover_me('eek you want mkdir -p')
 
     def retrieve_entity(self, id_s, listener):
         """NOTICE
@@ -526,4 +549,5 @@ def _sib_lib():
 
 _okay = True
 
+# #history: production only: create directories
 # #born.

@@ -76,13 +76,13 @@ the main thing the "filesystem" offers is what we're calling
 """
 
 
-class _Filesystem:  # #testpoint
+class Filesystem_EXPERIMENTAL:  # #testpoint
 
-    def __init__(self, inj):
-        self._inj = inj
+    def __init__(self, commit_file_rewrite):
+        self._commit_file_rewrite = commit_file_rewrite
 
     def FILE_REWRITE_TRANSACTION(self, listener):
-        return _FILE_REWRITE_TRANSACTION(self._inj, listener)
+        return _FILE_REWRITE_TRANSACTION(self._commit_file_rewrite, listener)
 
     def CREATE_AND_OPEN_LOCKED_FILE(self, path):
         return _LockedFile(path, 'a+')  # create file (since not exist)..
@@ -96,12 +96,12 @@ class _Filesystem:  # #testpoint
 
 class _FILE_REWRITE_TRANSACTION:
 
-    def __init__(self, inj, listener):
+    def __init__(self, commit_file_rewrite, listener):
         from kiss_rdb.magnetics_.identifiers_via_file_lines import (
                 ErrorMonitor_,
                 )
         self._monitor = ErrorMonitor_(listener)
-        self._inj = inj
+        self._commit_file_rewrite = commit_file_rewrite
         self._units_of_work = []
         self._exit_me = []
         self._OK = True
@@ -187,7 +187,7 @@ class _FILE_REWRITE_TRANSACTION:
 
             from_fh.flush()  # (could do this after last write too)
 
-            self._inj(from_fh, to_fh)
+            self._commit_file_rewrite(from_fh, to_fh)
         return _OK
 
     def __exit__(self, *_3):

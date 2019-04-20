@@ -47,7 +47,7 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
 def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):
     from kiss_rdb.magnetics_ import filesystem as _
 
-    fs = _._Filesystem(INJECTED_FELLOW)
+    fs = _.Filesystem_EXPERIMENTAL(INJECTED_FELLOW)
 
     fs.FINISH_AS_HACKY_SPY = finish
 

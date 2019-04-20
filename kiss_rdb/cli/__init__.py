@@ -44,7 +44,7 @@ def require_hub(orig_f):
             ec = orig_f(ctx, **kwargs)
             assert(isinstance(ec, int))
             if ec is 0:
-                return 0  # (Case819) (test_100)
+                return 0  # (Case822) (test_100)
             else:
                 return __crazy_time(ec)  # should throw an exception
 
@@ -110,7 +110,7 @@ class _CommonFunctions:
         # derive the schema
         schema = lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
         if schema is None:
-            return  # (Case802)
+            return  # (Case812)
 
         # money
         from kiss_rdb.magnetics_ import collection_via_directory as lib
@@ -123,7 +123,7 @@ class _CommonFunctions:
         return _Monitor(_express_error_structure, _echo_error)
 
 
-def _express_error_structure(error_category, struct):  # (Case810)
+def _express_error_structure(error_category, struct):  # (Case819)
     """FOR NOW, this is just a messy attempt at making contact with all the
 
     components we expect to see for different cases..
@@ -149,7 +149,7 @@ def _express_error_structure(error_category, struct):  # (Case810)
                 dim_pool.pop('might_be_out_of_order')
                 assert(0 == len(dim_pool))
             elif 'collection_not_found' == typ:
-                assert(0 == len(dim_pool))  # (Case802)
+                assert(0 == len(dim_pool))  # (Case812)
             else:
                 cover_me(f'hi, new kind of input error subtype: {typ}')
         else:
@@ -163,6 +163,62 @@ _coll_hub_env_var = 'KSS_HUB'
 
 
 # == BELOW
+
+def cli_for_production():
+
+    """this is where all the magic happens that we can't/don't test:
+
+    where:
+      - when a file write/rewrite is committed, actually commit the rewrite.
+      - do something real and not contrived for the random number generator
+      - NOTE all the print commands #todo
+
+    (spiked without coverage at #hisory-A.1.)
+    """
+
+    def commit_file_rewrite(from_fh, to_fh):  # to fail is to corrupt
+        import os
+        os.rename(from_fh.name, to_fh.name)  # madman
+        with open(from_fh.name, 'w+'):  # DOUBLE MADMAN - touch the temp
+            pass  # file you just moved. (the tmp libary needs it to be there)
+
+    def filesystem():
+        import kiss_rdb.magnetics_.filesystem as fs
+        return fs.Filesystem_EXPERIMENTAL(
+                commit_file_rewrite=commit_file_rewrite)
+
+    def rng(pool_size):  # used only for CREATE
+        assert(pool_size > 1)
+
+        import random
+        import time
+
+        time_float = time.time()
+        print(f'\nRANDOM SEED: {time_float}')
+        random.seed(time_float)
+
+        # currently, never returning 0 is our hackish way of leaving '222'
+        # (the first identifier, as int 0) unoccupied (so int 0 is never an
+        # ID.) this is a vv fragile way of doing this #todo
+
+        num = random.randrange(1, pool_size)
+        print(f'\nRANDOM: {num} of {pool_size}')
+        return num
+
+    # == BEGIN NASTY python annoyance - why does it auto-escape wtf
+    #    (this only comes up in production, not in tests)
+    from sys import argv
+    for i in range(1, len(argv)):
+        if '\\' in argv[i]:
+            argv[i] = argv[i].encode('utf-8').decode('unicode_escape')  # ..
+    # == END
+
+    import kiss_rdb.magnetics_.collection_via_directory as _
+    _inj = _.INJECTIONS(random_number_generator=rng, filesystemer=filesystem)
+    _ = cli.main(obj=_inj)
+    cover_me(f'do you ever see this? {_}')
+    return 0
+
 
 @click.group()
 @click.option(
@@ -200,7 +256,7 @@ def create(ctx, collection, value):
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
     col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
     if col is None:
-        mon.some_error_code()
+        return mon.some_error_code()
     # end
 
     _cuds = tuple(('create', name_s, val_s) for name_s, val_s in value)
@@ -252,7 +308,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     _inj = cf.release_these_injections('filesystem')
     col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
     if col is None:
-        mon.some_error_code()
+        return mon.some_error_code()
     # end
 
     cuds = []
@@ -308,9 +364,9 @@ def get(ctx, collection, internal_identifier):
 
     dct = col.retrieve_entity(internal_identifier, listener)
     if dct is None:
-        return mon.max_errno or 404  # (Case812)  ##here1
+        return mon.max_errno or 404  # (Case818)  ##here1
 
-    # (Case813):
+    # (Case819):
     # don't get overly attached to the use of JSON here.
     # it's done out of the convenience of implementation here..
 
@@ -386,7 +442,7 @@ def traverse(ctx, collection):
 
     echo = click.echo
     for iid in _iids:
-        # (Case804)
+        # (Case813)
         echo(iid.to_string())
 
     # (make contact with what went wrong..)
@@ -435,24 +491,35 @@ class _Monitor:
         error_categories_box = _Box()
 
         def listener(mood, *rest):
-            # (Case802)
+            # (Case812)
             if 'error' == mood:
                 when_error(rest)
             else:
                 assert(False)
 
         def when_error(rest):
-            shape, error_category, payloader = rest
+            shape, error_category, *detail, payloader = rest
 
             error_categories_box.see(error_category)
 
             # express the emission appropriately for the shape
             if 'expression' == shape:
 
+                if len(detail):
+                    typ, = detail
+                    if typ == 'no_such_directory':
+                        pass  # #cover-me
+                    else:
+                        cover_me(f'type: {typ}')
+
                 # (error category & detail is disregarded here - meh for now)
                 for line in payloader():
                     echo_error_line(line)
             elif 'structure' == shape:
+
+                if len(detail):
+                    cover_me('meh')
+
                 dct = payloader()
                 if 'errno' in dct:
                     self._see_errno(dct['errno'])  # #here2
@@ -508,4 +575,5 @@ _failure_exit_code_bad_request = 400  # Bad Request lol ##here1
 _success_exit_code = 0
 
 
+# #history-A.1: make first production-only injections for CLI
 # #born.

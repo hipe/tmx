@@ -222,6 +222,29 @@ class Case739_deeper(_CommonCase):
                 )
 
 
+class Case740_shallowest(_CommonCase):
+
+    def test_100_write_file(self):
+        self.writes_file()
+
+    def test_200_read_file(self):
+        self.reads_file()
+
+    def expect_file_lines(self):
+        return """
+        .
+        B (  3)
+        D (2   4)
+        """
+
+    def given_identifiers(self):
+        return (
+                'B3',
+                'D2',
+                'D4',
+                )
+
+
 def _other_subject_mod():
     from kiss_rdb.magnetics_ import identifiers_via_index as _
     return _

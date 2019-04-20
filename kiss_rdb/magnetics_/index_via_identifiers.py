@@ -311,7 +311,17 @@ def new_lines_via_add_identifier_into_index__(identifier, iids, listener):
 
 def lines_of_index_via_identifiers(identifiers, depth):
 
-    assert(2 < depth)  # really shallow schemas are out of scope for now..
+    if 2 < depth:
+        return __lines_of_index_via_identifiers_when_deeper(identifiers, depth)
+    elif 2 == depth:
+        return __lines_of_index_via_identifiers_when_shallo(identifiers, depth)
+    else:
+        cover_me("no - we don't make indexes for numberspaces this small")
+
+
+def __lines_of_index_via_identifiers_when_deeper(identifiers, depth):
+
+    assert(2 < depth)
 
     # --
 
@@ -335,30 +345,10 @@ def lines_of_index_via_identifiers(identifiers, depth):
         # when re-racking, update the "penult" too
         head[offset_of_penult_digit] = nd_tup[offset_of_penult_digit]
 
-    def flush_rack():
+    def produce_head_character():
+        return head[offset_of_penult_digit].character
 
-        # backtrack from the end so we trim runs of trailing whitespace:
-
-        offset_of_last = _num_digits - 1
-        while rack[offset_of_last] is None:
-            offset_of_last -= 1
-
-        # when you output a digit, also nullify it in the rack BE CAREFUL:
-
-        def f(i):
-            x = rack[i]
-            if x is None:
-                return ' '
-            else:
-                rack[i] = None
-                return x.character
-
-        # ok go:
-
-        _run = ' '.join(f(i) for i in range(0, offset_of_last + 1))
-
-        _head_char = head[offset_of_penult_digit].character
-        return f'{_head_char} ({_run})\n'
+    flush_rack = _build_rack_flusher(rack, produce_head_character)
 
     def insert_in_rack():
         nd = nd_tup[offset_of_final_digit]
@@ -370,7 +360,7 @@ def lines_of_index_via_identifiers(identifiers, depth):
 
     had_at_least_one = False
 
-    for id_o in itr:  # once
+    for id_o in itr:  # #once
 
         had_at_least_one = True
 
@@ -409,11 +399,107 @@ def lines_of_index_via_identifiers(identifiers, depth):
         yield flush_rack()
 
 
+def __lines_of_index_via_identifiers_when_shallo(identifiers, depth):
+
+    # we want this to be much easier because we never indent
+    # NOTE abtract something from above maybe
+
+    assert(2 == depth)
+
+    itr = iter(identifiers)
+
+    rack = [None for _ in range(0, _num_digits)]
+
+    # == define funcs
+
+    def produce_head_character():
+        return rubric_nd.character
+
+    flush_rack = _build_rack_flusher(rack, produce_head_character)
+
+    # == run
+
+    had_at_least_one_identifier = False
+
+    for iid in itr:  # #once
+
+        had_at_least_one_identifier = True
+
+        rubric_nd, tail_nd = iid.native_digits  # assert identifier depth
+
+        # the first identifier in the list determines the first rubric
+        rubric_int = rubric_nd.integer
+
+        # store this guy
+        rack[tail_nd.integer] = tail_nd
+
+        break
+
+    for iid in itr:
+
+        curr_rubric_nd, tail_nd = iid.native_digits  # assert ID depth
+
+        curr_rubric_int = curr_rubric_nd.integer
+
+        if rubric_int < curr_rubric_int:
+
+            yield flush_rack()
+
+            # update rubric to reflect new .. rubric
+            rubric_nd = curr_rubric_nd
+            rubric_int = curr_rubric_int
+            rack[tail_nd.integer] = tail_nd
+        elif rubric_int == curr_rubric_int:
+            rack[tail_nd.integer] = tail_nd
+        else:
+            cover_me('out of order (not all out of orders are detected!)')
+
+    if had_at_least_one_identifier:
+        yield flush_rack()
+
+
+def _build_rack_flusher(rack, produce_head_character):
+
+    rightmost_offset = _num_digits - 1
+
+    def flush_rack():
+
+        # backtrack from the end so we trim runs of trailing whitespace:
+
+        offset_of_last = rightmost_offset
+        while rack[offset_of_last] is None:
+            offset_of_last -= 1
+
+        # when you output a digit, also nullify it in the rack BE CAREFUL:
+
+        def char_at(i):
+            nd = rack[i]
+            if nd is None:
+                return ' '
+            else:
+                rack[i] = None
+                return nd.character
+
+        # ok go:
+
+        _run = ' '.join(char_at(i) for i in range(0, offset_of_last + 1))
+
+        _head_char = produce_head_character()
+
+        return f'{_head_char} ({_run})\n'
+
+    return flush_rack
+
+
+# == whiners & related
+
 def _say_integrity_error(identifier, count_for_debug):
     return (
         f'integrity error: did not find {identifier.to_string()}'
         f' in {count_for_debug}')
 
+
+# ==
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')

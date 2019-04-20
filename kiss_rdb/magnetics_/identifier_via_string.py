@@ -98,7 +98,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         if iid is None:
             return 3
 
-        _, int_via_iid, _ = three_via_depth__(len(iid.native_digits))
+        _, int_via_iid, _ = three_via_depth_(len(iid.native_digits))
 
         _int = int_via_iid(iid)
         serr.write(f'{_int}\n')
@@ -112,7 +112,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         depth = int(depth)  # meh
         integer = int(integer)  # meh
 
-        iid_via_int, _, _ = three_via_depth__(depth)
+        iid_via_int, _, _ = three_via_depth_(depth)
         _iid = iid_via_int(integer)
         _as_s = _iid.to_string()
         serr.write(f'{_as_s}\n')
@@ -121,7 +121,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
     assert(False)  # placehold future sub-actions
 
 
-def three_via_depth__(depth):
+def three_via_depth_(depth):
     """given depth, produce an encoder function, decoder function, & capacity.
 
     for both "encoding" an identifier (i.e from integer to string), and for
@@ -172,6 +172,11 @@ def three_via_depth__(depth):
 
     def int_via_iid(iid):
         nd_tup = iid.native_digits
+
+        if len(nd_tup) != depth:
+            _msg = ('identifier depth mismatch '
+                    f'(needed {depth} had {len(nd_tup)})')
+            raise Exception(_msg)  # #cover-me (encountered IRL)
 
         total = nd_tup[least_significant_digit_offset].integer
         for i in significant_digit_offsets:

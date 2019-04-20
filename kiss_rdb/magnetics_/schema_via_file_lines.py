@@ -166,6 +166,18 @@ o['32x32x32'] = _32_32_32
 
 
 @memoize
+def _32_32():
+    return _StorageSchema(
+            identifier_depth=2,
+            filetree_depth=2,
+            paths_function='paths_when_two_deep',
+            )
+
+
+o['32x32'] = _32_32
+
+
+@memoize
 def _32up2():
     return _StorageSchema(
             identifier_depth=2,
@@ -245,6 +257,17 @@ def _paths_functions():
             for posix_path in sorted_entries_of(dir_pp):
                 yield posix_path
 
+    def paths_when_two_deep(pather, when_no_entries):  # #here1 #cover-me
+
+        entities_dir_pp = Path(pather._entities_directory_path)
+        files = sorted_entries_of(entities_dir_pp)
+
+        if not len(files):
+            when_no_entries(entities_dir_pp)
+            return ()
+
+        return files
+
     def paths_when_single_file(pather, when_no_entries):  # #here1
 
         entities_file_pp = Path(pather._entities_file)
@@ -277,6 +300,7 @@ def _paths_functions():
 
     return {
             'paths_when_three_deep': paths_when_three_deep,
+            'paths_when_two_deep': paths_when_two_deep,
             'paths_when_single_file': paths_when_single_file,
             }
 

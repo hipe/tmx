@@ -3,19 +3,16 @@ rankdir=BT
 node[shape=rect]
 
 944[label="CLI"]
-852->944
+862->944
 844->944
 617->944
 
+862[label="issue of greedy\nparsing whitespace\n& comments"]
+852->862
 
 852[label="multiline\nstrings"]
 
 
-/*
-812[label=" for CLI"]
-747[label=" for CLI"]
-682[label=" for CLI"]
-*/
 617[label="update for CLI" style=filled]
 552->617
 552[label="delete for CLI" style=filled]
@@ -26,7 +23,6 @@ node[shape=rect]
 422[label="mishmash of several\nmocked CLI endpoints" style=filled]
 410->422
 410[label="screen lines\nchunker\n(CLI testing lib)" style=filled]
-
 
 844[label="typed values\nvia CLI values"]
 756->844

@@ -85,7 +85,7 @@ def PROVISION_NEW_IDENTIFIER(
     # get the decoder function from the depth
 
     from . import identifier_via_string as _
-    iid_via_int, int_via_iid, cap = _.three_via_depth__(identifier_depth)
+    iid_via_int, int_via_iid, cap = _.three_via_depth_(identifier_depth)
 
     # run the function against the list of things
 

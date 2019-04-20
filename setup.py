@@ -12,7 +12,7 @@ ideally we will eventually know how we can have this file live in the
 sub-project directory if possible.
 
 also at #birth there is an #open [#867.N] issue :#here1, where we don't
-know how to make it so the egg (directly) doesn't have to keep hanging
+know how to make it so the egg (directory doesn't have to keep hanging
 around directly inside our project directory.
 """
 
@@ -27,7 +27,7 @@ setup(
         ],
         entry_points='''
             [console_scripts]
-            kss=kiss_rdb.cli:cli
+            kss=kiss_rdb.cli:cli_for_production
         ''',
 )
 

@@ -93,12 +93,15 @@ test file 650: CUD entities|
 nl100[label="
 test file 680: file rewrite request via collection (test cases 700-799)|
 <705>700-725: collection intro, RDUT|
-<735>730-739: create initial index file|
-<745>740-749: provision new ID pseudo-randomly|
-<765>764-766: create entity|
-<775>770-779: single-file schema CUD+RT|
-<785>780-789: RESERVED typed values via CLI values|
-<795>790-799: CLI lol
+<735>730-744: index files|
+<745>745-750: provision new ID pseudo-randomly|
+<765>764-766: create entity integ. w/ provision & locking|
+<775>770-779: single-file schema CUD+RT
+"]
+
+nl110[label="
+the one CLI test file|
+<820>800-840: CUD+RT adaptations for CLI
 "]
 
 nodeRight[label="
@@ -107,8 +110,9 @@ nodeRight[label="
 <300>\n\n\n\n\n\n\n\n\n\n(300) retrieve one entity\n\n\n\n\n\n\n\n\n\n\n\n|
 <400>\n\n(400) create\n\n\n|
 <500>\n\n(500) delete\n\n\n|
-<600>\n\n(600) update\n\n\n|
-<700>\n\n\n\n(700) rumspringa\n\n\n\n\n
+<600>\n(600) update\n\n|
+<700>\n\n(700) the collection\nfaçade\n\n\n|
+<800>\n(800-840) CLI\n\n
 "
 fontsize=22
 ]
@@ -185,8 +189,10 @@ nl100:745->nodeRight:700
 nl100:755->nodeRight:700
 nl100:765->nodeRight:700
 nl100:775->nodeRight:700
-nl100:785->nodeRight:700
 nl100:795->nodeRight:700
+
+
+nl110:820->nodeRight:800
 
 
 label="
