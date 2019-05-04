@@ -449,7 +449,7 @@ def _create_entity(
 
 def _create_MDE_via_ID_and_request(identifier_string, req, listener):
 
-    from .entity_via_open_table_line_and_body_lines import (
+    from .blocks_via_file_lines import (
         mutable_document_entity_via_identifer_and_body_lines as _,
         )
 

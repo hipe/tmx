@@ -34,7 +34,7 @@ def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
             return
         otl, lines = tup
 
-        from .entity_via_open_table_line_and_body_lines import (
+        from .blocks_via_file_lines import (
                 mutable_document_entity_via_open_table_line_and_body_lines as entity_via)  # noqa: E501
         return entity_via(otl, lines, listener)
 

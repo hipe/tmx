@@ -534,7 +534,7 @@ def __apply_C_and_U(head_ok_i, mde, groups, appends, qits, updates, listener):
 def __make_new_lines(updates, groups, appends, listener):
     """use real life vendor toml library to "encode" .."""
 
-    from .entity_via_open_table_line_and_body_lines import attribute_line_via_line  # noqa: E501
+    from .blocks_via_file_lines import attribute_line_via_line  # noqa: E501
     import toml
 
     yikes = {}
@@ -615,7 +615,7 @@ def _emit_request_error_via_reason(msg, listener):
 
 
 def _blank_line():
-    from .entity_via_open_table_line_and_body_lines import newline_line_object_singleton as _  # noqa: E501
+    from .blocks_via_file_lines import newline_line_object_singleton as _
     return _
 
 

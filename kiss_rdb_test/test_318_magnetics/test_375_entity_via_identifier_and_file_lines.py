@@ -601,7 +601,7 @@ def _MDE_via_body_lines_string_using_hack(big_s):
     """
 
     import re
-    from kiss_rdb.magnetics_.entity_via_open_table_line_and_body_lines import (
+    from kiss_rdb.magnetics_.blocks_via_file_lines import (
             _MutableDocumentEntity, _AttributeLine,
             _AttributeName, _CommentLine)
 

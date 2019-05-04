@@ -474,7 +474,7 @@ def _body_line_gen(mde):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import entity_via_open_table_line_and_body_lines as _  # noqa: E501
+    from kiss_rdb.magnetics_ import blocks_via_file_lines as _
     return _
 
 

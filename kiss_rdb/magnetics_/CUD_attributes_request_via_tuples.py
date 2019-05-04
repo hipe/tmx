@@ -1,5 +1,5 @@
 from . import (
-        entity_via_open_table_line_and_body_lines as ent_lib,
+        blocks_via_file_lines as ent_lib,
         )
 
 

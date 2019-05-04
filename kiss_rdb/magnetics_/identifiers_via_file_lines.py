@@ -40,7 +40,7 @@ class _ActionsForCoarseParse:
         self._line_cache = []
 
         # for now we realize this dependency late (when we are constructed)
-        from .entity_via_open_table_line_and_body_lines import (
+        from .blocks_via_file_lines import (
                 mutable_document_entity_via_open_table_line_and_body_lines as _
                 )
         self._entity_via = _
@@ -189,7 +189,7 @@ def open_table_line_via_line_(line, listener):
         _ = 1 + len(nc[0]) + 1 + len(identifier) + 1 + len(which)  # NOOOOOO
         return _input_error(listener, expecting="']'", position=_)
 
-    from .entity_via_open_table_line_and_body_lines import OpenTableLine_ as _
+    from .blocks_via_file_lines import OpenTableLine_ as _
     return _(identifier, which, line)
 
 
