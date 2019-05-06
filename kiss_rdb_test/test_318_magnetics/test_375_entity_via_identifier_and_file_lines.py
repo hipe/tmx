@@ -1,6 +1,10 @@
 from _common_state import (
+        TSLO_via,
         debugging_listener as _debugging_listener,
         unindent as _unindent,
+        )
+from kiss_rdb.magnetics_.entities_via_collection import (
+        table_block_via_lines_and_table_start_line_object_,
         )
 from modality_agnostic.memoization import (
     dangerous_memoize as shared_subject,
@@ -47,11 +51,6 @@ class _CommonCase(unittest.TestCase):
     def vendor_parse_expecting_failure(self):
         return self._expecting_failure(self.run_vendor_parse)
 
-    def run_build_vendor_value_index(self, listener):
-        _ = self.given_entity_body_lines()
-        _mde = _MDE_via_body_lines_string_using_hack(_)
-        return _comment_tester_via(_mde, listener)
-
     def run_vendor_parse(self, listener):
         _body_string = self.given_entity_body_lines()
         return _vendor_parse(_body_string, listener)
@@ -62,39 +61,40 @@ class _CommonCase(unittest.TestCase):
         _actual = self.error_structure_at('identifier_string')
         self.assertEqual(_actual, id_s)
 
-    def tells_you_it_might_be_out_of_order(self):
-        self.assertTrue(self._might_be_out_of_order_yes_no())
+    def tells_you_it_DID_traverse_whole_file(self):
+        self.assertTrue(self._did_traverse_whole_file())
 
-    def tells_you_it_was_NOT_out_of_order(self):
-        self.assertFalse(self._might_be_out_of_order_yes_no())
+    def tells_you_it_did_NOT_traverse_whole_file(self):
+        self.assertFalse(self._did_traverse_whole_file())
 
-    def _might_be_out_of_order_yes_no(self):
-        return self.error_structure_at('might_be_out_of_order')
+    def _did_traverse_whole_file(self):
+        return self.error_structure_at('did_traverse_whole_file')
 
     def expect_not_found_input_error_type(self):
         _actual = self.error_structure_at('input_error_type')
         self.assertEqual(_actual, 'not_found')
 
     def expect_entity_has_this_identifier(self, id_s):
-        otl = self.open_table_line_object()
-        self.assertEqual(otl.identifier_string, id_s)
-        self.assertEqual(otl.table_type, 'attributes')
+        tsl = self.table_start_line_object()
+        self.assertEqual(tsl.identifier_string, id_s)
+        self.assertEqual(tsl.table_type, 'attributes')
 
     def expect_attribute_line_has_name(self, al, nm):
-        self.assertEqual(al.attribute_name.name_string, nm)
+        self.assertEqual(al.attribute_name_string, nm)
 
-    def expect_is_blank_line_object(self, lo):
-        self.assertFalse(lo.is_attribute_line or lo.is_comment_line)
-        self.assertEqual(lo.line, '\n')
+    def expect_block_is_blank_line(self, blk):
+        self.assertTrue(blk.is_discretionary_block)
+        line, = blk.discretionary_block_lines
+        self.assertEqual(line, '\n')
 
-    def open_table_line_object(self):
-        return self.entity()._open_table_line_object
+    def table_start_line_object(self):
+        return self.entity()._table_start_line_object
 
     def body_component_at(self, idx):
         return self.body_block_index()[idx]
 
     def build_body_block_index(self):
-        return tuple(self.entity().TO_BODY_LINE_OBJECT_STREAM())
+        return self.entity()._body_blocks
 
     def retrieve_expecting_failure(self):
         return self._expecting_failure(self.run_retrieve)
@@ -156,12 +156,12 @@ class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
     def test_100_runs(self):
         self.assertIsNotNone(self.entity())
 
-    def test_233_open_table_line_components_look_good(self):
+    def test_233_table_start_line_components_look_good(self):
         self.expect_entity_has_this_identifier('BB')
 
-    def test_266_open_table_line_LINE_looks_good(self):
+    def test_266_table_start_line_LINE_looks_good(self):
         _expected = '[item.BB.attributes]\n'
-        self.assertEqual(self.open_table_line_object().line, _expected)
+        self.assertEqual(self.table_start_line_object().line, _expected)
 
     def test_300_yeah_i_got_attributes(self):
         al = self.body_component_at(0)
@@ -170,7 +170,7 @@ class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
         self.expect_attribute_line_has_name(al, 'prop-2')
 
     def test_400_trailing_blank_lines(self):
-        self.expect_is_blank_line_object(self.body_component_at(2))
+        self.expect_block_is_blank_line(self.body_component_at(2))
 
     @shared_subject
     def body_block_index(self):
@@ -195,8 +195,8 @@ class Case259_not_found(_CommonCase):
     def test_200_the_error_structure_has_the_ID_string(self):
         self.error_structure_has_identifier_string('BBCC')
 
-    def test_300_tells_you_if_it_might_be_because_out_of_order(self):
-        self.tells_you_it_might_be_out_of_order()
+    def test_300_tells_you_it_did_NOT_traverse_whole_file(self):
+        self.tells_you_it_did_NOT_traverse_whole_file()
 
     def test_400_reason_is_straightforward(self):
         _actual = self.error_structure_at('reason')
@@ -216,7 +216,7 @@ class Case259_not_found(_CommonCase):
 class Case263_not_found_anywhere(_CommonCase):
 
     def test_300_tells_you_it_traversed_the_whole_thing(self):
-        self.assertFalse(self.error_structure_at('might_be_out_of_order'))
+        self.assertTrue(self.error_structure_at('did_traverse_whole_file'))
 
     def test_400_reason_is_worded_slightly_differently(self):
         _actual = self.error_structure_at('reason')
@@ -242,7 +242,7 @@ class Case266_at_head(_CommonCase):
 
     def test_400_trailing_blank_lines(self):
         a = self.body_block_index()
-        self.expect_is_blank_line_object(a[2])
+        self.expect_block_is_blank_line(a[2])
         self.assertEqual(len(a), 3)
 
     @shared_subject
@@ -311,8 +311,8 @@ class Case278_against_empty(_CommonCase):
     def test_200_the_error_structure_has_the_ID_string(self):
         self.error_structure_has_identifier_string('FF')
 
-    def test_300_tells_you_it_was_NOT_out_of_order(self):
-        self.tells_you_it_was_NOT_out_of_order()
+    def test_300_tells_you_it_DID_traverse_whole_file(self):
+        self.tells_you_it_DID_traverse_whole_file()
 
     @shared_subject
     def error_structure(self):
@@ -325,12 +325,16 @@ class Case278_against_empty(_CommonCase):
         return ()
 
 
-class Case282_too_many_adjacent_same_identifiers(_CommonCase):
+class Case282_meta_not_yet_implemented(_CommonCase):
 
     def test_100_message(self):
         es = self.retrieve_expecting_failure()
-        _expected = "item 'B' has 3 adjacent tables (2 is max)"
-        self.assertEqual(es['reason'], _expected)
+
+        # [item.B.meta]
+        # --------^       (offset 8)
+
+        self.assertEqual(es['position'], 8)
+        self.assertEqual(es['reason'], "table type 'meta' not yet implemented")
 
     def given_identifier(self):
         return 'B'
@@ -353,7 +357,7 @@ class Case284_duplicate_identifiers_can_get_shadowed(_CommonCase):
 
     # [#864.provision-3.1]: stop at the first one
 
-    def test_200_open_table_line(self):
+    def test_200_table_start_line(self):
         self.expect_entity_has_this_identifier('B')
 
     def test_300_attributes(self):
@@ -410,22 +414,18 @@ class Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
         """
 
 
-class Case297_trick_the_coarse_parse_with_valid_toml(_CommonCase):
+class Case296_touch_multi_line(_CommonCase):  # #mutli-line-case
+    # before #history-A.1, the case around these input lines captured how it
+    # was possible to use multi-line strings to "trick" our parser. now that
+    # we attempt to support multi-line strings..
 
-    def test_100_in_general_say_toml_not_simple_enough(self):
-        _expect = 'toml not simple enough'
-        self.assertEqual(self._general_and_specific()[0], _expect)
-
-    def test_200_in_specific_say_this_thing_snuck_through(self):
-        _expect = "'number-nine' attribute snuck through"
-        self.assertEqual(self._general_and_specific()[1], _expect)
-
-    @shared_subject
-    def _general_and_specific(self):
-        return self.reason_via_expect_input_error().split(': ')
-
-    def given_run(self, listener):
-        return self.run_build_vendor_value_index(listener)
+    def test_100_EVERYTHING(self):
+        body_lines = tuple(_unindent(self.given_entity_body_lines()))
+        tb = _table_block_via_body_lines(body_lines)
+        one, = tb._body_blocks
+        self.assertEqual(one.attribute_name_string, 'love-potion')
+        _actual = tuple(one.to_line_stream())
+        self.assertSequenceEqual(_actual, body_lines)
 
     def given_entity_body_lines(self):
         # the below looks like two attributes to the coarse parse but isn't
@@ -437,13 +437,13 @@ class Case297_trick_the_coarse_parse_with_valid_toml(_CommonCase):
 
 """the next several cases are ordered such that the "{compound type} not
 yet supported" comes first, then the easy cases come second, then the
-"multiline strings not yet supported" come third. it may feel like a
+"multi-line strings not yet supported" come third. it may feel like a
 narrative disjoint having a break in the "not yet supported" cases; but
 the ordering is intentional and reflects the expected relative complexities
 of their respective implementations
 ([#010.6] regression-friendly ordering) because
-to detect multiline strings we need to get as far as firing up our ad-hoc
-value-expression parser..."""
+to detect [#867.J] multi-line strings we need to get as far as firing up our
+ad-hoc value-expression parser..."""
 
 
 class Case303_array_not_suported_yet(_CommonCase):
@@ -509,28 +509,13 @@ class Case366_literal_string_not_yet_supported(_CommonCase):
         return 'single-line-literal-string'
 
 
-class Case372_multi_line_literal_string_not_yet_supported(_CommonCase):
+class Case372_multi_line(_CommonCase):
 
-    def test_100(self):
-        self.expect_toml_type_not_supported('multi-line literal string')
+    def test_372_multi_line_literal_never_has_comment(self):  # Case372
+        self.expect_no_comment_easy('multi-line-literal')
 
-    def given_run(self, listener):
-        return self.run_comment_test_expecting_failure(listener)
-
-    def given_attribute(self):
-        return 'multi-line-literal-string'
-
-
-class Case378_multi_line_basic_not_yet_supported(_CommonCase):
-
-    def test_100(self):
-        self.expect_toml_type_not_supported('multi-line basic string')
-
-    def given_run(self, listener):
-        return self.run_comment_test_expecting_failure(listener)
-
-    def given_attribute(self):
-        return 'multi-line-basic-string'
+    def test_378_multi_line_basic_never_has_comment(self):  # Case378
+        self.expect_no_comment_easy('multi-line-basic')
 
 
 class Case384_the_hard_but_money_cases(_CommonCase):
@@ -552,6 +537,7 @@ def _comment_tester_one():
     """things to note about this fellow:
         - written so every line passes crude parse (should that be
           necessary. maybe it isnt.)
+        - .[#867.J] multi-line strings cannot have comments
         - note the trick we do to get tripple quotes into the multiline string
     """
 
@@ -567,9 +553,9 @@ def _comment_tester_one():
         datetime-no-comment = 1979-05-27T07:32:00Z
         datetime-yes-comment = 1979-05-27T07:32:00Z  # HBD TPW
         single-line-literal-string = 'hi'  # ..
-        multi-line-literal-string = '''
+        multi-line-literal = '''
         # not comment 1 \u0020'''
-        multi-line-basic-string = {orly}
+        multi-line-basic = {orly}
         # not comment 2 {orly}
         array = [ 1, 2, 3 ]
         inline-table = {{ first = "Tom", last = "Preston-Werner" }}
@@ -585,40 +571,26 @@ def _comment_tester_one():
 
 
 def _comment_tester_via_big_string_using_hack(big_s):
+    _lines = _unindent(big_s)
     listener = _debugging_listener() if True else _no_listener
-    mde = _MDE_via_body_lines_string_using_hack(big_s)
-    return _comment_tester_via(mde, listener)
+    _tb = _table_block_via_body_lines(_lines)
+    _bb = _tb.to_body_block_stream_as_table_block_()
+    # hackishly use this as reader for array
+    return _subject_module().comment_tester_via_body_blocks_(_bb, listener)
 
 
-def _comment_tester_via(mde, listener):
-    return _subject_module().COMMENT_TESTER_VIA_MDE(mde, listener)
+def _table_block_via_body_lines(lines):
+
+    # use the same parser that parses while files to get just a apendable
+    # document entity (table block) from the body lines of an ent
+
+    _ = _table_start_line_object()
+    return table_block_via_lines_and_table_start_line_object_(lines, _)
 
 
-def _MDE_via_body_lines_string_using_hack(big_s):
-    """
-    hmm we don't want to invoke the full power and dependency on the parsing
-    logic, so:
-    """
-
-    import re
-    from kiss_rdb.magnetics_.blocks_via_file_lines import (
-            _MutableDocumentEntity, _AttributeLine,
-            _AttributeName, _CommentLine)
-
-    def attribute_name_via_line(line):
-        md = re.match('^(?:(#)|([a-z0-9]+(?:-[a-z0-9]+)*) = (.))', line)
-        an_s = md[2]
-        if an_s is not None:
-            _an = _AttributeName(an_s.split('-'))
-            return _AttributeLine(_an, md.start(3), line)
-        else:
-            return _CommentLine(line)
-
-    mde = _MutableDocumentEntity('no open table line object')
-    for line in _unindent(big_s):
-        _line_object = attribute_name_via_line(line)
-        mde.append_line_object(_line_object)
-    return mde
+@memoize
+def _table_start_line_object():
+    return TSLO_via('ABCDE', 'attributes')
 
 
 def _vendor_parse(body_string, listener):
@@ -641,4 +613,6 @@ _no_listener = None
 if __name__ == '__main__':
     unittest.main()
 
+
+# #history-A.1 adding multi-line support changed some cases
 # #born.

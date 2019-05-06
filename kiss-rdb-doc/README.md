@@ -32,6 +32,7 @@ woah boy.
 |[#870]                     |       | "backend roadmap again"
 |[#869]                     |       | near term end game
 |[#868]                     |       | test number allocation
+|[#867.V]                   | #open | the way we keep id (int) 0 free is hackish
 |[#867.U]                   | #trak | injections (discussion)
 |[#867.T]                   |       | top secret crazy plan
 |[#867.S]                   |       | reference internal CLI somewhere else
@@ -41,11 +42,11 @@ woah boy.
 |[#867.N]                   | #open | (OUTSIDE OF SUB-PROJECT) how to setup.py
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
-|[#867.K]                   | #hole |
-|[#867.J]                   | #wish | future feature 4: multiline strings
+|[#867.K]                   | #trak | places where we use the toml vendor lib
+|[#867.J]                   | #wish | future feature 4: multi-line strings
 |[#867.H]                   | #open | blank lines during update move weirdly. depend maybe on #wish [#867.J].
 |[#867.G]                   | #wish | empty files would tell you they're empty
-|[#867.F]                   | #open | found a bug
+|[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
 |[#867.E]                   | #open | non-integrated testpoint island
 |[#867.D]                   | #open | these datetime forms not supported in python toml
 |[#867.C]                   | #open | known error cases yet to cover (not comprehensive)

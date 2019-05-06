@@ -63,13 +63,13 @@ def _line_stream_via_CUD_function(
         existing_lines,
         listener):
 
-    from .identifiers_via_file_lines import (
-            block_stream_via_file_lines,
-            ErrorMonitor_)
+    from . import blocks_via_file_lines as block_lib
+    from . import identifiers_via_file_lines as grammar_lib
 
-    monitor = ErrorMonitor_(listener)
+    monitor = grammar_lib.ErrorMonitor_(listener)
 
-    _block_itr = block_stream_via_file_lines(existing_lines, monitor.listener)
+    _block_itr = block_lib.block_stream_via_file_lines(
+            existing_lines, monitor.listener)
 
     _block_itr = __block_stream_via(
             args_for_CUD_function,
@@ -119,16 +119,16 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, recv, block_itr, monitor):
 
     # output entities that are lesser while searching for one that is equal.
 
+    # de = document entity
+
     did_find = False
-    for mde in block_itr:
-        if id_s == mde.identifier_string:
+    for de in block_itr:
+        if id_s == de.identifier_string:
             # do NOT yield the one we are updating. break.
             did_find = True
-            if recv is not None:
-                recv(mde)
             break
 
-        yield mde
+        yield de
 
     if not monitor.ok:  # there's a lot that could have been wrong in the file
         return
@@ -136,6 +136,13 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, recv, block_itr, monitor):
     if not did_find:
         _whine_about_entity_not_found(id_s, monitor.listener)
         return  # not covered - blind faith
+
+    mde = de.to_mutable_document_entity_(monitor.listener)
+    if mde is None:
+        return
+
+    if recv is not None:
+        recv(mde)  # to be cute we are yielding it out now, before the edit..
 
     new_entity_lines = new_lines_via_entity(mde, monitor.listener)
     if new_entity_lines is None:

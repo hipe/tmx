@@ -8,8 +8,9 @@ import unittest
 
 class _CommonCase(unittest.TestCase):
 
-    def is_head_block_with_this_many_lines(self, x, num):
-        self.assertEqual(len(x._lines), num)
+    def is_head_block_with_this_many_lines(self, hb, num):
+        _actual = len(hb._head_block_lines)
+        self.assertEqual(_actual, num)
 
     def is_attributes_table_with_this_name(self, mde, id_s):
         self.assertEqual(mde.table_type, 'attributes')
@@ -102,8 +103,7 @@ class Case157_simplified_typical(_CommonCase):
 class Case171_effectively_empty_file_of_course_has_head_block(_CommonCase):
 
     def test_100_head_block_looks_good(self):
-        hb = self.head_block()
-        lines = hb._lines
+        lines = self.head_block()._head_block_lines
         self.assertEqual(lines[0], "# hi hunger i'm dad. blank line next.\n")
         self.assertEqual(lines[1], '\n')
         self.assertEqual(len(lines), 2)
@@ -135,16 +135,16 @@ class Case186_truly_empty_file_has_no_head_block(_CommonCase):
         return ()
 
 
-class Case200_error_in_open_table_line(_CommonCase):
+class Case200_error_in_table_start_line(_CommonCase):
 
     def test_100_some_error_structure_detail(self):
         sct = self.count_and_structure()[1]
-        self.assertEqual(sct['lineno'], 3)  # #open [#867.F]  capture wrong thi
+        self.assertEqual(sct['lineno'], 2)
         self.assertEqual(sct['expecting'], 'keyword "item"')
 
-    def test_200_it_got_as_far_as_one_item(self):
+    def test_200_it_does_not_yield_even_one_entity(self):
         count = self.count_and_structure()[0]
-        self.assertEqual(count, 1)  # ..
+        self.assertEqual(count, 0)
 
     @shared_subject
     def count_and_structure(self):
@@ -163,10 +163,11 @@ class Case215_error_in_attribute_value_passes_thru_for_now(_CommonCase):
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 1)
 
-    def test_200_the_rest_looks_good(self):
-        mde, = tuple(self.the_rest())
-        atr1, = mde.TO_BODY_LINE_OBJECT_STREAM()
-        self.assertEqual(atr1.attribute_name.name_string, 'yes')
+    def test_200_the_invalid_toml_was_parsed(self):
+        eb, = tuple(self.the_rest())  # entity block
+        _ab = eb._body_blocks[0]  # attribute block
+        _line = _ab.line
+        self.assertEqual(_line, 'yes = see\n')
 
     @shared_subject
     def head_block_and_rest(self):
@@ -229,7 +230,7 @@ class Case243_two_yes_head(_CommonCase):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import identifiers_via_file_lines as _
+    from kiss_rdb.magnetics_ import blocks_via_file_lines as _
     return _
 
 

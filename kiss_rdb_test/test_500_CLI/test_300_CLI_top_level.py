@@ -988,9 +988,8 @@ def _sys():
 
 
 def _lines_via_big_string_as_is(big_string):
-    from script_lib.test_support.expect_treelike_screen import (
-            line_stream_via_big_string as _)
-    return _(big_string)
+    import kiss_rdb.magnetics_.CUD_attributes_via_request as lib
+    return lib.lines_via_big_string_(big_string)
 
 
 # == support for setup

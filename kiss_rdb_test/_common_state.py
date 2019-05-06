@@ -53,6 +53,18 @@ def lazy(f):  # #meh
 # ==
 
 
+def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
+    import kiss_rdb.magnetics_.entities_via_collection as ents_lib
+    _tb = ents_lib.table_block_via_lines_and_table_start_line_object_(
+            lines, tslo, listener)
+    return _tb.to_mutable_document_entity_(listener)
+
+
+def TSLO_via(identifier_string, meta_or_attributes):
+    import kiss_rdb.magnetics_.identifiers_via_file_lines as ids_lib
+    return ids_lib.TSLO_via(identifier_string, meta_or_attributes)
+
+
 def unindent_with_dot_hack(big_s):
     """preserve meaningful leading space in a big string with this dot hack.
 

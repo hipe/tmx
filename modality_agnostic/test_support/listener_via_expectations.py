@@ -31,6 +31,8 @@ def for_DEBUGGING(*a):
         io.write(f'meta-doh-dah: {repr(emit())}')
     else:
         raise Exception(f'strange shape: {repr(shape)}')
+
+    io.write('\n')
     io.flush()
 
 

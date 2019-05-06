@@ -543,6 +543,8 @@ def line_stream_via_big_string(big_s):
     it's garbage-in, garbage-out if you like. if your "big string"'s final
     "line" does *not* have an LTS, this "line" will still come back out as-
     is (i.e without an LTS). (tests cover this).
+
+    as this is so short, it may be copy-pasted elsewhere. track with :[#610].
     """
 
     import re

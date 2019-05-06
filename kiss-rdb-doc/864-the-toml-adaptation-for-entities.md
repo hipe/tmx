@@ -28,8 +28,8 @@ applicable to exactly our use case and perhaps a few outside of it.
 ## broad provision 2
 
 to make "crude" (fast) parsing easier on us, we are going to be very
-line-centric. this means that for now multi-line doo-has may be out
-but later for that. (this is now "future feature 4".)
+line-centric. this is why our first pass at this did not support
+.[#867.J] multi-line strings...
 
 
 
@@ -183,13 +183,15 @@ those higher level streams are streams of trees!).
 above we introduced our "collection edit theory" of "CUD" and then introduced
 our "file edit theory": that the main _idiom_ we will employ when working
 with files is seeing them as _streams_ of _lines_.
-(be advised this will get more nuanced at #wish [#867.J] multiline strings.)
+(be advised this will get more nuanced at #wish [#867.J] multi-line strings.)
 
 here we synthesize those lexicons towards this document's objective:
 our algorithms for the CUD of entities in files.
 
-algorithms are formed at the intersection of competing forces: the usual
-software design cost-dimensions like memory usage, execution speed, and
+
+the tradecraft of software algorithms certainly falls under the rubric of
+engineering's familiar game mechanic of trade offs: algorithms are formed at
+the intersection of competing forces like memory usage, execution speed, and
 code-value (code-value, in turn, being stuff like cost of maintenance
 from things like readability, DRY ("don't repeat yourself")).
 
@@ -328,9 +330,7 @@ valid key sets, possibly type, and attribute ordering.
 
 ## future feature 4
 
-multiline strings. we know we want it, but we can't guarantee that we will
-be able to support it and still stick to our broad provisions.. we're totally
-not thinking about it too deeply for now.
+.[#867.J] multi-line strings...
 
 
 

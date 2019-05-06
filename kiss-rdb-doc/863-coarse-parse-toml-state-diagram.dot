@@ -1,45 +1,50 @@
 digraph g {
 
-s0000[label="start" shape="rect"]
+node[shape=rect style=filled]
 
-s0000->a0100[label="blank or\ncomment"]
+n000[label="ready"]
+n000->n100[label="blank or\ncomment"]
+n000->n400[label="table start"]
+n000->n900[label="(eos)"]
 
-a0100[label="(usually\nno-op)"]
+n100[label="BC block (1)"]
+n100->n100[label="blank or\ncomment"]
+n100->n400[label="table start"]
+n100->n900[label="(eos)"]
 
-a0100->s0000
+n400[label="table\nbegun"]
+n400->n400[label="table start"]
+n400->n450[label="blank or\ncomment"]
+n400->n700[label="single-line KV"]
+n400->n600[label="multi-line KV head"]
+n400->n900[label="(eos)"]
 
-s0000->a0200[label="section"]
+n450[label="BC block (2)"]
+n450->n400[label="table start"]
+n450->n450[label="blank or\ncomment"]
+n450->n600[label="multi-line KV head"]
+n450->n700[label="single-line KV"]
+n450->n900[label="(eos)"]
 
-a0200[label="(maybe do something\nfor beginning of section)"]
+n600[label="inside\nmulti-line"]
+n600->n600[label="no delim"]
+n600->n700[label="yes delim"]
 
-a0200->s0300
+n700[label="inside\ntable"]
+n700->n400[label="table start"]
+n700->n600[label="multi-line KV head"]
+n700->n700[label="single-line KV"]
+n700->n750[label="blank or comment"]
+n700->n900[label="(eos)"]
 
-s0300[label="inside\nentity" shape=rect]
+n750[label="BC block (3)"]
+n750->n400[label="table start"]
+n750->n600[label="multi-line KV head"]
+n750->n700[label="single-line KV"]
+n750->n750[label="blank or comment"]
+n750->n900[label="(eos)"]
 
-s0300->a0300[label="blank or\ncomment"]
-s0300->a0400[label="one-line\nkey-value"]
-
-a0300[label="(usually\nno-op)"]
-
-a0300->s0300
-
-a0400[label="(maybe do something\nfor key-value)"]
-
-a0400->s0300
-
-s0300->a0500[label="section"]
-
-a0500[label="(maybe do something\nfor end of section)"]
-
-a0500->a0200
-
-s0300->a0600[label="(eos)"]
-
-a0600[label="(maybe do something\nfor end of file)"]
-
-a0600->s0600
-
-s0600[label=done shape=rect]
+n900[label=done]
 
 label="
 this is a state transition diagram for a 'coarse parse' pass of a stream-
@@ -51,10 +56,8 @@ at once.
 the point is this is a resource-efficient approach that obviates the need
 to read the whole file into memory at once as one giant dictionary.)
 
-  • rectangles are states
-  • arrows with labels are transitions
-  • arrows without labels are a transition made immediately
-  • ellipses are typical example actions
+  • rectangles are states. (they are all grey.)
+  • arrows are transitions
   • this is a coarse, line-based parser.
     here, \"input tokens\" are always lines.
   • for each next input token find a suitable transition
@@ -76,5 +79,6 @@ parse all toml, only our subset.
 
 }
 /*
+#history-A.1: remove actions (ellipses) for clarity
 #born.
 */

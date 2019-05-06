@@ -1,8 +1,3 @@
-from . import (
-        blocks_via_file_lines as ent_lib,
-        )
-
-
 def request_via_tuples(tuples, listener):
 
     def reason(msg):
@@ -11,23 +6,31 @@ def request_via_tuples(tuples, listener):
     if not len(tuples):
         return reason('request was empty')  # (Case011)
 
+    from . import blocks_via_file_lines as ent_lib
+
+    gist_via = ent_lib.attribute_name_functions_().name_gist_via_name
+
     components = []
     name_index = _RequestLocalNameUniquenessValidatorIndex(listener)
     strange_verbs = None
     for tup in tuples:
-        verb, attr_name, *rest = tup
+        verb, attr_name_string, *rest = tup
         if verb not in _component_class_via_verb:
             if strange_verbs is None:
                 strange_verbs = {}
             strange_verbs[verb] = None
             continue
 
-        an = ent_lib.attribute_name_via_string(attr_name, listener)
-        if not an:  # life is easier to fail on the first one, meh
+        gist = gist_via(attr_name_string, listener)
+        if not gist:  # life is easier to fail on the first one, meh
             return  # meh just short circuit b.c emitted (Case057)
 
+        an = _AttributeName(gist, attr_name_string)
+
         name_index.see_attribute_name(an)
-        components.append(_component_class_via_verb[verb](an, *rest))
+        _class = _component_class_via_verb[verb]
+        _cmpo = _class(an, *rest)
+        components.append(_cmpo)
 
     if strange_verbs is not None:
         _ = ', '.join(strange_verbs.keys())
@@ -46,9 +49,8 @@ class _CUD_Attributes_Request:
         self.components = tuple(components)
 
     def edit_mutable_document_entity_(self, mde, listener):
-        from .CUD_attributes_via_request import (
-                apply_CUD_attributes_request_to_MDE___ as _)
-        return _(mde, self, listener)
+        from . import CUD_attributes_via_request as lib
+        return lib.apply_CUD_attributes_request_to_MDE___(mde, self, listener)
 
 
 class _RequestLocalNameUniquenessValidatorIndex:
@@ -85,8 +87,8 @@ class _CreateAttributeValueUnsanitized:
 
     def sentence_phrases_for_collisions(tup_a):  # function not method
         sns = []
-        for cmpo, al in tup_a:
-            sns.append(al.attribute_name.name_string)
+        for cmpo, blk in tup_a:
+            sns.append(blk.attribute_name_string)
         if 1 == len(sns):
             mid = f"attribute {repr(sns[0])} because it already exists"
         else:
@@ -131,7 +133,14 @@ _component_class_via_verb = {
         }
 
 
-# -- expression production
+class _AttributeName:
+
+    def __init__(self, gist, s):
+        self.name_gist = gist
+        self.name_string = s
+
+
+# == WHINERS
 
 def _express_collisions(collisions, listener):
     """
@@ -207,12 +216,12 @@ def _sentence_phrases_for_missings(verb, tups):
     inexacts = []
     sns = []
 
-    for cmpo, al in tups:
+    for cmpo, blk in tups:
         sn = cmpo.attribute_name.name_string
-        if al is None:
+        if blk is None:
             sns.append(sn)
         else:
-            _exi_sn = al.attribute_name.name_string
+            _exi_sn = blk.attribute_name_string
             _sp = f'use {repr(_exi_sn)} not {repr(sn)}'
             inexacts.append(_sp)
 

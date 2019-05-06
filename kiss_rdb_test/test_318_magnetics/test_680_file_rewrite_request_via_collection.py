@@ -262,7 +262,9 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     here in terms of where blank lines end up is not what would probably
     be expected..
 
-    wait till after multilines maybe, because this is ugly but only cosmetic
+    wait till after [#867.J] multi-line strings maybe, because this is
+    an ugly issue but only cosmetic and can be worked around reasonably
+    by just prestending we don't support whitespace/comments yet..
     """
 
     def test_100_everything(self):
@@ -281,6 +283,7 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
 
         self.assertEqual(_last_three_path_parts(path), 'entities/B/9.toml')
         _expected = tuple(_unindent(self._expecting_these()))
+
         self.assertSequenceEqual(lines, _expected)
 
     def _expecting_these(self):

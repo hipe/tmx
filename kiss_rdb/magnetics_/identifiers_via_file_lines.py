@@ -1,123 +1,136 @@
+"""this module defines the grammar (state machine)
+
+we use for coarse, line-based parsing of toml files.
+
+it is a near-exact adaptation of [#863]
+"""
+
+
 from kiss_rdb.magnetics_ import (
         string_scanner_via_definition as scn_lib,
         state_machine_via_definition as sm_lib,
         )
 
 
-def block_stream_via_file_lines(file_lines, listener):
-    _actionser = _actionser_via_class(_ActionsForCoarseParse)
-    return parse_(file_lines, _actionser, listener)
+def table_start_line_stream_via_file_lines_(file_lines, listener):
+    return state_machine_.parse(
+            all_lines=file_lines,
+            actions_class=Actions_for_ID_Traversal_Non_Validating_,
+            listener=listener)
 
 
-def open_table_line_stream_via_file_lines_(file_lines, listener):
-    # #open [#867.E] #testpoint island
-    _actionser = _actionser_via_class(Actions_for_ID_Traversal_Non_Validating_)
-    return parse_(file_lines, _actionser, listener)
+class BaseActions_:
+    """base class with every action (transition) defined as no-op.
+
+    you are not required to subclass this, but if you don't, you must provide
+    a definition for every transition.
+    """
+
+    def ready__to__table_begun(self):
+        pass
+
+    def ready__to__discretionary_block_1(self):
+        pass
+
+    def ready__to__done(self):
+        pass
+
+    def discretionary_block_1__to__discretionary_block_1(self):
+        pass
+
+    def discretionary_block_1__to__table_begun(self):
+        pass
+
+    def discretionary_block_1__to__done(self):
+        pass
+
+    def table_begun__to__inside_table(self):
+        pass
+
+    def table_begun__to__inside_multi_line_literal(self):
+        pass
+
+    def table_begun__to__inside_multi_line_basic(self):
+        pass
+
+    def table_begun__to__table_begun(self):
+        pass
+
+    def table_begun__to__discretionary_block_2(self):
+        pass
+
+    def table_begun__to__done(self):
+        pass
+
+    def discretionary_block_2__to__discretionary_block_2(self):
+        pass
+
+    def discretionary_block_2__to__inside_table(self):
+        pass
+
+    def discretionary_block_2__to__inside_multi_line_literal(self):
+        pass
+
+    def discretionary_block_2__to__inside_multi_line_basic(self):
+        pass
+
+    def discretionary_block_2__to__done(self):
+        pass
+
+    def inside_multi_line_literal__to__inside_multi_line_literal(self):
+        pass
+
+    def inside_multi_line_literal__to__inside_table(self):
+        pass
+
+    def inside_multi_line_basic__to__inside_multi_line_basic(self):
+        pass
+
+    def inside_multi_line_basic__to__inside_table(self):
+        pass
+
+    def inside_table__to__inside_table(self):
+        pass
+
+    def inside_table__to__inside_multi_line_literal(self):
+        pass
+
+    def inside_table__to__inside_multi_line_basic(self):
+        pass
+
+    def inside_table__to__table_begun(self):
+        pass
+
+    def inside_table__to__discretionary_block_3(self):
+        pass
+
+    def inside_table__to__done(self):
+        pass
+
+    def discretionary_block_3__to__inside_table(self):
+        pass
+
+    def discretionary_block_3__to__inside_multi_line_literal(self):
+        pass
+
+    def discretionary_block_3__to__inside_multi_line_basic(self):
+        pass
+
+    def discretionary_block_3__to__discretionary_block_3(self):
+        pass
+
+    def discretionary_block_3__to__table_begun(self):
+        pass
+
+    def discretionary_block_3__to__done(self):
+        pass
 
 
-def parse_(file_lines, actionser, listener):
-    return state_machine_.parse(file_lines, actionser, listener)
+class Actions_for_ID_Traversal_Non_Validating_(BaseActions_):
+    """
 
-
-def _actionser_via_class(cls):
-    def actionser(ps):
-        def f(name):
-            return getattr(pa, name)
-        pa = cls(ps)
-        return f
-    return actionser
-
-
-class _ActionsForCoarseParse:
-
-    def __init__(self, parse_state):
-
-        # cache every line (including head lines)
-
-        def f():
-            self._line_cache.append(parse_state.line)
-        parse_state.on_line_do_this(f)
-        self._line_cache = []
-
-        # for now we realize this dependency late (when we are constructed)
-        from .blocks_via_file_lines import (
-                mutable_document_entity_via_open_table_line_and_body_lines as _
-                )
-        self._entity_via = _
-
-        # do something different between first table and the rest
-        self._on_section_start = self._on_first_section_start
-        self._at_end_of_input = self._at_end_of_input_in_empty_file
-
-        self._listener = parse_state.listener
-
-    def on_section_start(self):
-        return self._on_section_start()
-
-    def at_end_of_input(self):
-        return self._at_end_of_input()
-
-    def _on_first_section_start(self):
-        # whether empty or not, we guarantee exactly one head block
-
-        self._on_section_start = self._on_subsequent_section_start
-        self._at_end_of_input = self._at_end_of_input_normally
-        return (okay, _HeadBlock(tuple(self._turn_over_lines())))
-
-    def _on_subsequent_section_start(self):
-        _lines = self._turn_over_lines()
-        return self._MDE_via(_lines)
-
-    def _at_end_of_input_in_empty_file(self):
-
-        lines = self._release_all_lines()
-        if len(lines):
-            return (okay, _HeadBlock(tuple(lines)))  # (Case171)
-        else:
-            return stop  # (Case186)
-
-    def _at_end_of_input_normally(self):
-        # this is different from the other place where we make an MDE in
-        # that here we must *not* backtrack over the line cache by one line
-
-        return self._MDE_via(self._release_all_lines())
-
-    def _MDE_via(self, lines):
-        open_table_line, *body_lines = lines
-        otl = open_table_line_via_line_(open_table_line, self._listener)
-        if otl is None:
-            return stop  # (Case200)
-
-        mde = self._entity_via(otl, body_lines, self._listener)
-        if mde is None:
-            cover_me()  # ..
-            return stop
-
-        return (okay, mde)
-
-    # -- these two
-
-    def _turn_over_lines(self):
-        # assume this is happening at section start
-        # backtrack over the line that ended up being an open table line
-        lc = self._line_cache
-        self._line_cache = [lc.pop()]
-        return lc
-
-    def _release_all_lines(self):
-        lines = self._line_cache
-        del(self._line_cache)
-        return lines
-
-
-class Actions_for_ID_Traversal_Non_Validating_:
-    """the imagined, intended purpose of this is for traversing every ID
-
-    (for example for something like generating an index, we'll see..)
-
-    for now we exercise many of the kinds of things that supposedly make
-    kiss-rdb great by fast-parsing the big files and only parsing out the
-    part we care about (the table-opening ("section") lines).
+    meant to be a fast-ish, coarse traversal for the purpose of seeing
+    all the in-use identifiers.
 
     FOR NOW no validation. like:
       - it does NOT check that any `meta` sect comes before any `attributes'
@@ -130,50 +143,79 @@ class Actions_for_ID_Traversal_Non_Validating_:
         or are in ascending order. (probably this will be forthcoming, and
         somehow abstracted out of this so it is somehow a layer or something)
 
-    before #history-A.1 we structured these parse actions to be logically
-    similar for how we will want to do things for something like RETRIEVE
-    or deep search (true traversal): you can't emit
-    the entity until you've found its last line and you don't know you've
-    reached its last line until either you hit the next line of the next
-    section OR the end of the file.
+      - (at #history-A.4 everything overhauled for transition actions.)
 
-    but now that we know that works, we're simplifying this so we can see
-    if we can make this parse action somehow composable for the eventual
-    new implementation of RETRIEVE
+      - (after #history-A.1 we simplified it just to emit on table open line.)
+
+      - (before #history-A.1, these parse actions were implemented imagining
+        we were doing something like a RETRIEVE where you can't emit the whole
+        entity until you've found the end (i.e the start of next or EOF)..
+
+    (before #history-A.1 this was done more complicatedly as proof-of-concept)
     """
 
     def __init__(self, parse_state):
-        self._ps = parse_state
-        self._listener = parse_state.listener
 
-    def on_section_start(self):
-        otl = open_table_line_via_line_(self._ps.line, self._listener)
-        if otl is None:
+        listener = parse_state.listener
+
+        def f(line):
+            return table_start_line_via_line_(line, listener)
+
+        self._table_start_via_line = f
+        self._parse_state = parse_state
+
+    def ready__to__table_begun(self):
+        return self._table_begun()
+
+    def discretionary_block_1__to__table_begun(self):
+        return self._table_begun()
+
+    def table_begun__to__table_begun(self):
+        return self._table_begun()
+
+    def inside_table__to__table_begun(self):
+        return self._table_begun()
+
+    def discretionary_block_3__to__table_begun(self):
+        return self._table_begun()
+
+    def _table_begun(self):
+        ts = self._table_start_via_line(self._parse_state.line)
+        if ts is None:
             return stop
-        return (okay, otl)
-
-    def at_end_of_input(self):
-        return nothing
+        return (okay, ts)
 
 
-def open_table_line_via_line_(line, listener):
+def table_start_line_via_line_(line, listener):
+
+    # the line must parse into "name components" "[a.b.c]\n" => ('a', 'b', 'c')
 
     nc = _name_components_via_line(line, listener)
     if nc is None:
         return
 
+    # #cover-me we don't cover if it's "[]\n"
+
+    # the first name component must be the keyword `item`
+
     if 'item' != nc[0]:
         return _input_error(listener, expecting='keyword "item"', position=1)
+
+    # if there's only one name component, it's too few
 
     length = len(nc)
     if 1 == length:
         _ = 1 + len(nc[0])  # eew
         return _input_error(listener, expecting='dot', position=_)
 
+    # if there's only two name components, it's also too few
+
     identifier = nc[1]
     if 2 == length:
         _ = 1 + len(nc[0]) + 1 + len(identifier)  # the worst
         return _input_error(listener, expecting='dot', position=_)
+
+    # the third name component must be one of these TWO keywords
 
     keyword = nc[2]
     if 'attributes' == keyword:
@@ -185,12 +227,16 @@ def open_table_line_via_line_(line, listener):
         __ = 'keyword "attributes" or "meta"'
         return _input_error(listener, expecting=__, position=_)
 
+    # if there's more than three name components, it's too many
+
     if 3 < length:
         _ = 1 + len(nc[0]) + 1 + len(identifier) + 1 + len(which)  # NOOOOOO
         return _input_error(listener, expecting="']'", position=_)
 
-    from .blocks_via_file_lines import OpenTableLine_ as _
-    return _(identifier, which, line)
+    return _TableStartLine(
+            identifier_string=identifier,
+            table_type=which,
+            line=line)
 
 
 def _name_components_via_line(line, listener):
@@ -242,45 +288,133 @@ def _input_error(listener, **kwargs):
 
 # -- below is derived directly from the [#863] state transition graph
 
-def _define_state_machine(o):  # interface here is VERY experimental!
+def _define_state_machine(funcs):  # interface here is VERY experimental!
+
+    o = funcs.transition_via_definition
+    del(funcs)
+
+    # --
+
+    # BIG HACK: the function names for the below simple "testers"
+    # are used in UI !! eek (Case085) (e.g "blank line or comment line")
+
+    def blank_line_or_comment(line):
+        if '\n' == line:
+            return True
+        if '#' == line[0]:  # #[#867.F]
+            return True
+
+    def table_start(line):
+        return '[' == line[0]  # assume [#864.provision-2.1] - first character
 
     import re
+    _ = '"""'  # don't break syntax highlighting :/
+    bare_key_rx = re.compile(f"^([A-Za-z0-9_-]+) = ('''|{_})?")  # :#here1
 
-    def blank(line):
-        return '\n' == line
-    blank.noun_phrase = 'blank line'
+    def dispatch_when_key_value(line):
+        md = bare_key_rx.match(line)
+        if md is None:
+            return
 
-    def comment(line):
-        return '#' == line[0]  # assume [#864.provision-2.1] - first character
-    comment.noun_phrase = 'comment line'
+        quot = md[2]  # #here1
 
-    def section(line):
-        return '[' == line[0]  # assume [#864.provision-2.1] - first character
-    section.noun_phrase = 'section line'
+        if quot is None:
+            return ('inside table', md)
 
-    def key_value(line):
-        return bare_key_rx.match(line)
-    key_value.noun_phrase = 'key-value line'
-    bare_key_rx = re.compile(r'^[A-Za-z0-9_-]+ = ')
+        if '"""' == quot:
+            return ('inside multi-line literal', md)
+
+        if "'''" == quot:
+            return ('inside multi-line basic', md)
+
+        assert(False)
+
+    def no_literal_delim(line):
+        return '"""' not in line
+
+    def yes_literal_delim(line):
+        return '"""' in line
+
+    def no_basic_delim(line):
+        return "'''" not in line
+
+    def yes_basic_delim(line):
+        return "'''" in line
+
+    # --
+
+    key_value_of_some_sort = o(
+            dispatcher=dispatch_when_key_value,
+            noun_phrase='key-value of some sort',
+            transition_tos=(
+                'inside table',
+                'inside multi-line literal',
+                'inside multi-line basic',
+                ),
+            )
+    blank_or_comment_stay_here = o(
+            tester=blank_line_or_comment,
+            )
+    table_start__to__table_begun = o(
+            tester=table_start,
+            transition_to='table begun',
+            )
+    eos_ok = o(
+            tests_for_EOS=True,
+            transition_to='done',
+            )
+    # --
+
+    # (again, below is derived almost directly from [#863].)
 
     _transitions_via_state_name = {
-        'start': (
-            o(blank),
-            o(comment),
-            o(section, call='on_section_start', transition_to='inside entity'),
-            o(None, call='at_end_of_input')  # this must be the last rule
+        'ready': (
+            table_start__to__table_begun,
+            o(blank_line_or_comment, 'discretionary block 1'),
+            eos_ok,
             ),
-        'inside entity': (
-            o(key_value),  # ..
-            o(blank),
-            o(comment),
-            o(section, call='on_section_start'),
-            o(None, call='at_end_of_input')  # this must be the last rule
+        'discretionary block 1': (
+            blank_or_comment_stay_here,
+            table_start__to__table_begun,
+            eos_ok,
             ),
+        'table begun': (
+            key_value_of_some_sort,
+            table_start__to__table_begun,
+            o(blank_line_or_comment, 'discretionary block 2'),
+            eos_ok,
+            ),
+        'discretionary block 2': (
+            blank_or_comment_stay_here,
+            key_value_of_some_sort,
+            eos_ok,
+            ),
+        'inside multi-line literal': (
+            o(no_literal_delim),
+            o(yes_literal_delim, 'inside table'),
+            ),
+        'inside multi-line basic': (
+            o(no_basic_delim),
+            o(yes_basic_delim, 'inside table'),
+            ),
+        'inside table': (
+            key_value_of_some_sort,
+            table_start__to__table_begun,
+            o(blank_line_or_comment, 'discretionary block 3'),
+            eos_ok,
+            ),
+        'discretionary block 3': (
+            key_value_of_some_sort,
+            blank_or_comment_stay_here,
+            table_start__to__table_begun,
+            eos_ok,
+            ),
+        'done': (),
         }
-
     return {
+            'name_of_initial_state': 'ready',
             'transitions_via_state_name': _transitions_via_state_name,
+            'name_of_goal_state': 'done',
             }
 
 
@@ -289,13 +423,19 @@ state_machine_ = sm_lib.StateMachine(_define_state_machine)
 
 # ==
 
-class _HeadBlock:
 
-    def __init__(self, lines):
-        self._lines = lines  # #testpoint
+def TSLO_via(identifier_string, meta_or_attributes):
+    _meh = f'[item.{identifier_string}.{meta_or_attributes}]\n'
+    return _TableStartLine(identifier_string, meta_or_attributes, _meh)
 
-    def to_line_stream(self):
-        return self._lines  # hwile it works
+
+class _TableStartLine:
+
+    def __init__(self, identifier_string, table_type, line):
+        self.identifier_string = identifier_string
+        self.table_type = table_type
+        self.line = line
+
 
 # ==
 
@@ -333,8 +473,8 @@ class ErrorMonitor_:
         self.listener = my_listener
 
 
-def cover_me():
-    raise Exception('cover me')
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
 not_ok = False
@@ -342,6 +482,7 @@ stop = (not_ok, None)
 okay = True
 nothing = (okay, None)
 
+# #history-A.4: actions re-arch to support multi-line strings
 # #history-A.3: "error monitor" moved to here from elsewhere
 # #history-A.2: becomes stowaway location for "coarse parse"
 # #history-A.1: simplify open-table line finding to be eager

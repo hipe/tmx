@@ -1,3 +1,8 @@
+from modality_agnostic.memoization import (
+        memoize,
+        )
+
+
 def apply_CUD_attributes_request_to_MDE___(mde, req, listener):
 
     # (long explanation extracted into [#865] "in-depth code explanation")
@@ -63,14 +68,14 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, listener):
         if not __apply_C_and_U(i, mde, groups, apnds, qits, updates, listener):
             return
 
-    return _okay  # whenever failure happened, we short circuited (Case404)
+    return _okay  # whenever failure happened, we short circuited (Case405_404)
 
 
 # == CRAZY INSERTION (CREATE) ALGORITHM
 
 def __crazy_create_validation_and_preparation(mde, creates, listener):
 
-    qits = __longest_tail_anchored_run_of_line_objects_with_attrs_in_order(mde)
+    qits = __longest_tail_anchored_run_of_attribute_body_blocks_in_order(mde)
 
     groups, appends = __determine_insertion_groupings(qits, creates)
 
@@ -87,7 +92,7 @@ def __check_comment_proximity_for_inserts(hed_ok_i, groups, qits, listener):
 
     conditions" than that of the others (done #here1).
 
-    each insertion group is defined in terms of an existing attribute line
+    each insertion group is defined in terms of an existing attribute block
     to insert above. as such there is never a need to check that the
     insertion will touch a comment line below. however it's always necessary
     to check for such a touch above.
@@ -98,13 +103,27 @@ def __check_comment_proximity_for_inserts(hed_ok_i, groups, qits, listener):
 
     problems = []
 
+    # qit = qualified item
+
     def check(qits_i, inserts):
-        if qits[qits_i - 1].line_object.is_comment_line and hed_ok_i != qits_i:
-            problems.append((inserts[0], (True, False, False)))  # as #here3
+        assert(qits_i)
+        blk_above = qits[qits_i - 1].body_block
+        if not blk_above.is_discretionary_block:
+            assert(blk_above).is_attribute_block
+            return
+
+        if hed_ok_i == qits_i:  # #here4
+            return
+
+        if not _is_comment_line(blk_above.discretionary_block_lines[-1]):
+            return
+
+        # (Case405_330)
+        problems.append((inserts[0], (True, False, False)))  # as #here3
 
     itr = iter(groups)
 
-    for qits_i, inserts in itr:
+    for qits_i, inserts in itr:  # #once
         # the TL;DR: is "don't look for the element before the first element".
         # detail: when making the excerpt (upwards) we consumed comment lines
         # greedily (see "greedy"). so it's not possible for an excerpt line
@@ -122,8 +141,8 @@ def __check_comment_proximity_for_inserts(hed_ok_i, groups, qits, listener):
     if len(problems):
         _emit_comment_proximity_problems(problems, listener)
         return _not_ok
-    else:
-        return _okay
+
+    return _okay
 
 
 def __head_OK_excerpt_index(qits, mde):
@@ -134,56 +153,69 @@ def __head_OK_excerpt_index(qits, mde):
     trick we use #here2 :#here4
     """
 
+    # qit = qualified item
+
     head_iid = mde._LL.head_IID()
     if head_iid is None:
         return  # empty document entity
 
     # somehow we know that a non-empty mde implies a non-empty excerpt
 
+    first_qitem = qits[0]
+
     # is the first item of the excerpt also the first item of the mde?
-    if head_iid != qits[0].IID:
+    if head_iid != first_qitem.IID:
         return
 
     # is the first item (of both) a comment line?
-    if not qits[0].line_object.is_comment_line:
+
+    is_comment = False
+    if first_qitem.body_block.is_discretionary_block:
+        _first_line = first_qitem.body_block.discretionary_block_lines[0]
+        is_comment = _is_comment_line(_first_line)
+
+    if not is_comment:
         return
 
-    # is there an attribute line in affnity with these comment lines?
-    idx = None
+    # find the any offset of the first block that is an attribute block (why?)
+    offset = None
     for i in range(1, len(qits)):
-        lo = qits[i].line_object
-        if lo.is_comment_line:
+        blk = qits[i].body_block
+        if blk.is_discretionary_block:
             continue
-        if lo.is_attribute_line:
-            idx = i
+        assert(blk.is_attribute_block)
+        offset = i
         break
 
-    return idx
+    return offset
 
 
 def __determine_insertion_groupings(qits, creates):
     """you have a list of *one* or more CREATE request components and *zero*
 
-    or more line objects constituting a tail-anchored excerpt of the
+    or more blocks constituting a tail-anchored excerpt of the
     existing document entity.
 
-    the tail-anchored excerpt is (as touched on in [#866]) the longest run of
-    document lines anchored to the end of the document entity that have
-    their attribute lines going in order with respect to each other, and
-    include any interceding or bordering runs of comment/whitespace ("c/ws")
-    lines; i.e the matching of c/ws lines is "greedy" in both directions.
+    as touched on in [#866], this "excerpt" is the longest tail-anchored run
+    of the document entity's body blocks where the blocks that are attribute
+    blocks have names in alphabetical order relative to each other.
 
-    for "normal" cases we find the one or more "insertion points" in the list
-    of *lines* into each of we insert a "group" of insertion requests; such
-    that in the final would-be modified lines of the excerpt, the attribute
-    lines are still in order and our comments provision is observed.
+    (the blocks that are not attribute blocks (so, discretionary blocks)
+    are included greedily in this excerpt (so, both upwards and downwards).)
+
+    into this excerpt we look for the one or more "insertion points" where
+    we can insert a "group" of insertion requests; such that in the final
+    would-be modified excerpt, the attribute blocks (new/old/modified all)
+    are are still in order and our comments provision is observed.
 
     you are solving for not only the insertion points but groupings.
 
     we attempt something similar "interleaving" algorithm described in [#407].
     """
 
-    i_a = tuple(i for i in range(0, len(qits)) if qits[i].line_object.is_attribute_line)  # noqa: E501
+    # qits = qualified items
+
+    i_a = tuple(i for i in range(0, len(qits)) if qits[i].body_block.is_attribute_block)  # noqa: E501
 
     o_a = sorted(creates, key=lambda o: o.attribute_name.name_string)
 
@@ -198,7 +230,7 @@ def __determine_insertion_groupings(qits, creates):
         return req_scn.value.attribute_name.name_string
 
     def current_doc_s():
-        return qits[doc_scn.value].line_object.attribute_name.name_string
+        return qits[doc_scn.value].body_block.attribute_name_string
 
     groups = []  # list of tuples of (qits offset, insertion requests)
     group = []
@@ -236,7 +268,7 @@ def __determine_insertion_groupings(qits, creates):
         roll_over_line_and_maybe_group()
         if doc_scn.eos:
             # when you reach the end of the excerpt & you still have inserts
-            # (CREATEs) to make, this is where appends come from. (Case404)
+            # (CREATEs) to make, this is where appends come from. (Case405_404)
 
             a = [req_scn.value]
             req_scn.advance()
@@ -251,14 +283,14 @@ def __determine_insertion_groupings(qits, creates):
     return (groups, appends)
 
 
-def __longest_tail_anchored_run_of_line_objects_with_attrs_in_order(mde):
+def __longest_tail_anchored_run_of_attribute_body_blocks_in_order(mde):
 
     # (we originally wrote this w/ list comprehensions but, reasons)
 
     cache = []
 
-    def add_to_cache(iid, lo):  # lo = line object
-        cache.append(_QualifiedItem(iid, lo))
+    def add_to_cache(iid, blk):  # blk = line object
+        cache.append(_QualifiedItem(iid, blk))
 
     ll = mde._LL
     item_via_IID = ll.item_via_IID
@@ -275,73 +307,83 @@ def __longest_tail_anchored_run_of_line_objects_with_attrs_in_order(mde):
 
     def IIDs_of_attribute_lines_in_reverse():
         for iid in IIDs_in_reverse():
-            lo = item_via_IID(iid)
-            if lo.is_attribute_line:
+            blk = item_via_IID(iid)
+            if blk.is_attribute_block:
                 yield iid
             else:
-                add_to_cache(iid, lo)  # BE CAREFUL
+                add_to_cache(iid, blk)  # BE CAREFUL
 
     # -- with the iterator above
 
-    def identifier_string_of(lo):
-        return lo.attribute_name.name_string
+    def identifier_string_of(blk):
+        return blk.attribute_name_string
 
     itr = IIDs_of_attribute_lines_in_reverse()
 
-    for iid in itr:  # IF THERE'S AT LEAST ONE attribute line
-        lo = item_via_IID(iid)
-        add_to_cache(iid, lo)  # any MDE with at least one attr, yes
-        prev = identifier_string_of(lo)  # establish what to compare others to
+    # the MDE could have zero attribute blocks.
+    # if it has at least one, add it to the list and note its name
+
+    for iid in itr:  # #once
+        blk = item_via_IID(iid)
+        add_to_cache(iid, blk)  # any MDE with at least one attr, yes
+        prev = identifier_string_of(blk)  # establish what to compare others to
         break
 
     for iid in itr:  # IF THERE'S MORE THAN ONE attr line,
-        lo = item_via_IID(iid)
-        curr = identifier_string_of(lo)
+        blk = item_via_IID(iid)
+        curr = identifier_string_of(blk)
         if prev < curr:
             break  # NOTE you didn't cache the out-of-order item
-        add_to_cache(iid, lo)
+        add_to_cache(iid, blk)
         prev = curr  # now, use this new string to make the next compare
 
     return tuple(reversed(cache))  # or as needed
 
 
 class _QualifiedItem:
-    def __init__(self, iid, line_object):
+    def __init__(self, iid, body_block):
         self.IID = iid  # IID = internal identifier (for linked lists)
-        self.line_object = line_object
+        self.body_block = body_block
 
 
 # == CHECK FOR COMMENT LINES ABOVE, ON, AND BELOW
 
 def __U_and_D_comment_proximity_checkerer(problems, mde, listener):
 
-    from .entity_via_identifier_and_file_lines import (
-            COMMENT_TESTER_VIA_MDE as comment_tester_via)
-
+    @memoize
     def checker():
-        two_for_has_comment_via = comment_tester_via(mde, listener)
+
+        from . import entity_via_identifier_and_file_lines as ent_lib
+
+        body_blocks = tuple(mde.to_body_block_stream_as_MDE_())
+
+        two_for_has_comment_via = ent_lib.comment_tester_via_body_blocks_(
+                body_blocks, listener)
         if two_for_has_comment_via is None:
             return
-        offset_via_gist, line_objects = __build_line_number_index(mde)
-        lowest_offset = len(line_objects) - 1
+
+        offset_via_gist = __build_offset_via_gist(body_blocks, listener)
+
+        last_offset = len(body_blocks) - 1
 
         def check(cmpo):  # :#here1
+
             is_comment_above = False
             is_comment_on_line = False
             is_comment_below = False
 
             attr_name = cmpo.attribute_name
             gist = attr_name.name_gist
-            line_offset = offset_via_gist[gist]
+            body_block_offset = offset_via_gist[gist]
 
             # is there a comment above?
-            if line_offset:
-                if line_objects[line_offset - 1].is_comment_line:
+            if body_block_offset:
+                if _last_line_is_comment(body_blocks[body_block_offset - 1]):
                     is_comment_above = True
 
             # is there a comment below?
-            if line_offset != lowest_offset:
-                if line_objects[line_offset + 1].is_comment_line:
+            if body_block_offset != last_offset:
+                if _first_line_is_comment(body_blocks[body_block_offset + 1]):
                     is_comment_below = True
 
             # does this line contain a comment? (Case239).
@@ -363,17 +405,33 @@ def __U_and_D_comment_proximity_checkerer(problems, mde, listener):
     return checker
 
 
-def __build_line_number_index(mde):
-    line_objects = []
-    offset_via_gist = {}
+def _last_line_is_comment(blk):
+    if not blk.is_discretionary_block:
+        return False
+    return _is_comment_line(blk.discretionary_block_lines[-1])
 
-    for lo in mde.TO_BODY_LINE_OBJECT_STREAM():
-        if lo.is_attribute_line:
-            gist = lo.attribute_name.name_gist
-            offset_via_gist[gist] = len(line_objects)
-        line_objects.append(lo)
 
-    return (offset_via_gist, line_objects)
+def _first_line_is_comment(blk):
+    if not blk.is_discretionary_block:
+        return False
+    return _is_comment_line(blk.discretionary_block_lines[0])
+
+
+def _is_comment_line(line):
+    return '#' == line[0]  # #[#867.F]
+
+
+def __build_offset_via_gist(body_blocks, listener):
+
+    # make this function
+    gist_via_s = _blocks_lib().attribute_name_functions_().name_gist_via_name
+
+    def gist_of(blk):
+        return gist_via_s(blk.attribute_name_string, listener)
+
+    # make this index
+    _ = ((i, body_blocks[i]) for i in range(0, len(body_blocks)))
+    return {gist_of(blk): i for (i, blk) in _ if blk.is_attribute_block}
 
 
 def _emit_comment_proximity_problems(problems, listener):
@@ -405,36 +463,36 @@ def _emit_comment_proximity_problems(problems, listener):
 
 def __check_for_necessary_presence_or_absence(mde, req, listener):
 
-    def add_problem(typ, cmpo, al=None):
-        problems.append((typ, cmpo, al))
+    def add_problem(typ, cmpo, blk=None):
+        problems.append((typ, cmpo, blk))
 
     problems = []
 
     for cmpo in req.components:
         an = cmpo.attribute_name
-        al = mde.any_attribute_line_via_gist(an.name_gist)
+        blk = mde.any_block_via_gist__(an.name_gist)
         if cmpo.attribute_must_already_exist_in_entity:
 
             # it must already exist in entity..
 
-            if al is None:  # .. but no such attr by gist
+            if blk is None:  # .. but no such attr by gist
                 add_problem('missing', cmpo)  # (Case148)
             else:
                 # .. and is found by gist
 
                 surface_requested_name = an.name_string
-                surface_existent_name = al.attribute_name.name_string
+                surface_existent_name = blk.attribute_name_string
 
                 if surface_requested_name == surface_existent_name:
                     pass  # win! maybe you can UPDATE/DELETE this (Case239)
                 else:
-                    add_problem('missing', cmpo, al)
-        elif al is None:
+                    add_problem('missing', cmpo, blk)
+        elif blk is None:
             # it must not already exist in entity and was not found by gist
             pass  # win! maybe you can CREATE this component (Case420)
         else:
             # it must not already exist in entity but was found by gist
-            add_problem('collision', cmpo, al)  # (Case125)
+            add_problem('collision', cmpo, blk)  # (Case125)
 
     if len(problems):
         __complain_about_presence_problems(problems, listener)
@@ -444,11 +502,11 @@ def __check_for_necessary_presence_or_absence(mde, req, listener):
 
 
 def __complain_about_presence_problems(problems, listener):
-    """each problem is ('collision'|'missing', cmpo [,al])"""
+    """each problem is ('collision'|'missing', cmpo [,blk])"""
 
     via_verb = {}
 
-    for colli_or_miss, cmpo, al in problems:
+    for colli_or_miss, cmpo, blk in problems:
         verb = cmpo.lowercase_verb_string
         if verb in via_verb:
             a = via_verb[verb][1]
@@ -456,7 +514,7 @@ def __complain_about_presence_problems(problems, listener):
             a = []
             via_verb[verb] = (cmpo.__class__, colli_or_miss, a)
 
-        a.append((cmpo, al))  # include al as none for (Case170)
+        a.append((cmpo, blk))  # include blk as none for (Case170)
 
     long_sp_a = []
     for verb, (cls, colli_or_miss, arg_a) in via_verb.items():
@@ -492,26 +550,27 @@ def __apply_C_and_U(head_ok_i, mde, groups, appends, qits, updates, listener):
     appends are what they sound like (and penalty same, meh). but also
     """
 
-    yikes = __make_new_lines(updates, groups, appends, listener)
+    blk_via = __make_new_blocks(updates, groups, appends, listener)
 
     def new_attr(compo):
-        return yikes[compo.attribute_name.name_string]
+        return blk_via[compo.attribute_name.name_string]
 
     for qits_i, inserts in groups:
 
         iid = qits[qits_i].IID
 
-        if head_ok_i == qits_i:  # finish #here4 (Case443)
+        if head_ok_i == qits_i:
+            # finish #here4 (Case405_443)
             # don't insert before the attribute line, insert before
             # the top comment (which must be the top of the world item)
 
-            iid = mde.insert_line_object(_blank_line(), qits[0].IID)
+            iid = mde.insert_body_block(_blank_line(), qits[0].IID)
 
         # within each insertion group we *do* have to do the insertions in
         # reverse order b.c insertions are expressed in ref to item after
 
         for insert in reversed(inserts):
-            iid = mde.insert_line_object(new_attr(insert), iid)
+            iid = mde.insert_body_block(new_attr(insert), iid)
 
     # if the group of appends touches a comment line (so, a tail-anchored one)
     # we can do a trick only available for {head|tail}-anchored comment lines
@@ -519,64 +578,81 @@ def __apply_C_and_U(head_ok_i, mde, groups, appends, qits, updates, listener):
     # (only at head an tail do you know that your comment-line-touching
     # insertion does not break an association.)
 
-    if len(appends) and len(qits) and qits[-1].line_object.is_comment_line:
-        mde.append_line_object(_blank_line())  # (Case404)
+    if len(appends) and len(qits) and _first_line_is_comment(qits[-1].body_block):  # noqa: E501
+        mde.append_body_block(_blank_line())  # (Case405_404), (Case715)
 
     for append in appends:
-        mde.append_line_object(new_attr(append))  # (Case404)
+        mde.append_body_block(new_attr(append))  # (Case405_404)
 
     for update in updates:
-        mde.replace_line_object__(new_attr(update))  # (Case352)
+        mde.replace_attribute_block__(new_attr(update))  # (Case352)
 
     return _okay
 
 
-def __make_new_lines(updates, groups, appends, listener):
-    """use real life vendor toml library to "encode" .."""
+@memoize
+def _blank_line():
+    return _blocks_lib().AppendableDiscretionaryBlock_('\n')
 
-    from .blocks_via_file_lines import attribute_line_via_line  # noqa: E501
-    import toml
 
-    yikes = {}
+def __make_new_blocks(updates, groups, appends, listener):
+    """in order to "encode" the values, use the real life toml library..
+
+    (Case405_352)
+    """
+
+    # turn everything into a dictionary of the key-value pairs
+    dct = __values_dictionary_via(updates, groups, appends)
+
+    # turn the dictionary into a toml big string
+    from toml import dumps as toml_dumps  # another #[#867.K]
+    _big_s = toml_dumps(dct)  # ..
+    _lines = lines_via_big_string_(_big_s)
+
+    # turn the big string into a parsed block
+
+    from . import entities_via_collection as ents_lib
+    _table_block = ents_lib.table_block_via_lines_and_table_start_line_object_(
+            lines=_lines,
+            table_start_line_object=None,
+            listener=listener)
+
+    # turn the parsed block into
+
+    return {o.attribute_name_string: o for o in _table_block.to_body_block_stream_as_table_block_()}  # noqa: E501
+
+
+def __values_dictionary_via(updates, groups, appends):
+    # worrying about how to encode multiline is out of scope for now [#867.J]
+
+    dct = {}
+
+    def add_pair(compo):
+        mixed = compo.unsanitized_value
+        if isinstance(mixed, str) and '\n' in mixed:
+            cover_me('OMG multiline')
+        dct[compo.attribute_name.name_string] = mixed
+
     for update in updates:
-        yikes[update.attribute_name.name_string] = update.unsanitized_value
+        add_pair(update)
+
     for _, compos in groups:
         for compo in compos:
-            yikes[compo.attribute_name.name_string] = compo.unsanitized_value
+            add_pair(compo)
+
     for append in appends:
-        yikes[append.attribute_name.name_string] = append.unsanitized_value
+        add_pair(append)
 
-    big_s = toml.dumps(yikes)  # ..
-
-    res = {}
-    for line in _lines_via_big_string(big_s):
-        al = attribute_line_via_line(line, listener)
-        if al is None:
-            raise Exception("cover me - value couldn't be encoded?")
-        res[al.attribute_name.name_string] = al
-    return res
-
-
-def _lines_via_big_string(big_s):  # ..
-    pos = 0
-    stop_here = len(big_s)
-    while True:
-        i = big_s.find('\n', pos)
-        next_pos = i + 1
-        yield big_s[pos:next_pos]
-        if stop_here == next_pos:
-            break
-        pos = next_pos
+    return dct
 
 
 def __flush_deletes(mde, deletes):
     for delete in deletes:
         _gist = delete.attribute_name.name_gist
-        mde.delete_attribute_line_object_via_gist__(_gist)
+        mde.delete_attribute_body_block_via_gist__(_gist)
 
 
 # == SUPPORT
-
 
 class _Scanner():
     """
@@ -608,15 +684,28 @@ class _Scanner():
         advance()
 
 
+# == WHINERS
+
 def _emit_request_error_via_reason(msg, listener):
     def structure():
         return {'reason': msg}
     listener('error', 'structure', 'request_error', structure)
 
 
-def _blank_line():
-    from .blocks_via_file_lines import newline_line_object_singleton as _
-    return _
+# ==
+
+def lines_via_big_string_(big_s):  # (copy-paste of [#610].)
+    import re
+    return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
+
+
+def _blocks_lib():
+    from . import blocks_via_file_lines as blk_lib
+    return blk_lib
+
+
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
 _not_ok = False

@@ -449,12 +449,13 @@ def _create_entity(
 
 def _create_MDE_via_ID_and_request(identifier_string, req, listener):
 
-    from .blocks_via_file_lines import (
-        mutable_document_entity_via_identifer_and_body_lines as _,
-        )
+    from . import identifiers_via_file_lines as ids_lib
 
-    mde = _((), identifier_string, 'attributes', listener)
-    assert(mde)
+    _tslo = ids_lib.TSLO_via(identifier_string, 'attributes')
+
+    from . import blocks_via_file_lines as blk_lib
+
+    mde = blk_lib.MDE_via_TSLO_(_tslo)
 
     _ok = req.edit_mutable_document_entity_(mde, listener)
 
@@ -462,7 +463,7 @@ def _create_MDE_via_ID_and_request(identifier_string, req, listener):
         cover_me('like when?')
         return
 
-    return mde
+    return mde  # (Case764)
 
 
 def _request_via_cuds(cuds, listener):
@@ -480,24 +481,24 @@ def _retrieve_entity(identifier, file_path, listener):
     """
 
     from .entity_via_identifier_and_file_lines import (
-            entity_via_identifier_and_file_lines as MDE_via,
+            entity_via_identifier_and_file_lines as DE_via,
             entity_dict_via_entity_big_string__ as dict_via,
             )
 
     id_s = identifier.to_string()
 
     with open(file_path) as lines:  # file existed last we checked #here1
-        mde = MDE_via(id_s, lines, listener)
+        de = DE_via(id_s, lines, listener)
 
-    if mde is None:
+    if de is None:
         return  # (Case710)
 
     # (Case711):
 
-    assert(mde.table_type == 'attributes')
-    assert(mde.identifier_string == id_s)
+    assert(de.table_type == 'attributes')
+    assert(de.identifier_string == id_s)
 
-    _big_string = ''.join(mde.to_line_stream())
+    _big_string = ''.join(de.to_line_stream())
 
     return dict_via(_big_string, listener)
 

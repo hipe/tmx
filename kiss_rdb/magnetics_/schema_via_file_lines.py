@@ -2,6 +2,9 @@ from modality_agnostic.memoization import (
         memoize,
         )
 
+# (this is :[#867.K] the main place we use the toml vendor lib
+# but there may be more.)
+
 
 def SCHEMA_VIA_COLLECTION_PATH(collection_path, listener):
     from os import path as os_path

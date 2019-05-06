@@ -1,17 +1,28 @@
-from .identifiers_via_file_lines import (
-        ErrorMonitor_,
+"""this module contains:
+
+it contains:
+
+  - implementation of RETRIEVE as a flip-flop from one to another actions. (!)
+
+  - a byzantine expanse of support code for dealing with detecting whether
+    attribute blocks have comments in them, for a safeguard feature.
+
+history:
+
+  - at #history-A.3 this lost hosting of contact with the vendor-parsing lib
+  - at #history-A.2 this module became home to RETRIEVE
+
+wishlist:
+
+  - OCD: the RETRIEVE of every non-final doc ent creates a wasted TSLO.
+    this could be "fixed" by creating a new actions that sends a stop instead.
+"""
+
+
+from .identifiers_via_file_lines import (  # also as grammar_lib belo
         not_ok, okay, stop,
         )
 import re
-
-
-"""mainly, be the soul point of contact with the vendor parsing library
-   (but this moved at #history-A.3)
-"""
-
-"""secondarily, a hack for parsing strings to detect in-line comments."""
-
-"""new in this commit, house RETRIEVE (at #history-A.2)"""
 
 
 def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
@@ -20,167 +31,152 @@ def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
     behavior:
       - stop at first match
       - stop searching at first greater than
-
-    implementation:
-      - compose a higher-level line-stream parser from a lower-level one
-      - state machine trick of flipping-on line recording
-      - one day we will need to expose it maybe
-      - functional because we can
     """
 
-    def main():
-        tup = validate_for_one_attributes_table()
-        if tup is None:
-            return
-        otl, lines = tup
+    return _Main(id_s, all_lines, listener).main()
 
-        from .blocks_via_file_lines import (
-                mutable_document_entity_via_open_table_line_and_body_lines as entity_via)  # noqa: E501
-        return entity_via(otl, lines, listener)
 
-    def validate_for_one_attributes_table():
-        # (mostly placeholder logic for future feature 1)
+class _Main:
+    """the implementation of the above.
 
-        a = contiguous_tables()
-        if a is None:
-            return
+    implementaton:
+      - compose a higher-level line-stream parser from a lower-level one
+      - amazingly, our state machine allows us to HOT-SWAP the actions #histA4
+    """
 
-        length = len(a)
-        if 1 == length:
-            first = a[0]
-        elif 2 == length:
-            first, second = a
-        else:
-            __emit_too_many_adjacent_same_identifiers(length, id_s, listener)
-            return  # (Case282)
+    def main(self):
 
-        signature = tuple(tup[0].table_type for tup in a)  # #here3
+        self.find_the_first_table_start_line_equal_or_greater()
 
-        if ('attributes',) == signature:
-            result = first
-        elif ('meta', 'attributes') == signature:
-            cover_me()  # future feature 1
-        elif ('meta',) == signature:
-            cover_me()  # future feature 1
-        else:
-            # ('attributes', 'meta')
-            # ('attributes', 'attributes')
-            # ('meta', 'meta')
-            cover_me()  # invalid file
-
-        return result
-
-    def contiguous_tables():
-        # it's too gross to try to validate well-formedness while messing
-        # with capturing body lines. so all we do here is "scoop" all
-        # contiguous table-sections from the current point that also have
-        # the ID. validate next.
-
-        found_otl = None
-        might_be_out_of_order = False
-        for otl in otl_itr:
-            curr_id_s = otl.identifier_string
-            if id_s == curr_id_s:
-                found_otl = otl
-                break
-            if id_s < curr_id_s:
-                might_be_out_of_order = True
-                break
-
-        if not monitor.ok:
-            return  # e.g not well-formed file
-
-        if found_otl is None:
-            __emit_not_found(might_be_out_of_order, id_s, listener)
+        if not self.OK or not self.found:
             return
 
-        # the last line that was consumed abve is the first line that matched
-        # the argument ID (the open-table line). record the subsequent lines.
-        # only once we have begun parsing can we get the parse state (for now)
+        self.change_the_parse_actions()
 
-        parse_state = parse_state_pointer.release_value()
-
-        lines = []
-
-        def f():
-            lines.append(parse_state.line)
-
-        parse_state.on_line_do_this(f)
-
-        gulps = []
-        do_exclude_last_line = True
-
-        def swallow():
-            if do_exclude_last_line:
-                lines.pop()
-            gulps.append((found_otl, lines))  # :#here3
-
-        do_swallow = True
-        for otl in otl_itr:
-            swallow()  # once you've gotten to whatever next table
-            if id_s == otl.identifier_string:
-                found_otl = otl
-                lines = []
-                continue
-            do_swallow = False  # because you traversed and swallowed above
+        for appendable_table_block in self._item_itr:  # once
             break
 
-        # we got past the above loop either because there were no more
-        # open-table lines OR because (more likely) we found an open table
-        # line that didn't match exactly the ID for which we are scooping
-        # adjacent tables. whether or not we have to do one extra trailing
-        # swallow depends on which.
+        return appendable_table_block  # (Case253) (again)
 
-        if do_swallow:
-            do_exclude_last_line = False  # (Case272)
-            swallow()
+    def __init__(self, id_s, all_lines, listener):
 
-        return gulps
+        # build our parser "by hand" so we have a handle on the parse state
 
-    monitor = ErrorMonitor_(listener)  # see
+        from . import identifiers_via_file_lines as grammar_lib
 
-    # -- begin gross hack to be able to reach in and get parse state
+        mon = grammar_lib.ErrorMonitor_(listener)
 
-    parse_state_pointer = _Pointer()
+        _sm = grammar_lib.state_machine_
 
-    def actionser(ps):
-        parse_state_pointer.set_value(ps)
-        pa = lower_lib.Actions_for_ID_Traversal_Non_Validating_(ps)
+        ps = _sm.build_parse_state(
+                listener=mon.listener,
+                actions_class=grammar_lib.Actions_for_ID_Traversal_Non_Validating_,  # noqa: E501
+                )
 
-        def f(name):
-            return getattr(pa, name)
-        return f
+        self._item_itr = ps.items_via_all_lines_(all_lines)
 
-    from . import identifiers_via_file_lines as lower_lib
-    otl_itr = lower_lib.parse_(all_lines, actionser, monitor.listener)
+        self._parse_state = ps
+        self._target_IID_string = id_s
+        self._monitor = mon
 
-    # -- end
+    def change_the_parse_actions(self):
+        """this is the craziest thing...
 
-    return main()
+        CHANGE THE PARSE ACTIONS MID PARSE (Case253)
+        """
+
+        # hack a new parse actions to be as if it has started w/ the new table
+        ts = self._table_start
+        del(self._table_start)
+        from . import blocks_via_file_lines as block_lib
+        actions = block_lib.ActionsForCoarseBlockParse_(self._parse_state)
+        actions.begin_table_with_(ts)
+
+        # inject into into the LIVE PARSE STATE OMG
+        def f(distinct_transition_name):
+            return getattr(actions, distinct_transition_name)
+        self._parse_state.RECEIVE_ACTION_VIA_TRANSITION_NAME(f)
+
+    def find_the_first_table_start_line_equal_or_greater(self):
+
+        self.found = False
+        did_break = False
+
+        target_id_s = self._target_IID_string
+
+        for ts in self._item_itr:
+            curr_id_s = ts.identifier_string
+
+            # if exact match (string comparison!), you are done
+            if target_id_s == curr_id_s:
+                self.found = True
+                did_break = True
+                break
+
+            # as soon as you ecounter one identifier that is "greater"
+            # (numerically or lexically, same thing) than your target, then
+            # you don't need to keep searching because you won't ever find it.
+
+            if target_id_s < curr_id_s:
+                did_break = True
+                break
+
+            """(assume a valid file; i.e., valid identifiers of uniform depth &
+            same depth as target. it is in this way that an out-of-order file
+            will make some of its entities unretrievable and so is corrupt. but
+            per [#864] broad provision 3 it's out-of-scope to check these here.
+            here we just assume the file is well-formed & ordered.)
+            """
+
+        if not self._monitor.ok:
+            # e.g an error in parsing the file. something emitted so it's
+            # ugly to also emit that the entity was not found.
+            return
+
+        if not self.found:
+            _emit_not_found(
+                    listener=self._use_listener(),
+                    did_traverse_whole_file=not did_break,
+                    identifier_string=self._target_IID_string)
+            self.OK = False
+            return
+
+        if 'attributes' != ts.table_type:
+            # future feature 1 - meta tables (Case282)
+            _emit_table_type_not_yet_implemented(self._use_listener(), ts)
+            self.OK = False
+            return
+
+        self._table_start = ts
+        self.OK = True
+
+    def _use_listener(self):
+        # emit into this listener to get context enhancement
+        return self._parse_state.listener
 
 
-def COMMENT_TESTER_VIA_MDE(mde, listener):
+def comment_tester_via_body_blocks_(body_blocks, listener):
     """implement exactly what [#866] exists to describe.
 
-    given a mutable document entity `mde`, result (if successful) is a
-    function. the function is described below, where it is defined.
+    given a table block, result (if successful) is a function. the function
+    is described below, where it is defined.
     """
-
-    line_objects = tuple(mde.TO_BODY_LINE_OBJECT_STREAM())
-    build_listener = listener
-    del(listener)
 
     # is the would-be document entity (that coarse parsed) actually toml?
 
-    _big_string = ''.join(lo.line for lo in line_objects)
-    dct = _vendor_parse(_big_string, build_listener)
+    def to_body_line_stream():
+        for bb in body_blocks:
+            for line in bb.to_line_stream():
+                yield line
+    _big_string = ''.join(to_body_line_stream())
+    dct = _vendor_parse(_big_string, listener)
     if dct is None:
         return  # (Case290)
 
     # does it look like the coarse parse parsed it correctly?
 
-    if not __check_name_sets(dct, line_objects, build_listener):
-        return  # (Case297)
+    if not __check_name_sets(dct, body_blocks, listener):
+        return
 
     def yes_no_attribute_line_has_comment(an_s, listener):
         """attempt to indicate whether or not an attribute line has a comment.
@@ -201,18 +197,17 @@ def COMMENT_TESTER_VIA_MDE(mde, listener):
         :#here1 tags all the places that effect this return shape.
         """
 
-        def the_easy_way():
-            _yes_no = '#' in line_object().line  # straight from the pseudocode
-            return (okay, _yes_no)  # #here1
+        attr_blk = KV_block_via_attr_name_string[an_s]
 
-        def line_object():
-            return line_object_via_ANS[an_s]
+        def the_easy_way():
+            _yes_no = '#' in attr_blk.line  # straight from the pseudocode
+            return (okay, _yes_no)  # #here1
 
         x = dct[an_s]  # "vendor value"
 
         if isinstance(x, str):
             # step into the fun part of the problem.
-            return __zomg_parse_the_string(line_object(), listener)
+            return __yes_no_string_attribute_line_has_commment(attr_blk, listener)  # noqa: E501
         elif isinstance(x, bool):  # NOTE test bool before int! is-a
             return the_easy_way()  # (Case316) (Case322)
         elif isinstance(x, int):
@@ -228,18 +223,52 @@ def COMMENT_TESTER_VIA_MDE(mde, listener):
         else:
             assert(False)  # that's all the types there is according to the doc
 
-    line_object_via_ANS = {lo.attribute_name.name_string: lo for lo in line_objects if lo.is_attribute_line}  # noqa: E501
+    KV_block_via_attr_name_string = {blk.attribute_name_string: blk for blk in body_blocks if blk.is_attribute_block}  # noqa: E501
     import datetime
 
     return yes_no_attribute_line_has_comment
 
 
-def __zomg_parse_the_string(line_object, listener):
+def __yes_no_string_attribute_line_has_commment(attr_blk, listener):
+    """
+    YIKES
+    """
+
+    if attr_blk.is_multi_line_attribute_block:
+        return __yes_no_multi_line_string_attribute_block_has_comment(
+                attr_blk, listener)
+    else:
+        return __yes_no_single_line_string_attribute_block_has_comment(
+                attr_blk, listener)
+
+
+def __yes_no_multi_line_string_attribute_block_has_comment(attr_blk, listener):
+    """DISCUSSION: oops we wrote this assuming it was possible to have a
+
+    comment after the closing delimiters in a multi-line string. it appears
+    that it is not. so now this is just a contact exercise.
+    """
+
+    line = attr_blk.last_line__()
+
+    # get everything in the string beyond the last quote
+    needle = attr_blk.which_quote___()
+    _offset = line.index(needle)
+    the_rest = line[(_offset + len(needle)):]
+
+    if '\n' == the_rest:
+        return _there_is_no_comment
+    else:
+        assert(False)
+
+
+def __yes_no_single_line_string_attribute_block_has_comment(attr_blk, listener):  # noqa: E501
+
     # the most interesting part of all this. what [#866] was created for.
     # all of this is a hack and should go away after etc.
 
-    line = line_object.line
-    position = line_object.position_of_start_of_value
+    line = attr_blk.line
+    position = attr_blk.position_of_start_of_value
 
     md = _open_quote.match(line, position)
     multi_basic, basic, multi_literal, literal = md.groups()  # #here2
@@ -255,10 +284,10 @@ def __zomg_parse_the_string(line_object, listener):
         return stop  # #here1
 
     if multi_basic is not None:
-        return _not_yet('multi-line basic string')  # (Case378)
+        assert(False)  # this was (Case378), is now elsewhere
 
     elif multi_literal is not None:
-        return _not_yet('multi-line literal string')  # (Case366)
+        assert(False)  # this was (Case366)
 
     elif literal is not None:
         return _not_yet('literal string')  # (Case372)
@@ -367,16 +396,32 @@ _there_is_no_comment = (okay, False)
 _there_is_a_comment = (okay, True)
 
 
-def __check_name_sets(dct, line_objects, listener):
-    """per [#866], ensure that the two sets of names are the same"""
+def __check_name_sets(dct, body_blocks, listener):
+    """DISCUSSION:
 
-    by_coarse = set(o.attribute_name.name_string for o in line_objects if o.is_attribute_line)  # noqa: E501
+    .#history-A.4 was when we introduced support for multi-line strings.
+    before then, if a big string had a line within it that sorta looked like
+    a key-value line, it would get false-positive matched as such.
+
+    back then it was necessary to at detect & bork on this case.
+
+    now this particular circumstance is no longer possible (we think!),
+    however we leave this intact because it is a good sanity check for our
+    coarse-parse hack.
+
+    this is discusseed in [#866]. (Case303)
+    """
+
+    by_coarse = set(o.attribute_name_string for o in body_blocks if o.is_attribute_block)  # noqa: E501
     by_vendor = set(dct.keys())
     extra_by_coarse = by_coarse - by_vendor
     extra_by_vendor = by_vendor - by_coarse
 
     if len(extra_by_coarse):
-        def f():  # (Case297)
+        cover_me('this became detached and uncoverable')  # (see 2 lines below)
+
+        def f():
+            # (used to get hit by (Case297) before #history-A.4. now cannot.)
             from .state_machine_via_definition import oxford_AND
             _ = oxford_AND(tuple(repr(s) for s in extra_by_coarse))
             s = '' if 1 == len(extra_by_coarse) else 's'
@@ -432,26 +477,34 @@ def _vendor_parse(big_string, listener):  # #testpoint
 
 # == all emissions in one place because why not
 
-def __emit_not_found(might_be_out_of_order, id_s, listener):  # (Case259)
+def _emit_not_found(listener, did_traverse_whole_file, identifier_string):
     def f():
-        if might_be_out_of_order:
-            which = 'not found'  # (Case259)
-        else:
+        if did_traverse_whole_file:
             which = 'not in file'  # (Case263)
+        else:
+            which = 'not found'  # (Case259)
         return {
-                'reason': f'{repr(id_s)} { which }',
-                'might_be_out_of_order': might_be_out_of_order,
-                'identifier_string': id_s,
+                'reason': f'{repr(identifier_string)} { which }',
+                'did_traverse_whole_file': did_traverse_whole_file,
+                'identifier_string': identifier_string,
                 'input_error_type': 'not_found',
                 }
     _emit_input_error_via_structurer(f, listener)
 
 
-def __emit_too_many_adjacent_same_identifiers(length, id_s, listener):
+def _emit_table_type_not_yet_implemented(listener, ts):
 
-    # weird edge errors don't deserve a lot of lines of code :P
-    _ = f'item {repr(id_s)} has {length} adjacent tables (2 is max)'
-    _emit_input_error_via_reason(_, listener)
+    _pos = (1 + len('item') + 1 + len(ts.identifier_string) + 1 + 1) - 1
+    # EEW: '['  'item'       '.'  'ABC'                      '.' 'm' off by one
+
+    _tt = ts.table_type
+
+    def f():
+        return {
+                'reason': f"table type '{_tt}' not yet implemented",
+                'position': _pos,
+                }
+    _emit_input_error_via_structurer(f, listener)
 
 
 def __emit_toml_decode_error(e, listener):
@@ -481,32 +534,11 @@ def _emit_input_error_via_structurer(f, listener):
     listener('error', 'structure', 'input_error', f)
 
 
-class _Pointer:
-    """we wouldn't need this experimental weirdness if we were doing the
-
-    work in the context of a class (mutable object); but since this one thing
-    is the only place there we need this kind of mutability (set a value from
-    within a "callback" (function)); we would rather just have this small
-    class than add the cognitive weight of a big one. alternative: `nonlocal`
-    """
-
-    def __init__(self):
-        self._mutex = None
-
-    def set_value(self, x):
-        del self._mutex
-        self._value = x
-
-    def release_value(self):
-        x = self._value
-        del self._value
-        return x
-
-
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
+# #history-A.4: hot-swap actions. data-model change from line- to block-based
 # #history-A.3: the integration for parsing toml with vendor lib is moved
 # #history-A.2: house RETRIEVE
 # #history-A.1: spike hand-written surface-string string parser

@@ -145,8 +145,15 @@ def _express_error_structure(error_category, struct):  # (Case819)
         if 'input_error' == error_category:
             typ = dim_pool.pop('input_error_type')
             if 'not_found' == typ:
+
+                # == (Case818)
                 dim_pool.pop('identifier_string')
-                dim_pool.pop('might_be_out_of_order')
+                dim_pool.pop('did_traverse_whole_file')
+                dim_pool.pop('did_reach_end_of_stream')
+                dim_pool.pop('lineno')
+                dim_pool.pop('line')
+                # == END
+
                 assert(0 == len(dim_pool))
             elif 'collection_not_found' == typ:
                 assert(0 == len(dim_pool))  # (Case812)
@@ -171,7 +178,7 @@ def cli_for_production():
     where:
       - when a file write/rewrite is committed, actually commit the rewrite.
       - do something real and not contrived for the random number generator
-      - NOTE all the print commands #todo
+      - NOTE all the print commands are messy and temporary #todo-soon
 
     (spiked without coverage at #hisory-A.1.)
     """
@@ -199,7 +206,7 @@ def cli_for_production():
 
         # currently, never returning 0 is our hackish way of leaving '222'
         # (the first identifier, as int 0) unoccupied (so int 0 is never an
-        # ID.) this is a vv fragile way of doing this #todo
+        # ID.) this is a vv fragile way of doing this. #open [#867.V]
 
         num = random.randrange(1, pool_size)
         print(f'\nRANDOM: {num} of {pool_size}')

@@ -23,13 +23,29 @@ the linear composition of the existing document entity to preserve
 new composition (order) to determine deterministically, but we have
 all the craziness of our comments provision to worry about.
 
+that is:
+
+  - unlike SQL-like table which has a single, fixed order of its columns;
+    each entity within a collection can have its own distinct ordering of
+    its name-value pairs. (this is considered neither a feature nor a bug,
+    it's just the principle of least astonishment.)
+
+  - when we have a new incoming entity being CREATed, we need to serialize
+    its attributes into some order. we want to do this in some principled
+    manner. (crudely we might do it alphabetically. more advanced might be
+    using a "schema" but etc you can imagine complications..)
+
+  - unlike sane, production-grade databases; we offer the mischiveous
+    mis-feature of whitespace and comments being allowed in the storage
+    text files. more on this provision now:
+
 the provision is something like this: when machine-editing a document,
 we never want to break an existing association between a comment line an
 attribute (key-value) line; and as far as the machine is concerned, this
 association exists (or might exist) if the comment line and the attribute
 line are touching (in either order).
 
-most of the algorithmic work, then, in this docuement (and its counterpart
+most of the algorithmic work, then, in this document (and its counterpart
 asset) is concerned with checking this comment provision, working around it
 where possible, and the deterministic determination (eek) of groupings and
 insertion points for CREATE (explored below).
@@ -183,12 +199,7 @@ insertion points for CREATE (explored below).
     later. for now, remove the dashes as part of producing a "gist" for
     a key. (more later, near "gist".)
 
-  - no multiline values. (our hackish line-by-line parsng won't guarantee
-    this but we'll try to get a "good-enough" level of certainty with this.
-    we should at least do a validation pass after the edit to confirm that
-    the set of names in the vendor-parsed dictionary is as expected, and that
-    the any values that are strings contain none of a certain set/range of
-    characters? not sure here. again maybe check for `"""` near #here4.)
+  - .[#867.J] IN FLUX somethng about #here4
 
 
 
@@ -236,7 +247,7 @@ for every line *after* the open table (section) line:
   - if it looks like a key-value line,
 
       - sadly, offhand we can't think of a reliable way to ensure that
-        the line doesn't begin a multiline value except checking for `"""`
+        the line doesn't begin a multi-line value except checking for `"""`
         which we might do. and/or checking for the shorthand table thing..
         (:#here4)
 

@@ -1,4 +1,6 @@
 from _common_state import (
+        MDE_via_lines_and_table_start_line_object,
+        TSLO_via,
         debugging_listener as _debugging_listener,
         unindent as _unindent,
         )
@@ -63,8 +65,8 @@ class _CommonCase(unittest.TestCase):
     def expect_big_success(self):
         listener = None  # _DEBUGGING_LISTENER
         _mde = self.run_CUD_attributes(listener)
-        _act = list(o.line for o in _mde.TO_BODY_LINE_OBJECT_STREAM())
-        _exp = list(_unindent(self.expect_entity_body_lines()))
+        _act = tuple(TO_BODY_BLOCK_LINES_AS_MDE(_mde))
+        _exp = tuple(_unindent(self.expect_entity_body_lines()))
         self.assertSequenceEqual(_act, _exp)
 
     def run_CUD_attributes(self, listener):
@@ -86,7 +88,7 @@ class _CommonCase(unittest.TestCase):
         return _debugging_listener()
 
 
-class Case011_when_request_empty(_CommonCase):
+class Case405_011_when_request_empty(_CommonCase):
 
     def test_100_reason(self):
         self.expect_reason('request was empty')
@@ -95,7 +97,7 @@ class Case011_when_request_empty(_CommonCase):
         return _request_via_tuples((), listener)
 
 
-class Case034_strange_verbs(_CommonCase):
+class Case405_034_strange_verbs(_CommonCase):
 
     def test_100_reason(self):
         self.expect_reason('unrecognized verb(s): (fiz, bru-zuz)')
@@ -105,7 +107,7 @@ class Case034_strange_verbs(_CommonCase):
             (('fiz', 'a'), ('delete', 'x'), ('bru-zuz', 'x')), listener)
 
 
-class Case057_wrong_looking_attribute_name(_CommonCase):
+class Case405_057_wrong_looking_attribute_name(_CommonCase):
 
     def test_100_input_error(self):
         chan, sct = self.expect_error_structure()
@@ -121,7 +123,7 @@ class Case057_wrong_looking_attribute_name(_CommonCase):
             ), listener)
 
 
-class Case080_duplicate_names_within_request(_CommonCase):
+class Case405_080_duplicate_names_within_request(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -144,7 +146,7 @@ class Case080_duplicate_names_within_request(_CommonCase):
             ), listener)
 
 
-class Case102_names_too_similar_within_request(_CommonCase):
+class Case405_102_names_too_similar_within_request(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[1]
@@ -168,7 +170,7 @@ class Case102_names_too_similar_within_request(_CommonCase):
             ), listener)
 
 
-class Case125_cannot_create_when_attributes_already_exist(_CommonCase):
+class Case405_125_cannot_create_when_attributes_already_exist(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._right()
@@ -207,7 +209,7 @@ class Case125_cannot_create_when_attributes_already_exist(_CommonCase):
         """
 
 
-class Case148_cannot_delete_because_attributes_not_found(_CommonCase):
+class Case405_148_cannot_delete_because_attributes_not_found(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -238,7 +240,7 @@ class Case148_cannot_delete_because_attributes_not_found(_CommonCase):
         """
 
 
-class Case170_cannot_delete_because_attributes_not_exact_match(_CommonCase):
+class Case405_170_cannot_delete_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
 
     def test_100_context(self):
         _actual = self._three_parts()[0]
@@ -266,7 +268,7 @@ class Case170_cannot_delete_because_attributes_not_exact_match(_CommonCase):
         """
 
 
-class Case193_cannot_update_because_attributes_not_found(_CommonCase):
+class Case405_193_cannot_update_because_attributes_not_found(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -292,7 +294,7 @@ class Case193_cannot_update_because_attributes_not_found(_CommonCase):
         """
 
 
-class Case216_cannot_update_because_attributes_not_exact_match(_CommonCase):
+class Case405_216_cannot_update_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
 
     def test_100_context(self):
         _actual = self._three_parts()[0]
@@ -320,7 +322,7 @@ class Case216_cannot_update_because_attributes_not_exact_match(_CommonCase):
         """
 
 
-class Case239_cannot_delete_because_comment_line_above(_CommonCase):
+class Case405_239_cannot_delete_because_comment_line_above(_CommonCase):
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
         _actual = self._two_parts()[0]
@@ -348,7 +350,7 @@ class Case239_cannot_delete_because_comment_line_above(_CommonCase):
         """
 
 
-class Case261_cannot_update_because_comment_line_below(_CommonCase):
+class Case405_261_cannot_update_because_comment_line_below(_CommonCase):
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
         _actual = self._two_parts()[0]
@@ -376,7 +378,7 @@ class Case261_cannot_update_because_comment_line_below(_CommonCase):
         """
 
 
-class Case284_cannot_update_because_attribute_line_has_comment(_CommonCase):
+class Case405_284_cannot_update_because_attribute_line_has_comment(_CommonCase):  # noqa: E501
 
     def test_100_unable(self):
         _actual = self._two_parts()[0]
@@ -402,7 +404,7 @@ class Case284_cannot_update_because_attribute_line_has_comment(_CommonCase):
         """
 
 
-class Case307_aggregate_multiple_comment_based_failures(_CommonCase):
+class Case405_307_aggregate_multiple_comment_based_failures(_CommonCase):
 
     def test_100_broken_up_into_two_sentences(self):
         self.assertEqual(len(self._two_sentences()), 2)
@@ -437,7 +439,7 @@ class Case307_aggregate_multiple_comment_based_failures(_CommonCase):
         """
 
 
-class Case330_cannot_create_because_comment_line_above(_CommonCase):
+class Case405_330_cannot_create_because_comment_line_above(_CommonCase):
 
     def test_100_produces_two_sentences(self):
         self.assertIsNotNone(self._two_sentences())
@@ -489,7 +491,7 @@ class Case330_cannot_create_because_comment_line_above(_CommonCase):
         """
 
 
-class Case352_can_update_idk(_CommonCase):
+class Case405_352_can_update_idk(_CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -510,7 +512,7 @@ class Case352_can_update_idk(_CommonCase):
         """
 
 
-class Case375_can_delete(_CommonCase):
+class Case405_375_can_delete(_CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -536,7 +538,7 @@ class Case375_can_delete(_CommonCase):
 # (available: 398)
 
 
-class Case404_can_create_when_comment_line_at_tail(_CommonCase):
+class Case405_404_can_create_when_comment_line_at_tail(_CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -578,7 +580,7 @@ class Case404_can_create_when_comment_line_at_tail(_CommonCase):
         """
 
 
-class Case443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
+class Case405_443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -609,7 +611,7 @@ class Case443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
         """
 
 
-class Case466_create_into_truly_empty(_CommonCase):
+class Case405_466_create_into_truly_empty(_CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()
@@ -629,7 +631,7 @@ class Case466_create_into_truly_empty(_CommonCase):
         """
 
 
-class Case489_create_into_empty_with_comments(_CommonCase):
+class Case405_489_create_into_empty_with_comments(_CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()
@@ -673,11 +675,16 @@ def _request_via_tuples(tuples, listener):
     return _ancilliary_subject_module().request_via_tuples(tuples, listener)
 
 
-def _MDE(entity_body_lines_big_string, lstn):
-    from kiss_rdb.magnetics_ import blocks_via_file_lines as _
-    _line_gen = _unindent(entity_body_lines_big_string)
-    return _.mutable_document_entity_via_identifer_and_body_lines(
-            _line_gen, 'A', 'meta', lstn)
+def TO_BODY_BLOCK_LINES_AS_MDE(mde):
+    for blk in mde.to_body_block_stream_as_MDE_():
+        for line in blk.to_line_stream():
+            yield line
+
+
+def _MDE(entity_body_lines_big_string, listener):
+    _lines = _unindent(entity_body_lines_big_string)
+    _tslo = TSLO_via('A', 'meta')
+    return MDE_via_lines_and_table_start_line_object(_lines, _tslo, listener)
 
 
 def _subject_module():
@@ -697,4 +704,6 @@ def cover_me():
 if __name__ == '__main__':
     unittest.main()
 
+
+# #history-A.1: begin small changes for big overhaul for multi-line strings
 # #born.

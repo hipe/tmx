@@ -2,5 +2,7 @@ creative self actualization
 maybe a CLI (explode me)
 Cover DELETE that would leave entites file empty
 cover yes schema file but no ent entites dir
+a lot of the names in state machine module are still EXPERIMENTAL
 multiline strings
 "business schema" that has a primitive types section
+base actions perhaps not needed for that one actions

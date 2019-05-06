@@ -1,40 +1,31 @@
-from _common_state import unindent
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from _common_state import (
+        MDE_via_lines_and_table_start_line_object,
+        TSLO_via,
+        unindent,
+        )
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
 import unittest
 
 
 """
-(subject under test explained exhaustively in [#865] CUD for attributes)
+this module tests:
+the CUD of body blocks ({ attribute | discretionary }) in/from a doc entity.
 
-the objective & scope of this test file is actually focused well enough, but
-it can seem muddled until you get through this backstory:
+things like:
 
-  - based on the name of the counterpart asset this tries to cover (its
-    subject module, something like "entity_via_identifier_and_file_lines"),
-    one might expect this test to cover entity RETRIEVE;
+  - gist-ing will whine on existing names too similar
+  - append to { empty | not empty }
+  - insert at { head | mid }
+  - delete at/from { head | mid | tail } to make non-empty
+  - delete to make empty
 
-  - but the main asset provided by that magnet is actually the all-important
-    "mutable document entity" itself. so how do you cover that? well:
+trivia: midway through the initial development of this test file,
+we realized we needed to develop our doubly-linked list alon.
 
-  - we set out to cover the line-level CUD operations exposed by that mutable
-    model, an API that for a time we thought would speak in terms of line
-    offsets (when relevant) (e.g insert this line before this other line,
-    delete this line at offset X, etc.), before we realized that using IID's
-    was a preferable way to refer to existing body blocks. although this
-    line-offset-centric view is no longer in the asset, it endures in some of
-    the tests here.
-
-  - during implementation, we realized that what we were really doing was
-    just developing our chosen implementation: the doubly-linked list. this,
-    then, abstracted out into its own module & tests. so when we returned to
-    this test file, it became mostly an integration test between the mutable
-    document entity and its underlying doubly-linked list. (this is
-    reflected in how short the asset file is at writing: 267 LOC)
-
-see also a long note below about the test case ordering locally.
-
-also, during renames we renamed this with a hint toward the future
-(undocumented).
+see also a long note below about the test case ordering locally #here1.
 """
 
 
@@ -62,24 +53,26 @@ class _CommonCase(unittest.TestCase):
 
     def given_run_inserting_before_offset(self, line, offset, listener):
         mde = self._build_doc_ent(listener)
-        lo = mde.procure_line_object__(line, listener)
-        self.fail() if lo is None else None
-        _iid = _internal_identifer_via_body_line_offset(offset, mde)
-        mde.insert_line_object(lo, _iid)
+        blk = _block_via_line(line, mde, listener)
+        _iid = _internal_identifier_via_component_offset(offset, mde)
+        mde.insert_body_block(blk, _iid)
         return mde
 
     def given_run_appending(self, line, listener):
         mde = self._build_doc_ent(listener)
-        lo = mde.procure_line_object__(line, listener)
-        self.fail() if lo is None else None
-        mde.append_line_object(lo)
+        blk = _block_via_line(line, mde, listener)
+        _ok = mde.append_body_block(blk, None)
+        assert(_ok)
         return mde
 
     def given_run_deleting_at_offset(self, offset, listener):
         mde = self._build_doc_ent(listener)
-        _iid = _internal_identifer_via_body_line_offset(offset, mde)
-        x = mde._delete_line_object_via_iid(_iid)
-        x.line  # eek / meh
+        _iid = _internal_identifier_via_component_offset(offset, mde)
+        x = mde._delete_block_via_iid(_iid)
+        # -- begin make contact as assert. maybe types would help #[#008.D]
+        x.is_attribute_block
+        x.is_discretionary_block
+        # --
         return mde
 
     def _build_doc_ent(self, listener):
@@ -134,7 +127,7 @@ class _CommonCase(unittest.TestCase):
 # == 000's: INTRO, BASICS
 
 
-class Case000_empty(_CommonCase):
+class Case402_000_empty(_CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -159,7 +152,7 @@ class Case000_empty(_CommonCase):
         return _doc_entity_via_lines(())
 
 
-class Case050_all_three_kinds_of_lines(_CommonCase):
+class Case402_050_all_three_kinds_of_lines(_CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -184,7 +177,7 @@ class Case050_all_three_kinds_of_lines(_CommonCase):
         return _doc_entity_via_lines(_given)
 
 
-class Case060_index_gist_collision_in_entity(_CommonCase):
+class Case402_060_index_gist_collision_in_entity(_CommonCase):
 
     def test_100_expect_run_failed_to_produce_value(self):
         self.expect_run_failed_to_produce_value()
@@ -192,14 +185,14 @@ class Case060_index_gist_collision_in_entity(_CommonCase):
     def test_200_expect_the_usual_channel(self):
         self.expect_the_usual_channel()
 
-    def test_300_has_the_whole_line(self):
-        self.expect_structure_value('line', 'BIFFB-on-ZO10 = 123\n')
+    def test_300_does_NOT_have_a_whole_line(self):
+        self.expect_no_structure_value('line')  # changed at #history-A.1
 
     def test_310_does_NOT_have_line_number(self):
         self.expect_no_structure_value('lineno')
 
-    def test_320_has_position(self):
-        self.expect_structure_value('position', 13)
+    def test_320_does_NOT_have_position(self):
+        self.expect_no_structure_value('position')  # changed at #history-A.1
 
     def test_330_has_expecting(self):
         self.expect_structure_value('expecting', 'available name')
@@ -208,8 +201,8 @@ class Case060_index_gist_collision_in_entity(_CommonCase):
         self.expect_structure_value(
                 'reason',
                 (
-                    "new name 'biff-BON-zo-10' too similar to "
-                    "existing name 'BIFFB-on-ZO10'"
+                    "new name 'BIFFB-on-ZO10' too similar to "
+                    "existing name 'biff-BON-zo-10'"
                 ))
 
     @shared_subject
@@ -241,7 +234,7 @@ class Case060_index_gist_collision_in_entity(_CommonCase):
 # == APPENDS/INSERTS
 
 
-class Case100_append_to_empty(_CommonCase):
+class Case402_100_append_to_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -259,7 +252,7 @@ class Case100_append_to_empty(_CommonCase):
         return ()
 
 
-class Case110_append_to_non_empty(_CommonCase):
+class Case402_110_append_to_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -280,7 +273,7 @@ class Case110_append_to_non_empty(_CommonCase):
         """)
 
 
-class Case120_insert_at_head(_CommonCase):
+class Case402_120_insert_at_head(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -303,14 +296,14 @@ class Case120_insert_at_head(_CommonCase):
         """)
 
 
-class Case130_insert_into_mid(_CommonCase):
+class Case402_130_insert_into_mid(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
 
     def expect_these_body_lines_AFTER_edit(self):
         return """
-        # comment first
+        aa = "bb"
         # comment second
         # comment third
         """
@@ -321,7 +314,7 @@ class Case130_insert_into_mid(_CommonCase):
 
     def given_lines(self):
         return unindent("""
-        # comment first
+        aa = "bb"
         # comment third
         """)
 
@@ -329,11 +322,12 @@ class Case130_insert_into_mid(_CommonCase):
 # == DELETES
 
 
-"""a compuctionary note on test case ordering:
+"""a note about the rationale behind how we ordered these cases: :#here1
 
-  - (the below is now superseded by [#867] in terms of theoretical rigor,
-    however our order here (append, insert, delete) actually concurs with the
-    order proferred there (that is, same conclusion for different reasons).)
+  - in this file, the cases go: (append, insert, delete).
+
+  - [#867] (which was developed after this module) concurs with this order
+    (just by happy accident).
 
   - [#010.6] "regression-friendly ordering" offers that
     all things being equal you
@@ -361,10 +355,12 @@ class Case130_insert_into_mid(_CommonCase):
     cases in the file has no bearing on the order in which they are run. as
     such it probably minimizes confusion to have the lexical order and file
     placement order be the same.)
+
+  - at .#history-A.1 we "shard" the case numbers here so they are universal.
 """
 
 
-class Case200_delete_at_head_to_make_non_empty(_CommonCase):
+class Case402_200_delete_at_head_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -386,7 +382,7 @@ class Case200_delete_at_head_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case210_delete_from_mid_to_make_non_empty(_CommonCase):
+class Case402_210_delete_from_mid_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -403,12 +399,12 @@ class Case210_delete_from_mid_to_make_non_empty(_CommonCase):
     def given_lines(self):
         return unindent("""
         # line 1
-        # line 2
+        bb = "line 2"
         # line 3
         """)
 
 
-class Case230_delete_from_tail_to_make_non_empty(_CommonCase):
+class Case402_230_delete_from_tail_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -416,7 +412,7 @@ class Case230_delete_from_tail_to_make_non_empty(_CommonCase):
     def expect_these_body_lines_AFTER_edit(self):
         return """
         # line 1
-        # line 2
+        bb = "line 2"
         """
 
     def given_run(self, listener):
@@ -425,12 +421,12 @@ class Case230_delete_from_tail_to_make_non_empty(_CommonCase):
     def given_lines(self):
         return unindent("""
         # line 1
-        # line 2
+        bb = "line 2"
         # line 3
         """)
 
 
-class Case240_delete_to_make_empty(_CommonCase):
+class Case402_240_delete_to_make_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -451,7 +447,7 @@ class Case240_delete_to_make_empty(_CommonCase):
 # == SUPPORT
 
 
-def _internal_identifer_via_body_line_offset(offset, mde):
+def _internal_identifier_via_component_offset(offset, mde):
 
     i = -1
     for iid in mde._LL.TO_IID_STREAM():
@@ -464,18 +460,27 @@ def _internal_identifer_via_body_line_offset(offset, mde):
 
 
 def _doc_entity_via_lines(given, listener=None):
-    return _subject_module().mutable_document_entity_via_identifer_and_body_lines(  # noqa: E501
-            given, 'A', 'meta', listener)
+    _ = _table_start_line_object()
+    return MDE_via_lines_and_table_start_line_object(given, _, listener)
+
+
+def _block_via_line(line, mde, listener):
+    import kiss_rdb.magnetics_.blocks_via_file_lines as blk_lib
+    if '#' == line[0]:  # #[#867.F]
+        return blk_lib.AppendableDiscretionaryBlock_(line)
+    else:
+        cover_me()
+
+
+@memoize
+def _table_start_line_object():
+    return TSLO_via('A', 'meta')
 
 
 def _body_line_gen(mde):
-    for lo in mde._LL.to_item_stream():
-        yield lo.line
-
-
-def _subject_module():
-    from kiss_rdb.magnetics_ import blocks_via_file_lines as _
-    return _
+    for blk in mde._LL.to_item_stream():
+        for line in blk.to_line_stream():
+            yield line
 
 
 def cover_me():
@@ -485,4 +490,5 @@ def cover_me():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: when became multi-line
 # #born.

@@ -1,4 +1,6 @@
-import _common_state  # noqa: F401
+from _common_state import (
+        unindent,
+        )
 from kiss_rdb_test import structured_emission
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
@@ -10,7 +12,11 @@ class _CommonCase(unittest.TestCase):
 
     def expecting_any_of_these_common_things(self):
         o = self.emitted_elements()
-        _ = ('blank line', 'comment line', 'section line', 'end of input')
+        _ = (
+                'blank line or comment line',
+                'table start line',
+                'end of input',
+                )
         self.assertEqual(o['expecting_any_of'], _)
 
     def line_number_but_not_position(self, lineno):
@@ -70,13 +76,13 @@ class _CommonCase(unittest.TestCase):
         # set the above to true if it's failing and trying to emit, to debug
         itr = self._run_non_validating_ID_traversal(listener)
         x_a = []
-        for otl in itr:
-            x_a.append((otl.identifier_string, otl.table_type))
+        for tsl in itr:
+            x_a.append((tsl.identifier_string, tsl.table_type))
         return tuple(x_a)
 
     def _run_non_validating_ID_traversal(self, listener):
         _all_lines = self.given_lines()
-        return _subject_module().open_table_line_stream_via_file_lines_(_all_lines, listener)  # noqa: E501
+        return _subject_module().table_start_line_stream_via_file_lines_(_all_lines, listener)  # noqa: E501
 
     def given_lines(self):
         raise Exception('ha ha')
@@ -281,6 +287,35 @@ class Case145_non_validated_ID_traversal_two(_CommonCase):
 
     def given_lines(self):
         return ('[item.B.attributes]\n', '[item.B.meta]\n')
+
+
+class Case150_first_touch_of_multi_line(_CommonCase):  # #[#867.J] #mutli-line-case # noqa: E501
+
+    def test_100_EVERYTHING(self):
+        _actual = self.run_non_validating_ID_traversal_expecting_success()
+        _expect = (
+                ('2K9', 'attributes'),
+                ('2KA', 'attributes'))
+        self.assertSequenceEqual(_actual, _expect)
+
+    def given_lines(self):
+
+        # DISCUSSION: below migh be too much, but it's exactly what we had
+        # in a file when we made it a file, and it's representative & useful
+        # this way
+
+        return unindent('''
+            [item.2K9.attributes]
+            ting = """
+            [item.ABC.attributes]
+            """
+            tang = 'tong'
+
+            [item.2KA.attributes]
+            thing = "x"
+
+            # #born.
+            ''')
 
 
 def _subject_module():

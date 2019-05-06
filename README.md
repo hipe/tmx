@@ -176,6 +176,11 @@ then in your 'main' terminal:
     moved. (reading edits to files in a diff can be ugly when it is paired
     with a move of the file, depending..)
 
+  - write commit messages following these
+    [git commit message guidelines][hugo-cmg]; namely that the first line
+    of the message start with a capital letter, not have ending punctuation,
+    be in the imperative mood, etc.
+
 
 
 
@@ -250,6 +255,7 @@ then in your 'main' terminal:
 
 [heroku4]: https://blog.heroku.com/the_new_heroku_4_erosion_resistance_explicit_contracts
 [heroku3]: https://12factor.net/
+[hugo-cmg]: https://github.com/gohugoio/hugo/blob/master/CONTRIBUTING.md#git-commit-message-guidelines
 
 
 

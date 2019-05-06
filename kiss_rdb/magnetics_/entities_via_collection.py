@@ -2,9 +2,58 @@
 DISCUSSION about roughness here:
 
   - the aspirational scope of this module is potentially (per its name)
-  - however currently its only public exposure is a traversing ID's function
+  - however, currently towards that topic it only traverses coll for all ID's
   - towards helping make an index for CREATE.
+  - at #history.A.1 it grew to house table block builders (e.g. for CREATE)
 """
+
+
+def table_block_via_lines_and_table_start_line_object_(
+        lines,
+        table_start_line_object,
+        listener=None):
+
+    """
+    EXPERIMENTAL. internal. parse a single table block from all the lines
+
+    expecting that the first line is the first line of the body blocks.
+    implicitly asserts etc (MORE ocd would be a grammar for this)
+    """
+
+    from . import (
+            blocks_via_file_lines as blk_lib,
+            identifiers_via_file_lines as sm_lib,
+            )
+
+    # == BEGIN massive a hacks to alter parse state to be as if mid-parse
+
+    actions = None
+
+    def actionser(ps):  # the actions object isn't normally accessible
+        nonlocal actions
+        actions = blk_lib.ActionsForCoarseBlockParse_(ps)
+        return actions
+
+    ps = sm_lib.state_machine_.build_parse_state(
+            listener=listener,
+            actions_class=actionser,
+            )
+
+    ps.be_in_state_('table begun')  # the state after "table start line"
+
+    actions.begin_table_with_(table_start_line_object)
+    # begin the appendable table block
+
+    # == END
+
+    block_itr = ps.items_via_all_lines_(lines)
+
+    table_block = next(block_itr)
+
+    for _ in block_itr:
+        assert(False)  # assert that that's the end of the stream
+
+    return table_block
 
 
 def identifiers_via__(paths_function, id_via_string, listener):
@@ -14,7 +63,7 @@ def identifiers_via__(paths_function, id_via_string, listener):
     monitor = ErrorMonitor_(listener)
     my_listener = monitor.listener
 
-    _otl_itr = _open_table_line_stream_via_dir_path(paths_function, monitor)
+    _otl_itr = _table_start_line_stream_via_dir_path(paths_function, monitor)
 
     def _():
         for otl in _otl_itr:
@@ -57,10 +106,10 @@ def identifiers_via__(paths_function, id_via_string, listener):
             cover_me('out of order')
 
 
-def _open_table_line_stream_via_dir_path(paths_function, monitor):
+def _table_start_line_stream_via_dir_path(paths_function, monitor):
 
     from .identifiers_via_file_lines import (
-            open_table_line_stream_via_file_lines_)
+            table_start_line_stream_via_file_lines_)
 
     def when_entities_dir_empty(entities_dir_pp):  # (Case720) pp=posix path
         """(Case720): the library function we call acts the same whether the
@@ -75,7 +124,7 @@ def _open_table_line_stream_via_dir_path(paths_function, monitor):
 
     for path_pp in _:
             with open(path_pp) as file_lines:
-                for otl in open_table_line_stream_via_file_lines_(
+                for otl in table_start_line_stream_via_file_lines_(
                         file_lines, monitor.listener):
                     yield otl
 
@@ -96,4 +145,6 @@ def __whine_about_not_exists(listener, pp):
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+
+# #history-A.1: become home to place that parses single table body from lines
 # #born.
