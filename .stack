@@ -4,5 +4,7 @@ Cover DELETE that would leave entites file empty
 cover yes schema file but no ent entites dir
 a lot of the names in state machine module are still EXPERIMENTAL
 multiline strings
+EDIT
+all occurrences of the tag [#867.J] (multi-line strings)
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions

@@ -22,6 +22,17 @@ it is certainly not the case that this is meant to work for all toml documents.
 our variant of toml is stricter than the official spec to scale it down to be
 applicable to exactly our use case and perhaps a few outside of it.
 
+EDIT:
+
+there are things we could store but that we don't want to because
+they wouldn't be "pretty".
+as a design decision towards our intended use-cases (and also as a
+pratical matter where it touched on performance); the system will be
+opionionated about some things.
+
+there may even be some heuristic limits so that things are kept
+adequately "pretty"..
+
 
 
 

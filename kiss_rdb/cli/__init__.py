@@ -180,7 +180,7 @@ def cli_for_production():
       - do something real and not contrived for the random number generator
       - NOTE all the print commands are messy and temporary #todo-soon
 
-    (spiked without coverage at #hisory-A.1.)
+    (spiked without coverage at #history-A.1.)
     """
 
     def commit_file_rewrite(from_fh, to_fh):  # to fail is to corrupt
@@ -213,7 +213,7 @@ def cli_for_production():
         return num
 
     # == BEGIN NASTY python annoyance - why does it auto-escape wtf
-    #    (this only comes up in production, not in tests)
+    #    (this only comes up in production, not in tests.) #[#867.W]
     from sys import argv
     for i in range(1, len(argv)):
         if '\\' in argv[i]:
