@@ -9,6 +9,8 @@ from kiss_rdb_test.CUD import (
         filesystem_expecting_no_rewrites,
         build_filesystem_expecting_num_file_rewrites,
         )
+
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -261,10 +263,6 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     associated with the attribute not the entity block so the behavior
     here in terms of where blank lines end up is not what would probably
     be expected..
-
-    wait till after [#867.J] multi-line strings maybe, because this is
-    an ugly issue but only cosmetic and can be worked around reasonably
-    by just prestending we don't support whitespace/comments yet..
     """
 
     def test_100_everything(self):
@@ -330,22 +328,14 @@ class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
 
     @shared_subject
     def _these_two(self):
-        count = 0
-        channel = None
-        payloader = None
 
-        def listener(*args):
-            nonlocal count, channel, payloader
-            count += 1
-            assert(count < 2)
-            *channel, payloader = args
-            channel = tuple(channel)
+        listener, emissioner = se_lib.listener_and_emissioner_for(self)
 
         _itr = self.subject_collection().to_identifier_stream(listener)
         for x in _itr:
             self.fail()
 
-        assert(1 == count)
+        channel, payloader = emissioner()
         return channel, payloader
 
     def subject_collection(self):

@@ -3,6 +3,7 @@ from _common_state import (
         TSLO_via,
         unindent,
         )
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -80,20 +81,10 @@ class _CommonCase(unittest.TestCase):
         return _doc_entity_via_lines(_given, listener)
 
     def failure_triple_given_run(self):
-        def listener(*a):
-            nonlocal chan, emit, count
-            count += 1
-            if 1 < count:
-                raise Exception('too many emissions')
-            *chan, emit = a
-            chan = tuple(chan)
-        count = 0
-        chan = None
-        emit = None
+        listener, emissioner = se_lib.listener_and_emissioner_for(self)
         _given = self.given_lines()
         x = _doc_entity_via_lines(_given, listener)
-        if 1 != count:
-            raise Exception('did not emit')
+        chan, emit = emissioner()
         return (x, chan, emit)
 
     def expect_lines_before_edit(self):

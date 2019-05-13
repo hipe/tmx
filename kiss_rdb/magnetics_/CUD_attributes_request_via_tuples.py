@@ -48,9 +48,11 @@ class _CUD_Attributes_Request:
         assert(components)
         self.components = tuple(components)
 
-    def edit_mutable_document_entity_(self, mde, listener):
+    def edit_mutable_document_entity_(self, mde, bs, listener):
         from . import CUD_attributes_via_request as lib
-        return lib.apply_CUD_attributes_request_to_MDE___(mde, self, listener)
+        _enc = bs.BUILD_ENTITY_ENCODER(listener)
+        return lib.apply_CUD_attributes_request_to_MDE___(
+                mde, self, _enc, listener)
 
 
 class _RequestLocalNameUniquenessValidatorIndex:

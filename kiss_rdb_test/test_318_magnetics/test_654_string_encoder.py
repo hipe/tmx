@@ -1,4 +1,5 @@
 from _common_state import unindent
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -62,20 +63,9 @@ class _CommonCase(unittest.TestCase):
         return res
 
     def expect_input_error_structure(self):
-
-        emissions = []
-
-        def listener(*a):
-            *chan, structer = a
-            _sct = structer()
-            emissions.append((chan, _sct))
-
-        _x = self.execute(listener)
-        self.assertIsNone(_x)
-        one_emission, = emissions  # asserts
-        chan, sct = one_emission
+        chan, structer = se_lib.one_and_none(self.execute, self)
         self.assertSequenceEqual(chan, ('error', 'structure', 'input_error'))
-        return sct
+        return structer()
 
     def build_encoding_plan_expecting_success(self):
         x = self.execute()
@@ -313,4 +303,5 @@ def cover_me():
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: move this to before the CUD attributes test unit
 # #born.

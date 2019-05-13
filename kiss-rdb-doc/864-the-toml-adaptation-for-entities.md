@@ -38,9 +38,12 @@ adequately "pretty"..
 
 ## broad provision 2
 
+EDIT: the "surface form" that storage will take will have self-imposed
+constraints on it so that it is easier to "coarse parse"..
+
 to make "crude" (fast) parsing easier on us, we are going to be very
 line-centric. this is why our first pass at this did not support
-.[#867.J] multi-line strings...
+.#multi-line strings...
 
 
 
@@ -194,7 +197,7 @@ those higher level streams are streams of trees!).
 above we introduced our "collection edit theory" of "CUD" and then introduced
 our "file edit theory": that the main _idiom_ we will employ when working
 with files is seeing them as _streams_ of _lines_.
-(be advised this will get more nuanced at #wish [#867.J] multi-line strings.)
+(EDIT this got more nuanced at #multi-line strings)
 
 here we synthesize those lexicons towards this document's objective:
 our algorithms for the CUD of entities in files.
@@ -335,13 +338,6 @@ maybe some kind of schema representation for the purpose of
 valid key sets, possibly type, and attribute ordering.
 
 (3.2 is inline tables, 3.3 is arrays.)
-
-
-
-
-## future feature 4
-
-.[#867.J] multi-line strings...
 
 
 

@@ -13,9 +13,7 @@ from .identifiers_via_file_lines import (
         table_start_line_via_line_,
         nothing, stop, okay,
         )
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import memoize
 
 
 def _MDE_via_ATB(table_block, listener):
@@ -420,6 +418,10 @@ class _AppendableTableBlock:
         self._table_start_line_object = ts  # #testpoint
         self._body_blocks = []  # #testpoint
 
+    def append_multi_line_attribute_block_via_lines__(self, attr_s, se_lines):
+        _attr_blk = _multi_line_attribute_block_via(attr_s, se_lines)
+        self._append_block(_attr_blk)
+
     def _append_block(self, x):
         self._body_blocks.append(x)
 
@@ -447,6 +449,40 @@ class _AppendableTableBlock:
 
     def _tail_block(self):
         return self._body_blocks[-1]
+
+
+class _multi_line_attribute_block_via:  # ..
+
+    def __init__(self, attr_s, semi_encoded_lines):
+
+        assert(len(semi_encoded_lines))
+
+        self.attribute_name_string = attr_s
+
+        *all_but_last_line, last_line = semi_encoded_lines
+
+        def f():
+            yield f'{attr_s} = """\n'
+            # (always only ever literal not basic. we don't want the delimiters
+            # flip-flopping based on content (while it is multi-line).)
+
+            for line in all_but_last_line:
+                yield line
+
+            if last_line[-1] == "\n":  # ICK/MEH
+                yield last_line
+                yield '"""\n'
+            else:
+                # (Case407_180) - currently never allowed
+                assert(False)
+                yield f'{last_line}"""\n'
+
+        self._lines = tuple(f())
+
+    def to_line_stream(self):
+        return self._lines
+
+    is_attribute_block = True  # (Case831)
 
 
 class _MultiLineAttributeBlock:

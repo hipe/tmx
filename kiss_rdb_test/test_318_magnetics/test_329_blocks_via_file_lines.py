@@ -2,6 +2,7 @@ from _common_state import (
         debugging_listener as _debugging_listener,
         unindent as _unindent,
         )
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -17,32 +18,19 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(mde.identifier_string, id_s)
 
     def when_expecting_failure_count_and_structure(self):
-        item_count, emi = self._item_count_and_only_emission()
-        *chan, payloader = emi
+        item_count, chan, payloader = self._item_count_and_only_emission()
         self.assertSequenceEqual(chan, ('error', 'structure', 'input_error'))
         sct = payloader()
         return item_count, sct
 
     def _item_count_and_only_emission(self):
-        emission_count = 0
-        last_emission = None
-
-        def listener(*a):
-            nonlocal emission_count
-            emission_count += 1
-            if 1 < emission_count:
-                self.fail('more than one emission')
-            nonlocal last_emission
-            last_emission = a
-
+        listener, emissioner = se_lib.listener_and_emissioner_for(self)
         itr = self._iterator_via_run(listener)
-
         item_count = 0
         for _ in itr:
             item_count += 1
-
-        self.assertEqual(emission_count, 1)
-        return item_count, last_emission
+        chan, emit = emissioner()
+        return item_count, chan, emit
 
     def the_rest(self):
         return self.head_block_and_rest()[1]

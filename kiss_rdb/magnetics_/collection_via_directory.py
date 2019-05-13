@@ -70,7 +70,7 @@ class collection_via_directory_and_schema:
         iid, path = tup
 
         with self._open_locked_mutable_entities_file(path) as lmef:
-            res = _update_entity(lmef, iid, cuds, self._filesystem, listener)
+            res = _update_entity(lmef, iid, cuds, self, listener)
 
         return res
 
@@ -147,10 +147,10 @@ class collection_via_directory_and_schema:
 
             id_s = iid.to_string()
 
-            mde = _create_MDE_via_ID_and_request(id_s, cuds_request, listener)
+            mde = _create_MDE_via_ID_and_request(
+                    id_s, cuds_request, self, listener)
             if mde is None:
-                cover_me('idk')
-                return
+                return  # (Case830) (CLI) #here6
 
             # from the identifier derive the entities path
 
@@ -281,6 +281,10 @@ class collection_via_directory_and_schema:
     def _file_path_pieces_via_identifier(self, iid):
         return self._schema_pather.file_path_pieces_via__(iid)
 
+    def BUSINESS_SCHEMA(self):
+        from . import business_schema_via_definition as lib
+        return lib.DEFAULT_BUSINESS_SCHEMA
+
 
 class _PassthruContextManager:
 
@@ -296,7 +300,7 @@ class _PassthruContextManager:
 # ==
 
 
-def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
+def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
     doc_ent = None
 
@@ -312,7 +316,8 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
         if req is None:
             return  # not covered - blind faith
 
-        _ok = req.edit_mutable_document_entity_(mde, my_listener)
+        _bs = coll.BUSINESS_SCHEMA()
+        _ok = req.edit_mutable_document_entity_(mde, _bs, my_listener)
 
         if not _ok:
             return  # not covered - blind faith
@@ -328,7 +333,7 @@ def _update_entity(locked_ents_file, identifier, cuds, fs, listener):
                 recv_new_doc_ent,
                 )
 
-    with fs.FILE_REWRITE_TRANSACTION(listener) as trans:
+    with coll._filesystem.FILE_REWRITE_TRANSACTION(listener) as trans:
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
         res = trans.finish()
 
@@ -447,7 +452,7 @@ def _create_entity(
     return trans.finish()
 
 
-def _create_MDE_via_ID_and_request(identifier_string, req, listener):
+def _create_MDE_via_ID_and_request(identifier_string, req, coll, listener):
 
     from . import identifiers_via_file_lines as ids_lib
 
@@ -457,11 +462,12 @@ def _create_MDE_via_ID_and_request(identifier_string, req, listener):
 
     mde = blk_lib.MDE_via_TSLO_(_tslo)
 
-    _ok = req.edit_mutable_document_entity_(mde, listener)
+    _bs = coll.BUSINESS_SCHEMA()
+
+    _ok = req.edit_mutable_document_entity_(mde, _bs, listener)
 
     if not _ok:
-        cover_me('like when?')
-        return
+        return  # (Case830) (CLI) #here6
 
     return mde  # (Case764)
 
@@ -501,6 +507,13 @@ def _retrieve_entity(identifier, file_path, listener):
     _big_string = ''.join(de.to_line_stream())
 
     return dict_via(_big_string, listener)
+
+
+"""
+:#here6: a new kind of UI error (attribute value validaton). we don't want
+CLI to be the one covering this. also this test case covers legitamate work
+that's only in CLI so etc
+"""
 
 
 # == whiners

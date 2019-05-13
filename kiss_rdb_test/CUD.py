@@ -1,3 +1,69 @@
+from modality_agnostic.memoization import memoize
+
+
+class CUD_BIG_SUCCESS_METHODS:
+
+    def expect_reason(self, msg=None):
+        reason = self.expect_request_error()['reason']
+        if msg is None:
+            return reason
+        self.assertEqual(reason, msg)
+
+    def expect_request_error(self):
+        return self._expect_error('request_error')
+
+    def expect_input_error(self):
+        return self._expect_error('input_error')
+
+    def _expect_error(self, s):
+        chan, sct = self.expect_error_structure()
+        self.assertEqual(chan, ('error', 'structure', s))
+        return sct
+
+    def expect_error_structure(self):
+        from . import structured_emission as se_lib
+        chan, payloader = se_lib.one_and_none(self.given_run, self)
+        return chan, payloader()
+
+    def expect_big_success(self):
+        listener = None  # _DEBUGGING_LISTENER
+        _mde = self.given_run(listener)
+
+        def f():  # TO_BODY_BLOCK_LINES
+            for blk in _mde.to_body_block_stream_as_MDE_():
+                for line in blk.to_line_stream():
+                    yield line
+
+        _act = tuple(f())
+
+        _big_s = self.expect_entity_body_lines()
+        _exp = tuple(_unindent(_big_s))
+
+        self.assertSequenceEqual(_act, _exp)
+
+    def given_run(self, listener):  # formerly "run_CUD_attributes"
+
+        this_listener = None  # _DEBUGGING_LISTENER
+
+        from . import _common_state as lib
+
+        _lines = _unindent(self.given_entity_body_lines())
+        _tslo = lib.TSLO_via('A', 'meta')
+        mde = lib.MDE_via_lines_and_table_start_line_object(
+            _lines, _tslo, this_listener)
+        assert(mde)
+
+        req = request_via_tuples(self.given_request_tuples(), this_listener)
+        assert(req)
+
+        x = req.edit_mutable_document_entity_(
+            mde, _default_business_schema(), listener)
+
+        if x is not None:
+            self.assertEqual(x, True)
+            return mde
+
+
 class CUD_Methods:
 
     # == DSL-ish for test assertions
@@ -96,6 +162,21 @@ class CUD_Methods:
         return payloader()
 
 
+# == public functions
+
+def request_via_tuples(tuples, listener):
+    from kiss_rdb.magnetics_ import CUD_attributes_request_via_tuples as lib
+    return lib.request_via_tuples(tuples, listener)
+
+
+# == memoized
+
+@memoize
+def _default_business_schema():
+    from kiss_rdb.magnetics_ import business_schema_via_definition as lib
+    return lib.DEFAULT_BUSINESS_SCHEMA
+
+
 # ==
 
 def _function_for_create(cuds):
@@ -128,9 +209,18 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
 
 
 def _fs_lib():
-    from kiss_rdb_test import filesystem_spy as _
+    from . import filesystem_spy as _
     return _
 
+
+def _DEBUGGING_LISTENER(self):
+    from . import structured_emission as lib
+    return lib.debugging_listener()
+
+
+def _unindent(big_string):
+    from . import structured_emission as se_lib
+    return se_lib.unindent(big_string)
 
 # ==
 

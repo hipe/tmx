@@ -180,26 +180,20 @@ insertion points for CREATE (explored below).
 ## creating attributes - overview
 
   - assume we already have an index of existing attributes (somehow).
-
   - use common, easy, lexical-esque insertion as we did with [#864]
     CUD'ing entities into/in/from documents.
-
   - whether "foo-bar" comes before or after "fo-obar" depends simply
     on the lexical value of the dash (whatever that is). we don't do any
     additional magic for this. we let the platform decide.
-
   - index these elements with case INSENSITVE indexing. it is not valid
     to have the "same" key with different casing. of "foo", "FOO" and "Foo"
     only one such casing can exist in a table. (:#here1)
-
   - (furthermore it may be the case that a name like "Foo" is invalid,
     whereas a name like "FOO-bar" is valid.)
-
   - for now we will extend the above idea to dashes but may change this
     later. for now, remove the dashes as part of producing a "gist" for
     a key. (more later, near "gist".)
-
-  - .[#867.J] IN FLUX somethng about #here4
+  - EDIT something about #here4
 
 
 
@@ -249,7 +243,7 @@ for every line *after* the open table (section) line:
       - sadly, offhand we can't think of a reliable way to ensure that
         the line doesn't begin a multi-line value except checking for `"""`
         which we might do. and/or checking for the shorthand table thing..
-        (:#here4)
+        .#multi-line strings (:#here4)
 
       - ensure that the key is valid for whatever our restrictive rules are.
         this can fail.

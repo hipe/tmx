@@ -73,7 +73,8 @@ SO here's our rough draft of what we're going to attempt:
   - (there are certainly edge cases where the above is not true; like where
     our hacky parsing lets through incorrect toml that will not parse (i.e
     _not_ toml). (for example, if the value surface form in our document is
-    some arbitrary bareword like "foo"..) also [#867.J] multi-line values...)
+    EDIT this changed
+    some arbitrary bareword like "foo"..) also #multi-line strings...)
 
   - indeed if the set of names from our "mutable document entity"
     _does not match exactly_ that set of names from the vendor-parsed
@@ -213,6 +214,8 @@ be *that* bad..
 
 givens:
 
+  - EDIT change all this
+
   - assume you have some N lines (possibly zero) of the _body_ of your
     document entity (table).
 
@@ -220,7 +223,7 @@ givens:
     tail-anchored substring that constitutes everything after the
     equals sign (and one (for now) requisite space character).
 
-  - [#867.J] mutliline strings will complicate this. for now, imagine
+  - #multi-line strings will complicate this. for now, imagine
     they are not supported.
 
 now, parsing this in python is _very_ short and easy with the toml library

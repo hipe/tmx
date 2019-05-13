@@ -133,35 +133,19 @@ def _express_error_structure(error_category, struct):  # (Case819)
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 
-    reason = dim_pool.pop('reason')  # assert
-
     dim_pool.pop('errno', None)  # get rid of it, if any. was handled #here2
 
-    if len(dim_pool):
+    if 1 == len(dim_pool):
+        __express_just_reason(** dim_pool)
+    else:
+        assert('input_error' == error_category)
+        # when the above fails, consider just adding it to the dictionary
 
-        # for now, just making a bunch of overly attentive contact, as a
-        # sort of specification assertion of what metadata is available
+        from . import _case_adaptations as cases
+        cases.WHINE_ABOUT(_echo_error, dim_pool)
 
-        if 'input_error' == error_category:
-            typ = dim_pool.pop('input_error_type')
-            if 'not_found' == typ:
 
-                # == (Case818)
-                dim_pool.pop('identifier_string')
-                dim_pool.pop('did_traverse_whole_file')
-                dim_pool.pop('did_reach_end_of_stream')
-                dim_pool.pop('lineno')
-                dim_pool.pop('line')
-                # == END
-
-                assert(0 == len(dim_pool))
-            elif 'collection_not_found' == typ:
-                assert(0 == len(dim_pool))  # (Case812)
-            else:
-                cover_me(f'hi, new kind of input error subtype: {typ}')
-        else:
-            cover_me(f'hi, new error category: {error_category}')
-
+def __express_just_reason(reason):
     _echo_error(reason)
 
 

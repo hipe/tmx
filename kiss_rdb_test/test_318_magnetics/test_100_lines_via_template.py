@@ -1,4 +1,5 @@
-import _common_state
+import _common_state  # noqa: E401
+from kiss_rdb_test import structured_emission as se_lib
 import unittest
 
 
@@ -31,7 +32,7 @@ class Case200_fails(_CommonCase):
     def test_100_channel(self):
         chan = self._channel_and_lines()[0]
         self.assertEqual(
-                chan, ['error', 'expression', 'missing_required_doohahs'])
+                chan, ('error', 'expression', 'missing_required_doohahs'))
 
     def test_200_message(self):
         lines = self._channel_and_lines()[1]
@@ -42,22 +43,16 @@ class Case200_fails(_CommonCase):
     @shared_subject
     def _channel_and_lines(self):
 
-        emissions = []
+        def run(listener):
+            return _subject_function()(
+                    data_source={'no': 'see'},
+                    template_big_string="hello $fn $ln\n",
+                    data_source_key_via_template_variable_name=lambda x: f'Q{x}',  # noqa: E501
+                    listener=listener)
 
-        def listener(*args):
-            *chan, lines = args
-            emissions.append((chan, list(lines())))
-
-        _these = {'no': 'see'}
-        _lines = _subject_function()(
-                _these, "hello $fn $ln\n", lambda x: f'Q{x}', listener)
-
-        self.assertIsNone(_lines)
-
-        em, = emissions  # assert exactly one
-        chan, lines = em
-
-        return (chan, lines)
+        chan, payloader = se_lib.one_and_none(run, self)
+        _lines = payloader()
+        return (chan, _lines)
 
 
 def _subject_function():

@@ -10,7 +10,7 @@ node[shape=rect]
 862[label="issue of greedy\nparsing whitespace\n& comments"]
 852->862
 
-852[label="multi-line\nstrings"]
+852[label="multi-line\nstrings" style=filled]
 
 
 617[label="update for CLI" style=filled]

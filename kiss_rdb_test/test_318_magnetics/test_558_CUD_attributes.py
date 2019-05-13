@@ -1,18 +1,10 @@
-from _common_state import (
-        MDE_via_lines_and_table_start_line_object,
-        TSLO_via,
-        debugging_listener as _debugging_listener,
-        unindent as _unindent,
-        )
+import _common_state  # noqa: F401
+from kiss_rdb_test import CUD as CUD_support
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-
-    def _expect_LTACOR(self, how_many, *identifier_strings):
-        _actual = _subject_module()._length_of_longest_tail_anchored_contiguous_ordered_run(identifier_strings)  # noqa: E501
-        self.assertEqual(_actual, how_many)
+class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
 
     def _same_because_sho_madjozi_not_found_in_entity(self):
         _actual = self._two_parts()[1]
@@ -25,67 +17,6 @@ class _CommonCase(unittest.TestCase):
     def _same_because_reason_exact_match(self):
         _actual = self._three_parts()[1]
         self.assertEqual(_actual, ' because names must match exactly')
-
-    def expect_reason(self, msg=None):
-
-        chan, sct = self.expect_error_structure()
-        self.assertEqual(chan, ('error', 'structure', 'request_error'))  # ..
-        reason = sct['reason']
-        if msg is None:
-            return reason
-        else:
-            self.assertEqual(reason, msg)
-
-    def expect_error_structure(self):
-
-        count = 0
-        chan = None
-        emit = None
-
-        def listener(*a):
-            nonlocal count
-            count += 1
-            if 1 < count:
-                raise Exception('had more than one emission')
-            nonlocal chan
-            nonlocal emit
-            *chan, emit = a
-
-        x = self.given_run(listener)
-
-        if 1 != count:
-            raise Exception('expected emission')
-
-        self.assertIsNone(x)
-
-        chan = tuple(chan)
-        sct = emit()
-        return (chan, sct)
-
-    def expect_big_success(self):
-        listener = None  # _DEBUGGING_LISTENER
-        _mde = self.run_CUD_attributes(listener)
-        _act = tuple(TO_BODY_BLOCK_LINES_AS_MDE(_mde))
-        _exp = tuple(_unindent(self.expect_entity_body_lines()))
-        self.assertSequenceEqual(_act, _exp)
-
-    def run_CUD_attributes(self, listener):
-
-        this_listener = None  # _DEBUGGING_LISTENER
-
-        mde = _MDE(self.given_entity_body_lines(), this_listener)
-        assert(mde)
-
-        req = _request_via_tuples(self.given_request_tuples(), this_listener)
-        assert(req)
-
-        x = req.edit_mutable_document_entity_(mde, listener)
-        if x is not None:
-            self.assertEqual(x, True)
-            return mde
-
-    def _DEBUGGING_LISTENER(self):
-        return _debugging_listener()
 
 
 class Case405_011_when_request_empty(_CommonCase):
@@ -197,9 +128,6 @@ class Case405_125_cannot_create_when_attributes_already_exist(_CommonCase):
         _rsn = self.expect_reason()
         return _split_because_hack(_rsn)
 
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
-
     def given_request_tuples(self):
         return (('create', 'foo-fani', 'x'),)
 
@@ -222,9 +150,6 @@ class Case405_148_cannot_delete_because_attributes_not_found(_CommonCase):
     def _two_parts(self):
         _rsn = self.expect_reason()
         return _split_because_hack(_rsn)
-
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
 
     def given_request_tuples(self):
         return (('delete', 'sho-madjozi'),)
@@ -256,9 +181,6 @@ class Case405_170_cannot_delete_because_attributes_not_exact_match(_CommonCase):
     def _three_parts(self):
         return _same_three_split(self.expect_reason())
 
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
-
     def given_request_tuples(self):
         return (('delete', 'sho-madjozi'),)
 
@@ -281,9 +203,6 @@ class Case405_193_cannot_update_because_attributes_not_found(_CommonCase):
     def _two_parts(self):
         _rsn = self.expect_reason()
         return _split_because_hack(_rsn)
-
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
 
     def given_request_tuples(self):
         return (('update', 'sho-madjozi', 'q'),)
@@ -310,9 +229,6 @@ class Case405_216_cannot_update_because_attributes_not_exact_match(_CommonCase):
     def _three_parts(self):
         return _same_three_split(self.expect_reason())
 
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
-
     def given_request_tuples(self):
         return (('update', 'sho-madjozi', 'q'),)
 
@@ -335,9 +251,6 @@ class Case405_239_cannot_delete_because_comment_line_above(_CommonCase):
     @shared_subject
     def _two_parts(self):
         return self.expect_reason().split(' because ')
-
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
 
     def given_request_tuples(self):
         return (('delete', 'ab-fab'),)
@@ -364,9 +277,6 @@ class Case405_261_cannot_update_because_comment_line_below(_CommonCase):
     def _two_parts(self):
         return self.expect_reason().split(' because ')
 
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
-
     def given_request_tuples(self):
         return (('update', 'ab-fab', 'qq'),)
 
@@ -391,9 +301,6 @@ class Case405_284_cannot_update_because_attribute_line_has_comment(_CommonCase):
     @shared_subject
     def _two_parts(self):
         return self.expect_reason().split(' because ')
-
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
 
     def given_request_tuples(self):
         return (('update', 'ab-fab', 'qq'),)
@@ -422,9 +329,6 @@ class Case405_307_aggregate_multiple_comment_based_failures(_CommonCase):
     @shared_subject
     def _two_sentences(self):
         return self.expect_reason().split('. ')
-
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
 
     def given_request_tuples(self):
         return (('delete', 'ab-fab-1'),
@@ -462,9 +366,6 @@ class Case405_330_cannot_create_because_comment_line_above(_CommonCase):
         sp1, sp2 = _.split('. ')
         return (sp1, sp2)
 
-    def given_run(self, listener):
-        return self.run_CUD_attributes(listener)
-
     def given_request_tuples(self):
         return (('create', 'dd-dd', '123'),
                 ('create', 'ee-ee', '123'),
@@ -492,6 +393,8 @@ class Case405_330_cannot_create_because_comment_line_above(_CommonCase):
 
 
 class Case405_352_can_update_idk(_CommonCase):
+
+    # this almost touches #multi-line
 
     def test_100_something(self):
         self.expect_big_success()
@@ -540,7 +443,9 @@ class Case405_375_can_delete(_CommonCase):
 
 class Case405_404_can_create_when_comment_line_at_tail(_CommonCase):
 
-    def test_100_something(self):
+    # this tests for #multi-line but is not
+
+    def test_100_everything(self):
         self.expect_big_success()
 
     def expect_entity_body_lines(self):
@@ -582,7 +487,7 @@ class Case405_404_can_create_when_comment_line_at_tail(_CommonCase):
 
 class Case405_443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
 
-    def test_100_something(self):
+    def test_100_everything(self):
         self.expect_big_success()
 
     def expect_entity_body_lines(self):
@@ -671,29 +576,14 @@ def _split_hack(sep, reason):
     return (left, f'{ sep }{ right }')  # ick/meh
 
 
-def _request_via_tuples(tuples, listener):
-    return _ancilliary_subject_module().request_via_tuples(tuples, listener)
+def _request_via_tuples(aa, bb):
+    return CUD_support.request_via_tuples(aa, bb)
 
 
-def TO_BODY_BLOCK_LINES_AS_MDE(mde):
-    for blk in mde.to_body_block_stream_as_MDE_():
-        for line in blk.to_line_stream():
-            yield line
-
-
-def _MDE(entity_body_lines_big_string, listener):
-    _lines = _unindent(entity_body_lines_big_string)
-    _tslo = TSLO_via('A', 'meta')
-    return MDE_via_lines_and_table_start_line_object(_lines, _tslo, listener)
-
+# ==
 
 def _subject_module():
     from kiss_rdb.magnetics_ import CUD_attributes_via_request as _
-    return _
-
-
-def _ancilliary_subject_module():
-    from kiss_rdb.magnetics_ import CUD_attributes_request_via_tuples as _
     return _
 
 

@@ -6,6 +6,7 @@ from _common_state import (
 from kiss_rdb.magnetics_.entities_via_collection import (
         table_block_via_lines_and_table_start_line_object_,
         )
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import (
     dangerous_memoize as shared_subject,
     memoize,
@@ -126,29 +127,9 @@ class _CommonCase(unittest.TestCase):
         return self._expecting_failure(self.given_run)
 
     def _expecting_failure(self, run):
-        chan, structurer = self._expect_one_emisson_given_run(run)
+        chan, structurer = se_lib.one_and_none(run, self)
         self.assertEqual(chan, ('error', 'structure', 'input_error'))
         return structurer()
-
-    # -- possibly shared support
-
-    def _expect_one_emisson_given_run(self, run):
-        def listener(*a):
-            nonlocal count
-            nonlocal last_emission
-            if 0 < count:
-                self.fail('more than one emission')
-            count += 1
-            last_emission = a
-        count = 0
-        last_emission = None
-        x = run(listener)
-        if not count:
-            self.fail('expected one emission, had none')
-        self.assertIsNone(x)
-        *chan, payloader = last_emission
-        chan = tuple(chan)
-        return (chan, payloader)
 
 
 class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
@@ -435,17 +416,6 @@ class Case296_touch_multi_line(_CommonCase):  # #mutli-line-case
         """
 
 
-"""the next several cases are ordered such that the "{compound type} not
-yet supported" comes first, then the easy cases come second, then the
-"multi-line strings not yet supported" come third. it may feel like a
-narrative disjoint having a break in the "not yet supported" cases; but
-the ordering is intentional and reflects the expected relative complexities
-of their respective implementations
-([#010.6] regression-friendly ordering) because
-to detect [#867.J] multi-line strings we need to get as far as firing up our
-ad-hoc value-expression parser..."""
-
-
 class Case303_array_not_suported_yet(_CommonCase):
 
     def test_100(self):
@@ -511,6 +481,8 @@ class Case366_literal_string_not_yet_supported(_CommonCase):
 
 class Case372_multi_line(_CommonCase):
 
+    # (#tombstone-A.2 remembers when these were not yet supported)
+
     def test_372_multi_line_literal_never_has_comment(self):  # Case372
         self.expect_no_comment_easy('multi-line-literal')
 
@@ -537,7 +509,8 @@ def _comment_tester_one():
     """things to note about this fellow:
         - written so every line passes crude parse (should that be
           necessary. maybe it isnt.)
-        - .[#867.J] multi-line strings cannot have comments
+        - .#mutli-line strings cannot have comments after them (according
+          to our vendor parsing library) so the break the pattern below
         - note the trick we do to get tripple quotes into the multiline string
     """
 
@@ -614,5 +587,6 @@ if __name__ == '__main__':
     unittest.main()
 
 
+# #tombstone-A.2 as referenced
 # #history-A.1 adding multi-line support changed some cases
 # #born.

@@ -1,28 +1,19 @@
 from _common_state import (
-        fixture_directories_path,
         unindent,
         )
+from kiss_rdb_test import CLI as CLI_support
+from kiss_rdb_test.CLI import (
+    common_args_head,
+    build_filesystem_expecting_num_file_rewrites,
+    )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
         )
-from script_lib.test_support import expect_STDs as es
 import unittest
 
 
 """GENERAL DISCUSSION of this test file
-
-on stdout capture support :[#817]: :#here2:
-
-  - this identifier marks a spot in the support library where is described
-    the component architecture from which IO facades (test spies) can be made.
-  - here we do a lot of gross bandaid code to accommodate the fact that Click
-    is not made testing friendly #[#867.L]
-  - here we do our own highly experimental construction of a write-only IO
-    listener as proposed in the aforementioned support file.
-  - here we have an interface for turning on the debugging form of this
-  - any/all of the above will be abstracted when appropriate
-
 
 on the test case number allocation here:
 
@@ -39,10 +30,13 @@ on the test case number allocation here:
     "modality" layer, mostly (i.e it's not a CLI thing, mainly) so SEVEN:
   - `${tmx subdivide} 790:839:7` gives us all the case numbers that appear here
   - NOTE *all* these cases are "the CLI adaptation of..". abstract later.
+
+
+(:#here2: is [#817] (our main test support module)
 """
 
 
-class _CommonCase(unittest.TestCase):
+class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
 
     def expect_requires_these_particular_arguments(self, *expect_these):
 
@@ -80,83 +74,10 @@ class _CommonCase(unittest.TestCase):
         # several lines
         self.assertTrue(3 < len(lines))
 
-    def _expect_exit_code_for_bad_request(self):
-        self.expect_exit_code(400)
-
-    def expect_exit_code(self, which):
-        self.assertEqual(self._end_state().exception.exit_code, which)
-
-    def expect_exit_code_is_the_success_exit_code(self):
-        self.assertEqual(self._end_state().exit_code, _success_exit_code)
-
     def _expect_common(self, which_IO, which_e):
-        o = self._build_end_state(which_IO, which_e)
+        o = self.build_end_state(which_IO, which_e)
         lines = tuple(o.lines)  # it's a generator. flatten it now before etc
         return lines, o.exception
-
-    def _build_end_state(self, which_IO, which_e):
-        if 'stdout' == which_IO:
-            yes_stdout = True
-            yes_stderr = False
-        elif 'stderr' == which_IO:
-            yes_stdout = False
-            yes_stderr = True
-        elif 'stdout and stderr':
-            yes_stdout = True
-            yes_stderr = True
-
-        return self.MY_BIG_FLEX(
-                allow_stdout_lines=yes_stdout,
-                allow_stderr_lines=yes_stderr,
-                exception_category=which_e,
-                )
-
-    def _build_end_state_FOR_DEBUGGING(self, exe_cat='anything experiment'):
-
-        o = self.MY_BIG_FLEX(
-                allow_stdout_lines=True,
-                allow_stderr_lines=True,
-                exception_category=exe_cat,
-                )
-
-        if hasattr(o, 'exception'):
-            e = o.exception
-            print(f'WAS EXCEPTION: {type(e)} {str(e)}')
-
-        if hasattr(o, 'filesystem_recordings'):
-            a = o.filesystem_recordings
-            if a is not None:
-                print(f'HAD NUM RECORDINGS: {len(a)}')
-
-        for line in o.lines:
-            cover_me('hi')
-        cover_me('hey')
-
-    def MY_BIG_FLEX(
-            self,
-            allow_stdout_lines,
-            allow_stderr_lines,
-            exception_category):
-
-        fs = self.filesystem()
-        if fs is None:
-            injections_dict = None
-        else:
-            injections_dict = {
-                    'filesystem': fs,
-                    'random_number': self.random_number(),
-                    }
-
-        return BIG_FLEX(
-            given_args=self.given_args(),
-            allow_stdout_lines=allow_stdout_lines,
-            allow_stderr_lines=allow_stderr_lines,
-            exception_category=exception_category,
-            injections_dictionary=injections_dict,
-            might_debug=self.might_debug,
-            do_debug_f=lambda: self.do_debug,
-            debug_IO_f=lambda: _sys().stderr,
-            )
 
     def random_number(self):
         return None
@@ -308,14 +229,14 @@ class Case812_traverse_fail(_CommonCase):
         self.expect_exit_code(2)  # FileNotFoundError.errno
 
     def test_200_message_lines(self):
-        _actual, = self._end_state().lines
+        _actual, = self.end_state().lines
         reason, path = _actual.split(' - ')
         self.assertEqual(reason, 'collection does not exist because no schema file')  # noqa: E501
         self.assertEqual(path, 'qq/pp/schema.toml\n')
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stderr', 'click exception')
+    def end_state(self):
+        return self.build_end_state('stderr', 'click exception')
 
     def given_args(self):
         return ('--collections-hub', 'qq', 'traverse', 'pp')
@@ -327,7 +248,7 @@ class Case813_traverse(_CommonCase):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_lines_look_like_internal_identifiers(self):
-        lines = tuple(self._end_state().lines)
+        lines = tuple(self.end_state().lines)
         self.assertIn(len(lines), range(7, 10))
         import re
         rx = re.compile('^[A-Z0-9]{3}\n$')
@@ -335,11 +256,11 @@ class Case813_traverse(_CommonCase):
             assert(rx.match(line))
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stdout', None)
+    def end_state(self):
+        return self.build_end_state('stdout', None)
 
     def given_args(self):
-        return (*_common_head(), 'traverse', _common_collection)
+        return (*common_args_head(), 'traverse', _common_collection)
 
 
 class Case814_select_help(_CommonCase):
@@ -379,18 +300,18 @@ class Case817_get_help(_CommonCase):
 class Case818_get_fail(_CommonCase):
 
     def test_100_exit_code_is_404_lol(self):
-        self.assertEqual(self._end_state().exception.exit_code, 404)
+        self.assertEqual(self.end_state().exception.exit_code, 404)
 
     def test_200_says_only_not_found__with_ID(self):
-        line, = self._end_state().lines
+        line, = self.end_state().lines
         self.assertEqual(line, "'B9F' not found\n")
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stderr', 'click exception')
+    def end_state(self):
+        return self.build_end_state('stderr', 'click exception')
 
     def given_args(self):
-        return (*_common_head(), 'get', _common_collection, 'B9F')
+        return (*common_args_head(), 'get', _common_collection, 'B9F')
 
 
 class Case819_get(_CommonCase):
@@ -399,7 +320,7 @@ class Case819_get(_CommonCase):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_lines_wow(self):
-        lines = self._end_state().lines
+        lines = self.end_state().lines
         _actual_big_string = ''.join(lines)  # correct an issue todo
         _actual_lines = tuple(_lines_via_big_string_as_is(_actual_big_string))
 
@@ -417,11 +338,11 @@ class Case819_get(_CommonCase):
         self.assertSequenceEqual(_actual_lines, _expect_lines)
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stdout', None)
+    def end_state(self):
+        return self.build_end_state('stdout', None)
 
     def given_args(self):
-        return (*_common_head(), 'get', _common_collection, 'B9H')
+        return (*common_args_head(), 'get', _common_collection, 'B9H')
 
 
 class Case820_create_help(_CommonCase):
@@ -444,18 +365,18 @@ class Case820_create_help(_CommonCase):
 class Case821_create_fail(_CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
-        self._expect_exit_code_for_bad_request()
+        self.expect_exit_code_for_bad_request()
 
     def test_200_reason(self):
-        line, = self._end_state().lines
+        line, = self.end_state().lines
         self.assertEqual(line, 'request was empty\n')
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stderr', 'click exception')
+    def end_state(self):
+        return self.build_end_state('stderr', 'click exception')
 
     def given_args(self):
-        return (*_common_head(), 'create', _common_collection)
+        return (*common_args_head(), 'create', _common_collection)
 
     def filesystem(self):
         return None
@@ -467,13 +388,6 @@ class Case822_create(_CommonCase):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_stdout_lines_are_toml_lines_of_created_fellow(self):
-
-        def assert_stdout(which, line):
-            self.assertEqual(which, 'sout')
-            return line
-
-        ql = self._qualified_lines()
-        _actual = tuple(assert_stdout(which, line) for which, line in ql[1:])
 
         """currently what is written to stdout on successful create is simply
         the same lines of the mutable document entity that were inserted into
@@ -493,8 +407,11 @@ class Case822_create(_CommonCase):
           as opposed to retrieving, the user wants visual confirmation that
           nothing strange happened in encoding their "deep" data into a
           surface representation for this particular datastore.
-        :#here3
+
+        :#HERE3
         """
+
+        _actual = self.common_entity_screen().stdout_lines
 
         _expected = tuple(unindent("""
         [item.2H3.attributes]
@@ -505,24 +422,23 @@ class Case822_create(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        which, line = self._qualified_lines()[0]
-        self.assertEqual(which, 'serr')
+        line = self.common_entity_screen().stderr_line
         self.assertEqual(line, 'created:\n')
 
     @shared_subject
-    def _qualified_lines(self):
-        return tuple(self._end_state().lines)
+    def common_entity_screen(self):
+        return self.expect_common_entity_screen()
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stdout and stderr', None)
+    def end_state(self):
+        return self.build_end_state('stdout and stderr', None)
 
     def given_args(self):
-        return (*_common_head(), 'create', _common_collection,
+        return (*common_args_head(), 'create', _common_collection,
                 '-val', 'aa', 'AA', '-val', 'bb', 'BB')
 
     def filesystem(self):
-        return _build_filesystem_expecting_num_file_rewrites(2)
+        return build_filesystem_expecting_num_file_rewrites(2)
 
     def random_number(self):
         return 481  # kiss ID 2H3 is base 10 481
@@ -553,14 +469,9 @@ class Case825_delete(_CommonCase):
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
-    def test_200_stdout_is_deleted_lines(self):  # same as #here3
+    def test_200_stdout_is_deleted_lines(self):
 
-        def assert_stdout(which, line):
-            self.assertEqual(which, 'sout')
-            return line
-
-        _ql = self._qualified_lines()
-        _actual = tuple(assert_stdout(which, line) for which, line in _ql[1:])
+        _actual = self.common_entity_screen().stdout_lines
 
         _expected = tuple(unindent("""
         [item.B7G.attributes]
@@ -571,24 +482,23 @@ class Case825_delete(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        which, line = self._qualified_lines()[0]
-        self.assertEqual(which, 'serr')
+        line = self.common_entity_screen().stderr_line
         self.assertEqual(line, 'deleted:\n')
 
     @shared_subject
-    def _qualified_lines(self):
-        return tuple(self._end_state().lines)
+    def common_entity_screen(self):
+        return self.expect_common_entity_screen()
 
     @shared_subject
-    def _end_state(self):
-        # return self._build_end_state_FOR_DEBUGGING()
-        return self._build_end_state('stdout and stderr', None)
+    def end_state(self):
+        # return self.build_end_state_FOR_DEBUGGING()
+        return self.build_end_state('stdout and stderr', None)
 
     def given_args(self):
-        return (*_common_head(), 'delete', _common_collection, 'B7G')
+        return (*common_args_head(), 'delete', _common_collection, 'B7G')
 
     def filesystem(self):
-        return _build_filesystem_expecting_num_file_rewrites(2)
+        return build_filesystem_expecting_num_file_rewrites(2)
 
 
 class Case226_update_help(_CommonCase):
@@ -613,14 +523,9 @@ class Case828_update(_CommonCase):
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
-    def test_200_stdout_is_updated_lines_CAPTURE_WS_ISSUE(self):  # #here3
+    def test_200_stdout_is_updated_lines_CAPTURE_WS_ISSUE(self):
 
-        def assert_stdout(which, line):
-            self.assertEqual(which, 'sout')
-            return line
-
-        _ql = self._qualified_lines()
-        _actual = tuple(assert_stdout(which, line) for which, line in _ql[1:])
+        _actual = self.common_entity_screen().stdout_lines
 
         _expected = tuple(unindent("""
         [item.B7F.attributes]
@@ -633,20 +538,19 @@ class Case828_update(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        which, line = self._qualified_lines()[0]
-        self.assertEqual(which, 'serr')
+        line = self.common_entity_screen().stderr_line
         self.assertEqual(line, 'updated. new entity:\n')
 
     @shared_subject
-    def _qualified_lines(self):
-        return tuple(self._end_state().lines)
+    def common_entity_screen(self):
+        return self.expect_common_entity_screen()
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state('stdout and stderr', None)
+    def end_state(self):
+        return self.build_end_state('stdout and stderr', None)
 
     def given_args(self):
-        return (*_common_head(), 'update', _common_collection,
+        return (*common_args_head(), 'update', _common_collection,
                 'B7F',
                 '-delete', 'thing-1',
                 '-change', 'thing-2', 'hey F updated',
@@ -655,7 +559,7 @@ class Case828_update(_CommonCase):
                 )
 
     def filesystem(self):
-        return _build_filesystem_expecting_num_file_rewrites(1)
+        return build_filesystem_expecting_num_file_rewrites(1)
 
 
 class Case829_search_help(_CommonCase):
@@ -677,7 +581,12 @@ class Case829_search_help(_CommonCase):
 
 @memoize
 def _CASE_A():  # usually it's one invocation
-    o = BIG_FLEX(
+
+    def debug_IO_f():
+        import sys as _
+        return _.stderr
+
+    o = CLI_support.BIG_FLEX(
             given_args=('--help',),
             allow_stdout_lines=True,
             allow_stderr_lines=False,
@@ -685,9 +594,11 @@ def _CASE_A():  # usually it's one invocation
             injections_dictionary=None,
             might_debug=False,  # ..
             do_debug_f=lambda: False,  # ..
-            debug_IO_f=lambda: _sys().stderr,
+            debug_IO_f=debug_IO_f,
             )
-    return _StructTreeAndExitCode(_tree_via_lines(o.lines), o.exception.code)
+
+    _tree = CLI_support.tree_via_lines(o.lines)
+    return _StructTreeAndExitCode(_tree, o.exception.code)
 
 
 class _StructUsageLineAndFirstDescLine:
@@ -700,311 +611,9 @@ class _StructTreeAndExitCode:
         self.tree, self.exit_code = two
 
 
-# == BEGIN stdout capture and support #here2
-
-def BIG_FLEX(
-        given_args,
-        allow_stdout_lines,
-        allow_stderr_lines,
-        exception_category,
-        injections_dictionary,
-        might_debug,
-        do_debug_f,
-        debug_IO_f,
-        ):
-
-    mixed_writes = []
-    is_complicated = False
-
-    if allow_stdout_lines:
-        if allow_stderr_lines:
-            is_complicated = True
-
-            def receive_sout_write(s):
-                mixed_writes.append(('sout', s))
-
-            def receive_serr_write(s):
-                mixed_writes.append(('serr', s))
-            out_WR = _write_receiver_via_function(receive_sout_write)
-            err_WR = _write_receiver_via_function(receive_serr_write)
-        else:
-            def receive_sout_write(s):
-                mixed_writes.append(s)
-            out_WR = _write_receiver_via_function(receive_sout_write)
-            err_WR = _no_WR
-    else:
-        def receive_serr_write(s):
-            mixed_writes.append(s)
-        out_WR = _no_WR
-        err_WR = _write_receiver_via_function(receive_serr_write)
-
-    if might_debug:
-        _odwr = es.DebuggingWriteReceiver('sout', do_debug_f, debug_IO_f)
-        _edwr = es.DebuggingWriteReceiver('serr', do_debug_f, debug_IO_f)
-        out_WR = es.MuxingWriteReceiver((_odwr, out_WR))
-        err_WR = es.MuxingWriteReceiver((_edwr, err_WR))
-
-    def invoke_CLI():
-        return _invoke_CLI(given_args, injections_dictionary)
-
-    def clean_up_writes():
-        if is_complicated:
-            return __clean_up_writes_complicatedly(mixed_writes)
-        return __lines_via_writes(mixed_writes)
-
-    if exception_category is None:
-
-        with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
-            fs_finish, exit_code = invoke_CLI()
-
-        if fs_finish is None:
-            fsr = None
-        else:
-            fsr = fs_finish()
-
-        _lines = clean_up_writes()
-        return _BigFlexEndStateWithLala(
-                filesystem_recordings=fsr,
-                lines=_lines,
-                exit_code=exit_code)
-
-    def these(s):
-        if 'click exception' == s:
-            yield ce('ClickException')
-        elif 'system exit' == s:
-            yield SystemExit
-        elif 'usage error' == s:
-            yield ce('UsageError')
-        elif 'anything experiment' == s:
-            yield ce('ClickException')
-            yield ce('UsageError')
-            yield SystemExit
-        else:
-            cover_me(f'uncoded for exception category: {s}')
-
-    def ce(s):  # ce="click exception"
-        import click.exceptions as _
-        return getattr(_, s)
-
-    _exception_class_expression = tuple(these(exception_category))
-
-    try:
-        with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
-            invoke_CLI()
-            raise Exception('never see')
-    except _exception_class_expression as e_:
-        e = e_
-
-    _ = clean_up_writes()
-    return _BigFlexEndStateWithException(_, e)
-
-
-class _BigFlexEndStateWithException:
-    def __init__(self, lines, e):
-        self.lines = lines
-        self.exception = e
-
-
-class _BigFlexEndStateWithLala:
-    def __init__(self, filesystem_recordings, lines, exit_code):
-        self.filesystem_recordings = filesystem_recordings
-        self.lines = lines
-        self.exit_code = exit_code
-
-
-def _write_receiver_via_function(receive_write):
-    return es.ProxyingWriteReceiver(receive_write)
-
-
-def _expecting_no_emissions(x):
-    assert(False)
-
-
-_no_WR = _write_receiver_via_function(_expecting_no_emissions)
-
-
-def _invoke_CLI(given_args, injections_dictionary):
-
-    from kiss_rdb.magnetics_.collection_via_directory import (
-            INJECTIONS as INJECTIONS)
-
-    from kiss_rdb.cli import cli
-
-    _NASTY_HACK_once()
-
-    if injections_dictionary is None:
-        injections_obj = None
-        filesystem_finish = None
-    else:
-        random_number, filesystem = __flatten_these(**injections_dictionary)
-        _random_number_generator = __rng_via(random_number)
-        filesystemer, filesystem_finish = __these_two_via_filesystem(filesystem)  # noqa: E501
-
-        injections_obj = INJECTIONS(
-                random_number_generator=_random_number_generator,
-                filesystemer=filesystemer)
-
-    _exit_code = cli.main(
-                args=given_args,
-                prog_name='ohai-mami',
-                standalone_mode=False,  # see.
-                complete_var='___hope_this_env_var_is_never_set',
-                obj=injections_obj,
-            )
-
-    return filesystem_finish, _exit_code
-
-
-@memoize
-def _NASTY_HACK_once():
-    # OCD for tests (this is a common OCD we run into when testing CLI):
-    # don't ever parse the same schema file more than once
-    # (at writing it saves from 4 extranous constructons)
-
-    from kiss_rdb.magnetics_ import schema_via_file_lines as mod
-
-    real_function = mod.SCHEMA_VIA_COLLECTION_PATH
-
-    cache = {}
-
-    def use_function(path, listener):
-
-        if path in cache:
-            return cache[path]
-        res = real_function(path, listener)
-        if res is not None:
-            cache[path] = res
-        return res
-
-    mod.SCHEMA_VIA_COLLECTION_PATH = use_function
-
-
-def __rng_via(random_number):
-    if random_number is None:
-        return
-
-    def random_number_generator(pool_size):
-        return random_number
-    return random_number_generator
-
-
-def __these_two_via_filesystem(filesystem):
-    if filesystem is None:
-        return (None, None)
-
-    def filesystem_finish():
-        return filesystem.FINISH_AS_HACKY_SPY()
-
-    def filesystemer():
-        return filesystem
-
-    return filesystemer, filesystem_finish
-
-
-def __flatten_these(random_number, filesystem):
-    return random_number, filesystem
-
-
-def OPEN_HORRIBLE_VENDOR_HACK(sout_write_receiver, serr_write_receiver):
-    """.#open [#867.L] this so bad:
-
-    click is not written to be test-friendly in any injection-sense, so
-    we have to awfully, hackishly rewrite these functions to be other
-    functions, and then (for each invocation under test) pop things back
-    into place and hope our execution context works alright and hope that
-    this doesn't break actual CLI that's being used during the running of
-    tests. so bad.
-
-    also:
-      - don't let the "default" in the name fool you below.
-    """
-
-    from click import utils as EEK_click_utils
-
-    sout_iof = es.Write_Only_IO_Facade(sout_write_receiver)
-    serr_iof = es.Write_Only_IO_Facade(serr_write_receiver)
-
-    dtso = getattr(EEK_click_utils, '_default_text_stdout')
-    dtse = getattr(EEK_click_utils, '_default_text_stderr')
-
-    setattr(EEK_click_utils, '_default_text_stdout', lambda: sout_iof)
-    setattr(EEK_click_utils, '_default_text_stderr', lambda: serr_iof)
-
-    def f():
-        setattr(EEK_click_utils, '_default_text_stdout', dtso)
-        setattr(EEK_click_utils, '_default_text_stderr', dtse)
-
-    return _Ensure(f)
-
-
-class _Ensure:
-
-    def __init__(self, f):
-        self._function = f
-
-    def __enter__(self):
-        # we could have put set-up code here, but why?
-        pass
-
-    def __exit__(self, _, _2, _3):
-        f = self._function
-        del self._function
-        f()
-
-
-def _tree_via_lines(lines):
-    from script_lib.test_support.expect_treelike_screen import (
-            tree_via_line_stream as _)
-    return _(lines)
-
-
-def __clean_up_writes_complicatedly(writes):
-    if not len(writes):
-        return ()
-
-    for which, big_s in writes:
-        for line in _lines_via_big_string_as_is(big_s):
-            yield which, line
-
-
-def __lines_via_writes(writes):
-    """DISCUSSION
-
-    we tried this with the equivalent of `re.split('(?<=\n)', write)` but
-    that adds a trailing *empty* string
-    """
-
-    for write in writes:
-        for line in _lines_via_big_string_as_is(write):
-            yield line
-
-
-def _sys():
-    import sys as _
-    return _
-
-
-# == END support for stdout capture
-
-
 def _lines_via_big_string_as_is(big_string):
     import kiss_rdb.magnetics_.CUD_attributes_via_request as lib
     return lib.lines_via_big_string_(big_string)
-
-
-# == support for setup
-
-def _common_head():
-    return '--collections-hub', fixture_directories_path()
-
-
-def _build_filesystem_expecting_num_file_rewrites(expected_num):
-    return _fs_lib().build_filesystem_expecting_num_file_rewrites(expected_num)
-
-
-def _fs_lib():
-    from kiss_rdb_test import filesystem_spy as _
-    return _
 
 
 # == general

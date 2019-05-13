@@ -1,6 +1,5 @@
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import memoize
+
 
 # (this is :[#867.K] the main place we use the toml vendor lib
 # but there may be more.)

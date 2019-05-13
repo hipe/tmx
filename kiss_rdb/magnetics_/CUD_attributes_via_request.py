@@ -3,10 +3,11 @@ from modality_agnostic.memoization import (
         )
 
 
-def apply_CUD_attributes_request_to_MDE___(mde, req, listener):
+def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
 
     # (long explanation extracted into [#865] "in-depth code explanation")
 
+    # eenc = entity encoder
     # qits = "Qualified Items", a tail-anchored excerpt list
 
     if not __check_for_necessary_presence_or_absence(mde, req, listener):
@@ -65,7 +66,8 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, listener):
         i, groups, apnds, qits = (None, (), (), None)  # (Case352)
 
     if has_creates or has_updates:
-        if not __apply_C_and_U(i, mde, groups, apnds, qits, updates, listener):
+        if not __apply_C_and_U(
+                i, mde, groups, apnds, qits, updates, eenc, listener):
             return
 
     return _okay  # whenever failure happened, we short circuited (Case405_404)
@@ -537,8 +539,10 @@ _function_name_via_presence_problem_type = {
 # == APPLYs/FLUSHes
 
 
-def __apply_C_and_U(head_ok_i, mde, groups, appends, qits, updates, listener):
-    """each insertion group is defined in terms of an existing line object
+def __apply_C_and_U(
+        head_ok_i, mde, groups, appends, qits, updates, eenc, listener):
+
+    """each insertion group is defined in terms of an existing attribute block
 
     to insert before and a list of UNSANITIZED insertion requests. because
     doubly linked list and we're using internal identifiers, we can make the
@@ -550,7 +554,9 @@ def __apply_C_and_U(head_ok_i, mde, groups, appends, qits, updates, listener):
     appends are what they sound like (and penalty same, meh). but also
     """
 
-    blk_via = __make_new_blocks(updates, groups, appends, listener)
+    blk_via = __make_new_blocks(updates, groups, appends, eenc, listener)
+    if blk_via is None:
+        return
 
     def new_attr(compo):
         return blk_via[compo.attribute_name.name_string]
@@ -595,55 +601,105 @@ def _blank_line():
     return _blocks_lib().AppendableDiscretionaryBlock_('\n')
 
 
-def __make_new_blocks(updates, groups, appends, listener):
+def __make_new_blocks(updates, groups, appends, eenc, listener):
     """in order to "encode" the values, use the real life toml library..
 
     (Case405_352)
     """
 
-    # turn everything into a dictionary of the key-value pairs
-    dct = __values_dictionary_via(updates, groups, appends)
+    # turn everything into two dictionaries,
 
-    # turn the dictionary into a toml big string
+    tup = __PLAN_VIA(updates, groups, appends, eenc)
+    if not tup:
+        return
+
+    # ..one dictionary (right) of values we want the toml vendor lib to
+    # encode for us directly, and one dict of semi-encoded attribute blocks
+
+    semi_encoded_dct, vendor_lib_dct = tup
+
+    # start by using the vendor lib to parse the one dict to get a big string
+    # (remarkably, the empty case just works (Case407_100):
+    # empty dict -> empty big string -> no lines -> table_block w/ no childs)
+
     from toml import dumps as toml_dumps  # another #[#867.K]
-    _big_s = toml_dumps(dct)  # ..
+    _big_s = toml_dumps(vendor_lib_dct)
     _lines = lines_via_big_string_(_big_s)
 
     # turn the big string into a parsed block
 
     from . import entities_via_collection as ents_lib
-    _table_block = ents_lib.table_block_via_lines_and_table_start_line_object_(
+    table_block = ents_lib.table_block_via_lines_and_table_start_line_object_(
             lines=_lines,
             table_start_line_object=None,
             listener=listener)
 
+    # if you have any semi-encoded values to add, add them woot
+
+    for attr_s, semi_encoded_lines in semi_encoded_dct.items():
+        # (Case407_100)
+        table_block.append_multi_line_attribute_block_via_lines__(
+                attr_s, semi_encoded_lines)
+
     # turn the parsed block into
 
-    return {o.attribute_name_string: o for o in _table_block.to_body_block_stream_as_table_block_()}  # noqa: E501
+    return {o.attribute_name_string: o for o in table_block.to_body_block_stream_as_table_block_()}  # noqa: E501
 
 
-def __values_dictionary_via(updates, groups, appends):
-    # worrying about how to encode multiline is out of scope for now [#867.J]
+def __PLAN_VIA(updates, groups, appends, eenc):
 
-    dct = {}
+    semi_encoded_dct = {}
+    vendor_lib_dct = {}
 
-    def add_pair(compo):
+    def components_flattened():
+
+        for update in updates:
+            yield update
+
+        for _, compos in groups:
+            for compo in compos:
+                yield compo
+
+        for append in appends:
+            yield append
+
+    for compo in components_flattened():
+
+        attr_name_s = compo.attribute_name.name_string
         mixed = compo.unsanitized_value
-        if isinstance(mixed, str) and '\n' in mixed:
-            cover_me('OMG multiline')
-        dct[compo.attribute_name.name_string] = mixed
 
-    for update in updates:
-        add_pair(update)
+        tup = eenc.semi_encode(mixed, attr_name_s)
+        if tup is None:
+            # (Case407_120)
+            return
 
-    for _, compos in groups:
-        for compo in compos:
-            add_pair(compo)
+        name_value_plan, o = tup
 
-    for append in appends:
-        add_pair(append)
+        if 'use vendor lib' == name_value_plan:
+            vendor_lib_dct[attr_name_s] = mixed
+        else:
+            assert('semi-encoded string' == name_value_plan)
 
-    return dct
+            semi_encoded_lines = o.semi_encoded_lines
+            num_lines = len(semi_encoded_lines)
+
+            assert(num_lines)  # (Case407_120) empty string
+
+            if 1 == num_lines:
+                if o.has_special_characters:
+                    # (Case407_140) one line, special chars
+                    vendor_lib_dct[attr_name_s] = mixed  # RE-ENCODE
+                else:
+                    # one line, no special chars (Case405_404)
+                    vendor_lib_dct[attr_name_s] = mixed  # RE-ENCODE
+            elif o.has_special_characters:
+                # (Case407_160) multiple lines, special chars
+                semi_encoded_dct[attr_name_s] = semi_encoded_lines
+            else:
+                # multiple lines, no special chars (Case407_100)
+                semi_encoded_dct[attr_name_s] = semi_encoded_lines
+
+    return semi_encoded_dct, vendor_lib_dct
 
 
 def __flush_deletes(mde, deletes):
@@ -687,9 +743,13 @@ class _Scanner():
 # == WHINERS
 
 def _emit_request_error_via_reason(msg, listener):
-    def structure():
+    def structurer():
         return {'reason': msg}
-    listener('error', 'structure', 'request_error', structure)
+    _emit_request_error(listener, structurer)
+
+
+def _emit_request_error(listener, structurer):  # one of several
+    listener('error', 'structure', 'request_error', structurer)
 
 
 # ==
@@ -702,10 +762,6 @@ def lines_via_big_string_(big_s):  # (copy-paste of [#610].)
 def _blocks_lib():
     from . import blocks_via_file_lines as blk_lib
     return blk_lib
-
-
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
 _not_ok = False

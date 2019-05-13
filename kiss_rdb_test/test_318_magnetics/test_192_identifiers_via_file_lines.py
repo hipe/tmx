@@ -1,7 +1,7 @@
 from _common_state import (
         unindent,
         )
-from kiss_rdb_test import structured_emission
+from kiss_rdb_test import structured_emission as se_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -55,24 +55,22 @@ class _CommonCase(unittest.TestCase):
 
     def _run_expecting_input_error(self, shape, receive_payloader):
 
-        def listener(*args):
-            nonlocal count
-            count += 1
-            if 1 < count:
-                raise Exception('more than one emission')
-            *chan, payloader = args
-            self.assertEqual(chan, ['error', shape, 'input_error'])
+        def receive_emission(chan, payloader):
+            self.assertEqual(chan, ('error', shape, 'input_error'))
             receive_payloader(payloader)
 
-        count = 0
+        listener, ran = se_lib.one_and_done(receive_emission, self)
+
         itr = self._run_non_validating_ID_traversal(listener)
+
         for x in itr:
             self.fail()
-        self.assertEqual(count, 1)
+
+        ran()
 
     def run_non_validating_ID_traversal_expecting_success(self):
 
-        listener = structured_emission.debugging_listener() if False else None
+        listener = se_lib.debugging_listener() if False else None
         # set the above to true if it's failing and trying to emit, to debug
         itr = self._run_non_validating_ID_traversal(listener)
         x_a = []
@@ -289,7 +287,7 @@ class Case145_non_validated_ID_traversal_two(_CommonCase):
         return ('[item.B.attributes]\n', '[item.B.meta]\n')
 
 
-class Case150_first_touch_of_multi_line(_CommonCase):  # #[#867.J] #mutli-line-case # noqa: E501
+class Case150_first_touch_of_multi_line(_CommonCase):  # #mutli-line-case
 
     def test_100_EVERYTHING(self):
         _actual = self.run_non_validating_ID_traversal_expecting_success()
