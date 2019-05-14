@@ -1,0 +1,10 @@
+[item.48R.attributes]
+body = """
+trying this one [here][1]
+
+
+[1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
+"""
+next = "8W2"
+
+# #born.

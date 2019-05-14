@@ -1,0 +1,20 @@
+[item.PBR.attributes]
+header = "gotta learn CC first"
+body = """
+
+gotta learn [gcc][1] first.
+
+we had to learn you link C code (with `gcc`):
+
+```(bash)
+gcc -o pho/pho-bridge.o -Ipho -c pho/pho-bridge.c
+gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
+```
+
+
+
+[1] https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
+"""
+parent = "8W2"
+
+# #born.

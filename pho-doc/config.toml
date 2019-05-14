@@ -1,0 +1,16 @@
+# this is for hugo. run `hugo server` from THIS directory
+
+
+paginate=10
+
+theme="newsprint"
+themesDir="../themes"
+
+contentDir="hugo-content"
+
+baseURL="http://example.org/"
+title="My New Hugo Site"
+languageCode="en-us"
+
+
+# #born.

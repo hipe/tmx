@@ -1,0 +1,33 @@
+[item.8W2.attributes]
+body = """
+
+looked at [this gist][1].
+
+looked at [this blog][2].
+
+(from stack overflow:)
+
+> If you can get away with just using NSTask to launch
+> a Python process, that's a pretty good option too.
+
+then reading about the [C API][3]
+which is a companion to the [extending][4] thing.
+
+really you just the above two, and in this [swift guy][5],
+they talk about importing C API's
+
+a blog wxxxxxx
+
+
+
+
+[1]: https://github.com/ndevenish/Site-ndevenish/blob/master/_posts/2017-04-11-using-python-with-swift-3.markdown
+[2]: https://www.agnosticdev.com/blog-entry/swift-python/swift-and-python-interop-using-dynamic-member-lookup
+[3]: https://docs.python.org/3/c-api/index.html
+[4]: https://docs.python.org/3/extending/index.html#extending-index
+[5]: https://developer.apple.com/documentation/swift
+[6]: https://theswiftdev.com/2018/01/15/how-to-call-c-code-from-swift/
+"""
+previous = "48R"
+
+# #born.

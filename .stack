@@ -6,3 +6,11 @@ a lot of the names in state machine module are still EXPERIMENTAL
 EDIT
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
+codename WASD
+tons of work to make C-lib for kiss-db
+learn enough SDK to make WASD
+python that you write processing a request & giving a response into a swift app
+learn python extensions: a C extension lib for some minimal python you write
+a swift app calling a minimal C library that you wrie
+that minimal swift app from the tutorial
+learn how gcc linking works
