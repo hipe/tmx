@@ -1,5 +1,6 @@
 [item.PBR.attributes]
-header = "gotta learn CC first"
+parent = "8W2"
+heading = "gotta learn gcc and basic linking first"
 body = """
 
 gotta learn [gcc][1] first.
@@ -15,6 +16,5 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 [1] https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
 """
-parent = "8W2"
 
 # #born.

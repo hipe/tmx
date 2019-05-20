@@ -1,23 +1,52 @@
 [item.8W2.attributes]
+parent = "AZC"
+heading = "our sources for how we learned the above"
 body = """
+This [first gist][1] we looked at is from 2017-04,
+and a lot has changed since then.
 
-looked at [this gist][1].
+This second [blog][2] is from 2018-05, and it introduced us to the idea of
+bridge libraries, and we might come back to it.
 
-looked at [this blog][2].
 
 (from stack overflow:)
 
 > If you can get away with just using NSTask to launch
 > a Python process, that's a pretty good option too.
 
-then reading about the [C API][3]
+☝️ We probably don't want that, not enough fine grained control, probably
+some latency issues too. However we should confirm this eventually
+.#open [#882.C] that this is not the way we want to do this (and why).
+
+
+Soon with python we will dive into its [C API][3]
 which is a companion to the [extending][4] thing.
 
-really you just the above two, and in this [swift guy][5],
-they talk about importing C API's
 
-a blog wxxxxxx
+The Apple [swift developer documentation][5] touches on importing
+C API's, but is quite anemic there.
 
+
+This troubled pro guy wrote [this blog][7] that was helpful but didn't
+actually have his own C code, just him importing the headers to sqlite3.
+
+
+But the above introduced us to [the big change][8] where now they do
+system library targets instead of their own packages.
+
+
+Searching `swift "System Library Targets"` yielded several of these results.
+
+
+(From the same author of above (Ankit Aggarwal) they discuss the
+specifics of one such problem in [this forum post][9]; but it's a hazy fix.)
+
+
+This [Jacob Pan][11] post was essential in teaching us how to make a dylib.
+
+
+This [shopify post][10] was essential in getting us to figure out how to
+pass the command line options to get it to look in different libs.
 
 
 
@@ -27,6 +56,11 @@ a blog wxxxxxx
 [4]: https://docs.python.org/3/extending/index.html#extending-index
 [5]: https://developer.apple.com/documentation/swift
 [6]: https://theswiftdev.com/2018/01/15/how-to-call-c-code-from-swift/
+[7]: https://troubled.pro/2018/09/shim.html
+[8]: https://github.com/apple/swift-evolution/blob/master/proposals/0208-package-manager-system-library-targets.md
+[9]: https://forums.swift.org/t/problem-with-new-package-manager-system-library-targets/16358
+[10]: https://medium.com/shopify-mobile/wrapping-a-c-library-in-swift-part-1-6dd240070cef
+[11]: https://jacobpan3g.github.io/2017/09/01/build-dylib-on-mac/
 """
 previous = "48R"
 

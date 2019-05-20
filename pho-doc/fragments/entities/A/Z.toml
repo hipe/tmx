@@ -1,0 +1,40 @@
+[item.AZC.attributes]
+heading = "introduction/minimal case to bridging python & swift"
+body = """
+# We made a swift package:
+
+```bash
+swift package init --name Pho --type executable
+```
+
+("The bootstrapping problem" (see) describes why we deleted some of the
+above generated files for now.)
+
+
+# Compile the C-code:
+
+(With slight changes, the below can be run either from our "mono-repo"
+directory or the project directory within it. For now we do it from
+the former.)
+
+We compile our C-code to be a dynamic library, and we put it in some
+temporary local location because we can and this is development:
+
+```bash
+gcc -dynamiclib pho/pho-bridge.c -o z/libxxx-ohai-xxx.dylib
+```
+
+* `z` is any temporary/unversioned directory.
+* eventually .#open [#882.B] we hopefully won't have to do this by hand.
+
+
+# Run the command-line doo-hah:
+
+```bash
+swift run -v -Xlinker -L../z --package-path pho
+```
+
+Below we maintain how we obtained the above information, and details of our
+project structure and workflow at this moment.
+"""
+# #born.

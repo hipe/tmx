@@ -1,0 +1,16 @@
+module CPhoMid {
+  header "../../pho-bridge.h"
+  link "xxx-ohai-xxx"
+  export *
+}
+
+/* #open [#882.E] the above "link" name is funny-looking because it will be
+trivial and low-cost to name it something better later and we don't know what
+naming conventions to use yet.
+
+the name is referenced in 1x other place (until [#882.B], our documentation).
+*/
+
+/*
+#born.
+*/

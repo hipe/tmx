@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int factorial(int n);
+long factorial(long n);
 
 /*
 #born.

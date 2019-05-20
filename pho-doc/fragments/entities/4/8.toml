@@ -1,6 +1,9 @@
 [item.48R.attributes]
+heading = "we like the UI introduced here; but we must come back later.."
 body = """
 trying this one [here][1]
+
+.#open [#882.D] come back to this.
 
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
