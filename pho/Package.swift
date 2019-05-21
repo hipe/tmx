@@ -28,6 +28,7 @@ let package = Package(
 )
 
 /*
+#history-A.2: introduce Xcode project
 #history-A.1: introduce PythonKit
 #born.
 */

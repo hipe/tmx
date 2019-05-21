@@ -46,7 +46,7 @@ when you click create
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
 [[#882.E]                   | #open | give the dylib a better name #after:[#882.B]
-[[#882.D]                   | #open | come back to this swift UI stuff
+[[#882.D]                   | #hole |
 [[#882.C]                   | #open | prove by trying it that NSTask is not wha..
 [[#882.B]                   | #open | learn swift build tool enough to automate..
 [[#882.A]                   | #open | any unit tests at all ASAP!

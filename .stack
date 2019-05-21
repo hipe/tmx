@@ -12,4 +12,3 @@ learn enough SDK to make WASD
 python that you write processing a request & giving a response into a swift app
 learn python extensions: a C extension lib for some minimal python you write
 that minimal swift app from the tutorial
-commit just the empty app as referencepoint

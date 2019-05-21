@@ -1,13 +1,21 @@
 [item.48R.attributes]
 heading = "we like the UI introduced here; but we must come back later.."
 body = """
-trying this one [here][1]
+Here are reading notes from [this older blog][1] from February, 2017; that
+will serve as our very first introduction to swift and Xcode for macOS
+development. (Reminder that macOS development is not really the goal here,
+just a means to an end.)
 
-.#open [#882.D] come back to this.
+1. Launch Xcode. (At this moment we are using version 10.2.1 (10E1001).)
+
+1. Click "Create a new Xcode project", and continue with the instructions
+like these from the above mentioned blog up to and including the part where
+we click the `[Create]` button. We chose a whack-ass name we hope we can
+change later. We put this new project *inside* our "pho" project directory.
+
+1. As describe in the blog, we can now run this do-nothing app.
 
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
 """
-next = "8W2"
-
 # #born.
