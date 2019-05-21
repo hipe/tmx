@@ -51,7 +51,7 @@ that you wrote (050) [2]" style=filled color="#eeeeee"]
 
 040->070
 040[label="that minimal swift app
-from the tutorial (040)"]
+from the tutorial (040)" style=filled]
 045->040
 
 045[label="these\nCLI's" style=filled]

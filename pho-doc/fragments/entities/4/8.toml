@@ -16,6 +16,16 @@ change later. We put this new project *inside* our "pho" project directory.
 1. As describe in the blog, we can now run this do-nothing app.
 
 
+# introducing storyboards
+
+Interface of the IDE has changed somewhat since the blog was written,
+but you are able to figure it out because icons are the same.
+
+We were able to complete the functional parts of the article. (We did not
+bother with the section on icons (yet). We played with the debugger
+for about one minute.)
+
+
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
 """
 # #born.
