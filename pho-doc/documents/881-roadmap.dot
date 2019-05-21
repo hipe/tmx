@@ -14,34 +14,82 @@ base actions perhaps not needed for that one actions
 090->100
 090[label="learn tons of App\nSDK stuff (090)"]
 080->100
-080[label="tons of work\nto make C-lib\nfor kiss-db (080)"]
+080[label="tons of work
+to make C-lib
+for kiss-db (080) [2]"
+style=filled color="#eeeeee"]
 070->090
 070->080
 070[label="python that you wrote
 processing a request
 and giving a response
 into a swift app (070)"]
+
 060->070
 060[label="learn python extensions:
 a C extension library
 for some MINIMAL
 python you write
-called from C (060)"]
-050->070
+called from C (060) [2]"
+style=filled color="#eeeeee"]
+
+/* correct the L-to-R order */
+040
+050
+057
+/* end */
+
+057->070
+057[label="minimal GUI\nplus PythonKit"]
+045->057
+
+050->060
 050[label="a swift app calling
 a MINIMAL C library
-that you wrote (050)" style=filled]
-040->050
+that you wrote (050) [2]" style=filled color="#eeeeee"]
+045->050
+
+040->070
 040[label="that minimal swift app
 from the tutorial (040)"]
-030->060
-030->050
+045->040
+
+045[label="these\nCLI's" style=filled]
+
+/* correct the L-to-R order */
+028
+030
+035
+037
+/* end */
+
+037->045
+037[label="CLI using\nPythonKit [1]" style=filled]
+010->037
+
+035->045
+035[label="CLI\ncalling C [1]" style=filled]
+030->035
+
 030[label="learn how gcc
 linking works (030)" style=filled]
+010->030
+
+028->045
+028[label="CLI (w/ no\nbridging) [1][2][3]" style=filled color="#eeeeee"]
+010->028
+
+
+010[label="(begin)" shape=ellipse style=filled]
 
 label="
 
-fig 881."
+fig 881.
+
+[1]: can you get actual standalone command-line executable?
+[2]: we're probably gonna sunset these
+[3]: we want this, but wontfix
+"
 }
 /*
 #born.

@@ -2,6 +2,15 @@
 parent = "AZC"
 heading = "our sources for how we learned the above"
 body = """
+Swift for TensorFlow's [Python interoperability][12] seems that it is
+perhaps a model solution to this problem, but it may not be packaged in a
+way that's accessible to us as a dependency in a form we would want.
+
+[PythonKit][13] is cool.
+
+
+# notes leading up to the above
+
 This [first gist][1] we looked at is from 2017-04,
 and a lot has changed since then.
 
@@ -61,6 +70,8 @@ pass the command line options to get it to look in different libs.
 [9]: https://forums.swift.org/t/problem-with-new-package-manager-system-library-targets/16358
 [10]: https://medium.com/shopify-mobile/wrapping-a-c-library-in-swift-part-1-6dd240070cef
 [11]: https://jacobpan3g.github.io/2017/09/01/build-dylib-on-mac/
+[12]: https://www.tensorflow.org/swift/tutorials/python_interoperability
+[13]: https://github.com/pvieito/PythonKit
 """
 previous = "48R"
 
