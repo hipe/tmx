@@ -11,19 +11,46 @@ base actions perhaps not needed for that one actions
 180[label="codename \"WASD\" (180)"]
 100->180
 100[label="???"]
+
 090->100
 090[label="learn tons of App\nSDK stuff (090)"]
+
+085->100
+085[label="tons of easy-
+ish, covered
+backend"]
+077->085
+
 080->100
 080[label="tons of work
 to make C-lib
 for kiss-db (080) [2]"
 style=filled color="#eeeeee"]
-070->090
-070->080
+
+077->090
+077->080
+077[label="these refactorings"]
+
+/*order*/
+073
+075
+/*order*/
+
+075->077
+075[label="archive crufty
+old CLI stuff"]
+
+073->077
+073[label="cleanup to try and use
+swift package manager
+"]
+
+070->075
+070->073
 070[label="python that you wrote
 processing a request
 and giving a response
-into a swift app (070)"]
+into a swift app (077)" style=filled]
 
 060->070
 060[label="learn python extensions:
@@ -40,7 +67,7 @@ style=filled color="#eeeeee"]
 /* end */
 
 057->070
-057[label="minimal GUI\nplus PythonKit"]
+057[label="minimal GUI\nplus PythonKit" style=filled]
 045->057
 
 050->060

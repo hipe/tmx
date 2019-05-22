@@ -11,3 +11,6 @@ tons of work to make C-lib for kiss-db
 learn enough SDK to make WASD
 python that you write processing a request & giving a response into a swift app
 learn python extensions: a C extension lib for some minimal python you write
+archive cruft
+cleanup to try and use swift package manager
+do EDIT's in documentation

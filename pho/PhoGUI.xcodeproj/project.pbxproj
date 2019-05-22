@@ -11,6 +11,10 @@
 		385049272294058000FD0EE9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 385049262294058000FD0EE9 /* ViewController.swift */; };
 		385049292294058100FD0EE9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 385049282294058100FD0EE9 /* Assets.xcassets */; };
 		3850492C2294058100FD0EE9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3850492A2294058100FD0EE9 /* Main.storyboard */; };
+		38FEEBF12294FECB00640A48 /* NumpyConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FEEBED2294FECA00640A48 /* NumpyConversion.swift */; };
+		38FEEBF22294FECB00640A48 /* PythonLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FEEBEE2294FECA00640A48 /* PythonLibrary.swift */; };
+		38FEEBF32294FECB00640A48 /* PythonLibrary+Symbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FEEBEF2294FECA00640A48 /* PythonLibrary+Symbols.swift */; };
+		38FEEBF42294FECB00640A48 /* Python.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FEEBF02294FECA00640A48 /* Python.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +25,10 @@
 		3850492B2294058100FD0EE9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3850492D2294058100FD0EE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3850492E2294058100FD0EE9 /* PhoGUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhoGUI.entitlements; sourceTree = "<group>"; };
+		38FEEBED2294FECA00640A48 /* NumpyConversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumpyConversion.swift; sourceTree = "<group>"; };
+		38FEEBEE2294FECA00640A48 /* PythonLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PythonLibrary.swift; sourceTree = "<group>"; };
+		38FEEBEF2294FECA00640A48 /* PythonLibrary+Symbols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PythonLibrary+Symbols.swift"; sourceTree = "<group>"; };
+		38FEEBF02294FECA00640A48 /* Python.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Python.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +63,10 @@
 			children = (
 				385049242294058000FD0EE9 /* AppDelegate.swift */,
 				385049262294058000FD0EE9 /* ViewController.swift */,
+				38FEEBED2294FECA00640A48 /* NumpyConversion.swift */,
+				38FEEBF02294FECA00640A48 /* Python.swift */,
+				38FEEBEE2294FECA00640A48 /* PythonLibrary.swift */,
+				38FEEBEF2294FECA00640A48 /* PythonLibrary+Symbols.swift */,
 				385049282294058100FD0EE9 /* Assets.xcassets */,
 				3850492A2294058100FD0EE9 /* Main.storyboard */,
 				3850492D2294058100FD0EE9 /* Info.plist */,
@@ -134,7 +146,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				385049272294058000FD0EE9 /* ViewController.swift in Sources */,
+				38FEEBF42294FECB00640A48 /* Python.swift in Sources */,
+				38FEEBF22294FECB00640A48 /* PythonLibrary.swift in Sources */,
 				385049252294058000FD0EE9 /* AppDelegate.swift in Sources */,
+				38FEEBF32294FECB00640A48 /* PythonLibrary+Symbols.swift in Sources */,
+				38FEEBF12294FECB00640A48 /* NumpyConversion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

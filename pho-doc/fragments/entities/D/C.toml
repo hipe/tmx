@@ -1,0 +1,36 @@
+[item.DC7.attributes]
+heading="stumped on how to import"
+body="""
+We decided to take a step back and google (again) what we were looking for.
+This time we searched for "python swift interoperability". (Using this
+keyword "interoperability" was key.)
+
+So the first major windfall was discovering [PythonKit][1] at all.
+
+But we wouldn't have gotten anywhere without finding the
+[Tanmay Bakshi youtube video][2] walking us through the specifics of how
+to use PythonKit. An essential part of this (at 15:16) is about disabling
+the sandboxing security feature so that python can load arbitrary files.
+
+BEGIN EDIT
+
+read [arsty blog][3]
+
+read [thoughtbot blog][4]
+
+read [hipster blog][5]
+
+read [stack overflow question][6]
+
+END EDIT
+
+
+[6]: https://stackoverflow.com/questions/44994042/how-to-create-cocoa-gui-application-with-swiftpm
+[5]: https://nshipster.com/import/
+[4]: https://thoughtbot.com/blog/swift-imports
+[3]: https://artsy.github.io/blog/2018/12/21/why-is-swiftpm-taking-so-long/
+[2]: https://youtu.be/p64f6befZkw
+[1]: https://github.com/pvieito/PythonKit
+"""
+
+# #born.

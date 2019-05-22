@@ -1,2 +1,8 @@
 /.build
+PhoGUI/NumpyConversion.swift
+PhoGUI/Python.swift
+PhoGUI/PythonLibrary+Symbols.swift
+PhoGUI/PythonLibrary.swift
 /PhoGUI.xcodeproj/project.xcworkspace/xcuserdata
+# very likely do this but keep an eye on it for a second:
+# /PhoGUI.xcodeproj/xcuserdata
