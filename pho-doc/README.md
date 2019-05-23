@@ -48,6 +48,7 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.F]                   | #open | we need proper markdown parsing
 [[#882.E]                   | #open | give the dylib a better name #after:[#882.B]
 [[#882.D]                   | #hole |
 [[#882.C]                   | #open | prove by trying it that NSTask is not wha..

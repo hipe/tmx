@@ -30,7 +30,11 @@ class _DocumentState:
         return self.section_at(0)
 
     def section_at(self, i):
-        return self._sectionser()[i]
+        return self.sections[i]
+
+    @property
+    def sections(self):
+        return self._sectionser()
 
 
 def _sections_via_doc(doc):
@@ -39,7 +43,7 @@ def _sections_via_doc(doc):
 
 def _sections_via_doc_2(doc):
 
-    sl_itr = doc.to_structured_lines(None)
+    sl_itr = doc.to_line_sexps(None)
 
     # only for the first section, it's possible that there's no header line
 
@@ -61,14 +65,20 @@ def _sections_via_doc_2(doc):
         cache.append(tup)
 
     if len(cache) or header_SL_for_section is not None:
-        yield _Section(header_SL_for_section, cache)
+        yield _Section(header_SL_for_section, tuple(cache))
 
 
 class _Section:
 
-    def __init__(self, header_SL, lines):
-        assert('header' == header_SL[0])
-        self.header = _Header(*header_SL[1:])
+    def __init__(self, header_SL, SLs):
+
+        if header_SL is None:
+            self.header = None
+        else:
+            assert('header' == header_SL[0])
+            self.header = _Header(*header_SL[1:])
+
+        self.body_line_sexps = SLs
 
 
 class _Header:
