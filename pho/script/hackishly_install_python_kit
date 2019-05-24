@@ -38,6 +38,10 @@ co_dir="$build_dir/PythonKit"
 if [ -d "$co_dir" ] ;  then
   echo "using existing chekcout: $co_dir" >&2
 else
+  # becuse just indicating 'master' is absolutely not future-proof, here's
+  # the commit we used when we did this. but note we haven't put this in to
+  # the code yet because by the time this would become an issue it may no
+  # longer be an issue (because hopefully we achieve Swift Package Manager)
   # commit 29e05a7f7174d9aa64f1b3713fee9f5161b84a51
   # Merge: 9a979cc 2d98efa
   # Author: Pedro José Pereira Vieito <pvieito@gmail.com>

@@ -1,0 +1,134 @@
+from _common_state import (
+        fixture_directory,
+        kiss_rdber,
+        throwing_listenerer,
+        )
+from modality_agnostic.memoization import (
+        dangerous_memoize as shared_subject,
+        memoize,
+        )
+import unittest
+
+
+_CommonCase = unittest.TestCase
+
+
+class Case153_basics(_CommonCase):
+
+    def test_100_collection_builds(self):
+        self.assertIsNotNone(_collection_one())
+
+    def test_200_big_index_builds(self):
+        self.assertIsNotNone(_big_index_one())
+
+
+class Case154_WAT(_CommonCase):
+
+    def test_100_some_lines_were_made(self):
+        num = self._custom_index().total_line_count
+        self.assertLess(100, num)
+        self.assertLess(num, 120)
+
+    def test_220_every_fragment_heading_was_expressed_somehow(self):
+        _actual = len(self._lines_that_expressed_headings())
+        self.assertEqual(_actual, 6)
+
+    def test_240_these_7_fragments_produced_only_4_documents(self):
+        _lines = self._lines_that_expressed_headings()
+
+        count = 0
+        for line in _lines:
+            if 'DOC TITLE' in line:
+                count += 1
+
+        self.assertEqual(count, 4)
+
+    def test_300_all_the_bookmarks_came_out(self):
+        _actual = self._custom_index().lines_that_define_bookmarks
+        self.assertEqual(len(_actual), 7)
+
+    @shared_subject
+    def _lines_that_expressed_headings(self):
+        return self._custom_index().lines_that_express_the_fragment_heading
+
+    @shared_subject
+    def _custom_index(self):
+
+        listener = throwing_listenerer()
+        bi = _big_index_one()
+        doc_itr = bi.TO_DOCUMENT_STREAM(listener)
+        is_first = True
+
+        total_line_count = 0
+        lines_that_express_the_fragment_heading = []
+        lines_that_define_bookmarks = []
+
+        def echo(line):
+
+            # FOR DEBUGGING:
+            # print(line)
+
+            nonlocal total_line_count
+            total_line_count += 1
+
+            if not len(line):
+                return
+
+            if 'FRAG' in line:
+                lines_that_express_the_fragment_heading.append(line)
+            elif '[' == line[0]:
+                lines_that_define_bookmarks.append(line)
+
+        """SO:
+        we originally developed the below code as a quick-and-dirty visual
+        confirmation but then repurposed it so that it's used to hackishly
+        gather statistics (totals) on types of lines, for testing.
+
+        we aren't gonna refactor it yet because we anticipate a pretty big
+        overhaul at .#open :[#882.D] which will make testing this less hacky.
+        """
+
+        for doc in doc_itr:
+            if is_first:
+                is_first = False
+            else:
+                echo('')
+                echo('')
+
+            echo(f'DOC TITLE: {doc.document_title}')
+
+            for line in doc.TO_LINES(listener):
+                echo(line)
+
+        return _CustomIndex(
+                total_line_count,
+                lines_that_express_the_fragment_heading,
+                lines_that_define_bookmarks,
+                )
+
+
+class _CustomIndex:
+    def __init__(self, _1, _2, _3):
+        self.total_line_count = _1
+        self.lines_that_express_the_fragment_heading = _2
+        self.lines_that_define_bookmarks = _3
+
+
+@memoize
+def _big_index_one():
+    listener = throwing_listenerer()
+    from pho.magnetics_ import big_index_via_collection as lib
+    _coll = _collection_one()
+    return lib.big_index_via_collection(_coll, listener)
+
+
+@memoize
+def _collection_one():
+    _dir = fixture_directory('collection-00500-intro')
+    return kiss_rdber().COLLECTION_VIA_DIRECTORY(_dir)
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+# #born.

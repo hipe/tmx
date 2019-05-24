@@ -51,18 +51,88 @@ class Document_:
     def document_title(self):
         return self._fragments[0].heading  # guaranteed per [#883.2]
 
+    def TO_LINES(self, listener):
+
+        sx_itr = self.to_line_sexps(listener)
+        for sx in sx_itr:
+            typ = sx[0]
+
+            if 'content line' == typ or 'empty line' == typ:
+                yield sx[1]
+                continue
+
+            if 'header' == typ:
+                _1 = '#' * sx[1]
+                text = sx[2]
+                # (headers from headings don't, the others do probably)
+                _2 = '' if ' ' == text[0] else ' '
+                yield f'{_1}{_2}{text}'
+                continue
+
+            if 'multi-line code block open' == typ:
+                yield sx[1]
+                for sx in sx_itr:
+                    typ = sx[0]
+                    if 'multi-line code block body line' == typ:
+                        yield sx[1]
+                        continue
+                    assert('mutli-line code block end' == typ)
+                    yield sx[1]
+                    break
+                continue
+
+            if 'parsed content line' == typ:
+                line = _line_via_parsed_content_line(sx, listener)
+                if line is None:
+                    return
+                yield line
+                continue
+
+            if 'footnote definition' == typ:
+                yield _line_via_footnote_definition(sx)
+                for sx in sx_itr:  # ballsy
+                    assert('footnote definition' == sx[0])
+                    yield _line_via_footnote_definition(sx)
+                break
+
+            assert(False)
+
     def to_line_sexps(self, listener):
-        fi = _fragments_index_via(self._fragments, listener)
-        if fi is None:
+        idoc = _indexed_document_via(self._fragments, listener)
+        if idoc is None:
             cover_me('make sure you use a monitor')
             return
-        return _to_document_line_sexps(fi, listener)
+        return _to_document_line_sexps(idoc, listener)
 
 
-def _fragments_index_via(fragments, listener):
+def _line_via_parsed_content_line(sx, listener):
+    pcs = []
+    for s in _strings_via_parsed_content_line(sx, listener):
+        assert(isinstance(s, str))  # #[#008.G]
+        pcs.append(s)
+    return ''.join(pcs)
 
-    mfi = _MutableFragmentsIndex()
-    see = mfi.see_indexed_fragment
+
+def _strings_via_parsed_content_line(sexp, listener):
+    itr = iter(sexp)
+    assert('parsed content line' == next(itr))
+
+    yield next(itr)  # guaranteed string, maybe empty
+
+    for sx in itr:
+        typ = sx[0]
+        if 'footnote reference' == typ:
+            _text, _final_id = sx[1:]
+            yield f'[{_text}][{_final_id}]'
+        else:
+            assert(False)
+        yield next(itr)  # guaranteed string, maybe empty
+
+
+def _indexed_document_via(fragments, listener):
+
+    idoc = _IndexedDocument()
+    see = idoc.see_indexed_fragment
 
     frag_iter = iter(fragments)
 
@@ -79,39 +149,42 @@ def _fragments_index_via(fragments, listener):
             return
         see(ifr)
 
-    return mfi
+    return idoc
 
 
-def _to_document_line_sexps(fi, listener):
+def _to_document_line_sexps(idoc, listener):
 
     is_first = True
 
-    for ifr in fi.indexed_fragments:
+    for ifr in idoc.indexed_fragments:
         if is_first:
             is_first = False
         else:
             yield _the_empty_line_sexp
             yield _the_empty_line_sexp
 
+        lineno = 0
         for sexp in ifr.line_sexps:
+            lineno += 1
             if 'parsed content line' == sexp[0]:
-                sexp = __dereference_footnotes(sexp, ifr, fi, listener)
+                sexp = __dereference_footnotes(
+                        sexp, lineno, ifr, idoc, listener)
                 if sexp is None:
                     cover_me('make sure you have a monitor')
                     return
             yield sexp
 
-    fn_ids = fi.final_footnote_order
+    fn_ids = idoc.final_footnote_order
     if len(fn_ids):
         yield _the_empty_line_sexp
         yield _the_empty_line_sexp
 
-    url_via = fi.final_footnote_url_via_identifier
+    url_via = idoc.final_footnote_url_via_identifier
     for fn_id in fn_ids:
-        yield ('footnote definition', fn_id, url_via[fn_id])
+        yield ('footnote definition', fn_id, url_via[fn_id])  # #[#882.G]
 
 
-def __dereference_footnotes(sexp, ifr, fi, listener):
+def __dereference_footnotes(sexp, lineno, ifr, idoc, listener):
 
     pc_itr = iter(sexp)
     sx = [next(pc_itr), next(pc_itr)]  # ballsy
@@ -120,8 +193,13 @@ def __dereference_footnotes(sexp, ifr, fi, listener):
         typ = sub_sexp[0]
         if 'footnote reference' == typ:
             label_text, local_id = sub_sexp[1:]
-            _url = ifr.footnote_url_via_local_identifier[local_id]
-            _final_id = fi.final_footnote_identifier_via_url[_url]
+            dct = ifr.footnote_url_via_local_identifier
+            if local_id not in dct:
+                __whine_about_bad_footnote_ref(
+                        listener, local_id, lineno, ifr, idoc)
+                return
+            _url = dct[local_id]
+            _final_id = idoc.final_footnote_identifier_via_url[_url]
             sx.append(('footnote reference', label_text, _final_id))
         else:
             cover_me('ambitious')
@@ -130,7 +208,12 @@ def __dereference_footnotes(sexp, ifr, fi, listener):
     return sx
 
 
-class _MutableFragmentsIndex:
+def _line_via_footnote_definition(sx):
+    _final_id, _rest = sx[1:]
+    return f'[{_final_id}]: {_rest}'
+
+
+class _IndexedDocument:
 
     def __init__(self):
 
@@ -163,6 +246,7 @@ class _IndexedFragment:
 
         self.footnote_url_via_local_identifier = {}
         self._footnote_definitions_in_reverse = []
+        # becomes `footnote_definitions` below
 
         self.line_sexps = []
 
@@ -223,7 +307,7 @@ class _IndexedFragment:
                 self._process_line = process_line_crazily
                 return self._add_sexp(tup)
 
-            if 'footnote def' == typ:
+            if 'local footnote definition' == typ:
                 cover_me("FOR NOW footnote definition must be anchored at end")
                 return _okay
 
@@ -234,10 +318,10 @@ class _IndexedFragment:
         def process_line_crazily(line):
             md = _end_of_multi_line_code_block_rx.match(line)
             if md is None:
-                self._add_sexp(('multi-line code block body line', line))
+                self._add('multi-line code block body line', line)  # #[#882.G]
                 return _okay
             self._process_line = process_line_normally
-            return self._add_sexp(('mutli-line code block end', line))
+            return self._add('mutli-line code block end', line)  # #[#882.G]
 
         self.OK = True
         for line in lines:
@@ -247,6 +331,7 @@ class _IndexedFragment:
                 self.OK = False
                 return
 
+        self.fragment_identifier_string = frag.identifier_string
         del self._listener
 
     def _maybe_parse_line(self, tup):
@@ -265,7 +350,7 @@ class _IndexedFragment:
         # this could deffo false match, like "`[xx][yy]`" (in backtics) :#here1
         # this is why we need proper parsing one day #open [#882.F]
 
-        sx = ['parsed content line']
+        sx = ['parsed content line']  # #[#882.G]
         cursor = 0
 
         for md in unpeek():
@@ -288,6 +373,9 @@ class _IndexedFragment:
 
         self._footnote_definitions_in_reverse.append(fd)
         return _okay
+
+    def _add(self, *sx):
+        return self._add_sexp(sx)
 
     def _add_sexp(self, tup):
         self.line_sexps.append(tup)
@@ -337,17 +425,17 @@ def _sexp_via_line_normally(line):
         number_of_octothorpes = end - begin
         rest = md[2]
         # --
-        return ('header', number_of_octothorpes, rest)
+        return ('header', number_of_octothorpes, rest)  # #[#882.G]
 
     if '`' == char and '```' == line[0:3]:
-        return ('multi-line code block open', line)
+        return ('multi-line code block open', line)  # #[#882.G]
 
     if '[' == char:
         sexp = _footnote_definition_sexp_via(line)
         if sexp is not None:
             return sexp
 
-    return ('content line', line)
+    return ('content line', line)  # #[#882.G]
 
 
 _header_rx = re.compile('^(#+)(.+\n)$')
@@ -358,7 +446,7 @@ def _footnote_definition_sexp_via(line):
     if md is None:
         return
     _ = _FootnoteDef(md[1], md.string[md.span()[1]:])  # `post_match`
-    return ('footnote def', _)
+    return ('local footnote definition', _)  # #[#882.G]
 
 
 _footnote_definition_rx = re.compile(r'^\[([0-9a-zA-Z_]+)\]: *')
@@ -371,41 +459,44 @@ class _FootnoteDef:
         self.url_probably = s
 
 
+# == whiners
+
+def __whine_about_bad_footnote_ref(listener, local_id, lineno, ifr, idoc):
+
+    _iid = ifr.fragment_identifier_string
+
+    a = tuple(fnd.identifier_string for fnd in ifr.footnote_definitions)
+
+    if len(a):
+        _these = ', '.join(a)
+        but_what = f'(had: {_these})'
+    else:
+        but_what = 'but no footnotes are defined'
+
+    _msg = (
+            f'in document {repr(_iid)} '
+            f'on body line {lineno}, '
+            f'it references a footnote {repr(local_id)} '
+            f'{but_what}'
+            )
+
+    cover_me(_msg)
+
+# ==
+
+
 def _lines_via_big_string(big_s):  # (copy-paste of [#610].)
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
-
-
-# == coming soon: document_fragment_via_definition ==
-
-
-class _DocumentFragment:  # #testpoint
-
-    def __init__(
-            self,
-            identifier_string,
-            heading,
-            heading_is_natural_key,
-            body,
-            parent,
-            previous,
-            # next ..
-            ):
-
-        self.identifier_string = identifier_string
-        self.parent_identifier_string = parent
-        self.heading = heading
-        self.heading_is_natural_key = heading_is_natural_key  # not used yet..
-        self.body = body
-        self.previous_identifier_string = previous
 
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
-_the_empty_line_sexp = ('empty line', '\n')
+_the_empty_line_sexp = ('empty line', '\n')  # #[#882.G]
 _not_ok = False
 _okay = True
 
+# #history-A.2: document fragment moves to own file
 # #history-A.1: introduce footnote merging
 # #born.

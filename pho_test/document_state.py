@@ -89,7 +89,7 @@ class _Header:
 
 def _frags_via_frag_itr(frag_itr):
 
-    from pho.magnetics_.document_via_fragments import (
+    from pho.magnetics_.document_fragment_via_definition import (
             _DocumentFragment,
             )
 

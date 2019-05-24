@@ -62,7 +62,7 @@ class Case773_retrieve_OK(_CommonCase):
         dct = self._result_value()
 
         self.assertEqual(dct['identifier_string'], '68')
-        dct = dct['SIMPLE_AND_IMMEDIATE_ATTRIBUTES']
+        dct = dct['core_attributes']
         self.assertEqual(dct, {'xx': 'xx of 68'})
 
     # NOTE not memoized

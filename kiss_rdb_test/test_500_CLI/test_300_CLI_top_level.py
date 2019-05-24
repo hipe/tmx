@@ -327,7 +327,7 @@ class Case819_get(_CommonCase):
         _expect_big_s = """
         {
           "identifier_string": "B9H",
-          "SIMPLE_AND_IMMEDIATE_ATTRIBUTES": {
+          "core_attributes": {
             "thing-A": "hi H",
             "thing-B": "hey H"
           }

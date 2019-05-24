@@ -1,0 +1,23 @@
+[item.48R.attributes]
+heading = "heading for (FRAG: 48R)"
+body = '''
+We enjoyed reading [this older blog][1] from February, 2017; but blah
+line 2
+
+1. numbered item
+
+1. numbered item with \"escaped quote\" (why escaped?)
+line 2 of numbered item
+
+1. third numbered item
+
+
+# introducing storyboards
+
+sec 2 para 1 line 1
+sec 2 para 2 line 2
+
+
+[1]: url for this blog
+'''
+# #born.

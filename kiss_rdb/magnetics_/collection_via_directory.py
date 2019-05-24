@@ -239,7 +239,7 @@ class collection_via_directory_and_schema:
 
         to retrieve one entity; this opens a file, reads some or all of the
         file line-by-line, and then closes it (ALL just for that one entity.)
-        o not use this as written if you need to retrieve multiple entities
+        do not use this as written if you need to retrieve multiple entities
         in one invocation.. :#here2
         """
 

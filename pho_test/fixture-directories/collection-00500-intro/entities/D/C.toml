@@ -1,0 +1,17 @@
+[item.DC7.attributes]
+heading="heading for (FRAG: DC7)"
+body='''
+Hello this is an intro paragraph.
+Para 1 line 2.
+
+So the first major windfall was discovering [PythonKit][1] at all.
+
+But we wouldn't have gotten anywhere without finding
+the [Tanmay Bakshi youtube video][2] walking us through the specifics of how
+to use PythonKit..
+
+[2]: url for tanmay bakshi youtube
+[1]: url for pythonkit
+'''
+
+# #born.

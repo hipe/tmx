@@ -28,4 +28,8 @@ def cover_me(msg=None):
 
 _normalize_sys_path()
 
+
+from pho_test import _common_state as _  # noqa: E402
+sys.modules[__name__] = _
+
 # #born.

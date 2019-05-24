@@ -1,0 +1,32 @@
+[item.8W2.attributes]
+parent = "AZC"
+heading = "heading for FRAG: 8WZ"
+body = '''
+we love [Python interoperability][12] and we love it.
+line 2 of this para.
+
+i think [PythonKit][13] is cool.
+
+
+# notes leading up to the above
+
+the [first gist][1] we looked at is from 2017-04,
+and a lot has changed since then.
+
+(from place:)
+
+> If you can get away with jooobie dooobie,
+> that's a pretty good option.
+
+☝️ We probably don't want that
+line 2
+
+
+
+[1]: url for python kit doc
+[12]: url for tensor flow python interop
+[13]: url for python kit repo
+'''
+previous = "48R"
+
+# #born.

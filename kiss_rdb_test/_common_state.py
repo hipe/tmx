@@ -26,6 +26,8 @@ def _normalize_sys_path():  # see [#019]
         # this file was loaded by a lower same-named file
         # that wants its resources
         pass
+    else:
+        raise Exception('when')
 
     assert(mono_repo_dir == a[0])
 

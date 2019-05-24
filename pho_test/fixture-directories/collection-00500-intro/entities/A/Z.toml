@@ -1,0 +1,35 @@
+[item.AZC.attributes]
+heading = "heading for (FRAG: AZC)"
+body = '''
+# We made a swift package:
+
+```bash
+swift package init --name Pho --type executable
+```
+
+("The bootstrapping problem" (see) describes why we deleted some of the
+above generated files for now.)
+
+
+# Compile the C-code:
+
+(With slight changes, we did thing mcWing,
+line two.)
+
+```bash
+gcc -dynamiclib pho/pho-bridge.c -o z/libxxx-ohai-xxx.dylib
+```
+
+* `foo-bah` in list
+* ohai item 2
+
+
+# Run the command-line doo-hah:
+
+```bash
+swift run -v -Xlinker -L../z --package-path pho
+```
+
+below, something something.
+'''
+# #born.

@@ -1,0 +1,14 @@
+[item.38U.attributes]
+natural_key="natural key for (FRAG: 38U)"
+body = """
+para 1 line 1
+para 1 line 2
+
+para 2 line 1
+
+bullet list:
+
+* Item 1
+* Item 2 `with this`
+"""
+# #born.

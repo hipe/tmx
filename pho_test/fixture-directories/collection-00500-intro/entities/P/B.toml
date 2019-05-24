@@ -1,0 +1,20 @@
+[item.PBR.attributes]
+parent = "8W2"
+heading = "heading for (FRAG: PBR)"
+body = """
+
+gotta learn [gcc][1] first.
+
+this is a thing:
+
+```(bash)
+gcc -o pho/pho-bridge.o -Ipho -c pho/pho-bridge.c
+gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
+```
+
+
+
+[1]: url for gcc
+"""
+
+# #born.

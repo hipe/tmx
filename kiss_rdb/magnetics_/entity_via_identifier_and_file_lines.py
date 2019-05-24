@@ -458,7 +458,7 @@ def entity_dict_via_entity_big_string__(big_string, listener):
 
     return {
             'identifier_string': id_string,
-            'SIMPLE_AND_IMMEDIATE_ATTRIBUTES': item_partitions[attrs_key],
+            'core_attributes': item_partitions[attrs_key],
             }
 
 

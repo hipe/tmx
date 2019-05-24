@@ -309,7 +309,7 @@ def _define_state_machine(funcs):  # interface here is VERY experimental!
 
     import re
     _ = '"""'  # don't break syntax highlighting :/
-    bare_key_rx = re.compile(f"^([A-Za-z0-9_-]+) = ('''|{_})?")  # :#here1
+    bare_key_rx = re.compile(f"^([A-Za-z0-9_-]+) ?= ?('''|{_})?")  # :#here1
 
     def dispatch_when_key_value(line):
         md = bare_key_rx.match(line)
