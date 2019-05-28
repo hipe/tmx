@@ -43,26 +43,26 @@ def _sections_via_doc(doc):
 
 def _sections_via_doc_2(doc):
 
-    sl_itr = doc.to_line_sexps(None)
+    ast_itr = doc._to_line_ASTs(None)
 
     # only for the first section, it's possible that there's no header line
 
-    tup = next(sl_itr)
+    ast = next(ast_itr)
 
-    if 'header' == tup[0]:
-        header_SL_for_section = tup
+    if 'header' == ast.symbol_name:
+        header_SL_for_section = ast
         cache = []
     else:
         header_SL_for_section = None
-        cache = [tup]
+        cache = [ast]
 
-    for tup in sl_itr:
-        if 'header' == tup[0]:
+    for ast in ast_itr:
+        if 'header' == ast.symbol_name:
             yield _Section(header_SL_for_section, tuple(cache))
-            header_SL_for_section = tup
+            header_SL_for_section = ast
             cache.clear()
             continue
-        cache.append(tup)
+        cache.append(ast)
 
     if len(cache) or header_SL_for_section is not None:
         yield _Section(header_SL_for_section, tuple(cache))
@@ -70,21 +70,9 @@ def _sections_via_doc_2(doc):
 
 class _Section:
 
-    def __init__(self, header_SL, SLs):
-
-        if header_SL is None:
-            self.header = None
-        else:
-            assert('header' == header_SL[0])
-            self.header = _Header(*header_SL[1:])
-
-        self.body_line_sexps = SLs
-
-
-class _Header:
-    def __init__(self, depth, mixed_s):
-        self.depth = depth
-        self.text = mixed_s  # when came from heading, might not have leading
+    def __init__(self, header_AST, asts):
+        self.header = header_AST  # None ok
+        self.body_line_ASTs = asts
 
 
 def _frags_via_frag_itr(frag_itr):

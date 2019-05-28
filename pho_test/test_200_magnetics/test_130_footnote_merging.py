@@ -6,14 +6,14 @@ import unittest
 
 class _CommonCase(unittest.TestCase):
 
-    def to_document_line_sexps(self):
+    def to_document_line_ASTs(self):
 
         _frags = self.given_fragments()
         _state = doc_state_lib.document_state_via_fragments(_frags)
 
         for sect in _state.sections:
-            for sx in sect.body_line_sexps:
-                yield sx
+            for ast in sect.body_line_ASTs:
+                yield ast
 
 
 # (120-139)
@@ -21,11 +21,11 @@ class _CommonCase(unittest.TestCase):
 class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
 
     def test_100_footnote_defs_have_IDs_in_order_w_respect_to_each_other(self):
-        def f(sx):
-            self.assertEqual(sx[0], 'footnote definition')
-            return int(sx[1])
-        a = self._the_last_N_line_sexps()
-        int_itr = (f(sx) for sx in a)
+        def f(ast):
+            self.assertEqual(ast.symbol_name, 'footnote definition')
+            return int(ast.identifier_string)
+        a = self._the_last_N_line_ASTs()
+        int_itr = (f(ast) for ast in a)
         prev_int = next(int_itr)
         for integer in int_itr:
             expected = prev_int + 1
@@ -36,43 +36,56 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
         import re
         rx = re.compile(r'^url for ([^\n]+)\n$')
 
-        def f(sx):
-            md = rx.match(sx[2])
+        def f(ast):
+            md = rx.match(ast.url_probably)
             return md[1]
-        _actual = tuple(f(sx) for sx in self._the_last_N_line_sexps())
+        _actual = tuple(f(ast) for ast in self._the_last_N_line_ASTs())
 
         self.assertSequenceEqual(_actual, ('bking', 'here', 'mcdo'))
 
     def test_300_footnote_defs_now_start_at_number_one(self):
-        self.assertEqual(self._the_last_N_line_sexps()[0][1], '1')
+        _ast = self._the_last_N_line_ASTs()[0]
+        self.assertEqual(_ast.identifier_string, '1')
 
     def test_400_the_body_copy_now_uses_the_new_IDs_and_they_are_correct(self):
-        first_sx, second_sx, third_sx = self.line_sexps()[0:3]
 
-        self.assertSequenceEqual(second_sx, ('content line', 'and also the\n'))
+        def f(ast, s, s_):
+            self.assertEqual(ast.symbol_name, 'footnote reference')
+            self.assertEqual(ast.label_text, s)
+            self.assertEqual(ast.identifier_string, s_)
 
-        self.assertSequenceEqual(first_sx, (
-                'parsed content line',
-                'as youths, we enjoyed ',
-                ('footnote reference', "McDonald's", '3'),
-                '\n'))
+        first, second, third = self.line_ASTs()[0:3]
 
-        self.assertSequenceEqual(third_sx[2][1:], ('Burger King', '1'))
-        self.assertSequenceEqual(third_sx[4][1:], ('here', '2'))
+        self.assertEqual(second.symbol_name, 'content line')
+        self.assertEqual(second.line, 'and also the\n')
+
+        self.assertEqual(first.symbol_name, 'structured content line')
+
+        _1, _2, _3 = first.mixed_children
+
+        self.assertEqual(_1, 'as youths, we enjoyed ')
+
+        f(_2, "McDonald's", '3')
+
+        self.assertEqual(_3, '\n')
+
+        a = third.mixed_children
+        f(a[1], 'Burger King', '1')
+        f(a[3], 'here', '2')
 
     def test_500_footnote_defs_now_have_some_blank_lines_in_between(self):
         my_set = set()
-        for sx in self.line_sexps()[-5:-3]:
-            my_set.add(sx[0])
+        for ast in self.line_ASTs()[-5:-3]:
+            my_set.add(ast.symbol_name)
         self.assertSequenceEqual(tuple(my_set), ('empty line',))
 
     @shared_subject
-    def _the_last_N_line_sexps(self):
-        return self.line_sexps()[-3:]
+    def _the_last_N_line_ASTs(self):
+        return self.line_ASTs()[-3:]
 
     @shared_subject
-    def line_sexps(self):
-        return tuple(self.to_document_line_sexps())
+    def line_ASTs(self):
+        return tuple(self.to_document_line_ASTs())
 
     def given_fragments(self):
         yield 'el título', (
@@ -88,24 +101,34 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
 class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
 
     def test_100_only_3_footnotes_down_from_4(self):
+        def f(act, exp):
+            sn, id_s, url = exp
+            self.assertEqual(act.symbol_name, sn)
+            self.assertEqual(act.identifier_string, id_s)
+            self.assertEqual(act.url_probably, url)
+
         a1, a2, a3 = self._custom_three()[2]
 
         e1 = ('footnote definition', '1', 'url for paris\n')
         e2 = ('footnote definition', '2', 'url for cph\n')
         e3 = ('footnote definition', '3', 'url for berlin\n')
 
-        self.assertSequenceEqual(a1, e1)
-        self.assertSequenceEqual(a2, e2)
-        self.assertSequenceEqual(a3, e3)
+        f(a1, e1)
+        f(a2, e2)
+        f(a3, e3)
 
     def test_200_ids_are_correct(self):
-        s1, s2 = self._custom_three()[0:-1]
 
-        s1l1, s1l2 = s1
-        s2l1, s2l2 = s2
+        def f(act, exp):
+            a_s, o, _ = act.mixed_children
+            e_s, (sn, tx, id_s) = exp
+            self.assertEqual(_, '\n')
+            self.assertEqual(a_s, e_s)
+            self.assertEqual(o.symbol_name, sn)
+            self.assertEqual(o.label_text, tx)
+            self.assertEqual(o.identifier_string, id_s)
 
-        def f(sx):
-            return tuple(sx[1:-1])
+        ((a1, a2), (a3, a4)) = self._custom_three()[0:-1]
 
         e1 = ('meet me at the ', ('footnote reference', 'paris', '1'))
         e2 = ('meet me at the ', ('footnote reference', 'copenhagen', '2'))
@@ -113,24 +136,24 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
         e3 = ("let's meet in ", ('footnote reference', 'berlin', '3'))
         e4 = ("let's meet in ", ('footnote reference', 'paris', '1'))
 
-        self.assertSequenceEqual(f(s1l1), e1)
-        self.assertSequenceEqual(f(s1l2), e2)
-        self.assertSequenceEqual(f(s2l1), e3)
-        self.assertSequenceEqual(f(s2l2), e4)
+        f(a1, e1)
+        f(a2, e2)
+        f(a3, e3)
+        f(a4, e4)
 
     @shared_subject
     def _custom_three(self):
-        itr = self.to_document_line_sexps()
+        itr = self.to_document_line_ASTs()
         sections = []
         cache = []
-        for sx in itr:
-            if 'empty line' == sx[0]:
+        for ast in itr:
+            if 'empty line' == ast.symbol_name:
                 nxt = next(itr)
-                self.assertEqual(nxt[0], 'empty line')
+                self.assertEqual(nxt.symbol_name, 'empty line')
                 sections.append(tuple(cache))
                 cache.clear()
                 continue
-            cache.append(sx)
+            cache.append(ast)
         sections.append(tuple(cache))
         self.assertEqual(len(sections), 3)
         return sections
@@ -153,27 +176,36 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
 class Case133_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
 
     def test_100_look_at_this_crazy_thing(self):
-        expected = (
+        _actual = tuple(ast.symbol_name for ast in self.a())
+        _expected = (
                 'content line',
-                'multi-line code block open',
-                'multi-line code block body line',
-                'mutli-line code block end',
-                'parsed content line',
+                'fenced code block',
+                'structured content line',
                 'empty line',
+                'empty line',
+                'footnote definition',
                 )
-        _ = self.a()[0:len(expected)]
-        _actual = tuple(sx[0] for sx in _)
-        self.assertSequenceEqual(_actual, expected)
+        self.assertSequenceEqual(_actual, _expected)
 
-    def test_200_doesnt_and_does(self):
-        a = self.a()
-        self.assertEqual(a[2][1],  '[mami][tchami]\n')
+    def test_200_the_fenced_code_block_is_just_lines(self):
+        _actual = self.a()[1]._lines
+        _expected = (
+            '```bash\n',
+            '[mami][tchami]\n',
+            '```\n',
+            )
+        self.assertSequenceEqual(_actual, _expected)
+
+    def test_300_but_this_other_fellow_is_actually_a_footnote_reference(self):
+        ast = self.a()[2]
+        _1, _2, _3 = ast.mixed_children
         _exp = ('see ', ('footnote reference', 'mami', '1'))
-        self.assertSequenceEqual(a[4][1:3], _exp)
+        _act = (_1, (_2.symbol_name, _2.label_text, _2.identifier_string))
+        self.assertSequenceEqual(_act, _exp)
 
     @shared_subject
     def a(self):
-        return tuple(self.to_document_line_sexps())
+        return tuple(self.to_document_line_ASTs())
 
     def given_fragments(self):
         yield 'el título', (

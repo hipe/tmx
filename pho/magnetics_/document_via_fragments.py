@@ -52,81 +52,17 @@ class Document_:
         return self._fragments[0].heading  # guaranteed per [#883.2]
 
     def TO_LINES(self, listener):
-
-        sx_itr = self.to_line_sexps(listener)
-        for sx in sx_itr:
-            typ = sx[0]
-
-            if 'content line' == typ or 'empty line' == typ:
-                yield sx[1]
-                continue
-
-            if 'header' == typ:
-                _1 = '#' * sx[1]
-                text = sx[2]
-                # (headers from headings don't, the others do probably)
-                _2 = '' if ' ' == text[0] else ' '
-                yield f'{_1}{_2}{text}'
-                continue
-
-            if 'multi-line code block open' == typ:
-                yield sx[1]
-                for sx in sx_itr:
-                    typ = sx[0]
-                    if 'multi-line code block body line' == typ:
-                        yield sx[1]
-                        continue
-                    assert('mutli-line code block end' == typ)
-                    yield sx[1]
-                    break
-                continue
-
-            if 'parsed content line' == typ:
-                line = _line_via_parsed_content_line(sx, listener)
-                if line is None:
-                    return
+        ast_itr = self._to_line_ASTs(listener)
+        for ast in ast_itr:
+            for line in ast.to_lines():
                 yield line
-                continue
 
-            if 'footnote definition' == typ:
-                yield _line_via_footnote_definition(sx)
-                for sx in sx_itr:  # ballsy
-                    assert('footnote definition' == sx[0])
-                    yield _line_via_footnote_definition(sx)
-                break
-
-            assert(False)
-
-    def to_line_sexps(self, listener):
+    def _to_line_ASTs(self, listener):  # #testpoint
         idoc = _indexed_document_via(self._fragments, listener)
         if idoc is None:
             cover_me('make sure you use a monitor')
             return
-        return _to_document_line_sexps(idoc, listener)
-
-
-def _line_via_parsed_content_line(sx, listener):
-    pcs = []
-    for s in _strings_via_parsed_content_line(sx, listener):
-        assert(isinstance(s, str))  # #[#008.G]
-        pcs.append(s)
-    return ''.join(pcs)
-
-
-def _strings_via_parsed_content_line(sexp, listener):
-    itr = iter(sexp)
-    assert('parsed content line' == next(itr))
-
-    yield next(itr)  # guaranteed string, maybe empty
-
-    for sx in itr:
-        typ = sx[0]
-        if 'footnote reference' == typ:
-            _text, _final_id = sx[1:]
-            yield f'[{_text}][{_final_id}]'
-        else:
-            assert(False)
-        yield next(itr)  # guaranteed string, maybe empty
+        return _to_document_line_ASTs(idoc, listener)
 
 
 def _indexed_document_via(fragments, listener):
@@ -152,7 +88,7 @@ def _indexed_document_via(fragments, listener):
     return idoc
 
 
-def _to_document_line_sexps(idoc, listener):
+def _to_document_line_ASTs(idoc, listener):
 
     is_first = True
 
@@ -160,57 +96,30 @@ def _to_document_line_sexps(idoc, listener):
         if is_first:
             is_first = False
         else:
-            yield _the_empty_line_sexp
-            yield _the_empty_line_sexp
+            o = _the_empty_line_AST()
+            yield o
+            yield o
 
         lineno = 0
-        for sexp in ifr.line_sexps:
+        for ast in ifr.line_ASTs:
             lineno += 1
-            if 'parsed content line' == sexp[0]:
-                sexp = __dereference_footnotes(
-                        sexp, lineno, ifr, idoc, listener)
-                if sexp is None:
+            if 'structured content line' == ast.symbol_name:
+                ast = ast.dereference_footnotes__(lineno, ifr, idoc, listener)
+                if ast is None:
                     cover_me('make sure you have a monitor')
                     return
-            yield sexp
+            yield ast
 
     fn_ids = idoc.final_footnote_order
     if len(fn_ids):
-        yield _the_empty_line_sexp
-        yield _the_empty_line_sexp
+        o = _the_empty_line_AST()
+        yield o
+        yield o
+        footnote_definition_via = _footnote_lib().footnote_definition_via
 
     url_via = idoc.final_footnote_url_via_identifier
     for fn_id in fn_ids:
-        yield ('footnote definition', fn_id, url_via[fn_id])  # #[#882.G]
-
-
-def __dereference_footnotes(sexp, lineno, ifr, idoc, listener):
-
-    pc_itr = iter(sexp)
-    sx = [next(pc_itr), next(pc_itr)]  # ballsy
-
-    for sub_sexp in pc_itr:
-        typ = sub_sexp[0]
-        if 'footnote reference' == typ:
-            label_text, local_id = sub_sexp[1:]
-            dct = ifr.footnote_url_via_local_identifier
-            if local_id not in dct:
-                __whine_about_bad_footnote_ref(
-                        listener, local_id, lineno, ifr, idoc)
-                return
-            _url = dct[local_id]
-            _final_id = idoc.final_footnote_identifier_via_url[_url]
-            sx.append(('footnote reference', label_text, _final_id))
-        else:
-            cover_me('ambitious')
-        sx.append(next(pc_itr))  # omg
-
-    return sx
-
-
-def _line_via_footnote_definition(sx):
-    _final_id, _rest = sx[1:]
-    return f'[{_final_id}]: {_rest}'
+        yield footnote_definition_via(fn_id, url_via[fn_id])
 
 
 class _IndexedDocument:
@@ -224,8 +133,8 @@ class _IndexedDocument:
         self.indexed_fragments = []
 
     def see_indexed_fragment(self, ifr):
-        for fd in ifr.footnote_definitions:
-            url = fd.url_probably
+        for ast in ifr.footnote_definitions:
+            url = ast.url_probably
             if url not in self.final_footnote_identifier_via_url:
                 _use_id_int = len(self.final_footnote_order) + 1  # start at 1
                 use_id = str(_use_id_int)
@@ -248,15 +157,19 @@ class _IndexedFragment:
         self._footnote_definitions_in_reverse = []
         # becomes `footnote_definitions` below
 
-        self.line_sexps = []
+        self.line_ASTs = []
 
         self._listener = listener
         self.OK = False  # gets "re-initialized" to True later below
 
         # --
 
-        add_header_depth = _do_the_do(
-                self._add_sexp, is_head_fragment, frag.heading)
+        from pho.models_ import header
+        add_header_depth, hdr = header.decide_how_to_express_heading(
+                is_head_fragment, frag.heading)
+
+        if hdr is not None:
+            self._add_AST(hdr)
 
         # requiring that footnote definitions are tail-anchored may or may
         # not help us avoid trickier parsing edge cases involving ``` blocks
@@ -264,12 +177,12 @@ class _IndexedFragment:
         lines = list(_lines_via_big_string(frag.body))
 
         while len(lines):
-            foot_def_sexp = _footnote_definition_sexp_via(lines[-1])
-            if foot_def_sexp is None:
+            foot_def_ast = _footnote_lib().any_definition_via_line(lines[-1])
+            if foot_def_ast is None:
                 break
             # (Case212)
             lines.pop()
-            ok = self._add_footnote_definition_sexp(foot_def_sexp)
+            ok = self.__add_footnote_definition_AST(foot_def_ast)
             if not ok:
                 return
 
@@ -286,26 +199,34 @@ class _IndexedFragment:
         # GO HAM CRAY
 
         def process_line_normally(line):
-            tup = _sexp_via_line_normally(line)
-            typ = tup[0]
+            ast = _AST_via_line_normally(line)
+            typ = ast.symbol_name
 
             if 'content line' == typ:
+                o = None
                 if '][' in line:  # already tres hacky
-                    return self._maybe_parse_line(tup)
-
-                return self._add_sexp(tup)
+                    from pho.models_ import content_line
+                    o = content_line.any_structured_via_line(ast.line)
+                if o is None:
+                    o = ast  # (Case112)
+                return self._add_AST(o)
 
             if 'empty line' == typ:
-                return self._add_sexp(tup)
+                return self._add_AST(ast)
 
             if 'header' == typ:
-                depth, rest_s = tup[1:]
-                self._add_sexp(('header', depth + add_header_depth, rest_s))
-                return _okay
+                _ = ast.new_via(
+                        depth=(ast.depth + add_header_depth),
+                        text=ast.text)
+                return self._add_AST(_)
 
-            if 'multi-line code block open' == typ:
+            if 'fenced code block open' == typ:
+                # (Case133)
+                _ = ast.build_alternate_line_processer__(listener)
+                self._process_line_crazily = _
                 self._process_line = process_line_crazily
-                return self._add_sexp(tup)
+                self._end_of_stream_is_OK_here = False
+                return _okay
 
             if 'local footnote definition' == typ:
                 cover_me("FOR NOW footnote definition must be anchored at end")
@@ -316,14 +237,24 @@ class _IndexedFragment:
         self._process_line = process_line_normally
 
         def process_line_crazily(line):
-            md = _end_of_multi_line_code_block_rx.match(line)
-            if md is None:
-                self._add('multi-line code block body line', line)  # #[#882.G]
-                return _okay
-            self._process_line = process_line_normally
-            return self._add('mutli-line code block end', line)  # #[#882.G]
+            # (Case133) experimental parse API. away when [#882.F]
+            ok, done, ast = self._process_line_crazily(line)
+            if not ok:
+                self._close()
+                return
+            if done:
+                del self._process_line_crazily
+                self._process_line = process_line_normally
+                self._end_of_stream_is_OK_here = True
+            if ast is not None:
+                self._add_AST(ast)
+            return _okay
+
+        # now do the work, a parse loop:
 
         self.OK = True
+        self._end_of_stream_is_OK_here = True
+
         for line in lines:
             _ok = self._process_line(line)
             if not _ok:
@@ -331,158 +262,66 @@ class _IndexedFragment:
                 self.OK = False
                 return
 
+        if not self._end_of_stream_is_OK_here:
+            cover_me('unclosed multli-line code block?')
+
         self.fragment_identifier_string = frag.identifier_string
         del self._listener
 
-    def _maybe_parse_line(self, tup):
-        line = tup[1]
-        md_itr = re.finditer(_find_iter_rx_s, line)
-        for first_md in md_itr:  # once
-            break
-        if first_md is None:
-            return self._add_sexp(tup)
+    def __add_footnote_definition_AST(self, ast):
 
-        def unpeek():
-            yield first_md
-            for md in md_itr:
-                yield md
-
-        # this could deffo false match, like "`[xx][yy]`" (in backtics) :#here1
-        # this is why we need proper parsing one day #open [#882.F]
-
-        sx = ['parsed content line']  # #[#882.G]
-        cursor = 0
-
-        for md in unpeek():
-            begin, end = md.span(0)
-            sx.append(line[cursor:begin])  # even if the empty string
-            sx.append(('footnote reference', md[1], md[2]))
-            cursor = end
-
-        sx.append(line[cursor:])  # even if empty string
-        return self._add_sexp(tuple(sx))
-
-    def _add_footnote_definition_sexp(self, sexp):
-
-        fd = sexp[1]
-        fid = fd.identifier_string
+        fid = ast.identifier_string
 
         if fid in self.footnote_url_via_local_identifier:
             cover_me(f"footnote re-defined: {repr(fid)}")
-        self.footnote_url_via_local_identifier[fid] = fd.url_probably
 
-        self._footnote_definitions_in_reverse.append(fd)
+        self.footnote_url_via_local_identifier[fid] = ast.url_probably
+        self._footnote_definitions_in_reverse.append(ast)
         return _okay
 
-    def _add(self, *sx):
-        return self._add_sexp(sx)
-
-    def _add_sexp(self, tup):
-        self.line_sexps.append(tup)
+    def _add_AST(self, ast):
+        assert(hasattr(ast, 'symbol_name'))  # #[#008.D]
+        self.line_ASTs.append(ast)
         return _okay
 
-
-_find_iter_rx_s = (
-        r'\[([^\]]+)\]'
-        r'\[([^\]]+)\]'
-        )
-
-
-_end_of_multi_line_code_block_rx = re.compile('^```')
+    def _close(self):
+        self._process_line_crazily = None
+        del self._process_line_crazily
+        del self._process_line
 
 
-def _do_the_do(add_sexp, is_head_fragment, frag_heading):
-
-    if is_head_fragment:
-        # all head fragments have headings [#883.2], expressed elsewhere
-        assert(frag_heading is not None)
-        add_header_depth = _normal_header_depth_to_add
-
-    elif frag_heading is None:
-        # non-head fragment with no heading (Case121)
-        add_header_depth = _normal_header_depth_to_add
-
-    else:
-        # non-head fragment with YES heading (Case115)
-        add_header_depth = _normal_header_depth_to_add + 1
-        add_sexp(('header', add_header_depth, frag_heading))
-
-    return add_header_depth
-
-
-_normal_header_depth_to_add = 1  # #[#883.3]
-
-
-def _sexp_via_line_normally(line):
+def _AST_via_line_normally(line):
 
     if '\n' == line:
-        return _the_empty_line_sexp
+        return _the_empty_line_AST()  # (Case154)
 
     char = line[0]
     if '#' == char:
-        md = _header_rx.match(line)
-        begin, end = md.span(1)
-        number_of_octothorpes = end - begin
-        rest = md[2]
-        # --
-        return ('header', number_of_octothorpes, rest)  # #[#882.G]
+        from pho.models_ import header
+        return header.via_line(line)  # (Case112)
 
     if '`' == char and '```' == line[0:3]:
-        return ('multi-line code block open', line)  # #[#882.G]
+        return _fenced_code_block_lib().opening_via_line(line)  # (Case133)
 
-    if '[' == char:
-        sexp = _footnote_definition_sexp_via(line)
-        if sexp is not None:
-            return sexp
+    assert('[' != char)  # did something else before #history-A.3
 
-    return ('content line', line)  # #[#882.G]
+    from pho.models_ import content_line
+    return content_line.via_line(line)
 
 
-_header_rx = re.compile('^(#+)(.+\n)$')
+def _fenced_code_block_lib():
+    from pho.models_ import fenced_code_block as _
+    return _
 
 
-def _footnote_definition_sexp_via(line):
-    md = _footnote_definition_rx.match(line)
-    if md is None:
-        return
-    _ = _FootnoteDef(md[1], md.string[md.span()[1]:])  # `post_match`
-    return ('local footnote definition', _)  # #[#882.G]
+def _footnote_lib():
+    from pho.models_ import footnote as _
+    return _
 
 
-_footnote_definition_rx = re.compile(r'^\[([0-9a-zA-Z_]+)\]: *')
-
-
-class _FootnoteDef:
-
-    def __init__(self, id_s, s):
-        self.identifier_string = id_s
-        self.url_probably = s
-
-
-# == whiners
-
-def __whine_about_bad_footnote_ref(listener, local_id, lineno, ifr, idoc):
-
-    _iid = ifr.fragment_identifier_string
-
-    a = tuple(fnd.identifier_string for fnd in ifr.footnote_definitions)
-
-    if len(a):
-        _these = ', '.join(a)
-        but_what = f'(had: {_these})'
-    else:
-        but_what = 'but no footnotes are defined'
-
-    _msg = (
-            f'in document {repr(_iid)} '
-            f'on body line {lineno}, '
-            f'it references a footnote {repr(local_id)} '
-            f'{but_what}'
-            )
-
-    cover_me(_msg)
-
-# ==
+def _the_empty_line_AST():
+    from pho.models_ import empty_line
+    return empty_line.the_empty_line_AST
 
 
 def _lines_via_big_string(big_s):  # (copy-paste of [#610].)
@@ -493,10 +332,10 @@ def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
-_the_empty_line_sexp = ('empty line', '\n')  # #[#882.G]
 _not_ok = False
 _okay = True
 
+# #history-A.3: refactored from S-expressions's to AST's
 # #history-A.2: document fragment moves to own file
 # #history-A.1: introduce footnote merging
 # #born.

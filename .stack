@@ -14,6 +14,4 @@ learn python extensions: a C extension lib for some minimal python you write
 archive cruft
 cleanup to try and use swift package manager
 do EDIT's in documentation
-big index
-refactor doc generation
-introduce doc generation
+CLI client
