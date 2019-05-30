@@ -34,7 +34,7 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
 
     def test_200_footnote_defs_preserved_the_order_of_their_entities(self):
         import re
-        rx = re.compile(r'^url for ([^\n]+)\n$')
+        rx = re.compile(r'^url_for_([^\n]+)\n$')
 
         def f(ast):
             md = rx.match(ast.url_probably)
@@ -92,9 +92,9 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
                 "as youths, we enjoyed [McDonald's][99]",
                 'and also the',
                 'understated elegance of [Burger King][66] and [here][33].',
-                '[66]: url for bking',
-                '[33]: url for here',
-                '[99]: url for mcdo',
+                '[66]: url_for_bking',
+                '[33]: url_for_here',
+                '[99]: url_for_mcdo',
                 )
 
 
@@ -109,9 +109,9 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
 
         a1, a2, a3 = self._custom_three()[2]
 
-        e1 = ('footnote definition', '1', 'url for paris\n')
-        e2 = ('footnote definition', '2', 'url for cph\n')
-        e3 = ('footnote definition', '3', 'url for berlin\n')
+        e1 = ('footnote definition', '1', 'url_for_paris\n')
+        e2 = ('footnote definition', '2', 'url_for_cph\n')
+        e3 = ('footnote definition', '3', 'url_for_berlin\n')
 
         f(a1, e1)
         f(a2, e2)
@@ -162,14 +162,14 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
         yield 'el título de frag 1', (
                 'meet me at the [paris][uno]',
                 'meet me at the [copenhagen][dos]',
-                '[uno]: url for paris',
-                '[dos]: url for cph',
+                '[uno]: url_for_paris',
+                '[dos]: url_for_cph',
                 )
         yield 'el título de frag 2', (
                 "let's meet in [berlin][ein]",
                 "let's meet in [paris][zwei]",
-                '[ein]: url for berlin',
-                '[zwei]: url for paris',
+                '[ein]: url_for_berlin',
+                '[zwei]: url_for_paris',
                 )
 
 
@@ -214,7 +214,7 @@ class Case133_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
                 '[mami][tchami]',
                 '```',
                 'see [mami][tchami]',
-                '[tchami]: url for tchami',
+                '[tchami]: url_for_tchami',
                 )
 
 

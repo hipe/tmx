@@ -49,7 +49,19 @@ class Document_:
 
     @property
     def document_title(self):
-        return self._fragments[0].heading  # guaranteed per [#883.2]
+        return self.head_fragment.heading  # guaranteed per [#883.2]
+
+    @property
+    def document_datetime(self):
+        return self.head_fragment.document_datetime
+
+    @property
+    def head_fragment_identifier_string(self):
+        return self.head_fragment.identifier_string
+
+    @property
+    def head_fragment(self):
+        return self._fragments[0]
 
     def TO_LINES(self, listener):
         ast_itr = self._to_line_ASTs(listener)

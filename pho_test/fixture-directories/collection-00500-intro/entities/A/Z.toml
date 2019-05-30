@@ -1,5 +1,6 @@
 [item.AZC.attributes]
 heading = "heading for (FRAG: AZC)"
+document_datetime=2019-05-24 18:41:19-04:00
 body = '''
 # We made a swift package:
 

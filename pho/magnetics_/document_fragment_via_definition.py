@@ -46,6 +46,7 @@ def _normalize_core_attribute_names(  # #[#008.D]
         parent=None,
         natural_key=None,
         heading=None,
+        document_datetime=None,
         body=None,
         previous=None,
         ):
@@ -61,6 +62,7 @@ def _normalize_core_attribute_names(  # #[#008.D]
             'parent': parent,
             'natural_key': natural_key,
             'heading': heading,
+            'document_datetime': document_datetime,
             'body': body,
             'previous': previous,
             }
@@ -73,6 +75,7 @@ class _DocumentFragment:  # #testpoint
             identifier_string,
             heading,
             heading_is_natural_key,
+            document_datetime,
             body,
             parent,
             previous,
@@ -83,6 +86,7 @@ class _DocumentFragment:  # #testpoint
         self.parent_identifier_string = parent
         self.heading = heading
         self.heading_is_natural_key = heading_is_natural_key  # not used yet..
+        self.document_datetime = document_datetime
         self.body = body
         self.previous_identifier_string = previous
 

@@ -1,0 +1,37 @@
+digraph g {
+
+rankdir="BT"
+
+n920523  /*filename*/
+n913324  /*fm title*/
+n983113  /*fm date*/
+
+n920523[label="filename"]
+n329324->n920523
+
+n913324[label="frontmatter\ntitle"]
+n329324->n913324
+
+n983113[label="frontmatter\ndate"]
+n329324->n983113
+
+n329324[label="facets for\npublishing" shape=rect]
+
+n839423 /*iid*/
+n234324 /*heading*/
+n018322 /*date*/
+
+n234324->n329324
+n234324[label="document head\nheading"]
+
+n839423->n329324
+n839423[label="document head\ninternal identifier"]
+
+n018322->n329324
+n018322[label="date\n~ somehow ~"]
+
+label="\nfig 884. facets towards publication."
+}
+/*
+#born.
+*/

@@ -89,6 +89,7 @@ def _frags_via_frag_itr(frag_itr):
                 identifier_string=None,
                 heading=title_s,
                 heading_is_natural_key=None,
+                document_datetime=None,
                 body=_body,
                 parent=None,
                 previous=None,

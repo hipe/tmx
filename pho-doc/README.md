@@ -45,6 +45,7 @@ when you click create
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
+|[#884]                     |       | facets towards publication (graph)
 |[#883.4]                   |       | provision: TEMPORARY document demarcation
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading

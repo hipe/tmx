@@ -23,9 +23,9 @@ line 2
 
 
 
-[1]: url for python kit doc
-[12]: url for tensor flow python interop
-[13]: url for python kit repo
+[1]: url_for_python_kit_doc
+[12]: url_for_tensor_flow_python_interop
+[13]: url_for_python_kit_repo
 '''
 previous = "48R"
 

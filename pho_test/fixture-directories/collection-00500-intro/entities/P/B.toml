@@ -14,7 +14,7 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 
 
-[1]: url for gcc
+[1]: url_for_gcc
 """
 
 # #born.
