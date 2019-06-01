@@ -1,4 +1,7 @@
 import _init  # noqa: F401
+from modality_agnostic.memoization import (
+        memoize,
+        )
 import doctest
 import unittest
 
@@ -9,12 +12,114 @@ def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
     return tests
 
 
-_CommonCase = unittest.TestCase
+class _WrapperCase(unittest.TestCase):
+
+    def do_test(self):
+        _wrapper = self.given_wrapper()
+        _argument = iter(self.given())
+        _itr = _wrapper(_argument)
+        _actual = tuple(_itr)
+        _expected = self.expect()
+        self.assertSequenceEqual(_actual, _expected)
 
 
-class Case180_oxford_join_variant_B(_CommonCase):
+class _WrapperTwoCase(_WrapperCase):
 
-    # (at #tombstone-A.1 we severed this production but still want it)
+    def given_wrapper(self):
+        return wrapper_two()
+
+
+class _WrapperOneCase(_WrapperCase):
+
+    def given_wrapper(self):
+        return wrapper_one()
+
+
+class Case173_typical(_WrapperTwoCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('u:A', 'u:B', 'u:C', 'u:D', 'u:E', 'stl:F', 'l:G')
+
+    def given(self):
+        return ('A', 'B', 'C', 'D', 'E', 'F', 'G')
+
+
+class Case174_three(_WrapperTwoCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('u:A', 'stl:B', 'l:C')
+
+    def given(self):
+        return ('A', 'B', 'C')
+
+
+class Case175_two(_WrapperTwoCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('stl:A', 'l:B')
+
+    def given(self):
+        return ('A', 'B')
+
+
+class Case176_one(_WrapperTwoCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('l:A',)
+
+    def given(self):
+        return ('A',)
+
+
+class Case177_two(_WrapperOneCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('nf:A', 'f:B')
+
+    def given(self):
+        return ('A', 'B')
+
+
+class Case178_one(_WrapperOneCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('f:A',)
+
+    def given(self):
+        return ('A',)
+
+
+class Case179_zero(_WrapperOneCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ()
+
+    def given(self):
+        return ()
+
+
+class Case180_oxford_join_variant_B(unittest.TestCase):
 
     def test_000_zero_items_OK(self):
         self.expect((), 'nothing')
@@ -36,6 +141,23 @@ class Case180_oxford_join_variant_B(_CommonCase):
                 oxford_OR)
         _actual = oxford_OR(given_tuple)
         self.assertEqual(_actual, expected_string)
+
+
+@memoize
+def wrapper_two():
+    return _subject_module().rotating_bufferer(
+            lambda c: f'u:{c}',  # u = uninteresting
+            lambda c: f'stl:{c}',  # stl = final
+            lambda c: f'l:{c}'  # l = last
+            )
+
+
+@memoize
+def wrapper_one():
+    return _subject_module().rotating_bufferer(
+            lambda c: f'nf:{c}',  # nf = non-final
+            lambda c: f'f:{c}'  # f = final
+            )
 
 
 def _subject_module():

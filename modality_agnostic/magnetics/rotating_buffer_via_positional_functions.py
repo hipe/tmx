@@ -123,4 +123,54 @@ def oxford_join_VARIANT_B(these, ult_sep):
             return tail
 
 
+def rotating_bufferer(*these):
+
+    these_length = len(these)
+    assert(1 < these_length)
+
+    ring_size = these_length - 1
+    largest_i = ring_size - 1
+
+    def wrapped_items_via(itr):
+
+        # load up the ring
+        ring = []
+        for item in itr:
+            ring.append(item)
+            if len(ring) == ring_size:
+                break
+
+        # handle edge case: number of items is less than rotating buffer size
+        if len(ring) < ring_size:
+            for i in range(0, len(ring)):
+                yield these[ring_size - i](ring[i])
+            return
+
+        ring = list(reversed(ring))
+        i = 0
+
+        uninteresting_item = these[0]  # ..
+
+        # normally
+        for item in itr:
+            if i:
+                i -= 1
+            else:
+                i = largest_i
+            yield uninteresting_item(ring[i])
+            ring[i] = item
+
+        # flush the cache
+        for these_offset in range(1, these_length):
+            # the first time: you have a full ring (you checked above)) so
+            # ticking it fwd one actually ticks it back to the oldestmost item
+            if i:
+                i -= 1
+            else:
+                i = largest_i
+            yield these[these_offset](ring[i])
+
+    return wrapped_items_via
+
+# #history-A.1: introduce rotating buffer
 # #abstracted.

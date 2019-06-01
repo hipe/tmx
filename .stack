@@ -17,5 +17,3 @@ do EDIT's in documentation
 graph viz for fragments and generate docs from current frags
 word wrap
 refactor oxford join to use roating buffer
-introduce rotating buffer
-snapshot of oxford join moved (not yet unified)
