@@ -14,3 +14,8 @@ learn python extensions: a C extension lib for some minimal python you write
 archive cruft
 cleanup to try and use swift package manager
 do EDIT's in documentation
+graph viz for fragments and generate docs from current frags
+word wrap
+refactor oxford join to use roating buffer
+introduce rotating buffer
+snapshot of oxford join moved (not yet unified)

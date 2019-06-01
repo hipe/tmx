@@ -203,8 +203,7 @@ def _express_collisions(collisions, listener):
 
     # -- (Case102)
     for gist, sns in list_of_gist_and_surface_names:
-        from . import state_machine_via_definition as _
-        _ = _.oxford_AND(list(repr(x) for x in sns))
+        _ = _oxford_AND(repr(x) for x in sns)
         and_join.append(
                 f'{_} are too similar to co-exist validly in one request')
     # --
@@ -249,6 +248,12 @@ def _emit_request_error_via_reason(msg, listener):
     def structure():
         return {'reason': msg}
     listener('error', 'structure', 'request_error', structure)
+
+
+def _oxford_AND(itr):
+    from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
+            oxford_AND_HELLO_FROM_KISS)
+    return oxford_AND_HELLO_FROM_KISS(tuple(itr))
 
 
 # --

@@ -422,8 +422,11 @@ def __check_name_sets(dct, body_blocks, listener):
 
         def f():
             # (used to get hit by (Case297) before #history-A.4. now cannot.)
-            from .state_machine_via_definition import oxford_AND
-            _ = oxford_AND(tuple(repr(s) for s in extra_by_coarse))
+
+            from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
+                    oxford_AND_HELLO_FROM_KISS)
+
+            _ = oxford_AND_HELLO_FROM_KISS(tuple(repr(s) for s in extra_by_coarse))  # noqa: E501
             s = '' if 1 == len(extra_by_coarse) else 's'
             _reason = f'toml not simple enough: {_} attribute{s} snuck through'
             return {'reason': _reason}

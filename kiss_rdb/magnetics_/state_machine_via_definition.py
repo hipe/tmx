@@ -448,29 +448,6 @@ def _when_transition_not_found(ps, sm):
     ps.listener('error', 'structure', 'input_error', struct)
 
 
-def oxford_AND(these):
-    return oxford_join(these, ' and ')
-
-
-def oxford_OR(these):
-    return oxford_join(these, ' or ')
-
-
-def oxford_join(these, ult_sep):
-    length = len(these)
-    if 0 == length:
-        return 'nothing'
-    elif 1 == length:
-        return these[0]
-    else:
-        *head, penult, ult = these
-        tail = f'{ penult }{ ult_sep }{ ult }'
-        if len(head):
-            return ', '.join((*head, tail))
-        else:
-            return tail
-
-
 _dash_or_space = re.compile('[- ]')  # intentionally not robust for now
 
 

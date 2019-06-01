@@ -99,34 +99,6 @@ class Case055_truly_blank_file_produces_empty_stream(_CommonCase):
         return ()
 
 
-class Case065_sneak_oxford_join_coverage_into_here(_CommonCase):
-
-    # (at #tombstone-A.1 we severed this production but still want it)
-
-    def test_000_zero_items_OK(self):
-        self.expect((), 'nothing')
-
-    def test_010_one_item_OK(self):
-        self.expect(('hi there',), 'hi there')
-
-    def test_020_two_items_OK(self):
-        self.expect(('eenie', 'meenie'), 'eenie or meenie')
-
-    def test_030_three_items_OK(self):
-        self.expect(('A', 'B', 'C'), 'A, B or C')
-
-    def test_040_four_items_OK(self):
-        self.expect(('A', 'B', 'C', 'D'), 'A, B, C or D')
-
-    def expect(self, given_tuple, expected_string):
-        from kiss_rdb.magnetics_.state_machine_via_definition import (
-                oxford_OR as subject,
-                )
-
-        _actual = subject(given_tuple)
-        self.assertEqual(_actual, expected_string)
-
-
 class Case075_effectively_empty_file_produces_empty_stream(_CommonCase):
 
     # lost a message production at #tombstone-A.1:

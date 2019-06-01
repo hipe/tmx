@@ -53,7 +53,8 @@ def _generator_via_dir_path(dir_path):
 def _dir_path_via_module(collection_module):
     s_a = collection_module.__path__._path  # #todo
     if 1 != len(s_a):
-        raise Exception('cover me - more than one path element')
+        assert(2 == len(s_a))
+        assert(s_a[0] == s_a[1])
     return s_a[0]
 
 # #born.
