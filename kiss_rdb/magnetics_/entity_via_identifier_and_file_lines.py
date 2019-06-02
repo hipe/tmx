@@ -39,7 +39,7 @@ def entity_via_identifier_and_file_lines(id_s, all_lines, listener):
 class _Main:
     """the implementation of the above.
 
-    implementaton:
+    implementation:
       - compose a higher-level line-stream parser from a lower-level one
       - amazingly, our state machine allows us to HOT-SWAP the actions #histA4
     """
@@ -424,9 +424,9 @@ def __check_name_sets(dct, body_blocks, listener):
             # (used to get hit by (Case297) before #history-A.4. now cannot.)
 
             from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-                    oxford_AND_HELLO_FROM_KISS)
+                    oxford_AND)
 
-            _ = oxford_AND_HELLO_FROM_KISS(tuple(repr(s) for s in extra_by_coarse))  # noqa: E501
+            _ = oxford_AND(repr(s) for s in extra_by_coarse)
             s = '' if 1 == len(extra_by_coarse) else 's'
             _reason = f'toml not simple enough: {_} attribute{s} snuck through'
             return {'reason': _reason}

@@ -5,10 +5,6 @@ this will *very* likely move to the [#500] subproject but we want to avoid
 early abstraction at first.
 """
 
-from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-        STREAM_STEPPER_DEPRECATING_NOW
-        )
-
 
 def _subfeatures_via_item_default_function(human_key, _item):
     """(the default subfeature to search against an item is its key)"""
@@ -517,7 +513,7 @@ placeholder_for_say_subfeature = repr
 
 def _oxford_join(itr, interesting_sep=' and ', boring_sep=', '):
     from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-            oxford_join_VARIANT_A as oxford_join)
+            oxford_join)
     return oxford_join(itr, interesting_sep, boring_sep)
 
 
@@ -543,8 +539,10 @@ def _ellipsis_join(itr, ellipsis='…', sep=', '):
 
     """
 
-    _itr = _EllipsisJoin(itr, ellipsis, sep).execute()
-    return ''.join(_itr)
+    # #history-A.3 buries something complicated & awkward (but "streaming")
+
+    _ = sep.join(itr)
+    return f'{_}{ellipsis}'
 
 
 ellipsis_join = _ellipsis_join
@@ -552,26 +550,8 @@ ellipsis_join = _ellipsis_join
 # we want the doctest tests to read as if it's an "ordinary" function.
 
 
-class _EllipsisJoin(STREAM_STEPPER_DEPRECATING_NOW):
-    """(stream-centric implementation. access t)"""
-
-    def __init__(self, itr, ellipsis, sep):
-        self.ellipsis = ellipsis
-        self.sep = sep
-        super().__init__(itr)
-
-    def execute(self):
-        self.step()
-        if not self.done:
-            yield self.item
-            self.step()
-            while not self.done:
-                yield self.sep
-                yield self.item
-                self.step()
-        yield self.ellipsis
-
-
+# #pending-rename: wouldn't you rather call this "natural key"?
+# #history-A.3 (as referenced)
 # #history-A.2
 # #history-A.1
 # #born

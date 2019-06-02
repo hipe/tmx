@@ -450,12 +450,12 @@ def _emit_comment_proximity_problems(problems, listener):
                 and_join.append('above')
             if below:
                 and_join.append('below')
-            _ = en.oxford_AND_HELLO_FROM_KISS(and_join)
+            _ = en.oxford_AND(iter(and_join))
             bc_join.append(f'line touches comment line {_}')
         if on:
             bc_join.append('it has comment')
 
-        _ = en.oxford_join_VARIANT_B(bc_join, ' and because ')
+        _ = en.oxford_join(iter(bc_join), ' and because ')
 
         _ = (f'cannot {cmpo.lowercase_verb_string} '
              f'{repr(cmpo.attribute_name.name_string)} '

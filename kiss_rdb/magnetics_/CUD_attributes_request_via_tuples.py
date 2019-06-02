@@ -252,12 +252,11 @@ def _emit_request_error_via_reason(msg, listener):
 
 def _oxford_AND(itr):
     from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-            oxford_AND_HELLO_FROM_KISS)
-    return oxford_AND_HELLO_FROM_KISS(tuple(itr))
+            oxford_AND)
+    return oxford_AND(itr)
 
 
 # --
-
 
 _not_ok = False
 _okay = True

@@ -107,7 +107,7 @@ class Case178_one(_WrapperOneCase):
         return ('A',)
 
 
-class Case179_zero(_WrapperOneCase):
+class Case179_zero_when_no_callback(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -119,7 +119,19 @@ class Case179_zero(_WrapperOneCase):
         return ()
 
 
-class Case180_oxford_join_variant_B(unittest.TestCase):
+class Case180_zero_when_yes_callback(_WrapperTwoCase):
+
+    def test(self):
+        self.do_test()
+
+    def expect(self):
+        return ('nada',)
+
+    def given(self):
+        return ()
+
+
+class Case181_oxford_join_hand_written_unit_test(unittest.TestCase):
 
     def test_000_zero_items_OK(self):
         self.expect((), 'nothing')
@@ -139,7 +151,7 @@ class Case180_oxford_join_variant_B(unittest.TestCase):
     def expect(self, given_tuple, expected_string):
         from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
                 oxford_OR)
-        _actual = oxford_OR(given_tuple)
+        _actual = oxford_OR(iter(given_tuple))
         self.assertEqual(_actual, expected_string)
 
 
@@ -148,7 +160,8 @@ def wrapper_two():
     return _subject_module().rotating_bufferer(
             lambda c: f'u:{c}',  # u = uninteresting
             lambda c: f'stl:{c}',  # stl = final
-            lambda c: f'l:{c}'  # l = last
+            lambda c: f'l:{c}',  # l = last
+            lambda: 'nada'
             )
 
 
@@ -156,7 +169,8 @@ def wrapper_two():
 def wrapper_one():
     return _subject_module().rotating_bufferer(
             lambda c: f'nf:{c}',  # nf = non-final
-            lambda c: f'f:{c}'  # f = final
+            lambda c: f'f:{c}',  # f = final
+            None,  # when empty
             )
 
 
