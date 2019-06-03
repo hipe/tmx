@@ -120,7 +120,7 @@ def __strings_for_oxford_join(
         more_significant_separator,
         less_significant_separator):
 
-    _spatialized_itr = __spatialize_with_2_items_of_lookahead(string_iterator)
+    _spatialized_itr = spatialize_with_2_items_of_lookahead(string_iterator)
 
     for o in _spatialized_itr:
         if o.is_neither_last_nor_second_to_last_item:
@@ -276,7 +276,7 @@ class _EMPTY_SINGLETON:  # #as-namespace-only
     is_the_empty_item = True
 
 
-__spatialize_with_2_items_of_lookahead = rotating_bufferer(
+spatialize_with_2_items_of_lookahead = rotating_bufferer(
         _NeitherLastNorSecondToLastItem,
         _SecondToLastItem,
         _LastItem,
