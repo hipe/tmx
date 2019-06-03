@@ -81,6 +81,8 @@ def unindent_with_dot_hack(big_s):
     if '' == big_s:
         return iter(())
 
+    from script_lib.test_support import unindent
+
     itr = unindent(big_s)
     for line in itr:  # once
         assert('.\n' == line)
@@ -88,12 +90,15 @@ def unindent_with_dot_hack(big_s):
     return itr
 
 
-def unindent(big_s):
-    return _selib().unindent(big_s)
+def unindent(big_string):
+    # #[#008.I]
+    from script_lib.test_support import unindent
+    return unindent(big_string)
 
 
 def debugging_listener():
-    return _selib().debugging_listener()
+    from modality_agnostic.test_support import structured_emission as se_lib
+    return se_lib.debugging_listener()
 
 
 def fixture_directory_path(stem):
@@ -103,12 +108,5 @@ def fixture_directory_path(stem):
 @lazy
 def fixture_directories_path():
     return os_path.join(_top_test_dir, 'fixture-directories')
-
-
-def _selib():
-    # from . import structured_emission as _  # breaks on pud why?
-    from kiss_rdb_test import structured_emission as _
-    return _
-
 
 # #born.

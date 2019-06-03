@@ -1,6 +1,4 @@
-from _common_state import (
-        unindent,
-        )
+import _common_state  # noqa: F401
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
     common_args_head,
@@ -68,6 +66,8 @@ class Case831_multi_line_create(_CommonCase):
         self.assertEqual(_actual, 'created:\n')
 
     def test_300_outputs_created(self):
+        from script_lib.test_support import unindent
+
         _actual = self.common_entity_screen().stdout_lines
 
         _expected = tuple(unindent('''

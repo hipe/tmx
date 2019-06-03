@@ -1,5 +1,5 @@
-import _common_state  # noqa: E401
-from kiss_rdb_test import structured_emission as se_lib
+import _common_state  # noqa: F401
+from modality_agnostic.test_support import structured_emission as se_lib
 import unittest
 
 

@@ -21,7 +21,8 @@ class CUD_BIG_SUCCESS_METHODS:
         return sct
 
     def expect_error_structure(self):
-        from . import structured_emission as se_lib
+        from modality_agnostic.test_support import (
+                structured_emission as se_lib)
         chan, payloader = se_lib.one_and_none(self.given_run, self)
         return chan, payloader()
 
@@ -214,13 +215,13 @@ def _fs_lib():
 
 
 def _DEBUGGING_LISTENER(self):
-    from . import structured_emission as lib
-    return lib.debugging_listener()
+    from modality_agnostic.test_support import structured_emission as se_lib
+    return se_lib.debugging_listener()
 
 
 def _unindent(big_string):
-    from . import structured_emission as se_lib
-    return se_lib.unindent(big_string)
+    from script_lib.test_support import unindent
+    return unindent(big_string)
 
 # ==
 

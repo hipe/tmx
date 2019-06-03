@@ -1,5 +1,5 @@
 from _common_state import unindent
-from kiss_rdb_test import structured_emission as se_lib
+from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

@@ -9,8 +9,7 @@ from kiss_rdb_test.CUD import (
         filesystem_expecting_no_rewrites,
         build_filesystem_expecting_num_file_rewrites,
         )
-
-from kiss_rdb_test import structured_emission as se_lib
+from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

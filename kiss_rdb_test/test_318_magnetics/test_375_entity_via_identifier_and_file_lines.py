@@ -6,7 +6,7 @@ from _common_state import (
 from kiss_rdb.magnetics_.entities_via_collection import (
         table_block_via_lines_and_table_start_line_object_,
         )
-from kiss_rdb_test import structured_emission as se_lib
+from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
     dangerous_memoize as shared_subject,
     memoize,
