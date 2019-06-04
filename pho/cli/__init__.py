@@ -82,6 +82,7 @@ def _build_structure_listener(did_error, do_express_verbose):
 @click.command(cls=_ComplexCLI, context_settings=_CONTEXT_SETTINGS)
 @click.option(
         '--collection-path',
+        metavar='PATH',
         help=(
             'The path to the directory with the fragments '
             '(the directory that contains the `entities` directory).'

@@ -1,6 +1,6 @@
 ## numbering scheme
 
-This imgained scheme is absurdly optimisitic but whatever. The utopian
+This imgained scheme is absurdly optimistic but whatever. The utopian
 ideal is that every test case has a number within the range appropriate
 for the modality or level of abstraction.
 
@@ -24,6 +24,7 @@ spots sounds like too many.)
               - 110 cases about headers (100-119)
               - 130 cases about footnotes (120-139)
               - 150 big index and rough gen (140-159)
+              - 162 this one visualization (160-164)
               - [and so on, 7 more..]
   - 300-399:  (placeholder for some kind of API)
   - 400-499:  (placeholder for non-interactive CLI)

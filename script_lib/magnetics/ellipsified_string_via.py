@@ -13,7 +13,7 @@ def fixed_shape_word_wrapperer(row_max_widths, ellipsis_string=None):
     def word_wrapped_lines_via(**kwargs):
 
         which, = kwargs.keys()
-        if 'big_string':
+        if 'big_string' == which:
             tokens = __token_stream_via_big_string(kwargs['big_string'])
         else:
             raise KeyError(which)
