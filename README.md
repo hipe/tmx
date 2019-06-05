@@ -115,6 +115,11 @@ if you are familiar with the term "mono-repo", that's what's going on here.
 
 ## <a name='running-all-the-tests'></a>overview of running the tests
 
+wahoo:
+
+```bash
+cat mono-repo.test-these.list | while read line ; do pud -fq "$line" ; done 2>&1 | awk '/^Ran ([0-9]+) test/ { print $2}' | paste -sd '+' -
+```
 
 we "shouldn't" be specifying all these sub-project-specific instructions
 redundantly here, but the desire to have this in one centralized easy

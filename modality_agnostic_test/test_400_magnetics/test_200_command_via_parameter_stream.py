@@ -8,7 +8,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class Case010(unittest.TestCase):
+class Case8063_the_only_case(unittest.TestCase):
 
     def test_050_subject_module_loads(self):
         self.assertIsNotNone(_subject_module())  # ..

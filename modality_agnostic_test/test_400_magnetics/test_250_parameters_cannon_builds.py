@@ -41,7 +41,7 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(msg, _act)
 
 
-class Case010_build_and_see_component_names(_CommonCase):
+class Case8189_build_and_see_component_names(_CommonCase):
 
     def test_010_class_only_builds(self):
         _ = _command_modules().two_crude_function_parameters_by_class()

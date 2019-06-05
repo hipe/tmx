@@ -68,20 +68,31 @@ class FakeFilesystem:
         if content is not None:
             return f(_FakeReadOnlyIO(content))
 
+    def open(self, path, mode):
+        # below used to be _FakeWriteSession before #history-A.1
+
+        if mode not in ('w', 'x'):
+            raise Exception(f'cover me: {repr(mode)}')
+
+        from modality_agnostic import io as io_lib
+
+        buff = []
+        mutex = None
+
+        def on_OK_exit():
+            nonlocal mutex
+            del mutex
+            self._receive_writes(buff, path)
+
+        return io_lib.write_only_IO_proxy(
+                write=lambda s: buff.append(s),  # #hi.
+                on_OK_exit=on_OK_exit,
+                )
+
     def _receive_writes(self, writes, path):
         if path not in self._order:
             self._order.append(path)
         self._string_via_path[path] = ''.join(writes)
-
-    def open(self, path, mode):
-        if 'x' == mode:
-            ok = True
-        elif 'w' == mode:
-            ok = True
-        if ok:
-            return _FakeWriteSession(path, self)
-        else:
-            raise Exception('cover me: {}'.format(repr(mode)))
 
     def file_exists(self, path):
         return (path in self._string_via_path)
@@ -89,29 +100,6 @@ class FakeFilesystem:
     @memoize
     def the_empty_filesystem():
         return FakeFilesystem()
-
-
-class _FakeWriteSession:
-
-    def __init__(self, path, parent):
-        self._writes = []
-        self._path = path
-        self._parent = parent
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, xa, xb, xd):
-        if xa is None:
-            a = self._writes
-            del self._writes
-            self._parent._receive_writes(a, self._path)
-        else:
-            raise Exception('cover me')
-
-    def write(self, s):
-        self._writes.append(s)
-        return len(s)
 
 
 class _FakeReadOnlyIO:
@@ -122,5 +110,5 @@ class _FakeReadOnlyIO:
     def read(self):
         return self._content
 
-
+# #history-A.1
 # #born.

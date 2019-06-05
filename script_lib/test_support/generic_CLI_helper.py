@@ -138,12 +138,12 @@ class CLI_CaseMethods:
         return stdout, stderr
 
     def _debugging_IO__CLI(self, upstream_IO, format):
+        def write(s):
+            sys.stderr.write(format % (NEWLINE, s))
+            upstream_IO.write(s)
         import sys
-        return _MinimalIOTee(
-          upstream_IO=upstream_IO,
-          IO_for_debugging=sys.stderr,
-          format=format,
-        )
+        from modality_agnostic import io as io_lib
+        return io_lib.write_only_IO_proxy(write)
 
     def _build_recording_list_and_expectation_list__CLI(self, num_lines):
         """given an expected number of lines, result in two components:
@@ -244,19 +244,6 @@ class _Invocation:
     @property
     def OK(self):
         return self._interpretation_result.OK
-
-
-class _MinimalIOTee:  # TODO move this. #[#609]
-    """a minimally simple multiplexer (muxer) for debug-tracing writes to IO"""
-
-    def __init__(self, upstream_IO, IO_for_debugging, format):
-        self._IO_for_debugging = IO_for_debugging
-        self._upstream_IO = upstream_IO
-        self._format = format
-
-    def write(self, s):
-        self._IO_for_debugging.write(self._format % (NEWLINE, s))
-        return self._upstream_IO.write(s)
 
 
 @memoize

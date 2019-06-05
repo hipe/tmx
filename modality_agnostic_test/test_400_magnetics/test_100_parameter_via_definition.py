@@ -16,7 +16,7 @@ class _CommonCase(unittest.TestCase):
         return self.parameter_.argument_arity_range
 
 
-class Case010_default_argument_arity(_CommonCase):
+class Case7755_default_argument_arity(_CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_magnetic())
@@ -37,7 +37,7 @@ class Case010_default_argument_arity(_CommonCase):
         return _the_totally_empty_parameter()
 
 
-class Case020_flag_argument_arity_intro(_CommonCase):
+class Case7765_flag_argument_arity_intro(_CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -52,7 +52,7 @@ class Case020_flag_argument_arity_intro(_CommonCase):
         return _parameter_with_flag_argument_arity()
 
 
-class Case030_list_argument_arity(_CommonCase):
+class Case7775_list_argument_arity(_CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -67,7 +67,7 @@ class Case030_list_argument_arity(_CommonCase):
         return _parameter_with_list_argument_arity()
 
 
-class Case110_default_value_everything(_CommonCase):
+class Case7785_default_value_everything(_CommonCase):
 
     def test_010_by_default_the_default_value_is_none(self):
         _x = _default_value_of_this(_the_totally_empty_parameter())
@@ -92,7 +92,7 @@ def _default_value_of_this(para):
     return para.default_value
 
 
-class Case210_desc_no_style(_CommonCase):
+class Case7795_desc_no_style(_CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -111,7 +111,7 @@ class Case210_desc_no_style(_CommonCase):
         return _build_parameter_with_this_description(f)
 
 
-class Case220_desc_yes_style(_CommonCase):
+class Case7805_desc_yes_style(_CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)

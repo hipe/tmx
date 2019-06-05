@@ -12,7 +12,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case010_main(_CommonCase):
+class Case8313_the_only_case(_CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_magnetic())

@@ -188,56 +188,37 @@ def __header_line_via_node(node):
 
 def help_screen_chunks_via_test_case(tc):  # tc=test case
 
-    _cmd = tc.command_module_()
+    chunks = []
+    is_open = True
+
+    def write(s):
+        assert(is_open)
+        if tc.do_debug:
+            import sys
+            io = sys.stderr
+            io.write("(begin help screen chunk)\n")
+            io.write(s)
+            io.write("(end help screen chunk)\n")
+        chunks.append(s)
+
+    from modality_agnostic import io as io_lib
+    mock_IO = io_lib.write_only_IO_proxy(
+            write=write,
+            )
 
     import script_lib.magnetics.interpretation_via_parse_stepper as _mag
-
-    def _do_debug():
-        return tc.do_debug
-
-    def _debug_IO():
-        import sys
-        return sys.stderr
-
-    mock_IO = _QuickDirty_IO_Mock(_do_debug, _debug_IO)
-
     _oo = _mag.interpretationer_via_individual_resources(
         ARGV=['ohai', 'my-command', '--help'],
         stdout=None,
         stderr=mock_IO,
     )
 
+    _cmd = tc.command_module_()
     rslt = _oo.interpretation_via_command_stream([_cmd])
     tc.assertFalse(rslt.OK)
     tc.assertEqual(0, rslt.exitstatus)
-    return mock_IO.flush_chunks()
-
-
-class _QuickDirty_IO_Mock():  # #[#609]
-    """this is an IO mock for a single use-case. there are others like it..
-
-    but this one is ours. (we can of course abstract this as necessary, but
-    why?
-    """
-
-    def __init__(self, do_debug_f, debug_IO_f):
-        self._do_debug_function = do_debug_f
-        self._debug_IO_function = debug_IO_f
-        self._chunks = []
-
-    def write(self, s):
-        if self._do_debug_function():
-            io = self._debug_IO_function()
-            io.write("(begin help screen chunk)\n")
-            io.write(s)
-            io.write("(end help screen chunk)\n")
-        self._chunks.append(s)
-        return len(s)
-
-    def flush_chunks(self):
-        s_a = self._chunks
-        del self._chunks
-        return s_a
+    is_open = False
+    return chunks
 
 
 def _this_lib():

@@ -20,9 +20,6 @@ long to fit on one line, having every function named xxxxx)
 """
 
 
-from . import expect_STDs as lib
-
-
 def for_DEBUGGING():
     """this simply shows you what is being written to your STDOUT and STDERR
 
@@ -57,8 +54,8 @@ def for_DEBUGGING():
 
     from sys import stderr as serr
 
-    _sout_proxy = lib.WriteOnly_IO_Proxy(sout_f)
-    _serr_proxy = lib.WriteOnly_IO_Proxy(serr_f)
+    _sout_proxy = _write_only_IO_proxy(sout_f)
+    _serr_proxy = _write_only_IO_proxy(serr_f)
 
     return _sout_proxy, _serr_proxy, finish
 
@@ -122,8 +119,8 @@ def for_flip_flopping_sectioner():
 
     stateful_fellow = _StatefulFellow()
 
-    _sout_proxy = lib.WriteOnly_IO_Proxy(stateful_fellow.receive_stdout_write)
-    _serr_proxy = lib.WriteOnly_IO_Proxy(stateful_fellow.receive_stderr_write)
+    _sout_proxy = _write_only_IO_proxy(stateful_fellow.receive_stdout_write)
+    _serr_proxy = _write_only_IO_proxy(stateful_fellow.receive_stderr_write)
 
     return _sout_proxy, _serr_proxy, stateful_fellow.finish
 
@@ -139,6 +136,7 @@ def for_expect_on_which_this_many_under(which, num, test_context):
     """
 
     actual_lines, itr = __recording_list_and_expectation_functions_via_count(num)  # noqa: E501
+    from . import expect_STDs as lib
     if 'stderr' == which:
         exp = lib.expect_stderr_lines(itr)
         offset = 1
@@ -168,7 +166,7 @@ def for_recording_all_stderr_lines():
     def finish(actual_exitstatus):
         return _EndState(actual_exitstatus, None, tuple(lines))
     lines = []
-    _serr = lib.WriteOnly_IO_Proxy(lines.append)
+    _serr = _write_only_IO_proxy(lines.append)
     return None, _serr, finish
 
 
@@ -182,7 +180,7 @@ def for_recording_all_stdout_lines():
     def finish(actual_exitstatus):
         return _EndState(actual_exitstatus, tuple(lines), None)
     lines = []
-    _sout = lib.WriteOnly_IO_Proxy(lines.append)
+    _sout = _write_only_IO_proxy(lines.append)
     return _sout, None, finish
 
 
@@ -263,5 +261,9 @@ class MINIMAL_INTERACTIVE_IO:  # as namespace only
     def isatty():
         return True
 
+
+def _write_only_IO_proxy(f):
+    from modality_agnostic import io as io_lib
+    return io_lib.write_only_IO_proxy(f)
 
 # #abstracted

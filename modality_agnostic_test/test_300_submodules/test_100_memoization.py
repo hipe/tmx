@@ -33,7 +33,7 @@ class _CommonYikes(unittest.TestCase):
         return namedtuple
 
 
-class Case020_memoize(_CommonYikes):
+class Case0105_memoize(_CommonYikes):
 
     def test_010_gives_the_same_result_at_each_subsquent_call(self):
         num_a = self.end_state.number_array
@@ -65,7 +65,7 @@ class Case020_memoize(_CommonYikes):
         )
 
 
-class Case030_lazy(_CommonYikes):
+class Case0115_lazy(_CommonYikes):
 
     def test_010_does_something_different_at_each_call(self):
         s_a = self.end_state.string_array

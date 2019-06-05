@@ -35,7 +35,7 @@ class _WrapperOneCase(_WrapperCase):
         return wrapper_one()
 
 
-class Case173_typical(_WrapperTwoCase):
+class Case5129_typical(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -47,7 +47,7 @@ class Case173_typical(_WrapperTwoCase):
         return ('A', 'B', 'C', 'D', 'E', 'F', 'G')
 
 
-class Case174_three(_WrapperTwoCase):
+class Case5135_three(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -59,7 +59,7 @@ class Case174_three(_WrapperTwoCase):
         return ('A', 'B', 'C')
 
 
-class Case175_two(_WrapperTwoCase):
+class Case5141_two(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -71,7 +71,7 @@ class Case175_two(_WrapperTwoCase):
         return ('A', 'B')
 
 
-class Case176_one(_WrapperTwoCase):
+class Case5147_one(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -83,7 +83,7 @@ class Case176_one(_WrapperTwoCase):
         return ('A',)
 
 
-class Case177_two(_WrapperOneCase):
+class Case5153_two(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -95,7 +95,7 @@ class Case177_two(_WrapperOneCase):
         return ('A', 'B')
 
 
-class Case178_one(_WrapperOneCase):
+class Case5159_one(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -107,7 +107,7 @@ class Case178_one(_WrapperOneCase):
         return ('A',)
 
 
-class Case179_zero_when_no_callback(_WrapperOneCase):
+class Case5165_zero_when_no_callback(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -119,7 +119,7 @@ class Case179_zero_when_no_callback(_WrapperOneCase):
         return ()
 
 
-class Case180_zero_when_yes_callback(_WrapperTwoCase):
+class Case5171_zero_when_yes_callback(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -131,7 +131,7 @@ class Case180_zero_when_yes_callback(_WrapperTwoCase):
         return ()
 
 
-class Case181_oxford_join_hand_written_unit_test(unittest.TestCase):
+class Case5177_oxford_join_hand_written_unit_test(unittest.TestCase):
 
     def test_000_zero_items_OK(self):
         self.expect((), 'nothing')

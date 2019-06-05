@@ -337,8 +337,8 @@ def OPEN_HORRIBLE_VENDOR_HACK(sout_write_receiver, serr_write_receiver):
 
     from click import utils as EEK_click_utils
 
-    sout_iof = es.Write_Only_IO_Facade(sout_write_receiver)
-    serr_iof = es.Write_Only_IO_Facade(serr_write_receiver)
+    sout_iof = _write_only_facade(sout_write_receiver)
+    serr_iof = _write_only_facade(serr_write_receiver)
 
     dtso = getattr(EEK_click_utils, '_default_text_stdout')
     dtse = getattr(EEK_click_utils, '_default_text_stderr')
@@ -415,6 +415,14 @@ def __lines_via_writes(writes):
     for write in writes:
         for line in _lines_via_big_string_as_is(write):
             yield line
+
+
+def _write_only_facade(receiver):
+    from modality_agnostic import io as io_lib
+    return io_lib.write_only_IO_proxy(
+            write=lambda s: receiver.receive_write(s),
+            flush=lambda: receiver.receive_flush(),
+            )
 
 
 def _lines_via_big_string_as_is(big_string):

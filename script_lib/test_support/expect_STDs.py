@@ -76,8 +76,10 @@ class _Performance:
 
     def __init__(self, test_case, line_expectations):
 
-        self.stdout = _WriteOnly_IO_Proxy(self._receive_stdout_line)
-        self.stderr = _WriteOnly_IO_Proxy(self._receive_stderr_line)
+        from modality_agnostic import io as io_lib
+        proxy = io_lib.write_only_IO_proxy
+        self.stdout = proxy(self._receive_stdout_line)
+        self.stderr = proxy(self._receive_stderr_line)
 
         from collections import deque
         self._deque = deque(line_expectations)
@@ -161,14 +163,6 @@ class _Performance:
     def _flatten_message(self, dic, fmt):
         # TODO - here is where we would do i18n with that one function
         return fmt.format(** dic)
-
-
-class WriteOnly_IO_Proxy:  # #[#609]
-    def __init__(self, f):
-        self.write = f
-
-
-_WriteOnly_IO_Proxy = WriteOnly_IO_Proxy
 
 
 class _Expectation:
@@ -341,19 +335,6 @@ feature in the main body of all this.
 at writing it is our only client that does this composing.
 see topic identifier.
 '''
-
-
-class Write_Only_IO_Facade:  # #[#609]
-
-    def __init__(self, wr):
-        self._write_receiver = wr
-
-    def write(self, s):
-        self._write_receiver.receive_write(s)
-        return len(s)
-
-    def flush(self):
-        self._write_receiver.receive_flush()
 
 
 class DebuggingWriteReceiver:
