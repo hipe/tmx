@@ -3,7 +3,8 @@ import os
 import sys
 
 
-_CONTEXT_SETTINGS = {'auto_envvar_prefix': 'PHO'}
+_env_var_prefix = 'PHO'
+_CONTEXT_SETTINGS = {'auto_envvar_prefix': _env_var_prefix}
 
 
 def lazy(f):
@@ -85,7 +86,8 @@ def _build_structure_listener(did_error, do_express_verbose):
         metavar='PATH',
         help=(
             'The path to the directory with the fragments '
-            '(the directory that contains the `entities` directory).'
+            '(the directory that contains the `entities` directory)'
+            f' (or set the env var {_env_var_prefix}_COLLECTION_PATH)'
             ),
         )
 @click.option(

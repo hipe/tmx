@@ -13,6 +13,9 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
+# Case153-Case161
+
+
 class Case153_basics(_CommonCase):
 
     def test_100_collection_builds(self):
@@ -22,7 +25,7 @@ class Case153_basics(_CommonCase):
         self.assertIsNotNone(_big_index_one())
 
 
-class Case154_WAT(_CommonCase):
+class Case154_whole_document_tree_from_first_collection(_CommonCase):
 
     def test_100_some_lines_were_made(self):
         num = self._custom_index().total_line_count
@@ -53,10 +56,93 @@ class Case154_WAT(_CommonCase):
 
     @shared_subject
     def _custom_index(self):
+        return custom_index_via_big_index(_big_index_one())
+
+
+_this_range = range(57, 59)
+
+
+class Case158_generate_one_document(_CommonCase):
+
+    def test_100_wrote_the_lines_probably(self):
+        self.assertIn(len(self['writes']), _this_range)
+
+    def test_125_the_lines_ARE_newline_terminated_probably(self):
+        _ = self['writes']
+        self.assertEqual(_[0][-1], '\n')
+        self.assertEqual(_[-1][-1], '\n')
+
+    def test_150_the_frontmatter_is_there(self):
+        _ = self['writes']
+        self.assertEqual(_[0], '---\n')
+        self.assertEqual(_[3], '---\n')  # ..
+
+    def test_200_resulted_in_true_for_OK(self):
+        self.assertTrue(self['result_value'] is True)  # like this, it matters
+
+    def test_300_emitted_a_summary(self):
+        o = self.ad_hoc_end_state()
+        chan = o['channel']
+        sct = o['payloader_BE_CAREFUL_HOT']()
+
+        self.assertSequenceEqual(chan, ('info', 'structure', 'wrote_files'))
+
+        import re
+        md = re.match(
+                r'^wrote 1 of 1 files \((\d+) lines, ~(\d+) bytes\)$',
+                sct['message'])
+
+        self.assertIn(int(md[1]), range(57, 59))
+        self.assertIn(int(md[2]), range(1000, 1200))
+
+    def __getitem__(self, k):
+        return self.ad_hoc_end_state()[k]
+
+    @shared_subject
+    def ad_hoc_end_state(self):
+
+        writes = []
+        from modality_agnostic import io as io_lib
+        spy = io_lib.write_only_IO_proxy(
+                write=writes.append,
+                on_OK_exit=lambda: None,
+                )
+
+        _big_index = _big_index_one()
+
+        def run(listener):
+            from pho.magnetics_.document_tree_via_fragment import (
+                    document_tree_via_fragment)
+
+            return document_tree_via_fragment(
+                    out_tuple=('open_output_filehandle', spy),
+                    fragment_IID_string='48R',
+                    big_index=_big_index,
+                    be_recursive=False,
+                    force_is_present=False,
+                    is_dry_run=False,
+                    listener=listener,
+                    )
+
+        from modality_agnostic.test_support import (
+                structured_emission as se_lib)
+
+        listener, emissioner = se_lib.listener_and_emissioner_for(self)
+        x = run(listener)
+        chan, payloader = emissioner()
+
+        return {
+                'result_value': x,
+                'writes': writes,
+                'channel': chan,
+                'payloader_BE_CAREFUL_HOT': payloader,
+                }
+
+
+def custom_index_via_big_index(big_index):
 
         listener = throwing_listenerer()
-        bi = _big_index_one()
-        doc_itr = bi.TO_DOCUMENT_STREAM(listener)
+        doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
         is_first = True
 
         total_line_count = 0

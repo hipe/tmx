@@ -47,7 +47,7 @@ def dereference_footnotes__(mixed_children, lineno, ifr, idoc, listener):
 def any_structured_via_line__(line):
     # (this is wholly concerned with finding footnote references so it's here)
 
-    md_itr = re.finditer(_find_iter_rx_s, line)
+    md_itr = re.finditer(footnote_reference_regex_, line)
     for first_md in md_itr:  # once
         break
     if first_md is None:
@@ -78,7 +78,7 @@ def any_structured_via_line__(line):
     return pho.models_.StructuredContentLine__(tuple(a))
 
 
-_find_iter_rx_s = (
+footnote_reference_regex_ = re.compile(
         r'\[([^\]]+)\]'
         r'\[([^\]]+)\]'
         )

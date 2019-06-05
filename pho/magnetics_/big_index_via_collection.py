@@ -8,7 +8,7 @@ etc), books, small libraries with ad-hoc categories, etc.
 
 also we like the idea of making was constitutes a "document" be
 configurable; like maybe it's as small as what can fit on a printed page,
-or maybe it's very large like those old school internet html documenation
+or maybe it's very large like that oldschool internet html documentation
 like the guides on tldp.org.
 
 let's see what it's like:
@@ -17,6 +17,7 @@ let's see what it's like:
     make that fragment become the head fragment for a document. this is
     currently the sole means by which we demarcate the boundaries between
     documents (but in the future we'd like to change this, in two ways).
+    (this is now the provision :[#883.4] discussed more below at #here1.)
 
   - (for one thing, this current approach doesn't effect an order for
     the documents.)
@@ -142,8 +143,8 @@ class _OrderedRun:
         use_child_iids = []
 
         for iid in child_iids:
-            # we have the [#883.4] hacky provision that we delineate documents
-            # by determinging head nodes as nodes without parents. were this
+            # we have the #here1 hacky provision that we delineate documents
+            # by determining head nodes as nodes without parents. were this
             # not the case, we could require that a node can have MAX ONE of
             # a parent or a previous (ie mutually exclusive but not required).
             # since we cannot require that, for nodes that hold both relation-
@@ -288,9 +289,13 @@ def big_index_via_collection(collection, listener):
 
     id_itr = collection.to_identifier_stream(listener)
     for iid in id_itr:
-        _iid_s = iid.to_string()
-        _dct = collection.retrieve_entity(_iid_s, listener)
-        frag = frag_lib.document_fragment_via_definition(listener, **_dct)
+        iid_s = iid.to_string()
+        dct = collection.retrieve_entity(iid_s, listener)
+
+        if dct is None:
+            cover_me(f'maybe this decode error thing in {repr(iid_s)}')
+
+        frag = frag_lib.document_fragment_via_definition(listener, **dct)
         if frag is None:
             return
 
@@ -353,26 +358,47 @@ class _BigIndex:
 
         ct = _CollectionTraversal(self)
 
+        for iid in self.ids_of_frags_with_no_parent:
+            doc = self._build_document(iid, ct, listener)
+            if not doc:
+                cover_me('not doc')
+            yield doc
+
+    def RETRIEVE_DOCUMENT(self, iid_s, listener):
+
+        dct = self.frag_via_iid
+        if iid_s not in dct:
+            cover_me(f'fragment not found: {repr(iid_s)}')
+
+        frag = dct[iid_s]
+        parend_iid_s = frag.parent_identifier_string
+        if parend_iid_s is not None:
+            _reason = (
+                    f'fragment {repr(iid_s)} is not a document head'
+                    f' because has parent {repr(parend_iid_s)}'
+                    )
+            cover_me(_reason)
+
+        ct = _CollectionTraversal(self)
+        # even within one document we need to make sure we do not cycle
+
+        return self._build_document(iid_s, ct, listener)
+
+    def _build_document(self, iid_s, collection_traversal, listener):
+        # the main thing of eveything
+
+        a = collection_traversal.ordered_IIDs_for(
+                iid_s, 'document head fragment', listener)
+        if a is None:
+            cover_me('it is as the prophecy foretold')
+
         frag_via_iid = self.frag_via_iid
+
+        _frags = tuple(frag_via_iid[iid] for iid in a)
 
         from .document_via_fragments import Document_
 
-        for iid in self.ids_of_frags_with_no_parent:
-
-            """order the fragments. can fail
-
-            this is the whole key thing
-
-            this is so cool
-            """
-
-            a = ct.ordered_IIDs_for(iid, 'document head fragment', listener)
-            if a is None:
-                cover_me('it is as the prophecy foretold')
-
-            _frags = tuple(frag_via_iid[iid] for iid in a)
-
-            yield Document_(_frags)
+        return Document_(_frags)
 
 
 def _touch_list(dct, key):  # there's got to be a better idiom

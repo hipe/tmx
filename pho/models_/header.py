@@ -18,7 +18,8 @@ def decide_how_to_express_heading(
     else:
         # non-head fragment with YES heading (Case115)
         add_header_depth = _normal_header_depth_to_add + 1
-        header = _Header(add_header_depth, frag_heading)
+        _use_header_text = f'{frag_heading}\n'
+        header = _Header(add_header_depth, _use_header_text)
 
     return add_header_depth, header
 

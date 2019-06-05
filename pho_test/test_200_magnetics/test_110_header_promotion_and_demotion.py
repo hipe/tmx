@@ -38,7 +38,7 @@ class Case112_one_fragment_with_heading_and_leading_header(_CommonCase):
 class Case115_nonfirst_fragment_headings(_CommonCase):
 
     def test_100_turn_nonfirst_fragment_heading_into_header(self):
-        self.assertEqual(self._this_header().text, 'dogs are cool')
+        self.assertEqual(self._this_header().text, 'dogs are cool\n')
 
     def test_200_this_header_becomes_the_common_depth(self):
         self.assertEqual(self._this_header().depth, 2)
@@ -62,7 +62,7 @@ class Case118_nonfirst_fragments_with_heading_and_headers(_CommonCase):
         state = self.build_state()
 
         hdr = state.section_at(1).header
-        assert(hdr.text == 'dogs are cool')
+        assert(hdr.text == 'dogs are cool\n')
         self.assertEqual(hdr.depth, 2)
 
         hdr = state.section_at(2).header

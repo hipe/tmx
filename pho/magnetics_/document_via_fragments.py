@@ -193,7 +193,7 @@ class _IndexedFragment:
             if foot_def_ast is None:
                 break
             # (Case212)
-            lines.pop()
+            lines.pop()  # #here2
             ok = self.__add_footnote_definition_AST(foot_def_ast)
             if not ok:
                 return
@@ -206,9 +206,12 @@ class _IndexedFragment:
         # footnotes at the bottom (& i suppose tail-anchored blanks otherwise)
 
         while len(lines) and '\n' == lines[-1]:
-            lines.pop()
+            lines.pop()  # #here2
 
         # GO HAM CRAY
+
+        parse_context = _ParseContext(frag.identifier_string)
+        _AST_via_line_normally = _AST_via_liner(parse_context, listener)
 
         def process_line_normally(line):
             ast = _AST_via_line_normally(line)
@@ -268,6 +271,7 @@ class _IndexedFragment:
         self._end_of_stream_is_OK_here = True
 
         for line in lines:
+            parse_context.lineno += 1
             _ok = self._process_line(line)
             if not _ok:
                 cover_me('then what')
@@ -302,23 +306,57 @@ class _IndexedFragment:
         del self._process_line
 
 
-def _AST_via_line_normally(line):
+def _AST_via_liner(parse_context, listener):
 
-    if '\n' == line:
-        return _the_empty_line_AST()  # (Case154)
+    def AST_via_line_normally(line):
 
-    char = line[0]
-    if '#' == char:
-        from pho.models_ import header
-        return header.via_line(line)  # (Case112)
+        if '\n' == line:
+            return _the_empty_line_AST()  # (Case154)
 
-    if '`' == char and '```' == line[0:3]:
-        return _fenced_code_block_lib().opening_via_line(line)  # (Case133)
+        char = line[0]
+        if '#' == char:
+            from pho.models_ import header
+            return header.via_line(line)  # (Case112)
 
-    assert('[' != char)  # did something else before #history-A.3
+        if '`' == char and '```' == line[0:3]:
+            return _fenced_code_block_lib().opening_via_line(line)  # (Case133)
 
-    from pho.models_ import content_line
-    return content_line.via_line(line)
+        if '[' == char:
+
+            # edge case: if this occurs at the start of a line, then FOR NOW
+            # it better be a footnote reference. .. (clean up as necessary)
+
+            from pho.models_.footnote import footnote_reference_regex_ as rx
+            md = rx.match(line)
+            if not md:
+                _at_here = parse_context.say_at_where()
+                reason = (
+                        f'{_at_here}, '
+                        f'what is the deal with this line: {repr(line)}'
+                        )
+                cover_me(reason)
+                # (did something else before #history-A.3)
+
+        from pho.models_ import content_line
+        return content_line.via_line(line)
+
+    return AST_via_line_normally
+
+
+class _ParseContext:
+    # experiment for better error messages
+    # at #here2 we pop lines off the end of the fragment, but:
+    # that shouldn't effect our line offsets (which count from beginnning)
+
+    def __init__(self, iid_s):
+        self.lineno = 0
+        self.fragment_identifier_string = iid_s
+
+    def say_at_where(self):
+        return (
+            f'in {repr(self.fragment_identifier_string)}.body'
+            f' (line {self.lineno})'
+            )
 
 
 def _fenced_code_block_lib():
