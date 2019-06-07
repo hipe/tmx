@@ -52,7 +52,7 @@ class _DictionaryStream_via_Table:
         dictionary_via_cels = self._dictionary_via_cels
 
         def dictionary_via_row(row):
-            _tds = row.select('> td')
+            _tds = _filter('td', row)
             return dictionary_via_cels(_tds)
         return (dictionary_via_row(row) for row in self._rows)
 
@@ -64,8 +64,8 @@ class _DictionaryStream_via_Table:
         def trs_via(thead_or_tbody):
             return thead_or_tbody.find_all('tr', recursive=False)
 
-        theads = table.select('> thead')
-        tbody, = table.select('> tbody')
+        theads = _filter('thead', table)
+        tbody, = _filter('tbody', table)
 
         if 0 == len(theads):
             self._is_proper = False
@@ -79,8 +79,8 @@ class _DictionaryStream_via_Table:
 
 
 def _unsanitized_far_field_names_via_first_row(row, s_via_td, is_proper):
-    _selector = '> th' if is_proper else '> td'
-    return tuple([s_via_td(td) for td in row.select(_selector)])
+    _selector = 'th' if is_proper else 'td'
+    return tuple(s_via_td(td) for td in _filter(_selector, row))
 
 
 def _s_via_td_loosely(td):
@@ -92,7 +92,14 @@ def _s_via_td_strictly(td):
     return navigable_string.strip()
 
 
+def _filter(sel, el):
+    # at #history-A.1 BeautifulSoup changed
+    import soupsieve as sv
+    return sv.filter(sel, el)
+
+
 sys.modules[__name__] = _DictionaryStream_via_Table
 
+# #history-A.2: as referenced
 # #history-A.1: a big chunk of it abstracted out to be not format specific
 # #born.

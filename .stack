@@ -15,3 +15,12 @@ archive cruft
 cleanup to try and use swift package manager
 do EDIT's in documentation
 graph viz for fragments and generate docs from current frags
+migrate real doc fragments to eno
+have full on eno
+refactor toml test to be canon based
+maybe a waypoint commit of just flushing the renames
+move tons of toml test and asset files, flush other renames, maybe __init__.py
+maybe rename _common_state along with the below item
+finish toy storage adapter to jumpstart canon
+introduce toy storage adapter to jumpstart canon
+update dependencies

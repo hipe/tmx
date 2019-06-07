@@ -57,27 +57,27 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
         self.assertIn(s, _line)
 
     def build_command_help_screen_subtree(self):
-        lines, e = self._expect_common('stdout', 'system exit')
-        self.assertEqual(e.code, _success_exit_code)
+        o = self.build_end_state('stdout', None)
+        self.assertEqual(o.exit_code, _success_exit_code)
+        lines = tuple(o.lines)  # #here3
         assert('\n' == lines[1])  # meh
         return _StructUsageLineAndFirstDescLine(lines[0], lines[2])
 
     def apparently_just_prints_entire_help_screen(self):
 
         # #open [#867.L] the fact that exit_code=0 is an annoying thing from..
-        lines, e = self._expect_common('stdout', 'system exit')
-        self.assertEqual(e.code, _success_exit_code)
+
+        es = self.build_end_state('stdout', None)
+        exit_code = es.exit_code
+        lines = tuple(es.lines)
+
+        self.assertEqual(exit_code, _success_exit_code)
 
         # emits same generic message (near #here1)
         self.assertTrue('Usage:' in lines[0])
 
         # several lines
         self.assertTrue(3 < len(lines))
-
-    def _expect_common(self, which_IO, which_e):
-        o = self.build_end_state(which_IO, which_e)
-        lines = tuple(o.lines)  # it's a generator. flatten it now before etc
-        return lines, o.exception
 
     def random_number(self):
         return None
@@ -136,9 +136,10 @@ class Case801_strange_arg(_CommonCase):
 
     @shared_subject
     def _exe(self):
-        lines, e = self._expect_common('stdout', 'usage error')
+        o = self.build_end_state('stdout', 'usage error')
+        lines = tuple(o.lines)  # #here3
         self.assertEqual(len(lines), 0)
-        return e
+        return o.exception
 
     def given_args(self):
         return ('foo-fah-fee',)
@@ -590,7 +591,7 @@ def _CASE_A():  # usually it's one invocation
             given_args=('--help',),
             allow_stdout_lines=True,
             allow_stderr_lines=False,
-            exception_category='system exit',
+            exception_category=None,
             injections_dictionary=None,
             might_debug=False,  # ..
             do_debug_f=lambda: False,  # ..
@@ -598,7 +599,7 @@ def _CASE_A():  # usually it's one invocation
             )
 
     _tree = CLI_support.tree_via_lines(o.lines)
-    return _StructTreeAndExitCode(_tree, o.exception.code)
+    return _StructTreeAndExitCode(_tree, o.exit_code)
 
 
 class _StructUsageLineAndFirstDescLine:
@@ -630,4 +631,5 @@ _success_exit_code = 0
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1 they fixed their abuse of exceptions for some cases
 # #born.

@@ -7,6 +7,8 @@ available in a sibling script.
 """
 # #[#410.1.2] this is a producer script.
 
+import soupsieve as sv
+
 
 _domain = 'https://themes.gohugo.io'
 _url = _domain + '/'
@@ -77,7 +79,7 @@ class open_dictionary_stream:
 
 def _write_url_and_label(dct, a):
 
-    span, = a.select('> span')
+    span, = _filter('span', a)
     dct['label'] = span.string
 
     s = a['href']
@@ -88,7 +90,11 @@ def _write_url_and_label(dct, a):
 
 
 def _direct_children(node):  # #cp
-    return node.select('> *')  # not sure if this is idiomatic
+    return _filter('*', node)  # omit strings
+
+
+def _filter(sel, el):
+    return sv.filter(sel, el)
 
 
 def cover_me():

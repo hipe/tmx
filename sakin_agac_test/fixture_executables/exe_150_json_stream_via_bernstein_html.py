@@ -91,7 +91,7 @@ def _via_upda(s):
 
 def _this_typical_humkey_via_td():
     def f(td):
-        a_tag, = td.select('> a')
+        a_tag, = _filter('a', td)
         url = a_tag['href']
         # ..
         return markdown_link_via(_string_via_el(a_tag), url)
@@ -102,6 +102,11 @@ def _this_typical_humkey_via_td():
 def _string_via_el(el):  # td.text() would be same, but this gives sanity
     navigable_string, = el.children
     return navigable_string.strip()
+
+
+def _filter(sel, el):
+    import soupsieve as sv
+    return sv.filter(sel, el)
 
 
 def _top_html_lib():

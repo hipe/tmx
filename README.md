@@ -115,33 +115,23 @@ if you are familiar with the term "mono-repo", that's what's going on here.
 
 ## <a name='running-all-the-tests'></a>overview of running the tests
 
-wahoo:
+We're currently experimenting with different ways we run the whole test
+suite universe-wide (something we don't usually do at each commit).
+
+This is the current sketch:
 
 ```bash
-cat mono-repo.test-these.list | while read line ; do pud -fq "$line" ; done 2>&1 | awk '/^Ran ([0-9]+) test/ { print $2}' | paste -sd '+' -
+cat mono-repo.test-these.list | while read line ; do echo -n " $line " >&2 ; pud -fq "$line" 2>&1; if [ $? -ne 0 ] ; then ; echo "ERRRORRED" >&2 ; break ; fi ; done | awk '/^Ran ([0-9]+) test/ { printf "+%d", $2}'
 ```
 
-we "shouldn't" be specifying all these sub-project-specific instructions
-redundantly here, but the desire to have this in one centralized easy
-reference outweighs this concern.
-
-at the moment our tests fall into two categories:
-
-  1. the easy, unit-test-like tests in python
-
-  1. the more involved tests that require a server to be running.
+This ☝️ used `pud` from the [below aliases](#aliases). It gives progressive
+output only of each sub-project name as it _starts_ and doesn't show a stack
+track. (If the test suite X failed, just do `pud -vf X` to see details).
 
 
 
-### the easy tests
 
-(using [these aliases](#aliases)):
-
-    pud modality_agnostic_test && pud script_lib_test && pud sakin_agac_test && pud game_server_test && pud grep_dump_test && pud upload_bot_test
-
-
-
-### the more invovled tests
+### more complicated (and now legacy) test suites
 
 testing the API server of the "upload bot" is more involved. it its own
 terminal:

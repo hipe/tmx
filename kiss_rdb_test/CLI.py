@@ -204,12 +204,16 @@ def BIG_FLEX(
 
     _exception_class_expression = tuple(these(exception_category))
 
+    did_throw = False
     try:
         with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
             invoke_CLI()
-            raise Exception('never see')
     except _exception_class_expression as e_:
+        did_throw = True
         e = e_
+
+    if not did_throw:
+        raise Exception("this used to throw but it doesn't any more")
 
     _ = clean_up_writes()
     return _BigFlexEndStateWithException(_, e)

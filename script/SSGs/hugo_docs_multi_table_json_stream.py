@@ -15,6 +15,9 @@ presumably the most representative of yadda..
 # #[#432] tracks multi-tablism
 
 
+import soupsieve as sv
+
+
 _domain = 'https://gohugo.io'  # no trailing slash because #here1
 _url = _domain + '/documentation/'
 
@@ -115,7 +118,7 @@ def _write_anchor_tag(dct, a):
 
 
 def _direct_children(node):
-    return node.select('> *')  # not sure if this is idiomatic
+    return sv.filter('*', node)  # omit strings, `_filter`
 
 
 def cover_me():

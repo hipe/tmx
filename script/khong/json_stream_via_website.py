@@ -7,6 +7,8 @@
 """
 # #[#410.1.2] this is a producer script.
 
+import soupsieve as sv
+
 
 _domain = 'http://www.bogotobogo.com'
 domain = _domain  # expose it
@@ -151,10 +153,10 @@ def _second_selector(soup, listener):
     """
 
     main_div, = soup.select('#main')
-    cont_div, = main_div.select('> div.container')
-    top_div, = cont_div.select('> div.topspace')
-    row_div, = top_div.select('> div.row')
-    one_div, two_div = row_div.select('> div')
+    cont_div, = _filter('div.container', main_div)
+    top_div, = _filter('div.topspace', cont_div)
+    row_div, = _filter('div.row', top_div)
+    one_div, two_div = _filter('div', row_div)
 
     """
     thus far:
@@ -245,8 +247,8 @@ def _all_these_functions(listener):
 
     def special_doo_hah_for_one_div(one_div):
         # (shear off unadorned divs)
-        _, _, yikes_br = one_div.select('> br')  # #TODO
-        _1, _2 = yikes_br.select('> *')
+        _, _, yikes_br = _filter('br', one_div)  # #TODO
+        _1, _2 = _filter('*', yikes_br.children)  # no strings
         _ = shear(_2, 2, 1, 'br')
         _ = one_br(_)
         _ = one_br(_)
@@ -257,17 +259,16 @@ def _all_these_functions(listener):
 
     def special_doo_hah_for_two_div(two_div):
         # (shear off unadorned divs)
-        side_div, = two_div.select('> div.side_menu')
-        yikes_br, = side_div.select('> *')
-        two_inner, = yikes_br.select('> *')
-
+        side_div, = _filter('div.side_menu', two_div)
+        yikes_br, = _filter('*', side_div)  # no strings
+        two_inner, = tuple(yikes_br.children)
         return json_objects_via(two_inner)
 
     def one_br(el):
         return shear(el, 1, 0, 'br')
 
     def shear(el, how_many, which_one, name):
-        these = el.select('> *')
+        these = _filter('*', el)  # no strings
         if len(these) != how_many:
             cover_me('more than %d (%d)' % (how_many, len(these)))
         this = these[which_one]
@@ -339,6 +340,10 @@ def _all_these_functions(listener):
     return o
 
 
+def _filter(sel, el):
+    return sv.filter(sel, el)
+
+
 def _this_lazy(f):  # experiment
 
     def g(*a):
@@ -390,6 +395,7 @@ if __name__ == '__main__':
             )
     exit(_exitstatus)
 
+# #history-A.3: beaut. soup changed.
 # #history-A.2: sunsetted file of origin
 # #history-A.1
 # #born: abstracted from sibling

@@ -71,7 +71,8 @@ def _this_more_complicated_string_via_td():
     del(o)
 
     def f(td):
-        a_tag, = td.select('> p > a')
+        _p, = _filter('p', td)
+        a_tag, = _filter('a', _p)
         url = a_tag['href']
         if '/' == url[0]:  # ick/meh coverpoint [#708.2.3]
             url = url_via_href(url)
@@ -81,18 +82,23 @@ def _this_more_complicated_string_via_td():
 
 
 def _string_via_td_LOOSE(td):
-    p, = td.select('> p')
+    p, = _filter('p', td)
     return p.text.strip()
 
 
 def _string_via_td_STRICT(td):
-    p, = td.select('> p')
+    p, = _filter('p', td)
     return _string_via_el(p)
 
 
 def _string_via_el(el):  # td.text() would be same, but this gives sanity
     navigable_string, = el.children
     return navigable_string.strip()
+
+
+def _filter(sel, el):
+    import soupsieve as sv
+    return sv.filter(sel, el)
 
 
 def _md_lib():
@@ -116,6 +122,8 @@ if __name__ == '__main__':
             )
     exit(_exitstatus)
 
+
+# #history-A.3: beaut. soup changed
 # #history-A.2: key simplifier found to be not covered and left broken
 # #history-A.1: key simplifier gets extracted
 # #born

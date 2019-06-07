@@ -378,7 +378,7 @@ class Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
         self.assertEqual(self._general_and_specific()[0], 'toml decode error')
 
     def test_200_in_specific_say_this_one_weird_error(self):
-        _expect = "This float doesn't have a leading digit"
+        _expect = "This float doesn't have a leading digit (line 2 column 1 char 1)"  # noqa: E501
         self.assertEqual(self._general_and_specific()[1], _expect)
 
     @shared_subject
