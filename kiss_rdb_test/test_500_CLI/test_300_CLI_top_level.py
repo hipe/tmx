@@ -329,8 +329,8 @@ class Case819_get(_CommonCase):
         {
           "identifier_string": "B9H",
           "core_attributes": {
-            "thing-A": "hi H",
-            "thing-B": "hey H"
+            "thing-A": "hi i'm B9H",
+            "thing-B": "hey i'm B9H"
           }
         }
         """

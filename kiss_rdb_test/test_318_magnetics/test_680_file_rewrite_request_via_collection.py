@@ -176,8 +176,8 @@ class Case711_retrieve(_CommonCase):
 
     def test_200_simple_immediate_values_are_there(self):
         dct = self._this_dict()['core_attributes']
-        self.assertEqual(dct['thing-A'], 'hi H')
-        self.assertEqual(dct['thing-B'], 'hey H')
+        self.assertEqual(dct['thing-A'], "hi i'm B9H")
+        self.assertEqual(dct['thing-B'], "hey i'm B9H")
 
     @shared_subject
     def _this_dict(self):

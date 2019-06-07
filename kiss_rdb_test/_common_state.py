@@ -9,25 +9,30 @@ def _normalize_sys_path():  # see [#019]
     mono_repo_dir = dn(test_dir)
 
     if test_dir == a[0]:
-        # IF this then this is a [#019.test-run-type-C], i.e the topmost
-        # test directory was the argument path.
+        # the topmost test directory was the argument path (type C)
 
-        # as far as we know, such circumstance is the *only* circumstance
-        # under which this subject file is loaded.
+        assert(mono_repo_dir == a[1])  # `py -m unittest discover` probably
 
-        if mono_repo_dir != a[1]:  # (unittest must do this? why?)
-            raise Exception('hello')
-
-        # simply SWAP THEM, so that sys.path looks normalized
+        # swap them so sys.path advertises that it is normalized
         a[0] = mono_repo_dir
         a[1] = test_dir
 
     elif mono_repo_dir == a[0]:
-        # this file was loaded by a lower same-named file
-        # that wants its resources
+        # file was loaded by a lower same-named file that wants its resources
         pass
     else:
-        raise Exception('when')
+        # either sub-unit is being run or a test file is loading us the new way
+        assert(0 == a[0].index(test_dir))
+
+        if mono_repo_dir == a[1]:  # sub-unit
+            # swap them so sys.path advertises that it is normalized
+            a[1] = a[0]  # keep the deep test module so other tests can load
+            a[0] = mono_repo_dir
+        else:
+            # single file is being run, loaded this the the new way. clobber
+            a[0] = mono_repo_dir
+
+        # (this branch added at #history-A.1)
 
     assert(mono_repo_dir == a[0])
 
@@ -65,6 +70,25 @@ def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
 def TSLO_via(identifier_string, meta_or_attributes):
     import kiss_rdb.magnetics_.identifiers_via_file_lines as ids_lib
     return ids_lib.TSLO_via(identifier_string, meta_or_attributes)
+
+
+def pretend_file_via_path_and_big_string(path, big_string):
+    return PretendFile(unindent(big_string), path)
+
+
+class PretendFile:
+
+    def __init__(self, lines, path):
+        self._lines = lines
+        self.path = path
+
+    def __enter__(self):
+        x = self._lines
+        del self._lines
+        return x
+
+    def __exit__(self, typ, err, stack):
+        pass
 
 
 def unindent_with_dot_hack(big_s):
@@ -109,4 +133,5 @@ def fixture_directory_path(stem):
 def fixture_directories_path():
     return os_path.join(_top_test_dir, 'fixture-directories')
 
+# #history-A.1
 # #born.

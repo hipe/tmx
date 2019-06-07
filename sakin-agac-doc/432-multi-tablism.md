@@ -25,7 +25,7 @@ syncing could be seen as some kind of fundamental theoretical pillar of the
 whole sub-project.)
 
 so to the point: to get syncing to work with multi-tablism,
-entity identfiers will go from being plain old "values" (strings) in a shared
+entity identifiers will go from being plain old "values" (strings) in a shared
 namespace to being tuples that have to be aware of a stack (later for this).
 
 this will be a non-trivial amount of work to inject this change into the
