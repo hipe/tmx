@@ -46,7 +46,7 @@ woah boy.
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
-|[#867.J]                   | #hole |
+|[#867.J]                   | #open | redundancy
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc

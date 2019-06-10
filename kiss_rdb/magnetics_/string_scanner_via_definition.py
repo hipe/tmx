@@ -7,9 +7,10 @@ class Scanner:
     attempts to wrap up higher-level behavior we always end up wanting
     when we hand-write our parsers.
 
-    this attempts to improve deficencies, short-comings, or ill-fits from
+    this attempts to improve deficiencies, short-comings, or ill-fits from
     the competition
 
+      - declaratively associate a business description with your regex
       - our higher-level doo-hah with error message generation
       - smaller API: you must use our custom pattern class to define symbols
 
@@ -51,16 +52,28 @@ class Scanner:
     def scan_required(self, pattern):
         m = self._required(pattern)
         if m is None:
-            return None
-        else:
-            self._position = m.end()
-            return m.group(0)  # ..
+            return
+        return self._advance_for_scan(m)
+
+    def scan(self, pattern):
+        m = self._match(pattern)
+        if m is None:
+            return
+        return self._advance_for_scan(m)
+
+    def _advance_for_scan(self, m):
+        self._position = m.end()
+        return m.group(0)  # ..
 
     # == READ ONLY things
+
+    def rest(self):  # #cover-me
+        return self._line[self._position:]
 
     def eos(self):
         return self._length == self._position
 
+    @property
     def pos(self):
         return self._position
 
@@ -159,8 +172,8 @@ def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
 
 class pattern_via_description_and_regex_string:
 
-    def __init__(self, desc, rx_string):
+    def __init__(self, desc, rx_string, *flags):
         self.description = desc
-        self.regex = re.compile(rx_string)
+        self.regex = re.compile(rx_string, *flags)
 
 # #born.

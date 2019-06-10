@@ -22,4 +22,3 @@ todo's in asset and test
 maybe a waypoint commit of just flushing the renames
 move tons of toml test and asset files, flush other renames, maybe __init__.py
 maybe rename _common_state along with the below item
-finish toy storage adapter to jumpstart canon

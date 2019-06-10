@@ -137,6 +137,9 @@ def three_via_depth_(depth):
     we produce these functions together.
 
     "capacity" is simply the max number of entities given depth. used elsewh.
+
+    BUT if you really want the version that doesn't have fixed depth,
+    see identifier_via_integer__ and integer_via_identifierer__ below.
     """
 
     # from depth, derive a bunch of stuff you need to make the functions
@@ -204,6 +207,27 @@ def identifier_via_string__(id_s, listener):
     return Identifier_(tuple(digits))
 
 
+def identifier_via_integer__(i):  # arbitrary depth, on the fly
+    assert(0 <= i)
+    big_endian = []
+    remaining = i
+    while True:
+        quotient, remainder = divmod(remaining, _num_digits)
+        if quotient:
+            big_endian.append(remainder)
+            remaining = quotient
+            continue
+        big_endian.append(remainder)
+        break
+    little_endian = reversed(big_endian)
+
+    def f(num):
+        _digit = _digits[num]  # perhaps not efficient
+        return native_digit_via_character_(_digit, None)
+    nd_tup = tuple(f(num) for num in little_endian)
+    return Identifier_(nd_tup)
+
+
 class Identifier_:
 
     def __init__(self, native_digits):
@@ -217,6 +241,33 @@ class Identifier_:
 
     def to_string(self):
         return ''.join(nd.character for nd in self.native_digits)
+
+
+def integer_via_identifier_er__():
+    # because we supposedly have arbitrary depth...
+
+    from functools import reduce
+    powers = [1]
+    num_powers = 1
+
+    def CALCULATE_MORE_POWERS(depth):
+        nonlocal num_powers  # #meh
+        for i in range(num_powers, depth):
+            powers.append(_num_digits ** i)
+        num_powers = depth
+
+    def int_via_iden(iden):
+        depth = len(iden.native_digits)
+        if num_powers < depth:
+            CALCULATE_MORE_POWERS(depth)
+        depth_minus_one = depth - 1
+        nd_tup = iden.native_digits
+
+        def add_me(i):
+            return nd_tup[i].integer * powers[depth_minus_one - i]
+        return reduce(lambda m, x: m + x, (add_me(i) for i in range(0, depth)))
+
+    return int_via_iden
 
 
 def native_digit_via_character_(s, listener):
@@ -296,4 +347,5 @@ if __name__ == '__main__':
     exit(_CLI(None, stdout, stderr, argv))
 
 
+# #history-A.1: added depth-free encoder/decoder
 # #abstracted.

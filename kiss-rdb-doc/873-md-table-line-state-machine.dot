@@ -1,0 +1,63 @@
+digraph g {
+
+n000[shape=rect label="start\ntrailing pipe=no"]
+
+
+/* there must always be a first pipe, and it must be at column 1 */
+n000->n005[label="pipe"]
+n005[label="after pipe 005"]
+
+
+/* there must always be some content (an ID) for the first cel */
+n005->n007[label="*some* content"]
+n007[shape=rect label="emit first cel"]
+n007->n010
+n010[label="after content 010"]
+
+
+/* at this point you can be done */
+n010->n995[label="eos"]
+
+/* or maybe there's a pipe */
+
+n010->n015[label="pipe"]
+n015[shape=rect label="trailing pipe=yes"]
+
+
+n015->n020
+n020[label="after pipe 020"]
+
+
+/* after this pipe, you can be done */
+n020->n995[label="eos"]
+
+
+/* after this pipe, you can have another pipe */
+n020->n025[label="pipe"]
+n025[shape=rect label="emit empty cel"]
+n025->n020
+
+
+/* after a pipe, you could have content */
+
+n020->n030[label="content"]
+n030[shape=rect label="trailing pipe=no
+emit cel"]
+
+/* after content now is the same as after content before */
+n030->n010
+
+
+n995[shape=rect label="emit trailing pipe yes/no"]
+n995->n999
+n999[label="done"]
+
+
+label="\nfig 873. how we hackishly parse markdown table lines,
+determining whether a trailing pipe is considered decorative.
+NOTE this should be replaced with a proper markdown parser.
+"
+}
+/*
+#born.
+*/

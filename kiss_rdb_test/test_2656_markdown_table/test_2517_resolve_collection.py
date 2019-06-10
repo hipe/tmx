@@ -30,6 +30,7 @@ class _CommonCase(unittest.TestCase):
                 'channel': chan,
                 'payloader_CAUTION_HOT': lambda: sct,
                 }
+        # eventually #open [#867.J] re-redund this
 
     def resolve_collection(self, listener):
         from kiss_rdb.storage_adapters_ import markdown_table as lib
@@ -69,7 +70,7 @@ class Case2513_file_has_no_table(_CommonCase):
 
     def test_200_emitted_accordingly(self):
         canon.case_of_collection_not_found.confirm_emitted_accordingly(self)
-        reason = self.end_state()['payloader_CAUTION_HOT']()['reason']
+        reason = reason_from(self.end_state())
         self.assertIn(': no markdown table found in 7 lines - ', reason)
 
     @shared_subject
@@ -87,7 +88,7 @@ class Case2516_file_has_multiple_tables(_CommonCase):
 
     def test_200_emitted_accordingly(self):
         canon.case_of_collection_not_found.confirm_emitted_accordingly(self)
-        reason = self.end_state()['payloader_CAUTION_HOT']()['reason']
+        reason = reason_from(self.end_state())
         needle = ': found 3 markdown tables, for now can only have one - '
         self.assertIn(needle, reason)
 
@@ -156,6 +157,9 @@ class Case2522_non_empty_collection_found(_CommonCase):
             |---|---|---
             |
             """)
+
+
+reason_from = canon.reason_from
 
 
 def my_fixture_directory_path(tail):  # ..

@@ -17,8 +17,7 @@ import unittest
 canon = storage_adapter_canon.produce_agent()
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+_CommonCase = unittest.TestCase
 
 
 class Case2535_traverse_whole_collection_as_IDs(_CommonCase):
